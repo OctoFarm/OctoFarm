@@ -1,0 +1,95 @@
+/*MAIN OVERRIDES*/
+html {
+  height: 100%;
+}
+
+body {
+  background-color: black;
+  background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
+    url("../images/bg.jpg");
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  background-position: center;
+  color: grey;
+}
+hr {
+  border-color: inherit;
+  margin-top: 4px;
+  margin-bottom: 4px;
+}
+li {
+  padding: 3px !important;
+}
+.row {
+  margin-left: 0px;
+  margin-right: 0px;
+}
+.largeWidth {
+  margin: 0 auto;
+  max-width: 700px;
+}
+/*Scroll Bar*/
+::-webkit-scrollbar {
+  width: 10px;
+}
+/* Track */
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #888;
+}
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+/* Disable a links */
+a.notyet {
+  pointer-events: none;
+  color: grey !important;
+}
+/* CUSTOM CLASSES */
+/* Dashboard */
+[class*="col-"] {
+  padding-top: 4px;
+  padding-right: 4px;
+  padding-left: 4px;
+  padding-bottom: 4px;
+}
+
+#dashboard {
+  min-height: 90vh;
+  height: 90vh;
+  max-height: 90vh;
+}
+.dashHeader {
+  padding: 5px;
+}
+
+.dashBody {
+  padding: 5px;
+  overflow-y: scroll;
+  min-height: 82vh;
+  max-height: 82vh;
+}
+
+.dashBody p {
+  margin-bottom: 0px !important;
+}
+
+.dashFooter {
+  padding: 5px;
+  position: bottom;
+}
+
+/* json printer import */
+.fileElem {
+  display: none;
+  padding-left: 5px;
+  padding-right: 5px;
+}

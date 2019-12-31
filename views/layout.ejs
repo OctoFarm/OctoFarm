@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <link rel="stylesheet" href="/css/font-awesome.css" />
+    <link rel="stylesheet" href="/css/bootstrap-v4.css" />
+    <link rel="stylesheet" href="/css/slate.css" />
+    <link rel="stylesheet" href="/css/octofarm.css" />
+    <link rel="stylesheet" href="/css/noty.css">
+    <script type="text/javascript" src="/js/vendor/jquery-3.4.1.min.js"></script>
+    <title>OctoFarm</title>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <a class="navbar-brand notyet" href="#">
+            <center>OctoFarm</center>
+        </a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item active">
+                <li id="menuDashboard">
+                    <a class="nav-link" href="/dashboard" class="disable">
+                        <center><i class="fas fa-tachometer-alt"></i> Dashboard</center>
+                    </a>
+                </li>
+                </li>
+                <ul id="monitoringMenu" class="nav navbar-nav navbar-right">
+                    <li class="nav-item dropdown">
+                        <a class="nav-link notyet" href="#" id="menuMonitoring" role="button" data-toggle="dropdown"
+                            aria-haspopup="true" aria-expanded="false">
+                            <center><i class="fas fa-eye"></i> Monitoring</center>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                            <center>
+                                <a class="dropdown-item" id="menuPanelView" href="#"><i class="fas fa-columns"></i>
+                                    Panel View</a>
+                                <a class="dropdown-item" id="menuListView" href="#"><i class="fas fa-list"></i> List
+                                    View</a>
+                                <a class="dropdown-item" id="menuCameraView" href="#"><i class="fas fa-video"></i>
+                                    Camera View</a></center>
+                        </div>
+                    </li>
+                </ul>
+                <li class="nav-item">
+                    <a class="nav-link notyet" href="#" data-toggle="modal" role="button"
+                        data-target="#fileManagerModal" id="fileManagerBtn">
+                        <center><i class="fas fa-folder-open"></i> File Manager</center>
+                    </a>
+                </li>
+                </li>
+                <!--<li class="nav-item">
+                    <a class="nav-link notyet" data-toggle="collapse" id="farmStatusBtn" href="#dashPanelCollapse" role="button" aria-expanded="false" aria-controls="dashPanelCollapse">
+                        <center><i class="fas fa-mail-bulk"></i> Bulk Actions</center>
+                    </a>
+                </li>-->
+                <li class="nav-item">
+                    <a class="nav-link notyet" data-toggle="collapse" id="farmStatusBtn" href="#dashPanelCollapse"
+                        role="button" aria-expanded="false" aria-controls="dashPanelCollapse">
+                        <center><i class="fas fa-info"></i> Overview</center>
+                    </a>
+                </li>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li class="nav-item dropdown">
+                    <% if(typeof name != 'undefined'){ %>
+                         <a class="nav-link" href="#" id="systemDropDown" role="button" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                    <% }else{%>
+                        <a class="nav-link notyet" href="#" id="systemDropDown" role="button" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">
+                        <% } %>
+                        <center><i class="fas fa-cogs"></i> System</center>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-right bg-dark text-light" aria-labelledby="systemDropDown">
+                        <% if(typeof name != 'undefined'){ %>
+                            <h6 class="dropdown-header">Account</h6>  
+                            <a class="dropdown-item text-center  text-light" href="#"><i class="far fa-user"></i> <%= name %></a>
+                            <a class="dropdown-item text-center  text-light" href="/users/logout"><i class="fas fa-sign-out-alt"></i>Sign Out</a>
+                        <% }%>
+                       
+                        <h6 class="dropdown-header">Settings</h6>
+                        <a class="dropdown-item  text-center text-light" href="#" data-toggle="modal"
+                            data-target="#printerSetupModal" id="printerSetup"><i class="fas fa-print"></i> Printers</a>
+                            <a class="dropdown-item  text-center  text-light" href="#" data-toggle="modal"
+                            data-target="#systemSettingsModal" id="setSystemSettingsBtn"><i class="fas fa-cog"></i>
+                            Client</a>
+                            <a class="dropdown-item  text-center  text-light" href="#" data-toggle="modal"
+                            data-target="#systemSettingsModal" id="setSystemSettingsBtn"><i class="fas fa-server"></i>
+                            Server</a>
+
+                            <h6 class="dropdown-header">Help</h6> 
+                            <a class="dropdown-item text-center  text-light" href="#" data-toggle="modal"
+                            data-target="#aboutOctoFarm" id="aBoutModalBtn"><i class="fas fa-info-circle"></i> About</a>
+                        <% if(typeof version != 'undefined'){ %>
+                            <a class="dropdown-item text-center text-light"
+                            href="https://git.notexpectedyet.com/NotExpectedYet/OctoFarm/wiki/Changelog"
+                            target="_blank"><i class="fas fa-code-branch"></i> Version: <%= version %></a>
+                        <% }%>
+
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div>
+        <%- body %>
+
+
+
+
+
+        <div class="modal fade" id="printerSetupModal" tabindex="0" role="dialog" aria-labelledby="printerSetupLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="systemSettingsLabel">Printer Management</h3>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span class="text-white" aria-hidden="true">&times;</span>
+                </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-12 col-sm-12 col-md-12 col-lg-2 col-xl-2">
+                                    <div class="list-group" id="list-tab" role="tablist">
+                                        <a class="list-group-item list-group-item-action active" id="system-settings-list" data-toggle="list" href="#printer-add-edit" role="tab" aria-controls="home"><i class="fas fa-plus"></i> Add/Delete</a>
+                                        <a class="list-group-item list-group-item-action" id="system-dashboard-list" data-toggle="list" href="#printer-import-export" role="tab" aria-controls="profile"><i class="fas fa-file-import"></i> Import/Export</a>
+                                        <a class="list-group-item list-group-item-action" id="system-panel-view-list" data-toggle="list" href="#printer-remove-all" role="tab" aria-controls="messages"><i class="fas fa-trash-alt"></i> Remove All</a>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-12 col-md-12 col-lg-10 col-xl-10">
+                                    <div class="tab-content" id="nav-tabContent">
+                                        <div class="tab-pane fade show active" id="printer-add-edit" role="tabpanel" aria-labelledby="system-settings-list">
+                                            <h5>Add/Delete Printers</h5>
+                                            <hr>
+                                            <p>Please use the form below to add your printers to OctoFarm. Once added click the Save button to add them to the database.</p><p> If you have any connection issues please make sure CORS is activated on Octoprint's API settings page.</p>
+                                            <p>NOTE: If you would like to use your OctoPrint camera URL, leave it blank here and it will attempt to pull from Octoprint.</p>
+                                            <div id="message"></div>
+                                            <form>
+                                                <div class="input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text" id="">IP: </span>
+                                                    </div>
+                                                    <input type="text" class="form-control" placeholder="192.168.1.5" id="printerIP">
+                                                </div>
+                                                <div class="input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text" id="">Port: </span>
+                                                    </div>
+                                                    <input type="text" class="form-control" placeholder="5001" id="printerPort">
+                                                </div>
+                                                <div class="input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text" id="basic-addon3">Camera URL: </span>
+                                                    </div>
+                                                    <input type="text" class="form-control" placeholder="192.168.1.5:8081/webcam/?action=stream" id="printerCamURL">
+                                                </div>
+                                                <div class="input-group mb-3">
+                                                    <div class="input-group-prepend">
+                                                        <span class="input-group-text" id="basic-addon3">ApiKey</span>
+                                                    </div>
+                                                    <input type="text" class="form-control" placeholder="OctoPrints API Key" id="printerApiKey">
+                                                </div>
+                                                <button id="addPrinterLine" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Add Printer</button>
+                                                <button id="editPrinters" class="btn btn-info btn-block d-none"><i class="fas fa-edit"></i> Edit Printers</button>
+
+
+                                               
+                                            </form>
+                                            <hr>
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th scope="col" width="150px">IP Address</th>
+                                                        <th scope="col" width="100px">Port Number</th>
+                                                        <th scope="col">Camera URL</th>
+                                                        <th scope="col" width="200px">API Key</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody id="addPrintersTable">
+                                                  
+                                                    <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
+                                                        <%- include('./partials/Printers/printerTable.ejs') %>
+                                                    <% } %>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                <div
+                  class="tab-pane fade"
+                  id="printer-import-export"
+                  role="tabpanel"
+                  aria-labelledby="system-dashboard-list"
+                >
+                  <h5>Import Printer List</h5>
+                  <hr>
+                  <p>
+                    Please use the select button below to import a
+                    pre-configured file containing your printers list. (This
+                    will completely replace your printers list).
+                  </p>
+                  <p>
+                    You can download an example import file here:
+                    <a
+                      class="text-info"
+                      href="printers.json"
+                      download
+                      target="_blank"
+                      >Import Example</a
+                    >
+                  </p>
+                  <form id="uploadFileModalContentForm" class="text-center">
+                    <p>Use the Select button to upload your file.</p>
+                    <input
+                      class="fileElem"
+                      type="file"
+                      id="importFileBtn"
+                      accept=".json"
+                    /><label
+                      class="btn btn-lg btn-primary btn-block"
+                      for="importFileBtn"
+                      >Select</label
+                    >
+                  </form>
+                  <br />
+                  <h5>Export Printer List</h5>
+                  <hr />
+                  <p>
+                    Click the button below to export a full list of your
+                    printers saved in OctoFarm.
+                  </p>
+                  <center>
+                    <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
+                        <button
+                        id="exportPrintersBtn"
+                        type="button"
+                        class="btn btn-lg btn-primary btn-lg btn-block"
+                        
+                      >
+                        Export Printers Database</button
+                      ><br />
+                    <% }else{ %>
+                        <button
+                        id="exportPrintersBtn"
+                        type="button"
+                        class="btn btn-lg btn-primary btn-lg btn-block"
+                        disabled
+                      >
+                        Export Printers Database</button
+                      ><br />
+                    <% } %>
+                   
+                  </center>
+                </div>
+                <div
+                  class="tab-pane fade"
+                  id="printer-remove-all"
+                  role="tabpanel"
+                  aria-labelledby="system-panel-view-list"
+                >
+                  <h5>Remove All Printers</h5>
+                  <hr>
+                  <p>
+                    This will remove all of your printers, it is unreversable so
+                    if you'd like to keep a backup of your printer list please
+                    use the Import/Export settings.
+                  </p>
+                  <p>Press save to complete the printer wipe.</p>
+                  <p>
+                    You have <span id="printerAmmount"><% if(typeof printerCount != 'undefined'){ %>
+                        <%= printerCount %>
+                    <% } else {%>
+                        0
+                        <% } %>
+                </span> stored in
+                    the database.
+                  </p>
+                  <center>
+                    <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
+                        <button
+                        id="deletePrintersBtn"
+                        type="button"
+                        class="btn btn-danger btn-lg btn-block"
+                        
+                      >
+                        Delete Printers Database</button
+                      ><br />
+                    <% }else{ %>
+                        <button
+                        id="deletePrintersBtn"
+                        type="button"
+                        class="btn btn-danger btn-lg btn-block"
+                        disabled
+                      >
+                        Delete Printers Database</button
+                      ><br />
+                    <% } %>
+
+                  </center>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button id="printerSaveBtn" type="button" class="btn btn-success" data-dismiss="modal">
+          Save
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+</div>
+    <script src="/js/vendor/bootstrap.bundle.js"></script>
+    <script src="/js/vendor/lodash.min.js"></script>
+    <script src="/js/vendor/bootbox.min.js"></script>
+    <script src="/js/vendor/noty.js"></script>
+    <script src="/js/printerManagement.js" type="module"></script>
+</body>
+
+</html>

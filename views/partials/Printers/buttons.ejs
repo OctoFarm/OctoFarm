@@ -1,0 +1,51 @@
+<% if(printer.stateColour.category === "Closed"){ %>
+<button type="button" class="btn btn-info">
+  <i class="fas fa-print"></i>
+</button>
+<button type="button" class="btn btn-info" disabled>
+  <i class="fas fa-gamepad"></i>
+</button>
+<button type="button" class="btn btn-info">
+  <i class="fas fa-plug"></i>
+</button>
+<button type="button" class="btn btn-info">
+  <i class="fas fa-pen"></i>
+</button>
+<button type="button" class="btn btn-info">
+  <i class="fas fa-cog"></i>
+</button>
+<% }else if(printer.current.state === "Offline"){ %>
+<button type="button" class="btn btn-info" disabled>
+  <i class="fas fa-print"></i>
+</button>
+<button type="button" class="btn btn-info" disabled>
+  <i class="fas fa-gamepad"></i>
+</button>
+<button type="button" class="btn btn-info" disabled>
+  <i class="fas fa-plug"></i>
+</button>
+<button type="button" class="btn btn-info" disabled>
+  <i class="fas fa-pen"></i>
+</button>
+<button type="button" class="btn btn-info" disabled>
+  <i class="fas fa-cog"></i>
+</button>
+<%}else{ %>
+
+<button type="button" class="btn btn-info">
+  <i class="fas fa-print"></i>
+</button>
+<button type="button" class="btn btn-info">
+  <i class="fas fa-gamepad"></i>
+</button>
+<button type="button" class="btn btn-info">
+  <i class="fas fa-plug"></i>
+</button>
+<button type="button" class="btn btn-info">
+  <i class="fas fa-pen"></i>
+</button>
+<button type="button" class="btn btn-info">
+  <i class="fas fa-cog"></i>
+</button>
+
+<%} %>

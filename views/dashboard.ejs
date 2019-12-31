@@ -1,0 +1,126 @@
+<% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
+<div id="dashboard" class="row">
+  <div
+    id="dashboardPrinters"
+    class="cell col-12 col-sm-12 col-md-6 col-lg-4 col-xl-3"
+  >
+    <div class="card text-white bg-dark">
+      <div class="card-header dashHeader">
+        <h5 class="float-left">
+          <button
+            type="button"
+            class="btn btn-secondary float-right d-block"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            <i class="fas fa-print"></i> Printers
+          </button>
+        </h5>
+        <button
+          type="button"
+          class="btn btn-secondary float-right d-block"
+          href="#"
+          aria-expanded="false"
+          disabled
+        >
+          <%= printerCount %>
+        </button>
+        <button
+          id="searchOfflineBtn"
+          type="button"
+          class="btn btn-success float-right d-block mr-1"
+          href="#"
+          aria-expanded="false"
+        >
+          <i class="fas fa-redo"></i>
+        </button>
+      </div>
+      <div class="card-body dashBody">
+        <%- include('./partials/Printers/dashboardList.ejs') %>
+      </div>
+      <div class="card-footer dashFooter text-muted"></div>
+    </div>
+  </div>
+
+  <div class="cell col-12 col-sm-12 col-md-6 col-lg-8 col-xl-9">
+
+    <div class="card text-white bg-dark">
+      <div class="card-header dashHeader">
+        <h5 class="float-left">
+          <button
+            type="button"
+            class="btn btn-secondary float-right d-block"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+          <i class="fas fa-running"></i> Current Operations
+          </button>
+        </h5>
+          <button
+        type="button"
+        class="btn btn-danger float-right d-block"
+        href="#"
+        aria-expanded="false"
+        disabled
+      >
+        <%= offlineCount %>
+      </button>
+      <button
+      type="button"
+      class="btn btn-warning float-right d-block ml-1 mr-1"
+      href="#"
+      aria-expanded="false"
+      disabled
+    >
+      <%= idleCount %>
+    </button>
+    <button
+          type="button"
+          class="btn btn-success float-right d-block"
+          href="#"
+          aria-expanded="false"
+          disabled
+        >
+          <%= activeCount %>
+        </button>
+      </div>
+      <div class="card-body dashBody">
+        <div class="list-group">
+        <div class="row"><%- include('./partials/Printers/dashboardCA.ejs') %></div>
+      </div>
+      </div>
+      <div class="card-footer dashFooter text-muted"></div>
+    </div>
+  </div>
+
+  </div>
+</div>
+
+<% }else{ %>
+<div class="row mt-5">
+  <div class="col-md-6 m-auto">
+    <div class="card card-body text-center">
+      <h1>Welcome to OctoFarm</h1>
+      <p>
+        The all in one monitoring solution for multiple Octoprint instances.
+      </p>
+      <h1><img src="images/logo.png" /></h1>
+      <p>
+        Thank you for creating an account <% if(typeof name != 'undefined'){ %>
+        <%= name %> <% }%>. To get started though, we need some printers in your
+        farm!
+      </p>
+      <a
+        href="/users/register"
+        class="btn btn-primary btn-block mb-2"
+        href="#"
+        data-toggle="modal"
+        data-target="#printerSetupModal"
+        >Setup Printers</a
+      >
+    </div>
+  </div>
+</div>
+<% } %>

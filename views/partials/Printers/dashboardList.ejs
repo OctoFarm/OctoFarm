@@ -1,0 +1,48 @@
+
+<% printers.forEach(printer => { %> <% if(printer.inited === false){ %>
+<!-- Searching -->
+<div class="list-group">
+  <li class="list-group-item list-group-item-action flex-column align-items-start">
+    <div class="d-flex w-100 justify-content-between text-light">
+      <h5 class="mb-1">       <%= printer.index %>. <% if(typeof printer.settingsApperance != 'undefined'){ %>
+        <%= printer.settingsApperance.name %> <% }else{ %>
+          <%= printer.action %>
+        <% } %></span
+        ></h5>
+      <small><span
+        class="badge badge-<%= printer.stateColour.name %> badge-pill"
+        ><%= printer.current.state %></small></span>
+    </div>
+      <div
+      class="float-right btn-group flex-wrap btn-group-sm"
+      role="group"
+      aria-label="Basic example"
+    >
+    <%- include('buttons.ejs', {printer: printer}) %>
+    </div>
+    <small class="pt-2 float-left"><%= printer.ip%>:<%= printer.port%></small>
+  </li>
+</div>
+<% }else{ %>
+<!-- Connected -->
+<div class="list-group">
+  <li class="list-group-item list-group-item-action flex-column align-items-start">
+    <div class="d-flex w-100 justify-content-between text-light">
+      <h5 class="mb-1">        <%= printer.index %>. <% if(typeof printer.settingsApperance != 'undefined'){ %>
+        <%= printer.settingsApperance.name %> <% } %></span
+        ></h5>
+      <small><span
+        class="badge badge-<%= printer.stateColour.name %> badge-pill"
+        ><%= printer.current.state %></small></span>
+    </div>
+      <div
+      class="float-right btn-group flex-wrap btn-group-sm"
+      role="group"
+      aria-label="Basic example"
+    >
+    <%- include('buttons.ejs', {printer: printer}) %>
+    </div>
+    <small class="pt-2 float-left"><%= printer.ip%>:<%= printer.port%></small>
+  </li>
+</div>
+<% } %> <% }) %>
