@@ -74,8 +74,8 @@ a.notyet {
 .dashBody {
   padding: 5px;
   overflow-y: scroll;
-  min-height: 82vh;
-  max-height: 82vh;
+  min-height: 50vh;
+  max-height: 50vh;
 }
 
 .dashBody p {

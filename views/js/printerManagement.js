@@ -566,9 +566,16 @@ class PrintersManagement {
     //document.getElementById("editPrinters").classList.remove("d-none");
     document.getElementById("exportPrintersBtn").disabled = false;
     document.getElementById("deletePrintersBtn").disabled = false;
+    document.getElementById("menuMonitoring").classList.remove("notyet");
+    document.getElementById("fileManagerBtn").classList.remove("notyet");
+    document.getElementById("farmStatusBtn").classList.remove("notyet");
+    console.log(document.getElementById("farmStatusBtn"));
   }
   static deactivatePrinterManagement() {
     //document.getElementById("editPrinters").classList.add("d-none");
+    document.getElementById("menuMonitoring").classList.add("notyet");
+    document.getElementById("fileManagerBtn").classList.add("notyet");
+    document.getElementById("farmStatusBtn").classList.add("notyet");
     document.getElementById("exportPrintersBtn").disabled = true;
     document.getElementById("deletePrintersBtn").disabled = true;
   }

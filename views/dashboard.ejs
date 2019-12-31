@@ -1,5 +1,39 @@
 <% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
+
 <div id="dashboard" class="row">
+  <div
+    id="dashboardPrinters"
+    class="cell col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12"
+  >
+    <div class="card text-white bg-dark">
+      <div class="card-header dashHeader">
+        <h5 class="float-left">
+          <button
+            type="button"
+            class="btn btn-secondary float-right d-block"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+          <i class="fas fa-tractor"></i> Farm Information
+          </button>
+        </h5>
+        <button
+          type="button"
+          class="btn btn-secondary float-right d-block"
+          href="#"
+          aria-expanded="false"
+          disabled
+        >
+          Total Progress: 50%
+        </button>
+      </div>
+      <div class="card-body pt-2">
+        <%- include('./partials/Printers/dashboardFI.ejs') %>
+      </div>
+      <div class="card-footer dashFooter text-muted"></div>
+    </div>
+  </div>
   <div
     id="dashboardPrinters"
     class="cell col-12 col-sm-12 col-md-6 col-lg-4 col-xl-3"

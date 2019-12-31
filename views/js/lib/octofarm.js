@@ -1,11 +1,10 @@
 export default class OctoFarmclient {
-  static get(ip, port, apikey, item) {
-    let url = `http://${ip}:${port}/api/${item}`;
+  static get(item) {
+    let url = `/${item}`;
     return fetch(url, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": apikey
+        "Content-Type": "application/json"
       }
     });
   }

@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const Printers = require("../models/Printer.js");
+const { ensureAuthenticated } = require("../config/auth");
 // User Modal
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
@@ -11,7 +12,7 @@ router.get("/login", (req, res) => res.render("login"));
 router.get("/register", (req, res) => res.render("register")); */
 
 //Register Handle for Saving printers
-router.post("/save", (req, res) => {
+router.post("/save", ensureAuthenticated, (req, res) => {
   //Check required fields
   const printers = req.body;
 
@@ -28,13 +29,32 @@ router.post("/save", (req, res) => {
 
   res.send(printers);
 });
+//Register Handle for Saving printers
+router.get("/allBasic", ensureAuthenticated, (req, res) => {
+  //Check required fields
+  let basic = [];
+  Printers.find({}, async (err, printers) => {
+    for (let i = 0; i < printers.length; i++) {
+      re = {
+        ip: printers[i].ip,
+        port: printers[i].port,
+        camURL: printers[i].camURL,
+        apikey: printers[i].apikey
+      };
+      basic.push(re);
+    }
+    res.send({
+      printers: basic
+    });
+  });
+});
 //Register handle for initialising runners
-router.post("/runner/init", (req, res) => {
+router.post("/runner/init", ensureAuthenticated, (req, res) => {
   Runner.init();
   res.send("Initialised Printers");
 });
 //Register handle for checking for offline printers
-router.post("/runner/checkOffline", (req, res) => {
+router.post("/runner/checkOffline", ensureAuthenticated, (req, res) => {
   let checked = [];
   Printers.find({}, async (err, printers) => {
     for (let i = 0; i < printers.length; i++) {
