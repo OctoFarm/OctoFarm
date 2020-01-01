@@ -4,6 +4,7 @@ const { ensureAuthenticated } = require("../config/auth");
 const db = require("../config/db").MongoURI;
 const pjson = require("../package.json");
 const Printers = require("../models/Printer.js");
+const prettyHelpers = require("../views/partials/functions/pretty.js");
 
 console.log("db: " + db);
 
@@ -41,51 +42,61 @@ router.get("/dashboard", ensureAuthenticated, (req, res) => {
       printerCount: printers.length,
       activeCount: active.length,
       idleCount: idle.length,
-      offlineCount: offline.length
+      offlineCount: offline.length,
+      page: "dashboard",
+      helpers: prettyHelpers
     });
   });
 });
 //File Manager Page
 router.get("/filemanager", ensureAuthenticated, (req, res) => {
   Printers.find({}, (err, printers) => {
-    res.render("dashboard", {
+    res.render("filemanager", {
       name: req.user.name,
       version: pjson.version,
       printers: printers,
-      printerCount: printers.length
+      printerCount: printers.length,
+      page: "filemanager",
+      helpers: prettyHelpers
     });
   });
 });
 //Panel view  Page
 router.get("/mon/panel", ensureAuthenticated, (req, res) => {
   Printers.find({}, (err, printers) => {
-    res.render("dashboard", {
+    res.render("panelView", {
       name: req.user.name,
       version: pjson.version,
       printers: printers,
-      printerCount: printers.length
+      printerCount: printers.length,
+      page: "panelview",
+      helpers: prettyHelpers
     });
   });
 });
 //Camera view  Page
 router.get("/mon/camera", ensureAuthenticated, (req, res) => {
   Printers.find({}, (err, printers) => {
-    res.render("dashboard", {
+    res.render("listView", {
       name: req.user.name,
       version: pjson.version,
       printers: printers,
-      printerCount: printers.length
+      printerCount: printers.length,
+      page: "camera",
+      helpers: prettyHelpers
     });
   });
 });
 //List view  Page
 router.get("/mon/list", ensureAuthenticated, (req, res) => {
   Printers.find({}, (err, printers) => {
-    res.render("dashboard", {
+    res.render("cameraView", {
       name: req.user.name,
       version: pjson.version,
       printers: printers,
-      printerCount: printers.length
+      printerCount: printers.length,
+      page: "list",
+      helpers: prettyHelpers
     });
   });
 });

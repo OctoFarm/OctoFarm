@@ -1,0 +1,49 @@
+
+<% printers.forEach(printer => { %> <% if(printer.inited === false){ %>
+<!-- No need to show offline/none inited printers here. -->
+
+<% }else if(printer.current.state != "Offline"){ %>
+<!-- Connected -->
+<a
+  href="#"
+  class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
+  style="display: block;
+  padding: 0.7rem 0.1rem;"
+>
+  <div class="row">
+    <div
+      class="col-lg-2"
+      style="display:flex; justify-content:center; align-items:center;"
+    >
+      <center><i class="fas fa-print fa-2x"></i></center>
+    </div>
+    <div class="col-lg-10">
+        <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">        <%= printer.index %>. <% if(typeof printer.settingsApperance != 'undefined'){ %>
+              <%= printer.settingsApperance.name %> <% } %></span
+              ></h5>
+                  <small> <span
+              class="float-right badge badge-dark badge-pill"
+              >
+              <% if(typeof printer.fileList.fileCount != 'undefined'){ %>
+                  Files: <%= printer.fileList.fileCount %> / Folders: <%= printer.fileList.folderCount %>
+              <% }else{ %>
+                  Files: 0 / Folders: 0
+              <% } %>
+      </span></small>
+          </div>
+            <div
+            class="float-right btn-group flex-wrap btn-group-sm"
+            role="group"
+            aria-label="Basic example"
+          >
+          <% if(typeof printer.storage != 'undefined'){ %>
+              <p><%- helpers.generateBytes(printer.storage.free) %> / <%- helpers.generateBytes(printer.storage.total) %> </p>
+          <% } %>
+          </div>
+          <small class="pt-2 float-left"><%= printer.ip%>:<%= printer.port%></small>
+    </div>
+  </div>
+</a>
+
+<% } %> <% }) %>

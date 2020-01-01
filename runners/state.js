@@ -1,5 +1,6 @@
 const Printers = require("../models/Printer.js");
 const fetch = require("node-fetch");
+const _ = require("lodash");
 
 let onlineRunners = [];
 let offlineRunners = [];
@@ -18,6 +19,8 @@ class Runner {
                   Runner.getProfile(printer).then(printer => {
                     Runner.getSettings(printer).then(printer => {
                       Runner.getSystem(printer).then(printer => {
+                        printer.inited = true;
+                        printer.action = "Online Monitoring...";
                         printer.save();
                         Runner.setOnline(printer);
                       });
@@ -32,9 +35,19 @@ class Runner {
             Printers.find({ inited: false }, (err, printers) => {
               Runner.setOffline(printers[i]);
             });
+            console.error({
+              error: "RUNNER INIT: ",
+              printer: printers[i].ip + ":" + printers[i].port,
+              msg: err
+            });
           });
       }
-    }).catch(err => console.log("DB: ", err));
+    }).catch(err => {
+      console.error({
+        error: "DB GRAB: ",
+        msg: err
+      });
+    });
     //Check for printers already initiated...
     Printers.find({ inited: true }, (err, printers) => {
       console.log("init: " + printers.length);
@@ -44,6 +57,7 @@ class Runner {
             if (typeof check.message === "undefined") {
               Runner.getFiles(printers[i]).then(printer => {
                 Runner.getJob(printer).then(printer => {
+                  printer.action = "Online Monitoring...";
                   printer.save();
                   Runner.setOnline(printer);
                 });
@@ -55,9 +69,19 @@ class Runner {
             Printers.find({ inited: true }, (err, printers) => {
               Runner.setOffline(printers[i]);
             });
+            console.error({
+              error: "RUNNER RE-INIT: ",
+              printer: printers[i].ip + ":" + printers[i].port,
+              msg: err
+            });
           });
       }
-    }).catch(err => console.log("DB: ", err));
+    }).catch(err => {
+      console.error({
+        error: "DB GRAB: ",
+        msg: err
+      });
+    });
   }
   static stopAll() {
     onlineRunners.forEach(run => {
@@ -68,7 +92,7 @@ class Runner {
     });
   }
   static setOnline(printer) {
-    printer.inited = true;
+    console.log("Setting Online Check");
     //Make sure printer not offline
     clearInterval(offlineRunners[printer.index]);
     offlineRunners[printer.index] = false;
@@ -79,8 +103,10 @@ class Runner {
     onlineRunners[printer.index] = setInterval(function() {
       Runner.checkOnline(printer);
     }, 4000);
+    console.log("Set online check with: " + printer.ip + ":" + printer.port);
   }
   static setOffline(printer) {
+    console.log("Setting Offline Check");
     let current = {
       state: "Offline",
       port: "",
@@ -101,9 +127,9 @@ class Runner {
     offlineRunners[printer.index] = setInterval(function() {
       Runner.checkOffline(printer);
     }, 300000);
+    console.log("Set offline check with: " + printer.ip + ":" + printer.port);
   }
   static checkOnline(printer) {
-    console.log("On Check " + printer.index);
     Runner.getConnection(printer)
       .then(check => {
         if (
@@ -114,7 +140,6 @@ class Runner {
           Runner.getJob(printer).then(printer => {
             Runner.getPrinter(printer).then(printer => {
               printer.save();
-              Runner.setOnline(printer);
             });
           });
         }
@@ -127,7 +152,6 @@ class Runner {
       });
   }
   static async checkOffline(printer) {
-    console.log("Off Check " + printer.index);
     await Runner.getConnection(printer)
       .then(printer => {
         printer.save();
@@ -162,14 +186,79 @@ class Runner {
         return res.json();
       })
       .then(res => {
-        //Update info to db
-        printer.fileList = res.files;
+        //Setup storage object
+        printer.storage = {
+          free: res.free,
+          total: res.total
+        };
+        //Setup logcations object
+        let printerFiles = [];
+        let printerLocations = [];
+        let recursivelyPrintNames = function(entry, depth) {
+          depth = depth || 0;
+          let timeStat = "";
+          let isFolder = entry.type === "folder";
+          if (!isFolder) {
+            if (entry.gcodeAnalysis !== undefined) {
+              if (entry.gcodeAnalysis.estimatedPrintTime !== undefined) {
+                timeStat = entry.gcodeAnalysis.estimatedPrintTime;
+              } else {
+                timeStat = "No Time Estimate";
+              }
+            } else {
+              timeStat = "No Time Estimate";
+            }
+            let path = "";
+            if (entry.path.indexOf("/") > -1) {
+              path = entry.path.substr(0, entry.path.lastIndexOf("/"));
+            } else {
+              path = "local";
+            }
+            let file = {
+              path: entry.path,
+              display: entry.display,
+              name: entry.name,
+              size: entry.size,
+              time: timeStat
+            };
+            printerFiles.push(file);
+          }
+          let folderPaths = entry.path;
+          if (isFolder) {
+            if (entry.path.indexOf("/")) {
+              printerLocations.push(folderPaths);
+            } else {
+              folderPaths = entry.path.substr(0, entry.path.lastIndexOf("/"));
+              printerLocations.push(folderPaths);
+            }
+          }
+          printer.fileList = {
+            files: printerFiles,
+            fileCount: printerFiles.length,
+            folders: printerLocations,
+            folderCount: printerLocations.length
+          };
+
+          if (isFolder) {
+            _.each(entry.children, function(child) {
+              recursivelyPrintNames(child, depth + 1);
+            });
+          }
+        };
+        _.each(res.files, function(entry) {
+          recursivelyPrintNames(entry);
+        });
+
         printer.action = "Grabbing Files...";
-        printer.storage = { free: res.free, total: res.total };
+
         return printer;
       })
       .catch(err => {
-        console.log("FILES" + err);
+        console.error({
+          error: "FILES CHECK: ",
+          printer: printer.ip + ":" + printer.port,
+          msg: err
+        });
       });
   }
   static getJob(printer) {
@@ -185,7 +274,11 @@ class Runner {
         return printer;
       })
       .catch(err => {
-        console.log("JOB");
+        console.error({
+          error: "JOB CHECK: ",
+          printer: printer.ip + ":" + printer.port,
+          msg: err
+        });
       });
   }
   static getPrinter(printer) {
@@ -205,7 +298,11 @@ class Runner {
         return printer;
       })
       .catch(err => {
-        console.log("PRINTER");
+        console.error({
+          error: "PRINTER CHECK: ",
+          printer: printer.ip + ":" + printer.port,
+          msg: err
+        });
       });
   }
   static getProfile(printer) {
@@ -225,7 +322,11 @@ class Runner {
         return printer;
       })
       .catch(err => {
-        console.log("PROFILE");
+        console.error({
+          error: "PROFILE CHECK: ",
+          printer: printer.ip + ":" + printer.port,
+          msg: err
+        });
       });
   }
   static getSettings(printer) {
@@ -261,7 +362,11 @@ class Runner {
         return printer;
       })
       .catch(err => {
-        console.log("SETTINGS");
+        console.error({
+          error: "SETTINGS CHECK: ",
+          printer: printer.ip + ":" + printer.port,
+          msg: err
+        });
       });
   }
   static getSystem(printer) {
@@ -281,7 +386,11 @@ class Runner {
         return printer;
       })
       .catch(err => {
-        console.log("SYSTEM");
+        console.error({
+          error: "FILES CHECK: ",
+          printer: printer.ip + ":" + printer.port,
+          msg: err
+        });
       });
   }
   static get(ip, port, apikey, item) {
@@ -292,7 +401,13 @@ class Runner {
         "Content-Type": "application/json",
         "X-Api-Key": apikey
       }
-    }).catch(err => {});
+    }).catch(err => {
+      console.error({
+        error: "ACTUAL GET: ",
+        printer: printer.ip + ":" + printer.port,
+        msg: err
+      });
+    });
   }
 
   static getColour(state) {

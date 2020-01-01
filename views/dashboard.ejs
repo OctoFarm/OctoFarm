@@ -2,7 +2,7 @@
 
 <div id="dashboard" class="row">
   <div
-    id="dashboardPrinters"
+    id="dashboardInfo"
     class="cell col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12"
   >
     <div class="card text-white bg-dark">
@@ -10,22 +10,58 @@
         <h5 class="float-left">
           <button
             type="button"
-            class="btn btn-secondary float-right d-block"
+            class="btn btn-secondary float-right d-block ml-1 mr-1"
             href="#"
             aria-expanded="false"
             disabled
           >
-          <i class="fas fa-tractor"></i> Farm Information
+          <i class="fas fa-info-circle"></i> Farm Information
           </button>
         </h5>
         <button
           type="button"
-          class="btn btn-secondary float-right d-block"
+          class="btn btn-info float-right d-block ml-1 mr-1"
           href="#"
           aria-expanded="false"
           disabled
         >
           Total Progress: 50%
+        </button>
+        <button
+        type="button"
+        class="btn btn-danger float-right d-block ml-1 mr-1"
+        href="#"
+        aria-expanded="false"
+        disabled
+      >
+        Offline: <%= offlineCount %>
+      </button>
+      <button
+      type="button"
+      class="btn btn-dark float-right d-block ml-1 mr-1"
+      href="#"
+      aria-expanded="false"
+      disabled
+    >
+      Idle: <%= idleCount %>
+    </button>
+    <button
+    type="button"
+    class="btn btn-warning float-right d-block ml-1 mr-1"
+    href="#"
+    aria-expanded="false"
+    disabled
+  >
+   Active: <%= idleCount %>
+  </button>
+    <button
+          type="button"
+          class="btn btn-success float-right d-block ml-1 mr-1"
+          href="#"
+          aria-expanded="false"
+          disabled
+        >
+          Complete: <%= activeCount %>
         </button>
       </div>
       <div class="card-body pt-2">
@@ -89,36 +125,10 @@
             aria-expanded="false"
             disabled
           >
-          <i class="fas fa-running"></i> Current Operations
+          <i class="fas fa-fast-forward"></i> Current Operations
           </button>
         </h5>
-          <button
-        type="button"
-        class="btn btn-danger float-right d-block"
-        href="#"
-        aria-expanded="false"
-        disabled
-      >
-        <%= offlineCount %>
-      </button>
-      <button
-      type="button"
-      class="btn btn-warning float-right d-block ml-1 mr-1"
-      href="#"
-      aria-expanded="false"
-      disabled
-    >
-      <%= idleCount %>
-    </button>
-    <button
-          type="button"
-          class="btn btn-success float-right d-block"
-          href="#"
-          aria-expanded="false"
-          disabled
-        >
-          <%= activeCount %>
-        </button>
+ 
       </div>
       <div class="card-body dashBody">
         <div class="list-group">
@@ -147,7 +157,7 @@
         farm!
       </p>
       <a
-        href="/users/register"
+        href="#"
         class="btn btn-primary btn-block mb-2"
         href="#"
         data-toggle="modal"

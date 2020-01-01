@@ -86,9 +86,57 @@ a.notyet {
   padding: 5px;
   position: bottom;
 }
+#filemanager {
+  min-height: 90vh;
+  height: 90vh;
+  max-height: 90vh;
+}
+.fileHeader {
+  padding: 5px;
+}
 
+.fileBody {
+  padding: 5px;
+  overflow-y: scroll;
+  min-height: 83vh;
+  max-height: 83vh;
+}
+
+.fileBody p {
+  margin-bottom: 0px !important;
+}
+
+.fileFooter {
+  padding: 5px;
+  position: bottom;
+}
+.search-control:focus {
+  border-width: 0;
+  border-bottom-width: 1px;
+  border-color: rgb(36, 0, 104);
+  border-radius: 0;
+  padding-left: 0;
+  color: #999;
+  background-color: #444;
+  outline-width: 0;
+}
+.search-control-underlined {
+  border-width: 0;
+  border-bottom-width: 1px;
+  border-color: black;
+  border-radius: 0;
+  padding-left: 0;
+  color: #fff;
+  background-color: #444;
+}
 /* json printer import */
 .fileElem {
+  display: none;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+/*Hide the choose file*/
+#gcodeUpload {
   display: none;
   padding-left: 5px;
   padding-right: 5px;

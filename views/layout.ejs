@@ -49,19 +49,18 @@
 
                         <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
                             <center>
-                                <a class="dropdown-item" id="menuPanelView" href="#"><i class="fas fa-columns"></i>
+                                <a class="dropdown-item" id="menuPanelView" href="/mon/panel"><i class="fas fa-columns"></i>
                                     Panel View</a>
-                                <a class="dropdown-item" id="menuListView" href="#"><i class="fas fa-list"></i> List
+                                <a class="dropdown-item" id="menuListView" href="/mon/list"><i class="fas fa-list"></i> List
                                     View</a>
-                                <a class="dropdown-item" id="menuCameraView" href="#"><i class="fas fa-video"></i>
+                                <a class="dropdown-item" id="menuCameraView" href="/mon/camera"><i class="fas fa-video"></i>
                                     Camera View</a></center>
                         </div>
                     </li>
                 </ul>
                 <li class="nav-item">
                   <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
-                    <a class="nav-link" href="#" data-toggle="modal" role="button"
-                    data-target="#fileManagerModal" id="fileManagerBtn">
+                    <a class="nav-link" href="/filemanager" id="fileManagerBtn">
                     <center><i class="fas fa-folder-open"></i> File Manager</center>
                 </a>
 
@@ -345,8 +344,105 @@
       </div>
     </div>
   </div>
-</div>
+        </div>
+        <div class="modal fade" id="multiUploadModal" tabindex="0" role="dialog" aria-labelledby="multiUploadLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+          <div class="modal-dialog modal-xl" role="document">
+              <div class="modal-content">
+                  <div class="modal-header">
+                      <h3 class="modal-title" id="systemSettingsLabel">Multi-Upload</h3>
+                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span class="text-white" aria-hidden="true">&times;</span>
+              </button>
+                  </div>
+                  <div class="modal-body">
+                      <div class="container-fluid">
+                          <div class="row">
+                              <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12  text-center">
+                                <div class="btn-group" role="group" aria-label="Basic example">
+                                  <button class="btn btn-danger">1. Choose your printers..</button>
+                                  <button class="btn btn-warning" disabled>2. Choose your folder path..</button>
+                                  <button class="btn btn-success" disabled>3. Select your files..</button>
+                                  <button class="btn btn-info" disabled>4. Uploading..</button>
+                                </div>
 
+                              </div>
+                              <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                <div class="col-lg-12">
+                                  <p>Check the boxes below to select the printers you'd like to upload files too.</p>
+                                  <p><b>Note:</b> You must select at least 2 printers.</p>
+                                  <form class="was-validated form-check-inline form-check">
+                                    <div class="custom-control custom-checkbox mb-2 pr-2">
+                                      <input type="checkbox" class="custom-control-input" id="customControlValidation1" required>
+                                      <label class="custom-control-label" for="customControlValidation1">0. TEST NAME</label>
+                                      <div class="invalid-feedback">Not this printer</div>
+                                    </div>
+                                    </form>
+                                </div>
+                                <div class="col-lg-12">
+                                  <p>Please type the folder name you'd like to create on the selected printers.</p>
+                                  <p><b>Note:</b> Leaving blank will create the files in local</p>
+                                  <input id="newFolderName" class="form-control bg-dark text-light" type="text" placeholder="Please type your new folder name here..." aria-label="NewFolder">
+                                </div>
+                                <div class="col-lg-12">
+                                  <p>Please use the form below to select the files you'd like to complete this process with. </p>
+                                  <p><b>Note:</b> You can select a single file, or multiple.</p>
+                                  <div class="mb-3"><center><div id="drop-area"> <form class="my-form"> <p>Drag and Drop into the dashed region, or use the Select button to upload your file.</p><input type="file" id="gcodeUpload" multiple accept=".gcode,.gco,.g"><label class="btn btn-success" for="gcodeUpload">Select</label><br></form></div></div></center>
+                                </div>
+                                <div class="col-lg-12">
+                                  <p><b>Note:</b> Due to the network heavy nature of this function this modal is locked in place until complete.</p>
+                                  <div class="row">
+                                    <div class="col-lg-4">
+                                      <h5>Printer Progress</h5>
+                                      <button type="button" class="btn btn-secondary">0. TEST NAME<br>
+                                        <div class="progress">
+                                          <div class="progress-bar bg-ssecondary" progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                                        </div></button>
+                                        <button type="button" class="btn btn-primary">2. Bob<br>
+                                          <div class="progress">
+                                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
+                                          </div></button>
+                                          <button type="button" class="btn btn-primary">5. Anothjer Name<br>
+                                            <div class="progress">
+                                              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                                            </div></button>
+                                            <button type="button" class="btn btn-primary">6. <br>
+                                              <div class="progress">
+                                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                                              </div></button>
+                                    </div>
+                                    <div class="col-lg-8">
+                                      <h5>File Progress</h5>
+                                      <button type="button" class="btn btn-primary">Poppy-Something.gcode<br>
+                                        <div class="progress">
+                                          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 25%"></div>
+                                        </div></button>
+                                        <button type="button" class="btn btn-success">more something.gcode<br>
+                                          <div class="progress">
+                                            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+                                          </div></button>
+                                          <button type="button" class="btn btn-primary">a really long title for a bloody gcode file.gcode<br>
+                                            <div class="progress">
+                                              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100" style="width: 78%"></div>
+                                            </div></button>
+                                            <button type="button" class="btn btn-primary">another file of similar context.gcode<br>
+                                              <div class="progress">
+                                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                                              </div></button>
+
+                                    </div>
+                                  </div>
+                                </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-dark float-right">Next</button><button type="button" class="btn btn-dark float-left">Previous</button><button type="button" class="btn btn-dark float-left">Close</button>
+    </div>
+  </div>
+</div>
+      </div>
 
 
 

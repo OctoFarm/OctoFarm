@@ -1,0 +1,171 @@
+<% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
+
+<div id="filemanager" class="row">
+  <div id="filePrinters" class="col-12 col-sm-12 col-md-4 col-lg-3 col-xl-3">
+    <div class="card text-white bg-dark">
+      <div class="card-header fileHeader">
+        <h5 class="float-left">
+          <button
+            type="button"
+            class="btn btn-secondary float-right d-block"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            <i class="fas fa-print"></i> Printers
+          </button>
+        </h5>
+        <button
+          type="button"
+          class="btn btn-secondary float-right d-block"
+          href="#"
+          aria-expanded="false"
+          disabled
+        >
+          <%= printerCount %>
+        </button>
+      </div>
+      <div class="card-body fileBody">
+        <center>
+          <button
+            type="button"
+            class="btn btn-info m-3"
+            data-toggle="modal"
+            data-target="#multiUploadModal"
+          >
+            <i class="fas fa-layer-group"></i> Multi-Upload
+          </button>
+        </center>
+        <div class="list-group">
+          <%- include('./partials/FileManager/printerList.ejs') %>
+        </div>
+      </div>
+      <div class="card-footer fileFooter text-muted"></div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+    <div class="card text-white bg-dark">
+      <div class="card-header fileHeader">
+        <h5 class="float-left">
+          <button
+            type="button"
+            class="btn btn-secondary float-right d-block"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            <i class="fas fa-folder"></i> Folders
+          </button>
+        </h5>
+      </div>
+      <div class="card-body fileBody">
+        <center>
+          <button
+            type="button"
+            class="btn btn-warning m-3"
+            data-toggle="collapse"
+            href="#createFolder"
+            role="button"
+            aria-expanded="false"
+            aria-controls="createFolder"
+          >
+            <i class="fas fa-folder-plus"></i> Create Folder
+          </button>
+          <div class="collapse" id="createFolder">
+            <div class="card card-body">Creating Folder INN</div>
+          </div>
+        </center>
+        <div class="list-group">
+          <%- include('./partials/FileManager/folderList.ejs') %>
+        </div>
+      </div>
+      <div class="card-footer fileFooter text-muted"></div>
+    </div>
+  </div>
+  <div class="col-12 col-sm-12 col-md-5 col-lg-6 col-xl-6">
+    <div class="card text-white bg-dark">
+      <div class="card-header fileHeader">
+        <h5 class="float-left">
+          <button
+            type="button"
+            class="btn btn-secondary float-right d-block"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            <i class="fas fa-file-code"></i> Files
+          </button>
+        </h5>
+        <div class="form-group mt-2 float-right">
+          <form class="form-inline">
+            <div class="form-group">
+              <label for="inputPassword6">
+                <i class="fas fa-search pr-1"></i>
+              </label>
+              <input
+                id="searchFiles"
+                type="text"
+                placeholder="File Search..."
+                class="search-control search-control-underlined"
+              />
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="card-body fileBody">
+        <center>
+          <button
+            type="button"
+            class="btn btn-success m-3"
+            data-toggle="collapse"
+            href="#fileUpload"
+            role="button"
+            aria-expanded="false"
+            aria-controls="fileUpload"
+          >
+            <i class="fas fa-file-import"></i> Upload File(s)
+          </button>
+          <div class="collapse" id="fileUpload">
+            <div class="card card-body">
+              Anim pariatur cliche reprehenderit, enim eiusmod high life
+              accusamus terry richardson ad squid. Nihil anim keffiyeh
+              helvetica, craft beer labore wes anderson cred nesciunt sapiente
+              ea proident.
+            </div>
+          </div>
+        </center>
+        <div class="list-group">
+          <%- include('./partials/FileManager/fileList.ejs') %>
+        </div>
+      </div>
+      <div class="card-footer fileFooter text-muted"></div>
+    </div>
+  </div>
+</div>
+
+<% }else{ %>
+<div class="row mt-5">
+  <div class="col-md-6 m-auto">
+    <div class="card card-body text-center">
+      <h1>Welcome to OctoFarm</h1>
+      <p>
+        The all in one monitoring solution for multiple Octoprint instances.
+      </p>
+      <h1><img src="images/logo.png" /></h1>
+      <p>
+        Thank you for creating an account <% if(typeof name != 'undefined'){ %>
+        <%= name %> <% }%>. To get started though, we need some printers in your
+        farm!
+      </p>
+      <a
+        href="#"
+        class="btn btn-primary btn-block mb-2"
+        href="#"
+        data-toggle="modal"
+        data-target="#printerSetupModal"
+        >Setup Printers</a
+      >
+    </div>
+  </div>
+</div>
+<% } %>
