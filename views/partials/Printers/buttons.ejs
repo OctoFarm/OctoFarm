@@ -1,50 +1,131 @@
 <% if(printer.stateColour.category === "Closed"){ %>
-<button type="button" class="btn btn-dark">
+<button
+  type="button"
+  class="btn btn-dark"
+  data-toggle="modal"
+  data-target="#printerManagerModal"
+>
   <i class="fas fa-print"></i>
 </button>
-<button type="button" class="btn btn-dark" disabled>
+<button
+  type="button"
+  class="btn btn-dark"
+  disabled
+  data-toggle="modal"
+  data-target="#printerManagerModal"
+>
   <i class="fas fa-gamepad"></i>
 </button>
-<button type="button" class="btn btn-dark">
+<button
+  type="button"
+  class="btn btn-dark"
+  data-toggle="modal"
+  data-target="#printerManagerModal"
+>
   <i class="fas fa-plug"></i>
 </button>
-<button type="button" class="btn btn-dark">
+<button
+  type="button"
+  class="btn btn-dark"
+  data-toggle="modal"
+  data-target="#printerManagerModal"
+>
   <i class="fas fa-pen"></i>
 </button>
-<button type="button" class="btn btn-dark">
+<button
+  type="button"
+  class="btn btn-dark"
+  data-toggle="modal"
+  data-target="#printerManagerModal"
+>
   <i class="fas fa-cog"></i>
 </button>
 <% }else if(printer.current.state === "Offline"){ %>
-<button type="button" class="btn btn-dark" disabled>
+<button
+  type="button"
+  class="btn btn-dark"
+  data-toggle="modal"
+  data-target="#printerManagerModal"
+  disabled
+>
   <i class="fas fa-print"></i>
 </button>
-<button type="button" class="btn btn-dark" disabled>
+<button
+  type="button"
+  class="btn btn-dark"
+  data-toggle="modal"
+  data-target="#printerManagerModal"
+  disabled
+>
   <i class="fas fa-gamepad"></i>
 </button>
-<button type="button" class="btn btn-dark" disabled>
+<button
+  type="button"
+  class="btn btn-dark"
+  data-toggle="modal"
+  data-target="#printerManagerModal"
+  disabled
+>
   <i class="fas fa-plug"></i>
 </button>
-<button type="button" class="btn btn-dark" disabled>
+<button
+  type="button"
+  class="btn btn-dark"
+  data-toggle="modal"
+  data-target="#printerManagerModal"
+  disabled
+>
   <i class="fas fa-pen"></i>
 </button>
-<button type="button" class="btn btn-dark" disabled>
+<button
+  type="button"
+  class="btn btn-dark"
+  data-toggle="modal"
+  data-target="#printerManagerModal"
+  disabled
+>
   <i class="fas fa-cog"></i>
 </button>
 <%}else{ %>
 
-<button type="button" class="btn btn-dark">
+<button
+  data-toggle="modal"
+  data-target="#printerManagerModal"
+  type="button"
+  class="btn btn-dark"
+>
   <i class="fas fa-print"></i>
 </button>
-<button type="button" class="btn btn-dark">
+<button
+  type="button"
+  class="btn btn-dark"
+  data-toggle="modal"
+  data-target="#printerManagerModal"
+>
   <i class="fas fa-gamepad"></i>
 </button>
-<button type="button" class="btn btn-dark">
+<button
+  type="button"
+  class="btn btn-dark"
+  data-toggle="modal"
+  data-target="#printerManagerModal"
+>
   <i class="fas fa-plug"></i>
 </button>
-<button type="button" class="btn btn-dark">
+<button
+  type="button"
+  class="btn btn-dark"
+  data-toggle="modal"
+  data-target="#printerManagerModal"
+>
   <i class="fas fa-pen"></i>
 </button>
-<button type="button" class="btn btn-dark">
+<button
+  type="button"
+  class="btn btn-dark"
+  data-toggle="modal"
+  data-target="#printerManagerModal"
+>
   <i class="fas fa-cog"></i>
 </button>
 

@@ -7,11 +7,11 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <link rel="stylesheet" href="/css/font-awesome.css" />
     <link rel="stylesheet" href="/css/bootstrap-v4.css" />
-    <link rel="stylesheet" href="/css/slate.css" />
+    <link rel="stylesheet" href="/css/themes/slate.css" />
     <link rel="stylesheet" href="/css/octofarm.css" />
     <link rel="stylesheet" href="/css/noty.css">
     <script type="text/javascript" src="/js/vendor/jquery-3.4.1.min.js"></script>
-    <title>OctoFarm</title>
+    <title>OctoFarm: <%= page %></title>
 </head>
 
 <body>
@@ -41,43 +41,59 @@
                         <center><i class="fas fa-eye"></i> Monitoring</center>
                     </a>
                     <% }else { %>
-                      <a class="nav-link notyet" href="#" id="menuMonitoring" role="button" data-toggle="dropdown"
+                      <a class="nav-link notyet " href="#" id="menuMonitoring" role="button" data-toggle="dropdown"
                       aria-haspopup="true" aria-expanded="false">
                       <center><i class="fas fa-eye"></i> Monitoring</center>
                   </a>
                 <%    } %>
 
-                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdown">
+                        <div class="dropdown-menu dropdown-menu-right bg-dark text-light" aria-labelledby="navbarDropdown">
                             <center>
-                                <a class="dropdown-item" id="menuPanelView" href="/mon/panel"><i class="fas fa-columns"></i>
+                                <a class="dropdown-item  text-light" id="menuPanelView" href="/mon/panel"><i class="fas fa-columns"></i>
                                     Panel View</a>
-                                <a class="dropdown-item" id="menuListView" href="/mon/list"><i class="fas fa-list"></i> List
+                                <a class="dropdown-item  text-light" id="menuListView" href="/mon/list"><i class="fas fa-list"></i> List
                                     View</a>
-                                <a class="dropdown-item" id="menuCameraView" href="/mon/camera"><i class="fas fa-video"></i>
+                                <a class="dropdown-item  text-light" id="menuCameraView" href="/mon/camera"><i class="fas fa-video"></i>
                                     Camera View</a></center>
                         </div>
                     </li>
                 </ul>
+<!--                 <li class="nav-item">
+                  <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
+                    <a class="d-none d-sm-none d-md-none d-lg-block nav-link" href="/filemanager" id="fileManagerBtn">
+                    <center><i class="fas fa-box-open"></i> Operations</center>
+                </a>
+                <% }else { %>
+                  <a class="nav-link notyet" href="#" data-toggle="modal" role="button"
+                  data-target="#fileManagerModal" id="fileManagerBtn">
+                  <center><i class="fas fa-box-open"></i> Operations</center>
+                  </a>
+            <%    } %>
+                </li> -->
                 <li class="nav-item">
                   <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
-                    <a class="nav-link" href="/filemanager" id="fileManagerBtn">
+                    <a class="d-none d-sm-none d-md-none d-lg-block nav-link" href="/filemanager" id="fileManagerBtn">
                     <center><i class="fas fa-folder-open"></i> File Manager</center>
                 </a>
-
                 <% }else { %>
                   <a class="nav-link notyet" href="#" data-toggle="modal" role="button"
                   data-target="#fileManagerModal" id="fileManagerBtn">
                   <center><i class="fas fa-folder-open"></i> File Manager</center>
-              </a>
+                  </a>
             <%    } %>
-
                 </li>
+                <li class="nav-item">
+                  <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
+                    <a class="d-none d-sm-none d-md-none d-lg-block nav-link" href="/filemanager" id="fileManagerBtn">
+                    <center><i class="fas fa-folder-open"></i> Historyr</center>
+                </a>
+                <% }else { %>
+                  <a class="nav-link notyet" href="#" data-toggle="modal" role="button"
+                  data-target="#fileManagerModal" id="fileManagerBtn">
+                  <center><i class="fas fa-folder-open"></i> History</center>
+                  </a>
+            <%    } %>
                 </li>
-                <!--<li class="nav-item">
-                    <a class="nav-link notyet" data-toggle="collapse" id="farmStatusBtn" href="#dashPanelCollapse" role="button" aria-expanded="false" aria-controls="dashPanelCollapse">
-                        <center><i class="fas fa-mail-bulk"></i> Bulk Actions</center>
-                    </a>
-                </li>-->
 <!--                 <li class="nav-item">
                   <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
                     <a class="nav-link" data-toggle="collapse" id="farmStatusBtn" href="#dashPanelCollapse"
@@ -109,7 +125,8 @@
                     <div class="dropdown-menu dropdown-menu-right bg-dark text-light" aria-labelledby="systemDropDown">
                         <% if(typeof name != 'undefined'){ %>
                             <h6 class="dropdown-header">Account</h6>  
-                            <a class="dropdown-item text-center  text-light" href="#"><i class="far fa-user"></i> <%= name %></a>
+                            <a class="dropdown-item text-center text-light"  data-toggle="modal"
+                            data-target="#userModal" text-light" href="#"><i class="far fa-user"></i> <%= name %></a>
                             <a class="dropdown-item text-center  text-light" href="/users/logout"><i class="fas fa-sign-out-alt"></i>Sign Out</a>
                         <% }%>
                        
@@ -117,10 +134,10 @@
                         <a class="dropdown-item  text-center text-light" href="#" data-toggle="modal"
                             data-target="#printerSetupModal" id="printerSetup"><i class="fas fa-print"></i> Printers</a>
                             <a class="dropdown-item  text-center  text-light" href="#" data-toggle="modal"
-                            data-target="#systemSettingsModal" id="setSystemSettingsBtn"><i class="fas fa-cog"></i>
+                            data-target="#clientSettingsModal" id="setClientSettingsBtn"><i class="fas fa-cog"></i>
                             Client</a>
                             <a class="dropdown-item  text-center  text-light" href="#" data-toggle="modal"
-                            data-target="#systemSettingsModal" id="setSystemSettingsBtn"><i class="fas fa-server"></i>
+                            data-target="#serverSettingsModal" id="setServerBtn"><i class="fas fa-server"></i>
                             Server</a>
 
                             <h6 class="dropdown-header">Help</h6> 
@@ -370,13 +387,21 @@
                                 <div class="col-lg-12">
                                   <p>Check the boxes below to select the printers you'd like to upload files too.</p>
                                   <p><b>Note:</b> You must select at least 2 printers.</p>
-                                  <form class="was-validated form-check-inline form-check">
-                                    <div class="custom-control custom-checkbox mb-2 pr-2">
-                                      <input type="checkbox" class="custom-control-input" id="customControlValidation1" required>
-                                      <label class="custom-control-label" for="customControlValidation1">0. TEST NAME</label>
-                                      <div class="invalid-feedback">Not this printer</div>
-                                    </div>
-                                    </form>
+                                  <% if (typeof printers != 'undefined'){ %>
+                                    <% for(let i=0;i < printers.length;i++){%>
+                                      <form class="was-validated form-check-inline form-check">
+                                        <div class="custom-control custom-checkbox mb-2 pr-2">
+                                          <input type="checkbox" class="custom-control-input" id="customControlValidation-<%= printers[i].index %>" required>
+                                         <label class="custom-control-label" for="customControlValidation-<%= printers[i].index %>"><%= printers[i].index %>. <% if(typeof printers[i].settingsApperance != 'undefined'){ %> <%= printers[i].settingsApperance.name %> <%}%></label>
+                                          <div class="invalid-feedback">Not this printer</div>
+                                          <div class="valid-feedback">
+                                            Sending to this printer
+                                          </div>
+                                        </div>
+                                        </form>
+                                      <%}%>
+                                  <% } %>
+
                                 </div>
                                 <div class="col-lg-12">
                                   <p>Please type the folder name you'd like to create on the selected printers.</p>
@@ -438,11 +463,437 @@
       </div>
     </div>
     <div class="modal-footer">
-      <button type="button" class="btn btn-dark float-right">Next</button><button type="button" class="btn btn-dark float-left">Previous</button><button type="button" class="btn btn-dark float-left">Close</button>
+     <button type="button" class="btn btn-dark float-left">Next</button><button type="button" class="btn btn-dark float-right">Close</button><button type="button" class="btn btn-dark float-right">Previous</button> 
     </div>
   </div>
 </div>
       </div>
+
+
+      <div class="modal fade" id="aboutOctoFarm" tabindex="-1" role="dialog" aria-labelledby="aBoutModal" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="aboutOctoFarm">About OctoFarm</h5>
+                    <button id="aboutOctoFarmModalClose" type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span class="text-white" aria-hidden="true">&times;</span>
+            </button>
+                </div>
+                <div class="modal-body">
+                    <center>
+                        <p>OctoFarm is the creation of James Mackay from <a href="https://notexpectedyet.com">NotExpectedYet</a> which is also one of his personal projects. It was designed after using the wonderful software Octoprint for well over a year
+                            before getting his second printer. Realising he could only control/monitor one printer from the Octoprint interface he decided to write his own implementation using the API in Octoprint. This spawned OctoFarm which is used
+                            currently for monitoring and managing multiple Octoprint attached printers. <br>If you would like to say thanks to James for designing this free and open source software package then feel free to send him a donation using the
+                            button below.</p>
+                        <p><a href="https://www.patreon.com/bePatron?u=19808757" target="_blank"><button type="button" class="btn btn-danger">Become a Patreon!</button></a></p>
+                        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
+                            <input type="hidden" name="cmd" value="_s-xclick" />
+                            <input type="hidden" name="hosted_button_id" value="QGBJML3E7268L" />
+                            <input type="image" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
+                            <img alt="" border="0" src="https://www.paypal.com/en_GB/i/scr/pixel.gif" width="1" height="1" />
+                        </form>
+                    </center>
+                    <center>
+                        <div class="row"><div class="col-12">
+                            <h5>Big thanks to the following Patreon Supporters!</h5>
+                            <ul class="list-group">
+                                    <li class="list-group-item">ding jienan <i style="color:gold;" class="fas fa-trophy"></i></li>
+
+                            </ul>
+                        </div></div>
+                    </center>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="userModal" tabindex="-1" role="dialog" aria-labelledby="userLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="userLabel">User </h5>
+                  <button id="aboutOctoFarmModalClose" type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span class="text-white" aria-hidden="true">&times;</span>
+          </button>
+              </div>
+              <div class="modal-body">
+                <% if(typeof name != 'undefined'){ %>
+                  <h6 class="dropdown-header">Account</h6>  
+                  <a class="dropdown-item text-center  data-toggle="modal"
+                  data-target="#userModal" text-light" href="#"><i class="far fa-user"></i> <%= name %></a>
+                  <a class="dropdown-item text-center  text-light" href="/users/logout"><i class="fas fa-sign-out-alt"></i>Sign Out</a>
+              <% }%>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+    <div class="modal fade" id="clientSettingsModal" tabindex="0" role="dialog" aria-labelledby="systemSettingsLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg" role="document">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h3 class="modal-title" id="systemSettingsLabel">Client Settings</h3>
+                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span class="text-white" aria-hidden="true">&times;</span>
+          </button>
+              </div>
+              <div class="modal-body">
+                  <div class="container-fluid">
+                      <div class="row">
+                          <div class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
+                              <div class="list-group" id="list-tab" role="tablist">
+                                  <a class="list-group-item list-group-item-action  active" id="system-settings-list" data-toggle="list" href="#system-settings" role="tab" aria-controls="system">Settings</a>
+                                  <a class="list-group-item list-group-item-action" id="system-panel-view-list" data-toggle="list" href="#system-panel-view" role="tab" aria-controls="panelview">Panel View</a>
+                                  <a class="list-group-item list-group-item-action" id="system-list-view-list" data-toggle="list" href="#system-list-view" role="tab" aria-controls="listview">List View</a>
+                                  <a class="list-group-item list-group-item-action" id="system-camera-view-list" data-toggle="list" href="#system-camera-view" role="tab" aria-controls="cameraview">Camera View</a>
+                              </div>
+                          </div>
+                          <div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
+                              <div class="tab-content" id="nav-tabContent">
+                                  <div class="tab-pane fade show active" id="system-settings" role="tabpanel" aria-labelledby="system-settings-list">
+                                      <h5>Client Settings</h5>
+                                      <hr>
+                                      <p class="font-weight-bold">Server Polling</p>
+                                      <p>Set how often the client requests updates from the server. The server will not poll any faster than 4 seconds currently.</p>
+                                      <p><b>Min</b>: 4 seconds, <b>Max:</b> 60 seconds</p>
+
+                                      <div class="input-group mb-3">
+                                          <div class="input-group-prepend">
+                                              <span class="input-group-text">Refresh Rate:</span>
+                                          </div>
+                                          <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="eeRefreshRate" value="6" min="4" max="60" step="1">
+                                          <div class="input-group-append">
+                                              <span class="input-group-text">Seconds</span>
+                                          </div>
+                                      </div>
+
+
+                                      <hr>
+                                      <p class="font-weight-bold">Change Background</p>
+                                      <p>Enter a URL below to change the default background of OctoFarm</p>
+                                      <div class="input-group mb-3">
+                                          <div class="input-group-prepend">
+                                              <span class="input-group-text" id="basic-addon1">URL:</span>
+                                          </div>
+                                          <input type="url" class="form-control" placeholder="https://i.redd.it/frehj36ltk101.png" aria-label="Username" aria-describedby="basic-addon1" id="eeBackgroundURL" value="">
+                                      </div>
+                                      <p><b>URL Example:</b> "https://i.redd.it/frehj36ltk101.png"</p>
+                                  </div>
+                                  <div class="tab-pane fade" id="system-panel-view" role="tabpanel" aria-labelledby="system-panel-view-list">
+                                      <h5>Panel View Settings</h5>
+                                      <hr>
+                                      <form class="was-validated">
+                                        <div class="custom-control custom-checkbox mb-3">
+                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" checked required>
+                                          <label class="custom-control-label" for="offlinePollOn">Hide Offline</label>
+                                          <div class="valid-feedback">Offline printers will be hidden from the panel view.</div>
+                                          <div class="invalid-feedback">Offline printers will be shown on the panel view.</div>
+                                        </div>
+                                      </form>
+                                      <form class="was-validated">
+                                        <div class="custom-control custom-checkbox mb-3">
+                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
+                                          <label class="custom-control-label" for="offlinePollOn">Hide Closed</label>
+                                          <div class="valid-feedback">Closed printers will be hidden from the panel view.</div>
+                                          <div class="invalid-feedback">Closed printers will be shown on the panel view.</div>
+                                        </div>
+                                      </form>
+                                      <form class="was-validated">
+                                        <div class="custom-control custom-checkbox mb-3">
+                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
+                                          <label class="custom-control-label" for="offlinePollOn">Hide Idle</label>
+                                          <div class="valid-feedback">Idle printers will be hidden from the panel view.</div>
+                                          <div class="invalid-feedback">Idle printers will be shown on the panel view.</div>
+                                        </div>
+                                      </form>
+                                  </div>
+                                  <div class="tab-pane fade" id="system-list-view" role="tabpanel" aria-labelledby="system-list-view-list">
+                                      <h5>List View Settings</h5>
+                                      <hr>
+                                      <form class="was-validated">
+                                        <div class="custom-control custom-checkbox mb-3">
+                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" checked required>
+                                          <label class="custom-control-label" for="offlinePollOn">Hide Offline</label>
+                                          <div class="valid-feedback">Offline printers will be hidden from the list view.</div>
+                                          <div class="invalid-feedback">Offline printers will be shown on the list view.</div>
+                                        </div>
+                                      </form>
+                                      <form class="was-validated">
+                                        <div class="custom-control custom-checkbox mb-3">
+                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
+                                          <label class="custom-control-label" for="offlinePollOn">Hide Closed</label>
+                                          <div class="valid-feedback">Closed printers will be hidden from the panel view.</div>
+                                          <div class="invalid-feedback">Closed printers will be shown on the panel view.</div>
+                                        </div>
+                                      </form>
+                                      <form class="was-validated">
+                                        <div class="custom-control custom-checkbox mb-3">
+                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
+                                          <label class="custom-control-label" for="offlinePollOn">Hide Idle</label>
+                                          <div class="valid-feedback">Idle printers will be hidden from the panel view.</div>
+                                          <div class="invalid-feedback">Idle printers will be shown on the panel view.</div>
+                                        </div>
+                                      </form>
+
+                                  </div>
+                            
+                                  <div class="tab-pane fade" id="system-camera-view" role="tabpanel" aria-labelledby="system-camera-view-list">
+                                      <h5>Camera View Settings</h5>
+                                      <hr>
+                                      <p>Select how many camera's you would like to have per row:</p>
+                                      <p><b>Note:</b>This only takes effect on screen sizes larger than a tablet.</p>
+                                      <div class="input-group mb-3">
+                                          <div class="input-group-prepend">
+                                              <label class="input-group-text" for="selectCameraGrid">Cameras</label>
+                                          </div>
+                                          <select class="custom-select" id="selectCameraGrid">
+                                                  <option value="12">1</option>
+                                                  <option value="6" selected>2</option>
+                                                  <option value="4">3</option>
+                                                  <option value="3">4</option>
+                                                  <option value="2">6</option>
+                                              </select>
+                                      </div>
+                                      <hr>
+                                      <form class="was-validated">
+                                        <div class="custom-control custom-checkbox mb-3">
+                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" checked required>
+                                          <label class="custom-control-label" for="offlinePollOn">Hide Offline</label>
+                                          <div class="valid-feedback">Offline printers will be hidden from the list view.</div>
+                                          <div class="invalid-feedback">Offline printers will be shown on the list view.</div>
+                                        </div>
+                                      </form>
+                                      <form class="was-validated">
+                                        <div class="custom-control custom-checkbox mb-3">
+                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
+                                          <label class="custom-control-label" for="offlinePollOn">Hide Closed</label>
+                                          <div class="valid-feedback">Closed printers will be hidden from the panel view.</div>
+                                          <div class="invalid-feedback">Closed printers will be shown on the panel view.</div>
+                                        </div>
+                                      </form>
+                                      <form class="was-validated">
+                                        <div class="custom-control custom-checkbox mb-3">
+                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
+                                          <label class="custom-control-label" for="offlinePollOn">Hide Idle</label>
+                                          <div class="valid-feedback">Idle printers will be hidden from the panel view.</div>
+                                          <div class="invalid-feedback">Idle printers will be shown on the panel view.</div>
+                                        </div>
+                                      </form>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-success" id="saveSettings">Save</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <div class="modal fade" id="serverSettingsModal" tabindex="0" role="dialog" aria-labelledby="serverSettingsLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="serverSettingsLabel">Server Settings</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span class="text-white" aria-hidden="true">&times;</span>
+        </button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                          <p class="font-weight-bold">Server Online Polling</p>
+                          <p>Change how often the server polls for an online printers information...</p>
+                          <p><b>Note:</b> Due to the limited CPU of PiZero it is recommended this be set above 7 seconds or more to stop overheating.</p>
+                          <p><b>Min</b>: 4 seconds, <b>Max:</b> 60 seconds</p>
+
+                          <div class="input-group mb-3">
+                              <div class="input-group-prepend">
+                                  <span class="input-group-text">Online Poll Rate:</span>
+                              </div>
+                              <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="eeRefreshRate" value="6" min="4" max="60" step="1">
+                              <div class="input-group-append">
+                                  <span class="input-group-text">Seconds</span>
+                              </div>
+                          </div>
+                          <hr>
+                          <p class="font-weight-bold">Server Offline Polling</p>
+                          <form class="was-validated">
+                            <div class="custom-control custom-checkbox mb-3">
+                              <input type="checkbox" class="custom-control-input" id="offlinePollOn" checked required>
+                              <label class="custom-control-label" for="offlinePollOn">Toggle Offline Polling</label>
+                              <div class="invalid-feedback">Offline Polling is turned off</div>
+                              <div class="valid-feedback">Offline Polling is turned on</div>
+                            </div>
+                          </form>
+                          <p>Change how often the server will poll for printers that have been detected as offline... If you turn this off you will have to use the refresh button on the dashboard re-detect your printer.</p>
+                          <p><b>Min:</b> 1 minutes, <b>Max:</b> 10 minutes</p>
+                          <div class="input-group mb-3">
+                              <div class="input-group-prepend">
+                                  <span class="input-group-text">Offline Poll Rate:</span>
+                              </div>
+                              <input type="number" class="form-control" placeholder="5" aria-label="Refresh Rate" id="OfflineRefreshRate" value="5" min="1" max="10" step="1">
+                              <div class="input-group-append">
+                                  <span class="input-group-text">Minutes</span>
+                              </div>
+                          </div>
+                          <hr>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="saveSettings">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="printerManagerModal" tabindex="-1" role="dialog" aria-labelledby="printerManagerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content bg-dark text-light">
+          <div class="modal-header">
+              <h5 class="modal-title" id="printerManagerTitle">Printer Manager:</h5>
+              <h5 class="modal-title" id="printerIndex" style="display: none;"></h5>
+              <span id="printerIndex" value=""></span>
+              <button id="printerManagerModalBtn" type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span class="text-white" aria-hidden="true">&times;</span>
+      </button>
+          </div>
+          <div class="modal-body">
+              <div class="container-fluid">
+                  <div class="row">
+                      <div class="col-12 col-sm-12 col-md-12 col-lg-2 col-xl-2">
+                          <div class="list-group" id="list-tab" role="tablist">
+                                  <button id="pmStatus" type="button" class="btn btn-warning mb-2" href="#" target="_blank" disabled>STATUS</button>
+                              <a class="list-group-item list-group-item-action active" id="printer-connection-btn" data-toggle="list" href="#printer-connection" role="tab" aria-controls="messages"><i class="fas fa-print"></i> Printer</a>
+                              <a class="list-group-item list-group-item-action" id="printer-control-btn" data-toggle="list" href="#printer-control" role="tab" aria-controls="home"><i class="fas fa-gamepad"></i> Control</a>
+                              <a class="list-group-item list-group-item-action" id="printer-plugins-btn" data-toggle="list" href="#printer-plugins" role="tab" aria-controls="messages"><i class="fas fa-plug"></i> Plugins</a>
+                              <a class="list-group-item list-group-item-action" id="printer-gcode-btn" data-toggle="list" href="#printer-gcode" role="tab" aria-controls="messages"><i class="fas fa-pen"></i> Gcode Scripts</a>
+                              <a class="list-group-item list-group-item-action" id="printer-settings-btn" data-toggle="list" href="#printer-settings" role="tab" aria-controls="messages"><i class="fas fa-cog"></i> Settings</a>
+                          </div>
+                      </div>
+                      <div class="col-12 col-sm-12 col-md-12 col-lg-10 col-xl-10">
+                          <div class="tab-content" id="nav-tabContent">
+                              <div class="tab-pane fade" id="printer-control" role="tabpanel" aria-labelledby="system-settings-list">
+                                  <h5>Printer Controls</h5>
+                                  <hr>
+                                  <div id="printerControls"></div>
+
+                              </div>
+
+                              <div class="tab-pane fade show active" id="printer-connection" role="tabpanel" aria-labelledby="system-panel-view-list">
+                                  <h5>OctoPrint</h5>
+                                  <hr>
+                                  <div id="octoPrintControl">
+                                      <div class="row align-items-center">
+                                          <div class="col-lg-3" id="printerWeb">
+
+                                          </div>
+                                          <div class="col-lg-3" id="printerRestart">
+
+                                          </div>
+                                          <div class="col-lg-3" id="printerReboot">
+
+                                          </div>
+                                          <div class="col-lg-3" id="printerShutdown">
+
+                                          </div>
+                                      </div>
+
+                                      <div class="row align-items-center">
+                                          <div class="col-lg-12">
+                                              <h5>Connection Information</h5>
+                                              <hr>
+                                          </div>
+                                          <div class="col-lg-3" id="printerCPort">
+
+                                          </div>
+                                          <div class="col-lg-3" id="printerCBaud">
+
+                                          </div>
+                                          <div class="col-lg-3" id="printerCProfile">
+
+                                          </div>
+                                          <div class="col-lg-3" id="printerCConnect">
+
+                                          </div>
+                                      </div>
+                                      <div class="row">
+                                          <div class="col-lg-12" id="printerFileInformation">
+                                              
+                                          </div>
+                                      </div>
+                                  </div>
+                              </div>
+                              <div class="tab-pane fade" id="printer-plugins" role="tabpanel" aria-labelledby="system-panel-view-list">
+                                  <h5>Octoprint Plugins</h5>
+                                  <hr>
+                                  <p>Plugin Support coming soon!<br>
+                                      <div id="printerManagerPlugins">
+
+                                      </div>
+                              </div>
+                              <div class="tab-pane fade" id="printer-gcode" role="tabpanel" aria-labelledby="system-panel-view-list">
+                                  <h5>Gcode Scripts</h5>
+                                  <hr>
+                                  <div id="printerManagerGcode">
+
+                                  </div>
+                              </div>
+                              <div class="tab-pane fade" id="printer-settings" role="tabpanel" aria-labelledby="system-settings-list">
+                                  <h5>Printer Settings</h5>
+                                  <hr>
+                                  <div class="col-lg-12" id="printerInformation">
+
+                                  </div>
+                                  <div id="printerManagerSettings">
+                                      <h5>Camera Rotation</h5>
+                                      <hr>
+                                          <div class="form-check">
+                                              <input class="form-check-input" type="checkbox" value="" id="camRot90">
+                                              <label class="form-check-label" for="camRot90">
+                                                Rotate your camera by 90°
+                                              </label>
+                                            </div>
+                                            <div class="form-check">
+                                              <input class="form-check-input" type="checkbox" value="" id="camFlipH">
+                                              <label class="form-check-label" for="camFlipH">
+                                                Flip your camera horizontally
+                                              </label>
+                                            </div>
+                                            <div class="form-check">
+                                              <input class="form-check-input" type="checkbox" value="" id="camFlipV">
+                                              <label class="form-check-label" for="camFlipV">
+                                                Flip your camera vertically
+                                              </label>
+                                            </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                  </div>
+              </div>
+          </div>
+          <div class="modal-footer" id="printerManagerFooter">
+          </div>
+      </div>
+  </div>
+</div>
 
 
 

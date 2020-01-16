@@ -4,12 +4,22 @@
 
 <% }else if(printer.current.state != "Offline"){ %>
 <!-- Connected -->
-<a
-  href="#"
-  class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
-  style="display: block;
-  padding: 0.7rem 0.1rem;"
->
+<% if(printer.index === printers[0].index){ %>
+    <a
+    href="#"
+    class="list-group-item list-group-item-action bg-dark active flex-column align-items-start bg-secondary"
+    style="display: block;
+    padding: 0.7rem 0.1rem;"
+  >
+<% }else{ %>
+    <a
+    href="#"
+    class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
+    style="display: block;
+    padding: 0.7rem 0.1rem;"
+  >
+<% } %>
+
   <div class="row">
     <div
       class="col-lg-2"
@@ -41,7 +51,7 @@
               <p><%- helpers.generateBytes(printer.storage.free) %> / <%- helpers.generateBytes(printer.storage.total) %> </p>
           <% } %>
           </div>
-          <small class="pt-2 float-left"><%= printer.ip%>:<%= printer.port%></small>
+          <small class="pt-2 float-left"><i class="fas fa-network-wired"></i> <%= printer.ip%>:<%= printer.port%></small>
     </div>
   </div>
 </a>

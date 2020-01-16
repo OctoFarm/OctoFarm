@@ -56,11 +56,12 @@ app.use((req, res, next) => {
 //Routes
 app.use(express.static(__dirname + "/views"));
 if (db === "") {
-  app.use("/", require("./routes/index"));
+  app.use("/", require("./routes/index", { page: "route" }));
 } else {
-  app.use("/", require("./routes/index"));
-  app.use("/users", require("./routes/users"));
-  app.use("/printers", require("./routes/printers"));
+  app.use("/", require("./routes/index", { page: "route" }));
+  app.use("/users", require("./routes/users", { page: "route" }));
+  app.use("/printers", require("./routes/printers", { page: "route" }));
+  app.use("/settings", require("./routes/settings", { page: "route" }));
 }
 
 //Server
@@ -71,4 +72,7 @@ if (db != "") {
   const runner = require("./runners/state.js");
   const Runner = runner.Runner;
   Runner.init();
+  const system = require("./runners/systemInfo.js");
+  const SystemRunner = system.SystemRunner;
+  SystemRunner.setSystemRunner();
 }

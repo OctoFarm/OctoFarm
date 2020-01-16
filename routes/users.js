@@ -7,9 +7,17 @@ const passport = require("passport");
 const User = require("../models/User.js");
 
 //Login Page
-router.get("/login", (req, res) => res.render("login"));
+router.get("/login", (req, res) =>
+  res.render("login", {
+    page: "Login"
+  })
+);
 //Register Page
-router.get("/register", (req, res) => res.render("register"));
+router.get("/register", (req, res) =>
+  res.render("register", {
+    page: "Register"
+  })
+);
 
 //Register Handle
 router.post("/register", (req, res) => {
@@ -54,31 +62,40 @@ router.post("/register", (req, res) => {
           password2
         });
       } else {
-        const newUser = new User({
-          name,
-          email,
-          password
+        //Check if first user that's created.
+        User.find({}).then(user => {
+          let userGroup = "";
+          if (user.length < 1) {
+            userGroup = "Administrator";
+          } else {
+            userGroup = "User";
+          }
+          const newUser = new User({
+            name,
+            email,
+            password,
+            group: userGroup
+          });
+          //Hash Password
+          bcrypt.genSalt(10, (error, salt) =>
+            bcrypt.hash(newUser.password, salt, (err, hash) => {
+              if (err) throw err;
+              //Set password to hashed
+              newUser.password = hash;
+              //Save new User
+              newUser
+                .save()
+                .then(user => {
+                  req.flash(
+                    "success_msg",
+                    "You are now registered and can login"
+                  );
+                  res.redirect("/users/login");
+                })
+                .catch(err => console.log(err));
+            })
+          );
         });
-
-        //Hash Password
-        bcrypt.genSalt(10, (error, salt) =>
-          bcrypt.hash(newUser.password, salt, (err, hash) => {
-            if (err) throw err;
-            //Set password to hashed
-            newUser.password = hash;
-            //Save new User
-            newUser
-              .save()
-              .then(user => {
-                req.flash(
-                  "success_msg",
-                  "You are now registered and can login"
-                );
-                res.redirect("/users/login");
-              })
-              .catch(err => console.log(err));
-          })
-        );
       }
     });
   }
@@ -89,7 +106,8 @@ router.post("/login", (req, res, next) => {
   passport.authenticate("local", {
     successRedirect: "/dashboard",
     failureRedirect: "/users/login",
-    failureFlash: true
+    failureFlash: true,
+    page: "Login"
   })(req, res, true);
 });
 

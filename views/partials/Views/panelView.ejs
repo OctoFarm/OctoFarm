@@ -1,0 +1,133 @@
+<% printers.forEach(printer => { %> <% if(printer.camURL != ""){ %>
+<div class="col-sm-12 col-md-4 col-lg-3 col-xl-2" id="panelInstance-${index}">
+  <div class="card mt-1 mb-1 ml-1 mr-1 text-center">
+    <div class="card-header dashHeader">
+      <h6 class="float-left mb-0" id="panPrinterName-${index}">
+        <button
+          id="panPrinterStatus-${index}"
+          type="button"
+          class="btn btn-secondary mb-0"
+          role="button"
+          disabled
+        >
+          <%= printer.index %> . <% if(typeof printer.settingsApperance !=
+          'undefined'){ %> <%= printer.settingsApperance.name %><%}%>
+        </button>
+      </h6>
+      <button
+        id="panPrinterStatus-${index}"
+        type="button"
+        class="btn btn-success float-right mb-0"
+        role="button"
+        disabled
+      >
+        <i class="fas fa-cog"></i>
+      </button>
+    </div>
+    <div class="card-body pt-1 pb-0 pl-2 pr-2">
+      <button
+        id="panPrinterStatus-${index}"
+        type="button"
+        class="btn btn-block btn-secondary mb-0"
+        role="button"
+        disabled
+      >
+        <% if(typeof printer.job.file != 'undefined' && printer.job.file.name !=
+        null){ %><i class="fas fa-file-code"></i> <%= printer.job.file.name %>
+        <%}else{%><i class="fas fa-file-code"></i> No File Selected <%}%>
+      </button>
+      <% let camURL = ""; %> <% if(printer.camURL != ''){ %> <% camURL =
+      "http://" + printer.camURL; %> <%}%>
+      <img id="cameraSRC-${index}" width="100%" class="" src="<%= camURL %>" />
+      <div class="progress">
+        <div
+          id="panProgress-${index}"
+          class="progress-bar"
+          role="progressbar progress-bar-striped"
+          style="width:     <% if(typeof printer.progress!= 'undefined'){ %> <%=
+            Math.floor(printer.progress.completion) %> <%}%>%"
+          aria-valuenow="25"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
+          <% if(typeof printer.progress!= 'undefined'){ %> <%=
+          Math.floor(printer.progress.completion) %> <%}%>"%
+        </div>
+      </div>
+      <button
+        id="panPrinterStatus-${index}"
+        type="button"
+        class="btn btn-block <%= printer.stateColour.category %> mb-1 mt-1"
+        role="button"
+        disabled
+      >
+        <%= printer.current.state %>
+      </button>
+      <center>
+        <button
+          id="panPrintStart-${index}"
+          type="button"
+          class="btn btn-success mt-1 mb-1"
+          role="button"
+        >
+          <i class="fas fa-print"></i> Print
+        </button>
+        <button
+          id="panPrintPause-${index}"
+          type="button"
+          class="btn btn-light mt-1 mb-1"
+          role="button"
+        >
+          <i class="fas fa-pause"></i> Pause
+        </button>
+        <button
+          id="panRestart-${index}"
+          type="button"
+          class="btn btn-danger mt-1 mb-1  d-none"
+          role="button"
+        >
+          <i class="fas fa-undo"></i> Restart
+        </button>
+        <button
+          id="panResume-${index}"
+          type="button"
+          class="btn btn-success mt-1 mb-1  d-none"
+          role="button"
+        >
+          <i class="fas fa-redo"></i> Resume
+        </button>
+        <button
+          id="panStop-${index}"
+          type="button"
+          class="btn btn-danger mt-1 mb-1"
+          role="button"
+        >
+          <i class="fas fa-square"></i> Cancel
+        </button>
+      </center>
+    </div>
+    <div class="card-footer text-muted dashFooter" id="panFileName-${index}">
+      <small class="mb-0 float-left" id="panT0-${index}">
+        <% if(typeof printer.temperature.tool0 != 'undefined'){ %>
+        <b>T0: </b> <i class="far fa-circle"></i> <%=
+        printer.temperature.tool0.actual %>°C
+        <i class="fas fa-bullseye"></i> <%= printer.temperature.tool0.target
+        %>°C <%}else{ %>
+
+        <b>T0: </b><i class="far fa-circle"></i> 0°C
+        <i class="fas fa-bullseye"></i> 0°C <%}%>
+      </small>
+
+      <small class="mb-0 float-right" id="panBed-${index}">
+        <% if(typeof printer.temperature.bed != 'undefined'){ %>
+
+        <b>Bed: </b> <i class="far fa-circle"></i> <%=
+        printer.temperature.bed.actual %>°C <i class="fas fa-bullseye"></i> <%=
+        printer.temperature.bed.target %>°C <%}else{ %> <b>Bed: </b>
+        <i class="far fa-circle"></i> 0°C <i class="fas fa-bullseye"></i> 0°C
+        <%}%>
+      </small>
+    </div>
+  </div>
+</div>
+<% } %> <% }) %>

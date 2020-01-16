@@ -32,6 +32,30 @@ li {
   margin: 0 auto;
   max-width: 700px;
 }
+/* Colours */
+.Idle {
+  background-color: #262626;
+}
+.Active {
+  background-color: #583c0e;
+}
+.Offline {
+  background-color: #2e0905;
+}
+.Closed {
+  background-color: #2e0905;
+}
+.Complete {
+  background-color: #00330e;
+}
+
+/*Sticky Table header*/
+.sticky-table {
+  position: sticky;
+  top: 70px;
+  z-index: 1000px;
+}
+
 /*Scroll Bar*/
 ::-webkit-scrollbar {
   width: 10px;
@@ -53,6 +77,10 @@ a.notyet {
   pointer-events: none;
   color: grey !important;
 }
+/*Progres Bar*/
+.progress {
+  height: 15px;
+}
 /* CUSTOM CLASSES */
 /* Dashboard */
 [class*="col-"] {
@@ -61,12 +89,10 @@ a.notyet {
   padding-left: 4px;
   padding-bottom: 4px;
 }
-
-#dashboard {
-  min-height: 90vh;
-  height: 90vh;
-  max-height: 90vh;
+.card {
+  margin: 5px;
 }
+
 .dashHeader {
   padding: 5px;
 }
@@ -74,8 +100,7 @@ a.notyet {
 .dashBody {
   padding: 5px;
   overflow-y: scroll;
-  min-height: 50vh;
-  max-height: 50vh;
+  height: 80vh;
 }
 
 .dashBody p {
@@ -86,11 +111,7 @@ a.notyet {
   padding: 5px;
   position: bottom;
 }
-#filemanager {
-  min-height: 90vh;
-  height: 90vh;
-  max-height: 90vh;
-}
+
 .fileHeader {
   padding: 5px;
 }
@@ -98,8 +119,8 @@ a.notyet {
 .fileBody {
   padding: 5px;
   overflow-y: scroll;
-  min-height: 83vh;
-  max-height: 83vh;
+  min-height: 77vh;
+  max-height: 77vh;
 }
 
 .fileBody p {
@@ -140,4 +161,23 @@ a.notyet {
   display: none;
   padding-left: 5px;
   padding-right: 5px;
+}
+/*Camera View*/
+.cameraContain {
+  position: relative;
+  padding: 5px;
+}
+.camButtons {
+  position: absolute;
+  bottom: 20px;
+  right: 7px;
+}
+.camProgress {
+  position: absolute;
+  z-index: 998;
+  width: 100%;
+  height: 15px;
+  bottom: 1px;
+  left: -1px;
+  opacity: 0.8;
 }

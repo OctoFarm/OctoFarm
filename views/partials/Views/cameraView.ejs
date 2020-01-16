@@ -1,0 +1,87 @@
+<% printers.forEach(printer => { %> <% if(printer.camURL != ""){ %>
+<div id="camInstance-${index}" class="col-sm-12 col-md-6 col-lg-2 col-xl-2">
+  <div class="card text-center mb-0 mt-0 ml-0 mr-0">
+    <div class="card-header dashHeader" id="camHeader-${index}">
+      <small class="float-left" id="camPrinterName-${index}"
+
+      >        <button
+      type="button"
+      class="btn btn-secondary float-right btn-sm ml-1"
+      data-toggle="modal"
+      data-target="#printerManagerModal" disabled
+    >
+    <%= printer.index%>.
+    </button></small
+      <small>
+        <button
+          type="button"
+          class="btn btn-dark float-right btn-sm ml-1"
+          data-toggle="modal"
+          data-target="#printerManagerModal"
+        >
+          <i class="fas fa-cog"></i>
+        </button>
+        <% if(typeof printer.job.file != 'undefined' && printer.job.file.name !=
+        null){ %> <% let fileNameStart = printer.job.file.name; %> <% let
+        fileNameEnd = printer.job.file.name; %> <% let fileName = ""; %> <%
+        fileNameStart = fileNameStart.substring(1,20); %> <% fileNameEnd =
+        fileNameEnd.substring(fileNameEnd.length-6,fileNameEnd.length); %> <%
+        fileName = fileNameStart+"..."+fileNameEnd; %>
+
+        <span class="float-right"
+          ><i class="fas fa-file-code"></i> <%= fileName %></span
+        >
+        <%}%></small
+      >
+    </div>
+    <div class="card-body cameraContain" id="camBody-${index}">
+      <div class="progress camProgress">
+        <div
+          id="camProgress-${index}"
+          class="progress-bar progress-bar-striped"
+          role="progressbar"
+          style="width: 0%"
+          aria-valuenow="10"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
+          0
+        </div>
+      </div>
+      <% let camURL = ""; %> <% if(printer.camURL != ''){ %> <% camURL =
+      "http://" + printer.camURL; %> <%}%>
+      <img id="cameraSRC-${index}" width="100%" class="" src="<%= camURL %>" />
+
+      <small>
+        <button
+          class="btn btn-success camButtons d-none btn-sm"
+          id="camStart-${index}"
+        >
+          <i class="fas fa-print text-white"></i>
+        </button>
+        <button class="btn btn-danger camButtons  btn-sm" id="camStop-${index}">
+          <i class="fas fa-hand-paper text-white"></i></button
+      ></small>
+    </div>
+    <div class="card-footer dashFooter text-muted" id="camFooter-${index}">
+      <small class="float-left" id="camT0Temp-${index}"
+        >T0: <% if(typeof printer.temperature.tool0 != 'undefined'){ %>
+        <i class="far fa-circle"></i> <%= printer.temperature.tool0.actual %>
+        <%}else{ %> <i class="far fa-circle"></i> <%= 0 %><%}%>°C <% if(typeof
+        printer.temperature.tool0 != 'undefined'){ %>
+        <i class="fas fa-bullseye"></i> <%= printer.temperature.tool0.target %>
+        <%}else{ %><i class="fas fa-bullseye"></i> <%= 0 %><%}%>°C</small
+      >
+      <small class="float-right" id="camBedTemp-${index}"
+        >Bed: <% if(typeof printer.temperature.bed != 'undefined'){ %>
+        <i class="far fa-circle"></i>
+        <%= printer.temperature.bed.actual %> <%}else{ %>
+        <i class="far fa-circle"></i> <%= 0 %><%}%>°C<% if(typeof
+        printer.temperature.bed != 'undefined'){ %>
+        <i class="fas fa-bullseye"></i> <%= printer.temperature.bed.target %>
+        <%}else{ %> <i class="fas fa-bullseye"></i> <%= 0 %><%}%>°C</small
+      >
+    </div>
+  </div>
+</div>
+<% } %> <% }) %>

@@ -4,6 +4,7 @@ const { ensureAuthenticated } = require("../config/auth");
 const db = require("../config/db").MongoURI;
 const pjson = require("../package.json");
 const Printers = require("../models/Printer.js");
+const SystemInfo = require("../models/SystemInfo.js");
 const prettyHelpers = require("../views/partials/functions/pretty.js");
 
 console.log("db: " + db);
@@ -11,13 +12,16 @@ console.log("db: " + db);
 //Welcome Page
 if (db === "") {
   //No db setup, show db warning before login.
-  router.get("/", (req, res) => res.render("database"));
+  router.get("/", (req, res) =>
+    res.render("database", { page: "Database Warning" })
+  );
 } else {
-  router.get("/", (req, res) => res.render("welcome"));
+  router.get("/", (req, res) => res.render("welcome", { page: "Welcome" }));
 }
+
 //Dashboard Page
 router.get("/dashboard", ensureAuthenticated, (req, res) => {
-  Printers.find({}, (err, printers) => {
+  Printers.find({}, null, { sort: { index: 1 } }, async (err, printers) => {
     let active = [];
     let idle = [];
     let offline = [];
@@ -35,6 +39,7 @@ router.get("/dashboard", ensureAuthenticated, (req, res) => {
         offline.push(print.ip);
       }
     });
+    let systemInformation = await SystemInfo.find({});
     res.render("dashboard", {
       name: req.user.name,
       version: pjson.version,
@@ -43,59 +48,60 @@ router.get("/dashboard", ensureAuthenticated, (req, res) => {
       activeCount: active.length,
       idleCount: idle.length,
       offlineCount: offline.length,
-      page: "dashboard",
-      helpers: prettyHelpers
+      page: "Dashboard",
+      helpers: prettyHelpers,
+      systemInfo: systemInformation[0]
     });
   });
 });
 //File Manager Page
 router.get("/filemanager", ensureAuthenticated, (req, res) => {
-  Printers.find({}, (err, printers) => {
+  Printers.find({}, null, { sort: { index: 1 } }, (err, printers) => {
     res.render("filemanager", {
       name: req.user.name,
       version: pjson.version,
       printers: printers,
       printerCount: printers.length,
-      page: "filemanager",
+      page: "File Manager",
       helpers: prettyHelpers
     });
   });
 });
 //Panel view  Page
 router.get("/mon/panel", ensureAuthenticated, (req, res) => {
-  Printers.find({}, (err, printers) => {
+  Printers.find({}, null, { sort: { index: 1 } }, (err, printers) => {
     res.render("panelView", {
       name: req.user.name,
       version: pjson.version,
       printers: printers,
       printerCount: printers.length,
-      page: "panelview",
+      page: "Panel View",
       helpers: prettyHelpers
     });
   });
 });
 //Camera view  Page
 router.get("/mon/camera", ensureAuthenticated, (req, res) => {
-  Printers.find({}, (err, printers) => {
-    res.render("listView", {
+  Printers.find({}, null, { sort: { index: 1 } }, (err, printers) => {
+    res.render("cameraView", {
       name: req.user.name,
       version: pjson.version,
       printers: printers,
       printerCount: printers.length,
-      page: "camera",
+      page: "Camera View",
       helpers: prettyHelpers
     });
   });
 });
 //List view  Page
 router.get("/mon/list", ensureAuthenticated, (req, res) => {
-  Printers.find({}, (err, printers) => {
-    res.render("cameraView", {
+  Printers.find({}, null, { sort: { index: 1 } }, (err, printers) => {
+    res.render("listView", {
       name: req.user.name,
       version: pjson.version,
       printers: printers,
       printerCount: printers.length,
-      page: "list",
+      page: "Camera View",
       helpers: prettyHelpers
     });
   });

@@ -187,7 +187,7 @@ class PrintersManagement {
         });
       } else {
         apikey.className = "form-control is-valid";
-        let printer = new this(
+        let printer = new Printer(
           ip.value,
           port.value,
           camURL.value,
@@ -316,6 +316,10 @@ class PrintersManagement {
       gcode: {}
     };
     let settingsSerial = {};
+    let fileList = {
+      folderCount: 0,
+      fileCount: 0
+    };
     let settingsServer = {
       commands: {
         serverRestartCommand: "sudo service octoprint-1 restart",
@@ -341,7 +345,7 @@ class PrintersManagement {
         table.rows[r].cells[3].innerHTML
       )
         .setConnection(r, current, options, "Initialising Printer", false)
-        .setFile({}, "", "")
+        .setFile(fileList, "", "")
         .setJob(job, progress)
         .setPrinter(temperature)
         .setProfile(profiles)
@@ -465,6 +469,10 @@ class PrintersManagement {
                   gcode: {}
                 };
                 let settingsSerial = {};
+                let fileList = {
+                  folderCount: 0,
+                  fileCount: 0
+                };
                 let settingsServer = {
                   commands: {
                     serverRestartCommand: "sudo service octoprint-1 restart",
@@ -501,7 +509,7 @@ class PrintersManagement {
                       "Initialising Printer",
                       false
                     )
-                    .setFile({}, "", "")
+                    .setFile(fileList, "", "")
                     .setJob(job, progress)
                     .setPrinter(temperature)
                     .setProfile(profiles)
@@ -528,9 +536,9 @@ class PrintersManagement {
                   .then(res => {
                     if (res.status === 200) {
                       Client.post("printers/runner/init", {});
-                      //window.location.replace("/dashboard");
+                      window.location.replace("/dashboard");
                     } else {
-                      //window.location.replace("/dashboard");
+                      window.location.replace("/dashboard");
                     }
                   })
                   .catch(err => {

@@ -1,0 +1,65 @@
+<% printers.forEach(printer => { %>
+
+<tr class="<%= printer.stateColour.category %>" id="listRow-${index}">
+  <th scope="row"><%= printer.index%></th>
+  <td id="listName-${index}">
+    <% if(typeof printer.settingsApperance != 'undefined'){ %> <%=
+    printer.settingsApperance.name %><%}%>
+  </td>
+  <td>
+    <button
+      type="button"
+      class="btn btn-dark"
+      data-toggle="modal"
+      data-target="#printerManagerModal"
+    >
+      <i class="fas fa-cog"></i>
+    </button>
+  </td>
+  <td>
+    <button
+      id="listPlay${index}"
+      type="button"
+      class="btn btn-success"
+      disabled
+    >
+      <i class="fas fa-play"></i>
+    </button>
+    <button
+      id="listCancel${index}"
+      type="button"
+      class="btn btn-danger"
+      disabled
+    >
+      <i class="fas fa-square"></i>
+    </button>
+  </td>
+  <td id="listFile-${index}">
+    <i class="fas fa-file-code"></i> <% if(typeof printer.job.file != 'undefined'){ %> <%= printer.job.file.name
+    %> <%}%>
+  </td>
+  <td id="listState-${index}"><%= printer.current.state %></td>
+  <td id="listPrintTime-${index}">
+    <% if(typeof printer.progress!= 'undefined'){ %> <%=
+      helpers.generateTime(printer.progress.printTimeLeft) %> <%}%>
+  </td>
+  <td id="listE0Temp-${index}">
+    <% if(typeof printer.temperature.tool0 != 'undefined'){ %>
+      <i class="far fa-circle"></i> <%=
+      printer.temperature.tool0.actual %> <%}else{ %> <i class="far fa-circle"></i> <%= 0 %><%}%>°C <%
+      if(typeof printer.temperature.tool0 != 'undefined'){ %>
+         <i class="fas fa-bullseye"></i> <%=
+      printer.temperature.tool0.target %> <%}else{ %> <i class="fas fa-bullseye"></i> <%= 0 %><%}%>°C</span
+    >
+  </td>
+  <td id="listBedTemp-${index}">
+    <% if(typeof printer.temperature.bed != 'undefined'){ %><i class="far fa-circle"></i>
+    <%= printer.temperature.bed.actual %> <%}else{ %> <i class="far fa-circle"></i> <%= 0 %><%}%>°C<%
+    if(typeof printer.temperature.bed != 'undefined'){ %>
+      <i class="fas fa-bullseye"></i> <%=
+    printer.temperature.bed.target %> <%}else{ %> <i class="fas fa-bullseye"></i> <%= 0 %><%}%>°C</span
+  >
+  </td>
+</tr>
+
+<% }) %>

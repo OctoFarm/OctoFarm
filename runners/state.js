@@ -21,7 +21,16 @@ class Runner {
                       Runner.getSystem(printer).then(printer => {
                         printer.inited = true;
                         printer.action = "Online Monitoring...";
-                        printer.save();
+                        printer
+                          .save()
+                          .then()
+                          .catch(err => {
+                            console.error({
+                              error: "SAVING DB ERROR: ",
+                              printer: printer.ip + ":" + printer.port,
+                              msg: err
+                            });
+                          });
                         Runner.setOnline(printer);
                       });
                     });
@@ -32,7 +41,7 @@ class Runner {
           })
           .catch(err => {
             //Set printer offline
-            Printers.find({ inited: false }, (err, printers) => {
+            Printers.find({}, (err, printers) => {
               Runner.setOffline(printers[i]);
             });
             console.error({
@@ -58,7 +67,16 @@ class Runner {
               Runner.getFiles(printers[i]).then(printer => {
                 Runner.getJob(printer).then(printer => {
                   printer.action = "Online Monitoring...";
-                  printer.save();
+                  printer
+                    .save()
+                    .then()
+                    .catch(err => {
+                      console.error({
+                        error: "SAVING DB ERROR: ",
+                        printer: printers[i].ip + ":" + printers[i].port,
+                        msg: err
+                      });
+                    });
                   Runner.setOnline(printer);
                 });
               });
@@ -66,7 +84,7 @@ class Runner {
           })
           .catch(err => {
             //Set printer offline
-            Printers.find({ inited: true }, (err, printers) => {
+            Printers.find({}, (err, printers) => {
               Runner.setOffline(printers[i]);
             });
             console.error({
@@ -91,6 +109,7 @@ class Runner {
       clearInterval(run);
     });
   }
+
   static setOnline(printer) {
     console.log("Setting Online Check");
     //Make sure printer not offline
@@ -106,17 +125,26 @@ class Runner {
     console.log("Set online check with: " + printer.ip + ":" + printer.port);
   }
   static setOffline(printer) {
-    console.log("Setting Offline Check");
     let current = {
       state: "Offline",
       port: "",
       baudrate: "",
       printerProfile: ""
     };
+
     printer.current = current;
     printer.action = "Offline Checking...";
     printer.stateColour = this.getColour(current.state);
-    printer.save();
+    printer
+      .save()
+      .then()
+      .catch(err => {
+        console.error({
+          error: "SAVING DB ERROR: ",
+          printer: printer.ip + ":" + printer.port,
+          msg: err
+        });
+      });
     //Make sure printer not online
     clearInterval(onlineRunners[printer.index]);
     onlineRunners[printer.index] = false;
@@ -137,32 +165,60 @@ class Runner {
           printer.stateColour.category !== "Offline" &&
           printer.stateColour.category !== "Closed"
         ) {
-          Runner.getJob(printer).then(printer => {
+          Runner.getJob(check).then(printer => {
             Runner.getPrinter(printer).then(printer => {
-              printer.save();
+              printer
+                .save()
+                .then()
+                .catch(err => {
+                  console.error({
+                    error: "SAVING DB ERROR: ",
+                    printer: printer.ip + ":" + printer.port,
+                    msg: err
+                  });
+                });
             });
           });
         }
       })
       .catch(err => {
         //Set printer offline
-        Printers.find({ inited: true }, (err, printers) => {
-          Runner.setOffline(printer);
+        Runner.setOffline(printer);
+        console.error({
+          error: "CHECK ONLINE ERROR: ",
+          printer: printer.ip + ":" + printer.port,
+          msg: err
         });
       });
   }
   static async checkOffline(printer) {
     await Runner.getConnection(printer)
       .then(printer => {
-        printer.save();
+        printer
+          .save()
+          .then()
+          .catch(err => {
+            console.error({
+              error: "SAVING DB ERROR: ",
+              printer: printer.ip + ":" + printer.port,
+              msg: err
+            });
+          });
         this.setOnline(printer);
       })
-      .catch(err => console.log("Printer Offline: Keeping Offline"));
+      .catch(err => {
+        console.error({
+          error: "CHECK OFFLINE ERROR: ",
+          printer: printer.ip + ":" + printer.port,
+          msg: "Leaving on offline search",
+          msg2: "Original due to promise timeout: " + err
+        });
+      });
   }
 
   static getConnection(printer) {
     return Promise.race([
-      Runner.timeout(1000),
+      Runner.timeout(3000),
       Runner.get(printer.ip, printer.port, printer.apikey, "connection")
         .then(res => {
           return res.json();
@@ -215,7 +271,7 @@ class Runner {
               path = "local";
             }
             let file = {
-              path: entry.path,
+              path: path,
               display: entry.display,
               name: entry.name,
               size: entry.size,

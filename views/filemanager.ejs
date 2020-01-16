@@ -1,7 +1,6 @@
 <% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
-
 <div id="filemanager" class="row">
-  <div id="filePrinters" class="col-12 col-sm-12 col-md-4 col-lg-3 col-xl-3">
+  <div id="filePrinters" class="col-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 ">
     <div class="card text-white bg-dark">
       <div class="card-header fileHeader">
         <h5 class="float-left">
@@ -35,6 +34,14 @@
           >
             <i class="fas fa-layer-group"></i> Multi-Upload
           </button>
+          <button
+            type="button"
+            class="btn btn-info m-3"
+            data-toggle="modal"
+            data-target="#fileReplaceModal"
+          >
+            <i class="fas fa-exchange-alt"></i> File Replace
+          </button>
         </center>
         <div class="list-group">
           <%- include('./partials/FileManager/printerList.ejs') %>
@@ -43,7 +50,7 @@
       <div class="card-footer fileFooter text-muted"></div>
     </div>
   </div>
-  <div class="col-12 col-sm-12 col-md-3 col-lg-3 col-xl-3">
+  <div class="col-12 col-sm-12 col-md-8 col-lg-9 col-xl-9">
     <div class="card text-white bg-dark">
       <div class="card-header fileHeader">
         <h5 class="float-left">
@@ -54,52 +61,13 @@
             aria-expanded="false"
             disabled
           >
-            <i class="fas fa-folder"></i> Folders
+            <i class="fas fa-file-code"></i> Files: local/
           </button>
         </h5>
-      </div>
-      <div class="card-body fileBody">
-        <center>
-          <button
-            type="button"
-            class="btn btn-warning m-3"
-            data-toggle="collapse"
-            href="#createFolder"
-            role="button"
-            aria-expanded="false"
-            aria-controls="createFolder"
-          >
-            <i class="fas fa-folder-plus"></i> Create Folder
-          </button>
-          <div class="collapse" id="createFolder">
-            <div class="card card-body">Creating Folder INN</div>
-          </div>
-        </center>
-        <div class="list-group">
-          <%- include('./partials/FileManager/folderList.ejs') %>
-        </div>
-      </div>
-      <div class="card-footer fileFooter text-muted"></div>
-    </div>
-  </div>
-  <div class="col-12 col-sm-12 col-md-5 col-lg-6 col-xl-6">
-    <div class="card text-white bg-dark">
-      <div class="card-header fileHeader">
-        <h5 class="float-left">
-          <button
-            type="button"
-            class="btn btn-secondary float-right d-block"
-            href="#"
-            aria-expanded="false"
-            disabled
-          >
-            <i class="fas fa-file-code"></i> Files
-          </button>
-        </h5>
-        <div class="form-group mt-2 float-right">
+        <div class="form-group mt-2 mb-2 float-right">
           <form class="form-inline">
             <div class="form-group">
-              <label for="inputPassword6">
+              <label for="searchFiles">
                 <i class="fas fa-search pr-1"></i>
               </label>
               <input
@@ -113,18 +81,39 @@
         </div>
       </div>
       <div class="card-body fileBody">
+        <button type="button" class="btn btn-success m-3 float-right">
+          <i class="fas fa-file-import"></i> Back
+        </button>
+
+        <button
+          type="button"
+          class="btn btn-success m-3 float-left"
+          data-toggle="collapse"
+          href="#fileUpload"
+          role="button"
+          aria-expanded="false"
+          aria-controls="fileUpload"
+        >
+          <i class="fas fa-file-import"></i> Upload File(s)
+        </button>
+        <button
+          type="button"
+          class="btn btn-warning m-3 float-left"
+          data-toggle="collapse"
+          href="#createFolder"
+          role="button"
+          aria-expanded="false"
+          aria-controls="createFolder"
+        >
+          <i class="fas fa-folder-plus"></i> Create Folder
+        </button>
+        <button type="button" class="btn btn-primary m-3">
+          <i class="fas fa-folder-plus"></i> Re-Sync
+        </button>
         <center>
-          <button
-            type="button"
-            class="btn btn-success m-3"
-            data-toggle="collapse"
-            href="#fileUpload"
-            role="button"
-            aria-expanded="false"
-            aria-controls="fileUpload"
-          >
-            <i class="fas fa-file-import"></i> Upload File(s)
-          </button>
+          <div class="collapse" id="createFolder">
+            <div class="card card-body">Creating Folder INN</div>
+          </div>
           <div class="collapse" id="fileUpload">
             <div class="card card-body">
               Anim pariatur cliche reprehenderit, enim eiusmod high life
@@ -135,7 +124,8 @@
           </div>
         </center>
         <div class="list-group">
-          <%- include('./partials/FileManager/fileList.ejs') %>
+          <%- include('./partials/FileManager/fileList.ejs') %> <%-
+          include('./partials/FileManager/folderList.ejs') %>
         </div>
       </div>
       <div class="card-footer fileFooter text-muted"></div>

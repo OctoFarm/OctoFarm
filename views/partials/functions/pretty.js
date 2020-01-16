@@ -6,6 +6,10 @@ const bytes = function(a, b) {
     f = Math.floor(Math.log(a) / Math.log(c));
   return parseFloat((a / Math.pow(c, f)).toFixed(d)) + " " + e[f];
 };
+const calculatePercent = function(use, total) {
+  let percent = (use / total) * 100;
+  return Math.round(percent);
+};
 const generateTime = function(seconds) {
   let string = "";
   if (seconds === undefined) {
@@ -51,5 +55,6 @@ const generateTime = function(seconds) {
 };
 module.exports = {
   generateBytes: bytes,
-  generateTime: generateTime
+  generateTime: generateTime,
+  calculatePercent: calculatePercent
 };

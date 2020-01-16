@@ -1,3 +1,5 @@
+<% for(let i=0;i <
+printers[0].fileList.files.length;i++){%>
 <a
   href="#"
   class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
@@ -13,7 +15,7 @@
     </div>
     <div class="col-lg-11">
       <div class="d-flex w-100 justify-content-between">
-        <h5 class="mb-1">Poppy-Sweetheart.gcode</h5>
+        <h5 class="mb-1"><%= printers[0].fileList.files[i].display %></h5>
         <small>22 Hrs, 5 Mins, 12 Seconds</small>
       </div>
       <p class="mb-1 float-left">
@@ -23,3 +25,5 @@
     </div>
   </div>
 </a>
+</a>
+<%}%>
