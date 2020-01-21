@@ -20,14 +20,14 @@
     >
     <%- include('buttons.ejs', {printer: printer}) %>
     </div>
-    <small class="pt-2 float-left ml-1"><i class="fas fa-network-wired"></i> <%= printer.ip%>:<%= printer.port%></small>
+    <small class="pt-2 float-left ml-1 text-light"><i class="fas fa-network-wired"></i> <%= printer.ip%>:<%= printer.port%></small>
   </li>
 </div>
 <% }else{ %>
 <!-- Connected -->
 <div class="list-group">
   <li class="list-group-item list-group-item-action flex-column align-items-start">
-    <div class="d-flex w-100 justify-content-between text-light">
+    <div class="d-flex w-100 justify-content-between">
       <h5 class="mb-1 ml-1"> <i class="fas fa-print"></i>  <%= printer.index %>. <% if(typeof printer.settingsApperance != 'undefined'){ %>
         <%= printer.settingsApperance.name %> <% } %></span
         ></h5>
@@ -42,7 +42,7 @@
     >
     <%- include('buttons.ejs', {printer: printer}) %>
     </div>
-    <small class="pt-2 float-left ml-1 text-light"><i class="fas fa-network-wired"></i> <%= printer.ip%>:<%= printer.port%></small>
+    <small class="pt-2 float-left ml-1"><i class="fas fa-network-wired"></i> <%= printer.ip%>:<%= printer.port%></small>
   </li>
 </div>
 <% } %> <% }) %>

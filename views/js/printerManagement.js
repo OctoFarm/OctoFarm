@@ -365,15 +365,11 @@ class PrintersManagement {
         .build();
       printers.push(printer);
     }
-    await printers.sort(Calculate.sortObjValues("index"));
-    await Client.post("printers/save", printers)
+    printers.sort(Calculate.sortObjValues("index"));
+
+    Client.post("printers/save", printers)
       .then(res => {
         if (res.status === 200) {
-          if (printers.length > 0) {
-            PrintersManagement.activatePrinterManagement();
-          } else {
-            PrintersManagement.deactivatePrinterManagement();
-          }
           Client.post("printers/runner/init", {});
           window.location.replace("/dashboard");
         } else {
@@ -381,7 +377,12 @@ class PrintersManagement {
         }
       })
       .catch(err => {
-        window.location.replace("/dashboard");
+        UI.createAlert(
+          "error",
+          "Sorry I can't seem to access the API to save your printers.",
+          3000,
+          "yes"
+        );
         console.log(err);
       });
   }

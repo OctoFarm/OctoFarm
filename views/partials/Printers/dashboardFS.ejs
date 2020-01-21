@@ -1,0 +1,85 @@
+<div class="row">
+  <div class="col-lg-6 text-center text-light">
+    <b><i class="fas fa-star-half-alt"></i> Farm Utilisation</b>
+    <p class="mb-0 mt-1">
+      <i class="fas fa-square text-success"></i> <b>Active: </b>
+      3 Day, 5 Hrs, 43 Mins, 65 Seconds
+      <!-- Calculate by: {total successful print time} -->
+      <i class="fas fa-square text-danger"></i> <b>Idle: </b>
+      1 Day, 2 Hrs, 20 Mins, 3 Seconds
+      <!-- Calculate by: {{now} - {farm startdate}} - {all print time} -->
+    </p>
+    <center>
+      <div class="progress mb-0">
+        <div
+          class="progress-bar progress-bar-striped bg-success"
+          role="progressbar"
+          style="width: 75% "
+          aria-valuenow=" 75%"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
+          75%
+        </div>
+        <div
+          class="progress-bar progress-bar-striped bg-danger"
+          role="progressbar"
+          style="width: 25% "
+          aria-valuenow="25%"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
+          25%
+        </div>
+      </div>
+    </center>
+  </div>
+  <div class="col-lg-6 text-center text-light">
+    <b class="mt-1"><i class="fas fa-archive"></i> Files and Storage</b>
+    <div class="row">
+      <div class="col-lg-6">
+        <p class="mb-0">
+          <i class="fas fa-square text-warning"></i> <b>Used: </b>
+          6.5GB
+
+          <i class="fas fa-square text-success"></i> <b>Available: </b>
+          31.3GB
+        </p>
+        <center>
+          <div class="progress mb-0">
+            <div
+              class="progress-bar progress-bar-striped bg-warning"
+              role="progressbar"
+              style="width: 20% "
+              aria-valuenow=" 20%"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              75%
+            </div>
+            <div
+              class="progress-bar progress-bar-striped bg-success"
+              role="progressbar"
+              style="width: 80% "
+              aria-valuenow="80%"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              25%
+            </div>
+          </div>
+        </center>
+      </div>
+      <div class="col-lg-6">
+        <div class="row">
+          <div class="col-lg-6">
+            <b>Largest File <br /></b>25MB<br />
+          </div>
+          <div class="col-lg-6">
+            <b>Smallest File <br /></b>25KB<br />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

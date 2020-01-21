@@ -38,6 +38,21 @@
     <i class="fas fa-file-code"></i> <% if(typeof printer.job.file != 'undefined'){ %> <%= printer.job.file.name
     %> <%}%>
   </td>
+  <td id="listState-${index}">
+    <div class="input-group mb-0">
+      <div class="input-group-prepend">
+        <label class="input-group-text" for="inputGroupSelect01"
+          >Filament</label
+        >
+      </div>
+      <select class="custom-select" id="inputGroupSelect01">
+        <option selected></option>
+        <option value="1">PLA - White</option>
+        <option value="2">ABS - Green</option>
+        <option value="3">PLA - Glitter Blue</option>
+      </select>
+    </div>
+  </td>
   <td id="listState-${index}"><%= printer.current.state %></td>
   <td id="listPrintTime-${index}">
     <% if(typeof printer.progress!= 'undefined'){ %> <%=

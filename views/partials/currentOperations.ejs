@@ -1,0 +1,97 @@
+<div
+  id="currentOperations"
+  class="d-none d-sm-none d-md-block col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12"
+>
+  <div class="card text-white bg-dark">
+    <div class="card-header dashHeader">
+      <div class="row">
+        <div class="col-md-2 col-lg-2">
+          <button
+            type="button"
+            class="btn btn-secondary d-block"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            <i class="fas fa-star"></i> Current Operations
+          </button>
+        </div>
+        <div class="col-md-3 col-lg-6">
+          <div class="progress mt-2">
+            <div
+              class="progress-bar progress-bar-striped bg-success"
+              role="progressbar"
+              style="width: 25%"
+              aria-valuenow="25"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              25%
+            </div>
+          </div>
+        </div>
+        <div class="col-md-7 col-lg-4">
+          <button
+            type="button"
+            class="btn btn-danger float-right d-block ml-1"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            Offline: <%= offlineCount %>
+          </button>
+          <button
+            type="button"
+            class="btn btn-dark float-right d-block ml-1"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            Idle: <%= idleCount %>
+          </button>
+          <button
+            type="button"
+            class="btn btn-warning float-right d-block ml-1"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            Active: <%= activeCount %>
+          </button>
+          <button
+            type="button"
+            class="btn btn-success float-right ml-1 d-block"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            Complete: <%= completeCount %>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card-body pt-0 pb-0 d-flex flex-row overflow-x">
+      <div
+        class="card card-block text-white bg-secondary d-inline-block"
+        style="min-width: 200px; height:65px;"
+      >
+        <div class="card-header pb-1 pt-1 pl-2 pr-2">0. Battle Bot</div>
+        <div class="card-body  pb-0 pt-2 pl-2 pr-2">
+          <div class="progress">
+            <div
+              class="progress-bar progress-bar-striped bg-success"
+              role="progressbar"
+              style="width: 25%"
+              aria-valuenow="25"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              25%
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

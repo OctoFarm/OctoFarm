@@ -62,7 +62,7 @@ li {
 }
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #303030;
 }
 /* Handle */
 ::-webkit-scrollbar-thumb {
@@ -92,7 +92,10 @@ a.notyet {
 .card {
   margin: 5px;
 }
-
+.overflow-x {
+  overflow-x: scroll;
+  overflow-y: hidden;
+}
 .dashHeader {
   padding: 5px;
 }
@@ -100,7 +103,9 @@ a.notyet {
 .dashBody {
   padding: 5px;
   overflow-y: scroll;
-  height: 80vh;
+  min-height: 81vh;
+  height: 82vh;
+  max-height: 85vh;
 }
 
 .dashBody p {

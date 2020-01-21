@@ -64,6 +64,20 @@
         <%= printer.current.state %>
       </button>
       <center>
+        <div class="input-group mb-0">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="inputGroupSelect01"
+              >Filament</label
+            >
+          </div>
+          <select class="custom-select" id="inputGroupSelect01">
+            <option selected></option>
+            <option value="1">PLA - White</option>
+            <option value="2">ABS - Green</option>
+            <option value="3">PLA - Glitter Blue</option>
+          </select>
+        </div>
+
         <button
           id="panPrintStart-${index}"
           type="button"

@@ -25,8 +25,12 @@ router.get("/dashboard", ensureAuthenticated, (req, res) => {
     let active = [];
     let idle = [];
     let offline = [];
+    let complete = [];
     printers.forEach(print => {
       if (print.stateColour.category === "Active") {
+        complete.push(print.ip);
+      }
+      if (print.stateColour.category === "Complete") {
         active.push(print.ip);
       }
       if (print.stateColour.category === "Idle") {
@@ -47,6 +51,7 @@ router.get("/dashboard", ensureAuthenticated, (req, res) => {
       printerCount: printers.length,
       activeCount: active.length,
       idleCount: idle.length,
+      completeCount: complete.length,
       offlineCount: offline.length,
       page: "Dashboard",
       helpers: prettyHelpers,
@@ -63,6 +68,19 @@ router.get("/filemanager", ensureAuthenticated, (req, res) => {
       printers: printers,
       printerCount: printers.length,
       page: "File Manager",
+      helpers: prettyHelpers
+    });
+  });
+});
+//History Page
+router.get("/history", ensureAuthenticated, (req, res) => {
+  Printers.find({}, null, { sort: { index: 1 } }, (err, printers) => {
+    res.render("history", {
+      name: req.user.name,
+      version: pjson.version,
+      printers: printers,
+      printerCount: printers.length,
+      page: "History",
       helpers: prettyHelpers
     });
   });

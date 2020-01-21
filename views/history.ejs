@@ -1,0 +1,123 @@
+<% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
+
+<div class="row">
+  <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+    <table class="table table-dark text-center">
+      <thead>
+        <tr>
+          <th class="sticky-table table-dark" scope="col">#</th>
+          <th class="sticky-table table-dark" scope="col">State</th>
+          <th class="sticky-table table-dark" scope="col">File Name</th>
+          <th class="sticky-table table-dark" scope="col">Start Date</th>
+          <th class="sticky-table table-dark" scope="col">End Date</th>
+          <th class="sticky-table table-dark" scope="col">Print Time</th>
+          <th class="sticky-table table-dark" scope="col">Spool</th>
+          <th class="sticky-table table-dark" scope="col">Filament Usage</th>
+          <th class="sticky-table table-dark" scope="col" width="400px">
+            Notes
+          </th>
+          <th class="sticky-table table-dark" scope="col"></th>
+        </tr>
+      </thead>
+      <tbody id="listViewTable">
+        <tr id="3">
+          <th scope="row">3</th>
+          <td><i class="fas fa-thumbs-up text-success"></i></td>
+          <td>a file.gcode</td>
+          <td>05/03/2020 21:45</td>
+          <td>06/03/2020 02:55</td>
+          <td>5 Hrs, 10 Mins</td>
+          <td>Eryone - PLA - White</td>
+          <td>23m / 215g</td>
+          <td class="text-wrap">
+            Print was a tiny bit stringy, tweak retraction settings
+          </td>
+          <td>
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <button type="button" class="btn btn-info btn-small">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button type="button" class="btn btn-danger btn-small">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr id="2">
+          <th scope="row">2</th>
+          <td><i class="fas fa-thumbs-up text-success"></i></td>
+          <td>another file.gcode</td>
+          <td>09/03/2020 03:00</td>
+          <td>09/03/2020 04:35</td>
+          <td>1 Hrs, 35 Mins</td>
+          <td>Eryone - PLA - Glitter Blue</td>
+          <td>150m / 254g</td>
+          <td class="text-wrap">
+            Managed to get the print restarted at the correct layer height boo
+            ya!
+          </td>
+          <td>
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <button type="button" class="btn btn-info btn-small">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button type="button" class="btn btn-danger btn-small">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr id="1">
+          <th scope="row">1</th>
+          <td><i class="fas fa-thumbs-down text-danger"></i></td>
+          <td>another file.gcode</td>
+          <td>07/03/2020 10:50</td>
+          <td>09/03/2020 02:55</td>
+          <td>1 Day, 16 Hrs, 5 Mins</td>
+          <td>Eryone - PLA - Glitter Blue</td>
+          <td>358m / 1554g</td>
+          <td class="text-wrap">
+            Cancelled at last minute due to filament running out.
+          </td>
+          <td>
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <button type="button" class="btn btn-info btn-small">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button type="button" class="btn btn-danger btn-small">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<% }else{ %>
+<div class="row mt-5">
+  <div class="col-md-6 m-auto">
+    <div class="card card-body text-center">
+      <h1>Welcome to OctoFarm</h1>
+      <p>
+        The all in one monitoring solution for multiple Octoprint instances.
+      </p>
+      <h1><img src="images/logo.png" /></h1>
+      <p>
+        Thank you for creating an account <% if(typeof name != 'undefined'){ %>
+        <%= name %> <% }%>. To get started though, we need some printers in your
+        farm!
+      </p>
+      <a
+        href="#"
+        class="btn btn-primary btn-block mb-2"
+        href="#"
+        data-toggle="modal"
+        data-target="#printerSetupModal"
+        >Setup Printers</a
+      >
+    </div>
+  </div>
+</div>
+<% } %>

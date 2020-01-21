@@ -57,21 +57,14 @@ class SystemRunner {
     let cpuCurrentSpeed = await si
       .cpuCurrentspeed()
       .catch(error => console.error(error));
-    let cpuTemperature = await si
-      .cpuTemperature()
-      .catch(error => console.error(error));
     let cpuLoad = await si.currentLoad().catch(error => console.error(error));
     let cpuInfo = {
       cpu: cpu,
-      speed: cpuCurrentSpeed,
-      cpuTemperature: cpuTemperature
+      speed: cpuCurrentSpeed
     };
 
     let memoryInfo = await si.mem().catch(error => console.error(error));
     let uptime = si.time();
-    let networkStats = await si
-      .networkStats()
-      .catch(error => console.error(error));
     let osInfo = await si.osInfo().catch(error => console.error(error));
     let currentProcess = await si
       .processes()
@@ -87,7 +80,6 @@ class SystemRunner {
       cpuInfo: cpuInfo,
       cpuLoad: cpuLoad,
       memoryInfo: memoryInfo,
-      networkInfo: networkStats,
       sysUptime: uptime,
       sysProcess: sysProcess
     };

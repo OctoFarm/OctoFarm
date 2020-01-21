@@ -77,20 +77,32 @@
                 </a>
                 <% }else { %>
                   <a class="nav-link notyet" href="#" data-toggle="modal" role="button"
-                  data-target="#fileManagerModal" id="fileManagerBtn">
+                  >
                   <center><i class="fas fa-folder-open"></i> File Manager</center>
                   </a>
             <%    } %>
                 </li>
                 <li class="nav-item">
                   <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
-                    <a class="d-none d-sm-none d-md-none d-lg-block nav-link" href="/filemanager" id="fileManagerBtn">
-                    <center><i class="fas fa-folder-open"></i> Historyr</center>
+                    <a class="d-none d-sm-none d-md-none d-lg-block nav-link" href="/history" id="fileManagerBtn">
+                    <center><i class="fas fa-history"></i> History</center>
                 </a>
                 <% }else { %>
                   <a class="nav-link notyet" href="#" data-toggle="modal" role="button"
-                  data-target="#fileManagerModal" id="fileManagerBtn">
-                  <center><i class="fas fa-folder-open"></i> History</center>
+                 >
+                  <center><i class="fas fa-history"></i> History</center>
+                  </a>
+            <%    } %>
+                </li>
+                <li class="nav-item">
+                  <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
+                    <a class="d-none d-sm-none d-md-none d-lg-block nav-link" href="#" data-toggle="modal" data-target="#filamentModal">
+                    <center><i class="fas fa-toilet-paper"></i> Filament</center>
+                </a>
+                <% }else { %>
+                  <a class="nav-link notyet" href="#" data-toggle="modal" role="button"
+                 >
+                  <center><i class="fas fa-toilet-paper"></i> Filament</center>
                   </a>
             <%    } %>
                 </li>
@@ -426,7 +438,7 @@
                                           <div class="progress">
                                             <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
                                           </div></button>
-                                          <button type="button" class="btn btn-primary">5. Anothjer Name<br>
+                                          <button type="button" class="btn btn-primary">5. Another Name<br>
                                             <div class="progress">
                                               <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
                                             </div></button>
@@ -590,6 +602,14 @@
                                       <hr>
                                       <form class="was-validated">
                                         <div class="custom-control custom-checkbox mb-3">
+                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
+                                          <label class="custom-control-label" for="offlinePollOn">Current Operations</label>
+                                          <div class="valid-feedback">Current Operations will be shown on the panel view.</div>
+                                          <div class="invalid-feedback">Current Operations will not be shown on the panel view.</div>
+                                        </div>
+                                      </form>
+                                      <form class="was-validated">
+                                        <div class="custom-control custom-checkbox mb-3">
                                           <input type="checkbox" class="custom-control-input" id="offlinePollOn" checked required>
                                           <label class="custom-control-label" for="offlinePollOn">Hide Offline</label>
                                           <div class="valid-feedback">Offline printers will be hidden from the panel view.</div>
@@ -616,6 +636,14 @@
                                   <div class="tab-pane fade" id="system-list-view" role="tabpanel" aria-labelledby="system-list-view-list">
                                       <h5>List View Settings</h5>
                                       <hr>
+                                      <form class="was-validated">
+                                        <div class="custom-control custom-checkbox mb-3">
+                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
+                                          <label class="custom-control-label" for="offlinePollOn">Current Operations</label>
+                                          <div class="valid-feedback">Current Operations will be shown on the list view.</div>
+                                          <div class="invalid-feedback">Current Operations will not be shown on the list view.</div>
+                                        </div>
+                                      </form>
                                       <form class="was-validated">
                                         <div class="custom-control custom-checkbox mb-3">
                                           <input type="checkbox" class="custom-control-input" id="offlinePollOn" checked required>
@@ -662,6 +690,15 @@
                                       </div>
                                       <hr>
                                       <form class="was-validated">
+                                        <div class="custom-control custom-checkbox mb-3">
+                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
+                                          <label class="custom-control-label" for="offlinePollOn">Current Operations</label>
+                                          <div class="valid-feedback">Current Operations will be shown on the camera view.</div>
+                                          <div class="invalid-feedback">Current Operations will not be shown on the camera view.</div>
+                                        </div>
+                                      </form>
+                                      <form class="was-validated">
+
                                         <div class="custom-control custom-checkbox mb-3">
                                           <input type="checkbox" class="custom-control-input" id="offlinePollOn" checked required>
                                           <label class="custom-control-label" for="offlinePollOn">Hide Offline</label>
@@ -894,7 +931,123 @@
       </div>
   </div>
 </div>
+<div class="modal fade" id="filamentModal" tabindex="0" role="dialog" aria-labelledby="filamentModal" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h3 class="modal-title" id="systemSettingsLabel">Filament Manager</h3>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+        <span class="text-white" aria-hidden="true">&times;</span>
+      </button>
+          </div>
+          <div class="modal-body">
+              <div class="container-fluid">
+                  <div class="row">
+                    
+                      <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                          <div class="tab-content" id="nav-tabContent">
+                              <div class="tab-pane fade show active" id="printer-add-edit" role="tabpanel" aria-labelledby="system-settings-list">
+                                  <p>OctoFarm will use the list below to populate the filament list you see when starting a print.</p>
+                                  <p><b>NOTE: </b> This is currently only used for reference on the History page. Deleting them here will not affect History at all.</p>
+                                  <div id="message"></div>
+                                      <div class="row">
+                                        <div class="col-sm-12 col-lg-6">
+                                          <div class="input-group mb-1">
+                                            <input type="text" class="form-control" placeholder="New Manufacturer" aria-label="" aria-describedby="basic-addon1">
+                                            <div class="input-group-append">
+                                              <button class="btn btn-outline-success" type="button">Add</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="col-sm-12 col-lg-6">
+                                          <div class="input-group mb-1">
+                                            <input type="text" class="form-control" placeholder="New Colour" aria-label="" aria-describedby="basic-addon1">
+                                            <div class="input-group-append">
+                                              <button class="btn btn-outline-success" type="button">Add</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="col-sm-12 col-lg-6">
+                                          <div class="input-group mb-1">
+                                            <input type="text" class="form-control" placeholder="Filament Type" aria-label="" aria-describedby="basic-addon1">
+                                            <div class="input-group-append">
+                                              <button class="btn btn-outline-success" type="button">Add</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="col-sm-12 col-lg-6">
+                                          <div class="input-group mb-1">
+                                            <input type="text" class="form-control" placeholder="Filament Density" aria-label="" aria-describedby="basic-addon1">
+                                            <div class="input-group-append">
+                                              <button class="btn btn-outline-success" type="button">Add</button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                        <div class="col-lg-12">
+                                          <div class="input-group mb-3">
+                                            <div class="input-group-prepend">
+                                              <label class="input-group-text" for="inputGroupSelect01">Manufacturer</label>
+                                            </div>
+                                            <select class="custom-select" id="inputGroupSelect01">
+                                              <option selected>Choose...</option>
+                                              <option value="1">One</option>
+                                              <option value="2">Two</option>
+                                              <option value="3">Three</option>
+                                            </select>
+                                            <div class="input-group-prepend">
+                                              <label class="input-group-text" for="inputGroupSelect01">Filament</label>
+                                            </div>
+                                            <select class="custom-select" id="inputGroupSelect01">
+                                              <option selected>Choose...</option>
+                                              <option value="1">One</option>
+                                              <option value="2">Two</option>
+                                              <option value="3">Three</option>
+                                            </select>
+                                            <div class="input-group-prepend">
+                                              <label class="input-group-text" for="inputGroupSelect01">Colour</label>
+                                            </div>
+                                            <select class="custom-select" id="inputGroupSelect01">
+                                              <option selected>Choose...</option>
+                                              <option value="1">One</option>
+                                              <option value="2">Two</option>
+                                              <option value="3">Three</option>
+                                            </select>
+                                            <div class="input-group-append">
+                                              <button class="btn btn-outline-success" type="button">Add</button>
+                                            </div>
+                                          </div>
+                                        
+                                        </div>
+                                        </div>
+                                      </div>
+                   
+                                  <table class="table">
+                                      <thead>
+                                          <tr>
+                                              <th scope="col" width="150px">Manufacturer</th>
+                                              <th scope="col" width="100px">Type</th>
+                                              <th scope="col">Colour</th>
+                                          </tr>
+                                      </thead>
+                                      <tbody id="addPrintersTable">
+                                        
 
+                                      </tbody>
+                                  </table>
+                              </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+<div class="modal-footer">
+<button id="filamentSaveBtn" type="button" class="btn btn-light" data-dismiss="modal">
+Close
+</button>
+</div>
+</div>
+</div>
+</div>
 
 
 
