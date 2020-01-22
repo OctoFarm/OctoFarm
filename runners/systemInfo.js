@@ -5,7 +5,7 @@ const process = require("process");
 let systemRunner = false;
 
 class SystemRunner {
-  static setSystemRunner() {
+  static init() {
     if (systemRunner === false) {
       console.log("Starting System Runner");
       systemRunner = setInterval(function() {

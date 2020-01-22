@@ -68,11 +68,18 @@ if (db === "") {
 const PORT = process.env.PORT || 4000;
 app.listen(PORT, console.log(`Server started on port ${PORT}`));
 if (db != "") {
+  //Setup Settings
+  const serverSettings = require("./settings/serverSettings.js");
+  const ServerSettings = serverSettings.ServerSettings;
+  ServerSettings.init();
+  const clientSettings = require("./settings/clientSettings.js");
+  const ClientSettings = clientSettings.ClientSettings;
+  ClientSettings.init();
   //Start backend metrics gathering...
   const runner = require("./runners/state.js");
   const Runner = runner.Runner;
   Runner.init();
   const system = require("./runners/systemInfo.js");
   const SystemRunner = system.SystemRunner;
-  SystemRunner.setSystemRunner();
+  SystemRunner.init();
 }

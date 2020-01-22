@@ -1,4 +1,6 @@
 const Printers = require("../models/Printer.js");
+const serverSettings = require("../settings/serverSettings.js");
+const ServerSettings = serverSettings.ServerSettings;
 const fetch = require("node-fetch");
 const _ = require("lodash");
 
@@ -42,9 +44,17 @@ class Runner {
         clearInterval(offlineRunners[printer.index]);
         offlineRunners[printer.index] = false;
         //Set offline
-        offlineRunners[printer.index] = setInterval(function() {
-          Runner.getConnection(printer);
-        }, 300000);
+        ServerSettings.check().then(checked => {
+          if(checked[0].offlinePolling.on === true){
+            offlineRunners[printer.index] = setInterval(function() {
+              Runner.getConnection(printer);
+            }, checked[0].offlinePolling.seconds);
+            console.log("Set offline check with: " + printer.ip + ":" + printer.port);
+          }else{
+            console.log("Offline Polling is disabled in settings, enable if required.")
+          }
+        })
+
       })
       .catch(err => {
         let error = {
@@ -57,7 +67,6 @@ class Runner {
   }
 
   static setOnline(printer) {
-    console.log("Setting Online Check");
     //Make sure printer not offline
     clearInterval(offlineRunners[printer.index]);
     offlineRunners[printer.index] = false;
@@ -65,10 +74,12 @@ class Runner {
     clearInterval(onlineRunners[printer.index]);
     onlineRunners[printer.index] = false;
     //Set Online
-    onlineRunners[printer.index] = setInterval(function() {
-      Runner.checkOnline(printer);
-    }, 4000);
-    console.log("Set online check with: " + printer.ip + ":" + printer.port);
+    ServerSettings.check().then(checked => {
+      onlineRunners[printer.index] = setInterval(function() {
+        Runner.checkOnline(printer);
+      }, checked[0].onlinePolling.seconds);
+      console.log("Set online check with: " + printer.ip + ":" + printer.port);
+    })
   }
 
   static checkOnline(printer) {
@@ -118,7 +129,7 @@ class Runner {
             action: "Printer moved to Offline Checking"
           };
           Runner.setOffline(printer);
-          console.log(error);
+          console.log(error)
         })
     ]);
   }

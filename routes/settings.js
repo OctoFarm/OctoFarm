@@ -1,24 +1,37 @@
 const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
-const db = require("../config/db").MongoURI;
+const ServerSettingsDB = require("../models/serverSettings.js");
+const ClientSettingsDB = require("../models/ClientSettings.js");
+const runner = require("../runners/state.js");
+const Runner = runner.Runner;
 
 module.exports = router;
 
-router.post("/save", ensureAuthenticated, (req, res) => {
-  //Check required fields
-  const printers = req.body;
+router.get("/server/get", ensureAuthenticated, (req, res) => {
+  ServerSettingsDB.find({}).then(checked => {
+    res.send(checked[0]);
+  })
 
-  Printers.deleteMany({})
-    .then(res => {
-      Runner.stopAll();
-    })
-    .catch(err => console.log(err));
+});
 
-  printers.forEach(printer => {
-    let newPrinter = new Printers(printer);
-    newPrinter.save().then(res => {});
-  });
+router.post("/server/update", ensureAuthenticated, (req, res) => {
+  ServerSettingsDB.find({}).then(checked => {
+    Runner.stopAll();
+    checked[0].onlinePolling = req.body.onlinePolling;
+    checked[0].offlinePolling = req.body.offlinePolling;
+    checked[0].save();
+    res.send({msg: "Successfully saved your settings"})
+    return;
+  }).then(res => {
+    Runner.init();
+  })
 
-  res.send(printers);
+});
+
+router.get("/client/get", ensureAuthenticated, (req, res) => {
+  ClientSettingsDB.find({}).then(checked => {
+    res.send(checked[0]);
+  })
+
 });

@@ -579,7 +579,7 @@
                                           <div class="input-group-prepend">
                                               <span class="input-group-text">Refresh Rate:</span>
                                           </div>
-                                          <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="eeRefreshRate" value="6" min="4" max="60" step="1">
+                                          <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="clientRefreshRate" value="6" min="4" max="60" step="1">
                                           <div class="input-group-append">
                                               <span class="input-group-text">Seconds</span>
                                           </div>
@@ -593,7 +593,7 @@
                                           <div class="input-group-prepend">
                                               <span class="input-group-text" id="basic-addon1">URL:</span>
                                           </div>
-                                          <input type="url" class="form-control" placeholder="https://i.redd.it/frehj36ltk101.png" aria-label="Username" aria-describedby="basic-addon1" id="eeBackgroundURL" value="">
+                                          <input type="url" class="form-control" placeholder="https://i.redd.it/frehj36ltk101.png" aria-label="Username" aria-describedby="basic-addon1" id="clientBackground" value="">
                                       </div>
                                       <p><b>URL Example:</b> "https://i.redd.it/frehj36ltk101.png"</p>
                                   </div>
@@ -602,15 +602,15 @@
                                       <hr>
                                       <form class="was-validated">
                                         <div class="custom-control custom-checkbox mb-3">
-                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
-                                          <label class="custom-control-label" for="offlinePollOn">Current Operations</label>
+                                          <input type="checkbox" class="custom-control-input" id="panelCurrentOpOn" required>
+                                          <label class="custom-control-label" for="CurrentOpOn">Current Operations</label>
                                           <div class="valid-feedback">Current Operations will be shown on the panel view.</div>
                                           <div class="invalid-feedback">Current Operations will not be shown on the panel view.</div>
                                         </div>
                                       </form>
                                       <form class="was-validated">
                                         <div class="custom-control custom-checkbox mb-3">
-                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" checked required>
+                                          <input type="checkbox" class="custom-control-input" id="panelHideOffline" checked required>
                                           <label class="custom-control-label" for="offlinePollOn">Hide Offline</label>
                                           <div class="valid-feedback">Offline printers will be hidden from the panel view.</div>
                                           <div class="invalid-feedback">Offline printers will be shown on the panel view.</div>
@@ -618,18 +618,10 @@
                                       </form>
                                       <form class="was-validated">
                                         <div class="custom-control custom-checkbox mb-3">
-                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
-                                          <label class="custom-control-label" for="offlinePollOn">Hide Closed</label>
+                                          <input type="checkbox" class="custom-control-input" id="panelHideClosed" required>
+                                          <label class="custom-control-label" for="panelHideClosed">Hide Closed</label>
                                           <div class="valid-feedback">Closed printers will be hidden from the panel view.</div>
                                           <div class="invalid-feedback">Closed printers will be shown on the panel view.</div>
-                                        </div>
-                                      </form>
-                                      <form class="was-validated">
-                                        <div class="custom-control custom-checkbox mb-3">
-                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
-                                          <label class="custom-control-label" for="offlinePollOn">Hide Idle</label>
-                                          <div class="valid-feedback">Idle printers will be hidden from the panel view.</div>
-                                          <div class="invalid-feedback">Idle printers will be shown on the panel view.</div>
                                         </div>
                                       </form>
                                   </div>
@@ -638,37 +630,28 @@
                                       <hr>
                                       <form class="was-validated">
                                         <div class="custom-control custom-checkbox mb-3">
-                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
-                                          <label class="custom-control-label" for="offlinePollOn">Current Operations</label>
+                                          <input type="checkbox" class="custom-control-input" id="listCurrentOpOn" required>
+                                          <label class="custom-control-label" for="listCurrentOpOn">Current Operations</label>
                                           <div class="valid-feedback">Current Operations will be shown on the list view.</div>
                                           <div class="invalid-feedback">Current Operations will not be shown on the list view.</div>
                                         </div>
                                       </form>
                                       <form class="was-validated">
                                         <div class="custom-control custom-checkbox mb-3">
-                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" checked required>
-                                          <label class="custom-control-label" for="offlinePollOn">Hide Offline</label>
+                                          <input type="checkbox" class="custom-control-input" id="listHideOffline" checked required>
+                                          <label class="custom-control-label" for="listHideOffline">Hide Offline</label>
                                           <div class="valid-feedback">Offline printers will be hidden from the list view.</div>
                                           <div class="invalid-feedback">Offline printers will be shown on the list view.</div>
                                         </div>
                                       </form>
                                       <form class="was-validated">
                                         <div class="custom-control custom-checkbox mb-3">
-                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
-                                          <label class="custom-control-label" for="offlinePollOn">Hide Closed</label>
+                                          <input type="checkbox" class="custom-control-input" id="listHideClosed" required>
+                                          <label class="custom-control-label" for="listHideClosed">Hide Closed</label>
                                           <div class="valid-feedback">Closed printers will be hidden from the panel view.</div>
                                           <div class="invalid-feedback">Closed printers will be shown on the panel view.</div>
                                         </div>
                                       </form>
-                                      <form class="was-validated">
-                                        <div class="custom-control custom-checkbox mb-3">
-                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
-                                          <label class="custom-control-label" for="offlinePollOn">Hide Idle</label>
-                                          <div class="valid-feedback">Idle printers will be hidden from the panel view.</div>
-                                          <div class="invalid-feedback">Idle printers will be shown on the panel view.</div>
-                                        </div>
-                                      </form>
-
                                   </div>
                             
                                   <div class="tab-pane fade" id="system-camera-view" role="tabpanel" aria-labelledby="system-camera-view-list">
@@ -691,35 +674,18 @@
                                       <hr>
                                       <form class="was-validated">
                                         <div class="custom-control custom-checkbox mb-3">
-                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
-                                          <label class="custom-control-label" for="offlinePollOn">Current Operations</label>
+                                          <input type="checkbox" class="custom-control-input" id="cameraCurrentOpOn" required>
+                                          <label class="custom-control-label" for="cameraCurrentOpOn">Current Operations</label>
                                           <div class="valid-feedback">Current Operations will be shown on the camera view.</div>
                                           <div class="invalid-feedback">Current Operations will not be shown on the camera view.</div>
                                         </div>
                                       </form>
                                       <form class="was-validated">
-
                                         <div class="custom-control custom-checkbox mb-3">
-                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" checked required>
-                                          <label class="custom-control-label" for="offlinePollOn">Hide Offline</label>
-                                          <div class="valid-feedback">Offline printers will be hidden from the list view.</div>
-                                          <div class="invalid-feedback">Offline printers will be shown on the list view.</div>
-                                        </div>
-                                      </form>
-                                      <form class="was-validated">
-                                        <div class="custom-control custom-checkbox mb-3">
-                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
-                                          <label class="custom-control-label" for="offlinePollOn">Hide Closed</label>
+                                          <input type="checkbox" class="custom-control-input" id="cameraHideClosed" required>
+                                          <label class="custom-control-label" for="cameraHideClosed">Hide Closed</label>
                                           <div class="valid-feedback">Closed printers will be hidden from the panel view.</div>
                                           <div class="invalid-feedback">Closed printers will be shown on the panel view.</div>
-                                        </div>
-                                      </form>
-                                      <form class="was-validated">
-                                        <div class="custom-control custom-checkbox mb-3">
-                                          <input type="checkbox" class="custom-control-input" id="offlinePollOn" required>
-                                          <label class="custom-control-label" for="offlinePollOn">Hide Idle</label>
-                                          <div class="valid-feedback">Idle printers will be hidden from the panel view.</div>
-                                          <div class="invalid-feedback">Idle printers will be shown on the panel view.</div>
                                         </div>
                                       </form>
                                   </div>
@@ -759,7 +725,7 @@
                               <div class="input-group-prepend">
                                   <span class="input-group-text">Online Poll Rate:</span>
                               </div>
-                              <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="eeRefreshRate" value="6" min="4" max="60" step="1">
+                              <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="onlinePollRate" value="6" min="4" max="60" step="1">
                               <div class="input-group-append">
                                   <span class="input-group-text">Seconds</span>
                               </div>
@@ -768,8 +734,8 @@
                           <p class="font-weight-bold">Server Offline Polling</p>
                           <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
-                              <input type="checkbox" class="custom-control-input" id="offlinePollOn" checked required>
-                              <label class="custom-control-label" for="offlinePollOn">Toggle Offline Polling</label>
+                              <input type="checkbox" class="custom-control-input" id="offlinePoll" checked required>
+                              <label class="custom-control-label" for="offlinePoll">Toggle Offline Polling</label>
                               <div class="invalid-feedback">Offline Polling is turned off</div>
                               <div class="valid-feedback">Offline Polling is turned on</div>
                             </div>
@@ -780,7 +746,7 @@
                               <div class="input-group-prepend">
                                   <span class="input-group-text">Offline Poll Rate:</span>
                               </div>
-                              <input type="number" class="form-control" placeholder="5" aria-label="Refresh Rate" id="OfflineRefreshRate" value="5" min="1" max="10" step="1">
+                              <input type="number" class="form-control" placeholder="5" aria-label="Refresh Rate" id="offlinePollRate" value="5" min="1" max="10" step="1">
                               <div class="input-group-append">
                                   <span class="input-group-text">Minutes</span>
                               </div>
@@ -794,7 +760,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-success" id="saveSettings">Save</button>
+                <button type="button" class="btn btn-success" id="saveServerSettings" data-dismiss="modal">Save</button>
             </div>
         </div>
     </div>
@@ -1057,6 +1023,7 @@ Close
     <script src="/js/vendor/bootbox.min.js"></script>
     <script src="/js/vendor/noty.js"></script>
     <script src="/js/printerManagement.js" type="module"></script>
+    <script src="/js/settings.js" type="module"></script>
 </body>
 
 </html>
