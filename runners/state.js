@@ -45,16 +45,19 @@ class Runner {
         offlineRunners[printer.index] = false;
         //Set offline
         ServerSettings.check().then(checked => {
-          if(checked[0].offlinePolling.on === true){
+          if (checked[0].offlinePolling.on === true) {
             offlineRunners[printer.index] = setInterval(function() {
               Runner.getConnection(printer);
             }, checked[0].offlinePolling.seconds);
-            console.log("Set offline check with: " + printer.ip + ":" + printer.port);
-          }else{
-            console.log("Offline Polling is disabled in settings, enable if required.")
+            console.log(
+              "Set offline check with: " + printer.ip + ":" + printer.port
+            );
+          } else {
+            console.log(
+              "Offline Polling is disabled in settings, enable if required."
+            );
           }
-        })
-
+        });
       })
       .catch(err => {
         let error = {
@@ -79,16 +82,20 @@ class Runner {
         Runner.checkOnline(printer);
       }, checked[0].onlinePolling.seconds);
       console.log("Set online check with: " + printer.ip + ":" + printer.port);
-    })
+    });
   }
 
   static checkOnline(printer) {
     if (printer.current.state === "Closed") {
-      //If closed doesn't really need to do anything....
+      Runner.testConnection(printer).then(printer => {
+        printer.save();
+      });
     } else {
-      Runner.getPrinter(printer).then(printer => {
-        Runner.getJob(printer).then(printer => {
-          printer.save();
+      Runner.testConnection(printer).then(printer => {
+        Runner.getPrinter(printer).then(printer => {
+          Runner.getJob(printer).then(printer => {
+            printer.save();
+          });
         });
       });
     }
@@ -129,9 +136,30 @@ class Runner {
             action: "Printer moved to Offline Checking"
           };
           Runner.setOffline(printer);
-          console.log(error)
+          console.log(error);
         })
     ]);
+  }
+  static testConnection(printer) {
+    return Runner.get(printer.ip, printer.port, printer.apikey, "connection")
+      .then(res => {
+        return res.json();
+      })
+      .then(res => {
+        printer.current = res.current;
+        printer.options = res.options;
+        printer.stateColour = this.getColour(res.current.state);
+        return printer;
+      })
+      .catch(err => {
+        let error = {
+          err: err.message,
+          printer: printer.index + ". " + printer.ip + ":" + printer.port,
+          action: "Printer moved to Offline Checking"
+        };
+        Runner.setOffline(printer);
+        console.log(error);
+      });
   }
 
   static getFiles(printer) {

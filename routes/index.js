@@ -28,10 +28,10 @@ router.get("/dashboard", ensureAuthenticated, (req, res) => {
     let complete = [];
     printers.forEach(print => {
       if (print.stateColour.category === "Active") {
-        complete.push(print.ip);
+        active.push(print.ip);
       }
       if (print.stateColour.category === "Complete") {
-        active.push(print.ip);
+        complete.push(print.ip);
       }
       if (print.stateColour.category === "Idle") {
         idle.push(print.ip);
