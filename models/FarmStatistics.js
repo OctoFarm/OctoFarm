@@ -1,11 +1,15 @@
 const mongoose = require("mongoose");
 
 const FarmInfoSchema = new mongoose.Schema({
+  farmStart: {
+    type: Date,
+    default: Date.now
+  },
   farmInfo: {
     type: Object,
     required: false
   },
-  farmStatistics: {
+  octofarmStatistics: {
     type: Object,
     required: false
   },
@@ -13,7 +17,6 @@ const FarmInfoSchema = new mongoose.Schema({
     type: Object,
     required: false
   }
-
 });
 
 const FarmInfo = mongoose.model("FarmInfo", FarmInfoSchema);

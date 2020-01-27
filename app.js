@@ -82,4 +82,7 @@ if (db != "") {
   const system = require("./runners/systemInfo.js");
   const SystemRunner = system.SystemRunner;
   SystemRunner.init();
+  const stats = require("./runners/statisticsCollection.js");
+  const StatisticsCollection = stats.StatisticsCollection;
+  StatisticsCollection.init();
 }

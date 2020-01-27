@@ -1,6 +1,8 @@
 const Printers = require("../models/Printer.js");
 const serverSettings = require("../settings/serverSettings.js");
 const ServerSettings = serverSettings.ServerSettings;
+const statisticsCollection = require("./statisticsCollection.js");
+const StatisticsCollection = statisticsCollection.StatisticsCollection;
 const fetch = require("node-fetch");
 const _ = require("lodash");
 
@@ -148,7 +150,15 @@ class Runner {
       .then(res => {
         printer.current = res.current;
         printer.options = res.options;
-        printer.stateColour = this.getColour(res.current.state);
+        if (
+          typeof printer.progress != "undefined" &&
+          printer.progress.completion === 100
+        ) {
+          printer.stateColour = this.getColour("Complete");
+        } else {
+          printer.stateColour = this.getColour(res.current.state);
+        }
+
         return printer;
       })
       .catch(err => {
@@ -257,6 +267,9 @@ class Runner {
         //Update info to db
         printer.job = res.job;
         printer.progress = res.progress;
+        if (res.progress === 100) {
+          printer.stateColour = this.getColour("Complete");
+        }
         printer.action = "Grabbing Job...";
         return printer;
       })
