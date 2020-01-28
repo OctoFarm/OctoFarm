@@ -25,86 +25,83 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
   let printers = await Printers.find({}, null, { sort: { index: 1 } });
   let statistics = await FarmStatistics.find({});
   let systemInformation = await SystemInfo.find({});
-    res.render("dashboard", {
-      name: req.user.name,
-      version: pjson.version,
-      printers: printers,
-      farmInfo: statistics[0].farmInfo,
-      octofarmStatistics: statistics[0].octofarmStatistics,
-      printerCount: printers.length,
-      activeCount: statistics[0].farmInfo.active,
-      idleCount: statistics[0].farmInfo.idle,
-      completeCount: statistics[0].farmInfo.complete,
-      offlineCount: statistics[0].farmInfo.offline,
-      page: "Dashboard",
-      helpers: prettyHelpers,
-      systemInfo: systemInformation[0]
-    });
-
+  res.render("dashboard", {
+    name: req.user.name,
+    version: pjson.version,
+    printers: printers,
+    farmInfo: statistics[0].farmInfo,
+    octofarmStatistics: statistics[0].octofarmStatistics,
+    printerCount: printers.length,
+    activeCount: statistics[0].farmInfo.active,
+    idleCount: statistics[0].farmInfo.idle,
+    completeCount: statistics[0].farmInfo.complete,
+    offlineCount: statistics[0].farmInfo.offline,
+    page: "Dashboard",
+    helpers: prettyHelpers,
+    systemInfo: systemInformation[0]
+  });
 });
 //File Manager Page
 router.get("/filemanager", ensureAuthenticated, async (req, res) => {
-  let printers = await Printers.find({}, null, { sort: { index: 1 } })
-    res.render("filemanager", {
-      name: req.user.name,
-      version: pjson.version,
-      printers: printers,
-      printerCount: printers.length,
-      page: "File Manager",
-      helpers: prettyHelpers
-    });
-
+  let printers = await Printers.find({}, null, { sort: { index: 1 } });
+  res.render("filemanager", {
+    name: req.user.name,
+    version: pjson.version,
+    printers: printers,
+    printerCount: printers.length,
+    page: "File Manager",
+    helpers: prettyHelpers
+  });
 });
 //History Page
 router.get("/history", ensureAuthenticated, async (req, res) => {
-  let printers = await Printers.find({}, null, { sort: { index: 1 } })
-    res.render("history", {
-      name: req.user.name,
-      version: pjson.version,
-      printers: printers,
-      printerCount: printers.length,
-      page: "History",
-      helpers: prettyHelpers
-    });
-
+  let printers = await Printers.find({}, null, { sort: { index: 1 } });
+  const History = require("../models/History.js");
+  let history = await History.find({});
+  res.render("history", {
+    name: req.user.name,
+    version: pjson.version,
+    printers: printers,
+    printerCount: printers.length,
+    history: history,
+    page: "History",
+    helpers: prettyHelpers
+  });
 });
 //Panel view  Page
 router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
-  let printers = await Printers.find({}, null, { sort: { index: 1 } })
-    res.render("panelView", {
-      name: req.user.name,
-      version: pjson.version,
-      printers: printers,
-      printerCount: printers.length,
-      page: "Panel View",
-      helpers: prettyHelpers
-    });
-
+  let printers = await Printers.find({}, null, { sort: { index: 1 } });
+  res.render("panelView", {
+    name: req.user.name,
+    version: pjson.version,
+    printers: printers,
+    printerCount: printers.length,
+    page: "Panel View",
+    helpers: prettyHelpers
+  });
 });
 //Camera view  Page
 router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
-  let printers = await Printers.find({}, null, { sort: { index: 1 } })
-    res.render("cameraView", {
-      name: req.user.name,
-      version: pjson.version,
-      printers: printers,
-      printerCount: printers.length,
-      page: "Camera View",
-      helpers: prettyHelpers
-    });
-
+  let printers = await Printers.find({}, null, { sort: { index: 1 } });
+  res.render("cameraView", {
+    name: req.user.name,
+    version: pjson.version,
+    printers: printers,
+    printerCount: printers.length,
+    page: "Camera View",
+    helpers: prettyHelpers
+  });
 });
 //List view  Page
 router.get("/mon/list", ensureAuthenticated, async (req, res) => {
-  let printers = await Printers.find({}, null, { sort: { index: 1 } })
-    res.render("listView", {
-      name: req.user.name,
-      version: pjson.version,
-      printers: printers,
-      printerCount: printers.length,
-      page: "Camera View",
-      helpers: prettyHelpers
-    });
-
+  let printers = await Printers.find({}, null, { sort: { index: 1 } });
+  res.render("listView", {
+    name: req.user.name,
+    version: pjson.version,
+    printers: printers,
+    printerCount: printers.length,
+    page: "Camera View",
+    helpers: prettyHelpers
+  });
 });
 module.exports = router;

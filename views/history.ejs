@@ -21,7 +21,57 @@
         </tr>
       </thead>
       <tbody id="listViewTable">
-     
+        <% history.forEach((print, index) => { %>
+        <tr>
+          <td scope="row">
+            <%= index %>
+          </td>
+          <td>
+            <% if(print.printHistory.success){%>
+            <i class="fas fa-thumbs-up text-success"></i>
+            <% }else{ %>
+            <i class="fas fa-thumbs-down text-error"></i>
+            <% } %>
+          </td>
+          <td>
+            <%= print.printHistory.printerIndex %>. <%=
+            print.printHistory.printerName %>
+          </td>
+          <td class="text-wrap">
+            <%= print.printHistory.fileName %>
+          </td>
+          <td>
+            <%= print.printHistory.startDate %>
+          </td>
+          <td>
+            <%= print.printHistory.endDate %>
+          </td>
+          <td>
+            <%= helpers.generateTime(print.printHistory.printTime) %>
+          </td>
+          <td>
+            <%= print.printHistory.spoolUsed %>
+          </td>
+          <td>
+            <%= print.printHistory.filamentLength %> / <%=
+            print.printHistory.filamentVolume %>
+          </td>
+          <td class="text-wrap">
+            <%= print.printHistory.notes %>
+          </td>
+          <td>
+            <div class="btn-group" role="group" aria-label="Basic example">
+              <button type="button" class="btn btn-info btn-small">
+                <i class="fas fa-edit"></i>
+              </button>
+
+              <button type="button" class="btn btn-danger btn-small">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <% }) %>
       </tbody>
     </table>
   </div>
