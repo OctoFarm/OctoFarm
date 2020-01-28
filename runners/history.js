@@ -57,11 +57,12 @@ class HistoryCollection {
                         printHistory
                      })
                      newHistory.save();
+                     console.log("Saved: " + res.prints.last.date+printer.job.file.name)
                 }
-            }).catch(err => console.log(res))
+            }).catch(err => console.log("ERROR CONNECTING TO DATABASE: "+ res))
             
 
-        }).catch(err => console.log("ERROR"+err))
+        }).catch(err => console.log("ERROR GRABBING FILE INFO:"+err))
 
 
 
