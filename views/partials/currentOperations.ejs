@@ -19,14 +19,14 @@
         <div class="col-md-3 col-lg-6">
           <div class="progress mt-2">
             <div
-              class="progress-bar progress-bar-striped bg-success"
+              class="progress-bar progress-bar-striped bg-<%= farmInfo.farmProgressColour %>"
               role="progressbar"
-              style="width: 25%"
-              aria-valuenow="25"
+              style="width: <%= farmInfo.farmProgress %>%"
+              aria-valuenow="<%= farmInfo.farmProgress %>"
               aria-valuemin="0"
               aria-valuemax="100"
             >
-              25%
+            <%= farmInfo.farmProgress %>%
             </div>
           </div>
         </div>
@@ -72,26 +72,30 @@
     </div>
 
     <div class="card-body pt-0 pb-0 d-flex flex-row overflow-x">
-      <div
+
+      <% farmInfo.currentOperations.forEach(current => { %>
+        <div
         class="card card-block text-white bg-secondary d-inline-block"
         style="min-width: 200px; height:65px;"
       >
-        <div class="card-header pb-1 pt-1 pl-2 pr-2">0. Battle Bot</div>
-        <div class="card-body  pb-0 pt-2 pl-2 pr-2">
-          <div class="progress">
-            <div
-              class="progress-bar progress-bar-striped bg-success"
-              role="progressbar"
-              style="width: 25%"
-              aria-valuenow="25"
-              aria-valuemin="0"
-              aria-valuemax="100"
-            >
-              25%
+          <div class="card-header pb-1 pt-1 pl-2 pr-2"><%=current.index%>. <%=current.name%></div>
+          <div class="card-body  pb-0 pt-2 pl-2 pr-2">
+            <div class="progress">
+              <div
+                class="progress-bar progress-bar-striped bg-<%=current.progressColour%>"
+                role="progressbar"
+                style="width: <%=current.progress%>%"
+                aria-valuenow="<%=current.progress%>"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+              <%=current.progress%>%
+              </div>
             </div>
           </div>
         </div>
-      </div>
+    <%  }) %>
+
     </div>
   </div>
 </div>

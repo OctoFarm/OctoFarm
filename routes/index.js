@@ -4,6 +4,7 @@ const { ensureAuthenticated } = require("../config/auth");
 const db = require("../config/db").MongoURI;
 const pjson = require("../package.json");
 const Printers = require("../models/Printer.js");
+const FarmStatistics = require("../models/FarmStatistics.js");
 const SystemInfo = require("../models/SystemInfo.js");
 const prettyHelpers = require("../views/partials/functions/pretty.js");
 
@@ -20,48 +21,29 @@ if (db === "") {
 }
 
 //Dashboard Page
-router.get("/dashboard", ensureAuthenticated, (req, res) => {
-  Printers.find({}, null, { sort: { index: 1 } }, async (err, printers) => {
-    let active = [];
-    let idle = [];
-    let offline = [];
-    let complete = [];
-    printers.forEach(print => {
-      if (print.stateColour.category === "Active") {
-        active.push(print.ip);
-      }
-      if (print.stateColour.category === "Complete") {
-        complete.push(print.ip);
-      }
-      if (print.stateColour.category === "Idle") {
-        idle.push(print.ip);
-      }
-      if (
-        print.stateColour.category === "Closed" ||
-        print.stateColour.category === "Offline"
-      ) {
-        offline.push(print.ip);
-      }
-    });
-    let systemInformation = await SystemInfo.find({});
+router.get("/dashboard", ensureAuthenticated, async (req, res) => {
+  let printers = await Printers.find({}, null, { sort: { index: 1 } });
+  let statistics = await FarmStatistics.find({});
+  let systemInformation = await SystemInfo.find({});
     res.render("dashboard", {
       name: req.user.name,
       version: pjson.version,
       printers: printers,
+      farmInfo: statistics[0].farmInfo,
       printerCount: printers.length,
-      activeCount: active.length,
-      idleCount: idle.length,
-      completeCount: complete.length,
-      offlineCount: offline.length,
+      activeCount: statistics[0].farmInfo.active,
+      idleCount: statistics[0].farmInfo.idle,
+      completeCount: statistics[0].farmInfo.complete,
+      offlineCount: statistics[0].farmInfo.offline,
       page: "Dashboard",
       helpers: prettyHelpers,
       systemInfo: systemInformation[0]
     });
-  });
+
 });
 //File Manager Page
-router.get("/filemanager", ensureAuthenticated, (req, res) => {
-  Printers.find({}, null, { sort: { index: 1 } }, (err, printers) => {
+router.get("/filemanager", ensureAuthenticated, async (req, res) => {
+  let printers = await Printers.find({}, null, { sort: { index: 1 } })
     res.render("filemanager", {
       name: req.user.name,
       version: pjson.version,
@@ -70,11 +52,11 @@ router.get("/filemanager", ensureAuthenticated, (req, res) => {
       page: "File Manager",
       helpers: prettyHelpers
     });
-  });
+
 });
 //History Page
-router.get("/history", ensureAuthenticated, (req, res) => {
-  Printers.find({}, null, { sort: { index: 1 } }, (err, printers) => {
+router.get("/history", ensureAuthenticated, async (req, res) => {
+  let printers = await Printers.find({}, null, { sort: { index: 1 } })
     res.render("history", {
       name: req.user.name,
       version: pjson.version,
@@ -83,11 +65,11 @@ router.get("/history", ensureAuthenticated, (req, res) => {
       page: "History",
       helpers: prettyHelpers
     });
-  });
+
 });
 //Panel view  Page
-router.get("/mon/panel", ensureAuthenticated, (req, res) => {
-  Printers.find({}, null, { sort: { index: 1 } }, (err, printers) => {
+router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
+  let printers = await Printers.find({}, null, { sort: { index: 1 } })
     res.render("panelView", {
       name: req.user.name,
       version: pjson.version,
@@ -96,11 +78,11 @@ router.get("/mon/panel", ensureAuthenticated, (req, res) => {
       page: "Panel View",
       helpers: prettyHelpers
     });
-  });
+
 });
 //Camera view  Page
-router.get("/mon/camera", ensureAuthenticated, (req, res) => {
-  Printers.find({}, null, { sort: { index: 1 } }, (err, printers) => {
+router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
+  let printers = await Printers.find({}, null, { sort: { index: 1 } })
     res.render("cameraView", {
       name: req.user.name,
       version: pjson.version,
@@ -109,11 +91,11 @@ router.get("/mon/camera", ensureAuthenticated, (req, res) => {
       page: "Camera View",
       helpers: prettyHelpers
     });
-  });
+
 });
 //List view  Page
-router.get("/mon/list", ensureAuthenticated, (req, res) => {
-  Printers.find({}, null, { sort: { index: 1 } }, (err, printers) => {
+router.get("/mon/list", ensureAuthenticated, async (req, res) => {
+  let printers = await Printers.find({}, null, { sort: { index: 1 } })
     res.render("listView", {
       name: req.user.name,
       version: pjson.version,
@@ -122,6 +104,6 @@ router.get("/mon/list", ensureAuthenticated, (req, res) => {
       page: "Camera View",
       helpers: prettyHelpers
     });
-  });
+
 });
 module.exports = router;

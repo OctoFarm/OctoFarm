@@ -32,6 +32,11 @@ class StatisticsCollection {
         let toolT = [];
         let bedA = [];
         let bedT = [];
+        let progress = [];
+        let currentOperations = [];
+        let printTimeEstimate = [];
+        let printTimeRemaining = [];
+        let printTimeElapsed = [];
         printers.forEach(printer => {
           if (printer.stateColour.category === "Complete") {
             complete.push(printer.index);
@@ -39,6 +44,16 @@ class StatisticsCollection {
             toolT.push(printer.temperature.tool0.target);
             bedA.push(printer.temperature.bed.actual);
             bedT.push(printer.temperature.bed.target);
+            progress.push(printer.progress.completion);
+            currentOperations.push({
+              index: printer.index,
+              name: printer.settingsApperance.name,
+              progress: Math.floor(printer.progress.completion),
+              progressColour: "success"
+            })
+            printTimeEstimate.push(printer.job.estimatedPrintTime)
+            printTimeRemaining.push(printer.progress.printTimeLeft)
+            printTimeElapsed.push(printer.progress.printTime)
           }
           if (printer.stateColour.category === "Active") {
             active.push(printer.index);
@@ -46,6 +61,16 @@ class StatisticsCollection {
             toolT.push(printer.temperature.tool0.target);
             bedA.push(printer.temperature.bed.actual);
             bedT.push(printer.temperature.bed.target);
+            progress.push(printer.progress.completion);
+            currentOperations.push({
+              index: printer.index,
+              name: printer.settingsApperance.name,
+              progress: Math.floor(printer.progress.completion),
+              progressColour: "warning"
+            })
+            printTimeEstimate.push(printer.job.estimatedPrintTime)
+            printTimeRemaining.push(printer.progress.printTimeLeft)
+            printTimeElapsed.push(printer.progress.printTime)
           }
           if (printer.stateColour.category === "Idle") {
             idle.push(printer.index);
@@ -70,6 +95,21 @@ class StatisticsCollection {
         farmInfo.activeToolA = toolT.reduce((a, b) => a + b, 0);
         farmInfo.activeBedA = bedA.reduce((a, b) => a + b, 0);
         farmInfo.activeBedT = bedT.reduce((a, b) => a + b, 0);
+        let actProg = progress.reduce((a, b) => a + b, 0);
+        farmInfo.farmProgress = Math.floor(actProg / progress.length)
+        if(farmInfo.farmProgress === 100){
+          farmInfo.farmProgressColour = "success"
+        }else{
+          farmInfo.farmProgressColour = "warning"
+        }
+        farmInfo.currentOperations = currentOperations;
+        farmInfo.totalElapsedTime = printTimeElapsed.reduce((a, b) => a + b, 0);
+        farmInfo.totalRemainingTime = printTimeRemaining.reduce((a, b) => a + b, 0);
+        farmInfo.totalEstimateTime = printTimeEstimate.reduce((a, b) => a + b, 0);
+        farmInfo.avgElapsedTime =  farmInfo.totalElapsedTime / printTimeElapsed.length;
+        farmInfo.avgRemainingTime = farmInfo.totalRemainingTime / printTimeRemaining.length;
+        farmInfo.avgEstimateTime = farmInfo.totalEstimateTime / printTimeEstimate.length;
+
         farmStats[0].farmInfo = farmInfo;
 
         farmStats[0].save();
