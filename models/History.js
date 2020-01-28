@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const HistorySchema = new mongoose.Schema({
-  print: {
+  printHistory: {
     type: Object,
     required: true
   }

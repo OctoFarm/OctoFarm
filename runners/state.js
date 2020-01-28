@@ -1,8 +1,8 @@
 const Printers = require("../models/Printer.js");
 const serverSettings = require("../settings/serverSettings.js");
 const ServerSettings = serverSettings.ServerSettings;
-const statisticsCollection = require("./statisticsCollection.js");
-const StatisticsCollection = statisticsCollection.StatisticsCollection;
+const historyCollection = require("./history.js");
+const HistoryCollection = historyCollection.HistoryCollection;
 const fetch = require("node-fetch");
 const _ = require("lodash");
 
@@ -97,6 +97,9 @@ class Runner {
         Runner.getPrinter(printer).then(printer => {
           Runner.getJob(printer).then(printer => {
             printer.save();
+            if (printer.stateColour.category === "Complete"){
+              HistoryCollection.watcher(printer)
+            }
           });
         });
       });
@@ -267,6 +270,7 @@ class Runner {
         //Update info to db
         printer.job = res.job;
         printer.progress = res.progress;
+
         if (res.progress === 100) {
           printer.stateColour = this.getColour("Complete");
         }

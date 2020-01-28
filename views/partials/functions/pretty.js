@@ -11,8 +11,9 @@ const calculatePercent = function(use, total) {
   return Math.round(percent);
 };
 const generateTime = function(seconds) {
+
   let string = "";
-  if (seconds === undefined) {
+  if (seconds === undefined || isNaN(seconds)) {
     string = "No Time Estimate";
   } else {
     let days = Math.floor(seconds / (3600 * 24));

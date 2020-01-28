@@ -30,6 +30,7 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
       version: pjson.version,
       printers: printers,
       farmInfo: statistics[0].farmInfo,
+      octofarmStatistics: statistics[0].octofarmStatistics,
       printerCount: printers.length,
       activeCount: statistics[0].farmInfo.active,
       idleCount: statistics[0].farmInfo.idle,
