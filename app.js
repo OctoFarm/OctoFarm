@@ -70,7 +70,7 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, console.log(`Server started on port ${PORT}`));
 if (db != "") {
   //Setup Settings
-  const serverSettings = require("./settings/ServerSettings.js");
+  const serverSettings = require("./settings/serverSettings.js");
   const ServerSettings = serverSettings.ServerSettings;
   ServerSettings.init();
   const clientSettings = require("./settings/clientSettings.js");
