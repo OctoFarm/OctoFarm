@@ -33,8 +33,7 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "socket.io": "^2.3.0",
-    "systeminformation": "^4.16.1",
-    "ws": "^7.2.1"
+    "systeminformation": "^4.16.1"
   },
   "devDependencies": {
     "debug": "^4.1.1",

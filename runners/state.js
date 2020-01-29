@@ -17,6 +17,8 @@ class Runner {
       });
     });
   }
+  // static async init() {}
+
   static stopAll() {
     onlineRunners.forEach(run => {
       clearInterval(run);
@@ -90,10 +92,8 @@ class Runner {
   static checkOnline(printer) {
     if (printer.current.state === "Closed") {
       Runner.testConnection(printer).then(printer => {
-        if(printer.current.state === "Closed"){
-          printer.save();
-        }
-      })
+        printer.save();
+      });
     } else {
       Runner.testConnection(printer).then(printer => {
         Runner.getPrinter(printer).then(printer => {
@@ -106,8 +106,8 @@ class Runner {
               };
               console.log(error);
             });
-            if (printer.stateColour.category === "Complete"){
-              HistoryCollection.watcher(printer)
+            if (printer.stateColour.category === "Complete") {
+              HistoryCollection.watcher(printer);
             }
           });
         });
@@ -136,8 +136,14 @@ class Runner {
                     printer.save().catch(err => {
                       let error = {
                         err: err.message,
-                        printer: printer.index + ". " + printer.ip + ":" + printer.port,
-                        action: "Error grabbing initial connection to database... No action taken"
+                        printer:
+                          printer.index +
+                          ". " +
+                          printer.ip +
+                          ":" +
+                          printer.port,
+                        action:
+                          "Error grabbing initial connection to database... No action taken"
                       };
                       console.log(error);
                     });
