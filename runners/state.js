@@ -94,7 +94,6 @@ class Runner {
           printer.save();
         }
       })
-
     } else {
       Runner.testConnection(printer).then(printer => {
         Runner.getPrinter(printer).then(printer => {
