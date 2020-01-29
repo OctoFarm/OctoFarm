@@ -65,15 +65,15 @@
         <div class="row">
           <div class="col-lg-6">
             <b><i class="fas fa-clock"></i> Longest Print Time</b> <br />
-            3 Days, 10 Hrs, 3 Mins, 12 Seconds<br />
+            <%= helpers.generateTime(printStatistics.longestPrint) %><br />
             <b><i class="fas fa-clock"></i> Shortest Print Time</b> <br />
-            25 Mins, 54 Seconds <br />
+            <%= helpers.generateTime(printStatistics.shortestPrint) %> <br />
           </div>
           <div class="col-lg-6">
-            <b><i class="fas fa-clock"></i> Average Print Time <br /></b>10
-            Hours, 5 Mins, 45 Seconds<br />
-            <b><i class="fas fa-ruler"></i> Filament Usage <br /></b>954m /
-            20kg<br />
+            <b><i class="fas fa-clock"></i> Average Print Time <br /></b><%=
+            helpers.generateTime(printStatistics.averagePrintTime) %><br />
+            <b><i class="fas fa-ruler"></i> Filament Usage <br /></b><%=
+            printStatistics.filamentUsage %><br />
           </div>
         </div>
       </div>

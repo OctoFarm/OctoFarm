@@ -53,8 +53,11 @@
             <%= print.printHistory.spoolUsed %>
           </td>
           <td>
-            <%= print.printHistory.filamentLength %> / <%=
-            print.printHistory.filamentVolume %>
+            <% let filamentLength = print.printHistory.filamentLength / 1000 %>
+            <% filamentLength = Math.round(filamentLength*100)/100 %> <%=
+            filamentLength %>m / <% let filamentWeight =
+            3.14*(1.75/2)^2*1.24*filamentLength %> <%= filamentWeight %>g
+            <!- Filament Requirements - Pi, density, width ->
           </td>
           <td class="text-wrap">
             <%= print.printHistory.notes %>

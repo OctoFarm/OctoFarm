@@ -31,6 +31,7 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
     printers: printers,
     farmInfo: statistics[0].farmInfo,
     octofarmStatistics: statistics[0].octofarmStatistics,
+    printStatistics: statistics[0].printStatistics,
     printerCount: printers.length,
     activeCount: statistics[0].farmInfo.active,
     idleCount: statistics[0].farmInfo.idle,

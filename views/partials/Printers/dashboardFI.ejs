@@ -1,44 +1,36 @@
 <div class="row">
   <div class="col-md-4 col-lg-4 text-center text-light">
     <b><i class="fas fa-clock"></i> Average Estimated Time</b>
-    <p><%=
-      helpers.generateTime(farmInfo.avgEstimateTime) %></p>
+    <p><%= helpers.generateTime(farmInfo.avgEstimateTime) %></p>
     <b><i class="fas fa-clock"></i> Average Remaining Time</b>
-    <p><%=
-      helpers.generateTime(farmInfo.avgRemainingTime) %></p>
+    <p><%= helpers.generateTime(farmInfo.avgRemainingTime) %></p>
     <b><i class="fas fa-clock"></i> Average Elapsed Time</b>
-    <p class="mb-0"><%=
-      helpers.generateTime(farmInfo.avgElapsedTime) %></p>
+    <p class="mb-0"><%= helpers.generateTime(farmInfo.avgElapsedTime) %></p>
   </div>
   <div class="col-md-4 col-lg-4 text-center text-light">
     <b><i class="fas fa-clock"></i> Cumulative Estimated Time</b>
-    <p><%=
-      helpers.generateTime(farmInfo.totalEstimateTime) %></p>
+    <p><%= helpers.generateTime(farmInfo.totalEstimateTime) %></p>
     <b><i class="fas fa-clock"></i> Cumulative Remaining Time</b>
-    <p><%=
-      helpers.generateTime(farmInfo.totalRemainingTime) %></p>
+    <p><%= helpers.generateTime(farmInfo.totalRemainingTime) %></p>
     <b><i class="fas fa-clock"></i> Cumulative Elapsed Time</b>
-    <p class="mb-0"><%=
-      helpers.generateTime(farmInfo.totalElapsedTime) %></p>
+    <p class="mb-0"><%= helpers.generateTime(farmInfo.totalElapsedTime) %></p>
   </div>
   <div class="col-md-4 col-lg-4 text-center text-light">
     <b><i class="fas fa-thermometer-half"></i> Cumulative Tool Heat</b>
     <p>
-      <i class="far fa-circle"></i> <%=
-     farmInfo.activeToolA %>°C <i class="fas fa-bullseye"></i> <%=
-    farmInfo.activeToolT %>°C
+      <i class="far fa-circle"></i> <%= farmInfo.activeToolA %>°C
+      <i class="fas fa-bullseye"></i> <%= farmInfo.activeToolT %>°C
     </p>
     <b><i class="fas fa-thermometer-half"></i> Cumulative Bed Heat</b>
     <p>
-      <i class="far fa-circle"></i> <%=
-      farmInfo.activeBedA %>°C <i class="fas fa-bullseye"></i> <%=
-      farmInfo.activeBedT %>°C
+      <i class="far fa-circle"></i> <%= farmInfo.activeBedA %>°C
+      <i class="fas fa-bullseye"></i> <%= farmInfo.activeBedT %>°C
     </p>
     <b><i class="fas fa-thermometer-half"></i> Cumulative Printer Heat</b>
     <p class="mb-0">
-      <i class="far fa-circle"></i> <%=
-     farmInfo.activeToolA + farmInfo.activeBedA %>°C <i class="fas fa-bullseye"></i> <%=
-     farmInfo.activeToolT + farmInfo.activeBedT %>°C
+      <i class="far fa-circle"></i> <%= Math.round((farmInfo.activeToolA +
+      farmInfo.activeBedA) * 100) / 100 %>°C <i class="fas fa-bullseye"></i> <%=
+      Math.round((farmInfo.activeToolT + farmInfo.activeBedT) * 100) / 100 %>°C
     </p>
   </div>
 </div>

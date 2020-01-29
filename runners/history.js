@@ -57,37 +57,41 @@ class HistoryCollection {
           newPrintHistory.success = true;
           newPrintHistory.fileName = printer.job.file.display;
           newPrintHistory.filePath = printer.job.file.path;
-          var startDate = await new Date(res.prints.last.date * 1000);
-          let dateStart = await startDate.toDateString();
-          let timeStart = await startDate.toTimeString();
-          let newStart = timeStart.substring(0, 8);
-          newPrintHistory.startDate = dateStart + " - " + newStart;
-          let dateToday = await today.toDateString();
-          let timeToday = await today.toTimeString();
-          let newToday = await timeToday.substring(0, 8);
-          newPrintHistory.endDate = dateToday + " - " + newToday;
-          newPrintHistory.id = res.prints.last.date + printer.job.file.name;
-          newPrintHistory.printTime = printer.progress.printTime;
-          newPrintHistory.spoolUsed = ""; // Awaiting link for spools
-          newPrintHistory.filamentLength = printer.job.filament.tool0.length;
-          newPrintHistory.filamentVolume = printer.job.filament.tool0.volume;
-          //Search and see if print exists in db...
-          History.findOne({
-            "printHistory.id": res.prints.last.date + printer.job.file.name
-          })
-            .then(res => {
-              if (res === null) {
-                let printHistory = newPrintHistory;
-                let newHistory = new History({
-                  printHistory
-                });
-                newHistory.save();
-                console.log(
-                  "Saved: " + res.prints.last.date + printer.job.file.name
-                );
-              }
+          if (typeof res.prints.last.date != "undefined") {
+            let startDate = await new Date(res.prints.last.date * 1000);
+            let dateStart = await startDate.toDateString();
+            let timeStart = await startDate.toTimeString();
+            let newStart = timeStart.substring(0, 8);
+            newPrintHistory.startDate = dateStart + " - " + newStart;
+            let dateToday = await today.toDateString();
+            let timeToday = await today.toTimeString();
+            let newToday = await timeToday.substring(0, 8);
+            newPrintHistory.endDate = dateToday + " - " + newToday;
+            newPrintHistory.id = res.prints.last.date + printer.job.file.name;
+            newPrintHistory.printTime = printer.progress.printTime;
+            newPrintHistory.spoolUsed = ""; // Awaiting link for spools
+            newPrintHistory.filamentLength = printer.job.filament.tool0.length;
+            newPrintHistory.filamentVolume = printer.job.filament.tool0.volume;
+            //Search and see if print exists in db...
+            History.findOne({
+              "printHistory.id": res.prints.last.date + printer.job.file.name
             })
-            .catch(err => console.log("ERROR CONNECTING TO DATABASE: " + res));
+              .then(res => {
+                if (res === null) {
+                  let printHistory = newPrintHistory;
+                  let newHistory = new History({
+                    printHistory
+                  });
+                  newHistory.save();
+                  console.log(
+                    "Saved: " + res.prints.last.date + printer.job.file.name
+                  );
+                }
+              })
+              .catch(err =>
+                console.log("ERROR CONNECTING TO DATABASE: " + res)
+              );
+          }
         }
       })
       .catch(err => console.log("ERROR GRABBING FILE INFO:" + err));
@@ -105,7 +109,8 @@ class HistoryCollection {
       endDate: "",
       printTime: "",
       spoolUsed: "",
-      filamentUsage: "",
+      filamentLength: 0,
+      filamentVolume: 0,
       notes: ""
     };
     return printHistory;

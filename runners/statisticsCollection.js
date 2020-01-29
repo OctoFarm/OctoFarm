@@ -13,7 +13,7 @@ class StatisticsCollection {
     FarmStatistics.find({}).then(async farmStats => {
       let farmInfo = await this.blankFarmInfo();
       let octofarmStatistics = await this.blankFarmStatistics();
-      let printStatistics = {};
+      let printStatistics = await this.blankPrintStatistics();
       if (typeof farmStats === undefined || farmStats.length < 1) {
         let newfarmStats = new FarmStatistics({
           farmInfo,
@@ -42,10 +42,10 @@ class StatisticsCollection {
         printers.forEach(printer => {
           if (printer.stateColour.category === "Complete") {
             complete.push(printer.index);
-            toolA.push(printer.temperature.tool0.actual);
-            toolT.push(printer.temperature.tool0.target);
-            bedA.push(printer.temperature.bed.actual);
-            bedT.push(printer.temperature.bed.target);
+            // toolA.push(printer.temperature.tool0.actual);
+            // toolT.push(printer.temperature.tool0.target);
+            // bedA.push(printer.temperature.bed.actual);
+            // bedT.push(printer.temperature.bed.target);
             progress.push(printer.progress.completion);
             currentOperations.push({
               index: printer.index,
@@ -75,10 +75,10 @@ class StatisticsCollection {
           }
           if (printer.stateColour.category === "Idle") {
             idle.push(printer.index);
-            toolA.push(printer.temperature.tool0.actual);
-            toolT.push(printer.temperature.tool0.target);
-            bedA.push(printer.temperature.bed.actual);
-            bedT.push(printer.temperature.bed.target);
+            // toolA.push(printer.temperature.tool0.actual);
+            // toolT.push(printer.temperature.tool0.target);
+            // bedA.push(printer.temperature.bed.actual);
+            // bedT.push(printer.temperature.bed.target);
           }
           if (
             printer.stateColour.category === "Offline" ||
@@ -91,9 +91,9 @@ class StatisticsCollection {
         farmInfo.active = active.length;
         farmInfo.idle = idle.length;
         farmInfo.offline = offline.length;
-        farmInfo.activeToolT =
-          Math.round(toolA.reduce((a, b) => a + b, 0) * 10) / 10;
         farmInfo.activeToolA =
+          Math.round(toolA.reduce((a, b) => a + b, 0) * 10) / 10;
+        farmInfo.activeToolT =
           Math.round(toolT.reduce((a, b) => a + b, 0) * 10) / 10;
         farmInfo.activeBedA =
           Math.round(bedA.reduce((a, b) => a + b, 0) * 10) / 10;
@@ -128,8 +128,17 @@ class StatisticsCollection {
         //Farm Statistics
         let history = await History.find({});
         let printTimes = [];
+        let completed = [];
+        let cancelled = [];
+        let filamentLengths = [];
         history.forEach(print => {
           printTimes.push(print.printHistory.printTime);
+          filamentLengths.push(print.printHistory.filamentLength);
+          if (print.printHistory.success) {
+            completed.push(print.printHistory.state);
+          } else {
+            cancelled.push(print.printHistory.state);
+          }
         });
 
         let printTimesTotal = printTimes.reduce((a, b) => a + b, 0);
@@ -190,6 +199,36 @@ class StatisticsCollection {
 
         farmStats[0].octofarmStatistics = octofarmStatistics;
 
+        printStatistics.completed = complete.length;
+        printStatistics.cancelled = cancelled.length;
+
+        printStatistics.completedPercent =
+          (complete.length / cancelled.length) * 100;
+
+        if (printStatistics.completedPercent === Infinity) {
+          printStatistics.completedPercent = 0;
+        }
+        //Grab resumed when it's inputted into db.
+
+        printStatistics.longestPrint = Math.max(...printTimes);
+        printStatistics.shortestPrint = Math.min(...printTimes);
+        printStatistics.averagePrintTime = printTimes.reduce(
+          (a, b) => a + b,
+          0
+        );
+        printStatistics.averagePrintTime =
+          printStatistics.averagePrintTime / printTimes.length;
+        let totalFilamentLength = filamentLengths.reduce((a, b) => a + b, 0);
+        totalFilamentLength = totalFilamentLength / 1000;
+        totalFilamentLength = Math.round(totalFilamentLength * 100) / 100;
+        let totalFilamentWeight =
+          (3.14 * (1.75 / 2)) ^ (2 * 1.24 * totalFilamentLength);
+
+        printStatistics.filamentUsage =
+          totalFilamentLength + "m / " + totalFilamentWeight + "g";
+
+        farmStats[0].printStatistics = printStatistics;
+
         farmStats[0].save();
       }
     });
@@ -230,7 +269,21 @@ class StatisticsCollection {
     };
     return octofarmStatistics;
   }
-  static blankPrintStatistics() {}
+  static blankPrintStatistics() {
+    let printStatistics = {
+      completed: 0,
+      completedPercent: 0,
+      cancelled: 0,
+      resumed: 0,
+      resumedPercent: 0,
+      restarted: 0,
+      longestPrint: 0,
+      shortestPrint: 0,
+      averagePrintTime: 0,
+      filamentUsage: 0
+    };
+    return printStatistics;
+  }
 }
 
 module.exports = {
