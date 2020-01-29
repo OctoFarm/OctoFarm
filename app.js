@@ -62,6 +62,7 @@ if (db === "") {
   app.use("/users", require("./routes/users", { page: "route" }));
   app.use("/printers", require("./routes/printers", { page: "route" }));
   app.use("/settings", require("./routes/settings", { page: "route" }));
+  app.use("/client", require("./routes/dash", { page: "route" }));
 }
 
 //Server

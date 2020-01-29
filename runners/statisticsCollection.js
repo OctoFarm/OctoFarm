@@ -53,8 +53,8 @@ class StatisticsCollection {
               progress: Math.floor(printer.progress.completion),
               progressColour: "success"
             });
-            printTimeRemaining.push(printer.progress.printTimeLeft);
-            printTimeElapsed.push(printer.progress.printTime);
+            //printTimeRemaining.push(printer.progress.printTimeLeft);
+            //printTimeElapsed.push(printer.progress.printTime);
           }
           if (printer.stateColour.category === "Active") {
             active.push(printer.index);
@@ -107,6 +107,9 @@ class StatisticsCollection {
           farmInfo.farmProgressColour = "warning";
         }
         farmInfo.currentOperations = currentOperations;
+
+        farmInfo.currentOperations = _.orderBy(farmInfo.currentOperations, ['progress'],['desc']);
+
         farmInfo.totalElapsedTime = printTimeElapsed.reduce((a, b) => a + b, 0);
         farmInfo.totalRemainingTime = printTimeRemaining.reduce(
           (a, b) => a + b,

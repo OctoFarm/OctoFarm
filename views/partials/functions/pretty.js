@@ -14,7 +14,7 @@ const generateTime = function(seconds) {
 
   let string = "";
   if (seconds === undefined || isNaN(seconds)) {
-    string = "No Time Estimate";
+    string = "Done";
   } else {
     let days = Math.floor(seconds / (3600 * 24));
 

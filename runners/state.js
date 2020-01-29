@@ -90,13 +90,23 @@ class Runner {
   static checkOnline(printer) {
     if (printer.current.state === "Closed") {
       Runner.testConnection(printer).then(printer => {
-        printer.save();
-      });
+        if(printer.current.state === "Closed"){
+          printer.save();
+        }
+      })
+
     } else {
       Runner.testConnection(printer).then(printer => {
         Runner.getPrinter(printer).then(printer => {
           Runner.getJob(printer).then(printer => {
-            printer.save();
+            printer.save().catch(err => {
+              let error = {
+                err: err.message,
+                printer: printer.index + ". " + printer.ip + ":" + printer.port,
+                action: "Error saving online to database... No action taken"
+              };
+              console.log(error);
+            });
             if (printer.stateColour.category === "Complete"){
               HistoryCollection.watcher(printer)
             }
@@ -124,7 +134,14 @@ class Runner {
                 Runner.getSettings(printer).then(printer => {
                   Runner.getSystem(printer).then(printer => {
                     printer.inited = true;
-                    printer.save();
+                    printer.save().catch(err => {
+                      let error = {
+                        err: err.message,
+                        printer: printer.index + ". " + printer.ip + ":" + printer.port,
+                        action: "Error grabbing initial connection to database... No action taken"
+                      };
+                      console.log(error);
+                    });
                     Runner.setOnline(printer);
                   });
                 });
