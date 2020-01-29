@@ -4,8 +4,10 @@
       <div class="col-lg-6">
         <b class="mt-1"><i class="fas fa-print"></i> Status</b>
         <p class="mb-0">
-          <i class="fas fa-square text-success"></i> <b>Completed: 25</b>
-          <i class="fas fa-square text-danger"></i> <b>Cancelled: 4</b>
+          <i class="fas fa-square text-success"></i>
+          <b>Completed: <%= printStatistics.completed %></b>
+          <i class="fas fa-square text-danger"></i>
+          <b>Cancelled: <%= printStatistics.cancelled %></b>
 
           <br />
         </p>
@@ -13,27 +15,29 @@
           <div
             class="progress-bar progress-bar-striped bg-success"
             role="progressbar"
-            style="width: 84% "
-            aria-valuenow=" 84%"
+            style="width: <%= 100 -printStatistics.completedPercent  %>% "
+            aria-valuenow=" <%= 100 -printStatistics.completedPercent %>%"
             aria-valuemin="0"
             aria-valuemax="100"
           >
-            84%
+            <%= 100 -printStatistics.completedPercent %>%
           </div>
           <div
             class="progress-bar progress-bar-striped bg-danger"
             role="progressbar"
-            style="width: 16% "
-            aria-valuenow="16%"
+            style="width: <%= printStatistics.completedPercent %>% "
+            aria-valuenow="<%= printStatistics.completedPercent %>%"
             aria-valuemin="0"
             aria-valuemax="100"
           >
-            16%
+            <%= printStatistics.completedPercent%>%
           </div>
         </div>
         <p class="mb-0">
-          <i class="fas fa-square text-info"></i> <b>Resumed: 3</b>
-          <i class="fas fa-square text-warning"></i> <b>Restarted: 1</b>
+          <i class="fas fa-square text-info"></i>
+          <b>Resumed: <%= printStatistics.resumed %></b>
+          <i class="fas fa-square text-warning"></i>
+          <b>Restarted: <%= printStatistics.restarted %></b>
 
           <br />
         </p>
@@ -41,22 +45,22 @@
           <div
             class="progress-bar progress-bar-striped bg-info"
             role="progressbar"
-            style="width: 75% "
-            aria-valuenow=" 75%"
+            style="width: <%= printStatistics.resumedPercent %>% "
+            aria-valuenow=" <%= printStatistics.resumedPercent %>%"
             aria-valuemin="0"
             aria-valuemax="100"
           >
-            75%
+            <%= printStatistics.resumedPercent %>%
           </div>
           <div
             class="progress-bar progress-bar-striped bg-warning"
             role="progressbar"
-            style="width: 25% "
-            aria-valuenow="25%"
+            style="width: <%= 100 - printStatistics.resumedPercent %>% "
+            aria-valuenow="<%= 100 - printStatistics.resumedPercent %>%"
             aria-valuemin="0"
             aria-valuemax="100"
           >
-            25%
+            <%= 100 - printStatistics.resumedPercent %>%
           </div>
         </div>
       </div>
