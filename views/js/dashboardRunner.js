@@ -8,15 +8,19 @@ setInterval(function() {
       return res.json();
     })
     .then(res => {
-      let farmInfo = res.farmStats.farmInfo;
-      let octofarmStatistics = res.farmStats.octofarmStatistics;
-      let printStatistics = res.farmStats.printStatistics;
-      let printers = res.printers;
-      let systemInfo = res.systemInfo;
+      if(res.printers.length === 0){
 
-      dashUpdate.systemInformation(systemInfo);
-      dashUpdate.printers(printers);
-      dashUpdate.currentOperations(farmInfo);
+      }else{
+        let farmInfo = res.farmStats.farmInfo;
+        let octofarmStatistics = res.farmStats.octofarmStatistics;
+        let printStatistics = res.farmStats.printStatistics;
+        let printers = res.printers;
+        let systemInfo = res.systemInfo;
+  
+        dashUpdate.systemInformation(systemInfo);
+        dashUpdate.printers(printers);
+        dashUpdate.currentOperations(farmInfo);
+      }
     })
     .catch(err => {
       console.log(err);
