@@ -1,5 +1,4 @@
 export default function currentOperations(farmInfo) {
-    console.log("UPDATE OPS")
     document.getElementById("completeCount").innerHTML =
       "Complete: " + farmInfo.complete;
     document.getElementById("idleCount").innerHTML = "Idle: " + farmInfo.idle;
@@ -7,11 +6,17 @@ export default function currentOperations(farmInfo) {
       "Active: " + farmInfo.active;
     document.getElementById("offlineCount").innerHTML =
       "Offline: " + farmInfo.offline;
+
+    document.getElementById("farmProgress").innerHTML = farmInfo.farmProgress + "%";
+    document.getElementById("farmProgress").style = `width: ${farmInfo.farmProgress}%`;
+    document.getElementById("farmProgress").classList = `progress-bar progress-bar-striped bg-${farmInfo.farmProgressColour}`;
+      
     farmInfo.currentOperations = _.orderBy(
       farmInfo.currentOperations,
       ["progress"],
       ["desc"]
     );
+
     farmInfo.currentOperations.forEach((current, index) => {
       //check if exists, create if not....
       if (document.getElementById("currentOpCard-" + current.index)) {

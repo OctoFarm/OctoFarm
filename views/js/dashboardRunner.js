@@ -102,7 +102,16 @@ class dashUpdate {
     });
   }
 
-  static farmInformation(farmInformation){
-      
+  static farmInformation(farmInfo){
+        document.getElementById("avgEstimatedTime").innerHTML = Calc.generateTime(farmInfo.avgEstimateTime) ;
+        document.getElementById("avgRemaingingTime").innerHTML = Calc.generateTime(farmInfo.avgRemainingTime);
+         document.getElementById("avgElapsedTime").innerHTML = Calc.generateTime(farmInfo.avgElapsedTime);
+         document.getElementById("cumEstimatedTime").innerHTML = Calc.generateTime(farmInfo.totalEstimateTime);
+         document.getElementById("cumRemainingTime").innerHTML = Calc.generateTime(farmInfo.totalRemainingTime);
+         document.getElementById("cumElapsedTime").innerHTML = Calc.generateTime(farmInfo.totalElapsedTime);
+         document.getElementById("cumTool0Heat").innerHTML = `<i class="far fa-circle"></i> ${Math.round((farmInfo.activeToolA) * 100) / 100}°C <i class="fas fa-bullseye"></i> ${Math.round((farmInfo.activeToolT) * 100) / 100}°C`;
+         document.getElementById("cumBedHeat").innerHTML = `<i class="far fa-circle"></i> ${Math.round((farmInfo.activeBedA) * 100) / 100}°C <i class="fas fa-bullseye"></i> ${Math.round((farmInfo.activeBedT) * 100) / 100}°C`;
+         document.getElementById("cumPrintHeat").innerHTML = `<i class="far fa-circle"></i> ${Math.round((farmInfo.activeToolA + farmInfo.activeBedA) * 100) / 100}°C <i class="fas fa-bullseye"></i> ${Math.round((farmInfo.activeToolT + farmInfo.activeBedT) * 100) / 100}°C`;
+
   }
 }
