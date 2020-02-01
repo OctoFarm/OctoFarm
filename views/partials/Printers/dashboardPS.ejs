@@ -15,22 +15,22 @@
           <div
             class="progress-bar progress-bar-striped bg-success"
             role="progressbar"
-            style="width: <%= 100 -printStatistics.completedPercent  %>% "
-            aria-valuenow=" <%= 100 -printStatistics.completedPercent %>%"
+            style="width: <%= printStatistics.completedPercent  %>% "
+            aria-valuenow=" <%= printStatistics.completedPercent %>%"
             aria-valuemin="0"
             aria-valuemax="100"
           >
-            <%= 100 -printStatistics.completedPercent %>%
+            <%= printStatistics.completedPercent %>%
           </div>
           <div
             class="progress-bar progress-bar-striped bg-danger"
             role="progressbar"
-            style="width: <%= printStatistics.completedPercent %>% "
-            aria-valuenow="<%= printStatistics.completedPercent %>%"
+            style="width: <%= 100 - printStatistics.completedPercent %>% "
+            aria-valuenow="<%= 100 - printStatistics.completedPercent %>%"
             aria-valuemin="0"
             aria-valuemax="100"
           >
-            <%= printStatistics.completedPercent%>%
+            <%= 100 - printStatistics.completedPercent %>%
           </div>
         </div>
         <p class="mb-0">

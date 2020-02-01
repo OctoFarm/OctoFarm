@@ -76,6 +76,7 @@ class Runner {
     }
   }
   static async setOffline(printer, i) {
+    console.log("Printer " + printer.index + " has gone offline");
     //Make sure only setting offline new offline printers
     if (offlineRunners[i] === false) {
       //Make sure online and offline intervals are not running for the printer.
@@ -103,6 +104,7 @@ class Runner {
     }
   }
   static async setOnline(printer, i) {
+    console.log("Printer " + printer.index + " has come online");
     //Make sure only setting offline new offline printers
     if (onlineRunners[i] === false) {
       //Make sure online and offline intervals are not running for the printer.
@@ -129,11 +131,21 @@ class Runner {
             if (printer.progress.completion === 100) {
               HistoryCollection.completed(printer);
             }
-            if (printer.current.state === "Cancelling") {
+            if (
+              printer.current.state === "Cancelling" &&
+              printer.progress.completion < 100
+            ) {
+              HistoryCollection.failed(printer);
             }
-            if (printer.current.state === "Pausing") {
+            if (
+              printer.current.state === "Pausing" &&
+              printer.progress.completion < 100
+            ) {
             }
-            if (printer.current.state === "Paused") {
+            if (
+              printer.current.state === "Paused" &&
+              printer.progress.completion < 100
+            ) {
             }
           }
         } else {

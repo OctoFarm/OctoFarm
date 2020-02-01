@@ -108,7 +108,11 @@ class StatisticsCollection {
         }
         farmInfo.currentOperations = currentOperations;
 
-        farmInfo.currentOperations = _.orderBy(farmInfo.currentOperations, ['progress'],['desc']);
+        farmInfo.currentOperations = _.orderBy(
+          farmInfo.currentOperations,
+          ["progress"],
+          ["desc"]
+        );
 
         farmInfo.totalElapsedTime = printTimeElapsed.reduce((a, b) => a + b, 0);
         farmInfo.totalRemainingTime = printTimeRemaining.reduce(
@@ -138,12 +142,11 @@ class StatisticsCollection {
           printTimes.push(print.printHistory.printTime);
           filamentLengths.push(print.printHistory.filamentLength);
           if (print.printHistory.success) {
-            completed.push(print.printHistory.state);
+            completed.push(print.printHistory.success);
           } else {
-            cancelled.push(print.printHistory.state);
+            cancelled.push(print.printHistory.success);
           }
         });
-
         let printTimesTotal = printTimes.reduce((a, b) => a + b, 0);
 
         let currentDate = new Date();
@@ -202,11 +205,14 @@ class StatisticsCollection {
 
         farmStats[0].octofarmStatistics = octofarmStatistics;
 
-        printStatistics.completed = complete.length;
+        printStatistics.completed = completed.length;
         printStatistics.cancelled = cancelled.length;
 
         printStatistics.completedPercent =
           (complete.length / cancelled.length) * 100;
+        if (isNaN(printStatistics.completedPercent)) {
+          printStatistics.completedPercent = 100;
+        }
 
         if (printStatistics.completedPercent === Infinity) {
           printStatistics.completedPercent = 0;
