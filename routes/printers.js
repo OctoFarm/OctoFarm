@@ -59,8 +59,13 @@ router.post("/runner/checkOffline", ensureAuthenticated, (req, res) => {
   Printers.find({}, async (err, printers) => {
     for (let i = 0; i < printers.length; i++) {
       if (printers[i].current.state === "Offline") {
-        console.log(i);
-        await Runner.getConnection(printers[i]);
+        console.log("Forced Offline check for print: " + i);
+        let currentState = await Runner.testConnection(printers[i]);
+        if (currentState.connect) {
+          Runner.setOnline(printers[i], i);
+        } else {
+          Runner.setOffline(printers[i], i);
+        }
         await checked.push(i);
       }
     }

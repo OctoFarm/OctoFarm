@@ -66,7 +66,6 @@ export default function currentOperations(farmInfo) {
 
     currentCards.forEach(card => {
       if (card.id != "currentOpCard-" + current.index) {
-        console.log("Remove");
       }
     });
   });
