@@ -3,7 +3,7 @@ const _ = require("lodash");
 const fetch = require("node-fetch");
 
 class HistoryCollection {
-  static async watcher(printer) {
+  static async completed(printer) {
     let newPrintHistory = await HistoryCollection.history();
     let historyCollection = await History.find({});
     let today = new Date();
@@ -35,7 +35,7 @@ class HistoryCollection {
           newPrintHistory.startDate = dateStart + " - " + newStart;
           let printTime = new Date(printer.progress.printTime * 1000);
           let dateEnd = startDate.getTime() + printTime.getTime();
-          let isoDateEnd = new Date(dateEnd)
+          let isoDateEnd = new Date(dateEnd);
           let yearEnd = await isoDateEnd.toDateString();
           let timeEnd = await isoDateEnd.toTimeString();
           let newEnd = timeEnd.substring(0, 8);
@@ -68,7 +68,7 @@ class HistoryCollection {
             newPrintHistory.startDate = dateStart + " - " + newStart;
             let printTime = new Date(printer.progress.printTime * 1000);
             let dateEnd = startDate.getTime() + printTime.getTime();
-            let isoDateEnd = new Date(dateEnd)
+            let isoDateEnd = new Date(dateEnd);
             let yearEnd = await isoDateEnd.toDateString();
             let timeEnd = await isoDateEnd.toTimeString();
             let newEnd = timeEnd.substring(0, 8);

@@ -1,35 +1,40 @@
 export default function currentOperations(farmInfo) {
-    document.getElementById("completeCount").innerHTML =
-      "Complete: " + farmInfo.complete;
-    document.getElementById("idleCount").innerHTML = "Idle: " + farmInfo.idle;
-    document.getElementById("activeCount").innerHTML =
-      "Active: " + farmInfo.active;
-    document.getElementById("offlineCount").innerHTML =
-      "Offline: " + farmInfo.offline;
+  document.getElementById("completeCount").innerHTML =
+    "Complete: " + farmInfo.complete;
+  document.getElementById("idleCount").innerHTML = "Idle: " + farmInfo.idle;
+  document.getElementById("activeCount").innerHTML =
+    "Active: " + farmInfo.active;
+  document.getElementById("offlineCount").innerHTML =
+    "Offline: " + farmInfo.offline;
 
-    document.getElementById("farmProgress").innerHTML = farmInfo.farmProgress + "%";
-    document.getElementById("farmProgress").style = `width: ${farmInfo.farmProgress}%`;
-    document.getElementById("farmProgress").classList = `progress-bar progress-bar-striped bg-${farmInfo.farmProgressColour}`;
-      
-    farmInfo.currentOperations = _.orderBy(
-      farmInfo.currentOperations,
-      ["progress"],
-      ["desc"]
-    );
+  document.getElementById("farmProgress").innerHTML =
+    farmInfo.farmProgress + "%";
+  document.getElementById(
+    "farmProgress"
+  ).style = `width: ${farmInfo.farmProgress}%`;
+  document.getElementById(
+    "farmProgress"
+  ).classList = `progress-bar progress-bar-striped bg-${farmInfo.farmProgressColour}`;
 
-    farmInfo.currentOperations.forEach((current, index) => {
-      //check if exists, create if not....
-      if (document.getElementById("currentOpCard-" + current.index)) {
-        let progress = document.getElementById(
-          "currentProgress-" + current.index
-        );
-        progress.style = `width: ${current.progress}%`;
-        progress.innerHTML = current.progress + "%";
-        progress.className = `progress-bar progress-bar-striped bg-${current.progressColour}`;
-      } else {
-        document.getElementById("currentOperationsBody").insertAdjacentHTML(
-          "beforeend",
-          `
+  farmInfo.currentOperations = _.orderBy(
+    farmInfo.currentOperations,
+    ["progress"],
+    ["desc"]
+  );
+
+  farmInfo.currentOperations.forEach((current, index) => {
+    //check if exists, create if not....
+    if (document.getElementById("currentOpCard-" + current.index)) {
+      let progress = document.getElementById(
+        "currentProgress-" + current.index
+      );
+      progress.style = `width: ${current.progress}%`;
+      progress.innerHTML = current.progress + "%";
+      progress.className = `progress-bar progress-bar-striped bg-${current.progressColour}`;
+    } else {
+      document.getElementById("currentOperationsBody").insertAdjacentHTML(
+        "beforeend",
+        `
                 <div id="currentOpCard-${current.index}"
                 class="card card-block text-white bg-secondary d-inline-block"
                 style="min-width: 200px; height:65px;"
@@ -51,10 +56,18 @@ export default function currentOperations(farmInfo) {
                   </div>
                 </div>
                 `
-        );
+      );
+    }
+    document.getElementById(
+      "currentOpCard-" + current.index
+    ).style.order = index;
+    //find and hide printers that shouldn't be here anymore...
+    let currentCards = document.querySelectorAll("[id^='currentOpCard-']");
+
+    currentCards.forEach(card => {
+      if (card.id != "currentOpCard-" + current.index) {
+        console.log("Remove");
       }
-      document.getElementById(
-        "currentOpCard-" + current.index
-      ).style.order = index;
     });
-  }
+  });
+}
