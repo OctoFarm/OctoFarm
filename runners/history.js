@@ -127,17 +127,18 @@ class HistoryCollection {
           let timeStart = await startDate.toTimeString();
           let newStart = timeStart.substring(0, 8);
           newPrintHistory.startDate = dateStart + " - " + newStart;
-          let printTime = new Date();
-          let printTimeNew =
-            printTime.getMilliseconds() - startDate.getMilliseconds();
-          let dateEnd = startDate.getTime() + printTime;
-          let isoDateEnd = new Date(dateEnd);
+          let today = new Date();
+          let printTime = today.getTime() - startDate.getTime();
+          let printEnd = new Date(printTime);
+          let endDate = startDate.getTime() + printEnd.getTime();
+          let isoDateEnd = new Date(endDate);
           let yearEnd = await isoDateEnd.toDateString();
           let timeEnd = await isoDateEnd.toTimeString();
           let newEnd = timeEnd.substring(0, 8);
+          newPrintHistory.printTime = Math.round(printTime / 1000);
           newPrintHistory.endDate = yearEnd + " - " + newEnd;
           newPrintHistory.id = res.prints.last.date + printer.job.file.name;
-          newPrintHistory.printTime = printTime;
+
           newPrintHistory.spoolUsed = ""; // Awaiting link for spools - print.currentSpool.
           newPrintHistory.filamentLength = printer.job.filament.tool0.length;
           newPrintHistory.filamentVolume = printer.job.filament.tool0.volume;
@@ -150,7 +151,6 @@ class HistoryCollection {
           //Save if this print is different to last print date.
           //setup newHistory
           newPrintHistory.old = false;
-
           newPrintHistory.printerIndex = printer.index;
           newPrintHistory.printerName = printer.settingsApperance.name;
           newPrintHistory.success = false;
@@ -162,20 +162,18 @@ class HistoryCollection {
             let timeStart = await startDate.toTimeString();
             let newStart = timeStart.substring(0, 8);
             newPrintHistory.startDate = dateStart + " - " + newStart;
-            let printTime = new Date();
-            let printTimeNew =
-              printTime.getMilliseconds() - startDate.getMilliseconds();
-            let dateEnd = startDate.getTime() + printTime;
-            console.log(startDate.getTime());
-            console.log(printTime);
-
-            let isoDateEnd = new Date(dateEnd);
+            let today = new Date();
+            let printTime = today.getTime() - startDate.getTime();
+            let printEnd = new Date(printTime);
+            let endDate = startDate.getTime() + printEnd.getTime();
+            let isoDateEnd = new Date(endDate);
             let yearEnd = await isoDateEnd.toDateString();
             let timeEnd = await isoDateEnd.toTimeString();
             let newEnd = timeEnd.substring(0, 8);
+            newPrintHistory.printTime = Math.round(printTime / 1000);
             newPrintHistory.endDate = yearEnd + " - " + newEnd;
             newPrintHistory.id = res.prints.last.date + printer.job.file.name;
-            newPrintHistory.printTime = printTime;
+
             newPrintHistory.spoolUsed = ""; // Awaiting link for spools - print.currentSpool.
             newPrintHistory.filamentLength = printer.job.filament.tool0.length;
             newPrintHistory.filamentVolume = printer.job.filament.tool0.volume;
@@ -237,6 +235,49 @@ class HistoryCollection {
   }
 }
 
+const generateTime = function(seconds) {
+  let string = "";
+  if (seconds === undefined || isNaN(seconds)) {
+    string = "Done";
+  } else {
+    let days = Math.floor(seconds / (3600 * 24));
+
+    seconds -= days * 3600 * 24;
+    let hrs = Math.floor(seconds / 3600);
+
+    seconds -= hrs * 3600;
+    let mnts = Math.floor(seconds / 60);
+
+    seconds -= mnts * 60;
+    seconds = Math.floor(seconds);
+
+    string =
+      days +
+      " Days, " +
+      hrs +
+      " Hrs, " +
+      mnts +
+      " Mins, " +
+      seconds +
+      " Seconds";
+
+    if (string.includes("0 Days")) {
+      string = string.replace("0 Days,", "");
+    }
+    if (string.includes("0 Hrs")) {
+      string = string.replace(" 0 Hrs,", "");
+    }
+    if (string.includes("0 Mins")) {
+      string = string.replace(" 0 Mins,", "");
+    }
+    if (mnts > 0 || hrs > 0 || days > 0 || seconds > 0) {
+    } else {
+      string = string.replace("0 Seconds", "Done");
+    }
+  }
+
+  return string;
+};
 module.exports = {
   HistoryCollection: HistoryCollection
 };
