@@ -138,10 +138,6 @@ class HistoryCollection {
           newPrintHistory.printTime = Math.round(printTime / 1000);
           newPrintHistory.endDate = yearEnd + " - " + newEnd;
           newPrintHistory.id = res.prints.last.date + printer.job.file.name;
-
-          newPrintHistory.spoolUsed = ""; // Awaiting link for spools - print.currentSpool.
-          newPrintHistory.filamentLength = printer.job.filament.tool0.length;
-          newPrintHistory.filamentVolume = printer.job.filament.tool0.volume;
           let printHistory = newPrintHistory;
           let newHistory = new History({
             printHistory
