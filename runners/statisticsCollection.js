@@ -5,6 +5,7 @@ const _ = require("lodash");
 
 class StatisticsCollection {
   static init() {
+    console.log("Starting Statistics Collection");
     setInterval(function() {
       StatisticsCollection.grab();
     }, 3000);

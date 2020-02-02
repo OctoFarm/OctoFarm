@@ -118,16 +118,15 @@ class Runner {
       let Polling = await ServerSettings.check();
       onlineRunners[i] = setInterval(async function() {
         let connectionTest = await Runner.testConnection(printer);
+
         if (connectionTest.connect) {
           printer = connectionTest.printer;
           if (printer.current.state === "Closed") {
             printer.save();
           } else {
-            let getPrinter = await Runner.getPrinter(printer);
-            printer = getPrinter.printer;
             let getJob = await Runner.getJob(printer);
             printer = getJob.printer;
-            printer.save();
+
             if (printer.progress.completion === 100) {
               HistoryCollection.completed(printer);
             }
@@ -137,16 +136,9 @@ class Runner {
             ) {
               HistoryCollection.failed(printer);
             }
-            if (
-              printer.current.state === "Pausing" &&
-              printer.progress.completion < 100
-            ) {
-            }
-            if (
-              printer.current.state === "Paused" &&
-              printer.progress.completion < 100
-            ) {
-            }
+            let getPrinter = await Runner.getPrinter(printer);
+            printer = getPrinter.printer;
+            printer.save();
           }
         } else {
           Runner.setOffline(printer, i);

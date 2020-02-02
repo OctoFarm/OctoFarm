@@ -166,6 +166,9 @@ class HistoryCollection {
             let printTimeNew =
               printTime.getMilliseconds() - startDate.getMilliseconds();
             let dateEnd = startDate.getTime() + printTime;
+            console.log(startDate.getTime());
+            console.log(printTime);
+
             let isoDateEnd = new Date(dateEnd);
             let yearEnd = await isoDateEnd.toDateString();
             let timeEnd = await isoDateEnd.toTimeString();
