@@ -140,10 +140,11 @@ class StatisticsCollection {
         let cancelled = [];
         let filamentLengths = [];
         history.forEach(print => {
-          printTimes.push(print.printHistory.printTime);
           filamentLengths.push(print.printHistory.filamentLength);
           if (print.printHistory.success) {
+            printTimes.push(print.printHistory.printTime);
             completed.push(print.printHistory.success);
+            filamentLengths.push(print.printHistory.filamentLength);
           } else {
             cancelled.push(print.printHistory.success);
           }
