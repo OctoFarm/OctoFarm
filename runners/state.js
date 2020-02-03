@@ -5,15 +5,55 @@ const historyCollection = require("./history.js");
 const HistoryCollection = historyCollection.HistoryCollection;
 const fetch = require("node-fetch");
 const _ = require("lodash");
+const WebSocket = require('ws');  
 
-let onlineRunners = [];
 let offlineRunners = [];
 
-class Runner {
-  static async init() {
-    console.log("Init Printers");
+class ClientAPI{
+  static get(ip, port, apikey, item) {
+    let url = `http://${ip}:${port}/api/${item}`;
+    return fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": apikey
+      }
+    })
+  }
+}
 
-    //Grab all the printers,
+class ClientSocket{
+  static async connect(ip, port, apikey){
+    let users = await ClientAPI.get(ip, port, apikey, "users")
+    users = await users.json()
+
+    let currentUser = "";
+    if(_.isEmpty(users) ){
+      currentUser = "admin"
+    }else{
+      users.users.forEach(user=>{
+        if(user.admin){
+          currentUser = user.name;
+        }
+      })
+    }
+
+    const ws = new WebSocket(`ws://${ip}:${port}/sockjs/websocket`);
+
+    let client = {
+      ws: ws,
+      currentUser: currentUser,
+      apikey: apikey
+    }
+    return client
+  }
+}
+
+
+
+class Runner {
+  static async init(){
+    //Grab printers from database....
     let farmPrinters = [];
     try {
       farmPrinters = await Printers.find({});
@@ -27,54 +67,109 @@ class Runner {
       };
       console.log(error);
     }
-    //Loop through the printers
-    try {
-      for (let i = 0; i < farmPrinters.length; i++) {
-        //Do inital connection attempt on printers
-        let connectionTest = await Runner.testConnection(farmPrinters[i]);
-        farmPrinters[i] = connectionTest.printer;
-        //Do a full update of printer if current online...
-        if (connectionTest.connect) {
-          //Update the farmPrinters variable with updated information... then pass to checkers
-          let getFiles = await Runner.getFiles(farmPrinters[i]);
-          farmPrinters[i] = getFiles.printer;
-          let getProfile = await Runner.getProfile(farmPrinters[i]);
-          farmPrinters[i] = getProfile.printer;
-          let getSettings = await Runner.getSettings(farmPrinters[i]);
-          farmPrinters[i] = getSettings.printer;
-          let getSystem = await Runner.getSystem(farmPrinters[i]);
-          farmPrinters[i] = getSystem.printer;
+    for (let i = 0; i < farmPrinters.length;i++){
+      try {
+        let client = await ClientSocket.connect(farmPrinters[i].ip,farmPrinters[i].port,farmPrinters[i].apikey)
+        if(typeof client.err != 'undefined'){
+          await client.ws.on('open', function open() {
+            var data = {};
+            data["auth"] = client.currentUser + ":" + client.apikey;
+            client.ws.send(JSON.stringify(data));
+          });
+      
+          await client.ws.on('message', async function incoming(data) {
+            data = await JSON.parse(data);
+            
+          });
         }
+      } catch (err) {
+        let error = {
+          err: err.message,
+          action: "Connection to client failed...",
+          userAction:
+            "Could not get initial connection to client, pushing client to offline checking..."
+        };
+        //Move to offline connection checking...
+        console.log(error);
+      }
 
-        console.log(
-          "Printer " + i + " checked, state: " + farmPrinters[i].current.state
-        );
-        //Base the runners ready to get printers...
-        onlineRunners[i] = false;
-        offlineRunners[i] = false;
-        //Make sure results are saved to db.
-        farmPrinters[i].save();
-      }
-      //Send all printers to monitoring section
-      console.log("Starting Monitoring...");
-      for (let i = 0; i < farmPrinters.length; i++) {
-        if (farmPrinters[i].current.state != "Offline") {
-          Runner.setOnline(farmPrinters[i], i);
-        } else {
-          Runner.setOffline(farmPrinters[i], i);
-        }
-      }
-    } catch (err) {
-      let error = {
-        err: err.message,
-        //printer: printer.index + ". " + printer.ip + ":" + printer.port,
-        action: "Failed to update printers state... No action taken",
-        userAction:
-          "Make sure your printer connection settings are type correctly..."
-      };
-      console.log(error);
+
     }
+
+    
+
+    //grab admin user
+
+
+
+
+
   }
+  // static async init() {
+  //   console.log("Init Printers");
+
+  //   //Grab all the printers,
+  //   let farmPrinters = [];
+  //   try {
+  //     farmPrinters = await Printers.find({});
+  //     console.log("Grabbed " + farmPrinters.length + " for checking");
+  //   } catch (err) {
+  //     let error = {
+  //       err: err.message,
+  //       action: "Database connection failed... No action taken",
+  //       userAction:
+  //         "Please make sure the database URL is inputted and can be reached... 'file located at: config/db.js'"
+  //     };
+  //     console.log(error);
+  //   }
+  //   //Loop through the printers
+  //   try {
+  //     for (let i = 0; i < farmPrinters.length; i++) {
+  //       //Do inital connection attempt on printers
+  //       let connectionTest = await Runner.testConnection(farmPrinters[i]);
+  //       farmPrinters[i] = connectionTest.printer;
+  //       //Do a full update of printer if current online...
+  //       if (connectionTest.connect) {
+  //         //Update the farmPrinters variable with updated information... then pass to checkers
+  //         let getFiles = await Runner.getFiles(farmPrinters[i]);
+  //         farmPrinters[i] = getFiles.printer;
+  //         let getProfile = await Runner.getProfile(farmPrinters[i]);
+  //         farmPrinters[i] = getProfile.printer;
+  //         let getSettings = await Runner.getSettings(farmPrinters[i]);
+  //         farmPrinters[i] = getSettings.printer;
+  //         let getSystem = await Runner.getSystem(farmPrinters[i]);
+  //         farmPrinters[i] = getSystem.printer;
+  //       }
+
+  //       console.log(
+  //         "Printer " + i + " checked, state: " + farmPrinters[i].current.state
+  //       );
+  //       //Base the runners ready to get printers...
+  //       onlineRunners[i] = false;
+  //       offlineRunners[i] = false;
+  //       //Make sure results are saved to db.
+  //       farmPrinters[i].save();
+  //     }
+  //     //Send all printers to monitoring section
+  //     console.log("Starting Monitoring...");
+  //     for (let i = 0; i < farmPrinters.length; i++) {
+  //       if (farmPrinters[i].current.state != "Offline") {
+  //         Runner.setOnline(farmPrinters[i], i);
+  //       } else {
+  //         Runner.setOffline(farmPrinters[i], i);
+  //       }
+  //     }
+  //   } catch (err) {
+  //     let error = {
+  //       err: err.message,
+  //       //printer: printer.index + ". " + printer.ip + ":" + printer.port,
+  //       action: "Failed to update printers state... No action taken",
+  //       userAction:
+  //         "Make sure your printer connection settings are type correctly..."
+  //     };
+  //     console.log(error);
+  //   }
+  // }
   static async setOffline(printer, i) {
     console.log("Printer " + printer.index + " has gone offline");
     //Make sure only setting offline new offline printers
@@ -446,16 +541,7 @@ class Runner {
       });
   }
 
-  static get(ip, port, apikey, item) {
-    let url = `http://${ip}:${port}/api/${item}`;
-    return fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": apikey
-      }
-    });
-  }
+ 
   static getColour(state) {
     if (state === "Operational") {
       return { name: "secondary", hex: "#262626", category: "Idle" };
@@ -487,6 +573,7 @@ class Runner {
     });
   }
 }
+
 module.exports = {
   Runner: Runner
 };
