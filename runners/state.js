@@ -5,11 +5,11 @@ const historyCollection = require("./history.js");
 const HistoryCollection = historyCollection.HistoryCollection;
 const fetch = require("node-fetch");
 const _ = require("lodash");
-const WebSocket = require('ws');  
+const WebSocket = require("ws");
 
 let offlineRunners = [];
 
-class ClientAPI{
+class ClientAPI {
   static get(ip, port, apikey, item) {
     let url = `http://${ip}:${port}/api/${item}`;
     return fetch(url, {
@@ -18,41 +18,58 @@ class ClientAPI{
         "Content-Type": "application/json",
         "X-Api-Key": apikey
       }
-    })
+    });
   }
 }
 
-class ClientSocket{
-  static async connect(ip, port, apikey){
-    let users = await ClientAPI.get(ip, port, apikey, "users")
-    users = await users.json()
-
-    let currentUser = "";
-    if(_.isEmpty(users) ){
-      currentUser = "admin"
-    }else{
-      users.users.forEach(user=>{
-        if(user.admin){
-          currentUser = user.name;
-        }
-      })
-    }
-
-    const ws = new WebSocket(`ws://${ip}:${port}/sockjs/websocket`);
-
+class ClientSocket {
+  static async connect(ip, port, apikey) {
     let client = {
-      ws: ws,
-      currentUser: currentUser,
+      ws: {},
+      currentUser: "",
       apikey: apikey
+    };
+    try {
+      let users = await ClientAPI.get(ip, port, apikey, "users");
+      users = await users.json();
+
+      let currentUser = "";
+      if (_.isEmpty(users)) {
+        currentUser = "admin";
+      } else {
+        users.users.forEach(user => {
+          if (user.admin) {
+            currentUser = user.name;
+          }
+        });
+      }
+      const ws = new WebSocket(`ws://${ip}:${port}/sockjs/websocket`);
+      client = {
+        ws: ws,
+        currentUser: currentUser,
+        apikey: apikey
+      };
+      return client;
+    } catch (err) {
+      client = {
+        ws: {},
+        currentUser: "",
+        apikey: apikey,
+        error: {
+          err: err.message,
+          action: "Client connection failed",
+          userAction:
+            "Could not get initial connection to client, pushing client to offline checking..."
+        }
+      };
+      //Move to offline connection checking...
+      return client;
     }
-    return client
   }
 }
-
-
 
 class Runner {
-  static async init(){
+  static async init() {
     //Grab printers from database....
     let farmPrinters = [];
     try {
@@ -67,43 +84,37 @@ class Runner {
       };
       console.log(error);
     }
-    for (let i = 0; i < farmPrinters.length;i++){
-      try {
-        let client = await ClientSocket.connect(farmPrinters[i].ip,farmPrinters[i].port,farmPrinters[i].apikey)
-        if(typeof client.err != 'undefined'){
-          await client.ws.on('open', function open() {
-            var data = {};
-            data["auth"] = client.currentUser + ":" + client.apikey;
-            client.ws.send(JSON.stringify(data));
-          });
-      
-          await client.ws.on('message', async function incoming(data) {
-            data = await JSON.parse(data);
-            
-          });
-        }
-      } catch (err) {
-        let error = {
-          err: err.message,
-          action: "Connection to client failed...",
-          userAction:
-            "Could not get initial connection to client, pushing client to offline checking..."
-        };
-        //Move to offline connection checking...
-        console.log(error);
+    for (let i = 0; i < farmPrinters.length; i++) {
+      let client = await ClientSocket.connect(
+        farmPrinters[i].ip,
+        farmPrinters[i].port,
+        farmPrinters[i].apikey
+      );
+
+      if (typeof client.error === "undefined") {
+        client.ws.on("open", function open() {
+          var data = {};
+          data["auth"] = client.currentUser + ":" + client.apikey;
+          client.ws.send(JSON.stringify(data));
+        });
+
+        client.ws.on("message", async function incoming(data) {
+          data = await JSON.parse(data);
+          if (typeof data.event != "undefined") {
+            console.log(data.event);
+          }
+          if (typeof data.current != "undefined") {
+            console.log(data.current.state.text);
+            farmPrinters[i].current = data.current;
+            farmPrinters[i].save().then(res => {
+              console.log("save success");
+            });
+          }
+        });
       }
-
-
     }
 
-    
-
     //grab admin user
-
-
-
-
-
   }
   // static async init() {
   //   console.log("Init Printers");
@@ -541,7 +552,6 @@ class Runner {
       });
   }
 
- 
   static getColour(state) {
     if (state === "Operational") {
       return { name: "secondary", hex: "#262626", category: "Idle" };
