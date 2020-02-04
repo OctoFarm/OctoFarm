@@ -121,4 +121,3 @@ wss.on("connection", function connection(ws) {
     ws.send(data);
   }, 3000);
 });
-console.log("TEST")
