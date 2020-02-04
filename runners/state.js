@@ -8,6 +8,7 @@ const _ = require("lodash");
 const WebSocket = require("ws");
 
 let offlineRunners = [];
+let farmPrinters = [];
 
 class ClientAPI {
   static get(ip, port, apikey, item) {
@@ -71,7 +72,7 @@ class ClientSocket {
 class Runner {
   static async init() {
     //Grab printers from database....
-    let farmPrinters = [];
+
     try {
       farmPrinters = await Printers.find({});
       console.log("Grabbed " + farmPrinters.length + " for checking");
@@ -104,17 +105,21 @@ class Runner {
             console.log(data.event);
           }
           if (typeof data.current != "undefined") {
-            console.log(data.current.state.text);
-            farmPrinters[i].current = data.current;
-            farmPrinters[i].save().then(res => {
-              console.log("save success");
-            });
+            farmPrinters[i].state = data.current.state.text;
+            farmPrinters[i].currentZ = data.current.currentZ;
+            farmPrinters[i].progress = data.current.progress;
+            farmPrinters[i].logs = data.current.logs;
+            farmPrinters[i].temps = data.current.temps;
+            farmPrinters[i].messages = data.current.messages;
           }
         });
       }
     }
 
     //grab admin user
+  }
+  static returnFarmPrinters() {
+    return farmPrinters;
   }
   // static async init() {
   //   console.log("Init Printers");

@@ -4,12 +4,12 @@ const History = require("../models/History.js");
 const _ = require("lodash");
 
 class StatisticsCollection {
-  static init() {
-    console.log("Starting Statistics Collection");
-    setInterval(function() {
-      StatisticsCollection.grab();
-    }, 3000);
-  }
+  // static init() {
+  //   console.log("Starting Statistics Collection");
+  //   setInterval(function() {
+  //     StatisticsCollection.grab();
+  //   }, 3000);
+  // }
   static async grab() {
     FarmStatistics.find({}).then(async farmStats => {
       let farmInfo = await this.blankFarmInfo();

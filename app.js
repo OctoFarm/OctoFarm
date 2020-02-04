@@ -80,10 +80,10 @@ if (db != "") {
   const runner = require("./runners/state.js");
   const Runner = runner.Runner;
   Runner.init();
-  const system = require("./runners/systemInfo.js");
+  /*   const system = require("./runners/systemInfo.js");
   const SystemRunner = system.SystemRunner;
-  SystemRunner.init();
-  const stats = require("./runners/statisticsCollection.js");
-  const StatisticsCollection = stats.StatisticsCollection;
-  StatisticsCollection.init();
+  SystemRunner.init(); */
+  // const stats = require("./runners/statisticsCollection.js");
+  // const StatisticsCollection = stats.StatisticsCollection;
+  // StatisticsCollection.init();
 }
