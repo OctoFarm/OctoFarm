@@ -76,7 +76,6 @@ class ClientSocket {
 class Runner {
   static async init() {
     //Grab printers from database....
-
     try {
       farmPrinters = await Printers.find({});
       console.log("Grabbed " + farmPrinters.length + " for checking");
@@ -90,6 +89,7 @@ class Runner {
       console.log(error);
     }
     for (let i = 0; i < farmPrinters.length; i++) {
+      try{
       //clear runners for start
       onlineRunners[i] = false;
       offlineRunners[i] = false;
@@ -125,8 +125,16 @@ class Runner {
           }
         });
       }
+      }catch(err){
+        let error = {
+          err: err.message,
+          action: "Database connection failed... No action taken",
+          userAction:
+            "Please make sure the database URL is inputted and can be reached... 'file located at: config/db.js'"
+        };
+        console.log(error);
+      }
     }
-    //grab admin user
   }
   static returnFarmPrinters() {
     return farmPrinters;
