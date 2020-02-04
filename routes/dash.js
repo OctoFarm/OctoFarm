@@ -9,10 +9,6 @@ const SystemInfo = require("../models/SystemInfo");
 module.exports = router;
 
 router.get("/dash/get", ensureAuthenticated, async (req, res) => {
-  let farmStatistics = await FarmStatistics.find({});
-  let printers = await Printers.find({});
-  let systemInfo = await SystemInfo.find({});
-
   let dashboard = {
     farmStats: farmStatistics[0],
     printers: printers,
