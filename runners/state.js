@@ -8,6 +8,7 @@ const _ = require("lodash");
 const WebSocket = require("ws");
 
 let offlineRunners = [];
+let onlineRunners = [];
 let farmPrinters = [];
 
 class ClientAPI {
@@ -64,6 +65,9 @@ class ClientSocket {
         }
       };
       //Move to offline connection checking...
+      offlineRunners[i] = setInterval(function() {
+        console.log("Check offline runner");
+      }, 5000);
       return client;
     }
   }
@@ -86,20 +90,27 @@ class Runner {
       console.log(error);
     }
     for (let i = 0; i < farmPrinters.length; i++) {
-      let client = await ClientSocket.connect(
+      //clear runners for start
+      onlineRunners[i] = false;
+      offlineRunners[i] = false;
+
+      onlineRunners[i] = await ClientSocket.connect(
         farmPrinters[i].ip,
         farmPrinters[i].port,
         farmPrinters[i].apikey
       );
 
-      if (typeof client.error === "undefined") {
-        client.ws.on("open", function open() {
+      if (typeof onlineRunners[i].error === "undefined") {
+        clearInterval(offlineRunners[i]);
+        offlineRunners[i] = false;
+        onlineRunners[i].ws.on("open", function open() {
           var data = {};
-          data["auth"] = client.currentUser + ":" + client.apikey;
-          client.ws.send(JSON.stringify(data));
+          data["auth"] =
+            onlineRunners[i].currentUser + ":" + onlineRunners[i].apikey;
+          onlineRunners[i].ws.send(JSON.stringify(data));
         });
 
-        client.ws.on("message", async function incoming(data) {
+        onlineRunners[i].ws.on("message", async function incoming(data) {
           data = await JSON.parse(data);
           if (typeof data.event != "undefined") {
             console.log(data.event);
@@ -115,7 +126,6 @@ class Runner {
         });
       }
     }
-
     //grab admin user
   }
   static returnFarmPrinters() {
