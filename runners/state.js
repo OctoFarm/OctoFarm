@@ -113,15 +113,18 @@ class Runner {
         onlineRunners[i].ws.on("message", async function incoming(data) {
           data = await JSON.parse(data);
           if (typeof data.event != "undefined") {
+            data.event.printerIndex = i;
             console.log(data.event);
           }
           if (typeof data.current != "undefined") {
+            data.current.printerIndex = i;
             farmPrinters[i].state = data.current.state.text;
             farmPrinters[i].currentZ = data.current.currentZ;
             farmPrinters[i].progress = data.current.progress;
             farmPrinters[i].logs = data.current.logs;
             farmPrinters[i].temps = data.current.temps;
             farmPrinters[i].messages = data.current.messages;
+            console.log(data.current)
           }
         });
       }
