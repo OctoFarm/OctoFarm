@@ -30,7 +30,12 @@
             <% if(print.printHistory.success){%>
             <i class="fas fa-thumbs-up text-success"></i>
             <% }else{ %>
-            <i class="fas fa-thumbs-down text-danger"></i>
+              <%  if(print.printHistory.reason === "cancelled"){ %>
+                <i class="fas fa-thumbs-down text-warning"></i>
+                <%  }else{ %>
+                  <i class="fas fa-exclamation text-danger"></i>
+             <% } %>
+
             <% } %>
           </td>
           <td>
@@ -53,11 +58,16 @@
             <%= print.printHistory.spoolUsed %>
           </td>
           <td>
+            <% if(print.printHistory.filamentLength === "-"){ %>
+              -
+           <% }else{ %>
             <% let filamentLength = print.printHistory.filamentLength / 1000 %>
             <% filamentLength = Math.round(filamentLength*100)/100 %> <%=
             filamentLength %>m / <% let filamentWeight =
             3.14*(1.75/2)^2*1.24*filamentLength %> <%= filamentWeight %>g
             <!- Filament Requirements - Pi, density, width ->
+          <% } %>
+        
           </td>
           <td class="text-wrap">
             <%= print.printHistory.notes %>

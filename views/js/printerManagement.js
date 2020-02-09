@@ -17,7 +17,7 @@ window.onload = () => {
   });
   //Listener for save button
   document.getElementById("printerSaveBtn").addEventListener("click", e => {
-    PrintersManagement.save();
+    PrintersManagement.save("addPrintersTable");
   });
   //Listener for Importing Printers
   document
@@ -81,60 +81,8 @@ class PrintersManagement {
   build() {
     return this.printer;
   }
-
-  setConnection(index, current, options, action, init) {
+  setPrinter(index) {
     this.printer.index = index;
-    this.printer.current = current;
-    this.printer.options = options;
-    this.printer.action = action;
-    this.printer.inited = init;
-    this.printer.stateColour = UI.getColour(current.state);
-    return this;
-  }
-  setFile(files, freeSpace, totalSpace) {
-    this.printer.fileList = files;
-    this.printer.storage = { free: freeSpace, total: totalSpace };
-    return this;
-  }
-  setJob(job, progress) {
-    this.printer.job = job;
-    this.printer.progress = progress;
-    return this;
-  }
-  setPrinter(temperature) {
-    this.printer.temperature = temperature;
-    return this;
-  }
-  setProfile(profiles) {
-    this.printer.profiles = profiles;
-    return this;
-  }
-  setSettings(
-    settingsAPI,
-    settingsAppearance,
-    settingsFeature,
-    settingsFolder,
-    settingsPlugins,
-    settingsScripts,
-    settingsSerial,
-    settingsServer,
-    settingsSystem,
-    settingsWebcam
-  ) {
-    this.printer.settingsAPI = settingsAPI;
-    this.printer.settingsAppearance = settingsAppearance;
-    this.printer.settingsFeature = settingsFeature;
-    this.printer.settingsFolder = settingsFolder;
-    this.printer.settingsPlugins = settingsPlugins;
-    this.printer.settingsScripts = settingsScripts;
-    this.printer.settingsSerial = settingsSerial;
-    this.printer.settingsServer = settingsServer;
-    this.printer.settingsSystem = settingsSystem;
-    this.printer.settingsWebcam = settingsWebcam;
-    return this;
-  }
-  setSystem(core) {
-    this.printer.core = core;
     return this;
   }
   static validate(e) {
@@ -273,70 +221,9 @@ class PrintersManagement {
       oldPrinterCount.innerHTML = newPrinterCount;
     }
   }
-  static async save() {
-    const table = document.getElementById("addPrintersTable");
+  static async save(printerTable) {
+    const table = document.getElementById(printerTable);
     let printers = new Array();
-    let current = {
-      state: "Searching...",
-      port: "",
-      baudrate: "",
-      printerProfile: ""
-    };
-    let options = {
-      ports: [],
-      baudrates: [],
-      printerProfiles: [],
-      portPreference: "",
-      baudratePreference: "",
-      printerProfilePreference: "",
-      autoconnect: ""
-    };
-    let job = {
-      file: {},
-      estimatedPrintTime: 0,
-      filament: {}
-    };
-    let progress = {};
-    let temperature = {
-      tool0: {},
-      tool1: {},
-      bed: {},
-      history: [{}]
-    };
-    let profiles = [{}];
-    let settingsAPI = {};
-    let settingsAppearance = {};
-    let settingsFeature = {};
-    let settingsFolder = {};
-    let settingsPlugins = {
-      action_command_prompt: {},
-      pluginmanager: {}
-    };
-    let settingsScripts = {
-      gcode: {}
-    };
-    let settingsSerial = {};
-    let fileList = {
-      folderCount: 0,
-      fileCount: 0
-    };
-    let settingsServer = {
-      commands: {
-        serverRestartCommand: "sudo service octoprint-1 restart",
-        systemRestartCommand: "sudo reboot",
-        systemShutdownCommand: "sudo shutdown -h now"
-      },
-      diskspace: { critical: 209715200, warning: 524288000 },
-      onlineCheck: { enabled: true, host: "8.8.8.8", interval: 15, port: 53 },
-      pluginBlacklist: {
-        enabled: true,
-        ttl: 15,
-        url: "https://plugins.octoprint.org/blacklist.json"
-      }
-    };
-    let settingsSystem = { actions: [], events: null };
-    let settingsWebcam = {};
-    let core = [];
     for (var r = 0, n = table.rows.length; r < n; r++) {
       let printer = new PrintersManagement(
         table.rows[r].cells[0].innerHTML,
@@ -344,28 +231,15 @@ class PrintersManagement {
         table.rows[r].cells[2].innerHTML,
         table.rows[r].cells[3].innerHTML
       )
-        .setConnection(r, current, options, "Initialising Printer", false)
-        .setFile(fileList, "", "")
-        .setJob(job, progress)
-        .setPrinter(temperature)
-        .setProfile(profiles)
-        .setSettings(
-          settingsAPI,
-          settingsAppearance,
-          settingsFeature,
-          settingsFolder,
-          settingsPlugins,
-          settingsScripts,
-          settingsSerial,
-          settingsServer,
-          settingsSystem,
-          settingsWebcam
-        )
-        .setSystem(core)
+        .setPrinter(r)
         .build();
       printers.push(printer);
     }
-    printers.sort(Calculate.sortObjValues("index"));
+    _.orderBy(
+      printers,
+      ["index"],
+      ["desc"]
+    );
 
     Client.post("printers/save", printers)
       .then(res => {
@@ -398,7 +272,7 @@ class PrintersManagement {
       UI.createAlert("error", `File type not .json!`, 3000);
     }
   }
-  static stageImport(theFile) {
+  static stageImport() {
     return function(e) {
       const theBytes = e.target.result; //.split('base64,')[1];
       //Initial JSON validation
@@ -427,130 +301,7 @@ class PrintersManagement {
           bootbox
             .confirm(message, function(result) {
               if (result) {
-                //Loop through new printers and add to screen and store
-                const table = document.getElementById("newPrintersTable");
-                let printers = new Array();
-                let current = {
-                  state: "Searching...",
-                  port: "",
-                  baudrate: "",
-                  printerProfile: ""
-                };
-                let options = {
-                  ports: [],
-                  baudrates: [],
-                  printerProfiles: [],
-                  portPreference: "",
-                  baudratePreference: "",
-                  printerProfilePreference: "",
-                  autoconnect: ""
-                };
-                let job = {
-                  file: {},
-                  estimatedPrintTime: 0,
-                  filament: {}
-                };
-                let progress = {};
-                let temperature = {
-                  tool0: {},
-                  tool1: {},
-                  bed: {},
-                  history: [{}]
-                };
-                let profiles = [{}];
-                let settingsAPI = {};
-                let settingsAppearance = {};
-                let settingsFeature = {};
-                let settingsFolder = {};
-                let settingsPlugins = {
-                  action_command_prompt: {},
-                  pluginmanager: {}
-                };
-                let settingsScripts = {
-                  gcode: {}
-                };
-                let settingsSerial = {};
-                let fileList = {
-                  folderCount: 0,
-                  fileCount: 0
-                };
-                let settingsServer = {
-                  commands: {
-                    serverRestartCommand: "sudo service octoprint-1 restart",
-                    systemRestartCommand: "sudo reboot",
-                    systemShutdownCommand: "sudo shutdown -h now"
-                  },
-                  diskspace: { critical: 209715200, warning: 524288000 },
-                  onlineCheck: {
-                    enabled: true,
-                    host: "8.8.8.8",
-                    interval: 15,
-                    port: 53
-                  },
-                  pluginBlacklist: {
-                    enabled: true,
-                    ttl: 15,
-                    url: "https://plugins.octoprint.org/blacklist.json"
-                  }
-                };
-                let settingsSystem = { actions: [], events: null };
-                let settingsWebcam = {};
-                let core = [];
-                for (var r = 0, n = table.rows.length; r < n; r++) {
-                  let printer = new PrintersManagement(
-                    table.rows[r].cells[0].innerHTML,
-                    table.rows[r].cells[1].innerHTML,
-                    table.rows[r].cells[2].innerHTML,
-                    table.rows[r].cells[3].innerHTML
-                  )
-                    .setConnection(
-                      r,
-                      current,
-                      options,
-                      "Initialising Printer",
-                      false
-                    )
-                    .setFile(fileList, "", "")
-                    .setJob(job, progress)
-                    .setPrinter(temperature)
-                    .setProfile(profiles)
-                    .setSettings(
-                      settingsAPI,
-                      settingsAppearance,
-                      settingsFeature,
-                      settingsFolder,
-                      settingsPlugins,
-                      settingsScripts,
-                      settingsSerial,
-                      settingsServer,
-                      settingsSystem,
-                      settingsWebcam
-                    )
-                    .setSystem(core)
-                    .build();
-                  printers.push(printer);
-                }
-
-                printers.sort(Calculate.sortObjValues("index"));
-
-                Client.post("printers/save", printers)
-                  .then(res => {
-                    if (res.status === 200) {
-                      Client.post("printers/runner/init", {});
-                      window.location.replace("/dashboard");
-                    } else {
-                      window.location.replace("/dashboard");
-                    }
-                  })
-                  .catch(err => {
-                    UI.createAlert(
-                      "error",
-                      "Sorry I can't seem to access the API to save your printers.",
-                      3000,
-                      "yes"
-                    );
-                    console.log(err);
-                  });
+                PrintersManagement.save("newPrintersTable");
               }
             })
             .find("div.modal-dialog")

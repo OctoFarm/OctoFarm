@@ -2,18 +2,34 @@ const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
 const FarmStatistics = require("../models/FarmStatistics.js");
-const Printers = require("../models/Printer.js");
 const SystemInfo = require("../models/SystemInfo");
-
+const runner = require("../runners/state.js");
+const Runner = runner.Runner;
 
 module.exports = router;
 
 router.get("/dash/get", ensureAuthenticated, async (req, res) => {
-  let dashboard = {
-    farmStats: farmStatistics[0],
-    printers: printers,
-    systemInfo: systemInfo[0]
+  let printers = await Runner.returnFarmPrinters();
+  let statistics = await FarmStatistics.find({});
+  let printerInfo = [];
+  let systemInformation = await SystemInfo.find({});
+  for (let i = 0; i < printers.length; i++){
+    printer = {
+      state: printers[i].state,
+      index: printers[i].index,
+      settingsAppearance: printers[i].settingsApperance,
+      stateColour: printers[i].stateColour
+    }
+    printerInfo.push(printer)
   }
-
-  res.send(dashboard);
+  let dashboardInfo = {
+    printerInfo: printerInfo,
+    currentOperations: statistics[0].currentOperations,
+    currentOperationsCount: statistics[0].currentOperationsCount,
+    farmInfo: statistics[0].farmInfo,
+    octofarmStatistics: statistics[0].octofarmStatistics,
+    printStatistics: statistics[0].printStatistics,
+    systemInfo: systemInformation[0]
+  }
+  res.json(dashboardInfo);
 });

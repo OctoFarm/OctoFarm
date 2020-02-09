@@ -1,31 +1,6 @@
 
-<% printers.forEach(printer => { %> <% if(printer.inited === false){ %>
-<!-- Searching -->
-<div class="list-group">
-  <li class="list-group-item list-group-item-action flex-column align-items-start">
-    <div class="d-flex w-100 justify-content-between text-white">
-      <h5 id="printerName-<%= printer.index %>" class="mb-1 ml-1"><i class="fas fa-print"></i> <%= printer.index %>. <% if(typeof printer.settingsApperance != 'undefined'){ %>
-        <%= printer.settingsApperance.name %> <% }else{ %>
-          <%= printer.action %>
-        <% } %></span
-        ></h5>
-      <small><span id="printerBadge-<%= printer.index %>"
-        class="badge badge-<%= printer.stateColour.name %> badge-pill"
-        ><%= printer.current.state %></small></span>
-    </div>
 
-    <button  id="printerButton-<%= printer.index %>"
-      type="button"
-      class="btn btn-secondary btn-sm float-right"
-      data-toggle="modal"
-      data-target="#printerManagerModal"
-    >
-      <i class="fas fa-cog"></i>
-    </button>
-    <small class="pt-2 float-left ml-1 text-white"><i class="fas fa-network-wired"></i> <%= printer.ip%>:<%= printer.port%></small>
-  </li>
-</div>
-<% }else{ %>
+<% printers.forEach(printer => { %> 
 <!-- Connected -->
 <div class="list-group">
   <li class="list-group-item list-group-item-action flex-column align-items-start">
@@ -35,9 +10,14 @@
         ></h5>
       <small><span id="printerBadge-<%= printer.index %>"
         class="badge badge-<%= printer.stateColour.name %> badge-pill"
-        ><%= printer.current.state %></small></span>
+        >
+        <% if(printer.state === "Offline"){ %>
+          <i class="fas fa-spinner fa-pulse"></i>   <%= printer.state %>
+          <% }else{%>
+            <%= printer.state %>
+            <% }%>
+        </small></span>
     </div>
-
     <button  id="printerButton-<%= printer.index %>"
       type="button"
       class="btn btn-secondary btn-sm float-right"
@@ -49,4 +29,4 @@
     <small class="pt-2 float-left ml-1 text-white"><i class="fas fa-network-wired"></i> <%= printer.ip%>:<%= printer.port%></small>
   </li>
 </div>
-<% } %> <% }) %>
+ <% }) %>

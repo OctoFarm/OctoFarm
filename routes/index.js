@@ -7,6 +7,8 @@ const Printers = require("../models/Printer.js");
 const FarmStatistics = require("../models/FarmStatistics.js");
 const SystemInfo = require("../models/SystemInfo.js");
 const prettyHelpers = require("../views/partials/functions/pretty.js");
+const runner = require("../runners/state.js");
+const Runner = runner.Runner;
 
 console.log("db: " + db);
 
@@ -22,7 +24,7 @@ if (db === "") {
 
 //Dashboard Page
 router.get("/dashboard", ensureAuthenticated, async (req, res) => {
-  let printers = await Printers.find({}, null, { sort: { index: 1 } });
+  let printers = Runner.returnFarmPrinters();
   let statistics = await FarmStatistics.find({});
   let systemInformation = await SystemInfo.find({});
   res.render("dashboard", {
@@ -30,13 +32,11 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
     version: pjson.version,
     printers: printers,
     farmInfo: statistics[0].farmInfo,
+    currentOperations: statistics[0].currentOperations,
     octofarmStatistics: statistics[0].octofarmStatistics,
     printStatistics: statistics[0].printStatistics,
     printerCount: printers.length,
-    activeCount: statistics[0].farmInfo.active,
-    idleCount: statistics[0].farmInfo.idle,
-    completeCount: statistics[0].farmInfo.complete,
-    offlineCount: statistics[0].farmInfo.offline,
+    currentOperationsCount: statistics[0].currentOperationsCount[0],
     page: "Dashboard",
     helpers: prettyHelpers,
     systemInfo: systemInformation[0]

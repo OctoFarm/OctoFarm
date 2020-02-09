@@ -2,6 +2,7 @@ import Client from "./lib/octofarm.js";
 import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
+import printerManager from "./lib/modules/printerManager.js"
 
 setInterval(function() {
   Client.get("client/dash/get")
@@ -9,23 +10,19 @@ setInterval(function() {
       return res.json();
     })
     .then(res => {
-      if(res.printers.length === 0){
+      if(res.printerInfo.length === 0){
 
       }else{
-        let farmInfo = res.farmStats.farmInfo;
-        let octofarmStatistics = res.farmStats.octofarmStatistics;
-        let printStatistics = res.farmStats.printStatistics;
-        let printers = res.printers;
-        let systemInfo = res.systemInfo;
-  
-        dashUpdate.systemInformation(systemInfo);
-        dashUpdate.printers(printers);
-        currentOperations(farmInfo);
-        dashUpdate.farmInformation(farmInfo);
-        //dashUpdate.FarmStatistics
-        //dashUpdate.PrintStatistics
-      }
-    })
+        currentOperations(res.currentOperations, res.currentOperationsCount);
+        dashUpdate.systemInformation(res.systemInfo);
+        dashUpdate.printers(res.printerInfo);
+        dashUpdate.farmInformation(res.farmInfo)
+        dashUpdate.farmStatistics(res.octofarmStatistics)
+        if(document.getElementById("printerManagerModal").classList.contains("show")){
+          console.log("Open")
+        }
+    }
+  })
     .catch(err => {
       console.log(err);
       UI.createAlert(
@@ -35,7 +32,7 @@ setInterval(function() {
         "clicked"
       );
     });
-}, 5000);
+}, 1000);
 
 class dashUpdate {
   static systemInformation(systemInfo) {
@@ -80,25 +77,14 @@ class dashUpdate {
     document.getElementById("freeRamProg").style.width = freePer + "%";
   }
   static printers(printers) {
+
     printers.forEach(printer => {
+
       document.getElementById("printerBadge-" + printer.index).innerHTML =
-        printer.current.state;
+        printer.state;
       document.getElementById(
         "printerBadge-" + printer.index
       ).className = `badge badge-${printer.stateColour.name} badge-pill`;
-      if (printer.current.state != "Offline") {
-        document.getElementById("printerName-" + printer.index).innerHTML =
-          "<i class='fas fa-print'></i> " +
-          printer.index +
-          ". " +
-          printer.settingsApperance.name;
-      } else {
-        document.getElementById("printerName-" + printer.index).innerHTML =
-          "<i class='fas fa-print'></i> " +
-          printer.index +
-          ". " +
-          printer.action;
-      }
     });
   }
 
@@ -114,4 +100,15 @@ class dashUpdate {
          document.getElementById("cumPrintHeat").innerHTML = `<i class="far fa-circle"></i> ${Math.round((farmInfo.activeToolA + farmInfo.activeBedA) * 100) / 100}°C <i class="fas fa-bullseye"></i> ${Math.round((farmInfo.activeToolT + farmInfo.activeBedT) * 100) / 100}°C`;
 
   }
+  static farmStatistics(octofarmStatistics){
+    document.getElementById("activeHours").innerHTML = "<i class='fas fa-square text-success'></i> <b>Active: </b>" + Calc.generateTime(octofarmStatistics.activeHours);
+    document.getElementById("idleHours").innerHTML =  "<i class='fas fa-square text-danger'></i> <b>Idle: </b>" + Calc.generateTime(octofarmStatistics.idleHours);
+    let activeProgress = document.getElementById("activeProgress");
+    activeProgress.innerHTML = octofarmStatistics.activePercent + "%"
+    activeProgress.style.width = octofarmStatistics.activePercent + "%"
+
+    let idleProgress = document.getElementById("idleProgress");
+    idleProgress.innerHTML = 100 - octofarmStatistics.activePercent + "%"
+    idleProgress.style.width = 100 - octofarmStatistics.activePercent + "%"
+}
 }

@@ -19,14 +19,14 @@
         <div class="col-md-3 col-lg-6">
           <div class="progress mt-2">
             <div id="farmProgress"
-              class="progress-bar progress-bar-striped bg-<%= farmInfo.farmProgressColour %>"
+              class="progress-bar progress-bar-striped bg-<%= currentOperationsCount.farmProgressColour %>"
               role="progressbar"
-              style="width: <%= farmInfo.farmProgress %>%"
-              aria-valuenow="<%= farmInfo.farmProgress %>"
+              style="width: <%= currentOperationsCount.farmProgress %>%"
+              aria-valuenow="<%= currentOperationsCount.farmProgress %>"
               aria-valuemin="0"
               aria-valuemax="100"
             >
-            <%= farmInfo.farmProgress %>%
+            <%= currentOperationsCount.farmProgress %>%
             </div>
           </div>
         </div>
@@ -38,7 +38,7 @@
             aria-expanded="false"
             disabled
           >
-            Offline: <%= offlineCount %>
+            Offline: <%= currentOperationsCount.offline %>
           </button>
           <button id="idleCount"
             type="button"
@@ -47,7 +47,7 @@
             aria-expanded="false"
             disabled
           >
-            Idle: <%= idleCount %>
+            Idle: <%= currentOperationsCount.idle %>
           </button>
           <button id="activeCount"
             type="button"
@@ -56,7 +56,7 @@
             aria-expanded="false"
             disabled
           >
-            Active: <%= activeCount %>
+            Active: <%= currentOperationsCount.active %>
           </button>
           <button id="completeCount"
             type="button"
@@ -65,35 +65,37 @@
             aria-expanded="false"
             disabled
           >
-            Complete: <%= completeCount %>
+            Complete: <%= currentOperationsCount.complete %>
           </button>
         </div>
       </div>
     </div>
 
     <div class="card-body pt-0 pb-0 d-flex flex-row overflow-x" id="currentOperationsBody">
-
-      <% farmInfo.currentOperations.forEach(current => { %>
-        <div id="currentOpCard-<%=current.index%>"
-        class="card card-block text-white bg-secondary d-inline-block"
-        style="min-width: 200px; height:65px;"
-      >
-          <div class="card-header pb-1 pt-1 pl-2 pr-2"><%=current.index%>. <%=current.name%></div>
-          <div class="card-body  pb-0 pt-2 pl-2 pr-2">
-            <div class="progress">
-              <div id="currentProgress-<%=current.index%>"
-                class="progress-bar progress-bar-striped bg-<%=current.progressColour%>"
-                role="progressbar"
-                style="width: <%=current.progress%>%"
-                aria-valuenow=""
-                aria-valuemin="0"
-                aria-valuemax="100"
-              >
-              <%=current.progress%>%
+      <% currentOperations.forEach(current => { %>
+        <% if(current != null){ %>
+          <div id="currentOpCard-<%=current.index%>"
+            class="card card-block text-white bg-secondary d-inline-block"
+            style="min-width: 200px; height:85px;"
+          >
+              <div class="card-header pb-1 pt-1 pl-2 pr-2"><%=current.index%>. <%=current.name%></div>
+              <div class="card-body  pb-0 pt-2 pl-2 pr-2">
+                <h6 id="currentTime-<%=current.index%>" class="pb-0 text-center" style="font-size:0.6rem;"><%=  helpers.generateTime(current.timeRemaining) %></h6>
+                <div class="progress">
+                  <div id="currentProgress-<%=current.index%>"
+                    class="progress-bar progress-bar-striped bg-<%=current.progressColour%>"
+                    role="progressbar"
+                    style="width: <%=current.progress%>%"
+                    aria-valuenow=""
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                  >
+                  <%=current.progress%>%
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+        <% } %>
     <%  }) %>
 
     </div>

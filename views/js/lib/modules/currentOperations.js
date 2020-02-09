@@ -1,28 +1,31 @@
-export default function currentOperations(farmInfo) {
+import Calc from "../functions/calc.js";
+
+export default function currentOperations(currentOperations, currentOperationsCount) {
+  currentOperationsCount = currentOperationsCount[0]
   document.getElementById("completeCount").innerHTML =
-    "Complete: " + farmInfo.complete;
-  document.getElementById("idleCount").innerHTML = "Idle: " + farmInfo.idle;
+    "Complete: " + currentOperationsCount.complete;
+  document.getElementById("idleCount").innerHTML = "Idle: " + currentOperationsCount.idle;
   document.getElementById("activeCount").innerHTML =
-    "Active: " + farmInfo.active;
+    "Active: " + currentOperationsCount.active;
   document.getElementById("offlineCount").innerHTML =
-    "Offline: " + farmInfo.offline;
+    "Offline: " + currentOperationsCount.offline;
 
   document.getElementById("farmProgress").innerHTML =
-    farmInfo.farmProgress + "%";
+  currentOperationsCount.farmProgress + "%";
   document.getElementById(
     "farmProgress"
-  ).style = `width: ${farmInfo.farmProgress}%`;
+  ).style = `width: ${currentOperationsCount.farmProgress}%`;
   document.getElementById(
     "farmProgress"
-  ).classList = `progress-bar progress-bar-striped bg-${farmInfo.farmProgressColour}`;
+  ).classList = `progress-bar progress-bar-striped bg-${currentOperationsCount.farmProgressColour}`;
 
-  farmInfo.currentOperations = _.orderBy(
-    farmInfo.currentOperations,
+  currentOperations = _.orderBy(
+    currentOperations,
     ["progress"],
     ["desc"]
   );
 
-  farmInfo.currentOperations.forEach((current, index) => {
+  currentOperations.forEach((current, index) => {
     //check if exists, create if not....
     if (document.getElementById("currentOpCard-" + current.index)) {
       let progress = document.getElementById(
@@ -31,16 +34,18 @@ export default function currentOperations(farmInfo) {
       progress.style = `width: ${current.progress}%`;
       progress.innerHTML = current.progress + "%";
       progress.className = `progress-bar progress-bar-striped bg-${current.progressColour}`;
+      document.getElementById("currentTime-"+current.index).innerHTML = Calc.generateTime(current.timeRemaining);
     } else {
       document.getElementById("currentOperationsBody").insertAdjacentHTML(
         "beforeend",
         `
                 <div id="currentOpCard-${current.index}"
                 class="card card-block text-white bg-secondary d-inline-block"
-                style="min-width: 200px; height:65px;"
+                style="min-width: 200px; height:85px;"
               >
                   <div class="card-header pb-1 pt-1 pl-2 pr-2">${current.index}. ${current.name}</div>
                   <div class="card-body  pb-0 pt-2 pl-2 pr-2">
+                  <h6 id="currentTime-${current.index}" class="pb-0 text-center" style="font-size:0.6rem;">${ Calc.generateTime(current.timeRemaining) }</h6>
                     <div class="progress">
                       <div id="currentProgress-${current.index}"
                         class="progress-bar progress-bar-striped bg-${current.progressColour}"
@@ -61,12 +66,19 @@ export default function currentOperations(farmInfo) {
     document.getElementById(
       "currentOpCard-" + current.index
     ).style.order = index;
-    //find and hide printers that shouldn't be here anymore...
     let currentCards = document.querySelectorAll("[id^='currentOpCard-']");
-
+    let curr = [];
+    currentOperations.forEach(cur => {
+      curr.push(cur.index);
+    })
+    let cards = [];
     currentCards.forEach(card => {
-      if (card.id != "currentOpCard-" + current.index) {
-      }
-    });
+      let ca = card.id.split("-");
+      cards.push(parseInt(ca[1]));
+    })
+    let remove = _.difference(cards, curr)
+    remove.forEach(rem => {
+      document.getElementById("currentOpCard-"+rem).remove();
+    })
   });
 }

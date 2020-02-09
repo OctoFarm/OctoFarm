@@ -2,16 +2,16 @@
   <div class="col-lg-6 text-center text-light">
     <b><i class="fas fa-star-half-alt"></i> Farm Utilisation</b>
     <p class="mb-0 mt-1">
-      <i class="fas fa-square text-success"></i> <b>Active: </b>
-      <%=  helpers.generateTime(octofarmStatistics.activeHours) %>
-      <i class="fas fa-square text-danger"></i> <b>Idle: </b>
+      <span id="activeHours"><i class="fas fa-square text-success"></i> <b>Active: </b>
+      <%=  helpers.generateTime(octofarmStatistics.activeHours) %></span>
+      <span id="idleHours"><i class="fas fa-square text-danger"></i> <b>Idle: </b>
       <%=  helpers.generateTime(octofarmStatistics.idleHours) %>
-      <% let idlePercent = 100 - octofarmStatistics.activePercent  %>
+      <% let idlePercent = 100 - octofarmStatistics.activePercent  %></span>
 
     </p>
     <center>
       <div class="progress mb-0">
-        <div
+        <div id="activeProgress"
           class="progress-bar progress-bar-striped bg-success"
           role="progressbar"
           style="width: <%= octofarmStatistics.activePercent %>% "
@@ -21,7 +21,7 @@
         >
         <%= octofarmStatistics.activePercent %>%
         </div>
-        <div
+        <div id="idleProgress"
           class="progress-bar progress-bar-striped bg-danger"
           role="progressbar"
           style="width: <%= idlePercent %>% "

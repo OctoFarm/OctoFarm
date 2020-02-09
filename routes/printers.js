@@ -29,25 +29,6 @@ router.post("/save", ensureAuthenticated, (req, res) => {
 
   res.send(printers);
 });
-//Register Handle for Saving printers
-router.get("/allBasic", ensureAuthenticated, (req, res) => {
-  //Check required fields
-  let basic = [];
-  Printers.find({}, async (err, printers) => {
-    for (let i = 0; i < printers.length; i++) {
-      re = {
-        ip: printers[i].ip,
-        port: printers[i].port,
-        camURL: printers[i].camURL,
-        apikey: printers[i].apikey
-      };
-      basic.push(re);
-    }
-    res.send({
-      printers: basic
-    });
-  });
-});
 //Register handle for initialising runners
 router.post("/runner/init", ensureAuthenticated, (req, res) => {
   Runner.init();
@@ -56,23 +37,21 @@ router.post("/runner/init", ensureAuthenticated, (req, res) => {
 //Register handle for checking for offline printers
 router.post("/runner/checkOffline", ensureAuthenticated, (req, res) => {
   let checked = [];
-  Printers.find({}, async (err, printers) => {
-    for (let i = 0; i < printers.length; i++) {
-      if (printers[i].current.state === "Offline") {
-        console.log("Forced Offline check for print: " + i);
-        let currentState = await Runner.testConnection(printers[i]);
-        if (currentState.connect) {
-          Runner.setOnline(printers[i], i);
-        } else {
-          Runner.setOffline(printers[i], i);
-        }
-        await checked.push(i);
+  let farmPrinters = Runner.returnFarmPrinters();
+
+    for (let i = 0; i < farmPrinters.length; i++) {
+    if (farmPrinters[i].state === "Offline") {
+      let client = {
+        index: i
       }
+         //Make sure runners are created ready for each printer to pass between...
+        Runner.setOffline(client)
+        checked.push(i)
     }
+  };
     res.send({
       printers: checked,
       msg: " If they were found they will appear online shortly."
     });
-  });
-});
+})
 module.exports = router;

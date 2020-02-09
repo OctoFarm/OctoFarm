@@ -21,14 +21,6 @@ const PrinterSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  stateColour: {
-    type: Object,
-    required: false
-  },
-  data: {
-    type: Object,
-    required: false
-  }
 });
 
 const Printer = mongoose.model("Printer", PrinterSchema);

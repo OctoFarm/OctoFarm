@@ -1,277 +1,378 @@
 const FarmStatistics = require("../models/FarmStatistics.js");
-const Printers = require("../models/Printer.js");
 const History = require("../models/History.js");
 const _ = require("lodash");
 
+let farmStats = [];
+
+function currentStats() {
+  return farmStats;
+}
+
 class StatisticsCollection {
-  // static init() {
-  //   console.log("Starting Statistics Collection");
-  //   setInterval(function() {
-  //     StatisticsCollection.grab();
-  //   }, 3000);
-  // }
-  static async grab() {
-    FarmStatistics.find({}).then(async farmStats => {
+  static async init(){
+      farmStats = await FarmStatistics.find({})
       let farmInfo = await this.blankFarmInfo();
+      let currentOperations = [];
       let octofarmStatistics = await this.blankFarmStatistics();
       let printStatistics = await this.blankPrintStatistics();
+      let currentOperationsCount = await this.blankCurrentCount();
       if (typeof farmStats === undefined || farmStats.length < 1) {
         let newfarmStats = new FarmStatistics({
           farmInfo,
           octofarmStatistics,
-          printStatistics
+          printStatistics,
+          currentOperations,
+          currentOperationsCount
         });
+        farmStats[0] = newfarmStats;
         newfarmStats.save();
-      } else {
-        //Count Printers
-        let printers = await Printers.find({});
-        farmInfo.printerCount = printers.length;
-        //Grab state counts
-        let complete = [];
-        let active = [];
-        let idle = [];
-        let offline = [];
-        let toolA = [];
-        let toolT = [];
-        let bedA = [];
-        let bedT = [];
-        let progress = [];
-        let currentOperations = [];
-        let printTimeEstimate = [];
-        let printTimeRemaining = [];
-        let printTimeElapsed = [];
-        printers.forEach(printer => {
-          if (printer.stateColour.category === "Complete") {
-            complete.push(printer.index);
-            // toolA.push(printer.temperature.tool0.actual);
-            // toolT.push(printer.temperature.tool0.target);
-            // bedA.push(printer.temperature.bed.actual);
-            // bedT.push(printer.temperature.bed.target);
-            progress.push(printer.progress.completion);
-            currentOperations.push({
+        }
+      setInterval(() => {
+        farmStats[0].save();
+      }, 1000);
+  }
+  static async currentOperations(farmPrinters){
+    let currentOperations = [];
+    let currentOperationsCount = await this.blankCurrentCount();
+    let complete = [];
+    let active = [];
+    let idle = [];
+    let offline = [];
+    let progress = [];
+    farmPrinters.forEach(printer => {
+      if(typeof printer.stateColour != 'undefined'){
+        if(printer.stateColour.category === "Idle"){
+          idle.push(printer.index);
+
+        }
+        if(printer.stateColour.category === "Offline" ||
+        printer.stateColour.category === "Closed"){
+          offline.push(printer.index);
+  
+        }
+      }
+      if(typeof printer.stateColour != 'undefined' && typeof printer.progress != 'undefined'){
+        if(printer.stateColour.category === "Complete"){
+          complete.push(printer.index);
+          progress.push(printer.progress.completion);
+
+          currentOperations.push({
               index: printer.index,
               name: printer.settingsApperance.name,
               progress: Math.floor(printer.progress.completion),
-              progressColour: "success"
-            });
-            //printTimeRemaining.push(printer.progress.printTimeLeft);
-            //printTimeElapsed.push(printer.progress.printTime);
-          }
-          if (printer.stateColour.category === "Active") {
-            active.push(printer.index);
-            toolA.push(printer.temperature.tool0.actual);
-            toolT.push(printer.temperature.tool0.target);
-            bedA.push(printer.temperature.bed.actual);
-            bedT.push(printer.temperature.bed.target);
-            progress.push(printer.progress.completion);
-            currentOperations.push({
-              index: printer.index,
-              name: printer.settingsApperance.name,
-              progress: Math.floor(printer.progress.completion),
-              progressColour: "warning"
-            });
+              progressColour: "success",
+              timeRemaining: printer.progress.printTimeLeft
+          })
+        }
+        if(printer.stateColour.category === "Active" && typeof printer.progress != 'undefined'){
+          active.push(printer.index);
+          progress.push(printer.progress.completion);
+          currentOperations.push({
+            index: printer.index,
+            name: printer.settingsApperance.name,
+            progress: Math.floor(printer.progress.completion),
+            progressColour: "warning",
+            timeRemaining: printer.progress.printTimeLeft
+        })
+        }
+      }
+    })
+    let actProg = progress.reduce((a, b) => a + b, 0);
+    currentOperationsCount.farmProgress = Math.floor(actProg / progress.length);
+    if(isNaN(currentOperationsCount.farmProgress)){
+      currentOperationsCount.farmProgress = 0;
+    }
+    if (currentOperationsCount.farmProgress === 100) {
+      currentOperationsCount.farmProgressColour = "success";
+    } else {
+      currentOperationsCount.farmProgressColour = "warning";
+    }
+    currentOperationsCount.printerCount = farmPrinters.length;
+    currentOperationsCount.complete = complete.length;
+    currentOperationsCount.active = active.length;
+    currentOperationsCount.offline = offline.length;
+    currentOperationsCount.idle = idle.length;
+    currentOperations = _.orderBy(
+      currentOperations,
+      ["progress"],
+      ["desc"]
+    );
+    farmStats[0].currentOperations = currentOperations;
+    farmStats[0].currentOperationsCount = currentOperationsCount;
+
+  }
+  static async farmInformation(farmPrinters){
+    let farmInfo = await this.blankFarmInfo();
+    let printTimeEstimate = [];
+    let printTimeRemaining = [];
+    let printTimeElapsed = [];
+    let toolA = [];
+    let toolT = [];
+    let bedA = [];
+    let bedT = [];
+    farmPrinters.forEach(printer => {
+      if(typeof printer.stateColour != 'undefined'){
+        if(printer.stateColour.category === "Active"){
+          if(typeof printer.job != 'undefined'){
             printTimeEstimate.push(printer.job.estimatedPrintTime);
+          }
+          if(typeof printer.progress != 'undefined'){
             printTimeRemaining.push(printer.progress.printTimeLeft);
             printTimeElapsed.push(printer.progress.printTime);
           }
-          if (printer.stateColour.category === "Idle") {
-            idle.push(printer.index);
-            // toolA.push(printer.temperature.tool0.actual);
-            // toolT.push(printer.temperature.tool0.target);
-            // bedA.push(printer.temperature.bed.actual);
-            // bedT.push(printer.temperature.bed.target);
+          if(typeof printer.temps != 'undefined'){
+            toolA.push(printer.temps[0].tool0.actual);
+            toolT.push(printer.temps[0].tool0.target);
+            bedA.push(printer.temps[0].bed.actual);
+            bedT.push(printer.temps[0].bed.target);
           }
-          if (
-            printer.stateColour.category === "Offline" ||
-            printer.stateColour.category === "Closed"
-          ) {
-            offline.push(printer.index);
-          }
-        });
-        farmInfo.complete = complete.length;
-        farmInfo.active = active.length;
-        farmInfo.idle = idle.length;
-        farmInfo.offline = offline.length;
-        farmInfo.activeToolA =
+
+        }
+      }
+    })
+
+    farmInfo.activeToolA =
           Math.round(toolA.reduce((a, b) => a + b, 0) * 10) / 10;
-        farmInfo.activeToolT =
+    farmInfo.activeToolT =
           Math.round(toolT.reduce((a, b) => a + b, 0) * 10) / 10;
-        farmInfo.activeBedA =
+    farmInfo.activeBedA =
           Math.round(bedA.reduce((a, b) => a + b, 0) * 10) / 10;
-        farmInfo.activeBedT =
+    farmInfo.activeBedT =
           Math.round(bedT.reduce((a, b) => a + b, 0) * 10) / 10;
-        let actProg = progress.reduce((a, b) => a + b, 0);
-        farmInfo.farmProgress = Math.floor(actProg / progress.length);
-        if (farmInfo.farmProgress === 100) {
-          farmInfo.farmProgressColour = "success";
-        } else {
-          farmInfo.farmProgressColour = "warning";
-        }
-        farmInfo.currentOperations = currentOperations;
 
-        farmInfo.currentOperations = _.orderBy(
-          farmInfo.currentOperations,
-          ["progress"],
-          ["desc"]
-        );
-
-        farmInfo.totalElapsedTime = printTimeElapsed.reduce((a, b) => a + b, 0);
-        farmInfo.totalRemainingTime = printTimeRemaining.reduce(
+    farmInfo.totalElapsedTime = printTimeElapsed.reduce((a, b) => a + b, 0);
+    farmInfo.totalRemainingTime = printTimeRemaining.reduce(
           (a, b) => a + b,
           0
         );
-        farmInfo.totalEstimateTime = printTimeEstimate.reduce(
+    farmInfo.totalEstimateTime = printTimeEstimate.reduce(
           (a, b) => a + b,
           0
         );
-        farmInfo.avgElapsedTime =
-          farmInfo.totalElapsedTime / printTimeElapsed.length;
-        farmInfo.avgRemainingTime =
-          farmInfo.totalRemainingTime / printTimeRemaining.length;
-        farmInfo.avgEstimateTime =
-          farmInfo.totalEstimateTime / printTimeEstimate.length;
+    farmInfo.avgElapsedTime =
+      farmInfo.totalElapsedTime / printTimeElapsed.length;
+    farmInfo.avgRemainingTime =
+      farmInfo.totalRemainingTime / printTimeRemaining.length;
+    farmInfo.avgEstimateTime =
+      farmInfo.totalEstimateTime / printTimeEstimate.length;
 
-        farmStats[0].farmInfo = farmInfo;
-
-        //Farm Statistics
-        let history = await History.find({});
-        let printTimes = [];
-        let completed = [];
-        let cancelled = [];
-        let filamentLengths = [];
-        history.forEach(print => {
-          filamentLengths.push(print.printHistory.filamentLength);
-          if (print.printHistory.success) {
-            printTimes.push(print.printHistory.printTime);
-            completed.push(print.printHistory.success);
-            filamentLengths.push(print.printHistory.filamentLength);
-          } else {
-            cancelled.push(print.printHistory.success);
-          }
-        });
-        let printTimesTotal = printTimes.reduce((a, b) => a + b, 0);
-
-        let currentDate = new Date();
-        octofarmStatistics.activeHours = printTimesTotal;
-        octofarmStatistics.idleHours =
-          currentDate.getTime() - farmStats[0].farmStart.getTime();
-        octofarmStatistics.idleHours = octofarmStatistics.idleHours / 1000;
-        octofarmStatistics.idleHours =
-          octofarmStatistics.idleHours - octofarmStatistics.activeHours;
-        if (octofarmStatistics.idleHours === 0) {
-          octofarmStatistics.activePercent = 100;
-        } else {
-          octofarmStatistics.activePercent = Math.floor(
-            (octofarmStatistics.activeHours / octofarmStatistics.idleHours) *
-              100
-          );
-        }
-
-        let storageFree = [];
-        let storageTotal = [];
-        let devices = [];
-        let fileSizes = [];
-        //Collect unique devices - Total for farm storage should not duplicate storage on instances running on same devices.
-        printers.forEach((printer, index) => {
-          let device = {
-            ip: printer.ip,
-            index: printer.index,
-            storage: printer.storage
-          };
-          devices.push(device);
-          if (typeof printer.fileList.files != "undefined") {
-            printer.fileList.files.forEach(file => {
-              fileSizes.push(file.size);
-            });
-          }
-        });
-
-        let uniqueDevices = _.uniqBy(devices, "ip");
-
-        uniqueDevices.forEach(device => {
-          storageFree.push(device.storage.free);
-          storageTotal.push(device.storage.total);
-        });
-
-        let storageFreeTotal = storageFree.reduce((a, b) => a + b, 0);
-        let storageTotalTotal = storageTotal.reduce((a, b) => a + b, 0);
-
-        octofarmStatistics.storageUsed = storageTotalTotal - storageFreeTotal;
-        octofarmStatistics.storageRemain = storageFreeTotal;
-        octofarmStatistics.storagePercent = Math.floor(
-          (octofarmStatistics.storageUsed / storageTotalTotal) * 100
-        );
-
-        octofarmStatistics.largestFile = Math.max(...fileSizes);
-        octofarmStatistics.smallestFile = Math.min(...fileSizes);
-
-        farmStats[0].octofarmStatistics = octofarmStatistics;
-
-        printStatistics.completed = completed.length;
-        printStatistics.cancelled = cancelled.length;
-
-        printStatistics.completedPercent =
-          (complete.length / cancelled.length) * 100;
-        if (isNaN(printStatistics.completedPercent)) {
-          printStatistics.completedPercent = 100;
-        }
-
-        if (printStatistics.completedPercent === Infinity) {
-          printStatistics.completedPercent = 0;
-        }
-        //Grab resumed when it's inputted into db.
-
-        printStatistics.longestPrint = Math.max(...printTimes);
-        printStatistics.shortestPrint = Math.min(...printTimes);
-        printStatistics.averagePrintTime = printTimes.reduce(
-          (a, b) => a + b,
-          0
-        );
-        printStatistics.averagePrintTime =
-          printStatistics.averagePrintTime / printTimes.length;
-        let totalFilamentLength = filamentLengths.reduce((a, b) => a + b, 0);
-        totalFilamentLength = totalFilamentLength / 1000;
-        totalFilamentLength = Math.round(totalFilamentLength * 100) / 100;
-        let totalFilamentWeight =
-          (3.14 * (1.75 / 2)) ^ (2 * 1.24 * totalFilamentLength);
-
-        printStatistics.filamentUsage =
-          totalFilamentLength + "m / " + totalFilamentWeight + "g";
-
-        farmStats[0].printStatistics = printStatistics;
-
-        farmStats[0].save();
+    farmStats[0].farmInfo = farmInfo;
+  }
+  static async octofarmStatistics(farmPrinters){
+    let octofarmStatistics = await this.blankFarmStatistics();
+    let history = await History.find({});
+    let printTimes = [];
+    history.forEach(print => {
+      if (print.printHistory.success) {
+        printTimes.push(print.printHistory.printTime);
       }
     });
+    farmPrinters.forEach(printer => {
+      if(typeof printer.stateColour != 'undefined'){
+        if (printer.stateColour.category === "Active"){
+          printTimes.push(printer.progress.printTime)
+        }
+      }
+
+    })
+    let printTimesTotal = printTimes.reduce((a, b) => a + b, 0);
+
+    let currentDate = new Date();
+    octofarmStatistics.activeHours = printTimesTotal;
+    octofarmStatistics.idleHours =
+      currentDate.getTime() - farmStats[0].farmStart.getTime();
+    octofarmStatistics.idleHours = octofarmStatistics.idleHours / 1000;
+    octofarmStatistics.idleHours =
+      octofarmStatistics.idleHours - octofarmStatistics.activeHours;
+    octofarmStatistics.totalHours = octofarmStatistics.idleHours + octofarmStatistics.activeHours;
+
+    octofarmStatistics.activePercent =
+    (octofarmStatistics.activeHours / octofarmStatistics.totalHours) * 100;
+    if (isNaN(octofarmStatistics.activePercent)) {
+      octofarmStatistics.activePercent = 100;
+    }
+    if (octofarmStatistics.activePercent === Infinity) {
+      octofarmStatistics.activePercent = 0;
+    }
+    octofarmStatistics.idlePercent =
+    (octofarmStatistics.idleHours / octofarmStatistics.totalHours) * 100;
+    if (isNaN(octofarmStatistics.idlePercent)) {
+      octofarmStatistics.idlePercent = 100;
+    }
+    if (octofarmStatistics.idlePercent === Infinity) {
+      octofarmStatistics.idlePercent= 0;
+    }
+    octofarmStatistics.activePercent = Math.round(octofarmStatistics.activePercent *10 ) /10;
+    octofarmStatistics.idlePercent =  Math.round(octofarmStatistics.idlePercent*10 ) /10;
+
+
+
+    let storageFree = [];
+    let storageTotal = [];
+    let devices = [];
+    let fileSizes = [];
+    //Collect unique devices - Total for farm storage should not duplicate storage on instances running on same devices.
+    farmPrinters.forEach((printer, index) => {
+      if(typeof printer.storage != 'undefined'){
+        let device = {
+          ip: printer.ip,
+          index: printer.index,
+          storage: printer.storage
+        };
+        devices.push(device);
+      }
+      if (typeof printer.fileList != "undefined") {
+        printer.fileList.files.forEach(file => {
+          fileSizes.push(file.size);
+        });
+      }
+    });
+
+    let uniqueDevices = _.uniqBy(devices, "ip");
+
+    uniqueDevices.forEach(device => {
+      storageFree.push(device.storage.free);
+      storageTotal.push(device.storage.total);
+    });
+
+    let storageFreeTotal = storageFree.reduce((a, b) => a + b, 0);
+    let storageTotalTotal = storageTotal.reduce((a, b) => a + b, 0);
+
+    octofarmStatistics.storageUsed = storageTotalTotal - storageFreeTotal;
+    octofarmStatistics.storageRemain = storageFreeTotal;
+    octofarmStatistics.storagePercent = Math.floor(
+      (octofarmStatistics.storageUsed / storageTotalTotal) * 100
+    );
+
+    octofarmStatistics.largestFile = Math.max(...fileSizes);
+    octofarmStatistics.smallestFile = Math.min(...fileSizes);
+
+    farmStats[0].octofarmStatistics = octofarmStatistics;
+    
   }
-  static blankFarmInfo() {
-    let farmInfo = {
+  static async printStatistics(){
+    let printStatistics = await this.blankPrintStatistics();
+    let history = await History.find({});
+    let completed = [];
+    let cancelled = [];
+    let failed = [];
+    let printTimes = [];
+    let filamentLengths = [];
+    history.forEach(print => {
+      filamentLengths.push(print.printHistory.filamentLength);
+      if (print.printHistory.success) {
+        completed.push(print.printHistory.success);
+        printTimes.push(print.printHistory.printTime);
+        filamentLengths.push(print.printHistory.filamentLength);
+      } else {
+        if(print.printHistory.reason === "cancelled"){
+          cancelled.push(print.printHistory.success);
+        }else{
+          failed.push(print.printHistory.success);
+        }
+      }
+    });
+
+    printStatistics.completed = completed.length;
+    printStatistics.cancelled = cancelled.length;
+    printStatistics.failed = failed.length;
+
+    printStatistics.completedPercent =
+    (completed.length / (completed.length + cancelled.length + failed.length)) * 100;
+    if (isNaN(printStatistics.completedPercent)) {
+      printStatistics.completedPercent = 100;
+    }
+    if (printStatistics.completedPercent === Infinity) {
+      printStatistics.completedPercent = 0;
+    }
+    printStatistics.cancelledPercent =
+    (cancelled.length / (cancelled.length + completed.length + failed.length)) * 100;
+    if (isNaN(printStatistics.cancelledPercent)) {
+      printStatistics.cancelledPercent = 100;
+    }
+    if (printStatistics.cancelledPercent === Infinity) {
+      printStatistics.cancelledPercent = 0;
+    }
+    printStatistics.failedPercent =
+    (failed.length / (failed.length + completed.length + cancelled.length)) * 100;
+    if (isNaN(printStatistics.failedPercent)) {
+      printStatistics.failedPercent = 100;
+    }
+    if (printStatistics.failedPercent === Infinity) {
+      printStatistics.failedPercent = 0;
+    }
+    printStatistics.completedPercent = printStatistics.completedPercent;
+    printStatistics.cancelledPercent = printStatistics.cancelledPercent;
+    printStatistics.failedPercent = printStatistics.failedPercent;
+    
+
+
+    printStatistics.longestPrint = Math.max(...printTimes);
+    if(printStatistics.longestPrint === -Infinity){
+      printStatistics.longestPrint = 0;
+    }
+    printStatistics.shortestPrint = Math.min(...printTimes);
+    if(printStatistics.shortestPrint === Infinity){
+      printStatistics.shortestPrint = 0;
+    }
+    printStatistics.averagePrintTime = printTimes.reduce(
+      (a, b) => a + b,
+      0
+    );
+
+    printStatistics.averagePrintTime =
+      printStatistics.averagePrintTime / printTimes.length;
+      if(isNaN(printStatistics.averagePrintTime)){
+        printStatistics.averagePrintTime = 0;
+      };
+      let totalFilamentLength = filamentLengths.reduce((a, b) => a + b, 0);
+      if(isNaN(totalFilamentLength)){
+        totalFilamentLength = 0;
+      }
+      totalFilamentLength = totalFilamentLength / 1000;
+      totalFilamentLength = Math.round(totalFilamentLength * 100) / 100;
+      let totalFilamentWeight =
+        (3.14 * (1.75 / 2)) ^ (2 * 1.24 * totalFilamentLength);
+
+      printStatistics.filamentUsage =
+        totalFilamentLength + "m / " + totalFilamentWeight + "g";
+
+    farmStats[0].printStatistics = printStatistics;
+  }
+  static blankCurrentCount(){
+    let currentOperationsCount = {
       printerCount: 0,
       complete: 0,
       offline: 0,
       active: 0,
       idle: 0,
+      farmProgress: 0,
+      farmProgressColour: "danger",
+    };
+    return currentOperationsCount;
+  }
+  static blankFarmInfo() {
+    let farmInfo = {
       activeToolT: 0,
       activeBedT: 0,
       activeToolA: 0,
       activeBedA: 0,
-      farmProgress: 0,
-      farmProgressColour: "",
       avgEstimateTime: 0,
       avgRemainingTime: 0,
       avgElapsedTime: 0,
       totalEstimateTime: 0,
       totalRemainingTime: 0,
-      totalElapsedTime: 0,
-      currentOperations: []
+      totalElapsedTime: 0
     };
     return farmInfo;
   }
   static blankFarmStatistics() {
     let octofarmStatistics = {
       activeHours: 0,
-      idleHours: 0,
       activePercent: 0,
+      idleHours: 0,
+      idlePercent: 0,
+      totalHours: 0,
       storageUsed: 0,
       storagePercent: 0,
       storageRemain: 0,
@@ -285,9 +386,9 @@ class StatisticsCollection {
       completed: 0,
       completedPercent: 0,
       cancelled: 0,
-      resumed: 0,
-      resumedPercent: 0,
-      restarted: 0,
+      cancelledPercent: 0,
+      failed: 0,
+      failedPercent: 0,
       longestPrint: 0,
       shortestPrint: 0,
       averagePrintTime: 0,

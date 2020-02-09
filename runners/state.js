@@ -1,6 +1,8 @@
 const Printers = require("../models/Printer.js");
 const serverSettings = require("../settings/serverSettings.js");
 const ServerSettings = serverSettings.ServerSettings;
+const statisticsCollection = require("../runners/statisticsCollection.js");
+const StatisticsCollection = statisticsCollection.StatisticsCollection;
 const historyCollection = require("./history.js");
 const HistoryCollection = historyCollection.HistoryCollection;
 const fetch = require("node-fetch");
@@ -10,6 +12,7 @@ const WebSocket = require("ws");
 let offlineRunners = [];
 let onlineRunners = [];
 let farmPrinters = [];
+
 
 class ClientAPI {
   static get(ip, port, apikey, item) {
@@ -25,14 +28,22 @@ class ClientAPI {
 }
 
 class ClientSocket {
-  static async connect(ip, port, apikey) {
+  static async connect(index, ip, port, apikey) {
     let client = {
+      index: index,
       ws: {},
       currentUser: "",
       apikey: apikey
     };
     try {
       let users = await ClientAPI.get(ip, port, apikey, "users");
+      if(users.status === 200){
+        await Runner.getState(index);
+        await Runner.getFiles(index);
+        await Runner.getSystem(index);
+        await Runner.getSettings(index);
+        await Runner.getProfile(index);
+      }
       users = await users.json();
 
       let currentUser = "";
@@ -47,6 +58,7 @@ class ClientSocket {
       }
       const ws = new WebSocket(`ws://${ip}:${port}/sockjs/websocket`);
       client = {
+        index: index,
         ws: ws,
         currentUser: currentUser,
         apikey: apikey
@@ -54,6 +66,7 @@ class ClientSocket {
       return client;
     } catch (err) {
       client = {
+        index: index,
         ws: {},
         currentUser: "",
         apikey: apikey,
@@ -64,10 +77,6 @@ class ClientSocket {
             "Could not get initial connection to client, pushing client to offline checking..."
         }
       };
-      //Move to offline connection checking...
-      offlineRunners[i] = setInterval(function() {
-        console.log("Check offline runner");
-      }, 5000);
       return client;
     }
   }
@@ -77,7 +86,7 @@ class Runner {
   static async init() {
     //Grab printers from database....
     try {
-      farmPrinters = await Printers.find({});
+      farmPrinters = await Printers.find({}, null, { sort: { index: 1 } });
       console.log("Grabbed " + farmPrinters.length + " for checking");
     } catch (err) {
       let error = {
@@ -88,262 +97,136 @@ class Runner {
       };
       console.log(error);
     }
+    //cycle through printers and move them to correct checking location...
     for (let i = 0; i < farmPrinters.length; i++) {
-      try{
-      //clear runners for start
-      onlineRunners[i] = false;
+      //Make sure runners are created ready for each printer to pass between...
       offlineRunners[i] = false;
-
-      onlineRunners[i] = await ClientSocket.connect(
+      farmPrinters[i].state = 'Offline';
+      farmPrinters[i].stateColour = Runner.getColour("Offline");
+      let client = await ClientSocket.connect(
+        farmPrinters[i].index,
         farmPrinters[i].ip,
         farmPrinters[i].port,
         farmPrinters[i].apikey
       );
-
-      if (typeof onlineRunners[i].error === "undefined") {
-        clearInterval(offlineRunners[i]);
-        offlineRunners[i] = false;
-        onlineRunners[i].ws.on("open", function open() {
-          var data = {};
-          data["auth"] =
-            onlineRunners[i].currentUser + ":" + onlineRunners[i].apikey;
-          onlineRunners[i].ws.send(JSON.stringify(data));
-        });
-
-        onlineRunners[i].ws.on("message", async function incoming(data) {
-          data = await JSON.parse(data);
-          if (typeof data.event != "undefined") {
-            data.event.printerIndex = i;
-            console.log(data.event);
-          }
-          if (typeof data.current != "undefined") {
-            data.current.printerIndex = i;
-            farmPrinters[i].state = data.current.state.text;
-            farmPrinters[i].currentZ = data.current.currentZ;
-            farmPrinters[i].progress = data.current.progress;
-            farmPrinters[i].logs = data.current.logs;
-            farmPrinters[i].temps = data.current.temps;
-            farmPrinters[i].messages = data.current.messages;
-            console.log(data.current)
-          }
-        });
-      }
-      }catch(err){
-        let error = {
-          err: err.message,
-          action: "Database connection failed... No action taken",
-          userAction:
-            "Please make sure the database URL is inputted and can be reached... 'file located at: config/db.js'"
-        };
-        console.log(error);
+      if (typeof client.error === "undefined") {
+       Runner.setOnline(client)
+      }else{
+       Runner.setOffline(client)
       }
     }
   }
   static returnFarmPrinters() {
     return farmPrinters;
   }
-  // static async init() {
-  //   console.log("Init Printers");
+  static async setOnline(client){
+    console.log("Printer: " + client.index + " is online")
+    //Make sure offline is clear
+    clearInterval(offlineRunners[client.index]);
+    offlineRunners[client.index] = false;
+    onlineRunners[client.index] = client;
+    //Create socket listeners
+    onlineRunners[client.index] .ws.on("open", function open() {
+      var data = {};
+      data["auth"] =
+      onlineRunners[client.index] .currentUser + ":" + onlineRunners[client.index] .apikey;
+      onlineRunners[client.index] .ws.send(JSON.stringify(data));
+    });
+    onlineRunners[client.index].ws.on("message", async function incoming(data) {
+      data = await JSON.parse(data);
+      if (typeof data.event != "undefined") {
+        //console.log(data.event);
+        //console.log(data.event)
+        if(data.event.type === "PrintFailed"){
+          //Register cancelled print... 
+          HistoryCollection.failed(data.event.payload, farmPrinters[client.index]);
+          //
+        }
+        if(data.event.type === "PrintDone"){
+          //Register cancelled print... 
+          HistoryCollection.complete(data.event.payload, farmPrinters[client.index]);
+        }
+      }
+      if (typeof data.current != "undefined") {
+        farmPrinters[client.index].temps
+        farmPrinters[client.index].state = data.current.state.text;
+        farmPrinters[client.index].currentZ = data.current.currentZ;
+        farmPrinters[client.index].progress = data.current.progress;
+        farmPrinters[client.index].job = data.current.job;
+        farmPrinters[client.index].logs = data.current.logs;
+        if(data.current.temps.length != 0){
+          farmPrinters[client.index].temps = data.current.temps;
+        }
+        farmPrinters[client.index].messages = data.current.messages;
+        if(data.current.progress.completion != null && data.current.progress.completion === 100){
+          farmPrinters[client.index].stateColour = Runner.getColour("Complete");
+        }else{
+          farmPrinters[client.index].stateColour = Runner.getColour(data.current.state.text);
+        }
+        //Update Current Operations
+        StatisticsCollection.currentOperations(farmPrinters);
+        //Update farm information when we have temps
+        StatisticsCollection.farmInformation(farmPrinters);
+        //Update farm statistics
+        StatisticsCollection.octofarmStatistics(farmPrinters);
+        //Update print statistics
+        StatisticsCollection.printStatistics();
+      }
+    });
+    onlineRunners[client.index].ws.on("error", async function incoming(data) {
+      Runner.setOffline(client);
+    });
+    onlineRunners[client.index].ws.on("close", async function incoming(data) {
+      Runner.setOffline(client);
+    });
 
-  //   //Grab all the printers,
-  //   let farmPrinters = [];
-  //   try {
-  //     farmPrinters = await Printers.find({});
-  //     console.log("Grabbed " + farmPrinters.length + " for checking");
-  //   } catch (err) {
-  //     let error = {
-  //       err: err.message,
-  //       action: "Database connection failed... No action taken",
-  //       userAction:
-  //         "Please make sure the database URL is inputted and can be reached... 'file located at: config/db.js'"
-  //     };
-  //     console.log(error);
-  //   }
-  //   //Loop through the printers
-  //   try {
-  //     for (let i = 0; i < farmPrinters.length; i++) {
-  //       //Do inital connection attempt on printers
-  //       let connectionTest = await Runner.testConnection(farmPrinters[i]);
-  //       farmPrinters[i] = connectionTest.printer;
-  //       //Do a full update of printer if current online...
-  //       if (connectionTest.connect) {
-  //         //Update the farmPrinters variable with updated information... then pass to checkers
-  //         let getFiles = await Runner.getFiles(farmPrinters[i]);
-  //         farmPrinters[i] = getFiles.printer;
-  //         let getProfile = await Runner.getProfile(farmPrinters[i]);
-  //         farmPrinters[i] = getProfile.printer;
-  //         let getSettings = await Runner.getSettings(farmPrinters[i]);
-  //         farmPrinters[i] = getSettings.printer;
-  //         let getSystem = await Runner.getSystem(farmPrinters[i]);
-  //         farmPrinters[i] = getSystem.printer;
-  //       }
 
-  //       console.log(
-  //         "Printer " + i + " checked, state: " + farmPrinters[i].current.state
-  //       );
-  //       //Base the runners ready to get printers...
-  //       onlineRunners[i] = false;
-  //       offlineRunners[i] = false;
-  //       //Make sure results are saved to db.
-  //       farmPrinters[i].save();
-  //     }
-  //     //Send all printers to monitoring section
-  //     console.log("Starting Monitoring...");
-  //     for (let i = 0; i < farmPrinters.length; i++) {
-  //       if (farmPrinters[i].current.state != "Offline") {
-  //         Runner.setOnline(farmPrinters[i], i);
-  //       } else {
-  //         Runner.setOffline(farmPrinters[i], i);
-  //       }
-  //     }
-  //   } catch (err) {
-  //     let error = {
-  //       err: err.message,
-  //       //printer: printer.index + ". " + printer.ip + ":" + printer.port,
-  //       action: "Failed to update printers state... No action taken",
-  //       userAction:
-  //         "Make sure your printer connection settings are type correctly..."
-  //     };
-  //     console.log(error);
-  //   }
-  // }
-  static async setOffline(printer, i) {
-    console.log("Printer " + printer.index + " has gone offline");
-    //Make sure only setting offline new offline printers
-    if (offlineRunners[i] === false) {
-      //Make sure online and offline intervals are not running for the printer.
-      clearInterval(onlineRunners[i]);
-      onlineRunners[i] = false;
-
-      clearInterval(offlineRunners[i]);
-      offlineRunners[i] = false;
-
-      //Set the interval for checking status
+  }
+  static async setOffline(client) {
+    console.log("Printer: " + client.index + " is offline")
+    farmPrinters[client.index].state = "Offline";
+    farmPrinters[client.index].stateColour = Runner.getColour("Offline");
+    //Make sure offline isn't already running
+    if(offlineRunners[client.index] === false){
       let Polling = await ServerSettings.check();
       if (Polling[0].offlinePolling.on) {
-        offlineRunners[i] = setInterval(async function() {
-          let connectionTest = await Runner.testConnection(printer);
-          if (connectionTest.connect) {
-            printer = connectionTest.printer;
-            printer.save();
-            //Set Online
-            Runner.setOnline(printer, i);
-          }
-          //Else leave it in offline running...
-        }, Polling[0].onlinePolling.seconds +
-          Polling[0].offlinePolling.seconds);
-      }
+          offlineRunners[client.index] = setInterval(async function() {
+            let clientNew = await ClientSocket.connect(
+              farmPrinters[client.index].index,
+              farmPrinters[client.index].ip,
+              farmPrinters[client.index].port,
+              farmPrinters[client.index].apikey
+            );
+            if (typeof clientNew.error === "undefined") {
+              Runner.setOnline(clientNew)
+            }
+          }, Polling[0].offlinePolling.seconds);
     }
   }
-  static async setOnline(printer, i) {
-    console.log("Printer " + printer.index + " has come online");
-    //Make sure only setting offline new offline printers
-    if (onlineRunners[i] === false) {
-      //Make sure online and offline intervals are not running for the printer.
-      clearInterval(onlineRunners[i]);
-      onlineRunners[i] = false;
-
-      clearInterval(offlineRunners[i]);
-      onlineRunners[i] = false;
-
-      //Set the interval for checking status
-      let Polling = await ServerSettings.check();
-      onlineRunners[i] = setInterval(async function() {
-        let connectionTest = await Runner.testConnection(printer);
-
-        if (connectionTest.connect) {
-          printer = connectionTest.printer;
-          if (printer.current.state === "Closed") {
-            printer.save();
-          } else {
-            let getJob = await Runner.getJob(printer);
-            printer = getJob.printer;
-
-            if (printer.progress.completion === 100) {
-              HistoryCollection.completed(printer);
-            }
-            if (
-              printer.current.state === "Cancelling" &&
-              printer.progress.completion < 100
-            ) {
-              HistoryCollection.failed(printer);
-            }
-            let getPrinter = await Runner.getPrinter(printer);
-            printer = getPrinter.printer;
-            printer.save();
-          }
-        } else {
-          Runner.setOffline(printer, i);
-          printer.save();
-        }
-      }, Polling[0].onlinePolling.seconds);
-    }
-  }
-  static testConnection(printer) {
-    return Runner.get(printer.ip, printer.port, printer.apikey, "connection")
-      .then(res => {
-        return res.json();
-      })
-      .then(res => {
-        printer.current = res.current;
-        printer.options = res.options;
-        if (
-          typeof printer.progress != "undefined" &&
-          printer.progress.completion === 100 &&
-          printer.current.state != "Closed"
-        ) {
-          printer.stateColour = this.getColour("Complete");
-        } else {
-          printer.stateColour = this.getColour(res.current.state);
-        }
-        let ret = {
-          connect: true,
-          printer: printer
-        };
-        return ret;
-      })
-      .catch(err => {
-        let current = {
-          state: "Offline",
-          port: "",
-          baudrate: "",
-          printerProfile: ""
-        };
-        printer.current = current;
-        printer.action = "Offline Checking...";
-        printer.stateColour = this.getColour(current.state);
-        let ret = {
-          connect: false,
-          printer: printer
-        };
-        return ret;
-      });
-  }
+}
 
   static stopAll() {
-    onlineRunners.forEach(run => {
-      clearInterval(run);
-      run = false;
-    });
     offlineRunners.forEach(run => {
       clearInterval(run);
       run = false;
     });
+    onlineRunners.forEach(run => {
+      run.ws.close();
+      run = false;
+    });
   }
 
-  static getFiles(printer) {
-    return Runner.get(
-      printer.ip,
-      printer.port,
-      printer.apikey,
-      "files?recursive=true"
-    )
+  static getFiles(index) {
+    return ClientAPI.get(farmPrinters[index].ip,
+      farmPrinters[index].port,
+      farmPrinters[index].apikey,
+      "files?recursive=true")
       .then(res => {
         return res.json();
       })
       .then(res => {
         //Setup storage object
-        printer.storage = {
+        farmPrinters[index].storage = {
           free: res.free,
           total: res.total
         };
@@ -388,7 +271,7 @@ class Runner {
               printerLocations.push(folderPaths);
             }
           }
-          printer.fileList = {
+          farmPrinters[index].fileList = {
             files: printerFiles,
             fileCount: printerFiles.length,
             folders: printerLocations,
@@ -404,84 +287,31 @@ class Runner {
         _.each(res.files, function(entry) {
           recursivelyPrintNames(entry);
         });
+      }).catch(err => console.log("Error grabbing files" + err))
 
-        printer.action = "Grabbing Files...";
-
-        let ret = {
-          connect: true,
-          printer: printer
-        };
-        return ret;
-      })
-      .catch(err => {
-        let ret = {
-          connect: false,
-          printer: printer
-        };
-        return ret;
-      });
   }
-  static getJob(printer) {
-    return Runner.get(printer.ip, printer.port, printer.apikey, "job")
-      .then(res => {
-        return res.json();
-      })
-      .then(res => {
-        //Update info to db
-        printer.job = res.job;
-        printer.progress = res.progress;
-
-        if (res.progress === 100) {
-          printer.stateColour = this.getColour("Complete");
-        }
-        printer.action = "Grabbing Job...";
-        let ret = {
-          connect: true,
-          printer: printer
-        };
-        return ret;
-      })
-      .catch(err => {
-        let ret = {
-          connect: false,
-          printer: printer
-        };
-        return ret;
-      });
-  }
-  static getPrinter(printer) {
-    return Runner.get(
-      printer.ip,
-      printer.port,
-      printer.apikey,
-      "printer?exclude=sd,flags"
+  static getState(index) {
+    return ClientAPI.get(
+      farmPrinters[index].ip,
+      farmPrinters[index].port,
+      farmPrinters[index].apikey,
+      "connection"
     )
       .then(res => {
         return res.json();
       })
       .then(res => {
         //Update info to DB
-        printer.temperature = res.temperature;
-        printer.action = "Grabbing Temperature History...";
-        let ret = {
-          connect: false,
-          printer: printer
-        };
-        return ret;
+        farmPrinters[index].state = res.current.state;
+        farmPrinters[index].stateColour = Runner.getColour(res.current.state);
       })
-      .catch(err => {
-        let ret = {
-          connect: false,
-          printer: printer
-        };
-        return ret;
-      });
+      .catch(err => console.log("Error grabbing profiles"))
   }
-  static getProfile(printer) {
-    return Runner.get(
-      printer.ip,
-      printer.port,
-      printer.apikey,
+  static getProfile(index) {
+    return ClientAPI.get(
+      farmPrinters[index].ip,
+      farmPrinters[index].port,
+      farmPrinters[index].apikey,
       "printerprofiles"
     )
       .then(res => {
@@ -489,71 +319,47 @@ class Runner {
       })
       .then(res => {
         //Update info to DB
-        printer.profiles = res.profiles;
-        printer.action = "Grabbing Profile...";
-        let ret = {
-          connect: false,
-          printer: printer
-        };
-        return ret;
+        farmPrinters[index].profiles = res.profiles;
       })
-      .catch(err => {
-        let ret = {
-          connect: false,
-          printer: printer
-        };
-        return ret;
-      });
+      .catch(err => console.log("Error grabbing profiles"))
   }
-  static getSettings(printer) {
-    return Runner.get(printer.ip, printer.port, printer.apikey, "settings")
+  static getSettings(index) {
+    return ClientAPI.get(farmPrinters[index].ip, farmPrinters[index].port, farmPrinters[index].apikey, "settings")
       .then(res => {
         return res.json();
       })
       .then(res => {
         //Update info to DB
-        printer.action = "Grabbing Settings...";
-        printer.settingsAPI = res.api;
-        printer.settingsApperance = res.appearance;
-        printer.settingsFeature = res.feature;
-        printer.settingsFolder = res.folder;
-        printer.settingsPlugins = res.plugins;
-        printer.settingsScripts = res.scripts;
-        printer.settingsSerial = res.serial;
-        printer.settingsServer = res.server;
-        printer.settingsSystem = res.system;
-        printer.settingsWebcam = res.webcam;
-        if (printer.camURL === "" || printer.camURL === null) {
+        farmPrinters[index].settingsApi = res.api;
+        farmPrinters[index].settingsApperance = res.appearance;
+        farmPrinters[index].settingsFeature = res.feature;
+        farmPrinters[index].settingsFolder = res.folder;
+        farmPrinters[index].settingsPlugins = res.plugins;
+        farmPrinters[index].settingsScripts = res.scripts;
+        farmPrinters[index].settingsSerial = res.serial;
+        farmPrinters[index].settingsServer = res.server;
+        farmPrinters[index].settingsSystem = res.system;
+        farmPrinters[index].settingsWebcam = res.webcam;
+        if (farmPrinters[index].camURL === "" || farmPrinters[index].camURL === null) {
           if (
             typeof res.webcam != "undefined" &&
             typeof res.webcam.streamURL != "undefined"
           ) {
             if (res.webcam.streamURL.includes("http")) {
-              printer.camURL = res.webcam.streamURL;
+              farmPrinters[index].camURL = res.webcam.streamURL;
             } else {
-              printer.camURL = "http://" + printer.ip + streamURL;
+              farmPrinters[index].camURL = "http://" + farmPrinters[index].ip+ ":"+ farmPrinters[index].port + streamURL;
             }
           }
         }
-        let ret = {
-          connect: false,
-          printer: printer
-        };
-        return ret;
       })
-      .catch(err => {
-        let ret = {
-          connect: false,
-          printer: printer
-        };
-        return ret;
-      });
+      .catch(err => console.log("Error grabbing Settings" + err))
   }
-  static getSystem(printer) {
-    return Runner.get(
-      printer.ip,
-      printer.port,
-      printer.apikey,
+  static getSystem(index) {
+    return ClientAPI.get(
+      farmPrinters[index].ip,
+      farmPrinters[index].port,
+      farmPrinters[index].apikey,
       "system/commands"
     )
       .then(res => {
@@ -561,23 +367,10 @@ class Runner {
       })
       .then(res => {
         //Update info to DB
-        printer.core = res.core;
-        printer.action = "";
-        let ret = {
-          connect: false,
-          printer: printer
-        };
-        return ret;
+        farmPrinters[index].core = res.core;
       })
-      .catch(err => {
-        let ret = {
-          connect: false,
-          printer: printer
-        };
-        return ret;
-      });
+      .catch(err => console.log("Error grabbing System"))
   }
-
   static getColour(state) {
     if (state === "Operational") {
       return { name: "secondary", hex: "#262626", category: "Idle" };
@@ -600,13 +393,6 @@ class Runner {
     } else if (state === "Complete") {
       return { name: "success", hex: "#00330e", category: "Complete" };
     }
-  }
-  static timeout(value) {
-    return new Promise(function(resolve, reject) {
-      setTimeout(function() {
-        reject(new Error("Printer Offline: Setting to offline search"));
-      }, value);
-    });
   }
 }
 

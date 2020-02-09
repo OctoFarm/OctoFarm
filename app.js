@@ -81,43 +81,10 @@ if (db != "") {
   const runner = require("./runners/state.js");
   const Runner = runner.Runner;
   Runner.init();
-  /*   const system = require("./runners/systemInfo.js");
+  const statisticsCollection = require("./runners/statisticsCollection.js");
+  const StatisticsCollection = statisticsCollection.StatisticsCollection;
+  StatisticsCollection.init();
+  const system = require("./runners/systemInfo.js");
   const SystemRunner = system.SystemRunner;
-  SystemRunner.init(); */
-  // const stats = require("./runners/statisticsCollection.js");
-  // const StatisticsCollection = stats.StatisticsCollection;
-  // StatisticsCollection.init();
+  SystemRunner.init();
 }
-
-//Web Socket Setup
-const wss = new WebSocket.Server({
-  port: 4001,
-  perMessageDeflate: {
-    zlibDeflateOptions: {
-      // See zlib defaults.
-      chunkSize: 1024,
-      memLevel: 7,
-      level: 3
-    },
-    zlibInflateOptions: {
-      chunkSize: 10 * 1024
-    },
-    // Other options settable:
-    clientNoContextTakeover: true, // Defaults to negotiated value.
-    serverNoContextTakeover: true, // Defaults to negotiated value.
-    serverMaxWindowBits: 10, // Defaults to negotiated value.
-    // Below options specified as default values.
-    concurrencyLimit: 10, // Limits zlib concurrency for perf.
-    threshold: 1024 // Size (in bytes) below which messages
-    // should not be compressed.
-  }
-});
-wss.on("connection", function connection(ws) {
-  ws.on("message", function incoming(message) {
-    console.log("received: %s", message);
-  });
-  let data = [{ data: "hello" }];
-  setInterval(function() {
-    ws.send(data);
-  }, 3000);
-});

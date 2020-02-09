@@ -54,6 +54,7 @@ const generateTime = function(seconds) {
 
   return string;
 };
+
 module.exports = {
   generateBytes: bytes,
   generateTime: generateTime,
