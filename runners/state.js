@@ -84,6 +84,7 @@ class ClientSocket {
 
 class Runner {
   static async init() {
+    StatisticsCollection.init();
     //Grab printers from database....
     try {
       farmPrinters = await Printers.find({}, null, { sort: { index: 1 } });
@@ -115,28 +116,33 @@ class Runner {
        Runner.setOffline(client)
       }
     }
+    
   }
   static returnFarmPrinters() {
     return farmPrinters;
   }
   static async setOnline(client){
+
     console.log("Printer: " + client.index + " is online")
     //Make sure offline is clear
     clearInterval(offlineRunners[client.index]);
     offlineRunners[client.index] = false;
     onlineRunners[client.index] = client;
     //Create socket listeners
+    let Polling = await ServerSettings.check();
+
     onlineRunners[client.index] .ws.on("open", function open() {
       var data = {};
       data["auth"] =
-      onlineRunners[client.index] .currentUser + ":" + onlineRunners[client.index] .apikey;
-      onlineRunners[client.index] .ws.send(JSON.stringify(data));
+      onlineRunners[client.index].currentUser + ":" + onlineRunners[client.index] .apikey;
+      onlineRunners[client.index].ws.send(JSON.stringify(data));
+      var throt = {}
+      throt["throttle"] = parseInt(Polling[0].onlinePolling.seconds * 1000 / 500);
+      onlineRunners[client.index].ws.send(JSON.stringify(throt));
     });
     onlineRunners[client.index].ws.on("message", async function incoming(data) {
       data = await JSON.parse(data);
       if (typeof data.event != "undefined") {
-        //console.log(data.event);
-        //console.log(data.event)
         if(data.event.type === "PrintFailed"){
           //Register cancelled print... 
           HistoryCollection.failed(data.event.payload, farmPrinters[client.index]);
@@ -149,11 +155,15 @@ class Runner {
       }
       if (typeof data.current != "undefined") {
         farmPrinters[client.index].temps
+        if(data.current.state.text === "Offline"){
+          data.current.state.text = "Closed";
+        }
         farmPrinters[client.index].state = data.current.state.text;
         farmPrinters[client.index].currentZ = data.current.currentZ;
         farmPrinters[client.index].progress = data.current.progress;
         farmPrinters[client.index].job = data.current.job;
         farmPrinters[client.index].logs = data.current.logs;
+        
         if(data.current.temps.length != 0){
           farmPrinters[client.index].temps = data.current.temps;
         }
@@ -177,7 +187,7 @@ class Runner {
       Runner.setOffline(client);
     });
     onlineRunners[client.index].ws.on("close", async function incoming(data) {
-      Runner.setOffline(client);
+      console.log("Online Printer: " + client.index + " stopped")
     });
 
 
@@ -206,12 +216,14 @@ class Runner {
 }
 
   static stopAll() {
-    offlineRunners.forEach(run => {
-      clearInterval(run);
-      run = false;
-    });
+    StatisticsCollection.stop();
     onlineRunners.forEach(run => {
       run.ws.close();
+      run = false;
+    });
+    offlineRunners.forEach(run => {
+      console.log("Offline Printer: " + [run] + " stopped")
+      clearInterval(run);
       run = false;
     });
   }
@@ -304,8 +316,10 @@ class Runner {
         //Update info to DB
         farmPrinters[index].state = res.current.state;
         farmPrinters[index].stateColour = Runner.getColour(res.current.state);
+        farmPrinters[index].current = res.current;
+        farmPrinters[index].options = res.options;
       })
-      .catch(err => console.log("Error grabbing profiles"))
+      .catch(err => console.log("Error grabbing state"))
   }
   static getProfile(index) {
     return ClientAPI.get(

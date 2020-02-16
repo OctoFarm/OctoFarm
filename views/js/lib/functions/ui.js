@@ -21,6 +21,8 @@ export default class UI {
       return { name: "danger", hex: "#2e0905", category: "Closed" };
     } else if (state === "Complete") {
       return { name: "success", hex: "#00330e", category: "Complete" };
+    } else {
+      return { name: "danger", hex: "#2e0905", category: "Offline" };
     }
   }
   //Create message

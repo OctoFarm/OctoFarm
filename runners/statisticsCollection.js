@@ -3,6 +3,7 @@ const History = require("../models/History.js");
 const _ = require("lodash");
 
 let farmStats = [];
+let farmRunner = [];
 
 function currentStats() {
   return farmStats;
@@ -27,9 +28,9 @@ class StatisticsCollection {
         farmStats[0] = newfarmStats;
         newfarmStats.save();
         }
-      setInterval(() => {
+      farmRunner[0] = setInterval(() => {
         farmStats[0].save();
-      }, 1000);
+      }, 1500);
   }
   static async currentOperations(farmPrinters){
     let currentOperations = [];
@@ -64,6 +65,7 @@ class StatisticsCollection {
               timeRemaining: printer.progress.printTimeLeft
           })
         }
+        
         if(printer.stateColour.category === "Active" && typeof printer.progress != 'undefined'){
           active.push(printer.index);
           progress.push(printer.progress.completion);
@@ -158,6 +160,9 @@ class StatisticsCollection {
 
     farmStats[0].farmInfo = farmInfo;
   }
+  static stop() {
+      clearInterval(farmRunner);
+  }
   static async octofarmStatistics(farmPrinters){
     let octofarmStatistics = await this.blankFarmStatistics();
     let history = await History.find({});
@@ -170,7 +175,7 @@ class StatisticsCollection {
     farmPrinters.forEach(printer => {
       if(typeof printer.stateColour != 'undefined'){
         if (printer.stateColour.category === "Active"){
-          printTimes.push(printer.progress.printTime)
+          //Need to figure this out
         }
       }
 

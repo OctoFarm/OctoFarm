@@ -17,8 +17,21 @@ router.get("/dash/get", ensureAuthenticated, async (req, res) => {
     printer = {
       state: printers[i].state,
       index: printers[i].index,
+      ip: printers[i].ip,
+      port: printers[i].port,
+      camURL: printers[i].camURL,
+      apikey: printers[i].apikey,
+      currentZ: printers[i].currentZ,
+      progress: printers[i].progress,
+      job: printers[i].job,
+      profile: printers[i].profiles,
+      temps: printers[i].temps,
+      filesList: printers[i].fileList,
+      url: printers[i].ip + ":" + printers[i].port,
       settingsAppearance: printers[i].settingsApperance,
-      stateColour: printers[i].stateColour
+      stateColour: printers[i].stateColour,
+      current: printers[i].current,
+      options: printers[i].options
     }
     printerInfo.push(printer)
   }

@@ -84,7 +84,7 @@
                 </li>
                 <li class="nav-item">
                   <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
-                    <a class="d-none d-sm-none d-md-none d-lg-block nav-link" href="/history" id="fileManagerBtn">
+                    <a class="nav-link" href="/history" id="fileManagerBtn">
                     <center><i class="fas fa-history"></i> History</center>
                 </a>
                 <% }else { %>
@@ -572,14 +572,14 @@
                                       <h5>Client Settings</h5>
                                       <hr>
                                       <p class="font-weight-bold">Server Polling</p>
-                                      <p>Set how often the client requests updates from the server. The server will not poll any faster than 4 seconds currently.</p>
-                                      <p><b>Min</b>: 4 seconds, <b>Max:</b> 60 seconds</p>
+                                      <p>Set how often this client checks for updates from the server. Default is set to update the page every 1000ms (1 second). If you find this too much for your browser then lower it below.</p>
+                                      <p><b>Min</b>: 1 seconds, <b>Max:</b> 60 seconds</p>
 
                                       <div class="input-group mb-3">
                                           <div class="input-group-prepend">
                                               <span class="input-group-text">Refresh Rate:</span>
                                           </div>
-                                          <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="clientRefreshRate" value="6" min="4" max="60" step="1">
+                                          <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="clientRefreshRate" value="1" min="1" max="60" step="1">
                                           <div class="input-group-append">
                                               <span class="input-group-text">Seconds</span>
                                           </div>
@@ -716,16 +716,17 @@
                 <div class="container-fluid">
                     <div class="row">
                         <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-                          <p class="font-weight-bold">Server Online Polling</p>
-                          <p>Change how often the server polls for an online printers information...</p>
-                          <p><b>Note:</b> Due to the limited CPU of PiZero it is recommended this be set above 7 seconds or more to stop overheating.</p>
-                          <p><b>Min</b>: 4 seconds, <b>Max:</b> 60 seconds</p>
+                          <p class="font-weight-bold">WebSocket Throttle</p>
+                          <p>You may be trying to run OctoFarm on a potato, which I've no aversion too but the CPU on the potato might not like it. If you find that to be the case then please increase the throttle amount.</p>
+                          <p>Currently the octoprint client will send a message every 500ms, so the server will process at that rate. A value of 2 will set the rate limit to every 1000ms (1 second), 3 would be 1500ms and so on.</p>
+                          
+                          <p><b>Min</b>: 0.5 seconds (Default), <b>Max:</b> 10 seconds</p>
 
                           <div class="input-group mb-3">
                               <div class="input-group-prepend">
-                                  <span class="input-group-text">Online Poll Rate:</span>
+                                  <span class="input-group-text">Throttle:</span>
                               </div>
-                              <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="onlinePollRate" value="6" min="4" max="60" step="1">
+                              <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="onlinePollRate" value="0.5" min="0.5" max="10" step="0.5">
                               <div class="input-group-append">
                                   <span class="input-group-text">Seconds</span>
                               </div>
@@ -823,21 +824,21 @@
                                               <h5>Connection Information</h5>
                                               <hr>
                                           </div>
-                                          <div class="col-lg-3" id="printerCPort">
+                                          <div class="col-lg-3" id="printerPortDrop">
 
                                           </div>
-                                          <div class="col-lg-3" id="printerCBaud">
+                                          <div class="col-lg-3" id="printerBaudDrop">
 
                                           </div>
-                                          <div class="col-lg-3" id="printerCProfile">
+                                          <div class="col-lg-3" id="printerProfileDrop">
 
                                           </div>
-                                          <div class="col-lg-3" id="printerCConnect">
+                                          <div class="col-lg-3" id="printerConnect">
 
                                           </div>
                                       </div>
                                       <div class="row">
-                                          <div class="col-lg-12" id="printerFileInformation">
+                                          <div class="col-lg-12" id="printerInformation">
                                               
                                           </div>
                                       </div>
@@ -893,7 +894,8 @@
               </div>
           </div>
           <div class="modal-footer" id="printerManagerFooter">
-          </div>
+
+            </div>
       </div>
   </div>
 </div>
@@ -1023,6 +1025,7 @@ Close
     <script src="/js/vendor/bootbox.min.js"></script>
     <script src="/js/vendor/noty.js"></script>
     <script src="/js/printerManagement.js" type="module"></script>
+    <script src="/js/lib/modules/printerManager.js" type="module"></script>
     <script src="/js/settings.js" type="module"></script>
 </body>
 

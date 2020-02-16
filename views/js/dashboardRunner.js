@@ -2,7 +2,48 @@ import Client from "./lib/octofarm.js";
 import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
-import printerManager from "./lib/modules/printerManager.js"
+import PrinterManager from "./lib/modules/printerManager.js";
+
+let printerInfo = "";
+
+//Close modal event listeners...
+$("#printerManagerModal").on("hidden.bs.modal", function(e) {
+  //Fix for mjpeg stream not ending when element removed...
+  document.getElementById("printerControlCamera").src = "";
+})
+
+
+//Update page variables
+Client.get("client/dash/get")
+    .then(res => {
+      return res.json();
+    })
+    .then(res => {
+      if(res.printerInfo.length === 0){
+
+      }else{
+        printerInfo = res.printerInfo;
+    }
+  })
+    .catch(err => {
+      console.log(err);
+      UI.createAlert(
+        "error",
+        "There was trouble updating page, please check logs",
+        4000,
+        "clicked"
+      );
+    });
+
+//Setup page listeners... 
+let printerCard = document.querySelectorAll("[id^='printerButton-']");
+  printerCard.forEach(card => {
+    let ca = card.id.split("-");
+    card.addEventListener("click", e=> {
+      PrinterManager.updateIndex(parseInt(ca[1]));
+      PrinterManager.init(printerInfo);
+    })
+  })
 
 setInterval(function() {
   Client.get("client/dash/get")
@@ -16,10 +57,11 @@ setInterval(function() {
         currentOperations(res.currentOperations, res.currentOperationsCount);
         dashUpdate.systemInformation(res.systemInfo);
         dashUpdate.printers(res.printerInfo);
+        printerInfo = res.printerInfo;
         dashUpdate.farmInformation(res.farmInfo)
         dashUpdate.farmStatistics(res.octofarmStatistics)
         if(document.getElementById("printerManagerModal").classList.contains("show")){
-          console.log("Open")
+          PrinterManager.init(res.printerInfo);
         }
     }
   })
@@ -78,13 +120,51 @@ class dashUpdate {
   }
   static printers(printers) {
 
-    printers.forEach(printer => {
-
-      document.getElementById("printerBadge-" + printer.index).innerHTML =
-        printer.state;
+    printers.forEach((printer, index) => {
+      let printerName = "";
+      if(typeof printer.settingsAppearance != 'undefined'){
+        printerName = printer.settingsAppearance.name;
+      }
+      if(document.getElementById("printerCard-"+printer.index)){
+          document.getElementById("printerBadge-" + printer.index).innerHTML =
+          printer.state;
+        document.getElementById(
+          "printerBadge-" + printer.index
+        ).className = `badge badge-${printer.stateColour.name} badge-pill`;
+        document.getElementById("printerName-"+printer.index).innerHTML = `<i class="fas fa-print"></i> ${printer.index}. ${printerName}`;
+        if(printer.state != "Offline"){
+          document.getElementById("printerButton-"+printer.index).disabled = false;
+        }
+   
+      }else{
+        document.getElementById("printerList").insertAdjacentHTML('beforeend',`
+            <div class="list-group" id="printerCard-${printer.index}">
+            <li class="list-group-item list-group-item-action flex-column align-items-start">
+              <div class="d-flex w-100 justify-content-between text-white">
+                <h5 id="printerName-${printer.index}" class="mb-1 ml-1"> <i class="fas fa-print"></i>  ${printer.index}. ${printerName}</span
+                  ></h5>
+                <small><span id="printerBadge-${printer.index}"
+                  class="badge badge-${printer.stateColour.name} badge-pill"
+                  >${printer.state}
+                  </small></span>
+              </div>
+              <button  id="printerButton-<%= printer.index %>"
+                type="button"
+                class="btn btn-secondary btn-sm float-right"
+                data-toggle="modal"
+                data-target="#printerManagerModal"
+              >
+                <i class="fas fa-cog"></i>
+              </button>
+              <small class="pt-2 float-left ml-1 text-white"><i class="fas fa-network-wired"></i> ${printer.ip}:${printer.port}</small>
+            </li>
+          </div>
+        `
+      );
+      }
       document.getElementById(
-        "printerBadge-" + printer.index
-      ).className = `badge badge-${printer.stateColour.name} badge-pill`;
+        "printerCard-" + printer.index
+      ).style.order = index;
     });
   }
 

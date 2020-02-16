@@ -14,14 +14,14 @@ class ServerSettings{
             Client.get("settings/server/get").then(res => {
                 return res.json();
             }).then(res => {
-                document.getElementById("onlinePollRate").value = res.onlinePolling.seconds / 1000;
+                document.getElementById("onlinePollRate").value = res.onlinePolling.seconds;
                 document.getElementById("offlinePollRate").value = res.offlinePolling.seconds / 1000 / 60;
                 document.getElementById("offlinePoll").checked = res.offlinePolling.on;
             })
         }
     }
     static update(){
-        let onlinePoll = document.getElementById("onlinePollRate").value * 1000;
+        let onlinePoll = document.getElementById("onlinePollRate").value;
         let offlineOn = document.getElementById("offlinePoll").checked;
         let offlinePoll = document.getElementById("offlinePollRate").value * 1000 * 60;
         let onlinePolling = {
