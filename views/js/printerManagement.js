@@ -235,11 +235,7 @@ class PrintersManagement {
         .build();
       printers.push(printer);
     }
-    _.orderBy(
-      printers,
-      ["index"],
-      ["desc"]
-    );
+    _.orderBy(printers, ["index"], ["desc"]);
 
     Client.post("printers/save", printers)
       .then(res => {
@@ -328,14 +324,15 @@ class PrintersManagement {
     document.getElementById("deletePrintersBtn").disabled = false;
     document.getElementById("menuMonitoring").classList.remove("notyet");
     document.getElementById("fileManagerBtn").classList.remove("notyet");
-    document.getElementById("farmStatusBtn").classList.remove("notyet");
-    console.log(document.getElementById("farmStatusBtn"));
+    document.getElementById("historyBtn").classList.remove("notyet");
+    document.getElementById("filamentBtn").classList.remove("notyet");
   }
   static deactivatePrinterManagement() {
     //document.getElementById("editPrinters").classList.add("d-none");
     document.getElementById("menuMonitoring").classList.add("notyet");
     document.getElementById("fileManagerBtn").classList.add("notyet");
-    document.getElementById("farmStatusBtn").classList.add("notyet");
+    document.getElementById("historyBtn").classList.add("notyet");
+    document.getElementById("filamentBtn").classList.add("notyet");
     document.getElementById("exportPrintersBtn").disabled = true;
     document.getElementById("deletePrintersBtn").disabled = true;
   }
@@ -365,8 +362,25 @@ class PrintersManagement {
     FileOperations.download("printers.json", JSON.stringify(reFormat));
   }
   static resetPrinters() {
-    document.getElementById("addPrintersTable").innerHTML = "";
-    document.getElementById("printerAmmount").innerHTML = 0;
-    PrintersManagement.deactivatePrinterManagement();
+    Client.post("printers/delete")
+      .then(res => {
+        if (res.status === 200) {
+          document.getElementById("addPrintersTable").innerHTML = "";
+          document.getElementById("printerAmmount").innerHTML = 0;
+          PrintersManagement.deactivatePrinterManagement();
+          window.location.replace("/dashboard");
+        } else {
+          window.location.replace("/dashboard");
+        }
+      })
+      .catch(err => {
+        UI.createAlert(
+          "error",
+          "Sorry I can't seem to access the API to save your printers.",
+          3000,
+          "yes"
+        );
+        console.log(err);
+      });
   }
 }

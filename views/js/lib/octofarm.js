@@ -8,15 +8,6 @@ export default class OctoFarmclient {
       }
     });
   }
-  static delete(ip, port, apikey, item) {
-    let url = `http://${ip}:${port}/api/${item}`;
-    return fetch(url, {
-      method: "DELETE",
-      headers: {
-        "X-Api-Key": apikey
-      }
-    });
-  }
   static post(item, data) {
     let url = `/${item}`;
     return fetch(url, {
@@ -28,4 +19,3 @@ export default class OctoFarmclient {
     });
   }
 }
-

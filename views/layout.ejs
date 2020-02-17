@@ -5,6 +5,13 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
     <link rel="stylesheet" href="/css/font-awesome.css" />
     <link rel="stylesheet" href="/css/bootstrap-v4.css" />
     <link rel="stylesheet" href="/css/themes/slate.css" />
@@ -17,7 +24,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
         <a class="navbar-brand notyet" href="#">
-            <center>OctoFarm</center>
+            <img width="50px" src="/images/logo.png">
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -84,7 +91,7 @@
                 </li>
                 <li class="nav-item">
                   <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
-                    <a class="nav-link" href="/history" id="fileManagerBtn">
+                    <a class="nav-link" href="/history" id="historyBtn">
                     <center><i class="fas fa-history"></i> History</center>
                 </a>
                 <% }else { %>
@@ -96,7 +103,7 @@
                 </li>
                 <li class="nav-item">
                   <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
-                    <a class="d-none d-sm-none d-md-none d-lg-block nav-link" href="#" data-toggle="modal" data-target="#filamentModal">
+                    <a class="d-none d-sm-none d-md-none d-lg-block nav-link" href="#" data-toggle="modal" id="filamentBtn" data-target="#filamentModal">
                     <center><i class="fas fa-toilet-paper"></i> Filament</center>
                 </a>
                 <% }else { %>

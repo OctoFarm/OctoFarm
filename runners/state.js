@@ -13,7 +13,6 @@ let offlineRunners = [];
 let onlineRunners = [];
 let farmPrinters = [];
 
-
 class ClientAPI {
   static get(ip, port, apikey, item) {
     let url = `http://${ip}:${port}/api/${item}`;
@@ -37,7 +36,7 @@ class ClientSocket {
     };
     try {
       let users = await ClientAPI.get(ip, port, apikey, "users");
-      if(users.status === 200){
+      if (users.status === 200) {
         await Runner.getState(index);
         await Runner.getFiles(index);
         await Runner.getSystem(index);
@@ -102,7 +101,7 @@ class Runner {
     for (let i = 0; i < farmPrinters.length; i++) {
       //Make sure runners are created ready for each printer to pass between...
       offlineRunners[i] = false;
-      farmPrinters[i].state = 'Offline';
+      farmPrinters[i].state = "Offline";
       farmPrinters[i].stateColour = Runner.getColour("Offline");
       let client = await ClientSocket.connect(
         farmPrinters[i].index,
@@ -111,19 +110,14 @@ class Runner {
         farmPrinters[i].apikey
       );
       if (typeof client.error === "undefined") {
-       Runner.setOnline(client)
-      }else{
-       Runner.setOffline(client)
+        Runner.setOnline(client);
+      } else {
+        Runner.setOffline(client);
       }
     }
-    
   }
-  static returnFarmPrinters() {
-    return farmPrinters;
-  }
-  static async setOnline(client){
-
-    console.log("Printer: " + client.index + " is online")
+  static async setOnline(client) {
+    console.log("Printer: " + client.index + " is online");
     //Make sure offline is clear
     clearInterval(offlineRunners[client.index]);
     offlineRunners[client.index] = false;
@@ -131,31 +125,40 @@ class Runner {
     //Create socket listeners
     let Polling = await ServerSettings.check();
 
-    onlineRunners[client.index] .ws.on("open", function open() {
+    onlineRunners[client.index].ws.on("open", function open() {
       var data = {};
       data["auth"] =
-      onlineRunners[client.index].currentUser + ":" + onlineRunners[client.index] .apikey;
+        onlineRunners[client.index].currentUser +
+        ":" +
+        onlineRunners[client.index].apikey;
       onlineRunners[client.index].ws.send(JSON.stringify(data));
-      var throt = {}
-      throt["throttle"] = parseInt(Polling[0].onlinePolling.seconds * 1000 / 500);
+      var throt = {};
+      throt["throttle"] = parseInt(
+        (Polling[0].onlinePolling.seconds * 1000) / 500
+      );
       onlineRunners[client.index].ws.send(JSON.stringify(throt));
     });
     onlineRunners[client.index].ws.on("message", async function incoming(data) {
       data = await JSON.parse(data);
       if (typeof data.event != "undefined") {
-        if(data.event.type === "PrintFailed"){
-          //Register cancelled print... 
-          HistoryCollection.failed(data.event.payload, farmPrinters[client.index]);
+        if (data.event.type === "PrintFailed") {
+          //Register cancelled print...
+          HistoryCollection.failed(
+            data.event.payload,
+            farmPrinters[client.index]
+          );
           //
         }
-        if(data.event.type === "PrintDone"){
-          //Register cancelled print... 
-          HistoryCollection.complete(data.event.payload, farmPrinters[client.index]);
+        if (data.event.type === "PrintDone") {
+          //Register cancelled print...
+          HistoryCollection.complete(
+            data.event.payload,
+            farmPrinters[client.index]
+          );
         }
       }
       if (typeof data.current != "undefined") {
-        farmPrinters[client.index].temps
-        if(data.current.state.text === "Offline"){
+        if (data.current.state.text === "Offline") {
           data.current.state.text = "Closed";
         }
         farmPrinters[client.index].state = data.current.state.text;
@@ -163,15 +166,20 @@ class Runner {
         farmPrinters[client.index].progress = data.current.progress;
         farmPrinters[client.index].job = data.current.job;
         farmPrinters[client.index].logs = data.current.logs;
-        
-        if(data.current.temps.length != 0){
+
+        if (data.current.temps.length != 0) {
           farmPrinters[client.index].temps = data.current.temps;
         }
         farmPrinters[client.index].messages = data.current.messages;
-        if(data.current.progress.completion != null && data.current.progress.completion === 100){
+        if (
+          data.current.progress.completion != null &&
+          data.current.progress.completion === 100
+        ) {
           farmPrinters[client.index].stateColour = Runner.getColour("Complete");
-        }else{
-          farmPrinters[client.index].stateColour = Runner.getColour(data.current.state.text);
+        } else {
+          farmPrinters[client.index].stateColour = Runner.getColour(
+            data.current.state.text
+          );
         }
         //Update Current Operations
         StatisticsCollection.currentOperations(farmPrinters);
@@ -187,33 +195,31 @@ class Runner {
       Runner.setOffline(client);
     });
     onlineRunners[client.index].ws.on("close", async function incoming(data) {
-      console.log("Online Printer: " + client.index + " stopped")
+      console.log("Online Printer: " + client.index + " stopped");
     });
-
-
   }
   static async setOffline(client) {
-    console.log("Printer: " + client.index + " is offline")
+    console.log("Printer: " + client.index + " is offline");
     farmPrinters[client.index].state = "Offline";
     farmPrinters[client.index].stateColour = Runner.getColour("Offline");
     //Make sure offline isn't already running
-    if(offlineRunners[client.index] === false){
+    if (offlineRunners[client.index] === false) {
       let Polling = await ServerSettings.check();
       if (Polling[0].offlinePolling.on) {
-          offlineRunners[client.index] = setInterval(async function() {
-            let clientNew = await ClientSocket.connect(
-              farmPrinters[client.index].index,
-              farmPrinters[client.index].ip,
-              farmPrinters[client.index].port,
-              farmPrinters[client.index].apikey
-            );
-            if (typeof clientNew.error === "undefined") {
-              Runner.setOnline(clientNew)
-            }
-          }, Polling[0].offlinePolling.seconds);
+        offlineRunners[client.index] = setInterval(async function() {
+          let clientNew = await ClientSocket.connect(
+            farmPrinters[client.index].index,
+            farmPrinters[client.index].ip,
+            farmPrinters[client.index].port,
+            farmPrinters[client.index].apikey
+          );
+          if (typeof clientNew.error === "undefined") {
+            Runner.setOnline(clientNew);
+          }
+        }, Polling[0].offlinePolling.seconds);
+      }
     }
   }
-}
 
   static stopAll() {
     StatisticsCollection.stop();
@@ -222,17 +228,18 @@ class Runner {
       run = false;
     });
     offlineRunners.forEach(run => {
-      console.log("Offline Printer: " + [run] + " stopped")
+      console.log("Offline Printer: " + [run] + " stopped");
       clearInterval(run);
       run = false;
     });
   }
-
   static getFiles(index) {
-    return ClientAPI.get(farmPrinters[index].ip,
+    return ClientAPI.get(
+      farmPrinters[index].ip,
       farmPrinters[index].port,
       farmPrinters[index].apikey,
-      "files?recursive=true")
+      "files?recursive=true"
+    )
       .then(res => {
         return res.json();
       })
@@ -267,6 +274,7 @@ class Runner {
             }
             let file = {
               path: path,
+              fullPath: entry.path,
               display: entry.display,
               name: entry.name,
               size: entry.size,
@@ -274,6 +282,7 @@ class Runner {
             };
             printerFiles.push(file);
           }
+
           let folderPaths = entry.path;
           if (isFolder) {
             if (entry.path.indexOf("/")) {
@@ -299,8 +308,8 @@ class Runner {
         _.each(res.files, function(entry) {
           recursivelyPrintNames(entry);
         });
-      }).catch(err => console.log("Error grabbing files" + err))
-
+      })
+      .catch(err => console.log("Error grabbing files" + err));
   }
   static getState(index) {
     return ClientAPI.get(
@@ -319,7 +328,7 @@ class Runner {
         farmPrinters[index].current = res.current;
         farmPrinters[index].options = res.options;
       })
-      .catch(err => console.log("Error grabbing state"))
+      .catch(err => console.log("Error grabbing state"));
   }
   static getProfile(index) {
     return ClientAPI.get(
@@ -335,10 +344,15 @@ class Runner {
         //Update info to DB
         farmPrinters[index].profiles = res.profiles;
       })
-      .catch(err => console.log("Error grabbing profiles"))
+      .catch(err => console.log("Error grabbing profiles"));
   }
   static getSettings(index) {
-    return ClientAPI.get(farmPrinters[index].ip, farmPrinters[index].port, farmPrinters[index].apikey, "settings")
+    return ClientAPI.get(
+      farmPrinters[index].ip,
+      farmPrinters[index].port,
+      farmPrinters[index].apikey,
+      "settings"
+    )
       .then(res => {
         return res.json();
       })
@@ -354,7 +368,10 @@ class Runner {
         farmPrinters[index].settingsServer = res.server;
         farmPrinters[index].settingsSystem = res.system;
         farmPrinters[index].settingsWebcam = res.webcam;
-        if (farmPrinters[index].camURL === "" || farmPrinters[index].camURL === null) {
+        if (
+          farmPrinters[index].camURL === "" ||
+          farmPrinters[index].camURL === null
+        ) {
           if (
             typeof res.webcam != "undefined" &&
             typeof res.webcam.streamURL != "undefined"
@@ -362,12 +379,17 @@ class Runner {
             if (res.webcam.streamURL.includes("http")) {
               farmPrinters[index].camURL = res.webcam.streamURL;
             } else {
-              farmPrinters[index].camURL = "http://" + farmPrinters[index].ip+ ":"+ farmPrinters[index].port + streamURL;
+              farmPrinters[index].camURL =
+                "http://" +
+                farmPrinters[index].ip +
+                ":" +
+                farmPrinters[index].port +
+                streamURL;
             }
           }
         }
       })
-      .catch(err => console.log("Error grabbing Settings" + err))
+      .catch(err => console.log("Error grabbing Settings" + err));
   }
   static getSystem(index) {
     return ClientAPI.get(
@@ -383,7 +405,7 @@ class Runner {
         //Update info to DB
         farmPrinters[index].core = res.core;
       })
-      .catch(err => console.log("Error grabbing System"))
+      .catch(err => console.log("Error grabbing System"));
   }
   static getColour(state) {
     if (state === "Operational") {
@@ -406,7 +428,18 @@ class Runner {
       return { name: "danger", hex: "#2e0905", category: "Closed" };
     } else if (state === "Complete") {
       return { name: "success", hex: "#00330e", category: "Complete" };
+    } else {
+      return { name: "danger", hex: "#00330e", category: "Searching..." };
     }
+  }
+  static returnFarmPrinters() {
+    return farmPrinters;
+  }
+  static async removeFile(i, fullPath) {
+    let index = await _.findIndex(farmPrinters[i].fileList.files, function(o) {
+      return o.fullPath == fullPath;
+    });
+    farmPrinters[i].fileList.files.splice(index, 1);
   }
 }
 

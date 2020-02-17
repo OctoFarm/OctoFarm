@@ -6,7 +6,7 @@ class ServerSettings {
     ServerSettingsDB.find({}).then(settings => {
       if (settings.length < 1) {
         let onlinePolling = {
-          seconds: 6000
+          seconds: 0.5
         };
         let offlinePolling = {
           on: true,
