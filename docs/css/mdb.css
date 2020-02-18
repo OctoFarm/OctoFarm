@@ -25,6 +25,9 @@
  * Attribution: Animate CSS, Twitter Bootstrap, Materialize CSS, Normalize CSS, Waves JS, WOW JS, Toastr, Chart.js
  *
  */
+ html {
+  scroll-behavior: smooth;
+}
 .mdb-color.lighten-5 {
   background-color: #d0d6e2 !important; }
 
