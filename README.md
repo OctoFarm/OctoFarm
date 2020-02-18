@@ -28,7 +28,7 @@
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
-
+[![Feature Requests](https://feathub.com/NotExpectedYet/OctoFarm?format=svg)](https://feathub.com/NotExpectedYet/OctoFarm)
 
 
 <!-- PROJECT LOGO -->
