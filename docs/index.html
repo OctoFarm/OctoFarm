@@ -9,11 +9,11 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
   <!-- Bootstrap core CSS -->
-  <link href="css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/bootstrap.css" rel="stylesheet">
   <!-- Material Design Bootstrap -->
-  <link href="css/mdb.min.css" rel="stylesheet">
+  <link href="css/mdb.css" rel="stylesheet">
   <!-- Your custom styles (optional) -->
-  <link href="css/style.min.css" rel="stylesheet">
+  <link href="css/style.css" rel="stylesheet">
   <style type="text/css">
     html {
       scroll-behavior: smooth !important;
@@ -22,7 +22,7 @@
     body,
     header,
     .carousel {
-      height: 45vh;
+      height: 100vh;
     }
 
     @media (max-width: 740px) {
@@ -31,7 +31,7 @@
       body,
       header,
       .carousel {
-        height: 65vh;
+        height: 100vh;
       }
     }
 
@@ -41,13 +41,7 @@
       body,
       header,
       .carousel {
-        height: 65vh;
-      }
-    }
-
-    @media (min-width: 800px) and (max-width: 850px) {
-      .navbar:not(.top-nav-collapse) {
-        background: #311b92 !important;
+        height: 100vh;
       }
     }
 
@@ -62,7 +56,7 @@
 
   <div class="container">
 
-    <a class="navbar-brand" href="https://octofarm.notexpectedyet.com" target="_blank">
+    <a class="navbar-brand" href="https://octofarm.notexpectedyet.com">
       <strong>OctoFarm</strong>
     </a>
 
@@ -84,8 +78,14 @@
           <a class="nav-link" href="#features">Features</a>
         </li>
         <li class="nav-item">
+          <a class="nav-link" href="#comingsoon">Coming Soon!</a>
+        </li>
+        <li class="nav-item">
           <a class="nav-link" href="#donate">Donate</a>
         </li>
+        <!-- <li class="nav-item">
+          <a class="nav-link" href="#contribute">Contribute</a>
+        </li> -->
       </ul>
       <!-- Links -->
       
@@ -114,21 +114,21 @@
 
    
    
-    <div class="view jarallax" data-jarallax='{"speed": 0.2}' style="background-color:#7e57c2; background-repeat: no-repeat; background-size: cover; background-position: center center;">
+    <div class="view jarallax" data-jarallax='{"speed": 0.2}' style=" background-image: url(img/OctoFarmTest.png); background-repeat: no-repeat; background-size: cover; background-position: center center;">
       <!-- Mask & flexbox options-->
-      <div class="mask pattern-2 d-flex justify-content-center align-items-center">
+      <div class="mask pattern-6 d-flex justify-content-center align-items-center">
         <!-- Content -->
         <div class="container">
           <!--Grid row-->
           <div class="row">
             <!--Grid column-->
-            <div class="col-lg-6 white-text text-center pt-5">
-              <h1 class="">OctoFarm</h1>
+            <div class="col-lg-12 white-text text-center pt-5">
+              <h1 class="font-weight-bold zindex-fixed">OctoFarm</h1>
                 <h5 class="">Web server and client combo for managing and monitoring multiple Octoprint instances.</h5>
                 <small>Created and maintained by James Mackay from NotExpectedYet</small>
             </div>
             <div class="col-lg-6 white-text text-center black-bg">
-                <img class="mt-2"  width="50%" src="img/logo/logo.png">
+                <!-- <center><img class="mt-2 zindex-modal-backdrop" width="100%" src="img/logo/logo.png"></center> -->
             </div>
           </div>
             <!--Grid column-->
@@ -407,14 +407,14 @@
       
       
       </div>
-      <hr class="mb-5">
+      <hr id="comingsoon" class="mb-5">
 
       <!--Section: More-->
       <section>
 
 
         <div class="container pt-5 my-5 z-depth-2" style="background-color:#2d3134; background-repeat: no-repeat; background-size: cover; background-position: center center;">
-          <h2 class="my-5 h3 text-center">...and even more</h2>
+          <h2 class="my-5 h3 text-center">...coming soon!</h2>
           <section class="p-md-3 mx-md-5">
             <div class="row">
               <div class="col-lg-4 col-md-6 mb-5">
@@ -469,65 +469,86 @@
           </section>
         </div>
 
-        <!--Second row-->
-        <div class="container pt-5 my-5 z-depth-2" style="background-color:#2d3134; background-repeat: no-repeat; background-size: cover; background-position: center center;">
-          
-        <h2 class="my-5 h3 text-center">...coming soon!</h2>
-          <section class="p-md-3 mx-md-5">
-            <div class="row">
-              <div class="col-lg-4 col-md-6 mb-5">
-                <h4 class="font-weight-bold mb-3">
-                  <i class="far fa-paper-plane indigo-text pr-2"></i> Feature 1
-                </h4>
-                <p class="text-muted">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. 
-                </p>
-              </div>
-              <div class="col-lg-4 col-md-6 mb-5">
-                <h4 class="font-weight-bold mb-3">
-                  <i class="fas fa-pen-alt green-text pr-2"></i> Feature 2
-                </h4>
-                <p class="text-muted">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                </p>
-              </div>
-              <div class="col-lg-4 col-md-6 mb-5">
-                <h4 class="font-weight-bold mb-3">
-                  <i class="fas fa-user amber-text pr-2"></i> Feature 3
-                </h4>
-                <p class="text-muted">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                </p>
-              </div>
-              <div class="col-lg-4 col-md-6 mb-5">
-                <h4 class="font-weight-bold mb-3">
-                  <i class="fas fa-rocket red-text pr-2"></i> Feature 4
-                </h4>
-                <p class="text-muted mb-lg-0">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                </p>
-              </div>
-              <div class="col-lg-4 col-md-6 mb-5">
-                <h4 class="font-weight-bold mb-3">
-                  <i class="fas fa-home lime-text pr-2"></i> Feature 5
-                </h4>
-                <p class="text-muted mb-lg-0">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                </p>
-              </div>
-              <div class="col-lg-4 col-md-6 mb-5">
-                <h4 class="font-weight-bold mb-3">
-                  <i class="fas fa-book-open blue-text pr-2"></i> Feature 6
-                </h4>
-                <p class="text-muted mb-lg-0">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit.
-                </p>
-              </div>
-            </div>
-          </section>
-        </div>
+
         <!--/Second row-->
+        <div id="donate" class="container pt-5 my-5 z-depth-2" style="background-color:#2d3134; background-repeat: no-repeat; background-size: cover; background-position: center center;">
+          <!--Section: Content-->
+          <section class="text-center">
+        
+            <!-- Section heading -->
+            <h3 class="font-weight-bold white-text pb-2 mb-4">Donate</h3>
+            <!-- Section description -->
+            <p class="text-muted w-responsive mx-auto mb-5">This project is built by an English bloke in his spare time, around a 9-5 job to boot. If it's in anyway helped you out I'd love it if you'd donate towards the project.</p>
+        
+            <!-- Grid row -->
+            <div class="row">
+        
+              <!-- Grid column -->
+              <div class="col-lg-6 col-md-6 mb-4">
+        
+                <!-- Pricing card -->
+                <div class="card pricing-card white-text">
+        
+                  <!-- Price -->
+                  <div class="indigo rounded-top">
+                    <h4 class="option m-2">Paypal</h4>
+                  </div>
+        
+                  <!-- Features -->
+                  <div class="card-body striped green-striped card-background px-5">
+        
+                    <p>Paypal is available as a donation option if you'd like to give something back to the developer James. There are no benefits for you apart from making James very happy, not happy because of the money... but happy because he can spend it on steak!</p>
+                    <p>All funding from this source will go towards James himself, he will more than likely be using it to buy steak and fuel his coding exploits that way. It is certainly most appreciated! A massive big thank you to everyone who donates.</p>
+                    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QGBJML3E7268L&source=url"><button class="mb-3 mt-3 btn blue white-text btn-rounded"><i class="fab fa-paypal"></i> Donate!</button></a>
+        
+                  </div>
+                  <!-- Features -->
+        
+                </div>
+        
+                <!-- Pricing card -->
+        
+              </div>
+              <!-- Grid column -->
+        
+              <!-- Grid column -->
+              <div class="col-lg-6 col-md-6 mb-4">
+        
+                <!-- Pricing card -->
+                <div class="card pricing-card white-text">
+        
+                  <!-- Price -->
+                  <div class="indigo rounded-top">
+                    <h4 class="option m-2">Patreon</h4>
+                  </div>
+        
+                  <!-- Features -->
+                  <div class="card-body striped orange-striped card-background px-5">
+                    <p>My Patreon page is mainly for making a long term set of donations to the project. £10+ you get access to the "secret" discord channel, and also early door previews and code samples.</p>
+                    <p>All funding from this source is put back directly into the project. Whether this be forwarding that donation on to Gina at Octoprint (Whome without this project wouldn't exist!) or other projects used in this project, or to pay for web services and printing equipment.</p>
+                    <a href="https://www.patreon.com/NotExpectedYet"><button class="mb-3 mt-3 btn red white-text btn-rounded"><i class="fab fa-patreon"></i> Donate!</button></a>
+        
+                  </div>
+                  <!-- Features -->
+        
+                </div>
+                <!-- Pricing card -->
+        
+              </div>
+              <!-- Grid column -->
+        
+              <!-- Grid column -->
 
+              <!-- Grid column -->
+        
+            </div>
+            <!-- Grid row -->
+        
+          </section>
+          <!--Section: Content-->
+        
+        
+        </div>
       </section>
       <!--Section: More-->
 
@@ -546,6 +567,9 @@
       </a>
       <a href="mailto:info@notexpectedyet.com" target="_blank">
         <i class="fas fa-envelope mr-3 fa-2x"></i>
+      </a>
+      <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QGBJML3E7268L&source=url" target="_blank">
+        <i class="fab fa-paypal mr-3 fa-2x"></i> 
       </a>
       <a href="https://www.patreon.com/NotExpectedYet" target="_blank">
         <i class="fab fa-patreon mr-3 fa-2x"></i>
