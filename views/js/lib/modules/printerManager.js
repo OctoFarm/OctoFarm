@@ -112,7 +112,7 @@ export default class PrinterManager {
                 </div>
             </div>
             <div class="row">
-                <div class="col-12">
+                <div id="cameraCol" class="col-12">
                   <img id="printerControlCamera" width="100%" src="http://${
                     printer.camURL
                   }"/>
@@ -738,7 +738,7 @@ export default class PrinterManager {
   static async applyState(printer, job, progress) {
     let elements = await PrinterManager.grabPage();
     elements.mainPage.title.innerHTML =
-      "Printer Manager: " + printer.settingsAppearance.name;
+      "Octoprint Manager: " + printer.settingsAppearance.name;
     elements.mainPage.status.innerHTML = printer.state;
     elements.mainPage.status.className = `btn btn-${printer.stateColour.name} mb-2`;
 

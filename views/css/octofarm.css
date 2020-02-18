@@ -54,7 +54,7 @@ li {
   -o-transition: width 1s ease-in-out;
   transition: width 1s ease-in-out;
   animation: progressBar 3s ease-in-out;
-  animation-fill-mode:both; 
+  animation-fill-mode: both;
 }
 @keyframes progressBar {
   0% {
@@ -62,7 +62,6 @@ li {
   }
   100% {
     background-position: 0 0;
-
   }
 }
 
@@ -71,7 +70,6 @@ li {
   position: sticky;
   top: 70px;
   z-index: 1000px;
-  
 }
 
 /*Scroll Bar*/
@@ -203,4 +201,11 @@ a.notyet {
   bottom: 1px;
   left: -1px;
   opacity: 0.8;
+}
+.rotate180 {
+  -webkit-transform: rotate(180deg);
+  -moz-transform: rotate(180deg);
+  -ms-transform: rotate(180deg);
+  -o-transform: rotate(180deg);
+  transform: rotate(180deg);
 }
