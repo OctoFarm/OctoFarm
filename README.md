@@ -1,8 +1,10 @@
 <!-- PROJECT LOGO -->
+
 [![GitHub issues](https://img.shields.io/github/issues/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/issues)
 [![GitHub forks](https://img.shields.io/github/forks/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/network)
 [![GitHub stars](https://img.shields.io/github/stars/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/stargazers)
 [![GitHub license](https://img.shields.io/github/license/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/blob/master/LICENSE.txt)
+
   <h3 align="center">WARNING THIS IS MAJOR ALPHA VERSION</h3>
   <p>Please visit <a href="https://git.notexpectedyet.com/NotExpectedYet/OctoFarm">NotExpectedYet Git</a> for earlier working versions.
 <br />
@@ -12,8 +14,6 @@
   </a>
 
   <h3 align="center">OctoFarm</h3>
-
-
 
   <p align="center">
     OctoFarm is an easy to setup and install web server and client for unifying multiple instances of Octoprint. You can manage and monitor as many instances as you want from a single interface giving you full control over your 3D printer farm.
@@ -27,51 +27,55 @@
   </p>
 </p>
 
-
-
 <!-- TABLE OF CONTENTS -->
+
 ## Table of Contents
 
-* [About the Project](#about-the-project)
-* [Getting Started](#getting-started)
-  * [Prerequisites](#prerequisites)
-  * [Installation](#installation)
-* [Roadmap](#roadmap)
-* [Contributing](#contributing)
-* [License](#license)
-* [Contact](#contact)
-* [Acknowledgements](#acknowledgements)
-
-
+- [About the Project](#about-the-project)
+- [Getting Started](#getting-started)
+  - [Prerequisites](#prerequisites)
+  - [Installation](#installation)
+- [Roadmap](#roadmap)
+- [Contributing](#contributing)
+- [License](#license)
+- [Contact](#contact)
+- [Acknowledgements](#acknowledgements)
 
 <!-- ABOUT THE PROJECT -->
+
 ## About The Project
-OctoFarm was built to fill a need that anyone with multiple 3D printers with Octoprint will have run into. How do I manage multiple printers from one place? That's where OctoFarm steps in, add your OctoPrint instances to the system and it will scan and keep you up to date on the status of your printers. 
+
+OctoFarm was built to fill a need that anyone with multiple 3D printers with Octoprint will have run into. How do I manage multiple printers from one place? That's where OctoFarm steps in, add your OctoPrint instances to the system and it will scan and keep you up to date on the status of your printers.
 ![Dashboard View](https://github.com/NotExpectedYet/OctoFarm/blob/master/screenshots/dashboard.png)
 
 <!-- GETTING STARTED -->
+
 ## Getting Started
 
 To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-* [MongoDB](https://www.mongodb.com/)
-* [NodeJS](https://nodejs.org/)
-* [NPM](https://www.npmjs.com/)
-
+- [MongoDB](https://www.mongodb.com/)
+- [NodeJS](https://nodejs.org/)
+- [NPM](https://www.npmjs.com/)
 
 ### Installation Development
- 
+
 1. Clone the OctoFarm
+
 ```sh
 git clone https://github.com/NotExpectedYet/OctoFarm.git
 ```
+
 2. Install NPM packages
+
 ```sh
 npm install
 ```
-3. Edit the db.js file with your database. 
+
+3. Edit the db.js file with your database.
+
 ```sh
 module.exports = {
   MongoURI: "mongodb://192.168.1.5:27017/octofarm"
@@ -79,23 +83,31 @@ module.exports = {
 //Example Local URL: "mongodb://192.168.1.5:27017/octofarm"
 //Example Remote URL: "mongodb+srv://s1mpleman:<YOUR PASSWORD>@cluster0-lgugu.mongodb.net/test?retryWrites=true&w=majority"
 ```
+
 4. Start the system
+
 ```sh
 npm run dev
 ```
-* The developer version uses nodemon for live server reloading on changes. 
+
+- The developer version uses nodemon for live server reloading on changes.
 
 ### Installation Production
- 
+
 1. Clone the OctoFarm
+
 ```sh
 git clone https://github.com/NotExpectedYet/OctoFarm.git
 ```
+
 2. Install NPM packages
+
 ```sh
 npm install
 ```
-3. Edit the db.js file with your database. 
+
+3. Edit the db.js file with your database.
+
 ```sh
 module.exports = {
   MongoURI: "mongodb://192.168.1.5:27017/octofarm"
@@ -103,48 +115,56 @@ module.exports = {
 //Example Local URL: "mongodb://192.168.1.5:27017/octofarm"
 //Example Remote URL: "mongodb+srv://s1mpleman:<YOUR PASSWORD>@cluster0-lgugu.mongodb.net/test?retryWrites=true&w=majority"
 ```
+
 4. Start the system
+
 ```sh
 npm start
 ```
 
+## Packaged Versions
 
+These will be coming shortly after the release of version 1.1.
 
 <!-- ROADMAP -->
+
 ## Roadmap
 
 See the [open issues](https://github.com/NotExpectedYet/OctoFarm/issues) for a list of known issues.
 
-
 <!-- CONTRIBUTING -->
+
 ## Contributing
 
-I am currently not accepting any contribution to the code. I started this project to teach myself nodejs and Javascript better. With my current plans I will have exhausted most learning opportunities by Version 1.2 and will be happy to take pull requests from people then. Thanks for understanding. 
+I am currently not accepting any contribution to the code. I started this project to teach myself nodejs and Javascript better. With my current plans I will have exhausted most learning opportunities by Version 1.2 and will be happy to take pull requests from people then. Thanks for understanding.
 
 <!-- LICENSE -->
+
 ## License
 
 Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more information.
 
-
 <!-- CONTACT -->
+
 ## Contact
-* Email: [Email NotExpectedYet](mailto:info@notexpectedyet.com)
 
-* Project Link: [https://github.com/NotExpectedYet/OctoFarm](https://github.com/NotExpectedYet/OctoFarm)
+- Email: [Email NotExpectedYet](mailto:info@notexpectedyet.com)
 
-* Discord: [Discord](https://discord.gg/CkNDRgK)
+- Project Link: [https://github.com/NotExpectedYet/OctoFarm](https://github.com/NotExpectedYet/OctoFarm)
 
+- Discord: [Discord](https://discord.gg/CkNDRgK)
 
 <!-- ACKNOWLEDGEMENTS -->
+
 ## Acknowledgements
 
-* [Gina Häußge](https://octoprint.org/) - Without OctoPrint none of this would be possible. Massive thanks to the work of Gina and everyone who helps out with that. 
-* [Derek from 3D Printed Debris](https://www.3dprinteddebris.com/) - Massive big thanks to Derek who has donated a lot of time and money to the project. I don't think I'd have continued at the rate I did without his bug reports and support. 
-* All Patreon Supporters and random donations! - Big massive thanks for these, they keep me full of steak! 
+- [Gina Häußge](https://octoprint.org/) - Without OctoPrint none of this would be possible. Massive thanks to the work of Gina and everyone who helps out with that.
+- [Derek from 3D Printed Debris](https://www.3dprinteddebris.com/) - Massive big thanks to Derek who has donated a lot of time and money to the project. I don't think I'd have continued at the rate I did without his bug reports and support.
+- All Patreon Supporters and random donations! - Big massive thanks for these, they keep me full of steak!
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+
 [contributors-shield]: https://img.shields.io/github/contributors/othneildrew/Best-README-Template.svg?style=flat-square
 [contributors-url]: https://github.com/NotExpectedYet/OctoFarm/graphs/contributors
 [forks-shield]: https://img.shields.io/github/forks/othneildrew/Best-README-Template.svg?style=flat-square
