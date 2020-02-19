@@ -1,5 +1,8 @@
 <!-- PROJECT LOGO -->
-[![GitHub issues](https://img.shields.io/github/issues/NotExpectedYet/OctoFarm)](https://github.com/NotExpectedYet/OctoFarm/issues)
+[![GitHub issues](https://img.shields.io/github/issues/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/issues)
+[![GitHub forks](https://img.shields.io/github/forks/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/network)
+[![GitHub stars](https://img.shields.io/github/stars/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/stargazers)
+[![GitHub license](https://img.shields.io/github/license/NotExpectedYet/OctoFarm)](https://github.com/NotExpectedYet/OctoFarm/blob/master/LICENSE.txt)
 <br />
 <p align="center">
   <a href="https://github.com/NotExpectedYet/OctoFarm">
