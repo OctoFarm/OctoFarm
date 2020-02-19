@@ -49,7 +49,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-[![Product Name Screen Shot][product-screenshot]](https://example.com)
+[![Dashboard View][product-screenshot]](https://github.com/NotExpectedYet/OctoFarm/blob/master/screenshots/dashboard.png)
 
 ### Built With
 
