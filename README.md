@@ -48,8 +48,7 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-
-[![Dashboard View][product-screenshot]](https://github.com/NotExpectedYet/OctoFarm/blob/master/screenshots/dashboard.png)
+![Dashboard View](https://github.com/NotExpectedYet/OctoFarm/blob/master/screenshots/dashboard.png)
 
 ### Built With
 
