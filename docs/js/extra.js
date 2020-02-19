@@ -1,5 +1,7 @@
-$(document).on("click", ".navbar-toggleable-xs.in", function(e) {
+$(document).on("click", ".navbar-nav", function(e) {
+  console.log("clicked");
+  console.log(e.target);
   if ($(e.target).is("a")) {
-    $(this).collapse("hide");
+    $(".navbar-collapse").collapse("hide");
   }
 });
