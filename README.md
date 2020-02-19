@@ -28,7 +28,7 @@
 [![Issues][issues-shield]][issues-url]
 [![MIT License][license-shield]][license-url]
 [![LinkedIn][linkedin-shield]][linkedin-url]
-[![Feature Requests](https://feathub.com/NotExpectedYet/OctoFarm?format=svg)][https://feathub.com/NotExpectedYet/OctoFarm]
+[![Feature Requests](https://feathub.com/NotExpectedYet/OctoFarm?format=svg)](https://feathub.com/NotExpectedYet/OctoFarm)
 
 
 <!-- PROJECT LOGO -->
@@ -48,7 +48,7 @@
     <br />
     <a href="https://github.com/NotExpectedYet/OctoFarm/issues">OctoFarm Bug</a>
     ·
-    <a href="hhttps://feathub.com/NotExpectedYet/OctoFarm">Request Feature</a>
+    <a href="https://feathub.com/NotExpectedYet/OctoFarm">Request Feature</a>
   </p>
 </p>
 
@@ -176,7 +176,7 @@ Project Link: [https://github.com/NotExpectedYet/OctoFarm](https://github.com/No
 [forks-shield]: https://img.shields.io/github/forks/othneildrew/Best-README-Template.svg?style=flat-square
 [forks-url]: https://github.com/NotExpectedYet/OctoFarm/network/members
 [stars-shield]: https://img.shields.io/github/stars/othneildrew/Best-README-Template.svg?style=flat-square
-[stars-url]: https://github.com/othneildrew/Best-README-Template/stargazers
+[stars-url]: https://github.com/NotExpectedYet/OctoFarm/stargazers
 [issues-shield]: https://img.shields.io/github/issues/othneildrew/Best-README-Template.svg?style=flat-square
 [issues-url]: https://github.com/NotExpectedYet/OctoFarm/issues
 [license-shield]: https://img.shields.io/github/license/othneildrew/Best-README-Template.svg?style=flat-square
