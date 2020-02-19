@@ -1,4 +1,5 @@
 <!-- PROJECT LOGO -->
+[![GitHub issues](https://img.shields.io/github/issues/NotExpectedYet/OctoFarm)](https://github.com/NotExpectedYet/OctoFarm/issues)
 <br />
 <p align="center">
   <a href="https://github.com/NotExpectedYet/OctoFarm">
