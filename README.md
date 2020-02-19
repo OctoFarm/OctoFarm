@@ -3,13 +3,17 @@
 [![GitHub forks](https://img.shields.io/github/forks/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/network)
 [![GitHub stars](https://img.shields.io/github/stars/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/stargazers)
 [![GitHub license](https://img.shields.io/github/license/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/blob/master/LICENSE.txt)
+  <h3 align="center">WARNING THIS IS MAJOR ALPHA VERSION</h3>
+  <p>Please visit <a href="https://git.notexpectedyet.com/NotExpectedYet/OctoFarm">NotExpectedYet Git</a> for earlier working versions.
 <br />
 <p align="center">
   <a href="https://github.com/NotExpectedYet/OctoFarm">
     <img src="views/images/logo.png" alt="Logo" width="60%">
   </a>
 
-  <h3 align="center">OctoFarm (MAJOR ALPHA VERSION NOT READY FOR RELEASE YET)</h3>
+  <h3 align="center">OctoFarm</h3>
+
+
 
   <p align="center">
     OctoFarm is an easy to setup and install web server and client for unifying multiple instances of Octoprint. You can manage and monitor as many instances as you want from a single interface giving you full control over your 3D printer farm.
