@@ -38,19 +38,17 @@
     <img src="images/logo.png" alt="Logo" width="80" height="80">
   </a>
 
-  <h3 align="center">YOUR_TITLE</h3>
+  <h3 align="center">OctoFarm</h3>
 
   <p align="center">
-    YOUR_SHORT_DESCRIPTION
+    OctoFarm is an easy to setup and install web server and client for unifying multiple instances of Octoprint. You can manage and monitor as many instances as you want from a single interface giving you full control over your 3D printer farm.
     <br />
-    <a href="https://github.com/NotExpectedYet/OctoFarm"><strong>Explore the docs »</strong></a>
+    <a href="https://github.com/NotExpectedYet/OctoFarm/wiki"><strong>Explore the docs »</strong></a>
     <br />
     <br />
-    <a href="https://github.com/NotExpectedYet/OctoFarm">View Demo</a>
+    <a href="https://github.com/NotExpectedYet/OctoFarm/issues">OctoFarm Bug</a>
     ·
-    <a href="https://github.com/NotExpectedYet/OctoFarm/issues">OctoFarmrt Bug</a>
-    ·
-    <a href="https://github.com/NotExpectedYet/OctoFarm/issues">Request Feature</a>
+    <a href="hhttps://feathub.com/NotExpectedYet/OctoFarm">Request Feature</a>
   </p>
 </p>
 
