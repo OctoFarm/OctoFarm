@@ -33,11 +33,9 @@
 ## Table of Contents
 
 * [About the Project](#about-the-project)
-  * [Built With](#built-with)
 * [Getting Started](#getting-started)
   * [Prerequisites](#prerequisites)
   * [Installation](#installation)
-* [Usage](#usage)
 * [Roadmap](#roadmap)
 * [Contributing](#contributing)
 * [License](#license)
@@ -48,15 +46,8 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
+OctoFarm was built to fill a need that anyone with multiple 3D printers with Octoprint will have run into. How do I manage multiple printers from one place? That's where OctoFarm steps in, add your octoprint instances to the system and it will scan and keep you up to date on the status of your printer. 
 ![Dashboard View](https://github.com/NotExpectedYet/OctoFarm/blob/master/screenshots/dashboard.png)
-
-### Built With
-
-* []()
-* []()
-* []()
-
-
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -65,11 +56,11 @@ To get a local copy up and running follow these simple steps.
 
 ### Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-```sh
-npm install npm@latest -g
-```
+* [MongoDB](https://www.mongodb.com/)
+* [NodeJS](https://nodejs.org/)
+* [NPM](https://www.npmjs.com/)
+
+
 
 ### Installation
  
@@ -81,37 +72,27 @@ git clone https://github.com/NotExpectedYet/OctoFarm.git
 ```sh
 npm install
 ```
-
-
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
-
+3. Edit the db.js file with your database. 
+```sh
+//Example Local URL: "mongodb://192.168.1.5:27017/octofarm"
+//Example Remote URL: "mongodb+srv://s1mpleman:<YOUR PASSWORD>@cluster0-lgugu.mongodb.net/test?retryWrites=true&w=majority"
+```
+4. Start the system
+```sh
+npm start
+```
 
 
 <!-- ROADMAP -->
 ## Roadmap
 
-See the [open issues](https://github.com/NotExpectedYet/OctoFarm/issues) for a list of proposed features (and known issues).
-
+See the [open issues](https://github.com/NotExpectedYet/OctoFarm/issues) for a list of known issues.
 
 
 <!-- CONTRIBUTING -->
 ## Contributing
 
-Contributions are what make the open source community such an amazing place to be learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-
+I am currently not accepting any contribution to the code. I started this project to teach myself nodejs and Javascript better. With my current plans I will have exhausted most learning opportunities by Version 1.2 and will be happy to take pull requests from people then. Thanks for understanding. 
 
 <!-- LICENSE -->
 ## License
@@ -119,24 +100,21 @@ Contributions are what make the open source community such an amazing place to b
 Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more information.
 
 
-
 <!-- CONTACT -->
 ## Contact
-Email: [Email NotExpectedYet](mailto:info@notexpectedyet.com)
-Project Link: [https://github.com/NotExpectedYet/OctoFarm](https://github.com/NotExpectedYet/OctoFarm)
+* Email: [Email NotExpectedYet](mailto:info@notexpectedyet.com)
 
+* Project Link: [https://github.com/NotExpectedYet/OctoFarm](https://github.com/NotExpectedYet/OctoFarm)
+
+* Discord: [Discord](https://discord.gg/CkNDRgK)
 
 
 <!-- ACKNOWLEDGEMENTS -->
 ## Acknowledgements
 
-* []()
-* []()
-* []()
-
-
-
-
+* [Gina Häußge](https://octoprint.org/) - Without OctoPrint none of this would be possible. Massive thanks to the work of Gina and everyone who helps out with that. 
+* [Derek from 3D Printed Debris](https://www.3dprinteddebris.com/) - Massive big thanks to Derek who has donated a lot of time and money to the project. I don't think I'd have continued at the rate I did without his bug reports and support. 
+* All Patreon Supporters and random donations! - Big massive thanks for these, they keep me full of steak! 
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
