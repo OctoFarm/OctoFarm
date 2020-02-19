@@ -46,7 +46,7 @@
 
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-OctoFarm was built to fill a need that anyone with multiple 3D printers with Octoprint will have run into. How do I manage multiple printers from one place? That's where OctoFarm steps in, add your octoprint instances to the system and it will scan and keep you up to date on the status of your printer. 
+OctoFarm was built to fill a need that anyone with multiple 3D printers with Octoprint will have run into. How do I manage multiple printers from one place? That's where OctoFarm steps in, add your OctoPrint instances to the system and it will scan and keep you up to date on the status of your printers. 
 ![Dashboard View](https://github.com/NotExpectedYet/OctoFarm/blob/master/screenshots/dashboard.png)
 
 <!-- GETTING STARTED -->
@@ -61,8 +61,7 @@ To get a local copy up and running follow these simple steps.
 * [NPM](https://www.npmjs.com/)
 
 
-
-### Installation
+### Installation Development
  
 1. Clone the OctoFarm
 ```sh
@@ -74,6 +73,33 @@ npm install
 ```
 3. Edit the db.js file with your database. 
 ```sh
+module.exports = {
+  MongoURI: "mongodb://192.168.1.5:27017/octofarm"
+};
+//Example Local URL: "mongodb://192.168.1.5:27017/octofarm"
+//Example Remote URL: "mongodb+srv://s1mpleman:<YOUR PASSWORD>@cluster0-lgugu.mongodb.net/test?retryWrites=true&w=majority"
+```
+4. Start the system
+```sh
+npm run dev
+```
+* The developer version uses nodemon for live server reloading on changes. 
+
+### Installation Production
+ 
+1. Clone the OctoFarm
+```sh
+git clone https://github.com/NotExpectedYet/OctoFarm.git
+```
+2. Install NPM packages
+```sh
+npm install
+```
+3. Edit the db.js file with your database. 
+```sh
+module.exports = {
+  MongoURI: "mongodb://192.168.1.5:27017/octofarm"
+};
 //Example Local URL: "mongodb://192.168.1.5:27017/octofarm"
 //Example Remote URL: "mongodb+srv://s1mpleman:<YOUR PASSWORD>@cluster0-lgugu.mongodb.net/test?retryWrites=true&w=majority"
 ```
@@ -81,6 +107,7 @@ npm install
 ```sh
 npm start
 ```
+
 
 
 <!-- ROADMAP -->
