@@ -2,7 +2,7 @@
 <br />
 <p align="center">
   <a href="https://github.com/NotExpectedYet/OctoFarm">
-    <img src="views/images/logo.png" alt="Logo" width="80" height="80">
+    <img src="views/images/logo.png" alt="Logo" width="60%">
   </a>
 
   <h3 align="center">OctoFarm</h3>
