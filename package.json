@@ -28,7 +28,6 @@
     "express": "^4.17.1",
     "express-ejs-layouts": "^2.5.0",
     "express-session": "^1.17.0",
-    "file-on-write": "^1.1.1",
     "jquery": "^3.4.1",
     "lodash": "^4.17.15",
     "mongoose": "^5.8.3",
