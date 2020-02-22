@@ -547,6 +547,16 @@ export default class PrinterManager {
     elements.jobStatus.fileSearch.addEventListener("keyup", e => {
       PrinterManager.search(printer, elements);
     });
+    //Octoprint listeners, restart...
+    elements.connectPage.restartButton.addEventListener("click", e => {
+      OctoPrintClient.system(printer, "restart");
+    });
+    elements.connectPage.rebootButton.addEventListener("click", e => {
+      OctoPrintClient.system(printer, "reboot");
+    });
+    elements.connectPage.shutdownButton.addEventListener("click", e => {
+      OctoPrintClient.system(printer, "shutdown");
+    });
     //Control Listeners... There's a lot!
     elements.printerControls.xPlus.addEventListener("click", e => {});
     elements.printerControls.xMinus.addEventListener("click", e => {});

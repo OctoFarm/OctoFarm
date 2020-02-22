@@ -195,7 +195,11 @@ class Runner {
       Runner.setOffline(client);
     });
     onlineRunners[client.index].ws.on("close", async function incoming(data) {
-      console.log("Online Printer: " + client.index + " stopped");
+      Runner.setOffline(client);
+      //Make connection attempt...
+      //Increment how many attempts
+
+      //If over 5 attempts made and failed then class the device offline
     });
   }
   static async setOffline(client) {
@@ -217,6 +221,16 @@ class Runner {
             Runner.setOnline(clientNew);
           }
         }, Polling[0].offlinePolling.seconds);
+      }
+    } else {
+      let clientNew = await ClientSocket.connect(
+        farmPrinters[client.index].index,
+        farmPrinters[client.index].ip,
+        farmPrinters[client.index].port,
+        farmPrinters[client.index].apikey
+      );
+      if (typeof clientNew.error === "undefined") {
+        Runner.setOnline(clientNew);
       }
     }
   }

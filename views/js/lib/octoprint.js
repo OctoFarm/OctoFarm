@@ -22,6 +22,44 @@ export default class OctoPrintClient {
       }
     });
   }
+  static async system(printer, action) {
+    let url = "system/commands/core/" + action;
+    bootbox.confirm({
+      message:
+        "This is a confirm with custom button text and color! Do you like it?",
+      buttons: {
+        cancel: {
+          label: '<i class="fa fa-times"></i> Cancel'
+        },
+        confirm: {
+          label: '<i class="fa fa-check"></i> Confirm'
+        }
+      },
+      callback: async function(result) {
+        if (result) {
+          let post = await OctoPrintClient.post(printer, url);
+          if (post.status === 204) {
+            UI.createAlert(
+              "success",
+              `${printer.index}: ${action} was successful`,
+              3000,
+              "clicked"
+            );
+          } else {
+            UI.createAlert(
+              "danger",
+              `${printer.index}: ${action} was unsuccessful. Please make sure printer is connected and commands are setup in Settings -> Server.`,
+              3000,
+              "clicked"
+            );
+          }
+        }
+      }
+    });
+
+    console.log(printer.ip, printer.port, action);
+  }
+  static move(printer) {}
   static async file(printer, fullPath, action, file) {
     let url = "files/local/" + fullPath;
     let post = null;
