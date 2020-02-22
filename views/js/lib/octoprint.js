@@ -47,7 +47,7 @@ export default class OctoPrintClient {
             );
           } else {
             UI.createAlert(
-              "danger",
+              "error",
               `${printer.index}: ${action} was unsuccessful. Please make sure printer is connected and commands are setup in Settings -> Server.`,
               3000,
               "clicked"
@@ -91,7 +91,7 @@ export default class OctoPrintClient {
         UI.createAlert("success", `${action} actioned`, 3000, "clicked");
       }
     } else {
-      UI.createAlert("danger", `${action} failed`, 3000, "clicked");
+      UI.createAlert("error", `${action} failed`, 3000, "clicked");
     }
   }
   static async connect(command, printer) {
@@ -118,7 +118,7 @@ export default class OctoPrintClient {
       );
     } else {
       UI.createAlert(
-        "danger",
+        "error",
         `Printer: ${printer.index} could not ${opts.command}.`,
         3000,
         "click"
