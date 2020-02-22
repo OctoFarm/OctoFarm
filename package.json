@@ -22,7 +22,6 @@
   "license": "ISC",
   "dependencies": {
     "agenda": "^2.3.0",
-    "agendash": "^1.0.0",
     "bcryptjs": "^2.4.3",
     "connect-flash": "^0.1.1",
     "ejs": "^3.0.1",
