@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js",
-    "dev": "nodemon --ignore './views/js' app.js"
+    "dev": "nodemon app.js"
   },
   "repository": {
     "type": "git",
@@ -40,5 +40,11 @@
   "devDependencies": {
     "debug": "^4.1.1",
     "nodemon": "^2.0.2"
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "views/js/*"
+    ],
+    "delay": "2500"
   }
 }

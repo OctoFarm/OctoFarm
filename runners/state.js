@@ -515,8 +515,11 @@ class Runner {
       return false;
     }
   }
-  static resetFeedRate() {
-    //prep for feedrate
+  static flowRate(i, newRate) {
+    farmPrinters[i].flowRate = newRate;
+  }
+  static feedRate(i, newRate) {
+    farmPrinters[i].feedRate = newRate;
   }
   static stepRate(i, newRate) {
     farmPrinters[i].stepRate = newRate;

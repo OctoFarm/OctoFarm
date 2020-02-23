@@ -346,8 +346,8 @@ export default class PrinterManager {
             </div>
             <div class="row">
                 <div class="col-8">
-                    <label for="pcFeed">Feed Rate: <span id="pcFeedValue"></span>%</label>
-                    <input type="range" class="custom-range" min="50" max="150" step="1" id="pcFeed" value="">
+                    <label for="pcFeed">Feed Rate: <span id="pcFeedValue">${printer.feedRate}%</span></label>
+                    <input type="range" class="octoRange custom-range" min="50" max="150" step="1" id="pcFeed" value="${printer.feedRate}">
                 </div>
                 <div class="col-4">
                     <button id="pcFeedRate" type="button" class="btn btn-light">Update</button>
@@ -355,8 +355,8 @@ export default class PrinterManager {
             </div>
             <div class="row">
                 <div class="col-8">
-                    <label for="pcFlow">Flow Rate: <span id="pcFlowValue"></span>%</label>
-                    <input type="range" class="custom-range" min="75" max="125" step="1" id="pcFlow" value="">
+                    <label for="pcFlow">Flow Rate: <span id="pcFlowValue">${printer.flowRate}%</span></label>
+                    <input type="range" class="octoRange custom-range" min="75" max="125" step="1" id="pcFlow" value="${printer.flowRate}">
                 </div>
                 <div class="col-4">
                     <button id="pcFlowRate" type="button" class="btn btn-light">Update</button>
@@ -379,9 +379,9 @@ export default class PrinterManager {
             </div>
             <div class="row">
                 <div class="col-12">
-                <label for="pcFlow">Fan Percent: <span id="pcFanPercent"></span>%</label>
-                <input type="range" class="custom-range" min="0" max="100" step="1" id="pcFanPercent" value="">
-                    <center><button id="pcFanOff" class="btn btn-light" type="submit">Fans On</button> <button id="pcFanOn" class="btn btn-light" type="submit">Fans Off</button></center>
+                <label for="pcFlow">Fan Percent: <span id="pcFanPercent">100%</span></label>
+                <input type="range" class="octoRange custom-range" min="0" max="100" step="1" id="pcFanPercent" value="100">
+                    <center><button id="pcFanOn" class="btn btn-light" type="submit">Fans On</button> <button id="pcFanOff" class="btn btn-light" type="submit">Fans Off</button></center>
                 </div>
             </div>
         </div>
@@ -522,6 +522,12 @@ export default class PrinterManager {
     PrinterManager.applyState(printer, job, progress);
   }
   static applyListeners(printer, elements) {
+    let rangeSliders = document.querySelectorAll("input.octoRange");
+    rangeSliders.forEach(slider => {
+      slider.addEventListener("input", e => {
+        e.target.previousSibling.previousSibling.lastChild.innerHTML = `${e.target.value}%`;
+      });
+    });
     if (printer.state != "Closed") {
       elements.connectPage.connectButton.addEventListener("click", e => {
         elements.connectPage.connectButton.disabled = true;
@@ -624,21 +630,250 @@ export default class PrinterManager {
       elements.printerControls.step10.className = "btn btn-light";
       elements.printerControls.step01.className = "btn btn-light";
     });
-    elements.printerControls.e0Neg.addEventListener("click", e => {});
-    elements.printerControls.e0Pos.addEventListener("click", e => {});
-    elements.printerControls.bedNeg.addEventListener("click", e => {});
-    elements.printerControls.begPos.addEventListener("click", e => {});
-    elements.printerControls.e0Set.addEventListener("click", e => {});
-    elements.printerControls.bedSet.addEventListener("click", e => {});
-    elements.printerControls.feedRate.addEventListener("click", e => {});
-    elements.printerControls.flowRate.addEventListener("click", e => {});
-    elements.printerControls.motorsOff.addEventListener("click", e => {});
-    elements.printerControls.fansOn.addEventListener("click", e => {});
-    elements.printerControls.fansOff.addEventListener("click", e => {});
-    elements.printerControls.extrude.addEventListener("click", e => {});
-    elements.printerControls.retract.addEventListener("click", e => {});
-    elements.printerControls.progress.addEventListener("click", e => {});
+    elements.printerControls.e0Neg.addEventListener("click", e => {
+      PrinterManager.incrementTemp(e, "-");
+    });
+    elements.printerControls.e0Pos.addEventListener("click", e => {
+      PrinterManager.incrementTemp(e, "+");
+    });
+    elements.printerControls.bedNeg.addEventListener("click", e => {
+      PrinterManager.incrementTemp(e, "-");
+    });
+    elements.printerControls.begPos.addEventListener("click", e => {
+      PrinterManager.incrementTemp(e, "+");
+    });
+    elements.printerControls.e0Set.addEventListener("click", async e => {
+      let flashReturn = function() {
+        e.target.classList = "btn btn-md btn-light m-0 px-3";
+      };
+      let value = e.target.parentNode.previousSibling.previousSibling.value;
+      if (value === "Off") {
+        value = 0;
+      }
+      let opt = {
+        command: "target",
+        targets: {
+          tool0: parseInt(value)
+        }
+      };
+      let post = await OctoPrintClient.post(printer, "printer/tool", opt);
+      if (post.status === 204) {
+        e.target.classList = "btn btn-md btn-success m-0 px-3";
+        setTimeout(flashReturn, 500);
+      } else {
+        e.target.classList = "btn btn-md btn-success m-0 px-3";
+        setTimeout(flashReturn, 500);
+      }
+    });
+    elements.printerControls.bedSet.addEventListener("click", async e => {
+      let flashReturn = function() {
+        e.target.classList = "btn btn-md btn-light m-0 px-3";
+      };
+      let value = e.target.parentNode.previousSibling.previousSibling.value;
+      if (value === "Off") {
+        value = 0;
+      }
+      let opt = {
+        command: "target",
+        targets: {
+          tool0: parseInt(value)
+        }
+      };
+      let post = await OctoPrintClient.post(printer, "printer/tool", opt);
+      if (post.status === 204) {
+        e.target.classList = "btn btn-md btn-success m-0 px-3";
+        setTimeout(flashReturn, 500);
+      } else {
+        e.target.classList = "btn btn-md btn-success m-0 px-3";
+        setTimeout(flashReturn, 500);
+      }
+    });
+    elements.printerControls.feedRate.addEventListener("click", async e => {
+      let flashReturn = function() {
+        e.target.classList = "btn btn-light";
+      };
+      let value = elements.printerControls.feedRateValue.innerHTML;
+      value = value.replace("%", "");
+      OctoFarmClient.post("printers/feedChange", {
+        printer: printer.index,
+        newSteps: value
+      });
+      let opt = {
+        command: "feedrate",
+        factor: parseInt(value)
+      };
+      let post = await OctoPrintClient.post(printer, "printer/printhead", opt);
+      if (post.status === 204) {
+        e.target.classList = "btn btn-success";
+        setTimeout(flashReturn, 500);
+      } else {
+        e.target.classList = "btn btn-danger";
+        setTimeout(flashReturn, 500);
+      }
+    });
+    elements.printerControls.flowRate.addEventListener("click", async e => {
+      let flashReturn = function() {
+        e.target.classList = "btn btn-light";
+      };
+      let value = elements.printerControls.feedRateValue.innerHTML;
+      value = value.replace("%", "");
+      OctoFarmClient.post("printers/flowChange", {
+        printer: printer.index,
+        newSteps: value
+      });
+      let opt = {
+        command: "flowrate",
+        factor: parseInt(value)
+      };
+      let post = await OctoPrintClient.post(printer, "printer/tool", opt);
+      if (post.status === 204) {
+        e.target.classList = "btn btn-success";
+        setTimeout(flashReturn, 500);
+      } else {
+        e.target.classList = "btn btn-danger";
+        setTimeout(flashReturn, 500);
+      }
+    });
+    elements.printerControls.motorsOff.addEventListener("click", async e => {
+      let flashReturn = function() {
+        e.target.classList = "btn btn-light";
+      };
+      let opt = {
+        commands: ["M18"]
+      };
+      let post = await OctoPrintClient.post(printer, "printer/command", opt);
+      if (post.status === 204) {
+        e.target.classList = "btn btn-success";
+        setTimeout(flashReturn, 500);
+      } else {
+        e.target.classList = "btn btn-danger";
+        setTimeout(flashReturn, 500);
+      }
+    });
+    elements.printerControls.fansOn.addEventListener("click", async e => {
+      let fanspeed = elements.printerControls.fanPercent.innerHTML;
+      fanspeed = fanspeed.replace("%", "");
+      fanspeed = fanspeed / 100;
+      fanspeed = 255 * fanspeed;
+      fanspeed = Math.floor(fanspeed);
+
+      let flashReturn = function() {
+        e.target.classList = "btn btn-light";
+      };
+      let opt = {
+        commands: [`M106 S${fanspeed}`]
+      };
+      let post = await OctoPrintClient.post(printer, "printer/command", opt);
+      if (post.status === 204) {
+        e.target.classList = "btn btn-success";
+        setTimeout(flashReturn, 500);
+      } else {
+        e.target.classList = "btn btn-danger";
+        setTimeout(flashReturn, 500);
+      }
+    });
+    elements.printerControls.fansOff.addEventListener("click", async e => {
+      let flashReturn = function() {
+        e.target.classList = "btn btn-light";
+      };
+      let opt = {
+        commands: ["M107"]
+      };
+      let post = await OctoPrintClient.post(printer, "printer/command", opt);
+      if (post.status === 204) {
+        e.target.classList = "btn btn-success";
+        setTimeout(flashReturn, 500);
+      } else {
+        e.target.classList = "btn btn-danger";
+        setTimeout(flashReturn, 500);
+      }
+    });
+    elements.printerControls.extrude.addEventListener("click", async e => {
+      let flashReturn = function() {
+        e.target.classList = "btn btn-light";
+      };
+      if (
+        elements.printerControls.extruder.value != undefined &&
+        elements.printerControls.extruder.value !== ""
+      ) {
+        let select = OctoPrintClient.selectTool(printer, "tool0");
+        if (select) {
+          let value = elements.printerControls.extruder.value;
+          let opt = {
+            command: "extrude",
+            amount: parseInt(value)
+          };
+          let post = await OctoPrintClient.post(
+            printer,
+            "printer/command",
+            opt
+          );
+          if (post.status === 204) {
+            e.target.classList = "btn btn-success";
+            setTimeout(flashReturn, 500);
+          } else {
+            e.target.classList = "btn btn-danger";
+            setTimeout(flashReturn, 500);
+          }
+        }
+      } else {
+        UI.createAlert(
+          "error",
+          "You haven't told octoprint how much you'd like to extrude...",
+          3000,
+          "clicked"
+        );
+      }
+    });
+    elements.printerControls.retract.addEventListener("click", async e => {
+      let flashReturn = function() {
+        e.target.classList = "btn btn-light";
+      };
+      if (
+        elements.printerControls.extruder.value != undefined &&
+        elements.printerControls.extruder.value !== ""
+      ) {
+        let select = OctoPrintClient.selectTool(printer, "tool0");
+        if (select) {
+          let value = elements.printerControls.extruder.value;
+          let opt = {
+            command: "extrude",
+            amount: parseInt(value)
+          };
+          let post = await OctoPrintClient.post(
+            printer,
+            "printer/command",
+            opt
+          );
+          if (post.status === 204) {
+            e.target.classList = "btn btn-success";
+            setTimeout(flashReturn, 500);
+          } else {
+            e.target.classList = "btn btn-danger";
+            setTimeout(flashReturn, 500);
+          }
+        }
+      } else {
+        UI.createAlert(
+          "error",
+          "You haven't told octoprint how much you'd like to retract...",
+          3000,
+          "clicked"
+        );
+      }
+    });
     elements.printerControls.printStart.addEventListener("click", e => {
+      //Make sure feed/flow are set before starting print...
+      let flow = {
+        command: "flowrate",
+        factor: parseInt(printer.flowRate)
+      };
+      OctoPrintClient.post(printer, "printer/tool", flow);
+      let feed = {
+        command: "feedrate",
+        factor: parseInt(printer.feedRate)
+      };
+      OctoPrintClient.post(printer, "printer/printhead", feed);
       e.target.disabled = true;
       let opts = {
         command: "start"
@@ -838,9 +1073,13 @@ export default class PrinterManager {
         bedSet: document.getElementById("pcBedset"),
         feedRate: document.getElementById("pcFeedRate"),
         flowRate: document.getElementById("pcFlowRate"),
+        feedRateValue: document.getElementById("pcFeedValue"),
+        flowRateValue: document.getElementById("pcFlowValue"),
         motorsOff: document.getElementById("pcMotorTog"),
+        fanPercent: document.getElementById("pcFanPercent"),
         fansOn: document.getElementById("pcFanOn"),
         fansOff: document.getElementById("pcFanOff"),
+        extruder: document.getElementById("pcExtruder"),
         extrude: document.getElementById("pcExtrude"),
         retract: document.getElementById("pcRetract"),
         progress: document.getElementById("pcAxisSteps100"),
@@ -1081,5 +1320,27 @@ export default class PrinterManager {
   }
   static async updateIndex(newIndex) {
     currentIndex = newIndex;
+  }
+  static incrementTemp(e, dir) {
+    if (dir === "-") {
+      let current = e.target.parentNode.nextSibling.nextSibling;
+      if (current.value === "" || current.value === "Off") {
+        current.value = 0;
+      }
+      if (current.value < 1) {
+        current.value = "Off";
+      }
+      if (current.value >= -1) {
+        current.value = parseInt(current.value) - 1;
+      }
+    } else if (dir === "+") {
+      let current = e.target.parentNode.previousSibling.previousSibling;
+      if (current.value === "" || current.value === "Off") {
+        current.value = 0;
+      }
+      if (current.value >= -1) {
+        current.value = parseInt(current.value) + 1;
+      }
+    }
   }
 }

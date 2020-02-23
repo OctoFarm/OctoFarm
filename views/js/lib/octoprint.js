@@ -23,6 +23,18 @@ export default class OctoPrintClient {
       }
     });
   }
+  static async selectTool(printer, tool) {
+    let opt = {
+      command: "select",
+      tool: tool
+    };
+    let post = await OctoPrintClient.post(printer, "printer/tool", opt);
+    if (post.status === 204) {
+      return true;
+    } else {
+      return false;
+    }
+  }
   static async system(printer, action) {
     let url = "system/commands/core/" + action;
     bootbox.confirm({

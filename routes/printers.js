@@ -35,6 +35,18 @@ router.post("/stepChange", ensureAuthenticated, async (req, res) => {
   Runner.stepRate(step.printer, step.newSteps);
   res.send("success");
 });
+router.post("/flowChange", ensureAuthenticated, async (req, res) => {
+  //Check required fields
+  const step = req.body;
+  Runner.flowRate(step.printer, step.newSteps);
+  res.send("success");
+});
+router.post("/feedChange", ensureAuthenticated, async (req, res) => {
+  //Check required fields
+  const step = req.body;
+  Runner.feedRate(step.printer, step.newSteps);
+  res.send("success");
+});
 //Register Handle for Saving printers
 router.post("/save", ensureAuthenticated, async (req, res) => {
   //Check required fields
