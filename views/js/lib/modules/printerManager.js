@@ -1,5 +1,7 @@
 import OctoPrintClient from "../octoprint.js";
+import OctoFarmClient from "../octofarm.js";
 import Calc from "../functions/calc.js";
+import UI from "../functions/ui.js";
 let currentIndex = 0;
 
 export default class PrinterManager {
@@ -171,11 +173,11 @@ export default class PrinterManager {
             <div class="row">
                 <div class="col-12">
                     <center>
-                        <div class="btn-group" role="group">
-                            <button id="pcAxisSteps01" type="button" class="btn btn-light">0.1</button>
-                            <button id="pcAxisSteps1" type="button" class="btn btn-light">1</button>
-                            <button id="pcAxisSteps10" type="button" class="btn btn-light active">10</button>
-                            <button id="pcAxisSteps100" type="button" class="btn btn-light">100</button>
+                        <div id="pcAxisSteps" class="btn-group" role="group">
+                            <button id="pcAxisSteps01" type="button" class="btn btn-light" value="01">0.1</button>
+                            <button id="pcAxisSteps1" type="button" class="btn btn-light" value="1">1</button>
+                            <button id="pcAxisSteps10" type="button" class="btn btn-light" value="10">10</button>
+                            <button id="pcAxisSteps100" type="button" class="btn btn-light" value="100">100</button>
                         </div>
                     </center>
                 </div>
@@ -558,18 +560,70 @@ export default class PrinterManager {
       OctoPrintClient.system(printer, "shutdown");
     });
     //Control Listeners... There's a lot!
-    elements.printerControls.xPlus.addEventListener("click", e => {});
-    elements.printerControls.xMinus.addEventListener("click", e => {});
-    elements.printerControls.yPlus.addEventListener("click", e => {});
-    elements.printerControls.yMinus.addEventListener("click", e => {});
-    elements.printerControls.xyHome.addEventListener("click", e => {});
-    elements.printerControls.zPlus.addEventListener("click", e => {});
-    elements.printerControls.zMinus.addEventListener("click", e => {});
-    elements.printerControls.zHome.addEventListener("click", e => {});
-    elements.printerControls.step01.addEventListener("click", e => {});
-    elements.printerControls.step1.addEventListener("click", e => {});
-    elements.printerControls.step10.addEventListener("click", e => {});
-    elements.printerControls.step100.addEventListener("click", e => {});
+    elements.printerControls.xPlus.addEventListener("click", e => {
+      OctoPrintClient.move(e, printer, "jog", "x");
+    });
+    elements.printerControls.xMinus.addEventListener("click", e => {
+      OctoPrintClient.move(e, printer, "jog", "x", "-");
+    });
+    elements.printerControls.yPlus.addEventListener("click", e => {
+      OctoPrintClient.move(e, printer, "jog", "y");
+    });
+    elements.printerControls.yMinus.addEventListener("click", e => {
+      OctoPrintClient.move(e, printer, "jog", "y", "-");
+    });
+    elements.printerControls.xyHome.addEventListener("click", e => {
+      OctoPrintClient.move(e, printer, "home", ["x", "y"]);
+    });
+    elements.printerControls.zPlus.addEventListener("click", e => {
+      OctoPrintClient.move(e, printer, "jog", "z");
+    });
+    elements.printerControls.zMinus.addEventListener("click", e => {
+      OctoPrintClient.move(e, printer, "jog", "z", "-");
+    });
+    elements.printerControls.zHome.addEventListener("click", e => {
+      OctoPrintClient.move(e, printer, "home", ["z"]);
+    });
+    elements.printerControls.step01.addEventListener("click", e => {
+      OctoFarmClient.post("printers/stepChange", {
+        printer: printer.index,
+        newSteps: "01"
+      });
+      e.target.className = "btn btn-dark active";
+      elements.printerControls.step1.className = "btn btn-light";
+      elements.printerControls.step10.className = "btn btn-light";
+      elements.printerControls.step100.className = "btn btn-light";
+    });
+    elements.printerControls.step1.addEventListener("click", e => {
+      OctoFarmClient.post("printers/stepChange", {
+        printer: printer.index,
+        newSteps: "1"
+      });
+      e.target.className = "btn btn-dark active";
+      elements.printerControls.step01.className = "btn btn-light";
+      elements.printerControls.step10.className = "btn btn-light";
+      elements.printerControls.step100.className = "btn btn-light";
+    });
+    elements.printerControls.step10.addEventListener("click", e => {
+      OctoFarmClient.post("printers/stepChange", {
+        printer: printer.index,
+        newSteps: "10"
+      });
+      e.target.className = "btn btn-dark active";
+      elements.printerControls.step1.className = "btn btn-light";
+      elements.printerControls.step01.className = "btn btn-light";
+      elements.printerControls.step100.className = "btn btn-light";
+    });
+    elements.printerControls.step100.addEventListener("click", e => {
+      OctoFarmClient.post("printers/stepChange", {
+        printer: printer.index,
+        newSteps: "100"
+      });
+      e.target.className = "btn btn-dark active";
+      elements.printerControls.step1.className = "btn btn-light";
+      elements.printerControls.step10.className = "btn btn-light";
+      elements.printerControls.step01.className = "btn btn-light";
+    });
     elements.printerControls.e0Neg.addEventListener("click", e => {});
     elements.printerControls.e0Pos.addEventListener("click", e => {});
     elements.printerControls.bedNeg.addEventListener("click", e => {});
@@ -584,11 +638,43 @@ export default class PrinterManager {
     elements.printerControls.extrude.addEventListener("click", e => {});
     elements.printerControls.retract.addEventListener("click", e => {});
     elements.printerControls.progress.addEventListener("click", e => {});
-    elements.printerControls.printStart.addEventListener("click", e => {});
-    elements.printerControls.printPause.addEventListener("click", e => {});
-    elements.printerControls.printRestart.addEventListener("click", e => {});
-    elements.printerControls.printResume.addEventListener("click", e => {});
-    elements.printerControls.printStop.addEventListener("click", e => {});
+    elements.printerControls.printStart.addEventListener("click", e => {
+      e.target.disabled = true;
+      let opts = {
+        command: "start"
+      };
+      OctoPrintClient.jobAction(printer, opts, e);
+    });
+    elements.printerControls.printPause.addEventListener("click", e => {
+      e.target.disabled = true;
+      let opts = {
+        command: "pause",
+        action: "pause"
+      };
+      OctoPrintClient.jobAction(printer, opts, e);
+    });
+    elements.printerControls.printRestart.addEventListener("click", e => {
+      e.target.disabled = true;
+      let opts = {
+        command: "restart"
+      };
+      OctoPrintClient.jobAction(printer, opts, e);
+    });
+    elements.printerControls.printResume.addEventListener("click", e => {
+      e.target.disabled = true;
+      let opts = {
+        command: "pause",
+        action: "resume"
+      };
+      OctoPrintClient.jobAction(printer, opts, e);
+    });
+    elements.printerControls.printStop.addEventListener("click", e => {
+      e.target.disabled = true;
+      let opts = {
+        command: "cancel"
+      };
+      OctoPrintClient.jobAction(printer, opts, e);
+    });
   }
   static changeFolder(printer, fileManagerFileList, fileManagerFolderSelect) {
     fileManagerFileList.innerHTML = "";
@@ -614,9 +700,11 @@ export default class PrinterManager {
           file.time
         )}</small>
       </div>
-          <small class="float-right"><button id="load-${
+          <small class="float-right"><button id="refresh-${
             file.name
-          }" role="button" class="btn btn-primary btn-sm"><i class="fas fa-file-upload"></i></button>&nbsp;<button id="select-${
+          }" role="button" class="btn btn-dark btn-sm"><i class="fas fa-sync"></i></button>&nbsp;<button id="load-${
+        file.name
+      }" role="button" class="btn btn-primary btn-sm"><i class="fas fa-file-upload"></i></button>&nbsp;<button id="select-${
         file.name
       }" role="button" class="btn btn-success btn-sm"><i class="fas fa-print"></i></button>&nbsp;<button id="delete-${
         file.name
@@ -635,6 +723,26 @@ export default class PrinterManager {
     });
     document.getElementById("delete-" + file).addEventListener("click", e => {
       OctoPrintClient.file(printer, fullPath, "delete", file);
+    });
+    let refreshBtn = document.getElementById("refresh-" + file);
+    refreshBtn.addEventListener("click", async e => {
+      refreshBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i>';
+      let done = await OctoFarmClient.post("printers/resyncFile", {
+        i: printer.index,
+        fullPath: fullPath
+      });
+      let how = await done.json();
+      refreshBtn.innerHTML = '<i class="fas fa-sync"></i>';
+      let flashReturn = function() {
+        e.target.classList = "btn btn-dark btn-sm";
+      };
+      if (how) {
+        e.target.classList = "btn btn-sm btn-success";
+        setTimeout(flashReturn, 500);
+      } else {
+        e.target.classList = "btn btn-sm btn-danger";
+        setTimeout(flashReturn, 500);
+      }
     });
   }
   static search(printer, elements) {
@@ -751,7 +859,8 @@ export default class PrinterManager {
       "Octoprint Manager: " + printer.settingsAppearance.name;
     elements.mainPage.status.innerHTML = printer.state;
     elements.mainPage.status.className = `btn btn-${printer.stateColour.name} mb-2`;
-
+    elements.printerControls["step" + printer.stepRate].className =
+      "btn btn-dark active";
     elements.jobStatus.progressBar.innerHTML =
       Math.round(progress.completion) + "%";
     elements.jobStatus.progressBar.style.width = progress.completion + "%";
@@ -818,6 +927,7 @@ export default class PrinterManager {
       printer.stateColour.category === "Idle" ||
       printer.stateColour.category === "Complete"
     ) {
+      PrinterManager.controls(false);
       elements.connectPage.connectButton.value = "disconnect";
       elements.connectPage.connectButton.innerHTML = "Disconnect";
       elements.connectPage.connectButton.classList = "btn btn-danger inline";
@@ -847,7 +957,10 @@ export default class PrinterManager {
       elements.connectPage.printerPort.disabled = true;
       elements.connectPage.printerBaud.disabled = true;
       elements.connectPage.printerProfile.disabled = true;
-      if (printer.job.filename === "No File Selected") {
+      if (
+        typeof printer.job != "undefined" &&
+        printer.job.filename === "No File Selected"
+      ) {
         elements.printerControls.printStart.disabled = true;
         elements.printerControls.printStart.style.display = "inline-block";
         elements.printerControls.printPause.disabled = true;

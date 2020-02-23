@@ -11,6 +11,7 @@ function currentStats() {
 
 class StatisticsCollection {
   static async init() {
+    console.log("Starting Statistics Collection");
     farmStats = await FarmStatistics.find({});
     let farmInfo = await this.blankFarmInfo();
     let currentOperations = [];
@@ -28,8 +29,8 @@ class StatisticsCollection {
       farmStats[0] = newfarmStats;
       newfarmStats.save();
     }
-    farmRunner[0] = setInterval(() => {
-      farmStats[0].save().catch(err => {
+    farmRunner[0] = setInterval(async () => {
+      await farmStats[0].save().catch(err => {
         console.log("Couldn't save stats, trying again" + err);
       });
     }, 2000);

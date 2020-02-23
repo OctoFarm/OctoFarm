@@ -16,6 +16,9 @@ body {
   background-position: center;
   color: grey;
 }
+button > * {
+  pointer-events: none;
+}
 hr {
   border-color: inherit;
   margin-top: 4px;

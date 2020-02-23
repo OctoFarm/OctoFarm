@@ -18,7 +18,23 @@ router.post("/removefile", ensureAuthenticated, async (req, res) => {
   Runner.removeFile(file.i, file.fullPath);
   res.send("success");
 });
-
+router.post("/resyncFile", ensureAuthenticated, async (req, res) => {
+  //Check required fields
+  const file = req.body;
+  let ret = null;
+  if (file.fullPath != undefined) {
+    ret = await Runner.reSyncFile(file.i, file.fullPath);
+  } else {
+    ret = await Runner.reSyncFile(file.i);
+  }
+  res.send(ret);
+});
+router.post("/stepChange", ensureAuthenticated, async (req, res) => {
+  //Check required fields
+  const step = req.body;
+  Runner.stepRate(step.printer, step.newSteps);
+  res.send("success");
+});
 //Register Handle for Saving printers
 router.post("/save", ensureAuthenticated, async (req, res) => {
   //Check required fields

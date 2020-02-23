@@ -1,5 +1,6 @@
 import UI from "./functions/ui.js";
 import OctoFarmClient from "./octofarm.js";
+
 export default class OctoPrintClient {
   static post(printer, item, data) {
     let url = `http://${printer.ip}:${printer.port}/api/${item}`;
@@ -25,14 +26,13 @@ export default class OctoPrintClient {
   static async system(printer, action) {
     let url = "system/commands/core/" + action;
     bootbox.confirm({
-      message:
-        "This is a confirm with custom button text and color! Do you like it?",
+      message: `Are your sure you want to ${action} printer ${printer.index}?`,
       buttons: {
         cancel: {
-          label: '<i class="fa fa-times"></i> Cancel'
+          label: '<i class="fa fa-times"></i> No'
         },
         confirm: {
-          label: '<i class="fa fa-check"></i> Confirm'
+          label: '<i class="fa fa-check"></i> Yes'
         }
       },
       callback: async function(result) {
@@ -56,10 +56,46 @@ export default class OctoPrintClient {
         }
       }
     });
-
-    console.log(printer.ip, printer.port, action);
   }
-  static move(printer) {}
+  static async move(element, printer, action, axis, dir) {
+    let flashReturn = function() {
+      element.target.classList = "btn btn-light";
+    };
+    let url = "printer/printhead";
+    let post = null;
+    let amount = await document.querySelectorAll("#pcAxisSteps > .btn.active");
+    amount = amount[0].innerHTML;
+    let opt = null;
+    if (action === "home") {
+      opt = {
+        command: action,
+        axes: axis
+      };
+    } else if (action === "jog") {
+      if (dir != undefined) {
+        amount = Number(dir + amount);
+      } else {
+        amount = Number(amount);
+      }
+      opt = {
+        command: action,
+        [axis]: amount
+      };
+    } else if (action === "feedrate") {
+      opt = {
+        command: action,
+        factor: amount
+      };
+    }
+    post = await OctoPrintClient.post(printer, url, opt);
+    if (post.status === 204) {
+      element.target.classList = "btn btn-success";
+      setTimeout(flashReturn, 500);
+    } else {
+      element.target.classList = "btn btn-danger";
+      setTimeout(flashReturn, 500);
+    }
+  }
   static async file(printer, fullPath, action, file) {
     let url = "files/local/" + fullPath;
     let post = null;
@@ -93,6 +129,10 @@ export default class OctoPrintClient {
     } else {
       UI.createAlert("error", `${action} failed`, 3000, "clicked");
     }
+  }
+  static async jobAction(printer, opts, element) {
+    let post = await OctoPrintClient.post(printer, "job", opts);
+    element.target.disabled = false;
   }
   static async connect(command, printer) {
     let opts = null;

@@ -38,7 +38,7 @@ class ClientSocket {
       let users = await ClientAPI.get(ip, port, apikey, "users");
       if (users.status === 200) {
         await Runner.getState(index);
-        await Runner.getFiles(index);
+        await Runner.getFiles(index, "files?recursive=true");
         await Runner.getSystem(index);
         await Runner.getSettings(index);
         await Runner.getProfile(index);
@@ -83,7 +83,6 @@ class ClientSocket {
 
 class Runner {
   static async init() {
-    StatisticsCollection.init();
     //Grab printers from database....
     try {
       farmPrinters = await Printers.find({}, null, { sort: { index: 1 } });
@@ -97,12 +96,20 @@ class Runner {
       };
       console.log(error);
     }
+    StatisticsCollection.init();
     //cycle through printers and move them to correct checking location...
     for (let i = 0; i < farmPrinters.length; i++) {
       //Make sure runners are created ready for each printer to pass between...
       offlineRunners[i] = false;
       farmPrinters[i].state = "Offline";
       farmPrinters[i].stateColour = Runner.getColour("Offline");
+      farmPrinters[i].stepRate = 10;
+      if (typeof farmPrinters[i].feedRate === "undefined") {
+        farmPrinters[i].feedRate = 100;
+      }
+      if (typeof farmPrinters[i].flowRate === "undefined") {
+        farmPrinters[i].flowRate = 100;
+      }
       let client = await ClientSocket.connect(
         farmPrinters[i].index,
         farmPrinters[i].ip,
@@ -171,6 +178,7 @@ class Runner {
           farmPrinters[client.index].temps = data.current.temps;
         }
         farmPrinters[client.index].messages = data.current.messages;
+
         if (
           data.current.progress.completion != null &&
           data.current.progress.completion === 100
@@ -247,12 +255,12 @@ class Runner {
       run = false;
     });
   }
-  static getFiles(index) {
+  static getFiles(index, location) {
     return ClientAPI.get(
       farmPrinters[index].ip,
       farmPrinters[index].port,
       farmPrinters[index].apikey,
-      "files?recursive=true"
+      location
     )
       .then(res => {
         return res.json();
@@ -319,11 +327,50 @@ class Runner {
             });
           }
         };
-        _.each(res.files, function(entry) {
-          recursivelyPrintNames(entry);
-        });
+        if (res.files != undefined) {
+          _.each(res.files, function(entry) {
+            recursivelyPrintNames(entry);
+          });
+          return true;
+        } else {
+          let timeStat = null;
+          if (res.gcodeAnalysis !== undefined) {
+            if (res.gcodeAnalysis.estimatedPrintTime !== undefined) {
+              timeStat = res.gcodeAnalysis.estimatedPrintTime;
+            } else {
+              timeStat = "No Time Estimate";
+            }
+          } else {
+            timeStat = "No Time Estimate";
+          }
+          let path = "";
+          if (res.path.indexOf("/") > -1) {
+            path = res.path.substr(0, res.path.lastIndexOf("/"));
+          } else {
+            path = "local";
+          }
+          let file = {
+            path: path,
+            fullPath: res.path,
+            display: res.display,
+            name: res.name,
+            size: res.size,
+            time: timeStat
+          };
+          let replace = _.findIndex(
+            farmPrinters[index].fileList.files,
+            function(o) {
+              return o.fullPath == file.fullPath;
+            }
+          );
+          farmPrinters[index].fileList.files.splice(replace, 1, file);
+          return true;
+        }
       })
-      .catch(err => console.log("Error grabbing files" + err));
+      .catch(err => {
+        console.log("Error grabbing files" + err);
+        return false;
+      });
   }
   static getState(index) {
     return ClientAPI.get(
@@ -454,6 +501,25 @@ class Runner {
       return o.fullPath == fullPath;
     });
     farmPrinters[i].fileList.files.splice(index, 1);
+  }
+  static async reSyncFile(i, file) {
+    let success = null;
+    if (file != undefined) {
+      success = await Runner.getFiles(i, "files/local/" + file);
+    } else {
+      success = await Runner.getFiles(i, "files?recursive=true");
+    }
+    if (success) {
+      return success;
+    } else {
+      return false;
+    }
+  }
+  static resetFeedRate() {
+    //prep for feedrate
+  }
+  static stepRate(i, newRate) {
+    farmPrinters[i].stepRate = newRate;
   }
 }
 

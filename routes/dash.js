@@ -13,7 +13,7 @@ router.get("/dash/get", ensureAuthenticated, async (req, res) => {
   let statistics = await FarmStatistics.find({});
   let printerInfo = [];
   let systemInformation = await SystemInfo.find({});
-  for (let i = 0; i < printers.length; i++){
+  for (let i = 0; i < printers.length; i++) {
     printer = {
       state: printers[i].state,
       index: printers[i].index,
@@ -26,14 +26,17 @@ router.get("/dash/get", ensureAuthenticated, async (req, res) => {
       job: printers[i].job,
       profile: printers[i].profiles,
       temps: printers[i].temps,
+      flowRate: printers[i].flowRate,
+      feedRate: printers[i].feedRate,
+      stepRate: printers[i].stepRate,
       filesList: printers[i].fileList,
       url: printers[i].ip + ":" + printers[i].port,
       settingsAppearance: printers[i].settingsApperance,
       stateColour: printers[i].stateColour,
       current: printers[i].current,
       options: printers[i].options
-    }
-    printerInfo.push(printer)
+    };
+    printerInfo.push(printer);
   }
   let dashboardInfo = {
     printerInfo: printerInfo,
@@ -43,6 +46,6 @@ router.get("/dash/get", ensureAuthenticated, async (req, res) => {
     octofarmStatistics: statistics[0].octofarmStatistics,
     printStatistics: statistics[0].printStatistics,
     systemInfo: systemInformation[0]
-  }
+  };
   res.json(dashboardInfo);
 });

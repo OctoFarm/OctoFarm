@@ -793,6 +793,7 @@
                                   <button id="pmStatus" type="button" class="btn btn-warning mb-2" href="#" target="_blank" disabled>STATUS</button>
                               <a class="list-group-item list-group-item-action active" id="printer-connection-btn" data-toggle="list" href="#printer-connection" role="tab" aria-controls="messages"><i class="fas fa-print"></i> Printer</a>
                               <a class="list-group-item list-group-item-action" id="printer-control-btn" data-toggle="list" href="#printer-control" role="tab" aria-controls="home"><i class="fas fa-gamepad"></i> Control</a>
+                              <a class="list-group-item list-group-item-action" id="printer-terminal-btn" data-toggle="list" href="#printer-terminal" role="tab" aria-controls="home"><i class="fas fa-terminal"></i> Terminal</a>
                               <a class="list-group-item list-group-item-action" id="printer-plugins-btn" data-toggle="list" href="#printer-plugins" role="tab" aria-controls="messages"><i class="fas fa-plug"></i> Plugins</a>
                               <a class="list-group-item list-group-item-action" id="printer-gcode-btn" data-toggle="list" href="#printer-gcode" role="tab" aria-controls="messages"><i class="fas fa-pen"></i> Gcode Scripts</a>
                               <a class="list-group-item list-group-item-action" id="printer-settings-btn" data-toggle="list" href="#printer-settings" role="tab" aria-controls="messages"><i class="fas fa-cog"></i> Settings</a>
@@ -800,6 +801,12 @@
                       </div>
                       <div class="col-12 col-sm-12 col-md-12 col-lg-10 col-xl-10">
                           <div class="tab-content" id="nav-tabContent">
+                            <div class="tab-pane fade" id="printer-terminal" role="tabpanel" aria-labelledby="system-settings-list">
+                              <h5>Printer Terminal</h5>
+                              <hr>
+                              <div id="printerTerminal"></div>
+
+                          </div>
                               <div class="tab-pane fade" id="printer-control" role="tabpanel" aria-labelledby="system-settings-list">
                                   <h5>Printer Controls</h5>
                                   <hr>
