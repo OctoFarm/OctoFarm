@@ -212,3 +212,10 @@ a.notyet {
   -o-transform: rotate(180deg);
   transform: rotate(180deg);
 }
+/*PRINTER MANAGER*/
+.terminal-window {
+  width: 100%;
+  height: 400px;
+  max-height: 400px;
+  overflow-y: scroll;
+}

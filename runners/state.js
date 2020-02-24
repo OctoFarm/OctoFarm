@@ -177,7 +177,6 @@ class Runner {
         if (data.current.temps.length != 0) {
           farmPrinters[client.index].temps = data.current.temps;
         }
-        farmPrinters[client.index].messages = data.current.messages;
 
         if (
           data.current.progress.completion != null &&

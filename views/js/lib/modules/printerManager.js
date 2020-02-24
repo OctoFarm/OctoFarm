@@ -862,18 +862,18 @@ export default class PrinterManager {
         );
       }
     });
-    elements.printerControls.printStart.addEventListener("click", e => {
+    elements.printerControls.printStart.addEventListener("click", async e => {
       //Make sure feed/flow are set before starting print...
       let flow = {
         command: "flowrate",
         factor: parseInt(printer.flowRate)
       };
-      OctoPrintClient.post(printer, "printer/tool", flow);
+      await OctoPrintClient.post(printer, "printer/tool", flow);
       let feed = {
         command: "feedrate",
         factor: parseInt(printer.feedRate)
       };
-      OctoPrintClient.post(printer, "printer/printhead", feed);
+      await OctoPrintClient.post(printer, "printer/printhead", feed);
       e.target.disabled = true;
       let opts = {
         command: "start"
@@ -1048,6 +1048,10 @@ export default class PrinterManager {
         baudDropDown: document.getElementById("pmBaudrate"),
         profileDropDown: document.getElementById("pmProfile")
       },
+      terminal: {
+        terminalWindow: document.getElementById("terminal"),
+        sendBtn: document.getElementById("terminalSendBtn")
+      },
       printerControls: {
         xPlus: document.getElementById("pcXpos"),
         xMinus: document.getElementById("pcXneg"),
@@ -1094,6 +1098,20 @@ export default class PrinterManager {
   }
   static async applyState(printer, job, progress) {
     let elements = await PrinterManager.grabPage();
+
+    function updateScroll() {
+      elements.terminal.terminalWindow.scrollTop =
+        elements.terminal.terminalWindow.scrollHeight;
+    }
+
+    printer.logs.forEach(log => {
+      elements.terminal.terminalWindow.insertAdjacentHTML(
+        "beforeend",
+        `<div>${log}</div>`
+      );
+      updateScroll();
+    });
+
     elements.mainPage.title.innerHTML =
       "Octoprint Manager: " + printer.settingsAppearance.name;
     elements.mainPage.status.innerHTML = printer.state;
