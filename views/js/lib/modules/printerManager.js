@@ -381,7 +381,7 @@ export default class PrinterManager {
                 <div class="col-12">
                 <label for="pcFlow">Fan Percent: <span id="pcFanPercent">100%</span></label>
                 <input type="range" class="octoRange custom-range" min="0" max="100" step="1" id="pcFanPercent" value="100">
-                    <center><button id="pcFanOn" class="btn btn-light" type="submit">Fans On</button> <button id="pcFanOff" class="btn btn-light" type="submit">Fans Off</button></center>
+                    <center><button id="pcFanOn" class="btn btn-light" type="submit">Set Fans</button> <button id="pcFanOff" class="btn btn-light" type="submit">Fans Off</button></center>
                 </div>
             </div>
         </div>
@@ -500,6 +500,7 @@ export default class PrinterManager {
           '<center> <button id="pmConnect" class="btn btn-danger inline" value="disconnect">Disconnect</button></center>';
       }
       let elements = PrinterManager.grabPage();
+      elements.terminal.terminalWindow.innerHTML = "";
       printer.filesList.files.forEach(file => {
         if (file.path === "local") {
           PrinterManager.drawFileList(
@@ -1098,18 +1099,42 @@ export default class PrinterManager {
   }
   static async applyState(printer, job, progress) {
     let elements = await PrinterManager.grabPage();
+    let isScrolledToBottom =
+      elements.terminal.terminalWindow.scrollHeight -
+        elements.terminal.terminalWindow.clientHeight <=
+      elements.terminal.terminalWindow.scrollTop + 1;
 
-    function updateScroll() {
-      elements.terminal.terminalWindow.scrollTop =
-        elements.terminal.terminalWindow.scrollHeight;
-    }
+    printer.logs.forEach((log, index) => {
+      function isOdd(num) {
+        return num % 2;
+      }
+      if (log.includes("Recv: ok")) {
+        elements.terminal.terminalWindow.insertAdjacentHTML(
+          "beforeend",
+          `<div class="Complete">${log}</div>`
+        );
+      } else if (log.includes("Send: G")) {
+        elements.terminal.terminalWindow.insertAdjacentHTML(
+          "beforeend",
+          `<div class="Active">${log}</div>`
+        );
+      } else if (log.includes("Send: M")) {
+        elements.terminal.terminalWindow.insertAdjacentHTML(
+          "beforeend",
+          `<div class="Closed">${log}</div>`
+        );
+      } else {
+        elements.terminal.terminalWindow.insertAdjacentHTML(
+          "beforeend",
+          `<div class="">${log}</div>`
+        );
+      }
 
-    printer.logs.forEach(log => {
-      elements.terminal.terminalWindow.insertAdjacentHTML(
-        "beforeend",
-        `<div>${log}</div>`
-      );
-      updateScroll();
+      if (isScrolledToBottom) {
+        elements.terminal.terminalWindow.scrollTop =
+          elements.terminal.terminalWindow.scrollHeight -
+          elements.terminal.terminalWindow.clientHeight;
+      }
     });
 
     elements.mainPage.title.innerHTML =

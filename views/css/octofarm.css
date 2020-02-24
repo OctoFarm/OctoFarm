@@ -214,8 +214,9 @@ a.notyet {
 }
 /*PRINTER MANAGER*/
 .terminal-window {
+  padding: 5px;
   width: 100%;
   height: 400px;
   max-height: 400px;
-  overflow-y: scroll;
+  overflow: auto;
 }
