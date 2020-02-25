@@ -32,6 +32,7 @@ router.get("/dash/get", ensureAuthenticated, async (req, res) => {
       filesList: printers[i].fileList,
       logs: printers[i].logs,
       messages: printers[i].messages,
+      plugins: printers[i].settingsPlugins,
       url: printers[i].ip + ":" + printers[i].port,
       settingsAppearance: printers[i].settingsApperance,
       stateColour: printers[i].stateColour,

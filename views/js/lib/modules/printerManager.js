@@ -518,6 +518,7 @@ export default class PrinterManager {
         `
         );
       });
+
       PrinterManager.applyListeners(printer, elements);
     }
     PrinterManager.applyState(printer, job, progress);
@@ -911,6 +912,25 @@ export default class PrinterManager {
       };
       OctoPrintClient.jobAction(printer, opts, e);
     });
+    elements.terminal.sendBtn.addEventListener("click", async e => {
+      let input = elements.terminal.input.value;
+      elements.terminal.input.value = "";
+      let flashReturn = function() {
+        e.target.classList = "btn btn-secondary";
+      };
+      let opt = {
+        commands: [input]
+      };
+      let post = await OctoPrintClient.post(printer, "printer/command", opt);
+      console.log(post);
+      if (post.status === 204) {
+        e.target.classList = "btn btn-success";
+        setTimeout(flashReturn, 500);
+      } else {
+        e.target.classList = "btn btn-danger";
+        setTimeout(flashReturn, 500);
+      }
+    });
   }
   static changeFolder(printer, fileManagerFileList, fileManagerFolderSelect) {
     fileManagerFileList.innerHTML = "";
@@ -1020,7 +1040,8 @@ export default class PrinterManager {
     let printerManager = {
       mainPage: {
         title: document.getElementById("printerManagerTitle"),
-        status: document.getElementById("pmStatus")
+        status: document.getElementById("pmStatus"),
+        plugins: document.getElementById("printerManagerPlugins")
       },
       jobStatus: {
         expectedTime: document.getElementById("pmExpectedTime"),
@@ -1051,7 +1072,8 @@ export default class PrinterManager {
       },
       terminal: {
         terminalWindow: document.getElementById("terminal"),
-        sendBtn: document.getElementById("terminalSendBtn")
+        sendBtn: document.getElementById("terminalInputBtn"),
+        input: document.getElementById("terminalInput")
       },
       printerControls: {
         xPlus: document.getElementById("pcXpos"),
@@ -1104,38 +1126,40 @@ export default class PrinterManager {
         elements.terminal.terminalWindow.clientHeight <=
       elements.terminal.terminalWindow.scrollTop + 1;
 
-    printer.logs.forEach((log, index) => {
-      function isOdd(num) {
-        return num % 2;
-      }
-      if (log.includes("Recv: ok")) {
-        elements.terminal.terminalWindow.insertAdjacentHTML(
-          "beforeend",
-          `<div class="Complete">${log}</div>`
-        );
-      } else if (log.includes("Send: G")) {
-        elements.terminal.terminalWindow.insertAdjacentHTML(
-          "beforeend",
-          `<div class="Active">${log}</div>`
-        );
-      } else if (log.includes("Send: M")) {
-        elements.terminal.terminalWindow.insertAdjacentHTML(
-          "beforeend",
-          `<div class="Closed">${log}</div>`
-        );
-      } else {
-        elements.terminal.terminalWindow.insertAdjacentHTML(
-          "beforeend",
-          `<div class="">${log}</div>`
-        );
-      }
+    if (typeof printer.logs != "undefined") {
+      printer.logs.forEach((log, index) => {
+        function isOdd(num) {
+          return num % 2;
+        }
+        if (log.includes("Recv: ok")) {
+          elements.terminal.terminalWindow.insertAdjacentHTML(
+            "beforeend",
+            `<div class="Complete">${log}</div>`
+          );
+        } else if (log.includes("Send: G")) {
+          elements.terminal.terminalWindow.insertAdjacentHTML(
+            "beforeend",
+            `<div class="Active">${log}</div>`
+          );
+        } else if (log.includes("Send: M")) {
+          elements.terminal.terminalWindow.insertAdjacentHTML(
+            "beforeend",
+            `<div class="Closed">${log}</div>`
+          );
+        } else {
+          elements.terminal.terminalWindow.insertAdjacentHTML(
+            "beforeend",
+            `<div class="">${log}</div>`
+          );
+        }
 
-      if (isScrolledToBottom) {
-        elements.terminal.terminalWindow.scrollTop =
-          elements.terminal.terminalWindow.scrollHeight -
-          elements.terminal.terminalWindow.clientHeight;
-      }
-    });
+        if (isScrolledToBottom) {
+          elements.terminal.terminalWindow.scrollTop =
+            elements.terminal.terminalWindow.scrollHeight -
+            elements.terminal.terminalWindow.clientHeight;
+        }
+      });
+    }
 
     elements.mainPage.title.innerHTML =
       "Octoprint Manager: " + printer.settingsAppearance.name;
