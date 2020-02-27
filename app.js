@@ -4,10 +4,10 @@ const mongoose = require("mongoose");
 const flash = require("connect-flash");
 const session = require("express-session");
 const passport = require("passport");
-const WebSocket = require("ws");
+const { ensureAuthenticated } = require("./config/auth");
 
 const app = express();
-
+const expressWs = require("express-ws")(app);
 //Passport Config
 require("./config/passport.js")(passport);
 
@@ -63,7 +63,7 @@ if (db === "") {
   app.use("/users", require("./routes/users", { page: "route" }));
   app.use("/printers", require("./routes/printers", { page: "route" }));
   app.use("/settings", require("./routes/settings", { page: "route" }));
-  app.use("/client", require("./routes/dash", { page: "route" }));
+  app.use("/ws", require("./routes/webSocket", { page: "route" }));
 }
 
 //Server

@@ -12,26 +12,38 @@ $("#printerManagerModal").on("hidden.bs.modal", function(e) {
   document.getElementById("printerControlCamera").src = "";
 });
 
-//Update page variables
-Client.get("client/dash/get")
-  .then(res => {
-    return res.json();
-  })
-  .then(res => {
-    if (res.printerInfo.length === 0) {
-    } else {
-      printerInfo = res.printerInfo;
+let url = window.location.hostname;
+let port = window.location.port;
+if (port != "") {
+  port = ":" + port;
+}
+
+//Connect to servers socket..webSocket =
+var sock = new WebSocket("ws://" + url + port + "/ws/grab");
+sock.onopen = function() {
+  sock.send("hello");
+};
+
+sock.onmessage = function(e) {
+  if (e.data != null) {
+    let res = JSON.parse(e.data);
+    currentOperations(res.currentOperations, res.currentOperationsCount);
+    dashUpdate.systemInformation(res.systemInfo);
+    dashUpdate.printers(res.printerInfo);
+    printerInfo = res.printerInfo;
+    dashUpdate.farmInformation(res.farmInfo);
+    dashUpdate.farmStatistics(res.octofarmStatistics);
+    if (
+      document.getElementById("printerManagerModal").classList.contains("show")
+    ) {
+      PrinterManager.init(res.printerInfo);
     }
-  })
-  .catch(err => {
-    console.log(err);
-    UI.createAlert(
-      "error",
-      "There was trouble updating page, please check logs",
-      4000,
-      "clicked"
-    );
-  });
+  }
+};
+
+sock.onclose = function() {
+  console.log("close");
+};
 
 //Setup page listeners...
 let printerCard = document.querySelectorAll("[id^='printerButton-']");
@@ -42,40 +54,6 @@ printerCard.forEach(card => {
     PrinterManager.init(printerInfo);
   });
 });
-
-setInterval(function() {
-  Client.get("client/dash/get")
-    .then(res => {
-      return res.json();
-    })
-    .then(res => {
-      if (res.printerInfo.length === 0) {
-      } else {
-        currentOperations(res.currentOperations, res.currentOperationsCount);
-        dashUpdate.systemInformation(res.systemInfo);
-        dashUpdate.printers(res.printerInfo);
-        printerInfo = res.printerInfo;
-        dashUpdate.farmInformation(res.farmInfo);
-        dashUpdate.farmStatistics(res.octofarmStatistics);
-        if (
-          document
-            .getElementById("printerManagerModal")
-            .classList.contains("show")
-        ) {
-          PrinterManager.init(res.printerInfo);
-        }
-      }
-    })
-    .catch(err => {
-      console.log(err);
-      UI.createAlert(
-        "error",
-        "There was trouble updating page, please check logs",
-        4000,
-        "clicked"
-      );
-    });
-}, 1000);
 
 class dashUpdate {
   static systemInformation(systemInfo) {
