@@ -15,7 +15,6 @@ let farmPrinters = [];
 
 class ClientAPI {
   static get(ip, port, apikey, item) {
-    let timeout = 1000;
     let url = `http://${ip}:${port}/api/${item}`;
     return Promise.race([
       fetch(url, {
@@ -26,7 +25,7 @@ class ClientAPI {
         }
       }),
       new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("timeout")), timeout)
+        setTimeout(() => reject(new Error("timeout")), 1000)
       )
     ]);
   }
@@ -43,13 +42,20 @@ class ClientSocket {
     try {
       let users = await ClientAPI.get(ip, port, apikey, "users");
       if (users.status === 200) {
+        users = await users.json();
+        console.log(index + ": Grabbing State..");
         await Runner.getState(index);
+        console.log(index + ": Grabbing File List...");
         await Runner.getFiles(index, "files?recursive=true");
+        console.log(index + ": Grabbing System Information...");
         await Runner.getSystem(index);
+        console.log(index + ": Grabbing System Settings...");
         await Runner.getSettings(index);
+        console.log(index + ": Grabbing Printer Profiles...");
         await Runner.getProfile(index);
+      } else {
+        users = {};
       }
-
       let currentUser = "";
       if (_.isEmpty(users)) {
         currentUser = "admin";
