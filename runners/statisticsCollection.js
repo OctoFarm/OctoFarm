@@ -3,7 +3,7 @@ const History = require("../models/History.js");
 const _ = require("lodash");
 
 let farmStats = [];
-let farmRunner = [];
+let farmRunner = null;
 
 function currentStats() {
   return farmStats;
@@ -11,7 +11,7 @@ function currentStats() {
 
 class StatisticsCollection {
   static async init() {
-    console.log("Starting Statistics Collection");
+    console.log("Setting up Statistics Collection");
     farmStats = await FarmStatistics.find({});
     let farmInfo = await this.blankFarmInfo();
     let currentOperations = [];
@@ -29,11 +29,14 @@ class StatisticsCollection {
       farmStats[0] = newfarmStats;
       newfarmStats.save();
     }
-    farmRunner[0] = setInterval(async () => {
+    farmRunner = setInterval(async () => {
       await farmStats[0].save().catch(err => {
-        console.log("Couldn't save stats, trying again" + err);
+        console.log("Couldn't save stats, trying again: Err MSG:" + err);
+        clearInterval(farmRunner);
+        StatisticsCollection.init();
       });
     }, 2000);
+    return "Statistics collection has started...";
   }
   static async currentOperations(farmPrinters) {
     let currentOperations = [];
@@ -43,69 +46,75 @@ class StatisticsCollection {
     let idle = [];
     let offline = [];
     let progress = [];
-    farmPrinters.forEach(printer => {
-      if (typeof printer.stateColour != "undefined") {
-        if (printer.stateColour.category === "Idle") {
-          idle.push(printer.index);
+    try {
+      farmPrinters.forEach(printer => {
+        if (typeof printer.stateColour != "undefined") {
+          if (printer.stateColour.category === "Idle") {
+            idle.push(printer.index);
+          }
+          if (
+            printer.stateColour.category === "Offline" ||
+            printer.stateColour.category === "Closed"
+          ) {
+            offline.push(printer.index);
+          }
         }
         if (
-          printer.stateColour.category === "Offline" ||
-          printer.stateColour.category === "Closed"
-        ) {
-          offline.push(printer.index);
-        }
-      }
-      if (
-        typeof printer.stateColour != "undefined" &&
-        typeof printer.progress != "undefined"
-      ) {
-        if (printer.stateColour.category === "Complete") {
-          complete.push(printer.index);
-          progress.push(printer.progress.completion);
-
-          currentOperations.push({
-            index: printer.index,
-            name: printer.settingsApperance.name,
-            progress: Math.floor(printer.progress.completion),
-            progressColour: "success",
-            timeRemaining: printer.progress.printTimeLeft
-          });
-        }
-
-        if (
-          printer.stateColour.category === "Active" &&
+          typeof printer.stateColour != "undefined" &&
           typeof printer.progress != "undefined"
         ) {
-          active.push(printer.index);
-          progress.push(printer.progress.completion);
-          currentOperations.push({
-            index: printer.index,
-            name: printer.settingsApperance.name,
-            progress: Math.floor(printer.progress.completion),
-            progressColour: "warning",
-            timeRemaining: printer.progress.printTimeLeft
-          });
+          if (printer.stateColour.category === "Complete") {
+            complete.push(printer.index);
+            progress.push(printer.progress.completion);
+
+            currentOperations.push({
+              index: printer.index,
+              name: printer.settingsApperance.name,
+              progress: Math.floor(printer.progress.completion),
+              progressColour: "success",
+              timeRemaining: printer.progress.printTimeLeft
+            });
+          }
+
+          if (
+            printer.stateColour.category === "Active" &&
+            typeof printer.progress != "undefined"
+          ) {
+            active.push(printer.index);
+            progress.push(printer.progress.completion);
+            currentOperations.push({
+              index: printer.index,
+              name: printer.settingsApperance.name,
+              progress: Math.floor(printer.progress.completion),
+              progressColour: "warning",
+              timeRemaining: printer.progress.printTimeLeft
+            });
+          }
         }
+      });
+      let actProg = progress.reduce((a, b) => a + b, 0);
+      currentOperationsCount.farmProgress = Math.floor(
+        actProg / progress.length
+      );
+      if (isNaN(currentOperationsCount.farmProgress)) {
+        currentOperationsCount.farmProgress = 0;
       }
-    });
-    let actProg = progress.reduce((a, b) => a + b, 0);
-    currentOperationsCount.farmProgress = Math.floor(actProg / progress.length);
-    if (isNaN(currentOperationsCount.farmProgress)) {
-      currentOperationsCount.farmProgress = 0;
+      if (currentOperationsCount.farmProgress === 100) {
+        currentOperationsCount.farmProgressColour = "success";
+      } else {
+        currentOperationsCount.farmProgressColour = "warning";
+      }
+      currentOperationsCount.printerCount = farmPrinters.length;
+      currentOperationsCount.complete = complete.length;
+      currentOperationsCount.active = active.length;
+      currentOperationsCount.offline = offline.length;
+      currentOperationsCount.idle = idle.length;
+      currentOperations = _.orderBy(currentOperations, ["progress"], ["desc"]);
+      farmStats[0].currentOperations = currentOperations;
+      farmStats[0].currentOperationsCount = currentOperationsCount;
+    } catch (err) {
+      console.log("Errant Stats Runner.... can be ignored...");
     }
-    if (currentOperationsCount.farmProgress === 100) {
-      currentOperationsCount.farmProgressColour = "success";
-    } else {
-      currentOperationsCount.farmProgressColour = "warning";
-    }
-    currentOperationsCount.printerCount = farmPrinters.length;
-    currentOperationsCount.complete = complete.length;
-    currentOperationsCount.active = active.length;
-    currentOperationsCount.offline = offline.length;
-    currentOperationsCount.idle = idle.length;
-    currentOperations = _.orderBy(currentOperations, ["progress"], ["desc"]);
-    farmStats[0].currentOperations = currentOperations;
-    farmStats[0].currentOperationsCount = currentOperationsCount;
   }
   static async farmInformation(farmPrinters) {
     let farmInfo = await this.blankFarmInfo();

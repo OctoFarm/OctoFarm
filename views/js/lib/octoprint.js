@@ -118,6 +118,17 @@ export default class OctoPrintClient {
       };
       post = await OctoPrintClient.post(printer, url, opt);
     } else if (action === "print") {
+      //Make sure feed/flow are set before starting print...
+      let flow = {
+        command: "flowrate",
+        factor: parseInt(printer.flowRate)
+      };
+      await OctoPrintClient.post(printer, "printer/tool", flow);
+      let feed = {
+        command: "feedrate",
+        factor: parseInt(printer.feedRate)
+      };
+      await OctoPrintClient.post(printer, "printer/printhead", feed);
       let opt = {
         command: "select",
         print: true

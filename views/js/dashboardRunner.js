@@ -27,22 +27,32 @@ sock.onopen = function() {
 sock.onmessage = function(e) {
   if (e.data != null) {
     let res = JSON.parse(e.data);
-    currentOperations(res.currentOperations, res.currentOperationsCount);
-    dashUpdate.systemInformation(res.systemInfo);
-    dashUpdate.printers(res.printerInfo);
-    printerInfo = res.printerInfo;
-    dashUpdate.farmInformation(res.farmInfo);
-    dashUpdate.farmStatistics(res.octofarmStatistics);
     if (
       document.getElementById("printerManagerModal").classList.contains("show")
     ) {
       PrinterManager.init(res.printerInfo);
+    } else {
+      currentOperations(res.currentOperations, res.currentOperationsCount);
+      dashUpdate.systemInformation(res.systemInfo);
+      dashUpdate.printers(res.printerInfo);
+      printerInfo = res.printerInfo;
+      dashUpdate.farmInformation(res.farmInfo);
+      dashUpdate.farmStatistics(res.octofarmStatistics);
     }
   }
 };
 
 sock.onclose = function() {
-  console.log("close");
+  UI.createAlert(
+    "error",
+    "We have lost connection to the server, please check and restart client to reconnect."
+  );
+};
+sock.onerror = function() {
+  UI.createAlert(
+    "error",
+    "We have lost connection to the server, please check and restart client to reconnect."
+  );
 };
 
 //Setup page listeners...

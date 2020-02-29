@@ -2,7 +2,6 @@ const ServerSettingsDB = require("../models/ServerSettings.js");
 
 class ServerSettings {
   static init() {
-    console.log("Initialising Server Settings");
     ServerSettingsDB.find({}).then(settings => {
       if (settings.length < 1) {
         let onlinePolling = {
@@ -17,8 +16,10 @@ class ServerSettings {
           offlinePolling
         });
         defaultSystemSettings.save();
+        return "Server settings have been created...";
       }
     });
+    return "Server settings already exist, loaded existing values...";
   }
   static check() {
     return ServerSettingsDB.find({});

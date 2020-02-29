@@ -21,11 +21,12 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
       checked[0].onlinePolling = req.body.onlinePolling;
       checked[0].offlinePolling = req.body.offlinePolling;
       checked[0].save();
-      res.send({ msg: "Successfully saved your settings" });
       return;
     })
-    .then(res => {
-      Runner.init();
+    .then(async () => {
+      let start = await Runner.init();
+      res.send({ msg: start });
+      return start;
     });
 });
 

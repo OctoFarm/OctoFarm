@@ -64,7 +64,6 @@ router.ws("/grab", function(ws, req) {
     if (msg === "hello") {
       try {
         ws.interval = setInterval(function() {
-          console.log(ws.readyState);
           if (ws.readyState === 1) {
             ws.send(JSON.stringify(dashboardInfo));
           } else {

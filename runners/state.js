@@ -87,6 +87,12 @@ class Runner {
     try {
       farmPrinters = await Printers.find({}, null, { sort: { index: 1 } });
       console.log("Grabbed " + farmPrinters.length + " for checking");
+      for (let i = 0; i < farmPrinters.length; i++) {
+        //Make sure runners are created ready for each printer to pass between...
+
+        farmPrinters[i].state = "Searching...";
+        farmPrinters[i].stateColour = Runner.getColour("Searching...");
+      }
     } catch (err) {
       let error = {
         err: err.message,
@@ -96,10 +102,12 @@ class Runner {
       };
       console.log(error);
     }
-    StatisticsCollection.init();
+    let stat = await StatisticsCollection.init();
+    console.log(stat);
     //cycle through printers and move them to correct checking location...
     for (let i = 0; i < farmPrinters.length; i++) {
       //Make sure runners are created ready for each printer to pass between...
+      console.log("Checking for printer: " + i);
       offlineRunners[i] = false;
       farmPrinters[i].state = "Offline";
       farmPrinters[i].stateColour = Runner.getColour("Offline");
@@ -122,6 +130,9 @@ class Runner {
         Runner.setOffline(client);
       }
     }
+    return (
+      "System Runner has checked over " + farmPrinters.length + " printers..."
+    );
   }
   static async setOnline(client) {
     console.log("Printer: " + client.index + " is online");
@@ -165,7 +176,7 @@ class Runner {
         }
       }
       if (typeof data.current != "undefined") {
-        if (data.current.state.text === "Offline") {
+        if (data.current.state.text.includes("Offline")) {
           data.current.state.text = "Closed";
         }
         farmPrinters[client.index].state = data.current.state.text;
@@ -243,13 +254,19 @@ class Runner {
   }
 
   static stopAll() {
+    console.log("Stopping statistics collection...");
     StatisticsCollection.stop();
+    console.log("Stopped statistic collection");
+    farmPrinters.forEach((run, index) => {
+      farmPrinters[index].state = "Searching...";
+      farmPrinters[index].stateColour = Runner.getColour("Searching...");
+    });
     onlineRunners.forEach(run => {
       run.ws.close();
       run = false;
     });
-    offlineRunners.forEach(run => {
-      console.log("Offline Printer: " + [run] + " stopped");
+    offlineRunners.forEach((run, index) => {
+      console.log("Offline Printer: " + [index] + " stopped");
       clearInterval(run);
       run = false;
     });

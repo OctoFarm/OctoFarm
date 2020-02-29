@@ -6,6 +6,9 @@ const session = require("express-session");
 const passport = require("passport");
 const { ensureAuthenticated } = require("./config/auth");
 
+//Server Port
+const PORT = process.env.PORT || 4000;
+
 const app = express();
 const expressWs = require("express-ws")(app);
 //Passport Config
@@ -65,23 +68,35 @@ if (db === "") {
   app.use("/settings", require("./routes/settings", { page: "route" }));
   app.use("/ws", require("./routes/webSocket", { page: "route" }));
 }
-
-//Server
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, console.log(`Server started on port ${PORT}`));
-if (db != "") {
+let serverStart = async function() {
   //Setup Settings
   const serverSettings = require("./settings/serverSettings.js");
   const ServerSettings = serverSettings.ServerSettings;
-  ServerSettings.init();
+  console.log("Checking Server Settings...");
+  let ss = await ServerSettings.init();
+  console.log(ss);
   const clientSettings = require("./settings/clientSettings.js");
   const ClientSettings = clientSettings.ClientSettings;
-  ClientSettings.init();
+  console.log("Checking Client Settings...");
+  let cs = await ClientSettings.init();
+  console.log(cs);
   //Start backend metrics gathering...
+  console.log("Starting System Printers Runner...");
   const runner = require("./runners/state.js");
   const Runner = runner.Runner;
-  Runner.init();
+  let r = await Runner.init();
+  console.log(r);
+  console.log("Starting System Information Runner...");
   const system = require("./runners/systemInfo.js");
   const SystemRunner = system.SystemRunner;
-  SystemRunner.init();
+  let sr = await SystemRunner.init();
+  console.log(sr);
+  app.listen(PORT, () => {
+    console.log(`HTTP server started...`);
+    console.log(`You can now access your server on port: ${PORT}`);
+  });
+};
+//Server
+if (db != "") {
+  serverStart();
 }

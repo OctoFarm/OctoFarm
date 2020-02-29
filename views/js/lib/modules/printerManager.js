@@ -3,7 +3,7 @@ import OctoFarmClient from "../octofarm.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 let currentIndex = 0;
-
+let previousLog = null;
 export default class PrinterManager {
   static async init(printers) {
     let i = currentIndex;
@@ -19,7 +19,10 @@ export default class PrinterManager {
     const selectedProfile = printer.current.printerProfile;
     //Fake name
     let name = "";
-    if (printer.settingsAppearance.name === null) {
+    if (
+      printer.settingsAppearance.name === "null" ||
+      printer.settingsAppearance.name === ""
+    ) {
       name = "Type a name here and save";
       printer.settingsAppearance.name = "";
     } else {
@@ -61,7 +64,6 @@ export default class PrinterManager {
       currentIndex ===
       parseInt(document.getElementById("printerIndex").innerHTML)
     ) {
-      PrinterManager.applyState(printer, job, progress);
     } else {
       document.getElementById("printerInformation").innerHTML = `
         <h5>Printer Information</h5><hr>
@@ -102,6 +104,11 @@ export default class PrinterManager {
         </div>
         
         `;
+      document.getElementById("printerTerminal").innerHTML = `
+        <div id="terminal" class="terminal-window bg-secondary">
+
+
+        </div>`;
       document.getElementById("printerControls").innerHTML = `
         <div class="row">
         <div class="col-12 col-sm-12 col-md-4 col-lg-4 col-xl-6">
@@ -220,7 +227,7 @@ export default class PrinterManager {
               <div class="col-lg-12 text-center">
               <div class="col-12 list-group" id="fileLocations"><div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="fileSearchBar">Search:</label> </div><input id="fileSearch" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" placeholder="Type your filename here"></div></div>
               <div class="col-12 list-group" id="fileLocations"><div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="fileManagerFolderSelect">Folders:</label> </div> <select class="custom-select bg-secondary text-light" id="fileManagerFolderSelect"><option value="local">local</option></select></div></div>
-    <ul class="col-12 list-group border-secondary" id="fileManagerFileList" style="height:200px; overflow-y:scroll;">
+    <ul class="col-12 list-group border-secondary" id="fileManagerFileList" style="height:230px; overflow-y:scroll;">
 
 
     
@@ -252,6 +259,7 @@ export default class PrinterManager {
             <b class="mb-1">File Name: </b><p class="mb-1" id="pmFileName">${
               job.file.name
             }</p>
+            <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="filamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="filamentManagerFolderSelect"><option value="local"></option></select>
           </div>
         </div>
         `;
@@ -649,6 +657,7 @@ export default class PrinterManager {
         e.target.classList = "btn btn-md btn-light m-0 px-3";
       };
       let value = e.target.parentNode.previousSibling.previousSibling.value;
+      e.target.parentNode.previousSibling.previousSibling.value = "";
       if (value === "Off") {
         value = 0;
       }
@@ -672,16 +681,15 @@ export default class PrinterManager {
         e.target.classList = "btn btn-md btn-light m-0 px-3";
       };
       let value = e.target.parentNode.previousSibling.previousSibling.value;
+      e.target.parentNode.previousSibling.previousSibling.value = "";
       if (value === "Off") {
         value = 0;
       }
       let opt = {
         command: "target",
-        targets: {
-          tool0: parseInt(value)
-        }
+        target: parseInt(value)
       };
-      let post = await OctoPrintClient.post(printer, "printer/tool", opt);
+      let post = await OctoPrintClient.post(printer, "printer/bed", opt);
       if (post.status === 204) {
         e.target.classList = "btn btn-md btn-success m-0 px-3";
         setTimeout(flashReturn, 500);
@@ -805,11 +813,7 @@ export default class PrinterManager {
             command: "extrude",
             amount: parseInt(value)
           };
-          let post = await OctoPrintClient.post(
-            printer,
-            "printer/command",
-            opt
-          );
+          let post = await OctoPrintClient.post(printer, "printer/tool", opt);
           if (post.status === 204) {
             e.target.classList = "btn btn-success";
             setTimeout(flashReturn, 500);
@@ -922,7 +926,6 @@ export default class PrinterManager {
         commands: [input]
       };
       let post = await OctoPrintClient.post(printer, "printer/command", opt);
-      console.log(post);
       if (post.status === 204) {
         e.target.classList = "btn btn-success";
         setTimeout(flashReturn, 500);
@@ -1115,137 +1118,63 @@ export default class PrinterManager {
         printRestart: document.getElementById("pmPrintRestart"),
         printResume: document.getElementById("pmPrintResume"),
         printStop: document.getElementById("pmPrintStop")
+      },
+      menu: {
+        printer: document.getElementById("printer-connection-btn"),
+        control: document.getElementById("printer-control-btn"),
+        terminal: document.getElementById("printer-terminal-btn"),
+        plugins: document.getElementById("printer-plugins-btn"),
+        gcode: document.getElementById("printer-gcode-btn"),
+        settings: document.getElementById("printer-settings-btn")
       }
     };
     return printerManager;
   }
   static async applyState(printer, job, progress) {
+    //Garbage collection for terminal
+    let terminalCount = document.querySelectorAll(".logLine");
     let elements = await PrinterManager.grabPage();
-    let isScrolledToBottom =
-      elements.terminal.terminalWindow.scrollHeight -
-        elements.terminal.terminalWindow.clientHeight <=
-      elements.terminal.terminalWindow.scrollTop + 1;
-
-    if (typeof printer.logs != "undefined") {
-      printer.logs.forEach((log, index) => {
-        function isOdd(num) {
-          return num % 2;
-        }
-        if (log.includes("Recv: ok")) {
-          elements.terminal.terminalWindow.insertAdjacentHTML(
-            "beforeend",
-            `<div class="Complete">${log}</div>`
-          );
-        } else if (log.includes("Send: G")) {
-          elements.terminal.terminalWindow.insertAdjacentHTML(
-            "beforeend",
-            `<div class="Active">${log}</div>`
-          );
-        } else if (log.includes("Send: M")) {
-          elements.terminal.terminalWindow.insertAdjacentHTML(
-            "beforeend",
-            `<div class="Closed">${log}</div>`
-          );
-        } else {
-          elements.terminal.terminalWindow.insertAdjacentHTML(
-            "beforeend",
-            `<div class="">${log}</div>`
-          );
-        }
-
-        if (isScrolledToBottom) {
-          elements.terminal.terminalWindow.scrollTop =
-            elements.terminal.terminalWindow.scrollHeight -
-            elements.terminal.terminalWindow.clientHeight;
-        }
-      });
+    //init global info
+    if (printer.settingsAppearance.name === "") {
+      elements.mainPage.title.innerHTML = "Octoprint Manager:";
+    } else {
+      elements.mainPage.title.innerHTML =
+        "Octoprint Manager: " + printer.settingsAppearance.name;
     }
 
-    elements.mainPage.title.innerHTML =
-      "Octoprint Manager: " + printer.settingsAppearance.name;
     elements.mainPage.status.innerHTML = printer.state;
     elements.mainPage.status.className = `btn btn-${printer.stateColour.name} mb-2`;
-    elements.printerControls["step" + printer.stepRate].className =
-      "btn btn-dark active";
-    elements.jobStatus.progressBar.innerHTML =
-      Math.round(progress.completion) + "%";
-    elements.jobStatus.progressBar.style.width = progress.completion + "%";
-    elements.jobStatus.expectedTime.innerHTML = Calc.generateTime(
-      job.estimatedPrintTime
-    );
-    elements.jobStatus.remainingTime.innerHTML = Calc.generateTime(
-      progress.printTimeLeft
-    );
-    elements.jobStatus.elapsedTime.innerHTML = Calc.generateTime(
-      progress.printTime
-    );
-    elements.jobStatus.currentZ.innerHTML = printer.currentZ + "mm";
-    elements.jobStatus.fileName.innerHTML = job.file.name;
 
-    if (printer.stateColour.category === "Active") {
-      elements.printerControls.e0Target.placeholder =
-        printer.temps[0].tool0.target + "°C";
-      elements.printerControls.e0Actual.innerHTML =
-        "Actual: " + printer.temps[0].tool0.actual + "°C";
-      elements.printerControls.bedTarget.placeholder =
-        printer.temps[0].bed.target + "°C";
-      elements.printerControls.bedActual.innerHTML =
-        "Actual: " + printer.temps[0].bed.actual + "°C";
-      if (
-        printer.temps[0].tool0.actual > printer.temps[0].tool0.target - 0.5 &&
-        printer.temps[0].tool0.actual < printer.temps[0].tool0.target + 0.5
-      ) {
-        elements.printerControls.e0Actual.classList =
-          "input-group-text Complete";
-      } else if (printer.temps[0].tool0.actual < 35) {
-        elements.printerControls.e0Actual.classList = "input-group-text";
-      } else {
-        elements.printerControls.e0Actual.classList = "input-group-text Active";
-      }
-      if (
-        printer.temps[0].bed.actual > printer.temps[0].bed.target - 0.5 &&
-        printer.temps[0].bed.actual < printer.temps[0].bed.target + 0.5
-      ) {
-        elements.printerControls.bedActual.classList =
-          "input-group-text Complete";
-      } else if (printer.temps[0].bed.actual < 35) {
-        elements.printerControls.bedActual.classList = "input-group-text";
-      } else {
-        elements.printerControls.bedActual.classList =
-          "input-group-text Active";
-      }
+    //Check which view is active... hopefully save some CPU.
+
+    if (
+      elements.menu.printer.classList.contains("active") ||
+      elements.menu.control.classList.contains("active")
+    ) {
       elements.connectPage.restartButton.disabled = true;
       elements.connectPage.rebootButton.disabled = true;
       elements.connectPage.shutdownButton.disabled = true;
-
-      PrinterManager.controls(true, true);
-      elements.printerControls.printStart.disabled = true;
-      elements.printerControls.printStart.style.display = "inline-block";
-      elements.printerControls.printPause.disabled = false;
-      elements.printerControls.printPause.style.display = "inline-block";
-      elements.printerControls.printStop.disabled = false;
-      elements.printerControls.printStop.style.display = "inline-block";
-      elements.printerControls.printRestart.disabled = true;
-      elements.printerControls.printRestart.style.display = "none";
-      elements.printerControls.printResume.disabled = true;
-      elements.printerControls.printResume.style.display = "none";
-    } else if (
-      printer.stateColour.category === "Idle" ||
-      printer.stateColour.category === "Complete"
-    ) {
-      PrinterManager.controls(false);
-      elements.connectPage.connectButton.value = "disconnect";
-      elements.connectPage.connectButton.innerHTML = "Disconnect";
-      elements.connectPage.connectButton.classList = "btn btn-danger inline";
-      elements.connectPage.connectButton.disabled = false;
       elements.connectPage.portDropDown.disabled = true;
       elements.connectPage.baudDropDown.disabled = true;
       elements.connectPage.profileDropDown.disabled = true;
-      if (
-        typeof printer.temps != "undefined" &&
-        typeof printer.temps[0].tool0 != "undefined" &&
-        typeof printer.temps[0].tool0.target != "undefined"
-      ) {
+      elements.printerControls["step" + printer.stepRate].className =
+        "btn btn-dark active";
+      elements.jobStatus.progressBar.innerHTML =
+        Math.round(progress.completion) + "%";
+      elements.jobStatus.progressBar.style.width = progress.completion + "%";
+      elements.jobStatus.expectedTime.innerHTML = Calc.generateTime(
+        job.estimatedPrintTime
+      );
+      elements.jobStatus.remainingTime.innerHTML = Calc.generateTime(
+        progress.printTimeLeft
+      );
+      elements.jobStatus.elapsedTime.innerHTML = Calc.generateTime(
+        progress.printTime
+      );
+      elements.jobStatus.currentZ.innerHTML = printer.currentZ + "mm";
+      elements.jobStatus.fileName.innerHTML = job.file.name;
+
+      if (printer.stateColour.category === "Active") {
         elements.printerControls.e0Target.placeholder =
           printer.temps[0].tool0.target + "°C";
         elements.printerControls.e0Actual.innerHTML =
@@ -1254,19 +1183,141 @@ export default class PrinterManager {
           printer.temps[0].bed.target + "°C";
         elements.printerControls.bedActual.innerHTML =
           "Actual: " + printer.temps[0].bed.actual + "°C";
-      }
-      elements.printerControls.e0Actual.classList = "input-group-text";
-      elements.printerControls.bedActual.classList = "input-group-text";
-      elements.connectPage.restartButton.disabled = false;
-      elements.connectPage.rebootButton.disabled = false;
-      elements.connectPage.shutdownButton.disabled = false;
-      elements.connectPage.printerPort.disabled = true;
-      elements.connectPage.printerBaud.disabled = true;
-      elements.connectPage.printerProfile.disabled = true;
-      if (
-        typeof printer.job != "undefined" &&
-        printer.job.filename === "No File Selected"
+        if (
+          printer.temps[0].tool0.actual > printer.temps[0].tool0.target - 0.5 &&
+          printer.temps[0].tool0.actual < printer.temps[0].tool0.target + 0.5
+        ) {
+          elements.printerControls.e0Actual.classList =
+            "input-group-text Complete";
+        } else if (printer.temps[0].tool0.actual < 35) {
+          elements.printerControls.e0Actual.classList = "input-group-text";
+        } else {
+          elements.printerControls.e0Actual.classList =
+            "input-group-text Active";
+        }
+        if (
+          printer.temps[0].bed.actual > printer.temps[0].bed.target - 0.5 &&
+          printer.temps[0].bed.actual < printer.temps[0].bed.target + 0.5
+        ) {
+          elements.printerControls.bedActual.classList =
+            "input-group-text Complete";
+        } else if (printer.temps[0].bed.actual < 35) {
+          elements.printerControls.bedActual.classList = "input-group-text";
+        } else {
+          elements.printerControls.bedActual.classList =
+            "input-group-text Active";
+        }
+
+        PrinterManager.controls(true, true);
+        elements.printerControls.printStart.disabled = true;
+        elements.printerControls.printStart.style.display = "inline-block";
+        elements.printerControls.printPause.disabled = false;
+        elements.printerControls.printPause.style.display = "inline-block";
+        elements.printerControls.printStop.disabled = false;
+        elements.printerControls.printStop.style.display = "inline-block";
+        elements.printerControls.printRestart.disabled = true;
+        elements.printerControls.printRestart.style.display = "none";
+        elements.printerControls.printResume.disabled = true;
+        elements.printerControls.printResume.style.display = "none";
+      } else if (
+        printer.stateColour.category === "Idle" ||
+        printer.stateColour.category === "Complete"
       ) {
+        PrinterManager.controls(false);
+        elements.connectPage.restartButton.disabled = false;
+        elements.connectPage.rebootButton.disabled = false;
+        elements.connectPage.shutdownButton.disabled = false;
+        elements.connectPage.connectButton.value = "disconnect";
+        elements.connectPage.connectButton.innerHTML = "Disconnect";
+        elements.connectPage.connectButton.classList = "btn btn-danger inline";
+        elements.connectPage.connectButton.disabled = false;
+        elements.connectPage.portDropDown.disabled = true;
+        elements.connectPage.baudDropDown.disabled = true;
+        elements.connectPage.profileDropDown.disabled = true;
+        if (
+          typeof printer.temps != "undefined" &&
+          typeof printer.temps[0].tool0 != "undefined" &&
+          typeof printer.temps[0].tool0.target != "undefined"
+        ) {
+          elements.printerControls.e0Target.placeholder =
+            printer.temps[0].tool0.target + "°C";
+          elements.printerControls.e0Actual.innerHTML =
+            "Actual: " + printer.temps[0].tool0.actual + "°C";
+          elements.printerControls.bedTarget.placeholder =
+            printer.temps[0].bed.target + "°C";
+          elements.printerControls.bedActual.innerHTML =
+            "Actual: " + printer.temps[0].bed.actual + "°C";
+        }
+        elements.printerControls.e0Actual.classList = "input-group-text";
+        elements.printerControls.bedActual.classList = "input-group-text";
+        elements.connectPage.restartButton.disabled = false;
+        elements.connectPage.rebootButton.disabled = false;
+        elements.connectPage.shutdownButton.disabled = false;
+        elements.connectPage.printerPort.disabled = true;
+        elements.connectPage.printerBaud.disabled = true;
+        elements.connectPage.printerProfile.disabled = true;
+        if (
+          typeof printer.job != "undefined" &&
+          printer.job.filename === "No File Selected"
+        ) {
+          elements.printerControls.printStart.disabled = true;
+          elements.printerControls.printStart.style.display = "inline-block";
+          elements.printerControls.printPause.disabled = true;
+          elements.printerControls.printPause.style.display = "inline-block";
+          elements.printerControls.printStop.disabled = true;
+          elements.printerControls.printStop.style.display = "inline-block";
+          elements.printerControls.printRestart.disabled = true;
+          elements.printerControls.printRestart.style.display = "none";
+          elements.printerControls.printResume.disabled = true;
+          elements.printerControls.printResume.style.display = "none";
+        } else {
+          if (printer.state === "Paused") {
+            PrinterManager.controls(false);
+            elements.printerControls.printStart.disabled = true;
+            elements.printerControls.printStart.style.display = "none";
+            elements.printerControls.printPause.disabled = true;
+            elements.printerControls.printPause.style.display = "none";
+            elements.printerControls.printStop.disabled = false;
+            elements.printerControls.printStop.style.display = "inline-block";
+            elements.printerControls.printRestart.disabled = false;
+            elements.printerControls.printRestart.style.display =
+              "inline-block";
+            elements.printerControls.printResume.disabled = false;
+            elements.printerControls.printResume.style.display = "inline-block";
+          } else {
+            elements.printerControls.printStart.disabled = false;
+            elements.printerControls.printStart.style.display = "inline-block";
+            elements.printerControls.printPause.disabled = true;
+            elements.printerControls.printPause.style.display = "inline-block";
+            elements.printerControls.printStop.disabled = true;
+            elements.printerControls.printStop.style.display = "inline-block";
+            elements.printerControls.printRestart.disabled = true;
+            elements.printerControls.printRestart.style.display = "none";
+            elements.printerControls.printResume.disabled = true;
+            elements.printerControls.printResume.style.display = "none";
+          }
+        }
+      } else if (
+        printer.stateColour.category === "Offline" ||
+        printer.stateColour.category === "Closed"
+      ) {
+        elements.connectPage.connectButton.value = "connect";
+        elements.connectPage.connectButton.innerHTML = "Connect";
+        elements.connectPage.connectButton.classList = "btn btn-success inline";
+        elements.connectPage.portDropDown.disabled = false;
+        elements.connectPage.baudDropDown.disabled = false;
+        elements.connectPage.profileDropDown.disabled = false;
+        elements.connectPage.connectButton.disabled = false;
+        elements.printerControls.e0Target.placeholder = 0 + "°C";
+        elements.printerControls.e0Actual.innerHTML = "Actual: " + 0 + "°C";
+        elements.printerControls.bedTarget.placeholder = 0 + "°C";
+        elements.printerControls.bedActual.innerHTML = "Actual: " + 0 + "°C";
+        elements.connectPage.restartButton.disabled = false;
+        elements.connectPage.rebootButton.disabled = false;
+        elements.connectPage.shutdownButton.disabled = false;
+        elements.printerControls.e0Actual.classList = "input-group-text";
+        elements.printerControls.bedActual.classList = "input-group-text";
+        PrinterManager.controls(true);
         elements.printerControls.printStart.disabled = true;
         elements.printerControls.printStart.style.display = "inline-block";
         elements.printerControls.printPause.disabled = true;
@@ -1277,63 +1328,39 @@ export default class PrinterManager {
         elements.printerControls.printRestart.style.display = "none";
         elements.printerControls.printResume.disabled = true;
         elements.printerControls.printResume.style.display = "none";
-      } else {
-        if (printer.state === "Paused") {
-          PrinterManager.controls(false);
-          elements.printerControls.printStart.disabled = true;
-          elements.printerControls.printStart.style.display = "none";
-          elements.printerControls.printPause.disabled = true;
-          elements.printerControls.printPause.style.display = "none";
-          elements.printerControls.printStop.disabled = false;
-          elements.printerControls.printStop.style.display = "inline-block";
-          elements.printerControls.printRestart.disabled = false;
-          elements.printerControls.printRestart.style.display = "inline-block";
-          elements.printerControls.printResume.disabled = false;
-          elements.printerControls.printResume.style.display = "inline-block";
-        } else {
-          elements.printerControls.printStart.disabled = false;
-          elements.printerControls.printStart.style.display = "inline-block";
-          elements.printerControls.printPause.disabled = true;
-          elements.printerControls.printPause.style.display = "inline-block";
-          elements.printerControls.printStop.disabled = true;
-          elements.printerControls.printStop.style.display = "inline-block";
-          elements.printerControls.printRestart.disabled = true;
-          elements.printerControls.printRestart.style.display = "none";
-          elements.printerControls.printResume.disabled = true;
-          elements.printerControls.printResume.style.display = "none";
+        if (printer.stateColour.category === "Offline") {
+          document
+            .getElementById("printerManagerModal")
+            .classList.remove("show");
         }
       }
-    } else if (
-      printer.stateColour.category === "Offline" ||
-      printer.stateColour.category === "Closed"
-    ) {
-      elements.connectPage.connectButton.value = "connect";
-      elements.connectPage.connectButton.innerHTML = "Connect";
-      elements.connectPage.connectButton.classList = "btn btn-success inline";
-      elements.connectPage.portDropDown.disabled = false;
-      elements.connectPage.baudDropDown.disabled = false;
-      elements.connectPage.profileDropDown.disabled = false;
-      elements.connectPage.connectButton.disabled = false;
-      elements.printerControls.e0Target.placeholder = 0 + "°C";
-      elements.printerControls.e0Actual.innerHTML = "Actual: " + 0 + "°C";
-      elements.printerControls.bedTarget.placeholder = 0 + "°C";
-      elements.printerControls.bedActual.innerHTML = "Actual: " + 0 + "°C";
-      elements.connectPage.restartButton.disabled = false;
-      elements.connectPage.rebootButton.disabled = false;
-      elements.connectPage.shutdownButton.disabled = false;
-      elements.printerControls.e0Actual.classList = "input-group-text";
-      elements.printerControls.bedActual.classList = "input-group-text";
-      PrinterManager.controls(true);
-      elements.printerControls.printStart.disabled = true;
-      elements.printerControls.printStart.style.display = "inline-block";
-      elements.printerControls.printPause.disabled = true;
-      elements.printerControls.printPause.style.display = "inline-block";
-      elements.printerControls.printStop.disabled = true;
-      elements.printerControls.printStop.style.display = "inline-block";
-      elements.printerControls.printRestart.disabled = true;
-      elements.printerControls.printRestart.style.display = "none";
-      elements.printerControls.printResume.disabled = true;
-      elements.printerControls.printResume.style.display = "none";
+    }
+    if (elements.menu.terminal.classList.contains("active")) {
+      let isScrolledToBottom =
+        elements.terminal.terminalWindow.scrollHeight -
+          elements.terminal.terminalWindow.clientHeight <=
+        elements.terminal.terminalWindow.scrollTop + 1;
+      if (typeof printer.logs != "undefined") {
+        //console.log(printer.logs);
+        let logText = printer.logs.join("<br />");
+        if (logText != previousLog) {
+          elements.terminal.terminalWindow.insertAdjacentHTML(
+            "beforeend",
+            `<div id="logLine-${terminalCount.length}" class="logLine">${logText}</div>`
+          );
+          if (terminalCount.length > 15) {
+            for (let i = 0; i < terminalCount.length - 5; i++) {
+              terminalCount[i].remove();
+            }
+          }
+        }
+
+        if (isScrolledToBottom) {
+          elements.terminal.terminalWindow.scrollTop =
+            elements.terminal.terminalWindow.scrollHeight -
+            elements.terminal.terminalWindow.clientHeight;
+        }
+      }
     }
   }
   static async controls(enable, printing) {
