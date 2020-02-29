@@ -94,7 +94,6 @@ class ClientSocket {
 
 class Runner {
   static async init() {
-    async function incoming(data) {}
     //Grab printers from database....
     try {
       farmPrinters = await Printers.find({}, null, { sort: { index: 1 } });
@@ -223,13 +222,13 @@ class Runner {
       }
     });
     onlineRunners[client.index].ws.on("error", async function incoming(data) {
+      console.log("RRR");
       Runner.setOffline(client);
     });
     onlineRunners[client.index].ws.on("close", async function incoming(data) {
-      Runner.setOffline(client);
+      //Runner.setOffline(client);
       //Make connection attempt...
       //Increment how many attempts
-
       //If over 5 attempts made and failed then class the device offline
     });
   }
@@ -248,6 +247,8 @@ class Runner {
             farmPrinters[client.index].port,
             farmPrinters[client.index].apikey
           );
+          console.log(clientNew);
+          console.log(clientNewerror);
           if (typeof clientNew.error === "undefined") {
             Runner.setOnline(clientNew);
           }
@@ -260,15 +261,17 @@ class Runner {
         farmPrinters[client.index].port,
         farmPrinters[client.index].apikey
       );
+      console.log(clientNew);
+      console.log(clientNewerror);
       if (typeof clientNew.error === "undefined") {
         Runner.setOnline(clientNew);
       }
     }
   }
 
-  static stopAll() {
+  static async stopAll() {
     console.log("Stopping statistics collection...");
-    StatisticsCollection.stop();
+    await StatisticsCollection.stop();
     console.log("Stopped statistic collection");
     farmPrinters.forEach((run, index) => {
       farmPrinters[index].state = "Searching...";
@@ -284,6 +287,7 @@ class Runner {
       clearInterval(run);
       run = false;
     });
+    return;
   }
   static getFiles(index, location) {
     return ClientAPI.get(

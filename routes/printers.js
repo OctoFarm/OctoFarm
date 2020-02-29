@@ -57,17 +57,18 @@ router.post("/save", ensureAuthenticated, async (req, res) => {
     let newPrinter = await new Printers(printers[i]);
     await newPrinter.save();
   }
-  Runner.init();
+  await Runner.init();
   res.send(printers);
 });
+
 //Register handle for initialising runners
 router.post("/runner/init", ensureAuthenticated, (req, res) => {
   res.send("Initialised Printers");
 });
 router.post("/delete", ensureAuthenticated, async (req, res) => {
-  Runner.stopAll();
+  await Runner.stopAll();
   await Printers.deleteMany({}).catch(err => console.log(err));
-  Runner.init();
+  await Runner.init();
   res.send("Deleted Printers");
 });
 //Register handle for checking for offline printers

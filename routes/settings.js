@@ -13,19 +13,20 @@ router.get("/server/get", ensureAuthenticated, (req, res) => {
     res.send(checked[0]);
   });
 });
-
+function sleep(ms) {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms);
+  });
+}
 router.post("/server/update", ensureAuthenticated, (req, res) => {
-  ServerSettingsDB.find({})
-    .then(checked => {
-      Runner.stopAll();
-      checked[0].onlinePolling = req.body.onlinePolling;
-      checked[0].offlinePolling = req.body.offlinePolling;
-      checked[0].save();
-      return;
-    })
-    .then(async () => {
-      let start = await Runner.init();
-      res.send({ msg: start });
-      return start;
-    });
+  ServerSettingsDB.find({}).then(async checked => {
+    await Runner.stopAll();
+    checked[0].onlinePolling = req.body.onlinePolling;
+    checked[0].offlinePolling = req.body.offlinePolling;
+    await checked[0].save();
+    let printers = await Runner.returnFarmPrinters();
+    await sleep(3000 * printers.length);
+    await Runner.init();
+    res.send({ msg: "Settings Saved, Restarting Runners..." });
+  });
 });

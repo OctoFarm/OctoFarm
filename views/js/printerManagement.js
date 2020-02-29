@@ -222,6 +222,13 @@ class PrintersManagement {
     }
   }
   static async save(printerTable) {
+    document.getElementById("overlay").style.display = "block";
+    UI.createAlert(
+      "success",
+      "Printers updated, please wait whilst the server restarts...<br> This may take some time...<br> The page will automatically refresh when complete.... ",
+      10000,
+      "clicked"
+    );
     const table = document.getElementById(printerTable);
     let printers = new Array();
     for (var r = 0, n = table.rows.length; r < n; r++) {
