@@ -15,14 +15,20 @@ let farmPrinters = [];
 
 class ClientAPI {
   static get(ip, port, apikey, item) {
+    let timeout = 1000;
     let url = `http://${ip}:${port}/api/${item}`;
-    return fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": apikey
-      }
-    });
+    return Promise.race([
+      fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Key": apikey
+        }
+      }),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("timeout")), timeout)
+      )
+    ]);
   }
 }
 
@@ -43,7 +49,6 @@ class ClientSocket {
         await Runner.getSettings(index);
         await Runner.getProfile(index);
       }
-      users = await users.json();
 
       let currentUser = "";
       if (_.isEmpty(users)) {

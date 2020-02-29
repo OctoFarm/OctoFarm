@@ -17,12 +17,6 @@ require("./config/passport.js")(passport);
 //DB Config
 const db = require("./config/db.js").MongoURI;
 
-//Mongo Connect
-mongoose
-  .connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB Connected..."))
-  .catch(err => console.log(err));
-
 //JSON
 app.use(express.json());
 
@@ -68,7 +62,15 @@ if (db === "") {
   app.use("/settings", require("./routes/settings", { page: "route" }));
   app.use("/ws", require("./routes/webSocket", { page: "route" }));
 }
+
+//Mongo Connect
+mongoose
+  .connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => serverStart())
+  .catch(err => console.log(err));
+
 let serverStart = async function() {
+  console.log("MongoDB Connected...");
   //Setup Settings
   const serverSettings = require("./settings/serverSettings.js");
   const ServerSettings = serverSettings.ServerSettings;
@@ -96,7 +98,3 @@ let serverStart = async function() {
     console.log(`You can now access your server on port: ${PORT}`);
   });
 };
-//Server
-if (db != "") {
-  serverStart();
-}

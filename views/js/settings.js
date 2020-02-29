@@ -41,7 +41,7 @@ class ServerSettings {
     document.getElementById("overlay").style.display = "block";
     UI.createAlert(
       "success",
-      "Server settings saved, restarting Server Runners... <br> Please wait.... <br> this may take some time!",
+      "Settings updated, please wait whilst the server restarts...<br> This may take some time...<br> The page will automatically refresh when complete.... ",
       10000,
       "clicked"
     );
@@ -50,8 +50,7 @@ class ServerSettings {
         return res.json();
       })
       .then(res => {
-        UI.createAlert("success", res.msg, 3000, "clicked");
-        document.getElementById("overlay").style.display = "none";
+        location.reload();
       });
   }
 }

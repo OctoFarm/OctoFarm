@@ -1,6 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
+const serverSettings = require("../settings/serverSettings.js");
+const ServerSettings = serverSettings.ServerSettings;
+
+//Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
 let dashboardInfo = null;
 
 const FarmStatistics = require("../models/FarmStatistics.js");
@@ -58,11 +62,11 @@ let interval = null;
 router.ws("/grab", function(ws, req) {
   ws.on("open", function open() {
     console.log("Client connected");
-    ws.send(Date.now());
   });
-  ws.on("message", function(msg) {
+  ws.on("message", async function(msg) {
     if (msg === "hello") {
       try {
+        let Polling = await ServerSettings.check();
         ws.interval = setInterval(function() {
           if (ws.readyState === 1) {
             ws.send(JSON.stringify(dashboardInfo));
@@ -70,7 +74,7 @@ router.ws("/grab", function(ws, req) {
             clearInterval(ws.interval);
             ws.terminate();
           }
-        }, 500);
+        }, parseInt(Polling[0].onlinePolling.seconds * 1000));
       } catch (e) {
         console.log({
           error: e,
