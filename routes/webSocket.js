@@ -81,6 +81,7 @@ router.ws("/grab", function(ws, req) {
           message:
             "Client unexpectedly disconnected... stopping interval, refresh client to reconnect..."
         });
+        clearInterval(ws.interval);
         ws.terminate();
       }
     }

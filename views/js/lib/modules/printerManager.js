@@ -226,12 +226,12 @@ export default class PrinterManager {
             <div class="row">
               <div class="col-lg-12 text-center">
               <div class="col-12 list-group" id="fileLocations"><div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="fileSearchBar">Search:</label> </div><input id="fileSearch" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" placeholder="Type your filename here"></div></div>
-              <div class="col-12 list-group" id="fileLocations"><div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="fileManagerFolderSelect">Folders:</label> </div> <select class="custom-select bg-secondary text-light" id="fileManagerFolderSelect"><option value="local">local</option></select></div></div>
-    <ul class="col-12 list-group border-secondary" id="fileManagerFileList" style="height:230px; overflow-y:scroll;">
+              <div class="col-12 list-group" id="fileLocations"><div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="fileManagerFolderSelect">Folders:</label> </div> <select class="custom-select bg-secondary text-light" id="fileManagerFolderSelect"><option value="local">local</option></select><button id="fileUpload" type="button" class="btn btn-primary btn-sm">Upload</button></div></div>
+                <ul class="col-12 list-group border-secondary" id="fileManagerFileList" style="height:230px; overflow-y:scroll;">
 
 
-    
-    </ul>
+                
+                </ul>
               </div>
             </div>
           </div>

@@ -94,6 +94,7 @@ class ClientSocket {
 
 class Runner {
   static async init() {
+    async function incoming(data) {}
     //Grab printers from database....
     try {
       farmPrinters = await Printers.find({}, null, { sort: { index: 1 } });
@@ -275,6 +276,7 @@ class Runner {
     });
     onlineRunners.forEach(run => {
       run.ws.close();
+      run.ws.terminate();
       run = false;
     });
     offlineRunners.forEach((run, index) => {

@@ -29,9 +29,3 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
       return start;
     });
 });
-
-router.get("/client/get", ensureAuthenticated, (req, res) => {
-  ClientSettingsDB.find({}).then(checked => {
-    res.send(checked[0]);
-  });
-});

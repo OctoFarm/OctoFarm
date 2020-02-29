@@ -44,65 +44,102 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
 });
 //File Manager Page
 router.get("/filemanager", ensureAuthenticated, async (req, res) => {
-  let printers = await Printers.find({}, null, { sort: { index: 1 } });
-  res.render("filemanager", {
+  let printers = Runner.returnFarmPrinters();
+  let statistics = await FarmStatistics.find({});
+  let systemInformation = await SystemInfo.find({});
+  res.render("dashboard", {
     name: req.user.name,
     version: pjson.version,
     printers: printers,
+    farmInfo: statistics[0].farmInfo,
+    currentOperations: statistics[0].currentOperations,
+    octofarmStatistics: statistics[0].octofarmStatistics,
+    printStatistics: statistics[0].printStatistics,
     printerCount: printers.length,
-    page: "File Manager",
-    helpers: prettyHelpers
+    currentOperationsCount: statistics[0].currentOperationsCount[0],
+    page: "Dashboard",
+    helpers: prettyHelpers,
+    systemInfo: systemInformation[0]
   });
 });
 //History Page
 router.get("/history", ensureAuthenticated, async (req, res) => {
-  let printers = await Printers.find({}, null, { sort: { index: 1 } });
-  const History = require("../models/History.js");
-  let history = await History.find({});
-  res.render("history", {
+  let printers = Runner.returnFarmPrinters();
+  let statistics = await FarmStatistics.find({});
+  let systemInformation = await SystemInfo.find({});
+  res.render("dashboard", {
     name: req.user.name,
     version: pjson.version,
     printers: printers,
+    farmInfo: statistics[0].farmInfo,
+    currentOperations: statistics[0].currentOperations,
+    octofarmStatistics: statistics[0].octofarmStatistics,
+    printStatistics: statistics[0].printStatistics,
     printerCount: printers.length,
-    history: history,
-    page: "History",
-    helpers: prettyHelpers
+    currentOperationsCount: statistics[0].currentOperationsCount[0],
+    page: "Dashboard",
+    helpers: prettyHelpers,
+    systemInfo: systemInformation[0]
   });
 });
 //Panel view  Page
 router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
-  let printers = await Printers.find({}, null, { sort: { index: 1 } });
-  res.render("panelView", {
+  let printers = Runner.returnFarmPrinters();
+  let statistics = await FarmStatistics.find({});
+  let systemInformation = await SystemInfo.find({});
+  res.render("dashboard", {
     name: req.user.name,
     version: pjson.version,
     printers: printers,
+    farmInfo: statistics[0].farmInfo,
+    currentOperations: statistics[0].currentOperations,
+    octofarmStatistics: statistics[0].octofarmStatistics,
+    printStatistics: statistics[0].printStatistics,
     printerCount: printers.length,
-    page: "Panel View",
-    helpers: prettyHelpers
+    currentOperationsCount: statistics[0].currentOperationsCount[0],
+    page: "Dashboard",
+    helpers: prettyHelpers,
+    systemInfo: systemInformation[0]
   });
 });
 //Camera view  Page
 router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
-  let printers = await Printers.find({}, null, { sort: { index: 1 } });
-  res.render("cameraView", {
+  let printers = Runner.returnFarmPrinters();
+  let statistics = await FarmStatistics.find({});
+  let systemInformation = await SystemInfo.find({});
+  res.render("dashboard", {
     name: req.user.name,
     version: pjson.version,
     printers: printers,
+    farmInfo: statistics[0].farmInfo,
+    currentOperations: statistics[0].currentOperations,
+    octofarmStatistics: statistics[0].octofarmStatistics,
+    printStatistics: statistics[0].printStatistics,
     printerCount: printers.length,
-    page: "Camera View",
-    helpers: prettyHelpers
+    currentOperationsCount: statistics[0].currentOperationsCount[0],
+    page: "Dashboard",
+    helpers: prettyHelpers,
+    systemInfo: systemInformation[0]
   });
 });
 //List view  Page
 router.get("/mon/list", ensureAuthenticated, async (req, res) => {
-  let printers = await Printers.find({}, null, { sort: { index: 1 } });
-  res.render("listView", {
+  let printers = Runner.returnFarmPrinters();
+  let statistics = await FarmStatistics.find({});
+  let systemInformation = await SystemInfo.find({});
+  res.render("dashboard", {
     name: req.user.name,
     version: pjson.version,
     printers: printers,
+    farmInfo: statistics[0].farmInfo,
+    currentOperations: statistics[0].currentOperations,
+    octofarmStatistics: statistics[0].octofarmStatistics,
+    printStatistics: statistics[0].printStatistics,
     printerCount: printers.length,
-    page: "Camera View",
-    helpers: prettyHelpers
+    currentOperationsCount: statistics[0].currentOperationsCount[0],
+    page: "Dashboard",
+    helpers: prettyHelpers,
+    systemInfo: systemInformation[0]
   });
 });
 module.exports = router;
