@@ -44,6 +44,11 @@
         </button>
       </div>
       <div class="card-body dashBody" id="printerList">
+        <div class="row">
+          <div class="cell col-6"><center><button id="connectAllBtn" type="button" class="btn btn-success btn-sm"><i class="fas fa-link"></i> Connect</button></center></div>
+          <div class="cell col-6"><center><button id="disconnectAllBtn" type="button" class="btn btn-danger btn-sm"><i class="fas fa-unlink"></i> Disconnect</button></center></div>
+        </div>
+
         <%- include('./partials/Printers/dashboardList.ejs') %>
       </div>
       <div class="card-footer dashFooter text-muted"></div>

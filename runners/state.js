@@ -195,7 +195,8 @@ class Runner {
         farmPrinters[client.index].progress = data.current.progress;
         farmPrinters[client.index].job = data.current.job;
         farmPrinters[client.index].logs = data.current.logs;
-
+        //console.log(data.current.temps.length != 0);
+        //console.log(data.current.temps);
         if (data.current.temps.length != 0) {
           farmPrinters[client.index].temps = data.current.temps;
         }

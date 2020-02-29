@@ -1,4 +1,4 @@
-import Client from "./lib/octofarm.js";
+import OctoPrintClient from "./lib/octoprint.js";
 import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
@@ -64,6 +64,163 @@ printerCard.forEach(card => {
     PrinterManager.init(printerInfo);
   });
 });
+document.getElementById("connectAllBtn").addEventListener("click", e => {
+  dashActions.connectAll();
+});
+document.getElementById("disconnectAllBtn").addEventListener("click", e => {
+  dashActions.disconnectAll();
+});
+
+class dashActions {
+  static async connectAll() {
+    //Create bootbox confirmation message
+    let message =
+      "You must have at least 1 printer in the Closed state to use this function";
+    printerInfo.forEach(printer => {
+      if (printer.state === "Closed") {
+        message = "";
+        let print = `
+        <form class="was-validated">
+        <div class="custom-control custom-checkbox mb-3">
+          <input type="checkbox" class="custom-control-input" id="printerSel-${printer.index}" required>
+          <label class="custom-control-label" for="printerSel-${printer.index}">${printer.index}. ${printer.settingsAppearance.name}</label>
+          <div class="valid-feedback">Attempt to connect to this printer!</div>
+          <div class="invalid-feedback">DO NOT attempt to connect to this printer</div>
+        </div>
+      </form>
+        `;
+        message += print;
+      }
+    });
+    //Last change confirmation
+    bootbox
+      .confirm(message, async function(result) {
+        if (result) {
+          if (
+            message ===
+            "You must have at least 1 printer in the Closed state to use this function"
+          ) {
+            return;
+          }
+          //Grab page of selected elements...
+          let selected = await document.querySelectorAll("[id^='printerSel-']");
+
+          for (let i = 0; i < selected.length; i++) {
+            if (selected[i].checked === true) {
+              let index = selected[i].id.replace("printerSel-", "");
+              let preferBaud = printerInfo[i].options.baudratePreference;
+              let preferPort = printerInfo[i].options.portPreference;
+              let preferProfile =
+                printerInfo[i].options.printerProfilePreference;
+              if (preferBaud === null) {
+                preferBaud = "115200";
+              }
+              if (preferPort === null) {
+                preferPort = printerInfo[i].options.ports[0];
+              }
+              if (preferProfile === null) {
+                preferProfile = printerInfo[i].options.printerProfiles[0];
+              }
+
+              let opts = {
+                command: "connect",
+                port: preferPort,
+                baudrate: preferBaud,
+                printerProfile: preferProfile
+              };
+              let post = await OctoPrintClient.post(
+                printerInfo[i],
+                "connection",
+                opts
+              );
+              if (post.status === 204) {
+                UI.createAlert(
+                  "success",
+                  `Connected: ${printerInfo[index].index}. ${printerInfo[index].settingsAppearance.name}`,
+                  3000,
+                  "clicked"
+                );
+              } else {
+                UI.createAlert(
+                  "error",
+                  `Couldn't Connect ${printerInfo[index].index}with Port: ${preferPort}, Baud: ${preferBaud}, Profile: ${preferProfile}`,
+                  3000,
+                  "clicked"
+                );
+              }
+            }
+          }
+        }
+      })
+      .find("div.modal-dialog")
+      .addClass("largeWidth");
+  }
+  static async disconnectAll() {
+    //Create bootbox confirmation message
+    let message =
+      "You must have at least 1 printer in the Idle category to use this function";
+    printerInfo.forEach(printer => {
+      if (printer.stateColour.category === "Idle") {
+        message = "";
+        let print = `
+            <form class="was-validated">
+            <div class="custom-control custom-checkbox mb-3">
+              <input type="checkbox" class="custom-control-input" id="printerSel-${printer.index}" required>
+              <label class="custom-control-label" for="printerSel-${printer.index}">${printer.index}. ${printer.settingsAppearance.name}</label>
+              <div class="valid-feedback">ATTEMPT to disconnect this printer!</div>
+              <div class="invalid-feedback">Do not attempt to connect to this printer</div>
+            </div>
+          </form>
+            `;
+        message += print;
+      }
+    });
+    //Last change confirmation
+    bootbox
+      .confirm(message, async function(result) {
+        if (result) {
+          if (
+            message ===
+            "You must have at least 1 printer in the Idle category to use this function"
+          ) {
+            return;
+          }
+          //Grab page of selected elements...
+          let selected = await document.querySelectorAll("[id^='printerSel-']");
+          for (let i = 0; i < selected.length; i++) {
+            if (selected[i].checked === true) {
+              let index = selected[i].id.replace("printerSel-", "");
+              let opts = {
+                command: "disconnect"
+              };
+              let post = await OctoPrintClient.post(
+                printerInfo[i],
+                "connection",
+                opts
+              );
+              if (post.status === 204) {
+                UI.createAlert(
+                  "success",
+                  `Disconnected: ${printerInfo[index].index}. ${printerInfo[index].settingsAppearance.name}`,
+                  3000,
+                  "clicked"
+                );
+              } else {
+                UI.createAlert(
+                  "error",
+                  `Couldn't Disconnect: ${printerInfo[index].index}. ${printerInfo[index].settingsAppearance.name}`,
+                  3000,
+                  "clicked"
+                );
+              }
+            }
+          }
+        }
+      })
+      .find("div.modal-dialog")
+      .addClass("largeWidth");
+  }
+}
 
 class dashUpdate {
   static systemInformation(systemInfo) {
