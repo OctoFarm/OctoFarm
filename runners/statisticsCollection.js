@@ -35,7 +35,7 @@ class StatisticsCollection {
         clearInterval(farmRunner);
         StatisticsCollection.init();
       });
-    }, 2000);
+    }, 5000);
     return "Statistics collection has started...";
   }
   static async currentOperations(farmPrinters) {
