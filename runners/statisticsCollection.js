@@ -34,8 +34,9 @@ class StatisticsCollection {
         console.log("Couldn't save stats, trying again: Err MSG:" + err);
         clearInterval(farmRunner);
         StatisticsCollection.init();
+        return reject Error;
       });
-    }, 5000);
+    }, 1000);
     return "Statistics collection has started...";
   }
   static async currentOperations(farmPrinters) {
