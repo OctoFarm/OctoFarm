@@ -46,7 +46,7 @@ class SystemRunner {
           .catch(err => {
             err => console.log(err);
           });
-      }, 4000);
+      }, 5000);
     }
     return "System Information Runner Started...";
   }

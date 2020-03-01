@@ -74,20 +74,19 @@ document.getElementById("disconnectAllBtn").addEventListener("click", e => {
 class dashActions {
   static async connectAll() {
     //Create bootbox confirmation message
-    let message =
-      "You must have at least 1 printer in the Closed state to use this function";
+    let message = "";
     printerInfo.forEach(printer => {
       if (printer.state === "Closed") {
-        message = "";
         let print = `
+        <div style="display:inline-block;">
         <form class="was-validated">
         <div class="custom-control custom-checkbox mb-3">
-          <input type="checkbox" class="custom-control-input" id="printerSel-${printer.index}" required>
+          <input type="checkbox" class="custom-control-input" id="printerSel-${printer.index}" selected>
           <label class="custom-control-label" for="printerSel-${printer.index}">${printer.index}. ${printer.settingsAppearance.name}</label>
-          <div class="valid-feedback">Attempt to connect to this printer!</div>
-          <div class="invalid-feedback">DO NOT attempt to connect to this printer</div>
+          <div class="valid-feedback">Attempt to connect</div>
+          <div class="invalid-feedback">DO NOT connect</div>
         </div>
-      </form>
+      </form></div>
         `;
         message += print;
       }
@@ -161,7 +160,16 @@ class dashActions {
       "You must have at least 1 printer in the Idle category to use this function";
     printerInfo.forEach(printer => {
       if (printer.stateColour.category === "Idle") {
-        message = "";
+        if (
+          message.includes(
+            "You must have at least 1 printer in the Idle category to use this function"
+          )
+        ) {
+          message.replace(
+            "You must have at least 1 printer in the Idle category to use this function",
+            ""
+          );
+        }
         let print = `
             <form class="was-validated">
             <div class="custom-control custom-checkbox mb-3">

@@ -509,24 +509,29 @@ export default class PrinterManager {
       }
       let elements = PrinterManager.grabPage();
       elements.terminal.terminalWindow.innerHTML = "";
-      printer.filesList.files.forEach(file => {
-        if (file.path === "local") {
-          PrinterManager.drawFileList(
-            file,
-            elements.jobStatus.fileManagerFileList
-          );
-          PrinterManager.applyFileListeners(printer, file.name, file.fullPath);
-        }
-      });
-      printer.filesList.folders.forEach(folder => {
-        elements.jobStatus.fileManagerFolderSelect.insertAdjacentHTML(
-          "beforeend",
-          `
+      if (typeof printer.filesList != "undefined") {
+        printer.filesList.files.forEach(file => {
+          if (file.path === "local") {
+            PrinterManager.drawFileList(
+              file,
+              elements.jobStatus.fileManagerFileList
+            );
+            PrinterManager.applyFileListeners(
+              printer,
+              file.name,
+              file.fullPath
+            );
+          }
+        });
+        printer.filesList.folders.forEach(folder => {
+          elements.jobStatus.fileManagerFolderSelect.insertAdjacentHTML(
+            "beforeend",
+            `
             <option value="${folder}">${folder}</option></select>
         `
-        );
-      });
-
+          );
+        });
+      }
       PrinterManager.applyListeners(printer, elements);
     }
     PrinterManager.applyState(printer, job, progress);
@@ -1154,9 +1159,6 @@ export default class PrinterManager {
       elements.connectPage.restartButton.disabled = true;
       elements.connectPage.rebootButton.disabled = true;
       elements.connectPage.shutdownButton.disabled = true;
-      elements.connectPage.portDropDown.disabled = true;
-      elements.connectPage.baudDropDown.disabled = true;
-      elements.connectPage.profileDropDown.disabled = true;
       elements.printerControls["step" + printer.stepRate].className =
         "btn btn-dark active";
       elements.jobStatus.progressBar.innerHTML =
@@ -1231,9 +1233,6 @@ export default class PrinterManager {
         elements.connectPage.connectButton.innerHTML = "Disconnect";
         elements.connectPage.connectButton.classList = "btn btn-danger inline";
         elements.connectPage.connectButton.disabled = false;
-        elements.connectPage.portDropDown.disabled = true;
-        elements.connectPage.baudDropDown.disabled = true;
-        elements.connectPage.profileDropDown.disabled = true;
         if (
           typeof printer.temps != "undefined" &&
           typeof printer.temps[0].tool0 != "undefined" &&
@@ -1304,9 +1303,6 @@ export default class PrinterManager {
         elements.connectPage.connectButton.value = "connect";
         elements.connectPage.connectButton.innerHTML = "Connect";
         elements.connectPage.connectButton.classList = "btn btn-success inline";
-        elements.connectPage.portDropDown.disabled = false;
-        elements.connectPage.baudDropDown.disabled = false;
-        elements.connectPage.profileDropDown.disabled = false;
         elements.connectPage.connectButton.disabled = false;
         elements.printerControls.e0Target.placeholder = 0 + "°C";
         elements.printerControls.e0Actual.innerHTML = "Actual: " + 0 + "°C";

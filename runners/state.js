@@ -248,7 +248,7 @@ class Runner {
             farmPrinters[client.index].apikey
           );
           console.log(clientNew);
-          console.log(clientNewerror);
+          console.log(clientNew.error);
           if (typeof clientNew.error === "undefined") {
             Runner.setOnline(clientNew);
           }
