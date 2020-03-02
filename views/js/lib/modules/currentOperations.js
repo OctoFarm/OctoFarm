@@ -1,17 +1,21 @@
 import Calc from "../functions/calc.js";
 
-export default function currentOperations(currentOperations, currentOperationsCount) {
-  currentOperationsCount = currentOperationsCount[0]
+export default function currentOperations(
+  currentOperations,
+  currentOperationsCount
+) {
+  currentOperationsCount = currentOperationsCount;
   document.getElementById("completeCount").innerHTML =
     "Complete: " + currentOperationsCount.complete;
-  document.getElementById("idleCount").innerHTML = "Idle: " + currentOperationsCount.idle;
+  document.getElementById("idleCount").innerHTML =
+    "Idle: " + currentOperationsCount.idle;
   document.getElementById("activeCount").innerHTML =
     "Active: " + currentOperationsCount.active;
   document.getElementById("offlineCount").innerHTML =
     "Offline: " + currentOperationsCount.offline;
 
   document.getElementById("farmProgress").innerHTML =
-  currentOperationsCount.farmProgress + "%";
+    currentOperationsCount.farmProgress + "%";
   document.getElementById(
     "farmProgress"
   ).style = `width: ${currentOperationsCount.farmProgress}%`;
@@ -19,11 +23,7 @@ export default function currentOperations(currentOperations, currentOperationsCo
     "farmProgress"
   ).classList = `progress-bar progress-bar-striped bg-${currentOperationsCount.farmProgressColour}`;
 
-  currentOperations = _.orderBy(
-    currentOperations,
-    ["progress"],
-    ["desc"]
-  );
+  currentOperations = _.orderBy(currentOperations, ["progress"], ["desc"]);
 
   currentOperations.forEach((current, index) => {
     //check if exists, create if not....
@@ -34,7 +34,9 @@ export default function currentOperations(currentOperations, currentOperationsCo
       progress.style = `width: ${current.progress}%`;
       progress.innerHTML = current.progress + "%";
       progress.className = `progress-bar progress-bar-striped bg-${current.progressColour}`;
-      document.getElementById("currentTime-"+current.index).innerHTML = Calc.generateTime(current.timeRemaining);
+      document.getElementById(
+        "currentTime-" + current.index
+      ).innerHTML = Calc.generateTime(current.timeRemaining);
     } else {
       document.getElementById("currentOperationsBody").insertAdjacentHTML(
         "beforeend",
@@ -43,12 +45,20 @@ export default function currentOperations(currentOperations, currentOperationsCo
                 class="card card-block text-white bg-secondary d-inline-block"
                 style="min-width: 200px; height:85px;"
               >
-                  <div class="card-header pb-1 pt-1 pl-2 pr-2">${current.index}. ${current.name}</div>
+                  <div class="card-header pb-1 pt-1 pl-2 pr-2">${
+                    current.index
+                  }. ${current.name}</div>
                   <div class="card-body  pb-0 pt-2 pl-2 pr-2">
-                  <h6 id="currentTime-${current.index}" class="pb-0 text-center" style="font-size:0.6rem;">${ Calc.generateTime(current.timeRemaining) }</h6>
+                  <h6 id="currentTime-${
+                    current.index
+                  }" class="pb-0 text-center" style="font-size:0.6rem;">${Calc.generateTime(
+          current.timeRemaining
+        )}</h6>
                     <div class="progress">
                       <div id="currentProgress-${current.index}"
-                        class="progress-bar progress-bar-striped bg-${current.progressColour}"
+                        class="progress-bar progress-bar-striped bg-${
+                          current.progressColour
+                        }"
                         role="progressbar"
                         style="width: ${current.progress}%"
                         aria-valuenow="${current.progress}"
@@ -70,15 +80,15 @@ export default function currentOperations(currentOperations, currentOperationsCo
     let curr = [];
     currentOperations.forEach(cur => {
       curr.push(cur.index);
-    })
+    });
     let cards = [];
     currentCards.forEach(card => {
       let ca = card.id.split("-");
       cards.push(parseInt(ca[1]));
-    })
-    let remove = _.difference(cards, curr)
+    });
+    let remove = _.difference(cards, curr);
     remove.forEach(rem => {
-      document.getElementById("currentOpCard-"+rem).remove();
-    })
+      document.getElementById("currentOpCard-" + rem).remove();
+    });
   });
 }

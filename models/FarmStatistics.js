@@ -12,18 +12,6 @@ const FarmInfoSchema = new mongoose.Schema({
   octofarmStatistics: {
     type: Object,
     required: false
-  },
-  printStatistics: {
-    type: Object,
-    required: false
-  },
-  currentOperationsCount: {
-    type: Array,
-    required: false
-  },
-  currentOperations: {
-    type: Array,
-    required: false
   }
 });
 

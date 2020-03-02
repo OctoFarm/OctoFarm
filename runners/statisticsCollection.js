@@ -5,11 +5,10 @@ const _ = require("lodash");
 let farmStats = [];
 let farmRunner = null;
 
-function currentStats() {
-  return farmStats;
-}
-
 class StatisticsCollection {
+  static returnStats() {
+    return farmStats[0];
+  }
   static async init() {
     console.log("Setting up Statistics Collection");
     farmStats = await FarmStatistics.find({});
@@ -26,16 +25,20 @@ class StatisticsCollection {
         currentOperations,
         currentOperationsCount
       });
+
       farmStats[0] = newfarmStats;
       newfarmStats.save();
     }
     farmRunner = setInterval(async () => {
       await farmStats[0].save().catch(err => {
-        console.log("Couldn't save stats, trying again: Err MSG:" + err);
+        console.log(
+          "Couldn't save stats, Restarting Statistics Collection: Err MSG:" +
+            err
+        );
         clearInterval(farmRunner);
         StatisticsCollection.init();
       });
-    }, 3000);
+    }, 20000);
     return "Statistics collection has started...";
   }
   static async currentOperations(farmPrinters) {

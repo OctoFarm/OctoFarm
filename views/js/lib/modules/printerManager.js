@@ -422,6 +422,25 @@ export default class PrinterManager {
 `
       );
 
+      let pluginManager = document.getElementById("printerManagerPlugins");
+      console.log(Object.keys(printer.plugins));
+      console.log(printer.plugins);
+      let plugins = Object.keys(printer.plugins);
+      plugins.forEach(plug => {
+        pluginManager.insertAdjacentHTML(
+          "beforeend",
+          `
+        
+        <div style="display:inline-block;">
+          <label class="">${plug}</label>
+         
+          <div class="invalid-feedback" style="display:inline-block;">Not Supported</div>
+        </div>
+        
+        `
+        );
+        // <div class="valid-feedback" style="display:inline-block;">Activated!</div>
+      });
       document.getElementById("printerIndex").innerHTML = i;
       document.getElementById("printerWeb").innerHTML =
         '<center><a href="http://' +

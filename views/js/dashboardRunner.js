@@ -13,7 +13,9 @@ $("#printerManagerModal").on("hidden.bs.modal", function(e) {
 });
 $("#connectionModal").on("hidden.bs.modal", function(e) {
   //Fix for mjpeg stream not ending when element removed...
-  document.getElementById("connectionAction").remove();
+  if (document.getElementById("connectionAction")) {
+    document.getElementById("connectionAction").remove();
+  }
 });
 
 //Initial listeners
@@ -86,17 +88,18 @@ class dashActions {
       for (let i = 0; i < selected.length; i++) {
         if (selected[i].checked === true) {
           let index = selected[i].id.replace("printerSel-", "");
-          let preferBaud = printerInfo[i].options.baudratePreference;
-          let preferPort = printerInfo[i].options.portPreference;
-          let preferProfile = printerInfo[i].options.printerProfilePreference;
+          let preferBaud = printerInfo[index].options.baudratePreference;
+          let preferPort = printerInfo[index].options.portPreference;
+          let preferProfile =
+            printerInfo[index].options.printerProfilePreference;
           if (preferBaud === null) {
             preferBaud = "115200";
           }
           if (preferPort === null) {
-            preferPort = printerInfo[i].options.ports[0];
+            preferPort = printerInfo[index].options.ports[0];
           }
           if (preferProfile === null) {
-            preferProfile = printerInfo[i].options.printerProfiles[0];
+            preferProfile = printerInfo[index].options.printerProfiles[0];
           }
 
           let opts = {
@@ -106,7 +109,7 @@ class dashActions {
             printerProfile: preferProfile
           };
           let post = await OctoPrintClient.post(
-            printerInfo[i],
+            printerInfo[index],
             "connection",
             opts
           );
@@ -135,7 +138,7 @@ class dashActions {
             command: "disconnect"
           };
           let post = await OctoPrintClient.post(
-            printerInfo[i],
+            printerInfo[index],
             "connection",
             opts
           );

@@ -3,7 +3,6 @@ const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
 const db = require("../config/db").MongoURI;
 const pjson = require("../package.json");
-const Printers = require("../models/Printer.js");
 const FarmStatistics = require("../models/FarmStatistics.js");
 const SystemInfo = require("../models/SystemInfo.js");
 const prettyHelpers = require("../views/partials/functions/pretty.js");
@@ -24,19 +23,21 @@ if (db === "") {
 
 //Dashboard Page
 router.get("/dashboard", ensureAuthenticated, async (req, res) => {
-  let printers = Runner.returnFarmPrinters();
-  let statistics = await FarmStatistics.find({});
+  let printers = await Runner.returnFarmPrinters();
+  const farmStatistics = require("../runners/statisticsCollection.js");
+  const FarmStatistics = farmStatistics.StatisticsCollection;
+  let statistics = await FarmStatistics.returnStats();
   let systemInformation = await SystemInfo.find({});
   res.render("dashboard", {
     name: req.user.name,
     version: pjson.version,
     printers: printers,
-    farmInfo: statistics[0].farmInfo,
-    currentOperations: statistics[0].currentOperations,
-    octofarmStatistics: statistics[0].octofarmStatistics,
-    printStatistics: statistics[0].printStatistics,
+    farmInfo: statistics.farmInfo,
+    currentOperations: statistics.currentOperations,
+    octofarmStatistics: statistics.octofarmStatistics,
+    printStatistics: statistics.printStatistics,
     printerCount: printers.length,
-    currentOperationsCount: statistics[0].currentOperationsCount[0],
+    currentOperationsCount: statistics.currentOperationsCount,
     page: "Dashboard",
     helpers: prettyHelpers,
     systemInfo: systemInformation[0]
@@ -45,19 +46,14 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
 //File Manager Page
 router.get("/filemanager", ensureAuthenticated, async (req, res) => {
   let printers = Runner.returnFarmPrinters();
-  let statistics = await FarmStatistics.find({});
+  const FarmStatistics = farmStatistics.StatisticsCollection;
   let systemInformation = await SystemInfo.find({});
   res.render("filemanager", {
     name: req.user.name,
     version: pjson.version,
     printers: printers,
-    farmInfo: statistics[0].farmInfo,
-    currentOperations: statistics[0].currentOperations,
-    octofarmStatistics: statistics[0].octofarmStatistics,
-    printStatistics: statistics[0].printStatistics,
     printerCount: printers.length,
-    currentOperationsCount: statistics[0].currentOperationsCount[0],
-    page: "Dashboard",
+    page: "File Manager",
     helpers: prettyHelpers,
     systemInfo: systemInformation[0]
   });
@@ -65,8 +61,6 @@ router.get("/filemanager", ensureAuthenticated, async (req, res) => {
 //History Page
 router.get("/history", ensureAuthenticated, async (req, res) => {
   let printers = Runner.returnFarmPrinters();
-  let statistics = await FarmStatistics.find({});
-  let systemInformation = await SystemInfo.find({});
   const History = require("../models/History.js");
   let history = await History.find({});
   res.render("history", {
@@ -88,13 +82,10 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
     name: req.user.name,
     version: pjson.version,
     printers: printers,
-    farmInfo: statistics[0].farmInfo,
-    currentOperations: statistics[0].currentOperations,
-    octofarmStatistics: statistics[0].octofarmStatistics,
-    printStatistics: statistics[0].printStatistics,
+    currentOperations: statistics.currentOperations,
     printerCount: printers.length,
-    currentOperationsCount: statistics[0].currentOperationsCount[0],
-    page: "Dashboard",
+    currentOperationsCount: statistics.currentOperationsCount,
+    page: "Panel View",
     helpers: prettyHelpers,
     systemInfo: systemInformation[0]
   });
@@ -108,13 +99,9 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
     name: req.user.name,
     version: pjson.version,
     printers: printers,
-    farmInfo: statistics[0].farmInfo,
-    currentOperations: statistics[0].currentOperations,
-    octofarmStatistics: statistics[0].octofarmStatistics,
-    printStatistics: statistics[0].printStatistics,
+    currentOperations: statistics.currentOperations,
     printerCount: printers.length,
-    currentOperationsCount: statistics[0].currentOperationsCount[0],
-    page: "Dashboard",
+    page: "Camera View",
     helpers: prettyHelpers,
     systemInfo: systemInformation[0]
   });
@@ -128,13 +115,9 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
     name: req.user.name,
     version: pjson.version,
     printers: printers,
-    farmInfo: statistics[0].farmInfo,
-    currentOperations: statistics[0].currentOperations,
-    octofarmStatistics: statistics[0].octofarmStatistics,
-    printStatistics: statistics[0].printStatistics,
+    currentOperations: statistics.currentOperations,
     printerCount: printers.length,
-    currentOperationsCount: statistics[0].currentOperationsCount[0],
-    page: "Dashboard",
+    page: "List View",
     helpers: prettyHelpers,
     systemInfo: systemInformation[0]
   });

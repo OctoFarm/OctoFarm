@@ -7,7 +7,8 @@ const ServerSettings = serverSettings.ServerSettings;
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
 let dashboardInfo = null;
 
-const FarmStatistics = require("../models/FarmStatistics.js");
+const farmStatistics = require("../runners/statisticsCollection.js");
+const FarmStatistics = farmStatistics.StatisticsCollection;
 const SystemInfo = require("../models/SystemInfo.js");
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
@@ -15,7 +16,7 @@ const Runner = runner.Runner;
 setInterval(async function() {
   //Only needed for WebSocket Information
   let printers = await Runner.returnFarmPrinters();
-  let statistics = await FarmStatistics.find({});
+  let statistics = await FarmStatistics.returnStats();
   let printerInfo = [];
   let systemInformation = await SystemInfo.find({});
   for (let i = 0; i < printers.length; i++) {
@@ -48,11 +49,11 @@ setInterval(async function() {
   }
   dashboardInfo = {
     printerInfo: printerInfo,
-    currentOperations: statistics[0].currentOperations,
-    currentOperationsCount: statistics[0].currentOperationsCount,
-    farmInfo: statistics[0].farmInfo,
-    octofarmStatistics: statistics[0].octofarmStatistics,
-    printStatistics: statistics[0].printStatistics,
+    currentOperations: statistics.currentOperations,
+    currentOperationsCount: statistics.currentOperationsCount,
+    farmInfo: statistics.farmInfo,
+    octofarmStatistics: statistics.octofarmStatistics,
+    printStatistics: statistics.printStatistics,
     systemInfo: systemInformation[0]
   };
 }, 500);
