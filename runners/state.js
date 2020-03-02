@@ -222,17 +222,31 @@ class Runner {
       }
     });
     onlineRunners[client.index].ws.on("error", async function incoming(data) {
-      console.log("RRR");
-      Runner.setOffline(client);
+      onlineRunners[client.index].ws.close();
+      onlineRunners[client.index].ws.terminate();
+      onlineRunners[client.index] = false;
+      Runner.setOffline(ClipboardEvent);
     });
     onlineRunners[client.index].ws.on("close", async function incoming(data) {
-      //Runner.setOffline(client);
+      onlineRunners[client.index].ws.close();
+      onlineRunners[client.index].ws.terminate();
+      onlineRunners[client.index] = false;
+      Runner.setOffline(client);
+
       //Make connection attempt...
       //Increment how many attempts
       //If over 5 attempts made and failed then class the device offline
     });
   }
   static async setOffline(client) {
+    //Make sure stats are re-updated when client sent offline
+    StatisticsCollection.currentOperations(farmPrinters);
+    //Update farm information when we have temps
+    StatisticsCollection.farmInformation(farmPrinters);
+    //Update farm statistics
+    StatisticsCollection.octofarmStatistics(farmPrinters);
+    //Update print statistics
+    StatisticsCollection.printStatistics();
     console.log("Printer: " + client.index + " is offline");
     farmPrinters[client.index].state = "Offline";
     farmPrinters[client.index].stateColour = Runner.getColour("Offline");
@@ -247,8 +261,6 @@ class Runner {
             farmPrinters[client.index].port,
             farmPrinters[client.index].apikey
           );
-          console.log(clientNew);
-          console.log(clientNew.error);
           if (typeof clientNew.error === "undefined") {
             Runner.setOnline(clientNew);
           }
@@ -261,8 +273,6 @@ class Runner {
         farmPrinters[client.index].port,
         farmPrinters[client.index].apikey
       );
-      console.log(clientNew);
-      console.log(clientNewerror);
       if (typeof clientNew.error === "undefined") {
         Runner.setOnline(clientNew);
       }
@@ -276,11 +286,6 @@ class Runner {
     farmPrinters.forEach((run, index) => {
       farmPrinters[index].state = "Searching...";
       farmPrinters[index].stateColour = Runner.getColour("Searching...");
-    });
-    onlineRunners.forEach(run => {
-      run.ws.close();
-      run.ws.terminate();
-      run = false;
     });
     offlineRunners.forEach((run, index) => {
       console.log("Offline Printer: " + [index] + " stopped");
