@@ -563,6 +563,12 @@ class Runner {
   static stepRate(i, newRate) {
     farmPrinters[i].stepRate = newRate;
   }
+  static updateSettings(i, opts) {
+    farmPrinters[i].settingsScripts.gcode = opts.scripts.gcode;
+    farmPrinters[i].settingsApperance.name = opts.appearance.name;
+    farmPrinters[i].settingsWebcam = opts.webcam;
+    farmPrinters[i].camURL = opts.camURL;
+  }
 }
 
 module.exports = {

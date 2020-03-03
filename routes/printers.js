@@ -47,6 +47,15 @@ router.post("/feedChange", ensureAuthenticated, async (req, res) => {
   Runner.feedRate(step.printer, step.newSteps);
   res.send("success");
 });
+router.post("/updateSettings", ensureAuthenticated, async (req, res) => {
+  //Check required fields
+  const settings = req.body;
+  Runner.updateSettings(settings.index, settings.options);
+  let printer = await Printers.findOne({ index: settings.index });
+  printer.camURL = settings.options.camURL;
+  await printer.save();
+  res.send("success");
+});
 //Register Handle for Saving printers
 router.post("/save", ensureAuthenticated, async (req, res) => {
   //Check required fields
@@ -71,8 +80,9 @@ router.post("/delete", ensureAuthenticated, async (req, res) => {
   await Runner.init();
   res.send("Deleted Printers");
 });
+
 //Register handle for checking for offline printers
-router.post("/runner/checkOffline", ensureAuthenticated, (req, res) => {
+router.post("/runner/checkOffline", ensureAuthenticated, async (req, res) => {
   let checked = [];
   let farmPrinters = Runner.returnFarmPrinters();
 
@@ -82,7 +92,7 @@ router.post("/runner/checkOffline", ensureAuthenticated, (req, res) => {
         index: i
       };
       //Make sure runners are created ready for each printer to pass between...
-      Runner.setOffline(client);
+      await Runner.setOffline(client);
       checked.push(i);
     }
   }

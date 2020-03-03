@@ -19,14 +19,17 @@ export default class PrinterManager {
     const selectedProfile = printer.current.printerProfile;
     //Fake name
     let name = "";
+    let valueName = "";
     if (
       printer.settingsAppearance.name === "null" ||
       printer.settingsAppearance.name === ""
     ) {
       name = "Type a name here and save";
       printer.settingsAppearance.name = "";
+      valueName = "";
     } else {
       name = printer.settingsAppearance.name;
+      valueName = printer.settingsAppearance.name;
     }
 
     //Fake job and progress
@@ -65,13 +68,18 @@ export default class PrinterManager {
       parseInt(document.getElementById("printerIndex").innerHTML)
     ) {
     } else {
+      let camURL = "";
+      if (typeof printer.camURL != "undefined" && printer.camURL != "") {
+        camURL = printer.camURL;
+      }
       document.getElementById("printerInformation").innerHTML = `
         <h5>Printer Information</h5><hr>
         <form>
         <div class="form-row">
             <div class="col-lg-2">
             <label for="newPrinterName">Printer Name</label>
-            <input id="newPrinterName" type="text" class="form-control bg-dark text-white" style="width: 300px;" placeholder="${name}">
+            <input id="newPrinterName" type="text" class="form-control bg-dark text-white" style="width: 300px;" placeholder="${name}" value="${valueName}">
+
             </div>
         </div>
         </form>
@@ -87,7 +95,7 @@ export default class PrinterManager {
             </div>
             <div class="col-lg-4">
             <label for="newPrinterCamURL">Camera URL</label>
-            <input id="newPrinterCamURL" type="text" class="form-control bg-dark text-white" placeholder="${printer.camURL}">
+            <input id="newPrinterCamURL" type="text" class="form-control bg-dark text-white" placeholder="${printer.camURL}" value="${camURL}">
             </div>
             <div class="col-lg-5">
             <label for="newPrinterAPIKey">API Key</label>
@@ -460,6 +468,7 @@ export default class PrinterManager {
 `
       );
       let pluginManager = document.getElementById("printerManagerPlugins");
+      pluginManager.innerHTML = "";
       let plugins = Object.keys(printer.plugins);
       plugins.forEach(plug => {
         pluginManager.insertAdjacentHTML(
@@ -506,7 +515,7 @@ export default class PrinterManager {
           //PrinterActions.shutdownOctoprint(i);
         });
       document.getElementById("printerManagerFooter").innerHTML =
-        '<button id="savePrinterBtn" type="button" class="btn btn-success float-left" data-dismiss="modal">Save Changes</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>';
+        '<button id="savePrinterBtn" type="button" class="btn btn-success float-left">Save Changes</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>';
       document.getElementById("savePrinterBtn").addEventListener("click", e => {
         //Shutdown Event Listener
         //this.savePrinterChanges(i);
@@ -515,6 +524,7 @@ export default class PrinterManager {
       const printerBaud = document.getElementById("printerBaudDrop");
       const printerProfile = document.getElementById("printerProfileDrop");
       const printerConnect = document.getElementById("printerConnect");
+
       printerPort.innerHTML =
         '<label for="dashboardSerialPort">Port:</label><select id="pmSerialPort" class="form-control inline"></select>';
       printerBaud.innerHTML =
@@ -560,6 +570,9 @@ export default class PrinterManager {
       } else {
         printerConnect.innerHTML =
           '<center> <button id="pmConnect" class="btn btn-danger inline" value="disconnect">Disconnect</button></center>';
+        document.getElementById("pmSerialPort").disabled = true;
+        document.getElementById("pmBaudrate").disabled = true;
+        document.getElementById("pmProfile").disabled = true;
       }
       let elements = PrinterManager.grabPage();
       elements.terminal.terminalWindow.innerHTML = "";
@@ -993,6 +1006,11 @@ export default class PrinterManager {
         setTimeout(flashReturn, 500);
       }
     });
+    elements.mainPage.saveBtn.addEventListener("click", e => {
+      elements.mainPage.saveBtn.innerHTML =
+        "<i class='fas fa-cog fa-spin'></i> Saving Changes";
+      PrinterManager.saveOctoPrintSettings(printer, elements.mainPage.saveBtn);
+    });
   }
   static changeFolder(printer, fileManagerFileList, fileManagerFolderSelect) {
     fileManagerFileList.innerHTML = "";
@@ -1103,7 +1121,8 @@ export default class PrinterManager {
       mainPage: {
         title: document.getElementById("printerManagerTitle"),
         status: document.getElementById("pmStatus"),
-        plugins: document.getElementById("printerManagerPlugins")
+        plugins: document.getElementById("printerManagerPlugins"),
+        saveBtn: document.getElementById("savePrinterBtn")
       },
       jobStatus: {
         expectedTime: document.getElementById("pmExpectedTime"),
@@ -1484,5 +1503,99 @@ export default class PrinterManager {
         current.value = parseInt(current.value) + 1;
       }
     }
+  }
+  static async saveOctoPrintSettings(printer, saveBtn) {
+    let settingsAfterPrinterConnected = document.getElementById(
+      "settingsAfterPrinterConnected"
+    ).value;
+    let settingsAfterToolChange = document.getElementById(
+      "settingsAfterToolChange"
+    ).value;
+    let settingsBeforeToolChange = document.getElementById(
+      "settingsBeforeToolChange"
+    ).value;
+    let settingsBeforePrinterDisconnected = document.getElementById(
+      "settingsBeforePrinterDisconnected"
+    ).value;
+    let settingsBeforePrinterStarted = document.getElementById(
+      "settingsBeforePrinterStarted"
+    ).value;
+    let settingsAfterPrinterCancelled = document.getElementById(
+      "settingsAfterPrinterCancelled"
+    ).value;
+    let settingsAfterPrinterDone = document.getElementById(
+      "settingsAfterPrinterDone"
+    ).value;
+    let settingsAfterPrinterPaused = document.getElementById(
+      "settingsAfterPrinterPaused"
+    ).value;
+    let settingsBeforePrinterResumed = document.getElementById(
+      "settingsBeforePrinterResumed"
+    ).value;
+    let newPrinterCamURL = document.getElementById("newPrinterCamURL").value;
+    let settingsRotatecam = document.getElementById("camRot90").checked;
+    let settingsFlipH = document.getElementById("camFlipH").checked;
+    let settingsFlipV = document.getElementById("camFlipV").checked;
+    let printerNameChange = document.getElementById("newPrinterName").value;
+    let opts = {
+      scripts: {
+        gcode: {
+          afterPrintCancelled: settingsAfterPrinterCancelled,
+          afterPrintDone: settingsAfterPrinterDone,
+          afterPrintPaused: settingsAfterPrinterPaused,
+          afterPrinterConnected: settingsAfterPrinterConnected,
+          afterToolChange: settingsAfterToolChange,
+          beforePrintResumed: settingsBeforePrinterResumed,
+          beforePrintStarted: settingsBeforePrinterStarted,
+          beforePrinterDisconnected: settingsBeforePrinterDisconnected,
+          beforeToolChange: settingsBeforeToolChange
+        }
+      },
+      appearance: {
+        name: printerNameChange
+      },
+      webcam: {
+        rotate90: settingsRotatecam,
+        flipH: settingsFlipH,
+        flipV: settingsFlipV
+      }
+    };
+    let octoPost = await OctoPrintClient.post(printer, "settings", opts);
+    if (octoPost.status === 200) {
+      UI.createAlert(
+        "success",
+        `Printer: ${printer.index} OctoPrint has updated successfully`,
+        3000,
+        "click"
+      );
+    } else {
+      UI.createAlert(
+        "error",
+        `Printer: ${printer.index} OctoPrint has failed to update...`,
+        3000,
+        "click"
+      );
+    }
+    opts.camURL = newPrinterCamURL;
+    let farmPost = await OctoFarmClient.post("printers/updateSettings", {
+      index: printer.index,
+      options: opts
+    });
+    if (farmPost.status === 200) {
+      UI.createAlert(
+        "success",
+        `Printer: ${printer.index} OctoFarm has updated successfully`,
+        3000,
+        "click"
+      );
+    } else {
+      UI.createAlert(
+        "error",
+        `Printer: ${printer.index} OctoFarm failed to update...`,
+        3000,
+        "click"
+      );
+    }
+    saveBtn.innerHTML = "Save Changes";
   }
 }

@@ -179,6 +179,15 @@ export default class OctoPrintClient {
         3000,
         "click"
       );
+      if (command === "connect") {
+        document.getElementById("pmSerialPort").disabled = true;
+        document.getElementById("pmBaudrate").disabled = true;
+        document.getElementById("pmProfile").disabled = true;
+      } else {
+        document.getElementById("pmSerialPort").disabled = false;
+        document.getElementById("pmBaudrate").disabled = false;
+        document.getElementById("pmProfile").disabled = false;
+      }
     } else {
       UI.createAlert(
         "error",

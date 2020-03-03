@@ -86,6 +86,10 @@ class dashActions {
       for (let i = 0; i < selected.length; i++) {
         if (selected[i].checked === true) {
           let index = selected[i].id.replace("printerSel-", "");
+          let printerName = "";
+          if (typeof printerInfo[index].settingsAppearance != "undefined") {
+            printerName = printerInfo[index].settingsAppearance.name;
+          }
           let preferBaud = printerInfo[index].options.baudratePreference;
           let preferPort = printerInfo[index].options.portPreference;
           let preferProfile =
@@ -114,7 +118,7 @@ class dashActions {
           if (post.status === 204) {
             UI.createAlert(
               "success",
-              `Connected: ${printerInfo[index].index}. ${printerInfo[index].settingsAppearance.name}`,
+              `Connected: ${printerInfo[index].index}. ${printerName}`,
               1000,
               "clicked"
             );
@@ -132,6 +136,10 @@ class dashActions {
       for (let i = 0; i < selected.length; i++) {
         if (selected[i].checked === true) {
           let index = selected[i].id.replace("printerSel-", "");
+          let printerName = "";
+          if (typeof printerInfo[index].settingsAppearance != "undefined") {
+            printerName = printerInfo[index].settingsAppearance.name;
+          }
           let opts = {
             command: "disconnect"
           };
@@ -143,14 +151,14 @@ class dashActions {
           if (post.status === 204) {
             UI.createAlert(
               "success",
-              `Disconnected: ${printerInfo[index].index}. ${printerInfo[index].settingsAppearance.name}`,
+              `Disconnected: ${printerInfo[index].index}. ${printerName}`,
               1000,
               "clicked"
             );
           } else {
             UI.createAlert(
               "error",
-              `Couldn't Disconnect: ${printerInfo[index].index}. ${printerInfo[index].settingsAppearance.name}`,
+              `Couldn't Disconnect: ${printerInfo[index].index}. ${printerName}`,
               1000,
               "clicked"
             );
@@ -177,12 +185,16 @@ class dashActions {
     let printersList = "";
     printerInfo.forEach(printer => {
       if (printer.state === "Closed") {
+        let printerName = "";
+        if (typeof printer.settingsAppearance != "undefined") {
+          printerName = printer.settingsAppearance.name;
+        }
         let print = `
           <div style="display:inline-block;">
           <form class="was-validated">
           <div class="custom-control custom-checkbox mb-3">
             <input type="checkbox" class="custom-control-input" id="printerSel-${printer.index}" required>
-            <label class="custom-control-label" for="printerSel-${printer.index}">${printer.index}. ${printer.settingsAppearance.name}</label>
+            <label class="custom-control-label" for="printerSel-${printer.index}">${printer.index}. ${printerName}</label>
             <div class="valid-feedback">Attempt to connect</div>
             <div class="invalid-feedback">DO NOT connect</div>
           </div>
@@ -216,12 +228,16 @@ class dashActions {
     let printersList = "";
     printerInfo.forEach(printer => {
       if (printer.stateColour.category === "Idle") {
+        let printerName = "";
+        if (typeof printer.settingsAppearance != "undefined") {
+          printerName = printer.settingsAppearance.name;
+        }
         let print = `
               <div style="display:inline-block;">
               <form class="was-validated">
               <div class="custom-control custom-checkbox mb-3">
                 <input type="checkbox" class="custom-control-input" id="printerSel-${printer.index}" required>
-                <label class="custom-control-label" for="printerSel-${printer.index}">${printer.index}. ${printer.settingsAppearance.name}</label>
+                <label class="custom-control-label" for="printerSel-${printer.index}">${printer.index}. ${printerName}</label>
                 <div class="valid-feedback">Attempt to connect</div>
                 <div class="invalid-feedback">DO NOT connect</div>
               </div>
