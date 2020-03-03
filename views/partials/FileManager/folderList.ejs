@@ -1,4 +1,6 @@
-<% for(let i=0;i < printers[0].fileList.folders.length;i++){%>
+<% if(typeof printers[0].fileList != 'undefined' && typeof
+printers[0].fileList.folders != 'undefined'){%> <% for(let i=0;i <
+printers[0].fileList.folders.length;i++){%>
 <a
   href="#"
   class="list-group-item list-group-item-action flex-column align-items-start bg-dark"
@@ -18,7 +20,12 @@
         <h5 class="mb-1 float-left">
           <%= printers[0].fileList.folders[i] %>
         </h5>
-
+        <% if(typeof printer.storage != 'undefined'){ %>
+        <p>
+          <%- helpers.generateBytes(printer.storage.free) %> / <%-
+          helpers.generateBytes(printer.storage.total) %>
+        </p>
+        <% } %>
         <div
           class="float-right btn-group flex-wrap btn-group-sm"
           role="group"
@@ -35,4 +42,4 @@
     </div>
   </div>
 </a>
-<%}%>
+<%}%> <% } %>

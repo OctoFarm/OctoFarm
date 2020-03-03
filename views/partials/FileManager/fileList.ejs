@@ -1,29 +1,32 @@
-<% for(let i=0;i <
-printers[0].fileList.files.length;i++){%>
-<a
-  href="#"
-  class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
-  style="display: block;
-  padding: 0.7rem 0.1rem;"
->
-  <div class="row">
-    <div
-      class="col-lg-1"
-      style="display:flex; justify-content:center; align-items:center;"
+<% if(typeof printers[0].fileList != 'undefined' && typeof printers[0].fileList.files != 'undefined'){%>
+  <% for(let i=0;i <
+    printers[0].fileList.files.length;i++){%>
+    <a
+      href="#"
+      class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
+      style="display: block;
+      padding: 0.7rem 0.1rem;"
     >
-      <center><i class="fas fa-file-code fa-2x"></i></center>
-    </div>
-    <div class="col-lg-11">
-      <div class="d-flex w-100 justify-content-between">
-        <h5 class="mb-1"><%= printers[0].fileList.files[i].display %></h5>
-        <small>22 Hrs, 5 Mins, 12 Seconds</small>
+      <div class="row">
+        <div
+          class="col-lg-1"
+          style="display:flex; justify-content:center; align-items:center;"
+        >
+          <center><i class="fas fa-file-code fa-2x"></i></center>
+        </div>
+        <div class="col-lg-11">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1"><%= printers[0].fileList.files[i].display %></h5>
+            <small>22 Hrs, 5 Mins, 12 Seconds</small>
+          </div>
+          <p class="mb-1 float-left">
+            23.4MB
+          </p>
+          <%- include('./fileButtons.ejs') %>
+        </div>
       </div>
-      <p class="mb-1 float-left">
-        23.4MB
-      </p>
-      <%- include('./fileButtons.ejs') %>
-    </div>
-  </div>
-</a>
-</a>
-<%}%>
+    </a>
+    </a>
+    <%}%>
+    
+  <% } %>

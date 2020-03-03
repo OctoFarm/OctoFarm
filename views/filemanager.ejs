@@ -53,6 +53,21 @@
   <div class="col-12 col-sm-12 col-md-8 col-lg-9 col-xl-9">
     <div class="card text-white bg-dark">
       <div class="card-header fileHeader">
+        <% if(typeof printers[0].storage != 'undefined'){ %>
+        <h5 class="float-left">
+          <button
+            type="button"
+            class="btn btn-secondary float-right d-block"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            <i class="fas fa-hdd"></i> <%-
+            helpers.generateBytes(printers[0].storage.free) %> / <%-
+            helpers.generateBytes(printers[0].storage.total) %>
+          </button>
+        </h5>
+        <% } %>
         <h5 class="float-left">
           <button
             type="button"

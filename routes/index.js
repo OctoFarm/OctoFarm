@@ -48,19 +48,14 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
 });
 //File Manager Page
 router.get("/filemanager", ensureAuthenticated, async (req, res) => {
-  let printers = Runner.returnFarmPrinters();
-  const FarmStatistics = farmStatistics.StatisticsCollection;
-  let systemInformation = await SystemInfo.find({});
-  let filament = await Filament.find({});
+  let printers = await Runner.returnFarmPrinters();
   res.render("filemanager", {
     name: req.user.name,
     version: pjson.version,
     printers: printers,
     printerCount: printers.length,
     page: "File Manager",
-    helpers: prettyHelpers,
-    systemInfo: systemInformation[0],
-    filament: filament
+    helpers: prettyHelpers
   });
 });
 //History Page

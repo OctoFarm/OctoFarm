@@ -1,8 +1,5 @@
 
-<% printers.forEach(printer => { %> <% if(true){ %>
-<!-- No need to show offline/none inited printers here. -->
-
-<% }else if(printer.current.state != "Offline"){ %>
+<% printers.forEach(printer => { %> <% if(printer.current.state != "Offline"){ %>
 <!-- Connected -->
 <% if(printer.index === printers[0].index){ %>
     <a
@@ -35,7 +32,7 @@
                   <small> <span
               class="float-right badge badge-dark badge-pill"
               >
-              <% if(typeof printer.fileList.fileCount != 'undefined'){ %>
+              <% if(typeof printers[0].fileList != 'undefined' && typeof printer.fileList.fileCount != 'undefined'){ %>
                   Files: <%= printer.fileList.fileCount %> / Folders: <%= printer.fileList.folderCount %>
               <% }else{ %>
                   Files: 0 / Folders: 0
@@ -47,11 +44,12 @@
             role="group"
             aria-label="Basic example"
           >
-          <% if(typeof printer.storage != 'undefined'){ %>
-              <p><%- helpers.generateBytes(printer.storage.free) %> / <%- helpers.generateBytes(printer.storage.total) %> </p>
-          <% } %>
+          <% const selectedProfile = printers[0].current.printerProfile; %>
           </div>
-          <small class="pt-2 float-left"><i class="fas fa-network-wired"></i> <%= printer.ip%>:<%= printer.port%></small>
+          <small class="pt-2 float-left"><i class="fas fa-cube"></i>          
+            <b>H:</b> <%= printers[0].profiles[selectedProfile].volume.height%>mm x <b>W:</b> <%= printers[0].profiles[selectedProfile].volume.width%>mm x <b>D:</b> <%= printers[0].profiles[selectedProfile].volume.depth%>mm</small>
+            <small class="pt-2 float-left"><i class="fas fa-cube"></i>          
+              <b>Extruders:</b> <%= printers[0].profiles[selectedProfile].extruder.count %> <b>Nozzle Size:</b> <%= printers[0].profiles[selectedProfile].extruder.nozzleDiameter %>mm</small>
     </div>
   </div>
 </a>
