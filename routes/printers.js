@@ -52,7 +52,8 @@ router.post("/updateSettings", ensureAuthenticated, async (req, res) => {
   const settings = req.body;
   Runner.updateSettings(settings.index, settings.options);
   let printer = await Printers.findOne({ index: settings.index });
-  printer.camURL = settings.options.camURL;
+  if (typeof settings.options.camURL != "undefined")
+    printer.camURL = settings.options.camURL;
   await printer.save();
   res.send("success");
 });
@@ -66,7 +67,7 @@ router.post("/save", ensureAuthenticated, async (req, res) => {
     let newPrinter = await new Printers(printers[i]);
     await newPrinter.save();
   }
-  await Runner.init();
+  let run = await Runner.init();
   res.send(printers);
 });
 

@@ -569,6 +569,9 @@ class Runner {
     farmPrinters[i].settingsWebcam = opts.webcam;
     farmPrinters[i].camURL = opts.camURL;
   }
+  static selectFilament(i, filament) {
+    farmPrinters[i].selectedFilament = filament;
+  }
 }
 
 module.exports = {

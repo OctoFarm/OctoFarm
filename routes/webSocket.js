@@ -12,6 +12,7 @@ const FarmStatistics = farmStatistics.StatisticsCollection;
 const SystemInfo = require("../models/SystemInfo.js");
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
+const Roll = require("../models/Filament.js");
 
 setInterval(async function() {
   //Only needed for WebSocket Information
@@ -19,6 +20,7 @@ setInterval(async function() {
   let statistics = await FarmStatistics.returnStats();
   let printerInfo = [];
   let systemInformation = await SystemInfo.find({});
+  let roll = await Roll.find({});
   for (let i = 0; i < printers.length; i++) {
     let printer = {
       state: printers[i].state,
@@ -55,11 +57,10 @@ setInterval(async function() {
     farmInfo: statistics.farmInfo,
     octofarmStatistics: statistics.octofarmStatistics,
     printStatistics: statistics.printStatistics,
-    systemInfo: systemInformation[0]
+    systemInfo: systemInformation[0],
+    filament: roll
   };
 }, 500);
-
-let interval = null;
 
 router.ws("/grab", function(ws, req) {
   ws.on("open", function open() {

@@ -3,27 +3,27 @@ const mongoose = require("mongoose");
 const ClientSettingsSchema = new mongoose.Schema({
   settings: {
     type: Object,
-    required: true
+    required: false
   },
   panelView: {
     type: Object,
-    required: true
+    required: false
   },
   listView: {
     type: Object,
-    required: true
+    required: false
   },
   cameraView: {
     type: Object,
-    required: true
+    required: false
   },
   operations: {
     type: Object,
-    required: true
+    required: false
   },
   filaManager: {
     type: Object,
-    required: true
+    required: false
   }
 });
 
