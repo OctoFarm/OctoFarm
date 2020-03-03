@@ -5,6 +5,16 @@ import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
 
 let printerInfo = "";
+//Connect to servers socket..webSocket
+let url = window.location.hostname;
+let port = window.location.port;
+if (port != "") {
+  port = ":" + port;
+}
+var sock = new WebSocket("ws://" + url + port + "/ws/grab");
+sock.onopen = function() {
+  sock.send("hello");
+};
 
 //Close modal event listeners...
 $("#printerManagerModal").on("hidden.bs.modal", function(e) {
@@ -25,18 +35,6 @@ document.getElementById("connectAllBtn").addEventListener("click", e => {
 document.getElementById("disconnectAllBtn").addEventListener("click", e => {
   dashActions.disconnectAll();
 });
-
-let url = window.location.hostname;
-let port = window.location.port;
-if (port != "") {
-  port = ":" + port;
-}
-
-//Connect to servers socket..webSocket =
-var sock = new WebSocket("ws://" + url + port + "/ws/grab");
-sock.onopen = function() {
-  sock.send("hello");
-};
 
 sock.onmessage = function(e) {
   if (e.data != null) {
@@ -306,6 +304,10 @@ class dashUpdate {
             document.getElementById(
               "printerButton-" + printer.index
             ).disabled = false;
+          } else {
+            document.getElementById(
+              "printerButton-" + printer.index
+            ).disabled = true;
           }
         } else {
           document.getElementById("printerList").insertAdjacentHTML(

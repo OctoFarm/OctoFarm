@@ -263,43 +263,81 @@ export default class PrinterManager {
           </div>
         </div>
         `;
+
+      printer.gcode = printer.gcode.gcode;
+      let afterPrintCancelled = "";
+      if (typeof printer.gcode.afterPrintCancelled != "undefined") {
+        afterPrintCancelled = printer.gcode.afterPrintCancelled;
+      }
+      let afterPrintDone = "";
+      if (typeof printer.gcode.afterPrintDone != "undefined") {
+        afterPrintDone = printer.gcode.afterPrintDone;
+      }
+      let afterPrintPaused = "";
+      if (typeof printer.gcode.afterPrintPaused != "undefined") {
+        afterPrintPaused = printer.gcode.afterPrintPaused;
+      }
+      let afterPrinterConnected = "";
+      if (typeof printer.gcode.afterPrinterConnected != "undefined") {
+        afterPrinterConnected = printer.gcode.afterPrinterConnected;
+      }
+      let beforePrintResumed = "";
+      if (typeof printer.gcode.beforePrintResumed != "undefined") {
+        beforePrintResumed = printer.gcode.beforePrintResumed;
+      }
+      let afterToolChange = "";
+      if (typeof printer.gcode.afterToolChange != "undefined") {
+        afterToolChange = printer.gcode.afterToolChange;
+      }
+      let beforePrintStarted = "";
+      if (typeof printer.gcode.beforePrintStarted != "undefined") {
+        beforePrintStarted = printer.gcode.beforePrintStarted;
+      }
+      let beforePrinterDisconnected = "";
+      if (typeof printer.gcode.beforePrinterDisconnected != "undefined") {
+        beforePrinterDisconnected = printer.gcode.beforePrinterDisconnected;
+      }
+      let beforeToolChange = "";
+      if (typeof printer.gcode.beforeToolChange != "undefined") {
+        beforeToolChange = printer.gcode.beforeToolChange;
+      }
       document.getElementById("printerManagerGcode").innerHTML = `
         <div class="form-group">
             <label for="settingsAfterPrinterCancelled">After Printing Cancelled</label>
-            <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterCancelled" rows="2"></textarea>
+            <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterCancelled" rows="2">${afterPrintCancelled}</textarea>
             </div>
             <div class="form-group">
             <label for="settingsAfterPrinterDone">After Printing Done</label>
-            <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterDone" rows="2"></textarea>
+            <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterDone" rows="2">${afterPrintDone}</textarea>
             </div>
             <div class="form-group">
             <label for="settingsAfterPrinterPaused">After Printing Paused</label>
-            <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterPaused" rows="2"></textarea>
+            <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterPaused" rows="2">${afterPrintPaused}</textarea>
             </div>
             <div class="form-group">
             <label for="settingsAfterPrinterConnected">After Printer Connected</label>
-            <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterConnected" rows="2"></textarea>
+            <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterConnected" rows="2">${afterPrinterConnected}</textarea>
             </div>
             <div class="form-group">
             <label for="settingsAfterToolChange">After Tool Change</label>
-            <textarea class="form-control bg-dark text-white" id="settingsAfterToolChange" rows="2"></textarea>
+            <textarea class="form-control bg-dark text-white" id="settingsAfterToolChange" rows="2">${afterToolChange}</textarea>
             </div>
             <div class="form-group">
             <label for="settingsBeforePrinterResumed">Before Printing Resumed</label>
-            <textarea class="form-control bg-dark text-white" id="settingsBeforePrinterResumed" rows="2"></textarea>
+            <textarea class="form-control bg-dark text-white" id="settingsBeforePrinterResumed" rows="2">${beforePrintResumed}</textarea>
             </div>
             <div class="form-group">
             <label for="settingsBeforePrinterStarted">Before Printing Started</label>
-            <textarea class="form-control bg-dark text-white" id="settingsBeforePrinterStarted" rows="2"></textarea>
+            <textarea class="form-control bg-dark text-white" id="settingsBeforePrinterStarted" rows="2">${beforePrintStarted}</textarea>
             </div>
             <div class="form-group">
             <labe
             l for="settingsBeforePrinterDisconnected">Before Printer Disconnected</label>
-            <textarea class="form-control bg-dark text-white" id="settingsBeforePrinterDisconnected" rows="2"></textarea>
+            <textarea class="form-control bg-dark text-white" id="settingsBeforePrinterDisconnected" rows="2">${beforePrinterDisconnected}</textarea>
             </div>
             <div class="form-group">
             <label for="settingsBeforeToolChange">Before Tool Change</label>
-            <textarea class="form-control bg-dark text-white" id="settingsBeforeToolChange" rows="2"></textarea>
+            <textarea class="form-control bg-dark text-white" id="settingsBeforeToolChange" rows="2">${beforeToolChange}</textarea>
             </div>
         `;
       document.getElementById("printerControls").insertAdjacentHTML(
@@ -421,10 +459,7 @@ export default class PrinterManager {
         </div>
 `
       );
-
       let pluginManager = document.getElementById("printerManagerPlugins");
-      console.log(Object.keys(printer.plugins));
-      console.log(printer.plugins);
       let plugins = Object.keys(printer.plugins);
       plugins.forEach(plug => {
         pluginManager.insertAdjacentHTML(
@@ -1344,9 +1379,7 @@ export default class PrinterManager {
         elements.printerControls.printResume.disabled = true;
         elements.printerControls.printResume.style.display = "none";
         if (printer.stateColour.category === "Offline") {
-          document
-            .getElementById("printerManagerModal")
-            .classList.remove("show");
+          $("#printerManagerModal").modal("hide");
         }
       }
     }

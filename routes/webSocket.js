@@ -39,6 +39,7 @@ setInterval(async function() {
       logs: printers[i].logs,
       messages: printers[i].messages,
       plugins: printers[i].settingsPlugins,
+      gcode: printers[i].settingsScripts,
       url: printers[i].ip + ":" + printers[i].port,
       settingsAppearance: printers[i].settingsApperance,
       stateColour: printers[i].stateColour,
