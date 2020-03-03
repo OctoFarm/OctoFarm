@@ -116,7 +116,7 @@ class PrintersManagement {
         apikey.className = "form-control is-valid";
       }
       errors.forEach(error => {
-        UI.createMessage(error);
+        UI.createMessage(error, "message");
       });
     } else {
       let currentApiKeys = document.querySelectorAll("[data-apikey]");
@@ -131,7 +131,7 @@ class PrintersManagement {
           msg: "ApiKey already exists in database."
         });
         errors.forEach(error => {
-          UI.createMessage(error);
+          UI.createMessage(error, "message");
         });
       } else {
         apikey.className = "form-control is-valid";
@@ -154,7 +154,7 @@ class PrintersManagement {
             "Printer successfully added, she's a beaut! Don't forget to save after finishing adding your farm."
         });
         errors.forEach(error => {
-          UI.createMessage(error);
+          UI.createMessage(error, "message");
         });
       }
     }
@@ -208,7 +208,7 @@ class PrintersManagement {
           "Printer has been successfully removed from farm. Don't forget to save after finishing your changes."
       });
       errors.forEach(error => {
-        UI.createMessage(error);
+        UI.createMessage(error, "message");
       });
       if (el.classList.contains("deleteIcon")) {
         el.parentElement.parentElement.parentElement.remove();

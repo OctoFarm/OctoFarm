@@ -61,6 +61,7 @@ if (db === "") {
   app.use("/printers", require("./routes/printers", { page: "route" }));
   app.use("/settings", require("./routes/settings", { page: "route" }));
   app.use("/ws", require("./routes/webSocket", { page: "route" }));
+  app.use("/filament", require("./routes/filament", { page: "route" }));
 }
 
 //Mongo Connect

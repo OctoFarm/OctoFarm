@@ -100,18 +100,6 @@
                   </a>
             <%    } %>
                 </li>
-                <li class="nav-item">
-                  <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
-                    <a class="d-none d-sm-none d-md-none d-lg-block nav-link" href="#" data-toggle="modal" id="filamentBtn" data-target="#filamentModal">
-                    <center><i class="fas fa-toilet-paper"></i> Filament</center>
-                </a>
-                <% }else { %>
-                  <a class="nav-link notyet" href="#" data-toggle="modal" role="button"
-                 >
-                  <center><i class="fas fa-toilet-paper"></i> Filament</center>
-                  </a>
-            <%    } %>
-                </li>
 <!--                 <li class="nav-item">
                   <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
                     <a class="nav-link" data-toggle="collapse" id="farmStatusBtn" href="#dashPanelCollapse"
@@ -147,13 +135,16 @@
                             data-target="#userModal" text-light" href="#"><i class="far fa-user"></i> <%= name %></a>
                             <a class="dropdown-item text-center  text-light" href="/users/logout"><i class="fas fa-sign-out-alt"></i>Sign Out</a>
                         <% }%>
-                       
-                        <h6 class="dropdown-header">Settings</h6>
+                        <h6 class="dropdown-header">Managment</h6>
                         <a class="dropdown-item  text-center text-light" href="#" data-toggle="modal"
                             data-target="#printerSetupModal" id="printerSetup"><i class="fas fa-print"></i> Printers</a>
+                            <a class="dropdown-item  text-center text-light" href="#" data-toggle="modal"
+                            data-target="#filamentModal" id=""><i class="fas fa-toilet-paper"></i> Filament</a>
+                        <h6 class="dropdown-header">Settings</h6>
                             <a class="dropdown-item  text-center  text-light" href="#" data-toggle="modal"
                             data-target="#clientSettingsModal" id="setClientSettingsBtn"><i class="fas fa-cog"></i>
                             Client</a>
+                            
                             <a class="dropdown-item  text-center  text-light" href="#" data-toggle="modal"
                             data-target="#serverSettingsModal" id="setServerBtn"><i class="fas fa-server"></i>
                             Server</a>
@@ -921,93 +912,65 @@
                               <div class="tab-pane fade show active" id="printer-add-edit" role="tabpanel" aria-labelledby="system-settings-list">
                                   <p>OctoFarm will use the list below to populate the filament list you see when starting a print.</p>
                                   <p><b>NOTE: </b> This is currently only used for reference on the History page. Deleting them here will not affect History at all.</p>
-                                  <div id="message"></div>
+                                  <div id="filamentMessage"></div>
                                       <div class="row">
-                                        <div class="col-sm-12 col-lg-6">
-                                          <div class="input-group mb-1">
-                                            <input type="text" class="form-control" placeholder="New Manufacturer" aria-label="" aria-describedby="basic-addon1">
-                                            <div class="input-group-append">
-                                              <button class="btn btn-outline-success" type="button">Add</button>
+                                        <div class="col-sm-12 col-lg-12">
+                                          <form>
+                                            <div class="form-row">
+                                              <div class="col-md-3 mb-3">
+                                                <label for="filamentName">Name</label>
+                                                <input type="text" class="form-control" id="filamentName" placeholder="Name / Identifier" required>
+                                              </div>
+                                              <div class="col-md-3 mb-3">
+                                                <label for="filamentType">Type</label>
+                                                <input type="text" class="form-control" id="filamentType" placeholder="Filament Type" required>
+                                              </div>
+                                              <div class="col-md-3 mb-3">
+                                                <label for="filamentColour">Colour</label>
+                                                <input type="text" class="form-control" id="filamentColour" placeholder="Filament Colour" required>
+                                              </div>
+                                              <div class="col-md-3 mb-3">
+                                                <label for="filamentManufacturer">Manufacturer</label>
+                                                <input type="text" class="form-control" id="filamentManufacturer" placeholder="Filament Manufacturer">
+                                              </div>
                                             </div>
-                                          </div>
+                                            <button id="addFilamentBtn" class="btn btn-success" type="submit">Add Filament</button>
+                                          </form>
                                         </div>
-                                        <div class="col-sm-12 col-lg-6">
-                                          <div class="input-group mb-1">
-                                            <input type="text" class="form-control" placeholder="New Colour" aria-label="" aria-describedby="basic-addon1">
-                                            <div class="input-group-append">
-                                              <button class="btn btn-outline-success" type="button">Add</button>
-                                            </div>
-                                          </div>
-                                        </div>
-                                        <div class="col-sm-12 col-lg-6">
-                                          <div class="input-group mb-1">
-                                            <input type="text" class="form-control" placeholder="Filament Type" aria-label="" aria-describedby="basic-addon1">
-                                            <div class="input-group-append">
-                                              <button class="btn btn-outline-success" type="button">Add</button>
-                                            </div>
-                                          </div>
-                                        </div>
-                                        <div class="col-sm-12 col-lg-6">
-                                          <div class="input-group mb-1">
-                                            <input type="text" class="form-control" placeholder="Filament Density" aria-label="" aria-describedby="basic-addon1">
-                                            <div class="input-group-append">
-                                              <button class="btn btn-outline-success" type="button">Add</button>
-                                            </div>
-                                          </div>
-                                        </div>
-                                        <div class="col-lg-12">
-                                          <div class="input-group mb-3">
-                                            <div class="input-group-prepend">
-                                              <label class="input-group-text" for="inputGroupSelect01">Manufacturer</label>
-                                            </div>
-                                            <select class="custom-select" id="inputGroupSelect01">
-                                              <option selected>Choose...</option>
-                                              <option value="1">One</option>
-                                              <option value="2">Two</option>
-                                              <option value="3">Three</option>
-                                            </select>
-                                            <div class="input-group-prepend">
-                                              <label class="input-group-text" for="inputGroupSelect01">Filament</label>
-                                            </div>
-                                            <select class="custom-select" id="inputGroupSelect01">
-                                              <option selected>Choose...</option>
-                                              <option value="1">One</option>
-                                              <option value="2">Two</option>
-                                              <option value="3">Three</option>
-                                            </select>
-                                            <div class="input-group-prepend">
-                                              <label class="input-group-text" for="inputGroupSelect01">Colour</label>
-                                            </div>
-                                            <select class="custom-select" id="inputGroupSelect01">
-                                              <option selected>Choose...</option>
-                                              <option value="1">One</option>
-                                              <option value="2">Two</option>
-                                              <option value="3">Three</option>
-                                            </select>
-                                            <div class="input-group-append">
-                                              <button class="btn btn-outline-success" type="button">Add</button>
-                                            </div>
-                                          </div>
-                                        
-                                        </div>
+
                                         </div>
                                       </div>
                    
                                   <table class="table">
                                       <thead>
                                           <tr>
-                                              <th scope="col" width="150px">Manufacturer</th>
-                                              <th scope="col" width="100px">Type</th>
+                                              <th scope="col">Name</th>
+                                              <th scope="col">Type</th>
                                               <th scope="col">Colour</th>
+                                              <th scope="col">Manufacturer</th>
                                           </tr>
                                       </thead>
-                                      <tbody id="addPrintersTable">
-                                        
+                                      <tbody id="addFilamentTable">
+                                        <% if(typeof filament != 'undefined'){ %>
+                                          <% filament.forEach(roll => { %>
+                                            <tr>
+                                              <th style="display: none;"><%= roll.id %></th>
+                                              <% roll = roll.roll %>
+                                              <th scope="row"><%= roll.name %></th>
+                                              <td><%= roll.type %></td>
+                                              <td><%= roll.colour %></td>
+                                              <td><%= roll.manufacturer %></td>
+                                              <td><button type="button" class="btn btn-danger delete">
+                                                <i class="fas fa-trash deleteIcon"></i>
+                                              </button></td>
+                                            </tr>
+                                            <%  }) %>
+                                            <% } %>
 
                                       </tbody>
                                   </table>
                               </div>
-    </div>
+ 
   </div>
 </div>
 </div>
@@ -1055,6 +1018,7 @@ Close
     <script src="/js/vendor/bootbox.min.js"></script>
     <script src="/js/vendor/noty.js"></script>
     <script src="/js/printerManagement.js" type="module"></script>
+    <script src="/js/filamentManagement.js" type="module"></script>
     <script src="/js/lib/modules/printerManager.js" type="module"></script>
     <script src="/js/settings.js" type="module"></script>
     <script src="/js/vendor/screenfull.min.js"></script>

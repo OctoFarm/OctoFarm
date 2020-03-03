@@ -26,8 +26,8 @@ export default class UI {
     }
   }
   //Create message
-  static createMessage(options) {
-    const message = document.getElementById("message");
+  static createMessage(options, element) {
+    const message = document.getElementById(element);
     const row = `
       <div class="alert alert-${options.type} alert-dismissible fade show" role="alert">
         ${options.msg}
