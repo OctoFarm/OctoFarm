@@ -1,57 +1,74 @@
-
-<% printers.forEach(printer => { %> <% if(printer.current.state != "Offline"){ %>
+<% printers.forEach(printer => { %> <% if(printer.current.state != "Offline"){
+%>
 <!-- Connected -->
 <% if(printer.index === printers[0].index){ %>
-    <a
-    href="#"
-    class="list-group-item list-group-item-action bg-dark active flex-column align-items-start bg-secondary"
-    style="display: block;
+<a
+  id="printer-<%= printer.index %>"
+  href="#"
+  class="list-group-item list-group-item-action bg-dark active flex-column align-items-start bg-secondary"
+  style="display: block;
     padding: 0.7rem 0.1rem;"
-  >
-<% }else{ %>
-    <a
+>
+  <% }else{ %>
+  <a
+    id="printer-<%= printer.index %>"
     href="#"
     class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
     style="display: block;
     padding: 0.7rem 0.1rem;"
   >
-<% } %>
+    <% } %>
 
-  <div class="row">
-    <div
-      class="col-lg-2"
-      style="display:flex; justify-content:center; align-items:center;"
-    >
-      <center><i class="fas fa-print fa-2x"></i></center>
-    </div>
-    <div class="col-lg-10">
+    <div class="row">
+      <div
+        class="col-lg-2"
+        style="display:flex; justify-content:center; align-items:center;"
+      >
+        <center><i class="fas fa-print fa-2x"></i></center>
+      </div>
+      <div class="col-lg-10">
         <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">        <%= printer.index %>. <% if(typeof printer.settingsApperance != 'undefined'){ %>
-              <%= printer.settingsApperance.name %> <% } %></span
-              ></h5>
-                  <small> <span
-              class="float-right badge badge-dark badge-pill"
-              >
-              <% if(typeof printers[0].fileList != 'undefined' && typeof printer.fileList.fileCount != 'undefined'){ %>
-                  Files: <%= printer.fileList.fileCount %> / Folders: <%= printer.fileList.folderCount %>
-              <% }else{ %>
-                  Files: 0 / Folders: 0
+          <h5 class="mb-1">
+            <%= printer.index %>.
+            <span id="printerName-<%= printer.index %>"
+              ><% if(typeof printer.settingsApperance != 'undefined'){ %> <%=
+              printer.settingsApperance.name %> <% } %></span
+            >
+          </h5>
+          <small>
+            <span class="float-right badge badge-dark badge-pill">
+              <% if(typeof printer.fileList != 'undefined' && typeof
+              printer.fileList.fileCount != 'undefined'){ %> Files: <%=
+              printer.fileList.fileCount %> / Folders: <%=
+              printer.fileList.folderCount %> <% }else{ %> Files: 0 / Folders: 0
               <% } %>
-      </span></small>
-          </div>
-            <div
-            class="float-right btn-group flex-wrap btn-group-sm"
-            role="group"
-            aria-label="Basic example"
+            </span></small
           >
+        </div>
+        <div
+          class="float-right btn-group flex-wrap btn-group-sm"
+          role="group"
+          aria-label="Basic example"
+        >
           <% const selectedProfile = printers[0].current.printerProfile; %>
-          </div>
-          <small class="pt-2 float-left"><i class="fas fa-cube"></i>          
-            <b>H:</b> <%= printers[0].profiles[selectedProfile].volume.height%>mm x <b>W:</b> <%= printers[0].profiles[selectedProfile].volume.width%>mm x <b>D:</b> <%= printers[0].profiles[selectedProfile].volume.depth%>mm</small>
-            <small class="pt-2 float-left"><i class="fas fa-cube"></i>          
-              <b>Extruders:</b> <%= printers[0].profiles[selectedProfile].extruder.count %> <b>Nozzle Size:</b> <%= printers[0].profiles[selectedProfile].extruder.nozzleDiameter %>mm</small>
+        </div>
+        <small class="pt-2 float-left"
+          ><i class="fas fa-cube"></i> <b>H:</b> <%=
+          printers[0].profiles[selectedProfile].volume.height%>mm x
+          <b>W:</b> <%= printers[0].profiles[selectedProfile].volume.width%>mm x
+          <b>D:</b> <%=
+          printers[0].profiles[selectedProfile].volume.depth%>mm</small
+        >
+        <small class="pt-2 float-left"
+          ><i class="fas fa-pen"></i> <b>Extruders:</b> <%=
+          printers[0].profiles[selectedProfile].extruder.count %>
+          <b>Nozzle Size:</b> <%=
+          printers[0].profiles[selectedProfile].extruder.nozzleDiameter
+          %>mm</small
+        >
+      </div>
     </div>
-  </div>
-</a>
+  </a>
 
-<% } %> <% }) %>
+  <% } %> <% }) %>
+</a>

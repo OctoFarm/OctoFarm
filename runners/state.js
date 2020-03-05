@@ -13,6 +13,8 @@ let offlineRunners = [];
 let onlineRunners = [];
 let farmPrinters = [];
 
+let statRunner = null;
+
 class ClientAPI {
   static get(ip, port, apikey, item) {
     let url = `http://${ip}:${port}/api/${item}`;
@@ -94,6 +96,17 @@ class ClientSocket {
 
 class Runner {
   static async init() {
+    statRunner = setInterval(function() {
+      //Update Current Operations
+      StatisticsCollection.currentOperations(farmPrinters);
+      //Update farm information when we have temps
+      StatisticsCollection.farmInformation(farmPrinters);
+      //Update farm statistics
+      StatisticsCollection.octofarmStatistics(farmPrinters);
+      //Update print statistics
+      StatisticsCollection.printStatistics();
+    }, 500);
+
     //Grab printers from database....
     try {
       farmPrinters = await Printers.find({}, null, { sort: { index: 1 } });
@@ -129,6 +142,7 @@ class Runner {
       if (typeof farmPrinters[i].flowRate === "undefined") {
         farmPrinters[i].flowRate = 100;
       }
+
       let client = await ClientSocket.connect(
         farmPrinters[i].index,
         farmPrinters[i].ip,
@@ -211,14 +225,6 @@ class Runner {
             data.current.state.text
           );
         }
-        //Update Current Operations
-        StatisticsCollection.currentOperations(farmPrinters);
-        //Update farm information when we have temps
-        StatisticsCollection.farmInformation(farmPrinters);
-        //Update farm statistics
-        StatisticsCollection.octofarmStatistics(farmPrinters);
-        //Update print statistics
-        StatisticsCollection.printStatistics();
       }
     });
     onlineRunners[client.index].ws.on("error", async function incoming(data) {
@@ -239,14 +245,6 @@ class Runner {
     });
   }
   static async setOffline(client) {
-    //Make sure stats are re-updated when client sent offline
-    StatisticsCollection.currentOperations(farmPrinters);
-    //Update farm information when we have temps
-    StatisticsCollection.farmInformation(farmPrinters);
-    //Update farm statistics
-    StatisticsCollection.octofarmStatistics(farmPrinters);
-    //Update print statistics
-    StatisticsCollection.printStatistics();
     console.log("Printer: " + client.index + " is offline");
     farmPrinters[client.index].state = "Offline";
     farmPrinters[client.index].stateColour = Runner.getColour("Offline");
@@ -281,6 +279,7 @@ class Runner {
 
   static async stopAll() {
     console.log("Stopping statistics collection...");
+    clearInterval(statRunner);
     await StatisticsCollection.stop();
     console.log("Stopped statistic collection");
     farmPrinters.forEach((run, index) => {
@@ -310,6 +309,7 @@ class Runner {
           free: res.free,
           total: res.total
         };
+
         //Setup logcations object
         let printerFiles = [];
         let printerLocations = [];
@@ -344,14 +344,29 @@ class Runner {
             printerFiles.push(file);
           }
 
-          let folderPaths = entry.path;
+          let folderPaths = {
+            name: "",
+            path: ""
+          };
           if (isFolder) {
-            if (entry.path.indexOf("/")) {
-              printerLocations.push(folderPaths);
+            if (entry.path.indexOf("/") > -1) {
+              folderPaths.path = entry.path.substr(
+                0,
+                entry.path.lastIndexOf("/")
+              );
             } else {
-              folderPaths = entry.path.substr(0, entry.path.lastIndexOf("/"));
-              printerLocations.push(folderPaths);
+              folderPaths.path = "local";
             }
+
+            if (entry.path.indexOf("/")) {
+              folderPaths.name = entry.path;
+            } else {
+              folderPaths.name = entry.path.substr(
+                0,
+                entry.path.lastIndexOf("/")
+              );
+            }
+            printerLocations.push(folderPaths);
           }
           farmPrinters[index].fileList = {
             files: printerFiles,
@@ -388,6 +403,7 @@ class Runner {
           } else {
             path = "local";
           }
+
           let file = {
             path: path,
             fullPath: res.path,
@@ -540,6 +556,12 @@ class Runner {
       return o.fullPath == fullPath;
     });
     farmPrinters[i].fileList.files.splice(index, 1);
+  }
+  static returnFileList(i) {
+    return farmPrinters[i].fileList;
+  }
+  static returnStorage(i) {
+    return farmPrinters[i].storage;
   }
   static async reSyncFile(i, file) {
     let success = null;

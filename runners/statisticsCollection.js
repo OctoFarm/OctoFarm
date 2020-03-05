@@ -31,12 +31,15 @@ class StatisticsCollection {
     }
     farmRunner = setInterval(async () => {
       farmStats[0].save().catch(err => {
-        console.log(
-          "Couldn't save stats, Restarting Statistics Collection: Err MSG:" +
-            err
-        );
         clearInterval(farmRunner);
-        StatisticsCollection.init();
+        setTimeout(async function() {
+          console.log(
+            "Couldn't save stats, Restarting Statistics Collection: Err MSG:" +
+              err
+          );
+          let restart = await StatisticsCollection.init();
+          console.log(restart);
+        }, 5000);
       });
     }, 5000);
     return "Statistics collection has started...";

@@ -1,11 +1,13 @@
 <% if(typeof printers[0].fileList != 'undefined' && typeof
 printers[0].fileList.folders != 'undefined'){%> <% for(let i=0;i <
-printers[0].fileList.folders.length;i++){%>
+printers[0].fileList.folders.length;i++){%> <%
+if(printers[0].fileList.folders[i].path == "local"){ %>
 <a
   href="#"
+  id="folder-<%= printers[0].fileList.folders[i].name %>"
   class="list-group-item list-group-item-action flex-column align-items-start bg-dark"
   style="display: block;
-  padding: 0.7rem 0.1rem;"
+    padding: 0.7rem 0.1rem;"
 >
   <div class="row">
     <div
@@ -15,17 +17,13 @@ printers[0].fileList.folders.length;i++){%>
       <center><i class="fas fa-folder fa-2x"></i></center>
     </div>
     <div class="col-lg-11">
-      <small class="float-right">Files: / Folders: 0</small>
+      <small class="float-right"
+        ><!--Display file and folder count here eventually--></small
+      >
       <div class="d-flex w-100 justify-content-between">
         <h5 class="mb-1 float-left">
-          <%= printers[0].fileList.folders[i] %>
+          <%= printers[0].fileList.folders[i].name %>
         </h5>
-        <% if(typeof printer.storage != 'undefined'){ %>
-        <p>
-          <%- helpers.generateBytes(printer.storage.free) %> / <%-
-          helpers.generateBytes(printer.storage.total) %>
-        </p>
-        <% } %>
         <div
           class="float-right btn-group flex-wrap btn-group-sm"
           role="group"
@@ -42,4 +40,4 @@ printers[0].fileList.folders.length;i++){%>
     </div>
   </div>
 </a>
-<%}%> <% } %>
+<% } %> <%}%> <% } %>

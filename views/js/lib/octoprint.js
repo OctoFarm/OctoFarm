@@ -118,6 +118,10 @@ export default class OctoPrintClient {
       };
       post = await OctoPrintClient.post(printer, url, opt);
     } else if (action === "print") {
+      let opt = {
+        command: "select",
+        print: true
+      };
       //Make sure feed/flow are set before starting print...
       let flow = {
         command: "flowrate",
@@ -129,10 +133,6 @@ export default class OctoPrintClient {
         factor: parseInt(printer.feedRate)
       };
       await OctoPrintClient.post(printer, "printer/printhead", feed);
-      let opt = {
-        command: "select",
-        print: true
-      };
       post = await OctoPrintClient.post(printer, url, opt);
     } else if (action === "delete") {
       post = await OctoPrintClient.delete(printer, url);
@@ -154,6 +154,17 @@ export default class OctoPrintClient {
     }
   }
   static async jobAction(printer, opts, element) {
+    //Make sure feed/flow are set before starting print...
+    let flow = {
+      command: "flowrate",
+      factor: parseInt(printer.flowRate)
+    };
+    await OctoPrintClient.post(printer, "printer/tool", flow);
+    let feed = {
+      command: "feedrate",
+      factor: parseInt(printer.feedRate)
+    };
+    await OctoPrintClient.post(printer, "printer/printhead", feed);
     let post = await OctoPrintClient.post(printer, "job", opts);
     element.target.disabled = false;
   }

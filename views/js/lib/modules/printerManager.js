@@ -941,17 +941,6 @@ export default class PrinterManager {
       }
     });
     elements.printerControls.printStart.addEventListener("click", async e => {
-      //Make sure feed/flow are set before starting print...
-      let flow = {
-        command: "flowrate",
-        factor: parseInt(printer.flowRate)
-      };
-      await OctoPrintClient.post(printer, "printer/tool", flow);
-      let feed = {
-        command: "feedrate",
-        factor: parseInt(printer.feedRate)
-      };
-      await OctoPrintClient.post(printer, "printer/printhead", feed);
       e.target.disabled = true;
       let opts = {
         command: "start"
@@ -1054,9 +1043,11 @@ export default class PrinterManager {
     document.getElementById("load-" + file).addEventListener("click", e => {
       OctoPrintClient.file(printer, fullPath, "load");
     });
-    document.getElementById("select-" + file).addEventListener("click", e => {
-      OctoPrintClient.file(printer, fullPath, "print");
-    });
+    document
+      .getElementById("select-" + file)
+      .addEventListener("click", async e => {
+        OctoPrintClient.file(printer, fullPath, "print");
+      });
     document.getElementById("delete-" + file).addEventListener("click", e => {
       OctoPrintClient.file(printer, fullPath, "delete", file);
     });

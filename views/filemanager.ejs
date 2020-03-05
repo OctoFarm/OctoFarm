@@ -43,7 +43,7 @@
             <i class="fas fa-exchange-alt"></i> File Replace
           </button>
         </center>
-        <div class="list-group">
+        <div id="printerList" class="list-group">
           <%- include('./partials/FileManager/printerList.ejs') %>
         </div>
       </div>
@@ -53,9 +53,23 @@
   <div class="col-12 col-sm-12 col-md-8 col-lg-9 col-xl-9">
     <div class="card text-white bg-dark">
       <div class="card-header fileHeader">
+        <h5 class="float-left">
+          <button
+          id="currentPrinterBtn"
+            type="button"
+            class="btn btn-secondary float-right d-block"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            <i class="fas fa-print"></i> <span id="currentPrinter"><%= printers[0].index %></span>.  <% if(typeof printers[0].settingsApperance != 'undefined'){ %>
+              <%= printers[0].settingsApperance.name %> <% } %>
+          </button>
+        </h5>
         <% if(typeof printers[0].storage != 'undefined'){ %>
         <h5 class="float-left">
           <button
+            id="printerStorage"
             type="button"
             class="btn btn-secondary float-right d-block"
             href="#"
@@ -76,7 +90,7 @@
             aria-expanded="false"
             disabled
           >
-            <i class="fas fa-file-code"></i> Files: local/
+            <i class="fas fa-file-code"></i> Files: <span id="currentFolder">local</span>/
           </button>
         </h5>
         <div class="form-group mt-2 mb-2 float-right">
@@ -96,18 +110,15 @@
         </div>
       </div>
       <div class="card-body fileBody">
-        <button type="button" class="btn btn-success m-3 float-right">
-          <i class="fas fa-file-import"></i> Back
+        <button id="fileBackBtn" type="button" class="btn btn-success m-3 float-right">
+          <i class="fas fa-chevron-left"></i> Back
         </button>
 
         <button
           type="button"
           class="btn btn-success m-3 float-left"
-          data-toggle="collapse"
           href="#fileUpload"
           role="button"
-          aria-expanded="false"
-          aria-controls="fileUpload"
         >
           <i class="fas fa-file-import"></i> Upload File(s)
         </button>
@@ -122,23 +133,11 @@
         >
           <i class="fas fa-folder-plus"></i> Create Folder
         </button>
-        <button type="button" class="btn btn-primary m-3">
-          <i class="fas fa-folder-plus"></i> Re-Sync
+        <button id="fileReSync" type="button" class="btn btn-primary m-3">
+          <i class="fas fa-sync"></i> Re-Sync
         </button>
-        <center>
-          <div class="collapse" id="createFolder">
-            <div class="card card-body">Creating Folder INN</div>
-          </div>
-          <div class="collapse" id="fileUpload">
-            <div class="card card-body">
-              Anim pariatur cliche reprehenderit, enim eiusmod high life
-              accusamus terry richardson ad squid. Nihil anim keffiyeh
-              helvetica, craft beer labore wes anderson cred nesciunt sapiente
-              ea proident.
-            </div>
-          </div>
         </center>
-        <div class="list-group">
+        <div id="fileList" class="list-group">
           <%- include('./partials/FileManager/fileList.ejs') %> <%-
           include('./partials/FileManager/folderList.ejs') %>
         </div>
@@ -174,3 +173,4 @@
   </div>
 </div>
 <% } %>
+<script src="/js/lib/modules/fileManager.js" type="module"></script>

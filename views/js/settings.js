@@ -13,36 +13,41 @@ document.getElementById("saveSettings").addEventListener("click", e => {
 
 class ClientSettings {
   static init() {
-    Client.get("settings/client/get")
-      .then(res => {
-        return res.json();
-      })
-      .then(res => {
-        localStorage.setItem("clientSettings", JSON.stringify(res));
-        if (res.backgroundURL != null) {
-          document.getElementById("clientBackground").value = res.backgroundURL;
-        }
-        document.getElementById("panelCurrentOpOn").checked =
-          res.panelView.currentOp;
-        document.getElementById("panelHideOffline").checked =
-          res.panelView.hideOff;
-        document.getElementById("panelHideClosed").checked =
-          res.panelView.hideClosed;
+    if (
+      !document.getElementById("systemDropDown").classList.contains("notyet")
+    ) {
+      Client.get("settings/client/get")
+        .then(res => {
+          return res.json();
+        })
+        .then(res => {
+          localStorage.setItem("clientSettings", JSON.stringify(res));
+          if (res.backgroundURL != null) {
+            document.getElementById("clientBackground").value =
+              res.backgroundURL;
+          }
+          document.getElementById("panelCurrentOpOn").checked =
+            res.panelView.currentOp;
+          document.getElementById("panelHideOffline").checked =
+            res.panelView.hideOff;
+          document.getElementById("panelHideClosed").checked =
+            res.panelView.hideClosed;
 
-        document.getElementById("cameraCurrentOpOn").checked =
-          res.cameraView.currentOp;
-        document.getElementById("selectCameraGrid").value =
-          res.cameraView.cameraRows;
-        document.getElementById("cameraHideClosed").checked =
-          res.cameraView.hideClosed;
+          document.getElementById("cameraCurrentOpOn").checked =
+            res.cameraView.currentOp;
+          document.getElementById("selectCameraGrid").value =
+            res.cameraView.cameraRows;
+          document.getElementById("cameraHideClosed").checked =
+            res.cameraView.hideClosed;
 
-        document.getElementById("listCurrentOpOn").checked =
-          res.listView.currentOp;
-        document.getElementById("listHideOffline").checked =
-          res.listView.hideOff;
-        document.getElementById("listHideClosed").checked =
-          res.listView.hideClosed;
-      });
+          document.getElementById("listCurrentOpOn").checked =
+            res.listView.currentOp;
+          document.getElementById("listHideOffline").checked =
+            res.listView.hideOff;
+          document.getElementById("listHideClosed").checked =
+            res.listView.hideClosed;
+        });
+    }
   }
   static async update() {
     let opts = {

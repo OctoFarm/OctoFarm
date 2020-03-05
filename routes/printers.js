@@ -81,7 +81,28 @@ router.post("/delete", ensureAuthenticated, async (req, res) => {
   await Runner.init();
   res.send("Deleted Printers");
 });
+router.get("/printerInfo", ensureAuthenticated, async (req, res) => {
+  let printers = await Runner.returnFarmPrinters();
+  let printerInfo = [];
+  for (let i = 0; i < printers.length; i++) {
+    let printer = {
+      state: printers[i].state,
+      index: printers[i].index,
+      ip: printers[i].ip,
+      port: printers[i].port,
+      camURL: printers[i].camURL,
+      apikey: printers[i].apikey,
+      flowRate: printers[i].flowRate,
+      feedRate: printers[i].feedRate,
+      stepRate: printers[i].stepRate,
+      filesList: printers[i].fileList,
+      stateColour: printers[i].stateColour
+    };
+    await printerInfo.push(printer);
+  }
 
+  res.send(printerInfo);
+});
 //Register handle for checking for offline printers
 router.post("/runner/checkOffline", ensureAuthenticated, async (req, res) => {
   let checked = [];
@@ -101,5 +122,15 @@ router.post("/runner/checkOffline", ensureAuthenticated, async (req, res) => {
     printers: checked,
     msg: " If they were found they will appear online shortly."
   });
+});
+router.post("/fileList", ensureAuthenticated, async (req, res) => {
+  let index = req.body.i;
+  let files = await Runner.returnFileList(index);
+  let storage = await Runner.returnStorage(index);
+  if (typeof files != "undefined") {
+    res.send({ files: files, storage: storage });
+  } else {
+    res.send({ files: "EMPTY", storage: storage });
+  }
 });
 module.exports = router;
