@@ -1,19 +1,23 @@
 const bytes = function(a, b) {
-  if (0 == a) return "0 Bytes";
-  var c = 1024,
-    d = b || 2,
-    e = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
-    f = Math.floor(Math.log(a) / Math.log(c));
-  return parseFloat((a / Math.pow(c, f)).toFixed(d)) + " " + e[f];
+  let string = "";
+  if (a === undefined || isNaN(a) || a === null) {
+    return (string = "No File Estimate");
+  } else {
+    if (0 == a) return "0 Bytes";
+    var c = 1024,
+      d = b || 2,
+      e = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
+      f = Math.floor(Math.log(a) / Math.log(c));
+    return parseFloat((a / Math.pow(c, f)).toFixed(d)) + " " + e[f];
+  }
 };
 const calculatePercent = function(use, total) {
   let percent = (use / total) * 100;
   return Math.round(percent);
 };
 const generateTime = function(seconds) {
-
   let string = "";
-  if (seconds === undefined || isNaN(seconds)) {
+  if (seconds === undefined || isNaN(seconds) || seconds === null) {
     string = "Done";
   } else {
     let days = Math.floor(seconds / (3600 * 24));

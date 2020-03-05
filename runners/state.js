@@ -556,6 +556,7 @@ class Runner {
       return o.fullPath == fullPath;
     });
     farmPrinters[i].fileList.files.splice(index, 1);
+    farmPrinters[i].fileList.fileCount = farmPrinters[i].fileList.files.length;
   }
   static returnFileList(i) {
     return farmPrinters[i].fileList;
@@ -593,6 +594,69 @@ class Runner {
   }
   static selectFilament(i, filament) {
     farmPrinters[i].selectedFilament = filament;
+  }
+  static moveFile(i, newPath, fullPath, filename) {
+    let file = _.findIndex(farmPrinters[i].fileList.files, function(o) {
+      return o.name == filename;
+    });
+    //farmPrinters[i].fileList.files[file].path = newPath;
+    farmPrinters[i].fileList.files[file].path = newPath;
+    farmPrinters[i].fileList.files[file].fullPath = fullPath;
+  }
+  static moveFolder(i, oldFolder, fullPath, folderName) {
+    let file = _.findIndex(farmPrinters[i].fileList.folders, function(o) {
+      return o.name == oldFolder;
+    });
+    farmPrinters[i].fileList.files.forEach((file, index) => {
+      if (file.path === oldFolder) {
+        let fileName = farmPrinters[i].fileList.files[index].fullPath.substring(
+          farmPrinters[i].fileList.files[index].fullPath.lastIndexOf("/") + 1
+        );
+        farmPrinters[i].fileList.files[index].fullPath =
+          folderName + "/" + fileName;
+        farmPrinters[i].fileList.files[index].path = folderName;
+      }
+    });
+    farmPrinters[i].fileList.folders[file].name = folderName;
+    farmPrinters[i].fileList.folders[file].path = fullPath;
+  }
+  static deleteFolder(i, fullPath) {
+    farmPrinters[i].fileList.files.forEach((file, index) => {
+      if (file.path === fullPath) {
+        farmPrinters[i].fileList.files.splice(index, 1);
+      }
+    });
+    farmPrinters[i].fileList.folders.forEach((folder, index) => {
+      if (folder.path === fullPath) {
+        farmPrinters[i].fileList.folders.splice(index, 1);
+      }
+    });
+    let folder = _.findIndex(farmPrinters[i].fileList.folders, function(o) {
+      return o.name == fullPath;
+    });
+    farmPrinters[i].fileList.folders.splice(folder, 1);
+    farmPrinters[i].fileList.fileCount = farmPrinters[i].fileList.files.length;
+    farmPrinters[i].fileList.folderCount =
+      farmPrinters[i].fileList.folders.length;
+  }
+  static newFile(file) {
+    let i = file.index;
+    file = file.files.local;
+    let path = "";
+    if (file.path.indexOf("/") > -1) {
+      path = file.path.substr(0, entry.path.lastIndexOf("/"));
+    } else {
+      path = "local";
+    }
+    let data = {
+      path: path,
+      fullPath: file.path,
+      display: file.name,
+      name: file.name,
+      size: null,
+      time: null
+    };
+    farmPrinters[i].fileList.files.push(data);
   }
 }
 

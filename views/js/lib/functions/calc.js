@@ -10,7 +10,7 @@ export default class Calculate {
   //Convert miliseconds to Days, Hours, Minutes
   static generateTime(seconds) {
     let string = "";
-    if (seconds === undefined) {
+    if (seconds === undefined || isNaN(seconds) || seconds === null) {
       string = "No Time Estimate";
     } else {
       let days = Math.floor(seconds / (3600 * 24));
@@ -57,12 +57,16 @@ export default class Calculate {
   }
 
   static bytes(a, b) {
-    if (0 == a) return "0 Bytes";
-    var c = 1024,
-      d = b || 2,
-      e = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
-      f = Math.floor(Math.log(a) / Math.log(c));
-    return parseFloat((a / Math.pow(c, f)).toFixed(d)) + " " + e[f];
+    let string = "";
+    if (a === undefined || isNaN(a) || a === null) {
+      return (string = "No File Estimate");
+    } else {
+      if (0 == a) return "0 Bytes";
+      var c = 1024,
+        d = b || 2,
+        e = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
+        f = Math.floor(Math.log(a) / Math.log(c));
+      return parseFloat((a / Math.pow(c, f)).toFixed(d)) + " " + e[f];
+    }
   }
-
 }

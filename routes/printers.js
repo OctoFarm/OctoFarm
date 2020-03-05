@@ -18,6 +18,13 @@ router.post("/removefile", ensureAuthenticated, async (req, res) => {
   Runner.removeFile(file.i, file.fullPath);
   res.send("success");
 });
+router.post("/removefolder", ensureAuthenticated, async (req, res) => {
+  //Check required fields
+  const folder = req.body;
+
+  Runner.deleteFolder(folder.index, folder.fullPath);
+  res.send("success");
+});
 router.post("/resyncFile", ensureAuthenticated, async (req, res) => {
   //Check required fields
   const file = req.body;
@@ -132,5 +139,30 @@ router.post("/fileList", ensureAuthenticated, async (req, res) => {
   } else {
     res.send({ files: "EMPTY", storage: storage });
   }
+});
+router.post("/moveFile", ensureAuthenticated, async (req, res) => {
+  let data = req.body;
+  if (data.newPath === "/") {
+    data.newPath = "local";
+    data.newFullPath = data.newFullPath.replace("//", "");
+  }
+  Runner.moveFile(data.index, data.newPath, data.newFullPath, data.fileName);
+  res.send({ msg: "success" });
+});
+router.post("/moveFolder", ensureAuthenticated, async (req, res) => {
+  let data = req.body;
+  Runner.moveFolder(
+    data.index,
+    data.oldFolder,
+    data.newFullPath,
+    data.folderName
+  );
+  res.send({ msg: "success" });
+});
+
+router.post("/newFiles", ensureAuthenticated, async (req, res) => {
+  let data = req.body;
+  Runner.newFile(data);
+  res.send({ msg: "success" });
 });
 module.exports = router;

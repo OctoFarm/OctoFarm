@@ -394,85 +394,57 @@
                               </div>
                               <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
                                 <div class="col-lg-12">
-                                  <p>Check the boxes below to select the printers you'd like to upload files too.</p>
+                                  <p>Check the boxes below to select the printers you'd like to upload files too. (Only idle printers available for selection...)</p>
                                   <p><b>Note:</b> You must select at least 2 printers.</p>
                                   <% if (typeof printers != 'undefined'){ %>
                                     <% for(let i=0;i < printers.length;i++){%>
-                                      <form class="was-validated form-check-inline form-check">
-                                        <div class="custom-control custom-checkbox mb-2 pr-2">
-                                          <input type="checkbox" class="custom-control-input" id="customControlValidation-<%= printers[i].index %>" required>
-                                         <label class="custom-control-label" for="customControlValidation-<%= printers[i].index %>"><%= printers[i].index %>. <% if(typeof printers[i].settingsAppearance != 'undefined'){ %> <%= printers[i].settingsAppearance.name %> <%}%></label>
-                                          <div class="invalid-feedback">Not this printer</div>
-                                          <div class="valid-feedback">
-                                            Sending to this printer
+                                      <% if(printers[i].stateColour.category === "Idle"){%>
+                                        <form class="was-validated form-check-inline form-check">
+                                          <div class="custom-control custom-checkbox mb-2 pr-2">
+                                            <input type="checkbox" class="custom-control-input" id="multiUpPrinters-<%= printers[i].index %>" required>
+                                           <label class="custom-control-label" for="multiUpPrinters-<%= printers[i].index %>"><%= printers[i].index %>. <% if(typeof printers[i].settingsApperance != 'undefined'){ %> <%= printers[i].settingsApperance.name %> <%}%></label>
+                                            <div class="invalid-feedback">Not this printer</div>
+                                            <div class="valid-feedback">
+                                              Sending to this printer
+                                            </div>
                                           </div>
-                                        </div>
-                                        </form>
+                                          </form>
+                                      <% } %>
+       
                                       <%}%>
                                   <% } %>
 
                                 </div>
-                                <div class="col-lg-12">
+                                <div class="col-lg-12 hidden">
                                   <p>Please type the folder name you'd like to create on the selected printers.</p>
                                   <p><b>Note:</b> Leaving blank will create the files in local</p>
                                   <input id="newFolderName" class="form-control bg-dark text-light" type="text" placeholder="Please type your new folder name here..." aria-label="NewFolder">
                                 </div>
-                                <div class="col-lg-12">
+                                <div class="col-lg-12 hidden">
                                   <p>Please use the form below to select the files you'd like to complete this process with. </p>
                                   <p><b>Note:</b> You can select a single file, or multiple.</p>
                                   <div class="mb-3"><center><div id="drop-area"> <form class="my-form"> <p>Drag and Drop into the dashed region, or use the Select button to upload your file.</p><input type="file" id="gcodeUpload" multiple accept=".gcode,.gco,.g"><label class="btn btn-success" for="gcodeUpload">Select</label><br></form></div></div></center>
                                 </div>
-                                <div class="col-lg-12">
+                                <div class="col-lg-12 hidden">
                                   <p><b>Note:</b> Due to the network heavy nature of this function this modal is locked in place until complete.</p>
                                   <div class="row">
                                     <div class="col-lg-4">
-                                      <h5>Printer Progress</h5>
+                                      <h5>Job Progress</h5>
                                       <button type="button" class="btn btn-secondary">0. TEST NAME<br>
                                         <div class="progress">
                                           <div class="progress-bar bg-ssecondary" progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
                                         </div></button>
-                                        <button type="button" class="btn btn-primary">2. Bob<br>
-                                          <div class="progress">
-                                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100" style="width: 75%"></div>
-                                          </div></button>
-                                          <button type="button" class="btn btn-primary">5. Another Name<br>
-                                            <div class="progress">
-                                              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
-                                            </div></button>
-                                            <button type="button" class="btn btn-primary">6. <br>
-                                              <div class="progress">
-                                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
-                                              </div></button>
                                     </div>
-                                    <div class="col-lg-8">
-                                      <h5>File Progress</h5>
-                                      <button type="button" class="btn btn-primary">Poppy-Something.gcode<br>
-                                        <div class="progress">
-                                          <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100" style="width: 25%"></div>
-                                        </div></button>
-                                        <button type="button" class="btn btn-success">more something.gcode<br>
-                                          <div class="progress">
-                                            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
-                                          </div></button>
-                                          <button type="button" class="btn btn-primary">a really long title for a bloody gcode file.gcode<br>
-                                            <div class="progress">
-                                              <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="78" aria-valuemin="0" aria-valuemax="100" style="width: 78%"></div>
-                                            </div></button>
-                                            <button type="button" class="btn btn-primary">another file of similar context.gcode<br>
-                                              <div class="progress">
-                                                <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
-                                              </div></button>
-
+                                    
                                     </div>
                                   </div>
-                                </div>
-
+                         
           </div>
         </div>
       </div>
     </div>
     <div class="modal-footer">
-     <button type="button" class="btn btn-dark float-left">Next</button><button type="button" class="btn btn-dark float-right">Close</button><button type="button" class="btn btn-dark float-right">Previous</button> 
+     <button type="button" class="btn btn-secondary float-left">Back</button><button id="multiUpSubmitBtn" type="button" class="btn btn-success float-right">Submit</button>
     </div>
   </div>
 </div>

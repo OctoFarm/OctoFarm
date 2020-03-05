@@ -13,6 +13,27 @@ export default class OctoPrintClient {
       body: JSON.stringify(data)
     });
   }
+  static folder(printer, item, data) {
+    let url = `http://${printer.ip}:${printer.port}/api/files${item}`;
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "X-Api-Key": printer.apikey
+      },
+      body: data
+    });
+  }
+  static move(printer, item, data) {
+    let url = `http://${printer.ip}:${printer.port}/api/${item}`;
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": printer.apikey
+      },
+      body: JSON.stringify(data)
+    });
+  }
   static delete(printer, item) {
     let url = `http://${printer.ip}:${printer.port}/api/${item}`;
     return fetch(url, {

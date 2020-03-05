@@ -4,8 +4,8 @@ printers[0].fileList.folders.length;i++){%> <%
 if(printers[0].fileList.folders[i].path == "local"){ %>
 <a
   href="#"
-  id="folder-<%= printers[0].fileList.folders[i].name %>"
-  class="list-group-item list-group-item-action flex-column align-items-start bg-dark"
+  id="file-<%= printers[0].fileList.folders[i].name %>"
+  class="list-group-item list-group-item-action flex-column align-items-start bg-dark folderAction"
   style="display: block;
     padding: 0.7rem 0.1rem;"
 >
@@ -29,10 +29,18 @@ if(printers[0].fileList.folders[i].path == "local"){ %>
           role="group"
           aria-label="Basic example"
         >
-          <button type="button" class="btn btn-warning">
+          <button
+            id="<%= printers[0].index %>*folderActionMove*<%= printers[0].fileList.folders[i].name %>"
+            type="button"
+            class="btn btn-warning"
+          >
             <i class="fas fa-people-carry"></i> Move
           </button>
-          <button type="button" class="btn btn-danger">
+          <button
+            id="<%= printers[0].index %>*folderActionDelete*<%= printers[0].fileList.folders[i].name %>"
+            type="button"
+            class="btn btn-danger"
+          >
             <i class="fas fa-trash-alt"></i> Delete
           </button>
         </div>

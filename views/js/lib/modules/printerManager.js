@@ -971,11 +971,26 @@ export default class PrinterManager {
       OctoPrintClient.jobAction(printer, opts, e);
     });
     elements.printerControls.printStop.addEventListener("click", e => {
-      e.target.disabled = true;
-      let opts = {
-        command: "cancel"
-      };
-      OctoPrintClient.jobAction(printer, opts, e);
+      bootbox.confirm({
+        message: `${printer.index}.  ${printer.settingsAppearance.name}: <br>Are you sure you want to cancel the ongoing print?`,
+        buttons: {
+          cancel: {
+            label: '<i class="fa fa-times"></i> Cancel'
+          },
+          confirm: {
+            label: '<i class="fa fa-check"></i> Confirm'
+          }
+        },
+        callback: function(result) {
+          if (result) {
+            e.target.disabled = true;
+            let opts = {
+              command: "cancel"
+            };
+            OctoPrintClient.jobAction(printer, opts, e);
+          }
+        }
+      });
     });
     elements.terminal.sendBtn.addEventListener("click", async e => {
       let input = elements.terminal.input.value;
@@ -1049,7 +1064,22 @@ export default class PrinterManager {
         OctoPrintClient.file(printer, fullPath, "print");
       });
     document.getElementById("delete-" + file).addEventListener("click", e => {
-      OctoPrintClient.file(printer, fullPath, "delete", file);
+      bootbox.confirm({
+        message: `Are you sure you want to delete ${fullPath}?`,
+        buttons: {
+          cancel: {
+            label: '<i class="fa fa-times"></i> Cancel'
+          },
+          confirm: {
+            label: '<i class="fa fa-check"></i> Confirm'
+          }
+        },
+        callback: function(result) {
+          if (result) {
+            OctoPrintClient.file(printer, fullPath, "delete", file);
+          }
+        }
+      });
     });
     let refreshBtn = document.getElementById("refresh-" + file);
     refreshBtn.addEventListener("click", async e => {
