@@ -14,7 +14,7 @@ export default class OctoPrintClient {
     });
   }
   static folder(printer, item, data) {
-    let url = `http://${printer.ip}:${printer.port}/api/files${item}`;
+    let url = `http://${printer.ip}:${printer.port}/api/files/${item}`;
     return fetch(url, {
       method: "POST",
       headers: {

@@ -49,13 +49,15 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
 //File Manager Page
 router.get("/filemanager", ensureAuthenticated, async (req, res) => {
   let printers = await Runner.returnFarmPrinters();
+  let filament = await Filament.find({});
   res.render("filemanager", {
     name: req.user.name,
     version: pjson.version,
     printers: printers,
     printerCount: printers.length,
     page: "File Manager",
-    helpers: prettyHelpers
+    helpers: prettyHelpers,
+    filament: filament
   });
 });
 //History Page
@@ -72,7 +74,7 @@ router.get("/history", ensureAuthenticated, async (req, res) => {
     history: history,
     page: "History",
     helpers: prettyHelpers,
-    filament: filament.roll
+    filament: filament
   });
 });
 //Panel view  Page
@@ -91,7 +93,7 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
     page: "Panel View",
     helpers: prettyHelpers,
     systemInfo: systemInformation[0],
-    filament: filament.roll
+    filament: filament
   });
 });
 //Camera view  Page
@@ -109,7 +111,7 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
     page: "Camera View",
     helpers: prettyHelpers,
     systemInfo: systemInformation[0],
-    filament: filament.roll
+    filament: filament
   });
 });
 //List view  Page
@@ -127,7 +129,7 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
     page: "List View",
     helpers: prettyHelpers,
     systemInfo: systemInformation[0],
-    filament: filament.roll
+    filament: filament
   });
 });
 module.exports = router;

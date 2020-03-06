@@ -294,6 +294,13 @@ class Runner {
     return;
   }
   static getFiles(index, location) {
+    //Shim to fix undefined on upload files/folders
+    farmPrinters[index].fileList = {
+      files: [],
+      fileCount: 0,
+      folders: [],
+      folderCount: 0
+    };
     return ClientAPI.get(
       farmPrinters[index].ip,
       farmPrinters[index].port,
@@ -639,12 +646,27 @@ class Runner {
     farmPrinters[i].fileList.folderCount =
       farmPrinters[i].fileList.folders.length;
   }
+  static newFolder(folder) {
+    let i = folder.i;
+    let path = "local";
+    if (folder.path != "") {
+      path = folder.path;
+    }
+    let newFolder = {
+      name: folder.foldername,
+      path: path
+    };
+    farmPrinters[i].fileList.folders.push(newFolder);
+    farmPrinters[i].fileList.folderCount =
+      farmPrinters[i].fileList.folders.length;
+  }
   static newFile(file) {
     let i = file.index;
+
     file = file.files.local;
     let path = "";
     if (file.path.indexOf("/") > -1) {
-      path = file.path.substr(0, entry.path.lastIndexOf("/"));
+      path = file.path.substr(0, file.path.lastIndexOf("/"));
     } else {
       path = "local";
     }

@@ -1,10 +1,27 @@
 import OctoFarmClient from "../octofarm.js";
 import OctoPrintClient from "../octoprint.js";
+import Queue from "../modules/clientQueue.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 
 let printerInfo = null;
-let uploadingFiles = [];
+let fileUploads = new Queue();
+
+setInterval(async () => {
+  //If there are files in the queue, plow through until uploaded... currently single file at a time.
+  if (fileUploads.size() > 0) {
+    let current = fileUploads.first();
+    if (!current.active) {
+      fileUploads.activate(0);
+      let file = await current.upload(current);
+      file = JSON.parse(file);
+      file.index = current.index;
+      let post = await OctoFarmClient.post("printers/newFiles", file);
+      let update = await FileManager.updateFileList();
+      fileUploads.remove();
+    }
+  }
+}, 1000);
 
 async function init() {
   printerInfo = await OctoFarmClient.get("printers/printerInfo");
@@ -71,62 +88,46 @@ export default class FileManager {
   static async handleFiles(Afiles) {
     Afiles = [...Afiles];
     for (let i = 0; i < Afiles.length; i++) {
-      let push = await FileManager.fileUpload(Afiles[i]);
-      push = JSON.parse(push);
-      push.index = document.getElementById("currentPrinter").innerHTML;
-      let post = await OctoFarmClient.post("printers/newFiles", push);
-      FileManager.updateFileList();
+      let newObject = {};
+      let spinner = document.getElementById("fileUploadCountSpinner");
+      if (spinner.classList.contains("fa-spin")) {
+      } else {
+        spinner.classList = "fas fa-spinner fa-spin";
+      }
+      newObject.file = Afiles[i];
+      newObject.index = document.getElementById("currentPrinter").innerHTML;
+      newObject.currentFolder = document.getElementById(
+        "currentFolder"
+      ).innerHTML;
+      newObject.upload = FileManager.fileUpload;
+      fileUploads.add(newObject);
+      let fileCounts = document.getElementById("fileCounts-" + newObject.index);
+      let amount = parseInt(fileCounts.innerHTML);
+      amount = amount + 1;
+      fileCounts.innerHTML = " " + amount;
     }
   }
   static createUpload(index, fileName, loaded, total) {
-    let currentFile = {
-      printer: index,
-      filename: fileName,
-      loaded: loaded,
-      total: total
-    };
-    let fileCheck = _.findIndex(uploadingFiles, function(o) {
-      return o.printer == index && o.filename == fileName;
-    });
+    let uploadSize = fileUploads.size();
 
-    if (fileCheck < 0) {
-      uploadingFiles.push(currentFile);
-    } else {
-      let fileIndex = _.findIndex(uploadingFiles, function(o) {
-        return o.printer == index && o.filename == fileName;
-      });
-      uploadingFiles.splice(fileIndex, 1, currentFile);
+    let upCount = document.getElementById("fileUploadCount");
+    upCount.innerHTML = "File Queue: " + uploadSize;
+    if (uploadSize < 1) {
+      upCount.innerHTML = "File Queue: 0";
+      let spinner = document.getElementById("fileUploadCountSpinner");
+      if (spinner.classList.contains("fa-spin")) {
+        spinner.classList = "fas fa-spinner";
+      }
     }
-    FileManager.updatePrinterList(index);
-  }
 
-  static updatePrinterList(index) {
-    let numberUp = document.getElementById("fileCounts-" + index);
     let progress = document.getElementById("fileProgress-" + index);
     progress.classList = "progress-bar progress-bar-striped bg-warning";
-    let currentFiles = [];
-    uploadingFiles.forEach(file => {
-      if (file.printer == index) {
-        currentFiles.push(file);
-      }
-    });
-    let currentLoaded = [];
-    let currentTotal = [];
-    currentLoaded.reduce((a, b) => a + b, 0);
-    currentFiles.forEach(print => {
-      currentLoaded.push(print.loaded);
-      currentTotal.push(print.total);
-    });
-    numberUp.innerHTML = " " + currentLoaded.length;
-    currentLoaded = currentLoaded.reduce((a, b) => a + b, 0);
-    currentTotal = currentTotal.reduce((a, b) => a + b, 0);
-    let percentLoad = (currentLoaded / currentTotal) * 100;
+    let percentLoad = (loaded / total) * 100;
     if (isNaN(percentLoad)) {
       percentLoad = 0;
     }
     progress.innerHTML = Math.floor(percentLoad) + "%";
     progress.style.width = percentLoad + "%";
-
     if (percentLoad == 100) {
       progress.classList = "progress-bar progress-bar-striped bg-success";
     }
@@ -135,10 +136,13 @@ export default class FileManager {
   static fileUpload(file) {
     return new Promise(function(resolve, reject) {
       //Grab folder location
-      let currentFolder = document.getElementById("currentFolder").innerHTML;
+      let currentFolder = file.currentFolder;
       //Grab Client Info
-      let index = document.getElementById("currentPrinter").innerHTML;
+
+      let index = file.index;
       index = parseInt(index);
+
+      let fileCounts = document.getElementById("fileCounts-" + index);
       //XHR doesn't like posting without it been a form, can't use offical octoprint api way...
       //Create form data
       let formData = new FormData();
@@ -146,8 +150,13 @@ export default class FileManager {
       if (currentFolder.includes("local/")) {
         path = currentFolder.replace("local/", "");
       }
-      formData.append("file", file);
+
+      formData.append("file", file.file);
       formData.append("path", path);
+      console.log(path);
+      if (file.print) {
+        formData.append("print", true);
+      }
       let url =
         "http://" +
         printerInfo[index].ip +
@@ -155,6 +164,7 @@ export default class FileManager {
         printerInfo[index].port +
         "/api/files/local";
       var xhr = new XMLHttpRequest();
+      file = file.file;
       xhr.open("POST", url);
       xhr.upload.onprogress = function(e) {
         if (e.lengthComputable) {
@@ -166,6 +176,7 @@ export default class FileManager {
           );
         }
       };
+
       //xhr.setRequestHeader("Content-Type", "multipart/form-data");
       xhr.setRequestHeader("X-Api-Key", printerInfo[index].apikey);
       xhr.onloadstart = function(e) {
@@ -177,24 +188,30 @@ export default class FileManager {
         );
       };
       xhr.onloadend = function(e) {
-        resolve(xhr.response);
+        FileManager.createUpload(
+          printerInfo[index].index,
+          file.name,
+          e.loaded,
+          e.total
+        );
+        fileCounts.innerHTML = " " + (parseInt(fileCounts.innerHTML) - 1);
+        let spinner = document.getElementById("fileUploadCountSpinner");
+        UI.createAlert(
+          "success",
+          file.name + " has finished uploading to Printer " + index,
+          3000,
+          "clicked"
+        );
         setTimeout(() => {
-          if (uploadingFiles.length === 0) {
-            let uploads = document.querySelectorAll("[id^='fileCounts-']");
-            uploads.forEach(u => {
-              u.innerHTML = " ";
-            });
-          }
-          let fileCheck = _.findIndex(uploadingFiles, function(o) {
-            return o.printer == index && o.filename == file.name;
-          });
-          if (fileCheck > -1) {
-            uploadingFiles.splice(fileCheck, 1);
-          }
+          FileManager.createUpload(
+            printerInfo[index].index,
+            file.name,
+            e.loaded,
+            e.total
+          );
         }, 5000);
-      };
-      xhr.onload = function() {
         if (this.status >= 200 && this.status < 300) {
+          resolve(xhr.response);
         } else {
           reject({
             status: this.status,
@@ -280,12 +297,14 @@ export default class FileManager {
       i: index
     });
     done = await done.json();
+
     FileManager.drawFiles(index, done.files);
     document.getElementById("printerStorage").innerHTML = `
     <i class="fas fa-hdd"></i> 
     ${Calc.bytes(done.storage.free)}  / 
     ${Calc.bytes(done.storage.total)}
   </button>`;
+    return "done";
   }
   static openFolder(folder, target) {
     if (typeof target != "undefined" && target.type === "button") {
@@ -471,17 +490,194 @@ export default class FileManager {
       });
     });
   }
-  static async multiUpload1() {
-    let printers = document.querySelectorAll("#multiUpPrinters-");
-    let submit = document.getElementById("multiUpSubmitBtn");
+  static async multiUpload() {
+    let selectedPrinters = null;
+    let selectedFolder = "";
+    let printAfterUpload = false;
+    let selectedFile = null;
 
-    console.log(printers);
+    function first() {
+      // let boxs = document.querySelectorAll('*[id^="multiUpPrinters-"]');
+      // selectedPrinters = [].filter.call(boxs, function(el) {
+      //   return el.checked;
+      // });
+
+      // if (selectedPrinters.length < 2) {
+      //   UI.createAlert(
+      //     "error",
+      //     "Please select MORE than " + selectedPrinters.length + " printer(s)!",
+      //     2000,
+      //     "clicked"
+      //   );
+      //   return;
+      // }
+      document.getElementById("multiPrinterBtn").disabled = true;
+      document.getElementById("multiFolder").disabled = false;
+      document.getElementById("multiPrintersSection").classList.add("hidden");
+      document.getElementById("multiFolderSection").classList.remove("hidden");
+      document.getElementById("multiUploadFooter").innerHTML =
+        '<button id="multiUpSubmitBtn" type="button" class="btn btn-warning float-right">Next</button>';
+      document
+        .getElementById("multiUpSubmitBtn")
+        .addEventListener("click", e => {
+          second();
+        });
+      document.getElementById("multiSelectedPrinters").innerHTML = "";
+      selectedPrinters.forEach((printer, index) => {
+        if (printer)
+          document.getElementById("multiSelectedPrinters").insertAdjacentHTML(
+            "beforeend",
+            `
+              [<span class="MultiSelected">${printer.value}</span>]
+            `
+          );
+      });
+    }
+
+    function second() {
+      //DELETE WHEN FOLDERS WORKING
+      let boxs = document.querySelectorAll('*[id^="multiUpPrinters-"]');
+      selectedPrinters = [].filter.call(boxs, function(el) {
+        return el.checked;
+      });
+
+      if (selectedPrinters.length < 2) {
+        UI.createAlert(
+          "error",
+          "Please select MORE than " + selectedPrinters.length + " printer(s)!",
+          2000,
+          "clicked"
+        );
+        return;
+      }
+
+      document.getElementById("multiPrinterBtn").disabled = true;
+      document.getElementById("multiFolder").disabled = false;
+      document.getElementById("multiPrintersSection").classList.add("hidden");
+      document.getElementById("multiFolderSection").classList.remove("hidden");
+      document.getElementById("multiUploadFooter").innerHTML =
+        '<button id="multiUpSubmitBtn" type="button" class="btn btn-warning float-right">Next</button>';
+      document
+        .getElementById("multiUpSubmitBtn")
+        .addEventListener("click", e => {
+          second();
+        });
+
+      document.getElementById("multiSelectedPrinters2").innerHTML = "";
+      selectedPrinters.forEach((printer, index) => {
+        if (printer)
+          document.getElementById("multiSelectedPrinters2").insertAdjacentHTML(
+            "beforeend",
+            `
+            [<span class="MultiSelected">${printer.value}</span>]
+            `
+          );
+      });
+      document.getElementById("multiFolder").disabled = true;
+      document.getElementById("multiFile").disabled = false;
+      document.getElementById("multiFileSection").classList.remove("hidden");
+      document.getElementById("multiFolderSection").classList.add("hidden");
+      document.getElementById("multiUploadFooter").innerHTML =
+        '<button id="multiUpSubmitBtn" type="button" class="btn btn-success float-right" data-dismiss="modal">Start!</button>';
+      document
+        .getElementById("multiUpSubmitBtn")
+        .addEventListener("click", e => {
+          third();
+        });
+      selectedFolder = document.getElementById("multiNewFolder").value;
+      if (selectedFolder != "") {
+        selectedFolder = selectedFolder + "";
+      }
+      document.getElementById("printOnLoadBtn").addEventListener("click", e => {
+        let state = null;
+        state = e.target.checked;
+        let fileBtn = document.getElementById("multiFileUploadBtn");
+        let fileBtnLabel = document.getElementById("multiFileUploadBtnLabel");
+        if (state) {
+          fileBtn.removeAttribute("multiple", "");
+          fileBtn.setAttribute("single", "");
+          fileBtnLabel.innerHTML =
+            '<i class="fas fa-file-import"></i> Upload File';
+          printAfterUpload = true;
+        } else {
+          fileBtn.setAttribute("multiple", "");
+          fileBtn.removeAttribute("single", "");
+          fileBtnLabel.innerHTML =
+            '<i class="fas fa-file-import"></i> Upload Files';
+          printAfterUpload = false;
+        }
+      });
+      document
+        .getElementById("multiFileUploadBtn")
+        .addEventListener("change", function() {
+          grabFiles(this.files);
+        });
+    }
+    function third() {
+      if (selectedFolder == "") {
+        selectedFolder = "local";
+      }
+
+      selectedPrinters.forEach(printer => {
+        let spinner = document.getElementById("fileUploadCountSpinner");
+        if (spinner.classList.contains("fa-spin")) {
+        } else {
+          spinner.classList = "fas fa-spinner fa-spin";
+        }
+        selectedFile.forEach(file => {
+          let newObject = {};
+          const num = printer.value;
+          newObject.file = file;
+          newObject.index = num;
+          newObject.upload = FileManager.fileUpload;
+          newObject.currentFolder = selectedFolder;
+
+          if (printAfterUpload) {
+            newObject.print = true;
+          }
+          fileUploads.add(newObject);
+          let fileCounts = document.getElementById(
+            "fileCounts-" + printer.value
+          );
+          let amount = parseInt(fileCounts.innerHTML);
+          amount = amount + 1;
+          fileCounts.innerHTML = " " + amount;
+        });
+      });
+    }
+
+    function grabFiles(Afiles) {
+      Afiles = [...Afiles];
+      selectedFile = Afiles;
+      let files = document.getElementById("multiFileSelectedNow");
+      files.innerHTML = "";
+      selectedFile.forEach(file => {
+        files.insertAdjacentHTML(
+          "beforeend",
+          `
+          <li>${file.name}</li>
+        `
+        );
+      });
+    }
+    let files = document.getElementById("multiFileSelectedNow");
+    files.innerHTML = "";
+    document.getElementById("multiPrinterBtn").disabled = false;
+    document.getElementById("multiFolder").disabled = true;
+    document.getElementById("multiFile").disabled = true;
+    document.getElementById("multiPrintersSection").classList.remove("hidden");
+    document.getElementById("multiFolderSection").classList.add("hidden");
+    document.getElementById("multiFileSection").classList.add("hidden");
+    document.getElementById("multiUploadFooter").innerHTML =
+      '<button id="multiUpSubmitBtn" type="button" class="btn btn-warning float-right">Next</button>';
+    document.getElementById("multiUpSubmitBtn").addEventListener("click", e => {
+      second();
+    });
   }
 }
 export class FileActions {
   static search() {
     let index = document.getElementById("currentPrinter").innerHTML;
-    console.log(printerInfo[index].filesList);
     let fileList = document.getElementById("fileList");
     let input = document.getElementById("searchFiles").value.toUpperCase();
     fileList.innerHTML = "";
@@ -501,27 +697,43 @@ export class FileActions {
   static async createFolder() {
     let index = document.getElementById("currentPrinter").innerHTML;
     let currentFolder = document.getElementById("currentFolder").innerHTML;
-    bootbox.prompt({
-      title:
-        "What would you like to call your folder?, it will be saved in... " +
-        currentFolder +
-        "/",
-      callback: async function(result) {
-        if (result) {
-          let formData = new FormData();
-          console.log(result);
-          console.log(currentFolder + "/");
+    let formData = new FormData();
 
-          formData.append("foldername", "test");
-          formData.append("path", "");
-          let post = await OctoPrintClient.folder(
-            printerInfo[index],
-            "files/local",
-            formData
+    if (currentFolder === "local") {
+      currentFolder = "";
+    } else if (currentFolder.includes("local/")) {
+      currentFolder = currentFolder.replace("local/", "");
+    }
+    bootbox.prompt("This is the default prompt!", async function(result) {
+      if (result) {
+        formData.append("foldername", result);
+        formData.append("path", currentFolder + "/");
+        let post = await OctoPrintClient.folder(
+          printerInfo[index],
+          "local",
+          formData
+        );
+        if (post.status === 201 || post.status === 200) {
+          let opts = {
+            i: index,
+            foldername: result,
+            path: currentFolder
+          };
+          let update = await OctoFarmClient.post("printers/newFolder", opts);
+          UI.createAlert(
+            "success",
+            "Successfully created your new folder...",
+            3000,
+            "clicked"
           );
-          console.log(post);
+          FileManager.updateFileList();
         } else {
-          UI.createAlert("error", "Did you type a folder name?", 3000);
+          UI.createAlert(
+            "error",
+            "Sorry your folder couldn't be saved...",
+            3000,
+            "clicked"
+          );
         }
       }
     });

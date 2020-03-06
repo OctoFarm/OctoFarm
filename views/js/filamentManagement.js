@@ -40,7 +40,7 @@ async function load() {
           "filamentMessage"
         );
         document.getElementById("addFilamentTable").insertAdjacentHTML(
-          "afterend",
+          "beforeend",
           `
           <tr>
             <th scope="row">${filamentName.value}</th>

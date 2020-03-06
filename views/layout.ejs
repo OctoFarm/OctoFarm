@@ -385,15 +385,14 @@
                           <div class="row">
                               <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12  text-center">
                                 <div class="btn-group" role="group" aria-label="Basic example">
-                                  <button class="btn btn-danger">1. Choose your printers..</button>
-                                  <button class="btn btn-warning" disabled>2. Choose your folder path..</button>
-                                  <button class="btn btn-success" disabled>3. Select your files..</button>
-                                  <button class="btn btn-info" disabled>4. Uploading..</button>
+                                  <button id="multiPrinterBtn" class="btn btn-danger">1. Choose your printers..</button>
+                                  <button id="multiFolder" class="btn btn-warning hidden" disabled>2. Choose your folder path..</button>
+                                  <button id="multiFile" class="btn btn-success" disabled>3. Select your files..</button>
                                 </div>
 
                               </div>
                               <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-                                <div class="col-lg-12">
+                                <div id="multiPrintersSection" class="col-lg-12">
                                   <p>Check the boxes below to select the printers you'd like to upload files too. (Only idle printers available for selection...)</p>
                                   <p><b>Note:</b> You must select at least 2 printers.</p>
                                   <% if (typeof printers != 'undefined'){ %>
@@ -401,7 +400,7 @@
                                       <% if(printers[i].stateColour.category === "Idle"){%>
                                         <form class="was-validated form-check-inline form-check">
                                           <div class="custom-control custom-checkbox mb-2 pr-2">
-                                            <input type="checkbox" class="custom-control-input" id="multiUpPrinters-<%= printers[i].index %>" required>
+                                            <input type="checkbox" class="custom-control-input" id="multiUpPrinters-<%= printers[i].index %>" value="<%= printers[i].index %>" required>
                                            <label class="custom-control-label" for="multiUpPrinters-<%= printers[i].index %>"><%= printers[i].index %>. <% if(typeof printers[i].settingsApperance != 'undefined'){ %> <%= printers[i].settingsApperance.name %> <%}%></label>
                                             <div class="invalid-feedback">Not this printer</div>
                                             <div class="valid-feedback">
@@ -415,36 +414,38 @@
                                   <% } %>
 
                                 </div>
-                                <div class="col-lg-12 hidden">
-                                  <p>Please type the folder name you'd like to create on the selected printers.</p>
-                                  <p><b>Note:</b> Leaving blank will create the files in local</p>
-                                  <input id="newFolderName" class="form-control bg-dark text-light" type="text" placeholder="Please type your new folder name here..." aria-label="NewFolder">
+                                <div id="multiFolderSection" class="col-lg-12 hidden">
+                                  <p id="multiSelectedPrinters"></p>
+                                  <p>Would you like to create a folder too?</p>
+                                  <p><b>Note:</b> Leaving blank will create the files in local, otherwise they will be put inside your newly created folder...</p>
+                                  <input id="multiNewFolder" class="form-control bg-dark text-light" type="text" placeholder="Please type your new folder name here..." aria-label="NewFolder">
                                 </div>
-                                <div class="col-lg-12 hidden">
-                                  <p>Please use the form below to select the files you'd like to complete this process with. </p>
-                                  <p><b>Note:</b> You can select a single file, or multiple.</p>
-                                  <div class="mb-3"><center><div id="drop-area"> <form class="my-form"> <p>Drag and Drop into the dashed region, or use the Select button to upload your file.</p><input type="file" id="gcodeUpload" multiple accept=".gcode,.gco,.g"><label class="btn btn-success" for="gcodeUpload">Select</label><br></form></div></div></center>
+                                <div id="multiFileSection" class="col-lg-12 hidden">
+                                  <p id="multiSelectedPrinters2"></p>
+                                  <form class="was-validated form-check-inline form-check">
+                                    <div class="custom-control custom-checkbox mb-2 pr-2">
+                                      <input type="checkbox" class="custom-control-input" id="printOnLoadBtn" required>
+                                       <label class="custom-control-label" for="printOnLoadBtn">Would you like to print after upload? (Global Effect...)</label>
+                                      <div class="invalid-feedback">Do not print after upload...</div>
+                                      <div class="valid-feedback">
+                                        Print after upload...
+                                      </div>
+                                    </div>
+                                    </form>
+                                  <p><b>Note:</b> If the print on successful upload action is enabled above, you may only upload a single file to your printers.</p>
+                                  <label id="multiFileUploadBtnLabel" class="btn btn-success m-3 float-left" for="multiFileUploadBtn"><i class="fas fa-file-import"></i> Upload File's</label>
+                                  <input id="multiFileUploadBtn" multiple accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left">
+                                  <br>
+                                  <p id="multiFileSelectedNow"></p>
                                 </div>
-                                <div class="col-lg-12 hidden">
-                                  <p><b>Note:</b> Due to the network heavy nature of this function this modal is locked in place until complete.</p>
-                                  <div class="row">
-                                    <div class="col-lg-4">
-                                      <h5>Job Progress</h5>
-                                      <button type="button" class="btn btn-secondary">0. TEST NAME<br>
-                                        <div class="progress">
-                                          <div class="progress-bar bg-ssecondary" progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
-                                        </div></button>
-                                    </div>
-                                    
-                                    </div>
-                                  </div>
+
                          
           </div>
         </div>
       </div>
     </div>
-    <div class="modal-footer">
-     <button type="button" class="btn btn-secondary float-left">Back</button><button id="multiUpSubmitBtn" type="button" class="btn btn-success float-right">Submit</button>
+    <div id="multiUploadFooter" class="modal-footer">
+
     </div>
   </div>
 </div>

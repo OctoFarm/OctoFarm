@@ -66,21 +66,9 @@ li {
 .Complete {
   background-color: #00330e;
 }
-.progress-bar {
-  -webkit-transition: width 1s ease-in-out;
-  -moz-transition: width 1s ease-in-out;
-  -o-transition: width 1s ease-in-out;
-  transition: width 1s ease-in-out;
-  animation: progressBar 3s ease-in-out;
-  animation-fill-mode: both;
-}
-@keyframes progressBar {
-  0% {
-    background-position: 40px 0;
-  }
-  100% {
-    background-position: 0 0;
-  }
+.MultiSelected {
+  background-color: black;
+  colour: green;
 }
 
 /*Sticky Table header*/
@@ -271,6 +259,11 @@ label {
   display: none;
 }
 #fileUploadBtn {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}
+#multiFileUploadBtn {
   opacity: 0;
   position: absolute;
   z-index: -1;

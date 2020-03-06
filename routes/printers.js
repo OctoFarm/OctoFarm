@@ -159,7 +159,11 @@ router.post("/moveFolder", ensureAuthenticated, async (req, res) => {
   );
   res.send({ msg: "success" });
 });
-
+router.post("/newFolder", ensureAuthenticated, async (req, res) => {
+  let data = req.body;
+  Runner.newFolder(data);
+  res.send({ msg: "success" });
+});
 router.post("/newFiles", ensureAuthenticated, async (req, res) => {
   let data = req.body;
   Runner.newFile(data);

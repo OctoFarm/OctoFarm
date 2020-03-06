@@ -10,77 +10,87 @@ class HistoryCollection {
     let printTime = new Date(payload.time * 1000);
     let startDate = today.getTime() - printTime.getTime();
     startDate = new Date(startDate);
-    
+
     let startDDMM = startDate.toDateString();
     let startTime = startDate.toTimeString();
     let startTimeFormat = startTime.substring(0, 8);
     startDate = startDDMM + " - " + startTimeFormat;
 
-    let endDDMM = today.toDateString(); 
+    let endDDMM = today.toDateString();
     let endTime = today.toTimeString();
     let endTimeFormat = endTime.substring(0, 8);
     let endDate = endDDMM + " - " + endTimeFormat;
 
+    let jobLength = "";
+    let jobVolume = "";
+    if (typeof printer.job.filament.tool.length != "undefined") {
+      jobLength = printer.job.filament.tool.length;
+      jobVolume = printer.job.filament.tool.volume;
+    } else {
+      jobLength = 0;
+      jobVolume = 0;
+    }
+
     let printHistory = {
-        historyIndex: historyCollection.length + 1,
-        printerIndex: printer.index,
-        printerName: printer.settingsApperance.name,
-        success: true,
-        reason: payload.reason,
-        fileName: payload.name,
-        filePath: payload.path,
-        startDate: startDate,
-        endDate: endDate,
-        printTime: Math.round(payload.time),
-        spoolUsed: "-",
-        filamentLength: printer.job.filament.tool0.length,
-        filamentVolume: printer.job.filament.tool0.volume,
-        notes: ""
-      }
-  
-      let saveHistory = new History({
-        printHistory
-      });
-      saveHistory.save();
+      historyIndex: historyCollection.length + 1,
+      printerIndex: printer.index,
+      printerName: printer.settingsApperance.name,
+      success: true,
+      reason: payload.reason,
+      fileName: payload.name,
+      filePath: payload.path,
+      startDate: startDate,
+      endDate: endDate,
+      printTime: Math.round(payload.time),
+      spoolUsed: "-",
+      filamentLength: jobLength,
+      filamentVolume: jobVolume,
+      notes: ""
+    };
+
+    let saveHistory = new History({
+      printHistory
+    });
+    saveHistory.save();
   }
-  static async failed(payload, printer){
+  static async failed(payload, printer) {
     let today = new Date();
     let historyCollection = await History.find({});
 
     let printTime = new Date(payload.time * 1000);
     let startDate = today.getTime() - printTime.getTime();
     startDate = new Date(startDate);
-    
+
     let startDDMM = startDate.toDateString();
     let startTime = startDate.toTimeString();
     let startTimeFormat = startTime.substring(0, 8);
     startDate = startDDMM + " - " + startTimeFormat;
 
-    let endDDMM = today.toDateString(); 
+    let endDDMM = today.toDateString();
     let endTime = today.toTimeString();
     let endTimeFormat = endTime.substring(0, 8);
     let endDate = endDDMM + " - " + endTimeFormat;
 
     let printHistory = {
-        historyIndex: historyCollection.length + 1,
-        printerIndex: printer.index,
-        printerName: printer.settingsApperance.name,
-        success: false,
-        reason: payload.reason,
-        fileName: payload.name,
-        filePath: payload.path,
-        startDate: startDate,
-        endDate: endDate,
-        printTime: Math.round(payload.time),
-        spoolUsed: "-",
-        filamentLength: "-",
-        filamentVolume: "-",
-        notes: ""
-      }
-      let saveHistory = new History({
-        printHistory
-      });
-      saveHistory.save();
+      historyIndex: historyCollection.length + 1,
+      printerIndex: printer.index,
+      printerName: printer.settingsApperance.name,
+      success: false,
+      reason: payload.reason,
+      fileName: payload.name,
+      filePath: payload.path,
+      startDate: startDate,
+      endDate: endDate,
+      printTime: Math.round(payload.time),
+      spoolUsed: "-",
+      filamentLength: "-",
+      filamentVolume: "-",
+      notes: ""
+    };
+    let saveHistory = new History({
+      printHistory
+    });
+    saveHistory.save();
   }
   static history() {
     let printHistory = {
