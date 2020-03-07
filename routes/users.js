@@ -41,6 +41,7 @@ router.post("/register", (req, res) => {
 
   if (errors.length > 0) {
     res.render("register", {
+      page: "Login",
       errors,
       name,
       username,
