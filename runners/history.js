@@ -51,7 +51,6 @@ class HistoryCollection {
       startDate: startDate,
       endDate: endDate,
       printTime: Math.round(payload.time),
-      spoolUsed: "-",
       filamentLength: jobLength,
       filamentVolume: jobVolume,
       filamentSelection: filamentChoice,

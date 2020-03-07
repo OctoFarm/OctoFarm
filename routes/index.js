@@ -10,6 +10,8 @@ const prettyHelpers = require("../views/partials/functions/pretty.js");
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 const _ = require("lodash");
+const filamentType = require("../config/filaments.js");
+const returnFilamentTypes = filamentType.returnFilamentTypes;
 
 console.log("db: " + db);
 
@@ -67,6 +69,7 @@ router.get("/history", ensureAuthenticated, async (req, res) => {
   const History = require("../models/History.js");
   let history = await History.find({});
   let filament = await Filament.find({});
+  let filamentTypes = await returnFilamentTypes();
   res.render("history", {
     name: req.user.name,
     version: pjson.version,
@@ -75,7 +78,8 @@ router.get("/history", ensureAuthenticated, async (req, res) => {
     history: history,
     page: "History",
     helpers: prettyHelpers,
-    filament: filament
+    filament: filament,
+    filamentTypes: filamentTypes
   });
 });
 //Panel view  Page
