@@ -40,10 +40,14 @@ class HistoryCollection {
 
       filamentChoice = roll;
     }
+    let name = "";
+    if (typeof printer.settingsApperance != "undefined") {
+      name = printer.settingsApperance.name;
+    }
     let printHistory = {
       historyIndex: historyCollection.length + 1,
       printerIndex: printer.index,
-      printerName: printer.settingsApperance.name,
+      printerName: name,
       success: true,
       reason: payload.reason,
       fileName: payload.name,

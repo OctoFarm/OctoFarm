@@ -153,7 +153,6 @@ export default class FileManager {
 
       formData.append("file", file.file);
       formData.append("path", path);
-      console.log(path);
       if (file.print) {
         formData.append("print", true);
       }
@@ -327,7 +326,6 @@ export default class FileManager {
     }
   }
   static drawFiles(index, fileList) {
-    console.log(fileList);
     let fileElem = document.getElementById("fileList");
     if (fileList === "EMPTY") {
       fileElem.innerHTML = `

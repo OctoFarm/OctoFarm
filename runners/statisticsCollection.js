@@ -56,6 +56,10 @@ class StatisticsCollection {
     let progress = [];
     try {
       farmPrinters.forEach(printer => {
+        let name = "";
+        if (typeof printer.settingsApperance != "undefined") {
+          name = printer.settingsApperance.name;
+        }
         if (typeof printer.stateColour != "undefined") {
           if (printer.stateColour.category === "Idle") {
             idle.push(printer.index);
@@ -77,7 +81,7 @@ class StatisticsCollection {
 
             currentOperations.push({
               index: printer.index,
-              name: printer.settingsApperance.name,
+              name: name,
               progress: Math.floor(printer.progress.completion),
               progressColour: "success",
               timeRemaining: printer.progress.printTimeLeft
@@ -92,7 +96,7 @@ class StatisticsCollection {
             progress.push(printer.progress.completion);
             currentOperations.push({
               index: printer.index,
-              name: printer.settingsApperance.name,
+              name: name,
               progress: Math.floor(printer.progress.completion),
               progressColour: "warning",
               timeRemaining: printer.progress.printTimeLeft
@@ -121,7 +125,7 @@ class StatisticsCollection {
       farmStats[0].currentOperations = currentOperations;
       farmStats[0].currentOperationsCount = currentOperationsCount;
     } catch (err) {
-      console.log("Errant Stats Runner.... can be ignored...");
+      console.log("Current Operations issue: " + err);
     }
   }
   static async farmInformation(farmPrinters) {
@@ -182,6 +186,10 @@ class StatisticsCollection {
     history.forEach(print => {
       if (print.printHistory.success) {
         printTimes.push(print.printHistory.printTime);
+      } else {
+        if (print.printHistory.reason === "cancelled") {
+          printTimes.push(print.printHistory.printTime);
+        }
       }
     });
     farmPrinters.forEach(printer => {
@@ -296,11 +304,12 @@ class StatisticsCollection {
           });
           calcWeight =
             (3.14 * (1.75 / 2)) ^
-            (2 * parseFloat(currentType) * print.printHistory.filamentLength);
+            ((2 * parseFloat(currentType) * print.printHistory.filamentLength) /
+              1000);
         } else {
           calcWeight =
             (3.14 * (1.75 / 2)) ^
-            (2 * 1.24 * print.printHistory.filamentLength);
+            ((2 * 1.24 * print.printHistory.filamentLength) / 1000);
         }
 
         completed.push(print.printHistory.success);
