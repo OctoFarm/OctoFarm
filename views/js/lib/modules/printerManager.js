@@ -2,8 +2,14 @@ import OctoPrintClient from "../octoprint.js";
 import OctoFarmClient from "../octofarm.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
+import * as FilamentManager from "../../filamentManagement.js";
+
+const returnFilament = FilamentManager.returnFilament;
+const chooseFilament = FilamentManager.choose;
+
 let currentIndex = 0;
 let previousLog = null;
+
 export default class PrinterManager {
   static async init(printers) {
     let i = currentIndex;
@@ -11,6 +17,7 @@ export default class PrinterManager {
     const availableBaud = printer.options.baudrates;
     const availablePort = printer.options.ports;
     const availableProfile = printer.options.printerProfiles;
+
     const preferedBaud = printer.options.baudratePreference;
     const preferedPort = printer.options.portPreference;
     const preferedProfile = printer.options.printerProfilePreference;
@@ -267,7 +274,7 @@ export default class PrinterManager {
             <b class="mb-1">File Name: </b><p class="mb-1" id="pmFileName">${
               job.file.name
             }</p>
-            <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="filamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="filamentManagerFolderSelect"><option value="local"></option></select>
+            <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="filamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="filamentManagerFolderSelect"><option value="local" selected>Please choose filament..</option></select>
           </div>
         </div>
         `;
@@ -492,34 +499,34 @@ export default class PrinterManager {
         '" target="_blank"><button id="printerWebInterfaceBtn" type="button" class="btn btn-info"><i class="fas fa-globe-europe"></i><br> Web Interface</button></a></center>';
       document.getElementById("printerRestart").innerHTML =
         '<center><button id="printerRestartBtn" type="button" class="btn btn-warning" href="#" target="_blank"><i class="fas fa-redo"></i><br>Restart Octoprint</button></center>';
-      document
-        .getElementById("printerRestartBtn")
-        .addEventListener("click", e => {
-          //Restart Event Listener
-          //PrinterActions.restartOctoprint(i);
-        });
       document.getElementById("printerReboot").innerHTML =
         ' <center><button id="printerRebootBtn" type="button" class="btn btn-danger" href="#" target="_blank"><i class="fas fa-sync-alt"></i><br>Reboot System</button></center>';
-      document
-        .getElementById("printerRebootBtn")
-        .addEventListener("click", e => {
-          //Reboot Event Listener
-          //PrinterActions.rebootOctoprint(i);
-        });
       document.getElementById("printerShutdown").innerHTML =
         '<center><button id="printerShutdownBtn" type="button" class="btn btn-danger" href="#" target="_blank"><i class="fas fa-power-off"></i><br>Shutdown System</button></center>';
-      document
-        .getElementById("printerShutdownBtn")
-        .addEventListener("click", e => {
-          //Shutdown Event Listener
-          //PrinterActions.shutdownOctoprint(i);
-        });
       document.getElementById("printerManagerFooter").innerHTML =
         '<button id="savePrinterBtn" type="button" class="btn btn-success float-left">Save Changes</button><button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>';
-      document.getElementById("savePrinterBtn").addEventListener("click", e => {
-        //Shutdown Event Listener
-        //this.savePrinterChanges(i);
+
+      let rolls = returnFilament();
+      let filamentKeys = rolls.checked;
+
+      let filamentSelect = document.getElementById(
+        "filamentManagerFolderSelect"
+      );
+      filamentKeys.forEach((e, index) => {
+        filamentSelect.insertAdjacentHTML(
+          "beforeend",
+          `  
+              <option value="${e._id}">${e.roll.name} - ${e.roll.type[1]} - ${e.roll.colour} (${e.roll.manufacturer})</option>
+          `
+        );
       });
+      filamentSelect.addEventListener("change", e => {
+        chooseFilament(e.target, i);
+      });
+
+      if (typeof printer.selectedFilament != "undefined") {
+        filamentSelect.value = printer.selectedFilament;
+      }
       const printerPort = document.getElementById("printerPortDrop");
       const printerBaud = document.getElementById("printerBaudDrop");
       const printerProfile = document.getElementById("printerProfileDrop");

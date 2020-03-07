@@ -327,12 +327,18 @@ export default class FileManager {
     }
   }
   static drawFiles(index, fileList) {
+    console.log(fileList);
     let fileElem = document.getElementById("fileList");
     if (fileList === "EMPTY") {
       fileElem.innerHTML = `
       <div class="noStorage  text-center"><i class="fas fa-file-code fa-5x"></i><br><h5>There are no files in local storage...</h5></div>
       `;
     } else {
+      fileList.files = _.sortBy(fileList.files, [
+        function(o) {
+          return o.display;
+        }
+      ]);
       fileElem.innerHTML = "";
       let currentFolder = document.getElementById("currentFolder").innerHTML;
       if (currentFolder.includes("local/")) {
@@ -416,6 +422,11 @@ export default class FileManager {
           );
         }
       });
+      fileList.folders = _.sortBy(fileList.folders, [
+        function(o) {
+          return o.display;
+        }
+      ]);
       //then draw folders
       fileList.folders.forEach(folder => {
         if (folder.path == currentFolder) {

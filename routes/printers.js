@@ -169,4 +169,9 @@ router.post("/newFiles", ensureAuthenticated, async (req, res) => {
   Runner.newFile(data);
   res.send({ msg: "success" });
 });
+router.post("/selectFilament", ensureAuthenticated, async (req, res) => {
+  let data = req.body;
+  let roll = await Runner.selectFilament(data);
+  res.send({ msg: roll });
+});
 module.exports = router;

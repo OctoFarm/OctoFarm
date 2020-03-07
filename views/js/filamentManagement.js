@@ -1,14 +1,19 @@
 import Client from "./lib/octofarm.js";
 import UI from "./lib/functions/ui.js";
+import OctoFarmclient from "./lib/octofarm.js";
 
 let filamentStore = null;
+
+export function returnFilament() {
+  return filamentStore;
+}
 
 async function init() {
   let post = await Client.get("filament/get");
   post = await post.json();
-  filamentStore = post.filamentStore;
+  filamentStore = post;
 
-  let filamentKeys = Object.entries(filamentStore);
+  let filamentKeys = Object.entries(filamentStore.filamentStore);
 
   let filamentSelect = document.getElementById("filementTypeSelect");
   filamentKeys.forEach((e, index) => {
@@ -19,6 +24,12 @@ async function init() {
       `
     );
   });
+}
+
+export async function choose(value, i) {
+  let id = { id: value.options[value.selectedIndex].value, index: i };
+  let post = await OctoFarmclient.post("printers/selectFilament", id);
+  post = await post.json();
 }
 
 async function load() {
@@ -52,7 +63,6 @@ async function load() {
         colour: filamentColour.value,
         manufacturer: filamentManufacturer.value
       };
-      console.log(filamentColour.value);
       let post = await Client.post("filament/saveNew", opts);
       if (post.status === 200) {
         UI.createMessage(

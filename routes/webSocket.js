@@ -22,6 +22,10 @@ setInterval(async function() {
   let systemInformation = await SystemInfo.find({});
   let roll = await Roll.find({});
   for (let i = 0; i < printers.length; i++) {
+    let selectedFilament = null;
+    if (typeof printers[i].selectedFilament != "undefined") {
+      selectedFilament = printers[i].selectedFilament;
+    }
     let printer = {
       state: printers[i].state,
       index: printers[i].index,
@@ -46,7 +50,8 @@ setInterval(async function() {
       settingsAppearance: printers[i].settingsApperance,
       stateColour: printers[i].stateColour,
       current: printers[i].current,
-      options: printers[i].options
+      options: printers[i].options,
+      selectedFilament: selectedFilament
     };
     printerInfo.push(printer);
   }
@@ -63,9 +68,7 @@ setInterval(async function() {
 }, 500);
 
 router.ws("/grab", function(ws, req) {
-  ws.on("open", function open() {
-    console.log("Client connected");
-  });
+  ws.on("open", function open() {});
   ws.on("message", async function(msg) {
     if (msg === "hello") {
       try {
@@ -90,7 +93,6 @@ router.ws("/grab", function(ws, req) {
     }
   });
   ws.on("close", function() {
-    console.log("Client close");
     clearInterval(ws.interval);
     ws.terminate();
   });

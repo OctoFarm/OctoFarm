@@ -1,7 +1,10 @@
 <% if(typeof printers[0].fileList != 'undefined' && typeof printers[0].fileList.files != 'undefined'){%>
   <% for(let i=0;i <
     printers[0].fileList.files.length;i++){%>
-      <% if(printers[0].fileList.files[i].path === "local") {%>
+      <% let sorted = printers[0].fileList.files.sort((a, b) => (a.display > b.display) ? 1 : -1) %>
+
+      <% if(sorted[i].path === "local") {%>
+        
         <a
         id="file-<%=printers[0].fileList.files[i].fullPath%>"
         href="#"

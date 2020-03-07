@@ -213,6 +213,7 @@ class Runner {
         //console.log(data.current.temps);
         if (data.current.temps.length != 0) {
           farmPrinters[client.index].temps = data.current.temps;
+          //console.log(farmPrinters[1].temps);
         }
 
         if (
@@ -659,6 +660,10 @@ class Runner {
     farmPrinters[i].fileList.folders.push(newFolder);
     farmPrinters[i].fileList.folderCount =
       farmPrinters[i].fileList.folders.length;
+  }
+  static selectFilament(filament) {
+    farmPrinters[filament.index].selectedFilament = filament.id;
+    return farmPrinters[filament.index].selectedFilament;
   }
   static newFile(file) {
     let i = file.index;
