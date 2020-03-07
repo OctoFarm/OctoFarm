@@ -15,10 +15,16 @@ let lastPrinter = null;
 export default class PrinterManager {
   static async init(printers) {
     let i = currentIndex;
-    let printer = printers[i];
-    lastPrinter = printers[i];
+    let printer = null;
 
-    if (typeof printer != "undefined") {
+    if (typeof printers != "undefined") {
+      if (typeof printers.length === "undefined") {
+        printer = printers;
+        lastPrinter = printers;
+      } else {
+        printer = printers[i];
+        lastPrinter = printers[i];
+      }
       const availableBaud = printer.options.baudrates;
       const availablePort = printer.options.ports;
       const availableProfile = printer.options.printerProfiles;
@@ -594,9 +600,11 @@ export default class PrinterManager {
         }
         let elements = PrinterManager.grabPage();
         elements.terminal.terminalWindow.innerHTML = "";
+        let folder = document.getElementById("fileManagerFolderSelect");
+
         if (typeof printer.filesList != "undefined") {
           printer.filesList.files.forEach(file => {
-            if (file.path === "local") {
+            if (file.path === folder.options[folder.selectedIndex].text) {
               PrinterManager.drawFileList(
                 file,
                 elements.jobStatus.fileManagerFileList
@@ -1661,9 +1669,12 @@ async function handleFiles(Afiles, printer) {
     file.fullPath = file.files.local.path;
     file.display = file.name;
     file.index = currentIndex;
-    console.log(file);
     let post = await OctoFarmClient.post("printers/newFiles", file);
-    PrinterManager.init(lastPrinter);
+    PrinterManager.drawFileList(
+      file,
+      document.getElementById("fileManagerFileList")
+    );
+    PrinterManager.applyFileListeners(printer, file.name, file.fullPath);
   }
 }
 async function fileUpload(printerInfo, file) {

@@ -92,6 +92,10 @@ router.get("/printerInfo", ensureAuthenticated, async (req, res) => {
   let printers = await Runner.returnFarmPrinters();
   let printerInfo = [];
   for (let i = 0; i < printers.length; i++) {
+    let selectedFilament = null;
+    if (typeof printers[i].selectedFilament != "undefined") {
+      selectedFilament = printers[i].selectedFilament;
+    }
     let printer = {
       state: printers[i].state,
       index: printers[i].index,
@@ -99,13 +103,27 @@ router.get("/printerInfo", ensureAuthenticated, async (req, res) => {
       port: printers[i].port,
       camURL: printers[i].camURL,
       apikey: printers[i].apikey,
+      currentZ: printers[i].currentZ,
+      progress: printers[i].progress,
+      job: printers[i].job,
+      profile: printers[i].profiles,
+      temps: printers[i].temps,
       flowRate: printers[i].flowRate,
       feedRate: printers[i].feedRate,
       stepRate: printers[i].stepRate,
       filesList: printers[i].fileList,
-      stateColour: printers[i].stateColour
+      logs: printers[i].logs,
+      messages: printers[i].messages,
+      plugins: printers[i].settingsPlugins,
+      gcode: printers[i].settingsScripts,
+      url: printers[i].ip + ":" + printers[i].port,
+      settingsAppearance: printers[i].settingsApperance,
+      stateColour: printers[i].stateColour,
+      current: printers[i].current,
+      options: printers[i].options,
+      selectedFilament: selectedFilament
     };
-    await printerInfo.push(printer);
+    printerInfo.push(printer);
   }
 
   res.send(printerInfo);
