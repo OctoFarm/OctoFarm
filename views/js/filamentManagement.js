@@ -117,5 +117,7 @@ async function deleteFilament(e) {
     }
   }
 }
-load();
-init();
+if (!document.getElementById("systemDropDown").classList.contains("notyet")) {
+  load();
+  init();
+}
