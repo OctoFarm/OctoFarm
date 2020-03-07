@@ -1271,14 +1271,20 @@ export default class PrinterManager {
       elements.jobStatus.fileName.innerHTML = job.file.name;
 
       if (printer.stateColour.category === "Active") {
-        elements.printerControls.e0Target.placeholder =
-          printer.temps[0].tool0.target + "°C";
-        elements.printerControls.e0Actual.innerHTML =
-          "Actual: " + printer.temps[0].tool0.actual + "°C";
-        elements.printerControls.bedTarget.placeholder =
-          printer.temps[0].bed.target + "°C";
-        elements.printerControls.bedActual.innerHTML =
-          "Actual: " + printer.temps[0].bed.actual + "°C";
+        if (
+          typeof printer.temps != "undefined" &&
+          typeof printer.temps[0].tool0 != "undefined" &&
+          typeof printer.temps[0].tool0.target != "undefined"
+        ) {
+          elements.printerControls.e0Target.placeholder =
+            printer.temps[0].tool0.target + "°C";
+          elements.printerControls.e0Actual.innerHTML =
+            "Actual: " + printer.temps[0].tool0.actual + "°C";
+          elements.printerControls.bedTarget.placeholder =
+            printer.temps[0].bed.target + "°C";
+          elements.printerControls.bedActual.innerHTML =
+            "Actual: " + printer.temps[0].bed.actual + "°C";
+        }
         if (
           printer.temps[0].tool0.actual > printer.temps[0].tool0.target - 0.5 &&
           printer.temps[0].tool0.actual < printer.temps[0].tool0.target + 0.5
