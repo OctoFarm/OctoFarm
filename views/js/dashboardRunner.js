@@ -227,7 +227,10 @@ class dashActions {
       "You must have at least 1 printer in the Idle category to use this function...";
     let printersList = "";
     printerInfo.forEach(printer => {
-      if (printer.stateColour.category === "Idle") {
+      if (
+        printer.stateColour.category === "Idle" ||
+        printer.stateColour.category === "Complete"
+      ) {
         let printerName = "";
         if (typeof printer.settingsAppearance != "undefined") {
           printerName = printer.settingsAppearance.name;
