@@ -23,9 +23,9 @@ class HistoryCollection {
 
     let jobLength = "";
     let jobVolume = "";
-    if (typeof printer.job.filament.tool.length != "undefined") {
-      jobLength = printer.job.filament.tool.length;
-      jobVolume = printer.job.filament.tool.volume;
+    if (typeof printer.job.filament.tool0.length != "undefined") {
+      jobLength = printer.job.filament.tool0.length;
+      jobVolume = printer.job.filament.tool0.volume;
     } else {
       jobLength = 0;
       jobVolume = 0;

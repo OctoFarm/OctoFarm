@@ -397,7 +397,7 @@
                                   <p><b>Note:</b> You must select at least 2 printers.</p>
                                   <% if (typeof printers != 'undefined'){ %>
                                     <% for(let i=0;i < printers.length;i++){%>
-                                      <% if(printers[i].stateColour.category === "Idle"){%>
+                                      <% if(printers[i].stateColour.category === "Idle" || printers[i].stateColour.category === "Complete"){%>
                                         <form class="was-validated form-check-inline form-check">
                                           <div class="custom-control custom-checkbox mb-2 pr-2">
                                             <input type="checkbox" class="custom-control-input" id="multiUpPrinters-<%= printers[i].index %>" value="<%= printers[i].index %>" required>
