@@ -1,6 +1,7 @@
 const History = require("../models/History.js");
 const _ = require("lodash");
 const fetch = require("node-fetch");
+const Roll = require("../models/Filament.js");
 
 class HistoryCollection {
   static async complete(payload, printer) {
@@ -30,7 +31,15 @@ class HistoryCollection {
       jobLength = 0;
       jobVolume = 0;
     }
+    let filamentChoice = "None chosen...";
+    if (
+      typeof printer.selectedFilament != "undefined" &&
+      printer.selectedFilament != 0
+    ) {
+      let roll = await Roll.findOne({ _id: printer.selectedFilament });
 
+      filamentChoice = roll;
+    }
     let printHistory = {
       historyIndex: historyCollection.length + 1,
       printerIndex: printer.index,
@@ -45,6 +54,7 @@ class HistoryCollection {
       spoolUsed: "-",
       filamentLength: jobLength,
       filamentVolume: jobVolume,
+      filamentSelection: filamentChoice,
       notes: ""
     };
 

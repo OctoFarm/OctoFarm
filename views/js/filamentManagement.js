@@ -89,6 +89,9 @@ async function load() {
           </tr>
           `
         );
+        let post = await Client.get("filament/get");
+        post = await post.json();
+        filamentStore = post;
       } else {
         UI.createMessage(
           {
