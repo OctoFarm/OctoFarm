@@ -1,6 +1,8 @@
 const FarmStatistics = require("../models/FarmStatistics.js");
 const History = require("../models/History.js");
 const _ = require("lodash");
+const filamentType = require("../config/filaments.js");
+const returnFilamentTypes = filamentType.returnFilamentTypes;
 
 let farmStats = [];
 let farmRunner = null;
@@ -272,12 +274,39 @@ class StatisticsCollection {
     let failed = [];
     let printTimes = [];
     let filamentLengths = [];
+    let filamentWeights = [];
     history.forEach(print => {
       filamentLengths.push(print.printHistory.filamentLength);
       if (print.printHistory.success) {
+        let filamentTypes = returnFilamentTypes();
+        let calcWeight = null;
+        if (
+          typeof print.printHistory.filamentSelection != "undefined" &&
+          print.printHistory.filamentSelection != "None chosen..."
+        ) {
+          let currentType = null;
+          let filamentKeys = Object.entries(filamentTypes);
+
+          filamentKeys.forEach(entry => {
+            if (
+              entry[0] === print.printHistory.filamentSelection.roll.type[0]
+            ) {
+              currentType = entry[1].density;
+            }
+          });
+          calcWeight =
+            (3.14 * (1.75 / 2)) ^
+            (2 * parseFloat(currentType) * print.printHistory.filamentLength);
+        } else {
+          calcWeight =
+            (3.14 * (1.75 / 2)) ^
+            (2 * 1.24 * print.printHistory.filamentLength);
+        }
+
         completed.push(print.printHistory.success);
         printTimes.push(print.printHistory.printTime);
         filamentLengths.push(print.printHistory.filamentLength);
+        filamentWeights.push(calcWeight);
       } else {
         if (print.printHistory.reason === "cancelled") {
           cancelled.push(print.printHistory.success);
@@ -339,14 +368,19 @@ class StatisticsCollection {
     if (isNaN(printStatistics.averagePrintTime)) {
       printStatistics.averagePrintTime = 0;
     }
+
     let totalFilamentLength = filamentLengths.reduce((a, b) => a + b, 0);
     if (isNaN(totalFilamentLength)) {
       totalFilamentLength = 0;
     }
+
     totalFilamentLength = totalFilamentLength / 1000;
     totalFilamentLength = Math.round(totalFilamentLength * 100) / 100;
-    let totalFilamentWeight =
-      (3.14 * (1.75 / 2)) ^ (2 * 1.24 * totalFilamentLength);
+
+    let totalFilamentWeight = filamentWeights.reduce((a, b) => a + b, 0);
+    if (isNaN(totalFilamentWeight)) {
+      totalFilamentWeight = 0;
+    }
 
     printStatistics.filamentUsage =
       totalFilamentLength + "m / " + totalFilamentWeight + "g";
