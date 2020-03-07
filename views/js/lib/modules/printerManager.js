@@ -1284,30 +1284,31 @@ export default class PrinterManager {
             printer.temps[0].bed.target + "°C";
           elements.printerControls.bedActual.innerHTML =
             "Actual: " + printer.temps[0].bed.actual + "°C";
-        }
-        if (
-          printer.temps[0].tool0.actual > printer.temps[0].tool0.target - 0.5 &&
-          printer.temps[0].tool0.actual < printer.temps[0].tool0.target + 0.5
-        ) {
-          elements.printerControls.e0Actual.classList =
-            "input-group-text Complete";
-        } else if (printer.temps[0].tool0.actual < 35) {
-          elements.printerControls.e0Actual.classList = "input-group-text";
-        } else {
-          elements.printerControls.e0Actual.classList =
-            "input-group-text Active";
-        }
-        if (
-          printer.temps[0].bed.actual > printer.temps[0].bed.target - 0.5 &&
-          printer.temps[0].bed.actual < printer.temps[0].bed.target + 0.5
-        ) {
-          elements.printerControls.bedActual.classList =
-            "input-group-text Complete";
-        } else if (printer.temps[0].bed.actual < 35) {
-          elements.printerControls.bedActual.classList = "input-group-text";
-        } else {
-          elements.printerControls.bedActual.classList =
-            "input-group-text Active";
+          if (
+            printer.temps[0].tool0.actual >
+              printer.temps[0].tool0.target - 0.5 &&
+            printer.temps[0].tool0.actual < printer.temps[0].tool0.target + 0.5
+          ) {
+            elements.printerControls.e0Actual.classList =
+              "input-group-text Complete";
+          } else if (printer.temps[0].tool0.actual < 35) {
+            elements.printerControls.e0Actual.classList = "input-group-text";
+          } else {
+            elements.printerControls.e0Actual.classList =
+              "input-group-text Active";
+          }
+          if (
+            printer.temps[0].bed.actual > printer.temps[0].bed.target - 0.5 &&
+            printer.temps[0].bed.actual < printer.temps[0].bed.target + 0.5
+          ) {
+            elements.printerControls.bedActual.classList =
+              "input-group-text Complete";
+          } else if (printer.temps[0].bed.actual < 35) {
+            elements.printerControls.bedActual.classList = "input-group-text";
+          } else {
+            elements.printerControls.bedActual.classList =
+              "input-group-text Active";
+          }
         }
 
         PrinterManager.controls(true, true);
