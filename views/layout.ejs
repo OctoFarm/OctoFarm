@@ -922,8 +922,11 @@
                                                 <input type="text" class="form-control" id="filamentName" placeholder="Name / Identifier" required>
                                               </div>
                                               <div class="col-md-3 mb-3">
-                                                <label for="filamentType">Type</label>
-                                                <input type="text" class="form-control" id="filamentType" placeholder="Filament Type" required>
+                                                <label for="filamentTypeSelect">Colour</label>
+                                                <select id="filementTypeSelect" class="form-control bg-dark text-light" required>
+                                                  <option id="filamentSelect" selected value="0">Select Filament Type</option>
+
+                                                </select>
                                               </div>
                                               <div class="col-md-3 mb-3">
                                                 <label for="filamentColour">Colour</label>
@@ -957,7 +960,7 @@
                                               <th style="display: none;"><%= roll.id %></th>
                                               <% roll = roll.roll %>
                                               <th scope="row"><%= roll.name %></th>
-                                              <td><%= roll.type %></td>
+                                              <td><%= roll.type[1] %></td>
                                               <td><%= roll.colour %></td>
                                               <td><%= roll.manufacturer %></td>
                                               <td><button type="button" class="btn btn-danger delete">

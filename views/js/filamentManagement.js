@@ -1,13 +1,35 @@
 import Client from "./lib/octofarm.js";
 import UI from "./lib/functions/ui.js";
 
+let filamentStore = null;
+
+async function init() {
+  let post = await Client.get("filament/get");
+  post = await post.json();
+  filamentStore = post.filamentStore;
+
+  let filamentKeys = Object.entries(filamentStore);
+
+  let filamentSelect = document.getElementById("filementTypeSelect");
+  filamentKeys.forEach((e, index) => {
+    filamentSelect.insertAdjacentHTML(
+      "beforeend",
+      `  
+          <option value="${e[0]}">${e[1].display}</option>
+      `
+    );
+  });
+}
+
 async function load() {
   document
     .getElementById("addFilamentBtn")
     .addEventListener("click", async e => {
+      e.preventDefault();
+      e.stopPropagation();
       document.getElementById("filamentMessage").innerHTML = "";
       let filamentName = document.getElementById("filamentName");
-      let filamentType = document.getElementById("filamentType");
+      let filamentType = document.getElementById("filementTypeSelect");
       let filamentColour = document.getElementById("filamentColour");
       let filamentManufacturer = document.getElementById(
         "filamentManufacturer"
@@ -15,22 +37,23 @@ async function load() {
 
       if (
         filamentName.value === "" ||
-        filamentType === "" ||
-        filamentColour === ""
+        filamentType.value === "0" ||
+        filamentColour.value === ""
       ) {
         return;
       }
-      e.preventDefault();
-      e.stopPropagation();
+
       let opts = {
         name: filamentName.value,
-        type: filamentType.value,
+        type: [
+          filamentType.value,
+          filamentType.options[filamentType.selectedIndex].text
+        ],
         colour: filamentColour.value,
         manufacturer: filamentManufacturer.value
       };
-
+      console.log(filamentColour.value);
       let post = await Client.post("filament/saveNew", opts);
-
       if (post.status === 200) {
         UI.createMessage(
           {
@@ -43,8 +66,11 @@ async function load() {
           "beforeend",
           `
           <tr>
+            <th style="display: none;">${filamentStore.id}</th>
             <th scope="row">${filamentName.value}</th>
-            <td>${filamentType.value}</td>
+            <td id="filemantSelect">${
+              filamentType.options[filamentType.selectedIndex].text
+            }</td>
             <td>${filamentColour.value}</td>
             <td>${filamentManufacturer.value}</td>
             <td><button type="button" class="btn btn-danger delete">
@@ -92,3 +118,4 @@ async function deleteFilament(e) {
   }
 }
 load();
+init();
