@@ -231,7 +231,7 @@ class Runner {
       onlineRunners[client.index].ws.close();
       onlineRunners[client.index].ws.terminate();
       onlineRunners[client.index] = false;
-      Runner.setOffline(ClipboardEvent);
+      Runner.setOffline(client);
     });
     onlineRunners[client.index].ws.on("close", async function incoming(data) {
       onlineRunners[client.index].ws.close();
