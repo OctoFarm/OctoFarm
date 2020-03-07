@@ -713,7 +713,9 @@ export class FileActions {
     } else if (currentFolder.includes("local/")) {
       currentFolder = currentFolder.replace("local/", "");
     }
-    bootbox.prompt("This is the default prompt!", async function(result) {
+    bootbox.prompt("What would you like to name your folder?", async function(
+      result
+    ) {
       if (result) {
         formData.append("foldername", result);
         formData.append("path", currentFolder + "/");

@@ -52,18 +52,20 @@
             <%= helpers.generateTime(print.printHistory.printTime) %>
           </td>
           <td>
-            <% if(print.printHistory.filamentSelection != "None chosen..."){%>
-            <%= print.printHistory.filamentSelection.roll.type[1] %> (<%=
+            <% if(typeof print.printHistory.filamentSelect != 'undefined' &&
+            print.printHistory.filamentSelection != "None chosen..."){%> <%=
+            print.printHistory.filamentSelection.roll.type[1] %> (<%=
             print.printHistory.filamentSelection.roll.colour %>) <% }else{ %>
             <%= print.printHistory.filamentSelection %> <% } %>
           </td>
           <td>
-            <% if(print.printHistory.filamentSelection === "None chosen..."){%>
-            <% if(print.printHistory.filamentLength === "-"){ %> - <% }else{ %>
-            <% let filamentLength = print.printHistory.filamentLength / 1000 %>
-            <% filamentLength = Math.round(filamentLength*100)/100 %> <%=
-            filamentLength %>m / <% let filamentWeight =
-            3.14*(1.75/2)^2*1.24*filamentLength %> <%= filamentWeight %>g
+            <% if(typeof print.printHistory.filamentSelect === 'undefined'){%>
+            <% if(print.printHistory.filamentSelection === "None chosen..."){ %>
+            - <% }else{ %> <% let filamentLength =
+            print.printHistory.filamentLength / 1000 %> <% filamentLength =
+            Math.round(filamentLength*100)/100 %> <%= filamentLength %>m / <%
+            let filamentWeight = 3.14*(1.75/2)^2*1.24*filamentLength %> <%=
+            filamentWeight %>g
             <!- Filament Requirements - Pi, density, width ->
             <% } %> <% }else{ %> <% let currentType = null; %> <% let
             filamentKeys = Object.entries(filamentTypes); %> <%
