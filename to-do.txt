@@ -1,0 +1,23 @@
+VIEWS! 
+
+
+Panel View
+Camera View
+
+**BUGS**
+
+- File Manager, not refreshing file on load properly... doesn't seem to be loading individual file refresh properly...
+- Printer Manager, same as above for file... not refreshing a single file
+- Printer Manager needs progress bar for file upload...
+- Printer exports come out as null
+- Dashboard doesn't update meterage from history...
+
+
+- Saving printers restarts server badly, needs checking...
+- Possible problem with printer timing out on closed?
+
+-- Update Changelog
+-- Do Release
+-- Update Patreon, Discord, Email
+-- Update facebook, Instagram
+

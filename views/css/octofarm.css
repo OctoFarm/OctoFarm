@@ -68,7 +68,13 @@ li {
 }
 .MultiSelected {
   background-color: black;
-  colour: green;
+  color: green;
+}
+.toolOn{
+  color: green;
+}
+.toolOut{
+  color: orange;
 }
 
 /*Sticky Table header*/

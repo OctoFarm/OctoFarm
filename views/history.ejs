@@ -52,24 +52,27 @@
             <%= helpers.generateTime(print.printHistory.printTime) %>
           </td>
           <td>
-            <% if(typeof print.printHistory.filamentSelect != 'undefined' &&
-            print.printHistory.filamentSelection != "None chosen..."){%> <%=
-            print.printHistory.filamentSelection.roll.type[1] %> (<%=
-            print.printHistory.filamentSelection.roll.colour %>) <% }else{ %>
-            <%= print.printHistory.filamentSelection %> <% } %>
+            <% if(typeof print.printHistory.filamentSelection != 'undefined' &&
+            print.printHistory.filamentSelection != "None chosen..."){%> <% let
+            filament = print.printHistory.filamentSelection.roll %> <%=
+            filament.name %> [<%= filament.colour %> / <%= filament.type[1] %>]
+            <%}else{%> None selected... <% } %>
           </td>
           <td>
-            <% if(typeof print.printHistory.filamentSelect === 'undefined'){%>
-            <% if(print.printHistory.filamentSelection === "None chosen..."){ %>
-            - <% }else{ %> <% let filamentLength =
-            print.printHistory.filamentLength / 1000 %> <% filamentLength =
-            Math.round(filamentLength*100)/100 %> <%= filamentLength %>m / <%
-            let filamentWeight = 3.14*(1.75/2)^2*1.24*filamentLength %> <%=
-            filamentWeight %>g
-            <!- Filament Requirements - Pi, density, width ->
-            <% } %> <% }else{ %> <% let currentType = null; %> <% let
-            filamentKeys = Object.entries(filamentTypes); %> <%
-            filamentKeys.forEach(entry => {%> <% if(entry[0] ===
+            <% if(print.printHistory.success){%> <% if(typeof
+            print.printHistory.filamentSelect === 'undefined'){%> <%
+            if(print.printHistory.filamentSelection === "None chosen..."){ %> <%
+            let filamentLength = print.printHistory.filamentLength / 1000 %> <%
+            filamentLength = Math.round(filamentLength*100)/100 %> <%=
+            filamentLength %>m / <% let filamentWeight =
+            3.14*(1.75/2)^2*1.24*filamentLength %> <%= filamentWeight %>g <%
+            }else{ %> <% let filamentLength = print.printHistory.filamentLength
+            / 1000 %> <% filamentLength = Math.round(filamentLength*100)/100 %>
+            <%= filamentLength %>m / <% let filamentWeight =
+            3.14*(1.75/2)^2*1.24*filamentLength %> <%= filamentWeight %>g <% }
+            %> <% }else{ %> <% let currentType = null; %> <% let filamentKeys =
+            Object.entries(filamentTypes); %> <% filamentKeys.forEach(entry =>
+            {%> <% if(entry[0] ===
             print.printHistory.filamentSelection.roll.type[0]){%> <% currentType
             = entry[1].density %> <% } %> <% })%> <%
             if(print.printHistory.filamentLength === "-"){ %> - <% }else{ %> <%
@@ -77,10 +80,9 @@
             filamentLength = Math.round(filamentLength*100)/100 %> <%=
             filamentLength %>m / <% let filamentWeight =
             3.14*(1.75/2)^2*parseFloat(currentType)*filamentLength %> <%=
-            filamentWeight %>g
-            <!- Filament Requirements - Pi, density, width ->
-
-            <% } %> <% } %>
+            filamentWeight %>g <% } %> <% } %> <% }else{ %> <%
+            if(print.printHistory.reason === "cancelled"){ %> <% }else{ %> <% }
+            %> <% } %>
           </td>
           <td class="text-wrap">
             <%= print.printHistory.notes %>
@@ -104,6 +106,7 @@
 </div>
 
 <% }else{ %>
+
 <div class="row mt-5">
   <div class="col-md-6 m-auto">
     <div class="card card-body text-center">

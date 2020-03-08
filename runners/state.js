@@ -8,6 +8,7 @@ const HistoryCollection = historyCollection.HistoryCollection;
 const fetch = require("node-fetch");
 const _ = require("lodash");
 const WebSocket = require("ws");
+const Filament = require("../models/Filament.js");
 
 let offlineRunners = [];
 let onlineRunners = [];
@@ -185,6 +186,7 @@ class Runner {
       data = await JSON.parse(data);
       if (typeof data.event != "undefined") {
         if (data.event.type === "PrintFailed") {
+          console.log(data.event.type);
           //Register cancelled print...
           HistoryCollection.failed(
             data.event.payload,
@@ -193,6 +195,7 @@ class Runner {
           //
         }
         if (data.event.type === "PrintDone") {
+          console.log(data.event.type);
           //Register cancelled print...
           HistoryCollection.complete(
             data.event.payload,
@@ -661,8 +664,16 @@ class Runner {
     farmPrinters[i].fileList.folderCount =
       farmPrinters[i].fileList.folders.length;
   }
-  static selectFilament(filament) {
-    farmPrinters[filament.index].selectedFilament = filament.id;
+  static async selectFilament(filament) {
+    let rolls = await Filament.findOne({ _id: filament.id });
+
+    farmPrinters[filament.index].selectedFilament = {
+      id: rolls.roll.id,
+      name: rolls.roll.name,
+      type: rolls.roll.type,
+      colour: rolls.roll.colour,
+      manufacturer: rolls.roll.manufacturer
+    };
     return farmPrinters[filament.index].selectedFilament;
   }
   static newFile(file) {

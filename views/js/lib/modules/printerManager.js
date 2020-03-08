@@ -8,6 +8,7 @@ const returnFilament = FilamentManager.returnFilament;
 const chooseFilament = FilamentManager.choose;
 
 let currentIndex = 0;
+
 let previousLog = null;
 
 let lastPrinter = null;

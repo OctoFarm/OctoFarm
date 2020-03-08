@@ -11,6 +11,7 @@ const bytes = function(a, b) {
     return parseFloat((a / Math.pow(c, f)).toFixed(d)) + " " + e[f];
   }
 };
+
 const calculatePercent = function(use, total) {
   let percent = (use / total) * 100;
   return Math.round(percent);

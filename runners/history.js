@@ -44,6 +44,10 @@ class HistoryCollection {
     if (typeof printer.settingsApperance != "undefined") {
       name = printer.settingsApperance.name;
     }
+    let job = null;
+    if (typeof printer.job != undefined) {
+      job = printer.job;
+    }
     let printHistory = {
       historyIndex: historyCollection.length + 1,
       printerIndex: printer.index,
@@ -58,6 +62,7 @@ class HistoryCollection {
       filamentLength: jobLength,
       filamentVolume: jobVolume,
       filamentSelection: filamentChoice,
+      job: job,
       notes: ""
     };
 

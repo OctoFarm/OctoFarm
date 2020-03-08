@@ -74,6 +74,7 @@ class ClientSettings {
     let post = await Client.post("settings/client/update", opts);
     localStorage.setItem("clientSettings", JSON.stringify(opts));
     UI.createAlert("success", "Client settings updated", 3000, "clicked");
+    location.reload();
   }
   static get() {
     return JSON.parse(localStorage.getItem("clientSettings"));

@@ -3,6 +3,7 @@ const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
 const serverSettings = require("../settings/serverSettings.js");
 const ServerSettings = serverSettings.ServerSettings;
+const ClientSettings = require("../models/ClientSettings.js");
 
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
 let dashboardInfo = null;
@@ -21,6 +22,7 @@ setInterval(async function() {
   let printerInfo = [];
   let systemInformation = await SystemInfo.find({});
   let roll = await Roll.find({});
+  let clientSettings = await ClientSettings.find({});
   for (let i = 0; i < printers.length; i++) {
     let selectedFilament = null;
     if (typeof printers[i].selectedFilament != "undefined") {
@@ -63,7 +65,8 @@ setInterval(async function() {
     octofarmStatistics: statistics.octofarmStatistics,
     printStatistics: statistics.printStatistics,
     systemInfo: systemInformation[0],
-    filament: roll
+    filament: roll,
+    clientSettings: clientSettings
   };
 }, 500);
 

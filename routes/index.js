@@ -4,6 +4,7 @@ const { ensureAuthenticated } = require("../config/auth");
 const db = require("../config/db").MongoURI;
 const pjson = require("../package.json");
 const FarmStatistics = require("../models/FarmStatistics.js");
+const ClientSettings = require("../models/ClientSettings.js");
 const Filament = require("../models/Filament.js");
 const SystemInfo = require("../models/SystemInfo.js");
 const prettyHelpers = require("../views/partials/functions/pretty.js");
@@ -122,19 +123,24 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
 //List view  Page
 router.get("/mon/list", ensureAuthenticated, async (req, res) => {
   let printers = Runner.returnFarmPrinters();
-  let statistics = await FarmStatistics.find({});
+  const farmStatistics = require("../runners/statisticsCollection.js");
+  const FarmStatistics = farmStatistics.StatisticsCollection;
+  let statistics = await FarmStatistics.returnStats();
   let systemInformation = await SystemInfo.find({});
   let filament = await Filament.find({});
+  let clientSettings = await ClientSettings.find({});
   res.render("listView", {
     name: req.user.name,
     version: pjson.version,
     printers: printers,
     currentOperations: statistics.currentOperations,
+    currentOperationsCount: statistics.currentOperationsCount,
     printerCount: printers.length,
     page: "List View",
     helpers: prettyHelpers,
     systemInfo: systemInformation[0],
-    filament: filament
+    filament: filament,
+    clientSettings: clientSettings
   });
 });
 module.exports = router;
