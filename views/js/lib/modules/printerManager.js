@@ -25,6 +25,9 @@ export default class PrinterManager {
         printer = printers[i];
         lastPrinter = printers[i];
       }
+      if (typeof printer.options === "undefined") {
+        return;
+      }
       const availableBaud = printer.options.baudrates;
       const availablePort = printer.options.ports;
       const availableProfile = printer.options.printerProfiles;
