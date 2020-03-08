@@ -86,9 +86,12 @@ router.get("/history", ensureAuthenticated, async (req, res) => {
 //Panel view  Page
 router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
   let printers = Runner.returnFarmPrinters();
-  let statistics = await FarmStatistics.find({});
+  const farmStatistics = require("../runners/statisticsCollection.js");
+  const FarmStatistics = farmStatistics.StatisticsCollection;
+  let statistics = await FarmStatistics.returnStats();
   let systemInformation = await SystemInfo.find({});
   let filament = await Filament.find({});
+  let clientSettings = await ClientSettings.find({});
   res.render("panelView", {
     name: req.user.name,
     version: pjson.version,
@@ -99,15 +102,19 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
     page: "Panel View",
     helpers: prettyHelpers,
     systemInfo: systemInformation[0],
-    filament: filament
+    filament: filament,
+    clientSettings: clientSettings
   });
 });
 //Camera view  Page
 router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
   let printers = Runner.returnFarmPrinters();
-  let statistics = await FarmStatistics.find({});
+  const farmStatistics = require("../runners/statisticsCollection.js");
+  const FarmStatistics = farmStatistics.StatisticsCollection;
+  let statistics = await FarmStatistics.returnStats();
   let systemInformation = await SystemInfo.find({});
   let filament = await Filament.find({});
+  let clientSettings = await ClientSettings.find({});
   res.render("cameraView", {
     name: req.user.name,
     version: pjson.version,
@@ -117,7 +124,8 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
     page: "Camera View",
     helpers: prettyHelpers,
     systemInfo: systemInformation[0],
-    filament: filament
+    filament: filament,
+    clientSettings: clientSettings
   });
 });
 //List view  Page

@@ -97,23 +97,30 @@ printerCard.forEach(card => {
     });
 });
 
+function addListeners() {
+  printers.forEach(printer => {});
+}
 function grabElements(printer) {
   if (typeof elems[printer.index] != "undefined") {
     return elems[printer.index];
   } else {
     let printerElemens = {
-      row: document.getElementById("listRow-" + printer.index),
-      index: document.getElementById("listIndex-" + printer.index),
-      name: document.getElementById("listName-" + printer.index),
-      control: document.getElementById("printerButton-" + printer.index),
-      start: document.getElementById("listPlay-" + printer.index),
-      stop: document.getElementById("listCancel-" + printer.index),
-      currentFile: document.getElementById("listFile-" + printer.index),
+      row: document.getElementById("panelInstance-" + printer.index),
+      index: document.getElementById("panIndex-" + printer.index),
+      name: document.getElementById("panName-" + printer.index),
+      control: document.getElementById("panManage-" + printer.index),
+      start: document.getElementById("panPrintStart-" + printer.index),
+      stop: document.getElementById("panStop-" + printer.index),
+      restart: document.getElementById("panRestart-" + printer.index),
+      pause: document.getElementById("panPrintPause-" + printer.index),
+      resume: document.getElementById("panResume-" + printer.index),
+      camera: document.getElementById("panCamera" + printer.index),
+      currentFile: document.getElementById("panFileName-" + printer.index),
       filament: document.getElementById("listFilament-" + printer.index),
-      state: document.getElementById("listState-" + printer.index),
-      printTime: document.getElementById("listPrintTime-" + printer.index),
-      tool0: document.getElementById("listE0Temp-" + printer.index),
-      bed: document.getElementById("listBedTemp-" + printer.index),
+      state: document.getElementById("panState-" + printer.index),
+      progress: document.getElementById("panProgress-" + printer.index),
+      tool0: document.getElementById("panE0Temp-" + printer.index),
+      bed: document.getElementById("panBedTemp-" + printer.index),
       iconBedT: document.getElementById("bedT-" + printer.index),
       iconBedA: document.getElementById("bedA-" + printer.index),
       iconTool0A: document.getElementById("tool0A-" + printer.index),
@@ -127,10 +134,15 @@ function updateState(printers) {
   printers.forEach(printer => {
     let elements = grabElements(printer);
     //Set the data
-    elements.index.innerHTML = printer.index;
+
     if (typeof printer.settingsApperance != "undefined") {
-      elements.name.innerHTML = printer.settingsApperance.name;
-      elements.row.classList = printer.settingsApperance.category;
+      elements.index.innerHTML = `
+      <h6 class="float-left mb-0" id="panIndex-${printer.index}">
+        <button id="panName-1" type="button" class="btn btn-secondary mb-0" role="button" disabled="">
+          ${printer.index} . ${printer.settingsApperance.name}
+        </button>
+      </h6>
+      `;
     }
 
     if (typeof printer.job != "undefined" && printer.job.file.name != null) {
@@ -155,9 +167,9 @@ function updateState(printers) {
     }
     elements.state.innerHTML = printer.state;
     if (typeof printer.progress != "undefined") {
-      elements.printTime.innerHTML = Calc.generateTime(
-        printer.progress.printTimeLeft
-      );
+      elements.progress.innerHTML =
+        Math.floor(printer.progress.completion) + "%";
+      elements.progress.style.width = printer.progress.completion + "%";
     }
     let tool0A = 0;
     let tool0T = 0;

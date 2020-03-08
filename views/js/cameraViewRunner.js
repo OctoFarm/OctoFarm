@@ -97,6 +97,9 @@ printerCard.forEach(card => {
     });
 });
 
+function addListeners() {
+  printers.forEach(printer => {});
+}
 function grabElements(printer) {
   if (typeof elems[printer.index] != "undefined") {
     return elems[printer.index];
