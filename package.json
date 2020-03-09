@@ -43,6 +43,7 @@
     "nodemon": "^2.0.2"
   },
   "nodemonConfig": {
+    "verbose": true,
     "ignore": [
       "views/js/*"
     ],
