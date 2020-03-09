@@ -1,8 +1,9 @@
 VIEWS! 
 
-
-Panel View
-Camera View
+List View (Minor Checking)
+Panel View (Minor Checking)
+Camera View (Need's fixing from db changes)
+Swap out websockets for SSE!!!!!
 
 **BUGS**
 
@@ -14,9 +15,10 @@ Camera View
 - Views don't hide-unhide elements on state changes taking into consideration settings
 - Feed rate / Flow rate not been remembered...
 - Options still defined error
+- updated instances to 14 seem to loose websocket
 
 - Saving printers restarts server badly, needs checking...
-- Possible problem with printer timing out on closed?
+
 
 -- Update Changelog
 -- Do Release

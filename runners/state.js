@@ -184,6 +184,7 @@ class Runner {
     });
     onlineRunners[client.index].ws.on("message", async function incoming(data) {
       data = await JSON.parse(data);
+
       if (typeof data.event != "undefined") {
         if (data.event.type === "PrintFailed") {
           console.log(data.event.type);
@@ -207,7 +208,11 @@ class Runner {
         if (data.current.state.text.includes("Offline")) {
           data.current.state.text = "Closed";
         }
+
         farmPrinters[client.index].state = data.current.state.text;
+
+        console.log(farmPrinters[0].state);
+        console.log(farmPrinters[1].state);
         farmPrinters[client.index].currentZ = data.current.currentZ;
         farmPrinters[client.index].progress = data.current.progress;
         farmPrinters[client.index].job = data.current.job;

@@ -16,6 +16,8 @@ const returnFilamentTypes = filamentType.returnFilamentTypes;
 
 console.log("db: " + db);
 
+const Roll = require("../models/Filament.js");
+
 //Welcome Page
 if (db === "") {
   //No db setup, show db warning before login.
@@ -151,4 +153,5 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
     clientSettings: clientSettings
   });
 });
+
 module.exports = router;

@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "node app.js > production.log 2> productionError.log",
-    "dev": "nodemon app.js > testlog.log 2> error.log"
+    "dev": "nodemon app.js"
   },
   "repository": {
     "type": "git",

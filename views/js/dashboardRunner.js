@@ -11,6 +11,7 @@ let port = window.location.port;
 if (port != "") {
   port = ":" + port;
 }
+
 var sock = new WebSocket("ws://" + url + port + "/ws/grab");
 sock.onopen = function() {
   sock.send("hello");
