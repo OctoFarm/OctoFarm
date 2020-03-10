@@ -211,8 +211,6 @@ class Runner {
 
         farmPrinters[client.index].state = data.current.state.text;
 
-        console.log(farmPrinters[0].state);
-        console.log(farmPrinters[1].state);
         farmPrinters[client.index].currentZ = data.current.currentZ;
         farmPrinters[client.index].progress = data.current.progress;
         farmPrinters[client.index].job = data.current.job;

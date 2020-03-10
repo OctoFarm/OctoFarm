@@ -70,39 +70,33 @@ setInterval(async function() {
   };
 }, 500);
 
-router.ws("/grab", function(ws, req) {
-  ws.on("open", function open() {});
-  ws.on("message", async function(msg) {
-    if (msg === "hello") {
-      try {
-        let Polling = await ServerSettings.check();
-        ws.interval = setInterval(function() {
-          if (ws.readyState === 1) {
-            ws.send(JSON.stringify(dashboardInfo));
-          } else {
-            clearInterval(ws.interval);
-            ws.terminate();
-          }
-        }, parseInt(Polling[0].onlinePolling.seconds * 1000));
-      } catch (e) {
-        console.log({
-          error: e,
-          message:
-            "Client unexpectedly disconnected... stopping interval, refresh client to reconnect..."
-        });
-        clearInterval(ws.interval);
-        ws.terminate();
-      }
-    }
+var clientId = 0;
+var clients = {}; // <- Keep a map of attached clients
+
+// Called once for each new client. Note, this response is left open!
+router.get("/printerInfo/", function(req, res) {
+  req.socket.setTimeout(Number.MAX_VALUE);
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream", // <- Important headers
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive"
   });
-  ws.on("close", function() {
-    clearInterval(ws.interval);
-    ws.terminate();
-  });
-  ws.on("error", function() {
-    console.log("Client error");
-    clearInterval(ws.interval);
-    ws.terminate();
-  });
+  res.write("\n");
+  (function(clientId) {
+    clients[clientId] = res; // <- Add this client to those we consider "attached"
+    req.on("close", function() {
+      delete clients[clientId];
+    }); // <- Remove this client when he disconnects
+  })(++clientId);
+  console.log("New Client: " + Object.keys(clients));
 });
+
+setInterval(function() {
+  var msg = Math.random();
+  dashboardInfo = JSON.stringify(dashboardInfo);
+  for (clientId in clients) {
+    clients[clientId].write("data: " + dashboardInfo + "\n\n"); // <- Push a message to a single attached client
+  }
+}, 500);
+
 module.exports = router;

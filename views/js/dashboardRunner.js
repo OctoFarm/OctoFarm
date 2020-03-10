@@ -12,11 +12,37 @@ if (port != "") {
   port = ":" + port;
 }
 
-var sock = new WebSocket("ws://" + url + port + "/ws/grab");
-sock.onopen = function() {
-  sock.send("hello");
-};
+var source = new EventSource("/sse/printerInfo/");
+source.onmessage = function(e) {
+  if (e.data != null) {
+    let res = JSON.parse(e.data);
 
+    if (
+      document.getElementById("printerManagerModal").classList.contains("show")
+    ) {
+      PrinterManager.init(res.printerInfo);
+    } else {
+      currentOperations(res.currentOperations, res.currentOperationsCount);
+      dashUpdate.systemInformation(res.systemInfo);
+      dashUpdate.printers(res.printerInfo);
+      printerInfo = res.printerInfo;
+      dashUpdate.farmInformation(res.farmInfo);
+      dashUpdate.farmStatistics(res.octofarmStatistics);
+    }
+  }
+};
+source.onerror = function(e) {
+  UI.createAlert(
+    "error",
+    "Communication with the server has been suddenly lost, please restart client and try again..."
+  );
+};
+source.onclose = function(e) {
+  UI.createAlert(
+    "error",
+    "Communication with the server has been suddenly lost, please restart client and try again..."
+  );
+};
 //Close modal event listeners...
 $("#printerManagerModal").on("hidden.bs.modal", function(e) {
   //Fix for mjpeg stream not ending when element removed...
@@ -36,38 +62,6 @@ document.getElementById("connectAllBtn").addEventListener("click", e => {
 document.getElementById("disconnectAllBtn").addEventListener("click", e => {
   dashActions.disconnectAll();
 });
-
-sock.onmessage = function(e) {
-  if (e.data != null) {
-    let res = JSON.parse(e.data);
-    if (
-      document.getElementById("printerManagerModal").classList.contains("show")
-    ) {
-      PrinterManager.init(res.printerInfo);
-    } else {
-      currentOperations(res.currentOperations, res.currentOperationsCount);
-      dashUpdate.systemInformation(res.systemInfo);
-      dashUpdate.printers(res.printerInfo);
-      printerInfo = res.printerInfo;
-      dashUpdate.farmInformation(res.farmInfo);
-      dashUpdate.farmStatistics(res.octofarmStatistics);
-    }
-  }
-};
-
-sock.onclose = function() {
-  UI.createAlert(
-    "error",
-    "We have lost connection to the server, please check and restart client to reconnect."
-  );
-};
-sock.onerror = function() {
-  UI.createAlert(
-    "error",
-    "We have lost connection to the server, please check and restart client to reconnect."
-  );
-};
-
 //Setup page listeners...
 let printerCard = document.querySelectorAll("[id^='printerButton-']");
 printerCard.forEach(card => {

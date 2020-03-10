@@ -12,18 +12,8 @@ let port = window.location.port;
 if (port != "") {
   port = ":" + port;
 }
-var sock = new WebSocket("ws://" + url + port + "/ws/grab");
-sock.onopen = function() {
-  sock.send("hello");
-};
-
-//Close modal event listeners...
-$("#printerManagerModal").on("hidden.bs.modal", function(e) {
-  //Fix for mjpeg stream not ending when element removed...
-  document.getElementById("printerControlCamera").src = "";
-});
-
-sock.onmessage = function(e) {
+var source = new EventSource("/sse/printerInfo/");
+source.onmessage = function(e) {
   if (e.data != null) {
     let res = JSON.parse(e.data);
 
@@ -40,19 +30,24 @@ sock.onmessage = function(e) {
     }
   }
 };
+source.onerror = function(e) {
+  UI.createAlert(
+    "error",
+    "Communication with the server has been suddenly lost, please restart client and try again..."
+  );
+};
+source.onclose = function(e) {
+  UI.createAlert(
+    "error",
+    "Communication with the server has been suddenly lost, please restart client and try again..."
+  );
+};
 
-sock.onclose = function() {
-  UI.createAlert(
-    "error",
-    "We have lost connection to the server, please check and restart client to reconnect."
-  );
-};
-sock.onerror = function() {
-  UI.createAlert(
-    "error",
-    "We have lost connection to the server, please check and restart client to reconnect."
-  );
-};
+//Close modal event listeners...
+$("#printerManagerModal").on("hidden.bs.modal", function(e) {
+  //Fix for mjpeg stream not ending when element removed...
+  document.getElementById("printerControlCamera").src = "";
+});
 
 //Setup page listeners...
 let printerCard = document.querySelectorAll("[id^='printerButton-']");

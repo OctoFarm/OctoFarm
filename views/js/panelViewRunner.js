@@ -12,10 +12,6 @@ let port = window.location.port;
 if (port != "") {
   port = ":" + port;
 }
-var sock = new WebSocket("ws://" + url + port + "/ws/grab");
-sock.onopen = function() {
-  sock.send("hello");
-};
 
 //Close modal event listeners...
 $("#printerManagerModal").on("hidden.bs.modal", function(e) {
@@ -23,7 +19,8 @@ $("#printerManagerModal").on("hidden.bs.modal", function(e) {
   document.getElementById("printerControlCamera").src = "";
 });
 
-sock.onmessage = function(e) {
+var source = new EventSource("/sse/printerInfo/");
+source.onmessage = function(e) {
   if (e.data != null) {
     let res = JSON.parse(e.data);
 
@@ -40,17 +37,16 @@ sock.onmessage = function(e) {
     }
   }
 };
-
-sock.onclose = function() {
+source.onerror = function(e) {
   UI.createAlert(
     "error",
-    "We have lost connection to the server, please check and restart client to reconnect."
+    "Communication with the server has been suddenly lost, please restart client and try again..."
   );
 };
-sock.onerror = function() {
+source.onclose = function(e) {
   UI.createAlert(
     "error",
-    "We have lost connection to the server, please check and restart client to reconnect."
+    "Communication with the server has been suddenly lost, please restart client and try again..."
   );
 };
 

@@ -1,21 +1,20 @@
-VIEWS! 
 
-List View (Minor Checking)
-Panel View (Minor Checking)
-Camera View (Need's fixing from db changes)
-Swap out websockets for SSE!!!!!
+- List View (Minor Checking)
+- Panel View (Minor Checking)
+- Camera View (Need's fixing from db changes)
+* Swap out websockets for SSE!!!!!
 
 **BUGS**
 
 - File Manager, not refreshing file on load properly... doesn't seem to be loading individual file refresh properly...
 - Printer Manager, same as above for file... not refreshing a single file
 - Printer Manager needs progress bar for file upload...
-- Printer exports come out as null
+* Printer exports come out as null
 - Dashboard doesn't update meterage from history...
 - Views don't hide-unhide elements on state changes taking into consideration settings
-- Feed rate / Flow rate not been remembered...
-- Options still defined error
-- updated instances to 14 seem to loose websocket
+* Feed rate / Flow rate not been remembered...
+* Options still defined error
+
 
 - Saving printers restarts server badly, needs checking...
 
@@ -25,3 +24,5 @@ Swap out websockets for SSE!!!!!
 -- Update Patreon, Discord, Email
 -- Update facebook, Instagram
 
+Warnings
+- Don't run two servers with same client...

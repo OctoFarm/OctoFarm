@@ -284,7 +284,10 @@ class StatisticsCollection {
     let filamentLengths = [];
     let filamentWeights = [];
     history.forEach(print => {
-      filamentLengths.push(print.printHistory.filamentLength);
+      if (print.printHistory.filamentLength != "-") {
+        filamentLengths.push(print.printHistory.filamentLength);
+      }
+
       if (print.printHistory.success) {
         let filamentTypes = returnFilamentTypes();
         let calcWeight = null;

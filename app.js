@@ -60,7 +60,7 @@ if (db === "") {
   app.use("/users", require("./routes/users", { page: "route" }));
   app.use("/printers", require("./routes/printers", { page: "route" }));
   app.use("/settings", require("./routes/settings", { page: "route" }));
-  app.use("/ws", require("./routes/webSocket", { page: "route" }));
+  app.use("/sse", require("./routes/SSE", { page: "route" }));
   app.use("/filament", require("./routes/filament", { page: "route" }));
 }
 

@@ -17,8 +17,7 @@ export default class PrinterManager {
   static async init(printers) {
     let i = currentIndex;
     let printer = null;
-
-    if (typeof printers != "undefined") {
+    if (typeof printers != "undefined" && printers != "") {
       if (typeof printers.length === "undefined") {
         printer = printers;
         lastPrinter = printers;

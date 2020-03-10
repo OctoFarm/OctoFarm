@@ -361,10 +361,10 @@ class PrintersManagement {
     reFormat.camURL = [];
     reFormat.apikey = [];
     printers.forEach((old, index) => {
-      reFormat["ip"].push(old.ip);
-      reFormat["port"].push(old.port);
-      reFormat["camURL"].push(old.camURL);
-      reFormat["apikey"].push(old.apikey);
+      reFormat["ip"].push(old.printer.ip);
+      reFormat["port"].push(old.printer.port);
+      reFormat["camURL"].push(old.printer.camURL);
+      reFormat["apikey"].push(old.printer.apikey);
     });
     FileOperations.download("printers.json", JSON.stringify(reFormat));
   }
