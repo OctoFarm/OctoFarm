@@ -28,6 +28,7 @@ source.onmessage = function(e) {
       printerInfo = res.printerInfo;
       dashUpdate.farmInformation(res.farmInfo);
       dashUpdate.farmStatistics(res.octofarmStatistics);
+      console.log(printerInfo);
     }
   }
 };

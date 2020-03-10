@@ -210,7 +210,7 @@ class Runner {
         }
 
         farmPrinters[client.index].state = data.current.state.text;
-
+        farmPrinters[client.index].current.state = data.current.state.text;
         farmPrinters[client.index].currentZ = data.current.currentZ;
         farmPrinters[client.index].progress = data.current.progress;
         farmPrinters[client.index].job = data.current.job;
@@ -252,6 +252,14 @@ class Runner {
     });
   }
   static async setOffline(client) {
+    if (typeof farmPrinters[client.index].current == "undefined") {
+      farmPrinters[client.index].current = {
+        state: "Offline",
+        baudrate: 250000,
+        port: null,
+        printerProfile: "_default"
+      };
+    }
     console.log("Printer: " + client.index + " is offline");
     farmPrinters[client.index].state = "Offline";
     farmPrinters[client.index].stateColour = Runner.getColour("Offline");

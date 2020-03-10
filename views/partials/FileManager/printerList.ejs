@@ -1,14 +1,6 @@
-<% printers.forEach(printer => { %> <% if(printer.state != "Offline"){ %>
+<% printers.forEach((printer, index) => { %> <%printer.state%> <%
+if(printer.state != "Offline"){ %>
 <!-- Connected -->
-<% if(printer.index === printers[0].index){ %>
-<a
-  id="printer-<%= printer.index %>"
-  href="#"
-  class="list-group-item list-group-item-action bg-dark active flex-column align-items-start bg-secondary"
-  style="display: block;
-    padding: 0.7rem 0.1rem;"
->
-  <% }else{ %>
   <a
     id="printer-<%= printer.index %>"
     href="#"
@@ -16,8 +8,6 @@
     style="display: block;
     padding: 0.7rem 0.1rem;"
   >
-    <% } %>
-
     <div class="row">
       <div
         class="col-lg-2"
@@ -49,7 +39,7 @@
           role="group"
           aria-label="Basic example"
         >
-          <% const selectedProfile = printers[0].current.printerProfile; %>
+          <% const selectedProfile = printer.current.printerProfile; %>
         </div>
         <div class="row">
           <div class="col-lg-2">
@@ -74,17 +64,15 @@
         </div>
         <small class="pt-2 float-left"
           ><i class="fas fa-cube"></i> <b>H:</b> <%=
-          printers[0].profiles[selectedProfile].volume.height%>mm x
-          <b>W:</b> <%= printers[0].profiles[selectedProfile].volume.width%>mm x
-          <b>D:</b> <%=
-          printers[0].profiles[selectedProfile].volume.depth%>mm</small
+          printer.profiles[selectedProfile].volume.height%>mm x <b>W:</b> <%=
+          printer.profiles[selectedProfile].volume.width%>mm x <b>D:</b> <%=
+          printer.profiles[selectedProfile].volume.depth%>mm</small
         >
         <small class="pt-2 float-left"
           ><i class="fas fa-pen"></i> <b>Extruders:</b> <%=
-          printers[0].profiles[selectedProfile].extruder.count %>
+          printer.profiles[selectedProfile].extruder.count %>
           <b>Nozzle Size:</b> <%=
-          printers[0].profiles[selectedProfile].extruder.nozzleDiameter
-          %>mm</small
+          printer.profiles[selectedProfile].extruder.nozzleDiameter %>mm</small
         >
       </div>
     </div>

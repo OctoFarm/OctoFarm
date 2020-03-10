@@ -7,6 +7,20 @@ import UI from "../functions/ui.js";
 let printerInfo = null;
 let fileUploads = new Queue();
 
+let printers = document.querySelectorAll("[id^='printer-']");
+printers.forEach((printer, index) => {
+  if (index === 0) {
+    printer.classList.add("bg-dark");
+    printer.classList.remove("bg-secondary");
+    let first = printer.id.replace("printer-", "");
+    document.getElementById("currentPrinter").innerHTML = first;
+    init();
+  }
+  printer.addEventListener("click", e => {
+    //Remove from UI
+    FileManager.changePrinter(printer.id);
+  });
+});
 setInterval(async () => {
   //If there are files in the queue, plow through until uploaded... currently single file at a time.
   if (fileUploads.size() > 0) {
@@ -26,8 +40,8 @@ setInterval(async () => {
 async function init() {
   printerInfo = await OctoFarmClient.get("printers/printerInfo");
   printerInfo = await printerInfo.json();
+  FileManager.updateFileList();
 }
-init();
 
 document.getElementById("fileReSync").addEventListener("click", e => {
   e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Syncing";
@@ -52,14 +66,6 @@ document.getElementById("fileUploadBtn").addEventListener("change", function() {
 
 document.getElementById("fileBackBtn").addEventListener("click", e => {
   FileManager.openFolder();
-});
-
-let printers = document.querySelectorAll("[id^='printer-']");
-printers.forEach(printer => {
-  printer.addEventListener("click", e => {
-    //Remove from UI
-    FileManager.changePrinter(printer.id);
-  });
 });
 
 let folders = document.querySelectorAll("a.folderAction");
@@ -297,6 +303,9 @@ export default class FileManager {
     });
     done = await done.json();
 
+    document.getElementById(
+      "currentPrinterBtn"
+    ).innerHTML = `<i class="fas fa-print"></i> <span id="currentPrinter">${index}</span>. ${printerInfo[index].settingsAppearance.name}`;
     FileManager.drawFiles(index, done.files);
     document.getElementById("printerStorage").innerHTML = `
     <i class="fas fa-hdd"></i> 

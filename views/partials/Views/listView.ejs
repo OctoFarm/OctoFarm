@@ -77,7 +77,7 @@ clientSettings[0].listView.hideOff){%>
     printer.selectedFilament.name %> [<%= printer.selectedFilament.colour %> /
     <%= printer.selectedFilament.type[1] %>] <% }%>
   </td>
-  <td id="listState-<%= printer.index %>"><%= printer.current.state %></td>
+  <td id="listState-<%= printer.index %>"><%= printer.state %></td>
   <td id="listPrintTime-<%= printer.index %>">
     <% if(typeof printer.progress != 'undefined'){ %> <%=
     helpers.generateTime(printer.progress.printTimeLeft) %> <%}%>

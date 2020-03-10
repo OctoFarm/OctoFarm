@@ -63,11 +63,9 @@
             aria-expanded="false"
             disabled
           >
-            <i class="fas fa-print"></i> <span id="currentPrinter"><%= printers[0].index %></span>.  <% if(typeof printers[0].settingsApperance != 'undefined'){ %>
-              <%= printers[0].settingsApperance.name %> <% } %>
+            <i class="fas fa-print"></i> <span id="currentPrinter"><i class="fas fa-spinner fa-spin"></i></span>.  
           </button>
         </h5>
-        <% if(typeof printers[0].storage != 'undefined'){ %>
         <h5 class="float-left">
           <button
             id="printerStorage"
@@ -77,12 +75,9 @@
             aria-expanded="false"
             disabled
           >
-            <i class="fas fa-hdd"></i> <%-
-            helpers.generateBytes(printers[0].storage.free) %> / <%-
-            helpers.generateBytes(printers[0].storage.total) %>
+            <i class="fas fa-hdd"></i> 0 / 0
           </button>
         </h5>
-        <% } %>
         <h5 class="float-left">
           <button
             type="button"
@@ -133,8 +128,7 @@
         </button>
         </center>
         <div id="fileList" class="list-group">
-          <%- include('./partials/FileManager/fileList.ejs') %> <%-
-          include('./partials/FileManager/folderList.ejs') %>
+
         </div>
       </div>
       <div class="card-footer fileFooter text-muted"></div>

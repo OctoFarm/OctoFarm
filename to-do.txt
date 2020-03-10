@@ -1,8 +1,11 @@
 
 - List View (Minor Checking)
 - Panel View (Minor Checking)
+- Lazy loading for panel view
 - Camera View (Need's fixing from db changes)
+- Lazy loading for camera view
 * Swap out websockets for SSE!!!!!
+
 
 **BUGS**
 
@@ -26,4 +29,6 @@
 -- Update facebook, Instagram
 
 Warnings
+- Version 4.2 > of MongoDB
 - Don't run two servers with same client...
+- RaspberryPi installation not tested, currently tested and confirmed on Windows/Ubuntu. 
