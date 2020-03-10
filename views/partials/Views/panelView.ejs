@@ -46,6 +46,7 @@ clientSettings[0].panelView.hideClosed){%> <%}else %> <% if(printer.camURL !=
       <% let camURL = ""; %> <% if(printer.camURL != ''){ %> <% camURL =
       "http://" + printer.camURL; %> <%}%>
       <img
+        loading="lazy"
         id="panCamera-<%= printer.index %>"
         width="100%"
         class=""

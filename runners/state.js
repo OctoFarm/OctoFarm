@@ -588,11 +588,8 @@ class Runner {
   }
   static async reSyncFile(i, file) {
     let success = null;
-    if (file != undefined) {
-      success = await Runner.getFiles(i, "files/local/" + file);
-    } else {
-      success = await Runner.getFiles(i, "files?recursive=true");
-    }
+    //Doesn't actually resync just the file... shhh
+    success = await Runner.getFiles(i, "files?recursive=true");
     if (success) {
       return success;
     } else {
