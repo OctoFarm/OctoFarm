@@ -48,5 +48,10 @@
       "views/js/*"
     ],
     "delay": "2500"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">= 13.0.1",
+    "npm": ">= 6.14.1"
   }
 }

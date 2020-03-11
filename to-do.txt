@@ -1,6 +1,6 @@
 
-* List View (Minor Checking)
-* Panel View (Minor Checking)
+- List View (Minor Checking)
+- Panel View (Minor Checking)
 - Camera View (Minor Checking)
 * Lazy loading for panel view
 * Camera View (Need's fixing from db changes)
@@ -23,6 +23,7 @@
 
 * Saving printers restarts server badly, needs checking... Done!!!
 
+either check if element has hidden or re-write the loading of invisible elements... yeah... check!
 
 -- Update Changelog
 -- Do Release
