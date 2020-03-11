@@ -52,7 +52,7 @@
   <%  } %>
       <% let camURL = ""; %> <% if(printer.camURL != ''){ %> <% camURL =
       "http://" + printer.camURL; %> <%}%>
-      <img id="cameraSRC-${index}" width="100%" class="" src="<%= camURL %>" />
+      <img loading="lazy" id="cameraSRC-${index}" width="100%" class="" src="<%= camURL %>" />
 
       <small>
         <button
