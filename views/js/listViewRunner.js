@@ -178,6 +178,7 @@ function updateState(printers) {
 
     //Set the state
     if (printer.stateColour.category === "Active") {
+      elements.row.className.remove("hidden");
       elements.control.disabled = false;
       elements.start.disabled = true;
       elements.stop.disabled = false;

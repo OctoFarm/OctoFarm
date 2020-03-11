@@ -95,7 +95,7 @@ clientSettings[0].panelView.hideOff){%>
                 aria-valuemax="100"
               >
                 <% if(typeof printer.progress!= 'undefined'){ %> <%=
-                Math.floor(printer.progress.completion) %> <%}%>%
+                Math.floor(printer.progress.completion) %>% <%}%>
               </div>
             </div>
             <button
@@ -129,7 +129,7 @@ clientSettings[0].panelView.hideOff){%>
               <button
                 id="panRestart-<%= printer.index %>"
                 type="button"
-                class="btn btn-danger mt-1 mb-1  d-none"
+                class="btn btn-danger mt-1 mb-1 hidden "
                 role="button"
                 disabled
               >
@@ -138,7 +138,7 @@ clientSettings[0].panelView.hideOff){%>
               <button
                 id="panResume-<%= printer.index %>"
                 type="button"
-                class="btn btn-success mt-1 mb-1  d-none"
+                class="btn btn-success mt-1 mb-1 hidden"
                 role="button"
                 disabled
               >
@@ -147,7 +147,7 @@ clientSettings[0].panelView.hideOff){%>
               <button
                 id="panStop-<%= printer.index %>"
                 type="button"
-                class="btn btn-danger mt-1 mb-1"
+                class="btn btn-danger mt-1 mb-1 "
                 role="button"
                 disabled
               >
