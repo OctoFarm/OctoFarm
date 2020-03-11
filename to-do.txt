@@ -1,23 +1,23 @@
 
 - List View (Minor Checking)
 - Panel View (Minor Checking)
-- Lazy loading for panel view
+* Lazy loading for panel view
 - Camera View (Need's fixing from db changes)
 - Lazy loading for camera view
 * Swap out websockets for SSE!!!!!
-
+- Views don't hide-unhide elements on state changes taking into consideration settings
 
 **BUGS**
 
 * File Manager, not refreshing file on load properly... doesn't seem to be loading individual file refresh properly...
 * Printer Manager, same as above for file... not refreshing a single file
-- Printer Manager needs progress bar for file upload...
+* Printer Manager needs progress bar for file upload...
 * Printer exports come out as null
-- Dashboard doesn't update meterage from history...
-- Views don't hide-unhide elements on state changes taking into consideration settings
+* Dashboard doesn't update meterage from history...
+
 * Feed rate / Flow rate not been remembered...
 * Options still defined error
-- File manager search not recursive...
+* File manager search not recursive...
 
 
 - Saving printers restarts server badly, needs checking...

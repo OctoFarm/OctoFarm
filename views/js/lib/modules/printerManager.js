@@ -259,6 +259,18 @@ export default class PrinterManager {
                 <div class="col-lg-12 text-center">
           
                 <div class="col-12 list-group" id="fileLocations"><div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="fileManagerFolderSelect">Folders:</label> </div> <select class="custom-select bg-secondary text-light" id="fileManagerFolderSelect"><option value="local">local</option></select></div></div>
+                <div class="row">
+                <div class="col-lg-2">
+                  <i class="fas fa-file-upload"></i><span id="fileCounts"> 0</span>
+                </div>
+                <div class="col-lg-10">
+                  <div class="progress">
+                    <div id="fileProgress" class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                      0%
+                    </div>
+                  </div>
+                </div>
+              </div>
                 <div class="col-12"><div class="custom-file"><label class="custom-file-label " for="printerManagerUploadBtn"><i class="fas fa-file-import"></i> Choose File(s)</label><input id="printerManagerUploadBtn" multiple="" accept=".gcode,.gco,.g" type="file" class="custom-file-input"></div></div>
                 <ul class="col-12 list-group border-secondary" id="fileManagerFileList" style="height:250px; overflow-y:scroll;">
   
@@ -1121,6 +1133,7 @@ export default class PrinterManager {
         i: printer.index,
         fullPath: fullPath
       });
+
       let how = await done.json();
       PrinterManager.init(lastPrinter);
       refreshBtn.innerHTML = '<i class="fas fa-sync"></i>';
@@ -1665,6 +1678,16 @@ export default class PrinterManager {
 }
 async function handleFiles(Afiles, printer) {
   Afiles = [...Afiles];
+  let count = document.getElementById("fileCounts");
+  count.innerHTML = " " + Afiles.length;
+
+  UI.createAlert(
+    "warning",
+    "Your files are uploading, do not close the modal or refresh the page until complete.",
+    5000,
+    "Clicked"
+  );
+
   for (let i = 0; i < Afiles.length; i++) {
     let file = await fileUpload(printer, Afiles[i]);
     file = JSON.parse(file);
@@ -1677,6 +1700,8 @@ async function handleFiles(Afiles, printer) {
       file,
       document.getElementById("fileManagerFileList")
     );
+    count.innerHTML = " " + parseInt(count.innerHTML - 1);
+
     PrinterManager.applyFileListeners(printer, file.name, file.fullPath);
   }
 }
@@ -1687,7 +1712,7 @@ async function fileUpload(printerInfo, file) {
     currentFolder = currentFolder.options[currentFolder.selectedIndex].text;
     //Grab Client Info
     let index = currentIndex;
-
+    let loadingBar = document.getElementById("fileProgress");
     //XHR doesn't like posting without it been a form, can't use offical octoprint api way...
     //Create form data
     let formData = new FormData();
@@ -1704,23 +1729,26 @@ async function fileUpload(printerInfo, file) {
     xhr.open("POST", url);
     xhr.upload.onprogress = function(e) {
       if (e.lengthComputable) {
-        console.log(e.loaded);
+        loadingBar.innerHTML = Math.floor((e.loaded / e.total) * 100) + "%";
+        loadingBar.style.width = Math.floor((e.loaded / e.total) * 100) + "%";
       }
     };
 
     //xhr.setRequestHeader("Content-Type", "multipart/form-data");
     xhr.setRequestHeader("X-Api-Key", printerInfo.apikey);
     xhr.onloadstart = function(e) {
-      console.log("started");
+      loadingBar.className = "progress-bar progress-bar-striped bg-warning";
     };
     xhr.onloadend = async function(e) {
       if (this.status >= 200 && this.status < 300) {
         resolve(xhr.response);
+        loadingBar.className = "progress-bar progress-bar-striped bg-success";
       } else {
         reject({
           status: this.status,
           statusText: xhr.statusText
         });
+        loadingBar.className = "progress-bar progress-bar-striped bg-danger";
       }
     };
     xhr.onerror = function() {

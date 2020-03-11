@@ -334,7 +334,7 @@ export default class FileManager {
       }
     }
   }
-  static drawFiles(index, fileList) {
+  static drawFiles(index, fileList, recursive) {
     let fileElem = document.getElementById("fileList");
     if (fileList === "EMPTY") {
       fileElem.innerHTML = `
@@ -352,7 +352,82 @@ export default class FileManager {
         currentFolder = currentFolder.replace("local/", "");
       }
       fileList.files.forEach(file => {
-        if (file.path == currentFolder) {
+        if (typeof recursive != "undefined") {
+          fileElem.insertAdjacentHTML(
+            "beforeend",
+            `
+          <a
+          id="file-${file.fullPath}"
+          href="#"
+          class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
+          style="display: block;
+          padding: 0.7rem 0.1rem;"
+        >
+          <div class="row">
+            <div
+              class="col-lg-1"
+              style="display:flex; justify-content:center; align-items:center;"
+            >
+              <center><i class="fas fa-file-code fa-2x"></i></center>
+            </div>
+            <div class="col-lg-11">
+            <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">${file.display}</h5>
+            <small><i class="fas fa-stopwatch"></i>  ${Calc.generateTime(
+              file.time
+            )}</small>
+          </div>
+          <p class="mb-1 float-left">
+          <i class="fas fa-hdd"></i> ${Calc.bytes(file.size)}
+          </p>
+              <div
+              class="float-right btn-group flex-wrap btn-group-sm"
+              role="group"
+              aria-label="Basic example"
+            >
+              <button
+                id="${index}*fileActionUpdate*${file.fullPath}"
+                role="button"
+                class="btn btn-dark"
+              >
+                <i class="fas fa-sync"></i> Refresh
+              </button>
+              <button id="${index}*fileActionStart*${
+              file.fullPath
+            }" type="button" class="btn btn-success">
+                <i class="fas fa-play"></i> Start
+              </button>
+              <button id="${index}*fileActionSelect*${
+              file.fullPath
+            }" type="button" class="btn btn-info">
+                <i class="fas fa-file-upload"></i> Select
+              </button>
+              <button id="${index}*fileActionMove*${
+              file.fullPath
+            }" type="button" class="btn btn-warning">
+                <i class="fas fa-people-carry"></i> Move
+              </button>
+              <button onclick="window.open('http://${printerInfo[index].ip}:${
+              printerInfo[index].port
+            }/downloads/files/local/${
+              file.fullPath
+            }')" type="button" class="btn btn-dark">
+                <i class="fas fa-download"></i> Download
+              </button>
+              <button id="${index}*fileActionDelete*${
+              file.fullPath
+            }" type="button" class="btn btn-danger">
+                <i class="fas fa-trash-alt"></i> Delete
+              </button>
+              </div>
+              </div>
+            </div>
+          </div>
+        </a>
+        </a>
+          `
+          );
+        } else if (file.path == currentFolder) {
           fileElem.insertAdjacentHTML(
             "beforeend",
             `
@@ -700,11 +775,19 @@ export class FileActions {
     let input = document.getElementById("searchFiles").value.toUpperCase();
     fileList.innerHTML = "";
 
-    FileManager.drawFiles(index, printerInfo[index].filesList);
-
-    let button = document.querySelectorAll('*[id^="file-"]');
+    if (input.value === "") {
+      //No search term so reset view
+      document.getElementById("currentFolder").value = "local";
+      FileManager.drawFiles(index, printerInfo[index].filesList, "Recursive");
+    } else {
+      fileList.innerHTML = "";
+      document.getElementById("currentFolder").value = "local";
+      FileManager.drawFiles(index, printerInfo[index].filesList, "Recursive");
+    }
+    console.log(printerInfo[index].filesList);
+    let button = fileList.querySelectorAll('*[id^="file-"]');
     for (let i = 0; i < button.length; i++) {
-      let file = button[i].id.replace("file-");
+      let file = button[i].id.replace("file-", "");
       if (file.toUpperCase().indexOf(input) > -1) {
         button[i].style.display = "";
       } else {

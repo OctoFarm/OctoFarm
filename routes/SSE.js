@@ -74,7 +74,7 @@ var clientId = 0;
 var clients = {}; // <- Keep a map of attached clients
 
 // Called once for each new client. Note, this response is left open!
-router.get("/printerInfo/", function(req, res) {
+router.get("/printerInfo/", ensureAuthenticated, function(req, res) {
   req.socket.setTimeout(Number.MAX_VALUE);
   res.writeHead(200, {
     "Content-Type": "text/event-stream", // <- Important headers
@@ -88,7 +88,7 @@ router.get("/printerInfo/", function(req, res) {
       delete clients[clientId];
     }); // <- Remove this client when he disconnects
   })(++clientId);
-  console.log("New Client: " + Object.keys(clients));
+  //console.log("Client: " + Object.keys(clients));
 });
 
 setInterval(function() {
