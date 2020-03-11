@@ -21,7 +21,7 @@
         >
           <i class="fas fa-cog"></i>
         </button>
-        <% if(typeof printer.job.file != 'undefined' && printer.job.file.name !=
+        <% if(typeof printer.job != 'undefined' && printer.job.file.name !=
         null){ %> <% let fileNameStart = printer.job.file.name; %> <% let
         fileNameEnd = printer.job.file.name; %> <% let fileName = ""; %> <%
         fileNameStart = fileNameStart.substring(1,20); %> <% fileNameEnd =
@@ -34,7 +34,8 @@
         <%}%></small
       >
     </div>
-    <div class="card-body cameraContain" id="camBody-${index}">
+   <% if(typeof printer.progress != 'undefined'){ %>
+      <div class="card-body cameraContain" id="camBody-${index}">
       <div class="progress camProgress">
         <div
           id="camProgress-${index}"
@@ -48,6 +49,7 @@
         <%= Math.floor(printer.progress.completion) %>
         </div>
       </div>
+  <%  } %>
       <% let camURL = ""; %> <% if(printer.camURL != ''){ %> <% camURL =
       "http://" + printer.camURL; %> <%}%>
       <img id="cameraSRC-${index}" width="100%" class="" src="<%= camURL %>" />
@@ -64,23 +66,41 @@
       ></small>
     </div>
     <div class="card-footer dashFooter text-muted" id="camFooter-${index}">
-      <small class="float-left" id="camT0Temp-${index}"
-        >T0: <% if(typeof printer.temperature.tool0 != 'undefined'){ %>
-        <i class="far fa-circle"></i> <%= printer.temperature.tool0.actual %>
-        <%}else{ %> <i class="far fa-circle"></i> <%= 0 %><%}%>°C <% if(typeof
-        printer.temperature.tool0 != 'undefined'){ %>
-        <i class="fas fa-bullseye"></i> <%= printer.temperature.tool0.target %>
-        <%}else{ %><i class="fas fa-bullseye"></i> <%= 0 %><%}%>°C</small
+      <small
+        id="panE0Temp-<%= printer.index %>"
+        class="mb-0 float-left"
+        id="panT0-<%= printer.index %>"
       >
-      <small class="float-right" id="camBedTemp-${index}"
-        >Bed: <% if(typeof printer.temperature.bed != 'undefined'){ %>
-        <i class="far fa-circle"></i>
-        <%= printer.temperature.bed.actual %> <%}else{ %>
-        <i class="far fa-circle"></i> <%= 0 %><%}%>°C<% if(typeof
-        printer.temperature.bed != 'undefined'){ %>
-        <i class="fas fa-bullseye"></i> <%= printer.temperature.bed.target %>
-        <%}else{ %> <i class="fas fa-bullseye"></i> <%= 0 %><%}%>°C</small
+        <% if(typeof printer.temps != 'undefined'){ %> <% if(typeof
+        printer.temps[0].tool0 != 'undefined'){ %>
+        <i id="tool0A-<%= printer.index %>" class="far fa-circle"></i> <%=
+        printer.temps[0].tool0.actual %><%}else{ %>
+        <i id="tool0A-<%= printer.index %>" class="far fa-circle"></i> <%=
+        0%><%}%>°C <% if(typeof printer.temps[0].tool0 != 'undefined'){ %>
+        <i id="tool0T-<%= printer.index %>" class="fas fa-bullseye"></i> <%=
+        printer.temps[0].tool0.target%><%}else{ %>
+        <i id="tool0T-<%= printer.index %>" class="fas fa-bullseye"></i> <%=
+        0%><%}%>°C <%} %>
+      </small>
+
+      <small
+        id="panBedTemp-<%= printer.index %>"
+        class="mb-0 float-right"
+        id="panBed-<%= printer.index %>"
       >
+        <% if(typeof printer.temps != 'undefined'){ %> <% if(typeof
+        printer.temps[0].bed != 'undefined'){ %><i
+          id="bedA-<%= printer.index %>"
+          class="far fa-circle"
+        ></i>
+        <%= printer.temps[0].bed.actual %><%}else{ %>
+        <i id="bedA-<%= printer.index %>" class="far fa-circle"></i> <%=
+        0%><%}%>°C <% if(typeof printer.temps[0].bed != 'undefined'){ %>
+        <i id="bedT-<%= printer.index %>" class="fas fa-bullseye"></i> <%=
+        printer.temps[0].bed.target %><%}else{ %>
+        <i id="bedT-<%= printer.index %>" class="fas fa-bullseye"></i> <%=
+        0%><%}%>°C <%} %>
+      </small>
     </div>
   </div>
 </div>
