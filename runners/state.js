@@ -114,7 +114,6 @@ class Runner {
       console.log("Grabbed " + farmPrinters.length + " for checking");
       for (let i = 0; i < farmPrinters.length; i++) {
         //Make sure runners are created ready for each printer to pass between...
-
         farmPrinters[i].state = "Searching...";
         farmPrinters[i].stateColour = Runner.getColour("Searching...");
       }
@@ -241,9 +240,9 @@ class Runner {
       Runner.setOffline(client);
     });
     onlineRunners[client.index].ws.on("close", async function incoming(data) {
-      onlineRunners[client.index].ws.close();
-      onlineRunners[client.index].ws.terminate();
-      onlineRunners[client.index] = false;
+      // onlineRunners[client.index].ws.close();
+      // onlineRunners[client.index].ws.terminate();
+      // onlineRunners[client.index] = false;
       Runner.setOffline(client);
 
       //Make connection attempt...
@@ -300,6 +299,16 @@ class Runner {
     farmPrinters.forEach((run, index) => {
       farmPrinters[index].state = "Searching...";
       farmPrinters[index].stateColour = Runner.getColour("Searching...");
+    });
+    onlineRunners.forEach((run, index) => {
+      if (
+        (typeof onlineRunners[index].ws != "undefined" &&
+          onlineRunners[index].ws.readyState === 1) ||
+        onlineRunners[index].ws.readyState === 0
+      ) {
+        onlineRunners[index].ws.terminate();
+        onlineRunners[index] = false;
+      }
     });
     offlineRunners.forEach((run, index) => {
       console.log("Offline Printer: " + [index] + " stopped");

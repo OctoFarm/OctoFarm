@@ -103,6 +103,9 @@ function grabElements(printer) {
       control: document.getElementById("printerButton-" + printer.index),
       start: document.getElementById("listPlay-" + printer.index),
       stop: document.getElementById("listCancel-" + printer.index),
+      pause: document.getElementById("listCancel-" + printer.index),
+      restart: document.getElementById("listCancel-" + printer.index),
+      resume: document.getElementById("listCancel-" + printer.index),
       currentFile: document.getElementById("listFile-" + printer.index),
       filament: document.getElementById("listFilament-" + printer.index),
       state: document.getElementById("listState-" + printer.index),
@@ -123,6 +126,7 @@ function updateState(printers) {
     let elements = grabElements(printer);
     //Set the data
     elements.index.innerHTML = printer.index;
+    elements.row.className = printer.stateColour.category;
     if (typeof printer.settingsApperance != "undefined") {
       elements.name.innerHTML = printer.settingsApperance.name;
       elements.row.classList = printer.settingsApperance.category;

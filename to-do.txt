@@ -1,5 +1,5 @@
 
-- List View (Minor Checking)
+* List View (Minor Checking)
 - Panel View (Minor Checking)
 - Camera View (Minor Checking)
 * Lazy loading for panel view
@@ -21,7 +21,7 @@
 * File manager search not recursive...
 
 
-- Saving printers restarts server badly, needs checking...
+* Saving printers restarts server badly, needs checking... Done!!!
 
 
 -- Update Changelog

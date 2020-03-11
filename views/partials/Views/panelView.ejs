@@ -1,179 +1,214 @@
 <% printers.forEach(printer => { %> <% if(printer.state === "Offline" &&
-clientSettings[0].panelView.hideOff){%> <%}else if(printer.state === "Closed" &&
-clientSettings[0].panelView.hideClosed){%> <%}else %> <% if(printer.camURL !=
-""){ %> <%} else { %> <%}%>
+clientSettings[0].panelView.hideOff){%>
 <div
-  class="col-sm-12 col-md-4 col-lg-3 col-xl-2"
+  class="col-sm-12 col-md-4 col-lg-3 col-xl-2 hidden"
   id="panelInstance-<%= printer.index %>"
 >
-  <div class="card mt-1 mb-1 ml-1 mr-1 text-center">
-    <div class="card-header dashHeader">
-      <h6 class="float-left mb-0" id="panIndex-<%= printer.index %>">
-        <button
-          id="panName-<%= printer.index %>"
-          type="button"
-          class="btn btn-secondary mb-0"
-          role="button"
-          disabled
-        >
-          <%= printer.index %> . <% if(typeof printer.settingsApperance !=
-          'undefined'){ %> <%= printer.settingsApperance.name %><%}%>
-        </button>
-      </h6>
-      <button
-        id="panManage-<%= printer.index %>"
-        type="button"
-        class="btn btn-success float-right mb-0"
-        role="button"
-        disabled
+  <%}else if(printer.state === "Closed" &&
+  clientSettings[0].panelView.hideClosed){%>
+  <div
+    class="col-sm-12 col-md-4 col-lg-3 col-xl-2 hidden"
+    id="panelInstance-<%= printer.index %>"
+  >
+    <%}else if(printer.camURL === ""){ %>
+
+    <div
+      class="col-sm-12 col-md-4 col-lg-3 col-xl-2 hidden"
+      id="panelInstance-<%= printer.index %>"
+    >
+      <%} else { %>
+      <div
+        class="col-sm-12 col-md-4 col-lg-3 col-xl-2"
+        id="panelInstance-<%= printer.index %>"
       >
-        <i class="fas fa-cog"></i>
-      </button>
-    </div>
-    <div class="card-body pt-1 pb-0 pl-2 pr-2">
-      <button
-        id="panFileName-<%= printer.index %>"
-        type="button"
-        class="btn btn-block btn-secondary mb-0"
-        role="button"
-        disabled
-      >
-        <% if(typeof printer.job != 'undefined' && typeof printer.job.file !=
-        'undefined'){ %><i class="fas fa-file-code"></i> <%=
-        printer.job.file.name %> <%}else{%><i class="fas fa-file-code"></i> No
-        File Selected <%}%>
-      </button>
-      <% let camURL = ""; %> <% if(printer.camURL != ''){ %> <% camURL =
-      "http://" + printer.camURL; %> <%}%>
-      <img
-        loading="lazy"
-        id="panCamera-<%= printer.index %>"
-        width="100%"
-        class=""
-        src="<%= camURL %>"
-      />
-      <div class="progress">
-        <div
-          id="panProgress-<%= printer.index %>"
-          class="progress-bar"
-          role="progressbar progress-bar-striped"
-          style="width:<% if(typeof printer.progress!= 'undefined'){ %><%=
+        <%}%>
+        <div class="card mt-1 mb-1 ml-1 mr-1 text-center">
+          <div class="card-header dashHeader">
+            <h6 class="float-left mb-0" id="panIndex-<%= printer.index %>">
+              <button
+                id="panName-<%= printer.index %>"
+                type="button"
+                class="btn btn-secondary mb-0"
+                role="button"
+                disabled
+              >
+                <%= printer.index %> . <% if(typeof printer.settingsApperance !=
+                'undefined'){ %> <%= printer.settingsApperance.name %><%}%>
+              </button>
+            </h6>
+            <% if(printer.state === "Offline"){ %>
+            <button
+              id="printerButton-<%= printer.index %>"
+              type="button"
+              class="btn btn-dark float-right"
+              data-toggle="modal"
+              data-target="#printerManagerModal"
+              disabled
+            >
+              <i class="fas fa-cog"></i>
+            </button>
+            <% }else{ %>
+            <button
+              id="printerButton-<%= printer.index %>"
+              type="button"
+              class="btn btn-dark float-right"
+              data-toggle="modal"
+              data-target="#printerManagerModal"
+            >
+              <i class="fas fa-cog"></i>
+            </button>
+            <% } %>
+          </div>
+          <div class="card-body pt-1 pb-0 pl-2 pr-2">
+            <button
+              id="panFileName-<%= printer.index %>"
+              type="button"
+              class="btn btn-block btn-secondary mb-0"
+              role="button"
+              disabled
+            >
+              <% if(typeof printer.job != 'undefined' && typeof printer.job.file
+              != 'undefined'){ %><i class="fas fa-file-code"></i> <%=
+              printer.job.file.name %> <%}else{%><i
+                class="fas fa-file-code"
+              ></i>
+              No File Selected <%}%>
+            </button>
+            <% let camURL = ""; %> <% if(printer.camURL != ''){ %> <% camURL =
+            "http://" + printer.camURL; %> <%}%>
+            <img
+              loading="lazy"
+              id="panCamera-<%= printer.index %>"
+              width="100%"
+              class=""
+              src="<%= camURL %>"
+            />
+            <div class="progress">
+              <div
+                id="panProgress-<%= printer.index %>"
+                class="progress-bar"
+                role="progressbar progress-bar-striped"
+                style="width:<% if(typeof printer.progress!= 'undefined'){ %><%=
             Math.floor(printer.progress.completion) %><%}%>%"
-          aria-valuenow="25"
-          aria-valuemin="0"
-          aria-valuemax="100"
-        >
-          <% if(typeof printer.progress!= 'undefined'){ %> <%=
-          Math.floor(printer.progress.completion) %> <%}%>%
+                aria-valuenow="25"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+                <% if(typeof printer.progress!= 'undefined'){ %> <%=
+                Math.floor(printer.progress.completion) %> <%}%>%
+              </div>
+            </div>
+            <button
+              id="panState-<%= printer.index %>"
+              type="button"
+              class="btn btn-block <%= printer.stateColour.category %> mb-1 mt-1"
+              role="button"
+              disabled
+            >
+              <%= printer.current.state %>
+            </button>
+            <center>
+              <button
+                id="panPrintStart-<%= printer.index %>"
+                type="button"
+                class="btn btn-success mt-1 mb-1"
+                role="button"
+                disabled
+              >
+                <i class="fas fa-print"></i> Print
+              </button>
+              <button
+                id="panPrintPause-<%= printer.index %>"
+                type="button"
+                class="btn btn-light mt-1 mb-1"
+                role="button"
+                disabled
+              >
+                <i class="fas fa-pause"></i> Pause
+              </button>
+              <button
+                id="panRestart-<%= printer.index %>"
+                type="button"
+                class="btn btn-danger mt-1 mb-1  d-none"
+                role="button"
+                disabled
+              >
+                <i class="fas fa-undo"></i> Restart
+              </button>
+              <button
+                id="panResume-<%= printer.index %>"
+                type="button"
+                class="btn btn-success mt-1 mb-1  d-none"
+                role="button"
+                disabled
+              >
+                <i class="fas fa-redo"></i> Resume
+              </button>
+              <button
+                id="panStop-<%= printer.index %>"
+                type="button"
+                class="btn btn-danger mt-1 mb-1"
+                role="button"
+                disabled
+              >
+                <i class="fas fa-square"></i> Cancel
+              </button>
+            </center>
+          </div>
+
+          <% if(typeof printer.selectedFilament != 'undefined'){%>
+          <button
+            type="button"
+            class="btn btn-block btn-secondary mb-0"
+            role="button"
+            id="listFilament-<%= printer.index %>"
+          >
+            <%= printer.selectedFilament.name %> [<%=
+            printer.selectedFilament.colour %> / <%=
+            printer.selectedFilament.type[1] %>]</button
+          ><% }%>
+
+          <div class="card-footer text-muted dashFooter">
+            <small
+              id="panE0Temp-<%= printer.index %>"
+              class="mb-0 float-left"
+              id="panT0-<%= printer.index %>"
+            >
+              <% if(typeof printer.temps != 'undefined'){ %> <% if(typeof
+              printer.temps[0].tool0 != 'undefined'){ %>
+              <i id="tool0A-<%= printer.index %>" class="far fa-circle"></i> <%=
+              printer.temps[0].tool0.actual %><%}else{ %>
+              <i id="tool0A-<%= printer.index %>" class="far fa-circle"></i> <%=
+              0%><%}%>°C <% if(typeof printer.temps[0].tool0 != 'undefined'){ %>
+              <i id="tool0T-<%= printer.index %>" class="fas fa-bullseye"></i>
+              <%= printer.temps[0].tool0.target%><%}else{ %>
+              <i id="tool0T-<%= printer.index %>" class="fas fa-bullseye"></i>
+              <%= 0%><%}%>°C <%} %>
+            </small>
+
+            <small
+              id="panBedTemp-<%= printer.index %>"
+              class="mb-0 float-right"
+              id="panBed-<%= printer.index %>"
+            >
+              <% if(typeof printer.temps != 'undefined'){ %> <% if(typeof
+              printer.temps[0].bed != 'undefined'){ %><i
+                id="bedA-<%= printer.index %>"
+                class="far fa-circle"
+              ></i>
+              <%= printer.temps[0].bed.actual %><%}else{ %>
+              <i id="bedA-<%= printer.index %>" class="far fa-circle"></i> <%=
+              0%><%}%>°C <% if(typeof printer.temps[0].bed != 'undefined'){ %>
+              <i id="bedT-<%= printer.index %>" class="fas fa-bullseye"></i> <%=
+              printer.temps[0].bed.target %><%}else{ %>
+              <i id="bedT-<%= printer.index %>" class="fas fa-bullseye"></i> <%=
+              0%><%}%>°C <%} %>
+            </small>
+          </div>
         </div>
       </div>
-      <button
-        id="panState-<%= printer.index %>"
-        type="button"
-        class="btn btn-block <%= printer.stateColour.category %> mb-1 mt-1"
-        role="button"
-        disabled
-      >
-        <%= printer.current.state %>
-      </button>
-      <center>
-        <button
-          id="panPrintStart-<%= printer.index %>"
-          type="button"
-          class="btn btn-success mt-1 mb-1"
-          role="button"
-          disabled
-        >
-          <i class="fas fa-print"></i> Print
-        </button>
-        <button
-          id="panPrintPause-<%= printer.index %>"
-          type="button"
-          class="btn btn-light mt-1 mb-1"
-          role="button"
-          disabled
-        >
-          <i class="fas fa-pause"></i> Pause
-        </button>
-        <button
-          id="panRestart-<%= printer.index %>"
-          type="button"
-          class="btn btn-danger mt-1 mb-1  d-none"
-          role="button"
-          disabled
-        >
-          <i class="fas fa-undo"></i> Restart
-        </button>
-        <button
-          id="panResume-<%= printer.index %>"
-          type="button"
-          class="btn btn-success mt-1 mb-1  d-none"
-          role="button"
-          disabled
-        >
-          <i class="fas fa-redo"></i> Resume
-        </button>
-        <button
-          id="panStop-<%= printer.index %>"
-          type="button"
-          class="btn btn-danger mt-1 mb-1"
-          role="button"
-          disabled
-        >
-          <i class="fas fa-square"></i> Cancel
-        </button>
-      </center>
-    </div>
-
-    <% if(typeof printer.selectedFilament != 'undefined'){%>
-    <button
-      type="button"
-      class="btn btn-block btn-secondary mb-0"
-      role="button"
-      id="listFilament-<%= printer.index %>"
-    >
-      <%= printer.selectedFilament.name %> [<%= printer.selectedFilament.colour
-      %> / <%= printer.selectedFilament.type[1] %>]</button
-    ><% }%>
-
-    <div class="card-footer text-muted dashFooter">
-      <small
-        id="panE0Temp-<%= printer.index %>"
-        class="mb-0 float-left"
-        id="panT0-<%= printer.index %>"
-      >
-        <% if(typeof printer.temps != 'undefined'){ %> <% if(typeof
-        printer.temps[0].tool0 != 'undefined'){ %>
-        <i id="tool0A-<%= printer.index %>" class="far fa-circle"></i> <%=
-        printer.temps[0].tool0.actual %><%}else{ %>
-        <i id="tool0A-<%= printer.index %>" class="far fa-circle"></i> <%=
-        0%><%}%>°C <% if(typeof printer.temps[0].tool0 != 'undefined'){ %>
-        <i id="tool0T-<%= printer.index %>" class="fas fa-bullseye"></i> <%=
-        printer.temps[0].tool0.target%><%}else{ %>
-        <i id="tool0T-<%= printer.index %>" class="fas fa-bullseye"></i> <%=
-        0%><%}%>°C <%} %>
-      </small>
-
-      <small
-        id="panBedTemp-<%= printer.index %>"
-        class="mb-0 float-right"
-        id="panBed-<%= printer.index %>"
-      >
-        <% if(typeof printer.temps != 'undefined'){ %> <% if(typeof
-        printer.temps[0].bed != 'undefined'){ %><i
-          id="bedA-<%= printer.index %>"
-          class="far fa-circle"
-        ></i>
-        <%= printer.temps[0].bed.actual %><%}else{ %>
-        <i id="bedA-<%= printer.index %>" class="far fa-circle"></i> <%=
-        0%><%}%>°C <% if(typeof printer.temps[0].bed != 'undefined'){ %>
-        <i id="bedT-<%= printer.index %>" class="fas fa-bullseye"></i> <%=
-        printer.temps[0].bed.target %><%}else{ %>
-        <i id="bedT-<%= printer.index %>" class="fas fa-bullseye"></i> <%=
-        0%><%}%>°C <%} %>
-      </small>
+      <% }) %>
+      <script src="/js/panelViewRunner.js" type="module"></script>
     </div>
   </div>
 </div>
-<% }) %>
-<script src="/js/panelViewRunner.js" type="module"></script>

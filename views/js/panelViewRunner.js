@@ -58,43 +58,9 @@ printerCard.forEach(card => {
     PrinterManager.updateIndex(parseInt(ca[1]));
     PrinterManager.init(printerInfo);
   });
-  document.getElementById("listPlay-" + ca[1]).addEventListener("click", e => {
-    e.target.disabled = true;
-    let opts = {
-      command: "start"
-    };
-    OctoPrintClient.jobAction(printerInfo[ca[1]], opts, e);
-  });
-  document
-    .getElementById("listCancel-" + ca[1])
-    .addEventListener("click", e => {
-      bootbox.confirm({
-        message: `${printerInfo[ca[1]].index}.  ${
-          printerInfo[ca[1]].settingsAppearance.name
-        }: <br>Are you sure you want to cancel the ongoing print?`,
-        buttons: {
-          cancel: {
-            label: '<i class="fa fa-times"></i> Cancel'
-          },
-          confirm: {
-            label: '<i class="fa fa-check"></i> Confirm'
-          }
-        },
-        callback: function(result) {
-          if (result) {
-            e.target.disabled = true;
-            let opts = {
-              command: "cancel"
-            };
-            OctoPrintClient.jobAction(printerInfo[ca[1]], opts, e);
-          }
-        }
-      });
-    });
+  
 });
 
-function addListeners() {
-  printers.forEach(printer => {});
 }
 function grabElements(printer) {
   if (typeof elems[printer.index] != "undefined") {
@@ -104,7 +70,7 @@ function grabElements(printer) {
       row: document.getElementById("panelInstance-" + printer.index),
       index: document.getElementById("panIndex-" + printer.index),
       name: document.getElementById("panName-" + printer.index),
-      control: document.getElementById("panManage-" + printer.index),
+      control: document.getElementById("printerButton-" + printer.index),
       start: document.getElementById("panPrintStart-" + printer.index),
       stop: document.getElementById("panStop-" + printer.index),
       restart: document.getElementById("panRestart-" + printer.index),
@@ -129,7 +95,6 @@ function grabElements(printer) {
 function updateState(printers) {
   printers.forEach(printer => {
     let elements = grabElements(printer);
-    //Set the data
 
     if (typeof printer.settingsApperance != "undefined") {
       elements.index.innerHTML = `
