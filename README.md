@@ -9,7 +9,7 @@
 
 [![Feature Requests](https://feathub.com/NotExpectedYet/OctoFarm?format=svg)](https://feathub.com/NotExpectedYet/OctoFarm)
 
-  <p>Please visit <a href="https://git.notexpectedyet.com/NotExpectedYet/OctoFarm">to log a request.
+  <p>Please visit <a href="https://git.notexpectedyet.com/NotExpectedYet/OctoFarm">to log a request.</a>
 
   <h3 align="center">Version 1.1 - BETA</h3>
 <br />
