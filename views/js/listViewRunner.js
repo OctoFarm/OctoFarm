@@ -26,7 +26,7 @@ source.onmessage = function(e) {
       if (res.clientSettings[0].listView.currentOp) {
         currentOperations(res.currentOperations, res.currentOperationsCount);
       }
-      updateState(res.printerInfo);
+      updateState(res.printerInfo, res.clientSettings[0].listView);
     }
   }
 };
@@ -121,15 +121,14 @@ function grabElements(printer) {
     return elems[printer.index];
   }
 }
-function updateState(printers) {
+function updateState(printers, clientSettings) {
   printers.forEach(printer => {
     let elements = grabElements(printer);
     //Set the data
     elements.index.innerHTML = printer.index;
-    elements.row.className = printer.stateColour.category;
+
     if (typeof printer.settingsApperance != "undefined") {
       elements.name.innerHTML = printer.settingsApperance.name;
-      elements.row.classList = printer.settingsApperance.category;
     }
 
     if (typeof printer.job != "undefined" && printer.job.file.name != null) {
@@ -175,10 +174,18 @@ function updateState(printers) {
         bedT = 0;
       }
     }
+    let hideClosed = "";
+    let hideOffline = "";
 
-    //Set the state
+    if (clientSettings.hideOff) {
+      hideOffline = "hidden";
+    }
+    if (clientSettings.hideClosed) {
+      hideClosed = "hidden";
+    }
     if (printer.stateColour.category === "Active") {
-      //elements.row.className.remove("hidden");
+      //Set the state
+      elements.row.className = printer.stateColour.category;
       elements.control.disabled = false;
       elements.start.disabled = true;
       elements.stop.disabled = false;
@@ -264,6 +271,7 @@ function updateState(printers) {
       printer.stateColour.category === "Idle" ||
       printer.stateColour.category === "Complete"
     ) {
+      elements.row.className = printer.stateColour.category;
       elements.control.disabled = false;
       if (typeof printer.job != "undefined" && printer.job.file.name != null) {
         elements.start.disabled = false;
@@ -273,10 +281,12 @@ function updateState(printers) {
         elements.stop.disabled = true;
       }
     } else if (printer.state === "Closed") {
+      elements.row.className = printer.stateColour.category + " " + hideClosed;
       elements.control.disabled = false;
       elements.start.disabled = true;
       elements.stop.disabled = true;
     } else if (printer.stateColour.category === "Offline") {
+      elements.row.className = printer.stateColour.category + " " + hideOffline;
       elements.control.disabled = true;
       elements.start.disabled = true;
       elements.stop.disabled = true;

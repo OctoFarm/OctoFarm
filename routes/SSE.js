@@ -22,14 +22,14 @@ setInterval(async function() {
   let currentOperationsCount = null;
   let farmInfo = null;
   let octofarmStatistics = null;
-  let printStatistics= null;
-  if(typeof statistics != 'undefined'){
+  let printStatistics = null;
+  if (typeof statistics != "undefined") {
     currentOperations = statistics.currentOperations;
     currentOperationsCount = statistics.currentOperationsCount;
     farmInfo = statistics.farmInfo;
     octofarmStatistics = statistics.octofarmStatistics;
     printStatistics = statistics.printStatistics;
-  }else{
+  } else {
     currentOperations = 0;
     currentOperationsCount = 0;
     farmInfo = 0;
@@ -70,7 +70,8 @@ setInterval(async function() {
       stateColour: printers[i].stateColour,
       current: printers[i].current,
       options: printers[i].options,
-      selectedFilament: selectedFilament
+      selectedFilament: selectedFilament,
+      settingsWebcam: printers[i].settingsWebcam
     };
     printerInfo.push(printer);
   }

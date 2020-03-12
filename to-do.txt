@@ -1,30 +1,4 @@
 
-- List View (Minor Checking)
-- Panel View (Minor Checking)
-- Camera View (Minor Checking)
-* Lazy loading for panel view
-* Camera View (Need's fixing from db changes)
-* Lazy loading for camera view
-* Swap out websockets for SSE!!!!!
-* Views don't hide-unhide elements on state changes taking into consideration settings
-
-**BUGS**
-
-* File Manager, not refreshing file on load properly... doesn't seem to be loading individual file refresh properly...
-* Printer Manager, same as above for file... not refreshing a single file
-* Printer Manager needs progress bar for file upload...
-* Printer exports come out as null
-* Dashboard doesn't update meterage from history...
-
-* Feed rate / Flow rate not been remembered...
-* Options still defined error
-* File manager search not recursive...
-
-
-* Saving printers restarts server badly, needs checking... Done!!!
-
-either check if element has hidden or re-write the loading of invisible elements... yeah... check!
-
 -- Update Changelog
 -- Do Release
 -- Update Patreon, Discord, Email
@@ -32,5 +6,4 @@ either check if element has hidden or re-write the loading of invisible elements
 
 Warnings
 - Version 4.2 > of MongoDB
-- Don't run two servers with same client...
 - RaspberryPi installation not tested, currently tested and confirmed on Windows/Ubuntu. 

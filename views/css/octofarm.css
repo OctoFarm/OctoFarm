@@ -274,3 +274,15 @@ label {
   position: absolute;
   z-index: -1;
 }
+
+.flipH {
+  transform: rotateY(180deg);
+}
+
+.flipV {
+  transform: rotateX(180deg);
+}
+
+.rotate90 {
+  transform: rotate(90deg);
+}

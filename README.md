@@ -5,6 +5,8 @@
 [![GitHub stars](https://img.shields.io/github/stars/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/stargazers)
 [![GitHub license](https://img.shields.io/github/license/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/blob/master/LICENSE.txt)
 
+[![Feature Requests](https://feathub.com/NotExpectedYet/OctoFarm?format=svg)](https://feathub.com/NotExpectedYet/OctoFarm)
+
   <h3 align="center">WARNING THIS IS MAJOR ALPHA VERSION</h3>
   <p>Please visit <a href="https://git.notexpectedyet.com/NotExpectedYet/OctoFarm">NotExpectedYet Git</a> for earlier working versions.
 <br />

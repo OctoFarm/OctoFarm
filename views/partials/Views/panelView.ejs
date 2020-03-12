@@ -1,6 +1,6 @@
-
-<% printers.forEach(printer => { %>  <% if(printer.state === "Offline" &&
+<% printers.forEach(printer => { %> <% if(printer.state === "Offline" &&
 clientSettings[0].panelView.hideOff){%>
+
 <div
   class="col-sm-12 col-md-4 col-lg-3 col-xl-2 hidden"
   id="panelInstance-<%= printer.index %>"
@@ -22,7 +22,11 @@ clientSettings[0].panelView.hideOff){%>
         class="col-sm-12 col-md-4 col-lg-3 col-xl-2"
         id="panelInstance-<%= printer.index %>"
       >
-        <%}%>
+        <%}%> <% let rotation = "" %> <% if(typeof printer.settingsWebcam !=
+        'undefined'){%> <% if(printer.settingsWebcam.flipH){%> <% rotation +=
+        "flipH"; %> <%}else if(printer.settingsWebcam.flipV){%> <% rotation +=
+        "flipV"; %> <% }else if(printer.settingsWebcam.rotate90){%> <% rotation
+        += " rotate90"; %> <% } %> <% }%>
         <div class="card mt-1 mb-1 ml-1 mr-1 text-center">
           <div class="card-header dashHeader">
             <h6 class="float-left mb-0" id="panIndex-<%= printer.index %>">
@@ -77,13 +81,16 @@ clientSettings[0].panelView.hideOff){%>
             </button>
             <% let camURL = ""; %> <% if(printer.camURL != ''){ %> <% camURL =
             "http://" + printer.camURL; %> <%}%>
-            <img
-              loading="lazy"
-              id="panCamera-<%= printer.index %>"
-              width="100%"
-              class=""
-              src="<%= camURL %>"
-            />
+            <div id="cameraContain-<%= printer.index %>">
+              <img
+                loading="lazy"
+                id="panCamera-<%= printer.index %>"
+                width="100%"
+                class=""
+                src="<%= camURL %>"
+                style="pointer-events: none;"
+              />
+            </div>
             <div class="progress">
               <div
                 id="panProgress-<%= printer.index %>"
@@ -210,4 +217,6 @@ clientSettings[0].panelView.hideOff){%>
       </div>
       <% }) %>
       <script src="/js/panelViewRunner.js" type="module"></script>
-
+    </div>
+  </div>
+</div>

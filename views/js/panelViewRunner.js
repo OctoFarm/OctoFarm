@@ -3,6 +3,7 @@ import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
+import doubleClickFullScreen from "./lib/functions/fullscreen.js";
 
 let printerInfo = "";
 let elems = [];
@@ -30,10 +31,10 @@ source.onmessage = function(e) {
       PrinterManager.init(res.printerInfo);
     } else {
       printerInfo = res.printerInfo;
-      if (res.clientSettings[0].listView.currentOp) {
+      if (res.clientSettings[0].panelView.currentOp) {
         currentOperations(res.currentOperations, res.currentOperationsCount);
       }
-      updateState(res.printerInfo);
+      updateState(res.printerInfo, res.clientSettings[0].panelView.currentOp);
     }
   }
 };
@@ -54,13 +55,18 @@ source.onclose = function(e) {
 let printerCard = document.querySelectorAll("[id^='printerButton-']");
 printerCard.forEach(card => {
   let ca = card.id.split("-");
-  card.addEventListener("click", e => {
+  card.addEventListener("dblclick", e => {
     PrinterManager.updateIndex(parseInt(ca[1]));
     PrinterManager.init(printerInfo);
   });
   document
+    .getElementById("cameraContain-" + parseInt(ca[1]))
+    .addEventListener("dblclick", e => {
+      doubleClickFullScreen(e.target);
+    });
+  document
     .getElementById("panPrintStart-" + ca[1])
-    .addEventListener("click", async e => {
+    .addEventListener("dblclick", async e => {
       e.target.disabled = true;
       let opts = {
         command: "start"
@@ -79,7 +85,7 @@ printerCard.forEach(card => {
     });
   document
     .getElementById("panRestart-" + ca[1])
-    .addEventListener("click", e => {
+    .addEventListener("dblclick", e => {
       e.target.disabled = true;
       let opts = {
         command: "restart"
@@ -150,7 +156,7 @@ function grabElements(printer) {
     return elems[printer.index];
   }
 }
-function updateState(printers) {
+function updateState(printers, clientSettings) {
   printers.forEach(printer => {
     let elements = grabElements(printer);
     elements.state.innerHTML = printer.state;
@@ -208,9 +214,21 @@ function updateState(printers) {
         bedT = 0;
       }
     }
+    let hideClosed = "";
+    let hideOffline = "";
 
+    if (clientSettings.hideOff) {
+      hideOffline = "hidden";
+    }
+    if (clientSettings.hideClosed) {
+      hideClosed = "hidden";
+    }
     //Set the state
     if (printer.stateColour.category === "Active") {
+      if (printer.camURL != "") {
+        elements.row.className = "col-sm-12 col-md-4 col-lg-3 col-xl-2";
+      }
+
       elements.control.disabled = false;
       elements.start.disabled = true;
       elements.stop.disabled = false;
@@ -322,6 +340,9 @@ function updateState(printers) {
       printer.stateColour.category === "Idle" ||
       printer.stateColour.category === "Complete"
     ) {
+      if (printer.camURL != "") {
+        elements.row.className = "col-sm-12 col-md-4 col-lg-3 col-xl-2";
+      }
       elements.control.disabled = false;
       if (typeof printer.job != "undefined" && printer.job.file.name != null) {
         elements.start.disabled = false;
@@ -354,6 +375,11 @@ function updateState(printers) {
         elements.restart.disabled = true;
       }
     } else if (printer.state === "Closed") {
+      if (printer.camURL != "") {
+        elements.row.className =
+          "col-sm-12 col-md-4 col-lg-3 col-xl-2" + hideClosed;
+      }
+
       elements.control.disabled = false;
       elements.start.disabled = true;
       elements.stop.disabled = true;
@@ -365,6 +391,11 @@ function updateState(printers) {
       elements.resume.classList.add("hidden");
       elements.restart.classList.add("hidden");
     } else if (printer.stateColour.category === "Offline") {
+      if (printer.camURL != "") {
+        elements.row.className =
+          "col-sm-12 col-md-4 col-lg-3 col-xl-2" + hideOffline;
+      }
+
       elements.control.disabled = true;
       elements.start.disabled = true;
       elements.stop.disabled = true;

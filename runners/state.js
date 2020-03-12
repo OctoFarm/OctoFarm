@@ -15,72 +15,71 @@ let webSockets = [];
 
 let statRunner = null;
 
+function WebSocketClient() {
+  this.number = 0; // Message number
 
-function WebSocketClient(){
-  this.number = 0;	// Message number
-  
-	this.autoReconnectInterval = 5*1000;	// ms
+  this.autoReconnectInterval = 5 * 1000; // ms
 }
-WebSocketClient.prototype.open = function(url){
-	this.url = url;
-	this.instance = new WebSocket(this.url);
-	this.instance.on('open',()=>{
-		this.onopen();
-	});
-	this.instance.on('message',(data,flags)=>{
-		this.number ++;
-		this.onmessage(data,flags,this.number);
-	});
-	this.instance.on('close',(e)=>{
-		switch (e.code){
-		case 1000:	// CLOSE_NORMAL
-			//console.log("WebSocket: closed");
-			break;
-		default:	// Abnormal closure
-			this.reconnect(e);
-			break;
-		}
-		this.onclose(e);
-	});
-	this.instance.on('error',(e)=>{
-		switch (e.code){
-		case 'ECONNREFUSED':
-			this.reconnect(e);
-			break;
-		default:
-			this.onerror(e);
-			break;
-		}
-	});
-}
-WebSocketClient.prototype.send = function(data,option){
-	try{
-		this.instance.send(data,option);
-	}catch (e){
-		this.instance.emit('error',e);
-	}
-}
-WebSocketClient.prototype.reconnect = function(e){
-	// console.log(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`,e);
+WebSocketClient.prototype.open = function(url) {
+  this.url = url;
+  this.instance = new WebSocket(this.url);
+  this.instance.on("open", () => {
+    this.onopen();
+  });
+  this.instance.on("message", (data, flags) => {
+    this.number++;
+    this.onmessage(data, flags, this.number);
+  });
+  this.instance.on("close", e => {
+    switch (e.code) {
+      case 1000: // CLOSE_NORMAL
+        //console.log("WebSocket: closed");
+        break;
+      default:
+        // Abnormal closure
+        this.reconnect(e);
+        break;
+    }
+    this.onclose(e);
+  });
+  this.instance.on("error", e => {
+    switch (e.code) {
+      case "ECONNREFUSED":
+        this.reconnect(e);
+        break;
+      default:
+        this.onerror(e);
+        break;
+    }
+  });
+};
+WebSocketClient.prototype.send = function(data, option) {
+  try {
+    this.instance.send(data, option);
+  } catch (e) {
+    this.instance.emit("error", e);
+  }
+};
+WebSocketClient.prototype.reconnect = function(e) {
+  // console.log(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`,e);
   this.instance.removeAllListeners();
-	var that = this;
-	setTimeout(function(){
-		//console.log("WebSocketClient: reconnecting...");
-		that.open(that.url);
-	},this.autoReconnectInterval);
-}
-WebSocketClient.prototype.terminate = async function(e){
-  console.log(this.instance.readyState)
-  if(this.instance.readyState === 1){
+  var that = this;
+  setTimeout(function() {
+    //console.log("WebSocketClient: reconnecting...");
+    that.open(that.url);
+  }, this.autoReconnectInterval);
+};
+WebSocketClient.prototype.terminate = async function(e) {
+  if (this.instance.readyState === 1) {
     this.instance.removeAllListeners();
     this.instance.close();
   }
   return;
-}
-WebSocketClient.prototype.onopen = function(e){		}
-WebSocketClient.prototype.onmessage = function(data,flags,number){		}
-WebSocketClient.prototype.onerror = function(e){		}
-WebSocketClient.prototype.onclose = function(e){		}
+};
+WebSocketClient.prototype.onopen = function(e) {};
+WebSocketClient.prototype.onmessage = function(data, flags, number) {};
+WebSocketClient.prototype.onerror = function(e) {};
+WebSocketClient.prototype.onclose = function(e) {};
 
 class ClientAPI {
   static get(ip, port, apikey, item) {
@@ -217,52 +216,44 @@ class Runner {
     return (
       "System Runner has checked over " + farmPrinters.length + " printers..."
     );
-
   }
   static async setupClient(i) {
     console.log("Printer: " + webSockets[i].index + " is been setup...");
     await Runner.getState(i);
-    webSockets[i].ws.open(`ws://${farmPrinters[i].ip}:${farmPrinters[i].port}/sockjs/websocket`);
-    webSockets[i].ws.onopen = async function(e){
+    webSockets[i].ws.open(
+      `ws://${farmPrinters[i].ip}:${farmPrinters[i].port}/sockjs/websocket`
+    );
+    webSockets[i].ws.onopen = async function(e) {
       //Make sure to get current printer status...
       await Runner.getState(i);
       let Polling = await ServerSettings.check();
       var data = {};
-      data["auth"] =
-      webSockets[i].currentUser +
-        ":" +
-        webSockets[i].apikey;
-        webSockets[i].ws.send(JSON.stringify(data));
+      data["auth"] = webSockets[i].currentUser + ":" + webSockets[i].apikey;
+      webSockets[i].ws.send(JSON.stringify(data));
       // var throt = {};
       // throt["throttle"] = parseInt(
       //   (Polling[0].onlinePolling.seconds * 1000) / 500
       // );
       // webSockets[i].ws.send(JSON.stringify(throt));
-    }
-    webSockets[i].ws.onmessage = async function(data,flags,number){
-           data = await JSON.parse(data);
+    };
+    webSockets[i].ws.onmessage = async function(data, flags, number) {
+      data = await JSON.parse(data);
 
       if (typeof data.event != "undefined") {
         if (data.event.type === "PrintFailed") {
           console.log(data.event.type);
           //Register cancelled print...
-          HistoryCollection.failed(
-            data.event.payload,
-            farmPrinters[i]
-          );
+          HistoryCollection.failed(data.event.payload, farmPrinters[i]);
           //
         }
         if (data.event.type === "PrintDone") {
           console.log(data.event.type);
           //Register cancelled print...
-          HistoryCollection.complete(
-            data.event.payload,
-            farmPrinters[i]
-          );
+          HistoryCollection.complete(data.event.payload, farmPrinters[i]);
         }
       }
       if (typeof data.current != "undefined") {
-        try{
+        try {
           if (data.current.state.text.includes("Offline")) {
             data.current.state.text = "Closed";
           }
@@ -278,7 +269,7 @@ class Runner {
             farmPrinters[i].temps = data.current.temps;
             //console.log(farmPrinters[1].temps);
           }
-  
+
           if (
             data.current.progress.completion != null &&
             data.current.progress.completion === 100
@@ -289,7 +280,7 @@ class Runner {
               data.current.state.text
             );
           }
-        }catch (err) {
+        } catch (err) {
           let error = {
             err: err.message,
             action: "Failed to update current printer set...",
@@ -299,9 +290,9 @@ class Runner {
           console.log(error);
         }
       }
-    }
-    webSockets[i].ws.onerror = async function(data,flags,number){
-      try{
+    };
+    webSockets[i].ws.onerror = async function(data, flags, number) {
+      try {
         farmPrinters[i].current = {
           state: "Offline",
           baudrate: 250000,
@@ -310,7 +301,7 @@ class Runner {
         };
         farmPrinters[i].state = "Offline";
         farmPrinters[i].stateColour = Runner.getColour("Offline");
-      }catch (err) {
+      } catch (err) {
         let error = {
           err: err.message,
           action: "Failed to update current printer set...",
@@ -319,9 +310,9 @@ class Runner {
         };
         console.log(error);
       }
-    }
-    webSockets[i].ws.onclose = async function(data,flags,number){
-      try{
+    };
+    webSockets[i].ws.onclose = async function(data, flags, number) {
+      try {
         farmPrinters[i].current = {
           state: "Offline",
           baudrate: 250000,
@@ -330,7 +321,7 @@ class Runner {
         };
         farmPrinters[i].state = "Offline";
         farmPrinters[i].stateColour = Runner.getColour("Offline");
-      }catch (err) {
+      } catch (err) {
         let error = {
           err: err.message,
           action: "Failed to update current printer set...",
@@ -339,11 +330,11 @@ class Runner {
         };
         console.log(error);
       }
-    }
+    };
   }
 
   static async reset() {
-    for(let i=0; i < webSockets.length; i++){
+    for (let i = 0; i < webSockets.length; i++) {
       await webSockets[i].ws.terminate();
     }
     webSockets = [];

@@ -141,6 +141,51 @@ export default class PrinterManager {
   
   
           </div>`;
+
+        document.getElementById("cameraRotation").innerHTML = `
+        
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="camRot90">
+          <label class="form-check-label" for="camRot90">
+            Rotate your camera by 90°
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="camFlipH">
+          <label class="form-check-label" for="camFlipH">
+            Flip your camera horizontally
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="camFlipV">
+          <label class="form-check-label" for="camFlipV">
+            Flip your camera vertically
+          </label>
+        </div>
+      
+      `;
+        document.getElementById("camRot90").checked =
+          printer.settingsWebcam.rotate90;
+        document.getElementById("camFlipH").checked =
+          printer.settingsWebcam.flipH;
+        document.getElementById("camFlipV").checked =
+          printer.settingsWebcam.flipV;
+
+        let flipH = "";
+        let flipV = "";
+        let rotate90 = "";
+        if (typeof printer.settingsWebcam != "undefined") {
+          if (printer.settingsWebcam.flipH) {
+            flipH = "flipH";
+          }
+          if (printer.settingsWebcam.flipV) {
+            flipV = "flipV";
+          }
+          if (printer.settingsWebcam.rotate90) {
+            rotate90 = "rotate90";
+          }
+        }
+
         document.getElementById("printerControls").innerHTML = `
           <div class="row">
           <div class="col-12 col-sm-12 col-md-4 col-lg-4 col-xl-6">
@@ -154,9 +199,9 @@ export default class PrinterManager {
               </div>
               <div class="row">
                   <div id="cameraCol" class="col-12">
-                    <img id="printerControlCamera" width="100%" src="http://${
-                      printer.camURL
-                    }"/>
+                    <img class="${flipH} ${flipV} ${rotate90}" id="printerControlCamera" width="100%" src="http://${
+          printer.camURL
+        }"/>
                   </div>
               </div>
           </div>
