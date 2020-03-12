@@ -233,11 +233,11 @@ class Runner {
         ":" +
         webSockets[i].apikey;
         webSockets[i].ws.send(JSON.stringify(data));
-      var throt = {};
-      throt["throttle"] = parseInt(
-        (Polling[0].onlinePolling.seconds * 1000) / 500
-      );
-      webSockets[i].ws.send(JSON.stringify(throt));
+      // var throt = {};
+      // throt["throttle"] = parseInt(
+      //   (Polling[0].onlinePolling.seconds * 1000) / 500
+      // );
+      // webSockets[i].ws.send(JSON.stringify(throt));
     }
     webSockets[i].ws.onmessage = async function(data,flags,number){
            data = await JSON.parse(data);

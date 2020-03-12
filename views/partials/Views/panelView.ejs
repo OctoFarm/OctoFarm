@@ -1,5 +1,5 @@
 
-<% printers.forEach(printer => { %> <% if(printer.state === "Offline" &&
+<% printers.forEach(printer => { %>  <% if(printer.state === "Offline" &&
 clientSettings[0].panelView.hideOff){%>
 <div
   class="col-sm-12 col-md-4 col-lg-3 col-xl-2 hidden"
@@ -210,6 +210,4 @@ clientSettings[0].panelView.hideOff){%>
       </div>
       <% }) %>
       <script src="/js/panelViewRunner.js" type="module"></script>
-    </div>
-  </div>
-</div>
+
