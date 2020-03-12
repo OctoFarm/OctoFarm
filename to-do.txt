@@ -1,9 +1,0 @@
-
--- Update Changelog
--- Do Release
--- Update Patreon, Discord, Email
--- Update facebook, Instagram
-
-Warnings
-- Version 4.2 > of MongoDB
-- RaspberryPi installation not tested, currently tested and confirmed on Windows/Ubuntu. 
