@@ -6,7 +6,7 @@
   id="dashboardPrinters"
   class="cell col-12 col-sm-12 col-md-6 col-lg-4 col-xl-3"
 > 
-  <div class="row">
+  <div class="row dashRow">
     <div
     id="dashboardPrinters"
     class="cell col-12 col-sm-12"
@@ -33,7 +33,7 @@
         >
           <%= printerCount %>
         </button>
-        <button
+    <!-- <button
           id="searchOfflineBtn"
           type="button"
           class="btn btn-success float-right d-block mr-1"
@@ -41,9 +41,14 @@
           aria-expanded="false"
         >
           <i class="fas fa-redo"></i>
-        </button>
+        </button> -->
       </div>
       <div class="card-body dashBody" id="printerList">
+        <div class="row">
+          <div class="cell col-6"><center><button data-toggle="modal" data-target="#connectionModal" id="connectAllBtn" type="button" class="btn btn-success btn-sm"><i class="fas fa-link"></i> Connect All</button></center></div>
+          <div class="cell col-6"><center><button data-toggle="modal" data-target="#connectionModal" id="disconnectAllBtn" type="button" class="btn btn-danger btn-sm"><i class="fas fa-unlink"></i> Disconnect All</button></center></div>
+        </div>
+
         <%- include('./partials/Printers/dashboardList.ejs') %>
       </div>
       <div class="card-footer dashFooter text-muted"></div>

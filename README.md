@@ -5,8 +5,11 @@
 [![GitHub stars](https://img.shields.io/github/stars/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/stargazers)
 [![GitHub license](https://img.shields.io/github/license/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/blob/master/LICENSE.txt)
 
-  <h3 align="center">WARNING THIS IS MAJOR ALPHA VERSION</h3>
-  <p>Please visit <a href="https://git.notexpectedyet.com/NotExpectedYet/OctoFarm">NotExpectedYet Git</a> for earlier working versions.
+<h3 align="center">Current Feature Requests</h3>
+[![Feature Requests](https://feathub.com/NotExpectedYet/OctoFarm?format=svg)](https://feathub.com/NotExpectedYet/OctoFarm)
+  <p>Please visit <a href="https://git.notexpectedyet.com/NotExpectedYet/OctoFarm">to log a request.
+
+  <h3 align="center">Version 1.1 - BETA</h3>
 <br />
 <p align="center">
   <a href="https://github.com/NotExpectedYet/OctoFarm">
@@ -54,10 +57,15 @@ OctoFarm was built to fill a need that anyone with multiple 3D printers with Oct
 
 To get a local copy up and running follow these simple steps.
 
+### Platform
+
+Confirmed working on: Linux (Ubuntu, Debian), RaspberryPi (Rasbian), Windows 10.
+Should also work on but not tested: MacOS, anything else nodejs will run on.
+
 ### Prerequisites
 
-- [MongoDB](https://www.mongodb.com/)
-- [NodeJS](https://nodejs.org/)
+- [MongoDB](https://www.mongodb.com/) - v4.2+
+- [NodeJS](https://nodejs.org/) - v13+
 - [NPM](https://www.npmjs.com/)
 
 ### Installation Development
@@ -74,7 +82,7 @@ git clone https://github.com/NotExpectedYet/OctoFarm.git
 npm install
 ```
 
-3. Edit the db.js file with your database.
+3. Edit the /config/db.js file with your database.
 
 ```sh
 module.exports = {
@@ -90,7 +98,7 @@ module.exports = {
 npm run dev
 ```
 
-- The developer version uses nodemon for live server reloading on changes.
+- The developer version uses nodemon for live server reloading on changes. It will output all the logs to the console.
 
 ### Installation Production
 
@@ -106,7 +114,7 @@ git clone https://github.com/NotExpectedYet/OctoFarm.git
 npm install
 ```
 
-3. Edit the db.js file with your database.
+3. Edit the /config/db.js file with your database.
 
 ```sh
 module.exports = {
@@ -121,6 +129,8 @@ module.exports = {
 ```sh
 npm start
 ```
+
+- The production version will run without interaction, but currently there are no way to persist other than something like screen on linux, or using a service you create yourself. The logs will be outputted to \*.log files for error and standard operations. Check the error log if your server unexpectedly halts.
 
 ## Packaged Versions
 

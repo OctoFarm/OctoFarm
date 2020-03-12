@@ -1,38 +1,67 @@
-import Client from "./lib/octofarm.js";
+import OctoPrintClient from "./lib/octoprint.js";
 import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
 
 let printerInfo = "";
+//Connect to servers socket..webSocket
+let url = window.location.hostname;
+let port = window.location.port;
+if (port != "") {
+  port = ":" + port;
+}
 
+var source = new EventSource("/sse/printerInfo/");
+source.onmessage = function(e) {
+  if (e.data != null) {
+    let res = JSON.parse(e.data);
+
+    if (
+      document.getElementById("printerManagerModal").classList.contains("show")
+    ) {
+      PrinterManager.init(res.printerInfo);
+    } else {
+      currentOperations(res.currentOperations, res.currentOperationsCount);
+      dashUpdate.systemInformation(res.systemInfo);
+      dashUpdate.printers(res.printerInfo);
+      printerInfo = res.printerInfo;
+      dashUpdate.farmInformation(res.farmInfo);
+      dashUpdate.farmStatistics(res.octofarmStatistics);
+    }
+  }
+};
+source.onerror = function(e) {
+  UI.createAlert(
+    "error",
+    "Communication with the server has been suddenly lost, please restart client and try again..."
+  );
+};
+source.onclose = function(e) {
+  UI.createAlert(
+    "error",
+    "Communication with the server has been suddenly lost, please restart client and try again..."
+  );
+};
 //Close modal event listeners...
 $("#printerManagerModal").on("hidden.bs.modal", function(e) {
   //Fix for mjpeg stream not ending when element removed...
   document.getElementById("printerControlCamera").src = "";
 });
+$("#connectionModal").on("hidden.bs.modal", function(e) {
+  //Fix for mjpeg stream not ending when element removed...
+  if (document.getElementById("connectionAction")) {
+    document.getElementById("connectionAction").remove();
+  }
+});
 
-//Update page variables
-Client.get("client/dash/get")
-  .then(res => {
-    return res.json();
-  })
-  .then(res => {
-    if (res.printerInfo.length === 0) {
-    } else {
-      printerInfo = res.printerInfo;
-    }
-  })
-  .catch(err => {
-    console.log(err);
-    UI.createAlert(
-      "error",
-      "There was trouble updating page, please check logs",
-      4000,
-      "clicked"
-    );
-  });
-
+//Initial listeners
+document.getElementById("connectAllBtn").addEventListener("click", e => {
+  dashActions.connectAll();
+});
+document.getElementById("disconnectAllBtn").addEventListener("click", e => {
+  dashActions.disconnectAll();
+});
 //Setup page listeners...
 let printerCard = document.querySelectorAll("[id^='printerButton-']");
 printerCard.forEach(card => {
@@ -43,39 +72,189 @@ printerCard.forEach(card => {
   });
 });
 
-setInterval(function() {
-  Client.get("client/dash/get")
-    .then(res => {
-      return res.json();
-    })
-    .then(res => {
-      if (res.printerInfo.length === 0) {
-      } else {
-        currentOperations(res.currentOperations, res.currentOperationsCount);
-        dashUpdate.systemInformation(res.systemInfo);
-        dashUpdate.printers(res.printerInfo);
-        printerInfo = res.printerInfo;
-        dashUpdate.farmInformation(res.farmInfo);
-        dashUpdate.farmStatistics(res.octofarmStatistics);
-        if (
-          document
-            .getElementById("printerManagerModal")
-            .classList.contains("show")
-        ) {
-          PrinterManager.init(res.printerInfo);
+class dashActions {
+  static async connectionAction(action) {
+    $("#connectionModal").modal("hide");
+    let selected = await document.querySelectorAll("[id^='printerSel-']");
+    document.getElementById("connectionAction").remove();
+    if (action === "connect") {
+      for (let i = 0; i < selected.length; i++) {
+        if (selected[i].checked === true) {
+          let index = selected[i].id.replace("printerSel-", "");
+          let printerName = "";
+          if (typeof printerInfo[index].settingsAppearance != "undefined") {
+            printerName = printerInfo[index].settingsAppearance.name;
+          }
+          let preferBaud = printerInfo[index].options.baudratePreference;
+          let preferPort = printerInfo[index].options.portPreference;
+          let preferProfile =
+            printerInfo[index].options.printerProfilePreference;
+          if (preferBaud === null) {
+            preferBaud = "115200";
+          }
+          if (preferPort === null) {
+            preferPort = printerInfo[index].options.ports[0];
+          }
+          if (preferProfile === null) {
+            preferProfile = printerInfo[index].options.printerProfiles[0];
+          }
+
+          let opts = {
+            command: "connect",
+            port: preferPort,
+            baudrate: preferBaud,
+            printerProfile: preferProfile
+          };
+          let post = await OctoPrintClient.post(
+            printerInfo[index],
+            "connection",
+            opts
+          );
+          if (post.status === 204) {
+            UI.createAlert(
+              "success",
+              `Connected: ${printerInfo[index].index}. ${printerName}`,
+              1000,
+              "clicked"
+            );
+          } else {
+            UI.createAlert(
+              "error",
+              `Couldn't Connect ${printerInfo[index].index}with Port: ${preferPort}, Baud: ${preferBaud}, Profile: ${preferProfile}`,
+              1000,
+              "clicked"
+            );
+          }
         }
       }
-    })
-    .catch(err => {
-      console.log(err);
-      UI.createAlert(
-        "error",
-        "There was trouble updating page, please check logs",
-        4000,
-        "clicked"
-      );
+    } else if (action === "disconnect") {
+      for (let i = 0; i < selected.length; i++) {
+        if (selected[i].checked === true) {
+          let index = selected[i].id.replace("printerSel-", "");
+          let printerName = "";
+          if (typeof printerInfo[index].settingsAppearance != "undefined") {
+            printerName = printerInfo[index].settingsAppearance.name;
+          }
+          let opts = {
+            command: "disconnect"
+          };
+          let post = await OctoPrintClient.post(
+            printerInfo[index],
+            "connection",
+            opts
+          );
+          if (post.status === 204) {
+            UI.createAlert(
+              "success",
+              `Disconnected: ${printerInfo[index].index}. ${printerName}`,
+              1000,
+              "clicked"
+            );
+          } else {
+            UI.createAlert(
+              "error",
+              `Couldn't Disconnect: ${printerInfo[index].index}. ${printerName}`,
+              1000,
+              "clicked"
+            );
+          }
+        }
+      }
+    }
+  }
+  static async connectAll() {
+    //Create bootbox confirmation message
+    document.getElementById("connectionActionBtn").insertAdjacentHTML(
+      "beforeBegin",
+      `
+    <button id="connectionAction" type="button" class="btn btn-success" data-dismiss="modal">
+      Connect All
+    </button>
+    `
+    );
+    let message = document.getElementById("printerConnection");
+
+    message.innerHTML =
+      "You must have at least 1 printer in the Closed state to use this function...";
+
+    let printersList = "";
+    printerInfo.forEach(printer => {
+      if (printer.state === "Closed") {
+        let printerName = "";
+        if (typeof printer.settingsAppearance != "undefined") {
+          printerName = printer.settingsAppearance.name;
+        }
+        let print = `
+          <div style="display:inline-block;">
+          <form class="was-validated">
+          <div class="custom-control custom-checkbox mb-3">
+            <input type="checkbox" class="custom-control-input" id="printerSel-${printer.index}" required>
+            <label class="custom-control-label" for="printerSel-${printer.index}">${printer.index}. ${printerName}</label>
+            <div class="valid-feedback">Attempt to connect</div>
+            <div class="invalid-feedback">DO NOT connect</div>
+          </div>
+        </form></div>
+          `;
+        printersList += print;
+        message.innerHTML = printersList;
+      }
     });
-}, 1000);
+    let checkBoxes = document.querySelectorAll("[id^='printerSel-']");
+    checkBoxes.forEach(box => {
+      box.checked = true;
+    });
+    document.getElementById("connectionAction").addEventListener("click", e => {
+      dashActions.connectionAction("connect");
+    });
+  }
+  static async disconnectAll() {
+    //Create bootbox confirmation message
+    document.getElementById("connectionActionBtn").insertAdjacentHTML(
+      "beforeBegin",
+      `
+        <button id="connectionAction" type="button" class="btn btn-success" data-dismiss="modal">
+          Disconnect All
+        </button>
+        `
+    );
+    let message = document.getElementById("printerConnection");
+    message.innerHTML =
+      "You must have at least 1 printer in the Idle category to use this function...";
+    let printersList = "";
+    printerInfo.forEach(printer => {
+      if (
+        printer.stateColour.category === "Idle" ||
+        printer.stateColour.category === "Complete"
+      ) {
+        let printerName = "";
+        if (typeof printer.settingsAppearance != "undefined") {
+          printerName = printer.settingsAppearance.name;
+        }
+        let print = `
+              <div style="display:inline-block;">
+              <form class="was-validated">
+              <div class="custom-control custom-checkbox mb-3">
+                <input type="checkbox" class="custom-control-input" id="printerSel-${printer.index}" required>
+                <label class="custom-control-label" for="printerSel-${printer.index}">${printer.index}. ${printerName}</label>
+                <div class="valid-feedback">Attempt to connect</div>
+                <div class="invalid-feedback">DO NOT connect</div>
+              </div>
+            </form></div>
+              `;
+        printersList += print;
+        message.innerHTML = printersList;
+      }
+    });
+
+    let checkBoxes = document.querySelectorAll("[id^='printerSel-']");
+    checkBoxes.forEach(box => {
+      box.checked = true;
+    });
+    document.getElementById("connectionAction").addEventListener("click", e => {
+      dashActions.connectionAction("disconnect");
+    });
+  }
+}
 
 class dashUpdate {
   static systemInformation(systemInfo) {
@@ -139,6 +318,10 @@ class dashUpdate {
             document.getElementById(
               "printerButton-" + printer.index
             ).disabled = false;
+          } else {
+            document.getElementById(
+              "printerButton-" + printer.index
+            ).disabled = true;
           }
         } else {
           document.getElementById("printerList").insertAdjacentHTML(

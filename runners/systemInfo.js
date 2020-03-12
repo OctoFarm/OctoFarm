@@ -7,7 +7,6 @@ let systemRunner = false;
 class SystemRunner {
   static init() {
     if (systemRunner === false) {
-      console.log("Starting System Runner");
       systemRunner = setInterval(function() {
         SystemRunner.getSystemInfo()
           .then(res => {
@@ -47,8 +46,9 @@ class SystemRunner {
           .catch(err => {
             err => console.log(err);
           });
-      }, 4000);
+      }, 5000);
     }
+    return "System Information Runner Started...";
   }
   static async getSystemInfo() {
     //Collect some system information

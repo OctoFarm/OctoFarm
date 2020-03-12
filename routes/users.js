@@ -41,6 +41,7 @@ router.post("/register", (req, res) => {
 
   if (errors.length > 0) {
     res.render("register", {
+      page: "Login",
       errors,
       name,
       username,
@@ -54,6 +55,7 @@ router.post("/register", (req, res) => {
         //User exists
         errors.push({ msg: "Username is already registered" });
         res.render("register", {
+          page: "Login",
           errors,
           name,
           username,

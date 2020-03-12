@@ -1,59 +1,82 @@
-
-<% printers.forEach(printer => { %> <% if(printer.inited === false){ %>
-<!-- No need to show offline/none inited printers here. -->
-
-<% }else if(printer.current.state != "Offline"){ %>
+<% printers.forEach((printer, index) => { %> <%printer.state%> <%
+if(printer.state != "Offline"){ %>
 <!-- Connected -->
-<% if(printer.index === printers[0].index){ %>
-    <a
-    href="#"
-    class="list-group-item list-group-item-action bg-dark active flex-column align-items-start bg-secondary"
-    style="display: block;
-    padding: 0.7rem 0.1rem;"
-  >
-<% }else{ %>
-    <a
+  <a
+    id="printer-<%= printer.index %>"
     href="#"
     class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
     style="display: block;
     padding: 0.7rem 0.1rem;"
   >
-<% } %>
-
-  <div class="row">
-    <div
-      class="col-lg-2"
-      style="display:flex; justify-content:center; align-items:center;"
-    >
-      <center><i class="fas fa-print fa-2x"></i></center>
-    </div>
-    <div class="col-lg-10">
+    <div class="row">
+      <div
+        class="col-lg-2"
+        style="display:flex; justify-content:center; align-items:center;"
+      >
+        <center><i class="fas fa-print fa-2x"></i></center>
+      </div>
+      <div class="col-lg-10">
         <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">        <%= printer.index %>. <% if(typeof printer.settingsApperance != 'undefined'){ %>
-              <%= printer.settingsApperance.name %> <% } %></span
-              ></h5>
-                  <small> <span
-              class="float-right badge badge-dark badge-pill"
-              >
-              <% if(typeof printer.fileList.fileCount != 'undefined'){ %>
-                  Files: <%= printer.fileList.fileCount %> / Folders: <%= printer.fileList.folderCount %>
-              <% }else{ %>
-                  Files: 0 / Folders: 0
+          <h5 class="mb-1">
+            <%= printer.index %>.
+            <span id="printerName-<%= printer.index %>"
+              ><% if(typeof printer.settingsApperance != 'undefined'){ %> <%=
+              printer.settingsApperance.name %> <% } %></span
+            >
+          </h5>
+          <small>
+            <span class="float-right badge badge-dark badge-pill">
+              <% if(typeof printer.fileList != 'undefined' && typeof
+              printer.fileList.fileCount != 'undefined'){ %> Files: <%=
+              printer.fileList.fileCount %> / Folders: <%=
+              printer.fileList.folderCount %> <% }else{ %> Files: 0 / Folders: 0
               <% } %>
-      </span></small>
-          </div>
-            <div
-            class="float-right btn-group flex-wrap btn-group-sm"
-            role="group"
-            aria-label="Basic example"
+            </span></small
           >
-          <% if(typeof printer.storage != 'undefined'){ %>
-              <p><%- helpers.generateBytes(printer.storage.free) %> / <%- helpers.generateBytes(printer.storage.total) %> </p>
-          <% } %>
+        </div>
+        <div
+          class="float-right btn-group flex-wrap btn-group-sm"
+          role="group"
+          aria-label="Basic example"
+        >
+          <% const selectedProfile = printer.current.printerProfile; %>
+        </div>
+        <div class="row">
+          <div class="col-lg-2">
+            <i class="fas fa-file-upload"></i
+            ><span id="fileCounts-<%= printer.index %>"> 0 </span>
           </div>
-          <small class="pt-2 float-left"><i class="fas fa-network-wired"></i> <%= printer.ip%>:<%= printer.port%></small>
+          <div class="col-lg-10">
+            <div class="progress">
+              <div
+                id="fileProgress-<%= printer.index %>"
+                class="progress-bar progress-bar-striped bg-warning"
+                role="progressbar"
+                style="width: 0%"
+                aria-valuenow="0"
+                aria-valuemin="0"
+                aria-valuemax="100"
+              >
+                0%
+              </div>
+            </div>
+          </div>
+        </div>
+        <small class="pt-2 float-left"
+          ><i class="fas fa-cube"></i> <b>H:</b> <%=
+          printer.profiles[selectedProfile].volume.height%>mm x <b>W:</b> <%=
+          printer.profiles[selectedProfile].volume.width%>mm x <b>D:</b> <%=
+          printer.profiles[selectedProfile].volume.depth%>mm</small
+        >
+        <small class="pt-2 float-left"
+          ><i class="fas fa-pen"></i> <b>Extruders:</b> <%=
+          printer.profiles[selectedProfile].extruder.count %>
+          <b>Nozzle Size:</b> <%=
+          printer.profiles[selectedProfile].extruder.nozzleDiameter %>mm</small
+        >
+      </div>
     </div>
-  </div>
-</a>
+  </a>
 
-<% } %> <% }) %>
+  <% } %> <% }) %>
+</a>

@@ -4,7 +4,10 @@ const mongoose = require("mongoose");
 const flash = require("connect-flash");
 const session = require("express-session");
 const passport = require("passport");
-const WebSocket = require("ws");
+const { ensureAuthenticated } = require("./config/auth");
+
+//Server Port
+const PORT = process.env.PORT || 4000;
 
 const app = express();
 
@@ -13,12 +16,6 @@ require("./config/passport.js")(passport);
 
 //DB Config
 const db = require("./config/db.js").MongoURI;
-
-//Mongo Connect
-mongoose
-  .connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
-  .then(() => console.log("MongoDB Connected..."))
-  .catch(err => console.log(err));
 
 //JSON
 app.use(express.json());
@@ -63,25 +60,42 @@ if (db === "") {
   app.use("/users", require("./routes/users", { page: "route" }));
   app.use("/printers", require("./routes/printers", { page: "route" }));
   app.use("/settings", require("./routes/settings", { page: "route" }));
-  app.use("/client", require("./routes/dash", { page: "route" }));
+  app.use("/sse", require("./routes/SSE", { page: "route" }));
+  app.use("/filament", require("./routes/filament", { page: "route" }));
 }
 
-//Server
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, console.log(`Server started on port ${PORT}`));
-if (db != "") {
+//Mongo Connect
+mongoose
+  .connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => serverStart())
+  .catch(err => console.log(err));
+
+let serverStart = async function() {
+  console.log("MongoDB Connected...");
   //Setup Settings
   const serverSettings = require("./settings/serverSettings.js");
   const ServerSettings = serverSettings.ServerSettings;
-  ServerSettings.init();
+  console.log("Checking Server Settings...");
+  let ss = await ServerSettings.init();
+  console.log(ss);
   const clientSettings = require("./settings/clientSettings.js");
   const ClientSettings = clientSettings.ClientSettings;
-  ClientSettings.init();
+  console.log("Checking Client Settings...");
+  let cs = await ClientSettings.init();
+  console.log(cs);
   //Start backend metrics gathering...
+  console.log("Starting System Printers Runner...");
   const runner = require("./runners/state.js");
   const Runner = runner.Runner;
-  Runner.init();
+  let r = await Runner.init();
+  console.log(r);
+  console.log("Starting System Information Runner...");
   const system = require("./runners/systemInfo.js");
   const SystemRunner = system.SystemRunner;
-  SystemRunner.init();
-}
+  let sr = await SystemRunner.init();
+  console.log(sr);
+  app.listen(PORT, () => {
+    console.log(`HTTP server started...`);
+    console.log(`You can now access your server on port: ${PORT}`);
+  });
+};

@@ -116,7 +116,7 @@ class PrintersManagement {
         apikey.className = "form-control is-valid";
       }
       errors.forEach(error => {
-        UI.createMessage(error);
+        UI.createMessage(error, "message");
       });
     } else {
       let currentApiKeys = document.querySelectorAll("[data-apikey]");
@@ -131,7 +131,7 @@ class PrintersManagement {
           msg: "ApiKey already exists in database."
         });
         errors.forEach(error => {
-          UI.createMessage(error);
+          UI.createMessage(error, "message");
         });
       } else {
         apikey.className = "form-control is-valid";
@@ -154,7 +154,7 @@ class PrintersManagement {
             "Printer successfully added, she's a beaut! Don't forget to save after finishing adding your farm."
         });
         errors.forEach(error => {
-          UI.createMessage(error);
+          UI.createMessage(error, "message");
         });
       }
     }
@@ -208,7 +208,7 @@ class PrintersManagement {
           "Printer has been successfully removed from farm. Don't forget to save after finishing your changes."
       });
       errors.forEach(error => {
-        UI.createMessage(error);
+        UI.createMessage(error, "message");
       });
       if (el.classList.contains("deleteIcon")) {
         el.parentElement.parentElement.parentElement.remove();
@@ -222,6 +222,13 @@ class PrintersManagement {
     }
   }
   static async save(printerTable) {
+    document.getElementById("overlay").style.display = "block";
+    UI.createAlert(
+      "success",
+      "Printers updated, please wait whilst the server restarts...<br> This may take some time...<br> The page will automatically refresh when complete.... ",
+      10000,
+      "clicked"
+    );
     const table = document.getElementById(printerTable);
     let printers = new Array();
     for (var r = 0, n = table.rows.length; r < n; r++) {
@@ -354,10 +361,10 @@ class PrintersManagement {
     reFormat.camURL = [];
     reFormat.apikey = [];
     printers.forEach((old, index) => {
-      reFormat["ip"].push(old.ip);
-      reFormat["port"].push(old.port);
-      reFormat["camURL"].push(old.camURL);
-      reFormat["apikey"].push(old.apikey);
+      reFormat["ip"].push(old.printer.ip);
+      reFormat["port"].push(old.printer.port);
+      reFormat["camURL"].push(old.printer.camURL);
+      reFormat["apikey"].push(old.printer.apikey);
     });
     FileOperations.download("printers.json", JSON.stringify(reFormat));
   }

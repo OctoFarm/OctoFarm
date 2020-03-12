@@ -16,6 +16,9 @@ body {
   background-position: center;
   color: grey;
 }
+button > * {
+  pointer-events: none;
+}
 hr {
   border-color: inherit;
   margin-top: 4px;
@@ -33,6 +36,21 @@ li {
   max-width: 700px;
 }
 /* Colours */
+.textIdle {
+  color: #262626;
+}
+.textActive {
+  color: #583c0e;
+}
+.textOffline {
+  color: #2e0905;
+}
+.textClosed {
+  color: #2e0905;
+}
+.textComplete {
+  color: #00330e;
+}
 .Idle {
   background-color: #262626;
 }
@@ -48,21 +66,15 @@ li {
 .Complete {
   background-color: #00330e;
 }
-.progress-bar {
-  -webkit-transition: width 1s ease-in-out;
-  -moz-transition: width 1s ease-in-out;
-  -o-transition: width 1s ease-in-out;
-  transition: width 1s ease-in-out;
-  animation: progressBar 3s ease-in-out;
-  animation-fill-mode: both;
+.MultiSelected {
+  background-color: black;
+  color: green;
 }
-@keyframes progressBar {
-  0% {
-    background-position: 40px 0;
-  }
-  100% {
-    background-position: 0 0;
-  }
+.toolOn {
+  color: green;
+}
+.toolOut {
+  color: orange;
 }
 
 /*Sticky Table header*/
@@ -208,4 +220,69 @@ a.notyet {
   -ms-transform: rotate(180deg);
   -o-transform: rotate(180deg);
   transform: rotate(180deg);
+}
+/*PRINTER MANAGER*/
+.terminal-window {
+  padding: 5px;
+  width: 100%;
+  height: 400px;
+  max-height: 400px;
+  overflow: auto;
+}
+/*SERVER WORK OVERLAY*/
+#overlay {
+  position: fixed; /* Sit on top of the page content */
+  display: none; /* Hidden by default */
+  width: 100%; /* Full width (cover the whole page) */
+  height: 100%; /* Full height (cover the whole page) */
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5); /* Black background with opacity */
+  z-index: 99999; /* Specify a stack order in case you're using a different order for other elements */
+  cursor: pointer; /* Add a pointer on hover */
+}
+#overlayIcon {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, 0);
+  z-index: 1023;
+}
+.noStorage {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  transform: translate(20%, 0);
+  z-index: 1023;
+}
+label {
+  cursor: pointer;
+  /* Style as you please, it will become the visible UI component. */
+}
+.hidden {
+  display: none;
+}
+#fileUploadBtn {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}
+#multiFileUploadBtn {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}
+
+.flipH {
+  transform: rotateY(180deg);
+}
+
+.flipV {
+  transform: rotateX(180deg);
+}
+
+.rotate90 {
+  transform: rotate(90deg);
 }

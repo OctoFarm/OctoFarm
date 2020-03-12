@@ -1,10 +1,10 @@
 {
   "name": "octofarm",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "description": "OctoFarm is a easy to setup and install web interface that unifies your Octoprint instances for easy monitoring of all your printers. OctoFarm allows you to connect to multiple octoprint instances on your network allowing creating a farm management system. You can control, manage, upload files to any of your instances without ever leaving the tab it's open in.",
   "main": "app.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node app.js > production.log 2> productionError.log",
     "dev": "nodemon app.js"
   },
   "repository": {
@@ -21,24 +21,37 @@
   "author": "James Mackay (NotExpectedYet)",
   "license": "ISC",
   "dependencies": {
-    "agenda": "^2.3.0",
+    "agenda": "^3.0.0",
     "bcryptjs": "^2.4.3",
     "connect-flash": "^0.1.1",
     "ejs": "^3.0.1",
     "express": "^4.17.1",
     "express-ejs-layouts": "^2.5.0",
     "express-session": "^1.17.0",
-    "jquery": "^3.4.1",
+    "express-ws": "^4.0.0",
     "lodash": "^4.17.15",
-    "mongoose": "^5.8.3",
+    "mongoose": "^5.9.2",
     "node-fetch": "^2.6.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
-    "systeminformation": "^4.16.1",
+    "systeminformation": "^4.22.3",
     "ws": "^7.2.1"
   },
   "devDependencies": {
     "debug": "^4.1.1",
+    "dependency-check": "^4.1.0",
     "nodemon": "^2.0.2"
+  },
+  "nodemonConfig": {
+    "verbose": true,
+    "ignore": [
+      "views/js/*"
+    ],
+    "delay": "2500"
+  },
+  "engineStrict": true,
+  "engines": {
+    "node": ">= 14.0.0",
+    "npm": ">= 6.0.0"
   }
 }
