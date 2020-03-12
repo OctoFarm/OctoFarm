@@ -6,7 +6,9 @@
 [![GitHub license](https://img.shields.io/github/license/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/blob/master/LICENSE.txt)
 
 <h3 align="center">Current Feature Requests</h3>
+
 [![Feature Requests](https://feathub.com/NotExpectedYet/OctoFarm?format=svg)](https://feathub.com/NotExpectedYet/OctoFarm)
+
   <p>Please visit <a href="https://git.notexpectedyet.com/NotExpectedYet/OctoFarm">to log a request.
 
   <h3 align="center">Version 1.1 - BETA</h3>
