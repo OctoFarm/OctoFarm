@@ -48,3 +48,21 @@ html {
 .page-footer {
   background-color: #929fba;
 }
+a:link {
+  color: #b78eff;
+}
+
+/* visited link */
+a:visited {
+  color: white;
+}
+
+/* mouse over link */
+a:hover {
+  color: #b78eff;
+}
+
+/* selected link */
+a:active {
+  color: #b78eff;
+}
