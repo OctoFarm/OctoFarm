@@ -68,7 +68,7 @@ Should also work on but not tested: MacOS, anything else nodejs will run on.
 
 - [MongoDB](https://www.mongodb.com/) - v4.2+
 - [NodeJS](https://nodejs.org/) - v13+
-- [NPM](https://www.npmjs.com/)
+- [NPM](https://www.npmjs.com/) - v6+
 
 ### Installation Development
 
