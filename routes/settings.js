@@ -42,18 +42,19 @@ router.post("/client/update", ensureAuthenticated, (req, res) => {
   });
 });
 
-router.get("/server/get", ensureAuthenticated, (req, res) => {
-  ServerSettingsDB.find({}).then(checked => {
-    res.send(checked[0]);
-  });
-});
-router.post("/server/update", ensureAuthenticated, (req, res) => {
-  ServerSettingsDB.find({}).then(async checked => {
-    await Runner.stopAll();
-    checked[0].onlinePolling = req.body.onlinePolling;
-    checked[0].offlinePolling = req.body.offlinePolling;
-    await checked[0].save();
-    await Runner.init();
-    res.send({ msg: "Settings Saved, Restarting Runners..." });
-  });
-});
+//Depricated due to new websockets implementation for octoprint...
+// router.get("/server/get", ensureAuthenticated, (req, res) => {
+//   ServerSettingsDB.find({}).then(checked => {
+//     res.send(checked[0]);
+//   });
+// });
+// router.post("/server/update", ensureAuthenticated, (req, res) => {
+//   ServerSettingsDB.find({}).then(async checked => {
+//     await Runner.stopAll();
+//     checked[0].onlinePolling = req.body.onlinePolling;
+//     checked[0].offlinePolling = req.body.offlinePolling;
+//     await checked[0].save();
+//     await Runner.init();
+//     res.send({ msg: "Settings Saved, Restarting Runners..." });
+//   });
+// });

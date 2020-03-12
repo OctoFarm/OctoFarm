@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
-const serverSettings = require("../settings/serverSettings.js");
-const ServerSettings = serverSettings.ServerSettings;
+
 const ClientSettings = require("../models/ClientSettings.js");
 
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
@@ -19,6 +18,24 @@ setInterval(async function() {
   //Only needed for WebSocket Information
   let printers = await Runner.returnFarmPrinters();
   let statistics = await FarmStatistics.returnStats();
+  let currentOperations = null;
+  let currentOperationsCount = null;
+  let farmInfo = null;
+  let octofarmStatistics = null;
+  let printStatistics= null;
+  if(typeof statistics != 'undefined'){
+    currentOperations = statistics.currentOperations;
+    currentOperationsCount = statistics.currentOperationsCount;
+    farmInfo = statistics.farmInfo;
+    octofarmStatistics = statistics.octofarmStatistics;
+    printStatistics = statistics.printStatistics;
+  }else{
+    currentOperations = 0;
+    currentOperationsCount = 0;
+    farmInfo = 0;
+    octofarmStatistics = 0;
+    printStatistics = 0;
+  }
   let printerInfo = [];
   let systemInformation = await SystemInfo.find({});
   let roll = await Roll.find({});
@@ -59,11 +76,11 @@ setInterval(async function() {
   }
   dashboardInfo = {
     printerInfo: printerInfo,
-    currentOperations: statistics.currentOperations,
-    currentOperationsCount: statistics.currentOperationsCount,
-    farmInfo: statistics.farmInfo,
-    octofarmStatistics: statistics.octofarmStatistics,
-    printStatistics: statistics.printStatistics,
+    currentOperations: currentOperations,
+    currentOperationsCount: currentOperationsCount,
+    farmInfo: farmInfo,
+    octofarmStatistics: octofarmStatistics,
+    printStatistics: printStatistics,
     systemInfo: systemInformation[0],
     filament: roll,
     clientSettings: clientSettings

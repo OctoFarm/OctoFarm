@@ -68,7 +68,7 @@ router.post("/updateSettings", ensureAuthenticated, async (req, res) => {
 router.post("/save", ensureAuthenticated, async (req, res) => {
   //Check required fields
   const printers = req.body;
-  Runner.stopAll();
+  const reset = await Runner.reset();
   await Printers.deleteMany({}).catch(err => console.log(err));
   for (let i = 0; i < printers.length; i++) {
     let newPrinter = await new Printers(printers[i]);
@@ -83,7 +83,7 @@ router.post("/runner/init", ensureAuthenticated, (req, res) => {
   res.send("Initialised Printers");
 });
 router.post("/delete", ensureAuthenticated, async (req, res) => {
-  await Runner.stopAll();
+  const reset = await Runner.reset();
   await Printers.deleteMany({}).catch(err => console.log(err));
   await Runner.init();
   res.send("Deleted Printers");
@@ -128,26 +128,14 @@ router.get("/printerInfo", ensureAuthenticated, async (req, res) => {
 
   res.send(printerInfo);
 });
-//Register handle for checking for offline printers
-router.post("/runner/checkOffline", ensureAuthenticated, async (req, res) => {
-  let checked = [];
-  let farmPrinters = Runner.returnFarmPrinters();
+//Register handle for checking for offline printers - Depricated due to websocket full implementation
+// router.post("/runner/checkOffline", ensureAuthenticated, async (req, res) => {
 
-  for (let i = 0; i < farmPrinters.length; i++) {
-    if (farmPrinters[i].state === "Offline") {
-      let client = {
-        index: i
-      };
-      //Make sure runners are created ready for each printer to pass between...
-      await Runner.setOffline(client);
-      checked.push(i);
-    }
-  }
-  res.send({
-    printers: checked,
-    msg: " If they were found they will appear online shortly."
-  });
-});
+//   res.send({
+//     printers: checked,
+//     msg: " If they were found they will appear online shortly."
+//   });
+// });
 router.post("/fileList", ensureAuthenticated, async (req, res) => {
   let index = req.body.i;
   let files = await Runner.returnFileList(index);
