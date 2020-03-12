@@ -234,14 +234,13 @@ class Runner {
       }
     });
     onlineRunners[client.index].ws.on("error", async function incoming(data) {
-      onlineRunners[client.index].ws.close();
       onlineRunners[client.index].ws.terminate();
       onlineRunners[client.index] = false;
       Runner.setOffline(client);
     });
     onlineRunners[client.index].ws.on("close", async function incoming(data) {
       // onlineRunners[client.index].ws.close();
-      // onlineRunners[client.index].ws.terminate();
+      onlineRunners[client.index].ws.terminate();
       // onlineRunners[client.index] = false;
       Runner.setOffline(client);
 
@@ -312,7 +311,7 @@ class Runner {
     });
     offlineRunners.forEach((run, index) => {
       console.log("Offline Printer: " + [index] + " stopped");
-      clearInterval(run);
+      clearInterval(offlineRunners(index));
       run = false;
     });
     return;
