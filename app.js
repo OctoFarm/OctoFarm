@@ -10,7 +10,7 @@ const { ensureAuthenticated } = require("./config/auth");
 const PORT = process.env.PORT || 4000;
 
 const app = express();
-const expressWs = require("express-ws")(app);
+
 //Passport Config
 require("./config/passport.js")(passport);
 
