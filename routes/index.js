@@ -122,6 +122,7 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
     version: pjson.version,
     printers: printers,
     currentOperations: statistics.currentOperations,
+    currentOperationsCount: statistics.currentOperationsCount,
     printerCount: printers.length,
     page: "Camera View",
     helpers: prettyHelpers,

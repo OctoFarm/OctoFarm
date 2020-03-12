@@ -1,5 +1,14 @@
-<% printers.forEach(printer => { %> <% if(printer.camURL != ""){ %>
-<div id="camInstance-${index}" class="col-sm-12 col-md-6 col-lg-6 col-xl-6">
+<% printers.forEach(printer => { %> 
+  <% if(printer.state === "Offline" && clientSettings[0].panelView.hideOff){%>
+  <div id="camInstance-${index}" class="col-sm-12 col-md-6 col-lg-6 col-xl-4 hidden">
+  <%}else if(printer.state === "Closed" && clientSettings[0].panelView.hideClosed){%>
+    <div id="camInstance-${index}" class="col-sm-12 col-md-6 col-lg-6 col-xl-4 hidden">
+    <%}else if(printer.camURL === ""){ %>
+      <div id="camInstance-${index}" class="col-sm-12 col-md-6 col-lg-6 col-xl-4 hidden">
+      <%} else { %>
+        <div id="camInstance-${index}" class="col-sm-12 col-md-6 col-lg-6 col-xl-4">
+        <%}%>
+
   <div class="card text-center mb-0 mt-0 ml-0 mr-0">
     <div class="card-header dashHeader" id="camHeader-${index}">
       <small class="float-left" id="camPrinterName-${index}"
@@ -103,5 +112,6 @@
       </small>
     </div>
   </div>
-</div>
-<% } %> <% }) %>
+
+
+<% }) %>
