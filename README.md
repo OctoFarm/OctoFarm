@@ -57,11 +57,16 @@ OctoFarm was built to fill a need that anyone with multiple 3D printers with Oct
 
 To get a local copy up and running follow these simple steps.
 
+### Platform
+
+Confirmed working on: Linux (Ubuntu, Debian), RaspberryPi (Rasbian), Windows 10.
+Should also work on but not tested: MacOS, anything else nodejs will run on.
+
 ### Prerequisites
 
 - [MongoDB](https://www.mongodb.com/) - v4.2+
 - [NodeJS](https://nodejs.org/) - v13+
-- [NPM](https://www.npmjs.com/) - v6+
+- [NPM](https://www.npmjs.com/)
 
 ### Installation Development
 
@@ -93,7 +98,7 @@ module.exports = {
 npm run dev
 ```
 
-- The developer version uses nodemon for live server reloading on changes.
+- The developer version uses nodemon for live server reloading on changes. It will output all the logs to the console.
 
 ### Installation Production
 
@@ -124,6 +129,8 @@ module.exports = {
 ```sh
 npm start
 ```
+
+- The production version will run without interaction, but currently there are no way to persist other than something like screen on linux, or using a service you create yourself. The logs will be outputted to \*.log files for error and standard operations. Check the error log if your server unexpectedly halts.
 
 ## Packaged Versions
 

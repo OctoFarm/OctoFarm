@@ -174,9 +174,6 @@ function updateState(printers, clientSettings) {
     let hideClosed = "";
     let hideOffline = "";
 
-    if (clientSettings.hideOff) {
-      hideOffline = "hidden";
-    }
     if (clientSettings.hideClosed) {
       hideClosed = "hidden";
     }
@@ -300,11 +297,6 @@ function updateState(printers, clientSettings) {
       elements.start.classList.remove("hidden");
       elements.stop.classList.add("hidden");
     } else if (printer.stateColour.category === "Offline") {
-      if (printer.camURL != "") {
-        elements.row.className =
-          "col-sm-12 col-md-4 col-lg-3 col-xl-2" + " " + hideOffline;
-      }
-
       elements.start.classList.remove("hidden");
       elements.stop.classList.add("hidden");
       elements.control.disabled = true;
