@@ -147,6 +147,49 @@ npm run dev
 These will be coming shortly after the release of version 1.1.
 
 <!-- ROADMAP -->
+## Docker
+
+```sh
+docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -p4000:4000 octofarm/octofarm
+```
+
+Environment Variables
+
+* MONGO = contains mongodb connection string
+
+Ports
+
+* 4000
+
+### Docker compose minimal example
+
+```yml
+version: '2'
+services:
+    octofarm:
+        container_name: octofarm
+        image: octofarm/octofarm
+        restart: always
+        ports:
+            - 4000:4000
+        environment:
+            - MONGO=mongodb://octofarm_mongo/octofarm
+
+    octofarm_mongo:
+        container_name: octofarm_mongo
+        image: bitnami/mongodb
+        restart: always
+        volumes:
+            - <your persistent folder>:/bitnami
+        environment:
+            - ALLOW_EMPTY_PASSWORD=yes
+            - MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=2'
+```
+
+
+
+  
+
 
 ## Roadmap
 
