@@ -42,7 +42,7 @@
   - [Installation Docker](#installation-Docker)
   - [Installation Production](#installation-Production)
   - [Installation Development](#installation-Development)
-  - [Roadmap](#roadmap)
+- [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
@@ -82,7 +82,7 @@ Instructions can be found: [TheTinkerDad/OctoFarm](https://hub.docker.com/r/thet
 
 ### OctoFarm Official
 
-# BIG thanks to knoker for the help with this!
+BIG thanks to knoker for the help with this!
 
 ```sh
 docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -p4000:4000 octofarm/octofarm
