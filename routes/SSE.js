@@ -39,14 +39,18 @@ setInterval(async function() {
   }
   let printerInfo = [];
   let systemInformation = await SystemInfo.find({});
-  let sysInfo = {
-    osInfo: systemInformation[0].osInfo,
-    cpuInfo: systemInformation[0].cpuInfo,
-    cpuLoad: systemInformation[0].cpuLoad,
-    memoryInfo: systemInformation[0].memoryInfo,
-    sysUptime: systemInformation[0].sysUptime,
-    sysProcess: systemInformation[0].sysProcess
-  };
+  let sysInfo = null;
+  if (typeof systemInformation === undefined || systemInformation.length < 1) {
+    sysInfo = {
+      osInfo: systemInformation[0].osInfo,
+      cpuInfo: systemInformation[0].cpuInfo,
+      cpuLoad: systemInformation[0].cpuLoad,
+      memoryInfo: systemInformation[0].memoryInfo,
+      sysUptime: systemInformation[0].sysUptime,
+      sysProcess: systemInformation[0].sysProcess
+    };
+  }
+
   let roll = await Roll.find({});
   let clientSettings = await ClientSettings.find({});
   let cSettings = {
