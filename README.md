@@ -72,6 +72,12 @@ Should also work on but not tested: MacOS, anything else nodejs will run on.
 - [NodeJS](https://nodejs.org/) - v13+
 - [NPM](https://www.npmjs.com/) - v6+
 
+### Installation Docker
+
+Instructions can be found: [TheTinkerDad/OctoFarm](https://hub.docker.com/r/thetinkerdad/octofarm)
+
+- Massive thanks to TheTinkerDad for making this, he's also better at keeping up with his documentation. Be sure to send him some love on his[Youtube Channel](https://www.youtube.com/channel/UCNaLzBZhXTCwjsDPU03y-kQ)
+
 ### Installation Production
 
 1. Clone the OctoFarm
