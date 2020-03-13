@@ -39,7 +39,9 @@
 - [About the Project](#about-the-project)
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
+  - [Installation Docker](#installation-Docker)
+  - [Installation Production](#installation-Production)
+  - [Installation Development](#installation-Development)
 - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
@@ -69,38 +71,6 @@ Should also work on but not tested: MacOS, anything else nodejs will run on.
 - [MongoDB](https://www.mongodb.com/) - v4.2+
 - [NodeJS](https://nodejs.org/) - v13+
 - [NPM](https://www.npmjs.com/) - v6+
-
-### Installation Development
-
-1. Clone the OctoFarm
-
-```sh
-git clone https://github.com/NotExpectedYet/OctoFarm.git
-```
-
-2. Install NPM packages
-
-```sh
-npm install
-```
-
-3. Edit the /config/db.js file with your database.
-
-```sh
-module.exports = {
-  MongoURI: "mongodb://192.168.1.5:27017/octofarm"
-};
-//Example Local URL: "mongodb://192.168.1.5:27017/octofarm"
-//Example Remote URL: "mongodb+srv://s1mpleman:<YOUR PASSWORD>@cluster0-lgugu.mongodb.net/test?retryWrites=true&w=majority"
-```
-
-4. Start the system
-
-```sh
-npm run dev
-```
-
-- The developer version uses nodemon for live server reloading on changes. It will output all the logs to the console.
 
 ### Installation Production
 
@@ -133,6 +103,38 @@ npm start
 ```
 
 - The production version will run without interaction, but currently there are no way to persist other than something like screen on linux, or using a service you create yourself. The logs will be outputted to \*.log files for error and standard operations. Check the error log if your server unexpectedly halts.
+
+### Installation Development
+
+1. Clone the OctoFarm
+
+```sh
+git clone https://github.com/NotExpectedYet/OctoFarm.git
+```
+
+2. Install NPM packages
+
+```sh
+npm install
+```
+
+3. Edit the /config/db.js file with your database.
+
+```sh
+module.exports = {
+  MongoURI: "mongodb://192.168.1.5:27017/octofarm"
+};
+//Example Local URL: "mongodb://192.168.1.5:27017/octofarm"
+//Example Remote URL: "mongodb+srv://s1mpleman:<YOUR PASSWORD>@cluster0-lgugu.mongodb.net/test?retryWrites=true&w=majority"
+```
+
+4. Start the system
+
+```sh
+npm run dev
+```
+
+- The developer version uses nodemon for live server reloading on changes. It will output all the logs to the console.
 
 ## Packaged Versions
 
