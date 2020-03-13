@@ -34,7 +34,7 @@ source.onmessage = function(e) {
       if (res.clientSettings.panelView.currentOp) {
         currentOperations(res.currentOperations, res.currentOperationsCount);
       }
-      updateState(res.printerInfo, res.clientSettings.panelView.currentOp);
+      updateState(res.printerInfo, res.clientSettings.panelView);
     }
   }
 };
@@ -216,7 +216,6 @@ function updateState(printers, clientSettings) {
     }
     let hideClosed = "";
     let hideOffline = "";
-
     if (clientSettings.hideOff) {
       hideOffline = "hidden";
     }
@@ -377,7 +376,7 @@ function updateState(printers, clientSettings) {
     } else if (printer.state === "Closed") {
       if (printer.camURL != "") {
         elements.row.className =
-          "col-sm-12 col-md-4 col-lg-3 col-xl-2" + hideClosed;
+          "col-sm-12 col-md-4 col-lg-3 col-xl-2" + " " + hideClosed;
       }
 
       elements.control.disabled = false;
@@ -392,8 +391,9 @@ function updateState(printers, clientSettings) {
       elements.restart.classList.add("hidden");
     } else if (printer.stateColour.category === "Offline") {
       if (printer.camURL != "") {
+        console.log(printer);
         elements.row.className =
-          "col-sm-12 col-md-4 col-lg-3 col-xl-2" + hideOffline;
+          "col-sm-12 col-md-4 col-lg-3 col-xl-2" + " " + hideOffline;
       }
 
       elements.control.disabled = true;
