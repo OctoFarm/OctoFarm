@@ -45,6 +45,37 @@ Nothing else from 1.0 I believe
 
 ## [Unreleased Template]
 
+## [1.1.3 - BETA :: includes 1.1.1 + 1.1.2] - 13/03/2020
+
+### Added
+
+- Updated to async JSON.stringify implentation to alleviate any further stringify issues.
+- 2 Docker installation options:
+  https://hub.docker.com/r/thetinkerdad/octofarm - Big thanks to youtuber TheTinkerDad for creating and managing this one.
+  https://hub.docker.com/repository/docker/octofarm/octofarm - Thanks to user Knoker for the help and PR with this.
+
+### Changed
+
+- Nothing
+
+### Removed
+
+- Nothing
+
+### Deprecated
+
+- Nothing
+
+### Fixed
+
+- Issue #1 - Panel View wasn't respecting the Hide Closed client setting
+- Issue regarding octoprint (I believe, need to test further and reproduce) missing sending temperature data for history
+- Cured the memory issue by sending malformed and large objects through JSON.parse
+
+### Security
+
+## [Unreleased Template]
+
 ## [] - TBA
 
 ### Added

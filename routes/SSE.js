@@ -40,7 +40,7 @@ setInterval(async function() {
   let printerInfo = [];
   let systemInformation = await SystemInfo.find({});
   let sysInfo = null;
-  if (typeof systemInformation != undefined || systemInformation.length > 1) {
+  if (typeof systemInformation != undefined || systemInformation.length > 0) {
     sysInfo = {
       osInfo: systemInformation[0].osInfo,
       cpuInfo: systemInformation[0].cpuInfo,

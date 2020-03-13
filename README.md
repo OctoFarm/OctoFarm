@@ -42,7 +42,7 @@
   - [Installation Docker](#installation-Docker)
   - [Installation Production](#installation-Production)
   - [Installation Development](#installation-Development)
-- [Roadmap](#roadmap)
+  - [Roadmap](#roadmap)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
@@ -74,9 +74,52 @@ Should also work on but not tested: MacOS, anything else nodejs will run on.
 
 ### Installation Docker
 
+### TinkerCads Version
+
 Instructions can be found: [TheTinkerDad/OctoFarm](https://hub.docker.com/r/thetinkerdad/octofarm)
 
 - Massive thanks to TheTinkerDad for making this, he's also better at keeping up with his documentation. Be sure to send him some love on his[Youtube Channel](https://www.youtube.com/channel/UCNaLzBZhXTCwjsDPU03y-kQ)
+
+### OctoFarm Official
+
+# BIG thanks to knoker for the help with this!
+
+```sh
+docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -p4000:4000 octofarm/octofarm
+```
+
+Environment Variables
+
+- MONGO = contains mongodb connection string
+
+Ports
+
+- 4000
+
+### Docker compose minimal example
+
+```yml
+version: "2"
+services:
+  octofarm:
+    container_name: octofarm
+    image: octofarm/octofarm
+    restart: always
+    ports:
+      - 4000:4000
+    environment:
+      - MONGO=mongodb://octofarm_mongo/octofarm
+
+  octofarm_mongo:
+    container_name: octofarm_mongo
+    image: bitnami/mongodb
+    restart: always
+    volumes:
+      - <your persistent folder>:/bitnami
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=2'
+```
 
 ### Installation Production
 
@@ -147,49 +190,6 @@ npm run dev
 These will be coming shortly after the release of version 1.1.
 
 <!-- ROADMAP -->
-## Docker
-
-```sh
-docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -p4000:4000 octofarm/octofarm
-```
-
-Environment Variables
-
-* MONGO = contains mongodb connection string
-
-Ports
-
-* 4000
-
-### Docker compose minimal example
-
-```yml
-version: '2'
-services:
-    octofarm:
-        container_name: octofarm
-        image: octofarm/octofarm
-        restart: always
-        ports:
-            - 4000:4000
-        environment:
-            - MONGO=mongodb://octofarm_mongo/octofarm
-
-    octofarm_mongo:
-        container_name: octofarm_mongo
-        image: bitnami/mongodb
-        restart: always
-        volumes:
-            - <your persistent folder>:/bitnami
-        environment:
-            - ALLOW_EMPTY_PASSWORD=yes
-            - MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=2'
-```
-
-
-
-  
-
 
 ## Roadmap
 
