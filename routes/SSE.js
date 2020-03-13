@@ -14,6 +14,27 @@ const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 const Roll = require("../models/Filament.js");
 
+var clientId = 0;
+var clients = {}; // <- Keep a map of attached clients
+
+// Called once for each new client. Note, this response is left open!
+router.get("/printerInfo/", ensureAuthenticated, function(req, res) {
+  req.socket.setTimeout(Number.MAX_VALUE);
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream", // <- Important headers
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive"
+  });
+  res.write("\n");
+  (function(clientId) {
+    clients[clientId] = res; // <- Add this client to those we consider "attached"
+    req.on("close", function() {
+      delete clients[clientId];
+    }); // <- Remove this client when he disconnects
+  })(++clientId);
+  //console.log("Client: " + Object.keys(clients));
+});
+
 setInterval(async function() {
   //Only needed for WebSocket Information
   let printers = await Runner.returnFarmPrinters();
@@ -40,7 +61,7 @@ setInterval(async function() {
   let printerInfo = [];
   let systemInformation = await SystemInfo.find({});
   let sysInfo = null;
-  if (typeof systemInformation != undefined || systemInformation.length > 0) {
+  if (typeof systemInformation != undefined || systemInformation.length > 1) {
     sysInfo = {
       osInfo: systemInformation[0].osInfo,
       cpuInfo: systemInformation[0].cpuInfo,
@@ -106,30 +127,6 @@ setInterval(async function() {
     filament: roll,
     clientSettings: cSettings
   };
-}, 500);
-
-var clientId = 0;
-var clients = {}; // <- Keep a map of attached clients
-
-// Called once for each new client. Note, this response is left open!
-router.get("/printerInfo/", ensureAuthenticated, function(req, res) {
-  req.socket.setTimeout(Number.MAX_VALUE);
-  res.writeHead(200, {
-    "Content-Type": "text/event-stream", // <- Important headers
-    "Cache-Control": "no-cache",
-    Connection: "keep-alive"
-  });
-  res.write("\n");
-  (function(clientId) {
-    clients[clientId] = res; // <- Add this client to those we consider "attached"
-    req.on("close", function() {
-      delete clients[clientId];
-    }); // <- Remove this client when he disconnects
-  })(++clientId);
-  //console.log("Client: " + Object.keys(clients));
-});
-
-setInterval(function() {
   yj.stringifyAsync(dashboardInfo, (err, data) => {
     if (!err) {
       for (clientId in clients) {
