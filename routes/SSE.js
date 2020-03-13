@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
-
+const yj = require("yieldable-json");
 const ClientSettings = require("../models/ClientSettings.js");
 
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
@@ -23,6 +23,7 @@ setInterval(async function() {
   let farmInfo = null;
   let octofarmStatistics = null;
   let printStatistics = null;
+
   if (typeof statistics != "undefined") {
     currentOperations = statistics.currentOperations;
     currentOperationsCount = statistics.currentOperationsCount;
@@ -38,8 +39,23 @@ setInterval(async function() {
   }
   let printerInfo = [];
   let systemInformation = await SystemInfo.find({});
+  let sysInfo = {
+    osInfo: systemInformation[0].osInfo,
+    cpuInfo: systemInformation[0].cpuInfo,
+    cpuLoad: systemInformation[0].cpuLoad,
+    memoryInfo: systemInformation[0].memoryInfo,
+    sysUptime: systemInformation[0].sysUptime,
+    sysProcess: systemInformation[0].sysProcess
+  };
   let roll = await Roll.find({});
   let clientSettings = await ClientSettings.find({});
+  let cSettings = {
+    settings: clientSettings[0].settings,
+    panelView: clientSettings[0].panelView,
+    listView: clientSettings[0].listView,
+    cameraView: clientSettings[0].cameraView
+  };
+
   for (let i = 0; i < printers.length; i++) {
     let selectedFilament = null;
     if (typeof printers[i].selectedFilament != "undefined") {
@@ -82,9 +98,9 @@ setInterval(async function() {
     farmInfo: farmInfo,
     octofarmStatistics: octofarmStatistics,
     printStatistics: printStatistics,
-    systemInfo: systemInformation[0],
+    systemInfo: sysInfo,
     filament: roll,
-    clientSettings: clientSettings
+    clientSettings: cSettings
   };
 }, 500);
 
@@ -110,11 +126,15 @@ router.get("/printerInfo/", ensureAuthenticated, function(req, res) {
 });
 
 setInterval(function() {
-  var msg = Math.random();
-  dashboardInfo = JSON.stringify(dashboardInfo);
-  for (clientId in clients) {
-    clients[clientId].write("data: " + dashboardInfo + "\n\n"); // <- Push a message to a single attached client
-  }
+  yj.stringifyAsync(dashboardInfo, (err, data) => {
+    if (!err) {
+      for (clientId in clients) {
+        clients[clientId].write("data: " + data + "\n\n"); // <- Push a message to a single attached client
+      }
+    } else {
+      console.log(err);
+    }
+  });
 }, 500);
 
 module.exports = router;

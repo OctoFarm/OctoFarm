@@ -31,10 +31,10 @@ source.onmessage = function(e) {
       PrinterManager.init(res.printerInfo);
     } else {
       printerInfo = res.printerInfo;
-      if (res.clientSettings[0].panelView.currentOp) {
+      if (res.clientSettings.panelView.currentOp) {
         currentOperations(res.currentOperations, res.currentOperationsCount);
       }
-      updateState(res.printerInfo, res.clientSettings[0].panelView.currentOp);
+      updateState(res.printerInfo, res.clientSettings.panelView.currentOp);
     }
   }
 };

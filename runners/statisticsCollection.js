@@ -5,7 +5,6 @@ const filamentType = require("../config/filaments.js");
 const returnFilamentTypes = filamentType.returnFilamentTypes;
 
 let farmStats = [];
-let farmRunner = null;
 
 class StatisticsCollection {
   static returnStats() {
@@ -31,8 +30,9 @@ class StatisticsCollection {
       farmStats[0] = newfarmStats;
       newfarmStats.save();
     }
-    farmRunner = setInterval(async () => {
-      farmStats[0].save().catch(err => {
+    //Saving is pointless now, it keeps crashing anyway due to some concurrent error even though it's the only thing hitting this database...
+    setInterval(async () => {
+      await farmStats[0].save().catch(err => {
         clearInterval(farmRunner);
         setTimeout(async function() {
           console.log(
@@ -176,9 +176,7 @@ class StatisticsCollection {
 
     farmStats[0].farmInfo = farmInfo;
   }
-  static stop() {
-    clearInterval(farmRunner);
-  }
+
   static async octofarmStatistics(farmPrinters) {
     let octofarmStatistics = await this.blankFarmStatistics();
     let history = await History.find({});

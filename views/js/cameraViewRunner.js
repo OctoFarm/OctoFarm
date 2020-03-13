@@ -32,10 +32,10 @@ source.onmessage = function(e) {
       PrinterManager.init(res.printerInfo);
     } else {
       printerInfo = res.printerInfo;
-      if (res.clientSettings[0].cameraView.currentOp) {
+      if (res.clientSettings.cameraView.currentOp) {
         currentOperations(res.currentOperations, res.currentOperationsCount);
       }
-      updateState(res.printerInfo, res.clientSettings[0].cameraView);
+      updateState(res.printerInfo, res.clientSettings.cameraView);
     }
   }
 };

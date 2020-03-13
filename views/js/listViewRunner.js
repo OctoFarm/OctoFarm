@@ -23,10 +23,10 @@ source.onmessage = function(e) {
       PrinterManager.init(res.printerInfo);
     } else {
       printerInfo = res.printerInfo;
-      if (res.clientSettings[0].listView.currentOp) {
+      if (res.clientSettings.listView.currentOp) {
         currentOperations(res.currentOperations, res.currentOperationsCount);
       }
-      updateState(res.printerInfo, res.clientSettings[0].listView);
+      updateState(res.printerInfo, res.clientSettings.listView);
     }
   }
 };
