@@ -4,6 +4,55 @@ All notable changes to this project will be documented in this file.
 
 ## [Released]
 
+## [v1.1.4]
+
+## [] - TBA
+
+### Added
+
+### Changed
+
+### Removed
+
+### Deprecated
+
+### Fixed
+
+- Blue screen (selecting) when double clicking a camera view to enlarge.
+
+### Security
+
+## [1.1.3 - BETA :: includes 1.1.1 + 1.1.2] - 13/03/2020
+
+### Added
+
+- Updated to async JSON.stringify implentation to alleviate any further stringify issues.
+- 2 Docker installation options:
+  https://hub.docker.com/r/thetinkerdad/octofarm - Big thanks to youtuber TheTinkerDad for creating and managing this one.
+  https://hub.docker.com/repository/docker/octofarm/octofarm - Thanks to user Knoker for the help and PR with this.
+
+### Changed
+
+- Nothing
+
+### Removed
+
+- Nothing
+
+### Deprecated
+
+- Nothing
+
+### Fixed
+
+- Issue #1 - Panel View wasn't respecting the Hide Closed client setting
+- Issue regarding octoprint (I believe, need to test further and reproduce) missing sending temperature data for history
+- Cured the memory issue by sending malformed and large objects through JSON.parse
+
+### Securit
+
+- Nothing
+
 ## [1.1.0 - BETA] - 12/03/2020
 
 ### Added
@@ -43,38 +92,9 @@ Nothing else from 1.0 I believe
 
 - Camera rotation not sticking with double click enlarge.
 
-## [Unreleased Template]
+## [TEMPLATE]
 
-## [1.1.3 - BETA :: includes 1.1.1 + 1.1.2] - 13/03/2020
-
-### Added
-
-- Updated to async JSON.stringify implentation to alleviate any further stringify issues.
-- 2 Docker installation options:
-  https://hub.docker.com/r/thetinkerdad/octofarm - Big thanks to youtuber TheTinkerDad for creating and managing this one.
-  https://hub.docker.com/repository/docker/octofarm/octofarm - Thanks to user Knoker for the help and PR with this.
-
-### Changed
-
-- Nothing
-
-### Removed
-
-- Nothing
-
-### Deprecated
-
-- Nothing
-
-### Fixed
-
-- Issue #1 - Panel View wasn't respecting the Hide Closed client setting
-- Issue regarding octoprint (I believe, need to test further and reproduce) missing sending temperature data for history
-- Cured the memory issue by sending malformed and large objects through JSON.parse
-
-### Security
-
-## [Unreleased Template]
+## [v1.1.4]
 
 ## [] - TBA
 

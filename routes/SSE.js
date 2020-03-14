@@ -61,6 +61,7 @@ setInterval(async function() {
   let printerInfo = [];
   let systemInformation = await SystemInfo.find({});
   let sysInfo = null;
+  //There is a circular structure in here somewhere!?
   if (typeof systemInformation != undefined || systemInformation.length > 1) {
     sysInfo = {
       osInfo: systemInformation[0].osInfo,
