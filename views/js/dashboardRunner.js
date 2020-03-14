@@ -318,9 +318,15 @@ class dashUpdate {
             document.getElementById(
               "printerButton-" + printer.index
             ).disabled = false;
+            document.getElementById(
+              "octoButton-" + printer.index
+            ).disabled = false;
           } else {
             document.getElementById(
               "printerButton-" + printer.index
+            ).disabled = true;
+            document.getElementById(
+              "octoButton-" + printer.index
             ).disabled = true;
           }
         } else {
@@ -339,12 +345,21 @@ class dashUpdate {
                 </div>
                 <button  id="printerButton-<%= printer.index %>"
                   type="button"
-                  class="btn btn-secondary btn-sm float-right"
+                  class="btn btn-secondary btn-sm float-right d-block ml-1"
                   data-toggle="modal"
                   data-target="#printerManagerModal"
                 >
                   <i class="fas fa-cog"></i>
                 </button>
+                <a href="http://<%= printer.ip%>:<%= printer.port%>" target="_blank">
+                <button  id="octoButton-<%= printer.index %>"
+                    type="button"
+                    class="btn btn-secondary btn-sm float-right d-block ml-1"
+                    data-toggle="modal"                    
+                >
+                    <i class="fas fa-globe-europe"></i>
+                  </button>
+                </a>
                 <small class="pt-2 float-left ml-1 text-white"><i class="fas fa-network-wired"></i> ${printer.ip}:${printer.port}</small>
               </li>
             </div>
@@ -398,6 +413,29 @@ class dashUpdate {
     ) / 100}°C <i class="fas fa-bullseye"></i> ${Math.round(
       (farmInfo.activeToolT + farmInfo.activeBedT) * 100
     ) / 100}°C`;
+      
+    document.getElementById(
+      "avgTool0Heat"
+    ).innerHTML = `<i class="far fa-circle"></i> ${Math.round(
+      farmInfo.avgToolA * 100
+    ) / 100}°C <i class="fas fa-bullseye"></i> ${Math.round(
+      farmInfo.avgToolT * 100
+    ) / 100}°C`;
+    document.getElementById(
+      "avgBedHeat"
+    ).innerHTML = `<i class="far fa-circle"></i> ${Math.round(
+      farmInfo.avgBedA * 100
+    ) / 100}°C <i class="fas fa-bullseye"></i> ${Math.round(
+      farmInfo.avgBedT * 100
+    ) / 100}°C`;
+    document.getElementById(
+      "avgPrintHeat"
+    ).innerHTML = `<i class="far fa-circle"></i> ${Math.round(
+      (farmInfo.avgToolA + farmInfo.avgBedA) * 100
+    ) / 100}°C <i class="fas fa-bullseye"></i> ${Math.round(
+      (farmInfo.avgToolT + farmInfo.avgBedT) * 100
+    ) / 100}°C`;
+      
   }
   static farmStatistics(octofarmStatistics) {
     document.getElementById("activeHours").innerHTML =

@@ -37,6 +37,16 @@ clientSettings[0].listView.hideOff){%>
     >
       <i class="fas fa-cog"></i>
     </button>
+      <a href="http://<%= printer.ip%>:<%= printer.port%>" target="_blank">
+          <button  id="octoButton-<%= printer.index %>"
+            type="button"
+            class="btn btn-dark"
+            data-toggle="modal"
+            data-target="http://<%= printer.ip%>:<%= printer.port%>" target="_blank"
+          disabled>
+            <i class="fas fa-globe-europe"></i>
+          </button>
+</a>
     <% }else{ %>
     <button
       id="printerButton-<%= printer.index %>"
@@ -47,6 +57,16 @@ clientSettings[0].listView.hideOff){%>
     >
       <i class="fas fa-cog"></i>
     </button>
+      <a href="http://<%= printer.ip%>:<%= printer.port%>" target="_blank">
+          <button  id="octoButton-<%= printer.index %>"
+            type="button"
+            class="btn btn-dark"
+            data-toggle="modal"
+            data-target="http://<%= printer.ip%>:<%= printer.port%>" target="_blank"
+          >
+            <i class="fas fa-globe-europe"></i>
+          </button>
+</a>
     <% } %>
   </td>
   <td>

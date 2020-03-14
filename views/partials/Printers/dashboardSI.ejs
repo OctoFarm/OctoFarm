@@ -12,6 +12,7 @@
         systemInfo.sysProcess.pcpu * 10 ) / 10 %>%</span>
       <i class="fas fa-square text-primary"></i> <b>User: </b><span id="userCPU"><%= Math.round(
         systemInfo.cpuLoad.currentload_user * 10 ) / 10 %>%</span> <br />
+        <i class="fas fa-square text-success"></i> <b>Free: </b><span id="freeCPU"><%= 100 - Math.round(((Math.round( systemInfo.sysProcess.pcpu * 10) / 10 + Math.round( systemInfo.cpuLoad.currentload_user * 10) / 10 + Math.round( systemInfo.cpuLoad.currentload_system * 10) / 10)) * 10 ) / 10 %>%</span> <br />
       </span>
     <div class="progress mb-0">
       <div id="systemCPUProg"

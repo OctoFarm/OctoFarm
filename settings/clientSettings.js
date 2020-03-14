@@ -5,7 +5,8 @@ class ClientSettings {
     ClientSettingsDB.find({}).then(settings => {
       if (settings.length < 1) {
         let settings = {
-          backgroundURL: null
+          backgroundURL: null,
+          currentTheme: null
         };
         let panelView = {
           currentOp: false,

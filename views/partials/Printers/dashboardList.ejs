@@ -17,12 +17,22 @@
     </div>
     <button  id="printerButton-<%= printer.index %>"
       type="button"
-      class="btn btn-secondary btn-sm float-right"
+      class="btn btn-secondary btn-sm float-right d-block ml-1"
       data-toggle="modal"
       data-target="#printerManagerModal"
     >
       <i class="fas fa-cog"></i>
     </button>
+<a href="http://<%= printer.ip%>:<%= printer.port%>" target="_blank">
+    <button  id="octoButton-<%= printer.index %>"
+            type="button"
+            class="btn btn-secondary btn-sm float-right d-block ml-1"
+            data-toggle="modal"
+            data-target="http://<%= printer.ip%>:<%= printer.port%>" target="_blank"
+    >
+            <i class="fas fa-globe-europe"></i>
+          </button>
+</a>
     <small class="pt-2 float-left ml-1 text-white"><i class="fas fa-network-wired"></i> <%= printer.ip%>:<%= printer.port%></small>
   </li>
 </div>
@@ -41,12 +51,22 @@
           </div>
           <button  id="printerButton-<%= printer.index %>"
             type="button"
-            class="btn btn-secondary btn-sm float-right"
+            class="btn btn-secondary btn-sm float-right d-block ml-1"
             data-toggle="modal"
             data-target="#printerManagerModal"
           disabled>
             <i class="fas fa-cog"></i>
           </button>
+<a href="http://<%= printer.ip%>:<%= printer.port%>" target="_blank">
+          <button  id="octoButton-<%= printer.index %>"
+            type="button"
+            class="btn btn-secondary btn-sm float-right d-block ml-1"
+            data-toggle="modal"
+            data-target="http://<%= printer.ip%>:<%= printer.port%>" target="_blank"
+          disabled>
+            <i class="fas fa-globe-europe"></i>
+          </button>
+</a>
           <small class="pt-2 float-left ml-1 text-white"><i class="fas fa-network-wired"></i> <%= printer.ip%>:<%= printer.port%></small>
         </li>
       </div>

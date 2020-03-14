@@ -26,6 +26,8 @@ class ClientSettings {
             document.getElementById("clientBackground").value =
               res.backgroundURL;
           }
+          //document.getElementById("currentTheme").value =  res.currentTheme;
+          
           document.getElementById("panelCurrentOpOn").checked =
             res.panelView.currentOp;
           document.getElementById("panelHideOffline").checked =
@@ -53,6 +55,7 @@ class ClientSettings {
     let opts = {
       settings: {
         backgroundURL: document.getElementById("clientBackground").value
+        //currentTheme: document.getElementById("currentTheme").value
       },
       panelView: {
         currentOp: document.getElementById("panelCurrentOpOn").checked,

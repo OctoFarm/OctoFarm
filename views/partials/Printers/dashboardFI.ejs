@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-md-4 col-lg-4 text-center text-light">
+  <div class="col-md-3 col-lg-3 text-center text-light">
     <b><i class="fas fa-clock"></i> Average Estimated Time</b>
     <p id="avgEstimatedTime"><%= helpers.generateTime(farmInfo.avgEstimateTime) %></p>
     <b><i class="fas fa-clock"></i> Average Remaining Time</b>
@@ -7,7 +7,7 @@
     <b><i class="fas fa-clock"></i> Average Elapsed Time</b>
     <p id="avgElapsedTime" class="mb-0"><%= helpers.generateTime(farmInfo.avgElapsedTime) %></p>
   </div>
-  <div class="col-md-4 col-lg-4 text-center text-light">
+  <div class="col-md-3 col-lg-3 text-center text-light">
     <b><i class="fas fa-clock"></i> Cumulative Estimated Time</b>
     <p id="cumEstimatedTime"><%= helpers.generateTime(farmInfo.totalEstimateTime) %></p>
     <b><i class="fas fa-clock"></i> Cumulative Remaining Time</b>
@@ -15,7 +15,25 @@
     <b><i class="fas fa-clock"></i> Cumulative Elapsed Time</b id="cumElapsedTime">
     <p id="cumElapsedTime" class="mb-0"><%= helpers.generateTime(farmInfo.totalElapsedTime) %></p>
   </div>
-  <div class="col-md-4 col-lg-4 text-center text-light">
+  <div class="col-md-3 col-lg-3 text-center text-light">
+    <b><i class="fas fa-thermometer-half"></i> Average Tool Heat</b>
+    <p id="avgTool0Heat">
+      <i class="far fa-circle"></i> <%= farmInfo.avgToolA %>°C
+      <i class="fas fa-bullseye"></i> <%= farmInfo.avgToolT %>°C
+    </p>
+    <b><i class="fas fa-thermometer-half"></i> Average Bed Heat</b>
+    <p id="avgBedHeat">
+      <i class="far fa-circle"></i> <%= farmInfo.avgBedA %>°C
+      <i class="fas fa-bullseye"></i> <%= farmInfo.avgBedT %>°C
+    </p>
+    <b><i class="fas fa-thermometer-half"></i> Average Printer Heat</b>
+    <p id="avgPrintHeat" class="mb-0">
+      <i class="far fa-circle"></i> <%= Math.round((farmInfo.avgToolA +
+      farmInfo.avgBedA) * 100) / 100 %>°C <i class="fas fa-bullseye"></i> <%=
+      Math.round((farmInfo.avgToolT + farmInfo.avgBedT) * 100) / 100 %>°C
+    </p>
+  </div>    
+  <div class="col-md-3 col-lg-3 text-center text-light">
     <b><i class="fas fa-thermometer-half"></i> Cumulative Tool Heat</b>
     <p id="cumTool0Heat">
       <i class="far fa-circle"></i> <%= farmInfo.activeToolA %>°C
