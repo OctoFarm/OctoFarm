@@ -22,11 +22,12 @@ clientSettings[0].panelView.hideOff){%>
         class="col-sm-12 col-md-4 col-lg-3 col-xl-2"
         id="panelInstance-<%= printer.index %>"
       >
-        <%}%> <% let rotation = "" %> <% if(typeof printer.settingsWebcam !=
-        'undefined'){%> <% if(printer.settingsWebcam.flipH){%> <% rotation +=
-        "flipH"; %> <%}else if(printer.settingsWebcam.flipV){%> <% rotation +=
-        "flipV"; %> <% }else if(printer.settingsWebcam.rotate90){%> <% rotation
-        += " rotate90"; %> <% } %> <% }%>
+        <%}%> <% let flipH = ""; %> <% let flipV = ""; %> <% let rotate90 = "";
+        %> <% if (typeof printer.settingsWebcam != "undefined") { %> <% if
+        (printer.settingsWebcam.flipH) { %> <% flipH = "flipH"; %> <% } %> <% if
+        (printer.settingsWebcam.flipV) { %> <% flipV = "flipV"; %> <% } %> <% if
+        (printer.settingsWebcam.rotate90) { %> <% rotate90 = "rotate90"; %> <% }
+        %> <% } %>
         <div class="card mt-1 mb-1 ml-1 mr-1 text-center">
           <div class="card-header dashHeader">
             <h6 class="float-left mb-0" id="panIndex-<%= printer.index %>">
@@ -86,7 +87,7 @@ clientSettings[0].panelView.hideOff){%>
                 loading="lazy"
                 id="panCamera-<%= printer.index %>"
                 width="100%"
-                class=""
+                class="<%= flipH %> <%= flipV %> <%= rotate90 %> "
                 src="<%= camURL %>"
                 style="pointer-events: none;"
               />
