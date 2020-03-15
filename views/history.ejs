@@ -55,7 +55,7 @@
             <% if(typeof print.printHistory.filamentSelection != 'undefined' &&
             print.printHistory.filamentSelection != "None chosen..."){%> <% let
             filament = print.printHistory.filamentSelection.roll %> <%=
-            filament.name %> [<%= filament.colour %> / <%= filament.type[1] %>]
+            filament.name %> [<%= filament.colour %> / <%= filament.type[1] %> - <%= filament.cost %>]
             <%}else{%> None selected... <% } %>
           </td>
           <td>
@@ -67,12 +67,14 @@
                         %> <% let filamentLength = print.printHistory.filamentLength / 1000 %> <% 
                         filamentLength = Math.round(filamentLength*100)/100 %> <%=
                         filamentLength %>m / <% let filamentWeight =
-                        3.14*(1.75/2)^2*1.24*filamentLength %> <%= filamentWeight %>g <%
+                        3.14*(1.75/2)^2*1.24*filamentLength %> <%= filamentWeight %>g - $<% 
+              let printCost =  (filament.cost / 1000) * filamentWeight %> <%= printCost%> <%
                     }else{ 
                         %> <% let filamentLength = print.printHistory.filamentLength
                         / 1000 %> <% filamentLength = Math.round(filamentLength*100)/100 %>
                         <%= filamentLength %>m / <% let filamentWeight =
-                        3.14*(1.75/2)^2*1.24*filamentLength %> <%= filamentWeight %>g <% 
+                        3.14*(1.75/2)^2*1.24*filamentLength %> <%= filamentWeight %>g <%= filamentWeight %>g - $<% 
+              let printCost =  (filament.cost / 1000) * filamentWeight %> <%= printCost %> <% 
                     }
                 %> <% 
                 }else{ 
@@ -84,17 +86,20 @@
                         } %> <% 
                     })%> <% 
 
-                    if(print.printHistory.filamentLength === "-"){ %> - <% }
-                    else{
+                    if(print.printHistory.filamentLength === "-"){ %> - <% 
+                    }else{
                         %> <% let filamentLength = print.printHistory.filamentLength / 1000 %> <%
                         filamentLength = Math.round(filamentLength*100)/100 %> <%=
                         filamentLength %>m / <% let filamentWeight =
                         3.14*(1.75/2)^2*parseFloat(currentType)*filamentLength %> <%=
-                        filamentWeight %>g <% 
+                        filamentWeight %>g <%= filamentWeight %>g - $<% 
+             let printCost =  (filament.cost / 1000) * filamentWeight %> <%= printCost%> <% 
                     } %> <% 
                 } %> <% 
               }else{
-                  %> <% if(print.printHistory.reason === "cancelled"){ %> <% }else{ %> <% }
+                  %> <% 
+                    if(print.printHistory.reason === "cancelled"){ %> Canceled <% 
+                    }else{ %> <% }
                   %> <% 
               } %>
           </td>

@@ -236,10 +236,10 @@ class StatisticsCollection {
     if (octofarmStatistics.idlePercent === Infinity) {
       octofarmStatistics.idlePercent = 0;
     }
-    octofarmStatistics.activePercent = Math.floor(
-      Math.round(octofarmStatistics.activePercent * 10) / 10);
-    octofarmStatistics.idlePercent = Math.floor(
-      Math.round(octofarmStatistics.idlePercent * 10) / 10);
+    octofarmStatistics.activePercent = 
+      Math.round(octofarmStatistics.activePercent * 10) / 10;
+    octofarmStatistics.idlePercent = 
+      Math.round(octofarmStatistics.idlePercent * 10) / 10;
 
     let storageFree = [];
     let storageTotal = [];
@@ -274,10 +274,8 @@ class StatisticsCollection {
 
     octofarmStatistics.storageUsed = storageTotalTotal - storageFreeTotal;
     octofarmStatistics.storageRemain = storageFreeTotal;
-    octofarmStatistics.storagePercent = Math.floor(
-      (octofarmStatistics.storageUsed / storageTotalTotal) * 100
-    );
-
+    octofarmStatistics.storagePercent = Math.round((
+      (octofarmStatistics.storageUsed / storageTotalTotal) * 100)* 10) / 10;
     octofarmStatistics.largestFile = Math.max(...fileSizes);
     octofarmStatistics.smallestFile = Math.min(...fileSizes);
 
@@ -342,29 +340,29 @@ class StatisticsCollection {
     printStatistics.cancelled = cancelled.length;
     printStatistics.failed = failed.length;
 
-    printStatistics.completedPercent = Math.floor(
+    printStatistics.completedPercent = 
       (completed.length /
         (completed.length + cancelled.length + failed.length)) *
-      100);
+      100;
     if (isNaN(printStatistics.completedPercent)) {
       printStatistics.completedPercent = 100;
     }
     if (printStatistics.completedPercent === Infinity) {
       printStatistics.completedPercent = 0;
     }
-    printStatistics.cancelledPercent = Math.floor(
+    printStatistics.cancelledPercent = 
       (cancelled.length /
         (cancelled.length + completed.length + failed.length)) *
-      100);
+      100;
     if (isNaN(printStatistics.cancelledPercent)) {
       printStatistics.cancelledPercent = 100;
     }
     if (printStatistics.cancelledPercent === Infinity) {
       printStatistics.cancelledPercent = 0;
     }
-    printStatistics.failedPercent = Math.floor(
+    printStatistics.failedPercent = 
       (failed.length / (failed.length + completed.length + cancelled.length)) *
-      100);
+      100;
     if (isNaN(printStatistics.failedPercent)) {
       printStatistics.failedPercent = 100;
     }

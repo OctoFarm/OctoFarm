@@ -115,6 +115,7 @@ class HistoryCollection {
       printerIndex: 0,
       printerName: "",
       success: true,
+      reason: "",
       fileName: "",
       filePath: "",
       startDate: "",
@@ -123,6 +124,8 @@ class HistoryCollection {
       spoolUsed: "",
       filamentLength: 0,
       filamentVolume: 0,
+      filamentSelection: "",
+      job: "",
       notes: ""
     };
     return printHistory;
@@ -143,7 +146,7 @@ class HistoryCollection {
 const generateTime = function(seconds) {
   let string = "";
   if (seconds === undefined || isNaN(seconds)) {
-    string = "Done";
+    string = "Time Unavailable";
   } else {
     let days = Math.floor(seconds / (3600 * 24));
 
