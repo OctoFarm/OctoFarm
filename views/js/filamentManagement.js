@@ -50,7 +50,7 @@ async function load() {
         filamentName.value === "" ||
         filamentType.value === "0" ||
         filamentColour.value === "" ||
-        filamentColour.value === ""
+        filamentCost.value === ""
       ) {
           UI.createMessage(
           {

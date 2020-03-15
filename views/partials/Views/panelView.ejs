@@ -74,7 +74,7 @@ clientSettings[0].panelView.hideOff){%>
             >
               <% if(typeof printer.job != 'undefined' && typeof printer.job.file
               != 'undefined'){ %><i class="fas fa-file-code"></i> <%=
-              printer.job.file.name %> <%}else{%><i
+              printer.job.file.name.substring(0, 10) %> <%}else{%><i
                 class="fas fa-file-code"
               ></i>
               No File Selected <%}%>
