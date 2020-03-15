@@ -906,25 +906,29 @@
                                         <div class="col-sm-12 col-lg-12">
                                           <form>
                                             <div class="form-row">
-                                              <div class="col-md-3 mb-3">
+                                              <div class="col-md-2 mb-2">
                                                 <label for="filamentName">Name</label>
                                                 <input type="text" class="form-control" id="filamentName" placeholder="Name / Identifier" required>
                                               </div>
-                                              <div class="col-md-3 mb-3">
+                                              <div class="col-md-2 mb-2">
                                                 <label for="filamentTypeSelect">Colour</label>
                                                 <select id="filementTypeSelect" class="form-control bg-dark text-light" required>
                                                   <option id="filamentSelect" selected value="0">Select Filament Type</option>
 
                                                 </select>
                                               </div>
-                                              <div class="col-md-3 mb-3">
+                                              <div class="col-md-2 mb-2">
                                                 <label for="filamentColour">Colour</label>
                                                 <input type="text" class="form-control" id="filamentColour" placeholder="Filament Colour" required>
                                               </div>
-                                              <div class="col-md-3 mb-3">
+                                              <div class="col-md-2 mb-2">
                                                 <label for="filamentManufacturer">Manufacturer</label>
                                                 <input type="text" class="form-control" id="filamentManufacturer" placeholder="Filament Manufacturer">
                                               </div>
+                                              <div class="col-md-2 mb-2">
+                                                <label for="filamentCost">Cost: $</label>
+                                                <input type="text" class="form-control" id="filamentCost" placeholder="Filament Cost">
+                                              </div>                                                                                                
                                             </div>
                                             <button id="addFilamentBtn" class="btn btn-success" type="submit">Add Filament</button>
                                           </form>
@@ -940,6 +944,7 @@
                                               <th scope="col">Type</th>
                                               <th scope="col">Colour</th>
                                               <th scope="col">Manufacturer</th>
+                                              <th scope="col">Cost</th>
                                           </tr>
                                       </thead>
                                       <tbody id="addFilamentTable">
@@ -952,6 +957,7 @@
                                               <td><%= roll.type[1] %></td>
                                               <td><%= roll.colour %></td>
                                               <td><%= roll.manufacturer %></td>
+                                              <td><%= roll.cost %></td>
                                               <td><button type="button" class="btn btn-danger delete">
                                                 <i class="fas fa-trash deleteIcon"></i>
                                               </button></td>

@@ -84,7 +84,8 @@ class StatisticsCollection {
               name: name,
               progress: Math.floor(printer.progress.completion),
               progressColour: "success",
-              timeRemaining: printer.progress.printTimeLeft
+              timeRemaining: printer.progress.printTimeLeft,
+              timeElapsed: printer.progress.printTime
             });
           }
 
@@ -99,7 +100,8 @@ class StatisticsCollection {
               name: name,
               progress: Math.floor(printer.progress.completion),
               progressColour: "warning",
-              timeRemaining: printer.progress.printTimeLeft
+              timeRemaining: printer.progress.printTimeLeft,
+              timeElapsed: printer.progress.printTime
             });
           }
         }
@@ -167,11 +169,11 @@ class StatisticsCollection {
     farmInfo.avgToolA =
       farmInfo.activeToolA / printTimeElapsed.length;
     farmInfo.avgToolT =
-      farmInfo.activeToolT / printTimeRemaining.length;
+      farmInfo.activeToolT / printTimeElapsed.length;
     farmInfo.avgBedA =
-      farmInfo.activeBedA / printTimeEstimate.length;
+      farmInfo.activeBedA / printTimeElapsed.length;
     farmInfo.avgBedT =
-      farmInfo.activeBedT / printTimeEstimate.length;
+      farmInfo.activeBedT / printTimeElapsed.length;
       
     farmInfo.totalElapsedTime = printTimeElapsed.reduce((a, b) => a + b, 0);
     farmInfo.totalRemainingTime = printTimeRemaining.reduce((a, b) => a + b, 0);
@@ -290,6 +292,7 @@ class StatisticsCollection {
     let printTimes = [];
     let filamentLengths = [];
     let filamentWeights = [];
+    //let filamentCosts = [];
     history.forEach(print => {
       if (print.printHistory.filamentLength != "-") {
         filamentLengths.push(print.printHistory.filamentLength);
@@ -402,7 +405,7 @@ class StatisticsCollection {
     }
 
     printStatistics.filamentUsage =
-      totalFilamentLength + "m / " + totalFilamentWeight + "g";
+      totalFilamentLength + "m / " + totalFilamentWeight + "g"; //TODO: Add total cost here.
 
     farmStats[0].printStatistics = printStatistics;
   }

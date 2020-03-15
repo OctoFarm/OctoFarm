@@ -45,12 +45,20 @@ async function load() {
       let filamentManufacturer = document.getElementById(
         "filamentManufacturer"
       );
-
+      let filamentCost = document.getElementById("filamentCost");
       if (
         filamentName.value === "" ||
         filamentType.value === "0" ||
+        filamentColour.value === "" ||
         filamentColour.value === ""
       ) {
+          UI.createMessage(
+          {
+            type: "danger",
+            msg: "Error: Could not add roll to database, Fill in all fields..."
+          },
+          "filamentMessage"
+        );
         return;
       }
 
@@ -61,7 +69,9 @@ async function load() {
           filamentType.options[filamentType.selectedIndex].text
         ],
         colour: filamentColour.value,
+        cost: filamentCost.value,
         manufacturer: filamentManufacturer.value
+        
       };
       let post = await Client.post("filament/saveNew", opts);
       if (post.status === 200) {
@@ -83,6 +93,7 @@ async function load() {
             }</td>
             <td>${filamentColour.value}</td>
             <td>${filamentManufacturer.value}</td>
+            <td>${filamentCost.value}</td>
             <td><button type="button" class="btn btn-danger delete">
               <i class="fas fa-trash deleteIcon"></i>
             </button></td>

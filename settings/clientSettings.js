@@ -6,7 +6,7 @@ class ClientSettings {
       if (settings.length < 1) {
         let settings = {
           backgroundURL: null,
-          currentTheme: null
+          //currentTheme: null
         };
         let panelView = {
           currentOp: false,

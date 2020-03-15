@@ -22,7 +22,8 @@ router.post("/saveNew", ensureAuthenticated, async (req, res) => {
     name: filament.name,
     type: filament.type,
     colour: filament.colour,
-    manufacturer: filament.manufacturer
+    manufacturer: filament.manufacturer,
+    cost: filament.cost
   };
   let newFilament = new Roll({
     roll

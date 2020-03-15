@@ -593,7 +593,7 @@ export default class PrinterManager {
           filamentSelect.insertAdjacentHTML(
             "beforeend",
             `  
-                <option value="${e._id}">${e.roll.name} - ${e.roll.type[1]} - ${e.roll.colour} (${e.roll.manufacturer})</option>
+                <option value="${e._id}">${e.roll.name} - ${e.roll.type[1]} - ${e.roll.colour} - ${e.roll.cost} (${e.roll.manufacturer})</option>
             `
           );
         });

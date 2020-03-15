@@ -35,25 +35,33 @@ export default function currentOperations(
       progress.innerHTML = current.progress + "%";
       progress.className = `progress-bar progress-bar-striped bg-${current.progressColour}`;
       document.getElementById(
+        "elapsedTime-" + current.index
+      ).innerHTML = 'Elapsed: ' + Calc.generateTime(current.timeElapsed);
+      document.getElementById(
         "currentTime-" + current.index
-      ).innerHTML = Calc.generateTime(current.timeRemaining);
+      ).innerHTML = 'Remaining: ' +  Calc.generateTime(current.timeRemaining);
     } else {
       document.getElementById("currentOperationsBody").insertAdjacentHTML(
         "beforeend",
         `
                 <div id="currentOpCard-${current.index}"
                 class="card card-block text-white bg-secondary d-inline-block"
-                style="min-width: 200px; height:85px;"
+                style="min-width: 200px; height:100px;"
               >
                   <div class="card-header pb-1 pt-1 pl-2 pr-2">${
                     current.index
                   }. ${current.name}</div>
                   <div class="card-body  pb-0 pt-2 pl-2 pr-2">
+                  <h6 id="elapsedTime-${
+                    current.index
+                  }" class="pb-0 text-center" style="font-size:0.6rem;">Elapsed: ${Calc.generateTime(
+                      current.timeElapsed
+                    )}</h6
                   <h6 id="currentTime-${
                     current.index
-                  }" class="pb-0 text-center" style="font-size:0.6rem;">${Calc.generateTime(
-          current.timeRemaining
-        )}</h6>
+                  }" class="pb-0 text-center" style="font-size:0.6rem;">Remaining: ${Calc.generateTime(
+                      current.timeRemaining
+                    )}</h6>
                     <div class="progress">
                       <div id="currentProgress-${current.index}"
                         class="progress-bar progress-bar-striped bg-${

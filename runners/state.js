@@ -713,7 +713,8 @@ class Runner {
       name: rolls.roll.name,
       type: rolls.roll.type,
       colour: rolls.roll.colour,
-      manufacturer: rolls.roll.manufacturer
+      manufacturer: rolls.roll.manufacturer,
+      cost: rolls.roll.cost
     };
     return farmPrinters[filament.index].selectedFilament;
   }
