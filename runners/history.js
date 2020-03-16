@@ -55,6 +55,7 @@ class HistoryCollection {
       success: true,
       reason: payload.reason,
       fileName: payload.name,
+      fileDisplay: payload.display,
       filePath: payload.path,
       startDate: startDate,
       endDate: endDate,
