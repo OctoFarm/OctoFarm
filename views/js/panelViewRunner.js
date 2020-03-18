@@ -14,12 +14,6 @@ if (port != "") {
   port = ":" + port;
 }
 
-//Close modal event listeners...
-$("#printerManagerModal").on("hidden.bs.modal", function(e) {
-  //Fix for mjpeg stream not ending when element removed...
-  document.getElementById("printerControlCamera").src = "";
-});
-
 var source = new EventSource("/sse/printerInfo/");
 source.onmessage = function(e) {
   if (e.data != null) {

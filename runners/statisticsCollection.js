@@ -32,16 +32,8 @@ class StatisticsCollection {
     }
     //Saving is pointless now, it keeps crashing anyway due to some concurrent error even though it's the only thing hitting this database...
     setInterval(async () => {
-      await farmStats[0].save().catch(err => {
-        clearInterval(farmRunner);
-        setTimeout(async function() {
-          console.log(
-            "Couldn't save stats, Restarting Statistics Collection: Err MSG:" +
-              err
-          );
-          let restart = await StatisticsCollection.init();
-          console.log(restart);
-        }, 5000);
+      farmStats[0].save().catch(err => {
+        console.log(err, "Error saving farm statistics...");
       });
     }, 5000);
     return "Statistics collection has started...";

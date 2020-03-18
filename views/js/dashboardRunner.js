@@ -43,18 +43,6 @@ source.onclose = function(e) {
     "Communication with the server has been suddenly lost, please restart client and try again..."
   );
 };
-//Close modal event listeners...
-$("#printerManagerModal").on("hidden.bs.modal", function(e) {
-  //Fix for mjpeg stream not ending when element removed...
-  document.getElementById("printerControlCamera").src = "";
-});
-$("#connectionModal").on("hidden.bs.modal", function(e) {
-  //Fix for mjpeg stream not ending when element removed...
-  if (document.getElementById("connectionAction")) {
-    document.getElementById("connectionAction").remove();
-  }
-});
-
 //Initial listeners
 document.getElementById("connectAllBtn").addEventListener("click", e => {
   dashActions.connectAll();

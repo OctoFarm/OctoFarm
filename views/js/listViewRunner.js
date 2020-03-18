@@ -43,12 +43,6 @@ source.onclose = function(e) {
   );
 };
 
-//Close modal event listeners...
-$("#printerManagerModal").on("hidden.bs.modal", function(e) {
-  //Fix for mjpeg stream not ending when element removed...
-  document.getElementById("printerControlCamera").src = "";
-});
-
 //Setup page listeners...
 let printerCard = document.querySelectorAll("[id^='printerButton-']");
 printerCard.forEach(card => {

@@ -13,6 +13,19 @@ let previousLog = null;
 
 let lastPrinter = null;
 
+//Close modal event listeners...
+$("#printerManagerModal").on("hidden.bs.modal", function(e) {
+  //Fix for mjpeg stream not ending when element removed...
+  document.getElementById("printerControlCamera").src = "";
+  document.getElementById("printerControlCamera").remove();
+});
+$("#connectionModal").on("hidden.bs.modal", function(e) {
+  //Fix for mjpeg stream not ending when element removed...
+  if (document.getElementById("connectionAction")) {
+    document.getElementById("connectionAction").remove();
+  }
+});
+
 export default class PrinterManager {
   static async init(printers) {
     let i = currentIndex;
