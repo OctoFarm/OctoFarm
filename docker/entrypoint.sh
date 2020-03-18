@@ -4,6 +4,9 @@
 if [ -d "node_modules" ] 
 then
     echo "Node modules exist, skipping install" 
+    echo "Making sure node modules are up to date..."
+    npm update
+    echo "packages updated..."
 else
     npm install
 fi

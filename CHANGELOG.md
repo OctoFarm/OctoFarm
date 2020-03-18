@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
+- Docker now checks for updated packages on start.
+
 ### Removed
 
 ### Deprecated
@@ -24,6 +26,8 @@ All notable changes to this project will be documented in this file.
 - Fixed file manager not loading when no Active/Idle/Closed printers are present. Now requires at least 1 Active/Idle/Closed printer to open.
 
 ### Security
+
+- Updated some packages with security vulnerabilities. Please make sure to do npm update before starting the application to update these.
 
 ## [1.1.3 - BETA :: includes 1.1.1 + 1.1.2] - 13/03/2020
 
