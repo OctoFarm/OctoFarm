@@ -55,9 +55,9 @@ source.onclose = function(e) {
 let printerCard = document.querySelectorAll("[id^='printerButton-']");
 printerCard.forEach(card => {
   let ca = card.id.split("-");
-  card.addEventListener("dblclick", e => {
+  card.addEventListener("click", e => {
     PrinterManager.updateIndex(parseInt(ca[1]));
-    PrinterManager.init(printerInfo);
+    PrinterManager.init(printerInfo[ca[1]]);
   });
   document
     .getElementById("cameraContain-" + parseInt(ca[1]))
@@ -391,7 +391,6 @@ function updateState(printers, clientSettings) {
       elements.restart.classList.add("hidden");
     } else if (printer.stateColour.category === "Offline") {
       if (printer.camURL != "") {
-        console.log(printer);
         elements.row.className =
           "col-sm-12 col-md-4 col-lg-3 col-xl-2" + " " + hideOffline;
       }
