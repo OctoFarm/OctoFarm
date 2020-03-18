@@ -56,11 +56,15 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
 router.get("/filemanager", ensureAuthenticated, async (req, res) => {
   let printers = await Runner.returnFarmPrinters();
   let filament = await Filament.find({});
+  const farmStatistics = require("../runners/statisticsCollection.js");
+  const FarmStatistics = farmStatistics.StatisticsCollection;
+  let statistics = await FarmStatistics.returnStats();
   res.render("filemanager", {
     name: req.user.name,
     version: pjson.version,
     printers: printers,
     printerCount: printers.length,
+    currentOperationsCount: statistics.currentOperationsCount,
     page: "File Manager",
     helpers: prettyHelpers,
     filament: filament

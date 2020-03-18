@@ -1,4 +1,4 @@
-<% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
+<% if(typeof currentOperationsCount != 'undefined' && currentOperationsCount.idle > 0 || currentOperationsCount.active > 0) {%>
 <div id="filemanager" class="row">
   <div id="filePrinters" class="col-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 ">
     <div class="card text-white bg-dark">
@@ -140,24 +140,9 @@
 <div class="row mt-5">
   <div class="col-md-6 m-auto">
     <div class="card card-body text-center">
-      <h1>Welcome to OctoFarm</h1>
       <p>
-        The all in one monitoring solution for multiple Octoprint instances.
+       To use file manager you need at least 1 idle or active printer in your farm... Please turn your printer on and connect. 
       </p>
-      <h1><img src="images/logo.png" /></h1>
-      <p>
-        Thank you for creating an account <% if(typeof name != 'undefined'){ %>
-        <%= name %> <% }%>. To get started though, we need some printers in your
-        farm!
-      </p>
-      <a
-        href="#"
-        class="btn btn-primary btn-block mb-2"
-        href="#"
-        data-toggle="modal"
-        data-target="#printerSetupModal"
-        >Setup Printers</a
-      >
     </div>
   </div>
 </div>
