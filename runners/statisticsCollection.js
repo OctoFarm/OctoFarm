@@ -54,6 +54,7 @@ class StatisticsCollection {
     let idle = [];
     let offline = [];
     let progress = [];
+    let closed = [];
     try {
       farmPrinters.forEach(printer => {
         let name = "";
@@ -70,6 +71,9 @@ class StatisticsCollection {
           ) {
             offline.push(printer.index);
           }
+        }
+        if (typeof printer.state != undefined && printer.state === "Closed") {
+          closed.push(printer.index);
         }
         if (
           typeof printer.stateColour != "undefined" &&
@@ -121,6 +125,7 @@ class StatisticsCollection {
       currentOperationsCount.active = active.length;
       currentOperationsCount.offline = offline.length;
       currentOperationsCount.idle = idle.length;
+      currentOperationsCount.closed = closed.length;
       currentOperations = _.orderBy(currentOperations, ["progress"], ["desc"]);
       farmStats[0].currentOperations = currentOperations;
       farmStats[0].currentOperationsCount = currentOperationsCount;

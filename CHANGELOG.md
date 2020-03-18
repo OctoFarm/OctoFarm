@@ -10,6 +10,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Now following the state of printers that are closed.
+
 ### Changed
 
 ### Removed
@@ -19,6 +21,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 
 - Blue screen (selecting) when double clicking a camera view to enlarge.
+- Fixed file manager not loading when no Active/Idle/Closed printers are present. Now requires at least 1 Active/Idle/Closed printer to open.
 
 ### Security
 
