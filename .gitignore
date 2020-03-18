@@ -1,3 +1,5 @@
 node_modules/
 config/db.js
 TODO.md
+production.log
+productionError.log
