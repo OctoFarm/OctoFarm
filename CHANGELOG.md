@@ -9,9 +9,9 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 - Now following the state of printers that are closed.
-- Ability to change port - Setting available in config/server.js requires server restart to take effect.
-- Ability to turn off login requirement - Setting available in config/server.js requires server restart to take effect.
-- Ability to turn off registration pages - Setting available in config/server.js requires server restart to take effect.
+- Ability to change port - Setting available in serverConfig/server.js requires server restart to take effect.
+- Ability to turn off login requirement - Setting available in serverConfig/server.js requires server restart to take effect.
+- Ability to turn off registration pages - Setting available in serverConfig/server.js requires server restart to take effect.
 
 ### Changed
 
