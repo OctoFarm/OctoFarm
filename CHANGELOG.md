@@ -26,6 +26,8 @@ All notable changes to this project will be documented in this file.
 
 - Blue screen (selecting) when double clicking a camera view to enlarge.
 - Fixed file manager not loading when no Active/Idle/Closed printers are present. Now requires at least 1 Active/Idle/Closed printer to open.
+-
+- OctoFarm.net Mobile Menu fix
 
 ### Security
 
