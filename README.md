@@ -11,7 +11,7 @@
 
   <p>Please visit <a href="https://feathub.com/NotExpectedYet/OctoFarm">to log a request.</a>
 
-  <h3 align="center">Version 1.1 - BETA</h3>
+  <h3 align="center">Version 1.1.4</h3>
 <br />
 <p align="center">
   <a href="https://github.com/NotExpectedYet/OctoFarm">
@@ -66,6 +66,8 @@ To get a local copy up and running follow these simple steps.
 Confirmed working on: Linux (Ubuntu, Debian), RaspberryPi (Rasbian), Windows 10.
 Should also work on but not tested: MacOS, anything else nodejs will run on.
 
+_Note_: Raspberry Pi's Raspbian OS doesn't officially support running MongoDB yet (MongoDB requires a 64bit kernel, whereas Raspbian's is 32bit), so in that case, you'll need an external database running on some other machine or VM.
+
 ### Prerequisites
 
 - [MongoDB](https://www.mongodb.com/) - v4.2+
@@ -74,11 +76,11 @@ Should also work on but not tested: MacOS, anything else nodejs will run on.
 
 ### Installation Docker
 
-### TinkerCads Version
+### TinkerDad's Version
 
 Instructions can be found: [TheTinkerDad/OctoFarm](https://hub.docker.com/r/thetinkerdad/octofarm)
 
-- Massive thanks to TheTinkerDad for making this, he's also better at keeping up with his documentation. Be sure to send him some love on his[Youtube Channel](https://www.youtube.com/channel/UCNaLzBZhXTCwjsDPU03y-kQ)
+- Massive thanks to TheTinkerDad for making this, he's also better at keeping up with his documentation. Be sure to send him some love on his [Youtube Channel](https://www.youtube.com/channel/UCNaLzBZhXTCwjsDPU03y-kQ)
 
 ### OctoFarm Official
 
