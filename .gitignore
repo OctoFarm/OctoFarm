@@ -1,6 +1,6 @@
 node_modules/
 config/db.js
-config/server.js
 TODO.md
 production.log
 productionError.log
+config/server.js
