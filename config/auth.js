@@ -1,4 +1,4 @@
-const serverConfig = require("./server");
+const serverConfig = require("../serverConfig/server");
 
 module.exports = {
   ensureAuthenticated: function(req, res, next) {

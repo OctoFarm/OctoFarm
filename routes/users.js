@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const passport = require("passport");
-const serverConfig = require("../config/server.js");
+const serverConfig = require("../serverConfig/server.js");
 
 // User Modal
 const User = require("../models/User.js");

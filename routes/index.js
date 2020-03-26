@@ -12,7 +12,7 @@ const Runner = runner.Runner;
 const _ = require("lodash");
 const filamentType = require("../config/filaments.js");
 const returnFilamentTypes = filamentType.returnFilamentTypes;
-const serverConfig = require("../config/server.js");
+const serverConfig = require("../serverConfig/server.js");
 
 console.log("db: " + db);
 
