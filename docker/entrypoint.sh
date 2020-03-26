@@ -26,4 +26,19 @@ EOF
 
 fi
 
+if [ -d "serverConfig" ]
+then
+    echo "Config already exists"
+else
+    echo "" > serverConfig/server.js
+    tee serverConfig/server.js <<EOF >/dev/null
+module.exports = {
+  port: 4000,
+  registration: true,
+  loginRequired: true
+};
+EOF
+
+fi
+
 node ./app.js
