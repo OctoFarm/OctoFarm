@@ -26,7 +26,7 @@ EOF
 
 fi
 
-if [ -d "serverConfig/server.js" ]
+if [ -f "serverConfig/server.js" ]
 then
     echo "Config already exists"
 else
