@@ -5,9 +5,10 @@ const flash = require("connect-flash");
 const session = require("express-session");
 const passport = require("passport");
 const { ensureAuthenticated } = require("./config/auth");
+const serverConfig = require("./config/server");
 
 //Server Port
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || serverConfig.port;
 
 const app = express();
 

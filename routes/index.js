@@ -3,7 +3,6 @@ const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
 const db = require("../config/db").MongoURI;
 const pjson = require("../package.json");
-const FarmStatistics = require("../models/FarmStatistics.js");
 const ClientSettings = require("../models/ClientSettings.js");
 const Filament = require("../models/Filament.js");
 const SystemInfo = require("../models/SystemInfo.js");
@@ -13,6 +12,7 @@ const Runner = runner.Runner;
 const _ = require("lodash");
 const filamentType = require("../config/filaments.js");
 const returnFilamentTypes = filamentType.returnFilamentTypes;
+const serverConfig = require("../config/server.js");
 
 console.log("db: " + db);
 
@@ -36,8 +36,14 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
   let statistics = await FarmStatistics.returnStats();
   let systemInformation = await SystemInfo.find({});
   let filament = await Filament.find({});
+  let user = null;
+  if (serverConfig.loginRequired === false) {
+    user = "No User";
+  } else {
+    user = req.user.name;
+  }
   res.render("dashboard", {
-    name: req.user.name,
+    name: user,
     version: pjson.version,
     printers: printers,
     farmInfo: statistics.farmInfo,
@@ -59,8 +65,13 @@ router.get("/filemanager", ensureAuthenticated, async (req, res) => {
   const farmStatistics = require("../runners/statisticsCollection.js");
   const FarmStatistics = farmStatistics.StatisticsCollection;
   let statistics = await FarmStatistics.returnStats();
+  if (serverConfig.loginRequired === false) {
+    user = "No User";
+  } else {
+    user = req.user.name;
+  }
   res.render("filemanager", {
-    name: req.user.name,
+    name: user,
     version: pjson.version,
     printers: printers,
     printerCount: printers.length,
@@ -77,8 +88,13 @@ router.get("/history", ensureAuthenticated, async (req, res) => {
   let history = await History.find({});
   let filament = await Filament.find({});
   let filamentTypes = await returnFilamentTypes();
+  if (serverConfig.loginRequired === false) {
+    user = "No User";
+  } else {
+    user = req.user.name;
+  }
   res.render("history", {
-    name: req.user.name,
+    name: user,
     version: pjson.version,
     printers: printers,
     printerCount: printers.length,
@@ -98,8 +114,13 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
   let systemInformation = await SystemInfo.find({});
   let filament = await Filament.find({});
   let clientSettings = await ClientSettings.find({});
+  if (serverConfig.loginRequired === false) {
+    user = "No User";
+  } else {
+    user = req.user.name;
+  }
   res.render("panelView", {
-    name: req.user.name,
+    name: user,
     version: pjson.version,
     printers: printers,
     currentOperations: statistics.currentOperations,
@@ -121,8 +142,13 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
   let systemInformation = await SystemInfo.find({});
   let filament = await Filament.find({});
   let clientSettings = await ClientSettings.find({});
+  if (serverConfig.loginRequired === false) {
+    user = "No User";
+  } else {
+    user = req.user.name;
+  }
   res.render("cameraView", {
-    name: req.user.name,
+    name: user,
     version: pjson.version,
     printers: printers,
     currentOperations: statistics.currentOperations,
@@ -144,8 +170,13 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
   let systemInformation = await SystemInfo.find({});
   let filament = await Filament.find({});
   let clientSettings = await ClientSettings.find({});
+  if (serverConfig.loginRequired === false) {
+    user = "No User";
+  } else {
+    user = req.user.name;
+  }
   res.render("listView", {
-    name: req.user.name,
+    name: user,
     version: pjson.version,
     printers: printers,
     currentOperations: statistics.currentOperations,
