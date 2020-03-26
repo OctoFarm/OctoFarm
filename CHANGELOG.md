@@ -6,8 +6,6 @@ All notable changes to this project will be documented in this file.
 
 ## [v1.1.4]
 
-## [] - TBA
-
 ### Added
 
 - Now following the state of printers that are closed.
@@ -105,9 +103,7 @@ Nothing else from 1.0 I believe
 
 ## [TEMPLATE]
 
-## [v1.1.4]
-
-## [] - TBA
+## [v]
 
 ### Added
 
