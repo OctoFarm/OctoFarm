@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
 
 - Docker now checks for updated packages on start.
+- Client will automatically reload the page in 10 seconds if connection to server is lost.
 
 ### Removed
 

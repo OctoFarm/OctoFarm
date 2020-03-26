@@ -34,14 +34,16 @@ source.onmessage = function(e) {
 source.onerror = function(e) {
   UI.createAlert(
     "error",
-    "Communication with the server has been suddenly lost, please restart client and try again..."
+    "Communication with the server has been suddenly lost, we will automatically refresh in 10 seconds..."
   );
+  setTimeout(function(){ location.reload(); }, 10000);
 };
 source.onclose = function(e) {
   UI.createAlert(
     "error",
-    "Communication with the server has been suddenly lost, please restart client and try again..."
+    "Communication with the server has been suddenly lost, we will automatically refresh in 10 seconds..."
   );
+  setTimeout(function(){ location.reload(); }, 10000);
 };
 //Initial listeners
 document.getElementById("connectAllBtn").addEventListener("click", e => {
