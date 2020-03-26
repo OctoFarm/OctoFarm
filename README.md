@@ -85,7 +85,7 @@ Instructions can be found: [TheTinkerDad/OctoFarm](https://hub.docker.com/r/thet
 BIG thanks to knoker for the help with this!
 
 ```sh
-docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -p4000:4000 octofarm/octofarm
+docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -p4000:4000 octofarm/octofarm -v '/mnt/user/apps/OctoFarm/config/':'/app/serverConfig/':'rw'
 ```
 
 Environment Variables
