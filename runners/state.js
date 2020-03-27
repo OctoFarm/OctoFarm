@@ -527,10 +527,13 @@ class Runner {
       .then(res => {
         return res.json();
       })
-      .then(res => {
+      .then(async res => {
         //Update info to DB
         farmPrinters[index].settingsApi = res.api;
         farmPrinters[index].settingsApperance = res.appearance;
+        let printer = await Printers.findOne({ index: index });
+        printer.settingsApperance = farmPrinters[index].settingsApperance;
+        printer.save();
         farmPrinters[index].settingsFeature = res.feature;
         farmPrinters[index].settingsFolder = res.folder;
         farmPrinters[index].settingsPlugins = res.plugins;
@@ -545,18 +548,26 @@ class Runner {
         ) {
           if (
             typeof res.webcam != "undefined" &&
-            typeof res.webcam.streamURL != "undefined"
+            typeof res.webcam.streamUrl != "undefined" &&
+            res.webcam.streamUrl != null
           ) {
-            if (res.webcam.streamURL.includes("http")) {
-              farmPrinters[index].camURL = res.webcam.streamURL;
+            if (res.webcam.streamUrl.includes("http")) {
+              farmPrinters[index].camURL = res.webcam.streamUrl;
+              farmPrinters[index].camURL = farmPrinters[index].camURL.replace(
+                "http://",
+                ""
+              );
             } else {
               farmPrinters[index].camURL =
                 "http://" +
                 farmPrinters[index].ip +
                 ":" +
                 farmPrinters[index].port +
-                streamURL;
+                res.webcam.streamUrl;
             }
+            let printer = await Printers.findOne({ index: index });
+            printer.camURL = farmPrinters[index].camURL;
+            printer.save();
           }
         }
       })
@@ -629,23 +640,37 @@ class Runner {
       return false;
     }
   }
-  static flowRate(i, newRate) {
+  static async flowRate(i, newRate) {
     farmPrinters[i].flowRate = newRate;
+    let printer = await Printers.findOne({ index: i });
+    printer.flowRate = farmPrinters[i].flowRate;
+    printer.save();
   }
-  static feedRate(i, newRate) {
+  static async feedRate(i, newRate) {
     farmPrinters[i].feedRate = newRate;
+    let printer = await Printers.findOne({ index: i });
+    printer.feedRate = farmPrinters[i].feedRate;
+    printer.save();
   }
   static stepRate(i, newRate) {
     farmPrinters[i].stepRate = newRate;
   }
-  static updateSettings(i, opts) {
+  static async updateSettings(i, opts) {
     farmPrinters[i].settingsScripts.gcode = opts.scripts.gcode;
     farmPrinters[i].settingsApperance.name = opts.appearance.name;
     farmPrinters[i].settingsWebcam = opts.webcam;
     farmPrinters[i].camURL = opts.camURL;
+    let printer = await Printers.findOne({ index: i });
+    printer.settingsWebcam = farmPrinters[i].settingsWebcam;
+    printer.camURL = farmPrinters[index].camURL;
+    printer.settingsApperance.name = farmPrinters[i].settingsApperance.name;
+    printer.save();
   }
-  static selectFilament(i, filament) {
+  static async selectFilament(i, filament) {
     farmPrinters[i].selectedFilament = filament;
+    let printer = await Printers.findOne({ index: i });
+    printer.selectedFilament = farmPrinters[i].selectedFilament;
+    printer.save();
   }
   static moveFile(i, newPath, fullPath, filename) {
     let file = _.findIndex(farmPrinters[i].fileList.files, function(o) {

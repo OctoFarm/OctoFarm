@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const PrinterSchema = new mongoose.Schema({
+  sortIndex: {
+    type: Number,
+    required: false
+  },
   index: {
     type: Number,
     required: true
@@ -21,6 +25,22 @@ const PrinterSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  feedRate: {
+    type: Number,
+    required: false
+  },
+  flowRate: {
+    type: Number,
+    required: false
+  },
+  settingsApperance: {
+    type: Object,
+    required: false
+  },
+  selectedFilament: {
+    type: String,
+    required: false
+  }
 });
 
 const Printer = mongoose.model("Printer", PrinterSchema);

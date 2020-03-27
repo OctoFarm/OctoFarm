@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
 - Docker now checks for updated packages on start.
 - Client will automatically reload the page in 10 seconds if connection to server is lost.
 - Tables should now be somewhat responsive on smaller screens. This isn't perfect, tables aren't great for smaller screen sizes but hope this mitigates it some.
+- Printer Database now stores: FeedRate, FlowRate, PrinterName, Custom Sort Index and filament selected.
 
 ### Removed
 
@@ -31,6 +32,8 @@ All notable changes to this project will be documented in this file.
 - Fixed Panel View action buttons not working.
 - OctoFarm.net Mobile Menu fix
 - Percent values correctly rounded to 1 decimal place on dashboard.
+- A blank field in the cameraURL now actually pulls through your camera settings from OctoPrint.
+- Cameral URL now saves to database after been updated in UI.
 
 ### Security
 
