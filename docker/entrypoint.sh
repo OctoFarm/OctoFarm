@@ -41,4 +41,4 @@ EOF
 
 fi
 
-npm start
+node app.js
