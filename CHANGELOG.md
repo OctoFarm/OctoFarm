@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 - Ability to change port - Setting available in serverConfig/server.js requires server restart to take effect.
 - Ability to turn off login requirement - Setting available in serverConfig/server.js requires server restart to take effect.
 - Ability to turn off registration pages - Setting available in serverConfig/server.js requires server restart to take effect.
+- Notes to printer manager regarding HTTP and the use of port:ip combo.
 
 ### Changed
 
@@ -27,8 +28,9 @@ All notable changes to this project will be documented in this file.
 
 - Blue screen (selecting) when double clicking a camera view to enlarge.
 - Fixed file manager not loading when no Active/Idle/Closed printers are present. Now requires at least 1 Active/Idle/Closed printer to open.
--
+- Fixed Panel View action buttons not working.
 - OctoFarm.net Mobile Menu fix
+- Percent values correctly rounded to 1 decimal place on dashboard.
 
 ### Security
 

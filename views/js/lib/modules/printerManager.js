@@ -113,9 +113,9 @@ export default class PrinterManager {
           <h5>Printer Information</h5><hr>
           <form>
           <div class="form-row">
-              <div class="col-lg-2">
+              <div class="col">
               <label for="newPrinterName">Printer Name</label>
-              <input id="newPrinterName" type="text" class="form-control bg-dark text-white" style="width: 300px;" placeholder="${name}" value="${valueName}">
+              <input id="newPrinterName" type="text" class="form-control bg-dark text-white" placeholder="${name}" value="${valueName}">
   
               </div>
           </div>

@@ -65,7 +65,7 @@ printerCard.forEach(card => {
       doubleClickFullScreen(e.target);
     });
   document
-    .getElementById("panPrintStart-" + ca[1])
+    .getElementById("panPrintStart-" + parseInt(ca[1]))
     .addEventListener("dblclick", async e => {
       e.target.disabled = true;
       let opts = {
@@ -74,7 +74,7 @@ printerCard.forEach(card => {
       OctoPrintClient.jobAction(printerInfo[ca[1]], opts, e);
     });
   document
-    .getElementById("panPrintPause-" + ca[1])
+    .getElementById("panPrintPause-" + parseInt(ca[1]))
     .addEventListener("click", e => {
       e.target.disabled = true;
       let opts = {
@@ -84,7 +84,7 @@ printerCard.forEach(card => {
       OctoPrintClient.jobAction(printerInfo[ca[1]], opts, e);
     });
   document
-    .getElementById("panRestart-" + ca[1])
+    .getElementById("panRestart-" + parseInt(ca[1]))
     .addEventListener("dblclick", e => {
       e.target.disabled = true;
       let opts = {
@@ -92,38 +92,42 @@ printerCard.forEach(card => {
       };
       OctoPrintClient.jobAction(printerInfo[ca[1]], opts, e);
     });
-  document.getElementById("panResume-" + ca[1]).addEventListener("click", e => {
-    e.target.disabled = true;
-    let opts = {
-      command: "pause",
-      action: "resume"
-    };
-    OctoPrintClient.jobAction(printerInfo[ca[1]], opts, e);
-  });
-  document.getElementById("panStop-" + ca[1]).addEventListener("click", e => {
-    bootbox.confirm({
-      message: `${printerInfo[ca[1]].index}.  ${
-        printerInfo[ca[1]].settingsAppearance.name
-      }: <br>Are you sure you want to cancel the ongoing print?`,
-      buttons: {
-        cancel: {
-          label: '<i class="fa fa-times"></i> Cancel'
-        },
-        confirm: {
-          label: '<i class="fa fa-check"></i> Confirm'
-        }
-      },
-      callback: function(result) {
-        if (result) {
-          e.target.disabled = true;
-          let opts = {
-            command: "cancel"
-          };
-          OctoPrintClient.jobAction(printerInfo[ca[1]], opts, e);
-        }
-      }
+  document
+    .getElementById("panResume-" + parseInt(ca[1]))
+    .addEventListener("click", e => {
+      e.target.disabled = true;
+      let opts = {
+        command: "pause",
+        action: "resume"
+      };
+      OctoPrintClient.jobAction(printerInfo[ca[1]], opts, e);
     });
-  });
+  document
+    .getElementById("panStop-" + parseInt(ca[1]))
+    .addEventListener("click", e => {
+      bootbox.confirm({
+        message: `${printerInfo[ca[1]].index}.  ${
+          printerInfo[ca[1]].settingsAppearance.name
+        }: <br>Are you sure you want to cancel the ongoing print?`,
+        buttons: {
+          cancel: {
+            label: '<i class="fa fa-times"></i> Cancel'
+          },
+          confirm: {
+            label: '<i class="fa fa-check"></i> Confirm'
+          }
+        },
+        callback: function(result) {
+          if (result) {
+            e.target.disabled = true;
+            let opts = {
+              command: "cancel"
+            };
+            OctoPrintClient.jobAction(printerInfo[ca[1]], opts, e);
+          }
+        }
+      });
+    });
 });
 
 function grabElements(printer) {

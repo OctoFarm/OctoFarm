@@ -196,6 +196,7 @@
                                             <hr>
                                             <p>Please use the form below to add your printers to OctoFarm. Once added click the Save button to add them to the database.</p><p> If you have any connection issues please make sure CORS is activated on Octoprint's API settings page.</p>
                                             <p>NOTE: If you would like to use your OctoPrint camera URL, leave it blank here and it will attempt to pull from Octoprint.</p>
+                                            <p>NOTE: You can omit http:// as the application only works with non-ssl ip:port style addresses. ssl and domain name are not supported at this time.</p>
                                             <div id="message"></div>
                                             <form>
                                                 <div class="input-group mb-3">
@@ -229,7 +230,7 @@
                                                
                                             </form>
                                             <hr>
-                                            <table class="table">
+                                            <table class="table table-responsive-sm table-respsonsive-md col-lg-12">
                                                 <thead>
                                                     <tr>
                                                         <th scope="col" width="150px">IP Address</th>
@@ -906,22 +907,22 @@
                                         <div class="col-sm-12 col-lg-12">
                                           <form>
                                             <div class="form-row">
-                                              <div class="col-md-3 mb-3">
+                                              <div class="col-md-6 col-lg-3 mb-3">
                                                 <label for="filamentName">Name</label>
                                                 <input type="text" class="form-control" id="filamentName" placeholder="Name / Identifier" required>
                                               </div>
-                                              <div class="col-md-3 mb-3">
+                                              <div class="col-md-6 col-lg-3 mb-3">
                                                 <label for="filamentTypeSelect">Colour</label>
                                                 <select id="filementTypeSelect" class="form-control bg-dark text-light" required>
                                                   <option id="filamentSelect" selected value="0">Select Filament Type</option>
 
                                                 </select>
                                               </div>
-                                              <div class="col-md-3 mb-3">
+                                              <div class="col-md-6 col-lg-3 mb-3">
                                                 <label for="filamentColour">Colour</label>
                                                 <input type="text" class="form-control" id="filamentColour" placeholder="Filament Colour" required>
                                               </div>
-                                              <div class="col-md-3 mb-3">
+                                              <div class="col-md-6 col-lg-3 mb-3">
                                                 <label for="filamentManufacturer">Manufacturer</label>
                                                 <input type="text" class="form-control" id="filamentManufacturer" placeholder="Filament Manufacturer">
                                               </div>
@@ -933,7 +934,7 @@
                                         </div>
                                       </div>
                    
-                                  <table class="table">
+                                  <table class="table table-responsive-sm table-responsive-md col-lg-12">
                                       <thead>
                                           <tr>
                                               <th scope="col">Name</th>

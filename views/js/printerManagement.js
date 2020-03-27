@@ -175,7 +175,7 @@ class PrintersManagement {
     row.innerHTML = `
                 <td>${printer.ip}</td>
                 <td>${printer.port}</td>
-                <td>${printer.camURL}</td>
+                <td class="text-wrap">${printer.camURL}</td>
                 <td data-apikey="${printer.apikey}">${printer.apikey}</td>
                 <td class="delete"><button type="button" class="btn btn-danger delete"><i class="fas fa-trash delete"></i></button></td>`;
     list.appendChild(row);
@@ -296,7 +296,7 @@ class PrintersManagement {
             message += `
                             <tr><td>${newPrinters.ip[i]}</td>
                             <td>${newPrinters.port[i]}</td>
-                            <td>${newPrinters.camURL[i]}</td>
+                            <td class="text-wrap">${newPrinters.camURL[i]}</td>
                             <td>${newPrinters.apikey[i]}</td></tr>`;
           }
           message += `</tbody></table >`;
