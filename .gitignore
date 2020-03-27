@@ -4,4 +4,5 @@ TODO.md
 production.log
 productionError.log
 serverConfig/
+logs/
 

@@ -662,7 +662,7 @@ class Runner {
     farmPrinters[i].camURL = opts.camURL;
     let printer = await Printers.findOne({ index: i });
     printer.settingsWebcam = farmPrinters[i].settingsWebcam;
-    printer.camURL = farmPrinters[index].camURL;
+    printer.camURL = farmPrinters[i].camURL;
     printer.settingsApperance.name = farmPrinters[i].settingsApperance.name;
     printer.save();
   }
