@@ -27,7 +27,7 @@
   </li>
 </div>
     <% }else{ %>
-      <div class="list-group" id="printerCard-<%= printer.index %>">
+      <div class="list-group" id="printerCard-<%= printer.index %>">.  <% if(typeof printer.settingsApperance != "undefined" ){%> <%= printer.settingsApperance.name %> <%}%>
         <li class="list-group-item list-group-item-action flex-column align-items-start">
           <div class="d-flex w-100 justify-content-between text-white">
             <h5 id="printerName-<%= printer.index %>" class="mb-1 ml-1"> <i class="fas fa-print"></i>  <%= printer.index %>. Searching for printer information...</span

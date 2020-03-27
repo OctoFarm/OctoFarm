@@ -34,6 +34,7 @@ All notable changes to this project will be documented in this file.
 - Percent values correctly rounded to 1 decimal place on dashboard.
 - A blank field in the cameraURL now actually pulls through your camera settings from OctoPrint.
 - Cameral URL now saves to database after been updated in UI.
+- Dashboard now shows printer name if available when offline.
 
 ### Security
 
