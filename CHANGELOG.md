@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- Now following the state of printers that are closed.
+- Closed printers are tracked better.
 - Ability to change port - Setting available in serverConfig/server.js requires server restart to take effect.
 - Ability to turn off login requirement - Setting available in serverConfig/server.js requires server restart to take effect.
 - Ability to turn off registration pages - Setting available in serverConfig/server.js requires server restart to take effect.
@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 
 - Docker now checks for updated packages on start.
 - Client will automatically reload the page in 10 seconds if connection to server is lost.
+- Tables should now be somewhat responsive on smaller screens. This isn't perfect, tables aren't great for smaller screen sizes but hope this mitigates it some.
 
 ### Removed
 
