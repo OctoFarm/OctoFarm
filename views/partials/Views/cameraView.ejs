@@ -57,14 +57,12 @@ clientSettings[0].panelView.hideClosed){%> <% if(typeof printer.settingsWebcam
             >
               <i class="fas fa-cog"></i>
             </button>
-            <% } %> <% let fileName = ""; %><% if(typeof printer.job !=
-            'undefined' && printer.job.file.name != null){ %> <% let
-            fileNameStart = printer.job.file.name; %> <% let fileNameEnd =
-            printer.job.file.name; %> <% fileNameStart =
-            fileNameStart.substring(0,20); %> <% fileNameEnd =
-            fileNameEnd.substring(fileNameEnd.length,fileNameEnd.length); %> <%
-            fileName = fileNameStart+"..."+fileNameEnd; %> <%}%>
-            <span id="camFileName-<%= printer.index %>" class="float-right"
+            <% } %> <% let fileName = "No File Selected"; %><% if(typeof
+            printer.job != 'undefined' && printer.job.file.display != null){ %>
+            <% let fileNameStart = printer.job.file.display; %> <%}%>
+            <span
+              id="camFileName-<%= printer.index %>"
+              class="d-block text-right text-truncate"
               ><i class="fas fa-file-code"></i> <%= fileName %></span
             >
           </small>

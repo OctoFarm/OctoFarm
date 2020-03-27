@@ -533,6 +533,10 @@ class Runner {
         farmPrinters[index].settingsApperance = res.appearance;
         let printer = await Printers.findOne({ index: index });
         printer.settingsApperance = farmPrinters[index].settingsApperance;
+        if (typeof farmPrinters[index].sortIndex === "undefined") {
+          farmPrinters[index].sortIndex = index;
+          printer.sortIndex = index;
+        }
         printer.save();
         farmPrinters[index].settingsFeature = res.feature;
         farmPrinters[index].settingsFolder = res.folder;

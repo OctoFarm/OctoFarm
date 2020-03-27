@@ -67,10 +67,10 @@ clientSettings[0].listView.hideOff){%>
       <i class="fas fa-square"></i>
     </button>
   </td>
-  <td id="listFile-<%= printer.index %>">
+  <td id="listFile-<%= printer.index %>" class="text-truncate">
     <i class="fas fa-file-code"></i> <% if(typeof printer.job != 'undefined' &&
-    printer.job.file.name != null){ %> <%= printer.job.file.name %><%}else{ %>
-    No File Selected <% }%>
+    printer.job.file.display != null){ %> <%= printer.job.file.display
+    %><%}else{ %> No File Selected <% }%>
   </td>
   <td id="listFilament-<%= printer.index %>">
     <% if(typeof printer.selectedFilament != 'undefined'){%> <%=

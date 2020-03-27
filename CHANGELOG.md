@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
 - Client will automatically reload the page in 10 seconds if connection to server is lost.
 - Tables should now be somewhat responsive on smaller screens. This isn't perfect, tables aren't great for smaller screen sizes but hope this mitigates it some.
 - Printer Database now stores: FeedRate, FlowRate, PrinterName, Custom Sort Index and filament selected.
+- All monitoring views added truncate for filename. Overflows will be replaced with "..."
 
 ### Removed
 
