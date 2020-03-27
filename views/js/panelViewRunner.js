@@ -66,7 +66,7 @@ printerCard.forEach(card => {
     });
   document
     .getElementById("panPrintStart-" + parseInt(ca[1]))
-    .addEventListener("dblclick", async e => {
+    .addEventListener("click", async e => {
       e.target.disabled = true;
       let opts = {
         command: "start"
@@ -85,7 +85,7 @@ printerCard.forEach(card => {
     });
   document
     .getElementById("panRestart-" + parseInt(ca[1]))
-    .addEventListener("dblclick", e => {
+    .addEventListener("click", e => {
       e.target.disabled = true;
       let opts = {
         command: "restart"
