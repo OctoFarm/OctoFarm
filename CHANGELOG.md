@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - Ability to turn off login requirement - Setting available in serverConfig/server.js requires server restart to take effect.
 - Ability to turn off registration pages - Setting available in serverConfig/server.js requires server restart to take effect.
 - Notes to printer manager regarding HTTP and the use of port:ip combo.
+- Padded our the installation instructions on the README.md file.
 
 ### Changed
 

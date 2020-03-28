@@ -187,20 +187,21 @@ class StatisticsCollection {
         }
       }
     });
-    farmPrinters.forEach(printer => {
-      if (typeof printer.stateColour != "undefined") {
-        if (printer.stateColour.category === "Active") {
-          //Need to figure this out
-        }
-      }
-    });
+    // farmPrinters.forEach(printer => {
+    //   if (typeof printer.stateColour != "undefined") {
+    //     if (printer.stateColour.category === "Active") {
+    //       //Need to figure this out
+    //     }
+    //   }
+    // });
     let printTimesTotal = printTimes.reduce((a, b) => a + b, 0);
 
     let currentDate = new Date();
     octofarmStatistics.activeHours = printTimesTotal;
     octofarmStatistics.idleHours =
       currentDate.getTime() - farmStats[0].farmStart.getTime();
-    octofarmStatistics.idleHours = octofarmStatistics.idleHours / 1000;
+    octofarmStatistics.idleHours =
+      (octofarmStatistics.idleHours / 1000) * farmPrinters.length;
     octofarmStatistics.idleHours =
       octofarmStatistics.idleHours - octofarmStatistics.activeHours;
     octofarmStatistics.totalHours =
