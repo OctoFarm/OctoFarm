@@ -40,6 +40,7 @@ All notable changes to this project will be documented in this file.
 - Cameral URL now saves to database after been updated in UI.
 - Dashboard now shows printer name if available when offline.
 - Statistic runners now close with printer update.
+- Fixed annoying message in logs when a client connects
 
 ### Security
 

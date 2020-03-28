@@ -34,17 +34,22 @@ export default class Calculate {
         seconds +
         " Seconds";
 
-      if (string.includes("0 Days")) {
-        string = string.replace("0 Days,", "");
+      if (mnts == 0) {
+        if (string.includes("0 Mins")) {
+          string = string.replace(" 0 Mins,", "");
+        }
       }
-      if (string.includes("0 Hrs")) {
-        string = string.replace(" 0 Hrs,", "");
+      if (hrs == 0) {
+        if (string.includes("0 Hrs")) {
+          string = string.replace(" 0 Hrs,", "");
+        }
       }
-      if (string.includes("0 Mins")) {
-        string = string.replace(" 0 Mins,", "");
+      if (days == 0) {
+        if (string.includes("0 Days")) {
+          string = string.replace("0 Days,", "");
+        }
       }
-      if (mnts > 0 || hrs > 0 || days > 0 || seconds > 0) {
-      } else {
+      if (seconds == 0) {
         string = string.replace("0 Seconds", "Done");
       }
     }
