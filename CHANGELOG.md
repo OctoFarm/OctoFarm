@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 - Dashboard now has the ability to refresh the printers connection/information. Good incase you encounter crashes and the websocket doesn't automatically update, or you make changes to OctoPrints settings outside of OctoFarm.
   - Pressing on an Offline printer will attempt to re-establish the lost websocket connection then update the instace from OctoPrint.
   - Pressing on an Online printer will update the instance from OctoPrint.
+- New button on Printer List in Dashboard. You can drag and drop this button to re-order your printer list. This will also persist a reboot, all views respect this order.
 
 ### Changed
 
