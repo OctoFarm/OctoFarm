@@ -613,9 +613,8 @@ export default class PrinterManager {
         filamentSelect.addEventListener("change", e => {
           chooseFilament(e.target, i);
         });
-
         if (typeof printer.selectedFilament != "undefined") {
-          filamentSelect.value = printer.selectedFilament;
+          filamentSelect.value = printer.selectedFilament.id;
         }
         const printerPort = document.getElementById("printerPortDrop");
         const printerBaud = document.getElementById("printerBaudDrop");

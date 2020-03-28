@@ -759,7 +759,7 @@ class Runner {
   static async selectedFilament(filament) {
     let rolls = await Filament.findOne({ _id: filament.id });
     farmPrinters[filament.index].selectedFilament = {
-      id: rolls.roll.id,
+      id: filament.id,
       name: rolls.roll.name,
       type: rolls.roll.type,
       colour: rolls.roll.colour,
