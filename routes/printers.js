@@ -177,13 +177,11 @@ router.post("/newFiles", ensureAuthenticated, async (req, res) => {
 });
 router.post("/selectFilament", ensureAuthenticated, async (req, res) => {
   let data = req.body;
-  console.log(data);
   let roll = await Runner.selectedFilament(data);
   res.send({ msg: roll });
 });
 router.post("/reScanOcto", ensureAuthenticated, async (req, res) => {
   let data = req.body;
-  console.log(data);
   let reScan = await Runner.reScanOcto(data.id);
   res.send({ msg: reScan });
 });

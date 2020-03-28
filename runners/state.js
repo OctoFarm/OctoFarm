@@ -87,7 +87,9 @@ WebSocketClient.prototype.terminate = async function(e) {
 };
 WebSocketClient.prototype.onopen = function(e) {};
 WebSocketClient.prototype.onmessage = function(data, flags, number) {};
-WebSocketClient.prototype.onerror = function(e) {};
+WebSocketClient.prototype.onerror = function(e) {
+  console.log(e);
+};
 WebSocketClient.prototype.onclose = function(e) {};
 
 class ClientAPI {
@@ -347,16 +349,59 @@ class Runner {
   }
 
   static async reScanOcto(index) {
-    let result = null;
-    try {
+    let result = {
+      status: null,
+      msg: null
+    };
+    console.log(webSockets[index].ws);
+    if (webSockets[index].ws.instance.readyState == 3) {
       console.log(index + ": Attempting to reconnect socket...");
-      webSockets[i].ws.open();
-      result = "Printer: " + index + " has successfully been reconnected...";
-      return result;
-    } catch (error) {
-      result = "Printer: " + index + " could not connect to socket...";
-      return result;
+      try {
+        webSockets[i] = await ClientSocket.connect(
+          farmPrinters[i].index,
+          farmPrinters[i].ip,
+          farmPrinters[i].port,
+          farmPrinters[i].apikey
+        );
+        Runner.setupClient(i);
+        result.status = "success";
+        result.msg =
+          "Printer: " +
+          index +
+          " socket connection re-attempted, will appear online if successful...";
+      } catch (error) {
+        result.status = "error";
+        result.msg =
+          "Printer: " +
+          index +
+          " socket re-connection attempt failed... printer is still offline... <br>" +
+          error;
+      }
+    } else if (
+      webSockets[index].ws.instance.readyState == 2 ||
+      webSockets[index].ws.instance.readyState == 0
+    ) {
+      result.status = "error";
+      result.msg =
+        "Printer: " +
+        index +
+        " socket is either Closing/Connecting please await that to finish before attempting a reconnect...";
+    } else {
+      console.log(index + ": Grabbing State..");
+      await Runner.getState(index);
+      console.log(index + ": Grabbing File List...");
+      await Runner.getFiles(index, "files?recursive=true");
+      console.log(index + ": Grabbing System Information...");
+      await Runner.getSystem(index);
+      console.log(index + ": Grabbing System Settings...");
+      await Runner.getSettings(index);
+      console.log(index + ": Grabbing Printer Profiles...");
+      await Runner.getProfile(index);
+      result.status = "success";
+      result.msg =
+        "Printer: " + index + " information has been successfully re-synced...";
     }
+    return result;
   }
 
   static async reset() {

@@ -77,6 +77,7 @@ printerReSync.forEach(card => {
     };
     let post = await OctoFarmClient.post("printers/reScanOcto", data);
     post = await post.json();
+    UI.createAlert("success", post.msg, 3000, "clicked");
     e.target.innerHTML = "<i class='fas fa-sync'></i>";
     e.target.disabled = false;
   });
@@ -327,16 +328,10 @@ class dashUpdate {
             document.getElementById(
               "printerButton-" + printer.index
             ).disabled = false;
-            document.getElementById(
-              "printerSyncButton-" + printer.index
-            ).disabled = true;
           } else {
             document.getElementById(
               "printerButton-" + printer.index
             ).disabled = true;
-            document.getElementById(
-              "printerSyncButton-" + printer.index
-            ).disabled = false;
           }
         } else {
           document.getElementById("printerList").insertAdjacentHTML(
