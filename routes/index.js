@@ -38,14 +38,18 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
   let systemInformation = await SystemInfo.find({});
   let filament = await Filament.find({});
   let user = null;
+  let group = null;
   if (serverConfig.loginRequired === false) {
     user = "No User";
+    group = "Administrator";
   } else {
     user = req.user.name;
+    group = req.user.group;
   }
+
   res.render("dashboard", {
     name: user,
-    userGroup: req.user.group,
+    userGroup: group,
     version: pjson.version,
     printers: printers,
     farmInfo: statistics.farmInfo,
@@ -68,14 +72,18 @@ router.get("/filemanager", ensureAuthenticated, async (req, res) => {
   const farmStatistics = require("../runners/statisticsCollection.js");
   const FarmStatistics = farmStatistics.StatisticsCollection;
   let statistics = await FarmStatistics.returnStats();
+  let user = null;
+  let group = null;
   if (serverConfig.loginRequired === false) {
     user = "No User";
+    group = "Administrator";
   } else {
     user = req.user.name;
+    group = req.user.group;
   }
   res.render("filemanager", {
     name: user,
-    userGroup: req.user.group,
+    userGroup: group,
     version: pjson.version,
     printers: printers,
     printerCount: printers.length,
@@ -93,14 +101,18 @@ router.get("/history", ensureAuthenticated, async (req, res) => {
   let history = await History.find({});
   let filament = await Filament.find({});
   let filamentTypes = await returnFilamentTypes();
+  let user = null;
+  let group = null;
   if (serverConfig.loginRequired === false) {
     user = "No User";
+    group = "Administrator";
   } else {
     user = req.user.name;
+    group = req.user.group;
   }
   res.render("history", {
     name: user,
-    userGroup: req.user.group,
+    userGroup: group,
     version: pjson.version,
     printers: printers,
     printerCount: printers.length,
@@ -121,14 +133,18 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
   let systemInformation = await SystemInfo.find({});
   let filament = await Filament.find({});
   let clientSettings = await ClientSettings.find({});
+  let user = null;
+  let group = null;
   if (serverConfig.loginRequired === false) {
     user = "No User";
+    group = "Administrator";
   } else {
     user = req.user.name;
+    group = req.user.group;
   }
   res.render("panelView", {
     name: user,
-    userGroup: req.user.group,
+    userGroup: group,
     version: pjson.version,
     printers: printers,
     currentOperations: statistics.currentOperations,
@@ -151,10 +167,14 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
   let systemInformation = await SystemInfo.find({});
   let filament = await Filament.find({});
   let clientSettings = await ClientSettings.find({});
+  let user = null;
+  let group = null;
   if (serverConfig.loginRequired === false) {
     user = "No User";
+    group = "Administrator";
   } else {
     user = req.user.name;
+    group = group;
   }
   res.render("cameraView", {
     name: user,
@@ -181,10 +201,14 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
   let systemInformation = await SystemInfo.find({});
   let filament = await Filament.find({});
   let clientSettings = await ClientSettings.find({});
+  let user = null;
+  let group = null;
   if (serverConfig.loginRequired === false) {
     user = "No User";
+    group = "Administrator";
   } else {
     user = req.user.name;
+    group = group;
   }
   res.render("listView", {
     name: user,

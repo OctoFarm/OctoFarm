@@ -408,7 +408,7 @@ class dashUpdate {
 }
 var el = document.getElementById("printerList");
 var sortable = Sortable.create(el, {
-  handle: ".fa-grip-vertical",
+  handle: ".sortableList",
   animation: 150,
   onUpdate: function(/**Event*/ e) {
     //console.log(evt);
