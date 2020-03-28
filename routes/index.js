@@ -31,6 +31,7 @@ if (db === "") {
 //Dashboard Page
 router.get("/dashboard", ensureAuthenticated, async (req, res) => {
   let printers = await Runner.returnFarmPrinters();
+  printers = printers.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
   const farmStatistics = require("../runners/statisticsCollection.js");
   const FarmStatistics = farmStatistics.StatisticsCollection;
   let statistics = await FarmStatistics.returnStats();
@@ -61,6 +62,7 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
 //File Manager Page
 router.get("/filemanager", ensureAuthenticated, async (req, res) => {
   let printers = await Runner.returnFarmPrinters();
+  printers = printers.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
   let filament = await Filament.find({});
   const farmStatistics = require("../runners/statisticsCollection.js");
   const FarmStatistics = farmStatistics.StatisticsCollection;
@@ -84,6 +86,7 @@ router.get("/filemanager", ensureAuthenticated, async (req, res) => {
 //History Page
 router.get("/history", ensureAuthenticated, async (req, res) => {
   let printers = Runner.returnFarmPrinters();
+  printers = printers.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
   const History = require("../models/History.js");
   let history = await History.find({});
   let filament = await Filament.find({});
@@ -108,6 +111,7 @@ router.get("/history", ensureAuthenticated, async (req, res) => {
 //Panel view  Page
 router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
   let printers = Runner.returnFarmPrinters();
+  printers = printers.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
   const farmStatistics = require("../runners/statisticsCollection.js");
   const FarmStatistics = farmStatistics.StatisticsCollection;
   let statistics = await FarmStatistics.returnStats();
@@ -136,6 +140,7 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
 //Camera view  Page
 router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
   let printers = Runner.returnFarmPrinters();
+  printers = printers.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
   const farmStatistics = require("../runners/statisticsCollection.js");
   const FarmStatistics = farmStatistics.StatisticsCollection;
   let statistics = await FarmStatistics.returnStats();
@@ -164,6 +169,7 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
 //List view  Page
 router.get("/mon/list", ensureAuthenticated, async (req, res) => {
   let printers = Runner.returnFarmPrinters();
+  printers = printers.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
   const farmStatistics = require("../runners/statisticsCollection.js");
   const FarmStatistics = farmStatistics.StatisticsCollection;
   let statistics = await FarmStatistics.returnStats();

@@ -73,9 +73,10 @@ clientSettings[0].listView.hideOff){%>
     %><%}else{ %> No File Selected <% }%>
   </td>
   <td id="listFilament-<%= printer.index %>">
-    <% if(typeof printer.selectedFilament != 'undefined'){%> <%=
-    printer.selectedFilament.name %> [<%= printer.selectedFilament.colour %> /
-    <%= printer.selectedFilament.type[1] %>] <% }%>
+    <% if(typeof printer.selectedFilament != 'undefined' &&
+    printer.selectedFilament.name != null){%> <%= printer.selectedFilament.name
+    %> [<%= printer.selectedFilament.colour %> / <%=
+    printer.selectedFilament.type[1] %>] <% }%>
   </td>
   <td id="listState-<%= printer.index %>"><%= printer.state %></td>
   <td id="listPrintTime-<%= printer.index %>">

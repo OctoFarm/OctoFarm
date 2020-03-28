@@ -114,7 +114,7 @@ clientSettings[0].panelView.hideOff){%>
               role="button"
               disabled
             >
-              <%= printer.current.state %>
+              <%= printer.state %>
             </button>
             <center>
               <button
@@ -165,7 +165,8 @@ clientSettings[0].panelView.hideOff){%>
             </center>
           </div>
 
-          <% if(typeof printer.selectedFilament != 'undefined'){%>
+          <% if(typeof printer.selectedFilament != 'undefined' &&
+          printer.selectedFilament.name != null){%>
           <button
             type="button"
             class="btn btn-block btn-secondary mb-0"
