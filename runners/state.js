@@ -356,13 +356,13 @@ class Runner {
     if (webSockets[index].ws.instance.readyState == 3) {
       console.log(index + ": Attempting to reconnect socket...");
       try {
-        webSockets[i] = await ClientSocket.connect(
-          farmPrinters[i].index,
-          farmPrinters[i].ip,
-          farmPrinters[i].port,
-          farmPrinters[i].apikey
+        webSockets[index] = await ClientSocket.connect(
+          farmPrinters[index].index,
+          farmPrinters[index].ip,
+          farmPrinters[index].port,
+          farmPrinters[index].apikey
         );
-        Runner.setupClient(i);
+        Runner.setupClient(index);
         result.status = "success";
         result.msg =
           "Printer: " +
