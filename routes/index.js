@@ -182,7 +182,7 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
   }
   res.render("cameraView", {
     name: user,
-    userGroup: req.user.group,
+    userGroup: group,
     version: pjson.version,
     printers: printers,
     sortedIndex: sortedPrinters,
@@ -217,7 +217,7 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
   }
   res.render("listView", {
     name: user,
-    userGroup: req.user.group,
+    userGroup: group,
     version: pjson.version,
     printers: printers,
     sortedIndex: sortedPrinters,
