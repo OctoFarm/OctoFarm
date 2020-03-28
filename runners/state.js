@@ -875,9 +875,13 @@ class Runner {
   static sortedIndex() {
     let sorted = [];
     farmPrinters.forEach(p => {
-      sorted.push(p.sortIndex);
+      let sort = {
+        sortIndex: p.sortIndex,
+        actualIndex: p.index
+      };
+      sorted.push(sort);
     });
-
+    sorted.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
     return sorted;
   }
 }

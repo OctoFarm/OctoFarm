@@ -1,34 +1,36 @@
-<% printers.forEach(printer => { %> <% if(printer.state === "Offline" &&
-clientSettings[0].listView.hideOff){%>
+<% sortedIndex.forEach(sorted => { %> <% if(printers[sorted.actualIndex].state
+=== "Offline" && clientSettings[0].listView.hideOff){%>
 <tr
-  class="<%= printer.stateColour.category %> hidden"
-  id="listRow-<%= printer.index %>"
+  class="<%= printers[sorted.actualIndex].stateColour.category %> hidden"
+  id="listRow-<%= printers[sorted.actualIndex].index %>"
 >
-  <%}else if(printer.state === "Closed" &&
+  <%}else if(printers[sorted.actualIndex].state === "Closed" &&
   clientSettings[0].listView.hideClosed){%>
 </tr>
 
 <tr
-  class="<%= printer.stateColour.category %> hidden"
-  id="listRow-<%= printer.index %>"
+  class="<%= printers[sorted.actualIndex].stateColour.category %> hidden"
+  id="listRow-<%= printers[sorted.actualIndex].index %>"
 >
   <%}else{%>
 </tr>
 
 <tr
-  class="<%= printer.stateColour.category %>"
-  id="listRow-<%= printer.index %>"
+  class="<%= printers[sorted.actualIndex].stateColour.category %>"
+  id="listRow-<%= printers[sorted.actualIndex].index %>"
 >
   <%}%>
-  <th id="listIndex-<%= printer.index %>" scope="row"><%= printer.index%></th>
-  <td id="listName-<%= printer.index %>">
-    <% if(typeof printer.settingsApperance != 'undefined'){ %> <%=
-    printer.settingsApperance.name %><%}%>
+  <th id="listIndex-<%= printers[sorted.actualIndex].index %>" scope="row">
+    <%= printers[sorted.actualIndex].index%>
+  </th>
+  <td id="listName-<%= printers[sorted.actualIndex].index %>">
+    <% if(typeof printers[sorted.actualIndex].settingsApperance != 'undefined'){
+    %> <%= printers[sorted.actualIndex].settingsApperance.name %><%}%>
   </td>
   <td>
-    <% if(printer.state === "Offline"){ %>
+    <% if(printers[sorted.actualIndex].state === "Offline"){ %>
     <button
-      id="printerButton-<%= printer.index %>"
+      id="printerButton-<%= printers[sorted.actualIndex].index %>"
       type="button"
       class="btn btn-dark"
       data-toggle="modal"
@@ -39,7 +41,7 @@ clientSettings[0].listView.hideOff){%>
     </button>
     <% }else{ %>
     <button
-      id="printerButton-<%= printer.index %>"
+      id="printerButton-<%= printers[sorted.actualIndex].index %>"
       type="button"
       class="btn btn-dark"
       data-toggle="modal"
@@ -51,7 +53,7 @@ clientSettings[0].listView.hideOff){%>
   </td>
   <td>
     <button
-      id="listPlay-<%= printer.index %>"
+      id="listPlay-<%= printers[sorted.actualIndex].index %>"
       type="button"
       class="btn btn-success"
       disabled
@@ -59,7 +61,7 @@ clientSettings[0].listView.hideOff){%>
       <i class="fas fa-play"></i>
     </button>
     <button
-      id="listCancel-<%= printer.index %>"
+      id="listCancel-<%= printers[sorted.actualIndex].index %>"
       type="button"
       class="btn btn-danger"
       disabled
@@ -67,47 +69,79 @@ clientSettings[0].listView.hideOff){%>
       <i class="fas fa-square"></i>
     </button>
   </td>
-  <td id="listFile-<%= printer.index %>" class="text-truncate">
-    <i class="fas fa-file-code"></i> <% if(typeof printer.job != 'undefined' &&
-    printer.job.file.display != null){ %> <%= printer.job.file.display
-    %><%}else{ %> No File Selected <% }%>
+  <td
+    id="listFile-<%= printers[sorted.actualIndex].index %>"
+    class="text-truncate"
+  >
+    <i class="fas fa-file-code"></i> <% if(typeof
+    printers[sorted.actualIndex].job != 'undefined' &&
+    printers[sorted.actualIndex].job.file.display != null){ %> <%=
+    printers[sorted.actualIndex].job.file.display %><%}else{ %> No File Selected
+    <% }%>
   </td>
-  <td id="listFilament-<%= printer.index %>">
-    <% if(typeof printer.selectedFilament != 'undefined' &&
-    printer.selectedFilament.name != null){%> <%= printer.selectedFilament.name
-    %> [<%= printer.selectedFilament.colour %> / <%=
-    printer.selectedFilament.type[1] %>] <% }%>
+  <td id="listFilament-<%= printers[sorted.actualIndex].index %>">
+    <% if(typeof printers[sorted.actualIndex].selectedFilament != 'undefined' &&
+    printers[sorted.actualIndex].selectedFilament.name != null){%> <%=
+    printers[sorted.actualIndex].selectedFilament.name %> [<%=
+    printers[sorted.actualIndex].selectedFilament.colour %> / <%=
+    printers[sorted.actualIndex].selectedFilament.type[1] %>] <% }%>
   </td>
-  <td id="listState-<%= printer.index %>"><%= printer.state %></td>
-  <td id="listPrintTime-<%= printer.index %>">
-    <% if(typeof printer.progress != 'undefined'){ %> <%=
-    helpers.generateTime(printer.progress.printTimeLeft) %> <%}%>
+  <td id="listState-<%= printers[sorted.actualIndex].index %>">
+    <%= printers[sorted.actualIndex].state %>
   </td>
-  <td id="listE0Temp-<%= printer.index %>">
-    <% if(typeof printer.temps != 'undefined'){ %> <% if(typeof
-    printer.temps[0].tool0 != 'undefined'){ %>
-    <i id="tool0A-<%= printer.index %>" class="far fa-circle"></i> <%=
-    printer.temps[0].tool0.actual %><%}else{ %>
-    <i id="tool0A-<%= printer.index %>" class="far fa-circle"></i> <%=
-    0%><%}%>°C <% if(typeof printer.temps[0].tool0 != 'undefined'){ %>
-    <i id="tool0T-<%= printer.index %>" class="fas fa-bullseye"></i> <%=
-    printer.temps[0].tool0.target%><%}else{ %>
-    <i id="tool0T-<%= printer.index %>" class="fas fa-bullseye"></i> <%=
-    0%><%}%>°C <%} %>
+  <td id="listPrintTime-<%= printers[sorted.actualIndex].index %>">
+    <% if(typeof printers[sorted.actualIndex].progress != 'undefined'){ %> <%=
+    helpers.generateTime(printers[sorted.actualIndex].progress.printTimeLeft) %>
+    <%}%>
   </td>
-  <td id="listBedTemp-<%= printer.index %>">
-    <% if(typeof printer.temps != 'undefined'){ %> <% if(typeof
-    printer.temps[0].bed != 'undefined'){ %><i
-      id="bedA-<%= printer.index %>"
+  <td id="listE0Temp-<%= printers[sorted.actualIndex].index %>">
+    <% if(typeof printers[sorted.actualIndex].temps != 'undefined'){ %> <%
+    if(typeof printers[sorted.actualIndex].temps[0].tool0 != 'undefined'){ %>
+    <i
+      id="tool0A-<%= printers[sorted.actualIndex].index %>"
       class="far fa-circle"
     ></i>
-    <%= printer.temps[0].bed.actual %><%}else{ %>
-    <i id="bedA-<%= printer.index %>" class="far fa-circle"></i> <%= 0%><%}%>°C
-    <% if(typeof printer.temps[0].bed != 'undefined'){ %>
-    <i id="bedT-<%= printer.index %>" class="fas fa-bullseye"></i> <%=
-    printer.temps[0].bed.target %><%}else{ %>
-    <i id="bedT-<%= printer.index %>" class="fas fa-bullseye"></i> <%=
-    0%><%}%>°C <%} %>
+    <%= printers[sorted.actualIndex].temps[0].tool0.actual %><%}else{ %>
+    <i
+      id="tool0A-<%= printers[sorted.actualIndex].index %>"
+      class="far fa-circle"
+    ></i>
+    <%= 0%><%}%>°C <% if(typeof printers[sorted.actualIndex].temps[0].tool0 !=
+    'undefined'){ %>
+    <i
+      id="tool0T-<%= printers[sorted.actualIndex].index %>"
+      class="fas fa-bullseye"
+    ></i>
+    <%= printers[sorted.actualIndex].temps[0].tool0.target%><%}else{ %>
+    <i
+      id="tool0T-<%= printers[sorted.actualIndex].index %>"
+      class="fas fa-bullseye"
+    ></i>
+    <%= 0%><%}%>°C <%} %>
+  </td>
+  <td id="listBedTemp-<%= printers[sorted.actualIndex].index %>">
+    <% if(typeof printers[sorted.actualIndex].temps != 'undefined'){ %> <%
+    if(typeof printers[sorted.actualIndex].temps[0].bed != 'undefined'){ %><i
+      id="bedA-<%= printers[sorted.actualIndex].index %>"
+      class="far fa-circle"
+    ></i>
+    <%= printers[sorted.actualIndex].temps[0].bed.actual %><%}else{ %>
+    <i
+      id="bedA-<%= printers[sorted.actualIndex].index %>"
+      class="far fa-circle"
+    ></i>
+    <%= 0%><%}%>°C <% if(typeof printers[sorted.actualIndex].temps[0].bed !=
+    'undefined'){ %>
+    <i
+      id="bedT-<%= printers[sorted.actualIndex].index %>"
+      class="fas fa-bullseye"
+    ></i>
+    <%= printers[sorted.actualIndex].temps[0].bed.target %><%}else{ %>
+    <i
+      id="bedT-<%= printers[sorted.actualIndex].index %>"
+      class="fas fa-bullseye"
+    ></i>
+    <%= 0%><%}%>°C <%} %>
   </td>
 </tr>
 <% }) %>

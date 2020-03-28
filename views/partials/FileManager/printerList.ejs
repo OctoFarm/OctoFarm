@@ -1,8 +1,8 @@
-<% printers.forEach((printer, index) => { %> <%printer.state%> <%
-if(printer.state != "Offline"){ %>
+<% sortedIndex.forEach(sorted => { %>  <% printers[sorted.actualIndex].state%> <%
+if(printers[sorted.actualIndex].state != "Offline"){ %>
 <!-- Connected -->
   <a
-    id="printer-<%= printer.index %>"
+    id="printer-<%= printers[sorted.actualIndex].index %>"
     href="#"
     class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
     style="display: block;
@@ -18,18 +18,18 @@ if(printer.state != "Offline"){ %>
       <div class="col-lg-10">
         <div class="d-flex w-100 justify-content-between">
           <h5 class="mb-1">
-            <%= printer.index %>.
-            <span id="printerName-<%= printer.index %>"
-              ><% if(typeof printer.settingsApperance != 'undefined'){ %> <%=
-              printer.settingsApperance.name %> <% } %></span
+            <%= printers[sorted.actualIndex].index %>.
+            <span id="printerName-<%= printers[sorted.actualIndex].index %>"
+              ><% if(typeof printers[sorted.actualIndex].settingsApperance != 'undefined'){ %> <%=
+              printers[sorted.actualIndex].settingsApperance.name %> <% } %></span
             >
           </h5>
           <small>
             <span class="float-right badge badge-dark badge-pill">
-              <% if(typeof printer.fileList != 'undefined' && typeof
-              printer.fileList.fileCount != 'undefined'){ %> Files: <%=
-              printer.fileList.fileCount %> / Folders: <%=
-              printer.fileList.folderCount %> <% }else{ %> Files: 0 / Folders: 0
+              <% if(typeof printers[sorted.actualIndex].fileList != 'undefined' && typeof
+              printers[sorted.actualIndex].fileList.fileCount != 'undefined'){ %> Files: <%=
+              printers[sorted.actualIndex].fileList.fileCount %> / Folders: <%=
+              printers[sorted.actualIndex].fileList.folderCount %> <% }else{ %> Files: 0 / Folders: 0
               <% } %>
             </span></small
           >
@@ -40,17 +40,17 @@ if(printer.state != "Offline"){ %>
           aria-label="Basic example"
         >
 
-          <% const selectedProfile = printer.current.printerProfile; %>
+          <% const selectedProfile = printers[sorted.actualIndex].current.printerProfile; %>
         </div>
         <div class="row">
           <div class="col-lg-2">
             <i class="fas fa-file-upload"></i
-            ><span id="fileCounts-<%= printer.index %>"> 0 </span>
+            ><span id="fileCounts-<%= printers[sorted.actualIndex].index %>"> 0 </span>
           </div>
           <div class="col-lg-10">
             <div class="progress">
               <div
-                id="fileProgress-<%= printer.index %>"
+                id="fileProgress-<%= printers[sorted.actualIndex].index %>"
                 class="progress-bar progress-bar-striped bg-warning"
                 role="progressbar"
                 style="width: 0%"
@@ -65,15 +65,15 @@ if(printer.state != "Offline"){ %>
         </div>
         <small class="pt-2 float-left"
           ><i class="fas fa-cube"></i> <b>H:</b> <%=
-          printer.profiles[selectedProfile].volume.height%>mm x <b>W:</b> <%=
-          printer.profiles[selectedProfile].volume.width%>mm x <b>D:</b> <%=
-          printer.profiles[selectedProfile].volume.depth%>mm</small
+          printers[sorted.actualIndex].profiles[selectedProfile].volume.height%>mm x <b>W:</b> <%=
+          printers[sorted.actualIndex].profiles[selectedProfile].volume.width%>mm x <b>D:</b> <%=
+          printers[sorted.actualIndex].profiles[selectedProfile].volume.depth%>mm</small
         >
         <small class="pt-2 float-left"
           ><i class="fas fa-pen"></i> <b>Extruders:</b> <%=
-          printer.profiles[selectedProfile].extruder.count %>
+          printers[sorted.actualIndex].profiles[selectedProfile].extruder.count %>
           <b>Nozzle Size:</b> <%=
-          printer.profiles[selectedProfile].extruder.nozzleDiameter %>mm</small
+          printers[sorted.actualIndex].profiles[selectedProfile].extruder.nozzleDiameter %>mm</small
         >
       </div>
     </div>

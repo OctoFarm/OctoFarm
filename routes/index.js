@@ -32,7 +32,6 @@ if (db === "") {
 router.get("/dashboard", ensureAuthenticated, async (req, res) => {
   let printers = await Runner.returnFarmPrinters();
   let sortedPrinters = await Runner.sortedIndex();
-  console.log(sortedPrinters);
   const farmStatistics = require("../runners/statisticsCollection.js");
   const FarmStatistics = farmStatistics.StatisticsCollection;
   let statistics = await FarmStatistics.returnStats();
@@ -88,6 +87,7 @@ router.get("/filemanager", ensureAuthenticated, async (req, res) => {
     userGroup: group,
     version: pjson.version,
     printers: printers,
+    sortedIndex: sortedPrinters,
     printerCount: printers.length,
     currentOperationsCount: statistics.currentOperationsCount,
     page: "File Manager",
@@ -117,6 +117,7 @@ router.get("/history", ensureAuthenticated, async (req, res) => {
     userGroup: group,
     version: pjson.version,
     printers: printers,
+    sortedIndex: sortedPrinters,
     printerCount: printers.length,
     history: history,
     page: "History",
@@ -149,6 +150,7 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
     userGroup: group,
     version: pjson.version,
     printers: printers,
+    sortedIndex: sortedPrinters,
     currentOperations: statistics.currentOperations,
     printerCount: printers.length,
     currentOperationsCount: statistics.currentOperationsCount,
@@ -183,6 +185,7 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
     userGroup: req.user.group,
     version: pjson.version,
     printers: printers,
+    sortedIndex: sortedPrinters,
     currentOperations: statistics.currentOperations,
     currentOperationsCount: statistics.currentOperationsCount,
     printerCount: printers.length,
@@ -217,6 +220,7 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
     userGroup: req.user.group,
     version: pjson.version,
     printers: printers,
+    sortedIndex: sortedPrinters,
     currentOperations: statistics.currentOperations,
     currentOperationsCount: statistics.currentOperationsCount,
     printerCount: printers.length,
