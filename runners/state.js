@@ -194,7 +194,10 @@ class Runner {
         //Make sure runners are created ready for each printer to pass between...
         farmPrinters[i].state = "Searching...";
         farmPrinters[i].stateColour = Runner.getColour("Searching...");
-        console.log(farmPrinters[i].sortIndex);
+        if (typeof farmPrinters[i].sortIndex === "undefined") {
+          farmPrinters[i].sortIndex = i;
+          farmPrinters[i].save();
+        }
       }
     } catch (err) {
       let error = {
