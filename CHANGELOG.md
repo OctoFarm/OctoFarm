@@ -41,6 +41,9 @@ All notable changes to this project will be documented in this file.
 - Dashboard now shows printer name if available when offline.
 - Statistic runners now close with printer update.
 - Fixed annoying message in logs when a client connects
+- Times no longer chop off multiple's of 10
+- Fixed issue where filament was sometimes not collected in History.
+- Fixed issue where flowRate was getting confused with feedRate. Both values are correctly applied now.
 
 ### Security
 

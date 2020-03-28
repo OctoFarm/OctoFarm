@@ -896,7 +896,7 @@ export default class PrinterManager {
       let flashReturn = function() {
         e.target.classList = "btn btn-light";
       };
-      let value = elements.printerControls.feedRateValue.innerHTML;
+      let value = elements.printerControls.flowRateValue.innerHTML;
       value = value.replace("%", "");
       OctoFarmClient.post("printers/flowChange", {
         printer: printer.index,
@@ -906,6 +906,7 @@ export default class PrinterManager {
         command: "flowrate",
         factor: parseInt(value)
       };
+      console.log(opt);
       let post = await OctoPrintClient.post(printer, "printer/tool", opt);
       if (post.status === 204) {
         e.target.classList = "btn btn-success";
