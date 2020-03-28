@@ -70,19 +70,28 @@ _Note_: Raspberry Pi's Raspbian OS doesn't officially support running MongoDB ye
 
 ### Prerequisites
 
-- [MongoDB](https://www.mongodb.com/) - v4.2+
-- [NodeJS](https://nodejs.org/) - v13+
+- [MongoDB](https://www.mongodb.com/) - v3.6+
+- [NodeJS](https://nodejs.org/) - v12+
 - [NPM](https://www.npmjs.com/) - v6+
+- [OctoPrint](https://octoprint.org) - v1.3.12+
+
+On your OctoPrint instance
+
+- Settings -> API
+- Copy the API Key someplace easy to get to
+- Enabled the "Allow Cross Origin Resource Sharing (CORS)
+- Restart OctoPrint
+- Repeat for all OctoPrints that will be added to the Farm
 
 ### Installation Docker
 
-### TinkerDad's Version
+### TinkerDad's Version (MongoDB Included)
 
 Instructions can be found: [TheTinkerDad/OctoFarm](https://hub.docker.com/r/thetinkerdad/octofarm)
 
 - Massive thanks to TheTinkerDad for making this, he's also better at keeping up with his documentation. Be sure to send him some love on his [Youtube Channel](https://www.youtube.com/channel/UCNaLzBZhXTCwjsDPU03y-kQ)
 
-### OctoFarm Official
+### OctoFarm Official (MongoDB Not Included)
 
 BIG thanks to knoker for the help with this!
 
@@ -98,7 +107,7 @@ Ports
 
 - 4000
 
-### Docker compose minimal example
+# Docker-Compose Installation (Includes a MongoDB Server)
 
 ```yml
 version: "2"
@@ -123,12 +132,23 @@ services:
       - MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=2'
 ```
 
-### Installation Production
+### Installation Production (Ubuntu/Debian Linux)
 
-1. Clone the OctoFarm
+1. Install the Pre-requisites
+
+```sh
+curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+sudo apt-get install -y nodejs
+sudo apt install mongodb
+```
+
+1. Clone the OctoFarm and cd into it's directory.
 
 ```sh
 git clone https://github.com/NotExpectedYet/OctoFarm.git
+
+cd OctoFarm
+
 ```
 
 2. Install NPM packages
@@ -137,15 +157,15 @@ git clone https://github.com/NotExpectedYet/OctoFarm.git
 npm install
 ```
 
-3. Edit the /config/db.js file with your database.
+3. Edit the /config/db.js file with your database and grab your hosts IP.
 
 ```sh
-module.exports = {
-  MongoURI: "mongodb://192.168.1.5:27017/octofarm"
-};
-//Example Local URL: "mongodb://192.168.1.5:27017/octofarm"
-//Example Remote URL: "mongodb+srv://s1mpleman:<YOUR PASSWORD>@cluster0-lgugu.mongodb.net/test?retryWrites=true&w=majority"
+nano config/db.js
 ```
+
+## Change 192.168.1.5 to the mongodb server's IP Address (127.0.0.1 if you installed on the same machine, the actual IP Address otherwise), Save the File
+
+## hostname -I (Take note of the IP Address returned here)
 
 4. Start the system
 
@@ -153,7 +173,26 @@ module.exports = {
 npm start
 ```
 
-- The production version will run without interaction, but currently there are no way to persist other than something like screen on linux, or using a service you create yourself. The logs will be outputted to \*.log files for error and standard operations. Check the error log if your server unexpectedly halts.
+### If the last message you see is '> node app.js > production.log 2> productionError.log' You did it correctly!
+
+5. Load up a browser and add your printers.
+
+```sh
+Open a browser and go to http://<IP from hostname -I>:4000
+Register a New User ## Password must be six characters
+Login as that new User
+Click the Setup Printers button
+Enter Your First Printer's information
+ - IP
+ - Port (Typically 80)
+ - Camera URL (Typically IP:8081/webcam/?action=stream if using a USB camera or Pi Camera )
+ - APIKey (Gathered during the PreRequisites)
+ - Click Add Printer
+ - Repeat for all your OctoPrint Instances
+ - Click Save
+```
+
+- The production version will run without interaction, but currently there are no way to persist other than something like screen on linux, or using a service you create yourself. The logs will be outputted to /logs folder for error and standard operations. Check the error log if your server unexpectedly halts.
 
 ### Installation Development
 
@@ -179,7 +218,13 @@ module.exports = {
 //Example Remote URL: "mongodb+srv://s1mpleman:<YOUR PASSWORD>@cluster0-lgugu.mongodb.net/test?retryWrites=true&w=majority"
 ```
 
-4. Start the system
+4. Install nodemon
+
+```sh
+npm install --save-dev nodemon
+```
+
+5. Start the system
 
 ```sh
 npm run dev
