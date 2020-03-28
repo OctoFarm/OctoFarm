@@ -22,6 +22,8 @@ All notable changes to this project will be documented in this file.
 - Tables should now be somewhat responsive on smaller screens. This isn't perfect, tables aren't great for smaller screen sizes but hope this mitigates it some.
 - Printer Database now stores: FeedRate, FlowRate, PrinterName, Custom Sort Index and filament selected.
 - All monitoring views added truncate for filename. Overflows will be replaced with "..."
+- Farm Utilisation Idle hours is now correctly multiplied by the total printers in the farm.
+- Farm Statistics updated on a longer interval
 
 ### Removed
 
@@ -37,6 +39,7 @@ All notable changes to this project will be documented in this file.
 - A blank field in the cameraURL now actually pulls through your camera settings from OctoPrint.
 - Cameral URL now saves to database after been updated in UI.
 - Dashboard now shows printer name if available when offline.
+- Statistic runners now close with printer update.
 
 ### Security
 

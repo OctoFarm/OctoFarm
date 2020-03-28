@@ -14,6 +14,7 @@ let farmPrinters = [];
 let webSockets = [];
 
 let statRunner = null;
+let farmStatRunner = null;
 
 function WebSocketClient() {
   this.number = 0; // Message number
@@ -167,11 +168,14 @@ class Runner {
       StatisticsCollection.currentOperations(farmPrinters);
       //Update farm information when we have temps
       StatisticsCollection.farmInformation(farmPrinters);
-      //Update farm statistics
-      StatisticsCollection.octofarmStatistics(farmPrinters);
       //Update print statistics
       StatisticsCollection.printStatistics();
     }, 500);
+    farmStatRunner = setInterval(function() {
+      //Update farm statistics
+      StatisticsCollection.octofarmStatistics(farmPrinters);
+    }, 5000);
+
     //Grab printers from database....
     try {
       farmPrinters = await Printers.find({}, null, { sort: { index: 1 } });
@@ -334,6 +338,8 @@ class Runner {
   }
 
   static async reset() {
+    clearInterval(farmStatRunner);
+    clearInterval(statRunner);
     for (let i = 0; i < webSockets.length; i++) {
       await webSockets[i].ws.terminate();
     }
