@@ -247,6 +247,7 @@ npm run dev
 ```
 
 - The developer version uses nodemon for live server reloading on changes. It will output all the logs to the console.
+- The developer version will skip some basic sanity checks, if your pages don't load right after server boot then it's because those sanity checks haven't finished.
 
 ## Packaged Versions
 
