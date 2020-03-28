@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 - Ability to turn off registration pages - Setting available in serverConfig/server.js requires server restart to take effect.
 - Notes to printer manager regarding HTTP and the use of port:ip combo.
 - Padded our the installation instructions on the README.md file.
+- Dashboard now has the ability to refresh the printers connection/information. Good incase you encounter crashes and the websocket doesn't automatically update, or you make changes to OctoPrints settings outside of OctoFarm.
 
 ### Changed
 
@@ -24,6 +25,7 @@ All notable changes to this project will be documented in this file.
 - All monitoring views added truncate for filename. Overflows will be replaced with "..."
 - Farm Utilisation Idle hours is now correctly multiplied by the total printers in the farm.
 - Farm Statistics updated on a longer interval
+- Updated port example to show 80 instead of 5001 which is the more common application due to most people using the Pi installation of OctoPrint.
 
 ### Removed
 
@@ -44,6 +46,7 @@ All notable changes to this project will be documented in this file.
 - Times no longer chop off multiple's of 10
 - Fixed issue where filament was sometimes not collected in History.
 - Fixed issue where flowRate was getting confused with feedRate. Both values are correctly applied now.
+- Never online printers now correctly re-grab printer information when connection is re-established.
 
 ### Security
 

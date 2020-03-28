@@ -1,4 +1,5 @@
 import OctoPrintClient from "./lib/octoprint.js";
+import OctoFarmClient from "./lib/octofarm.js";
 import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
@@ -36,14 +37,18 @@ source.onerror = function(e) {
     "error",
     "Communication with the server has been suddenly lost, we will automatically refresh in 10 seconds..."
   );
-  setTimeout(function(){ location.reload(); }, 10000);
+  setTimeout(function() {
+    location.reload();
+  }, 10000);
 };
 source.onclose = function(e) {
   UI.createAlert(
     "error",
     "Communication with the server has been suddenly lost, we will automatically refresh in 10 seconds..."
   );
-  setTimeout(function(){ location.reload(); }, 10000);
+  setTimeout(function() {
+    location.reload();
+  }, 10000);
 };
 //Initial listeners
 document.getElementById("connectAllBtn").addEventListener("click", e => {
@@ -61,7 +66,21 @@ printerCard.forEach(card => {
     PrinterManager.init(printerInfo);
   });
 });
-
+let printerReSync = document.querySelectorAll("[id^='printerSyncButton-']");
+printerReSync.forEach(card => {
+  let ca = card.id.split("-");
+  card.addEventListener("click", async e => {
+    e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i>";
+    e.target.disabled = true;
+    let data = {
+      id: parseInt(ca[1])
+    };
+    let post = await OctoFarmClient.post("printers/reScanOcto", data);
+    post = await post.json();
+    e.target.innerHTML = "<i class='fas fa-sync'></i>";
+    e.target.disabled = false;
+  });
+});
 class dashActions {
   static async connectionAction(action) {
     $("#connectionModal").modal("hide");
@@ -308,10 +327,16 @@ class dashUpdate {
             document.getElementById(
               "printerButton-" + printer.index
             ).disabled = false;
+            document.getElementById(
+              "printerSyncButton-" + printer.index
+            ).disabled = true;
           } else {
             document.getElementById(
               "printerButton-" + printer.index
             ).disabled = true;
+            document.getElementById(
+              "printerSyncButton-" + printer.index
+            ).disabled = false;
           }
         } else {
           document.getElementById("printerList").insertAdjacentHTML(
@@ -335,6 +360,12 @@ class dashUpdate {
                 >
                   <i class="fas fa-cog"></i>
                 </button>
+                <button  id="printerSyncButton-<%= printer.index %>"
+                type="button"
+                class="btn btn-secondary btn-sm float-right mr-1"
+              disabled>
+              <i class="fas fa-sync"></i>
+              </button>
                 <small class="pt-2 float-left ml-1 text-white"><i class="fas fa-network-wired"></i> ${printer.ip}:${printer.port}</small>
               </li>
             </div>

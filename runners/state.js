@@ -21,7 +21,10 @@ function WebSocketClient() {
 
   this.autoReconnectInterval = 5 * 1000; // ms
 }
-WebSocketClient.prototype.open = function(url) {
+WebSocketClient.prototype.open = function(url, index) {
+  if (typeof this.index === "undefined") {
+    this.index = index;
+  }
   this.url = url;
   this.instance = new WebSocket(this.url);
   this.instance.on("open", () => {
@@ -61,13 +64,18 @@ WebSocketClient.prototype.send = function(data, option) {
     this.instance.emit("error", e);
   }
 };
-WebSocketClient.prototype.reconnect = function(e) {
+WebSocketClient.prototype.reconnect = async function(e) {
   // console.log(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`,e);
   this.instance.removeAllListeners();
   var that = this;
-  setTimeout(function() {
+  setTimeout(async function() {
     //console.log("WebSocketClient: reconnecting...");
     that.open(that.url);
+    await Runner.getState(that.index);
+    await Runner.getFiles(that.index, "files?recursive=true");
+    await Runner.getSystem(that.index);
+    await Runner.getSettings(that.index);
+    await Runner.getProfile(that.index);
   }, this.autoReconnectInterval);
 };
 WebSocketClient.prototype.terminate = async function(e) {
@@ -225,7 +233,8 @@ class Runner {
     console.log("Printer: " + webSockets[i].index + " is been setup...");
     await Runner.getState(i);
     webSockets[i].ws.open(
-      `ws://${farmPrinters[i].ip}:${farmPrinters[i].port}/sockjs/websocket`
+      `ws://${farmPrinters[i].ip}:${farmPrinters[i].port}/sockjs/websocket`,
+      i
     );
     webSockets[i].ws.onopen = async function(e) {
       //Make sure to get current printer status...
@@ -338,18 +347,16 @@ class Runner {
   }
 
   static async reScanOcto(index) {
-    console.log(index + ": Attempting to reconnect socket...");
-    WebSockets[index].ws.reconnect();
-    console.log(index + ": Grabbing State..");
-    await Runner.getState(index);
-    console.log(index + ": Grabbing File List...");
-    await Runner.getFiles(index, "files?recursive=true");
-    console.log(index + ": Grabbing System Information...");
-    await Runner.getSystem(index);
-    console.log(index + ": Grabbing System Settings...");
-    await Runner.getSettings(index);
-    console.log(index + ": Grabbing Printer Profiles...");
-    await Runner.getProfile(index);
+    let result = null;
+    try {
+      console.log(index + ": Attempting to reconnect socket...");
+      webSockets[i].ws.open();
+      result = "Printer: " + index + " has successfully been reconnected...";
+      return result;
+    } catch (error) {
+      result = "Printer: " + index + " could not connect to socket...";
+      return result;
+    }
   }
 
   static async reset() {
@@ -499,7 +506,7 @@ class Runner {
         }
       })
       .catch(err => {
-        console.log("Error grabbing files" + err);
+        //console.log("Error grabbing files" + err);
         return false;
       });
   }
@@ -520,7 +527,10 @@ class Runner {
         farmPrinters[index].current = res.current;
         farmPrinters[index].options = res.options;
       })
-      .catch(err => console.log("Error grabbing state"));
+      .catch(err => {
+        //console.log("Error grabbing files" + err);
+        return false;
+      });
   }
   static getProfile(index) {
     return ClientAPI.get(
@@ -536,7 +546,10 @@ class Runner {
         //Update info to DB
         farmPrinters[index].profiles = res.profiles;
       })
-      .catch(err => console.log("Error grabbing profiles"));
+      .catch(err => {
+        //console.log("Error grabbing files" + err);
+        return false;
+      });
   }
   static getSettings(index) {
     return ClientAPI.get(
@@ -596,7 +609,10 @@ class Runner {
           }
         }
       })
-      .catch(err => console.log("Error grabbing Settings" + err));
+      .catch(err => {
+        //console.log("Error grabbing files" + err);
+        return false;
+      });
   }
   static getSystem(index) {
     return ClientAPI.get(
@@ -612,7 +628,10 @@ class Runner {
         //Update info to DB
         farmPrinters[index].core = res.core;
       })
-      .catch(err => console.log("Error grabbing System"));
+      .catch(err => {
+        //console.log("Error grabbing files" + err);
+        return false;
+      });
   }
   static getColour(state) {
     if (state === "Operational") {
@@ -757,14 +776,24 @@ class Runner {
       farmPrinters[i].fileList.folders.length;
   }
   static async selectedFilament(filament) {
-    let rolls = await Filament.findOne({ _id: filament.id });
-    farmPrinters[filament.index].selectedFilament = {
-      id: filament.id,
-      name: rolls.roll.name,
-      type: rolls.roll.type,
-      colour: rolls.roll.colour,
-      manufacturer: rolls.roll.manufacturer
-    };
+    if (filament.id == "") {
+      farmPrinters[filament.index].selectedFilament = {
+        id: null,
+        name: null,
+        type: null,
+        colour: null,
+        manufacturer: null
+      };
+    } else {
+      let rolls = await Filament.findOne({ _id: filament.id });
+      farmPrinters[filament.index].selectedFilament = {
+        id: filament.id,
+        name: rolls.roll.name,
+        type: rolls.roll.type,
+        colour: rolls.roll.colour,
+        manufacturer: rolls.roll.manufacturer
+      };
+    }
     let printer = await Printers.findOne({ index: filament.index });
     printer.selectedFilament = farmPrinters[filament.index].selectedFilament;
     printer.save();

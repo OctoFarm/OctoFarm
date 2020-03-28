@@ -340,7 +340,7 @@ export default class PrinterManager {
             </div>
             <div class="col-md-5">
             <div class="col-12 list-group" id="fileLocations"><div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="fileSearchBar">Search:</label> </div><input id="fileSearch" type="text" class="form-control" aria-label="Small" aria-describedby="inputGroup-sizing-sm" placeholder="Type your filename here"></div></div>
-            <div class="col-12"> <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="filamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="filamentManagerFolderSelect"><option value="local" selected>Please choose filament..</option></select></div>
+            <div class="col-12"> <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="filamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="filamentManagerFolderSelect"><option value="" selected></option></select></div>
             <center>
               <div class="progress mb-2">
               <div id="pmProgress" class="progress-bar" role="progressbar progress-bar-striped" style="width:${
@@ -613,7 +613,12 @@ export default class PrinterManager {
         filamentSelect.addEventListener("change", e => {
           chooseFilament(e.target, i);
         });
-        if (typeof printer.selectedFilament != "undefined") {
+
+        console.log(printer.selectedFilament);
+        if (
+          typeof printer.selectedFilament != "undefined" &&
+          printer.selectedFilament != null
+        ) {
           filamentSelect.value = printer.selectedFilament.id;
         }
         const printerPort = document.getElementById("printerPortDrop");
