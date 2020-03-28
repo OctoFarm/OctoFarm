@@ -615,7 +615,8 @@ export default class PrinterManager {
         });
         if (
           typeof printer.selectedFilament != "undefined" &&
-          printer.selectedFilament != null
+          printer.selectedFilament != null &&
+          printer.selectedFilament.name != null
         ) {
           filamentSelect.value = printer.selectedFilament.id;
         }

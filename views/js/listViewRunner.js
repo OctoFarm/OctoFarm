@@ -140,7 +140,8 @@ function updateState(printers, clientSettings) {
     }
     if (
       typeof printer.selectedFilament != "undefined" &&
-      printer.selectedFilament != null
+      printer.selectedFilament != null &&
+      printer.selectedFilament.name != null
     ) {
       elements.filament.innerHTML =
         printer.selectedFilament.name +
