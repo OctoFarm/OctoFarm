@@ -342,39 +342,6 @@ class dashUpdate {
               "printerButton-" + printer.index
             ).disabled = true;
           }
-        } else {
-          document.getElementById("printerList").insertAdjacentHTML(
-            "beforeend",
-            `
-              <div class="list-group" id="printerCard-${printer.index}">
-              <li class="list-group-item list-group-item-action flex-column align-items-start">
-                <div class="d-flex w-100 justify-content-between text-white">
-                  <h5 id="printerName-${printer.index}" class="mb-1 ml-1"> <i class="fas fa-print"></i>  ${printer.index}. ${printerName}</span
-                    ></h5>
-                  <small><span id="printerBadge-${printer.index}"
-                    class="badge badge-${printer.stateColour.name} badge-pill"
-                    >${printer.state}
-                    </small></span>
-                </div>
-                <button  id="printerButton-<%= printer.index %>"
-                  type="button"
-                  class="btn btn-secondary btn-sm float-right"
-                  data-toggle="modal"
-                  data-target="#printerManagerModal"
-                >
-                  <i class="fas fa-cog"></i>
-                </button>
-                <button  id="printerSyncButton-<%= printer.index %>"
-                type="button"
-                class="btn btn-secondary btn-sm float-right mr-1"
-              disabled>
-              <i class="fas fa-sync"></i>
-              </button>
-                <small class="pt-2 float-left ml-1 text-white"><i class="fas fa-network-wired"></i> ${printer.ip}:${printer.port}</small>
-              </li>
-            </div>
-          `
-          );
         }
         // document.getElementById("printerCard-" + printer.index).style.order =
         //   printer.sortIndex;
@@ -439,3 +406,18 @@ class dashUpdate {
     idleProgress.style.width = 100 - octofarmStatistics.activePercent + "%";
   }
 }
+var el = document.getElementById("printerList");
+var sortable = Sortable.create(el, {
+  handle: ".fa-grip-vertical",
+  animation: 150,
+  onUpdate: function(/**Event*/ e) {
+    //console.log(evt);
+    let elements = e.target.querySelectorAll("[id^='printerCard-']");
+    let listID = [];
+    elements.forEach(e => {
+      let ca = e.id.split("-");
+      listID.push(ca[1]);
+    });
+    OctoFarmClient.post("printers/updateSortIndex", listID);
+  }
+});

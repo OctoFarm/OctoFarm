@@ -291,3 +291,7 @@ label {
 .rotate90 {
   transform: rotate(90deg);
 }
+.sortableList {
+  cursor: move;
+  cursor: -webkit-grabbing;
+}

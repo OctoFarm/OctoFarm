@@ -185,5 +185,8 @@ router.post("/reScanOcto", ensureAuthenticated, async (req, res) => {
   let reScan = await Runner.reScanOcto(data.id);
   res.send({ msg: reScan });
 });
-
+router.post("/updateSortIndex", ensureAuthenticated, async (req, res) => {
+  let data = req.body;
+  Runner.updateSortIndex(data);
+});
 module.exports = router;

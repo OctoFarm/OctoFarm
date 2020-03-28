@@ -641,7 +641,6 @@ class Runner {
               );
             } else {
               farmPrinters[index].camURL =
-                "http://" +
                 farmPrinters[index].ip +
                 ":" +
                 farmPrinters[index].port +
@@ -739,6 +738,20 @@ class Runner {
     let printer = await Printers.findOne({ index: i });
     printer.feedRate = farmPrinters[i].feedRate;
     printer.save();
+  }
+  static async updateSortIndex(list) {
+    //Update the live information
+    console.log(list);
+    for (let i = 0; i < farmPrinters.length; i++) {
+      console.log("Actual Index: ", farmPrinters[list[i]].index);
+      console.log("Old Sort Index ", farmPrinters[list[i]].sortIndex);
+      console.log("New Sort Index ", i);
+      farmPrinters[list[i]].sortIndex = i;
+      let printer = await Printers.findOne({ index: list[i] });
+      printer.sortIndex = i;
+      printer.save();
+    }
+    //Update database...
   }
   static stepRate(i, newRate) {
     farmPrinters[i].stepRate = newRate;

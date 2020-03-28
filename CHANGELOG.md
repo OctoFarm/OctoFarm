@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
 - Updated port example to show 80 instead of 5001 which is the more common application due to most people using the Pi installation of OctoPrint.
 - Printer Manager is restricted to the Admin user only. (This is the first user created).
 - Get a warning when adding printers to remove http:// from IP and Camera URL.
+- Printers displayed on page will respect the sortedIndex.
 
 ### Removed
 
@@ -51,6 +52,7 @@ All notable changes to this project will be documented in this file.
 - Fixed issue where filament was sometimes not collected in History.
 - Fixed issue where flowRate was getting confused with feedRate. Both values are correctly applied now.
 - Never online printers now correctly re-grab printer information when connection is re-established.
+- Deleting a printer should not require server restart anymore. Please inform me if this is not the case, my testings suggests it's fine now.
 
 ### Security
 

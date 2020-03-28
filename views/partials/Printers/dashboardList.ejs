@@ -29,6 +29,11 @@
     >
     <i class="fas fa-sync"></i>
     </button>
+    <span  id="printerSortButton-<%= printer.index %>"
+      class="btn btn-secondary btn-sm float-right mr-1 sortableList"
+    >
+    <i class="fas fa-grip-vertical"></i>
+    </span>
     <small class="pt-2 float-left ml-1 text-white"><i class="fas fa-network-wired"></i> <%= printer.ip%>:<%= printer.port%></small>
   </li>
 </div>
@@ -59,6 +64,11 @@
           >
           <i class="fas fa-sync"></i>
           </button>
+          <span  id="printerSortButton-<%= printer.index %>"
+            class="btn btn-secondary btn-sm float-right mr-1 sortableList"
+          >
+          <i class="fas fa-grip-vertical"></i>
+          </span>
           <small class="pt-2 float-left ml-1 text-white"><i class="fas fa-network-wired"></i> <%= printer.ip%>:<%= printer.port%></small>
         </li>
       </div>
