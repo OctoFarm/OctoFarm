@@ -145,6 +145,17 @@ services:
 curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
 sudo apt-get install -y nodejs
 sudo apt install mongodb
+sudo apt install git
+```
+
+- Alternative
+
+```sh
+curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+sudo apt-get install -y nodejs
+wget https://repo.mongodb.org/apt/ubuntu/dists/bionic/mongodb-org/4.2/multiverse/binary-amd64/mongodb-org-server_4.2.5_amd64.deb
+sudo dpkg -i mongodb-org-server_4.2.5_amd64.deb
+sudo apt install git
 ```
 
 1. Clone the OctoFarm and cd into it's directory.
