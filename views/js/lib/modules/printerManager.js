@@ -28,7 +28,9 @@ $("#connectionModal").on("hidden.bs.modal", function(e) {
 
 export default class PrinterManager {
   static async init(printers) {
-    let i = currentIndex;
+    let i = _.findIndex(printers, function(o) {
+      return o.index == currentIndex;
+    });
     let printer = null;
     if (typeof printers != "undefined" && printers != "") {
       if (typeof printers.length === "undefined") {
@@ -724,6 +726,7 @@ export default class PrinterManager {
     } else {
       elements.connectPage.connectButton.addEventListener("click", e => {
         elements.connectPage.connectButton.disabled = true;
+        console.log(printer)
         OctoPrintClient.connect(
           elements.connectPage.connectButton.value,
           printer
@@ -1349,7 +1352,10 @@ export default class PrinterManager {
       elements.mainPage.title.innerHTML = "Octoprint Manager:";
     } else {
       elements.mainPage.title.innerHTML =
-        "Octoprint Manager: " + printer.settingsAppearance.name;
+        "Octoprint Manager: " +
+        printer.index +
+        ". " +
+        printer.settingsAppearance.name;
     }
 
     elements.mainPage.status.innerHTML = printer.state;
@@ -1364,6 +1370,7 @@ export default class PrinterManager {
       elements.connectPage.restartButton.disabled = true;
       elements.connectPage.rebootButton.disabled = true;
       elements.connectPage.shutdownButton.disabled = true;
+
       elements.printerControls["step" + printer.stepRate].className =
         "btn btn-dark active";
       elements.jobStatus.progressBar.innerHTML =

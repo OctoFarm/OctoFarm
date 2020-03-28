@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - Printer Manager is restricted to the Admin user only. (This is the first user created).
 - Get a warning when adding printers to remove http:// from IP and Camera URL.
 - Printers displayed on page will respect the sortedIndex.
+- added AutoComplete tags to password and username forms.
 
 ### Removed
 
@@ -54,6 +55,7 @@ All notable changes to this project will be documented in this file.
 - Fixed issue where flowRate was getting confused with feedRate. Both values are correctly applied now.
 - Never online printers now correctly re-grab printer information when connection is re-established.
 - Deleting a printer should not require server restart anymore. Please inform me if this is not the case, my testings suggests it's fine now.
+- Fixed circular reference error with filaments
 
 ### Security
 

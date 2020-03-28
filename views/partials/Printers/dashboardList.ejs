@@ -1,21 +1,19 @@
-
-
-<% printers.forEach(printer => { %> 
-  <% if(typeof printer.stateColour != 'undefined' && typeof printer.settingsApperance != "undefined" && printer.settingsApperance.category != 'Offline' ){%> 
+<% sortedIndex.forEach(sorted => { %> 
+  <% if(typeof printers[sorted].stateColour != 'undefined' && typeof printers[sorted].settingsApperance != "undefined" && printers[sorted].settingsApperance.category != 'Offline' ){%> 
   <!-- Connected -->
-<div class="list-group" id="printerCard-<%= printer.index %>">
+<div class="list-group" id="printerCard-<%= printers[sorted].index %>">
   <li class="list-group-item list-group-item-action flex-column align-items-start">
     <div class="d-flex w-100 justify-content-between text-white">
-      <h5 id="printerName-<%= printer.index %>" class="mb-1 ml-1"> <i class="fas fa-print"></i>  <%= printer.index %>.
-        <%= printer.settingsApperance.name %></span
+      <h5 id="printerName-<%= printers[sorted].index %>" class="mb-1 ml-1"> <i class="fas fa-print"></i>  <%= printers[sorted].index %>.
+        <%= printers[sorted].settingsApperance.name %></span
         ></h5>
-      <small><span id="printerBadge-<%= printer.index %>"
-        class="badge badge-<%= printer.stateColour.name %> badge-pill"
+      <small><span id="printerBadge-<%= printers[sorted].index %>"
+        class="badge badge-<%= printers[sorted].stateColour.name %> badge-pill"
         >
-            <%= printer.state %>
+            <%= printers[sorted].state %>
         </small></span>
     </div>
-    <button  id="printerButton-<%= printer.index %>"
+    <button  id="printerButton-<%= printers[sorted].index %>"
       type="button"
       class="btn btn-secondary btn-sm float-right"
       data-toggle="modal"
@@ -23,34 +21,34 @@
     >
       <i class="fas fa-cog"></i>
     </button>
-    <button  id="printerSyncButton-<%= printer.index %>"
+    <button  id="printerSyncButton-<%= printers[sorted].index %>"
       type="button"
       class="btn btn-secondary btn-sm float-right mr-1"
     >
     <i class="fas fa-sync"></i>
     </button>
-    <span  id="printerSortButton-<%= printer.index %>"
+    <span  id="printerSortButton-<%= printers[sorted].index %>"
       class="btn btn-secondary btn-sm float-right mr-1 sortableList"
     >
     <i class="fas fa-grip-vertical"></i>
     </span>
-    <small class="pt-2 float-left ml-1 text-white"><i class="fas fa-network-wired"></i> <%= printer.ip%>:<%= printer.port%></small>
+    <small class="pt-2 float-left ml-1 text-white"><i class="fas fa-network-wired"></i> <%= printers[sorted].ip%>:<%= printers[sorted].port%></small>
   </li>
 </div>
     <% }else{ %>
-      <div class="list-group" id="printerCard-<%= printer.index %>">.  <% if(typeof printer.settingsApperance != "undefined" ){%> <%= printer.settingsApperance.name %> <%}%>
+      <div class="list-group" id="printerCard-<%= printers[sorted].index %>">.  <% if(typeof printers[sorted].settingsApperance != "undefined" ){%> <%= printers[sorted].settingsApperance.name %> <%}%>
         <li class="list-group-item list-group-item-action flex-column align-items-start">
           <div class="d-flex w-100 justify-content-between text-white">
-            <h5 id="printerName-<%= printer.index %>" class="mb-1 ml-1"> <i class="fas fa-print"></i>  <%= printer.index %>. Searching for printer information...</span
+            <h5 id="printerName-<%= printers[sorted].index %>" class="mb-1 ml-1"> <i class="fas fa-print"></i>  <%= printers[sorted].index %>. Searching for printers[sorted] information...</span
               ></h5>
-            <small><span id="printerBadge-<%= printer.index %>"
+            <small><span id="printerBadge-<%= printers[sorted].index %>"
               class="badge badge-danger badge-pill"
               >
                 <i class="fas fa-spinner fa-pulse"></i>   Searching...
 
               </small></span>
           </div>
-          <button  id="printerButton-<%= printer.index %>"
+          <button  id="printerButton-<%= printers[sorted].index %>"
             type="button"
             class="btn btn-secondary btn-sm float-right"
             data-toggle="modal"
@@ -58,18 +56,18 @@
           disabled>
             <i class="fas fa-cog"></i>
           </button>
-          <button  id="printerSyncButton-<%= printer.index %>"
+          <button  id="printerSyncButton-<%= printers[sorted].index %>"
             type="button"
             class="btn btn-secondary btn-sm float-right mr-1"
           >
           <i class="fas fa-sync"></i>
           </button>
-          <span  id="printerSortButton-<%= printer.index %>"
+          <span  id="printerSortButton-<%= printers[sorted].index %>"
             class="btn btn-secondary btn-sm float-right mr-1 sortableList"
           >
           <i class="fas fa-grip-vertical"></i>
           </span>
-          <small class="pt-2 float-left ml-1 text-white"><i class="fas fa-network-wired"></i> <%= printer.ip%>:<%= printer.port%></small>
+          <small class="pt-2 float-left ml-1 text-white"><i class="fas fa-network-wired"></i> <%= printers[sorted].ip%>:<%= printers[sorted].port%></small>
         </li>
       </div>
 

@@ -741,11 +741,7 @@ class Runner {
   }
   static async updateSortIndex(list) {
     //Update the live information
-    console.log(list);
     for (let i = 0; i < farmPrinters.length; i++) {
-      console.log("Actual Index: ", farmPrinters[list[i]].index);
-      console.log("Old Sort Index ", farmPrinters[list[i]].sortIndex);
-      console.log("New Sort Index ", i);
       farmPrinters[list[i]].sortIndex = i;
       let printer = await Printers.findOne({ index: list[i] });
       printer.sortIndex = i;
@@ -875,6 +871,14 @@ class Runner {
       time: null
     };
     farmPrinters[i].fileList.files.push(data);
+  }
+  static sortedIndex() {
+    let sorted = [];
+    farmPrinters.forEach(p => {
+      sorted.push(p.sortIndex);
+    });
+
+    return sorted;
   }
 }
 
