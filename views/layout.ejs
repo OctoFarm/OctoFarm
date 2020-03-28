@@ -136,8 +136,11 @@
                             <a class="dropdown-item text-center  text-light" href="/users/logout"><i class="fas fa-sign-out-alt"></i>Sign Out</a>
                         <% }%>
                         <h6 class="dropdown-header">Managment</h6>
-                        <a class="dropdown-item  text-center text-light" href="#" data-toggle="modal"
-                            data-target="#printerSetupModal" id="printerSetup"><i class="fas fa-print"></i> Printers</a>
+                        <% if(typeof userGroup != "undefined" && userGroup === "Administrator"){ %>
+                          <a class="dropdown-item  text-center text-light" href="#" data-toggle="modal"
+                          data-target="#printerSetupModal" id="printerSetup"><i class="fas fa-print"></i> Printers</a>
+                      <% }%>
+             
                             <a class="dropdown-item  text-center text-light" href="#" data-toggle="modal"
                             data-target="#filamentModal" id=""><i class="fas fa-toilet-paper"></i> Filament</a>
                         <h6 class="dropdown-header">Settings</h6>

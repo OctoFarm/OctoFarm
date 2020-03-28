@@ -28,6 +28,8 @@ All notable changes to this project will be documented in this file.
 - Farm Utilisation Idle hours is now correctly multiplied by the total printers in the farm.
 - Farm Statistics updated on a longer interval
 - Updated port example to show 80 instead of 5001 which is the more common application due to most people using the Pi installation of OctoPrint.
+- Printer Manager is restricted to the Admin user only. (This is the first user created).
+- Get a warning when adding printers to remove http:// from IP and Camera URL.
 
 ### Removed
 

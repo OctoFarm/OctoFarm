@@ -38,7 +38,7 @@ router.get("/printerInfo/", ensureAuthenticated, function(req, res) {
 setInterval(async function() {
   //Only needed for WebSocket Information
   let printers = await Runner.returnFarmPrinters();
-  printers = printers.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
+
   let statistics = await FarmStatistics.returnStats();
   let currentOperations = null;
   let currentOperationsCount = null;

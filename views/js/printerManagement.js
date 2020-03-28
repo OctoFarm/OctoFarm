@@ -115,6 +115,18 @@ class PrintersManagement {
       } else {
         apikey.className = "form-control is-valid";
       }
+      if (ip.value.includes("http")) {
+        errors.push({
+          type: "danger",
+          msg: "Please remove http:// from IP Address"
+        });
+      }
+      if (camURL.value.includes("http")) {
+        errors.push({
+          type: "danger",
+          msg: "Please remove http:// from Camera URL"
+        });
+      }
       errors.forEach(error => {
         UI.createMessage(error, "message");
       });

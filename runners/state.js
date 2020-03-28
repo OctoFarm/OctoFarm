@@ -194,6 +194,7 @@ class Runner {
         //Make sure runners are created ready for each printer to pass between...
         farmPrinters[i].state = "Searching...";
         farmPrinters[i].stateColour = Runner.getColour("Searching...");
+        console.log(farmPrinters[i].sortIndex);
       }
     } catch (err) {
       let error = {
@@ -611,10 +612,6 @@ class Runner {
         farmPrinters[index].settingsApperance = res.appearance;
         let printer = await Printers.findOne({ index: index });
         printer.settingsApperance = farmPrinters[index].settingsApperance;
-        if (typeof farmPrinters[index].sortIndex === "undefined") {
-          farmPrinters[index].sortIndex = index;
-          printer.sortIndex = index;
-        }
         printer.save();
         farmPrinters[index].settingsFeature = res.feature;
         farmPrinters[index].settingsFolder = res.folder;

@@ -17,18 +17,21 @@ var source = new EventSource("/sse/printerInfo/");
 source.onmessage = function(e) {
   if (e.data != null) {
     let res = JSON.parse(e.data);
-
-    if (
-      document.getElementById("printerManagerModal").classList.contains("show")
-    ) {
-      PrinterManager.init(res.printerInfo);
-    } else {
-      currentOperations(res.currentOperations, res.currentOperationsCount);
-      dashUpdate.systemInformation(res.systemInfo);
-      dashUpdate.printers(res.printerInfo);
-      printerInfo = res.printerInfo;
-      dashUpdate.farmInformation(res.farmInfo);
-      dashUpdate.farmStatistics(res.octofarmStatistics);
+    if (res.printerInfo.length > 0) {
+      if (
+        document
+          .getElementById("printerManagerModal")
+          .classList.contains("show")
+      ) {
+        PrinterManager.init(res.printerInfo);
+      } else {
+        currentOperations(res.currentOperations, res.currentOperationsCount);
+        dashUpdate.systemInformation(res.systemInfo);
+        dashUpdate.printers(res.printerInfo);
+        printerInfo = res.printerInfo;
+        dashUpdate.farmInformation(res.farmInfo);
+        dashUpdate.farmStatistics(res.octofarmStatistics);
+      }
     }
   }
 };
@@ -57,6 +60,7 @@ document.getElementById("connectAllBtn").addEventListener("click", e => {
 document.getElementById("disconnectAllBtn").addEventListener("click", e => {
   dashActions.disconnectAll();
 });
+
 //Setup page listeners...
 let printerCard = document.querySelectorAll("[id^='printerButton-']");
 printerCard.forEach(card => {
@@ -372,9 +376,8 @@ class dashUpdate {
           `
           );
         }
-        document.getElementById(
-          "printerCard-" + printer.index
-        ).style.order = index;
+        // document.getElementById("printerCard-" + printer.index).style.order =
+        //   printer.sortIndex;
       }
     });
   }

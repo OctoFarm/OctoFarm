@@ -10,7 +10,8 @@ const User = require("../models/User.js");
 //Login Page
 router.get("/login", (req, res) =>
   res.render("login", {
-    page: "Login"
+    page: "Login",
+    registration: serverConfig.registration
   })
 );
 if (serverConfig.registration === true) {
@@ -44,6 +45,7 @@ if (serverConfig.registration === true) {
     if (errors.length > 0) {
       res.render("register", {
         page: "Login",
+        registration: serverConfig.registration,
         errors,
         name,
         username,
@@ -58,6 +60,7 @@ if (serverConfig.registration === true) {
           errors.push({ msg: "Username is already registered" });
           res.render("register", {
             page: "Login",
+            registration: serverConfig.registration,
             errors,
             name,
             username,
@@ -111,7 +114,8 @@ router.post("/login", (req, res, next) => {
     successRedirect: "/dashboard",
     failureRedirect: "/users/login",
     failureFlash: true,
-    page: "Login"
+    page: "Login",
+    registration: serverConfig.registration
   })(req, res, true);
 });
 
