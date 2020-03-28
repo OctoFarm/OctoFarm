@@ -353,7 +353,6 @@ class Runner {
       status: null,
       msg: null
     };
-    console.log(webSockets[index].ws);
     if (webSockets[index].ws.instance.readyState == 3) {
       console.log(index + ": Attempting to reconnect socket...");
       try {

@@ -613,8 +613,6 @@ export default class PrinterManager {
         filamentSelect.addEventListener("change", e => {
           chooseFilament(e.target, i);
         });
-
-        console.log(printer.selectedFilament);
         if (
           typeof printer.selectedFilament != "undefined" &&
           printer.selectedFilament != null

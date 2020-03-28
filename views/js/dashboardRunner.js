@@ -77,7 +77,12 @@ printerReSync.forEach(card => {
     };
     let post = await OctoFarmClient.post("printers/reScanOcto", data);
     post = await post.json();
-    UI.createAlert("success", post.msg, 3000, "clicked");
+    if (post.status != "error") {
+      UI.createAlert("success", post.msg, 3000, "clicked");
+    } else {
+      UI.createAlert("error", post.msg, 3000, "clicked");
+    }
+
     e.target.innerHTML = "<i class='fas fa-sync'></i>";
     e.target.disabled = false;
   });
