@@ -107,7 +107,7 @@ Ports
 
 - 4000
 
-# Docker-Compose Installation (Includes a MongoDB Server)
+### Docker-Compose Installation (Includes a MongoDB Server)
 
 ```yml
 version: "2"
@@ -234,7 +234,7 @@ npm run dev
 
 ## Packaged Versions
 
-These will be coming shortly after the release of version 1.1.
+These are planned but not available yet...
 
 <!-- ROADMAP -->
 
