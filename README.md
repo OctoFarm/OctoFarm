@@ -163,9 +163,9 @@ npm install
 nano config/db.js
 ```
 
-## Change 192.168.1.5 to the mongodb server's IP Address (127.0.0.1 if you installed on the same machine, the actual IP Address otherwise), Save the File
+#### Change 192.168.1.5 to the mongodb server's IP Address (127.0.0.1 if you installed on the same machine, the actual IP Address otherwise), Save the File
 
-## hostname -I (Take note of the IP Address returned here)
+#### hostname -I (Take note of the IP Address returned here)
 
 4. Start the system
 
@@ -173,7 +173,7 @@ nano config/db.js
 npm start
 ```
 
-### If the last message you see is '> node app.js > production.log 2> productionError.log' You did it correctly!
+#### If the last message you see is '> node app.js > production.log 2> productionError.log' You did it correctly!
 
 5. Load up a browser and add your printers.
 
