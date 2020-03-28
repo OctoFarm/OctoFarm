@@ -182,7 +182,7 @@ Open a browser and go to http://<IP from hostname -I>:4000
 Register a New User ## Password must be six characters
 Login as that new User
 Click the Setup Printers button
-Enter Your First Printer's information
+Enter Your First Printers information
  - IP
  - Port (Typically 80)
  - Camera URL (Typically IP:8081/webcam/?action=stream if using a USB camera or Pi Camera )
