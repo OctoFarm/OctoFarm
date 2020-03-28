@@ -15,6 +15,8 @@ All notable changes to this project will be documented in this file.
 - Notes to printer manager regarding HTTP and the use of port:ip combo.
 - Padded our the installation instructions on the README.md file.
 - Dashboard now has the ability to refresh the printers connection/information. Good incase you encounter crashes and the websocket doesn't automatically update, or you make changes to OctoPrints settings outside of OctoFarm.
+  - Pressing on an Offline printer will attempt to re-establish the lost websocket connection then update the instace from OctoPrint.
+  - Pressing on an Online printer will update the instance from OctoPrint.
 
 ### Changed
 
