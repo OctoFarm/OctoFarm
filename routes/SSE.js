@@ -19,7 +19,7 @@ var clients = {}; // <- Keep a map of attached clients
 
 // Called once for each new client. Note, this response is left open!
 router.get("/printerInfo/", ensureAuthenticated, function(req, res) {
-  req.socket.setTimeout(Number.MAX_VALUE);
+  //req.socket.setTimeout(Number.MAX_VALUE);
   res.writeHead(200, {
     "Content-Type": "text/event-stream", // <- Important headers
     "Cache-Control": "no-cache",
