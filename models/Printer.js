@@ -38,7 +38,7 @@ const PrinterSchema = new mongoose.Schema({
     required: false
   },
   selectedFilament: {
-    type: String,
+    type: Object,
     required: false
   }
 });

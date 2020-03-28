@@ -337,6 +337,21 @@ class Runner {
     };
   }
 
+  static async reScanOcto(index) {
+    console.log(index + ": Attempting to reconnect socket...");
+    WebSockets[index].ws.reconnect();
+    console.log(index + ": Grabbing State..");
+    await Runner.getState(index);
+    console.log(index + ": Grabbing File List...");
+    await Runner.getFiles(index, "files?recursive=true");
+    console.log(index + ": Grabbing System Information...");
+    await Runner.getSystem(index);
+    console.log(index + ": Grabbing System Settings...");
+    await Runner.getSettings(index);
+    console.log(index + ": Grabbing Printer Profiles...");
+    await Runner.getProfile(index);
+  }
+
   static async reset() {
     clearInterval(farmStatRunner);
     clearInterval(statRunner);
@@ -676,12 +691,13 @@ class Runner {
     printer.settingsApperance.name = farmPrinters[i].settingsApperance.name;
     printer.save();
   }
-  static async selectFilament(i, filament) {
-    farmPrinters[i].selectedFilament = filament;
-    let printer = await Printers.findOne({ index: i });
-    printer.selectedFilament = farmPrinters[i].selectedFilament;
-    printer.save();
-  }
+  //Keeping just in case but shouldn't be required...
+  // static async selectFilament(i, filament) {
+  //   farmPrinters[i].selectedFilament = filament;
+  //   let printer = await Printers.findOne({ index: i });
+  //   printer.selectedFilament = farmPrinters[i].selectedFilament;
+  //   printer.save();
+  // }
   static moveFile(i, newPath, fullPath, filename) {
     let file = _.findIndex(farmPrinters[i].fileList.files, function(o) {
       return o.name == filename;
@@ -740,9 +756,8 @@ class Runner {
     farmPrinters[i].fileList.folderCount =
       farmPrinters[i].fileList.folders.length;
   }
-  static async selectFilament(filament) {
+  static async selectedFilament(filament) {
     let rolls = await Filament.findOne({ _id: filament.id });
-
     farmPrinters[filament.index].selectedFilament = {
       id: rolls.roll.id,
       name: rolls.roll.name,
@@ -750,6 +765,9 @@ class Runner {
       colour: rolls.roll.colour,
       manufacturer: rolls.roll.manufacturer
     };
+    let printer = await Printers.findOne({ index: filament.index });
+    printer.selectedFilament = farmPrinters[filament.index].selectedFilament;
+    printer.save();
     return farmPrinters[filament.index].selectedFilament;
   }
   static newFile(file) {
