@@ -96,7 +96,7 @@ Instructions can be found: [TheTinkerDad/OctoFarm](https://hub.docker.com/r/thet
 BIG thanks to knoker for the help with this!
 
 ```sh
-docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -p4000:4000 octofarm/octofarm -v '/mnt/user/apps/OctoFarm/config/':'/app/serverConfig/':'rw' -v '/mnt/user/apps/OctoFarm/logs/':'/app/logs/':'rw'
+docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -p4000:4000 octofarm/octofarm -v '<your persistent folder>/OctoFarm/config/':'/app/serverConfig/':'rw' -v '<your persistent folder>/OctoFarm/logs/':'/app/logs/':'rw'
 ```
 
 Environment Variables
@@ -109,8 +109,8 @@ Ports
 
 Paths
 
-- '/mnt/user/apps/OctoFarm/config/':'/app/serverConfig/'
-- '/mnt/user/apps/OctoFarm/logs/':'/app/logs/'
+- '<your persistent folder>/OctoFarm/config/':'/app/serverConfig/'
+- '<your persistent folder>/OctoFarm/logs/':'/app/logs/'
 
 ### Docker-Compose Installation (Includes a MongoDB Server)
 
@@ -125,6 +125,9 @@ services:
       - 4000:4000
     environment:
       - MONGO=mongodb://octofarm_mongo/octofarm
+    volumes:
+      - <your persistent folder>/OctoFarm/config:/app/serverConfig
+      - <your persistent folder>/OctoFarm/logs:/app/serverConfig
 
   octofarm_mongo:
     container_name: octofarm_mongo
