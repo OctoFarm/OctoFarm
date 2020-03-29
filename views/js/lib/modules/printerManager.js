@@ -200,7 +200,6 @@ export default class PrinterManager {
             rotate90 = "rotate90";
           }
         }
-
         document.getElementById("printerControls").innerHTML = `
           <div class="row">
           <div class="col-12 col-sm-12 col-md-4 col-lg-4 col-xl-6">
@@ -707,6 +706,10 @@ export default class PrinterManager {
       }
       PrinterManager.applyState(printer, job, progress);
       document.getElementById("printerManagerModal").style.overflow = "auto";
+      if (printer.camURL == "") {
+        document.getElementById("printerControlCamera").src =
+          "../../../images/noCamera.jpg";
+      }
     }
   }
   static applyListeners(printer, elements) {

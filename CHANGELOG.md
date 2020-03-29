@@ -60,6 +60,8 @@ All notable changes to this project will be documented in this file.
 - Fixed Panel view not updating filament selection if not previously selected.
 - Fixed Colour heading on Filament Type Selection.
 - Fixed issue with Printer Manager locking when pressing a few action buttons.
+- Printer Manager shows no camera message when none inputted.
+- I've found an issue with the \_default profile on File Manager, I think there's some setup specific settings that I can't replicate. I've mitigated this with some checks, but please if your File Manager shows the warning please update issue [#15](https://github.com/NotExpectedYet/OctoFarm/issues/15) with a screen shot of your profile page so I can replicate it further here on my test boxes.
 
 ### Security
 

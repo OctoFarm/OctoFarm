@@ -1,5 +1,5 @@
 <% sortedIndex.forEach(sorted => { %>  <% printers[sorted.actualIndex].state%> <%
-if(printers[sorted.actualIndex].state != "Offline"){ %>
+if(printers[sorted.actualIndex].state != "Offline" && typeof printers[sorted.actualIndex].current != 'undefined'){ %>
 <!-- Connected -->
   <a
     id="printer-<%= printers[sorted.actualIndex].index %>"
@@ -39,8 +39,12 @@ if(printers[sorted.actualIndex].state != "Offline"){ %>
           role="group"
           aria-label="Basic example"
         >
+          
+          <% let selectedProfile = null %>
+          <%if(typeof printers[sorted.actualIndex].current.printerProfile != 'undefined'){ %>
+              <% selectedProfile = printers[sorted.actualIndex].current.printerProfile %>
+          <% } %>
 
-          <% const selectedProfile = printers[sorted.actualIndex].current.printerProfile; %>
         </div>
         <div class="row">
           <div class="col-lg-2">
@@ -63,7 +67,9 @@ if(printers[sorted.actualIndex].state != "Offline"){ %>
             </div>
           </div>
         </div>
-        <small class="pt-2 float-left"
+        <% if(selectedProfile != null && typeof printers[sorted.actualIndex].profiles != 'undefined'){ %>
+          <% console.log(selectedProfile) %>
+          <small class="pt-2 float-left"
           ><i class="fas fa-cube"></i> <b>H:</b> <%=
           printers[sorted.actualIndex].profiles[selectedProfile].volume.height%>mm x <b>W:</b> <%=
           printers[sorted.actualIndex].profiles[selectedProfile].volume.width%>mm x <b>D:</b> <%=
@@ -75,6 +81,12 @@ if(printers[sorted.actualIndex].state != "Offline"){ %>
           <b>Nozzle Size:</b> <%=
           printers[sorted.actualIndex].profiles[selectedProfile].extruder.nozzleDiameter %>mm</small
         >
+          <% }else{ %>
+            <small class="pt-2 float-left"><i class="fas fa-pen"></i> No Profile found matching your selected Profile</small>
+            <small class="pt-2 float-left">This is either a bug, or your setup isn't accounted for... Please log an issue request on the git with a snapshot of your profile on Issue number #15.</small>
+            <% } %>
+        
+      
       </div>
     </div>
   </a>
