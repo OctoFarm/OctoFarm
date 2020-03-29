@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 - Ability to change port - Setting available in serverConfig/server.js requires server restart to take effect.
 - Ability to turn off login requirement - Setting available in serverConfig/server.js requires server restart to take effect.
 - Ability to turn off registration pages - Setting available in serverConfig/server.js requires server restart to take effect.
+  - For docker check the README.md it contains the paths you need to make persistent.
 - Notes to printer manager regarding HTTP and the use of port:ip combo.
 - Padded our the installation instructions on the README.md file.
 - Dashboard now has the ability to refresh the printers connection/information. Good incase you encounter crashes and the websocket doesn't automatically update, or you make changes to OctoPrints settings outside of OctoFarm.
