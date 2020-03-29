@@ -195,15 +195,18 @@ a.notyet {
   padding-left: 5px;
   padding-right: 5px;
 }
-/*Camera View*/
-.cameraContain {
-  position: relative;
-  padding: 5px;
+.noBlue {
   user-select: none; /* standard syntax */
   -webkit-user-select: none; /* webkit (safari, chrome) browsers */
   -moz-user-select: none; /* mozilla browsers */
   -khtml-user-select: none; /* webkit (konqueror) browsers */
   -ms-user-select: none;
+}
+
+/*Camera View*/
+.cameraContain {
+  position: relative;
+  padding: 5px;
 }
 .camButtons {
   position: absolute;

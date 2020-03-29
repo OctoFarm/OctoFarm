@@ -93,12 +93,15 @@
             <% let camURL = ""; %> <% if(printers[sorted.actualIndex].camURL !=
             ''){ %> <% camURL = "http://" + printers[sorted.actualIndex].camURL;
             %> <%}%>
-            <div id="cameraContain-<%= printers[sorted.actualIndex].index %>">
+            <div
+              id="cameraContain-<%= printers[sorted.actualIndex].index %>"
+              class="cameraContain"
+            >
               <img
                 loading="lazy"
                 id="panCamera-<%= printers[sorted.actualIndex].index %>"
                 width="100%"
-                class="<%= flipH %> <%= flipV %> <%= rotate90 %> "
+                class="<%= flipH %> <%= flipV %> <%= rotate90 %>"
                 src="<%= camURL %>"
                 style="pointer-events: none;"
               />
@@ -178,20 +181,18 @@
             </center>
           </div>
 
-          <% if(typeof printers[sorted.actualIndex].selectedFilament !=
-          'undefined' && printers[sorted.actualIndex].selectedFilament.name !=
-          null){%>
           <button
             type="button"
             class="btn btn-block btn-secondary mb-0"
             role="button"
             id="listFilament-<%= printers[sorted.actualIndex].index %>"
           >
-            <%= printers[sorted.actualIndex].selectedFilament.name %> [<%=
-            printers[sorted.actualIndex].selectedFilament.colour %> / <%=
-            printers[sorted.actualIndex].selectedFilament.type[1] %>]</button
-          ><% }%>
-
+            <% if(typeof printers[sorted.actualIndex].selectedFilament !=
+            'undefined' && printers[sorted.actualIndex].selectedFilament.name !=
+            null){%> <%= printers[sorted.actualIndex].selectedFilament.name %>
+            [<%= printers[sorted.actualIndex].selectedFilament.colour %> / <%=
+            printers[sorted.actualIndex].selectedFilament.type[1] %>]<% }%>
+          </button>
           <div class="card-footer text-muted dashFooter">
             <small
               id="panE0Temp-<%= printers[sorted.actualIndex].index %>"

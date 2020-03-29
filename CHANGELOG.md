@@ -56,6 +56,8 @@ All notable changes to this project will be documented in this file.
 - Never online printers now correctly re-grab printer information when connection is re-established.
 - Deleting a printer should not require server restart anymore. Please inform me if this is not the case, my testings suggests it's fine now.
 - Fixed circular reference error with filaments
+- Fixed Panel view not updating filament selection if not previously selected.
+- Fixed Colour heading on Filament Type Selection.
 
 ### Security
 
