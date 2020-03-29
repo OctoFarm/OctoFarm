@@ -19,6 +19,8 @@ All notable changes to this project will be documented in this file.
   - Pressing on an Offline printer will attempt to re-establish the lost websocket connection then update the instace from OctoPrint.
   - Pressing on an Online printer will update the instance from OctoPrint.
 - New button on Printer List in Dashboard. You can drag and drop this button to re-order your printer list. This will also persist a reboot, all views respect this order.
+- History list delete button is now enabled.
+- History list edit button is now enabled.
 
 ### Changed
 

@@ -784,7 +784,6 @@ export class FileActions {
       document.getElementById("currentFolder").value = "local";
       FileManager.drawFiles(index, printerInfo[index].filesList, "Recursive");
     }
-    console.log(printerInfo[index].filesList);
     let button = fileList.querySelectorAll('*[id^="file-"]');
     for (let i = 0; i < button.length; i++) {
       let file = button[i].id.replace("file-", "");

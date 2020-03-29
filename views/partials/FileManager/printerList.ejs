@@ -68,7 +68,6 @@ if(printers[sorted.actualIndex].state != "Offline" && typeof printers[sorted.act
           </div>
         </div>
         <% if(selectedProfile != null && typeof printers[sorted.actualIndex].profiles != 'undefined'){ %>
-          <% console.log(selectedProfile) %>
           <small class="pt-2 float-left"
           ><i class="fas fa-cube"></i> <b>H:</b> <%=
           printers[sorted.actualIndex].profiles[selectedProfile].volume.height%>mm x <b>W:</b> <%=

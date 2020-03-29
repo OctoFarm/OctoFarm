@@ -21,10 +21,15 @@ class ClientSettings {
           return res.json();
         })
         .then(res => {
-          localStorage.setItem("clientSettings", JSON.stringify(res));
+          //localStorage.setItem("clientSettings", JSON.stringify(res));
           if (res.settings.backgroundURL != null) {
             document.getElementById("clientBackground").value =
               res.settings.backgroundURL;
+
+            document.body.style.backgroundImage =
+              "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(" +
+              res.settings.backgroundURL +
+              ")";
           }
           document.getElementById("panelCurrentOpOn").checked =
             res.panelView.currentOp;
@@ -82,18 +87,9 @@ class ClientSettings {
     location.reload();
   }
   static get() {
-    return JSON.parse(localStorage.getItem("clientSettings"));
+    //return JSON.parse(localStorage.getItem("clientSettings"));
   }
 }
-let settings = ClientSettings.get();
-console.log(settings.settings.backgroundURL != null);
-if (settings.settings.backgroundURL != null) {
-  document.body.style.backgroundImage =
-    "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(" +
-    settings.settings.backgroundURL +
-    ")";
-}
-
 // class ServerSettings {
 //   static init() {
 //     if (
