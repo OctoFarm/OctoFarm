@@ -26,7 +26,7 @@ source.onmessage = function(e) {
       PrinterManager.init(res.printerInfo);
     } else {
       printerInfo = res.printerInfo;
-      if (res.clientSettings.cameraView.currentOp) {
+      if (res.clientSettings.currentOp) {
         currentOperations(res.currentOperations, res.currentOperationsCount);
       }
       updateState(res.printerInfo, res.clientSettings.cameraView);
@@ -180,7 +180,7 @@ function updateState(printers, clientSettings) {
     //Set the state
     if (printer.stateColour.category === "Active") {
       if (printer.camURL != "") {
-        elements.row.className = "col-sm-12 col-md-4 col-lg-3 col-xl-2";
+        elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows}`;
       }
 
       elements.control.disabled = false;
@@ -272,7 +272,7 @@ function updateState(printers, clientSettings) {
     ) {
       elements.control.disabled = false;
       if (printer.camURL != "") {
-        elements.row.className = "col-sm-12 col-md-4 col-lg-3 col-xl-2";
+        elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows}`;
       }
       if (typeof printer.job != "undefined" && printer.job.file.name != null) {
         elements.start.disabled = false;
@@ -287,8 +287,7 @@ function updateState(printers, clientSettings) {
       }
     } else if (printer.state === "Closed") {
       if (printer.camURL != "") {
-        elements.row.className =
-          "col-sm-12 col-md-4 col-lg-3 col-xl-2" + " " + hideClosed;
+        elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${hideClosed}`;
       }
 
       elements.control.disabled = false;
@@ -297,6 +296,7 @@ function updateState(printers, clientSettings) {
       elements.start.classList.remove("hidden");
       elements.stop.classList.add("hidden");
     } else if (printer.stateColour.category === "Offline") {
+      elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${hideClosed}`;
       elements.start.classList.remove("hidden");
       elements.stop.classList.add("hidden");
       elements.control.disabled = true;

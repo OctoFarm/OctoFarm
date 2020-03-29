@@ -3,17 +3,17 @@
 printers[sorted.actualIndex].settingsWebcam != 'undefined'){%> <% } %>
 <div
   id="camPanel-<%= printers[sorted.actualIndex].index %>"
-  class="col-sm-12 col-md-4 col-lg-3 col-xl-2 hidden"
+  class="col-lg-<%= (clientSettings[0].cameraView.cameraRows)%> col-xl-<%= (clientSettings[0].cameraView.cameraRows)%> hidden"
 >
   <%}else if(printers[sorted.actualIndex].camURL === ""){ %>
   <div
     id="camPanel-<%= printers[sorted.actualIndex].index %>"
-    class="col-sm-12 col-md-4 col-lg-3 col-xl-2 hidden"
+    class="col-lg-<%= (clientSettings[0].cameraView.cameraRows)%> col-xl-<%= (clientSettings[0].cameraView.cameraRows)%> hidden"
   >
     <%} else { %>
     <div
       id="camPanel-<%= printers[sorted.actualIndex].index %>"
-      class="col-sm-12 col-md-4 col-lg-3 col-xl-2"
+      class="col-lg-<%= (clientSettings[0].cameraView.cameraRows)%> col-xl-<%= (clientSettings[0].cameraView.cameraRows)%>"
     >
       <%}%> <% let flipH = ""; %> <% let flipV = ""; %> <% let rotate90 = ""; %>
       <% if (typeof printers[sorted.actualIndex].settingsWebcam != "undefined")

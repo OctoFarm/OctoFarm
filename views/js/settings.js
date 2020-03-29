@@ -22,9 +22,9 @@ class ClientSettings {
         })
         .then(res => {
           localStorage.setItem("clientSettings", JSON.stringify(res));
-          if (res.backgroundURL != null) {
+          if (res.settings.backgroundURL != null) {
             document.getElementById("clientBackground").value =
-              res.backgroundURL;
+              res.settings.backgroundURL;
           }
           document.getElementById("panelCurrentOpOn").checked =
             res.panelView.currentOp;
@@ -50,9 +50,14 @@ class ClientSettings {
     }
   }
   static async update() {
+    let bg = document.getElementById("clientBackground").value;
+    let bgVal = null;
+    if (bg != null && bg != "") {
+      bgVal = bg;
+    }
     let opts = {
       settings: {
-        backgroundURL: document.getElementById("clientBackground").value
+        backgroundURL: bgVal
       },
       panelView: {
         currentOp: document.getElementById("panelCurrentOpOn").checked,
@@ -79,6 +84,14 @@ class ClientSettings {
   static get() {
     return JSON.parse(localStorage.getItem("clientSettings"));
   }
+}
+let settings = ClientSettings.get();
+console.log(settings.settings.backgroundURL != null);
+if (settings.settings.backgroundURL != null) {
+  document.body.style.backgroundImage =
+    "linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(" +
+    settings.settings.backgroundURL +
+    ")";
 }
 
 // class ServerSettings {

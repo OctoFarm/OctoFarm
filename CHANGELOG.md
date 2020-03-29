@@ -34,6 +34,7 @@ All notable changes to this project will be documented in this file.
 - Printers displayed on page will respect the sortedIndex.
 - added AutoComplete tags to password and username forms.
 - Panel view will now display printers without a CameraURL attached.
+- Camera Columns setting is now activated. You can choose from 1-6 columns per row, including 5!.
 
 ### Removed
 
@@ -62,6 +63,7 @@ All notable changes to this project will be documented in this file.
 - Fixed issue with Printer Manager locking when pressing a few action buttons.
 - Printer Manager shows no camera message when none inputted.
 - I've found an issue with the \_default profile on File Manager, I think there's some setup specific settings that I can't replicate. I've mitigated this with some checks, but please if your File Manager shows the warning please update issue [#15](https://github.com/NotExpectedYet/OctoFarm/issues/15) with a screen shot of your profile page so I can replicate it further here on my test boxes.
+- Fixed the ability to change your background to a URL.
 
 ### Security
 

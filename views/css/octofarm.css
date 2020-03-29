@@ -270,7 +270,7 @@ label {
   /* Style as you please, it will become the visible UI component. */
 }
 .hidden {
-  display: none;
+  display: none !important;
 }
 #fileUploadBtn {
   opacity: 0;
@@ -297,4 +297,16 @@ label {
 .sortableList {
   cursor: move;
   cursor: -webkit-grabbing;
+}
+.col-sm-5,
+.col-md-5,
+.col-lg-5,
+.col-xl-5 {
+  display: block;
+  position: relative !important;
+  min-height: 1px !important;
+  padding-right: 10px !important;
+  padding-left: 10px !important;
+  width: 20% !important;
+  float: left !important;
 }
