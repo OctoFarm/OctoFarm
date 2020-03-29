@@ -23,7 +23,7 @@ All notable changes to this project will be documented in this file.
 
 - Docker now checks for updated packages on start.
 - Client will automatically reload the page in 10 seconds if connection to server is lost.
-- Tables should now be somewhat responsive on smaller screens. This isn't perfect, tables aren't great for smaller screen sizes but hope this mitigates it some.
+- Tables should now be somewhat responsive on smaller screens. This isn't perfect, tables aren't great for smaller screen sizes but hope this mitigates it some. Anyone with access to smaller devices (mobiles and tablets) send me your screenshots and I will try and improve further.
 - Printer Database now stores: FeedRate, FlowRate, PrinterName, Custom Sort Index and filament selected.
 - All monitoring views added truncate for filename. Overflows will be replaced with "..."
 - Farm Utilisation Idle hours is now correctly multiplied by the total printers in the farm.

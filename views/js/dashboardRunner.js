@@ -66,7 +66,6 @@ let printerCard = document.querySelectorAll("[id^='printerButton-']");
 printerCard.forEach(card => {
   let ca = card.id.split("-");
   card.addEventListener("click", e => {
-    console.log("Index PUSHED: " + ca[1]);
     PrinterManager.updateIndex(parseInt(ca[1]));
     PrinterManager.init(printerInfo);
   });
