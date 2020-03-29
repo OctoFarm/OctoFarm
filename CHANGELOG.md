@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
+- Massive readme update, installation instructions will hopefully be a bit more clear now. Especially for docker!
 - Closed printers are tracked better.
 - Ability to change port - Setting available in serverConfig/server.js requires server restart to take effect.
 - Ability to turn off login requirement - Setting available in serverConfig/server.js requires server restart to take effect.
