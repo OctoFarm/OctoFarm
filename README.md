@@ -109,8 +109,10 @@ Ports
 
 Paths
 
-- '<your persistent folder>/OctoFarm/config/':'/app/serverConfig/'
-- '<your persistent folder>/OctoFarm/logs/':'/app/logs/'
+```sh
+- <your persistent folder>/OctoFarm/config/':'/app/serverConfig/
+- <your persistent folder>/OctoFarm/logs/':'/app/logs/
+```
 
 ### Docker-Compose Installation (Includes a MongoDB Server)
 
