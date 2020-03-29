@@ -706,6 +706,7 @@ export default class PrinterManager {
         PrinterManager.applyListeners(printer, elements);
       }
       PrinterManager.applyState(printer, job, progress);
+      document.getElementById("printerManagerModal").style.overflow = "auto";
     }
   }
   static applyListeners(printer, elements) {
@@ -726,7 +727,6 @@ export default class PrinterManager {
     } else {
       elements.connectPage.connectButton.addEventListener("click", e => {
         elements.connectPage.connectButton.disabled = true;
-        console.log(printer)
         OctoPrintClient.connect(
           elements.connectPage.connectButton.value,
           printer

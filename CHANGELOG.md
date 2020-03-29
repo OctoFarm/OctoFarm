@@ -58,6 +58,7 @@ All notable changes to this project will be documented in this file.
 - Fixed circular reference error with filaments
 - Fixed Panel view not updating filament selection if not previously selected.
 - Fixed Colour heading on Filament Type Selection.
+- Fixed issue with Printer Manager locking when pressing a few action buttons.
 
 ### Security
 
