@@ -33,6 +33,7 @@ All notable changes to this project will be documented in this file.
 - Get a warning when adding printers to remove http:// from IP and Camera URL.
 - Printers displayed on page will respect the sortedIndex.
 - added AutoComplete tags to password and username forms.
+- Panel view will now display printers without a CameraURL attached.
 
 ### Removed
 

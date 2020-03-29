@@ -312,12 +312,6 @@ class Runner {
     };
     webSockets[i].ws.onerror = async function(data, flags, number) {
       try {
-        farmPrinters[i].current = {
-          state: "Offline",
-          baudrate: 250000,
-          port: null,
-          printerProfile: "_default"
-        };
         farmPrinters[i].state = "Offline";
         farmPrinters[i].stateColour = Runner.getColour("Offline");
       } catch (err) {
@@ -332,12 +326,6 @@ class Runner {
     };
     webSockets[i].ws.onclose = async function(data, flags, number) {
       try {
-        farmPrinters[i].current = {
-          state: "Offline",
-          baudrate: 250000,
-          port: null,
-          printerProfile: "_default"
-        };
         farmPrinters[i].state = "Offline";
         farmPrinters[i].stateColour = Runner.getColour("Offline");
       } catch (err) {
