@@ -249,11 +249,11 @@ class Runner {
       var data = {};
       data["auth"] = webSockets[i].currentUser + ":" + webSockets[i].apikey;
       webSockets[i].ws.send(JSON.stringify(data));
-      // var throt = {};
-      // throt["throttle"] = parseInt(
-      //   (Polling[0].onlinePolling.seconds * 1000) / 500
-      // );
-      // webSockets[i].ws.send(JSON.stringify(throt));
+      var throt = {};
+      throt["throttle"] = parseInt(
+        (Polling[0].onlinePolling.seconds * 1000) / 500
+      );
+      webSockets[i].ws.send(JSON.stringify(throt));
     };
     webSockets[i].ws.onmessage = async function(data, flags, number) {
       data = await JSON.parse(data);
@@ -288,7 +288,8 @@ class Runner {
             farmPrinters[i].temps = data.current.temps;
             //console.log(farmPrinters[1].temps);
           }
-
+          let currentDate = new Date();
+          console.log(currentDate + ":" + farmPrinters[1].state);
           if (
             data.current.progress.completion != null &&
             data.current.progress.completion === 100
@@ -394,7 +395,17 @@ class Runner {
     }
     return result;
   }
-
+  static async updatePoll() {
+    for (let i = 0; i < farmPrinters.length; i++) {
+      let Polling = await ServerSettings.check();
+      var throt = {};
+      throt["throttle"] = parseInt(
+        (Polling[0].onlinePolling.seconds * 1000) / 500
+      );
+      await webSockets[i].ws.send(JSON.stringify(throt));
+    }
+    return;
+  }
   static async reset() {
     clearInterval(farmStatRunner);
     clearInterval(statRunner);

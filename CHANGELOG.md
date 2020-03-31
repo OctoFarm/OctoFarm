@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [UnReleased]
+
+## [v1.1.5]
+
+### Added
+
+- Added windows specific docker-compose example to README
+
+### Changed
+
+- Offline Polling is now back. System -> Server Settings to change and click save to update.
+- Updated the note on the settings screen to better reflect this and it's affect. Yes I like potato's.
+
+### Removed
+
+### Deprecated
+
+### Fixed
+
+- Fixed the errant " displayed on all views
+- Fixed the errant . when loading offline printers.
+
+### Security
+
 ## [Released]
 
 ## [v1.1.4]

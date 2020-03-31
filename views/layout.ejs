@@ -148,9 +148,10 @@
                             data-target="#clientSettingsModal" id="setClientSettingsBtn"><i class="fas fa-cog"></i>
                             Client</a>
                             
-                            <!--<a class="dropdown-item  text-center  text-light" href="#" data-toggle="modal"
+                          
+                          <a class="dropdown-item  text-center  text-light" href="#" data-toggle="modal"
                             data-target="#serverSettingsModal" id="setServerBtn"><i class="fas fa-server"></i>
-                            Server</a>-->
+                            Server</a>
 
                             <h6 class="dropdown-header">Help</h6> 
                             <a class="dropdown-item text-center  text-light" href="#" data-toggle="modal"
@@ -680,8 +681,8 @@
                     <div class="row">
                         <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
                           <p class="font-weight-bold">WebSocket Throttle</p>
-                          <p>You may be trying to run OctoFarm on a potato, which I've no aversion too but the CPU on the potato might not like it. If you find that to be the case then please increase the throttle amount.</p>
-                          <p>Currently the octoprint client will send a message every 500ms, so the server will process at that rate. A value of 2 will set the rate limit to every 1000ms (1 second), 3 would be 1500ms and so on.</p>
+                          <p>You may be trying to run OctoFarm/OctoPrint on a potato, which I've no aversion too but the CPU on the potato might not like it. If you find that to be the case then please increase the throttle amount.</p>
+                          <p>Currently the OctoPrint client will send a message every 500ms, so the server will process at that rate.</p>
                           
                           <p><b>Min</b>: 0.5 seconds (Default), <b>Max:</b> 10 seconds</p>
 
@@ -695,28 +696,6 @@
                               </div>
                           </div>
                           <hr>
-                          <p class="font-weight-bold">Server Offline Polling</p>
-                          <form class="was-validated">
-                            <div class="custom-control custom-checkbox mb-3">
-                              <input type="checkbox" class="custom-control-input" id="offlinePoll" checked required>
-                              <label class="custom-control-label" for="offlinePoll">Toggle Offline Polling</label>
-                              <div class="invalid-feedback">Offline Polling is turned off</div>
-                              <div class="valid-feedback">Offline Polling is turned on</div>
-                            </div>
-                          </form>
-                          <p>Change how often the server will poll for printers that have been detected as offline... If you turn this off you will have to use the refresh button on the dashboard re-detect your printer.</p>
-                          <p><b>Min:</b> 1 minutes, <b>Max:</b> 10 minutes</p>
-                          <div class="input-group mb-3">
-                              <div class="input-group-prepend">
-                                  <span class="input-group-text">Offline Poll Rate:</span>
-                              </div>
-                              <input type="number" class="form-control" placeholder="5" aria-label="Refresh Rate" id="offlinePollRate" value="5" min="1" max="10" step="1">
-                              <div class="input-group-append">
-                                  <span class="input-group-text">Minutes</span>
-                              </div>
-                          </div>
-                          <hr>
-
                         </div>
                     </div>
                 </div>

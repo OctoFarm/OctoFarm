@@ -4,10 +4,6 @@ const ServerSettingsSchema = new mongoose.Schema({
   onlinePolling: {
     type: Object,
     required: true
-  },
-  offlinePolling: {
-    type: Object,
-    required: true
   }
 });
 

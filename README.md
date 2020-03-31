@@ -114,7 +114,7 @@ Paths
 - <your persistent folder>/OctoFarm/logs/':'/app/logs/
 ```
 
-### Docker-Compose Installation (Includes a MongoDB Server)
+### Generic Docker-Compose Installation (Includes a MongoDB Server)
 
 ```yml
 version: "2"
@@ -140,6 +140,30 @@ services:
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
       - MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=2'
+```
+
+### Windows Specific Docker-Compose Installation (Includes a MongoDB Server)
+
+- NOTE: Docker Dashboard -> Settings -> Resources -> File Sharing -> check the C drive (or wherever you want persistent storage to be)
+
+```yml
+version: "3.1"
+
+services:
+  mongo:
+    image: mongo
+    restart: always
+
+  octofarm:
+    image: octofarm/octofarm
+    restart: always
+    ports:
+      - 4000:4000
+    environment:
+      - MONGO=mongodb://mongo/octofarm
+    volumes:
+      - /c/ProgramData/OctoFarm/serverConfig:/app/serverConfig
+      - /c/ProgramData/OctoFarm/logs:/app/logs
 ```
 
 ### Installation Production (Ubuntu/Debian Linux)
@@ -293,6 +317,7 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
 - [Gina Häußge](https://octoprint.org/) - Without OctoPrint none of this would be possible. Massive thanks to the work of Gina and everyone who helps out with that.
 - [Derek from 3D Printed Debris](https://www.3dprinteddebris.com/) - Massive big thanks to Derek who has donated a lot of time and money to the project. I don't think I'd have continued at the rate I did without his bug reports and support.
 - All Patreon Supporters and random donations! - Big massive thanks for these, they keep me full of steak!
+- The users calonmer, Insertion and noxin from my discord server! Seriously no end to my thanks for these 3.
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
