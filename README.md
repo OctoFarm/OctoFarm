@@ -166,7 +166,9 @@ services:
       - /c/ProgramData/OctoFarm/logs:/app/logs
 ```
 
-### Installation Production (Ubuntu/Debian Linux)
+### Installation Production
+
+- Debian/Linux Specific
 
 1. Install the Pre-requisites
 
