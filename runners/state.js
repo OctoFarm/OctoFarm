@@ -288,8 +288,6 @@ class Runner {
             farmPrinters[i].temps = data.current.temps;
             //console.log(farmPrinters[1].temps);
           }
-          let currentDate = new Date();
-          console.log(currentDate + ":" + farmPrinters[1].state);
           if (
             data.current.progress.completion != null &&
             data.current.progress.completion === 100
