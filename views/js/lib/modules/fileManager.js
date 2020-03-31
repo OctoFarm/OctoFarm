@@ -201,12 +201,7 @@ export default class FileManager {
         );
         fileCounts.innerHTML = " " + (parseInt(fileCounts.innerHTML) - 1);
         let spinner = document.getElementById("fileUploadCountSpinner");
-        UI.createAlert(
-          "success",
-          file.name + " has finished uploading to Printer " + index,
-          3000,
-          "clicked"
-        );
+
         setTimeout(() => {
           FileManager.createUpload(
             printerInfo[index].index,
@@ -217,11 +212,23 @@ export default class FileManager {
         }, 5000);
         if (this.status >= 200 && this.status < 300) {
           resolve(xhr.response);
+          UI.createAlert(
+            "success",
+            file.name + " has finished uploading to Printer " + index,
+            3000,
+            "clicked"
+          );
         } else {
           reject({
             status: this.status,
             statusText: xhr.statusText
           });
+          UI.createAlert(
+            "error",
+            `Sorry but ${file.name} could not be uploaded... is CORS enabled and OctoPrint online?`,
+            3000,
+            "clicked"
+          );
         }
       };
       xhr.onerror = function() {
@@ -229,13 +236,19 @@ export default class FileManager {
           status: this.status,
           statusText: xhr.statusText
         });
+        UI.createAlert(
+          "error",
+          `Sorry but ${file.name} could not be uploaded... is CORS enabled and OctoPrint online?`,
+          3000,
+          ""
+        );
       };
       if (file.name.includes(".gcode")) {
         xhr.send(formData);
       } else {
         UI.createAlert(
           "error",
-          `Sorry but ${file.name} is not a gcode file, not uploading.`,
+          `Sorry but ${file.name} is not a gcode file, could not be uploading.`,
           3000,
           ""
         );
