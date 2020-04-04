@@ -29,22 +29,19 @@ function WebSocketClient() {
   this.autoReconnectInterval = 5 * 1000; // ms
 }
 WebSocketClient.prototype.open = async function(url, index) {
+
   if (typeof this.index === "undefined") {
     this.index = index;
   }
   this.url = url;
   this.instance = new WebSocket(this.url);
+
   this.instance.on("open", e => {
     this.onopen(e, this.instance);
-    Runner.getState(this.index);
-    Runner.getFiles(this.index, "files?recursive=true");
-    Runner.getSystem(this.index);
-    Runner.getSettings(this.index);
-    Runner.getProfile(this.index);
   });
   this.instance.on("message", (data, flags) => {
     this.number++;
-    //this.onmessage();
+    this.onmessage(data, flags, this.number);
     //When socket is opened grab all api info
   });
   this.instance.on("close", e => {
@@ -90,9 +87,9 @@ WebSocketClient.prototype.terminate = async function() {
 };
 WebSocketClient.prototype.onopen = function() {
 };
-// WebSocketClient.prototype.onmessage = function(data, flags, number) {
-//   console.log(number)
-// };
+WebSocketClient.prototype.onmessage = function(data, flags, number) {
+  console.log(e)
+};
 WebSocketClient.prototype.onerror = function(e) {
   console.log(e);
 };
@@ -214,7 +211,6 @@ class Runner {
     //cycle through printers and move them to correct checking location...
     for (let i = 0; i < farmPrinters.length; i++) {
       //Make sure runners are created ready for each printer to pass between...
-      console.log("Checking for printer: " + i);
       farmPrinters[i].state = "Offline";
       farmPrinters[i].stateColour = Runner.getColour("Offline");
       farmPrinters[i].stepRate = 10;
@@ -238,13 +234,17 @@ class Runner {
     );
   }
   static async setupClient(i) {
-    console.log("Printer: " + webSockets[i].index + " is been setup...");
     webSockets[i].ws.open(
       `ws://${farmPrinters[i].ip}:${farmPrinters[i].port}/sockjs/websocket`,
       i
     );
     webSockets[i].ws.onopen = async function() {
-      //Make sure to get current printer status...
+      console.log("Printer: " + webSockets[i].index + " is been setup...");
+      await Runner.getState(this.index);
+      await Runner.getFiles(this.index, "files?recursive=true");
+      await Runner.getSystem(this.index);
+      await Runner.getSettings(this.index);
+      await Runner.getProfile(this.index);
       let Polling = await ServerSettings.check();
       var data = {};
       data["auth"] = webSockets[i].currentUser + ":" + webSockets[i].apikey;
@@ -257,7 +257,6 @@ class Runner {
     };
     webSockets[i].ws.onmessage = async function(data) {
       data = await JSON.parse(data);
-
       if (typeof data.event != "undefined") {
         if (data.event.type === "PrintFailed") {
           console.log(data.event.type);
@@ -509,7 +508,6 @@ class Runner {
           _.each(res.files, function(entry) {
             recursivelyPrintNames(entry);
           });
-          return true;
         } else {
           let timeStat = null;
           if (res.gcodeAnalysis !== undefined) {
@@ -543,7 +541,6 @@ class Runner {
             }
           );
           farmPrinters[index].fileList.files.splice(replace, 1, file);
-          return true;
         }
       })
       .catch(err => {

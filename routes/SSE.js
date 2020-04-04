@@ -14,57 +14,8 @@ const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 const Roll = require("../models/Filament.js");
 
-var clientId = 0;
-var clients = {}; // <- Keep a map of attached clients
-
-//trying to find the circular reference
-// This function is going to return an array of paths
-// that point to the cycles in the object
-const getCycles = object => {
-  if (!object) {
-    return;
-  }
-
-  // Save traversed references here
-  const traversedProps = new Set();
-  const cycles = [];
-
-  // Recursive function to go over objects/arrays
-  const traverse = function(currentObj, path) {
-    // If we saw a node it's a cycle, no need to travers it's entries
-    if (traversedProps.has(currentObj)) {
-      cycles.push(path);
-      return;
-    }
-
-    traversedProps.add(currentObj);
-
-    // Traversing the entries
-    for (let key in currentObj) {
-      const value = currentObj[key];
-      // We don't want to care about the falsy values
-      // Only objects and arrays can produce the cycles and they are truthy
-      if (currentObj.hasOwnProperty(key) && value) {
-        if (value.constructor === Object) {
-          // We'd like to save path as parent[0] in case when parent obj is an array
-          // and parent.prop in case it's an object
-          let parentIsArray = currentObj.constructor === Array;
-          traverse(value, parentIsArray ? `${path}[${key}]` : `${path}.${key}`);
-        } else if (value.constructor === Array) {
-          for (let i = 0; i < value.length; i += 1) {
-            traverse(value[i], `${path}.${key}[${i}]`);
-          }
-        }
-
-        // We don't care of any other values except Arrays and objects.
-      }
-    }
-  };
-
-  traverse(object, "root");
-  return cycles;
-};
-
+let clientId = 0;
+let clients = {}; // <- Keep a map of attached clients
 // Called once for each new client. Note, this response is left open!
 router.get("/printerInfo/", ensureAuthenticated, function(req, res) {
   //req.socket.setTimeout(Number.MAX_VALUE);
@@ -111,7 +62,7 @@ setInterval(async function() {
   let systemInformation = await SystemInfo.find({});
   let sysInfo = null;
   //There is a circular structure in here somewhere!?
-  if (typeof systemInformation != undefined || systemInformation.length > 1) {
+  if (typeof systemInformation !== undefined || systemInformation.length > 1) {
     sysInfo = {
       osInfo: systemInformation[0].osInfo,
       cpuInfo: systemInformation[0].cpuInfo,
@@ -188,8 +139,6 @@ setInterval(async function() {
     filament: rolls,
     clientSettings: cSettings
   };
-  //Circular reference where areee youuu!?
-  //console.log(getCycles(dashboardInfo));
   yj.stringifyAsync(dashboardInfo, (err, data) => {
     if (!err) {
       for (clientId in clients) {
