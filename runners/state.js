@@ -12,7 +12,6 @@ const WebSocket = require("ws");
 const Filament = require("../models/Filament.js");
 
 let farmPrinters = [];
-let webSockets = [];
 
 let statRunner = null;
 let farmStatRunner = null;
@@ -22,79 +21,136 @@ let farmStatRunner = null;
 //   console.log(farmPrinters[0].profiles)
 // }, 10000);
 
-
-function WebSocketClient() {
-  this.number = 0; // Message number
-
-  this.autoReconnectInterval = 5 * 1000; // ms
+function WebSocketClient(){
+  this.number = 0;	// Message number
+  this.autoReconnectInterval = 5*1000;	// ms
 }
-WebSocketClient.prototype.open = async function(url, index) {
-
-  if (typeof this.index === "undefined") {
-    this.index = index;
-  }
+WebSocketClient.prototype.open = function(url, index){
   this.url = url;
+  this.index = index;
   this.instance = new WebSocket(this.url);
-
-  this.instance.on("open", e => {
-    this.onopen(e, this.instance);
+  this.instance.on('open',()=>{
+    this.onopen(this.index);
   });
-  this.instance.on("message", (data, flags) => {
-    this.number++;
-    this.onmessage(data, flags, this.number);
-    //When socket is opened grab all api info
+  this.instance.on('message',(data,flags)=>{
+    this.number ++;
+    this.onmessage(data,flags,this.number, this.index);
   });
-  this.instance.on("close", e => {
-    if (e.code === 1000) {
-    } else {
-      this.reconnect(e);
+  this.instance.on('close',(e)=>{
+    switch (e.code){
+      case 1000:	// CLOSE_NORMAL
+        console.log("WebSocket: closed");
+        break;
+      default:	// Abnormal closure
+        this.reconnect(e);
+        break;
     }
     this.onclose(e);
   });
-  this.instance.on("error", e => {
-    switch (e.code) {
-      case "ECONNREFUSED":
+  this.instance.on('error',(e)=>{
+    switch (e.code){
+      case 'ECONNREFUSED':
         this.reconnect(e);
         break;
       default:
         this.onerror(e);
         break;
     }
-    return this;
   });
-};
-WebSocketClient.prototype.send = function(data, option) {
-  try {
-    this.instance.send(data, option);
-  } catch (e) {
-    this.instance.emit("error", e);
+}
+WebSocketClient.prototype.send = function(data,option){
+  try{
+    this.instance.send(data,option);
+  }catch (e){
+    this.instance.emit('error',e);
   }
-};
-WebSocketClient.prototype.reconnect = async function() {
-  // console.log(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`,e);
+}
+WebSocketClient.prototype.reconnect = function(e){
+  console.log(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`,e);
+  farmPrinters[this.index].state = "Offline";
+  farmPrinters[this.index].stateColour = Runner.getColour("Offline");
   this.instance.removeAllListeners();
-  var that = this;
-  setTimeout(async function() {
-    that.number++;
-    await that.open(that.url);
-  }, this.autoReconnectInterval);
+  let that = this;
+  setTimeout(function(){
+    console.log("WebSocketClient: reconnecting...");
+    that.open(that.url, that.index);
+  },this.autoReconnectInterval);
+}
+WebSocketClient.prototype.onopen = async function(e){
+  //console.log("WebSocketClient: open",arguments);
+  await Runner.getState(this.index);
+  await Runner.getFiles(this.index, "files?recursive=true");
+  await Runner.getSystem(this.index);
+  await Runner.getSettings(this.index);
+  await Runner.getProfile(this.index);
+  let Polling = await ServerSettings.check();
+  var data = {};
+  data["auth"] = farmPrinters[this.index].currentUser + ":" + farmPrinters[this.index].apikey;
+  //Send User Auth
+  farmPrinters[this.index].ws.send(JSON.stringify(data));
+  var throt = {};
+  throt["throttle"] = parseInt(
+      (Polling[0].onlinePolling.seconds * 1000) / 500
+  );
+  //Send Throttle
+  farmPrinters[this.index].ws.send(JSON.stringify(throt));
+  return true;
 };
-WebSocketClient.prototype.terminate = async function() {
-  if (this.instance.readyState === 1) {
-    this.instance.removeAllListeners();
-    this.instance.close();
+WebSocketClient.prototype.onmessage = async function(data,flags,number){
+  //console.log("WebSocketClient: message",arguments);
+  //Listen for print jobs
+  data = await JSON.parse(data);
+  if (typeof data.event != "undefined") {
+    if (data.event.type === "PrintFailed") {
+      console.log(data.event.type);
+      //Register cancelled print...
+      await HistoryCollection.failed(data.event.payload, farmPrinters[this.index]);
+    }
+    if (data.event.type === "PrintDone") {
+      console.log(data.event.type);
+      //Register cancelled print...
+      await HistoryCollection.complete(data.event.payload, farmPrinters[this.index]);
+    }
+  }
+  //Listen for printer status
+  if (typeof data.current != "undefined") {
+      if (data.current.state.text.includes("Offline")) {
+        data.current.state.text = "Closed";
+      }
+      farmPrinters[this.index].state = data.current.state.text;
+    farmPrinters[this.index].stateColour = Runner.getColour(data.current.state.text);
+      farmPrinters[this.index].currentZ = data.current.currentZ;
+      farmPrinters[this.index].progress = data.current.progress;
+      farmPrinters[this.index].job = data.current.job;
+      farmPrinters[this.index].logs = data.current.logs;
+      //console.log(data.current.temps.length != 0);
+      //console.log(data.current.temps);
+      if (data.current.temps.length !== 0) {
+        farmPrinters[this.index].temps = data.current.temps;
+        //console.log(farmPrinters[1].temps);
+      }
+      if (
+          data.current.progress.completion != null &&
+          data.current.progress.completion === 100
+      ) {
+        farmPrinters[this.index].stateColour = Runner.getColour("Complete");
+      } else {
+        farmPrinters[this.index].stateColour = Runner.getColour(
+            data.current.state.text
+        );
+      }
   }
 };
-WebSocketClient.prototype.onopen = function() {
+WebSocketClient.prototype.onerror = function(e){
+  console.log("WebSocketClient: error",arguments);
+  farmPrinters[this.index].state = "Offline";
+  farmPrinters[this.index].stateColour = Runner.getColour("Offline");
 };
-WebSocketClient.prototype.onmessage = function(data, flags, number) {
-  console.log(e)
+WebSocketClient.prototype.onclose = function(e){
+  console.log("WebSocketClient: closed",arguments);
+  farmPrinters[this.index].state = "Offline";
+  farmPrinters[this.index].stateColour = Runner.getColour("Offline");
 };
-WebSocketClient.prototype.onerror = function(e) {
-  console.log(e);
-};
-WebSocketClient.prototype.onclose = function() {};
-
 
 
 
@@ -118,59 +174,24 @@ class ClientAPI {
 
 class ClientSocket {
   static async connect(index, ip, port, apikey) {
-    let client;
     const ws = new WebSocketClient();
-    try {
-      let users = await ClientAPI.get(ip, port, apikey, "users");
-      if (users.status === 200) {
-        farmPrinters[i].state = "Searching...";
-        farmPrinters[i].stateColour = Runner.getColour("Searching...");
-        if (typeof farmPrinters[i].sortIndex === "undefined") {
-          farmPrinters[i].sortIndex = i;
-          farmPrinters[i].save();
-        }
-        users = await users.json();
-      } else {
-        console.log("User Bad");
-        users = {};
-      }
-      let currentUser = "";
-      if (_.isEmpty(users)) {
-        currentUser = "admin";
-      } else {
-        users.users.forEach(user => {
-          if (user.admin) {
-            currentUser = user.name;
-          }
-        });
-      }
-      client = {
-        index: index,
-        ws: ws,
-        currentUser: currentUser,
-        apikey: apikey
-      };
-      return client;
-    } catch (err) {
-      client = {
-        index: index,
-        ws: ws,
-        currentUser: "",
-        apikey: apikey,
-        error: {
-          err: err.message,
-          action: "Client connection failed",
-          userAction:
-            "Some error with initial connection, please restart server... Offline / Online printers should pass this..."
-        }
-      };
-      return client;
+
+    farmPrinters[index].state = "Searching...";
+    farmPrinters[index].stateColour = Runner.getColour("Searching...");
+    if (typeof farmPrinters[index].sortIndex === "undefined") {
+      farmPrinters[index].sortIndex = index;
+      farmPrinters[index].save();
     }
+
+    farmPrinters[index].ws = ws;
+    farmPrinters[index].currentUser = "admin";
+    return true;
+
   }
 }
 
 class Runner {
-  static async init() {
+static async init() {
     statRunner = setInterval(function() {
       //Update Current Operations
       StatisticsCollection.currentOperations(farmPrinters);
@@ -211,8 +232,6 @@ class Runner {
     //cycle through printers and move them to correct checking location...
     for (let i = 0; i < farmPrinters.length; i++) {
       //Make sure runners are created ready for each printer to pass between...
-      farmPrinters[i].state = "Offline";
-      farmPrinters[i].stateColour = Runner.getColour("Offline");
       farmPrinters[i].stepRate = 10;
       if (typeof farmPrinters[i].feedRate === "undefined") {
         farmPrinters[i].feedRate = 100;
@@ -221,152 +240,40 @@ class Runner {
         farmPrinters[i].flowRate = 100;
       }
 
-      webSockets[i] = await ClientSocket.connect(
+      await ClientSocket.connect(
         farmPrinters[i].index,
         farmPrinters[i].ip,
         farmPrinters[i].port,
         farmPrinters[i].apikey
       );
-      await Runner.setupClient(i);
+      await farmPrinters[i].ws.open(
+          `ws://${farmPrinters[i].ip}:${farmPrinters[i].port}/sockjs/websocket`,
+          i
+      );
     }
     return (
       "System Runner has checked over " + farmPrinters.length + " printers..."
     );
   }
-  static async setupClient(i) {
-    webSockets[i].ws.open(
-      `ws://${farmPrinters[i].ip}:${farmPrinters[i].port}/sockjs/websocket`,
-      i
-    );
-    webSockets[i].ws.onopen = async function() {
-      console.log("Printer: " + webSockets[i].index + " is been setup...");
-      await Runner.getState(this.index);
-      await Runner.getFiles(this.index, "files?recursive=true");
-      await Runner.getSystem(this.index);
-      await Runner.getSettings(this.index);
-      await Runner.getProfile(this.index);
-      let Polling = await ServerSettings.check();
-      var data = {};
-      data["auth"] = webSockets[i].currentUser + ":" + webSockets[i].apikey;
-      webSockets[i].ws.send(JSON.stringify(data));
-      var throt = {};
-      throt["throttle"] = parseInt(
-        (Polling[0].onlinePolling.seconds * 1000) / 500
-      );
-      webSockets[i].ws.send(JSON.stringify(throt));
-    };
-    webSockets[i].ws.onmessage = async function(data) {
-      data = await JSON.parse(data);
-      if (typeof data.event != "undefined") {
-        if (data.event.type === "PrintFailed") {
-          console.log(data.event.type);
-          //Register cancelled print...
-          await HistoryCollection.failed(data.event.payload, farmPrinters[i]);
-        }
-        if (data.event.type === "PrintDone") {
-          console.log(data.event.type);
-          //Register cancelled print...
-          await HistoryCollection.complete(data.event.payload, farmPrinters[i]);
-        }
-      }
-      if (typeof data.current != "undefined") {
-        try {
-          if (data.current.state.text.includes("Offline")) {
-            data.current.state.text = "Closed";
-          }
-          farmPrinters[i].state = data.current.state.text;
-          farmPrinters[i].currentZ = data.current.currentZ;
-          farmPrinters[i].progress = data.current.progress;
-          farmPrinters[i].job = data.current.job;
-          farmPrinters[i].logs = data.current.logs;
-          //console.log(data.current.temps.length != 0);
-          //console.log(data.current.temps);
-          if (data.current.temps.length !== 0) {
-            farmPrinters[i].temps = data.current.temps;
-            //console.log(farmPrinters[1].temps);
-          }
-          if (
-            data.current.progress.completion != null &&
-            data.current.progress.completion === 100
-          ) {
-            farmPrinters[i].stateColour = Runner.getColour("Complete");
-          } else {
-            farmPrinters[i].stateColour = Runner.getColour(
-              data.current.state.text
-            );
-          }
-        } catch (err) {
-          let error = {
-            err: err.message,
-            action: "Failed to update current printer set...",
-            userAction:
-              "This should be safe to ignore if you've just updated your printer list from an old one..."
-          };
-          console.log(error);
-        }
-      }
-    };
-    webSockets[i].ws.onerror = async function() {
-      try {
-        farmPrinters[i].state = "Offline";
-        farmPrinters[i].stateColour = Runner.getColour("Offline");
-      } catch (err) {
-        let error = {
-          err: err.message,
-          action: "Failed to update current printer set...",
-          userAction:
-            "This should be safe to ignore if you've just updated your printer list from an old one..."
-        };
-        console.log(error);
-      }
-    };
-    webSockets[i].ws.onclose = async function() {
-      try {
-        farmPrinters[i].state = "Offline";
-        farmPrinters[i].stateColour = Runner.getColour("Offline");
-      } catch (err) {
-        let error = {
-          err: err.message,
-          action: "Failed to update current printer set...",
-          userAction:
-            "This should be safe to ignore if you've just updated your printer list from an old one..."
-        };
-        console.log(error);
-      }
-    };
-  }
-
   static async reScanOcto(index) {
     let result = {
       status: null,
       msg: null
     };
-    if (webSockets[index].ws.instance.readyState === 3) {
+    if (farmPrinters[index].ws.instance.readyState === 3) {
       console.log(index + ": Attempting to reconnect socket...");
-      try {
-        webSockets[index] = await ClientSocket.connect(
-          farmPrinters[index].index,
-          farmPrinters[index].ip,
-          farmPrinters[index].port,
-          farmPrinters[index].apikey
+        await farmPrinters[i].ws.open(
+            `ws://${farmPrinters[i].ip}:${farmPrinters[i].port}/sockjs/websocket`,
+            i
         );
-        Runner.setupClient(index);
         result.status = "success";
         result.msg =
           "Printer: " +
           index +
           " socket connection re-attempted, will appear online if successful...";
-      } catch (error) {
-        result.status = "error";
-        result.msg =
-          "Printer: " +
-          index +
-          " socket re-connection attempt failed... printer is still offline... <br>" +
-          error;
-      }
     } else if (
-      webSockets[index].ws.instance.readyState === 2 ||
-      webSockets[index].ws.instance.readyState === 0
+        farmPrinters[index].ws.instance.readyState === 2 ||
+        farmPrinters[index].ws.instance.readyState === 0
     ) {
       result.status = "error";
       result.msg =
@@ -394,20 +301,23 @@ class Runner {
       throt["throttle"] = parseInt(
         (Polling[0].onlinePolling.seconds * 1000) / 500
       );
-      await webSockets[i].ws.send(JSON.stringify(throt));
+      await farmPrinters[i].ws.send(JSON.stringify(throt));
     }
     return "updated";
   }
   static async reset() {
     clearInterval(farmStatRunner);
     clearInterval(statRunner);
-    for (let i = 0; i < webSockets.length; i++) {
-      await webSockets[i].ws.terminate();
+    for (let i = 0; i < farmPrinters.length; i++) {
+      await farmPrinters[i].ws.terminate();
     }
-    webSockets = [];
     farmPrinters = [];
     return "update";
   }
+
+
+
+
   static getFiles(index, location) {
     //Shim to fix undefined on upload files/folders
     console.log("Grabbing files for Printer: " + index);

@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this file.
 
 - Offline Polling is now back. System -> Server Settings to change and click save to update.
 - Updated the note on the settings screen to better reflect this and it's affect. Yes I like potato's.
+- Changed the whole websocket implementation to help with issue #15. NOTE: If you add your printer to the farm offline, you may still need to re-sync it to get it detected by the farm. I'm working on why this is happening still. Printers added Online then going Offline do not encounter this. This is also the case for restarting the server with offline printers. 
+
 
 ### Removed
 
@@ -23,6 +25,7 @@ All notable changes to this project will be documented in this file.
 
 - Fixed the errant " displayed on all views
 - Fixed the errant . when loading offline printers.
+- Fixed issue with printer's not collecting correct data #15 ie _default bug... Should no longer exist.
 
 ### Security
 
