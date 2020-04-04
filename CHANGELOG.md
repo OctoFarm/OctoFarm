@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [UnReleased]
+## [Released]
 
 ## [v1.1.4-bugfix]
 
