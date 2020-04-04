@@ -86,6 +86,7 @@ router.get("/printerInfo/", ensureAuthenticated, function(req, res) {
 setInterval(async function() {
   //Only needed for WebSocket Information
   let printers = await Runner.returnFarmPrinters();
+
   let statistics = await FarmStatistics.returnStats();
   let currentOperations = null;
   let currentOperationsCount = null;

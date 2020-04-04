@@ -7,11 +7,11 @@ import PrinterManager from "./lib/modules/printerManager.js";
 
 let printerInfo = "";
 //Connect to servers socket..webSocket
-let url = window.location.hostname;
-let port = window.location.port;
-if (port != "") {
-  port = ":" + port;
-}
+//let url = window.location.hostname;
+// let port = window.location.port;
+// if (port != "") {
+//   port = ":" + port;
+// }
 
 var source = new EventSource("/sse/printerInfo/");
 source.onmessage = function(e) {
@@ -35,7 +35,7 @@ source.onmessage = function(e) {
     }
   }
 };
-source.onerror = function(e) {
+source.onerror = function() {
   UI.createAlert(
     "error",
     "Communication with the server has been suddenly lost, we will automatically refresh in 10 seconds..."
@@ -44,7 +44,7 @@ source.onerror = function(e) {
     location.reload();
   }, 10000);
 };
-source.onclose = function(e) {
+source.onclose = function() {
   UI.createAlert(
     "error",
     "Communication with the server has been suddenly lost, we will automatically refresh in 10 seconds..."
@@ -54,10 +54,10 @@ source.onclose = function(e) {
   }, 10000);
 };
 //Initial listeners
-document.getElementById("connectAllBtn").addEventListener("click", e => {
+document.getElementById("connectAllBtn").addEventListener("click", () => {
   dashActions.connectAll();
 });
-document.getElementById("disconnectAllBtn").addEventListener("click", e => {
+document.getElementById("disconnectAllBtn").addEventListener("click", () => {
   dashActions.disconnectAll();
 });
 
@@ -65,7 +65,7 @@ document.getElementById("disconnectAllBtn").addEventListener("click", e => {
 let printerCard = document.querySelectorAll("[id^='printerButton-']");
 printerCard.forEach(card => {
   let ca = card.id.split("-");
-  card.addEventListener("click", e => {
+  card.addEventListener("click", () => {
     PrinterManager.updateIndex(parseInt(ca[1]));
     PrinterManager.init(printerInfo);
   });
@@ -81,7 +81,7 @@ printerReSync.forEach(card => {
     };
     let post = await OctoFarmClient.post("printers/reScanOcto", data);
     post = await post.json();
-    if (post.msg.status != "error") {
+    if (post.msg.status !== "error") {
       UI.createAlert("success", post.msg.msg, 3000, "clicked");
     } else {
       UI.createAlert("error", post.msg.msg, 3000, "clicked");
@@ -222,7 +222,7 @@ class dashActions {
     checkBoxes.forEach(box => {
       box.checked = true;
     });
-    document.getElementById("connectionAction").addEventListener("click", e => {
+    document.getElementById("connectionAction").addEventListener("click", () => {
       dashActions.connectionAction("connect");
     });
   }
@@ -269,7 +269,7 @@ class dashActions {
     checkBoxes.forEach(box => {
       box.checked = true;
     });
-    document.getElementById("connectionAction").addEventListener("click", e => {
+    document.getElementById("connectionAction").addEventListener("click", () => {
       dashActions.connectionAction("disconnect");
     });
   }
@@ -318,7 +318,7 @@ class dashUpdate {
     document.getElementById("freeRamProg").style.width = freePer + "%";
   }
   static printers(printers) {
-    printers.forEach((printer, index) => {
+    printers.forEach((printer) => {
       let printerName = "";
       if (typeof printer.stateColour != "undefined") {
         if (typeof printer.settingsAppearance != "undefined") {
@@ -333,15 +333,9 @@ class dashUpdate {
           document.getElementById(
             "printerName-" + printer.index
           ).innerHTML = `<i class="fas fa-print"></i> ${printer.index}. ${printerName}`;
-          if (printer.state != "Offline") {
-            document.getElementById(
+          document.getElementById(
               "printerButton-" + printer.index
-            ).disabled = false;
-          } else {
-            document.getElementById(
-              "printerButton-" + printer.index
-            ).disabled = true;
-          }
+          ).disabled = printer.state === "Offline";
         }
         // document.getElementById("printerCard-" + printer.index).style.order =
         //   printer.sortIndex;
@@ -411,7 +405,6 @@ var sortable = Sortable.create(el, {
   handle: ".sortableList",
   animation: 150,
   onUpdate: function(/**Event*/ e) {
-    //console.log(evt);
     let elements = e.target.querySelectorAll("[id^='printerCard-']");
     let listID = [];
     elements.forEach(e => {

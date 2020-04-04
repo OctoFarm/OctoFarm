@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [UnReleased]
 
-## [v1.1.5]
+## [v1.1.4-bugfix]
 
 ### Added
 

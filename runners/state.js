@@ -1,3 +1,4 @@
+
 const Printers = require("../models/Printer.js");
 const serverSettings = require("../settings/serverSettings.js");
 const ServerSettings = serverSettings.ServerSettings;
@@ -16,33 +17,40 @@ let webSockets = [];
 let statRunner = null;
 let farmStatRunner = null;
 
+//Checking interval for information...
+// setInterval(() => {
+//   console.log(farmPrinters[0].profiles)
+// }, 10000);
+
+
 function WebSocketClient() {
   this.number = 0; // Message number
 
   this.autoReconnectInterval = 5 * 1000; // ms
 }
-WebSocketClient.prototype.open = function(url, index) {
+WebSocketClient.prototype.open = async function(url, index) {
   if (typeof this.index === "undefined") {
     this.index = index;
   }
   this.url = url;
   this.instance = new WebSocket(this.url);
-  this.instance.on("open", () => {
-    this.onopen();
+  this.instance.on("open", e => {
+    this.onopen(e, this.instance);
+    Runner.getState(this.index);
+    Runner.getFiles(this.index, "files?recursive=true");
+    Runner.getSystem(this.index);
+    Runner.getSettings(this.index);
+    Runner.getProfile(this.index);
   });
   this.instance.on("message", (data, flags) => {
     this.number++;
-    this.onmessage(data, flags, this.number);
+    //this.onmessage();
+    //When socket is opened grab all api info
   });
   this.instance.on("close", e => {
-    switch (e.code) {
-      case 1000: // CLOSE_NORMAL
-        //console.log("WebSocket: closed");
-        break;
-      default:
-        // Abnormal closure
-        this.reconnect(e);
-        break;
+    if (e.code === 1000) {
+    } else {
+      this.reconnect(e);
     }
     this.onclose(e);
   });
@@ -55,6 +63,7 @@ WebSocketClient.prototype.open = function(url, index) {
         this.onerror(e);
         break;
     }
+    return this;
   });
 };
 WebSocketClient.prototype.send = function(data, option) {
@@ -64,33 +73,33 @@ WebSocketClient.prototype.send = function(data, option) {
     this.instance.emit("error", e);
   }
 };
-WebSocketClient.prototype.reconnect = async function(e) {
+WebSocketClient.prototype.reconnect = async function() {
   // console.log(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`,e);
   this.instance.removeAllListeners();
   var that = this;
   setTimeout(async function() {
-    //console.log("WebSocketClient: reconnecting...");
-    that.open(that.url);
-    await Runner.getState(that.index);
-    await Runner.getFiles(that.index, "files?recursive=true");
-    await Runner.getSystem(that.index);
-    await Runner.getSettings(that.index);
-    await Runner.getProfile(that.index);
+    that.number++;
+    await that.open(that.url);
   }, this.autoReconnectInterval);
 };
-WebSocketClient.prototype.terminate = async function(e) {
+WebSocketClient.prototype.terminate = async function() {
   if (this.instance.readyState === 1) {
     this.instance.removeAllListeners();
     this.instance.close();
   }
-  return;
 };
-WebSocketClient.prototype.onopen = function(e) {};
-WebSocketClient.prototype.onmessage = function(data, flags, number) {};
+WebSocketClient.prototype.onopen = function() {
+};
+// WebSocketClient.prototype.onmessage = function(data, flags, number) {
+//   console.log(number)
+// };
 WebSocketClient.prototype.onerror = function(e) {
   console.log(e);
 };
-WebSocketClient.prototype.onclose = function(e) {};
+WebSocketClient.prototype.onclose = function() {};
+
+
+
 
 class ClientAPI {
   static get(ip, port, apikey, item) {
@@ -112,28 +121,20 @@ class ClientAPI {
 
 class ClientSocket {
   static async connect(index, ip, port, apikey) {
-    let client = {
-      index: index,
-      ws: {},
-      currentUser: "",
-      apikey: apikey
-    };
+    let client;
     const ws = new WebSocketClient();
     try {
       let users = await ClientAPI.get(ip, port, apikey, "users");
       if (users.status === 200) {
+        farmPrinters[i].state = "Searching...";
+        farmPrinters[i].stateColour = Runner.getColour("Searching...");
+        if (typeof farmPrinters[i].sortIndex === "undefined") {
+          farmPrinters[i].sortIndex = i;
+          farmPrinters[i].save();
+        }
         users = await users.json();
-        console.log(index + ": Grabbing State..");
-        await Runner.getState(index);
-        console.log(index + ": Grabbing File List...");
-        await Runner.getFiles(index, "files?recursive=true");
-        console.log(index + ": Grabbing System Information...");
-        await Runner.getSystem(index);
-        console.log(index + ": Grabbing System Settings...");
-        await Runner.getSettings(index);
-        console.log(index + ": Grabbing Printer Profiles...");
-        await Runner.getProfile(index);
       } else {
+        console.log("User Bad");
         users = {};
       }
       let currentUser = "";
@@ -163,7 +164,7 @@ class ClientSocket {
           err: err.message,
           action: "Client connection failed",
           userAction:
-            "Some error with intitial connection, please restart server... Offline / Online printers should pass this..."
+            "Some error with initial connection, please restart server... Offline / Online printers should pass this..."
         }
       };
       return client;
@@ -223,13 +224,14 @@ class Runner {
       if (typeof farmPrinters[i].flowRate === "undefined") {
         farmPrinters[i].flowRate = 100;
       }
+
       webSockets[i] = await ClientSocket.connect(
         farmPrinters[i].index,
         farmPrinters[i].ip,
         farmPrinters[i].port,
         farmPrinters[i].apikey
       );
-      Runner.setupClient(i);
+      await Runner.setupClient(i);
     }
     return (
       "System Runner has checked over " + farmPrinters.length + " printers..."
@@ -237,14 +239,12 @@ class Runner {
   }
   static async setupClient(i) {
     console.log("Printer: " + webSockets[i].index + " is been setup...");
-    await Runner.getState(i);
     webSockets[i].ws.open(
       `ws://${farmPrinters[i].ip}:${farmPrinters[i].port}/sockjs/websocket`,
       i
     );
-    webSockets[i].ws.onopen = async function(e) {
+    webSockets[i].ws.onopen = async function() {
       //Make sure to get current printer status...
-      await Runner.getState(i);
       let Polling = await ServerSettings.check();
       var data = {};
       data["auth"] = webSockets[i].currentUser + ":" + webSockets[i].apikey;
@@ -255,20 +255,19 @@ class Runner {
       );
       webSockets[i].ws.send(JSON.stringify(throt));
     };
-    webSockets[i].ws.onmessage = async function(data, flags, number) {
+    webSockets[i].ws.onmessage = async function(data) {
       data = await JSON.parse(data);
 
       if (typeof data.event != "undefined") {
         if (data.event.type === "PrintFailed") {
           console.log(data.event.type);
           //Register cancelled print...
-          HistoryCollection.failed(data.event.payload, farmPrinters[i]);
-          //
+          await HistoryCollection.failed(data.event.payload, farmPrinters[i]);
         }
         if (data.event.type === "PrintDone") {
           console.log(data.event.type);
           //Register cancelled print...
-          HistoryCollection.complete(data.event.payload, farmPrinters[i]);
+          await HistoryCollection.complete(data.event.payload, farmPrinters[i]);
         }
       }
       if (typeof data.current != "undefined") {
@@ -277,14 +276,13 @@ class Runner {
             data.current.state.text = "Closed";
           }
           farmPrinters[i].state = data.current.state.text;
-          farmPrinters[i].current.state = data.current.state.text;
           farmPrinters[i].currentZ = data.current.currentZ;
           farmPrinters[i].progress = data.current.progress;
           farmPrinters[i].job = data.current.job;
           farmPrinters[i].logs = data.current.logs;
           //console.log(data.current.temps.length != 0);
           //console.log(data.current.temps);
-          if (data.current.temps.length != 0) {
+          if (data.current.temps.length !== 0) {
             farmPrinters[i].temps = data.current.temps;
             //console.log(farmPrinters[1].temps);
           }
@@ -309,7 +307,7 @@ class Runner {
         }
       }
     };
-    webSockets[i].ws.onerror = async function(data, flags, number) {
+    webSockets[i].ws.onerror = async function() {
       try {
         farmPrinters[i].state = "Offline";
         farmPrinters[i].stateColour = Runner.getColour("Offline");
@@ -323,7 +321,7 @@ class Runner {
         console.log(error);
       }
     };
-    webSockets[i].ws.onclose = async function(data, flags, number) {
+    webSockets[i].ws.onclose = async function() {
       try {
         farmPrinters[i].state = "Offline";
         farmPrinters[i].stateColour = Runner.getColour("Offline");
@@ -344,7 +342,7 @@ class Runner {
       status: null,
       msg: null
     };
-    if (webSockets[index].ws.instance.readyState == 3) {
+    if (webSockets[index].ws.instance.readyState === 3) {
       console.log(index + ": Attempting to reconnect socket...");
       try {
         webSockets[index] = await ClientSocket.connect(
@@ -368,28 +366,25 @@ class Runner {
           error;
       }
     } else if (
-      webSockets[index].ws.instance.readyState == 2 ||
-      webSockets[index].ws.instance.readyState == 0
+      webSockets[index].ws.instance.readyState === 2 ||
+      webSockets[index].ws.instance.readyState === 0
     ) {
       result.status = "error";
       result.msg =
         "Printer: " +
         index +
         " socket is either Closing/Connecting please await that to finish before attempting a reconnect...";
-    } else {
-      console.log(index + ": Grabbing State..");
+    }else{
       await Runner.getState(index);
-      console.log(index + ": Grabbing File List...");
       await Runner.getFiles(index, "files?recursive=true");
-      console.log(index + ": Grabbing System Information...");
       await Runner.getSystem(index);
-      console.log(index + ": Grabbing System Settings...");
       await Runner.getSettings(index);
-      console.log(index + ": Grabbing Printer Profiles...");
       await Runner.getProfile(index);
       result.status = "success";
       result.msg =
-        "Printer: " + index + " information has been successfully re-synced...";
+          "Printer: " +
+          index +
+          " has been re-synced with OctoPrint";
     }
     return result;
   }
@@ -402,7 +397,7 @@ class Runner {
       );
       await webSockets[i].ws.send(JSON.stringify(throt));
     }
-    return;
+    return "updated";
   }
   static async reset() {
     clearInterval(farmStatRunner);
@@ -412,10 +407,11 @@ class Runner {
     }
     webSockets = [];
     farmPrinters = [];
-    return;
+    return "update";
   }
   static getFiles(index, location) {
     //Shim to fix undefined on upload files/folders
+    console.log("Grabbing files for Printer: " + index);
     farmPrinters[index].fileList = {
       files: [],
       fileCount: 0,
@@ -455,7 +451,7 @@ class Runner {
             } else {
               timeStat = "No Time Estimate";
             }
-            let path = "";
+            let path = null;
             if (entry.path.indexOf("/") > -1) {
               path = entry.path.substr(0, entry.path.lastIndexOf("/"));
             } else {
@@ -509,7 +505,7 @@ class Runner {
             });
           }
         };
-        if (res.files != undefined) {
+        if (typeof res.files !== undefined) {
           _.each(res.files, function(entry) {
             recursivelyPrintNames(entry);
           });
@@ -525,7 +521,7 @@ class Runner {
           } else {
             timeStat = "No Time Estimate";
           }
-          let path = "";
+          let path = null;
           if (res.path.indexOf("/") > -1) {
             path = res.path.substr(0, res.path.lastIndexOf("/"));
           } else {
@@ -543,7 +539,7 @@ class Runner {
           let replace = _.findIndex(
             farmPrinters[index].fileList.files,
             function(o) {
-              return o.fullPath == file.fullPath;
+              return o.fullPath === file.fullPath;
             }
           );
           farmPrinters[index].fileList.files.splice(replace, 1, file);
@@ -551,11 +547,12 @@ class Runner {
         }
       })
       .catch(err => {
-        //console.log("Error grabbing files" + err);
+        //console.log("Error grabbing Printer: "+ index + "files - " + err);
         return false;
       });
   }
   static getState(index) {
+    console.log("Grabbing state for Printer: " + index);
     return ClientAPI.get(
       farmPrinters[index].ip,
       farmPrinters[index].port,
@@ -573,11 +570,12 @@ class Runner {
         farmPrinters[index].options = res.options;
       })
       .catch(err => {
-        //console.log("Error grabbing files" + err);
+        //console.log("Error grabbing Printer: "+ index + "state - " + err);
         return false;
       });
   }
   static getProfile(index) {
+    console.log("Grabbing profiles for Printer:" + index);
     return ClientAPI.get(
       farmPrinters[index].ip,
       farmPrinters[index].port,
@@ -592,11 +590,12 @@ class Runner {
         farmPrinters[index].profiles = res.profiles;
       })
       .catch(err => {
-        //console.log("Error grabbing files" + err);
+        //console.log("Error grabbing Printer: "+ index + "profiles - " + err);
         return false;
       });
   }
   static getSettings(index) {
+    console.log("Grabbing settings for Printer:" + index);
     return ClientAPI.get(
       farmPrinters[index].ip,
       farmPrinters[index].port,
@@ -650,11 +649,12 @@ class Runner {
         }
       })
       .catch(err => {
-        //console.log("Error grabbing files" + err);
+        //console.log("Error grabbing Printer: "+ index + "settings - " + err);
         return false;
       });
   }
   static getSystem(index) {
+    console.log("Grabbing system for Printer: " + index);
     return ClientAPI.get(
       farmPrinters[index].ip,
       farmPrinters[index].port,
@@ -669,7 +669,7 @@ class Runner {
         farmPrinters[index].core = res.core;
       })
       .catch(err => {
-        //console.log("Error grabbing files" + err);
+        //console.log("Error grabbing Printer: "+ index + "system - " + err);
         return false;
       });
   }
@@ -703,7 +703,7 @@ class Runner {
   }
   static async removeFile(i, fullPath) {
     let index = await _.findIndex(farmPrinters[i].fileList.files, function(o) {
-      return o.fullPath == fullPath;
+      return o.fullPath === fullPath;
     });
     farmPrinters[i].fileList.files.splice(index, 1);
     farmPrinters[i].fileList.fileCount = farmPrinters[i].fileList.files.length;
@@ -714,7 +714,7 @@ class Runner {
   static returnStorage(i) {
     return farmPrinters[i].storage;
   }
-  static async reSyncFile(i, file) {
+  static async reSyncFile(i) {
     let success = null;
     //Doesn't actually resync just the file... shhh
     success = await Runner.getFiles(i, "files?recursive=true");
@@ -769,7 +769,7 @@ class Runner {
   // }
   static moveFile(i, newPath, fullPath, filename) {
     let file = _.findIndex(farmPrinters[i].fileList.files, function(o) {
-      return o.name == filename;
+      return o.name === filename;
     });
     //farmPrinters[i].fileList.files[file].path = newPath;
     farmPrinters[i].fileList.files[file].path = newPath;
@@ -777,7 +777,7 @@ class Runner {
   }
   static moveFolder(i, oldFolder, fullPath, folderName) {
     let file = _.findIndex(farmPrinters[i].fileList.folders, function(o) {
-      return o.name == oldFolder;
+      return o.name === oldFolder;
     });
     farmPrinters[i].fileList.files.forEach((file, index) => {
       if (file.path === oldFolder) {
@@ -804,7 +804,7 @@ class Runner {
       }
     });
     let folder = _.findIndex(farmPrinters[i].fileList.folders, function(o) {
-      return o.name == fullPath;
+      return o.name === fullPath;
     });
     farmPrinters[i].fileList.folders.splice(folder, 1);
     farmPrinters[i].fileList.fileCount = farmPrinters[i].fileList.files.length;
@@ -814,7 +814,7 @@ class Runner {
   static newFolder(folder) {
     let i = folder.i;
     let path = "local";
-    if (folder.path != "") {
+    if (folder.path !== "") {
       path = folder.path;
     }
     let newFolder = {
@@ -826,7 +826,7 @@ class Runner {
       farmPrinters[i].fileList.folders.length;
   }
   static async selectedFilament(filament) {
-    if (filament.id == "") {
+    if (filament.id === "") {
       farmPrinters[filament.index].selectedFilament = {
         id: null,
         name: null,
