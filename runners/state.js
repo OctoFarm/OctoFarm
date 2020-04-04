@@ -78,11 +78,12 @@ WebSocketClient.prototype.reconnect = function(e){
 }
 WebSocketClient.prototype.onopen = async function(e){
   //console.log("WebSocketClient: open",arguments);
+  await Runner.getProfile(this.index);
   await Runner.getState(this.index);
   await Runner.getFiles(this.index, "files?recursive=true");
   await Runner.getSystem(this.index);
   await Runner.getSettings(this.index);
-  await Runner.getProfile(this.index);
+
   let Polling = await ServerSettings.check();
   var data = {};
   data["auth"] = farmPrinters[this.index].currentUser + ":" + farmPrinters[this.index].apikey;
@@ -281,11 +282,12 @@ static async init() {
         index +
         " socket is either Closing/Connecting please await that to finish before attempting a reconnect...";
     }else{
+      await Runner.getProfile(index);
       await Runner.getState(index);
       await Runner.getFiles(index, "files?recursive=true");
       await Runner.getSystem(index);
       await Runner.getSettings(index);
-      await Runner.getProfile(index);
+
       result.status = "success";
       result.msg =
           "Printer: " +

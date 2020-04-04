@@ -41,4 +41,4 @@ EOF
 
 fi
 
-node app.js > /app/logs/production.log 2> /app/logs/productionError.log
+node app.js

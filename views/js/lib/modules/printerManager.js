@@ -487,7 +487,7 @@ export default class PrinterManager {
           </div>
       </div>
       <div class="row">
-          <div class="col-12 col-sm-12 col-md-12 col-lg-5 col-xl-5">
+          <div class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
               <div class="row">
                   <div class="col-12">
                       <center>
@@ -515,7 +515,7 @@ export default class PrinterManager {
                   </div>
               </div>
           </div>
-          <div class="col-12 col-sm-12 col-md-12 col-lg-3 col-xl-3">
+          <div class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
               <div class="row">
                   <div class="col-12">
                       <center>
@@ -992,6 +992,7 @@ export default class PrinterManager {
         if (select) {
           let value = elements.printerControls.extruder.value;
           let opt = {
+
             command: "extrude",
             amount: parseInt(value)
           };
@@ -1024,13 +1025,15 @@ export default class PrinterManager {
         let select = OctoPrintClient.selectTool(printer, "tool0");
         if (select) {
           let value = elements.printerControls.extruder.value;
+          value = "-"+value;
           let opt = {
             command: "extrude",
             amount: parseInt(value)
           };
+          console.log(opt)
           let post = await OctoPrintClient.post(
             printer,
-            "printer/command",
+            "printer/tool",
             opt
           );
           if (post.status === 204) {
