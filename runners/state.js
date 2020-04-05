@@ -50,10 +50,13 @@ WebSocketClient.prototype.open = async function(url, index){
   this.instance.on('error',(e)=>{
     switch (e.code){
       case 'ECONNREFUSED':
+        //console.error(e);
         this.reconnect(e);
         break;
       default:
+        //console.error(e);
         this.onerror(e);
+        this.reconnect(e);
         break;
     }
   });
@@ -79,27 +82,27 @@ WebSocketClient.prototype.open = async function(url, index){
         }
       });
     }
+    let Polling = await ServerSettings.check();
+    var data = {};
+    data["auth"] = farmPrinters[this.index].currentUser + ":" + farmPrinters[this.index].apikey;
+    //Send User Auth
+    try{
+      farmPrinters[this.index].ws.send(JSON.stringify(data));
+    }catch (e){
+      this.instance.emit('error',e);
+    }
+    var throt = {};
+    throt["throttle"] = parseInt(
+        (Polling[0].onlinePolling.seconds * 1000) / 500
+    );
+    //Send Throttle
+    try{
+      farmPrinters[this.index].ws.send(JSON.stringify(throt));
+    }catch (e){
+      this.instance.emit('error',e);
+    }
   }catch(e){
     farmPrinters[this.index].currentUser = "";
-  }
-  let Polling = await ServerSettings.check();
-  var data = {};
-  data["auth"] = farmPrinters[this.index].currentUser + ":" + farmPrinters[this.index].apikey;
-  //Send User Auth
-  try{
-    farmPrinters[this.index].ws.send(JSON.stringify(data));
-  }catch (e){
-    this.instance.emit('error',e);
-  }
-  var throt = {};
-  throt["throttle"] = parseInt(
-      (Polling[0].onlinePolling.seconds * 1000) / 500
-  );
-  //Send Throttle
-  try{
-    farmPrinters[this.index].ws.send(JSON.stringify(throt));
-  }catch (e){
-    this.instance.emit('error',e);
   }
   return true;
 };
