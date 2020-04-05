@@ -6,3 +6,4 @@ productionError.log
 serverConfig/
 logs/
 
+/.eslintrc.js
