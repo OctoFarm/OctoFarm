@@ -322,31 +322,39 @@ label {
   padding: 0px 10px;
 }
 /*Small devices (landscape phones, 576px and up)*/
-@media (min-width: 576px) {
+@media (max-width: 767px) {
+  #oldPrinterList {
+    display: block;
+  }
   .sidenav {
-    height: 60%; /* Full-height: remove this if you want "auto" height */
-    width: 20%; /* Set the width of the sidebar */
+    display:none;
   }
   /* Style page content */
   .main {
-    margin-left: 20%; /* Same as the width of the sidebar */
+    margin-left: 0px; /* Same as the width of the sidebar */
   }
 }
 
 /* Medium devices (tablets, 768px and up)*/
-@media (min-width: 768px) {
+@media (min-width: 768px) and (max-width: 991px)  {
+  #oldPrinterList {
+    display: none;
+  }
   .sidenav {
     height: 100%; /* Full-height: remove this if you want "auto" height */
-    width: 20%; /* Set the width of the sidebar */
+    width: 35%; /* Set the width of the sidebar */
   }
   /* Style page content */
   .main {
-    margin-left: 20%; /* Same as the width of the sidebar */
+    margin-left: 35%; /* Same as the width of the sidebar */
   }
 }
 
 /* Large devices (desktops, 992px and up)*/
-@media (min-width: 992px) {
+@media (min-width: 992px)  and (max-width: 1199px) {
+  #oldPrinterList {
+    display: none;
+  }
   .sidenav {
     height: 100%; /* Full-height: remove this if you want "auto" height */
     width: 30%; /* Set the width of the sidebar */
@@ -359,6 +367,9 @@ label {
 }
 /*Extra large devices (large desktops, 1200px and up)*/
 @media (min-width: 1200px) {
+  #oldPrinterList {
+    display: none;
+  }
   .sidenav {
     height: 100%; /* Full-height: remove this if you want "auto" height */
     width: 20%; /* Set the width of the sidebar */

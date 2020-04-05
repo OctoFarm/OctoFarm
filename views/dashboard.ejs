@@ -1,4 +1,59 @@
 <% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
+  <div
+          id="oldPrinterList"
+          class="cell col-12"
+  >
+    <div class="row dashRow">
+      <div
+              id=""
+              class="cell col-12 col-sm-12"
+      >
+        <div class="card text-white bg-dark">
+          <div class="card-header dashHeader">
+            <h5 class="float-left">
+              <button
+                      type="button"
+                      class="btn btn-secondary float-right d-block"
+                      href="#"
+                      aria-expanded="false"
+                      disabled
+              >
+                <i class="fas fa-print"></i> Printers
+              </button>
+            </h5>
+            <button
+                    type="button"
+                    class="btn btn-secondary float-right d-block"
+                    href="#"
+                    aria-expanded="false"
+                    disabled
+            >
+              <%= printerCount %>
+            </button>
+            <!-- <button
+                  id="searchOfflineBtn"
+                  type="button"
+                  class="btn btn-success float-right d-block mr-1"
+                  href="#"
+                  aria-expanded="false"
+                >
+                  <i class="fas fa-redo"></i>
+                </button> -->
+          </div>
+          <div class="card-body dashBody" id="printerList">
+            <div class="row">
+              <div class="cell col-6"><center><button data-toggle="modal" data-target="#connectionModal" id="connectAllBtn" type="button" class="btn btn-success btn-sm"><i class="fas fa-link"></i> Connect All</button></center></div>
+              <div class="cell col-6"><center><button data-toggle="modal" data-target="#connectionModal" id="disconnectAllBtn" type="button" class="btn btn-danger btn-sm"><i class="fas fa-unlink"></i> Disconnect All</button></center></div>
+            </div>
+            <%- include('./partials/Printers/dashboardList.ejs') %>
+
+          </div>
+          <div class="card-footer dashFooter text-muted"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 <div class="sidenav text-white bg-dark mt-5 pt-2">
   <div class="row pl-2">
     <div class="col-md-12 pr-0">
