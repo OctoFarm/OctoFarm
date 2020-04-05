@@ -55,7 +55,7 @@ WebSocketClient.prototype.open = async function(url, index){
         break;
       default:
         //console.error(e);
-        this.onerror(e);
+        //this.onerror(e);
         this.reconnect(e);
         break;
     }
