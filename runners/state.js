@@ -51,26 +51,43 @@ WebSocketClient.prototype.open = async function(url, index){
     switch (e.code){
       case 'ECONNREFUSED':
         console.error(e);
-        farmPrinters[this.index].state = "Offline";
-        farmPrinters[this.index].stateColour = Runner.getColour("Offline");
+        try {
+          farmPrinters[this.index].state = "Offline";
+          farmPrinters[this.index].stateColour = Runner.getColour("Offline");
+        }catch(e){
+          console.log("Couldn't set state of missing printer, safe to ignore...")
+        }
         this.reconnect(e);
         break;
       case 'ECONNRESET':
         console.error(e);
-        farmPrinters[this.index].state = "Offline";
-        farmPrinters[this.index].stateColour = Runner.getColour("Offline");
+        try {
+          farmPrinters[this.index].state = "Offline";
+          farmPrinters[this.index].stateColour = Runner.getColour("Offline");
+        }catch(e){
+          console.log("Couldn't set state of missing printer, safe to ignore...")
+        }
         this.reconnect(e);
         break;
       case 'EHOSTUNREACH':
         console.error(e);
-        farmPrinters[this.index].state = "Shutdown";
-        farmPrinters[this.index].stateColour = Runner.getColour("Shutdown");
+        try {
+          farmPrinters[this.index].state = "Shutdown";
+          farmPrinters[this.index].stateColour = Runner.getColour("Shutdown");
+        }catch(e){
+          console.log("Couldn't set state of missing printer, safe to ignore...")
+        }
         this.reconnect(e);
         break;
       default:
         console.error(e);
-        farmPrinters[this.index].state = "Shutdown";
-        farmPrinters[this.index].stateColour = Runner.getColour("Shutdown");
+        try {
+          farmPrinters[this.index].state = "Shutdown";
+          farmPrinters[this.index].stateColour = Runner.getColour("Shutdown");
+        }catch(e){
+          console.log("Couldn't set state of missing printer, safe to ignore...")
+        }
+
 
         break;
     }
@@ -107,8 +124,8 @@ WebSocketClient.prototype.open = async function(url, index){
         }
       }catch(e){
         console.log(e)
-        farmPrinters[this.index].state = "Please Re-Sync";
-        farmPrinters[this.index].stateColour = Runner.getColour("Please Re-Sync");
+        // farmPrinters[this.index].state = "Please Re-Sync";
+        // farmPrinters[this.index].stateColour = Runner.getColour("Please Re-Sync");
       }
     }else{
       await Runner.getProfile(this.index);
