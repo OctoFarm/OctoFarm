@@ -6,14 +6,17 @@ All notable changes to this project will be documented in this file.
 
 ### Added 
 
+ - Added back in the re-sync all button. This will fire off the same re-sync command as the printer one but for all printers. 
+
 ### Changed
+ - Dashboard layout has been updated with a fixed sidebar. Medium sized screens and above will display this. 
 
 ### Removed
 
 ### Deprecated
 
 ### Fixed
- - My git user!
+
 ### Security
 
 

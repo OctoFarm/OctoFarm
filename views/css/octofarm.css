@@ -80,8 +80,8 @@ li {
 /*Sticky Table header*/
 .sticky-table {
   position: sticky;
-  top: 70px;
-  z-index: 1000px;
+  top: 60px;
+  z-index: 1000;
 }
 
 /*Scroll Bar*/
@@ -131,9 +131,6 @@ a.notyet {
 .dashBody {
   padding: 5px;
   overflow-y: scroll;
-  min-height: 81vh;
-  height: 82vh;
-  max-height: 85vh;
 }
 
 .dashBody p {
@@ -142,7 +139,6 @@ a.notyet {
 
 .dashFooter {
   padding: 5px;
-  position: bottom;
 }
 
 .fileHeader {
@@ -162,7 +158,6 @@ a.notyet {
 
 .fileFooter {
   padding: 5px;
-  position: bottom;
 }
 .search-control:focus {
   border-width: 0;
@@ -296,7 +291,6 @@ label {
 }
 .sortableList {
   cursor: move;
-  cursor: -webkit-grabbing;
 }
 .col-sm-5,
 .col-md-5,
@@ -309,4 +303,68 @@ label {
   padding-left: 10px !important;
   width: 20% !important;
   float: left !important;
+}
+.sidenav {
+  height: 100%; /* Full-height: remove this if you want "auto" height */
+  width: 20%; /* Set the width of the sidebar */
+  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
+  z-index: 1; /* Stay on top */
+  top: 0; /* Stay at the top */
+  left: 0;
+  background-color: #111; /* Black */
+  overflow-x: hidden;
+  overflow-y: scroll;/* Disable horizontal scroll */
+  padding-top: 20px;
+}
+/* Style page content */
+.main {
+  margin-left: 20%; /* Same as the width of the sidebar */
+  padding: 0px 10px;
+}
+/*Small devices (landscape phones, 576px and up)*/
+@media (min-width: 576px) {
+  .sidenav {
+    height: 60%; /* Full-height: remove this if you want "auto" height */
+    width: 20%; /* Set the width of the sidebar */
+  }
+  /* Style page content */
+  .main {
+    margin-left: 20%; /* Same as the width of the sidebar */
+  }
+}
+
+/* Medium devices (tablets, 768px and up)*/
+@media (min-width: 768px) {
+  .sidenav {
+    height: 100%; /* Full-height: remove this if you want "auto" height */
+    width: 20%; /* Set the width of the sidebar */
+  }
+  /* Style page content */
+  .main {
+    margin-left: 20%; /* Same as the width of the sidebar */
+  }
+}
+
+/* Large devices (desktops, 992px and up)*/
+@media (min-width: 992px) {
+  .sidenav {
+    height: 100%; /* Full-height: remove this if you want "auto" height */
+    width: 30%; /* Set the width of the sidebar */
+  }
+  /* Style page content */
+  .main {
+    margin-left: 30%; /* Same as the width of the sidebar */
+  }
+
+}
+/*Extra large devices (large desktops, 1200px and up)*/
+@media (min-width: 1200px) {
+  .sidenav {
+    height: 100%; /* Full-height: remove this if you want "auto" height */
+    width: 20%; /* Set the width of the sidebar */
+  }
+  /* Style page content */
+  .main {
+    margin-left: 20%; /* Same as the width of the sidebar */
+  }
 }

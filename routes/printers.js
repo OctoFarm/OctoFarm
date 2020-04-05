@@ -129,13 +129,16 @@ router.get("/printerInfo", ensureAuthenticated, async (req, res) => {
   res.send(printerInfo);
 });
 //Register handle for checking for offline printers - Depricated due to websocket full implementation
-// router.post("/runner/checkOffline", ensureAuthenticated, async (req, res) => {
-
-//   res.send({
-//     printers: checked,
-//     msg: " If they were found they will appear online shortly."
-//   });
-// });
+router.post("/runner/checkOffline", ensureAuthenticated, async (req, res) => {
+  let printers = await Runner.returnFarmPrinters();
+  for(let i=0; i<printers.length; i++){
+    const reset = await Runner.reScanOcto(i);
+  }
+  res.send({
+    printers: "All",
+    msg: " Were successfully rescanned..."
+  });
+});
 router.post("/fileList", ensureAuthenticated, async (req, res) => {
   let index = req.body.i;
   let files = await Runner.returnFileList(index);
