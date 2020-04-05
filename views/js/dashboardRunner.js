@@ -335,7 +335,7 @@ class dashUpdate {
           ).innerHTML = `<i class="fas fa-print"></i> ${printer.index}. ${printerName}`;
           document.getElementById(
               "printerButton-" + printer.index
-          ).disabled = printer.state === "Offline";
+          ).disabled = printer.state === "Offline" || printer.state === "Shutdown" || printer.state === "Searching...";
         }
         // document.getElementById("printerCard-" + printer.index).style.order =
         //   printer.sortIndex;

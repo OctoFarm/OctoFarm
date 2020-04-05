@@ -2,15 +2,39 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.1.5 - UnReleased]
+
+### Added 
+
+### Changed
+
+### Removed
+
+### Deprecated
+
+### Fixed
+
+### Security
+
+
 ## [Released]
 
 ## [v1.1.4-2-bugfix]
+
+### Added
+ - New states to OctoPrint detection... Now includes and reacts to "Searching..." + "Shutdown".
+    - Searching... will be shown when OctoFarm is trying to make a connection to to OctoPrint... 
+    - If the OctoPrint host is unreachable it will enter an Shutdown state... NOTE: If OctoPrint instance is added in a shutdown state, it currently get's stuck in Searching... a Re-Sync will refresh this.
+    
+### Changed 
+ - All screens updated to respond to the changes.
 
 ### Fixed
 
 - Fixed issue with passworded/non-passworded OctoPrint instances running on 1.4.0 not re-establishing web sockets. 
 - Fixed issue with adding printers offline, not correctly re-establishing websocket connection.
-- Current Operations correctly loads if all printers are offline, no display error requiring refresh.
+- Fixed issue with Shutdown Instances, ie. the OctoPrint host been turned off, causing server crash.
+- Current Operations correctly loads if all printers are added offline, no display error requiring refresh.
 
 
 ## [Released]

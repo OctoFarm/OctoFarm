@@ -1549,7 +1549,7 @@ export default class PrinterManager {
         elements.printerControls.printRestart.style.display = "none";
         elements.printerControls.printResume.disabled = true;
         elements.printerControls.printResume.style.display = "none";
-        if (printer.stateColour.category === "Offline") {
+        if (printer.state === "Offline" || printer.state === "Shutdown" || printer.state === "Searching...") {
           $("#printerManagerModal").modal("hide");
         }
       }

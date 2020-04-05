@@ -40,6 +40,10 @@ const PrinterSchema = new mongoose.Schema({
   selectedFilament: {
     type: Object,
     required: false
+ },
+  currentUser: {
+    type: String,
+    required: false
   }
 });
 
