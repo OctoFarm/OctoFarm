@@ -172,7 +172,7 @@ function updateState(printers, clientSettings) {
       }
     }
     let hideClosed = "";
-    let hideOffline = "";
+
 
     if (clientSettings.hideClosed) {
       hideClosed = "hidden";
@@ -296,7 +296,7 @@ function updateState(printers, clientSettings) {
       elements.start.classList.remove("hidden");
       elements.stop.classList.add("hidden");
     } else if (printer.stateColour.category === "Offline") {
-      elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${hideClosed}`;
+      elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} hidden`;
       elements.start.classList.remove("hidden");
       elements.stop.classList.add("hidden");
       elements.control.disabled = true;

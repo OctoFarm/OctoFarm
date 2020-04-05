@@ -5,7 +5,7 @@ printers[sorted.actualIndex].settingsWebcam != 'undefined'){%> <% } %>
   id="camPanel-<%= printers[sorted.actualIndex].index %>"
   class="col-lg-<%= (clientSettings[0].cameraView.cameraRows)%> col-xl-<%= (clientSettings[0].cameraView.cameraRows)%> hidden"
 >
-  <%}else if(printers[sorted.actualIndex].camURL === ""){ %>
+  <%}else if(printers[sorted.actualIndex].camURL === "" || printers[sorted.actualIndex].stateColour.category === "Offline"){ %>
   <div
     id="camPanel-<%= printers[sorted.actualIndex].index %>"
     class="col-lg-<%= (clientSettings[0].cameraView.cameraRows)%> col-xl-<%= (clientSettings[0].cameraView.cameraRows)%> hidden"

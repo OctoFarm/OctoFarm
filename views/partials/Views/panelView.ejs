@@ -1,5 +1,4 @@
-<% sortedIndex.forEach(sorted => { %> <% if( printers[sorted.actualIndex].state
-=== "Offline" && clientSettings[0].panelView.hideOff){%>
+<% sortedIndex.forEach(sorted => { %> <% if( printers[sorted.actualIndex].stateColour.category === "Offline" && clientSettings[0].panelView.hideOff){%>
 
 <div
   class="col-sm-12 col-md-4 col-lg-3 col-xl-2 hidden"

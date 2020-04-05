@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 ### Deprecated
 
 ### Fixed
+ - Issue #21 - Camera View and Panel view don't respect Offline/Shutdown printer hiding.
 
 ### Security
 
