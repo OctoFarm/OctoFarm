@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
 
-- Fixed issue with passworded/non-password OctoPrint instances running on 1.4.0 not re-establishing web sockets. 
+- Fixed issue with passworded/non-passworded OctoPrint instances running on 1.4.0 not re-establishing web sockets. 
 - Fixed issue with adding printers offline, not correctly re-establishing websocket connection.
 - Current Operations correctly loads if all printers are offline, no display error requiring refresh.
 

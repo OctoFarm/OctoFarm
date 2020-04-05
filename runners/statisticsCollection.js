@@ -17,7 +17,6 @@ class StatisticsCollection {
     if(typeof farmStats[0].printStatistics === 'undefined'){
       farmStats[0].printStatistics = this.blankFarmStatistics()
     }
-    console.log(farmStats[0].printStatistics)
     return farmStats[0];
   }
   static async init() {
