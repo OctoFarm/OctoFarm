@@ -8,6 +8,16 @@ let farmStats = [];
 
 class StatisticsCollection {
   static returnStats() {
+    if(typeof farmStats[0].currentOperationsCount === 'undefined') {
+      farmStats[0].currentOperationsCount = this.blankCurrentCount()
+    }
+    if(typeof farmStats[0].currentOperations === 'undefined'){
+      farmStats[0].currentOperations = [];
+    }
+    if(typeof farmStats[0].printStatistics === 'undefined'){
+      farmStats[0].printStatistics = this.blankFarmStatistics()
+    }
+    console.log(farmStats[0].printStatistics)
     return farmStats[0];
   }
   static async init() {
@@ -36,7 +46,7 @@ class StatisticsCollection {
     //     console.log(err, "Error saving farm statistics...");
     //   });
     // }, 5000);
-    // return "Statistics collection has started...";
+    return "Statistics collection has started...";
   }
   static async currentOperations(farmPrinters) {
     let currentOperations = [];
@@ -440,11 +450,11 @@ class StatisticsCollection {
   static blankPrintStatistics() {
     let printStatistics = {
       completed: 0,
-      completedPercent: 0,
+      completedPercent: 33.3,
       cancelled: 0,
-      cancelledPercent: 0,
+      cancelledPercent: 33.3,
       failed: 0,
-      failedPercent: 0,
+      failedPercent: 33.3,
       longestPrint: 0,
       shortestPrint: 0,
       averagePrintTime: 0,
