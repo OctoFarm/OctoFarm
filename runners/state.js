@@ -55,7 +55,7 @@ WebSocketClient.prototype.open = async function(url, index){
         break;
       default:
         //console.error(e);
-        //this.onerror(e);
+        this.onerror(e);
         this.reconnect(e);
         break;
     }
@@ -121,7 +121,7 @@ WebSocketClient.prototype.send = function(data,option){
   }
 };
 WebSocketClient.prototype.reconnect = function(e){
-  //console.log(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`,e);
+  console.log(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`,e);
   farmPrinters[this.index].state = "Offline";
   farmPrinters[this.index].stateColour = Runner.getColour("Offline");
   this.instance.removeAllListeners();
