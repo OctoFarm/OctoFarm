@@ -14,6 +14,8 @@ const filamentType = require("../config/filaments.js");
 const returnFilamentTypes = filamentType.returnFilamentTypes;
 const serverConfig = require("../serverConfig/server.js");
 
+const version = pjson.version+".3";
+
 console.log("db: " + db);
 
 const Roll = require("../models/Filament.js");
@@ -50,7 +52,7 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
   res.render("dashboard", {
     name: user,
     userGroup: group,
-    version: pjson.version+".2",
+    version: version,
     sortedIndex: sortedPrinters,
     printers: printers,
     farmInfo: statistics.farmInfo,
@@ -85,7 +87,7 @@ router.get("/filemanager", ensureAuthenticated, async (req, res) => {
   res.render("filemanager", {
     name: user,
     userGroup: group,
-    version: pjson.version+".2",
+    version: version,
     printers: printers,
     sortedIndex: sortedPrinters,
     printerCount: printers.length,
@@ -115,7 +117,7 @@ router.get("/history", ensureAuthenticated, async (req, res) => {
   res.render("history", {
     name: user,
     userGroup: group,
-    version: pjson.version+".2",
+    version: version,
     printers: printers,
     sortedIndex: sortedPrinters,
     printerCount: printers.length,
@@ -148,7 +150,7 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
   res.render("panelView", {
     name: user,
     userGroup: group,
-    version: pjson.version+".2",
+    version: version,
     printers: printers,
     sortedIndex: sortedPrinters,
     currentOperations: statistics.currentOperations,
@@ -183,7 +185,7 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
   res.render("cameraView", {
     name: user,
     userGroup: group,
-    version: pjson.version+".2",
+    version: version,
     printers: printers,
     sortedIndex: sortedPrinters,
     currentOperations: statistics.currentOperations,
@@ -218,7 +220,7 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
   res.render("listView", {
     name: user,
     userGroup: group,
-    version: pjson.version+".2",
+    version: version,
     printers: printers,
     sortedIndex: sortedPrinters,
     currentOperations: statistics.currentOperations,

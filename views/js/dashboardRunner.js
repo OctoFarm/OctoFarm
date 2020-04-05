@@ -333,9 +333,16 @@ class dashUpdate {
           document.getElementById(
             "printerName-" + printer.index
           ).innerHTML = `<i class="fas fa-print"></i> ${printer.index}. ${printerName}`;
-          document.getElementById(
-              "printerButton-" + printer.index
-          ).disabled = printer.state === "Offline" || printer.state === "Shutdown" || printer.state === "Searching...";
+          if(printer.stateColour.category === "Offline"){
+            document.getElementById(
+                "printerButton-" + printer.index
+            ).disabled = true;
+          }else{
+            document.getElementById(
+                "printerButton-" + printer.index
+            ).disabled = false;
+          }
+
         }
         // document.getElementById("printerCard-" + printer.index).style.order =
         //   printer.sortIndex;
@@ -414,17 +421,17 @@ let sortable = Sortable.create(el, {
     OctoFarmClient.post("printers/updateSortIndex", listID);
   }
 });
-let el = document.getElementById("printerList2");
-let sortable = Sortable.create(el, {
-  handle: ".sortableList",
-  animation: 150,
-  onUpdate: function(/**Event*/ e) {
-    let elements = e.target.querySelectorAll("[id^='printerCard-']");
-    let listID = [];
-    elements.forEach(e => {
-      let ca = e.id.split("-");
-      listID.push(ca[1]);
-    });
-    OctoFarmClient.post("printers/updateSortIndex", listID);
-  }
-});
+// let el2 = document.getElementById("printerList2");
+// let sortable2 = Sortable.create(el2, {
+//   handle: ".sortableList",
+//   animation: 150,
+//   onUpdate: function(/**Event*/ e) {
+//     let elements = e.target.querySelectorAll("[id^='printerCard-']");
+//     let listID = [];
+//     elements.forEach(e => {
+//       let ca = e.id.split("-");
+//       listID.push(ca[1]);
+//     });
+//     OctoFarmClient.post("printers/updateSortIndex", listID);
+//   }
+// });
