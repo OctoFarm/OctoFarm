@@ -1,0 +1,109 @@
+<div
+  id="currentOperations"
+  class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12"
+>
+  <div class="card text-white bg-dark">
+    <div class="card-header dashHeader">
+      <div class="row">
+        <div class="col-md-2 col-lg-2">
+          <button
+            type="button"
+            class="btn btn-secondary d-block"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            <i class="fas fa-star"></i> Current Operations
+          </button>
+        </div>
+        <div class="col-md-3 col-lg-6">
+          <div class="progress mt-2">
+            <div id="farmProgress"
+              class="progress-bar progress-bar-striped bg-"
+              role="progressbar"
+              style="width: <%= currentOperationsCount.farmProgress %>%"
+              aria-valuenow="<%= currentOperationsCount.farmProgress %>"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+            <%= currentOperationsCount.farmProgress %>%
+            </div>
+          </div>
+        </div>
+        <div class="col-md-7 col-lg-4">
+          <button id="offlineCount"
+            type="button"
+            class="btn btn-danger float-right d-block ml-1"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            Offline: <%= currentOperationsCount.offline %>
+          </button>
+          <button id="idleCount"
+            type="button"
+            class="btn btn-dark float-right d-block ml-1"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            Idle: <%= currentOperationsCount.idle %>
+          </button>
+          <button id="activeCount"
+            type="button"
+            class="btn btn-warning float-right d-block ml-1"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            Active: <%= currentOperationsCount.active %>
+          </button>
+          <button id="completeCount"
+            type="button"
+            class="btn btn-success float-right ml-1 d-block"
+            href="#"
+            aria-expanded="false"
+            disabled
+          >
+            Complete: <%= currentOperationsCount.complete %>
+          </button>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+</div>
+<div class="row">
+  <div class="cell col-12">
+
+      <% currentOperations.forEach(current => { %>
+        <% if(current != null){ %>
+        <div id="currentOpCard-<%=current.index%>"
+             class="card card-block text-white bg-secondary d-inline-block"
+             style="min-width: 200px; height:85px;"
+        >
+          <div class="card-header pb-1 pt-1 pl-2 pr-2"><%=current.index%>. <%=current.name%></div>
+          <div class="card-body  pb-0 pt-2 pl-2 pr-2">
+            <h6 id="currentTime-<%=current.index%>" class="pb-0 text-center" style="font-size:0.6rem;"><%=  helpers.generateTime(current.timeRemaining) %></h6>
+            <div class="progress">
+              <div id="currentProgress-<%=current.index%>"
+                   class="progress-bar progress-bar-striped bg-<%=current.progressColour%>"
+                   role="progressbar"
+                   style="width: <%=current.progress%>%"
+                   aria-valuenow=""
+                   aria-valuemin="0"
+                   aria-valuemax="100"
+              >
+                <%=current.progress%>%
+              </div>
+            </div>
+          </div>
+        </div>
+        <% } %>
+      <%  }) %>
+
+</div>
+
+
+</div>

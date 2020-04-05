@@ -233,5 +233,38 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
     clientSettings: clientSettings
   });
 });
-
+router.get("/mon/currentOp", ensureAuthenticated, async (req, res) => {
+  let printers = Runner.returnFarmPrinters();
+  let sortedPrinters = await Runner.sortedIndex();
+  const farmStatistics = require("../runners/statisticsCollection.js");
+  const FarmStatistics = farmStatistics.StatisticsCollection;
+  let statistics = await FarmStatistics.returnStats();
+  let systemInformation = await SystemInfo.find({});
+  let filament = await Filament.find({});
+  let clientSettings = await ClientSettings.find({});
+  let user = null;
+  let group = null;
+  if (serverConfig.loginRequired === false) {
+    user = "No User";
+    group = "Administrator";
+  } else {
+    user = req.user.name;
+    group = req.user.group;
+  }
+  res.render("currentOperationsView", {
+    name: user,
+    userGroup: group,
+    version: version,
+    printers: printers,
+    sortedIndex: sortedPrinters,
+    currentOperations: statistics.currentOperations,
+    printerCount: printers.length,
+    currentOperationsCount: statistics.currentOperationsCount,
+    page: "Current Operations View",
+    helpers: prettyHelpers,
+    systemInfo: systemInformation[0],
+    filament: filament,
+    clientSettings: clientSettings
+  });
+});
 module.exports = router;
