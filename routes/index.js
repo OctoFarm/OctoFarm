@@ -50,7 +50,7 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
   res.render("dashboard", {
     name: user,
     userGroup: group,
-    version: pjson.version,
+    version: pjson.version+".2",
     sortedIndex: sortedPrinters,
     printers: printers,
     farmInfo: statistics.farmInfo,
@@ -85,7 +85,7 @@ router.get("/filemanager", ensureAuthenticated, async (req, res) => {
   res.render("filemanager", {
     name: user,
     userGroup: group,
-    version: pjson.version,
+    version: pjson.version+".2",
     printers: printers,
     sortedIndex: sortedPrinters,
     printerCount: printers.length,
@@ -115,7 +115,7 @@ router.get("/history", ensureAuthenticated, async (req, res) => {
   res.render("history", {
     name: user,
     userGroup: group,
-    version: pjson.version,
+    version: pjson.version+".2",
     printers: printers,
     sortedIndex: sortedPrinters,
     printerCount: printers.length,
@@ -148,7 +148,7 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
   res.render("panelView", {
     name: user,
     userGroup: group,
-    version: pjson.version,
+    version: pjson.version+".2",
     printers: printers,
     sortedIndex: sortedPrinters,
     currentOperations: statistics.currentOperations,
@@ -183,7 +183,7 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
   res.render("cameraView", {
     name: user,
     userGroup: group,
-    version: pjson.version,
+    version: pjson.version+".2",
     printers: printers,
     sortedIndex: sortedPrinters,
     currentOperations: statistics.currentOperations,
@@ -218,7 +218,7 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
   res.render("listView", {
     name: user,
     userGroup: group,
-    version: pjson.version,
+    version: pjson.version+".2",
     printers: printers,
     sortedIndex: sortedPrinters,
     currentOperations: statistics.currentOperations,
