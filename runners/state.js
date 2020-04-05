@@ -51,12 +51,25 @@ WebSocketClient.prototype.open = async function(url, index){
     switch (e.code){
       case 'ECONNREFUSED':
         //console.error(e);
+        farmPrinters[this.index].state = "Offline";
+        farmPrinters[this.index].stateColour = Runner.getColour("Offline");
+        this.reconnect(e);
+        break;
+      case 'EHOSTUNREACH':
+        //console.error(e);
+        farmPrinters[this.index].state = "Shutdown";
+        farmPrinters[this.index].stateColour = Runner.getColour("Shutdown");
+        this.reconnect(e);
+        break;
+      case 'ECONNRESET':
+        //console.error(e);
+        farmPrinters[this.index].state = "Shutdown";
+        farmPrinters[this.index].stateColour = Runner.getColour("Shutdown");
         this.reconnect(e);
         break;
       default:
         //console.error(e);
         this.onerror(e);
-        this.reconnect(e);
         break;
     }
   });
@@ -122,8 +135,6 @@ WebSocketClient.prototype.send = function(data,option){
 };
 WebSocketClient.prototype.reconnect = function(e){
   console.log(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`,e);
-  farmPrinters[this.index].state = "Offline";
-  farmPrinters[this.index].stateColour = Runner.getColour("Offline");
   this.instance.removeAllListeners();
   let that = this;
   setTimeout(function(){
@@ -182,14 +193,10 @@ WebSocketClient.prototype.onmessage = async function(data,flags,number){
 WebSocketClient.prototype.onerror = function(e){
   console.log("WebSocketClient: error",arguments);
   this.instance.removeAllListeners();
-  farmPrinters[this.index].state = "Offline";
-  farmPrinters[this.index].stateColour = Runner.getColour("Offline");
 };
 WebSocketClient.prototype.onclose = function(e){
   console.log("WebSocketClient: closed",arguments);
   this.instance.removeAllListeners();
-  farmPrinters[this.index].state = "Offline";
-  farmPrinters[this.index].stateColour = Runner.getColour("Offline");
   return "closed";
 };
 
@@ -623,7 +630,9 @@ class Runner {
       return { name: "danger", hex: "#2e0905", category: "Closed" };
     } else if (state === "Complete") {
       return { name: "success", hex: "#00330e", category: "Complete" };
-    } else {
+    } else if (state === "Shutdown") {
+      return { name: "danger", hex: "#00330e", category: "Offline" };
+    }else{
       return { name: "danger", hex: "#00330e", category: "Searching..." };
     }
   }
