@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
  - Dashboard layout has been updated with a fixed sidebar. Medium sized screens and above will display this. 
+ - Refactored mobile views for dashboard
 
 ### Removed
 

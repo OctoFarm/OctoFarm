@@ -400,8 +400,22 @@ class dashUpdate {
     idleProgress.style.width = 100 - octofarmStatistics.activePercent + "%";
   }
 }
-var el = document.getElementById("printerList");
-var sortable = Sortable.create(el, {
+let el = document.getElementById("printerList");
+let sortable = Sortable.create(el, {
+  handle: ".sortableList",
+  animation: 150,
+  onUpdate: function(/**Event*/ e) {
+    let elements = e.target.querySelectorAll("[id^='printerCard-']");
+    let listID = [];
+    elements.forEach(e => {
+      let ca = e.id.split("-");
+      listID.push(ca[1]);
+    });
+    OctoFarmClient.post("printers/updateSortIndex", listID);
+  }
+});
+let el = document.getElementById("printerList2");
+let sortable = Sortable.create(el, {
   handle: ".sortableList",
   animation: 150,
   onUpdate: function(/**Event*/ e) {
