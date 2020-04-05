@@ -19,7 +19,7 @@ All notable changes to this project will be documented in this file.
  - Issue #21 - Camera View and Panel view don't respect Offline/Shutdown printer hiding.
  - Sometimes when removing printers would incorrectly try to update the state still.
  - Some offline/shutdown Printers would try ask to Re-Sync when not required due to still been offline/shutdown.
- - My git account... pushes as myself now. 
+ - My git account... pushes as myself now. Hopefully...
 
 ### Security
 
