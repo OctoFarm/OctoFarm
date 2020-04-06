@@ -4,6 +4,7 @@ export default function currentOperations(
   currentOperations,
   currentOperationsCount
 ) {
+  console.log(currentOperations)
   currentOperationsCount = currentOperationsCount;
   document.getElementById("completeCount").innerHTML =
     "Complete: " + currentOperationsCount.complete;

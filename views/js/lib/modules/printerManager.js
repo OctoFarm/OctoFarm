@@ -17,7 +17,6 @@ let lastPrinter = null;
 $("#printerManagerModal").on("hidden.bs.modal", function(e) {
   //Fix for mjpeg stream not ending when element removed...
   document.getElementById("printerControlCamera").src = "";
-  document.getElementById("printerControlCamera").remove();
 });
 $("#connectionModal").on("hidden.bs.modal", function(e) {
   //Fix for mjpeg stream not ending when element removed...
@@ -213,9 +212,7 @@ export default class PrinterManager {
               </div>
               <div class="row">
                   <div id="cameraCol" class="col-12">
-                    <img class="${flipH} ${flipV} ${rotate90}" id="printerControlCamera" width="100%" src="http://${
-          printer.camURL
-        }"/>
+                    <img class="${flipH} ${flipV} ${rotate90}" id="printerControlCamera" width="100%" src=""/>
                   </div>
               </div>
           </div>
@@ -709,6 +706,9 @@ export default class PrinterManager {
       if (printer.camURL == "") {
         document.getElementById("printerControlCamera").src =
           "../../../images/noCamera.jpg";
+      }else{
+        document.getElementById("printerControlCamera").src =
+        "http://"+printer.camURL;
       }
     }
   }

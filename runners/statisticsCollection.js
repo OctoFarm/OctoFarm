@@ -76,6 +76,7 @@ class StatisticsCollection {
         if (typeof printer.state != undefined && printer.state === "Closed") {
           closed.push(printer.index);
         }
+        
         if (
           typeof printer.stateColour != "undefined" &&
           typeof printer.progress != "undefined"
@@ -107,6 +108,7 @@ class StatisticsCollection {
               timeRemaining: printer.progress.printTimeLeft
             });
           }
+          
         }
       });
       let actProg = progress.reduce((a, b) => a + b, 0);
