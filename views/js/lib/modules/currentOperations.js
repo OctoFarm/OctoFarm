@@ -40,7 +40,6 @@ export default function currentOperations(
     let futureTimeString = new Date(currentDate + current.timeRemaining * 1000).toTimeString()
     futureTimeString = futureTimeString.substring(0, 8); 
     let dateComplete = futureDateString + ": " + futureTimeString;
-    console.log(current.timeRemaining) 
      if(current.timeRemaining === 0){ 
        dateComplete = "Harvest Your Print!"; 
      } 
