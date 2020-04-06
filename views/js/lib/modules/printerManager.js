@@ -709,6 +709,7 @@ export default class PrinterManager {
       }else{
         document.getElementById("printerControlCamera").src =
         "http://"+printer.camURL;
+        
       }
     }
   }
