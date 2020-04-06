@@ -14,11 +14,13 @@ let port = window.location.port;
 if (port != "") {
   port = ":" + port;
 }
-
+async function asyncParse(str) {
+  return JSON.parse(str);
+}
 var source = new EventSource("/sse/printerInfo/");
-source.onmessage = function(e) {
+source.onmessage = async function(e) {
   if (e.data != null) {
-    let res = JSON.parse(e.data);
+    let res = await asyncParse(e.data);
 
     if (
       document.getElementById("printerManagerModal").classList.contains("show")
@@ -26,7 +28,7 @@ source.onmessage = function(e) {
       PrinterManager.init(res.printerInfo);
     } else {
       printerInfo = res.printerInfo;
-      if (res.clientSettings.currentOp) {
+      if (res.clientSettings.cameraView.currentOp) {
         currentOperations(res.currentOperations, res.currentOperationsCount);
       }
       updateState(res.printerInfo, res.clientSettings.cameraView);

@@ -28,6 +28,7 @@ function WebSocketClient(){
 WebSocketClient.prototype.open = async function(url, index){
   this.url = url;
   this.index = index;
+  farmPrinters[this.index].webSocket = "trying";
   this.instance = new WebSocket(this.url);
   this.instance.on('open',()=>{
     this.onopen(this.index);
@@ -54,6 +55,7 @@ WebSocketClient.prototype.open = async function(url, index){
         try {
           farmPrinters[this.index].state = "Offline";
           farmPrinters[this.index].stateColour = Runner.getColour("Offline");
+          farmPrinters[this.index].webSocket = "offline";
         }catch(e){
           console.log("Couldn't set state of missing printer, safe to ignore...")
         }
@@ -64,6 +66,7 @@ WebSocketClient.prototype.open = async function(url, index){
         try {
           farmPrinters[this.index].state = "Offline";
           farmPrinters[this.index].stateColour = Runner.getColour("Offline");
+          farmPrinters[this.index].webSocket = "offline";
         }catch(e){
           console.log("Couldn't set state of missing printer, safe to ignore...")
         }
@@ -74,16 +77,18 @@ WebSocketClient.prototype.open = async function(url, index){
         try {
           farmPrinters[this.index].state = "Shutdown";
           farmPrinters[this.index].stateColour = Runner.getColour("Shutdown");
+          farmPrinters[this.index].webSocket = "offline";
         }catch(e){
           console.log("Couldn't set state of missing printer, safe to ignore...")
         }
         this.reconnect(e);
         break;
       default:
-        console.error(e);
+        console.error("Last error" + e);
         try {
           farmPrinters[this.index].state = "Shutdown";
           farmPrinters[this.index].stateColour = Runner.getColour("Shutdown");
+          farmPrinters[this.index].webSocket = "offline";
         }catch(e){
           console.log("Couldn't set state of missing printer, safe to ignore...")
         }
@@ -166,7 +171,7 @@ WebSocketClient.prototype.send = function(data,option){
     this.instance.emit('error',e);
   }
 };
-WebSocketClient.prototype.reconnect = function(e){
+WebSocketClient.prototype.reconnect = async function(e){
   console.log(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`,e);
   this.instance.removeAllListeners();
   let that = this;
@@ -174,10 +179,11 @@ WebSocketClient.prototype.reconnect = function(e){
     console.log("WebSocketClient: reconnecting...");
     that.open(that.url, that.index);
   },this.autoReconnectInterval);
+  return true;
 };
 WebSocketClient.prototype.onopen = async function(e){
   console.log("WebSocketClient: open",arguments);
-  console.log("ON OPEN" + farmPrinters[this.index].state);
+  farmPrinters[this.index].webSocket = "online";
 };
 WebSocketClient.prototype.onmessage = async function(data,flags,number){
 
@@ -279,6 +285,8 @@ class Runner {
         //Make sure runners are created ready for each printer to pass between...
         farmPrinters[i].state = "Searching...";
         farmPrinters[i].stateColour = Runner.getColour("Searching...");
+        farmPrinters[i].webSocket = "offline";
+        console.log(farmPrinters[i].webSocket = "offline")
       }
     } catch (err) {
       let error = {
@@ -327,6 +335,7 @@ class Runner {
     };
     if (farmPrinters[index].ws.instance.readyState === 3) {
       console.log(index + ": Attempting to reconnect socket...");
+      await farmPrinters[index].ws.reconnect({msg: "User Attempted Reconnect..."});
       result.status = "success";
       result.msg =
           "Printer: " +

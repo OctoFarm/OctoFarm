@@ -12,10 +12,13 @@ let port = window.location.port;
 if (port != "") {
   port = ":" + port;
 }
+async function asyncParse(str) {
+  return JSON.parse(str);
+}
 var source = new EventSource("/sse/printerInfo/");
-source.onmessage = function(e) {
+source.onmessage = async function(e) {
   if (e.data != null) {
-    let res = JSON.parse(e.data);
+    let res = await asyncParse(e.data);
 
     if (
       document.getElementById("printerManagerModal").classList.contains("show")

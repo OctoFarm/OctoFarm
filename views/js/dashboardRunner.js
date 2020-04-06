@@ -12,11 +12,13 @@ let printerInfo = "";
 // if (port != "") {
 //   port = ":" + port;
 // }
-
+async function asyncParse(str) {
+  return JSON.parse(str);
+}
 var source = new EventSource("/sse/printerInfo/");
-source.onmessage = function(e) {
+source.onmessage = async function(e) {
   if (e.data != null) {
-    let res = JSON.parse(e.data);
+    let res = await asyncParse(e.data);
     if (res.printerInfo.length > 0) {
       if (
         document
@@ -332,7 +334,7 @@ class dashUpdate {
           ).className = `badge badge-${printer.stateColour.name} badge-pill`;
           document.getElementById(
             "printerName-" + printer.index
-          ).innerHTML = `<i class="fas fa-print"></i> ${printer.index}. ${printerName}`;
+          ).innerHTML = `<i id="printerIcon-${printer.index}" class="fas fa-print"></i> ${printer.index}. ${printerName}`;
           if(printer.stateColour.category === "Offline"){
             document.getElementById(
                 "printerButton-" + printer.index
@@ -341,6 +343,15 @@ class dashUpdate {
             document.getElementById(
                 "printerButton-" + printer.index
             ).disabled = false;
+          }
+          let printerIcon = document.getElementById("printerIcon-"+printer.index);
+
+          if(printer.webSocket == "online"){
+              printerIcon.className = "fas fa-print textComplete";
+          }else if(printer.webSocket == "offline"){
+            printerIcon.className = "fas fa-print textOffline";
+          }else if(printer.webSocket == "trying"){
+            printerIcon.className = "fas fa-print textActive";
           }
 
         }

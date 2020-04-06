@@ -40,16 +40,16 @@ li {
   color: #262626;
 }
 .textActive {
-  color: #583c0e;
+  color: #63450f;
 }
 .textOffline {
-  color: #2e0905;
+  color: #630c05;
 }
 .textClosed {
-  color: #2e0905;
+  color: #630a05;
 }
 .textComplete {
-  color: #00330e;
+  color: #006311;
 }
 .Idle {
   background-color: #262626;

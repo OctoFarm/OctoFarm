@@ -7,20 +7,29 @@ All notable changes to this project will be documented in this file.
 ### Added 
 
  - Added back in the re-sync all button. This will fire off the same re-sync command as the printer one but for all printers. 
+ - Websockets connections are now indicated separately to Printer Status. The Printer Icon on the dashboard will show this status. 
+    - Green = Currently connected
+    - Yellow = Attempting a connection
+    - Red = Disconnected.  
 
 ### Changed
  - Dashboard layout has been updated with a fixed sidebar. Medium sized screens and above will display this. 
- - Refactored mobile views for dashboard
+ - Refactored mobile views for dashboard - See Deprecated.
+ - Current Operations now viewable on mobile.
+ - async information reception from server -> client. 
 
 ### Removed
 
 ### Deprecated
+
+ - Mobile view printer list no longer available due to dashboard changes. Will be returning in later release. 
 
 ### Fixed
  - Issue #21 - Camera View and Panel view don't respect Offline/Shutdown printer hiding.
  - Sometimes when removing printers would incorrectly try to update the state still.
  - Some offline/shutdown Printers would try ask to Re-Sync when not required due to still been offline/shutdown.
  - My git account... pushes as myself now. Hopefully...
+ - Camera View Current Operations now updates with printers.
 
 ### Security
 

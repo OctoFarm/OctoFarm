@@ -124,7 +124,8 @@ setInterval(async function() {
       current: printers[i].current,
       options: printers[i].options,
       selectedFilament: selectedFilament,
-      settingsWebcam: printers[i].settingsWebcam
+      settingsWebcam: printers[i].settingsWebcam,
+      webSocket: printers[i].webSocket
     };
     printerInfo.push(printer);
   }
