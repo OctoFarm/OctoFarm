@@ -206,6 +206,8 @@ WebSocketClient.prototype.onmessage = async function(data,flags,number){
   if (typeof data.current != "undefined") {
     if (data.current.state.text === "Offline") {
       data.current.state.text = "Closed";
+    }else if(data.current.state.text.includes("Error:")){
+      data.current.state.text = "Error!"
     }
     farmPrinters[this.index].state = data.current.state.text;
     farmPrinters[this.index].stateColour = Runner.getColour(data.current.state.text);

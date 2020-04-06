@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
     - Green = Currently connected
     - Yellow = Attempting a connection
     - Red = Disconnected.  
+ - State now grabs an Error and displays on the printer status label if one ocurrs until recified. 
 
 ### Changed
  - Dashboard layout has been updated with a fixed sidebar. Medium sized screens and above will display this. 

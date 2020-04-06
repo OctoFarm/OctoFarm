@@ -52,6 +52,25 @@ export default class PrinterManager {
       const selectedBaud = printer.current.baudrate;
       const selectedPort = printer.current.port;
       const selectedProfile = printer.current.printerProfile;
+       //Attempted printer pofile fix...
+       let pProfile = null;
+       if(typeof printer.profile[selectedProfile] !== 'undefined'){
+         pProfile = printer.profile[selectedProfile];
+       }else{
+         pProfile = {
+           model: "Couldn't grab...",
+           volume: {
+             height: "000",
+             width: "000",
+             depth: "000"
+           },
+           extruder:{
+             count: "0",
+             nozzleDiameter: "0",
+           },
+           heatedChamber: "Couldn't grab..."
+         }
+       }
       //Fake name
       let name = "";
       let valueName = "";
@@ -110,6 +129,7 @@ export default class PrinterManager {
         if (typeof printer.camURL != "undefined" && printer.camURL != "") {
           camURL = printer.camURL;
         }
+       
         document.getElementById("printerInformation").innerHTML = `
           <h5>Printer Information</h5><hr>
           <form>
@@ -142,11 +162,11 @@ export default class PrinterManager {
           </div>
           </form>
   
-          <p class="mb-1"><b>Model:</b> ${printer.profile[selectedProfile].model} </p>
-          <p class="mb-1"><b>H:</b> ${printer.profile[selectedProfile].volume.height}mm x <b>W:</b> ${printer.profile[selectedProfile].volume.width}mm x <b>D:</b> ${printer.profile[selectedProfile].volume.depth}mm</p>
-          <p class="mb-1"> <b>Extruder Count:</b> ${printer.profile[selectedProfile].extruder.count}</p>
-          <p class="mb-1"><b>E0 Nozzle Size:</b> ${printer.profile[selectedProfile].extruder.nozzleDiameter}</p>
-          <p class="mb-1"><b>Heated Chamber:</b> ${printer.profile[selectedProfile].heatedChamber}</p>
+          <p class="mb-1"><b>Model:</b> ${pProfile.model} </p>
+          <p class="mb-1"><b>H:</b> ${pProfile.volume.height}mm x <b>W:</b> ${pProfile.volume.width}mm x <b>D:</b> ${pProfile.volume.depth}mm</p>
+          <p class="mb-1"> <b>Extruder Count:</b> ${pProfile.extruder.count}</p>
+          <p class="mb-1"><b>E0 Nozzle Size:</b> ${pProfile.extruder.nozzleDiameter}</p>
+          <p class="mb-1"><b>Heated Chamber:</b> ${pProfile.heatedChamber}</p>
           </div>
           
           `;
@@ -709,7 +729,6 @@ export default class PrinterManager {
       }else{
         document.getElementById("printerControlCamera").src =
         "http://"+printer.camURL;
-        
       }
     }
   }

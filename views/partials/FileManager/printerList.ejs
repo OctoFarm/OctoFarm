@@ -67,7 +67,7 @@ if(printers[sorted.actualIndex].state != "Offline" && typeof printers[sorted.act
             </div>
           </div>
         </div>
-        <% if(selectedProfile != null && typeof printers[sorted.actualIndex].profiles != 'undefined'){ %>
+        <% if(selectedProfile != null && typeof printers[sorted.actualIndex].profiles[selectedProfile] != 'undefined'){ %>
           <small class="pt-2 float-left"
           ><i class="fas fa-cube"></i> <b>H:</b> <%=
           printers[sorted.actualIndex].profiles[selectedProfile].volume.height%>mm x <b>W:</b> <%=
@@ -80,10 +80,7 @@ if(printers[sorted.actualIndex].state != "Offline" && typeof printers[sorted.act
           <b>Nozzle Size:</b> <%=
           printers[sorted.actualIndex].profiles[selectedProfile].extruder.nozzleDiameter %>mm</small
         >
-          <% }else{ %>
-            <small class="pt-2 float-left"><i class="fas fa-pen"></i> No Profile found matching your selected Profile</small>
-            <small class="pt-2 float-left">This is either a bug, or your setup isn't accounted for... Please log an issue request on the git with a snapshot of your profile on Issue number #15.</small>
-            <% } %>
+          <% } %>
         
       
       </div>
