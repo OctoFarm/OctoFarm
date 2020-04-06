@@ -204,7 +204,7 @@ WebSocketClient.prototype.onmessage = async function(data,flags,number){
   }
   //Listen for printer status
   if (typeof data.current != "undefined") {
-    if (data.current.state.text.includes("Offline")) {
+    if (data.current.state.text === "Offline") {
       data.current.state.text = "Closed";
     }
     farmPrinters[this.index].state = data.current.state.text;

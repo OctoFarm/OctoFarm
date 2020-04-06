@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
  - Refactored mobile views for dashboard - See Deprecated.
  - Current Operations now viewable on mobile.
  - async information reception from server -> client. 
+ - State should now show if Serial Error occurs on OctoPrint.
 
 ### Removed
 
