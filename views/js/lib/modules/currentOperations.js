@@ -33,6 +33,17 @@ export default function currentOperations(
   currentOperations = _.orderBy(currentOperations, ["progress"], ["desc"]);
 
   currentOperations.forEach((current, index) => {
+    //Generate future time
+    let currentDate = new Date(); 
+    currentDate = currentDate.getTime(); 
+    let futureDateString = new Date(currentDate + current.timeRemaining * 1000).toDateString()
+    let futureTimeString = new Date(currentDate + current.timeRemaining * 1000).toTimeString()
+    futureTimeString = futureTimeString.substring(0, 8); 
+    let dateComplete = futureDateString + ": " + futureTimeString;
+    console.log(current.timeRemaining) 
+     if(current.timeRemaining === 0){ 
+       dateComplete = "Harvest Your Print!"; 
+     } 
     //check if exists, create if not....
     if (document.getElementById("currentOpCard-" + current.index)) {
       let progress = document.getElementById(
@@ -41,6 +52,7 @@ export default function currentOperations(
       progress.style = `width: ${current.progress}%`;
       progress.innerHTML = current.progress + "%";
       progress.className = `progress-bar progress-bar-striped bg-${current.progressColour}`;
+      document.getElementById("futureDate-" + current.index).innerHTML = dateComplete;
       document.getElementById(
         "currentTime-" + current.index
       ).innerHTML = Calc.generateTime(current.timeRemaining);
@@ -61,6 +73,7 @@ export default function currentOperations(
                   }" class="pb-0 text-center" style="font-size:0.6rem;">${Calc.generateTime(
           current.timeRemaining
         )}</h6>
+        <h6 id="futureDate-${current.index}" class="pb-0 text-center" style="font-size:0.6rem;">${dateComplete}</h6>
                     <div class="progress">
                       <div id="currentProgress-${current.index}"
                         class="progress-bar progress-bar-striped bg-${

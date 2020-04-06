@@ -567,7 +567,7 @@ class Runner {
       .then(res => {
         //Update info to DB
         farmPrinters[index].profiles = res.profiles;
-        console.log("Grabbing profiles for Printer:" + index);
+        console.log("Grabbed profiles for Printer:" + index);
       })
       .catch(err => {
         //console.log("Error grabbing Printer: "+ index + "profiles - " + err);

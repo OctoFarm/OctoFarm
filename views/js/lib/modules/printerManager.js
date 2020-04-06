@@ -37,7 +37,6 @@ export default class PrinterManager {
         lastPrinter = printers;
       } else {
         printer = printers[i];
-        lastPrinter = printers[i];
       }
       if (typeof printer.options === "undefined") {
         return;
@@ -1375,7 +1374,7 @@ export default class PrinterManager {
     let elements = await PrinterManager.grabPage();
     //init global info
     if (printer.settingsAppearance.name === "") {
-      elements.mainPage.title.innerHTML = "Octoprint Manager:";
+      elements.mainPage.title.innerHTML = "Octoprint Manager: "+printer.index;
     } else {
       elements.mainPage.title.innerHTML =
         "Octoprint Manager: " +

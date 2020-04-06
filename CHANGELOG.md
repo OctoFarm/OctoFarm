@@ -12,6 +12,8 @@ All notable changes to this project will be documented in this file.
     - Yellow = Attempting a connection
     - Red = Disconnected.  
  - State now grabs an Error and displays on the printer status label if one ocurrs until recified. 
+ - Show printer index on printer with no name
+ - Current Operations Card on view's now displays the predicted end date and time, calculated from the current date + print time remaining.
 
 ### Changed
  - Dashboard layout has been updated with a fixed sidebar. Medium sized screens and above will display this. 
@@ -33,6 +35,7 @@ All notable changes to this project will be documented in this file.
  - My git account... pushes as myself now. Hopefully...
  - Camera View Current Operations now updates with printers.
  - Fixed issue with Current Operations not clearing final finished or ended print card. 
+ - Issue #22 - File Manager crashes when using Canvas Hub.
 
 ### Security
 
