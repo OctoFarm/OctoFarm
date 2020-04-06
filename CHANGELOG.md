@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file.
  - Some offline/shutdown Printers would try ask to Re-Sync when not required due to still been offline/shutdown.
  - My git account... pushes as myself now. Hopefully...
  - Camera View Current Operations now updates with printers.
+ - Fixed issue with Current Operations not clearing final finished or ended print card. 
 
 ### Security
 

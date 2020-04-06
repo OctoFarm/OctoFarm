@@ -4,7 +4,13 @@ export default function currentOperations(
   currentOperations,
   currentOperationsCount
 ) {
-  console.log(currentOperations)
+
+  if(currentOperations.length === 0){
+    let currentCards = document.querySelectorAll("[id^='currentOpCard-']");
+    currentCards.forEach(card => {
+      card.remove();
+    })
+  }
   currentOperationsCount = currentOperationsCount;
   document.getElementById("completeCount").innerHTML =
     "Complete: " + currentOperationsCount.complete;
@@ -91,5 +97,6 @@ export default function currentOperations(
     remove.forEach(rem => {
       document.getElementById("currentOpCard-" + rem).remove();
     });
+
   });
 }
