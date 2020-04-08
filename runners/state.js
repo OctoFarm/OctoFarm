@@ -92,13 +92,18 @@ WebSocketClient.prototype.open = async function(url, index){
         }catch(e){
           console.log("Couldn't set state of missing printer, safe to ignore...")
         }
+
         break;
     }
   });
 
   farmPrinters[this.index].state = "Searching...";
   farmPrinters[this.index].stateColour = Runner.getColour("Searching...");
-
+  await Runner.getProfile(index);
+  await Runner.getState(index);
+  await Runner.getFiles(index, "files?recursive=true");
+  await Runner.getSystem(index);
+  await Runner.getSettings(index);
   let Polling = await ServerSettings.check();
   let data = {};
   let throt = {};
@@ -106,16 +111,6 @@ WebSocketClient.prototype.open = async function(url, index){
   throt["throttle"] = parseInt(
       (Polling[0].onlinePolling.seconds * 1000) / 500
   );
-
-  //Send User Auth
-  try{
-    this.instance.send(JSON.stringify(data));
-    this.instance.send(JSON.stringify(throt));
-
-  }catch (e){
-    this.instance.emit('error',e);
-  }
-  let that = this;
   setTimeout( async function(){
     await Runner.getProfile(that.index);
     await Runner.getState(that.index);
@@ -123,6 +118,17 @@ WebSocketClient.prototype.open = async function(url, index){
     await Runner.getSystem(that.index);
     await Runner.getSettings(that.index);
   }, 15*1000);
+  //Send User Auth
+  try{
+    this.instance.send(JSON.stringify(data));
+    this.instance.send(JSON.stringify(throt));
+
+  }catch (e){
+    console.log("THIS FAILE")
+    this.instance.emit('error',e);
+  }
+  let that = this;
+
   return true;
 };
 WebSocketClient.prototype.throttle = function(data){
