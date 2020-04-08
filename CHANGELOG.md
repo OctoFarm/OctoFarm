@@ -11,9 +11,10 @@ All notable changes to this project will be documented in this file.
     - Green = Currently connected
     - Yellow = Attempting a connection
     - Red = Disconnected.  
- - State now grabs an Error and displays on the printer status label if one ocurrs until recified. 
+ - State now grabs an Error and displays on the printer status label if one ocurs until recified. 
  - Show printer index on printer with no name
  - Current Operations Card on view's now displays the predicted end date and time, calculated from the current date + print time remaining.
+ - More Checks into the API/Websocket connection... if it fails to grab your API Key it will now warn you. You will see "No-API" in the state.
 
 ### Changed
  - Dashboard layout has been updated with a fixed sidebar. Medium sized screens and above will display this. 
@@ -21,6 +22,7 @@ All notable changes to this project will be documented in this file.
  - Current Operations now viewable on mobile.
  - async information reception from server -> client. 
  - State should now show if Serial Error occurs on OctoPrint.
+ - Shutdown printers, that have been scanned by the farm will now wait 15seconds before trying to grab an API connection due to how OctoPrint loads the websockets -> API.
 
 ### Removed
 
