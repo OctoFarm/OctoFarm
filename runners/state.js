@@ -113,7 +113,6 @@ WebSocketClient.prototype.open = async function(url, index){
         } else {
           users = {};
         }
-        let currentUser = "";
         if (_.isEmpty(users)) {
           farmPrinters[this.index].currentUser = "admin";
           farmPrinters[this.index].markModified("currentUser");
@@ -288,7 +287,6 @@ class Runner {
         farmPrinters[i].state = "Searching...";
         farmPrinters[i].stateColour = Runner.getColour("Searching...");
         farmPrinters[i].webSocket = "offline";
-        console.log(farmPrinters[i].webSocket = "offline")
       }
     } catch (err) {
       let error = {
@@ -542,6 +540,11 @@ class Runner {
       })
       .then(res => {
         //Update info to DB
+        if (res.current.state === "Offline") {
+          res.current.state = "Closed";
+        }else if(res.current.state.includes("Error:")){
+          res.current.state = "Error!"
+        }
         farmPrinters[index].state = res.current.state;
         farmPrinters[index].stateColour = Runner.getColour(res.current.state);
         farmPrinters[index].current = res.current;
@@ -700,9 +703,8 @@ class Runner {
     return farmPrinters[i].storage;
   }
   static async reSyncFile(i) {
-    let success = null;
     //Doesn't actually resync just the file... shhh
-    success = await Runner.getFiles(i, "files?recursive=true");
+    let success = await Runner.getFiles(i, "files?recursive=true");
     if (success) {
       return success;
     } else {

@@ -4,7 +4,6 @@ const mongoose = require("mongoose");
 const flash = require("connect-flash");
 const session = require("express-session");
 const passport = require("passport");
-const { ensureAuthenticated } = require("./config/auth");
 const serverConfig = require("./serverConfig/server");
 
 //Server Port
@@ -89,7 +88,7 @@ let serverStart = async function() {
   console.log("Starting System Printers Runner...");
   const runner = require("./runners/state.js");
   const Runner = runner.Runner;
-  let r = await Runner.init();
+  let r = Runner.init();
   console.log(r);
   console.log("Starting System Information Runner...");
   const system = require("./runners/systemInfo.js");

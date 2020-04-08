@@ -38,26 +38,6 @@ setInterval(async function() {
   //Only needed for WebSocket Information
   let printers = await Runner.returnFarmPrinters();
 
-  let statistics = await FarmStatistics.returnStats();
-  let currentOperations = null;
-  let currentOperationsCount = null;
-  let farmInfo = null;
-  let octofarmStatistics = null;
-  let printStatistics = null;
-
-  if (typeof statistics != "undefined") {
-    currentOperations = statistics.currentOperations;
-    currentOperationsCount = statistics.currentOperationsCount;
-    farmInfo = statistics.farmInfo;
-    octofarmStatistics = statistics.octofarmStatistics;
-    printStatistics = statistics.printStatistics;
-  } else {
-    currentOperations = 0;
-    currentOperationsCount = 0;
-    farmInfo = 0;
-    octofarmStatistics = 0;
-    printStatistics = 0;
-  }
   let printerInfo = [];
   let systemInformation = await SystemInfo.find({});
   let sysInfo = null;
@@ -128,6 +108,26 @@ setInterval(async function() {
       webSocket: printers[i].webSocket
     };
     printerInfo.push(printer);
+  }
+  let statistics = await FarmStatistics.returnStats();
+  let currentOperations = null;
+  let currentOperationsCount = null;
+  let farmInfo = null;
+  let octofarmStatistics = null;
+  let printStatistics = null;
+
+  if (typeof statistics != "undefined") {
+    currentOperations = statistics.currentOperations;
+    currentOperationsCount = statistics.currentOperationsCount;
+    farmInfo = statistics.farmInfo;
+    octofarmStatistics = statistics.octofarmStatistics;
+    printStatistics = statistics.printStatistics;
+  } else {
+    currentOperations = 0;
+    currentOperationsCount = 0;
+    farmInfo = 0;
+    octofarmStatistics = 0;
+    printStatistics = 0;
   }
   dashboardInfo = {
     printerInfo: printerInfo,
