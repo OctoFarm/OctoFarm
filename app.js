@@ -88,7 +88,7 @@ let serverStart = async function() {
   console.log("Starting System Printers Runner...");
   const runner = require("./runners/state.js");
   const Runner = runner.Runner;
-  let r = Runner.init();
+  let r = await Runner.init();
   console.log(r);
   console.log("Starting System Information Runner...");
   const system = require("./runners/systemInfo.js");

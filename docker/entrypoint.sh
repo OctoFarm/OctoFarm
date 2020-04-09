@@ -38,7 +38,12 @@ module.exports = {
   loginRequired: true
 };
 EOF
-
+fi
+if [ -d "logs" ]
+then
+    mkdir -p logs
+else
+    echo "Logs folder already exists..."
 fi
 
-node app.js
+node app.js  > logs/production.log 2> logs/productionError.log

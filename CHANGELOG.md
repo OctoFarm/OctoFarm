@@ -14,7 +14,7 @@ All notable changes to this project will be documented in this file.
  - State now grabs an Error and displays on the printer status label if one ocurs until recified. 
  - Show printer index on printer with no name
  - Current Operations Card on view's now displays the predicted end date and time, calculated from the current date + print time remaining.
- - More Checks into the API/Websocket connection... if it fails to grab your API Key it will now warn you. You will see "No-API" in the state.
+ - More Checks into the API/Websocket connection... if it fails to grab your API Key it will now warn you. You will see "No-API" in the state. Pressing the refresh button for your printer on dashboard will attempt a reconnect. 
 
 ### Changed
  - Dashboard layout has been updated with a fixed sidebar. Medium sized screens and above will display this. 
