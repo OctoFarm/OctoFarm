@@ -55,7 +55,7 @@ export default function currentOperations(
     let futureTimeString = new Date(currentDate + current.timeRemaining * 1000).toTimeString()
     futureTimeString = futureTimeString.substring(0, 8);
     let dateComplete = futureDateString + ": " + futureTimeString;
-    let finishedPrint = `<button id='currentHarvest-${current.index}' type='button' class='btn btn-success btn-sm pt-0 pb-0'>Harvest Your Print!</button>`;
+    let finishedPrint = `<button id='currentHarvest-${current.index}' type='button' class='btn btn-success btn-sm pt-0 pb-0'>Print Harvested?</button>`;
     //check if exists, create if not....
 
     if (document.getElementById("currentOpCard-" + current.index)) {

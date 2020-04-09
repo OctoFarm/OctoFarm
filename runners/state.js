@@ -101,7 +101,7 @@ WebSocketClient.prototype.open = async function(url, index){
   farmPrinters[this.index].stateColour = Runner.getColour("Searching...");
   await Runner.getProfile(index);
   await Runner.getState(index);
-  await Runner.getFiles(index, "files?recursive=true");
+  Runner.getFiles(index, "files?recursive=true");
   await Runner.getSystem(index);
   await Runner.getSettings(index);
   let Polling = await ServerSettings.check();
@@ -114,7 +114,7 @@ WebSocketClient.prototype.open = async function(url, index){
   setTimeout( async function(){
     await Runner.getProfile(that.index);
     await Runner.getState(that.index);
-    await Runner.getFiles(that.index, "files?recursive=true");
+    Runner.getFiles(that.index, "files?recursive=true");
     await Runner.getSystem(that.index);
     await Runner.getSettings(that.index);
   }, 15*1000);
@@ -403,7 +403,7 @@ class Runner {
 
     }else if(farmPrinters[index].webSocket === "online"){
       await Runner.getProfile(index);
-      await Runner.getFiles(index, "files?recursive=true");
+      Runner.getFiles(index, "files?recursive=true");
       await Runner.getSystem(index);
       await Runner.getSettings(index);
       await Runner.getState(index);

@@ -83,7 +83,7 @@
           <% let futureTimeString = new Date(currentDate + current.timeRemaining * 1000).toTimeString() %>
           <% futureTimeString = futureTimeString.substring(0, 8); %>
           <% let dateComplete = futureDateString + ": " + futureTimeString; %>
-          <% let finishedPrint = `<button id='currentHarvest-${current.index}' type='button' class='btn btn-success btn-sm pt-0 pb-0'>Harvest Your Print!</button>`; %>
+          <% let finishedPrint = `<button id='currentHarvest-${current.index}' type='button' class='btn btn-success btn-sm pt-0 pb-0'>Print Harvested?</button>`; %>
 
           <div id="currentOpCard-<%=current.index%>"
             class="card card-block text-white bg-secondary d-inline-block"
