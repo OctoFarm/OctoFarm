@@ -60,12 +60,10 @@ const generateTime = function(seconds) {
       string = string.replace("0 Seconds", "Done");
     }
   }
-
   return string;
 };
-
 module.exports = {
   generateBytes: bytes,
   generateTime: generateTime,
-  calculatePercent: calculatePercent
+  calculatePercent: calculatePercent,
 };

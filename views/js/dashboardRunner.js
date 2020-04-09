@@ -27,7 +27,7 @@ source.onmessage = async function(e) {
       ) {
         PrinterManager.init(res.printerInfo);
       } else {
-        currentOperations(res.currentOperations, res.currentOperationsCount);
+        currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
         dashUpdate.systemInformation(res.systemInfo);
         dashUpdate.printers(res.printerInfo);
         printerInfo = res.printerInfo;

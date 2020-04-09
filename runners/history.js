@@ -36,7 +36,7 @@ class HistoryCollection {
       typeof printer.selectedFilament != "undefined" &&
       printer.selectedFilament != 0
     ) {
-      let roll = await Roll.findOne({ _id: printer.selectedFilament });
+      let roll = await Roll.findById( printer.selectedFilament.id );
 
       filamentChoice = roll;
     }
@@ -89,7 +89,15 @@ class HistoryCollection {
     let endTime = today.toTimeString();
     let endTimeFormat = endTime.substring(0, 8);
     let endDate = endDDMM + " - " + endTimeFormat;
+    let filamentChoice = "None chosen...";
+    if (
+        typeof printer.selectedFilament != "undefined" &&
+        printer.selectedFilament != 0
+    ) {
+      let roll = await Roll.findById( printer.selectedFilament.id );
 
+      filamentChoice = roll;
+    }
     let printHistory = {
       historyIndex: historyCollection.length + 1,
       printerIndex: printer.index,
@@ -101,7 +109,7 @@ class HistoryCollection {
       startDate: startDate,
       endDate: endDate,
       printTime: Math.round(payload.time),
-      spoolUsed: "-",
+      filamentSelection: filamentChoice,
       filamentLength: "-",
       filamentVolume: "-",
       notes: ""

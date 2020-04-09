@@ -51,8 +51,10 @@
             <%= helpers.generateTime(print.printHistory.printTime) %>
           </td>
           <td>
+
             <% if(typeof print.printHistory.filamentSelection != 'undefined' &&
-            print.printHistory.filamentSelection != "None chosen..."){%> <% let
+            print.printHistory.filamentSelection != "None chosen..."){%>
+              <% let
             filament = print.printHistory.filamentSelection.roll %> <%=
             filament.name %> [<%= filament.colour %> / <%= filament.type[1] %>]
             <%}else{%> None selected... <% } %>

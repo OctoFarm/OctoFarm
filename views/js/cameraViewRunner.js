@@ -29,7 +29,7 @@ source.onmessage = async function(e) {
     } else {
       printerInfo = res.printerInfo;
       if (res.clientSettings.cameraView.currentOp) {
-        currentOperations(res.currentOperations, res.currentOperationsCount);
+        currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
       }
       updateState(res.printerInfo, res.clientSettings.cameraView);
     }

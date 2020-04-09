@@ -83,9 +83,7 @@
           <% let futureTimeString = new Date(currentDate + current.timeRemaining * 1000).toTimeString() %>
           <% futureTimeString = futureTimeString.substring(0, 8); %>
           <% let dateComplete = futureDateString + ": " + futureTimeString; %>
-          <% if(current.timeRemaining === 0){ %>
-          <% dateComplete = "Harvest Your Print!"; %>
-          <% } %>
+          <% let finishedPrint = `<button id='currentHarvest-${current.index}' type='button' class='btn btn-success btn-sm pt-0 pb-0'>Harvest Your Print!</button>`; %>
 
           <div id="currentOpCard-<%=current.index%>"
             class="card card-block text-white bg-secondary d-inline-block"
@@ -94,7 +92,14 @@
               <div class="card-header pb-1 pt-1 pl-2 pr-2"><%=current.index%>. <%=current.name%></div>
               <div class="card-body  pb-0 pt-2 pl-2 pr-2 pb-1">
                 <h6 id="currentTime-<%=current.index%>" class="pb-0 text-center" style="font-size:0.6rem;"><%=  helpers.generateTime(current.timeRemaining) %></h6>
-                <h6 id="futureDate-<%=current.index%>" class="pb-0 text-center" style="font-size:0.6rem;"><%= dateComplete %></h6>
+                <% if(current.timeRemaining === 0){ %>
+                <h6 id="futureDate-<%=current.index%>" class="pb-0 text-center d-none" style="font-size:0.6rem;"><%- dateComplete %></h6>
+                <h6 id="finishedPrint-<%=current.index%>" class="pb-0 text-center" style="font-size:0.6rem;"><%- finishedPrint %></h6>
+                <% }else{ %>
+                <h6 id="futureDate-<%=current.index%>" class="pb-0 text-center" style="font-size:0.6rem;"><%- dateComplete %></h6>
+                <h6 id="finishedPrint-<%=current.index%>" class="pb-0 text-center d-none" style="font-size:0.6rem;"><%- finishedPrint %></h6>
+               <% } %>
+
                 <div class="progress">
                   <div id="currentProgress-<%=current.index%>"
                     class="progress-bar progress-bar-striped bg-<%=current.progressColour%>"

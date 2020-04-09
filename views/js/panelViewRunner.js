@@ -28,7 +28,7 @@ source.onmessage = async function(e) {
     } else {
       printerInfo = res.printerInfo;
       if (res.clientSettings.panelView.currentOp) {
-        currentOperations(res.currentOperations, res.currentOperationsCount);
+        currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
       }
       updateState(res.printerInfo, res.clientSettings.panelView);
     }
