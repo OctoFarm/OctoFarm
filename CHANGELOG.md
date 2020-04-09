@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file.
  - Current Operations now viewable on mobile.
  - async information reception from server -> client. 
  - State should now show if Serial Error occurs on OctoPrint.
- - Shutdown printers, that have been scanned by the farm will now wait 15seconds before trying to grab an API connection due to how OctoPrint loads the websockets -> API.
+ - Shutdown printers, that have been scanned by the farm will now wait 15-seconds before trying to grab an API connection. This should help those with websockets not connecting initially.
 
 ### Removed
 
