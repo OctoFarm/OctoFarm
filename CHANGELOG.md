@@ -43,7 +43,8 @@ All notable changes to this project will be documented in this file.
  - async information reception from server -> client. 
  - State should now show if Serial Error occurs on OctoPrint.
  - Shutdown printers, that have been scanned by the farm will now wait 15-seconds before trying to grab an API connection. This should help those with websockets not connecting initially.
- - History now captures and displays selected rolls of filament. No usage available from OctoPrint currently. 
+ - History now captures and displays selected rolls of filament. No usage available from OctoPrint currently.
+ - An initial API connection timeout now increases until it hit's an upper limit. So all API connections will attempt at the default of 1000ms, this will then increase to 10000ms after the first attempt hitting the upper limit and hard fail afterwards. These are configurable in serverConfig/server.js.
  
 ### Deprecated
 
