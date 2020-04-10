@@ -43,7 +43,7 @@ All notable changes to this project will be documented in this file.
  - Issue #22 - File Manager crashes when using Canvas Hub.
  - Docker should now correctly put logs into log folder.
  - Freshly created filament is now found and saved in the history logs. 
- - Due to timeout retry, Prusa Printers and other printers taking a longer time to respond should now gather data correctly. 
+ - Issue #26 - Due to timeout retry, Prusa Printers and other printers taking a longer time to respond should now gather data correctly. 
 
 ### Security
 

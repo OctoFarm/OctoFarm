@@ -38,6 +38,7 @@
 
 - [About the Project](#about-the-project)
 - [Getting Started](#getting-started)
+  - [Wiki](https://github.com/NotExpectedYet/OctoFarm/wiki)
   - [Prerequisites](#prerequisites)
   - [Installation Docker](#installation-Docker)
   - [Installation Production](#installation-Production)
