@@ -61,8 +61,12 @@ All notable changes to this project will be documented in this file.
  - Docker should now correctly put logs into log folder.
  - Freshly created filament is now found and saved in the history logs. 
  - Issue #26 - File timeout issues. 
-    - This issue is down to a ludicrously large amount of gcode files stored on a persons OctoPrint system. If your a gcode horder and having issues with your files scanning into OctoFarm you will need to play with the API connections, or do some house keeping. Anyone else you won't know any different.
-
+    - This issue is down to a ludicrously large amount of gcode files stored on a persons OctoPrint system. If your a gcode hoarder and having issues with your files scanning into OctoFarm you will need to play with the API connections, or do some house keeping. Anyone else you won't know any different.
+    - Some numbers reported back from a user:
+        - sub 200 files, was completely fine. 
+        - 380 + files will nearly hit the full second api timeout which is 10 seconds...
+        - 670 + files you will need to play with the system timeout I've created to get those to scan. 
+    - I will be working to make improvements to this in the future where possible but for now the timeout changes will succeed and I believe it's only an edge set of users that get this effect going by reports I've had. If you do not, do not worry. 
 
 ## [v1.1.4-2-bugfix]
 
