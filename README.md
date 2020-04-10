@@ -118,8 +118,14 @@ Paths
 ### Generic Docker-Compose Installation (Includes a MongoDB Server)
 
 ```yml
-version: "2"
+version: "3"
 services:
+  mongo:
+    image: mongo
+    restart: always
+    volumes:
+      - <your persistent folder>/MongoDB:/data/db
+
   octofarm:
     container_name: octofarm
     image: octofarm/octofarm
@@ -127,20 +133,11 @@ services:
     ports:
       - 4000:4000
     environment:
-      - MONGO=mongodb://octofarm_mongo/octofarm
+      - MONGO=mongodb://mongo/octofarm
     volumes:
       - <your persistent folder>/OctoFarm/config:/app/serverConfig
       - <your persistent folder>/OctoFarm/logs:/app/serverConfig
 
-  octofarm_mongo:
-    container_name: octofarm_mongo
-    image: bitnami/mongodb
-    restart: always
-    volumes:
-      - <your persistent folder>:/bitnami
-    environment:
-      - ALLOW_EMPTY_PASSWORD=yes
-      - MONGODB_EXTRA_FLAGS='--wiredTigerCacheSizeGB=2'
 ```
 
 ### Windows Specific Docker-Compose Installation (Includes a MongoDB Server)
