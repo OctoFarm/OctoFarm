@@ -10,6 +10,8 @@ const fetch = require("node-fetch");
 const _ = require("lodash");
 const WebSocket = require("ws");
 const Filament = require("../models/Filament.js");
+const serverConfig = require("../serverConfig/server.js");
+console.log(serverConfig)
 
 let farmPrinters = [];
 
@@ -221,7 +223,7 @@ WebSocketClient.prototype.onclose = function(e){
 
 
 class ClientAPI {
-  static get(ip, port, apikey, item) {
+  static async get(ip, port, apikey, item) {
     let url = `http://${ip}:${port}/api/${item}`;
       return Promise.race([
         fetch(url, {
@@ -232,7 +234,7 @@ class ClientAPI {
           }
         }),
         new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("timeout")), 1000)
+            setTimeout(() => reject(new Error("timeout")), serverConfig.apiTimeout)
         )
       ]);
   }
