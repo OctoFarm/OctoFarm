@@ -16,7 +16,7 @@ All notable changes to this project will be documented in this file.
  - Current Operations Card on view's now displays the predicted end date and time, calculated from the current date + print time remaining.
  - More Checks into the API/Websocket connection... if it fails to grab your API Key it will now warn you. You will see "No-API" in the state. Pressing the refresh button for your printer on dashboard will attempt a reconnect. 
  - Current Operations allows you to now de-select a file and remove it from the view. When a print is complete, you will see a "Harvest Your Print!" button, click it to remove the printer from that View.
- - Added configuration options to /serverConfig/api.js - This is for any printer that doesn't respond quick enough.
+ - Added configuration options to /serverConfig/timeout.js - This is for any printer that doesn't respond quick enough.
 
 ### Changed
  - Dashboard layout has been updated with a fixed sidebar. Medium sized screens and above will display this. 
@@ -43,6 +43,7 @@ All notable changes to this project will be documented in this file.
  - Issue #22 - File Manager crashes when using Canvas Hub.
  - Docker should now correctly put logs into log folder.
  - Freshly created filament is now found and saved in the history logs. 
+ - Due to timeout retry, Prusa Printers and other printers taking a longer time to respond should now gather data correctly. 
 
 ### Security
 
