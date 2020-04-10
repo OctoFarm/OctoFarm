@@ -10,8 +10,7 @@ const fetch = require("node-fetch");
 const _ = require("lodash");
 const WebSocket = require("ws");
 const Filament = require("../models/Filament.js");
-const serverConfig = require("../serverConfig/server.js");
-console.log(serverConfig)
+const timeout = require("../serverConfig/timeout.js");
 
 let farmPrinters = [];
 
@@ -25,7 +24,7 @@ let farmStatRunner = null;
 
 function WebSocketClient(){
   this.number = 0;	// Message number
-  this.autoReconnectInterval = 5*1000;	// ms
+  this.autoReconnectInterval = timeout.webSocketRetry;	// ms
 }
 WebSocketClient.prototype.open = async function(url, index){
   this.url = url;
@@ -103,9 +102,9 @@ WebSocketClient.prototype.open = async function(url, index){
   farmPrinters[this.index].stateColour = Runner.getColour("Searching...");
   await Runner.getProfile(index);
   await Runner.getState(index);
-  await Runner.getFiles(index, "files?recursive=true");
   await Runner.getSystem(index);
   await Runner.getSettings(index);
+  await Runner.getFiles(index, "files?recursive=true");
   let Polling = await ServerSettings.check();
   let data = {};
   let throt = {};
@@ -116,17 +115,15 @@ WebSocketClient.prototype.open = async function(url, index){
   setTimeout( async function(){
     await Runner.getProfile(that.index);
     await Runner.getState(that.index);
-    await Runner.getFiles(that.index, "files?recursive=true");
     await Runner.getSystem(that.index);
     await Runner.getSettings(that.index);
+    await Runner.getFiles(that.index, "files?recursive=true");
   }, 15*1000);
   //Send User Auth
   try{
     this.instance.send(JSON.stringify(data));
     this.instance.send(JSON.stringify(throt));
-
   }catch (e){
-    console.log("THIS FAILE")
     this.instance.emit('error',e);
   }
   let that = this;
@@ -223,7 +220,20 @@ WebSocketClient.prototype.onclose = function(e){
 
 
 class ClientAPI {
-  static async get(ip, port, apikey, item) {
+  static async get_retry(ip, port, apikey, item){
+    try {
+    return await ClientAPI.get(ip, port, apikey, item)
+  } catch(err) {
+    //console.log(err)
+    console.log(err)
+    if (timeout.apiTimeout >= timeout.apiRetryCutoff) throw err;
+    timeout.apiTimeout = timeout.apiTimeout + 9000;
+    console.log("Retrying Connection with: " + timeout.apiTimeout)
+    return await ClientAPI.get_retry(ip, port, apikey, item);
+    }
+  }
+
+  static get(ip, port, apikey, item) {
     let url = `http://${ip}:${port}/api/${item}`;
       return Promise.race([
         fetch(url, {
@@ -234,7 +244,7 @@ class ClientAPI {
           }
         }),
         new Promise((_, reject) =>
-            setTimeout(() => reject(new Error("timeout")), serverConfig.apiTimeout)
+            setTimeout(() => reject(new Error("timeout")), timeout.apiTimeout)
         )
       ]);
   }
@@ -299,7 +309,7 @@ class Runner {
       //Make a connection attempt, and grab current user.
       let users = null;
       try{
-        users = await ClientAPI.get(farmPrinters[i].ip, farmPrinters[i].port, farmPrinters[i].apikey, "users");
+        users = await ClientAPI.get_retry(farmPrinters[i].ip, farmPrinters[i].port, farmPrinters[i].apikey, "users");
       }catch(e){
         console.error("Couldn't grab initial connection for Printer: " + i, e)
         farmPrinters[i].state = "Shutdown";
@@ -352,7 +362,7 @@ class Runner {
       //Make a connection attempt, and grab current user.
       let users = null;
       try{
-        users = await ClientAPI.get(farmPrinters[index].ip, farmPrinters[index].port, farmPrinters[index].apikey, "users");
+        users = await ClientAPI.get_retry(farmPrinters[index].ip, farmPrinters[index].port, farmPrinters[index].apikey, "users");
       }catch(e){
         console.error("Couldn't grab initial connection for Printer: " + index, e)
         farmPrinters[index].state = "Shutdown";
@@ -405,10 +415,10 @@ class Runner {
 
     }else if(farmPrinters[index].webSocket === "online"){
       await Runner.getProfile(index);
-      await Runner.getFiles(index, "files?recursive=true");
       await Runner.getSystem(index);
       await Runner.getSettings(index);
       await Runner.getState(index);
+      await Runner.getFiles(index, "files?recursive=true");
       result.status = "success";
       result.msg =
           "Printer: " +
@@ -456,7 +466,7 @@ class Runner {
       folders: [],
       folderCount: 0
     };
-    return ClientAPI.get(
+    return ClientAPI.get_retry(
       farmPrinters[index].ip,
       farmPrinters[index].port,
       farmPrinters[index].apikey,
@@ -589,7 +599,7 @@ class Runner {
       });
   }
   static getState(index) {
-    return ClientAPI.get(
+    return ClientAPI.get_retry(
       farmPrinters[index].ip,
       farmPrinters[index].port,
       farmPrinters[index].apikey,
@@ -618,7 +628,7 @@ class Runner {
   }
   static getProfile(index) {
 
-    return ClientAPI.get(
+    return ClientAPI.get_retry(
       farmPrinters[index].ip,
       farmPrinters[index].port,
       farmPrinters[index].apikey,
@@ -638,7 +648,7 @@ class Runner {
       });
   }
   static getSettings(index) {
-    return ClientAPI.get(
+    return ClientAPI.get_retry(
       farmPrinters[index].ip,
       farmPrinters[index].port,
       farmPrinters[index].apikey,
@@ -698,7 +708,7 @@ class Runner {
       });
   }
   static getSystem(index) {
-    return ClientAPI.get(
+    return ClientAPI.get_retry(
       farmPrinters[index].ip,
       farmPrinters[index].port,
       farmPrinters[index].apikey,

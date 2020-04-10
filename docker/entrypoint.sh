@@ -39,6 +39,23 @@ module.exports = {
 };
 EOF
 fi
+
+if [ -f "serverConfig/timeout.js" ]
+then
+    echo "Config already exists"
+else
+    echo "" > serverConfig/timeout.js
+    tee serverConfig/timeout.js <<EOF >/dev/null
+module.exports = {
+    webSocketRetry: 5000,
+    apiTimeout: 1000,
+    apiRetryCutoff: 10000,
+};
+EOF
+fi
+
+
+
 if [ -d "logs" ]
 then
     mkdir -p logs
