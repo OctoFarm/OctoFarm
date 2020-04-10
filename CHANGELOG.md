@@ -60,7 +60,8 @@ All notable changes to this project will be documented in this file.
  - Issue #22 - File Manager crashes when using Canvas Hub.
  - Docker should now correctly put logs into log folder.
  - Freshly created filament is now found and saved in the history logs. 
- - Issue #26 - Due to timeout retry, Prusa Printers and other printers taking a longer time to respond should now gather data correctly. 
+ - Issue #26 - File timeout issues. 
+    - This issue is down to a ludicrously large amount of gcode files stored on a persons OctoPrint system. If your a gcode horder and having issues with your files scanning into OctoFarm you will need to play with the API connections, or do some house keeping. Anyone else you won't know any different.
 
 
 ## [v1.1.4-2-bugfix]
