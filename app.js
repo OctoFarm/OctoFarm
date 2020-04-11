@@ -5,11 +5,35 @@ const flash = require("connect-flash");
 const session = require("express-session");
 const passport = require("passport");
 const serverConfig = require("./serverConfig/server");
+const winston = require('winston');
+const fs = require('fs');
 
 //Server Port
 const PORT = process.env.PORT || serverConfig.port;
 
 const app = express();
+
+//Logging
+const { createLogger, format, transports } = winston;
+
+const logger = createLogger({
+  format: format.combine(
+    format.timestamp(),
+    format.simple()
+  ),
+  transports: [
+    new transports.Console({
+      format: format.combine(
+        format.timestamp(),
+        format.colorize(),
+        format.simple()
+      )
+    }),
+    new transports.Stream({
+      stream: fs.createWriteStream('./logs/OctoFarm-Server.log')
+    })
+  ]
+})
 
 //Passport Config
 require("./config/passport.js")(passport);
@@ -69,34 +93,34 @@ if (db === "") {
 mongoose
   .connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => serverStart())
-  .catch(err => console.log(err));
+  .catch(err => logger.error(err));
 
 let serverStart = async function() {
-  console.log("MongoDB Connected...");
+  logger.info("MongoDB Connected...");
   //Setup Settings
   const serverSettings = require("./settings/serverSettings.js");
   const ServerSettings = serverSettings.ServerSettings;
-  console.log("Checking Server Settings...");
+  logger.info("Checking Server Settings...");
   let ss = await ServerSettings.init();
-  console.log(ss);
+  logger.info(ss);
   const clientSettings = require("./settings/clientSettings.js");
   const ClientSettings = clientSettings.ClientSettings;
-  console.log("Checking Client Settings...");
+  logger.info("Checking Client Settings...");
   let cs = await ClientSettings.init();
-  console.log(cs);
+  logger.info(cs);
   //Start backend metrics gathering...
-  console.log("Starting System Printers Runner...");
+  logger.info("Starting System Printers Runner...");
   const runner = require("./runners/state.js");
   const Runner = runner.Runner;
   let r = await Runner.init();
-  console.log(r);
-  console.log("Starting System Information Runner...");
+  logger.info(r);
+  logger.info("Starting System Information Runner...");
   const system = require("./runners/systemInfo.js");
   const SystemRunner = system.SystemRunner;
   let sr = await SystemRunner.init();
-  console.log(sr);
+  logger.info(sr);
   app.listen(PORT, () => {
-    console.log(`HTTP server started...`);
-    console.log(`You can now access your server on port: ${PORT}`);
+    logger.info(`HTTP server started...`);
+    logger.info(`You can now access your server on port: ${PORT}`);
   });
 };

@@ -7,6 +7,10 @@ All notable changes to this project will be documented in this file.
 ## [v.1.1.5]
 
 ### Added
+ - Much improved logging for all areas. Now creates new log files as follows:
+  - OctoFarm-Server.log: Server errors and information
+  - OctoFarm-State.log: Printer logging for state collection...
+
 
 ### Changed
 
@@ -15,6 +19,8 @@ All notable changes to this project will be documented in this file.
 ### Deprecated
 
 ### Fixed
+  - Long server starts due to second information grab. Now runs in the background to not effect start up.
+  - Fixed issues with throttle and server re-start checking printers without websockets yet. 
 
 ### Security
 

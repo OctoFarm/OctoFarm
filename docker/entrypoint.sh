@@ -63,4 +63,4 @@ else
     echo "Logs folder already exists..."
 fi
 
-node app.js  > logs/production.log 2> logs/productionError.log
+node app.js

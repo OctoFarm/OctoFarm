@@ -11,6 +11,33 @@ const _ = require("lodash");
 const WebSocket = require("ws");
 const Filament = require("../models/Filament.js");
 const timeout = require("../serverConfig/timeout.js");
+const winston = require('winston');
+const fs = require('fs');
+
+//Logging
+const { createLogger, format, transports } = winston;
+const logger = createLogger({
+  format: format.combine(
+    format.timestamp({
+      format: 'YYYY-MM-DD HH:mm:ss'
+  }),
+    format.simple()
+  ),
+  transports: [
+    new transports.Console({
+      format: format.combine(
+        format.timestamp({
+          format: 'YYYY-MM-DD HH:mm:ss'
+      }),
+        format.colorize(),
+        format.simple()
+      )
+    }),
+    new transports.Stream({
+      stream: fs.createWriteStream('./logs/OctoFarm-State.log')
+    })
+  ]
+})
 
 let farmPrinters = [];
 
@@ -41,7 +68,7 @@ WebSocketClient.prototype.open = async function(url, index){
   this.instance.on('close',(e)=>{
     switch (e.code){
       case 1000:	// CLOSE_NORMAL
-        console.log("WebSocket: closed");
+        logger.warn("WebSocket: closed: "  + this.index + ": " + this.url);
         break;
       default:	// Abnormal closure
         this.reconnect(e);
@@ -52,48 +79,48 @@ WebSocketClient.prototype.open = async function(url, index){
   this.instance.on('error',(e)=>{
     switch (e.code){
       case 'ECONNREFUSED':
-        console.error(e);
+        logger.error(e  + this.index + ": " + this.url);
         try {
           farmPrinters[this.index].state = "Offline";
           farmPrinters[this.index].stateColour = Runner.getColour("Offline");
           farmPrinters[this.index].webSocket = "offline";
         }catch(e){
-          console.log("Couldn't set state of missing printer, safe to ignore...")
+          logger.warn("Couldn't set state of missing printer, safe to ignore: "  + this.index + ": " + this.url)
         }
         this.reconnect(e);
         break;
       case 'ECONNRESET':
-        console.error(e);
+        logger.error(e  + this.index + ": " + this.url);
         try {
           farmPrinters[this.index].state = "Offline";
           farmPrinters[this.index].stateColour = Runner.getColour("Offline");
           farmPrinters[this.index].webSocket = "offline";
         }catch(e){
-          console.log("Couldn't set state of missing printer, safe to ignore...")
+          logger.warn("Couldn't set state of missing printer, safe to ignore: "  + this.index + ": " + this.url)
         }
         this.reconnect(e);
         break;
       case 'EHOSTUNREACH':
-        console.error(e);
+        logger.error(e  + this.index + ": " + this.url);
         try {
           farmPrinters[this.index].state = "Shutdown";
           farmPrinters[this.index].stateColour = Runner.getColour("Shutdown");
           farmPrinters[this.index].webSocket = "offline";
         }catch(e){
-          console.log("Couldn't set state of missing printer, safe to ignore...")
+          logger.warn("Couldn't set state of missing printer, safe to ignore: "  + this.index + ": " + this.url)
         }
         this.reconnect(e);
         break;
       default:
-        console.error("Last error" + e);
+        logger.error(e  + this.index + ": " + this.url);
         try {
           farmPrinters[this.index].state = "Shutdown";
           farmPrinters[this.index].stateColour = Runner.getColour("Shutdown");
           farmPrinters[this.index].webSocket = "offline";
         }catch(e){
-          console.log("Couldn't set state of missing printer, safe to ignore...")
+          logger.warn("Couldn't set state of missing printer, safe to ignore: "  + this.index + ": " + this.url)
         }
-
+        logger.error("WebSocket hard failure: "  + this.index + ": " + this.url)
         break;
     }
   });
@@ -112,28 +139,32 @@ WebSocketClient.prototype.open = async function(url, index){
   throt["throttle"] = parseInt(
       (Polling[0].onlinePolling.seconds * 1000) / 500
   );
-  setTimeout( async function(){
-    await Runner.getProfile(that.index);
-    await Runner.getState(that.index);
-    await Runner.getSystem(that.index);
-    await Runner.getSettings(that.index);
-    await Runner.getFiles(that.index, "files?recursive=true");
+  let that = this;
+  setTimeout(function(){
+    logger.info("Setting data collection timeout: " + that.index + ": " + that.url);
+    Runner.getProfile(that.index);
+    Runner.getState(that.index);
+    Runner.getSystem(that.index);
+    Runner.getSettings(that.index);
+    Runner.getFiles(that.index, "files?recursive=true");
   }, 15*1000);
   //Send User Auth
+  logger.info("Sending Auth to Websocket: " + this.index + ": " + this.url + " ", data);
   try{
     this.instance.send(JSON.stringify(data));
     this.instance.send(JSON.stringify(throt));
   }catch (e){
+    logger.error("Auth failed to send: " + this.index + ": " + this.url);
     this.instance.emit('error',e);
   }
-  let that = this;
-
   return true;
 };
 WebSocketClient.prototype.throttle = function(data){
   try{
+    logger.info("Throttling your websocket connection: " + this.index + ": " + this.url + " ", data);
     farmPrinters[this.index].ws.send(JSON.stringify(data));
   }catch (e){
+    logger.error("Failed to Throttle websocket: " + this.index + ": " + this.url);
     this.instance.emit('error',e);
   }
 };
@@ -145,17 +176,17 @@ WebSocketClient.prototype.send = function(data,option){
   }
 };
 WebSocketClient.prototype.reconnect = async function(e){
-  console.log(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`,e);
+  logger.warn(`WebSocketClient: retry in ${this.autoReconnectInterval}ms`,e + this.index + ": " + this.url);
   this.instance.removeAllListeners();
   let that = this;
   setTimeout(function(){
-    console.log("WebSocketClient: reconnecting...");
+    logger.info("Re-Opening Websocket: " + this.index + ": " + this.url);
     that.open(that.url, that.index);
   },this.autoReconnectInterval);
   return true;
 };
 WebSocketClient.prototype.onopen = function(e){
-  console.log("WebSocketClient: open",arguments);
+  logger.info("WebSocketClient: open",arguments + this.index + ": " + this.url);
   farmPrinters[this.index].webSocket = "online";
   farmPrinters[this.index].state = "Awaiting API..";
   farmPrinters[this.index].stateColour = Runner.getColour("Offline");
@@ -167,12 +198,12 @@ WebSocketClient.prototype.onmessage = async function(data,flags,number){
   data = await JSON.parse(data);
   if (typeof data.event != "undefined") {
     if (data.event.type === "PrintFailed") {
-      console.log(data.event.type);
+      logger.info(data.event.type + this.index + ": " + this.url);
       //Register cancelled print...
       await HistoryCollection.failed(data.event.payload, farmPrinters[this.index]);
     }
     if (data.event.type === "PrintDone") {
-      console.log(data.event.type);
+      logger.info(data.event.type + this.index + ": " + this.url);
       //Register cancelled print...
       await HistoryCollection.complete(data.event.payload, farmPrinters[this.index]);
     }
@@ -209,11 +240,11 @@ WebSocketClient.prototype.onmessage = async function(data,flags,number){
   }
 };
 WebSocketClient.prototype.onerror = function(e){
-  console.log("WebSocketClient: error",arguments);
+  logger.error("WebSocketClient: Error",arguments + this.index + ": " + this.url);
   this.instance.removeAllListeners();
 };
 WebSocketClient.prototype.onclose = function(e){
-  console.log("WebSocketClient: closed",arguments);
+  logger.warn("WebSocketClient: Closed",arguments + this.index + ": " + this.url);
   this.instance.removeAllListeners();
   return "closed";
 };
@@ -222,13 +253,14 @@ WebSocketClient.prototype.onclose = function(e){
 class ClientAPI {
   static async get_retry(ip, port, apikey, item){
     try {
+      logger.info("Attempting to connect to API: " + item + " " + ip + ":" + port);
     return await ClientAPI.get(ip, port, apikey, item)
   } catch(err) {
-    //console.log(err)
-    console.log(err)
+    logger.warn("Could not connect to API: " + ip + ":" + port);
     if (timeout.apiTimeout >= timeout.apiRetryCutoff) throw err;
     timeout.apiTimeout = timeout.apiTimeout + 9000;
-    console.log("Retrying Connection with: " + timeout.apiTimeout)
+    logger.warn("New timeout applied " + timeout.apiTimeout + ": " + ip + ":" + port);
+    logger.warn("Retrying API connection again " + ip + ":" + port);
     return await ClientAPI.get_retry(ip, port, apikey, item);
     }
   }
@@ -270,7 +302,7 @@ class Runner {
     //Grab printers from database....
     try {
       farmPrinters = await Printers.find({}, null, { sort: { index: 1 } });
-      console.log("Grabbed " + farmPrinters.length + " for checking");
+      logger.info("Grabbed " + farmPrinters.length + " for checking");
       for (let i = 0; i < farmPrinters.length; i++) {
         //Make sure runners are created ready for each printer to pass between...
         farmPrinters[i].state = "Searching...";
@@ -284,10 +316,9 @@ class Runner {
         userAction:
             "Please make sure the database URL is inputted and can be reached... 'file located at: config/db.js'"
       };
-      console.log(error);
+      logger.error(error);
     }
-    let stat = await StatisticsCollection.init();
-    console.log(stat);
+    await StatisticsCollection.init();
 
     //cycle through printers and move them to correct checking location...
     for (let i = 0; i < farmPrinters.length; i++) {
@@ -311,7 +342,7 @@ class Runner {
       try{
         users = await ClientAPI.get_retry(farmPrinters[i].ip, farmPrinters[i].port, farmPrinters[i].apikey, "users");
       }catch(e){
-        console.error("Couldn't grab initial connection for Printer: " + i, e)
+        logger.error("Couldn't grab initial connection for Printer: " + item + " " + ip + ":" + port, e);
         farmPrinters[i].state = "Shutdown";
         farmPrinters[i].stateColour = Runner.getColour("Shutdown");
         farmPrinters[i].webSocket = "offline";
@@ -339,7 +370,6 @@ class Runner {
         );
       } else {
         //hardfail, do not connect websockets...
-        console.error("Couldn't grab initial connection for Printer: " + i)
         farmPrinters[i].state = "No-API";
         farmPrinters[i].stateColour = Runner.getColour("Shutdown");
         farmPrinters[i].webSocket = "offline";
@@ -354,8 +384,8 @@ class Runner {
       status: null,
       msg: null
     };
-    console.log(farmPrinters[index].webSocket)
     if(farmPrinters[index].webSocket === "offline"){
+      logger.info("Socket Offline, Attempted to connect to: " + farmPrinters[index].ip + ":" + farmPrinters[index].port);
       farmPrinters[index].state = "Searching...";
       farmPrinters[index].stateColour = Runner.getColour("Searching...");
       farmPrinters[index].webSocket = "trying";
@@ -364,7 +394,7 @@ class Runner {
       try{
         users = await ClientAPI.get_retry(farmPrinters[index].ip, farmPrinters[index].port, farmPrinters[index].apikey, "users");
       }catch(e){
-        console.error("Couldn't grab initial connection for Printer: " + index, e)
+        logger.error("Socket still Offline, no API access for: " + farmPrinters[index].ip + ":" + farmPrinters[index].port, e);
         farmPrinters[index].state = "Shutdown";
         farmPrinters[index].stateColour = Runner.getColour("Shutdown");
         farmPrinters[index].webSocket = "offline";
@@ -414,6 +444,7 @@ class Runner {
       }
 
     }else if(farmPrinters[index].webSocket === "online"){
+      logger.info("Socket already Online, Updating information for: " + farmPrinters[index].ip + ":" + farmPrinters[index].port);
       await Runner.getProfile(index);
       await Runner.getSystem(index);
       await Runner.getSettings(index);
@@ -431,7 +462,6 @@ class Runner {
           index +
           " we are already attempting a connection!";
     }
-
     return result;
   }
   static async updatePoll() {
@@ -441,7 +471,9 @@ class Runner {
       throt["throttle"] = parseInt(
         (Polling[0].onlinePolling.seconds * 1000) / 500
       );
-      await farmPrinters[i].ws.throttle(JSON.stringify(throt));
+      if(typeof farmPrinters[i].ws.instance != 'undefined'){
+        await farmPrinters[i].ws.throttle(JSON.stringify(throt));
+      }
     }
     return "updated";
   }
@@ -477,7 +509,6 @@ class Runner {
         return res.json();
       })
       .then(res => {
-        console.log("Grabbed files for Printer: " + index);
         //Setup storage object
         farmPrinters[index].storage = {
           free: res.free,
@@ -595,7 +626,7 @@ class Runner {
         }
       })
       .catch(err => {
-        //console.log("Error grabbing Printer: "+ index + "files - " + err);
+        logger.error("Error grabbing files for: " + farmPrinters[index].ip + ":" + farmPrinters[index].port + "Reason: ", err);
         return false;
       });
   }
@@ -620,10 +651,10 @@ class Runner {
         farmPrinters[index].stateColour = Runner.getColour(res.current.state);
         farmPrinters[index].current = res.current;
         farmPrinters[index].options = res.options;
-        console.log("Grabbed state for Printer: " + index);
+        logger.info("Successfully grabbed State for...: " + farmPrinters[index].ip + ":" + farmPrinters[index].port);
       })
       .catch(err => {
-        //console.log("Error grabbing Printer: "+ index + "state - " + err);
+        logger.error("Error grabbing files for: " + farmPrinters[index].ip + ":" + farmPrinters[index].port + "Reason: ", err);
         return false;
       });
   }
@@ -641,10 +672,10 @@ class Runner {
       .then(res => {
         //Update info to DB
         farmPrinters[index].profiles = res.profiles;
-        console.log("Grabbed profiles for Printer:" + index);
+        logger.info("Successfully grabbed State for...: " + farmPrinters[index].ip + ":" + farmPrinters[index].port);
       })
       .catch(err => {
-        //console.log("Error grabbing Printer: "+ index + "profiles - " + err);
+        logger.error("Error grabbing files for: " + farmPrinters[index].ip + ":" + farmPrinters[index].port + "Reason: ", err);
         return false;
       });
   }
@@ -700,11 +731,11 @@ class Runner {
             printer.save();
 
           }
-          console.log("Grabbed settings for Printer:" + index);
+          logger.info("Successfully grabbed State for...: " + farmPrinters[index].ip + ":" + farmPrinters[index].port);
         }
       })
       .catch(err => {
-        //console.log("Error grabbing Printer: "+ index + "settings - " + err);
+        logger.error("Error grabbing files for: " + farmPrinters[index].ip + ":" + farmPrinters[index].port + "Reason: ", err);
         return false;
       });
   }
@@ -721,10 +752,10 @@ class Runner {
       .then(res => {
         //Update info to DB
         farmPrinters[index].core = res.core;
-        console.log("Grabbed system for Printer: " + index);
+        logger.info("Successfully grabbed State for...: " + farmPrinters[index].ip + ":" + farmPrinters[index].port);
       })
       .catch(err => {
-        //console.log("Error grabbing Printer: "+ index + "system - " + err);
+        logger.error("Error grabbing files for: " + farmPrinters[index].ip + ":" + farmPrinters[index].port + "Reason: ", err);
         return false;
       });
   }
