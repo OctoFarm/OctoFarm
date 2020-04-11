@@ -449,9 +449,10 @@ class Runner {
     clearInterval(farmStatRunner);
     clearInterval(statRunner);
     for (let i = 0; i < farmPrinters.length; i++) {
-      await farmPrinters[i].ws.instance.close();
+      if(typeof farmPrinters[i].ws.instance != 'undefined'){
+        await farmPrinters[i].ws.instance.close();
+      }
     }
-
     return "update";
   }
 
