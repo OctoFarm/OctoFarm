@@ -136,7 +136,7 @@ services:
       - MONGO=mongodb://mongo/octofarm
     volumes:
       - <your persistent folder>/OctoFarm/config:/app/serverConfig
-      - <your persistent folder>/OctoFarm/logs:/app/serverConfig
+      - <your persistent folder>/OctoFarm/logs:/app/logs
 
 ```
 
