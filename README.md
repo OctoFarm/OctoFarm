@@ -292,6 +292,8 @@ See the [open issues](https://github.com/NotExpectedYet/OctoFarm/issues) for a l
 
 ## Contributing
 
+<a href="https://www.patreon.com/bePatron?u=19808757" data-patreon-widget-type="become-patron-button">Become a Patron!</a><script async src="https://c6.patreon.com/becomePatronButton.bundle.js"></script>
+
 I am currently not accepting any contribution to the code. I started this project to teach myself nodejs and Javascript better. With my current plans I will have exhausted most learning opportunities by Version 1.2 and will be happy to take pull requests from people then. Thanks for understanding.
 
 <!-- LICENSE -->
