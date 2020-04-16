@@ -97,12 +97,13 @@ Instructions can be found: [TheTinkerDad/OctoFarm](https://hub.docker.com/r/thet
 BIG thanks to knoker for the help with this!
 
 ```sh
-docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -p4000:4000 octofarm/octofarm -v '<your persistent folder>/OctoFarm/config/':'/app/serverConfig/':'rw' -v '<your persistent folder>/OctoFarm/logs/':'/app/logs/':'rw'
+docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -e "TZ=America/Chicago" -p4000:4000 octofarm/octofarm -v '<your persistent folder>/OctoFarm/config/':'/app/serverConfig/':'rw' -v '<your persistent folder>/OctoFarm/logs/':'/app/logs/':'rw'
 ```
 
 Environment Variables
 
 - MONGO = contains mongodb connection string
+- TZ = local timezone code e.g. "America/Chicago" ([database of values here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones))
 
 Ports
 
@@ -134,6 +135,7 @@ services:
       - 4000:4000
     environment:
       - MONGO=mongodb://mongo/octofarm
+      - TZ=<your timezone>
     volumes:
       - <your persistent folder>/OctoFarm/config:/app/serverConfig
       - <your persistent folder>/OctoFarm/logs:/app/logs
