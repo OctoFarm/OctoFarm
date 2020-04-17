@@ -28,7 +28,7 @@
     <br />
     <a href="https://github.com/NotExpectedYet/OctoFarm/issues">OctoFarm Bug</a>
     ·
-    <a href="https://feathub.com/NotExpectedYet/OctoFarm">Request Feature</a>
+    <a href="https://features.octofarm.net/">Request Feature</a>
   </p>
 </p>
 
