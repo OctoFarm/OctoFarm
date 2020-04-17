@@ -7,9 +7,9 @@
 
 <h3 align="center">Current Feature Requests</h3>
 
-[![Feature Requests](https://feathub.com/NotExpectedYet/OctoFarm?format=svg)](https://feathub.com/NotExpectedYet/OctoFarm)
+[![Feature Requests](https://features.octofarm.net/)](https://features.octofarm.net/)
 
-  <p>Please visit <a href="https://feathub.com/NotExpectedYet/OctoFarm">to log a request.</a>
+  <p>Please visit <a href="https://features.octofarm.net/">to log a request.</a>
 
   <h3 align="center">Version 1.1.4</h3>
 <br />
