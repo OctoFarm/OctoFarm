@@ -89,6 +89,7 @@ export default function currentOperations(
       let progress = document.getElementById(
         "currentProgress-" + current.index
       );
+      document.getElementById("currentTime-"+current.index).innerHTML = Calc.generateTime(current.timeRemaining);
       progress.style = `width: ${current.progress}%`;
       progress.innerHTML = current.progress + "%";
       progress.className = `progress-bar progress-bar-striped bg-${current.progressColour}`;
