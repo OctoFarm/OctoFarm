@@ -7,9 +7,7 @@
 
 <h3 align="center">Current Feature Requests</h3>
 
-[![Feature Requests](https://feathub.com/NotExpectedYet/OctoFarm?format=svg)](https://feathub.com/NotExpectedYet/OctoFarm)
-
-  <p>Please visit <a href="https://feathub.com/NotExpectedYet/OctoFarm">to log a request.</a>
+  <p>Please visit <a href="https://features.octofarm.net">Octofarm's Features Page to log a request.</a>
 
   <h3 align="center">Version 1.1.4</h3>
 <br />
@@ -39,11 +37,10 @@
 - [About the Project](#about-the-project)
 - [Getting Started](#getting-started)
   - [Wiki](https://github.com/NotExpectedYet/OctoFarm/wiki)
+  - [Platform](#platform)
   - [Prerequisites](#prerequisites)
-  - [Installation Docker](#installation-Docker)
-  - [Installation Production](#installation-Production)
-  - [Installation Development](#installation-Development)
-- [Roadmap](#roadmap)
+  - [Installation Production](#installation-production)
+  - [Installation Development](#installation-development)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
@@ -74,7 +71,7 @@ _Note_: Raspberry Pi's Raspbian OS doesn't officially support running MongoDB ye
 - [MongoDB](https://www.mongodb.com/) - v3.6+
 - [NodeJS](https://nodejs.org/) - v12+
 - [NPM](https://www.npmjs.com/) - v6+
-- [OctoPrint](https://octoprint.org) - v1.3.12+
+- [OctoPrint](https://octoprint.org) - v1.3.9+
 
 On your OctoPrint instance
 
@@ -84,85 +81,8 @@ On your OctoPrint instance
 - Restart OctoPrint
 - Repeat for all OctoPrints that will be added to the Farm
 
-### Installation Docker
+#See The WIKI for more detailed instructions than what's available below
 
-### TinkerDad's Version (MongoDB Included)
-
-Instructions can be found: [TheTinkerDad/OctoFarm](https://hub.docker.com/r/thetinkerdad/octofarm)
-
-- Massive thanks to TheTinkerDad for making this, he's also better at keeping up with his documentation. Be sure to send him some love on his [Youtube Channel](https://www.youtube.com/channel/UCNaLzBZhXTCwjsDPU03y-kQ)
-
-### OctoFarm Official (MongoDB Not Included)
-
-BIG thanks to knoker for the help with this!
-
-```sh
-docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -p4000:4000 octofarm/octofarm -v '<your persistent folder>/OctoFarm/config/':'/app/serverConfig/':'rw' -v '<your persistent folder>/OctoFarm/logs/':'/app/logs/':'rw'
-```
-
-Environment Variables
-
-- MONGO = contains mongodb connection string
-
-Ports
-
-- 4000
-
-Paths
-
-```sh
-- <your persistent folder>/OctoFarm/config/':'/app/serverConfig/
-- <your persistent folder>/OctoFarm/logs/':'/app/logs/
-```
-
-### Generic Docker-Compose Installation (Includes a MongoDB Server)
-
-```yml
-version: "3"
-services:
-  mongo:
-    image: mongo
-    restart: always
-    volumes:
-      - <your persistent folder>/MongoDB:/data/db
-
-  octofarm:
-    container_name: octofarm
-    image: octofarm/octofarm
-    restart: always
-    ports:
-      - 4000:4000
-    environment:
-      - MONGO=mongodb://mongo/octofarm
-    volumes:
-      - <your persistent folder>/OctoFarm/config:/app/serverConfig
-      - <your persistent folder>/OctoFarm/logs:/app/serverConfig
-
-```
-
-### Windows Specific Docker-Compose Installation (Includes a MongoDB Server)
-
-- NOTE: Docker Dashboard -> Settings -> Resources -> File Sharing -> check the C drive (or wherever you want persistent storage to be)
-
-```yml
-version: "3.1"
-
-services:
-  mongo:
-    image: mongo
-    restart: always
-
-  octofarm:
-    image: octofarm/octofarm
-    restart: always
-    ports:
-      - 4000:4000
-    environment:
-      - MONGO=mongodb://mongo/octofarm
-    volumes:
-      - /c/ProgramData/OctoFarm/serverConfig:/app/serverConfig
-      - /c/ProgramData/OctoFarm/logs:/app/logs
-```
 
 ### Installation Production
 
@@ -281,12 +201,6 @@ npm run dev
 ## Packaged Versions
 
 These are planned but not available yet...
-
-<!-- ROADMAP -->
-
-## Roadmap
-
-See the [open issues](https://github.com/NotExpectedYet/OctoFarm/issues) for a list of known issues.
 
 <!-- CONTRIBUTING -->
 
