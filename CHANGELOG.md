@@ -4,25 +4,87 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [v.1.1.5]
+## [v1.1.4.9-dev-1]
 
 ### Added
- - Much improved logging for all areas. Now creates new log files as follows:
-  - OctoFarm-Server.log: Server errors and information
-  - OctoFarm-State.log: Printer logging for state collection...
-
-
+    - New Node dependancy's, make sure to run "npm install" & "npm update"
+        - pm2: Now takes over daemonising your server. Should work cross platform, and allows for server restarts to be done from the GUI. 
+            - Log's are still output to the log folder but you can use the following commands to control your installation:
+                - pm2 stop OctoFarm: Stops the running OctoFarm service. 
+                - pm2 restart OctoFarm: Restarts the running OctoFarm service. 
+        - exec: Used for executing the pm2 scripts for restarting OctoFarm server. 
+    - Much improved logging for all areas. Now creates new log files as follows:
+        - OctoFarm-Server.log: Server errors and information
+        - OctoFarm-State.log: Printer logging for state collection...
+        - OctoFarm-API.log: Logs all actions made from the client -> OctoFarm.
+        - OctoFarm-HistoryCollection.log: Logs all attempts at adding prints to history. 
+    - Disonnected state is now counted and shown in Current Operations overview.
+    - Terminal input can now be pressed with enter key
+    - Terminal input now auto capitalises all inputs.
+    - Printer Management now allows editing printers already on the farm. Turn on edit mode on the dashboard.
+    - File manager now list upload date next to print time.
+    - File manager now has an upload and print option.    
+    - Current Operations has a new button "Restart Print" Shows up when print is complete allowing you to quickly restart that specific print. 
+    - Views now have a cooldown colour change on the temperature icons. When under a specified limit the icon will go blue indicating the tool/bed is now cool.
+    - All views now have 3 buttons, Printer Control, Web View (OctoPrint interface) and Power Control.
+    
 ### Changed
-
+    - Dashboard has had a re-vamp.
+        - Printers are now added inline. Clicking "+ Add Printer" will pop up a box to the top of your printer list. Deleting it can be removed, and saving the printer it will be added to a new row on the list and start off a scan. A notification will be generated after a connection attempt. 
+    - Closed is now renamed to Disconnected. This is when your USB port is not connected to OctoPrint. 
+    - Server Settings only accessible by Administrator.
+    - Filament moved from System Menu to the navigation bar. 
+    - Switched over to new platform for feature requests: https://features.octofarm.net
+    - Split the Printer states for the dashboard to make it clearer. There is now the following: 
+        - WebSocket: 
+            - Green: connected.
+            - Yellow: Live but not receiving data. This is usually due to your printer been disconnected from OctoPrint when added as no data is transmitted from OctoPrint. 
+            - Red: not connected.
+        - Host State:
+            - Online: Host connection active
+            - Shutdown: Cannot connect to host
+        - Printer State: 
+            - Disconnected: Printer not connected to OctoPrint.
+            - No-API: Failed to grab API status, usually due to CORS if Host State = Online.
+            - The usual OctoPrint states: Idle, Printing, Cancelling, Error, Paused, Pausing
+    - Full file manager added to Printer Control pop-up.
+    - Printer Manager now split (Old Setting Cog):
+        - Printer Control (Printer Icon): Connection and Printer Control inc... file manager. 
+            - File selection here now has the majority of the File Manager functionality for a single printer. 
+        - Printer Settings (Cog Icon): Anything that's a 1 time settings, so Settings, Alerts, Power and Gcode Scripts
+        - Printer Power (Power Icon): Will open the power menu for shutdown, restart, reboot and custom buttons setup in the Printer Settings Modal.
+    - Split the information generation for Server -> Client comminication, will save some CPU on serverside and client side... 
+    - If printer name available then no index number is shown on views. 
+    - Converted to using a full URL string for printer connection... 
+        - If you already have port:ip set in the database this will be automagically converted for you. It will default to http:// when creating the new field. 
+        - Anyone adding and setting up new printers will have to use the full URL string now. If you leave http:// out it will automatically add that in as default. 
+    - Camera URL is similar to above, it will automagically add in the http:// for you if you have previous items in the database, you may also specify your own connection string with https://.
+    - Temperature values no longer use the external buttons on the input. This is now a number field and uses the original HTML up and down arrows that appear on focus.
+    - Export printers now exports with the following tags: Printer Name, Printer Group, Printer URL, Camera URL and API Key
+    - Import printers no longer deletes all old printers to import new ones. The new printers are added to your existing list. 
+    - Completed Prints are now triggered by percent complete rather than Print time left as it seems prints can get left with time left when actually completed.
+    - Moved all detailed instructions to the WIKI page, and removed from README.md.
+    - Views progress bars now display colours to corrospond with state. Yellow = Currently printing, Green = Complete. 
+    - Camera View now displays text on the print and cancel buttons. 
+    
 ### Removed
-
-### Deprecated
+    - Printer Management, see changed regarding dashboard. 
+    - History and file statistics from Dashboard.
+    - Removed systemInfo from database, extra uneeded steps as data is all gathered live anyway. 
 
 ### Fixed
-  - Long server starts due to second information grab. Now runs in the background to not effect start up.
-  - Fixed issues with throttle and server re-start checking printers without websockets yet. 
-
-### Security
+    - Long server starts due to second information grab. Now runs in the background to not effect start up.
+    - Fixed issues with throttle and server re-start checking printers whom the hosts are not online. 
+    - Fixed issue with multiple connected clients causing bubbling when grabbing information from the server. 
+    - Fixed issue with JSON Stringify error and clients receiving duff data due to it. 
+    - Fixed file manager single file refresh.
+    - Fixed and issue with folders not allowing entry when created inside a path. 
+    - Fixed issue with newly created folder not recognising new file till refresh.
+    - Fixed issue with newly created files not moving to folders until refresh.
+    - Fixed issue with Camera view reacting to Panel view Hide Disconnected Setting.
+    - Fixed spacing icon on temperature displays
+    - Fixed views not updating temperature for complete/idle printers.
+    - Fixed cameras not applying multiple rotate settings
 
 ## [Released]
 
