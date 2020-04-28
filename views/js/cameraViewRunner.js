@@ -5,7 +5,7 @@ import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
 import doubleClickFullScreen from "./lib/functions/fullscreen.js";
 
-let printerInfo = "";
+let printerInfo = [];
 let elems = [];
 
 //Connect to servers socket..webSocket
@@ -15,23 +15,30 @@ if (port != "") {
   port = ":" + port;
 }
 async function asyncParse(str) {
-  return JSON.parse(str);
+  try{
+    let info = JSON.parse(str)
+    return info;
+  }catch(e){
+    console.log(e)
+    return false;
+  }
 }
-var source = new EventSource("/sse/printerInfo/");
+var source = new EventSource("/sse/monitoringInfo/");
 source.onmessage = async function(e) {
   if (e.data != null) {
     let res = await asyncParse(e.data);
-
-    if (
-      document.getElementById("printerManagerModal").classList.contains("show")
-    ) {
-      PrinterManager.init(res.printerInfo);
-    } else {
-      printerInfo = res.printerInfo;
-      if (res.clientSettings.cameraView.currentOp) {
-        currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
+    if (res != false) {
+      if (
+          document.getElementById("printerManagerModal").classList.contains("show")
+      ) {
+        PrinterManager.init(res.printerInfo);
+      } else {
+        if (res.clientSettings.cameraView.currentOp) {
+          currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
+        }
+        printerInfo = res.printerInfo;
+        updateState(res.printerInfo, res.clientSettings.cameraView);
       }
-      updateState(res.printerInfo, res.clientSettings.cameraView);
     }
   }
 };
@@ -45,42 +52,50 @@ source.onerror = function(e) {
   }, 10000);
 };
 source.onclose = function(e) {
-  UI.createAlert(
-    "error",
-    "Communication with the server has been suddenly lost, we will automatically refresh in 10 seconds..."
-  );
-  setTimeout(function() {
-    location.reload();
-  }, 10000);
-};
 
-//Setup page listeners...
+};
+let returnPrinterInfo = (id) => {
+  let zeeIndex = _.findIndex(printerInfo, function(o) { return o._id == id; });
+  return printerInfo[zeeIndex];
+}
 let printerCard = document.querySelectorAll("[id^='printerButton-']");
 printerCard.forEach(card => {
   let ca = card.id.split("-");
   card.addEventListener("click", e => {
-    PrinterManager.updateIndex(parseInt(ca[1]));
-    PrinterManager.init(printerInfo);
+    let printer = returnPrinterInfo(ca[1]);
+    PrinterManager.updateIndex(ca[1]);
+    PrinterManager.init(printer);
   });
   document
-    .getElementById("camBody-" + parseInt(ca[1]))
-    .addEventListener("dblclick", e => {
-      doubleClickFullScreen(e.target);
-    });
+      .getElementById("camBody-" + ca[1])
+      .addEventListener("dblclick", e => {
+        doubleClickFullScreen(e.target);
+      });
+
   document
-    .getElementById("camStart-" + ca[1])
-    .addEventListener("click", async e => {
-      e.target.disabled = true;
-      let opts = {
-        command: "start"
-      };
-      OctoPrintClient.jobAction(printerInfo[ca[1]], opts, e);
-    });
+      .getElementById("camStart-" + ca[1])
+      .addEventListener("click", async e => {
+        let printer = returnPrinterInfo(ca[1]);
+        e.target.disabled = true;
+        let opts = {
+          command: "start"
+        };
+        OctoPrintClient.jobAction(printer, opts, e);
+      });
   document.getElementById("camStop-" + ca[1]).addEventListener("click", e => {
+    let printer = returnPrinterInfo(ca[1]);
+    let name = "";
+    if (typeof printer.settingsAppearance != "undefined") {
+      if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
+        name = printer.printerURL;
+      } else {
+        name = printer.settingsAppearance.name;
+      }
+    } else {
+      name = printer.printerURL;
+    }
     bootbox.confirm({
-      message: `${printerInfo[ca[1]].index}.  ${
-        printerInfo[ca[1]].settingsAppearance.name
-      }: <br>Are you sure you want to cancel the ongoing print?`,
+      message: `${name}: <br>Are you sure you want to cancel the ongoing print?`,
       buttons: {
         cancel: {
           label: '<i class="fa fa-times"></i> Cancel'
@@ -95,57 +110,49 @@ printerCard.forEach(card => {
           let opts = {
             command: "cancel"
           };
-          OctoPrintClient.jobAction(printerInfo[ca[1]], opts, e);
+          OctoPrintClient.jobAction(printer, opts, e);
         }
       }
     });
   });
 });
 
+//Setup page listeners...
 function grabElements(printer) {
-  if (typeof elems[printer.index] != "undefined") {
-    return elems[printer.index];
+  if (typeof elems[printer._id] != "undefined") {
+    return elems[printer._id];
   } else {
     let printerElemens = {
-      row: document.getElementById("camPanel-" + printer.index),
-      index: document.getElementById("camIndex-" + printer.index),
-      name: document.getElementById("camName-" + printer.index),
-      control: document.getElementById("printerButton-" + printer.index),
-      start: document.getElementById("camStart-" + printer.index),
-      stop: document.getElementById("camStop-" + printer.index),
-      camera: document.getElementById("panCameraSRC-" + printer.index),
-      currentFile: document.getElementById("camFileName-" + printer.index),
-      camBackground: document.getElementById("camBody-" + printer.index),
-      state: document.getElementById("camState-" + printer.index),
-      progress: document.getElementById("camProgress-" + printer.index),
-      tool0: document.getElementById("panE0Temp-" + printer.index),
-      bed: document.getElementById("panBedTemp-" + printer.index),
-      iconBedT: document.getElementById("bedT-" + printer.index),
-      iconBedA: document.getElementById("bedA-" + printer.index),
-      iconTool0A: document.getElementById("tool0A-" + printer.index),
-      iconTool0T: document.getElementById("tool0T-" + printer.index)
+      row: document.getElementById("camPanel-" + printer._id),
+      name: document.getElementById("camPrinterName-" + printer._id),
+      control: document.getElementById("printerButton-" + printer._id),
+      start: document.getElementById("camStart-" + printer._id),
+      stop: document.getElementById("camStop-" + printer._id),
+      camera: document.getElementById("cameraSRC-" + printer._id),
+      currentFile: document.getElementById("camName-" + printer._id),
+      camBackground: document.getElementById("camBody-" + printer._id),
+      progress: document.getElementById("camProgress-" + printer._id),
+      tool0: document.getElementById("panE0Temp-" + printer._id),
+      bed: document.getElementById("panBedTemp-" + printer._id),
+      iconBedT: document.getElementById("bedT-" + printer._id),
+      iconBedA: document.getElementById("bedA-" + printer._id),
+      iconTool0A: document.getElementById("tool0A-" + printer._id),
+      iconTool0T: document.getElementById("tool0T-" + printer._id)
     };
-    elems[printer.index] = printerElemens;
-    return elems[printer.index];
+    elems[printer._id] = printerElemens;
+    return elems[printer._id];
   }
 }
 function updateState(printers, clientSettings) {
   printers.forEach(printer => {
     let elements = grabElements(printer);
+
     elements.camBackground.className = `card-body cameraContain ${printer.stateColour.category}`;
-    if (typeof printer.settingsApperance != "undefined") {
-      elements.index.innerHTML = `
-      <h6 class="float-left mb-0" id="panIndex-${printer.index}">
-        <button id="panName-1" type="button" class="btn btn-secondary mb-0" role="button" disabled="">
-          ${printer.index} . ${printer.settingsApperance.name}
-        </button>
-      </h6>
-      `;
-    }
+
 
     if (typeof printer.job != "undefined" && printer.job.file.name != null) {
       elements.currentFile.innerHTML =
-        '<i class="fas fa-file-code"></i> ' + printer.job.file.name;
+        '<i class="fas fa-file-code"></i> ' + printer.job.file.display;
     } else {
       elements.currentFile.innerHTML =
         '<i class="fas fa-file-code"></i> ' + "No File Selected";
@@ -155,6 +162,7 @@ function updateState(printers, clientSettings) {
       elements.progress.innerHTML =
         Math.floor(printer.progress.completion) + "%";
       elements.progress.style.width = printer.progress.completion + "%";
+      elements.progress.classList = `progress-bar progress-bar-striped bg-${printer.stateColour.name}`
     }
     let tool0A = 0;
     let tool0T = 0;
@@ -190,80 +198,80 @@ function updateState(printers, clientSettings) {
       elements.stop.disabled = false;
       elements.start.classList.add("hidden");
       elements.stop.classList.remove("hidden");
-      if (tool0A > tool0T - 0.5 && tool0A < tool0T + 0.5) {
+      if (tool0A > tool0T - parseInt(printer.tempTriggers.heatingVariation) && tool0A < tool0T + parseInt(printer.tempTriggers.heatingVariation)) {
         elements.tool0.innerHTML =
-          '<i id="tool0A-' +
-          printer.index +
+          ' <i id="tool0A-' +
+          printer._id +
           '" class="far fa-circle toolOn"></i> ' +
           tool0A +
           "°C" +
           " " +
-          '<i id="tool0T-' +
-          printer.index +
+          ' <i id="tool0T-' +
+          printer._id +
           '" class="fas fa-bullseye toolOn"></i> ' +
           tool0T +
           "°C";
-      } else if (tool0A < 35) {
+      } else if (tool0A < parseInt(printer.tempTriggers.heatingVariation)) {
         elements.tool0.innerHTML =
-          '<i id="tool0A-' +
-          printer.index +
+          ' <i id="tool0A-' +
+          printer._id +
           '" class="far fa-circle"></i> ' +
           tool0A +
           "°C" +
           " " +
-          '<i id="tool0T-' +
-          printer.index +
+          ' <i id="tool0T-' +
+          printer._id +
           '" class="fas fa-bullseye"></i> ' +
           tool0T +
           "°C";
       } else {
         elements.tool0.innerHTML =
-          '<i id="tool0A-' +
-          printer.index +
+          ' <i id="tool0A-' +
+          printer._id +
           '" class="far fa-circle toolOut"></i> ' +
           tool0A +
           "°C" +
-          '<i id="tool0T-' +
-          printer.index +
+          ' <i id="tool0T-' +
+          printer._id +
           '" class="fas fa-bullseye toolOut"></i> ' +
           tool0T +
           "°C";
       }
-      if (bedA > bedT - 0.5 && bedA < bedT + 0.5) {
+      if (bedA > bedT - parseInt(printer.tempTriggers.heatingVariation) && bedA < bedT + parseInt(printer.tempTriggers.heatingVariation)) {
         elements.bed.innerHTML =
-          '<i id="bedA-' +
-          printer.index +
+          ' <i id="bedA-' +
+          printer._id +
           '" class="far fa-circle toolOn"></i> ' +
           bedA +
           "°C" +
           " " +
-          '<i id="bedT-' +
-          printer.index +
+          ' <i id="bedT-' +
+          printer._id +
           '" class="fas fa-bullseye toolOn"></i> ' +
           bedT +
           "°C";
-      } else if (bedA < 35) {
+      } else if (bedA < parseInt(printer.tempTriggers.heatingVariation)) {
         elements.bed.innerHTML =
-          '<i id="bedA-' +
-          printer.index +
+          ' <i id="bedA-' +
+          printer._id +
           '" class="far fa-circle"></i> ' +
           bedA +
           "°C" +
           " " +
-          '<i id="bedT-' +
-          printer.index +
+          ' <i id="bedT-' +
+          printer._id +
           '" class="fas fa-bullseye"></i> ' +
           bedT +
           "°C";
       } else {
         elements.bed.innerHTML =
-          '<i id="bedA-' +
-          printer.index +
+          ' <i id="bedA-' +
+          printer._id +
           '" class="far fa-circle toolOut"></i> ' +
           bedA +
           "°C" +
-          '<i id="bedT-' +
-          printer.index +
+          ' <i id="bedT-' +
+          printer._id +
           '" class="fas fa-bullseye toolOut"></i> ' +
           bedT +
           "°C";
@@ -287,11 +295,62 @@ function updateState(printers, clientSettings) {
         elements.start.classList.remove("hidden");
         elements.stop.classList.add("hidden");
       }
-    } else if (printer.state === "Closed") {
+      if (tool0A > parseInt(printer.tempTriggers.coolDown)) {
+        elements.tool0.innerHTML =
+            ' <i id="tool0A-' +
+            printer._id +
+            '" class="far fa-circle"></i> ' +
+            tool0A +
+            "°C" +
+            " " +
+            ' <i id="tool0T-' +
+            printer._id +
+            '" class="fas fa-bullseye"></i> ' +
+            tool0T +
+            "°C";
+      } else {
+        elements.tool0.innerHTML =
+            ' <i id="tool0A-' +
+            printer._id +
+            '" class="far fa-circle toolUnder"></i> ' +
+            tool0A +
+            "°C" +
+            ' <i id="tool0T-' +
+            printer._id +
+            '" class="fas fa-bullseye toolUnder"></i> ' +
+            tool0T +
+            "°C";
+      }
+      if (bedA > parseInt(printer.tempTriggers.coolDown)) {
+        elements.bed.innerHTML =
+            ' <i id="bedA-' +
+            printer._id +
+            '" class="far fa-circle"></i> ' +
+            bedA +
+            "°C" +
+            " " +
+            ' <i id="bedT-' +
+            printer._id +
+            '" class="fas fa-bullseye"></i> ' +
+            bedT +
+            "°C";
+      } else {
+        elements.bed.innerHTML =
+            ' <i id="bedA-' +
+            printer._id +
+            '" class="far fa-circle toolUnder"></i> ' +
+            bedA +
+            "°C" +
+            ' <i id="bedT-' +
+            printer._id +
+            '" class="fas fa-bullseye toolUnder"></i> ' +
+            bedT +
+            "°C";
+      }
+    } else if (printer.state === "Disconnected") {
       if (printer.camURL != "") {
         elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${hideClosed}`;
       }
-
       elements.control.disabled = false;
       elements.start.disabled = true;
       elements.stop.disabled = true;
@@ -305,5 +364,7 @@ function updateState(printers, clientSettings) {
       elements.start.disabled = true;
       elements.stop.disabled = true;
     }
+
   });
+
 }

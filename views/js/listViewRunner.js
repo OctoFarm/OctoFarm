@@ -4,8 +4,9 @@ import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
 
-let printerInfo = "";
+let printerInfo = [];
 let elems = [];
+
 //Connect to servers socket..webSocket
 let url = window.location.hostname;
 let port = window.location.port;
@@ -13,23 +14,30 @@ if (port != "") {
   port = ":" + port;
 }
 async function asyncParse(str) {
-  return JSON.parse(str);
+  try{
+    let info = JSON.parse(str)
+    return info;
+  }catch(e){
+    console.log(e)
+    return false;
+  }
 }
-var source = new EventSource("/sse/printerInfo/");
+var source = new EventSource("/sse/monitoringInfo/");
 source.onmessage = async function(e) {
   if (e.data != null) {
     let res = await asyncParse(e.data);
-
-    if (
-      document.getElementById("printerManagerModal").classList.contains("show")
-    ) {
-      PrinterManager.init(res.printerInfo);
-    } else {
-      printerInfo = res.printerInfo;
-      if (res.clientSettings.listView.currentOp) {
-        currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
+    if (res != false) {
+      if (
+          document.getElementById("printerManagerModal").classList.contains("show")
+      ) {
+        PrinterManager.init(res.printerInfo);
+      } else {
+        printerInfo = res.printerInfo;
+        if (res.clientSettings.listView.currentOp) {
+          currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
+        }
+        updateState(res.printerInfo, res.clientSettings.listView);
       }
-      updateState(res.printerInfo, res.clientSettings.listView);
     }
   }
 };
@@ -43,37 +51,45 @@ source.onerror = function(e) {
   }, 10000);
 };
 source.onclose = function(e) {
-  UI.createAlert(
-    "error",
-    "Communication with the server has been suddenly lost, we will automatically refresh in 10 seconds..."
-  );
-  setTimeout(function() {
-    location.reload();
-  }, 10000);
-};
 
+};
+let returnPrinterInfo = (id) => {
+  let zeeIndex = _.findIndex(printerInfo, function(o) { return o._id == id; });
+  return printerInfo[zeeIndex];
+}
 //Setup page listeners...
 let printerCard = document.querySelectorAll("[id^='printerButton-']");
 printerCard.forEach(card => {
   let ca = card.id.split("-");
   card.addEventListener("click", e => {
-    PrinterManager.updateIndex(parseInt(ca[1]));
-    PrinterManager.init(printerInfo);
+    let printer = returnPrinterInfo(ca[1]);
+    PrinterManager.updateIndex(ca[1]);
+    PrinterManager.init(printer);
   });
   document.getElementById("listPlay-" + ca[1]).addEventListener("click", e => {
+    let printer = returnPrinterInfo(ca[1]);
     e.target.disabled = true;
     let opts = {
       command: "start"
     };
-    OctoPrintClient.jobAction(printerInfo[ca[1]], opts, e);
+    OctoPrintClient.jobAction(printer, opts, e);
   });
   document
     .getElementById("listCancel-" + ca[1])
     .addEventListener("click", e => {
+      let printer = returnPrinterInfo(ca[1]);
+      let name = "";
+      if (typeof printer.settingsAppearance != "undefined") {
+        if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
+          name = printer.printerURL;
+        } else {
+          name = printer.settingsAppearance.name;
+        }
+      } else {
+        name = printer.printerURL;
+      }
       bootbox.confirm({
-        message: `${printerInfo[ca[1]].index}.  ${
-          printerInfo[ca[1]].settingsAppearance.name
-        }: <br>Are you sure you want to cancel the ongoing print?`,
+        message: `${name}: <br>Are you sure you want to cancel the ongoing print?`,
         buttons: {
           cancel: {
             label: '<i class="fa fa-times"></i> Cancel'
@@ -88,7 +104,7 @@ printerCard.forEach(card => {
             let opts = {
               command: "cancel"
             };
-            OctoPrintClient.jobAction(printerInfo[ca[1]], opts, e);
+            OctoPrintClient.jobAction(printer, opts, e);
           }
         }
       });
@@ -96,47 +112,43 @@ printerCard.forEach(card => {
 });
 
 function grabElements(printer) {
-  if (typeof elems[printer.index] != "undefined") {
-    return elems[printer.index];
+  if (typeof elems[printer._id] != "undefined") {
+    return elems[printer._id];
   } else {
     let printerElemens = {
-      row: document.getElementById("listRow-" + printer.index),
-      index: document.getElementById("listIndex-" + printer.index),
-      name: document.getElementById("listName-" + printer.index),
-      control: document.getElementById("printerButton-" + printer.index),
-      start: document.getElementById("listPlay-" + printer.index),
-      stop: document.getElementById("listCancel-" + printer.index),
-      pause: document.getElementById("listCancel-" + printer.index),
-      restart: document.getElementById("listCancel-" + printer.index),
-      resume: document.getElementById("listCancel-" + printer.index),
-      currentFile: document.getElementById("listFile-" + printer.index),
-      filament: document.getElementById("listFilament-" + printer.index),
-      state: document.getElementById("listState-" + printer.index),
-      printTime: document.getElementById("listPrintTime-" + printer.index),
-      tool0: document.getElementById("listE0Temp-" + printer.index),
-      bed: document.getElementById("listBedTemp-" + printer.index),
-      iconBedT: document.getElementById("bedT-" + printer.index),
-      iconBedA: document.getElementById("bedA-" + printer.index),
-      iconTool0A: document.getElementById("tool0A-" + printer.index),
-      iconTool0T: document.getElementById("tool0T-" + printer.index)
+      row: document.getElementById("listRow-" + printer._id),
+      index: document.getElementById("listIndex-" + printer._id),
+      name: document.getElementById("listName-" + printer._id),
+      control: document.getElementById("printerButton-" + printer._id),
+      start: document.getElementById("listPlay-" + printer._id),
+      stop: document.getElementById("listCancel-" + printer._id),
+      pause: document.getElementById("listCancel-" + printer._id),
+      restart: document.getElementById("listCancel-" + printer._id),
+      resume: document.getElementById("listCancel-" + printer._id),
+      currentFile: document.getElementById("listFile-" + printer._id),
+      filament: document.getElementById("listFilament-" + printer._id),
+      state: document.getElementById("listState-" + printer._id),
+      printTime: document.getElementById("listPrintTime-" + printer._id),
+      tool0: document.getElementById("listE0Temp-" + printer._id),
+      bed: document.getElementById("listBedTemp-" + printer._id),
+      iconBedT: document.getElementById("bedT-" + printer._id),
+      iconBedA: document.getElementById("bedA-" + printer._id),
+      iconTool0A: document.getElementById("tool0A-" + printer._id),
+      iconTool0T: document.getElementById("tool0T-" + printer._id)
     };
-    elems[printer.index] = printerElemens;
-    return elems[printer.index];
+    elems[printer._id] = printerElemens;
+    return elems[printer._id];
   }
 }
 function updateState(printers, clientSettings) {
   printers.forEach(printer => {
     let elements = grabElements(printer);
     //Set the data
-    elements.index.innerHTML = printer.index;
 
-    if (typeof printer.settingsApperance != "undefined") {
-      elements.name.innerHTML = printer.settingsApperance.name;
-    }
 
     if (typeof printer.job != "undefined" && printer.job.file.name != null) {
       elements.currentFile.innerHTML =
-        '<i class="fas fa-file-code"></i> ' + printer.job.file.name;
+        '<i class="fas fa-file-code"></i> ' + printer.job.file.display;
     } else {
       elements.currentFile.innerHTML =
         '<i class="fas fa-file-code"></i> ' + "No File Selected";
@@ -193,83 +205,84 @@ function updateState(printers, clientSettings) {
       elements.control.disabled = false;
       elements.start.disabled = true;
       elements.stop.disabled = false;
-      if (tool0A > tool0T - 0.5 && tool0A < tool0T + 0.5) {
+
+      if (tool0A > tool0T - parseInt(printer.tempTriggers.heatingVariation) && tool0A < tool0T + parseInt(printer.tempTriggers.heatingVariation)) {
         elements.tool0.innerHTML =
-          '<i id="tool0A-' +
-          printer.index +
-          '" class="far fa-circle toolOn"></i> ' +
-          tool0A +
-          "°C" +
-          " " +
-          '<i id="tool0T-' +
-          printer.index +
-          '" class="fas fa-bullseye toolOn"></i> ' +
-          tool0T +
-          "°C";
-      } else if (tool0A < 35) {
+            ' <i id="tool0A-' +
+            printer._id +
+            '" class="far fa-circle toolOn"></i> ' +
+            tool0A +
+            "°C" +
+            " " +
+            ' <i id="tool0T-' +
+            printer._id +
+            '" class="fas fa-bullseye toolOn"></i> ' +
+            tool0T +
+            "°C";
+      } else if (tool0A < parseInt(printer.tempTriggers.heatingVariation)) {
         elements.tool0.innerHTML =
-          '<i id="tool0A-' +
-          printer.index +
-          '" class="far fa-circle"></i> ' +
-          tool0A +
-          "°C" +
-          " " +
-          '<i id="tool0T-' +
-          printer.index +
-          '" class="fas fa-bullseye"></i> ' +
-          tool0T +
-          "°C";
+            ' <i id="tool0A-' +
+            printer._id +
+            '" class="far fa-circle"></i> ' +
+            tool0A +
+            "°C" +
+            " " +
+            ' <i id="tool0T-' +
+            printer._id +
+            '" class="fas fa-bullseye"></i> ' +
+            tool0T +
+            "°C";
       } else {
         elements.tool0.innerHTML =
-          '<i id="tool0A-' +
-          printer.index +
-          '" class="far fa-circle toolOut"></i> ' +
-          tool0A +
-          "°C" +
-          '<i id="tool0T-' +
-          printer.index +
-          '" class="fas fa-bullseye toolOut"></i> ' +
-          tool0T +
-          "°C";
+            ' <i id="tool0A-' +
+            printer._id +
+            '" class="far fa-circle toolOut"></i> ' +
+            tool0A +
+            "°C" +
+            ' <i id="tool0T-' +
+            printer._id +
+            '" class="fas fa-bullseye toolOut"></i> ' +
+            tool0T +
+            "°C";
       }
-      if (bedA > bedT - 0.5 && bedA < bedT + 0.5) {
+      if (bedA > bedT - parseInt(printer.tempTriggers.heatingVariation) && bedA < bedT + parseInt(printer.tempTriggers.heatingVariation)) {
         elements.bed.innerHTML =
-          '<i id="bedA-' +
-          printer.index +
-          '" class="far fa-circle toolOn"></i> ' +
-          bedA +
-          "°C" +
-          " " +
-          '<i id="bedT-' +
-          printer.index +
-          '" class="fas fa-bullseye toolOn"></i> ' +
-          bedT +
-          "°C";
-      } else if (bedA < 35) {
+            ' <i id="bedA-' +
+            printer._id +
+            '" class="far fa-circle toolOn"></i> ' +
+            bedA +
+            "°C" +
+            " " +
+            ' <i id="bedT-' +
+            printer._id +
+            '" class="fas fa-bullseye toolOn"></i> ' +
+            bedT +
+            "°C";
+      } else if (bedA < parseInt(printer.tempTriggers.heatingVariation)) {
         elements.bed.innerHTML =
-          '<i id="bedA-' +
-          printer.index +
-          '" class="far fa-circle"></i> ' +
-          bedA +
-          "°C" +
-          " " +
-          '<i id="bedT-' +
-          printer.index +
-          '" class="fas fa-bullseye"></i> ' +
-          bedT +
-          "°C";
+            ' <i id="bedA-' +
+            printer._id +
+            '" class="far fa-circle"></i> ' +
+            bedA +
+            "°C" +
+            " " +
+            ' <i id="bedT-' +
+            printer._id +
+            '" class="fas fa-bullseye"></i> ' +
+            bedT +
+            "°C";
       } else {
         elements.bed.innerHTML =
-          '<i id="bedA-' +
-          printer.index +
-          '" class="far fa-circle toolOut"></i> ' +
-          bedA +
-          "°C" +
-          '<i id="bedT-' +
-          printer.index +
-          '" class="fas fa-bullseye toolOut"></i> ' +
-          bedT +
-          "°C";
+            ' <i id="bedA-' +
+            printer._id +
+            '" class="far fa-circle toolOut"></i> ' +
+            bedA +
+            "°C" +
+            ' <i id="bedT-' +
+            printer._id +
+            '" class="fas fa-bullseye toolOut"></i> ' +
+            bedT +
+            "°C";
       }
     } else if (
       printer.stateColour.category === "Idle" ||
@@ -284,7 +297,59 @@ function updateState(printers, clientSettings) {
         elements.start.disabled = true;
         elements.stop.disabled = true;
       }
-    } else if (printer.state === "Closed") {
+      if (tool0A > parseInt(printer.tempTriggers.coolDown)) {
+        elements.tool0.innerHTML =
+            ' <i id="tool0A-' +
+            printer._id +
+            '" class="far fa-circle"></i> ' +
+            tool0A +
+            "°C" +
+            " " +
+            ' <i id="tool0T-' +
+            printer._id +
+            '" class="fas fa-bullseye"></i> ' +
+            tool0T +
+            "°C";
+      } else {
+        elements.tool0.innerHTML =
+            ' <i id="tool0A-' +
+            printer._id +
+            '" class="far fa-circle toolUnder"></i> ' +
+            tool0A +
+            "°C" +
+            ' <i id="tool0T-' +
+            printer._id +
+            '" class="fas fa-bullseye toolUnder"></i> ' +
+            tool0T +
+            "°C";
+      }
+      if (bedA > parseInt(printer.tempTriggers.coolDown)) {
+        elements.bed.innerHTML =
+            ' <i id="bedA-' +
+            printer._id +
+            '" class="far fa-circle"></i> ' +
+            bedA +
+            "°C" +
+            " " +
+            ' <i id="bedT-' +
+            printer._id +
+            '" class="fas fa-bullseye"></i> ' +
+            bedT +
+            "°C";
+      } else {
+        elements.bed.innerHTML =
+            ' <i id="bedA-' +
+            printer._id +
+            '" class="far fa-circle toolUnder"></i> ' +
+            bedA +
+            "°C" +
+            ' <i id="bedT-' +
+            printer._id +
+            '" class="fas fa-bullseye toolUnder"></i> ' +
+            bedT +
+            "°C";
+      }
+    } else if (printer.state === "Disconnected") {
       elements.row.className = printer.stateColour.category + " " + hideClosed;
       elements.control.disabled = false;
       elements.start.disabled = true;

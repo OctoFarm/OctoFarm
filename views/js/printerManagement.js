@@ -68,6 +68,13 @@ window.onload = () => {
 };
 class Printer {
   constructor(ip, port, camURL, apikey) {
+    this.settingsApperance = {
+      color: "default",
+      colorTransparent: false,
+      defaultLanguage: "_default",
+      name: name,
+      showFahrenheitAlso: false
+    },
     this.ip = ip;
     this.port = port;
     this.camURL = camURL;
@@ -356,9 +363,10 @@ class PrintersManagement {
     document.getElementById("deletePrintersBtn").disabled = true;
   }
   static exportPrinters() {
-    const table = document.getElementById("addPrintersTable");
+    const table = document.getElementById("printerTable");
     let printers = new Array();
     for (var r = 0, n = table.rows.length; r < n; r++) {
+      console.log(table.rows[r].calls[0].innerHTML)
       let printer = new PrintersManagement(
         table.rows[r].cells[0].innerHTML,
         table.rows[r].cells[1].innerHTML,
