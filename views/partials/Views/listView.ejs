@@ -1,76 +1,118 @@
-<% sortedIndex.forEach(sorted => { %> <% if(printers[sorted.actualIndex].state
+<% sortedIndex.forEach(sorted => { %> <% if(printers[sorted.actualIndex].stateColour.category
 === "Offline" && clientSettings[0].listView.hideOff){%>
 <tr
   class="<%= printers[sorted.actualIndex].stateColour.category %> hidden"
-  id="listRow-<%= printers[sorted.actualIndex].index %>"
+  id="listRow-<%= printers[sorted.actualIndex]._id %>"
 >
-  <%}else if(printers[sorted.actualIndex].state === "Closed" &&
+  <%}else if(printers[sorted.actualIndex].state === "Disconnected" &&
   clientSettings[0].listView.hideClosed){%>
 </tr>
 
 <tr
   class="<%= printers[sorted.actualIndex].stateColour.category %> hidden"
-  id="listRow-<%= printers[sorted.actualIndex].index %>"
+  id="listRow-<%= printers[sorted.actualIndex]._id %>"
 >
   <%}else{%>
 </tr>
 
 <tr
   class="<%= printers[sorted.actualIndex].stateColour.category %>"
-  id="listRow-<%= printers[sorted.actualIndex].index %>"
+  id="listRow-<%= printers[sorted.actualIndex]._id %>"
 >
   <%}%>
-  <th id="listIndex-<%= printers[sorted.actualIndex].index %>" scope="row">
-    <%= printers[sorted.actualIndex].index%>
-  </th>
-  <td id="listName-<%= printers[sorted.actualIndex].index %>">
-    <% if(typeof printers[sorted.actualIndex].settingsApperance != 'undefined'){
-    %> <%= printers[sorted.actualIndex].settingsApperance.name %><%}%>
+  <% let name = "";%>
+  <% if (typeof printers[sorted.actualIndex].settingsApperance != "undefined") {%>
+    <% if (printers[sorted.actualIndex].settingsApperance.name === "" || printers[sorted.actualIndex].settingsApperance.name === null) {%>
+      <% name = printers[sorted.actualIndex].printerURL;%>
+    <% } else {%>
+      <% name = printers[sorted.actualIndex].settingsApperance.name;%>
+    <% }%>
+  <% } else {%>
+    <% name = printers[sorted.actualIndex].printerURL;%>
+  <%}%>
+  <td id="listName-<%= printers[sorted.actualIndex]._id %>">
+    <% if(name.includes("http://")){ %>
+      <%  name = name.replace("http://", ""); %>
+    <% }else if(name.includes("https://")){ %>
+      <%  name = name.replace("https://",""); %>
+    <%}  %>
+    <%= name %>
   </td>
   <td>
-    <% if(printers[sorted.actualIndex].state === "Offline"){ %>
-    <button
-      id="printerButton-<%= printers[sorted.actualIndex].index %>"
-      type="button"
-      class="btn btn-dark"
-      data-toggle="modal"
-      data-target="#printerManagerModal"
-      disabled
-    >
-      <i class="fas fa-cog"></i>
-    </button>
+    <% if(printers[sorted.actualIndex].stateColour.category === "Offline"){ %>
+      <button
+              id="printerButton-<%= printers[sorted.actualIndex]._id %>"
+              type="button"
+              class="btn btn-primary btn-sm"
+              data-toggle="modal"
+              data-target="printerManagerModal" disabled
+      >
+        <i class="fas fa-print"></i>
+      </button>
+      <a id="printerWeb-5ea68355110cfe5ca94265ac"
+         type="button"
+         class="btn btn-info btn-sm disabled"
+         target="_blank" href="<%= printers[sorted.actualIndex].printerURL %>"
+         role="button">
+        <i class="fas fa-globe-europe"></i>
+      </a>
+      <button
+              id="powerButton-<%= printers[sorted.actualIndex]._id %>"
+              type="button"
+              class="btn btn-danger btn-sm"
+              data-toggle="modal"
+              data-target="#printerPowerModal"
+      >
+        <i class="fas fa-power-off"></i>
+      </button>
     <% }else{ %>
-    <button
-      id="printerButton-<%= printers[sorted.actualIndex].index %>"
-      type="button"
-      class="btn btn-dark"
-      data-toggle="modal"
-      data-target="#printerManagerModal"
-    >
-      <i class="fas fa-cog"></i>
-    </button>
+        <button
+                id="printerButton-<%= printers[sorted.actualIndex]._id %>"
+                type="button"
+                class="btn btn-primary btn-sm"
+                data-toggle="modal"
+                data-target="#printerManagerModal"
+        >
+          <i class="fas fa-print"></i>
+        </button>
+        <a id="printerWeb-5ea68355110cfe5ca94265ac"
+           type="button"
+           class="btn btn-info btn-sm"
+           target="_blank" href="<%= printers[sorted.actualIndex].printerURL %>"
+           role="button">
+          <i class="fas fa-globe-europe"></i>
+        </a>
+        <button
+                id="powerButton-<%= printers[sorted.actualIndex]._id %>"
+                type="button"
+                class="btn btn-danger btn-sm"
+                data-toggle="modal"
+                data-target="#printerPowerModal"
+        >
+          <i class="fas fa-power-off"></i>
+        </button>
     <% } %>
   </td>
   <td>
     <button
-      id="listPlay-<%= printers[sorted.actualIndex].index %>"
+      id="listPlay-<%= printers[sorted.actualIndex]._id %>"
       type="button"
-      class="btn btn-success"
+      class="btn btn-success btn-sm"
       disabled
     >
       <i class="fas fa-play"></i>
     </button>
     <button
-      id="listCancel-<%= printers[sorted.actualIndex].index %>"
+      id="listCancel-<%= printers[sorted.actualIndex]._id %>"
       type="button"
-      class="btn btn-danger"
+      class="btn btn-danger btn-sm"
       disabled
     >
       <i class="fas fa-square"></i>
     </button>
   </td>
   <td
-    id="listFile-<%= printers[sorted.actualIndex].index %>"
+    id="listFile-<%= printers[sorted.actualIndex]._id %>"
     class="text-truncate"
   >
     <i class="fas fa-file-code"></i> <% if(typeof
@@ -79,66 +121,66 @@
     printers[sorted.actualIndex].job.file.display %><%}else{ %> No File Selected
     <% }%>
   </td>
-  <td id="listFilament-<%= printers[sorted.actualIndex].index %>">
+  <td id="listFilament-<%= printers[sorted.actualIndex]._id %>">
     <% if(typeof printers[sorted.actualIndex].selectedFilament != 'undefined' &&
     printers[sorted.actualIndex].selectedFilament.name != null){%> <%=
     printers[sorted.actualIndex].selectedFilament.name %> [<%=
     printers[sorted.actualIndex].selectedFilament.colour %> / <%=
     printers[sorted.actualIndex].selectedFilament.type[1] %>] <% }%>
   </td>
-  <td id="listState-<%= printers[sorted.actualIndex].index %>">
+  <td id="listState-<%= printers[sorted.actualIndex]._id %>">
     <%= printers[sorted.actualIndex].state %>
   </td>
-  <td id="listPrintTime-<%= printers[sorted.actualIndex].index %>">
+  <td id="listPrintTime-<%= printers[sorted.actualIndex]._id %>">
     <% if(typeof printers[sorted.actualIndex].progress != 'undefined'){ %> <%=
     helpers.generateTime(printers[sorted.actualIndex].progress.printTimeLeft) %>
     <%}%>
   </td>
-  <td id="listE0Temp-<%= printers[sorted.actualIndex].index %>">
+  <td id="listE0Temp-<%= printers[sorted.actualIndex]._id %>">
     <% if(typeof printers[sorted.actualIndex].temps != 'undefined'){ %> <%
     if(typeof printers[sorted.actualIndex].temps[0].tool0 != 'undefined'){ %>
     <i
-      id="tool0A-<%= printers[sorted.actualIndex].index %>"
+      id="tool0A-<%= printers[sorted.actualIndex]._id %>"
       class="far fa-circle"
     ></i>
     <%= printers[sorted.actualIndex].temps[0].tool0.actual %><%}else{ %>
     <i
-      id="tool0A-<%= printers[sorted.actualIndex].index %>"
+      id="tool0A-<%= printers[sorted.actualIndex]._id %>"
       class="far fa-circle"
     ></i>
     <%= 0%><%}%>°C <% if(typeof printers[sorted.actualIndex].temps[0].tool0 !=
     'undefined'){ %>
     <i
-      id="tool0T-<%= printers[sorted.actualIndex].index %>"
+      id="tool0T-<%= printers[sorted.actualIndex]._id %>"
       class="fas fa-bullseye"
     ></i>
     <%= printers[sorted.actualIndex].temps[0].tool0.target%><%}else{ %>
     <i
-      id="tool0T-<%= printers[sorted.actualIndex].index %>"
+      id="tool0T-<%= printers[sorted.actualIndex]._id %>"
       class="fas fa-bullseye"
     ></i>
     <%= 0%><%}%>°C <%} %>
   </td>
-  <td id="listBedTemp-<%= printers[sorted.actualIndex].index %>">
+  <td id="listBedTemp-<%= printers[sorted.actualIndex]._id %>">
     <% if(typeof printers[sorted.actualIndex].temps != 'undefined'){ %> <%
     if(typeof printers[sorted.actualIndex].temps[0].bed != 'undefined'){ %><i
-      id="bedA-<%= printers[sorted.actualIndex].index %>"
+      id="bedA-<%= printers[sorted.actualIndex]._id %>"
       class="far fa-circle"
     ></i>
     <%= printers[sorted.actualIndex].temps[0].bed.actual %><%}else{ %>
     <i
-      id="bedA-<%= printers[sorted.actualIndex].index %>"
+      id="bedA-<%= printers[sorted.actualIndex]._id %>"
       class="far fa-circle"
     ></i>
     <%= 0%><%}%>°C <% if(typeof printers[sorted.actualIndex].temps[0].bed !=
     'undefined'){ %>
     <i
-      id="bedT-<%= printers[sorted.actualIndex].index %>"
+      id="bedT-<%= printers[sorted.actualIndex]._id %>"
       class="fas fa-bullseye"
     ></i>
     <%= printers[sorted.actualIndex].temps[0].bed.target %><%}else{ %>
     <i
-      id="bedT-<%= printers[sorted.actualIndex].index %>"
+      id="bedT-<%= printers[sorted.actualIndex]._id %>"
       class="fas fa-bullseye"
     ></i>
     <%= 0%><%}%>°C <%} %>

@@ -15,7 +15,8 @@
     <link rel="stylesheet" href="/css/bootstrap-v4.css" />
     <link rel="stylesheet" href="/css/themes/slate.css" />
     <link rel="stylesheet" href="/css/octofarm.css" />
-    <link rel="stylesheet" href="/css/noty.css">
+    <link rel="stylesheet" href="/css/noty.css"/>
+    <link rel="stylesheet" href="/css/balloon.css"/>
     <script type="text/javascript" src="/js/vendor/jquery-3.4.1.min.js"></script>
     <title>OctoFarm: <%= page %></title>
 </head>
@@ -23,7 +24,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top p-1">
         <a class="navbar-brand notyet" href="#">
-            OctoFarm
+            <img src="favicon.ico" width="40px" class="pl-2">
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -61,8 +62,8 @@
                                     View</a>
                                 <a class="dropdown-item  text-light" id="menuCameraView" href="/mon/camera"><i class="fas fa-video"></i>
                                     Camera View</a>
-                                <!--<a class="dropdown-item  text-light" id="menucurrentOperationsView" href="/mon/currentOp"><i class="fas fa-star"></i>
-                                    Current Operations View</a></center>-->
+                                <a class="dropdown-item  text-light" id="menucurrentOperationsView" href="/mon/currentOp"><i class="fas fa-star"></i>
+                                    Current Operations View</a></center>
 
                         </div>
                     </li>
@@ -103,6 +104,14 @@
                   </a>
             <%    } %>
                 </li>
+                <li class="nav-item">
+                    <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
+                        <a class="nav-link" href="#" data-toggle="modal"
+                           data-target="#filamentModal" id=""><i class="fas fa-toilet-paper"></i> Filament</a>
+                    <% }else { %>
+                            <a class="nav-link notyet" href="#" data-toggle="modal"
+                               data-target="#filamentModal" id=""><i class="fas fa-toilet-paper"></i> Filament</a>
+                        <%    } %>
 <!--                 <li class="nav-item">
                   <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
                     <a class="nav-link" data-toggle="collapse" id="farmStatusBtn" href="#dashPanelCollapse"
@@ -138,23 +147,17 @@
                             data-target="#userModal" text-light" href="#"><i class="far fa-user"></i> <%= name %></a>
                             <a class="dropdown-item text-center  text-light" href="/users/logout"><i class="fas fa-sign-out-alt"></i>Sign Out</a>
                         <% }%>
-                        <h6 class="dropdown-header">Managment</h6>
-                        <% if(typeof userGroup != "undefined" && userGroup === "Administrator"){ %>
-                          <a class="dropdown-item  text-center text-light" href="#" data-toggle="modal"
-                          data-target="#printerSetupModal" id="printerSetup"><i class="fas fa-print"></i> Printers</a>
-                      <% }%>
-             
-                            <a class="dropdown-item  text-center text-light" href="#" data-toggle="modal"
-                            data-target="#filamentModal" id=""><i class="fas fa-toilet-paper"></i> Filament</a>
                         <h6 class="dropdown-header">Settings</h6>
                             <a class="dropdown-item  text-center  text-light" href="#" data-toggle="modal"
                             data-target="#clientSettingsModal" id="setClientSettingsBtn"><i class="fas fa-cog"></i>
                             Client</a>
-                            
-                          
-                          <a class="dropdown-item  text-center  text-light" href="#" data-toggle="modal"
-                            data-target="#serverSettingsModal" id="setServerBtn"><i class="fas fa-server"></i>
+
+                    <% if(typeof userGroup != "undefined" && userGroup === "Administrator"){ %>
+                        <a class="dropdown-item  text-center  text-light" href="#" data-toggle="modal"
+                           data-target="#serverSettingsModal" id="setServerBtn"><i class="fas fa-server"></i>
                             Server</a>
+                    <% }%>
+
 
                             <h6 class="dropdown-header">Help</h6> 
                             <a class="dropdown-item text-center  text-light" href="#" data-toggle="modal"
@@ -177,287 +180,86 @@
 
 
 
-        <div class="modal fade" id="printerSetupModal" tabindex="0" role="dialog" aria-labelledby="printerSetupLabel" aria-hidden="true">
-            <div class="modal-dialog modal-xl" role="document">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h3 class="modal-title" id="systemSettingsLabel">Printer Management</h3>
-                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                  <span class="text-white" aria-hidden="true">&times;</span>
-                </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="container-fluid">
-                            <div class="row">
-                                <div class="col-12 col-sm-12 col-md-12 col-lg-2 col-xl-2">
-                                    <div class="list-group" id="list-tab" role="tablist">
-                                        <a class="list-group-item list-group-item-action active" id="system-settings-list" data-toggle="list" href="#printer-add-edit" role="tab" aria-controls="home"><i class="fas fa-plus"></i> Add/Delete</a>
-                                        <a class="list-group-item list-group-item-action" id="system-dashboard-list" data-toggle="list" href="#printer-import-export" role="tab" aria-controls="profile"><i class="fas fa-file-import"></i> Import/Export</a>
-                                        <a class="list-group-item list-group-item-action" id="system-panel-view-list" data-toggle="list" href="#printer-remove-all" role="tab" aria-controls="messages"><i class="fas fa-trash-alt"></i> Remove All</a>
-                                    </div>
-                                </div>
-                                <div class="col-12 col-sm-12 col-md-12 col-lg-10 col-xl-10">
-                                    <div class="tab-content" id="nav-tabContent">
-                                        <div class="tab-pane fade show active" id="printer-add-edit" role="tabpanel" aria-labelledby="system-settings-list">
-                                            <h5>Add/Delete Printers</h5>
-                                            <hr>
-                                            <p>Please use the form below to add your printers to OctoFarm. Once added click the Save button to add them to the database.</p><p> If you have any connection issues please make sure CORS is activated on Octoprint's API settings page.</p>
-                                            <p>NOTE: If you would like to use your OctoPrint camera URL, leave it blank here and it will attempt to pull from Octoprint.</p>
-                                            <p>NOTE: You can omit http:// as the application only works with non-ssl ip:port style addresses. ssl and domain name are not supported at this time.</p>
-                                            <div id="message"></div>
-                                            <form>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text" id="">IP: </span>
-                                                    </div>
-                                                    <input type="text" class="form-control" placeholder="192.168.1.5" id="printerIP">
-                                                </div>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text" id="">Port: </span>
-                                                    </div>
-                                                    <input type="text" class="form-control" placeholder="80" id="printerPort">
-                                                </div>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text" id="basic-addon3">Camera URL: </span>
-                                                    </div>
-                                                    <input type="text" class="form-control" placeholder="192.168.1.5:8081/webcam/?action=stream" id="printerCamURL">
-                                                </div>
-                                                <div class="input-group mb-3">
-                                                    <div class="input-group-prepend">
-                                                        <span class="input-group-text" id="basic-addon3">ApiKey</span>
-                                                    </div>
-                                                    <input type="text" class="form-control" placeholder="OctoPrints API Key" id="printerApiKey">
-                                                </div>
-                                                <button id="addPrinterLine" class="btn btn-primary btn-block"><i class="fas fa-plus"></i> Add Printer</button>
-                                                <button id="editPrinters" class="btn btn-info btn-block d-none"><i class="fas fa-edit"></i> Edit Printers</button>
+<!--    -->
+<!--        <div class="modal fade" id="multiUploadModal" tabindex="0" role="dialog" aria-labelledby="multiUploadLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">-->
+<!--          <div class="modal-dialog modal-xl" role="document">-->
+<!--              <div class="modal-content">-->
+<!--                  <div class="modal-header">-->
+<!--                      <h3 class="modal-title" id="systemSettingsLabel">Multi-Upload</h3>-->
+<!--                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">-->
+<!--                <span class="text-white" aria-hidden="true">&times;</span>-->
+<!--              </button>-->
+<!--                  </div>-->
+<!--                  <div class="modal-body">-->
+<!--                      <div class="container-fluid">-->
+<!--                          <div class="row">-->
+<!--                              <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12  text-center">-->
+<!--                                <div class="btn-group" role="group" aria-label="Basic example">-->
+<!--                                  <button id="multiPrinterBtn" class="btn btn-danger">1. Choose your printers..</button>-->
+<!--                                  <button id="multiFolder" class="btn btn-warning hidden" disabled>2. Choose your folder path..</button>-->
+<!--                                  <button id="multiFile" class="btn btn-success" disabled>3. Select your files..</button>-->
+<!--                                </div>-->
 
+<!--                              </div>-->
+<!--                              <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">-->
+<!--                                <div id="multiPrintersSection" class="col-lg-12">-->
+<!--                                  <p>Check the boxes below to select the printers you'd like to upload files too. (Only idle printers available for selection...)</p>-->
+<!--                                  <p><b>Note:</b> You must select at least 2 printers.</p>-->
+<!--                                  <% if (typeof printers != 'undefined'){ %>-->
+<!--                                    <% for(let i=0;i < printers.length;i++){%>-->
+<!--                                      <% if(printers[i].stateColour.category === "Idle" || printers[i].stateColour.category === "Complete"){%>-->
+<!--                                        <form class="was-validated form-check-inline form-check">-->
+<!--                                          <div class="custom-control custom-checkbox mb-2 pr-2">-->
+<!--                                            <input type="checkbox" class="custom-control-input" id="multiUpPrinters-<%= printers[i].index %>" value="<%= printers[i].index %>" required>-->
+<!--                                           <label class="custom-control-label" for="multiUpPrinters-<%= printers[i].index %>"><%= printers[i].index %>. <% if(typeof printers[i].settingsApperance != 'undefined'){ %> <%= printers[i].settingsApperance.name %> <%}%></label>-->
+<!--                                            <div class="invalid-feedback">Not this printer</div>-->
+<!--                                            <div class="valid-feedback">-->
+<!--                                              Sending to this printer-->
+<!--                                            </div>-->
+<!--                                          </div>-->
+<!--                                          </form>-->
+<!--                                      <% } %>-->
+<!--       -->
+<!--                                      <%}%>-->
+<!--                                  <% } %>-->
 
-                                               
-                                            </form>
-                                            <hr>
-                                            <table class="table table-responsive-sm table-respsonsive-md col-lg-12">
-                                                <thead>
-                                                    <tr>
-                                                        <th scope="col" width="150px">IP Address</th>
-                                                        <th scope="col" width="100px">Port Number</th>
-                                                        <th scope="col">Camera URL</th>
-                                                        <th scope="col" width="200px">API Key</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody id="addPrintersTable">
-                                                  
-                                                    <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
-                                                        <%- include('./partials/Printers/printerTable.ejs') %>
-                                                    <% } %>
-                                                </tbody>
-                                            </table>
-                                        </div>
-                <div
-                  class="tab-pane fade"
-                  id="printer-import-export"
-                  role="tabpanel"
-                  aria-labelledby="system-dashboard-list"
-                >
-                  <h5>Import Printer List</h5>
-                  <hr>
-                  <p>
-                    Please use the select button below to import a
-                    pre-configured file containing your printers list. (This
-                    will completely replace your printers list).
-                  </p>
-                  <p>
-                    You can download an example import file here:
-                    <a
-                      class="text-info"
-                      href="printers.json"
-                      download
-                      target="_blank"
-                      >Import Example</a
-                    >
-                  </p>
-                  <form id="uploadFileModalContentForm" class="text-center">
-                    <p>Use the Select button to upload your file.</p>
-                    <input
-                      class="fileElem"
-                      type="file"
-                      id="importFileBtn"
-                      accept=".json"
-                    /><label
-                      class="btn btn-lg btn-primary btn-block"
-                      for="importFileBtn"
-                      >Select</label
-                    >
-                  </form>
-                  <br />
-                  <h5>Export Printer List</h5>
-                  <hr />
-                  <p>
-                    Click the button below to export a full list of your
-                    printers saved in OctoFarm.
-                  </p>
-                  <center>
-                    <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
-                        <button
-                        id="exportPrintersBtn"
-                        type="button"
-                        class="btn btn-lg btn-primary btn-lg btn-block"
-                        
-                      >
-                        Export Printers Database</button
-                      ><br />
-                    <% }else{ %>
-                        <button
-                        id="exportPrintersBtn"
-                        type="button"
-                        class="btn btn-lg btn-primary btn-lg btn-block"
-                        disabled
-                      >
-                        Export Printers Database</button
-                      ><br />
-                    <% } %>
-                   
-                  </center>
-                </div>
-                <div
-                  class="tab-pane fade"
-                  id="printer-remove-all"
-                  role="tabpanel"
-                  aria-labelledby="system-panel-view-list"
-                >
-                  <h5>Remove All Printers</h5>
-                  <hr>
-                  <p>
-                    This will remove all of your printers, it is unreversable so
-                    if you'd like to keep a backup of your printer list please
-                    use the Import/Export settings.
-                  </p>
-                  <p>Press save to complete the printer wipe.</p>
-                  <p>
-                    You have <span id="printerAmmount"><% if(typeof printerCount != 'undefined'){ %>
-                        <%= printerCount %>
-                    <% } else {%>
-                        0
-                        <% } %>
-                </span> stored in
-                    the database.
-                  </p>
-                  <center>
-                    <% if(typeof printerCount != 'undefined' && printerCount > 0){ %>
-                        <button
-                        id="deletePrintersBtn"
-                        type="button"
-                        class="btn btn-danger btn-lg btn-block"
-                        
-                      >
-                        Delete Printers Database</button
-                      ><br />
-                    <% }else{ %>
-                        <button
-                        id="deletePrintersBtn"
-                        type="button"
-                        class="btn btn-danger btn-lg btn-block"
-                        disabled
-                      >
-                        Delete Printers Database</button
-                      ><br />
-                    <% } %>
+<!--                                </div>-->
+<!--                                <div id="multiFolderSection" class="col-lg-12 hidden">-->
+<!--                                  <p id="multiSelectedPrinters"></p>-->
+<!--                                  <p>Would you like to create a folder too?</p>-->
+<!--                                  <p><b>Note:</b> Leaving blank will create the files in local, otherwise they will be put inside your newly created folder...</p>-->
+<!--                                  <input id="multiNewFolder" class="form-control bg-dark text-light" type="text" placeholder="Please type your new folder name here..." aria-label="NewFolder">-->
+<!--                                </div>-->
+<!--                                <div id="multiFileSection" class="col-lg-12 hidden">-->
+<!--                                  <p id="multiSelectedPrinters2"></p>-->
+<!--                                  <form class="was-validated form-check-inline form-check">-->
+<!--                                    <div class="custom-control custom-checkbox mb-2 pr-2">-->
+<!--                                      <input type="checkbox" class="custom-control-input" id="printOnLoadBtn" required>-->
+<!--                                       <label class="custom-control-label" for="printOnLoadBtn">Would you like to print after upload? (Global Effect...)</label>-->
+<!--                                      <div class="invalid-feedback">Do not print after upload...</div>-->
+<!--                                      <div class="valid-feedback">-->
+<!--                                        Print after upload...-->
+<!--                                      </div>-->
+<!--                                    </div>-->
+<!--                                    </form>-->
+<!--                                  <p><b>Note:</b> If the print on successful upload action is enabled above, you may only upload a single file to your printers.</p>-->
+<!--                                  <label id="multiFileUploadBtnLabel" class="btn btn-success m-3 float-left" for="multiFileUploadBtn"><i class="fas fa-file-import"></i> Upload File's</label>-->
+<!--                                  <input id="multiFileUploadBtn" multiple accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left">-->
+<!--                                  <br>-->
+<!--                                  <p id="multiFileSelectedNow"></p>-->
+<!--                                </div>-->
 
-                  </center>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button id="printerSaveBtn" type="button" class="btn btn-success" data-dismiss="modal">
-          Save
-        </button>
-      </div>
-    </div>
-  </div>
-        </div>
-        <div class="modal fade" id="multiUploadModal" tabindex="0" role="dialog" aria-labelledby="multiUploadLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-          <div class="modal-dialog modal-xl" role="document">
-              <div class="modal-content">
-                  <div class="modal-header">
-                      <h3 class="modal-title" id="systemSettingsLabel">Multi-Upload</h3>
-                      <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span class="text-white" aria-hidden="true">&times;</span>
-              </button>
-                  </div>
-                  <div class="modal-body">
-                      <div class="container-fluid">
-                          <div class="row">
-                              <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12  text-center">
-                                <div class="btn-group" role="group" aria-label="Basic example">
-                                  <button id="multiPrinterBtn" class="btn btn-danger">1. Choose your printers..</button>
-                                  <button id="multiFolder" class="btn btn-warning hidden" disabled>2. Choose your folder path..</button>
-                                  <button id="multiFile" class="btn btn-success" disabled>3. Select your files..</button>
-                                </div>
+<!--                         -->
+<!--          </div>-->
+<!--        </div>-->
+<!--      </div>-->
+<!--    </div>-->
+<!--    <div id="multiUploadFooter" class="modal-footer">-->
 
-                              </div>
-                              <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-                                <div id="multiPrintersSection" class="col-lg-12">
-                                  <p>Check the boxes below to select the printers you'd like to upload files too. (Only idle printers available for selection...)</p>
-                                  <p><b>Note:</b> You must select at least 2 printers.</p>
-                                  <% if (typeof printers != 'undefined'){ %>
-                                    <% for(let i=0;i < printers.length;i++){%>
-                                      <% if(printers[i].stateColour.category === "Idle" || printers[i].stateColour.category === "Complete"){%>
-                                        <form class="was-validated form-check-inline form-check">
-                                          <div class="custom-control custom-checkbox mb-2 pr-2">
-                                            <input type="checkbox" class="custom-control-input" id="multiUpPrinters-<%= printers[i].index %>" value="<%= printers[i].index %>" required>
-                                           <label class="custom-control-label" for="multiUpPrinters-<%= printers[i].index %>"><%= printers[i].index %>. <% if(typeof printers[i].settingsApperance != 'undefined'){ %> <%= printers[i].settingsApperance.name %> <%}%></label>
-                                            <div class="invalid-feedback">Not this printer</div>
-                                            <div class="valid-feedback">
-                                              Sending to this printer
-                                            </div>
-                                          </div>
-                                          </form>
-                                      <% } %>
-       
-                                      <%}%>
-                                  <% } %>
-
-                                </div>
-                                <div id="multiFolderSection" class="col-lg-12 hidden">
-                                  <p id="multiSelectedPrinters"></p>
-                                  <p>Would you like to create a folder too?</p>
-                                  <p><b>Note:</b> Leaving blank will create the files in local, otherwise they will be put inside your newly created folder...</p>
-                                  <input id="multiNewFolder" class="form-control bg-dark text-light" type="text" placeholder="Please type your new folder name here..." aria-label="NewFolder">
-                                </div>
-                                <div id="multiFileSection" class="col-lg-12 hidden">
-                                  <p id="multiSelectedPrinters2"></p>
-                                  <form class="was-validated form-check-inline form-check">
-                                    <div class="custom-control custom-checkbox mb-2 pr-2">
-                                      <input type="checkbox" class="custom-control-input" id="printOnLoadBtn" required>
-                                       <label class="custom-control-label" for="printOnLoadBtn">Would you like to print after upload? (Global Effect...)</label>
-                                      <div class="invalid-feedback">Do not print after upload...</div>
-                                      <div class="valid-feedback">
-                                        Print after upload...
-                                      </div>
-                                    </div>
-                                    </form>
-                                  <p><b>Note:</b> If the print on successful upload action is enabled above, you may only upload a single file to your printers.</p>
-                                  <label id="multiFileUploadBtnLabel" class="btn btn-success m-3 float-left" for="multiFileUploadBtn"><i class="fas fa-file-import"></i> Upload File's</label>
-                                  <input id="multiFileUploadBtn" multiple accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left">
-                                  <br>
-                                  <p id="multiFileSelectedNow"></p>
-                                </div>
-
-                         
-          </div>
-        </div>
-      </div>
-    </div>
-    <div id="multiUploadFooter" class="modal-footer">
-
-    </div>
-  </div>
-</div>
-      </div>
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+<!--      </div>-->
 
 
       <div class="modal fade" id="aboutOctoFarm" tabindex="-1" role="dialog" aria-labelledby="aBoutModal" aria-hidden="true">
@@ -476,12 +278,7 @@
                             currently for monitoring and managing multiple Octoprint attached printers. <br>If you would like to say thanks to James for designing this free and open source software package then feel free to send him a donation using the
                             button below.</p>
                         <p><a href="https://www.patreon.com/bePatron?u=19808757" target="_blank"><button type="button" class="btn btn-danger">Become a Patreon!</button></a></p>
-                        <form action="https://www.paypal.com/cgi-bin/webscr" method="post" target="_top">
-                            <input type="hidden" name="cmd" value="_s-xclick" />
-                            <input type="hidden" name="hosted_button_id" value="QGBJML3E7268L" />
-                            <input type="image" src="https://www.paypalobjects.com/en_US/GB/i/btn/btn_donateCC_LG.gif" border="0" name="submit" title="PayPal - The safer, easier way to pay online!" alt="Donate with PayPal button" />
-                            <img alt="" border="0" src="https://www.paypal.com/en_GB/i/scr/pixel.gif" width="1" height="1" />
-                        </form>
+                        <p><a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QGBJML3E7268L&source=url" target="_blank"><button type="button" class="btn btn-info">Paypal Donation!</button></a></p>
                     </center>
                     <center>
                         <div class="row"><div class="col-12">
@@ -492,7 +289,7 @@
                                     <li class="list-group-item">Kyle Menigoz <i style="color:gold;" class="fas fa-trophy"></i></li>
                                     <li class="list-group-item">Insertion <i style="color:gold;" class="fas fa-trophy"></i></li>
                                     <li class="list-group-item">Iago Iglesias Pose <i style="color:gold;" class="fas fa-trophy"></i></li>
-                                    <li class="list-group-item">Guy Barton< <i style="color:gold;" class="fas fa-trophy"></i></li>
+                                    <li class="list-group-item">Guy Barton<i style="color:gold;" class="fas fa-trophy"></i></li>
 
                             </ul>
                         </div></div>
@@ -587,7 +384,7 @@
                                       <form class="was-validated">
                                         <div class="custom-control custom-checkbox mb-3">
                                           <input type="checkbox" class="custom-control-input" id="panelHideClosed" required>
-                                          <label class="custom-control-label" for="panelHideClosed">Hide Closed</label>
+                                          <label class="custom-control-label" for="panelHideClosed">Hide Disconnected</label>
                                           <div class="valid-feedback">Closed printers will be hidden from the panel view.</div>
                                           <div class="invalid-feedback">Closed printers will be shown on the panel view.</div>
                                         </div>
@@ -615,7 +412,7 @@
                                       <form class="was-validated">
                                         <div class="custom-control custom-checkbox mb-3">
                                           <input type="checkbox" class="custom-control-input" id="listHideClosed" required>
-                                          <label class="custom-control-label" for="listHideClosed">Hide Closed</label>
+                                          <label class="custom-control-label" for="listHideClosed">Hide Disconnected</label>
                                           <div class="valid-feedback">Closed printers will be hidden from the panel view.</div>
                                           <div class="invalid-feedback">Closed printers will be shown on the panel view.</div>
                                         </div>
@@ -652,7 +449,7 @@
                                       <form class="was-validated">
                                         <div class="custom-control custom-checkbox mb-3">
                                           <input type="checkbox" class="custom-control-input" id="cameraHideClosed" required>
-                                          <label class="custom-control-label" for="cameraHideClosed">Hide Closed</label>
+                                          <label class="custom-control-label" for="cameraHideClosed">Hide Disconnected</label>
                                           <div class="valid-feedback">Closed printers will be hidden from the panel view.</div>
                                           <div class="invalid-feedback">Closed printers will be shown on the panel view.</div>
                                         </div>
@@ -713,14 +510,125 @@
         </div>
     </div>
 </div>
+        <div class="modal fade" id="printerSettingsModal" tabindex="-1" role="dialog" aria-labelledby="printerSettingsModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl" role="document">
+                <div class="modal-content bg-dark text-light">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="printerSettingsTitle">Printer Settings:</h5>
+                        <h5 class="modal-title" id="printerSettingsIndex" style="display: none;"></h5>
+                        <span id="printerIndex" value=""></span>
+                        <button id="printerSettingsModalBtn" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span class="text-white" aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-12 col-sm-12 col-md-12 col-lg-1 col-xl-1">
+                                    <div class="list-group" id="list-tab" role="tablist">
+                                        <a class="list-group-item list-group-item-action" id="printer-connection-btn" data-toggle="list" href="#printer-connection" role="tab" aria-controls="messages"><i class="fas fa-cog"></i> Connection</a>
+                                        <a class="list-group-item list-group-item-action" id="printer-profile-btn" data-toggle="list" href="#printer-profile" role="tab" aria-controls="messages"><i class="fas fa-cog"></i> Profile</a>
+                                        <a class="list-group-item list-group-item-action" id="printer-settings-btn" data-toggle="list" href="#printer-settings" role="tab" aria-controls="messages"><i class="fas fa-cog"></i> Settings</a>
+                                        <a class="list-group-item list-group-item-action" id="printer-alerts-btn" data-toggle="list" href="#printer-alerts" role="tab" aria-controls="home"><i class="far fa-bell"></i> Alerts</a>
+                                        <a class="list-group-item list-group-item-action" id="printer-power-btn" data-toggle="list" href="#printer-power" role="tab" aria-controls="messages"><i class="fas fa-plug"></i> Power</a>
+                                        <a class="list-group-item list-group-item-action" id="printer-gcode-btn" data-toggle="list" href="#printer-gcode" role="tab" aria-controls="messages"><i class="fas fa-pen"></i> Gcode Scripts</a>
+                                    </div>
+                                </div>
+                                <div class="col-12 col-sm-12 col-md-12 col-lg-11 col-xl-11">
+                                    <div class="tab-content" id="nav-tabContent">
+                                        <div class="tab-pane fade" id="printer-control" role="tabpanel" aria-labelledby="system-settings-list">
+                                            <h5>Printer Controls</h5>
+                                            <hr>
 
+
+                                        </div>
+
+                                        <div class="tab-pane fade show active" id="printer-connection" role="tabpanel" aria-labelledby="system-panel-view-list">
+                                            <h5>OctoPrint</h5>
+                                            <hr>
+                                            <div id="octoPrintControl">
+                                                <div class="row align-items-center">
+<!--                                                    <div class="col-lg-3" id="printerWeb">-->
+
+<!--                                                    </div>-->
+<!--                                                    <div class="col-lg-3" id="printerRestart">-->
+
+<!--                                                    </div>-->
+<!--                                                    <div class="col-lg-3" id="printerReboot">-->
+
+<!--                                                    </div>-->
+<!--                                                    <div class="col-lg-3" id="printerShutdown">-->
+
+<!--                                                    </div>-->
+                                                </div>
+
+                                                <div class="row align-items-center">
+                                                    <div class="col-lg-12">
+                                                        <h5>Connection Information</h5>
+                                                        <hr>
+                                                    </div>
+<!--                                                    <div class="col-lg-3" id="printerPortDrop">-->
+
+<!--                                                    </div>-->
+<!--                                                    <div class="col-lg-3" id="printerBaudDrop">-->
+
+<!--                                                    </div>-->
+<!--                                                    <div class="col-lg-3" id="printerProfileDrop">-->
+
+<!--                                                    </div>-->
+<!--                                                    <div class="col-lg-3" id="printerConnect">-->
+
+<!--                                                    </div>-->
+                                                </div>
+                                                <div class="row">
+<!--                                                    <div class="col-lg-12" id="printerInformation">-->
+
+<!--                                                    </div>-->
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="printer-plugins" role="tabpanel" aria-labelledby="system-panel-view-list">
+
+                                        </div>
+                                        <div class="tab-pane fade" id="printer-gcode" role="tabpanel" aria-labelledby="system-panel-view-list">
+                                            <h5>Gcode Scripts</h5>
+                                            <hr>
+                                            <p>NOTE: OctoPrint doesn't seem to update the API with this information straight away. If it doesn't seem to update after clicking the "Save Changes" button then please check there to see if your values have saved. </p>
+                                            <div id="printerManagerGcode">
+
+                                            </div>
+                                        </div>
+                                        <div class="tab-pane fade" id="printer-settings" role="tabpanel" aria-labelledby="system-settings-list">
+                                            <h5>Printer Settings</h5>
+                                            <hr>
+                                            <div class="col-lg-12" id="printerInformation">
+
+                                            </div>
+                                            <div id="printerManagerSettings">
+                                                <h5>Camera Rotation</h5>
+                                                <hr>
+                                                <div id="cameraRotation">
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer" id="printerSettingsFooter">
+
+                    </div>
+                </div>
+            </div>
+        </div>
 <div class="modal fade" id="printerManagerModal" tabindex="-1" role="dialog" aria-labelledby="printerManagerModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
       <div class="modal-content bg-dark text-light">
-          <div class="modal-header">
-              <h5 class="modal-title" id="printerManagerTitle">Octoprint Manager:</h5>
-              <h5 class="modal-title" id="printerIndex" style="display: none;"></h5>
-              <span id="printerIndex" value=""></span>
+          <div class="modal-header px-3">
+              <h5 class="modal-title" id="printerManagerTitle">Printer Control:</h5>
+              <span id="printerIndex" value="" style="display: none;"></span>
               <button id="printerManagerModalBtn" type="button" class="close" data-dismiss="modal" aria-label="Close">
         <span class="text-white" aria-hidden="true">&times;</span>
       </button>
@@ -728,120 +636,34 @@
           <div class="modal-body">
               <div class="container-fluid">
                   <div class="row">
-                      <div class="col-12 col-sm-12 col-md-12 col-lg-2 col-xl-2">
-                          <div class="list-group" id="list-tab" role="tablist">
-                                  <button id="pmStatus" type="button" class="btn btn-warning mb-2" href="#" target="_blank" disabled>STATUS</button>
-                              <a class="list-group-item list-group-item-action active" id="printer-connection-btn" data-toggle="list" href="#printer-connection" role="tab" aria-controls="messages"><i class="fas fa-print"></i> Printer</a>
-                              <a class="list-group-item list-group-item-action" id="printer-control-btn" data-toggle="list" href="#printer-control" role="tab" aria-controls="home"><i class="fas fa-gamepad"></i> Control</a>
-                              <a class="list-group-item list-group-item-action" id="printer-terminal-btn" data-toggle="list" href="#printer-terminal" role="tab" aria-controls="home"><i class="fas fa-terminal"></i> Terminal</a>
-                              <a class="list-group-item list-group-item-action" id="printer-plugins-btn" data-toggle="list" href="#printer-plugins" role="tab" aria-controls="messages"><i class="fas fa-plug"></i> Plugins</a>
-                              <a class="list-group-item list-group-item-action" id="printer-gcode-btn" data-toggle="list" href="#printer-gcode" role="tab" aria-controls="messages"><i class="fas fa-pen"></i> Gcode Scripts</a>
-                              <a class="list-group-item list-group-item-action" id="printer-settings-btn" data-toggle="list" href="#printer-settings" role="tab" aria-controls="messages"><i class="fas fa-cog"></i> Settings</a>
+                          <div class="col-12 col-sm-12 col-md-12 col-lg-2 col-xl-2 text-center" id="status">
+                              <button id="pmStatus" type="button" class="btn btn-warning mb-2 " href="#" target="_blank" disabled>Checking..</button>
                           </div>
-                      </div>
-                      <div class="col-12 col-sm-12 col-md-12 col-lg-10 col-xl-10">
-                          <div class="tab-content" id="nav-tabContent">
-                            <div class="tab-pane fade" id="printer-terminal" role="tabpanel" aria-labelledby="system-settings-list">
-                              <h5>Printer Terminal</h5>
-                              <hr>
-                              <div id="printerTerminal">
- 
-                              </div>
-                              <div class="input-group mb-3">
-                                <input id="terminalInput" type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon2">
-                                <div class="input-group-append">
-                                  <button id="terminalInputBtn" class="btn btn-seondary" type="submit">Send</button>
-                                </div>
-                              </div>
-                          </div>
-                              <div class="tab-pane fade" id="printer-control" role="tabpanel" aria-labelledby="system-settings-list">
-                                  <h5>Printer Controls</h5>
-                                  <hr>
-                                  <div id="printerControls"></div>
+                          <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3" id="printerPortDrop">
 
-                              </div>
+                                                                  </div>
+                          <div class="col-12 col-sm-12 col-md-6 col-lg-2 col-xl-2" id="printerBaudDrop">
 
-                              <div class="tab-pane fade show active" id="printer-connection" role="tabpanel" aria-labelledby="system-panel-view-list">
-                                  <h5>OctoPrint</h5>
-                                  <hr>
-                                  <div id="octoPrintControl">
-                                      <div class="row align-items-center">
-                                          <div class="col-lg-3" id="printerWeb">
+                                                                  </div>
+                          <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3" id="printerProfileDrop">
 
-                                          </div>
-                                          <div class="col-lg-3" id="printerRestart">
+                                                                  </div>
+                          <div class="col-12 col-sm-12 col-md-6 col-lg-2 col-xl-2" id="printerConnect">
 
-                                          </div>
-                                          <div class="col-lg-3" id="printerReboot">
-
-                                          </div>
-                                          <div class="col-lg-3" id="printerShutdown">
-
-                                          </div>
-                                      </div>
-
-                                      <div class="row align-items-center">
-                                          <div class="col-lg-12">
-                                              <h5>Connection Information</h5>
-                                              <hr>
-                                          </div>
-                                          <div class="col-lg-3" id="printerPortDrop">
-
-                                          </div>
-                                          <div class="col-lg-3" id="printerBaudDrop">
-
-                                          </div>
-                                          <div class="col-lg-3" id="printerProfileDrop">
-
-                                          </div>
-                                          <div class="col-lg-3" id="printerConnect">
-
-                                          </div>
-                                      </div>
-                                      <div class="row">
-                                          <div class="col-lg-12" id="printerInformation">
-                                              
-                                          </div>
-                                      </div>
-                                  </div>
-                              </div>
-                              <div class="tab-pane fade" id="printer-plugins" role="tabpanel" aria-labelledby="system-panel-view-list">
-                                  <h5>Octoprint Plugins</h5>
-                                  <hr>
-                                  <p>Below you will see a list of all your plugins, and whether they are supported. </p><p> If your {insert praise here} plugin isn't supported by OctoFarm then please visit <a target="_blank" href="https://feathub.com/NotExpectedYet">OctoFarms Feature Request Page</a> and log it there.<br>
-                                      <div id="printerManagerPlugins">
-
-                                      </div>
-                              </div>
-                              <div class="tab-pane fade" id="printer-gcode" role="tabpanel" aria-labelledby="system-panel-view-list">
-                                  <h5>Gcode Scripts</h5>
-                                  <hr>
-                                  <div id="printerManagerGcode">
-
-                                  </div>
-                              </div>
-                              <div class="tab-pane fade" id="printer-settings" role="tabpanel" aria-labelledby="system-settings-list">
-                                  <h5>Printer Settings</h5>
-                                  <hr>
-                                  <div class="col-lg-12" id="printerInformation">
-
-                                  </div>
-                                  <div id="printerManagerSettings">
-                                      <h5>Camera Rotation</h5>
-                                      <hr>
-                                      <div id="cameraRotation">
-
-                                      </div>
-                                  </div>
-                              </div>
-                          </div>
+                                                                  </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                        <div id="printerControls"></div>
                       </div>
                   </div>
               </div>
           </div>
           <div class="modal-footer" id="printerManagerFooter">
-
-            </div>
+              <button id="" type="button" class="btn btn-light" data-dismiss="modal">
+                  Close
+              </button>
+          </div>
       </div>
   </div>
 </div>
@@ -1098,7 +920,7 @@ Close
     <script src="/js/vendor/lodash.min.js"></script>
     <script src="/js/vendor/bootbox.min.js"></script>
     <script src="/js/vendor/noty.js"></script>
-    <script src="/js/printerManagement.js" type="module"></script>
+<!--    <script src="/js/printerManagement.js" type="module"></script>-->
     <script src="/js/filamentManagement.js" type="module"></script>
     <script src="/js/lib/modules/printerManager.js" type="module"></script>
     <script src="/js/settings.js" type="module"></script>
