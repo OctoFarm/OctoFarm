@@ -8,19 +8,9 @@ let farmStats = [];
 
 class StatisticsCollection {
   static returnStats() {
-    if(typeof farmStats[0].currentOperationsCount === 'undefined') {
-      farmStats[0].currentOperationsCount = this.blankCurrentCount()
-    }
-    if(typeof farmStats[0].currentOperations === 'undefined'){
-      farmStats[0].currentOperations = [];
-    }
-    if(typeof farmStats[0].printStatistics === 'undefined'){
-      farmStats[0].printStatistics = this.blankFarmStatistics()
-    }
     return farmStats[0];
   }
   static async init() {
-    console.log("Setting up Statistics Collection");
     farmStats = await FarmStatistics.find({});
     let farmInfo = await this.blankFarmInfo();
     let currentOperations = [];
@@ -54,54 +44,67 @@ class StatisticsCollection {
     let active = [];
     let idle = [];
     let offline = [];
+    let disconnected = [];
     let progress = [];
     let closed = [];
     try {
       farmPrinters.forEach(printer => {
         let name = "";
         if (typeof printer.settingsApperance != "undefined") {
-          name = printer.settingsApperance.name;
+          if (printer.settingsApperance.name === "" || printer.settingsApperance.name === null) {
+            name = printer.printerURL;
+          } else {
+            name = printer.settingsApperance.name;
+          }
+        } else {
+          name = printer.printerURL;
         }
         if (typeof printer.stateColour != "undefined") {
           if (printer.stateColour.category === "Idle") {
-            idle.push(printer.index);
+            idle.push(printer._id);
           }
           if (
-            printer.stateColour.category === "Offline" ||
-            printer.stateColour.category === "Closed"
+            printer.stateColour.category === "Offline"
           ) {
-            offline.push(printer.index);
+            offline.push(printer._id);
           }
+          if (
+              printer.stateColour.category === "Disconnected"
+          ) {
+            disconnected.push(printer._id);
+          }
+
         }
         if (typeof printer.state != undefined && printer.state === "Closed") {
-          closed.push(printer.index);
+          closed.push(printer._id);
         }
         
         if (
           typeof printer.stateColour != "undefined" &&
           typeof printer.progress != "undefined"
         ) {
+          let id = printer._id
+          id = id.toString();
           if (printer.stateColour.category === "Complete") {
-            complete.push(printer.index);
+            complete.push(printer._id);
             progress.push(printer.progress.completion);
 
             currentOperations.push({
-              index: printer.index,
+              index: id,
               name: name,
               progress: Math.floor(printer.progress.completion),
               progressColour: "success",
               timeRemaining: printer.progress.printTimeLeft
             });
           }
-
           if (
             printer.stateColour.category === "Active" &&
             typeof printer.progress != "undefined"
           ) {
-            active.push(printer.index);
+            active.push(printer._id);
             progress.push(printer.progress.completion);
             currentOperations.push({
-              index: printer.index,
+              index: id,
               name: name,
               progress: Math.floor(printer.progress.completion),
               progressColour: "warning",
@@ -128,6 +131,7 @@ class StatisticsCollection {
       currentOperationsCount.active = active.length;
       currentOperationsCount.offline = offline.length;
       currentOperationsCount.idle = idle.length;
+      currentOperationsCount.disconnected = disconnected.length;
       currentOperationsCount.closed = closed.length;
       currentOperations = _.orderBy(currentOperations, ["progress"], ["desc"]);
       farmStats[0].currentOperations = currentOperations;
@@ -247,7 +251,7 @@ class StatisticsCollection {
     farmPrinters.forEach((printer, index) => {
       if (typeof printer.storage != "undefined") {
         let device = {
-          ip: printer.ip,
+          ip: printer.printerURL,
           index: printer.index,
           storage: printer.storage
         };
@@ -413,6 +417,7 @@ class StatisticsCollection {
       offline: 0,
       active: 0,
       idle: 0,
+      disconnected: 0,
       farmProgress: 0,
       farmProgressColour: "danger"
     };
