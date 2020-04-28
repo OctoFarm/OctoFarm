@@ -5,35 +5,17 @@ const flash = require("connect-flash");
 const session = require("express-session");
 const passport = require("passport");
 const serverConfig = require("./serverConfig/server");
-const winston = require('winston');
-const fs = require('fs');
+const Logger = require('./lib/logger.js');
+const logger = new Logger('OctoFarm-Server')
+
+
+
 
 //Server Port
 const PORT = process.env.PORT || serverConfig.port;
 
 const app = express();
 
-//Logging
-const { createLogger, format, transports } = winston;
-
-const logger = createLogger({
-  format: format.combine(
-    format.timestamp(),
-    format.simple()
-  ),
-  transports: [
-    new transports.Console({
-      format: format.combine(
-        format.timestamp(),
-        format.colorize(),
-        format.simple()
-      )
-    }),
-    new transports.Stream({
-      stream: fs.createWriteStream('./logs/OctoFarm-Server.log')
-    })
-  ]
-})
 
 //Passport Config
 require("./config/passport.js")(passport);
@@ -76,7 +58,7 @@ app.use((req, res, next) => {
 });
 
 //Routes
-app.use(express.static(__dirname + "/views"));
+app.use(express.static(__dirname + '/views'));
 if (db === "") {
   app.use("/", require("./routes/index", { page: "route" }));
 } else {
@@ -112,8 +94,7 @@ let serverStart = async function() {
   logger.info("Starting System Printers Runner...");
   const runner = require("./runners/state.js");
   const Runner = runner.Runner;
-  let r = await Runner.init();
-  logger.info(r);
+  let r = Runner.init();
   logger.info("Starting System Information Runner...");
   const system = require("./runners/systemInfo.js");
   const SystemRunner = system.SystemRunner;
