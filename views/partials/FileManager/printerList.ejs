@@ -1,8 +1,9 @@
-<% sortedIndex.forEach(sorted => { %>  <% printers[sorted.actualIndex].state%> <%
+<% sortedIndex.forEach(sorted => { %>  <% printers[sorted.actualIndex].state %> <%
 if(printers[sorted.actualIndex].state != "Offline" && typeof printers[sorted.actualIndex].current != 'undefined'){ %>
 <!-- Connected -->
+
   <a
-    id="printer-<%= printers[sorted.actualIndex].index %>"
+    id="fileManagerPrinter-<%= printers[sorted.actualIndex]._id %>"
     href="#"
     class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
     style="display: block;
@@ -18,11 +19,20 @@ if(printers[sorted.actualIndex].state != "Offline" && typeof printers[sorted.act
       <div class="col-lg-10">
         <div class="d-flex w-100 justify-content-between">
           <h5 class="mb-1">
-            <%= printers[sorted.actualIndex].index %>.
-            <span id="printerName-<%= printers[sorted.actualIndex].index %>"
-              ><% if(typeof printers[sorted.actualIndex].settingsApperance != 'undefined'){ %> <%=
-              printers[sorted.actualIndex].settingsApperance.name %> <% } %></span
-            >
+            <span id="printerName-<%= printers[sorted.actualIndex]._id %>">
+              <% console.log("Name = " + printers[sorted.actualIndex].settingsApperance.name) %>
+              <% if(typeof printers[sorted.actualIndex].settingsApperance !== 'undefined'){ %>
+              <% if(printers[sorted.actualIndex].settingsApperance.name === "" || printers[sorted.actualIndex].settingsApperance.name === null){%>
+                            <%= printers[sorted.actualIndex].printerURL %>
+                <% }else{ %>
+
+                  <%= printers[sorted.actualIndex].settingsApperance.name %>
+                <% }%>
+              <% }else{ %>
+
+                      <%= printers[sorted.actualIndex].printerURL %>
+              <%  } %></span>
+
           </h5>
           <small>
             <span class="float-right badge badge-dark badge-pill">
@@ -49,12 +59,12 @@ if(printers[sorted.actualIndex].state != "Offline" && typeof printers[sorted.act
         <div class="row">
           <div class="col-lg-2">
             <i class="fas fa-file-upload"></i
-            ><span id="fileCounts-<%= printers[sorted.actualIndex].index %>"> 0 </span>
+            ><span id="fileCounts-<%= printers[sorted.actualIndex]._id %>"> 0 </span>
           </div>
           <div class="col-lg-10">
             <div class="progress">
               <div
-                id="fileProgress-<%= printers[sorted.actualIndex].index %>"
+                id="fileProgress-<%= printers[sorted.actualIndex]._id %>"
                 class="progress-bar progress-bar-striped bg-warning"
                 role="progressbar"
                 style="width: 0%"
