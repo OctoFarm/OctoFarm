@@ -3,7 +3,7 @@ import OctoFarmClient from "./octofarm.js";
 
 export default class OctoPrintClient {
   static post(printer, item, data) {
-    let url = `http://${printer.ip}:${printer.port}/api/${item}`;
+    let url = `${printer.printerURL}/api/${item}`;
     return fetch(url, {
       method: "POST",
       headers: {
@@ -14,7 +14,7 @@ export default class OctoPrintClient {
     });
   }
   static folder(printer, item, data) {
-    let url = `http://${printer.ip}:${printer.port}/api/files/${item}`;
+    let url = `${printer.printerURL}/api/files/${item}`;
     return fetch(url, {
       method: "POST",
       headers: {
@@ -24,7 +24,7 @@ export default class OctoPrintClient {
     });
   }
   static move(printer, item, data) {
-    let url = `http://${printer.ip}:${printer.port}/api/${item}`;
+    let url = `${printer.printerURL}/api/${item}`;
     return fetch(url, {
       method: "POST",
       headers: {
@@ -35,7 +35,7 @@ export default class OctoPrintClient {
     });
   }
   static delete(printer, item) {
-    let url = `http://${printer.ip}:${printer.port}/api/${item}`;
+    let url = `${printer.printerURL}/api/${item}`;
     return fetch(url, {
       method: "DELETE",
       headers: {
@@ -162,7 +162,7 @@ export default class OctoPrintClient {
       if (action === "delete") {
         document.getElementById("file-" + fullPath).remove();
         let opt = {
-          i: printer.index,
+          i: printer,
           fullPath: fullPath
         };
         let fileDel = await OctoFarmClient.post("printers/removefile", opt);
@@ -196,7 +196,8 @@ export default class OctoPrintClient {
         command: "connect",
         port: document.getElementById("pmSerialPort").value,
         baudrate: parseInt(document.getElementById("pmBaudrate").value),
-        printerProfile: document.getElementById("pmProfile").value
+        printerProfile: document.getElementById("pmProfile").value,
+        save: true,
       };
     } else {
       opts = {
