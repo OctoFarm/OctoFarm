@@ -5,7 +5,6 @@ const db = require("../config/db").MongoURI;
 const pjson = require("../package.json");
 const ClientSettings = require("../models/ClientSettings.js");
 const Filament = require("../models/Filament.js");
-const SystemInfo = require("../models/SystemInfo.js");
 const prettyHelpers = require("../views/partials/functions/pretty.js");
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
@@ -14,7 +13,7 @@ const filamentType = require("../config/filaments.js");
 const returnFilamentTypes = filamentType.returnFilamentTypes;
 const serverConfig = require("../serverConfig/server.js");
 
-const version = pjson.version+".6";
+const version = pjson.version+".9-dev-1";
 
 console.log("db: " + db);
 
@@ -37,8 +36,11 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
   const farmStatistics = require("../runners/statisticsCollection.js");
   const FarmStatistics = farmStatistics.StatisticsCollection;
   let statistics = await FarmStatistics.returnStats();
-  let systemInformation = await SystemInfo.find({});
+  const system = require("../runners/systemInfo.js");
+  const SystemRunner = system.SystemRunner;
+  let systemInformation = await SystemRunner.returnInfo();
   let filament = await Filament.find({});
+  let clientSettings = await ClientSettings.find({});
   let user = null;
   let group = null;
   if (serverConfig.loginRequired === false) {
@@ -48,7 +50,6 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
     user = req.user.name;
     group = req.user.group;
   }
-
   res.render("dashboard", {
     name: user,
     userGroup: group,
@@ -63,8 +64,9 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
     currentOperationsCount: statistics.currentOperationsCount,
     page: "Dashboard",
     helpers: prettyHelpers,
-    systemInfo: systemInformation[0],
-    filament: filament
+    systemInfo: systemInformation,
+    filament: filament,
+    clientSettings: clientSettings
   });
 });
 //File Manager Page
@@ -135,7 +137,6 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
   const farmStatistics = require("../runners/statisticsCollection.js");
   const FarmStatistics = farmStatistics.StatisticsCollection;
   let statistics = await FarmStatistics.returnStats();
-  let systemInformation = await SystemInfo.find({});
   let filament = await Filament.find({});
   let clientSettings = await ClientSettings.find({});
   let user = null;
@@ -158,7 +159,6 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
     currentOperationsCount: statistics.currentOperationsCount,
     page: "Panel View",
     helpers: prettyHelpers,
-    systemInfo: systemInformation[0],
     filament: filament,
     clientSettings: clientSettings
   });
@@ -170,7 +170,6 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
   const farmStatistics = require("../runners/statisticsCollection.js");
   const FarmStatistics = farmStatistics.StatisticsCollection;
   let statistics = await FarmStatistics.returnStats();
-  let systemInformation = await SystemInfo.find({});
   let filament = await Filament.find({});
   let clientSettings = await ClientSettings.find({});
   let user = null;
@@ -193,7 +192,6 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
     printerCount: printers.length,
     page: "Camera View",
     helpers: prettyHelpers,
-    systemInfo: systemInformation[0],
     filament: filament,
     clientSettings: clientSettings
   });
@@ -205,7 +203,6 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
   const farmStatistics = require("../runners/statisticsCollection.js");
   const FarmStatistics = farmStatistics.StatisticsCollection;
   let statistics = await FarmStatistics.returnStats();
-  let systemInformation = await SystemInfo.find({});
   let filament = await Filament.find({});
   let clientSettings = await ClientSettings.find({});
   let user = null;
@@ -228,7 +225,6 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
     printerCount: printers.length,
     page: "List View",
     helpers: prettyHelpers,
-    systemInfo: systemInformation[0],
     filament: filament,
     clientSettings: clientSettings
   });
@@ -239,7 +235,6 @@ router.get("/mon/currentOp", ensureAuthenticated, async (req, res) => {
   const farmStatistics = require("../runners/statisticsCollection.js");
   const FarmStatistics = farmStatistics.StatisticsCollection;
   let statistics = await FarmStatistics.returnStats();
-  let systemInformation = await SystemInfo.find({});
   let filament = await Filament.find({});
   let clientSettings = await ClientSettings.find({});
   let user = null;
@@ -262,7 +257,6 @@ router.get("/mon/currentOp", ensureAuthenticated, async (req, res) => {
     currentOperationsCount: statistics.currentOperationsCount,
     page: "Current Operations View",
     helpers: prettyHelpers,
-    systemInfo: systemInformation[0],
     filament: filament,
     clientSettings: clientSettings
   });
