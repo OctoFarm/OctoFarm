@@ -6,8 +6,13 @@ then
     echo "Making sure node modules are up to date..."
     npm update
     echo "packages updated..."
+    echo "installing pm2 dependancy"
+    npm install pm2 -g
 else
+      echo "Installing node packages"
     npm install
+      echo "installing pm2 dependancy"
+    npm install pm2 -g
 fi
 
 if [ -z "$MONGO" ]
