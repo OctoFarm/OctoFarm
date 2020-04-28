@@ -5,51 +5,36 @@ const yj = require("yieldable-json");
 const ClientSettings = require("../models/ClientSettings.js");
 
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
-let dashboardInfo = null;
+let clientInfo = null;
+let clientInfoString = null;
 
 const farmStatistics = require("../runners/statisticsCollection.js");
 const FarmStatistics = farmStatistics.StatisticsCollection;
-const SystemInfo = require("../models/SystemInfo.js");
+const systemInfo = require("../runners/systemInfo.js");
+const SystemInfo = systemInfo.SystemRunner;
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 const Roll = require("../models/Filament.js");
 
 let clientId = 0;
 let clients = {}; // <- Keep a map of attached clients
-// Called once for each new client. Note, this response is left open!
-router.get("/printerInfo/", ensureAuthenticated, function(req, res) {
-  //req.socket.setTimeout(Number.MAX_VALUE);
-  res.writeHead(200, {
-    "Content-Type": "text/event-stream", // <- Important headers
-    "Cache-Control": "no-cache",
-    Connection: "keep-alive"
-  });
-  res.write("\n");
-  (function(clientId) {
-    clients[clientId] = res; // <- Add this client to those we consider "attached"
-    req.on("close", function() {
-      delete clients[clientId];
-    }); // <- Remove this client when he disconnects
-  })(++clientId);
-  //console.log("Client: " + Object.keys(clients));
-});
 
+let sysInfo = null;
 setInterval(async function() {
   //Only needed for WebSocket Information
   let printers = await Runner.returnFarmPrinters();
 
   let printerInfo = [];
-  let systemInformation = await SystemInfo.find({});
-  let sysInfo = null;
+  let systemInformation = await SystemInfo.returnInfo();
   //There is a circular structure in here somewhere!?
-  if (typeof systemInformation !== undefined || systemInformation.length > 1) {
+  if (typeof systemInformation !== 'undefined') {
     sysInfo = {
-      osInfo: systemInformation[0].osInfo,
-      cpuInfo: systemInformation[0].cpuInfo,
-      cpuLoad: systemInformation[0].cpuLoad,
-      memoryInfo: systemInformation[0].memoryInfo,
-      sysUptime: systemInformation[0].sysUptime,
-      sysProcess: systemInformation[0].sysProcess
+      osInfo: systemInformation.osInfo,
+      cpuInfo: systemInformation.cpuInfo,
+      cpuLoad: systemInformation.cpuLoad,
+      memoryInfo: systemInformation.memoryInfo,
+      sysUptime: systemInformation.sysUptime,
+      sysProcess: systemInformation.sysProcess
     };
   }
 
@@ -79,8 +64,8 @@ setInterval(async function() {
       selectedFilament = printers[i].selectedFilament;
     }
     let printer = {
+      _id: printers[i]._id,
       state: printers[i].state,
-      index: printers[i].index,
       ip: printers[i].ip,
       port: printers[i].port,
       camURL: printers[i].camURL,
@@ -94,18 +79,24 @@ setInterval(async function() {
       feedRate: printers[i].feedRate,
       stepRate: printers[i].stepRate,
       filesList: printers[i].fileList,
+      storage: printers[i].storage,
       logs: printers[i].logs,
       messages: printers[i].messages,
       plugins: printers[i].settingsPlugins,
       gcode: printers[i].settingsScripts,
-      url: printers[i].ip + ":" + printers[i].port,
       settingsAppearance: printers[i].settingsApperance,
       stateColour: printers[i].stateColour,
       current: printers[i].current,
       options: printers[i].options,
       selectedFilament: selectedFilament,
       settingsWebcam: printers[i].settingsWebcam,
-      webSocket: printers[i].webSocket
+      webSocket: printers[i].webSocket,
+      octoPrintVersion: printers[i].octoPrintVersion,
+      hostState: printers[i].hostState,
+      hostStateColour: printers[i].hostStateColour,
+      printerURL: printers[i].printerURL,
+      group: printers[i].group,
+      tempTriggers: printers[i].tempTriggers
     };
     printerInfo.push(printer);
   }
@@ -129,26 +120,116 @@ setInterval(async function() {
     octofarmStatistics = 0;
     printStatistics = 0;
   }
-  dashboardInfo = {
+  clientInfo = {
     printerInfo: printerInfo,
     currentOperations: currentOperations,
     currentOperationsCount: currentOperationsCount,
     farmInfo: farmInfo,
-    octofarmStatistics: octofarmStatistics,
-    printStatistics: printStatistics,
     systemInfo: sysInfo,
     filament: rolls,
     clientSettings: cSettings
   };
-  yj.stringifyAsync(dashboardInfo, (err, data) => {
+  yj.stringifyAsync(clientInfo, (err, data) => {
     if (!err) {
-      for (clientId in clients) {
-        clients[clientId].write("data: " + data + "\n\n"); // <- Push a message to a single attached client
-      }
+      clientInfoString = data;
     } else {
       console.log(err);
     }
   });
+
+}, 500);
+// Called once for each new client. Note, this response is left open!
+router.get("/dashboardInfo/", ensureAuthenticated, function(req, res) {
+  //req.socket.setTimeout(Number.MAX_VALUE);
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream", // <- Important headers
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive"
+  });
+  res.write("\n");
+  (function(clientId) {
+    clients[clientId] = res; // <- Add this client to those we consider "attached"
+    req.on("close", function() {
+      delete clients[clientId];
+    }); // <- Remove this client when he disconnects
+  })(++clientId);
+  //console.log("Client: " + Object.keys(clients));
+});
+// Called once for each new client. Note, this response is left open!
+router.get("/monitoringInfo/", ensureAuthenticated, function(req, res) {
+  //req.socket.setTimeout(Number.MAX_VALUE);
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream", // <- Important headers
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive"
+  });
+  res.write("\n");
+  (function(clientId) {
+    clients[clientId] = res; // <- Add this client to those we consider "attached"
+    req.on("close", function() {
+      delete clients[clientId];
+    }); // <- Remove this client when he disconnects
+  })(++clientId);
+  //console.log("Client: " + Object.keys(clients));
+
+});
+// Called once for each new client. Note, this response is left open!
+router.get("/historyInfo/", ensureAuthenticated, function(req, res) {
+  //req.socket.setTimeout(Number.MAX_VALUE);
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream", // <- Important headers
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive"
+  });
+  res.write("\n");
+  (function(clientId) {
+    clients[clientId] = res; // <- Add this client to those we consider "attached"
+    req.on("close", function() {
+      delete clients[clientId];
+    }); // <- Remove this client when he disconnects
+  })(++clientId);
+  //console.log("Client: " + Object.keys(clients));
+});
+// Called once for each new client. Note, this response is left open!
+router.get("/fileManagerInfo/", ensureAuthenticated, function(req, res) {
+  //req.socket.setTimeout(Number.MAX_VALUE);
+  res.writeHead(200, {
+    "Content-Type": "text/event-stream", // <- Important headers
+    "Cache-Control": "no-cache",
+    Connection: "keep-alive"
+  });
+  res.write("\n");
+  (function(clientId) {
+    clients[clientId] = res; // <- Add this client to those we consider "attached"
+    req.on("close", function() {
+      delete clients[clientId];
+    }); // <- Remove this client when he disconnects
+  })(++clientId);
+});
+
+setInterval(async function() {
+  for (clientId in clients) {
+    if(clients[clientId].socket.parser.incoming.url.includes("dashboard")){
+          for (clientId in clients) {
+            clients[clientId].write("data: " + clientInfoString + "\n\n"); // <- Push a message to a single attached client
+          }
+    }else if(clients[clientId].socket.parser.incoming.url.includes("monitoring")){
+          for (clientId in clients) {
+            clients[clientId].write("data: " + clientInfoString + "\n\n"); // <- Push a message to a single attached client
+          }
+    }else if(clients[clientId].socket.parser.incoming.url.includes("history")){
+          for (clientId in clients) {
+            clients[clientId].write("data: " + clientInfoString + "\n\n"); // <- Push a message to a single attached client
+          }
+    }else if(clients[clientId].socket.parser.incoming.url.includes("filemanager")){
+          for (clientId in clients) {
+            clients[clientId].write("data: " + clientInfoString  + "\n\n"); // <- Push a message to a single attached client
+          }
+    }
+  }
 }, 500);
 
+
+
 module.exports = router;
+
