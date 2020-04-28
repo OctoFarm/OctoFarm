@@ -67,4 +67,4 @@ else
     echo "Logs folder already exists..."
 fi
 
-pm2 start OctoFarm
+pm2 start app.js --name OctoFarm
