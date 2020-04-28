@@ -236,8 +236,21 @@ router.post("/selectFilament", ensureAuthenticated, async (req, res) => {
 });
 router.post("/reScanOcto", ensureAuthenticated, async (req, res) => {
   let data = req.body;
-  let reScan = await Runner.reScanOcto(data.id);
-  res.send({ msg: reScan });
+  if(data.id === null){
+    logger.info("Rescan All OctoPrint Requests: ", data);
+    let printers = await Runner.returnFarmPrinters()
+    for(let i=0;i<printers.length;i++){
+      await Runner.reScanOcto(printers[i]._id);
+    }
+    logger.info("Full re-scan of OctoFarm completed");
+    res.send({ msg: "Started a full farm rescan." });
+  }else{
+    logger.info("Rescan OctoPrint Requests: ", data);
+    let reScan = await Runner.reScanOcto(data.id);
+    logger.info("Rescan OctoPrint complete: ", reScan);
+    res.send({ msg: reScan });
+  }
+
 });
 router.post("/updateSortIndex", ensureAuthenticated, async (req, res) => {
   let data = req.body;

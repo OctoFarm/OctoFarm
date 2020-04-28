@@ -62,7 +62,16 @@ deleteBtns.forEach(b => {
     PrintersManagement.deletePrinter(event.target);
   })
 })
+let searchOffline = document.getElementById("searchOfflineBtn");
+    searchOffline.addEventListener('click', async e => {
+      searchOffline.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...'
 
+  let post = await OctoFarmClient.post("printers/reScanOcto", {
+    id: null
+  });
+      searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync'
+      UI.createAlert("success", `Started a background re-sync of all printers connected to OctoFarm`, 1000, "Clicked");
+});
 saveEditBtn.addEventListener("click", async event => {
   let saveEdits = document.getElementById("saveEditsBtn")
   saveEdits.innerHTML = '<i class=\"fas fa-spinner fa-spin\"></i> Saving...';
@@ -491,7 +500,7 @@ printerReSync.forEach(card => {
     e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i>";
     e.target.disabled = true;
     let data = {
-      id: parseInt(ca[1])
+      id: ca[1]
     };
     let post = await OctoFarmClient.post("printers/reScanOcto", data);
     post = await post.json();
@@ -868,6 +877,23 @@ class dashUpdate {
           document.getElementById("deleteButton-"+printer._id).addEventListener('click', event => {
             PrintersManagement.deletePrinter(event.target);
           })
+          document.getElementById("printerSyncButton-"+printer._id).addEventListener("click", async e => {
+            e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i>";
+            e.target.disabled = true;
+            let data = {
+              id: printer._id
+            };
+            let post = await OctoFarmClient.post("printers/reScanOcto", data);
+            post = await post.json();
+            if (post.msg.status !== "error") {
+              UI.createAlert("success", post.msg.msg, 3000, "clicked");
+            } else {
+              UI.createAlert("error", post.msg.msg, 3000, "clicked");
+            }
+
+            e.target.innerHTML = "<i class='fas fa-sync'></i>";
+            e.target.disabled = false;
+          });
           }
       }
     });

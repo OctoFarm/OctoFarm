@@ -54,7 +54,7 @@ All notable changes to this project will be documented in this file.
         - Printer Settings (Cog Icon): Anything that's a 1 time settings, so Settings, Alerts, Power and Gcode Scripts
         - Printer Power (Power Icon): Will open the power menu for shutdown, restart, reboot and custom buttons setup in the Printer Settings Modal.
     - Split the information generation for Server -> Client comminication, will save some CPU on serverside and client side... 
-    - If printer name available then no index number is shown on views. 
+    - If printer name not available will default to IP. 
     - Converted to using a full URL string for printer connection... 
         - If you already have port:ip set in the database this will be automagically converted for you. It will default to http:// when creating the new field. 
         - Anyone adding and setting up new printers will have to use the full URL string now. If you leave http:// out it will automatically add that in as default. 

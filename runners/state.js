@@ -535,87 +535,36 @@ class Runner {
     farmPrinters[index].stateColour = Runner.getColour("Searching...");
     farmPrinters[index].hostState = "Searching...";
     farmPrinters[index].hostStateColour = Runner.getColour("Searching...");
-    farmPrinters[index].webSocket = "warning";
     if(farmPrinters[index].webSocket === "danger"){
-      logger.info("Socket Offline, Attempted to connect to: " + farmPrinters[index].printerURL);
-      //Make a connection attempt, and grab current user.
-      let users = null;
-      try{
-        users = await ClientAPI.get_retry(farmPrinters[index].printerURL, farmPrinters[index].apikey, "users");
-      }catch(e){
-        logger.error("Socket still Offline, no API access for: " + farmPrinters[index].printerURL, e);
-        farmPrinters[index].state = "Disconnected";
-        farmPrinters[index].stateColour = Runner.getColour("Disconnected");
-        farmPrinters[index].hostState = "Shutdown";
-        farmPrinters[index].hostStateColour = Runner.getColour("Shutdown");
-        farmPrinters[index].webSocket = "danger";
+        await Runner.setupWebSocket(id)
         result.status = "error";
         result.msg =
             "Printer: " +
             index +
-            " has failed, is your octoprint online?";
-        return result;
-      }
-      if (users.status === 200) {
-        users = await users.json();
-        if (_.isEmpty(users)) {
-          farmPrinters[index].currentUser = "admin";
-          farmPrinters[index].markModified("currentUser");
-          farmPrinters[index].save();
-        } else {
-          users.users.forEach(user => {
-            if (user.admin) {
-              farmPrinters[index].currentUser = user.name;
-              farmPrinters[index].markModified("currentUser");
-              farmPrinters[index].save();
-            }
-          });
-        }
-        //Connection to API successful, gather initial data and setup websocket.
-        await farmPrinters[index].ws.open(
-            `ws://${farmPrinters[index].printerURL}/sockjs/websocket`,
-            index
-        );
-        farmPrinters[index].hostState = "Online";
-        farmPrinters[index].hostStateColour = Runner.getColour("Online");
-        result.status = "success";
-        result.msg =
-            "Printer: " +
-            index +
-            " has been re-synced with OctoPrint";
-      } else {
-        //hardfail, do not connect websockets...
-        logger.error("Couldn't grab initial connection for Printer: " + farmPrinters[index].printerURL);
-        farmPrinters[index].hostState = "Shutdown";
-        farmPrinters[index].hostStateColour = Runner.getColour("Shutdown");
-        farmPrinters[index].state = "Disconnected";
-        farmPrinters[index].stateColour = Runner.getColour("Shutdown");
-        farmPrinters[index].webSocket = "danger";
-        result.status = "error";
-        result.msg =
-            "Printer: " +
-            index +
-            " has failed, are your connection settings correct and CORS activated?";
-      }
+            " please check CORS, and make sure your OctoPrint instance is fully booted if it hasn't come online...";
+
 
     }else if(farmPrinters[index].webSocket === "success"){
       logger.info("Socket already Online, Updating information for: " + farmPrinters[index].printerURL);
-      await Runner.getProfile(index);
-      await Runner.getSystem(index);
-      await Runner.getSettings(index);
-      await Runner.getState(index);
-      await Runner.getFiles(index, "files?recursive=true");
+      await Runner.getProfile(id);
+      await Runner.getSystem(id);
+      await Runner.getSettings(id);
+      await Runner.getState(id);
+      await Runner.getFiles(id, "files?recursive=true");
       result.status = "success";
       result.msg =
           "Printer: " +
           index +
           " has been successfully re-synced with OctoPrint.";
+      farmPrinters[index].hostState = "Online";
+      farmPrinters[index].hostStateColour = Runner.getColour("Online");
     }else{
+      await Runner.setupWebSocket(id)
       result.status = "warning";
       result.msg =
           "Printer: " +
           index +
-          " we are already attempting a connection!";
+          " have attempted a force re-connect.";
     }
     return result;
   }
