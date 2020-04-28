@@ -2,122 +2,145 @@ const History = require("../models/History.js");
 const _ = require("lodash");
 const fetch = require("node-fetch");
 const Roll = require("../models/Filament.js");
+const Logger = require('../lib/logger.js');
+const logger = new Logger('OctoFarm-HistoryCollection')
 
 class HistoryCollection {
   static async complete(payload, printer) {
-    let today = new Date();
-    let historyCollection = await History.find({});
+    try{
+      logger.info("Completed Print triggered", payload + printer.printerURL);
+      let today = new Date();
+      let historyCollection = await History.find({});
 
-    let printTime = new Date(payload.time * 1000);
-    let startDate = today.getTime() - printTime.getTime();
-    startDate = new Date(startDate);
+      let printTime = new Date(payload.time * 1000);
+      let startDate = today.getTime() - printTime.getTime();
+      startDate = new Date(startDate);
 
-    let startDDMM = startDate.toDateString();
-    let startTime = startDate.toTimeString();
-    let startTimeFormat = startTime.substring(0, 8);
-    startDate = startDDMM + " - " + startTimeFormat;
+      let startDDMM = startDate.toDateString();
+      let startTime = startDate.toTimeString();
+      let startTimeFormat = startTime.substring(0, 8);
+      startDate = startDDMM + " - " + startTimeFormat;
 
-    let endDDMM = today.toDateString();
-    let endTime = today.toTimeString();
-    let endTimeFormat = endTime.substring(0, 8);
-    let endDate = endDDMM + " - " + endTimeFormat;
+      let endDDMM = today.toDateString();
+      let endTime = today.toTimeString();
+      let endTimeFormat = endTime.substring(0, 8);
+      let endDate = endDDMM + " - " + endTimeFormat;
 
-    let jobLength = "";
-    let jobVolume = "";
-    if (typeof printer.job != "undefined") {
-      jobLength = printer.job.filament.tool0.length;
-      jobVolume = printer.job.filament.tool0.volume;
-    } else {
-      jobLength = 0;
-      jobVolume = 0;
+      let jobLength = "";
+      let jobVolume = "";
+
+      let job = null;
+      if (typeof printer != "undefined" && typeof printer.job != "undefined" && typeof printer.job.filament != 'undefined' && typeof printer.job.filament.tool0 != 'undefined') {
+        jobLength = printer.job.filament.tool0.length;
+        jobVolume = printer.job.filament.tool0.volume;
+      } else {
+        logger.info("No tool statistics could be found for " + printer.printerURL);
+        job = null;
+        jobLength = 0;
+        jobVolume = 0;
+      }
+      let filamentChoice = "None chosen...";
+      if (
+          typeof printer.selectedFilament != "undefined" &&
+          printer.selectedFilament != 0
+      ) {
+        let roll = await Roll.findById( printer.selectedFilament.id );
+
+        filamentChoice = roll;
+      }
+      let name = null;
+      if (typeof printer.settingsApperance != "undefined") {
+        if (printer.settingsApperance.name === "" || printer.settingsApperance.name === null) {
+          name = printer.printerURL;
+        } else {
+          name = printer.settingsApperance.name;
+        }
+      } else {
+        name = printer.printerURL;
+      }
+
+      let printHistory = {
+        historyIndex: historyCollection.length + 1,
+        printerIndex: "",
+        printerName: name,
+        success: true,
+        reason: payload.reason,
+        fileName: payload.name,
+        fileDisplay: payload.display,
+        filePath: payload.path,
+        startDate: startDate,
+        endDate: endDate,
+        printTime: Math.round(payload.time),
+        filamentLength: jobLength,
+        filamentVolume: jobVolume,
+        filamentSelection: filamentChoice,
+        job: job,
+        notes: ""
+      };
+
+      let saveHistory = new History({
+        printHistory
+      });
+      saveHistory.save();
+      logger.info("Completed Print Captured for ", payload + printer.printerURL);
+    }catch(e){
+      logger.error(e, "Failed to capture history for " + printer.printerURL);
     }
-    let filamentChoice = "None chosen...";
-    if (
-      typeof printer.selectedFilament != "undefined" &&
-      printer.selectedFilament != 0
-    ) {
-      let roll = await Roll.findById( printer.selectedFilament.id );
 
-      filamentChoice = roll;
-    }
-    let name = "";
-    if (typeof printer.settingsApperance != "undefined") {
-      name = printer.settingsApperance.name;
-    }
-    let job = null;
-    if (typeof printer.job != undefined) {
-      job = printer.job;
-    }
-    let printHistory = {
-      historyIndex: historyCollection.length + 1,
-      printerIndex: printer.index,
-      printerName: name,
-      success: true,
-      reason: payload.reason,
-      fileName: payload.name,
-      fileDisplay: payload.display,
-      filePath: payload.path,
-      startDate: startDate,
-      endDate: endDate,
-      printTime: Math.round(payload.time),
-      filamentLength: jobLength,
-      filamentVolume: jobVolume,
-      filamentSelection: filamentChoice,
-      job: job,
-      notes: ""
-    };
-
-    let saveHistory = new History({
-      printHistory
-    });
-    saveHistory.save();
   }
   static async failed(payload, printer) {
-    let today = new Date();
-    let historyCollection = await History.find({});
+    try{
+      logger.info("Failed Print triggered ", payload + printer.printerURL);
+      let today = new Date();
+      let historyCollection = await History.find({});
 
-    let printTime = new Date(payload.time * 1000);
-    let startDate = today.getTime() - printTime.getTime();
-    startDate = new Date(startDate);
+      let printTime = new Date(payload.time * 1000);
+      let startDate = today.getTime() - printTime.getTime();
+      startDate = new Date(startDate);
 
-    let startDDMM = startDate.toDateString();
-    let startTime = startDate.toTimeString();
-    let startTimeFormat = startTime.substring(0, 8);
-    startDate = startDDMM + " - " + startTimeFormat;
+      let startDDMM = startDate.toDateString();
+      let startTime = startDate.toTimeString();
+      let startTimeFormat = startTime.substring(0, 8);
+      startDate = startDDMM + " - " + startTimeFormat;
 
-    let endDDMM = today.toDateString();
-    let endTime = today.toTimeString();
-    let endTimeFormat = endTime.substring(0, 8);
-    let endDate = endDDMM + " - " + endTimeFormat;
-    let filamentChoice = "None chosen...";
-    if (
-        typeof printer.selectedFilament != "undefined" &&
-        printer.selectedFilament != 0
-    ) {
-      let roll = await Roll.findById( printer.selectedFilament.id );
+      let endDDMM = today.toDateString();
+      let endTime = today.toTimeString();
+      let endTimeFormat = endTime.substring(0, 8);
+      let endDate = endDDMM + " - " + endTimeFormat;
+      let filamentChoice = "None chosen...";
+      if (
+          typeof printer.selectedFilament != "undefined" &&
+          printer.selectedFilament != 0
+      ) {
+        let roll = await Roll.findById( printer.selectedFilament.id );
 
-      filamentChoice = roll;
+        filamentChoice = roll;
+      }
+      let printHistory = {
+        historyIndex: historyCollection.length + 1,
+        printerIndex: printer.index,
+        printerName: printer.settingsApperance.name,
+        success: false,
+        reason: payload.reason,
+        fileName: payload.name,
+        filePath: payload.path,
+        startDate: startDate,
+        endDate: endDate,
+        printTime: Math.round(payload.time),
+        filamentSelection: filamentChoice,
+        filamentLength: "-",
+        filamentVolume: "-",
+        notes: ""
+      };
+      let saveHistory = new History({
+        printHistory
+      });
+      saveHistory.save();
+      logger.info("Failed Print captured ", payload + printer.printerURL);
+    }catch(e){
+      logger.error(e, "Failed to capture history for " + printer.printerURL);
     }
-    let printHistory = {
-      historyIndex: historyCollection.length + 1,
-      printerIndex: printer.index,
-      printerName: printer.settingsApperance.name,
-      success: false,
-      reason: payload.reason,
-      fileName: payload.name,
-      filePath: payload.path,
-      startDate: startDate,
-      endDate: endDate,
-      printTime: Math.round(payload.time),
-      filamentSelection: filamentChoice,
-      filamentLength: "-",
-      filamentVolume: "-",
-      notes: ""
-    };
-    let saveHistory = new History({
-      printHistory
-    });
-    saveHistory.save();
+
   }
   static history() {
     let printHistory = {
@@ -135,6 +158,7 @@ class HistoryCollection {
       notes: ""
     };
     return printHistory;
+
   }
 
   static get(ip, port, apikey, item) {
