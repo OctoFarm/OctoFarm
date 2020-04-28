@@ -5,14 +5,10 @@ then
     echo "Node modules exist, skipping install" 
     echo "Making sure node modules are up to date..."
     npm update
-    echo "packages updated..."
-    echo "installing pm2 dependancy"
-    npm install pm2 -g
+    npm install
 else
       echo "Installing node packages"
     npm install
-      echo "installing pm2 dependancy"
-    npm install pm2 -g
 fi
 
 if [ -z "$MONGO" ]
@@ -67,4 +63,6 @@ else
     echo "Logs folder already exists..."
 fi
 
-pm2 start app.js --name OctoFarm
+cd app/
+
+pm2 start app.js --name OctoFarm --no-daemon
