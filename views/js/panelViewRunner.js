@@ -398,7 +398,60 @@ function updateState(printers, clientSettings) {
         elements.resume.disabled = true;
         elements.restart.disabled = true;
       }
-      if (tool0A > parseInt(printer.tempTriggers.coolDown)) {
+      if(printer.stateColour.category === "Complete"){
+        if (tool0A > parseInt(printer.tempTriggers.coolDown)) {
+          elements.tool0.innerHTML =
+              ' <i id="tool0A-' +
+              printer._id +
+              '" class="far fa-circle"></i> ' +
+              tool0A +
+              "°C" +
+              " " +
+              ' <i id="tool0T-' +
+              printer._id +
+              '" class="fas fa-bullseye"></i> ' +
+              tool0T +
+              "°C";
+        } else {
+          elements.tool0.innerHTML =
+              ' <i id="tool0A-' +
+              printer._id +
+              '" class="far fa-circle toolUnder"></i> ' +
+              tool0A +
+              "°C" +
+              ' <i id="tool0T-' +
+              printer._id +
+              '" class="fas fa-bullseye toolUnder"></i> ' +
+              tool0T +
+              "°C";
+        }
+        if (bedA > parseInt(printer.tempTriggers.coolDown)) {
+          elements.bed.innerHTML =
+              ' <i id="bedA-' +
+              printer._id +
+              '" class="far fa-circle"></i> ' +
+              bedA +
+              "°C" +
+              " " +
+              ' <i id="bedT-' +
+              printer._id +
+              '" class="fas fa-bullseye"></i> ' +
+              bedT +
+              "°C";
+        } else {
+          elements.bed.innerHTML =
+              ' <i id="bedA-' +
+              printer._id +
+              '" class="far fa-circle toolUnder"></i> ' +
+              bedA +
+              "°C" +
+              ' <i id="bedT-' +
+              printer._id +
+              '" class="fas fa-bullseye toolUnder"></i> ' +
+              bedT +
+              "°C";
+        }
+      }else{
         elements.tool0.innerHTML =
             ' <i id="tool0A-' +
             printer._id +
@@ -411,20 +464,6 @@ function updateState(printers, clientSettings) {
             '" class="fas fa-bullseye"></i> ' +
             tool0T +
             "°C";
-      } else {
-        elements.tool0.innerHTML =
-            ' <i id="tool0A-' +
-            printer._id +
-            '" class="far fa-circle toolUnder"></i> ' +
-            tool0A +
-            "°C" +
-            ' <i id="tool0T-' +
-            printer._id +
-            '" class="fas fa-bullseye toolUnder"></i> ' +
-            tool0T +
-            "°C";
-      }
-      if (bedA > parseInt(printer.tempTriggers.coolDown)) {
         elements.bed.innerHTML =
             ' <i id="bedA-' +
             printer._id +
@@ -435,18 +474,6 @@ function updateState(printers, clientSettings) {
             ' <i id="bedT-' +
             printer._id +
             '" class="fas fa-bullseye"></i> ' +
-            bedT +
-            "°C";
-      } else {
-        elements.bed.innerHTML =
-            ' <i id="bedA-' +
-            printer._id +
-            '" class="far fa-circle toolUnder"></i> ' +
-            bedA +
-            "°C" +
-            ' <i id="bedT-' +
-            printer._id +
-            '" class="fas fa-bullseye toolUnder"></i> ' +
             bedT +
             "°C";
       }

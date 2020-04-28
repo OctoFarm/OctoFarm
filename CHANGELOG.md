@@ -66,6 +66,7 @@ All notable changes to this project will be documented in this file.
     - Moved all detailed instructions to the WIKI page, and removed from README.md.
     - Views progress bars now display colours to corrospond with state. Yellow = Currently printing, Green = Complete. 
     - Camera View now displays text on the print and cancel buttons. 
+    - File manager brought inline with the printer manager version after update.
     
 ### Removed
     - Printer Management, see changed regarding dashboard. 

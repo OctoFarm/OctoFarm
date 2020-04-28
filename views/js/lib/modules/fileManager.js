@@ -28,6 +28,13 @@ export default class FileManager {
     Afiles = [...Afiles];
     for (let i = 0; i < Afiles.length; i++) {
       let newObject = {};
+      let spinner = document.getElementById("fileUploadCountSpinner");
+      if(spinner){
+        if(spinner.classList.contains("fa-spin")) {
+        } else {
+          spinner.classList = "fas fa-spinner fa-spin";
+        }
+      }
 
       newObject.file = Afiles[i];
       if(typeof print !== 'undefined'){
@@ -48,6 +55,17 @@ export default class FileManager {
   }
   static createUpload(index, fileName, loaded, total) {
     let uploadSize = fileUploads.size();
+    let upCount = document.getElementById("fileUploadCount");
+    if(upCount){
+      upCount.innerHTML = "File Queue: " + uploadSize;
+      if (uploadSize < 1) {
+        upCount.innerHTML = "File Queue: 0";
+        let spinner = document.getElementById("fileUploadCountSpinner");
+        if (spinner.classList.contains("fa-spin")) {
+          spinner.classList = "fas fa-spinner";
+        }
+      }
+    }
 
     let progress = document.getElementById("fileProgress-" + index);
     progress.classList = "progress-bar progress-bar-striped bg-warning";
@@ -550,18 +568,9 @@ export default class FileManager {
             second();
           });
       document.getElementById("multiSelectedPrinters").innerHTML = "";
-      selectedPrinters.forEach((printer, index) => {
-        if (printer)
-          document.getElementById("multiSelectedPrinters").insertAdjacentHTML(
-              "beforeend",
-              `
-              [<span class="MultiSelected">${printer.value}</span>]
-            `
-          );
-      });
     }
 
-    function second() {
+    async function second() {
       //DELETE WHEN FOLDERS WORKING
       let boxs = document.querySelectorAll('*[id^="multiUpPrinters-"]');
       selectedPrinters = [].filter.call(boxs, function(el) {
@@ -591,14 +600,39 @@ export default class FileManager {
           });
 
       document.getElementById("multiSelectedPrinters2").innerHTML = "";
+      let printers = await OctoFarmClient.post("printers/printerInfo", {
+        i: null
+      });
+      printers = await printers.json()
+
       selectedPrinters.forEach((printer, index) => {
-        if (printer)
+        if (printer) {
+          let i = _.findIndex(printers, function (o) {
+            return o._id == printer.value.toString();
+          });
+
+          let name = "";
+          if (typeof printers[i].settingsAppearance != "undefined") {
+            if (printers[i].settingsAppearance.name === "" || printers[i].settingsAppearance.name === null) {
+              name = printers[i].printerURL;
+            } else {
+              name = printers[i].settingsAppearance.name;
+            }
+          } else {
+            name = printers[i].printerURL;
+          }
+
           document.getElementById("multiSelectedPrinters2").insertAdjacentHTML(
               "beforeend",
               `
-            [<span class="MultiSelected">${printer.value}</span>]
+            [<span class="MultiSelected">${name}</span>]
             `
           );
+          selectedPrinters[index] = {
+            value: printers[i]._id,
+            printerInfo: printers[i]
+          }
+        }
       });
       document.getElementById("multiFolder").disabled = true;
       document.getElementById("multiFile").disabled = false;
@@ -656,19 +690,18 @@ export default class FileManager {
           const num = printer.value;
           newObject.file = file;
           newObject.index = num;
+          newObject.printerInfo = printer.printerInfo;
           newObject.upload = FileManager.fileUpload;
           newObject.currentFolder = selectedFolder;
 
           if (printAfterUpload) {
             newObject.print = true;
           }
-          fileUploads.add(newObject);
-          let fileCounts = document.getElementById(
-              "fileCounts-" + printer.value
-          );
+          let fileCounts = document.getElementById("fileCounts-" + newObject.index);
           let amount = parseInt(fileCounts.innerHTML);
           amount = amount + 1;
           fileCounts.innerHTML = " " + amount;
+          fileUploads.add(newObject);
         });
       });
     }
@@ -711,14 +744,13 @@ export class FileActions {
 
     let fileList = document.getElementById("fileList-"+id);
     let input = document.getElementById("searchFiles").value.toUpperCase();
-    fileList.innerHTML = "";
+
     input = input.replace(/ /g,"_");
     if (input.value === "") {
       //No search term so reset view
       document.getElementById("currentFolder").value = "local";
       FileManager.drawFiles(printer, "Recursive");
     } else {
-      fileList.innerHTML = "";
       document.getElementById("currentFolder").value = "local";
       FileManager.drawFiles(printer, "Recursive");
     }
