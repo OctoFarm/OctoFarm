@@ -1,6 +1,5 @@
 #!/bin/sh
 
-
 if [ -d "node_modules" ] 
 then
     echo "Node modules exist, skipping install" 
@@ -63,4 +62,4 @@ else
     echo "Logs folder already exists..."
 fi
 
-node app.js
+pm2 start OctoFarm
