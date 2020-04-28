@@ -194,19 +194,7 @@ export default class FileManager {
       FileActions.deleteFolder(printer, filePath);
     }
   }
-  static changePrinter(target) {
-    let oldIndex = document.getElementById("currentPrinter").innerHTML;
-    document.getElementById("currentFolder").innerHTML = "local";
-    document.getElementById("fileManagerPrinter-" + oldIndex).className =
-        "list-group-item list-group-item-action flex-column align-items-start bg-secondary";
-    console.log(target)
-    let index = target.replace("fileManagerPrinter-", "");
-    let printerName = document.getElementById("printerName-" + index).innerHTML;
-    document.getElementById(
-        "currentPrinterBtn"
-    ).innerHTML = `<i class="fas fa-print"></i> <span id="currentPrinter">${index}</span>. ${printerName}`;
-    FileManager.updateFileList(printer._id);
-  }
+
   static async reSyncFiles(e, printer) {
     e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Re-Syncing...";
     let done = await OctoFarmClient.post("printers/resyncFile", {
@@ -251,7 +239,7 @@ export default class FileManager {
     }
     if (typeof folder != "undefined") {
       folder = folder.replace("file-", "");
-      console.log(folder)
+
       document.getElementById("currentFolder").innerHTML = "local/" + folder;
       FileManager.updateFileList(printer._id);
     } else {
@@ -268,33 +256,34 @@ export default class FileManager {
   }
   static drawFiles(printer, recursive) {
     let fileElem = document.getElementById("fileList-"+printer._id);
-    let fileList = printer.filesList;
+    if(fileElem){
+      let fileList = printer.filesList;
 
-    if (fileList === "EMPTY") {
-      fileElem.innerHTML = `
+      if (fileList === "EMPTY") {
+        fileElem.innerHTML = `
       <div class="noStorage  text-center"><i class="fas fa-file-code fa-5x"></i><br><h5>There are no files in local storage...</h5></div>
       `;
-    } else {
-      fileList.files = _.sortBy(fileList.files, [
-        function(o) {
-          return o.display;
+      } else {
+        fileList.files = _.sortBy(fileList.files, [
+          function(o) {
+            return o.display;
+          }
+        ]);
+        fileElem.innerHTML = "";
+        let currentFolder = document.getElementById("currentFolder").innerHTML;
+        if (currentFolder.includes("local/")) {
+          currentFolder = currentFolder.replace("local/", "");
         }
-      ]);
-      fileElem.innerHTML = "";
-      let currentFolder = document.getElementById("currentFolder").innerHTML;
-      if (currentFolder.includes("local/")) {
-        currentFolder = currentFolder.replace("local/", "");
-      }
-      fileList.files.forEach(file => {
-        let fileDate = new Date(file.date*1000);
-        let dateString = fileDate.toDateString();
-        let timeString = fileDate.toTimeString().substring(0, 8);
-        fileDate = dateString + " " + timeString;
+        fileList.files.forEach(file => {
+          let fileDate = new Date(file.date*1000);
+          let dateString = fileDate.toDateString();
+          let timeString = fileDate.toTimeString().substring(0, 8);
+          fileDate = dateString + " " + timeString;
 
-        if (typeof recursive != "undefined") {
-          fileElem.insertAdjacentHTML(
-              "beforeend",
-              `
+          if (typeof recursive != "undefined") {
+            fileElem.insertAdjacentHTML(
+                "beforeend",
+                `
           <a
           id="file-${file.fullPath}"
           href="#"
@@ -313,8 +302,8 @@ export default class FileManager {
             <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">${file.display}</h5>
             <small><i class="fas fa-stopwatch"></i>  ${Calc.generateTime(
-                  file.time
-              )}</small>
+                    file.time
+                )}</small>
 
           </div>
           <p class="mb-1 float-left">
@@ -334,28 +323,28 @@ export default class FileManager {
                 <i class="fas fa-sync"></i> Refresh
               </button>
               <button id="${printer._id}*fileActionStart*${
-                  file.fullPath
-              }" type="button" class="btn btn-success">
+                    file.fullPath
+                }" type="button" class="btn btn-success">
                 <i class="fas fa-play"></i> Start
               </button>
               <button id="${printer._id}*fileActionSelect*${
-                  file.fullPath
-              }" type="button" class="btn btn-info">
+                    file.fullPath
+                }" type="button" class="btn btn-info">
                 <i class="fas fa-file-upload"></i> Select
               </button>
               <button id="${printer._id}*fileActionMove*${
-                  file.fullPath
-              }" type="button" class="btn btn-warning">
+                    file.fullPath
+                }" type="button" class="btn btn-warning">
                 <i class="fas fa-people-carry"></i> Move
               </button>
               <button onclick="window.open('${printer.printerURL}/downloads/files/local/${
-                  file.fullPath
-              }')" type="button" class="btn btn-dark">
+                    file.fullPath
+                }')" type="button" class="btn btn-dark">
                 <i class="fas fa-download"></i> Download
               </button>
               <button id="${printer._id}*fileActionDelete*${
-                  file.fullPath
-              }" type="button" class="btn btn-danger">
+                    file.fullPath
+                }" type="button" class="btn btn-danger">
                 <i class="fas fa-trash-alt"></i> Delete
               </button>
               </div>
@@ -365,11 +354,11 @@ export default class FileManager {
         </a>
         </a>
           `
-          );
-        } else if (file.path == currentFolder) {
-          fileElem.insertAdjacentHTML(
-              "beforeend",
-              `
+            );
+          } else if (file.path == currentFolder) {
+            fileElem.insertAdjacentHTML(
+                "beforeend",
+                `
           <a
           id="file-${file.fullPath}"
           href="#"
@@ -388,8 +377,8 @@ export default class FileManager {
             <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1">${file.display}</h5>
             <small><i class="fas fa-stopwatch"></i>  ${Calc.generateTime(
-                  file.time
-              )}</small>
+                    file.time
+                )}</small>
           </div>
           <p class="mb-1 float-left">
           <i class="fas fa-clock"></i> ${fileDate}<br>
@@ -408,28 +397,28 @@ export default class FileManager {
                 <i class="fas fa-sync"></i> Refresh
               </button>
               <button id="${printer._id}*fileActionStart*${
-                  file.fullPath
-              }" type="button" class="btn btn-success">
+                    file.fullPath
+                }" type="button" class="btn btn-success">
                 <i class="fas fa-play"></i> Start
               </button>
               <button id="${printer._id}*fileActionSelect*${
-                  file.fullPath
-              }" type="button" class="btn btn-info">
+                    file.fullPath
+                }" type="button" class="btn btn-info">
                 <i class="fas fa-file-upload"></i> Select
               </button>
               <button id="${printer._id}*fileActionMove*${
-                  file.fullPath
-              }" type="button" class="btn btn-warning">
+                    file.fullPath
+                }" type="button" class="btn btn-warning">
                 <i class="fas fa-people-carry"></i> Move
               </button>
               <button onclick="window.open('${printer.printerURL}/downloads/files/local/${
-                  file.fullPath
-              }')" type="button" class="btn btn-dark">
+                    file.fullPath
+                }')" type="button" class="btn btn-dark">
                 <i class="fas fa-download"></i> Download
               </button>
               <button id="${printer.printerURL}*fileActionDelete*${
-                  file.fullPath
-              }" type="button" class="btn btn-danger">
+                    file.fullPath
+                }" type="button" class="btn btn-danger">
                 <i class="fas fa-trash-alt"></i> Delete
               </button>
               </div>
@@ -439,20 +428,20 @@ export default class FileManager {
         </a>
         </a>
           `
-          );
-        }
-      });
-      fileList.folders = _.sortBy(fileList.folders, [
-        function(o) {
-          return o.display;
-        }
-      ]);
-      //then draw folders
-      fileList.folders.forEach(folder => {
-        if (folder.path == currentFolder) {
-          fileElem.insertAdjacentHTML(
-              "beforeend",
-              `<a
+            );
+          }
+        });
+        fileList.folders = _.sortBy(fileList.folders, [
+          function(o) {
+            return o.display;
+          }
+        ]);
+        //then draw folders
+        fileList.folders.forEach(folder => {
+          if (folder.path == currentFolder) {
+            fileElem.insertAdjacentHTML(
+                "beforeend",
+                `<a
               id="file-${folder.name}"
               href="#"
               class="list-group-item list-group-item-action flex-column align-items-start bg-dark folderAction"
@@ -492,10 +481,11 @@ export default class FileManager {
             </a>
          
             `
-          );
-        }
-      });
-      FileManager.updateListeners(printer);
+            );
+          }
+        });
+        FileManager.updateListeners(printer);
+      }
     }
   }
   static search(id){
@@ -752,7 +742,7 @@ export class FileActions {
     } else if (currentFolder.includes("local/")) {
       currentFolder = currentFolder.replace("local/", "");
     }
-    console.log(currentFolder)
+
     bootbox.prompt("What would you like to name your folder?", async function(
         result
     ) {

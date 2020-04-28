@@ -221,7 +221,7 @@ setInterval(async function() {
           for (clientId in clients) {
             clients[clientId].write("data: " + clientInfoString + "\n\n"); // <- Push a message to a single attached client
           }
-    }else if(clients[clientId].socket.parser.incoming.url.includes("filemanager")){
+    }else if(clients[clientId].socket.parser.incoming.url.includes("fileManagerInfo")){
           for (clientId in clients) {
             clients[clientId].write("data: " + clientInfoString  + "\n\n"); // <- Push a message to a single attached client
           }

@@ -1,4 +1,4 @@
-<% if(typeof currentOperationsCount != 'undefined' && currentOperationsCount.idle > 0 || currentOperationsCount.active > 0 || currentOperationsCount.closed > 0) {%>
+<% if(typeof currentOperationsCount != 'undefined' && currentOperationsCount.idle > 0 || currentOperationsCount.active > 0 || currentOperationsCount.disconnected > 0) {%>
 <div id="filemanager" class="row">
   <div id="filePrinters" class="col-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 ">
     <div class="card text-white bg-dark">
@@ -54,82 +54,39 @@
   <div class="col-12 col-sm-12 col-md-8 col-lg-9 col-xl-9">
     <div class="card text-white bg-dark">
       <div class="card-header fileHeader">
-        <h5 class="float-left">
-          <button
-          id="currentPrinterBtn"
-            type="button"
-            class="btn btn-secondary float-right d-block"
-            href="#"
-            aria-expanded="false"
-            disabled
-          >
-            <i class="fas fa-print"></i> <span id="currentPrinter"><i class="fas fa-spinner fa-spin"></i></span>.  
-          </button>
-        </h5>
-        <h5 class="float-left">
-          <button
-            id="printerStorage"
-            type="button"
-            class="btn btn-secondary float-right d-block"
-            href="#"
-            aria-expanded="false"
-            disabled
-          >
-            <i class="fas fa-hdd"></i> 0 / 0
-          </button>
-        </h5>
-        <h5 class="float-left">
-          <button
-            type="button"
-            class="btn btn-secondary float-right d-block"
-            href="#"
-            aria-expanded="false"
-            disabled
-          >
-            <i class="fas fa-file-code"></i> Files: <span id="currentFolder">local</span>/
-          </button>
-        </h5>
-        <div class="form-group mt-2 mb-2 float-right">
-          <form class="form-inline">
-            <div class="form-group">
-              <label for="searchFiles">
-                <i class="fas fa-search pr-1"></i>
-              </label>
-              <input
-                id="searchFiles"
-                type="text"
-                placeholder="File Search..."
-                class="search-control search-control-underlined"
-              />
-            </div>
-          </form>
+        <div class="col-12">
+          <h5 class="float-left  mb-0">
+            <button id="printerFileCount" type="button" class="btn btn-secondary float-right d-block" href="#" aria-expanded="false" disabled="">
+              <i class="fas fa-file"></i>  <i class="fas fa-spinner fa-spin"></i> <i class="fas fa-folder"></i>  <i class="fas fa-spinner fa-spin"></i>
+            </button>
+            <button id="printerStorage" type="button" class="btn btn-secondary float-right d-block" href="#" aria-expanded="false" disabled="">
+
+              <i class="fas fa-hdd"></i> <i class="fas fa-spinner fa-spin"></i> /  <i class="fas fa-spinner fa-spin"></i>
+            </button>
+            <button id="currentPrinter" type="button" class="btn btn-secondary float-right d-block" href="#" aria-expanded="false" disabled="">
+              <i class="fas fa-print"></i> <i class="fas fa-spinner fa-spin"></i>
+            </button>
+          </h5>
+          <h5 class="float-left mb-0">
+            <button type="button" class="btn btn-secondary float-right d-block" href="#" aria-expanded="false" disabled="">
+              <i class="fas fa-file-code"></i> Files: <span id="currentFolder">local</span>/
+            </button>
+          </h5>
+          <div class="btn btn-secondary form-group float-right  mb-0">
+            <form class="form-inline">
+              <div class="form-group">
+                <label for="searchFiles">
+                  <i class="fas fa-search pr-1"></i>
+                </label>
+                <input id="searchFiles" type="text" placeholder="File Search..." class="search-control search-control-underlined">
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-      <div class="card-body fileBody">
-        <button id="fileBackBtn" type="button" class="btn btn-success m-3 float-right">
-          <i class="fas fa-chevron-left"></i> Back
-        </button>
-          <label class="btn btn-success m-3 float-left" for="fileUploadBtn"><i class="fas fa-file-import"></i> Upload File(s)</label>
-          <input id="fileUploadBtn" multiple accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left" id="uploadFileBtn">
-        <button
-          id="createFolderBtn"
-          type="button"
-          class="btn btn-warning m-3 float-left"
-          data-toggle="collapse"
-          href="#createFolder"
-          role="button"
-          aria-expanded="false"
-          aria-controls="createFolder"
-        >
-          <i class="fas fa-folder-plus"></i> Create Folder
-        </button>
-        <button id="fileReSync" type="button" class="btn btn-primary m-3">
-          <i class="fas fa-sync"></i> Re-Sync
-        </button>
-        </center>
-        <div id="fileList" class="list-group">
+      <div id="fileBody" class="card-body fileBody">
 
-        </div>
+
       </div>
       <div class="card-footer fileFooter text-muted"></div>
     </div>
@@ -147,4 +104,4 @@
   </div>
 </div>
 <% } %>
-<script src="/js/lib/modules/fileManager.js" type="module"></script>
+<script src="/js/fileManagerRunner.js" type="module"></script>

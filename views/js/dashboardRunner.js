@@ -814,7 +814,7 @@ class dashUpdate {
         <th>
             <button  id="printerButton-${printer._id}"
                      type="button"
-                     class="btn btn-primary btn-sm"
+                     class="btn btn-primary btn-sm d-none"
                      data-toggle="modal"
                      data-target="#printerManagerModal" disabled
             ><i class="fas fa-print"></i>
