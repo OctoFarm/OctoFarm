@@ -1,0 +1,8 @@
+{
+    "name": "OctoFarm",
+    "script": "app.js",
+    "instances": "1",
+    "env_production" : {
+      "NODE_ENV": "production"
+    }
+  }

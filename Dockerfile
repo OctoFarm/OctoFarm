@@ -1,8 +1,15 @@
 FROM node:13.0.1-stretch
 
-COPY . /app
+# Bundle APP files
+COPY . app/
 
-WORKDIR /app
+COPY package*.json app/
 
-RUN chmod +x docker/entrypoint.sh
-ENTRYPOINT docker/entrypoint.sh
+WORKDIR app/
+
+RUN npm install
+
+EXPOSE 4000
+
+CMD [ "pm2-runtime", "start", "pm2.json" ]
+
