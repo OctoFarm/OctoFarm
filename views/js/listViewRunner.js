@@ -54,8 +54,12 @@ source.onclose = function(e) {
 
 };
 let returnPrinterInfo = (id) => {
-  let zeeIndex = _.findIndex(printerInfo, function(o) { return o._id == id; });
-  return printerInfo[zeeIndex];
+  if(typeof id !== 'undefined'){
+    let zeeIndex = _.findIndex(printerInfo, function(o) { return o._id == id; });
+    return printerInfo[zeeIndex];
+  }else{
+    return printerInfo;
+  }
 }
 //Setup page listeners...
 let printerCard = document.querySelectorAll("[id^='printerButton-']");
@@ -64,7 +68,8 @@ printerCard.forEach(card => {
   card.addEventListener("click", e => {
     let printer = returnPrinterInfo(ca[1]);
     PrinterManager.updateIndex(ca[1]);
-    PrinterManager.init(printer);
+    let printers = returnPrinterInfo()
+    PrinterManager.init(printers);
   });
   document.getElementById("listPlay-" + ca[1]).addEventListener("click", e => {
     let printer = returnPrinterInfo(ca[1]);

@@ -797,11 +797,9 @@ class dashUpdate {
           socketBadge.className = `badge badge-${printer.webSocket} badge-pill`;
           webButton.href = printer.printerURL;
           if (printer.stateColour.category === "Offline") {
-            webButton.classList.add("disabled");
             printButton.disabled = true;
             settingButton.disabled = true;
           } else {
-            webButton.classList.remove("disabled");
             printButton.disabled = false;
             settingButton.disabled = false;
           }

@@ -14,7 +14,7 @@ let previousLog = null;
 
 let lastPrinter = null;
 
-
+let printDropCheck = false;
 
 //Close modal event listeners...
 $("#printerManagerModal").on("hidden.bs.modal", function(e) {
@@ -28,6 +28,20 @@ $("#connectionModal").on("hidden.bs.modal", function(e) {
 });
 
 export default class PrinterManager {
+  static grabName(printer){
+    let name = "";
+    if (typeof printer.settingsAppearance != "undefined") {
+      if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
+        name = printer.printerURL;
+      } else {
+        name = printer.settingsAppearance.name;
+      }
+    } else {
+      name = printer.printerURL;
+    }
+    return name;
+  }
+
   static async init(printers) {
     let i = _.findIndex(printers, function (o) {
       return o._id == currentIndex;
@@ -43,6 +57,7 @@ export default class PrinterManager {
       if (typeof printer.options === "undefined") {
         return;
       }
+
       const availableBaud = printer.options.baudrates;
       const availablePort = printer.options.ports;
       const availableProfile = printer.options.printerProfiles;
@@ -114,9 +129,12 @@ export default class PrinterManager {
       ) {
       } else {
         let camURL = "";
-        if (typeof printer.camURL != "undefined" && printer.camURL != "") {
+        if (typeof printer.camURL != "undefined" && printer.camURL.includes("http")) {
           camURL = printer.camURL;
+        }else{
+          camURL = "../../../images/noCamera.jpg";
         }
+
 
         let flipH = "";
         let flipV = "";
@@ -143,6 +161,28 @@ export default class PrinterManager {
         } else {
           dateComplete = "No Active Print"
         }
+        //Load the printer drop down...
+        let printerDrop = document.getElementById("printerSelection");
+        printerDrop.innerHTML = "";
+        printers.forEach(printer => {
+          let name = PrinterManager.grabName(printer);
+          if(printer.stateColour.category !== "Offline"){
+            printerDrop.insertAdjacentHTML('beforeend', `
+                <option value="${printer._id}" selected>${name}</option>
+            `)
+          }
+        })
+        printerDrop.value = printer._id;
+        if(!printDropCheck){
+          printerDrop.addEventListener('change', event => {
+            let newIndex = document.getElementById("printerSelection").value;
+            PrinterManager.updateIndex(newIndex);
+            PrinterManager.init(printers)
+          });
+          printDropCheck = true;
+        }
+
+
 
         document.getElementById("printerControls").innerHTML = `
         <div class="row">
@@ -157,7 +197,7 @@ export default class PrinterManager {
               </div>
               <div class="row">
                   <div id="cameraCol" class="col-12">
-                    <img style="transform: ${flipH} ${flipV} ${rotate90};" id="printerControlCamera" width="100%" src=""/>
+                    <img style="transform: ${flipH} ${flipV} ${rotate90};" id="printerControlCamera" width="100%" src="${camURL}"/>
                   </div>
               </div>
           </div>
@@ -597,22 +637,15 @@ export default class PrinterManager {
         let elements = PrinterManager.grabPage();
         elements.terminal.terminalWindow.innerHTML = "";
 
-        PrinterManager.applyListeners(printer, elements);
+        PrinterManager.applyListeners(printer, elements, printers);
         FileManager.drawFiles(printer)
       }
       PrinterManager.applyState(printer, job, progress);
       document.getElementById("printerManagerModal").style.overflow = "auto";
-      if (printer.camURL == "") {
-        document.getElementById("printerControlCamera").src =
-            "../../../images/noCamera.jpg";
-      } else {
-        document.getElementById("printerControlCamera").src =
-            printer.camURL;
-      }
     }
   }
 
-  static applyListeners(printer, elements) {
+  static applyListeners(printer, elements, printers) {
     let rangeSliders = document.querySelectorAll("input.octoRange");
     rangeSliders.forEach(slider => {
       slider.addEventListener("input", e => {
@@ -1048,14 +1081,13 @@ export default class PrinterManager {
       FileManager.reSyncFiles(e, printer);
     });
 
-
   }
 
 
   static grabPage() {
     let printerManager = {
       mainPage: {
-        title: document.getElementById("printerManagerTitle"),
+        title: document.getElementById("printerSelection"),
         status: document.getElementById("pmStatus"),
       },
       jobStatus: {
@@ -1142,19 +1174,6 @@ export default class PrinterManager {
     //Garbage collection for terminal
     let terminalCount = document.querySelectorAll(".logLine");
     let elements = await PrinterManager.grabPage();
-    //init global info
-    //Fake name
-    let name = "";
-    if (typeof printer.settingsAppearance != "undefined") {
-      if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
-        name = printer.printerURL;
-      } else {
-        name = printer.settingsAppearance.name;
-      }
-    } else {
-      name = printer.printerURL;
-    }
-    elements.mainPage.title.innerHTML = "Printer Control: " + name;
 
     elements.fileManager.fileFolderCount.innerHTML = `<i class="fas fa-file"></i> ${printer.filesList.fileCount} <i class="fas fa-folder"></i> ${printer.filesList.folderCount}`;
     elements.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(printer.storage.free)} / ${Calc.bytes(printer.storage.total)}`

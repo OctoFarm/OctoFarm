@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v1.1.4.9-dev-2]
+
+### Added
+    - Printer Control Manager now allows for switching of printers on the fly from the modal. No need to close and re-open. 
+    
+    
+### Changed
+    - Printer web button does not disable when offline
+    
+### Removed
+
+
+### Fixed
+    - Printer Camera in printer mananger now displays correct placeholder when no URL detected. Placeholder updated for new URL system. 
+
 ## [v1.1.4.9-dev-1]
 
 ### Added

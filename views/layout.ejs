@@ -636,8 +636,15 @@
 <div class="modal fade" id="printerManagerModal" tabindex="-1" role="dialog" aria-labelledby="printerManagerModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
       <div class="modal-content bg-dark text-light">
-          <div class="modal-header px-3">
-              <h5 class="modal-title" id="printerManagerTitle">Printer Control:</h5>
+          <div class="modal-header px-3 pt-3 pb-2">
+              <div class="input-group mb-0"   style="width:600px">
+                  <div class="input-group-prepend">
+                      <label class="input-group-text p-1" for="printerSelection">Printer Control: </label>
+                  </div>
+                  <select class="custom-select p-1" id="printerSelection">
+
+                  </select>
+              </div>
               <span id="printerIndex" value="" style="display: none;"></span>
               <button id="printerManagerModalBtn" type="button" class="close" data-dismiss="modal" aria-label="Close">
         <span class="text-white" aria-hidden="true">&times;</span>
