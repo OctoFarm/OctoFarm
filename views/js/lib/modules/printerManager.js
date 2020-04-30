@@ -1062,7 +1062,7 @@ export default class PrinterManager {
       submitTerminal(e);
     });
     elements.fileManager.uploadFiles.addEventListener('change', function() {
-      UI.createAlert("warning", "Your files have been sent to the queue, Please do not close the Printer Control Modal or refresh the page until complete!", 3000, "Clicked")
+      UI.createAlert("warning", "Your files for Printer: " + PrinterManager.grabName(printer) + " has begun. Please do not navigate away from this page.", 3000, "Clicked")
       FileManager.handleFiles(this.files, printer);
     });
     elements.fileManager.createFolderBtn.addEventListener("click", e => {

@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
     - Printer web button does not disable when offline
     - Printer re-sync now detroys any established connection and re-setups the specific printer fresh.
+    - Uploads done on the Printer Control modal are now not dependant on the status you can check the status by viewing the printer. A complete notification will be done whe the file has been uploaded. 
     
 ### Removed
 

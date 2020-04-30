@@ -5,6 +5,9 @@ import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 
 let fileUploads = new Queue();
+
+
+
 setInterval(async () => {
   //If there are files in the queue, plow through until uploaded... currently single file at a time.
   if (fileUploads.size() > 0) {
@@ -24,6 +27,19 @@ setInterval(async () => {
 }, 1000);
 
 export default class FileManager {
+  static grabName(printer){
+    let name = "";
+    if (typeof printer.settingsAppearance != "undefined") {
+      if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
+        name = printer.printerURL;
+      } else {
+        name = printer.settingsAppearance.name;
+      }
+    } else {
+      name = printer.printerURL;
+    }
+    return name;
+  }
   static async handleFiles(Afiles, printerInfo, print) {
     Afiles = [...Afiles];
     for (let i = 0; i < Afiles.length; i++) {
@@ -47,10 +63,8 @@ export default class FileManager {
       ).innerHTML;
       newObject.upload = FileManager.fileUpload;
       fileUploads.add(newObject);
-      let fileCounts = document.getElementById("fileCounts-" + newObject.index);
-      let amount = parseInt(fileCounts.innerHTML);
-      amount = amount + 1;
-      fileCounts.innerHTML = " " + amount;
+
+
     }
   }
   static createUpload(index, fileName, loaded, total) {
@@ -68,16 +82,19 @@ export default class FileManager {
     }
 
     let progress = document.getElementById("fileProgress-" + index);
-    progress.classList = "progress-bar progress-bar-striped bg-warning";
-    let percentLoad = (loaded / total) * 100;
-    if (isNaN(percentLoad)) {
-      percentLoad = 0;
+    if(progress){
+      progress.classList = "progress-bar progress-bar-striped bg-warning";
+      let percentLoad = (loaded / total) * 100;
+      if (isNaN(percentLoad)) {
+        percentLoad = 0;
+      }
+      progress.innerHTML = Math.floor(percentLoad) + "%";
+      progress.style.width = percentLoad + "%";
+      if (percentLoad == 100) {
+        progress.classList = "progress-bar progress-bar-striped bg-success";
+      }
     }
-    progress.innerHTML = Math.floor(percentLoad) + "%";
-    progress.style.width = percentLoad + "%";
-    if (percentLoad == 100) {
-      progress.classList = "progress-bar progress-bar-striped bg-success";
-    }
+
   }
 
   static fileUpload(file) {
@@ -108,6 +125,10 @@ export default class FileManager {
       file = file.file;
       xhr.open("POST", url);
       xhr.upload.onprogress = function(e) {
+        console.log(              printerInfo._id,
+            file.name,
+            e.loaded,
+            e.total)
         if (e.lengthComputable) {
           FileManager.createUpload(
               printerInfo._id,
@@ -135,9 +156,9 @@ export default class FileManager {
             e.loaded,
             e.total
         );
-        fileCounts.innerHTML = " " + (parseInt(fileCounts.innerHTML) - 1);
-        let spinner = document.getElementById("fileUploadCountSpinner");
-
+        if(fileCounts){
+          fileCounts.innerHTML = " " + (parseInt(fileCounts.innerHTML) - 1);
+        }
         setTimeout(() => {
           FileManager.createUpload(
               printerInfo._id,
@@ -150,7 +171,7 @@ export default class FileManager {
           resolve(xhr.response);
           UI.createAlert(
               "success",
-              file.name + " has finished uploading to Printer " + index,
+              file.name + " has finished uploading to Printer: " + FileManager.grabName(printerInfo),
               3000,
               "clicked"
           );
@@ -698,10 +719,14 @@ export default class FileManager {
             newObject.print = true;
           }
           let fileCounts = document.getElementById("fileCounts-" + newObject.index);
-          let amount = parseInt(fileCounts.innerHTML);
-          amount = amount + 1;
-          fileCounts.innerHTML = " " + amount;
-          fileUploads.add(newObject);
+          if(fileCounts){
+            let amount = parseInt(fileCounts.innerHTML);
+            amount = amount + 1;
+            fileCounts.innerHTML = " " + amount;
+            fileUploads.add(newObject);
+          }
+
+
         });
       });
     }
@@ -878,7 +903,7 @@ export class FileActions {
           } else if (post.status === 409) {
             UI.createAlert(
                 "error",
-                `There was a conflic, file already exists or is in use...`,
+                `There was a conflict, file already exists or is in use...`,
                 3000,
                 "clicked"
             );
@@ -990,7 +1015,7 @@ export class FileActions {
           } else if (post.status === 409) {
             UI.createAlert(
                 "error",
-                `There was a conflic, file already exists or is in use...`,
+                `There was a conflict, file already exists or is in use...`,
                 3000,
                 "clicked"
             );
