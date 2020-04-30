@@ -29,6 +29,26 @@ function WebSocketClient(){
   this.number = 0;	// Message number
   this.autoReconnectInterval = timeout.webSocketRetry;	// ms
 }
+function noop() {}
+
+function heartBeat(index) {
+  farmPrinters[index].webSocket = "success";
+  farmPrinters[index].ws.isAlive = true;
+
+}
+console.log(timeout)
+const heartBeatInterval = setInterval(function ping() {
+  farmPrinters.forEach(function each(client) {
+    if(typeof client.ws !== 'undefined' && typeof client.ws.isAlive !== 'undefined'){
+      if (client.ws.isAlive === false) return client.ws.instance.terminate();
+      client.webSocket = "info";
+      client.ws.isAlive = false;
+      client.ws.instance.ping(noop);
+    }
+
+  });
+}, 300000);
+
 WebSocketClient.prototype.open = function(url, index){
   if(url.includes("http://")){
     url = url.replace("http://","")
@@ -41,7 +61,11 @@ WebSocketClient.prototype.open = function(url, index){
   farmPrinters[this.index].webSocket = "warning";
   this.instance = new WebSocket(this.url);
   this.instance.on('open',()=>{
+    this.isAlive = true;
     this.onopen(this.index);
+  });
+  this.instance.on('pong', () => {
+    heartBeat(this.index)
   });
   this.instance.on('message',(data,flags)=>{
     this.number ++;
@@ -51,12 +75,42 @@ WebSocketClient.prototype.open = function(url, index){
     switch (e){
       case 1000:	// CLOSE_NORMAL
         logger.info("WebSocket: closed: "  + this.index + ": " + this.url);
+        try {
+          farmPrinters[this.index].state = "Offline";
+          farmPrinters[this.index].stateColour = Runner.getColour("Offline");
+          farmPrinters[this.index].hostState = "Shutdown";
+          farmPrinters[this.index].hostStateColour = Runner.getColour("Shutdown");
+          farmPrinters[this.index].webSocket = "danger";
+
+        }catch(e){
+          logger.info("Couldn't set state of missing printer, safe to ignore: "  + this.index + ": " + this.url)
+        }
         break;
       case 1005:	// CLOSE_NORMAL
         logger.info("WebSocket: closed: "  + this.index + ": " + this.url);
+        try {
+          farmPrinters[this.index].state = "Offline";
+          farmPrinters[this.index].stateColour = Runner.getColour("Offline");
+          farmPrinters[this.index].hostState = "Shutdown";
+          farmPrinters[this.index].hostStateColour = Runner.getColour("Shutdown");
+          farmPrinters[this.index].webSocket = "danger";
+
+        }catch(e){
+          logger.info("Couldn't set state of missing printer, safe to ignore: "  + this.index + ": " + this.url)
+        }
         break;
-      case 1006:	// CLOSE_NORMAL
-        logger.info("WebSocket: closed: "  + this.index + ": " + this.url);
+      case 1006:	// TERMINATE();
+        try {
+          farmPrinters[this.index].state = "Offline";
+          farmPrinters[this.index].stateColour = Runner.getColour("Offline");
+          farmPrinters[this.index].hostState = "Shutdown";
+          farmPrinters[this.index].hostStateColour = Runner.getColour("Shutdown");
+          farmPrinters[this.index].webSocket = "danger";
+
+        }catch(e){
+          logger.info("Ping/Pong failed to get a response, closing and attempted to reconnect: "  + this.index + ": " + this.url)
+        }
+        this.reconnect(e);
         break;
       default:	// Abnormal closure
         this.reconnect(e);
@@ -535,43 +589,20 @@ class Runner {
     farmPrinters[index].stateColour = Runner.getColour("Searching...");
     farmPrinters[index].hostState = "Searching...";
     farmPrinters[index].hostStateColour = Runner.getColour("Searching...");
-    if(farmPrinters[index].webSocket === "danger"){
-        await Runner.setupWebSocket(id)
-        result.status = "error";
-        result.msg =
-            "Printer: " +
-            index +
-            " please check CORS, and make sure your OctoPrint instance is fully booted if it hasn't come online...";
-
-
-    }else if(farmPrinters[index].webSocket === "success"){
-      logger.info("Socket already Online, Updating information for: " + farmPrinters[index].printerURL);
-      await Runner.getProfile(id);
-      await Runner.getSystem(id);
-      await Runner.getSettings(id);
-      await Runner.getState(id);
-      await Runner.getFiles(id, "files?recursive=true");
-      result.status = "success";
-      result.msg =
-          "Printer: " +
-          index +
-          " has been successfully re-synced with OctoPrint.";
-      farmPrinters[index].hostState = "Online";
-      farmPrinters[index].hostStateColour = Runner.getColour("Online");
-    }else{
-      await Runner.setupWebSocket(id)
-      result.status = "warning";
-      result.msg =
-          "Printer: " +
-          index +
-          " have attempted a force re-connect.";
+    if(typeof farmPrinters[index].ws !== 'undefined' && typeof farmPrinters[index].ws.instance !== 'undefined'){
+      await farmPrinters[index].ws.instance.close();
+      logger.info("Closed websocket connection for: " + farmPrinters[index].printerURL);
     }
+    await this.setupWebSocket(farmPrinters[index]._id);
+    result.status = "sucess",
+    result.msg = "Your client has been re-synced!"
     return result;
   }
   static async updatePoll() {
     for (let i = 0; i < farmPrinters.length; i++) {
       let Polling = await ServerSettings.check();
       let throt = {};
+      logger.info("Updating websock poll time: " + Polling[0].onlinePolling.seconds * 1000 / 500);
       throt["throttle"] = parseInt(
         (Polling[0].onlinePolling.seconds * 1000) / 500
       );
@@ -587,6 +618,7 @@ class Runner {
     clearInterval(farmStatRunner);
     logger.info("Stopping farm Information runner...");
     clearInterval(statRunner);
+
     for (let i = 0; i < farmPrinters.length; i++) {
       if(typeof farmPrinters[i].ws !== 'undefined' && typeof farmPrinters[i].ws.instance !== 'undefined'){
         await farmPrinters[i].ws.instance.close();
@@ -851,7 +883,7 @@ class Runner {
     } else if (state === "Cancelling") {
       return { name: "warning", hex: "#583c0e", category: "Active" };
     } else if (state === "Error") {
-      return { name: "danger", hex: "#2e0905", category: "Idle" };
+      return { name: "danger", hex: "#2e0905", category: "Disconnected" };
     } else if (state === "Offline") {
       return { name: "danger", hex: "#2e0905", category: "Offline" };
     } else if (state === "Searching...") {

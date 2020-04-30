@@ -12,12 +12,14 @@ All notable changes to this project will be documented in this file.
     
 ### Changed
     - Printer web button does not disable when offline
+    - Printer re-sync now detroys any established connection and re-setups the specific printer fresh.
     
 ### Removed
 
 
 ### Fixed
     - Printer Camera in printer mananger now displays correct placeholder when no URL detected. Placeholder updated for new URL system. 
+    - Added in websocket Ping/Pong which will fire every 30 seconds to check the connection is still alive
 
 ## [v1.1.4.9-dev-1]
 
