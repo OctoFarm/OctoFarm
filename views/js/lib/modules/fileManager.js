@@ -22,8 +22,23 @@ setInterval(async () => {
       let post = await OctoFarmClient.post("printers/newFiles", file);
       let update = await FileManager.updateFileList(file.index);
       fileUploads.remove();
+      let fileCounts = document.getElementById("fileCounts-" + current.index);
+      if(fileCounts && fileCounts.innerHTML == 1){
+          fileCounts.innerHTML = " " +0;
+      }
     }
   }
+  let allUploads = fileUploads.all();
+  allUploads.forEach(uploads => {
+    let currentCount = allUploads.reduce(function (n, up) {
+      return n + (up.index == uploads.index);
+    }, 0)
+    let fileCounts = document.getElementById("fileCounts-" + uploads.index);
+    if(fileCounts){
+      fileCounts.innerHTML = " " + currentCount;
+    }
+  })
+
 }, 1000);
 
 export default class FileManager {
@@ -106,7 +121,7 @@ export default class FileManager {
       let index = file.index;
       let printerInfo = file.printerInfo;
 
-      let fileCounts = document.getElementById("fileCounts-" + index);
+
       //XHR doesn't like posting without it been a form, can't use offical octoprint api way...
       //Create form data
       let formData = new FormData();
@@ -125,10 +140,6 @@ export default class FileManager {
       file = file.file;
       xhr.open("POST", url);
       xhr.upload.onprogress = function(e) {
-        console.log(              printerInfo._id,
-            file.name,
-            e.loaded,
-            e.total)
         if (e.lengthComputable) {
           FileManager.createUpload(
               printerInfo._id,
@@ -156,9 +167,6 @@ export default class FileManager {
             e.loaded,
             e.total
         );
-        if(fileCounts){
-          fileCounts.innerHTML = " " + (parseInt(fileCounts.innerHTML) - 1);
-        }
         setTimeout(() => {
           FileManager.createUpload(
               printerInfo._id,
@@ -718,13 +726,7 @@ export default class FileManager {
           if (printAfterUpload) {
             newObject.print = true;
           }
-          let fileCounts = document.getElementById("fileCounts-" + newObject.index);
-          if(fileCounts){
-            let amount = parseInt(fileCounts.innerHTML);
-            amount = amount + 1;
-            fileCounts.innerHTML = " " + amount;
-            fileUploads.add(newObject);
-          }
+
 
 
         });
