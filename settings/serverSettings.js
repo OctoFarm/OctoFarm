@@ -13,7 +13,6 @@ class ServerSettings {
         loginRequired: true
       };
       let timeout = {
-        webSocketRetry: 5000,
         apiTimeout: 1000,
         apiRetryCutoff: 10000,
         apiRetry: 300000
