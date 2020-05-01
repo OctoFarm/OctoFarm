@@ -129,7 +129,7 @@ setInterval(async function() {
     filament: rolls,
     clientSettings: cSettings
   };
-  yj.stringifyAsync(clientInfo, (err, data) => {
+  yj.stringifyAsync(clientInfo, null, null,32,(err, data) => {
     if (!err) {
       clientInfoString = data;
     } else {
@@ -210,21 +210,21 @@ router.get("/fileManagerInfo/", ensureAuthenticated, function(req, res) {
 setInterval(async function() {
   for (clientId in clients) {
     if(clients[clientId].socket.parser.incoming.url.includes("dashboard")){
-          for (clientId in clients) {
-            clients[clientId].write("data: " + clientInfoString + "\n\n"); // <- Push a message to a single attached client
-          }
+      for (clientId in clients) {
+        clients[clientId].write("data: " + clientInfoString + "\n\n"); // <- Push a message to a single attached client
+      }
     }else if(clients[clientId].socket.parser.incoming.url.includes("monitoring")){
-          for (clientId in clients) {
-            clients[clientId].write("data: " + clientInfoString + "\n\n"); // <- Push a message to a single attached client
-          }
+      for (clientId in clients) {
+        clients[clientId].write("data: " + clientInfoString + "\n\n"); // <- Push a message to a single attached client
+      }
     }else if(clients[clientId].socket.parser.incoming.url.includes("history")){
-          for (clientId in clients) {
-            clients[clientId].write("data: " + clientInfoString + "\n\n"); // <- Push a message to a single attached client
-          }
+      for (clientId in clients) {
+        clients[clientId].write("data: " + clientInfoString + "\n\n"); // <- Push a message to a single attached client
+      }
     }else if(clients[clientId].socket.parser.incoming.url.includes("fileManagerInfo")){
-          for (clientId in clients) {
-            clients[clientId].write("data: " + clientInfoString  + "\n\n"); // <- Push a message to a single attached client
-          }
+      for (clientId in clients) {
+        clients[clientId].write("data: " + clientInfoString  + "\n\n"); // <- Push a message to a single attached client
+      }
     }
   }
 }, 500);
@@ -232,4 +232,3 @@ setInterval(async function() {
 
 
 module.exports = router;
-

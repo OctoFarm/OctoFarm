@@ -10,6 +10,457 @@ import Validate from "./lib/functions/validate.js";
 let printerInfo = "";
 let editMode = false;
 let deletedPrinters = [];
+//Setup charts
+let optionsMemory = {
+  title: {
+    text: "Memory",
+    align: 'center',
+    margin: 0,
+    offsetX: 0,
+    offsetY: 100,
+    floating: false,
+    style: {
+      fontSize:  '14px',
+      fontWeight:  'bold',
+      fontFamily:  undefined,
+      color:  '#fff',
+    },
+  },
+  chart: {
+    type: 'donut',
+    width: '100%',
+    height: 300,
+    animations: {
+      enabled: false,
+    },
+    background: '#303030'
+  },
+  theme: {
+    mode: 'dark',
+  },
+  plotOptions: {
+    pie: {
+      expandOnClick: true,
+      dataLabels: {
+        offset: 10,
+        minAngleToShowLabel: 15
+      },
+    }
+  },
+  stroke: {
+    show: false,
+  },
+  tooltip: {
+    enabled: false,
+  },
+  noData: {
+    text: 'Loading...'
+  },
+  dataLabels: {
+    enabled: true,
+    offsetY: 90,
+    formatter: function (val , { seriesIndex, w }) {
+      return Calc.bytes(w.config.series[seriesIndex])
+    },
+    dropShadow: {
+      blur: 3,
+      opacity: 0.8
+    }
+  },
+  series: [],
+  labels: ['Other', 'OctoFarm', 'Free'],
+  colors:['#f39c12', '#3498db','#00bc8c'],
+  legend: {
+    show: true,
+    showForSingleSeries: false,
+    showForNullSeries: true,
+    showForZeroSeries: true,
+    position: 'bottom',
+    horizontalAlign: 'center',
+    floating: false,
+    fontSize: '11px',
+    fontFamily: 'Helvetica, Arial',
+    fontWeight: 400,
+    formatter: undefined,
+    inverseOrder: false,
+    width: undefined,
+    height: undefined,
+    tooltipHoverFormatter: undefined,
+    offsetX: -25,
+    offsetY: 0,
+    labels: {
+      colors: undefined,
+      useSeriesColors: false
+    },
+    markers: {
+      width: 9,
+      height: 9,
+      strokeWidth: 0,
+      strokeColor: '#fff',
+      fillColors: undefined,
+      radius: 1,
+      customHTML: undefined,
+      onClick: undefined,
+      offsetX: 0,
+      offsetY: 0
+    },
+    itemMargin: {
+      horizontal: 1,
+      vertical: 0
+    },
+    onItemClick: {
+      toggleDataSeries: false
+    },
+    onItemHover: {
+      highlightDataSeries: false
+    },
+  }
+};
+let optionsCPU = {
+  title: {
+    text: "CPU",
+    align: 'center',
+    margin: 5,
+    offsetX: 0,
+    offsetY: 100,
+    floating: false,
+    style: {
+      fontSize:  '14px',
+      fontWeight:  'bold',
+      fontFamily:  undefined,
+      color:  '#fff'
+    },
+  },
+  chart: {
+    type: 'donut',
+    width: '100%',
+    height: 300,
+    animations: {
+      enabled: true,
+    },
+    background: '#303030'
+  },
+  theme: {
+    mode: 'dark',
+  },
+  plotOptions: {
+    pie: {
+      expandOnClick: false,
+      dataLabels: {
+        offset: 10,
+        minAngleToShowLabel: 15
+      },
+    }
+  },
+  stroke: {
+    show: false,
+  },
+  tooltip: {
+    enabled: false,
+  },
+  noData: {
+    text: 'Loading...'
+  },
+  dataLabels: {
+    enabled: true,
+    offsetY: 90,
+    formatter: function (val) {
+      return  Math.round(val * 10) / 10 + "%"
+    },
+    dropShadow: {
+      blur: 3,
+      opacity: 0.8
+    }
+  },
+  series: [],
+  labels: ['System', 'OctoFarm', 'User', 'Free'],
+  colors:['#f39c12', '#3498db', '#375a7f','#00bc8c'],
+  legend: {
+    show: true,
+    showForSingleSeries: false,
+    showForNullSeries: true,
+    showForZeroSeries: true,
+    position: 'bottom',
+    horizontalAlign: 'center',
+    floating: false,
+    fontSize: '11px',
+    fontFamily: 'Helvetica, Arial',
+    fontWeight: 400,
+    formatter: undefined,
+    inverseOrder: false,
+    width: undefined,
+    height: undefined,
+    tooltipHoverFormatter: undefined,
+    offsetX: -25,
+    offsetY: 0,
+    labels: {
+      colors: undefined,
+      useSeriesColors: false
+    },
+    markers: {
+      width: 9,
+      height: 9,
+      strokeWidth: 0,
+      strokeColor: '#fff',
+      fillColors: undefined,
+      radius: 1,
+      customHTML: undefined,
+      onClick: undefined,
+      offsetX: 0,
+      offsetY: 0
+    },
+    itemMargin: {
+      horizontal: 1,
+      vertical: 0
+    },
+    onItemClick: {
+      toggleDataSeries: false
+    },
+    onItemHover: {
+      highlightDataSeries: false
+    },
+  }
+};
+let optionsFarmStatus = {
+  title: {
+    text: 'Print Time Chart',
+    align: 'center'
+  },
+  chart: {
+    type: 'line',
+    id: 'realtime',
+    height: 255,
+    width: '100%',
+    animations: {
+      enabled: true,
+      easing: 'linear',
+      dynamicAnimation: {
+        speed: 1000
+      }
+    },
+    toolbar: {
+      show: false
+    },
+    zoom: {
+      enabled: false
+    },
+    background: '#303030'
+  },
+  colors:['#00bc8c', '#f39c12', '#e74c3c'],
+  stroke: {
+    curve: 'smooth'
+  },
+  toolbar: {
+    show: false
+  },
+  theme: {
+    mode: 'dark',
+  },
+  noData: {
+    text: 'Loading...'
+  },
+
+  series: [],
+  yaxis:
+      [
+    {
+      title: {
+        text: "Time"
+      },
+      seriesName: "Total Estimated",
+      labels: {
+        formatter: function (value) {
+          return Calc.generateTime(value);
+        }
+      },
+    },
+    {
+      seriesName: "Total Estimated",
+      show: false,
+      labels: {
+        formatter: function (value) {
+          return Calc.generateTime(value);
+        }
+      },
+    },
+    {
+      seriesName: "Total Estimated",
+      show: false,
+      labels: {
+        formatter: function (value) {
+          return Calc.generateTime(value);
+        }
+      },
+    },
+  ],
+  xaxis: {
+    type: 'datetime',
+    labels: {
+      formatter: function (value) {
+        let date = new Date(value);
+        let formatTime = date.toLocaleTimeString();
+        return formatTime;
+      }
+    },
+  },
+};
+let optionsFarmTemp = {
+  title: {
+    text: 'Print Temp Chart',
+    align: 'center'
+  },
+  chart: {
+    type: 'line',
+    id: 'realtime',
+    height: 255,
+    width:'100%',
+    animations: {
+      enabled: true,
+      easing: 'linear',
+      dynamicAnimation: {
+        speed: 1000
+      }
+    },
+    toolbar: {
+      show: false
+    },
+    zoom: {
+      enabled: false
+    },
+    background: '#303030'
+  },
+  colors:['#21618a', '#8f3026','#3eb2ff','#e74c3c','#9ed8ff','#e5958e'],
+  stroke: {
+    curve: 'smooth'
+  },
+  toolbar: {
+    show: false
+  },
+  theme: {
+    mode: 'dark',
+  },
+  noData: {
+    text: 'Loading...'
+  },
+
+  series: [],
+  yaxis:
+      [
+        {
+          title: {
+            text: "Temp"
+          },
+          seriesName: "Actual Tool",
+          labels: {
+            formatter: function (value) {
+              return value + "°C";
+            }
+          },
+        },
+        {
+          seriesName: "Actual Tool",
+          show: false,
+          labels: {
+            formatter: function (value) {
+              return value + "°C";
+            }
+          },
+        },
+        {
+          seriesName: "Actual Tool",
+          show: false,
+          labels: {
+            formatter: function (value) {
+              return value + "°C";
+            }
+          },
+        },
+        {
+          seriesName: "Actual Tool",
+          show: false,
+          labels: {
+            formatter: function (value) {
+              return value + "°C";
+            }
+          },
+        },
+        {
+          seriesName: "Actual Total",
+          show: false,
+          labels: {
+            formatter: function (value) {
+              return value + "°C";
+            }
+          },
+        },
+        {
+          seriesName: "Actual Tool",
+          show: false,
+          labels: {
+            formatter: function (value) {
+              return value + "°C";
+            }
+          },
+        },
+      ],
+  xaxis: {
+    type: 'datetime',
+    labels: {
+      formatter: function (value) {
+        let date = new Date(value);
+        let formatTime = date.toLocaleTimeString();
+        return formatTime;
+      }
+    },
+  },
+};
+// var optionsHeatMap = {
+//   series: [],
+//   chart: {
+//     height: 350,
+//     type: 'heatmap',
+//     background: '#303030'
+//   },
+//   dataLabels: {
+//     enabled: false
+//   },
+//   colors: ["#008FFB"],
+//   title: {
+//     text: 'HeatMap Chart (Single color)'
+//   },
+//   xaxis: {
+//     type: 'category',
+//     categories: ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '01:00', '01:30']
+//   },
+//   theme: {
+//     mode: 'dark',
+//   },
+//   noData: {
+//     text: 'Loading...'
+//   },
+// };
+// var heatMapChart = new ApexCharts(document.querySelector("#farmHeatMap"), optionsHeatMap);
+// heatMapChart.render();
+let systemChartCPU = new ApexCharts(
+    document.querySelector("#systemChartCPU"),
+    optionsCPU
+);
+systemChartCPU.render();
+let systemChartMemory = new ApexCharts(
+    document.querySelector("#systemChartMemory"),
+    optionsMemory
+);
+systemChartMemory.render();
+let systemFarmStatus = new ApexCharts(
+    document.querySelector("#farmStatusMap"),
+    optionsFarmStatus
+);
+systemFarmStatus.render();
+let systemFarmTemp = new ApexCharts(
+    document.querySelector("#farmTempMap"),
+    optionsFarmTemp
+);
+systemFarmTemp.render();
 async function asyncParse(str) {
     try{
       let info = JSON.parse(str)
@@ -20,6 +471,7 @@ async function asyncParse(str) {
     }
 }
 let source = new EventSource("/sse/dashboardInfo/");
+let statsCounter = 10;
 source.onmessage = async function(e) {
   if(!editMode){
     if (e.data != null) {
@@ -31,10 +483,18 @@ source.onmessage = async function(e) {
           ) {
             PrinterManager.init(res.printerInfo);
           } else {
-            currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
-            dashUpdate.systemInformation(res.systemInfo);
-            dashUpdate.printers(res.printerInfo);
             printerInfo = res.printerInfo;
+            currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
+            dashUpdate.printers(res.printerInfo);
+            if(statsCounter === 10){
+              dashUpdate.systemInformation(res.systemInfo);
+              dashUpdate.farmInformation(res.farmInfo);
+              statsCounter = 0;
+            }else{
+              statsCounter = statsCounter+1;
+            }
+
+
           }
         }
       }
@@ -711,45 +1171,19 @@ class dashUpdate {
     if(Object.keys(systemInfo).length === 0 && systemInfo.constructor === Object){
 
     }else{
-      let cpuLoad = Math.round(systemInfo.cpuLoad.currentload_system * 10) / 10;
-      let octoLoad = Math.round(systemInfo.sysProcess.pcpu * 10) / 10;
-      let userLoad = Math.round(systemInfo.cpuLoad.currentload_user * 10) / 10;
-      let remain = Math.round(cpuLoad + octoLoad + userLoad * 10) / 10;
-      document.getElementById("systemUpdate").innerHTML = Calc.generateTime(
-          systemInfo.sysUptime.uptime
-      );
-      document.getElementById("systemCPU").innerHTML = cpuLoad + "%";
-      document.getElementById("octofarmCPU").innerHTML = octoLoad + "%";
-      document.getElementById("userCPU").innerHTML = userLoad + "%";
-      document.getElementById("systemCPUProg").style.width = cpuLoad + "%";
-      document.getElementById("octofarmCPUProg").style.width = octoLoad + "%";
-      document.getElementById("userCPUProg").style.width = userLoad + "%";
-      document.getElementById("remainingCPUProg").style.width =
-          100 - remain + "%";
-      let otherRAM = Calc.bytes(
-          systemInfo.memoryInfo.total - systemInfo.memoryInfo.free
-      );
-      let octoRAM = Calc.bytes(
-          (systemInfo.memoryInfo.total / 100) * systemInfo.sysProcess.pmem
-      );
-      let freeRAM = Calc.bytes(systemInfo.memoryInfo.free);
-      let otherPer =
-          Math.round(
-              (systemInfo.memoryInfo.used / systemInfo.memoryInfo.total) * 100 * 10
-          ) / 10;
-      let octoPer = Math.round(systemInfo.sysProcess.pmem * 10) / 10;
-      let freePer =
-          100 -
-          Math.round(
-              (systemInfo.memoryInfo.used / systemInfo.memoryInfo.total) * 100 * 10
-          ) /
-          10;
-      document.getElementById("otherRam").innerHTML = otherRAM;
-      document.getElementById("octoRam").innerHTML = octoRAM;
-      document.getElementById("freeRam").innerHTML = freeRAM;
-      document.getElementById("otherRamProg").style.width = otherPer + "%";
-      document.getElementById("octoRamProg").style.width = octoPer + "%";
-      document.getElementById("freeRamProg").style.width = freePer + "%";
+      //labels: ['System', 'OctoFarm', 'User', 'Free'],
+      let cpuLoad = systemInfo.cpuLoad.currentload_system;
+      let octoLoad = systemInfo.sysProcess.pcpu;
+      let userLoad = systemInfo.cpuLoad.currentload_user;
+      let remain = cpuLoad + octoLoad + userLoad;
+      systemChartCPU.updateSeries([cpuLoad ,octoLoad,userLoad,100 - remain])
+
+      let otherRAM = systemInfo.memoryInfo.total - systemInfo.memoryInfo.free
+      let octoRAM = systemInfo.memoryInfo.total / 100 * systemInfo.sysProcess.pmem
+      let freeRAM = systemInfo.memoryInfo.free
+
+      systemChartMemory.updateSeries([otherRAM ,octoRAM,freeRAM])
+
     }
 
   }
@@ -811,8 +1245,8 @@ class dashUpdate {
             <center>
             <form class="was-validated form-check-inline form-check">
                 <div class="custom-control custom-checkbox mb-2 pr-2">
-                    <input type="checkbox" class="custom-control-input" id="dashboardPrinterSelect-${printer._id}" required>
-                    <label class="custom-control-label" for="multiUpPrinters-${printer._id}" contenteditable="false"></label>
+                    <input type="checkbox" class="custom-control-input" id="dashboardSelect-${printer._id}" required>
+                    <label class="custom-control-label" for="dashboardSelect-${printer._id}" contenteditable="false"></label>
                 </div>
             </form>
             </center>
@@ -896,6 +1330,14 @@ class dashUpdate {
       }
     });
   }
+  static farmInformation(farmInfo){
+  // console.log(farmInfo.heat)
+  //   heatMapChart.updateSeries(farmInfo.heat);
+
+    systemFarmStatus.updateSeries(farmInfo.time);
+
+    systemFarmTemp.updateSeries(farmInfo.temp);
+
 }
 
 //   static farmInformation(farmInfo) {
@@ -955,7 +1397,7 @@ class dashUpdate {
 //     idleProgress.innerHTML = 100 - octofarmStatistics.activePercent + "%";
 //     idleProgress.style.width = 100 - octofarmStatistics.activePercent + "%";
 //   }
-// }
+ }
 let el = document.getElementById("printerList");
 let sortable = Sortable.create(el, {
   handle: ".sortableList",

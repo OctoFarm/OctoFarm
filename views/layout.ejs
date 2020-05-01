@@ -219,8 +219,7 @@
                                             <%}%>
                                       <% if(printers[i].stateColour.category === "Idle" || printers[i].stateColour.category === "Complete"){%>
                                         <form class="was-validated form-check-inline form-check">
-                                          <div class="custom-control custom-checkbox mb-2 pr-2">
-                                            <input type="checkbox" class="custom-control-input" id="multiUpPrinters-<%= printers[i]._id %>" value="<%= printers[i]._id %>" required>
+                                          <div class="custom-control custom-checkbox mb-2 pr-2"><input type="checkbox" class="custom-control-input" id="multiUpPrinters-<%= printers[i]._id %>" value="<%= printers[i]._id %>" required>
                                            <label class="custom-control-label" for="multiUpPrinters-<%= printers[i]._id %>"><%= name%></label>
                                             <div class="invalid-feedback">Not this printer</div>
                                             <div class="valid-feedback">

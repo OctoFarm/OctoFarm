@@ -8,21 +8,26 @@ All notable changes to this project will be documented in this file.
 
 ### Added
     - Printer Control Manager now allows for switching of printers on the fly from the modal. No need to close and re-open. 
-    
+    - Historical collection for Farm Statistics, now gathers up to 6 hours of data. (Temp, time data). Resets on server restart. 
     
 ### Changed
     - Printer web button does not disable when offline
     - Printer re-sync now detroys any established connection and re-setups the specific printer fresh.
     - Uploads done on the Printer Control modal are now not dependant on the status you can check the status by viewing the printer. A complete notification will be done whe the file has been uploaded. 
     - Current upload count no longer uses the +/- mechanism, it counds the uploads and displays the current amount found.
+    - Moved system information to the right hand side of the screen. 
+    - System information is now a donut chart
     
 ### Removed
+    - Pointless space wasting footers on dashboard
 
 
 ### Fixed
     - Printer Camera in printer mananger now displays correct placeholder when no URL detected. Placeholder updated for new URL system. 
     - Added in websocket Ping/Pong which will fire every 30 seconds to check the connection is still alive
-
+    - Fixed annoying browser console output warning of multiple similar id's
+    - Fixed saying "Done" when 0 seconds was detected.
+    
 ## [v1.1.4.9-dev-1]
 
 ### Added

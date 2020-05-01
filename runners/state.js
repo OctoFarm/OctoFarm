@@ -329,14 +329,14 @@ class Runner {
     statRunner = setInterval(function() {
       //Update Current Operations
       StatisticsCollection.currentOperations(farmPrinters);
-      //Update farm information when we have temps
-      StatisticsCollection.farmInformation(farmPrinters);
-      //Update print statistics
-      StatisticsCollection.printStatistics();
     }, 500);
     farmStatRunner = setInterval(function() {
       //Update farm statistics
       StatisticsCollection.octofarmStatistics(farmPrinters);
+      //Update farm information when we have temps
+      StatisticsCollection.farmInformation(farmPrinters);
+      //Update print statistics
+      StatisticsCollection.printStatistics();
     }, 5000);
 
     //Grab printers from database....

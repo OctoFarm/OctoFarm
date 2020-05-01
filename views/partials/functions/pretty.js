@@ -56,7 +56,7 @@ const generateTime = function(seconds) {
         string = string.replace("0 Days,", "");
       }
     }
-    if (seconds == 0) {
+    if (mnts == 0 && hrs == 0 && days == 0 && seconds == 0) {
       string = string.replace("0 Seconds", "Done");
     }
   }

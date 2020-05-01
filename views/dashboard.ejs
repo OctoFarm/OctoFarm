@@ -1,29 +1,12 @@
 
   <!--Current Operations-->
-<%- include('./partials/currentOperations.ejs') %>
+
+        <%- include('./partials/currentOperations.ejs') %>
+
+
+
   <!--System/Farm Overview-->
   <div class="row">
-    <div id="systemInformation" class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-3">
-      <div class="card text-white bg-dark">
-        <div class="card-header dashHeader p-0 pt-1"">
-            <button
-                    type="button"
-                    class="btn btn-secondary d-block ml-1 mr-1 p-1"
-                    href="#"
-                    aria-expanded="false"
-                    disabled
-            >
-              <i class="fas fa-info-circle"></i> System Information
-            </button>
-
-
-        </div>
-        <div class="card-body pt-2 pb-0">
-          <%- include('./partials/Printers/dashboardSI.ejs') %>
-        </div>
-        <div class="card-footer dashFooter text-muted"></div>
-      </div>
-    </div>
     <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-9">
       <div class="card text-white bg-dark">
         <div class="card-header dashHeader p-0 pt-1">
@@ -34,7 +17,7 @@
                     aria-expanded="false"
                     disabled
             >
-              <i class="fas fa-info-circle"></i> Farm Information
+              <i class="fas fa-info-circle"></i> Farm Status
             </button>
 
 
@@ -42,9 +25,37 @@
         <div class="card-body pt-2 pb-0">
           <%- include('./partials/Printers/dashboardFI.ejs') %>
         </div>
-        <div class="card-footer dashFooter text-muted"></div>
       </div>
     </div>
+    <div id="systemInformation" class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-3">
+      <div class="card text-white bg-dark">
+        <div class="card-header dashHeader p-0 pt-1"">
+        <button
+                type="button"
+                class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-info-circle"></i> System Information
+        </button>
+        <button
+                type="button"
+                class="btn btn-secondary float-right d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-hourglass"></i> Uptime: <span id="systemUpdate" style="font-size:0.8rem;"><%- helpers.generateTime(systemInfo.sysUptime.uptime)%></span>
+        </button>
+
+
+      </div>
+      <div class="card-body p-0">
+        <%- include('./partials/Printers/dashboardSI.ejs') %>
+      </div>
+    </div>
+  </div>
   </div>
   <!--Printer Management-->
   <div class="row">
@@ -167,7 +178,6 @@
             </tbody>
           </table>
         </div>
-        <div class="card-footer dashFooter text-muted"></div>
       </div>
     </div>
   </div>
