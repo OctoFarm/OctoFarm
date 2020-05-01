@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
     - Current upload count no longer uses the +/- mechanism, it counds the uploads and displays the current amount found.
     - Moved system information to the right hand side of the screen. 
     - System information is now a donut chart
+    - New farm status graphs for Print time and Temp. 
     
 ### Removed
     - Pointless space wasting footers on dashboard

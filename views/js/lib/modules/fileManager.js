@@ -10,7 +10,6 @@ let fileUploads = new Queue();
 
 setInterval(async () => {
   //If there are files in the queue, plow through until uploaded... currently single file at a time.
-  console.log(fileUploads)
   if (fileUploads.size() > 0) {
     let current = fileUploads.first();
     if (!current.active) {
@@ -715,7 +714,6 @@ export default class FileManager {
         } else {
           spinner.classList = "fas fa-spinner fa-spin";
         }
-        console.log(selectedFile)
         selectedFile.forEach(file => {
           let newObject = {};
           const num = printer.value;

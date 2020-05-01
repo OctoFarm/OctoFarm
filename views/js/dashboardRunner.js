@@ -636,12 +636,13 @@ document.getElementById(("exportPrinterBtn")).addEventListener('click', event =>
   const table = document.getElementById("printerList");
   let printers = new Array();
   for (let r = 0, n = table.rows.length; r < n; r++) {
+    let index = table.rows[r].id.split('-')
     let printer = {
-      name: document.getElementById("printerName-" + r).innerHTML,
-      group: document.getElementById("printerGroup-" + r).innerHTML,
-      printerURL: document.getElementById("printerURL-" + r).innerHTML,
-      cameraURL: document.getElementById("printerCamURL-" + r).innerHTML,
-      apikey: document.getElementById("printerApiKey-" + r).innerHTML
+      name: document.getElementById("printerName-" + index[1]).innerHTML,
+      group: document.getElementById("printerGroup-" + index[1]).innerHTML,
+      printerURL: document.getElementById("printerURL-" + index[1]).innerHTML,
+      cameraURL: document.getElementById("printerCamURL-" + index[1]).innerHTML,
+      apikey: document.getElementById("printerApiKey-" + index[1]).innerHTML
     }
     printers.push(printer);
   }
