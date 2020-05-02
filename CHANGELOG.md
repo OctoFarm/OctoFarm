@@ -8,16 +8,18 @@ All notable changes to this project will be documented in this file.
 
 ### Added
     - Printer Control Manager now allows for switching of printers on the fly from the modal. No need to close and re-open. 
-    - Historical collection for Farm Statistics, now gathers up to 6 hours of data. (Temp, time data). Resets on server restart. 
+    - Historical collection for Farm Statistics, now gathers up to 1 hours of live data. (Temperature). Resets on server restart. 
+    - Added loading status to all dashboard  graphs and data. 
     
 ### Changed
     - Printer web button does not disable when offline
-    - Printer re-sync now detroys any established connection and re-setups the specific printer fresh.
+    - Printer re-sync now detroys any established connection and re-sets up the specific printer fresh regardless of state..
     - Uploads done on the Printer Control modal are now not dependant on the status you can check the status by viewing the printer. A complete notification will be done whe the file has been uploaded. 
-    - Current upload count no longer uses the +/- mechanism, it counds the uploads and displays the current amount found.
+    - Current upload count no longer uses the +/- mechanism, it counts the uploads and displays the current amount found.
     - Moved system information to the right hand side of the screen. 
     - System information is now a donut chart
-    - New farm status graphs for Print time and Temp. 
+    - New farm status graphs for Temp. Shows Actual and Targets for global tool and bed temperatures with a status at top for total farm temperature. 
+    - Table headers fixed for "Actions" on Printer Management
     
 ### Removed
     - Pointless space wasting footers on dashboard
@@ -28,6 +30,7 @@ All notable changes to this project will be documented in this file.
     - Added in websocket Ping/Pong which will fire every 30 seconds to check the connection is still alive
     - Fixed annoying browser console output warning of multiple similar id's
     - Fixed saying "Done" when 0 seconds was detected.
+    - Fixed issue with history not grabbing relevant job information due to OctoPrint sending undefined information at odd times. Added checks for progress and currentZ too. 
     
 ## [v1.1.4.9-dev-1]
 

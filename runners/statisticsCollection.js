@@ -5,17 +5,6 @@ const filamentType = require("../config/filaments.js");
 const returnFilamentTypes = filamentType.returnFilamentTypes;
 
 let farmStats = [];
-let currentHistoryTime = [{
-  name: 'Total Estimated',
-  data: []
-}, {
-  name: 'Total Elapsed',
-  data: []
-}, {
-  name: 'Total Remaining',
-  data: []
-}
-];
 let currentHistoryTemp = [{
   name: 'Actual Tool',
   data: []
@@ -28,15 +17,27 @@ let currentHistoryTemp = [{
 }, {
   name: 'Target Bed',
   data: []
-}, {
-  name: 'Actual Total',
-  data: []
-}, {
-  name: 'Target Total',
-  data: []
 }
 ];
-// let heatMap = []
+let heatMap = [{
+  name: 'Completed',
+  data: []
+}, {
+  name: 'Active',
+  data: []
+}, {
+  name: 'Idle',
+  data: []
+},{
+  name: 'Offline',
+  data: []
+},{
+  name: 'Disconnected',
+  data: []
+}]
+
+let heatMapCounter = 17280;
+
 class StatisticsCollection {
   static returnStats() {
     return farmStats[0];
@@ -70,11 +71,11 @@ class StatisticsCollection {
   }
   static grabName(printer){
     let name = "";
-    if (typeof printer.settingsAppearance != "undefined") {
-      if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
+    if (typeof printer.settingsApperance != "undefined") {
+      if (printer.settingsApperance.name === "" || printer.settingsApperance.name === null) {
         name = printer.printerURL;
       } else {
-        name = printer.settingsAppearance.name;
+        name = printer.settingsApperance.name;
       }
     } else {
       name = printer.printerURL;
@@ -90,7 +91,6 @@ class StatisticsCollection {
     let offline = [];
     let disconnected = [];
     let progress = [];
-    let closed = [];
     try {
       farmPrinters.forEach(printer => {
         let name = StatisticsCollection.grabName(printer);
@@ -109,9 +109,6 @@ class StatisticsCollection {
             disconnected.push(printer._id);
           }
 
-        }
-        if (typeof printer.state != undefined && printer.state === "Closed") {
-          closed.push(printer._id);
         }
         
         if (
@@ -167,43 +164,96 @@ class StatisticsCollection {
       currentOperationsCount.offline = offline.length;
       currentOperationsCount.idle = idle.length;
       currentOperationsCount.disconnected = disconnected.length;
-      currentOperationsCount.closed = closed.length;
+      if(heatMapCounter >= 17280){
+        StatisticsCollection.heatMapping(currentOperationsCount.complete,
+            currentOperationsCount.active,
+            currentOperationsCount.offline,
+            currentOperationsCount.idle,
+            currentOperationsCount.disconnected
+        )
+        heatMapCounter = 0;
+      }else{
+        heatMapCounter = heatMapCounter + 250;
+      }
+
       currentOperations = _.orderBy(currentOperations, ["progress"], ["desc"]);
       farmStats[0].currentOperations = currentOperations;
       farmStats[0].currentOperationsCount = currentOperationsCount;
     } catch (err) {
       console.log("Current Operations issue: " + err);
     }
-    //StatisticsCollection.headMapping(farmPrinters)
   }
-  static headMapping(farmPrinters){
-    farmPrinters.forEach(printer => {
-      let name = StatisticsCollection.grabName(printer);
-      let activity = {
-        name: name,
-        data: []
+  static heatMapping(complete, active, offline, idle, disconnected){
+      let today = new Date()
+          today = today.getDay()
+      let CompleteCount = {
+        x: today,
+        y: 0
       }
-      let index = _.findIndex(heatMap, function(o) { return o.name == name; });
-      if(index > -1){
-        //It exists, no need to create
-        if(printer.stateColour.category === "Offline"){
-          heatMap[index].data.push(0)
-        }else if(printer.stateColour.category === "Active"){
-          heatMap[index].data.push(2)
-        }else if(printer.stateColour.category === "Active"){
-          heatMap[index].data.push(2)
-        }else if(printer.stateColour.category === "Idle"){
-          heatMap[index].data.push(1)
+        let ActiveCount = {
+          x: today,
+          y: 0
         }
-        if(heatMap[index].data.length > 8320){
-          heatMap[index].data.shift();
-        }
+
+      let IdleCount = {
+        x: today,
+        y: 0
+      }
+      let OfflineCount = {
+        x: today,
+        y: 0
+      }
+      let DisconnectedCount = {
+        x: today,
+        y: 0
+      }
+      if(heatMap[0].data.length === 0){
+        //Created initial data set
+        heatMap[0].data.push(CompleteCount)
+        heatMap[1].data.push(ActiveCount)
+        heatMap[2].data.push(IdleCount)
+        heatMap[3].data.push(OfflineCount)
+        heatMap[4].data.push(DisconnectedCount)
       }else{
-        //Doesn't exist, create activity
-        heatMap.push(activity);
+        //Cycle through current data and check if day exists...
+        for(let i = 0; i < heatMap.length; i++){
+          //If x = today add that fucker up!
+          if(heatMap[i].data[0].x === today) {
+            if (heatMap[i].name === "Completed" && complete > 0) {
+              heatMap[i].data[0].y = heatMap[i].data[0].y + complete;
+            }
+            if (heatMap[i].name === "Active" && active > 0) {
+              heatMap[i].data[0].y = heatMap[i].data[0].y + active;
+            }
+            if (heatMap[i].name === "Offline" && offline > 0) {
+              heatMap[i].data[0].y = heatMap[i].data[0].y + offline;
+            }
+            if (heatMap[i].name === "Idle" && idle > 0) {
+              heatMap[i].data[0].y = heatMap[i].data[0].y + idle;
+            }
+            if (heatMap[i].name === "Disconnected" && disconnected > 0) {
+              heatMap[i].data[0].y = heatMap[i].data[0].y + disconnected;
+            }
+          }else{
+            //Must be a new day, so shift with new heatMap
+            heatMap[0].data.shift(CompleteCount)
+            heatMap[1].data.shift(ActiveCount)
+            heatMap[2].data.shift(IdleCount)
+            heatMap[3].data.shift(OfflineCount)
+            heatMap[4].data.shift(DisconnectedCount)
+          }
+        }
       }
-    })
-    farmStats[0].farmInfo.heat = heatMap;
+      //Clean up old days....
+    if(heatMap[0].data.length > 7){
+      heatMap[0].data.pop()
+      heatMap[1].data.pop()
+      heatMap[2].data.pop()
+      heatMap[3].data.pop()
+      heatMap[4].data.pop()
+    }
+    farmStats[0].heatMap = heatMap;
+
   }
   static async farmInformation(farmPrinters) {
     let farmInfo = await this.blankFarmInfo();
@@ -234,12 +284,12 @@ class StatisticsCollection {
       }
     });
 
-    farmInfo.activeToolA =
+    let activeToolA =
       Math.round(toolA.reduce((a, b) => a + b, 0) * 10) / 10;
-    farmInfo.activeToolT =
+    let activeToolT =
       Math.round(toolT.reduce((a, b) => a + b, 0) * 10) / 10;
-    farmInfo.activeBedA = Math.round(bedA.reduce((a, b) => a + b, 0) * 10) / 10;
-    farmInfo.activeBedT = Math.round(bedT.reduce((a, b) => a + b, 0) * 10) / 10;
+    let activeBedA = Math.round(bedA.reduce((a, b) => a + b, 0) * 10) / 10;
+    let activeBedT = Math.round(bedT.reduce((a, b) => a + b, 0) * 10) / 10;
 
     farmInfo.totalElapsedTime = printTimeElapsed.reduce((a, b) => a + b, 0);
     farmInfo.totalRemainingTime = printTimeRemaining.reduce((a, b) => a + b, 0);
@@ -250,30 +300,22 @@ class StatisticsCollection {
       farmInfo.totalRemainingTime / printTimeRemaining.length;
     farmInfo.avgEstimateTime =
       farmInfo.totalEstimateTime / printTimeEstimate.length;
+    farmInfo.totalActualTemperature = activeBedA + activeToolA;
+
     let timeStamp = new Date();
-    farmInfo.timeStamp = timeStamp.getTime();
-    currentHistoryTime[0].data.push({x: farmInfo.timeStamp , y: farmInfo.totalEstimateTime})
-    currentHistoryTime[1].data.push({x: farmInfo.timeStamp , y: farmInfo.totalElapsedTime})
-    currentHistoryTime[2].data.push({x: farmInfo.timeStamp , y: farmInfo.totalRemainingTime})
-    currentHistoryTemp[0].data.push({x: farmInfo.timeStamp , y: farmInfo.activeToolA})
-    currentHistoryTemp[1].data.push({x: farmInfo.timeStamp , y: farmInfo.activeToolT})
-    currentHistoryTemp[2].data.push({x: farmInfo.timeStamp , y: farmInfo.activeBedA})
-    currentHistoryTemp[3].data.push({x: farmInfo.timeStamp , y: farmInfo.activeBedT})
-    currentHistoryTemp[4].data.push({x: farmInfo.timeStamp , y: farmInfo.activeBedA + farmInfo.activeToolA})
-    currentHistoryTemp[5].data.push({x: farmInfo.timeStamp , y: farmInfo.activeBedT + farmInfo.activeToolA})
-    if(currentHistoryTime[0].data.length > 4320){
-      currentHistoryTime[0].data.shift();
-      currentHistoryTime[1].data.shift();
-      currentHistoryTime[2].data.shift();
+    timeStamp = timeStamp.getTime();
+    currentHistoryTemp[0].data.push({x: timeStamp, y: activeToolA})
+    currentHistoryTemp[1].data.push({x: timeStamp, y: activeToolT})
+    currentHistoryTemp[2].data.push({x: timeStamp, y: activeBedA})
+    currentHistoryTemp[3].data.push({x: timeStamp, y: activeBedT})
+    if(currentHistoryTemp[0].data.length > 720){
       currentHistoryTemp[0].data.shift();
       currentHistoryTemp[1].data.shift();
       currentHistoryTemp[2].data.shift();
       currentHistoryTemp[3].data.shift();
-      currentHistoryTemp[4].data.shift();
-      currentHistoryTemp[5].data.shift();
     }
-    farmStats[0].farmInfo.time = currentHistoryTime;
-    farmStats[0].farmInfo.temp = currentHistoryTemp;
+    farmInfo.temp = currentHistoryTemp;
+    farmStats[0].farmInfo = farmInfo
   }
 
   static async octofarmStatistics(farmPrinters) {

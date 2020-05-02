@@ -104,6 +104,7 @@ setInterval(async function() {
   let currentOperations = null;
   let currentOperationsCount = null;
   let farmInfo = null;
+  let heatMap = null;
   let octofarmStatistics = null;
   let printStatistics = null;
 
@@ -111,12 +112,14 @@ setInterval(async function() {
     currentOperations = statistics.currentOperations;
     currentOperationsCount = statistics.currentOperationsCount;
     farmInfo = statistics.farmInfo;
+    heatMap = statistics.heatMap;
     octofarmStatistics = statistics.octofarmStatistics;
     printStatistics = statistics.printStatistics;
   } else {
     currentOperations = 0;
     currentOperationsCount = 0;
     farmInfo = 0;
+    heatMap = 0;
     octofarmStatistics = 0;
     printStatistics = 0;
   }
@@ -125,6 +128,7 @@ setInterval(async function() {
     currentOperations: currentOperations,
     currentOperationsCount: currentOperationsCount,
     farmInfo: farmInfo,
+    heatMap: heatMap,
     systemInfo: sysInfo,
     filament: rolls,
     clientSettings: cSettings

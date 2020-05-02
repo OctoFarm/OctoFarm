@@ -36,7 +36,7 @@ function heartBeat(index) {
   farmPrinters[index].ws.isAlive = true;
 
 }
-console.log(timeout)
+
 const heartBeatInterval = setInterval(function ping() {
   farmPrinters.forEach(function each(client) {
     if(typeof client.ws !== 'undefined' && typeof client.ws.isAlive !== 'undefined'){
@@ -253,9 +253,17 @@ WebSocketClient.prototype.onmessage = async function(data,flags,number){
 
     farmPrinters[this.index].state = data.current.state.text;
     farmPrinters[this.index].stateColour = Runner.getColour(data.current.state.text);
-    farmPrinters[this.index].currentZ = data.current.currentZ;
-    farmPrinters[this.index].progress = data.current.progress;
-    farmPrinters[this.index].job = data.current.job;
+
+    if(typeof data.current.progress !== 'undefined'){
+      farmPrinters[this.index].progress = data.current.progress;
+    }
+    if(typeof data.current.currentZ !== 'undefined'){
+      farmPrinters[this.index].currentZ = data.current.currentZ;
+    }
+    if(typeof data.current.job !== 'undefined'){
+      farmPrinters[this.index].job = data.current.job;
+    }
+
     farmPrinters[this.index].logs = data.current.logs;
     //console.log(data.current.temps.length != 0);
     //console.log(data.current.temps);

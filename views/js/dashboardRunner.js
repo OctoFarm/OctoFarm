@@ -15,9 +15,9 @@ let optionsMemory = {
   title: {
     text: "Memory",
     align: 'center',
-    margin: 0,
+    margin: 1,
     offsetX: 0,
-    offsetY: 100,
+    offsetY: 0,
     floating: false,
     style: {
       fontSize:  '14px',
@@ -28,8 +28,7 @@ let optionsMemory = {
   },
   chart: {
     type: 'donut',
-    width: '100%',
-    height: 300,
+    height: '160px',
     animations: {
       enabled: false,
     },
@@ -51,21 +50,17 @@ let optionsMemory = {
     show: false,
   },
   tooltip: {
-    enabled: false,
+    y: {
+      formatter: function (val) {
+        return Calc.bytes(val)
+      },
+    }
   },
   noData: {
     text: 'Loading...'
   },
   dataLabels: {
-    enabled: true,
-    offsetY: 90,
-    formatter: function (val , { seriesIndex, w }) {
-      return Calc.bytes(w.config.series[seriesIndex])
-    },
-    dropShadow: {
-      blur: 3,
-      opacity: 0.8
-    }
+    enabled: false,
   },
   series: [],
   labels: ['Other', 'OctoFarm', 'Free'],
@@ -120,9 +115,9 @@ let optionsCPU = {
   title: {
     text: "CPU",
     align: 'center',
-    margin: 5,
+    margin: 1,
     offsetX: 0,
-    offsetY: 100,
+    offsetY: 0,
     floating: false,
     style: {
       fontSize:  '14px',
@@ -133,8 +128,7 @@ let optionsCPU = {
   },
   chart: {
     type: 'donut',
-    width: '100%',
-    height: 300,
+    height: '160px',
     animations: {
       enabled: true,
     },
@@ -156,21 +150,17 @@ let optionsCPU = {
     show: false,
   },
   tooltip: {
-    enabled: false,
+    y: {
+      formatter: function (val) {
+        return  Math.round(val * 10) / 10 + "%"
+      },
+    }
   },
   noData: {
     text: 'Loading...'
   },
   dataLabels: {
-    enabled: true,
-    offsetY: 90,
-    formatter: function (val) {
-      return  Math.round(val * 10) / 10 + "%"
-    },
-    dropShadow: {
-      blur: 3,
-      opacity: 0.8
-    }
+    enabled: false,
   },
   series: [],
   labels: ['System', 'OctoFarm', 'User', 'Free'],
@@ -221,22 +211,14 @@ let optionsCPU = {
     },
   }
 };
-let optionsFarmStatus = {
-  title: {
-    text: 'Print Time Chart',
-    align: 'center'
-  },
+let optionsFarmTemp = {
   chart: {
     type: 'line',
     id: 'realtime',
-    height: 255,
+    height: '330px',
     width: '100%',
     animations: {
-      enabled: true,
-      easing: 'linear',
-      dynamicAnimation: {
-        speed: 1000
-      }
+      enabled: false,
     },
     toolbar: {
       show: false
@@ -246,7 +228,7 @@ let optionsFarmStatus = {
     },
     background: '#303030'
   },
-  colors:['#00bc8c', '#f39c12', '#e74c3c'],
+  colors:['#fcc329', '#ff1500','#009cff','#ff1800'],
   stroke: {
     curve: 'smooth'
   },
@@ -259,90 +241,6 @@ let optionsFarmStatus = {
   noData: {
     text: 'Loading...'
   },
-
-  series: [],
-  yaxis:
-      [
-    {
-      title: {
-        text: "Time"
-      },
-      seriesName: "Total Estimated",
-      labels: {
-        formatter: function (value) {
-          return Calc.generateTime(value);
-        }
-      },
-    },
-    {
-      seriesName: "Total Estimated",
-      show: false,
-      labels: {
-        formatter: function (value) {
-          return Calc.generateTime(value);
-        }
-      },
-    },
-    {
-      seriesName: "Total Estimated",
-      show: false,
-      labels: {
-        formatter: function (value) {
-          return Calc.generateTime(value);
-        }
-      },
-    },
-  ],
-  xaxis: {
-    type: 'datetime',
-    labels: {
-      formatter: function (value) {
-        let date = new Date(value);
-        let formatTime = date.toLocaleTimeString();
-        return formatTime;
-      }
-    },
-  },
-};
-let optionsFarmTemp = {
-  title: {
-    text: 'Print Temp Chart',
-    align: 'center'
-  },
-  chart: {
-    type: 'line',
-    id: 'realtime',
-    height: 255,
-    width:'100%',
-    animations: {
-      enabled: true,
-      easing: 'linear',
-      dynamicAnimation: {
-        speed: 1000
-      }
-    },
-    toolbar: {
-      show: false
-    },
-    zoom: {
-      enabled: false
-    },
-    background: '#303030'
-  },
-  colors:['#21618a', '#8f3026','#3eb2ff','#e74c3c','#9ed8ff','#e5958e'],
-  stroke: {
-    curve: 'smooth'
-  },
-  toolbar: {
-    show: false
-  },
-  theme: {
-    mode: 'dark',
-  },
-  noData: {
-    text: 'Loading...'
-  },
-
   series: [],
   yaxis:
       [
@@ -384,24 +282,6 @@ let optionsFarmTemp = {
             }
           },
         },
-        {
-          seriesName: "Actual Total",
-          show: false,
-          labels: {
-            formatter: function (value) {
-              return value + "°C";
-            }
-          },
-        },
-        {
-          seriesName: "Actual Tool",
-          show: false,
-          labels: {
-            formatter: function (value) {
-              return value + "°C";
-            }
-          },
-        },
       ],
   xaxis: {
     type: 'datetime',
@@ -414,33 +294,143 @@ let optionsFarmTemp = {
     },
   },
 };
-// var optionsHeatMap = {
-//   series: [],
-//   chart: {
-//     height: 350,
-//     type: 'heatmap',
-//     background: '#303030'
-//   },
-//   dataLabels: {
-//     enabled: false
-//   },
-//   colors: ["#008FFB"],
-//   title: {
-//     text: 'HeatMap Chart (Single color)'
-//   },
-//   xaxis: {
-//     type: 'category',
-//     categories: ['10:00', '10:30', '11:00', '11:30', '12:00', '12:30', '01:00', '01:30']
-//   },
-//   theme: {
-//     mode: 'dark',
-//   },
-//   noData: {
-//     text: 'Loading...'
-//   },
-// };
-// var heatMapChart = new ApexCharts(document.querySelector("#farmHeatMap"), optionsHeatMap);
-// heatMapChart.render();
+var optionsHeatChart = {
+  title: {
+    text: "State Heat Map (Last 7 Days)",
+    align: 'center',
+    margin: 1,
+    offsetX: 0,
+    offsetY: 0,
+    floating: false,
+    style: {
+      fontSize:  '14px',
+      fontWeight:  'bold',
+      fontFamily:  undefined,
+      color:  '#fff'
+    },
+  },
+  chart: {
+    type: 'heatmap',
+    id: 'realtime',
+    height: '330px',
+    animations: {
+      enabled: true,
+      easing: 'linear',
+      dynamicAnimation: {
+        speed: 1000
+      }
+    },
+    toolbar: {
+      show: false
+    },
+    zoom: {
+      enabled: false
+    },
+    background: '#303030'
+  },
+  theme: {
+    mode: 'dark',
+  },
+  noData: {
+    text: 'Loading...'
+  },
+  series: [],
+  dataLabels: {
+    enabled: true,
+    textAnchor: 'middle',
+    distributed: false,
+    offsetX: 0,
+    offsetY: 0,
+    style: {
+      fontSize: '14px',
+      fontFamily: 'Helvetica, Arial, sans-serif',
+      fontWeight: 'bold',
+      colors: ['#000000']
+    },
+    dropShadow: {
+      enabled: false,
+      top: 1,
+      left: 1,
+      blur: 1,
+      color: '#000000',
+      opacity: 0.45
+    }
+  },
+  plotOptions: {
+    heatmap: {
+      shadeIntensity: 0.5,
+      radius: 0,
+      useFillColorAsStroke: true,
+      colorScale: {
+        ranges: [{
+          from: 0,
+          to: 499,
+          name: 'low',
+          color: '#004cff'
+        },
+          {
+            from: 500,
+            to: 1999,
+            name: 'medium',
+            color: '#af00b5'
+          },
+          {
+            from: 2000,
+            to: 4999,
+            name: 'high',
+            color: '#ff7800'
+          },
+          {
+            from: 5000,
+            to: 9999,
+            name: 'extreme',
+            color: '#96ff00'
+          },
+          {
+            from: 10000,
+            to: 20000,
+            name: 'ultra-extreme',
+            color: '#ff0000'
+          },
+        ]
+      }
+    }
+  },
+  yaxis: {
+    type: 'category',
+    labels: {
+    },
+  },
+  xaxis: {
+    labels: {
+      show: true,
+      formatter: function (value) {
+        if(value === 1){
+          return "Monday";
+        }
+        if(value === 2){
+          return "Tuesday";
+        }
+        if(value === 3){
+          return "Wednesday";
+        }
+        if(value === 4){
+          return "Thursday";
+        }
+        if(value === 5){
+          return "Friday";
+        }
+        if(value === 6){
+          return "Saturday";
+        }
+        if(value === 7){
+          return "Sunday";
+        }
+
+      }
+    },
+  }
+};
 let systemChartCPU = new ApexCharts(
     document.querySelector("#systemChartCPU"),
     optionsCPU
@@ -451,22 +441,18 @@ let systemChartMemory = new ApexCharts(
     optionsMemory
 );
 systemChartMemory.render();
-let systemFarmStatus = new ApexCharts(
-    document.querySelector("#farmStatusMap"),
-    optionsFarmStatus
-);
-systemFarmStatus.render();
 let systemFarmTemp = new ApexCharts(
     document.querySelector("#farmTempMap"),
     optionsFarmTemp
 );
 systemFarmTemp.render();
+var activityHeatChart = new ApexCharts(document.querySelector("#daysActivityHeatMap"), optionsHeatChart);
+activityHeatChart.render();
 async function asyncParse(str) {
     try{
       let info = JSON.parse(str)
       return info;
     }catch(e){
-      console.log(e)
       return false;
     }
 }
@@ -488,7 +474,7 @@ source.onmessage = async function(e) {
             dashUpdate.printers(res.printerInfo);
             if(statsCounter === 10){
               dashUpdate.systemInformation(res.systemInfo);
-              dashUpdate.farmInformation(res.farmInfo);
+              dashUpdate.farmInformation(res.farmInfo, res.heatMap);
               statsCounter = 0;
             }else{
               statsCounter = statsCounter+1;
@@ -1089,7 +1075,6 @@ class dashActions {
 
     let printersList = "";
     printerInfo.forEach(printer => {
-      console.log(printer.state)
       if (printer.state === "Disconnected") {
         let printerName = "";
         if (typeof printer.settingsAppearance != "undefined") {
@@ -1172,6 +1157,9 @@ class dashUpdate {
     if(Object.keys(systemInfo).length === 0 && systemInfo.constructor === Object){
 
     }else{
+      document.getElementById("systemUpdate").innerHTML = Calc.generateTime(
+          systemInfo.sysUptime.uptime
+      );
       //labels: ['System', 'OctoFarm', 'User', 'Free'],
       let cpuLoad = systemInfo.cpuLoad.currentload_system;
       let octoLoad = systemInfo.sysProcess.pcpu;
@@ -1331,14 +1319,31 @@ class dashUpdate {
       }
     });
   }
-  static farmInformation(farmInfo){
-  // console.log(farmInfo.heat)
-  //   heatMapChart.updateSeries(farmInfo.heat);
+  static farmInformation(farmInfo, heatMap){
 
-    systemFarmStatus.updateSeries(farmInfo.time);
-
+    document.getElementById("globalTemp").innerHTML = `
+            <i class="fas fa-temperature-high"></i> Total Temperature: ${farmInfo.totalActualTemperature} °C
+    `;
+    document.getElementById("avgEstimatedTime").innerHTML = Calc.generateTime(
+        farmInfo.avgEstimateTime
+    );
+    document.getElementById("avgRemainingTime").innerHTML = Calc.generateTime(
+        farmInfo.avgRemainingTime
+    );
+    document.getElementById("avgElapsedTime").innerHTML = Calc.generateTime(
+        farmInfo.avgElapsedTime
+    );
+    document.getElementById("cumEstimatedTime").innerHTML = Calc.generateTime(
+        farmInfo.totalEstimateTime
+    );
+    document.getElementById("cumRemainingTime").innerHTML = Calc.generateTime(
+        farmInfo.totalRemainingTime
+    );
+    document.getElementById("cumElapsedTime").innerHTML = Calc.generateTime(
+        farmInfo.totalElapsedTime
+    );
     systemFarmTemp.updateSeries(farmInfo.temp);
-
+    activityHeatChart.updateSeries(heatMap);
 }
 
 //   static farmInformation(farmInfo) {

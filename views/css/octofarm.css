@@ -88,8 +88,15 @@ li {
   top: 60px;
   z-index: 1000;
 }
-.tableFixHead          { overflow-y: auto; height: 100px; }
-.tableFixHead thead th { position: sticky; top: 0; background-color:#303030; z-index:100;}
+
+.table-fixed thead th {
+  position: sticky;
+  position: -webkit-sticky;
+  top: 100;
+  z-index: 999;
+  background-color: #000;
+  color: #fff;
+}
 
 /*Scroll Bar*/
 ::-webkit-scrollbar {

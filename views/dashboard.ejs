@@ -1,31 +1,8 @@
 
   <!--Current Operations-->
-
-        <%- include('./partials/currentOperations.ejs') %>
-
-
-
-  <!--System/Farm Overview-->
   <div class="row">
-    <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-9">
-      <div class="card text-white bg-dark">
-        <div class="card-header dashHeader p-0 pt-1">
-            <button
-                    type="button"
-                    class="btn btn-secondary d-block ml-1 mr-1 p-1"
-                    href="#"
-                    aria-expanded="false"
-                    disabled
-            >
-              <i class="fas fa-info-circle"></i> Farm Status
-            </button>
-
-
-        </div>
-        <div class="card-body pt-2 pb-0">
-          <%- include('./partials/Printers/dashboardFI.ejs') %>
-        </div>
-      </div>
+    <div  class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-9">
+      <%- include('./partials/currentOperations.ejs') %>
     </div>
     <div id="systemInformation" class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-3">
       <div class="card text-white bg-dark">
@@ -51,8 +28,61 @@
 
 
       </div>
-      <div class="card-body p-0">
+      <div class="card-body p-0" style="min-height:138px;max-height:138px">
         <%- include('./partials/Printers/dashboardSI.ejs') %>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <!--System/Farm Overview-->
+  <div class="row">
+    <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
+      <div class="card text-white bg-dark">
+        <div class="card-header dashHeader p-0 pt-1">
+            <button
+                    type="button"
+                    class="btn btn-secondary d-block ml-1 mr-1 p-1"
+                    href="#"
+                    aria-expanded="false"
+                    disabled
+            >
+              <i class="fas fa-info-circle"></i> Farm Status
+            </button>
+
+
+        </div>
+        <div class="card-body pt-2 pb-0" style="min-height:350px;max-height:350px">
+          <%- include('./partials/Printers/dashboardFI.ejs') %>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
+      <div class="card text-white bg-dark">
+        <div class="card-header dashHeader p-0 pt-1"">
+        <button
+                type="button"
+                class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-thermometer-three-quarters"></i> Temperature Statistics
+        </button>
+        <button
+                type="button"
+                class="btn btn-secondary float-right d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <span id="globalTemp"> <i class="fas fa-temperature-high"></i> Total Temperature: <%= farmInfo.totalActualTemperature %> °C </span>
+        </button>
+
+
+      </div>
+      <div class="card-body p-0" style="min-height:350px;max-height:350px">
+        <div id="farmTempMap"></div>
       </div>
     </div>
   </div>
@@ -156,13 +186,13 @@
             <i  class="fas fa-print"></i> Selected:%>
           </button>
       </div>
-        <div class="card-body pt-0 pb-0 tableFixHead" style="height: 50vh;">
+        <div class="pt-0 pb-0 tableFixHead">
           <table id="printerTable" class="table table-sm table-dark table-striped table-responsive-sm table-responsive-md text-center">
-            <thead>
+            <thead >
             <tr>
               <th scope="col">Select</th>
               <th scope="table-dark text-wrap">Name</th>
-              <th scope="col">Actions</th>
+              <th scope="col" width="250px">Actions</th>
               <th scope="col"style="width:50px;">Host State</th>
               <th scope="col">Printer State</th>
               <th scope="col" width="10px">WebSocket</th>
