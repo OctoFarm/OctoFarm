@@ -183,9 +183,33 @@ class StatisticsCollection {
       console.log("Current Operations issue: " + err);
     }
   }
+  static getDay(value){
+    if(value === 1){
+      return "Monday";
+    }
+    if(value === 2){
+      return "Tuesday";
+    }
+    if(value === 3){
+      return "Wednesday";
+    }
+    if(value === 4){
+      return "Thursday";
+    }
+    if(value === 5){
+      return "Friday";
+    }
+    if(value === 6){
+      return "Saturday";
+    }
+    if(value === 0){
+      return "Sunday";
+    }
+  }
   static heatMapping(complete, active, offline, idle, disconnected){
       let today = new Date()
           today = today.getDay()
+      today = StatisticsCollection.getDay(today)
       let CompleteCount = {
         x: today,
         y: 0

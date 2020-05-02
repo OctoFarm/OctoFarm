@@ -312,7 +312,8 @@ var optionsHeatChart = {
   chart: {
     type: 'heatmap',
     id: 'realtime',
-    height: '330px',
+    height: '333px',
+    width: '100%',
     animations: {
       enabled: true,
       easing: 'linear',
@@ -336,25 +337,7 @@ var optionsHeatChart = {
   },
   series: [],
   dataLabels: {
-    enabled: true,
-    textAnchor: 'middle',
-    distributed: false,
-    offsetX: 0,
-    offsetY: 0,
-    style: {
-      fontSize: '14px',
-      fontFamily: 'Helvetica, Arial, sans-serif',
-      fontWeight: 'bold',
-      colors: ['#000000']
-    },
-    dropShadow: {
-      enabled: false,
-      top: 1,
-      left: 1,
-      blur: 1,
-      color: '#000000',
-      opacity: 0.45
-    }
+    enabled: false,
   },
   plotOptions: {
     heatmap: {
@@ -396,39 +379,8 @@ var optionsHeatChart = {
       }
     }
   },
-  yaxis: {
-    type: 'category',
-    labels: {
-    },
-  },
-  xaxis: {
-    labels: {
-      show: true,
-      formatter: function (value) {
-        if(value === 1){
-          return "Monday";
-        }
-        if(value === 2){
-          return "Tuesday";
-        }
-        if(value === 3){
-          return "Wednesday";
-        }
-        if(value === 4){
-          return "Thursday";
-        }
-        if(value === 5){
-          return "Friday";
-        }
-        if(value === 6){
-          return "Saturday";
-        }
-        if(value === 7){
-          return "Sunday";
-        }
-
-      }
-    },
+  tooltip: {
+    enabled: false,
   }
 };
 let systemChartCPU = new ApexCharts(

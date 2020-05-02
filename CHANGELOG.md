@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
     - Printer Control Manager now allows for switching of printers on the fly from the modal. No need to close and re-open. 
     - Historical collection for Farm Statistics, now gathers up to 1 hours of live data. (Temperature). Resets on server restart. 
     - Added loading status to all dashboard  graphs and data. 
+    - Activity heatmap for the last 7 days.
     
 ### Changed
     - Printer web button does not disable when offline
@@ -20,6 +21,7 @@ All notable changes to this project will be documented in this file.
     - System information is now a donut chart
     - New farm status graphs for Temp. Shows Actual and Targets for global tool and bed temperatures with a status at top for total farm temperature. 
     - Table headers fixed for "Actions" on Printer Management
+    - Dashboard list has changed to scroll with page. The full list is loaded rather than constraining to a specific height. 
     
 ### Removed
     - Pointless space wasting footers on dashboard
