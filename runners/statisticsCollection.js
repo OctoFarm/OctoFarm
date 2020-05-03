@@ -110,7 +110,6 @@ class StatisticsCollection {
                     }
 
                 }
-
                 if (
                     typeof printer.stateColour != "undefined" &&
                     typeof printer.progress != "undefined"
@@ -250,44 +249,44 @@ class StatisticsCollection {
                 //If x = today add that fucker up!
                 if (heatMap[i].data[0].x === today) {
                     if (heatMap[i].name === "Completed") {
+                        heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
+                        if (!isFinite(heatMap[i].data[0].y)) {
+                            heatMap[i].data[0].y === 0;
+                        }
                         heatMap[i].data[0].figure = heatMap[i].data[0].figure + complete;
                         arrayTotal[0] = heatMap[i].data[0].figure;
-                        heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
-                        if (!isFinite(heatMap[i].data[0].y)) {
-                            heatMap[i].data[0].y === 0;
-                        }
                     }
                     if (heatMap[i].name === "Active") {
+                        heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
+                        if (!isFinite(heatMap[i].data[0].y)) {
+                            heatMap[i].data[0].y === 0;
+                        }
                         heatMap[i].data[0].figure = heatMap[i].data[0].figure + active;
                         arrayTotal[1] = heatMap[i].data[0].figure;
-                        heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
-                        if (!isFinite(heatMap[i].data[0].y)) {
-                            heatMap[i].data[0].y === 0;
-                        }
                     }
                     if (heatMap[i].name === "Offline") {
+                        heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
+                        if (!isFinite(heatMap[i].data[0].y)) {
+                            heatMap[i].data[0].y === 0;
+                        }
                         heatMap[i].data[0].figure = heatMap[i].data[0].figure + offline;
                         arrayTotal[2] = heatMap[i].data[0].figure;
-                        heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
-                        if (!isFinite(heatMap[i].data[0].y)) {
-                            heatMap[i].data[0].y === 0;
-                        }
                     }
                     if (heatMap[i].name === "Idle") {
+                        heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
+                        if (!isFinite(heatMap[i].data[0].y)) {
+                            heatMap[i].data[0].y === 0;
+                        }
                         heatMap[i].data[0].figure = heatMap[i].data[0].figure + idle;
                         arrayTotal[3] = heatMap[i].data[0].figure;
-                        heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
-                        if (!isFinite(heatMap[i].data[0].y)) {
-                            heatMap[i].data[0].y === 0;
-                        }
                     }
                     if (heatMap[i].name === "Disconnected") {
-                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + disconnected;
-                        arrayTotal[4] = heatMap[i].data[0].figure;
                         heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
                         if (!isFinite(heatMap[i].data[0].y)) {
                             heatMap[i].data[0].y === 0;
                         }
+                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + disconnected;
+                        arrayTotal[4] = heatMap[i].data[0].figure;
                     }
                 } else {
                     //Must be a new day, so shift with new heatMap

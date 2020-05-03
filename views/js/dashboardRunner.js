@@ -416,6 +416,7 @@ async function asyncParse(str) {
 }
 let source = new EventSource("/sse/dashboardInfo/");
 let statsCounter = 10;
+let iHavePrinters = false;
 source.onmessage = async function(e) {
     if (!editMode) {
         if (e.data != null) {
@@ -440,6 +441,8 @@ source.onmessage = async function(e) {
 
 
                     }
+                } else {
+
                 }
             }
         }
