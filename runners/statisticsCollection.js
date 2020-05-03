@@ -352,7 +352,6 @@ class StatisticsCollection {
         }
         farmStats[0].heatMap = heatMap;
         farmStats[0].markModified('heatMap');
-        console.log(JSON.stringify(heatMap))
         farmStats[0].save();
 
     }
