@@ -62,6 +62,17 @@ class StatisticsCollection {
             farmStats[0] = newfarmStats;
             newfarmStats.save();
         } else {
+            //Shim for old database structure coming to new
+            console.log(farmStats[0].heatMap)
+            if(typeof farmStats[0].heatMap === 'undefined'){
+                farmStats[0].heatMap = heatMap;
+                StatisticsCollection.heatMapping(0,
+                    0,
+                    0,
+                    0,
+                    0
+                )
+            }
             //Load in old heatMap data
             heatMap = farmStats[0].heatMap;
             //Make sure array total is updated...
