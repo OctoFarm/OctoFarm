@@ -66,34 +66,30 @@ class StatisticsCollection {
             console.log(farmStats[0].heatMap)
             if(typeof farmStats[0].heatMap === 'undefined'){
                 farmStats[0].heatMap = heatMap;
-                StatisticsCollection.heatMapping(0,
-                    0,
-                    0,
-                    0,
-                    0
-                )
-            }
-            //Load in old heatMap data
-            heatMap = farmStats[0].heatMap;
-            //Make sure array total is updated...
-            let today = StatisticsCollection.getDay(new Date())
-            for (let i = 0; i < heatMap.length; i++) {
-                //If x = today add that fucker up!
-                if (heatMap[i].data[0].x === today) {
-                    if (heatMap[i].name === "Completed") {
-                        arrayTotal[0] = heatMap[i].data[0].figure;
-                    }
-                    if (heatMap[i].name === "Active") {
-                        arrayTotal[1] = heatMap[i].data[0].figure;
-                    }
-                    if (heatMap[i].name === "Offline") {
-                        arrayTotal[2] = heatMap[i].data[0].figure;
-                    }
-                    if (heatMap[i].name === "Idle") {
-                        arrayTotal[3] = heatMap[i].data[0].figure;
-                    }
-                    if (heatMap[i].name === "Disconnected") {
-                        arrayTotal[4] = heatMap[i].data[0].figure;
+                farmStats[0].markModified("heatMap")
+                farmStats[0].save();
+            }else{
+                heatMap = farmStats[0].heatMap;
+                //Make sure array total is updated...
+                let today = StatisticsCollection.getDay(new Date())
+                for (let i = 0; i < heatMap.length; i++) {
+                    //If x = today add that fucker up!
+                    if (heatMap[i].data[0].x === today) {
+                        if (heatMap[i].name === "Completed") {
+                            arrayTotal[0] = heatMap[i].data[0].figure;
+                        }
+                        if (heatMap[i].name === "Active") {
+                            arrayTotal[1] = heatMap[i].data[0].figure;
+                        }
+                        if (heatMap[i].name === "Offline") {
+                            arrayTotal[2] = heatMap[i].data[0].figure;
+                        }
+                        if (heatMap[i].name === "Idle") {
+                            arrayTotal[3] = heatMap[i].data[0].figure;
+                        }
+                        if (heatMap[i].name === "Disconnected") {
+                            arrayTotal[4] = heatMap[i].data[0].figure;
+                        }
                     }
                 }
             }
@@ -315,23 +311,23 @@ class StatisticsCollection {
                             heatMap[i].data[0].y === 0;
                         }
                     }
-                    if (heatMap[i].name === "Completed") {
+                    if (heatMap[i].name === "Completed" && complete > 0) {
                         heatMap[i].data[0].figure = heatMap[i].data[0].figure + complete;
                         arrayTotal[0] = heatMap[i].data[0].figure;
                     }
-                    if (heatMap[i].name === "Active") {
+                    if (heatMap[i].name === "Active" && active > 0) {
                         heatMap[i].data[0].figure = heatMap[i].data[0].figure + active;
                         arrayTotal[1] = heatMap[i].data[0].figure;
                     }
-                    if (heatMap[i].name === "Offline") {
+                    if (heatMap[i].name === "Offline" && offline > 0) {
                         heatMap[i].data[0].figure = heatMap[i].data[0].figure + offline;
                         arrayTotal[2] = heatMap[i].data[0].figure;
                     }
-                    if (heatMap[i].name === "Idle") {
+                    if (heatMap[i].name === "Idle" && idle > 0) {
                         heatMap[i].data[0].figure = heatMap[i].data[0].figure + idle;
                         arrayTotal[3] = heatMap[i].data[0].figure;
                     }
-                    if (heatMap[i].name === "Disconnected") {
+                    if (heatMap[i].name === "Disconnected" && disconnected > 0) {
                         heatMap[i].data[0].figure = heatMap[i].data[0].figure + disconnected;
                         arrayTotal[4] = heatMap[i].data[0].figure;
                     }

@@ -1320,6 +1320,7 @@ class dashUpdate {
             farmInfo.totalElapsedTime
         );
         systemFarmTemp.updateSeries(farmInfo.temp);
+        console.log(heatMap)
         activityHeatChart.updateSeries(heatMap);
     }
 
