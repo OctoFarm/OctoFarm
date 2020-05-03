@@ -306,7 +306,7 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
         if (data.current.temps.length !== 0) {
 
             farmPrinters[this.index].temps = data.current.temps;
-            console.log(data.current.temps)
+
             // /console.log(farmPrinters[1].temps);
         }
         if (
