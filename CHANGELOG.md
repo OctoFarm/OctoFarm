@@ -12,7 +12,10 @@ All notable changes to this project will be documented in this file.
     - Added loading status to all dashboard  graphs and data. 
     - Activity heatmap for the last 7 days - Calculates a percentage of activity per printers in that state for the whole day, calculation will happen all day then save the final days value. 
     - Added check for if printers exist on dashboard load, note tells you to add some.
-    
+    - Added new Patreon member EIPS to About page. 
+    - Tool tip explanations for states on dashboard. Host, Printer and Websockets. 
+    - New state when printer fresh on the farm, "Setting Up" Whilst awaiting for scanner to finish with other printers. Hits searching state straight after.
+    - Tool tip explanations for dashboard Action buttons, and Printer Management setup buttons
 ### Changed
     - Printer web button does not disable when offline
     - Printer re-sync now detroys any established connection and re-sets up the specific printer fresh regardless of state..
@@ -23,6 +26,7 @@ All notable changes to this project will be documented in this file.
     - New farm status graphs for Temp. Shows Actual and Targets for global tool and bed temperatures with a status at top for total farm temperature. 
     - Table headers fixed for "Actions" on Printer Management
     - Dashboard list has changed to scroll with page. The full list is loaded rather than constraining to a specific height. 
+    - View pages no longer inside dropdown
     
 ### Removed
     - Pointless space wasting footers on dashboard
@@ -35,6 +39,8 @@ All notable changes to this project will be documented in this file.
     - Fixed saying "Done" when 0 seconds was detected.
     - Fixed issue with history not grabbing relevant job information due to OctoPrint sending undefined information at odd times. Added checks for progress and currentZ too. 
     - Fixed issue with startup trying to grab currentOp/statistics too fast causing errors. 
+    - Fixed logs not been deleted
+    - Fixed circular structure errors with moving over to Flatted library for JSON stringify/parse.
     
 ## [v1.1.4.9-dev-1]
 
