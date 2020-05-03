@@ -442,6 +442,11 @@ source.onmessage = async function(e) {
 
                     }
                 } else {
+                    if (iHavePrinters === false) {
+                        bootbox.alert("No printers detected, please add them using the printer manager below.", function() {
+                            iHavePrinters = true;
+                        });
+                    }
 
                 }
             }

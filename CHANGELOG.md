@@ -10,7 +10,8 @@ All notable changes to this project will be documented in this file.
     - Printer Control Manager now allows for switching of printers on the fly from the modal. No need to close and re-open. 
     - Historical collection for Farm Statistics, now gathers up to 1 hours of live data. (Temperature). Resets on server restart. 
     - Added loading status to all dashboard  graphs and data. 
-    - Activity heatmap for the last 7 days - Calculates a percentage of activity per printers in that state for the whole day.
+    - Activity heatmap for the last 7 days - Calculates a percentage of activity per printers in that state for the whole day, calculation will happen all day then save the final days value. 
+    - Added check for if printers exist on dashboard load, note tells you to add some.
     
 ### Changed
     - Printer web button does not disable when offline
@@ -33,6 +34,7 @@ All notable changes to this project will be documented in this file.
     - Fixed annoying browser console output warning of multiple similar id's
     - Fixed saying "Done" when 0 seconds was detected.
     - Fixed issue with history not grabbing relevant job information due to OctoPrint sending undefined information at odd times. Added checks for progress and currentZ too. 
+    - Fixed issue with startup trying to grab currentOp/statistics too fast causing errors. 
     
 ## [v1.1.4.9-dev-1]
 

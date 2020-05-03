@@ -18,6 +18,7 @@ let currentHistoryTemp = [{
     name: 'Target Bed',
     data: []
 }];
+
 let heatMap = [{
     name: 'Completed',
     data: []
@@ -55,11 +56,36 @@ class StatisticsCollection {
                 octofarmStatistics,
                 printStatistics,
                 currentOperations,
-                currentOperationsCount
+                currentOperationsCount,
+                heatMap
             });
-
             farmStats[0] = newfarmStats;
             newfarmStats.save();
+        } else {
+            //Load in old heatMap data
+            heatMap = farmStats[0].heatMap;
+            //Make sure array total is updated...
+            let today = StatisticsCollection.getDay(new Date())
+            for (let i = 0; i < heatMap.length; i++) {
+                //If x = today add that fucker up!
+                if (heatMap[i].data[0].x === today) {
+                    if (heatMap[i].name === "Completed") {
+                        arrayTotal[0] = heatMap[i].data[0].figure;
+                    }
+                    if (heatMap[i].name === "Active") {
+                        arrayTotal[1] = heatMap[i].data[0].figure;
+                    }
+                    if (heatMap[i].name === "Offline") {
+                        arrayTotal[2] = heatMap[i].data[0].figure;
+                    }
+                    if (heatMap[i].name === "Idle") {
+                        arrayTotal[3] = heatMap[i].data[0].figure;
+                    }
+                    if (heatMap[i].name === "Disconnected") {
+                        arrayTotal[4] = heatMap[i].data[0].figure;
+                    }
+                }
+            }
         }
         //Saving is pointless now, it keeps crashing anyway due to some concurrent error even though it's the only thing hitting this database...
         // setInterval(async () => {
@@ -164,7 +190,7 @@ class StatisticsCollection {
             currentOperationsCount.idle = idle.length;
             currentOperationsCount.disconnected = disconnected.length;
             //17280
-            if (heatMapCounter >= 1000) {
+            if (heatMapCounter >= 17280) {
                 StatisticsCollection.heatMapping(currentOperationsCount.complete,
                     currentOperationsCount.active,
                     currentOperationsCount.offline,
@@ -253,38 +279,48 @@ class StatisticsCollection {
                         if (!isFinite(heatMap[i].data[0].y)) {
                             heatMap[i].data[0].y === 0;
                         }
-                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + complete;
-                        arrayTotal[0] = heatMap[i].data[0].figure;
                     }
                     if (heatMap[i].name === "Active") {
                         heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
                         if (!isFinite(heatMap[i].data[0].y)) {
                             heatMap[i].data[0].y === 0;
                         }
-                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + active;
-                        arrayTotal[1] = heatMap[i].data[0].figure;
                     }
                     if (heatMap[i].name === "Offline") {
                         heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
                         if (!isFinite(heatMap[i].data[0].y)) {
                             heatMap[i].data[0].y === 0;
                         }
-                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + offline;
-                        arrayTotal[2] = heatMap[i].data[0].figure;
                     }
                     if (heatMap[i].name === "Idle") {
                         heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
                         if (!isFinite(heatMap[i].data[0].y)) {
                             heatMap[i].data[0].y === 0;
-                        }
-                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + idle;
-                        arrayTotal[3] = heatMap[i].data[0].figure;
+                        };
                     }
                     if (heatMap[i].name === "Disconnected") {
                         heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
                         if (!isFinite(heatMap[i].data[0].y)) {
                             heatMap[i].data[0].y === 0;
                         }
+                    }
+                    if (heatMap[i].name === "Completed") {
+                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + complete;
+                        arrayTotal[0] = heatMap[i].data[0].figure;
+                    }
+                    if (heatMap[i].name === "Active") {
+                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + active;
+                        arrayTotal[1] = heatMap[i].data[0].figure;
+                    }
+                    if (heatMap[i].name === "Offline") {
+                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + offline;
+                        arrayTotal[2] = heatMap[i].data[0].figure;
+                    }
+                    if (heatMap[i].name === "Idle") {
+                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + idle;
+                        arrayTotal[3] = heatMap[i].data[0].figure;
+                    }
+                    if (heatMap[i].name === "Disconnected") {
                         heatMap[i].data[0].figure = heatMap[i].data[0].figure + disconnected;
                         arrayTotal[4] = heatMap[i].data[0].figure;
                     }
@@ -309,6 +345,8 @@ class StatisticsCollection {
             heatMap[4].data.pop()
         }
         farmStats[0].heatMap = heatMap;
+        farmStats[0].markModified('heatMap');
+        farmStats[0].save();
 
     }
     static async farmInformation(farmPrinters) {

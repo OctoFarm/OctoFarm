@@ -368,7 +368,7 @@ class Runner {
 
 
         //cycle through printers and move them to correct checking location...
-        await StatisticsCollection.init();
+
         for (let i = 0; i < farmPrinters.length; i++) {
             //Make sure runners are created ready for each printer to pass between...
             await Runner.setupWebSocket(farmPrinters[i]._id);
