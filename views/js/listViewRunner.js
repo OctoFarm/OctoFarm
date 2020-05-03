@@ -3,6 +3,7 @@ import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
+import {parse} from "./vendor/flatted.js";
 
 let printerInfo = [];
 let elems = [];
@@ -15,7 +16,7 @@ if (port != "") {
 }
 async function asyncParse(str) {
   try{
-    let info = JSON.parse(str)
+    let info = parse(str)
     return info;
   }catch(e){
     console.log(e)

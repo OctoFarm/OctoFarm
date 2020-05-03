@@ -6,7 +6,7 @@ import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
 import FileOperations from "./lib/functions/file.js";
 import Validate from "./lib/functions/validate.js";
-import {parse, stringify} from './vendor/flatted.js';
+import {parse} from './vendor/flatted.js';
 
 
 let printerInfo = "";
