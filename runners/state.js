@@ -68,6 +68,9 @@ WebSocketClient.prototype.open = function(url, index) {
     }
     this.url = url;
     this.index = index;
+    farmPrinters[this.index].hostState = "Online";
+    farmPrinters[this.index].hostStateColour = Runner.getColour("Online");
+    farmPrinters[this.index].hostDescription = "Host is Shutdown";
     farmPrinters[this.index].webSocket = "warning";
     farmPrinters[this.index].webSocketDescription = "Websocket Connected but in Tentative state until receiving data";
     this.instance = new WebSocket(this.url);
@@ -198,8 +201,8 @@ WebSocketClient.prototype.open = function(url, index) {
                     farmPrinters[this.index].hostStateColour = Runner.getColour("Error");
                     farmPrinters[this.index].webSocket = "danger";
                     farmPrinters[this.index].stateDescription = "Hard Failure, please Re-Sync when Online";
-                    farmPrinters[this.index].hostDescription = "Host is Shutdown";
-                    farmPrinters[this.index].webSocketDescription = "Websocket Connection returned and Unknown Error";
+                    farmPrinters[this.index].hostDescription = "Hard Failure, please Re-Sync when Online";
+                    farmPrinters[this.index].webSocketDescription = "Hard Failure, please Re-Sync when Online";
                 } catch (e) {
                     logger.info("Couldn't set state of missing printer, safe to ignore: " + this.index + ": " + this.url)
                 }
