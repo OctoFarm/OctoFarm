@@ -205,7 +205,7 @@ class StatisticsCollection {
                 )
                 heatMapCounter = 0;
             } else {
-                heatMapCounter = heatMapCounter + 250;
+                heatMapCounter = heatMapCounter + 1728;
             }
 
             currentOperations = _.orderBy(currentOperations, ["progress"], ["desc"]);
