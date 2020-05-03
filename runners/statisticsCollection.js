@@ -184,6 +184,7 @@ class StatisticsCollection {
     }
   }
   static getDay(value){
+    value = value.getDay()
     if(value === 1){
       return "Monday";
     }
@@ -207,9 +208,7 @@ class StatisticsCollection {
     }
   }
   static heatMapping(complete, active, offline, idle, disconnected){
-      let today = new Date()
-          today = today.getDay()
-      today = StatisticsCollection.getDay(today)
+      let today = StatisticsCollection.getDay(new Date())
       let CompleteCount = {
         x: today,
         y: 0
@@ -260,11 +259,11 @@ class StatisticsCollection {
             }
           }else{
             //Must be a new day, so shift with new heatMap
-            heatMap[0].data.shift(CompleteCount)
-            heatMap[1].data.shift(ActiveCount)
-            heatMap[2].data.shift(IdleCount)
-            heatMap[3].data.shift(OfflineCount)
-            heatMap[4].data.shift(DisconnectedCount)
+            heatMap[0].data.unshift(CompleteCount)
+            heatMap[1].data.unshift(ActiveCount)
+            heatMap[2].data.unshift(IdleCount)
+            heatMap[3].data.unshift(OfflineCount)
+            heatMap[4].data.unshift(DisconnectedCount)
           }
         }
       }

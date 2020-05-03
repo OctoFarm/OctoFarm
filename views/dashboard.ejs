@@ -28,7 +28,7 @@
 
 
       </div>
-      <div class="card-body p-0" style="min-height:138px;max-height:138px">
+      <div class="card-body p-0" style="min-height:138px">
         <%- include('./partials/Printers/dashboardSI.ejs') %>
       </div>
     </div>
@@ -37,7 +37,28 @@
 
   <!--System/Farm Overview-->
   <div class="row">
-    <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
+    <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-2 col-xl-2">
+      <div class="card text-white bg-dark">
+        <div class="card-header dashHeader p-0 pt-1">
+          <button
+                  type="button"
+                  class="btn btn-secondary d-block ml-1 mr-1 p-1"
+                  href="#"
+                  aria-expanded="false"
+                  disabled
+          >
+            <i class="fas fa-info-circle"></i> Farm Status
+          </button>
+
+
+        </div>
+        <div class="card-body pt-2 pb-0 text-center" style="min-height:350px;max-height:350px">
+     <%- include('./partials/Printers/dashboardTimeStats.ejs') %>
+
+        </div>
+      </div>
+    </div>
+    <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6 ">
       <div class="card text-white bg-dark">
         <div class="card-header dashHeader p-0 pt-1">
             <button
@@ -53,13 +74,13 @@
 
         </div>
         <div class="card-body pt-2 pb-0" style="min-height:350px;max-height:350px">
-          <%- include('./partials/Printers/dashboardFI.ejs') %>
+          <%- include('./partials/Printers/dashboardHeatMap.ejs') %>
         </div>
       </div>
     </div>
     <div class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">
       <div class="card text-white bg-dark">
-        <div class="card-header dashHeader p-0 pt-1"">
+        <div class="card-header dashHeader p-0 pt-1">
         <button
                 type="button"
                 class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
@@ -192,7 +213,7 @@
             <tr>
               <th scope="col">Select</th>
               <th scope="table-dark text-wrap">Name</th>
-              <th scope="col" width="250px">Actions</th>
+              <th scope="col" style="min-width:300px;">Actions</th>
               <th scope="col"style="width:50px;">Host State</th>
               <th scope="col">Printer State</th>
               <th scope="col" width="10px">WebSocket</th>
