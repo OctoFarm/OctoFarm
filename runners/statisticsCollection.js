@@ -273,72 +273,75 @@ class StatisticsCollection {
             heatMap[1].data.push(ActiveCount)
             heatMap[2].data.push(IdleCount)
             heatMap[3].data.push(OfflineCount)
+            //TEst
             heatMap[4].data.push(DisconnectedCount)
         } else {
             //Cycle through current data and check if day exists...
+
             let currentTotal = arrayTotal.reduce((a, b) => a + b, 0);
             for (let i = 0; i < heatMap.length; i++) {
                 //If x = today add that fucker up!
                 if (heatMap[i].data[0].x === today) {
                     if (heatMap[i].name === "Completed" && complete > 0) {
                         let completePer = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
-                        if (!isFinite(completePer)) {
-                            heatMap[i].data[0].y === 0;
-                        }else if(isNaN(completePer)){
+                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + complete;
+                        if (!isFinite(parseInt(completePer))) {
+                            heatMap[i].data[0].y = 0;
+                        }else if(isNaN(parseInt(completePer))){
 
                         }else{
-                            heatMap[i].data[0].y = completePer;
-                            heatMap[i].data[0].figure = heatMap[i].data[0].figure + complete;
+                            heatMap[i].data[0].y = parseInt(completePer);
                             arrayTotal[0] = heatMap[i].data[0].figure;
                         }
 
                     }
                     if (heatMap[i].name === "Active" && active > 0) {
                         let activePer = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
-                        if (!isFinite(heatMap[i].data[0].y)) {
-                            heatMap[i].data[0].y === 0;
-                        }else if(isNaN(activePer)){
+                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + active;
+                        if (!isFinite(parseInt(activePer))) {
+                            heatMap[i].data[0].y = 0;
+                        }else if(isNaN(parseInt(activePer))){
 
                         }else{
-                            heatMap[i].data[0].y = activePer;
-                            heatMap[i].data[0].figure = heatMap[i].data[0].figure + active;
+                            heatMap[i].data[0].y = parseInt(activePer);
                             arrayTotal[1] = heatMap[i].data[0].figure;
                         }
 
                     }
                     if (heatMap[i].name === "Offline" && offline > 0) {
                         let offlinePer = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
-                        if (!isFinite(heatMap[i].data[0].y)) {
-                            heatMap[i].data[0].y === 0;
-                        }else if(isNaN(offlinePer)){
+                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + offline;
+                        if (!isFinite(praseInt(offlinePer))) {
+                            heatMap[i].data[0].y = 0;
+                        }else if(isNaN(parseInt(offlinePer))){
 
                         }else{
-                            heatMap[i].data[0].y = offlinePer;
-                            heatMap[i].data[0].figure = heatMap[i].data[0].figure + offline;
+                            heatMap[i].data[0].y = parseInt(offlinePer);
                             arrayTotal[2] = heatMap[i].data[0].figure;
                         }
                     }
                     if (heatMap[i].name === "Idle" && idle > 0) {
                         let idlePer = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
-                        if (!isFinite(heatMap[i].data[0].y)) {
-                            heatMap[i].data[0].y === 0;
-                        }else if(isNaN(idlePer)){
+                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + idle;
+                        if (!isFinite(parseInt(idlePer))) {
+                            heatMap[i].data[0].y = 0;
+                        }else if(isNaN(parseInt(idlePer))){
 
                         }else{
-                            heatMap[i].data[0].y = idlePer;
-                            heatMap[i].data[0].figure = heatMap[i].data[0].figure + idle;
+                            heatMap[i].data[0].y = parseInt(idlePer);
+                            console.log(heatMap[i].data[0].figure)
                             arrayTotal[3] = heatMap[i].data[0].figure;
                         }
                     }
                     if (heatMap[i].name === "Disconnected" && disconnected > 0) {
                         let disconnectPer = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
-                        if (!isFinite(heatMap[i].data[0].y)) {
-                            heatMap[i].data[0].y === 0;
-                        }else if(isNaN(disconnectPer)){
+                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + disconnected;
+                        if (!isFinite(parseInt(disconnectPer))) {
+                            heatMap[i].data[0].y = 0;
+                        }else if(isNaN(parseInt(disconnectPer))){
 
                         }else{
-                            heatMap[i].data[0].y = disconnectPer;
-                            heatMap[i].data[0].figure = heatMap[i].data[0].figure + disconnected;
+                            heatMap[i].data[0].y = parseInt(disconnectPer);
                             arrayTotal[4] = heatMap[i].data[0].figure;
                         }
                     }
@@ -364,6 +367,7 @@ class StatisticsCollection {
         }
         farmStats[0].heatMap = heatMap;
         farmStats[0].markModified('heatMap');
+        console.log(JSON.stringify(heatMap))
         farmStats[0].save();
 
     }
