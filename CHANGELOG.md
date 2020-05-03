@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
     - Printer Control Manager now allows for switching of printers on the fly from the modal. No need to close and re-open. 
     - Historical collection for Farm Statistics, now gathers up to 1 hours of live data. (Temperature). Resets on server restart. 
     - Added loading status to all dashboard  graphs and data. 
-    - Activity heatmap for the last 7 days.
+    - Activity heatmap for the last 7 days - Calculates a percentage of activity per printers in that state for the whole day.
     
 ### Changed
     - Printer web button does not disable when offline
