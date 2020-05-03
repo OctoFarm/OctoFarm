@@ -3,7 +3,7 @@ const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
 const yj = require("yieldable-json");
 const ClientSettings = require("../models/ClientSettings.js");
-
+const {parse, stringify} = require('flatted/cjs');
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
 let clientInfo = null;
 let clientInfoString = null;
@@ -96,7 +96,10 @@ setInterval(async function() {
       hostStateColour: printers[i].hostStateColour,
       printerURL: printers[i].printerURL,
       group: printers[i].group,
-      tempTriggers: printers[i].tempTriggers
+      tempTriggers: printers[i].tempTriggers,
+      stateDescription: printers[i].stateDescription,
+      hostDescription: printers[i].hostDescription,
+      webSocketDescription: printers[i].webSocketDescription
     };
     printerInfo.push(printer);
   }
@@ -133,13 +136,8 @@ setInterval(async function() {
     filament: rolls,
     clientSettings: cSettings
   };
-  yj.stringifyAsync(clientInfo, null, null,32,(err, data) => {
-    if (!err) {
-      clientInfoString = data;
-    } else {
-      console.log(err);
-    }
-  });
+  clientInfoString = stringify(clientInfo);
+
 
 }, 500);
 // Called once for each new client. Note, this response is left open!

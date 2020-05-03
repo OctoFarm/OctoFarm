@@ -6,10 +6,13 @@ import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
 import FileOperations from "./lib/functions/file.js";
 import Validate from "./lib/functions/validate.js";
+import {parse, stringify} from './vendor/flatted.js';
+
 
 let printerInfo = "";
 let editMode = false;
 let deletedPrinters = [];
+
 //Setup charts
 let optionsMemory = {
     title: {
@@ -408,7 +411,7 @@ var activityHeatChart = new ApexCharts(document.querySelector("#daysActivityHeat
 activityHeatChart.render();
 async function asyncParse(str) {
     try {
-        let info = JSON.parse(str)
+        let info = parse(str)
         return info;
     } catch (e) {
         return false;
@@ -1178,10 +1181,13 @@ class dashUpdate {
                     printerBadge.innerHTML =
                         printer.state;
                     printerBadge.className = `badge badge-${printer.stateColour.name} badge-pill`;
+                    printerBadge.setAttribute('title',printer.stateDescription)
                     hostBadge.innerHTML =
                         printer.hostState;
+                    hostBadge.setAttribute('title',printer.hostDescription)
                     hostBadge.className = `badge badge-${printer.hostStateColour.name} badge-pill`;
                     socketBadge.className = `badge badge-${printer.webSocket} badge-pill`;
+                    socketBadge.setAttribute('title',printer.webSocketDescription)
                     webButton.href = printer.printerURL;
                     if (printer.stateColour.category === "Offline") {
                         printButton.disabled = true;
@@ -1206,48 +1212,55 @@ class dashUpdate {
         </th>
         <th><div id="printerName-${printer._id}" contenteditable="false">${printerName}</div></th>
         <th>
-            <button  id="printerButton-${printer._id}"
+            <button  
+            title="Control Your Printer"
+            id="printerButton-${printer._id}"
                      type="button"
                      class="btn btn-primary btn-sm d-none"
                      data-toggle="modal"
                      data-target="#printerManagerModal" disabled
             ><i class="fas fa-print"></i>
             </button>
-            <button  id="printerSettings-${printer._id}"
+            <button  title="Change your Printer Settings"
+            id="printerSettings-${printer._id}"
                                  type="button"
                                  class="btn btn-secondary btn-sm"
                                  data-toggle="modal"
                                  data-target="#printerSettingsModal" disabled
             ><i class="fas fa-cog"></i>
             </button>
-            <a id="printerWeb-${printer._id}"
+            <a title="Open your Printers Web Interface"
+               id="printerWeb-${printer._id}"
                type="button"
                class="btn btn-info btn-sm"
                target="_blank"
                href="${ printer.printerURL }" role="button"><i class="fas fa-globe-europe"></i></a>
-            <button  id="printerSyncButton-${printer._id}"
+            <button  
+                     title="Re-Sync your printer"
+                     id="printerSyncButton-${printer._id}"
                      type="button"
                      class="btn btn-success btn-sm"
             >
                 <i class="fas fa-sync"></i>
             </button>
-            <button  id="printerPower-${printer._id}"
+            <button  title="Turn your printer on/off"
+                     id="printerPower-${printer._id}"
                      type="button"
                      class="btn btn-danger btn-sm"
                      data-toggle="modal"
                      data-target="#powerModal"
             ><i class="fas fa-power-off"></i>
             </button>
-            <span  id="printerSortButton-${printer._id}"
+            <span title="Drag and Change your Printers sorting"  id="printerSortButton-${printer._id}"
                    class="btn btn-light btn-sm sortableList"
             >
     <i class="fas fa-grip-vertical"></i>
     </span></th>
-        <th><small><span id="hostBadge-${printer._id}" class="badge badge-${ printer.hostStateColour.name } badge-pill">
+        <th><small><span title="${printer.hostDescription}" id="hostBadge-${printer._id}" class="badge badge-${ printer.hostStateColour.name } badge-pill">
                 ${ printer.hostState }</small></span></th>
-        <th><small><span id="printerBadge-${printer._id}" class="badge badge-${ printer.stateColour.name } badge-pill">
+        <th><small><span title="${printer.stateDescription}" id="printerBadge-${printer._id}" class="badge badge-${ printer.stateColour.name } badge-pill">
                 ${ printer.state }</small></span></th>
-        <th><small><span id="webSocketIcon-${printer._id}" class="badge badge-${ printer.webSocket } badge-pill">
+        <th><small><span title="${printer.webSocketDescription}" id="webSocketIcon-${printer._id}" class="badge badge-${ printer.webSocket } badge-pill">
                 <i  class="fas fa-plug"></i></span></th>
         <th><div id="printerGroup-${printer._id}" contenteditable="false"></div></th>
         <th><div id="printerURL-${printer._id}" contenteditable="false"></div></th>
