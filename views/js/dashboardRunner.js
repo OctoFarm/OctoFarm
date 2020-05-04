@@ -668,6 +668,7 @@ class PrintersManagement {
         if (typeof newPrinter !== 'undefined') {
             document.getElementById("printerList").insertAdjacentHTML("beforebegin", `
          <tr id="newPrinterCard-${newPrintersIndex}">
+          
               <th></th>
               <th></th>
               <th><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="plaintext-only">${newPrinter.name}</div></th>
@@ -693,6 +694,7 @@ class PrintersManagement {
         } else {
             document.getElementById("printerList").insertAdjacentHTML("beforebegin", `
         <tr id="newPrinterCard-${newPrintersIndex}">
+                <th></th>
         <th></th>
         <th><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="plaintext-only">{Leave to Grab from OctoPrint}</div></th>
         <th></th>
