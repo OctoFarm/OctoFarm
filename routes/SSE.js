@@ -70,6 +70,7 @@ setInterval(async function() {
       port: printers[i].port,
       camURL: printers[i].camURL,
       apikey: printers[i].apikey,
+      sortIndex: printers[i].sortIndex,
       currentZ: printers[i].currentZ,
       progress: printers[i].progress,
       job: printers[i].job,
