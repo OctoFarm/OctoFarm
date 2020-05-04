@@ -7,6 +7,7 @@ import PrinterManager from "./lib/modules/printerManager.js";
 import FileOperations from "./lib/functions/file.js";
 import Validate from "./lib/functions/validate.js";
 import {parse} from './vendor/flatted.js';
+import tableSort from "./lib/functions/tablesort.js";
 
 
 let printerInfo = "";
@@ -1165,7 +1166,8 @@ class dashUpdate {
                     let printerCameraURL = document.getElementById("printerCamURL-" + printer._id);
                     let printerAPIKey = document.getElementById("printerApiKey-" + printer._id);
                     let printerOctoPrintVersion = document.getElementById("printerOctoPrintVersion-" + printer._id);
-
+                    let printerSortIndex = document.getElementById("printerSortIndex-"+printer._id)
+                    printerSortIndex.innerHTML = printer.sortIndex;
                     printerGroup.innerHTML = printer.group;
                     printerURL.innerHTML = printer.printerURL;
                     printerAPIKey.innerHTML = printer.apikey;
@@ -1180,13 +1182,13 @@ class dashUpdate {
                     printName.innerHTML = `${printerName}`;
                     printerBadge.innerHTML =
                         printer.state;
-                    printerBadge.className = `badge badge-${printer.stateColour.name} badge-pill`;
+                    printerBadge.className = `tag badge badge-${printer.stateColour.name} badge-pill`;
                     printerBadge.setAttribute('title',printer.stateDescription)
                     hostBadge.innerHTML =
                         printer.hostState;
                     hostBadge.setAttribute('title',printer.hostDescription)
-                    hostBadge.className = `badge badge-${printer.hostStateColour.name} badge-pill`;
-                    socketBadge.className = `badge badge-${printer.webSocket} badge-pill`;
+                    hostBadge.className = `tag badge badge-${printer.hostStateColour.name} badge-pill`;
+                    socketBadge.className = `tag badge badge-${printer.webSocket} badge-pill`;
                     socketBadge.setAttribute('title',printer.webSocketDescription)
                     webButton.href = printer.printerURL;
                     if (printer.stateColour.category === "Offline") {
@@ -1213,54 +1215,54 @@ class dashUpdate {
         <th><div id="printerName-${printer._id}" contenteditable="false">${printerName}</div></th>
         <th>
             <button  
-            title="Control Your Printer"
+            data-title="Control Your Printer"
             id="printerButton-${printer._id}"
                      type="button"
-                     class="btn btn-primary btn-sm d-none"
+                     class="tag btn btn-primary btn-sm"
                      data-toggle="modal"
                      data-target="#printerManagerModal" disabled
             ><i class="fas fa-print"></i>
             </button>
-            <button  title="Change your Printer Settings"
+            <button  data-title="Change your Printer Settings"
             id="printerSettings-${printer._id}"
                                  type="button"
-                                 class="btn btn-secondary btn-sm"
+                                 class="tag btn btn-secondary btn-sm"
                                  data-toggle="modal"
                                  data-target="#printerSettingsModal" disabled
             ><i class="fas fa-cog"></i>
             </button>
-            <a title="Open your Printers Web Interface"
+            <a data-title="Open your Printers Web Interface"
                id="printerWeb-${printer._id}"
                type="button"
-               class="btn btn-info btn-sm"
+               class="tag btn btn-info btn-sm"
                target="_blank"
                href="${ printer.printerURL }" role="button"><i class="fas fa-globe-europe"></i></a>
             <button  
-                     title="Re-Sync your printer"
+                     data-title="Re-Sync your printer"
                      id="printerSyncButton-${printer._id}"
                      type="button"
-                     class="btn btn-success btn-sm"
+                     class="tag btn btn-success btn-sm"
             >
                 <i class="fas fa-sync"></i>
             </button>
-            <button  title="Turn your printer on/off"
+            <button  data-title="Turn your printer on/off"
                      id="printerPower-${printer._id}"
                      type="button"
-                     class="btn btn-danger btn-sm"
+                     class="tag btn btn-danger btn-sm"
                      data-toggle="modal"
                      data-target="#powerModal"
             ><i class="fas fa-power-off"></i>
             </button>
-            <span title="Drag and Change your Printers sorting"  id="printerSortButton-${printer._id}"
-                   class="btn btn-light btn-sm sortableList"
+            <span data-title="Drag and Change your Printers sorting"  id="printerSortButton-${printer._id}"
+                   class="tag btn btn-light btn-sm sortableList"
             >
     <i class="fas fa-grip-vertical"></i>
     </span></th>
-        <th><small><span title="${printer.hostDescription}" id="hostBadge-${printer._id}" class="badge badge-${ printer.hostStateColour.name } badge-pill">
+        <th><small><span data-title="${printer.hostDescription}" id="hostBadge-${printer._id}" class="tag badge badge-${ printer.hostStateColour.name } badge-pill">
                 ${ printer.hostState }</small></span></th>
-        <th><small><span title="${printer.stateDescription}" id="printerBadge-${printer._id}" class="badge badge-${ printer.stateColour.name } badge-pill">
+        <th><small><span data-title="${printer.stateDescription}" id="printerBadge-${printer._id}" class="tag badge badge-${ printer.stateColour.name } badge-pill">
                 ${ printer.state }</small></span></th>
-        <th><small><span title="${printer.webSocketDescription}" id="webSocketIcon-${printer._id}" class="badge badge-${ printer.webSocket } badge-pill">
+        <th><small><span data-title="${printer.webSocketDescription}" id="webSocketIcon-${printer._id}" class="tag badge badge-${ printer.webSocket } badge-pill">
                 <i  class="fas fa-plug"></i></span></th>
         <th><div id="printerGroup-${printer._id}" contenteditable="false"></div></th>
         <th><div id="printerURL-${printer._id}" contenteditable="false"></div></th>
@@ -1395,3 +1397,5 @@ let sortable = Sortable.create(el, {
         OctoFarmClient.post("printers/updateSortIndex", listID);
     }
 });
+
+window.onload = function () {tableSort.makeAllSortable();};

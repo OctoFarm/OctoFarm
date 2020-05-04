@@ -111,7 +111,9 @@ export default class PrinterManager {
       } else {
         job = {
           file: {
-            name: "No File Selected"
+            name: "No File Selected",
+            display: "No File Selected",
+            path: "No File Selected"
           },
           estimatedPrintTime: 0,
           lastPrintTime: 0
@@ -313,7 +315,7 @@ export default class PrinterManager {
                   <b>Current Z: </b><p class="mb-1" id="pmCurrentZ">${
             printer.currentZ
         }mm</p>
-                  <b class="mb-1">File Name: </b><p class="mb-1" id="pmFileName">${
+                  <b class="mb-1">File Name: </b><br><p title="${job.file.path}" class="tag mb-1" id="pmFileName">${
             job.file.name
         }</p></center>
                   </div>
@@ -1215,6 +1217,7 @@ export default class PrinterManager {
         progress.printTime
     );
     elements.jobStatus.currentZ.innerHTML = printer.currentZ + "mm";
+    elements.jobStatus.fileName.setAttribute('title', job.file.path)
     elements.jobStatus.fileName.innerHTML = job.file.name;
 
     if (printer.stateColour.category === "Active") {

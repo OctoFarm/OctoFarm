@@ -27,11 +27,11 @@
           </td>
           <td>
             <% if(print.printHistory.success){%>
-            <i class="fas fa-thumbs-up text-success"></i>
+            <p class="d-none">Success</p><i class="fas fa-thumbs-up text-success"></i>
             <% }else{ %> <% if(print.printHistory.reason === "cancelled"){ %>
-            <i class="fas fa-thumbs-down text-warning"></i>
+                <p class="d-none">Cancelled</p><i class="fas fa-thumbs-down text-warning"></i>
             <% }else{ %>
-            <i class="fas fa-exclamation text-danger"></i>
+                <p class="d-none">Failure</p><i class="fas fa-exclamation text-danger"></i>
             <% } %> <% } %>
           </td>
           <td><%=
@@ -96,7 +96,7 @@
                 data-toggle="modal"
                 data-target="#historyModal"
               >
-                <i class="fas fa-edit"></i>
+                <i class="fas fa-eye"></i>
               </button>
 
               <button

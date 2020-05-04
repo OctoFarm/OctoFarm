@@ -1,10 +1,13 @@
 <% sortedIndex.forEach(sorted => { %>
 
     <tr id="printerCard-<%= printers[sorted.actualIndex]._id %>">
+        <th id="printerSortIndex-<%= printers[sorted.actualIndex]._id %>">
+            <%= printers[sorted.actualIndex].sortIndex %>
+        </th>
         <th>
             <center>
-            <form class="was-validated form-check-inline form-check">
-                <div class="custom-control custom-checkbox mb-2 pr-2">
+            <form title="Select your printer for multi-printer commands" class="was-validated form-check-inline form-check">
+                <div title="Select your printer for multi-printer commands" class="tag custom-control custom-checkbox mb-2 pr-2">
                     <input type="checkbox" class="custom-control-input" id="dashboardSelect-<%= printers[sorted.actualIndex]._id %>" required>
                     <label class="custom-control-label" for="dashboardSelect-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"></label>
                 </div>
@@ -16,7 +19,7 @@
             <button  title="Control Your Printer"
                      id="printerButton-<%= printers[sorted.actualIndex]._id %>"
                      type="button"
-                     class="btn btn-primary btn-sm"
+                     class="tag btn btn-primary btn-sm"
                      data-toggle="modal"
                      data-target="#printerManagerModal" disabled
             ><i class="fas fa-print"></i>
@@ -24,7 +27,7 @@
             <button  title="Change your Printer Settings"
                     id="printerSettings-<%= printers[sorted.actualIndex]._id %>"
                                  type="button"
-                                 class="btn btn-secondary btn-sm"
+                                 class="tag btn btn-secondary btn-sm"
                                  data-toggle="modal"
                                  data-target="#printerSettingsModal" disabled
             ><i class="fas fa-cog"></i>
@@ -32,35 +35,35 @@
             <a title="Open your Printers Web Interface"
                id="printerWeb-<%= printers[sorted.actualIndex]._id %>"
                type="button"
-               class="btn btn-info btn-sm"
+               class="tag btn btn-info btn-sm"
                target="_blank"
                href="<%= printers[sorted.actualIndex].printerURL %>" role="button"><i class="fas fa-globe-europe"></i></a>
             <button  title="Re-Sync your printer"
                     id="printerSyncButton-<%= printers[sorted.actualIndex]._id %>"
                      type="button"
-                     class="btn btn-success btn-sm"
+                     class="tag btn btn-success btn-sm"
             >
                 <i class="fas fa-sync"></i>
             </button>
             <button  title="Turn your printer on/off"
                      id="printerPower-<%= printers[sorted.actualIndex]._id %>"
                      type="button"
-                     class="btn btn-danger btn-sm d-none"
+                     class="tag btn btn-danger btn-sm d-none"
                      data-toggle="modal"
                      data-target="#powerModal"
             ><i class="fas fa-power-off"></i>
             </button>
             <span  title="Drag and Change your Printers sorting"
                    id="printerSortButton-<%= printers[sorted.actualIndex]._id %>"
-                   class="btn btn-light btn-sm sortableList"
+                   class="tag btn btn-light btn-sm sortableList"
             >
     <i class="fas fa-grip-vertical"></i>
     </span></th>
-        <th><small><span title="<%= printers[sorted.actualIndex].hostDescription %>" id="hostBadge-<%= printers[sorted.actualIndex]._id %>" class="badge badge-<%= printers[sorted.actualIndex].hostStateColour.name %> badge-pill">
+        <th><small><span title="<%= printers[sorted.actualIndex].hostDescription %>" id="hostBadge-<%= printers[sorted.actualIndex]._id %>" class="tag badge badge-<%= printers[sorted.actualIndex].hostStateColour.name %> badge-pill">
                 <%= printers[sorted.actualIndex].hostState %></small></span></th>
-        <th><small><span title="<%= printers[sorted.actualIndex].stateDescription %>" id="printerBadge-<%= printers[sorted.actualIndex]._id %>" class="badge badge-<%= printers[sorted.actualIndex].stateColour.name %> badge-pill">
+        <th><small><span title="<%= printers[sorted.actualIndex].stateDescription %>" id="printerBadge-<%= printers[sorted.actualIndex]._id %>" class="tag badge badge-<%= printers[sorted.actualIndex].stateColour.name %> badge-pill">
                 <%= printers[sorted.actualIndex].state %></small></span></th>
-        <th><small><span title="<%= printers[sorted.actualIndex].webSocketDescription %>" id="webSocketIcon-<%= printers[sorted.actualIndex]._id %>" class="badge badge-<%= printers[sorted.actualIndex].webSocket %> badge-pill">
+        <th><small><span title="<%= printers[sorted.actualIndex].webSocketDescription %>" id="webSocketIcon-<%= printers[sorted.actualIndex]._id %>" class="tag badge badge-<%= printers[sorted.actualIndex].webSocket %> badge-pill">
                 <i  class="fas fa-plug"></i></span></th>
         <th><div id="printerGroup-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"><%= printers[sorted.actualIndex].group %></div></th>
         <th><div id="printerURL-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"><%= printers[sorted.actualIndex].printerURL %></div></th>

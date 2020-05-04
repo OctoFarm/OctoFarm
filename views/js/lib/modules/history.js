@@ -1,6 +1,7 @@
 import OctoFarmClient from "../octofarm.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
+import tableSort from "../functions/tablesort.js";
 //Setup history listeners
 document.getElementById("historyTable").addEventListener("click", e => {
   //Remove from UI
@@ -174,3 +175,4 @@ export default class History {
   static reload() {}
 }
 History.get();
+window.onload = function () {tableSort.makeAllSortable();};

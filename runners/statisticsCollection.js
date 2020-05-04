@@ -216,28 +216,8 @@ class StatisticsCollection {
         }
     }
     static getDay(value) {
-        value = value.getDay()
-        if (value === 1) {
-            return "Monday";
-        }
-        if (value === 2) {
-            return "Tuesday";
-        }
-        if (value === 3) {
-            return "Wednesday";
-        }
-        if (value === 4) {
-            return "Thursday";
-        }
-        if (value === 5) {
-            return "Friday";
-        }
-        if (value === 6) {
-            return "Saturday";
-        }
-        if (value === 0) {
-            return "Sunday";
-        }
+        value = value.toLocaleDateString();
+        return value
     }
     static heatMapping(complete, active, offline, idle, disconnected) {
         let today = StatisticsCollection.getDay(new Date())
@@ -343,7 +323,7 @@ class StatisticsCollection {
 
         }
         //Clean up old days....
-        if (heatMap[0].data.length > 7) {
+        if (heatMap[0].data.length === 8) {
             heatMap[0].data.pop()
             heatMap[1].data.pop()
             heatMap[2].data.pop()

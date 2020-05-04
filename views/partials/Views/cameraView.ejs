@@ -1,11 +1,13 @@
 <% sortedIndex.forEach(sorted => { %> <%if(printers[sorted.actualIndex].state
 === "Disconnected" && clientSettings[0].cameraView.hideClosed){%> <% if(typeof
-printers[sorted.actualIndex].settingsWebcam != 'undefined' || printers[sorted.actualIndex].settingsWebcam != ''){%> <% } %>
+printers[sorted.actualIndex].settingsWebcam != 'undefined' ||
+printers[sorted.actualIndex].settingsWebcam != ''){%> <% } %>
 <div
   id="camPanel-<%= printers[sorted.actualIndex]._id %>"
   class="col-lg-<%= (clientSettings[0].cameraView.cameraRows)%> col-xl-<%= (clientSettings[0].cameraView.cameraRows)%> hidden"
 >
-  <%}else if(printers[sorted.actualIndex].camURL === "" || printers[sorted.actualIndex].stateColour.category === "Offline"){ %>
+  <%}else if(printers[sorted.actualIndex].camURL === "" ||
+  printers[sorted.actualIndex].stateColour.category === "Offline"){ %>
   <div
     id="camPanel-<%= printers[sorted.actualIndex]._id %>"
     class="col-lg-<%= (clientSettings[0].cameraView.cameraRows)%> col-xl-<%= (clientSettings[0].cameraView.cameraRows)%> hidden"
@@ -15,30 +17,20 @@ printers[sorted.actualIndex].settingsWebcam != 'undefined' || printers[sorted.ac
       id="camPanel-<%= printers[sorted.actualIndex]._id %>"
       class="col-lg-<%= (clientSettings[0].cameraView.cameraRows)%> col-xl-<%= (clientSettings[0].cameraView.cameraRows)%>"
     >
-      <%}%>        <% let flipH = ""; %> <% let flipV = ""; %> <% let rotate90 = "";
-        %> <% if (typeof printers[sorted.actualIndex].settingsWebcam !=
-                "undefined") { %>
-
-            <% if
-            (printers[sorted.actualIndex].settingsWebcam.flipH) { %> <% flipH =
-                    "rotateY(180deg)"; %> <% } %> <% if
-            (printers[sorted.actualIndex].settingsWebcam.flipV) { %> <% flipV =
-                    "rotateX(180deg)"; %> <% } %> <% if
-            (printers[sorted.actualIndex].settingsWebcam.rotate90) { %> <% rotate90
-                    = "rotate(90deg)"; %> <% } %> <% } %>
-
-      <% let name = "";%>
-      <% if (typeof printers[sorted.actualIndex].settingsApperance != "undefined") {%>
-      <% if (printers[sorted.actualIndex].settingsApperance.name === "" || printers[sorted.actualIndex].settingsApperance.name === null) {%>
-      <% name = printers[sorted.actualIndex].printerURL;%>
-      <% } else {%>
-      <% name = printers[sorted.actualIndex].settingsApperance.name;%>
-      <% }%>
-      <% } else {%>
-      <% name = printers[sorted.actualIndex].printerURL;%>
-      <%}%>
-
-
+      <%}%> <% let flipH = ""; %> <% let flipV = ""; %> <% let rotate90 = ""; %>
+      <% if (typeof printers[sorted.actualIndex].settingsWebcam != "undefined")
+      { %> <% if (printers[sorted.actualIndex].settingsWebcam.flipH) { %> <%
+      flipH = "rotateY(180deg)"; %> <% } %> <% if
+      (printers[sorted.actualIndex].settingsWebcam.flipV) { %> <% flipV =
+      "rotateX(180deg)"; %> <% } %> <% if
+      (printers[sorted.actualIndex].settingsWebcam.rotate90) { %> <% rotate90 =
+      "rotate(90deg)"; %> <% } %> <% } %> <% let name = "";%> <% if (typeof
+      printers[sorted.actualIndex].settingsApperance != "undefined") {%> <% if
+      (printers[sorted.actualIndex].settingsApperance.name === "" ||
+      printers[sorted.actualIndex].settingsApperance.name === null) {%> <% name
+      = printers[sorted.actualIndex].printerURL;%> <% } else {%> <% name =
+      printers[sorted.actualIndex].settingsApperance.name;%> <% }%> <% } else
+      {%> <% name = printers[sorted.actualIndex].printerURL;%> <%}%>
 
       <div class="card text-center mb-0 mt-0 ml-0 mr-0">
         <div
@@ -55,83 +47,96 @@ printers[sorted.actualIndex].settingsWebcam != 'undefined' || printers[sorted.ac
               data-target="#printerManagerModal"
               disabled
             >
-                  <% if(name.includes("http://")){ %>
-                      <%  name = name.replace("http://", ""); %>
-                  <% }else if(name.includes("https://")){ %>
-                      <%  name = name.replace("https://",""); %>
-                  <%}  %>
-              <%= name %>
+              <% if(name.includes("http://")){ %> <% name =
+              name.replace("http://", ""); %> <% }else
+              if(name.includes("https://")){ %> <% name =
+              name.replace("https://",""); %> <%} %> <%= name %>
             </button></small
           >
 
           <small>
             <% if(printers[sorted.actualIndex].state === "Offline"){ %>
-              <button
-                      id="powerButton-<%= printers[sorted.actualIndex]._id %>"
-                      type="button"
-                      class="btn btn-danger float-right btn-sm d-none"
-                      data-toggle="modal"
-                      data-target="#printerPowerModal"
-              >
-                <i class="fas fa-power-off"></i>
-              </button>
-              <a id="printerWeb-5ea68355110cfe5ca94265ac"
-                 type="button"
-                 class="btn btn-info btn-sm disabled float-right mr-1"
-                 target="_blank" href="<%= printers[sorted.actualIndex].printerURL %>"
-                 role="button">
-                  <i class="fas fa-globe-europe"></i>
-              </a>
-              <button
-                      id="printerButton-<%= printers[sorted.actualIndex]._id %>"
-                      type="button"
-                      class="btn btn-primary float-right btn-sm mr-1"
-                      data-toggle="modal"
-                      data-target="#printerManagerModal" disabled
-              >
-                <i class="fas fa-print"></i>
-              </button>
+            <button
+              title="Turn your printer on/off"
+              id="powerButton-<%= printers[sorted.actualIndex]._id %>"
+              type="button"
+              class="tag btn btn-danger float-right btn-sm d-none"
+              data-toggle="modal"
+              data-target="#printerPowerModal"
+            >
+              <i class="fas fa-power-off"></i>
+            </button>
+
+            <a
+              title="Open your Printers Web Interface"
+              id="printerWeb-5ea68355110cfe5ca94265ac"
+              type="button"
+              class="tag btn btn-info btn-sm disabled float-right mr-1"
+              target="_blank"
+              href="<%= printers[sorted.actualIndex].printerURL %>"
+              role="button"
+            >
+              <i class="fas fa-globe-europe"></i>
+            </a>
+            <button
+              title="Control Your Printer"
+              id="printerButton-<%= printers[sorted.actualIndex]._id %>"
+              type="button"
+              class="tag btn btn-primary float-right btn-sm mr-1"
+              data-toggle="modal"
+              data-target="#printerManagerModal"
+              disabled
+            >
+              <i class="fas fa-print"></i>
+            </button>
             <% }else{ %>
-              <button
-                      id="powerButton-<%= printers[sorted.actualIndex]._id %>"
-                      type="button"
-                      class="btn btn-danger float-right btn-sm d-none"
-                      data-toggle="modal"
-                      data-target="#printerPowerModal"
-              >
-                <i class="fas fa-power-off"></i>
-              </button>
-              <a id="printerWeb-5ea68355110cfe5ca94265ac"
-                 type="button"
-                 class="btn btn-info btn-sm float-right mr-1"
-                 target="_blank" href="<%= printers[sorted.actualIndex].printerURL %>"
-                 role="button">
-                <i class="fas fa-globe-europe"></i>
-              </a>
-              <button
-                      id="printerButton-<%= printers[sorted.actualIndex]._id %>"
-                      type="button"
-                      class="btn btn-primary float-right btn-sm mr-1"
-                      data-toggle="modal"
-                      data-target="#printerManagerModal"
-              >
-                <i class="fas fa-print"></i>
-              </button>
+            <button
+              title="Turn your printer on/off"
+              id="powerButton-<%= printers[sorted.actualIndex]._id %>"
+              type="button"
+              class="tag btn btn-danger float-right btn-sm d-none"
+              data-toggle="modal"
+              data-target="#printerPowerModal"
+            >
+              <i class="fas fa-power-off"></i>
+            </button>
+            <a
+              title="Open your Printers Web Interface"
+              id="printerWeb-5ea68355110cfe5ca94265ac"
+              type="button"
+              class="tag btn btn-info btn-sm float-right mr-1"
+              target="_blank"
+              href="<%= printers[sorted.actualIndex].printerURL %>"
+              role="button"
+            >
+              <i class="fas fa-globe-europe"></i>
+            </a>
+            <button
+              title="Control Your Printer"
+              id="printerButton-<%= printers[sorted.actualIndex]._id %>"
+              type="button"
+              class="tag btn btn-primary float-right btn-sm mr-1"
+              data-toggle="modal"
+              data-target="#printerManagerModal"
+            >
+              <i class="fas fa-print"></i>
+            </button>
 
             <% } %>
           </small>
         </div>
         <div
-          class="card-body cameraContain"
+          class="card-body cameraContain text-truncate"
           id="camBody-<%= printers[sorted.actualIndex]._id %>"
         >
           <div class="camName">
             <small
-                    class="mb-0 text-center text-truncate" id="camName-<%= printers[sorted.actualIndex]._id %>"
+              class="mb-0 text-center"
+              id="camName-<%= printers[sorted.actualIndex]._id %>"
             >
               <% if(typeof printers[sorted.actualIndex].job != 'undefined'){ %>
-                <i class="fas fa-file-code"></i> <%= printers[sorted.actualIndex].job.file.display %> <%}else{%>
-                  <i class="fas fa-file-code"></i> No File Selected<%}%>
+              <i class="fas fa-file-code"></i> Loading... <%}else{%>
+              <i class="fas fa-file-code"></i> No File Selected<%}%>
             </small>
           </div>
           <img
@@ -144,61 +149,63 @@ printers[sorted.actualIndex].settingsWebcam != 'undefined' || printers[sorted.ac
           />
           <div class="camTemps">
             <small
-                    id="panE0Temp-<%= printers[sorted.actualIndex]._id %>"
-                    class="mb-0 float-left"
+              id="panE0Temp-<%= printers[sorted.actualIndex]._id %>"
+              class="mb-0 float-left"
             >
-              <% if(typeof printers[sorted.actualIndex].temps != 'undefined'){ %>
-                <% if(typeof printers[sorted.actualIndex].temps[0].tool0 !=
-                        'undefined'){ %>
-                  <i
-                          id="tool0A-<%= printers[sorted.actualIndex]._id %>"
-                          class="far fa-circle"
-                  ></i>
-                  <%= printers[sorted.actualIndex].temps[0].tool0.actual %><%}else{ %>
-                  <i
-                          id="tool0A-<%= printers[sorted.actualIndex]._id %>"
-                          class="far fa-circle"
-                  ></i>
-                  <%= 0%><%}%>°C <% if(typeof
-                        printers[sorted.actualIndex].temps[0].tool0 != 'undefined'){ %>
-                  <i
-                          id="tool0T-<%= printers[sorted.actualIndex]._id %>"
-                          class="fas fa-bullseye"
-                  ></i>
-                  <%= printers[sorted.actualIndex].temps[0].tool0.target%><%}else{ %>
-                  <i
-                          id="tool0T-<%= printers[sorted.actualIndex]._id %>"
-                          class="fas fa-bullseye"
-                  ></i>
-                  <%= 0%><%}%>°C <%} %>
+              <% if(typeof printers[sorted.actualIndex].temps != 'undefined'){
+              %> <% if(typeof printers[sorted.actualIndex].temps[0].tool0 !=
+              'undefined'){ %>
+              <i
+                id="tool0A-<%= printers[sorted.actualIndex]._id %>"
+                class="far fa-circle"
+              ></i>
+              <%= printers[sorted.actualIndex].temps[0].tool0.actual %><%}else{
+              %>
+              <i
+                id="tool0A-<%= printers[sorted.actualIndex]._id %>"
+                class="far fa-circle"
+              ></i>
+              <%= 0%><%}%>°C <% if(typeof
+              printers[sorted.actualIndex].temps[0].tool0 != 'undefined'){ %>
+              <i
+                id="tool0T-<%= printers[sorted.actualIndex]._id %>"
+                class="fas fa-bullseye"
+              ></i>
+              <%= printers[sorted.actualIndex].temps[0].tool0.target%><%}else{
+              %>
+              <i
+                id="tool0T-<%= printers[sorted.actualIndex]._id %>"
+                class="fas fa-bullseye"
+              ></i>
+              <%= 0%><%}%>°C <%} %>
             </small>
             <small
-                    id="panBedTemp-<%= printers[sorted.actualIndex]._id %>"
-                    class="mb-0 float-right"
+              id="panBedTemp-<%= printers[sorted.actualIndex]._id %>"
+              class="mb-0 float-right"
             >
-              <% if(typeof printers[sorted.actualIndex].temps != 'undefined'){ %>
-                <% if(typeof printers[sorted.actualIndex].temps[0].bed !=
-                        'undefined'){ %><i
-                        id="bedA-<%= printers[sorted.actualIndex]._id %>"
-                        class="far fa-circle"
-                ></i>
-                <%= printers[sorted.actualIndex].temps[0].bed.actual %><%}else{ %>
-                  <i
-                          id="bedA-<%= printers[sorted.actualIndex]._id %>"
-                          class="far fa-circle"
-                  ></i>
-                  <%= 0%><%}%>°C <% if(typeof
-                        printers[sorted.actualIndex].temps[0].bed != 'undefined'){ %>
-                  <i
-                          id="bedT-<%= printers[sorted.actualIndex]._id %>"
-                          class="fas fa-bullseye"
-                  ></i>
-                  <%= printers[sorted.actualIndex].temps[0].bed.target %><%}else{ %>
-                  <i
-                          id="bedT-<%= printers[sorted.actualIndex]._id %>"
-                          class="fas fa-bullseye"
-                  ></i>
-                  <%= 0%><%}%>°C <%} %>
+              <% if(typeof printers[sorted.actualIndex].temps != 'undefined'){
+              %> <% if(typeof printers[sorted.actualIndex].temps[0].bed !=
+              'undefined'){ %><i
+                id="bedA-<%= printers[sorted.actualIndex]._id %>"
+                class="far fa-circle"
+              ></i>
+              <%= printers[sorted.actualIndex].temps[0].bed.actual %><%}else{ %>
+              <i
+                id="bedA-<%= printers[sorted.actualIndex]._id %>"
+                class="far fa-circle"
+              ></i>
+              <%= 0%><%}%>°C <% if(typeof
+              printers[sorted.actualIndex].temps[0].bed != 'undefined'){ %>
+              <i
+                id="bedT-<%= printers[sorted.actualIndex]._id %>"
+                class="fas fa-bullseye"
+              ></i>
+              <%= printers[sorted.actualIndex].temps[0].bed.target %><%}else{ %>
+              <i
+                id="bedT-<%= printers[sorted.actualIndex]._id %>"
+                class="fas fa-bullseye"
+              ></i>
+              <%= 0%><%}%>°C <%} %>
             </small>
           </div>
           <div class="progress camProgress">
@@ -220,13 +227,15 @@ printers[sorted.actualIndex].settingsWebcam != 'undefined' || printers[sorted.ac
           </div>
           <small>
             <button
-              class="btn btn-success camButtons hidden btn-sm"
+              title="Start your current selected print"
+              class="tag btn btn-success camButtons hidden btn-sm"
               id="camStart-<%= printers[sorted.actualIndex]._id %>"
             >
               Start
             </button>
             <button
-              class="btn btn-danger camButtons btn-sm"
+              title="Stop your current selected print"
+              class="tag btn btn-danger camButtons btn-sm"
               id="camStop-<%= printers[sorted.actualIndex]._id %>"
             >
               Cancel

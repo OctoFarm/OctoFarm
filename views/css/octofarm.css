@@ -19,6 +19,8 @@ body {
 button > * {
   pointer-events: none;
 }
+th {cursor: ns-resize;}
+
 hr {
   border-color: inherit;
   margin-top: 4px;
@@ -80,12 +82,65 @@ li {
 .toolUnder {
   color: cyan;
 }
-
-
+.tag{
+  display: inline;
+  position: relative;
+}
+.tag:hover:after{
+  background: #333;
+  background: rgba(0,0,0,.8);
+  border-radius: 5px;
+  bottom: 26px;
+  color: #fff;
+  content: attr(title);
+  right: 20%;
+  padding: 5px 15px;
+  position: absolute;
+  z-index: 9998;
+  width: 220px;
+}
+.tag:hover:before{
+  border: solid;
+  border-color: #333 transparent;
+  border-width: 6px 6px 0 6px;
+  bottom: 20px;
+  content: "";
+  right: 50%;
+  position: absolute;
+  z-index: 9999;
+}
+.tag-bottom{
+  display: inline;
+  position: relative;
+}
+.tag-bottom:hover:after{
+  background: #333;
+  background: rgba(0,0,0,.8);
+  border-radius: 5px;
+  top: 26px;
+  color: #fff;
+  content: attr(title);
+  right: 20%;
+  padding: 5px 15px;
+  position: absolute;
+  z-index: 9998;
+  width: 220px;
+}
+.tag-bottom:hover:before{
+  border: solid;
+  border-color: #333 transparent;
+  border-width: 6px 6px 0 6px;
+  top: 20px;
+  content: "";
+  right: 50%;
+  position: absolute;
+  z-index:9999;
+}
 /*Sticky Table header*/
 .sticky-table {
+  min-width:100px;
   position: sticky;
-  top: 60px;
+  top: 40px;
   z-index: 1000;
 }
 
@@ -140,6 +195,7 @@ a.notyet {
 }
 .dashHeader {
   padding: 5px;
+  z-index:100;
 }
 
 .dashBody {

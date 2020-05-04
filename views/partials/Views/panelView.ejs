@@ -61,26 +61,28 @@
               </button>
             </h6>
             <% if(printers[sorted.actualIndex].stateColour.category === "Offline"){ %>
-              <button
+              <button title="Turn your printer on/off"
                       id="powerButton-<%= printers[sorted.actualIndex]._id %>"
                       type="button"
-                      class="btn btn-danger float-right btn-sm d-none"
+                      class="tag btn btn-danger float-right btn-sm d-none"
                       data-toggle="modal"
                       data-target="#printerPowerModal"
               >
                 <i class="fas fa-power-off"></i>
               </button>
-              <a id="printerWeb-5ea68355110cfe5ca94265ac"
+              <a title="Open your Printers Web Interface"
+                 id="printerWeb-5ea68355110cfe5ca94265ac"
                  type="button"
-                 class="btn btn-info btn-sm disabled float-right mr-1"
+                 class="tag btn btn-info btn-sm disabled float-right mr-1"
                  target="_blank" href="<%= printers[sorted.actualIndex].printerURL %>"
                  role="button">
                 <i class="fas fa-globe-europe"></i>
               </a>
               <button
+                      title="Control Your Printer"
                       id="printerButton-<%= printers[sorted.actualIndex]._id %>"
                       type="button"
-                      class="btn btn-primary float-right btn-sm mr-1"
+                      class="tag btn btn-primary float-right btn-sm mr-1"
                       data-toggle="modal"
                       data-target="#printerManagerModal" disabled
               >
@@ -88,25 +90,28 @@
               </button>
             <% }else{ %>
               <button
+                      title="Turn your printer on/off"
                       id="powerButton-<%= printers[sorted.actualIndex]._id %>"
                       type="button"
-                      class="btn btn-danger float-right btn-sm d-none"
+                      class="tag btn btn-danger float-right btn-sm d-none"
                       data-toggle="modal"
                       data-target="#printerPowerModal"
               >
                 <i class="fas fa-power-off"></i>
               </button>
-              <a id="printerWeb-5ea68355110cfe5ca94265ac"
+              <a title="Open your Printers Web Interface"
+                 id="printerWeb-5ea68355110cfe5ca94265ac"
                  type="button"
-                 class="btn btn-info btn-sm float-right mr-1"
+                 class="tag btn btn-info btn-sm float-right mr-1"
                  target="_blank" href="<%= printers[sorted.actualIndex].printerURL %>"
                  role="button">
                 <i class="fas fa-globe-europe"></i>
               </a>
               <button
+                      title="Control Your Printer"
                       id="printerButton-<%= printers[sorted.actualIndex]._id %>"
                       type="button"
-                      class="btn btn-primary float-right btn-sm mr-1"
+                      class="tag btn btn-primary float-right btn-sm mr-1"
                       data-toggle="modal"
                       data-target="#printerManagerModal"
               >
@@ -118,7 +123,7 @@
             <button
               id="panFileName-<%= printers[sorted.actualIndex]._id %>"
               type="button"
-              class="btn btn-block btn-secondary mb-0 text-truncate btn-sm"
+              class="tag btn btn-block btn-secondary mb-0 text-truncate btn-sm"
               role="button"
               disabled
             >
@@ -175,45 +180,50 @@
             </button>
             <center>
               <button
+                title="Start your currently selected print"
                 id="panPrintStart-<%= printers[sorted.actualIndex]._id %>"
                 type="button"
-                class="btn btn-success mt-1 mb-1 btn-sm"
+                class="tag btn btn-success mt-1 mb-1 btn-sm"
                 role="button"
                 disabled
               >
                 <i class="fas fa-print"></i> Print
               </button>
               <button
+                      title="Pause your current print"
                 id="panPrintPause-<%= printers[sorted.actualIndex]._id %>"
                 type="button"
-                class="btn btn-light mt-1 mb-1 btn-sm"
+                class="tag btn btn-light mt-1 mb-1 btn-sm"
                 role="button"
                 disabled
               >
                 <i class="fas fa-pause"></i> Pause
               </button>
               <button
+                title="Restart your current print"
                 id="panRestart-<%= printers[sorted.actualIndex]._id %>"
                 type="button"
-                class="btn btn-danger mt-1 mb-1 hidden btn-sm"
+                class="tag btn btn-danger mt-1 mb-1 hidden btn-sm"
                 role="button"
                 disabled
               >
                 <i class="fas fa-undo"></i> Restart
               </button>
               <button
+                      title="Resume your current print"
                 id="panResume-<%= printers[sorted.actualIndex]._id %>"
                 type="button"
-                class="btn btn-success mt-1 mb-1 hidden btn-sm"
+                class="tag btn btn-success mt-1 mb-1 hidden btn-sm"
                 role="button"
                 disabled
               >
                 <i class="fas fa-redo"></i> Resume
               </button>
               <button
+                      title="Stop your current print"
                 id="panStop-<%= printers[sorted.actualIndex]._id %>"
                 type="button"
-                class="btn btn-danger mt-1 mb-1 btn-sm"
+                class="tag btn btn-danger mt-1 mb-1 btn-sm"
                 role="button"
                 disabled
               >

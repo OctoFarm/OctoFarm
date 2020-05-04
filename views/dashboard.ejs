@@ -127,7 +127,7 @@
                     title="Add Printer to your Farm"
                     id="addPrinterBtn"
                     type="button"
-                    class="btn btn-success ml-1 p-1"
+                    class="tag btn btn-success ml-1 p-1"
                     href="#"
                     aria-expanded="false"
             >
@@ -137,7 +137,7 @@
                     title="Turn on edit mode to edit current printers"
                     id="editPrinterBtn"
                     type="button"
-                    class="btn btn-warning ml-1 p-1"
+                    class="tag btn btn-warning ml-1 p-1"
                     href="#"
                     aria-expanded="false"
             >
@@ -147,7 +147,7 @@
                     title="Save your current printer edits"
                     id="saveEditsBtn"
                     type="button"
-                    class="btn btn-success ml-1 p-1 d-none"
+                    class="tag btn btn-success ml-1 p-1 d-none"
                     href="#"
                     aria-expanded="false"
             >
@@ -155,13 +155,14 @@
             </button>
             <form id="uploadFileModalContentForm" class="text-center">
               <input
-                      title="Import printers from a json file"
+
                       class="fileElem"
                       type="file"
                       id="importPrinterBtn"
                       accept=".json"
               /><label
-                      class="btn btn-primary ml-1 mb-0 p-1"
+                      title="Import printers from a json file"
+                      class="tag btn btn-primary ml-1 mb-0 p-1"
                       for="importPrinterBtn"
               ><i class="fas fa-file-import"></i> Import Printers</label
               >
@@ -170,16 +171,17 @@
                     title="Export printers from OctoFarm"
                     id="exportPrinterBtn"
                     type="button"
-                    class="btn btn-info ml-1 p-1"
+                    class="tag btn btn-info ml-1 p-1"
                     href="#"
                     aria-expanded="false"
             >
               <i class="fas fa-file-export"></i> Export Printers
             </button>
             <button
+                    title="Save your printer edits"
                     id="savePrinterBtn"
                     type="button"
-                    class="btn btn-primary ml-1 p-1 d-none"
+                    class="tag btn btn-primary ml-1 p-1 d-none"
                     href="#"
                     aria-expanded="false"
             >
@@ -192,7 +194,7 @@
                   title="Re-Sync all the printers in your farm to troubleshoot connection issues"
                   id="searchOfflineBtn"
                   type="button"
-                  class="btn btn-success ml-1 mb-1 mr-1 p-1 float-right"
+                  class="tag btn btn-success ml-1 mb-1 mr-1 p-1 float-right"
                   href="#"
                   aria-expanded="false"
           >
@@ -217,6 +219,7 @@
           <table id="printerTable" class="table table-sm table-dark table-striped table-responsive-sm table-responsive-md text-center">
             <thead >
             <tr>
+              <th scope="col">Sort Index</th>
               <th scope="col">Select</th>
               <th scope="table-dark text-wrap">Name</th>
               <th scope="col" style="min-width:300px;">Actions</th>

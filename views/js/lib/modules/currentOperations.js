@@ -69,8 +69,8 @@ export default function currentOperations(
     let futureTimeString = new Date(currentDate + current.timeRemaining * 1000).toTimeString()
     futureTimeString = futureTimeString.substring(0, 8);
     let dateComplete = futureDateString + ": " + futureTimeString;
-    let finishedPrint = `<button id='currentHarvest-${current.index}' type='button' class='btn btn-success btn-sm mt-0 pt-0 pb-0'>Print Harvested?</button>`;
-    let restartPrint = `<button id='restartCurrentPrint-${current.index}' type='button' class='btn btn-warning btn-sm mt-0 pt-0 pb-0'>Restart Print</button>`
+    let finishedPrint = `<button id='currentHarvest-${current.index}' type='button' title="Clear your finished print from current operations" class='tag btn btn-success btn-sm mt-0 pt-0 pb-0'>Print Harvested?</button>`;
+    let restartPrint = `<button id='restartCurrentPrint-${current.index}' type='button' title="Restart your current selected print" class='tag btn btn-warning btn-sm mt-0 pt-0 pb-0'>Restart Print</button>`
     //check if exists, create if not....
     if (document.getElementById("currentOpCard-" + current.index)) {
         if(current.progress === 100){

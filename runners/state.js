@@ -416,7 +416,7 @@ class Runner {
         );
     }
 
-    static async setupWebSocket(id) {
+    static async setupWebSocket(id, skipAPICheck) {
         let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
         try {
             if (i === -1) {
@@ -455,9 +455,11 @@ class Runner {
                 farmPrinters[i].hostState = "Online";
                 farmPrinters[i].hostStateColour = Runner.getColour("Online");
                 farmPrinters[i].hostDescription = "Host is Online";
-                await Runner.getProfile(id);
-                await Runner.getSystem(id);
-                await Runner.getSettings(id);
+                if(typeof skipAPICheck === "undefined"){
+                    await Runner.getProfile(id);
+                    await Runner.getSystem(id);
+                    await Runner.getSettings(id);
+                }
                 await Runner.getState(id);
                 await Runner.getFiles(id, "files?recursive=true");
                 //Connection to API successful, gather initial data and setup websocket.
@@ -589,13 +591,20 @@ class Runner {
     static async updatePrinters(printers) {
         //Updating printer's information
         logger.info("Pausing runners to update printers...");
-        await this.pause();
         let edited = []
         for (let i = 0; i < printers.length; i++) {
             let index = _.findIndex(farmPrinters, function(o) { return o._id == printers[i]._id; });
+            farmPrinters[index].state = "Searching...";
+            farmPrinters[index].stateColour = Runner.getColour("Searching...");
+            farmPrinters[index].hostState = "Searching...";
+            farmPrinters[index].hostStateColour = Runner.getColour("Searching...");
+            farmPrinters[index].webSocket = "danger"
+            farmPrinters[index].stateDescription = "Re-Scanning your OctoPrint Instance";
+            farmPrinters[index].hostDescription = "Re-Scanning for OctoPrint Host";
+            farmPrinters[index].webSocketDescription = "Websocket is Offline";
             farmPrinters[index].settingsApperance.name = printers[i].settingsApperance.name;
             farmPrinters[index].markModified("settingsApperance");
-            logger.info("Modified current name  for: " + farmPrinters[i].printerURL);
+            logger.info("Modified Current Name  for: " + farmPrinters[i].printerURL);
             farmPrinters[index].printerURL = printers[i].printerURL;
             farmPrinters[index].markModified("printerURL");
             logger.info("Modified current printer URL  for: " + farmPrinters[i].printerURL);
@@ -604,13 +613,15 @@ class Runner {
             logger.info("Modified current camera URL for: " + farmPrinters[i].printerURL);
             farmPrinters[index].apikey = printers[i].apikey;
             farmPrinters[index].markModified("apikey");
-            logger.info("Modified current printer name for: " + farmPrinters[i].printerURL);
+            logger.info("Modified current APIKEY for: " + farmPrinters[i].printerURL);
             farmPrinters[index].group = printers[i].group;
             farmPrinters[index].markModified("group");
-            logger.info("Modified current printer name for: " + farmPrinters[i].printerURL);
+            logger.info("Modified current group for: " + farmPrinters[i].printerURL);
             await farmPrinters[index].save();
-            edited.push({ printerURL: farmPrinters[i].printerURL })
+            edited.push({ printerURL: farmPrinters[index].printerURL });
+            await this.reScanOcto(farmPrinters[index]._id);
         }
+
         logger.info("Re-Scanning printers farm");
         return edited;
     }
@@ -656,7 +667,7 @@ class Runner {
             await farmPrinters[index].ws.instance.close();
             logger.info("Closed websocket connection for: " + farmPrinters[index].printerURL);
         }
-        await this.setupWebSocket(farmPrinters[index]._id);
+        await this.setupWebSocket(farmPrinters[index]._id, true);
         result.status = "sucess",
             result.msg = "Your client has been re-synced!"
         return result;

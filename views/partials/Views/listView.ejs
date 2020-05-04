@@ -40,7 +40,7 @@
   </td>
   <td>
     <% if(printers[sorted.actualIndex].stateColour.category === "Offline"){ %>
-      <button
+      <button title="Control Your Printer"
               id="printerButton-<%= printers[sorted.actualIndex]._id %>"
               type="button"
               class="btn btn-primary btn-sm"
@@ -49,43 +49,45 @@
       >
         <i class="fas fa-print"></i>
       </button>
-      <a id="printerWeb-5ea68355110cfe5ca94265ac"
+      <a title="Open your Printers Web Interface"
+              id="printerWeb-5ea68355110cfe5ca94265ac"
          type="button"
-         class="btn btn-info btn-sm disabled"
+         class="tag btn btn-info btn-sm disabled"
          target="_blank" href="<%= printers[sorted.actualIndex].printerURL %>"
          role="button">
         <i class="fas fa-globe-europe"></i>
       </a>
-      <button
+      <button title="Turn your printer on/off"
               id="powerButton-<%= printers[sorted.actualIndex]._id %>"
               type="button"
-              class="btn btn-danger btn-sm d-none"
+              class="tag btn btn-danger btn-sm d-none"
               data-toggle="modal"
               data-target="#printerPowerModal"
       >
         <i class="fas fa-power-off"></i>
       </button>
     <% }else{ %>
-        <button
+        <button title="Control Your Printer"
                 id="printerButton-<%= printers[sorted.actualIndex]._id %>"
                 type="button"
-                class="btn btn-primary btn-sm"
+                class="tag btn btn-primary btn-sm"
                 data-toggle="modal"
                 data-target="#printerManagerModal"
         >
           <i class="fas fa-print"></i>
         </button>
-        <a id="printerWeb-5ea68355110cfe5ca94265ac"
+        <a title="Open your Printers Web Interface"
+                id="printerWeb-5ea68355110cfe5ca94265ac"
            type="button"
-           class="btn btn-info btn-sm"
+           class="tag btn btn-info btn-sm"
            target="_blank" href="<%= printers[sorted.actualIndex].printerURL %>"
            role="button">
           <i class="fas fa-globe-europe"></i>
         </a>
-        <button
+        <button title="Turn your printer on/off"
                 id="powerButton-<%= printers[sorted.actualIndex]._id %>"
                 type="button"
-                class="btn btn-danger btn-sm d-none"
+                class="tag btn btn-danger btn-sm d-none"
                 data-toggle="modal"
                 data-target="#printerPowerModal"
         >
@@ -94,32 +96,31 @@
     <% } %>
   </td>
   <td>
-    <button
+    <button title="Start your current selected file"
       id="listPlay-<%= printers[sorted.actualIndex]._id %>"
       type="button"
-      class="btn btn-success btn-sm"
+      class="tag btn btn-success btn-sm"
       disabled
     >
       <i class="fas fa-play"></i>
     </button>
-    <button
+    <button title="Cancel your current print"
       id="listCancel-<%= printers[sorted.actualIndex]._id %>"
       type="button"
-      class="btn btn-danger btn-sm"
+      class="tag btn btn-danger btn-sm"
       disabled
     >
       <i class="fas fa-square"></i>
     </button>
   </td>
-  <td
-    id="listFile-<%= printers[sorted.actualIndex]._id %>"
-    class="text-truncate"
-  >
-    <i class="fas fa-file-code"></i> <% if(typeof
-    printers[sorted.actualIndex].job != 'undefined' &&
-    printers[sorted.actualIndex].job.file.display != null){ %> <%=
-    printers[sorted.actualIndex].job.file.display %><%}else{ %> No File Selected
+  <td>
+    <% if(typeof printers[sorted.actualIndex].job != 'undefined' && printers[sorted.actualIndex].job.file.display != null){ %>
+       <p id="listFile-<%= printers[sorted.actualIndex]._id %>" title="<%= printers[sorted.actualIndex].job.file.path %>" class="mb-1 tag">
+         <i class="fas fa-file-code"></i> <%=
+      printers[sorted.actualIndex].job.file.display %> <p><%}else{ %> <p id="listFile-<%= printers[sorted.actualIndex]._id %>" class="mb-1">
+        <i class="fas fa-file-code"></i> No File Selected <p>
     <% }%>
+
   </td>
   <td id="listFilament-<%= printers[sorted.actualIndex]._id %>">
     <% if(typeof printers[sorted.actualIndex].selectedFilament != 'undefined' &&

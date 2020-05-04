@@ -4,6 +4,8 @@ import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
 import {parse} from "./vendor/flatted.js";
+import tableSort from "./lib/functions/tablesort.js";
+window.onload = function () {tableSort.makeAllSortable();};
 
 let printerInfo = [];
 let elems = [];
@@ -153,12 +155,14 @@ function updateState(printers, clientSettings) {
 
 
     if (typeof printer.job != "undefined" && printer.job.file.name != null) {
+      elements.currentFile.setAttribute('title', printer.job.file.path)
       elements.currentFile.innerHTML =
         '<i class="fas fa-file-code"></i> ' + printer.job.file.display;
     } else {
       elements.currentFile.innerHTML =
         '<i class="fas fa-file-code"></i> ' + "No File Selected";
     }
+
     if (
       typeof printer.selectedFilament != "undefined" &&
       printer.selectedFilament != null &&

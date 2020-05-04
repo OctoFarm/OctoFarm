@@ -15,7 +15,10 @@ All notable changes to this project will be documented in this file.
     - Added new Patreon member EIPS to About page. 
     - Tool tip explanations for states on dashboard. Host, Printer and Websockets. 
     - New state when printer fresh on the farm, "Setting Up" Whilst awaiting for scanner to finish with other printers. Hits searching state straight after.
-    - Tool tip explanations for dashboard Action buttons, and Printer Management setup buttons
+    - Tool tip explanations for dashboard Action buttons, and Printer Management setup buttons, camera view, panel view and list view and current operations.
+    - Any table headers are now clickable and can be sorted by the text below. This includes, Printer Management, Filament List, List View, History. Hovering will display a sort icon to indicate can be sorted.
+    - Sort Index is now viewable on dashboard, will auto update after moving a printer into a new sort index.
+    
 ### Changed
     - Printer web button does not disable when offline
     - Printer re-sync now detroys any established connection and re-sets up the specific printer fresh regardless of state..
@@ -27,10 +30,12 @@ All notable changes to this project will be documented in this file.
     - Table headers fixed for "Actions" on Printer Management
     - Dashboard list has changed to scroll with page. The full list is loaded rather than constraining to a specific height. 
     - View pages no longer inside dropdown
+    - Editing printers only re-scans the currently edited set. 
+    - Path now shows on hover in printer manager & list view. Panel and Camera will take some time due to wrappers overlaying the tag...
+    
     
 ### Removed
     - Pointless space wasting footers on dashboard
-
 
 ### Fixed
     - Printer Camera in printer mananger now displays correct placeholder when no URL detected. Placeholder updated for new URL system. 
@@ -41,6 +46,10 @@ All notable changes to this project will be documented in this file.
     - Fixed issue with startup trying to grab currentOp/statistics too fast causing errors. 
     - Fixed logs not been deleted
     - Fixed circular structure errors with moving over to Flatted library for JSON stringify/parse.
+    - Fixed overly long filenames causing wrapping issue on Camera View
+    - List view not respecting word wrapping for file name
+    - Fixed gap in top of list view header when scrolled
+    
     
 ## [v1.1.4.9-dev-1]
 
