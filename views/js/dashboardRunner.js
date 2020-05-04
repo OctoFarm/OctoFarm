@@ -1177,7 +1177,7 @@ class dashUpdate {
                     if (printer.camURL === "none") {
                         printerCameraURL.innerHTML = "";
                     } else {
-                        printerCameraURL.innerHTML = printer.camURL;R
+                        printerCameraURL.innerHTML = printer.camURL;
                     }
 
                     printerOctoPrintVersion.innerHTML = printer.octoPrintVersion;

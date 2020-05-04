@@ -68,9 +68,6 @@ WebSocketClient.prototype.open = function(url, index) {
     }
     this.url = url;
     this.index = index;
-    farmPrinters[this.index].hostState = "Searching...";
-    farmPrinters[this.index].hostStateColour = Runner.getColour("Offline");
-    farmPrinters[this.index].hostDescription = "Searching for Host";
     farmPrinters[this.index].webSocket = "warning";
     farmPrinters[this.index].webSocketDescription = "Websocket Connected but in Tentative state until receiving data";
     this.instance = new WebSocket(this.url);
@@ -233,6 +230,8 @@ WebSocketClient.prototype.reconnect = async function(e) {
     this.instance.removeAllListeners();
     let that = this;
     setTimeout(function() {
+        farmPrinters[this.index].hostStateColour = Runner.getColour("Searching...");
+        farmPrinters[this.index].hostDescription = "Host is Online";
         logger.info("Re-Opening Websocket: " + that.index + ": " + that.url);
         that.open(that.url, that.index);
     }, this.autoReconnectInterval);
@@ -255,6 +254,9 @@ WebSocketClient.prototype.onopen = async function(e) {
 WebSocketClient.prototype.onmessage = async function(data, flags, number) {
     //console.log("WebSocketClient: message",arguments);
     //Listen for print jobs
+    farmPrinters[this.index].hostState = "Online";
+    farmPrinters[this.index].hostStateColour = Runner.getColour("Online");
+    farmPrinters[this.index].hostDescription = "Host is Online";
     data = await JSON.parse(data);
     if (typeof data.connected != "undefined") {
         farmPrinters[this.index].octoPrintVersion = data.connected.version;
