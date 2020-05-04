@@ -669,6 +669,7 @@ class PrintersManagement {
             document.getElementById("printerList").insertAdjacentHTML("beforebegin", `
          <tr id="newPrinterCard-${newPrintersIndex}">
               <th></th>
+              <th></th>
               <th><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="plaintext-only">${newPrinter.name}</div></th>
               <th></th>
               <th></th>
@@ -1174,7 +1175,7 @@ class dashUpdate {
                     if (printer.camURL === "none") {
                         printerCameraURL.innerHTML = "";
                     } else {
-                        printerCameraURL.innerHTML = printer.camURL;
+                        printerCameraURL.innerHTML = printer.camURL;R
                     }
 
                     printerOctoPrintVersion.innerHTML = printer.octoPrintVersion;

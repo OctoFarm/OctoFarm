@@ -184,10 +184,12 @@ export default class FileManager {
               "clicked"
           );
         } else {
-          reject({
-            status: this.status,
-            statusText: xhr.statusText
-          });
+          fileUploads.remove();
+          let fileCounts = document.getElementById("fileCounts-" + index);
+          if(fileCounts && fileCounts.innerHTML == 1){
+            fileCounts.innerHTML = " " +0;
+          }
+          resolve(xhr.response);
           UI.createAlert(
               "error",
               `Sorry but ${file.name} could not be uploaded... is CORS enabled and OctoPrint online?`,
@@ -197,10 +199,7 @@ export default class FileManager {
         }
       };
       xhr.onerror = function() {
-        reject({
-          status: this.status,
-          statusText: xhr.statusText
-        });
+        resolve(xhr.response);
         UI.createAlert(
             "error",
             `Sorry but ${file.name} could not be uploaded... is CORS enabled and OctoPrint online?`,

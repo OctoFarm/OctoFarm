@@ -32,7 +32,7 @@ All notable changes to this project will be documented in this file.
     - View pages no longer inside dropdown
     - Editing printers only re-scans the currently edited set. 
     - Path now shows on hover in printer manager & list view. Panel and Camera will take some time due to wrappers overlaying the tag...
-    
+    - History now shows view icon instead of edit for captured prints.
     
 ### Removed
     - Pointless space wasting footers on dashboard
@@ -49,7 +49,7 @@ All notable changes to this project will be documented in this file.
     - Fixed overly long filenames causing wrapping issue on Camera View
     - List view not respecting word wrapping for file name
     - Fixed gap in top of list view header when scrolled
-    
+    - Fixed error with history page not displaying job information on view
     
 ## [v1.1.4.9-dev-1]
 

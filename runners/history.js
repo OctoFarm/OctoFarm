@@ -26,19 +26,6 @@ class HistoryCollection {
       let endTimeFormat = endTime.substring(0, 8);
       let endDate = endDDMM + " - " + endTimeFormat;
 
-      let jobLength = "";
-      let jobVolume = "";
-
-      let job = null;
-      if (typeof printer != "undefined" && typeof printer.job != "undefined" && typeof printer.job.filament != 'undefined' && typeof printer.job.filament.tool0 != 'undefined') {
-        jobLength = printer.job.filament.tool0.length;
-        jobVolume = printer.job.filament.tool0.volume;
-      } else {
-        logger.info("No tool statistics could be found for " + printer.printerURL);
-        job = null;
-        jobLength = 0;
-        jobVolume = 0;
-      }
       let filamentChoice = "None chosen...";
       if (
           typeof printer.selectedFilament != "undefined" &&
@@ -71,10 +58,10 @@ class HistoryCollection {
         startDate: startDate,
         endDate: endDate,
         printTime: Math.round(payload.time),
-        filamentLength: jobLength,
-        filamentVolume: jobVolume,
+        filamentLength: printer.job.filament.tool0.length,
+        filamentVolume: printer.job.filament.tool0.volume,
         filamentSelection: filamentChoice,
-        job: job,
+        job: printer.job,
         notes: ""
       };
 

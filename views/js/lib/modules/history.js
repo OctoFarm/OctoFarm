@@ -96,7 +96,7 @@ export default class History {
           (3.14 * (1.75 / 2)) ^
           ((2 * 1.24 * Math.round((current.filamentLength / 1000) * 100)) /
             100);
-        if (current.job != "undefined") {
+        if (typeof current.job != "undefined") {
           let upDate = new Date(current.job.file.date * 1000);
           upDate =
             upDate.toLocaleDateString() + " " + upDate.toLocaleTimeString();
