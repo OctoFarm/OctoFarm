@@ -231,7 +231,7 @@ WebSocketClient.prototype.reconnect = async function(e) {
     let that = this;
     setTimeout(function() {
         farmPrinters[this.index].hostStateColour = Runner.getColour("Searching...");
-        farmPrinters[this.index].hostDescription = "Host is Online";
+        farmPrinters[this.index].hostDescription = "Searching for Host";
         logger.info("Re-Opening Websocket: " + that.index + ": " + that.url);
         that.open(that.url, that.index);
     }, this.autoReconnectInterval);
