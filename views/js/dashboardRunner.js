@@ -32,7 +32,7 @@ let optionsMemory = {
     },
     chart: {
         type: 'donut',
-        height: '160px',
+        height: '100%',
         animations: {
             enabled: false,
         },
@@ -132,7 +132,7 @@ let optionsCPU = {
     },
     chart: {
         type: 'donut',
-        height: '160px',
+        height: '100%',
         animations: {
             enabled: true,
         },
@@ -359,19 +359,19 @@ var optionsHeatChart = {
             colorScale: {
                 ranges: [{
                         from: 0,
-                        to: 25,
+                        to: 25.9,
                         name: 'low',
                         color: '#004cff'
                     },
                     {
                         from: 26,
-                        to: 50,
+                        to: 50.9,
                         name: 'medium',
                         color: '#af00b5'
                     },
                     {
                         from: 51,
-                        to: 75,
+                        to: 75.9,
                         name: 'high',
                         color: '#ff7800'
                     },
@@ -391,6 +391,9 @@ var optionsHeatChart = {
                 return Math.round(val * 10) / 10 + "%"
             },
         }
+    },
+    xaxis: {
+        reversed: true
     }
 };
 let systemChartCPU = new ApexCharts(
