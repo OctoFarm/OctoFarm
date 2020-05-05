@@ -447,8 +447,8 @@ source.onmessage = async function(e) {
                     }
                 } else {
                     if (iHavePrinters === false) {
+                        iHavePrinters = true;
                         bootbox.alert("No printers detected, please add them using the printer manager below.", function() {
-                            iHavePrinters = true;
                         });
                     }
 
@@ -694,7 +694,7 @@ class PrintersManagement {
         } else {
             document.getElementById("printerList").insertAdjacentHTML("beforebegin", `
         <tr id="newPrinterCard-${newPrintersIndex}">
-                <th></th>
+        <th></th>
         <th></th>
         <th><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="plaintext-only">{Leave to Grab from OctoPrint}</div></th>
         <th></th>
@@ -1205,6 +1205,7 @@ class dashUpdate {
                     //Insert new printer addition...
                     document.getElementById("printerList").insertAdjacentHTML("beforeend", `
         <tr id="printerCard-${printer._id}">
+        <th id="printerSortIndex-${printer._id}">${printer.sortIndex}</th>
         <th>
             <center>
             <form class="was-validated form-check-inline form-check">
@@ -1218,7 +1219,7 @@ class dashUpdate {
         <th><div id="printerName-${printer._id}" contenteditable="false">${printerName}</div></th>
         <th>
             <button  
-            data-title="Control Your Printer"
+            title="Control Your Printer"
             id="printerButton-${printer._id}"
                      type="button"
                      class="tag btn btn-primary btn-sm"
@@ -1226,7 +1227,7 @@ class dashUpdate {
                      data-target="#printerManagerModal" disabled
             ><i class="fas fa-print"></i>
             </button>
-            <button  data-title="Change your Printer Settings"
+            <button  title="Change your Printer Settings"
             id="printerSettings-${printer._id}"
                                  type="button"
                                  class="tag btn btn-secondary btn-sm"
@@ -1234,29 +1235,29 @@ class dashUpdate {
                                  data-target="#printerSettingsModal" disabled
             ><i class="fas fa-cog"></i>
             </button>
-            <a data-title="Open your Printers Web Interface"
+            <a title="Open your Printers Web Interface"
                id="printerWeb-${printer._id}"
                type="button"
                class="tag btn btn-info btn-sm"
                target="_blank"
                href="${ printer.printerURL }" role="button"><i class="fas fa-globe-europe"></i></a>
             <button  
-                     data-title="Re-Sync your printer"
+                     title="Re-Sync your printer"
                      id="printerSyncButton-${printer._id}"
                      type="button"
                      class="tag btn btn-success btn-sm"
             >
                 <i class="fas fa-sync"></i>
             </button>
-            <button  data-title="Turn your printer on/off"
+            <button  title="Turn your printer on/off"
                      id="printerPower-${printer._id}"
                      type="button"
-                     class="tag btn btn-danger btn-sm"
+                     class="tag btn btn-danger btn-sm d-none"
                      data-toggle="modal"
                      data-target="#powerModal"
             ><i class="fas fa-power-off"></i>
             </button>
-            <span data-title="Drag and Change your Printers sorting"  id="printerSortButton-${printer._id}"
+            <span title="Drag and Change your Printers sorting"  id="printerSortButton-${printer._id}"
                    class="tag btn btn-light btn-sm sortableList"
             >
     <i class="fas fa-grip-vertical"></i>
