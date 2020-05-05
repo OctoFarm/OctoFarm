@@ -73,21 +73,22 @@ class StatisticsCollection {
                 let today = StatisticsCollection.getDay(new Date())
                 for (let i = 0; i < heatMap.length; i++) {
                     //If x = today add that fucker up!
-                    if (heatMap[i].data[0].x === today) {
+                    let lastInArray = heatMap[i].data.length - 1;
+                    if (heatMap[i].data[lastInArray].x === today) {
                         if (heatMap[i].name === "Completed") {
-                            arrayTotal[0] = heatMap[i].data[0].figure;
+                            arrayTotal[0] = heatMap[i].data[lastInArray].figure;
                         }
                         if (heatMap[i].name === "Active") {
-                            arrayTotal[1] = heatMap[i].data[0].figure;
+                            arrayTotal[1] = heatMap[i].data[lastInArray].figure;
                         }
                         if (heatMap[i].name === "Offline") {
-                            arrayTotal[2] = heatMap[i].data[0].figure;
+                            arrayTotal[2] = heatMap[i].data[lastInArray].figure;
                         }
                         if (heatMap[i].name === "Idle") {
-                            arrayTotal[3] = heatMap[i].data[0].figure;
+                            arrayTotal[3] = heatMap[i].data[lastInArray].figure;
                         }
                         if (heatMap[i].name === "Disconnected") {
-                            arrayTotal[4] = heatMap[i].data[0].figure;
+                            arrayTotal[4] = heatMap[i].data[lastInArray].figure;
                         }
                     }
                 }
@@ -216,8 +217,29 @@ class StatisticsCollection {
         }
     }
     static getDay(value) {
-        value = value.toLocaleDateString();
-        return value
+        value = value.getDay();
+        if (value === 1) {
+            return "Monday";
+        }
+        if (value === 2) {
+            return "Tuesday";
+        }
+        if (value === 3) {
+            return "Wednesday";
+        }
+        if (value === 4) {
+            return "Thursday";
+        }
+        if (value === 5) {
+            return "Friday";
+        }
+        if (value === 6) {
+            return "Saturday";
+        }
+        if (value === 0) {
+            return "Sunday";
+        }
+
     }
     static heatMapping(complete, active, offline, idle, disconnected) {
         let today = StatisticsCollection.getDay(new Date())
@@ -253,70 +275,71 @@ class StatisticsCollection {
             heatMap[1].data.push(ActiveCount)
             heatMap[2].data.push(IdleCount)
             heatMap[3].data.push(OfflineCount)
-            //TEst
             heatMap[4].data.push(DisconnectedCount)
         } else {
             //Cycle through current data and check if day exists...
 
             let currentTotal = arrayTotal.reduce((a, b) => a + b, 0);
             for (let i = 0; i < heatMap.length; i++) {
+                let lastInArray = heatMap[i].data.length - 1;
                 //If x = today add that fucker up!
-                if (heatMap[i].data[0].x === today) {
-                    if (heatMap[i].name === "Completed") {
-                        heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
+                if (heatMap[i].data[lastInArray].x === today) {
 
-                        if (!isFinite(heatMap[i].data[0].y)) {
-                            heatMap[i].data[0].y = 0;
+                    if (heatMap[i].name === "Completed") {
+                        heatMap[i].data[lastInArray].y = ((heatMap[i].data[lastInArray].figure / currentTotal) * 100).toFixed(3)
+
+                        if (!isFinite(heatMap[i].data[lastInArray].y)) {
+                            heatMap[i].data[lastInArray].y = 0;
                         }
-                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + complete;
-                        arrayTotal[0] = heatMap[i].data[0].figure;
+                        heatMap[i].data[lastInArray].figure = heatMap[i].data[lastInArray].figure + complete;
+                        arrayTotal[0] = heatMap[i].data[lastInArray].figure;
                     }
                     if (heatMap[i].name === "Active") {
-                        heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
+                        heatMap[i].data[lastInArray].y = ((heatMap[i].data[lastInArray].figure / currentTotal) * 100).toFixed(3)
 
-                        if (!isFinite(heatMap[i].data[0].y)) {
-                            heatMap[i].data[0].y = 0;
+                        if (!isFinite(heatMap[i].data[lastInArray].y)) {
+                            heatMap[i].data[lastInArray].y = 0;
                         }
-                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + active;
-                        arrayTotal[1] = heatMap[i].data[0].figure;
+                        heatMap[i].data[lastInArray].figure = heatMap[i].data[lastInArray].figure + active;
+                        arrayTotal[1] = heatMap[i].data[lastInArray].figure;
 
 
                     }
                     if (heatMap[i].name === "Offline") {
-                        heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
+                        heatMap[i].data[lastInArray].y = ((heatMap[i].data[lastInArray].figure / currentTotal) * 100).toFixed(3)
 
-                        if (!isFinite(heatMap[i].data[0].y)) {
-                            heatMap[i].data[0].y = 0;
+                        if (!isFinite(heatMap[i].data[lastInArray].y)) {
+                            heatMap[i].data[lastInArray].y = 0;
                         }
-                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + offline;
-                        arrayTotal[2] = heatMap[i].data[0].figure;
+                        heatMap[i].data[lastInArray].figure = heatMap[i].data[lastInArray].figure + offline;
+                        arrayTotal[2] = heatMap[i].data[lastInArray].figure;
 
                     }
                     if (heatMap[i].name === "Idle") {
-                        heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
-                        if (!isFinite(heatMap[i].data[0].y)) {
-                            heatMap[i].data[0].y = 0;
+                        heatMap[i].data[lastInArray].y = ((heatMap[i].data[lastInArray].figure / currentTotal) * 100).toFixed(3)
+                        if (!isFinite(heatMap[i].data[lastInArray].y)) {
+                            heatMap[i].data[lastInArray].y = 0;
                         }
-                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + idle;
-                        arrayTotal[3] = heatMap[i].data[0].figure;
+                        heatMap[i].data[lastInArray].figure = heatMap[i].data[lastInArray].figure + idle;
+                        arrayTotal[3] = heatMap[i].data[lastInArray].figure;
 
                     }
                     if (heatMap[i].name === "Disconnected") {
-                        heatMap[i].data[0].y = ((heatMap[i].data[0].figure / currentTotal) * 100).toFixed(3)
-                        if (!isFinite(heatMap[i].data[0].y)) {
-                            heatMap[i].data[0].y = 0;
+                        heatMap[i].data[lastInArray].y = ((heatMap[i].data[lastInArray].figure / currentTotal) * 100).toFixed(3)
+                        if (!isFinite(heatMap[i].data[lastInArray].y)) {
+                            heatMap[i].data[lastInArray].y = 0;
                         }
-                        heatMap[i].data[0].figure = heatMap[i].data[0].figure + disconnected;
-                        arrayTotal[4] = heatMap[i].data[0].figure;
+                        heatMap[i].data[lastInArray].figure = heatMap[i].data[lastInArray].figure + disconnected;
+                        arrayTotal[4] = heatMap[i].data[lastInArray].figure;
 
                     }
                 } else {
                     //Must be a new day, so shift with new heatMap
-                    heatMap[0].data.unshift(CompleteCount)
-                    heatMap[1].data.unshift(ActiveCount)
-                    heatMap[2].data.unshift(IdleCount)
-                    heatMap[3].data.unshift(OfflineCount)
-                    heatMap[4].data.unshift(DisconnectedCount)
+                    heatMap[0].data.push(CompleteCount)
+                    heatMap[1].data.push(ActiveCount)
+                    heatMap[2].data.push(IdleCount)
+                    heatMap[3].data.push(OfflineCount)
+                    heatMap[4].data.push(DisconnectedCount)
                 }
             }
 
@@ -324,11 +347,11 @@ class StatisticsCollection {
         }
         //Clean up old days....
         if (heatMap[0].data.length === 8) {
-            heatMap[0].data.pop()
-            heatMap[1].data.pop()
-            heatMap[2].data.pop()
-            heatMap[3].data.pop()
-            heatMap[4].data.pop()
+            heatMap[0].data.shift()
+            heatMap[1].data.shift()
+            heatMap[2].data.shift()
+            heatMap[3].data.shift()
+            heatMap[4].data.shift()
         }
         farmStats[0].heatMap = heatMap;
         farmStats[0].markModified('heatMap');
