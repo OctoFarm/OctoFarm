@@ -70,7 +70,7 @@ export default class PrinterManager {
       const selectedProfile = printer.current.printerProfile;
       //Attempted printer pofile fix...
       let pProfile = null;
-      if (typeof printer.profile[selectedProfile] !== 'undefined') {
+      if (typeof selectedProfile !== 'undefined' && typeof printer.profile[selectedProfile] !== 'undefined') {
         pProfile = printer.profile[selectedProfile];
       } else {
         pProfile = {
@@ -199,7 +199,7 @@ export default class PrinterManager {
               </div>
               <div class="row">
                   <div id="cameraCol" class="col-12">
-                    <img style="transform: ${flipH} ${flipV} ${rotate90};" id="printerControlCamera" width="100%" src="${camURL}"/>
+                    <img style="transform: ${flipH} ${flipV} ${rotate90};" id="printerControlCamera" width="100%" src=""/>
                   </div>
               </div>
           </div>
@@ -553,6 +553,7 @@ export default class PrinterManager {
 
           </div>
           `;
+        document.getElementById("printerControlCamera").src = camURL;
         document.getElementById("printerIndex").innerHTML = printer._id;
         let rolls = returnFilament();
         let filamentKeys = rolls.checked;

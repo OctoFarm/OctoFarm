@@ -3,8 +3,8 @@
     <tr id="printerCard-<%= printers[sorted.actualIndex]._id %>">
         <th id="printerSortIndex-<%= printers[sorted.actualIndex]._id %>">
             <%= printers[sorted.actualIndex].sortIndex %>
-        </th>
-        <th>
+        </td>
+        <td>
             <center>
             <form title="Select your printer for multi-printer commands" class="was-validated form-check-inline form-check">
                 <div title="Select your printer for multi-printer commands" class="tag custom-control custom-checkbox mb-2 pr-2">
@@ -13,9 +13,9 @@
                 </div>
             </form>
             </center>
-        </th>
-        <th><div id="printerName-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"><%if(typeof printers[sorted.actualIndex].settingsApperance != "undefined" ){%> <%= printers[sorted.actualIndex].settingsApperance.name %> <%}%></div></th>
-        <th>
+        </td>
+        <td><div id="printerName-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"><%if(typeof printers[sorted.actualIndex].settingsApperance != "undefined" ){%> <%= printers[sorted.actualIndex].settingsApperance.name %> <%}%></div></td>
+        <td>
             <button  title="Control Your Printer"
                      id="printerButton-<%= printers[sorted.actualIndex]._id %>"
                      type="button"
@@ -58,20 +58,20 @@
                    class="tag btn btn-light btn-sm sortableList"
             >
     <i class="fas fa-grip-vertical"></i>
-    </span></th>
-        <th><small><span title="<%= printers[sorted.actualIndex].hostDescription %>" id="hostBadge-<%= printers[sorted.actualIndex]._id %>" class="tag badge badge-<%= printers[sorted.actualIndex].hostStateColour.name %> badge-pill">
-                <%= printers[sorted.actualIndex].hostState %></small></span></th>
-        <th><small><span title="<%= printers[sorted.actualIndex].stateDescription %>" id="printerBadge-<%= printers[sorted.actualIndex]._id %>" class="tag badge badge-<%= printers[sorted.actualIndex].stateColour.name %> badge-pill">
-                <%= printers[sorted.actualIndex].state %></small></span></th>
-        <th><small><span title="<%= printers[sorted.actualIndex].webSocketDescription %>" id="webSocketIcon-<%= printers[sorted.actualIndex]._id %>" class="tag badge badge-<%= printers[sorted.actualIndex].webSocket %> badge-pill">
-                <i  class="fas fa-plug"></i></span></th>
-        <th><div id="printerGroup-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"><%= printers[sorted.actualIndex].group %></div></th>
-        <th><div id="printerURL-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"><%= printers[sorted.actualIndex].printerURL %></div></th>
-        <th><div id="printerCamURL-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"><%= printers[sorted.actualIndex].camURL %></div></th>
-        <th><div id="printerApiKey-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"><%= printers[sorted.actualIndex].apikey %></div></th>
-        <th id="printerOctoPrintVersion-<%= printers[sorted.actualIndex]._id %>"><%if(typeof printers[sorted.actualIndex].octoPrintVersion != "undefined" ){%> <%= printers[sorted.actualIndex].octoPrintVersion %> <%}%></th>
-        <th><button id="deleteButton-<%= printers[sorted.actualIndex]._id %>" type="button" class="btn btn-danger btn-sm d-none">
+    </span></td>
+        <td><small><span title="<%= printers[sorted.actualIndex].hostDescription %>" id="hostBadge-<%= printers[sorted.actualIndex]._id %>" class="tag badge badge-<%= printers[sorted.actualIndex].hostStateColour.name %> badge-pill">
+                <%= printers[sorted.actualIndex].hostState %></small></span></td>
+        <td><small><span title="<%= printers[sorted.actualIndex].stateDescription %>" id="printerBadge-<%= printers[sorted.actualIndex]._id %>" class="tag badge badge-<%= printers[sorted.actualIndex].stateColour.name %> badge-pill">
+                <%= printers[sorted.actualIndex].state %></small></span></td>
+        <td><small><span title="<%= printers[sorted.actualIndex].webSocketDescription %>" id="webSocketIcon-<%= printers[sorted.actualIndex]._id %>" class="tag badge badge-<%= printers[sorted.actualIndex].webSocket %> badge-pill">
+                <i  class="fas fa-plug"></i></span></td>
+        <td><div id="printerGroup-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"><%= printers[sorted.actualIndex].group %></div></td>
+        <td><div id="printerURL-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"><%= printers[sorted.actualIndex].printerURL %></div></td>
+        <td><div id="printerCamURL-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"><%= printers[sorted.actualIndex].camURL %></div></td>
+        <td><div id="printerApiKey-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"><%= printers[sorted.actualIndex].apikey %></div></td>
+        <th id="printerOctoPrintVersion-<%= printers[sorted.actualIndex]._id %>"><%if(typeof printers[sorted.actualIndex].octoPrintVersion != "undefined" ){%> <%= printers[sorted.actualIndex].octoPrintVersion %> <%}%></td>
+        <td><button id="deleteButton-<%= printers[sorted.actualIndex]._id %>" type="button" class="btn btn-danger btn-sm d-none">
                 <i class="fas fa-trash"></i>
-            </button></th>
+            </button></td>
     </tr>
  <% }) %>

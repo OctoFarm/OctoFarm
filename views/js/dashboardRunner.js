@@ -4,6 +4,7 @@ import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
+import PrinterSettings from "./lib/modules/printerSettings.js";
 import FileOperations from "./lib/functions/file.js";
 import Validate from "./lib/functions/validate.js";
 import {parse} from './vendor/flatted.js';
@@ -434,6 +435,8 @@ source.onmessage = async function(e) {
                         document.getElementById("printerManagerModal").classList.contains("show")
                     ) {
                         PrinterManager.init(res.printerInfo);
+                    }else if(document.getElementById("printerSettingsModal").classList.contains("show")){
+                        PrinterSettings.init(res.printerInfo);
                     } else {
                         printerInfo = res.printerInfo;
                         currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
@@ -643,7 +646,14 @@ printerCard.forEach(card => {
         PrinterManager.init(printerInfo);
     });
 });
-
+let printerSettings = document.querySelectorAll("[id^='printerSettings-']");
+printerSettings.forEach(card => {
+    let ca = card.id.split("-");
+    card.addEventListener("click", e => {
+        PrinterSettings.updateIndex(ca[1]);
+        PrinterSettings.init(printerInfo);
+    });
+});
 class Printer {
     constructor(printerURL, camURL, apikey, group, name) {
         this.settingsApperance = {
@@ -672,50 +682,50 @@ class PrintersManagement {
             document.getElementById("printerList").insertAdjacentHTML("beforebegin", `
          <tr id="newPrinterCard-${newPrintersIndex}">
           
-              <th></th>
-              <th></th>
-              <th><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="plaintext-only">${newPrinter.name}</div></th>
-              <th></th>
-              <th></th>
-              <th></th>
-              <th></th>
-              <th><div class="Idle" id="newPrinterGroup-${newPrintersIndex}" contenteditable="plaintext-only">${newPrinter.group}</div></th>
-              <th><div class="Idle" id="newPrinterURL-${newPrintersIndex}" contenteditable="plaintext-only">${newPrinter.printerURL}</th>
-              <th><div class="Idle" id="newPrinterCamURL-${newPrintersIndex}" contenteditable="plaintext-only">${newPrinter.cameraURL}</div></th>
-              <th><div class="Idle" id="newPrinterAPIKEY-${newPrintersIndex}" contenteditable="plaintext-only" >${newPrinter.apikey}</div></th>
-              <th></th>
-              <th></th>
-              <th><button id="saveButton-${newPrintersIndex}" type="button" class="btn btn-success btn-sm">
+              <td></td>
+              <td></td>
+              <td><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="plaintext-only">${newPrinter.name}</div></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td><div class="Idle" id="newPrinterGroup-${newPrintersIndex}" contenteditable="plaintext-only">${newPrinter.group}</div></td>
+              <td><div class="Idle" id="newPrinterURL-${newPrintersIndex}" contenteditable="plaintext-only">${newPrinter.printerURL}</td>
+              <td><div class="Idle" id="newPrinterCamURL-${newPrintersIndex}" contenteditable="plaintext-only">${newPrinter.cameraURL}</div></td>
+              <td><div class="Idle" id="newPrinterAPIKEY-${newPrintersIndex}" contenteditable="plaintext-only" >${newPrinter.apikey}</div></td>
+              <td></td>
+              <td></td>
+              <td><button id="saveButton-${newPrintersIndex}" type="button" class="btn btn-success btn-sm">
                       <i class="fas fa-save"></i>
-                  </button></th>
-              <th><button id="delButton-${newPrintersIndex}" type="button" class="btn btn-danger btn-sm">
+                  </button></td>
+              <td><button id="delButton-${newPrintersIndex}" type="button" class="btn btn-danger btn-sm">
                       <i class="fas fa-trash"></i>
-                  </button></th>
+                  </button></td>
       
           </tr>
   `)
         } else {
             document.getElementById("printerList").insertAdjacentHTML("beforebegin", `
         <tr id="newPrinterCard-${newPrintersIndex}">
-        <th></th>
-        <th></th>
-        <th><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="plaintext-only">{Leave to Grab from OctoPrint}</div></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th></th>
-        <th><div class="Idle" id="newPrinterGroup-${newPrintersIndex}" contenteditable="plaintext-only"></div></th>
-        <th><div class="Idle" id="newPrinterURL-${newPrintersIndex}" contenteditable="plaintext-only"></th>
-        <th><div class="Idle" id="newPrinterCamURL-${newPrintersIndex}" contenteditable="plaintext-only">{Set blank to grab from OctoPrint}</div></th>
-        <th><div class="Idle" id="newPrinterAPIKEY-${newPrintersIndex}" contenteditable="plaintext-only" ></div></th>
-        <th></th>
-        <th></th>
-        <th><button id="saveButton-${newPrintersIndex}" type="button" class="btn btn-success btn-sm">
+        <td></td>
+        <td></td>
+        <td><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="plaintext-only">{Leave to Grab from OctoPrint}</div></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><div class="Idle" id="newPrinterGroup-${newPrintersIndex}" contenteditable="plaintext-only"></div></td>
+        <td><div class="Idle" id="newPrinterURL-${newPrintersIndex}" contenteditable="plaintext-only"></td>
+        <td><div class="Idle" id="newPrinterCamURL-${newPrintersIndex}" contenteditable="plaintext-only">{Set blank to grab from OctoPrint}</div></td>
+        <td><div class="Idle" id="newPrinterAPIKEY-${newPrintersIndex}" contenteditable="plaintext-only" ></div></td>
+        <td></td>
+        <td></td>
+        <td><button id="saveButton-${newPrintersIndex}" type="button" class="btn btn-success btn-sm">
                 <i class="fas fa-save"></i>
-            </button></th>
-        <th><button id="delButton-${newPrintersIndex}" type="button" class="btn btn-danger btn-sm">
+            </button></td>
+        <td><button id="delButton-${newPrintersIndex}" type="button" class="btn btn-danger btn-sm">
                 <i class="fas fa-trash"></i>
-            </button></th>
+            </button></td>
 
     </tr>
   `)
@@ -1208,8 +1218,8 @@ class dashUpdate {
                     //Insert new printer addition...
                     document.getElementById("printerList").insertAdjacentHTML("beforeend", `
         <tr id="printerCard-${printer._id}">
-        <th id="printerSortIndex-${printer._id}">${printer.sortIndex}</th>
-        <th>
+        <th id="printerSortIndex-${printer._id}">${printer.sortIndex}</td>
+        <td>
             <center>
             <form class="was-validated form-check-inline form-check">
                 <div class="custom-control custom-checkbox mb-2 pr-2">
@@ -1218,9 +1228,9 @@ class dashUpdate {
                 </div>
             </form>
             </center>
-        </th>
-        <th><div id="printerName-${printer._id}" contenteditable="false">${printerName}</div></th>
-        <th>
+        </td>
+        <td><div id="printerName-${printer._id}" contenteditable="false">${printerName}</div></td>
+        <td>
             <button  
             title="Control Your Printer"
             id="printerButton-${printer._id}"
@@ -1264,21 +1274,21 @@ class dashUpdate {
                    class="tag btn btn-light btn-sm sortableList"
             >
     <i class="fas fa-grip-vertical"></i>
-    </span></th>
-        <th><small><span data-title="${printer.hostDescription}" id="hostBadge-${printer._id}" class="tag badge badge-${ printer.hostStateColour.name } badge-pill">
-                ${ printer.hostState }</small></span></th>
-        <th><small><span data-title="${printer.stateDescription}" id="printerBadge-${printer._id}" class="tag badge badge-${ printer.stateColour.name } badge-pill">
-                ${ printer.state }</small></span></th>
-        <th><small><span data-title="${printer.webSocketDescription}" id="webSocketIcon-${printer._id}" class="tag badge badge-${ printer.webSocket } badge-pill">
-                <i  class="fas fa-plug"></i></span></th>
-        <th><div id="printerGroup-${printer._id}" contenteditable="false"></div></th>
-        <th><div id="printerURL-${printer._id}" contenteditable="false"></div></th>
-        <th><div id="printerCamURL-${printer._id}" contenteditable="false"></div></th>
-        <th><div id="printerApiKey-${printer._id}" contenteditable="false"></div></th>
-        <th id="printerOctoPrintVersion-${printer._id}"></th>
-        <th><button id="deleteButton-${printer._id}" type="button" class="btn btn-danger btn-sm d-none">
+    </span></td>
+        <td><small><span data-title="${printer.hostDescription}" id="hostBadge-${printer._id}" class="tag badge badge-${ printer.hostStateColour.name } badge-pill">
+                ${ printer.hostState }</small></span></td>
+        <td><small><span data-title="${printer.stateDescription}" id="printerBadge-${printer._id}" class="tag badge badge-${ printer.stateColour.name } badge-pill">
+                ${ printer.state }</small></span></td>
+        <td><small><span data-title="${printer.webSocketDescription}" id="webSocketIcon-${printer._id}" class="tag badge badge-${ printer.webSocket } badge-pill">
+                <i  class="fas fa-plug"></i></span></td>
+        <td><div id="printerGroup-${printer._id}" contenteditable="false"></div></td>
+        <td><div id="printerURL-${printer._id}" contenteditable="false"></div></td>
+        <td><div id="printerCamURL-${printer._id}" contenteditable="false"></div></td>
+        <td><div id="printerApiKey-${printer._id}" contenteditable="false"></div></td>
+        <th id="printerOctoPrintVersion-${printer._id}"></td>
+        <td><button id="deleteButton-${printer._id}" type="button" class="btn btn-danger btn-sm d-none">
                 <i class="fas fa-trash"></i>
-            </button></th>
+            </button></td>
     </tr>
           `)
                     document.getElementById("deleteButton-" + printer._id).addEventListener('click', event => {
