@@ -230,8 +230,8 @@ WebSocketClient.prototype.reconnect = async function(e) {
     this.instance.removeAllListeners();
     let that = this;
     setTimeout(function() {
-        farmPrinters[this.index].hostStateColour = Runner.getColour("Searching...");
-        farmPrinters[this.index].hostDescription = "Searching for Host";
+        farmPrinters[that.index].hostStateColour = Runner.getColour("Searching...");
+        farmPrinters[that.index].hostDescription = "Searching for Host";
         logger.info("Re-Opening Websocket: " + that.index + ": " + that.url);
         that.open(that.url, that.index);
     }, this.autoReconnectInterval);
@@ -455,10 +455,10 @@ class Runner {
                 farmPrinters[i].hostStateColour = Runner.getColour("Online");
                 farmPrinters[i].hostDescription = "Host is Online";
                 if(typeof skipAPICheck === "undefined"){
-                    await Runner.getProfile(id);
                     await Runner.getSystem(id);
                     await Runner.getSettings(id);
                 }
+                await Runner.getProfile(id);
                 await Runner.getState(id);
                 await Runner.getFiles(id, "files?recursive=true");
                 //Connection to API successful, gather initial data and setup websocket.
