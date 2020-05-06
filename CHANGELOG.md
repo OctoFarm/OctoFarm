@@ -43,6 +43,8 @@ All notable changes to this project will be documented in this file.
     - Path now shows on hover in printer manager & list view. Panel and Camera will take some time due to wrappers overlaying the tag...
     - History now shows view icon instead of edit for captured prints, Notes are still editable.
     - Changed up the farm Status styling to more match inline with OctoFarm colours
+    - All views inc... Printer Control now truncate names to not overflow, add "..." to the end of the string to state it has been truncated. 
+    - All views inc... Printer Control now display the full path when hovering over file name.
     
 ### Removed
     - Pointless space wasting footers on dashboard

@@ -202,6 +202,7 @@ function updateState(printers, clientSettings) {
     }
 
     if (typeof printer.job != "undefined" && printer.job.file.name != null) {
+      elements.currentFile.setAttribute("title", printer.job.file.path)
       elements.currentFile.innerHTML =
         '<i class="fas fa-file-code"></i> ' + printer.job.file.name;
     } else {

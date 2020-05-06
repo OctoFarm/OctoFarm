@@ -156,8 +156,12 @@ function updateState(printers, clientSettings) {
 
     if (typeof printer.job != "undefined" && printer.job.file.name != null) {
       elements.currentFile.setAttribute('title', printer.job.file.path)
+      let fileName = printer.job.file.display;
+      if (fileName.length > 49) {
+        fileName = fileName.substring(0, 49) + "...";
+      }
       elements.currentFile.innerHTML =
-        '<i class="fas fa-file-code"></i> ' + printer.job.file.display;
+        '<i class="fas fa-file-code"></i> ' + fileName;
     } else {
       elements.currentFile.innerHTML =
         '<i class="fas fa-file-code"></i> ' + "No File Selected";

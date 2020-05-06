@@ -1219,7 +1219,11 @@ export default class PrinterManager {
     );
     elements.jobStatus.currentZ.innerHTML = printer.currentZ + "mm";
     elements.jobStatus.fileName.setAttribute('title', job.file.path)
-    elements.jobStatus.fileName.innerHTML = job.file.name;
+    let fileName = printer.job.file.display;
+    if (fileName.length > 49) {
+      fileName = fileName.substring(0, 49) + "...";
+    }
+    elements.jobStatus.fileName.innerHTML = fileName;
 
     if (printer.stateColour.category === "Active") {
       if (

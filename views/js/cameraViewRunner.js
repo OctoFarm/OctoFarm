@@ -165,7 +165,7 @@ function updateState(printers, clientSettings) {
 
         elements.camBackground.className = `card-body cameraContain ${printer.stateColour.category}`;
         if (typeof printer.job != "undefined" && printer.job.file.name != null) {
-            elements.currentFile.setAttribute("title", "TEST")
+            elements.currentFile.setAttribute("title", printer.job.file.path)
             let fileName = printer.job.file.display;
             if (fileName.length > 49) {
                 fileName = fileName.substring(0, 49) + "...";
