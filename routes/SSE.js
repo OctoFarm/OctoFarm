@@ -100,7 +100,10 @@ setInterval(async function() {
       tempTriggers: printers[i].tempTriggers,
       stateDescription: printers[i].stateDescription,
       hostDescription: printers[i].hostDescription,
-      webSocketDescription: printers[i].webSocketDescription
+      webSocketDescription: printers[i].webSocketDescription,
+      settingsFolder: printers[i].settingsFolder,
+      settingsSerial: printers[i].settingsSerial,
+      settingsServer: printers[i].settingsServer,
     };
     printerInfo.push(printer);
   }
