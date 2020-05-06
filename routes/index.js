@@ -27,7 +27,13 @@ if (db === "") {
         res.render("database", { page: "Database Warning" })
     );
 } else {
-    router.get("/", (req, res) => res.render("welcome", { page: "Welcome" }));
+    if (serverConfig.loginRequired === false) {
+        router.get("/", (req, res) => res.redirect('/dashboard'));
+    } else {
+        let registration = serverConfig.registration
+        router.get("/", (req, res) => res.render("welcome", { page: "Welcome", registration: registration }));
+    }
+
 }
 
 //Dashboard Page
