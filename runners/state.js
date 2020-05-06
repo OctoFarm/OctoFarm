@@ -269,13 +269,13 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
             data.current.state = "Disconnected";
             farmPrinters[this.index].stateDescription = "Your printer is disconnected";
         } else if (data.current.state.includes("Error:")) {
-            farmPrinters[this.index].stateDescription = data.current.state;
-            data.current.state = "Error!"
-        } else if (res.current.state === "Closed") {
-            data.current.state = "Disconnected";
-            farmPrinters[this.index].stateDescription = "Your printer is disconnected";
+            farmPrinters[index].stateDescription = res.current.state;
+            res.current.state = "Error!"
+        } else if (data.current.state === "Closed") {
+            res.current.state = "Disconnected";
+            farmPrinters[index].stateDescription = "Your printer is disconnected";
         }else{
-            farmPrinters[this.index].stateDescription = "Current Status from OctoPrint";
+            farmPrinters[index].stateDescription = "Current Status from OctoPrint";
         }
         farmPrinters[this.index].state = data.current.state.text;
         farmPrinters[this.index].stateColour = Runner.getColour(data.current.state.text);
