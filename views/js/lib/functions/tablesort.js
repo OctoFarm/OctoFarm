@@ -19,7 +19,13 @@ export default class tableSort {
                 let dateB3 = dateB1 + ", " + dateB2;
                 dateB3 = dateB3.replace(" - ", " ")
                 return reverse * (Date.parse(dateA3) - Date.parse(dateB3))
-            }else if(cellContentA.trim().includes("Days") || cellContentA.trim().includes("Hrs") || cellContentA.trim().includes("Mins") || cellContentA.trim().includes("Seconds")){
+            }else if(cellContentA.trim().includes("Days") || cellContentA.trim().includes("Hrs") || cellContentA.trim().includes("Mins") || cellContentA.trim().includes("Seconds") || cellContentA.trim().includes("No Time Estimate")){
+                if(cellContentA === "No Time Estimate"){
+                    cellContentA = " 0 ";
+                }
+                if(cellContentB === "No Time Estimate"){
+                    cellContentB = " 0 ";
+                }
                 var mapObj = {
                     Days:"",
                     Hrs:"",
