@@ -18,6 +18,15 @@ All notable changes to this project will be documented in this file.
     - Tool tip explanations for dashboard Action buttons, and Printer Management setup buttons, camera view, panel view and list view and current operations.
     - Any table headers are now clickable and can be sorted by the text below. This includes, Printer Management, Filament List, List View, History. Hovering will display a sort icon to indicate can be sorted.
     - Sort Index is now viewable on dashboard, will auto update after moving a printer into a new sort index.
+    - Note to README regarding thanks to JetBrains for use of their IDE.
+    - Printer Settings Modal with the following sections: 
+        - Connection: Anything relating to OctoPrints connection to your printer. 
+        - Profile: Anything relating to your OctoPrints default profile selection. 
+        - Alerts: 
+        - Power: 
+        - GCode Scripts: Same as previous implementation allows editing gcode scripts. 
+        - Other Settings: Anything that doesn't fit in the above categories, currently just camera settings. 
+    - New dependancy "requests" Required for API calls to user endpoints. 
     
 ### Changed
     - Printer web button does not disable when offline
@@ -32,7 +41,8 @@ All notable changes to this project will be documented in this file.
     - View pages no longer inside dropdown
     - Editing printers only re-scans the currently edited set. 
     - Path now shows on hover in printer manager & list view. Panel and Camera will take some time due to wrappers overlaying the tag...
-    - History now shows view icon instead of edit for captured prints.
+    - History now shows view icon instead of edit for captured prints, Notes are still editable.
+    - Changed up the farm Status styling to more match inline with OctoFarm colours
     
 ### Removed
     - Pointless space wasting footers on dashboard
@@ -50,6 +60,7 @@ All notable changes to this project will be documented in this file.
     - List view not respecting word wrapping for file name
     - Fixed gap in top of list view header when scrolled
     - Fixed error with history page not displaying job information on view
+    - Fixed incorrect re-direct to login/registration pages when either is disbaled. Login disabled will re-direct straight to the dashboard now. 
     
 ## [v1.1.4.9-dev-1]
 
