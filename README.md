@@ -232,6 +232,7 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
 - [Derek from 3D Printed Debris](https://www.3dprinteddebris.com/) - Massive big thanks to Derek who has donated a lot of time and money to the project. I don't think I'd have continued at the rate I did without his bug reports and support.
 - All Patreon Supporters and random donations! - Big massive thanks for these, they keep me full of steak!
 - The users calonmer, Insertion and noxin from my discord server! Seriously no end to my thanks for these 3.
+- [JetBrains IDE](https://www.jetbrains.com/webstorm/) - Thanks to JebBrains for allowing a free license to use with developing my application. Their IDE is top notch! 
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
