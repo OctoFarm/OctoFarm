@@ -819,7 +819,7 @@ class Runner {
                 _.each(res.files, function(entry) {
                     recursivelyPrintNames(entry);
                 });
-                logger.info("Successfully grabbed Current State for...: " + farmPrinters[index].printerURL);
+                logger.info("Successfully grabbed Files for...: " + farmPrinters[index].printerURL);
             })
             .catch(err => {
                 logger.error("Error grabbing files for: " + farmPrinters[index].printerURL + ": Reason: ", err);
@@ -840,14 +840,18 @@ class Runner {
                 //Update info to DB
                 if (res.current.state === "Offline") {
                     res.current.state = "Disconnected";
+                    farmPrinters[index].stateDescription = "Your printer is disconnected";
                 } else if (res.current.state.includes("Error:")) {
+                    farmPrinters[index].stateDescription = res.current.state;
                     res.current.state = "Error!"
                 } else if (res.current.state === "Closed") {
                     res.current.state = "Disconnected";
+                    farmPrinters[index].stateDescription = "Your printer is disconnected";
+                }else{
+                    farmPrinters[index].stateDescription = "Current Status from OctoPrint";
                 }
                 farmPrinters[index].state = res.current.state;
                 farmPrinters[index].stateColour = Runner.getColour(res.current.state);
-                farmPrinters[index].stateDescription = "Current Status from OctoPrint";
                 farmPrinters[index].current = res.current;
                 farmPrinters[index].options = res.options;
                 logger.info("Successfully grabbed Current State for...: " + farmPrinters[index].printerURL);
