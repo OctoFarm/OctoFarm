@@ -45,14 +45,24 @@
             >
                 <i class="fas fa-sync"></i>
             </button>
-            <button  title="Turn your printer on/off"
-                     id="printerPower-<%= printers[sorted.actualIndex]._id %>"
-                     type="button"
-                     class="tag btn btn-danger btn-sm d-none"
-                     data-toggle="modal"
-                     data-target="#powerModal"
-            ><i class="fas fa-power-off"></i>
-            </button>
+            <div class="btn-group">
+                <button title="Toggle your printers power"
+                        id="printerPower-<%= printers[sorted.actualIndex]._id %>"
+                        class="btn btn-danger btn-sm" type="button" disabled>
+                    <i class="textActive fas fa-power-off"></i>
+                </button>
+                <button title="Other power actions" type="button" class="btn btn-sm btn-danger dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <span class="sr-only">Toggle Dropdown</span>
+                </button>
+                <div class="dropdown-menu">
+                    <a title="Turn off your printer" class="dropdown-item" href="#"><i class="textActive fas fa-power-off"></i> Power Off Printer</a>
+                    <a title="Turn on your printer" class="dropdown-item" href="#"><i class="textComplete fas fa-power-off"></i> Power On Printer</a>
+                    <div class="dropdown-divider"></div>
+                    <a title="Restart OctoPrint Service" class="dropdown-item" href="#"><i class="textActive fas fa-redo"></i> Restart OctoPrint</a>
+                    <a title="Reboot OctoPrint Host" class="dropdown-item" href="#"><i class="textActive fas fa-sync-alt"></i> Reboot Host</a>
+                    <a title="Shutdown OctoPrint Host" class="dropdown-item" href="#"><i class="textActive fas fa-power-off"></i> Shutdown Host</a>
+                </div>
+            </div>
             <span  title="Drag and Change your Printers sorting"
                    id="printerSortButton-<%= printers[sorted.actualIndex]._id %>"
                    class="tag btn btn-light btn-sm sortableList"
@@ -60,11 +70,11 @@
     <i class="fas fa-grip-vertical"></i>
     </span></td>
         <td><small><span title="<%= printers[sorted.actualIndex].hostDescription %>" id="hostBadge-<%= printers[sorted.actualIndex]._id %>" class="tag badge badge-<%= printers[sorted.actualIndex].hostStateColour.name %> badge-pill">
-                <%= printers[sorted.actualIndex].hostState %></small></span></td>
+                <%= printers[sorted.actualIndex].hostState %></span></small></td>
         <td><small><span title="<%= printers[sorted.actualIndex].stateDescription %>" id="printerBadge-<%= printers[sorted.actualIndex]._id %>" class="tag badge badge-<%= printers[sorted.actualIndex].stateColour.name %> badge-pill">
-                <%= printers[sorted.actualIndex].state %></small></span></td>
+                <%= printers[sorted.actualIndex].state %></span></small></td>
         <td><small><span title="<%= printers[sorted.actualIndex].webSocketDescription %>" id="webSocketIcon-<%= printers[sorted.actualIndex]._id %>" class="tag badge badge-<%= printers[sorted.actualIndex].webSocket %> badge-pill">
-                <i  class="fas fa-plug"></i></span></td>
+                <i  class="fas fa-plug"></i></span></small></td>
         <td><div id="printerGroup-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"><%= printers[sorted.actualIndex].group %></div></td>
         <td><div id="printerURL-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"><%= printers[sorted.actualIndex].printerURL %></div></td>
         <td><div id="printerCamURL-<%= printers[sorted.actualIndex]._id %>" contenteditable="false"><%= printers[sorted.actualIndex].camURL %></div></td>

@@ -480,8 +480,8 @@ export default class PrinterSettings {
             </small>
           </div>
           <h6><u>Custom Power Commands</u></h6>
-          <p class="mb-0">The below allows your to setup a custom POST request to an API endpoint, instructions for such will be in your plugin/device instructions. You can use the following placeholders:</p>
-          <p>If you'd like to enter in a full URL command then leave the command blank and it will skip the requirement and just make a POST to the URL provided similar to CURL.</p>
+          <p class="mb-0">The below allows your to setup a custom POST request to an API endpoint, instructions for such will be in your plugin/device instructions. Setting this up will activate the power button on all Views.</p>
+           <p class="mb-0">If you'd like to enter in a full URL command then leave the command blank and it will skip the requirement and just make a POST to the URL provided similar to CURL. You can use the following placeholders:</p>
           <p class="mb-0">Printer URL: <code>[PrinterURL]</code></p>
           <p class="mb-0">Printer api-key: <code>[PrinterAPI]</code></p
           <h6>Power On</h6>
