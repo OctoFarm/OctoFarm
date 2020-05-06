@@ -37,9 +37,14 @@ export default class PrinterSettings {
     }
     return name;
   }
-
+  static grabThumb(value){
+    if(value === true){
+      return "<i class=\"text-success fas fa-thumbs-up\"></i>"
+    }else{
+      return "<i class=\"text-danger fas fa-thumbs-down\"></i>"
+    }
+  }
   static async init(printers) {
-    console.log(printers)
     let i = _.findIndex(printers, function (o) {
       return o._id == currentIndex;
     });
@@ -56,7 +61,7 @@ export default class PrinterSettings {
       if (typeof printer.options === "undefined") {
         return;
       }
-      console.log(printer)
+
       const availableBaud = printer.options.baudrates;
       const availablePort = printer.options.ports;
       const availableProfile = printer.options.printerProfiles;
@@ -126,42 +131,9 @@ export default class PrinterSettings {
       }
       if (
           currentIndex ===
-          document.getElementById("printerIndex").innerHTML
+          document.getElementById("printerSettingsIndex").innerHTML
       ) {
       } else {
-        let camURL = "";
-        if (typeof printer.camURL != "undefined" && printer.camURL.includes("http")) {
-          camURL = printer.camURL;
-        }else{
-          camURL = "../../../images/noCamera.jpg";
-        }
-
-
-        let flipH = "";
-        let flipV = "";
-        let rotate90 = "";
-        if (typeof printer.settingsWebcam != "undefined") {
-          if (printer.settingsWebcam.flipH) {
-            flipH = "rotateY(180deg)";
-          }
-          if (printer.settingsWebcam.flipV) {
-            flipV = "rotateX(180deg)";
-          }
-          if (printer.settingsWebcam.rotate90) {
-            rotate90 = "rotate(90deg)";
-          }
-        }
-        let dateComplete = null;
-        if (typeof printer.progress !== "undefined" && printer.progress.printTimeLeft !== null) {
-          let currentDate = new Date();
-          currentDate = currentDate.getTime();
-          let futureDateString = new Date(currentDate + printer.progress.printTimeLeft * 1000).toDateString()
-          let futureTimeString = new Date(currentDate + printer.progress.printTimeLeft * 1000).toTimeString()
-          futureTimeString = futureTimeString.substring(0, 8);
-          dateComplete = futureDateString + ": " + futureTimeString;
-        } else {
-          dateComplete = "No Active Print"
-        }
         //Load the printer drop down...
         let printerDrop = document.getElementById("printerSettingsSelection");
         printerDrop.innerHTML = "";
@@ -183,649 +155,882 @@ export default class PrinterSettings {
           printDropCheck = true;
         }
         //Setup page
+        const printerPort = document.getElementById("psPortDrop");
+        const printerBaud = document.getElementById("psBaudDrop");
+        const printerProfile = document.getElementById("psProfileDrop");
+        const printerConnect = document.getElementById("psConnect");
 
+        printerPort.innerHTML = `
+        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardSerialPort">Port:</label> </div> <select class="custom-select bg-secondary text-light" id="psSerialPort"></select></div>
+        `;
+        printerBaud.innerHTML = `
+        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardBaudrate">Baudrate:</label> </div> <select class="custom-select bg-secondary text-light" id="psBaudrate"></select></div>
+        `;
+        printerProfile.innerHTML = `
+        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardPrinterProfile">Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="psProfile"></select></div>
+        `;
+        availableBaud.forEach(baud => {
+          document
+              .getElementById("psBaudrate")
+              .insertAdjacentHTML(
+                  "beforeend",
+                  `<option value="${baud}">${baud}</option>`
+              );
+        });
+        if (preferedBaud != null) {
+          document.getElementById("psBaudrate").value = preferedBaud;
+        }
+        availablePort.forEach(port => {
+          document
+              .getElementById("psSerialPort")
+              .insertAdjacentHTML(
+                  "beforeend",
+                  `<option value="${port}">${port}</option>`
+              );
+        });
+        if (preferedPort != null) {
+          document.getElementById("psSerialPort").value = preferedPort;
+        }
+        availableProfile.forEach(profile => {
+          document
+              .getElementById("psProfile")
+              .insertAdjacentHTML(
+                  "beforeend",
+                  `<option value="${profile.id}">${profile.name}</option>`
+              );
+        });
+        if (preferedProfile != null) {
+          document.getElementById("psProfile").value = preferedProfile;
+        }
 
-        let elements = PrinterSettings.grabPage();
-        elements.terminal.terminalWindow.innerHTML = "";
+        if (printer.state === "Disconnected") {
+          printerConnect.innerHTML =
+              '<center> <button id="psConnectBtn" class="btn btn-success inline" value="connect">Connect</button></center>';
+        } else {
+          printerConnect.innerHTML =
+              '<center> <button id="psConnectBtn" class="btn btn-danger inline" value="disconnect">Disconnect</button></center>';
+          document.getElementById("psSerialPort").disabled = true;
+          document.getElementById("psBaudrate").disabled = true;
+          document.getElementById("psProfile").disabled = true;
+        }
 
-        PrinterSettings.applyListeners(printer, elements, printers);
-        FileManager.drawFiles(printer)
+        const printerDefaultPort = document.getElementById("psDefaultPortDrop");
+        const printerDefaultBaud = document.getElementById("psDefaultBaudDrop");
+        const printerDefaultProfile = document.getElementById("psDefaultProfileDrop");
+
+        printerDefaultPort.innerHTML = `
+        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultSerialPort"">Preferred Port:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultSerialPort"></select></div>
+        `;
+        printerDefaultBaud.innerHTML = `
+        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultBaudrate">Preferred Baudrate:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultBaudrate"></select></div>
+        `;
+        printerDefaultProfile.innerHTML = `
+        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultProfile">Preferred Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultProfile"></select></div>
+        `;
+        document.getElementById("printerSettingsIndex").innerHTML = printer._id;
+        availableBaud.forEach(baud => {
+          document
+              .getElementById("psDefaultBaudrate")
+              .insertAdjacentHTML(
+                  "beforeend",
+                  `<option value="${baud}">${baud}</option>`
+              );
+        });
+        if(preferedBaud === null) {
+          document
+              .getElementById("psDefaultBaudrate")
+              .insertAdjacentHTML(
+                  "afterbegin",
+                  `<option value="0">No Preference</option>`);
+        }
+        availablePort.forEach(port => {
+          document
+              .getElementById("psDefaultSerialPort")
+              .insertAdjacentHTML(
+                  "beforeend",
+                  `<option value="${port}">${port}</option>`
+              );
+        });
+        if(preferedPort === null) {
+          document
+              .getElementById("psDefaultSerialPort")
+              .insertAdjacentHTML(
+                  "afterbegin",
+                  `<option value="0">No Preference</option>`);
+        }
+        availableProfile.forEach(profile => {
+          document
+              .getElementById("psDefaultProfile")
+              .insertAdjacentHTML(
+                  "beforeend",
+                  `<option value="${profile.id}">${profile.name}</option>`
+              );
+        });
+        if(preferedProfile === null) {
+          document
+              .getElementById("psDefaultProfile")
+              .insertAdjacentHTML(
+                  "afterbegin",
+                  `<option value="0">No Preference</option>`);
+        }
+        if (preferedBaud != null) {
+
+          document.getElementById("psDefaultBaudrate").value = preferedBaud;
+        }else{
+          document.getElementById("psDefaultBaudrate").value = 0;
+        }
+        if (preferedPort != null) {
+
+          document.getElementById("psDefaultSerialPort").value = preferedPort;
+        }else{
+          document.getElementById("psDefaultSerialPort").value = 0;
+        }
+        if (preferedProfile != null) {
+          document.getElementById("psDefaultProfile").value = preferedProfile;
+        }else{
+          document.getElementById("psDefaultProfile").value = 0;
+        }
+
+        document.getElementById("psPrinterProfiles").innerHTML = `
+            <div class="col-12 col-lg-4">
+            <h6 class="mb-1"><u>Printer</u></h6>
+            <p class="mb-0"><b>Printer Name: </b><span>${PrinterSettings.grabName(printer)}<span></p>
+            <p class="mb-0"><b>Printer Model: </b><span contenteditable="false">${pProfile.model}</span></p>
+            <h6 class="mb-1"><u>Axis</u></h6>
+            <p class="mb-0"><b>E: </b><span contenteditable="false">${pProfile.axes.e.speed}mm/min | Inverted: ${PrinterSettings.grabThumb(pProfile.axes.e.inverted)}</span></p>
+            <p class="mb-0"><b>X: </b><span contenteditable="false">${pProfile.axes.x.speed}mm/min | Inverted: ${PrinterSettings.grabThumb(pProfile.axes.x.inverted)}</span></p>
+            <p class="mb-0"><b>Y: </b><span contenteditable="false">${pProfile.axes.y.speed}mm/min | Inverted: ${PrinterSettings.grabThumb(pProfile.axes.y.inverted)}</span></p>
+            <p class="mb-0"><b>Z: </b><span contenteditable="false">${pProfile.axes.z.speed}mm/min | Inverted: ${PrinterSettings.grabThumb(pProfile.axes.z.inverted)}</span></p>
+            </div>
+            <div class="col-12 col-lg-4">
+            <h6 class="mb-1"><u>Extrusion</u></h6>
+            <p class="mb-0"><b>Extruder Count: </b><span contenteditable="false">${pProfile.extruder.count}</span></p>
+            <p class="mb-0"><b>Nozzle Size: </b><span contenteditable="false">${pProfile.extruder.nozzleDiameter}</span></p>
+            <p class="mb-0"><b>Nozzle Offsets: </b><span>X: ${pProfile.extruder.offsets[0][0]}mm | Y: ${pProfile.extruder.offsets[0][0]}mm</span></p>
+            <p class="mb-0"><b>Shared Nozzle:  </b><span contenteditable="false">${PrinterSettings.grabThumb(pProfile.extruder.sharedNozzle)}</span></p>
+            </div>
+            <div class="col-12 col-lg-4">
+            <h6 class="mb-1"><u>Bed / Chamber</u></h6>
+            <p class="mb-1"><b>Heated Bed: </b><span contenteditable="false">${PrinterSettings.grabThumb(pProfile.heatedBed)}</span></p>  
+             <p class="mb-1"><b>Form Factor: </b><span contenteditable="false">${pProfile.volume.formFactor}</span></p>                   
+            <p class="mb-1"><b>Dimensions:</b><span contenteditable="false"> D: ${pProfile.volume.depth}mm x H: ${pProfile.volume.height}mm x W: ${pProfile.volume.width}</span></p>                 
+            <p class="mb-1"><b>Heated Chamber: </b><span contenteditable="false">${PrinterSettings.grabThumb(pProfile.heatedChamber)}</span></p>  
+            </div>
+        `;
+        printer.gcode = printer.gcode.gcode;
+        let afterPrintCancelled = "";
+        if (typeof printer.gcode.afterPrintCancelled != "undefined") {
+          afterPrintCancelled = printer.gcode.afterPrintCancelled;
+        }
+        let afterPrintDone = "";
+        if (typeof printer.gcode.afterPrintDone != "undefined") {
+          afterPrintDone = printer.gcode.afterPrintDone;
+        }
+        let afterPrintPaused = "";
+        if (typeof printer.gcode.afterPrintPaused != "undefined") {
+          afterPrintPaused = printer.gcode.afterPrintPaused;
+        }
+        let afterPrinterConnected = "";
+        if (typeof printer.gcode.afterPrinterConnected != "undefined") {
+          afterPrinterConnected = printer.gcode.afterPrinterConnected;
+        }
+        let beforePrintResumed = "";
+        if (typeof printer.gcode.beforePrintResumed != "undefined") {
+          beforePrintResumed = printer.gcode.beforePrintResumed;
+        }
+        let afterToolChange = "";
+        if (typeof printer.gcode.afterToolChange != "undefined") {
+          afterToolChange = printer.gcode.afterToolChange;
+        }
+        let beforePrintStarted = "";
+        if (typeof printer.gcode.beforePrintStarted != "undefined") {
+          beforePrintStarted = printer.gcode.beforePrintStarted;
+        }
+        let beforePrinterDisconnected = "";
+        if (typeof printer.gcode.beforePrinterDisconnected != "undefined") {
+          beforePrinterDisconnected = printer.gcode.beforePrinterDisconnected;
+        }
+        let beforeToolChange = "";
+        if (typeof printer.gcode.beforeToolChange != "undefined") {
+          beforeToolChange = printer.gcode.beforeToolChange;
+        }
+        document.getElementById("psGcodeManagerGcode").innerHTML = `
+              <div class="form-group">
+              <label for="settingsAfterPrinterCancelled">After Printing Cancelled</label>
+              <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterCancelled" rows="2">${afterPrintCancelled}</textarea>
+              </div>
+              <div class="form-group">
+              <label for="settingsAfterPrinterDone">After Printing Done</label>
+              <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterDone" rows="2">${afterPrintDone}</textarea>
+              </div>
+              <div class="form-group">
+              <label for="settingsAfterPrinterPaused">After Printing Paused</label>
+              <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterPaused" rows="2">${afterPrintPaused}</textarea>
+              </div>
+              <div class="form-group">
+              <label for="settingsAfterPrinterConnected">After Printer Connected</label>
+              <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterConnected" rows="2">${afterPrinterConnected}</textarea>
+              </div>
+              <div class="form-group">
+              <label for="settingsAfterToolChange">After Tool Change</label>
+              <textarea class="form-control bg-dark text-white" id="settingsAfterToolChange" rows="2">${afterToolChange}</textarea>
+              </div>
+              <div class="form-group">
+              <label for="settingsBeforePrinterResumed">Before Printing Resumed</label>
+              <textarea class="form-control bg-dark text-white" id="settingsBeforePrinterResumed" rows="2">${beforePrintResumed}</textarea>
+              </div>
+              <div class="form-group">
+              <label for="settingsBeforePrinterStarted">Before Printing Started</label>
+              <textarea class="form-control bg-dark text-white" id="settingsBeforePrinterStarted" rows="2">${beforePrintStarted}</textarea>
+              </div>
+              <div class="form-group">
+              <labe
+              l for="settingsBeforePrinterDisconnected">Before Printer Disconnected</label>
+              <textarea class="form-control bg-dark text-white" id="settingsBeforePrinterDisconnected" rows="2">${beforePrinterDisconnected}</textarea>
+              </div>
+              <div class="form-group">
+              <label for="settingsBeforeToolChange">Before Tool Change</label>
+              <textarea class="form-control bg-dark text-white" id="settingsBeforeToolChange" rows="2">${beforeToolChange}</textarea>
+              </div>
+        `;
+        document.getElementById("cameraRotation").innerHTML = `
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="camEnabled">
+          <label class="form-check-label" for="camRot90">
+            Enable Web Camera
+          </label>
+        </div> 
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="camRot90">
+          <label class="form-check-label" for="camRot90">
+            Rotate your camera by 90°
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="camFlipH">
+          <label class="form-check-label" for="camFlipH">
+            Flip your camera horizontally
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="camFlipV">
+          <label class="form-check-label" for="camFlipV">
+            Flip your camera vertically
+          </label>
+        </div>
+        <div class="form-check">
+          <input class="form-check-input" type="checkbox" id="camTimelapse">
+          <label class="form-check-label" for="camRot90">
+            Enable Time lapse
+          </label>
+        </div>
+      `;
+
+        document.getElementById("camEnabled").checked =
+            printer.settingsWebcam.webcamEnabled;
+        document.getElementById("camTimelapse").checked =
+            printer.settingsWebcam.timelapseEnabled;
+        document.getElementById("camRot90").checked =
+            printer.settingsWebcam.rotate90;
+        document.getElementById("camFlipH").checked =
+            printer.settingsWebcam.flipH;
+        document.getElementById("camFlipV").checked =
+            printer.settingsWebcam.flipV;
+        console.log(printer)
+        let serverRestart = null;
+        let systemRestart = null;
+        let systemShutdown = null;
+        if(printer.settingsServer.commands.serverRestartCommand === null){
+          serverRestart = "N/A";
+        }else{
+          serverRestart = printer.settingsServer.commands.serverRestartCommand
+        }
+        if(printer.settingsServer.commands.systemRestartCommand === null){
+          systemRestart = "N/A";
+        }else{
+          systemRestart = printer.settingsServer.commands.systemRestartCommand
+        }
+        if(printer.settingsServer.commands.systemShutdownCommand === null){
+          systemShutdown = "N/A";
+        }else{
+          systemShutdown = printer.settingsServer.commands.systemShutdownCommand
+        }
+
+        document.getElementById("psPowerCommands").innerHTML = `
+        <form>
+          <div class="form-group">
+            <label for="formGroupExampleInput">OctoPrint Server Restart</label>
+            <input type="text" class="form-control" id="formGroupExampleInput" placeholder="${serverRestart}">
+            <small id="passwordHelpBlock" class="form-text text-muted">
+                Usually your OctoPrint hosts server restart command. i.e: <code>sudo service octoprint restart</code>
+            </small>
+          </div>
+          <div class="form-group">
+            <label for="formGroupExampleInput2">OctoPrint System Restart</label>
+            <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="${systemRestart}">
+            <small id="passwordHelpBlock" class="form-text text-muted">
+               Usually your OctoPrint hosts system restart command. i.e: <code>sudo shutdown -r now</code>
+            </small>
+          </div>
+          <div class="form-group">
+            <label for="formGroupExampleInput2">OctoPrint System Shutdown</label>
+            <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="${systemShutdown}">
+            <small id="passwordHelpBlock" class="form-text text-muted">
+              Usually your OctoPrint hosts system shutdown command. i.e: <code>sudo shutdown -h now</code>
+            </small>
+          </div>
+          <h6><u>Custom Power Commands</u></h6>
+          <p class="mb-0">The below allows your to setup a custom POST request to an API endpoint, instructions for such will be in your plugin/device instructions. You can use the following placeholders:</p>
+          <p>If you'd like to enter in a full URL command then leave the command blank and it will skip the requirement and just make a POST to the URL provided similar to CURL.</p>
+          <p class="mb-0">Printer URL: <code>[PrinterURL]</code></p>
+          <p class="mb-0">Printer api-key: <code>[PrinterAPI]</code></p
+          <h6>Power On</h6>
+           <div class="form-row">
+              <div class="col-4">
+                <input type="text" class="form-control" placeholder="Command">
+                 <small id="passwordHelpBlock" class="form-text text-muted">
+                  This is usually an json object supplied in the following format <code>{"command":"turnOn"}</code>
+                 </small>
+              </div>
+              <div class="col-8">
+                <input type="text" class="form-control" placeholder="URL">
+                 <small id="passwordHelpBlock" class="form-text text-muted">
+                  The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
+                 </small>
+              </div>
+            </div>
+           <h6>Power Off</h6>
+            <div class="form-row">
+              <div class="col-4">
+                <input type="text" class="form-control" placeholder="Command">
+                 <small id="passwordHelpBlock" class="form-text text-muted">
+                   This is usually an json object supplied in the following format <code>{"command":"turnOff"}</code>
+                 </small>
+              </div>
+              <div class="col-8">
+                <input type="text" class="form-control" placeholder="URL">
+                 <small id="passwordHelpBlock" class="form-text text-muted">
+                   The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
+                 </small>
+              </div>
+            </div>
+            <h6>Power Toggle</h6>
+            <div class="form-row">
+              <div class="col-4">
+                <input type="text" class="form-control" placeholder="Command">
+                 <small id="passwordHelpBlock" class="form-text text-muted">
+                   This is usually an json object supplied in the following format <code>{"command":"turnOff"}</code>
+                 </small>
+              </div>
+              <div class="col-8">
+                <input type="text" class="form-control" placeholder="URL">
+                 <small id="passwordHelpBlock" class="form-text text-muted">
+                    The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
+                 </small>
+              </div>
+            </div>
+            <h6>Power Status</h6>
+            <p class="mb-0">This must return a boolean value to work properly. When you enter this in your printer will show it's power state on the power button icon.</p>
+            <div class="form-row">
+              <div class="col-4">
+                <input type="text" class="form-control" placeholder="Command">
+                 <small id="passwordHelpBlock" class="form-text text-muted">
+                   This is usually an json object supplied in the following format <code>{"command":"state"}</code>
+                 </small>
+              </div>
+              <div class="col-8">
+                <input type="text" class="form-control" placeholder="URL">
+                 <small id="passwordHelpBlock" class="form-text text-muted">
+                    The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
+                 </small>
+              </div>
+            </div>
+        </form>
+        `
+
+        //let elements = PrinterSettings.grabPage();
+
+        //PrinterSettings.applyListeners(printer, elements, printers);
       }
       PrinterSettings.applyState(printer, job, progress);
-      document.getElementById("PrinterSettingsModal").style.overflow = "auto";
     }
   }
 
-  static applyListeners(printer, elements, printers) {
-    let rangeSliders = document.querySelectorAll("input.octoRange");
-    rangeSliders.forEach(slider => {
-      slider.addEventListener("input", e => {
-        e.target.previousSibling.previousSibling.lastChild.innerHTML = `${e.target.value}%`;
-      });
-    });
-    if (printer.state != "Disconnected") {
-      elements.connectPage.connectButton.addEventListener("click", e => {
-        elements.connectPage.connectButton.disabled = true;
-        OctoPrintClient.connect(
-            elements.connectPage.connectButton.value,
-            printer
-        );
-      });
-    } else {
-      elements.connectPage.connectButton.addEventListener("click", e => {
-        elements.connectPage.connectButton.disabled = true;
-        OctoPrintClient.connect(
-            elements.connectPage.connectButton.value,
-            printer
-        );
-      });
-    }
-
-    //Control Listeners... There's a lot!
-    elements.printerControls.xPlus.addEventListener("click", e => {
-      OctoPrintClient.move(e, printer, "jog", "x");
-    });
-    elements.printerControls.xMinus.addEventListener("click", e => {
-      OctoPrintClient.move(e, printer, "jog", "x", "-");
-    });
-    elements.printerControls.yPlus.addEventListener("click", e => {
-      OctoPrintClient.move(e, printer, "jog", "y");
-    });
-    elements.printerControls.yMinus.addEventListener("click", e => {
-      OctoPrintClient.move(e, printer, "jog", "y", "-");
-    });
-    elements.printerControls.xyHome.addEventListener("click", e => {
-      OctoPrintClient.move(e, printer, "home", ["x", "y"]);
-    });
-    elements.printerControls.zPlus.addEventListener("click", e => {
-      OctoPrintClient.move(e, printer, "jog", "z");
-    });
-    elements.printerControls.zMinus.addEventListener("click", e => {
-      OctoPrintClient.move(e, printer, "jog", "z", "-");
-    });
-    elements.printerControls.zHome.addEventListener("click", e => {
-      OctoPrintClient.move(e, printer, "home", ["z"]);
-    });
-    elements.printerControls.step01.addEventListener("click", e => {
-      OctoFarmClient.post("printers/stepChange", {
-        printer: printer._id,
-        newSteps: "01"
-      });
-      e.target.className = "btn btn-dark active";
-      elements.printerControls.step1.className = "btn btn-light";
-      elements.printerControls.step10.className = "btn btn-light";
-      elements.printerControls.step100.className = "btn btn-light";
-    });
-    elements.printerControls.step1.addEventListener("click", e => {
-      OctoFarmClient.post("printers/stepChange", {
-        printer: printer._id,
-        newSteps: "1"
-      });
-      e.target.className = "btn btn-dark active";
-      elements.printerControls.step01.className = "btn btn-light";
-      elements.printerControls.step10.className = "btn btn-light";
-      elements.printerControls.step100.className = "btn btn-light";
-    });
-    elements.printerControls.step10.addEventListener("click", e => {
-      OctoFarmClient.post("printers/stepChange", {
-        printer: printer._id,
-        newSteps: "10"
-      });
-      e.target.className = "btn btn-dark active";
-      elements.printerControls.step1.className = "btn btn-light";
-      elements.printerControls.step01.className = "btn btn-light";
-      elements.printerControls.step100.className = "btn btn-light";
-    });
-    elements.printerControls.step100.addEventListener("click", e => {
-      OctoFarmClient.post("printers/stepChange", {
-        printer: printer._id,
-        newSteps: "100"
-      });
-      e.target.className = "btn btn-dark active";
-      elements.printerControls.step1.className = "btn btn-light";
-      elements.printerControls.step10.className = "btn btn-light";
-      elements.printerControls.step01.className = "btn btn-light";
-    });
-
-    let e0Set = async function (e) {
-      let flashReturn = function () {
-        elements.printerControls.e0Set.className = "btn btn-md btn-light m-0 p-1";
-      };
-      let value = elements.printerControls.e0Target.value;
-      elements.printerControls.e0Target.value = "";
-      if (value === "Off") {
-        value = 0;
-      }
-      let opt = {
-        command: "target",
-        targets: {
-          tool0: parseInt(value)
-        }
-      };
-      let post = await OctoPrintClient.post(printer, "printer/tool", opt);
-      if (post.status === 204) {
-        elements.printerControls.e0Set.className = "btn btn-md btn-success m-0 p-1";
-        setTimeout(flashReturn, 500);
-      } else {
-        elements.printerControls.e0Set.className = "btn btn-md btn-danger m-0 p-1";
-        setTimeout(flashReturn, 500);
-      }
-    }
-    elements.printerControls.e0Target.addEventListener("change", async e => {
-      if (elements.printerControls.e0Target.value <= 0) {
-        elements.printerControls.e0Target.value = "0"
-      }
-    });
-    elements.printerControls.e0Target.addEventListener("keypress", async e => {
-      if (e.key === 'Enter') {
-        e0Set(e);
-      }
-    });
-    elements.printerControls.e0Set.addEventListener("click", async e => {
-      e0Set(e);
-    });
-
-    let bedSet = async function (e) {
-      let flashReturn = function () {
-        elements.printerControls.bedSet.classList = "btn btn-md btn-light m-0 p-1";
-      };
-      let value = elements.printerControls.bedTarget.value;
-
-      elements.printerControls.bedTarget.value = "";
-      if (value === "Off") {
-        value = 0;
-      }
-      let opt = {
-        command: "target",
-        target: parseInt(value)
-      };
-      let post = await OctoPrintClient.post(printer, "printer/bed", opt);
-      if (post.status === 204) {
-        elements.printerControls.bedSet.className = "btn btn-md btn-success m-0 p-1";
-        setTimeout(flashReturn, 500);
-      } else {
-        elements.printerControls.bedSet.className = "btn btn-md btn-success m-0 p-1";
-        setTimeout(flashReturn, 500);
-      }
-    }
-    elements.printerControls.bedTarget.addEventListener("change", async e => {
-      if (elements.printerControls.bedTarget.value <= 0) {
-        elements.printerControls.bedTarget.value = "0"
-      }
-    });
-    elements.printerControls.bedTarget.addEventListener("keypress", async e => {
-      if (e.key === 'Enter') {
-        bedSet(e);
-      }
-    });
-    elements.printerControls.bedSet.addEventListener("click", async e => {
-      bedSet(e);
-    });
-    elements.printerControls.feedRate.addEventListener("click", async e => {
-      let flashReturn = function () {
-        e.target.classList = "btn btn-light";
-      };
-      let value = elements.printerControls.feedRateValue.innerHTML;
-      value = value.replace("%", "");
-      OctoFarmClient.post("printers/feedChange", {
-        printer: printer._id,
-        newSteps: value
-      });
-      let opt = {
-        command: "feedrate",
-        factor: parseInt(value)
-      };
-      let post = await OctoPrintClient.post(printer, "printer/printhead", opt);
-      if (post.status === 204) {
-        e.target.classList = "btn btn-success";
-        setTimeout(flashReturn, 500);
-      } else {
-        e.target.classList = "btn btn-danger";
-        setTimeout(flashReturn, 500);
-      }
-    });
-    elements.printerControls.flowRate.addEventListener("click", async e => {
-      let flashReturn = function () {
-        e.target.classList = "btn btn-light";
-      };
-      let value = elements.printerControls.flowRateValue.innerHTML;
-      value = value.replace("%", "");
-      OctoFarmClient.post("printers/flowChange", {
-        printer: printer._id,
-        newSteps: value
-      });
-      let opt = {
-        command: "flowrate",
-        factor: parseInt(value)
-      };
-      let post = await OctoPrintClient.post(printer, "printer/tool", opt);
-      if (post.status === 204) {
-        e.target.classList = "btn btn-success";
-        setTimeout(flashReturn, 500);
-      } else {
-        e.target.classList = "btn btn-danger";
-        setTimeout(flashReturn, 500);
-      }
-    });
-    elements.printerControls.motorsOff.addEventListener("click", async e => {
-      let flashReturn = function () {
-        e.target.classList = "btn btn-light";
-      };
-      let opt = {
-        commands: ["M18"]
-      };
-      let post = await OctoPrintClient.post(printer, "printer/command", opt);
-      if (post.status === 204) {
-        e.target.classList = "btn btn-success";
-        setTimeout(flashReturn, 500);
-      } else {
-        e.target.classList = "btn btn-danger";
-        setTimeout(flashReturn, 500);
-      }
-    });
-    elements.printerControls.fansOn.addEventListener("click", async e => {
-      let fanspeed = elements.printerControls.fanPercent.innerHTML;
-      fanspeed = fanspeed.replace("%", "");
-      fanspeed = fanspeed / 100;
-      fanspeed = 255 * fanspeed;
-      fanspeed = Math.floor(fanspeed);
-
-      let flashReturn = function () {
-        e.target.classList = "btn btn-light";
-      };
-      let opt = {
-        commands: [`M106 S${fanspeed}`]
-      };
-      let post = await OctoPrintClient.post(printer, "printer/command", opt);
-      if (post.status === 204) {
-        e.target.classList = "btn btn-success";
-        setTimeout(flashReturn, 500);
-      } else {
-        e.target.classList = "btn btn-danger";
-        setTimeout(flashReturn, 500);
-      }
-    });
-    elements.printerControls.fansOff.addEventListener("click", async e => {
-      let flashReturn = function () {
-        e.target.classList = "btn btn-light";
-      };
-      let opt = {
-        commands: ["M107"]
-      };
-      let post = await OctoPrintClient.post(printer, "printer/command", opt);
-      if (post.status === 204) {
-        e.target.classList = "btn btn-success";
-        setTimeout(flashReturn, 500);
-      } else {
-        e.target.classList = "btn btn-danger";
-        setTimeout(flashReturn, 500);
-      }
-    });
-    elements.printerControls.extrude.addEventListener("click", async e => {
-      let flashReturn = function () {
-        e.target.classList = "btn btn-light";
-      };
-      if (
-          elements.printerControls.extruder.value != undefined &&
-          elements.printerControls.extruder.value !== ""
-      ) {
-        let select = OctoPrintClient.selectTool(printer, "tool0");
-        if (select) {
-          let value = elements.printerControls.extruder.value;
-          let opt = {
-
-            command: "extrude",
-            amount: parseInt(value)
-          };
-          let post = await OctoPrintClient.post(printer, "printer/tool", opt);
-          if (post.status === 204) {
-            e.target.classList = "btn btn-success";
-            setTimeout(flashReturn, 500);
-          } else {
-            e.target.classList = "btn btn-danger";
-            setTimeout(flashReturn, 500);
-          }
-        }
-      } else {
-        UI.createAlert(
-            "error",
-            "You haven't told octoprint how much you'd like to extrude...",
-            3000,
-            "clicked"
-        );
-      }
-    });
-    elements.printerControls.retract.addEventListener("click", async e => {
-      let flashReturn = function () {
-        e.target.classList = "btn btn-light";
-      };
-      if (
-          elements.printerControls.extruder.value != undefined &&
-          elements.printerControls.extruder.value !== ""
-      ) {
-        let select = OctoPrintClient.selectTool(printer, "tool0");
-        if (select) {
-          let value = elements.printerControls.extruder.value;
-          value = "-" + value;
-          let opt = {
-            command: "extrude",
-            amount: parseInt(value)
-          };
-          let post = await OctoPrintClient.post(
-              printer,
-              "printer/tool",
-              opt
-          );
-          if (post.status === 204) {
-            e.target.classList = "btn btn-success";
-            setTimeout(flashReturn, 500);
-          } else {
-            e.target.classList = "btn btn-danger";
-            setTimeout(flashReturn, 500);
-          }
-        }
-      } else {
-        UI.createAlert(
-            "error",
-            "You haven't told octoprint how much you'd like to retract...",
-            3000,
-            "clicked"
-        );
-      }
-    });
-    elements.printerControls.printStart.addEventListener("click", async e => {
-      e.target.disabled = true;
-      let opts = {
-        command: "start"
-      };
-      OctoPrintClient.jobAction(printer, opts, e);
-    });
-    elements.printerControls.printPause.addEventListener("click", e => {
-      e.target.disabled = true;
-      let opts = {
-        command: "pause",
-        action: "pause"
-      };
-      OctoPrintClient.jobAction(printer, opts, e);
-    });
-    elements.printerControls.printRestart.addEventListener("click", e => {
-      e.target.disabled = true;
-      let opts = {
-        command: "restart"
-      };
-      OctoPrintClient.jobAction(printer, opts, e);
-    });
-    elements.printerControls.printResume.addEventListener("click", e => {
-      e.target.disabled = true;
-      let opts = {
-        command: "pause",
-        action: "resume"
-      };
-      OctoPrintClient.jobAction(printer, opts, e);
-    });
-    elements.printerControls.printStop.addEventListener("click", e => {
-      bootbox.confirm({
-        message: `${printer._id}.  ${printer.settingsAppearance.name}: <br>Are you sure you want to cancel the ongoing print?`,
-        buttons: {
-          cancel: {
-            label: '<i class="fa fa-times"></i> Cancel'
-          },
-          confirm: {
-            label: '<i class="fa fa-check"></i> Confirm'
-          }
-        },
-        callback: function (result) {
-          if (result) {
-            e.target.disabled = true;
-            let opts = {
-              command: "cancel"
-            };
-            OctoPrintClient.jobAction(printer, opts, e);
-          }
-        }
-      });
-    });
-    let submitTerminal = async function (e) {
-      let input = elements.terminal.input.value;
-      input = input.toUpperCase();
-      elements.terminal.input.value = "";
-      let flashReturn = function () {
-        elements.terminal.sendBtn = "btn btn-secondary";
-      };
-      let opt = {
-        commands: [input]
-      };
-      let post = await OctoPrintClient.post(printer, "printer/command", opt);
-      if (post.status === 204) {
-        elements.terminal.sendBtn = "btn btn-success";
-        setTimeout(flashReturn, 500);
-      } else {
-        elements.terminal.sendBtn = "btn btn-danger";
-        setTimeout(flashReturn, 500);
-      }
-    }
-    elements.terminal.input.addEventListener("keypress", async e => {
-      if (e.key === 'Enter') {
-        submitTerminal(e);
-      }
-    });
-    elements.terminal.sendBtn.addEventListener("click", async e => {
-      submitTerminal(e);
-    });
-    elements.fileManager.uploadFiles.addEventListener('change', function() {
-      UI.createAlert("warning", "Your files for Printer: " + PrinterSettings.grabName(printer) + " has begun. Please do not navigate away from this page.", 3000, "Clicked")
-      FileManager.handleFiles(this.files, printer);
-    });
-    elements.fileManager.createFolderBtn.addEventListener("click", e => {
-      FileManager.createFolder(printer)
-    });
-    elements.fileManager.fileSearch.addEventListener("keyup", e => {
-      FileManager.search(printer._id);
-    });
-    elements.fileManager.uploadPrintFile.addEventListener("change", function() {
-      FileManager.handleFiles(this.files, printer, "print")
-    });
-    elements.fileManager.back.addEventListener("click", e => {
-      FileManager.openFolder(undefined, undefined, printer);
-    });
-    elements.fileManager.syncFiles.addEventListener('click', e => {
-      FileManager.reSyncFiles(e, printer);
-    });
-
-  }
-
-
+  // static applyListeners(printer, elements, printers) {
+  //   let rangeSliders = document.querySelectorAll("input.octoRange");
+  //   rangeSliders.forEach(slider => {
+  //     slider.addEventListener("input", e => {
+  //       e.target.previousSibling.previousSibling.lastChild.innerHTML = `${e.target.value}%`;
+  //     });
+  //   });
+  //   if (printer.state != "Disconnected") {
+  //     elements.connectPage.connectButton.addEventListener("click", e => {
+  //       elements.connectPage.connectButton.disabled = true;
+  //       OctoPrintClient.connect(
+  //           elements.connectPage.connectButton.value,
+  //           printer
+  //       );
+  //     });
+  //   } else {
+  //     elements.connectPage.connectButton.addEventListener("click", e => {
+  //       elements.connectPage.connectButton.disabled = true;
+  //       OctoPrintClient.connect(
+  //           elements.connectPage.connectButton.value,
+  //           printer
+  //       );
+  //     });
+  //   }
+  //
+  //   //Control Listeners... There's a lot!
+  //   elements.printerControls.xPlus.addEventListener("click", e => {
+  //     OctoPrintClient.move(e, printer, "jog", "x");
+  //   });
+  //   elements.printerControls.xMinus.addEventListener("click", e => {
+  //     OctoPrintClient.move(e, printer, "jog", "x", "-");
+  //   });
+  //   elements.printerControls.yPlus.addEventListener("click", e => {
+  //     OctoPrintClient.move(e, printer, "jog", "y");
+  //   });
+  //   elements.printerControls.yMinus.addEventListener("click", e => {
+  //     OctoPrintClient.move(e, printer, "jog", "y", "-");
+  //   });
+  //   elements.printerControls.xyHome.addEventListener("click", e => {
+  //     OctoPrintClient.move(e, printer, "home", ["x", "y"]);
+  //   });
+  //   elements.printerControls.zPlus.addEventListener("click", e => {
+  //     OctoPrintClient.move(e, printer, "jog", "z");
+  //   });
+  //   elements.printerControls.zMinus.addEventListener("click", e => {
+  //     OctoPrintClient.move(e, printer, "jog", "z", "-");
+  //   });
+  //   elements.printerControls.zHome.addEventListener("click", e => {
+  //     OctoPrintClient.move(e, printer, "home", ["z"]);
+  //   });
+  //   elements.printerControls.step01.addEventListener("click", e => {
+  //     OctoFarmClient.post("printers/stepChange", {
+  //       printer: printer._id,
+  //       newSteps: "01"
+  //     });
+  //     e.target.className = "btn btn-dark active";
+  //     elements.printerControls.step1.className = "btn btn-light";
+  //     elements.printerControls.step10.className = "btn btn-light";
+  //     elements.printerControls.step100.className = "btn btn-light";
+  //   });
+  //   elements.printerControls.step1.addEventListener("click", e => {
+  //     OctoFarmClient.post("printers/stepChange", {
+  //       printer: printer._id,
+  //       newSteps: "1"
+  //     });
+  //     e.target.className = "btn btn-dark active";
+  //     elements.printerControls.step01.className = "btn btn-light";
+  //     elements.printerControls.step10.className = "btn btn-light";
+  //     elements.printerControls.step100.className = "btn btn-light";
+  //   });
+  //   elements.printerControls.step10.addEventListener("click", e => {
+  //     OctoFarmClient.post("printers/stepChange", {
+  //       printer: printer._id,
+  //       newSteps: "10"
+  //     });
+  //     e.target.className = "btn btn-dark active";
+  //     elements.printerControls.step1.className = "btn btn-light";
+  //     elements.printerControls.step01.className = "btn btn-light";
+  //     elements.printerControls.step100.className = "btn btn-light";
+  //   });
+  //   elements.printerControls.step100.addEventListener("click", e => {
+  //     OctoFarmClient.post("printers/stepChange", {
+  //       printer: printer._id,
+  //       newSteps: "100"
+  //     });
+  //     e.target.className = "btn btn-dark active";
+  //     elements.printerControls.step1.className = "btn btn-light";
+  //     elements.printerControls.step10.className = "btn btn-light";
+  //     elements.printerControls.step01.className = "btn btn-light";
+  //   });
+  //
+  //   let e0Set = async function (e) {
+  //     let flashReturn = function () {
+  //       elements.printerControls.e0Set.className = "btn btn-md btn-light m-0 p-1";
+  //     };
+  //     let value = elements.printerControls.e0Target.value;
+  //     elements.printerControls.e0Target.value = "";
+  //     if (value === "Off") {
+  //       value = 0;
+  //     }
+  //     let opt = {
+  //       command: "target",
+  //       targets: {
+  //         tool0: parseInt(value)
+  //       }
+  //     };
+  //     let post = await OctoPrintClient.post(printer, "printer/tool", opt);
+  //     if (post.status === 204) {
+  //       elements.printerControls.e0Set.className = "btn btn-md btn-success m-0 p-1";
+  //       setTimeout(flashReturn, 500);
+  //     } else {
+  //       elements.printerControls.e0Set.className = "btn btn-md btn-danger m-0 p-1";
+  //       setTimeout(flashReturn, 500);
+  //     }
+  //   }
+  //   elements.printerControls.e0Target.addEventListener("change", async e => {
+  //     if (elements.printerControls.e0Target.value <= 0) {
+  //       elements.printerControls.e0Target.value = "0"
+  //     }
+  //   });
+  //   elements.printerControls.e0Target.addEventListener("keypress", async e => {
+  //     if (e.key === 'Enter') {
+  //       e0Set(e);
+  //     }
+  //   });
+  //   elements.printerControls.e0Set.addEventListener("click", async e => {
+  //     e0Set(e);
+  //   });
+  //
+  //   let bedSet = async function (e) {
+  //     let flashReturn = function () {
+  //       elements.printerControls.bedSet.classList = "btn btn-md btn-light m-0 p-1";
+  //     };
+  //     let value = elements.printerControls.bedTarget.value;
+  //
+  //     elements.printerControls.bedTarget.value = "";
+  //     if (value === "Off") {
+  //       value = 0;
+  //     }
+  //     let opt = {
+  //       command: "target",
+  //       target: parseInt(value)
+  //     };
+  //     let post = await OctoPrintClient.post(printer, "printer/bed", opt);
+  //     if (post.status === 204) {
+  //       elements.printerControls.bedSet.className = "btn btn-md btn-success m-0 p-1";
+  //       setTimeout(flashReturn, 500);
+  //     } else {
+  //       elements.printerControls.bedSet.className = "btn btn-md btn-success m-0 p-1";
+  //       setTimeout(flashReturn, 500);
+  //     }
+  //   }
+  //   elements.printerControls.bedTarget.addEventListener("change", async e => {
+  //     if (elements.printerControls.bedTarget.value <= 0) {
+  //       elements.printerControls.bedTarget.value = "0"
+  //     }
+  //   });
+  //   elements.printerControls.bedTarget.addEventListener("keypress", async e => {
+  //     if (e.key === 'Enter') {
+  //       bedSet(e);
+  //     }
+  //   });
+  //   elements.printerControls.bedSet.addEventListener("click", async e => {
+  //     bedSet(e);
+  //   });
+  //   elements.printerControls.feedRate.addEventListener("click", async e => {
+  //     let flashReturn = function () {
+  //       e.target.classList = "btn btn-light";
+  //     };
+  //     let value = elements.printerControls.feedRateValue.innerHTML;
+  //     value = value.replace("%", "");
+  //     OctoFarmClient.post("printers/feedChange", {
+  //       printer: printer._id,
+  //       newSteps: value
+  //     });
+  //     let opt = {
+  //       command: "feedrate",
+  //       factor: parseInt(value)
+  //     };
+  //     let post = await OctoPrintClient.post(printer, "printer/printhead", opt);
+  //     if (post.status === 204) {
+  //       e.target.classList = "btn btn-success";
+  //       setTimeout(flashReturn, 500);
+  //     } else {
+  //       e.target.classList = "btn btn-danger";
+  //       setTimeout(flashReturn, 500);
+  //     }
+  //   });
+  //   elements.printerControls.flowRate.addEventListener("click", async e => {
+  //     let flashReturn = function () {
+  //       e.target.classList = "btn btn-light";
+  //     };
+  //     let value = elements.printerControls.flowRateValue.innerHTML;
+  //     value = value.replace("%", "");
+  //     OctoFarmClient.post("printers/flowChange", {
+  //       printer: printer._id,
+  //       newSteps: value
+  //     });
+  //     let opt = {
+  //       command: "flowrate",
+  //       factor: parseInt(value)
+  //     };
+  //     let post = await OctoPrintClient.post(printer, "printer/tool", opt);
+  //     if (post.status === 204) {
+  //       e.target.classList = "btn btn-success";
+  //       setTimeout(flashReturn, 500);
+  //     } else {
+  //       e.target.classList = "btn btn-danger";
+  //       setTimeout(flashReturn, 500);
+  //     }
+  //   });
+  //   elements.printerControls.motorsOff.addEventListener("click", async e => {
+  //     let flashReturn = function () {
+  //       e.target.classList = "btn btn-light";
+  //     };
+  //     let opt = {
+  //       commands: ["M18"]
+  //     };
+  //     let post = await OctoPrintClient.post(printer, "printer/command", opt);
+  //     if (post.status === 204) {
+  //       e.target.classList = "btn btn-success";
+  //       setTimeout(flashReturn, 500);
+  //     } else {
+  //       e.target.classList = "btn btn-danger";
+  //       setTimeout(flashReturn, 500);
+  //     }
+  //   });
+  //   elements.printerControls.fansOn.addEventListener("click", async e => {
+  //     let fanspeed = elements.printerControls.fanPercent.innerHTML;
+  //     fanspeed = fanspeed.replace("%", "");
+  //     fanspeed = fanspeed / 100;
+  //     fanspeed = 255 * fanspeed;
+  //     fanspeed = Math.floor(fanspeed);
+  //
+  //     let flashReturn = function () {
+  //       e.target.classList = "btn btn-light";
+  //     };
+  //     let opt = {
+  //       commands: [`M106 S${fanspeed}`]
+  //     };
+  //     let post = await OctoPrintClient.post(printer, "printer/command", opt);
+  //     if (post.status === 204) {
+  //       e.target.classList = "btn btn-success";
+  //       setTimeout(flashReturn, 500);
+  //     } else {
+  //       e.target.classList = "btn btn-danger";
+  //       setTimeout(flashReturn, 500);
+  //     }
+  //   });
+  //   elements.printerControls.fansOff.addEventListener("click", async e => {
+  //     let flashReturn = function () {
+  //       e.target.classList = "btn btn-light";
+  //     };
+  //     let opt = {
+  //       commands: ["M107"]
+  //     };
+  //     let post = await OctoPrintClient.post(printer, "printer/command", opt);
+  //     if (post.status === 204) {
+  //       e.target.classList = "btn btn-success";
+  //       setTimeout(flashReturn, 500);
+  //     } else {
+  //       e.target.classList = "btn btn-danger";
+  //       setTimeout(flashReturn, 500);
+  //     }
+  //   });
+  //   elements.printerControls.extrude.addEventListener("click", async e => {
+  //     let flashReturn = function () {
+  //       e.target.classList = "btn btn-light";
+  //     };
+  //     if (
+  //         elements.printerControls.extruder.value != undefined &&
+  //         elements.printerControls.extruder.value !== ""
+  //     ) {
+  //       let select = OctoPrintClient.selectTool(printer, "tool0");
+  //       if (select) {
+  //         let value = elements.printerControls.extruder.value;
+  //         let opt = {
+  //
+  //           command: "extrude",
+  //           amount: parseInt(value)
+  //         };
+  //         let post = await OctoPrintClient.post(printer, "printer/tool", opt);
+  //         if (post.status === 204) {
+  //           e.target.classList = "btn btn-success";
+  //           setTimeout(flashReturn, 500);
+  //         } else {
+  //           e.target.classList = "btn btn-danger";
+  //           setTimeout(flashReturn, 500);
+  //         }
+  //       }
+  //     } else {
+  //       UI.createAlert(
+  //           "error",
+  //           "You haven't told octoprint how much you'd like to extrude...",
+  //           3000,
+  //           "clicked"
+  //       );
+  //     }
+  //   });
+  //   elements.printerControls.retract.addEventListener("click", async e => {
+  //     let flashReturn = function () {
+  //       e.target.classList = "btn btn-light";
+  //     };
+  //     if (
+  //         elements.printerControls.extruder.value != undefined &&
+  //         elements.printerControls.extruder.value !== ""
+  //     ) {
+  //       let select = OctoPrintClient.selectTool(printer, "tool0");
+  //       if (select) {
+  //         let value = elements.printerControls.extruder.value;
+  //         value = "-" + value;
+  //         let opt = {
+  //           command: "extrude",
+  //           amount: parseInt(value)
+  //         };
+  //         let post = await OctoPrintClient.post(
+  //             printer,
+  //             "printer/tool",
+  //             opt
+  //         );
+  //         if (post.status === 204) {
+  //           e.target.classList = "btn btn-success";
+  //           setTimeout(flashReturn, 500);
+  //         } else {
+  //           e.target.classList = "btn btn-danger";
+  //           setTimeout(flashReturn, 500);
+  //         }
+  //       }
+  //     } else {
+  //       UI.createAlert(
+  //           "error",
+  //           "You haven't told octoprint how much you'd like to retract...",
+  //           3000,
+  //           "clicked"
+  //       );
+  //     }
+  //   });
+  //   elements.printerControls.printStart.addEventListener("click", async e => {
+  //     e.target.disabled = true;
+  //     let opts = {
+  //       command: "start"
+  //     };
+  //     OctoPrintClient.jobAction(printer, opts, e);
+  //   });
+  //   elements.printerControls.printPause.addEventListener("click", e => {
+  //     e.target.disabled = true;
+  //     let opts = {
+  //       command: "pause",
+  //       action: "pause"
+  //     };
+  //     OctoPrintClient.jobAction(printer, opts, e);
+  //   });
+  //   elements.printerControls.printRestart.addEventListener("click", e => {
+  //     e.target.disabled = true;
+  //     let opts = {
+  //       command: "restart"
+  //     };
+  //     OctoPrintClient.jobAction(printer, opts, e);
+  //   });
+  //   elements.printerControls.printResume.addEventListener("click", e => {
+  //     e.target.disabled = true;
+  //     let opts = {
+  //       command: "pause",
+  //       action: "resume"
+  //     };
+  //     OctoPrintClient.jobAction(printer, opts, e);
+  //   });
+  //   elements.printerControls.printStop.addEventListener("click", e => {
+  //     bootbox.confirm({
+  //       message: `${printer._id}.  ${printer.settingsAppearance.name}: <br>Are you sure you want to cancel the ongoing print?`,
+  //       buttons: {
+  //         cancel: {
+  //           label: '<i class="fa fa-times"></i> Cancel'
+  //         },
+  //         confirm: {
+  //           label: '<i class="fa fa-check"></i> Confirm'
+  //         }
+  //       },
+  //       callback: function (result) {
+  //         if (result) {
+  //           e.target.disabled = true;
+  //           let opts = {
+  //             command: "cancel"
+  //           };
+  //           OctoPrintClient.jobAction(printer, opts, e);
+  //         }
+  //       }
+  //     });
+  //   });
+  //   let submitTerminal = async function (e) {
+  //     let input = elements.terminal.input.value;
+  //     input = input.toUpperCase();
+  //     elements.terminal.input.value = "";
+  //     let flashReturn = function () {
+  //       elements.terminal.sendBtn = "btn btn-secondary";
+  //     };
+  //     let opt = {
+  //       commands: [input]
+  //     };
+  //     let post = await OctoPrintClient.post(printer, "printer/command", opt);
+  //     if (post.status === 204) {
+  //       elements.terminal.sendBtn = "btn btn-success";
+  //       setTimeout(flashReturn, 500);
+  //     } else {
+  //       elements.terminal.sendBtn = "btn btn-danger";
+  //       setTimeout(flashReturn, 500);
+  //     }
+  //   }
+  //   elements.terminal.input.addEventListener("keypress", async e => {
+  //     if (e.key === 'Enter') {
+  //       submitTerminal(e);
+  //     }
+  //   });
+  //   elements.terminal.sendBtn.addEventListener("click", async e => {
+  //     submitTerminal(e);
+  //   });
+  //   elements.fileManager.uploadFiles.addEventListener('change', function() {
+  //     UI.createAlert("warning", "Your files for Printer: " + PrinterSettings.grabName(printer) + " has begun. Please do not navigate away from this page.", 3000, "Clicked")
+  //     FileManager.handleFiles(this.files, printer);
+  //   });
+  //   elements.fileManager.createFolderBtn.addEventListener("click", e => {
+  //     FileManager.createFolder(printer)
+  //   });
+  //   elements.fileManager.fileSearch.addEventListener("keyup", e => {
+  //     FileManager.search(printer._id);
+  //   });
+  //   elements.fileManager.uploadPrintFile.addEventListener("change", function() {
+  //     FileManager.handleFiles(this.files, printer, "print")
+  //   });
+  //   elements.fileManager.back.addEventListener("click", e => {
+  //     FileManager.openFolder(undefined, undefined, printer);
+  //   });
+  //   elements.fileManager.syncFiles.addEventListener('click', e => {
+  //     FileManager.reSyncFiles(e, printer);
+  //   });
+  //
+  // }
+  //
+  //
   static grabPage() {
     let PrinterSettings = {
       mainPage: {
-        title: document.getElementById("printerSelection"),
-        status: document.getElementById("pmStatus"),
-      },
-      jobStatus: {
-        expectedCompletionDate: document.getElementById("pmExpectedCompletionDate"),
-        expectedTime: document.getElementById("pmExpectedTime"),
-        remainingTime: document.getElementById("pmTimeRemain"),
-        elapsedTime: document.getElementById("pmTimeElapsed"),
-        currentZ: document.getElementById("pmCurrentZ"),
-        fileName: document.getElementById("pmFileName"),
-        progressBar: document.getElementById("pmProgress")
+        title: document.getElementById("printerSettingsSelection"),
+        status: document.getElementById("psStatus"),
       },
       connectPage: {
         printerPort: document.getElementById("printerPortDrop"),
         printerBaud: document.getElementById("printerBaudDrop"),
         printerProfile: document.getElementById("printerProfileDrop"),
         printerConnect: document.getElementById("printerConnect"),
-        connectButton: document.getElementById("pmConnect"),
-        portDropDown: document.getElementById("pmSerialPort"),
-        baudDropDown: document.getElementById("pmBaudrate"),
-        profileDropDown: document.getElementById("pmProfile")
+        connectButton: document.getElementById("psConnectBtn"),
+        portDropDown: document.getElementById("psSerialPort"),
+        baudDropDown: document.getElementById("psBaudrate"),
+        profileDropDown: document.getElementById("psProfile")
       },
-      terminal: {
-        terminalWindow: document.getElementById("terminal"),
-        sendBtn: document.getElementById("terminalInputBtn"),
-        input: document.getElementById("terminalInput")
-      },
-      printerControls: {
-        fileUpload: document.getElementById("PrinterSettingsUploadBtn"),
-        xPlus: document.getElementById("pcXpos"),
-        xMinus: document.getElementById("pcXneg"),
-        yPlus: document.getElementById("pcYpos"),
-        yMinus: document.getElementById("pcYneg"),
-        xyHome: document.getElementById("pcXYhome"),
-        zPlus: document.getElementById("pcZpos"),
-        zMinus: document.getElementById("pcZneg"),
-        zHome: document.getElementById("pcZhome"),
-        step01: document.getElementById("pcAxisSteps01"),
-        step1: document.getElementById("pcAxisSteps1"),
-        step10: document.getElementById("pcAxisSteps10"),
-        step100: document.getElementById("pcAxisSteps100"),
-        e0Neg: document.getElementById("pcE0neg"),
-        e0Target: document.getElementById("pcE0Target"),
-        e0Actual: document.getElementById("pcE0Actual"),
-        e0Pos: document.getElementById("pcE0pos"),
-        bedNeg: document.getElementById("pcBedneg"),
-        bedTarget: document.getElementById("pcBedTarget"),
-        bedActual: document.getElementById("pcBedActual"),
-        begPos: document.getElementById("pcBedpos"),
-        e0Set: document.getElementById("pcE0set"),
-        bedSet: document.getElementById("pcBedset"),
-        feedRate: document.getElementById("pcFeedRate"),
-        flowRate: document.getElementById("pcFlowRate"),
-        feedRateValue: document.getElementById("pcFeedValue"),
-        flowRateValue: document.getElementById("pcFlowValue"),
-        motorsOff: document.getElementById("pcMotorTog"),
-        fanPercent: document.getElementById("pcFanPercent"),
-        fansOn: document.getElementById("pcFanOn"),
-        fansOff: document.getElementById("pcFanOff"),
-        extruder: document.getElementById("pcExtruder"),
-        extrude: document.getElementById("pcExtrude"),
-        retract: document.getElementById("pcRetract"),
-        progress: document.getElementById("pcAxisSteps100"),
-        printStart: document.getElementById("pmPrintStart"),
-        printPause: document.getElementById("pmPrintPause"),
-        printRestart: document.getElementById("pmPrintRestart"),
-        printResume: document.getElementById("pmPrintResume"),
-        printStop: document.getElementById("pmPrintStop")
-      },
-      fileManager: {
-        printerStorage: document.getElementById("printerStorage"),
-        fileFolderCount: document.getElementById("printerFileCount"),
-        fileSearch: document.getElementById("searchFiles"),
-        uploadFiles: document.getElementById("fileUploadBtn"),
-        uploadPrintFile: document.getElementById("fileUploadPrintBtn"),
-        syncFiles: document.getElementById("fileReSync"),
-        back: document.getElementById("fileBackBtn"),
-        createFolderBtn: document.getElementById("createFolderBtn")
-      }
+
     };
     return PrinterSettings;
   }
 
-  static async applyState(printer, job, progress) {
+  static async applyState(printer) {
     //Garbage collection for terminal
-    let terminalCount = document.querySelectorAll(".logLine");
     let elements = await PrinterSettings.grabPage();
 
-    elements.fileManager.fileFolderCount.innerHTML = `<i class="fas fa-file"></i> ${printer.filesList.fileCount} <i class="fas fa-folder"></i> ${printer.filesList.folderCount}`;
-    elements.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(printer.storage.free)} / ${Calc.bytes(printer.storage.total)}`
+
     elements.mainPage.status.innerHTML = printer.state;
     elements.mainPage.status.className = `btn btn-${printer.stateColour.name} mb-2`;
-    let dateComplete = null;
-    if (typeof printer.progress !== "undefined" && printer.progress.printTimeLeft !== null) {
 
-      let currentDate = new Date();
-
-      if(printer.progress.completion === 100){
-        dateComplete = "Print Ready for Harvest"
-      }else{
-        currentDate = currentDate.getTime();
-        let futureDateString = new Date(currentDate + printer.progress.printTimeLeft * 1000).toDateString()
-        let futureTimeString = new Date(currentDate + printer.progress.printTimeLeft * 1000).toTimeString()
-        futureTimeString = futureTimeString.substring(0, 8);
-        dateComplete = futureDateString + ": " + futureTimeString;
-      }
-    } else {
-      dateComplete = "No Active Print"
-    }
-
-
-    elements.jobStatus.expectedCompletionDate.innerHTML = dateComplete;
-
-    elements.printerControls["step" + printer.stepRate].className =
-        "btn btn-dark active";
-    elements.jobStatus.progressBar.innerHTML =
-        Math.round(progress.completion) + "%";
-    elements.jobStatus.progressBar.style.width = progress.completion + "%";
-    elements.jobStatus.expectedTime.innerHTML = Calc.generateTime(
-        job.estimatedPrintTime
-    );
-    elements.jobStatus.remainingTime.innerHTML = Calc.generateTime(
-        progress.printTimeLeft
-    );
-    elements.jobStatus.elapsedTime.innerHTML = Calc.generateTime(
-        progress.printTime
-    );
-    elements.jobStatus.currentZ.innerHTML = printer.currentZ + "mm";
-    elements.jobStatus.fileName.setAttribute('title', job.file.path)
-    elements.jobStatus.fileName.innerHTML = job.file.name;
 
     if (printer.stateColour.category === "Active") {
-      if (
-          typeof printer.temps != "undefined" &&
-          typeof printer.temps[0].tool0 != "undefined" &&
-          typeof printer.temps[0].tool0.target != "undefined"
-      ) {
-        elements.printerControls.e0Target.placeholder =
-            printer.temps[0].tool0.target + "°C";
-        elements.printerControls.e0Actual.innerHTML =
-            "Actual: " + printer.temps[0].tool0.actual + "°C";
-        elements.printerControls.bedTarget.placeholder =
-            printer.temps[0].bed.target + "°C";
-        elements.printerControls.bedActual.innerHTML =
-            "Actual: " + printer.temps[0].bed.actual + "°C";
-        if (
-            printer.temps[0].tool0.actual >
-            printer.temps[0].tool0.target - 0.5 &&
-            printer.temps[0].tool0.actual < printer.temps[0].tool0.target + 0.5
-        ) {
-          elements.printerControls.e0Actual.classList =
-              "input-group-text Complete";
-        } else if (printer.temps[0].tool0.actual < 35) {
-          elements.printerControls.e0Actual.classList = "input-group-text";
-        } else {
-          elements.printerControls.e0Actual.classList =
-              "input-group-text Active";
-        }
-        if (
-            printer.temps[0].bed.actual > printer.temps[0].bed.target - 0.5 &&
-            printer.temps[0].bed.actual < printer.temps[0].bed.target + 0.5
-        ) {
-          elements.printerControls.bedActual.classList =
-              "input-group-text Complete";
-        } else if (printer.temps[0].bed.actual < 35) {
-          elements.printerControls.bedActual.classList = "input-group-text";
-        } else {
-          elements.printerControls.bedActual.classList =
-              "input-group-text Active";
-        }
-      }
 
-      PrinterSettings.controls(true, true);
-      elements.printerControls.printStart.disabled = true;
-      elements.printerControls.printStart.style.display = "inline-block";
-      elements.printerControls.printPause.disabled = false;
-      elements.printerControls.printPause.style.display = "inline-block";
-      elements.printerControls.printStop.disabled = false;
-      elements.printerControls.printStop.style.display = "inline-block";
-      elements.printerControls.printRestart.disabled = true;
-      elements.printerControls.printRestart.style.display = "none";
-      elements.printerControls.printResume.disabled = true;
-      elements.printerControls.printResume.style.display = "none";
     } else if (
         printer.stateColour.category === "Idle" ||
         printer.stateColour.category === "Complete"
     ) {
-      PrinterSettings.controls(false);
       elements.connectPage.connectButton.value = "disconnect";
       elements.connectPage.connectButton.innerHTML = "Disconnect";
       elements.connectPage.connectButton.classList = "btn btn-danger inline";
@@ -835,17 +1040,9 @@ export default class PrinterSettings {
           typeof printer.temps[0].tool0 != "undefined" &&
           typeof printer.temps[0].tool0.target != "undefined"
       ) {
-        elements.printerControls.e0Target.placeholder =
-            printer.temps[0].tool0.target + "°C";
-        elements.printerControls.e0Actual.innerHTML =
-            "Actual: " + printer.temps[0].tool0.actual + "°C";
-        elements.printerControls.bedTarget.placeholder =
-            printer.temps[0].bed.target + "°C";
-        elements.printerControls.bedActual.innerHTML =
-            "Actual: " + printer.temps[0].bed.actual + "°C";
+
       }
-      elements.printerControls.e0Actual.classList = "input-group-text";
-      elements.printerControls.bedActual.classList = "input-group-text";
+
       elements.connectPage.printerPort.disabled = true;
       elements.connectPage.printerBaud.disabled = true;
       elements.connectPage.printerProfile.disabled = true;
@@ -853,141 +1050,106 @@ export default class PrinterSettings {
           typeof printer.job != "undefined" &&
           printer.job.filename === "No File Selected"
       ) {
-        elements.printerControls.printStart.disabled = true;
-        elements.printerControls.printStart.style.display = "inline-block";
-        elements.printerControls.printPause.disabled = true;
-        elements.printerControls.printPause.style.display = "inline-block";
-        elements.printerControls.printStop.disabled = true;
-        elements.printerControls.printStop.style.display = "inline-block";
-        elements.printerControls.printRestart.disabled = true;
-        elements.printerControls.printRestart.style.display = "none";
-        elements.printerControls.printResume.disabled = true;
-        elements.printerControls.printResume.style.display = "none";
+
       } else {
         if (printer.state === "Paused") {
-          PrinterSettings.controls(false);
-          elements.printerControls.printStart.disabled = true;
-          elements.printerControls.printStart.style.display = "none";
-          elements.printerControls.printPause.disabled = true;
-          elements.printerControls.printPause.style.display = "none";
-          elements.printerControls.printStop.disabled = false;
-          elements.printerControls.printStop.style.display = "inline-block";
-          elements.printerControls.printRestart.disabled = false;
-          elements.printerControls.printRestart.style.display =
-              "inline-block";
-          elements.printerControls.printResume.disabled = false;
-          elements.printerControls.printResume.style.display = "inline-block";
+
         } else {
-          elements.printerControls.printStart.disabled = false;
-          elements.printerControls.printStart.style.display = "inline-block";
-          elements.printerControls.printPause.disabled = true;
-          elements.printerControls.printPause.style.display = "inline-block";
-          elements.printerControls.printStop.disabled = true;
-          elements.printerControls.printStop.style.display = "inline-block";
-          elements.printerControls.printRestart.disabled = true;
-          elements.printerControls.printRestart.style.display = "none";
-          elements.printerControls.printResume.disabled = true;
-          elements.printerControls.printResume.style.display = "none";
+
         }
       }
     } else if (
         printer.stateColour.category === "Offline" ||
         printer.stateColour.category === "Disconnected"
     ) {
-      elements.connectPage.connectButton.value = "connect";
-      elements.connectPage.connectButton.innerHTML = "Connect";
-      elements.connectPage.connectButton.classList = "btn btn-success inline";
-      elements.connectPage.connectButton.disabled = false;
-      elements.printerControls.e0Target.placeholder = 0 + "°C";
-      elements.printerControls.e0Actual.innerHTML = "Actual: " + 0 + "°C";
-      elements.printerControls.bedTarget.placeholder = 0 + "°C";
-      elements.printerControls.bedActual.innerHTML = "Actual: " + 0 + "°C";
-      elements.printerControls.e0Actual.classList = "input-group-text";
-      elements.printerControls.bedActual.classList = "input-group-text";
-      PrinterSettings.controls(true);
-      elements.printerControls.printStart.disabled = true;
-      elements.printerControls.printStart.style.display = "inline-block";
-      elements.printerControls.printPause.disabled = true;
-      elements.printerControls.printPause.style.display = "inline-block";
-      elements.printerControls.printStop.disabled = true;
-      elements.printerControls.printStop.style.display = "inline-block";
-      elements.printerControls.printRestart.disabled = true;
-      elements.printerControls.printRestart.style.display = "none";
-      elements.printerControls.printResume.disabled = true;
-      elements.printerControls.printResume.style.display = "none";
+
       if (printer.state === "Offline" || printer.state === "Shutdown" || printer.state === "Searching...") {
         $("#PrinterSettingsModal").modal("hide");
       }
     }
-
-    let isScrolledToBottom =
-        elements.terminal.terminalWindow.scrollHeight -
-        elements.terminal.terminalWindow.clientHeight <=
-        elements.terminal.terminalWindow.scrollTop + 1;
-    if (typeof printer.logs != "undefined") {
-      //console.log(printer.logs);
-      let logText = printer.logs.join("<br />");
-      if (logText != previousLog) {
-        elements.terminal.terminalWindow.insertAdjacentHTML(
-            "beforeend",
-            `<div id="logLine-${terminalCount.length}" class="logLine">${logText}</div>`
-        );
-        if (terminalCount.length > 20) {
-          for (let i = 0; i < terminalCount.length - 5; i++) {
-            terminalCount[i].remove();
-          }
-        }
-      }
-
-      if (isScrolledToBottom) {
-        elements.terminal.terminalWindow.scrollTop =
-            elements.terminal.terminalWindow.scrollHeight -
-            elements.terminal.terminalWindow.clientHeight;
-      }
-    }
   }
 
-  static async controls(enable, printing) {
-    let elements = await PrinterSettings.grabPage();
-    elements = elements.printerControls;
-    if (typeof printing != "undefined" && printing) {
-      elements.e0Target.disabled = !printing;
-      elements.e0Actual.disabled = !printing;
-      elements.bedTarget.disabled = !printing;
-      elements.e0Set.disabled = !printing;
-      elements.bedSet.disabled = !printing;
-      elements.feedRate.disabled = !printing;
-      elements.flowRate.disabled = !printing;
-      elements.fansOn.disabled = !printing;
-      elements.fansOff.disabled = !printing;
-    } else {
-      elements.e0Target.disabled = enable;
-      elements.e0Actual.disabled = enable;
-      elements.bedTarget.disabled = enable;
-      elements.e0Set.disabled = enable;
-      elements.bedSet.disabled = enable;
-      elements.feedRate.disabled = enable;
-      elements.flowRate.disabled = enable;
-      elements.fansOn.disabled = enable;
-      elements.fansOff.disabled = enable;
-    }
-    elements.xPlus.disabled = enable;
-    elements.xMinus.disabled = enable;
-    elements.yPlus.disabled = enable;
-    elements.yMinus.disabled = enable;
-    elements.xyHome.disabled = enable;
-    elements.zPlus.disabled = enable;
-    elements.zMinus.disabled = enable;
-    elements.zHome.disabled = enable;
-    elements.step01.disabled = enable;
-    elements.step1.disabled = enable;
-    elements.step10.disabled = enable;
-    elements.step100.disabled = enable;
-
-    elements.motorsOff.disabled = enable;
-    elements.extrude.disabled = enable;
-    elements.retract.disabled = enable;
-  }
+  // static async controls(enable, printing) {
+  //   let elements = await PrinterSettings.grabPage();
+  //   elements = elements.printerControls;
+  //   if (typeof printing != "undefined" && printing) {
+  //     elements.e0Target.disabled = !printing;
+  //     elements.e0Actual.disabled = !printing;
+  //     elements.bedTarget.disabled = !printing;
+  //     elements.e0Set.disabled = !printing;
+  //     elements.bedSet.disabled = !printing;
+  //     elements.feedRate.disabled = !printing;
+  //     elements.flowRate.disabled = !printing;
+  //     elements.fansOn.disabled = !printing;
+  //     elements.fansOff.disabled = !printing;
+  //   } else {
+  //     elements.e0Target.disabled = enable;
+  //     elements.e0Actual.disabled = enable;
+  //     elements.bedTarget.disabled = enable;
+  //     elements.e0Set.disabled = enable;
+  //     elements.bedSet.disabled = enable;
+  //     elements.feedRate.disabled = enable;
+  //     elements.flowRate.disabled = enable;
+  //     elements.fansOn.disabled = enable;
+  //     elements.fansOff.disabled = enable;
+  //   }
+  //   elements.xPlus.disabled = enable;
+  //   elements.xMinus.disabled = enable;
+  //   elements.yPlus.disabled = enable;
+  //   elements.yMinus.disabled = enable;
+  //   elements.xyHome.disabled = enable;
+  //   elements.zPlus.disabled = enable;
+  //   elements.zMinus.disabled = enable;
+  //   elements.zHome.disabled = enable;
+  //   elements.step01.disabled = enable;
+  //   elements.step1.disabled = enable;
+  //   elements.step10.disabled = enable;
+  //   elements.step100.disabled = enable;
+  //
+  //   elements.motorsOff.disabled = enable;
+  //   elements.extrude.disabled = enable;
+  //   elements.retract.disabled = enable;
+  // }  // static async controls(enable, printing) {
+  //   let elements = await PrinterSettings.grabPage();
+  //   elements = elements.printerControls;
+  //   if (typeof printing != "undefined" && printing) {
+  //     elements.e0Target.disabled = !printing;
+  //     elements.e0Actual.disabled = !printing;
+  //     elements.bedTarget.disabled = !printing;
+  //     elements.e0Set.disabled = !printing;
+  //     elements.bedSet.disabled = !printing;
+  //     elements.feedRate.disabled = !printing;
+  //     elements.flowRate.disabled = !printing;
+  //     elements.fansOn.disabled = !printing;
+  //     elements.fansOff.disabled = !printing;
+  //   } else {
+  //     elements.e0Target.disabled = enable;
+  //     elements.e0Actual.disabled = enable;
+  //     elements.bedTarget.disabled = enable;
+  //     elements.e0Set.disabled = enable;
+  //     elements.bedSet.disabled = enable;
+  //     elements.feedRate.disabled = enable;
+  //     elements.flowRate.disabled = enable;
+  //     elements.fansOn.disabled = enable;
+  //     elements.fansOff.disabled = enable;
+  //   }
+  //   elements.xPlus.disabled = enable;
+  //   elements.xMinus.disabled = enable;
+  //   elements.yPlus.disabled = enable;
+  //   elements.yMinus.disabled = enable;
+  //   elements.xyHome.disabled = enable;
+  //   elements.zPlus.disabled = enable;
+  //   elements.zMinus.disabled = enable;
+  //   elements.zHome.disabled = enable;
+  //   elements.step01.disabled = enable;
+  //   elements.step1.disabled = enable;
+  //   elements.step10.disabled = enable;
+  //   elements.step100.disabled = enable;
+  //
+  //   elements.motorsOff.disabled = enable;
+  //   elements.extrude.disabled = enable;
+  //   elements.retract.disabled = enable;
+  // }
 
   static async updateIndex(newIndex) {
     currentIndex = newIndex;
