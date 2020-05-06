@@ -30,6 +30,9 @@
   <% } else {%>
     <% name = printers[sorted.actualIndex].printerURL;%>
   <%}%>
+  <td id="listSortIndex-<%= printers[sorted.actualIndex]._id %>">
+    <%= printers[sorted.actualIndex].sortIndex %>
+  </td>
   <td id="listName-<%= printers[sorted.actualIndex]._id %>">
     <% if(name.includes("http://")){ %>
       <%  name = name.replace("http://", ""); %>
