@@ -265,14 +265,18 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
     if (typeof data.current != "undefined") {
         farmPrinters[this.index].webSocket = "success";
         farmPrinters[this.index].webSocketDescription = "Websocket Alive and Receiving Data";
-        if (data.current.state.text === "Offline") {
-            data.current.state.text = "Disconnected";
-        } else if (data.current.state.text.includes("Error:")) {
-            data.current.state.text = "Error!"
-        } else if (data.current.state.text === "Closed") {
-            data.current.state.text = "Disconnected";
+        if (data.current.state === "Offline") {
+            data.current.state = "Disconnected";
+            farmPrinters[this.index].stateDescription = "Your printer is disconnected";
+        } else if (data.current.state.includes("Error:")) {
+            farmPrinters[this.index].stateDescription = data.current.state;
+            data.current.state = "Error!"
+        } else if (res.current.state === "Closed") {
+            data.current.state = "Disconnected";
+            farmPrinters[this.index].stateDescription = "Your printer is disconnected";
+        }else{
+            farmPrinters[this.index].stateDescription = "Current Status from OctoPrint";
         }
-
         farmPrinters[this.index].state = data.current.state.text;
         farmPrinters[this.index].stateColour = Runner.getColour(data.current.state.text);
         farmPrinters[this.index].stateDescription = "Current Status from OctoPrint";
