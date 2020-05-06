@@ -97,7 +97,7 @@ router.post("/updateSettings", ensureAuthenticated, async (req, res) => {
 
 router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
   let index = req.body.i;
-  if(index === null){
+  if(typeof index === 'undefined' && index === null){
     let printers = await Runner.returnFarmPrinters();
     let printerInfo = [];
     for (let i = 0; i < printers.length; i++) {
