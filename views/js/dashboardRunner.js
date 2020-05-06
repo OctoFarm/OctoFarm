@@ -352,35 +352,49 @@ var optionsHeatChart = {
         },
 
     },
+    stroke: {
+        show: true,
+        curve: 'smooth',
+        lineCap: 'butt',
+        colors: ['#303030'],
+        width: 2,
+        dashArray: 0,
+    },
     plotOptions: {
         heatmap: {
-            shadeIntensity: 0.5,
+            shadeIntensity: 0.7,
             radius: 0,
-            useFillColorAsStroke: true,
+            useFillColorAsStroke: false,
             colorScale: {
                 ranges: [{
                         from: 0,
+                        to: 1,
+                        name: 'none',
+                        color: '#444'
+                    },
+                    {
+                        from: 1.1,
                         to: 25.9,
                         name: 'low',
-                        color: '#004cff'
+                        color: '#375a7f'
                     },
                     {
                         from: 26,
                         to: 50.9,
                         name: 'medium',
-                        color: '#af00b5'
+                        color: '#f39c12'
                     },
                     {
                         from: 51,
                         to: 75.9,
                         name: 'high',
-                        color: '#ff7800'
+                        color: '#00bc8c'
                     },
                     {
                         from: 76,
                         to: 100,
                         name: 'extreme',
-                        color: '#96ff00'
+                        color: '#e74c3c'
                     }
                 ]
             }
