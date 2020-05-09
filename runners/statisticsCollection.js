@@ -431,13 +431,12 @@ class StatisticsCollection {
         })
 
         let activeTime = activeTimeTotle.reduce((a, b) => a + b, 0);
-        let timeSpan =  dateNow - farmStats[0].farmStart.getTime();
-        let idleTime = timeSpan - activeTime;
-
+        let idleTime  =  dateNow - farmStats[0].farmStart.getTime();
+        let totalHours = activeTime + idleTime;
         octofarmStatistics.activeHours = activeTime;
         octofarmStatistics.idleHours = idleTime;
-        let activePercent = activeTime / timeSpan * 100;
-        let idlePercent = idleTime / timeSpan * 100;
+        let activePercent = activeTime / totalHours * 100;
+        let idlePercent = idleTime / totalHours * 100;
         activePercent = activePercent.toFixed(2);
         idlePercent = idlePercent.toFixed(2);
 
