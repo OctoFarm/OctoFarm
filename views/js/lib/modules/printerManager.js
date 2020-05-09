@@ -1218,12 +1218,20 @@ export default class PrinterManager {
         progress.printTime
     );
     elements.jobStatus.currentZ.innerHTML = printer.currentZ + "mm";
-    elements.jobStatus.fileName.setAttribute('title', job.file.path)
-    let fileName = printer.job.file.display;
-    if (fileName.length > 49) {
-      fileName = fileName.substring(0, 49) + "...";
+    if(typeof printer.job === 'undefined'){
+      elements.jobStatus.fileName.setAttribute('title', 'No File Selected')
+      let fileName = 'No File Selected'
+      elements.jobStatus.fileName.innerHTML = fileName;
+
+    }else{
+      elements.jobStatus.fileName.setAttribute('title', printer.job.file.path)
+      let fileName = printer.job.file.display;
+      if (fileName.length > 49) {
+        fileName = fileName.substring(0, 49) + "...";
+      }
+      elements.jobStatus.fileName.innerHTML = fileName;
+
     }
-    elements.jobStatus.fileName.innerHTML = fileName;
 
     if (printer.stateColour.category === "Active") {
       if (
