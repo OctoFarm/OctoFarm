@@ -24,4 +24,15 @@ export default class Validate {
             return false;
         }
     }
+    static getName(printer){
+        if (typeof printer.settingsAppearance != "undefined") {
+            if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
+                return printer.printerURL;
+            } else {
+                return printer.settingsAppearance.name;
+            }
+        } else {
+            return printer.printerURL;
+        }
+    }
 }
