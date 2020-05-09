@@ -322,7 +322,7 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
         if (data.event.type === "PrintDone") {
             logger.info(data.event.type + this.index + ": " + this.url);
             //Register cancelled print...
-            console.log(farmPrinters[this.index].job)
+
             await HistoryCollection.complete(data.event.payload, farmPrinters[this.index]);
         }
     }
@@ -480,7 +480,6 @@ class Runner {
                 throw error;
             }
         } catch (e) {
-            console.log(e.code)
             switch (e.code) {
                 case 'NO-API':
                     logger.error(e.message, "Couldn't grab initial connection for Printer: " + farmPrinters[i].printerURL);
