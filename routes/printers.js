@@ -14,7 +14,7 @@ router.get("/register", (req, res) => res.render("register")); */
 router.post("/add", ensureAuthenticated, async (req, res) => {
   //Grab the API body
   const printers = req.body;
-  //Send Printers to Runner..
+  //Send Dashboard to Runner..
   logger.info("Update printers request: ", printers);
   let p = await Runner.addPrinters(printers);
   //Return printers added...
@@ -23,7 +23,7 @@ router.post("/add", ensureAuthenticated, async (req, res) => {
 router.post("/update", ensureAuthenticated, async (req, res) => {
   //Grab the API body
   const printers = req.body;
-  //Send Printers to Runner..
+  //Send Dashboard to Runner..
   logger.info("Update printers request: ", printers);
   let p = await Runner.updatePrinters(printers);
   //Return printers added...
@@ -32,7 +32,7 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
 router.post("/remove", ensureAuthenticated, async (req, res) => {
   //Grab the API body
   const printers = req.body;
-  //Send Printers to Runner..
+  //Send Dashboard to Runner..
   logger.info("Delete printers request: ", printers);
   let p = await Runner.removePrinter(printers);
   //Return printers added...
