@@ -14,7 +14,7 @@ const returnFilamentTypes = filamentType.returnFilamentTypes;
 const serverConfig = require("../serverConfig/server.js");
 
 
-const version = pjson.version + ".9-dev-2";
+const version = pjson.version + ".9-dev-2.7";
 
 console.log("db: " + db);
 

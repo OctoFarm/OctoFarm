@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [v1.1.4.9-dev-2]
+## [v1.1.4.9-dev-2.7]
 
 ### Added
     - Printer Control Manager now allows for switching of printers on the fly from the modal. No need to close and re-open. 
