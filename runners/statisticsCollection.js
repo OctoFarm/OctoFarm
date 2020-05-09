@@ -423,57 +423,31 @@ class StatisticsCollection {
 
     static async octofarmStatistics(farmPrinters) {
         let octofarmStatistics = await this.blankFarmStatistics();
-        let history = await History.find({});
-        let printTimes = [];
-        history.forEach(print => {
-            if (print.printHistory.success) {
-                printTimes.push(print.printHistory.printTime);
-            } else {
-                if (print.printHistory.reason === "cancelled") {
-                    printTimes.push(print.printHistory.printTime);
-                }
-            }
-        });
-        // farmPrinters.forEach(printer => {
-        //   if (typeof printer.stateColour != "undefined") {
-        //     if (printer.stateColour.category === "Active") {
-        //       //Need to figure this out
-        //     }
-        //   }
-        // });
-        let printTimesTotal = printTimes.reduce((a, b) => a + b, 0);
+        let dateNow = new Date();
+        dateNow = dateNow.getTime();
+        let activeTimeTotle = [];
+        farmPrinters.forEach(printer => {
+            activeTimeTotle.push(printer.currentUptime);
+        })
 
-        let currentDate = new Date();
-        octofarmStatistics.activeHours = printTimesTotal;
-        octofarmStatistics.idleHours =
-            currentDate.getTime() - farmStats[0].farmStart.getTime();
-        octofarmStatistics.idleHours =
-            (octofarmStatistics.idleHours / 1000) * farmPrinters.length;
-        octofarmStatistics.idleHours =
-            octofarmStatistics.idleHours - octofarmStatistics.activeHours;
-        octofarmStatistics.totalHours =
-            octofarmStatistics.idleHours + octofarmStatistics.activeHours;
+        let activeTime = activeTimeTotle.reduce((a, b) => a + b, 0);
+        let timeSpan =  dateNow - farmStats[0].farmStart.getTime();
+        let idleTime = timeSpan - activeTime;
 
-        octofarmStatistics.activePercent =
-            (octofarmStatistics.activeHours / octofarmStatistics.totalHours) * 100;
-        if (isNaN(octofarmStatistics.activePercent)) {
-            octofarmStatistics.activePercent = 100;
-        }
-        if (octofarmStatistics.activePercent === Infinity) {
-            octofarmStatistics.activePercent = 0;
-        }
-        octofarmStatistics.idlePercent =
-            (octofarmStatistics.idleHours / octofarmStatistics.totalHours) * 100;
-        if (isNaN(octofarmStatistics.idlePercent)) {
-            octofarmStatistics.idlePercent = 100;
-        }
-        if (octofarmStatistics.idlePercent === Infinity) {
-            octofarmStatistics.idlePercent = 0;
-        }
-        octofarmStatistics.activePercent =
-            Math.round(octofarmStatistics.activePercent * 10) / 10;
-        octofarmStatistics.idlePercent =
-            Math.round(octofarmStatistics.idlePercent * 10) / 10;
+        octofarmStatistics.activeHours = activeTime;
+        octofarmStatistics.idleHours = idleTime;
+        let activePercent = activeTime / timeSpan * 100;
+        let idlePercent = idleTime / timeSpan * 100;
+        activePercent = activePercent.toFixed(2);
+        idlePercent = idlePercent.toFixed(2);
+
+        octofarmStatistics.activePercent = activePercent;
+        octofarmStatistics.idlePercent = idlePercent;
+
+        // let timeSpan = dateNow - printer.dateAdded;
+        // let percentUp = printer.currentUptime / timeSpan * 100;
+        // percentUp = percentUp.toFixed(2)+"%"
+
 
         let storageFree = [];
         let storageTotal = [];
@@ -496,7 +470,7 @@ class StatisticsCollection {
             }
         });
 
-        let uniqueDevices = _.uniqBy(devices, "ip");
+        let uniqueDevices = _.uniqBy(devices, "printerURL");
 
         uniqueDevices.forEach(device => {
             storageFree.push(device.storage.free);
@@ -511,9 +485,6 @@ class StatisticsCollection {
         octofarmStatistics.storagePercent = Math.floor(
             (octofarmStatistics.storageUsed / storageTotalTotal) * 100
         );
-
-        octofarmStatistics.largestFile = Math.max(...fileSizes);
-        octofarmStatistics.smallestFile = Math.min(...fileSizes);
 
         farmStats[0].octofarmStatistics = octofarmStatistics;
     }
@@ -680,8 +651,6 @@ class StatisticsCollection {
             storageUsed: 0,
             storagePercent: 0,
             storageRemain: 0,
-            largestFile: 0,
-            smallestFile: 0
         };
         return octofarmStatistics;
     }
