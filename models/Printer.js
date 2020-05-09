@@ -1,6 +1,14 @@
 const mongoose = require("mongoose");
 
 const PrinterSchema = new mongoose.Schema({
+  dateAdded: {
+    type: Number,
+    required: false,
+  },
+  currentUptime:{
+    type: Number,
+    required: false,
+  },
   sortIndex: {
     type: Number,
     required: false
