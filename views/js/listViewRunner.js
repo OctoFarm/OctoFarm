@@ -5,6 +5,7 @@ import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
 import {parse} from "./vendor/flatted.js";
 import tableSort from "./lib/functions/tablesort.js";
+import Validate from "./lib/functions/validate.js";
 window.onload = function () {tableSort.makeAllSortable();};
 
 let printerInfo = [];
@@ -86,16 +87,7 @@ printerCard.forEach(card => {
     .getElementById("listCancel-" + ca[1])
     .addEventListener("click", e => {
       let printer = returnPrinterInfo(ca[1]);
-      let name = "";
-      if (typeof printer.settingsAppearance != "undefined") {
-        if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
-          name = printer.printerURL;
-        } else {
-          name = printer.settingsAppearance.name;
-        }
-      } else {
-        name = printer.printerURL;
-      }
+      let name = Validate.getName(printer)
       bootbox.confirm({
         message: `${name}: <br>Are you sure you want to cancel the ongoing print?`,
         buttons: {
