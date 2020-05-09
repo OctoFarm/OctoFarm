@@ -432,6 +432,7 @@ class StatisticsCollection {
 
         let activeTime = activeTimeTotle.reduce((a, b) => a + b, 0);
         let idleTime  =  dateNow - farmStats[0].farmStart.getTime();
+        idleTime = idleTime * farmPrinters.length
         let totalHours = activeTime + idleTime;
         octofarmStatistics.activeHours = activeTime;
         octofarmStatistics.idleHours = idleTime;
