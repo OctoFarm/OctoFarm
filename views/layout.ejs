@@ -52,25 +52,30 @@
                 Camera View</a>
             </li>
             <li class="nav-item">
-            <a class="d-none text-light text-center btn-sm" id="menucurrentOperationsView" href="/mon/currentOp"><i class="fas fa-star"></i>
+            <a class="nav-link text-light d-none text-center btn-sm" id="menucurrentOperationsView" href="/mon/currentOp"><i class="fas fa-star"></i>
                 Current Operations View</a>
-            </li>
-            <li class="nav-item">
-                    <a class="d-none d-sm-none d-md-none d-lg-block nav-link" href="/filemanager" id="fileManagerBtn">
-                        <i class="fas fa-folder-open"></i> File Manager
-                    </a>
-            </li>
-            <li class="nav-item">
-                    <a class="nav-link text-center" href="/history" id="historyBtn">
-                        <i class="fas fa-history"></i> History
-                    </a>
-            </li>
-            <li class="nav-item">
-                   <a class="nav-link text-center" href="#" data-toggle="modal"
-                                 data-target="#filamentModal" id=""><i class="fas fa-toilet-paper"></i> Filament</a>
             </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
+            <li id="menuPrinters">
+                <a class="nav-link text-center" href="/printers">
+                    <i class="fas fa-print"></i> Printers
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="d-none d-sm-none d-md-none d-lg-block nav-link" href="/filemanager" id="fileManagerBtn">
+                    <i class="fas fa-folder-open"></i> File Manager
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-center" href="/history" id="historyBtn">
+                    <i class="fas fa-history"></i> History
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link text-center" href="#" data-toggle="modal"
+                   data-target="#filamentModal" id=""><i class="fas fa-toilet-paper"></i> Filament</a>
+            </li>
             <li class="nav-item dropdown">
                 <% if(typeof name != 'undefined'){ %>
                 <a class="nav-link" href="#" id="systemDropDown" role="button" data-toggle="dropdown"
@@ -98,7 +103,7 @@
                         Server</a>
                 <% }%>
                 <% if(typeof userGroup != "undefined" && userGroup === "Administrator"){ %>
-                    <a class="dropdown-item  text-center  text-light" href="#" data-toggle="modal"
+                    <a class="dropdown-item d-none text-center  text-light" href="#" data-toggle="modal"
                        data-target="#alertsModal" id="alertsModalBtn"><i class="far fa-bell"></i>
                         Alerts</a>
                 <% }%>
@@ -454,6 +459,12 @@
                     <div class="container-fluid">
                         <div class="row">
                             <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+<!--                                <div id="systemChartMemory"></div>-->
+<!--                                <div id="systemChartCPU" ></div>-->
+
+                                <i class="fas fa-hourglass"></i> Uptime: <span id="systemUpdate" style="font-size:0.8rem;">
+
+                                </span>
                                 <p class="font-weight-bold">WebSocket Throttle</p>
                                 <p>You may be trying to run OctoFarm/OctoPrint on a potato, which I've no aversion too but the CPU on the potato might not like it. If you find that to be the case then please increase the throttle amount.</p>
                                 <p>Currently the OctoPrint client will send a message every 500ms, so the server will process at that rate.</p>
@@ -719,6 +730,7 @@
                 <div class="modal-body">
                     <div class="container-fluid">
                         <div class="row">
+
 
                             <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
                                 <div class="tab-content" id="nav-tabContent">
