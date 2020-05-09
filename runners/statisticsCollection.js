@@ -423,40 +423,20 @@ class StatisticsCollection {
 
     static async octofarmStatistics(farmPrinters) {
         let octofarmStatistics = await this.blankFarmStatistics();
+        let activeTimeTotal = [];
+        let idleTimeTotal = [];
         let dateNow = new Date();
         dateNow = dateNow.getTime();
-        let activeTimeTotle = [];
         farmPrinters.forEach(printer => {
-            activeTimeTotle.push(printer.currentUptime);
+            let timeSpan = dateNow - printer.dateAdded;
+            activeTimeTotal.push(printer.currentUptime);
+            idleTimeTotal.push(timeSpan - printer.currentUptime)
         })
-        let offline = []
-        farmPrinters.forEach(printer => {
-            if (typeof printer.stateColour != "undefined") {
-                if (printer.stateColour.category === "Idle") {
-                    offline.push(printer._id);
-                }
-                if (
-                    printer.stateColour.category === "Offline"
-                ) {
-                    offline.push(printer._id);
-                }
-                if (
-                    printer.stateColour.category === "Disconnected"
-                ) {
-                    offline.push(printer._id);
-                }
-                if (
-                    printer.stateColour.category === "Complete"
-                ) {
-                    offline.push(printer._id);
-                }
 
-            }
-        })
-        let activeTime = activeTimeTotle.reduce((a, b) => a + b, 0);
-        let idleTime  =  dateNow - farmStats[0].farmStart.getTime();
+        let activeTime = activeTimeTotal.reduce((a, b) => a + b, 0);
 
-        idleTime = idleTime * offline.length
+        let idleTime  = idleTimeTotal.reduce((a, b) => a + b, 0);
+
         let totalHours = activeTime + idleTime;
         octofarmStatistics.activeHours = activeTime;
         octofarmStatistics.idleHours = idleTime;
