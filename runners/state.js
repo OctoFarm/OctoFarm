@@ -54,8 +54,6 @@ const heartBeatInterval = setInterval(function ping() {
             client.ws.isAlive = false;
             client.ws.instance.ping(noop);
         }
-
-
     });
 }, 300000);
 
@@ -280,6 +278,9 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
         }
         farmPrinters[this.index].state = data.current.state.text;
         farmPrinters[this.index].stateColour = Runner.getColour(data.current.state.text);
+        if(farmPrinters[this.index].stateColour.category === "Active"){
+            Runner.uptimeCount(this.index)
+        }
         farmPrinters[this.index].stateDescription = "Current Status from OctoPrint";
 
         if (typeof data.current.progress !== 'undefined') {
@@ -295,10 +296,10 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
         if (typeof data.current.logs != undefined) {
             farmPrinters[this.index].logs = data.current.logs;
         }
-        //console.log(data.current.temps);
-        if (data.current.temps.length !== 0) {
-            farmPrinters[this.index].temps = data.current.temps;
-            // /console.log(farmPrinters[1].temps);
+        if (typeof data.current.temps !== 'undefined' && data.current.temps.length !== 0) {
+            if(typeof data.current.temps[0].tool0 !== 'undefined'){
+                farmPrinters[this.index].temps = data.current.temps;
+            }
         }
         if (
             data.current.progress.completion != null &&
@@ -550,6 +551,14 @@ class Runner {
         farmPrinters[i].hostDescription = "Setting up your Printer";
         farmPrinters[i].webSocketDescription = "Websocket is Offline";
         farmPrinters[i].stepRate = 10;
+        if(typeof farmPrinters[i].dateAdded === "undefined"){
+            let currentTime = new Date();
+            currentTime = currentTime.getTime();
+            farmPrinters[i].dateAdded = currentTime;
+        }
+        if(typeof farmPrinters[i].currentUptime === "undefined"){
+            farmPrinters[i].currentUptime = 0;
+        }
         if (typeof farmPrinters[i].octoPrintVersion === "undefined") {
             farmPrinters[i].octoPrintVersion = "";
         }
@@ -595,6 +604,8 @@ class Runner {
         printer.flowRate = farmPrinters[i].flowRate;
         printer.sortIndex = farmPrinters[i].sortIndex;
         printer.tempTriggers = farmPrinters[i].tempTriggers;
+        printer.dateAdded = farmPrinters[i].dateAdded;
+        printer.currentUptime = farmPrinters[i].currentUptime;
         await printer.save();
         return true;
     }
@@ -640,11 +651,18 @@ class Runner {
             logger.info("Modified current group for: " + farmPrinters[i].printerURL);
             await farmPrinters[index].save();
             edited.push({ printerURL: farmPrinters[index].printerURL });
-            await this.reScanOcto(farmPrinters[index]._id);
+            await this.reScanOcto(farmPrinters[index]._id, true);
         }
 
         logger.info("Re-Scanning printers farm");
         return edited;
+    }
+    static async uptimeCount(index){
+        let printer = await Printers.findById(farmPrinters[index]._id);
+        farmPrinters[index].currentUptime = farmPrinters[index].currentUptime + 500;
+        printer.currentUptime = farmPrinters[index].currentUptime;
+        printer.markModified("currentUptime");
+        printer.save();
     }
     static async removePrinter(indexs) {
         logger.info("Pausing runners to remove printer...");
@@ -669,7 +687,7 @@ class Runner {
         return removed;
     }
 
-    static async reScanOcto(id) {
+    static async reScanOcto(id, skipAPI) {
         let index = _.findIndex(farmPrinters, function(o) { return o._id == id; });
         let result = {
             status: null,
@@ -688,7 +706,7 @@ class Runner {
             await farmPrinters[index].ws.instance.close();
             logger.info("Closed websocket connection for: " + farmPrinters[index].printerURL);
         }
-        await this.setupWebSocket(farmPrinters[index]._id, true);
+        await this.setupWebSocket(farmPrinters[index]._id, skipAPI);
         result.status = "sucess",
             result.msg = "Your client has been re-synced!"
         return result;
@@ -1071,7 +1089,7 @@ class Runner {
         //Keeping just in case but shouldn't be required...
         // static async selectFilament(i, filament) {
         //   farmPrinters[i].selectedFilament = filament;
-        //   let printer = await Printers.findOne({ index: i });
+        //   let printer = await Dashboard.findOne({ index: i });
         //   printer.selectedFilament = farmPrinters[i].selectedFilament;
         //   printer.save();
         // }

@@ -104,6 +104,8 @@ setInterval(async function() {
       settingsFolder: printers[i].settingsFolder,
       settingsSerial: printers[i].settingsSerial,
       settingsServer: printers[i].settingsServer,
+      currentUptime: printers[i].currentUptime,
+      dateAdded: printers[i].dateAdded,
     };
     printerInfo.push(printer);
   }
@@ -134,6 +136,7 @@ setInterval(async function() {
     printerInfo: printerInfo,
     currentOperations: currentOperations,
     currentOperationsCount: currentOperationsCount,
+    octofarmStatistics: octofarmStatistics,
     farmInfo: farmInfo,
     heatMap: heatMap,
     systemInfo: sysInfo,
