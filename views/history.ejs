@@ -116,30 +116,6 @@
 </div>
 
 <% }else{ %>
-
-<div class="row mt-5">
-  <div class="col-md-6 m-auto">
-    <div class="card card-body text-center">
-      <h1>Welcome to OctoFarm</h1>
-      <p>
-        The all in one monitoring solution for multiple Octoprint instances.
-      </p>
-      <h1><img src="images/logo.png" /></h1>
-      <p>
-        Thank you for creating an account <% if(typeof name != 'undefined'){ %>
-        <%= name %> <% }%>. To get started though, we need some printers in your
-        farm!
-      </p>
-      <a
-        href="#"
-        class="btn btn-primary btn-block mb-2"
-        href="#"
-        data-toggle="modal"
-        data-target="#printerSetupModal"
-        >Setup Printers</a
-      >
-    </div>
-  </div>
-</div>
+  <%- include('./addPrinters.ejs') %>
 <% } %>
 <script src="/js/lib/modules/history.js" type="module"></script>
