@@ -76,6 +76,40 @@ router.get("/dashboard", ensureAuthenticated, async(req, res) => {
         clientSettings: clientSettings
     });
 });
+router.get("/printers", ensureAuthenticated, async(req, res) => {
+    let printers = await Runner.returnFarmPrinters();
+    let sortedPrinters = await Runner.sortedIndex();
+    const farmStatistics = require("../runners/statisticsCollection.js");
+    const FarmStatistics = farmStatistics.StatisticsCollection;
+    let statistics = await FarmStatistics.returnStats();
+    const system = require("../runners/systemInfo.js");
+    const SystemRunner = system.SystemRunner;
+    let systemInformation = await SystemRunner.returnInfo();
+    let filament = await Filament.find({});
+    let clientSettings = await ClientSettings.find({});
+    let user = null;
+    let group = null;
+    if (serverConfig.loginRequired === false) {
+        user = "No User";
+        group = "Administrator";
+    } else {
+        user = req.user.name;
+        group = req.user.group;
+    }
+    res.render("printerManagement", {
+        name: user,
+        userGroup: group,
+        version: version,
+        sortedIndex: sortedPrinters,
+        printers: printers,
+        page: "Dashboard",
+        printerCount: printers.length,
+        helpers: prettyHelpers,
+        systemInfo: systemInformation,
+        filament: filament,
+        clientSettings: clientSettings
+    });
+});
 //File Manager Page
 router.get("/filemanager", ensureAuthenticated, async(req, res) => {
     let printers = await Runner.returnFarmPrinters();
