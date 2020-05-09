@@ -9,35 +9,30 @@ All notable changes to this project will be documented in this file.
 ### Added
     - Printer Control Manager now allows for switching of printers on the fly from the modal. No need to close and re-open. 
     - Historical collection for Farm Statistics, now gathers up to 1 hours of live data. (Temperature). Resets on server restart. 
-    - Added loading status to all dashboard  graphs and data. 
+    - Added loading status to all dashboard graphs and data. 
     - Activity heatmap for the last 7 days - Calculates a percentage of activity per printers in that state for the whole day, calculation will happen all day then save the final days value. 
     - Added check for if printers exist on dashboard load, note tells you to add some.
     - Added new Patreon member EIPS to About page. 
-    - Tool tip explanations for states on dashboard. Host, Printer and Websockets. 
+    - Tool tip explanations for states on Printers Page. Host, Printer and Websockets. 
     - New state when printer fresh on the farm, "Setting Up" Whilst awaiting for scanner to finish with other printers. Hits searching state straight after.
     - Tool tip explanations for dashboard Action buttons, and Printer Management setup buttons, camera view, panel view and list view and current operations.
     - Any table headers are now clickable and can be sorted by the text below. This includes, Printer Management, Filament List, List View, History. Hovering will display a sort icon to indicate can be sorted.
-    - Sort Index is now viewable on dashboard, will auto update after moving a printer into a new sort index.
+    - Sort Index is now viewable on Printer List, will auto update after moving a printer into a new sort index.
     - Note to README regarding thanks to JetBrains for use of their IDE.
-    - Printer Settings Modal with the following sections: 
-        - Connection: Anything relating to OctoPrints connection to your printer. 
-        - Profile: Anything relating to your OctoPrints default profile selection. 
-        - Alerts: 
-        - Power: 
-        - GCode Scripts: Same as previous implementation allows editing gcode scripts. 
-        - Other Settings: Anything that doesn't fit in the above categories, currently just camera settings. 
     - New dependancy "requests" Required for API calls to user endpoints. 
+    - New heat type graphs, Printer Status, Printer Progress, Printer Temps, Printer Utilisation. - Will be adding a key in next version. 
+    - Farm Utilisation back and updates live with active printers. 
+    - Current Status bar graph. 
+    - Current Utilisation graph. 
     
 ### Changed
     - Printer web button does not disable when offline
     - Printer re-sync now detroys any established connection and re-sets up the specific printer fresh regardless of state..
     - Uploads done on the Printer Control modal are now not dependant on the status you can check the status by viewing the printer. A complete notification will be done whe the file has been uploaded. 
     - Current upload count no longer uses the +/- mechanism, it counts the uploads and displays the current amount found.
-    - Moved system information to the right hand side of the screen. 
-    - System information is now a donut chart
     - New farm status graphs for Temp. Shows Actual and Targets for global tool and bed temperatures with a status at top for total farm temperature. 
-    - Table headers fixed for "Actions" on Printer Management
-    - Dashboard list has changed to scroll with page. The full list is loaded rather than constraining to a specific height. 
+    - Dashboard printer list now moved to it's own page Printers. 
+    - Printer list has changed to scroll with page. The full list is loaded rather than constraining to a specific height. 
     - View pages no longer inside dropdown
     - Editing printers only re-scans the currently edited set. 
     - Path now shows on hover in printer manager & list view. Panel and Camera will take some time due to wrappers overlaying the tag...
@@ -45,16 +40,18 @@ All notable changes to this project will be documented in this file.
     - Changed up the farm Status styling to more match inline with OctoFarm colours
     - All views inc... Printer Control now truncate names to not overflow, add "..." to the end of the string to state it has been truncated. 
     - All views inc... Printer Control now display the full path when hovering over file name.
+    - Re-Sync does a full sync of octoprint again. 
     
 ### Removed
     - Pointless space wasting footers on dashboard
+    - CPU Stats from main page. 
 
 ### Fixed
     - Printer Camera in printer mananger now displays correct placeholder when no URL detected. Placeholder updated for new URL system. 
     - Added in websocket Ping/Pong which will fire every 30 seconds to check the connection is still alive
     - Fixed annoying browser console output warning of multiple similar id's
     - Fixed saying "Done" when 0 seconds was detected.
-    - Fixed issue with history not grabbing relevant job information due to OctoPrint sending undefined information at odd times. Added checks for progress and currentZ too. 
+    - Fixed issue with history not grabbing relevant job information due to OctoPrint sending null information when prints started without the gcode calculation running. Added checks for progress and currentZ too. 
     - Fixed issue with startup trying to grab currentOp/statistics too fast causing errors. 
     - Fixed logs not been deleted
     - Fixed circular structure errors with moving over to Flatted library for JSON stringify/parse.
@@ -63,6 +60,7 @@ All notable changes to this project will be documented in this file.
     - Fixed gap in top of list view header when scrolled
     - Fixed error with history page not displaying job information on view
     - Fixed incorrect re-direct to login/registration pages when either is disbaled. Login disabled will re-direct straight to the dashboard now. 
+    - Fixed issues with pages loading with no printers. 
     
 ## [v1.1.4.9-dev-1]
 
