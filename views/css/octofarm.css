@@ -1,8 +1,44 @@
 /*MAIN OVERRIDES*/
 html {
   height: 100%;
+  font-size: 0.1rem;
 }
-
+@media (min-width: 576px) {
+  html { font-size: 0.3rem; }
+}
+@media (min-width: 768px) {
+  html { font-size: 0.5rem; }
+}
+@media (min-width: 992px) {
+  html { font-size: 0.7rem; }
+}
+@media (min-width: 1200px) {
+  html { font-size: 1rem; }
+}
+.heatMapRight {
+  width:19px;
+  height:40px;
+  margin-right:1px;
+  margin-top:1px;
+  margin-bottom:1px;
+  border: 1px solid black;
+}
+.heatMapLeft {
+  width:19px;
+  height:40px;
+  margin-left:1px;
+  margin-bottom:1px;
+  margin-top:1px;
+  border: 1px solid black;
+}
+.heatMap {
+  width:40px;
+  height:40px;
+  margin-left:1px;
+  margin-bottom:1px;
+  margin-top:1px;
+  border: 1px solid black;
+}
 body {
   background-color: black;
   background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
@@ -69,6 +105,23 @@ li {
 .Complete {
   background-color: #00330e;
 }
+
+.tempCool {
+  background-color: cyan;
+}
+.tempCooling {
+  background-color: darkBlue;
+}
+.tempActive {
+  background-color: orange;
+}
+.tempSuccess {
+  background-color: green;
+}
+.tempOffline {
+  background-color: #e74c3c;
+}
+
 .MultiSelected {
   background-color: black;
   color: green;
@@ -95,7 +148,7 @@ li {
 .table-fixed thead th {
   position: sticky;
   position: -webkit-sticky;
-  top: 100;
+  top: 100px;
   z-index: 999;
   background-color: #000;
   color: #fff;
