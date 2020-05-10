@@ -2,18 +2,18 @@
 
 <div
   class="col-sm-12 col-md-4 col-lg-3 col-xl-2 hidden"
-  id="panelInstance-<%= printers[sorted.actualIndex]._id %>"
+  id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
 >
   <%}else if(printers[sorted.actualIndex].state === "Disconnected" &&
   clientSettings[0].panelView.hideClosed){%>
   <div
     class="col-sm-12 col-md-4 col-lg-3 col-xl-2 hidden"
-    id="panelInstance-<%= printers[sorted.actualIndex]._id %>"
+    id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
   >
     <%} else { %>
       <div
         class="col-sm-12 col-md-4 col-lg-3 col-xl-2"
-        id="panelInstance-<%= printers[sorted.actualIndex]._id %>"
+        id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
       >
         <%}%>
         <% let flipH = ""; %> <% let flipV = ""; %> <% let rotate90 = "";

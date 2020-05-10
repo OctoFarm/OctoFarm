@@ -116,7 +116,7 @@ function grabElements(printer) {
     return elems[printer._id];
   } else {
     let printerElemens = {
-      row: document.getElementById("listRow-" + printer._id),
+      row: document.getElementById("viewPanel-" + printer._id),
       index: document.getElementById("listIndex-" + printer._id),
       name: document.getElementById("listName-" + printer._id),
       control: document.getElementById("printerButton-" + printer._id),

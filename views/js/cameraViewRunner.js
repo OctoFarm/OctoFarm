@@ -138,7 +138,7 @@ function grabElements(printer) {
         return elems[printer._id];
     } else {
         let printerElemens = {
-            row: document.getElementById("camPanel-" + printer._id),
+            row: document.getElementById("viewPanel-" + printer._id),
             name: document.getElementById("camPrinterName-" + printer._id),
             control: document.getElementById("printerButton-" + printer._id),
             start: document.getElementById("camStart-" + printer._id),

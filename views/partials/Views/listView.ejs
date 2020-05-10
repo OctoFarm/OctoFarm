@@ -2,7 +2,7 @@
 === "Offline" && clientSettings[0].listView.hideOff){%>
 <tr
   class="<%= printers[sorted.actualIndex].stateColour.category %> hidden"
-  id="listRow-<%= printers[sorted.actualIndex]._id %>"
+  id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
 >
   <%}else if(printers[sorted.actualIndex].state === "Disconnected" &&
   clientSettings[0].listView.hideClosed){%>
@@ -10,14 +10,14 @@
 
 <tr
   class="<%= printers[sorted.actualIndex].stateColour.category %> hidden"
-  id="listRow-<%= printers[sorted.actualIndex]._id %>"
+  id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
 >
   <%}else{%>
 </tr>
 
 <tr
   class="<%= printers[sorted.actualIndex].stateColour.category %>"
-  id="listRow-<%= printers[sorted.actualIndex]._id %>"
+  id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
 >
   <%}%>
   <% let name = "";%>

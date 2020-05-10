@@ -654,6 +654,7 @@ class dashUpdate {
         let avgElapsed = document.getElementById("avgElapsed")
         avgElapsed.style.width = elapsedProgress.toFixed(2)+"%";
         avgElapsed.innerHTML = elapsedProgress.toFixed(2)+"%"
+
         let totalTime = farmInfo.totalRemainingTime + farmInfo.totalElapsedTime
         let remaningCumProgress = farmInfo.totalRemainingTime / totalTime * 100;
         let elapsedCumProgress =  farmInfo.totalElapsedTime / totalTime * 100;

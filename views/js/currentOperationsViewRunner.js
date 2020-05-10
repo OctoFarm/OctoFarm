@@ -48,7 +48,7 @@ let currentHarvest = document.querySelectorAll("[id^='currentHarvest-']");
 currentHarvest.forEach(harvest => {
     harvest.addEventListener("click", e => {
         let id = harvest.id.split("-");
-        document.getElementById("currentOperationsBody-" +id[1]).style.display = "none";
+        document.getElementById("viewPanel-" +id[1]).style.display = "none";
         resetFile(id[1]);
     })
 })
@@ -109,7 +109,7 @@ function currentOperationsView(
         let restartPrint = `<button id='restartCurrentPrint-${current.index}' type='button' title="Restart your current selected print" class='tag btn btn-warning btn-sm mt-0 pt-0 pb-0'>Restart Print</button>`
         //check if exists, create if not....
         if (document.getElementById("currentOpCard-" + current.index)) {
-            document.getElementById("currentOperationsBody-" + current.index).style.display = "inline-block";
+            document.getElementById("viewPanel-" + current.index).style.display = "inline-block";
             if(current.progress === 100){
                 document.getElementById("finishedPrint-"+current.index).classList.remove("d-none");
                 document.getElementById("futureDate-"+current.index).classList.add("d-none");
@@ -135,7 +135,7 @@ function currentOperationsView(
             document.getElementById("currentOperationsBody").insertAdjacentHTML(
                 "beforeend",
                 `
-            <div class="col-2 pt-0 pb-0" id="currentOperationsBody-${current.index}">
+            <div class="col-2 pt-0 pb-0" id="viewPanel-${current.index}">
                 <div id="currentOpCard-${current.index}"
                 class="card card-block text-white bg-secondary d-inline-block"
                  style="width:100%;"
@@ -194,7 +194,7 @@ function currentOperationsView(
         });
         let remove = _.difference(cards, curr);
         remove.forEach(rem => {
-            document.getElementById("currentOperationsBody-" + rem).style.display = "none";
+            document.getElementById("viewPanel-" + rem).style.display = "none";
         });
     });
 }

@@ -89,7 +89,7 @@
 </div>
 <div class="row" id="currentOperationsBody">
   <% currentOperations.forEach(current => { %>
-  <div class="col-2 pt-0 pb-0" id="currentOperationsBody-<%=current.index%>">
+  <div class="col-2 pt-0 pb-0" id="viewPanel-<%=current.index%>">
     <% if(current != null){ %>
       <% let currentDate = new Date(); %>
       <% currentDate = currentDate.getTime(); %>
