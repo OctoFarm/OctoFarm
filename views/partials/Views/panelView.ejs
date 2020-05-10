@@ -120,16 +120,17 @@
             <% } %>
           </div>
           <div class="card-body pt-1 pb-0 pl-2 pr-2">
+            <button
+                    id="panFileName-<%= printers[sorted.actualIndex]._id %>"
+                    type="button"
+                    class="tag btn btn-block btn-secondary mb-0 text-truncate btn-sm"
+                    role="button"
+                    title="Loading..."
+                    disabled
+            >
             <% if(typeof printers[sorted.actualIndex].job != 'undefined' &&
                     typeof printers[sorted.actualIndex].job.file != 'undefined'){ %>
-            <button
-              id="panFileName-<%= printers[sorted.actualIndex]._id %>"
-              type="button"
-              class="tag btn btn-block btn-secondary mb-0 text-truncate btn-sm"
-              role="button"
-              title="Loading..."
-              disabled
-            ><i class="fas fa-file-code"></i> Loading...<%}else{%>
+                <i class="fas fa-file-code"></i> Loading...<%}else{%>
                 <i class="fas fa-file-code" ></i> No File Selected <%}%>
             </button>
             <% let camURL = ""; %> <% if(printers[sorted.actualIndex].camURL !=
