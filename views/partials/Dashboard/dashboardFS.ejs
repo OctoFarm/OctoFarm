@@ -1,13 +1,16 @@
 <p class="mb-2">
       <span id="currentPrinterCount"
-      ><i class="fas fa-square"></i> <b>Printers </b>
+      ><i class="fas fa-square"></i> <b>Printers </b></span>
 </p>
 <p class="mb-0 mt-1">
       <span id="activeHours"
       ><i class="fas fa-square text-success"></i> <b>Active Hours: </b> Loading...</span>
       <br>
-      <span id="idleHours"
-      ><i class="fas fa-square text-danger"></i> <b>Idle Hours: </b> Loading...</span>
+      <span id="failedHours"
+      ><i class="fas fa-square text-danger"></i> <b>Failed Hours: </b> Loading...</span>
+    <br>
+    <span id="idleHours"
+    ><i class="fas fa-square text-secondary"></i> <b>Idle Hours: </b> Loading...</span>
 </p>
     <center>
       <div class="progress mt-0 mb-2">
@@ -22,9 +25,20 @@
         >
          0%
         </div>
+          <div
+                  id="failedProgress"
+                  class="progress-bar progress-bar-striped bg-danger"
+                  role="progressbar"
+                  style="width: 0% "
+                  aria-valuenow="0%"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+          >
+              0%
+          </div>
         <div
           id="idleProgress"
-          class="progress-bar progress-bar-striped bg-danger"
+          class="progress-bar progress-bar-striped bg-secondary"
           role="progressbar"
           style="width: 0% "
           aria-valuenow="0%"
@@ -37,7 +51,7 @@
     </center>
 <p class="mb-2 mt-1">
       <span id=""
-      ><i class="fas fa-square"></i> <b>Storage </b>
+      ><i class="fas fa-square"></i> <b>Storage </b></span>
 </p>
     <p class="mb-0">
               <span id="usedStorage"

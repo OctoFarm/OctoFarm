@@ -822,13 +822,19 @@ class dashUpdate {
         let activeHours = document.getElementById("activeHours")
         activeHours.innerHTML = "<i class=\"fas fa-square text-success\"></i> <b>Active: </b> " + Calc.generateTime(stats.activeHours / 1000)
         let idleHours = document.getElementById("idleHours")
-        idleHours.innerHTML = '<i class="fas fa-square text-danger"></i> <b>Idle Hours: </b> ' + Calc.generateTime(stats.idleHours / 1000)
+        idleHours.innerHTML = '<i class="fas fa-square text-secondary"></i> <b>Idle Hours: </b> ' + Calc.generateTime(stats.idleHours / 1000)
+        let failedHours = document.getElementById("failedHours")
+        failedHours.innerHTML = '<i class="fas fa-square text-danger"></i> <b>Failed Hours: </b>' +  Calc.generateTime(stats.downHours / 1000)
         let activeProgress = document.getElementById("activeProgress")
         activeProgress.style.width = stats.activePercent+"%";
         activeProgress.innerHTML = stats.activePercent+"%"
         let idleProgress = document.getElementById("idleProgress")
         idleProgress.style.width = stats.idlePercent+"%";
         idleProgress.innerHTML = stats.idlePercent+"%"
+        let failedProgress = document.getElementById("failedProgress")
+        failedProgress.style.width = stats.downPercent+"%";
+        failedProgress.innerHTML = stats.downPercent+"%"
+
 
         let usedStorage = document.getElementById("usedStorage")
         let availableStorage = document.getElementById("availableStorage")

@@ -423,9 +423,20 @@ class StatisticsCollection {
 
     static async octofarmStatistics(farmPrinters) {
         let octofarmStatistics = await this.blankFarmStatistics();
+        let currentHistory = await History.find({});
         let activeTimeTotal = [];
         let idleTimeTotal = [];
         let dateNow = new Date();
+
+
+        let failedTimeTotal = []
+        currentHistory.forEach(history => {
+            if(history.printHistory.success === false) {
+                failedTimeTotal.push(history.printHistory.printTime)
+            }
+        })
+
+
         dateNow = dateNow.getTime();
         farmPrinters.forEach(printer => {
             let timeSpan = dateNow - printer.dateAdded;
@@ -437,16 +448,25 @@ class StatisticsCollection {
 
         let idleTime  = idleTimeTotal.reduce((a, b) => a + b, 0);
 
-        let totalHours = activeTime + idleTime;
+        let downTime  = failedTimeTotal.reduce((a, b) => a + b, 0);
+        //downTime to miliseconds
+        downTime = downTime * 1000;
+
+        let totalHours = activeTime + idleTime + downTime;
         octofarmStatistics.activeHours = activeTime;
         octofarmStatistics.idleHours = idleTime;
+        octofarmStatistics.downHours = downTime;
         let activePercent = activeTime / totalHours * 100;
         let idlePercent = idleTime / totalHours * 100;
+        let downPercent = downTime / totalHours * 100;
         activePercent = activePercent.toFixed(2);
         idlePercent = idlePercent.toFixed(2);
+        downPercent = downPercent.toFixed(2);
+        console.log(downPercent)
 
         octofarmStatistics.activePercent = activePercent;
         octofarmStatistics.idlePercent = idlePercent;
+        octofarmStatistics.downPercent = downPercent;
 
         // let timeSpan = dateNow - printer.dateAdded;
         // let percentUp = printer.currentUptime / timeSpan * 100;
