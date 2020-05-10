@@ -37,6 +37,7 @@ source.onclose = function(e) {
 let printers = [];
 let resetFile = function(id){
     let i = _.findIndex(printers, function(o) { return o._id == id; });
+
     OctoPrintClient.file(printers[i], printers[i].job.file.path, "load");
 }
 let rePrint = function(id){
@@ -47,6 +48,7 @@ let currentHarvest = document.querySelectorAll("[id^='currentHarvest-']");
 currentHarvest.forEach(harvest => {
     harvest.addEventListener("click", e => {
         let id = harvest.id.split("-");
+        document.getElementById("currentOperationsBody-" +id[1]).style.display = "none";
         resetFile(id[1]);
     })
 })
@@ -57,7 +59,7 @@ currentRestartPrint.forEach(harvest => {
         rePrint(id[1]);
     })
 })
-export default function currentOperationsView(
+function currentOperationsView(
     currentOperations,
     currentOperationsCount,
     printerInfo
@@ -66,7 +68,8 @@ export default function currentOperationsView(
     if(currentOperations.length === 0){
         let currentCards = document.querySelectorAll("[id^='currentOpCard-']");
         currentCards.forEach(card => {
-            card.remove();
+            let id = cardt.id.split("-");
+            console.log(id[1])
         })
     }
 
@@ -106,6 +109,7 @@ export default function currentOperationsView(
         let restartPrint = `<button id='restartCurrentPrint-${current.index}' type='button' title="Restart your current selected print" class='tag btn btn-warning btn-sm mt-0 pt-0 pb-0'>Restart Print</button>`
         //check if exists, create if not....
         if (document.getElementById("currentOpCard-" + current.index)) {
+            document.getElementById("currentOperationsBody-" + current.index).style.display = "inline-block";
             if(current.progress === 100){
                 document.getElementById("finishedPrint-"+current.index).classList.remove("d-none");
                 document.getElementById("futureDate-"+current.index).classList.add("d-none");
@@ -131,13 +135,14 @@ export default function currentOperationsView(
             document.getElementById("currentOperationsBody").insertAdjacentHTML(
                 "beforeend",
                 `
+            <div class="col-2 pt-0 pb-0" id="currentOperationsBody-${current.index}">
                 <div id="currentOpCard-${current.index}"
                 class="card card-block text-white bg-secondary d-inline-block"
-                style="min-width: 200px; max-width: 200px;"
+                 style="width:100%;"
               >
                   <div class="card-header pb-1 pt-1 pl-2 pr-2">
                      ${current.name}</div>
-                  <div class="card-body  pb-0 pt-2 pl-2 pr-2">
+                  <div class="card-body pb-0 pt-2 pl-2 pr-2 pb-1">
                   <h6 id="currentRestart-${current.index}" class="pb-0 text-center d-none" style="font-size:0.6rem;">${restartPrint}</h6>
                   <h6 id="currentTime-${
                     current.index
@@ -189,7 +194,7 @@ export default function currentOperationsView(
         });
         let remove = _.difference(cards, curr);
         remove.forEach(rem => {
-            document.getElementById("currentOpCard-" + rem).remove();
+            document.getElementById("currentOperationsBody-" + rem).style.display = "none";
         });
     });
 }
