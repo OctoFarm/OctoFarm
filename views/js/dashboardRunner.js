@@ -645,31 +645,24 @@ class dashUpdate {
         document.getElementById("cumElapsedTime").innerHTML = Calc.generateTime(
             farmInfo.totalElapsedTime
         );
-        let remaningProgress = farmInfo.avgRemainingTime / farmInfo.avgEstimateTime * 100;
-        let elapsedProgress =  farmInfo.avgElapsedTime / farmInfo.avgEstimateTime * 100;
-        let restProgress = 100 - elapsedProgress - remaningProgress;
+        let totalAvgTime = farmInfo.avgRemainingTime + farmInfo.avgElapsedTime
+        let remaningProgress = farmInfo.avgRemainingTime / totalAvgTime * 100;
+        let elapsedProgress =  farmInfo.avgElapsedTime / totalAvgTime * 100
         let avgRemainingProgress = document.getElementById("avgRemainingProgress")
         avgRemainingProgress.style.width = remaningProgress.toFixed(2)+"%";
         avgRemainingProgress.innerHTML = remaningProgress.toFixed(2)+"%"
         let avgElapsed = document.getElementById("avgElapsed")
         avgElapsed.style.width = elapsedProgress.toFixed(2)+"%";
         avgElapsed.innerHTML = elapsedProgress.toFixed(2)+"%"
-        let avgEstimateProgress = document.getElementById("avgEstimateProgress")
-        avgEstimateProgress.style.width = restProgress.toFixed(2) +"%";
-        avgEstimateProgress.innerHTML = restProgress.toFixed(2) +"%"
-
-        let remaningCumProgress = farmInfo.totalRemainingTime / farmInfo.totalEstimateTime * 100;
-        let elapsedCumProgress =  farmInfo.totalElapsedTime / farmInfo.totalEstimateTime * 100;
-        let restCumProgress = 100 - elapsedProgress - remaningProgress;
+        let totalTime = farmInfo.totalRemainingTime + farmInfo.totalElapsedTime
+        let remaningCumProgress = farmInfo.totalRemainingTime / totalTime * 100;
+        let elapsedCumProgress =  farmInfo.totalElapsedTime / totalTime * 100;
         let cumRemainingProgress = document.getElementById("cumRemainingProgress")
         cumRemainingProgress.style.width = remaningCumProgress.toFixed(2)+"%";
         cumRemainingProgress.innerHTML = remaningCumProgress.toFixed(2)+"%"
         let cumElapsed = document.getElementById("cumElapsed")
         cumElapsed.style.width = elapsedCumProgress.toFixed(2)+"%";
         cumElapsed.innerHTML = elapsedCumProgress.toFixed(2)+"%"
-        let cumEstimateProgress = document.getElementById("cumEstimateProgress")
-        cumEstimateProgress.style.width = restCumProgress.toFixed(2)+"%";
-        cumEstimateProgress.innerHTML = restCumProgress.toFixed(2)+"%"
 
 
 
