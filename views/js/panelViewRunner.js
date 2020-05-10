@@ -267,7 +267,7 @@ function updateState(printers, clientSettings) {
     //Set the state
     if (printer.stateColour.category === "Active") {
       if (printer.camURL != "") {
-        elements.row.className = "col-sm-12 col-md-4 col-lg-3 col-xl-2 " + d-none;
+        elements.row.className = "col-sm-12 col-md-4 col-lg-3 col-xl-2 " + dNone;
       }
       elements.control.disabled = false;
       elements.start.disabled = true;
@@ -381,7 +381,7 @@ function updateState(printers, clientSettings) {
       printer.stateColour.category === "Complete"
     ) {
       if (printer.camURL != "") {
-        elements.row.className = "col-sm-12 col-md-4 col-lg-3 col-xl-2 " + d-none;
+        elements.row.className = "col-sm-12 col-md-4 col-lg-3 col-xl-2 " + dNone;
       }
       elements.control.disabled = false;
       if (typeof printer.job != "undefined" && printer.job.file.name != null) {
@@ -496,7 +496,7 @@ function updateState(printers, clientSettings) {
     } else if (printer.state === "Disconnected") {
       if (printer.camURL != "") {
         elements.row.className =
-          "col-sm-12 col-md-4 col-lg-3 col-xl-2" + " " + hideClosed + " " + d-none;
+          "col-sm-12 col-md-4 col-lg-3 col-xl-2" + " " + hideClosed + " " + dNone;
       }
 
       elements.control.disabled = false;
@@ -512,7 +512,7 @@ function updateState(printers, clientSettings) {
     } else if (printer.stateColour.category === "Offline") {
       if (printer.camURL != "") {
         elements.row.className =
-          "col-sm-12 col-md-4 col-lg-3 col-xl-2" + " " + hideOffline + " " + d-none;
+          "col-sm-12 col-md-4 col-lg-3 col-xl-2" + " " + hideOffline + " " + dNone;
       }
 
       elements.control.disabled = true;

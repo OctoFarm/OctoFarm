@@ -60,7 +60,7 @@ let filterGroup = async function(selectedGroup){
     //Make sure all groups are visible
     let groupList = await OctoFarmclient.get("printers/groups");
     groupList = await groupList.json();
-    console.log(currentGroup)
+
     groupList.forEach(group => {
         if(selectedGroup != "All Printers"){
             if(selectedGroup == group.group){
