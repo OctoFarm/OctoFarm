@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [v1.1.4.9-dev-3]
+
+### Added
+  - Farm Utilisation chart on dashboard now calculates Failed Hours. These are the hours totaled registered from history that are set as success = false;
+  - Idle hours is now black on the farm key, red for failed and active is green.
+  - Keys and bar charts added to the Cumulative/Average times on the dashboard
+  - Keys added to the Printer Status, Printer Progress, Printer Temps and Printer Utilisation heat charts on dashboard.
+  - Current Operations View. Displays full screen the current operations bar. 
+    
+### Changed
+
+    
+### Removed
+
+
+### Fixed
+
+    
+
 ## [v1.1.4.9-dev-2.7]
 
 ### Added
