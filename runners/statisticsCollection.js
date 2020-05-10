@@ -462,7 +462,6 @@ class StatisticsCollection {
         activePercent = activePercent.toFixed(2);
         idlePercent = idlePercent.toFixed(2);
         downPercent = downPercent.toFixed(2);
-        console.log(downPercent)
 
         octofarmStatistics.activePercent = activePercent;
         octofarmStatistics.idlePercent = idlePercent;

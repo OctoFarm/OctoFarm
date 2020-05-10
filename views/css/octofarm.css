@@ -77,6 +77,9 @@ li {
 .textComplete {
   color: #006311;
 }
+.text-offline {
+  color: #401418;
+}
 .Idle {
   background-color: #262626;
 }
@@ -107,6 +110,9 @@ li {
 }
 .tempOffline {
   background-color: #e74c3c;
+}
+.bg-offline {
+  background-color: #401418;
 }
 
 .MultiSelected {

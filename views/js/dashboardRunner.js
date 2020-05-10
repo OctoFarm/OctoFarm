@@ -645,6 +645,35 @@ class dashUpdate {
         document.getElementById("cumElapsedTime").innerHTML = Calc.generateTime(
             farmInfo.totalElapsedTime
         );
+        let remaningProgress = farmInfo.avgRemainingTime / farmInfo.avgEstimateTime * 100;
+        let elapsedProgress =  farmInfo.avgElapsedTime / farmInfo.avgEstimateTime * 100;
+        let restProgress = 100 - elapsedProgress - remaningProgress;
+        let avgRemainingProgress = document.getElementById("avgRemainingProgress")
+        avgRemainingProgress.style.width = remaningProgress.toFixed(2)+"%";
+        avgRemainingProgress.innerHTML = remaningProgress.toFixed(2)+"%"
+        let avgElapsed = document.getElementById("avgElapsed")
+        avgElapsed.style.width = elapsedProgress.toFixed(2)+"%";
+        avgElapsed.innerHTML = elapsedProgress.toFixed(2)+"%"
+        let avgEstimateProgress = document.getElementById("avgEstimateProgress")
+        avgEstimateProgress.style.width = restProgress.toFixed(2) +"%";
+        avgEstimateProgress.innerHTML = restProgress.toFixed(2) +"%"
+
+        let remaningCumProgress = farmInfo.totalRemainingTime / farmInfo.totalEstimateTime * 100;
+        let elapsedCumProgress =  farmInfo.totalElapsedTime / farmInfo.totalEstimateTime * 100;
+        let restCumProgress = 100 - elapsedProgress - remaningProgress;
+        let cumRemainingProgress = document.getElementById("cumRemainingProgress")
+        cumRemainingProgress.style.width = remaningCumProgress.toFixed(2)+"%";
+        cumRemainingProgress.innerHTML = remaningCumProgress.toFixed(2)+"%"
+        let cumElapsed = document.getElementById("cumElapsed")
+        cumElapsed.style.width = elapsedCumProgress.toFixed(2)+"%";
+        cumElapsed.innerHTML = elapsedCumProgress.toFixed(2)+"%"
+        let cumEstimateProgress = document.getElementById("cumEstimateProgress")
+        cumEstimateProgress.style.width = restCumProgress.toFixed(2)+"%";
+        cumEstimateProgress.innerHTML = restCumProgress.toFixed(2)+"%"
+
+
+
+
         systemFarmTemp.updateSeries(farmInfo.temp);
         activityHeatChart.updateSeries(heatMap);
 
@@ -701,7 +730,7 @@ class dashUpdate {
             return "dark"
         } else if (progress < 25) {
             return "secondary"
-        } else if (progress > 25 && progress <= 50) {
+        } else if (progress >= 25 && progress <= 50) {
             return "primary"
         } else if (progress >= 50 && progress <= 75) {
             return "info"
@@ -742,6 +771,9 @@ class dashUpdate {
         printers.forEach(printer => {
             let status = printer.stateColour.category;
             let colour = printer.stateColour.name;
+            if(printer.stateColour.category === "Offline"){
+                colour = "offline"
+            }
             if(document.getElementById("printerStatus-"+printer._id)){
                 //Exists so just update the values
                 let eStatus = document.getElementById("printerStatus-"+printer._id)
@@ -818,7 +850,6 @@ class dashUpdate {
         }
     }
     static farmUtilisation(stats){
-        console.log(stats)
         let activeHours = document.getElementById("activeHours")
         activeHours.innerHTML = "<i class=\"fas fa-square text-success\"></i> <b>Active: </b> " + Calc.generateTime(stats.activeHours / 1000)
         let idleHours = document.getElementById("idleHours")
@@ -834,8 +865,6 @@ class dashUpdate {
         let failedProgress = document.getElementById("failedProgress")
         failedProgress.style.width = stats.downPercent+"%";
         failedProgress.innerHTML = stats.downPercent+"%"
-
-
         let usedStorage = document.getElementById("usedStorage")
         let availableStorage = document.getElementById("availableStorage")
         let usedProgress = document.getElementById("usedProgress")
