@@ -7,10 +7,10 @@ import {parse} from "./vendor/flatted.js";
 import tableSort from "./lib/functions/tablesort.js";
 import Validate from "./lib/functions/validate.js";
 window.onload = function () {tableSort.makeAllSortable();};
+import initGroupSelect from "./lib/modules/groupSelection.js";
 
 let printerInfo = [];
 let elems = [];
-
 //Connect to servers socket..webSocket
 let url = window.location.hostname;
 let port = window.location.port;
@@ -26,10 +26,15 @@ async function asyncParse(str) {
     return false;
   }
 }
+let groupInit = false;
 var source = new EventSource("/sse/monitoringInfo/");
 source.onmessage = async function(e) {
   if (e.data != null) {
     let res = await asyncParse(e.data);
+    if(groupInit === false){
+      initGroupSelect(res.printerInfo)
+      groupInit = true;
+    }
     if (res != false) {
       if (
           document.getElementById("printerManagerModal").classList.contains("show")
@@ -141,6 +146,9 @@ function grabElements(printer) {
   }
 }
 function updateState(printers, clientSettings) {
+  let currentGroup = document.getElementById("currentGroup").innerHTML;
+  currentGroup = currentGroup.replace("Selected: ", "").trim()
+
   printers.forEach(printer => {
     let elements = grabElements(printer);
     //Set the data
@@ -207,7 +215,13 @@ function updateState(printers, clientSettings) {
     }
     if (printer.stateColour.category === "Active") {
       //Set the state
-      elements.row.className = printer.stateColour.category;
+      if(elements.row.classList.contains(hideClosed)){
+        elements.row.classList.remove(hideClosed);
+      }
+      if(elements.row.classList.contains(hideOffline)){
+        elements.row.classList.remove(hideOffline);
+      }
+
       elements.control.disabled = false;
       elements.start.disabled = true;
       elements.stop.disabled = false;
@@ -294,7 +308,12 @@ function updateState(printers, clientSettings) {
       printer.stateColour.category === "Idle" ||
       printer.stateColour.category === "Complete"
     ) {
-      elements.row.className = printer.stateColour.category;
+      if(elements.row.classList.contains(hideClosed)){
+        elements.row.classList.remove(hideClosed);
+      }
+      if(elements.row.classList.contains(hideOffline)){
+        elements.row.classList.remove(hideOffline);
+      }
       elements.control.disabled = false;
       if (typeof printer.job != "undefined" && printer.job.file.name != null) {
         elements.start.disabled = false;
@@ -384,12 +403,16 @@ function updateState(printers, clientSettings) {
       }
 
     } else if (printer.state === "Disconnected") {
-      elements.row.className = printer.stateColour.category + " " + hideClosed;
+      if(hideClosed != ""){
+        elements.row.classList.add(hideClosed);
+      }
       elements.control.disabled = false;
       elements.start.disabled = true;
       elements.stop.disabled = true;
     } else if (printer.stateColour.category === "Offline") {
-      elements.row.className = printer.stateColour.category + " " + hideOffline;
+      if(hideOffline != ""){
+        elements.row.classList.add(hideOffline);
+      }
       elements.control.disabled = true;
       elements.start.disabled = true;
       elements.stop.disabled = true;

@@ -5,6 +5,7 @@ import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
 import doubleClickFullScreen from "./lib/functions/fullscreen.js";
 import { parse } from "./vendor/flatted.js";
+import initGroupSelect from "./lib/modules/groupSelection.js";
 
 let printerInfo = [];
 let elems = [];
@@ -25,9 +26,14 @@ async function asyncParse(str) {
     }
 }
 var source = new EventSource("/sse/monitoringInfo/");
+let groupInit = false;
 source.onmessage = async function(e) {
     if (e.data != null) {
         let res = await asyncParse(e.data);
+        if(groupInit === false){
+            initGroupSelect(res.printerInfo)
+            groupInit = true;
+        }
         if (res != false) {
             if (
                 document
@@ -205,10 +211,14 @@ function updateState(printers, clientSettings) {
         if (clientSettings.hideClosed) {
             hideClosed = "hidden";
         }
+        let dNone = ""
+        if(elements.row.classList.contains("d-none")){
+            dNone = "d-none"
+        }
         //Set the state
         if (printer.stateColour.category === "Active") {
             if (printer.camURL != "") {
-                elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows}`;
+                elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${d-none}`;
             }
 
             elements.control.disabled = false;
@@ -306,7 +316,7 @@ function updateState(printers, clientSettings) {
         ) {
             elements.control.disabled = false;
             if (printer.camURL != "") {
-                elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows}`;
+                elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${d-none}`;
             }
             if (typeof printer.job != "undefined" && printer.job.file.name != null) {
                 elements.start.disabled = false;
@@ -400,7 +410,7 @@ function updateState(printers, clientSettings) {
             }
         } else if (printer.state === "Disconnected") {
             if (printer.camURL != "") {
-                elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${hideClosed}`;
+                elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${hideClosed} ${d-none}`;
             }
             elements.control.disabled = false;
             elements.start.disabled = true;
@@ -408,7 +418,7 @@ function updateState(printers, clientSettings) {
             elements.start.classList.remove("hidden");
             elements.stop.classList.add("hidden");
         } else if (printer.stateColour.category === "Offline") {
-            elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} hidden`;
+            elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} hidden ${d-none}`;
             elements.start.classList.remove("hidden");
             elements.stop.classList.add("hidden");
             elements.control.disabled = true;

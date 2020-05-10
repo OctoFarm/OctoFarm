@@ -94,7 +94,18 @@ router.post("/updateSettings", ensureAuthenticated, async (req, res) => {
   await printer.save();
   res.send("success");
 });
+router.get("/groups", ensureAuthenticated, async (req, res) => {
+    let printers = await Runner.returnFarmPrinters();
+    let groups = [];
+    for(let i = 0; i < printers.length; i++){
+        await groups.push({
+        _id: printers[i]._id,
+        group: printers[i].group
+      });
+    }
 
+    res.send(groups);
+});
 router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
   let index = req.body.i;
   if(typeof index === 'undefined' || index === null){
@@ -183,6 +194,7 @@ router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
     res.send(returnPrinter);
   }
 });
+
 //Register handle for checking for offline printers - Depricated due to websocket full implementation
 router.post("/runner/checkOffline", ensureAuthenticated, async (req, res) => {
   let printers = await Runner.returnFarmPrinters();

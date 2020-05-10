@@ -2,6 +2,7 @@ import Calc from "./lib/functions/calc.js";
 import OctoPrintClient from "./lib/octoprint.js";
 import {parse} from "./vendor/flatted.js";
 import UI from "./lib/functions/ui.js";
+//import initGroupSelect from "./lib/modules/groupSelection.js";
 
 async function asyncParse(str) {
     try{
@@ -13,9 +14,15 @@ async function asyncParse(str) {
     }
 }
 var source = new EventSource("/sse/monitoringInfo/");
+//let groupInit = false;
+
 source.onmessage = async function(e) {
     if (e.data != null) {
         let res = await asyncParse(e.data);
+        // if(groupInit === false){
+        //     initGroupSelect(res.printerInfo)
+        //     groupInit = true;
+        // }
         if (res != false) {
                     currentOperationsView(res.currentOperations, res.currentOperationsCount, res.printerInfo);
         }
@@ -37,7 +44,6 @@ source.onclose = function(e) {
 let printers = [];
 let resetFile = function(id){
     let i = _.findIndex(printers, function(o) { return o._id == id; });
-
     OctoPrintClient.file(printers[i], printers[i].job.file.path, "load");
 }
 let rePrint = function(id){
@@ -69,7 +75,6 @@ function currentOperationsView(
         let currentCards = document.querySelectorAll("[id^='currentOpCard-']");
         currentCards.forEach(card => {
             let id = cardt.id.split("-");
-            console.log(id[1])
         })
     }
 

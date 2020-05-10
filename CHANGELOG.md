@@ -7,11 +7,12 @@ All notable changes to this project will be documented in this file.
 ## [v1.1.4.9-dev-3]
 
 ### Added
-  - Farm Utilisation chart on dashboard now calculates Failed Hours. These are the hours totaled registered from history that are set as success = false;
-  - Idle hours is now black on the farm key, red for failed and active is green.
-  - Keys and bar charts added to the Cumulative/Average times on the dashboard
-  - Keys added to the Printer Status, Printer Progress, Printer Temps and Printer Utilisation heat charts on dashboard.
-  - Current Operations View. Displays full screen the current operations bar. 
+    - Farm Utilisation chart on dashboard now calculates Failed Hours. These are the hours totaled registered from history that are set as success = false;
+    - Idle hours is now black on the farm key, red for failed and active is green.
+    - Keys and bar charts added to the Cumulative/Average times on the dashboard
+    - Keys added to the Printer Status, Printer Progress, Printer Temps and Printer Utilisation heat charts on dashboard.
+    - Current Operations View. Displays full screen the current operations bar. 
+    - Panel, List and Camera View all react to groups now. When loading a page it will always default to "All Printers", any modification with the drop down will append a URL to the page. This URL can be re-used as a book mark to automatically load a group. 
     
 ### Changed
 
@@ -20,7 +21,7 @@ All notable changes to this project will be documented in this file.
 
 
 ### Fixed
-
+    - Fixed Panel view file name been stuck in loading...
     
 
 ## [v1.1.4.9-dev-2.7]
