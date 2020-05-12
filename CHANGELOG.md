@@ -15,7 +15,13 @@ All notable changes to this project will be documented in this file.
     - Panel, List and Camera View all react to groups now. When loading a page it will always default to "All Printers", any modification with the drop down will append a URL to the page. This URL can be re-used as a book mark to automatically load a group. 
     
 ### Changed
-
+    - Group dropdown only appears if groups exist.
+    - Renamed the views removing the "Views" Tag. Added in placeholders on hover to describe function.
+    - Filament manager now get's its own page
+        - New support for the filament manager plugin, press the sync button at the bottom of the filament page to activate. 
+        - Will now track costs if available. 
+        - Can also apply temperature offsets. 
+    - Reduced the width of printer manager, allowing for click close outside of the modal window.
     
 ### Removed
 
