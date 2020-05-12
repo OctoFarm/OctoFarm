@@ -389,17 +389,17 @@ label {
 }
 @media (min-width: 768px) {
   .modal-xl {
-    max-width: 98% !important;
+    max-width: 95% !important;
   }
 }
 @media (min-width: 992px) {
   .modal-xl {
-    max-width: 98% !important;
+    max-width: 90% !important;
   }
 }
 
 @media (min-width: 1200px) {
   .modal-xl {
-    max-width: 98% !important;
+    max-width: 85% !important;
   }
 }
