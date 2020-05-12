@@ -5,207 +5,8 @@ import Validate from "./lib/functions/validate.js";
 import {parse} from './vendor/flatted.js';
 import currentOperations from "./lib/modules/currentOperations.js";
 
+
 //Setup charts
-// let optionsMemory = {
-//     title: {
-//         text: "Memory",
-//         align: 'center',
-//         margin: 1,
-//         offsetX: 0,
-//         offsetY: 0,
-//         floating: false,
-//         style: {
-//             fontSize: '14px',
-//             fontWeight: 'bold',
-//             fontFamily: undefined,
-//             color: '#fff',
-//         },
-//     },
-//     chart: {
-//         type: 'donut',
-//         height: '100%',
-//         animations: {
-//             enabled: false,
-//         },
-//         background: '#303030'
-//     },
-//     theme: {
-//         mode: 'dark',
-//     },
-//     plotOptions: {
-//         pie: {
-//             expandOnClick: true,
-//             dataLabels: {
-//                 offset: 10,
-//                 minAngleToShowLabel: 15
-//             },
-//         }
-//     },
-//     stroke: {
-//         show: false,
-//     },
-//     tooltip: {
-//         y: {
-//             formatter: function(val) {
-//                 return Calc.bytes(val)
-//             },
-//         }
-//     },
-//     noData: {
-//         text: 'Loading...'
-//     },
-//     dataLabels: {
-//         enabled: false,
-//     },
-//     series: [],
-//     labels: ['Other', 'OctoFarm', 'Free'],
-//     colors: ['#f39c12', '#3498db', '#00bc8c'],
-//     legend: {
-//         show: true,
-//         showForSingleSeries: false,
-//         showForNullSeries: true,
-//         showForZeroSeries: true,
-//         position: 'bottom',
-//         horizontalAlign: 'center',
-//         floating: false,
-//         fontSize: '11px',
-//         fontFamily: 'Helvetica, Arial',
-//         fontWeight: 400,
-//         formatter: undefined,
-//         inverseOrder: false,
-//         width: undefined,
-//         height: undefined,
-//         tooltipHoverFormatter: undefined,
-//         offsetX: -25,
-//         offsetY: 0,
-//         labels: {
-//             colors: undefined,
-//             useSeriesColors: false
-//         },
-//         markers: {
-//             width: 9,
-//             height: 9,
-//             strokeWidth: 0,
-//             strokeColor: '#fff',
-//             fillColors: undefined,
-//             radius: 1,
-//             customHTML: undefined,
-//             onClick: undefined,
-//             offsetX: 0,
-//             offsetY: 0
-//         },
-//         itemMargin: {
-//             horizontal: 1,
-//             vertical: 0
-//         },
-//         onItemClick: {
-//             toggleDataSeries: false
-//         },
-//         onItemHover: {
-//             highlightDataSeries: false
-//         },
-//     }
-// };
-// let optionsCPU = {
-//     title: {
-//         text: "CPU",
-//         align: 'center',
-//         margin: 1,
-//         offsetX: 0,
-//         offsetY: 0,
-//         floating: false,
-//         style: {
-//             fontSize: '14px',
-//             fontWeight: 'bold',
-//             fontFamily: undefined,
-//             color: '#fff'
-//         },
-//     },
-//     chart: {
-//         type: 'donut',
-//         height: '100%',
-//         animations: {
-//             enabled: true,
-//         },
-//         background: '#303030'
-//     },
-//     theme: {
-//         mode: 'dark',
-//     },
-//     plotOptions: {
-//         pie: {
-//             expandOnClick: false,
-//             dataLabels: {
-//                 offset: 10,
-//                 minAngleToShowLabel: 15
-//             },
-//         }
-//     },
-//     stroke: {
-//         show: false,
-//     },
-//     tooltip: {
-//         y: {
-//             formatter: function(val) {
-//                 return Math.round(val * 10) / 10 + "%"
-//             },
-//         }
-//     },
-//     noData: {
-//         text: 'Loading...'
-//     },
-//     dataLabels: {
-//         enabled: false,
-//     },
-//     series: [],
-//     labels: ['System', 'OctoFarm', 'User', 'Free'],
-//     colors: ['#f39c12', '#3498db', '#375a7f', '#00bc8c'],
-//     legend: {
-//         show: true,
-//         showForSingleSeries: false,
-//         showForNullSeries: true,
-//         showForZeroSeries: true,
-//         position: 'bottom',
-//         horizontalAlign: 'center',
-//         floating: false,
-//         fontSize: '11px',
-//         fontFamily: 'Helvetica, Arial',
-//         fontWeight: 400,
-//         formatter: undefined,
-//         inverseOrder: false,
-//         width: undefined,
-//         height: undefined,
-//         tooltipHoverFormatter: undefined,
-//         offsetX: -25,
-//         offsetY: 0,
-//         labels: {
-//             colors: undefined,
-//             useSeriesColors: false
-//         },
-//         markers: {
-//             width: 9,
-//             height: 9,
-//             strokeWidth: 0,
-//             strokeColor: '#fff',
-//             fillColors: undefined,
-//             radius: 1,
-//             customHTML: undefined,
-//             onClick: undefined,
-//             offsetX: 0,
-//             offsetY: 0
-//         },
-//         itemMargin: {
-//             horizontal: 1,
-//             vertical: 0
-//         },
-//         onItemClick: {
-//             toggleDataSeries: false
-//         },
-//         onItemHover: {
-//             highlightDataSeries: false
-//         },
-//     }
-// };
 let optionsFarmTemp = {
     chart: {
         type: 'line',
@@ -522,16 +323,6 @@ let optionsUtilisation = {
         },
     }
 };
-// let systemChartCPU = new ApexCharts(
-//     document.querySelector("#systemChartCPU"),
-//     optionsCPU
-// );
-// systemChartCPU.render();
-// let systemChartMemory = new ApexCharts(
-//     document.querySelector("#systemChartMemory"),
-//     optionsMemory
-// );
-// systemChartMemory.render();
 let systemFarmTemp = new ApexCharts(
     document.querySelector("#farmTempMap"),
     optionsFarmTemp
@@ -570,6 +361,7 @@ source.onmessage = async function(e) {
                             dashUpdate.currentProgress(res.printerInfo);
                             dashUpdate.currentUptime(res.printerInfo);
                             statsCounter = 0;
+
                         } else {
                             statsCounter = statsCounter + 1;
                         }
@@ -598,30 +390,6 @@ source.onerror = function() {
 source.onclose = function() {};
 
 class dashUpdate {
-    // static systemInformation(systemInfo) {
-    //     if (Object.keys(systemInfo).length === 0 && systemInfo.constructor === Object) {
-    //
-    //     } else {
-    //         document.getElementById("systemUpdate").innerHTML = Calc.generateTime(
-    //             systemInfo.sysUptime.uptime
-    //         );
-    //         //labels: ['System', 'OctoFarm', 'User', 'Free'],
-    //         let cpuLoad = systemInfo.cpuLoad.currentload_system;
-    //         let octoLoad = systemInfo.sysProcess.pcpu;
-    //         let userLoad = systemInfo.cpuLoad.currentload_user;
-    //         let remain = cpuLoad + octoLoad + userLoad;
-    //         systemChartCPU.updateSeries([cpuLoad, octoLoad, userLoad, 100 - remain])
-    //
-    //         let otherRAM = systemInfo.memoryInfo.total - systemInfo.memoryInfo.free
-    //         let octoRAM = systemInfo.memoryInfo.total / 100 * systemInfo.sysProcess.pmem
-    //         let freeRAM = systemInfo.memoryInfo.free
-    //
-    //         systemChartMemory.updateSeries([otherRAM, octoRAM, freeRAM])
-    //
-    //     }
-    //
-    // }
-
     static farmInformation(farmInfo, heatMap) {
 
         document.getElementById("globalTemp").innerHTML = `
