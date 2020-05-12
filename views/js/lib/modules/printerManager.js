@@ -3,10 +3,7 @@ import OctoFarmClient from "../octofarm.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import FileManager from "./fileManager.js";
-import * as FilamentManager from "../../filamentManagement.js";
 
-const returnFilament = FilamentManager.returnFilament;
-const chooseFilament = FilamentManager.choose;
 
 let currentIndex = 0;
 
@@ -555,30 +552,31 @@ export default class PrinterManager {
           `;
         document.getElementById("printerControlCamera").src = camURL;
         document.getElementById("printerIndex").innerHTML = printer._id;
-        let rolls = returnFilament();
-        let filamentKeys = rolls.checked;
+        // let rolls = await returnFilament();
 
-        let filamentSelect = document.getElementById(
-            "filamentManagerFolderSelect"
-        );
-        filamentKeys.forEach((e, index) => {
-          filamentSelect.insertAdjacentHTML(
-              "beforeend",
-              `  
-                <option value="${e._id}">${e.roll.name} - ${e.roll.type[1]} - ${e.roll.colour} (${e.roll.manufacturer})</option>
-            `
-          );
-        });
-        filamentSelect.addEventListener("change", e => {
-          chooseFilament(e.target, printer._id);
-        });
-        if (
-            typeof printer.selectedFilament != "undefined" &&
-            printer.selectedFilament != null &&
-            printer.selectedFilament.name != null
-        ) {
-          filamentSelect.value = printer.selectedFilament.id;
-        }
+        // let filamentKeys = rolls.checked;
+        //
+        // let filamentSelect = document.getElementById(
+        //     "filamentManagerFolderSelect"
+        // );
+        // filamentKeys.forEach((e, index) => {
+        //   filamentSelect.insertAdjacentHTML(
+        //       "beforeend",
+        //       `
+        //         <option value="${e._id}">${e.roll.name} - ${e.roll.type[1]} - ${e.roll.colour} (${e.roll.manufacturer})</option>
+        //     `
+        //   );
+        // });
+        // filamentSelect.addEventListener("change", e => {
+        //   chooseFilament(e.target, printer._id);
+        // });
+        // if (
+        //     typeof printer.selectedFilament != "undefined" &&
+        //     printer.selectedFilament != null &&
+        //     printer.selectedFilament.name != null
+        // ) {
+        //   filamentSelect.value = printer.selectedFilament.id;
+        // }
         const printerPort = document.getElementById("printerPortDrop");
         const printerBaud = document.getElementById("printerBaudDrop");
         const printerProfile = document.getElementById("printerProfileDrop");
