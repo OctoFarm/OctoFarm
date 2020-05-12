@@ -4,14 +4,13 @@ const { ensureAuthenticated } = require("../config/auth");
 const yj = require("yieldable-json");
 const ClientSettings = require("../models/ClientSettings.js");
 const {parse, stringify} = require('flatted/cjs');
+const ServerSettings = require("../models/ServerSettings.js");
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
 let clientInfo = null;
 let clientInfoString = null;
 
 const farmStatistics = require("../runners/statisticsCollection.js");
 const FarmStatistics = farmStatistics.StatisticsCollection;
-const systemInfo = require("../runners/systemInfo.js");
-const SystemInfo = systemInfo.SystemRunner;
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 const Roll = require("../models/Filament.js");
@@ -25,31 +24,19 @@ setInterval(async function() {
   let printers = await Runner.returnFarmPrinters();
 
   let printerInfo = [];
-  let systemInformation = await SystemInfo.returnInfo();
-  //There is a circular structure in here somewhere!?
-  if (typeof systemInformation !== 'undefined') {
-    sysInfo = {
-      osInfo: systemInformation.osInfo,
-      cpuInfo: systemInformation.cpuInfo,
-      cpuLoad: systemInformation.cpuLoad,
-      memoryInfo: systemInformation.memoryInfo,
-      sysUptime: systemInformation.sysUptime,
-      sysProcess: systemInformation.sysProcess
-    };
-  }
 
-  let filly = await Roll.find({});
-  let rolls = [];
-  filly.forEach(r => {
-    let filament = {
-      id: r._id,
-      name: r.roll.name,
-      type: r.roll.type,
-      colour: r.roll.colour,
-      manufacturer: r.roll.manufacturer
-    };
-    rolls.push(filament);
-  });
+  // let filly = await Roll.find({});
+  // let rolls = [];
+  // filly.forEach(r => {
+  //   let filament = {
+  //     id: r._id,
+  //     name: r.roll.name,
+  //     type: r.roll.type,
+  //     colour: r.roll.colour,
+  //     manufacturer: r.roll.manufacturer
+  //   };
+  //   rolls.push(filament);
+  // });
   let clientSettings = await ClientSettings.find({});
   let cSettings = {
     settings: clientSettings[0].settings,
@@ -139,8 +126,7 @@ setInterval(async function() {
     octofarmStatistics: octofarmStatistics,
     farmInfo: farmInfo,
     heatMap: heatMap,
-    systemInfo: sysInfo,
-    filament: rolls,
+    //filament: rolls,
     clientSettings: cSettings
   };
   clientInfoString = stringify(clientInfo);
@@ -218,22 +204,8 @@ router.get("/fileManagerInfo/", ensureAuthenticated, function(req, res) {
 
 setInterval(async function() {
   for (clientId in clients) {
-    if(clients[clientId].socket.parser.incoming.url.includes("dashboard")){
-      for (clientId in clients) {
-        clients[clientId].write("data: " + clientInfoString + "\n\n"); // <- Push a message to a single attached client
-      }
-    }else if(clients[clientId].socket.parser.incoming.url.includes("monitoring")){
-      for (clientId in clients) {
-        clients[clientId].write("data: " + clientInfoString + "\n\n"); // <- Push a message to a single attached client
-      }
-    }else if(clients[clientId].socket.parser.incoming.url.includes("history")){
-      for (clientId in clients) {
-        clients[clientId].write("data: " + clientInfoString + "\n\n"); // <- Push a message to a single attached client
-      }
-    }else if(clients[clientId].socket.parser.incoming.url.includes("fileManagerInfo")){
-      for (clientId in clients) {
-        clients[clientId].write("data: " + clientInfoString  + "\n\n"); // <- Push a message to a single attached client
-      }
+    for (clientId in clients) {
+      clients[clientId].write("data: " + clientInfoString + "\n\n"); // <- Push a message to a single attached client
     }
   }
 }, 500);

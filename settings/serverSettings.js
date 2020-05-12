@@ -17,6 +17,7 @@ class ServerSettings {
         apiRetryCutoff: 10000,
         apiRetry: 300000
       }
+      let filamentManager = false;
       if (settings.length < 1) {
         let defaultSystemSettings = new ServerSettingsDB({
           onlinePolling,
@@ -32,6 +33,9 @@ class ServerSettings {
         }
         if(typeof settings[0].server === 'undefined'){
           settings[0].server = server;
+        }
+        if(typeof settings[0].filamentManager === 'undefined'){
+          settings[0].filamentManager = filamentManager;
         }
         settings[0].save();
       }

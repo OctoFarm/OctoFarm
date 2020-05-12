@@ -1,8 +1,6 @@
 const FarmStatistics = require("../models/FarmStatistics.js");
 const History = require("../models/History.js");
 const _ = require("lodash");
-const filamentType = require("../config/filaments.js");
-const returnFilamentTypes = filamentType.returnFilamentTypes;
 
 let farmStats = [];
 let currentHistoryTemp = [{
@@ -526,22 +524,22 @@ class StatisticsCollection {
             }
 
             if (print.printHistory.success) {
-                let filamentTypes = returnFilamentTypes();
+                //let filamentTypes = returnFilamentTypes();
                 let calcWeight = null;
                 if (
                     typeof print.printHistory.filamentSelection != "undefined" &&
                     print.printHistory.filamentSelection != "None chosen..."
                 ) {
                     let currentType = null;
-                    let filamentKeys = Object.entries(filamentTypes);
+                    //let filamentKeys = Object.entries(filamentTypes);
 
-                    filamentKeys.forEach(entry => {
-                        if (
-                            entry[0] === print.printHistory.filamentSelection.roll.type[0]
-                        ) {
-                            currentType = entry[1].density;
-                        }
-                    });
+                    // filamentKeys.forEach(entry => {
+                    //     if (
+                    //         entry[0] === print.printHistory.filamentSelection.roll.type[0]
+                    //     ) {
+                    //         currentType = entry[1].density;
+                    //     }
+                    // });
                     calcWeight =
                         (3.14 * (1.75 / 2)) ^
                         ((2 * parseFloat(currentType) * print.printHistory.filamentLength) /

@@ -896,7 +896,7 @@ class Runner {
             .then(res => {
                 //Update info to DB
                 farmPrinters[index].profiles = res.profiles;
-                logger.info("Successfully grabbed Profiles for...: " + farmPrinters[index].printerURL);
+                logger.info("Successfully grabbed Profiles.js for...: " + farmPrinters[index].printerURL);
             })
             .catch(err => {
                 logger.error("Error grabbing profile for: " + farmPrinters[index].printerURL + ": Reason: ", err);

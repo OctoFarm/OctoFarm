@@ -5,6 +5,8 @@ const ServerSettingsDB = require("../models/ServerSettings.js");
 const ClientSettingsDB = require("../models/ClientSettings.js");
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
+const systemInfo = require("../runners/systemInfo.js");
+const SystemInfo = systemInfo.SystemRunner;
 
 module.exports = router;
 
@@ -55,3 +57,20 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
     res.send({ msg: "Settings Saved" });
   });
 });
+router.get("/sysInfo", ensureAuthenticated, async (req, res) => {
+  let systemInformation = await SystemInfo.returnInfo();
+  //There is a circular structure in here somewhere!?
+  let sysInfo = null;
+  if (typeof systemInformation !== 'undefined') {
+    sysInfo = {
+      osInfo: systemInformation.osInfo,
+      cpuInfo: systemInformation.cpuInfo,
+      cpuLoad: systemInformation.cpuLoad,
+      memoryInfo: systemInformation.memoryInfo,
+      sysUptime: systemInformation.sysUptime,
+      sysProcess: systemInformation.sysProcess
+    };
+  }
+  res.send(sysInfo);
+});
+

@@ -1,3 +1,4 @@
+
 export default class Validate {
     //Check the validity of a URL
     static URL(u) {
@@ -35,4 +36,6 @@ export default class Validate {
             return printer.printerURL;
         }
     }
+
+
 }
