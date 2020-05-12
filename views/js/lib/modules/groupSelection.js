@@ -21,7 +21,6 @@ let currentGroup = document.getElementById("currentGroup")
 
 export default function initGroupSelect(printers){
     //Active and fill dropdown...
-    groupSelectionBtn.classList.remove("d-none")
     let currentGroups = [];
     printers.forEach(printer => {
        currentGroups.push(printer.group)
@@ -31,10 +30,8 @@ export default function initGroupSelect(printers){
                         <a class="dropdown-item groupSelect" href="#?Group=All Printers">All Printers</a>
         `)
     if(uniqueGroups.length === 0){
-        groupSelectionDropDown.insertAdjacentHTML('beforeend', `
-                        <a class="dropdown-item groupSelect" href="#">Please setup some groups</a>
-        `)
     }else{
+        groupSelectionBtn.classList.remove("d-none")
         uniqueGroups.forEach(group => {
             groupSelectionDropDown.insertAdjacentHTML('beforeend', `
                         <a class="dropdown-item groupSelect" href="#?Group=${group}">${group}</a>
