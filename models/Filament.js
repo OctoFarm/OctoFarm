@@ -1,11 +1,12 @@
 const mongoose = require("mongoose");
 
 const RollSchema = new mongoose.Schema({
-  roll: {
+  spools: {
     type: Object,
     required: true
-  }
+  },
 });
-const Roll = mongoose.model("Roll", RollSchema);
 
-module.exports = Roll;
+const Spool = mongoose.model("Spool", RollSchema);
+
+module.exports = Spool;

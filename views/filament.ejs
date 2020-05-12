@@ -1,0 +1,211 @@
+<div class="d-none row">
+    <div class="col-lg-12">
+        <div class="card text-white bg-dark">
+            <div class="card-header dashHeader p-0">
+                <button
+                        type="button"
+                        class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
+                        href="#"
+                        aria-expanded="false"
+                        disabled
+                >
+                    <i class="fas fa-toilet-paper"></i>  Statistics
+                </button>
+
+            </div>
+            <div class="card-body">
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-lg-4">
+        <div class="card text-white bg-dark">
+            <div class="card-header dashHeader p-0">
+                <button
+                        type="button"
+                        class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
+                        href="#"
+                        aria-expanded="false"
+                        disabled
+                >
+                    <i class="fas fa-toilet-paper"></i>  Profiles
+                </button>
+
+            </div>
+            <div class="card-body">
+                <div id="profilesMessage"></div>
+                <form>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="profilesManufactuer">Manufacturer</label>
+                            <input type="text" class="form-control" id="profilesManufactuer">
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="profilesMaterial">Material</label>
+                            <input autocomplete="off" list="huge_list" type="text" class="form-control" id="profilesMaterial">
+                            <datalist id="huge_list" class="bg-secondary">
+                            </datalist>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label for="profilesDensity">Density</label>
+                            <div class="input-group mb-3">
+                                <input id="profilesDensity" type="number" class="form-control" value="1.25" step="0.01" aria-label="profilesDansity" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon2">g/cm3</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="profilesDiameter">Diameter</label>
+                            <div class="input-group mb-3">
+                                <input id="profilesDiameter" type="number" class="form-control" value="1.75" step="0.01" aria-label="" aria-describedby="profilesDiameter">
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon2">mm</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="addProfilesBtn" type="submit" class="btn btn-success">Add</button>
+                </form>
+
+                <br>
+                <hr>
+                <br>
+                <table class="table table-responsive-sm table-responsive-md col-lg-12">
+                    <thead>
+                    <tr>
+                        <th scope="col">Manufacturer</th>
+                        <th scope="col">Material</th>
+                        <th scope="col">Density</th>
+                        <th scope="col">Diameter</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody id="addProfilesTable">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="card text-white bg-dark">
+            <div class="card-header dashHeader p-0">
+                <button
+                        type="button"
+                        class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
+                        href="#"
+                        aria-expanded="false"
+                        disabled
+                >
+                    <i class="fas fa-toilet-paper"></i>  Spools
+                </button>
+
+            </div>
+            <div class="card-body">
+                <div id="addSpoolsMessage"></div>
+                <form>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="spoolsName">Name</label>
+                            <input type="email" class="form-control" id="spoolsName">
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="spoolsProfile">Profile</label>
+                            <select id="spoolsProfile" class="form-control">
+
+                            </select>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="spoolsPrice">Price</label>
+                            <input type="number" class="form-control" id="spoolsPrice">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group col-md-4">
+                            <label for="spoolsWeight">Weight</label>
+                            <div class="input-group mb-3">
+                                <input id="spoolsWeight" type="number" class="form-control" value="1000" step="1" aria-label="" aria-describedby="profilesDiameter">
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon2">g</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="spoolsRemaining">Remaining</label>
+                            <div class="input-group mb-3">
+                                <input id="spoolsRemaining" type="number" class="form-control" value="1000" step="1" aria-label="" aria-describedby="profilesDiameter">
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon2">g</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group col-md-4">
+                            <label for="spoolsTempOffset">Temperature Offset</label>
+                            <div class="input-group mb-3">
+                                <input id="spoolsTempOffset" type="number" class="form-control" placeholder="Recipient's username" value="0.00" step="0.01" aria-label="" aria-describedby="basic-addon2">
+                                <div class="input-group-append">
+                                    <span class="input-group-text" id="basic-addon2">°C</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="addSpoolBtn" type="submit" class="btn btn-success">Add</button>
+                </form>
+
+                <br>
+                <hr>
+                <br>
+                <table class="table table-responsive-sm table-responsive-md col-lg-12">
+                    <thead>
+                    <tr>
+                        <th scope="col">Name</th>
+                        <th scope="col">Profile</th>
+                        <th scope="col">Price</th>
+                        <th scope="col">Weight</th>
+                        <th scope="col">Remaining</th>
+                        <th scope="col">Temperature Offset</th>
+                        <th scope="col"></th>
+                    </tr>
+                    </thead>
+                    <tbody id="addSpoolsTable">
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card text-white bg-dark">
+                <div class="card-header dashHeader p-0">
+                    <button
+                            type="button"
+                            class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
+                            href="#"
+                            aria-expanded="false"
+                            disabled
+                    >
+                        <i class="fas fa-toilet-paper"></i>  Filament Manager
+                    </button>
+
+                </div>
+                <div class="card-body">
+                    <h5>Filament Manager Sync</h5>
+                    <p class="mb-1">Click the button below to activate filament manager plugin and link it to OctoFarm. Please read the notes below before proceding.</p>
+                    <small><b>Note:</b> OctoFarm expects filament manager installed on every instance. If it isn't, and you activate it you run the risk of some updates/selections failing to register.</small>
+                    <br>
+                    <small><b>Note:</b> It is preferred, but not neccassary, that OctoPrint's Filament Manager is setup with a postgres database. </small>
+                    <center><br><button id="filamentManagerSyncBtn" type="button" class="btn btn-warning mb-1 btn-lg"><i class="fas fa-sync"></i><br> Sync Filament Manager</button><br></center>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/filamentManagement.js" type="module"></script>
+
