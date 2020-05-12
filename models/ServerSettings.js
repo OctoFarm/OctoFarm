@@ -12,6 +12,10 @@ const ServerSettingsSchema = new mongoose.Schema({
   timeout: {
     type: Object,
     required: false
+  },
+  filamentManager: {
+    type: Boolean,
+    required: false
   }
 });
 
