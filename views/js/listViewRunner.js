@@ -182,6 +182,7 @@ function updateState(printers, clientSettings) {
         "]";
     }
     elements.state.innerHTML = printer.state;
+    elements.row.classList = printer.stateColour.category;
     if (typeof printer.progress != "undefined") {
       elements.printTime.innerHTML = Calc.generateTime(
         printer.progress.printTimeLeft
