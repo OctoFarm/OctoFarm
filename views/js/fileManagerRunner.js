@@ -1,7 +1,6 @@
-import OctoPrintClient from "./lib/octoprint.js";
+
 import OctoFarmClient from "./lib/octofarm.js";
 import Calc from "./lib/functions/calc.js";
-import UI from "./lib/functions/ui.js";
 import FileManager from "./lib/modules/fileManager.js";
 
 let url = window.location.hostname;
