@@ -8,7 +8,6 @@ import Validate from "./lib/functions/validate.js";
 import {parse} from './vendor/flatted.js';
 import tableSort from "./lib/functions/tablesort.js";
 
-
 let printerInfo = "";
 let editMode = false;
 let deletedPrinters = [];
