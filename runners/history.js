@@ -45,13 +45,6 @@ class HistoryCollection {
       } else {
         name = printer.printerURL;
       }
-      let filamentLength = null;
-      let filamentVolume = null
-      if(printer.job.filament === null){
-        filamentLength = printer.job.filament.tool0.length
-        filamentVolume = printer.job.filament.tool0.volume
-      }
-
 
       let printHistory = {
         historyIndex: historyCollection.length + 1,
@@ -65,8 +58,6 @@ class HistoryCollection {
         startDate: startDate,
         endDate: endDate,
         printTime: Math.round(payload.time),
-        filamentLength: filamentLength,
-        filamentVolume: filamentVolume,
         filamentSelection: filamentChoice,
         job: printer.job,
         notes: ""
