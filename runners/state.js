@@ -1166,10 +1166,18 @@ class Runner {
     static async selectedFilament(printerId, filamentId) {
         let printer = await Printers.findById(printerId);
         let spool = await Filament.findById(filamentId);
+
         let i = _.findIndex(farmPrinters, function(o) { return o._id == printerId; });
-        printer.selectedFilament = spool;
-        farmPrinters[i].selectedFilament = spool;
-        printer.save();
+        if(spool != 0){
+            printer.selectedFilament = spool;
+            farmPrinters[i].selectedFilament = spool;
+            printer.save();
+        }else{
+            printer.selectedFilament = null;
+            farmPrinters[i].selectedFilament = null;
+            printer.save();
+        }
+
         return farmPrinters[i].selectedFilament;
 
     }
