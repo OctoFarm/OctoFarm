@@ -215,7 +215,7 @@ async function init() {
     if(!filamentManager) {
         let filManager = document.getElementById("filamentManagerSyncBtn")
         filManager.addEventListener('click', async event => {
-            filManager.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing Please Wait..."
+            filManager.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing <br> Please Wait..."
             let post = await OctoFarmclient.post("filament/filamentManagerSync", {activate: true})
             post = await post.json();
             if (post.status) {
