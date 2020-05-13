@@ -4,6 +4,7 @@ const { ensureAuthenticated } = require("../config/auth");
 const db = require("../config/db").MongoURI;
 const pjson = require("../package.json");
 const ClientSettings = require("../models/ClientSettings.js");
+const ServerSettings = require("../models/ServerSettings.js");
 const prettyHelpers = require("../views/partials/functions/pretty.js");
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
@@ -289,6 +290,7 @@ router.get("/filament", ensureAuthenticated, async(req, res) => {
     const FarmStatistics = farmStatistics.StatisticsCollection;
     let statistics = await FarmStatistics.returnStats();
     let clientSettings = await ClientSettings.find({});
+    let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
     if (serverConfig.loginRequired === false) {
@@ -309,7 +311,8 @@ router.get("/filament", ensureAuthenticated, async(req, res) => {
         currentOperationsCount: statistics.currentOperationsCount,
         page: "Current Operations View",
         helpers: prettyHelpers,
-        clientSettings: clientSettings
+        clientSettings: clientSettings,
+        serverSettings: serverSettings
     });
 });
 module.exports = router;

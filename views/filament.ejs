@@ -1,3 +1,9 @@
+<% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
+<%let filamentManager = false;%>
+<% if(typeof serverSettings != 'undefined'){ %>
+    <%filamentManager = serverSettings[0].filamentManager%>
+<% } %>
+
 <div class="d-none row">
     <div class="col-lg-12">
         <div class="card text-white bg-dark">
@@ -20,6 +26,43 @@
     </div>
 </div>
 <div class="row">
+    <div class="col-lg-12">
+        <div class="card text-white bg-dark">
+            <div class="card-header dashHeader p-0">
+                <button
+                        type="button"
+                        class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
+                        href="#"
+                        aria-expanded="false"
+                        disabled
+                >
+                    <i class="fas fa-tasks"></i> Management
+                </button>
+
+            </div>
+            <div class="card-body">
+                <div class="row">
+                <%if(filamentManager){%>
+                    <div class="col-3">
+                        <h5>Filament Manager Plugin</h5>
+                        <button id="resync-FilamentManager" type="button" class="btn btn-info btn-lg"><i class="fas fa-sync"></i> <br> Re-sync Database</button>
+                        <button id="disable-FilamentManager" type="button" class="d-none btn btn-danger btn-lg"><i class="fas fa-sync"></i> <br> Disable</button>
+                    </div>
+
+                    <div class="col-3">
+                <%}else{%>
+                    <div class="col-6">
+                <% }%>
+                        <h5></h5>
+                    </div>
+                    <div class="col-3"></div>
+                    <div class="col-3"></div>
+                    </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
     <div class="col-lg-4">
         <div class="card text-white bg-dark">
             <div class="card-header dashHeader p-0">
@@ -30,7 +73,7 @@
                         aria-expanded="false"
                         disabled
                 >
-                    <i class="fas fa-toilet-paper"></i>  Profiles
+                    <i class="far fa-id-card"></i>  Profiles
                 </button>
 
             </div>
@@ -82,7 +125,7 @@
                         <th scope="col">Material</th>
                         <th scope="col">Density</th>
                         <th scope="col">Diameter</th>
-                        <th scope="col"></th>
+                        <th scope="col" width="100px"></th>
                     </tr>
                     </thead>
                     <tbody id="addProfilesTable">
@@ -136,7 +179,7 @@
                             </div>
                         </div>
                         <div class="form-group col-md-4">
-                            <label for="spoolsRemaining">Remaining</label>
+                            <label for="spoolsRemaining">Used</label>
                             <div class="input-group mb-3">
                                 <input id="spoolsRemaining" type="number" class="form-control" value="1000" step="1" aria-label="" aria-describedby="profilesDiameter">
                                 <div class="input-group-append">
@@ -166,10 +209,13 @@
                         <th scope="col">Name</th>
                         <th scope="col">Profile</th>
                         <th scope="col">Price</th>
-                        <th scope="col">Weight</th>
-                        <th scope="col">Remaining</th>
-                        <th scope="col">Temperature Offset</th>
-                        <th scope="col"></th>
+                        <th scope="col">Weight (g)</th>
+                        <th scope="col">Used (g)</th>
+                        <th scope="col">Remaining (g)</th>
+                        <th scope="col">Remaining (%)</th>
+                        <th scope="col">Temperature Offset (°C)</th>
+                        <th scope="col">Printer Assignment</th>
+                        <th scope="col" width="100px"></th>
                     </tr>
                     </thead>
                     <tbody id="addSpoolsTable">
@@ -180,32 +226,38 @@
         </div>
     </div>
 </div>
-    <div class="row">
-        <div class="col-lg-12">
-            <div class="card text-white bg-dark">
-                <div class="card-header dashHeader p-0">
-                    <button
-                            type="button"
-                            class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
-                            href="#"
-                            aria-expanded="false"
-                            disabled
-                    >
-                        <i class="fas fa-toilet-paper"></i>  Filament Manager
-                    </button>
+    <% if(!filamentManager){ %>
+        <div id="filamentManagerSetup" class="row">
+            <div class="col-lg-12">
+                <div class="card text-white bg-dark">
+                    <div class="card-header dashHeader p-0">
+                        <button
+                                type="button"
+                                class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
+                                href="#"
+                                aria-expanded="false"
+                                disabled
+                        >
+                            <i class="fas fa-toilet-paper"></i>  Filament Manager
+                        </button>
 
-                </div>
-                <div class="card-body">
-                    <h5>Filament Manager Sync</h5>
-                    <p class="mb-1">Click the button below to activate filament manager plugin and link it to OctoFarm. Please read the notes below before proceding.</p>
-                    <small><b>Note:</b> OctoFarm expects filament manager installed on every instance. If it isn't, and you activate it you run the risk of some updates/selections failing to register.</small>
-                    <br>
-                    <small><b>Note:</b> It is preferred, but not neccassary, that OctoPrint's Filament Manager is setup with a postgres database. </small>
-                    <center><br><button id="filamentManagerSyncBtn" type="button" class="btn btn-warning mb-1 btn-lg"><i class="fas fa-sync"></i><br> Sync Filament Manager</button><br></center>
+                    </div>
+                    <div class="card-body">
+                        <h5>Filament Manager Sync</h5>
+                        <p class="mb-1">Click the button below to activate filament manager plugin and link it to OctoFarm. Please read the notes below before proceding.</p>
+                        <small><b>Note:</b> OctoFarm expects filament manager installed on every instance. If it isn't, and you activate it you run the risk of some updates/selections failing to register.</small>
+                        <br>
+                        <small><b>Note:</b> You must also have all these instances setup with a postgres database. Without this you will not be able to select filament on every instance.</small>
+                        <center><br><button id="filamentManagerSyncBtn" type="button" class="btn btn-warning mb-1 btn-lg"><i class="fas fa-sync"></i><br> Sync Filament Manager</button><br></center>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    <% } %>
+
 </div>
+<% }else{ %>
+    <%- include('./addPrinters.ejs') %>
+<% } %>
 <script src="/js/filamentManagement.js" type="module"></script>
 

@@ -558,6 +558,9 @@ class Runner {
         if(typeof farmPrinters[i].currentUptime === "undefined"){
             farmPrinters[i].currentUptime = 0;
         }
+        if(typeof farmPrinters[i].selectedFilament === "undefined"){
+            farmPrinters[i].selectedFilament = null;
+        }
         if (typeof farmPrinters[i].octoPrintVersion === "undefined") {
             farmPrinters[i].octoPrintVersion = "";
         }
@@ -605,6 +608,7 @@ class Runner {
         printer.tempTriggers = farmPrinters[i].tempTriggers;
         printer.dateAdded = farmPrinters[i].dateAdded;
         printer.currentUptime = farmPrinters[i].currentUptime;
+        printer.selectedFilament = farmPrinters[i].selectedFilament;
         await printer.save();
         return true;
     }
@@ -1159,31 +1163,15 @@ class Runner {
         farmPrinters[i].fileList.folderCount =
             farmPrinters[i].fileList.folders.length;
     }
-    static async selectedFilament(filament) {
-        let printer = await Printers.findById(filament.index);
-        let printerIndex = _.findIndex(farmPrinters, function(o) { return o._id == filament.index; });
-        if (filament.id === "") {
-            farmPrinters[printerIndex].selectedFilament = {
-                id: null,
-                name: null,
-                type: null,
-                colour: null,
-                manufacturer: null
-            };
-        } else {
-            let rolls = await Filament.findById(filament.id);
-            farmPrinters[printerIndex].selectedFilament = {
-                id: filament.id,
-                name: rolls.roll.name,
-                type: rolls.roll.type,
-                colour: rolls.roll.colour,
-                manufacturer: rolls.roll.manufacturer
-            };
-        }
-
-        printer.selectedFilament = farmPrinters[printerIndex].selectedFilament;
+    static async selectedFilament(printerId, filamentId) {
+        let printer = await Printers.findById(printerId);
+        let spool = await Filament.findById(filamentId);
+        let i = _.findIndex(farmPrinters, function(o) { return o._id == printerId; });
+        printer.selectedFilament = spool;
+        farmPrinters[i].selectedFilament = spool;
         printer.save();
-        return farmPrinters[printerIndex].selectedFilament;
+        return farmPrinters[i].selectedFilament;
+
     }
     static newFile(file) {
         let i = _.findIndex(farmPrinters, function(o) { return o._id == file.index; });

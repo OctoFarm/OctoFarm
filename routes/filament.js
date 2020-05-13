@@ -8,17 +8,23 @@ const ServerSettings = require("../models/ServerSettings.js");
 const _ = require("lodash");
 module.exports = router;
 
-router.get("/get/profile", ensureAuthenticated, (req, res) => {
+router.get("/get/profile", ensureAuthenticated, async (req, res) => {
   Profile.find({}).then(async profiles => {
     let serverSettings = await ServerSettings.find({});
     res.send({ profiles: profiles, filamentManager: serverSettings[0].filamentManager });
   });
 });
-router.get("/get/filament", ensureAuthenticated, (req, res) => {
+router.get("/get/filament", ensureAuthenticated, async (req, res) => {
   Spool.find({}).then(async spool => {
     let serverSettings = await ServerSettings.find({});
     res.send({ Spool: spool, filamentManager: serverSettings[0].filamentManager  });
   });
+});
+router.post("/select", ensureAuthenticated, async (req, res) => {
+    const runner = require("../runners/state.js");
+    const Runner = runner.Runner;
+    let printerList = await Runner.selectedFilament(req.body.printerId, req.body.spoolId);
+    res.send({status: 200});
 });
 router.post("/save/profile", ensureAuthenticated, async (req, res) => {
   let serverSettings = await ServerSettings.find({});
@@ -102,7 +108,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
       "profile": profile,
       "cost": filament.spoolsPrice,
       "weight": filament.spoolsWeight,
-      "used": filament.spoolsRemaining,
+      "used": filament.spoolsUsed,
       "temp_offset": filament.spoolsTempOffset
     };
     let url = `${printer.printerURL}/plugin/filamentmanager/spools`;
@@ -124,7 +130,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
     profile: profiles[findID].profile.index,
     price: filament.spoolsPrice,
     weight: filament.spoolsWeight,
-    remaining: filament.spoolsRemaining,
+    used: filament.spoolsUsed,
     tempOffset: filament.spoolsTempOffset,
     fmID: filamentManagerID
   };
@@ -255,6 +261,7 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
       "used": newContent[3],
       "temp_offset": newContent[4]
     };
+
     let url = `${printer.printerURL}/plugin/filamentmanager/spools/${spools.spools.fmID}`;
     let updateFilamentManager = await fetch(url, {
       method: "PATCH",
@@ -281,15 +288,15 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
     spools.spools.weight = newContent[2];
     spools.markModified("spools")
   }
-  if(spools.spools.remaining != newContent[3]){
-    spools.spools.remaining = newContent[3];
+  if(spools.spools.used != newContent[3]){
+    spools.spools.used = newContent[3];
     spools.markModified("spools")
   }
   if(spools.spools.tempOffset != newContent[4]){
     spools.spools.tempOffset = newContent[4];
     spools.markModified("spools")
   }
-  // await spool.save();
+  await spools.save();
 
   Spool.find({}).then(spools => {
     res.send({ spools: spools });
@@ -402,7 +409,7 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
       profile: sp.profile.id,
       price: sp.cost,
       weight: sp.weight,
-      remaining: sp.used,
+      used: sp.used,
       tempOffset: sp.temp_offset,
       fmID: sp.id
     };
@@ -429,13 +436,23 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
   serverSettings[0].filamentManager = true;
   serverSettings[0].markModified("filamentManager");
   serverSettings[0].save();
-  //If not return fails
-  //Sync profiles...
-
-  //Sync spools
 
   //Return success
   if(spools.status === 200 || profiles.status != 200){
     res.send({ status: true });
   }
+});
+router.post("/disableFilamentPlugin", ensureAuthenticated, async (req, res) => {
+  let searchId = req.body.id;
+  //Find first online printer...
+  const runner = require("../runners/state.js");
+  const Runner = runner.Runner;
+
+  let serverSettings = await ServerSettings.find({});
+  serverSettings[0].filamentManager = false;
+  serverSettings[0].markModified("filamentManager");
+  serverSettings[0].save();
+
+  //Return success
+    res.send({ status: true });
 });

@@ -342,20 +342,7 @@ class ServerSettings {
         .then(res => {
           document.getElementById("onlinePollRate").value =
             res.onlinePolling.seconds;
-            // let filManager = document.getElementById("filamentManagerSyncBtn")
-            //     filManager.disabled = res.filamentManager;
-            //     filManager.addEventListener('click', async event => {
-            //         filManager.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing Please Wait..."
-            //         let post = await Client.post("filament/filamentManagerSync", {activate: true})
-            //         post = await post.json();
-            //         console.log(post)
-            //         if(post.status){
-            //             filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Sync Filament Manager"
-            //         }else{
-            //             filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Sync Filament Manager"
-            //         }
-            //     });
-            //
+
         });
     }
   }

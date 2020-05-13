@@ -2,6 +2,7 @@ import OctoFarmclient from "./lib/octofarm.js";
 import OctoPrintClient from "./lib/octoprint.js";
 import UI from "./lib/functions/ui.js";
 import tableSort from "./lib/functions/tablesort.js";
+import Validate from "./lib/functions/validate.js";
 window.onload = function () {tableSort.makeAllSortable();};
 
 let filamentStore = [
@@ -118,14 +119,22 @@ let filamentStore = [
 // }
 let filamentManager = "";
 
+
+
 async function init() {
+
+
+
    //Init Spools
     let fill = await OctoFarmclient.get("filament/get/filament");
     fill = await fill.json();
     let spoolTable = document.getElementById("addSpoolsTable");
     let profile = await OctoFarmclient.get("filament/get/profile");
     profile = await profile.json();
+    let printers = await OctoFarmclient.post("printers/printerInfo");
+    printers = await printers.json();
     filamentManager = profile.filamentManager;
+    spoolTable.innerHTML = "";
     fill.Spool.forEach(spools => {
         spoolTable.insertAdjacentHTML(
             "beforeend",
@@ -140,8 +149,13 @@ async function init() {
                    </td>
                   <td><p contenteditable="false">${spools.spools.price}</p></td>
                   <td><p contenteditable="false">${spools.spools.weight}</p></td>
-                  <td><p contenteditable="false">${spools.spools.remaining}</p></td>
+                  <td><p contenteditable="false">${spools.spools.used}</p></td>
+                  <td>${spools.spools.weight - spools.spools.used}g</td>
+                   <td>${spools.spools.used / spools.spools.weight * 100}%</td>
                   <td><p contenteditable="false">${spools.spools.tempOffset}</p></td>
+                  <td><select id="spoolsPrinterAssignment-${spools._id}" class="form-control">
+    
+                       </select></td>
                   <td><button id="edit-${spools._id}" type="button" class="btn btn-sm btn-info edit">
                     <i class="fas fa-edit editIcon"></i>
                   </button>
@@ -166,7 +180,28 @@ async function init() {
                     `)
         })
         document.getElementById("spoolsProfile-"+spools._id).value = spools.spools.profile;
+        let printerListCurrent = document.getElementById("spoolsPrinterAssignment-"+spools._id);
+        printerListCurrent.insertAdjacentHTML("beforeend", `
+                        <option value="0">No Selection</option>
+                   `)
+            printers.forEach(printer => {
+                    printerListCurrent.insertAdjacentHTML("beforeend", `
+                        <option value="${printer._id}">${Validate.getName(printer)}</option>
+                   `)
+                if(printer.selectedFilament !== null && printer.selectedFilament._id === spools._id){
+                    printerListCurrent.value = printer._id
+                }
+            })
+        printerListCurrent.addEventListener("change", e => {
+            let data = {
+                printerId: e.target.value,
+                spoolId: e.target.parentElement.parentElement.firstElementChild.innerHTML.trim()
+            }
+            OctoFarmclient.post("filament/select", data)
+        })
     })
+    //Grab printer list...
+
     document.getElementById("addSpoolsTable").addEventListener("click", e => {
         //Remove from UI
         if(e.target.classList.contains("edit")){
@@ -177,11 +212,48 @@ async function init() {
             saveSpool(e.target)
         }
     });
-
+    if(!filamentManager) {
+        let filManager = document.getElementById("filamentManagerSyncBtn")
+        filManager.addEventListener('click', async event => {
+            filManager.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing Please Wait..."
+            let post = await OctoFarmclient.post("filament/filamentManagerSync", {activate: true})
+            post = await post.json();
+            if (post.status) {
+                filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Sync Filament Manager"
+            } else {
+                filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Sync Filament Manager"
+            }
+            location.reload();
+        });
+    }else if(filamentManager){
+        let filManager = document.getElementById("resync-FilamentManager")
+        filManager.addEventListener('click', async event => {
+            filManager.disabled = true;
+            filManager.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing... <br> Please Wait..."
+            let post = await OctoFarmclient.post("filament/filamentManagerSync", {activate: true})
+            post = await post.json();
+            console.log(post)
+            if(post.status){
+                filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Re-Sync Database"
+                filManager.disabled = false;
+            }else{
+                filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Re-Sync Database"
+                filManager.disabled = false;
+            }
+        });
+        let disableFilManager = document.getElementById("disable-FilamentManager")
+        disableFilManager.addEventListener('click', async event => {
+            let post = await OctoFarmclient.post("filament/disableFilamentPlugin", {activate: true})
+            post = await post.json();
+            console.log(post)
+            location.reload();
+        });
+    }
   //Init Profiles
   let post = await OctoFarmclient.get("filament/get/profile");
   post = await post.json();
   let profileTable = document.getElementById("addProfilesTable");
+    profileTable.innerHTML = "";
   post.profiles.forEach(profiles => {
       let profileID = null;
       if(filamentManager){
@@ -289,7 +361,7 @@ async function load() {
             let spoolsProfile = document.getElementById("spoolsProfile");
             let spoolsPrice = document.getElementById("spoolsPrice");
             let spoolsWeight = document.getElementById("spoolsWeight");
-            let spoolsRemaining = document.getElementById("spoolsRemaining");
+            let spoolsUsed = document.getElementById("spoolsRemaining");
             let spoolsTempOffset = document.getElementById("spoolsTempOffset");
             let errors = [];
 
@@ -305,8 +377,8 @@ async function load() {
             if (spoolsWeight.value === 0 || spoolsWeight.value === "") {
                 errors.push({type: "warning", msg: "Please input a spool weight"})
             }
-            if (spoolsRemaining.value === 0 || spoolsRemaining.value === "") {
-                errors.push({type: "warning", msg: "Please input spool remaining weight"})
+            if (spoolsUsed.value === 0 || spoolsUsed.value === "") {
+                errors.push({type: "warning", msg: "Please input spool used weight"})
             }
 
             if (errors.length > 0) {
@@ -320,9 +392,11 @@ async function load() {
                 spoolsProfile: spoolsProfile.value,
                 spoolsPrice: spoolsPrice.value,
                 spoolsWeight: spoolsWeight.value,
-                spoolsRemaining: spoolsRemaining.value,
+                spoolsUsed: spoolsUsed.value,
                 spoolsTempOffset: spoolsTempOffset.value
             };
+            let printers = await OctoFarmclient.post("printers/printerInfo");
+            printers = await printers.json();
             let post = await OctoFarmclient.post("filament/save/filament", opts);
             if (post.status === 200) {
                 UI.createMessage(
@@ -336,7 +410,7 @@ async function load() {
                 spoolsName.value = "";
                 spoolsPrice.value = "";
                 spoolsWeight.value = 1000;
-                spoolsRemaining.value = 1000;
+                spoolsUsed.value = 1000;
                 spoolsTempOffset.value = 0.00;
                 post = post.spools;
                 document.getElementById("addSpoolsTable").insertAdjacentHTML(
@@ -352,8 +426,15 @@ async function load() {
                    </td>
                   <td><p contenteditable="false">${post.spools.price}</p></td>
                   <td><p contenteditable="false">${post.spools.weight}</p></td>
-                  <td><p contenteditable="false">${post.spools.remaining}</p></td>
+                  <td><p contenteditable="false">${post.spools.used}</p></td>
+                  <td>${post.spools.weight - post.spools.used}g </td>
+                  <td>${post.spools.used / post.spools.weight * 100}% </td>
                   <td><p contenteditable="false">${post.spools.tempOffset}</p></td>
+                   <td>
+                       <select id="spoolsPrinterAssignment-${post.spools._id}" class="form-control">
+        
+                       </select>
+                   </td>
                   <td><button id="edit-${post._id}" type="button" class="btn btn-sm btn-info edit">
                     <i class="fas fa-edit editIcon"></i>
                   </button>
@@ -366,7 +447,23 @@ async function load() {
                 </tr>
                 `
                 );
-
+                document.getElementById("spoolsProfile-"+post._id).value = post.spools.profile;
+                let printerListCurrent = document.getElementById("spoolsPrinterAssignment-"+post.spools._id);
+                printerListCurrent.insertAdjacentHTML("beforeend", `
+                    <option value = "0" > No Selection </option>
+                   `)
+                printers.forEach(printer => {
+                    printerListCurrent.insertAdjacentHTML("beforeend", `
+                <option value = "${printer._id}" >${Validate.getName(printer)} </option>
+                   `)
+                })
+                printerListCurrent.addEventListener("change", e => {
+                    let data = {
+                        printerId: e.target.value,
+                        spoolId: e.target.parentElement.parentElement.firstElementChild.innerHTML.trim()
+                    }
+                    OctoFarmclient.post("filament/select", data)
+                })
                 let profile = await OctoFarmclient.get("filament/get/profile");
                 profile = await profile.json();
                 profile.profiles.forEach(profile => {
@@ -584,9 +681,11 @@ async function saveSpool(e, filamentManager) {
      let post = await OctoFarmclient.post("filament/edit/filament", data);
      if (post.status === 200) {
          post = await post.json();
+         init();
     document.getElementById("spoolsProfile-"+id).disabled = true;
     document.getElementById("save-" + id).classList.add("d-none");
     document.getElementById("edit-" + id).classList.remove("d-none");
+
      }
 }
 async function deleteProfile(e, filamentManager) {

@@ -13,6 +13,9 @@ export default class Calculate {
     if (seconds === undefined || isNaN(seconds) || seconds === null) {
       string = "No Time Estimate";
     } else {
+      let years = Math.floor(seconds / (360 * 365))
+
+
       let days = Math.floor(seconds / (3600 * 24));
 
       seconds -= days * 3600 * 24;
