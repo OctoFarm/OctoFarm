@@ -23,6 +23,27 @@ router.get("/get/filament", ensureAuthenticated, async (req, res) => {
 router.post("/select", ensureAuthenticated, async (req, res) => {
     const runner = require("../runners/state.js");
     const Runner = runner.Runner;
+    let serverSettings = await ServerSettings.find({});
+    if(serverSettings[0].filamentManager && req.body.spoolId != 0){
+      let printerList = Runner.returnFarmPrinters();
+      let i = _.findIndex(printerList, function(o) {
+        return o._id == req.body.printerId;
+      });
+      let printer = printerList[i];
+      let spool = await Spool.findById(req.body.spoolId)
+      let selection = {
+        "tool": 0, "spool": {"id": spool.spools.fmID}
+      };
+      let url = `${printer.printerURL}/plugin/filamentmanager/selections/0`;
+      let updateFilamentManager = await fetch(url, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Key": printer.apikey
+        },
+        body: JSON.stringify({selection: selection})
+      })
+    }
     let printerList = await Runner.selectedFilament(req.body.printerId, req.body.spoolId);
     res.send({status: 200});
 });
@@ -79,7 +100,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
   let serverSettings = await ServerSettings.find({});
   const filament = req.body;
 
-  let filamentManagerID = filament.spoolsProfile;
+  let filamentManagerID = null;
   let profiles = await Profile.find({})
   let findID = _.findIndex(profiles, function(o) {
     return o.profile.index == filamentManagerID;
@@ -127,7 +148,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
   }
   let spools = {
     name: filament.spoolsName,
-    profile: profiles[findID].profile.index,
+    profile: filament.spoolsProfile,
     price: filament.spoolsPrice,
     weight: filament.spoolsWeight,
     used: filament.spoolsUsed,
