@@ -36,7 +36,7 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
     let printerList = Runner.returnFarmPrinters();
     let printer = null;
     for (let i = 0; i < 10; i++) {
-      if (printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
+      if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
         printer = printerList[i]
         break;
       }
@@ -90,7 +90,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
     let printerList = Runner.returnFarmPrinters();
     let printer = null;
     for (let i = 0; i < 10; i++) {
-      if (printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
+      if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
         printer = printerList[i]
         break;
       }
@@ -155,7 +155,7 @@ router.post("/delete/filament", ensureAuthenticated, async (req, res) => {
     let printerList = Runner.returnFarmPrinters();
     let printer = null;
     for (let i = 0; i < 10; i++) {
-      if (printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
+      if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
         printer = printerList[i]
         break;
       }
@@ -194,7 +194,7 @@ router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
     let printerList = Runner.returnFarmPrinters();
     let printer = null;
     for (let i = 0; i < 10; i++) {
-      if (printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
+      if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
         printer = printerList[i]
         break;
       }
@@ -235,7 +235,7 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
     let printerList = Runner.returnFarmPrinters();
     let printer = null;
     for (let i = 0; i < 10; i++) {
-      if (printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
+      if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
         printer = printerList[i]
         break;
       }
@@ -312,7 +312,7 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
     let printerList = Runner.returnFarmPrinters();
     let printer = null;
     for (let i = 0; i < 10; i++) {
-      if (printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
+      if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
         printer = printerList[i]
         break;
       }
@@ -371,7 +371,7 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
   let printerList = Runner.returnFarmPrinters();
   let printer = null;
   for (let i = 0; i < 10; i++) {
-    if (printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
+    if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
       printer = printerList[i]
       break;
     }
