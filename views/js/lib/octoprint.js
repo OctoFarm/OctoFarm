@@ -185,6 +185,15 @@ export default class OctoPrintClient {
       command: "feedrate",
       factor: parseInt(printer.feedRate)
     };
+    if(printer.selectedFilament != null){
+      let offset = {
+        command: "offset",
+        offsets: {
+          tool0: parseInt(printer.selectedFilament.spools.tempOffset)
+        }
+      }
+      let post = await OctoPrintClient.post(printer, "printer/tool", offset);
+    }
     await OctoPrintClient.post(printer, "printer/printhead", feed);
     let post = await OctoPrintClient.post(printer, "job", opts);
     element.target.disabled = false;

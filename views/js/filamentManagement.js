@@ -151,7 +151,7 @@ async function init() {
                   <td><p contenteditable="false">${spools.spools.weight}</p></td>
                   <td><p contenteditable="false">${spools.spools.used}</p></td>
                   <td>${spools.spools.weight - spools.spools.used}g</td>
-                   <td>${spools.spools.used / spools.spools.weight * 100}%</td>
+                   <td>${100 - spools.spools.used / spools.spools.weight * 100}%</td>
                   <td><p contenteditable="false">${spools.spools.tempOffset}</p></td>
                   <td><select id="spoolsPrinterAssignment-${spools._id}" class="form-control">
     
@@ -162,7 +162,7 @@ async function init() {
                   <button id="save-${spools._id}" type="button" class="btn btn-sm d-none btn-success save">
                     <i class="fas fa-save saveIcon"></i>
                   </button>
-                  <button type="button" class="btn btn-sm btn-danger delete">
+                  <button id="delete-${spools._id}" type="button" class="btn btn-sm btn-danger delete">
                     <i class="fas fa-trash deleteIcon"></i>
                   </button></td>
                 </tr>
@@ -185,11 +185,22 @@ async function init() {
                         <option value="0">No Selection</option>
                    `)
             printers.forEach(printer => {
-                    printerListCurrent.insertAdjacentHTML("beforeend", `
+                    if(printer.stateColour.category !== "Active"){
+                        printerListCurrent.insertAdjacentHTML("beforeend", `
                         <option value="${printer._id}">${Validate.getName(printer)}</option>
                    `)
+                    }else{
+                        printerListCurrent.insertAdjacentHTML("beforeend", `
+                        <option value="${printer._id}" disabled>${Validate.getName(printer)}</option>
+                   `)
+                    }
                 if(printer.selectedFilament !== null && printer.selectedFilament._id === spools._id){
                     printerListCurrent.value = printer._id
+                    if(printer.stateColour.category === "Active"){
+                        printerListCurrent.disabled = true;
+                        document.getElementById("delete-"+spools._id).disabled = true;
+                        document.getElementById("edit-"+spools._id).disabled = true;
+                    }
                 }
             })
         printerListCurrent.addEventListener("change", e => {
@@ -232,7 +243,6 @@ async function init() {
             filManager.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing... <br> Please Wait..."
             let post = await OctoFarmclient.post("filament/filamentManagerSync", {activate: true})
             post = await post.json();
-            console.log(post)
             if(post.status){
                 filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Re-Sync Database"
                 filManager.disabled = false;
@@ -245,7 +255,6 @@ async function init() {
         disableFilManager.addEventListener('click', async event => {
             let post = await OctoFarmclient.post("filament/disableFilamentPlugin", {activate: true})
             post = await post.json();
-            console.log(post)
             location.reload();
         });
     }
@@ -285,12 +294,21 @@ async function init() {
                   <button id="save-${profileID}" type="button" class="btn d-none btn-sm btn-success save">
                     <i class="fas fa-save saveIcon"></i>
                   </button>
-                  <button  type="button" class="btn btn-sm btn-danger delete">
+                  <button id="delete-${profileID}" type="button" class="btn btn-sm btn-danger delete">
                     <i class="fas fa-trash deleteIcon"></i>
                   </button>
               </td>
         </tr>
     `)
+      printers.forEach(printer => {
+
+          if(printer.selectedFilament !== null && printer.selectedFilament.spools.profile === profileID){
+              if(printer.stateColour.category === "Active"){
+                  document.getElementById("delete-"+profileID).disabled = true;
+                  document.getElementById("edit-"+profileID).disabled = true;
+              }
+          }
+      })
   })
     document.getElementById("addProfilesTable").addEventListener("click", e => {
         //Remove from UI
@@ -377,7 +395,7 @@ async function load() {
             if (spoolsWeight.value === 0 || spoolsWeight.value === "") {
                 errors.push({type: "warning", msg: "Please input a spool weight"})
             }
-            if (spoolsUsed.value === 0 || spoolsUsed.value === "") {
+            if (spoolsUsed.value === "") {
                 errors.push({type: "warning", msg: "Please input spool used weight"})
             }
 
@@ -410,7 +428,7 @@ async function load() {
                 spoolsName.value = "";
                 spoolsPrice.value = "";
                 spoolsWeight.value = 1000;
-                spoolsUsed.value = 1000;
+                spoolsUsed.value = 0;
                 spoolsTempOffset.value = 0.00;
                 post = post.spools;
                 document.getElementById("addSpoolsTable").insertAdjacentHTML(
@@ -428,7 +446,7 @@ async function load() {
                   <td><p contenteditable="false">${post.spools.weight}</p></td>
                   <td><p contenteditable="false">${post.spools.used}</p></td>
                   <td>${post.spools.weight - post.spools.used}g </td>
-                  <td>${post.spools.used / post.spools.weight * 100}% </td>
+                  <td>${100 - post.spools.used / post.spools.weight * 100}% </td>
                   <td><p contenteditable="false">${post.spools.tempOffset}</p></td>
                    <td>
                        <select id="spoolsPrinterAssignment-${post.spools._id}" class="form-control">
@@ -441,7 +459,7 @@ async function load() {
                   <button id="save-${post._id}" type="button" class="btn btn-sm d-none btn-success save">
                     <i class="fas fa-save saveIcon"></i>
                   </button>
-                  <button type="button" class="btn btn-sm btn-danger delete">
+                  <button id="delete-${post._id}" type="button" class="btn btn-sm btn-danger delete">
                     <i class="fas fa-trash deleteIcon"></i>
                   </button></td>
                 </tr>
@@ -453,9 +471,16 @@ async function load() {
                     <option value = "0" > No Selection </option>
                    `)
                 printers.forEach(printer => {
-                    printerListCurrent.insertAdjacentHTML("beforeend", `
-                <option value = "${printer._id}" >${Validate.getName(printer)} </option>
+                    if(printer.stateColour.category !== "Active"){
+                        printerListCurrent.insertAdjacentHTML("beforeend", `
+                        <option value="${printer._id}">${Validate.getName(printer)}</option>
                    `)
+                    }else{
+
+                        printerListCurrent.insertAdjacentHTML("beforeend", `
+                        <option value="${printer._id}" disabled>${Validate.getName(printer)}</option>
+                   `)
+                    }
                 })
                 printerListCurrent.addEventListener("change", e => {
                     let data = {
@@ -576,7 +601,7 @@ async function load() {
                   <button id="save-${profileID}" type="button" class="btn btn-sm d-none btn-success save">
                     <i class="fas fa-save saveIcon"></i>
                   </button>
-                  <button type="button" class="btn btn-sm btn-danger delete">
+                  <button id="delete-${profileID}" type="button" class="btn btn-sm btn-danger delete">
                     <i class="fas fa-trash deleteIcon"></i>
                   </button></td>
                 </tr>

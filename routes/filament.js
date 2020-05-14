@@ -20,6 +20,12 @@ router.get("/get/filament", ensureAuthenticated, async (req, res) => {
     res.send({ Spool: spool, filamentManager: serverSettings[0].filamentManager  });
   });
 });
+router.get("/get/selected", ensureAuthenticated, async (req, res) => {
+  const runner = require("../runners/state.js");
+  const Runner = runner.Runner;
+  let selected = await Runner.getSelected();
+  res.send({status: 200, selected});
+})
 router.post("/select", ensureAuthenticated, async (req, res) => {
     const runner = require("../runners/state.js");
     const Runner = runner.Runner;
@@ -249,10 +255,10 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
   let searchId = req.body.id;
   let newContent = req.body.spool
   let spools = await Spool.findById(searchId);
-
+  const runner = require("../runners/state.js");
+  const Runner = runner.Runner;
   if(serverSettings[0].filamentManager) {
-    const runner = require("../runners/state.js");
-    const Runner = runner.Runner;
+
     let printerList = Runner.returnFarmPrinters();
     let printer = null;
     for (let i = 0; i < 10; i++) {
@@ -318,7 +324,7 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
     spools.markModified("spools")
   }
   await spools.save();
-
+  Runner.updateFilament();
   Spool.find({}).then(spools => {
     res.send({ spools: spools });
   });
@@ -468,7 +474,8 @@ router.post("/disableFilamentPlugin", ensureAuthenticated, async (req, res) => {
   //Find first online printer...
   const runner = require("../runners/state.js");
   const Runner = runner.Runner;
-
+  await Spool.deleteMany({});
+  await Profile.deleteMany({});
   let serverSettings = await ServerSettings.find({});
   serverSettings[0].filamentManager = false;
   serverSettings[0].markModified("filamentManager");

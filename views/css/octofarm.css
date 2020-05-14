@@ -130,23 +130,6 @@ li {
   color: cyan;
 }
 
-/*Sticky Table header*/
-.sticky-table {
-  min-width:100px;
-  position: sticky;
-  top: 40px;
-  z-index: 1000;
-}
-
-.table-fixed thead th {
-  position: sticky;
-  position: -webkit-sticky;
-  top: 100px;
-  z-index: 999;
-  background-color: #000;
-  color: #fff;
-}
-
 /*Scroll Bar*/
 ::-webkit-scrollbar {
   width: 10px;
@@ -396,10 +379,24 @@ label {
   .modal-xl {
     max-width: 90% !important;
   }
+  .sticky-table {
+    min-width:100px;
+    position: sticky;
+    top: 40px;
+    z-index: 1000;
+  }
+
 }
 
 @media (min-width: 1200px) {
   .modal-xl {
     max-width: 85% !important;
   }
+  .sticky-table {
+    min-width:100px;
+    position: sticky;
+    top: 40px;
+    z-index: 1000;
+  }
+
 }
