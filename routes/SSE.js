@@ -5,6 +5,7 @@ const yj = require("yieldable-json");
 const ClientSettings = require("../models/ClientSettings.js");
 const {parse, stringify} = require('flatted/cjs');
 const ServerSettings = require("../models/ServerSettings.js");
+const FilamentProfiles = require("../models/Profiles");
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
 let clientInfo = null;
 let clientInfoString = null;
@@ -126,7 +127,7 @@ setInterval(async function() {
     octofarmStatistics: octofarmStatistics,
     farmInfo: farmInfo,
     heatMap: heatMap,
-    //filament: rolls,
+    filamentProfiles: await FilamentProfiles.find({}),
     clientSettings: cSettings
   };
   clientInfoString = stringify(clientInfo);

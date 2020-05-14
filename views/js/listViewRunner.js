@@ -8,6 +8,7 @@ import tableSort from "./lib/functions/tablesort.js";
 import Validate from "./lib/functions/validate.js";
 window.onload = function () {tableSort.makeAllSortable();};
 import initGroupSelect from "./lib/modules/groupSelection.js";
+import {returnSelected} from "./lib/modules/filamentGrab.js";
 
 let printerInfo = [];
 let elems = [];
@@ -45,7 +46,7 @@ source.onmessage = async function(e) {
         if (res.clientSettings.listView.currentOp) {
           currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
         }
-        updateState(res.printerInfo, res.clientSettings.listView);
+        updateState(res.printerInfo, res.clientSettings.listView, res.filamentProfiles);
       }
     }
   }
@@ -145,7 +146,7 @@ function grabElements(printer) {
     return elems[printer._id];
   }
 }
-function updateState(printers, clientSettings) {
+function updateState(printers, clientSettings, filamentProfiles) {
   let currentGroup = document.getElementById("currentGroup").innerHTML;
   currentGroup = currentGroup.replace("Selected: ", "").trim()
 
@@ -166,23 +167,15 @@ function updateState(printers, clientSettings) {
       elements.currentFile.innerHTML =
         '<i class="fas fa-file-code"></i> ' + "No File Selected";
     }
-
     if (
-      typeof printer.selectedFilament != "undefined" &&
-      printer.selectedFilament != null &&
-      printer.selectedFilament.name != null
+        printer.selectedFilament !== null
     ) {
-      elements.filament.innerHTML =
-        printer.selectedFilament.name +
-        " " +
-        "[" +
-        printer.selectedFilament.colour +
-        " / " +
-        printer.selectedFilament.type[1] +
-        "]";
+      elements.filament.innerHTML = returnSelected(printer.selectedFilament, filamentProfiles)
+    }else{
+      elements.filament.innerHTML = ""
     }
     elements.state.innerHTML = printer.state;
-    elements.row.classList = printer.stateColour.category;
+
     if (typeof printer.progress != "undefined") {
       elements.printTime.innerHTML = Calc.generateTime(
         printer.progress.printTimeLeft
@@ -214,7 +207,9 @@ function updateState(printers, clientSettings) {
     if (clientSettings.hideClosed) {
       hideClosed = "hidden";
     }
+    elements.row.style.backgroundColor = printer.stateColour.hex;
     if (printer.stateColour.category === "Active") {
+
       //Set the state
       if(elements.row.classList.contains(hideClosed)){
         elements.row.classList.remove(hideClosed);
@@ -404,6 +399,7 @@ function updateState(printers, clientSettings) {
       }
 
     } else if (printer.state === "Disconnected") {
+
       if(hideClosed != ""){
         elements.row.classList.add(hideClosed);
       }
@@ -411,6 +407,7 @@ function updateState(printers, clientSettings) {
       elements.start.disabled = true;
       elements.stop.disabled = true;
     } else if (printer.stateColour.category === "Offline") {
+
       if(hideOffline != ""){
         elements.row.classList.add(hideOffline);
       }

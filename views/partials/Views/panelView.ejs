@@ -235,11 +235,7 @@
             role="button"
             id="listFilament-<%= printers[sorted.actualIndex]._id %>"
           >
-            <% if(typeof printers[sorted.actualIndex].selectedFilament !=
-            'undefined' && printers[sorted.actualIndex].selectedFilament.name !=
-            null){%> <%= printers[sorted.actualIndex].selectedFilament.name %>
-            [<%= printers[sorted.actualIndex].selectedFilament.colour %> / <%=
-            printers[sorted.actualIndex].selectedFilament.type[1] %>]<% }%>
+           Loading...
           </button>
           <div class="card-footer text-muted dashFooter">
             <small

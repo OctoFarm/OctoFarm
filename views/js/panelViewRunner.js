@@ -6,6 +6,7 @@ import PrinterManager from "./lib/modules/printerManager.js";
 import doubleClickFullScreen from "./lib/functions/fullscreen.js";
 import {parse} from "./vendor/flatted.js";
 import initGroupSelect from "./lib/modules/groupSelection.js";
+import {returnSelected} from "./lib/modules/filamentGrab.js"
 
 let printerInfo = "";
 let elems = [];
@@ -43,7 +44,7 @@ source.onmessage = async function(e) {
         if (res.clientSettings.panelView.currentOp) {
           currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
         }
-        updateState(res.printerInfo, res.clientSettings.panelView);
+        updateState(res.printerInfo, res.clientSettings.panelView, res.filamentProfiles);
       }
     }
   }
@@ -192,7 +193,7 @@ function grabElements(printer) {
     return elems[printer._id];
   }
 }
-function updateState(printers, clientSettings) {
+function updateState(printers, clientSettings, filamentProfiles) {
   printers.forEach(printer => {
     let elements = grabElements(printer);
     elements.state.innerHTML = printer.state;
@@ -215,19 +216,13 @@ function updateState(printers, clientSettings) {
       elements.currentFile.innerHTML =
         '<i class="fas fa-file-code"></i> ' + "No File Selected";
     }
+
     if (
-      typeof printer.selectedFilament != "undefined" &&
-      printer.selectedFilament != null &&
-      printer.selectedFilament.name != null
+      printer.selectedFilament !== null
     ) {
-      elements.filament.innerHTML =
-        printer.selectedFilament.name +
-        " " +
-        "[" +
-        printer.selectedFilament.colour +
-        " / " +
-        printer.selectedFilament.type[1] +
-        "]";
+      elements.filament.innerHTML = returnSelected(printer.selectedFilament, filamentProfiles)
+    }else{
+      elements.filament.innerHTML = ""
     }
     elements.state.innerHTML = printer.state;
     if (typeof printer.progress != "undefined") {

@@ -15,6 +15,20 @@ export async function getSelected(){
     selected = await selected.json();
     return selected;
 }
+export function returnSelected(id, profiles){
+        let profileId = null;
+        if(profiles.filamentManager){
+            profileId = _.findIndex(profiles, function (o) {
+                return o.profile.index == id.spools.profile;
+            });
+        }else{
+            profileId = _.findIndex(profiles, function (o) {
+                return o._id == id.spools.profile;
+            });
+        }
+
+    return `${id.spools.name} (${id.spools.weight - id.spools.used}g) - ${profiles[profileId].profile.material}`
+}
 export async function returnDropDown(){
     let spools = await loadFilament();
     let profiles = await getProfile();

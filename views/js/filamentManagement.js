@@ -122,9 +122,6 @@ let filamentManager = "";
 
 
 async function init() {
-
-
-
    //Init Spools
     let fill = await OctoFarmclient.get("filament/get/filament");
     fill = await fill.json();

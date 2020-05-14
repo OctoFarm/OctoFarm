@@ -124,11 +124,7 @@
 
   </td>
   <td id="listFilament-<%= printers[sorted.actualIndex]._id %>">
-    <% if(typeof printers[sorted.actualIndex].selectedFilament != 'undefined' &&
-    printers[sorted.actualIndex].selectedFilament.name != null){%> <%=
-    printers[sorted.actualIndex].selectedFilament.name %> [<%=
-    printers[sorted.actualIndex].selectedFilament.colour %> / <%=
-    printers[sorted.actualIndex].selectedFilament.type[1] %>] <% }%>
+  Loading...
   </td>
   <td id="listState-<%= printers[sorted.actualIndex]._id %>">
     <%= printers[sorted.actualIndex].state %>
