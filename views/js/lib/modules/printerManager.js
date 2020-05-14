@@ -3,7 +3,7 @@ import OctoFarmClient from "../octofarm.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import FileManager from "./fileManager.js";
-
+import {returnDropDown, selectFilament} from "../modules/filamentGrab.js";
 
 let currentIndex = 0;
 
@@ -552,31 +552,21 @@ export default class PrinterManager {
           `;
         document.getElementById("printerControlCamera").src = camURL;
         document.getElementById("printerIndex").innerHTML = printer._id;
-        // let rolls = await returnFilament();
 
-        // let filamentKeys = rolls.checked;
-        //
-        // let filamentSelect = document.getElementById(
-        //     "filamentManagerFolderSelect"
-        // );
-        // filamentKeys.forEach((e, index) => {
-        //   filamentSelect.insertAdjacentHTML(
-        //       "beforeend",
-        //       `
-        //         <option value="${e._id}">${e.roll.name} - ${e.roll.type[1]} - ${e.roll.colour} (${e.roll.manufacturer})</option>
-        //     `
-        //   );
-        // });
-        // filamentSelect.addEventListener("change", e => {
-        //   chooseFilament(e.target, printer._id);
-        // });
-        // if (
-        //     typeof printer.selectedFilament != "undefined" &&
-        //     printer.selectedFilament != null &&
-        //     printer.selectedFilament.name != null
-        // ) {
-        //   filamentSelect.value = printer.selectedFilament.id;
-        // }
+        let filamentDropDown = await returnDropDown();
+        let pmFilamentDrop = document.getElementById("filamentManagerFolderSelect")
+        pmFilamentDrop.innerHTML = "";
+        filamentDropDown.forEach(filament => {
+          pmFilamentDrop.insertAdjacentHTML('beforeend', filament)
+        })
+        if(printer.selectedFilament != null){
+          console.log(printer.selectedFilament._id)
+          pmFilamentDrop.value = printer.selectedFilament._id
+        }
+        pmFilamentDrop.addEventListener('change', event => {
+          selectFilament(printer._id, event.target.value)
+        });
+
         const printerPort = document.getElementById("printerPortDrop");
         const printerBaud = document.getElementById("printerBaudDrop");
         const printerProfile = document.getElementById("printerProfileDrop");
@@ -637,13 +627,15 @@ export default class PrinterManager {
         }
         let elements = PrinterManager.grabPage();
         elements.terminal.terminalWindow.innerHTML = "";
-
+        elements.printerControls["step" + printer.stepRate].className =
+            "btn btn-dark active";
         PrinterManager.applyListeners(printer, elements, printers);
         FileManager.drawFiles(printer)
       }
       PrinterManager.applyState(printer, job, progress);
       document.getElementById("printerManagerModal").style.overflow = "auto";
     }
+
   }
 
   static applyListeners(printer, elements, printers) {
@@ -701,7 +693,7 @@ export default class PrinterManager {
         printer: printer._id,
         newSteps: "01"
       });
-      e.target.className = "btn btn-dark active";
+      elements.printerControls.step01.className = "btn btn-dark active";
       elements.printerControls.step1.className = "btn btn-light";
       elements.printerControls.step10.className = "btn btn-light";
       elements.printerControls.step100.className = "btn btn-light";
@@ -711,7 +703,7 @@ export default class PrinterManager {
         printer: printer._id,
         newSteps: "1"
       });
-      e.target.className = "btn btn-dark active";
+      elements.printerControls.step1.className = "btn btn-dark active";
       elements.printerControls.step01.className = "btn btn-light";
       elements.printerControls.step10.className = "btn btn-light";
       elements.printerControls.step100.className = "btn btn-light";
@@ -721,7 +713,7 @@ export default class PrinterManager {
         printer: printer._id,
         newSteps: "10"
       });
-      e.target.className = "btn btn-dark active";
+      elements.printerControls.step10.className = "btn btn-dark active";
       elements.printerControls.step1.className = "btn btn-light";
       elements.printerControls.step01.className = "btn btn-light";
       elements.printerControls.step100.className = "btn btn-light";
@@ -731,7 +723,7 @@ export default class PrinterManager {
         printer: printer._id,
         newSteps: "100"
       });
-      e.target.className = "btn btn-dark active";
+      elements.printerControls.step100.className = "btn btn-dark active";
       elements.printerControls.step1.className = "btn btn-light";
       elements.printerControls.step10.className = "btn btn-light";
       elements.printerControls.step01.className = "btn btn-light";
@@ -1116,6 +1108,7 @@ export default class PrinterManager {
         input: document.getElementById("terminalInput")
       },
       printerControls: {
+        filamentDrop: document.getElementById("filamentManagerFolderSelect"),
         fileUpload: document.getElementById("printerManagerUploadBtn"),
         xPlus: document.getElementById("pcXpos"),
         xMinus: document.getElementById("pcXneg"),
@@ -1201,8 +1194,7 @@ export default class PrinterManager {
 
     elements.jobStatus.expectedCompletionDate.innerHTML = dateComplete;
 
-    elements.printerControls["step" + printer.stepRate].className =
-        "btn btn-dark active";
+
     elements.jobStatus.progressBar.innerHTML =
         Math.round(progress.completion) + "%";
     elements.jobStatus.progressBar.style.width = progress.completion + "%";
@@ -1232,6 +1224,7 @@ export default class PrinterManager {
     }
 
     if (printer.stateColour.category === "Active") {
+      elements.printerControls.filamentDrop.disabled = true;
       if (
           typeof printer.temps != "undefined" &&
           typeof printer.temps[0].tool0 != "undefined" &&
@@ -1287,6 +1280,7 @@ export default class PrinterManager {
         printer.stateColour.category === "Idle" ||
         printer.stateColour.category === "Complete"
     ) {
+      elements.printerControls.filamentDrop.disabled = false;
       PrinterManager.controls(false);
       elements.connectPage.connectButton.value = "disconnect";
       elements.connectPage.connectButton.innerHTML = "Disconnect";
@@ -1356,6 +1350,7 @@ export default class PrinterManager {
         printer.stateColour.category === "Offline" ||
         printer.stateColour.category === "Disconnected"
     ) {
+      elements.printerControls.filamentDrop.disabled = false;
       elements.connectPage.connectButton.value = "connect";
       elements.connectPage.connectButton.innerHTML = "Connect";
       elements.connectPage.connectButton.classList = "btn btn-success inline";

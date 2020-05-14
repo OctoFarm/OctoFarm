@@ -14,7 +14,7 @@ const Logger = require('../lib/logger.js');
 const logger = new Logger('OctoFarm-State')
 
 let farmPrinters = [];
-
+let selectedFilament = [];
 let statRunner = null;
 let farmStatRunner = null;
 
@@ -560,6 +560,10 @@ class Runner {
         }
         if(typeof farmPrinters[i].selectedFilament === "undefined"){
             farmPrinters[i].selectedFilament = null;
+        }else{
+            if(farmPrinters[i].selectedFilament != null){
+                selectedFilament.push(farmPrinters[i].selectedFilament._id)
+            }
         }
         if (typeof farmPrinters[i].octoPrintVersion === "undefined") {
             farmPrinters[i].octoPrintVersion = "";
@@ -1089,13 +1093,6 @@ class Runner {
             printer.settingsApperance.name = farmPrinters[i].settingsApperance.name;
             printer.save();
         }
-        //Keeping just in case but shouldn't be required...
-        // static async selectFilament(i, filament) {
-        //   farmPrinters[i].selectedFilament = filament;
-        //   let printer = await Dashboard.findOne({ index: i });
-        //   printer.selectedFilament = farmPrinters[i].selectedFilament;
-        //   printer.save();
-        // }
     static moveFile(id, newPath, fullPath, filename) {
         let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
         let file = _.findIndex(farmPrinters[i].fileList.files, function(o) {
@@ -1163,23 +1160,61 @@ class Runner {
         farmPrinters[i].fileList.folderCount =
             farmPrinters[i].fileList.folders.length;
     }
+    static getSelected(){
+        return selectedFilament;
+    }
+    static async updateFilament(){
+        for(let i = 0; i < farmPrinters.length; i++){
+            if(farmPrinters[i].selectedFilament != null){
+                let newInfo = await Filament.findById(farmPrinters[i].selectedFilament._id)
+                let printer = await Printers.findById(farmPrinters[i]._id)
+                farmPrinters[i].selectedFilament = newInfo;
+                printer.selectedFilament = newInfo;
+                printer.save();
+            }
+        }
+    }
     static async selectedFilament(printerId, filamentId) {
-        let printer = await Printers.findById(printerId);
-        let spool = await Filament.findById(filamentId);
-
-        let i = _.findIndex(farmPrinters, function(o) { return o._id == printerId; });
-        if(spool != 0){
+        if (printerId == 0) {
+            //Deselecting a spool
+            //Find the printer spool is attached too
+            let i = _.findIndex(farmPrinters, function(o) {
+                    if(o.selectedFilament !== null && o.selectedFilament._id == filamentId){
+                        return o.selectedFilament._id;
+                    }
+            });
+            if(i > -1){
+                let printer = await Printers.findById(farmPrinters[i]._id);
+                printer.selectedFilament = null;
+                farmPrinters[i].selectedFilament = null;
+                printer.save();
+                //remove from selected filament list
+                let selectedFilamentId = _.findIndex(selectedFilament, function(o) {
+                    return o == filamentId;
+                });
+                if(selectedFilamentId > -1){
+                    selectedFilament.splice(selectedFilamentId, 1)
+                }
+            }
+        } else {
+            //Selecting a spool
+            let printer = await Printers.findById(printerId);
+            let i = _.findIndex(farmPrinters, function(o) { return o._id == printerId; });
+            if(farmPrinters[i].selectedFilament != null){
+                //farm printer already has filament, remove before updating...
+                let selectedFilamentId = _.findIndex(selectedFilament, function(o) {
+                    return o._id == farmPrinters[i].selectedFilament._id;
+                });
+                if(selectedFilamentId > -1){
+                    selectedFilament.splice(selectedFilamentId, 1)
+                }
+            }
+            let spool = await Filament.findById(filamentId);
             printer.selectedFilament = spool;
             farmPrinters[i].selectedFilament = spool;
-            printer.save();
-        }else{
-            printer.selectedFilament = null;
-            farmPrinters[i].selectedFilament = null;
+            selectedFilament.push(spool._id);
             printer.save();
         }
-
-        return farmPrinters[i].selectedFilament;
-
     }
     static newFile(file) {
         let i = _.findIndex(farmPrinters, function(o) { return o._id == file.index; });
