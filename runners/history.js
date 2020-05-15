@@ -5,6 +5,8 @@ const Roll = require("../models/Filament.js");
 const Logger = require('../lib/logger.js');
 const logger = new Logger('OctoFarm-HistoryCollection')
 const filamentProfiles = require("../models/Profiles.js")
+const ServerSettings = require("../models/ServerSettings.js")
+const Spool = require("../models/Filament.js")
 
 class HistoryCollection {
   static async resyncFilament(printer){
@@ -15,22 +17,19 @@ class HistoryCollection {
         "X-Api-Key": printer.apikey
       }
     });
-    //Make sure filament manager responds...
-    if(spools.status != 200 || profiles.status != 200){
-      res.send({ status: false });
-    }
     let spool = await Spool.findById(printer.selectedFilament._id)
 
     let sp = await spools.json();
     spool.spools = {
-      name: sp.name,
-      profile: sp.profile.id,
-      price: sp.cost,
-      weight: sp.weight,
-      used: sp.used,
-      tempOffset: sp.temp_offset,
-      fmID: sp.id
+      name: sp.spool.name,
+      profile: sp.spool.profile.id,
+      price: sp.spool.cost,
+      weight: sp.spool.weight,
+      used: sp.spool.used,
+      tempOffset: sp.spool.temp_offset,
+      fmID: sp.spool.id
     };
+    spool.markModified("spools")
     spool.save();
   }
   static async complete(payload, printer) {
