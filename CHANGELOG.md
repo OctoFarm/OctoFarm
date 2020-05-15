@@ -34,6 +34,7 @@ All notable changes to this project will be documented in this file.
     - Fixed issue with list view not updating list colour on state change.
     - Fixed issue with history index sort requiring two clicks.
     - Filament calculation now correctly applies to power of.
+    - Fixed annoying pop-up with no printers
     
 
 ## [v1.1.4.9-dev-2.7]
