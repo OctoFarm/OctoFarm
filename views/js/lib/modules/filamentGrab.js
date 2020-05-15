@@ -15,18 +15,47 @@ export async function getSelected(){
     selected = await selected.json();
     return selected;
 }
-export function returnSelected(id, profiles){
-        let profileId = null;
-        if(profiles.filamentManager){
-            profileId = _.findIndex(profiles, function (o) {
-                return o.profile.index == id.spools.profile;
-            });
+export function returnHistory(id) {
+    if(id.spools !== undefined){
+        return `${id.spools.name} - [${id.spools.profile.material} / ${id.spools.profile.manufacturer}]`
+    }else{
+        return `Old database, please update on the view modal.`
+    }
+
+}
+export function returnHistoryUsage(id){
+    if(id.job.filament === null) {
+        id.job.filament = {
+            tool0: {
+                length: 0
+            }
+        }
+    }
+    if(id.filamentSelection.spools !== undefined){
+        let length = id.job.filament.tool0.length / 1000
+        if(length === 0){
+            return ''
         }else{
-            profileId = _.findIndex(profiles, function (o) {
-                return o._id == id.spools.profile;
-            });
+            let usage = Math.pow((3.14 * (parseFloat(id.filamentSelection.spools.profile.diameter) / 2)) , (2 * parseFloat(id.filamentSelection.spools.profile.density) * (length) ))
+            return length.toFixed(2) + "m / " + usage.toFixed(2) + "g";
         }
 
+    }else{
+        return ``
+    }
+
+}
+export function returnSelected(id, profiles) {
+    let profileId = null;
+    if (profiles.filamentManager) {
+        profileId = _.findIndex(profiles, function (o) {
+            return o.profile.index == id.spools.profile;
+        });
+    } else {
+        profileId = _.findIndex(profiles, function (o) {
+            return o._id == id.spools.profile;
+        });
+    }
     return `${id.spools.name} (${id.spools.weight - id.spools.used}g) - ${profiles[profileId].profile.material}`
 }
 export async function returnDropDown(){
@@ -74,7 +103,6 @@ export async function selectFilament(printerId, spoolId){
         printerId: printerId,
         spoolId: spoolId
     }
-    console.log(data)
     let changedFilament = await OctoFarmclient.post("filament/select", data)
 }
 
