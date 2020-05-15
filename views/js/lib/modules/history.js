@@ -3,6 +3,7 @@ import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import tableSort from "../functions/tablesort.js";
 import {returnHistory, returnHistoryUsage} from "./filamentGrab.js";
+import fetch from "node-fetch";
 
 
 //Setup history listeners
@@ -172,6 +173,73 @@ export default class History {
       printTime.innerHTML = Calc.generateTime(current.printTime);
       endDate.innerHTML = current.endDate;
     }
+  }
+  static async resyncHistory(){
+    const runner = require("../runners/state.js");
+    const Runner = runner.Runner;
+    let printerList = Runner.returnFarmPrinters();
+    let printer = null;
+    for (let i = 0; i < 10; i++) {
+      if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
+        printer = printerList[i]
+        break;
+      }
+    }
+
+    if(printer === null){
+      res.send({ status: false });
+    }
+    let spools = await fetch(`${printer.printerURL}/plugin/filamentmanager/spools`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": printer.apikey
+      }
+    });
+    let profiles = await fetch(`${printer.printerURL}/plugin/filamentmanager/profiles`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": printer.apikey
+      }
+    });
+    //Make sure filament manager responds...
+    if(spools.status != 200 || profiles.status != 200){
+      res.send({ status: false });
+    }
+    await Spool.deleteMany({})
+    await Profile.deleteMany({})
+    spools = await spools.json();
+    profiles = await profiles.json();
+    spools.spools.forEach(sp => {
+
+      let spools = {
+        name: sp.name,
+        profile: sp.profile.id,
+        price: sp.cost,
+        weight: sp.weight,
+        used: sp.used,
+        tempOffset: sp.temp_offset,
+        fmID: sp.id
+      };
+      let newS = new Spool({
+        spools
+      });
+      newS.save();
+    })
+    profiles.profiles.forEach(sp => {
+      let profile = {
+        index: sp.id,
+        density: sp.density,
+        diameter: sp.diameter,
+        manufacturer: sp.vendor,
+        material: sp.material,
+      };
+      let newP = new Profile({
+        profile
+      });
+      newP.save();
+    })
   }
   static async save(id) {
     let update = {
