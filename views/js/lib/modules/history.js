@@ -174,7 +174,7 @@ export default class History {
       endDate.innerHTML = current.endDate;
     }
   }
-  static async resyncHistory(){
+  static async resyncFilament(){
     const runner = require("../runners/state.js");
     const Runner = runner.Runner;
     let printerList = Runner.returnFarmPrinters();
@@ -196,23 +196,15 @@ export default class History {
         "X-Api-Key": printer.apikey
       }
     });
-    let profiles = await fetch(`${printer.printerURL}/plugin/filamentmanager/profiles`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
-      }
-    });
     //Make sure filament manager responds...
     if(spools.status != 200 || profiles.status != 200){
       res.send({ status: false });
     }
     await Spool.deleteMany({})
-    await Profile.deleteMany({})
-    spools = await spools.json();
-    profiles = await profiles.json();
-    spools.spools.forEach(sp => {
 
+    spools = await spools.json();
+
+    spools.spools.forEach(sp => {
       let spools = {
         name: sp.name,
         profile: sp.profile.id,
@@ -226,19 +218,6 @@ export default class History {
         spools
       });
       newS.save();
-    })
-    profiles.profiles.forEach(sp => {
-      let profile = {
-        index: sp.id,
-        density: sp.density,
-        diameter: sp.diameter,
-        manufacturer: sp.vendor,
-        material: sp.material,
-      };
-      let newP = new Profile({
-        profile
-      });
-      newP.save();
     })
   }
   static async save(id) {
