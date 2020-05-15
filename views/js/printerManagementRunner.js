@@ -21,7 +21,7 @@ async function asyncParse(str) {
     }
 }
 let source = new EventSource("/sse/dashboardInfo/");
-let iHavePrinters = false;
+
 source.onmessage = async function(e) {
     if (!editMode) {
         if (e.data != null) {
@@ -38,13 +38,6 @@ source.onmessage = async function(e) {
                         printerInfo = res.printerInfo;
                         dashUpdate.printers(res.printerInfo)
                     }
-                } else {
-                    if (iHavePrinters === false) {
-                        iHavePrinters = true;
-                        bootbox.alert("No printers detected, please add them using the printer manager below.", function() {
-                        });
-                    }
-
                 }
             }
         }

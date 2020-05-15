@@ -344,7 +344,6 @@ async function asyncParse(str) {
 }
 let source = new EventSource("/sse/dashboardInfo/");
 let statsCounter = 10;
-let iHavePrinters = false;
 source.onmessage = async function(e) {
         if (e.data != null) {
             let res = await asyncParse(e.data);
@@ -365,13 +364,6 @@ source.onmessage = async function(e) {
                         } else {
                             statsCounter = statsCounter + 1;
                         }
-                } else {
-                    if (iHavePrinters === false) {
-                        iHavePrinters = true;
-                        bootbox.alert("No printers detected, please add them using the printer manager below.", function() {
-                        });
-                    }
-
                 }
             }
         }
