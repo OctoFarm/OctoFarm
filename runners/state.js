@@ -1007,7 +1007,7 @@ class Runner {
             return { name: "warning", hex: "#583c0e", category: "Active" };
         } else if (state === "Cancelling") {
             return { name: "warning", hex: "#583c0e", category: "Active" };
-        } else if (state === "Error") {
+        } else if (state === "Error!") {
             return { name: "danger", hex: "#2e0905", category: "Disconnected" };
         } else if (state === "Offline") {
             return { name: "danger", hex: "#2e0905", category: "Offline" };
@@ -1018,11 +1018,11 @@ class Runner {
         } else if (state === "Complete") {
             return { name: "success", hex: "#00330e", category: "Complete" };
         } else if (state === "Shutdown") {
-            return { name: "danger", hex: "#00330e", category: "Offline" };
+            return { name: "danger", hex: "#2e0905", category: "Offline" };
         } else if (state === "Online") {
             return { name: "success", hex: "#00330e", category: "Idle" };
         } else {
-            return { name: "danger", hex: "#00330e", category: "Offline" };
+            return { name: "danger", hex: "#2e0905", category: "Offline" };
         }
     }
     static returnFarmPrinters(index) {
