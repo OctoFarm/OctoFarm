@@ -1200,19 +1200,36 @@ class Runner {
             //Selecting a spool
             let printer = await Printers.findById(printerId);
             let i = _.findIndex(farmPrinters, function(o) { return o._id == printerId; });
+
             if(farmPrinters[i].selectedFilament != null){
-                //farm printer already has filament, remove before updating...
-                let selectedFilamentId = _.findIndex(selectedFilament, function(o) {
-                    return o._id == farmPrinters[i].selectedFilament._id;
-                });
-                if(selectedFilamentId > -1){
-                    selectedFilament.splice(selectedFilamentId, 1)
+                if(filamentId == 0){
+                    let selectedFilamentId = _.findIndex(selectedFilament, function(o) {
+                        return o._id == farmPrinters[i].selectedFilament._id;
+                    });
+                    if(selectedFilamentId > -1){
+                        selectedFilament.splice(selectedFilamentId, 1)
+                    }
+                    printer.selectedFilament = null;
+                    farmPrinters[i].selectedFilament = null;
                 }
+                // //farm printer already has filament, remove before updating...
+                // let selectedFilamentId = _.findIndex(selectedFilament, function(o) {
+                //     return o._id == farmPrinters[i].selectedFilament._id;
+                // });
+                // if(selectedFilamentId > -1){
+                //     selectedFilament.splice(selectedFilamentId, 1)
+                // }
+                // let spool = await Filament.findById(filamentId);
+                // printer.selectedFilament = spool;
+                // farmPrinters[i].selectedFilament = spool;
+                // selectedFilament.push(spool._id);
+            }else{
+                let spool = await Filament.findById(filamentId);
+                printer.selectedFilament = spool;
+                farmPrinters[i].selectedFilament = spool;
+                selectedFilament.push(spool._id);
             }
-            let spool = await Filament.findById(filamentId);
-            printer.selectedFilament = spool;
-            farmPrinters[i].selectedFilament = spool;
-            selectedFilament.push(spool._id);
+            printer.markModified("selectedFilament")
             printer.save();
         }
     }
