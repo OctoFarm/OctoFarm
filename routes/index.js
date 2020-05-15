@@ -138,6 +138,7 @@ router.get("/history", ensureAuthenticated, async(req, res) => {
     let sortedPrinters = await Runner.sortedIndex();
     const History = require("../models/History.js");
     let history = await History.find({});
+
     let user = null;
     let group = null;
     if (serverConfig.loginRequired === false) {
@@ -187,7 +188,6 @@ router.get("/mon/panel", ensureAuthenticated, async(req, res) => {
         currentOperationsCount: statistics.currentOperationsCount,
         page: "Panel View",
         helpers: prettyHelpers,
-
         clientSettings: clientSettings
     });
 });
