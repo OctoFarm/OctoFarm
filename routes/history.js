@@ -22,7 +22,7 @@ router.post("/delete", ensureAuthenticated, async (req, res) => {
   res.send("success");
 });
 router.get("/get", ensureAuthenticated, (req, res) => {
-  History.find({}).then(checked => {
+  History.find({}, null, { sort: { historyIndex: 1 } }).then(checked => {
     res.send({ history: checked });
   });
 });

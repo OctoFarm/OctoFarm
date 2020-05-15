@@ -2,6 +2,9 @@ import OctoFarmClient from "../octofarm.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import tableSort from "../functions/tablesort.js";
+import {returnHistory, returnHistoryUsage} from "./filamentGrab.js";
+
+
 //Setup history listeners
 document.getElementById("historyTable").addEventListener("click", e => {
   //Remove from UI
@@ -17,11 +20,46 @@ let historyList = [];
 $("#historyModal").on("hidden.bs.modal", function(e) {
   document.getElementById("historySaveBtn").remove();
 });
+
+
+
 export default class History {
+  static returnFilamentUsage(id){
+    if(id.job.filament === null) {
+      id.job.filament = {
+        tool0: {
+          length: 0
+        }
+      }
+    }
+      let length = id.job.filament.tool0.length / 1000
+      if(length === 0){
+        return ''
+      }else{
+        let usage = Math.pow((3.14 * (1.75 / 2)) , (2 * 1.24 * (length) ))
+        return length.toFixed(2) + "m / " + usage.toFixed(2) + "g";
+      }
+  }
+
   static async get() {
     let newHistory = await OctoFarmClient.get("history/get");
     historyList = await newHistory.json();
+
+    historyList.history.forEach(history => {
+      let filamentString = null;
+      let filamentUsage = null;
+      if(history.printHistory.filamentSelection !== null){
+        filamentString = returnHistory(history.printHistory.filamentSelection)
+        filamentUsage = returnHistoryUsage(history.printHistory)
+      }else{
+        filamentString = "None selected..."
+        filamentUsage = History.returnFilamentUsage(history.printHistory)
+      }
+      document.getElementById("spool-"+history._id).innerHTML = filamentString;
+      document.getElementById("usage-"+history._id).innerHTML = filamentUsage
+    })
   }
+
   static async edit(e) {
     if (e.target.classList.value.includes("historyEdit")) {
       document.getElementById("historySave").insertAdjacentHTML(

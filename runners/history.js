@@ -4,6 +4,7 @@ const fetch = require("node-fetch");
 const Roll = require("../models/Filament.js");
 const Logger = require('../lib/logger.js');
 const logger = new Logger('OctoFarm-HistoryCollection')
+const filamentProfiles = require("../models/Profiles.js")
 
 class HistoryCollection {
   static async complete(payload, printer) {
@@ -25,16 +26,21 @@ class HistoryCollection {
       let endTime = today.toTimeString();
       let endTimeFormat = endTime.substring(0, 8);
       let endDate = endDDMM + " - " + endTimeFormat;
-
-      let filamentChoice = "None chosen...";
-      if (
-          typeof printer.selectedFilament != "undefined" &&
-          printer.selectedFilament != 0
-      ) {
-        let roll = await Roll.findById( printer.selectedFilament.id );
-
-        filamentChoice = roll;
+      let profiles = await filamentProfiles.find({});
+      if(printer.selectedFilament !== null){
+        let profileId = null;
+        if(profiles.filamentManager){
+          profileId = _.findIndex(profiles, function (o) {
+            return o.profile.index == printer.selectedFilament.spools.profile;
+          });
+        }else{
+          profileId = _.findIndex(profiles, function (o) {
+            return o._id == printer.selectedFilament.spools.profile;
+          });
+        }
+        printer.selectedFilament.spools.profile = profiles[profileId].profile;
       }
+
       let name = null;
       if (typeof printer.settingsApperance != "undefined") {
         if (printer.settingsApperance.name === "" || printer.settingsApperance.name === null) {
@@ -58,7 +64,7 @@ class HistoryCollection {
         startDate: startDate,
         endDate: endDate,
         printTime: Math.round(payload.time),
-        filamentSelection: filamentChoice,
+        filamentSelection: printer.selectedFilament,
         job: printer.job,
         notes: ""
       };

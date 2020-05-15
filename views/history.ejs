@@ -20,50 +20,50 @@
         </tr>
       </thead>
       <tbody id="historyTable">
-        <% history.forEach((print, index) => { %>
+        <% for(let i = history.length; i--;){ %>
         <tr>
           <td scope="row">
-            <%= index %>
+            <%= history[i].printHistory.historyIndex %>
           </td>
           <td>
-            <% if(print.printHistory.success){%>
+            <% if(history[i].printHistory.success){%>
             <p class="d-none">Success</p><i class="fas fa-thumbs-up text-success"></i>
-            <% }else{ %> <% if(print.printHistory.reason === "cancelled"){ %>
+            <% }else{ %> <% if(history[i].printHistory.reason === "cancelled"){ %>
                 <p class="d-none">Cancelled</p><i class="fas fa-thumbs-down text-warning"></i>
             <% }else{ %>
                 <p class="d-none">Failure</p><i class="fas fa-exclamation text-danger"></i>
             <% } %> <% } %>
           </td>
           <td><%=
-            print.printHistory.printerName %>
+            history[i].printHistory.printerName %>
           </td>
           <td class="text-wrap">
-            <%= print.printHistory.fileName %>
+            <%= history[i].printHistory.fileName %>
           </td>
           <td>
-            <%= print.printHistory.startDate %>
+            <%= history[i].printHistory.startDate %>
           </td>
           <td>
-            <%= print.printHistory.endDate %>
+            <%= history[i].printHistory.endDate %>
           </td>
           <td>
-            <%= helpers.generateTime(print.printHistory.printTime) %>
+            <%= helpers.generateTime(history[i].printHistory.printTime) %>
           </td>
-          <td>
+          <td id="spool-<%= history[i]._id %>">
             Loading...
           </td>
-          <td>
+          <td id="usage-<%= history[i]._id %>">
             Loading...
           </td>
-          <td class="text-wrap" id="note-<%= print._id %>">
-            <%= print.printHistory.notes %>
+          <td class="text-wrap" id="note-<%= history[i]._id %>">
+            <%= history[i].printHistory.notes %>
           </td>
           <td>
             <div class="btn-group" role="group" aria-label="Basic example">
               <button
                 type="button"
                 class="btn btn-info btn-small historyEdit"
-                id="<%= print._id %>"
+                id="<%= history[i]._id %>"
                 data-toggle="modal"
                 data-target="#historyModal"
               >
@@ -73,14 +73,14 @@
               <button
                 type="button"
                 class="btn btn-danger btn-small historyDelete"
-                id="<%= print._id %>"
+                id="<%= history[i]._id %>"
               >
                 <i class="fas fa-trash"></i>
               </button>
             </div>
           </td>
         </tr>
-        <% }) %>
+        <% } %>
       </tbody>
     </table>
   </div>
