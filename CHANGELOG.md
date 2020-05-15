@@ -8,26 +8,32 @@ All notable changes to this project will be documented in this file.
 
 ### Added
     - Farm Utilisation chart on dashboard now calculates Failed Hours. These are the hours totaled registered from history that are set as success = false;
-    - Idle hours is now black on the farm key, red for failed and active is green.
+    - Idle hours is now black on the farm unitlisation key, red for failed and active is green.
     - Keys and bar charts added to the Cumulative/Average times on the dashboard
     - Keys added to the Printer Status, Printer Progress, Printer Temps and Printer Utilisation heat charts on dashboard.
     - Current Operations View. Displays full screen the current operations bar. 
     - Panel, List and Camera View all react to groups now. When loading a page it will always default to "All Printers", any modification with the drop down will append a URL to the page. This URL can be re-used as a book mark to automatically load a group. 
     
+    
 ### Changed
     - Group dropdown only appears if groups exist.
     - Renamed the views removing the "Views" Tag. Added in placeholders on hover to describe function.
-    - Filament manager now get's its own page
-        - New support for the filament manager plugin, press the sync button at the bottom of the filament page to activate. 
+    - Filament manager now get's its own page (caveat, full redesign so no longer works with old database, history will show but will not recognise a filament. Editing ability to select the spool as been enabled if you'd like to update them.)
+        - New support for the filament manager plugin, press the sync button at the bottom of the filament page to activate. You will require this to automagically track filament usage on your spools.
         - Will now track costs if available. 
-        - Can also apply temperature offsets. 
+        - Can also apply temperature offsets with these, whatever is entered -/+ into the offset field will now be applied at the start of a print.
     - Reduced the width of printer manager, allowing for click close outside of the modal window.
+    - History page now loads latest first as default.
     
 ### Removed
-
+    - Old filament manager and database structure. 
 
 ### Fixed
     - Fixed Panel view file name been stuck in loading...
+    - Printer control not correctly displaying step rate.
+    - Fixed issue with list view not updating list colour on state change.
+    - Fixed issue with history index sort requiring two clicks.
+    - Filament calculation now correctly applies to power of.
     
 
 ## [v1.1.4.9-dev-2.7]
