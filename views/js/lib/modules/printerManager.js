@@ -560,7 +560,6 @@ export default class PrinterManager {
           pmFilamentDrop.insertAdjacentHTML('beforeend', filament)
         })
         if(printer.selectedFilament != null){
-          console.log(printer.selectedFilament._id)
           pmFilamentDrop.value = printer.selectedFilament._id
         }
         pmFilamentDrop.addEventListener('change', event => {
