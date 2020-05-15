@@ -46,7 +46,7 @@ source.onmessage = async function(e) {
         if (res.clientSettings.listView.currentOp) {
           currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
         }
-        updateState(res.printerInfo, res.clientSettings.listView, res.filamentProfiles);
+        updateState(res.printerInfo, res.clientSettings.listView, res.filamentProfiles, res.filamentManager);
       }
     }
   }
@@ -146,7 +146,7 @@ function grabElements(printer) {
     return elems[printer._id];
   }
 }
-function updateState(printers, clientSettings, filamentProfiles) {
+function updateState(printers, clientSettings, filamentProfiles, filamentManager) {
   let currentGroup = document.getElementById("currentGroup").innerHTML;
   currentGroup = currentGroup.replace("Selected: ", "").trim()
 
@@ -170,7 +170,7 @@ function updateState(printers, clientSettings, filamentProfiles) {
     if (
         printer.selectedFilament !== null
     ) {
-      elements.filament.innerHTML = returnSelected(printer.selectedFilament, filamentProfiles)
+      elements.filament.innerHTML = returnSelected(printer.selectedFilament, filamentProfiles, filamentManager)
     }else{
       elements.filament.innerHTML = ""
     }

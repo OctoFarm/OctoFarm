@@ -44,7 +44,7 @@ source.onmessage = async function(e) {
         if (res.clientSettings.panelView.currentOp) {
           currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
         }
-        updateState(res.printerInfo, res.clientSettings.panelView, res.filamentProfiles);
+        updateState(res.printerInfo, res.clientSettings.panelView, res.filamentProfiles, res.filamentManager);
       }
     }
   }
@@ -193,7 +193,7 @@ function grabElements(printer) {
     return elems[printer._id];
   }
 }
-function updateState(printers, clientSettings, filamentProfiles) {
+function updateState(printers, clientSettings, filamentProfiles, filamentManager) {
   printers.forEach(printer => {
     let elements = grabElements(printer);
     elements.state.innerHTML = printer.state;
@@ -220,7 +220,7 @@ function updateState(printers, clientSettings, filamentProfiles) {
     if (
       printer.selectedFilament !== null
     ) {
-      elements.filament.innerHTML = returnSelected(printer.selectedFilament, filamentProfiles)
+      elements.filament.innerHTML = returnSelected(printer.selectedFilament, filamentProfiles, filamentManager)
     }else{
       elements.filament.innerHTML = ""
     }

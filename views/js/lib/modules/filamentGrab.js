@@ -45,10 +45,12 @@ export function returnHistoryUsage(id){
     }
 
 }
-export function returnSelected(id, profiles) {
+export function returnSelected(id, profiles, filamentManager) {
     let profileId = null;
-    if (profiles.filamentManager) {
+    if (filamentManager) {
+        console.log("ME")
         profileId = _.findIndex(profiles, function (o) {
+            console.log(o)
             return o.profile.index == id.spools.profile;
         });
     } else {

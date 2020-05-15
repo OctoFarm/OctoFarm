@@ -23,8 +23,9 @@ let sysInfo = null;
 setInterval(async function() {
   //Only needed for WebSocket Information
   let printers = await Runner.returnFarmPrinters();
-
+  let filamentProfiles = await FilamentProfiles.find({})
   let printerInfo = [];
+  let systemSettings = await ServerSettings.find({})
 
   // let filly = await Roll.find({});
   // let rolls = [];
@@ -127,8 +128,10 @@ setInterval(async function() {
     octofarmStatistics: octofarmStatistics,
     farmInfo: farmInfo,
     heatMap: heatMap,
-    filamentProfiles: await FilamentProfiles.find({}),
-    clientSettings: cSettings
+    filamentProfiles: filamentProfiles,
+    filamentManager: systemSettings[0].filamentManager,
+    clientSettings: cSettings,
+
   };
   clientInfoString = stringify(clientInfo);
 
