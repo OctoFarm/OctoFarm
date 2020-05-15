@@ -1211,18 +1211,20 @@ class Runner {
                     }
                     printer.selectedFilament = null;
                     farmPrinters[i].selectedFilament = null;
+                }else{
+                    //farm printer already has filament, remove before updating...
+                    let selectedFilamentId = _.findIndex(selectedFilament, function(o) {
+                        return o._id == farmPrinters[i].selectedFilament._id;
+                    });
+                    if(selectedFilamentId > -1){
+                        selectedFilament.splice(selectedFilamentId, 1)
+                    }
+                    let spool = await Filament.findById(filamentId);
+                    printer.selectedFilament = spool;
+                    farmPrinters[i].selectedFilament = spool;
+                    selectedFilament.push(spool._id);
                 }
-                // //farm printer already has filament, remove before updating...
-                // let selectedFilamentId = _.findIndex(selectedFilament, function(o) {
-                //     return o._id == farmPrinters[i].selectedFilament._id;
-                // });
-                // if(selectedFilamentId > -1){
-                //     selectedFilament.splice(selectedFilamentId, 1)
-                // }
-                // let spool = await Filament.findById(filamentId);
-                // printer.selectedFilament = spool;
-                // farmPrinters[i].selectedFilament = spool;
-                // selectedFilament.push(spool._id);
+
             }else{
                 let spool = await Filament.findById(filamentId);
                 printer.selectedFilament = spool;
