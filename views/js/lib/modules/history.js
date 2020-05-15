@@ -41,6 +41,19 @@ export default class History {
         return length.toFixed(2) + "m / " + usage.toFixed(2) + "g";
       }
   }
+  static returnPrintCost(job, filament){
+    if(job.filament.tool0.length === 0){
+      return `No length to calculate from`
+    }else{
+      console.log(filament == "None chosen...")
+      if(filament === null || filament == "None chosen..."){
+        return `No filament to calculate from`
+      }else{
+        let cost = (filament.spools.price / filament.spools.weight) * (Math.pow((3.14 * (1.75 / 2)) , (2 * 1.24 * (job.filament.tool0.length / 1000))))
+        return cost.toFixed(2)
+      }
+    }
+  }
 
   static async get() {
     let newHistory = await OctoFarmClient.get("history/get");
@@ -57,7 +70,8 @@ export default class History {
         filamentUsage = History.returnFilamentUsage(history.printHistory)
       }
       document.getElementById("spool-"+history._id).innerHTML = filamentString;
-      document.getElementById("usage-"+history._id).innerHTML = filamentUsage
+      document.getElementById("usage-"+history._id).innerHTML = filamentUsage;
+      document.getElementById("cost-"+history._id).innerHTML = History.returnPrintCost(history.printHistory.job, history.printHistory.filamentSelection);
     })
   }
 
@@ -129,12 +143,23 @@ export default class History {
       if (current.success) {
         status.innerHTML =
           '<i class="fas fa-thumbs-up text-success fa-3x"></i>';
-        volume.value = Math.round((current.filamentVolume / 100) * 100) / 100;
-        length.value = Math.round((current.filamentLength / 1000) * 100) / 100;
-        weight.value =
-          (3.14 * (1.75 / 2)) ^
-          ((2 * 1.24 * Math.round((current.filamentLength / 1000) * 100)) /
-            100);
+        if(typeof current.job != 'undefined' && current.job.filament != null) {
+          volume.value = Math.round((current.job.filament.tool0.volume / 100) * 100) / 100;
+          length.value = Math.round((current.job.filament.tool0.length / 1000) * 100) / 100;
+          let filamentWeight = null;
+          if (current.filamentSelection !== null) {
+            filamentWeight = returnHistoryUsage(current)
+          } else {
+            filamentWeight = History.returnFilamentUsage(current)
+          }
+          filamentWeight = filamentWeight.split(" / ").pop()
+          weight.value = filamentWeight
+          if (current.job.filament.tool0.length === 0) {
+            volume.value = "No statistic generated on OctoPrint";
+            length.value = "No statistic generated on OctoPrint";
+            weight.value = "No statistic generated on OctoPrint";
+          }
+        }
         if (typeof current.job != "undefined") {
           let upDate = new Date(current.job.file.date * 1000);
           upDate =
@@ -160,15 +185,12 @@ export default class History {
             '<i class="fas fa-exclamation text-danger fa-3x"></i>';
         }
       }
-      if (
-        typeof current.filamentSelection != "undefined" &&
-        current.filamentSelection != "None chosen..."
-      ) {
-        let roll = current.filamentSelection.roll;
-        filament.value = `${roll.name}  [ ${roll.colour}  /  ${roll.type[1]} ]`;
-      } else {
+      if(current.filamentSelection != null){
+        filament.value = returnHistory(current.filamentSelection)
+      }else{
         filament.value = `None selected...`;
       }
+
       startDate.innerHTML = current.startDate;
       printTime.innerHTML = Calc.generateTime(current.printTime);
       endDate.innerHTML = current.endDate;

@@ -11,6 +11,7 @@
           <th class="sticky-table table-dark" scope="col">Start Date</th>
           <th class="sticky-table table-dark" scope="col">End Date</th>
           <th class="sticky-table table-dark" scope="col">Print Time</th>
+          <th class="sticky-table table-dark" scope="col">Cost</th>
           <th class="sticky-table table-dark" scope="col">Spool</th>
           <th class="sticky-table table-dark" scope="col">Filament Usage</th>
           <th class="sticky-table table-dark" scope="col" width="400px">
@@ -48,6 +49,9 @@
           </td>
           <td>
             <%= helpers.generateTime(history[i].printHistory.printTime) %>
+          </td>
+          <td id="cost-<%= history[i]._id %>">
+            Loading...
           </td>
           <td id="spool-<%= history[i]._id %>">
             Loading...
@@ -119,7 +123,7 @@
           </div>
           <div class="row">
             <div class="col-lg-6">
-              <h5><h5 class="mb-1 text-left">Filament</h5>
+             <h5 class="mb-1 text-left">Filament</h5>
                 <div class="input-group mb-1 input-group-sm">
                   <div class="input-group-prepend">
                     <span class="input-group-text">Spool</span>
