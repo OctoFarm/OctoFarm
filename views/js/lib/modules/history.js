@@ -3,7 +3,7 @@ import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import tableSort from "../functions/tablesort.js";
 import {returnHistory, returnHistoryUsage} from "./filamentGrab.js";
-import fetch from "node-fetch";
+
 
 
 //Setup history listeners
@@ -174,52 +174,7 @@ export default class History {
       endDate.innerHTML = current.endDate;
     }
   }
-  static async resyncFilament(){
-    const runner = require("../runners/state.js");
-    const Runner = runner.Runner;
-    let printerList = Runner.returnFarmPrinters();
-    let printer = null;
-    for (let i = 0; i < 10; i++) {
-      if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
-        printer = printerList[i]
-        break;
-      }
-    }
 
-    if(printer === null){
-      res.send({ status: false });
-    }
-    let spools = await fetch(`${printer.printerURL}/plugin/filamentmanager/spools`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
-      }
-    });
-    //Make sure filament manager responds...
-    if(spools.status != 200 || profiles.status != 200){
-      res.send({ status: false });
-    }
-    await Spool.deleteMany({})
-
-    spools = await spools.json();
-
-    spools.spools.forEach(sp => {
-      let spools = {
-        name: sp.name,
-        profile: sp.profile.id,
-        price: sp.cost,
-        weight: sp.weight,
-        used: sp.used,
-        tempOffset: sp.temp_offset,
-        fmID: sp.id
-      };
-      let newS = new Spool({
-        spools
-      });
-      newS.save();
-    })
-  }
   static async save(id) {
     let update = {
       id: id,

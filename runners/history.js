@@ -7,6 +7,32 @@ const logger = new Logger('OctoFarm-HistoryCollection')
 const filamentProfiles = require("../models/Profiles.js")
 
 class HistoryCollection {
+  static async resyncFilament(printer){
+    let spools = await fetch(`${printer.printerURL}/plugin/filamentmanager/spools/${printer.selectedFilament.spools.fmID}`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": printer.apikey
+      }
+    });
+    //Make sure filament manager responds...
+    if(spools.status != 200 || profiles.status != 200){
+      res.send({ status: false });
+    }
+    let spool = await Spool.findById(printer.selectedFilament._id)
+
+    let sp = await spools.json();
+    spool.spools = {
+      name: sp.name,
+      profile: sp.profile.id,
+      price: sp.cost,
+      weight: sp.weight,
+      used: sp.used,
+      tempOffset: sp.temp_offset,
+      fmID: sp.id
+    };
+    spool.save();
+  }
   static async complete(payload, printer) {
     try{
       logger.info("Completed Print triggered", payload + printer.printerURL);
@@ -27,9 +53,10 @@ class HistoryCollection {
       let endTimeFormat = endTime.substring(0, 8);
       let endDate = endDDMM + " - " + endTimeFormat;
       let profiles = await filamentProfiles.find({});
+      let serverSettings = await ServerSettings.find({});
       if(printer.selectedFilament !== null){
         let profileId = null;
-        if(profiles.filamentManager){
+        if(serverSettings[0].filamentManager){
           profileId = _.findIndex(profiles, function (o) {
             return o.profile.index == printer.selectedFilament.spools.profile;
           });
@@ -72,7 +99,11 @@ class HistoryCollection {
       let saveHistory = new History({
         printHistory
       });
-      saveHistory.save();
+      await saveHistory.save();
+      if(serverSettings[0].filamentManager){
+        HistoryCollection.resyncFilament(printer)
+      }
+
       logger.info("Completed Print Captured for ", payload + printer.printerURL);
     }catch(e){
       logger.error(e, "Failed to capture history for " + printer.printerURL);
