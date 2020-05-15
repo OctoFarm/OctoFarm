@@ -17,21 +17,20 @@ export async function getSelected(){
 }
 export function returnHistory(id) {
     if(id.spools !== undefined){
-        return `${id.spools.name} - [${id.spools.profile.material} / ${id.spools.profile.manufacturer}]`
+        return `${id.spools.name} [${id.spools.profile.material} / ${id.spools.profile.manufacturer}]`
     }else{
         return `Old database, please update on the view modal.`
     }
 
 }
 export function returnHistoryUsage(id){
-    if(id.filamentSelection.spools !== undefined){
+    if(typeof id.filamentSelection.spools !== 'undefined'){
         if(id.job.filament === null) {
             id.job.filament = {
                 tool0: {
                     length: 0
                 }
             }
-
         }
         let length = id.job.filament.tool0.length / 1000
         if(length === 0){
@@ -72,7 +71,6 @@ export async function returnDropDown(){
         let profileId = null;
         if(profiles.filamentManager){
             profileId = _.findIndex(profiles.profiles, function (o) {
-
                 return o.profile.index == spool.spools.profile;
             });
         }else{
