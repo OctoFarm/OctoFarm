@@ -6,7 +6,7 @@ import PrinterManager from "./lib/modules/printerManager.js";
 import doubleClickFullScreen from "./lib/functions/fullscreen.js";
 import {parse} from "./vendor/flatted.js";
 import initGroupSelect from "./lib/modules/groupSelection.js";
-import {returnSelected} from "./lib/modules/filamentGrab.js"
+import {returnSelected} from "./lib/modules/filamentGrab.js";
 
 let printerInfo = "";
 let elems = [];
