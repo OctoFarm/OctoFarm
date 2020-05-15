@@ -510,6 +510,22 @@ class StatisticsCollection {
         farmStats[0].octofarmStatistics = octofarmStatistics;
     }
     static async printStatistics() {
+        function arrayCounts(arr) {
+            var a = [], b = [], prev;
+
+            arr.sort();
+            for (var i = 0; i < arr.length; i++ ) {
+                if ( arr[i] !== prev ) {
+                    a.push(arr[i]);
+                    b.push(1);
+                } else {
+                    b[b.length-1]++;
+                }
+                prev = arr[i];
+            }
+
+            return [a, b];
+        }
         let printStatistics = await this.blankPrintStatistics();
         let history = await History.find({});
         let completed = [];
@@ -518,42 +534,23 @@ class StatisticsCollection {
         let printTimes = [];
         let filamentLengths = [];
         let filamentWeights = [];
+        let fileNames = [];
+        let printerNames = [];
+
+
         history.forEach(print => {
+            fileNames.push(print.printHistory.fileName)
+            printerNames.push(print.printHistory.printerName)
             if (print.printHistory.filamentLength != "-") {
                 filamentLengths.push(print.printHistory.filamentLength);
             }
 
             if (print.printHistory.success) {
-                //let filamentTypes = returnFilamentTypes();
-                let calcWeight = null;
-                if (
-                    typeof print.printHistory.filamentSelection != "undefined" &&
-                    print.printHistory.filamentSelection != "None chosen..."
-                ) {
-                    let currentType = null;
-                    //let filamentKeys = Object.entries(filamentTypes);
-
-                    // filamentKeys.forEach(entry => {
-                    //     if (
-                    //         entry[0] === print.printHistory.filamentSelection.roll.type[0]
-                    //     ) {
-                    //         currentType = entry[1].density;
-                    //     }
-                    // });
-                    calcWeight =
-                        (3.14 * (1.75 / 2)) ^
-                        ((2 * parseFloat(currentType) * print.printHistory.filamentLength) /
-                            1000);
-                } else {
-                    calcWeight =
-                        (3.14 * (1.75 / 2)) ^
-                        ((2 * 1.24 * print.printHistory.filamentLength) / 1000);
-                }
 
                 completed.push(print.printHistory.success);
                 printTimes.push(print.printHistory.printTime);
                 filamentLengths.push(print.printHistory.filamentLength);
-                filamentWeights.push(calcWeight);
+                filamentWeights.push();
             } else {
                 if (print.printHistory.reason === "cancelled") {
                     cancelled.push(print.printHistory.success);
@@ -566,6 +563,20 @@ class StatisticsCollection {
         printStatistics.completed = completed.length;
         printStatistics.cancelled = cancelled.length;
         printStatistics.failed = failed.length;
+
+        let filesArray = arrayCounts(fileNames)
+        let countFilesArray = filesArray[1].indexOf(Math.max(...filesArray[1]));
+        let mostPrintedFile = filesArray[0][countFilesArray]
+        printStatistics.mostPrintedFile = mostPrintedFile;
+        let printerNamesArray = arrayCounts(printerNames);
+        console.log(printerNamesArray)
+        let maxIndexPrinterNames = printerNamesArray[1].indexOf(Math.max(...printerNamesArray[1]));
+        let minIndexPrinterNames = printerNamesArray[1].indexOf(Math.min(...printerNamesArray[1]));
+        let mostUsedPrinters = printerNamesArray[0][maxIndexPrinterNames];
+        let leastUsedPrinters = printerNamesArray[0][minIndexPrinterNames];
+        printStatistics.mostUsedPrinters = mostUsedPrinters;
+        printStatistics.leastUsedPrinters = leastUsedPrinters;
+
 
         printStatistics.completedPercent =
             (completed.length /

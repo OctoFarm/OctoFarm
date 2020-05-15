@@ -99,6 +99,7 @@ class HistoryCollection {
         printHistory
       });
       await saveHistory.save();
+
       if(serverSettings[0].filamentManager){
         HistoryCollection.resyncFilament(printer)
       }
@@ -157,6 +158,10 @@ class HistoryCollection {
         printHistory
       });
       saveHistory.save();
+      let serverSettings = await ServerSettings.find({});
+      if(serverSettings[0].filamentManager){
+        HistoryCollection.resyncFilament(printer)
+      }
       logger.info("Failed Print captured ", payload + printer.printerURL);
     }catch(e){
       logger.error(e, "Failed to capture history for " + printer.printerURL);

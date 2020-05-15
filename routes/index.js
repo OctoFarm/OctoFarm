@@ -138,7 +138,9 @@ router.get("/history", ensureAuthenticated, async(req, res) => {
     let sortedPrinters = await Runner.sortedIndex();
     const History = require("../models/History.js");
     let history = await History.find({});
-
+    const farmStatistics = require("../runners/statisticsCollection.js");
+    const FarmStatistics = farmStatistics.StatisticsCollection;
+    let statistics = await FarmStatistics.returnStats();
     let user = null;
     let group = null;
     if (serverConfig.loginRequired === false) {
@@ -158,6 +160,7 @@ router.get("/history", ensureAuthenticated, async(req, res) => {
         history: history,
         page: "History",
         helpers: prettyHelpers,
+        printStatistics: statistics.printStatistics
     });
 });
 //Panel view  Page
