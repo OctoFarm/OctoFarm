@@ -24,14 +24,15 @@ export function returnHistory(id) {
 
 }
 export function returnHistoryUsage(id){
-    if(id.job.filament === null) {
-        id.job.filament = {
-            tool0: {
-                length: 0
-            }
-        }
-    }
     if(id.filamentSelection.spools !== undefined){
+        if(id.job.filament === null) {
+            id.job.filament = {
+                tool0: {
+                    length: 0
+                }
+            }
+
+        }
         let length = id.job.filament.tool0.length / 1000
         if(length === 0){
             return ''
@@ -48,7 +49,6 @@ export function returnHistoryUsage(id){
 export function returnSelected(id, profiles, filamentManager) {
     let profileId = null;
     if (filamentManager) {
-        console.log("ME")
         profileId = _.findIndex(profiles, function (o) {
             console.log(o)
             return o.profile.index == id.spools.profile;
