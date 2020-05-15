@@ -29,7 +29,9 @@ export default function initGroupSelect(printers){
     groupSelectionDropDown.insertAdjacentHTML('beforeend', `
                         <a class="dropdown-item groupSelect" href="#?Group=All Printers">All Printers</a>
         `)
+
     if(uniqueGroups.length === 0){
+
     }else{
         groupSelectionBtn.classList.remove("d-none")
         uniqueGroups.forEach(group => {
