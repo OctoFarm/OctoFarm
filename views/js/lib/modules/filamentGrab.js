@@ -58,7 +58,7 @@ export function returnSelected(id, profiles, filamentManager) {
             return o._id == id.spools.profile;
         });
     }
-    return `${id.spools.name} (${id.spools.weight - id.spools.used}g) - ${profiles[profileId].profile.material}`
+    return `${id.spools.name} (${(id.spools.weight - id.spools.used).toFixed(2)}g) - ${profiles[profileId].profile.material}`
 }
 export async function returnDropDown(){
     let spools = await loadFilament();
@@ -86,11 +86,11 @@ export async function returnDropDown(){
             });
             if(index > -1){
                 dropObject.push(`
-                    <option value="${spool._id}" disabled>${spool.spools.name} (${spool.spools.weight - spool.spools.used}g) - ${profiles.profiles[profileId].profile.material}</option>
+                    <option value="${spool._id}" disabled>${spool.spools.name} (${(spool.spools.weight - spool.spools.used).toFixed(2)}g) - ${profiles.profiles[profileId].profile.material}</option>
                 `)
             }else{
                 dropObject.push(`
-                    <option value="${spool._id}">${spool.spools.name} (${spool.spools.weight - spool.spools.used}g) - ${profiles.profiles[profileId].profile.material}</option>
+                    <option value="${spool._id}">${spool.spools.name} (${(spool.spools.weight - spool.spools.used).toFixed(2)}g) - ${profiles.profiles[profileId].profile.material}</option>
                 `)
             }
 
