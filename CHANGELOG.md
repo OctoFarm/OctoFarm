@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
     - Keys added to the Printer Status, Printer Progress, Printer Temps and Printer Utilisation heat charts on dashboard.
     - Current Operations View. Displays full screen the current operations bar. 
     - Panel, List and Camera View all react to groups now. When loading a page it will always default to "All Printers", any modification with the drop down will append a URL to the page. This URL can be re-used as a book mark to automatically load a group. 
-    
+    - History page now has metrics.
     
 ### Changed
     - Group dropdown only appears if groups exist.
@@ -24,6 +24,8 @@ All notable changes to this project will be documented in this file.
         - Can also apply temperature offsets with these, whatever is entered -/+ into the offset field will now be applied at the start of a print.
     - Reduced the width of printer manager, allowing for click close outside of the modal window.
     - History page now loads latest first as default.
+    - Removed underscores from history page. 
+    
     
 ### Removed
     - Old filament manager and database structure. 
@@ -34,7 +36,9 @@ All notable changes to this project will be documented in this file.
     - Fixed issue with list view not updating list colour on state change.
     - Fixed issue with history index sort requiring two clicks.
     - Filament calculation now correctly applies to power of.
-    - Fixed annoying pop-up with no printers
+    - Fixed annoying pop-up with no printers.
+    - Fixed groups not hiding when none availabe.
+    - Fixed errant blank group showing.
     
 
 ## [v1.1.4.9-dev-2.7]
