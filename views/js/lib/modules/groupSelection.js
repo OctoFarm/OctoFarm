@@ -29,7 +29,7 @@ export default function initGroupSelect(printers){
     groupSelectionDropDown.insertAdjacentHTML('beforeend', `
                         <a class="dropdown-item groupSelect" href="#?Group=All Printers">All Printers</a>
         `)
-    console.log(uniqueGroups)
+
     if(uniqueGroups[0] == ""){
 
     }else{
