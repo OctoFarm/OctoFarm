@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
     - Current Operations View. Displays full screen the current operations bar. 
     - Panel, List and Camera View all react to groups now. When loading a page it will always default to "All Printers", any modification with the drop down will append a URL to the page. This URL can be re-used as a book mark to automatically load a group. 
     - History page now has metrics.
+    - Can now select and save filament changes in history.
     
 ### Changed
     - Group dropdown only appears if groups exist.
