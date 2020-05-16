@@ -55,7 +55,7 @@ const heartBeatInterval = setInterval(function ping() {
             client.ws.instance.ping(noop);
         }
     });
-}, 300000);
+}, 10000);
 
 WebSocketClient.prototype.open = function(url, index) {
     if (url.includes("http://")) {
