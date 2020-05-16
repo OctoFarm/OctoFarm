@@ -18,8 +18,9 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
     let spool = await Spools.findById(filamentId);
     let profile = await Profiles.findById(spool.spools.profile)
     spool.spools.profile = profile.profile;
-    console.log(spool)
     history.printHistory.filamentSelection = spool
+  }else{
+    history.printHistory.filamentSelection = null;
   }
 
   history.markModified("printHistory");
