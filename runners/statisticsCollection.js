@@ -543,7 +543,9 @@ class StatisticsCollection {
                         if(length === 0){
                             return ''
                         }else{
-                            let usage = (3.14 * (parseFloat(printHistory.filamentSelection.spools.profile.diameter) / 2)) * (2 * parseFloat(printHistory.filamentSelection.spools.profile.density) * (length) )
+                            let radius = parseFloat(printHistory.filamentSelection.spools.profile.diameter) / 2
+                            let volume = (length * 3.1415926535 * radius * radius)
+                            let usage = volume * parseFloat(printHistory.filamentSelection.spools.profile.density)
                             filamentValues.push(usage)
                             let cost = (printHistory.filamentSelection.spools.price / printHistory.filamentSelection.spools.weight) * usage
                             costValues.push(cost)
@@ -564,7 +566,9 @@ class StatisticsCollection {
                         if(length === 0){
                             return ''
                         }else{
-                            let usage = (3.14 * (1.75 / 2)) * (2 * 1.24 * (length) )
+                            let radius = parseFloat(1.75) / 2
+                            let volume = (length * 3.1415926535 * radius * radius)
+                            let usage = volume * parseFloat(1.24)
                             filamentValues.push(usage)
                         }
                     }

@@ -37,7 +37,9 @@ export default class History {
       if(length === 0){
         return ''
       }else{
-        let usage = (3.14 * (1.75 / 2)) * (2 * 1.24 * (length) )
+        let radius = parseFloat(1.75) / 2
+        let volume = (length * 3.1415926535 * radius * radius)
+        let usage = volume * parseFloat(1.24)
         return length.toFixed(2) + "m / " + usage.toFixed(2) + "g";
       }
   }
