@@ -66,9 +66,9 @@
         <b class="mt-1"><i class="fas fa-print"></i> Printers</b>
         <div class="row">
           <div class="col-lg-12">
-            <b><i class="fas fa-star"></i> Most Used Printer</b> <br />
+            <b><i class="fas fa-star"></i> Most Occurances</b> <br />
             <%= printStatistics.mostUsedPrinters %><br />
-            <b><i class="fas fa-star-half-alt"></i> Least Used Printer</b> <br />
+            <b><i class="fas fa-star-half-alt"></i> Least Occurances</b> <br />
             <%= printStatistics.leastUsedPrinters %> <br />
           </div>
 
@@ -79,15 +79,16 @@
         <div class="row">
           <div class="col-lg-6">
             <b><i class="fas fa-clock"></i> Total Filament Usage</b> <br />
-            <%= helpers.generateTime(printStatistics.longestPrint) %><br />
+            <%= printStatistics.totalFilamentUsage.toFixed(2) %>g<br />
             <b><i class="fas fa-clock"></i> Average Filament Usage</b> <br />
-            <%= helpers.generateTime(printStatistics.shortestPrint) %> <br />
+            <%= printStatistics.averageFilamentUsage.toFixed(2) %>g <br />
           </div>
           <div class="col-lg-6">
-            <b><i class="fas fa-clock"></i> Lowest Filament Usage <br /></b><%=
-            helpers.generateTime(printStatistics.averagePrintTime) %><br />
             <b><i class="fas fa-ruler"></i> Highest Filament Usage <br /></b><%=
-            printStatistics.filamentUsage %><br />
+            printStatistics.highestFilamentUsage.toFixed(2) %>g<br />
+            <b><i class="fas fa-clock"></i> Lowest Filament Usage <br /></b><%=
+            printStatistics.lowestFilamentUsage.toFixed(2) %>g<br />
+
           </div>
         </div>
       </div>
@@ -95,10 +96,11 @@
         <b class="mt-1"><i class="fas fa-tag"></i> Cost</b>
         <div class="row">
           <div class="col-lg-12">
-            <b><i class="fas fa-clock"></i> Highest Cost</b> <br />
-            <%= helpers.generateTime(printStatistics.longestPrint) %><br />
             <b><i class="fas fa-clock"></i> Total Cost</b> <br />
-            <%= helpers.generateTime(printStatistics.shortestPrint) %> <br />
+            <%= printStatistics.totalCost.toFixed(2) %> <br />
+            <b><i class="fas fa-clock"></i> Highest Cost</b> <br />
+            <%= printStatistics.highestCost.toFixed(2) %><br />
+
           </div>
         </div>
       </div>

@@ -526,6 +526,47 @@ class StatisticsCollection {
 
             return [a, b];
         }
+        let filamentValues = [];
+        let costValues = [];
+        function filamentCounts(printHistory){
+            if(printHistory.filamentSelection != null){
+                if(typeof printHistory.filamentSelection.spools !== 'undefined'){
+                    if(printHistory.job.filament === null) {
+                        printHistory.job.filament = {
+                            tool0: {
+                                length: 0
+                            }
+                        }
+                    }
+                    let length = printHistory.job.filament.tool0.length / 1000
+                    if(length === 0){
+                        return ''
+                    }else{
+                        let usage = Math.pow((3.14 * (parseFloat(printHistory.filamentSelection.spools.profile.diameter) / 2)) , (2 * parseFloat(printHistory.filamentSelection.spools.profile.density) * (length) ))
+                        filamentValues.push(usage)
+                        let cost = (printHistory.filamentSelection.spools.price / printHistory.filamentSelection.spools.weight) * usage
+                        costValues.push(cost)
+                    }
+                }else{
+                    return ``
+                }
+            }else{
+                if(printHistory.job.filament === null) {
+                    printHistory.job.filament = {
+                        tool0: {
+                            length: 0
+                        }
+                    }
+                }
+                let length = printHistory.job.filament.tool0.length / 1000
+                if(length === 0){
+                    return ''
+                }else{
+                    let usage = Math.pow((3.14 * (1.75 / 2)) , (2 * 1.24 * (length) ))
+                    filamentValues.push(usage)
+                }
+            }
+        }
         let printStatistics = await this.blankPrintStatistics();
         let history = await History.find({});
         let completed = [];
@@ -539,6 +580,7 @@ class StatisticsCollection {
 
 
         history.forEach(print => {
+            filamentCounts(print.printHistory)
             fileNames.push(print.printHistory.fileName)
             printerNames.push(print.printHistory.printerName)
             if (print.printHistory.filamentLength != "-") {
@@ -559,6 +601,18 @@ class StatisticsCollection {
                 }
             }
         });
+        let totalFilamentUsage = filamentValues.reduce((a, b) => a + b, 0);
+        printStatistics.totalFilamentUsage = totalFilamentUsage;
+        let averageFilamentUsage = totalFilamentUsage / filamentValues.length;
+        printStatistics.averageFilamentUsage = averageFilamentUsage;
+        let lowestFilamentUsage = (Math.min(...filamentValues));
+        printStatistics.lowestFilamentUsage = lowestFilamentUsage;
+        let highestFilamentUsage = (Math.max(...filamentValues));
+        printStatistics.highestFilamentUsage = highestFilamentUsage;
+        let totalCost = costValues.reduce((a, b) => a + b, 0);
+        printStatistics.totalCost = totalCost;
+        let highestCost = (Math.max(...costValues));
+        printStatistics.highestCost = highestCost;
 
         printStatistics.completed = completed.length;
         printStatistics.cancelled = cancelled.length;
@@ -569,7 +623,6 @@ class StatisticsCollection {
         let mostPrintedFile = filesArray[0][countFilesArray]
         printStatistics.mostPrintedFile = mostPrintedFile;
         let printerNamesArray = arrayCounts(printerNames);
-        console.log(printerNamesArray)
         let maxIndexPrinterNames = printerNamesArray[1].indexOf(Math.max(...printerNamesArray[1]));
         let minIndexPrinterNames = printerNamesArray[1].indexOf(Math.min(...printerNamesArray[1]));
         let mostUsedPrinters = printerNamesArray[0][maxIndexPrinterNames];
@@ -701,6 +754,7 @@ class StatisticsCollection {
         };
         return printStatistics;
     }
+
 }
 
 module.exports = {
