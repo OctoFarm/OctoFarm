@@ -2,14 +2,26 @@ const express = require("express");
 const router = express.Router();
 const History = require("../models/History.js");
 const { ensureAuthenticated } = require("../config/auth");
+const Spools = require("../models/Filament.js");
+const Profiles = require("../models/Profiles.js")
 
 router.post("/update", ensureAuthenticated, async (req, res) => {
   //Check required fields
   const latest = req.body;
-  console.log(latest.note);
   let note = latest.note;
+  let filamentId = latest.filamentId;
   let history = await History.findOne({ _id: latest.id });
-  history.printHistory.notes = note;
+  if(history.printHistory.notes != note){
+    history.printHistory.notes = note;
+  }
+  if(history.printHistory.filamentSelection != filamentId && filamentId != 0){
+    let spool = await Spools.findById(filamentId);
+    let profile = await Profiles.findById(spool.spools.profile)
+    spool.spools.profile = profile.profile;
+    console.log(spool)
+    history.printHistory.filamentSelection = spool
+  }
+
   history.markModified("printHistory");
   history = history.save();
   res.send("success");

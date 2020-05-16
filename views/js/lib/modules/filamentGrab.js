@@ -59,7 +59,7 @@ export function returnSelected(id, profiles, filamentManager) {
     }
     return `${id.spools.name} (${(id.spools.weight - id.spools.used).toFixed(0)}g) - ${profiles[profileId].profile.material}`
 }
-export async function returnDropDown(){
+export async function returnDropDown(history){
     let spools = await loadFilament();
     let profiles = await getProfile();
     let selected = await getSelected();
@@ -82,7 +82,7 @@ export async function returnDropDown(){
             let index = _.findIndex(selected.selected, function(o) {
                 return o == spool._id;
             });
-            if(index > -1){
+            if(index > -1 && !history){
                 dropObject.push(`
                     <option value="${spool._id}" disabled>${spool.spools.name} (${(spool.spools.weight - spool.spools.used).toFixed(2)}g) - ${profiles.profiles[profileId].profile.material}</option>
                 `)

@@ -2,7 +2,7 @@ import OctoFarmClient from "../octofarm.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import tableSort from "../functions/tablesort.js";
-import {returnHistory, returnHistoryUsage} from "./filamentGrab.js";
+import {returnHistory, returnHistoryUsage, returnDropDown} from "./filamentGrab.js";
 
 
 
@@ -122,7 +122,7 @@ export default class History {
       printerName.innerHTML = " - ";
       fileName.innerHTML = " - ";
       status.innerHTML = " - ";
-      filament.value = " - ";
+      filament.innerHTML = " - ";
 
       startDate.innerHTML = " - ";
       printTime.innerHTML = " - ";
@@ -195,10 +195,31 @@ export default class History {
             '<i class="fas fa-exclamation text-danger fa-3x"></i>';
         }
       }
+      function SelectHasValue(select, value) {
+        let obj = document.getElementById(select);
+
+        if (obj !== null) {
+          return (obj.innerHTML.indexOf('value="' + value + '"') > -1);
+        } else {
+          return false;
+        }
+      }
+      let filamentList = await returnDropDown(true);
+      filamentList.forEach(list => {
+        filament.insertAdjacentHTML("beforeend", list)
+      })
       if(current.filamentSelection != null){
-        filament.value = returnHistory(current.filamentSelection)
+        if(SelectHasValue(filament, current.filamentSelection._id)){
+          filament.value = current.filamentSelection._id;
+        }else{
+          filament.insertAdjacentHTML("afterbegin", `
+            <option value="${current.filamentSelection._id}">${returnHistory(current.filamentSelection)}</option>
+          `)
+          filament.value = current.filamentSelection._id;
+        }
+
       }else{
-        filament.value = `None selected...`;
+        filament.value = 0;
       }
 
       startDate.innerHTML = current.startDate;
@@ -210,14 +231,16 @@ export default class History {
   static async save(id) {
     let update = {
       id: id,
-      note: document.getElementById("notes").value
+      note: document.getElementById("notes").value,
+      filamentId: document.getElementById("filament").value
     };
 
     let post = await OctoFarmClient.post("history/update", update);
-    console.log(post);
+
     if (post.status === 200) {
       UI.createAlert("success", "Successfully updated your history entry...");
       document.getElementById("note-" + id).innerHTML = update.note;
+      document.getElementById("spool-" + id).innerHTML = update.filamentId;
     }
   }
   static async delete(e) {
