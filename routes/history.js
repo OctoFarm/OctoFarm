@@ -3,7 +3,8 @@ const router = express.Router();
 const History = require("../models/History.js");
 const { ensureAuthenticated } = require("../config/auth");
 const Spools = require("../models/Filament.js");
-const Profiles = require("../models/Profiles.js")
+const Profiles = require("../models/Profiles.js");
+const ServerSettings = require("../models/ServerSettings.js");
 
 router.post("/update", ensureAuthenticated, async (req, res) => {
   //Check required fields
@@ -15,10 +16,21 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
     history.printHistory.notes = note;
   }
   if(history.printHistory.filamentSelection != filamentId && filamentId != 0){
+    let serverSettings = await ServerSettings.find({});
     let spool = await Spools.findById(filamentId);
-    let profile = await Profiles.findById(spool.spools.profile)
-    spool.spools.profile = profile.profile;
-    history.printHistory.filamentSelection = spool
+
+    if(serverSettings[0].filamentManager){
+      let profiles = await Profiles.find({})
+      let profileIndex = _.findIndex(profiles, function(o) {
+        return o.profile.index == spool.spools.profile;
+      });
+      spool.spools.profile = profiles[profileIndex].profile;
+      history.printHistory.filamentSelection = spool;
+    }else{
+      let profile = await Profiles.findById(spool.spools.profile)
+      spool.spools.profile = profile.profile;
+      history.printHistory.filamentSelection = spool;
+    }
   }else{
     history.printHistory.filamentSelection = null;
   }
