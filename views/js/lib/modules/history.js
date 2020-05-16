@@ -37,7 +37,7 @@ export default class History {
       if(length === 0){
         return ''
       }else{
-        let usage = Math.pow((3.14 * (1.75 / 2)) , (2 * 1.24 * (length) ))
+        let usage = (3.14 * (1.75 / 2)) * (2 * 1.24 * (length) )
         return length.toFixed(2) + "m / " + usage.toFixed(2) + "g";
       }
   }
