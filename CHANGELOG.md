@@ -40,6 +40,7 @@ All notable changes to this project will be documented in this file.
     - Fixed annoying pop-up with no printers.
     - Fixed groups not hiding when none availabe.
     - Fixed errant blank group showing.
+    - Cancelled prints not grabbing name of printer
     
 
 ## [v1.1.4.9-dev-2.7]

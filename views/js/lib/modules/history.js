@@ -64,19 +64,33 @@ export default class History {
     historyList.history.forEach(history => {
       let filamentString = null;
       let filamentUsage = null;
-      if(history.printHistory.filamentSelection !== null){
-        filamentString = returnHistory(history.printHistory.filamentSelection)
-        filamentUsage = returnHistoryUsage(history.printHistory)
+      if(history.printHistory.success){
+        let filamentString = null;
+        let filamentUsage = null;
+        if(history.printHistory.filamentSelection !== null){
+          filamentString = returnHistory(history.printHistory.filamentSelection)
+          filamentUsage = returnHistoryUsage(history.printHistory)
+        }else{
+          filamentString = "None selected..."
+          filamentUsage = History.returnFilamentUsage(history.printHistory)
+        }
+        document.getElementById("spool-"+history._id).innerHTML = filamentString;
+        document.getElementById("usage-"+history._id).innerHTML = filamentUsage;
+        let grams = document.getElementById("usage-"+history._id)
+        grams = grams.innerHTML
+        grams = grams.split(" / ").pop()
+        document.getElementById("cost-"+history._id).innerHTML = History.returnPrintCost(history.printHistory.filamentSelection, grams);
       }else{
-        filamentString = "None selected..."
-        filamentUsage = History.returnFilamentUsage(history.printHistory)
+        if(history.printHistory.filamentSelection !== null){
+          filamentString = returnHistory(history.printHistory.filamentSelection)
+        }else{
+          filamentString = "None selected..."
+        }
+        document.getElementById("spool-"+history._id).innerHTML = filamentString;
+        document.getElementById("cost-"+history._id).innerHTML = "";
+        document.getElementById("usage-"+history._id).innerHTML = "";
       }
-      document.getElementById("spool-"+history._id).innerHTML = filamentString;
-      document.getElementById("usage-"+history._id).innerHTML = filamentUsage;
-      let grams = document.getElementById("usage-"+history._id)
-      grams = grams.innerHTML
-      grams = grams.split(" / ").pop()
-      document.getElementById("cost-"+history._id).innerHTML = History.returnPrintCost(history.printHistory.filamentSelection, grams);
+
     })
   }
 

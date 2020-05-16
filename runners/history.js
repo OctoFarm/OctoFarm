@@ -112,6 +112,16 @@ class HistoryCollection {
   }
   static async failed(payload, printer) {
     try{
+      let name = null;
+      if (typeof printer.settingsApperance != "undefined") {
+        if (printer.settingsApperance.name === "" || printer.settingsApperance.name === null) {
+          name = printer.printerURL;
+        } else {
+          name = printer.settingsApperance.name;
+        }
+      } else {
+        name = printer.printerURL;
+      }
       logger.info("Failed Print triggered ", payload + printer.printerURL);
       let today = new Date();
       let historyCollection = await History.find({});
@@ -129,19 +139,25 @@ class HistoryCollection {
       let endTime = today.toTimeString();
       let endTimeFormat = endTime.substring(0, 8);
       let endDate = endDDMM + " - " + endTimeFormat;
-      let filamentChoice = "None chosen...";
-      if (
-          typeof printer.selectedFilament != "undefined" &&
-          printer.selectedFilament != 0
-      ) {
-        let roll = await Roll.findById( printer.selectedFilament.id );
-
-        filamentChoice = roll;
+      let profiles = await filamentProfiles.find({});
+      let serverSettings = await ServerSettings.find({});
+      if(printer.selectedFilament !== null){
+        let profileId = null;
+        if(serverSettings[0].filamentManager){
+          profileId = _.findIndex(profiles, function (o) {
+            return o.profile.index == printer.selectedFilament.spools.profile;
+          });
+        }else{
+          profileId = _.findIndex(profiles, function (o) {
+            return o._id == printer.selectedFilament.spools.profile;
+          });
+        }
+        printer.selectedFilament.spools.profile = profiles[profileId].profile;
       }
       let printHistory = {
         historyIndex: historyCollection.length + 1,
         printerIndex: printer.index,
-        printerName: printer.settingsApperance.name,
+        printerName: name,
         success: false,
         reason: payload.reason,
         fileName: payload.name,
@@ -149,7 +165,7 @@ class HistoryCollection {
         startDate: startDate,
         endDate: endDate,
         printTime: Math.round(payload.time),
-        filamentSelection: filamentChoice,
+        filamentSelection: printer.selectedFilament,
         filamentLength: "-",
         filamentVolume: "-",
         notes: ""
@@ -158,7 +174,6 @@ class HistoryCollection {
         printHistory
       });
       saveHistory.save();
-      let serverSettings = await ServerSettings.find({});
       if(serverSettings[0].filamentManager){
         HistoryCollection.resyncFilament(printer)
       }
