@@ -5,6 +5,7 @@ const { ensureAuthenticated } = require("../config/auth");
 const Spools = require("../models/Filament.js");
 const Profiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
+const _ = require("lodash");
 
 router.post("/update", ensureAuthenticated, async (req, res) => {
   //Check required fields
