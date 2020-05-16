@@ -41,6 +41,8 @@ All notable changes to this project will be documented in this file.
     - Fixed groups not hiding when none availabe.
     - Fixed errant blank group showing.
     - Cancelled prints not grabbing name of printer
+    - History collection creates unique ID based on the last captured print index, rather than the history length.
+    - Fixed issue with selected filament getting overwritten when passing to history.
     
 
 ## [v1.1.4.9-dev-2.7]

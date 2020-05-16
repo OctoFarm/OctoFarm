@@ -316,14 +316,17 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
     if (typeof data.event != "undefined") {
         if (data.event.type === "PrintFailed") {
             logger.info(data.event.type + this.index + ": " + this.url);
+            let sendPrinter = {};
+            sendPrinter = JSON.parse(JSON.stringify(farmPrinters[this.index]));
             //Register cancelled print...
-            await HistoryCollection.failed(data.event.payload, farmPrinters[this.index]);
+            await HistoryCollection.failed(data.event.payload, sendPrinter);
         }
         if (data.event.type === "PrintDone") {
             logger.info(data.event.type + this.index + ": " + this.url);
+            let sendPrinter = {};
+            sendPrinter = JSON.parse(JSON.stringify(farmPrinters[this.index]));
             //Register cancelled print...
-
-            await HistoryCollection.complete(data.event.payload, farmPrinters[this.index]);
+            await HistoryCollection.complete(data.event.payload, sendPrinter);
         }
     }
 };

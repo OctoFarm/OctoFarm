@@ -79,7 +79,7 @@ class HistoryCollection {
       }
 
       let printHistory = {
-        historyIndex: historyCollection.length + 1,
+        historyIndex: historyCollection[historyCollection.length-1].printHistory.historyIndex + 1,
         printerIndex: "",
         printerName: name,
         success: true,
@@ -141,6 +141,7 @@ class HistoryCollection {
       let endDate = endDDMM + " - " + endTimeFormat;
       let profiles = await filamentProfiles.find({});
       let serverSettings = await ServerSettings.find({});
+      let selectedFilament = null;
       if(printer.selectedFilament !== null){
         let profileId = null;
         if(serverSettings[0].filamentManager){
@@ -155,7 +156,7 @@ class HistoryCollection {
         printer.selectedFilament.spools.profile = profiles[profileId].profile;
       }
       let printHistory = {
-        historyIndex: historyCollection.length + 1,
+        historyIndex: historyCollection[historyCollection.length-1].printHistory.historyIndex + 1,
         printerIndex: printer.index,
         printerName: name,
         success: false,
@@ -166,8 +167,6 @@ class HistoryCollection {
         endDate: endDate,
         printTime: Math.round(payload.time),
         filamentSelection: printer.selectedFilament,
-        filamentLength: "-",
-        filamentVolume: "-",
         notes: ""
       };
       let saveHistory = new History({
