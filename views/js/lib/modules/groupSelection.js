@@ -29,15 +29,18 @@ export default function initGroupSelect(printers){
     groupSelectionDropDown.insertAdjacentHTML('beforeend', `
                         <a class="dropdown-item groupSelect" href="#?Group=All Printers">All Printers</a>
         `)
-
-    if(uniqueGroups.length === 0){
+    console.log(uniqueGroups)
+    if(uniqueGroups[0] == ""){
 
     }else{
         groupSelectionBtn.classList.remove("d-none")
         uniqueGroups.forEach(group => {
-            groupSelectionDropDown.insertAdjacentHTML('beforeend', `
+            if(group != ""){
+                groupSelectionDropDown.insertAdjacentHTML('beforeend', `
                         <a class="dropdown-item groupSelect" href="#?Group=${group}">${group}</a>
         `)
+            }
+
         })
     }
     //Add listeners to dropdown...
