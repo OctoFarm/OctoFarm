@@ -290,6 +290,7 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
             farmPrinters[this.index].currentZ = data.current.currentZ;
         }
         if (typeof data.current.job !== 'undefined' && data.current.job.user !== null) {
+            //console.log(data.current.job)
             farmPrinters[this.index].job = data.current.job;
         }
 
@@ -318,15 +319,23 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
             logger.info(data.event.type + this.index + ": " + this.url);
             let sendPrinter = {};
             sendPrinter = JSON.parse(JSON.stringify(farmPrinters[this.index]));
+            let job = {}
+            job = JSON.parse(JSON.stringify(farmPrinters[this.index].job));
             //Register cancelled print...
-            await HistoryCollection.failed(data.event.payload, sendPrinter);
+            await HistoryCollection.failed(data.event.payload, sendPrinter, job);
         }
         if (data.event.type === "PrintDone") {
             logger.info(data.event.type + this.index + ": " + this.url);
+            console.log(farmPrinters[this.index])
             let sendPrinter = {};
             sendPrinter = JSON.parse(JSON.stringify(farmPrinters[this.index]));
+            let job = {}
+            job = JSON.parse(JSON.stringify(farmPrinters[this.index].job));
             //Register cancelled print...
-            await HistoryCollection.complete(data.event.payload, sendPrinter);
+            await HistoryCollection.complete(data.event.payload, sendPrinter, job);
+        }
+        if(data.event.type === "Error"){
+            console.log(data.event.payload)
         }
     }
 };

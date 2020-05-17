@@ -43,6 +43,8 @@ All notable changes to this project will be documented in this file.
     - Cancelled prints not grabbing name of printer
     - History collection creates unique ID based on the last captured print index, rather than the history length.
     - Fixed issue with selected filament getting overwritten when passing to history.
+    - Fixed weight calculation been unusually high.
+    - Fix for jobs not been captured
     
 
 ## [v1.1.4.9-dev-2.7]

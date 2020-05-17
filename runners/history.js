@@ -32,7 +32,7 @@ class HistoryCollection {
     spool.markModified("spools")
     spool.save();
   }
-  static async complete(payload, printer) {
+  static async complete(payload, printer, job) {
     try{
       logger.info("Completed Print triggered", payload + printer.printerURL);
       let today = new Date();
@@ -77,7 +77,7 @@ class HistoryCollection {
       } else {
         name = printer.printerURL;
       }
-
+      console.log(printer.job)
       let printHistory = {
         historyIndex: historyCollection[historyCollection.length-1].printHistory.historyIndex + 1,
         printerIndex: "",
@@ -91,7 +91,7 @@ class HistoryCollection {
         endDate: endDate,
         printTime: Math.round(payload.time),
         filamentSelection: printer.selectedFilament,
-        job: printer.job,
+        job: job,
         notes: ""
       };
 
@@ -110,7 +110,7 @@ class HistoryCollection {
     }
 
   }
-  static async failed(payload, printer) {
+  static async failed(payload, printer, job) {
     try{
       let name = null;
       if (typeof printer.settingsApperance != "undefined") {
@@ -167,6 +167,7 @@ class HistoryCollection {
         endDate: endDate,
         printTime: Math.round(payload.time),
         filamentSelection: printer.selectedFilament,
+        job: job,
         notes: ""
       };
       let saveHistory = new History({
