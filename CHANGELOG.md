@@ -45,6 +45,7 @@ All notable changes to this project will be documented in this file.
     - Fixed issue with selected filament getting overwritten when passing to history.
     - Fixed weight calculation been unusually high.
     - Fix for jobs not been captured
+    - Fixed issue with filament manager not adding filaments due to 0.00 on temp offset.
     
 
 ## [v1.1.4.9-dev-2.7]
