@@ -308,7 +308,7 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
 
 - Project Link: [https://github.com/NotExpectedYet/OctoFarm](https://github.com/NotExpectedYet/OctoFarm)
 
-- Discord: [Discord](https://discord.gg/CkNDRgK)
+- Discord: [Discord](https://discord.gg/vjabMUn)
 
 <!-- ACKNOWLEDGEMENTS -->
 
