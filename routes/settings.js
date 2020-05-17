@@ -18,7 +18,6 @@ router.get("/server/get/logs", ensureAuthenticated, async (req, res) => {
 });
 router.get("/server/download/logs/:name", ensureAuthenticated, (req, res) => {
   let download = req.params.name;
-  console.log(req)
   const file = `./logs/${download}`;
   res.download(file, download); // Set disposition and send it.
 });
@@ -65,6 +64,9 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
   ServerSettingsDB.find({}).then(async checked => {
     checked[0].onlinePolling = req.body.onlinePolling;
     Runner.updatePoll();
+    checked[0].server = req.body.server;
+    checked[0].timeout = req.body.timeout;
+
     await checked[0].save();
     res.send({ msg: "Settings Saved" });
   });

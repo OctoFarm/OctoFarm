@@ -339,8 +339,16 @@ class ServerSettings {
           return res.json();
         })
         .then(res => {
-          document.getElementById("onlinePollRate").value =
+          document.getElementById("webSocketThrottle").value =
             res.onlinePolling.seconds;
+          document.getElementById("serverPortNo").value = res.server.port;
+          document.getElementById("requireLogin").checked = res.server.loginRequired;
+          document.getElementById("requireRegistration").checked = res.server.registration;
+
+          document.getElementById("webSocketRetry").value = res.timeout.webSocketRetry / 1000;
+          document.getElementById("APITimeout").value = res.timeout.apiTimeout / 1000;
+          document.getElementById("APIRetryTimeout").value = res.timeout.apiRetryCutoff / 1000;
+          document.getElementById("APIRetry").value = res.timeout.apiRetry / 1000;
 
         });
         let logList = await Client.get("settings/server/get/logs")
@@ -360,17 +368,29 @@ class ServerSettings {
                   logName: logs.name
               }
               window.open('/settings/server/download/logs/'+logs.name)
-
             });
         })
 
     }
   }
   static update() {
-    let onlinePoll = document.getElementById("onlinePollRate").value;
+    let onlinePoll = document.getElementById("webSocketThrottle").value;
     let onlinePolling = {
       seconds: onlinePoll
     };
+    let server = {
+        port: parseInt(document.getElementById("serverPortNo").value),
+        loginRequired: document.getElementById("requireLogin").checked,
+        registration: document.getElementById("requireRegistration").checked
+    }
+    let timeout = {
+        webSocketRetry: document.getElementById("webSocketRetry").value * 1000,
+        apiTimeout: document.getElementById("APITimeout").value * 1000,
+        apiRetryCutoff: document.getElementById("APIRetryTimeout").value * 1000,
+        apiRetry: document.getElementById("APIRetry").value * 1000,
+    }
+
+
     document.getElementById("overlay").style.display = "block";
     UI.createAlert(
       "success",
@@ -378,7 +398,7 @@ class ServerSettings {
       10000,
       "clicked"
     );
-    Client.post("settings/server/update", { onlinePolling })
+    Client.post("settings/server/update", { onlinePolling, server, timeout })
       .then(res => {
         return res.json();
       })

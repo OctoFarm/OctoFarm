@@ -9,7 +9,6 @@ const prettyHelpers = require("../views/partials/functions/pretty.js");
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 const _ = require("lodash");
-const serverConfig = require("../serverConfig/server.js");
 
 
 const version = pjson.version + ".9-dev-3";
@@ -19,20 +18,24 @@ console.log("db: " + db);
 const Roll = require("../models/Filament.js");
 
 //Welcome Page
-if (db === "") {
-    //No db setup, show db warning before login.
-    router.get("/", (req, res) =>
-        res.render("database", { page: "Database Warning" })
-    );
-} else {
-    if (serverConfig.loginRequired === false) {
-        router.get("/", (req, res) => res.redirect('/dashboard'));
+async function welcome(){
+    if (db === "") {
+        //No db setup, show db warning before login.
+        router.get("/", (req, res) =>
+            res.render("database", { page: "Database Warning" })
+        );
     } else {
-        let registration = serverConfig.registration
-        router.get("/", (req, res) => res.render("welcome", { page: "Welcome", registration: registration }));
-    }
+        let settings = await ServerSettings.find({});
+        if (settings[0].server.loginRequired === false) {
+            router.get("/", (req, res) => res.redirect('/dashboard'));
+        } else {
+            let registration = settings[0].server.registration
+            router.get("/", (req, res) => res.render("welcome", { page: "Welcome", registration: registration }));
+        }
 
+    }
 }
+welcome();
 
 //Dashboard Page
 router.get("/dashboard", ensureAuthenticated, async(req, res) => {
@@ -48,7 +51,7 @@ router.get("/dashboard", ensureAuthenticated, async(req, res) => {
     let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
-    if (serverConfig.loginRequired === false) {
+    if (serverSettings[0].server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -87,7 +90,7 @@ router.get("/printers", ensureAuthenticated, async(req, res) => {
     let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
-    if (serverConfig.loginRequired === false) {
+    if (serverSettings[0].server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -118,7 +121,7 @@ router.get("/filemanager", ensureAuthenticated, async(req, res) => {
     let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
-    if (serverConfig.loginRequired === false) {
+    if (serverSettings[0].server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -150,7 +153,7 @@ router.get("/history", ensureAuthenticated, async(req, res) => {
     let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
-    if (serverConfig.loginRequired === false) {
+    if (serverSettings[0].server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -182,7 +185,7 @@ router.get("/mon/panel", ensureAuthenticated, async(req, res) => {
     let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
-    if (serverConfig.loginRequired === false) {
+    if (serverSettings[0].server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -215,7 +218,7 @@ router.get("/mon/camera", ensureAuthenticated, async(req, res) => {
     let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
-    if (serverConfig.loginRequired === false) {
+    if (serverSettings[0].server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -248,7 +251,7 @@ router.get("/mon/list", ensureAuthenticated, async(req, res) => {
     let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
-    if (serverConfig.loginRequired === false) {
+    if (serverSettings[0].server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -280,7 +283,7 @@ router.get("/mon/currentOp", ensureAuthenticated, async(req, res) => {
     let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
-    if (serverConfig.loginRequired === false) {
+    if (serverSettings[0].server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -313,7 +316,7 @@ router.get("/filament", ensureAuthenticated, async(req, res) => {
     let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
-    if (serverConfig.loginRequired === false) {
+    if (serverSettings[0].server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {

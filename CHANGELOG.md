@@ -15,7 +15,12 @@ All notable changes to this project will be documented in this file.
     - Panel, List and Camera View all react to groups now. When loading a page it will always default to "All Printers", any modification with the drop down will append a URL to the page. This URL can be re-used as a book mark to automatically load a group. 
     - History page now has metrics.
     - Can now select and save filament changes in history.
-    
+    - Server Settings re-activated with the following:
+        - Shows server Status here instead of dashboard.
+        - Lists current log files and allows for download.
+        - Server settings
+        - Server timeout settings
+        - Server database actions    
 ### Changed
     - Group dropdown only appears if groups exist.
     - Renamed the views removing the "Views" Tag. Added in placeholders on hover to describe function.
@@ -30,6 +35,7 @@ All notable changes to this project will be documented in this file.
     
 ### Removed
     - Old filament manager and database structure. 
+    - Removed serverConfig file, now stored in the database and edited through the UI. 
 
 ### Fixed
     - Fixed Panel view file name been stuck in loading...
@@ -323,6 +329,7 @@ All notable changes to this project will be documented in this file.
 - Camera Columns setting is now activated. You can choose from 1-6 columns per row, including 5!.
 
 ### Removed
+
 
 ### Deprecated
 

@@ -4,17 +4,15 @@ const mongoose = require("mongoose");
 const flash = require("connect-flash");
 const session = require("express-session");
 const passport = require("passport");
-const serverConfig = require("./serverConfig/server");
+const ServerSettingsDB = require("./models/ServerSettings");
 const Logger = require('./lib/logger.js');
 const logger = new Logger('OctoFarm-Server');
 
 
 
 
-
-
 //Server Port
-const PORT = process.env.PORT || serverConfig.port;
+
 
 const app = express();
 
@@ -81,12 +79,15 @@ mongoose
 
 let serverStart = async function() {
     logger.info("MongoDB Connected...");
+    //Grab server settings
     //Setup Settings
     const serverSettings = require("./settings/serverSettings.js");
     const ServerSettings = serverSettings.ServerSettings;
     logger.info("Checking Server Settings...");
     let ss = await ServerSettings.init();
     logger.info(ss);
+    //Find server Settings
+    let settings = await ServerSettingsDB.find({});
     const clientSettings = require("./settings/clientSettings.js");
     const ClientSettings = clientSettings.ClientSettings;
     logger.info("Checking Client Settings...");
@@ -106,6 +107,7 @@ let serverStart = async function() {
     const SystemRunner = system.SystemRunner;
     let sr = await SystemRunner.init();
     logger.info(sr);
+    const PORT = process.env.PORT || settings[0].server.port;
     app.listen(PORT, () => {
         logger.info(`HTTP server started...`);
         logger.info(`You can now access your server on port: ${PORT}`);

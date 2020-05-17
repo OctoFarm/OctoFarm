@@ -419,7 +419,7 @@
         </div>
     </div>
     <div class="modal fade" id="serverSettingsModal" tabindex="0" role="dialog" aria-labelledby="serverSettingsLabel" aria-hidden="true">
-        <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-dialog modal-lg" role="document">
             <div class="modal-content">
                 <div class="modal-header">
                     <h3 class="modal-title" id="serverSettingsLabel">Server Settings</h3>
@@ -435,7 +435,7 @@
                                     <a class="list-group-item list-group-item-action  active" id="server-status-list" data-toggle="list" href="#server-status" role="tab" aria-controls="system"><i class="fas fa-info-circle"></i> Status</a>
                                     <a class="list-group-item list-group-item-action" id="server-settings-list" data-toggle="list" href="#server-settings" role="tab" aria-controls="panelview"><i class="fas fa-cogs"></i> Settings</a>
                                     <a class="list-group-item list-group-item-action" id="server-timeout-list" data-toggle="list" href="#server-timeout" role="tab" aria-controls="listview"><i class="fas fa-stopwatch"></i> Timeout</a>
-                                    <a class="list-group-item list-group-item-action" id="server-database-list" data-toggle="list" href="#server-database" role="tab" aria-controls="cameraview"><i class="fas fa-database"></i> Database</a>
+                                   <!-- <a class="list-group-item list-group-item-action" id="server-database-list" data-toggle="list" href="#server-database" role="tab" aria-controls="cameraview"><i class="fas fa-database"></i> Database</a> -->
 
                                 </div>
                             </div>
@@ -459,6 +459,30 @@
                                                 <div id="systemChartMemory"></div>
                                             </div>
                                         </div>
+                                        <div class="row">
+                                            <div class="col-12">
+                                                <h5 class="float-left">Current Logs</h5>
+                                                </p>
+                                            </div>
+
+                                            <hr>
+
+                                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                                <table class="table table-dark">
+                                                    <thead>
+                                                    <tr>
+                                                        <th scope="col">File Name</th>
+                                                        <th scope="col">Last Modified</th>
+                                                        <th scope="col">Size</th>
+                                                        <th scope="col">Download</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody id="serverLogs">
+
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
                                     </div>
                                     <div class="tab-pane fade" id="server-settings" role="tabpanel" aria-labelledby="server-settings-list">
                                         <h5>Server Settings</h5>
@@ -470,7 +494,7 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">Port:</span>
                                             </div>
-                                            <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="serverPortNumber" value="4000" step="1">
+                                            <input id="serverPortNo" type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="serverPortNumber" value="4000" step="1">
 
                                             </div>
                                         <small id="emailHelp" class="form-text text-muted">Requires a server restart</small>
@@ -484,8 +508,8 @@
                                             <div class="col-md-12 col-lg-6">
                                                 <form class="was-validated">
                                                     <div class="custom-control custom-checkbox mb-3">
-                                                        <input type="checkbox" class="custom-control-input" id="cameraCurrentOpOn" required>
-                                                        <label class="custom-control-label" for="cameraCurrentOpOn">Require a login</label>
+                                                        <input type="checkbox" class="custom-control-input" id="requireLogin" required>
+                                                        <label class="custom-control-label" for="requireLogin">Require a login</label>
                                                         <div class="valid-feedback">Login turned on</div>
                                                         <div class="invalid-feedback">Login turned off</div>
                                                     </div>
@@ -494,8 +518,8 @@
                                             <div class="col-md-12 col-lg-6">
                                                 <form class="was-validated">
                                                     <div class="custom-control custom-checkbox mb-3">
-                                                        <input type="checkbox" class="custom-control-input" id="cameraCurrentOpOn" required>
-                                                        <label class="custom-control-label" for="cameraCurrentOpOn">Registration</label>
+                                                        <input type="checkbox" class="custom-control-input" id="requireRegistration" required>
+                                                        <label class="custom-control-label" for="requireRegistration">Registration</label>
                                                         <div class="valid-feedback">Registration is turned on</div>
                                                         <div class="invalid-feedback">Registration is turned off</div>
                                                     </div>
@@ -516,13 +540,13 @@
                                             <div class="input-group-prepend">
                                                 <span class="input-group-text">Throttle:</span>
                                             </div>
-                                            <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="onlinePollRate" value="0.5" min="0.5" max="10" step="0.5">
+                                            <input id="webSocketThrottle" type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="onlinePollRate" value="0.5" min="0.5" max="10" step="0.5">
                                             <div class="input-group-append">
                                                 <span class="input-group-text">Seconds</span>
                                             </div>
 
                                         </div>
-                                        <small id="emailHelp" class="form-text text-muted">Does not require a server restart</small>
+                                        <small class="form-text text-muted">Does not require a server restart</small>
                                         <hr>
                                         <div class="row">
                                             <div class="col-md-12 col-lg-6">
@@ -534,7 +558,7 @@
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text">Websocket Retry:</span>
                                                     </div>
-                                                    <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="onlinePollRate" value="5" min="5" max="30" step="0.5">
+                                                    <input id="webSocketRetry" type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="onlinePollRate" value="5" min="5" max="30" step="0.5">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text">Seconds</span>
                                                     </div>
@@ -552,7 +576,7 @@
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text">API Timeout:</span>
                                                     </div>
-                                                    <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="onlinePollRate" value="1" min="1" max="10" step="0.5">
+                                                    <input id="APITimeout" type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="onlinePollRate" value="1" min="1" max="10" step="0.5">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text">Seconds</span>
                                                     </div>
@@ -570,7 +594,7 @@
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text">Secondary API Timeout:</span>
                                                     </div>
-                                                    <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="onlinePollRate" value="10" min="5" max="60" step="0.5">
+                                                    <input id="APIRetryTimeout" type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="onlinePollRate" value="10" min="5" max="60" step="0.5">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text">Seconds</span>
                                                     </div>
@@ -587,7 +611,7 @@
                                                     <div class="input-group-prepend">
                                                         <span class="input-group-text">API Retry:</span>
                                                     </div>
-                                                    <input type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="onlinePollRate" value="30" min="30" max="60" step="0.5">
+                                                    <input id="APIRetry" type="number" class="form-control" placeholder="6" aria-label="Refresh Rate" id="onlinePollRate" value="30" min="30" max="60" step="0.5">
                                                     <div class="input-group-append">
                                                         <span class="input-group-text">Seconds</span>
                                                     </div>

@@ -15,7 +15,7 @@ class ServerSettings {
       let timeout = {
         apiTimeout: 1000,
         apiRetryCutoff: 10000,
-        apiRetry: 300000
+        apiRetry: 30000
       }
       let filamentManager = false;
       if (settings.length < 1) {

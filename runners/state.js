@@ -9,7 +9,7 @@ const fetch = require("node-fetch");
 const _ = require("lodash");
 const WebSocket = require("ws");
 const Filament = require("../models/Filament.js");
-const timeout = require("../serverConfig/timeout.js");
+let timeout = null;
 const Logger = require('../lib/logger.js');
 const logger = new Logger('OctoFarm-State')
 
@@ -388,6 +388,8 @@ class ClientAPI {
 
 class Runner {
     static async init() {
+        let timeoutSettings = await ServerSettings.check();
+        timeout = timeoutSettings[0].timeout
         farmPrinters = [];
         statRunner = setInterval(function() {
             //Update Current Operations
@@ -737,7 +739,7 @@ class Runner {
             throt["throttle"] = parseInt(
                 (Polling[0].onlinePolling.seconds * 1000) / 500
             );
-            if (typeof farmPrinters[i].ws.instance != 'undefined') {
+            if (typeof farmPrinters[i].ws != 'undefined' && typeof farmPrinters[i].ws.instance != 'undefined') {
                 await farmPrinters[i].ws.throttle(JSON.stringify(throt));
             }
         }
