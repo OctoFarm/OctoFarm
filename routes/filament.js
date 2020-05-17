@@ -107,21 +107,25 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
   const filament = req.body;
 
   let filamentManagerID = null;
-  let profiles = await Profile.find({})
-  let findID = _.findIndex(profiles, function(o) {
-    return o.profile.index == filamentManagerID;
-  });
+
+
+
   if(serverSettings[0].filamentManager) {
     const runner = require("../runners/state.js");
     const Runner = runner.Runner;
     let printerList = Runner.returnFarmPrinters();
     let printer = null;
-    for (let i = 0; i < 10; i++) {
+
+    for (let i = 0; i < printerList.length; i++) {
       if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
         printer = printerList[i]
         break;
       }
     }
+    let profiles = await Profile.find({})
+    let findID = _.findIndex(profiles, function(o) {
+      return o.profile.index == filament.spoolsProfile;
+    });
 
     let profile = {
       "vendor": profiles[findID].profile.manufacturer,
@@ -137,6 +141,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
       "weight": filament.spoolsWeight,
       "used": filament.spoolsUsed,
       "temp_offset": filament.spoolsTempOffset
+
     };
     let url = `${printer.printerURL}/plugin/filamentmanager/spools`;
     let updateFilamentManager = await fetch(url, {
@@ -181,7 +186,7 @@ router.post("/delete/filament", ensureAuthenticated, async (req, res) => {
     const Runner = runner.Runner;
     let printerList = Runner.returnFarmPrinters();
     let printer = null;
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < printerList.length; i++) {
       if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
         printer = printerList[i]
         break;
@@ -220,7 +225,7 @@ router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
     const Runner = runner.Runner;
     let printerList = Runner.returnFarmPrinters();
     let printer = null;
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < printerList.length; i++) {
       if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
         printer = printerList[i]
         break;
@@ -261,7 +266,7 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
 
     let printerList = Runner.returnFarmPrinters();
     let printer = null;
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < printerList.length; i++) {
       if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
         printer = printerList[i]
         break;
@@ -288,7 +293,7 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
       "used": newContent[3],
       "temp_offset": newContent[4]
     };
-
+  console.log(spool)
     let url = `${printer.printerURL}/plugin/filamentmanager/spools/${spools.spools.fmID}`;
     let updateFilamentManager = await fetch(url, {
       method: "PATCH",
@@ -338,7 +343,7 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
     const Runner = runner.Runner;
     let printerList = Runner.returnFarmPrinters();
     let printer = null;
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < printerList.length; i++) {
       if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
         printer = printerList[i]
         break;
@@ -397,7 +402,7 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
   const Runner = runner.Runner;
   let printerList = Runner.returnFarmPrinters();
   let printer = null;
-  for (let i = 0; i < 10; i++) {
+  for (let i = 0; i < printerList.length; i++) {
     if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
       printer = printerList[i]
       break;

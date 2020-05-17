@@ -146,9 +146,9 @@ async function init() {
                    </td>
                   <td><p contenteditable="false">${spools.spools.price}</p></td>
                   <td><p contenteditable="false">${spools.spools.weight}</p></td>
-                  <td><p contenteditable="false">${spools.spools.used}g</p></td>
-                  <td>${(spools.spools.weight - spools.spools.used).toFixed(0)}g</td>
-                   <td>${(100 - spools.spools.used / spools.spools.weight * 100).toFixed(0)}%</td>
+                  <td><p contenteditable="false">${spools.spools.used}</p></td>
+                  <td>${(spools.spools.weight - spools.spools.used).toFixed(0)}</td>
+                   <td>${(100 - spools.spools.used / spools.spools.weight * 100).toFixed(0)}</td>
                   <td><p contenteditable="false">${spools.spools.tempOffset}</p></td>
                   <td><select id="spoolsPrinterAssignment-${spools._id}" class="form-control">
     
@@ -441,9 +441,9 @@ async function load() {
                    </td>
                   <td><p contenteditable="false">${post.spools.price}</p></td>
                   <td><p contenteditable="false">${post.spools.weight}</p></td>
-                  <td><p contenteditable="false">${post.spools.used}g</p></td>
-                  <td>${(post.spools.weight - post.spools.used).toFixed(0)}g </td>
-                  <td>${(100 - post.spools.used / post.spools.weight * 100).toFixed(0)}% </td>
+                  <td><p contenteditable="false">${post.spools.used}</p></td>
+                  <td>${(post.spools.weight - post.spools.used).toFixed(0)}</td>
+                  <td>${(100 - post.spools.used / post.spools.weight * 100).toFixed(0)}</td>
                   <td><p contenteditable="false">${post.spools.tempOffset}</p></td>
                    <td>
                        <select id="spoolsPrinterAssignment-${post.spools._id}" class="form-control">
