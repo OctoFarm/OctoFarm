@@ -77,7 +77,7 @@ class HistoryCollection {
       } else {
         name = printer.printerURL;
       }
-      console.log(printer.job)
+
       let printHistory = {
         historyIndex: historyCollection[historyCollection.length-1].printHistory.historyIndex + 1,
         printerIndex: "",
