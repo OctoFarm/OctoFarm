@@ -326,7 +326,6 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
         }
         if (data.event.type === "PrintDone") {
             logger.info(data.event.type + this.index + ": " + this.url);
-            console.log(farmPrinters[this.index])
             let sendPrinter = {};
             sendPrinter = JSON.parse(JSON.stringify(farmPrinters[this.index]));
             let job = {}

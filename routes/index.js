@@ -45,6 +45,7 @@ router.get("/dashboard", ensureAuthenticated, async(req, res) => {
     const SystemRunner = system.SystemRunner;
     let systemInformation = await SystemRunner.returnInfo();
     let clientSettings = await ClientSettings.find({});
+    let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
     if (serverConfig.loginRequired === false) {
@@ -69,7 +70,8 @@ router.get("/dashboard", ensureAuthenticated, async(req, res) => {
         page: "Dashboard",
         helpers: prettyHelpers,
         systemInfo: systemInformation,
-        clientSettings: clientSettings
+        clientSettings: clientSettings,
+        serverSettings: serverSettings
     });
 });
 router.get("/printers", ensureAuthenticated, async(req, res) => {
@@ -82,6 +84,7 @@ router.get("/printers", ensureAuthenticated, async(req, res) => {
     const SystemRunner = system.SystemRunner;
     let systemInformation = await SystemRunner.returnInfo();
     let clientSettings = await ClientSettings.find({});
+    let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
     if (serverConfig.loginRequired === false) {
@@ -101,7 +104,8 @@ router.get("/printers", ensureAuthenticated, async(req, res) => {
         printerCount: printers.length,
         helpers: prettyHelpers,
         systemInfo: systemInformation,
-        clientSettings: clientSettings
+        clientSettings: clientSettings,
+        serverSettings: serverSettings
     });
 });
 //File Manager Page
@@ -111,6 +115,7 @@ router.get("/filemanager", ensureAuthenticated, async(req, res) => {
     const farmStatistics = require("../runners/statisticsCollection.js");
     const FarmStatistics = farmStatistics.StatisticsCollection;
     let statistics = await FarmStatistics.returnStats();
+    let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
     if (serverConfig.loginRequired === false) {
@@ -130,6 +135,7 @@ router.get("/filemanager", ensureAuthenticated, async(req, res) => {
         currentOperationsCount: statistics.currentOperationsCount,
         page: "File Manager",
         helpers: prettyHelpers,
+        serverSettings: serverSettings
     });
 });
 //History Page
@@ -141,6 +147,7 @@ router.get("/history", ensureAuthenticated, async(req, res) => {
     const farmStatistics = require("../runners/statisticsCollection.js");
     const FarmStatistics = farmStatistics.StatisticsCollection;
     let statistics = await FarmStatistics.returnStats();
+    let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
     if (serverConfig.loginRequired === false) {
@@ -160,7 +167,8 @@ router.get("/history", ensureAuthenticated, async(req, res) => {
         history: history,
         page: "History",
         helpers: prettyHelpers,
-        printStatistics: statistics.printStatistics
+        printStatistics: statistics.printStatistics,
+        serverSettings: serverSettings
     });
 });
 //Panel view  Page
@@ -171,6 +179,7 @@ router.get("/mon/panel", ensureAuthenticated, async(req, res) => {
     const FarmStatistics = farmStatistics.StatisticsCollection;
     let statistics = await FarmStatistics.returnStats();
     let clientSettings = await ClientSettings.find({});
+    let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
     if (serverConfig.loginRequired === false) {
@@ -191,7 +200,8 @@ router.get("/mon/panel", ensureAuthenticated, async(req, res) => {
         currentOperationsCount: statistics.currentOperationsCount,
         page: "Panel View",
         helpers: prettyHelpers,
-        clientSettings: clientSettings
+        clientSettings: clientSettings,
+        serverSettings: serverSettings
     });
 });
 //Camera view  Page
@@ -202,6 +212,7 @@ router.get("/mon/camera", ensureAuthenticated, async(req, res) => {
     const FarmStatistics = farmStatistics.StatisticsCollection;
     let statistics = await FarmStatistics.returnStats();
     let clientSettings = await ClientSettings.find({});
+    let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
     if (serverConfig.loginRequired === false) {
@@ -222,7 +233,8 @@ router.get("/mon/camera", ensureAuthenticated, async(req, res) => {
         printerCount: printers.length,
         page: "Camera View",
         helpers: prettyHelpers,
-        clientSettings: clientSettings
+        clientSettings: clientSettings,
+        serverSettings: serverSettings
     });
 });
 //List view  Page
@@ -233,6 +245,7 @@ router.get("/mon/list", ensureAuthenticated, async(req, res) => {
     const FarmStatistics = farmStatistics.StatisticsCollection;
     let statistics = await FarmStatistics.returnStats();
     let clientSettings = await ClientSettings.find({});
+    let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
     if (serverConfig.loginRequired === false) {
@@ -253,7 +266,8 @@ router.get("/mon/list", ensureAuthenticated, async(req, res) => {
         printerCount: printers.length,
         page: "List View",
         helpers: prettyHelpers,
-        clientSettings: clientSettings
+        clientSettings: clientSettings,
+        serverSettings: serverSettings
     });
 });
 router.get("/mon/currentOp", ensureAuthenticated, async(req, res) => {
@@ -263,6 +277,7 @@ router.get("/mon/currentOp", ensureAuthenticated, async(req, res) => {
     const FarmStatistics = farmStatistics.StatisticsCollection;
     let statistics = await FarmStatistics.returnStats();
     let clientSettings = await ClientSettings.find({});
+    let serverSettings = await ServerSettings.find({});
     let user = null;
     let group = null;
     if (serverConfig.loginRequired === false) {
@@ -283,7 +298,9 @@ router.get("/mon/currentOp", ensureAuthenticated, async(req, res) => {
         currentOperationsCount: statistics.currentOperationsCount,
         page: "Current Operations View",
         helpers: prettyHelpers,
-        clientSettings: clientSettings
+        clientSettings: clientSettings,
+        serverSettings: serverSettings
+
     });
 });
 router.get("/filament", ensureAuthenticated, async(req, res) => {
@@ -312,7 +329,7 @@ router.get("/filament", ensureAuthenticated, async(req, res) => {
         currentOperations: statistics.currentOperations,
         printerCount: printers.length,
         currentOperationsCount: statistics.currentOperationsCount,
-        page: "Current Operations View",
+        page: "Filament Manager",
         helpers: prettyHelpers,
         clientSettings: clientSettings,
         serverSettings: serverSettings
