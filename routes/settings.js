@@ -7,9 +7,21 @@ const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 const systemInfo = require("../runners/systemInfo.js");
 const SystemInfo = systemInfo.SystemRunner;
+const serverCommands = require("../lib/serverCommands.js")
+const Logs = serverCommands.Logs;
 
 module.exports = router;
 
+router.get("/server/get/logs", ensureAuthenticated, async (req, res) => {
+    let serverLogs = await Logs.grabLogs();
+    res.send(serverLogs);
+});
+router.get("/server/download/logs/:name", ensureAuthenticated, (req, res) => {
+  let download = req.params.name;
+  console.log(req)
+  const file = `./logs/${download}`;
+  res.download(file, download); // Set disposition and send it.
+});
 router.get("/client/get", ensureAuthenticated, (req, res) => {
   ClientSettingsDB.find({}).then(checked => {
     res.send(checked[0]);

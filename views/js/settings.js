@@ -1,6 +1,7 @@
 import Client from "./lib/octofarm.js";
 import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
+import FileOperations from "./lib/functions/file.js";
 
 
 //Add listeners to settings
@@ -29,8 +30,7 @@ let optionsMemory = {
     },
     chart: {
         type: 'donut',
-        width: '100%',
-        height: '300px',
+        height: '150px',
         animations: {
             enabled: false,
         },
@@ -130,8 +130,7 @@ let optionsCPU = {
     },
     chart: {
         type: 'donut',
-        width: '100%',
-        height: '300px',
+        height: '150px',
         animations: {
             enabled: true,
         },
@@ -331,7 +330,7 @@ class ClientSettings {
   }
 }
 class ServerSettings {
-  static init() {
+  static async init() {
     if (
       !document.getElementById("systemDropDown").classList.contains("notyet")
     ) {
@@ -344,6 +343,27 @@ class ServerSettings {
             res.onlinePolling.seconds;
 
         });
+        let logList = await Client.get("settings/server/get/logs")
+        logList = await logList.json();
+        let logTable = document.getElementById("serverLogs");
+        logList.forEach(logs => {
+            logTable.insertAdjacentHTML('beforeend', `
+            <tr>
+                <td>${logs.name}</td>
+                <td>${new Date(logs.modified).toString().substring(0, 21)}</td>
+                <td>${Calc.bytes(logs.size)}</td>
+                <td><button id="${logs.name}" type="button" class="btn btn-sm btn-primary"><i class="fas fa-download"></i></button></td>
+            </tr>
+        `)
+            document.getElementById(logs.name).addEventListener('click', async event => {
+              let body = {
+                  logName: logs.name
+              }
+              window.open('/settings/server/download/logs/'+logs.name)
+
+            });
+        })
+
     }
   }
   static update() {
