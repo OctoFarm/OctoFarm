@@ -31,6 +31,7 @@ All notable changes to this project will be documented in this file.
     - Reduced the width of printer manager, allowing for click close outside of the modal window.
     - History page now loads latest first as default.
     - Removed underscores from history page. 
+    - History page will only load now with history added. Message to collect some before activation pops up. 
     
     
 ### Removed
@@ -52,6 +53,7 @@ All notable changes to this project will be documented in this file.
     - Fixed weight calculation been unusually high.
     - Fix for jobs not been captured
     - Fixed issue with filament manager not adding filaments due to 0.00 on temp offset.
+    - Not collecting history if there was none.
     
 
 ## [v1.1.4.9-dev-2.7]
