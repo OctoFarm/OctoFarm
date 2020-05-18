@@ -77,9 +77,15 @@ class HistoryCollection {
       } else {
         name = printer.printerURL;
       }
+        let counter = null;
+        if(historyCollection.length === 0){
+          counter = 0
+        }else{
+          counter = historyCollection[historyCollection.length-1].printHistory.historyIndex + 1
+        }
 
       let printHistory = {
-        historyIndex: historyCollection[historyCollection.length-1].printHistory.historyIndex + 1,
+        historyIndex: counter,
         printerIndex: "",
         printerName: name,
         success: true,
@@ -155,8 +161,15 @@ class HistoryCollection {
         }
         printer.selectedFilament.spools.profile = profiles[profileId].profile;
       }
+      let counter = null;
+      if(historyCollection.length === 0){
+        counter = 0
+      }else{
+        counter = historyCollection[historyCollection.length-1].printHistory.historyIndex + 1
+      }
+
       let printHistory = {
-        historyIndex: historyCollection[historyCollection.length-1].printHistory.historyIndex + 1,
+        historyIndex: counter,
         printerIndex: printer.index,
         printerName: name,
         success: false,
