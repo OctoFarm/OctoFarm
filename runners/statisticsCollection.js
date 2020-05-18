@@ -629,16 +629,27 @@ class StatisticsCollection {
         printStatistics.failed = failed.length;
 
         let filesArray = arrayCounts(fileNames)
-        let countFilesArray = filesArray[1].indexOf(Math.max(...filesArray[1]));
-        let mostPrintedFile = filesArray[0][countFilesArray]
-        printStatistics.mostPrintedFile = mostPrintedFile;
+        if(filesArray[0].length != 0){
+            let countFilesArray = filesArray[1].indexOf(Math.max(...filesArray[1]));
+            let mostPrintedFile = filesArray[0][countFilesArray]
+            printStatistics.mostPrintedFile = mostPrintedFile.replace(/_/g," ");
+        }else{
+            printStatistics.mostPrintedFile = "No Files";
+        }
+
         let printerNamesArray = arrayCounts(printerNames);
-        let maxIndexPrinterNames = printerNamesArray[1].indexOf(Math.max(...printerNamesArray[1]));
-        let minIndexPrinterNames = printerNamesArray[1].indexOf(Math.min(...printerNamesArray[1]));
-        let mostUsedPrinters = printerNamesArray[0][maxIndexPrinterNames];
-        let leastUsedPrinters = printerNamesArray[0][minIndexPrinterNames];
-        printStatistics.mostUsedPrinters = mostUsedPrinters;
-        printStatistics.leastUsedPrinters = leastUsedPrinters;
+        if(printerNamesArray[0].length != 0){
+            let maxIndexPrinterNames = printerNamesArray[1].indexOf(Math.max(...printerNamesArray[1]));
+            let minIndexPrinterNames = printerNamesArray[1].indexOf(Math.min(...printerNamesArray[1]));
+            let mostUsedPrinters = printerNamesArray[0][maxIndexPrinterNames];
+            let leastUsedPrinters = printerNamesArray[0][minIndexPrinterNames];
+            printStatistics.mostUsedPrinters = mostUsedPrinters;
+            printStatistics.leastUsedPrinters = leastUsedPrinters;
+        }else{
+            printStatistics.mostUsedPrinters = "No Printers";
+            printStatistics.leastUsedPrinters = "No Printers";
+        }
+
 
 
         printStatistics.completedPercent =

@@ -1,4 +1,4 @@
-<% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
+<% if(typeof history.length != 'undefined' && history.length > 0 ) {%>
 
 <div class="row">
   <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
@@ -117,7 +117,17 @@
 </div>
 
 <% }else{ %>
-  <%- include('./addPrinters.ejs') %>
+  <div class="row mt-5">
+    <div class="col-md-6 m-auto">
+      <div class="card card-body text-center">
+        <h1>No History yet</h1>
+        <p>
+          Come back here when you've completed some prints.
+        </p>
+        <h1><img width="500px" src="images/logo.png" /></h1>
+      </div>
+    </div>
+  </div>
 <% } %>
 <div class="modal fade" id="historyModal" tabindex="0" role="dialog" aria-labelledby="historyModal" aria-hidden="true">
   <div class="modal-dialog modal-xl" role="document">
