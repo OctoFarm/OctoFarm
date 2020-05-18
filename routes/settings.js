@@ -9,6 +9,7 @@ const systemInfo = require("../runners/systemInfo.js");
 const SystemInfo = systemInfo.SystemRunner;
 const serverCommands = require("../lib/serverCommands.js")
 const Logs = serverCommands.Logs;
+const SystemCommands = serverCommands.SystemCommands;
 
 module.exports = router;
 
@@ -20,6 +21,10 @@ router.get("/server/download/logs/:name", ensureAuthenticated, (req, res) => {
   let download = req.params.name;
   const file = `./logs/${download}`;
   res.download(file, download); // Set disposition and send it.
+});
+router.get("/server/restart", ensureAuthenticated, (req, res) => {
+  SystemCommands.rebootOctoFarm();
+
 });
 router.get("/client/get", ensureAuthenticated, (req, res) => {
   ClientSettingsDB.find({}).then(checked => {

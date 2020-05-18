@@ -1,8 +1,7 @@
 import Client from "./lib/octofarm.js";
 import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
-import FileOperations from "./lib/functions/file.js";
-
+import OctoFarmclient from "./lib/octofarm.js";
 
 //Add listeners to settings
 document.getElementById("saveServerSettings").addEventListener("click", e => {
@@ -390,20 +389,27 @@ class ServerSettings {
         apiRetry: document.getElementById("APIRetry").value * 1000,
     }
 
-
-    document.getElementById("overlay").style.display = "block";
-    UI.createAlert(
-      "success",
-      "Settings updated, please wait whilst the server restarts...<br> This may take some time...<br> The page will automatically refresh when complete.... ",
-      10000,
-      "clicked"
-    );
     Client.post("settings/server/update", { onlinePolling, server, timeout })
       .then(res => {
         return res.json();
       })
       .then(res => {
-        location.reload();
+          bootbox.confirm({
+              message: "Your settings changes require a restart, would you like to do this now?",
+              buttons: {
+                  cancel: {
+                      label: '<i class="fa fa-times"></i> Cancel'
+                  },
+                  confirm: {
+                      label: '<i class="fa fa-check"></i> Confirm'
+                  }
+              },
+              callback: function (result) {
+                  if(result){
+                    OctoFarmclient.get("settings/server/restart")
+                  }
+              }
+          });
       });
   }
 }

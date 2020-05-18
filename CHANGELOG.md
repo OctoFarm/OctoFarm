@@ -20,7 +20,9 @@ All notable changes to this project will be documented in this file.
         - Lists current log files and allows for download.
         - Server settings
         - Server timeout settings
-        - Server database actions    
+    - When saving settings it now asks if you'd like to restart OctoFarm. Confirm will restart the service. 
+    
+        
 ### Changed
     - Group dropdown only appears if groups exist.
     - Renamed the views removing the "Views" Tag. Added in placeholders on hover to describe function.
@@ -32,6 +34,7 @@ All notable changes to this project will be documented in this file.
     - History page now loads latest first as default.
     - Removed underscores from history page. 
     - History page will only load now with history added. Message to collect some before activation pops up. 
+    - Job information is now captured within history for cancelled prints. May use in UI at a later date. 
     
     
 ### Removed
@@ -54,6 +57,7 @@ All notable changes to this project will be documented in this file.
     - Fix for jobs not been captured
     - Fixed issue with filament manager not adding filaments due to 0.00 on temp offset.
     - Not collecting history if there was none.
+    - Fixed issue with ping pong incorrectly fireing for mid-connection websockets
     
 
 ## [v1.1.4.9-dev-2.7]
