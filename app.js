@@ -57,59 +57,71 @@ app.use((req, res, next) => {
     next();
 });
 
-//Routes
-app.use(express.static(__dirname + '/views'));
-if (db === "") {
-    app.use("/", require("./routes/index", { page: "route" }));
-} else {
-    app.use("/", require("./routes/index", { page: "route" }));
-    app.use("/users", require("./routes/users", { page: "route" }));
-    app.use("/printers", require("./routes/printers", { page: "route" }));
-    app.use("/settings", require("./routes/settings", { page: "route" }));
-    app.use("/sse", require("./routes/SSE", { page: "route" }));
-    app.use("/filament", require("./routes/filament", { page: "route" }));
-    app.use("/history", require("./routes/history", { page: "route" }));
-}
-
 //Mongo Connect
 mongoose
     .connect(db, { useNewUrlParser: true, useUnifiedTopology: true })
+    .then(() => setupServerSettings())
     .then(() => serverStart())
     .catch(err => logger.error(err));
 
-let serverStart = async function() {
-    logger.info("MongoDB Connected...");
-    //Grab server settings
-    //Setup Settings
+let setupServerSettings = async function() {
     const serverSettings = require("./settings/serverSettings.js");
     const ServerSettings = serverSettings.ServerSettings;
     logger.info("Checking Server Settings...");
     let ss = await ServerSettings.init();
+    console.log(ss)
+    //Setup Settings
     logger.info(ss);
-    //Find server Settings
-    let settings = await ServerSettingsDB.find({});
-    const clientSettings = require("./settings/clientSettings.js");
-    const ClientSettings = clientSettings.ClientSettings;
-    logger.info("Checking Client Settings...");
-    let cs = await ClientSettings.init();
-    logger.info(cs);
-    //Start backend metrics gathering...
-    logger.info("Starting Statistics Collection");
-    const statisticsCollection = require("./runners/statisticsCollection.js");
-    const StatisticsCollection = statisticsCollection.StatisticsCollection;
-    let sc = await StatisticsCollection.init();
-    logger.info(sc);
-    const runner = require("./runners/state.js");
-    const Runner = runner.Runner;
-    let r = Runner.init();
-    logger.info("Starting System Information Runner...");
-    const system = require("./runners/systemInfo.js");
-    const SystemRunner = system.SystemRunner;
-    let sr = await SystemRunner.init();
-    logger.info(sr);
-    const PORT = process.env.PORT || settings[0].server.port;
-    app.listen(PORT, () => {
-        logger.info(`HTTP server started...`);
-        logger.info(`You can now access your server on port: ${PORT}`);
-    });
+    return;
+}
+
+
+let serverStart = async function() {
+    try{
+        logger.info("MongoDB Connected...");
+        //Find server Settings
+        let settings = await ServerSettingsDB.find({});
+        console.log(settings)
+        const clientSettings = require("./settings/clientSettings.js");
+        const ClientSettings = clientSettings.ClientSettings;
+        logger.info("Checking Client Settings...");
+        let cs = await ClientSettings.init();
+        logger.info(cs);
+        //Start backend metrics gathering...
+        logger.info("Starting Statistics Collection");
+        const statisticsCollection = require("./runners/statisticsCollection.js");
+        const StatisticsCollection = statisticsCollection.StatisticsCollection;
+        let sc = await StatisticsCollection.init();
+        logger.info(sc);
+        const runner = require("./runners/state.js");
+        const Runner = runner.Runner;
+        let r = Runner.init();
+        logger.info("Starting System Information Runner...");
+        const system = require("./runners/systemInfo.js");
+        const SystemRunner = system.SystemRunner;
+        let sr = await SystemRunner.init();
+        logger.info(sr);
+        const PORT = process.env.PORT || settings[0].server.port;
+        app.listen(PORT, () => {
+            logger.info(`HTTP server started...`);
+            logger.info(`You can now access your server on port: ${PORT}`);
+        });
+    }catch(e){
+        console.log(e)
+    }
+
+//Routes
+    app.use(express.static(__dirname + '/views'));
+    if (db === "") {
+        app.use("/", require("./routes/index", { page: "route" }));
+    } else {
+        app.use("/", require("./routes/index", { page: "route" }));
+        app.use("/users", require("./routes/users", { page: "route" }));
+        app.use("/printers", require("./routes/printers", { page: "route" }));
+        app.use("/settings", require("./routes/settings", { page: "route" }));
+        app.use("/sse", require("./routes/SSE", { page: "route" }));
+        app.use("/filament", require("./routes/filament", { page: "route" }));
+        app.use("/history", require("./routes/history", { page: "route" }));
+    }
+
 };

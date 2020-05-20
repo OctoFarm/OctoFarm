@@ -1,32 +1,35 @@
 const ServerSettingsDB = require("../models/ServerSettings.js");
 
+//Default Settings
+let onlinePolling = {
+  seconds: 0.5
+};
+let server = {
+  port: 4000,
+  registration: true,
+  loginRequired: true
+};
+let timeout = {
+  apiTimeout: 1000,
+  apiRetryCutoff: 10000,
+  apiRetry: 30000
+}
+let filamentManager = false;
+
 class ServerSettings {
-  static init() {
-    ServerSettingsDB.find({}).then(settings => {
-      //Default Settings
-      let onlinePolling = {
-        seconds: 0.5
-      };
-      let server = {
-        port: 4000,
-        registration: true,
-        loginRequired: true
-      };
-      let timeout = {
-        apiTimeout: 1000,
-        apiRetryCutoff: 10000,
-        apiRetry: 30000
-      }
-      let filamentManager = false;
-      if (settings.length < 1) {
+   static async init() {
+     let settings = await ServerSettingsDB.find({})
+     if (settings.length < 1) {
         let defaultSystemSettings = new ServerSettingsDB({
           onlinePolling,
           server,
-          timeout
+          timeout,
+          filamentManager
         });
-        defaultSystemSettings.save();
+        await defaultSystemSettings.save()
+        console.log("SETINGS SAVED")
         return "Server settings have been created...";
-      }else{
+     }else{
         //Server settings exist, but need updating with new ones if they don't exists.
         if(typeof settings[0].timeout === 'undefined'){
           settings[0].timeout = timeout;
@@ -37,10 +40,10 @@ class ServerSettings {
         if(typeof settings[0].filamentManager === 'undefined'){
           settings[0].filamentManager = filamentManager;
         }
-        settings[0].save();
+        await settings[0].save()
+        console.log("SETINGS SAVED")
+        return "Server settings already exist, loaded existing values...";
       }
-    });
-    return "Server settings already exist, loaded existing values...";
   }
   static check() {
     return ServerSettingsDB.find({});
