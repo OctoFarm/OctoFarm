@@ -35,4 +35,4 @@ fi
 
 cd app/
 
-pm2 start app.js --name OctoFarm --no-daemon
+pm2 start app.js --name OctoFarm
