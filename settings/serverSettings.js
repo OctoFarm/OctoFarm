@@ -12,7 +12,8 @@ let server = {
 let timeout = {
   apiTimeout: 1000,
   apiRetryCutoff: 10000,
-  apiRetry: 30000
+  apiRetry: 30000,
+  webSocketRetry: 5000
 }
 let filamentManager = false;
 
@@ -27,7 +28,6 @@ class ServerSettings {
           filamentManager
         });
         await defaultSystemSettings.save()
-        console.log("SETINGS SAVED")
         return "Server settings have been created...";
      }else{
         //Server settings exist, but need updating with new ones if they don't exists.
@@ -41,7 +41,6 @@ class ServerSettings {
           settings[0].filamentManager = filamentManager;
         }
         await settings[0].save()
-        console.log("SETINGS SAVED")
         return "Server settings already exist, loaded existing values...";
       }
   }

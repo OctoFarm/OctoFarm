@@ -69,7 +69,6 @@ let setupServerSettings = async function() {
     const ServerSettings = serverSettings.ServerSettings;
     logger.info("Checking Server Settings...");
     let ss = await ServerSettings.init();
-    console.log(ss)
     //Setup Settings
     logger.info(ss);
     return;
@@ -81,7 +80,6 @@ let serverStart = async function() {
         logger.info("MongoDB Connected...");
         //Find server Settings
         let settings = await ServerSettingsDB.find({});
-        console.log(settings)
         const clientSettings = require("./settings/clientSettings.js");
         const ClientSettings = clientSettings.ClientSettings;
         logger.info("Checking Client Settings...");
@@ -106,8 +104,8 @@ let serverStart = async function() {
             logger.info(`HTTP server started...`);
             logger.info(`You can now access your server on port: ${PORT}`);
         });
-    }catch(e){
-        console.log(e)
+    }catch(err){
+        logger.error(err)
     }
 
 //Routes
