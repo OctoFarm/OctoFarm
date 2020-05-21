@@ -58,7 +58,7 @@ All notable changes to this project will be documented in this file.
     - Fixed issue with filament manager not adding filaments due to 0.00 on temp offset.
     - Not collecting history if there was none.
     - Fixed issue with ping pong incorrectly fireing for mid-connection websockets
-    
+    - Fixed history index not sequencially counting if multiple entries collected at same time.
 
 ## [v1.1.4.9-dev-2.7]
 
