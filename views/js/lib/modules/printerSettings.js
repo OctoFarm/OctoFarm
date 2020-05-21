@@ -88,47 +88,10 @@ export default class PrinterSettings {
             count: "0",
             nozzleDiameter: "0",
           },
-          heatedChamber: "Couldn't grab..."
+          heatedChamber: false,
         }
       }
 
-
-      //Fake job and progress
-      let job = "";
-      let progress = "";
-
-      if (
-          typeof printer.progress != "undefined" &&
-          printer.progress.completion != null
-      ) {
-        progress = printer.progress;
-      } else {
-        progress = {
-          completion: 0,
-          filepos: 0,
-          printTime: 0,
-          printTimeLeft: 0
-        };
-      }
-      if (typeof printer.job != "undefined") {
-        job = printer.job;
-      } else {
-        job = {
-          file: {
-            name: "No File Selected",
-            display: "No File Selected",
-            path: "No File Selected"
-          },
-          estimatedPrintTime: 0,
-          lastPrintTime: 0
-        };
-      }
-      if (
-          typeof printer.currentZ === "undefined" ||
-          printer.currentZ === null
-      ) {
-        printer.currentZ = 0;
-      }
       if (
           currentIndex ===
           document.getElementById("printerSettingsIndex").innerHTML
@@ -294,136 +257,187 @@ export default class PrinterSettings {
         document.getElementById("psPrinterProfiles").innerHTML = `
             <div class="col-12 col-lg-4">
             <h6 class="mb-1"><u>Printer</u></h6>
-            <p class="mb-0"><b>Printer Name: </b><span>${PrinterSettings.grabName(printer)}<span></p>
-            <p class="mb-0"><b>Printer Model: </b><span contenteditable="false">${pProfile.model}</span></p>
+            <p class="mb-0"><b>Printer Name: </b><span id="printerName" contenteditable="false">${PrinterSettings.grabName(printer)}<span></p>
+            <p class="mb-0"><b>Printer Model: </b><span id="printerModel" contenteditable="false">${pProfile.model}</span></p>
             <h6 class="mb-1"><u>Axis</u></h6>
-            <p class="mb-0"><b>E: </b><span contenteditable="false">${pProfile.axes.e.speed}mm/min | Inverted: ${PrinterSettings.grabThumb(pProfile.axes.e.inverted)}</span></p>
-            <p class="mb-0"><b>X: </b><span contenteditable="false">${pProfile.axes.x.speed}mm/min | Inverted: ${PrinterSettings.grabThumb(pProfile.axes.x.inverted)}</span></p>
-            <p class="mb-0"><b>Y: </b><span contenteditable="false">${pProfile.axes.y.speed}mm/min | Inverted: ${PrinterSettings.grabThumb(pProfile.axes.y.inverted)}</span></p>
-            <p class="mb-0"><b>Z: </b><span contenteditable="false">${pProfile.axes.z.speed}mm/min | Inverted: ${PrinterSettings.grabThumb(pProfile.axes.z.inverted)}</span></p>
+            <p class="mb-0"><b>E: </b><span id="printerEAxis" contenteditable="false">${pProfile.axes.e.speed}</span>mm/min<br><form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="eInverted" required>
+                                                        <label class="custom-control-label" for="eInverted">Inverted</label>
+                                                    </div>
+                                                </form></p>
+            <p class="mb-0"><b>X: </b><span id="printerXAxis" contenteditable="false">${pProfile.axes.x.speed}</span>mm/min<br><form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="xInverted" required>
+                                                        <label class="custom-control-label" for="xInverted">Inverted</label>
+                                                    </div>
+                                                </form></p>
+            <p class="mb-0"><b>Y: </b><span id="printerYAxis" contenteditable="false">${pProfile.axes.y.speed}</span>mm/min<br><form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="yInverted" required>
+                                                        <label class="custom-control-label" for="yInverted">Inverted</label>
+                                                    </div>
+                                                </form></p>
+            <p class="mb-0"><b>Z: </b><span id="printerZAxis" contenteditable="false">${pProfile.axes.z.speed}</span>mm/min<br><form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="zInverted" required>
+                                                        <label class="custom-control-label" for="zInverted">Inverted</label>
+                                                    </div>
+                                                </form></p>
             </div>
             <div class="col-12 col-lg-4">
             <h6 class="mb-1"><u>Extrusion</u></h6>
-            <p class="mb-0"><b>Extruder Count: </b><span contenteditable="false">${pProfile.extruder.count}</span></p>
-            <p class="mb-0"><b>Nozzle Size: </b><span contenteditable="false">${pProfile.extruder.nozzleDiameter}</span></p>
-            <p class="mb-0"><b>Nozzle Offsets: </b><span>X: ${pProfile.extruder.offsets[0][0]}mm | Y: ${pProfile.extruder.offsets[0][0]}mm</span></p>
-            <p class="mb-0"><b>Shared Nozzle:  </b><span contenteditable="false">${PrinterSettings.grabThumb(pProfile.extruder.sharedNozzle)}</span></p>
+            <p class="mb-0"><b>Extruder Count: </b><span id="extruderCount" contenteditable="false">${pProfile.extruder.count}</span></p>
+            <p class="mb-0"><b>Nozzle Size: </b><span id="nozzleDiameter" contenteditable="false">${pProfile.extruder.nozzleDiameter}</span></p>
+            <p class="mb-0"><b>Nozzle Offsets: </b><span id="extruderOffsetsX" contenteditable="false">X: ${pProfile.extruder.offsets[0][0]}</span>mm | Y: <span id="extruderOffsetsY" contenteditable="false">${pProfile.extruder.offsets[0][0]}</span>mm</p>
+            <p class="mb-0"><span><form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="sharedNozzle" required>
+                                                        <label class="custom-control-label" for="sharedNozzle">Shared Nozzle</label>
+                                                    </div>
+                                                </form></span></p>
             </div>
             <div class="col-12 col-lg-4">
             <h6 class="mb-1"><u>Bed / Chamber</u></h6>
-            <p class="mb-1"><b>Heated Bed: </b><span contenteditable="false">${PrinterSettings.grabThumb(pProfile.heatedBed)}</span></p>  
-             <p class="mb-1"><b>Form Factor: </b><span contenteditable="false">${pProfile.volume.formFactor}</span></p>                   
-            <p class="mb-1"><b>Dimensions:</b><span contenteditable="false"> D: ${pProfile.volume.depth}mm x H: ${pProfile.volume.height}mm x W: ${pProfile.volume.width}</span></p>                 
-            <p class="mb-1"><b>Heated Chamber: </b><span contenteditable="false">${PrinterSettings.grabThumb(pProfile.heatedChamber)}</span></p>  
+             <p class="mb-1"><b>Form Factor: </b><span id="extruderFormFactor" contenteditable="false">${pProfile.volume.formFactor}</span></p>                   
+            <p class="mb-1"><b>Dimensions:</b>D: <span id="volumeDepth" contenteditable="false">${pProfile.volume.depth}</span>mm x H: <span id="volumeHeight" contenteditable="false">${pProfile.volume.height}</span>mm x W: <span id="volumeWidth" contenteditable="false">${pProfile.volume.width}</span>mm</p> 
+               <p class="mb-1"><form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="heatedBed" required>
+                                                        <label class="custom-control-label" for="heatedBed">Heated Bed</label>
+                                                    </div>
+                                                </form></span></p>                  
+            <p class="mb-1"><form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="heatedChamber" required>
+                                                        <label class="custom-control-label" for="heatedChamber">Heated Chamber</label>
+                                                    </div>
+                                                </form></span></p>  
             </div>
         `;
-        printer.gcode = printer.gcode.gcode;
+
+        document.getElementById("eInverted").checked = pProfile.axes.e.inverted;
+        document.getElementById("xInverted").checked = pProfile.axes.x.inverted;
+        document.getElementById("yInverted").checked = pProfile.axes.y.inverted;
+        document.getElementById("zInverted").checked = pProfile.axes.z.inverted;
+        document.getElementById("sharedNozzle").checked = pProfile.extruder.sharedNozzle;
+        document.getElementById("heatedBed").checked = pProfile.heatedBed;
+        document.getElementById("heatedChamber").checked = pProfile.heatedChamber;
+
         let afterPrintCancelled = "";
-        if (typeof printer.gcode.afterPrintCancelled != "undefined") {
-          afterPrintCancelled = printer.gcode.afterPrintCancelled;
+        if (typeof printer.gcode.gcode.afterPrintCancelled != "undefined") {
+          afterPrintCancelled = printer.gcode.gcode.afterPrintCancelled;
         }
         let afterPrintDone = "";
-        if (typeof printer.gcode.afterPrintDone != "undefined") {
-          afterPrintDone = printer.gcode.afterPrintDone;
+        if (typeof printer.gcode.gcode.afterPrintDone != "undefined") {
+          afterPrintDone = printer.gcode.gcode.afterPrintDone;
         }
         let afterPrintPaused = "";
-        if (typeof printer.gcode.afterPrintPaused != "undefined") {
-          afterPrintPaused = printer.gcode.afterPrintPaused;
+        if (typeof printer.gcode.gcode.afterPrintPaused != "undefined") {
+          afterPrintPaused = printer.gcode.gcode.afterPrintPaused;
         }
         let afterPrinterConnected = "";
-        if (typeof printer.gcode.afterPrinterConnected != "undefined") {
-          afterPrinterConnected = printer.gcode.afterPrinterConnected;
+        if (typeof printer.gcode.gcode.afterPrinterConnected != "undefined") {
+          afterPrinterConnected = printer.gcode.gcode.afterPrinterConnected;
         }
         let beforePrintResumed = "";
-        if (typeof printer.gcode.beforePrintResumed != "undefined") {
-          beforePrintResumed = printer.gcode.beforePrintResumed;
+        if (typeof printer.gcode.gcode.beforePrintResumed != "undefined") {
+          beforePrintResumed = printer.gcode.gcode.beforePrintResumed;
         }
         let afterToolChange = "";
-        if (typeof printer.gcode.afterToolChange != "undefined") {
-          afterToolChange = printer.gcode.afterToolChange;
+        if (typeof printer.gcode.gcode.afterToolChange != "undefined") {
+          afterToolChange = printer.gcode.gcode.afterToolChange;
         }
         let beforePrintStarted = "";
-        if (typeof printer.gcode.beforePrintStarted != "undefined") {
-          beforePrintStarted = printer.gcode.beforePrintStarted;
+        if (typeof printer.gcode.gcode.beforePrintStarted != "undefined") {
+          beforePrintStarted = printer.gcode.gcode.beforePrintStarted;
         }
         let beforePrinterDisconnected = "";
-        if (typeof printer.gcode.beforePrinterDisconnected != "undefined") {
-          beforePrinterDisconnected = printer.gcode.beforePrinterDisconnected;
+        if (typeof printer.gcode.gcode.beforePrinterDisconnected != "undefined") {
+          beforePrinterDisconnected = printer.gcode.gcode.beforePrinterDisconnected;
         }
         let beforeToolChange = "";
-        if (typeof printer.gcode.beforeToolChange != "undefined") {
-          beforeToolChange = printer.gcode.beforeToolChange;
+        if (typeof printer.gcode.gcode.beforeToolChange != "undefined") {
+          beforeToolChange = printer.gcode.gcode.beforeToolChange;
         }
         document.getElementById("psGcodeManagerGcode").innerHTML = `
               <div class="form-group">
               <label for="settingsAfterPrinterCancelled">After Printing Cancelled</label>
               <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterCancelled" rows="2">${afterPrintCancelled}</textarea>
+              <small>Anything you put here will be executed after any lines in your files.</small>
               </div>
               <div class="form-group">
               <label for="settingsAfterPrinterDone">After Printing Done</label>
               <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterDone" rows="2">${afterPrintDone}</textarea>
+               <small>Anything you put here will be executed after any lines in your files.</small>
               </div>
               <div class="form-group">
               <label for="settingsAfterPrinterPaused">After Printing Paused</label>
               <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterPaused" rows="2">${afterPrintPaused}</textarea>
+               <small>Anything you put here will be executed after any lines in your files.</small>
               </div>
               <div class="form-group">
               <label for="settingsAfterPrinterConnected">After Printer Connected</label>
               <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterConnected" rows="2">${afterPrinterConnected}</textarea>
+               <small> Anything you put here will only be executed after the printer has established a connection.</small>
               </div>
               <div class="form-group">
               <label for="settingsAfterToolChange">After Tool Change</label>
               <textarea class="form-control bg-dark text-white" id="settingsAfterToolChange" rows="2">${afterToolChange}</textarea>
+               <small>Anything you put here will be executed after any tool change commands <code>Tn</code>.</small>
               </div>
               <div class="form-group">
               <label for="settingsBeforePrinterResumed">Before Printing Resumed</label>
               <textarea class="form-control bg-dark text-white" id="settingsBeforePrinterResumed" rows="2">${beforePrintResumed}</textarea>
+               <small>Anything you put here will be executed before any lines in your files.</small>
               </div>
               <div class="form-group">
               <label for="settingsBeforePrinterStarted">Before Printing Started</label>
               <textarea class="form-control bg-dark text-white" id="settingsBeforePrinterStarted" rows="2">${beforePrintStarted}</textarea>
+               <small>Anything you put here will be executed before any lines in your files.</small>
               </div>
               <div class="form-group">
-              <labe
-              l for="settingsBeforePrinterDisconnected">Before Printer Disconnected</label>
+              <label for="settingsBeforePrinterDisconnected">Before Printer Disconnected</label>
               <textarea class="form-control bg-dark text-white" id="settingsBeforePrinterDisconnected" rows="2">${beforePrinterDisconnected}</textarea>
+               <small> Anything you put here will only be executed when closing the connection actively. If the connection to the printer is suddenly lost nothing will be sent.</small>
               </div>
               <div class="form-group">
               <label for="settingsBeforeToolChange">Before Tool Change</label>
               <textarea class="form-control bg-dark text-white" id="settingsBeforeToolChange" rows="2">${beforeToolChange}</textarea>
+               <small>Anything you put here will be executed before any tool change commands <code>Tn</code>.</small>
               </div>
         `;
         document.getElementById("cameraRotation").innerHTML = `
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="camEnabled">
-          <label class="form-check-label" for="camRot90">
-            Enable Web Camera
-          </label>
-        </div> 
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="camRot90">
-          <label class="form-check-label" for="camRot90">
-            Rotate your camera by 90°
-          </label>
+        <form class="was-validated">
+        <div class="custom-control custom-checkbox mb-3">
+            <input type="checkbox" class="custom-control-input" id="camEnabled" required>
+            <label class="custom-control-label" for="camEnabled">Enable Web Camera</label>
         </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="camFlipH">
-          <label class="form-check-label" for="camFlipH">
-            Flip your camera horizontally
-          </label>
+        </form>
+        <form class="was-validated">
+        <div class="custom-control custom-checkbox mb-3">
+            <input type="checkbox" class="custom-control-input" id="camRot90" required>
+            <label class="custom-control-label" for="camRot90">Rotate your camera by 90°</label>
         </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="camFlipV">
-          <label class="form-check-label" for="camFlipV">
-            Flip your camera vertically
-          </label>
+        </form>
+        <form class="was-validated">
+        <div class="custom-control custom-checkbox mb-3">
+            <input type="checkbox" class="custom-control-input" id="camFlipH" required>
+            <label class="custom-control-label" for="camFlipH">Flip your camera horizontally</label>
         </div>
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" id="camTimelapse">
-          <label class="form-check-label" for="camRot90">
-            Enable Time lapse
-          </label>
+        </form>
+        <form class="was-validated">
+        <div class="custom-control custom-checkbox mb-3">
+            <input type="checkbox" class="custom-control-input" id="camFlipV" required>
+            <label class="custom-control-label" for="camFlipV">Flip your camera vertically</label>
         </div>
+        </form>
+        <form class="was-validated">
+        <div class="custom-control custom-checkbox mb-3">
+            <input type="checkbox" class="custom-control-input" id="camTimelapse" required>
+            <label class="custom-control-label" for="camTimelapse">Enable Time lapse</label>
+        </div>
+        </form>
       `;
 
         document.getElementById("camEnabled").checked =
@@ -436,7 +450,6 @@ export default class PrinterSettings {
             printer.settingsWebcam.flipH;
         document.getElementById("camFlipV").checked =
             printer.settingsWebcam.flipV;
-        console.log(printer)
         let serverRestart = null;
         let systemRestart = null;
         let systemShutdown = null;
@@ -459,22 +472,22 @@ export default class PrinterSettings {
         document.getElementById("psPowerCommands").innerHTML = `
         <form>
           <div class="form-group">
-            <label for="formGroupExampleInput">OctoPrint Server Restart</label>
-            <input type="text" class="form-control" id="formGroupExampleInput" placeholder="${serverRestart}">
+            <label for="serverRestart">OctoPrint Server Restart</label>
+            <input type="text" class="form-control" id="serverRestart" placeholder="${serverRestart}">
             <small id="passwordHelpBlock" class="form-text text-muted">
                 Usually your OctoPrint hosts server restart command. i.e: <code>sudo service octoprint restart</code>
             </small>
           </div>
           <div class="form-group">
-            <label for="formGroupExampleInput2">OctoPrint System Restart</label>
-            <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="${systemRestart}">
+            <label for="systemRestart">OctoPrint System Restart</label>
+            <input type="text" class="form-control" id="systemRestart" placeholder="${systemRestart}">
             <small id="passwordHelpBlock" class="form-text text-muted">
                Usually your OctoPrint hosts system restart command. i.e: <code>sudo shutdown -r now</code>
             </small>
           </div>
           <div class="form-group">
-            <label for="formGroupExampleInput2">OctoPrint System Shutdown</label>
-            <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="${systemShutdown}">
+            <label for="systemShutdown">OctoPrint System Shutdown</label>
+            <input type="text" class="form-control" id="systemShutdown" placeholder="${systemShutdown}">
             <small id="passwordHelpBlock" class="form-text text-muted">
               Usually your OctoPrint hosts system shutdown command. i.e: <code>sudo shutdown -h now</code>
             </small>
@@ -488,13 +501,13 @@ export default class PrinterSettings {
            <div class="form-row">
               <div class="col-4">
                 <input type="text" class="form-control" placeholder="Command">
-                 <small id="passwordHelpBlock" class="form-text text-muted">
+                 <small id="powerOnCommand" class="form-text text-muted">
                   This is usually an json object supplied in the following format <code>{"command":"turnOn"}</code>
                  </small>
               </div>
               <div class="col-8">
                 <input type="text" class="form-control" placeholder="URL">
-                 <small id="passwordHelpBlock" class="form-text text-muted">
+                 <small id="powerOnURL" class="form-text text-muted">
                   The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
                  </small>
               </div>
@@ -503,13 +516,13 @@ export default class PrinterSettings {
             <div class="form-row">
               <div class="col-4">
                 <input type="text" class="form-control" placeholder="Command">
-                 <small id="passwordHelpBlock" class="form-text text-muted">
+                 <small id="powerOffCommand" class="form-text text-muted">
                    This is usually an json object supplied in the following format <code>{"command":"turnOff"}</code>
                  </small>
               </div>
               <div class="col-8">
                 <input type="text" class="form-control" placeholder="URL">
-                 <small id="passwordHelpBlock" class="form-text text-muted">
+                 <small id="powerOffURL" class="form-text text-muted">
                    The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
                  </small>
               </div>
@@ -518,13 +531,13 @@ export default class PrinterSettings {
             <div class="form-row">
               <div class="col-4">
                 <input type="text" class="form-control" placeholder="Command">
-                 <small id="passwordHelpBlock" class="form-text text-muted">
-                   This is usually an json object supplied in the following format <code>{"command":"turnOff"}</code>
+                 <small id="powerToggleCommand" class="form-text text-muted">
+                   This is usually an json object supplied in the following format <code>{"command":"toggle"}</code>
                  </small>
               </div>
               <div class="col-8">
                 <input type="text" class="form-control" placeholder="URL">
-                 <small id="passwordHelpBlock" class="form-text text-muted">
+                 <small id="powerToggleURL" class="form-text text-muted">
                     The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
                  </small>
               </div>
@@ -534,28 +547,114 @@ export default class PrinterSettings {
             <div class="form-row">
               <div class="col-4">
                 <input type="text" class="form-control" placeholder="Command">
-                 <small id="passwordHelpBlock" class="form-text text-muted">
+                 <small id="powerStateCommand" class="form-text text-muted">
                    This is usually an json object supplied in the following format <code>{"command":"state"}</code>
                  </small>
               </div>
               <div class="col-8">
                 <input type="text" class="form-control" placeholder="URL">
-                 <small id="passwordHelpBlock" class="form-text text-muted">
+                 <small id="powerStateURL" class="form-text text-muted">
                     The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
                  </small>
               </div>
             </div>
         </form>
+        `;
+        console.log(printer)
+        document.getElementById("tempTriggers").innerHTML = `
+           <div class="form-group">
+              <label for="headtingVariation">Heating Variation</label>
+              <input type="text" class="form-control" id="headtingVariation" placeholder="${printer.tempTriggers.heatingVariation}">
+              <small id="passwordHelpBlock" class="form-text text-muted">
+                  What temperature variation will trigger orange warning on the temperature display when a printer is Active. <code>Default is 1°C</code>
+              </small>
+            </div>
+            <div class="form-group">
+              <label for="coolDown">Cool Down Trigger</label>
+              <input type="text" class="form-control" id="coolDown" placeholder="${printer.tempTriggers.coolDown}">
+              <small id="passwordHelpBlock" class="form-text text-muted">
+                  What temperature limit will trigger the blue status on the temperature display when a printer is Complete and cooling down. <code>Default is 30°C</code>
+              </small>
+            </div>
         `
+        document.getElementById("savePrinterSettings").addEventListener('click', event => {
+          console.log(printer);
+          let newValues = {
+            connection: {
+              preferredPort: document.getElementById("psDefaultSerialPort"),
+              preferredBaud: document.getElementById("psDefaultBaudDrop"),
+              preferredProfile: document.getElementById("psDefaultProfileDrop"),
+            },
+            profile: {
+              printerName: document.getElementById("printerName"),
+              printerModel: document.getElementById("printerModel"),
+              axisX: document.getElementById("printerXAxis"),
+              axisXInverted: document.getElementById("xInverted"),
+              axisY: document.getElementById("printerYAxis"),
+              axisYInverted: document.getElementById("yInverted"),
+              axisZ: document.getElementById("printerZAxis"),
+              axisZInverted: document.getElementById("zInverted"),
+              axisE: document.getElementById("printerEAxis"),
+              axisEInverted: document.getElementById("eInverted"),
+              extruderCount: document.getElementById("extruderCount"),
+              nozzleSize: document.getElementById("nozzleSize"),
+              nozzleOffsets: document.getElementById("nozzleOffsets"),
+              sharedNozzle: document.getElementById("sharedNozzle"),
+              formFactor: document.getElementById("formFactor"),
+              volumeDepth: document.getElementById("volumeDepth"),
+              volumeHeight: document.getElementById("volumeHeight"),
+              volumeWidth: document.getElementById("volumeWidth"),
+              headtedBed: document.getElementById("heatedBed"),
+              heatedChamber: document.getElementById("heatedChamber")
+            },
+            powerCommands:{
+              serverRestart: document.getElementById(""),
+              systemRestart: document.getElementById(""),
+              systemShutdown: document.getElementById(""),
+              powerOnCommand: document.getElementById(""),
+              powerOnURL: document.getElementById(""),
+              powerOffCommand: document.getElementById(""),
+              powerOffURL: document.getElementById(""),
+              powerToggleCommand: document.getElementById(""),
+              powerToggleURL: document.getElementById(""),
+              powerStatusCommand: document.getElementById(""),
+              powerStatusURL: document.getElementById(""),
+            },
+            gcode:{
+              afterPrintingCancells: document.getElementById(""),
+              afterPrintingDone: document.getElementById(""),
+              afterPrintingPaused: document.getElementById(""),
+              afterPrinterConnected: document.getElementById(""),
+              afterToolChange: document.getElementById(""),
+              beforePrintingResumed: document.getElementById(""),
+              beforePrintingStarted: document.getElementById(""),
+              beforePrintingDisconnected: document.getElementById(""),
+              beforeToolChange: document.getElementById(""),
+            },
+            other: {
+              enableCamera: document.getElementById(""),
+              rotateCamera: document.getElementById(""),
+              flipHCamera: document.getElementById(""),
+              flipVCamera: document.getElementById(""),
+              enableTimeLapse: document.getElementById(""),
+              heatingVariation: document.getElementById(""),
+              coolDown: document.getElementById(""),
+            }
+          }
+
+        });
+
 
         //let elements = PrinterSettings.grabPage();
 
         //PrinterSettings.applyListeners(printer, elements, printers);
       }
-      PrinterSettings.applyState(printer, job, progress);
+      PrinterSettings.applyState(printer);
     }
   }
+  static compareSave(printer, newValues){
 
+  }
   // static applyListeners(printer, elements, printers) {
   //   let rangeSliders = document.querySelectorAll("input.octoRange");
   //   rangeSliders.forEach(slider => {
@@ -1069,87 +1168,6 @@ export default class PrinterSettings {
     }
   }
 
-  // static async controls(enable, printing) {
-  //   let elements = await PrinterSettings.grabPage();
-  //   elements = elements.printerControls;
-  //   if (typeof printing != "undefined" && printing) {
-  //     elements.e0Target.disabled = !printing;
-  //     elements.e0Actual.disabled = !printing;
-  //     elements.bedTarget.disabled = !printing;
-  //     elements.e0Set.disabled = !printing;
-  //     elements.bedSet.disabled = !printing;
-  //     elements.feedRate.disabled = !printing;
-  //     elements.flowRate.disabled = !printing;
-  //     elements.fansOn.disabled = !printing;
-  //     elements.fansOff.disabled = !printing;
-  //   } else {
-  //     elements.e0Target.disabled = enable;
-  //     elements.e0Actual.disabled = enable;
-  //     elements.bedTarget.disabled = enable;
-  //     elements.e0Set.disabled = enable;
-  //     elements.bedSet.disabled = enable;
-  //     elements.feedRate.disabled = enable;
-  //     elements.flowRate.disabled = enable;
-  //     elements.fansOn.disabled = enable;
-  //     elements.fansOff.disabled = enable;
-  //   }
-  //   elements.xPlus.disabled = enable;
-  //   elements.xMinus.disabled = enable;
-  //   elements.yPlus.disabled = enable;
-  //   elements.yMinus.disabled = enable;
-  //   elements.xyHome.disabled = enable;
-  //   elements.zPlus.disabled = enable;
-  //   elements.zMinus.disabled = enable;
-  //   elements.zHome.disabled = enable;
-  //   elements.step01.disabled = enable;
-  //   elements.step1.disabled = enable;
-  //   elements.step10.disabled = enable;
-  //   elements.step100.disabled = enable;
-  //
-  //   elements.motorsOff.disabled = enable;
-  //   elements.extrude.disabled = enable;
-  //   elements.retract.disabled = enable;
-  // }  // static async controls(enable, printing) {
-  //   let elements = await PrinterSettings.grabPage();
-  //   elements = elements.printerControls;
-  //   if (typeof printing != "undefined" && printing) {
-  //     elements.e0Target.disabled = !printing;
-  //     elements.e0Actual.disabled = !printing;
-  //     elements.bedTarget.disabled = !printing;
-  //     elements.e0Set.disabled = !printing;
-  //     elements.bedSet.disabled = !printing;
-  //     elements.feedRate.disabled = !printing;
-  //     elements.flowRate.disabled = !printing;
-  //     elements.fansOn.disabled = !printing;
-  //     elements.fansOff.disabled = !printing;
-  //   } else {
-  //     elements.e0Target.disabled = enable;
-  //     elements.e0Actual.disabled = enable;
-  //     elements.bedTarget.disabled = enable;
-  //     elements.e0Set.disabled = enable;
-  //     elements.bedSet.disabled = enable;
-  //     elements.feedRate.disabled = enable;
-  //     elements.flowRate.disabled = enable;
-  //     elements.fansOn.disabled = enable;
-  //     elements.fansOff.disabled = enable;
-  //   }
-  //   elements.xPlus.disabled = enable;
-  //   elements.xMinus.disabled = enable;
-  //   elements.yPlus.disabled = enable;
-  //   elements.yMinus.disabled = enable;
-  //   elements.xyHome.disabled = enable;
-  //   elements.zPlus.disabled = enable;
-  //   elements.zMinus.disabled = enable;
-  //   elements.zHome.disabled = enable;
-  //   elements.step01.disabled = enable;
-  //   elements.step1.disabled = enable;
-  //   elements.step10.disabled = enable;
-  //   elements.step100.disabled = enable;
-  //
-  //   elements.motorsOff.disabled = enable;
-  //   elements.extrude.disabled = enable;
-  //   elements.retract.disabled = enable;
-  // }
 
   static async updateIndex(newIndex) {
     currentIndex = newIndex;
