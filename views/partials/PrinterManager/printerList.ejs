@@ -26,9 +26,9 @@
             <button  title="Change your Printer Settings"
                     id="printerSettings-<%= printers[sorted.actualIndex]._id %>"
                                  type="button"
-                                 class="tag btn btn-secondary btn-sm  d-none"
+                                 class="tag btn btn-secondary btn-sm"
                                  data-toggle="modal"
-                                 data-target="#printerSettingsModal" disabled
+                                 data-target="#printerSettingsModal"
             ><i class="fas fa-cog"></i>
             </button>
             <a title="Open your Printers Web Interface"
@@ -44,10 +44,10 @@
             >
                 <i class="fas fa-sync"></i>
             </button>
-            <div class="btn-group d-none">
+            <div class="btn-group">
                 <button title="Toggle your printers power"
                         id="printerPower-<%= printers[sorted.actualIndex]._id %>"
-                        class="btn btn-danger btn-sm" type="button" disabled>
+                        class="btn btn-danger btn-sm" type="button">
                     <i class="textActive fas fa-power-off"></i>
                 </button>
                 <button title="Other power actions" type="button" class="btn btn-sm btn-danger dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
