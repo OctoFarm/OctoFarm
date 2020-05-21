@@ -663,6 +663,10 @@
             </div>
         </div>
     </div>
+    </div>
+
+
+
     <div class="modal fade" id="printerSettingsModal" tabindex="-1" role="dialog" aria-labelledby="printerSettingsModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content bg-dark text-light">
@@ -797,6 +801,13 @@
 
                                                 </div>
                                             </div>
+                                            <div class="col-12 col-md-4" id="printerManagerSettings">
+                                                <h6><u>Temperature Triggers</u></h6>
+                                                <div id="tempTriggers">
+
+                                                </div>
+
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -805,7 +816,8 @@
                     </div>
                 </div>
                 <div class="modal-footer" id="printerSettingsFooter">
-
+                    <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success" id="savePrinterSettings" data-dismiss="modal">Save</button>
                 </div>
             </div>
         </div>
