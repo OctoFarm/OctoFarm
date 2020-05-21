@@ -8,6 +8,8 @@ const filamentProfiles = require("../models/Profiles.js")
 const ServerSettings = require("../models/ServerSettings.js")
 const Spool = require("../models/Filament.js")
 
+let counter = 0;
+
 class HistoryCollection {
   static async resyncFilament(printer){
     let spools = await fetch(`${printer.printerURL}/plugin/filamentmanager/spools/${printer.selectedFilament.spools.fmID}`, {
@@ -77,7 +79,6 @@ class HistoryCollection {
       } else {
         name = printer.printerURL;
       }
-        let counter = null;
         if(historyCollection.length === 0){
           counter = 0
         }else{
@@ -161,7 +162,6 @@ class HistoryCollection {
         }
         printer.selectedFilament.spools.profile = profiles[profileId].profile;
       }
-      let counter = null;
       if(historyCollection.length === 0){
         counter = 0
       }else{
