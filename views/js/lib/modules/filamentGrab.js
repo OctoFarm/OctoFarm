@@ -17,7 +17,7 @@ export async function getSelected(){
 }
 export function returnHistory(id) {
     if(id.spools !== undefined){
-        return `${id.spools.name} [${id.spools.profile.material} / ${id.spools.profile.manufacturer}]`
+        return `${id.spools.name} (${(id.spools.weight - id.spools.used).toFixed(0)}g) - ${id.spools.profile.material}`
     }else{
         return `Old database, please update on the view modal.`
     }
