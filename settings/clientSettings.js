@@ -17,6 +17,7 @@ class ClientSettings {
           currentOp: false,
           hideOff: true,
           hideClosed: false,
+          extraInfo: false,
           powerBtn: false,
           webBtn: false
         };
@@ -24,6 +25,7 @@ class ClientSettings {
           currentOp: false,
           hideOff: true,
           hideClosed: false,
+          extraInfo: false,
           powerBtn: false,
           webBtn: false
         };
@@ -31,6 +33,7 @@ class ClientSettings {
           currentOp: false,
           cameraRows: 4,
           hideClosed: false,
+          extraInfo: false,
           powerBtn: false,
           webBtn: false
         };

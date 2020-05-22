@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
         - Server settings
         - Server timeout settings
     - When saving settings it now asks if you'd like to restart OctoFarm. Confirm will restart the service. 
+    - Client settings to show extra information on views. List, Panel and 
     
         
 ### Changed

@@ -139,6 +139,14 @@ printers[sorted.actualIndex].settingsWebcam != ''){%> <% } %>
               <i class="fas fa-file-code"></i> No File Selected<%}%>
             </small>
           </div>
+          <div id="extraInfo-<%= printers[sorted.actualIndex]._id %>" class="camExtra row d-none">
+            <div class="col-6 p-0">
+            <small id="timeRemaining-<%= printers[sorted.actualIndex]._id %>">Loading...</small>
+            </div>
+            <div class="col-6 p-0">
+              <small id="eta-<%= printers[sorted.actualIndex]._id %>">Loading...</small>
+            </div>
+          </div>
           <img
             loading="lazy"
             id="cameraSRC-<%= printers[sorted.actualIndex]._id %>"

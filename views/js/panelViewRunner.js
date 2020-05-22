@@ -187,7 +187,10 @@ function grabElements(printer) {
       iconBedT: document.getElementById("bedT-" + printer._id),
       iconBedA: document.getElementById("bedA-" + printer._id),
       iconTool0A: document.getElementById("tool0A-" + printer._id),
-      iconTool0T: document.getElementById("tool0T-" + printer._id)
+      iconTool0T: document.getElementById("tool0T-" + printer._id),
+      extraInfo: document.getElementById("extraInfo-" + printer._id),
+      timeRemaining: document.getElementById("timeRemaining-" + printer._id),
+      eta: document.getElementById("eta-" + printer._id),
     };
     elems[printer._id] = printerElemens;
     return elems[printer._id];
@@ -208,6 +211,29 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
       `;
     }
 
+    if(clientSettings.extraInfo){
+      if(elements.extraInfo.classList.contains("d-none")){
+        elements.extraInfo.classList.remove("d-none");
+      }
+
+      if(typeof printer.progress != 'undefined' && printer.progress.printTimeLeft != 0){
+        let currentDate = new Date();
+        currentDate = currentDate.getTime();
+        let futureDateString = new Date(currentDate + printer.progress.printTimeLeft * 1000).toDateString()
+        let futureTimeString = new Date(currentDate + printer.progress.printTimeLeft * 1000).toTimeString()
+        futureTimeString = futureTimeString.substring(0, 8);
+        let dateComplete = futureDateString + ": " + futureTimeString;
+        elements.timeRemaining.innerHTML = `
+        ${Calc.generateTime(printer.progress.printTimeLeft)}
+      `;
+        elements.eta.innerHTML = dateComplete
+      }else{
+        elements.timeRemaining.innerHTML = `
+        ${Calc.generateTime(null)}
+      `;
+        elements.eta.innerHTML = "N/A"
+      }
+    }
     if (typeof printer.job != "undefined" && printer.job.file.name != null) {
       elements.currentFile.setAttribute("title", printer.job.file.path)
       elements.currentFile.innerHTML =

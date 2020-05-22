@@ -264,58 +264,88 @@
                                     <div class="tab-pane fade" id="system-panel-view" role="tabpanel" aria-labelledby="system-panel-view-list">
                                         <h5>Panel View Settings</h5>
                                         <hr>
-                                        <form class="was-validated">
-                                            <div class="custom-control custom-checkbox mb-3">
-                                                <input type="checkbox" class="custom-control-input" id="panelCurrentOpOn" required>
-                                                <label class="custom-control-label" for="panelCurrentOpOn">Current Operations</label>
-                                                <div class="valid-feedback">Current Operations will be shown on the panel view.</div>
-                                                <div class="invalid-feedback">Current Operations will not be shown on the panel view.</div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="panelCurrentOpOn" required>
+                                                        <label class="custom-control-label" for="panelCurrentOpOn">Current Operations</label>
+                                                        <div class="valid-feedback">Current Operations will be shown on the panel view.</div>
+                                                        <div class="invalid-feedback">Current Operations will not be shown on the panel view.</div>
+                                                    </div>
+                                                </form>
+                                                <form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="panelHideOffline" checked required>
+                                                        <label class="custom-control-label" for="panelHideOffline">Hide Offline</label>
+                                                        <div class="valid-feedback">Offline printers will be hidden from the panel view.</div>
+                                                        <div class="invalid-feedback">Offline printers will be shown on the panel view.</div>
+                                                    </div>
+                                                </form>
+                                                <form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="panelHideClosed" required>
+                                                        <label class="custom-control-label" for="panelHideClosed">Hide Disconnected</label>
+                                                        <div class="valid-feedback">Closed printers will be hidden from the panel view.</div>
+                                                        <div class="invalid-feedback">Closed printers will be shown on the panel view.</div>
+                                                    </div>
+                                                </form>
                                             </div>
-                                        </form>
-                                        <form class="was-validated">
-                                            <div class="custom-control custom-checkbox mb-3">
-                                                <input type="checkbox" class="custom-control-input" id="panelHideOffline" checked required>
-                                                <label class="custom-control-label" for="panelHideOffline">Hide Offline</label>
-                                                <div class="valid-feedback">Offline printers will be hidden from the panel view.</div>
-                                                <div class="invalid-feedback">Offline printers will be shown on the panel view.</div>
+                                            <div class="col-6">
+                                                <form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="panelExtraInfoOn" required>
+                                                        <label class="custom-control-label" for="panelExtraInfoOn">Extra Information</label>
+                                                        <div class="valid-feedback">Turn on extra print information in the panel view.</div>
+                                                        <div class="invalid-feedback">Extra information will not be shown in the panel view.</div>
+                                                    </div>
+                                                </form>
                                             </div>
-                                        </form>
-                                        <form class="was-validated">
-                                            <div class="custom-control custom-checkbox mb-3">
-                                                <input type="checkbox" class="custom-control-input" id="panelHideClosed" required>
-                                                <label class="custom-control-label" for="panelHideClosed">Hide Disconnected</label>
-                                                <div class="valid-feedback">Closed printers will be hidden from the panel view.</div>
-                                                <div class="invalid-feedback">Closed printers will be shown on the panel view.</div>
-                                            </div>
-                                        </form>
+                                        </div>
+
+
                                     </div>
                                     <div class="tab-pane fade" id="system-list-view" role="tabpanel" aria-labelledby="system-list-view-list">
                                         <h5>List View Settings</h5>
                                         <hr>
-                                        <form class="was-validated">
-                                            <div class="custom-control custom-checkbox mb-3">
-                                                <input type="checkbox" class="custom-control-input" id="listCurrentOpOn" required>
-                                                <label class="custom-control-label" for="listCurrentOpOn">Current Operations</label>
-                                                <div class="valid-feedback">Current Operations will be shown on the list view.</div>
-                                                <div class="invalid-feedback">Current Operations will not be shown on the list view.</div>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="listCurrentOpOn" required>
+                                                        <label class="custom-control-label" for="listCurrentOpOn">Current Operations</label>
+                                                        <div class="valid-feedback">Current Operations will be shown on the list view.</div>
+                                                        <div class="invalid-feedback">Current Operations will not be shown on the list view.</div>
+                                                    </div>
+                                                </form>
+                                                <form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="listHideOffline" checked required>
+                                                        <label class="custom-control-label" for="listHideOffline">Hide Offline</label>
+                                                        <div class="valid-feedback">Offline printers will be hidden from the list view.</div>
+                                                        <div class="invalid-feedback">Offline printers will be shown on the list view.</div>
+                                                    </div>
+                                                </form>
+                                                <form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="listHideClosed" required>
+                                                        <label class="custom-control-label" for="listHideClosed">Hide Disconnected</label>
+                                                        <div class="valid-feedback">Closed printers will be hidden from the panel view.</div>
+                                                        <div class="invalid-feedback">Closed printers will be shown on the panel view.</div>
+                                                    </div>
+                                                </form>
                                             </div>
-                                        </form>
-                                        <form class="was-validated">
-                                            <div class="custom-control custom-checkbox mb-3">
-                                                <input type="checkbox" class="custom-control-input" id="listHideOffline" checked required>
-                                                <label class="custom-control-label" for="listHideOffline">Hide Offline</label>
-                                                <div class="valid-feedback">Offline printers will be hidden from the list view.</div>
-                                                <div class="invalid-feedback">Offline printers will be shown on the list view.</div>
+                                            <div class="col-6">
+                                                <form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="listExtraInfoOn" required>
+                                                        <label class="custom-control-label" for="listExtraInfoOn">Extra Information</label>
+                                                        <div class="valid-feedback">Turn on extra print information in the list view.</div>
+                                                        <div class="invalid-feedback">Extra information will not be shown in the list view.</div>
+                                                    </div>
+                                                </form>
                                             </div>
-                                        </form>
-                                        <form class="was-validated">
-                                            <div class="custom-control custom-checkbox mb-3">
-                                                <input type="checkbox" class="custom-control-input" id="listHideClosed" required>
-                                                <label class="custom-control-label" for="listHideClosed">Hide Disconnected</label>
-                                                <div class="valid-feedback">Closed printers will be hidden from the panel view.</div>
-                                                <div class="invalid-feedback">Closed printers will be shown on the panel view.</div>
-                                            </div>
-                                        </form>
+                                        </div>
                                     </div>
 
                                     <div class="tab-pane fade" id="system-camera-view" role="tabpanel" aria-labelledby="system-camera-view-list">
@@ -337,13 +367,15 @@
                                             </select>
                                         </div>
                                         <hr>
-                                        <form class="was-validated">
-                                            <div class="custom-control custom-checkbox mb-3">
-                                                <input type="checkbox" class="custom-control-input" id="cameraCurrentOpOn" required>
-                                                <label class="custom-control-label" for="cameraCurrentOpOn">Current Operations</label>
-                                                <div class="valid-feedback">Current Operations will be shown on the camera view.</div>
-                                                <div class="invalid-feedback">Current Operations will not be shown on the camera view.</div>
-                                            </div>
+                                            <div class="row">
+                                                <div class="col-6">
+                                                    <form class="was-validated">
+                                                    <div class="custom-control custom-checkbox mb-3">
+                                                        <input type="checkbox" class="custom-control-input" id="cameraCurrentOpOn" required>
+                                                        <label class="custom-control-label" for="cameraCurrentOpOn">Current Operations</label>
+                                                        <div class="valid-feedback">Current Operations will be shown on the camera view.</div>
+                                                        <div class="invalid-feedback">Current Operations will not be shown on the camera view.</div>
+                                                    </div>
                                         </form>
                                         <form class="was-validated">
                                             <div class="custom-control custom-checkbox mb-3">
@@ -353,6 +385,18 @@
                                                 <div class="invalid-feedback">Closed printers will be shown on the panel view.</div>
                                             </div>
                                         </form>
+                                                </div>
+                                                <div class="col-6">
+                                                    <form class="was-validated">
+                                                        <div class="custom-control custom-checkbox mb-3">
+                                                            <input type="checkbox" class="custom-control-input" id="cameraExtraInfoOn" required>
+                                                            <label class="custom-control-label" for="cameraExtraInfoOn">Extra Information</label>
+                                                            <div class="valid-feedback">Turn on extra print information in the list view.</div>
+                                                            <div class="invalid-feedback">Extra information will not be shown in the list view.</div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
                                     </div>
                                 </div>
                             </div>

@@ -275,6 +275,8 @@ class ClientSettings {
             res.panelView.hideOff;
           document.getElementById("panelHideClosed").checked =
             res.panelView.hideClosed;
+            document.getElementById("panelExtraInfoOn").checked =
+                res.panelView.extraInfo;
 
           document.getElementById("cameraCurrentOpOn").checked =
             res.cameraView.currentOp;
@@ -282,6 +284,8 @@ class ClientSettings {
             res.cameraView.cameraRows;
           document.getElementById("cameraHideClosed").checked =
             res.cameraView.hideClosed;
+            document.getElementById("cameraExtraInfoOn").checked =
+                res.cameraView.extraInfo;
 
           document.getElementById("listCurrentOpOn").checked =
             res.listView.currentOp;
@@ -289,6 +293,8 @@ class ClientSettings {
             res.listView.hideOff;
           document.getElementById("listHideClosed").checked =
             res.listView.hideClosed;
+            document.getElementById("listExtraInfoOn").checked =
+                res.listView.extraInfo;
         });
     }
   }
@@ -305,20 +311,22 @@ class ClientSettings {
       panelView: {
         currentOp: document.getElementById("panelCurrentOpOn").checked,
         hideOff: document.getElementById("panelHideOffline").checked,
-        hideClosed: document.getElementById("panelHideClosed").checked
+        hideClosed: document.getElementById("panelHideClosed").checked,
+        extraInfo: document.getElementById("panelExtraInfoOn").checked
       },
       listView: {
         currentOp: document.getElementById("listCurrentOpOn").checked,
         hideOff: document.getElementById("listHideOffline").checked,
-        hideClosed: document.getElementById("listHideClosed").checked
+        hideClosed: document.getElementById("listHideClosed").checked,
+        extraInfo: document.getElementById("listExtraInfoOn").checked
       },
       cameraView: {
         currentOp: document.getElementById("cameraCurrentOpOn").checked,
         cameraRows: document.getElementById("selectCameraGrid").value,
-        hideClosed: document.getElementById("cameraHideClosed").checked
+        hideClosed: document.getElementById("cameraHideClosed").checked,
+        extraInfo: document.getElementById("cameraExtraInfoOn").checked
       }
     };
-
     let post = await Client.post("settings/client/update", opts);
     localStorage.setItem("clientSettings", JSON.stringify(opts));
     UI.createAlert("success", "Client settings updated", 3000, "clicked");

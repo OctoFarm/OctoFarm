@@ -134,6 +134,9 @@
     helpers.generateTime(printers[sorted.actualIndex].progress.printTimeLeft) %>
     <%}%>
   </td>
+  <td id="extraInfoCol-<%= printers[sorted.actualIndex]._id %>" class="d-none">
+    <p class="mb-0" id="eta-<%= printers[sorted.actualIndex]._id %>">Loading...</p>
+  </td>
   <td id="listE0Temp-<%= printers[sorted.actualIndex]._id %>">
     <% if(typeof printers[sorted.actualIndex].temps != 'undefined'){ %> <%
     if(typeof printers[sorted.actualIndex].temps[0].tool0 != 'undefined'){ %>
