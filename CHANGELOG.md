@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file.
         - Server timeout settings
     - When saving settings it now asks if you'd like to restart OctoFarm. Confirm will restart the service. 
     - Client settings to show extra information on views. List, Panel and Camera View
-    
+    - File manager shows weight
         
 ### Changed
     - Group dropdown only appears if groups exist.
