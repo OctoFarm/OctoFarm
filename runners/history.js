@@ -32,14 +32,14 @@ class HistoryCollection {
     };
     spool.markModified("spools")
     await spool.save();
-    return "Done"
+    return spool
   }
   static async complete(payload, printer, job) {
 
     try{
       let serverSettings = await ServerSettings.find({});
       if(serverSettings[0].filamentManager){
-        await HistoryCollection.resyncFilament(printer)
+        printer.filamentSelection = await HistoryCollection.resyncFilament(printer);
       }
       logger.info("Completed Print triggered", payload + printer.printerURL);
       let today = new Date();
@@ -122,7 +122,7 @@ class HistoryCollection {
     try{
       let serverSettings = await ServerSettings.find({});
       if(serverSettings[0].filamentManager){
-        await HistoryCollection.resyncFilament(printer)
+        printer.filamentSelection = await HistoryCollection.resyncFilament(printer);
       }
       let name = null;
       if (typeof printer.settingsApperance != "undefined") {

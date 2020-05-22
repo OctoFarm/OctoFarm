@@ -320,11 +320,11 @@ export default class FileManager {
         if (currentFolder.includes("local/")) {
           currentFolder = currentFolder.replace("local/", "");
         }
-        fileList.files.forEach(async file => {
+        fileList.files.forEach(file => {
           let fileDate = new Date(file.date*1000);
           let dateString = fileDate.toDateString();
           let timeString = fileDate.toTimeString().substring(0, 8);
-          let getUsage = await FileActions.grabUsage(file)
+          let getUsage = FileActions.grabUsage(file)
 
           fileDate = dateString + " " + timeString;
 
@@ -842,7 +842,10 @@ export class FileActions {
       }
     });
   }
-  static async grabUsage(file){
+  static grabUsage(file){
+    if(typeof file.length === 'undefined' || file.length === null){
+      return "No Length"
+    }
     let radius = parseFloat(1.75) / 2
     let volume = ((file.length /1000) * 3.1415926535 * radius * radius)
     let usage = volume * parseFloat(1.24)
