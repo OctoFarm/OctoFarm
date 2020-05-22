@@ -9,6 +9,14 @@ const PrinterSchema = new mongoose.Schema({
     type: Number,
     required: false,
   },
+  currentIdle:{
+    type: Number,
+    required: false,
+  },
+  type:{
+    type: String,
+    required: false,
+  },
   sortIndex: {
     type: Number,
     required: false

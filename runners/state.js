@@ -686,6 +686,13 @@ class Runner {
         printer.markModified("currentUptime");
         printer.save();
     }
+    static async idleCount(index){
+        let printer = await Printers.findById(farmPrinters[index]._id);
+        farmPrinters[index].currentIdle = farmPrinters[index].currentIdle + 500;
+        printer.currentUptime = farmPrinters[index].currentIdle;
+        printer.markModified("currentIdle");
+        printer.save();
+    }
     static async removePrinter(indexs) {
         logger.info("Pausing runners to remove printer...");
         await this.pause();
