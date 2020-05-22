@@ -481,7 +481,7 @@ class Runner {
                 }
                 await Runner.getProfile(id);
                 await Runner.getState(id);
-                await Runner.getFiles(id, "files?recursive=true");
+                Runner.getFiles(id, "files?recursive=true");
                 //Connection to API successful, gather initial data and setup websocket.
                 await farmPrinters[i].ws.open(
                     `ws://${farmPrinters[i].printerURL}/sockjs/websocket`,
@@ -572,6 +572,9 @@ class Runner {
         }
         if(typeof farmPrinters[i].currentUptime === "undefined"){
             farmPrinters[i].currentUptime = 0;
+        }
+        if(typeof farmPrinters[i].currentIdle === "undefined"){
+            farmPrinters[i].currentIdle = 0;
         }
         if(typeof farmPrinters[i].selectedFilament === "undefined"){
             farmPrinters[i].selectedFilament = null;
@@ -1068,7 +1071,7 @@ class Runner {
     static async reSyncFile(id) {
         let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
         //Doesn't actually resync just the file... shhh
-        let success = await Runner.getFiles(id, "files?recursive=true");
+        let success = Runner.getFiles(id, "files?recursive=true");
         if (success) {
             return success;
         } else {
