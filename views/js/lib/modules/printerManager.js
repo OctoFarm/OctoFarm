@@ -3,6 +3,7 @@ import OctoFarmClient from "../octofarm.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import FileManager from "./fileManager.js";
+import Validate from "../functions/validate.js";
 import {returnDropDown, selectFilament} from "../modules/filamentGrab.js";
 
 let currentIndex = 0;
@@ -25,20 +26,6 @@ $("#connectionModal").on("hidden.bs.modal", function(e) {
 });
 
 export default class PrinterManager {
-  static grabName(printer){
-    let name = "";
-    if (typeof printer.settingsAppearance != "undefined") {
-      if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
-        name = printer.printerURL;
-      } else {
-        name = printer.settingsAppearance.name;
-      }
-    } else {
-      name = printer.printerURL;
-    }
-    return name;
-  }
-
   static async init(printers) {
     let i = _.findIndex(printers, function (o) {
       return o._id == currentIndex;
@@ -164,7 +151,7 @@ export default class PrinterManager {
         let printerDrop = document.getElementById("printerSelection");
         printerDrop.innerHTML = "";
         printers.forEach(printer => {
-          let name = PrinterManager.grabName(printer);
+          let name = Validate.getName(printer);
           if(printer.stateColour.category !== "Offline"){
             printerDrop.insertAdjacentHTML('beforeend', `
                 <option value="${printer._id}" selected>${name}</option>
@@ -628,7 +615,7 @@ export default class PrinterManager {
         elements.terminal.terminalWindow.innerHTML = "";
         elements.printerControls["step" + printer.stepRate].className =
             "btn btn-dark active";
-        PrinterManager.applyListeners(printer, elements, printers);
+        PrinterManager.applyListeners(printer, elements, printers, filamentDropDown);
         FileManager.drawFiles(printer)
       }
       PrinterManager.applyState(printer, job, progress);
@@ -637,7 +624,7 @@ export default class PrinterManager {
 
   }
 
-  static applyListeners(printer, elements, printers) {
+  static applyListeners(printer, elements, printers, filamentDropDown) {
     let rangeSliders = document.querySelectorAll("input.octoRange");
     rangeSliders.forEach(slider => {
       slider.addEventListener("input", e => {
@@ -979,7 +966,10 @@ export default class PrinterManager {
       let opts = {
         command: "start"
       };
-      OctoPrintClient.jobAction(printer, opts, e);
+
+        OctoPrintClient.jobAction(printer, opts, e);
+
+
     });
     elements.printerControls.printPause.addEventListener("click", e => {
       e.target.disabled = true;
@@ -1054,7 +1044,7 @@ export default class PrinterManager {
       submitTerminal(e);
     });
     elements.fileManager.uploadFiles.addEventListener('change', function() {
-      UI.createAlert("warning", "Your files for Printer: " + PrinterManager.grabName(printer) + " has begun. Please do not navigate away from this page.", 3000, "Clicked")
+      UI.createAlert("warning", "Your files for Printer: " + Validate.getName(printer) + " has begun. Please do not navigate away from this page.", 3000, "Clicked")
       FileManager.handleFiles(this.files, printer);
     });
     elements.fileManager.createFolderBtn.addEventListener("click", e => {

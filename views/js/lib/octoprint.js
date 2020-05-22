@@ -1,5 +1,7 @@
 import UI from "./functions/ui.js";
 import OctoFarmClient from "./octofarm.js";
+import Validate from "./functions/validate.js";
+import {returnDropDown} from "./modules/filamentGrab.js";
 
 export default class OctoPrintClient {
   static post(printer, item, data) {
@@ -185,18 +187,60 @@ export default class OctoPrintClient {
       command: "feedrate",
       factor: parseInt(printer.feedRate)
     };
-    if(printer.selectedFilament != null){
-      let offset = {
-        command: "offset",
-        offsets: {
-          tool0: parseInt(printer.selectedFilament.spools.tempOffset)
-        }
-      }
-      let post = await OctoPrintClient.post(printer, "printer/tool", offset);
-    }
     await OctoPrintClient.post(printer, "printer/printhead", feed);
-    let post = await OctoPrintClient.post(printer, "job", opts);
-    element.target.disabled = false;
+    let body = {
+      i: printer._id
+    }
+    printer = await OctoFarmClient.post("printers/printerInfo", body);
+    printer = await printer.json();
+    let filamentDropDown = await returnDropDown();
+    if(filamentDropDown.length > 0 && printer.selectedFilament === null){
+      bootbox.confirm({
+        message: "You have spools in the inventory, but none selected. Would you like to select a spool?",
+        buttons: {
+          confirm: {
+            label: 'Yes',
+            className: 'btn-success'
+          },
+          cancel: {
+            label: 'No',
+            className: 'btn-danger'
+          }
+        },
+        callback: async function (result) {
+          if(result){
+
+          }else{
+            if(printer.selectedFilament != null){
+              let offset = {
+                command: "offset",
+                offsets: {
+                  tool0: parseInt(printer.selectedFilament.spools.tempOffset)
+                }
+              }
+              let post = await OctoPrintClient.post(printer, "printer/tool", offset);
+            }
+            await OctoPrintClient.post(printer, "printer/printhead", feed);
+            let post = await OctoPrintClient.post(printer, "job", opts);
+            element.target.disabled = false;
+          }
+        }
+      });
+    }else{
+      if(printer.selectedFilament != null){
+        let offset = {
+          command: "offset",
+          offsets: {
+            tool0: parseInt(printer.selectedFilament.spools.tempOffset)
+          }
+        }
+        let post = await OctoPrintClient.post(printer, "printer/tool", offset);
+      }
+      await OctoPrintClient.post(printer, "printer/printhead", feed);
+      let post = await OctoPrintClient.post(printer, "job", opts);
+      element.target.disabled = false;
+    }
+
   }
   static async connect(command, printer) {
     let opts = null;

@@ -35,7 +35,7 @@ All notable changes to this project will be documented in this file.
     - Removed underscores from history page. 
     - History page will only load now with history added. Message to collect some before activation pops up. 
     - Job information is now captured within history for cancelled prints. May use in UI at a later date. 
-    
+    - If filament exists in library then ask if you'd like to select before print. 
     
 ### Removed
     - Old filament manager and database structure. 
