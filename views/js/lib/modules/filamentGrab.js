@@ -65,7 +65,6 @@ export async function returnSelected(id, profiles) {
     let filamentManager = await checkFilamentManager();
     if (filamentManager) {
         profileId = _.findIndex(profiles, function (o) {
-            console.log(o)
             return o.profile.index == id.spools.profile;
         });
     } else {

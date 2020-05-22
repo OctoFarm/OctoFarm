@@ -194,7 +194,7 @@ function grabElements(printer) {
   }
 }
 function updateState(printers, clientSettings, filamentProfiles, filamentManager) {
-  printers.forEach(printer => {
+  printers.forEach(async printer => {
     let elements = grabElements(printer);
     elements.state.innerHTML = printer.state;
     elements.state.className = `btn btn-block ${printer.stateColour.category} mb-1 mt-1`;
@@ -220,7 +220,7 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
     if (
       printer.selectedFilament !== null
     ) {
-      elements.filament.innerHTML = returnSelected(printer.selectedFilament, filamentProfiles, filamentManager)
+      elements.filament.innerHTML = await returnSelected(printer.selectedFilament, filamentProfiles, filamentManager)
     }else{
       elements.filament.innerHTML = ""
     }

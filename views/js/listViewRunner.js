@@ -150,7 +150,7 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
   let currentGroup = document.getElementById("currentGroup").innerHTML;
   currentGroup = currentGroup.replace("Selected: ", "").trim()
 
-  printers.forEach(printer => {
+  printers.forEach(async printer => {
     let elements = grabElements(printer);
     //Set the data
 
@@ -170,7 +170,7 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
     if (
         printer.selectedFilament !== null
     ) {
-      elements.filament.innerHTML = returnSelected(printer.selectedFilament, filamentProfiles, filamentManager)
+      elements.filament.innerHTML = await returnSelected(printer.selectedFilament, filamentProfiles, filamentManager)
     }else{
       elements.filament.innerHTML = ""
     }
