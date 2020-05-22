@@ -62,38 +62,37 @@ export default class History {
   static async get() {
     let newHistory = await OctoFarmClient.get("history/get");
     historyList = await newHistory.json();
-
-    historyList.history.forEach(history => {
+    for(let i = historyList.history.length; i--;){
       let filamentString = null;
       let filamentUsage = null;
-      if(history.printHistory.success){
+      if(historyList.history[i].printHistory.success){
         let filamentString = null;
         let filamentUsage = null;
-        if(history.printHistory.filamentSelection !== null){
-          filamentString = returnHistory(history.printHistory.filamentSelection)
-          filamentUsage = returnHistoryUsage(history.printHistory)
+        if(historyList.history[i].printHistory.filamentSelection !== null){
+          filamentString = await returnHistory(historyList.history[i].printHistory.filamentSelection)
+          filamentUsage = returnHistoryUsage(historyList.history[i].printHistory)
         }else{
           filamentString = "None selected..."
-          filamentUsage = History.returnFilamentUsage(history.printHistory)
+          filamentUsage = History.returnFilamentUsage(historyList.history[i].printHistory)
         }
-        document.getElementById("spool-"+history._id).innerHTML = filamentString;
-        document.getElementById("usage-"+history._id).innerHTML = filamentUsage;
-        let grams = document.getElementById("usage-"+history._id)
+        document.getElementById("spool-"+historyList.history[i]._id).innerHTML = filamentString;
+        document.getElementById("usage-"+historyList.history[i]._id).innerHTML = filamentUsage;
+        let grams = document.getElementById("usage-"+historyList.history[i]._id)
         grams = grams.innerHTML
         grams = grams.split(" / ").pop()
-        document.getElementById("cost-"+history._id).innerHTML = History.returnPrintCost(history.printHistory.filamentSelection, grams);
+        document.getElementById("cost-"+historyList.history[i]._id).innerHTML = History.returnPrintCost(historyList.history[i].printHistory.filamentSelection, grams);
       }else{
-        if(history.printHistory.filamentSelection !== null){
-          filamentString = returnHistory(history.printHistory.filamentSelection)
+        if(historyList.history[i].printHistory.filamentSelection !== null){
+          filamentString = await returnHistory(historyList.history[i].printHistory.filamentSelection)
         }else{
           filamentString = "None selected..."
         }
-        document.getElementById("spool-"+history._id).innerHTML = filamentString;
-        document.getElementById("cost-"+history._id).innerHTML = "";
-        document.getElementById("usage-"+history._id).innerHTML = "";
+        document.getElementById("spool-"+historyList.history[i]._id).innerHTML = filamentString;
+        document.getElementById("cost-"+historyList.history[i]._id).innerHTML = "";
+        document.getElementById("usage-"+historyList.history[i]._id).innerHTML = "";
       }
 
-    })
+    }
   }
 
   static async edit(e) {
@@ -220,7 +219,7 @@ export default class History {
           return false;
         }
       }
-      let filamentList = await returnDropDown(true);
+      let filamentList = await returnDropDown();
       filamentList.forEach(list => {
         filament.insertAdjacentHTML("beforeend", list)
       })

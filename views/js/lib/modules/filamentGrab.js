@@ -1,5 +1,13 @@
 import OctoFarmclient from "../octofarm.js";
 
+let filamentManager = null;
+
+export async function checkFilamentManager(){
+    let settings = await OctoFarmclient.get("settings/server/get");
+    settings = await settings.json();
+    return settings.filamentManager;
+}
+
 export async function loadFilament(spoolId){
     let filament = await OctoFarmclient.get("filament/get/filament")
     filament = await filament.json();
@@ -15,9 +23,14 @@ export async function getSelected(){
     selected = await selected.json();
     return selected;
 }
-export function returnHistory(id) {
+export async function returnHistory(id) {
+    let filamentManager = await checkFilamentManager();
     if(id.spools !== undefined){
-        return `${id.spools.name} (${(id.spools.weight - id.spools.used).toFixed(0)}g) - ${id.spools.profile.material}`
+        if(filamentManager){
+            return `${id.spools.name} (${(id.spools.weight - id.spools.used).toFixed(0)}g) - ${id.spools.profile.material}`
+        }else{
+            return `${id.spools.name} - ${id.spools.profile.material}`
+        }
     }else{
         return `Old database, please update on the view modal.`
     }
@@ -47,8 +60,9 @@ export function returnHistoryUsage(id){
     }
 
 }
-export function returnSelected(id, profiles, filamentManager) {
+export async function returnSelected(id, profiles) {
     let profileId = null;
+    let filamentManager = await checkFilamentManager();
     if (filamentManager) {
         profileId = _.findIndex(profiles, function (o) {
             console.log(o)
@@ -66,6 +80,7 @@ export async function returnDropDown(history){
     let profiles = await getProfile();
     let selected = await getSelected();
     let dropObject = [];
+    let filamentManager = await checkFilamentManager();
     dropObject.push(`
                     <option value="0">No Spool Selected</option>
                 `)
@@ -85,13 +100,27 @@ export async function returnDropDown(history){
                 return o == spool._id;
             });
             if(index > -1 && !history){
-                dropObject.push(`
+                if(filamentManager){
+                    dropObject.push(`
                     <option value="${spool._id}" disabled>${spool.spools.name} (${(spool.spools.weight - spool.spools.used).toFixed(2)}g) - ${profiles.profiles[profileId].profile.material}</option>
                 `)
+                }else{
+                    dropObject.push(`
+                    <option value="${spool._id}" disabled>${spool.spools.name} - ${profiles.profiles[profileId].profile.material}</option>
+                `)
+                }
+
             }else{
-                dropObject.push(`
+                if(filamentManager){
+                    dropObject.push(`
                     <option value="${spool._id}">${spool.spools.name} (${(spool.spools.weight - spool.spools.used).toFixed(2)}g) - ${profiles.profiles[profileId].profile.material}</option>
                 `)
+                }else{
+                    dropObject.push(`
+                    <option value="${spool._id}">${spool.spools.name} - ${profiles.profiles[profileId].profile.material}</option>
+                `)
+                }
+
             }
 
         }
