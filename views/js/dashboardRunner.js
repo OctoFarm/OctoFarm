@@ -609,7 +609,9 @@ class dashUpdate {
         let idleHours = document.getElementById("idleHours")
         idleHours.innerHTML = '<i class="fas fa-square text-secondary"></i> <b>Idle Hours: </b> ' + Calc.generateTime(stats.idleHours / 1000)
         let failedHours = document.getElementById("failedHours")
-        failedHours.innerHTML = '<i class="fas fa-square text-danger"></i> <b>Failed Hours: </b>' +  Calc.generateTime(stats.downHours / 1000)
+        failedHours.innerHTML = '<i class="fas fa-square text-warning"></i> <b>Failed Hours: </b>' +  Calc.generateTime(stats.downHours / 1000)
+        let offlineHours = document.getElementById("offlineHours")
+        offlineHours.innerHTML = '<i class="fas fa-square text-danger"></i> <b>Offline Hours: </b>' +  Calc.generateTime(stats.offlineTime / 1000)
         let activeProgress = document.getElementById("activeProgress")
         activeProgress.style.width = stats.activePercent+"%";
         activeProgress.innerHTML = stats.activePercent+"%"
@@ -619,6 +621,9 @@ class dashUpdate {
         let failedProgress = document.getElementById("failedProgress")
         failedProgress.style.width = stats.downPercent+"%";
         failedProgress.innerHTML = stats.downPercent+"%"
+        let offlineProgress = document.getElementById("offlineProgress")
+        offlineProgress.style.width = stats.offlinePercent+"%";
+        offlineProgress.innerHTML = stats.offlinePercent+"%"
         let usedStorage = document.getElementById("usedStorage")
         let availableStorage = document.getElementById("availableStorage")
         let usedProgress = document.getElementById("usedProgress")

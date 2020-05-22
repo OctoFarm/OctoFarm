@@ -283,6 +283,9 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
         if(farmPrinters[this.index].stateColour.category === "Active"){
             Runner.uptimeCount(this.index)
         }
+        if(farmPrinters[this.index].stateColour.category === "Idle" ||farmPrinters[this.index].stateColour.category === "Complete"){
+            Runner.idleCount(this.index)
+        }
         farmPrinters[this.index].stateDescription = "Current Status from OctoPrint";
 
         if (typeof data.current.progress !== 'undefined') {
@@ -701,7 +704,7 @@ class Runner {
     static async idleCount(index){
         let printer = await Printers.findById(farmPrinters[index]._id);
         farmPrinters[index].currentIdle = farmPrinters[index].currentIdle + 500;
-        printer.currentUptime = farmPrinters[index].currentIdle;
+        printer.currentIdle = farmPrinters[index].currentIdle;
         printer.markModified("currentIdle");
         printer.save();
     }

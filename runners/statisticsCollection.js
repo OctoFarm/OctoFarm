@@ -424,6 +424,7 @@ class StatisticsCollection {
         let currentHistory = await History.find({});
         let activeTimeTotal = [];
         let idleTimeTotal = [];
+        let offlineTimeTotal = [];
         let dateNow = new Date();
 
 
@@ -439,7 +440,8 @@ class StatisticsCollection {
         farmPrinters.forEach(printer => {
             let timeSpan = dateNow - printer.dateAdded;
             activeTimeTotal.push(printer.currentUptime);
-            idleTimeTotal.push(timeSpan - printer.currentUptime)
+            idleTimeTotal.push(printer.currentIdle)
+            offlineTimeTotal.push(timeSpan - (printer.currentUptime + printer.currentIdle))
         })
 
         let activeTime = activeTimeTotal.reduce((a, b) => a + b, 0);
@@ -447,24 +449,29 @@ class StatisticsCollection {
         let idleTime  = idleTimeTotal.reduce((a, b) => a + b, 0);
 
         let downTime  = failedTimeTotal.reduce((a, b) => a + b, 0);
+
+        let offlineTime  = offlineTimeTotal.reduce((a, b) => a + b, 0);
+
         //downTime to miliseconds
         downTime = downTime * 1000;
 
-        let totalHours = activeTime + idleTime + downTime;
+        let totalHours = activeTime + idleTime + downTime + offlineTime;
         octofarmStatistics.activeHours = activeTime;
         octofarmStatistics.idleHours = idleTime;
+        octofarmStatistics.offlineTime = offlineTime;
         octofarmStatistics.downHours = downTime;
         let activePercent = activeTime / totalHours * 100;
         let idlePercent = idleTime / totalHours * 100;
         let downPercent = downTime / totalHours * 100;
+        let offlinePercent = offlineTime / totalHours * 100;
         activePercent = activePercent.toFixed(2);
         idlePercent = idlePercent.toFixed(2);
         downPercent = downPercent.toFixed(2);
-
+        offlinePercent = offlinePercent.toFixed(2);
         octofarmStatistics.activePercent = activePercent;
         octofarmStatistics.idlePercent = idlePercent;
         octofarmStatistics.downPercent = downPercent;
-
+        octofarmStatistics.offlinePercent = offlinePercent;
         // let timeSpan = dateNow - printer.dateAdded;
         // let percentUp = printer.currentUptime / timeSpan * 100;
         // percentUp = percentUp.toFixed(2)+"%"
