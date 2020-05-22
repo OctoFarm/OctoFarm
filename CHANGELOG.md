@@ -41,6 +41,7 @@ All notable changes to this project will be documented in this file.
 ### Removed
     - Old filament manager and database structure. 
     - Removed serverConfig file, now stored in the database and edited through the UI. 
+    - Removed file statistic from dashboard
 
 ### Fixed
     - Fixed Panel view file name been stuck in loading...

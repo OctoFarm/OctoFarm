@@ -624,16 +624,16 @@ class dashUpdate {
         let offlineProgress = document.getElementById("offlineProgress")
         offlineProgress.style.width = stats.offlinePercent+"%";
         offlineProgress.innerHTML = stats.offlinePercent+"%"
-        let usedStorage = document.getElementById("usedStorage")
-        let availableStorage = document.getElementById("availableStorage")
-        let usedProgress = document.getElementById("usedProgress")
-        let availableProgress = document.getElementById("availableProgress")
-        usedStorage.innerHTML = '<i class="fas fa-square text-warning"></i> <b>Used: </b>' + Calc.bytes(stats.storageUsed)
-        usedProgress.style.width = stats.storagePercent+"%";
-        usedProgress.innerHTML = stats.storagePercent+"%"
-        availableStorage.innerHTML = '<i class="fas fa-square text-success"></i> <b>Available: </b>' + Calc.bytes(stats.storageRemain)
-        availableProgress.style.width = 100 - stats.storagePercent+"%";
-        availableProgress.innerHTML =  100 - stats.storagePercent+"%";
+        // let usedStorage = document.getElementById("usedStorage")
+        // let availableStorage = document.getElementById("availableStorage")
+        // let usedProgress = document.getElementById("usedProgress")
+        // let availableProgress = document.getElementById("availableProgress")
+        // usedStorage.innerHTML = '<i class="fas fa-square text-warning"></i> <b>Used: </b>' + Calc.bytes(stats.storageUsed)
+        // usedProgress.style.width = stats.storagePercent+"%";
+        // usedProgress.innerHTML = stats.storagePercent+"%"
+        // availableStorage.innerHTML = '<i class="fas fa-square text-success"></i> <b>Available: </b>' + Calc.bytes(stats.storageRemain)
+        // availableProgress.style.width = 100 - stats.storagePercent+"%";
+        // availableProgress.innerHTML =  100 - stats.storagePercent+"%";
 
 
     }
