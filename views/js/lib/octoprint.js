@@ -59,9 +59,10 @@ export default class OctoPrintClient {
     }
   }
   static async system(printer, action) {
+    let name = Validate.getName(printer)
     let url = "system/commands/core/" + action;
     bootbox.confirm({
-      message: `Are your sure you want to ${action} printer ${printer.index}?`,
+      message: `Are your sure you want to ${action} ${name}?`,
       buttons: {
         cancel: {
           label: '<i class="fa fa-times"></i> No'
@@ -73,17 +74,18 @@ export default class OctoPrintClient {
       callback: async function(result) {
         if (result) {
           let post = await OctoPrintClient.post(printer, url);
+
           if (post.status === 204) {
             UI.createAlert(
               "success",
-              `${printer.index}: ${action} was successful`,
+              `${name}: ${action} was successful`,
               3000,
               "clicked"
             );
           } else {
             UI.createAlert(
               "error",
-              `${printer.index}: ${action} was unsuccessful. Please make sure printer is connected and commands are setup in Settings -> Server.`,
+              `${name}: ${action} was unsuccessful. Please make sure printer is connected and commands are setup in Settings -> Server.`,
               3000,
               "clicked"
             );
@@ -132,6 +134,7 @@ export default class OctoPrintClient {
     }
   }
   static async file(printer, fullPath, action, file) {
+    let name = Validate.getName(printer)
     let url = "files/local/" + fullPath;
     let post = null;
     if (action === "load") {
@@ -168,12 +171,12 @@ export default class OctoPrintClient {
           fullPath: fullPath
         };
         let fileDel = await OctoFarmClient.post("printers/removefile", opt);
-        UI.createAlert("success", `${action} completed`, 3000, "clicked");
+        UI.createAlert("success", `${name}: ${action} completed`, 3000, "clicked");
       } else {
-        UI.createAlert("success", `${action} actioned`, 3000, "clicked");
+        UI.createAlert("success", `${name}: ${action} actioned`, 3000, "clicked");
       }
     } else {
-      UI.createAlert("error", `${action} failed`, 3000, "clicked");
+      UI.createAlert("error", `${name}: ${action} failed`, 3000, "clicked");
     }
   }
   static async jobAction(printer, opts, element) {
@@ -194,7 +197,8 @@ export default class OctoPrintClient {
     printer = await OctoFarmClient.post("printers/printerInfo", body);
     printer = await printer.json();
     let filamentDropDown = await returnDropDown();
-    if(filamentDropDown.length > 0 && printer.selectedFilament === null){
+
+    if(filamentDropDown.length > 0 && printer.selectedFilament === null && opts.command === "start"){
       bootbox.confirm({
         message: "You have spools in the inventory, but none selected. Would you like to select a spool?",
         buttons: {
@@ -257,11 +261,12 @@ export default class OctoPrintClient {
         command: "disconnect"
       };
     }
+    let name = Validate.getName(printer)
     let post = await OctoPrintClient.post(printer, "connection", opts);
     if (post.status === 204) {
       UI.createAlert(
         "success",
-        `Printer: ${printer.index} has ${opts.command}ed successfully.`,
+        `Printer: ${name} has ${opts.command}ed successfully.`,
         3000,
         "click"
       );
@@ -277,7 +282,7 @@ export default class OctoPrintClient {
     } else {
       UI.createAlert(
         "error",
-        `Printer: ${printer.index} could not ${opts.command}.`,
+        `Printer: ${name} could not ${opts.command}.`,
         3000,
         "click"
       );
