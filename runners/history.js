@@ -1,7 +1,6 @@
 const History = require("../models/History.js");
 const _ = require("lodash");
 const fetch = require("node-fetch");
-const Roll = require("../models/Filament.js");
 const Logger = require('../lib/logger.js');
 const logger = new Logger('OctoFarm-HistoryCollection')
 const filamentProfiles = require("../models/Profiles.js")
@@ -38,6 +37,7 @@ class HistoryCollection {
   static async complete(payload, printer, job) {
 
     try{
+      let serverSettings = await ServerSettings.find({});
       if(serverSettings[0].filamentManager){
         await HistoryCollection.resyncFilament(printer)
       }
@@ -59,7 +59,7 @@ class HistoryCollection {
       let endTimeFormat = endTime.substring(0, 8);
       let endDate = endDDMM + " - " + endTimeFormat;
       let profiles = await filamentProfiles.find({});
-      let serverSettings = await ServerSettings.find({});
+
       if(printer.selectedFilament !== null){
         let profileId = null;
         if(serverSettings[0].filamentManager){
@@ -120,6 +120,7 @@ class HistoryCollection {
   }
   static async failed(payload, printer, job) {
     try{
+      let serverSettings = await ServerSettings.find({});
       if(serverSettings[0].filamentManager){
         await HistoryCollection.resyncFilament(printer)
       }
@@ -151,7 +152,7 @@ class HistoryCollection {
       let endTimeFormat = endTime.substring(0, 8);
       let endDate = endDDMM + " - " + endTimeFormat;
       let profiles = await filamentProfiles.find({});
-      let serverSettings = await ServerSettings.find({});
+
       let selectedFilament = null;
       if(printer.selectedFilament !== null){
         let profileId = null;
