@@ -369,7 +369,16 @@ class ClientAPI {
             return await ClientAPI.get_retry(printerURL, apikey, item);
         }
     }
-
+    static files(printerURL, apikey, item) {
+        let url = `${printerURL}/api/${item}`;
+        fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Api-Key": apikey
+            }
+        });
+    }
     static get(printerURL, apikey, item) {
         let url = `${printerURL}/api/${item}`;
         return Promise.race([
@@ -481,7 +490,7 @@ class Runner {
                 }
                 await Runner.getProfile(id);
                 await Runner.getState(id);
-                Runner.getFiles(id, "files?recursive=true");
+                await Runner.getFiles(id, "files?recursive=true");
                 //Connection to API successful, gather initial data and setup websocket.
                 await farmPrinters[i].ws.open(
                     `ws://${farmPrinters[i].printerURL}/sockjs/websocket`,
@@ -785,7 +794,7 @@ class Runner {
             folders: [],
             folderCount: 0
         };
-        return ClientAPI.get_retry(
+        return ClientAPI.get(
                 farmPrinters[index].printerURL,
                 farmPrinters[index].apikey,
                 location
@@ -1071,7 +1080,7 @@ class Runner {
     static async reSyncFile(id) {
         let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
         //Doesn't actually resync just the file... shhh
-        let success = Runner.getFiles(id, "files?recursive=true");
+        let success = await Runner.getFiles(id, "files?recursive=true");
         if (success) {
             return success;
         } else {
