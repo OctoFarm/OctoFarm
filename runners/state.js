@@ -818,14 +818,14 @@ class Runner {
                 let recursivelyPrintNames = function(entry, depth) {
                     depth = depth || 0;
                     let timeStat = "";
-                    let filament = ""
+                    let filament = "";
                     let isFolder = entry.type === "folder";
                     if (!isFolder) {
                         if (typeof entry.gcodeAnalysis !== 'undefined') {
                             if (typeof entry.gcodeAnalysis.estimatedPrintTime !== 'undefined') {
                                 timeStat = entry.gcodeAnalysis.estimatedPrintTime;
 
-                                filament = entry.gcodeAnalysis.filament.length;
+                                filament = entry.gcodeAnalysis.filament.tool0.length;
                             } else {
                                 timeStat = "No Time Estimate";
                                 filament = null;
@@ -834,6 +834,7 @@ class Runner {
                             timeStat = "No Time Estimate";
                             filament = null;
                         }
+
                         let path = null;
                         if (entry.path.indexOf("/") > -1) {
                             path = entry.path.substr(0, entry.path.lastIndexOf("/"));

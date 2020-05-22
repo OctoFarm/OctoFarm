@@ -320,10 +320,12 @@ export default class FileManager {
         if (currentFolder.includes("local/")) {
           currentFolder = currentFolder.replace("local/", "");
         }
-        fileList.files.forEach(file => {
+        fileList.files.forEach(async file => {
           let fileDate = new Date(file.date*1000);
           let dateString = fileDate.toDateString();
           let timeString = fileDate.toTimeString().substring(0, 8);
+          let getUsage = await FileActions.grabUsage(file)
+
           fileDate = dateString + " " + timeString;
 
           if (typeof recursive != "undefined") {
@@ -354,7 +356,9 @@ export default class FileManager {
           </div>
           <p class="mb-1 float-left">
           <i class="fas fa-clock"></i> ${fileDate}<br>
-          <i class="fas fa-hdd"></i> ${Calc.bytes(file.size)}
+          <i class="fas fa-hdd"></i> ${Calc.bytes(file.size)}<br>
+          <i class="fas fa-weight"></i> ${getUsage}
+          
           </p>
               <div
               class="float-right btn-group flex-wrap btn-group-sm"
@@ -428,7 +432,8 @@ export default class FileManager {
           </div>
           <p class="mb-1 float-left">
           <i class="fas fa-clock"></i> ${fileDate}<br>
-          <i class="fas fa-hdd"></i> ${Calc.bytes(file.size)}
+          <i class="fas fa-hdd"></i> ${Calc.bytes(file.size)}<br>
+          <i class="fas fa-weight"></i> ${getUsage}
           </p>
               <div
               class="float-right btn-group flex-wrap btn-group-sm"
@@ -836,6 +841,12 @@ export class FileActions {
         }
       }
     });
+  }
+  static async grabUsage(file){
+    let radius = parseFloat(1.75) / 2
+    let volume = ((file.length /1000) * 3.1415926535 * radius * radius)
+    let usage = volume * parseFloat(1.24)
+    return (file.length /1000).toFixed(2) + "m / " + usage.toFixed(2) + "g";
   }
   static async startPrint(printer, filePath) {
     OctoPrintClient.file(printer, filePath, "print");
