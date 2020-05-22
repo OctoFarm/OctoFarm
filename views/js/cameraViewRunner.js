@@ -243,7 +243,7 @@ function updateState(printers, clientSettings) {
         //Set the state
         if (printer.stateColour.category === "Active") {
             if (printer.camURL != "") {
-                elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${dNone}`;
+                elements.row.className = `col-md-4 col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${dNone}`;
             }
 
             elements.control.disabled = false;
@@ -341,7 +341,7 @@ function updateState(printers, clientSettings) {
         ) {
             elements.control.disabled = false;
             if (printer.camURL != "") {
-                elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${dNone}`;
+                elements.row.className = `col-md-4 col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${dNone}`;
             }
             if (typeof printer.job != "undefined" && printer.job.file.name != null) {
                 elements.start.disabled = false;
@@ -435,7 +435,7 @@ function updateState(printers, clientSettings) {
             }
         } else if (printer.state === "Disconnected") {
             if (printer.camURL != "") {
-                elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${hideClosed} ${dNone}`;
+                elements.row.className = `col-md-4 col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${hideClosed} ${dNone}`;
             }
             elements.control.disabled = false;
             elements.start.disabled = true;
@@ -443,7 +443,7 @@ function updateState(printers, clientSettings) {
             elements.start.classList.remove("hidden");
             elements.stop.classList.add("hidden");
         } else if (printer.stateColour.category === "Offline") {
-            elements.row.className = `col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} hidden ${dNone}`;
+            elements.row.className = `col-md-4 col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} hidden ${dNone}`;
             elements.start.classList.remove("hidden");
             elements.stop.classList.add("hidden");
             elements.control.disabled = true;
