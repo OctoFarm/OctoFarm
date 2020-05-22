@@ -32,10 +32,15 @@ class HistoryCollection {
       fmID: sp.spool.id
     };
     spool.markModified("spools")
-    spool.save();
+    await spool.save();
+    return "Done"
   }
   static async complete(payload, printer, job) {
+
     try{
+      if(serverSettings[0].filamentManager){
+        await HistoryCollection.resyncFilament(printer)
+      }
       logger.info("Completed Print triggered", payload + printer.printerURL);
       let today = new Date();
       let historyCollection = await History.find({});
@@ -107,10 +112,6 @@ class HistoryCollection {
       });
       await saveHistory.save();
 
-      if(serverSettings[0].filamentManager){
-        HistoryCollection.resyncFilament(printer)
-      }
-
       logger.info("Completed Print Captured for ", payload + printer.printerURL);
     }catch(e){
       logger.error(e, "Failed to capture history for " + printer.printerURL);
@@ -119,6 +120,9 @@ class HistoryCollection {
   }
   static async failed(payload, printer, job) {
     try{
+      if(serverSettings[0].filamentManager){
+        await HistoryCollection.resyncFilament(printer)
+      }
       let name = null;
       if (typeof printer.settingsApperance != "undefined") {
         if (printer.settingsApperance.name === "" || printer.settingsApperance.name === null) {
@@ -187,9 +191,7 @@ class HistoryCollection {
         printHistory
       });
       saveHistory.save();
-      if(serverSettings[0].filamentManager){
-        HistoryCollection.resyncFilament(printer)
-      }
+
       logger.info("Failed Print captured ", payload + printer.printerURL);
     }catch(e){
       logger.error(e, "Failed to capture history for " + printer.printerURL);
