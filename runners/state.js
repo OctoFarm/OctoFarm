@@ -331,7 +331,7 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
             //Register cancelled print...
             setTimeout(function(){
                 logger.info(data.event.type + that.index + ": " + that.url);
-                await HistoryCollection.failed(data.event.payload, sendPrinter, job);
+                HistoryCollection.failed(data.event.payload, sendPrinter, job);
             }, 10000);
 
 
@@ -346,7 +346,7 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
             let that = this;
             setTimeout(function(){
                 logger.info(data.event.type + that.index + ": " + that.url);
-                await HistoryCollection.complete(data.event.payload, sendPrinter, job);
+                HistoryCollection.complete(data.event.payload, sendPrinter, job);
             }, 10000);
             //Register cancelled print...
 
