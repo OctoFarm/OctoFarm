@@ -90,51 +90,7 @@ export default class History {
       }
 
     }
-    var tfConfig = {
-      base_path: 'js/vendor/tablefilter/',
-      sticky_headers: true,
-      col_0: 'none',
-      col_1: 'none',
-      col_2: 'none',
-      col_3: 'none',
-      col_4: 'none',
-      col_5: 'none',
-      col_6: 'none',
-      col_7: 'none',
-      col_8: 'none',
-      col_9: 'none',
-      col_10: 'none',
-      col_11: 'none',
-      grid_layout: {
-        filters: false,
-        cont_css_class: 'table',
-        tbl_head_css_class: 'table-dark text-center',
-        tbl_cont_css_class: 'table-dark'
-      },
-      toolbar: {
-        target_id: 'historyToolbar'
-      },
-      paging: {
-        results_per_page: ['Records: ', [10, 25, 50, 100]]
-      },
-      col_types: [
-        'number',
-        '',
-        '',
-        '',
-        '',
-        '',
-        '',
-        ''
-      ],
-      themes: [{
-        name: 'transparent'
-      }],
-      /* sorting feature */
-      extensions: [{ name: 'sort' }]
-    };
-    var tf = new TableFilter('historyTableTop', tfConfig);
-    tf.init();
+
     document.getElementById("loading").style.display = "none"
     document.getElementById("wrapper").classList.remove("d-none");
   }
