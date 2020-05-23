@@ -42,8 +42,6 @@ body {
 button > * {
   pointer-events: none;
 }
-th {cursor: ns-resize;}
-
 
 hr {
   border-color: inherit;

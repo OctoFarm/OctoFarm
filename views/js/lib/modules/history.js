@@ -3,8 +3,6 @@ import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import {returnHistory, returnHistoryUsage, returnDropDown} from "./filamentGrab.js";
 
-
-
 //Setup history listeners
 document.getElementById("historyTable").addEventListener("click", e => {
   //Remove from UI
@@ -61,88 +59,84 @@ export default class History {
   static async get() {
     let newHistory = await OctoFarmClient.get("history/get");
     historyList = await newHistory.json();
-    for(let i = historyList.history.length; i--;){
+    for (let i = historyList.history.length; i--;) {
       let filamentString = null;
       let filamentUsage = null;
-      if(historyList.history[i].printHistory.success){
+      if (historyList.history[i].printHistory.success) {
         let filamentString = null;
         let filamentUsage = null;
-        if(historyList.history[i].printHistory.filamentSelection !== null){
+        if (historyList.history[i].printHistory.filamentSelection !== null) {
           filamentString = await returnHistory(historyList.history[i].printHistory.filamentSelection)
           filamentUsage = returnHistoryUsage(historyList.history[i].printHistory)
-        }else{
+        } else {
           filamentString = "None selected..."
           filamentUsage = History.returnFilamentUsage(historyList.history[i].printHistory)
         }
-        document.getElementById("spool-"+historyList.history[i]._id).innerHTML = filamentString;
-        document.getElementById("usage-"+historyList.history[i]._id).innerHTML = filamentUsage;
-        let grams = document.getElementById("usage-"+historyList.history[i]._id)
+        document.getElementById("spool-" + historyList.history[i]._id).innerHTML = filamentString;
+        document.getElementById("usage-" + historyList.history[i]._id).innerHTML = filamentUsage;
+        let grams = document.getElementById("usage-" + historyList.history[i]._id)
         grams = grams.innerHTML
         grams = grams.split(" / ").pop()
-        document.getElementById("cost-"+historyList.history[i]._id).innerHTML = History.returnPrintCost(historyList.history[i].printHistory.filamentSelection, grams);
-      }else{
-        if(historyList.history[i].printHistory.filamentSelection !== null){
+        document.getElementById("cost-" + historyList.history[i]._id).innerHTML = History.returnPrintCost(historyList.history[i].printHistory.filamentSelection, grams);
+      } else {
+        if (historyList.history[i].printHistory.filamentSelection !== null) {
           filamentString = await returnHistory(historyList.history[i].printHistory.filamentSelection)
-        }else{
+        } else {
           filamentString = "None selected..."
         }
-        document.getElementById("spool-"+historyList.history[i]._id).innerHTML = filamentString;
-        document.getElementById("cost-"+historyList.history[i]._id).innerHTML = "";
-        document.getElementById("usage-"+historyList.history[i]._id).innerHTML = "";
+        document.getElementById("spool-" + historyList.history[i]._id).innerHTML = filamentString;
+        document.getElementById("cost-" + historyList.history[i]._id).innerHTML = "";
+        document.getElementById("usage-" + historyList.history[i]._id).innerHTML = "";
       }
 
     }
-    const tf = new TableFilter(document.querySelector('#historyTableTop'), {
+    var tfConfig = {
       base_path: 'js/vendor/tablefilter/',
+      sticky_headers: true,
+      col_0: 'none',
+      col_1: 'none',
+      col_2: 'none',
+      col_3: 'none',
+      col_4: 'none',
+      col_5: 'none',
+      col_6: 'none',
+      col_7: 'none',
+      col_8: 'none',
+      col_9: 'none',
+      col_10: 'none',
+      col_11: 'none',
+      grid_layout: {
+        filters: false,
+        cont_css_class: 'table',
+        tbl_head_css_class: 'table-dark text-center',
+        tbl_cont_css_class: 'table-dark'
+      },
+      toolbar: {
+        target_id: 'historyToolbar'
+      },
       paging: {
         results_per_page: ['Records: ', [10, 25, 50, 100]]
       },
-      btn_reset: true,
-      loader: true,
-      status_bar: true,
-      mark_active_columns: {
-        highlight_column: true
-      },
-      col_0: 'none',
-      col_1: 'select',
-      col_2: 'select',
-      col_3: 'select',
-      col_4: 'select',
-      col_5: 'select',
-      col_6: 'select',
-      col_7: 'select',
-      col_8: 'select',
-      col_9: 'select',
-      col_10: 'select',
-      col_11: 'select',
-      col_12: 'none',
-
       col_types: [
         'number',
-        'string',
-        'string',
-        'number',
-        'number',
-        'number',
-        'number',
-        'number',
-        'number'
+        '',
+        '',
+        '',
+        '',
+        '',
+        '',
+        ''
       ],
-      /** Bootstrap integration */
-
-      // aligns filter at cell bottom when Bootstrap is enabled
-      filters_cell_tag: 'th',
-
-      // allows Bootstrap table styling
       themes: [{
-        name: ''
+        name: 'transparent'
       }],
-      /* Column sorting extension */
-      extensions: [{
-        name: 'sort'
-      }],
-    });
+      /* sorting feature */
+      extensions: [{ name: 'sort' }]
+    };
+    var tf = new TableFilter('historyTableTop', tfConfig);
     tf.init();
+    document.getElementById("loading").style.display = "none"
+    document.getElementById("wrapper").classList.remove("d-none");
   }
 
   static async edit(e) {

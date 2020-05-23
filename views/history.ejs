@@ -23,31 +23,68 @@
     </div>
   </div>
 </div>
+<div class="row">
+  <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
+    <div class="card text-white bg-dark h-100">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-chart-bar"></i> History Filters
+        </button>
 
+
+      </div>
+      <div class="card-body pt-2 pb-0 text-center" id="historyToolbar">
+        <div class="row">
+          <div class="col-2">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="printerFilter">Options</label>
+              </div>
+              <select class="custom-select" id="printerFilter">
+                <option selected>Choose...</option>
+                <option value="1">One</option>
+                <option value="2">Two</option>
+                <option value="3">Three</option>
+              </select>
+            </div>
+          </div>
+        </div>
+        <p id="loading">Loading...</p>
+
+      </div>
+    </div>
+  </div>
+</div>
 
 <div class="row">
-  <div class="col-lg-12 table-responsive-sm table-responsive-md">
+  <div id="wrapper" class="col-lg-12 table-responsive-sm table-responsive-md d-none">
     <table id="historyTableTop" class="table table-dark text-center">
       <thead>
         <tr>
-          <th class="sticky-table table-dark" scope="col">#</th>
-          <th class="sticky-table table-dark" scope="col">State</th>
-          <th class="sticky-table table-dark" scope="col">Printer</th>
-          <th class="sticky-table table-dark" scope="col">File Name</th>
-          <th class="sticky-table table-dark" scope="col">Start Date</th>
-          <th class="sticky-table table-dark" scope="col">End Date</th>
-          <th class="sticky-table table-dark" scope="col">Print Time</th>
-          <th class="sticky-table table-dark" scope="col">Cost</th>
-          <th class="sticky-table table-dark" scope="col">Spool</th>
-          <th class="sticky-table table-dark" scope="col">Filament Usage</th>
-          <th class="sticky-table table-dark" scope="col" width="400px">
+          <th class="table-dark" scope="col">#</th>
+          <th class="table-dark" scope="col">State</th>
+          <th class="table-dark" scope="col">Printer</th>
+          <th class="table-dark" scope="col">File Name</th>
+          <th class="table-dark" scope="col">Start Date</th>
+          <th class="table-dark" scope="col">End Date</th>
+          <th class="table-dark" scope="col">Print Time</th>
+          <th class="table-dark" scope="col">Cost</th>
+          <th class="table-dark" scope="col">Spool</th>
+          <th class="table-dark" scope="col">Filament Usage</th>
+          <th class="table-dark" scope="col" width="400px">
             Notes
           </th>
           <th class="sticky-table table-dark" scope="col"></th>
         </tr>
       </thead>
       <tbody id="historyTable">
-        <% for(let i = history.length; i--;){ %>
+        <% for(let i = 0; i < history.length; i++){ %>
         <tr>
           <td scope="row">
             <%= history[i].printHistory.historyIndex %>
@@ -112,6 +149,7 @@
         </tr>
         <% } %>
       </tbody>
+
     </table>
 
   </div>
