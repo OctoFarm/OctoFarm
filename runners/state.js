@@ -321,22 +321,35 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
     }
     if (typeof data.event != "undefined") {
         if (data.event.type === "PrintFailed") {
-            logger.info(data.event.type + this.index + ": " + this.url);
+
+
             let sendPrinter = {};
             sendPrinter = JSON.parse(JSON.stringify(farmPrinters[this.index]));
             let job = {}
             job = JSON.parse(JSON.stringify(farmPrinters[this.index].job));
+            let that = this;
             //Register cancelled print...
-            await HistoryCollection.failed(data.event.payload, sendPrinter, job);
+            setTimeout(function(){
+                logger.info(data.event.type + that.index + ": " + that.url);
+                await HistoryCollection.failed(data.event.payload, sendPrinter, job);
+            }, 10000);
+
+
+
         }
         if (data.event.type === "PrintDone") {
-            logger.info(data.event.type + this.index + ": " + this.url);
+            setTimeout(function(){ alert("Hello"); }, 3000);
             let sendPrinter = {};
             sendPrinter = JSON.parse(JSON.stringify(farmPrinters[this.index]));
             let job = {}
             job = JSON.parse(JSON.stringify(farmPrinters[this.index].job));
+            let that = this;
+            setTimeout(function(){
+                logger.info(data.event.type + that.index + ": " + that.url);
+                await HistoryCollection.complete(data.event.payload, sendPrinter, job);
+            }, 10000);
             //Register cancelled print...
-            await HistoryCollection.complete(data.event.payload, sendPrinter, job);
+
         }
         if(data.event.type === "Error"){
             console.log(data.event.payload)
