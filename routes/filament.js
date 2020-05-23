@@ -6,6 +6,7 @@ const Spool = require("../models/Filament.js");
 const Profile = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const _ = require("lodash");
+const Runner = require("../runners/state.js")
 module.exports = router;
 
 router.get("/get/profile", ensureAuthenticated, async (req, res) => {
@@ -331,6 +332,7 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
   await spools.save();
   Runner.updateFilament();
   Spool.find({}).then(spools => {
+    Runner.updateFilament();
     res.send({ spools: spools });
   });
 });
@@ -392,6 +394,7 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
   await profile.save();
 
   Profile.find({}).then(profiles => {
+    Runner.updateFilament();
     res.send({ profiles: profiles });
   });
 });
