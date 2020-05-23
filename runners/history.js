@@ -6,7 +6,7 @@ const logger = new Logger('OctoFarm-HistoryCollection')
 const filamentProfiles = require("../models/Profiles.js")
 const ServerSettings = require("../models/ServerSettings.js")
 const Spool = require("../models/Filament.js")
-const Runner = require("../runners/state.js")
+const Runner = require("./state.js")
 
 let counter = 0;
 
