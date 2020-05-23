@@ -842,6 +842,7 @@ export class FileActions {
       }
     });
   }
+  //Needs updating when filament is brought in.
   static grabUsage(file){
     if(typeof file.length === 'undefined' || file.length === null){
       return "No Length"

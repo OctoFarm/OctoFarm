@@ -1,7 +1,6 @@
 import OctoFarmClient from "../octofarm.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
-import tableSort from "../functions/tablesort.js";
 import {returnHistory, returnHistoryUsage, returnDropDown} from "./filamentGrab.js";
 
 
@@ -93,6 +92,57 @@ export default class History {
       }
 
     }
+    const tf = new TableFilter(document.querySelector('#historyTableTop'), {
+      base_path: 'js/vendor/tablefilter/',
+      paging: {
+        results_per_page: ['Records: ', [10, 25, 50, 100]]
+      },
+      btn_reset: true,
+      loader: true,
+      status_bar: true,
+      mark_active_columns: {
+        highlight_column: true
+      },
+      col_0: 'none',
+      col_1: 'select',
+      col_2: 'select',
+      col_3: 'select',
+      col_4: 'select',
+      col_5: 'select',
+      col_6: 'select',
+      col_7: 'select',
+      col_8: 'select',
+      col_9: 'select',
+      col_10: 'select',
+      col_11: 'select',
+      col_12: 'none',
+
+      col_types: [
+        'number',
+        'string',
+        'string',
+        'number',
+        'number',
+        'number',
+        'number',
+        'number',
+        'number'
+      ],
+      /** Bootstrap integration */
+
+      // aligns filter at cell bottom when Bootstrap is enabled
+      filters_cell_tag: 'th',
+
+      // allows Bootstrap table styling
+      themes: [{
+        name: ''
+      }],
+      /* Column sorting extension */
+      extensions: [{
+        name: 'sort'
+      }],
+    });
+    tf.init();
   }
 
   static async edit(e) {
@@ -285,4 +335,3 @@ export default class History {
   static reload() {}
 }
 History.get();
-window.onload = function () {tableSort.makeAllSortable();};

@@ -81,7 +81,6 @@ printerCard.forEach(card => {
   document
     .getElementById("cameraContain-" + ca[1])
     .addEventListener("dblclick", e => {
-
       doubleClickFullScreen(e.target);
     });
   document
