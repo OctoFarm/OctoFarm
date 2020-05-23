@@ -1296,6 +1296,7 @@ class Runner {
             path: path,
             fullPath: file.path,
             display: fileDisplay,
+            length: null,
             name: file.name,
             size: null,
             time: null,
