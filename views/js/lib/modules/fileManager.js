@@ -6,7 +6,7 @@ import UI from "../functions/ui.js";
 
 let fileUploads = new Queue();
 
-
+let fileSortInit = false;
 
 setInterval(async () => {
   //If there are files in the queue, plow through until uploaded... currently single file at a time.
@@ -333,9 +333,10 @@ export default class FileManager {
                 "beforeend",
                 `
           <a
+          data-jplist-item
           id="file-${file.fullPath}"
           href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
+          class="list-group-item list-group-item-action flex-column align-items-start bg-secondary "
           style="display: block;
           padding: 0.7rem 0.1rem;"
         >
@@ -348,16 +349,16 @@ export default class FileManager {
             </div>
             <div class="col-lg-11">
             <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">${file.display}</h5>
-            <small><i class="fas fa-stopwatch"></i>  ${Calc.generateTime(
+            <h5 class="mb-1 name">${file.display}</h5>
+            <small><i class="fas fa-stopwatch"></i> <span class="time">${Calc.generateTime(
                     file.time
-                )}</small>
+                )}</span> </small>
 
           </div>
           <p class="mb-1 float-left">
-          <i class="fas fa-clock"></i> ${fileDate}<br>
-          <i class="fas fa-hdd"></i> ${Calc.bytes(file.size)}<br>
-          <i class="fas fa-weight"></i> ${getUsage}
+          <i class="fas fa-clock"></i><span class="date"> ${fileDate}</span><br>
+          <i class="fas fa-hdd"></i><span class="size"> ${Calc.bytes(file.size)}</span> <br>
+          <i class="fas fa-weight"></i><span class="usage"> ${getUsage}</span>
           
           </p>
               <div
@@ -410,6 +411,7 @@ export default class FileManager {
                 "beforeend",
                 `
           <a
+          data-jplist-item
           id="file-${file.fullPath}"
           href="#"
           class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
@@ -425,15 +427,17 @@ export default class FileManager {
             </div>
             <div class="col-lg-11">
             <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1">${file.display}</h5>
-            <small><i class="fas fa-stopwatch"></i>  ${Calc.generateTime(
+            <h5 class="mb-1 name">${file.display}</h5>
+            <small><i class="fas fa-stopwatch"></i> <span class="time">${Calc.generateTime(
                     file.time
-                )}</small>
+                )}</span> </small>
+
           </div>
           <p class="mb-1 float-left">
-          <i class="fas fa-clock"></i> ${fileDate}<br>
-          <i class="fas fa-hdd"></i> ${Calc.bytes(file.size)}<br>
-          <i class="fas fa-weight"></i> ${getUsage}
+          <i class="fas fa-clock"></i><span class="date"> ${fileDate}</span><br>
+          <i class="fas fa-hdd"></i><span class="size"> ${Calc.bytes(file.size)}</span> <br>
+          <i class="fas fa-weight"></i><span class="usage"> ${getUsage}</span>
+          
           </p>
               <div
               class="float-right btn-group flex-wrap btn-group-sm"
@@ -538,6 +542,16 @@ export default class FileManager {
         FileManager.updateListeners(printer);
       }
     }
+    console.log(fileSortInit)
+    if(fileSortInit){
+      jplist.refresh();
+    }else{
+      jplist.init({
+        storage: 'localStorage', //'localStorage', 'sessionStorage' or 'cookies'
+        storageName: 'file-sorting' //the same storage name can be used to share storage between multiple pages
+      });
+    }
+
   }
   static search(id){
     FileActions.search(id);

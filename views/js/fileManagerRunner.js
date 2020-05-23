@@ -63,24 +63,73 @@ class Manager{
               <i class="fas fa-chevron-left"></i> Back
             </button>
             <!-- Split dropright button -->
-            <div id="sortDirection" class="btn-group dropdown float-right mr-1 d-none">
-              <button id="sortChangeDirection" type="button" class="btn btn-secondary" disabled>
-                Sort By:
-              </button>
-              <button id="sortSelection" type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                Name
-              </button>
-              <div class="dropdown-menu">
-                <a id="sortName" class="dropdown-item" href="#">Name</a>
-                <a id="sortUploadDate" class="dropdown-item" href="#">Upload Date</a>
-                <a id="sortPrintTime" class="dropdown-item" href="#">Print Time</a>
-                <a id="sortFileSize" class="dropdown-item" href="#">File Size</a>
-              </div>
+            <div class="dropdown mr-3 float-right"
+                   data-jplist-control="dropdown-sort"
+                   data-opened-class="show"
+                   data-group="files"
+                   data-name="data-sort"
+                   data-id="data-file">
+                
+                <button
+                        data-type="panel"
+                        class="btn btn-primary dropdown-toggle"
+                        type="button">
+                    Sort by
+                </button>
+                
+                <div
+                        data-type="content"
+                        class="dropdown-menu"
+                        aria-labelledby="dropdownMenuButton">
+                
+                    <a class="dropdown-item"
+                       href="#"
+                       data-path="default">Sort By</a>
+                     <a class="dropdown-item"
+                       data-path=".name"
+                       data-order="asc"
+                       data-type="text"
+                       data-value="1">File Name A-Z</a>
+                
+                    <a class="dropdown-item"
+                       data-path=".name"
+                       data-order="desc"
+                       data-type="text"
+                       data-value="2">File Name Z-A</a>
+                                       
+                    <a class="dropdown-item"
+                       data-path=".time"
+                       data-order="asc"
+                       data-type="number"
+                       data-value="3">Print Time 0-10</a>
+                
+                    <a class="dropdown-item"
+                       data-path=".time"
+                       data-order="desc"
+                       data-type="number"
+                       data-value="4">Print Time 10-0</a>
+                                       
+                    <a class="dropdown-item"
+                       data-path=".date"
+                       data-order="asc"
+                       data-type="number"
+                       data-value="5">Upload Date 0-10</a>
+                
+                    <a class="dropdown-item"
+                       data-path=".date"
+                       data-order="desc"
+                       data-type="number"
+                       data-value="6">Upload Date 10-0</a>
+                                                           
+
+                          
+                </div>
             </div>
             <label class="btn btn-success float-left mr-1 mb-0" for="fileUploadBtn"><i class="fas fa-file-import"></i> Upload File(s)</label>
             <input id="fileUploadBtn" multiple accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left" id="uploadFileBtn">
             <label class="btn btn-info float-left mr-1 mb-0" for="fileUploadPrintBtn"><i class="fas fa-file-import"></i> Upload and Print</label>
             <input id="fileUploadPrintBtn" accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left" id="uploadFileBtn">
+
             <button
                     id="createFolderBtn"
                     type="button"
@@ -100,7 +149,7 @@ class Manager{
 
         </div>
 
-        <div id="fileList-${id}" class="list-group" style="max-height:100%; overflow-y:scroll;">
+        <div id="fileList-${id}" class="list-group" style="max-height:100%; overflow-y:scroll;" data-jplist-group="files">
 
         </div>
         `
