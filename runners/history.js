@@ -6,6 +6,7 @@ const logger = new Logger('OctoFarm-HistoryCollection')
 const filamentProfiles = require("../models/Profiles.js")
 const ServerSettings = require("../models/ServerSettings.js")
 const Spool = require("../models/Filament.js")
+const Runner = require("../runners/state.js")
 
 let counter = 0;
 
@@ -19,7 +20,7 @@ class HistoryCollection {
       }
     });
     let spool = await Spool.findById(printer.selectedFilament._id)
-
+    Runner.updateFilament();
     let sp = await spools.json();
     spool.spools = {
       name: sp.spool.name,
