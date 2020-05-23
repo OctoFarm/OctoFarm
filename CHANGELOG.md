@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file.
         - Server timeout settings
     - When saving settings it now asks if you'd like to restart OctoFarm. Confirm will restart the service. 
     - Client settings to show extra information on views. List, Panel and Camera View
-    - File manager shows weight
+    - File manager shows weight when length is calculated. Defaults to 1.24 density with 1.75mm filament.
         
 ### Changed
     - Group dropdown only appears if groups exist.
@@ -61,6 +61,7 @@ All notable changes to this project will be documented in this file.
     - Not collecting history if there was none.
     - Fixed issue with ping pong incorrectly fireing for mid-connection websockets
     - Fixed history index not sequencially counting if multiple entries collected at same time.
+    - Fixed issue where filament would update on List/Panel view when changes/history captured.
 
 ## [v1.1.4.9-dev-2.7]
 
