@@ -5,8 +5,9 @@ import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
 import {parse} from "./vendor/flatted.js";
 import tableSort from "./lib/functions/tablesort.js";
-import Validate from "./lib/functions/validate.js";
 window.onload = function () {tableSort.makeAllSortable();};
+import Validate from "./lib/functions/validate.js";
+
 import initGroupSelect from "./lib/modules/groupSelection.js";
 import {returnSelected} from "./lib/modules/filamentGrab.js";
 

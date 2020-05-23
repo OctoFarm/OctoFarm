@@ -39,13 +39,159 @@
 
 
       </div>
-      <div class="card-body pt-2 pb-0 text-center" id="historyToolbar">
-        <div class="row">
-          <div class="col-2">
-          </div>
-        </div>
-        <p id="loading">Loading...</p>
+      <div class="card-body pt-2 pb-0 text-center">
+        <div class="row d-none" id="historyToolbar">
+          <div class="col-3">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="defaultSort">Default Sort:</label>
+              </div>
+              <select class="custom-select" id="defaultSort"
+                      data-jplist-control="select-sort"
+                      data-group="history"
+                      data-name="default-sort"
+                      data-id="default-sort">
+                <option                data-path=".index"
+                                       data-order="asc"
+                                       value="1"
+                                       data-type="number">Index 0-10</option>
+                <option
+                        data-path=".index"
+                        data-order="desc"
+                        value="2"
+                        data-type="number">Index 10-0</option>
+                <option
+                        data-path=".printer"
+                        data-order="asc"
+                        value="3"
+                        data-type="text">Printer A-Z</option>
 
+                <option
+                        data-path=".printer"
+                        data-order="desc"
+                        value="4"
+                        data-type="text">Printer</option>
+                <option
+                        data-path=".file"
+                        data-order="asc"
+                        value="5"
+                        data-type="text">File Name A-Z</option>
+                <option
+                        data-path=".file"
+                        data-order="desc"
+                        value="6"
+                        data-type="text">File Name Z-A</option>
+                <option
+                        data-path=".start"
+                        data-order="asc"
+                        value="7"
+                        data-type="datetime">Start Date 0-10</option>
+                <option
+                        data-path=".start"
+                        data-order="desc"
+                        value="8"
+                        data-type="datetime">Start Date 10-0</option>
+                <option
+                        data-path=".end"
+                        data-order="asc"
+                        value="9"
+                        data-type="datetime">End Date 0-10</option>
+                <option
+                        data-path=".end"
+                        data-order="desc"
+                        value="10"
+                        data-type="datetime">End Date 10-0</option>
+                <option
+                        data-path=".time"
+                        data-order="asc"
+                        value="11"
+                        data-type="number">Print Time 0-10</option>
+                <option
+                        data-path=".time"
+                        data-order="desc"
+                        value="12"
+                        data-type="number">Print Time 10-0</option>
+                <option
+                        data-path=".cost"
+                        data-order="asc"
+                        value="11"
+                        data-type="number">Cost 0-10</option>
+                <option
+                        data-path=".cost"
+                        data-order="desc"
+                        value="12"
+                        data-type="number">Cost 10-0</option>
+                <option
+                        data-path=".usage"
+                        data-order="asc"
+                        value="13"
+                        data-type="number">Filament Usage 0-10</option>
+                <option
+                        data-path=".usage"
+                        data-order="desc"
+                        value="14"
+                        data-type="number">Filament Usage 10-0</option>
+              </select>
+            </div>
+          </div>
+          <div class="col-2">
+
+          </div>
+          <div class="col-12">
+            <nav
+                    data-jplist-control="pagination"
+                    data-group="history"
+                    data-items-per-page="25"
+                    data-current-page="0"
+                    data-disabled-class="disabled"
+                    data-selected-class="active"
+                    data-name="pagination"
+                    data-id="history-pagination">
+
+              <!-- first and previous buttons -->
+              <div class="btn-group pagination d-inline-flex" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-secondary" data-type="first">First</button>
+                <button type="button" class="btn btn-secondary" data-type="prev">Previous</button>
+              </div>
+
+
+              <div class="btn-group pagination d-inline-flex" data-type="pages">
+                <button type="button" class="btn btn-secondary" data-type="page">{pageNumber}</button>
+
+              </div>
+
+              <div class="btn-group pagination d-inline-flex" role="group" aria-label="Basic example">
+                <button type="button" class="btn btn-secondary" data-type="next">Next</button>
+                <button type="button" class="btn btn-secondary" data-type="lase">Last</button>
+              </div>
+
+              <!-- items per page dropdown -->
+              <div class="input-group mb-3 d-inline-flex w-25">
+                <div class="input-group-prepend">
+                  <label class="input-group-text" for="inputGroupSelect01">Items per page: </label>
+                </div>
+                <select data-type="items-per-page" class="custom-select" id="inputGroupSelect01">
+                  <option value="25">25</option>
+                  <option value="50">50</option>
+                  <option value="75">75</option>
+                  <option value="100"> 100 </option>
+                  <option value="0"> All </option>
+                </select>
+              </div>
+
+              <!-- information labels -->
+              <span data-type="info" class="badge badge-secondary ml-3 p-2">
+                    Page {pageNumber} of {pagesNumber}
+              </span>
+
+            </nav>
+          </div>
+          <!-- pagination control -->
+
+        </div>
+      <div class="row">
+        <div class="col-12"><p id="loading">Loading...</p></div>
+      </div>
       </div>
     </div>
   </div>
@@ -72,13 +218,13 @@
           <th class="sticky-table table-dark" scope="col"></th>
         </tr>
       </thead>
-      <tbody id="historyTable">
+      <tbody id="historyTable" data-jplist-group="history">
         <% for(let i = 0; i < history.length; i++){ %>
-        <tr>
-          <td scope="row">
+        <tr data-jplist-item>
+          <td class="index" scope="row">
             <%= history[i].printHistory.historyIndex %>
           </td>
-          <td>
+          <td class="state">
             <% if(history[i].printHistory.success){%>
             <p class="d-none">Success</p><i class="fas fa-thumbs-up text-success"></i>
             <% }else{ %> <% if(history[i].printHistory.reason === "cancelled"){ %>
@@ -87,31 +233,31 @@
                 <p class="d-none">Failure</p><i class="fas fa-exclamation text-danger"></i>
             <% } %> <% } %>
           </td>
-          <td><%=
+          <td class="printer"><%=
             history[i].printHistory.printerName %>
           </td>
-          <td class="text-wrap">
+          <td class="file" class="text-wrap">
             <%= history[i].printHistory.fileName.replace(/_/g," ") %>
           </td>
-          <td>
+          <td class="start">
             <%= history[i].printHistory.startDate %>
           </td>
-          <td>
+          <td class="end">
             <%= history[i].printHistory.endDate %>
           </td>
-          <td>
+          <td class="time">
             <%= helpers.generateTime(history[i].printHistory.printTime) %>
           </td>
-          <td id="cost-<%= history[i]._id %>">
+          <td class="cost" id="cost-<%= history[i]._id %>">
             Loading...
           </td>
-          <td id="spool-<%= history[i]._id %>">
+          <td class="spool" id="spool-<%= history[i]._id %>">
             Loading...
           </td>
-          <td id="usage-<%= history[i]._id %>">
+          <td class="usage" id="usage-<%= history[i]._id %>">
             Loading...
           </td>
-          <td class="text-wrap" id="note-<%= history[i]._id %>">
+          <td class="notes" class="text-wrap" id="note-<%= history[i]._id %>">
             <%= history[i].printHistory.notes %>
           </td>
           <td>

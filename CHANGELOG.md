@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
     - When saving settings it now asks if you'd like to restart OctoFarm. Confirm will restart the service. 
     - Client settings to show extra information on views. List, Panel and Camera View
     - File manager shows weight when length is calculated. Defaults to 1.24 density with 1.75mm filament.
+    - History button to set default sort function button and pagination. Remembers previously set values on client. 
         
 ### Changed
     - Group dropdown only appears if groups exist.
@@ -42,6 +43,7 @@ All notable changes to this project will be documented in this file.
     - Old filament manager and database structure. 
     - Removed serverConfig file, now stored in the database and edited through the UI. 
     - Removed file statistic from dashboard
+    - Remove old sort function from History
 
 ### Fixed
     - Fixed Panel view file name been stuck in loading...

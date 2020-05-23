@@ -2,6 +2,8 @@ import OctoFarmClient from "../octofarm.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import {returnHistory, returnHistoryUsage, returnDropDown} from "./filamentGrab.js";
+import tableSort from "../functions/tablesort.js";
+window.onload = function () {tableSort.makeAllSortable();};
 
 //Setup history listeners
 document.getElementById("historyTable").addEventListener("click", e => {
@@ -90,9 +92,13 @@ export default class History {
       }
 
     }
-
-    document.getElementById("loading").style.display = "none"
+    jplist.init({
+      storage: 'localStorage', //'localStorage', 'sessionStorage' or 'cookies'
+      storageName: 'history-sorting' //the same storage name can be used to share storage between multiple pages
+    });
+    document.getElementById("loading").style.display = "none";
     document.getElementById("wrapper").classList.remove("d-none");
+    document.getElementById("historyToolbar").classList.remove("d-none");
   }
 
   static async edit(e) {
