@@ -332,7 +332,6 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
                 await HistoryCollection.failed(data.event.payload, sendPrinter, job);
                 await Runner.updateFilament();
             }, 10000);
-
         }
         if (data.event.type === "PrintDone") {
             let that = this;
