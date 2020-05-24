@@ -603,6 +603,13 @@ class Runner {
         if(typeof farmPrinters[i].currentUptime === "undefined"){
             farmPrinters[i].currentUptime = 0;
         }
+
+        if(typeof farmPrinters[i].alerts === "undefined"){
+            farmPrinters[i].alerts = null;
+        }
+        if(typeof farmPrinters[i].powerSettings === "undefined"){
+            farmPrinters[i].powerSettings = null;
+        }
         if(typeof farmPrinters[i].currentIdle === "undefined"){
             farmPrinters[i].currentIdle = 0;
         }
@@ -661,6 +668,8 @@ class Runner {
         printer.dateAdded = farmPrinters[i].dateAdded;
         printer.currentUptime = farmPrinters[i].currentUptime;
         printer.selectedFilament = farmPrinters[i].selectedFilament;
+        printer.powerSettings = farmPrinters[i].powerSettings;
+        printer.alerts = farmPrinters[i].alerts;
         await printer.save();
         return true;
     }

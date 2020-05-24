@@ -76,6 +76,10 @@ const PrinterSchema = new mongoose.Schema({
   tempTriggers: {
     type: Object,
     required: false
+  },
+  powerSettings: {
+    type: Object,
+    required: false
   }
 });
 

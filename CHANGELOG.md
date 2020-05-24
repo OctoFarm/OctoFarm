@@ -40,6 +40,7 @@ All notable changes to this project will be documented in this file.
     - Job information is now captured within history for cancelled prints. May use in UI at a later date. 
     - If filament exists in library then ask if you'd like to select before print. 
     - History now captures information and waits 10 seconds before triggering the collection. This is for filament manager sync to collect the latest values before proceding. 
+    - Power Settings and Alerts are now saved in database
     
 ### Removed
     - Old filament manager and database structure. 
