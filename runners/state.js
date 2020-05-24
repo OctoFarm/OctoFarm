@@ -1228,7 +1228,6 @@ class Runner {
         return selectedFilament;
     }
     static async updateFilament(){
-        console.log("UPDATING")
         for(let i = 0; i < farmPrinters.length; i++){
             if(farmPrinters[i].selectedFilament != null){
                 let newInfo = await Filament.findById(farmPrinters[i].selectedFilament._id)

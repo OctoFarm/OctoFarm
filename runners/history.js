@@ -117,9 +117,9 @@ class HistoryCollection {
 
   }
   static async failed(payload, printer, job) {
-    try{
+    try {
       let serverSettings = await ServerSettings.find({});
-      if(serverSettings[0].filamentManager){
+      if (serverSettings[0].filamentManager) {
         printer.filamentSelection = await HistoryCollection.resyncFilament(printer);
         logger.info("Grabbed latest filament values", printer.filamentSelection);
       }
@@ -153,23 +153,23 @@ class HistoryCollection {
       let profiles = await filamentProfiles.find({});
 
       let selectedFilament = null;
-      if(printer.selectedFilament !== null){
+      if (printer.selectedFilament !== null) {
         let profileId = null;
-        if(serverSettings[0].filamentManager){
+        if (serverSettings[0].filamentManager) {
           profileId = _.findIndex(profiles, function (o) {
             return o.profile.index == printer.selectedFilament.spools.profile;
           });
-        }else{
+        } else {
           profileId = _.findIndex(profiles, function (o) {
             return o._id == printer.selectedFilament.spools.profile;
           });
         }
         printer.selectedFilament.spools.profile = profiles[profileId].profile;
       }
-      if(historyCollection.length === 0){
+      if (historyCollection.length === 0) {
         counter = 0
-      }else{
-        counter = historyCollection[historyCollection.length-1].printHistory.historyIndex + 1
+      } else {
+        counter = historyCollection[historyCollection.length - 1].printHistory.historyIndex + 1
       }
 
       let printHistory = {
@@ -193,10 +193,91 @@ class HistoryCollection {
       saveHistory.save();
 
       logger.info("Failed Print captured ", payload + printer.printerURL);
-    }catch(e){
+    } catch (e) {
       logger.error(e, "Failed to capture history for " + printer.printerURL);
     }
+  }
+    static async errorLog(payload, printer, job) {
+    console.log(payload)
+      try{
+        let serverSettings = await ServerSettings.find({});
+        if(serverSettings[0].filamentManager){
+          printer.filamentSelection = await HistoryCollection.resyncFilament(printer);
+          logger.info("Grabbed latest filament values", printer.filamentSelection);
+        }
+        let name = null;
+        if (typeof printer.settingsApperance != "undefined") {
+          if (printer.settingsApperance.name === "" || printer.settingsApperance.name === null) {
+            name = printer.printerURL;
+          } else {
+            name = printer.settingsApperance.name;
+          }
+        } else {
+          name = printer.printerURL;
+        }
+        logger.info("Error Log Collection Triggered", payload + printer.printerURL);
+        let today = new Date();
+        let historyCollection = await History.find({});
 
+        let printTime = new Date(payload.time * 1000);
+        let startDate = today.getTime() - printTime.getTime();
+        startDate = new Date(startDate);
+
+        let startDDMM = startDate.toDateString();
+        let startTime = startDate.toTimeString();
+        let startTimeFormat = startTime.substring(0, 8);
+        startDate = startDDMM + " - " + startTimeFormat;
+
+        let endDDMM = today.toDateString();
+        let endTime = today.toTimeString();
+        let endTimeFormat = endTime.substring(0, 8);
+        let endDate = endDDMM + " - " + endTimeFormat;
+        let profiles = await filamentProfiles.find({});
+
+        let selectedFilament = null;
+        if(printer.selectedFilament !== null){
+          let profileId = null;
+          if(serverSettings[0].filamentManager){
+            profileId = _.findIndex(profiles, function (o) {
+              return o.profile.index == printer.selectedFilament.spools.profile;
+            });
+          }else{
+            profileId = _.findIndex(profiles, function (o) {
+              return o._id == printer.selectedFilament.spools.profile;
+            });
+          }
+          printer.selectedFilament.spools.profile = profiles[profileId].profile;
+        }
+        if(historyCollection.length === 0){
+          counter = 0
+        }else{
+          counter = historyCollection[historyCollection.length-1].printHistory.historyIndex + 1
+        }
+
+        let printHistory = {
+          historyIndex: counter,
+          printerIndex: printer.index,
+          printerName: name,
+          success: false,
+          reason: payload.reason,
+          fileName: payload.name,
+          filePath: payload.path,
+          startDate: startDate,
+          endDate: endDate,
+          printTime: Math.round(payload.time),
+          filamentSelection: printer.selectedFilament,
+          job: job,
+          notes: ""
+        };
+        let saveHistory = new History({
+          printHistory
+        });
+        //saveHistory.save();
+
+        logger.info("Failed Print captured ", payload + printer.printerURL);
+      }catch(e){
+        logger.error(e, "Failed to capture history for " + printer.printerURL);
+      }
   }
   static history() {
     let printHistory = {
