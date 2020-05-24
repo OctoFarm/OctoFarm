@@ -6,8 +6,6 @@ const logger = new Logger('OctoFarm-HistoryCollection')
 const filamentProfiles = require("../models/Profiles.js")
 const ServerSettings = require("../models/ServerSettings.js")
 const Spool = require("../models/Filament.js")
-const Runner = require("./state.js")
-
 let counter = 0;
 
 class HistoryCollection {
@@ -20,7 +18,6 @@ class HistoryCollection {
       }
     });
     let spool = await Spool.findById(printer.selectedFilament._id)
-    Runner.updateFilament();
     let sp = await spools.json();
     spool.spools = {
       name: sp.spool.name,
@@ -36,11 +33,11 @@ class HistoryCollection {
     return spool
   }
   static async complete(payload, printer, job) {
-
     try{
       let serverSettings = await ServerSettings.find({});
       if(serverSettings[0].filamentManager){
         printer.filamentSelection = await HistoryCollection.resyncFilament(printer);
+        logger.info("Grabbed latest filament values", printer.filamentSelection);
       }
       logger.info("Completed Print triggered", payload + printer.printerURL);
       let today = new Date();
@@ -124,6 +121,7 @@ class HistoryCollection {
       let serverSettings = await ServerSettings.find({});
       if(serverSettings[0].filamentManager){
         printer.filamentSelection = await HistoryCollection.resyncFilament(printer);
+        logger.info("Grabbed latest filament values", printer.filamentSelection);
       }
       let name = null;
       if (typeof printer.settingsApperance != "undefined") {
