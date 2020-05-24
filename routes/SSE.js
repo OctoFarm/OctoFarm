@@ -93,6 +93,8 @@ setInterval(async function() {
       settingsServer: printers[i].settingsServer,
       currentUptime: printers[i].currentUptime,
       dateAdded: printers[i].dateAdded,
+      powerSettings: printers[i].powerSettings,
+      alerts: printers[i].alerts,
     };
     printerInfo.push(printer);
   }
