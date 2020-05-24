@@ -257,7 +257,7 @@ export default class PrinterSettings {
         document.getElementById("psPrinterProfiles").innerHTML = `
             <div class="col-12 col-lg-4">
             <h6 class="mb-1"><u>Printer</u></h6>
-            <p class="mb-0"><b>Printer Name: </b><span id="printerName" contenteditable="false">${PrinterSettings.grabName(printer)}<span></p>
+            <p class="mb-0"><b>Printer Name: </b><span id="printerName" contenteditable="false">${PrinterSettings.grabName(printer)}</span></p>
             <p class="mb-0"><b>Printer Model: </b><span id="printerModel" contenteditable="false">${pProfile.model}</span></p>
             <h6 class="mb-1"><u>Axis</u></h6>
             <p class="mb-0"><b>E: </b><span id="printerEAxis" contenteditable="false">${pProfile.axes.e.speed}</span>mm/min<br><form class="was-validated">
@@ -561,14 +561,14 @@ export default class PrinterSettings {
         </form>
         `;
         if(printer.powerSettings != null){
-          document.getElementById("powerOnCommand").value = printer.powerSettings.powerOn.command;
-          document.getElementById("powerOnURL").value = printer.powerSettings.powerOn.url;
-          document.getElementById("powerOffCommand").value = printer.powerSettings.powerOff.command;
-          document.getElementById("powerOffURL").value = printer.powerSettings.powerOff.url;
-          document.getElementById("powerToggleCommand").value = printer.powerSettings.powerToggle.command;
-          document.getElementById("powerToggleURL").value = printer.powerSettings.powerToggle.url;
-          document.getElementById("powerStateCommand").value = printer.powerSettings.powerState.command;
-          document.getElementById("powerStateURL").value = printer.powerSettings.powerState.url;
+          document.getElementById("powerOnCommand").value = printer.powerSettings.powerOnCommand;
+          document.getElementById("powerOnURL").value = printer.powerSettings.powerOnURL;
+          document.getElementById("powerOffCommand").value = printer.powerSettings.powerOffCommand;
+          document.getElementById("powerOffURL").value = printer.powerSettings.powerOffURL;
+          document.getElementById("powerToggleCommand").value = printer.powerSettings.powerToggleCommand;
+          document.getElementById("powerToggleURL").value = printer.powerSettings.powerToggleURL;
+          document.getElementById("powerStateCommand").value = printer.powerSettings.powerStatusCommand;
+          document.getElementById("powerStateURL").value = printer.powerSettings.powerStatusURL;
         }
         document.getElementById("tempTriggers").innerHTML = `
            <div class="form-group">
@@ -597,33 +597,54 @@ export default class PrinterSettings {
               preferredBaud: document.getElementById("psDefaultBaudrate").value,
               preferredProfile: document.getElementById("psDefaultProfile").value,
             },
+            profileID: selectedProfile,
             profile: {
-              printerName: document.getElementById("printerName").innerHTML,
-              printerModel: document.getElementById("printerModel").innerHTML,
-              axisX: document.getElementById("printerXAxis").innerHTML,
-              axisXInverted: document.getElementById("xInverted").checked,
-              axisY: document.getElementById("printerYAxis").innerHTML,
-              axisYInverted: document.getElementById("yInverted").checked,
-              axisZ: document.getElementById("printerZAxis").innerHTML,
-              axisZInverted: document.getElementById("zInverted").checked,
-              axisE: document.getElementById("printerEAxis").innerHTML,
-              axisEInverted: document.getElementById("eInverted").checked,
-              extruderCount: document.getElementById("extruderCount").innerHTML,
-              nozzleSize: document.getElementById("nozzleDiameter").innerHTML,
-              nozzleOffsetsX: document.getElementById("extruderOffsetsX").innerHTML,
-              nozzleOffsetsY: document.getElementById("extruderOffsetsY").innerHTML,
-              sharedNozzle: document.getElementById("sharedNozzle").checked,
-              formFactor: document.getElementById("extruderFormFactor").innerHTML,
-              volumeDepth: document.getElementById("volumeDepth").innerHTML,
-              volumeHeight: document.getElementById("volumeHeight").innerHTML,
-              volumeWidth: document.getElementById("volumeWidth").innerHTML,
-              headtedBed: document.getElementById("heatedBed").checked,
-              heatedChamber: document.getElementById("heatedChamber").checked
+              "name": document.getElementById("printerName").innerHTML,
+              "color": "default",
+              "model": document.getElementById("printerModel").innerHTML,
+              "default": true,
+              "current": true,
+              "volume": {
+                "formFactor": document.getElementById("extruderFormFactor").innerHTML,
+                "width": document.getElementById("volumeWidth").innerHTML,
+                "depth": document.getElementById("volumeDepth").innerHTML,
+                "height": document.getElementById("volumeHeight").innerHTML
+              },
+              "heatedBed": document.getElementById("heatedBed").checked,
+              "heatedChamber": document.getElementById("heatedChamber").checked,
+              "axes": {
+                "x": {
+                  "speed": document.getElementById("printerXAxis").innerHTML,
+                  "inverted": document.getElementById("xInverted").checked
+                },
+                "y": {
+                  "speed": document.getElementById("printerYAxis").innerHTML,
+                  "inverted": document.getElementById("yInverted").checked
+                },
+                "z": {
+                  "speed": document.getElementById("printerZAxis").innerHTML,
+                  "inverted": document.getElementById("zInverted").checked
+                },
+                "e": {
+                  "speed": document.getElementById("printerEAxis").innerHTML,
+                  "inverted": document.getElementById("eInverted").checked
+                }
+              },
+              "extruder": {
+                "count": document.getElementById("extruderCount").innerHTML,
+                "nozzleDiameter": document.getElementById("nozzleDiameter").innerHTML,
+                "offsets": [
+                  {"x": document.getElementById("extruderOffsetsX").innerHTML, "y": document.getElementById("extruderOffsetsY").innerHTML},
+                ],
+                "sharedNozzle": document.getElementById("sharedNozzle").checked,
+              }
             },
-            powerCommands:{
+            systemCommands: {
               serverRestart: document.getElementById("serverRestart").value,
               systemRestart: document.getElementById("systemRestart").value,
               systemShutdown: document.getElementById("systemShutdown").value,
+            },
+            powerCommands:{
               powerOnCommand: document.getElementById("powerOnCommand").value,
               powerOnURL: document.getElementById("powerOnURL").value,
               powerOffCommand: document.getElementById("powerOffCommand").value,

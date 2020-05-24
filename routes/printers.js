@@ -86,13 +86,11 @@ router.post("/feedChange", ensureAuthenticated, async (req, res) => {
 });
 router.post("/updateSettings", ensureAuthenticated, async (req, res) => {
   //Check required fields
+
   const settings = req.body;
-  Runner.updateSettings(settings.index, settings.options);
-  let printer = await Printers.findOne({ index: settings.index });
-  if (typeof settings.options.camURL != "undefined")
-    printer.camURL = settings.options.camURL;
-  await printer.save();
-  res.send("success");
+  logger.info("Update printers request: ", settings);
+  let updateSettings = await Runner.updateSettings(settings);
+  res.send({status: updateSettings.status, printer:updateSettings.printer});
 });
 router.get("/groups", ensureAuthenticated, async (req, res) => {
     let printers = await Runner.returnFarmPrinters();

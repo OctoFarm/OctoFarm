@@ -1015,6 +1015,7 @@ class Runner {
                 farmPrinters[index].settingsServer = res.server;
                 farmPrinters[index].settingsSystem = res.system;
                 farmPrinters[index].settingsWebcam = res.webcam;
+
                 if (
                     farmPrinters[index].camURL === "" ||
                     farmPrinters[index].camURL === null && farmPrinters[index].camURL !== "none"
@@ -1153,17 +1154,89 @@ class Runner {
         let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
         farmPrinters[i].stepRate = newRate;
     }
-    static async updateSettings(id, opts) {
-            let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
-            farmPrinters[i].settingsScripts.gcode = opts.scripts.gcode;
-            farmPrinters[i].settingsApperance.name = opts.appearance.name;
-            farmPrinters[i].settingsWebcam = opts.webcam;
-            farmPrinters[i].camURL = opts.camURL;
-            let printer = await Printers.findOne({ index: i });
-            printer.settingsWebcam = farmPrinters[i].settingsWebcam;
-            printer.camURL = farmPrinters[i].camURL;
-            printer.settingsApperance.name = farmPrinters[i].settingsApperance.name;
-            printer.save();
+    static async updateSettings(settings) {
+        let printer = await Printers.findById(settings.printer.index);
+        let index = _.findIndex(farmPrinters, function(o) { return o._id == settings.printer.index; });
+
+        //Preferred Only update on live
+        farmPrinters[index].options.baudratePreference = settings.connection.preferredBaud;
+        farmPrinters[index].options.portPreference = settings.connection.preferredPort;
+        farmPrinters[index].options.printerProfilePreference = settings.connection.preferredProfile;
+
+        //Gocde update printer and Live
+        farmPrinters[index].settingsScripts.gcode = settings.gcode;
+
+        if(settings.other.coolDown != ""){
+            farmPrinters[index].tempTriggers.coolDown = parseInt(settings.other.coolDown);
+            printer.tempTriggers.coolDown = parseInt(settings.other.coolDown);
+            printer.markModified("tempTriggers");
+        }
+        if(settings.other.heatingVariation != ""){
+            farmPrinters[index].tempTriggers.heatingVariation = parseInt(settings.other.heatingVariation);
+            printer.tempTriggers.heatingVariation = parseInt(settings.other.heatingVariation);
+            printer.markModified("tempTriggers");
+        }
+        farmPrinters[index].settingsApperance.name = settings.profile.name;
+        printer.settingsApperance.name = settings.profile.name;
+        printer.markModified("settingsApperance")
+        farmPrinters[index].powerSettings = settings.powerCommands;
+        printer.powerSettings = settings.powerCommands;
+        printer.markModified("powerSettings")
+
+        printer.save();
+
+        let opts = {
+            scripts: {
+                gcode: settings.gcode
+            },
+            server: {
+                commands: {
+                    systemShutdownCommand: settings.systemCommands.systemShutdown,
+                    systemRestartCommand: settings.systemCommands.systemRestart,
+                    serverRestartCommand: settings.systemCommands.serverRestart,
+                }
+            },
+            webcam: {
+                webcamEnabled: settings.other.enableCamera,
+                timelapseEnabled: settings.other.enableTimeLapse,
+                rotate90: settings.other.rotateCamera,
+                flipH: settings.other.flipHCamera,
+                flipV: settings.other.flipVCamera
+            }
+        }
+
+        let profile = await fetch(farmPrinters[index].printerURL + "/api/printerprofiles/" + settings.profileID, {
+            method: "PATCH",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Api-Key": farmPrinters[index].apikey
+            },
+            body: JSON.stringify({profile: settings.profile})
+        });
+
+        //Update octoprint profile...
+        let sett = await fetch(farmPrinters[index].printerURL + "/api/settings", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Api-Key": farmPrinters[index].apikey
+            },
+            body: JSON.stringify(opts)
+        });
+            // let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
+            //
+            // console.log()
+            //
+            // farmPrinters[i].settingsScripts.gcode = opts.scripts.gcode;
+            // farmPrinters[i].settingsApperance.name = opts.appearance.name;
+            // farmPrinters[i].settingsWebcam = opts.webcam;
+            // farmPrinters[i].camURL = opts.camURL;
+            // let printer = await Printers.findOne({ index: i });
+            // printer.settingsWebcam = farmPrinters[i].settingsWebcam;
+            // printer.camURL = farmPrinters[i].camURL;
+            // printer.settingsApperance.name = farmPrinters[i].settingsApperance.name;
+            // printer.save();
+        return {status: {profile: profile.status, settings:sett.status}, printer: printer}
         }
     static moveFile(id, newPath, fullPath, filename) {
         let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
