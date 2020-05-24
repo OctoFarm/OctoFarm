@@ -500,14 +500,14 @@ export default class PrinterSettings {
           <h6>Power On</h6>
            <div class="form-row">
               <div class="col-4">
-                <input type="text" class="form-control" placeholder="Command">
-                 <small id="powerOnCommand" class="form-text text-muted">
+                <input id="powerOnCommand"  type="text" class="form-control" placeholder="Command">
+                 <small class="form-text text-muted">
                   This is usually an json object supplied in the following format <code>{"command":"turnOn"}</code>
                  </small>
               </div>
               <div class="col-8">
-                <input type="text" class="form-control" placeholder="URL">
-                 <small id="powerOnURL" class="form-text text-muted">
+                <input id="powerOnURL"  type="text" class="form-control" placeholder="URL">
+                 <small class="form-text text-muted">
                   The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
                  </small>
               </div>
@@ -515,14 +515,14 @@ export default class PrinterSettings {
            <h6>Power Off</h6>
             <div class="form-row">
               <div class="col-4">
-                <input type="text" class="form-control" placeholder="Command">
-                 <small id="powerOffCommand" class="form-text text-muted">
+                <input id="powerOffCommand" type="text" class="form-control" placeholder="Command">
+                 <small class="form-text text-muted">
                    This is usually an json object supplied in the following format <code>{"command":"turnOff"}</code>
                  </small>
               </div>
               <div class="col-8">
-                <input type="text" class="form-control" placeholder="URL">
-                 <small id="powerOffURL" class="form-text text-muted">
+                <input  id="powerOffURL" type="text" class="form-control" placeholder="URL">
+                 <small class="form-text text-muted">
                    The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
                  </small>
               </div>
@@ -530,14 +530,14 @@ export default class PrinterSettings {
             <h6>Power Toggle</h6>
             <div class="form-row">
               <div class="col-4">
-                <input type="text" class="form-control" placeholder="Command">
-                 <small id="powerToggleCommand" class="form-text text-muted">
+                <input id="powerToggleCommand"  type="text" class="form-control" placeholder="Command">
+                 <small vclass="form-text text-muted">
                    This is usually an json object supplied in the following format <code>{"command":"toggle"}</code>
                  </small>
               </div>
               <div class="col-8">
-                <input type="text" class="form-control" placeholder="URL">
-                 <small id="powerToggleURL" class="form-text text-muted">
+                <input id="powerToggleURL" type="text" class="form-control" placeholder="URL">
+                 <small class="form-text text-muted">
                     The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
                  </small>
               </div>
@@ -546,102 +546,117 @@ export default class PrinterSettings {
             <p class="mb-0">This must return a boolean value to work properly. When you enter this in your printer will show it's power state on the power button icon.</p>
             <div class="form-row">
               <div class="col-4">
-                <input type="text" class="form-control" placeholder="Command">
-                 <small id="powerStateCommand" class="form-text text-muted">
+                <input id="powerStateCommand" type="text" class="form-control" placeholder="Command">
+                 <small class="form-text text-muted">
                    This is usually an json object supplied in the following format <code>{"command":"state"}</code>
                  </small>
               </div>
               <div class="col-8">
-                <input type="text" class="form-control" placeholder="URL">
-                 <small id="powerStateURL" class="form-text text-muted">
+                <input id="powerStateURL" type="text" class="form-control" placeholder="URL">
+                 <small class="form-text text-muted">
                     The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
                  </small>
               </div>
             </div>
         </form>
         `;
-        console.log(printer)
+        if(printer.powerSettings != null){
+          document.getElementById("powerOnCommand").value = printer.powerSettings.powerOn.command;
+          document.getElementById("powerOnURL").value = printer.powerSettings.powerOn.url;
+          document.getElementById("powerOffCommand").value = printer.powerSettings.powerOff.command;
+          document.getElementById("powerOffURL").value = printer.powerSettings.powerOff.url;
+          document.getElementById("powerToggleCommand").value = printer.powerSettings.powerToggle.command;
+          document.getElementById("powerToggleURL").value = printer.powerSettings.powerToggle.url;
+          document.getElementById("powerStateCommand").value = printer.powerSettings.powerState.command;
+          document.getElementById("powerStateURL").value = printer.powerSettings.powerState.url;
+        }
         document.getElementById("tempTriggers").innerHTML = `
            <div class="form-group">
               <label for="headtingVariation">Heating Variation</label>
-              <input type="text" class="form-control" id="headtingVariation" placeholder="${printer.tempTriggers.heatingVariation}">
+              <input type="number" class="form-control" id="headtingVariation" placeholder="${printer.tempTriggers.heatingVariation}">
               <small id="passwordHelpBlock" class="form-text text-muted">
                   What temperature variation will trigger orange warning on the temperature display when a printer is Active. <code>Default is 1°C</code>
               </small>
             </div>
             <div class="form-group">
               <label for="coolDown">Cool Down Trigger</label>
-              <input type="text" class="form-control" id="coolDown" placeholder="${printer.tempTriggers.coolDown}">
+              <input type="number" class="form-control" id="coolDown" placeholder="${printer.tempTriggers.coolDown}">
               <small id="passwordHelpBlock" class="form-text text-muted">
                   What temperature limit will trigger the blue status on the temperature display when a printer is Complete and cooling down. <code>Default is 30°C</code>
               </small>
             </div>
         `
-        document.getElementById("savePrinterSettings").addEventListener('click', event => {
-          console.log(printer);
+        document.getElementById("savePrinterSettings").addEventListener('click', async event => {
           let newValues = {
+            printer: {
+              printerURL: printer.printerURL,
+              index: printer._id,
+            },
             connection: {
-              preferredPort: document.getElementById("psDefaultSerialPort"),
-              preferredBaud: document.getElementById("psDefaultBaudDrop"),
-              preferredProfile: document.getElementById("psDefaultProfileDrop"),
+              preferredPort: document.getElementById("psDefaultSerialPort").value,
+              preferredBaud: document.getElementById("psDefaultBaudrate").value,
+              preferredProfile: document.getElementById("psDefaultProfile").value,
             },
             profile: {
-              printerName: document.getElementById("printerName"),
-              printerModel: document.getElementById("printerModel"),
-              axisX: document.getElementById("printerXAxis"),
-              axisXInverted: document.getElementById("xInverted"),
-              axisY: document.getElementById("printerYAxis"),
-              axisYInverted: document.getElementById("yInverted"),
-              axisZ: document.getElementById("printerZAxis"),
-              axisZInverted: document.getElementById("zInverted"),
-              axisE: document.getElementById("printerEAxis"),
-              axisEInverted: document.getElementById("eInverted"),
-              extruderCount: document.getElementById("extruderCount"),
-              nozzleSize: document.getElementById("nozzleSize"),
-              nozzleOffsets: document.getElementById("nozzleOffsets"),
-              sharedNozzle: document.getElementById("sharedNozzle"),
-              formFactor: document.getElementById("formFactor"),
-              volumeDepth: document.getElementById("volumeDepth"),
-              volumeHeight: document.getElementById("volumeHeight"),
-              volumeWidth: document.getElementById("volumeWidth"),
-              headtedBed: document.getElementById("heatedBed"),
-              heatedChamber: document.getElementById("heatedChamber")
+              printerName: document.getElementById("printerName").innerHTML,
+              printerModel: document.getElementById("printerModel").innerHTML,
+              axisX: document.getElementById("printerXAxis").innerHTML,
+              axisXInverted: document.getElementById("xInverted").checked,
+              axisY: document.getElementById("printerYAxis").innerHTML,
+              axisYInverted: document.getElementById("yInverted").checked,
+              axisZ: document.getElementById("printerZAxis").innerHTML,
+              axisZInverted: document.getElementById("zInverted").checked,
+              axisE: document.getElementById("printerEAxis").innerHTML,
+              axisEInverted: document.getElementById("eInverted").checked,
+              extruderCount: document.getElementById("extruderCount").innerHTML,
+              nozzleSize: document.getElementById("nozzleDiameter").innerHTML,
+              nozzleOffsetsX: document.getElementById("extruderOffsetsX").innerHTML,
+              nozzleOffsetsY: document.getElementById("extruderOffsetsY").innerHTML,
+              sharedNozzle: document.getElementById("sharedNozzle").checked,
+              formFactor: document.getElementById("extruderFormFactor").innerHTML,
+              volumeDepth: document.getElementById("volumeDepth").innerHTML,
+              volumeHeight: document.getElementById("volumeHeight").innerHTML,
+              volumeWidth: document.getElementById("volumeWidth").innerHTML,
+              headtedBed: document.getElementById("heatedBed").checked,
+              heatedChamber: document.getElementById("heatedChamber").checked
             },
             powerCommands:{
-              serverRestart: document.getElementById(""),
-              systemRestart: document.getElementById(""),
-              systemShutdown: document.getElementById(""),
-              powerOnCommand: document.getElementById(""),
-              powerOnURL: document.getElementById(""),
-              powerOffCommand: document.getElementById(""),
-              powerOffURL: document.getElementById(""),
-              powerToggleCommand: document.getElementById(""),
-              powerToggleURL: document.getElementById(""),
-              powerStatusCommand: document.getElementById(""),
-              powerStatusURL: document.getElementById(""),
+              serverRestart: document.getElementById("serverRestart").value,
+              systemRestart: document.getElementById("systemRestart").value,
+              systemShutdown: document.getElementById("systemShutdown").value,
+              powerOnCommand: document.getElementById("powerOnCommand").value,
+              powerOnURL: document.getElementById("powerOnURL").value,
+              powerOffCommand: document.getElementById("powerOffCommand").value,
+              powerOffURL: document.getElementById("powerOffURL").value,
+              powerToggleCommand: document.getElementById("powerToggleCommand").value,
+              powerToggleURL: document.getElementById("powerToggleURL").value,
+              powerStatusCommand: document.getElementById("powerStateCommand").value,
+              powerStatusURL: document.getElementById("powerStateURL").value,
             },
             gcode:{
-              afterPrintingCancells: document.getElementById(""),
-              afterPrintingDone: document.getElementById(""),
-              afterPrintingPaused: document.getElementById(""),
-              afterPrinterConnected: document.getElementById(""),
-              afterToolChange: document.getElementById(""),
-              beforePrintingResumed: document.getElementById(""),
-              beforePrintingStarted: document.getElementById(""),
-              beforePrintingDisconnected: document.getElementById(""),
-              beforeToolChange: document.getElementById(""),
+              afterPrintingCancels: document.getElementById("settingsAfterPrinterCancelled").value,
+              afterPrintingDone: document.getElementById("settingsAfterPrinterDone").value,
+              afterPrintingPaused: document.getElementById("settingsAfterPrinterPaused").value,
+              afterPrinterConnected: document.getElementById("settingsAfterPrinterConnected").value,
+              afterToolChange: document.getElementById("settingsAfterToolChange").value,
+              beforePrintingResumed: document.getElementById("settingsBeforePrinterResumed").value,
+              beforePrintingStarted: document.getElementById("settingsBeforePrinterStarted").value,
+              beforePrintingDisconnected: document.getElementById("settingsBeforePrinterDisconnected").value,
+              beforeToolChange: document.getElementById("settingsBeforeToolChange").value,
             },
             other: {
-              enableCamera: document.getElementById(""),
-              rotateCamera: document.getElementById(""),
-              flipHCamera: document.getElementById(""),
-              flipVCamera: document.getElementById(""),
-              enableTimeLapse: document.getElementById(""),
-              heatingVariation: document.getElementById(""),
-              coolDown: document.getElementById(""),
+              enableCamera: document.getElementById("camEnabled").checked,
+              rotateCamera: document.getElementById("camRot90").checked,
+              flipHCamera: document.getElementById("camFlipH").checked,
+              flipVCamera: document.getElementById("camFlipV").checked,
+              enableTimeLapse: document.getElementById("camTimelapse").checked,
+              heatingVariation: document.getElementById("headtingVariation").value,
+              coolDown: document.getElementById("coolDown").value,
             }
           }
-
+          console.log(newValues)
+          let update = await OctoFarmClient.post("printers/updateSettings", newValues);
+          console.log(update)
         });
 
 
