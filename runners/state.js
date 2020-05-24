@@ -321,25 +321,44 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
     }
     if (typeof data.event != "undefined") {
         if (data.event.type === "PrintFailed") {
-            logger.info(data.event.type + this.index + ": " + this.url);
-            let sendPrinter = {};
-            sendPrinter = JSON.parse(JSON.stringify(farmPrinters[this.index]));
-            let job = {}
-            job = JSON.parse(JSON.stringify(farmPrinters[this.index].job));
-            //Register cancelled print...
-            await HistoryCollection.failed(data.event.payload, sendPrinter, job);
+            let that = this;
+            setTimeout(async function(){
+                logger.info(data.event.type + that.index + ": " + that.url);
+                let sendPrinter = {};
+                sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
+                let job = {}
+                job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
+                //Register cancelled print...
+                await HistoryCollection.failed(data.event.payload, sendPrinter, job);
+                await Runner.updateFilament();
+            }, 10000);
+
         }
         if (data.event.type === "PrintDone") {
-            logger.info(data.event.type + this.index + ": " + this.url);
-            let sendPrinter = {};
-            sendPrinter = JSON.parse(JSON.stringify(farmPrinters[this.index]));
-            let job = {}
-            job = JSON.parse(JSON.stringify(farmPrinters[this.index].job));
-            //Register cancelled print...
-            await HistoryCollection.complete(data.event.payload, sendPrinter, job);
+            let that = this;
+            setTimeout(async function(){
+                logger.info(data.event.type + that.index + ": " + that.url);
+                let sendPrinter = {};
+                sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
+                let job = {}
+                job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
+                //Register cancelled print...
+                await HistoryCollection.complete(data.event.payload, sendPrinter, job);
+                await Runner.updateFilament();
+            }, 10000);
         }
         if(data.event.type === "Error"){
-            console.log(data.event.payload)
+            let that = this;
+            setTimeout(async function(){
+                logger.info(data.event.type + that.index + ": " + that.url);
+                let sendPrinter = {};
+                sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
+                let job = {}
+                job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
+                //Register cancelled print...
+                await HistoryCollection.errorLog(data.event.payload, sendPrinter, job);
+                await Runner.updateFilament();
+            }, 10000);
         }
     }
 };
@@ -1209,6 +1228,7 @@ class Runner {
         return selectedFilament;
     }
     static async updateFilament(){
+        console.log("UPDATING")
         for(let i = 0; i < farmPrinters.length; i++){
             if(farmPrinters[i].selectedFilament != null){
                 let newInfo = await Filament.findById(farmPrinters[i].selectedFilament._id)
