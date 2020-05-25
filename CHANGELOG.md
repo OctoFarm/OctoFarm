@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
     - File manager shows weight when length is calculated. Defaults to 1.24 density with 1.75mm filament.
     - History button to set default sort function button and pagination. Remembers previously set values on client. 
     - File Manager now has sort capabilities. File Name, Print Time, Upload Date.
+    - New Printer settings modal. Connection Defaults, Profile Changes, Power Button actions, Gcode Script and Other Settings (Camera / Heating Triggers)
         
 ### Changed
     - Group dropdown only appears if groups exist.

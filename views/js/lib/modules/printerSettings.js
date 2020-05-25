@@ -254,6 +254,8 @@ export default class PrinterSettings {
         }
 
         document.getElementById("psPrinterProfiles").innerHTML = `
+            <div class="col-12">
+                <button id="editProfileBtn" type="button" class="btn btn-warning">Edit</button></div>
             <div class="col-12 col-lg-4">
             <h6 class="mb-1"><u>Printer</u></h6>
             <p class="mb-0"><b>Printer Name: </b><span id="printerName" contenteditable="false">${PrinterSettings.grabName(printer)}</span></p>
@@ -314,7 +316,13 @@ export default class PrinterSettings {
                                                 </form></span></p>  
             </div>
         `;
-
+        document.getElementById("editProfileBtn").addEventListener('click', event => {
+          let profileEdits = document.getElementById("psPrinterProfiles").querySelectorAll('[contenteditable=false]')
+          profileEdits.forEach(element => {
+            element.classList.add("Active");
+            element.contentEditable = true;
+          })
+        });
         document.getElementById("eInverted").checked = pProfile.axes.e.inverted;
         document.getElementById("xInverted").checked = pProfile.axes.x.inverted;
         document.getElementById("yInverted").checked = pProfile.axes.y.inverted;
@@ -673,6 +681,11 @@ export default class PrinterSettings {
               coolDown: document.getElementById("coolDown").value,
             }
           }
+            let profileEdits = document.getElementById("psPrinterProfiles").querySelectorAll('[contenteditable=true]')
+            profileEdits.forEach(element => {
+              element.contentEditable = false;
+              element.classList.remove("Active");
+            })
           let update = await OctoFarmClient.post("printers/updateSettings", newValues);
           if(update.status === 200){
             update = await update.json();
