@@ -89,37 +89,37 @@ class Manager{
                        data-path=".name"
                        data-order="asc"
                        data-type="text"
-                       data-value="1">File Name A-Z</a>
+                       data-value="1"><i class="fas fa-sort-alpha-down"></i> File Name</a>
                 
                     <a class="dropdown-item"
                        data-path=".name"
                        data-order="desc"
                        data-type="text"
-                       data-value="2">File Name Z-A</a>
+                       data-value="2"><i class="fas fa-sort-alpha-up"></i> File Name</a>
                                        
                     <a class="dropdown-item"
                        data-path=".time"
                        data-order="asc"
                        data-type="number"
-                       data-value="3">Print Time 0-10</a>
+                       data-value="3"><i class="fas fa-sort-numeric-up-alt"></i> Print Time</a>
                 
                     <a class="dropdown-item"
                        data-path=".time"
                        data-order="desc"
                        data-type="number"
-                       data-value="4">Print Time 10-0</a>
+                       data-value="4"><i class="fas fa-sort-numeric-down-alt"></i> Print Time</a>
                                        
                     <a class="dropdown-item"
                        data-path=".date"
                        data-order="asc"
                        data-type="number"
-                       data-value="5">Upload Date 0-10</a>
+                       data-value="5"><i class="fas fa-sort-numeric-up-alt"></i> Upload Date</a>
                 
                     <a class="dropdown-item"
                        data-path=".date"
                        data-order="desc"
                        data-type="number"
-                       data-value="6">Upload Date 10-0</a>
+                       data-value="6"><i class="fas fa-sort-numeric-down-alt"></i> Upload Date</a>
                                                            
 
                           

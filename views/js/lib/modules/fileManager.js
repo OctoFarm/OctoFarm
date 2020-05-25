@@ -542,7 +542,6 @@ export default class FileManager {
         FileManager.updateListeners(printer);
       }
     }
-    console.log(fileSortInit)
     if(fileSortInit){
       jplist.refresh();
     }else{
