@@ -1,8 +1,7 @@
-import OctoPrintClient from "../octoprint.js";
+
 import OctoFarmClient from "../octofarm.js";
-import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
-import FileManager from "./fileManager.js";
+import Validate from "../functions/validate.js";
 
 let currentIndex = 0;
 
@@ -123,59 +122,59 @@ export default class PrinterSettings {
         const printerProfile = document.getElementById("psProfileDrop");
         const printerConnect = document.getElementById("psConnect");
 
-        printerPort.innerHTML = `
-        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardSerialPort">Port:</label> </div> <select class="custom-select bg-secondary text-light" id="psSerialPort"></select></div>
-        `;
-        printerBaud.innerHTML = `
-        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardBaudrate">Baudrate:</label> </div> <select class="custom-select bg-secondary text-light" id="psBaudrate"></select></div>
-        `;
-        printerProfile.innerHTML = `
-        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardPrinterProfile">Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="psProfile"></select></div>
-        `;
-        availableBaud.forEach(baud => {
-          document
-              .getElementById("psBaudrate")
-              .insertAdjacentHTML(
-                  "beforeend",
-                  `<option value="${baud}">${baud}</option>`
-              );
-        });
-        if (preferedBaud != null) {
-          document.getElementById("psBaudrate").value = preferedBaud;
-        }
-        availablePort.forEach(port => {
-          document
-              .getElementById("psSerialPort")
-              .insertAdjacentHTML(
-                  "beforeend",
-                  `<option value="${port}">${port}</option>`
-              );
-        });
-        if (preferedPort != null) {
-          document.getElementById("psSerialPort").value = preferedPort;
-        }
-        availableProfile.forEach(profile => {
-          document
-              .getElementById("psProfile")
-              .insertAdjacentHTML(
-                  "beforeend",
-                  `<option value="${profile.id}">${profile.name}</option>`
-              );
-        });
-        if (preferedProfile != null) {
-          document.getElementById("psProfile").value = preferedProfile;
-        }
-
-        if (printer.state === "Disconnected") {
-          printerConnect.innerHTML =
-              '<center> <button id="psConnectBtn" class="btn btn-success inline" value="connect">Connect</button></center>';
-        } else {
-          printerConnect.innerHTML =
-              '<center> <button id="psConnectBtn" class="btn btn-danger inline" value="disconnect">Disconnect</button></center>';
-          document.getElementById("psSerialPort").disabled = true;
-          document.getElementById("psBaudrate").disabled = true;
-          document.getElementById("psProfile").disabled = true;
-        }
+        // printerPort.innerHTML = `
+        // <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardSerialPort">Port:</label> </div> <select class="custom-select bg-secondary text-light" id="psSerialPort"></select></div>
+        // `;
+        // printerBaud.innerHTML = `
+        // <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardBaudrate">Baudrate:</label> </div> <select class="custom-select bg-secondary text-light" id="psBaudrate"></select></div>
+        // `;
+        // printerProfile.innerHTML = `
+        // <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardPrinterProfile">Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="psProfile"></select></div>
+        // `;
+        // availableBaud.forEach(baud => {
+        //   document
+        //       .getElementById("psBaudrate")
+        //       .insertAdjacentHTML(
+        //           "beforeend",
+        //           `<option value="${baud}">${baud}</option>`
+        //       );
+        // });
+        // if (preferedBaud != null) {
+        //   document.getElementById("psBaudrate").value = preferedBaud;
+        // }
+        // availablePort.forEach(port => {
+        //   document
+        //       .getElementById("psSerialPort")
+        //       .insertAdjacentHTML(
+        //           "beforeend",
+        //           `<option value="${port}">${port}</option>`
+        //       );
+        // });
+        // if (preferedPort != null) {
+        //   document.getElementById("psSerialPort").value = preferedPort;
+        // }
+        // availableProfile.forEach(profile => {
+        //   document
+        //       .getElementById("psProfile")
+        //       .insertAdjacentHTML(
+        //           "beforeend",
+        //           `<option value="${profile.id}">${profile.name}</option>`
+        //       );
+        // });
+        // if (preferedProfile != null) {
+        //   document.getElementById("psProfile").value = preferedProfile;
+        // }
+        //
+        // if (printer.state === "Disconnected") {
+        //   printerConnect.innerHTML =
+        //       '<center> <button id="psConnectBtn" class="btn btn-success inline" value="connect">Connect</button></center>';
+        // } else {
+        //   printerConnect.innerHTML =
+        //       '<center> <button id="psConnectBtn" class="btn btn-danger inline" value="disconnect">Disconnect</button></center>';
+        //   document.getElementById("psSerialPort").disabled = true;
+        //   document.getElementById("psBaudrate").disabled = true;
+        //   document.getElementById("psProfile").disabled = true;
+        // }
 
         const printerDefaultPort = document.getElementById("psDefaultPortDrop");
         const printerDefaultBaud = document.getElementById("psDefaultBaudDrop");
@@ -654,14 +653,14 @@ export default class PrinterSettings {
               powerStatusURL: document.getElementById("powerStateURL").value,
             },
             gcode:{
-              afterPrintingCancels: document.getElementById("settingsAfterPrinterCancelled").value,
-              afterPrintingDone: document.getElementById("settingsAfterPrinterDone").value,
-              afterPrintingPaused: document.getElementById("settingsAfterPrinterPaused").value,
+              afterPrintCancelled: document.getElementById("settingsAfterPrinterCancelled").value,
+              afterPrintDone: document.getElementById("settingsAfterPrinterDone").value,
+              afterPrintPaused: document.getElementById("settingsAfterPrinterPaused").value,
               afterPrinterConnected: document.getElementById("settingsAfterPrinterConnected").value,
               afterToolChange: document.getElementById("settingsAfterToolChange").value,
-              beforePrintingResumed: document.getElementById("settingsBeforePrinterResumed").value,
-              beforePrintingStarted: document.getElementById("settingsBeforePrinterStarted").value,
-              beforePrintingDisconnected: document.getElementById("settingsBeforePrinterDisconnected").value,
+              beforePrintResumed: document.getElementById("settingsBeforePrinterResumed").value,
+              beforePrintStarted: document.getElementById("settingsBeforePrinterStarted").value,
+              beforePrinterDisconnected: document.getElementById("settingsBeforePrinterDisconnected").value,
               beforeToolChange: document.getElementById("settingsBeforeToolChange").value,
             },
             other: {
@@ -675,7 +674,24 @@ export default class PrinterSettings {
             }
           }
           let update = await OctoFarmClient.post("printers/updateSettings", newValues);
-          console.log(update)
+          if(update.status === 200){
+            update = await update.json();
+            UI.createAlert("success", "OctoFarm successfully updated for " + Validate.getName(printer), 3000, "clicked")
+            if(update.status.profile === 200){
+              UI.createAlert("success", Validate.getName(printer) + ": profile successfully updated", 3000, "clicked")
+            }else{
+              UI.createAlert("error", Validate.getName(printer) + ": profile failed to updated", 3000, "clicked")
+            }
+            if(update.status.settings === 200){
+              UI.createAlert("success", Validate.getName(printer) + ": settings successfully updated", 3000, "clicked")
+            }else{
+              UI.createAlert("error", Validate.getName(printer) + ": settings failed to updated", 3000, "clicked")
+            }
+          }else{
+            UI.createAlert("error", "OctoFarm failed to update " + Validate.getName(printer), 3000, "clicked")
+          }
+
+
         });
 
 
