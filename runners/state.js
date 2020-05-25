@@ -1223,6 +1223,9 @@ class Runner {
             },
             body: JSON.stringify(opts)
         });
+        await Runner.getProfile(settings.printer.index);
+        await Runner.getSettings(settings.printer.index);
+
             // let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
             //
             // console.log()
