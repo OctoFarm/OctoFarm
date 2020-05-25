@@ -289,7 +289,7 @@ export default class PrinterSettings {
             <h6 class="mb-1"><u>Extrusion</u></h6>
             <p class="mb-0"><b>Extruder Count: </b><span id="extruderCount" contenteditable="false">${pProfile.extruder.count}</span></p>
             <p class="mb-0"><b>Nozzle Size: </b><span id="nozzleDiameter" contenteditable="false">${pProfile.extruder.nozzleDiameter}</span></p>
-            <p class="mb-0"><b>Nozzle Offsets: </b>X: <span id="extruderOffsetsX" contenteditable="false">${pProfile.extruder.offsets[0][0]}</span>mm | Y: <span id="extruderOffsetsY" contenteditable="false">${pProfile.extruder.offsets[0][0]}</span>mm</p>
+          
             <p class="mb-0"><span><form class="was-validated">
                                                     <div class="custom-control custom-checkbox mb-3">
                                                         <input type="checkbox" class="custom-control-input" id="sharedNozzle" required>
