@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
     - History button to set default sort function button and pagination. Remembers previously set values on client. 
     - File Manager now has sort capabilities. File Name, Print Time, Upload Date.
     - New Printer settings modal. Connection Defaults, Profile Changes, Power Button actions, Gcode Script and Other Settings (Camera / Heating Triggers)
+    - History now has filter dropdowns for File Name, Printer Name, Filament Type. 
         
 ### Changed
     - Group dropdown only appears if groups exist.

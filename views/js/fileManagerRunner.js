@@ -63,11 +63,11 @@ class Manager{
               <i class="fas fa-chevron-left"></i> Back
             </button>
             <!-- Split dropright button -->
-            <div class="dropdown mr-3 float-right"
+             <div class="dropdown mr-3 float-right"
                    data-jplist-control="dropdown-sort"
                    data-opened-class="show"
                    data-group="files"
-                   data-name="data-sort"
+                   data-name="data-file"
                    data-id="data-file">
                 
                 <button
@@ -77,7 +77,15 @@ class Manager{
                     Sort by
                 </button>
                 
-              
+                <div
+                        data-type="content"
+                        class="dropdown-menu"
+                        aria-labelledby="dropdownMenuButton">
+                
+                    <a class="dropdown-item"
+                       href="#"
+                       data-path="default">Sort By</a>
+
                      <a class="dropdown-item"
                        data-path=".name"
                        data-order="asc"
@@ -113,9 +121,13 @@ class Manager{
                        data-order="desc"
                        data-type="number"
                        data-value="6"><i class="fas fa-sort-numeric-up"></i> Upload Date</a>
+                                                           
+
+                                                           
 
                           
                 </div>
+            </div>
             </div>
             <label class="btn btn-success float-left mr-1 mb-0" for="fileUploadBtn"><i class="fas fa-file-import"></i> Upload File(s)</label>
             <input id="fileUploadBtn" multiple accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left" id="uploadFileBtn">

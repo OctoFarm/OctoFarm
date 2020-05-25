@@ -1,5 +1,6 @@
 <% if(typeof history.length != 'undefined' && history.length > 0 ) {%>
 
+  <% let historyTotals = helpers.historyTotals(history); %>
 <div class="row">
   <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
     <div class="card text-white bg-dark h-100">
@@ -41,102 +42,6 @@
       </div>
       <div class="card-body pt-2 pb-0 text-center">
         <div class="row d-none" id="historyToolbar">
-          <div class="col-3">
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <label class="input-group-text" for="defaultSort">Default Sort:</label>
-              </div>
-              <select class="custom-select" id="defaultSort"
-                      data-jplist-control="select-sort"
-                      data-group="history"
-                      data-name="default-sort"
-                      data-id="default-sort">
-                <option                data-path=".index"
-                                       data-order="asc"
-                                       value="1"
-                                       data-type="number">Index 0-10</option>
-                <option
-                        data-path=".index"
-                        data-order="desc"
-                        value="2"
-                        data-type="number">Index 10-0</option>
-                <option
-                        data-path=".printer"
-                        data-order="asc"
-                        value="3"
-                        data-type="text">Printer A-Z</option>
-
-                <option
-                        data-path=".printer"
-                        data-order="desc"
-                        value="4"
-                        data-type="text">Printer</option>
-                <option
-                        data-path=".file"
-                        data-order="asc"
-                        value="5"
-                        data-type="text">File Name A-Z</option>
-                <option
-                        data-path=".file"
-                        data-order="desc"
-                        value="6"
-                        data-type="text">File Name Z-A</option>
-                <option
-                        data-path=".start"
-                        data-order="asc"
-                        value="7"
-                        data-type="datetime">Start Date 0-10</option>
-                <option
-                        data-path=".start"
-                        data-order="desc"
-                        value="8"
-                        data-type="datetime">Start Date 10-0</option>
-                <option
-                        data-path=".end"
-                        data-order="asc"
-                        value="9"
-                        data-type="datetime">End Date 0-10</option>
-                <option
-                        data-path=".end"
-                        data-order="desc"
-                        value="10"
-                        data-type="datetime">End Date 10-0</option>
-                <option
-                        data-path=".time"
-                        data-order="asc"
-                        value="11"
-                        data-type="number">Print Time 0-10</option>
-                <option
-                        data-path=".time"
-                        data-order="desc"
-                        value="12"
-                        data-type="number">Print Time 10-0</option>
-                <option
-                        data-path=".cost"
-                        data-order="asc"
-                        value="11"
-                        data-type="number">Cost 0-10</option>
-                <option
-                        data-path=".cost"
-                        data-order="desc"
-                        value="12"
-                        data-type="number">Cost 10-0</option>
-                <option
-                        data-path=".usage"
-                        data-order="asc"
-                        value="13"
-                        data-type="number">Filament Usage 0-10</option>
-                <option
-                        data-path=".usage"
-                        data-order="desc"
-                        value="14"
-                        data-type="number">Filament Usage 10-0</option>
-              </select>
-            </div>
-          </div>
-          <div class="col-2">
-
-          </div>
           <div class="col-12">
             <nav
                     data-jplist-control="pagination"
@@ -186,6 +91,195 @@
 
             </nav>
           </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputGroupSelect01">File Name: </label>
+              </div>
+              <select class="custom-select" id="inputGroupSelect01"
+                      data-jplist-control="select-filter"
+                      data-group="history"
+                      data-name="fileNames"
+              >
+                <option selected
+                        href="#"
+                        data-value="0"
+                        data-path="default"
+                >Filter</option>
+                <% historyTotals.fileNames.forEach(file => { %>
+                  <option href="#"
+                          data-path=".<%= file %>"><%= file.replace(/_/g, " ") %></option>
+                <%  }) %>
+
+              </select>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputGroupSelect01">Printer Name: </label>
+              </div>
+              <select class="custom-select" id="inputGroupSelect01"
+                      data-jplist-control="select-filter"
+                      data-group="history"
+                      data-name="printerNames"
+              >
+                <option selected
+                        href="#"
+                        data-value="0"
+                        data-path="default"
+                >Filter</option>
+                <% historyTotals.printerNames.forEach(printer => { %>
+                  <option href="#"
+                          data-path=".<%= printer %>"><%= printer.replace(/_/g, " ") %></option>
+                <%  }) %>
+
+              </select>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputGroupSelect01">Filament Type: </label>
+              </div>
+              <select class="custom-select" id="inputGroupSelect01"
+                      data-jplist-control="select-filter"
+                      data-group="history"
+                      data-name="spoolName"
+              >
+                <option selected
+                        href="#"
+                        data-value="0"
+                        data-path="default"
+                >Filter</option>
+                <% historyTotals.spools.forEach(spool => { %>
+                  <option href="#"
+                          data-path=".<%= spool %>"><%= spool %></option>
+                <%  }) %>
+
+              </select>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+
+            <div class="dropdown mr-3"
+                 data-jplist-control="dropdown-sort"
+                 data-opened-class="show"
+                 data-group="history"
+                 data-name="default-sort"
+                 data-id="default-sort">
+
+              <button
+                      data-type="panel"
+                      class="btn btn-primary dropdown-toggle"
+                      type="button">
+                Default Sort
+              </button>
+
+              <div
+                      data-type="content"
+                      class="dropdown-menu"
+                      aria-labelledby="dropdownMenuButton">
+
+                <a class="dropdown-item"
+                   href="#"
+                   data-path="default">Default Sort</a>
+
+                <a class="dropdown-item"
+
+                   data-path=".index"
+                   data-order="asc"
+                   value="1"
+                   data-type="number"><i class="fas fa-sort-numeric-down"></i> Index</a>
+
+                <a class="dropdown-item"
+                   href="#"
+                   data-path=".index"
+                   data-order="desc"
+                   value="2"
+                   data-type="number"><i class="fas fa-sort-numeric-up"></i> Index</a>
+
+                <a class="dropdown-item"
+                   href="#"
+                   data-path=".printer"
+                   data-order="asc"
+                   value="3"
+                   data-type="text"><i class="fas fa-sort-alpha-down"></i> Printer Name</a>
+
+                <a class="dropdown-item"
+                   href="#"
+                   data-path=".printer"
+                   data-order="desc"
+                   value="4"
+                   data-type="text"><i class="fas fa-sort-alpha-up"></i> Printer Name</a>
+                <a class="dropdown-item"
+                   href="#"
+                   data-path=".file"
+                   data-order="asc"
+                   value="5"
+                   data-type="text"><i class="fas fa-sort-alpha-down"></i> File Name</a>
+                <a class="dropdown-item"
+                   href="#"
+                   data-path=".file"
+                   data-order="desc"
+                   value="6"
+                   data-type="text"><i class="fas fa-sort-alpha-up"></i> File Name</a>
+
+                <a class="dropdown-item"
+                   href="#"
+                   data-path=".start"
+                   data-order="asc"
+                   value="7"
+                   data-type="datetime"><i class="fas fa-sort-numeric-down"></i> Start Date</a>
+                <a class="dropdown-item"
+                   href="#"
+                   data-path=".start"
+                   data-order="desc"
+                   value="8"
+                   data-type="datetime"><i class="fas fa-sort-numeric-up"></i> Start Date</a>
+
+                <a class="dropdown-item"
+                   href="#"
+                   data-path=".end"
+                   data-order="asc"
+                   value="9"
+                   data-type="datetime"><i class="fas fa-sort-numeric-down"></i> End Date</a>
+                <a class="dropdown-item"
+                   href="#"
+                   data-path=".end"
+                   data-order="desc"
+                   value="10"
+                   data-type="datetime"><i class="fas fa-sort-numeric-up"></i> End Date</a>
+
+                <a class="dropdown-item"
+                   href="#"
+                   data-path=".cost"
+                   data-order="asc"
+                   value="11"
+                   data-type="numnber"><i class="fas fa-sort-numeric-down"></i> Cost</a>
+                <a class="dropdown-item"
+                   href="#"
+                   data-path=".cost"
+                   data-order="desc"
+                   value="12"
+                   data-type="number"><i class="fas fa-sort-numeric-up"></i> Cost</a>
+
+
+              </div>
+            </div>
+
+
+          </div>
+          <div class="col-12">
+<!--            <div class="row">-->
+<!--              <div class="col-6">-->
+<!--                Total Cost:-->
+<!--              </div>-->
+<!--              <div class="col-6">-->
+<!--                Total Usage:-->
+<!--              </div>-->
+<!--            </div>-->
+          </div>
           <!-- pagination control -->
 
         </div>
@@ -233,10 +327,10 @@
                 <p class="d-none">Failure</p><i class="fas fa-exclamation text-danger"></i>
             <% } %> <% } %>
           </td>
-          <td class="printer"><%=
+          <td class="printer <%= history[i].printHistory.printerName.replace(/ /g, "_") %>"><%=
             history[i].printHistory.printerName %>
           </td>
-          <td class="file" class="text-wrap">
+          <td class="file <%= history[i].printHistory.fileName.replace(".gcode", "") %>" class="text-wrap">
             <%= history[i].printHistory.fileName.replace(/_/g," ") %>
           </td>
           <td class="start">
@@ -251,7 +345,12 @@
           <td class="cost" id="cost-<%= history[i]._id %>">
             Loading...
           </td>
+          <%if(history[i].printHistory.filamentSelection != null){%>
+          <td class="spool <%= history[i].printHistory.filamentSelection.spools.profile.material %>" id="spool-<%= history[i]._id %>">
+          <% }else{%>
           <td class="spool" id="spool-<%= history[i]._id %>">
+          <%}%>
+
             Loading...
           </td>
           <td class="usage" id="usage-<%= history[i]._id %>">

@@ -1,3 +1,5 @@
+const _ = require("lodash");
+
 const bytes = function(a, b) {
   let string = "";
   if (a === undefined || isNaN(a) || a === null) {
@@ -62,8 +64,31 @@ const generateTime = function(seconds) {
   }
   return string;
 };
+const historyTotals = function(history){
+
+  let historyFileNames = []
+  let historyPrinterNames = []
+  let historySpools = []
+  history.forEach(hist => {
+    historyFileNames.push(hist.printHistory.fileName.replace(".gcode", ""));
+    historyPrinterNames.push(hist.printHistory.printerName.replace(/ /g, "_"));
+    if(hist.printHistory.filamentSelection != null){
+      historySpools.push(
+          hist.printHistory.filamentSelection.spools.profile.material
+      );
+    }
+
+  })
+  let historyTotals = {
+    fileNames: historyFileNames.filter(function(item, i, ar){ return ar.indexOf(item) === i; }),
+    printerNames: historyPrinterNames.filter(function(item, i, ar){ return ar.indexOf(item) === i; }),
+    spools: historySpools.filter(function(item, i, ar){ return ar.indexOf(item) === i; }),
+  }
+  return historyTotals;
+}
 module.exports = {
   generateBytes: bytes,
   generateTime: generateTime,
   calculatePercent: calculatePercent,
+  historyTotals: historyTotals
 };
