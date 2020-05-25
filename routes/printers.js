@@ -90,7 +90,6 @@ router.post("/updateSettings", ensureAuthenticated, async (req, res) => {
   const settings = req.body;
   logger.info("Update printers request: ", settings);
   let updateSettings = await Runner.updateSettings(settings);
-  console.log(updateSettings.status, updateSettings.printer)
   res.send({status: updateSettings.status, printer:updateSettings.printer});
 });
 router.get("/groups", ensureAuthenticated, async (req, res) => {

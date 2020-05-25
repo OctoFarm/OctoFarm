@@ -471,7 +471,7 @@ export default class PrinterSettings {
         document.getElementById("printerSettingsFooter").innerHTML = ``;
         document.getElementById("printerSettingsFooter").insertAdjacentHTML('beforeend', `
                             <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
-                           <button type="button" class="btn btn-success" id="savePrinterSettings" data-dismiss="modal">Save</button>
+                           <button type="button" class="btn btn-success" id="savePrinterSettings">Save</button>
         `)
         document.getElementById("psPowerCommands").innerHTML = `
         <form>
@@ -674,7 +674,6 @@ export default class PrinterSettings {
               coolDown: document.getElementById("coolDown").value,
             }
           }
-          console.log(newValues)
           let update = await OctoFarmClient.post("printers/updateSettings", newValues);
           console.log(update)
         });
