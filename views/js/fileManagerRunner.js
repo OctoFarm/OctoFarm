@@ -77,14 +77,7 @@ class Manager{
                     Sort by
                 </button>
                 
-                <div
-                        data-type="content"
-                        class="dropdown-menu"
-                        aria-labelledby="dropdownMenuButton">
-                
-                    <a class="dropdown-item"
-                       href="#"
-                       data-path="default">Sort By</a>
+              
                      <a class="dropdown-item"
                        data-path=".name"
                        data-order="asc"
@@ -101,26 +94,25 @@ class Manager{
                        data-path=".time"
                        data-order="asc"
                        data-type="number"
-                       data-value="3"><i class="fas fa-sort-numeric-up-alt"></i> Print Time</a>
+                       data-value="3"><i class="fas fa-sort-numeric-down"></i> Print Time</a>
                 
                     <a class="dropdown-item"
                        data-path=".time"
                        data-order="desc"
                        data-type="number"
-                       data-value="4"><i class="fas fa-sort-numeric-down-alt"></i> Print Time</a>
+                       data-value="4"><i class="fas fa-sort-numeric-up"></i> Print Time</a>
                                        
                     <a class="dropdown-item"
                        data-path=".date"
                        data-order="asc"
                        data-type="number"
-                       data-value="5"><i class="fas fa-sort-numeric-up-alt"></i> Upload Date</a>
+                       data-value="5"><i class="fas fa-sort-numeric-down"></i> Upload Date</a>
                 
                     <a class="dropdown-item"
                        data-path=".date"
                        data-order="desc"
                        data-type="number"
-                       data-value="6"><i class="fas fa-sort-numeric-down-alt"></i> Upload Date</a>
-                                                           
+                       data-value="6"><i class="fas fa-sort-numeric-up"></i> Upload Date</a>
 
                           
                 </div>
