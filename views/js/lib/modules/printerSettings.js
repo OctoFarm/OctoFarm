@@ -289,7 +289,7 @@ export default class PrinterSettings {
             <h6 class="mb-1"><u>Extrusion</u></h6>
             <p class="mb-0"><b>Extruder Count: </b><span id="extruderCount" contenteditable="false">${pProfile.extruder.count}</span></p>
             <p class="mb-0"><b>Nozzle Size: </b><span id="nozzleDiameter" contenteditable="false">${pProfile.extruder.nozzleDiameter}</span></p>
-            <p class="mb-0"><b>Nozzle Offsets: </b><span id="extruderOffsetsX" contenteditable="false">X: ${pProfile.extruder.offsets[0][0]}</span>mm | Y: <span id="extruderOffsetsY" contenteditable="false">${pProfile.extruder.offsets[0][0]}</span>mm</p>
+            <p class="mb-0"><b>Nozzle Offsets: </b>X: <span id="extruderOffsetsX" contenteditable="false">${pProfile.extruder.offsets[0][0]}</span>mm | Y: <span id="extruderOffsetsY" contenteditable="false">${pProfile.extruder.offsets[0][0]}</span>mm</p>
             <p class="mb-0"><span><form class="was-validated">
                                                     <div class="custom-control custom-checkbox mb-3">
                                                         <input type="checkbox" class="custom-control-input" id="sharedNozzle" required>
@@ -453,22 +453,26 @@ export default class PrinterSettings {
         let serverRestart = null;
         let systemRestart = null;
         let systemShutdown = null;
-        if(printer.settingsServer.commands.serverRestartCommand === null){
+        if(printer.settingsServer.commands.serverRestartCommand === null || printer.settingsServer.commands.serverRestartCommand === ""){
           serverRestart = "N/A";
         }else{
           serverRestart = printer.settingsServer.commands.serverRestartCommand
         }
-        if(printer.settingsServer.commands.systemRestartCommand === null){
+        if(printer.settingsServer.commands.systemRestartCommand === null || printer.settingsServer.commands.systemRestartCommand === ""){
           systemRestart = "N/A";
         }else{
           systemRestart = printer.settingsServer.commands.systemRestartCommand
         }
-        if(printer.settingsServer.commands.systemShutdownCommand === null){
+        if(printer.settingsServer.commands.systemShutdownCommand === null || printer.settingsServer.commands.systemShutdownCommand === ""){
           systemShutdown = "N/A";
         }else{
           systemShutdown = printer.settingsServer.commands.systemShutdownCommand
         }
-
+        document.getElementById("printerSettingsFooter").innerHTML = ``;
+        document.getElementById("printerSettingsFooter").insertAdjacentHTML('beforeend', `
+                            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+                           <button type="button" class="btn btn-success" id="savePrinterSettings" data-dismiss="modal">Save</button>
+        `)
         document.getElementById("psPowerCommands").innerHTML = `
         <form>
           <div class="form-group">
@@ -602,40 +606,35 @@ export default class PrinterSettings {
               "name": document.getElementById("printerName").innerHTML,
               "color": "default",
               "model": document.getElementById("printerModel").innerHTML,
-              "default": true,
-              "current": true,
               "volume": {
                 "formFactor": document.getElementById("extruderFormFactor").innerHTML,
-                "width": document.getElementById("volumeWidth").innerHTML,
-                "depth": document.getElementById("volumeDepth").innerHTML,
-                "height": document.getElementById("volumeHeight").innerHTML
+                "width": parseInt(document.getElementById("volumeWidth").innerHTML),
+                "depth": parseInt(document.getElementById("volumeDepth").innerHTML),
+                "height": parseInt(document.getElementById("volumeHeight").innerHTML)
               },
               "heatedBed": document.getElementById("heatedBed").checked,
               "heatedChamber": document.getElementById("heatedChamber").checked,
               "axes": {
                 "x": {
-                  "speed": document.getElementById("printerXAxis").innerHTML,
+                  "speed": parseInt(document.getElementById("printerXAxis").innerHTML),
                   "inverted": document.getElementById("xInverted").checked
                 },
                 "y": {
-                  "speed": document.getElementById("printerYAxis").innerHTML,
+                  "speed": parseInt(document.getElementById("printerYAxis").innerHTML),
                   "inverted": document.getElementById("yInverted").checked
                 },
                 "z": {
-                  "speed": document.getElementById("printerZAxis").innerHTML,
+                  "speed": parseInt(document.getElementById("printerZAxis").innerHTML),
                   "inverted": document.getElementById("zInverted").checked
                 },
                 "e": {
-                  "speed": document.getElementById("printerEAxis").innerHTML,
+                  "speed": parseInt(document.getElementById("printerEAxis").innerHTML),
                   "inverted": document.getElementById("eInverted").checked
                 }
               },
               "extruder": {
-                "count": document.getElementById("extruderCount").innerHTML,
-                "nozzleDiameter": document.getElementById("nozzleDiameter").innerHTML,
-                "offsets": [
-                  {"x": document.getElementById("extruderOffsetsX").innerHTML, "y": document.getElementById("extruderOffsetsY").innerHTML},
-                ],
+                "count": parseInt(document.getElementById("extruderCount").innerHTML),
+                "nozzleDiameter": parseFloat(document.getElementById("nozzleDiameter").innerHTML),
                 "sharedNozzle": document.getElementById("sharedNozzle").checked,
               }
             },
