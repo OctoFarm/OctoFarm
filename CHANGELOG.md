@@ -27,6 +27,8 @@ All notable changes to this project will be documented in this file.
     - File Manager now has sort capabilities. File Name, Print Time, Upload Date.
     - New Printer settings modal. Connection Defaults, Profile Changes, Power Button actions, Gcode Script and Other Settings (Camera / Heating Triggers)
     - History now has filter dropdowns for File Name, Printer Name, Filament Type. 
+    - Activated the restart/shutdown host and octoprint buttons
+    - Added checks for power state if enabled. Will check every 20 seconds for a state change unless powered off/on/toggled through the UI.
         
 ### Changed
     - Group dropdown only appears if groups exist.
