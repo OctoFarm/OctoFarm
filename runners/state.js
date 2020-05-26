@@ -1080,6 +1080,8 @@ class Runner {
             return { name: "warning", hex: "#583c0e", category: "Active" };
         } else if (state === "Cancelling") {
             return { name: "warning", hex: "#583c0e", category: "Active" };
+        } else if (state === "Starting") {
+            return { name: "warning", hex: "#583c0e", category: "Active" };
         } else if (state === "Error!") {
             return { name: "danger", hex: "#2e0905", category: "Disconnected" };
         } else if (state === "Offline") {
