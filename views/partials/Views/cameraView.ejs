@@ -78,28 +78,13 @@ printers[sorted.actualIndex].settingsWebcam != ''){%> <% } %>
             >
               <i class="fas fa-globe-europe"></i>
             </a>
-            <button
-              title="Control Your Printer"
-              id="printerButton-<%= printers[sorted.actualIndex]._id %>"
-              type="button"
-              class="tag btn btn-primary float-right btn-sm mr-1"
-              data-toggle="modal"
-              data-target="#printerManagerModal"
-              disabled
-            >
-              <i class="fas fa-print"></i>
-            </button>
+              <div id="powerBtn-<%= printers[sorted.actualIndex]._id %>" class="btn-group float-right">
+
+              </div>
             <% }else{ %>
-            <button
-              title="Turn your printer on/off"
-              id="powerButton-<%= printers[sorted.actualIndex]._id %>"
-              type="button"
-              class="tag btn btn-danger float-right btn-sm d-none"
-              data-toggle="modal"
-              data-target="#printerPowerModal"
-            >
-              <i class="fas fa-power-off"></i>
-            </button>
+                <div id="powerBtn-<%= printers[sorted.actualIndex]._id %>" class="btn-group float-right">
+
+                </div>
             <a
               title="Open your Printers Web Interface"
               id="printerWeb-5ea68355110cfe5ca94265ac"

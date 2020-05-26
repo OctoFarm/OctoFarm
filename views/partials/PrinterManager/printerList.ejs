@@ -44,23 +44,8 @@
             >
                 <i class="fas fa-sync"></i>
             </button>
-            <div class="btn-group">
-                <button title="Toggle your printers power"
-                        id="printerPower-<%= printers[sorted.actualIndex]._id %>"
-                        class="btn btn-danger btn-sm" type="button">
-                    <i class="textActive fas fa-power-off"></i>
-                </button>
-                <button title="Other power actions" type="button" class="btn btn-sm btn-danger dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="sr-only">Toggle Dropdown</span>
-                </button>
-                <div class="dropdown-menu text-center">
-                    <a id="printerPowerOff-<%= printers[sorted.actualIndex]._id %>" title="Turn off your printer" class="dropdown-item d-none" href="#"><i class="textActive fas fa-power-off"></i> Power Off Printer</a>
-                    <a id="printerPowerOn-<%= printers[sorted.actualIndex]._id %>" title="Turn on your printer" class="dropdown-item d-none" href="#"><i class="textComplete fas fa-power-off"></i> Power On Printer</a>
-                    <div id="printerDropDownMaker-<%= printers[sorted.actualIndex]._id %>" class="dropdown-divider d-none"></div>
-                    <a title="Restart OctoPrint Service" class="dropdown-item" href="#"><i class="textActive fas fa-redo"></i> Restart OctoPrint</a>
-                    <a title="Reboot OctoPrint Host" class="dropdown-item" href="#"><i class="textActive fas fa-sync-alt"></i> Reboot Host</a>
-                    <a title="Shutdown OctoPrint Host" class="dropdown-item" href="#"><i class="textActive fas fa-power-off"></i> Shutdown Host</a>
-                </div>
+            <div id="powerBtn-<%= printers[sorted.actualIndex]._id %>" class="btn-group">
+
             </div>
             <span  title="Drag and Change your Printers sorting"
                    id="printerSortButton-<%= printers[sorted.actualIndex]._id %>"

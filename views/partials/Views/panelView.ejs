@@ -61,15 +61,9 @@
               </button>
             </h6>
             <% if(printers[sorted.actualIndex].stateColour.category === "Offline"){ %>
-              <button title="Turn your printer on/off"
-                      id="powerButton-<%= printers[sorted.actualIndex]._id %>"
-                      type="button"
-                      class="tag btn btn-danger float-right btn-sm d-none"
-                      data-toggle="modal"
-                      data-target="#printerPowerModal"
-              >
-                <i class="fas fa-power-off"></i>
-              </button>
+              <div id="powerBtn-<%= printers[sorted.actualIndex]._id %>" class="btn-group float-right">
+
+              </div>
               <a title="Open your Printers Web Interface"
                  id="printerWeb-5ea68355110cfe5ca94265ac"
                  type="button"

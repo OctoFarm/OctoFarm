@@ -60,15 +60,9 @@
          role="button">
         <i class="fas fa-globe-europe"></i>
       </a>
-      <button title="Turn your printer on/off"
-              id="powerButton-<%= printers[sorted.actualIndex]._id %>"
-              type="button"
-              class="tag btn btn-danger btn-sm d-none"
-              data-toggle="modal"
-              data-target="#printerPowerModal"
-      >
-        <i class="fas fa-power-off"></i>
-      </button>
+      <div id="powerBtn-<%= printers[sorted.actualIndex]._id %>" class="btn-group">
+
+      </div>
     <% }else{ %>
         <button title="Control Your Printer"
                 id="printerButton-<%= printers[sorted.actualIndex]._id %>"
@@ -87,15 +81,9 @@
            role="button">
           <i class="fas fa-globe-europe"></i>
         </a>
-        <button title="Turn your printer on/off"
-                id="powerButton-<%= printers[sorted.actualIndex]._id %>"
-                type="button"
-                class="tag btn btn-danger btn-sm d-none"
-                data-toggle="modal"
-                data-target="#printerPowerModal"
-        >
-          <i class="fas fa-power-off"></i>
-        </button>
+        <div id="powerBtn-<%= printers[sorted.actualIndex]._id %>" class="btn-group">
+
+        </div>
     <% } %>
   </td>
   <td>
