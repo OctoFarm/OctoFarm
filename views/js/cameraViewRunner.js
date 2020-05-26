@@ -6,6 +6,7 @@ import PrinterManager from "./lib/modules/printerManager.js";
 import doubleClickFullScreen from "./lib/functions/fullscreen.js";
 import { parse } from "./vendor/flatted.js";
 import initGroupSelect from "./lib/modules/groupSelection.js";
+import PowerButton from "./lib/modules/powerButton.js";
 
 let printerInfo = [];
 let elems = [];
@@ -27,6 +28,8 @@ async function asyncParse(str) {
 }
 var source = new EventSource("/sse/monitoringInfo/");
 let groupInit = false;
+let powerTimer = 20000;
+
 source.onmessage = async function(e) {
     if (e.data != null) {
         let res = await asyncParse(e.data);
@@ -50,6 +53,14 @@ source.onmessage = async function(e) {
                     );
                 }
                 printerInfo = res.printerInfo;
+                if(powerTimer >= 20000){
+                    res.printerInfo.forEach(printer => {
+                        PowerButton.applyBtn(printer);
+                    });
+                    powerTimer = 0
+                }else{
+                    powerTimer = powerTimer + 500;
+                }
                 updateState(res.printerInfo, res.clientSettings.cameraView);
             }
         }
@@ -446,7 +457,7 @@ function updateState(printers, clientSettings) {
             elements.row.className = `col-md-4 col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} hidden ${dNone}`;
             elements.start.classList.remove("hidden");
             elements.stop.classList.add("hidden");
-            elements.control.disabled = true;
+
             elements.start.disabled = true;
             elements.stop.disabled = true;
         }

@@ -7,6 +7,7 @@ import doubleClickFullScreen from "./lib/functions/fullscreen.js";
 import {parse} from "./vendor/flatted.js";
 import initGroupSelect from "./lib/modules/groupSelection.js";
 import {returnSelected} from "./lib/modules/filamentGrab.js";
+import PowerButton from "./lib/modules/powerButton.js";
 
 let printerInfo = "";
 let elems = [];
@@ -26,6 +27,8 @@ async function asyncParse(str) {
   }
 }
 var source = new EventSource("/sse/monitoringInfo/");
+let powerTimer = 20000;
+
 let groupInit = false;
 source.onmessage = async function(e) {
   if (e.data != null) {
@@ -41,6 +44,14 @@ source.onmessage = async function(e) {
         PrinterManager.init(res.printerInfo);
       } else {
         printerInfo = res.printerInfo;
+        if(powerTimer >= 20000){
+          res.printerInfo.forEach(printer => {
+            PowerButton.applyBtn(printer);
+          });
+          powerTimer = 0
+        }else{
+          powerTimer = powerTimer + 500;
+        }
         if (res.clientSettings.panelView.currentOp) {
           currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
         }

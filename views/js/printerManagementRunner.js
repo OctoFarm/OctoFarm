@@ -7,6 +7,7 @@ import FileOperations from "./lib/functions/file.js";
 import Validate from "./lib/functions/validate.js";
 import {parse} from './vendor/flatted.js';
 import tableSort from "./lib/functions/tablesort.js";
+import PowerButton from "./lib/modules/powerButton.js";
 
 let printerInfo = "";
 let editMode = false;
@@ -21,6 +22,7 @@ async function asyncParse(str) {
     }
 }
 let source = new EventSource("/sse/dashboardInfo/");
+let powerTimer = 20000;
 
 source.onmessage = async function(e) {
     if (!editMode) {
@@ -37,6 +39,14 @@ source.onmessage = async function(e) {
                     } else {
                         printerInfo = res.printerInfo;
                         dashUpdate.printers(res.printerInfo)
+                        if(powerTimer >= 20000){
+                            res.printerInfo.forEach(printer => {
+                                PowerButton.applyBtn(printer);
+                            });
+                            powerTimer = 0
+                        }else{
+                            powerTimer = powerTimer + 500;
+                        }
                     }
                 }
             }

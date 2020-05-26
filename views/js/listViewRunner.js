@@ -7,7 +7,7 @@ import {parse} from "./vendor/flatted.js";
 import tableSort from "./lib/functions/tablesort.js";
 window.onload = function () {tableSort.makeAllSortable();};
 import Validate from "./lib/functions/validate.js";
-
+import PowerButton from "./lib/modules/powerButton.js";
 import initGroupSelect from "./lib/modules/groupSelection.js";
 import {returnSelected} from "./lib/modules/filamentGrab.js";
 
@@ -29,6 +29,8 @@ async function asyncParse(str) {
   }
 }
 let groupInit = false;
+let powerTimer = 20000;
+
 var source = new EventSource("/sse/monitoringInfo/");
 source.onmessage = async function(e) {
   if (e.data != null) {
@@ -44,6 +46,14 @@ source.onmessage = async function(e) {
         PrinterManager.init(res.printerInfo);
       } else {
         printerInfo = res.printerInfo;
+        if(powerTimer >= 20000){
+          res.printerInfo.forEach(printer => {
+            PowerButton.applyBtn(printer);
+          });
+          powerTimer = 0
+        }else{
+          powerTimer = powerTimer + 500;
+        }
         if (res.clientSettings.listView.currentOp) {
           currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
         }
