@@ -23,7 +23,7 @@ export default class PowerButton {
         return powerBtn
     }
     static applyBtn(printer){
-
+        console.log("APPLY")
     }
     static applyState(printer){
 
