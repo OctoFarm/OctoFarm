@@ -22,7 +22,7 @@ export default class PowerButton {
             `
         return powerBtn
     }
-    static applyBtn(printer){
+    static async applyBtn(printer){
         if(typeof printer.settingsServer !== 'undefined' && !document.getElementById("printerPower-"+printer._id)){
             if(printer.settingsServer.commands.serverRestartCommand !== "" || printer.settingsServer.commands.systemRestartCommand !== "" || printer.settingsServer.commands.systemShutdownCommand !== ""){
                 document.getElementById("powerBtn-"+printer._id).innerHTML = PowerButton.returnPowerBtn(printer);
