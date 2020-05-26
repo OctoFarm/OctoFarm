@@ -74,7 +74,7 @@ const historyTotals = function(history){
     historyPrinterNames.push(hist.printHistory.printerName.replace(/ /g, "_"));
     if(hist.printHistory.filamentSelection != null){
       historySpools.push(
-          hist.printHistory.filamentSelection.spools.profile.material
+          hist.printHistory.filamentSelection.spools.profile.material.replace(/ /g, "_")
       );
     }
 
