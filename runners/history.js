@@ -198,11 +198,10 @@ class HistoryCollection {
     }
   }
     static async errorLog(payload, printer, job) {
-    console.log(payload)
       try{
         let serverSettings = await ServerSettings.find({});
         if(serverSettings[0].filamentManager){
-          printer.filamentSelection = await HistoryCollection.resyncFilament(printer);
+          printer.selectedFilament = await HistoryCollection.resyncFilament(printer);
           logger.info("Grabbed latest filament values", printer.filamentSelection);
         }
         let name = null;
