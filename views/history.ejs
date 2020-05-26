@@ -154,7 +154,7 @@
                 >Filter</option>
                 <% historyTotals.spools.forEach(spool => { %>
                   <option href="#"
-                          data-path=".<%= spool %>"><%= spool %></option>
+                          data-path=".<%= spool %>"><%= spool.replace(/_/g, " ") %></option>
                 <%  }) %>
 
               </select>
@@ -310,7 +310,7 @@
             Loading...
           </td>
           <%if(history[i].printHistory.filamentSelection != null){%>
-          <td class="spool <%= history[i].printHistory.filamentSelection.spools.profile.material %>" id="spool-<%= history[i]._id %>">
+          <td class="spool <%= history[i].printHistory.filamentSelection.spools.profile.material.replace(/ /g, "_") %>" id="spool-<%= history[i]._id %>">
           <% }else{%>
           <td class="spool" id="spool-<%= history[i]._id %>">
           <%}%>
