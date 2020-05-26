@@ -36,7 +36,7 @@ class HistoryCollection {
     try{
       let serverSettings = await ServerSettings.find({});
       if(serverSettings[0].filamentManager){
-        printer.filamentSelection = await HistoryCollection.resyncFilament(printer);
+        printer.selectedFilament = await HistoryCollection.resyncFilament(printer);
         logger.info("Grabbed latest filament values", printer.filamentSelection);
       }
       logger.info("Completed Print triggered", payload + printer.printerURL);
@@ -120,7 +120,7 @@ class HistoryCollection {
     try {
       let serverSettings = await ServerSettings.find({});
       if (serverSettings[0].filamentManager) {
-        printer.filamentSelection = await HistoryCollection.resyncFilament(printer);
+        printer.selectedFilament = await HistoryCollection.resyncFilament(printer);
         logger.info("Grabbed latest filament values", printer.filamentSelection);
       }
       let name = null;
