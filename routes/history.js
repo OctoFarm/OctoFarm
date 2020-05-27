@@ -16,25 +16,29 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
   if(history.printHistory.notes != note){
     history.printHistory.notes = note;
   }
-  if(history.printHistory.filamentSelection != filamentId && filamentId != 0){
-    let serverSettings = await ServerSettings.find({});
-    let spool = await Spools.findById(filamentId);
+  console.log(history.printHistory.filamentSelection._id)
+  if(history.printHistory.filamentSelection != null && history.printHistory.filamentSelection._id != filamentId){
+    if(history.printHistory.filamentSelection != filamentId && filamentId != 0){
+      let serverSettings = await ServerSettings.find({});
+      let spool = await Spools.findById(filamentId);
 
-    if(serverSettings[0].filamentManager){
-      let profiles = await Profiles.find({})
-      let profileIndex = _.findIndex(profiles, function(o) {
-        return o.profile.index == spool.spools.profile;
-      });
-      spool.spools.profile = profiles[profileIndex].profile;
-      history.printHistory.filamentSelection = spool;
+      if(serverSettings[0].filamentManager){
+        let profiles = await Profiles.find({})
+        let profileIndex = _.findIndex(profiles, function(o) {
+          return o.profile.index == spool.spools.profile;
+        });
+        spool.spools.profile = profiles[profileIndex].profile;
+        history.printHistory.filamentSelection = spool;
+      }else{
+        let profile = await Profiles.findById(spool.spools.profile)
+        spool.spools.profile = profile.profile;
+        history.printHistory.filamentSelection = spool;
+      }
     }else{
-      let profile = await Profiles.findById(spool.spools.profile)
-      spool.spools.profile = profile.profile;
-      history.printHistory.filamentSelection = spool;
+      history.printHistory.filamentSelection = null;
     }
-  }else{
-    history.printHistory.filamentSelection = null;
   }
+
 
   history.markModified("printHistory");
   history = history.save();
