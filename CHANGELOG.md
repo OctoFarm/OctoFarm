@@ -37,6 +37,7 @@ All notable changes to this project will be documented in this file.
             - black - No status could be found.
             - red - Printer is turned off.
             - green - Printer is turned on.
+    - Filters on history table also now show totals of everything filtered, ignoring pagination.
         
 ### Changed
     - Group dropdown only appears if groups exist.

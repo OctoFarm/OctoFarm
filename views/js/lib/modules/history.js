@@ -288,6 +288,32 @@ export default class History {
       }
     }
   }
-  static reload() {}
+  static updateTotals(filtered) {
+    let times = []
+    let cost = [];
+    let usageG = [];
+    let usageL = [];
+      filtered.forEach(row => {
+        times.push(parseInt(row.getElementsByClassName("time")[0].innerText))
+        if(!isNaN(parseFloat(row.getElementsByClassName("cost")[0].innerText))){
+          cost.push(parseFloat(row.getElementsByClassName("cost")[0].innerText))
+        }
+        if(row.getElementsByClassName("usage")[0].innerText !== ""){
+          let split = row.getElementsByClassName("usage")[0].innerText.split("/")
+          usageL.push(parseFloat(split[0]))
+          usageG.push(parseFloat(split[1]))
+        }
+
+      })
+    document.getElementById("totalCost").innerHTML = cost.reduce((a, b) => a + b, 0).toFixed(2)
+    document.getElementById("totalFilament").innerHTML = usageL.reduce((a, b) => a + b, 0).toFixed(2) + "m / " + usageG.reduce((a, b) => a + b, 0).toFixed(2)+ "g"
+    let totalTimes = times.reduce((a, b) => a + b, 0)
+    document.getElementById("totalPrintTime").innerHTML = Calc.generateTime(totalTimes)
+  }
 }
+const element = document.getElementById('listenerHistory');
+element.addEventListener('jplist.state', (e) => {
+  //the elements list after filtering + pagination
+  History.updateTotals(e.jplistState.filtered);
+}, false);
 History.get();
