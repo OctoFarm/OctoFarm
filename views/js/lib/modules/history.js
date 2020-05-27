@@ -234,7 +234,7 @@ export default class History {
           filament.value = current.filamentSelection._id;
         }else{
           filament.insertAdjacentHTML("afterbegin", `
-            <option value="${current.filamentSelection._id}">${returnHistory(current.filamentSelection)}</option>
+            <option value="${current.filamentSelection._id}">${await returnHistory(current.filamentSelection)}</option>
           `)
           filament.value = current.filamentSelection._id;
         }
