@@ -17,31 +17,35 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
     history.printHistory.notes = note;
   }
 
-  if(history.printHistory.filamentSelection != null && history.printHistory.filamentSelection._id != filamentId){
-    if(history.printHistory.filamentSelection != filamentId && filamentId != 0){
-      let serverSettings = await ServerSettings.find({});
-      let spool = await Spools.findById(filamentId);
 
-      if(serverSettings[0].filamentManager){
-        let profiles = await Profiles.find({})
-        let profileIndex = _.findIndex(profiles, function(o) {
-          return o.profile.index == spool.spools.profile;
-        });
-        spool.spools.profile = profiles[profileIndex].profile;
-        history.printHistory.filamentSelection = spool;
+    if(filamentId != 0){
+      if(history.printHistory.filamentSelection !== null && history.printHistory.filamentSelection._id == filamentId){
+        //Skip da save
       }else{
-        let profile = await Profiles.findById(spool.spools.profile)
-        spool.spools.profile = profile.profile;
-        history.printHistory.filamentSelection = spool;
+        let serverSettings = await ServerSettings.find({});
+        let spool = await Spools.findById(filamentId);
+
+        if(serverSettings[0].filamentManager){
+          let profiles = await Profiles.find({})
+          let profileIndex = _.findIndex(profiles, function(o) {
+            return o.profile.index == spool.spools.profile;
+          });
+          spool.spools.profile = profiles[profileIndex].profile;
+          history.printHistory.filamentSelection = spool;
+        }else{
+          let profile = await Profiles.findById(spool.spools.profile)
+          spool.spools.profile = profile.profile;
+          history.printHistory.filamentSelection = spool;
+        }
       }
     }else{
       history.printHistory.filamentSelection = null;
     }
-  }
+
 
 
   history.markModified("printHistory");
-  history = history.save();
+  history.save();
   res.send("success");
 });
 //Register Handle for Saving printers
