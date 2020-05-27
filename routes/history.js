@@ -16,7 +16,7 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
   if(history.printHistory.notes != note){
     history.printHistory.notes = note;
   }
-  console.log(history.printHistory.filamentSelection._id)
+
   if(history.printHistory.filamentSelection != null && history.printHistory.filamentSelection._id != filamentId){
     if(history.printHistory.filamentSelection != filamentId && filamentId != 0){
       let serverSettings = await ServerSettings.find({});
