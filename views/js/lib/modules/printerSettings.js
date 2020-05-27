@@ -1168,7 +1168,6 @@ export default class PrinterSettings {
         printerBaud: document.getElementById("printerBaudDrop"),
         printerProfile: document.getElementById("printerProfileDrop"),
         printerConnect: document.getElementById("printerConnect"),
-        connectButton: document.getElementById("psConnectBtn"),
         portDropDown: document.getElementById("psSerialPort"),
         baudDropDown: document.getElementById("psBaudrate"),
         profileDropDown: document.getElementById("psProfile")
@@ -1193,10 +1192,6 @@ export default class PrinterSettings {
         printer.stateColour.category === "Idle" ||
         printer.stateColour.category === "Complete"
     ) {
-      elements.connectPage.connectButton.value = "disconnect";
-      elements.connectPage.connectButton.innerHTML = "Disconnect";
-      elements.connectPage.connectButton.classList = "btn btn-danger inline";
-      elements.connectPage.connectButton.disabled = false;
       if (
           typeof printer.temps != "undefined" &&
           typeof printer.temps[0].tool0 != "undefined" &&
