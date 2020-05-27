@@ -29,6 +29,14 @@ All notable changes to this project will be documented in this file.
     - History now has filter dropdowns for File Name, Printer Name, Filament Type. 
     - Activated the restart/shutdown host and octoprint buttons
     - Added checks for power state if enabled. Will check every 20 seconds for a state change unless powered off/on/toggled through the UI.
+    - Added buttons to activate the settings for power control. You will only see options for which you have setup.
+        - Drop down will show "Power On/Off" 
+        - As above it will check every 20 seconds for a state change, unless you action power toggle/on/off. 
+        - Main power button will toggle the current state.
+        - The Main power button will show the following colours:
+            - black - No status could be found.
+            - red - Printer is turned off.
+            - green - Printer is turned on.
         
 ### Changed
     - Group dropdown only appears if groups exist.
