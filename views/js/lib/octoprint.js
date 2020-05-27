@@ -288,4 +288,79 @@ export default class OctoPrintClient {
       );
     }
   }
+  static async power(printer, url, action, command) {
+    if (url.includes("[PrinterURL]")) {
+      url = url.replace("[PrinterURL]", printer.printerURL)
+    }
+    if (url.includes("[PrinterAPI]")) {
+      url = url.replace("[PrinterAPI]", printer.apikey)
+    }
+    if (typeof command === 'undefined' || command == "") {
+      let post = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (post.status !== 200) {
+        UI.createAlert("error", `${Validate.getName(printer)}: Could not complete ${action}`, 3000)
+      } else {
+        UI.createAlert("success", `${Validate.getName(printer)}: Successfully completed ${action}`, 3000)
+      }
+    } else {
+      let post = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Key": printer.apikey
+        },
+        body: JSON.stringify(command)
+      });
+      if (post.status !== 200) {
+        UI.createAlert("error", `${Validate.getName(printer)}: Could not complete ${action}`, 3000)
+      } else {
+        UI.createAlert("success", `${Validate.getName(printer)}: Successfully completed ${action}`, 3000)
+      }
+    }
+    if (action === "Power Toggle") {
+      return await OctoPrintClient.getPowerStatus(printer, url, command);
+    }
+  }
+  static async getPowerStatus(printer, url, command) {
+    if(url.includes("[PrinterURL]")){
+      url = url.replace("[PrinterURL]", printer.printerURL)
+    }
+    if(url.includes("[PrinterAPI]")){
+      url = url.replace("[PrinterAPI]", printer.apikey)
+    }
+      if(typeof command === 'undefined' || command == ""){
+        let post = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if(post.status !== 200){
+          return "No Status"
+        }else{
+          post = await post.json();
+          return post;
+        }
+      }else{
+        let post = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Api-Key": printer.apikey
+          },
+          body: JSON.stringify(command)
+        });
+        if(post.status !== 200){
+          return "No Status"
+        }else{
+          post = await post.json();
+          return post;
+        }
+      }
+  }
 }
