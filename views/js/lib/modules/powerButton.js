@@ -97,7 +97,7 @@ export default class PowerButton {
             let status = await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand)
             if(status === "No Status"){
                 powerStatusPrinter.style.color = "black";
-            }else if(status){
+            }else if(status[Object.keys(status)[0]]){
                 powerStatusPrinter.style.color = "green";
             }else{
                 powerStatusPrinter.style.color = "red";
@@ -115,7 +115,7 @@ export default class PowerButton {
                     let powerStatusPrinter = document.getElementById("printerStatus-" + printer._id);
                     if(status === "No Status"){
                         powerStatusPrinter.style.color = "black";
-                    }else if(status){
+                    }else if(status[Object.keys(status)[0]]){
                         powerStatusPrinter.style.color = "green";
                     }else{
                         powerStatusPrinter.style.color = "red";
