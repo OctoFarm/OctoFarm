@@ -658,6 +658,15 @@ class Runner {
                 farmPrinters[i].camURL = "http://" + farmPrinters[i].camURL;
             }
         }
+        if (typeof farmPrinters[i].costSettings === "undefined" || _.isEmpty(farmPrinters[i].costSettings)) {
+            farmPrinters[i].costSettings = {
+                powerConsumption: 0.5,
+                electricityCosts: 0.15,
+                purchasePrice: 500,
+                estimateLifespan: 43800,
+                maintenanceCosts: 0.25,
+            };
+        }
         printer.octoPrintVersion = farmPrinters[i].octoPrintVersion;
         printer.camURL = farmPrinters[i].camURL;
         printer.printerURL = farmPrinters[i].printerURL;
@@ -670,6 +679,7 @@ class Runner {
         printer.selectedFilament = farmPrinters[i].selectedFilament;
         printer.powerSettings = farmPrinters[i].powerSettings;
         printer.alerts = farmPrinters[i].alerts;
+        printer.costSettings = farmPrinters[i].costSettings;
         await printer.save();
         return true;
     }
@@ -1174,8 +1184,8 @@ class Runner {
             printer.markModified("tempTriggers");
         }
         if(settings.other.heatingVariation != ""){
-            farmPrinters[index].tempTriggers.heatingVariation = parseInt(settings.other.heatingVariation);
-            printer.tempTriggers.heatingVariation = parseInt(settings.other.heatingVariation);
+            farmPrinters[index].tempTriggers.heatingVariation = parseFloat(settings.other.heatingVariation);
+            printer.tempTriggers.heatingVariation = parseFloat(settings.other.heatingVariation);
             printer.markModified("tempTriggers");
         }
         farmPrinters[index].settingsApperance.name = settings.profile.name;
