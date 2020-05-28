@@ -282,6 +282,7 @@
           <th class="table-dark" scope="col">Print Time</th>
           <th class="table-dark" scope="col">Filament Cost</th>
           <th class="table-dark" scope="col">Printer Cost</th>
+          <th class="table-dark" scope="col">Total Cost</th>
           <th class="table-dark" scope="col">Spool</th>
           <th class="table-dark" scope="col">Filament Usage</th>
           <th class="table-dark" scope="col" width="400px">
@@ -325,6 +326,9 @@
             Loading...
           </td>
           <td class="printerCost" id="printerCost-<%= history[i]._id %>">
+            Loading...
+          </td>
+          <td class="totalCost" id="totalCost-<%= history[i]._id %>">
             Loading...
           </td>
           <%if(history[i].printHistory.filamentSelection != null){%>

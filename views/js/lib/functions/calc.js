@@ -63,7 +63,31 @@ export default class Calculate {
   static isBetween(n, a, b) {
     return (n - a) * (n - b) <= 0;
   }
+  static returnPrintCost(costSettings, time){
+    if(typeof costSettings === "undefined"){
+      //Attempt to update cost settings in history...
+      return "No cost settings to calculate from"
+    }else{
+      // calculating electricity cost
+      let powerConsumption = parseFloat(costSettings.powerConsumption);
+      let costOfElectricity = parseFloat(costSettings.electricityCosts);
+      let costPerHour = powerConsumption * costOfElectricity;
+      let estimatedPrintTime = time / 3600;  // h
+      let electricityCost = costPerHour * estimatedPrintTime;
+      // calculating printer cost
+      let purchasePrice = parseFloat(costSettings.purchasePrice);
+      let lifespan = parseFloat(costSettings.estimateLifespan);
+      let depreciationPerHour = lifespan > 0 ? purchasePrice / lifespan : 0;
+      let maintenancePerHour = parseFloat(costSettings.maintenanceCosts);
+      let printerCost = (depreciationPerHour + maintenancePerHour) * estimatedPrintTime;
+      // assembling string
+      let estimatedCost = electricityCost + printerCost;
+      return estimatedCost.toFixed(2);
+    }
 
+
+
+  }
   static bytes(a, b) {
     let string = "";
     if (a === undefined || isNaN(a) || a === null) {

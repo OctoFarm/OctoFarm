@@ -58,31 +58,7 @@ export default class History {
 
     }
   }
-  static returnPrintCost(costSettings, time){
-    if(typeof costSettings === "undefined"){
-      //Attempt to update cost settings in history...
-      return "No cost settings to calculate from"
-    }else{
-      // calculating electricity cost
-      let powerConsumption = parseFloat(costSettings.powerConsumption);
-      let costOfElectricity = parseFloat(costSettings.electricityCosts);
-      let costPerHour = powerConsumption * costOfElectricity;
-      let estimatedPrintTime = time / 3600;  // h
-      let electricityCost = costPerHour * estimatedPrintTime;
-      // calculating printer cost
-      let purchasePrice = parseFloat(costSettings.purchasePrice);
-      let lifespan = parseFloat(costSettings.estimateLifespan);
-      let depreciationPerHour = lifespan > 0 ? purchasePrice / lifespan : 0;
-      let maintenancePerHour = parseFloat(costSettings.maintenanceCosts);
-      let printerCost = (depreciationPerHour + maintenancePerHour) * estimatedPrintTime;
-      // assembling string
-      let estimatedCost = electricityCost + printerCost;
-      return estimatedCost.toFixed(2);
-    }
 
-
-
-  }
 
   static async get() {
     let newHistory = await OctoFarmClient.get("history/get");
@@ -105,9 +81,19 @@ export default class History {
         let grams = document.getElementById("usage-" + historyList.history[i]._id)
         grams = grams.innerHTML
         grams = grams.split(" / ").pop();
-
-        document.getElementById("printerCost-" + historyList.history[i]._id).innerHTML = History.returnPrintCost(historyList.history[i].printHistory.costSettings, historyList.history[i].printHistory.printTime);
-        document.getElementById("cost-" + historyList.history[i]._id).innerHTML = History.returnFilamentCost(historyList.history[i].printHistory.filamentSelection, grams);
+        let printerCost = Calc.returnPrintCost(historyList.history[i].printHistory.costSettings, historyList.history[i].printHistory.printTime)
+        let filamentCost = History.returnFilamentCost(historyList.history[i].printHistory.filamentSelection, grams);
+        document.getElementById("printerCost-" + historyList.history[i]._id).innerHTML = printerCost
+        document.getElementById("cost-" + historyList.history[i]._id).innerHTML = filamentCost
+        let totalCost = 0;
+        if(!isNaN(filamentCost)){
+          totalCost = (parseFloat(printerCost) + parseFloat(filamentCost)).toFixed(2)
+        }else if(isNaN(printerCost)){
+          totalCost = printerCost;
+        }else{
+          totalCost = parseFloat(printerCost).toFixed(2)
+        }
+        document.getElementById("totalCost-"+ historyList.history[i]._id).innerHTML = totalCost;
       } else {
         if (historyList.history[i].printHistory.filamentSelection !== null) {
           filamentString = await returnHistory(historyList.history[i].printHistory.filamentSelection)
@@ -117,7 +103,9 @@ export default class History {
         document.getElementById("spool-" + historyList.history[i]._id).innerHTML = filamentString;
         document.getElementById("cost-" + historyList.history[i]._id).innerHTML = "";
         document.getElementById("usage-" + historyList.history[i]._id).innerHTML = "";
-        document.getElementById("printerCost-" + historyList.history[i]._id).innerHTML = History.returnPrintCost(historyList.history[i].printHistory.costSettings, historyList.history[i].printHistory.printTime);
+        let printerCost = Calc.returnPrintCost(historyList.history[i].printHistory.costSettings, historyList.history[i].printHistory.printTime);
+        document.getElementById("printerCost-" + historyList.history[i]._id).innerHTML = printerCost;
+        document.getElementById("totalCost-"+ historyList.history[i]._id).innerHTML = printerCost;
       }
 
     }
@@ -220,7 +208,7 @@ export default class History {
           filamentWeight = filamentWeight.split(" / ").pop()
           weight.value = filamentWeight
           cost.value = History.returnFilamentCost(current.filamentSelection, filamentWeight);
-          printerCost.value = History.returnPrintCost(current.costSettings, current.printTime);
+          printerCost.value = Calc.returnPrintCost(current.costSettings, current.printTime);
 
 
           if (current.job.filament.tool0.length === 0) {
@@ -295,12 +283,10 @@ export default class History {
     post = await post.json();
     if (post.status === 200) {
       UI.createAlert("success", "Successfully added your printers cost to history.", 3000, "clicked");
-      console.log(History.returnPrintCost(post.costSettings, post.printTime))
-      console.log(document.getElementById("printerCost-"+id))
-      document.getElementById("printerCost-"+id).innerHTML = History.returnPrintCost(post.costSettings, post.printTime);
+      document.getElementById("printerCost-"+id).innerHTML = Calc.returnPrintCost(post.costSettings, post.printTime);
     }else{
       UI.createAlert("warning", "Printer no longer exists in database, default cost applied.", 3000, "clicked");
-      document.getElementById("printerCost-"+id).innerHTML = History.returnPrintCost(post.costSettings, post.printTime);
+      document.getElementById("printerCost-"+id).innerHTML = Calc.returnPrintCost(post.costSettings, post.printTime);
     }
   }
   static async save(id) {
