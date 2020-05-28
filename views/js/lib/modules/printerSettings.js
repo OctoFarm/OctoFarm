@@ -594,14 +594,14 @@ export default class PrinterSettings {
         document.getElementById("tempTriggers").innerHTML = `
            <div class="form-group">
               <label for="headtingVariation">Heating Variation</label>
-              <input type="number" class="form-control" id="headtingVariation" placeholder="${printer.tempTriggers.heatingVariation}">
+              <input type="number" class="form-control" id="headtingVariation" placeholder="${printer.tempTriggers.heatingVariation}" step="0.01">
               <small id="passwordHelpBlock" class="form-text text-muted">
                   What temperature variation will trigger orange warning on the temperature display when a printer is Active. <code>Default is 1°C</code>
               </small>
             </div>
             <div class="form-group">
               <label for="coolDown">Cool Down Trigger</label>
-              <input type="number" class="form-control" id="coolDown" placeholder="${printer.tempTriggers.coolDown}">
+              <input type="number" class="form-control" id="coolDown" placeholder="${printer.tempTriggers.coolDown}" step="0.01">
               <small id="passwordHelpBlock" class="form-text text-muted">
                   What temperature limit will trigger the blue status on the temperature display when a printer is Complete and cooling down. <code>Default is 30°C</code>
               </small>
@@ -613,7 +613,7 @@ export default class PrinterSettings {
                    <div class="form-group">
                     <label for="coolDown">Power Consumption</label>
                           <div class="input-group mb-2">
-                                <input type="number" class="form-control" id="powerConsumption" placeholder="${printer.costSettings.powerConsumption}">
+                                <input type="number" class="form-control" id="powerConsumption" placeholder="${printer.costSettings.powerConsumption}" step="0.01">
                                 <div class="input-group-append">
                                      <div class="input-group-text">kW</div>
                                 </div>
@@ -625,7 +625,7 @@ export default class PrinterSettings {
                   <div class="form-group">
                     <label for="coolDown">Electricity Costs</label>
                          <div class="input-group mb-2">
-                            <input type="number" class="form-control" id="electricityCosts" placeholder="${printer.costSettings.electricityCosts}">
+                            <input type="number" class="form-control" id="electricityCosts" placeholder="${printer.costSettings.electricityCosts}" step="0.01">
                                 <div class="input-group-append">
                                      <div class="input-group-text"></div>
                                 </div>
@@ -640,7 +640,7 @@ export default class PrinterSettings {
                     <div class="form-group">
                       <label for="coolDown">Purchase Price</label>
                          <div class="input-group mb-2">
-                            <input type="number" class="form-control" id="purchasePrice" placeholder="${printer.costSettings.purchasePrice}">
+                            <input type="number" class="form-control" id="purchasePrice" placeholder="${printer.costSettings.purchasePrice}" step="0.01">
                                 <div class="input-group-append">
                                      <div class="input-group-text"></div>
                                 </div>
@@ -653,7 +653,7 @@ export default class PrinterSettings {
                     <div class="form-group">
                       <label for="coolDown">Estimated Life Span</label>
                            <div class="input-group mb-2">
-                             <input type="number" class="form-control" id="estimatedLifespan" placeholder="${printer.costSettings.estimateLifespan}">
+                             <input type="number" class="form-control" id="estimatedLifespan" placeholder="${printer.costSettings.estimateLifespan}" step="0.01">
                                 <div class="input-group-append">
                                      <div class="input-group-text">hours</div>
                                 </div>
@@ -665,7 +665,7 @@ export default class PrinterSettings {
                     <div class="form-group">
                       <label for="coolDown">Maintenance Costs</label>
                            <div class="input-group mb-2">
-                             <input type="number" class="form-control" id="maintenanceCosts" placeholder="${printer.costSettings.maintenanceCosts}">
+                             <input type="number" class="form-control" id="maintenanceCosts" placeholder="${printer.costSettings.maintenanceCosts}" step="0.01">
                                 <div class="input-group-append">
                                      <div class="input-group-text"><i class="fas fa-wrench"></i> / hour</div>
                                 </div>
