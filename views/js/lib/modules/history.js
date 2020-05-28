@@ -292,10 +292,15 @@ export default class History {
       id: id
     }
     let post = await OctoFarmClient.post("history/updateCostMatch", update);
+    post = await post.json();
     if (post.status === 200) {
-      UI.createAlert("success", "Successfully updated your printers cost");
+      UI.createAlert("success", "Successfully added your printers cost to history.", 3000, "clicked");
+      console.log(History.returnPrintCost(post.costSettings, post.printTime))
+      console.log(document.getElementById("printerCost-"+id))
+      document.getElementById("printerCost-"+id).innerHTML = History.returnPrintCost(post.costSettings, post.printTime);
     }else{
-      UI.createAlert("success", "Printer no longer exists in database, default cost applied.");
+      UI.createAlert("warning", "Printer no longer exists in database, default cost applied.", 3000, "clicked");
+      document.getElementById("printerCost-"+id).innerHTML = History.returnPrintCost(post.costSettings, post.printTime);
     }
   }
   static async save(id) {
@@ -308,7 +313,7 @@ export default class History {
     let post = await OctoFarmClient.post("history/update", update);
 
     if (post.status === 200) {
-      UI.createAlert("success", "Successfully updated your history entry...");
+      UI.createAlert("success", "Successfully updated your history entry...", 3000, "clicked");
       document.getElementById("note-" + id).innerHTML = update.note;
       document.getElementById("spool-" + id).innerHTML = update.filamentId;
     }

@@ -74,7 +74,12 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
     history.printHistory.costSettings = printers[printer].costSettings;
     history.markModified("printHistory")
     history.save();
-    res.send({status: 200})
+    let send = {
+      status: 200,
+      printTime: history.printHistory.printTime,
+      costSettings: printers[printer].costSettings,
+    }
+    res.send(send)
   }else{
     history.printHistory.costSettings =
     {
@@ -84,9 +89,14 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
       estimateLifespan: 43800,
       maintenanceCosts: 0.25,
     };
+    let send = {
+      status: 400,
+      printTime: history.printHistory.printTime,
+      costSettings: history.printHistory.costSettings,
+    }
     history.markModified("printHistory")
     history.save();
-    res.send({status: 400})
+    res.send(send)
   }
 });
 
