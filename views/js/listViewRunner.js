@@ -10,6 +10,7 @@ import Validate from "./lib/functions/validate.js";
 import PowerButton from "./lib/modules/powerButton.js";
 import initGroupSelect from "./lib/modules/groupSelection.js";
 import {returnSelected} from "./lib/modules/filamentGrab.js";
+import {dragAndDropEnable} from "./lib/functions/dragAndDrop.js";
 
 let printerInfo = [];
 let elems = [];
@@ -30,6 +31,7 @@ async function asyncParse(str) {
 }
 let groupInit = false;
 let powerTimer = 20000;
+let dragDropInit = false;
 
 var source = new EventSource("/sse/monitoringInfo/");
 source.onmessage = async function(e) {
@@ -38,6 +40,15 @@ source.onmessage = async function(e) {
     if(groupInit === false){
       initGroupSelect(res.printerInfo)
       groupInit = true;
+    }
+    if(dragDropInit === false){
+      let printerList = document.querySelectorAll("[id^='viewPanel-']")
+      printerList.forEach(list => {
+        let ca = list.id.split("-");
+        let zeeIndex = _.findIndex(res.printerInfo, function(o) { return o._id == ca[1]; });
+        dragAndDropEnable(list, res.printerInfo[zeeIndex])
+        dragDropInit = true;
+      })
     }
     if (res != false) {
       if (

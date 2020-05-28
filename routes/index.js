@@ -11,7 +11,7 @@ const Runner = runner.Runner;
 const _ = require("lodash");
 
 
-const version = pjson.version + ".9-dev-3";
+const version = pjson.version + ".9-dev-3.9";
 
 console.log("db: " + db);
 

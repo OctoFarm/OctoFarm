@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [v1.1.4.9-dev-3]
+## [v1.1.4.9-dev-3.9]
 
 ### Added
     - Farm Utilisation chart on dashboard now calculates Failed Hours. These are the hours totaled registered from history that are set as success = false;
@@ -45,6 +45,10 @@ All notable changes to this project will be documented in this file.
         - Due to cost settings been captured on history grab no backwards compatablility. Have added ability to "Update Cost" settings, if printer doesn't exist in database anymore then a default set of values will be used.
         - History statistic totals now include Total Printer Cost/Highest Printer Cost
         - History filter totals now show printer cost total and combined total.
+    - Added drag and drop to all views and printer control panel
+        - Currently when you drag a file and hover over a printer/file list you will get a darkened box, dropping your file here will initiate the upload. 
+        - If you only have a single file it will ask if you would like to print the file.
+        - If you are on Printer Control/File Manager it will choose the current folder to upload too.
         
 ### Changed
     - Group dropdown only appears if groups exist.
@@ -90,6 +94,7 @@ All notable changes to this project will be documented in this file.
     - Dropdowns for power appearing off page.
     - Fixed power dropdowns showing under cam headings/panel
     - Typo's in client settings
+    - Timeout with large file sets
 
 ## [v1.1.4.9-dev-2.7]
 
