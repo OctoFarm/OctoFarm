@@ -475,6 +475,7 @@ export default class PrinterSettings {
         }else{
           systemShutdown = printer.settingsServer.commands.systemShutdownCommand
         }
+
         document.getElementById("printerSettingsFooter").innerHTML = ``;
         document.getElementById("printerSettingsFooter").insertAdjacentHTML('beforeend', `
                             <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
@@ -571,6 +572,15 @@ export default class PrinterSettings {
             </div>
         </form>
         `;
+        if(serverRestart != "N/A"){
+          document.getElementById("serverRestart").value = serverRestart;
+        }
+        if(systemRestart != "N/A"){
+          document.getElementById("systemRestart").value = systemRestart;
+        }
+        if(systemShutdown != "N/A"){
+          document.getElementById("systemShutdown").value = systemShutdown;
+        }
         if(printer.powerSettings != null){
           document.getElementById("powerOnCommand").value = printer.powerSettings.powerOnCommand;
           document.getElementById("powerOnURL").value = printer.powerSettings.powerOnURL;
