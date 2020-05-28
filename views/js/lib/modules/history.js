@@ -339,12 +339,16 @@ export default class History {
   static updateTotals(filtered) {
     let times = []
     let cost = [];
+    let printerCost = [];
     let usageG = [];
     let usageL = [];
       filtered.forEach(row => {
         times.push(parseInt(row.getElementsByClassName("time")[0].innerText))
         if(!isNaN(parseFloat(row.getElementsByClassName("cost")[0].innerText))){
           cost.push(parseFloat(row.getElementsByClassName("cost")[0].innerText))
+        }
+        if(!isNaN(parseFloat(row.getElementsByClassName("printerCost")[0].innerText))){
+          printerCost.push(parseFloat(row.getElementsByClassName("printerCost")[0].innerText))
         }
         if(row.getElementsByClassName("usage")[0].innerText !== ""){
           let split = row.getElementsByClassName("usage")[0].innerText.split("/")
@@ -357,6 +361,8 @@ export default class History {
     document.getElementById("totalFilament").innerHTML = usageL.reduce((a, b) => a + b, 0).toFixed(2) + "m / " + usageG.reduce((a, b) => a + b, 0).toFixed(2)+ "g"
     let totalTimes = times.reduce((a, b) => a + b, 0)
     document.getElementById("totalPrintTime").innerHTML = Calc.generateTime(totalTimes)
+    document.getElementById("printerTotalCost").innerHTML = printerCost.reduce((a, b) => a + b, 0).toFixed(2);
+    document.getElementById("combinedTotalCost").innerHTML = parseFloat(printerCost.reduce((a, b) => a + b, 0).toFixed(2)) + parseFloat(cost.reduce((a, b) => a + b, 0).toFixed(2));
   }
 }
 const element = document.getElementById('listenerHistory');
