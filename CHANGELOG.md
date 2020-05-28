@@ -38,6 +38,13 @@ All notable changes to this project will be documented in this file.
             - red - Printer is turned off.
             - green - Printer is turned on.
     - Filters on history table also now show totals of everything filtered, ignoring pagination.
+    - Printer Cost settings calculation
+        - Default values added on printer init. 
+        - Enter in your printers Power Consumption, kilowat price, purchase price, esitmated life span, maintenance costs
+        - Will be calculated on history grab. 
+        - Due to cost settings been captured on history grab no backwards compatablility. Have added ability to "Update Cost" settings, if printer doesn't exist in database anymore then a default set of values will be used.
+        - History statistic totals now include Total Printer Cost/Highest Printer Cost
+        - History filter totals now show printer cost total and combined total.
         
 ### Changed
     - Group dropdown only appears if groups exist.
