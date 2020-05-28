@@ -55,6 +55,7 @@ li {
   margin-left: 0px;
   margin-right: 0px;
 }
+
 .largeWidth {
   margin: 0 auto;
   max-width: 700px;
@@ -260,7 +261,7 @@ a.notyet {
 .camName {
   background-color:black;
   position: absolute;
-  z-index: 998;
+  z-index: 10;
   width: 100%;
   height: 18px;
   top:1px;
@@ -270,7 +271,7 @@ a.notyet {
 .camExtra {
   background-color:black;
   position: absolute;
-  z-index: 998;
+  z-index: 10;
   width: 100%;
   font-size:13px;
   top:19px;

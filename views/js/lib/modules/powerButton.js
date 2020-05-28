@@ -11,7 +11,7 @@ export default class PowerButton {
                             <button title="Other power actions" type="button" class="btn btn-sm btn-outline-danger dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 <span class="sr-only">Toggle Dropdown</span>
                             </button>
-                            <div class="dropdown-menu text-center">
+                            <div class="dropdown-menu text-center dropdown-menu-right">
                                   <a id="printerPowerOn-${printer._id}" title="Turn on your printer" class="dropdown-item d-none" href="#"><i class="textComplete fas fa-power-off"></i> Power On Printer</a>
                                 <a id="printerPowerOff-${printer._id}" title="Turn off your printer" class="dropdown-item d-none" href="#"><i class="textOffline fas fa-power-off"></i> Power Off Printer</a>
                           

@@ -80,6 +80,8 @@ All notable changes to this project will be documented in this file.
     - Fixed issue with ping pong incorrectly fireing for mid-connection websockets
     - Fixed history index not sequencially counting if multiple entries collected at same time.
     - Fixed issue where filament would update on List/Panel view when changes/history captured.
+    - Dropdowns for power appearing off page.
+    - Fixed power dropdowns showing under cam headings/panel
 
 ## [v1.1.4.9-dev-2.7]
 
