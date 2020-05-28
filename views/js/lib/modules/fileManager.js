@@ -324,7 +324,12 @@ export default class FileManager {
           let fileDate = new Date(file.date*1000);
           let dateString = fileDate.toDateString();
           let timeString = fileDate.toTimeString().substring(0, 8);
-          let getUsage = FileActions.grabUsage(file)
+          let getUsage = FileActions.grabUsage(file);
+          let usageElement = getUsage.split(" / ").pop();
+          let printCost = (parseFloat(Calc.returnFilamentCost(printer.selectedFilament, usageElement)) + parseFloat(Calc.returnPrintCost(printer.costSettings, file.time))).toFixed(2);
+            if(isNaN(printCost)){
+              printCost = "Unable to calculate";
+            }
 
           fileDate = dateString + " " + timeString;
 
@@ -350,9 +355,10 @@ export default class FileManager {
             <div class="col-lg-11">
             <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1 name">${file.display}</h5>
-            <small><i class="fas fa-stopwatch"></i> <span class="time">${Calc.generateTime(
+    <small><i class="fas fa-stopwatch"></i> <span class="time">${Calc.generateTime(
                     file.time
-                )}</span> </small>
+                )}</span> <br> <i class="fas fa-dollar-sign"></i> <span class="cost"> ${printCost} </span> </small>
+
 
           </div>
           <p class="mb-1 float-left">
@@ -427,10 +433,10 @@ export default class FileManager {
             </div>
             <div class="col-lg-11">
             <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1 name">${file.display}</h5>
+            <h5 class="mb-1 name">${file.display}</h5>         
             <small><i class="fas fa-stopwatch"></i> <span class="time">${Calc.generateTime(
                     file.time
-                )}</span> </small>
+                )}</span> <br> <i class="fas fa-dollar-sign"></i> <span class="cost"> ${printCost} </span> </small>
 
           </div>
           <p class="mb-1 float-left">

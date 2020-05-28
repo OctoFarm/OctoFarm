@@ -63,6 +63,21 @@ export default class Calculate {
   static isBetween(n, a, b) {
     return (n - a) * (n - b) <= 0;
   }
+  static returnFilamentCost(filament, usageElement){
+    let grams = usageElement.replace("g","")
+    grams = parseFloat(grams)
+    if(isNaN(grams)){
+      return `No length to calculate from`
+    }else{
+      if(filament === null || filament == "None chosen..."){
+        return `No filament to calculate from`
+      }else{
+        let cost = (filament.spools.price / filament.spools.weight) * grams
+        return  cost.toFixed(2)
+      }
+
+    }
+  }
   static returnPrintCost(costSettings, time){
     if(typeof costSettings === "undefined"){
       //Attempt to update cost settings in history...

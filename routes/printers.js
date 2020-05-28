@@ -145,7 +145,8 @@ router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
         hostState: printers[i].hostState,
         hostStateColour: printers[i].hostStateColour,
         printerURL: printers[i].printerURL,
-        group: printers[i].group
+        group: printers[i].group,
+        costSettings: printers[i].costSettings,
       };
       printerInfo.push(printer);
     }
@@ -187,7 +188,8 @@ router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
       hostState: printers.hostState,
       hostStateColour: printers.hostStateColour,
       printerURL: printers.printerURL,
-      group: printers.group
+      group: printers.group,
+      costSettings: printers.costSettings,
     };
     res.send(returnPrinter);
   }

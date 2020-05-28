@@ -43,21 +43,7 @@ export default class History {
         return length.toFixed(2) + "m / " + usage.toFixed(2) + "g";
       }
   }
-  static returnFilamentCost(filament, usageElement){
-    let grams = usageElement.replace("g","")
-    grams = parseFloat(grams)
-    if(isNaN(grams)){
-      return `No length to calculate from`
-    }else{
-      if(filament === null || filament == "None chosen..."){
-        return `No filament to calculate from`
-      }else{
-        let cost = (filament.spools.price / filament.spools.weight) * grams
-        return  cost.toFixed(2)
-      }
 
-    }
-  }
 
 
   static async get() {
@@ -82,7 +68,7 @@ export default class History {
         grams = grams.innerHTML
         grams = grams.split(" / ").pop();
         let printerCost = Calc.returnPrintCost(historyList.history[i].printHistory.costSettings, historyList.history[i].printHistory.printTime)
-        let filamentCost = History.returnFilamentCost(historyList.history[i].printHistory.filamentSelection, grams);
+        let filamentCost = Calc.returnFilamentCost(historyList.history[i].printHistory.filamentSelection, grams);
         document.getElementById("printerCost-" + historyList.history[i]._id).innerHTML = printerCost
         document.getElementById("cost-" + historyList.history[i]._id).innerHTML = filamentCost
         let totalCost = 0;
@@ -207,7 +193,7 @@ export default class History {
           }
           filamentWeight = filamentWeight.split(" / ").pop()
           weight.value = filamentWeight
-          cost.value = History.returnFilamentCost(current.filamentSelection, filamentWeight);
+          cost.value = Calc.returnFilamentCost(current.filamentSelection, filamentWeight);
           printerCost.value = Calc.returnPrintCost(current.costSettings, current.printTime);
 
 
