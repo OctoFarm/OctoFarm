@@ -10,6 +10,7 @@ import Validate from "./lib/functions/validate.js";
 import PowerButton from "./lib/modules/powerButton.js";
 import initGroupSelect from "./lib/modules/groupSelection.js";
 import {returnSelected} from "./lib/modules/filamentGrab.js";
+import {dragAndDropEnable} from "./lib/functions/dragAndDrop.js";
 
 let printerInfo = [];
 let elems = [];
@@ -30,6 +31,7 @@ async function asyncParse(str) {
 }
 let groupInit = false;
 let powerTimer = 20000;
+let dragDropInit = false;
 
 var source = new EventSource("/sse/monitoringInfo/");
 source.onmessage = async function(e) {
@@ -38,6 +40,15 @@ source.onmessage = async function(e) {
     if(groupInit === false){
       initGroupSelect(res.printerInfo)
       groupInit = true;
+    }
+    if(dragDropInit === false){
+      let printerList = document.querySelectorAll("[id^='viewPanel-']")
+      printerList.forEach(list => {
+        let ca = list.id.split("-");
+        let zeeIndex = _.findIndex(res.printerInfo, function(o) { return o._id == ca[1]; });
+        dragAndDropEnable(list, res.printerInfo[zeeIndex])
+        dragDropInit = true;
+      })
     }
     if (res != false) {
       if (
@@ -64,8 +75,8 @@ source.onmessage = async function(e) {
 };
 source.onerror = function(e) {
   UI.createAlert(
-    "error",
-    "Communication with the server has been suddenly lost, we will automatically refresh in 10 seconds..."
+      "error",
+      "Communication with the server has been suddenly lost, we will automatically refresh in 10 seconds..."
   );
   setTimeout(function() {
     location.reload();
@@ -101,31 +112,31 @@ printerCard.forEach(card => {
     OctoPrintClient.jobAction(printer, opts, e);
   });
   document
-    .getElementById("listCancel-" + ca[1])
-    .addEventListener("click", e => {
-      let printer = returnPrinterInfo(ca[1]);
-      let name = Validate.getName(printer)
-      bootbox.confirm({
-        message: `${name}: <br>Are you sure you want to cancel the ongoing print?`,
-        buttons: {
-          cancel: {
-            label: '<i class="fa fa-times"></i> Cancel'
+      .getElementById("listCancel-" + ca[1])
+      .addEventListener("click", e => {
+        let printer = returnPrinterInfo(ca[1]);
+        let name = Validate.getName(printer)
+        bootbox.confirm({
+          message: `${name}: <br>Are you sure you want to cancel the ongoing print?`,
+          buttons: {
+            cancel: {
+              label: '<i class="fa fa-times"></i> Cancel'
+            },
+            confirm: {
+              label: '<i class="fa fa-check"></i> Confirm'
+            }
           },
-          confirm: {
-            label: '<i class="fa fa-check"></i> Confirm'
+          callback: function(result) {
+            if (result) {
+              e.target.disabled = true;
+              let opts = {
+                command: "cancel"
+              };
+              OctoPrintClient.jobAction(printer, opts, e);
+            }
           }
-        },
-        callback: function(result) {
-          if (result) {
-            e.target.disabled = true;
-            let opts = {
-              command: "cancel"
-            };
-            OctoPrintClient.jobAction(printer, opts, e);
-          }
-        }
+        });
       });
-    });
 });
 
 function grabElements(printer) {
@@ -195,10 +206,10 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
         fileName = fileName.substring(0, 49) + "...";
       }
       elements.currentFile.innerHTML =
-        '<i class="fas fa-file-code"></i> ' + fileName;
+          '<i class="fas fa-file-code"></i> ' + fileName;
     } else {
       elements.currentFile.innerHTML =
-        '<i class="fas fa-file-code"></i> ' + "No File Selected";
+          '<i class="fas fa-file-code"></i> ' + "No File Selected";
     }
     if (
         printer.selectedFilament !== null
@@ -211,7 +222,7 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
 
     if (typeof printer.progress != "undefined") {
       elements.printTime.innerHTML = Calc.generateTime(
-        printer.progress.printTimeLeft
+          printer.progress.printTimeLeft
       );
     }
     let tool0A = 0;
@@ -334,8 +345,8 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
             "°C";
       }
     } else if (
-      printer.stateColour.category === "Idle" ||
-      printer.stateColour.category === "Complete"
+        printer.stateColour.category === "Idle" ||
+        printer.stateColour.category === "Complete"
     ) {
       if(elements.row.classList.contains(hideClosed)){
         elements.row.classList.remove(hideClosed);
@@ -450,3 +461,4 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
     }
   });
 }
+
