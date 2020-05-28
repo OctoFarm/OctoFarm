@@ -1,8 +1,9 @@
 import FileManager from "../modules/fileManager.js";
+import UI from "../functions/ui.js";
+import Validate from "../functions/validate.js";
 
 export async function dragAndDropEnable(element, printer){
     let dropArea = document.getElementById(element.id);
-
     // Prevent default drag behaviors
     ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
         dropArea.addEventListener(eventName, preventDefaults, false);
@@ -55,13 +56,16 @@ export function handleFiles(Afiles, currentPrinter) {
                 },
                 callback: function (result) {
                     if(result){
+                        UI.createAlert("warning", `${Validate.getName(currentPrinter)}: started upload`, 3000, "Clicked")
                         FileManager.handleFiles(Afiles, currentPrinter, "print");
                     }else{
+                        UI.createAlert("warning", `${Validate.getName(currentPrinter)}: started upload`, 3000, "Clicked")
                         FileManager.handleFiles(Afiles, currentPrinter);
                     }
                 }
             });
         }else{
+            UI.createAlert("warning", `${Validate.getName(currentPrinter)}: started upload`, 3000, "Clicked")
             FileManager.handleFiles(Afiles, currentPrinter);
         }
 }

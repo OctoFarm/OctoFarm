@@ -73,10 +73,15 @@ export default class FileManager {
         newObject.print = true;
       }
       newObject.index = printerInfo._id;
-      newObject.printerInfo = printerInfo
-      newObject.currentFolder = document.getElementById(
+      newObject.printerInfo = printerInfo;
+      let currentFolder = document.getElementById(
           "currentFolder"
-      ).innerHTML;
+      );
+      if(currentFolder){
+        newObject.currentFolder = currentFolder.innerHTML;
+      }else{
+        newObject.currentFolder = "local/"
+      }
       newObject.upload = FileManager.fileUpload;
       fileUploads.add(newObject);
 
@@ -270,15 +275,20 @@ export default class FileManager {
     });
     printer = await printer.json();
     FileManager.drawFiles(printer);
-    document.getElementById("printerStorage").innerHTML = `
-    <i class="fas fa-hdd"></i> 
-    ${Calc.bytes(printer.storage.free)}  / 
-    ${Calc.bytes(printer.storage.total)}
-  </button>`;
-    document.getElementById("printerFileCount").innerHTML = `
-    <i class="fas fa-file"></i> ${printer.filesList.fileCount} <i class="fas fa-folder"></i> ${printer.filesList.folderCount}
-    `
-    return "done";
+    let printerStorage = document.getElementById("printerStorage");
+    if(printerStorage){
+      printerStorage.innerHTML = `
+          <i class="fas fa-hdd"></i> 
+          ${Calc.bytes(printer.storage.free)}  / 
+          ${Calc.bytes(printer.storage.total)}
+        </button>`;
+            document.getElementById("printerFileCount").innerHTML = `
+          <i class="fas fa-file"></i> ${printer.filesList.fileCount} <i class="fas fa-folder"></i> ${printer.filesList.folderCount}
+          `
+      return "done";
+    }else{
+      return "done";
+    }
   }
   static openFolder(folder, target, printer) {
     if (typeof target != "undefined" && target.type === "button") {
