@@ -623,7 +623,7 @@ export default class PrinterSettings {
                     </small>
                   </div>
                   <div class="form-group">
-                    <label for="coolDown">Cool Down Trigger</label>
+                    <label for="coolDown">Electricity Costs</label>
                          <div class="input-group mb-2">
                             <input type="number" class="form-control" id="electricityCosts" placeholder="${printer.costSettings.electricityCosts}">
                                 <div class="input-group-append">
