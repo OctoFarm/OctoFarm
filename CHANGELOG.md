@@ -82,6 +82,7 @@ All notable changes to this project will be documented in this file.
     - Fixed issue where filament would update on List/Panel view when changes/history captured.
     - Dropdowns for power appearing off page.
     - Fixed power dropdowns showing under cam headings/panel
+    - Typo's in client settings
 
 ## [v1.1.4.9-dev-2.7]
 

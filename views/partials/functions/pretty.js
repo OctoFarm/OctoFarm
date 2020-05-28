@@ -72,7 +72,7 @@ const historyTotals = function(history){
   history.forEach(hist => {
     historyFileNames.push(hist.printHistory.fileName.replace(".gcode", ""));
     historyPrinterNames.push(hist.printHistory.printerName.replace(/ /g, "_"));
-    if(hist.printHistory.filamentSelection != null){
+    if(hist.printHistory.filamentSelection != null && hist.printHistory.filamentSelection.spools != 'undefined'){
       historySpools.push(
           hist.printHistory.filamentSelection.spools.profile.material.replace(/ /g, "_")
       );
