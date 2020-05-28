@@ -95,6 +95,7 @@ setInterval(async function() {
       dateAdded: printers[i].dateAdded,
       powerSettings: printers[i].powerSettings,
       alerts: printers[i].alerts,
+      costSettings: printers[i].costSettings,
     };
     printerInfo.push(printer);
   }
