@@ -19,6 +19,7 @@ document.getElementById("historyTable").addEventListener("click", e => {
 let historyList = [];
 $("#historyModal").on("hidden.bs.modal", function(e) {
   document.getElementById("historySaveBtn").remove();
+  document.getElementById("historyUpdateCostBtn").remove();
 });
 
 
