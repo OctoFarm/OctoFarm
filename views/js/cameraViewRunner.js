@@ -7,7 +7,6 @@ import doubleClickFullScreen from "./lib/functions/fullscreen.js";
 import { parse } from "./vendor/flatted.js";
 import initGroupSelect from "./lib/modules/groupSelection.js";
 import PowerButton from "./lib/modules/powerButton.js";
-import {dragAndDropEnable} from "./lib/functions/dragAndDrop.js";
 
 let printerInfo = [];
 let elems = [];
@@ -30,22 +29,13 @@ async function asyncParse(str) {
 var source = new EventSource("/sse/monitoringInfo/");
 let groupInit = false;
 let powerTimer = 20000;
-let dragDropInit = false;
+
 source.onmessage = async function(e) {
     if (e.data != null) {
         let res = await asyncParse(e.data);
         if(groupInit === false){
             initGroupSelect(res.printerInfo)
             groupInit = true;
-        }
-        if(dragDropInit === false){
-            let printerList = document.querySelectorAll("[id^='viewPanel-']")
-            printerList.forEach(list => {
-                let ca = list.id.split("-");
-                let zeeIndex = _.findIndex(res.printerInfo, function(o) { return o._id == ca[1]; });
-                dragAndDropEnable(list, res.printerInfo[zeeIndex])
-                dragDropInit = true;
-            })
         }
         if (res != false) {
             if (
