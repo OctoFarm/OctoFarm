@@ -2,6 +2,7 @@
 import OctoFarmClient from "./lib/octofarm.js";
 import Calc from "./lib/functions/calc.js";
 import FileManager from "./lib/modules/fileManager.js";
+import {dragAndDropEnable} from "./lib/functions/dragAndDrop.js";
 
 let url = window.location.hostname;
 let port = window.location.port;
@@ -18,8 +19,10 @@ document.getElementById("multUploadBtn").addEventListener("click", e => {
 });
 
 class Manager{
-    static init(){
+    static async init(){
         let printers = document.querySelectorAll("[id^='fileManagerPrinter-']");
+        let printerList = await OctoFarmClient.post("printers/printerInfo", {});
+        printerList = await printerList.json();
         printers.forEach((printer, index) => {
             if (index === 0) {
                 printer.classList.add("bg-dark");
@@ -37,6 +40,7 @@ class Manager{
             printer.addEventListener("click", e => {
                 Manager.changePrinter(id);
             });
+            dragAndDropEnable(printer, printerList[index]);
         });
         let ca = printers[0].id.split("-");
 
@@ -153,8 +157,8 @@ class Manager{
 
         </div>
 
-        <div id="fileList-${id}" class="list-group" style="max-height:100%; overflow-y:scroll;" data-jplist-group="files">
-
+        <div id="fileList-${id}" class="list-group" style="max-height:100%; overflow-y:scroll; min-height:1000px;" data-jplist-group="files">
+            
         </div>
         `
         let printer = await OctoFarmClient.post("printers/printerInfo", {

@@ -3,6 +3,7 @@ import OctoPrintClient from "../octoprint.js";
 import Queue from "../modules/clientQueue.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
+import {dragAndDropEnable} from "../functions/dragAndDrop.js";
 
 let fileUploads = new Queue();
 
@@ -565,6 +566,8 @@ export default class FileManager {
     FileActions.createFolder(printer);
   }
   static updateListeners(printer) {
+    let fileElem = document.getElementById("fileList-"+printer._id)
+    dragAndDropEnable(fileElem, printer);
     let folders = document.querySelectorAll(".folderAction");
     folders.forEach(folder => {
       folder.addEventListener("click", e => {

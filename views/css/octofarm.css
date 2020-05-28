@@ -247,7 +247,10 @@ a.notyet {
   -khtml-user-select: none; /* webkit (konqueror) browsers */
   -ms-user-select: none;
 }
-
+.highlight {
+  box-shadow: 0px 0px 20px 5px rgba(0,0,0,0.2);
+  filter: brightness(20%)
+}
 /*Camera View*/
 .cameraContain {
   position: relative;
