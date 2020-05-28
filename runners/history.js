@@ -1,4 +1,5 @@
 const History = require("../models/History.js");
+const ErrorLog = require("../models/ErrorLog.js");
 const _ = require("lodash");
 const fetch = require("node-fetch");
 const Logger = require('../lib/logger.js');
@@ -7,6 +8,7 @@ const filamentProfiles = require("../models/Profiles.js")
 const ServerSettings = require("../models/ServerSettings.js")
 const Spool = require("../models/Filament.js")
 let counter = 0;
+let errorCounter = 0;
 
 class HistoryCollection {
   static async resyncFilament(printer){
@@ -198,12 +200,8 @@ class HistoryCollection {
     }
   }
     static async errorLog(payload, printer, job) {
+    console.log(payload, printer, job)
       try{
-        let serverSettings = await ServerSettings.find({});
-        if(serverSettings[0].filamentManager){
-          printer.selectedFilament = await HistoryCollection.resyncFilament(printer);
-          logger.info("Grabbed latest filament values", printer.filamentSelection);
-        }
         let name = null;
         if (typeof printer.settingsApperance != "undefined") {
           if (printer.settingsApperance.name === "" || printer.settingsApperance.name === null) {
@@ -216,7 +214,7 @@ class HistoryCollection {
         }
         logger.info("Error Log Collection Triggered", payload + printer.printerURL);
         let today = new Date();
-        let historyCollection = await History.find({});
+        let errorCollection = await ErrorLog.find({});
 
         let printTime = new Date(payload.time * 1000);
         let startDate = today.getTime() - printTime.getTime();
@@ -231,30 +229,15 @@ class HistoryCollection {
         let endTime = today.toTimeString();
         let endTimeFormat = endTime.substring(0, 8);
         let endDate = endDDMM + " - " + endTimeFormat;
-        let profiles = await filamentProfiles.find({});
 
-        let selectedFilament = null;
-        if(printer.selectedFilament !== null){
-          let profileId = null;
-          if(serverSettings[0].filamentManager){
-            profileId = _.findIndex(profiles, function (o) {
-              return o.profile.index == printer.selectedFilament.spools.profile;
-            });
-          }else{
-            profileId = _.findIndex(profiles, function (o) {
-              return o._id == printer.selectedFilament.spools.profile;
-            });
-          }
-          printer.selectedFilament.spools.profile = profiles[profileId].profile;
-        }
-        if(historyCollection.length === 0){
-          counter = 0
+        if(errorCollection.length === 0){
+          errorCounter = 0
         }else{
-          counter = historyCollection[historyCollection.length-1].printHistory.historyIndex + 1
+          errorCounter = errorCollection[errorCollection.length-1].errorLog.historyIndex + 1
         }
 
-        let printHistory = {
-          historyIndex: counter,
+        let errorLog = {
+          historyIndex: errorCounter,
           printerIndex: printer.index,
           printerName: name,
           success: false,
@@ -264,18 +247,17 @@ class HistoryCollection {
           startDate: startDate,
           endDate: endDate,
           printTime: Math.round(payload.time),
-          filamentSelection: printer.selectedFilament,
           job: job,
           notes: ""
         };
-        let saveHistory = new History({
-          printHistory
+        let saveHistory = new ErrorLog({
+          errorLog
         });
         //saveHistory.save();
 
-        logger.info("Failed Print captured ", payload + printer.printerURL);
+        logger.info("Error captured ", payload + printer.printerURL);
       }catch(e){
-        logger.error(e, "Failed to capture history for " + printer.printerURL);
+        logger.error(e, "Failed to capture ErrorLog for " + printer.printerURL);
       }
   }
   static history() {

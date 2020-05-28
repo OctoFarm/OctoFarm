@@ -50,7 +50,7 @@ export function returnHistoryUsage(id){
             return ''
         }else{
             let radius = parseFloat(id.filamentSelection.spools.profile.diameter) / 2
-            let volume = (length * 3.1415926535 * radius * radius)
+            let volume = (length * Math.PI * radius * radius)
             let usage = volume * parseFloat(id.filamentSelection.spools.profile.density)
             return length.toFixed(2) + "m / " + usage.toFixed(2) + "g";
         }
