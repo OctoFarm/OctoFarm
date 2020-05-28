@@ -363,7 +363,7 @@ export default class History {
     let totalTimes = times.reduce((a, b) => a + b, 0)
     document.getElementById("totalPrintTime").innerHTML = Calc.generateTime(totalTimes)
     document.getElementById("printerTotalCost").innerHTML = printerCost.reduce((a, b) => a + b, 0).toFixed(2);
-    document.getElementById("combinedTotalCost").innerHTML = parseFloat(printerCost.reduce((a, b) => a + b, 0).toFixed(2)) + parseFloat(cost.reduce((a, b) => a + b, 0).toFixed(2));
+    document.getElementById("combinedTotalCost").innerHTML = (parseFloat(printerCost.reduce((a, b) => a + b, 0).toFixed(2)) + parseFloat(cost.reduce((a, b) => a + b, 0).toFixed(2))).toFixed(2);
   }
 }
 const element = document.getElementById('listenerHistory');
