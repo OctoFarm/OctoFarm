@@ -80,6 +80,10 @@ const PrinterSchema = new mongoose.Schema({
   powerSettings: {
     type: Object,
     required: false
+  },
+  costSettings: {
+    type: Object,
+    required: false
   }
 });
 

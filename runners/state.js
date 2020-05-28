@@ -1188,6 +1188,9 @@ class Runner {
             printer.tempTriggers.heatingVariation = parseFloat(settings.other.heatingVariation);
             printer.markModified("tempTriggers");
         }
+        farmPrinters[index].costSettings = settings.costSettings;
+        printer.costSettings = settings.costSettings;
+        printer.markModified("costSettings")
         farmPrinters[index].settingsApperance.name = settings.profile.name;
         printer.settingsApperance.name = settings.profile.name;
         printer.markModified("settingsApperance")

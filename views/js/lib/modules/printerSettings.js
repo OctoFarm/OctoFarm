@@ -607,6 +607,81 @@ export default class PrinterSettings {
               </small>
             </div>
         `
+        document.getElementById("psPrinterCost").innerHTML = `
+            <div class="col-6">
+                   <h5>Operating Costs</h5>
+                   <div class="form-group">
+                    <label for="coolDown">Power Consumption</label>
+                          <div class="input-group mb-2">
+                                <input type="number" class="form-control" id="powerConsumption" placeholder="${printer.costSettings.powerConsumption}">
+                                <div class="input-group-append">
+                                     <div class="input-group-text">kW</div>
+                                </div>
+                          </div>
+                    <small id="passwordHelpBlock" class="form-text text-muted">
+                        The kW (kilowatt) usage of your printer. 
+                    </small>
+                  </div>
+                  <div class="form-group">
+                    <label for="coolDown">Cool Down Trigger</label>
+                         <div class="input-group mb-2">
+                            <input type="number" class="form-control" id="electricityCosts" placeholder="${printer.costSettings.electricityCosts}">
+                                <div class="input-group-append">
+                                     <div class="input-group-text"></div>
+                                </div>
+                          </div>
+                    <small id="passwordHelpBlock" class="form-text text-muted">
+                        What is your kWh (kilowatt hour) rate for your home electricity.
+                    </small>
+                  </div>
+            </div>
+            <div class="col-6">
+                    <h5>Printer Costs</h5>
+                    <div class="form-group">
+                      <label for="coolDown">Purchase Price</label>
+                         <div class="input-group mb-2">
+                            <input type="number" class="form-control" id="purchasePrice" placeholder="${printer.costSettings.purchasePrice}">
+                                <div class="input-group-append">
+                                     <div class="input-group-text"></div>
+                                </div>
+                          </div>
+                      
+                      <small id="passwordHelpBlock" class="form-text text-muted">
+                          What did you buy your printer for?
+                      </small>
+                    </div>
+                    <div class="form-group">
+                      <label for="coolDown">Estimated Life Span</label>
+                           <div class="input-group mb-2">
+                             <input type="number" class="form-control" id="estimatedLifespan" placeholder="${printer.costSettings.estimateLifespan}">
+                                <div class="input-group-append">
+                                     <div class="input-group-text">hours</div>
+                                </div>
+                          </div>
+                      <small id="passwordHelpBlock" class="form-text text-muted">
+                          How many hours total do you expect your printer to last?
+                      </small>
+                    </div>
+                    <div class="form-group">
+                      <label for="coolDown">Maintenance Costs</label>
+                           <div class="input-group mb-2">
+                             <input type="number" class="form-control" id="maintenanceCosts" placeholder="${printer.costSettings.maintenanceCosts}">
+                                <div class="input-group-append">
+                                     <div class="input-group-text"><i class="fas fa-wrench"></i> / hour</div>
+                                </div>
+                          </div>
+                      <small id="passwordHelpBlock" class="form-text text-muted">
+                          What are your printer maintenance costs? Worked out on an hourly basis.
+                      </small>
+                    </div>                                        
+            </div>
+        `;
+        document.getElementById("powerConsumption").value = parseFloat(printer.costSettings.powerConsumption);
+        document.getElementById("electricityCosts").value = parseFloat(printer.costSettings.electricityCosts);
+        document.getElementById("purchasePrice").value = parseFloat(printer.costSettings.purchasePrice);
+        document.getElementById("estimatedLifespan").value = parseFloat(printer.costSettings.estimateLifespan);
+        document.getElementById("maintenanceCosts").value = parseFloat(printer.costSettings.maintenanceCosts);
+
         document.getElementById("savePrinterSettings").addEventListener('click', async event => {
           let newValues = {
             printer: {
@@ -689,6 +764,13 @@ export default class PrinterSettings {
               enableTimeLapse: document.getElementById("camTimelapse").checked,
               heatingVariation: document.getElementById("headtingVariation").value,
               coolDown: document.getElementById("coolDown").value,
+            },
+            costSettings: {
+              powerConsumption: parseFloat(document.getElementById("powerConsumption").value),
+              electricityCosts: parseFloat(document.getElementById("electricityCosts").value),
+              purchasePrice: parseFloat(document.getElementById("purchasePrice").value),
+              estimateLifespan: parseFloat(document.getElementById("estimatedLifespan").value),
+              maintenanceCosts: parseFloat(document.getElementById("maintenanceCosts").value)
             }
           }
             let profileEdits = document.getElementById("psPrinterProfiles").querySelectorAll('[contenteditable=true]')
