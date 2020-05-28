@@ -834,12 +834,14 @@ class Runner {
             folders: [],
             folderCount: 0
         };
-        return ClientAPI.get(
-                farmPrinters[index].printerURL,
-                farmPrinters[index].apikey,
-                location
-            )
-            .then(res => {
+        let url = `${farmPrinters[index].printerURL}/api/${location}`;
+        return fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+                "X-Api-Key": farmPrinters[index].apikey
+            }
+        }).then(res => {
                 return res.json();
             })
             .then(res => {
