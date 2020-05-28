@@ -276,7 +276,8 @@
           <th class="table-dark" scope="col">Start Date</th>
           <th class="table-dark" scope="col">End Date</th>
           <th class="table-dark" scope="col">Print Time</th>
-          <th class="table-dark" scope="col">Cost</th>
+          <th class="table-dark" scope="col">Filament Cost</th>
+          <th class="table-dark" scope="col">Printer Cost</th>
           <th class="table-dark" scope="col">Spool</th>
           <th class="table-dark" scope="col">Filament Usage</th>
           <th class="table-dark" scope="col" width="400px">
@@ -317,6 +318,9 @@
             <span><%= helpers.generateTime(history[i].printHistory.printTime) %></span>
           </td>
           <td class="cost" id="cost-<%= history[i]._id %>">
+            Loading...
+          </td>
+          <td class="printerCost" id="printerCost-<%= history[i]._id %>">
             Loading...
           </td>
           <%if(history[i].printHistory.filamentSelection != null){%>
@@ -438,12 +442,23 @@
                   <div class="col p-0">
                     <div class="input-group mb-1 input-group-sm">
                       <div class="input-group-prepend">
-                        <span class="input-group-text">Cost</span>
+                        <span class="input-group-text">Filament Cost</span>
                       </div>
                       <input id="cost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                      <div class="input-group-append">
-                        <span class="input-group-text" id="basic-addon2"></span>
+<!--                      <div class="input-group-append">-->
+<!--                        <span class="input-group-text" id="basic-addon2"></span>-->
+<!--                      </div>-->
+                    </div>
+                  </div>
+                  <div class="col p-0">
+                    <div class="input-group mb-1 input-group-sm">
+                      <div class="input-group-prepend">
+                        <span class="input-group-text">Printer Cost</span>
                       </div>
+                      <input id="printerCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+<!--                      <div class="input-group-append">-->
+<!--                        <span class="input-group-text" id="basic-addon2"></span>-->
+<!--                      </div>-->
                     </div>
                   </div>
                   <div class="col p-0 pl-1">

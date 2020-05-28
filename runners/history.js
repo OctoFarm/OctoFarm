@@ -92,8 +92,8 @@ class HistoryCollection {
 
       let printHistory = {
         historyIndex: counter,
-        printerIndex: "",
         printerName: name,
+        costSettings: printer.costSettings,
         success: true,
         reason: payload.reason,
         fileName: payload.name,
@@ -177,6 +177,7 @@ class HistoryCollection {
       let printHistory = {
         historyIndex: counter,
         printerIndex: printer.index,
+        costSettings: printer.costSettings,
         printerName: name,
         success: false,
         reason: payload.reason,
@@ -239,6 +240,7 @@ class HistoryCollection {
         let errorLog = {
           historyIndex: errorCounter,
           printerIndex: printer.index,
+          costSettings: printer.costSettings,
           printerName: name,
           success: false,
           reason: payload.reason,

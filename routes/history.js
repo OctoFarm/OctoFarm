@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const History = require("../models/History.js");
 const { ensureAuthenticated } = require("../config/auth");
+const Printers = require("../models/Printer.js");
 const Spools = require("../models/Filament.js");
 const Profiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
@@ -60,5 +61,34 @@ router.get("/get", ensureAuthenticated, (req, res) => {
     res.send({ history: checked });
   });
 });
+router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
+  //Check required fields
+  const latest = req.body;
+
+  //Find history
+  let history = await History.findOne({ _id: latest.id });
+  //match history name to printer ID
+  let printers = await Printers.find({});
+  let printer = _.findIndex(printers, function(o) { return o.settingsApperance.name == history.printHistory.printerName; });
+  if(printer > -1){
+    history.printHistory.costSettings = printers[printer].costSettings;
+    history.markModified("printHistory")
+    history.save();
+    res.send({status: 200})
+  }else{
+    history.printHistory.costSettings =
+    {
+      powerConsumption: 0.5,
+      electricityCosts: 0.15,
+      purchasePrice: 500,
+      estimateLifespan: 43800,
+      maintenanceCosts: 0.25,
+    };
+    history.markModified("printHistory")
+    history.save();
+    res.send({status: 400})
+  }
+});
+
 
 module.exports = router;
