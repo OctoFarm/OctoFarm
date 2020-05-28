@@ -62,7 +62,7 @@
           </div>
         </div>
       </div>
-      <div class="col-lg-2">
+      <div class="col-lg-1">
         <b class="mt-1">Printers</b>
         <div class="row">
           <div class="col-lg-12">
@@ -92,14 +92,21 @@
           </div>
         </div>
       </div>
-      <div class="col-lg-2">
+      <div class="col-lg-3">
         <b class="mt-1">Cost</b>
         <div class="row">
-          <div class="col-lg-12">
+          <div class="col-lg-6">
             <b><i class="fas fa-tag"></i>  Total Cost</b> <br />
             <%= printStatistics.totalCost.toFixed(2) %> <br />
             <b><i class="fas fa-tag"></i>  Highest Cost</b> <br />
             <%= printStatistics.highestCost.toFixed(2) %><br />
+
+          </div>
+          <div class="col-lg-6">
+            <b><i class="fas fa-tag"></i>  Total Printer Cost</b> <br />
+            <%= printStatistics.totalPrinterCost.toFixed(2) %> <br />
+            <b><i class="fas fa-tag"></i>  Highest Printer Cost</b> <br />
+            <%= printStatistics.highestPrinterCost.toFixed(2) %><br />
 
           </div>
         </div>

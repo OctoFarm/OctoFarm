@@ -594,7 +594,7 @@ class StatisticsCollection {
         let filamentWeights = [];
         let fileNames = [];
         let printerNames = [];
-
+        let printerCosts = [];
 
         history.forEach(print => {
             filamentCounts(print.printHistory)
@@ -603,7 +603,24 @@ class StatisticsCollection {
             if (print.printHistory.filamentLength != "-") {
                 filamentLengths.push(print.printHistory.filamentLength);
             }
+            if(typeof print.printHistory.costSettings != 'undefined'){
 
+                let costSettings = print.printHistory.costSettings;
+                let powerConsumption = parseFloat(costSettings.powerConsumption);
+                let costOfElectricity = parseFloat(costSettings.electricityCosts);
+                let costPerHour = powerConsumption * costOfElectricity;
+                let estimatedPrintTime = print.printHistory.printTime / 3600;  // h
+                let electricityCost = costPerHour * estimatedPrintTime;
+                // calculating printer cost
+                let purchasePrice = parseFloat(costSettings.purchasePrice);
+                let lifespan = parseFloat(costSettings.estimateLifespan);
+                let depreciationPerHour = lifespan > 0 ? purchasePrice / lifespan : 0;
+                let maintenancePerHour = parseFloat(costSettings.maintenanceCosts);
+                let printerCost = (depreciationPerHour + maintenancePerHour) * estimatedPrintTime;
+                // assembling string
+                let estimatedCost = electricityCost + printerCost;
+                printerCosts.push(parseFloat(estimatedCost.toFixed(2)));
+            }
             if (print.printHistory.success) {
 
                 completed.push(print.printHistory.success);
@@ -620,16 +637,14 @@ class StatisticsCollection {
         });
         let totalFilamentUsage = filamentValues.reduce((a, b) => a + b, 0);
         printStatistics.totalFilamentUsage = totalFilamentUsage;
-        let averageFilamentUsage = totalFilamentUsage / filamentValues.length;
-        printStatistics.averageFilamentUsage = averageFilamentUsage;
-        let lowestFilamentUsage = (Math.min(...filamentValues));
-        printStatistics.lowestFilamentUsage = lowestFilamentUsage;
-        let highestFilamentUsage = (Math.max(...filamentValues));
-        printStatistics.highestFilamentUsage = highestFilamentUsage;
-        let totalCost = costValues.reduce((a, b) => a + b, 0);
-        printStatistics.totalCost = totalCost;
-        let highestCost = (Math.max(...costValues));
-        printStatistics.highestCost = highestCost;
+        printStatistics.averageFilamentUsage = totalFilamentUsage / filamentValues.length;
+        printStatistics.lowestFilamentUsage = (Math.min(...filamentValues));
+        printStatistics.highestFilamentUsage = (Math.max(...filamentValues));
+        printStatistics.totalCost = costValues.reduce((a, b) => a + b, 0);
+        printStatistics.highestCost = (Math.max(...costValues));
+        printStatistics.totalPrinterCost = printerCosts.reduce((a, b) => a + b, 0) ;
+        printStatistics.highestPrinterCost = (Math.max(...printerCosts));
+
 
         printStatistics.completed = completed.length;
         printStatistics.cancelled = cancelled.length;
