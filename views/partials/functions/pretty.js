@@ -69,22 +69,39 @@ const historyTotals = function(history){
   let historyFileNames = []
   let historyPrinterNames = []
   let historySpools = []
+  let paths = [];
+
   history.forEach(hist => {
     historyFileNames.push(hist.printHistory.fileName.replace(".gcode", ""));
     historyPrinterNames.push(hist.printHistory.printerName.replace(/ /g, "_"));
-    if(hist.printHistory.filamentSelection != null && hist.printHistory.filamentSelection.spools != 'undefined'){
+    if(typeof hist.printHistory.job !== 'undefined'){
+      let path = hist.printHistory.job.file.path.substring(0, hist.printHistory.job.file.path.lastIndexOf("/"))
+      if(path != ''){
+        paths.push(path);
+      }
+    }
+    if(hist.printHistory.filamentSelection != null && hist.printHistory.filamentSelection.spools !== 'undefined'){
       historySpools.push(
           hist.printHistory.filamentSelection.spools.profile.material.replace(/ /g, "_")
       );
     }
 
   })
-  let historyTotals = {
-    fileNames: historyFileNames.filter(function(item, i, ar){ return ar.indexOf(item) === i; }),
-    printerNames: historyPrinterNames.filter(function(item, i, ar){ return ar.indexOf(item) === i; }),
-    spools: historySpools.filter(function(item, i, ar){ return ar.indexOf(item) === i; }),
-  }
-  return historyTotals;
+  return {
+    pathList: paths.filter(function (item, i, ar) {
+      return ar.indexOf(item) === i;
+    }),
+    fileNames: historyFileNames.filter(function (item, i, ar) {
+      return ar.indexOf(item) === i;
+    }),
+    printerNames: historyPrinterNames.filter(function (item, i, ar) {
+      return ar.indexOf(item) === i;
+    }),
+    spools: historySpools.filter(function (item, i, ar) {
+      return ar.indexOf(item) === i;
+    }),
+
+  };
 }
 module.exports = {
   generateBytes: bytes,

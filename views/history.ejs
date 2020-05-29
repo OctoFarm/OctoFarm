@@ -95,75 +95,6 @@
           <div class="col-12 col-md-6 col-lg-3">
             <div class="input-group mb-3">
               <div class="input-group-prepend">
-                <label class="input-group-text" for="inputGroupSelect01">File Name: </label>
-              </div>
-              <select class="custom-select" id="inputGroupSelect01"
-                      data-jplist-control="select-filter"
-                      data-group="history"
-                      data-name="fileNames"
-              >
-                <option selected
-                        href="#"
-                        data-value="0"
-                        data-path="default"
-                >Filter</option>
-                <% historyTotals.fileNames.forEach(file => { %>
-                  <option href="#"
-                          data-path=".<%= file %>"><%= file.replace(/_/g, " ") %></option>
-                <%  }) %>
-
-              </select>
-            </div>
-          </div>
-          <div class="col-12 col-md-6 col-lg-3">
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <label class="input-group-text" for="inputGroupSelect01">Printer Name: </label>
-              </div>
-              <select class="custom-select" id="inputGroupSelect01"
-                      data-jplist-control="select-filter"
-                      data-group="history"
-                      data-name="printerNames"
-              >
-                <option selected
-                        href="#"
-                        data-value="0"
-                        data-path="default"
-                >Filter</option>
-                <% historyTotals.printerNames.forEach(printer => { %>
-                  <option href="#"
-                          data-path=".<%= printer %>"><%= printer.replace(/_/g, " ") %></option>
-                <%  }) %>
-
-              </select>
-            </div>
-          </div>
-          <div class="col-12 col-md-6 col-lg-3">
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
-                <label class="input-group-text" for="inputGroupSelect01">Filament Type: </label>
-              </div>
-              <select class="custom-select" id="inputGroupSelect01"
-                      data-jplist-control="select-filter"
-                      data-group="history"
-                      data-name="spoolName"
-              >
-                <option selected
-                        href="#"
-                        data-value="0"
-                        data-path="default"
-                >Filter</option>
-                <% historyTotals.spools.forEach(spool => { %>
-                  <option href="#"
-                          data-path=".<%= spool %>"><%= spool.replace(/_/g, " ") %></option>
-                <%  }) %>
-
-              </select>
-            </div>
-          </div>
-          <div class="col-12 col-md-6 col-lg-3">
-            <div class="input-group mb-3">
-              <div class="input-group-prepend">
                 <label class="input-group-text" for="inputGroupSelect01">Default Sort: </label>
               </div>
               <select class="custom-select" id="inputGroupSelect01"
@@ -183,10 +114,10 @@
                                     data-path=".index"
                                     data-order="desc"
                                     data-type="number">Index (&darr;)</option>
-                  <option             value="3"
-                                      data-path=".printer"
-                                      data-order="asc"
-                                      data-type="text">Printer Name (&uarr;)</option>
+                <option             value="3"
+                                    data-path=".printer"
+                                    data-order="asc"
+                                    data-type="text">Printer Name (&uarr;)</option>
                 <option             value="4"
                                     data-path=".printer"
                                     data-order="desc"
@@ -234,6 +165,135 @@
 
               </select>
             </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputGroupSelect01">Printer Name: </label>
+              </div>
+              <select class="custom-select" id="inputGroupSelect01"
+                      data-jplist-control="select-filter"
+                      data-group="history"
+                      data-name="printerNames"
+              >
+                <option selected
+                        href="#"
+                        data-value="0"
+                        data-path="default"
+                >Filter</option>
+                <% historyTotals.printerNames.forEach(printer => { %>
+                  <option href="#"
+                          data-path=".<%= printer %>"><%= printer.replace(/_/g, " ") %></option>
+                <%  }) %>
+
+              </select>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputGroupSelect01">Spool Type: </label>
+              </div>
+              <select class="custom-select" id="inputGroupSelect01"
+                      data-jplist-control="select-filter"
+                      data-group="history"
+                      data-name="spoolName"
+              >
+                <option selected
+                        href="#"
+                        data-value="0"
+                        data-path="default"
+                >Filter</option>
+                <% historyTotals.spools.forEach(spool => { %>
+                  <option href="#"
+                          data-path=".<%= spool %>"><%= spool.replace(/_/g, " ") %></option>
+                <%  }) %>
+
+              </select>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <!--Filament Search-->
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">Spool Search</span>
+              </div>
+              <input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1"
+                     data-jplist-control="textbox-filter"
+                     data-group="history"
+                     data-name="fileNameSearch"
+                     data-path=".spool"
+                     type="text"
+                     value=""
+                     placeholder="Search...">
+            </div>
+
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <!--File Name Search-->
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text" id="basic-addon1">File Name Search</span>
+              </div>
+              <input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1"
+                     data-jplist-control="textbox-filter"
+                     data-group="history"
+                     data-name="fileNameSearch"
+                     data-path=".file"
+                     type="text"
+                     value=""
+                     placeholder="Search...">
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <!--Path Filter-->
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputGroupSelect01">File Path: </label>
+              </div>
+              <select class="custom-select" id="inputGroupSelect01"
+                      data-jplist-control="select-filter"
+                      data-group="history"
+                      data-name="pathName"
+              >
+                <option selected
+                        href="#"
+                        data-value="0"
+                        data-path="default"
+                >Filter</option>
+                <% historyTotals.pathList.forEach(path => { %>
+                  <option href="#"
+                          data-path=".<%= path %>"><%= path %></option>
+                <%  }) %>
+
+              </select>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="inputGroupSelect01">File Name: </label>
+              </div>
+              <select class="custom-select" id="inputGroupSelect01"
+                      data-jplist-control="select-filter"
+                      data-group="history"
+                      data-name="fileNames"
+              >
+                <option selected
+                        href="#"
+                        data-value="0"
+                        data-path="default"
+                >Filter</option>
+                <% historyTotals.fileNames.forEach(file => { %>
+                  <option href="#"
+                          data-path=".<%= file %>"><%= file.replace(/_/g, " ") %></option>
+                <%  }) %>
+
+              </select>
+            </div>
+          </div>
+          <div class="col-12 col-md-6 col-lg-3">
+            <!--Date Range Possibly-->
           </div>
               <div class="col-lg-12 table-responsive-sm table-responsive-md">
 
@@ -309,7 +369,11 @@
           <td class="printer <%= history[i].printHistory.printerName.replace(/ /g, "_") %>"><%=
             history[i].printHistory.printerName %>
           </td>
-          <td class="file <%= history[i].printHistory.fileName.replace(".gcode", "") %>" class="text-wrap">
+          <%  let path = ""; %>
+          <% if(typeof history[i].printHistory.job !== 'undefined'){%>
+          <%  path = history[i].printHistory.job.file.path.substring(0, history[i].printHistory.job.file.path.lastIndexOf("/"))%>
+          <%}%>
+          <td class="file <%= history[i].printHistory.fileName.replace(".gcode", "") %> <%= path %>" class="text-wrap">
             <%= history[i].printHistory.fileName.replace(/_/g," ") %>
           </td>
           <td class="start">

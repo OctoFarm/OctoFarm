@@ -17,7 +17,7 @@
     <link rel="stylesheet" href="/css/octofarm.css" />
     <link rel="stylesheet" href="/css/noty.css"/>
     <link rel="stylesheet" href="/css/balloon.css"/>
-
+    <link rel="stylesheet" href="/css/jplist.css"/>
     <script type="text/javascript" src="/js/vendor/jquery-3.4.1.min.js"></script>
 
     <title>OctoFarm: <%= page %></title>
@@ -482,6 +482,7 @@
                                     <a class="list-group-item list-group-item-action" id="server-settings-list" data-toggle="list" href="#server-settings" role="tab" aria-controls="panelview"><i class="fas fa-cogs"></i> Settings</a>
                                     <a class="list-group-item list-group-item-action" id="server-timeout-list" data-toggle="list" href="#server-timeout" role="tab" aria-controls="listview"><i class="fas fa-stopwatch"></i> Timeout</a>
                                    <!-- <a class="list-group-item list-group-item-action" id="server-database-list" data-toggle="list" href="#server-database" role="tab" aria-controls="cameraview"><i class="fas fa-database"></i> Database</a> -->
+                                    <a class="list-group-item list-group-item-action" id="server-filament-list" data-toggle="list" href="#server-filament" role="tab" aria-controls="listview"><i class="fas fa-toilet-paper"></i> Filament Manager</a>
 
                                 </div>
                             </div>
@@ -697,6 +698,24 @@
                                         <button type="button" class="btn btn-danger btn-lg"><i class="fas fa-print"></i><br> Nuke Printers</button></center>
 
                                 </div>
+                                    <div class="tab-pane fade" id="server-filament" role="tabpanel" aria-labelledby="server-filament-list">
+                                        <h5>Filament Manager Settings</h5>
+                                        <hr>
+                                            <div id="filamentManagerSetup" class="row">
+                                                <div class="col-lg-12">
+                                                            <h5>Filament Manager Sync</h5>
+                                                            <p class="mb-1">Click the button below to activate filament manager plugin and link it to OctoFarm. Please read the notes below before proceeding.</p>
+                                                            <small><b>Note:</b> OctoFarm expects filament manager installed on every instance. If it isn't, and you activate it you run the risk of some updates/selections failing to register.</small>
+                                                            <br>
+                                                            <small><b>Note:</b> You must also have all these instances setup with a postgres database. Without this you will not be able to select filament on every instance.</small>
+
+                                                            <% if(serverSettings.filamentManager){ %>
+                                                                <center><br><button id="filamentManagerSyncBtn" type="button" class="btn btn-warning mb-1 btn-lg" disabled><i class="fas fa-sync"></i><br> Filament Manager Sync'd</button><br></center>
+                                                            <% }else{ %>
+                                                                <center><br><button id="filamentManagerSyncBtn" type="button" class="btn btn-warning mb-1 btn-lg"><i class="fas fa-sync"></i><br> Sync Filament Manager</button><br></center>
+                                                            <% } %>
+                                                </div>
+                                            </div>
                             </div>
                         </div>
                     </div>
