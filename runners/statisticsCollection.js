@@ -418,7 +418,9 @@ class StatisticsCollection {
         farmInfo.temp = currentHistoryTemp;
         farmStats[0].farmInfo = farmInfo
     }
+    static async filamentStatistics(farmPrinters){
 
+    }
     static async octofarmStatistics(farmPrinters) {
         let octofarmStatistics = await this.blankFarmStatistics();
         let currentHistory = await History.find({});
