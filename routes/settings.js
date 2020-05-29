@@ -33,7 +33,6 @@ router.get("/client/get", ensureAuthenticated, (req, res) => {
 });
 router.post("/client/update", ensureAuthenticated, (req, res) => {
   ClientSettingsDB.find({}).then(checked => {
-    console.log( req.body)
     let settings = {
       backgroundURL: req.body.settings.backgroundURL
     };
