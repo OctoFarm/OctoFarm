@@ -11,6 +11,8 @@ All notable changes to this project will be documented in this file.
         - File Name Search
         - Path Filter
         - Spool Name Search
+
+        
         
 ### Changed
     - Moved filament manager plugin sync to server settings under Filament Manager Settings. 
