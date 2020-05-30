@@ -772,13 +772,13 @@ function updateTotals(filtered) {
         weight.push(parseInt(row.getElementsByClassName("weight")[0].innerText))
         used.push(parseInt(row.getElementsByClassName("used")[0].innerText))
     })
-    let usedReduced = used.reduce((a, b) => a + b, 0).toFixed(2);
-    let weightReduced = weight.reduce((a, b) => a + b, 0).toFixed(2);
-    document.getElementById("totalPrice").innerHTML = price.reduce((a, b) => a + b, 0).toFixed(2)
+    let usedReduced = used.reduce((a, b) => a + b, 0).toFixed(0);
+    let weightReduced = weight.reduce((a, b) => a + b, 0).toFixed(0);
+    document.getElementById("totalPrice").innerHTML = price.reduce((a, b) => a + b, 0).toFixed(0)
     document.getElementById("totalWeight").innerHTML = weightReduced;
     document.getElementById("totalUsed").innerHTML = usedReduced;
-    document.getElementById("totalRemaining").innerHTML = (weightReduced - usedReduced).toFixed(2);
-    document.getElementById("totalRemainingPercent").innerHTML = ((usedReduced / weightReduced ) * 100).toFixed(2);
+    document.getElementById("totalRemaining").innerHTML = (weightReduced - usedReduced).toFixed(0);
+    document.getElementById("totalRemainingPercent").innerHTML = ((100 - usedReduced / weightReduced) * 100).toFixed(0);
 }
 const element = document.getElementById('listenerSpools');
 element.addEventListener('jplist.state', (e) => {
