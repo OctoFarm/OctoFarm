@@ -116,7 +116,6 @@ const filamentTotals = function(profiles, spools, filamentManager){
       profileID = profile._id
     }
     material = {
-      id: profileID,
       name: profile.profile.material.replace(/ /g, "_"),
       weight: [],
       used: [],
@@ -124,15 +123,26 @@ const filamentTotals = function(profiles, spools, filamentManager){
     }
     materialBreak.push(material)
   })
+  materialBreak.filter(function (item, i, ar) {
+    return ar.indexOf(item) === i;
+  })
   let used = [];
   let total = [];
   let price = [];
-
+  console.log(materialBreak)
   spools.forEach(spool => {
     used.push(parseFloat(spool.spools.used))
     total.push(parseFloat(spool.spools.weight))
     price.push(parseFloat(spool.spools.price))
-    let index = _.findIndex(materialBreak, function(o) { return o.id == spool.spools.profile; });
+    let profInd = null;
+    if(filamentManager){
+      profInd = _.findIndex(profiles, function(o) { return o.profile.index == spool.spools.profile; });
+    }else{
+      profInd = _.findIndex(profiles, function(o) { return o._id == spool.spools.profile; });
+    }
+    console.log(profInd)
+    let index = _.findIndex(materialBreak, function(o) { return o.name == profiles[profInd].profile.material.replace(/ /g, "_"); });
+    console.log(index)
     materialBreak[index].weight.push(parseFloat(spool.spools.weight));
     materialBreak[index].used.push(parseFloat(spool.spools.used));
     materialBreak[index].price.push(parseFloat(spool.spools.price));
