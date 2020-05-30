@@ -708,11 +708,10 @@
                                                             <small><b>Note:</b> OctoFarm expects filament manager installed on every instance. If it isn't, and you activate it you run the risk of some updates/selections failing to register.</small>
                                                             <br>
                                                             <small><b>Note:</b> You must also have all these instances setup with a postgres database. Without this you will not be able to select filament on every instance.</small>
-
-                                                            <% if(serverSettings.filamentManager){ %>
-                                                                <center><button id="filamentManagerSyncBtn" type="button" class="btn btn-warning mb-1 btn-lg" disabled><i class="fas fa-sync"></i><br> Filament Manager Sync'd</button><br></center>
-                                                                <button id="resync-FilamentManager" type="button" class="btn btn-warning mb-1 btn-lg" disabled><i class="fas fa-sync"></i><br> Re-Sync Filament Manager</button>
-                                                                <button id="disable-FilamentManager" type="button" class="btn btn-danger mb-1 btn-lg" disabled><i class="fas fa-skull-crossbones"></i><br>  Disable Filament Manager</button>
+                                                            <% if(serverSettings[0].filamentManager){ %>
+                                                                <center><button id="filamentManagerSyncBtn" type="button" class="btn btn-warning mb-1 btn-lg d-none" disabled><i class="fas fa-sync"></i><br> Filament Manager Sync'd</button><br>
+                                                                <button id="resync-FilamentManager" type="button" class="btn btn-warning mb-1 btn-lg"><i class="fas fa-sync"></i><br> Re-Sync Filament Manager</button><br>
+                                                                <button id="disable-FilamentManager" type="button" class="btn btn-danger mb-1 btn-lg"><i class="fas fa-skull-crossbones"></i><br>  Disable Filament Manager</button></center>
                                                             <% }else{ %>
                                                                 <center><br><button id="filamentManagerSyncBtn" type="button" class="btn btn-warning mb-1 btn-lg"><i class="fas fa-sync"></i><br> Sync Filament Manager</button><br></center>
                                                             <% } %>

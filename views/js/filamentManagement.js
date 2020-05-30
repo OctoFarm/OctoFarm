@@ -150,7 +150,7 @@ async function init() {
         })
         document.getElementById("spoolsProfile-"+spools._id).value = spools.spools.profile;
         if(filamentManager){
-            let prof = _.findIndex(fill.Spool, function(o) { return o.profile.index == spools.spools.profile; });
+            let prof = _.findIndex(profile.profiles, function(o) { return o.profile.index == spools.spools.profile; });
             document.getElementById("spoolsProfile-"+spools._id).className = "form-control " + profile.profiles[prof].profile.material.replace(/ /g, "_");
         }else{
             let prof = _.findIndex(profile.profiles, function(o) { return o._id == spools.spools.profile; });
