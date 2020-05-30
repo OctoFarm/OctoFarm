@@ -16,6 +16,11 @@ All notable changes to this project will be documented in this file.
         - Default sort option for spools
         - Material Filter for Spools
         - Spool Search
+        - Statistics bar at the top
+            - Used / Remaining Progress Bar
+            - Counts for profiles and spools
+            - Total Weight/Used/Price
+            - Material Breakdowns for Weight/Used/Price
         
         
 ### Changed
