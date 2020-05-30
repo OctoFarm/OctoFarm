@@ -346,18 +346,52 @@ class ServerSettings {
           return res.json();
         })
         .then(res => {
-          document.getElementById("webSocketThrottle").value =
-            res.onlinePolling.seconds;
-          document.getElementById("serverPortNo").value = res.server.port;
-          document.getElementById("requireLogin").checked = res.server.loginRequired;
-          document.getElementById("requireRegistration").checked = res.server.registration;
+            document.getElementById("webSocketThrottle").value =
+                res.onlinePolling.seconds;
+            document.getElementById("serverPortNo").value = res.server.port;
+            document.getElementById("requireLogin").checked = res.server.loginRequired;
+            document.getElementById("requireRegistration").checked = res.server.registration;
 
-          document.getElementById("webSocketRetry").value = res.timeout.webSocketRetry / 1000;
-          document.getElementById("APITimeout").value = res.timeout.apiTimeout / 1000;
-          document.getElementById("APIRetryTimeout").value = res.timeout.apiRetryCutoff / 1000;
-          document.getElementById("APIRetry").value = res.timeout.apiRetry / 1000;
-
-        });
+            document.getElementById("webSocketRetry").value = res.timeout.webSocketRetry / 1000;
+            document.getElementById("APITimeout").value = res.timeout.apiTimeout / 1000;
+            document.getElementById("APIRetryTimeout").value = res.timeout.apiRetryCutoff / 1000;
+            document.getElementById("APIRetry").value = res.timeout.apiRetry / 1000;
+            if (!res.filamentManager) {
+                let filManager = document.getElementById("filamentManagerSyncBtn")
+                filManager.addEventListener('click', async event => {
+                    filManager.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing <br> Please Wait..."
+                    let post = await OctoFarmclient.post("filament/filamentManagerSync", {activate: true})
+                    post = await post.json();
+                    if (post.status) {
+                        filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Sync Filament Manager"
+                    } else {
+                        filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Sync Filament Manager"
+                    }
+                    location.reload();
+                });
+            } else if (res.filamentManager) {
+                let filManager = document.getElementById("resync-FilamentManager")
+                filManager.addEventListener('click', async event => {
+                    filManager.disabled = true;
+                    filManager.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing... <br> Please Wait..."
+                    let post = await OctoFarmclient.post("filament/filamentManagerSync", {activate: true})
+                    post = await post.json();
+                    if (post.status) {
+                        filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Re-Sync Database"
+                        filManager.disabled = false;
+                    } else {
+                        filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Re-Sync Database"
+                        filManager.disabled = false;
+                    }
+                });
+                let disableFilManager = document.getElementById("disable-FilamentManager")
+                disableFilManager.addEventListener('click', async event => {
+                    let post = await OctoFarmclient.post("filament/disableFilamentPlugin", {activate: true})
+                    post = await post.json();
+                    location.reload();
+                });
+            }
+        })
         let logList = await Client.get("settings/server/get/logs")
         logList = await logList.json();
         let logTable = document.getElementById("serverLogs");

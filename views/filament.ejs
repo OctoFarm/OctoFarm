@@ -3,7 +3,7 @@
 <% if(typeof serverSettings != 'undefined'){ %>
     <%filamentManager = serverSettings[0].filamentManager%>
 <% } %>
-<% let filamentTotals = helpers.filamentTotals(profiles, spools) %>
+<% let filamentTotals = helpers.filamentTotals(profiles, spools, filamentManager) %>
 <div class="row">
     <div class="col-lg-12">
         <div class="card text-white bg-dark">
@@ -20,7 +20,81 @@
 
             </div>
             <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <center>
+                            <div class="progress mt-0 mb-2">
+                                <div
+                                        id="fsUsedProgress"
+                                        class="progress-bar progress-bar-striped bg-danger"
+                                        role="progressbar"
+                                        style="width: <%= (filamentTotals.used / filamentTotals.total) * 100%>% "
+                                        aria-valuenow="<%= (filamentTotals.used / filamentTotals.total) * 100%>%"
+                                        aria-valuemin="0"
+                                        aria-valuemax="100"
+                                >
+                                    <%= ((filamentTotals.used / filamentTotals.total) * 100).toFixed(2)%> %
+                                </div>
+                                <div
+                                        id="fsRemainingProgress"
+                                        class="progress-bar progress-bar-striped bg-success"
+                                        role="progressbar"
+                                        style="width: <%= ( (filamentTotals.total - filamentTotals.used) / filamentTotals.total) * 100%>% "
+                                        aria-valuenow="<%= ( (filamentTotals.total - filamentTotals.used) / filamentTotals.total) * 100%>%"
+                                        aria-valuemin="0"
+                                        aria-valuemax="100"
+                                >
+                                    <%= (( (filamentTotals.total - filamentTotals.used) / filamentTotals.total) * 100).toFixed(2)%>%
+                                </div>
 
+                            </div>
+                        </center>
+                        <b class="mb-0 d-inline"><i class="fas fa-square text-warning d-inline"></i> Used: </b>
+                        <p id="fsUsed" class="mb-1 d-inline"><%= filamentTotals.used %>g</p> /
+                        <b class="mb-0 d-inline"><i class="fas fa-square text-success"></i> Remaining: </b>
+                        <p id="fsRemain" class="mb-1 d-inline"><%= filamentTotals.total - filamentTotals.used %>g</p> /
+                        <b class="mb-0 d-inline"><i class="fas fa-square"></i> Total: </b>
+                        <p id="fsTotal" class="mb-1 d-inline"><%= filamentTotals.total %>g</p>
+                    </div>
+                    <div class="col-lg-1">
+                        <h6>Counts</h6>
+                        <hr>
+                        <p><b>Profiles:</b> <%= filamentTotals.profileCount %> </p>
+                        <p><b>Spools:</b> <%= filamentTotals.spoolCount %> </p>
+                    </div>
+                    <div class="col-lg-2">
+                        <h6>Totals</h6>
+                        <hr>
+                        <p class="m-0"><b>Weight:</b> <%= filamentTotals.total %>g </p>
+                        <p class="m-0"><b>Used:</b> <%= filamentTotals.used %>g </p>
+                        <p class="m-0"><b>Price:</b> <%= filamentTotals.price %></p>
+                    </div>
+                    <div class="col-lg-9">
+                        <h6>Material Breakdown</h6>
+                        <hr>
+                        <div class="row">
+                            <p class="m-0 col p-0"><b>Weight:</b><% filamentTotals.materialBreakDown.forEach(used => { %>
+                            <p class="d-inline m-0 col"><b> <%= used.name %>:</b> <%= used.total %>g</p>
+                            <%   }) %>
+                            </p>
+                        </div>
+                         <div class="row">
+                            <p class="m-0 col p-0"><b>Used:</b><% filamentTotals.materialBreakDown.forEach(used => { %>
+                            <p class="d-inline m-0 col"><b> <%= used.name %>:</b> <%= used.used %>g</p>
+                            <%   }) %>
+                             </p>
+                         </div>
+                        <div class="row">
+                            <p class="m-0 col p-0"><b>Price:</b><% filamentTotals.materialBreakDown.forEach(used => { %>
+                            <p class="d-inline m-0 col"><b> <%= used.name %>:</b> <%= used.price %></p>
+                            <%   }) %>
+                            </p>
+                        </div>
+                        <%= console.log(filamentTotals.materialBreakDown) %>
+
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>

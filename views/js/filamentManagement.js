@@ -203,41 +203,6 @@ async function init() {
             saveSpool(e.target)
         }
     });
-    if(!filamentManager) {
-        let filManager = document.getElementById("filamentManagerSyncBtn")
-        filManager.addEventListener('click', async event => {
-            filManager.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing <br> Please Wait..."
-            let post = await OctoFarmclient.post("filament/filamentManagerSync", {activate: true})
-            post = await post.json();
-            if (post.status) {
-                filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Sync Filament Manager"
-            } else {
-                filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Sync Filament Manager"
-            }
-            location.reload();
-        });
-    }else if(filamentManager){
-        let filManager = document.getElementById("resync-FilamentManager")
-        filManager.addEventListener('click', async event => {
-            filManager.disabled = true;
-            filManager.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing... <br> Please Wait..."
-            let post = await OctoFarmclient.post("filament/filamentManagerSync", {activate: true})
-            post = await post.json();
-            if(post.status){
-                filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Re-Sync Database"
-                filManager.disabled = false;
-            }else{
-                filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Re-Sync Database"
-                filManager.disabled = false;
-            }
-        });
-        let disableFilManager = document.getElementById("disable-FilamentManager")
-        disableFilManager.addEventListener('click', async event => {
-            let post = await OctoFarmclient.post("filament/disableFilamentPlugin", {activate: true})
-            post = await post.json();
-            location.reload();
-        });
-    }
   //Init Profiles
   let post = await OctoFarmclient.get("filament/get/profile");
   post = await post.json();
@@ -401,6 +366,7 @@ async function load() {
             let printers = await OctoFarmclient.post("printers/printerInfo");
             printers = await printers.json();
             let post = await OctoFarmclient.post("filament/save/filament", opts);
+
             if (post.status === 200) {
                 UI.createMessage(
                     {
@@ -410,6 +376,7 @@ async function load() {
                     "addSpoolsMessage"
                 );
                 post = await post.json();
+
                 spoolsName.value = "";
                 spoolsPrice.value = "";
                 spoolsWeight.value = 1000;
@@ -434,7 +401,7 @@ async function load() {
                   <td>${(100 - post.spools.used / post.spools.weight * 100).toFixed(0)}</td>
                   <td><p contenteditable="false">${post.spools.tempOffset}</p></td>
                    <td>
-                       <select id="spoolsPrinterAssignment-${post.spools._id}" class="form-control">
+                       <select id="spoolsPrinterAssignment-${post._id}" class="form-control">
         
                        </select>
                    </td>
@@ -459,7 +426,7 @@ async function load() {
                 //
                 //     document.getElementById("spoolsProfile-"+post.spools._id).className = "form-control " + profile.profiles[prof].profile.material.replace(/ /g, "_");
                 // }
-                let printerListCurrent = document.getElementById("spoolsPrinterAssignment-"+post.spools._id);
+                let printerListCurrent = document.getElementById("spoolsPrinterAssignment-"+post._id);
                 printerListCurrent.insertAdjacentHTML("beforeend", `
                     <option value = "0" > No Selection </option>
                    `)

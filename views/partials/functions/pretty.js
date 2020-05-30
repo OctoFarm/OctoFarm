@@ -104,15 +104,60 @@ const historyTotals = function(history){
   };
 
 }
-const filamentTotals = function(profiles, spools){
+const filamentTotals = function(profiles, spools, filamentManager){
   let materials = [];
+  let materialBreak = [];
   profiles.forEach(profile => {
-    materials.push(profile.profile.material.replace(/ /g, "_"))
+    materials.push(profile.profile.material.replace(/ /g, "_"));
+    let profileID = null
+    if(filamentManager){
+      profileID = profile.profile.index
+    }else{
+      profileID = profile._id
+    }
+    material = {
+      id: profileID,
+      name: profile.profile.material.replace(/ /g, "_"),
+      weight: [],
+      used: [],
+      price: [],
+    }
+    materialBreak.push(material)
   })
+  let used = [];
+  let total = [];
+  let price = [];
+
+  spools.forEach(spool => {
+    used.push(parseFloat(spool.spools.used))
+    total.push(parseFloat(spool.spools.weight))
+    price.push(parseFloat(spool.spools.price))
+    let index = _.findIndex(materialBreak, function(o) { return o.id == spool.spools.profile; });
+    materialBreak[index].weight.push(parseFloat(spool.spools.weight));
+    materialBreak[index].used.push(parseFloat(spool.spools.used));
+    materialBreak[index].price.push(parseFloat(spool.spools.price));
+  })
+  materialBreakDown = []
+  materialBreak.forEach(material => {
+    let mat = {
+      name: material.name,
+      used: material.used.reduce((a, b) => a + b, 0),
+      total: material.weight.reduce((a, b) => a + b, 0),
+      price: material.price.reduce((a, b) => a + b, 0),
+    }
+    materialBreakDown.push(mat)
+  })
+
   return {
     materialList: materials.filter(function (item, i, ar) {
       return ar.indexOf(item) === i;
     }),
+    used: used.reduce((a, b) => a + b, 0),
+    total: total.reduce((a, b) => a + b, 0),
+    price: price.reduce((a,b) => a + b, 0),
+    profileCount: profiles.length,
+    spoolCount: spools.length,
+    materialBreakDown: materialBreakDown
   };
 
 }

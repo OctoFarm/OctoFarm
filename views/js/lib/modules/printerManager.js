@@ -168,9 +168,78 @@ export default class PrinterManager {
           printDropCheck = true;
         }
 
+        const printerPort = document.getElementById("printerPortDrop");
+        const printerBaud = document.getElementById("printerBaudDrop");
+        const printerProfile = document.getElementById("printerProfileDrop");
+        const printerConnect = document.getElementById("printerConnect");
 
+        printerPort.innerHTML = `
+        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardSerialPort">Port:</label> </div> <select class="custom-select bg-secondary text-light" id="pmSerialPort"></select></div>
+        `;
+        printerBaud.innerHTML = `
+        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardBaudrate">Baudrate:</label> </div> <select class="custom-select bg-secondary text-light" id="pmBaudrate"></select></div>
+        `;
+        printerProfile.innerHTML = `
+        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardPrinterProfile">Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="pmProfile"></select></div>
+        `;
+        availableBaud.forEach(baud => {
+          document
+              .getElementById("pmBaudrate")
+              .insertAdjacentHTML(
+                  "beforeend",
+                  `<option value="${baud}">${baud}</option>`
+              );
+        });
+        if (preferedBaud != null) {
+          document.getElementById("pmBaudrate").value = preferedBaud;
+        }
+        availablePort.forEach(port => {
+          document
+              .getElementById("pmSerialPort")
+              .insertAdjacentHTML(
+                  "beforeend",
+                  `<option value="${port}">${port}</option>`
+              );
+        });
+        if (preferedPort != null) {
+          document.getElementById("pmSerialPort").value = preferedPort;
+        }
+        availableProfile.forEach(profile => {
+          document
+              .getElementById("pmProfile")
+              .insertAdjacentHTML(
+                  "beforeend",
+                  `<option value="${profile.id}">${profile.name}</option>`
+              );
+        });
+        if (preferedProfile != null) {
+          document.getElementById("pmProfile").value = preferedProfile;
+        }
+
+        if (printer.state === "Disconnected") {
+          printerConnect.innerHTML =
+              '<center> <button id="pmConnect" class="btn btn-success inline" value="connect">Connect</button></center>';
+        } else {
+          printerConnect.innerHTML =
+              '<center> <button id="pmConnect" class="btn btn-danger inline" value="disconnect">Disconnect</button></center>';
+          document.getElementById("pmSerialPort").disabled = true;
+          document.getElementById("pmBaudrate").disabled = true;
+          document.getElementById("pmProfile").disabled = true;
+        }
 
         document.getElementById("printerControls").innerHTML = `
+        <div class="row">
+            <div class="col-lg-3">
+            
+            </div>
+            <div class="col-lg-3">
+            
+            </div>
+            <div class="col-lg-3">
+            
+            </div>
+        </div>
+
         <div class="row">
           <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
               <div class="row">
@@ -604,64 +673,7 @@ export default class PrinterManager {
           selectFilament(printer._id, event.target.value)
         });
 
-        const printerPort = document.getElementById("printerPortDrop");
-        const printerBaud = document.getElementById("printerBaudDrop");
-        const printerProfile = document.getElementById("printerProfileDrop");
-        const printerConnect = document.getElementById("printerConnect");
 
-        printerPort.innerHTML = `
-        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardSerialPort">Port:</label> </div> <select class="custom-select bg-secondary text-light" id="pmSerialPort"></select></div>
-        `;
-        printerBaud.innerHTML = `
-        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardBaudrate">Baudrate:</label> </div> <select class="custom-select bg-secondary text-light" id="pmBaudrate"></select></div>
-        `;
-        printerProfile.innerHTML = `
-        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardPrinterProfile">Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="pmProfile"></select></div>
-        `;
-        availableBaud.forEach(baud => {
-          document
-              .getElementById("pmBaudrate")
-              .insertAdjacentHTML(
-                  "beforeend",
-                  `<option value="${baud}">${baud}</option>`
-              );
-        });
-        if (preferedBaud != null) {
-          document.getElementById("pmBaudrate").value = preferedBaud;
-        }
-        availablePort.forEach(port => {
-          document
-              .getElementById("pmSerialPort")
-              .insertAdjacentHTML(
-                  "beforeend",
-                  `<option value="${port}">${port}</option>`
-              );
-        });
-        if (preferedPort != null) {
-          document.getElementById("pmSerialPort").value = preferedPort;
-        }
-        availableProfile.forEach(profile => {
-          document
-              .getElementById("pmProfile")
-              .insertAdjacentHTML(
-                  "beforeend",
-                  `<option value="${profile.id}">${profile.name}</option>`
-              );
-        });
-        if (preferedProfile != null) {
-          document.getElementById("pmProfile").value = preferedProfile;
-        }
-
-        if (printer.state === "Disconnected") {
-          printerConnect.innerHTML =
-              '<center> <button id="pmConnect" class="btn btn-success inline" value="connect">Connect</button></center>';
-        } else {
-          printerConnect.innerHTML =
-              '<center> <button id="pmConnect" class="btn btn-danger inline" value="disconnect">Disconnect</button></center>';
-          document.getElementById("pmSerialPort").disabled = true;
-          document.getElementById("pmBaudrate").disabled = true;
-          document.getElementById("pmProfile").disabled = true;
-        }
         let elements = PrinterManager.grabPage();
         elements.terminal.terminalWindow.innerHTML = "";
         elements.printerControls["step" + printer.stepRate].className =

@@ -24,7 +24,7 @@ All notable changes to this project will be documented in this file.
 ### Removed
 
 ### Fixed
-
+    - Fixed broken printer settings modal
 
 ## [v1.1.4.9-dev-3.9]
 
