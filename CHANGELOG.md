@@ -11,7 +11,11 @@ All notable changes to this project will be documented in this file.
         - File Name Search
         - Path Filter
         - Spool Name Search
-
+    - Filament Manager: 
+        - Pagination added to Spools and Profile lists
+        - Default sort option for spools
+        - Material Filter for Spools
+        - Spool Search
         
         
 ### Changed

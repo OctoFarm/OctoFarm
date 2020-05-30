@@ -3,8 +3,12 @@ import OctoPrintClient from "./lib/octoprint.js";
 import UI from "./lib/functions/ui.js";
 import tableSort from "./lib/functions/tablesort.js";
 import Validate from "./lib/functions/validate.js";
-window.onload = function () {tableSort.makeAllSortable();};
+import Calc from "./lib/functions/calc.js";
 
+window.onload = function () {
+    tableSort.makeAllSortable();
+};
+let jpInit = false;
 let filamentStore = [
     {
         code: "pla",
@@ -131,40 +135,7 @@ async function init() {
     let printers = await OctoFarmclient.post("printers/printerInfo");
     printers = await printers.json();
     filamentManager = profile.filamentManager;
-    spoolTable.innerHTML = "";
     fill.Spool.forEach(spools => {
-        spoolTable.insertAdjacentHTML(
-            "beforeend",
-            `
-                <tr>
-                  <th style="display: none;">${spools._id}</th>
-                  <th scope="row"><p contenteditable="false">${spools.spools.name}</p></th>
-                  <td>
-                       <select id="spoolsProfile-${spools._id}" class="form-control" disabled>
-    
-                       </select>
-                   </td>
-                  <td><p contenteditable="false">${spools.spools.price}</p></td>
-                  <td><p contenteditable="false">${spools.spools.weight}</p></td>
-                  <td><p contenteditable="false">${spools.spools.used}</p></td>
-                  <td>${(spools.spools.weight - spools.spools.used).toFixed(0)}</td>
-                   <td>${(100 - spools.spools.used / spools.spools.weight * 100).toFixed(0)}</td>
-                  <td><p contenteditable="false">${spools.spools.tempOffset}</p></td>
-                  <td><select id="spoolsPrinterAssignment-${spools._id}" class="form-control">
-    
-                       </select></td>
-                  <td><button id="edit-${spools._id}" type="button" class="btn btn-sm btn-info edit">
-                    <i class="fas fa-edit editIcon"></i>
-                  </button>
-                  <button id="save-${spools._id}" type="button" class="btn btn-sm d-none btn-success save">
-                    <i class="fas fa-save saveIcon"></i>
-                  </button>
-                  <button id="delete-${spools._id}" type="button" class="btn btn-sm btn-danger delete">
-                    <i class="fas fa-trash deleteIcon"></i>
-                  </button></td>
-                </tr>
-                `
-        );
         profile.profiles.forEach(prof => {
             let profileID = null;
             if(filamentManager){
@@ -175,9 +146,20 @@ async function init() {
             document.getElementById("spoolsProfile-"+spools._id).insertAdjacentHTML('beforeend',`
                      <option value="${profileID}">${prof.profile.manufacturer} (${prof.profile.material})</option>
                     `)
+
         })
         document.getElementById("spoolsProfile-"+spools._id).value = spools.spools.profile;
+        if(filamentManager){
+            let prof = _.findIndex(fill.Spool, function(o) { return o.profile.index == spools.spools.profile; });
+            document.getElementById("spoolsProfile-"+spools._id).className = "form-control " + profile.profiles[prof].profile.material.replace(/ /g, "_");
+        }else{
+            let prof = _.findIndex(profile.profiles, function(o) { return o._id == spools.spools.profile; });
+
+            document.getElementById("spoolsProfile-"+spools._id).className = "form-control " + profile.profiles[prof].profile.material.replace(/ /g, "_");
+        }
+
         let printerListCurrent = document.getElementById("spoolsPrinterAssignment-"+spools._id);
+
         printerListCurrent.insertAdjacentHTML("beforeend", `
                         <option value="0">No Selection</option>
                    `)
@@ -200,6 +182,7 @@ async function init() {
                     }
                 }
             })
+
         printerListCurrent.addEventListener("change", e => {
             let data = {
                 printerId: e.target.value,
@@ -259,7 +242,7 @@ async function init() {
   let post = await OctoFarmclient.get("filament/get/profile");
   post = await post.json();
   let profileTable = document.getElementById("addProfilesTable");
-    profileTable.innerHTML = "";
+    //profileTable.innerHTML = "";
   post.profiles.forEach(profiles => {
       let profileID = null;
       if(filamentManager){
@@ -267,36 +250,37 @@ async function init() {
       }else{
           profileID = profiles._id
       }
-    profileTable.insertAdjacentHTML("beforeend", `
-        <tr>
-          <td class="d-none" scope="row">
-            ${profileID}
-          </td>
-          <td scope="row">
-             <p contenteditable="false">${profiles.profile.manufacturer}</p>
-          </td>
-           <td>
-            <p contenteditable="false">${profiles.profile.material}</p>
-          </td>
-          <td>
-            <p contenteditable="false">${profiles.profile.density}</p> 
-          </td>
-          <td>
-            <p contenteditable="false">${profiles.profile.diameter}</p> 
-          </td>
-              <td>
-                  <button id="edit-${profileID}" type="button" class="btn btn-sm btn-info edit">
-                    <i class="fas fa-edit editIcon"></i>
-                  </button>
-                  <button id="save-${profileID}" type="button" class="btn d-none btn-sm btn-success save">
-                    <i class="fas fa-save saveIcon"></i>
-                  </button>
-                  <button id="delete-${profileID}" type="button" class="btn btn-sm btn-danger delete">
-                    <i class="fas fa-trash deleteIcon"></i>
-                  </button>
-              </td>
-        </tr>
-    `)
+    // profileTable.insertAdjacentHTML("beforeend", `
+    //     <tr data-jplist-item>
+    //       <td class="d-none" scope="row">
+    //         ${profileID}
+    //       </td>
+    //       <td scope="row">
+    //          <p contenteditable="false">${profiles.profile.manufacturer}</p>
+    //       </td>
+    //        <td>
+    //         <p contenteditable="false">${profiles.profile.material}</p>
+    //       </td>
+    //       <td>
+    //         <p contenteditable="false">${profiles.profile.density}</p>
+    //       </td>
+    //       <td>
+    //         <p contenteditable="false">${profiles.profile.diameter}</p>
+    //       </td>
+    //           <td>
+    //               <button id="edit-${profileID}" type="button" class="btn btn-sm btn-info edit">
+    //                 <i class="fas fa-edit editIcon"></i>
+    //               </button>
+    //               <button id="save-${profileID}" type="button" class="btn d-none btn-sm btn-success save">
+    //                 <i class="fas fa-save saveIcon"></i>
+    //               </button>
+    //               <button id="delete-${profileID}" type="button" class="btn btn-sm btn-danger delete">
+    //                 <i class="fas fa-trash deleteIcon"></i>
+    //               </button>
+    //           </td>
+    //     </tr>
+    // `)
+
       printers.forEach(printer => {
 
           if(printer.selectedFilament !== null && printer.selectedFilament.spools.profile === profileID){
@@ -316,6 +300,10 @@ async function init() {
         }else if(e.target.classList.contains("save")){
             saveProfile(e.target)
         }
+    });
+    jplist.init({
+        storage: 'localStorage', //'localStorage', 'sessionStorage' or 'cookies'
+        storageName: 'spools-sorting' //the same storage name can be used to share storage between multiple pages
     });
   //Update Profiles Spools Dropdown.
   updateProfiles(post)
@@ -431,7 +419,7 @@ async function load() {
                 document.getElementById("addSpoolsTable").insertAdjacentHTML(
                     "beforeend",
                     `
-                <tr>
+                <tr data-jplist-item>
                   <th style="display: none;">${post._id}</th>
                   <th scope="row"><p contenteditable="false">${post.spools.name}</p></th>
                   <td>
@@ -463,6 +451,14 @@ async function load() {
                 `
                 );
                 document.getElementById("spoolsProfile-"+post._id).value = post.spools.profile;
+                // if(filamentManager){
+                //     let prof = _.findIndex(fill.Spool, function(o) { return o.profile.index == post.spools.profile; });
+                //     document.getElementById("spoolsProfile-"+post.spools._id).className = "form-control " + profile.profiles[prof].profile.material.replace(/ /g, "_");
+                // }else{
+                //     let prof = _.findIndex(profile.profiles, function(o) { return o._id == post.spools.profile; });
+                //
+                //     document.getElementById("spoolsProfile-"+post.spools._id).className = "form-control " + profile.profiles[prof].profile.material.replace(/ /g, "_");
+                // }
                 let printerListCurrent = document.getElementById("spoolsPrinterAssignment-"+post.spools._id);
                 printerListCurrent.insertAdjacentHTML("beforeend", `
                     <option value = "0" > No Selection </option>
@@ -586,7 +582,7 @@ async function load() {
                 document.getElementById("addProfilesTable").insertAdjacentHTML(
                     "beforeend",
                     `
-                <tr>
+                <tr data-jplist-item>
                   <th style="display: none;">${profileID }</th>
                   <th scope="row"><p contenteditable="false">${post.profile.manufacturer}</p></th>
                   <td><p contenteditable="false">${post.profile.material}</p></td>
@@ -624,6 +620,7 @@ async function load() {
     //         saveProfile(e.target)
     //     }
     // });
+
 }
 async function editProfile(e) {
     let row = e.parentElement.parentElement;
@@ -635,6 +632,7 @@ async function editProfile(e) {
     })
     document.getElementById("save-"+id).classList.remove("d-none");
     document.getElementById("edit-"+id).classList.add("d-none");
+
 }
 async function editSpool(e) {
     let row = e.parentElement.parentElement;
@@ -684,6 +682,7 @@ async function saveProfile(e, filamentManager) {
         document.getElementById("save-" + id).classList.add("d-none");
         document.getElementById("edit-" + id).classList.remove("d-none");
     }
+    jplist.refresh();
 }
 async function saveSpool(e, filamentManager) {
     let row = e.parentElement.parentElement;
@@ -709,6 +708,7 @@ async function saveSpool(e, filamentManager) {
     document.getElementById("edit-" + id).classList.remove("d-none");
 
      }
+    jplist.refresh();
 }
 async function deleteProfile(e, filamentManager) {
   document.getElementById("profilesMessage").innerHTML = "";
@@ -736,6 +736,7 @@ async function deleteProfile(e, filamentManager) {
       );
     }
   }
+    jplist.refresh();
 }
 async function deleteSpool(e, filamentManager) {
     document.getElementById("profilesMessage").innerHTML = "";
@@ -760,6 +761,29 @@ async function deleteSpool(e, filamentManager) {
             );
         }
     }
+    jplist.refresh();
 }
+function updateTotals(filtered) {
+    let price = [];
+    let weight = [];
+    let used = [];
+    filtered.forEach(row => {
+        price.push(parseInt(row.getElementsByClassName("price")[0].innerText))
+        weight.push(parseInt(row.getElementsByClassName("weight")[0].innerText))
+        used.push(parseInt(row.getElementsByClassName("used")[0].innerText))
+    })
+    let usedReduced = used.reduce((a, b) => a + b, 0).toFixed(2);
+    let weightReduced = weight.reduce((a, b) => a + b, 0).toFixed(2);
+    document.getElementById("totalPrice").innerHTML = price.reduce((a, b) => a + b, 0).toFixed(2)
+    document.getElementById("totalWeight").innerHTML = weightReduced;
+    document.getElementById("totalUsed").innerHTML = usedReduced;
+    document.getElementById("totalRemaining").innerHTML = (weightReduced - usedReduced).toFixed(2);
+    document.getElementById("totalRemainingPercent").innerHTML = ((usedReduced / weightReduced ) * 100).toFixed(2);
+}
+const element = document.getElementById('listenerSpools');
+element.addEventListener('jplist.state', (e) => {
+    //the elements list after filtering + pagination
+    updateTotals(e.jplistState.filtered);
+}, false);
 init();
 load();

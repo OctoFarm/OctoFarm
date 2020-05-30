@@ -102,10 +102,25 @@ const historyTotals = function(history){
     }),
 
   };
+
 }
+const filamentTotals = function(profiles, spools){
+  let materials = [];
+  profiles.forEach(profile => {
+    materials.push(profile.profile.material.replace(/ /g, "_"))
+  })
+  return {
+    materialList: materials.filter(function (item, i, ar) {
+      return ar.indexOf(item) === i;
+    }),
+  };
+
+}
+
 module.exports = {
   generateBytes: bytes,
   generateTime: generateTime,
   calculatePercent: calculatePercent,
-  historyTotals: historyTotals
+  historyTotals: historyTotals,
+  filamentTotals: filamentTotals
 };

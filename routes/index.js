@@ -6,6 +6,8 @@ const pjson = require("../package.json");
 const ClientSettings = require("../models/ClientSettings.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const prettyHelpers = require("../views/partials/functions/pretty.js");
+const Spools = require("../models/Filament.js");
+const Profiles = require("../models/Profiles.js")
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 const _ = require("lodash");
@@ -314,6 +316,8 @@ router.get("/filament", ensureAuthenticated, async(req, res) => {
     let statistics = await FarmStatistics.returnStats();
     let clientSettings = await ClientSettings.find({});
     let serverSettings = await ServerSettings.find({});
+    let spools = await Spools.find({});
+    let profiles = await Profiles.find({});
     let user = null;
     let group = null;
     if (serverSettings[0].server.loginRequired === false) {
@@ -335,7 +339,9 @@ router.get("/filament", ensureAuthenticated, async(req, res) => {
         page: "Filament Manager",
         helpers: prettyHelpers,
         clientSettings: clientSettings,
-        serverSettings: serverSettings
+        serverSettings: serverSettings,
+        spools: spools,
+        profiles: profiles
     });
 });
 module.exports = router;
