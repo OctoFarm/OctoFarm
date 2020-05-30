@@ -123,13 +123,12 @@ const filamentTotals = function(profiles, spools, filamentManager){
     }
     materialBreak.push(material)
   })
-  materialBreak.filter(function (item, i, ar) {
-    return ar.indexOf(item) === i;
-  })
+  materialBreak = _.uniqWith(materialBreak, _.isEqual)
+
   let used = [];
   let total = [];
   let price = [];
-  console.log(materialBreak)
+
   spools.forEach(spool => {
     used.push(parseFloat(spool.spools.used))
     total.push(parseFloat(spool.spools.weight))
@@ -140,9 +139,9 @@ const filamentTotals = function(profiles, spools, filamentManager){
     }else{
       profInd = _.findIndex(profiles, function(o) { return o._id == spool.spools.profile; });
     }
-    console.log(profInd)
+
     let index = _.findIndex(materialBreak, function(o) { return o.name == profiles[profInd].profile.material.replace(/ /g, "_"); });
-    console.log(index)
+
     materialBreak[index].weight.push(parseFloat(spool.spools.weight));
     materialBreak[index].used.push(parseFloat(spool.spools.used));
     materialBreak[index].price.push(parseFloat(spool.spools.price));
