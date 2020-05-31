@@ -105,7 +105,7 @@ export async function returnDropDown(history){
                 `)
                 }else{
                     dropObject.push(`
-                    <option value="${spool._id}" disabled>${spool.spools.name} - ${profiles.profiles[profileId].profile.material}</option>
+                    <option value="${spool._id}">${spool.spools.name} - ${profiles.profiles[profileId].profile.material}</option>
                 `)
                 }
 

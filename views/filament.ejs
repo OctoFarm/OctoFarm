@@ -1,9 +1,14 @@
 <% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
 <%let filamentManager = false;%>
+<% let displayNone = "d-none" %>
 <% if(typeof serverSettings != 'undefined'){ %>
     <%filamentManager = serverSettings[0].filamentManager%>
 <% } %>
+<% if(filamentManager){ %>
+<% displayNone = ""; %>
+<% } %>
 <% let filamentTotals = helpers.filamentTotals(profiles, spools, filamentManager) %>
+
 <div class="row">
     <div class="col-lg-12">
         <div class="card text-white bg-dark">
@@ -21,9 +26,9 @@
             </div>
             <div class="card-body">
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-12  <%= displayNone %>">
                         <center>
-                            <div class="progress mt-0 mb-2">
+                            <div class="progress mt-0 mb-2 ">
                                 <div
                                         id="fsUsedProgress"
                                         class="progress-bar progress-bar-striped bg-warning"
@@ -66,7 +71,7 @@
                         <h6>Totals</h6>
                         <hr>
                         <p class="m-0"><b>Weight:</b> <%= filamentTotals.total.toFixed(2) %>g </p>
-                        <p class="m-0"><b>Used:</b> <%= filamentTotals.used.toFixed(2) %>g </p>
+                        <p class="m-0   <%= displayNone %>"><b>Used:</b> <%= filamentTotals.used.toFixed(2) %>g </p>
                         <p class="m-0"><b>Price:</b> <%= filamentTotals.price.toFixed(2) %></p>
                     </div>
                     <div class="col-lg-9">
@@ -78,7 +83,7 @@
                             <%   }) %>
                             </p>
                         </div>
-                         <div class="row">
+                         <div class="row   <%= displayNone %>">
                             <p class="m-0 col p-0"><b>Used:</b><% filamentTotals.materialBreakDown.forEach(used => { %>
                             <p class="d-inline m-0 col"><b> <%= used.name %>:</b> <%= used.used.toFixed(2) %>g</p>
                             <%   }) %>
@@ -90,7 +95,7 @@
                             <%   }) %>
                             </p>
                         </div>
-                        <%= console.log(filamentTotals.materialBreakDown) %>
+
 
                     </div>
 
@@ -303,7 +308,7 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="form-group col-md-4">
+                        <div class="form-group col-md-4   <%= displayNone %>">
                             <label for="spoolsRemaining">Used</label>
                             <div class="input-group mb-3">
                                 <input id="spoolsRemaining" type="number" class="form-control" value="0" step="1" aria-label="" aria-describedby="profilesDiameter">
@@ -468,18 +473,18 @@
                             <tr>
                                 <th scope="col">Total Price</th>
                                 <th scope="col">Total Weight (g)</th>
-                                <th scope="col">Total Used (g)</th>
-                                <th scope="col">Total Remaining (g)</th>
-                                <th scope="col">Total Remaining (%)</th>
+                                <th scope="col" class="  <%= displayNone %>">Total Used (g)</th>
+                                <th scope="col" class="  <%= displayNone %>">Total Remaining (g)</th>
+                                <th scope="col" class="  <%= displayNone %>">Total Remaining (%)</th>
                             </tr>
                             </thead>
                             <tbody>
                                 <tr>
                                     <td id="totalPrice"></td>
                                     <td id="totalWeight"></td>
-                                    <td id="totalUsed"></td>
-                                    <td id="totalRemaining"></td>
-                                    <td id="totalRemainingPercent"></td>
+                                    <td id="totalUsed" class="  <%= displayNone %>"></td>
+                                    <td id="totalRemaining" class="  <%= displayNone %>"></td>
+                                    <td id="totalRemainingPercent" class="  <%= displayNone %>"></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -492,9 +497,9 @@
                         <th scope="col" width="200px">Profile</th>
                         <th scope="col">Price</th>
                         <th scope="col">Weight (g)</th>
-                        <th scope="col">Used (g)</th>
-                        <th scope="col">Remaining (g)</th>
-                        <th scope="col">Remaining (%)</th>
+                        <th scope="col" class="  <%= displayNone %>">Used (g)</th>
+                        <th scope="col" class="  <%= displayNone %>">Remaining (g)</th>
+                        <th scope="col" class="  <%= displayNone %>">Remaining (%)</th>
                         <th scope="col">Temperature Offset (°C)</th>
                         <th scope="col" width="200px">Printer Assignment</th>
                         <th scope="col" width="150px"></th>
@@ -512,9 +517,9 @@
                                            </td>
                                           <td><p class="price" contenteditable="false"><%=spool.spools.price%></p></td>
                                           <td><p class="weight" contenteditable="false"><%=spool.spools.weight%></p></td>
-                                          <td><p class="used" contenteditable="false"><%=spool.spools.used%></p></td>
-                                          <td class="grams"><%=(spool.spools.weight - spool.spools.used).toFixed(0)%></td>
-                                           <td class="percent"><%=(100 - spool.spools.used / spool.spools.weight * 100).toFixed(0)%></td>
+                                          <td><p class="used <%= displayNone %>" contenteditable="false" ><%=spool.spools.used%></p></td>
+                                          <td class="grams <%= displayNone %>"><%=(spool.spools.weight - spool.spools.used).toFixed(0)%></td>
+                                           <td class="percent <%= displayNone %>"><%=(100 - spool.spools.used / spool.spools.weight * 100).toFixed(0)%></td>
                                           <td><p contenteditable="false"><%= spool.spools.tempOffset %></p></td>
                                           <td><select id="spoolsPrinterAssignment-<%=spool._id%>" class="form-control">
 

@@ -138,6 +138,7 @@ router.get("/filemanager", ensureAuthenticated, async(req, res) => {
         sortedIndex: sortedPrinters,
         printerCount: printers.length,
         currentOperationsCount: statistics.currentOperationsCount,
+        farmInfo: statistics.fileStatistics,
         page: "File Manager",
         helpers: prettyHelpers,
         serverSettings: serverSettings

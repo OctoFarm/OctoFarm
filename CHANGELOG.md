@@ -21,16 +21,24 @@ All notable changes to this project will be documented in this file.
             - Counts for profiles and spools
             - Total Weight/Used/Price
             - Material Breakdowns for Weight/Used/Price
+    - File Manager: 
+        - Has basic statistics: File/Folder Counts, Largest Smallest and Average Size/Length
+        - Displays current printer state
+        - Printer list now has a filter for Active,Idle and Disconnected printers
+        - Can now select filament from file manager.
+            - Change filament and re-sync to update costs.
         
         
 ### Changed
     - Moved filament manager plugin sync to server settings under Filament Manager Settings. 
     - New Filament Setting: Check if filament selected and warn to add one before starting a print. Default: False.
+    - Filament Manager allows selection when printer active IF filament Manager plugin is not linked.
 
 ### Removed
 
 ### Fixed
     - Fixed broken printer settings modal
+    - File Manager file action buttons on new line
 
 ## [v1.1.4.9-dev-3.9]
 

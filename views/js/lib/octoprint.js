@@ -182,7 +182,6 @@ export default class OctoPrintClient {
   static async jobAction(printer, opts, element) {
     let checkSettings = await OctoFarmClient.get("settings/server/get");
     checkSettings = await checkSettings.json();
-    console.log(checkSettings)
     //Make sure feed/flow are set before starting print...
     let flow = {
       command: "flowrate",

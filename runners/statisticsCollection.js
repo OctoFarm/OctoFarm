@@ -483,6 +483,9 @@ class StatisticsCollection {
         let storageTotal = [];
         let devices = [];
         let fileSizes = [];
+        let fileLengths = [];
+        let fileCount = [];
+        let folderCount = [];
         //Collect unique devices - Total for farm storage should not duplicate storage on instances running on same devices.
         farmPrinters.forEach((printer, index) => {
             if (typeof printer.storage != "undefined") {
@@ -495,7 +498,17 @@ class StatisticsCollection {
             }
             if (typeof printer.fileList != "undefined") {
                 printer.fileList.files.forEach(file => {
-                    fileSizes.push(file.size);
+                    if(!isNaN(file.size)){
+                        fileSizes.push(file.size);
+                    }
+                    if(!isNaN(file.length)){
+                        fileLengths.push(file.length);
+                    }
+
+                    fileCount.push(file)
+                });
+                printer.fileList.folders.forEach(file => {
+                    folderCount.push(file)
                 });
             }
         });
@@ -509,17 +522,24 @@ class StatisticsCollection {
 
         let storageFreeTotal = storageFree.reduce((a, b) => a + b, 0);
         let storageTotalTotal = storageTotal.reduce((a, b) => a + b, 0);
-
-        octofarmStatistics.storageUsed = storageTotalTotal - storageFreeTotal;
-        octofarmStatistics.storageRemain = storageFreeTotal;
-        octofarmStatistics.storagePercent = Math.floor(
+        let fileStatistics = {};
+        fileStatistics.storageUsed = storageTotalTotal - storageFreeTotal;
+        fileStatistics.storageTotal = storageTotalTotal
+        fileStatistics.storageRemain = storageFreeTotal;
+        fileStatistics.storagePercent = Math.floor(
             (octofarmStatistics.storageUsed / storageTotalTotal) * 100
         );
-
-
-
+        fileStatistics.fileCount = fileCount.length;
+        fileStatistics.folderCount = folderCount.length;
+        fileStatistics.biggestFile = Math.max.apply(Math, fileCount.map(o => o.size));
+        fileStatistics.smallestFile = Math.min.apply(Math, fileCount.map(o => o.size));
+        fileStatistics.biggestLength = Math.max.apply(Math, fileCount.map(o => o.length));
+        fileStatistics.smallestLength = Math.min.apply(Math, fileCount.map(o => o.length));
+        fileStatistics.averageFile =  (fileSizes.reduce((a, b) => a + b, 0)) / fileCount.length;
+        fileStatistics.averageLength = (fileLengths.reduce((a, b) => a + b, 0)) / fileCount.length;
 
         farmStats[0].octofarmStatistics = octofarmStatistics;
+        farmStats[0].fileStatistics = fileStatistics;
     }
     static async printStatistics() {
         function arrayCounts(arr) {

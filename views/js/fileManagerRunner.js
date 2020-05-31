@@ -3,6 +3,7 @@ import OctoFarmClient from "./lib/octofarm.js";
 import Calc from "./lib/functions/calc.js";
 import FileManager from "./lib/modules/fileManager.js";
 import {dragAndDropEnable} from "./lib/functions/dragAndDrop.js";
+import {returnDropDown, selectFilament} from "./lib/modules/filamentGrab.js";
 
 let url = window.location.hostname;
 let port = window.location.port;
@@ -23,7 +24,7 @@ class Manager{
         let printers = document.querySelectorAll("[id^='fileManagerPrinter-']");
         let printerList = await OctoFarmClient.post("printers/printerInfo", {});
         printerList = await printerList.json();
-        printers.forEach((printer, index) => {
+        printers.forEach(async (printer, index) => {
             if (index === 0) {
                 printer.classList.add("bg-dark");
                 printer.classList.remove("bg-secondary");
@@ -38,26 +39,44 @@ class Manager{
             }
             let id = printer.id.replace("fileManagerPrinter-", "");
             printer.addEventListener("click", e => {
-                Manager.changePrinter(id);
+                Manager.changePrinter(e, id);
             });
             dragAndDropEnable(printer, printerList[index]);
-        });
-        let ca = printers[0].id.split("-");
+            let filamentDropDown = await returnDropDown();
+            let filamentDrop = document.getElementById("filamentDrop-"+id)
+             filamentDropDown.forEach(filament => {
+               filamentDrop.insertAdjacentHTML('beforeend', filament)
+             })
+            if(printerList[index].selectedFilament != null){
+                filamentDrop.value = printerList[index].selectedFilament._id
+            }else{
+                filamentDrop.value = 0;
+            }
+            filamentDrop.addEventListener('change', event => {
 
+                 selectFilament(printerList[index]._id, event.target.value)
+             });
+        });
+
+
+
+        let ca = printers[0].id.split("-");
         Manager.updatePrinterList(ca[1]);
     }
-    static changePrinter(target) {
-        //Set old one deselected
-        document.getElementById("fileBody").innerHTML = "";
-        document.getElementById("currentFolder").innerHTML = "local"
-        document.getElementById("fileManagerPrinter-" + lastId).className =
-            "list-group-item list-group-item-action flex-column align-items-start bg-secondary";
-        //Update old index to this one
-        lastId = target
-        let printerName = document.getElementById("printerName-"+lastId).innerHTML;
-        let firstElement = document.getElementById("currentPrinter");
-        firstElement.innerHTML = "<i class=\"fas fa-print\"></i> "+printerName;
-        Manager.updatePrinterList(target)
+    static changePrinter(e, target) {
+        if(!e.target.id.includes("filamentDrop")){
+            //Set old one deselected
+            document.getElementById("fileBody").innerHTML = "";
+            document.getElementById("currentFolder").innerHTML = "local"
+            document.getElementById("fileManagerPrinter-" + lastId).className =
+                "list-group-item list-group-item-action flex-column align-items-start bg-secondary";
+            //Update old index to this one
+            lastId = target
+            let printerName = document.getElementById("printerName-"+lastId).innerHTML;
+            let firstElement = document.getElementById("currentPrinter");
+            firstElement.innerHTML = "<i class=\"fas fa-print\"></i> "+printerName;
+            Manager.updatePrinterList(target)
+        }
     }
     static async updatePrinterList(id){
         document.getElementById("fileBody").innerHTML = `
@@ -132,7 +151,7 @@ class Manager{
                           
                 </div>
             </div>
-            </div>
+
             <label class="btn btn-success float-left mr-1 mb-0" for="fileUploadBtn"><i class="fas fa-file-import"></i> Upload File(s)</label>
             <input id="fileUploadBtn" multiple accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left" id="uploadFileBtn">
             <label class="btn btn-info float-left mr-1 mb-0" for="fileUploadPrintBtn"><i class="fas fa-file-import"></i> Upload and Print</label>

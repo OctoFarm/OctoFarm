@@ -135,6 +135,7 @@ async function init() {
     let printers = await OctoFarmclient.post("printers/printerInfo");
     printers = await printers.json();
     filamentManager = profile.filamentManager;
+
     fill.Spool.forEach(spools => {
         profile.profiles.forEach(prof => {
             let profileID = null;
@@ -247,7 +248,6 @@ async function init() {
     // `)
 
       printers.forEach(printer => {
-
           if(printer.selectedFilament !== null && printer.selectedFilament.spools.profile === profileID){
               if(printer.stateColour.category === "Active"){
                   document.getElementById("delete-"+profileID).disabled = true;
@@ -318,6 +318,7 @@ async function load() {
         `)
     })
    // Grab Profile
+
     document
         .getElementById("addSpoolBtn")
         .addEventListener("click", async e => {
@@ -383,6 +384,10 @@ async function load() {
                 spoolsUsed.value = 0;
                 spoolsTempOffset.value = 0.00;
                 post = post.spools;
+                let displayNone = "d-none";
+                if(filamentManager){
+                    displayNone = "";
+                }
                 document.getElementById("addSpoolsTable").insertAdjacentHTML(
                     "beforeend",
                     `
@@ -394,11 +399,11 @@ async function load() {
     
                        </select>
                    </td>
-                  <td><p contenteditable="false">${post.spools.price}</p></td>
-                  <td><p contenteditable="false">${post.spools.weight}</p></td>
-                  <td><p contenteditable="false">${post.spools.used}</p></td>
-                  <td>${(post.spools.weight - post.spools.used).toFixed(0)}</td>
-                  <td>${(100 - post.spools.used / post.spools.weight * 100).toFixed(0)}</td>
+                  <td><p class="price" contenteditable="false">${post.spools.price}</p></td>
+                  <td><p class="weight" contenteditable="false">${post.spools.weight}</p></td>
+                  <td><p class="used ${displayNone}" contenteditable="false">${post.spools.used}</p></td>
+                  <td class="grams ${displayNone}">${(post.spools.weight - post.spools.used).toFixed(0)}</td>
+                  <td class="percent ${displayNone}">${(100 - post.spools.used / post.spools.weight * 100).toFixed(0)}</td>
                   <td><p contenteditable="false">${post.spools.tempOffset}</p></td>
                    <td>
                        <select id="spoolsPrinterAssignment-${post._id}" class="form-control">
@@ -451,6 +456,7 @@ async function load() {
                 })
                 let profile = await OctoFarmclient.get("filament/get/profile");
                 profile = await profile.json();
+
                 profile.profiles.forEach(profile => {
                     let profileID = null
                     if(filamentManager){

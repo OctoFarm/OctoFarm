@@ -1,0 +1,63 @@
+<div class="col-12">
+        <center>
+            <div class="progress mt-0 mb-2 ">
+                <div
+                        id="fsUsedProgress"
+                        class="progress-bar progress-bar-striped bg-warning"
+                        role="progressbar"
+                        style="width:<%= (farmInfo.storageUsed / farmInfo.storageTotal) * 100%>% "
+                        aria-valuenow="<%= (farmInfo.storageUsed / farmInfo.storageTotal) * 100%>%"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                >
+                    <%= ((farmInfo.storageUsed  / farmInfo.storageTotal) * 100).toFixed(2)%> %
+                </div>
+                <div
+                        id="fsRemainingProgress"
+                        class="progress-bar progress-bar-striped bg-success"
+                        role="progressbar"
+                        style="width: <%= ( (farmInfo.storageTotal - farmInfo.storageUsed ) / farmInfo.storageTotal) * 100%>% "
+                        aria-valuenow="<%= ( (farmInfo.storageTotal - farmInfo.storageUsed ) / farmInfo.storageTotal) * 100%>%"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                >
+                    <%= (( (farmInfo.storageTotal - farmInfo.storageUsed ) / farmInfo.storageTotal) * 100).toFixed(2)%>%
+                </div>
+
+            </div>
+        </center>
+        <b class="mb-0 d-inline"><i class="fas fa-square text-warning d-inline"></i> Used: </b>
+        <p id="fsUsed" class="mb-1 d-inline"><%= helpers.generateBytes(farmInfo.storageUsed.toFixed(2)) %></p> /
+        <b class="mb-0 d-inline"><i class="fas fa-square text-success"></i> Remaining: </b>
+        <p id="fsRemain" class="mb-1 d-inline"><%= helpers.generateBytes((farmInfo.storageTotal - farmInfo.storageUsed).toFixed(2)) %></p> /
+        <b class="mb-0 d-inline"><i class="fas fa-square"></i> Total: </b>
+        <p id="fsTotal" class="mb-1 d-inline"><%=helpers.generateBytes( farmInfo.storageTotal.toFixed(2)) %></p>
+    </div>
+<div class="col-12">
+    <div class="row">
+        <div class="col-lg-3">
+            <h6>Counts</h6>
+            <hr>
+            <i class="fas fa-file"></i> Files: <%= farmInfo.fileCount %> <br><i class="fas fa-folder"></i> Folders: <%= farmInfo.folderCount %>
+        </div>
+        <div class="col-lg-3">
+            <h6>Largest</h6>
+            <hr>
+            <b>Size: </b><%=helpers.generateBytes( farmInfo.biggestFile.toFixed(2)) %><br>
+            <b>Length: </b><%= (farmInfo.biggestLength/1000).toFixed(2)  %>m
+
+        </div>
+        <div class="col-lg-3">
+            <h6>Smallest</h6>
+            <hr>
+            <b>Size: </b><%=helpers.generateBytes( farmInfo.smallestFile.toFixed(2)) %><br>
+            <b>Length: </b><%= (farmInfo.smallestLength/1000).toFixed(2) %>m
+        </div>
+        <div class="col-lg-3">
+            <h6>Average</h6>
+            <hr>
+            <b>Size: </b><%=helpers.generateBytes( farmInfo.averageFile.toFixed(2)) %><br>
+            <b>Length: </b><%= (farmInfo.averageLength/1000).toFixed(2)%>m
+        </div>
+    </div>
+</div>
