@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
         
 ### Changed
     - Moved filament manager plugin sync to server settings under Filament Manager Settings. 
+    - New Filament Setting: Check if filament selected and warn to add one before starting a print. Default: False.
 
 ### Removed
 

@@ -356,6 +356,7 @@ class ServerSettings {
             document.getElementById("APITimeout").value = res.timeout.apiTimeout / 1000;
             document.getElementById("APIRetryTimeout").value = res.timeout.apiRetryCutoff / 1000;
             document.getElementById("APIRetry").value = res.timeout.apiRetry / 1000;
+            document.getElementById("checkFilament").checked = res.filament.filamentCheck;
             if (!res.filamentManager) {
                 let filManager = document.getElementById("filamentManagerSyncBtn")
                 filManager.addEventListener('click', async event => {
@@ -430,8 +431,11 @@ class ServerSettings {
         apiRetryCutoff: document.getElementById("APIRetryTimeout").value * 1000,
         apiRetry: document.getElementById("APIRetry").value * 1000,
     }
+    let filament = {
+        filamentCheck: document.getElementById("checkFilament").checked
+    }
 
-    Client.post("settings/server/update", { onlinePolling, server, timeout })
+    Client.post("settings/server/update", { onlinePolling, server, timeout, filament })
       .then(res => {
         return res.json();
       })

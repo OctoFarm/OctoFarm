@@ -1,5 +1,30 @@
 <% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
   <% if(typeof currentOperationsCount != 'undefined' && currentOperationsCount.idle > 0 || currentOperationsCount.active > 0 || currentOperationsCount.disconnected > 0|| currentOperationsCount.complete > 0) {%>
+
+    <div class="row">
+      <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
+        <div class="card text-white bg-dark h-100">
+          <div class="card-header dashHeader p-0">
+            <button
+                    type="button"
+                    class="btn btn-secondary d-block ml-1 mr-1 p-1"
+                    href="#"
+                    aria-expanded="false"
+                    disabled
+            >
+              <i class="fas fa-chart-bar"></i> File Manager Statistics
+            </button>
+
+
+          </div>
+          <div class="card-body pt-2 pb-0 text-center">
+            <%- include('./partials/FileManager/fileManagerStatistics.ejs') %>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div id="filemanager" class="row">
       <div id="filePrinters" class="col-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 ">
         <div class="card text-white bg-dark">

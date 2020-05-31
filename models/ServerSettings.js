@@ -16,6 +16,10 @@ const ServerSettingsSchema = new mongoose.Schema({
   filamentManager: {
     type: Boolean,
     required: false
+  },
+  filament: {
+    type: Object,
+    required: false
   }
 });
 

@@ -180,6 +180,9 @@ export default class OctoPrintClient {
     }
   }
   static async jobAction(printer, opts, element) {
+    let checkSettings = await OctoFarmClient.get("settings/server/get");
+    checkSettings = await checkSettings.json();
+    console.log(checkSettings)
     //Make sure feed/flow are set before starting print...
     let flow = {
       command: "flowrate",
@@ -196,9 +199,8 @@ export default class OctoPrintClient {
     }
     printer = await OctoFarmClient.post("printers/printerInfo", body);
     printer = await printer.json();
-    let filamentDropDown = await returnDropDown();
 
-    if(filamentDropDown.length > 0 && printer.selectedFilament === null && opts.command === "start"){
+    if(checkSettings.filament.filamentCheck && printer.selectedFilament === null && opts.command === "start"){
       bootbox.confirm({
         message: "You have spools in the inventory, but none selected. Would you like to select a spool?",
         buttons: {

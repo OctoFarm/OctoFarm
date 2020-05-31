@@ -516,6 +516,9 @@ class StatisticsCollection {
             (octofarmStatistics.storageUsed / storageTotalTotal) * 100
         );
 
+
+
+
         farmStats[0].octofarmStatistics = octofarmStatistics;
     }
     static async printStatistics() {

@@ -703,6 +703,17 @@
                                         <hr>
                                             <div id="filamentManagerSetup" class="row">
                                                 <div class="col-lg-12">
+                                                    <h5>Check for filament selection before starting a print?</h5>
+                                                    <form class="was-validated">
+                                                        <div class="custom-control custom-checkbox mb-3">
+                                                            <input type="checkbox" class="custom-control-input" id="checkFilament" required>
+                                                            <label class="custom-control-label" for="checkFilament">Filament Check</label>
+                                                            <div class="valid-feedback">Filament Check is turned on</div>
+                                                            <div class="invalid-feedback">Filament Check is turned off</div>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                                <div class="col-lg-12">
                                                             <h5>Filament Manager Sync</h5>
                                                             <p class="mb-1">Click the button below to activate filament manager plugin and link it to OctoFarm. Please read the notes below before proceeding.</p>
                                                             <small><b>Note:</b> OctoFarm expects filament manager installed on every instance. If it isn't, and you activate it you run the risk of some updates/selections failing to register.</small>

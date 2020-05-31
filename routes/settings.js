@@ -76,6 +76,7 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
     Runner.updatePoll();
     checked[0].server = req.body.server;
     checked[0].timeout = req.body.timeout;
+    checked[0].filament = req.body.filament;
 
     await checked[0].save();
     res.send({ msg: "Settings Saved" });
