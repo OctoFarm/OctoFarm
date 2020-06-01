@@ -69,10 +69,6 @@ const PrinterSchema = new mongoose.Schema({
     type: String,
     required: false
   },
-  alerts: {
-    type: Object,
-    required: false
-  },
   tempTriggers: {
     type: Object,
     required: false

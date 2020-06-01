@@ -120,6 +120,7 @@ let serverStart = async function() {
         app.use("/sse", require("./routes/SSE", { page: "route" }));
         app.use("/filament", require("./routes/filament", { page: "route" }));
         app.use("/history", require("./routes/history", { page: "route" }));
+        app.use("/scripts", require("./routes/scripts", { page: "route" }));
     }
 
 };

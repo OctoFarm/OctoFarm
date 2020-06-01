@@ -33,6 +33,7 @@ All notable changes to this project will be documented in this file.
     - Moved filament manager plugin sync to server settings under Filament Manager Settings. 
     - New Filament Setting: Check if filament selected and warn to add one before starting a print. Default: False.
     - Filament Manager allows selection when printer active IF filament Manager plugin is not linked.
+    - History now asks if your sure on deletions...
 
 ### Removed
 

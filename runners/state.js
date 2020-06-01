@@ -11,7 +11,9 @@ const WebSocket = require("ws");
 const Filament = require("../models/Filament.js");
 let timeout = null;
 const Logger = require('../lib/logger.js');
-const logger = new Logger('OctoFarm-State')
+const logger = new Logger('OctoFarm-State');
+const script = require("../runners/scriptCheck.js");
+const ScriptRunner = script.ScriptRunner;
 
 let farmPrinters = [];
 let selectedFilament = [];
@@ -332,6 +334,7 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
                 await HistoryCollection.failed(data.event.payload, sendPrinter, job);
                 await Runner.updateFilament();
             }, 10000);
+            ScriptRunner.check(farmPrinters[this.index], "failed")
         }
         if (data.event.type === "PrintDone") {
             let that = this;
@@ -345,6 +348,7 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
                 await HistoryCollection.complete(data.event.payload, sendPrinter, job);
                 await Runner.updateFilament();
             }, 10000);
+            ScriptRunner.check(farmPrinters[this.index], "done")
         }
         if(data.event.type === "Error"){
             let that = this;
@@ -358,6 +362,7 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
                 await HistoryCollection.errorLog(data.event.payload, sendPrinter, job);
                 await Runner.updateFilament();
             }, 10000);
+            ScriptRunner.check(farmPrinters[this.index], "error")
         }
     }
 };
