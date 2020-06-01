@@ -291,28 +291,44 @@ export default class History {
     }
   }
   static async delete(e) {
-    if (e.target.classList.value.includes("historyDelete")) {
-      let histID = {
-        id: e.target.id
-      };
-      let post = await OctoFarmClient.post("history/delete", histID);
-      if (post.status === 200) {
-        e.target.parentElement.parentElement.parentElement.remove();
-        UI.createAlert(
-          "success",
-          "Your history entry has been deleted...",
-          3000,
-          "clicked"
-        );
-      } else {
-        UI.createAlert(
-          "error",
-          "Hmmmm seems we couldn't contact the server to delete... is it online?",
-          3000,
-          "clicked"
-        );
-      }
-    }
+      bootbox.confirm({
+          message: "Are you sure you'd like to delete this entry? this is not reversible.",
+          buttons: {
+              confirm: {
+                  label: 'Yes',
+                  className: 'btn-success'
+              },
+              cancel: {
+                  label: 'No',
+                  className: 'btn-danger'
+              }
+          },
+          callback: async function (result) {
+            if (e.target.classList.value.includes("historyDelete")) {
+              let histID = {
+                id: e.target.id
+              };
+              let post = await OctoFarmClient.post("history/delete", histID);
+              if (post.status === 200) {
+                e.target.parentElement.parentElement.parentElement.remove();
+                UI.createAlert(
+                    "success",
+                    "Your history entry has been deleted...",
+                    3000,
+                    "clicked"
+                );
+              } else {
+                UI.createAlert(
+                    "error",
+                    "Hmmmm seems we couldn't contact the server to delete... is it online?",
+                    3000,
+                    "clicked"
+                );
+              }
+            }
+          }
+      });
+
   }
   static updateTotals(filtered) {
     let times = []
