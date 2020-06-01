@@ -15,7 +15,7 @@ async function enable(){
       res.render("login", {
         page: "Login",
         registration: settings[0].server.registration,
-        serverSettings: serverSettings
+        serverSettings: settings
       })
   );
   if (settings[0].server.registration === true) {
@@ -23,7 +23,7 @@ async function enable(){
     router.get("/register", (req, res) =>
         res.render("register", {
           page: "Register",
-          serverSettings: serverSettings
+          serverSettings: settings
         })
     );
 
@@ -51,7 +51,7 @@ async function enable(){
         res.render("register", {
           page: "Login",
           registration: settings[0].server.registration,
-          serverSettings: serverSettings,
+          serverSettings: settings,
           errors,
           name,
           username,
@@ -67,7 +67,7 @@ async function enable(){
             res.render("register", {
               page: "Login",
               registration: settings[0].server.registration,
-              serverSettings: serverSettings,
+              serverSettings: settings,
               errors,
               name,
               username,
@@ -123,7 +123,7 @@ async function enable(){
       failureFlash: true,
       page: "Login",
       registration: settings[0].server.registration,
-      serverSettings: serverSettings
+      serverSettings: settings,
     })(req, res, true);
   });
 
