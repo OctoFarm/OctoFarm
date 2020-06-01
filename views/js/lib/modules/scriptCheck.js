@@ -62,15 +62,22 @@ export default class Script {
                if(alert.printer.length === 0){
                    alert.printer = "All Printers"
                }
+
                alertsTable.insertAdjacentHTML('beforeend', `
                 <tr>
                 <td class="d-none">
                     ${alert._id}
                 </td>
-                <td>  <div class="custom-control custom-checkbox">
-                          <input type="checkbox" class="custom-control-input" id="customCheck1">
-                          <label class="custom-control-label" for="customCheck1">Check this custom checkbox</label>
-                        </div>  
+                <td> 
+                        <form class="was-validated form-check-inline form-check">
+                        <div class="custom-control custom-checkbox mb-2 pr-2"><input type="checkbox" class="custom-control-input" id="activeCheck-${alert._id}">
+                          <label class="custom-control-label" id="activeCheck-${alert._id}"></label>
+                          <div class="invalid-feedback">Not Active</div>
+                          <div class="valid-feedback">
+                            Active
+                          </div>
+                        </div>
+                      </form>
                 </td>
                 <td>  
                       ${alert.trigger}
@@ -86,6 +93,7 @@ export default class Script {
                 </td>
                 </tr>
            `)
+               document.getElementById('activeCheck-'+alert._id).checked = alert.active;
            })
 
        }else{
