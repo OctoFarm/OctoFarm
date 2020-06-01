@@ -293,7 +293,7 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
         if (typeof data.current.progress !== 'undefined') {
             farmPrinters[this.index].progress = data.current.progress;
         }
-        if (typeof data.current.currentZ !== 'undefined') {
+        if (typeof data.current.currentZ !== 'undefined' && data.currentZ !== null) {
             farmPrinters[this.index].currentZ = data.current.currentZ;
         }
         if (typeof data.current.job !== 'undefined' && data.current.job.user !== null) {
