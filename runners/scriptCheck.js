@@ -116,7 +116,7 @@ class ScriptRunner{
             let current = ""
             if (
                 typeof printer.currentZ === "undefined" ||
-                current === null
+                printer.currentZ === null
             ) {
                 current = "No Current Z";
             }else{
