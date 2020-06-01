@@ -27,6 +27,11 @@ All notable changes to this project will be documented in this file.
         - Printer list now has a filter for Active,Idle and Disconnected printers
         - Can now select filament from file manager.
             - Change filament and re-sync to update costs.
+    - Alerts: This alerts are fired on a specified trigger and run a custom script with a single command passed through
+        - Select Triggers: Print Done, Print Failed
+        - Custom Script Location
+        - Save new script
+        -        
         
         
 ### Changed
