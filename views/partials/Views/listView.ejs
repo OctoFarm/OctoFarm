@@ -122,6 +122,9 @@
     helpers.generateTime(printers[sorted.actualIndex].progress.printTimeLeft) %>
     <%}%>
   </td>
+  <td id="extraInfoColPercent-<%= printers[sorted.actualIndex]._id %>" class="d-none">
+    <p class="mb-0" id="percent-<%= printers[sorted.actualIndex]._id %>">Loading...</p>
+  </td>
   <td id="extraInfoCol-<%= printers[sorted.actualIndex]._id %>" class="d-none">
     <p class="mb-0" id="eta-<%= printers[sorted.actualIndex]._id %>">Loading...</p>
   </td>

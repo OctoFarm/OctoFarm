@@ -272,8 +272,8 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
             data.current.state.text = "Disconnected";
             farmPrinters[this.index].stateDescription = "Your printer is disconnected";
         } else if (data.current.state.text.includes("Error:")) {
-            farmPrinters[this.index].stateDescription = res.current.state.text;
-            res.current.state.text = "Error!"
+            farmPrinters[this.index].stateDescription = data.current.state.text;
+            data.current.state.text = "Error!"
         } else if (data.current.state.text === "Closed") {
             res.current.state.text = "Disconnected";
             farmPrinters[this.index].stateDescription = "Your printer is disconnected";
@@ -357,7 +357,9 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
                 let sendPrinter = {};
                 sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
                 let job = {}
-                job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
+                if(farmPrinters[that.index].job){
+                    job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
+                }
                 //Register cancelled print...
                 await HistoryCollection.errorLog(data.event.payload, sendPrinter, job);
                 await Runner.updateFilament();
