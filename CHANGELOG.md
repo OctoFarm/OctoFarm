@@ -32,7 +32,8 @@ All notable changes to this project will be documented in this file.
         - Custom Script Location
         - Save new script
         -        
-        
+    - List view Extra Info now includes percent remaining. 
+    - Printer errors are now logged to a seperate database. 
         
 ### Changed
     - Moved filament manager plugin sync to server settings under Filament Manager Settings. 
@@ -47,6 +48,7 @@ All notable changes to this project will be documented in this file.
     - File Manager file action buttons on new line
     - Broken total percent in filament manager
     - Broken action buttons on views
+    - Indefinate counter on ETA
     
 
 ## [v1.1.4.9-dev-3.9]
