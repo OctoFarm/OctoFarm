@@ -164,8 +164,11 @@ function grabElements(printer) {
       iconTool0A: document.getElementById("tool0A-" + printer._id),
       iconTool0T: document.getElementById("tool0T-" + printer._id),
       extraInfoCol: document.getElementById("extraInfoCol-" + printer._id),
+      extraInfoPercentCol: document.getElementById("extraInfoColPercent-"+printer._id),
+      extraInfoPercent: document.getElementById("extraInfoPercent"),
       extraInfoTitle: document.getElementById("extraInfoTitle"),
       eta: document.getElementById("eta-" + printer._id),
+      percent: document.getElementById("percent-" + printer._id)
     };
     elems[printer._id] = printerElemens;
     return elems[printer._id];
@@ -182,21 +185,33 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
       if(elements.extraInfoCol.classList.contains("d-none")){
         elements.extraInfoCol.classList.remove("d-none");
         elements.extraInfoTitle.classList.remove("d-none");
+        elements.extraInfoPercentCol.classList.remove("d-none");
+        elements.extraInfoPercent.classList.remove("d-none");
       }
 
       if(typeof printer.progress != 'undefined'){
-        let currentDate = new Date();
-        currentDate = currentDate.getTime();
-        let futureDateString = new Date(currentDate + printer.progress.printTimeLeft * 1000).toDateString()
-        let futureTimeString = new Date(currentDate + printer.progress.printTimeLeft * 1000).toTimeString()
-        futureTimeString = futureTimeString.substring(0, 8);
-        let dateComplete = futureDateString + ": " + futureTimeString;
-        elements.eta.innerHTML = dateComplete
+        if(printer.progress.printTimeLeft === null || printer.progress.printTimeLeft === 0){
+          elements.eta.innerHTML = "Done"
+        }else{
+          let currentDate = new Date();
+          currentDate = currentDate.getTime();
+          let futureDateString = new Date(currentDate + printer.progress.printTimeLeft * 1000).toDateString()
+          let futureTimeString = new Date(currentDate + printer.progress.printTimeLeft * 1000).toTimeString()
+          futureTimeString = futureTimeString.substring(0, 8);
+          let dateComplete = futureDateString + ": " + futureTimeString;
+          elements.eta.innerHTML = dateComplete
+        }
+        if(printer.progress.printTimeLeft === null || printer.progress.printTimeLeft === 0){
+          elements.percent.innerHTML = "0%"
+        }else{
+          elements.percent.innerHTML = printer.progress.completion.toFixed(0)+"%"
+        }
+
+
       }else{
         elements.eta.innerHTML = "N/A"
+        elements.percent.innerHTML = "0%"
       }
-
-      elements.eta;
     }
 
     if (typeof printer.job != "undefined" && printer.job.file.name != null) {

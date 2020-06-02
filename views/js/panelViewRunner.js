@@ -237,7 +237,7 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
         elements.extraInfo.classList.remove("d-none");
       }
 
-      if(typeof printer.progress != 'undefined' && printer.progress.printTimeLeft != 0){
+      if(typeof printer.progress != 'undefined' && printer.progress.printTimeLeft != 0 && printer.progress.printTimeLeft !== null){
         let currentDate = new Date();
         currentDate = currentDate.getTime();
         let futureDateString = new Date(currentDate + printer.progress.printTimeLeft * 1000).toDateString()

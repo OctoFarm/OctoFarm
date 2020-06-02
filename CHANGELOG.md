@@ -45,6 +45,9 @@ All notable changes to this project will be documented in this file.
 ### Fixed
     - Fixed broken printer settings modal
     - File Manager file action buttons on new line
+    - Broken total percent in filament manager
+    - Broken action buttons on views
+    
 
 ## [v1.1.4.9-dev-3.9]
 
