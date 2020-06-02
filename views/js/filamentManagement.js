@@ -751,7 +751,8 @@ function updateTotals(filtered) {
     document.getElementById("totalWeight").innerHTML = weightReduced;
     document.getElementById("totalUsed").innerHTML = usedReduced;
     document.getElementById("totalRemaining").innerHTML = (weightReduced - usedReduced).toFixed(0);
-    document.getElementById("totalRemainingPercent").innerHTML = ((100 - usedReduced / weightReduced) * 100).toFixed(0);
+    document.getElementById("totalRemainingPercent").innerHTML = (100 - (usedReduced / weightReduced) * 100).toFixed(0);
+    console.log()
 }
 const element = document.getElementById('listenerSpools');
 element.addEventListener('jplist.state', (e) => {
