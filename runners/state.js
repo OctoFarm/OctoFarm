@@ -14,6 +14,7 @@ const Logger = require('../lib/logger.js');
 const logger = new Logger('OctoFarm-State');
 const script = require("../runners/scriptCheck.js");
 const ScriptRunner = script.ScriptRunner;
+const EventEmitter = require('events');
 
 let farmPrinters = [];
 let selectedFilament = [];
@@ -322,6 +323,9 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
         }
     }
     if (typeof data.event != "undefined") {
+        if (data.event.type === "PrintPaused") {
+            ScriptRunner.check(farmPrinters[this.index], "paused")
+        }
         if (data.event.type === "PrintFailed") {
             let that = this;
             setTimeout(async function(){
@@ -364,8 +368,33 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
                 await HistoryCollection.errorLog(data.event.payload, sendPrinter, job);
                 await Runner.updateFilament();
             }, 10000);
-            ScriptRunner.check(farmPrinters[this.index], "error")
+            ScriptRunner.check(farmPrinters[this.index], "error");
         }
+    }
+    //Event Listeners for state changes
+    if(typeof farmPrinters[this.index].temps !== 'undefined'){
+        //When object changes to active, add event listener awaiting cool down.
+            if (farmPrinters[this.index].stateColour.category === "Active") {
+                //Check for existing events object...
+                if (typeof farmPrinters[this.index].events === 'undefined') {
+                    farmPrinters[this.index].events = new EventEmitter();
+                }
+                if (typeof farmPrinters[this.index].events._events.cooldown === 'undefined') {
+                    let that = this;
+                    farmPrinters[this.index].events.once('cooldown', (stream) => {
+                        ScriptRunner.check(farmPrinters[that.index], "cooldown");
+                    })
+                }
+            }
+            if (farmPrinters[this.index].stateColour.category === "Complete") {
+                if (typeof farmPrinters[this.index].events != 'undefined') {
+                    if (typeof farmPrinters[this.index].temps != 'undefined') {
+                        if (parseFloat(farmPrinters[this.index].temps[0].tool0.actual) < parseFloat(farmPrinters[this.index].tempTriggers.coolDown) && parseFloat(farmPrinters[this.index].temps[0].bed.actual) < parseFloat(farmPrinters[this.index].tempTriggers.coolDown)) {
+                            farmPrinters[this.index].events.emit('cooldown');
+                        }
+                    }
+                }
+            }
     }
 };
 WebSocketClient.prototype.onerror = function(e) {

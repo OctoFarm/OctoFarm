@@ -28,12 +28,13 @@ All notable changes to this project will be documented in this file.
         - Can now select filament from file manager.
             - Change filament and re-sync to update costs.
     - Alerts: This alerts are fired on a specified trigger and run a custom script with a single command passed through
-        - Select Triggers: Print Done, Print Failed
+        - Select Triggers: Print Done, Print Failed, Print Errors, Cool Down, Print Paused
         - Custom Script Location
         - Save new script
         -        
     - List view Extra Info now includes percent remaining. 
     - Printer errors are now logged to a seperate database. 
+    - New dependancy for nano events
         
 ### Changed
     - Moved filament manager plugin sync to server settings under Filament Manager Settings. 

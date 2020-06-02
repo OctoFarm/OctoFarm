@@ -36,7 +36,6 @@ class ScriptRunner{
             if(currentAlerts[i].printer === printer._id || currentAlerts[i].printer.length === 0){
                 if(currentAlerts[i].trigger === trigger && currentAlerts[i].active){
                     let newMessage = await ScriptRunner.convertMessage(printer, currentAlerts[i].message);
-                    console.log("FIRE ONCE")
                     ScriptRunner.fire(currentAlerts[i].scriptLocation, newMessage);
                 }
             }
@@ -50,7 +49,6 @@ class ScriptRunner{
     static async fire(scriptLocation, message){
         logger.info("Testing: " + scriptLocation + " " + message)
         let fire = await Script.fire(scriptLocation, message)
-        console.log(fire)
         return fire;
     }
     static async convertMessage(printer, message){
