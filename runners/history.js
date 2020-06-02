@@ -201,7 +201,6 @@ class HistoryCollection {
     }
   }
     static async errorLog(payload, printer, job) {
-    console.log(payload, printer, job)
       try{
         let name = null;
         if (typeof printer.settingsApperance != "undefined") {
@@ -252,10 +251,10 @@ class HistoryCollection {
           job: job,
           notes: ""
         };
-        let saveHistory = new ErrorLog({
+        let saveError = new ErrorLog({
           errorLog
         });
-        //saveHistory.save();
+        saveError.save();
 
         logger.info("Error captured ", payload + printer.printerURL);
       }catch(e){
