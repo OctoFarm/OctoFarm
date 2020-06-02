@@ -28,11 +28,12 @@ async function welcome(){
         );
     } else {
         let settings = await ServerSettings.find({});
+
         if (settings[0].server.loginRequired === false) {
             router.get("/", (req, res) => res.redirect('/dashboard'));
         } else {
             let registration = settings[0].server.registration
-            router.get("/", (req, res) => res.render("welcome", { page: "Welcome", registration: registration }));
+            router.get("/", (req, res) => res.render("welcome", { page: "Welcome", registration: registration, serverSettings: settings }));
         }
 
     }
