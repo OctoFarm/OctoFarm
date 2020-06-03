@@ -1,6 +1,16 @@
 import UI from "../functions/ui.js"
 import OctoFarmclient from "../octofarm.js";
 
+let alertsDrop = `
+                                                         <option selected value="0">Choose...</option>
+                                                            <option value="done">Print Done</option>
+                                                            <option value="failed">Print Failed</option>
+                                                            <option value="paused">Print Paused</option>
+                                                            <option value="cooldown">Print Cooled</option>
+                                                            <option value="error">Print Error</option>
+`
+
+
 document.getElementById("testScript").addEventListener('click', event => {
   event.preventDefault();
   event.stopPropagation();
@@ -26,6 +36,10 @@ document.getElementById("testScript").addEventListener('click', event => {
       Script.test(elements.script.value, elements.message.value);
   }
 });
+
+
+
+document.getElementById("alertsTrigger").insertAdjacentHTML('beforeend', alertsDrop);
 document.getElementById("saveScript").addEventListener('click', event => {
     event.preventDefault();
     event.stopPropagation();
@@ -57,6 +71,7 @@ export default class Script {
        let post = await OctoFarmclient.get("scripts/get");
        post = await post.json();
        let alertsTable = document.getElementById("alertsTable")
+        alertsTable.innerHTML = "";
        if(post.status === 200){
            post.alerts.forEach(alert => {
                if(alert.printer.length === 0){
@@ -64,36 +79,66 @@ export default class Script {
                }
 
                alertsTable.insertAdjacentHTML('beforeend', `
-                <tr>
+                <tr id="alertList-${alert._id}">
                 <td class="d-none">
                     ${alert._id}
                 </td>
                 <td> 
-                        <form class="was-validated form-check-inline form-check">
-                        <div class="custom-control custom-checkbox mb-2 pr-2"><input type="checkbox" class="custom-control-input" id="activeCheck-${alert._id}">
-                          <label class="custom-control-label" id="activeCheck-${alert._id}"></label>
-                          <div class="invalid-feedback">Not Active</div>
-                          <div class="valid-feedback">
-                            Active
-                          </div>
-                        </div>
-                      </form>
+                 <form class="was-validated">
+                        <center><div class="custom-control custom-checkbox mb-3">
+                            <input type="checkbox" class="custom-control-input" id="activeCheck-${alert._id}" required>
+                            <label class="custom-control-label" for="activeCheck-${alert._id}"></label>
+
+                        </div></center>
+                    </form>
                 </td>
                 <td>  
-                      ${alert.trigger}
+                      <select class="custom-select" id="trigger-${alert._id}" disabled>
+
+                       </select>
                 </td> 
-                <td>    
-                        ${alert.scriptLocation}
+                <td id="scriptLocation-${alert._id}">    
+                        <div contenteditable="false"> ${alert.scriptLocation}  </div>
                 </td>
-                <td>    
-                                        ${alert.message}
+                <td id="message-${alert._id}">    
+                        <div contenteditable="false"> ${alert.message}</div>
                 </td>
-                <td>
-                         ${alert.printer}
+                <td id="printers-${alert._id}">
+                        <div contenteditable="false"> ${alert.printer}</div>
+                </td>
+                 <td>
+                    <button id="edit-${alert._id}" type="button" class="btn btn-sm btn-info edit">
+                    <i class="fas fa-edit editIcon"></i>
+                  </button>
+                  <button id="save-${alert._id}" type="button" class="btn btn-sm d-none btn-success save">
+                    <i class="fas fa-save saveIcon"></i>
+                  </button>
+                  <button id="delete-${alert._id}" type="button" class="btn btn-sm btn-danger delete">
+                    <i class="fas fa-trash deleteIcon"></i>
+                  </button>
                 </td>
                 </tr>
            `)
+               let alertsTrigger = document.getElementById('trigger-'+alert._id)
+               alertsTrigger.innerHTML = alertsDrop;
+               alertsTrigger.value = alert.trigger
+
                document.getElementById('activeCheck-'+alert._id).checked = alert.active;
+               document.getElementById('edit-'+alert._id).addEventListener('click', event => {
+
+                    Script.edit(id)
+               });
+               document.getElementById('save-'+alert._id).addEventListener('click', event => {
+                   let newAlert = {
+                       trigger: document.getElementById("trigger-"+alert._id).value,
+                       script: document.getElementById("scriptLocation-"+alert._id).innerHTML,
+                       message: document.getElementById("message-"+alert._id).innerHTML
+                   }
+                   Script.delete(alert._id, newAlert)
+               });
+               document.getElementById('delete-'+alert._id).addEventListener('click', event => {
+                   Script.delete(alert._id)
+               });
            })
 
        }else{
@@ -118,7 +163,7 @@ export default class Script {
                 </tr>`)
        }
     }
-    static async edit(printer, trigger, scriptLocation, message){
+    static async edit(id){
         if(printer){
 
         }else{
@@ -138,8 +183,21 @@ export default class Script {
             UI.createAlert("error", "Failed to save your alert!", 3000, "Clicked");
         }else{
             UI.createAlert("success", "Successfully saved your alert!", 3000, "Clicked")
+            Script.get();
         }
 
+    }
+    static async delete(id){
+        let post = await OctoFarmclient.delete("scripts/delete/"+id);
+        post = await post.json();
+        console.log(post)
+        if(post.status === 200){
+            UI.createAlert("error", "Failed to delete your alert.", 3000, "Clicked")
+            console.log(document.getElementById("alertList-"+id))
+            document.getElementById("alertList-"+id).remove();
+        }else{
+            UI.createAlert("success", "Successfully deleted your alert.", 3000, "Clicked")
+        }
     }
     static async test(scriptLocation, message){
         let opts = {
