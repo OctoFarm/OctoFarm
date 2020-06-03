@@ -217,7 +217,6 @@ WebSocketClient.prototype.throttle = function(data) {
         logger.info("Throttling your websocket connection: " + this.index + ": " + this.url + " ", data);
         farmPrinters[this.index].ws.send(JSON.stringify(data));
     } catch (e) {
-        console.log(e)
         logger.error("Failed to Throttle websocket: " + this.index + ": " + this.url);
         this.instance.emit('error', e);
     }
@@ -269,7 +268,6 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
     if (typeof data.current != "undefined") {
         farmPrinters[this.index].webSocket = "success";
         farmPrinters[this.index].webSocketDescription = "Websocket Alive and Receiving Data";
-
         if (data.current.state.text === "Offline") {
             data.current.state.text = "Disconnected";
             farmPrinters[this.index].stateDescription = "Your printer is disconnected";
@@ -839,6 +837,8 @@ class Runner {
             );
             if (typeof farmPrinters[i].ws != 'undefined' && typeof farmPrinters[i].ws.instance != 'undefined') {
                 await farmPrinters[i].ws.throttle(JSON.stringify(throt));
+                logger.info("ReScanning Octoprint instance");
+                await this.reScanOcto(farmPrinters[i]._id);
             }
         }
         return "updated";
@@ -1146,7 +1146,7 @@ class Runner {
         } else if (state === "Online") {
             return { name: "success", hex: "#00330e", category: "Idle" };
         } else {
-            return { name: "danger", hex: "#2e0905", category: "Offline" };
+            return { name: "warning", hex: "#583c0e", category: "Active" };
         }
     }
     static returnFarmPrinters(index) {
