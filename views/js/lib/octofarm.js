@@ -8,6 +8,15 @@ export default class OctoFarmclient {
       }
     });
   }
+  static delete(item) {
+    let url = `/${item}`;
+    return fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
+  }
   static post(item, data) {
     let url = `/${item}`;
     return fetch(url, {
