@@ -12,6 +12,9 @@ document.getElementById("saveSettings").addEventListener("click", e => {
   //Validate Printer Form, then Add
   ClientSettings.update();
 });
+
+let oldServerSettings = {};
+
 let optionsMemory = {
     title: {
         text: "Memory",
@@ -346,6 +349,7 @@ class ServerSettings {
           return res.json();
         })
         .then(res => {
+            oldServerSettings = res;
             document.getElementById("webSocketThrottle").value =
                 res.onlinePolling.seconds;
             document.getElementById("serverPortNo").value = res.server.port;
@@ -416,6 +420,7 @@ class ServerSettings {
     }
   }
   static update() {
+    let reboot = false;
     let onlinePoll = document.getElementById("webSocketThrottle").value;
     let onlinePolling = {
       seconds: onlinePoll
@@ -434,28 +439,32 @@ class ServerSettings {
     let filament = {
         filamentCheck: document.getElementById("checkFilament").checked
     }
-
-    Client.post("settings/server/update", { onlinePolling, server, timeout, filament })
+    if(oldServerSettings.filament.filamentCheck !== filament.filamentCheck || oldServerSettings.server.port !== server.port || oldServerSettings.server.loginRequired !== server.loginRequired || oldServerSettings.server.registration !== server.registration || oldServerSettings.timeout.webSocketRetry !== timeout.webSocketRetry || oldServerSettings.timeout.apiTimeout !== timeout.apiTimeout  || oldServerSettings.timeout.apiRetryCutoff !== timeout.apiRetryCutoff || oldServerSettings.timeout.apiRetry !== timeout.apiRetry  ){
+        reboot = true;
+    }
+      Client.post("settings/server/update", { onlinePolling, server, timeout, filament })
       .then(res => {
         return res.json();
       })
       .then(res => {
-          bootbox.confirm({
-              message: "Your settings changes require a restart, would you like to do this now?",
-              buttons: {
-                  cancel: {
-                      label: '<i class="fa fa-times"></i> Cancel'
+          if(reboot){
+              bootbox.confirm({
+                  message: "Your settings changes require a restart, would you like to do this now?",
+                  buttons: {
+                      cancel: {
+                          label: '<i class="fa fa-times"></i> Cancel'
+                      },
+                      confirm: {
+                          label: '<i class="fa fa-check"></i> Confirm'
+                      }
                   },
-                  confirm: {
-                      label: '<i class="fa fa-check"></i> Confirm'
+                  callback: function (result) {
+                      if(result){
+                          OctoFarmclient.get("settings/server/restart")
+                      }
                   }
-              },
-              callback: function (result) {
-                  if(result){
-                    OctoFarmclient.get("settings/server/restart")
-                  }
-              }
-          });
+              });
+          }
       });
   }
 }

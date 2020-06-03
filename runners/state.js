@@ -217,6 +217,7 @@ WebSocketClient.prototype.throttle = function(data) {
         logger.info("Throttling your websocket connection: " + this.index + ": " + this.url + " ", data);
         farmPrinters[this.index].ws.send(JSON.stringify(data));
     } catch (e) {
+        console.log(e)
         logger.error("Failed to Throttle websocket: " + this.index + ": " + this.url);
         this.instance.emit('error', e);
     }
