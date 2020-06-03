@@ -1,7 +1,8 @@
 import UI from "../functions/ui.js"
 import OctoFarmclient from "../octofarm.js";
 
-let alertsDrop = `
+
+const alertsDrop = `
                                                          <option selected value="0">Choose...</option>
                                                             <option value="done">Print Done</option>
                                                             <option value="failed">Print Failed</option>
@@ -9,7 +10,6 @@ let alertsDrop = `
                                                             <option value="cooldown">Print Cooled</option>
                                                             <option value="error">Print Error</option>
 `
-
 
 document.getElementById("testScript").addEventListener('click', event => {
   event.preventDefault();
@@ -67,6 +67,9 @@ document.getElementById("saveScript").addEventListener('click', event => {
 });
 
 export default class Script {
+    static async alertsDrop(){
+        return alertsDrop;
+    }
     static async get(){
        let post = await OctoFarmclient.get("scripts/get");
        post = await post.json();
@@ -85,11 +88,11 @@ export default class Script {
                 </td>
                 <td> 
                  <form class="was-validated">
-                        <center><div class="custom-control custom-checkbox mb-3">
+                      <div class="custom-control custom-checkbox mb-3">
                             <input type="checkbox" class="custom-control-input" id="active-${alert._id}" required>
                             <label class="custom-control-label" for="active-${alert._id}"></label>
 
-                        </div></center>
+                        </div>
                     </form>
                 </td>
                 <td>  

@@ -33,9 +33,12 @@ All notable changes to this project will be documented in this file.
         - Save new script
         - Delete old scripts
         - Edit scripts
+    - Printer Settings 
+        - Now shows all the current alerts applied to that specific printer
     - List view Extra Info now includes percent remaining. 
     - Printer errors are now logged to a seperate database. 
     - New dependancy for nano events
+    
         
 ### Changed
     - Moved filament manager plugin sync to server settings under Filament Manager Settings. 

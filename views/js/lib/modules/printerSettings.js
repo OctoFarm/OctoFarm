@@ -2,6 +2,7 @@
 import OctoFarmClient from "../octofarm.js";
 import UI from "../functions/ui.js";
 import Validate from "../functions/validate.js";
+import Script from "./scriptCheck.js"
 
 let currentIndex = 0;
 
@@ -676,6 +677,43 @@ export default class PrinterSettings {
                     </div>                                        
             </div>
         `;
+        let scripts = await OctoFarmClient.get("scripts/get");
+        scripts = await scripts.json();
+        let printerScripts = [];
+        scripts.alerts.forEach(script => {
+          if(script.printer === printer._id || script.printer.length === 0){
+            printerScripts.push({active: script.active, message: script.message, scriptLocation: script.scriptLocation, trigger: script.trigger})
+          }
+        })
+
+        let alertsTable = document.getElementById("printerAltersTableBody")
+            alertsTable.innerHTML = "";
+        printerScripts.forEach(async script => {
+
+          alertsTable.insertAdjacentHTML('beforeend', `
+              <tr>
+                <td>
+                         <div class="custom-control custom-checkbox mb-3">
+                            <input type="checkbox" class="custom-control-input" id="active-${script._id}" required>
+                            <label class="custom-control-label" for="active-${script._id}"></label>
+                        </div>
+                </td>
+                <td> 
+                <select class="custom-select" id="trigger-${script._id}" disabled>
+
+                 </select>
+                       </td>
+                <td>${script.scriptLocation} </td>
+                <td>${script.message}</td>
+              </tr>
+          
+          `)
+          document.getElementById("active-"+script._id).checked = script.active;
+          let triggerSelect = document.getElementById("trigger-"+script._id)
+          triggerSelect.innerHTML = await Script.alertsDrop();
+          triggerSelect.value = script.trigger;
+        })
+
         document.getElementById("powerConsumption").value = parseFloat(printer.costSettings.powerConsumption);
         document.getElementById("electricityCosts").value = parseFloat(printer.costSettings.electricityCosts);
         document.getElementById("purchasePrice").value = parseFloat(printer.costSettings.purchasePrice);
