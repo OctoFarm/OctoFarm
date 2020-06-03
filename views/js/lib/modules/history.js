@@ -291,6 +291,7 @@ export default class History {
     }
   }
   static async delete(e) {
+    if (e.target.classList.value.includes("historyDelete")) {
       bootbox.confirm({
           message: "Are you sure you'd like to delete this entry? this is not reversible.",
           buttons: {
@@ -304,7 +305,7 @@ export default class History {
               }
           },
           callback: async function (result) {
-            if (e.target.classList.value.includes("historyDelete")) {
+
               let histID = {
                 id: e.target.id
               };
@@ -329,9 +330,9 @@ export default class History {
                 );
               }
             }
-          }
-      });
 
+      });
+    }
   }
   static updateTotals(filtered) {
     let times = []
