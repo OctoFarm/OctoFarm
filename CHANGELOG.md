@@ -31,7 +31,7 @@ All notable changes to this project will be documented in this file.
         - Select Triggers: Print Done, Print Failed, Print Errors, Cool Down, Print Paused
         - Custom Script Location
         - Save new script
-        -        
+        - Delete old scripts
     - List view Extra Info now includes percent remaining. 
     - Printer errors are now logged to a seperate database. 
     - New dependancy for nano events
@@ -41,6 +41,8 @@ All notable changes to this project will be documented in this file.
     - New Filament Setting: Check if filament selected and warn to add one before starting a print. Default: False.
     - Filament Manager allows selection when printer active IF filament Manager plugin is not linked.
     - History now asks if your sure on deletions...
+    - Server settings now only prompts to restart when changing setting that requires restart
+    - OctoFarm now rescans the client when updating throttle settings.
 
 ### Removed
 
@@ -50,6 +52,7 @@ All notable changes to this project will be documented in this file.
     - Broken total percent in filament manager
     - Broken action buttons on views
     - Indefinate counter on ETA
+    - Fixed issue with filamentCheck not getting applied with no setting.
     
 
 ## [v1.1.4.9-dev-3.9]
