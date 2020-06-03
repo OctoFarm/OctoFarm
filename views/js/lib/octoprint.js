@@ -165,7 +165,6 @@ export default class OctoPrintClient {
     }
     if (post.status === 204) {
       if (action === "delete") {
-        document.getElementById("file-" + fullPath).remove();
         let opt = {
           i: printer,
           fullPath: fullPath

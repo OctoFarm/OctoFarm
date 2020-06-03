@@ -310,7 +310,10 @@ export default class History {
               };
               let post = await OctoFarmClient.post("history/delete", histID);
               if (post.status === 200) {
-                e.target.parentElement.parentElement.parentElement.remove();
+                jplist.resetContent(function(){
+                  //remove element with id = el1
+                  e.target.parentElement.parentElement.parentElement.remove();
+                });
                 UI.createAlert(
                     "success",
                     "Your history entry has been deleted...",

@@ -990,9 +990,13 @@ export class FileActions {
           label: '<i class="fa fa-check"></i> Confirm'
         }
       },
-      callback: function(result) {
+      callback: async function(result) {
         if (result) {
-          OctoPrintClient.file(printer, fullPath, "delete");
+          await OctoPrintClient.file(printer, fullPath, "delete");
+          jplist.resetContent(function(){
+            //remove element with id = el1
+            document.getElementById("file-" + fullPath).remove();
+          });
         }
       }
     });
@@ -1014,12 +1018,16 @@ export class FileActions {
           fullPath: fullPath
         };
         if (result) {
+
           let post = await OctoPrintClient.delete(
               printer,
               "files/local/" + fullPath
           );
           let del = await OctoFarmClient.post("printers/removefolder", opts);
-          document.getElementById("file-" + fullPath).remove();
+          jplist.resetContent(function(){
+            //remove element with id = el1
+            document.getElementById("file-" + fullPath).remove();
+          });
         }
       }
     });
@@ -1048,6 +1056,7 @@ export class FileActions {
             command: "move",
             destination: result
           };
+
           let post = await OctoPrintClient.post(
               printer,
               "files/local/" + fullPath,
@@ -1079,7 +1088,8 @@ export class FileActions {
                 "printers/moveFolder",
                 opts
             );
-            FileManager.updateFileList(printer._id);
+            await FileManager.updateFileList(printer._id);
+
             UI.createAlert(
                 "success",
                 `Successfully moved your folder...`,

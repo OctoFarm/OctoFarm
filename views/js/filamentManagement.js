@@ -692,9 +692,17 @@ async function deleteProfile(e, filamentManager) {
     });
     if (post.status === 200) {
       if (e.classList.contains("deleteIcon")) {
-        e.parentElement.parentElement.parentElement.remove();
+          jplist.resetContent(function(){
+              //remove element with id = el1
+              e.parentElement.parentElement.parentElement.remove();
+          })
+
       } else {
-        e.parentElement.parentElement.remove();
+          jplist.resetContent(function(){
+              //remove element with id = el1
+              e.parentElement.parentElement.remove();
+          })
+
       }
       post = await post.json();
       updateProfiles(post)
@@ -709,7 +717,6 @@ async function deleteProfile(e, filamentManager) {
       );
     }
   }
-    jplist.refresh();
 }
 async function deleteSpool(e, filamentManager) {
     document.getElementById("profilesMessage").innerHTML = "";
@@ -719,9 +726,17 @@ async function deleteSpool(e, filamentManager) {
         });
         if (post.status === 200) {
             if (e.classList.contains("deleteIcon")) {
-                e.parentElement.parentElement.parentElement.remove();
+                jplist.resetContent(function(){
+                    //remove element with id = el1
+                    e.parentElement.parentElement.parentElement.remove();
+                });
+
             } else {
-                e.parentElement.parentElement.remove();
+                jplist.resetContent(function(){
+                    //remove element with id = el1
+                    e.parentElement.parentElement.remove();
+                });
+
             }
             post = await post.json();
         } else {
@@ -734,7 +749,6 @@ async function deleteSpool(e, filamentManager) {
             );
         }
     }
-    jplist.refresh();
 }
 function updateTotals(filtered) {
     let price = [];
