@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file.
         - Custom Script Location
         - Save new script
         - Delete old scripts
+        - Edit scripts
     - List view Extra Info now includes percent remaining. 
     - Printer errors are now logged to a seperate database. 
     - New dependancy for nano events

@@ -86,8 +86,8 @@ export default class Script {
                 <td> 
                  <form class="was-validated">
                         <center><div class="custom-control custom-checkbox mb-3">
-                            <input type="checkbox" class="custom-control-input" id="activeCheck-${alert._id}" required>
-                            <label class="custom-control-label" for="activeCheck-${alert._id}"></label>
+                            <input type="checkbox" class="custom-control-input" id="active-${alert._id}" required>
+                            <label class="custom-control-label" for="active-${alert._id}"></label>
 
                         </div></center>
                     </form>
@@ -97,14 +97,14 @@ export default class Script {
 
                        </select>
                 </td> 
-                <td id="scriptLocation-${alert._id}">    
-                        <div contenteditable="false"> ${alert.scriptLocation}  </div>
+                <td >    
+                        <div id="scriptLocation-${alert._id}" contenteditable="false"> ${alert.scriptLocation}  </div>
                 </td>
-                <td id="message-${alert._id}">    
-                        <div contenteditable="false"> ${alert.message}</div>
+                <td>    
+                        <div  id="message-${alert._id}" contenteditable="false"> ${alert.message}</div>
                 </td>
                 <td id="printers-${alert._id}">
-                        <div contenteditable="false"> ${alert.printer}</div>
+                        ${alert.printer}
                 </td>
                  <td>
                     <button id="edit-${alert._id}" type="button" class="btn btn-sm btn-info edit">
@@ -123,18 +123,19 @@ export default class Script {
                alertsTrigger.innerHTML = alertsDrop;
                alertsTrigger.value = alert.trigger
 
-               document.getElementById('activeCheck-'+alert._id).checked = alert.active;
+               document.getElementById('active-'+alert._id).checked = alert.active;
                document.getElementById('edit-'+alert._id).addEventListener('click', event => {
 
-                    Script.edit(id)
+                    Script.edit(alert._id)
                });
                document.getElementById('save-'+alert._id).addEventListener('click', event => {
                    let newAlert = {
+                       active: document.getElementById("active-"+alert._id).checked,
                        trigger: document.getElementById("trigger-"+alert._id).value,
-                       script: document.getElementById("scriptLocation-"+alert._id).innerHTML,
-                       message: document.getElementById("message-"+alert._id).innerHTML
+                       script: document.getElementById("scriptLocation-"+alert._id).innerHTML.trim(),
+                       message: document.getElementById("message-"+alert._id).innerHTML.trim()
                    }
-                   Script.delete(alert._id, newAlert)
+                   Script.save(alert._id, newAlert)
                });
                document.getElementById('delete-'+alert._id).addEventListener('click', event => {
                    Script.delete(alert._id)
@@ -164,18 +165,24 @@ export default class Script {
        }
     }
     static async edit(id){
-        if(printer){
+        let row = document.getElementById("alertList-"+id);
+        let editable = row.querySelectorAll("[contenteditable]");
 
-        }else{
-
-        }
+        editable.forEach(edit => {
+            edit.contentEditable = true;
+            edit.classList.add("Active");
+        })
+        document.getElementById("save-"+id).classList.remove("d-none");
+        document.getElementById("edit-"+id).classList.add("d-none");
+        document.getElementById("trigger-"+id).disabled = false;
     }
-    static async save(printer, trigger, scriptLocation, message){
+    static async save(id, newAlert){
         let opts = {
-            printer: printer,
-            trigger: trigger,
-            scriptLocation: scriptLocation,
-            message: message,
+            id: id,
+            active: newAlert.active,
+            trigger: newAlert.trigger,
+            scriptLocation: newAlert.script,
+            message: newAlert.message,
         }
         let post = await OctoFarmclient.post("scripts/save", opts);
         post = await post.json();
@@ -185,12 +192,20 @@ export default class Script {
             UI.createAlert("success", "Successfully saved your alert!", 3000, "Clicked")
             Script.get();
         }
+        let row = document.getElementById("alertList-"+id);
+        let editable = row.querySelectorAll("[contenteditable]");
 
+        editable.forEach(edit => {
+            edit.contentEditable = false;
+            edit.classList.remove("Active");
+        })
+        document.getElementById("save-"+id).classList.add("d-none");
+        document.getElementById("edit-"+id).classList.remove("d-none");
+        document.getElementById("trigger-"+id).disabled = true;
     }
     static async delete(id){
         let post = await OctoFarmclient.delete("scripts/delete/"+id);
         post = await post.json();
-        console.log(post)
         if(post.status === 200){
             UI.createAlert("error", "Failed to delete your alert.", 3000, "Clicked")
             console.log(document.getElementById("alertList-"+id))

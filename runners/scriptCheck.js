@@ -20,15 +20,13 @@ class ScriptRunner{
             });
             return "saved"
     }
-    static async edit(alertID, message, scriptLocation){
-
-    }
-    static async get(printer){
-        if(printer){
-
-        }else{
-
-        }
+    static async edit(newAlert){
+        let old = await Alerts.findById(newAlert.id);
+        old.active = newAlert.active;
+        old.trigger = newAlert.trigger;
+        old.scriptLocation = newAlert.scriptLocation;
+        old.save();
+        return "saved";
     }
     static async check(printer, trigger){
         let currentAlerts = await Alerts.find({});
