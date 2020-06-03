@@ -198,7 +198,7 @@ export default class OctoPrintClient {
     printer = await OctoFarmClient.post("printers/printerInfo", body);
     printer = await printer.json();
 
-    if(checkSettings.filament.filamentCheck && printer.selectedFilament === null && opts.command === "start"){
+    if(typeof checkSettings !== 'undefined' && typeof checkSettings.filament.filamentCheck !== 'undefined' && checkSettings.filament.filamentCheck &&  printer.selectedFilament === null && opts.command === "start"){
       bootbox.confirm({
         message: "You have spools in the inventory, but none selected. Would you like to select a spool?",
         buttons: {
