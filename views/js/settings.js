@@ -442,7 +442,7 @@ class ServerSettings {
     let filament = {
         filamentCheck: document.getElementById("checkFilament").checked
     }
-    if(oldServerSettings.filament.filamentCheck !== filament.filamentCheck || oldServerSettings.server.port !== server.port || oldServerSettings.server.loginRequired !== server.loginRequired || oldServerSettings.server.registration !== server.registration || oldServerSettings.timeout.webSocketRetry !== timeout.webSocketRetry || oldServerSettings.timeout.apiTimeout !== timeout.apiTimeout  || oldServerSettings.timeout.apiRetryCutoff !== timeout.apiRetryCutoff || oldServerSettings.timeout.apiRetry !== timeout.apiRetry  ){
+    if(oldServerSettings.server.port !== server.port || oldServerSettings.server.loginRequired !== server.loginRequired || oldServerSettings.server.registration !== server.registration || oldServerSettings.timeout.webSocketRetry !== timeout.webSocketRetry || oldServerSettings.timeout.apiTimeout !== timeout.apiTimeout  || oldServerSettings.timeout.apiRetryCutoff !== timeout.apiRetryCutoff || oldServerSettings.timeout.apiRetry !== timeout.apiRetry  ){
         reboot = true;
     }
       Client.post("settings/server/update", { onlinePolling, server, timeout, filament })
