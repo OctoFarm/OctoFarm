@@ -16,6 +16,18 @@ router.get("/get", ensureAuthenticated, async (req, res) => {
     //Return printers added...
     res.send({alerts: alerts, status:200});
 });
+router.delete("/delete/:id", ensureAuthenticated, async (req, res) => {
+    //Grab the API body
+    let id = req.params.id;
+    await Alerts.deleteOne({_id: id}).then(response => {
+        res.send({alerts: "success", status:200});
+    }).catch(err => {
+        console.log(err)
+            res.send({alerts: "error", status:500});
+    });
+    //Return printers added...
+
+});
 router.post("/test", ensureAuthenticated, async (req, res) => {
     //Grab the API body
     const opts = req.body;
