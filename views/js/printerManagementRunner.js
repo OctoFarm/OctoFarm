@@ -178,7 +178,7 @@ editBtn.addEventListener('click', event => {
     let editableFields = document.querySelectorAll('[contenteditable=false]')
 
     editableFields.forEach(f => {
-        f.classList.add("Active");
+        f.classList.add("contentEditable");
         f.contentEditable = true;
     })
     UI.createAlert("success", "Edit Mode turned on, press save once finished. <br> Your printer status will not update whilst in this mode...", 3000, "Clicked")
