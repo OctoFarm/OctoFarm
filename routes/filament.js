@@ -153,6 +153,7 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
     });
     updateFilamentManager = await updateFilamentManager.json()
     filamentManagerID = updateFilamentManager.profile.id;
+
   }
   let profile = {
     index: filamentManagerID,
@@ -166,7 +167,9 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
   });
 
    newFilament.save().then(async e => {
-   let reSync = await filamentManagerReSync();
+     if(serverSettings[0].filamentManager) {
+       await filamentManagerReSync();
+     }
    res.send({ res: "success", profile: newFilament });
   });
 });
@@ -237,7 +240,9 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
     spools
   });
   newFilament.save().then(async e => {
-    let reSync = await filamentManagerReSync()
+    if(serverSettings[0].filamentManager) {
+      await filamentManagerReSync();
+    }
     res.send({ res: "success", spools: newFilament });
   });
 

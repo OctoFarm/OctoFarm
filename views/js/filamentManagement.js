@@ -615,21 +615,20 @@ async function editSpool(e) {
         edit.contentEditable = true;
         edit.classList.add("contentEditable");
     })
-    let profile = await OctoFarmclient.get("filament/get/profile");
-    profile = await profile.json();
-    document.getElementById("spoolsProfile-"+id).innerHTML = "";
-    profile.profiles.forEach(prof => {
-        let profileID = null;
-        if(filamentManager){
-            profileID = prof.profile.index
-        }else{
-            profileID = prof._id
-        }
-        document.getElementById("spoolsProfile-"+id).insertAdjacentHTML('beforeend',`
-                     <option value="${profileID}">${prof.profile.manufacturer} (${prof.profile.material})</option>
-                    `)
-    })
-
+    // let profile = await OctoFarmclient.get("filament/get/profile");
+    // profile = await profile.json();
+    // document.getElementById("spoolsProfile-"+id).innerHTML = "";
+    // profile.profiles.forEach(prof => {
+    //     let profileID = null;
+    //     if(filamentManager){
+    //         profileID = prof.profile.index
+    //     }else{
+    //         profileID = prof._id
+    //     }
+    //     document.getElementById("spoolsProfile-"+id).insertAdjacentHTML('beforeend',`
+    //                  <option value="${profileID}">${prof.profile.manufacturer} (${prof.profile.material})</option>
+    //                 `)
+    // })
     document.getElementById("spoolsProfile-"+id).disabled = false;
     document.getElementById("save-"+id).classList.remove("d-none");
     document.getElementById("edit-"+id).classList.add("d-none");
