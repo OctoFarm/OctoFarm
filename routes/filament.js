@@ -8,7 +8,72 @@ const ServerSettings = require("../models/ServerSettings.js");
 const _ = require("lodash");
 const Runner = require("../runners/state.js")
 module.exports = router;
+const reSync = async function(){
+  const runner = require("../runners/state.js");
+  const Runner = runner.Runner;
+  let printerList = Runner.returnFarmPrinters();
+  let printer = null;
+  for (let i = 0; i < printerList.length; i++) {
+    if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
+      printer = printerList[i]
+      break;
+    }
+  }
 
+  if(printer === null){
+    return "error"
+  }
+  let spools = await fetch(`${printer.printerURL}/plugin/filamentmanager/spools`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Api-Key": printer.apikey
+    }
+  });
+  let profiles = await fetch(`${printer.printerURL}/plugin/filamentmanager/profiles`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Api-Key": printer.apikey
+    }
+  });
+  //Make sure filament manager responds...
+  if(spools.status != 200 || profiles.status != 200){
+    res.send({ status: false });
+  }
+  spoolsFM = await spools.json();
+  profilesFM = await profiles.json();
+
+  spoolsFM.spools.forEach(async sp => {
+    let spools = {
+      name: sp.name,
+      profile: sp.profile.id,
+      price: sp.cost,
+      weight: sp.weight,
+      used: sp.used,
+      tempOffset: sp.temp_offset,
+      fmID: sp.id
+    };
+    let oldSpool = await Spool.findOne({name: sp.name});
+    oldSpool.spools = spools;
+    oldSpool.markModified("spools")
+    oldSpool.save();
+  })
+  profilesFM.profiles.forEach(async sp => {
+    let profile = {
+      index: sp.id,
+      density: sp.density,
+      diameter: sp.diameter,
+      manufacturer: sp.vendor,
+      material: sp.material,
+    };
+    let oldProfile = await Spool.Profile({name: sp.name});
+    oldProfile.profile = profile;
+    oldProfile.markModified("profile")
+    oldProfile.save();
+  })
+  return "success"
+}
 router.get("/get/profile", ensureAuthenticated, async (req, res) => {
   Profile.find({}).then(async profiles => {
     let serverSettings = await ServerSettings.find({});
@@ -503,69 +568,3 @@ router.post("/disableFilamentPlugin", ensureAuthenticated, async (req, res) => {
   //Return success
     res.send({ status: true });
 });
-const reSync = async function(){
-  const runner = require("../runners/state.js");
-  const Runner = runner.Runner;
-  let printerList = Runner.returnFarmPrinters();
-  let printer = null;
-  for (let i = 0; i < printerList.length; i++) {
-    if (printerList[i].stateColour.category === "Disconnected" || printerList[i].stateColour.category === "Idle" || printerList[i].stateColour.category === "Active" || printerList[i].stateColour.category === "Complete") {
-      printer = printerList[i]
-      break;
-    }
-  }
-
-  if(printer === null){
-    return "error"
-  }
-  let spools = await fetch(`${printer.printerURL}/plugin/filamentmanager/spools`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Api-Key": printer.apikey
-    }
-  });
-  let profiles = await fetch(`${printer.printerURL}/plugin/filamentmanager/profiles`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "X-Api-Key": printer.apikey
-    }
-  });
-  //Make sure filament manager responds...
-  if(spools.status != 200 || profiles.status != 200){
-    res.send({ status: false });
-  }
-  spoolsFM = await spools.json();
-  profilesFM = await profiles.json();
-
-  spoolsFM.spools.forEach(async sp => {
-    let spools = {
-      name: sp.name,
-      profile: sp.profile.id,
-      price: sp.cost,
-      weight: sp.weight,
-      used: sp.used,
-      tempOffset: sp.temp_offset,
-      fmID: sp.id
-    };
-    let oldSpool = await Spool.findOne({name: sp.name});
-    oldSpool.spools = spools;
-    oldSpool.markModified("spools")
-    oldSpool.save();
-  })
-  profilesFM.profiles.forEach(async sp => {
-    let profile = {
-      index: sp.id,
-      density: sp.density,
-      diameter: sp.diameter,
-      manufacturer: sp.vendor,
-      material: sp.material,
-    };
-    let oldProfile = await Spool.Profile({name: sp.name});
-    oldProfile.profile = profile;
-    oldProfile.markModified("profile")
-    oldProfile.save();
-  })
-  return "success"
-}
