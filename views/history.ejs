@@ -395,7 +395,7 @@
           <td class="totalCost" id="totalCost-<%= history[i]._id %>">
             Loading...
           </td>
-          <%if(history[i].printHistory.filamentSelection != null){%>
+          <%if(history[i].printHistory.filamentSelection != null && typeof history[i].printHistory.filamentSelection !== 'undefined' && typeof history[i].printHistory.filamentSelection.spools !== 'undefined'){%>
           <td class="spool <%= history[i].printHistory.filamentSelection.spools.profile.material.replace(/ /g, "_") %>" id="spool-<%= history[i]._id %>">
           <% }else{%>
           <td class="spool" id="spool-<%= history[i]._id %>">
