@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [v1.1.4.9-dev-4]
+## [v1.1.4.9-dev-4.2]
 
 ### Added
     - History Page:

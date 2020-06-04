@@ -7,20 +7,19 @@ const ClientSettings = require("../models/ClientSettings.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const prettyHelpers = require("../views/partials/functions/pretty.js");
 const Spools = require("../models/Filament.js");
-const Profiles = require("../models/Profiles.js")
+const Profiles = require("../models/Profiles.js");
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 const _ = require("lodash");
 
-
-const version = pjson.version + ".9-dev-4";
+const version = pjson.version + ".9-dev-4.3";
 
 console.log("db: " + db);
 
 const Roll = require("../models/Filament.js");
 
 //Welcome Page
-async function welcome(){
+async function welcome() {
     if (db === "") {
         //No db setup, show db warning before login.
         router.get("/", (req, res) =>
@@ -30,12 +29,17 @@ async function welcome(){
         let settings = await ServerSettings.find({});
 
         if (settings[0].server.loginRequired === false) {
-            router.get("/", (req, res) => res.redirect('/dashboard'));
+            router.get("/", (req, res) => res.redirect("/dashboard"));
         } else {
-            let registration = settings[0].server.registration
-            router.get("/", (req, res) => res.render("welcome", { page: "Welcome", registration: registration, serverSettings: settings }));
+            let registration = settings[0].server.registration;
+            router.get("/", (req, res) =>
+                res.render("welcome", {
+                    page: "Welcome",
+                    registration: registration,
+                    serverSettings: settings,
+                })
+            );
         }
-
     }
 }
 welcome();
@@ -77,7 +81,7 @@ router.get("/dashboard", ensureAuthenticated, async(req, res) => {
         helpers: prettyHelpers,
         systemInfo: systemInformation,
         clientSettings: clientSettings,
-        serverSettings: serverSettings
+        serverSettings: serverSettings,
     });
 });
 router.get("/printers", ensureAuthenticated, async(req, res) => {
@@ -111,7 +115,7 @@ router.get("/printers", ensureAuthenticated, async(req, res) => {
         helpers: prettyHelpers,
         systemInfo: systemInformation,
         clientSettings: clientSettings,
-        serverSettings: serverSettings
+        serverSettings: serverSettings,
     });
 });
 //File Manager Page
@@ -142,7 +146,7 @@ router.get("/filemanager", ensureAuthenticated, async(req, res) => {
         farmInfo: statistics.fileStatistics,
         page: "File Manager",
         helpers: prettyHelpers,
-        serverSettings: serverSettings
+        serverSettings: serverSettings,
     });
 });
 //History Page
@@ -175,7 +179,7 @@ router.get("/history", ensureAuthenticated, async(req, res) => {
         page: "History",
         helpers: prettyHelpers,
         printStatistics: statistics.printStatistics,
-        serverSettings: serverSettings
+        serverSettings: serverSettings,
     });
 });
 //Panel view  Page
@@ -208,7 +212,7 @@ router.get("/mon/panel", ensureAuthenticated, async(req, res) => {
         page: "Panel View",
         helpers: prettyHelpers,
         clientSettings: clientSettings,
-        serverSettings: serverSettings
+        serverSettings: serverSettings,
     });
 });
 //Camera view  Page
@@ -241,7 +245,7 @@ router.get("/mon/camera", ensureAuthenticated, async(req, res) => {
         page: "Camera View",
         helpers: prettyHelpers,
         clientSettings: clientSettings,
-        serverSettings: serverSettings
+        serverSettings: serverSettings,
     });
 });
 //List view  Page
@@ -274,7 +278,7 @@ router.get("/mon/list", ensureAuthenticated, async(req, res) => {
         page: "List View",
         helpers: prettyHelpers,
         clientSettings: clientSettings,
-        serverSettings: serverSettings
+        serverSettings: serverSettings,
     });
 });
 router.get("/mon/currentOp", ensureAuthenticated, async(req, res) => {
@@ -306,8 +310,7 @@ router.get("/mon/currentOp", ensureAuthenticated, async(req, res) => {
         page: "Current Operations View",
         helpers: prettyHelpers,
         clientSettings: clientSettings,
-        serverSettings: serverSettings
-
+        serverSettings: serverSettings,
     });
 });
 router.get("/filament", ensureAuthenticated, async(req, res) => {
@@ -343,7 +346,7 @@ router.get("/filament", ensureAuthenticated, async(req, res) => {
         clientSettings: clientSettings,
         serverSettings: serverSettings,
         spools: spools,
-        profiles: profiles
+        profiles: profiles,
     });
 });
 module.exports = router;
