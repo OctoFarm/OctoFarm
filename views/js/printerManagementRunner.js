@@ -830,9 +830,6 @@ class dashUpdate {
                         e.target.innerHTML = "<i class='fas fa-sync'></i>";
                         e.target.disabled = false;
                     });
-                    document.getElementById("deleteButton-" + printer._id).addEventListener('click', event => {
-                            PrintersManagement.deletePrinter(event.target);
-                    })
                     document.getElementById("printerButton-" + printer._id).addEventListener("click", e => {
                             PrinterManager.updateIndex(printer._id);
                             PrinterManager.init(printerInfo);
