@@ -3,19 +3,20 @@
 All notable changes to this project will be documented in this file.
 
 ## [v1.1.5]
- - Notable changes onle: to see exact changelog please look at DEVELOPMENT below. 
+ - Notable changes only: to see exact changelog please look at DEVELOPMENT below. 
 
-### Added
+ - New Dashboard
+ - New Printer Management screen
+ - Statistics/filters added to most pages
+ - Improved octoprint monitor with speration between OctoPrint Host, OctoPrint Server and Websocket connection
+ - Filament Manager complete re-design
+    - Caveat: Old filament manager database no longer works
+ - Overhauled history with information from filament manager and new printer settings i.e. cost. 
+ - New Printer settings panel
+ - New Printer control panel
+ - PSUControl and other power plugin support
+ - New Alerts system with ability to fire custom system script.
 
-### Changed
-
-### Removed
-
-### Deprecated
-
-### Fixed
-
-### Security
 
 ## [DEVELOPMENTS]
 
