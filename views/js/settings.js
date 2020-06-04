@@ -382,7 +382,7 @@ class ServerSettings {
                 filManager.addEventListener('click', async event => {
                     filManager.disabled = true;
                     filManager.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing... <br> Please Wait..."
-                    let post = await OctoFarmclient.post("filament/filamentManagerSync", {activate: true})
+                    let post = await OctoFarmclient.post("filament/filamentManagerReSync", {activate: true})
                     post = await post.json();
                     if (post.status) {
                         filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Re-Sync Database"
