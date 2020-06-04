@@ -601,7 +601,7 @@ async function editProfile(e) {
     let id = e.parentElement.parentElement.firstElementChild.innerHTML.trim()
     editable.forEach(edit => {
         edit.contentEditable = true;
-        edit.classList.add("Active");
+        edit.classList.add("contentEditable");
     })
     document.getElementById("save-"+id).classList.remove("d-none");
     document.getElementById("edit-"+id).classList.add("d-none");

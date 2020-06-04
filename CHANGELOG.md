@@ -57,6 +57,9 @@ All notable changes to this project will be documented in this file.
     - Broken action buttons on views
     - Indefinate counter on ETA
     - Fixed issue with filamentCheck not getting applied with no setting.
+    - Fixed firefox not added editable text boxes in
+    - Fixed sticky tables on history
+    - Added sticky table to printer management
     
 
 ## [v1.1.4.9-dev-3.9]
