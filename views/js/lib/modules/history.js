@@ -55,7 +55,7 @@ export default class History {
       if (historyList.history[i].printHistory.success) {
         let filamentString = null;
         let filamentUsage = null;
-        if (historyList.history[i].printHistory.filamentSelection !== null) {
+        if (historyList.history[i].printHistory.filamentSelection !== null && typeof historyList.history[i].printHistory.filamentSelection !== 'undefined'&& typeof historyList.history[i].printHistory.filamentSelection.spool !== 'undefined' ) {
           filamentString = await returnHistory(historyList.history[i].printHistory.filamentSelection)
           filamentUsage = returnHistoryUsage(historyList.history[i].printHistory)
         } else {
@@ -81,7 +81,7 @@ export default class History {
         }
         document.getElementById("totalCost-"+ historyList.history[i]._id).innerHTML = totalCost;
       } else {
-        if (historyList.history[i].printHistory.filamentSelection !== null) {
+        if (historyList.history[i].printHistory.filamentSelection !== null && typeof historyList.history[i].printHistory.filamentSelection !== 'undefined'&& typeof historyList.history[i].printHistory.filamentSelection.spool !== 'undefined' ) {
           filamentString = await returnHistory(historyList.history[i].printHistory.filamentSelection)
         } else {
           filamentString = "None selected..."
