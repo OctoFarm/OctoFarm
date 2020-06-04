@@ -12,7 +12,7 @@ const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 const _ = require("lodash");
 
-const version = pjson.version + ".9-dev-4.3";
+const version = pjson.version + "";
 
 console.log("db: " + db);
 
