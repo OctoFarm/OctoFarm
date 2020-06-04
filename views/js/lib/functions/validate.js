@@ -36,6 +36,13 @@ export default class Validate {
             return printer.printerURL;
         }
     }
-
+    static stripHTML(text){
+        var tmp = document.createElement("DIV");
+        tmp.innerHTML = text;
+        var res = tmp.textContent || tmp.innerText || '';
+        res.replace('\u200B', ''); // zero width space
+        res = res.trim();
+        return res;
+    }
 
 }

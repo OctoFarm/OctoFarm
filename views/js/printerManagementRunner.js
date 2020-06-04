@@ -110,11 +110,11 @@ saveEditBtn.addEventListener("click", async event => {
             let printerGroup = document.getElementById("printerGroup-" + printerInfo[i]._id);
             let printerName = document.getElementById("printerName-" + printerInfo[i]._id);
             let printer = new PrintersManagement(
-                printerURL.innerHTML,
-                printerCamURL.innerHTML,
-                printerAPIKEY.innerHTML,
-                printerGroup.innerHTML,
-                printerName.innerHTML
+                Validate.stripHTML(printerURL.textContent),
+                Validate.stripHTML(printerCamURL.textContent),
+                Validate.stripHTML(printerAPIKEY.textContent),
+                Validate.stripHTML(printerGroup.textContent),
+                Validate.stripHTML(printerName.textContent)
             ).build();
             printer._id = printerInfo[i]._id;
             let currentInfoIndex = _.findIndex(printerInfo, function(o) { return o._id === printerInfo[i]._id })
