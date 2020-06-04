@@ -8,7 +8,7 @@ const ServerSettings = require("../models/ServerSettings.js");
 const _ = require("lodash");
 const Runner = require("../runners/state.js")
 module.exports = router;
-const reSync = async function(){
+const filamentManagerReSync = async function(){
   const runner = require("../runners/state.js");
   const Runner = runner.Runner;
   let printerList = Runner.returnFarmPrinters();
@@ -19,7 +19,6 @@ const reSync = async function(){
       break;
     }
   }
-
   if(printer === null){
     return "error"
   }
@@ -54,24 +53,26 @@ const reSync = async function(){
       tempOffset: sp.temp_offset,
       fmID: sp.id
     };
-    let oldSpool = await Spool.findOne({name: sp.name});
+    let oldSpool = await Spool.findOne({'spools.name': sp.name});
     oldSpool.spools = spools;
     oldSpool.markModified("spools")
     oldSpool.save();
   })
-  profilesFM.profiles.forEach(async sp => {
+  profilesFM.profiles = _.sortBy(profilesFM.profiles, [function(o) { return o.id; }]);
     let profile = {
-      index: sp.id,
-      density: sp.density,
-      diameter: sp.diameter,
-      manufacturer: sp.vendor,
-      material: sp.material,
+      index:   profilesFM.profiles[profilesFM.profiles.length-1].id,
+      density:   profilesFM.profiles[profilesFM.profiles.length-1].density,
+      diameter:   profilesFM.profiles[profilesFM.profiles.length-1].diameter,
+      manufacturer:   profilesFM.profiles[profilesFM.profiles.length-1].vendor,
+      material:   profilesFM.profiles[profilesFM.profiles.length-1].material,
     };
-    let oldProfile = await Spool.Profile({name: sp.name});
-    oldProfile.profile = profile;
-    oldProfile.markModified("profile")
-    oldProfile.save();
-  })
+
+    Profile.findOne({'profile.index': 0}).then(oldProfile => {
+      oldProfile.profile = profile;
+      oldProfile.markModified("profile")
+      oldProfile.save();
+    });
+
   return "success"
 }
 router.get("/get/profile", ensureAuthenticated, async (req, res) => {
@@ -151,7 +152,6 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
       body: JSON.stringify({profile: profile})
     });
     updateFilamentManager = await updateFilamentManager.json()
-    console.log(updateFilamentManager)
     filamentManagerID = updateFilamentManager.profile.id;
   }
   let profile = {
@@ -166,7 +166,7 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
   });
 
    newFilament.save().then(async e => {
-   let reSync = await reSync();
+   let reSync = await filamentManagerReSync();
    res.send({ res: "success", profile: newFilament });
   });
 });
@@ -237,7 +237,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
     spools
   });
   newFilament.save().then(async e => {
-    let reSync = await reSync()
+    let reSync = await filamentManagerReSync()
     res.send({ res: "success", spools: newFilament });
   });
 
@@ -465,7 +465,7 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
 
 router.post("/filamentManagerReSync", ensureAuthenticated, async (req, res) => {
   //Find first online printer...
-  let reSync = await reSync();
+  let reSync = await filamentManagerReSync();
   //Return success
   if(reSync === "success"){
     res.send({ status: true });

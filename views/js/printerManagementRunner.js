@@ -251,7 +251,7 @@ class PrintersManagement {
          <tr id="newPrinterCard-${newPrintersIndex}">
           
               <td></td>
-              <td></td>
+        
               <td><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="plaintext-only">${newPrinter.name}</div></td>
               <td></td>
               <td></td>
@@ -276,7 +276,7 @@ class PrintersManagement {
             document.getElementById("printerList").insertAdjacentHTML("beforebegin", `
         <tr id="newPrinterCard-${newPrintersIndex}">
         <td></td>
-        <td></td>
+
         <td><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="plaintext-only">{Leave to Grab from OctoPrint}</div></td>
         <td></td>
         <td></td>
