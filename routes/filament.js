@@ -86,6 +86,7 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
       body: JSON.stringify({profile: profile})
     });
     updateFilamentManager = await updateFilamentManager.json()
+    console.log(updateFilamentManager)
     filamentManagerID = updateFilamentManager.profile.id;
   }
   let profile = {
@@ -155,6 +156,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
     });
 
     updateFilamentManager = await updateFilamentManager.json()
+    console.log(updateFilamentManager)
     filamentManagerID = updateFilamentManager.spool.id;
 
   }
@@ -294,7 +296,6 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
       "used": newContent[3],
       "temp_offset": newContent[4]
     };
-  console.log(spool)
     let url = `${printer.printerURL}/plugin/filamentmanager/spools/${spools.spools.fmID}`;
     let updateFilamentManager = await fetch(url, {
       method: "PATCH",
