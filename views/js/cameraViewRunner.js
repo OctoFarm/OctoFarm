@@ -8,6 +8,7 @@ import { parse } from "./vendor/flatted.js";
 import initGroupSelect from "./lib/modules/groupSelection.js";
 import PowerButton from "./lib/modules/powerButton.js";
 import {dragAndDropEnable} from "./lib/functions/dragAndDrop.js";
+import {checkTemps} from "./lib/modules/temperatureCheck.js";
 
 let printerInfo = [];
 let elems = [];
@@ -177,10 +178,6 @@ function grabElements(printer) {
             progress: document.getElementById("camProgress-" + printer._id),
             tool0: document.getElementById("panE0Temp-" + printer._id),
             bed: document.getElementById("panBedTemp-" + printer._id),
-            iconBedT: document.getElementById("bedT-" + printer._id),
-            iconBedA: document.getElementById("bedA-" + printer._id),
-            iconTool0A: document.getElementById("tool0A-" + printer._id),
-            iconTool0T: document.getElementById("tool0T-" + printer._id),
             extraInfo: document.getElementById("extraInfo-" + printer._id),
             timeRemaining: document.getElementById("timeRemaining-" + printer._id),
             eta: document.getElementById("eta-" + printer._id),
@@ -262,6 +259,8 @@ function updateState(printers, clientSettings) {
             dNone = "d-none"
         }
         //Set the state
+        checkTemps(elements.tool0, tool0A, tool0T, printer.tempTriggers, printer.stateColour.category)
+        checkTemps(elements.bed, bedA, bedT, printer.tempTriggers, printer.stateColour.category)
         if (printer.stateColour.category === "Active") {
             if (printer.camURL != "") {
                 elements.row.className = `col-md-4 col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${dNone}`;

@@ -11,6 +11,7 @@ import PowerButton from "./lib/modules/powerButton.js";
 import initGroupSelect from "./lib/modules/groupSelection.js";
 import {returnSelected} from "./lib/modules/filamentGrab.js";
 import {dragAndDropEnable} from "./lib/functions/dragAndDrop.js";
+import {checkTemps} from "./lib/modules/temperatureCheck.js";
 
 let printerInfo = [];
 let elems = [];
@@ -159,10 +160,6 @@ function grabElements(printer) {
       printTime: document.getElementById("listPrintTime-" + printer._id),
       tool0: document.getElementById("listE0Temp-" + printer._id),
       bed: document.getElementById("listBedTemp-" + printer._id),
-      iconBedT: document.getElementById("bedT-" + printer._id),
-      iconBedA: document.getElementById("bedA-" + printer._id),
-      iconTool0A: document.getElementById("tool0A-" + printer._id),
-      iconTool0T: document.getElementById("tool0T-" + printer._id),
       extraInfoCol: document.getElementById("extraInfoCol-" + printer._id),
       extraInfoPercentCol: document.getElementById("extraInfoColPercent-"+printer._id),
       extraInfoPercent: document.getElementById("extraInfoPercent"),
@@ -267,6 +264,8 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
       hideClosed = "hidden";
     }
     elements.row.style.backgroundColor = printer.stateColour.hex;
+    checkTemps(elements.tool0, tool0A, tool0T, printer.tempTriggers, printer.stateColour.category)
+    checkTemps(elements.bed, bedA, bedT, printer.tempTriggers, printer.stateColour.category)
     if (printer.stateColour.category === "Active") {
 
       //Set the state
@@ -280,85 +279,6 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
       elements.control.disabled = false;
       elements.start.disabled = true;
       elements.stop.disabled = false;
-
-      if (tool0A > tool0T - parseInt(printer.tempTriggers.heatingVariation) && tool0A < tool0T + parseInt(printer.tempTriggers.heatingVariation)) {
-        elements.tool0.innerHTML =
-            ' <i id="tool0A-' +
-            printer._id +
-            '" class="far fa-circle toolOn"></i> ' +
-            tool0A +
-            "°C" +
-            " " +
-            ' <i id="tool0T-' +
-            printer._id +
-            '" class="fas fa-bullseye toolOn"></i> ' +
-            tool0T +
-            "°C";
-      } else if (tool0A < parseInt(printer.tempTriggers.heatingVariation)) {
-        elements.tool0.innerHTML =
-            ' <i id="tool0A-' +
-            printer._id +
-            '" class="far fa-circle"></i> ' +
-            tool0A +
-            "°C" +
-            " " +
-            ' <i id="tool0T-' +
-            printer._id +
-            '" class="fas fa-bullseye"></i> ' +
-            tool0T +
-            "°C";
-      } else {
-        elements.tool0.innerHTML =
-            ' <i id="tool0A-' +
-            printer._id +
-            '" class="far fa-circle toolOut"></i> ' +
-            tool0A +
-            "°C" +
-            ' <i id="tool0T-' +
-            printer._id +
-            '" class="fas fa-bullseye toolOut"></i> ' +
-            tool0T +
-            "°C";
-      }
-      if (bedA > bedT - parseInt(printer.tempTriggers.heatingVariation) && bedA < bedT + parseInt(printer.tempTriggers.heatingVariation)) {
-        elements.bed.innerHTML =
-            ' <i id="bedA-' +
-            printer._id +
-            '" class="far fa-circle toolOn"></i> ' +
-            bedA +
-            "°C" +
-            " " +
-            ' <i id="bedT-' +
-            printer._id +
-            '" class="fas fa-bullseye toolOn"></i> ' +
-            bedT +
-            "°C";
-      } else if (bedA < parseInt(printer.tempTriggers.heatingVariation)) {
-        elements.bed.innerHTML =
-            ' <i id="bedA-' +
-            printer._id +
-            '" class="far fa-circle"></i> ' +
-            bedA +
-            "°C" +
-            " " +
-            ' <i id="bedT-' +
-            printer._id +
-            '" class="fas fa-bullseye"></i> ' +
-            bedT +
-            "°C";
-      } else {
-        elements.bed.innerHTML =
-            ' <i id="bedA-' +
-            printer._id +
-            '" class="far fa-circle toolOut"></i> ' +
-            bedA +
-            "°C" +
-            ' <i id="bedT-' +
-            printer._id +
-            '" class="fas fa-bullseye toolOut"></i> ' +
-            bedT +
-            "°C";
-      }
     } else if (
         printer.stateColour.category === "Idle" ||
         printer.stateColour.category === "Complete"
@@ -377,86 +297,6 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
         elements.start.disabled = true;
         elements.stop.disabled = true;
       }
-      if(printer.stateColour.category === "Complete"){
-        if (tool0A > parseInt(printer.tempTriggers.coolDown)) {
-          elements.tool0.innerHTML =
-              ' <i id="tool0A-' +
-              printer._id +
-              '" class="far fa-circle"></i> ' +
-              tool0A +
-              "°C" +
-              " " +
-              ' <i id="tool0T-' +
-              printer._id +
-              '" class="fas fa-bullseye"></i> ' +
-              tool0T +
-              "°C";
-        } else {
-          elements.tool0.innerHTML =
-              ' <i id="tool0A-' +
-              printer._id +
-              '" class="far fa-circle toolUnder"></i> ' +
-              tool0A +
-              "°C" +
-              ' <i id="tool0T-' +
-              printer._id +
-              '" class="fas fa-bullseye toolUnder"></i> ' +
-              tool0T +
-              "°C";
-        }
-        if (bedA > parseInt(printer.tempTriggers.coolDown)) {
-          elements.bed.innerHTML =
-              ' <i id="bedA-' +
-              printer._id +
-              '" class="far fa-circle"></i> ' +
-              bedA +
-              "°C" +
-              " " +
-              ' <i id="bedT-' +
-              printer._id +
-              '" class="fas fa-bullseye"></i> ' +
-              bedT +
-              "°C";
-        } else {
-          elements.bed.innerHTML =
-              ' <i id="bedA-' +
-              printer._id +
-              '" class="far fa-circle toolUnder"></i> ' +
-              bedA +
-              "°C" +
-              ' <i id="bedT-' +
-              printer._id +
-              '" class="fas fa-bullseye toolUnder"></i> ' +
-              bedT +
-              "°C";
-        }
-      }else{
-        elements.tool0.innerHTML =
-            ' <i id="tool0A-' +
-            printer._id +
-            '" class="far fa-circle"></i> ' +
-            tool0A +
-            "°C" +
-            " " +
-            ' <i id="tool0T-' +
-            printer._id +
-            '" class="fas fa-bullseye"></i> ' +
-            tool0T +
-            "°C";
-        elements.bed.innerHTML =
-            ' <i id="bedA-' +
-            printer._id +
-            '" class="far fa-circle"></i> ' +
-            bedA +
-            "°C" +
-            " " +
-            ' <i id="bedT-' +
-            printer._id +
-            '" class="fas fa-bullseye"></i> ' +
-            bedT +
-            "°C";
-      }
-
     } else if (printer.state === "Disconnected") {
 
       if(hideClosed != ""){

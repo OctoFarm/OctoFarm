@@ -9,6 +9,7 @@ import initGroupSelect from "./lib/modules/groupSelection.js";
 import {returnSelected} from "./lib/modules/filamentGrab.js";
 import PowerButton from "./lib/modules/powerButton.js";
 import {dragAndDropEnable} from "./lib/functions/dragAndDrop.js";
+import {checkTemps} from "./lib/modules/temperatureCheck.js";
 
 let printerInfo = "";
 let elems = [];
@@ -23,7 +24,6 @@ async function asyncParse(str) {
     let info = parse(str)
     return info;
   }catch(e){
-    console.log(e)
     return false;
   }
 }
@@ -205,10 +205,6 @@ function grabElements(printer) {
       progress: document.getElementById("panProgress-" + printer._id),
       tool0: document.getElementById("panE0Temp-" + printer._id),
       bed: document.getElementById("panBedTemp-" + printer._id),
-      iconBedT: document.getElementById("bedT-" + printer._id),
-      iconBedA: document.getElementById("bedA-" + printer._id),
-      iconTool0A: document.getElementById("tool0A-" + printer._id),
-      iconTool0T: document.getElementById("tool0T-" + printer._id),
       extraInfo: document.getElementById("extraInfo-" + printer._id),
       timeRemaining: document.getElementById("timeRemaining-" + printer._id),
       eta: document.getElementById("eta-" + printer._id),
@@ -306,6 +302,8 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
     if(elements.row.classList.contains("d-none")){
       dNone = "d-none"
     }
+    checkTemps(elements.tool0, tool0A, tool0T, printer.tempTriggers, printer.stateColour.category)
+    checkTemps(elements.bed, bedA, bedT, printer.tempTriggers, printer.stateColour.category)
     //Set the state
     if (printer.stateColour.category === "Active") {
       if (printer.camURL != "") {
