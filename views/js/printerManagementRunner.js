@@ -68,12 +68,6 @@ let newPrintersIndex = 0;
 //Dash control listeners
 let saveEditBtn = document.getElementById("saveEditsBtn");
 let editBtn = document.getElementById(("editPrinterBtn"));
-let deleteBtns = document.querySelectorAll("[id^='deleteButton-']")
-deleteBtns.forEach(b => {
-    b.addEventListener('click', event => {
-        PrintersManagement.deletePrinter(event.target);
-    })
-})
 let searchOffline = document.getElementById("searchOfflineBtn");
 searchOffline.addEventListener('click', async e => {
     searchOffline.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...'
@@ -227,22 +221,6 @@ document.getElementById("importPrinterBtn").addEventListener('change', async fun
 });
 document.getElementById("addPrinterBtn").addEventListener('click', event => {
     PrintersManagement.addPrinter();
-});
-let printerCard = document.querySelectorAll("[id^='printerButton-']");
-printerCard.forEach(card => {
-    let ca = card.id.split("-");
-    card.addEventListener("click", e => {
-        PrinterManager.updateIndex(ca[1]);
-        PrinterManager.init(printerInfo);
-    });
-});
-let printerSettings = document.querySelectorAll("[id^='printerSettings-']");
-printerSettings.forEach(card => {
-    let ca = card.id.split("-");
-    card.addEventListener("click", e => {
-        PrinterSettings.updateIndex(ca[1]);
-        PrinterSettings.init(printerInfo);
-    });
 });
 class Printer {
     constructor(printerURL, camURL, apikey, group, name) {
@@ -514,27 +492,6 @@ document.getElementById("disconnectAllBtn").addEventListener("click", () => {
     dashActions.disconnectAll();
 });
 
-let printerReSync = document.querySelectorAll("[id^='printerSyncButton-']");
-printerReSync.forEach(card => {
-    let ca = card.id.split("-");
-    card.addEventListener("click", async e => {
-        e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i>";
-        e.target.disabled = true;
-        let data = {
-            id: ca[1]
-        };
-        let post = await OctoFarmClient.post("printers/reScanOcto", data);
-        post = await post.json();
-        if (post.msg.status !== "error") {
-            UI.createAlert("success", post.msg.msg, 3000, "clicked");
-        } else {
-            UI.createAlert("error", post.msg.msg, 3000, "clicked");
-        }
-
-        e.target.innerHTML = "<i class='fas fa-sync'></i>";
-        e.target.disabled = false;
-    });
-});
 class dashActions {
     static async connectionAction(action) {
         $("#connectionModal").modal("hide");
@@ -872,6 +829,17 @@ class dashUpdate {
 
                         e.target.innerHTML = "<i class='fas fa-sync'></i>";
                         e.target.disabled = false;
+                    });
+                    document.getElementById("deleteButton-" + printer._id).addEventListener('click', event => {
+                            PrintersManagement.deletePrinter(event.target);
+                    })
+                    document.getElementById("printerButton-" + printer._id).addEventListener("click", e => {
+                            PrinterManager.updateIndex(printer._id);
+                            PrinterManager.init(printerInfo);
+                    });
+                    document.getElementById("printerSettings-" + printer._id).addEventListener("click", e => {
+                            PrinterSettings.updateIndex(printer._id);
+                            PrinterSettings.init(printerInfo);
                     });
                 }
             }

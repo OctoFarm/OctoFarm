@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
-## [v1.1.4.9-dev-4.2]
+## [v1.1.4.9-dev-4.9]
 
 ### Added
     - History Page:
@@ -39,7 +39,6 @@ All notable changes to this project will be documented in this file.
     - Printer errors are now logged to a seperate database. 
     - New dependancy for nano events
     
-        
 ### Changed
     - Moved filament manager plugin sync to server settings under Filament Manager Settings. 
     - New Filament Setting: Check if filament selected and warn to add one before starting a print. Default: False.
@@ -47,6 +46,11 @@ All notable changes to this project will be documented in this file.
     - History now asks if your sure on deletions...
     - Server settings now only prompts to restart when changing setting that requires restart
     - OctoFarm now rescans the client when updating throttle settings.
+    - Temps now all read from unified temperature file, should keep consistency across the board. 
+    - Temps are now applied independant of state. Each state has some triggers:
+        - Active: Will display orange if temperature drifts out of heating variation settings
+        - Complete: Will show blue when fully cooled down
+        - Everything else: Will update temperature if figure available.
 
 ### Removed
 
