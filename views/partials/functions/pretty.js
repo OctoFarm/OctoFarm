@@ -80,7 +80,7 @@ const historyTotals = function(history){
         paths.push(path);
       }
     }
-    if(hist.printHistory.filamentSelection != null && hist.printHistory.filamentSelection.spools !== 'undefined'){
+    if(hist.printHistory.filamentSelection != null && typeof hist.printHistory.filamentSelection.spools !== 'undefined'){
       historySpools.push(
           hist.printHistory.filamentSelection.spools.profile.material.replace(/ /g, "_")
       );
