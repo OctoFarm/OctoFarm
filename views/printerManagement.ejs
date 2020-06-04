@@ -97,12 +97,12 @@
                 <button id="connectAllBtn" type="button" class="btn btn-success mr-1 p-1 float-right d-none"><i class="fas fa-link"></i> Connect</button>
                 <button
                         type="button"
-                        class="btn btn-secondary float-right"
+                        class="btn btn-secondary float-right d-none"
                         href="#"
                         aria-expanded="false"
                         disabled
                 >
-                    <i  class="fas fa-print"></i> Selected:%>
+                    <i  class="fas fa-print"></i> Selected:
                 </button>
             </div>
         </div>
@@ -113,18 +113,19 @@
         <table id="printerTable" class="table table-dark table-striped text-center">
             <thead>
             <tr>
-                <th scope="sticky-table col">Sort Index</th>
-                <th scope="sticky-table col">Select</th>
-                <th scope="sticky-table text-wrap">Name</th>
-                <th scope="sticky-table col" style="min-width:300px;">Actions</th>
-                <th scope="sticky-table col"style="width:50px;">Host State</th>
-                <th scope="sticky-table col">Printer State</th>
-                <th scope="sticky-table col" width="10px">WebSocket</th>
-                <th scope="sticky-table col">Group</th>
-                <th scope="sticky-table col" width="190px">Printer URL</th>
-                <th scope="sticky-table col">Camera URL</th>
-                <th scope="sticky-table col">API KEY</th>
-                <th scope="sticky-table col" width="190px">OctoPrint Version</th>
+                <th scope="col" class=" sticky-table table-dark">Sort Index</th>
+                <th scope="col" class="d-none  sticky-table table-dark">Select</th>
+                <th class=" sticky-table table-dark text-wrap">Name</th>
+                <th scope="col" class=" sticky-table table-dark" style="min-width:300px;">Actions</th>
+                <th scope="col" class=" sticky-table table-dark" style="width:50px;">Host State</th>
+                <th scope="col" class=" sticky-table table-dark">Printer State</th>
+                <th scope="col"  class=" sticky-table table-dark" width="10px">WebSocket</th>
+                <th scope="col" class=" sticky-table table-dark">Group</th>
+                <th scope="col" class=" sticky-table table-dark" width="190px">Printer URL</th>
+                <th scope="col" class=" sticky-table table-dark">Camera URL</th>
+                <th scope="col" class=" sticky-table table-dark">API KEY</th>
+                <th scope="col" class=" sticky-table table-dark" width="190px">OctoPrint Version</th>
+                <th scope="col" class=" sticky-table table-dark"></th>
             </tr>
             </thead>
             <tbody id="printerList" style="height:100%; overflow-y:auto;">

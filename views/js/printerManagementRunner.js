@@ -785,12 +785,12 @@ class dashUpdate {
                     document.getElementById("printerList").insertAdjacentHTML("beforeend", `
         <tr id="printerCard-${printer._id}">
         <th id="printerSortIndex-${printer._id}">${printer.sortIndex}</td>
-        <td>
+        <td class="d-none">
             <center>
-            <form class="was-validated form-check-inline form-check">
+            <form class="was-validated form-check-inline form-check d-none">
                 <div class="custom-control custom-checkbox mb-2 pr-2">
                     <input type="checkbox" class="custom-control-input" id="dashboardSelect-${printer._id}" required>
-                    <label class="custom-control-label" for="dashboardSelect-${printer._id}" contenteditable="false"></label>
+                    <label class="custom-control-label" for="dashboardSelect-${printer._id}"></label>
                 </div>
             </form>
             </center>
@@ -828,17 +828,9 @@ class dashUpdate {
             >
                 <i class="fas fa-sync"></i>
             </button>
-                <button title="Other power actions" type="button" class="btn btn-sm btn-danger dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="sr-only">Toggle Dropdown</span>
-                </button>
-                <div class="dropdown-menu text-center">
-                    <a id="printerPowerOff-${printer._id}" title="Turn off your printer" class="dropdown-item d-none" href="#"><i class="textActive fas fa-power-off"></i> Power Off Printer</a>
-                    <a id="printerPowerOn-${printer._id}" title="Turn on your printer" class="dropdown-item d-none" href="#"><i class="textComplete fas fa-power-off"></i> Power On Printer</a>
-                    <div id="printerDropDownMaker-${printer._id}" class="dropdown-divider d-none"></div>
-                    <a title="Restart OctoPrint Service" class="dropdown-item" href="#"><i class="textActive fas fa-redo"></i> Restart OctoPrint</a>
-                    <a title="Reboot OctoPrint Host" class="dropdown-item" href="#"><i class="textActive fas fa-sync-alt"></i> Reboot Host</a>
-                    <a title="Shutdown OctoPrint Host" class="dropdown-item" href="#"><i class="textActive fas fa-power-off"></i> Shutdown Host</a>
-                </div>
+            <div id="powerBtn-${printer._id}" class="btn-group">
+
+            </div>
             <span title="Drag and Change your Printers sorting"  id="printerSortButton-${printer._id}"
                    class="tag btn btn-light btn-sm sortableList"
             >
@@ -860,6 +852,7 @@ class dashUpdate {
             </button></td>
     </tr>
           `)
+                    PowerButton.applyBtn(printer)
                     document.getElementById("deleteButton-" + printer._id).addEventListener('click', event => {
                         PrintersManagement.deletePrinter(event.target);
                     })
