@@ -554,11 +554,8 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
   }
 });
 router.post("/disableFilamentPlugin", ensureAuthenticated, async (req, res) => {
-  let searchId = req.body.id;
-  //Find first online printer...
-  const runner = require("../runners/state.js");
-  const Runner = runner.Runner;
-
+  await Spool.deleteMany({})
+  await Profile.deleteMany({})
   let serverSettings = await ServerSettings.find({});
   serverSettings[0].filamentManager = false;
   serverSettings[0].markModified("filamentManager");
