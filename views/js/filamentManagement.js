@@ -613,7 +613,7 @@ async function editSpool(e) {
     let id = e.parentElement.parentElement.firstElementChild.innerHTML.trim()
     editable.forEach(edit => {
         edit.contentEditable = true;
-        edit.classList.add("Active");
+        edit.classList.add("contentEditable");
     })
     let profile = await OctoFarmclient.get("filament/get/profile");
     profile = await profile.json();

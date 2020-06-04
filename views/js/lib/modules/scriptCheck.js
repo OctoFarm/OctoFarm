@@ -173,7 +173,7 @@ export default class Script {
 
         editable.forEach(edit => {
             edit.contentEditable = true;
-            edit.classList.add("Active");
+            edit.classList.add("contentEditable");
         })
         document.getElementById("save-"+id).classList.remove("d-none");
         document.getElementById("edit-"+id).classList.add("d-none");
@@ -200,7 +200,7 @@ export default class Script {
 
         editable.forEach(edit => {
             edit.contentEditable = false;
-            edit.classList.remove("Active");
+            edit.classList.remove("contentEditable");
         })
         document.getElementById("save-"+id).classList.add("d-none");
         document.getElementById("edit-"+id).classList.remove("d-none");

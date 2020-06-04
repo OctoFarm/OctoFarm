@@ -158,7 +158,7 @@ saveEditBtn.addEventListener("click", async event => {
     let editableFields = document.querySelectorAll('[contenteditable=true]')
     editableFields.forEach(f => {
         //document.getElementById(f.id).contentEditable = true;
-        f.classList.remove("Active");
+        f.classList.remove("contentEditable");
         f.contentEditable = false;
     })
     deletedPrinters = [];
