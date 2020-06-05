@@ -75,7 +75,7 @@ class ScriptRunner{
             progress = printer.progress;
         } else {
             progress = {
-                completion: "No Percent Available",
+                completion: 0,
                 filepos: 0,
                 printTime: "No Time Left",
                 printTimeLeft: "No Time Left"
@@ -123,7 +123,12 @@ class ScriptRunner{
             message = message.replace(/\[CurrentZ\]/g, current);
         }
         if(message.includes("[PercentRemaining]")){
-            message = message.replace(/\[PercentRemaining\]/g, progress.completion.toFixed(0)+"%");
+            if(progress.completion === 0){
+                message = message.replace(/\[PercentRemaining\]/g, progress.completion);
+            }else{
+                message = message.replace(/\[PercentRemaining\]/g, progress.completion.toFixed(2));
+            }
+
         }
         if(message.includes("[CurrentTime]")){
             let dateNow = new Date();
