@@ -2,6 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.1.5.3]
+
+### Added
+
+### Changed
+
+### Removed
+
+### Deprecated
+
+### Fixed
+    - More tweaks to the edit function as still wasn't recovering correctly.
+
 ## [v1.1.5.2]
 
 ### Added

@@ -137,7 +137,6 @@ WebSocketClient.prototype.open = function(url, index) {
                 }
                 break;
             default: // Abnormal closure
-                this.reconnect(e);
                 break;
         }
         this.onclose(e);
