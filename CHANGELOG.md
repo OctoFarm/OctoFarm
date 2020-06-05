@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 ### Changed
+    - Changed message for websocket returning to Alive and Receiving data
 
 ### Removed
 
@@ -14,29 +15,14 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
     - More tweaks to the edit function as still wasn't recovering correctly.
+    - Websockets are terminated correctly when changes are made to edits and farm updates.
 
 ## [v1.1.5.2]
-
-### Added
-
-### Changed
-
-### Removed
-
-### Deprecated
 
 ### Fixed
     - Alerts manager didn't allow saving of new alerts
 
 ## [v1.1.5.1]
-
-### Added
-
-### Changed
-
-### Removed
-
-### Deprecated
 
 ### Fixed
     - Fixed issue with history stalling on loading old database entries.

@@ -819,7 +819,7 @@ class Runner {
         farmPrinters[index].hostDescription = "Re-Scanning for OctoPrint Host";
         farmPrinters[index].webSocketDescription = "Websocket is Offline";
         if (typeof farmPrinters[index].ws !== 'undefined' && typeof farmPrinters[index].ws.instance !== 'undefined') {
-            await farmPrinters[index].ws.instance.close();
+            await farmPrinters[index].ws.instance.terminate();
             logger.info("Closed websocket connection for: " + farmPrinters[index].printerURL);
 
         }
@@ -845,7 +845,6 @@ class Runner {
         return "updated";
     }
     static async pause() {
-
         logger.info("Stopping farm statistics runner...");
         clearInterval(farmStatRunner);
         logger.info("Stopping farm Information runner...");
@@ -853,7 +852,7 @@ class Runner {
 
         for (let i = 0; i < farmPrinters.length; i++) {
             if (typeof farmPrinters[i].ws !== 'undefined' && typeof farmPrinters[i].ws.instance !== 'undefined') {
-                await farmPrinters[i].ws.instance.close();
+                await farmPrinters[i].ws.instance.terminate();
                 logger.info("Closed websocket connection for: " + farmPrinters[i].printerURL);
             }
         }
