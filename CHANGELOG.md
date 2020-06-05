@@ -2,7 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
-## [TEMPLATE]
+## [v1.1.5.2]
+
+### Added
+
+### Changed
+
+### Removed
+
+### Deprecated
+
+### Fixed
+    - Alerts manager didn't allow saving of new alerts
 
 ## [v1.1.5.1]
 

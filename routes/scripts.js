@@ -40,6 +40,14 @@ router.post("/save", ensureAuthenticated, async (req, res) => {
     //Grab the API body
     const opts = req.body;
     //Send Dashboard to Runner..
+    let save = await Script.save(opts.printer, opts.trigger, opts.message, opts.scriptLocation)
+    //Return printers added...
+    res.send({message: save, status:200});
+});
+router.post("/edit", ensureAuthenticated, async (req, res) => {
+    //Grab the API body
+    const opts = req.body;
+    //Send Dashboard to Runner..
     let save = await Script.edit(opts)
     //Return printers added...
     res.send({message: save, status:200});

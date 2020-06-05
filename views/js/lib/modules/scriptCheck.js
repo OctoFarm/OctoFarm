@@ -62,7 +62,13 @@ document.getElementById("saveScript").addEventListener('click', event => {
         elements.script.style.borderColor = "green";
         elements.message.style.borderColor = "green";
         elements.trigger.style.borderColor = "green";
-        Script.save([], elements.trigger.value, elements.script.value, elements.message.value);
+        let newAlert = {
+            active: true,
+            trigger: elements.trigger.value,
+            script: elements.script.value,
+            message: elements.message.value,
+        }
+        Script.save(newAlert);
     }
 });
 
@@ -138,7 +144,7 @@ export default class Script {
                        script: document.getElementById("scriptLocation-"+alert._id).innerHTML.trim(),
                        message: document.getElementById("message-"+alert._id).innerHTML.trim()
                    }
-                   Script.save(alert._id, newAlert)
+                   Script.saveEdit(alert._id, newAlert)
                });
                document.getElementById('delete-'+alert._id).addEventListener('click', event => {
                    Script.delete(alert._id)
@@ -179,7 +185,7 @@ export default class Script {
         document.getElementById("edit-"+id).classList.add("d-none");
         document.getElementById("trigger-"+id).disabled = false;
     }
-    static async save(id, newAlert){
+    static async saveEdit(id, newAlert){
         let opts = {
             id: id,
             active: newAlert.active,
@@ -187,7 +193,7 @@ export default class Script {
             scriptLocation: newAlert.script,
             message: newAlert.message,
         }
-        let post = await OctoFarmclient.post("scripts/save", opts);
+        let post = await OctoFarmclient.post("scripts/edit", opts);
         post = await post.json();
         if(post.status !== 200){
             UI.createAlert("error", "Failed to save your alert!", 3000, "Clicked");
@@ -205,6 +211,24 @@ export default class Script {
         document.getElementById("save-"+id).classList.add("d-none");
         document.getElementById("edit-"+id).classList.remove("d-none");
         document.getElementById("trigger-"+id).disabled = true;
+    }
+    static async save(newAlert){
+        let opts = {
+            active: newAlert.active,
+            trigger: newAlert.trigger,
+            scriptLocation: newAlert.script,
+            message: newAlert.message,
+            printer: []
+        }
+        console.log(opts)
+        let post = await OctoFarmclient.post("scripts/save", opts);
+        post = await post.json();
+        if(post.status !== 200){
+            UI.createAlert("error", "Failed to save your alert!", 3000, "Clicked");
+        }else{
+            UI.createAlert("success", "Successfully saved your alert!", 3000, "Clicked")
+            Script.get();
+        }
     }
     static async delete(id){
         let post = await OctoFarmclient.delete("scripts/delete/"+id);
