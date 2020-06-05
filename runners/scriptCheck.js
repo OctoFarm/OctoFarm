@@ -124,9 +124,9 @@ class ScriptRunner{
         }
         if(message.includes("[PercentRemaining]")){
             if(progress.completion === 0){
-                message = message.replace(/\[PercentRemaining\]/g, progress.completion);
+                message = message.replace(/\[PercentRemaining\]/g, progress.completion + "%");
             }else{
-                message = message.replace(/\[PercentRemaining\]/g, progress.completion.toFixed(2));
+                message = message.replace(/\[PercentRemaining\]/g, progress.completion.toFixed(2) + "%");
             }
 
         }
