@@ -86,7 +86,6 @@ WebSocketClient.prototype.open = function(url, index) {
         this.onmessage(data, flags, this.number, this.index);
     });
     this.instance.on('close', (e) => {
-        console.log("CLOSE", e)
         switch (e) {
             case 1000: // CLOSE_NORMAL
                 logger.info("WebSocket: closed: " + this.index + ": " + this.url);
@@ -143,7 +142,6 @@ WebSocketClient.prototype.open = function(url, index) {
         return "closed";
     });
     this.instance.on('error', (e) => {
-        console.log("ERROR", e)
         switch (e.code) {
             case 'ECONNREFUSED':
                 logger.error(e, this.index + ": " + this.url);

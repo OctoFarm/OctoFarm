@@ -13,7 +13,6 @@ class ScriptRunner{
                 scriptLocation: scriptLocation,
                 printers: printer
             }
-            console.log(alert)
             let newAlert = await new Alerts(alert);
             logger.info("Saving: " + trigger + " " + scriptLocation + " " + message)
             newAlert.save().then(e=> {
