@@ -2,16 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
-## [v1.1.5.3]
+
+## [v1.1.5.4]
 
 ### Added
 
 ### Changed
-    - Changed message for websocket returning to Alive and Receiving data
+
 
 ### Removed
 
 ### Deprecated
+
+### Fixed
+
+## [v1.1.5.3]
+
+### Changed
+    - Changed message for websocket returning to Alive and Receiving data
 
 ### Fixed
     - Websockets terminated correctly when changes are made to edits and farm updates.
