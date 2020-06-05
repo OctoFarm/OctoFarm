@@ -322,7 +322,8 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
     }
     if (typeof data.event != "undefined") {
         if (data.event.type === "PrintPaused") {
-            ScriptRunner.check(farmPrinters[this.index], "paused")
+            let that = this;
+            ScriptRunner.check(farmPrinters[that.index], "paused")
         }
         if (data.event.type === "PrintFailed") {
             let that = this;
@@ -336,7 +337,7 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
                 await HistoryCollection.failed(data.event.payload, sendPrinter, job);
                 await Runner.updateFilament();
             }, 10000);
-            ScriptRunner.check(farmPrinters[this.index], "failed")
+            ScriptRunner.check(farmPrinters[that.index], "failed")
         }
         if (data.event.type === "PrintDone") {
             let that = this;
@@ -350,7 +351,7 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
                 await HistoryCollection.complete(data.event.payload, sendPrinter, job);
                 await Runner.updateFilament();
             }, 10000);
-            ScriptRunner.check(farmPrinters[this.index], "done")
+            ScriptRunner.check(farmPrinters[that.index], "done")
         }
         if(data.event.type === "Error"){
             let that = this;
@@ -366,7 +367,7 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
                 await HistoryCollection.errorLog(data.event.payload, sendPrinter, job);
                 await Runner.updateFilament();
             }, 10000);
-            ScriptRunner.check(farmPrinters[this.index], "error");
+            ScriptRunner.check(farmPrinters[that.index], "error");
         }
     }
     //Event Listeners for state changes

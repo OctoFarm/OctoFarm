@@ -1,4 +1,6 @@
 export function checkTemps(element, actual, target, tempTriggers, state){
+    actual = parseFloat(actual);
+    target = parseFloat(target);
     if(state === "Complete"){
         if (actual > parseFloat(tempTriggers.coolDown)) {
             element.innerHTML =

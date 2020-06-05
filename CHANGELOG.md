@@ -9,12 +9,12 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
 
-
 ### Removed
 
 ### Deprecated
 
 ### Fixed
+    - Fixed issue with heating trigger not working with floats
 
 ## [v1.1.5.3]
 
