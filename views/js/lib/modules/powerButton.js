@@ -85,7 +85,7 @@ export default class PowerButton {
             if (powerOnnPrinter.classList.contains("d-none")) {
                 powerOnnPrinter.classList.remove("d-none");
                 powerOnnPrinter.addEventListener('click', event => {
-                    OctoPrintClient.power(printer, printer.powerSettings.powerOffURL, "Power On", printer.powerSettings.powerOffCommand);
+                    OctoPrintClient.power(printer, printer.powerSettings.powerOnCommand, "Power On", printer.powerSettings.powerOnCommand);
                 });
             }
         }
@@ -111,7 +111,7 @@ export default class PowerButton {
             if (powerTogglePrinter.disabled === true) {
                 powerTogglePrinter.disabled = false;
                 powerTogglePrinter.addEventListener('click', async event => {
-                    let status = await OctoPrintClient.power(printer, printer.powerSettings.powerOffURL, "Power Toggle", printer.powerSettings.powerOffCommand);
+                    let status = await OctoPrintClient.power(printer, pprinter.powerSettings.powerToggleURL, "Power Toggle", printer.powerSettings.powerToggleCommand);
                     let powerStatusPrinter = document.getElementById("printerStatus-" + printer._id);
                     if(status === "No Status"){
                         powerStatusPrinter.style.color = "black";

@@ -300,7 +300,7 @@ export default class OctoPrintClient {
     if (url.includes("[PrinterAPI]")) {
       url = url.replace("[PrinterAPI]", printer.apikey)
     }
-    if (typeof command === 'undefined' || command == "") {
+    if (typeof command === 'undefined' || command.length === 0) {
       let post = await fetch(url, {
         method: "POST",
         headers: {
