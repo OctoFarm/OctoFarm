@@ -200,11 +200,11 @@ export default class OctoPrintClient {
 
     let filamentCheck = false;
     if(typeof checkSettings.filament !== 'undefined'){
-      filamentCheck = checkSettings.filament;
+      console.log(checkSettings.filament)
+      filamentCheck = checkSettings.filament.filamentCheck;
     }
 
-
-    if(filamentCheck &&  printer.selectedFilament === null && opts.command === "start"){
+    if(filamentCheck && printer.selectedFilament === null && opts.command === "start"){
       bootbox.confirm({
         message: "You have spools in the inventory, but none selected. Would you like to select a spool?",
         buttons: {
