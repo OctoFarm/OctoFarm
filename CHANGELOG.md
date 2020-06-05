@@ -14,9 +14,9 @@ All notable changes to this project will be documented in this file.
 ### Deprecated
 
 ### Fixed
-    - More tweaks to the edit function as still wasn't recovering correctly.
-    - Websockets are terminated correctly when changes are made to edits and farm updates.
-    - Fixed
+    - Websockets terminated correctly when changes are made to edits and farm updates.
+    - Fixed filament manager setting not been respected
+    - Fixed issue with multiple histories been logged due to websocket termination
 
 ## [v1.1.5.2]
 

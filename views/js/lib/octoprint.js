@@ -200,7 +200,6 @@ export default class OctoPrintClient {
 
     let filamentCheck = false;
     if(typeof checkSettings.filament !== 'undefined'){
-      console.log(checkSettings.filament)
       filamentCheck = checkSettings.filament.filamentCheck;
     }
 
