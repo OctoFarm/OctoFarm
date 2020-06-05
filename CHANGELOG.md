@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
     - More tweaks to the edit function as still wasn't recovering correctly.
     - Websockets are terminated correctly when changes are made to edits and farm updates.
+    - Fixed
 
 ## [v1.1.5.2]
 
