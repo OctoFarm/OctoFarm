@@ -111,7 +111,7 @@ export default class PowerButton {
             if (powerTogglePrinter.disabled === true) {
                 powerTogglePrinter.disabled = false;
                 powerTogglePrinter.addEventListener('click', async event => {
-                    let status = await OctoPrintClient.power(printer, pprinter.powerSettings.powerToggleURL, "Power Toggle", printer.powerSettings.powerToggleCommand);
+                    let status = await OctoPrintClient.power(printer, printer.powerSettings.powerToggleURL, "Power Toggle", printer.powerSettings.powerToggleCommand);
                     let powerStatusPrinter = document.getElementById("printerStatus-" + printer._id);
                     if(status === "No Status"){
                         powerStatusPrinter.style.color = "black";
