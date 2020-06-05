@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [TEMPLATE]
+
+## [v1.1.5.1]
+
+### Added
+
+### Changed
+
+### Removed
+
+### Deprecated
+
+### Fixed
+    - Fixed issue with history stalling on loading old database entries.
+    - Fixed issue with editing printers not correctly clearing out the old ones.
+
+### Security
+
 ## [v1.1.5]
  - Notable changes only: to see exact changelog please look at DEVELOPMENT below. 
 
