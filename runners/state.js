@@ -86,6 +86,7 @@ WebSocketClient.prototype.open = function(url, index) {
         this.onmessage(data, flags, this.number, this.index);
     });
     this.instance.on('close', (e) => {
+        console.log("CLOSE", e)
         switch (e) {
             case 1000: // CLOSE_NORMAL
                 logger.info("WebSocket: closed: " + this.index + ": " + this.url);
@@ -118,6 +119,7 @@ WebSocketClient.prototype.open = function(url, index) {
                 } catch (e) {
                     logger.info("Couldn't set state of missing printer, safe to ignore: " + this.index + ": " + this.url)
                 }
+                this.reconnect(e);
                 break;
             case 1006: // TERMINATE();
                 try {
@@ -133,7 +135,6 @@ WebSocketClient.prototype.open = function(url, index) {
                 } catch (e) {
                     logger.info("Ping/Pong failed to get a response, closing and attempted to reconnect: " + this.index + ": " + this.url)
                 }
-                this.reconnect(e);
                 break;
             default: // Abnormal closure
                 this.reconnect(e);
@@ -143,6 +144,7 @@ WebSocketClient.prototype.open = function(url, index) {
         return "closed";
     });
     this.instance.on('error', (e) => {
+        console.log("ERROR", e)
         switch (e.code) {
             case 'ECONNREFUSED':
                 logger.error(e, this.index + ": " + this.url);
@@ -817,10 +819,10 @@ class Runner {
         farmPrinters[index].stateDescription = "Re-Scanning your OctoPrint Instance";
         farmPrinters[index].hostDescription = "Re-Scanning for OctoPrint Host";
         farmPrinters[index].webSocketDescription = "Websocket is Offline";
-
         if (typeof farmPrinters[index].ws !== 'undefined' && typeof farmPrinters[index].ws.instance !== 'undefined') {
             await farmPrinters[index].ws.instance.close();
             logger.info("Closed websocket connection for: " + farmPrinters[index].printerURL);
+
         }
         await this.setupWebSocket(farmPrinters[index]._id, skipAPI);
         result.status = "sucess",
