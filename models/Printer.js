@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const PrinterSchema = new mongoose.Schema({
+  category:{
+    type: String,
+    required: false,
+  },
   dateAdded: {
     type: Number,
     required: false,
