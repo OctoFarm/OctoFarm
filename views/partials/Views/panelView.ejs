@@ -2,18 +2,18 @@
 
 <div
   class="col-sm-12 col-md-4 col-lg-3 col-xl-2 hidden"
-  id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
+  id="viewPanel-<%= printers[sorted.actualIndex]._id %>"  data-jplist-item
 >
   <%}else if(printers[sorted.actualIndex].state === "Disconnected" &&
   clientSettings[0].panelView.hideClosed){%>
   <div
     class="col-sm-12 col-md-4 col-lg-3 col-xl-2 hidden"
-    id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
+    id="viewPanel-<%= printers[sorted.actualIndex]._id %>"  data-jplist-item
   >
     <%} else { %>
       <div
         class="col-sm-12 col-md-4 col-lg-3 col-xl-2"
-        id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
+        id="viewPanel-<%= printers[sorted.actualIndex]._id %>"  data-jplist-item
       >
         <%}%>
         <% let flipH = ""; %> <% let flipV = ""; %> <% let rotate90 = "";
@@ -39,7 +39,7 @@
         <% } else {%>
           <% name = printers[sorted.actualIndex].printerURL;%>
         <%}%>
-        <div class="card mt-1 mb-1 ml-1 mr-1 text-center">
+        <div class="card mt-1 mb-1 ml-1 mr-1 text-center <%= printers[sorted.actualIndex].group.replace(/ /g,"_")%>">
           <div class="card-header dashHeader">
             <h6
               class="float-left mb-0"
@@ -139,7 +139,7 @@
             <div class="progress">
               <div
                 id="panProgress-<%= printers[sorted.actualIndex]._id %>"
-                class="progress-bar progress-bar-striped bg-<%=printers[sorted.actualIndex].stateColour.name%>"
+                class="progress-bar progress-bar-striped bg-<%=printers[sorted.actualIndex].stateColour.name%> percent"
                 role="progressbar progress-bar-striped"
                 style="width:<% if(typeof printers[sorted.actualIndex].progress!= 'undefined'){ %><%=
             Math.floor(printers[sorted.actualIndex].progress.completion) %><%}%>%"
@@ -218,7 +218,7 @@
           <div id="extraInfo-<%= printers[sorted.actualIndex]._id %>" class="row d-none">
               <div class="col-6">
                 <h5 class="mb-0"><small>Time Remaining</small></h5>
-                <p class="mb-0"><small id="timeRemaining-<%= printers[sorted.actualIndex]._id %>">Loading...</small></p>
+                <p class="mb-0"><small class="time" id="timeRemaining-<%= printers[sorted.actualIndex]._id %>">Loading...</small></p>
               </div>
               <div class="col-6">
                 <h5 class="mb-0"><small>ETA</small></h5>

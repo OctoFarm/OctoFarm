@@ -31,7 +31,7 @@ async function asyncParse(str) {
 var source = new EventSource("/sse/monitoringInfo/");
 let groupInit = false;
 let powerTimer = 20000;
-
+let jpInit = false;
 let dragDropInit = false;
 source.onmessage = async function(e) {
     if (e.data != null) {
@@ -471,4 +471,13 @@ function updateState(printers, clientSettings) {
             elements.stop.disabled = true;
         }
     });
+    if(jpInit){
+        jplist.refresh();
+    }else {
+        jpInit = true;
+        jplist.init({
+            storage: 'localStorage', //'localStorage', 'sessionStorage' or 'cookies'
+            storageName: 'view-storage'
+        });
+    }
 }

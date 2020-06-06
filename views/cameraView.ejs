@@ -5,7 +5,7 @@
     <% if(clientSettings[0].cameraView.currentOp){%> <%-
     include('./partials/currentOperations.ejs') %> <% }%>
     <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-      <div id="cameraView" class="row">
+      <div id="cameraView" class="row" data-jplist-group="printers">
         <%- include('./partials/Views/cameraView.ejs') %>
       </div>
     </div>

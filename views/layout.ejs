@@ -57,16 +57,16 @@
                 Current Operations</a>
             </li>
             <% if(page.includes("Camera") || page.includes("List") || page.includes("Panel")){%>
-                <div class="input-group p-0 m-0 mt-3 pr-1 w-25 h-25 mx-auto">
+                <div class="input-group p-0 m-0 mt-3 pr-1 w-50 h-25 mx-auto">
                     <div class="input-group-prepend">
                         <label class="input-group-text" for="filterStates">Filter: </label>
                     </div>
                     <select class="custom-select " id="filterStates" data-jplist-control="select-filter" data-group="printers" data-name="view-filter" data-id="view-filter-select">
-                        <option selected="" href="#">All Printers</option>
-                        <option href="#" data-path=".Idle" value="idle">Idle</option>
-                        <option href="#" data-path=".Active" value="active">Active</option>
-                        <option href="#" data-path=".Complete" value="complete">Complete</option>
-                        <option href="#" data-path=".Disconnected" value="disonnected">Disconnected</option>
+                        <option selected="" href="#" value="all">All Printers</option>
+                        <option href="#" data-path=".Idle" value="idle">State: Idle</option>
+                        <option href="#" data-path=".Active" value="active">State: Active</option>
+                        <option href="#" data-path=".Complete" value="complete">State: Complete</option>
+                        <option href="#" data-path=".Disconnected" value="disonnected">State: Disconnected</option>
 
                     </select>
                 </div>

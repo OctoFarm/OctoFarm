@@ -29,7 +29,7 @@ async function asyncParse(str) {
 }
 var source = new EventSource("/sse/monitoringInfo/");
 let powerTimer = 20000;
-
+let jpInit = false;
 let dragDropInit = false;
 let groupInit = false;
 source.onmessage = async function(e) {
@@ -267,7 +267,6 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
     }else{
       elements.filament.innerHTML = ""
     }
-    elements.state.innerHTML = printer.state;
     if (typeof printer.progress != "undefined") {
       elements.progress.innerHTML =
           Math.floor(printer.progress.completion) + "%";
@@ -567,5 +566,14 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
       elements.restart.classList.add("hidden");
     }
   });
+  if(jpInit){
+    jplist.refresh();
+  }else {
+    jpInit = true;
+    jplist.init({
+      storage: 'localStorage', //'localStorage', 'sessionStorage' or 'cookies'
+      storageName: 'view-storage'
+    });
+  }
 }
 

@@ -16,7 +16,7 @@ export default function initGroupSelect(printers){
         uniqueGroups.forEach(group => {
             if(group != ""){
                 groupSelectionDropDown.insertAdjacentHTML('beforeend', `
-                      <option href="#" data-path=".${group.replace(/ /g, "_")}" value="${group.replace(/ /g, "_")}">${group}</option>
+                      <option href="#" data-path=".${group.replace(/ /g, "_")}" value="${group.replace(/ /g, "_")}">Group: ${group}</option>
         `)
             }
 
