@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
     - Fixed issue with heating trigger not working with floats
+    - Fixed issue with Power settings not sending correct command
 
 ## [v1.1.5.3]
 

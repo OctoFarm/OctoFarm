@@ -71,8 +71,11 @@ export default class PowerButton {
             let powerOffPrinter = document.getElementById("printerPowerOff-" + printer._id)
             if (powerOffPrinter.classList.contains("d-none")) {
                 powerOffPrinter.classList.remove("d-none");
-                powerOffPrinter.addEventListener('click', event => {
-                    OctoPrintClient.power(printer, printer.powerSettings.powerOffURL, "Power Off", printer.powerSettings.powerOffCommand);
+                powerOffPrinter.addEventListener('click', async event => {
+                    await OctoPrintClient.power(printer, printer.powerSettings.powerOffURL, "Power Off", printer.powerSettings.powerOffCommand);
+                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
                 });
             }
 
@@ -84,8 +87,11 @@ export default class PowerButton {
             let powerOnnPrinter = document.getElementById("printerPowerOn-" + printer._id)
             if (powerOnnPrinter.classList.contains("d-none")) {
                 powerOnnPrinter.classList.remove("d-none");
-                powerOnnPrinter.addEventListener('click', event => {
-                    OctoPrintClient.power(printer, printer.powerSettings.powerOnCommand, "Power On", printer.powerSettings.powerOnCommand);
+                powerOnnPrinter.addEventListener('click', async event => {
+                    await OctoPrintClient.power(printer, printer.powerSettings.powerOnURL, "Power On", printer.powerSettings.powerOnCommand);
+                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
                 });
             }
         }
@@ -93,15 +99,7 @@ export default class PowerButton {
             if (divider.classList.contains("d-none")) {
                 divider.classList.remove("d-none")
             }
-            let powerStatusPrinter = document.getElementById("printerStatus-" + printer._id)
             let status = await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand)
-            if(status === "No Status"){
-                powerStatusPrinter.style.color = "black";
-            }else if(status[Object.keys(status)[0]]){
-                powerStatusPrinter.style.color = "green";
-            }else{
-                powerStatusPrinter.style.color = "red";
-            }
         }
         if (printer.powerSettings.powerToggleURL !== "") {
             if (divider.classList.contains("d-none")) {
@@ -112,14 +110,9 @@ export default class PowerButton {
                 powerTogglePrinter.disabled = false;
                 powerTogglePrinter.addEventListener('click', async event => {
                     let status = await OctoPrintClient.power(printer, printer.powerSettings.powerToggleURL, "Power Toggle", printer.powerSettings.powerToggleCommand);
-                    let powerStatusPrinter = document.getElementById("printerStatus-" + printer._id);
-                    if(status === "No Status"){
-                        powerStatusPrinter.style.color = "black";
-                    }else if(status[Object.keys(status)[0]]){
-                        powerStatusPrinter.style.color = "green";
-                    }else{
-                        powerStatusPrinter.style.color = "red";
-                    }
+                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
                 });
             }
         }

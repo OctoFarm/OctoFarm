@@ -307,7 +307,7 @@ export default class OctoPrintClient {
           "Content-Type": "application/json",
         },
       });
-      if (post.status !== 200) {
+      if (post.status !== 204)  {
         UI.createAlert("error", `${Validate.getName(printer)}: Could not complete ${action}`, 3000)
       } else {
         UI.createAlert("success", `${Validate.getName(printer)}: Successfully completed ${action}`, 3000)
@@ -319,17 +319,16 @@ export default class OctoPrintClient {
           "Content-Type": "application/json",
           "X-Api-Key": printer.apikey
         },
-        body: JSON.stringify(command)
+        body: command
       });
-      if (post.status !== 200) {
+
+      if (post.status !== 204) {
         UI.createAlert("error", `${Validate.getName(printer)}: Could not complete ${action}`, 3000)
       } else {
         UI.createAlert("success", `${Validate.getName(printer)}: Successfully completed ${action}`, 3000)
       }
     }
-    if (action === "Power Toggle") {
-      return await OctoPrintClient.getPowerStatus(printer, url, command);
-    }
+    return "done"
   }
   static async getPowerStatus(printer, url, command) {
     if(url.includes("[PrinterURL]")){
@@ -345,7 +344,7 @@ export default class OctoPrintClient {
             "Content-Type": "application/json",
           },
         });
-        if(post.status !== 200){
+        if(post.status !== 200 || post.status !== 204){
           return "No Status"
         }else{
           post = await post.json();
@@ -358,13 +357,20 @@ export default class OctoPrintClient {
             "Content-Type": "application/json",
             "X-Api-Key": printer.apikey
           },
-          body: JSON.stringify(command)
+          body: command
         });
-        if(post.status !== 200){
-          return "No Status"
+        let status = "No Status"
+        if(post.status === 200 || post.status === 204){
+          status = await post.json();
+        }
+        console.log(status)
+        let powerStatusPrinter = document.getElementById("printerStatus-" + printer._id);
+        if(status === "No Status"){
+          powerStatusPrinter.style.color = "black";
+        }else if(status[Object.keys(status)[0]]){
+          powerStatusPrinter.style.color = "green";
         }else{
-          post = await post.json();
-          return post;
+          powerStatusPrinter.style.color = "red";
         }
       }
   }
