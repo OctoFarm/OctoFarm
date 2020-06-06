@@ -682,24 +682,27 @@ export default class PrinterSettings {
         let printerScripts = [];
         scripts.alerts.forEach(script => {
           if(script.printer === printer._id || script.printer.length === 0){
-            printerScripts.push({active: script.active, message: script.message, scriptLocation: script.scriptLocation, trigger: script.trigger})
+            console.log(script)
+            printerScripts.push({_id: script._id, active: script.active, message: script.message, scriptLocation: script.scriptLocation, trigger: script.trigger})
           }
         })
 
         let alertsTable = document.getElementById("printerAltersTableBody")
-            alertsTable.innerHTML = "";
+        alertsTable.innerHTML = "";
         printerScripts.forEach(async script => {
-
           alertsTable.insertAdjacentHTML('beforeend', `
               <tr>
                 <td>
-                         <div class="custom-control custom-checkbox mb-3">
-                            <input type="checkbox" class="custom-control-input" id="active-${script._id}" required>
-                            <label class="custom-control-label" for="active-${script._id}"></label>
+                <form class="was-validated">
+                      <div class="custom-control custom-checkbox mb-3">
+                            <input type="checkbox" class="custom-control-input" id="activePrinter-${script._id}" required="">
+                            <label class="custom-control-label" for="activePrinter-${script._id}"></label>
+
                         </div>
+                    </form>
                 </td>
                 <td> 
-                <select class="custom-select" id="trigger-${script._id}" disabled>
+                <select class="custom-select" id="triggerPrinter-${script._id}" disabled>
 
                  </select>
                        </td>
@@ -708,8 +711,8 @@ export default class PrinterSettings {
               </tr>
           
           `)
-          document.getElementById("active-"+script._id).checked = script.active;
-          let triggerSelect = document.getElementById("trigger-"+script._id)
+          document.getElementById("activePrinter-"+script._id).checked = script.active;
+          let triggerSelect = document.getElementById("triggerPrinter-"+script._id)
           triggerSelect.innerHTML = await Script.alertsDrop();
           triggerSelect.value = script.trigger;
         })

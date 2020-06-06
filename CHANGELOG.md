@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
     - Fixed Printer Manager page name
     - Fixed issue with error message not displaying in hover
     - Fixed Alerts Trigger column not been wide enough to display alert.
+    - Fixed Alerts section of printer settings not showing Trigger selection
 
 
 ## [v1.1.5.4]
