@@ -915,7 +915,10 @@ class Runner {
                         } else {
                             path = "local";
                         }
-
+                        let thumbnail = null;
+                        if(typeof entry.thumbnail !== 'undefined'){
+                            thumbnail = entry.thumbnail
+                        }
                         let file = {
                             path: path,
                             fullPath: entry.path,
@@ -925,6 +928,7 @@ class Runner {
                             size: entry.size,
                             time: timeStat,
                             date: entry.date,
+                            thumbnail: thumbnail
                         };
                         printerFiles.push(file);
                     }

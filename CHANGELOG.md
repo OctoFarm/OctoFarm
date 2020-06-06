@@ -5,12 +5,15 @@ All notable changes to this project will be documented in this file.
 ## [v1.1.5.5]
 
 ### Added
+    - New sorting function for Camera, Panel and List view's. You can now filter by Idle, Active, Disconnected and Complete states and your available groups
+    - You can now choose the sorting for the view too by Index, Progress and Time.
 
 ### Changed
     - Error's are now captured as a full log set. To be displayed in UI at a later date.
     - History.js is non-destructive to filament
 
 ### Removed
+    - Old sorting functions
 
 ### Deprecated
 
