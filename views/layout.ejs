@@ -56,17 +56,33 @@
             <a title="Current Operations Monitoring Layout View" class="nav-link text-light text-center btn-sm" id="menucurrentOperationsView" href="/mon/currentOp"><i class="fas fa-star"></i>
                 Current Operations</a>
             </li>
-            <div title="Filter your on screen printers" id="groupSelectionBtn" class="btn-group mt-2 mb-2 d-none">
-                <button id="currentGroup" class="btn btn-secondary btn-sm pt-0 pb-0" type="button" disabled>
-                    Selected: All Printers
-                </button>
-                <button type="button" class="btn btn-sm btn-secondary dropdown-toggle dropdown-toggle-split  pt-0 pb-0" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <span class="sr-only">Toggle Dropdown</span>
-                </button>
-                <div id="groupSelection" class="dropdown-menu">
+            <% if(page.includes("Camera") || page.includes("List") || page.includes("Panel")){%>
+                <div class="input-group p-0 m-0 mt-3 pr-1 w-25 h-25 mx-auto">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="filterStates">Filter: </label>
+                    </div>
+                    <select class="custom-select " id="filterStates" data-jplist-control="select-filter" data-group="printers" data-name="view-filter" data-id="view-filter-select">
+                        <option selected="" href="#">All Printers</option>
+                        <option href="#" data-path=".Idle" value="idle">Idle</option>
+                        <option href="#" data-path=".Active" value="active">Active</option>
+                        <option href="#" data-path=".Complete" value="complete">Complete</option>
+                        <option href="#" data-path=".Disconnected" value="disonnected">Disconnected</option>
 
+                    </select>
                 </div>
-            </div>
+                <div class="input-group p-0 m-0 mt-3  pr-1 w-25 h-25 mx-auto">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="sortStates">Sort: </label>
+                    </div>
+                    <select class="custom-select " id="sortStates" data-jplist-control="select-sort" data-group="printers" data-name="view-sort" data-id="view-sort-select">
+                        <option href="#" selected="" data-path=".index" data-order="asc" data-type="number" value="index">Index</option>
+                        <option href="#" data-path=".percent" data-order="desc" data-type="number" value="percent">Percent</option>
+                        <option href="#" data-path=".time" data-order="asc" data-type="number" value="time">Time</option>
+
+                    </select>
+                </div>
+            <% }%>
+
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li id="menuPrinters">

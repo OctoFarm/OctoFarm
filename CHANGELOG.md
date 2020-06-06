@@ -7,12 +7,16 @@ All notable changes to this project will be documented in this file.
 ### Added
 
 ### Changed
+    - Error's are now captured as a full log set. To be displayed in UI at a later date.
+    - History.js is non-destructive to filament
 
 ### Removed
 
 ### Deprecated
 
 ### Fixed
+    - Fixed Printer Manager page name
+    - Fixed issue with error message not displaying in hover
 
 
 ## [v1.1.5.4]

@@ -21,6 +21,7 @@ let port = window.location.port;
 if (port != "") {
   port = ":" + port;
 }
+let jpInit = false;
 async function asyncParse(str) {
   try{
     let info = parse(str)
@@ -39,8 +40,8 @@ source.onmessage = async function(e) {
   if (e.data != null) {
     let res = await asyncParse(e.data);
     if(groupInit === false){
-      initGroupSelect(res.printerInfo)
       groupInit = true;
+      initGroupSelect(res.printerInfo)
     }
     if(dragDropInit === false){
       let printerList = document.querySelectorAll("[id^='viewPanel-']")
@@ -172,9 +173,6 @@ function grabElements(printer) {
   }
 }
 function updateState(printers, clientSettings, filamentProfiles, filamentManager) {
-  let currentGroup = document.getElementById("currentGroup").innerHTML;
-  currentGroup = currentGroup.replace("Selected: ", "").trim()
-
   printers.forEach(async printer => {
     let elements = grabElements(printer);
     //Set the data
@@ -231,6 +229,7 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
       elements.filament.innerHTML = ""
     }
     elements.state.innerHTML = printer.state;
+    elements.state.className = printer.stateColour.category;
 
     if (typeof printer.progress != "undefined") {
       elements.printTime.innerHTML = Calc.generateTime(
@@ -315,5 +314,15 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
       elements.stop.disabled = true;
     }
   });
+  if(jpInit){
+    jplist.refresh();
+  }else{
+    jpInit = true;
+    jplist.init({
+      storage: 'localStorage', //'localStorage', 'sessionStorage' or 'cookies'
+      storageName: 'view-storage'
+    });
+  }
+
 }
 

@@ -110,7 +110,7 @@ router.get("/printers", ensureAuthenticated, async(req, res) => {
         version: version,
         sortedIndex: sortedPrinters,
         printers: printers,
-        page: "Dashboard",
+        page: "Printer Manager",
         printerCount: printers.length,
         helpers: prettyHelpers,
         systemInfo: systemInformation,

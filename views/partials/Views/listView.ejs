@@ -3,6 +3,7 @@
 <tr
   class="<%= printers[sorted.actualIndex].stateColour.category %> hidden"
   id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
+  data-jplist-item
 >
   <%}else if(printers[sorted.actualIndex].state === "Disconnected" &&
   clientSettings[0].listView.hideClosed){%>
@@ -11,13 +12,15 @@
 <tr
   class="<%= printers[sorted.actualIndex].stateColour.category %> hidden"
   id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
+  data-jplist-item
 >
   <%}else{%>
 </tr>
 
 <tr
-  class="<%= printers[sorted.actualIndex].stateColour.category %>"
+  class="<%= printers[sorted.actualIndex].stateColour.category%>"
   id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
+  data-jplist-item
 >
   <%}%>
   <% let name = "";%>
@@ -30,10 +33,10 @@
   <% } else {%>
     <% name = printers[sorted.actualIndex].printerURL;%>
   <%}%>
-  <td id="listSortIndex-<%= printers[sorted.actualIndex]._id %>">
+  <td id="listSortIndex-<%= printers[sorted.actualIndex]._id %>" class="index">
     <%= printers[sorted.actualIndex].sortIndex %>
   </td>
-  <td id="listName-<%= printers[sorted.actualIndex]._id %>">
+  <td id="listName-<%= printers[sorted.actualIndex]._id %>" class="<%= printers[sorted.actualIndex].group.replace(/ /g,"_")%>">
     <% if(name.includes("http://")){ %>
       <%  name = name.replace("http://", ""); %>
     <% }else if(name.includes("https://")){ %>
@@ -114,15 +117,15 @@
   <td id="listFilament-<%= printers[sorted.actualIndex]._id %>">
   Loading...
   </td>
-  <td id="listState-<%= printers[sorted.actualIndex]._id %>">
+  <td id="listState-<%= printers[sorted.actualIndex]._id %>" class="<%= printers[sorted.actualIndex].stateColour.category%>">
     <%= printers[sorted.actualIndex].state %>
   </td>
-  <td id="listPrintTime-<%= printers[sorted.actualIndex]._id %>">
+  <td id="listPrintTime-<%= printers[sorted.actualIndex]._id %>" class="time">
     <% if(typeof printers[sorted.actualIndex].progress != 'undefined'){ %> <%=
     helpers.generateTime(printers[sorted.actualIndex].progress.printTimeLeft) %>
     <%}%>
   </td>
-  <td id="extraInfoColPercent-<%= printers[sorted.actualIndex]._id %>" class="d-none">
+  <td id="extraInfoColPercent-<%= printers[sorted.actualIndex]._id %>" class="d-none percent">
     <p class="mb-0" id="percent-<%= printers[sorted.actualIndex]._id %>">Loading...</p>
   </td>
   <td id="extraInfoCol-<%= printers[sorted.actualIndex]._id %>" class="d-none">
