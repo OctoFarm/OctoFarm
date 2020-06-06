@@ -2,16 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
-
-## [v1.1.5.4]
+## [v1.1.5.5]
 
 ### Added
-    - Seperated out process/system uptimes on server settings
+
 ### Changed
 
 ### Removed
 
 ### Deprecated
+
+### Fixed
+
+
+## [v1.1.5.4]
+
+### Added
+    - Seperated out process/system uptimes on server settings
 
 ### Fixed
     - Fixed issue with heating trigger not working with floats
