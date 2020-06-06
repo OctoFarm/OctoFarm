@@ -37,6 +37,7 @@ class HistoryCollection {
   static async complete(payload, printer, job) {
     try{
       let serverSettings = await ServerSettings.find({});
+      let previousFilament = JSON.parse(JSON.stringify(printer.selectedFilament));
       if(serverSettings[0].filamentManager){
         printer.selectedFilament = await HistoryCollection.resyncFilament(printer);
         logger.info("Grabbed latest filament values", printer.filamentSelection);
@@ -103,6 +104,7 @@ class HistoryCollection {
         endDate: endDate,
         printTime: Math.round(payload.time),
         filamentSelection: printer.selectedFilament,
+        previousFilamentSelection: previousFilament,
         job: job,
         notes: ""
       };
@@ -121,6 +123,7 @@ class HistoryCollection {
   static async failed(payload, printer, job) {
     try {
       let serverSettings = await ServerSettings.find({});
+      let previousFilament = JSON.parse(JSON.stringify(printer.selectedFilament));
       if (serverSettings[0].filamentManager) {
         printer.selectedFilament = await HistoryCollection.resyncFilament(printer);
         logger.info("Grabbed latest filament values", printer.filamentSelection);
@@ -187,6 +190,7 @@ class HistoryCollection {
         endDate: endDate,
         printTime: Math.round(payload.time),
         filamentSelection: printer.selectedFilament,
+        previousFilamentSelection: previousFilament,
         job: job,
         notes: ""
       };
@@ -242,9 +246,7 @@ class HistoryCollection {
           costSettings: printer.costSettings,
           printerName: name,
           success: false,
-          reason: payload.reason,
-          fileName: payload.name,
-          filePath: payload.path,
+          reason: payload.error,
           startDate: startDate,
           endDate: endDate,
           printTime: Math.round(payload.time),
