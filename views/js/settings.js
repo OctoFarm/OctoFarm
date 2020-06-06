@@ -235,6 +235,10 @@ setInterval(async function updateStatus() {
             document.getElementById("systemUpdate").innerHTML = Calc.generateTime(
                 systemInfo.sysUptime.uptime
             );
+            console.log(systemInfo)
+            document.getElementById("processUpdate").innerHTML = Calc.generateTime(
+                systemInfo.processUptime
+            );
             //labels: ['System', 'OctoFarm', 'User', 'Free'],
             let cpuLoad = systemInfo.cpuLoad.currentload_system;
             let octoLoad = systemInfo.sysProcess.pcpu;
@@ -382,7 +386,7 @@ class ServerSettings {
                 filManager.addEventListener('click', async event => {
                     filManager.disabled = true;
                     filManager.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing... <br> Please Wait..."
-                    let post = await OctoFarmclient.post("filament/filamentManagerReSync", {activate: true})
+                    let post = await OctoFarmclient.post("filament/filamentManagerReSync")
                     post = await post.json();
                     if (post.status) {
                         filManager.innerHTML = "<i class=\"fas fa-sync\"></i> <br> Re-Sync Database"

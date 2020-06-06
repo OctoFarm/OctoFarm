@@ -93,7 +93,8 @@ router.get("/sysInfo", ensureAuthenticated, async (req, res) => {
       cpuLoad: systemInformation.cpuLoad,
       memoryInfo: systemInformation.memoryInfo,
       sysUptime: systemInformation.sysUptime,
-      sysProcess: systemInformation.sysProcess
+      sysProcess: systemInformation.sysProcess,
+      processUptime: systemInformation.processUptime
     };
   }
   res.send(sysInfo);

@@ -48,6 +48,7 @@ class SystemRunner {
         cpuLoad: cpuLoad,
         memoryInfo: memoryInfo,
         sysUptime: uptime,
+        processUptime: process.uptime(),
         sysProcess: sysProcess
       };
         return systemInfo;
