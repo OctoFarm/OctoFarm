@@ -377,7 +377,7 @@ export default class FileManager {
 
           </div>
           <p class="mb-1 float-left">
-          <i class="fas fa-clock"></i><span class="date"> ${fileDate}</span><br>
+          <i class="fas fa-clock"></i><span class="date d-none"> ${file.date}</span><span> ${fileDate}</span><br>
           <i class="fas fa-hdd"></i><span class="size"> ${Calc.bytes(file.size)}</span> <br>
           <i class="fas fa-weight"></i><span class="usage"> ${getUsage}</span>
           
@@ -455,7 +455,7 @@ export default class FileManager {
 
           </div>
           <p class="mb-1 float-left">
-          <i class="fas fa-clock"></i><span class="date"> ${fileDate}</span><br>
+          <i class="fas fa-clock"></i><span class="date d-none"> ${file.date}</span><span> ${fileDate}</span><br>
           <i class="fas fa-hdd"></i><span class="size"> ${Calc.bytes(file.size)}</span> <br>
           <i class="fas fa-weight"></i><span class="usage"> ${getUsage}</span>
           

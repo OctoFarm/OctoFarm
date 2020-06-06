@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.1.5.6]
+
+### Added
+
+### Changed
+
+### Removed
+
+### Deprecated
+
+### Fixed
+    - Fix file manager bug
+
+
+
 ## [v1.1.5.5]
 
 ### Added
