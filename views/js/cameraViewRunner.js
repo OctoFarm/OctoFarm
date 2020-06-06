@@ -230,7 +230,7 @@ function updateState(printers, clientSettings) {
             elements.progress.innerHTML =
                 Math.floor(printer.progress.completion) + "%";
             elements.progress.style.width = printer.progress.completion + "%";
-            elements.progress.classList = `progress-bar progress-bar-striped bg-${printer.stateColour.name}`;
+            elements.progress.classList = `progress-bar progress-bar-striped bg-${printer.stateColour.name} progress`;
         }
         let tool0A = 0;
         let tool0T = 0;
