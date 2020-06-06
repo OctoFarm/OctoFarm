@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 ### Added
     - New sorting function for Camera, Panel and List view's. You can now filter by Idle, Active, Disconnected and Complete states and your available groups
     - You can now choose the sorting for the view too by Index, Progress and Time.
+    - Added support for PrusaSlicer Thumbnail and Ultimaker Format Package Thumbnail plugins. 
+        - Usual OctoFarm standard applies, if you've just uploaded you need to re-sync to generate the thumbnail with the rest of the meta. 
 
 ### Changed
     - Error's are now captured as a full log set. To be displayed in UI at a later date.

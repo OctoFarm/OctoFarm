@@ -916,6 +916,7 @@ class Runner {
                             path = "local";
                         }
                         let thumbnail = null;
+
                         if(typeof entry.thumbnail !== 'undefined'){
                             thumbnail = entry.thumbnail
                         }
