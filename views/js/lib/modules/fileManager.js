@@ -332,6 +332,10 @@ export default class FileManager {
           currentFolder = currentFolder.replace("local/", "");
         }
         fileList.files.forEach(file => {
+          let thumbnail = "<center><i class=\"fas fa-file-code fa-2x\"></i></center>";
+          if(typeof file.thumbnail !== 'undefined' && file.thumbnail !== null ){
+            thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
+          }
           let fileDate = new Date(file.date*1000);
           let dateString = fileDate.toDateString();
           let timeString = fileDate.toTimeString().substring(0, 8);
@@ -358,12 +362,12 @@ export default class FileManager {
         >
           <div class="row">
             <div
-              class="col-lg-1"
+              class="col-lg-2"
               style="display:flex; justify-content:center; align-items:center;"
             >
-              <center><i class="fas fa-file-code fa-2x"></i></center>
+       ${thumbnail}
             </div>
-            <div class="col-lg-11">
+            <div class="col-lg-10">
             <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1 name">${file.display}</h5>
     <small><i class="fas fa-stopwatch"></i> <span class="time">${Calc.generateTime(
@@ -437,12 +441,12 @@ export default class FileManager {
         >
           <div class="row">
             <div
-              class="col-lg-1"
+              class="col-lg-2"
               style="display:flex; justify-content:center; align-items:center;"
             >
-              <center><i class="fas fa-file-code fa-2x"></i></center>
+                   ${thumbnail}
             </div>
-            <div class="col-lg-11">
+            <div class="col-lg-10">
             <div class="d-flex w-100 justify-content-between">
             <h5 class="mb-1 name">${file.display}</h5>         
             <small><i class="fas fa-stopwatch"></i> <span class="time">${Calc.generateTime(
