@@ -365,13 +365,16 @@ export default class OctoPrintClient {
         }
 
         let powerStatusPrinter = document.getElementById("printerStatus-" + printer._id);
-        if(status === "No Status"){
-          powerStatusPrinter.style.color = "black";
-        }else if(status[Object.keys(status)[0]]){
-          powerStatusPrinter.style.color = "green";
-        }else{
-          powerStatusPrinter.style.color = "red";
+        if(powerStatusPrinter){
+          if(status === "No Status"){
+            powerStatusPrinter.style.color = "black";
+          }else if(status[Object.keys(status)[0]]){
+            powerStatusPrinter.style.color = "green";
+          }else{
+            powerStatusPrinter.style.color = "red";
+          }
         }
+
       }
   }
 }

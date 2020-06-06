@@ -55,8 +55,11 @@ export default class PowerButton {
         }
         if (printer.powerSettings !== null) {
             if (!document.getElementById("printerPower-" + printer._id)) {
-                document.getElementById("powerBtn-" + printer._id).innerHTML = PowerButton.returnPowerBtn(printer);
-                PowerButton.powerButtons(printer);
+                if(document.getElementById("powerBtn-"+ printer._id)){
+                    document.getElementById("powerBtn-" + printer._id).innerHTML = PowerButton.returnPowerBtn(printer);
+                    PowerButton.powerButtons(printer);
+                }
+
             }else{
                 PowerButton.powerButtons(printer);
             }
@@ -106,15 +109,18 @@ export default class PowerButton {
                 divider.classList.remove("d-none")
             }
             let powerTogglePrinter = document.getElementById("printerPower-" + printer._id)
-            if (powerTogglePrinter.disabled === true) {
-                powerTogglePrinter.disabled = false;
-                powerTogglePrinter.addEventListener('click', async event => {
-                    let status = await OctoPrintClient.power(printer, printer.powerSettings.powerToggleURL, "Power Toggle", printer.powerSettings.powerToggleCommand);
-                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
-                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
-                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
-                });
+            if(powerTogglePrinter){
+                if (powerTogglePrinter.disabled === true) {
+                    powerTogglePrinter.disabled = false;
+                    powerTogglePrinter.addEventListener('click', async event => {
+                        let status = await OctoPrintClient.power(printer, printer.powerSettings.powerToggleURL, "Power Toggle", printer.powerSettings.powerToggleCommand);
+                        await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                        await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                        await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                    });
+                }
             }
+
         }
     }
 }
