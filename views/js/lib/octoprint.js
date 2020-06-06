@@ -363,7 +363,7 @@ export default class OctoPrintClient {
         if(post.status === 200 || post.status === 204){
           status = await post.json();
         }
-        console.log(status)
+
         let powerStatusPrinter = document.getElementById("printerStatus-" + printer._id);
         if(status === "No Status"){
           powerStatusPrinter.style.color = "black";
