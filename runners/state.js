@@ -1138,6 +1138,8 @@ class Runner {
             return { name: "danger", hex: "#2e0905", category: "Offline" };
         } else if (state === "Disconnected") {
             return { name: "danger", hex: "#2e0905", category: "Disconnected" };
+        } else if (state === "No-API") {
+            return { name: "danger", hex: "#2e0905", category: "Offline" };
         } else if (state === "Complete") {
             return { name: "success", hex: "#00330e", category: "Complete" };
         } else if (state === "Shutdown") {
