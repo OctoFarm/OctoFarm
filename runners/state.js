@@ -287,7 +287,6 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
         if(farmPrinters[this.index].stateColour.category === "Idle" ||farmPrinters[this.index].stateColour.category === "Complete"){
             Runner.idleCount(this.index)
         }
-        farmPrinters[this.index].stateDescription = "Current Status from OctoPrint";
 
         if (typeof data.current.progress !== 'undefined') {
             farmPrinters[this.index].progress = data.current.progress;
