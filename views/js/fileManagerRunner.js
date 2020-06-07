@@ -87,75 +87,7 @@ class Manager{
         fileList.innerHTML = `
          <div class="row mb-1">
           <div class="col-12">
-            <button id="fileBackBtn" type="button" class="btn btn-success float-right">
-              <i class="fas fa-chevron-left"></i> Back
-            </button>
-            <!-- Split dropright button -->
-             <div class="dropdown mr-3 float-right"
-                   data-jplist-control="dropdown-sort"
-                   data-opened-class="show"
-                   data-group="files"
-                   data-name="data-file"
-                   data-id="data-file">
-                
-                <button
-                        data-type="panel"
-                        class="btn btn-primary dropdown-toggle"
-                        type="button">
-                    Sort by
-                </button>
-                
-                <div
-                        data-type="content"
-                        class="dropdown-menu"
-                        aria-labelledby="dropdownMenuButton">
-                
-                    <a class="dropdown-item"
-                       href="#"
-                       data-path="default">Sort By</a>
-
-                     <a class="dropdown-item"
-                       data-path=".name"
-                       data-order="asc"
-                       data-type="text"
-                       data-value="1"><i class="fas fa-sort-alpha-down"></i> File Name</a>
-                
-                    <a class="dropdown-item"
-                       data-path=".name"
-                       data-order="desc"
-                       data-type="text"
-                       data-value="2"><i class="fas fa-sort-alpha-up"></i> File Name</a>
-                                       
-                    <a class="dropdown-item"
-                       data-path=".time"
-                       data-order="asc"
-                       data-type="number"
-                       data-value="3"><i class="fas fa-sort-numeric-down"></i> Print Time</a>
-                
-                    <a class="dropdown-item"
-                       data-path=".time"
-                       data-order="desc"
-                       data-type="number"
-                       data-value="4"><i class="fas fa-sort-numeric-up"></i> Print Time</a>
-                                       
-                    <a class="dropdown-item"
-                       data-path=".date"
-                       data-order="asc"
-                       data-type="number"
-                       data-value="5"><i class="fas fa-sort-numeric-down"></i> Upload Date</a>
-                
-                    <a class="dropdown-item"
-                       data-path=".date"
-                       data-order="desc"
-                       data-type="number"
-                       data-value="6"><i class="fas fa-sort-numeric-up"></i> Upload Date</a>
-                                                           
-
-                                                           
-
-                          
-                </div>
-            </div>
+         
 
             <label class="btn btn-success float-left mr-1 mb-0" for="fileUploadBtn"><i class="fas fa-file-import"></i> Upload File(s)</label>
             <input id="fileUploadBtn" multiple accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left" id="uploadFileBtn">

@@ -310,6 +310,7 @@ export default class FileManager {
         FileManager.updateFileList(printer._id);
       }
     }
+    jplist.refresh();
   }
   static drawFiles(printer, recursive) {
     let fileElem = document.getElementById("fileList-"+printer._id);
