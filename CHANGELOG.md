@@ -5,16 +5,18 @@ All notable changes to this project will be documented in this file.
 ## [v1.1.5.6]
 
 ### Added
-    - Power button now asks if you'd like to 
+    - Power button now asks for confirmation when switching off
 
 ### Changed
+    - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
 
 ### Removed
 
 ### Deprecated
 
 ### Fixed
-    - Fix file manager bug
+    - Fix file manager bug with default date sorting.
+    - Fixed styling issue with the filters and sorting dropdowns on views making the bar bigger.
 
 
 

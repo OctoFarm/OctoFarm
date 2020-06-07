@@ -57,30 +57,35 @@
                 Current Operations</a>
             </li>
             <% if(page.includes("Camera") || page.includes("List") || page.includes("Panel")){%>
-                <div class="input-group p-0 m-0 mt-3 pr-1 w-50 h-25 mx-auto">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="filterStates">Filter: </label>
-                    </div>
-                    <select class="custom-select " id="filterStates" data-jplist-control="select-filter" data-group="printers" data-name="view-filter" data-id="view-filter-select">
-                        <option selected="" href="#" value="all">All Printers</option>
-                        <option href="#" data-path=".Idle" value="idle">State: Idle</option>
-                        <option href="#" data-path=".Active" value="active">State: Active</option>
-                        <option href="#" data-path=".Complete" value="complete">State: Complete</option>
-                        <option href="#" data-path=".Disconnected" value="disonnected">State: Disconnected</option>
+                <li class="nav-item">
+                    <div class="input-group p-0 m-0 pr-1  mx-auto">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="filterStates">Filter: </label>
+                        </div>
+                        <select class="custom-select " id="filterStates" data-jplist-control="select-filter" data-group="printers" data-name="view-filter" data-id="view-filter-select">
+                            <option selected="" href="#" value="all">All Printers</option>
+                            <option href="#" data-path=".Idle" value="idle">State: Idle</option>
+                            <option href="#" data-path=".Active" value="active">State: Active</option>
+                            <option href="#" data-path=".Complete" value="complete">State: Complete</option>
+                            <option href="#" data-path=".Disconnected" value="disonnected">State: Disconnected</option>
 
-                    </select>
-                </div>
-                <div class="input-group p-0 m-0 mt-3  pr-1 w-25 h-25 mx-auto">
-                    <div class="input-group-prepend">
-                        <label class="input-group-text" for="sortStates">Sort: </label>
+                        </select>
                     </div>
-                    <select class="custom-select " id="sortStates" data-jplist-control="select-sort" data-group="printers" data-name="view-sort" data-id="view-sort-select">
-                        <option href="#" selected="" data-path=".index" data-order="asc" data-type="number" value="index">Index</option>
-                        <option href="#" data-path=".percent" data-order="desc" data-type="number" value="percent">Percent</option>
-                        <option href="#" data-path=".time" data-order="asc" data-type="number" value="time">Time</option>
+                </li>
+                <li class="nav-item">
+                    <div class="input-group p-0 m-0 pr-1 mx-auto">
+                        <div class="input-group-prepend">
+                            <label class="input-group-text" for="sortStates">Sort: </label>
+                        </div>
+                        <select class="custom-select " id="sortStates" data-jplist-control="select-sort" data-group="printers" data-name="view-sort" data-id="view-sort-select">
+                            <option href="#" selected="" data-path=".index" data-order="asc" data-type="number" value="index">Index</option>
+                            <option href="#" data-path=".percent" data-order="desc" data-type="number" value="percent">Percent</option>
+                            <option href="#" data-path=".time" data-order="asc" data-type="number" value="time">Time</option>
 
-                    </select>
-                </div>
+                        </select>
+                    </div>
+                </li>
+
             <% }%>
 
         </ul>

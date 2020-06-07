@@ -79,7 +79,12 @@ class Manager{
         }
     }
     static async updatePrinterList(id){
-        document.getElementById("fileBody").innerHTML = `
+        let fileList = document.getElementById("fileBody");
+        let fileManagerManagement = document.getElementById("fileManagerManagement");
+        if(fileManagerManagement){
+            fileList = fileManagerManagement;
+        }
+        fileList.innerHTML = `
          <div class="row mb-1">
           <div class="col-12">
             <button id="fileBackBtn" type="button" class="btn btn-success float-right">
@@ -175,11 +180,12 @@ class Manager{
           </div>
 
         </div>
-
-        <div id="fileList-${id}" class="list-group" style="max-height:100%; overflow-y:scroll; min-height:1000px;" data-jplist-group="files">
-            
-        </div>
         `
+        document.getElementById("fileBody").insertAdjacentHTML('beforeend', `
+            <div id="fileList-${id}" class="list-group" style="max-height:100%; overflow-y:scroll; min-height:1000px;" data-jplist-group="files">
+                
+            </div>
+        `)
         let printer = await OctoFarmClient.post("printers/printerInfo", {
             i: id
         });
