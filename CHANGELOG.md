@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [v1.1.5.6]
 
 ### Added
+    - Power button now asks if you'd like to 
 
 ### Changed
 

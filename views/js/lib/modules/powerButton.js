@@ -75,10 +75,27 @@ export default class PowerButton {
             if (powerOffPrinter.classList.contains("d-none")) {
                 powerOffPrinter.classList.remove("d-none");
                 powerOffPrinter.addEventListener('click', async event => {
-                    await OctoPrintClient.power(printer, printer.powerSettings.powerOffURL, "Power Off", printer.powerSettings.powerOffCommand);
-                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
-                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
-                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                        bootbox.confirm({
+                            message: "Are you sure you would like to power down your printer?",
+                            buttons: {
+                                confirm: {
+                                    label: 'Yes',
+                                    className: 'btn-success'
+                                },
+                                cancel: {
+                                    label: 'No',
+                                    className: 'btn-danger'
+                                }
+                            },
+                            callback: async function (result) {
+                                if(result){
+                                    await OctoPrintClient.power(printer, printer.powerSettings.powerOffURL, "Power Off", printer.powerSettings.powerOffCommand);
+                                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                                    await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                                }
+                            }
+                        });
                 });
             }
 
@@ -113,10 +130,30 @@ export default class PowerButton {
                 if (powerTogglePrinter.disabled === true) {
                     powerTogglePrinter.disabled = false;
                     powerTogglePrinter.addEventListener('click', async event => {
-                        let status = await OctoPrintClient.power(printer, printer.powerSettings.powerToggleURL, "Power Toggle", printer.powerSettings.powerToggleCommand);
-                        await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
-                        await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
-                        await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                        if(document.getElementById("printerStatus-"+printer._id).style.color === "red" || document.getElementById("printerStatus-"+printer._id).style.color === "black"){
+                            bootbox.confirm({
+                                message: "Are you sure you would like to power down your printer?",
+                                buttons: {
+                                    confirm: {
+                                        label: 'Yes',
+                                        className: 'btn-success'
+                                    },
+                                    cancel: {
+                                        label: 'No',
+                                        className: 'btn-danger'
+                                    }
+                                },
+                                callback: async function (result) {
+                                    if(result){
+                                        let status = await OctoPrintClient.power(printer, printer.powerSettings.powerToggleURL, "Power Toggle", printer.powerSettings.powerToggleCommand);
+                                        await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                                        await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                                        await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                                    }
+                                }
+                            });
+                        }
+
                     });
                 }
             }
