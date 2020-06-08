@@ -320,7 +320,7 @@ export default class PrinterSettings {
         document.getElementById("editProfileBtn").addEventListener('click', event => {
           let profileEdits = document.getElementById("psPrinterProfiles").querySelectorAll('[contenteditable=false]')
           profileEdits.forEach(element => {
-            element.classList.add("Active");
+            element.classList.add("contentEditable");
             element.contentEditable = true;
           })
         });
@@ -817,7 +817,7 @@ export default class PrinterSettings {
             let profileEdits = document.getElementById("psPrinterProfiles").querySelectorAll('[contenteditable=true]')
             profileEdits.forEach(element => {
               element.contentEditable = false;
-              element.classList.remove("Active");
+              element.classList.remove("contentEditable");
             })
           let update = await OctoFarmClient.post("printers/updateSettings", newValues);
           if(update.status === 200){

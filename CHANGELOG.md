@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
     - Fix file manager bug with default date sorting.
     - Fixed styling issue with the filters and sorting dropdowns on views making the bar bigger.
+    - Printer Settings didn't apply new content editable css to fields.
 
 
 
