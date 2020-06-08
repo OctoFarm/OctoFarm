@@ -252,15 +252,15 @@ class PrintersManagement {
           
               <td></td>
         
-              <td><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="plaintext-only">${newPrinter.name}</div></td>
+              <td><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="true">${newPrinter.name}</div></td>
               <td></td>
               <td></td>
               <td></td>
               <td></td>
-              <td><div class="Idle" id="newPrinterGroup-${newPrintersIndex}" contenteditable="plaintext-only">${newPrinter.group}</div></td>
-              <td><div class="Idle" id="newPrinterURL-${newPrintersIndex}" contenteditable="plaintext-only">${newPrinter.printerURL}</td>
-              <td><div class="Idle" id="newPrinterCamURL-${newPrintersIndex}" contenteditable="plaintext-only">${newPrinter.cameraURL}</div></td>
-              <td><div class="Idle" id="newPrinterAPIKEY-${newPrintersIndex}" contenteditable="plaintext-only" >${newPrinter.apikey}</div></td>
+              <td><div class="Idle" id="newPrinterGroup-${newPrintersIndex}" contenteditable="true">${newPrinter.group}</div></td>
+              <td><div class="Idle" id="newPrinterURL-${newPrintersIndex}" contenteditable="true">${newPrinter.printerURL}</td>
+              <td><div class="Idle" id="newPrinterCamURL-${newPrintersIndex}" contenteditable="true">${newPrinter.cameraURL}</div></td>
+              <td><div class="Idle" id="newPrinterAPIKEY-${newPrintersIndex}" contenteditable="true" >${newPrinter.apikey}</div></td>
               <td></td>
               <td></td>
               <td><button id="saveButton-${newPrintersIndex}" type="button" class="btn btn-success btn-sm">
@@ -277,15 +277,15 @@ class PrintersManagement {
         <tr id="newPrinterCard-${newPrintersIndex}">
         <td></td>
 
-        <td><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="plaintext-only">{Leave to Grab from OctoPrint}</div></td>
+        <td><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="true">{Leave to Grab from OctoPrint}</div></td>
         <td></td>
         <td></td>
         <td></td>
         <td></td>
-        <td><div class="Idle" id="newPrinterGroup-${newPrintersIndex}" contenteditable="plaintext-only"></div></td>
-        <td><div class="Idle" id="newPrinterURL-${newPrintersIndex}" contenteditable="plaintext-only"></td>
-        <td><div class="Idle" id="newPrinterCamURL-${newPrintersIndex}" contenteditable="plaintext-only">{Set blank to grab from OctoPrint}</div></td>
-        <td><div class="Idle" id="newPrinterAPIKEY-${newPrintersIndex}" contenteditable="plaintext-only" ></div></td>
+        <td><div class="Idle" id="newPrinterGroup-${newPrintersIndex}" contenteditable="true"></div></td>
+        <td><div class="Idle" id="newPrinterURL-${newPrintersIndex}" contenteditable="true"></td>
+        <td><div class="Idle" id="newPrinterCamURL-${newPrintersIndex}" contenteditable="true">{Set blank to grab from OctoPrint}</div></td>
+        <td><div class="Idle" id="newPrinterAPIKEY-${newPrintersIndex}" contenteditable="true" ></div></td>
         <td></td>
         <td></td>
         <td><button id="saveButton-${newPrintersIndex}" type="button" class="btn btn-success btn-sm">
