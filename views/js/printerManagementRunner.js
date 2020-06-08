@@ -246,23 +246,18 @@ class PrintersManagement {
     }
     static addPrinter(newPrinter) {
         //Insert Blank Row at top of printer list
+        if(document.getElementById("printerNewTable").classList.contains("d-none")){
+            document.getElementById("printerNewTable").classList.remove("d-none");
+        }
+
         if (typeof newPrinter !== 'undefined') {
-            document.getElementById("printerList").insertAdjacentHTML("beforebegin", `
+            document.getElementById("printerNewList").insertAdjacentHTML("beforebegin", `
          <tr id="newPrinterCard-${newPrintersIndex}">
-          
-              <td></td>
-        
               <td><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="true">${newPrinter.name}</div></td>
-              <td></td>
-              <td></td>
-              <td></td>
-              <td></td>
               <td><div class="Idle" id="newPrinterGroup-${newPrintersIndex}" contenteditable="true">${newPrinter.group}</div></td>
               <td><div class="Idle" id="newPrinterURL-${newPrintersIndex}" contenteditable="true">${newPrinter.printerURL}</td>
               <td><div class="Idle" id="newPrinterCamURL-${newPrintersIndex}" contenteditable="true">${newPrinter.cameraURL}</div></td>
               <td><div class="Idle" id="newPrinterAPIKEY-${newPrintersIndex}" contenteditable="true" >${newPrinter.apikey}</div></td>
-              <td></td>
-              <td></td>
               <td><button id="saveButton-${newPrintersIndex}" type="button" class="btn btn-success btn-sm">
                       <i class="fas fa-save"></i>
                   </button></td>
@@ -273,21 +268,13 @@ class PrintersManagement {
           </tr>
   `)
         } else {
-            document.getElementById("printerList").insertAdjacentHTML("beforebegin", `
+            document.getElementById("printerNewList").insertAdjacentHTML("beforebegin", `
         <tr id="newPrinterCard-${newPrintersIndex}">
-        <td></td>
-
         <td><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="true">{Leave to Grab from OctoPrint}</div></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
         <td><div class="Idle" id="newPrinterGroup-${newPrintersIndex}" contenteditable="true"></div></td>
         <td><div class="Idle" id="newPrinterURL-${newPrintersIndex}" contenteditable="true"></td>
         <td><div class="Idle" id="newPrinterCamURL-${newPrintersIndex}" contenteditable="true">{Set blank to grab from OctoPrint}</div></td>
         <td><div class="Idle" id="newPrinterAPIKEY-${newPrintersIndex}" contenteditable="true" ></div></td>
-        <td></td>
-        <td></td>
         <td><button id="saveButton-${newPrintersIndex}" type="button" class="btn btn-success btn-sm">
                 <i class="fas fa-save"></i>
             </button></td>
@@ -413,7 +400,12 @@ class PrintersManagement {
         } else {
             event.parentElement.parentElement.parentElement.remove();
         }
-
+        let table = document.getElementById("printerNewTable");
+        if(table.rows.length === 2){
+            if(!table.classList.contains("d-none")){
+                table.classList.add("d-none")
+            }
+        }
     }
     static async savePrinter(event) {
         //Gather the printer data...
@@ -478,6 +470,12 @@ class PrintersManagement {
                 UI.createAlert("error", "Something went wrong updating the Server...", 3000, "Clicked")
                 saveButton.innerHTML = '<i class=\"fas fa-save\"></i>';
                 saveButton.disabled = false;
+            }
+        }
+        let table = document.getElementById("printerNewTable");
+        if(table.rows.length === 2){
+            if(!table.classList.contains("d-none")){
+                table.classList.add("d-none")
             }
         }
     }

@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
     - Power button now asks for confirmation when switching off
+    - Seperate smaller width table for adding printers. Should help with adding printers on a smaller screen laptop. 
 
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
