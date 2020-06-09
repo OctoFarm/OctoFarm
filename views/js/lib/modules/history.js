@@ -172,12 +172,17 @@ export default class History {
       estimatedPrintTime.value = " - ";
       averagePrintTime.value = " - ";
       lastPrintTime.value = " - ";
+      let thumbnail = document.getElementById("history-thumbnail");
+      thumbnail.innerHTML = "";
       let index = _.findIndex(historyList.history, function(o) {
         return o._id == e.target.id;
       });
       let current = historyList.history[index].printHistory;
       printerName.innerHTML = current.printerName;
       fileName.innerHTML = current.fileName;
+      if(typeof current.thumbnail !== 'undefined' && current.thumbnail != null){
+        thumbnail.innerHTML = `<center><img src="${current.thumbnail}" class="historyImage mb-2"></center>`
+      }
       if (current.success) {
         status.innerHTML =
           '<i class="fas fa-thumbs-up text-success fa-3x"></i>';

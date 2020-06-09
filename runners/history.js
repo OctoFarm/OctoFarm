@@ -34,7 +34,7 @@ class HistoryCollection {
     await spool.save();
     return spool
   }
-  static async complete(payload, printer, job) {
+  static async complete(payload, printer, job, files) {
     try{
       let serverSettings = await ServerSettings.find({});
       let previousFilament = JSON.parse(JSON.stringify(printer.selectedFilament));
@@ -91,6 +91,15 @@ class HistoryCollection {
           counter = historyCollection[historyCollection.length-1].printHistory.historyIndex + 1
         }
 
+      //grab Thumbnail if available.
+      let thumbnail = null;
+      let currentFileIndex = _.findIndex(files, function(o) { return o.name == payload.name; });
+      if(currentFileIndex > -1){
+        if(typeof files[currentFileIndex] !== 'undefined' && files[currentFileIndex].thumbnail != null){
+          thumbnail = files[currentFileIndex].thumbnail;
+        }
+      }
+
       let printHistory = {
         historyIndex: counter,
         printerName: name,
@@ -102,6 +111,7 @@ class HistoryCollection {
         filePath: payload.path,
         startDate: startDate,
         endDate: endDate,
+        thumbnail: printer.printerURL + "/" + thumbnail,
         printTime: Math.round(payload.time),
         filamentSelection: printer.selectedFilament,
         previousFilamentSelection: previousFilament,
@@ -120,7 +130,7 @@ class HistoryCollection {
     }
 
   }
-  static async failed(payload, printer, job) {
+  static async failed(payload, printer, job, files) {
     try {
       let serverSettings = await ServerSettings.find({});
       let previousFilament = JSON.parse(JSON.stringify(printer.selectedFilament));
@@ -176,6 +186,14 @@ class HistoryCollection {
       } else {
         counter = historyCollection[historyCollection.length - 1].printHistory.historyIndex + 1
       }
+      //grab Thumbnail if available.
+      let thumbnail = null;
+      let currentFileIndex = _.findIndex(files, function(o) { return o.name == payload.name; });
+      if(currentFileIndex > -1){
+        if(typeof files[currentFileIndex] !== 'undefined' && files[currentFileIndex].thumbnail != null){
+          thumbnail = files[currentFileIndex].thumbnail;
+        }
+      }
 
       let printHistory = {
         historyIndex: counter,
@@ -188,6 +206,7 @@ class HistoryCollection {
         filePath: payload.path,
         startDate: startDate,
         endDate: endDate,
+        thumbnail: printer.printerURL + "/" + thumbnail,
         printTime: Math.round(payload.time),
         filamentSelection: printer.selectedFilament,
         previousFilamentSelection: previousFilament,
@@ -204,7 +223,7 @@ class HistoryCollection {
       logger.error(e, "Failed to capture history for " + printer.printerURL);
     }
   }
-    static async errorLog(payload, printer, job) {
+    static async errorLog(payload, printer, job, files) {
       try{
         let name = null;
         if (typeof printer.settingsApperance != "undefined") {
@@ -239,7 +258,14 @@ class HistoryCollection {
         }else{
           errorCounter = errorCollection[errorCollection.length-1].errorLog.historyIndex + 1
         }
-
+        //grab Thumbnail if available.
+        let thumbnail = null;
+        let currentFileIndex = _.findIndex(files, function(o) { return o.name == payload.name; });
+        if(currentFileIndex > -1){
+          if(typeof files[currentFileIndex] !== 'undefined' && files[currentFileIndex].thumbnail != null){
+            thumbnail = files[currentFileIndex].thumbnail;
+          }
+        }
         let errorLog = {
           historyIndex: errorCounter,
           printerIndex: printer.index,
@@ -249,6 +275,7 @@ class HistoryCollection {
           reason: payload.error,
           startDate: startDate,
           endDate: endDate,
+          thumbnail: printer.printerURL + "/" + thumbnail,
           printTime: Math.round(payload.time),
           job: job,
           notes: ""

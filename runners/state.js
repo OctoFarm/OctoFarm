@@ -333,8 +333,10 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
                 sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
                 let job = {}
                 job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
+                let files = {};
+                files = JSON.parse(JSON.stringify(farmPrinters[that.index].fileList.files))
                 //Register cancelled print...
-                await HistoryCollection.failed(data.event.payload, sendPrinter, job);
+                await HistoryCollection.failed(data.event.payload, sendPrinter, job, files);
                 await Runner.updateFilament();
             }, 10000);
             ScriptRunner.check(farmPrinters[that.index], "failed")
@@ -347,8 +349,10 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
                 sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
                 let job = {}
                 job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
+                let files = {};
+                files = JSON.parse(JSON.stringify(farmPrinters[that.index].fileList.files))
                 //Register cancelled print...
-                await HistoryCollection.complete(data.event.payload, sendPrinter, job);
+                await HistoryCollection.complete(data.event.payload, sendPrinter, job, files);
                 await Runner.updateFilament();
             }, 10000);
             ScriptRunner.check(farmPrinters[that.index], "done")
@@ -360,11 +364,13 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
                 let sendPrinter = {};
                 sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
                 let job = {}
+                let files = {};
+                files = JSON.parse(JSON.stringify(farmPrinters[that.index].fileList.files))
                 if(farmPrinters[that.index].job){
                     job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
                 }
                 //Register cancelled print...
-                await HistoryCollection.errorLog(data.event.payload, sendPrinter, job);
+                await HistoryCollection.errorLog(data.event.payload, sendPrinter, job, files);
                 await Runner.updateFilament();
             }, 10000);
             ScriptRunner.check(farmPrinters[that.index], "error");
