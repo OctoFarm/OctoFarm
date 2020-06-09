@@ -119,6 +119,7 @@ export default class PrinterManager {
           camURL = printer.camURL;
         }else{
           camURL = "../../../images/noCamera.jpg";
+
         }
 
 
@@ -659,7 +660,15 @@ export default class PrinterManager {
           `;
         document.getElementById("printerControlCamera").src = camURL;
         document.getElementById("printerIndex").innerHTML = printer._id;
+        if (typeof printer.job != "undefined" && printer.job.file.name != null) {
+          let camField = document.getElementById("printerControlCamera");
+          if (camField.src.includes("localhost") || camField.src.includes("none")) {
+            if (typeof printer.job.file.thumbnail !== 'undefined' || printer.job.file.thumbnail != null) {
+              camField.src = printer.printerURL + "/" + printer.job.file.thumbnail
+            }
+          }
 
+        }
         let filamentDropDown = await returnDropDown();
         let pmFilamentDrop = document.getElementById("filamentManagerFolderSelect")
         pmFilamentDrop.innerHTML = "";
@@ -1226,6 +1235,12 @@ export default class PrinterManager {
     elements.mainPage.status.innerHTML = printer.state;
     elements.mainPage.status.className = `btn btn-${printer.stateColour.name} mb-2`;
     let dateComplete = null;
+    if (typeof printer.job != "undefined" && printer.job.file.name != null) {
+      let camField = document.getElementById("printerControlCamera");
+        if (typeof printer.job.file.thumbnail !== 'undefined' || printer.job.file.thumbnail != null) {
+          camField.src = printer.printerURL + "/" + printer.job.file.thumbnail
+        }
+    }
     if (typeof printer.progress !== "undefined" && printer.progress.printTimeLeft !== null) {
 
       let currentDate = new Date();

@@ -14,6 +14,9 @@ All notable changes to this project will be documented in this file.
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
     - Thumbnails if available are now captured when logging history for any file.
     - Panel view now shows file thumbnail if available and no camera is set.
+    - Printer Control window now shows file thumbnail if available on selected job.
+    - State runner now updates octoprint job information with the selected thumbnail.
+    
 ### Removed
 
 ### Deprecated
