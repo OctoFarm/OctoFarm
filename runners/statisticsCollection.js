@@ -431,12 +431,54 @@ class StatisticsCollection {
 
 
         let failedTimeTotal = []
+        let farmCounts = [];
         currentHistory.forEach(history => {
             if(history.printHistory.success === false) {
                 failedTimeTotal.push(history.printHistory.printTime)
             }
-        })
+            //if farm counts contains printer name...
+            if(farmCounts.length === 0){
+                //No records create first...
+                let record = {
+                    printerName: history.printHistory.printerName,
+                    success: [history.printHistory.success],
+                }
+                if(!history.printHistory.success){
+                    record.reason = [history.printHistory.printerName]
+                }
+                farmCounts.push(record);
+            }else {
+                //Search for record
+                let index = _.findIndex(farmCounts, function (o) {
+                    return o.printerName == history.printHistory.printerName;
+                });
+                if (index < 0) {
+                    //If no index exists, create record
+                    let record = {
+                        printerName: history.printHistory.printerName,
+                        success: [history.printHistory.success],
+                    }
+                    if (!history.printHistory.success) {
+                        record.reason = [history.printHistory.reason]
+                    }
+                    farmCounts.push(record);
+                } else {
+                    //Index exists update record...
+                    farmCounts[index].success.push(history.printHistory.success)
+                    if (!history.printHistory.success) {
+                        if(typeof farmCounts[index].reason === 'undefined'){
+                            farmCounts[index].reason = [history.printHistory.reason]
+                        }else{
+                            farmCounts[index].reason.push(history.printHistory.reason)
+                        }
 
+
+                    }
+
+                }
+                //
+            }
+        })
 
         dateNow = dateNow.getTime();
         farmPrinters.forEach(printer => {
@@ -474,6 +516,7 @@ class StatisticsCollection {
         octofarmStatistics.idlePercent = idlePercent;
         octofarmStatistics.downPercent = downPercent;
         octofarmStatistics.offlinePercent = offlinePercent;
+        octofarmStatistics.printerCounts = farmCounts;
         // let timeSpan = dateNow - printer.dateAdded;
         // let percentUp = printer.currentUptime / timeSpan * 100;
         // percentUp = percentUp.toFixed(2)+"%"

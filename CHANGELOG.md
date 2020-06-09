@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
     - Seperate smaller width table for adding printers. Should help with adding printers on a smaller screen laptop. 
     - Thumbnail to history view modal.
     - Added percent bar for Status on History Filters. Will show total failed/success/cancelled percentages on filtered results. 
+    - Added a utilisation column to printers management table
     
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
@@ -16,7 +17,7 @@ All notable changes to this project will be documented in this file.
     - Panel view now shows file thumbnail if available and no camera is set.
     - Printer Control window now shows file thumbnail if available on selected job.
     - State runner now updates octoprint job information with the selected thumbnail.
-    
+    - Started counting individual printer error/cancelled/success ratio
 ### Removed
 
 ### Deprecated
@@ -27,7 +28,7 @@ All notable changes to this project will be documented in this file.
     - Printer Settings didn't apply new content editable css to fields.
     - Fixed issue with websockets not been gracefully closed. Should help with double alerts/history notifications after editing/changing a printer meta.
 
-
+## [Released]
 
 ## [v1.1.5.5]
 
@@ -397,8 +398,6 @@ All notable changes to this project will be documented in this file.
     - Fixed spacing icon on temperature displays
     - Fixed views not updating temperature for complete/idle printers.
     - Fixed cameras not applying multiple rotate settings
-
-## [Released]
 
 ## [v1.1.4-6-bugfix]
 

@@ -38,7 +38,7 @@ source.onmessage = async function(e) {
                         PrinterSettings.init(res.printerInfo);
                     } else {
                         printerInfo = res.printerInfo;
-                        dashUpdate.printers(res.printerInfo)
+                        dashUpdate.printers(res.printerInfo, res.octofarmStatistics.printerCounts)
                         if(powerTimer >= 20000){
                             res.printerInfo.forEach(printer => {
                                 PowerButton.applyBtn(printer);
@@ -682,7 +682,7 @@ class dashActions {
 }
 
 class dashUpdate {
-    static printers(printers) {
+    static printers(printers, printerStatus) {
         printers.forEach((printer) => {
             let printerName = "";
             if (typeof printer.stateColour != "undefined") {
@@ -704,6 +704,40 @@ class dashUpdate {
                     let printerAPIKey = document.getElementById("printerApiKey-" + printer._id);
                     let printerOctoPrintVersion = document.getElementById("printerOctoPrintVersion-" + printer._id);
                     let printerSortIndex = document.getElementById("printerSortIndex-"+printer._id)
+                    let printerSuccess = document.getElementById("printerSuccess-"+printer._id);
+                    let printerCancelled = document.getElementById("printerCancelled-"+printer._id);
+                    let printerFailed = document.getElementById("printerFailure-"+printer._id);
+                    let statusIndex = _.findIndex(printerStatus, function(o) { return o.printerName == Validate.getName(printer); });
+                    let totalSuccess = []
+                    let totalCancelled = [];
+                    let totalFailed = [];
+                    if(statusIndex > 0){
+                        printerStatus[statusIndex].success.forEach((state, index) => {
+                            if(state){
+                                totalSuccess.push("success");
+                            }else{
+                                if(printerStatus[statusIndex].reason[index] === "cancelled"){
+                                    totalCancelled.push("cancelled")
+                                }else{
+                                    totalFailed.push("failed")
+                                }
+
+                            }
+                        })
+                        let total = totalSuccess.length + totalCancelled.length + totalFailed.length
+                        let successPercent = (totalSuccess.length / total) * 100;
+                        let failedPercent = (totalFailed.length / total) * 100;
+                        let cancelledPercent = (totalCancelled.length / total) * 100;
+                        printerSuccess.style.width = successPercent.toFixed(2)+"%";
+                        printerCancelled.style.width = cancelledPercent.toFixed(2)+"%";
+                        printerFailed.style.width = failedPercent.toFixed(2)+"%";
+                        let titleString = `Success: ${successPercent.toFixed(0)}% / Cancelled: ${cancelledPercent.toFixed(0)}% / Failed: ${failedPercent.toFixed(0)}%`
+                        printerSuccess.setAttribute('title', titleString)
+                        printerCancelled.setAttribute('title', titleString)
+                        printerFailed.setAttribute('title', titleString)
+
+                    }
+
                     printerSortIndex.innerHTML = printer.sortIndex;
                     printerGroup.innerHTML = printer.group;
                     printerURL.innerHTML = printer.printerURL;
@@ -802,6 +836,44 @@ class dashUpdate {
         <td><div id="printerCamURL-${printer._id}" contenteditable="false"></div></td>
         <td><div id="printerApiKey-${printer._id}" contenteditable="false"></div></td>
         <th id="printerOctoPrintVersion-${printer._id}"></td>
+                <td ><div>
+                <div id="printerStatus-${printer._id}" class="progress mb-0">
+          <div
+           id="printerSuccess-${printer._id}"
+            class="progress-bar progress-bar-striped bg-success"
+            role="progressbar"
+            style="width:          0% "
+            aria-valuenow="           0%"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+       
+          </div>
+          <div
+           id="printerCancelled-${printer._id}"
+            class="progress-bar progress-bar-striped bg-warning"
+            role="progressbar"
+            style="width:           0% "
+            aria-valuenow="          0%"
+            aria-valuemin="0"
+            aria-valuemax="100"
+          >
+                
+          </div>
+          <div
+           id="printerFailure-${printer._id}"
+          class="progress-bar progress-bar-striped bg-danger"
+          role="progressbar"
+          style="width:           0% "
+          aria-valuenow="          0%"
+          aria-valuemin="0"
+          aria-valuemax="100"
+        >
+
+        </div>
+        </div>
+        
+</div></td>
         <td><button id="deleteButton-${printer._id}" type="button" class="btn btn-danger btn-sm d-none">
                 <i class="fas fa-trash"></i>
             </button></td>
