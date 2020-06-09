@@ -345,6 +345,9 @@ export default class History {
     let printerCost = [];
     let usageG = [];
     let usageL = [];
+    let statesCancelled = [];
+    let statesFailed = [];
+    let statesSuccess = [];
       filtered.forEach(row => {
         times.push(parseInt(row.getElementsByClassName("time")[0].innerText))
         if(!isNaN(parseFloat(row.getElementsByClassName("cost")[0].innerText))){
@@ -353,6 +356,18 @@ export default class History {
         if(!isNaN(parseFloat(row.getElementsByClassName("printerCost")[0].innerText))){
           printerCost.push(parseFloat(row.getElementsByClassName("printerCost")[0].innerText))
         }
+        console.log(row.getElementsByClassName("stateText")[0])
+        let stateText = row.getElementsByClassName("stateText")[0].innerText.trim();
+        console.log(stateText)
+        if(stateText === "Cancelled"){
+          statesCancelled.push(stateText)
+        }
+        if(stateText === "Failure"){
+          statesFailed.push(stateText)
+        }
+        if(stateText === "Success"){
+          statesSuccess.push(stateText)
+        }
         if(row.getElementsByClassName("usage")[0].innerText !== ""){
           let split = row.getElementsByClassName("usage")[0].innerText.split("/")
           usageL.push(parseFloat(split[0]))
@@ -360,6 +375,24 @@ export default class History {
         }
 
       })
+    console.log(statesCancelled)
+    let total = statesCancelled.length + statesFailed.length + statesSuccess.length;
+      console.log(total)
+    let cancelledPercent = (statesCancelled.length / total) * 100;
+    let failurePercent = (statesFailed.length / total) * 100;
+    let successPercent = (statesSuccess.length / total) * 100;
+
+    console.log(cancelledPercent, failurePercent, successPercent)
+
+    let failure = document.getElementById("totalFailurePercent")
+    failure.style.width = failurePercent.toFixed(2)+"%";
+    failure.innerHTML = failurePercent.toFixed(2)+"%";
+    let success = document.getElementById("totalSuccessPercent")
+    success.style.width = successPercent.toFixed(2)+"%";
+    success.innerHTML = successPercent.toFixed(2)+"%";
+    let cancelled = document.getElementById("totalCancelledPercent")
+    cancelled.style.width = cancelledPercent.toFixed(2)+"%";
+    cancelled.innerHTML = cancelledPercent.toFixed(2)+"%";
     document.getElementById("totalCost").innerHTML = cost.reduce((a, b) => a + b, 0).toFixed(2)
     document.getElementById("totalFilament").innerHTML = usageL.reduce((a, b) => a + b, 0).toFixed(2) + "m / " + usageG.reduce((a, b) => a + b, 0).toFixed(2)+ "g"
     let totalTimes = times.reduce((a, b) => a + b, 0)
