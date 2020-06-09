@@ -196,8 +196,8 @@ WebSocketClient.prototype.open = function(url, index) {
                 try {
                     farmPrinters[this.index].state = "Re-Sync";
                     farmPrinters[this.index].stateColour = Runner.getColour("Offline");
-                    farmPrinters[this.index].hostState = "Error";
-                    farmPrinters[this.index].hostStateColour = Runner.getColour("Error");
+                    farmPrinters[this.index].hostState = "Offline";
+                    farmPrinters[this.index].hostStateColour = Runner.getColour("Offline");
                     farmPrinters[this.index].webSocket = "danger";
                     farmPrinters[this.index].stateDescription = "Hard Failure, please Re-Sync when Online";
                     farmPrinters[this.index].hostDescription = "Hard Failure, please Re-Sync when Online";
@@ -206,6 +206,7 @@ WebSocketClient.prototype.open = function(url, index) {
                     logger.info("Couldn't set state of missing printer, safe to ignore: " + this.index + ": " + this.url)
                 }
                 logger.error("WebSocket hard failure: " + this.index + ": " + this.url);
+                this.onerror(e);
                 break;
         }
     });
@@ -561,8 +562,8 @@ class Runner {
         } catch (e) {
             switch (e.code) {
                 case 'NO-API':
-                    logger.error(e.message, "Couldn't grab initial connection for Printer: " + farmPrinters[i].printerURL);
                     try {
+                        logger.error(e.message, "Couldn't grab initial connection for Printer: " + farmPrinters[i].printerURL);
                         farmPrinters[i].state = "No-API";
                         farmPrinters[i].stateColour = Runner.getColour("No-API");
                         farmPrinters[i].hostState = "Online";
@@ -577,8 +578,9 @@ class Runner {
                     setTimeout(function() { Runner.setupWebSocket(id); }, timeout.apiRetry);
                     break;
                 case 'ECONNREFUSED':
-                    logger.error(e.message, "Couldn't grab initial connection for Printer: " + farmPrinters[i].printerURL);
+
                     try {
+                        logger.error(e.message, "Couldn't grab initial connection for Printer: " + farmPrinters[i].printerURL);
                         farmPrinters[i].state = "Offline";
                         farmPrinters[i].stateColour = Runner.getColour("Offline");
                         farmPrinters[i].hostState = "Online";
@@ -596,8 +598,8 @@ class Runner {
                     logger.error(e.message, "Printer Deleted... Do not retry to connect");
                     break;
                 default:
-                    logger.error(e.message, "Couldn't grab initial connection for Printer: " + farmPrinters[i].printerURL);
                     try {
+                        logger.error(e.message, "Couldn't grab initial connection for Printer: " + farmPrinters[i].printerURL);
                         farmPrinters[i].state = "Offline";
                         farmPrinters[i].stateColour = Runner.getColour("Offline");
                         farmPrinters[i].hostState = "Shutdown";
@@ -836,8 +838,9 @@ class Runner {
             );
             if (typeof farmPrinters[i].ws != 'undefined' && typeof farmPrinters[i].ws.instance != 'undefined') {
                 await farmPrinters[i].ws.throttle(JSON.stringify(throt));
+                this.reScanOcto(farmPrinters[i]._id, true);
                 logger.info("ReScanning Octoprint instance");
-                await this.reScanOcto(farmPrinters[i]._id);
+
             }
         }
         return "updated";
