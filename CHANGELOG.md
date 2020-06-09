@@ -8,10 +8,12 @@ All notable changes to this project will be documented in this file.
     - Power button now asks for confirmation when switching off
     - Seperate smaller width table for adding printers. Should help with adding printers on a smaller screen laptop. 
     - Thumbnail to history view modal.
+    - Added percent bar for Status on History Filters. Will show total failed/success/cancelled percentages on filtered results. 
+    
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
     - Thumbnails if available are now captured when logging history for any file.
-
+    - Panel view now shows file thumbnail if available and no camera is set.
 ### Removed
 
 ### Deprecated

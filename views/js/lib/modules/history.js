@@ -356,9 +356,7 @@ export default class History {
         if(!isNaN(parseFloat(row.getElementsByClassName("printerCost")[0].innerText))){
           printerCost.push(parseFloat(row.getElementsByClassName("printerCost")[0].innerText))
         }
-        console.log(row.getElementsByClassName("stateText")[0])
         let stateText = row.getElementsByClassName("stateText")[0].innerText.trim();
-        console.log(stateText)
         if(stateText === "Cancelled"){
           statesCancelled.push(stateText)
         }
@@ -375,15 +373,10 @@ export default class History {
         }
 
       })
-    console.log(statesCancelled)
     let total = statesCancelled.length + statesFailed.length + statesSuccess.length;
-      console.log(total)
     let cancelledPercent = (statesCancelled.length / total) * 100;
     let failurePercent = (statesFailed.length / total) * 100;
     let successPercent = (statesSuccess.length / total) * 100;
-
-    console.log(cancelledPercent, failurePercent, successPercent)
-
     let failure = document.getElementById("totalFailurePercent")
     failure.style.width = failurePercent.toFixed(2)+"%";
     failure.innerHTML = failurePercent.toFixed(2)+"%";

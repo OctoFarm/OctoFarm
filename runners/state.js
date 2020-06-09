@@ -296,8 +296,15 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
             farmPrinters[this.index].currentZ = data.current.currentZ;
         }
         if (typeof data.current.job !== 'undefined' && data.current.job.user !== null) {
-            //console.log(data.current.job)
             farmPrinters[this.index].job = data.current.job;
+
+            let currentFileIndex = _.findIndex(farmPrinters[this.index].fileList.files, function(o) { return o.name == data.current.job.file.name; });
+            if(currentFileIndex > -1){
+                if(typeof farmPrinters[this.index].fileList.files[currentFileIndex] !== 'undefined' && farmPrinters[this.index].fileList.files[currentFileIndex].thumbnail != null){
+                    farmPrinters[this.index].job.file.thumbnail = farmPrinters[this.index].fileList.files[currentFileIndex].thumbnail;
+                }
+            }
+
         }
 
         if (typeof data.current.logs != undefined) {

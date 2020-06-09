@@ -251,10 +251,18 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
         elements.eta.innerHTML = "N/A"
       }
     }
+
     if (typeof printer.job != "undefined" && printer.job.file.name != null) {
       elements.currentFile.setAttribute("title", printer.job.file.path)
       elements.currentFile.innerHTML =
           '<i class="fas fa-file-code"></i> ' + printer.job.file.name;
+      let camField = document.getElementById("panCamera-"+printer._id);
+      if(camField.src.includes("localhost") || camField.src.includes("none")){
+        if(typeof printer.job.file.thumbnail !== 'undefined' || printer.job.file.thumbnail != null ){
+          camField.src = printer.printerURL + "/" + printer.job.file.thumbnail
+        }
+      }
+
     } else {
       elements.currentFile.innerHTML =
           '<i class="fas fa-file-code"></i> ' + "No File Selected";
