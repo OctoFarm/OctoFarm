@@ -220,7 +220,6 @@ export default class Script {
             message: newAlert.message,
             printer: []
         }
-        console.log(opts)
         let post = await OctoFarmclient.post("scripts/save", opts);
         post = await post.json();
         if(post.status !== 200){
@@ -235,7 +234,6 @@ export default class Script {
         post = await post.json();
         if(post.status === 200){
             UI.createAlert("error", "Failed to delete your alert.", 3000, "Clicked")
-            console.log(document.getElementById("alertList-"+id))
             document.getElementById("alertList-"+id).remove();
         }else{
             UI.createAlert("success", "Successfully deleted your alert.", 3000, "Clicked")
