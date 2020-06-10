@@ -1240,7 +1240,7 @@ export default class PrinterManager {
     let dateComplete = null;
     if (typeof printer.job != "undefined" && printer.job.file.name != null) {
       let camField = document.getElementById("printerControlCamera");
-      if(printer.camURL !== 'undefined'){
+      if(typeof printer.camURL != "undefined" && printer.camURL.includes("http")){
         if (typeof printer.job.file.thumbnail !== 'undefined' || printer.job.file.thumbnail != null) {
           camField.src = printer.printerURL + "/" + printer.job.file.thumbnail
         }
