@@ -24,10 +24,11 @@ export default class PowerButton {
         return powerBtn
     }
     static async applyBtn(printer) {
+        console.log(printer.powerSettings)
         if (typeof printer.settingsServer !== 'undefined' && !document.getElementById("printerPower-" + printer._id)) {
-            if (printer.settingsServer.commands.serverRestartCommand !== "" || printer.settingsServer.commands.systemRestartCommand !== "" || printer.settingsServer.commands.systemShutdownCommand !== "") {
+            if (printer.settingsServer.commands.serverRestartCommand !== "" && printer.settingsServer.commands.serverRestartCommand !== null || printer.settingsServer.commands.systemRestartCommand !== "" && printer.settingsServer.commands.systemRestartCommand !== null || printer.settingsServer.commands.systemShutdownCommand !== "" && printer.settingsServer.commands.systemShutdownCommand !== null) {
                 document.getElementById("powerBtn-" + printer._id).innerHTML = PowerButton.returnPowerBtn(printer);
-                if (printer.settingsServer.commands.serverRestartCommand !== "") {
+                if (printer.settingsServer.commands.serverRestartCommand !== "" && printer.settingsServer.commands.serverRestartCommand !== null) {
                     let restartOctoPrint = document.getElementById("printerRestartOctoPrint-" + printer._id)
                     restartOctoPrint.classList.remove("d-none")
                     restartOctoPrint.addEventListener('click', event => {
@@ -35,7 +36,7 @@ export default class PowerButton {
 
                     });
                 }
-                if (printer.settingsServer.commands.systemRestartCommand !== "") {
+                if (printer.settingsServer.commands.systemRestartCommand !== "" && printer.settingsServer.commands.systemRestartCommand !== null) {
                     let restartHost = document.getElementById("printerRestartHost-" + printer._id)
                     restartHost.classList.remove("d-none");
                     restartHost.addEventListener('click', event => {
@@ -43,7 +44,7 @@ export default class PowerButton {
                     });
                 }
 
-                if (printer.settingsServer.commands.systemShutdownCommand !== "") {
+                if (printer.settingsServer.commands.systemShutdownCommand !== "" && printer.settingsServer.commands.systemShutdownCommand !== null) {
                     let shutdownHost = document.getElementById("printerShutdownHost-" + printer._id)
                     shutdownHost.classList.remove("d-none");
                     shutdownHost.addEventListener('click', event => {
@@ -67,6 +68,7 @@ export default class PowerButton {
     }
     static async powerButtons(printer) {
         let divider = document.getElementById("printerDropDownMaker-" + printer._id)
+        console.log(printer.powerSettings)
         if (printer.powerSettings.powerOffURL !== "") {
             if (divider.classList.contains("d-none")) {
                 divider.classList.remove("d-none")
