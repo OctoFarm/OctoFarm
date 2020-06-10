@@ -307,6 +307,9 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
                 if(typeof farmPrinters[this.index].fileList.files[currentFileIndex] !== 'undefined' && farmPrinters[this.index].fileList.files[currentFileIndex].thumbnail != null){
                     farmPrinters[this.index].job.file.thumbnail = farmPrinters[this.index].fileList.files[currentFileIndex].thumbnail;
                 }
+                if(typeof farmPrinters[this.index].fileList.files[currentFileIndex] !== 'undefined'){
+                    farmPrinters[this.index].job.file.length = farmPrinters[this.index].fileList.files[currentFileIndex].length;
+                }
             }
 
         }
@@ -918,7 +921,6 @@ class Runner {
                         if (typeof entry.gcodeAnalysis !== 'undefined') {
                             if (typeof entry.gcodeAnalysis.estimatedPrintTime !== 'undefined') {
                                 timeStat = entry.gcodeAnalysis.estimatedPrintTime;
-
                                 filament = entry.gcodeAnalysis.filament.tool0.length;
                             } else {
                                 timeStat = "No Time Estimate";

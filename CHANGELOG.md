@@ -2,6 +2,8 @@
 
 All notable changes to this project will be documented in this file.
 
+# [UnReleased]
+
 ## [v1.1.5.6]
 
 ### Added
@@ -10,22 +12,25 @@ All notable changes to this project will be documented in this file.
     - Thumbnail to history view modal.
     - Added percent bar for Status on History Filters. Will show total failed/success/cancelled percentages on filtered results. 
     - Added a utilisation column to printers management table
+    - Added Placeholders to file actions on file list
     
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
     - Thumbnails if available are now captured when logging history for any file.
     - Panel view now shows file thumbnail if available and no camera is set.
     - Printer Control window now shows file thumbnail if available on selected job.
-    - State runner now updates octoprint job information with the selected thumbnail.
+    - State runner now updates octoprint job information with the selected thumbnail and filament length so this information can be used on the client.
     - Started counting individual printer error/cancelled/success ratio
     - Re-configured the printer control view:
         - Moved all the elements into new positions. Hopefully this brings more focus on what's used all the time, and it also allows for upcoming modifications to see extra tools/chamber temperatures. 
         - Converted Terminal input to multi-line input
+    - File List now shows actions buttons as bar across bottom of file.
+    - database configuration now defaults to localhost address for db uri.
+    - The File list now shows Filament Cost and Printer Cost seperate. 
+        - Filament Cost requires a filament to be selected to generate. Re-Sync to update.  
+        - Printer Cost requires your printer costs been filled in in Printer Settings and also requires an expected time to be generated. 
+       
     
-### Removed
-
-### Deprecated
-
 ### Fixed
     - Fix file manager bug with default date sorting.
     - Fixed styling issue with the filters and sorting dropdowns on views making the bar bigger.
@@ -35,6 +40,8 @@ All notable changes to this project will be documented in this file.
     - Fixed issue with sorting breaking fullscreen elements
     - Fixed bug with filament manager not turning off editable styling
     - Fixed issue with profiles not saving on filemant manager
+    - Fixed bug with file manager resetting page scroll when entering folder/choosing printer
+    
 ## [Released]
 
 ## [v1.1.5.5]
