@@ -132,6 +132,7 @@ export default class PowerButton {
                 if (powerTogglePrinter.disabled === true) {
                     powerTogglePrinter.disabled = false;
                     powerTogglePrinter.addEventListener('click', async event => {
+
                         if(document.getElementById("printerStatus-"+printer._id).style.color === "red" || document.getElementById("printerStatus-"+printer._id).style.color === "black"){
                             bootbox.confirm({
                                 message: "Are you sure you would like to power down your printer?",
@@ -154,6 +155,11 @@ export default class PowerButton {
                                     }
                                 }
                             });
+                        }else{
+                            let status = await OctoPrintClient.power(printer, printer.powerSettings.powerToggleURL, "Power Toggle", printer.powerSettings.powerToggleCommand);
+                            await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                            await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
+                            await OctoPrintClient.getPowerStatus(printer, printer.powerSettings.powerStatusURL, printer.powerSettings.powerStatusCommand);
                         }
 
                     });
