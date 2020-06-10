@@ -13,6 +13,7 @@ All notable changes to this project will be documented in this file.
     - Added percent bar for Status on History Filters. Will show total failed/success/cancelled percentages on filtered results. 
     - Added a utilisation column to printers management table
     - Added Placeholders to file actions on file list
+    - New Monilithic docker builds, builds with MongoDB included. 
     
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
