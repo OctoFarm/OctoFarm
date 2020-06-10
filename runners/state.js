@@ -52,7 +52,7 @@ const heartBeatInterval = setInterval(function ping() {
     farmPrinters.forEach(function each(client) {
         if (typeof client.ws !== 'undefined' && typeof client.ws.isAlive !== 'undefined') {
             if(client.ws.instance.readyState !== 0 && client.ws.instance.readyState !== 2 && client.ws.instance.readyState !== 3){
-                if (client.ws.isAlive === false) return client.ws.instance.terminate();
+                if (client.ws.isAlive === false) return client.ws.instance.close();
                 farmPrinters[client.ws.index].webSocket = "info";
                 farmPrinters[client.ws.index].webSocketDescription = "Checking if Websocket is still alive";
                 client.ws.isAlive = false;
@@ -60,7 +60,7 @@ const heartBeatInterval = setInterval(function ping() {
             }
         }
     });
-}, 10000);
+}, 30000);
 
 WebSocketClient.prototype.open = function(url, index) {
     if (url.includes("http://")) {
@@ -86,6 +86,7 @@ WebSocketClient.prototype.open = function(url, index) {
         this.onmessage(data, flags, this.number, this.index);
     });
     this.instance.on('close', (e) => {
+        console.log(e)
         switch (e) {
             case 1000: // CLOSE_NORMAL
                 logger.info("WebSocket: closed: " + this.index + ": " + this.url);
@@ -98,7 +99,7 @@ WebSocketClient.prototype.open = function(url, index) {
                     farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
                     farmPrinters[this.index].hostDescription = "Host is Shutdown";
                     farmPrinters[this.index].webSocketDescription = "Websocket Closed by OctoFarm";
-
+                    this.instance.removeAllListeners();
                 } catch (e) {
                     logger.info("Couldn't set state of missing printer, safe to ignore: " + this.index + ": " + this.url)
                 }
@@ -114,11 +115,10 @@ WebSocketClient.prototype.open = function(url, index) {
                     farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
                     farmPrinters[this.index].hostDescription = "Host is Shutdown";
                     farmPrinters[this.index].webSocketDescription = "Websocket Closed by OctoFarm";
-
+                    this.instance.removeAllListeners();
                 } catch (e) {
                     logger.info("Couldn't set state of missing printer, safe to ignore: " + this.index + ": " + this.url)
                 }
-                this.reconnect(e);
                 break;
             case 1006: // TERMINATE();
                 try {
@@ -130,10 +130,10 @@ WebSocketClient.prototype.open = function(url, index) {
                     farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
                     farmPrinters[this.index].hostDescription = "Host is Shutdown";
                     farmPrinters[this.index].webSocketDescription = "Websocket Terminated by OctoFarm, Ping/Pong check fails";
-
                 } catch (e) {
                     logger.info("Ping/Pong failed to get a response, closing and attempted to reconnect: " + this.index + ": " + this.url)
                 }
+                this.reconnect(e);
                 break;
             default: // Abnormal closure
                 break;
@@ -142,6 +142,7 @@ WebSocketClient.prototype.open = function(url, index) {
         return "closed";
     });
     this.instance.on('error', (e) => {
+        console.log(e)
         switch (e.code) {
             case 'ECONNREFUSED':
                 logger.error(e, this.index + ": " + this.url);
@@ -194,6 +195,7 @@ WebSocketClient.prototype.open = function(url, index) {
             default:
                 logger.error(e, this.index + ": " + this.url);
                 try {
+
                     farmPrinters[this.index].state = "Re-Sync";
                     farmPrinters[this.index].stateColour = Runner.getColour("Offline");
                     farmPrinters[this.index].hostState = "Offline";
@@ -202,6 +204,7 @@ WebSocketClient.prototype.open = function(url, index) {
                     farmPrinters[this.index].stateDescription = "Hard Failure, please Re-Sync when Online";
                     farmPrinters[this.index].hostDescription = "Hard Failure, please Re-Sync when Online";
                     farmPrinters[this.index].webSocketDescription = "Hard Failure, please Re-Sync when Online";
+                    this.instance.removeAllListeners();
                 } catch (e) {
                     logger.info("Couldn't set state of missing printer, safe to ignore: " + this.index + ": " + this.url)
                 }
@@ -233,6 +236,7 @@ WebSocketClient.prototype.reconnect = async function(e) {
     this.instance.removeAllListeners();
     let that = this;
     setTimeout(function() {
+        console.log("RECONNECTING")
         farmPrinters[that.index].hostStateColour = Runner.getColour("Searching...");
         farmPrinters[that.index].hostDescription = "Searching for Host";
         logger.info("Re-Opening Websocket: " + that.index + ": " + that.url);
@@ -832,7 +836,7 @@ class Runner {
         farmPrinters[index].hostDescription = "Re-Scanning for OctoPrint Host";
         farmPrinters[index].webSocketDescription = "Websocket is Offline";
         if (typeof farmPrinters[index].ws !== 'undefined' && typeof farmPrinters[index].ws.instance !== 'undefined') {
-            await farmPrinters[index].ws.instance.terminate();
+            await farmPrinters[index].ws.instance.close();
             logger.info("Closed websocket connection for: " + farmPrinters[index].printerURL);
 
         }
@@ -866,7 +870,7 @@ class Runner {
 
         for (let i = 0; i < farmPrinters.length; i++) {
             if (typeof farmPrinters[i].ws !== 'undefined' && typeof farmPrinters[i].ws.instance !== 'undefined') {
-                await farmPrinters[i].ws.instance.terminate();
+                await farmPrinters[i].ws.instance.close();
                 logger.info("Closed websocket connection for: " + farmPrinters[i].printerURL);
             }
         }
