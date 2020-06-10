@@ -231,34 +231,34 @@ export default class PrinterManager {
         document.getElementById("printerControls").innerHTML = `
         <div class="row">
             <div class="col-lg-3">
-            
-            </div>
-            <div class="col-lg-3">
-            
-            </div>
-            <div class="col-lg-3">
-            
-            </div>
-        </div>
-
-        <div class="row">
-          <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
-              <div class="row">
-                  <div class="col-12">
-                      <center>
-                          <h5>Camera</h5>
-                      </center>
-                      <hr>
+           <div class="row">
+              <div class="col-12">
+              <center>
+              <h5>Operation</h5>
+          </center>
+          <hr>
+         
+          <center>
+          <button id="pmPrintStart" type="button" class="btn btn-success" role="button"><i class="fas fa-print"></i> Print</button>
+          <button id="pmPrintPause" type="button" class="btn btn-light" role="button" disabled><i class="fas fa-pause"></i> Pause</button>
+          <button id="pmPrintRestart" type="button" class="btn btn-danger" role="button"><i class="fas fa-undo"></i> Restart</button>
+          <button id="pmPrintResume" type="button" class="btn btn-success" role="button"><i class="fas fa-redo"></i> Resume</button>
+          <button id="pmPrintStop" type="button" class="btn btn-danger" disabled><i class="fas fa-square"></i> Cancel</button>
+          </center></div></div> 
+                  <div class="row">
+                    <div class="col-12">
+                          <center>
+                              <h5>Camera</h5>
+                          </center>
+                          <hr>
+                      </div>
                   </div>
-              </div>
-              <div class="row">
-                  <div id="cameraCol" class="col-12">
-                    <img style="transform: ${flipH} ${flipV} ${rotate90};" id="printerControlCamera" width="100%" src=""/>
+                  <div class="row">
+                      <div id="cameraCol" class="col-12">
+                        <img style="transform: ${flipH} ${flipV} ${rotate90};" id="printerControlCamera" width="100%" src=""/>
+                      </div>
                   </div>
-              </div>
-          </div>
-          <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
-              <div class="row">
+                                <div class="row">
                   <div class="col-9">
                       <center>
                           <h5>X/Y</h5>
@@ -318,65 +318,7 @@ export default class PrinterManager {
                       </center>
                   </div>
               </div>
-              <div class="row">
-              <div class="col-12">
-              <br>
-              <center>
-              <h5>Operation</h5>
-          </center>
-          <hr>
-          <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="filamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="filamentManagerFolderSelect"><option value="" selected></option></select></div>
-          <center>
-          <button id="pmPrintStart" type="button" class="btn btn-success" role="button"><i class="fas fa-print"></i> Print</button>
-          <button id="pmPrintPause" type="button" class="btn btn-light" role="button" disabled><i class="fas fa-pause"></i> Pause</button>
-          <button id="pmPrintRestart" type="button" class="btn btn-danger" role="button"><i class="fas fa-undo"></i> Restart</button>
-          <button id="pmPrintResume" type="button" class="btn btn-success" role="button"><i class="fas fa-redo"></i> Resume</button>
-          <button id="pmPrintStop" type="button" class="btn btn-danger" disabled><i class="fas fa-square"></i> Cancel</button>
-          </center></div>
-          </div>
-          </div>
-          <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-2">
-               <div class="row">
-                  <div class="col-12">
-                      <center>
-                          <h5>Print Status</h5>
-                      </center>
-                      <hr>
-                  </div>
-              </div>
-              <div class="row">
-                <div class="col-12">
-                        <center>
-                <b>Expected Completion Date: </b><p class="mb-1" id="pmExpectedCompletionDate">${dateComplete}</p>
-                  <div class="progress mb-2">
-                    <div id="pmProgress" class="progress-bar" role="progressbar progress-bar-striped" style="width:${
-            progress.completion
-        }%;" aria-valuenow="${
-            progress.completion
-        }%" aria-valuemin="0" aria-valuemax="100">${progress.completion}%
-                    </div>
-                  </div>
-          
-                 <b>Expected Print Time: </b><p class="mb-1" id="pmExpectedTime">${Calc.generateTime(
-            job.estimatedPrintTime
-        )}</p>
-                  <b>Print Time Remaining: </b><p class="mb-1" id="pmTimeRemain">${Calc.generateTime(
-            progress.printTimeLeft
-        )}</p>
-                  <b>Print Time Elapsed: </b><p class="mb-1" id="pmTimeElapsed">${Calc.generateTime(
-            job.printTime
-        )}</p>
-                  <b>Current Z: </b><p class="mb-1" id="pmCurrentZ">${
-            printer.currentZ
-        }mm</p>
-                  <b class="mb-1">File Name: </b><br><p title="${job.file.path}" class="tag mb-1" id="pmFileName">${
-            job.file.name
-        }</p></center>
-                  </div>
-              </div>
-           </div>
-                 <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
-       <div class="row">
+                            <div class="row">
                   <div class="col-12">
                       <center>
                           <h5>Extruder</h5>
@@ -384,7 +326,7 @@ export default class PrinterManager {
                       <hr>
                   </div>
               </div>
-         <div class="row">
+                                    <div class="row">
                   <div class="col-12">
                       <center>
                           <div class="input-group">
@@ -401,47 +343,159 @@ export default class PrinterManager {
               </div>
           </div>
           </div>
+                <div class="row">
+                  <div class="col-12">
+                      <center>
+                          <h5>Feed/Flow</h5>
+                      </center>
+                      <hr>
+                  </div>
+              </div>
+                <div class="row">
+                  <div class="col-10 col-lg-8 col-xl-8">
+                      <label for="pcFeed">Feed Rate: <span id="pcFeedValue">${printer.feedRate}%</span></label>
+                      <input type="range" class="octoRange custom-range" min="50" max="150" step="1" id="pcFeed" value="${printer.feedRate}">
+                  </div>
+                  <div class="col-2 col-lg-4 col-xl-4">
+                      <button id="pcFeedRate" type="button" class="btn btn-light">Update</button>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-10 col-lg-8 col-xl-8">
+                      <label for="pcFlow">Flow Rate: <span id="pcFlowValue">${printer.flowRate}%</span></label>
+                      <input type="range" class="octoRange custom-range" min="75" max="125" step="1" id="pcFlow" value="${printer.flowRate}">
+                  </div>
+                  <div class="col-2 col-lg-4 col-xl-4">
+                      <button id="pcFlowRate" type="button" class="btn btn-light">Update</button>
+                  </div>
+              </div>
               <div class="row">
                   <div class="col-12">
                       <center>
-                          <h5>Temperatures</h5>
+                          <h5>Motors / Fans</h5>
+                      </center>
+                      <hr>
+                  </div>
+              </div>
+                <div class="row">
+                  <div class="col-12">
+                      <center><button id="pcMotorTog" class="btn btn-light" type="submit">Motors Off</button></center>
+                  </div>
+              </div>
+              <div class="row">
+                  <div class="col-12">
+                  <label for="pcFlow">Fan Percent: <span id="pcFanPercent">100%</span></label>
+                  <input type="range" class="octoRange custom-range" min="0" max="100" step="1" id="pcFanPercent" value="100">
+                      <center><button id="pcFanOn" class="btn btn-light" type="submit">Set Fans</button> <button id="pcFanOff" class="btn btn-light" type="submit">Fans Off</button></center>
+                  </div>
+              </div>
+            </div>
+            <div class="col-lg-9 pt-0">
+            <div class="row">
+                <div class="col-lg-6">
+                  <div class="col-12">
+                                    <center>
+                                        <h5>Print Status</h5>
+                                    </center>
+                                    <hr>
+                                </div>
+                                <div class="col-12">
+                                                                <div class="progress mb-2">
+                                  <div id="pmProgress" class="progress-bar" role="progressbar progress-bar-striped" style="width:${
+                          progress.completion
+                      }%;" aria-valuenow="${
+                          progress.completion
+                      }%" aria-valuemin="0" aria-valuemax="100">${progress.completion}%
+                                  </div>
+                                </div>
+              </div>
+              <div class="row">
+              <div class="col-12">
+              <center>
+                               <b class="mb-1">File Name: </b><br><p title="${job.file.path}" class="tag mb-1" id="pmFileName">${
+            job.file.name
+        }</p>
+</center>
+</div>
+                <div class="col-lg-6">
+                   <center>
+                <b>Expected Completion Date: </b><p class="mb-1" id="pmExpectedCompletionDate">${dateComplete}</p>
+
+                  <b>Print Time Remaining: </b><p class="mb-1" id="pmTimeRemain">${Calc.generateTime(
+            progress.printTimeLeft
+        )}</p>
+                  <b>Print Time Elapsed: </b><p class="mb-1" id="pmTimeElapsed">${Calc.generateTime(
+            job.printTime
+        )}</p>
+                  <b>Current Z: </b><p class="mb-1" id="pmCurrentZ">${
+            printer.currentZ
+        }mm</p></center>
+            </div>
+                <div class="col-lg-6">
+                               <center>  
+                 <b>Expected Print Time: </b><p class="mb-1" id="pmExpectedTime">${Calc.generateTime(
+            job.estimatedPrintTime
+        )}</p>
+                                                   <b class="mb-1">Expected Weight: </b><br><p title="${job.file.path}" class="tag mb-1" id="pmFileName">${
+            job.file.name
+        }</p>
+                                                                    <b class="mb-1">Expected Printer Costs: </b><br><p title="${job.file.path}" class="tag mb-1" id="pmFileName">${
+            job.file.name
+        }</p>
+                                                                                                                                        <b class="mb-1">Expected Filamnent Costs: </b><br><p title="${job.file.path}" class="tag mb-1" id="pmFileName">${
+            job.file.name
+        }</p>
+                               
+                               </center>
+</div>
+              </div>
+                </div>
+                <div class="col-lg-6">
+               <div class="row">
+                  <div class="col-12">
+                      <center>
+                          <h5>Tools</h5>
                       </center>
                       <hr>
                   </div>
               </div>
               <div class="row">
-                 <center>
-                    <h5>Tool 0</h5>
-                </center>
-                <hr>
-                <div class="md-form input-group mb-3">
-                    <div class="input-group-prepend">
-                        <span id="pcE0Actual" class="input-group-text">Actual: °C</span>
-                    </div>
-                    <input id="pcE0Target" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
-                    <div class="input-group-append">
-                        <span class="input-group-text">°C</span>
-                        <button class="btn btn-md btn-light m-0 p-1" type="button" id="pcE0set">Set</button>
-                    </div>
+                <div class="col-md-6">
+                   <div class="md-form input-group mb-3">
+                       <span class="input-group-text">Tool 0</span>
+                      <div title="Actual Tool temperature" class="input-group-prepend">
+                          <span id="pcE0Actual" class="input-group-text">Actual: °C</span>
+                      </div>
+                      <input title="Set your target Tool temperature" id="pcE0Target" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+                      <div class="input-group-append">
+                          <button class="btn btn-md btn-light m-0 p-1" type="button" id="pcE0set">Set</button>
+                      </div>
+                  </div>
                 </div>
-                <center>
+                <div class="col-md-6">
+                 <div class="input-group mb-1"><div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="filamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="filamentManagerFolderSelect"><option value="" selected></option></select></div>
+                </div>
+                <div class="col-12">
+                                <center>
                   <h5>Bed</h5>
               </center>
               <hr>
               <div class="md-form input-group mb-3">
-                  <div class="input-group-prepend">
+                  <div title="Actual Bed temperature" class="input-group-prepend">
                       <span id="pcBedActual" class="input-group-text">Actual: °C</span>
                   </div>
-                  <input id="pcBedTarget" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+                  <input title="Set your target Bed temperature" id="pcBedTarget" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
                   <div class="input-group-append">
-                      <span class="input-group-text">°C</span>
                       <button class="btn btn-md btn-light m-0 p-1" type="button" id="pcBedset">Set</button>
                   </div>
               </div>
+                </div>
+
               </div>
-      </div>
-      <div class="col-12 col-sm-12 col-md-6 col-lg-12 col-xl-6">
-              <div class="row">
+                </div>
+              </div>
+
+                         <div class="row">
                   <div class="col-12">
                       <center>
                           <h5>Files</h5>
@@ -583,59 +637,11 @@ export default class PrinterManager {
                  
                 </div>
              
-                    <div id="fileList-${printer._id}" class="list-group" style="max-height:350px; overflow-y:scroll;" data-jplist-group="files">
+                    <div id="fileList-${printer._id}" class="list-group" style="height:500px; min-height:500px;max-height:500px; overflow-y:scroll;" data-jplist-group="files">
             
                     </div>
-      </div>
-      <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
-              <div class="row">
-                  <div class="col-12">
-                      <center>
-                          <h5>Feed/Flow</h5>
-                      </center>
-                      <hr>
-                  </div>
-              </div>
-                <div class="row">
-                  <div class="col-10 col-lg-8 col-xl-8">
-                      <label for="pcFeed">Feed Rate: <span id="pcFeedValue">${printer.feedRate}%</span></label>
-                      <input type="range" class="octoRange custom-range" min="50" max="150" step="1" id="pcFeed" value="${printer.feedRate}">
-                  </div>
-                  <div class="col-2 col-lg-4 col-xl-4">
-                      <button id="pcFeedRate" type="button" class="btn btn-light">Update</button>
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="col-10 col-lg-8 col-xl-8">
-                      <label for="pcFlow">Flow Rate: <span id="pcFlowValue">${printer.flowRate}%</span></label>
-                      <input type="range" class="octoRange custom-range" min="75" max="125" step="1" id="pcFlow" value="${printer.flowRate}">
-                  </div>
-                  <div class="col-2 col-lg-4 col-xl-4">
-                      <button id="pcFlowRate" type="button" class="btn btn-light">Update</button>
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="col-12">
-                      <center>
-                          <h5>Motors / Fans</h5>
-                      </center>
-                      <hr>
-                  </div>
-              </div>
-                <div class="row">
-                  <div class="col-12">
-                      <center><button id="pcMotorTog" class="btn btn-light" type="submit">Motors Off</button></center>
-                  </div>
-              </div>
-              <div class="row">
-                  <div class="col-12">
-                  <label for="pcFlow">Fan Percent: <span id="pcFanPercent">100%</span></label>
-                  <input type="range" class="octoRange custom-range" min="0" max="100" step="1" id="pcFanPercent" value="100">
-                      <center><button id="pcFanOn" class="btn btn-light" type="submit">Set Fans</button> <button id="pcFanOff" class="btn btn-light" type="submit">Fans Off</button></center>
-                  </div>
-              </div>
-      </div>
-        <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-3">
+            </div>
+        </div>
                <div class="row">
                   <div class="col-12">
                       <center>
@@ -648,13 +654,12 @@ export default class PrinterManager {
                <div id="terminal" class="terminal-window bg-secondary">
                 </div>
                   <div class="input-group">
-                    <input id="terminalInput" type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon2">
+                    <textarea id="terminalInput" type="text" class="form-control" placeholder="" aria-label="" aria-describedby="basic-addon2"></textarea>
                     <div class="input-group-append">
                       <button class="btn btn-secondary" id="terminalInputBtn" type="submit">Send</button>
                     </div>
                   </div>
               </div>
-           </div>
 
           </div>
           `;
@@ -1108,7 +1113,7 @@ export default class PrinterManager {
       }
     }
     elements.terminal.input.addEventListener("keypress", async e => {
-      if (e.key === 'Enter') {
+      if (e.key === 'Enter' && !e.shiftKey) {
         submitTerminal(e);
       }
     });
@@ -1300,11 +1305,11 @@ export default class PrinterManager {
         elements.printerControls.e0Target.placeholder =
             printer.temps[0].tool0.target + "°C";
         elements.printerControls.e0Actual.innerHTML =
-            "Actual: " + printer.temps[0].tool0.actual + "°C";
+            printer.temps[0].tool0.actual + "°C";
         elements.printerControls.bedTarget.placeholder =
             printer.temps[0].bed.target + "°C";
         elements.printerControls.bedActual.innerHTML =
-            "Actual: " + printer.temps[0].bed.actual + "°C";
+            printer.temps[0].bed.actual + "°C";
         if (
             printer.temps[0].tool0.actual >
             printer.temps[0].tool0.target - 0.5 &&
@@ -1361,11 +1366,11 @@ export default class PrinterManager {
         elements.printerControls.e0Target.placeholder =
             printer.temps[0].tool0.target + "°C";
         elements.printerControls.e0Actual.innerHTML =
-            "Actual: " + printer.temps[0].tool0.actual + "°C";
+            printer.temps[0].tool0.actual + "°C";
         elements.printerControls.bedTarget.placeholder =
             printer.temps[0].bed.target + "°C";
         elements.printerControls.bedActual.innerHTML =
-            "Actual: " + printer.temps[0].bed.actual + "°C";
+            printer.temps[0].bed.actual + "°C";
       }
       elements.printerControls.e0Actual.classList = "input-group-text";
       elements.printerControls.bedActual.classList = "input-group-text";
@@ -1423,9 +1428,9 @@ export default class PrinterManager {
       elements.connectPage.connectButton.classList = "btn btn-success inline";
       elements.connectPage.connectButton.disabled = false;
       elements.printerControls.e0Target.placeholder = 0 + "°C";
-      elements.printerControls.e0Actual.innerHTML = "Actual: " + 0 + "°C";
+      elements.printerControls.e0Actual.innerHTML = 0 + "°C";
       elements.printerControls.bedTarget.placeholder = 0 + "°C";
-      elements.printerControls.bedActual.innerHTML = "Actual: " + 0 + "°C";
+      elements.printerControls.bedActual.innerHTML = 0 + "°C";
       elements.printerControls.e0Actual.classList = "input-group-text";
       elements.printerControls.bedActual.classList = "input-group-text";
       PrinterManager.controls(true);

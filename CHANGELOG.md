@@ -18,6 +18,9 @@ All notable changes to this project will be documented in this file.
     - Printer Control window now shows file thumbnail if available on selected job.
     - State runner now updates octoprint job information with the selected thumbnail.
     - Started counting individual printer error/cancelled/success ratio
+    - Re-configured the printer control view:
+        - Moved all the elements into new positions. Hopefully this brings more focus on what's used all the time, and it also allows for upcoming modifications to see extra tools/chamber temperatures. 
+        - Converted Terminal input to multi-line input
     
 ### Removed
 
