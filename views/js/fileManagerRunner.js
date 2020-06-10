@@ -124,7 +124,10 @@ class Manager{
         printer = await printer.json()
 
         FileManager.drawFiles(printer)
-
+        document.getElementById("backBtn").innerHTML = `
+          <button id="fileBackBtn" type="button" class="btn btn-success">
+                  <i class="fas fa-chevron-left"></i> Back
+                </button>`;
         let fileButtons = {
             fileManager: {
                 printerStorage: document.getElementById("printerStorage"),

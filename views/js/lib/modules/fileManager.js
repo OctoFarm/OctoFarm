@@ -27,6 +27,7 @@ setInterval(async () => {
       if(fileCounts && fileCounts.innerHTML == 1){
           fileCounts.innerHTML = " " +0;
       }
+
     }
   }
   let allUploads = fileUploads.all();
@@ -342,22 +343,25 @@ export default class FileManager {
           let timeString = fileDate.toTimeString().substring(0, 8);
           let getUsage = FileActions.grabUsage(file);
           let usageElement = getUsage.split(" / ").pop();
-          let printCost = (parseFloat(Calc.returnFilamentCost(printer.selectedFilament, usageElement)) + parseFloat(Calc.returnPrintCost(printer.costSettings, file.time))).toFixed(2);
+          let filamentCost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament, usageElement)).toFixed(2);
+          let printCost = parseFloat(Calc.returnPrintCost(printer.costSettings, file.time)).toFixed(2);
             if(isNaN(printCost)){
-              printCost = "Unable to calculate";
+              printCost = "No estmated time";
             }
-
+          if(isNaN(filamentCost)){
+            filamentCost = "No filament selected";
+          }
           fileDate = dateString + " " + timeString;
 
           if (typeof recursive != "undefined") {
             fileElem.insertAdjacentHTML(
                 "beforeend",
                 `
-          <a
+        <a
           data-jplist-item
           id="file-${file.fullPath}"
           href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start bg-secondary "
+          class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
           style="display: block;
           padding: 0.7rem 0.1rem;"
         >
@@ -366,56 +370,71 @@ export default class FileManager {
               class="col-lg-2"
               style="display:flex; justify-content:center; align-items:center;"
             >
-       ${thumbnail}
+                   ${thumbnail}
             </div>
             <div class="col-lg-10">
-            <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1 name">${file.display}</h5>
-    <small><i class="fas fa-stopwatch"></i> <span class="time">${Calc.generateTime(
-                    file.time
-                )}</span> <br> <i class="fas fa-dollar-sign"></i> <span class="cost"> ${printCost} </span> </small>
-
-
-          </div>
+                <div class="row">
+                    <div class="col-12">
+                                <h5 class="mb-1 name">${file.display}</h5>         
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+          <p class="mb-1 float-right">
+              <i class="fas fa-stopwatch"></i> 
+                <span class="time">
+                    ${Calc.generateTime(file.time)}</span> <br> 
+               <i class="fas fa-dollar-sign"></i> 
+               <span title="Expected Filament Cost"> ${filamentCost} </span>
+               <br> 
+               <i class="fas fa-dollar-sign"></i> 
+               <span title="Expected Printer Cost" class="cost"> ${printCost} </span>
+          </p>
           <p class="mb-1 float-left">
           <i class="fas fa-clock"></i><span class="date d-none"> ${file.date}</span><span> ${fileDate}</span><br>
           <i class="fas fa-hdd"></i><span class="size"> ${Calc.bytes(file.size)}</span> <br>
           <i class="fas fa-weight"></i><span class="usage"> ${getUsage}</span>
           
-          </p>
-              <div
-              class="float-right btn-group flex-wrap btn-group-sm"
+          </p> 
+                    </div>
+                </div>
+              </div>
+            <div class="col-lg-12">
+                   <div
+              class="d-flex btn-group flex-wrap btn-group-sm"
               role="group"
               aria-label="Basic example"
             >
               <button
+                title="Re-Sync File"
                 id="${printer._id}*fileActionUpdate*${file.fullPath}"
                 role="button"
                 class="btn btn-dark"
               >
-                <i class="fas fa-sync"></i> Refresh
+                <i class="fas fa-sync"></i> Re-Sync
               </button>
-              <button id="${printer._id}*fileActionStart*${
+              <button           title="Start printing file"
+              id="${printer._id}*fileActionStart*${
                     file.fullPath
                 }" type="button" class="btn btn-success">
                 <i class="fas fa-play"></i> Start
               </button>
-              <button id="${printer._id}*fileActionSelect*${
+              <button  title="Select file" id="${printer._id}*fileActionSelect*${
                     file.fullPath
                 }" type="button" class="btn btn-info">
                 <i class="fas fa-file-upload"></i> Select
               </button>
-              <button id="${printer._id}*fileActionMove*${
+              <button          title="Move file" id="${printer._id}*fileActionMove*${
                     file.fullPath
                 }" type="button" class="btn btn-warning">
                 <i class="fas fa-people-carry"></i> Move
               </button>
-              <button onclick="window.open('${printer.printerURL}/downloads/files/local/${
+              <button          title="Download file" onclick="window.open('${printer.printerURL}/downloads/files/local/${
                     file.fullPath
                 }')" type="button" class="btn btn-dark">
                 <i class="fas fa-download"></i> Download
               </button>
-              <button id="${printer._id}*fileActionDelete*${
+              <button title="Delete file" id="${printer.printerURL}*fileActionDelete*${
                     file.fullPath
                 }" type="button" class="btn btn-danger">
                 <i class="fas fa-trash-alt"></i> Delete
@@ -448,52 +467,68 @@ export default class FileManager {
                    ${thumbnail}
             </div>
             <div class="col-lg-10">
-            <div class="d-flex w-100 justify-content-between">
-            <h5 class="mb-1 name">${file.display}</h5>         
-            <small><i class="fas fa-stopwatch"></i> <span class="time">${Calc.generateTime(
-                    file.time
-                )}</span> <br> <i class="fas fa-dollar-sign"></i> <span class="cost"> ${printCost} </span> </small>
-
-          </div>
+                <div class="row">
+                    <div class="col-12">
+                                <h5 class="mb-1 name">${file.display}</h5>         
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+          <p class="mb-1 float-right">
+              <i class="fas fa-stopwatch"></i> 
+                <span class="time">
+                    ${Calc.generateTime(file.time)}</span> <br> 
+               <i class="fas fa-dollar-sign"></i> 
+               <span title="Expected Filament Cost"> ${filamentCost} </span>
+               <br> 
+               <i class="fas fa-dollar-sign"></i> 
+               <span title="Expected Printer Cost" class="cost"> ${printCost} </span>
+          </p>
           <p class="mb-1 float-left">
           <i class="fas fa-clock"></i><span class="date d-none"> ${file.date}</span><span> ${fileDate}</span><br>
           <i class="fas fa-hdd"></i><span class="size"> ${Calc.bytes(file.size)}</span> <br>
           <i class="fas fa-weight"></i><span class="usage"> ${getUsage}</span>
           
-          </p>
-              <div
-              class="float-right btn-group flex-wrap btn-group-sm"
+          </p> 
+                    </div>
+                </div>
+              </div>
+            <div class="col-lg-12">
+                   <div
+              class="d-flex btn-group flex-wrap btn-group-sm"
               role="group"
               aria-label="Basic example"
             >
               <button
+                title="Re-Sync File"
                 id="${printer._id}*fileActionUpdate*${file.fullPath}"
                 role="button"
                 class="btn btn-dark"
               >
-                <i class="fas fa-sync"></i> Refresh
+                <i class="fas fa-sync"></i> Re-Sync
               </button>
-              <button id="${printer._id}*fileActionStart*${
+              <button           title="Start printing file"
+              id="${printer._id}*fileActionStart*${
                     file.fullPath
                 }" type="button" class="btn btn-success">
                 <i class="fas fa-play"></i> Start
               </button>
-              <button id="${printer._id}*fileActionSelect*${
+              <button  title="Select file" id="${printer._id}*fileActionSelect*${
                     file.fullPath
                 }" type="button" class="btn btn-info">
                 <i class="fas fa-file-upload"></i> Select
               </button>
-              <button id="${printer._id}*fileActionMove*${
+              <button          title="Move file" id="${printer._id}*fileActionMove*${
                     file.fullPath
                 }" type="button" class="btn btn-warning">
                 <i class="fas fa-people-carry"></i> Move
               </button>
-              <button onclick="window.open('${printer.printerURL}/downloads/files/local/${
+              <button          title="Download file" onclick="window.open('${printer.printerURL}/downloads/files/local/${
                     file.fullPath
                 }')" type="button" class="btn btn-dark">
                 <i class="fas fa-download"></i> Download
               </button>
-              <button id="${printer.printerURL}*fileActionDelete*${
+              <button title="Delete file" id="${printer.printerURL}*fileActionDelete*${
                     file.fullPath
                 }" type="button" class="btn btn-danger">
                 <i class="fas fa-trash-alt"></i> Delete
