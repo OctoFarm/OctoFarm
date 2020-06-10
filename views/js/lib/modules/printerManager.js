@@ -5,6 +5,7 @@ import UI from "../functions/ui.js";
 import FileManager from "./fileManager.js";
 import Validate from "../functions/validate.js";
 import {returnDropDown, selectFilament} from "../modules/filamentGrab.js";
+import {FileActions} from "./fileManager.js";
 
 let currentIndex = 0;
 
@@ -436,15 +437,9 @@ export default class PrinterManager {
                  <b>Expected Print Time: </b><p class="mb-1" id="pmExpectedTime">${Calc.generateTime(
             job.estimatedPrintTime
         )}</p>
-                                                   <b class="mb-1">Expected Weight: </b><br><p title="${job.file.path}" class="tag mb-1" id="pmFileName">${
-            job.file.name
-        }</p>
-                                                                    <b class="mb-1">Expected Printer Costs: </b><br><p title="${job.file.path}" class="tag mb-1" id="pmFileName">${
-            job.file.name
-        }</p>
-                                                                                                                                        <b class="mb-1">Expected Filamnent Costs: </b><br><p title="${job.file.path}" class="tag mb-1" id="pmFileName">${
-            job.file.name
-        }</p>
+        <b class="mb-1">Expected Units: </b><br><p class="tag mb-1" id="pmExpectedWeight">Loading...</p>
+        <b class="mb-1">Expected Printer Costs: </b><br><p class="tag mb-1" id="pmExpectedPrinterCost">Loading...</p>
+        <b class="mb-1">Expected Filamnent Costs: </b><br><p class="tag mb-1" id="pmExpectedFilamentCost">Loading...</p>
                                
                                </center>
 </div>
@@ -1156,7 +1151,10 @@ export default class PrinterManager {
         elapsedTime: document.getElementById("pmTimeElapsed"),
         currentZ: document.getElementById("pmCurrentZ"),
         fileName: document.getElementById("pmFileName"),
-        progressBar: document.getElementById("pmProgress")
+        progressBar: document.getElementById("pmProgress"),
+        expectedWeight: document.getElementById("pmExpectedWeight"),
+        expectedPrinterCost: document.getElementById("pmExpectedPrinterCost"),
+        expectedFilamentCost: document.getElementById("pmExpectedFilamentCost"),
       },
       connectPage: {
         printerPort: document.getElementById("printerPortDrop"),
@@ -1245,6 +1243,7 @@ export default class PrinterManager {
         if (typeof printer.job.file.thumbnail !== 'undefined' || printer.job.file.thumbnail != null) {
           camField.src = printer.printerURL + "/" + printer.job.file.thumbnail
         }
+
     }
     if (typeof printer.progress !== "undefined" && printer.progress.printTimeLeft !== null) {
 
@@ -1270,6 +1269,7 @@ export default class PrinterManager {
     elements.jobStatus.progressBar.innerHTML =
         Math.round(progress.completion) + "%";
     elements.jobStatus.progressBar.style.width = progress.completion + "%";
+
     elements.jobStatus.expectedTime.innerHTML = Calc.generateTime(
         job.estimatedPrintTime
     );
@@ -1284,7 +1284,6 @@ export default class PrinterManager {
       elements.jobStatus.fileName.setAttribute('title', 'No File Selected')
       let fileName = 'No File Selected'
       elements.jobStatus.fileName.innerHTML = fileName;
-
     }else{
       elements.jobStatus.fileName.setAttribute('title', printer.job.file.path)
       let fileName = printer.job.file.display;
@@ -1294,7 +1293,18 @@ export default class PrinterManager {
       elements.jobStatus.fileName.innerHTML = fileName;
 
     }
-
+    let getUsage = FileActions.grabUsage(printer.job.file);
+    elements.jobStatus.expectedWeight.innerHTML = getUsage;
+    let filamentCost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament, elements.jobStatus.expectedWeight.innerHTML)).toFixed(2);
+    let printCost = parseFloat(Calc.returnPrintCost(printer.costSettings,  job.estimatedPrintTime)).toFixed(2);
+    if(isNaN(printCost)){
+      printCost = "No estmated time";
+    }
+    if(isNaN(filamentCost)){
+      filamentCost = "No filament selected";
+    }
+    elements.jobStatus.expectedFilamentCost.innerHTML = filamentCost;
+    elements.jobStatus.expectedPrinterCost.innerHTML = printCost;
     if (printer.stateColour.category === "Active") {
       elements.printerControls.filamentDrop.disabled = true;
       if (
