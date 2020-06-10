@@ -203,8 +203,8 @@ a.notyet {
 .fileBody {
   padding: 5px;
   overflow-y: scroll;
-  min-height: 77vh;
-  max-height: 77vh;
+  min-height: 65vh;
+  max-height: 65vh;
 }
 
 .fileBody p {
