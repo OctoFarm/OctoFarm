@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
     - Printer Control window now shows file thumbnail if available on selected job.
     - State runner now updates octoprint job information with the selected thumbnail.
     - Started counting individual printer error/cancelled/success ratio
+    
 ### Removed
 
 ### Deprecated
@@ -27,7 +28,9 @@ All notable changes to this project will be documented in this file.
     - Fixed styling issue with the filters and sorting dropdowns on views making the bar bigger.
     - Printer Settings didn't apply new content editable css to fields.
     - Fixed issue with websockets not been gracefully closed. Should help with double alerts/history notifications after editing/changing a printer meta.
-
+    - Fixed Panel view sorting not returning to index.
+    - Fixed issue with sorting breaking fullscreen elements
+    
 ## [Released]
 
 ## [v1.1.5.5]

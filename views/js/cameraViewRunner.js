@@ -472,7 +472,10 @@ function updateState(printers, clientSettings) {
         }
     });
     if(jpInit){
-        jplist.refresh();
+        let fullscreenElement = document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement;
+        if(!fullscreenElement){
+            jplist.refresh("printers");
+        }
     }else {
         jpInit = true;
         jplist.init({

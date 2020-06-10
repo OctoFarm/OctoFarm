@@ -114,6 +114,7 @@ printers[sorted.actualIndex].settingsWebcam != ''){%> <% } %>
           class="card-body cameraContain text-truncate"
           id="camBody-<%= printers[sorted.actualIndex]._id %>"
         >
+          <div class="d-none index"><%= sorted.actualIndex %></div>
           <div class="camName">
             <small
               class="mb-0 text-center"
@@ -202,6 +203,11 @@ printers[sorted.actualIndex].settingsWebcam != ''){%> <% } %>
             </small>
           </div>
           <div class="progress camProgress">
+
+            <div class="d-none percent">            <% if(typeof printers[sorted.actualIndex].progress!= 'undefined'){
+              %> <%=
+                Math.floor(printers[sorted.actualIndex].progress.completion) %>%
+              <%}%></div>
             <div
               id="camProgress-<%= printers[sorted.actualIndex]._id %>"
               class="progress-bar progress-bar-striped bg-<%=printers[sorted.actualIndex].stateColour.name%> percent"

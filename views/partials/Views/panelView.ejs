@@ -107,6 +107,7 @@
             <% } %>
           </div>
           <div class="card-body pt-1 pb-0 pl-2 pr-2">
+            <div class="d-none index"><%= sorted.actualIndex %></div>
             <button
                     id="panFileName-<%= printers[sorted.actualIndex]._id %>"
                     type="button"
@@ -131,9 +132,8 @@
                 loading="lazy"
                 id="panCamera-<%= printers[sorted.actualIndex]._id %>"
                 width="100%"
-                style="transform: <%= flipH %> <%= flipV %> <%= rotate90 %>;"
+                style="transform: <%= flipH %> <%= flipV %> <%= rotate90 %>; pointer-events: none;"
                 src="<%= camURL %>"
-                style="pointer-events: none;"
               />
             </div>
             <div class="progress">
