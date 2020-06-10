@@ -437,9 +437,9 @@ export default class PrinterManager {
                  <b>Expected Print Time: </b><p class="mb-1" id="pmExpectedTime">${Calc.generateTime(
             job.estimatedPrintTime
         )}</p>
-        <b class="mb-1">Expected Units: </b><br><p class="tag mb-1" id="pmExpectedWeight">Loading...</p>
-        <b class="mb-1">Expected Printer Costs: </b><br><p class="tag mb-1" id="pmExpectedPrinterCost">Loading...</p>
-        <b class="mb-1">Expected Filamnent Costs: </b><br><p class="tag mb-1" id="pmExpectedFilamentCost">Loading...</p>
+        <b class="mb-1">Expected Units: </b><br><p class="tag mb-1" id="pmExpectedWeight">No File Selected</p>
+        <b class="mb-1">Expected Printer Costs: </b><br><p class="tag mb-1" id="pmExpectedPrinterCost">No File Selected</p>
+        <b class="mb-1">Expected Filamnent Costs: </b><br><p class="tag mb-1" id="pmExpectedFilamentCost">No File Selected</p>
                                
                                </center>
 </div>
@@ -1240,9 +1240,12 @@ export default class PrinterManager {
     let dateComplete = null;
     if (typeof printer.job != "undefined" && printer.job.file.name != null) {
       let camField = document.getElementById("printerControlCamera");
+      if(printer.camURL !== 'undefined'){
         if (typeof printer.job.file.thumbnail !== 'undefined' || printer.job.file.thumbnail != null) {
           camField.src = printer.printerURL + "/" + printer.job.file.thumbnail
         }
+      }
+
 
     }
     if (typeof printer.progress !== "undefined" && printer.progress.printTimeLeft !== null) {
@@ -1291,20 +1294,20 @@ export default class PrinterManager {
         fileName = fileName.substring(0, 49) + "...";
       }
       elements.jobStatus.fileName.innerHTML = fileName;
+      let getUsage = FileActions.grabUsage(printer.job.file);
+      elements.jobStatus.expectedWeight.innerHTML = getUsage;
+      let filamentCost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament, elements.jobStatus.expectedWeight.innerHTML)).toFixed(2);
+      let printCost = parseFloat(Calc.returnPrintCost(printer.costSettings,  job.estimatedPrintTime)).toFixed(2);
+      if(isNaN(printCost)){
+        printCost = "No estmated time";
+      }
+      if(isNaN(filamentCost)){
+        filamentCost = "No filament selected";
+      }
+      elements.jobStatus.expectedFilamentCost.innerHTML = filamentCost;
+      elements.jobStatus.expectedPrinterCost.innerHTML = printCost;
 
     }
-    let getUsage = FileActions.grabUsage(printer.job.file);
-    elements.jobStatus.expectedWeight.innerHTML = getUsage;
-    let filamentCost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament, elements.jobStatus.expectedWeight.innerHTML)).toFixed(2);
-    let printCost = parseFloat(Calc.returnPrintCost(printer.costSettings,  job.estimatedPrintTime)).toFixed(2);
-    if(isNaN(printCost)){
-      printCost = "No estmated time";
-    }
-    if(isNaN(filamentCost)){
-      filamentCost = "No filament selected";
-    }
-    elements.jobStatus.expectedFilamentCost.innerHTML = filamentCost;
-    elements.jobStatus.expectedPrinterCost.innerHTML = printCost;
     if (printer.stateColour.category === "Active") {
       elements.printerControls.filamentDrop.disabled = true;
       if (
