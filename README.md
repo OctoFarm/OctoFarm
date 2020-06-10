@@ -88,7 +88,7 @@ On your OctoPrint instance
 Currently all docker images are built with linux/amd64 with debian stretch. There are a few different tags available. 
 
 #### Example Docker Run
-`docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -p4000:4000 octofarm/octofarm -e "TZ=America/Chicago" -v '<your persistent folder>/OctoFarm/logs/':'/app/logs/':'rw' -v '<your persistent folder>/OctoFarm/scripts/':'/app/scripts/':'rw'`
+`docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -p4000:4000 octofarm/octofarm -e "TZ=America/Chicago" -v '<your persistent folder>/OctoFarm/logs/':'/app/logs/':'rw' -v '<your persistent folder>/OctoFarm/scripts/':'/scripts/':'rw'`
 
 #### Generic Docker-Compose
 
@@ -105,7 +105,7 @@ Currently all docker images are built with linux/amd64 with debian stretch. Ther
           - MONGO=mongodb://mongo/octofarm
         volumes:
           - <your persistent folder>/OctoFarm/logs:/app/logs
-          - <your persistent folder>/OctoFarm/scripts:/app/scripts
+          - <your persistent folder>/OctoFarm/scripts:/scripts
 
 
 #### OctoFarm (Standalone)
