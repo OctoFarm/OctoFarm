@@ -24,7 +24,6 @@ export default class PowerButton {
         return powerBtn
     }
     static async applyBtn(printer) {
-        console.log(printer.powerSettings)
         if (typeof printer.settingsServer !== 'undefined' && !document.getElementById("printerPower-" + printer._id)) {
             if (printer.settingsServer.commands.serverRestartCommand !== "" && printer.settingsServer.commands.serverRestartCommand !== null || printer.settingsServer.commands.systemRestartCommand !== "" && printer.settingsServer.commands.systemRestartCommand !== null || printer.settingsServer.commands.systemShutdownCommand !== "" && printer.settingsServer.commands.systemShutdownCommand !== null) {
                 document.getElementById("powerBtn-" + printer._id).innerHTML = PowerButton.returnPowerBtn(printer);
@@ -68,7 +67,6 @@ export default class PowerButton {
     }
     static async powerButtons(printer) {
         let divider = document.getElementById("printerDropDownMaker-" + printer._id)
-        console.log(printer.powerSettings)
         if (printer.powerSettings.powerOffURL !== "") {
             if (divider.classList.contains("d-none")) {
                 divider.classList.remove("d-none")
