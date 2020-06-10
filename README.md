@@ -87,6 +87,27 @@ On your OctoPrint instance
 ### Installation Docker
 Currently all docker images are built with linux/amd64 with debian stretch. There are a few different tags available. 
 
+#### Example Docker Run
+`docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -p4000:4000 octofarm/octofarm -e "TZ=America/Chicago" -v '<your persistent folder>/OctoFarm/logs/':'/app/logs/':'rw' -v '<your persistent folder>/OctoFarm/scripts/':'/app/scripts/':'rw'`
+
+#### Generic Docker-Compose
+
+
+    version: "3"
+    services:
+      octofarm:
+        container_name: octofarm
+        image: octofarm/octofarm
+        restart: always
+        ports:
+          - 4000:4000
+        environment:
+          - MONGO=mongodb://mongo/octofarm
+        volumes:
+          - <your persistent folder>/OctoFarm/logs:/app/logs
+          - <your persistent folder>/OctoFarm/scripts:/app/scripts
+
+
 #### OctoFarm (Standalone)
     latest: Pulls the latest master release
     dev: Pulls the latest development release. (Bleeding edge features, only for testing)
