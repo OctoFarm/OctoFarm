@@ -438,8 +438,9 @@ export default class PrinterManager {
             job.estimatedPrintTime
         )}</p>
         <b class="mb-1">Expected Units: </b><br><p class="tag mb-1" id="pmExpectedWeight">No File Selected</p>
+        <b class="mb-1">Expected Filament Costs: </b><br><p class="tag mb-1" id="pmExpectedFilamentCost">No File Selected</p>
         <b class="mb-1">Expected Printer Costs: </b><br><p class="tag mb-1" id="pmExpectedPrinterCost">No File Selected</p>
-        <b class="mb-1">Expected Filamnent Costs: </b><br><p class="tag mb-1" id="pmExpectedFilamentCost">No File Selected</p>
+
                                
                                </center>
 </div>
@@ -1296,7 +1297,8 @@ export default class PrinterManager {
       elements.jobStatus.fileName.innerHTML = fileName;
       let getUsage = FileActions.grabUsage(printer.job.file);
       elements.jobStatus.expectedWeight.innerHTML = getUsage;
-      let filamentCost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament, elements.jobStatus.expectedWeight.innerHTML)).toFixed(2);
+      let usageElement = getUsage.split(" / ").pop();
+      let filamentCost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament, usageElement)).toFixed(2);
       let printCost = parseFloat(Calc.returnPrintCost(printer.costSettings,  job.estimatedPrintTime)).toFixed(2);
       if(isNaN(printCost)){
         printCost = "No estmated time";
