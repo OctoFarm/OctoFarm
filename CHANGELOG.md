@@ -30,7 +30,8 @@ All notable changes to this project will be documented in this file.
     - Fixed issue with websockets not been gracefully closed. Should help with double alerts/history notifications after editing/changing a printer meta.
     - Fixed Panel view sorting not returning to index.
     - Fixed issue with sorting breaking fullscreen elements
-    
+    - Fixed bug with filament manager not turning off editable styling
+    - Fixed issue with profiles not saving on filemant manager
 ## [Released]
 
 ## [v1.1.5.5]

@@ -409,9 +409,10 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
   let serverSettings = await ServerSettings.find({});
   let searchId = req.body.id;
   let newContent = req.body.profile
+  const runner = require("../runners/state.js");
+  const Runner = runner.Runner;
   if(serverSettings[0].filamentManager) {
-    const runner = require("../runners/state.js");
-    const Runner = runner.Runner;
+
     let printerList = Runner.returnFarmPrinters();
     let printer = null;
     for (let i = 0; i < printerList.length; i++) {

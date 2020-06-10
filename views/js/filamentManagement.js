@@ -640,7 +640,7 @@ async function saveProfile(e, filamentManager) {
     let profile = []
     editable.forEach(edit => {
         edit.contentEditable = false;
-        edit.classList.remove("Active");
+        edit.classList.remove("contentEditable");
         profile.push(edit.innerHTML.trim());
     })
     let data = {
@@ -663,7 +663,7 @@ async function saveSpool(e, filamentManager) {
     let spool = []
     editable.forEach(edit => {
         edit.contentEditable = false;
-        edit.classList.remove("Active");
+        edit.classList.remove("contentEditable");
         spool.push(edit.innerHTML.trim());
     })
     spool.push(document.getElementById("spoolsProfile-"+id).value);
