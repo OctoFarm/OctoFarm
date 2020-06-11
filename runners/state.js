@@ -53,6 +53,7 @@ const heartBeatInterval = setInterval(function ping() {
         if (typeof client.ws !== 'undefined' && typeof client.ws.isAlive !== 'undefined') {
             if(client.ws.instance.readyState !== 0 && client.ws.instance.readyState !== 2 && client.ws.instance.readyState !== 3){
                 if (client.ws.isAlive === false) return client.ws.instance.terminate();
+
                 farmPrinters[client.ws.index].webSocket = "info";
                 farmPrinters[client.ws.index].webSocketDescription = "Checking if Websocket is still alive";
                 client.ws.isAlive = false;
