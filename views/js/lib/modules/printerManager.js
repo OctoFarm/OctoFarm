@@ -458,6 +458,14 @@ export default class PrinterManager {
                       <hr>
                   </div>
               </div>
+              <div class="row">
+                <div class="col-12">
+                    <button id="pmTempTime" type="button" class="btn btn-secondary btn-sm float-right"></button>
+                </div>
+              </div>
+              <div class="row" id="pmToolTemps">
+                
+              </div>
               <div class="row" id="pmTemps">
                 
               </div>
@@ -634,58 +642,89 @@ export default class PrinterManager {
           `;
 
         let printerTemps = document.getElementById("pmTemps")
+        let printerToolTemps = document.getElementById("pmToolTemps")
             printerTemps.innerHTML = "";
+        printerToolTemps.innerHTML = "";
             if(typeof printer.temps !== 'undefined' && printer.temps.length !== 0){
-              console.log(printer.temps)
-            }
-            printerTemps.insertAdjacentHTML('beforeend', `
-                      <div class="col-md-6">
-                   <div class="md-form input-group mb-3">
-                       <span class="input-group-text">Tool 0</span>
-                      <div title="Actual Tool temperature" class="input-group-prepend">
-                          <span id="pcE0Actual" class="input-group-text">Actual: °C</span>
+              let keys = Object.keys(printer.temps[0])
+              keys = keys.reverse();
+              keys.forEach(key => {
+                if(key.includes("tool0")){
+                  printerToolTemps.insertAdjacentHTML('beforeend', `
+                    <div class="col-md-6">
+                       <div class="md-form input-group mb-3">
+                           <span class="input-group-text">${key}</span>
+                          <div title="Actual Tool temperature" class="input-group-prepend">
+                              <span id="${key}Actual" class="input-group-text">Actual: °C</span>
+                          </div>
+                          <input title="Set your target Tool temperature" id="${key}Target" type="number" class="form-control col" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+                          <div class="input-group-append">
+                              <button class="btn btn-md btn-light m-0 p-1" type="button" id="${key}Set">Set</button>
+                          </div>
                       </div>
-                      <input title="Set your target Tool temperature" id="pcE0Target" type="number" class="form-control col" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
-                      <div class="input-group-append">
-                          <button class="btn btn-md btn-light m-0 p-1" type="button" id="pcE0set">Set</button>
+                    </div>
+                    <div class="col-md-6">
+                     <div class="input-group mb-1"><div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="${key}FilamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="${key}FilamentManagerFolderSelect"><option value="" selected></option></select></div>
+                    </div>
+                    `)
+                }else if(key.includes("tool")){
+                  printerToolTemps.insertAdjacentHTML('beforeend', `
+                    <div class="col-md-12">
+                       <div class="md-form input-group mb-3">
+                           <span class="input-group-text">${key}</span>
+                          <div title="Actual Tool temperature" class="input-group-prepend">
+                              <span id="${key}Actual" class="input-group-text">Actual: °C</span>
+                          </div>
+                          <input title="Set your target Tool temperature" id="${key}Target" type="number" class="form-control col" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+                          <div class="input-group-append">
+                              <button class="btn btn-md btn-light m-0 p-1" type="button" id="${key}Set">Set</button>
+                          </div>
                       </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                 <div class="input-group mb-1"><div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="filamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="filamentManagerFolderSelect"><option value="" selected></option></select></div>
-                </div>
-                <div class="col-12">
-                                <center>
+                    </div>
+                    `)
+                }else if(key.includes("bed")){
+                  printerTemps.insertAdjacentHTML('beforeend', `
+              <span class="d-none col-12" id="pmBedTemps">
+               <div class="col-12">
+              <center>
                   <h5>Bed</h5>
               </center>
               <hr>
               <div class="md-form input-group mb-3">
                   <div title="Actual Bed temperature" class="input-group-prepend">
-                      <span id="pcBedActual" class="input-group-text">Actual: °C</span>
+                      <span id="${key}Actual" class="input-group-text">Actual: °C</span>
                   </div>
-                  <input title="Set your target Bed temperature" id="pcBedTarget" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+                  <input title="Set your target Bed temperature" id="${key}Target" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
                   <div class="input-group-append">
-                      <button class="btn btn-md btn-light m-0 p-1" type="button" id="pcBedset">Set</button>
+                      <button class="btn btn-md btn-light m-0 p-1" type="button" id="${key}Set">Set</button>
                   </div>
               </div>
                 </div>
-                <div class="col-12">
+              </span>
+             `)
+                }else if(key.includes("chamber")){
+                  printerTemps.insertAdjacentHTML('beforeend', `
+              <span class="d-none col-12" id="pmChamberTemps">
+                 <div class="col-12">
                                 <center>
                   <h5>Chamber</h5>
               </center>
               <hr>
               <div class="md-form input-group mb-3">
                   <div title="Actual Bed temperature" class="input-group-prepend">
-                      <span id="pcBedActual" class="input-group-text">Actual: °C</span>
+                      <span id="${key}Actual" class="input-group-text">Actual: °C</span>
                   </div>
-                  <input title="Set your target Bed temperature" id="pcBedTarget" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+                  <input title="Set your target Bed temperature" id="${key}Target" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
                   <div class="input-group-append">
-                      <button class="btn btn-md btn-light m-0 p-1" type="button" id="pcBedset">Set</button>
+                      <button class="btn btn-md btn-light m-0 p-1" type="button" id="${key}Set">Set</button>
                   </div>
               </div>
-                </div>         
-                    
-            `)
+                </div>   
+            </span>
+             `)
+                }
+              })
+            }
 
 
 
@@ -701,27 +740,32 @@ export default class PrinterManager {
 
         }
         let filamentDropDown = await returnDropDown();
-        let pmFilamentDrop = document.getElementById("filamentManagerFolderSelect")
-        pmFilamentDrop.innerHTML = "";
-        filamentDropDown.forEach(filament => {
-          pmFilamentDrop.insertAdjacentHTML('beforeend', filament)
-        })
-        if(printer.selectedFilament != null){
-          pmFilamentDrop.value = printer.selectedFilament._id
-        }
-        pmFilamentDrop.addEventListener('change', event => {
-          selectFilament(printer._id, event.target.value)
-        });
+        // let pmFilamentDrop = document.getElementById("filamentManagerFolderSelect")
+        // pmFilamentDrop.innerHTML = "";
+        // filamentDropDown.forEach(filament => {
+        //   pmFilamentDrop.insertAdjacentHTML('beforeend', filament)
+        // })
+        // if(printer.selectedFilament != null){
+        //   pmFilamentDrop.value = printer.selectedFilament._id
+        // }
+        // pmFilamentDrop.addEventListener('change', event => {
+        //   selectFilament(printer._id, event.target.value)
+        // });
 
 
         let elements = PrinterManager.grabPage();
         elements.terminal.terminalWindow.innerHTML = "";
         elements.printerControls["step" + printer.stepRate].className =
             "btn btn-dark active";
+
+        PrinterManager.applyTemps(printer, elements);
         PrinterManager.applyListeners(printer, elements, printers, filamentDropDown);
         FileManager.drawFiles(printer)
       }
+
       PrinterManager.applyState(printer, job, progress);
+      let elements = PrinterManager.grabPage();
+      PrinterManager.applyTemps(printer, elements);
       document.getElementById("printerManagerModal").style.overflow = "auto";
     }
 
@@ -818,80 +862,80 @@ export default class PrinterManager {
       elements.printerControls.step01.className = "btn btn-light";
     });
 
-    let e0Set = async function (e) {
-      let flashReturn = function () {
-        elements.printerControls.e0Set.className = "btn btn-md btn-light m-0 p-1";
-      };
-      let value = elements.printerControls.e0Target.value;
-      elements.printerControls.e0Target.value = "";
-      if (value === "Off") {
-        value = 0;
-      }
-      let opt = {
-        command: "target",
-        targets: {
-          tool0: parseInt(value)
-        }
-      };
-      let post = await OctoPrintClient.post(printer, "printer/tool", opt);
-      if (post.status === 204) {
-        elements.printerControls.e0Set.className = "btn btn-md btn-success m-0 p-1";
-        setTimeout(flashReturn, 500);
-      } else {
-        elements.printerControls.e0Set.className = "btn btn-md btn-danger m-0 p-1";
-        setTimeout(flashReturn, 500);
-      }
-    }
-    elements.printerControls.e0Target.addEventListener("change", async e => {
-      if (elements.printerControls.e0Target.value <= 0) {
-        elements.printerControls.e0Target.value = "0"
-      }
-    });
-    elements.printerControls.e0Target.addEventListener("keypress", async e => {
-      if (e.key === 'Enter') {
-        e0Set(e);
-      }
-    });
-    elements.printerControls.e0Set.addEventListener("click", async e => {
-      e0Set(e);
-    });
-
-    let bedSet = async function (e) {
-      let flashReturn = function () {
-        elements.printerControls.bedSet.classList = "btn btn-md btn-light m-0 p-1";
-      };
-      let value = elements.printerControls.bedTarget.value;
-
-      elements.printerControls.bedTarget.value = "";
-      if (value === "Off") {
-        value = 0;
-      }
-      let opt = {
-        command: "target",
-        target: parseInt(value)
-      };
-      let post = await OctoPrintClient.post(printer, "printer/bed", opt);
-      if (post.status === 204) {
-        elements.printerControls.bedSet.className = "btn btn-md btn-success m-0 p-1";
-        setTimeout(flashReturn, 500);
-      } else {
-        elements.printerControls.bedSet.className = "btn btn-md btn-success m-0 p-1";
-        setTimeout(flashReturn, 500);
-      }
-    }
-    elements.printerControls.bedTarget.addEventListener("change", async e => {
-      if (elements.printerControls.bedTarget.value <= 0) {
-        elements.printerControls.bedTarget.value = "0"
-      }
-    });
-    elements.printerControls.bedTarget.addEventListener("keypress", async e => {
-      if (e.key === 'Enter') {
-        bedSet(e);
-      }
-    });
-    elements.printerControls.bedSet.addEventListener("click", async e => {
-      bedSet(e);
-    });
+    // let e0Set = async function (e) {
+    //   let flashReturn = function () {
+    //     elements.printerControls.e0Set.className = "btn btn-md btn-light m-0 p-1";
+    //   };
+    //   let value = elements.printerControls.e0Target.value;
+    //   elements.printerControls.e0Target.value = "";
+    //   if (value === "Off") {
+    //     value = 0;
+    //   }
+    //   let opt = {
+    //     command: "target",
+    //     targets: {
+    //       tool0: parseInt(value)
+    //     }
+    //   };
+    //   let post = await OctoPrintClient.post(printer, "printer/tool", opt);
+    //   if (post.status === 204) {
+    //     elements.printerControls.e0Set.className = "btn btn-md btn-success m-0 p-1";
+    //     setTimeout(flashReturn, 500);
+    //   } else {
+    //     elements.printerControls.e0Set.className = "btn btn-md btn-danger m-0 p-1";
+    //     setTimeout(flashReturn, 500);
+    //   }
+    // }
+    // elements.printerControls.e0Target.addEventListener("change", async e => {
+    //   if (elements.printerControls.e0Target.value <= 0) {
+    //     elements.printerControls.e0Target.value = "0"
+    //   }
+    // });
+    // elements.printerControls.e0Target.addEventListener("keypress", async e => {
+    //   if (e.key === 'Enter') {
+    //     e0Set(e);
+    //   }
+    // });
+    // elements.printerControls.e0Set.addEventListener("click", async e => {
+    //   e0Set(e);
+    // });
+    //
+    // let bedSet = async function (e) {
+    //   let flashReturn = function () {
+    //     elements.printerControls.bedSet.classList = "btn btn-md btn-light m-0 p-1";
+    //   };
+    //   let value = elements.printerControls.bedTarget.value;
+    //
+    //   elements.printerControls.bedTarget.value = "";
+    //   if (value === "Off") {
+    //     value = 0;
+    //   }
+    //   let opt = {
+    //     command: "target",
+    //     target: parseInt(value)
+    //   };
+    //   let post = await OctoPrintClient.post(printer, "printer/bed", opt);
+    //   if (post.status === 204) {
+    //     elements.printerControls.bedSet.className = "btn btn-md btn-success m-0 p-1";
+    //     setTimeout(flashReturn, 500);
+    //   } else {
+    //     elements.printerControls.bedSet.className = "btn btn-md btn-success m-0 p-1";
+    //     setTimeout(flashReturn, 500);
+    //   }
+    // }
+    // elements.printerControls.bedTarget.addEventListener("change", async e => {
+    //   if (elements.printerControls.bedTarget.value <= 0) {
+    //     elements.printerControls.bedTarget.value = "0"
+    //   }
+    // });
+    // elements.printerControls.bedTarget.addEventListener("keypress", async e => {
+    //   if (e.key === 'Enter') {
+    //     bedSet(e);
+    //   }
+    // });
+    // elements.printerControls.bedSet.addEventListener("click", async e => {
+    //   bedSet(e);
+    // });
     elements.printerControls.feedRate.addEventListener("click", async e => {
       let flashReturn = function () {
         e.target.classList = "btn btn-light";
@@ -1217,16 +1261,6 @@ export default class PrinterManager {
         step1: document.getElementById("pcAxisSteps1"),
         step10: document.getElementById("pcAxisSteps10"),
         step100: document.getElementById("pcAxisSteps100"),
-        e0Neg: document.getElementById("pcE0neg"),
-        e0Target: document.getElementById("pcE0Target"),
-        e0Actual: document.getElementById("pcE0Actual"),
-        e0Pos: document.getElementById("pcE0pos"),
-        bedNeg: document.getElementById("pcBedneg"),
-        bedTarget: document.getElementById("pcBedTarget"),
-        bedActual: document.getElementById("pcBedActual"),
-        begPos: document.getElementById("pcBedpos"),
-        e0Set: document.getElementById("pcE0set"),
-        bedSet: document.getElementById("pcBedset"),
         feedRate: document.getElementById("pcFeedRate"),
         flowRate: document.getElementById("pcFlowRate"),
         feedRateValue: document.getElementById("pcFeedValue"),
@@ -1254,8 +1288,17 @@ export default class PrinterManager {
         syncFiles: document.getElementById("fileReSync"),
         back: document.getElementById("fileBackBtn"),
         createFolderBtn: document.getElementById("createFolderBtn")
+      },
+      temperatures: {
+        tempTime: document.getElementById("pmTempTime"),
+        bedList: document.getElementById("pmBedTemps"),
+        chamberList: document.getElementById("pmChamberTemps"),
+        bed: document.querySelectorAll(("[id^='bed']")),
+        chamber:  document.querySelectorAll(("[id^='chamber']")),
+        tools: document.querySelectorAll(("[id^='tool']"))
       }
     };
+
     return printerManager;
   }
 
@@ -1337,46 +1380,7 @@ export default class PrinterManager {
 
     }
     if (printer.stateColour.category === "Active") {
-      elements.printerControls.filamentDrop.disabled = true;
-      if (
-          typeof printer.temps != "undefined" &&
-          typeof printer.temps[0].tool0 != "undefined" &&
-          typeof printer.temps[0].tool0.target != "undefined"
-      ) {
-        elements.printerControls.e0Target.placeholder =
-            printer.temps[0].tool0.target + "°C";
-        elements.printerControls.e0Actual.innerHTML =
-            printer.temps[0].tool0.actual + "°C";
-        elements.printerControls.bedTarget.placeholder =
-            printer.temps[0].bed.target + "°C";
-        elements.printerControls.bedActual.innerHTML =
-            printer.temps[0].bed.actual + "°C";
-        if (
-            printer.temps[0].tool0.actual >
-            printer.temps[0].tool0.target - 0.5 &&
-            printer.temps[0].tool0.actual < printer.temps[0].tool0.target + 0.5
-        ) {
-          elements.printerControls.e0Actual.classList =
-              "input-group-text Complete";
-        } else if (printer.temps[0].tool0.actual < 35) {
-          elements.printerControls.e0Actual.classList = "input-group-text";
-        } else {
-          elements.printerControls.e0Actual.classList =
-              "input-group-text Active";
-        }
-        if (
-            printer.temps[0].bed.actual > printer.temps[0].bed.target - 0.5 &&
-            printer.temps[0].bed.actual < printer.temps[0].bed.target + 0.5
-        ) {
-          elements.printerControls.bedActual.classList =
-              "input-group-text Complete";
-        } else if (printer.temps[0].bed.actual < 35) {
-          elements.printerControls.bedActual.classList = "input-group-text";
-        } else {
-          elements.printerControls.bedActual.classList =
-              "input-group-text Active";
-        }
-      }
+
 
       PrinterManager.controls(true, true);
       elements.printerControls.printStart.disabled = true;
@@ -1393,28 +1397,12 @@ export default class PrinterManager {
         printer.stateColour.category === "Idle" ||
         printer.stateColour.category === "Complete"
     ) {
-      elements.printerControls.filamentDrop.disabled = false;
+
       PrinterManager.controls(false);
       elements.connectPage.connectButton.value = "disconnect";
       elements.connectPage.connectButton.innerHTML = "Disconnect";
       elements.connectPage.connectButton.classList = "btn btn-danger inline";
       elements.connectPage.connectButton.disabled = false;
-      if (
-          typeof printer.temps != "undefined" &&
-          typeof printer.temps[0].tool0 != "undefined" &&
-          typeof printer.temps[0].tool0.target != "undefined"
-      ) {
-        elements.printerControls.e0Target.placeholder =
-            printer.temps[0].tool0.target + "°C";
-        elements.printerControls.e0Actual.innerHTML =
-            printer.temps[0].tool0.actual + "°C";
-        elements.printerControls.bedTarget.placeholder =
-            printer.temps[0].bed.target + "°C";
-        elements.printerControls.bedActual.innerHTML =
-            printer.temps[0].bed.actual + "°C";
-      }
-      elements.printerControls.e0Actual.classList = "input-group-text";
-      elements.printerControls.bedActual.classList = "input-group-text";
       elements.connectPage.printerPort.disabled = true;
       elements.connectPage.printerBaud.disabled = true;
       elements.connectPage.printerProfile.disabled = true;
@@ -1463,17 +1451,10 @@ export default class PrinterManager {
         printer.stateColour.category === "Offline" ||
         printer.stateColour.category === "Disconnected"
     ) {
-      elements.printerControls.filamentDrop.disabled = false;
       elements.connectPage.connectButton.value = "connect";
       elements.connectPage.connectButton.innerHTML = "Connect";
       elements.connectPage.connectButton.classList = "btn btn-success inline";
       elements.connectPage.connectButton.disabled = false;
-      elements.printerControls.e0Target.placeholder = 0 + "°C";
-      elements.printerControls.e0Actual.innerHTML = 0 + "°C";
-      elements.printerControls.bedTarget.placeholder = 0 + "°C";
-      elements.printerControls.bedActual.innerHTML = 0 + "°C";
-      elements.printerControls.e0Actual.classList = "input-group-text";
-      elements.printerControls.bedActual.classList = "input-group-text";
       PrinterManager.controls(true);
       elements.printerControls.printStart.disabled = true;
       elements.printerControls.printStart.style.display = "inline-block";
@@ -1516,26 +1497,63 @@ export default class PrinterManager {
       }
     }
   }
+  static applyTemps(printer, elements){
+    if(typeof printer.temps !== "undefined" && printer.temps.length != 0){
+      elements.temperatures.tempTime.innerHTML = "Updated: <i class=\"far fa-clock\"></i> " + new Date(printer.temps[0].time * 1000).toTimeString().substring(1, 8);
+      if(printer.temps[0].bed.actual !== null){
+        if(elements.temperatures.bedList.classList.contains("d-none")){
+          elements.temperatures.bedList.classList.remove("d-none");
+        }
+        elements.temperatures.bed[0].innerHTML = printer.temps[0].bed.actual + "°C"
+        elements.temperatures.bed[1].placeholder = printer.temps[0].bed.target + "°C"
+      }
+      if(printer.temps[0].chamber.actual !== null){
+        if(elements.temperatures.chamberList.classList.contains("d-none")){
+          elements.temperatures.chamberList.classList.remove("d-none");
+        }
+        elements.temperatures.chamber[0].innerHTML = printer.temps[0].chamber.actual + "°C"
+        elements.temperatures.chamber[1].placeholder = printer.temps[0].chamber.target + "°C"
+      }
+      let keys = Object.keys(printer.temps[0])
+      keys = keys.reverse();
+      keys.forEach(key => {
+        if (key.includes("tool")) {
+          elements.temperatures.tools.forEach(tool => {
+            if(tool.id.includes(key) && tool.id.includes("Actual")){
+              tool.innerHTML = printer.temps[0][key].actual + "°C"
+            }
+            if(tool.id.includes(key) && tool.id.includes("Target")){
+              tool.placeholder = printer.temps[0][key].target + "°C"
+            }
+          })
+
+        }
+      })
+
+      //Setup listeners
+    }
+
+  }
 
   static async controls(enable, printing) {
     let elements = await PrinterManager.grabPage();
     elements = elements.printerControls;
     if (typeof printing != "undefined" && printing) {
-      elements.e0Target.disabled = !printing;
-      elements.e0Actual.disabled = !printing;
-      elements.bedTarget.disabled = !printing;
-      elements.e0Set.disabled = !printing;
-      elements.bedSet.disabled = !printing;
+      // elements.e0Target.disabled = !printing;
+      // elements.e0Actual.disabled = !printing;
+      // elements.bedTarget.disabled = !printing;
+      // elements.e0Set.disabled = !printing;
+      // elements.bedSet.disabled = !printing;
       elements.feedRate.disabled = !printing;
       elements.flowRate.disabled = !printing;
       elements.fansOn.disabled = !printing;
       elements.fansOff.disabled = !printing;
     } else {
-      elements.e0Target.disabled = enable;
-      elements.e0Actual.disabled = enable;
-      elements.bedTarget.disabled = enable;
-      elements.e0Set.disabled = enable;
-      elements.bedSet.disabled = enable;
+      // elements.e0Target.disabled = enable;
+      // elements.e0Actual.disabled = enable;
+      // elements.bedTarget.disabled = enable;
+      // elements.e0Set.disabled = enable;
+      // elements.bedSet.disabled = enable;
       elements.feedRate.disabled = enable;
       elements.flowRate.disabled = enable;
       elements.fansOn.disabled = enable;

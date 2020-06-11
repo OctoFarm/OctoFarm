@@ -11,7 +11,6 @@ All notable changes to this project will be documented in this file.
     - Seperate smaller width table for adding printers. Should help with adding printers on a smaller screen laptop. 
     - Thumbnail to history view modal.
     - Added percent bar for Status on History Filters. Will show total failed/success/cancelled percentages on filtered results. 
-    - Added a utilisation column to printers management table
     - Added Placeholders to file actions on file list
     - New Monilithic docker builds, builds with MongoDB included.
     
@@ -30,7 +29,7 @@ All notable changes to this project will be documented in this file.
     - The File list now shows Filament Cost and Printer Cost seperate. 
         - Filament Cost requires a filament to be selected to generate. Re-Sync to update.  
         - Printer Cost requires your printer costs been filled in in Printer Settings and also requires an expected time to be generated. 
-    - Client now uses service workers. 
+    - Client now uses service workers for information retrieval. 
        
     
 ### Fixed
