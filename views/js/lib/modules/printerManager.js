@@ -393,7 +393,7 @@ export default class PrinterManager {
             </div>
             <div class="col-lg-9 pt-0">
             <div class="row">
-                <div class="col-lg-6">
+                <div class="col-lg-12 col-xl-6">
                   <div class="col-12">
                                     <center>
                                         <h5>Print Status</h5>
@@ -411,6 +411,9 @@ export default class PrinterManager {
                                 </div>
               </div>
               <div class="row">
+              <div id="fileThumbnail" class="col-12">
+              
+              </div>
               <div class="col-12">
               <center>
                                <b class="mb-1">File Name: </b><br><p title="${job.file.path}" class="tag mb-1" id="pmFileName">${
@@ -418,7 +421,7 @@ export default class PrinterManager {
         }</p>
 </center>
 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-12 col-xl-6">
                    <center>
                 <b>Expected Completion Date: </b><p class="mb-1" id="pmExpectedCompletionDate">${dateComplete}</p>
 
@@ -432,7 +435,7 @@ export default class PrinterManager {
             printer.currentZ
         }mm</p></center>
             </div>
-                <div class="col-lg-6">
+                <div class="col-lg-12 col-xl-6">
                                <center>  
                  <b>Expected Print Time: </b><p class="mb-1" id="pmExpectedTime">${Calc.generateTime(
             job.estimatedPrintTime
@@ -446,7 +449,7 @@ export default class PrinterManager {
 </div>
               </div>
                 </div>
-                <div class="col-lg-6">
+                <div class="col-lg-12 col-xl-6">
                <div class="row">
                   <div class="col-12">
                       <center>
@@ -455,38 +458,8 @@ export default class PrinterManager {
                       <hr>
                   </div>
               </div>
-              <div class="row">
-                <div class="col-md-6">
-                   <div class="md-form input-group mb-3">
-                       <span class="input-group-text">Tool 0</span>
-                      <div title="Actual Tool temperature" class="input-group-prepend">
-                          <span id="pcE0Actual" class="input-group-text">Actual: °C</span>
-                      </div>
-                      <input title="Set your target Tool temperature" id="pcE0Target" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
-                      <div class="input-group-append">
-                          <button class="btn btn-md btn-light m-0 p-1" type="button" id="pcE0set">Set</button>
-                      </div>
-                  </div>
-                </div>
-                <div class="col-md-6">
-                 <div class="input-group mb-1"><div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="filamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="filamentManagerFolderSelect"><option value="" selected></option></select></div>
-                </div>
-                <div class="col-12">
-                                <center>
-                  <h5>Bed</h5>
-              </center>
-              <hr>
-              <div class="md-form input-group mb-3">
-                  <div title="Actual Bed temperature" class="input-group-prepend">
-                      <span id="pcBedActual" class="input-group-text">Actual: °C</span>
-                  </div>
-                  <input title="Set your target Bed temperature" id="pcBedTarget" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
-                  <div class="input-group-append">
-                      <button class="btn btn-md btn-light m-0 p-1" type="button" id="pcBedset">Set</button>
-                  </div>
-              </div>
-                </div>
-
+              <div class="row" id="pmTemps">
+                
               </div>
                 </div>
               </div>
@@ -659,6 +632,63 @@ export default class PrinterManager {
 
           </div>
           `;
+
+        let printerTemps = document.getElementById("pmTemps")
+            printerTemps.innerHTML = "";
+            if(typeof printer.temps !== 'undefined' && printer.temps.length !== 0){
+              console.log(printer.temps)
+            }
+            printerTemps.insertAdjacentHTML('beforeend', `
+                      <div class="col-md-6">
+                   <div class="md-form input-group mb-3">
+                       <span class="input-group-text">Tool 0</span>
+                      <div title="Actual Tool temperature" class="input-group-prepend">
+                          <span id="pcE0Actual" class="input-group-text">Actual: °C</span>
+                      </div>
+                      <input title="Set your target Tool temperature" id="pcE0Target" type="number" class="form-control col" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+                      <div class="input-group-append">
+                          <button class="btn btn-md btn-light m-0 p-1" type="button" id="pcE0set">Set</button>
+                      </div>
+                  </div>
+                </div>
+                <div class="col-md-6">
+                 <div class="input-group mb-1"><div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="filamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="filamentManagerFolderSelect"><option value="" selected></option></select></div>
+                </div>
+                <div class="col-12">
+                                <center>
+                  <h5>Bed</h5>
+              </center>
+              <hr>
+              <div class="md-form input-group mb-3">
+                  <div title="Actual Bed temperature" class="input-group-prepend">
+                      <span id="pcBedActual" class="input-group-text">Actual: °C</span>
+                  </div>
+                  <input title="Set your target Bed temperature" id="pcBedTarget" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+                  <div class="input-group-append">
+                      <button class="btn btn-md btn-light m-0 p-1" type="button" id="pcBedset">Set</button>
+                  </div>
+              </div>
+                </div>
+                <div class="col-12">
+                                <center>
+                  <h5>Chamber</h5>
+              </center>
+              <hr>
+              <div class="md-form input-group mb-3">
+                  <div title="Actual Bed temperature" class="input-group-prepend">
+                      <span id="pcBedActual" class="input-group-text">Actual: °C</span>
+                  </div>
+                  <input title="Set your target Bed temperature" id="pcBedTarget" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+                  <div class="input-group-append">
+                      <button class="btn btn-md btn-light m-0 p-1" type="button" id="pcBedset">Set</button>
+                  </div>
+              </div>
+                </div>         
+                    
+            `)
+
+
+
         document.getElementById("printerControlCamera").src = camURL;
         document.getElementById("printerIndex").innerHTML = printer._id;
         if (typeof printer.job != "undefined" && printer.job.file.name != null) {
@@ -1240,14 +1270,10 @@ export default class PrinterManager {
     elements.mainPage.status.className = `btn btn-${printer.stateColour.name} mb-2`;
     let dateComplete = null;
     if (typeof printer.job != "undefined" && printer.job.file.name != null) {
-      let camField = document.getElementById("printerControlCamera");
-      if(typeof printer.camURL != "undefined" && printer.camURL.includes("http")){
+      let camField = document.getElementById("fileThumbnail");
         if (typeof printer.job.file.thumbnail !== 'undefined' || printer.job.file.thumbnail != null) {
-          camField.src = printer.printerURL + "/" + printer.job.file.thumbnail
+          camField.innerHTML = `<img src="${printer.printerURL}/${printer.job.file.thumbnail}">`
         }
-      }
-
-
     }
     if (typeof printer.progress !== "undefined" && printer.progress.printTimeLeft !== null) {
 
