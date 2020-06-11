@@ -86,7 +86,7 @@ WebSocketClient.prototype.open = function(url, index) {
         this.onmessage(data, flags, this.number, this.index);
     });
     this.instance.on('close', (e) => {
-        console.log(e)
+
         switch (e) {
             case 1000: // CLOSE_NORMAL
                 logger.info("WebSocket: closed: " + this.index + ": " + this.url);
@@ -142,7 +142,6 @@ WebSocketClient.prototype.open = function(url, index) {
         return "closed";
     });
     this.instance.on('error', (e) => {
-        console.log(e)
         switch (e.code) {
             case 'ECONNREFUSED':
                 logger.error(e, this.index + ": " + this.url);
@@ -236,7 +235,6 @@ WebSocketClient.prototype.reconnect = async function(e) {
     this.instance.removeAllListeners();
     let that = this;
     setTimeout(function() {
-        console.log("RECONNECTING")
         farmPrinters[that.index].hostStateColour = Runner.getColour("Searching...");
         farmPrinters[that.index].hostDescription = "Searching for Host";
         logger.info("Re-Opening Websocket: " + that.index + ": " + that.url);
