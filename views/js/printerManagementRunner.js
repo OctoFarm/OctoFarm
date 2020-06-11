@@ -9,61 +9,50 @@ import {parse} from './vendor/flatted.js';
 import tableSort from "./lib/functions/tablesort.js";
 import PowerButton from "./lib/modules/powerButton.js";
 
+
 let printerInfo = "";
 let editMode = false;
 let deletedPrinters = [];
-
-async function asyncParse(str) {
-    try {
-        let info = parse(str)
-        return info;
-    } catch (e) {
-        return false;
-    }
-}
-let source = new EventSource("/sse/dashboardInfo/");
+let worker = null;
 let powerTimer = 20000;
-
-source.onmessage = async function(e) {
-    if (!editMode) {
-        if (e.data != null) {
-            let res = await asyncParse(e.data);
-            if (res != false) {
-                if (res.printerInfo.length > 0) {
-                    if (
-                        document.getElementById("printerManagerModal").classList.contains("show")
-                    ) {
-                        PrinterManager.init(res.printerInfo);
-                    }else if(document.getElementById("printerSettingsModal").classList.contains("show")){
-                        PrinterSettings.init(res.printerInfo);
-                    } else {
-                        printerInfo = res.printerInfo;
-                        dashUpdate.printers(res.printerInfo, res.octofarmStatistics.printerCounts)
-                        if(powerTimer >= 20000){
-                            res.printerInfo.forEach(printer => {
-                                PowerButton.applyBtn(printer);
-                            });
-                            powerTimer = 0
-                        }else{
-                            powerTimer = powerTimer + 500;
+if (window.Worker) {
+    // Yes! Web worker support!
+    try{
+        if (worker === null) {
+            worker = new Worker("./js/lib/modules/serverConnect.js", {type: "module"});
+            worker.onmessage = function(event){
+                if (event.data != false) {
+                    if (event.data.printerInfo.length > 0) {
+                        if (
+                            document.getElementById("printerManagerModal").classList.contains("show")
+                        ) {
+                            PrinterManager.init(event.data.printerInfo);
+                        }else if(document.getElementById("printerSettingsModal").classList.contains("show")){
+                            PrinterSettings.init(event.data.printerInfo);
+                        } else {
+                            printerInfo = event.data.printerInfo;
+                            dashUpdate.printers(event.data.printerInfo, event.data.octofarmStatistics.printerCounts)
+                            if(powerTimer >= 20000){
+                                event.data.printerInfo.forEach(printer => {
+                                    PowerButton.applyBtn(printer);
+                                });
+                                powerTimer = 0
+                            }else{
+                                powerTimer = powerTimer + 500;
+                            }
                         }
                     }
                 }
             }
         }
+    }catch(e){
+        console.log(e)
     }
+} else {
+    // Sorry! No Web Worker support..
+    console.log("Web workers not available... sorry!")
+}
 
-};
-source.onerror = function() {
-    UI.createAlert(
-        "error",
-        "Communication with the server has been suddenly lost, we will automatically refresh in 10 seconds..."
-    );
-    setTimeout(function() {
-        location.reload();
-    }, 10000);
-};
-source.onclose = function() {};
 let newPrintersIndex = 0;
 //Dash control listeners
 let saveEditBtn = document.getElementById("saveEditsBtn");

@@ -1,33 +1,44 @@
 import Calc from "./lib/functions/calc.js";
 import OctoPrintClient from "./lib/octoprint.js";
-import {parse} from "./vendor/flatted.js";
-import UI from "./lib/functions/ui.js";
-//import initGroupSelect from "./lib/modules/groupSelection.js";
 
-async function asyncParse(str) {
+import UI from "./lib/functions/ui.js";
+import initGroupSelect from "./lib/modules/groupSelection";
+import {dragAndDropEnable} from "./lib/functions/dragAndDrop";
+import PrinterManager from "./lib/modules/printerManager";
+import PowerButton from "./lib/modules/powerButton";
+import currentOperations from "./lib/modules/currentOperations";
+
+let worker = null;
+//Setup webWorker
+if (window.Worker) {
+    // Yes! Web worker support!
     try{
-        let info = parse(str)
-        return info;
+        if (worker === null) {
+            worker = new Worker("/js/lib/modules/serverConnect.js", {type: "module"});
+
+            worker.onmessage = function(event){
+                if (event.data !== false) {
+                    if (res != false) {
+                        currentOperationsView(event.data.currentOperations, event.data.currentOperationsCount, event.data.printerInfo);
+                    }
+                }else{
+                    UI.createAlert(
+                        "error",
+                        "Communication with the server has been suddenly lost, trying to re-establish connection...", 10000, "Clicked"
+
+                    );
+                }
+
+            }
+        }
     }catch(e){
         console.log(e)
-        return false;
     }
+} else {
+    // Sorry! No Web Worker support..
+    console.log("Web workers not available... sorry!")
 }
-var source = new EventSource("/sse/monitoringInfo/");
-//let groupInit = false;
 
-source.onmessage = async function(e) {
-    if (e.data != null) {
-        let res = await asyncParse(e.data);
-        // if(groupInit === false){
-        //     initGroupSelect(res.printerInfo)
-        //     groupInit = true;
-        // }
-        if (res != false) {
-                    currentOperationsView(res.currentOperations, res.currentOperationsCount, res.printerInfo);
-        }
-    }
-};
 source.onerror = function(e) {
     UI.createAlert(
         "error",

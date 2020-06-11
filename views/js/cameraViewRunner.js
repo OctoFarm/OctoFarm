@@ -13,81 +13,87 @@ import {checkTemps} from "./lib/modules/temperatureCheck.js";
 let printerInfo = [];
 let elems = [];
 
+
 //Connect to servers socket..webSocket
 let url = window.location.hostname;
 let port = window.location.port;
 if (port != "") {
     port = ":" + port;
 }
-async function asyncParse(str) {
-    try {
-        let info = parse(str);
-        return info;
-    } catch (e) {
-        console.log(e);
-        return false;
-    }
-}
-var source = new EventSource("/sse/monitoringInfo/");
 let groupInit = false;
 let powerTimer = 20000;
 let jpInit = false;
 let dragDropInit = false;
-source.onmessage = async function(e) {
-    if (e.data != null) {
-        let res = await asyncParse(e.data);
-        if(groupInit === false){
-            initGroupSelect(res.printerInfo)
-            groupInit = true;
-        }
-        if(dragDropInit === false){
-            let printerList = document.querySelectorAll("[id^='viewPanel-']")
-            printerList.forEach(list => {
-                let ca = list.id.split("-");
-                let zeeIndex = _.findIndex(res.printerInfo, function(o) { return o._id == ca[1]; });
-                dragAndDropEnable(list, res.printerInfo[zeeIndex])
-                dragDropInit = true;
-            })
-        }
-        if (res != false) {
-            if (
-                document
-                    .getElementById("printerManagerModal")
-                    .classList.contains("show")
-            ) {
-                PrinterManager.init(res.printerInfo);
-            } else {
-                if (res.clientSettings.cameraView.currentOp) {
-                    currentOperations(
-                        res.currentOperations,
-                        res.currentOperationsCount,
-                        res.printerInfo
+
+let worker = null;
+//Setup webWorker
+if (window.Worker) {
+    // Yes! Web worker support!
+    try{
+        if (worker === null) {
+            worker = new Worker("/js/lib/modules/serverConnect.js", {type: "module"});
+
+            worker.onmessage = function(event){
+                if (event.data !== false) {
+                    if(groupInit === false){
+                        initGroupSelect(event.data.printerInfo)
+                        groupInit = true;
+                    }
+                    if(dragDropInit === false){
+                        let printerList = document.querySelectorAll("[id^='viewPanel-']")
+                        printerList.forEach(list => {
+                            let ca = list.id.split("-");
+                            let zeeIndex = _.findIndex(event.data.printerInfo, function(o) { return o._id == ca[1]; });
+                            dragAndDropEnable(list, event.data.printerInfo[zeeIndex])
+                            dragDropInit = true;
+                        })
+                    }
+                    if (event.data != false) {
+                        if (
+                            document
+                                .getElementById("printerManagerModal")
+                                .classList.contains("show")
+                        ) {
+                            PrinterManager.init(event.data.printerInfo);
+                        } else {
+                            if (event.data.clientSettings.cameraView.currentOp) {
+                                currentOperations(
+                                    event.data.currentOperations,
+                                    event.data.currentOperationsCount,
+                                    event.data.printerInfo
+                                );
+                            }
+                            printerInfo = event.data.printerInfo;
+                            if(powerTimer >= 20000){
+                                event.data.printerInfo.forEach(printer => {
+                                    PowerButton.applyBtn(printer);
+                                });
+                                powerTimer = 0
+                            }else{
+                                powerTimer = powerTimer + 500;
+                            }
+                            updateState(event.data.printerInfo, event.data.clientSettings.cameraView);
+                        }
+                    }
+                }else{
+                    UI.createAlert(
+                        "error",
+                        "Communication with the server has been suddenly lost, trying to re-establish connection...", 10000, "Clicked"
+
                     );
                 }
-                printerInfo = res.printerInfo;
-                if(powerTimer >= 20000){
-                    res.printerInfo.forEach(printer => {
-                        PowerButton.applyBtn(printer);
-                    });
-                    powerTimer = 0
-                }else{
-                    powerTimer = powerTimer + 500;
-                }
-                updateState(res.printerInfo, res.clientSettings.cameraView);
+
             }
         }
+    }catch(e){
+        console.log(e)
     }
-};
-source.onerror = function(e) {
-    UI.createAlert(
-        "error",
-        "Communication with the server has been suddenly lost, we will automatically refresh in 10 seconds..."
-    );
-    setTimeout(function() {
-        location.reload();
-    }, 10000);
-};
-source.onclose = function(e) {};
+} else {
+    // Sorry! No Web Worker support..
+    console.log("Web workers not available... sorry!")
+}
+
+
 let returnPrinterInfo = (id) => {
     if (typeof id !== "undefined") {
         let zeeIndex = _.findIndex(printerInfo, function(o) {

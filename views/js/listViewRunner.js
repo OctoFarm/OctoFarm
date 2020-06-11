@@ -34,59 +34,67 @@ async function asyncParse(str) {
 let groupInit = false;
 let powerTimer = 20000;
 let dragDropInit = false;
+let worker = null;
+//Setup webWorker
+if (window.Worker) {
+  // Yes! Web worker support!
+  try{
+    if (worker === null) {
+      worker = new Worker("/js/lib/modules/serverConnect.js", {type: "module"});
 
-var source = new EventSource("/sse/monitoringInfo/");
-source.onmessage = async function(e) {
-  if (e.data != null) {
-    let res = await asyncParse(e.data);
-    if(groupInit === false){
-      groupInit = true;
-      initGroupSelect(res.printerInfo)
-    }
-    if(dragDropInit === false){
-      let printerList = document.querySelectorAll("[id^='viewPanel-']")
-      printerList.forEach(list => {
-        let ca = list.id.split("-");
-        let zeeIndex = _.findIndex(res.printerInfo, function(o) { return o._id == ca[1]; });
-        dragAndDropEnable(list, res.printerInfo[zeeIndex])
-        dragDropInit = true;
-      })
-    }
-    if (res != false) {
-      if (
-          document.getElementById("printerManagerModal").classList.contains("show")
-      ) {
-        PrinterManager.init(res.printerInfo);
-      } else {
-        printerInfo = res.printerInfo;
-        if(powerTimer >= 20000){
-          res.printerInfo.forEach(printer => {
-            PowerButton.applyBtn(printer);
-          });
-          powerTimer = 0
+      worker.onmessage = function(event){
+        if (event.data !== false) {
+          if(groupInit === false){
+            groupInit = true;
+            initGroupSelect(event.data.printerInfo)
+          }
+          if(dragDropInit === false){
+            let printerList = document.querySelectorAll("[id^='viewPanel-']")
+            printerList.forEach(list => {
+              let ca = list.id.split("-");
+              let zeeIndex = _.findIndex(event.data.printerInfo, function(o) { return o._id == ca[1]; });
+              dragAndDropEnable(list, event.data.printerInfo[zeeIndex])
+              dragDropInit = true;
+            })
+          }
+          if (event.data != false) {
+            if (
+                document.getElementById("printerManagerModal").classList.contains("show")
+            ) {
+              PrinterManager.init(event.data.printerInfo);
+            } else {
+              printerInfo = event.data.printerInfo;
+              if(powerTimer >= 20000){
+                event.data.printerInfo.forEach(printer => {
+                  PowerButton.applyBtn(printer);
+                });
+                powerTimer = 0
+              }else{
+                powerTimer = powerTimer + 500;
+              }
+              if (event.data.clientSettings.listView.currentOp) {
+                currentOperations(event.data.currentOperations, event.data.currentOperationsCount, event.data.printerInfo);
+              }
+              updateState(event.data.printerInfo, event.data.clientSettings.listView, event.data.filamentProfiles, event.data.filamentManager);
+            }
+          }
         }else{
-          powerTimer = powerTimer + 500;
+          UI.createAlert(
+              "error",
+              "Communication with the server has been suddenly lost, trying to re-establish connection...", 10000, "Clicked"
+
+          );
         }
-        if (res.clientSettings.listView.currentOp) {
-          currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo);
-        }
-        updateState(res.printerInfo, res.clientSettings.listView, res.filamentProfiles, res.filamentManager);
+
       }
     }
+  }catch(e){
+    console.log(e)
   }
-};
-source.onerror = function(e) {
-  UI.createAlert(
-      "error",
-      "Communication with the server has been suddenly lost, we will automatically refresh in 10 seconds..."
-  );
-  setTimeout(function() {
-    location.reload();
-  }, 10000);
-};
-source.onclose = function(e) {
-
-};
+} else {
+  // Sorry! No Web Worker support..
+  console.log("Web workers not available... sorry!")
+}
 let returnPrinterInfo = (id) => {
   if(typeof id !== 'undefined'){
     let zeeIndex = _.findIndex(printerInfo, function(o) { return o._id == id; });

@@ -2,7 +2,6 @@
 import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
 import Validate from "./lib/functions/validate.js";
-import {parse} from './vendor/flatted.js';
 import currentOperations from "./lib/modules/currentOperations.js";
 
 
@@ -334,52 +333,55 @@ var currentActivityChart = new ApexCharts(document.querySelector("#currentActivi
 currentActivityChart.render();
 var currentUtilisation = new ApexCharts(document.querySelector("#currentUtilisation"), optionsUtilisation);
 currentUtilisation.render();
-async function asyncParse(str) {
-    try {
-        let info = parse(str)
-        return info;
-    } catch (e) {
-        return false;
-    }
-}
-let source = new EventSource("/sse/dashboardInfo/");
+
+let worker = null;
 let statsCounter = 10;
-source.onmessage = async function(e) {
-        if (e.data != null) {
-            let res = await asyncParse(e.data);
-            if (res != false) {
-                if (res.printerInfo.length > 0) {
-                            currentOperations(res.currentOperations, res.currentOperationsCount, res.printerInfo)
+//Setup webWorker
+if (window.Worker) {
+    // Yes! Web worker support!
+    try{
+        if (worker === null) {
+            worker = new Worker("./js/lib/modules/serverConnect.js", {type: "module"});
+
+            worker.onmessage = function(event){
+                if (event.data != false) {
+                    if (event.data.printerInfo.length > 0) {
+                        currentOperations(event.data.currentOperations, event.data.currentOperationsCount, event.data.printerInfo)
                         if (statsCounter === 10) {
                             // dashUpdate.systemInformation(res.systemInfo);
-                            dashUpdate.farmInformation(res.farmInfo, res.heatMap);
-                            dashUpdate.farmUtilisation(res.octofarmStatistics)
-                            dashUpdate.currentActivity(res.currentOperationsCount)
-                            dashUpdate.currentTemperature(res.printerInfo);
-                            dashUpdate.currentStatus(res.printerInfo);
-                            dashUpdate.currentProgress(res.printerInfo);
-                            dashUpdate.currentUptime(res.printerInfo);
+                            dashUpdate.farmInformation(event.data.farmInfo, event.data.heatMap);
+                            dashUpdate.farmUtilisation(event.data.octofarmStatistics)
+                            dashUpdate.currentActivity(event.data.currentOperationsCount)
+                            dashUpdate.currentTemperature(event.data.printerInfo);
+                            dashUpdate.currentStatus(event.data.printerInfo);
+                            dashUpdate.currentProgress(event.data.printerInfo);
+                            dashUpdate.currentUptime(event.data.printerInfo);
                             statsCounter = 0;
-
                         } else {
                             statsCounter = statsCounter + 1;
                         }
+                    }
+                }else{
+                    UI.createAlert(
+                        "error",
+                        "Communication with the server has been suddenly lost, trying to re-establish connection...", 10000, "Clicked"
+
+                    );
                 }
+
             }
         }
+    }catch(e){
+        console.log(e)
+    }
+} else {
+    // Sorry! No Web Worker support..
+    console.log("Web workers not available... sorry!")
+}
 
 
-};
-source.onerror = function() {
-    UI.createAlert(
-        "error",
-        "Communication with the server has been suddenly lost, we will automatically refresh in 10 seconds..."
-    );
-    setTimeout(function() {
-        location.reload();
-    }, 10000);
-};
-source.onclose = function() {};
+
+
 
 class dashUpdate {
     static farmInformation(farmInfo, heatMap) {
