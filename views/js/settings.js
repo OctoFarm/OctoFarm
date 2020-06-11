@@ -235,7 +235,7 @@ setInterval(async function updateStatus() {
             document.getElementById("systemUpdate").innerHTML = Calc.generateTime(
                 systemInfo.sysUptime.uptime
             );
-            console.log(systemInfo)
+
             document.getElementById("processUpdate").innerHTML = Calc.generateTime(
                 systemInfo.processUptime
             );
@@ -468,6 +468,7 @@ class ServerSettings {
                   callback: function (result) {
                       if(result){
                           OctoFarmclient.get("settings/server/restart")
+                          UI.createAlert("warning", "Performing a server restart, please wait for it to come back online.", 6000, "Clicked")
                       }
                   }
               });
