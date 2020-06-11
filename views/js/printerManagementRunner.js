@@ -5,7 +5,6 @@ import PrinterManager from "./lib/modules/printerManager.js";
 import PrinterSettings from "./lib/modules/printerSettings.js";
 import FileOperations from "./lib/functions/file.js";
 import Validate from "./lib/functions/validate.js";
-import {parse} from './vendor/flatted.js';
 import tableSort from "./lib/functions/tablesort.js";
 import PowerButton from "./lib/modules/powerButton.js";
 
@@ -19,7 +18,7 @@ if (window.Worker) {
     // Yes! Web worker support!
     try{
         if (worker === null) {
-            worker = new Worker("./js/lib/modules/serverConnect.js", {type: "module"});
+            worker = new Worker("./js/lib/modules/serverConnect.js");
             worker.onmessage = function(event){
                 if (event.data != false) {
                     if (event.data.printerInfo.length > 0) {

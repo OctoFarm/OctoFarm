@@ -4,7 +4,6 @@ import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
 import doubleClickFullScreen from "./lib/functions/fullscreen.js";
-import {parse} from "./vendor/flatted.js";
 import initGroupSelect from "./lib/modules/groupSelection.js";
 import {returnSelected} from "./lib/modules/filamentGrab.js";
 import PowerButton from "./lib/modules/powerButton.js";
@@ -31,7 +30,7 @@ if (window.Worker) {
   // Yes! Web worker support!
   try{
     if (worker === null) {
-      worker = new Worker("/js/lib/modules/serverConnect.js", {type: "module"});
+      worker = new Worker("/js/lib/modules/serverConnect.js");
 
       worker.onmessage = function(event){
         if (event.data != false) {

@@ -4,7 +4,7 @@ import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
 import doubleClickFullScreen from "./lib/functions/fullscreen.js";
-import { parse } from "./vendor/flatted.js";
+
 import initGroupSelect from "./lib/modules/groupSelection.js";
 import PowerButton from "./lib/modules/powerButton.js";
 import {dragAndDropEnable} from "./lib/functions/dragAndDrop.js";
@@ -31,7 +31,7 @@ if (window.Worker) {
     // Yes! Web worker support!
     try{
         if (worker === null) {
-            worker = new Worker("/js/lib/modules/serverConnect.js", {type: "module"});
+            worker = new Worker("/js/lib/modules/serverConnect.js");
 
             worker.onmessage = function(event){
                 if (event.data !== false) {
@@ -277,90 +277,6 @@ function updateState(printers, clientSettings) {
             elements.stop.disabled = false;
             elements.start.classList.add("hidden");
             elements.stop.classList.remove("hidden");
-            if (
-                tool0A > tool0T - parseInt(printer.tempTriggers.heatingVariation) &&
-                tool0A < tool0T + parseInt(printer.tempTriggers.heatingVariation)
-            ) {
-                elements.tool0.innerHTML =
-                    ' <i id="tool0A-' +
-                    printer._id +
-                    '" class="far fa-circle toolOn"></i> ' +
-                    tool0A +
-                    "°C" +
-                    " " +
-                    ' <i id="tool0T-' +
-                    printer._id +
-                    '" class="fas fa-bullseye toolOn"></i> ' +
-                    tool0T +
-                    "°C";
-            } else if (tool0A < parseInt(printer.tempTriggers.heatingVariation)) {
-                elements.tool0.innerHTML =
-                    ' <i id="tool0A-' +
-                    printer._id +
-                    '" class="far fa-circle"></i> ' +
-                    tool0A +
-                    "°C" +
-                    " " +
-                    ' <i id="tool0T-' +
-                    printer._id +
-                    '" class="fas fa-bullseye"></i> ' +
-                    tool0T +
-                    "°C";
-            } else {
-                elements.tool0.innerHTML =
-                    ' <i id="tool0A-' +
-                    printer._id +
-                    '" class="far fa-circle toolOut"></i> ' +
-                    tool0A +
-                    "°C" +
-                    ' <i id="tool0T-' +
-                    printer._id +
-                    '" class="fas fa-bullseye toolOut"></i> ' +
-                    tool0T +
-                    "°C";
-            }
-            if (
-                bedA > bedT - parseInt(printer.tempTriggers.heatingVariation) &&
-                bedA < bedT + parseInt(printer.tempTriggers.heatingVariation)
-            ) {
-                elements.bed.innerHTML =
-                    ' <i id="bedA-' +
-                    printer._id +
-                    '" class="far fa-circle toolOn"></i> ' +
-                    bedA +
-                    "°C" +
-                    " " +
-                    ' <i id="bedT-' +
-                    printer._id +
-                    '" class="fas fa-bullseye toolOn"></i> ' +
-                    bedT +
-                    "°C";
-            } else if (bedA < parseInt(printer.tempTriggers.heatingVariation)) {
-                elements.bed.innerHTML =
-                    ' <i id="bedA-' +
-                    printer._id +
-                    '" class="far fa-circle"></i> ' +
-                    bedA +
-                    "°C" +
-                    " " +
-                    ' <i id="bedT-' +
-                    printer._id +
-                    '" class="fas fa-bullseye"></i> ' +
-                    bedT +
-                    "°C";
-            } else {
-                elements.bed.innerHTML =
-                    ' <i id="bedA-' +
-                    printer._id +
-                    '" class="far fa-circle toolOut"></i> ' +
-                    bedA +
-                    "°C" +
-                    ' <i id="bedT-' +
-                    printer._id +
-                    '" class="fas fa-bullseye toolOut"></i> ' +
-                    bedT +
-                    "°C";
-            }
         } else if (
             printer.stateColour.category === "Idle" ||
             printer.stateColour.category === "Complete"
@@ -381,58 +297,7 @@ function updateState(printers, clientSettings) {
                 elements.stop.classList.add("hidden");
             }
             if (printer.stateColour.category === "Complete") {
-                if (tool0A > parseInt(printer.tempTriggers.coolDown)) {
-                    elements.tool0.innerHTML =
-                        ' <i id="tool0A-' +
-                        printer._id +
-                        '" class="far fa-circle"></i> ' +
-                        tool0A +
-                        "°C" +
-                        " " +
-                        ' <i id="tool0T-' +
-                        printer._id +
-                        '" class="fas fa-bullseye"></i> ' +
-                        tool0T +
-                        "°C";
-                } else {
-                    elements.tool0.innerHTML =
-                        ' <i id="tool0A-' +
-                        printer._id +
-                        '" class="far fa-circle toolUnder"></i> ' +
-                        tool0A +
-                        "°C" +
-                        ' <i id="tool0T-' +
-                        printer._id +
-                        '" class="fas fa-bullseye toolUnder"></i> ' +
-                        tool0T +
-                        "°C";
-                }
-                if (bedA > parseInt(printer.tempTriggers.coolDown)) {
-                    elements.bed.innerHTML =
-                        ' <i id="bedA-' +
-                        printer._id +
-                        '" class="far fa-circle"></i> ' +
-                        bedA +
-                        "°C" +
-                        " " +
-                        ' <i id="bedT-' +
-                        printer._id +
-                        '" class="fas fa-bullseye"></i> ' +
-                        bedT +
-                        "°C";
-                } else {
-                    elements.bed.innerHTML =
-                        ' <i id="bedA-' +
-                        printer._id +
-                        '" class="far fa-circle toolUnder"></i> ' +
-                        bedA +
-                        "°C" +
-                        ' <i id="bedT-' +
-                        printer._id +
-                        '" class="fas fa-bullseye toolUnder"></i> ' +
-                        bedT +
-                        "°C";
-                }
+
             } else {
                 elements.tool0.innerHTML =
                     ' <i id="tool0A-' +

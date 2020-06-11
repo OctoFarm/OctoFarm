@@ -341,7 +341,7 @@ if (window.Worker) {
     // Yes! Web worker support!
     try{
         if (worker === null) {
-            worker = new Worker("./js/lib/modules/serverConnect.js", {type: "module"});
+            worker = new Worker("./js/lib/modules/serverConnect.js");
 
             worker.onmessage = function(event){
                 if (event.data != false) {

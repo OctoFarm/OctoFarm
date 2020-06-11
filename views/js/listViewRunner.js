@@ -3,7 +3,6 @@ import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
-import {parse} from "./vendor/flatted.js";
 import tableSort from "./lib/functions/tablesort.js";
 window.onload = function () {tableSort.makeAllSortable();};
 import Validate from "./lib/functions/validate.js";
@@ -40,7 +39,7 @@ if (window.Worker) {
   // Yes! Web worker support!
   try{
     if (worker === null) {
-      worker = new Worker("/js/lib/modules/serverConnect.js", {type: "module"});
+      worker = new Worker("/js/lib/modules/serverConnect.js");
 
       worker.onmessage = function(event){
         if (event.data !== false) {

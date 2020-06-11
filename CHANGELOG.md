@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file.
     - Added percent bar for Status on History Filters. Will show total failed/success/cancelled percentages on filtered results. 
     - Added a utilisation column to printers management table
     - Added Placeholders to file actions on file list
-    - New Monilithic docker builds, builds with MongoDB included. 
+    - New Monilithic docker builds, builds with MongoDB included.
     
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
@@ -30,6 +30,7 @@ All notable changes to this project will be documented in this file.
     - The File list now shows Filament Cost and Printer Cost seperate. 
         - Filament Cost requires a filament to be selected to generate. Re-Sync to update.  
         - Printer Cost requires your printer costs been filled in in Printer Settings and also requires an expected time to be generated. 
+    - Client now uses service workers. 
        
     
 ### Fixed
@@ -42,6 +43,7 @@ All notable changes to this project will be documented in this file.
     - Fixed bug with filament manager not turning off editable styling
     - Fixed issue with profiles not saving on filemant manager
     - Fixed bug with file manager resetting page scroll when entering folder/choosing printer
+    - Server reboot has a notification and no longer needs page to re-load. Live updating. 
     
 ## [Released]
 
