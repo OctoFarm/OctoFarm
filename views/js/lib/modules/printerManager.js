@@ -649,7 +649,7 @@ export default class PrinterManager {
               let keys = Object.keys(printer.temps[0])
               keys = keys.reverse();
               keys.forEach(key => {
-                if(key.includes("tool0")){
+                if(key.includes("tool")){
                   printerToolTemps.insertAdjacentHTML('beforeend', `
                     <div class="col-md-6">
                        <div class="md-form input-group mb-3">
@@ -665,21 +665,6 @@ export default class PrinterManager {
                     </div>
                     <div class="col-md-6">
                      <div class="input-group mb-1"><div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="${key}FilamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="${key}FilamentManagerFolderSelect"><option value="" selected></option></select></div>
-                    </div>
-                    `)
-                }else if(key.includes("tool")){
-                  printerToolTemps.insertAdjacentHTML('beforeend', `
-                    <div class="col-md-12">
-                       <div class="md-form input-group mb-3">
-                           <span class="input-group-text">${key}</span>
-                          <div title="Actual Tool temperature" class="input-group-prepend">
-                              <span id="${key}Actual" class="input-group-text">Actual: °C</span>
-                          </div>
-                          <input title="Set your target Tool temperature" id="${key}Target" type="number" class="form-control col" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
-                          <div class="input-group-append">
-                              <button class="btn btn-md btn-light m-0 p-1" type="button" id="${key}Set">Set</button>
-                          </div>
-                      </div>
                     </div>
                     `)
                 }else if(key.includes("bed")){
@@ -862,80 +847,142 @@ export default class PrinterManager {
       elements.printerControls.step01.className = "btn btn-light";
     });
 
-    // let e0Set = async function (e) {
-    //   let flashReturn = function () {
-    //     elements.printerControls.e0Set.className = "btn btn-md btn-light m-0 p-1";
-    //   };
-    //   let value = elements.printerControls.e0Target.value;
-    //   elements.printerControls.e0Target.value = "";
-    //   if (value === "Off") {
-    //     value = 0;
-    //   }
-    //   let opt = {
-    //     command: "target",
-    //     targets: {
-    //       tool0: parseInt(value)
-    //     }
-    //   };
-    //   let post = await OctoPrintClient.post(printer, "printer/tool", opt);
-    //   if (post.status === 204) {
-    //     elements.printerControls.e0Set.className = "btn btn-md btn-success m-0 p-1";
-    //     setTimeout(flashReturn, 500);
-    //   } else {
-    //     elements.printerControls.e0Set.className = "btn btn-md btn-danger m-0 p-1";
-    //     setTimeout(flashReturn, 500);
-    //   }
-    // }
-    // elements.printerControls.e0Target.addEventListener("change", async e => {
-    //   if (elements.printerControls.e0Target.value <= 0) {
-    //     elements.printerControls.e0Target.value = "0"
-    //   }
-    // });
-    // elements.printerControls.e0Target.addEventListener("keypress", async e => {
-    //   if (e.key === 'Enter') {
-    //     e0Set(e);
-    //   }
-    // });
-    // elements.printerControls.e0Set.addEventListener("click", async e => {
-    //   e0Set(e);
-    // });
+    let bedSet = async function (e) {
+      let flashReturn = function () {
+        elements.temperatures.bed[2].classList = "btn btn-md btn-light m-0 p-1";
+      };
+      let value = elements.temperatures.bed[1].value;
+
+      elements.temperatures.bed[2].value = "";
+      if (value === "Off") {
+        value = 0;
+      }
+      let opt = {
+        command: "target",
+        target: parseInt(value)
+      };
+      let post = await OctoPrintClient.post(printer, "printer/bed", opt);
+      if (post.status === 204) {
+        elements.temperatures.bed[2].className = "btn btn-md btn-success m-0 p-1";
+        setTimeout(flashReturn, 500);
+      } else {
+        elements.temperatures.bed[2].className = "btn btn-md btn-success m-0 p-1";
+        setTimeout(flashReturn, 500);
+      }
+    }
+    elements.temperatures.bed[1].addEventListener("change", async e => {
+      if (elements.temperatures.bed[1].value <= 0) {
+        elements.temperatures.bed[1].value = ""
+      }
+    });
+    elements.temperatures.bed.forEach(node => {
+      if(node.id.includes("Target")){
+        node.addEventListener("keypress", async e => {
+          if (e.key === 'Enter') {
+            bedSet(e);
+          }
+        });
+      }
+      if(node.id.includes("Set")){
+        node.addEventListener("click", async e => {
+          bedSet(e);
+        });
+      }
+
+    })
+    let chamberSet = async function (e) {
+      let flashReturn = function () {
+        elements.temperatures.chamber[2].classList = "btn btn-md btn-light m-0 p-1";
+      };
+      let value = elements.temperatures.chamber[1].value;
+
+      elements.temperatures.chamber[2].value = "";
+      if (value === "Off") {
+        value = 0;
+      }
+      let opt = {
+        command: "target",
+        target: parseInt(value)
+      };
+      let post = await OctoPrintClient.post(printer, "printer/chamber", opt);
+      if (post.status === 204) {
+        elements.temperatures.chamber[2].className = "btn btn-md btn-success m-0 p-1";
+        setTimeout(flashReturn, 500);
+      } else {
+        elements.temperatures.chamber[2].className = "btn btn-md btn-success m-0 p-1";
+        setTimeout(flashReturn, 500);
+      }
+    }
+    elements.temperatures.chamber[1].addEventListener("change", async e => {
+      if (elements.temperatures.chamber[1].value <= 0) {
+        elements.temperatures.chamber[1].value = ""
+      }
+    });
+    elements.temperatures.chamber.forEach(node => {
+      if(node.id.includes("Target")){
+        node.addEventListener("keypress", async e => {
+          if (e.key === 'Enter') {
+            chamberSet(e);
+          }
+        });
+      }
+      if(node.id.includes("Set")){
+        node.addEventListener("click", async e => {
+          chamberSet(e);
+        });
+      }
+    })
+    let keys = Object.keys(printer.temps[0])
+    keys = keys.reverse();
+    keys.forEach(key => {
+      if (key.includes("tool")) {
+          let toolSet = async function (e) {
+            let flashReturn = function () {
+
+              document.getElementById(key+"Set").className = "btn btn-md btn-light m-0 p-1";
+            };
+            let value = document.getElementById(key+"Target").value;
+            document.getElementById(key+"Target").value = "";
+            if (value === "Off") {
+              value = 0;
+            }
+            let opt = {
+              command: "target",
+              targets: {
+                [key]: parseInt(value)
+              }
+            };
+            let post = await OctoPrintClient.post(printer, "printer/tool", opt);
+            if (post.status === 204) {
+              document.getElementById(key+"Set").className = "btn btn-md btn-success m-0 p-1";
+              setTimeout(flashReturn, 500);
+            } else {
+              document.getElementById(key+"Set").className = "btn btn-md btn-danger m-0 p-1";
+              setTimeout(flashReturn, 500);
+            }
+          }
+        document.getElementById(key+"Target").addEventListener("change", async e => {
+            if (document.getElementById(key+"Target").value <= 0) {
+              document.getElementById(key+"Target").value = "0"
+            }
+          });
+        document.getElementById(key+"Target").addEventListener("keypress", async e => {
+            if (e.key === 'Enter') {
+              toolSet(e);
+            }
+          });
+          document.getElementById(key+"Set").addEventListener("click", async e => {
+            toolSet(e);
+          });
+
+
+      }
+    })
+
+
+
     //
-    // let bedSet = async function (e) {
-    //   let flashReturn = function () {
-    //     elements.printerControls.bedSet.classList = "btn btn-md btn-light m-0 p-1";
-    //   };
-    //   let value = elements.printerControls.bedTarget.value;
-    //
-    //   elements.printerControls.bedTarget.value = "";
-    //   if (value === "Off") {
-    //     value = 0;
-    //   }
-    //   let opt = {
-    //     command: "target",
-    //     target: parseInt(value)
-    //   };
-    //   let post = await OctoPrintClient.post(printer, "printer/bed", opt);
-    //   if (post.status === 204) {
-    //     elements.printerControls.bedSet.className = "btn btn-md btn-success m-0 p-1";
-    //     setTimeout(flashReturn, 500);
-    //   } else {
-    //     elements.printerControls.bedSet.className = "btn btn-md btn-success m-0 p-1";
-    //     setTimeout(flashReturn, 500);
-    //   }
-    // }
-    // elements.printerControls.bedTarget.addEventListener("change", async e => {
-    //   if (elements.printerControls.bedTarget.value <= 0) {
-    //     elements.printerControls.bedTarget.value = "0"
-    //   }
-    // });
-    // elements.printerControls.bedTarget.addEventListener("keypress", async e => {
-    //   if (e.key === 'Enter') {
-    //     bedSet(e);
-    //   }
-    // });
-    // elements.printerControls.bedSet.addEventListener("click", async e => {
-    //   bedSet(e);
-    // });
+
     elements.printerControls.feedRate.addEventListener("click", async e => {
       let flashReturn = function () {
         e.target.classList = "btn btn-light";
@@ -1315,7 +1362,7 @@ export default class PrinterManager {
     if (typeof printer.job != "undefined" && printer.job.file.name != null) {
       let camField = document.getElementById("fileThumbnail");
         if (typeof printer.job.file.thumbnail !== 'undefined' || printer.job.file.thumbnail != null) {
-          camField.innerHTML = `<img src="${printer.printerURL}/${printer.job.file.thumbnail}">`
+          camField.innerHTML = `<center><img width="50%" src="${printer.printerURL}/${printer.job.file.thumbnail}"></center>`
         }
     }
     if (typeof printer.progress !== "undefined" && printer.progress.printTimeLeft !== null) {

@@ -30,7 +30,10 @@ if (window.Worker) {
                             PrinterSettings.init(event.data.printerInfo);
                         } else {
                             printerInfo = event.data.printerInfo;
-                            dashUpdate.printers(event.data.printerInfo, event.data.octofarmStatistics.printerCounts)
+                            if(!editMode){
+                                dashUpdate.printers(event.data.printerInfo)
+                            }
+
                             if(powerTimer >= 20000){
                                 event.data.printerInfo.forEach(printer => {
                                     PowerButton.applyBtn(printer);
