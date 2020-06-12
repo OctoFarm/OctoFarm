@@ -288,11 +288,16 @@ function updateState(printers, clientSettings, filamentProfiles, filamentManager
       elements.currentFile.innerHTML =
           '<i class="fas fa-file-code"></i> ' + "No File Selected";
     }
-
     if (
-        printer.selectedFilament !== null
+        Array.isArray(printer.selectedFilament)
     ) {
-      elements.filament.innerHTML = await returnSelected(printer.selectedFilament, filamentProfiles, filamentManager)
+      let spoolList = "";
+      for(let i = 0; i < printer.selectedFilament.length; i++){
+        if(printer.selectedFilament[i] !== null){
+          spoolList += await returnSelected(printer.selectedFilament[i], filamentProfiles, filamentManager) + "<br>"
+        }
+      }
+      elements.filament.innerHTML = spoolList;
     }else{
       elements.filament.innerHTML = ""
     }

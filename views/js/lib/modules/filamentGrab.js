@@ -61,6 +61,7 @@ export function returnHistoryUsage(id){
 
 }
 export async function returnSelected(id, profiles) {
+
     let profileId = null;
     let filamentManager = await checkFilamentManager();
     if (filamentManager) {

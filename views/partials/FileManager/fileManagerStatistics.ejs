@@ -1,5 +1,6 @@
 <div class="col-12">
         <center>
+
             <div class="progress mt-0 mb-2 ">
                 <div
                         id="fsUsedProgress"
@@ -44,20 +45,20 @@
             <h6>Largest</h6>
             <hr>
             <b>Size: </b><%=helpers.generateBytes( farmInfo.biggestFile.toFixed(2)) %><br>
-            <b>Length: </b><%= (farmInfo.biggestLength/1000).toFixed(2)  %>m
+            <b>Length: </b><%= (farmInfo.biggestLength).toFixed(2)  %>m
 
         </div>
         <div class="col-lg-3">
             <h6>Smallest</h6>
             <hr>
             <b>Size: </b><%=helpers.generateBytes( farmInfo.smallestFile.toFixed(2)) %><br>
-            <b>Length: </b><%= (farmInfo.smallestLength/1000).toFixed(2) %>m
+            <b>Length: </b><%= (farmInfo.smallestLength).toFixed(2) %>m
         </div>
         <div class="col-lg-3">
             <h6>Average</h6>
             <hr>
             <b>Size: </b><%=helpers.generateBytes( farmInfo.averageFile.toFixed(2)) %><br>
-            <b>Length: </b><%= (farmInfo.averageLength/1000).toFixed(2)%>m
+            <b>Length: </b><%= (farmInfo.averageLength).toFixed(2)%>m
         </div>
     </div>
 </div>

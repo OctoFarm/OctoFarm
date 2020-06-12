@@ -421,6 +421,19 @@ class StatisticsCollection {
     static async filamentStatistics(farmPrinters){
 
     }
+    static grabFileLengths(file){
+        if(file.length.length === 0){
+            return "No Length"
+        }
+        let totalLength = [];
+        file.length.forEach(length => {
+            totalLength.push(length /1000);
+        })
+        totalLength = totalLength.reduce((a, b) => a + b, 0)
+        return totalLength;
+    }
+
+
     static async octofarmStatistics(farmPrinters) {
         let octofarmStatistics = await this.blankFarmStatistics();
         let currentHistory = await History.find({});
@@ -504,7 +517,8 @@ class StatisticsCollection {
                         fileSizes.push(file.size);
                     }
                     if(!isNaN(file.length)){
-                        fileLengths.push(file.length);
+                        console.log(this.grabFileLengths(file))
+                        fileLengths.push(this.grabFileLengths(file));
                     }
 
                     fileCount.push(file)
@@ -535,8 +549,10 @@ class StatisticsCollection {
         fileStatistics.folderCount = folderCount.length;
         fileStatistics.biggestFile = Math.max.apply(Math, fileCount.map(o => o.size));
         fileStatistics.smallestFile = Math.min.apply(Math, fileCount.map(o => o.size));
-        fileStatistics.biggestLength = Math.max.apply(Math, fileCount.map(o => o.length));
-        fileStatistics.smallestLength = Math.min.apply(Math, fileCount.map(o => o.length));
+        console.log(fileLengths)
+        fileStatistics.biggestLength = Math.max(...fileLengths);
+        fileStatistics.smallestLength = Math.min(...fileLengths);
+        console.log(Math.max(...fileLengths))
         fileStatistics.averageFile =  (fileSizes.reduce((a, b) => a + b, 0)) / fileCount.length;
         fileStatistics.averageLength = (fileLengths.reduce((a, b) => a + b, 0)) / fileCount.length;
 
