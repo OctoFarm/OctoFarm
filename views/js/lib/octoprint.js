@@ -202,8 +202,14 @@ export default class OctoPrintClient {
     if(typeof checkSettings.filament !== 'undefined'){
       filamentCheck = checkSettings.filament.filamentCheck;
     }
+    let printerCheck = false;
+    if(printer.selectedFilament != null && Array.isArray(printer.selectedFilament)){
+      printerCheck = printer.selectedFilament.every(function (e) {
+        return e !== null;
+      });
+    }
 
-    if(filamentCheck && printer.selectedFilament === null && opts.command === "start"){
+    if(filamentCheck && !printerCheck && opts.command === "start"){
       bootbox.confirm({
         message: "You have spools in the inventory, but none selected. Would you like to select a spool?",
         buttons: {
@@ -220,13 +226,16 @@ export default class OctoPrintClient {
           if(result){
 
           }else{
-            if(printer.selectedFilament != null){
+            if(printer.selectedFilament != null && Array.isArray(printer.selectedFilament)){
               let offset = {
                 command: "offset",
                 offsets: {
-                  tool0: parseInt(printer.selectedFilament.spools.tempOffset)
+
                 }
               }
+              printer.selectedFilament.forEach((spool,index) => {
+                offset.offsets["tool"+index] = spool.spools.tempOffset
+              })
               let post = await OctoPrintClient.post(printer, "printer/tool", offset);
             }
             await OctoPrintClient.post(printer, "printer/printhead", feed);
@@ -236,13 +245,16 @@ export default class OctoPrintClient {
         }
       });
     }else{
-      if(printer.selectedFilament != null){
+      if(printer.selectedFilament != null && Array.isArray(printer.selectedFilament)){
         let offset = {
           command: "offset",
           offsets: {
-            tool0: parseInt(printer.selectedFilament.spools.tempOffset)
+
           }
         }
+        printer.selectedFilament.forEach((spool,index) => {
+          offset.offsets["tool"+index] = spool.spools.tempOffset
+        })
         let post = await OctoPrintClient.post(printer, "printer/tool", offset);
       }
       await OctoPrintClient.post(printer, "printer/printhead", feed);

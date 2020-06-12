@@ -517,7 +517,6 @@ class StatisticsCollection {
                         fileSizes.push(file.size);
                     }
                     if(!isNaN(file.length)){
-                        console.log(this.grabFileLengths(file))
                         fileLengths.push(this.grabFileLengths(file));
                     }
 
@@ -549,10 +548,8 @@ class StatisticsCollection {
         fileStatistics.folderCount = folderCount.length;
         fileStatistics.biggestFile = Math.max.apply(Math, fileCount.map(o => o.size));
         fileStatistics.smallestFile = Math.min.apply(Math, fileCount.map(o => o.size));
-        console.log(fileLengths)
         fileStatistics.biggestLength = Math.max(...fileLengths);
         fileStatistics.smallestLength = Math.min(...fileLengths);
-        console.log(Math.max(...fileLengths))
         fileStatistics.averageFile =  (fileSizes.reduce((a, b) => a + b, 0)) / fileCount.length;
         fileStatistics.averageLength = (fileLengths.reduce((a, b) => a + b, 0)) / fileCount.length;
 

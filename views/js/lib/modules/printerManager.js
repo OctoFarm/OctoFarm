@@ -39,6 +39,7 @@ export default class PrinterManager {
       } else {
         printer = printers[i];
       }
+
       if (typeof printer.options === "undefined") {
         return;
       }
@@ -110,6 +111,7 @@ export default class PrinterManager {
       ) {
         printer.currentZ = 0;
       }
+
       if (
           currentIndex ===
           document.getElementById("printerIndex").innerHTML
@@ -118,7 +120,7 @@ export default class PrinterManager {
         let camURL = "";
         if (typeof printer.camURL != "undefined" && printer.camURL.includes("http")) {
           camURL = printer.camURL;
-        }else{
+        } else {
           camURL = "../../../images/noCamera.jpg";
 
         }
@@ -154,14 +156,14 @@ export default class PrinterManager {
         printerDrop.innerHTML = "";
         printers.forEach(printer => {
           let name = Validate.getName(printer);
-          if(printer.stateColour.category !== "Offline"){
+          if (printer.stateColour.category !== "Offline") {
             printerDrop.insertAdjacentHTML('beforeend', `
                 <option value="${printer._id}" selected>${name}</option>
             `)
           }
         })
         printerDrop.value = printer._id;
-        if(!printDropCheck){
+        if (!printDropCheck) {
           printerDrop.addEventListener('change', event => {
             let newIndex = document.getElementById("printerSelection").value;
             PrinterManager.updateIndex(newIndex);
@@ -228,7 +230,7 @@ export default class PrinterManager {
           document.getElementById("pmBaudrate").disabled = true;
           document.getElementById("pmProfile").disabled = true;
         }
-
+        document.getElementById("printerIndex").innerHTML = printer._id;
         document.getElementById("printerControls").innerHTML = `
         <div class="row">
             <div class="col-lg-3">
@@ -403,10 +405,10 @@ export default class PrinterManager {
                                 <div class="col-12">
                                                                 <div class="progress mb-2">
                                   <div id="pmProgress" class="progress-bar" role="progressbar progress-bar-striped" style="width:${
-                          progress.completion
-                      }%;" aria-valuenow="${
-                          progress.completion
-                      }%" aria-valuemin="0" aria-valuemax="100">${progress.completion}%
+            progress.completion
+        }%;" aria-valuenow="${
+            progress.completion
+        }%" aria-valuemin="0" aria-valuemax="100">${progress.completion}%
                                   </div>
                                 </div>
               </div>
@@ -643,14 +645,14 @@ export default class PrinterManager {
         let filamentDropDown = await returnDropDown();
         let printerTemps = document.getElementById("pmTemps")
         let printerToolTemps = document.getElementById("pmToolTemps")
-            printerTemps.innerHTML = "";
+        printerTemps.innerHTML = "";
         printerToolTemps.innerHTML = "";
-            if(typeof printer.profile[selectedProfile] !== 'undefined'){
-                let keys = Object.keys(printer.profile[selectedProfile])
-                keys.forEach(async key => {
-                  if(key.includes("extruder")){
-                    for(let i = 0; i < printer.profile[selectedProfile][key].count; i++){
-                            printerToolTemps.insertAdjacentHTML('beforeend', `
+        if (typeof printer.profile[selectedProfile] !== 'undefined') {
+          let keys = Object.keys(printer.profile[selectedProfile])
+          keys.forEach(async key => {
+            if (key.includes("extruder")) {
+              for (let i = 0; i < printer.profile[selectedProfile][key].count; i++) {
+                printerToolTemps.insertAdjacentHTML('beforeend', `
                               <div class="col-md-6">
                                  <div class="md-form input-group mb-3">
                                      <span class="input-group-text">Tool ${i}</span>
@@ -667,26 +669,26 @@ export default class PrinterManager {
                                <div class="input-group mb-1"><div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool${i}FilamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool${i}FilamentManagerFolderSelect"><option value="" selected></option></select></div>
                               </div>
                               `)
-                      // console.log(printers.temps)
-                      let pmFilamentDrop = document.getElementById(`tool${i}FilamentManagerFolderSelect`);
-                      pmFilamentDrop.innerHTML = "";
-                      filamentDropDown.forEach(filament => {
-                        pmFilamentDrop.insertAdjacentHTML('beforeend', filament)
-                      })
-                      if(Array.isArray(printer.selectedFilament) && printer.selectedFilament.length !== 0){
-                          if(typeof printer.selectedFilament[i] !== 'undefined' && printer.selectedFilament[i] !== null){
-                            pmFilamentDrop.value = printer.selectedFilament[i]._id
-                          }
+                // console.log(printers.temps)
+                let pmFilamentDrop = document.getElementById(`tool${i}FilamentManagerFolderSelect`);
+                pmFilamentDrop.innerHTML = "";
+                filamentDropDown.forEach(filament => {
+                  pmFilamentDrop.insertAdjacentHTML('beforeend', filament)
+                })
+                if (Array.isArray(printer.selectedFilament) && printer.selectedFilament.length !== 0) {
+                  if (typeof printer.selectedFilament[i] !== 'undefined' && printer.selectedFilament[i] !== null) {
+                    pmFilamentDrop.value = printer.selectedFilament[i]._id
+                  }
 
-                      }
-                      pmFilamentDrop.addEventListener('change', event => {
-                        selectFilament(printer._id, event.target.value, `${i}`)
-                      });
-                    }
+                }
+                pmFilamentDrop.addEventListener('change', event => {
+                  selectFilament(printer._id, event.target.value, `${i}`)
+                });
+              }
 
-                  }else if(key.includes("heatedBed")){
-                    if(printer.profile[selectedProfile][key]){
-                            printerTemps.insertAdjacentHTML('beforeend', `
+            } else if (key.includes("heatedBed")) {
+              if (printer.profile[selectedProfile][key]) {
+                printerTemps.insertAdjacentHTML('beforeend', `
                          <div class="col-12">
                         <center>
                             <h5>Bed</h5>
@@ -703,10 +705,10 @@ export default class PrinterManager {
                         </div>
                           </div>
                        `)
-                    }
-                  }else if(key.includes("heatedChamber")){
-                    if(printer.profile[selectedProfile][key]){
-                      printerTemps.insertAdjacentHTML('beforeend', `
+              }
+            } else if (key.includes("heatedChamber")) {
+              if (printer.profile[selectedProfile][key]) {
+                printerTemps.insertAdjacentHTML('beforeend', `
                          <div class="col-12">
                         <center>
                             <h5>Chamber</h5>
@@ -723,13 +725,14 @@ export default class PrinterManager {
                         </div>
                           </div>
                        `)
-                    }
-                  }
-                })
+              }
             }
+          })
+        }
 
         document.getElementById("printerControlCamera").src = camURL;
-        document.getElementById("printerIndex").innerHTML = printer._id;
+
+
 
 
         let elements = PrinterManager.grabPage();
@@ -738,10 +741,10 @@ export default class PrinterManager {
             "btn btn-dark active";
 
         PrinterManager.applyTemps(printer, elements);
+
         PrinterManager.applyListeners(printer, elements, printers, filamentDropDown);
         FileManager.drawFiles(printer)
       }
-
       PrinterManager.applyState(printer, job, progress);
       let elements = PrinterManager.grabPage();
       PrinterManager.applyTemps(printer, elements);
@@ -1374,6 +1377,8 @@ export default class PrinterManager {
       let camField = document.getElementById("fileThumbnail");
         if (typeof printer.job.file.thumbnail !== 'undefined' || printer.job.file.thumbnail != null) {
           camField.innerHTML = `<center><img width="50%" src="${printer.printerURL}/${printer.job.file.thumbnail}"></center>`
+        }else{
+          camField.innerHTML = "";
         }
     }
     if (typeof printer.progress !== "undefined" && printer.progress.printTimeLeft !== null) {

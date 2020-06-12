@@ -2,11 +2,15 @@ const History = require("../models/History.js");
 const ErrorLog = require("../models/ErrorLog.js");
 const _ = require("lodash");
 const fetch = require("node-fetch");
+const fetchBase64 = require('fetch-base64');
 const Logger = require('../lib/logger.js');
 const logger = new Logger('OctoFarm-HistoryCollection')
 const filamentProfiles = require("../models/Profiles.js")
 const ServerSettings = require("../models/ServerSettings.js")
 const Spool = require("../models/Filament.js")
+var request = require('request').defaults({ encoding: null });
+
+
 let counter = 0;
 let errorCounter = 0;
 
@@ -19,26 +23,34 @@ class HistoryCollection {
         "X-Api-Key": printer.apikey
       }
     });
-    let spool = await Spool.findById(printer.selectedFilament._id)
-    let sp = await spools.json();
-    spool.spools = {
-      name: sp.spool.name,
-      profile: sp.spool.profile.id,
-      price: sp.spool.cost,
-      weight: sp.spool.weight,
-      used: sp.spool.used,
-      tempOffset: sp.spool.temp_offset,
-      fmID: sp.spool.id
-    };
-    spool.markModified("spools")
-    await spool.save();
-    return spool
+    let returnSpools = [];
+    for(let i = 0; i < printer.selectedFilament.length; i++){
+      let spool = await Spool.findById(printer.selectedFilament[i]._id)
+      let sp = await spools.json();
+      spool.spools = {
+        name: sp.spool.name,
+        profile: sp.spool.profile.id,
+        price: sp.spool.cost,
+        weight: sp.spool.weight,
+        used: sp.spool.used,
+        tempOffset: sp.spool.temp_offset,
+        fmID: sp.spool.id
+      };
+      spool.markModified("spools")
+      await spool.save();
+      returnSpools.push(spool)
+    }
+
+    return returnSpools
+  }
+  static async grabThumbnail(url){
+    return await fetchBase64.remote(url).catch(err => console.log(err))
   }
   static async complete(payload, printer, job, files) {
     try{
       let serverSettings = await ServerSettings.find({});
       let previousFilament = JSON.parse(JSON.stringify(printer.selectedFilament));
-      if(serverSettings[0].filamentManager){
+      if(serverSettings[0].filamentManager && Array.isArray(printer.selectedFilament)){
         printer.selectedFilament = await HistoryCollection.resyncFilament(printer);
         logger.info("Grabbed latest filament values", printer.filamentSelection);
       }
@@ -75,28 +87,30 @@ class HistoryCollection {
         printer.selectedFilament.spools.profile = profiles[profileId].profile;
       }
 
-      let name = null;
-      if (typeof printer.settingsApperance != "undefined") {
-        if (printer.settingsApperance.name === "" || printer.settingsApperance.name === null) {
-          name = printer.printerURL;
-        } else {
-          name = printer.settingsApperance.name;
-        }
-      } else {
-        name = printer.printerURL;
+      let selectedFilament = null;
+      if (printer.selectedFilament !== null && Array.isArray(printer.selectedFilament)) {
+        let profileId = [];
+        printer.selectedFilament.forEach((spool,index) => {
+          if (serverSettings[0].filamentManager) {
+            profileId = _.findIndex(profiles, function (o) {
+              return o.profile.index == printer.selectedFilament[index].spools.profile;
+            });
+          } else {
+            profileId = _.findIndex(profiles, function (o) {
+              return o._id == printer.selectedFilament[index].spools.profile;
+            });
+          }
+          printer.selectedFilament[index].spools.profile = profiles[profileId].profile;
+        })
       }
-        if(historyCollection.length === 0){
-          counter = 0
-        }else{
-          counter = historyCollection[historyCollection.length-1].printHistory.historyIndex + 1
-        }
 
       //grab Thumbnail if available.
-      let thumbnail = null;
       let currentFileIndex = _.findIndex(files, function(o) { return o.name == payload.name; });
+      let base64Thumbnail = [null];
       if(currentFileIndex > -1){
         if(typeof files[currentFileIndex] !== 'undefined' && files[currentFileIndex].thumbnail != null){
-          thumbnail = files[currentFileIndex].thumbnail;
+          base64Thumbnail = await HistoryCollection.grabThumbnail(printer.printerURL + "/" + files[currentFileIndex].thumbnail);
+
         }
       }
 
@@ -111,7 +125,7 @@ class HistoryCollection {
         filePath: payload.path,
         startDate: startDate,
         endDate: endDate,
-        thumbnail: printer.printerURL + "/" + thumbnail,
+        thumbnail: base64Thumbnail[0],
         printTime: Math.round(payload.time),
         filamentSelection: printer.selectedFilament,
         previousFilamentSelection: previousFilament,
@@ -168,18 +182,20 @@ class HistoryCollection {
       let profiles = await filamentProfiles.find({});
 
       let selectedFilament = null;
-      if (printer.selectedFilament !== null) {
-        let profileId = null;
-        if (serverSettings[0].filamentManager) {
-          profileId = _.findIndex(profiles, function (o) {
-            return o.profile.index == printer.selectedFilament.spools.profile;
-          });
-        } else {
-          profileId = _.findIndex(profiles, function (o) {
-            return o._id == printer.selectedFilament.spools.profile;
-          });
-        }
-        printer.selectedFilament.spools.profile = profiles[profileId].profile;
+      if (printer.selectedFilament !== null && Array.isArray(printer.selectedFilament)) {
+        let profileId = [];
+        printer.selectedFilament.forEach((spool,index) => {
+          if (serverSettings[0].filamentManager) {
+            profileId = _.findIndex(profiles, function (o) {
+              return o.profile.index == printer.selectedFilament[index].spools.profile;
+            });
+          } else {
+            profileId = _.findIndex(profiles, function (o) {
+              return o._id == printer.selectedFilament[index].spools.profile;
+            });
+          }
+          printer.selectedFilament[index].spools.profile = profiles[profileId].profile;
+        })
       }
       if (historyCollection.length === 0) {
         counter = 0
@@ -187,11 +203,12 @@ class HistoryCollection {
         counter = historyCollection[historyCollection.length - 1].printHistory.historyIndex + 1
       }
       //grab Thumbnail if available.
-      let thumbnail = null;
       let currentFileIndex = _.findIndex(files, function(o) { return o.name == payload.name; });
+      let base64Thumbnail = [null];
       if(currentFileIndex > -1){
         if(typeof files[currentFileIndex] !== 'undefined' && files[currentFileIndex].thumbnail != null){
-          thumbnail = files[currentFileIndex].thumbnail;
+          base64Thumbnail = await HistoryCollection.grabThumbnail(printer.printerURL + "/" + files[currentFileIndex].thumbnail);
+
         }
       }
 
@@ -206,7 +223,7 @@ class HistoryCollection {
         filePath: payload.path,
         startDate: startDate,
         endDate: endDate,
-        thumbnail: printer.printerURL + "/" + thumbnail,
+        thumbnail: base64Thumbnail[0],
         printTime: Math.round(payload.time),
         filamentSelection: printer.selectedFilament,
         previousFilamentSelection: previousFilament,
@@ -217,9 +234,9 @@ class HistoryCollection {
         printHistory
       });
       saveHistory.save();
-
       logger.info("Failed Print captured ", payload + printer.printerURL);
     } catch (e) {
+      console.log(e)
       logger.error(e, "Failed to capture history for " + printer.printerURL);
     }
   }
@@ -259,11 +276,13 @@ class HistoryCollection {
           errorCounter = errorCollection[errorCollection.length-1].errorLog.historyIndex + 1
         }
         //grab Thumbnail if available.
-        let thumbnail = null;
+        //grab Thumbnail if available.
         let currentFileIndex = _.findIndex(files, function(o) { return o.name == payload.name; });
+        let base64Thumbnail = [null];
         if(currentFileIndex > -1){
           if(typeof files[currentFileIndex] !== 'undefined' && files[currentFileIndex].thumbnail != null){
-            thumbnail = files[currentFileIndex].thumbnail;
+            base64Thumbnail = await HistoryCollection.grabThumbnail(printer.printerURL + "/" + files[currentFileIndex].thumbnail);
+
           }
         }
         let errorLog = {
@@ -275,7 +294,7 @@ class HistoryCollection {
           reason: payload.error,
           startDate: startDate,
           endDate: endDate,
-          thumbnail: printer.printerURL + "/" + thumbnail,
+          thumbnail: base64Thumbnail[0],
           printTime: Math.round(payload.time),
           job: job,
           notes: ""

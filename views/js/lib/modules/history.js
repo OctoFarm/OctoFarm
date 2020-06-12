@@ -181,7 +181,7 @@ export default class History {
       printerName.innerHTML = current.printerName;
       fileName.innerHTML = current.fileName;
       if(typeof current.thumbnail !== 'undefined' && current.thumbnail != null){
-        thumbnail.innerHTML = `<center><img src="${current.thumbnail}" class="historyImage mb-2"></center>`
+        thumbnail.innerHTML = `<center><img src="data:image/png;base64, ${current.thumbnail}" class="historyImage mb-2"></center>`
       }
       if (current.success) {
         status.innerHTML =
