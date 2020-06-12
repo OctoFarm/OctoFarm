@@ -1416,27 +1416,46 @@ export default class PrinterManager {
       let fileName = 'No File Selected'
       elements.jobStatus.fileName.innerHTML = fileName;
     }else{
-      // elements.jobStatus.fileName.setAttribute('title', printer.job.file.path)
-      // let fileName = printer.job.file.display;
-      // if (fileName.length > 49) {
-      //   fileName = fileName.substring(0, 49) + "...";
-      // }
-      // elements.jobStatus.fileName.innerHTML = fileName;
-      // let getUsage = FileActions.grabUsage(printer.job.file);
-      // elements.jobStatus.expectedWeight.innerHTML = getUsage;
+      elements.jobStatus.fileName.setAttribute('title', printer.job.file.path)
+      let fileName = printer.job.file.display;
+      if (fileName.length > 49) {
+       fileName = fileName.substring(0, 49) + "...";
+      }
+      elements.jobStatus.fileName.innerHTML = fileName;
+      let getUsage = FileActions.grabUsage(printer.job.file);
+      let filamentCost = [];
+      let usageDisplay = getUsage.totalLength.toFixed(2) + "m / " + getUsage.totalGrams.toFixed(2) + "<br>";
+      getUsage.usage.forEach((usage,index) => {
+        usageDisplay += "<b> Tool </b>"+ index + ": " + usage + "<br>";
+        let usageElement = usage.split(" / ").pop();
+        let cost = "";
+        if(printer.selectedFilament !== null){
+          cost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament[index], usageElement)).toFixed(2);
+        }
+
+        if(isNaN(cost)){
+          filamentCost.push("<b> Tool "+index+"</b>: "+ "(No Spool)");
+        }else{
+          filamentCost.push("<b> Tool "+index+"</b>: "+ cost);
+        }
+
+      })
+
+     elements.jobStatus.expectedWeight.innerHTML = usageDisplay;
       // let usageElement = getUsage.split(" / ").pop();
       // let filamentCost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament, usageElement)).toFixed(2);
-      // let printCost = parseFloat(Calc.returnPrintCost(printer.costSettings,  job.estimatedPrintTime)).toFixed(2);
-      // if(isNaN(printCost)){
-      //   printCost = "No estmated time";
+
+
+      elements.jobStatus.expectedFilamentCost.innerHTML = filamentCost;
+
+
+
+      // if(isNaN(filamentCost)){
+      //   //filamentCost = "No filament selected";
       // }
-
-      //elements.jobStatus.expectedFilamentCost.innerHTML = filamentCost;
-
-
-
-      if(isNaN(filamentCost)){
-        //filamentCost = "No filament selected";
+      let printCost = parseFloat(Calc.returnPrintCost(printer.costSettings,  job.estimatedPrintTime)).toFixed(2);
+      if(isNaN(printCost)){
+        printCost = "No estmated time";
       }
       elements.jobStatus.expectedPrinterCost.innerHTML = printCost;
 

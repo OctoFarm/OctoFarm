@@ -347,11 +347,14 @@ export default class FileManager {
           getUsage.usage.forEach((usage,index) => {
             usageDisplay += "<b> Tool </b>"+ index + ": " + usage + "<br>";
             let usageElement = usage.split(" / ").pop();
-            let cost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament[index], usageElement)).toFixed(2);
+            let cost = "";
+            if(printer.selectedFilament !== null){
+              cost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament[index], usageElement)).toFixed(2);
+            }
             if(isNaN(cost)){
-              filamentCost.push("<b> Tool </b>"+index+": "+ "(No Spool)");
+              filamentCost.push("<b> Tool "+index+"</b>: "+ "(No Spool)");
             }else{
-              filamentCost.push("<b> Tool </b>"+index+": "+ cost);
+              filamentCost.push("<b> Tool "+index+"</b>: "+ cost);
             }
 
           })

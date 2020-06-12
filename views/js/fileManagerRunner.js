@@ -60,9 +60,8 @@ class Manager{
                         }
 
                     }
-                    filamentDrop.addEventListener('change', event => {
-
-                        selectFilament(printerList[index]._id, event.target.value, i)
+                    filamentDrop.addEventListener('change', async event => {
+                        selectFilament(printerList[index]._id, event.target.value, i);
                     });
 
                 }
