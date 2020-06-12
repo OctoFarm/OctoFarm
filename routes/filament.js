@@ -105,7 +105,7 @@ router.post("/select", ensureAuthenticated, async (req, res) => {
       let printer = printerList[i];
       let spool = await Spool.findById(req.body.spoolId)
       let selection = {
-        "tool": 0, "spool": {"id": spool.spools.fmID}
+        "tool": req.body.tool, "spool": {"id": spool.spools.fmID}
       };
       let url = `${printer.printerURL}/plugin/filamentmanager/selections/0`;
       let updateFilamentManager = await fetch(url, {
@@ -117,7 +117,7 @@ router.post("/select", ensureAuthenticated, async (req, res) => {
         body: JSON.stringify({selection: selection})
       })
     }
-    let printerList = await Runner.selectedFilament(req.body.printerId, req.body.spoolId);
+    let printerList = await Runner.selectedFilament(req.body.printerId, req.body.spoolId, req.body.tool);
     res.send({status: 200});
 });
 router.post("/save/profile", ensureAuthenticated, async (req, res) => {

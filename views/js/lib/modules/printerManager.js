@@ -460,7 +460,7 @@ export default class PrinterManager {
               </div>
               <div class="row">
                 <div class="col-12">
-                    <button id="pmTempTime" type="button" class="btn btn-secondary btn-sm float-right"></button>
+                    <button id="pmTempTime" type="button" class="btn btn-secondary btn-sm float-right" disabled>Updated: <i class="far fa-clock"></i> Never</button>
                 </div>
               </div>
               <div class="row" id="pmToolTemps">
@@ -640,102 +640,96 @@ export default class PrinterManager {
 
           </div>
           `;
-
+        let filamentDropDown = await returnDropDown();
         let printerTemps = document.getElementById("pmTemps")
         let printerToolTemps = document.getElementById("pmToolTemps")
             printerTemps.innerHTML = "";
         printerToolTemps.innerHTML = "";
-            if(typeof printer.temps !== 'undefined' && printer.temps.length !== 0){
-              let keys = Object.keys(printer.temps[0])
-              keys = keys.reverse();
-              keys.forEach(key => {
-                if(key.includes("tool")){
-                  printerToolTemps.insertAdjacentHTML('beforeend', `
-                    <div class="col-md-6">
-                       <div class="md-form input-group mb-3">
-                           <span class="input-group-text">${key}</span>
-                          <div title="Actual Tool temperature" class="input-group-prepend">
-                              <span id="${key}Actual" class="input-group-text">Actual: °C</span>
+            if(typeof printer.profile[selectedProfile] !== 'undefined'){
+                let keys = Object.keys(printer.profile[selectedProfile])
+                keys.forEach(async key => {
+                  if(key.includes("extruder")){
+                    for(let i = 0; i < printer.profile[selectedProfile][key].count; i++){
+                            printerToolTemps.insertAdjacentHTML('beforeend', `
+                              <div class="col-md-6">
+                                 <div class="md-form input-group mb-3">
+                                     <span class="input-group-text">Tool ${i}</span>
+                                    <div title="Actual Tool temperature" class="input-group-prepend">
+                                        <span id="tool${i}Actual" class="input-group-text">0°C</span>
+                                    </div>
+                                    <input title="Set your target Tool temperature" id="tool${i}Target" type="number" class="form-control col" placeholder="0°C" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+                                    <div class="input-group-append">
+                                        <button class="btn btn-md btn-light m-0 p-1" type="button" id="tool${i}Set">Set</button>
+                                    </div>
+                                </div>
+                              </div>
+                              <div class="col-md-6">
+                               <div class="input-group mb-1"><div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool${i}FilamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool${i}FilamentManagerFolderSelect"><option value="" selected></option></select></div>
+                              </div>
+                              `)
+                      // console.log(printers.temps)
+                      let pmFilamentDrop = document.getElementById(`tool${i}FilamentManagerFolderSelect`);
+                      pmFilamentDrop.innerHTML = "";
+                      filamentDropDown.forEach(filament => {
+                        pmFilamentDrop.insertAdjacentHTML('beforeend', filament)
+                      })
+                      if(Array.isArray(printer.selectedFilament) && printer.selectedFilament.length !== 0){
+                          if(typeof printer.selectedFilament[i] !== 'undefined' && printer.selectedFilament[i] !== null){
+                            pmFilamentDrop.value = printer.selectedFilament[i]._id
+                          }
+
+                      }
+                      pmFilamentDrop.addEventListener('change', event => {
+                        selectFilament(printer._id, event.target.value, `${i}`)
+                      });
+                    }
+
+                  }else if(key.includes("heatedBed")){
+                    if(printer.profile[selectedProfile][key]){
+                            printerTemps.insertAdjacentHTML('beforeend', `
+                         <div class="col-12">
+                        <center>
+                            <h5>Bed</h5>
+                        </center>
+                        <hr>
+                        <div class="md-form input-group mb-3">
+                            <div title="Actual Bed temperature" class="input-group-prepend">
+                                <span id="bedActual" class="input-group-text">0°C</span>
+                            </div>
+                            <input title="Set your target Bed temperature" id="bedTarget" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0°C" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-md btn-light m-0 p-1" type="button" id="bedSet">Set</button>
+                            </div>
+                        </div>
                           </div>
-                          <input title="Set your target Tool temperature" id="${key}Target" type="number" class="form-control col" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
-                          <div class="input-group-append">
-                              <button class="btn btn-md btn-light m-0 p-1" type="button" id="${key}Set">Set</button>
+                       `)
+                    }
+                  }else if(key.includes("heatedChamber")){
+                    if(printer.profile[selectedProfile][key]){
+                      printerTemps.insertAdjacentHTML('beforeend', `
+                         <div class="col-12">
+                        <center>
+                            <h5>Chamber</h5>
+                        </center>
+                        <hr>
+                        <div class="md-form input-group mb-3">
+                            <div title="Actual Bed temperature" class="input-group-prepend">
+                                <span id="chamberActual" class="input-group-text">0°C</span>
+                            </div>
+                            <input title="Set your target Bed temperature" id="chamberTarget" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0°C" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
+                            <div class="input-group-append">
+                                <button class="btn btn-md btn-light m-0 p-1" type="button" id="chamberSet">Set</button>
+                            </div>
+                        </div>
                           </div>
-                      </div>
-                    </div>
-                    <div class="col-md-6">
-                     <div class="input-group mb-1"><div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="${key}FilamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="${key}FilamentManagerFolderSelect"><option value="" selected></option></select></div>
-                    </div>
-                    `)
-                }else if(key.includes("bed")){
-                  printerTemps.insertAdjacentHTML('beforeend', `
-              <span class="d-none col-12" id="pmBedTemps">
-               <div class="col-12">
-              <center>
-                  <h5>Bed</h5>
-              </center>
-              <hr>
-              <div class="md-form input-group mb-3">
-                  <div title="Actual Bed temperature" class="input-group-prepend">
-                      <span id="${key}Actual" class="input-group-text">Actual: °C</span>
-                  </div>
-                  <input title="Set your target Bed temperature" id="${key}Target" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
-                  <div class="input-group-append">
-                      <button class="btn btn-md btn-light m-0 p-1" type="button" id="${key}Set">Set</button>
-                  </div>
-              </div>
-                </div>
-              </span>
-             `)
-                }else if(key.includes("chamber")){
-                  printerTemps.insertAdjacentHTML('beforeend', `
-              <span class="d-none col-12" id="pmChamberTemps">
-                 <div class="col-12">
-                                <center>
-                  <h5>Chamber</h5>
-              </center>
-              <hr>
-              <div class="md-form input-group mb-3">
-                  <div title="Actual Bed temperature" class="input-group-prepend">
-                      <span id="${key}Actual" class="input-group-text">Actual: °C</span>
-                  </div>
-                  <input title="Set your target Bed temperature" id="${key}Target" type="number" class="form-control col-lg-12 col-xl-12" placeholder="0" aria-label="Recipient's username" aria-describedby="MaterialButton-addon2">
-                  <div class="input-group-append">
-                      <button class="btn btn-md btn-light m-0 p-1" type="button" id="${key}Set">Set</button>
-                  </div>
-              </div>
-                </div>   
-            </span>
-             `)
-                }
-              })
+                       `)
+                    }
+                  }
+                })
             }
-
-
 
         document.getElementById("printerControlCamera").src = camURL;
         document.getElementById("printerIndex").innerHTML = printer._id;
-        if (typeof printer.job != "undefined" && printer.job.file.name != null) {
-          let camField = document.getElementById("printerControlCamera");
-          if (camField.src.includes("localhost") || camField.src.includes("none")) {
-            if (typeof printer.job.file.thumbnail !== 'undefined' || printer.job.file.thumbnail != null) {
-              camField.src = printer.printerURL + "/" + printer.job.file.thumbnail
-            }
-          }
-
-        }
-        let filamentDropDown = await returnDropDown();
-        // let pmFilamentDrop = document.getElementById("filamentManagerFolderSelect")
-        // pmFilamentDrop.innerHTML = "";
-        // filamentDropDown.forEach(filament => {
-        //   pmFilamentDrop.insertAdjacentHTML('beforeend', filament)
-        // })
-        // if(printer.selectedFilament != null){
-        //   pmFilamentDrop.value = printer.selectedFilament._id
-        // }
-        // pmFilamentDrop.addEventListener('change', event => {
-        //   selectFilament(printer._id, event.target.value)
-        // });
 
 
         let elements = PrinterManager.grabPage();
@@ -870,23 +864,33 @@ export default class PrinterManager {
         setTimeout(flashReturn, 500);
       }
     }
-    elements.temperatures.bed[1].addEventListener("change", async e => {
-      if (elements.temperatures.bed[1].value <= 0) {
-        elements.temperatures.bed[1].value = ""
-      }
-    });
+    if(elements.temperatures.bed[1]){
+      elements.temperatures.bed[1].addEventListener("change", async e => {
+        if (elements.temperatures.bed[1].value <= 0) {
+          elements.temperatures.bed[1].value = ""
+        }
+      });
+    }
+
+
     elements.temperatures.bed.forEach(node => {
       if(node.id.includes("Target")){
-        node.addEventListener("keypress", async e => {
-          if (e.key === 'Enter') {
-            bedSet(e);
-          }
-        });
+        if(node){
+          node.addEventListener("keypress", async e => {
+            if (e.key === 'Enter') {
+              bedSet(e);
+            }
+          });
+        }
+
       }
       if(node.id.includes("Set")){
-        node.addEventListener("click", async e => {
-          bedSet(e);
-        });
+        if(node){
+          node.addEventListener("click", async e => {
+            bedSet(e);
+          });
+        }
+
       }
 
     })
@@ -913,32 +917,39 @@ export default class PrinterManager {
         setTimeout(flashReturn, 500);
       }
     }
-    elements.temperatures.chamber[1].addEventListener("change", async e => {
-      if (elements.temperatures.chamber[1].value <= 0) {
-        elements.temperatures.chamber[1].value = ""
-      }
-    });
+    if(elements.temperatures.chamber[1]){
+      elements.temperatures.chamber[1].addEventListener("change", async e => {
+        if (elements.temperatures.chamber[1].value <= 0) {
+          elements.temperatures.chamber[1].value = ""
+        }
+      });
+    }
+
     elements.temperatures.chamber.forEach(node => {
       if(node.id.includes("Target")){
-        node.addEventListener("keypress", async e => {
-          if (e.key === 'Enter') {
-            chamberSet(e);
-          }
-        });
+        if(node){
+          node.addEventListener("keypress", async e => {
+            if (e.key === 'Enter') {
+              chamberSet(e);
+            }
+          });
+        }
       }
       if(node.id.includes("Set")){
-        node.addEventListener("click", async e => {
-          chamberSet(e);
-        });
+        if(node){
+          node.addEventListener("click", async e => {
+            chamberSet(e);
+          });
+        }
       }
     })
-    let keys = Object.keys(printer.temps[0])
-    keys = keys.reverse();
-    keys.forEach(key => {
-      if (key.includes("tool")) {
+    if(typeof printer.temps != 'undefined' && printer.temps.length !== 0){
+      let keys = Object.keys(printer.temps[0])
+      keys = keys.reverse();
+      keys.forEach(key => {
+        if (key.includes("tool")) {
           let toolSet = async function (e) {
             let flashReturn = function () {
-
               document.getElementById(key+"Set").className = "btn btn-md btn-light m-0 p-1";
             };
             let value = document.getElementById(key+"Target").value;
@@ -961,12 +972,12 @@ export default class PrinterManager {
               setTimeout(flashReturn, 500);
             }
           }
-        document.getElementById(key+"Target").addEventListener("change", async e => {
+          document.getElementById(key+"Target").addEventListener("change", async e => {
             if (document.getElementById(key+"Target").value <= 0) {
               document.getElementById(key+"Target").value = "0"
             }
           });
-        document.getElementById(key+"Target").addEventListener("keypress", async e => {
+          document.getElementById(key+"Target").addEventListener("keypress", async e => {
             if (e.key === 'Enter') {
               toolSet(e);
             }
@@ -976,8 +987,10 @@ export default class PrinterManager {
           });
 
 
-      }
-    })
+        }
+      })
+    }
+
 
 
 
@@ -1338,8 +1351,6 @@ export default class PrinterManager {
       },
       temperatures: {
         tempTime: document.getElementById("pmTempTime"),
-        bedList: document.getElementById("pmBedTemps"),
-        chamberList: document.getElementById("pmChamberTemps"),
         bed: document.querySelectorAll(("[id^='bed']")),
         chamber:  document.querySelectorAll(("[id^='chamber']")),
         tools: document.querySelectorAll(("[id^='tool']"))
@@ -1405,24 +1416,28 @@ export default class PrinterManager {
       let fileName = 'No File Selected'
       elements.jobStatus.fileName.innerHTML = fileName;
     }else{
-      elements.jobStatus.fileName.setAttribute('title', printer.job.file.path)
-      let fileName = printer.job.file.display;
-      if (fileName.length > 49) {
-        fileName = fileName.substring(0, 49) + "...";
-      }
-      elements.jobStatus.fileName.innerHTML = fileName;
-      let getUsage = FileActions.grabUsage(printer.job.file);
-      elements.jobStatus.expectedWeight.innerHTML = getUsage;
-      let usageElement = getUsage.split(" / ").pop();
-      let filamentCost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament, usageElement)).toFixed(2);
-      let printCost = parseFloat(Calc.returnPrintCost(printer.costSettings,  job.estimatedPrintTime)).toFixed(2);
-      if(isNaN(printCost)){
-        printCost = "No estmated time";
-      }
+      // elements.jobStatus.fileName.setAttribute('title', printer.job.file.path)
+      // let fileName = printer.job.file.display;
+      // if (fileName.length > 49) {
+      //   fileName = fileName.substring(0, 49) + "...";
+      // }
+      // elements.jobStatus.fileName.innerHTML = fileName;
+      // let getUsage = FileActions.grabUsage(printer.job.file);
+      // elements.jobStatus.expectedWeight.innerHTML = getUsage;
+      // let usageElement = getUsage.split(" / ").pop();
+      // let filamentCost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament, usageElement)).toFixed(2);
+      // let printCost = parseFloat(Calc.returnPrintCost(printer.costSettings,  job.estimatedPrintTime)).toFixed(2);
+      // if(isNaN(printCost)){
+      //   printCost = "No estmated time";
+      // }
+
+      //elements.jobStatus.expectedFilamentCost.innerHTML = filamentCost;
+
+
+
       if(isNaN(filamentCost)){
-        filamentCost = "No filament selected";
+        //filamentCost = "No filament selected";
       }
-      elements.jobStatus.expectedFilamentCost.innerHTML = filamentCost;
       elements.jobStatus.expectedPrinterCost.innerHTML = printCost;
 
     }
@@ -1548,16 +1563,10 @@ export default class PrinterManager {
     if(typeof printer.temps !== "undefined" && printer.temps.length != 0){
       elements.temperatures.tempTime.innerHTML = "Updated: <i class=\"far fa-clock\"></i> " + new Date(printer.temps[0].time * 1000).toTimeString().substring(1, 8);
       if(printer.temps[0].bed.actual !== null){
-        if(elements.temperatures.bedList.classList.contains("d-none")){
-          elements.temperatures.bedList.classList.remove("d-none");
-        }
         elements.temperatures.bed[0].innerHTML = printer.temps[0].bed.actual + "°C"
         elements.temperatures.bed[1].placeholder = printer.temps[0].bed.target + "°C"
       }
       if(printer.temps[0].chamber.actual !== null){
-        if(elements.temperatures.chamberList.classList.contains("d-none")){
-          elements.temperatures.chamberList.classList.remove("d-none");
-        }
         elements.temperatures.chamber[0].innerHTML = printer.temps[0].chamber.actual + "°C"
         elements.temperatures.chamber[1].placeholder = printer.temps[0].chamber.target + "°C"
       }

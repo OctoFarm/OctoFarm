@@ -24,7 +24,7 @@ class Manager{
         let printers = document.querySelectorAll("[id^='fileManagerPrinter-']");
         let printerList = await OctoFarmClient.post("printers/printerInfo", {});
         printerList = await printerList.json();
-        printers.forEach(async (printer, index) => {
+        printers.forEach( async (printer, index) => {
             if (index === 0) {
                 printer.classList.add("bg-dark");
                 printer.classList.remove("bg-secondary");
@@ -43,19 +43,32 @@ class Manager{
             });
             dragAndDropEnable(printer, printerList[index]);
             let filamentDropDown = await returnDropDown();
-            let filamentDrop = document.getElementById("filamentDrop-"+id)
-             filamentDropDown.forEach(filament => {
-               filamentDrop.insertAdjacentHTML('beforeend', filament)
-             })
-            if(printerList[index].selectedFilament != null){
-                filamentDrop.value = printerList[index].selectedFilament._id
-            }else{
-                filamentDrop.value = 0;
+            let selectedProfile = null
+            if(typeof printerList[index].current !== 'undefined' && typeof printerList[index].current.printerProfile !== 'undefined'){
+                selectedProfile = printerList[index].current.printerProfile
             }
-            filamentDrop.addEventListener('change', event => {
+            if(selectedProfile != null && typeof printerList[index].profile[selectedProfile] != 'undefined'){
+                for(let i = 0; i <printerList[index].profile[selectedProfile].extruder.count; i++){
+                    let filamentDrop = document.getElementById("tool"+i+"-"+printerList[index]._id)
+                    filamentDrop.innerHTML = "";
+                    filamentDropDown.forEach(filament => {
+                        filamentDrop.insertAdjacentHTML('beforeend', filament)
+                    })
+                    if(Array.isArray(printerList[index].selectedFilament) && printerList[index].selectedFilament.length !== 0){
+                        if(typeof printerList[index].selectedFilament[i] !== 'undefined' && printerList[index].selectedFilament[i] !== null){
+                            filamentDrop.value = printerList[index].selectedFilament[i]._id
+                        }
 
-                 selectFilament(printerList[index]._id, event.target.value)
-             });
+                    }
+                    filamentDrop.addEventListener('change', event => {
+
+                        selectFilament(printerList[index]._id, event.target.value, i)
+                    });
+
+                }
+            }
+
+
         });
 
 

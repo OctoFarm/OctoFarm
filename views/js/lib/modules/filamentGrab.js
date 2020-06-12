@@ -128,8 +128,9 @@ export async function returnDropDown(history){
     return dropObject
 }
 
-export async function selectFilament(printerId, spoolId){
+export async function selectFilament(printerId, spoolId, tool){
     let data = {
+        tool: tool,
         printerId: printerId,
         spoolId: spoolId
     }

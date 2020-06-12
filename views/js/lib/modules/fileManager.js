@@ -342,14 +342,26 @@ export default class FileManager {
           let dateString = fileDate.toDateString();
           let timeString = fileDate.toTimeString().substring(0, 8);
           let getUsage = FileActions.grabUsage(file);
-          let usageElement = getUsage.split(" / ").pop();
-          let filamentCost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament, usageElement)).toFixed(2);
-          let printCost = parseFloat(Calc.returnPrintCost(printer.costSettings, file.time)).toFixed(2);
-            if(isNaN(printCost)){
-              printCost = "No estmated time";
+          let filamentCost = [];
+          let usageDisplay = getUsage.totalLength.toFixed(2) + "m / " + getUsage.totalGrams.toFixed(2) + "<br>";
+          getUsage.usage.forEach((usage,index) => {
+            usageDisplay += "<b> Tool </b>"+ index + ": " + usage + "<br>";
+            let usageElement = usage.split(" / ").pop();
+            let cost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament[index], usageElement)).toFixed(2);
+            if(isNaN(cost)){
+              filamentCost.push("<b> Tool </b>"+index+": "+ "(No Spool)");
+            }else{
+              filamentCost.push("<b> Tool </b>"+index+": "+ cost);
             }
-          if(isNaN(filamentCost)){
-            filamentCost = "No filament selected";
+
+          })
+
+
+
+
+          let printCost = parseFloat(Calc.returnPrintCost(printer.costSettings, file.time)).toFixed(2);
+          if(isNaN(printCost)){
+            printCost = "No estmated time";
           }
           fileDate = dateString + " " + timeString;
 
@@ -393,7 +405,7 @@ export default class FileManager {
           <p class="mb-1 float-left">
           <i class="fas fa-clock"></i><span class="date d-none"> ${file.date}</span><span> ${fileDate}</span><br>
           <i class="fas fa-hdd"></i><span class="size"> ${Calc.bytes(file.size)}</span> <br>
-          <i class="fas fa-weight"></i><span class="usage"> ${getUsage}</span>
+          <i class="fas fa-weight"></i><span class="usage">${usageDisplay}</span>
           
           </p> 
                     </div>
@@ -487,7 +499,7 @@ export default class FileManager {
           <p class="mb-1 float-left">
           <i class="fas fa-clock"></i><span class="date d-none"> ${file.date}</span><span> ${fileDate}</span><br>
           <i class="fas fa-hdd"></i><span class="size"> ${Calc.bytes(file.size)}</span> <br>
-          <i class="fas fa-weight"></i><span class="usage"> ${getUsage}</span>
+          <i class="fas fa-weight"></i><span class="usage"> ${usageDisplay}</span>
           
           </p> 
                     </div>
@@ -916,13 +928,25 @@ export class FileActions {
   }
   //Needs updating when filament is brought in.
   static grabUsage(file){
-    if(typeof file.length === 'undefined' || file.length === null){
+    if(file.length.length === 0){
       return "No Length"
     }
-    let radius = parseFloat(1.75) / 2
-    let volume = ((file.length /1000) * 3.1415926535 * radius * radius)
-    let usage = volume * parseFloat(1.24)
-    return (file.length /1000).toFixed(2) + "m / " + usage.toFixed(2) + "g";
+    let usageArray = {
+      totalLength: [],
+      totalGrams: [],
+      usage: []
+    }
+    file.length.forEach(length => {
+      let radius = parseFloat(1.75) / 2
+      let volume = ((length /1000) * Math.PI * radius * radius)
+      let usage = volume * parseFloat(1.24)
+      usageArray.totalLength.push(length /1000);
+      usageArray.totalGrams.push(usage);
+      usageArray.usage.push((length /1000).toFixed(2) + "m / " + usage.toFixed(2) + "g");
+    })
+    usageArray.totalLength = usageArray.totalLength.reduce((a, b) => a + b, 0)
+    usageArray.totalGrams = usageArray.totalGrams.reduce((a, b) => a + b, 0)
+    return usageArray;
   }
   static async startPrint(printer, filePath) {
     OctoPrintClient.file(printer, filePath, "print");

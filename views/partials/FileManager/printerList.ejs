@@ -69,14 +69,18 @@ if(printers[sorted.actualIndex].stateColour.category != "Offline" && typeof prin
             </div>
           </div>
         </div>
-        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="filamentDrop-<%=printers[sorted.actualIndex]._id%>">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="filamentDrop-<%=printers[sorted.actualIndex]._id%>"><option value="" selected></option></select></div>
         <% if(selectedProfile != null && typeof printers[sorted.actualIndex].profiles[selectedProfile] != 'undefined'){ %>
+        <% for(let i = 0; i < printers[sorted.actualIndex].profiles[selectedProfile].extruder.count; i++){ %>
+          <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool<%= i %>-<%=printers[sorted.actualIndex]._id%>">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool<%= i %>-<%=printers[sorted.actualIndex]._id%>"></select></div>
+        <% } %>
+
+
           <small class="pt-2 float-left"
           ><i class="fas fa-cube"></i> <b>H:</b> <%=
           printers[sorted.actualIndex].profiles[selectedProfile].volume.height%>mm x <b>W:</b> <%=
           printers[sorted.actualIndex].profiles[selectedProfile].volume.width%>mm x <b>D:</b> <%=
           printers[sorted.actualIndex].profiles[selectedProfile].volume.depth%>mm</small
-        >
+        ><br><!--Fix for firefox-->
         <small class="pt-2 float-left"
           ><i class="fas fa-pen"></i> <b>Extruders:</b> <%=
           printers[sorted.actualIndex].profiles[selectedProfile].extruder.count %>

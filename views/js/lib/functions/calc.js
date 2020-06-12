@@ -69,8 +69,8 @@ export default class Calculate {
     if(isNaN(grams)){
       return `No length to calculate from`
     }else{
-      if(filament === null || filament == "None chosen..."){
-        return `No filament to calculate from`
+      if(typeof filament === 'undefined' || filament === null || filament == "None chosen..."){
+        return `(No Spool)`
       }else{
         let cost = (filament.spools.price / filament.spools.weight) * grams
         return  cost.toFixed(2)
