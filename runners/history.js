@@ -50,6 +50,16 @@ class HistoryCollection {
     try{
       let serverSettings = await ServerSettings.find({});
       let previousFilament = JSON.parse(JSON.stringify(printer.selectedFilament));
+      let name = null;
+      if (typeof printer.settingsApperance != "undefined") {
+        if (printer.settingsApperance.name === "" || printer.settingsApperance.name === null) {
+          name = printer.printerURL;
+        } else {
+          name = printer.settingsApperance.name;
+        }
+      } else {
+        name = printer.printerURL;
+      }
       if(serverSettings[0].filamentManager && Array.isArray(printer.selectedFilament)){
         printer.selectedFilament = await HistoryCollection.resyncFilament(printer);
         logger.info("Grabbed latest filament values", printer.filamentSelection);
@@ -73,20 +83,6 @@ class HistoryCollection {
       let endDate = endDDMM + " - " + endTimeFormat;
       let profiles = await filamentProfiles.find({});
 
-      if(printer.selectedFilament !== null){
-        let profileId = null;
-        if(serverSettings[0].filamentManager){
-          profileId = _.findIndex(profiles, function (o) {
-            return o.profile.index == printer.selectedFilament.spools.profile;
-          });
-        }else{
-          profileId = _.findIndex(profiles, function (o) {
-            return o._id == printer.selectedFilament.spools.profile;
-          });
-        }
-        printer.selectedFilament.spools.profile = profiles[profileId].profile;
-      }
-
       let selectedFilament = null;
       if (printer.selectedFilament !== null && Array.isArray(printer.selectedFilament)) {
         let profileId = [];
@@ -103,7 +99,11 @@ class HistoryCollection {
           printer.selectedFilament[index].spools.profile = profiles[profileId].profile;
         })
       }
-
+      if (historyCollection.length === 0) {
+        counter = 0
+      } else {
+        counter = historyCollection[historyCollection.length - 1].printHistory.historyIndex + 1
+      }
       //grab Thumbnail if available.
       let currentFileIndex = _.findIndex(files, function(o) { return o.name == payload.name; });
       let base64Thumbnail = [null];

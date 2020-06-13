@@ -64,19 +64,19 @@ export default class Calculate {
     return (n - a) * (n - b) <= 0;
   }
   static returnFilamentCost(filament, usageElement){
-    let grams = usageElement.replace("g","")
-    grams = parseFloat(grams)
-    if(isNaN(grams)){
-      return `No length to calculate from`
-    }else{
-      if(typeof filament === 'undefined' || filament === null || filament == "None chosen..."){
-        return `(No Spool)`
+      let grams = usageElement.replace("g","")
+      grams = parseFloat(grams)
+      if(isNaN(grams)){
+        return `(No Length)`
       }else{
-        let cost = (filament.spools.price / filament.spools.weight) * grams
-        return  cost.toFixed(2)
+        if(typeof filament === 'undefined' || filament === null || filament == "None chosen..."){
+          return `(No Spool)`
+        }else{
+          let cost = ((filament.spools.price / filament.spools.weight) * grams).toFixed(2)
+          return  cost
+        }
       }
 
-    }
   }
   static returnPrintCost(costSettings, time){
     if(typeof costSettings === "undefined"){

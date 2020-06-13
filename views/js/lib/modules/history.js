@@ -3,6 +3,7 @@ import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import {returnHistory, returnHistoryUsage, returnDropDown} from "./filamentGrab.js";
 import tableSort from "../functions/tablesort.js";
+import Validate from "../functions/validate.js";
 window.onload = function () {tableSort.makeAllSortable();};
 
 //Setup history listeners
@@ -26,6 +27,7 @@ $("#historyModal").on("hidden.bs.modal", function(e) {
 
 export default class History {
   static returnFilamentUsage(id){
+
     if(id.job.filament === null) {
       id.job.filament = {
         tool0: {
@@ -50,42 +52,70 @@ export default class History {
     let newHistory = await OctoFarmClient.get("history/get");
     historyList = await newHistory.json();
     for (let i = historyList.history.length; i--;) {
-      let filamentString = null;
+      let filamentString = "";
       let filamentUsage = null;
-      if (historyList.history[i].printHistory.success) {
-        let filamentString = null;
-        let filamentUsage = null;
+      let gramArray = [];
+      if(Array.isArray(historyList.history[i].printHistory.filamentSelection)){
+          for(let s=0;s<historyList.history[i].printHistory.filamentSelection.length; s++){
+            if(historyList.history[i].printHistory.filamentSelection[s] !== null){
+              filamentString += `<b>Tool ${s}: </b>` + await returnHistory(historyList.history[i].printHistory.filamentSelection[s]) + "<br>"
+            }
+            filamentUsage = returnHistoryUsage(historyList.history[i].printHistory)
+            filamentUsage.forEach(usage => {
+              let strippedUsage = Validate.stripHTML(usage)
+              strippedUsage = strippedUsage.split(" / ").pop();
+              gramArray.push(strippedUsage);
+            })
+          }
+      }else{
         if (historyList.history[i].printHistory.filamentSelection !== null && typeof historyList.history[i].printHistory.filamentSelection !== 'undefined' ) {
-          filamentString = await returnHistory(historyList.history[i].printHistory.filamentSelection)
+          filamentString = `<b>Tool 0: </b>` + await returnHistory(historyList.history[i].printHistory.filamentSelection)
           filamentUsage = returnHistoryUsage(historyList.history[i].printHistory)
         } else {
           filamentString = "None selected..."
-          filamentUsage = History.returnFilamentUsage(historyList.history[i].printHistory)
+          filamentUsage = `<b>Tool 0: </b>` + History.returnFilamentUsage(historyList.history[i].printHistory)
         }
+      }
+      if (historyList.history[i].printHistory.success) {
         document.getElementById("spool-" + historyList.history[i]._id).innerHTML = filamentString;
-        document.getElementById("usage-" + historyList.history[i]._id).innerHTML = filamentUsage;
+        if(Array.isArray(filamentUsage)){
+          document.getElementById("usage-" + historyList.history[i]._id).innerHTML = "";
+          filamentUsage.forEach(usage => {
+            document.getElementById("usage-" + historyList.history[i]._id).insertAdjacentHTML("beforeend", usage);
+          })
+        }else{
+          document.getElementById("usage-" + historyList.history[i]._id).innerHTML = filamentUsage;
+        }
+
         let grams = document.getElementById("usage-" + historyList.history[i]._id)
         grams = grams.innerHTML
         grams = grams.split(" / ").pop();
-        let printerCost = Calc.returnPrintCost(historyList.history[i].printHistory.costSettings, historyList.history[i].printHistory.printTime)
-        let filamentCost = Calc.returnFilamentCost(historyList.history[i].printHistory.filamentSelection, grams);
-        document.getElementById("printerCost-" + historyList.history[i]._id).innerHTML = printerCost
-        document.getElementById("cost-" + historyList.history[i]._id).innerHTML = filamentCost
+        let filamentCost = "";
+        let filamentCostText = "";
         let totalCost = 0;
-        if(!isNaN(filamentCost)){
-          totalCost = (parseFloat(printerCost) + parseFloat(filamentCost)).toFixed(2)
-        }else if(isNaN(printerCost)){
-          totalCost = printerCost;
+        let printerCost = Calc.returnPrintCost(historyList.history[i].printHistory.costSettings, historyList.history[i].printHistory.printTime)
+        if(Array.isArray(historyList.history[i].printHistory.filamentSelection)) {
+          historyList.history[i].printHistory.filamentSelection.forEach((spool, index) => {
+            filamentCostText += "Tool " + index + ": " + Calc.returnFilamentCost(spool, gramArray[index]) + "<br>";
+          })
         }else{
-          totalCost = parseFloat(printerCost).toFixed(2)
+          filamentCost = Calc.returnFilamentCost(historyList.history[i].printHistory.filamentSelection, grams);
+          filamentCostText = "<b>Tool 0: </b>"+filamentCost;
+          if(!isNaN(filamentCost)){
+            totalCost = (parseFloat(printerCost) + parseFloat(filamentCost)).toFixed(2)
+          }else if(isNaN(printerCost)){
+            totalCost = printerCost;
+          }else{
+            totalCost = parseFloat(printerCost).toFixed(2)
+          }
         }
+
+
+        document.getElementById("printerCost-" + historyList.history[i]._id).innerHTML = printerCost;
+        document.getElementById("cost-" + historyList.history[i]._id).innerHTML = filamentCostText;
+
         document.getElementById("totalCost-"+ historyList.history[i]._id).innerHTML = totalCost;
       } else {
-        if (historyList.history[i].printHistory.filamentSelection !== null && typeof historyList.history[i].printHistory.filamentSelection !== 'undefined'  ) {
-          filamentString = await returnHistory(historyList.history[i].printHistory.filamentSelection)
-        } else {
-          filamentString = "None selected..."
-        }
         document.getElementById("spool-" + historyList.history[i]._id).innerHTML = filamentString;
         document.getElementById("cost-" + historyList.history[i]._id).innerHTML = "";
         document.getElementById("usage-" + historyList.history[i]._id).innerHTML = "";

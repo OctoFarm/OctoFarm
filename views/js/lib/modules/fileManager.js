@@ -347,8 +347,9 @@ export default class FileManager {
           getUsage.usage.forEach((usage,index) => {
             usageDisplay += "<b> Tool </b>"+ index + ": " + usage + "<br>";
             let usageElement = usage.split(" / ").pop();
-            let cost = "";
-            if(printer.selectedFilament !== null){
+
+            let cost = NaN;
+            if(Array.isArray(printer.selectedFilament)){
               cost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament[index], usageElement)).toFixed(2);
             }
             if(isNaN(cost)){

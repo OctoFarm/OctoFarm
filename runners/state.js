@@ -665,10 +665,10 @@ class Runner {
         if(typeof farmPrinters[i].powerSettings === "undefined"){
             farmPrinters[i].powerSettings = null;
         }
-        if(typeof farmPrinters[i].currentIdle === "undefined"){
+        if(typeof farmPrinters[i].currentIdle === "undefined") {
             farmPrinters[i].currentIdle = 0;
         }
-        if(typeof farmPrinters[i].selectedFilament === "undefined"){
+        if(typeof farmPrinters[i].selectedFilament === "undefined" && !Array.isArray(farmPrinters[i].selectedFilament)){
             farmPrinters[i].selectedFilament = [];
         }else{
             if(Array.isArray(farmPrinters[i].selectedFilament)){
