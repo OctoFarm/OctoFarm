@@ -44,13 +44,13 @@ export function returnHistoryUsage(id){
             for(let i = 0; i <  keys.length; i++){
                 let length = id.job.filament[keys[i]].length / 1000
                         if (length === 0) {
-                            spoolText += "<b>Tool " + i + ":  </b>"  + length + "";
+                            spoolText += "<b>Tool " + keys[i].substring(4,5) + ":  </b>"  + length + "";
                         } else {
                             if(id.filamentSelection[i] !== null){
                                 let radius = parseFloat(id.filamentSelection[i].spools.profile.diameter) / 2
                                 let volume = (length * Math.PI * radius * radius)
                                 let usage = volume * parseFloat(id.filamentSelection[i].spools.profile.density)
-                                spoolText.push("<b>Tool " + i + ":  </b>"  + length.toFixed(2) + "m / " + usage.toFixed(2) + "g <br>");
+                                spoolText.push("<b>Tool " + keys[i].substring(4,5) + ":  </b>"  + length.toFixed(2) + "m / " + usage.toFixed(2) + "g <br>");
                             }
                         }
             }
