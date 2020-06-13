@@ -669,10 +669,13 @@ class Runner {
             farmPrinters[i].currentIdle = 0;
         }
         if(typeof farmPrinters[i].selectedFilament === "undefined"){
-            farmPrinters[i].selectedFilament = null;
+            farmPrinters[i].selectedFilament = [];
         }else{
-            if(farmPrinters[i].selectedFilament != null){
-                selectedFilament.push(farmPrinters[i].selectedFilament._id)
+            if(Array.isArray(farmPrinters[i].selectedFilament)){
+                farmPrinters[i].selectedFilament.forEach(spool => {
+                    selectedFilament.push(spool.spools._id)
+                })
+
             }
         }
         if (typeof farmPrinters[i].octoPrintVersion === "undefined") {
@@ -1417,6 +1420,9 @@ class Runner {
         if(filamentId == 0){
                 printer.selectedFilament[tool] = null;
                 farmPrinters[i].selectedFilament[tool] = null;
+                //Find in selected filament list and remove
+                let selected = _.findIndex(selectedFilament, function(o) { return o == filamentId; });
+                selectedFilament.splice(selected, 1);
         }else{
             if(!Array.isArray(farmPrinters[i].selectedFilament)){
                 //Setup new spool...
