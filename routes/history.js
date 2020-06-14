@@ -17,8 +17,6 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
   if(history.printHistory.notes != note){
     history.printHistory.notes = note;
   }
-
-
     if(filamentId != 0){
       if(history.printHistory.filamentSelection !== null && history.printHistory.filamentSelection._id == filamentId){
         //Skip da save
@@ -42,9 +40,6 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
     }else{
       history.printHistory.filamentSelection = null;
     }
-
-
-
   history.markModified("printHistory");
   history.save();
   res.send("success");
@@ -99,6 +94,27 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
     res.send(send)
   }
 });
-
-
+// router.get("/info/", ensureAuthenticated, function(req, res) {
+//   //req.socket.setTimeout(Number.MAX_VALUE);
+//   res.writeHead(200, {
+//     "Content-Type": "text/event-stream", // <- Important headers
+//     "Cache-Control": "no-cache",
+//     Connection: "keep-alive"
+//   });
+//   res.write("\n");
+//   (function(clientId) {
+//     clients[clientId] = res; // <- Add this client to those we consider "attached"
+//     req.on("close", function() {
+//       delete clients[clientId];
+//     }); // <- Remove this client when he disconnects
+//   })(++clientId);
+//   //console.log("Client: " + Object.keys(clients));
+// });
+// setInterval(async function() {
+//   for (clientId in clients) {
+//     for (clientId in clients) {
+//       clients[clientId].write("data: " + historyTable + "\n\n"); // <- Push a message to a single attached client
+//     }
+//   }
+// }, 10000);
 module.exports = router;
