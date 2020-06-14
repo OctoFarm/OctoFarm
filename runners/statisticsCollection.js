@@ -353,7 +353,7 @@ class StatisticsCollection {
         }
         farmStats[0].heatMap = heatMap;
         farmStats[0].markModified('heatMap');
-        farmStats[0].save();
+        //farmStats[0].save();
 
     }
     static async farmInformation(farmPrinters) {

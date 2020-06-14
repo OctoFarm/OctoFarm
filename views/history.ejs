@@ -437,15 +437,23 @@
 
             Loading...
           </td>
-          <td class="usage" id="usage-<%= history[i]._id %>">
-            Loading...
+          <td >
+            <span class="usage" id="usage-<%= history[i]._id %>">
+                          Loading...
+            </span>
+            <span class="d-none totalUsageMeter" id="totalUsageMeter-<%= history[i]._id %>">
+
+            </span>
+            <span class="d-none totalUsageGrams" id="totalUsageGrams-<%= history[i]._id %>">
+
+            </span>
           </td>
           <td>
             <span class="cost" id="cost-<%= history[i]._id %>">
                           Loading...
             </span>
-            <span class="d-none" id="totalFilamentCost-<%= history[i]._id %>">
-                          Loading...
+            <span class="d-none filamentCost" id="totalFilamentCost-<%= history[i]._id %>">
+
             </span>
           </td>
           <td class="totalCost" id="totalCost-<%= history[i]._id %>">

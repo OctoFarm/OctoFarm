@@ -4,6 +4,7 @@ import UI from "../functions/ui.js";
 import {returnHistory, returnHistoryUsage, returnDropDown} from "./filamentGrab.js";
 import tableSort from "../functions/tablesort.js";
 import Validate from "../functions/validate.js";
+
 window.onload = function () {tableSort.makeAllSortable();};
 
 //Setup history listeners
@@ -27,7 +28,6 @@ $("#historyModal").on("hidden.bs.modal", function(e) {
 
 export default class History {
   static returnFilamentUsage(id){
-
     if(id.job.filament === null) {
       id.job.filament = {
         tool0: {
@@ -58,12 +58,17 @@ export default class History {
       let filamentUsage = null;
       let filamentCostText = "";
       let totalCost = 0;
+      let filamentCost = 0;
+      let totalLength = 0;
+      let totalGrams = 0;
       if(typeof historyList.history[i].printHistory.job !== 'undefined') {
           if (typeof historyList.history[i].printHistory.job.filament !== 'undefined' && historyList.history[i].printHistory.job.filament !== null) {
             const keys = Object.keys(historyList.history[i].printHistory.job.filament)
+            let totalCostArray = [];
             let filamentCostArray = [];
-            filamentCostArray.push(parseFloat(printerCost));
-            let gramArray = [];
+            let totalLengthArray = [];
+            let totalGramArray = [];
+            totalCostArray.push(parseFloat(printerCost));
             for (let f = 0; f < keys.length; f++) {
               if (historyList.history[i].printHistory.success) {
                 let filamentCost = "";
@@ -72,9 +77,13 @@ export default class History {
                     filamentString += `<b>Tool ${keys[f].substring(4, 5)}: </b>` + await returnHistory(historyList.history[i].printHistory.filamentSelection[f]) + "<br>"
                     filamentUsage = returnHistoryUsage(historyList.history[i].printHistory);
                     let validateUsage = Validate.stripHTML(filamentUsage[f])
+                    let usageSplit = validateUsage.split(" / ");
+                    totalLengthArray.push(parseFloat(usageSplit[0].replace(`Tool ${keys[f].substring(4, 5)}: `, "").replace("m", "")));
+                    totalGramArray.push(parseFloat(usageSplit[1].replace("g", "")));
                     validateUsage = validateUsage.split(" / ").pop();
-                    gramArray.push(validateUsage)
+
                     filamentCost += Calc.returnFilamentCost(historyList.history[i].printHistory.filamentSelection[f], validateUsage);
+                    totalCostArray.push(parseFloat(filamentCost));
                     filamentCostArray.push(parseFloat(filamentCost));
                     filamentCostText += `<b>Tool ${keys[f].substring(4, 5)}: </b>`+filamentCost + "<br>";
                   } else {
@@ -87,9 +96,14 @@ export default class History {
                     filamentString = `<b>Tool ${keys[f].substring(4, 5)}: </b>` + await returnHistory(historyList.history[i].printHistory.filamentSelection)
                     filamentUsage = returnHistoryUsage(historyList.history[i].printHistory);
                     let validateUsage = Validate.stripHTML(filamentUsage)
+                    let usageSplit = validateUsage.replace(`Tool ${keys[f]}`, "");
+                    usageSplit = usageSplit.split(" / ");
+                    totalLengthArray.push(parseFloat(usageSplit[0].replace(`Tool ${keys[f].substring(4, 5)}: `, "").replace("m", "")));
+                    totalGramArray.push(parseFloat(usageSplit[1].replace("g", "")));
                     validateUsage = validateUsage.split(" / ").pop();
                     filamentCost = Calc.returnFilamentCost(historyList.history[i].printHistory.filamentSelection, validateUsage);
                     filamentCostText = `<b>Tool ${keys[f].substring(4, 5)}: </b>`+filamentCost;
+                    totalCostArray.push(parseFloat(filamentCost));
                     filamentCostArray.push(parseFloat(filamentCost));
                   } else {
                     filamentString = `<b>Tool ${keys[f].substring(4, 5)}: </b>` + "(No Spool)"
@@ -111,16 +125,26 @@ export default class History {
                     filamentString = `<b>Tool ${keys[f].substring(4, 5)}: </b>` + "(No Spool)"
                   }
                 }
-
-
               }
             }
 
 
 
             let numOr0 = n => isNaN(n) ? 0 : n
-            totalCost = filamentCostArray.reduce((a, b) =>
+            totalCost = totalCostArray.reduce((a, b) =>
                 numOr0(a) + numOr0(b))
+            if(filamentCostArray.length !== 0){
+              filamentCost = filamentCostArray.reduce((a, b) =>
+                  numOr0(a) + numOr0(b))
+            }
+            if(totalLengthArray.length !== 0){
+              totalLength = totalLengthArray.reduce((a, b) =>
+                  numOr0(a) + numOr0(b))
+            }
+            if(totalGramArray.length !== 0){
+              totalGrams = totalGramArray.reduce((a, b) =>
+                  numOr0(a) + numOr0(b))
+            }
             totalCost = totalCost.toFixed(2)
             if(isNaN(totalCost)){
               totalCost = "No printer cost..."
@@ -129,7 +153,9 @@ export default class History {
 
 
       }
-
+      document.getElementById("totalUsageMeter-"+ historyList.history[i]._id).innerHTML = totalLength;
+      document.getElementById("totalUsageGrams-"+ historyList.history[i]._id).innerHTML = totalGrams;
+      document.getElementById("totalFilamentCost-"+ historyList.history[i]._id).innerHTML = filamentCost;
       document.getElementById("totalCost-"+ historyList.history[i]._id).innerHTML = totalCost;
       document.getElementById("cost-" + historyList.history[i]._id).innerHTML = filamentCostText;
       document.getElementById("spool-" + historyList.history[i]._id).innerHTML = filamentString;
@@ -443,18 +469,24 @@ export default class History {
     let times = []
     let cost = [];
     let printerCost = [];
-    let usageG = [];
-    let usageL = [];
     let statesCancelled = [];
     let statesFailed = [];
     let statesSuccess = [];
+    let totalUsageGrams = [];
+    let totalUsageMeter = [];
       filtered.forEach(row => {
         times.push(parseInt(row.getElementsByClassName("time")[0].innerText))
-        if(!isNaN(parseFloat(row.getElementsByClassName("cost")[0].innerText))){
-          cost.push(parseFloat(row.getElementsByClassName("cost")[0].innerText))
+        if(!isNaN(parseFloat(row.getElementsByClassName("filamentCost")[0].innerText))){
+          cost.push(parseFloat(row.getElementsByClassName("filamentCost")[0].innerText))
         }
         if(!isNaN(parseFloat(row.getElementsByClassName("printerCost")[0].innerText))){
           printerCost.push(parseFloat(row.getElementsByClassName("printerCost")[0].innerText))
+        }
+        if(!isNaN(parseFloat(row.getElementsByClassName("totalUsageGrams")[0].innerText))){
+          totalUsageGrams.push(parseFloat(row.getElementsByClassName("totalUsageGrams")[0].innerText))
+        }
+        if(!isNaN(parseFloat(row.getElementsByClassName("totalUsageMeter")[0].innerText))){
+          totalUsageMeter.push(parseFloat(row.getElementsByClassName("totalUsageMeter")[0].innerText))
         }
         let stateText = row.getElementsByClassName("stateText")[0].innerText.trim();
         if(stateText === "Cancelled"){
@@ -466,11 +498,7 @@ export default class History {
         if(stateText === "Success"){
           statesSuccess.push(stateText)
         }
-        if(row.getElementsByClassName("usage")[0].innerText !== ""){
-          let split = row.getElementsByClassName("usage")[0].innerText.split("/")
-          usageL.push(parseFloat(split[0]))
-          usageG.push(parseFloat(split[1]))
-        }
+
 
       })
     let total = statesCancelled.length + statesFailed.length + statesSuccess.length;
@@ -487,7 +515,7 @@ export default class History {
     cancelled.style.width = cancelledPercent.toFixed(2)+"%";
     cancelled.innerHTML = cancelledPercent.toFixed(2)+"%";
     document.getElementById("totalCost").innerHTML = cost.reduce((a, b) => a + b, 0).toFixed(2)
-    document.getElementById("totalFilament").innerHTML = usageL.reduce((a, b) => a + b, 0).toFixed(2) + "m / " + usageG.reduce((a, b) => a + b, 0).toFixed(2)+ "g"
+    document.getElementById("totalFilament").innerHTML = totalUsageMeter.reduce((a, b) => a + b, 0).toFixed(2) + "m / " + totalUsageGrams.reduce((a, b) => a + b, 0).toFixed(2)+ "g"
     let totalTimes = times.reduce((a, b) => a + b, 0)
     document.getElementById("totalPrintTime").innerHTML = Calc.generateTime(totalTimes)
     document.getElementById("printerTotalCost").innerHTML = printerCost.reduce((a, b) => a + b, 0).toFixed(2);
