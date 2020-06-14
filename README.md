@@ -38,6 +38,7 @@
 - [Getting Started](#getting-started)
   - [Wiki](https://github.com/NotExpectedYet/OctoFarm/wiki/)
   - [Platform](#platform)
+  - [Supported Browsers](#supported-browsers)
   - [Prerequisites](#prerequisites)
   - [Installation Production](#installation-production)
   - [Installation Development](#installation-development)
@@ -65,6 +66,14 @@ Confirmed working on: Linux (Ubuntu, Debian), RaspberryPi (Rasbian), Windows 10.
 Should also work on but not tested: MacOS, anything else nodejs will run on.
 
 _Note_: Raspberry Pi's Raspbian OS doesn't officially support running MongoDB yet (MongoDB requires a 64bit kernel, whereas Raspbian's is 32bit), so in that case, you'll need an external database running on some other machine or VM.
+
+### Supported Browsers
+
+Currently OctoFarm only support Chrome, Chromium and Firefox. No other browsers have been tested and may produce bugs. Use one of the supported browsers for the best experience.
+
+ - Firefox currently has a bug where you can't add printers. This is down to firefox not handling editable html fields properly and you will need to use Chrome to input printers.
+
+
 
 ### Prerequisites
 
