@@ -1400,13 +1400,24 @@ class Runner {
     }
     static async updateFilament(){
         for(let i = 0; i < farmPrinters.length; i++){
-            if(farmPrinters[i].selectedFilament != null){
-                let newInfo = await Filament.findById(farmPrinters[i].selectedFilament._id)
-                let printer = await Printers.findById(farmPrinters[i]._id)
-                farmPrinters[i].selectedFilament = newInfo;
-                printer.selectedFilament = newInfo;
-                printer.save();
+            if(Array.isArray(farmPrinters[i].selectedFilament)){
+                for(let f = 0; f < farmPrinters[i].selectedFilament.length; f++){
+                    let newInfo = await Filament.findById(farmPrinters[i].selectedFilament[f]._id)
+                    let printer = await Printers.findById(farmPrinters[i]._id)
+                    farmPrinters[i].selectedFilament[f] = newInfo;
+                    printer.selectedFilament[f] = newInfo;
+                    printer.save();
+                }
+            }else{
+                if(farmPrinters[i].selectedFilament != null){
+                    let newInfo = await Filament.findById(farmPrinters[i].selectedFilament._id)
+                    let printer = await Printers.findById(farmPrinters[i]._id)
+                    farmPrinters[i].selectedFilament = newInfo;
+                    printer.selectedFilament = newInfo;
+                    printer.save();
+                }
             }
+
         }
     }
     static async selectedFilament(printerId, filamentId, tool) {
