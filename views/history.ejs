@@ -517,100 +517,113 @@
         </button>
       </div>
       <div class="modal-body">
-        <div id="history-thumbnail">
+        <div class="row">
+          <div class="col-lg-6 p-0 m-0">
+            <div class="row">
+              <div class="col-lg-12"><h5 class="mb-1">Date and Time</h5><hr></div>
+              <div class="col-lg-3 text-center "><button id="printStatus" type="button" class="btn btn-secondary" href="#" aria-expanded="false" disabled="">
 
+                </button></div>
+              <div class="col-lg-3 text-center "><button id="startDate" type="button" class="btn btn-secondary" href="#" aria-expanded="false" disabled="">
+
+                </button></div>
+              <div class="col-lg-3 text-center "><button id="printTime" type="button" class="btn btn-secondary" href="#" aria-expanded="false" disabled="">
+
+                </button></div>
+              <div class="col-lg-3 text-center "><button id="endDate" type="button" class="btn btn-secondary" href="#" aria-expanded="false" disabled="">
+
+                </button></div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="row">
+              <div id="history-thumbnail"></div>
+            </div>
+          </div>
         </div>
-        <div class="container-fluid">
-          <div class="row text-center">
-            <div class="col-lg-12"><h5 class="mb-1 text-left">Date and Time</h5></div>
-            <div class="col-lg-1"><button id="printStatus" type="button" class="btn btn-secondary float-right d-block" href="#" aria-expanded="false" disabled="">
+        <div class="row">
+                <div class="col-lg-12"><h5 class="mb-1 text-left">Tools</h5><hr></div>
+                <div class="col-lg-12">
+                  <table class="table table-dark text-center">
+                    <thead>
+                    <tr>
+                      <th class="table-dark sticky-table table-dark" scope="col">Tool</th>
+                      <th class="table-dark sticky-table tabl-dark" scope="col">Spool</th>
+                      <th class="table-dark sticky-table table-dark" scope="col">Volume</th>
+                      <th class="table-dark sticky-table table-dark" scope="col">Length</th>
+                      <th class="table-dark sticky-table table-dark" scope="col">Weight</th>
+                      <th class="table-dark sticky-table table-dark" scope="col">Filament Cost</th>
+                    </tr>
+                    </thead>
+                    <tbody id="viewTable">
 
-              </button></div>
-            <div class="col-lg-4"><button id="startDate" type="button" class="btn btn-secondary float-right d-block" href="#" aria-expanded="false" disabled="">
+                    <tr>
+                      <td>
+                        Totals
+                      </td>
+                      <td>
 
-              </button></div>
-            <div class="col-lg-3"><button id="printTime" type="button" class="btn btn-secondary float-right d-block" href="#" aria-expanded="false" disabled="">
+                      </td>
+                      <td>
 
-              </button></div>
-            <div class="col-lg-4"><button id="endDate" type="button" class="btn btn-secondary float-right d-block" href="#" aria-expanded="false" disabled="">
+                      </td>
+                      <td>
 
-              </button></div>
-          </div>
-          <div class="row">
-            <div class="col-lg-6">
-             <h5 class="mb-1 text-left">Filament</h5>
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="filament">Spool</label>
+                      </td>
+                      <td>
+
+                      </td>
+                      <td>
+
+                      </td>
+                    </tr>
+                    </tbody>
+
+                  </table>
                 </div>
-                <select id="filament" class="custom-select">
-
-                </select>
               </div>
-                <div class="input-group mb-1 input-group-sm">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">Volume</span>
-                  </div>
-                  <input id="volume" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                  <div class="input-group-append">
-                    <span class="input-group-text" id="basic-addon2">cm³</span>
-                  </div>
+        <div class="row">
+          <div class="col-lg-12"><h5 class="mb-1 text-left">Extra Information</h5><hr></div>
+          <div class="col-lg-4">
+            <h5 class="mb-1 text-left">Job</h5>
+            <div class="col p-0">
+              <div class="input-group mb-1 input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Printer Cost</span>
                 </div>
-                <div class="input-group mb-1 input-group-sm">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">Length</span>
-                  </div>
-                  <input id="length" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                  <div class="input-group-append">
-                    <span class="input-group-text" id="basic-addon2">m</span>
-                  </div>
-                </div>
-              <form>
-                <div class="row">
-                  <div class="col p-0">
-                    <div class="input-group mb-1 input-group-sm">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">Filament Cost</span>
-                      </div>
-                      <input id="cost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-<!--                      <div class="input-group-append">-->
-<!--                        <span class="input-group-text" id="basic-addon2"></span>-->
-<!--                      </div>-->
-                    </div>
-                  </div>
-                  <div class="col p-0">
-                    <div class="input-group mb-1 input-group-sm">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">Printer Cost</span>
-                      </div>
-                      <input id="printerCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-<!--                      <div class="input-group-append">-->
-<!--                        <span class="input-group-text" id="basic-addon2"></span>-->
-<!--                      </div>-->
-                    </div>
-                  </div>
-                  <div class="col p-0 pl-1">
-                    <div class="input-group mb-1 input-group-sm">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">Weight</span>
-                      </div>
-                      <input id="weight" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                      <div class="input-group-append">
-                        <span class="input-group-text" id="basic-addon2">g</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
+                <input id="printerCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+                <!--                      <div class="input-group-append">-->
+                <!--                        <span class="input-group-text" id="basic-addon2"></span>-->
+                <!--                      </div>-->
+              </div>
             </div>
-            <div class="col-lg-6">
-              <h5>Notes:</h5>
-              <textarea id="notes" class="form-control" aria-label="With textarea" style="margin-top: 0px; margin-bottom: 0px; height: 142px;"></textarea>
+            <div class="col p-0">
+              <div class="input-group mb-1 input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Estimated Print Time</span>
+                </div>
+                <input id="estimatedPrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+              </div>
+              <div class="input-group mb-1 input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Actual Print Time</span>
+                </div>
+                <input id="printerTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+                <!--                      <div class="input-group-append">-->
+                <!--                        <span class="input-group-text" id="basic-addon2"></span>-->
+                <!--                      </div>-->
+              </div>
+              <div class="input-group mb-1 input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Print Time Accuracy</span>
+                </div>
+                <input id="printTimeAccuracy" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+              </div>
             </div>
+
           </div>
-          <div class="row">
-            <div class="col-lg-6">
-              <h5>File Information</h5>
+          <div class="col-lg-4">
+              <h5 class="mb-1 text-left">File</h5>
               <div class="input-group mb-1 input-group-sm">
                 <div class="input-group-prepend">
                   <span class="input-group-text">Upload Date</span>
@@ -631,31 +644,26 @@
                 <div class="input-group-append">
                   <span class="input-group-text" id="basic-addon2">MB</span>
                 </div>
-              </div>
             </div>
-            <div class="col-lg-6">
-              <h5>File Statistics</h5>
-              <div class="input-group mb-1 input-group-sm">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Estimated Print Time</span>
-                </div>
-                <input id="estimatedPrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+            <div class="input-group mb-1 input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Average Print Time</span>
               </div>
-              <div class="input-group mb-1 input-group-sm">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Average Print Time</span>
-                </div>
-                <input id="averagePrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-              </div>
-              <div class="input-group mb-1 input-group-sm">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Last Print Time</span>
-                </div>
-                <input id="lastPrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-              </div>
+              <input id="averagePrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
             </div>
-          </div>
+            <div class="input-group mb-1 input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Last Print Time</span>
+              </div>
+              <input id="lastPrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+            </div>
+
         </div>
+          <div class="col-lg-4">
+            <h5 class="mb-1 text-left">Notes</h5>
+            <textarea id="notes" class="form-control" aria-label="With textarea" style="margin-top: 0px; margin-bottom: 0px; height: 142px;"></textarea>
+          </div>
+      </div>
       </div>
       <div class="modal-footer" id="historySave">
         <button type="button" class="btn btn-light" data-dismiss="modal">
