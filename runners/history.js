@@ -16,15 +16,16 @@ let errorCounter = 0;
 
 class HistoryCollection {
   static async resyncFilament(printer){
-    let spools = await fetch(`${printer.printerURL}/plugin/filamentmanager/spools/${printer.selectedFilament.spools.fmID}`, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
-      }
-    });
+
     let returnSpools = [];
     for(let i = 0; i < printer.selectedFilament.length; i++){
+      let spools = await fetch(`${printer.printerURL}/plugin/filamentmanager/spools/${printer.selectedFilament[i].spools.fmID}`, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Key": printer.apikey
+        }
+      });
       let spool = await Spool.findById(printer.selectedFilament[i]._id)
       let sp = await spools.json();
       spool.spools = {
