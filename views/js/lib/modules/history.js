@@ -234,7 +234,7 @@ export default class History {
           currentToolDropDown.insertAdjacentHTML("beforeend", list);
         })
         if(current.spools[i][toolsArray[i]].spoolId !== null){
-          if(SelectHasValue(currentToolDropDown, current.spools[i][toolsArray[i]].spoolId)){
+          if(SelectHasValue(currentToolDropDown.id, current.spools[i][toolsArray[i]].spoolId)){
             currentToolDropDown.value = current.spools[i][toolsArray[i]].spoolId;
           }else{
             currentToolDropDown.insertAdjacentHTML("afterbegin", `
@@ -271,33 +271,6 @@ export default class History {
       `)
 
     }
-  // </tr>
-  //   <td>
-  //   <b>Tool ${keys[f].substring(4, 5)} </b>
-  //   </td>
-  //   <td>
-  //   <div class="input-group mb-3">
-  //       <select id="filament-${keys[f]}" class="custom-select">
-  //       </select>
-  //       </div>
-  //       </td>
-  //       <td>
-  //       ${(current.job.filament[keys[f]].volume/100).toFixed(2)}m3
-  //       </td>
-  //       <td>
-  //       ${(current.job.filament[keys[f]].length/1000).toFixed(2)}m
-  //       </td>
-  //       <td id="weight-${keys[f]}">
-  //
-  //       </td>
-  //       <td id="cost-${keys[f]}">
-  //
-  //       </td>
-  //       </tr>
-  //           `)
-  //
-  //           viewTable.insertAdjacentHTML("beforeend", `
-
   }
   static async updateCost(id) {
     let update = {
