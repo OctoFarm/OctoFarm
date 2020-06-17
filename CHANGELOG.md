@@ -13,10 +13,9 @@ All notable changes to this project will be documented in this file.
     - Added percent bar for Status on History Filters. Will show total failed/success/cancelled percentages on filtered results. 
     - Added hover information to file actions on file list
     - New Monilithic docker builds, builds with MongoDB included.
-    - OctoFarm now grabs multiple tool information
     - Printer Control now supports multiple tools
     - Printer Control now shows "Updated" status for tools. Shows the last time the temperature was grabbed.
-    - History now displays multiple tool information 
+    - History now displays multiple tool information if it was collected in the record. All successful prints will contain this information. 
     
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
@@ -48,6 +47,9 @@ All notable changes to this project will be documented in this file.
     - Fixed bug with file manager resetting page scroll when entering folder/choosing printer
     - Server reboot has a notification and no longer needs page to re-load. Live updating. 
     - Improved loading times on history with pre-calculating the list values server side. 
+    
+### Removed
+    - Due to filament changes in display for history now relying on OctoPrints tool designation there will be no selected filament or amounts shown in Cancelled/Failed prints.     
     
 ## [Released]
 

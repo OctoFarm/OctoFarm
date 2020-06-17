@@ -20,29 +20,62 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
     history.printHistory.notes = note;
   }
   for(let f = 0; f < filamentId.length; f++){
-    if(filamentId[f] != 0){
-      if(history.printHistory.filamentSelection[f] !== null && history.printHistory.filamentSelection[f]._id == filamentId){
-        //Skip da save
-      }else{
-        let serverSettings = await ServerSettings.find({});
-        let spool = await Spools.findById(filamentId[f]);
+      if (Array.isArray(history.printHistory.filamentSelection)) {
+        if (history.printHistory.filamentSelection[f] !== null && history.printHistory.filamentSelection[f]._id == filamentId) {
+          //Skip da save
+        } else {
+          if(filamentId[f] != 0){
+            let serverSettings = await ServerSettings.find({});
+            let spool = await Spools.findById(filamentId[f]);
 
-        if(serverSettings[0].filamentManager){
-          let profiles = await Profiles.find({})
-          let profileIndex = _.findIndex(profiles, function(o) {
-            return o.profile.index == spool.spools.profile;
-          });
-          spool.spools.profile = profiles[profileIndex].profile;
-          history.printHistory.filamentSelection[f] = spool;
-        }else{
-          let profile = await Profiles.findById(spool.spools.profile)
-          spool.spools.profile = profile.profile;
-          history.printHistory.filamentSelection[f] = spool;
+            if (serverSettings[0].filamentManager) {
+              let profiles = await Profiles.find({})
+              let profileIndex = _.findIndex(profiles, function (o) {
+                return o.profile.index == spool.spools.profile;
+              });
+              spool.spools.profile = profiles[profileIndex].profile;
+              history.printHistory.filamentSelection[f] = spool;
+            } else {
+              let profile = await Profiles.findById(spool.spools.profile)
+              spool.spools.profile = profile.profile;
+              history.printHistory.filamentSelection[f] = spool;
+            }
+          }else{
+            filamentId.forEach((id,index) => {
+              history.printHistory.filamentSelection[index] = null;
+            })
+          }
+
+        }
+      } else {
+        if (history.printHistory.filamentSelection !== null && history.printHistory.filamentSelection._id == filamentId) {
+          //Skip da save
+        } else {
+          history.printHistory.filamentSelection = [];
+          if(filamentId[f] != 0) {
+            let serverSettings = await ServerSettings.find({});
+            let spool = await Spools.findById(filamentId[f]);
+
+            if (serverSettings[0].filamentManager) {
+              let profiles = await Profiles.find({})
+              let profileIndex = _.findIndex(profiles, function (o) {
+                return o.profile.index == spool.spools.profile;
+              });
+              spool.spools.profile = profiles[profileIndex].profile;
+              history.printHistory.filamentSelection[f] = spool;
+            } else {
+              let profile = await Profiles.findById(spool.spools.profile)
+              spool.spools.profile = profile.profile;
+              history.printHistory.filamentSelection[f] = spool;
+            }
+          }else{
+            filamentId.forEach((id,index) => {
+              history.printHistory.filamentSelection[index] = null;
+            })
+
+          }
         }
       }
-    }else{
-      history.printHistory.filamentSelection[f] = null;
-    }
   }
   history.markModified("printHistory");
   history.save();
