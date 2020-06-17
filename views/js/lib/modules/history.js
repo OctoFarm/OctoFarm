@@ -178,7 +178,6 @@ export default class History {
       if(typeof current.thumbnail !== 'undefined' && current.thumbnail != null){
         thumbnail.innerHTML = `<center><img src="data:image/png;base64, ${current.thumbnail}" class="historyImage mb-2"></center>`
       }
-      console.log(current)
       startDate.innerHTML = "<b>Started</b><hr>" + current.startDate.replace(" - ", "<br>");
       printTime.innerHTML = "<b>Duration</b><hr>" + Calc.generateTime(current.printTime);
       endDate.innerHTML = "<b>Finished</b><hr>" + current.endDate.replace(" - ", "<br>");
@@ -234,16 +233,18 @@ export default class History {
         filamentList.forEach(list => {
           currentToolDropDown.insertAdjacentHTML("beforeend", list);
         })
-        current.spools.forEach(spool => {
-          let sp = Object.keys(spool)[0]
-          if(spool[sp].spoolId !== null){
-            currentToolDropDown.insertAdjacentHTML("afterbegin", `
-                <option value="${spool[sp].spoolId}">${spool[sp].spoolName}</option>
-            `)
+        if(current.spools[i][toolsArray[i]].spoolId !== null){
+          if(SelectHasValue(currentToolDropDown, current.spools[i][toolsArray[i]].spoolId)){
+            currentToolDropDown.value = current.spools[i][toolsArray[i]].spoolId;
           }else{
-            currentToolDropDown.value = 0;
+            currentToolDropDown.insertAdjacentHTML("afterbegin", `
+              <option value="${current.spools[i][toolsArray[i]].spoolId}">${current.spools[i][toolsArray[i]].spoolName}</option>
+          `)
+            currentToolDropDown.value = current.spools[i][toolsArray[i]].spoolId;
           }
-        })
+        }else{
+          currentToolDropDown.value = 0;
+        }
       }
 
       viewTable.insertAdjacentHTML("beforeend", `
