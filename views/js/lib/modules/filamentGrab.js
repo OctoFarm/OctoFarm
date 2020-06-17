@@ -36,61 +36,6 @@ export async function returnHistory(id) {
     }
 
 }
-export function returnHistoryUsage(id){
-    if(Array.isArray(id.filamentSelection)){
-        let spoolText = [];
-        if(typeof id.job !== 'undefined' && typeof id.job.filament !== 'undefined'){
-            const keys = Object.keys(id.job.filament)
-            for(let i = 0; i <  keys.length; i++){
-                let length = id.job.filament[keys[i]].length / 1000
-                        if (length === 0) {
-                            spoolText += "<b>Tool " + keys[i].substring(4,5) + ":  </b>"  + length + "";
-                        } else {
-                            if(id.filamentSelection[i] !== null){
-                                let radius = parseFloat(id.filamentSelection[i].spools.profile.diameter) / 2
-                                let volume = (length * Math.PI * radius * radius)
-                                let usage = volume * parseFloat(id.filamentSelection[i].spools.profile.density)
-                                spoolText.push("<b>Tool " + keys[i].substring(4,5) + ":  </b>"  + length.toFixed(2) + "m / " + usage.toFixed(2) + "g <br>");
-                            }
-                        }
-            }
-        }
-        return spoolText;
-    }else{
-        if(typeof id.filamentSelection.spools !== 'undefined'){
-            if(id.job.filament === null) {
-                id.job.filament = {
-                    tool0: {
-                        length: 0
-                    }
-                }
-            }
-            let length = id.job.filament.tool0.length / 1000
-            if(length === 0){
-                return ""
-            }else{
-                let radius = parseFloat(id.filamentSelection.spools.profile.diameter) / 2
-                let volume = (length * Math.PI * radius * radius)
-                let usage = volume * parseFloat(id.filamentSelection.spools.profile.density)
-                return "<b>Tool " + "0" + ":  </b>" + length.toFixed(2) + "m / " + usage.toFixed(2) + "g";
-            }
-
-        }else{
-            return ``
-        }
-    }
-
-
-}
-export function returnSingleUsage(length, spool){
-        length = length / 1000
-        let radius = parseFloat(spool.spools.profile.diameter) / 2
-        let volume = (length * Math.PI * radius * radius)
-        let usage = volume * parseFloat(spool.spools.profile.density)
-        return usage.toFixed(2)+ "g"
-
-
-}
 export async function returnSelected(id, profiles) {
 
     let profileId = null;
