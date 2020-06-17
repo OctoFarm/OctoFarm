@@ -55,27 +55,6 @@ export function returnHistoryUsage(id){
                         }
             }
         }
-        // id.filamentSelection.forEach((spool,index) => {
-        //     if(typeof spool.spools !== null) {
-        //         if (id.job.filament === null) {
-        //             id.job.filament = {
-        //                 ["tool"+index]: {
-        //                     length: 0
-        //                 }
-        //             }
-        //         }
-        //         console.log(id.job.filament)
-        //         let length = id.job.filament["tool"+index].length / 1000
-        //         if (length === 0) {
-        //             spoolText += "Tool " + index + ": " + length + "";
-        //         } else {
-        //             let radius = parseFloat(spool.spools.profile.diameter) / 2
-        //             let volume = (length * Math.PI * radius * radius)
-        //             let usage = volume * parseFloat(spool.spools.profile.density)
-        //             spoolText += "Tool " + index + ": " + length.toFixed(2) + "m / " + usage.toFixed(2) + "g <br>";
-        //         }
-        //     }
-        // })
         return spoolText;
     }else{
         if(typeof id.filamentSelection.spools !== 'undefined'){
@@ -100,6 +79,15 @@ export function returnHistoryUsage(id){
             return ``
         }
     }
+
+
+}
+export function returnSingleUsage(length, spool){
+        length = length / 1000
+        let radius = parseFloat(spool.spools.profile.diameter) / 2
+        let volume = (length * Math.PI * radius * radius)
+        let usage = volume * parseFloat(spool.spools.profile.density)
+        return usage.toFixed(2)+ "g"
 
 
 }

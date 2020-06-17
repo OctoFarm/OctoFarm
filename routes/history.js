@@ -7,6 +7,8 @@ const Spools = require("../models/Filament.js");
 const Profiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const _ = require("lodash");
+const historyClean = require("../lib/dataFunctions/historyClean.js");
+const HistoryClean = historyClean.HistoryClean;
 
 router.post("/update", ensureAuthenticated, async (req, res) => {
   //Check required fields
@@ -51,10 +53,9 @@ router.post("/delete", ensureAuthenticated, async (req, res) => {
   await History.findOneAndDelete({ _id: deleteHistory.id });
   res.send("success");
 });
-router.get("/get", ensureAuthenticated, (req, res) => {
-  History.find({}, null, { sort: { historyIndex: 1 } }).then(checked => {
-    res.send({ history: checked });
-  });
+router.get("/get", ensureAuthenticated, async (req, res) => {
+  let sorted = await HistoryClean.get();
+  res.send({ history: sorted });
 });
 router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
   //Check required fields
