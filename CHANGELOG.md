@@ -11,9 +11,12 @@ All notable changes to this project will be documented in this file.
     - Seperate smaller width table for adding printers. Should help with adding printers on a smaller screen laptop. 
     - Thumbnail to history view modal.
     - Added percent bar for Status on History Filters. Will show total failed/success/cancelled percentages on filtered results. 
-    - Added Placeholders to file actions on file list
+    - Added hover information to file actions on file list
     - New Monilithic docker builds, builds with MongoDB included.
-    - Printer Control now shows "Updated" status for tools. Shows the last time the temperature was grabbed. 
+    - OctoFarm now grabs multiple tool information
+    - Printer Control now supports multiple tools
+    - Printer Control now shows "Updated" status for tools. Shows the last time the temperature was grabbed.
+    - History now displays multiple tool information 
     
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
@@ -44,6 +47,7 @@ All notable changes to this project will be documented in this file.
     - Fixed issue with profiles not saving on filemant manager
     - Fixed bug with file manager resetting page scroll when entering folder/choosing printer
     - Server reboot has a notification and no longer needs page to re-load. Live updating. 
+    - Improved loading times on history with pre-calculating the list values server side. 
     
 ## [Released]
 
