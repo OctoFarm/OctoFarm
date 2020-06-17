@@ -1,9 +1,8 @@
 import OctoFarmClient from "../octofarm.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
-import {returnHistory, returnHistoryUsage, returnDropDown, returnSingleUsage} from "./filamentGrab.js";
+import {returnDropDown} from "./filamentGrab.js";
 import tableSort from "../functions/tablesort.js";
-import Validate from "../functions/validate.js";
 
 window.onload = function () {tableSort.makeAllSortable();};
 
@@ -27,27 +26,6 @@ $("#historyModal").on("hidden.bs.modal", function(e) {
 
 
 export default class History {
-  static returnFilamentUsage(id){
-    if(id.job.filament === null) {
-      id.job.filament = {
-        tool0: {
-          length: 0
-        }
-      }
-    }
-      let length = id.job.filament.tool0.length / 1000
-      if(length === 0){
-        return ''
-      }else{
-        let radius = parseFloat(1.75) / 2
-        let volume = (length * Math.PI * radius * radius)
-        let usage = volume * parseFloat(1.24)
-        return length.toFixed(2) + "m / " + usage.toFixed(2) + "g";
-      }
-  }
-
-
-
   static async get() {
     let numOr0 = n => isNaN(n) ? 0 : parseFloat(n)
     let newHistory = await OctoFarmClient.get("history/get");
@@ -287,10 +265,16 @@ export default class History {
     }
   }
   static async save(id) {
+    let filamentDrops = document.querySelectorAll("[id^='filament-tool']");
+    let filamentID = [];
+    filamentDrops.forEach(drop => {
+      filamentID.push(drop.value);
+    })
+
     let update = {
       id: id,
       note: document.getElementById("notes").value,
-      filamentId: document.getElementById("filament").value
+      filamentId: filamentID
     };
 
     let post = await OctoFarmClient.post("history/update", update);

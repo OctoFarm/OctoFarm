@@ -19,12 +19,13 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
   if(history.printHistory.notes != note){
     history.printHistory.notes = note;
   }
-    if(filamentId != 0){
-      if(history.printHistory.filamentSelection !== null && history.printHistory.filamentSelection._id == filamentId){
+  for(let f = 0; f < filamentId.length; f++){
+    if(filamentId[f] != 0){
+      if(history.printHistory.filamentSelection[f] !== null && history.printHistory.filamentSelection[f]._id == filamentId){
         //Skip da save
       }else{
         let serverSettings = await ServerSettings.find({});
-        let spool = await Spools.findById(filamentId);
+        let spool = await Spools.findById(filamentId[f]);
 
         if(serverSettings[0].filamentManager){
           let profiles = await Profiles.find({})
@@ -32,16 +33,17 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
             return o.profile.index == spool.spools.profile;
           });
           spool.spools.profile = profiles[profileIndex].profile;
-          history.printHistory.filamentSelection = spool;
+          history.printHistory.filamentSelection[f] = spool;
         }else{
           let profile = await Profiles.findById(spool.spools.profile)
           spool.spools.profile = profile.profile;
-          history.printHistory.filamentSelection = spool;
+          history.printHistory.filamentSelection[f] = spool;
         }
       }
     }else{
-      history.printHistory.filamentSelection = null;
+      history.printHistory.filamentSelection[f] = null;
     }
+  }
   history.markModified("printHistory");
   history.save();
   res.send("success");
