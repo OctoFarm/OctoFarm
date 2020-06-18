@@ -673,7 +673,7 @@ class Runner {
         }else{
             if(Array.isArray(farmPrinters[i].selectedFilament)){
                 farmPrinters[i].selectedFilament.forEach(spool => {
-                    selectedFilament.push(spool.spools._id)
+                    selectedFilament.push(spool._id)
                 })
 
             }
