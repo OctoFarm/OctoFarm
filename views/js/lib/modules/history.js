@@ -55,14 +55,14 @@ export default class History {
       }else{
         spoolText += "<b>Tool 0</b>: (No Spool)<br>";
       }
-
+      console.log(historyList.history[i])
       document.getElementById("spool-" + historyList.history[i]._id).innerHTML = spoolText;
       document.getElementById("usage-" + historyList.history[i]._id).innerHTML = usageText;
       document.getElementById("totalUsageMeter-"+ historyList.history[i]._id).innerHTML = (lengthArray.reduce((a, b) => a + b, 0)/1000).toFixed(2);
       document.getElementById("totalUsageGrams-"+ historyList.history[i]._id).innerHTML = (gramsArray.reduce((a, b) => a + b, 0)).toFixed(2);
       document.getElementById("cost-"+ historyList.history[i]._id).innerHTML = costText;
-      document.getElementById("totalCost-"+ historyList.history[i]._id).innerHTML = historyList.history[i].totalCost.toFixed(2);
-
+      document.getElementById("totalFilamentCost-"+ historyList.history[i]._id).innerHTML = historyList.history[i].spoolCost.toFixed(2);
+      document.getElementById("totalCost-"+historyList.history[i]._id).innerHTML = historyList.history[i].totalCost.toFixed(2)
       //
 
 
