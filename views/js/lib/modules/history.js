@@ -2,9 +2,6 @@ import OctoFarmClient from "../octofarm.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import {returnDropDown} from "./filamentGrab.js";
-import tableSort from "../functions/tablesort.js";
-
-window.onload = function () {tableSort.makeAllSortable();};
 
 //Setup history listeners
 document.getElementById("historyTable").addEventListener("click", e => {
@@ -55,7 +52,6 @@ export default class History {
       }else{
         spoolText += "<b>Tool 0</b>: (No Spool)<br>";
       }
-      console.log(historyList.history[i])
       document.getElementById("spool-" + historyList.history[i]._id).innerHTML = spoolText;
       document.getElementById("usage-" + historyList.history[i]._id).innerHTML = usageText;
       document.getElementById("totalUsageMeter-"+ historyList.history[i]._id).innerHTML = (lengthArray.reduce((a, b) => a + b, 0)/1000).toFixed(2);

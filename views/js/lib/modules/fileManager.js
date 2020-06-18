@@ -343,22 +343,28 @@ export default class FileManager {
           let timeString = fileDate.toTimeString().substring(0, 8);
           let getUsage = FileActions.grabUsage(file);
           let filamentCost = [];
-          let usageDisplay = getUsage.totalLength.toFixed(2) + "m / " + getUsage.totalGrams.toFixed(2) + "<br>";
-          getUsage.usage.forEach((usage,index) => {
-            usageDisplay += "<b> Tool </b>"+ index + ": " + usage + "<br>";
-            let usageElement = usage.split(" / ").pop();
+          let usageDisplay = "";
+          if(getUsage !== "No Length"){
+            usageDisplay = getUsage.totalLength.toFixed(2) + "m / " + getUsage.totalGrams.toFixed(2) + "<br>";
+            getUsage.usage.forEach((usage,index) => {
+              usageDisplay += "<b> Tool </b>"+ index + ": " + usage + "<br>";
+              let usageElement = usage.split(" / ").pop();
 
-            let cost = NaN;
-            if(Array.isArray(printer.selectedFilament)){
-              cost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament[index], usageElement)).toFixed(2);
-            }
-            if(isNaN(cost)){
-              filamentCost.push("<b> Tool "+index+"</b>: "+ "(No Spool)");
-            }else{
-              filamentCost.push("<b> Tool "+index+"</b>: "+ cost);
-            }
+              let cost = NaN;
+              if(Array.isArray(printer.selectedFilament)){
+                cost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament[index], usageElement)).toFixed(2);
+              }
+              if(isNaN(cost)){
+                filamentCost.push("<b> Tool "+index+"</b>: "+ "(No Spool)");
+              }else{
+                filamentCost.push("<b> Tool "+index+"</b>: "+ cost);
+              }
 
-          })
+            })
+          }else{
+
+          }
+
 
 
 
@@ -932,7 +938,10 @@ export class FileActions {
   }
   //Needs updating when filament is brought in.
   static grabUsage(file){
-    if(file.length.length === 0){
+    if(typeof file.length === 'undefined' ){
+      if(file.length === null || file.length.length === 0){
+        return "No Length"
+      }
       return "No Length"
     }
     let usageArray = {
