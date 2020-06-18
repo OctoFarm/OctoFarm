@@ -5,7 +5,6 @@ import PrinterManager from "./lib/modules/printerManager.js";
 import PrinterSettings from "./lib/modules/printerSettings.js";
 import FileOperations from "./lib/functions/file.js";
 import Validate from "./lib/functions/validate.js";
-import tableSort from "./lib/functions/tablesort.js";
 import PowerButton from "./lib/modules/powerButton.js";
 
 
@@ -852,5 +851,3 @@ let sortable = Sortable.create(el, {
         OctoFarmClient.post("printers/updateSortIndex", listID);
     }
 });
-
-window.onload = function () {tableSort.makeAllSortable();};

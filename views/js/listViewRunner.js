@@ -3,8 +3,7 @@ import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
 import PrinterManager from "./lib/modules/printerManager.js";
-import tableSort from "./lib/functions/tablesort.js";
-window.onload = function () {tableSort.makeAllSortable();};
+
 import Validate from "./lib/functions/validate.js";
 import PowerButton from "./lib/modules/powerButton.js";
 import initGroupSelect from "./lib/modules/groupSelection.js";

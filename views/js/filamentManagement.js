@@ -1,13 +1,8 @@
 import OctoFarmclient from "./lib/octofarm.js";
 import OctoPrintClient from "./lib/octoprint.js";
 import UI from "./lib/functions/ui.js";
-import tableSort from "./lib/functions/tablesort.js";
 import Validate from "./lib/functions/validate.js";
 import Calc from "./lib/functions/calc.js";
-
-window.onload = function () {
-    tableSort.makeAllSortable();
-};
 let jpInit = false;
 let filamentStore = [
     {
