@@ -165,7 +165,7 @@ export default class History {
       status.innerHTML = current.state;
       if(typeof current.job !== 'undefined' && current.job !== null){
         estimatedPrintTime.value = Calc.generateTime(current.job.estimatedPrintTime);
-        printTimeAccuracy.value = current.job.printTimeAccuracy.toFixed(2);
+        printTimeAccuracy.value = current.job.printTimeAccuracy.toFixed(0)/100+"%";
       }
       jobCosting.value = current.totalCost;
       let upDate = new Date(current.file.uploadDate * 1000);
