@@ -11,6 +11,10 @@ const Profiles = require("../models/Profiles.js");
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 const _ = require("lodash");
+const historyClean = require("../lib/dataFunctions/historyClean.js");
+const HistoryClean = historyClean.HistoryClean;
+const filamentClean = require("../lib/dataFunctions/filamentClean.js");
+const FilamentClean = filamentClean.FilamentClean;
 
 const version = pjson.version + ".6";
 
@@ -150,15 +154,12 @@ router.get("/filemanager", ensureAuthenticated, async(req, res) => {
     });
 });
 //History Page
-router.get("/history", ensureAuthenticated, async(req, res) => {
+router.get("/history", ensureAuthenticated, async (req, res) => {
     let printers = Runner.returnFarmPrinters();
-    let sortedPrinters = await Runner.sortedIndex();
-    const History = require("../models/History.js");
-    let history = await History.find({});
-    const farmStatistics = require("../runners/statisticsCollection.js");
-    const FarmStatistics = farmStatistics.StatisticsCollection;
-    let statistics = await FarmStatistics.returnStats();
+    let history = await HistoryClean.returnHistory();
+    let statistics = await HistoryClean.returnStatistics();
     let serverSettings = await ServerSettings.find({});
+    let clientSettings = await ClientSettings.find({});
     let user = null;
     let group = null;
     if (serverSettings[0].server.loginRequired === false) {
@@ -172,13 +173,12 @@ router.get("/history", ensureAuthenticated, async(req, res) => {
         name: user,
         userGroup: group,
         version: version,
-        printers: printers,
-        sortedIndex: sortedPrinters,
         printerCount: printers.length,
         history: history,
-        page: "History",
+        printStatistics: statistics,
         helpers: prettyHelpers,
-        printStatistics: statistics.printStatistics,
+        page: "History",
+        clientSettings: clientSettings,
         serverSettings: serverSettings,
     });
 });
@@ -315,14 +315,11 @@ router.get("/mon/currentOp", ensureAuthenticated, async(req, res) => {
 });
 router.get("/filament", ensureAuthenticated, async(req, res) => {
     let printers = Runner.returnFarmPrinters();
-    let sortedPrinters = await Runner.sortedIndex();
-    const farmStatistics = require("../runners/statisticsCollection.js");
-    const FarmStatistics = farmStatistics.StatisticsCollection;
-    let statistics = await FarmStatistics.returnStats();
     let clientSettings = await ClientSettings.find({});
     let serverSettings = await ServerSettings.find({});
-    let spools = await Spools.find({});
-    let profiles = await Profiles.find({});
+    let statistics = await FilamentClean.getStatistics();
+    let spools = await FilamentClean.getSpools();
+    let profiles = await FilamentClean.getProfiles();
     let user = null;
     let group = null;
     if (serverSettings[0].server.loginRequired === false) {
@@ -336,17 +333,14 @@ router.get("/filament", ensureAuthenticated, async(req, res) => {
         name: user,
         userGroup: group,
         version: version,
-        printers: printers,
-        sortedIndex: sortedPrinters,
-        currentOperations: statistics.currentOperations,
         printerCount: printers.length,
-        currentOperationsCount: statistics.currentOperationsCount,
         page: "Filament Manager",
         helpers: prettyHelpers,
         clientSettings: clientSettings,
         serverSettings: serverSettings,
         spools: spools,
         profiles: profiles,
+        statistics: statistics,
     });
 });
 module.exports = router;

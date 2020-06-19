@@ -97,7 +97,7 @@ router.get("/get/filament", ensureAuthenticated, async (req, res) => {
 router.get("/get/selected", ensureAuthenticated, async (req, res) => {
   const runner = require("../runners/state.js");
   const Runner = runner.Runner;
-  let selected = await Runner.getSelected();
+  let selected = await FilamentClean.getSelected();
   res.send({status: 200, selected});
 })
 router.post("/select", ensureAuthenticated, async (req, res) => {

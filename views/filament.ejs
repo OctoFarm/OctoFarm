@@ -7,7 +7,7 @@
 <% if(filamentManager){ %>
 <% displayNone = ""; %>
 <% } %>
-<% let filamentTotals = helpers.filamentTotals(profiles, spools, filamentManager) %>
+<% let filamentTotals = statistics %>
 
 <div class="row">
     <div class="col-lg-12">
@@ -66,8 +66,9 @@
                         <hr>
                         <p><b>Profiles:</b> <%= filamentTotals.profileCount %> </p>
                         <p><b>Spools:</b> <%= filamentTotals.spoolCount %> </p>
+                        <p><b>Active:</b> <%= filamentTotals.activeSpoolCount %> </p>
                     </div>
-                    <div class="col-lg-2">
+                    <div class="col-lg-1">
                         <h6>Totals</h6>
                         <hr>
                         <p class="m-0"><b>Weight:</b> <%= filamentTotals.total.toFixed(2) %>g </p>
@@ -225,27 +226,22 @@
 
                     <tbody id="addProfilesTable" data-jplist-group="profiles">
                         <% profiles.forEach(profile => { %>
-                        <%   let profileID = null;  %>
-                        <%    if(filamentManager){  %>
-                        <%        profileID = profile.profile.index  %>
-                        <%    }else{  %>
-                        <%        profileID = profile._id  %>
-                        <%    }  %>
+                        <% let profileID = profile._id  %>
                             <tr data-jplist-item>
                                   <td class="d-none" scope="row">
                                     <%= profileID %>
                                   </td>
                                   <td scope="row">
-                                     <p contenteditable="false"><%=profile.profile.manufacturer%></p>
+                                     <p contenteditable="false"><%=profile.manufacturer%></p>
                                   </td>
                                    <td>
-                                    <p contenteditable="false"><%=profile.profile.material%></p>
+                                    <p contenteditable="false"><%=profile.material%></p>
                                   </td>
                                   <td>
-                                    <p contenteditable="false"><%=profile.profile.density%></p>
+                                    <p contenteditable="false"><%=profile.density%></p>
                                   </td>
                                   <td>
-                                    <p contenteditable="false"><%=profile.profile.diameter%></p>
+                                    <p contenteditable="false"><%=profile.diameter%></p>
                                   </td>
                                       <td>
                                           <button id="edit-<%=profileID%>" type="button" class="btn btn-sm btn-info edit">
@@ -509,18 +505,18 @@
                         <% spools.forEach(spool => { %>
                                         <tr data-jplist-item>
                                           <th style="display: none;"><%= spool._id %></th>
-                                          <th scope="row"><p class="name" contenteditable="false"><%=spool.spools.name%></p></th>
+                                          <th scope="row"><p class="name" contenteditable="false"><%=spool.name%></p></th>
                                           <td>
                                                <select id="spoolsProfile-<%=spool._id%>" class="form-control" disabled>
 
                                                </select>
                                            </td>
-                                          <td><p class="price" contenteditable="false"><%=spool.spools.price%></p></td>
-                                          <td><p class="weight" contenteditable="false"><%=spool.spools.weight%></p></td>
-                                          <td><p class="used <%= displayNone %>" contenteditable="false" ><%=spool.spools.used%></p></td>
-                                          <td class="grams <%= displayNone %>"><%=(spool.spools.weight - spool.spools.used).toFixed(0)%></td>
-                                           <td class="percent <%= displayNone %>"><%=(100 - spool.spools.used / spool.spools.weight * 100).toFixed(0)%></td>
-                                          <td><p contenteditable="false"><%= spool.spools.tempOffset %></p></td>
+                                          <td><p class="price" contenteditable="false"><%=spool.price%></p></td>
+                                          <td><p class="weight" contenteditable="false"><%=spool.weight%></p></td>
+                                          <td class="<%= displayNone %>"><p class="used" contenteditable="false" ><%=spool.used%></p></td>
+                                          <td class="grams <%= displayNone %>"><%=(spool.weight - spool.used).toFixed(0)%></td>
+                                            <td class="percent <%= displayNone %>"><%=(100 - spool.used / spool.weight * 100).toFixed(0)%></td>
+                                          <td><p contenteditable="false"><%= spool.tempOffset %></p></td>
                                           <td><select id="spoolsPrinterAssignment-<%=spool._id%>" class="form-control">
 
                                                </select></td>
