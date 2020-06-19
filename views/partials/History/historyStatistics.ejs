@@ -1,3 +1,4 @@
+<%console.log(printStatistics)%>
 <div class="row">
   <div class="col-lg-12 text-center text-light">
     <div class="row">
@@ -50,9 +51,9 @@
         <div class="row">
           <div class="col-lg-6">
             <b><i class="fas fa-clock"></i> Longest Print Time</b> <br />
-            <%= helpers.generateTime(printStatistics.longestPrint) %><br />
+            <%= helpers.generateTime(printStatistics.longestPrintTime) %><br />
             <b><i class="fas fa-clock"></i> Shortest Print Time</b> <br />
-            <%= helpers.generateTime(printStatistics.shortestPrint) %> <br />
+            <%= helpers.generateTime(printStatistics.shortestPrintTime) %> <br />
           </div>
           <div class="col-lg-6">
             <b><i class="fas fa-clock"></i> Average Print Time <br /></b><%=
@@ -67,9 +68,9 @@
         <div class="row">
           <div class="col-lg-12">
             <b><i class="fas fa-star"></i> Most Occurances</b> <br />
-            <%= printStatistics.mostUsedPrinters %><br />
+            <%= printStatistics.printerMost %><br />
             <b><i class="fas fa-star-half-alt"></i> Least Occurances</b> <br />
-            <%= printStatistics.leastUsedPrinters %> <br />
+            <%= printStatistics.printerLoad %> <br />
           </div>
 
         </div>
@@ -79,15 +80,15 @@
         <div class="row">
           <div class="col-lg-6">
             <b><i class="fas fa-weight"></i> Total Filament Usage</b> <br />
-            <%= printStatistics.totalFilamentUsage.toFixed(2) %>g<br />
+            <%= printStatistics.totalFilamentUsage %><br />
             <b><i class="fas fa-weight"></i> Average Filament Usage</b> <br />
-            <%= printStatistics.averageFilamentUsage.toFixed(2) %>g <br />
+            <%= printStatistics.averageFilamentUsage %> <br />
           </div>
           <div class="col-lg-6">
             <b><i class="fas fa-weight"></i> Highest Filament Usage <br /></b><%=
-            printStatistics.highestFilamentUsage.toFixed(2) %>g<br />
+            printStatistics.highestFilamentUsage %><br />
             <b><i class="fas fa-weight"></i> Lowest Filament Usage <br /></b><%=
-            printStatistics.lowestFilamentUsage.toFixed(2) %>g<br />
+            printStatistics.lowestFilamentUsage %><br />
 
           </div>
         </div>
@@ -96,17 +97,17 @@
         <b class="mt-1">Cost</b>
         <div class="row">
           <div class="col-lg-6">
-            <b><i class="fas fa-tag"></i>  Total Cost</b> <br />
-            <%= printStatistics.totalCost.toFixed(2) %> <br />
-            <b><i class="fas fa-tag"></i>  Highest Cost</b> <br />
-            <%= printStatistics.highestCost.toFixed(2) %><br />
+            <b><i class="fas fa-tag"></i>  Total Spool Cost</b> <br />
+            <%= printStatistics.totalSpoolCost %> <br />
+            <b><i class="fas fa-tag"></i>  Highest Spool Cost</b> <br />
+            <%= printStatistics.highestSpoolCost %><br />
 
           </div>
           <div class="col-lg-6">
             <b><i class="fas fa-tag"></i>  Total Printer Cost</b> <br />
-            <%= printStatistics.totalPrinterCost.toFixed(2) %> <br />
+            <%= printStatistics.highestPrinterCost %> <br />
             <b><i class="fas fa-tag"></i>  Highest Printer Cost</b> <br />
-            <%= printStatistics.highestPrinterCost.toFixed(2) %><br />
+            <%= printStatistics.totalPrinterCost %><br />
 
           </div>
         </div>

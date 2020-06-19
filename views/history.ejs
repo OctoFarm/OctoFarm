@@ -1,5 +1,4 @@
 <% if(typeof history.length != 'undefined' && history.length > 0 ) {%>
-
   <% let historyTotals = helpers.historyTotals(history); %>
 <div class="row">
   <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
@@ -395,72 +394,88 @@
         <% for(let i = 0; i < history.length; i++){ %>
         <tr data-jplist-item>
           <td class="index" scope="row">
-            <%= history[i].printHistory.historyIndex %>
+            <%= history[i].index %>
           </td>
           <td class="state">
-            <% if(history[i].printHistory.success){%>
-            <p class="stateText d-none">Success</p><i class="fas fa-thumbs-up text-success"></i>
-            <% }else{ %> <% if(history[i].printHistory.reason === "cancelled"){ %>
-                <p class="stateText d-none">Cancelled</p><i class="fas fa-thumbs-down text-warning"></i>
-            <% }else{ %>
-                <p class="stateText d-none">Failure</p><i class="fas fa-exclamation text-danger"></i>
-            <% } %> <% } %>
+            <%- history[i].state %>
           </td>
-          <td class="printer <%= history[i].printHistory.printerName.replace(/ /g, "_") %>"><%=
-            history[i].printHistory.printerName %>
+          <td class="printer <%= history[i].printer.replace(/ /g, "_") %>"><%=
+            history[i].printer %>
           </td>
-          <%  let path = ""; %>
-          <% if(typeof history[i].printHistory.job !== 'undefined'){%>
-          <%  path = history[i].printHistory.job.file.path.substring(0, history[i].printHistory.job.file.path.lastIndexOf("/"))%>
-          <%}%>
-          <td class="file <%= history[i].printHistory.fileName.replace(".gcode", "") %> <%= path %>" class="text-wrap">
-            <%= history[i].printHistory.fileName.replace(/_/g," ") %>
+          <% let path = history[i].file.path.substring(0, history[i].file.path.lastIndexOf("/"))%>
+          <td class="file <%= history[i].file.name.replace(".gcode", "") %> <%= path %>" class="text-wrap">
+            <%= history[i].file.name.replace(/_/g," ") %>
           </td>
           <td class="start">
-            <%= history[i].printHistory.startDate %>
+            <%= history[i].startDate %>
           </td>
           <td class="end">
-            <%= history[i].printHistory.endDate %>
+            <%= history[i].endDate %>
           </td>
           <td>
-            <span class="d-none time"><%= history[i].printHistory.printTime %></span>
-            <span><%= helpers.generateTime(history[i].printHistory.printTime) %></span>
+            <span class="d-none time"><%= history[i].printTime %></span>
+            <span><%= helpers.generateTime(history[i].printTime) %></span>
           </td>
           <td class="printerCost" id="printerCost-<%= history[i]._id %>">
-            Loading...
+            <%= history[i].printerCost %>
           </td>
-          <%if(history[i].printHistory.filamentSelection != null && typeof history[i].printHistory.filamentSelection !== 'undefined' && typeof history[i].printHistory.filamentSelection.spools !== 'undefined'){%>
-          <td class="spool <%= history[i].printHistory.filamentSelection.spools.profile.material.replace(/ /g, "_") %>" id="spool-<%= history[i]._id %>">
-          <% }else{%>
-          <td class="spool" id="spool-<%= history[i]._id %>">
-          <%}%>
-
-            Loading...
+          <% let spoolTypes = "" %>
+          <% if(history[i].spools !== null){ %>
+          <% history[i].spools.forEach((spool,index) => { %>
+            <% spoolTypes += spool["tool"+index].type+" " %>
+          <% })%>
+          <% } %>
+          <td class="spool <%= spoolTypes %>" id="spool-<%= history[i]._id %>">
+            <% if(history[i].spools !== null){ %>
+              <% history[i].spools.forEach((spool,index) => { %>
+                <%if(spool["tool"+index].spoolName !== null){%>
+                <b><%= spool["tool"+index].toolName %></b>: <p><%= spool["tool"+index].spoolName %></p>
+                <%}else{%>
+                <b><%= spool["tool"+index].toolName %></b>: <p>(No Spool)</p>
+              <%}%>
+              <% })%>
+            <% } %>
           </td>
           <td >
             <span class="usage" id="usage-<%= history[i]._id %>">
-                          Loading...
+              <% if(history[i].spools !== null){ %>
+                <% history[i].spools.forEach((spool,index) => { %>
+                <%if(spool["tool"+index].spoolName !== null){%>
+                  <b><%= spool["tool"+index].toolName %></b>: <p><%= spool["tool"+index].weight.toFixed(2) %>g / <%= spool["tool"+index].length.toFixed(2) %>m</p>
+                <%}else{%>
+                  <b><%= spool["tool"+index].toolName %></b>: <p>(No Spool)</p>
+                <%}%>
+                <% })%>
+              <% } %>
             </span>
             <span class="d-none totalUsageMeter" id="totalUsageMeter-<%= history[i]._id %>">
-
+              <%= history[i].totalLength %>
             </span>
             <span class="d-none totalUsageGrams" id="totalUsageGrams-<%= history[i]._id %>">
-
+              <%= history[i].totalWeight %>
             </span>
           </td>
           <td>
             <span class="cost" id="cost-<%= history[i]._id %>">
-                          Loading...
+              <% if(history[i].spools !== null){ %>
+                <% history[i].spools.forEach((spool,index) => { %>
+                <%if(spool["tool"+index].spoolName !== null){%>
+                  <b><%= spool["tool"+index].toolName %></b>: <p><%= spool["tool"+index].cost %></p>
+                <%}else{%>
+                  <b><%= spool["tool"+index].toolName %></b>: <p>(No Spool)</p>
+                <%}%>
+                <% })%>
+              <% } %>
             </span>
             <span class="d-none filamentCost" id="totalFilamentCost-<%= history[i]._id %>">
-
+              <%= history[i].spoolCost %>
             </span>
           </td>
           <td class="totalCost" id="totalCost-<%= history[i]._id %>">
-            Loading...
+            <%= history[i].totalCost %>
           </td>
           <td class="notes" class="text-wrap" id="note-<%= history[i]._id %>">
-            <%= history[i].printHistory.notes %>
+            <%= history[i].notes %>
           </td>
           <td>
             <div class="btn-group" role="group" aria-label="Basic example">

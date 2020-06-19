@@ -24,45 +24,9 @@ $("#historyModal").on("hidden.bs.modal", function(e) {
 
 export default class History {
   static async get() {
-    let numOr0 = n => isNaN(n) ? 0 : parseFloat(n)
+    // let numOr0 = n => isNaN(n) ? 0 : parseFloat(n)
     let newHistory = await OctoFarmClient.get("history/get");
     historyList = await newHistory.json();
-    for (let i = historyList.history.length; i--;) {
-      document.getElementById("printerCost-"+ historyList.history[i]._id).innerHTML = historyList.history[i].printerCost;
-      document.getElementById("printerCost-"+ historyList.history[i]._id).innerHTML
-      let spoolText = "";
-      let usageText = "";
-      let costText = "";
-      let lengthArray = [];
-      let gramsArray = [];
-      if(historyList.history[i].spools !== null){
-        historyList.history[i].spools.forEach(spool => {
-          let sp = Object.keys(spool)[0]
-          lengthArray.push(numOr0(spool[sp].length))
-          gramsArray.push(numOr0(spool[sp].weight))
-          if(spool[sp].spoolName === null){
-            spoolText += "<b>" + spool[sp].toolName + "</b>: (No Spool)<br>";
-          }else{
-            spoolText += "<b>" + spool[sp].toolName + "</b>: " + spool[sp].spoolName + "<br>";
-            usageText += "<b>" + spool[sp].toolName + "</b>: " + (parseFloat(spool[sp].length)/1000).toFixed(2) + "m / " + spool[sp].weight.toFixed(2) + "g" + "<br>";
-            costText += "<b>" + spool[sp].toolName + "</b>: " + spool[sp].cost+ "<br>";
-          }
-
-        })
-      }else{
-        spoolText += "<b>Tool 0</b>: (No Spool)<br>";
-      }
-      document.getElementById("spool-" + historyList.history[i]._id).innerHTML = spoolText;
-      document.getElementById("usage-" + historyList.history[i]._id).innerHTML = usageText;
-      document.getElementById("totalUsageMeter-"+ historyList.history[i]._id).innerHTML = (lengthArray.reduce((a, b) => a + b, 0)/1000).toFixed(2);
-      document.getElementById("totalUsageGrams-"+ historyList.history[i]._id).innerHTML = (gramsArray.reduce((a, b) => a + b, 0)).toFixed(2);
-      document.getElementById("cost-"+ historyList.history[i]._id).innerHTML = costText;
-      document.getElementById("totalFilamentCost-"+ historyList.history[i]._id).innerHTML = historyList.history[i].spoolCost.toFixed(2);
-      document.getElementById("totalCost-"+historyList.history[i]._id).innerHTML = historyList.history[i].totalCost.toFixed(2)
-      //
-
-
-    }
     jplist.init({
       storage: 'localStorage', //'localStorage', 'sessionStorage' or 'cookies'
       storageName: 'history-sorting' //the same storage name can be used to share storage between multiple pages
@@ -158,7 +122,7 @@ export default class History {
       printerCost.value = current.printerCost;
       notes.value = current.notes;
       actualPrintTime.value = Calc.generateTime(current.printTime);
-      status.innerHTML = current.state;
+      status.innerHTML = "<b>Status</b><hr>"+current.state;
       if(typeof current.job !== 'undefined' && current.job !== null){
         estimatedPrintTime.value = Calc.generateTime(current.job.estimatedPrintTime);
         printTimeAccuracy.value = current.job.printTimeAccuracy.toFixed(0)/100+"%";
@@ -191,13 +155,13 @@ export default class History {
               ${(spool[sp].volume).toFixed(2)}m3
               </td>
               <td>
-              ${(spool[sp].length/1000).toFixed(2)}m
+              ${(spool[sp].length).toFixed(2)}m
               </td>
               <td>
                  ${(spool[sp].weight).toFixed(2)}g
               </td>
               <td>
-                 ${spool[sp].cost}
+                 ${(spool[sp].cost)}
               </td>
               </tr>
           </tr>
@@ -241,7 +205,7 @@ export default class History {
         ${current.totalWeight.toFixed(2)}g
         </td>
         <td>
-        ${current.spoolCost.toFixed(2)}
+        ${current.spoolCost}
         </td>
         </tr>
       `)
@@ -350,7 +314,7 @@ export default class History {
         if(!isNaN(parseFloat(row.getElementsByClassName("totalUsageMeter")[0].innerText))){
           totalUsageMeter.push(parseFloat(row.getElementsByClassName("totalUsageMeter")[0].innerText))
         }
-        let stateText = row.getElementsByClassName("stateText")[0].innerText.trim();
+        let stateText = row.getElementsByClassName("state")[0].innerText.trim();
         if(stateText === "Cancelled"){
           statesCancelled.push(stateText)
         }

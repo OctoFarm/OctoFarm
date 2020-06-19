@@ -89,8 +89,9 @@ router.post("/delete", ensureAuthenticated, async (req, res) => {
   res.send("success");
 });
 router.get("/get", ensureAuthenticated, async (req, res) => {
-  let sorted = await HistoryClean.get();
-  res.send({ history: sorted });
+  let sorted = await HistoryClean.returnHistory();
+
+  res.send({ history: sorted});
 });
 router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
   //Check required fields
