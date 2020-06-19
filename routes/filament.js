@@ -5,6 +5,12 @@ const fetch = require("node-fetch");
 const Spool = require("../models/Filament.js");
 const Profile = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
+
+const filamentClean = require("../lib/dataFunctions/filamentClean.js");
+const FilamentClean = filamentClean.FilamentClean;
+
+
+
 const _ = require("lodash");
 const Runner = require("../runners/state.js")
 module.exports = router;
@@ -77,6 +83,7 @@ const filamentManagerReSync = async function(){
 }
 router.get("/get/profile", ensureAuthenticated, async (req, res) => {
   Profile.find({}).then(async profiles => {
+
     let serverSettings = await ServerSettings.find({});
     res.send({ profiles: profiles, filamentManager: serverSettings[0].filamentManager });
   });

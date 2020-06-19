@@ -17,7 +17,7 @@ const ScriptRunner = script.ScriptRunner;
 const EventEmitter = require('events');
 
 let farmPrinters = [];
-let selectedFilament = [];
+
 let statRunner = null;
 let farmStatRunner = null;
 
@@ -670,13 +670,6 @@ class Runner {
         }
         if(typeof farmPrinters[i].selectedFilament === "undefined" && !Array.isArray(farmPrinters[i].selectedFilament)){
             farmPrinters[i].selectedFilament = [];
-        }else{
-            if(Array.isArray(farmPrinters[i].selectedFilament)){
-                farmPrinters[i].selectedFilament.forEach(spool => {
-                    selectedFilament.push(spool._id)
-                })
-
-            }
         }
         if (typeof farmPrinters[i].octoPrintVersion === "undefined") {
             farmPrinters[i].octoPrintVersion = "";
@@ -1395,9 +1388,6 @@ class Runner {
         farmPrinters[i].fileList.folderCount =
             farmPrinters[i].fileList.folders.length;
     }
-    static getSelected(){
-        return selectedFilament;
-    }
     static async updateFilament(){
         for(let i = 0; i < farmPrinters.length; i++){
             if(Array.isArray(farmPrinters[i].selectedFilament)){
@@ -1435,7 +1425,6 @@ class Runner {
                 farmPrinters[i].selectedFilament[tool] = null;
                 //Find in selected filament list and remove
                 let selected = _.findIndex(selectedFilament, function(o) { return o == filamentId; });
-                selectedFilament.splice(selected, 1);
         }else{
             if(!Array.isArray(farmPrinters[i].selectedFilament)){
                 //Setup new spool...
@@ -1447,13 +1436,11 @@ class Runner {
                 //Save the spool to correct tool slot in filament array
                 printer.selectedFilament[tool] = spool;
                 farmPrinters[i].selectedFilament[tool] = spool;
-                selectedFilament.push(spool._id);
             }else{
                 //Already and array... check if spool already selected
                 let spool = await Filament.findById(filamentId);
                 printer.selectedFilament[tool] = spool;
                 farmPrinters[i].selectedFilament[tool] = spool;
-                selectedFilament.push(spool._id);
             }
         }
 
