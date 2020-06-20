@@ -16,7 +16,7 @@ const HistoryClean = historyClean.HistoryClean;
 const filamentClean = require("../lib/dataFunctions/filamentClean.js");
 const FilamentClean = filamentClean.FilamentClean;
 
-const version = pjson.version + ".6";
+const version = pjson.version + ".6.1";
 
 console.log("db: " + db);
 
