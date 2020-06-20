@@ -15,6 +15,7 @@ const _ = require("lodash");
 const Runner = require("../runners/state.js")
 module.exports = router;
 const filamentManagerReSync = async function(){
+  console.log("RESYNC")
   const runner = require("../runners/state.js");
   const Runner = runner.Runner;
   let printerList = Runner.returnFarmPrinters();
@@ -60,24 +61,36 @@ const filamentManagerReSync = async function(){
       fmID: sp.id
     };
     let oldSpool = await Spool.findOne({'spools.name': sp.name});
-    oldSpool.spools = spools;
-    oldSpool.markModified("spools")
-    oldSpool.save();
+    if(oldSpool !== null){
+      oldSpool.spools = spools;
+      oldSpool.markModified("spools")
+      oldSpool.save();
+    }else{
+      //New Spool
+      let newSpool = await new Spool(spools);
+      newSpool.save();
+    }
   })
-  profilesFM.profiles = _.sortBy(profilesFM.profiles, [function(o) { return o.id; }]);
+  profilesFM.profiles.forEach(async pr => {
+    console.log(pr)
     let profile = {
-      index:   profilesFM.profiles[profilesFM.profiles.length-1].id,
-      density:   profilesFM.profiles[profilesFM.profiles.length-1].density,
-      diameter:   profilesFM.profiles[profilesFM.profiles.length-1].diameter,
-      manufacturer:   profilesFM.profiles[profilesFM.profiles.length-1].vendor,
-      material:   profilesFM.profiles[profilesFM.profiles.length-1].material,
+      index:   pr.id,
+      density:   pr.density,
+      diameter:   pr.diameter,
+      manufacturer:   pr.vendor,
+      material:   pr.material,
     };
-
-    Profile.findOne({'profile.index': 0}).then(oldProfile => {
-      oldProfile.profile = profile;
-      oldProfile.markModified("profile")
-      oldProfile.save();
-    });
+    let oldSpool = await Spool.findOne({'profile.index': sp.id});
+    if(oldSpool !== null){
+      oldSpool.spools = spools;
+      oldSpool.markModified("spools")
+      oldSpool.save();
+    }else{
+      //New Profile
+      let newProfile = await new Profile(profile);
+      newProfile.save();
+    }
+  })
 
   return "success"
 }
