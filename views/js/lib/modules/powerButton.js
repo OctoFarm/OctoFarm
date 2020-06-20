@@ -131,7 +131,7 @@ export default class PowerButton {
                     powerTogglePrinter.disabled = false;
                     powerTogglePrinter.addEventListener('click', async event => {
 
-                        if(document.getElementById("printerStatus-"+printer._id).style.color === "red" || document.getElementById("printerStatus-"+printer._id).style.color === "black"){
+                        if(document.getElementById("printerStatus-"+printer._id).style.color === "green" || document.getElementById("printerStatus-"+printer._id).style.color === "black"){
                             bootbox.confirm({
                                 message: "Are you sure you would like to power down your printer?",
                                 buttons: {
