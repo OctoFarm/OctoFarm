@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
     - Printer Control now supports multiple tools
     - Printer Control now shows "Updated" status for tools. Shows the last time the temperature was grabbed.
     - History now displays multiple tool information if it was collected in the record. All successful prints will contain this information. 
+    - pm2 now outputs full process logs into log folder. 
     
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
@@ -33,7 +34,8 @@ All notable changes to this project will be documented in this file.
         - Filament Cost requires a filament to be selected to generate. Re-Sync to update.  
         - Printer Cost requires your printer costs been filled in in Printer Settings and also requires an expected time to be generated. 
     - Client now uses service workers for information retrieval. 
-       
+    - History information now generated on server side then sent to the client, should improve loading times. 
+    - Filament information now generated on server side then sent to the client, should improve loading times. 
     
 ### Fixed
     - Fix file manager bug with default date sorting.
@@ -47,9 +49,10 @@ All notable changes to this project will be documented in this file.
     - Fixed bug with file manager resetting page scroll when entering folder/choosing printer
     - Server reboot has a notification and no longer needs page to re-load. Live updating. 
     - Improved loading times on history with pre-calculating the list values server side. 
+    - Filament manager failed on re-syncing due to changes when adding spools/profiles. 
     
 ### Removed
-    - Due to filament changes in display for history now relying on OctoPrints tool designation there will be no selected filament or amounts shown in Cancelled/Failed prints.     
+    - History may not now show your selected spool for old records with no job information caught. This is mainly going to be cancelled/failed prints as there is no information caught or prints that start and finish before OctoPrint can generate the job information. OctoFarm now relies on the tool# information provided in this for captured histories to render spool information correctly.     
     
 ## [Released]
 
