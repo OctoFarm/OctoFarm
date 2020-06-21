@@ -1,12 +1,14 @@
+
 <% sortedIndex.forEach(sorted => { %> <% if(printers[sorted.actualIndex].stateColour.category
-=== "Offline" && clientSettings[0].listView.hideOff){%>
+=== "Offline" && clientSettings.listView.currentOp){%>
+
 <tr
   class="<%= printers[sorted.actualIndex].stateColour.category %> hidden"
   id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
   data-jplist-item
 >
   <%}else if(printers[sorted.actualIndex].state === "Disconnected" &&
-  clientSettings[0].listView.hideClosed){%>
+  clientSettings.listView.hideClosed){%>
 </tr>
 
 <tr

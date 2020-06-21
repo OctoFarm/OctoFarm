@@ -2,7 +2,7 @@ import Client from "./lib/octofarm.js";
 import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
 import OctoFarmclient from "./lib/octofarm.js";
-
+import Script from "./lib/modules/scriptCheck.js";
 //Add listeners to settings
 document.getElementById("saveServerSettings").addEventListener("click", e => {
   //Validate Printer Form, then Add
@@ -469,3 +469,4 @@ class ServerSettings {
 //Initialise Settings
 ServerSettings.init();
 ClientSettings.init();
+Script.get();

@@ -1,21 +1,21 @@
 <% sortedIndex.forEach(sorted => { %> <%if(printers[sorted.actualIndex].state
-=== "Disconnected" && clientSettings[0].cameraView.hideClosed){%> <% if(typeof
+=== "Disconnected" && clientSettings.cameraView.hideClosed){%> <% if(typeof
 printers[sorted.actualIndex].settingsWebcam != 'undefined' ||
 printers[sorted.actualIndex].settingsWebcam != ''){%> <% } %>
 <div
   id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
-  class="col-md-4 col-lg-<%= (clientSettings[0].cameraView.cameraRows)%> col-xl-<%= (clientSettings[0].cameraView.cameraRows)%> hidden"  data-jplist-item
+  class="col-md-4 col-lg-<%= (clientSettings.cameraView.cameraRows)%> col-xl-<%= (clientSettings.cameraView.cameraRows)%> hidden"  data-jplist-item
 >
   <%}else if(printers[sorted.actualIndex].camURL === "" ||
   printers[sorted.actualIndex].stateColour.category === "Offline"){ %>
   <div
     id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
-    class="col-md-4 col-lg-<%= (clientSettings[0].cameraView.cameraRows)%> col-xl-<%= (clientSettings[0].cameraView.cameraRows)%> hidden"  data-jplist-item
+    class="col-md-4 col-lg-<%= (clientSettings.cameraView.cameraRows)%> col-xl-<%= (clientSettings.cameraView.cameraRows)%> hidden"  data-jplist-item
   >
     <%} else { %>
     <div
       id="viewPanel-<%= printers[sorted.actualIndex]._id %>"
-      class="col-md-4 col-lg-<%= (clientSettings[0].cameraView.cameraRows)%> col-xl-<%= (clientSettings[0].cameraView.cameraRows)%>"  data-jplist-item
+      class="col-md-4 col-lg-<%= (clientSettings.cameraView.cameraRows)%> col-xl-<%= (clientSettings.cameraView.cameraRows)%>"  data-jplist-item
     >
       <%}%> <% let flipH = ""; %> <% let flipV = ""; %> <% let rotate90 = ""; %>
       <% if (typeof printers[sorted.actualIndex].settingsWebcam != "undefined")

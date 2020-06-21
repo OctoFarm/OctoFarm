@@ -10,68 +10,73 @@ const alertsDrop = `
                                                             <option value="cooldown">Print Cooled</option>
                                                             <option value="error">Print Error</option>
 `
-
-document.getElementById("testScript").addEventListener('click', event => {
-  event.preventDefault();
-  event.stopPropagation();
-  let elements = Script.grabPage();
-  let errors = Script.checkPage(elements);
-  if(errors.length > 0){
-      UI.createAlert("warning", "There are issues with your input, please correct the highlighted fields", 3000, "Clicked")
-      errors.forEach(error => {
-        if(error === "script"){
-            elements.script.style.borderColor = "red";
+let testScriptBtn = document.getElementById("testScript");
+if(testScriptBtn){
+    testScriptBtn.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        let elements = Script.grabPage();
+        let errors = Script.checkPage(elements);
+        if(errors.length > 0){
+            UI.createAlert("warning", "There are issues with your input, please correct the highlighted fields", 3000, "Clicked")
+            errors.forEach(error => {
+                if(error === "script"){
+                    elements.script.style.borderColor = "red";
+                }
+                if(error === "message"){
+                    elements.message.style.borderColor = "red";
+                }
+                if(error === "trigger"){
+                    elements.trigger.style.borderColor = "red";
+                }
+            })
+        }else{
+            elements.script.style.borderColor = "green";
+            elements.message.style.borderColor = "green";
+            elements.trigger.style.borderColor = "green";
+            Script.test(elements.script.value, elements.message.value);
         }
-        if(error === "message"){
-            elements.message.style.borderColor = "red";
-        }
-        if(error === "trigger"){
-            elements.trigger.style.borderColor = "red";
-        }
-      })
-  }else{
-      elements.script.style.borderColor = "green";
-      elements.message.style.borderColor = "green";
-      elements.trigger.style.borderColor = "green";
-      Script.test(elements.script.value, elements.message.value);
-  }
-});
+    });
+}
+let alertsTriggers = document.getElementById("alertsTrigger");
+if(alertsTriggers){
+    alertsTriggers.insertAdjacentHTML('beforeend', alertsDrop);
+}
 
-
-
-document.getElementById("alertsTrigger").insertAdjacentHTML('beforeend', alertsDrop);
-document.getElementById("saveScript").addEventListener('click', event => {
-    event.preventDefault();
-    event.stopPropagation();
-    let elements = Script.grabPage();
-    let errors = Script.checkPage(elements);
-    if(errors.length > 0){
-        UI.createAlert("warning", "There are issues with your input, please correct the highlighted fields", 3000, "Clicked")
-        errors.forEach(error => {
-            if(error === "script"){
-                elements.script.style.borderColor = "red";
+let saveScriptBtn = document.getElementById("saveScript");
+if(saveScriptBtn){
+    saveScriptBtn.addEventListener('click', event => {
+        event.preventDefault();
+        event.stopPropagation();
+        let elements = Script.grabPage();
+        let errors = Script.checkPage(elements);
+        if(errors.length > 0){
+            UI.createAlert("warning", "There are issues with your input, please correct the highlighted fields", 3000, "Clicked")
+            errors.forEach(error => {
+                if(error === "script"){
+                    elements.script.style.borderColor = "red";
+                }
+                if(error === "message"){
+                    elements.message.style.borderColor = "red";
+                }
+                if(error === "trigger"){
+                    elements.trigger.style.borderColor = "red";
+                }
+            })
+        }else{
+            elements.script.style.borderColor = "green";
+            elements.message.style.borderColor = "green";
+            elements.trigger.style.borderColor = "green";
+            let newAlert = {
+                active: true,
+                trigger: elements.trigger.value,
+                script: elements.script.value,
+                message: elements.message.value,
             }
-            if(error === "message"){
-                elements.message.style.borderColor = "red";
-            }
-            if(error === "trigger"){
-                elements.trigger.style.borderColor = "red";
-            }
-        })
-    }else{
-        elements.script.style.borderColor = "green";
-        elements.message.style.borderColor = "green";
-        elements.trigger.style.borderColor = "green";
-        let newAlert = {
-            active: true,
-            trigger: elements.trigger.value,
-            script: elements.script.value,
-            message: elements.message.value,
+            Script.save(newAlert);
         }
-        Script.save(newAlert);
-    }
-});
-
+    });
+}
 export default class Script {
     static async alertsDrop(){
         return alertsDrop;
@@ -274,4 +279,3 @@ export default class Script {
         };
     }
 }
-Script.get();

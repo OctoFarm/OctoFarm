@@ -2,7 +2,7 @@
 import OctoFarmClient from "../octofarm.js";
 import UI from "../functions/ui.js";
 import Validate from "../functions/validate.js";
-import Script from "./scriptCheck.js"
+import Script from "./scriptCheck.js";
 
 let currentIndex = 0;
 

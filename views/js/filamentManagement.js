@@ -121,9 +121,44 @@ let filamentManager = "";
 
 
 async function init() {
+    //Grab data
+    let spoolTable = document.getElementById("addSpoolsTable");
+    let fill = await OctoFarmclient.get("filament/get/filament");
+    fill = await fill.json();
+    let profile = await OctoFarmclient.get("filament/get/profile");
+    profile = await profile.json();
+    //Initialise Spools Listeners
+    console.log(fill)
+    console.log(profile)
+    fill.Spool.forEach(spools => {
+        profile.profiles.forEach(prof => {
+            document.getElementById("spoolsProfile-"+spools._id).insertAdjacentHTML('beforeend',`
+                     <option value="${prof._id}">${prof.manufacturer} (${prof.material})</option>
+                    `)
+
+        })
+    document.getElementById("spoolsProfile-"+spools._id).value = spools.profile;
+    let prof = _.findIndex(profile.profiles, function(o) { return o._id == spools.profile; });
+    document.getElementById("spoolsProfile-"+spools._id).className = "form-control " + profile.profiles[prof].material.replace(/ /g, "_");
+    })
+    document.getElementById("addSpoolsTable").addEventListener("click", e => {
+        //Remove from UI
+        if(e.target.classList.contains("edit")){
+            editSpool(e.target)
+        }else if(e.target.classList.contains("delete")){
+            deleteSpool(e.target)
+        }else if(e.target.classList.contains("save")){
+            saveSpool(e.target)
+        }
+    });
+
+    //Initialise Profile Listeners
+
+
+
+
 //    //Init Spools
-//     let fill = await OctoFarmclient.get("filament/get/filament");
-//     fill = await fill.json();
+
 //     let spoolTable = document.getElementById("addSpoolsTable");
 //     let profile = await OctoFarmclient.get("filament/get/profile");
 //     profile = await profile.json();
@@ -189,16 +224,7 @@ async function init() {
 //     })
 //     //Grab printer list...
 //
-//     document.getElementById("addSpoolsTable").addEventListener("click", e => {
-//         //Remove from UI
-//         if(e.target.classList.contains("edit")){
-//             editSpool(e.target)
-//         }else if(e.target.classList.contains("delete")){
-//             deleteSpool(e.target)
-//         }else if(e.target.classList.contains("save")){
-//             saveSpool(e.target)
-//         }
-//     });
+//
 //   //Init Profiles
 //   let post = await OctoFarmclient.get("filament/get/profile");
 //   post = await post.json();

@@ -156,6 +156,7 @@ router.get("/history", ensureAuthenticated, async (req, res) => {
     let printers = Runner.returnFarmPrinters();
     let history = await HistoryClean.returnHistory();
     let statistics = await HistoryClean.returnStatistics();
+    let serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
     if (serverSettings.server.loginRequired === false) {
@@ -251,6 +252,7 @@ router.get("/mon/list", ensureAuthenticated, async(req, res) => {
     let statistics = await FarmStatistics.returnStats();
     let clientSettings = await SettingsClean.returnClientSettings();
     let serverSettings = await SettingsClean.returnSystemSettings();
+    console.log(clientSettings)
     let user = null;
     let group = null;
     if (serverSettings.server.loginRequired === false) {
@@ -281,7 +283,6 @@ router.get("/mon/currentOp", ensureAuthenticated, async(req, res) => {
     const farmStatistics = require("../runners/statisticsCollection.js");
     const FarmStatistics = farmStatistics.StatisticsCollection;
     let statistics = await FarmStatistics.returnStats();
-    let clientSettings = await SettingsClean.returnClientSettings();
     let serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
@@ -303,8 +304,6 @@ router.get("/mon/currentOp", ensureAuthenticated, async(req, res) => {
         currentOperationsCount: statistics.currentOperationsCount,
         page: "Current Operations View",
         helpers: prettyHelpers,
-        clientSettings: clientSettings,
-        serverSettings: serverSettings,
     });
 });
 router.get("/filament", ensureAuthenticated, async(req, res) => {

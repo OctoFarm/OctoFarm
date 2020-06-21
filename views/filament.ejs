@@ -2,7 +2,7 @@
 <%let filamentManager = false;%>
 <% let displayNone = "d-none" %>
 <% if(typeof serverSettings != 'undefined'){ %>
-    <%filamentManager = serverSettings[0].filamentManager%>
+    <%filamentManager = serverSettings.filamentManager%>
 <% } %>
 <% if(filamentManager){ %>
 <% displayNone = ""; %>
@@ -363,11 +363,13 @@
                                 <option             value="5"
                                                     data-path=".grams"
                                                     data-order="asc"
-                                                    data-type="number">Remaining (&uarr;)</option>
+                                                    data-type="number"
+                                                    class="<%= displayNone %>">Remaining (&uarr;)</option>
                                 <option             value="6"
                                                     data-path=".grams"
                                                     data-order="desc"
-                                                    data-type="number">Remaining (&darr;)</option>
+                                                    data-type="number"
+                                                    class="<%= displayNone %>">Remaining (&darr;)</option>
                             </select>
                         </div>
                     </div>

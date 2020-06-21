@@ -15,7 +15,6 @@ const _ = require("lodash");
 const Runner = require("../runners/state.js")
 module.exports = router;
 const filamentManagerReSync = async function(){
-  console.log("RESYNC")
   const runner = require("../runners/state.js");
   const Runner = runner.Runner;
   let printerList = Runner.returnFarmPrinters();
@@ -72,7 +71,6 @@ const filamentManagerReSync = async function(){
     }
   })
   profilesFM.profiles.forEach(async pr => {
-    console.log(pr)
     let profile = {
       index:   pr.id,
       density:   pr.density,
@@ -95,17 +93,12 @@ const filamentManagerReSync = async function(){
   return "success"
 }
 router.get("/get/profile", ensureAuthenticated, async (req, res) => {
-  Profile.find({}).then(async profiles => {
-
-    let serverSettings = await ServerSettings.find({});
-    res.send({ profiles: profiles, filamentManager: serverSettings[0].filamentManager });
-  });
+    let profiles = await FilamentClean.getProfiles();
+    res.send({ profiles: profiles });
 });
 router.get("/get/filament", ensureAuthenticated, async (req, res) => {
-  Spool.find({}).then(async spool => {
-    let serverSettings = await ServerSettings.find({});
-    res.send({ Spool: spool, filamentManager: serverSettings[0].filamentManager  });
-  });
+    let spools = await FilamentClean.getSpools()
+    res.send({ Spool: spools  });
 });
 router.get("/get/selected", ensureAuthenticated, async (req, res) => {
   const runner = require("../runners/state.js");
