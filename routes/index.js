@@ -3,11 +3,8 @@ const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
 const db = require("../config/db").MongoURI;
 const pjson = require("../package.json");
-const ClientSettings = require("../models/ClientSettings.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const prettyHelpers = require("../views/partials/functions/pretty.js");
-const Spools = require("../models/Filament.js");
-const Profiles = require("../models/Profiles.js");
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 const _ = require("lodash");
@@ -15,6 +12,8 @@ const historyClean = require("../lib/dataFunctions/historyClean.js");
 const HistoryClean = historyClean.HistoryClean;
 const filamentClean = require("../lib/dataFunctions/filamentClean.js");
 const FilamentClean = filamentClean.FilamentClean;
+const settingsClean = require("../lib/dataFunctions/settingsClean.js");
+const SettingsClean = settingsClean.SettingsClean;
 
 const version = pjson.version + ".6.1";
 
@@ -30,17 +29,16 @@ async function welcome() {
             res.render("database", { page: "Database Warning" })
         );
     } else {
-        let settings = await ServerSettings.find({});
-
-        if (settings[0].server.loginRequired === false) {
+        let serverSettings = await ServerSettings.find({});
+        if (serverSettings[0].server.loginRequired === false) {
             router.get("/", (req, res) => res.redirect("/dashboard"));
         } else {
-            let registration = settings[0].server.registration;
+            let registration = serverSettings[0].server.registration;
             router.get("/", (req, res) =>
                 res.render("welcome", {
                     page: "Welcome",
                     registration: registration,
-                    serverSettings: settings,
+                    serverSettings: serverSettings[0],
                 })
             );
         }
@@ -58,11 +56,11 @@ router.get("/dashboard", ensureAuthenticated, async(req, res) => {
     const system = require("../runners/systemInfo.js");
     const SystemRunner = system.SystemRunner;
     let systemInformation = await SystemRunner.returnInfo();
-    let clientSettings = await ClientSettings.find({});
-    let serverSettings = await ServerSettings.find({});
+    let clientSettings = await SettingsClean.returnClientSettings();
+    let serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
+    if (serverSettings.server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -97,11 +95,11 @@ router.get("/printers", ensureAuthenticated, async(req, res) => {
     const system = require("../runners/systemInfo.js");
     const SystemRunner = system.SystemRunner;
     let systemInformation = await SystemRunner.returnInfo();
-    let clientSettings = await ClientSettings.find({});
-    let serverSettings = await ServerSettings.find({});
+    let clientSettings = await SettingsClean.returnClientSettings();
+    let serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
+    if (serverSettings.server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -129,10 +127,10 @@ router.get("/filemanager", ensureAuthenticated, async(req, res) => {
     const farmStatistics = require("../runners/statisticsCollection.js");
     const FarmStatistics = farmStatistics.StatisticsCollection;
     let statistics = await FarmStatistics.returnStats();
-    let serverSettings = await ServerSettings.find({});
+    let serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
+    if (serverSettings.server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -158,11 +156,9 @@ router.get("/history", ensureAuthenticated, async (req, res) => {
     let printers = Runner.returnFarmPrinters();
     let history = await HistoryClean.returnHistory();
     let statistics = await HistoryClean.returnStatistics();
-    let serverSettings = await ServerSettings.find({});
-    let clientSettings = await ClientSettings.find({});
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
+    if (serverSettings.server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -178,8 +174,6 @@ router.get("/history", ensureAuthenticated, async (req, res) => {
         printStatistics: statistics,
         helpers: prettyHelpers,
         page: "History",
-        clientSettings: clientSettings,
-        serverSettings: serverSettings,
     });
 });
 //Panel view  Page
@@ -189,11 +183,11 @@ router.get("/mon/panel", ensureAuthenticated, async(req, res) => {
     const farmStatistics = require("../runners/statisticsCollection.js");
     const FarmStatistics = farmStatistics.StatisticsCollection;
     let statistics = await FarmStatistics.returnStats();
-    let clientSettings = await ClientSettings.find({});
-    let serverSettings = await ServerSettings.find({});
+    let clientSettings = await SettingsClean.returnClientSettings();
+    let serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
+    if (serverSettings.server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -222,11 +216,11 @@ router.get("/mon/camera", ensureAuthenticated, async(req, res) => {
     const farmStatistics = require("../runners/statisticsCollection.js");
     const FarmStatistics = farmStatistics.StatisticsCollection;
     let statistics = await FarmStatistics.returnStats();
-    let clientSettings = await ClientSettings.find({});
-    let serverSettings = await ServerSettings.find({});
+    let clientSettings = await SettingsClean.returnClientSettings();
+    let serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
+    if (serverSettings.server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -255,11 +249,11 @@ router.get("/mon/list", ensureAuthenticated, async(req, res) => {
     const farmStatistics = require("../runners/statisticsCollection.js");
     const FarmStatistics = farmStatistics.StatisticsCollection;
     let statistics = await FarmStatistics.returnStats();
-    let clientSettings = await ClientSettings.find({});
-    let serverSettings = await ServerSettings.find({});
+    let clientSettings = await SettingsClean.returnClientSettings();
+    let serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
+    if (serverSettings.server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -287,11 +281,11 @@ router.get("/mon/currentOp", ensureAuthenticated, async(req, res) => {
     const farmStatistics = require("../runners/statisticsCollection.js");
     const FarmStatistics = farmStatistics.StatisticsCollection;
     let statistics = await FarmStatistics.returnStats();
-    let clientSettings = await ClientSettings.find({});
-    let serverSettings = await ServerSettings.find({});
+    let clientSettings = await SettingsClean.returnClientSettings();
+    let serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
+    if (serverSettings.server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -315,14 +309,14 @@ router.get("/mon/currentOp", ensureAuthenticated, async(req, res) => {
 });
 router.get("/filament", ensureAuthenticated, async(req, res) => {
     let printers = Runner.returnFarmPrinters();
-    let clientSettings = await ClientSettings.find({});
-    let serverSettings = await ServerSettings.find({});
+    let clientSettings = await SettingsClean.returnClientSettings();
+    let serverSettings = await SettingsClean.returnSystemSettings();
     let statistics = await FilamentClean.getStatistics();
     let spools = await FilamentClean.getSpools();
     let profiles = await FilamentClean.getProfiles();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
+    if (serverSettings.server.loginRequired === false) {
         user = "No User";
         group = "Administrator";
     } else {
@@ -341,6 +335,30 @@ router.get("/filament", ensureAuthenticated, async(req, res) => {
         spools: spools,
         profiles: profiles,
         statistics: statistics,
+    });
+});
+router.get("/system", ensureAuthenticated, async(req, res) => {
+    let clientSettings = await SettingsClean.returnClientSettings();
+    let serverSettings = await SettingsClean.returnSystemSettings();
+    let printers = Runner.returnFarmPrinters();
+    let user = null;
+    let group = null;
+    if (serverSettings.server.loginRequired === false) {
+        user = "No User";
+        group = "Administrator";
+    } else {
+        user = req.user.name;
+        group = req.user.group;
+    }
+    res.render("system", {
+        name: user,
+        userGroup: group,
+        version: version,
+        printerCount: printers.length,
+        page: "System",
+        helpers: prettyHelpers,
+        clientSettings: clientSettings,
+        serverSettings: serverSettings,
     });
 });
 module.exports = router;

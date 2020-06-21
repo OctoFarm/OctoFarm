@@ -1,10 +1,10 @@
 //Find server Settings
-const ServerSettingsDB = require("../models/ServerSettings");
+const ServerSettings = require("../models/ServerSettings.js");
 
 module.exports = {
   ensureAuthenticated: async function(req, res, next) {
-    let settings = await ServerSettingsDB.find({});
-    if (settings[0].server.loginRequired === false) {
+    let serverSettings = await ServerSettings.find({});
+    if (serverSettings[0].server.loginRequired === false) {
       return next();
     }
 

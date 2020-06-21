@@ -32,7 +32,7 @@ let optionsMemory = {
     },
     chart: {
         type: 'donut',
-        height: '150px',
+        height: '200px',
         animations: {
             enabled: false,
         },
@@ -132,7 +132,7 @@ let optionsCPU = {
     },
     chart: {
         type: 'donut',
-        height: '150px',
+        height: '200px',
         animations: {
             enabled: true,
         },
@@ -226,7 +226,6 @@ let systemChartMemory = new ApexCharts(
 );
 systemChartMemory.render();
 setInterval(async function updateStatus() {
-    if(document.getElementById("serverSettingsModal").classList.contains("show")){
         let systemInfo = await Client.get("settings/sysInfo");
         systemInfo = await systemInfo.json();
         if (Object.keys(systemInfo).length === 0 && systemInfo.constructor === Object) {
@@ -253,14 +252,10 @@ setInterval(async function updateStatus() {
             systemChartMemory.updateSeries([otherRAM, octoRAM, freeRAM])
 
         }
-    }
 }, 5000)
 
 class ClientSettings {
   static init() {
-    if (
-      !document.getElementById("systemDropDown").classList.contains("notyet")
-    ) {
       Client.get("settings/client/get")
         .then(res => {
           return res.json();
@@ -303,7 +298,6 @@ class ClientSettings {
             document.getElementById("listExtraInfoOn").checked =
                 res.listView.extraInfo;
         });
-    }
   }
   static async update() {
     let bg = document.getElementById("clientBackground").value;
@@ -345,9 +339,6 @@ class ClientSettings {
 }
 class ServerSettings {
   static async init() {
-    if (
-      !document.getElementById("systemDropDown").classList.contains("notyet")
-    ) {
       Client.get("settings/server/get")
         .then(res => {
           return res.json();
@@ -423,8 +414,6 @@ class ServerSettings {
               window.open('/settings/server/download/logs/'+logs.name)
             });
         })
-
-    }
   }
   static update() {
     let reboot = false;
