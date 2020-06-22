@@ -759,8 +759,8 @@ class Runner {
             farmPrinters[index].stateDescription = "Re-Scanning your OctoPrint Instance";
             farmPrinters[index].hostDescription = "Re-Scanning for OctoPrint Host";
             farmPrinters[index].webSocketDescription = "Websocket is Offline";
-            farmPrinters[index].settingsApperance.name = printers[i].settingsApperance.name;
-            farmPrinters[index].markModified("settingsApperance");
+            farmPrinters[index].settingsAppearance.name = printers[i].settingsAppearance.name;
+            farmPrinters[index].markModified("settingsAppearance");
             logger.info("Modified Current Name  for: " + farmPrinters[i].printerURL);
             farmPrinters[index].printerURL = printers[i].printerURL;
             farmPrinters[index].markModified("printerURL");
@@ -1070,15 +1070,15 @@ class Runner {
                 //Update info to DB
                 farmPrinters[index].settingsApi = res.api;
                 let appearance = null;
-                if (farmPrinters[index].settingsApperance.name === "" || farmPrinters[index].settingsApperance.name.includes("{Leave")) {
+                if (farmPrinters[index].settingsAppearance.name === "" || farmPrinters[index].settingsAppearance.name.includes("{Leave")) {
                     //If new name is supplied then update the name...
                     appearance = res.appearance;
                     appearance.name = res.appearance.name;
-                    farmPrinters[index].settingsApperance = appearance;
+                    farmPrinters[index].settingsAppearance = appearance;
                 }
                 let printer = await Printers.findById(id);
-                printer.settingsApperance = farmPrinters[index].settingsApperance;
-                farmPrinters[index].settingsApperance
+                printer.settingsAppearance = farmPrinters[index].settingsAppearance;
+                farmPrinters[index].settingsAppearance
                 printer.save();
                 farmPrinters[index].settingsFeature = res.feature;
                 farmPrinters[index].settingsFolder = res.folder;
@@ -1256,9 +1256,9 @@ class Runner {
         farmPrinters[index].costSettings = settings.costSettings;
         printer.costSettings = settings.costSettings;
         printer.markModified("costSettings")
-        farmPrinters[index].settingsApperance.name = settings.profile.name;
-        printer.settingsApperance.name = settings.profile.name;
-        printer.markModified("settingsApperance")
+        farmPrinters[index].settingsAppearance.name = settings.profile.name;
+        printer.settingsAppearance.name = settings.profile.name;
+        printer.markModified("settingsAppearance")
         farmPrinters[index].powerSettings = settings.powerCommands;
         printer.powerSettings = settings.powerCommands;
         printer.markModified("powerSettings")
@@ -1311,13 +1311,13 @@ class Runner {
             // console.log()
             //
             // farmPrinters[i].settingsScripts.gcode = opts.scripts.gcode;
-            // farmPrinters[i].settingsApperance.name = opts.appearance.name;
+            // farmPrinters[i].settingsAppearance.name = opts.appearance.name;
             // farmPrinters[i].settingsWebcam = opts.webcam;
             // farmPrinters[i].camURL = opts.camURL;
             // let printer = await Printers.findOne({ index: i });
             // printer.settingsWebcam = farmPrinters[i].settingsWebcam;
             // printer.camURL = farmPrinters[i].camURL;
-            // printer.settingsApperance.name = farmPrinters[i].settingsApperance.name;
+            // printer.settingsAppearance.name = farmPrinters[i].settingsAppearance.name;
             // printer.save();
         return {status: {profile: profile.status, settings:sett.status}, printer: printer}
         }

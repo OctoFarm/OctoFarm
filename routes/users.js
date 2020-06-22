@@ -3,7 +3,6 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const passport = require("passport");
 const ServerSettings = require("../models/ServerSettings.js");
-const prettyHelpers = require("../views/partials/functions/pretty.js");
 
 // User Modal
 const User = require("../models/User.js");
