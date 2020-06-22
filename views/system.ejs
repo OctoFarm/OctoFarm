@@ -113,7 +113,7 @@
                                                 <a class="list-group-item list-group-item-action" id="system-panel-view-list" data-toggle="list" href="#system-panel-view" role="tab" aria-controls="panelview">Panel View</a>
                                                 <a class="list-group-item list-group-item-action" id="system-list-view-list" data-toggle="list" href="#system-list-view" role="tab" aria-controls="listview">List View</a>
                                                 <a class="list-group-item list-group-item-action" id="system-camera-view-list" data-toggle="list" href="#system-camera-view" role="tab" aria-controls="cameraview">Camera View</a>
-                                                <button type="button" class="btn btn-success" id="saveSettings">Save</button>
+                                                <button type="button" class="btn btn-success btn-block mt-1" id="saveSettings">Save</button>
                                             </div>
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-8 col-lg-10 col-xl-10">
@@ -279,7 +279,7 @@
                                                 <a class="list-group-item list-group-item-action active" id="server-settings-list" data-toggle="list" href="#server-settings" role="tab" aria-controls="panelview"><i class="fas fa-cogs"></i> Settings</a>
                                                 <a class="list-group-item list-group-item-action" id="server-timeout-list" data-toggle="list" href="#server-timeout" role="tab" aria-controls="listview"><i class="fas fa-stopwatch"></i> Timeout</a>
                                                 <a class="list-group-item list-group-item-action" id="server-filament-list" data-toggle="list" href="#server-filament" role="tab" aria-controls="listview"><i class="fas fa-toilet-paper"></i> Filament Manager</a>
-                                                <button type="button" class="btn btn-success" id="saveServerSettings" data-dismiss="modal">Save</button>
+                                                <button type="button" class="btn btn-success btn-block mt-1" id="saveServerSettings" data-dismiss="modal">Save</button>
                                             </div>
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-8 col-lg-10 col-xl-10">
@@ -468,6 +468,8 @@
                                                 <a class="list-group-item list-group-item-action" id="alerts-current-list" data-toggle="list" href="#alerts-current" role="tab" aria-controls="panelview"><i class="fas fa-list"></i> Current</a>
                                                 <!--                                    <a class="list-group-item list-group-item-action" id="alerts-log-list" data-toggle="list" href="#alerts-log" role="tab" aria-controls="listview"><i class="fas fa-clipboard-list"></i> Logs</a>-->
                                             </div>
+                                            <button id="testScript" type="button" class="btn btn-warning btn-block mt-1">Test Script</button>
+                                            <button id="saveScript" type="button" class="btn btn-success btn-block">Save Script</button>
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-12 col-lg-10 col-xl-10">
                                             <div class="tab-content" id="nav-tabContent">
@@ -590,8 +592,7 @@
                                                             <label for="scriptMessage">Input the message that is passed through to the script.</label>
                                                             <textarea id="scriptMessage" class="form-control" aria-label="With textarea" placeholder="[PrinterName]: Just completed [CurrentFilePath] and took [EstimatedTime]"></textarea>
                                                         </div>
-                                                        <button id="testScript" type="button" class="btn btn-warning">Test Script</button>
-                                                        <button id="saveScript" type="button" class="btn btn-success">Save Script</button>
+
                                                     </form>
                                                 </div>
                                                 <div class="tab-pane fade" id="alerts-current" role="tabpanel" aria-labelledby="server-settings-list">

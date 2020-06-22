@@ -113,14 +113,20 @@ let serverStart = async function() {
     if (db === "") {
         app.use("/", require("./routes/index", { page: "route" }));
     } else {
-        app.use("/", require("./routes/index", { page: "route" }));
-        app.use("/users", require("./routes/users", { page: "route" }));
-        app.use("/printers", require("./routes/printers", { page: "route" }));
-        app.use("/settings", require("./routes/settings", { page: "route" }));
-        app.use("/sse", require("./routes/SSE", { page: "route" }));
-        app.use("/filament", require("./routes/filament", { page: "route" }));
-        app.use("/history", require("./routes/history", { page: "route" }));
-        app.use("/scripts", require("./routes/scripts", { page: "route" }));
+        try{
+            app.use("/", require("./routes/index", { page: "route" }));
+            app.use("/users", require("./routes/users", { page: "route" }));
+            app.use("/printers", require("./routes/printers", { page: "route" }));
+            app.use("/settings", require("./routes/settings", { page: "route" }));
+            app.use("/sse", require("./routes/SSE", { page: "route" }));
+            app.use("/printersInfo", require("./routes/SSE-printersInfo", { page: "route" }));
+            app.use("/filament", require("./routes/filament", { page: "route" }));
+            app.use("/history", require("./routes/history", { page: "route" }));
+            app.use("/scripts", require("./routes/scripts", { page: "route" }));
+        }catch(e){
+            logger.error(e)
+        }
+
     }
 
 };

@@ -1084,19 +1084,9 @@ class Runner {
                             appearance.name = res.appearance.name;
                             farmPrinters[index].settingsAppearance = appearance;
                         }
-
                         let printer = await Printers.findById(id);
                         printer.settingsApperance = farmPrinters[index].settingsAppearance;
-                        console.log(farmPrinters[index].settingsApperance.name)
                         printer.save();
-                        farmPrinters[index].settingsFeature = res.feature;
-                        farmPrinters[index].settingsFolder = res.folder;
-                        farmPrinters[index].settingsPlugins = res.plugins;
-                        farmPrinters[index].settingsScripts = res.scripts;
-                        farmPrinters[index].settingsSerial = res.serial;
-                        farmPrinters[index].settingsServer = res.server;
-                        farmPrinters[index].settingsSystem = res.system;
-                        farmPrinters[index].settingsWebcam = res.webcam;
                     }else{
                         farmPrinters[index].settingsAppearance = farmPrinters[index].settingsApperance;
                     }
@@ -1104,6 +1094,14 @@ class Runner {
                     console.log(e)
                 }
 
+                farmPrinters[index].settingsFeature = res.feature;
+                farmPrinters[index].settingsFolder = res.folder;
+                farmPrinters[index].settingsPlugins = res.plugins;
+                farmPrinters[index].settingsScripts = res.scripts;
+                farmPrinters[index].settingsSerial = res.serial;
+                farmPrinters[index].settingsServer = res.server;
+                farmPrinters[index].settingsSystem = res.system;
+                farmPrinters[index].settingsWebcam = res.webcam;
                 if (
                     farmPrinters[index].camURL === "" ||
                     farmPrinters[index].camURL === null && farmPrinters[index].camURL !== "none"

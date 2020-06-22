@@ -13,28 +13,31 @@ let editMode = false;
 let deletedPrinters = [];
 let worker = null;
 let powerTimer = 20000;
+let printerControlList = null;
+
 if (window.Worker) {
     // Yes! Web worker support!
     try{
         if (worker === null) {
-            worker = new Worker("./js/lib/modules/serverConnect.js");
+            worker = new Worker("./js/lib/modules/workers/printersManagerWorker.js");
             worker.onmessage = function(event){
                 if (event.data != false) {
-                    if (event.data.printerInfo.length > 0) {
+                    if (event.data.printersInformation.length > 0) {
                         if (
                             document.getElementById("printerManagerModal").classList.contains("show")
                         ) {
-                            PrinterManager.init(event.data.printerInfo);
+                            PrinterManager.init(event.data.printersInformation);
                         }else if(document.getElementById("printerSettingsModal").classList.contains("show")){
-                            PrinterSettings.init(event.data.printerInfo);
+                            PrinterSettings.init(event.data.printersInformation);
                         } else {
-                            printerInfo = event.data.printerInfo;
+                            printerInfo = event.data.printersInformation;
+                            printerControlList = event.data.printerControlList;
                             if(!editMode){
-                                dashUpdate.printers(event.data.printerInfo)
+                                dashUpdate.printers(event.data.printersInformation, event.data.printerControlList)
                             }
 
                             if(powerTimer >= 20000){
-                                event.data.printerInfo.forEach(printer => {
+                                event.data.printersInformation.forEach(printer => {
                                     PowerButton.applyBtn(printer);
                                 });
                                 powerTimer = 0
@@ -673,12 +676,13 @@ class dashActions {
 }
 
 class dashUpdate {
-    static printers(printers, printerStatus) {
+    static printers(printers, printerControlList) {
         printers.forEach((printer) => {
             let printerName = "";
-            if (typeof printer.stateColour != "undefined") {
-                if (typeof printer.settingsAppearance != "undefined") {
-                    printerName = printer.settingsAppearance.name;
+
+            if (typeof printer.printerState != "undefined") {
+                if (typeof printer.printerName != "undefined") {
+                    printerName = printer.printerName;
                 }
                 let printerCard = document.getElementById("printerCard-" + printer._id);
                 if (printerCard) {
@@ -707,30 +711,31 @@ class dashUpdate {
                     if (printer.camURL === "none") {
                         printerCameraURL.innerHTML = "";
                     } else {
-                        printerCameraURL.innerHTML = printer.camURL;
+                        printerCameraURL.innerHTML = printer.cameraURL;
                     }
 
                     printerOctoPrintVersion.innerHTML = printer.octoPrintVersion;
 
                     printName.innerHTML = `${printerName}`;
                     printerBadge.innerHTML =
-                        printer.state;
-                    printerBadge.className = `tag badge badge-${printer.stateColour.name} badge-pill`;
-                    printerBadge.setAttribute('title',printer.stateDescription)
+                        printer.printerState.state;
+                    printerBadge.className = `tag badge badge-${printer.printerState.colour.name} badge-pill`;
+                    printerBadge.setAttribute('title',printer.printerState.desc)
                     hostBadge.innerHTML =
-                        printer.hostState;
-                    hostBadge.setAttribute('title',printer.hostDescription)
-                    hostBadge.className = `tag badge badge-${printer.hostStateColour.name} badge-pill`;
-                    socketBadge.className = `tag badge badge-${printer.webSocket} badge-pill`;
-                    socketBadge.setAttribute('title',printer.webSocketDescription)
+                        printer.hostState.state;
+                    hostBadge.setAttribute('title',printer.hostState.desc)
+                    hostBadge.className = `tag badge badge-${printer.hostState.colour.name} badge-pill`;
+                    socketBadge.className = `tag badge badge-${printer.webSocketState.colour} badge-pill`;
+                    socketBadge.setAttribute('title',printer.webSocketState.desc)
                     webButton.href = printer.printerURL;
-                    if (printer.stateColour.category === "Offline") {
+                    if (printer.printerState.colour.name.category === "Offline") {
                         printButton.disabled = true;
                         settingButton.disabled = true;
                     } else {
                         printButton.disabled = false;
                         settingButton.disabled = false;
                     }
+
                 } else {
                     //Insert new printer addition...
                     document.getElementById("printerList").insertAdjacentHTML("beforeend", `
@@ -787,11 +792,11 @@ class dashUpdate {
             >
     <i class="fas fa-grip-vertical"></i>
     </span></td>
-        <td><small><span data-title="${printer.hostDescription}" id="hostBadge-${printer._id}" class="tag badge badge-${ printer.hostStateColour.name } badge-pill">
-                ${ printer.hostState }</small></span></td>
-        <td><small><span data-title="${printer.stateDescription}" id="printerBadge-${printer._id}" class="tag badge badge-${ printer.stateColour.name } badge-pill">
-                ${ printer.state }</small></span></td>
-        <td><small><span data-title="${printer.webSocketDescription}" id="webSocketIcon-${printer._id}" class="tag badge badge-${ printer.webSocket } badge-pill">
+        <td><small><span data-title="${printer.hostState.desc}" id="hostBadge-${printer._id}" class="tag badge badge-${ printer.hostState.colour.name } badge-pill">
+                ${ printer.hostState.state }</small></span></td>
+        <td><small><span data-title="${printer.printerState.desc}" id="printerBadge-${printer._id}" class="tag badge badge-${ printer.printerState.colour.name } badge-pill">
+                ${ printer.printerState.state }</small></span></td>
+        <td><small><span data-title="${printer.webSocketState.desc}" id="webSocketIcon-${printer._id}" class="tag badge badge-${ printer.webSocketState.colour } badge-pill">
                 <i  class="fas fa-plug"></i></span></td>
         <td><div id="printerGroup-${printer._id}" contenteditable="false"></div></td>
         <td><div id="printerURL-${printer._id}" contenteditable="false"></div></td>
@@ -826,12 +831,16 @@ class dashUpdate {
                         e.target.disabled = false;
                     });
                     document.getElementById("printerButton-" + printer._id).addEventListener("click", e => {
-                            PrinterManager.updateIndex(printer._id);
-                            PrinterManager.init(printerInfo);
+                            //PrinterManager.updateIndex(printer._id);
+                            let index = _.findIndex(printerInfo, function(o) { return o._id == printer._id; });
+                            console.log(index)
+                            PrinterManager.init(printerInfo[index], printerControlList);
                     });
                     document.getElementById("printerSettings-" + printer._id).addEventListener("click", e => {
-                            PrinterSettings.updateIndex(printer._id);
-                            PrinterSettings.init(printerInfo);
+                            //PrinterSettings.updateIndex(printer._id);
+                            let index = _.findIndex(printerInfo, function(o) { return o._id == printer._id; });
+
+                            PrinterSettings.init(printerInfo[index], printerControlList);
                     });
                 }
             }
