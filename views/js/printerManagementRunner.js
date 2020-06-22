@@ -101,6 +101,7 @@ saveEditBtn.addEventListener("click", async event => {
                 Validate.stripHTML(printerName.textContent)
             ).build();
             printer._id = printerInfo[i]._id;
+
             let currentInfoIndex = _.findIndex(printerInfo, function(o) { return o._id === printerInfo[i]._id })
             if (printerURL.innerHTML !== printerInfo[currentInfoIndex].printerURL ||
                 printerCamURL.innerHTML !== printerInfo[currentInfoIndex].camURL ||
@@ -214,7 +215,7 @@ document.getElementById("addPrinterBtn").addEventListener('click', event => {
 });
 class Printer {
     constructor(printerURL, camURL, apikey, group, name) {
-        this.settingsApperance = {
+        this.settingsAppearance = {
             color: "default",
             colorTransparent: false,
             defaultLanguage: "_default",
