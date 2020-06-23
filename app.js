@@ -118,8 +118,9 @@ let serverStart = async function() {
             app.use("/users", require("./routes/users", { page: "route" }));
             app.use("/printers", require("./routes/printers", { page: "route" }));
             app.use("/settings", require("./routes/settings", { page: "route" }));
-            app.use("/sse", require("./routes/SSE", { page: "route" }));
             app.use("/printersInfo", require("./routes/SSE-printersInfo", { page: "route" }));
+            app.use("/dashboardInfo", require("./routes/SSE-dashboard", { page: "route" }));
+            app.use("/monitoringInfo", require("./routes/SSE-monitoring", { page: "route" }));
             app.use("/filament", require("./routes/filament", { page: "route" }));
             app.use("/history", require("./routes/history", { page: "route" }));
             app.use("/scripts", require("./routes/scripts", { page: "route" }));

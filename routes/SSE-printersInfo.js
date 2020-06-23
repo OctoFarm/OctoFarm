@@ -19,7 +19,7 @@ setInterval(async function() {
         printersInformation: printersInformation,
         printerControlList: printerControlList
     }
-    clientInformation = stringify(infoDrop);
+    clientInformation = await stringify(infoDrop);
 
 }, 500);
 // Called once for each new client. Note, this response is left open!

@@ -11,7 +11,7 @@ let currentIndex = 0;
 
 let previousLog = null;
 
-let lastPrinter = null;
+let lastIndex = null;
 
 let printDropCheck = false;
 
@@ -24,8 +24,6 @@ $("#connectionModal").on("hidden.bs.modal", function(e) {
 export default class PrinterManager {
   static async init(printers, printerControlList) {
     //clear camera
-    console.log(printers)
-    console.log("CONTORL",printerControlList)
     if (document.getElementById("printerControlCamera")) {
       document.getElementById("printerControlCamera").src = "";
     }
@@ -37,6 +35,7 @@ export default class PrinterManager {
     } else {
       currentIndex = printers.sortIndex;
       currentPrinter = printers;
+      lastIndex = printers;
     }
 
 
@@ -60,14 +59,16 @@ export default class PrinterManager {
         camURL = "../../../images/noCamera.jpg";
 
       }
-      console.log(currentPrinter)
+
       if (document.getElementById("pmConnect")) {
         // PrinterManager.applyState(currentPrinter);
         // let elements = PrinterManager.grabPage();
         // PrinterManager.applyTemps(currentPrinter, elements);
         // document.getElementById("printerManagerModal").style.overflow = "auto";
       } else {
+        console.log(currentPrinter)
         PrinterManager.loadPrinter(currentPrinter, printerControlList)
+        //PrinterManager.applyListeners();
       }
 
 
@@ -733,22 +734,10 @@ export default class PrinterManager {
 //     }
   }
   static loadPrinter(printer, printerControlList){
-    if (printer.printerState.state === "Disconnected") {
-          printerConnect.innerHTML =
-              '<center> <button id="pmConnect" class="btn btn-success inline" value="connect">Connect</button></center>';
-        } else {
-          printerConnect.innerHTML =
-              '<center> <button id="pmConnect" class="btn btn-danger inline" value="disconnect">Disconnect</button></center>';
-          // document.getElementById("pmSerialPort").disabled = true;
-          // document.getElementById("pmBaudrate").disabled = true;
-          // document.getElementById("pmProfile").disabled = true;
-        }
-    console.log("ONCE")
-    //Load the printer drop down...
+    //Load the printer dropdown
     let printerDrop = document.getElementById("printerSelection");
     printerDrop.innerHTML = "";
     printerControlList.forEach(list => {
-      console.log(list.state)
       if (list.state.category !== "Offline") {
         printerDrop.insertAdjacentHTML('beforeend', `
                 <option value="${list.printerID}" selected>${list.printerName}</option>
@@ -756,17 +745,76 @@ export default class PrinterManager {
       }
     })
     printerDrop.value = printer._id;
-    // if (!printDropCheck) {
-    //   printerDrop.addEventListener('change', event => {
-    //     let newIndex = document.getElementById("printerSelection").value;
-    //     PrinterManager.updateIndex(newIndex);
-    //     PrinterManager.init(printers)
-    //   });
-    //   printDropCheck = true;
-    // }
+
+    //Load Connection Panel
+    const printerPort = document.getElementById("printerPortDrop");
+    const printerBaud = document.getElementById("printerBaudDrop");
+    const printerProfile = document.getElementById("printerProfileDrop");
+    const printerConnect = document.getElementById("printerConnect");
+
+    printerPort.innerHTML = `
+    <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardSerialPort">Port:</label> </div> <select class="custom-select bg-secondary text-light" id="pmSerialPort"></select></div>
+    `;
+    printerBaud.innerHTML = `
+    <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardBaudrate">Baudrate:</label> </div> <select class="custom-select bg-secondary text-light" id="pmBaudrate"></select></div>
+    `;
+    printerProfile.innerHTML = `
+    <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardPrinterProfile">Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="pmProfile"></select></div>
+    `;
+    printer.connectionOptions.baudrates.forEach(baud => {
+      document
+          .getElementById("pmBaudrate")
+          .insertAdjacentHTML(
+              "beforeend",
+              `<option value="${baud}">${baud}</option>`
+          );
+    });
+    if (printer.connectionOptions.baudratePreference != null) {
+      document.getElementById("pmBaudrate").value = printer.connectionOptions.baudratePreference;
+    }
+    printer.connectionOptions.ports.forEach(port => {
+      document
+          .getElementById("pmSerialPort")
+          .insertAdjacentHTML(
+              "beforeend",
+              `<option value="${port}">${port}</option>`
+          );
+    });
+    if (printer.connectionOptions.portPreference != null) {
+      document.getElementById("pmSerialPort").value = printer.connectionOptions.portPreference;
+    }
+    printer.connectionOptions.printerProfiles.forEach(profile => {
+      document
+          .getElementById("pmProfile")
+          .insertAdjacentHTML(
+              "beforeend",
+              `<option value="${profile.id}">${profile.name}</option>`
+          );
+    });
+    if (printer.connectionOptions.printerProfilePreference != null) {
+      document.getElementById("pmProfile").value = printer.connectionOptions.printerProfilePreference;
+    }
+    if (printer.printerState.state === "Disconnected") {
+          printerConnect.innerHTML =
+              '<center> <button id="pmConnect" class="btn btn-success inline" value="connect">Connect</button></center>';
+        } else {
+          printerConnect.innerHTML =
+              '<center> <button id="pmConnect" class="btn btn-danger inline" value="disconnect">Disconnect</button></center>';
+          document.getElementById("pmSerialPort").disabled = true;
+          document.getElementById("pmBaudrate").disabled = true;
+          document.getElementById("pmProfile").disabled = true;
+        }
+
 
   }
   static applyListeners(printer, elements, printers, filamentDropDown) {
+      printerDrop.addEventListener('change', event => {
+        let newIndex = document.getElementById("printerSelection").value;
+        // PrinterManager.updateIndex(newIndex);
+        // PrinterManager.init(printers)
+      });
+
+
     let rangeSliders = document.querySelectorAll("input.octoRange");
     rangeSliders.forEach(slider => {
       slider.addEventListener("input", e => {

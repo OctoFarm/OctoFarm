@@ -43,6 +43,7 @@
     "request": "^2.88.2",
     "systeminformation": "^4.26.9",
     "tablefilter": "^0.7.0",
+    "threads": "^1.6.2",
     "winston": "^3.2.1",
     "ws": "^7.3.0",
     "yieldable-json": "^2.0.0"
