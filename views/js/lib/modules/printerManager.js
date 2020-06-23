@@ -210,16 +210,7 @@ export default class PrinterManager {
 //           document.getElementById("pmProfile").value = preferedProfile;
 //         }
 //
-//         if (printer.state === "Disconnected") {
-//           printerConnect.innerHTML =
-//               '<center> <button id="pmConnect" class="btn btn-success inline" value="connect">Connect</button></center>';
-//         } else {
-//           printerConnect.innerHTML =
-//               '<center> <button id="pmConnect" class="btn btn-danger inline" value="disconnect">Disconnect</button></center>';
-//           document.getElementById("pmSerialPort").disabled = true;
-//           document.getElementById("pmBaudrate").disabled = true;
-//           document.getElementById("pmProfile").disabled = true;
-//         }
+//
 //         document.getElementById("printerIndex").innerHTML = printer._id;
 //         document.getElementById("printerControls").innerHTML = `
 //         <div class="row">
@@ -742,7 +733,17 @@ export default class PrinterManager {
 //     }
   }
   static loadPrinter(printer, printerControlList){
-
+    if (printer.printerState.state === "Disconnected") {
+          printerConnect.innerHTML =
+              '<center> <button id="pmConnect" class="btn btn-success inline" value="connect">Connect</button></center>';
+        } else {
+          printerConnect.innerHTML =
+              '<center> <button id="pmConnect" class="btn btn-danger inline" value="disconnect">Disconnect</button></center>';
+          // document.getElementById("pmSerialPort").disabled = true;
+          // document.getElementById("pmBaudrate").disabled = true;
+          // document.getElementById("pmProfile").disabled = true;
+        }
+    console.log("ONCE")
     //Load the printer drop down...
     let printerDrop = document.getElementById("printerSelection");
     printerDrop.innerHTML = "";

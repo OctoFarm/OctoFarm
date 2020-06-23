@@ -26,9 +26,9 @@ if (window.Worker) {
                         if (
                             document.getElementById("printerManagerModal").classList.contains("show")
                         ) {
-                            PrinterManager.init(event.data.printersInformation);
+                            PrinterManager.init(event.data.printersInformation, event.data.printerControlList);
                         }else if(document.getElementById("printerSettingsModal").classList.contains("show")){
-                            PrinterSettings.init(event.data.printersInformation);
+                            PrinterSettings.init(event.data.printersInformation, event.data.printerControlList);
                         } else {
                             printerInfo = event.data.printersInformation;
                             printerControlList = event.data.printerControlList;
