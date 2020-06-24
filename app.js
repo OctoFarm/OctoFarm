@@ -85,12 +85,6 @@ let serverStart = async function() {
         logger.info("Checking Client Settings...");
         let cs = await ClientSettings.init();
         logger.info(cs);
-        //Start backend metrics gathering...
-        logger.info("Starting Statistics Collection");
-        const statisticsCollection = require("./runners/statisticsCollection.js");
-        const StatisticsCollection = statisticsCollection.StatisticsCollection;
-        let sc = await StatisticsCollection.init();
-        logger.info(sc);
         const runner = require("./runners/state.js");
         const Runner = runner.Runner;
         let r = Runner.init();
@@ -103,6 +97,7 @@ let serverStart = async function() {
         app.listen(PORT, () => {
             logger.info(`HTTP server started...`);
             logger.info(`You can now access your server on port: ${PORT}`);
+            console.log(`You can now access your server on port: ${PORT}`);
         });
     }catch(err){
         logger.error(err)
@@ -119,13 +114,14 @@ let serverStart = async function() {
             app.use("/printers", require("./routes/printers", { page: "route" }));
             app.use("/settings", require("./routes/settings", { page: "route" }));
             app.use("/printersInfo", require("./routes/SSE-printersInfo", { page: "route" }));
-            app.use("/dashboardInfo", require("./routes/SSE-dashboard", { page: "route" }));
-            app.use("/monitoringInfo", require("./routes/SSE-monitoring", { page: "route" }));
+            app.use("/dashboardInfo", require("./routes/SSE-dashboardInfo", { page: "route" }));
+            app.use("/monitoringInfo", require("./routes/SSE-monitoringInfo", { page: "route" }));
             app.use("/filament", require("./routes/filament", { page: "route" }));
             app.use("/history", require("./routes/history", { page: "route" }));
             app.use("/scripts", require("./routes/scripts", { page: "route" }));
         }catch(e){
             logger.error(e)
+            console.log(e)
         }
 
     }
