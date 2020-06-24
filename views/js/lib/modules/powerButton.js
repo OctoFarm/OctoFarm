@@ -23,10 +23,10 @@ export default class PowerButton {
             `
         return powerBtn
     }
-    static async applyBtn(printer) {
+    static async applyBtn(printer, element) {
         if (typeof printer.settingsServer !== 'undefined' && !document.getElementById("printerPower-" + printer._id)) {
             if (printer.settingsServer.commands.serverRestartCommand !== "" && printer.settingsServer.commands.serverRestartCommand !== null || printer.settingsServer.commands.systemRestartCommand !== "" && printer.settingsServer.commands.systemRestartCommand !== null || printer.settingsServer.commands.systemShutdownCommand !== "" && printer.settingsServer.commands.systemShutdownCommand !== null) {
-                document.getElementById("powerBtn-" + printer._id).innerHTML = PowerButton.returnPowerBtn(printer);
+                document.getElementById(element + printer._id).innerHTML = PowerButton.returnPowerBtn(printer);
                 if (printer.settingsServer.commands.serverRestartCommand !== "" && printer.settingsServer.commands.serverRestartCommand !== null) {
                     let restartOctoPrint = document.getElementById("printerRestartOctoPrint-" + printer._id)
                     restartOctoPrint.classList.remove("d-none")
@@ -55,8 +55,8 @@ export default class PowerButton {
         }
         if (printer.powerSettings !== null) {
             if (!document.getElementById("printerPower-" + printer._id)) {
-                if(document.getElementById("powerBtn-"+ printer._id)){
-                    document.getElementById("powerBtn-" + printer._id).innerHTML = PowerButton.returnPowerBtn(printer);
+                if(document.getElementById(element+ printer._id)){
+                    document.getElementById(element + printer._id).innerHTML = PowerButton.returnPowerBtn(printer);
                     PowerButton.powerButtons(printer);
                 }
 
