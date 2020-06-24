@@ -23,19 +23,7 @@ export async function getSelected(){
     selected = await selected.json();
     return selected;
 }
-export async function returnHistory(id) {
-    let filamentManager = await checkFilamentManager();
-    if(id.spools !== undefined){
-        if(filamentManager){
-            return `${id.spools.name} (${(id.spools.weight - id.spools.used).toFixed(0)}g) - ${id.spools.profile.material}`
-        }else{
-            return `${id.spools.name} - ${id.spools.profile.material}`
-        }
-    }else{
-        return `Old database, please update on the view modal.`
-    }
 
-}
 export async function returnSelected(id, profiles) {
 
     let profileId = null;
@@ -62,38 +50,33 @@ export async function returnDropDown(history){
                 `)
     spools.Spool.forEach(spool => {
         let profileId = null;
-        if(profiles.filamentManager){
-            profileId = _.findIndex(profiles.profiles, function (o) {
-                return o.profile.index == spool.spools.profile;
-            });
-        }else{
-            profileId = _.findIndex(profiles.profiles, function (o) {
-                return o._id == spool.spools.profile;
-            });
-        }
-        if(spool.spools.weight - spool.spools.used > 0){
+        profileId = _.findIndex(profiles.profiles, function (o) {
+            return o._id == spool.profile;
+        });
+        console.log(profileId)
+        if(spool.weight - spool.used > 0){
             let index = _.findIndex(selected.selected, function(o) {
                 return o == spool._id;
             });
             if(index > -1 && !history){
                 if(filamentManager){
                     dropObject.push(`
-                    <option value="${spool._id}" disabled>${spool.spools.name} (${(spool.spools.weight - spool.spools.used).toFixed(2)}g) - ${profiles.profiles[profileId].profile.material}</option>
+                    <option value="${spool._id}" disabled>${spool.name} (${(spool.weight - spool.used).toFixed(2)}g) - ${profiles.profiles[profileId].material}</option>
                 `)
                 }else{
                     dropObject.push(`
-                    <option value="${spool._id}">${spool.spools.name} - ${profiles.profiles[profileId].profile.material}</option>
+                    <option value="${spool._id}">${spool.name} - ${profiles.profiles[profileId].material}</option>
                 `)
                 }
 
             }else{
                 if(filamentManager){
                     dropObject.push(`
-                    <option value="${spool._id}">${spool.spools.name} (${(spool.spools.weight - spool.spools.used).toFixed(2)}g) - ${profiles.profiles[profileId].profile.material}</option>
+                    <option value="${spool._id}">${spool.name} (${(spool.weight - spool.used).toFixed(2)}g) - ${profiles.profiles[profileId].material}</option>
                 `)
                 }else{
                     dropObject.push(`
-                    <option value="${spool._id}">${spool.spools.name} - ${profiles.profiles[profileId].profile.material}</option>
+                    <option value="${spool._id}">${spool.name} - ${profiles.profiles[profileId].material}</option>
                 `)
                 }
 
