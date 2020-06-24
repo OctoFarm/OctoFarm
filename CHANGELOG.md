@@ -17,7 +17,7 @@ All notable changes to this project will be documented in this file.
     - Printer Control now shows "Updated" status for tools. Shows the last time the temperature was grabbed.
     - History now displays multiple tool information if it was collected in the record. All successful prints will contain this information. 
     - pm2 now outputs full process logs into log folder. 
-    
+    - Printer Control now has web and power buttons. 
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
     - Thumbnails if available are now captured when logging history for any file.
@@ -50,6 +50,7 @@ All notable changes to this project will be documented in this file.
     - Server reboot has a notification and no longer needs page to re-load. Live updating. 
     - Improved loading times on history with pre-calculating the list values server side. 
     - Filament manager failed on re-syncing due to changes when adding spools/profiles. 
+    - Speed improvements with new backend pre-calculation. All information should be prepared ready for client access before access. 
     
 ### Removed
     - History may not now show your selected spool for old records with no job information caught. This is mainly going to be cancelled/failed prints as there is no information caught or prints that start and finish before OctoPrint can generate the job information. OctoFarm now relies on the tool# information provided in this for captured histories to render spool information correctly.     
