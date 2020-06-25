@@ -26,9 +26,9 @@ if (window.Worker) {
                         if (
                             document.getElementById("printerManagerModal").classList.contains("show")
                         ) {
-                            PrinterManager.init(event.data.printersInformation, event.data.printerControlList);
+                            PrinterManager.init("", event.data.printersInformation, event.data.printerControlList);
                         }else if(document.getElementById("printerSettingsModal").classList.contains("show")){
-                            PrinterSettings.init(event.data.printersInformation, event.data.printerControlList);
+                            PrinterSettings.init("", event.data.printersInformation, event.data.printerControlList);
                         } else {
                             printerInfo = event.data.printersInformation;
                             printerControlList = event.data.printerControlList;
@@ -38,7 +38,7 @@ if (window.Worker) {
 
                             if(powerTimer >= 20000){
                                 event.data.printersInformation.forEach(printer => {
-                                    PowerButton.applyBtn(printer);
+                                    PowerButton.applyBtn(printer, "powerBtn-");
                                 });
                                 powerTimer = 0
                             }else{
@@ -702,8 +702,32 @@ class dashUpdate {
                     let printerSuccess = document.getElementById("printerSuccess-"+printer._id);
                     let printerCancelled = document.getElementById("printerCancelled-"+printer._id);
                     let printerFailed = document.getElementById("printerFailure-"+printer._id);
-
-
+                    let systemChecks = {
+                        apiCheck: document.getElementById("apiCheck-"+printer._id),
+                        filesCheck: document.getElementById("filesCheck-"+printer._id),
+                        stateCheck: document.getElementById("stateCheck-"+printer._id),
+                        profileCheck: document.getElementById("profileCheck-"+printer._id),
+                        settingsCheck: document.getElementById("settingsCheck-"+printer._id),
+                        systemCheck: document.getElementById("systemCheck-"+printer._id)
+                    }
+                    let checkKeys = Object.keys(printer.systemCheck);
+                    checkKeys.forEach(key => {
+                        if(printer.systemCheck[key]){
+                            if(systemChecks[key+"Check"].classList.contains("text-offline")){
+                                systemChecks[key+"Check"].classList.remove("text-offline")
+                            }
+                            if(!systemChecks[key+"Check"].classList.contains("text-success")){
+                                systemChecks[key+"Check"].classList.add("text-success")
+                            }
+                        }else{
+                            if(!systemChecks[key+"Check"].classList.contains("text-offline")){
+                                systemChecks[key+"Check"].classList.add("text-offline")
+                            }
+                            if(systemChecks[key+"Check"].classList.contains("text-success")){
+                                systemChecks[key+"Check"].classList.remove("text-success")
+                            }
+                        }
+                    })
                     printerSortIndex.innerHTML = printer.sortIndex;
                     printerGroup.innerHTML = printer.group;
                     printerURL.innerHTML = printer.printerURL;
@@ -728,7 +752,7 @@ class dashUpdate {
                     socketBadge.className = `tag badge badge-${printer.webSocketState.colour} badge-pill`;
                     socketBadge.setAttribute('title',printer.webSocketState.desc)
                     webButton.href = printer.printerURL;
-                    if (printer.printerState.colour.name.category === "Offline") {
+                    if (printer.printerState.colour.category === "Offline") {
                         printButton.disabled = true;
                         settingButton.disabled = true;
                     } else {
@@ -798,6 +822,7 @@ class dashUpdate {
                 ${ printer.printerState.state }</small></span></td>
         <td><small><span data-title="${printer.webSocketState.desc}" id="webSocketIcon-${printer._id}" class="tag badge badge-${ printer.webSocketState.colour } badge-pill">
                 <i  class="fas fa-plug"></i></span></td>
+        <td><i title="API Status" id="apiCheck-${printer._id}" class="fas fa-link text-offline"></i><i title="Files Status" id="filesCheck-${printer._id}" class="fas fa-file-code ml-1 text-offline"></i><i title="State Status" id="stateCheck-${printer._id}" class="fas fa-info-circle ml-1 text-offline"></i><i title="Profile Status" id="profileCheck-${printer._id}" class="fas fa-id-card ml-1 text-offline"></i><i title="Settings Status" id="settingsCheck-${printer._id}" class="fas fa-cog ml-1 text-offline"></i><i title="System Status" id="systemCheck-${printer._id}" class="fas fa-server ml-1 text-offline"></i></td>
         <td><div id="printerGroup-${printer._id}" contenteditable="false"></div></td>
         <td><div id="printerURL-${printer._id}" contenteditable="false"></div></td>
         <td><div id="printerCamURL-${printer._id}" contenteditable="false"></div></td>
@@ -809,7 +834,7 @@ class dashUpdate {
             </button></td>
     </tr>
           `)
-                    PowerButton.applyBtn(printer)
+                    PowerButton.applyBtn(printer, "powerBtn-")
                     document.getElementById("deleteButton-" + printer._id).addEventListener('click', event => {
                         PrintersManagement.deletePrinter(event.target);
                     })
@@ -831,16 +856,10 @@ class dashUpdate {
                         e.target.disabled = false;
                     });
                     document.getElementById("printerButton-" + printer._id).addEventListener("click", e => {
-                            //PrinterManager.updateIndex(printer._id);
-                            let index = _.findIndex(printerInfo, function(o) { return o._id == printer._id; });
-                            console.log(index)
-                            PrinterManager.init(printerInfo[index], printerControlList);
+                            PrinterManager.init(printer._id, printerInfo, printerControlList);
                     });
                     document.getElementById("printerSettings-" + printer._id).addEventListener("click", e => {
-                            //PrinterSettings.updateIndex(printer._id);
-                            let index = _.findIndex(printerInfo, function(o) { return o._id == printer._id; });
-
-                            PrinterSettings.init(printerInfo[index], printerControlList);
+                            PrinterSettings.init(printer._id, printerInfo, printerControlList);
                     });
                 }
             }
