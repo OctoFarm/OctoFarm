@@ -363,7 +363,7 @@ export default class FileManager {
           <span class="usage" title="Expected Filament Usage/Cost"> ${toolInfo} </span>
           
           </p> 
-                    </div>
+                    </div> 
                 </div>
               </div>
             <div class="col-lg-12">
