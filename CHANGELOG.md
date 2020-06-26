@@ -38,7 +38,8 @@ All notable changes to this project will be documented in this file.
     - Client now uses service workers for information retrieval. 
     - History information now generated on server side then sent to the client, should improve loading times. 
     - Filament information now generated on server side then sent to the client, should improve loading times. 
-    
+    - Printer Control improvements, now shows loading spinner when loading/switching to a different print. Speeds should be slightly improved``
+        - Printer Control now live reloads filament/file changes. Shouldn't need to re-sync nearly as much manually. 
 ### Fixed
     - Fix file manager bug with default date sorting.
     - Fixed styling issue with the filters and sorting dropdowns on views making the bar bigger.

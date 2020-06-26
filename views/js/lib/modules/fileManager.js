@@ -19,7 +19,7 @@ setInterval(async () => {
       let file = await current.upload(current);
       file = JSON.parse(file);
       file.index = current.index;
-      file.date = currentDate.getTime() / 1000;
+      file.uploadDate = currentDate.getTime() / 1000;
       let post = await OctoFarmClient.post("printers/newFiles", file);
       let update = await FileManager.updateFileList(file.index);
       fileUploads.remove();
@@ -44,19 +44,6 @@ setInterval(async () => {
 }, 1000);
 
 export default class FileManager {
-  static grabName(printer){
-    let name = "";
-    if (typeof printer.settingsAppearance != "undefined") {
-      if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
-        name = printer.printerURL;
-      } else {
-        name = printer.settingsAppearance.name;
-      }
-    } else {
-      name = printer.printerURL;
-    }
-    return name;
-  }
   static async handleFiles(Afiles, printerInfo, print) {
     Afiles = [...Afiles];
     for (let i = 0; i < Afiles.length; i++) {
@@ -186,7 +173,7 @@ export default class FileManager {
           resolve(xhr.response);
           UI.createAlert(
               "success",
-              file.name + " has finished uploading to Printer: " + FileManager.grabName(printerInfo),
+              file.name + " has finished uploading to Printer: " + printerInfo.printerName,
               3000,
               "clicked"
           );
@@ -254,7 +241,7 @@ export default class FileManager {
       i: printer._id
     });
     let how = await done.json();
-
+    console.log(how)
     let flashReturn = function() {
       e.target.classList = "btn btn-primary mb-0";
       e.target.innerHTML = "<i class='fas fa-sync'></i> Re-Sync";
@@ -276,20 +263,7 @@ export default class FileManager {
     });
     printer = await printer.json();
     FileManager.drawFiles(printer);
-    let printerStorage = document.getElementById("printerStorage");
-    if(printerStorage){
-      printerStorage.innerHTML = `
-          <i class="fas fa-hdd"></i> 
-          ${Calc.bytes(printer.storage.free)}  / 
-          ${Calc.bytes(printer.storage.total)}
-        </button>`;
-            document.getElementById("printerFileCount").innerHTML = `
-          <i class="fas fa-file"></i> ${printer.filesList.fileCount} <i class="fas fa-folder"></i> ${printer.filesList.folderCount}
-          `
-      return "done";
-    }else{
-      return "done";
-    }
+    return "done";
   }
   static openFolder(folder, target, printer) {
     if (typeof target != "undefined" && target.type === "button") {
@@ -313,73 +287,45 @@ export default class FileManager {
     }
     jplist.refresh();
   }
+  static refreshFiles(printer){
+    if(document.getElementById(`file-${file.fullPath}`)){
+      document.getElementById("")
+    }
+  }
   static drawFiles(printer, recursive) {
     let fileElem = document.getElementById("fileList-"+printer._id);
     if(fileElem){
-      let fileList = printer.filesList;
-
-      if (fileList === "EMPTY") {
+      let fileList = printer.fileList.fileList;
+      if (fileList.length === 0) {
         fileElem.innerHTML = `
       <div class="noStorage  text-center"><i class="fas fa-file-code fa-5x"></i><br><h5>There are no files in local storage...</h5></div>
       `;
       } else {
-        fileList.files = _.sortBy(fileList.files, [
-          function(o) {
-            return o.display;
-          }
-        ]);
         fileElem.innerHTML = "";
         let currentFolder = document.getElementById("currentFolder").innerHTML;
         if (currentFolder.includes("local/")) {
           currentFolder = currentFolder.replace("local/", "");
         }
-        fileList.files.forEach(file => {
+        fileList.forEach(file => {
+          let toolInfo = "";
+          file.toolUnits.forEach((unit,index) => {
+            toolInfo += "<i class=\"fas fa-weight\"></i> "+ unit + " / <i class=\"fas fa-dollar-sign\"></i> Cost: "+file.toolCosts[index] + "<br>";
+          })
           let thumbnail = "<center><i class=\"fas fa-file-code fa-2x\"></i></center>";
           if(typeof file.thumbnail !== 'undefined' && file.thumbnail !== null ){
             thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
           }
-          let fileDate = new Date(file.date*1000);
+          let fileDate = new Date(file.uploadDate*1000);
           let dateString = fileDate.toDateString();
           let timeString = fileDate.toTimeString().substring(0, 8);
-          let getUsage = FileActions.grabUsage(file);
-          let filamentCost = [];
-          let usageDisplay = "";
-          if(getUsage !== "No Length"){
-            usageDisplay = getUsage.totalLength.toFixed(2) + "m / " + getUsage.totalGrams.toFixed(2) + "<br>";
-            getUsage.usage.forEach((usage,index) => {
-              usageDisplay += "<b> Tool </b>"+ index + ": " + usage + "<br>";
-              let usageElement = usage.split(" / ").pop();
-
-              let cost = NaN;
-              if(Array.isArray(printer.selectedFilament)){
-                cost = parseFloat(Calc.returnFilamentCost(printer.selectedFilament[index], usageElement)).toFixed(2);
-              }
-              if(isNaN(cost)){
-                filamentCost.push("<b> Tool "+index+"</b>: "+ "(No Spool)");
-              }else{
-                filamentCost.push("<b> Tool "+index+"</b>: "+ cost);
-              }
-
-            })
-          }else{
-
-          }
-
-
-
-
-
-          let printCost = parseFloat(Calc.returnPrintCost(printer.costSettings, file.time)).toFixed(2);
-          if(isNaN(printCost)){
-            printCost = "No estmated time";
-          }
           fileDate = dateString + " " + timeString;
 
-          if (typeof recursive != "undefined") {
-            fileElem.insertAdjacentHTML(
-                "beforeend",
-                `
-        <a
+            if (typeof recursive != "undefined") {
+
+              fileElem.insertAdjacentHTML(
+                  "beforeend",
+                  `
+           <a
           data-jplist-item
           id="file-${file.fullPath}"
           href="#"
@@ -405,17 +351,16 @@ export default class FileManager {
           <p class="mb-1 float-right">
               <i class="fas fa-stopwatch"></i> 
                 <span class="time">
-                    ${Calc.generateTime(file.time)}</span> <br> 
+                    ${Calc.generateTime(file.expectedPrintTime)}</span> <br> 
                <i class="fas fa-dollar-sign"></i> 
-               <span title="Expected Filament Cost"> ${filamentCost} </span>
-               <br> 
-               <i class="fas fa-dollar-sign"></i> 
-               <span title="Expected Printer Cost" class="cost"> ${printCost} </span>
+               <span title="Expected Printer Cost" class="cost"> Print Cost: ${file.printCost} </span>    <br> 
+               <span title="Expected Filament Cost"> </span>
+
           </p>
           <p class="mb-1 float-left">
-          <i class="fas fa-clock"></i><span class="date d-none"> ${file.date}</span><span> ${fileDate}</span><br>
-          <i class="fas fa-hdd"></i><span class="size"> ${Calc.bytes(file.size)}</span> <br>
-          <i class="fas fa-weight"></i><span class="usage">${usageDisplay}</span>
+          <i class="fas fa-clock"></i><span class="date d-none"> ${file.uploadDate}</span><span id="fileDate-${file.fullPath}"> ${fileDate}</span><br>
+          <i class="fas fa-hdd"></i><span class="size" id="fileSize-${file.fullPath}"> ${Calc.bytes(file.fileSize)}</span> <br>
+          <span class="usage" title="Expected Filament Usage/Cost"> ${toolInfo} </span>
           
           </p> 
                     </div>
@@ -437,28 +382,28 @@ export default class FileManager {
               </button>
               <button           title="Start printing file"
               id="${printer._id}*fileActionStart*${
-                    file.fullPath
-                }" type="button" class="btn btn-success">
+                      file.fullPath
+                  }" type="button" class="btn btn-success">
                 <i class="fas fa-play"></i> Start
               </button>
               <button  title="Select file" id="${printer._id}*fileActionSelect*${
-                    file.fullPath
-                }" type="button" class="btn btn-info">
+                      file.fullPath
+                  }" type="button" class="btn btn-info">
                 <i class="fas fa-file-upload"></i> Select
               </button>
               <button          title="Move file" id="${printer._id}*fileActionMove*${
-                    file.fullPath
-                }" type="button" class="btn btn-warning">
+                      file.fullPath
+                  }" type="button" class="btn btn-warning">
                 <i class="fas fa-people-carry"></i> Move
               </button>
               <button          title="Download file" onclick="window.open('${printer.printerURL}/downloads/files/local/${
-                    file.fullPath
-                }')" type="button" class="btn btn-dark">
+                      file.fullPath
+                  }')" type="button" class="btn btn-dark">
                 <i class="fas fa-download"></i> Download
               </button>
               <button title="Delete file" id="${printer.printerURL}*fileActionDelete*${
-                    file.fullPath
-                }" type="button" class="btn btn-danger">
+                      file.fullPath
+                  }" type="button" class="btn btn-danger">
                 <i class="fas fa-trash-alt"></i> Delete
               </button>
               </div>
@@ -466,13 +411,12 @@ export default class FileManager {
             </div>
           </div>
         </a>
-        </a>
           `
-            );
-          } else if (file.path == currentFolder) {
-            fileElem.insertAdjacentHTML(
-                "beforeend",
-                `
+              );
+            } else if (file.path == currentFolder) {
+              fileElem.insertAdjacentHTML(
+                  "beforeend",
+                  `
           <a
           data-jplist-item
           id="file-${file.fullPath}"
@@ -499,17 +443,16 @@ export default class FileManager {
           <p class="mb-1 float-right">
               <i class="fas fa-stopwatch"></i> 
                 <span class="time">
-                    ${Calc.generateTime(file.time)}</span> <br> 
+                    ${Calc.generateTime(file.expectedPrintTime)}</span> <br> 
                <i class="fas fa-dollar-sign"></i> 
-               <span title="Expected Filament Cost"> ${filamentCost} </span>
-               <br> 
-               <i class="fas fa-dollar-sign"></i> 
-               <span title="Expected Printer Cost" class="cost"> ${printCost} </span>
+               <span title="Expected Printer Cost" class="cost"> Print Cost: ${file.printCost} </span>    <br> 
+               <span title="Expected Filament Cost"> </span>
+
           </p>
           <p class="mb-1 float-left">
-          <i class="fas fa-clock"></i><span class="date d-none"> ${file.date}</span><span> ${fileDate}</span><br>
-          <i class="fas fa-hdd"></i><span class="size"> ${Calc.bytes(file.size)}</span> <br>
-          <i class="fas fa-weight"></i><span class="usage"> ${usageDisplay}</span>
+          <i class="fas fa-clock"></i><span class="date d-none"> ${file.uploadDate}</span><span id="fileDate-${file.fullPath}"> ${fileDate}</span><br>
+          <i class="fas fa-hdd"></i><span class="size"> ${Calc.bytes(file.fileSize)}</span> <br>
+          <span class="usage" title="Expected Filament Usage/Cost"> ${toolInfo} </span>
           
           </p> 
                     </div>
@@ -531,28 +474,28 @@ export default class FileManager {
               </button>
               <button           title="Start printing file"
               id="${printer._id}*fileActionStart*${
-                    file.fullPath
-                }" type="button" class="btn btn-success">
+                      file.fullPath
+                  }" type="button" class="btn btn-success">
                 <i class="fas fa-play"></i> Start
               </button>
               <button  title="Select file" id="${printer._id}*fileActionSelect*${
-                    file.fullPath
-                }" type="button" class="btn btn-info">
+                      file.fullPath
+                  }" type="button" class="btn btn-info">
                 <i class="fas fa-file-upload"></i> Select
               </button>
               <button          title="Move file" id="${printer._id}*fileActionMove*${
-                    file.fullPath
-                }" type="button" class="btn btn-warning">
+                      file.fullPath
+                  }" type="button" class="btn btn-warning">
                 <i class="fas fa-people-carry"></i> Move
               </button>
               <button          title="Download file" onclick="window.open('${printer.printerURL}/downloads/files/local/${
-                    file.fullPath
-                }')" type="button" class="btn btn-dark">
+                      file.fullPath
+                  }')" type="button" class="btn btn-dark">
                 <i class="fas fa-download"></i> Download
               </button>
               <button title="Delete file" id="${printer.printerURL}*fileActionDelete*${
-                    file.fullPath
-                }" type="button" class="btn btn-danger">
+                      file.fullPath
+                  }" type="button" class="btn btn-danger">
                 <i class="fas fa-trash-alt"></i> Delete
               </button>
               </div>
@@ -560,10 +503,11 @@ export default class FileManager {
             </div>
           </div>
         </a>
-        </a>
           `
-            );
-          }
+              );
+            }
+
+
         });
         fileList.folders = _.sortBy(fileList.folders, [
           function(o) {

@@ -59,10 +59,9 @@ export default class OctoPrintClient {
     }
   }
   static async system(printer, action) {
-    let name = Validate.getName(printer)
     let url = "system/commands/core/" + action;
     bootbox.confirm({
-      message: `Are your sure you want to ${action} ${name}?`,
+      message: `Are your sure you want to ${action} ${printer.printerName}?`,
       buttons: {
         cancel: {
           label: '<i class="fa fa-times"></i> No'
@@ -78,14 +77,14 @@ export default class OctoPrintClient {
           if (post.status === 204) {
             UI.createAlert(
               "success",
-              `${name}: ${action} was successful`,
+              `${printer.printerName}: ${action} was successful`,
               3000,
               "clicked"
             );
           } else {
             UI.createAlert(
               "error",
-              `${name}: ${action} was unsuccessful. Please make sure printer is connected and commands are setup in Settings -> Server.`,
+              `${printer.printerName}: ${action} was unsuccessful. Please make sure printer is connected and commands are setup in Settings -> Server.`,
               3000,
               "clicked"
             );
@@ -134,7 +133,6 @@ export default class OctoPrintClient {
     }
   }
   static async file(printer, fullPath, action, file) {
-    let name = Validate.getName(printer)
     let url = "files/local/" + fullPath;
     let post = null;
     if (action === "load") {
@@ -170,12 +168,12 @@ export default class OctoPrintClient {
           fullPath: fullPath
         };
         let fileDel = await OctoFarmClient.post("printers/removefile", opt);
-        UI.createAlert("success", `${name}: ${action} completed`, 3000, "clicked");
+        UI.createAlert("success", `${printer.printerName}: ${action} completed`, 3000, "clicked");
       } else {
-        UI.createAlert("success", `${name}: ${action} actioned`, 3000, "clicked");
+        UI.createAlert("success", `${printer.printerName}: ${action} actioned`, 3000, "clicked");
       }
     } else {
-      UI.createAlert("error", `${name}: ${action} failed`, 3000, "clicked");
+      UI.createAlert("error", `${printer.printerName}: ${action} failed`, 3000, "clicked");
     }
   }
   static async jobAction(printer, opts, element) {
@@ -191,12 +189,11 @@ export default class OctoPrintClient {
       command: "feedrate",
       factor: parseInt(printer.feedRate)
     };
+
     await OctoPrintClient.post(printer, "printer/printhead", feed);
     let body = {
       i: printer._id
     }
-    printer = await OctoFarmClient.post("printers/printerInfo", body);
-    printer = await printer.json();
 
     let filamentCheck = false;
     if(typeof checkSettings.filament !== 'undefined'){
@@ -208,7 +205,6 @@ export default class OctoPrintClient {
         return e !== null;
       });
     }
-
     if(filamentCheck && !printerCheck && opts.command === "start"){
       bootbox.confirm({
         message: "You have spools in the inventory, but none selected. Would you like to select a spool?",
@@ -234,8 +230,12 @@ export default class OctoPrintClient {
                 }
               }
               printer.selectedFilament.forEach((spool,index) => {
-                offset.offsets["tool"+index] = spool.spools.tempOffset
+                if(spool != null){
+                  offset.offsets["tool"+index] = spool.spools.tempOffset
+                }
+
               })
+
               let post = await OctoPrintClient.post(printer, "printer/tool", offset);
             }
             await OctoPrintClient.post(printer, "printer/printhead", feed);
@@ -245,18 +245,6 @@ export default class OctoPrintClient {
         }
       });
     }else{
-      if(printer.selectedFilament != null && Array.isArray(printer.selectedFilament)){
-        let offset = {
-          command: "offset",
-          offsets: {
-
-          }
-        }
-        printer.selectedFilament.forEach((spool,index) => {
-          offset.offsets["tool"+index] = spool.spools.tempOffset
-        })
-        let post = await OctoPrintClient.post(printer, "printer/tool", offset);
-      }
       await OctoPrintClient.post(printer, "printer/printhead", feed);
       let post = await OctoPrintClient.post(printer, "job", opts);
       element.target.disabled = false;
@@ -278,12 +266,11 @@ export default class OctoPrintClient {
         command: "disconnect"
       };
     }
-    let name = Validate.getName(printer)
     let post = await OctoPrintClient.post(printer, "connection", opts);
     if (post.status === 204) {
       UI.createAlert(
         "success",
-        `Printer: ${name} has ${opts.command}ed successfully.`,
+        `${printer.printerName}: has ${opts.command}ed successfully.`,
         3000,
         "click"
       );
@@ -299,7 +286,7 @@ export default class OctoPrintClient {
     } else {
       UI.createAlert(
         "error",
-        `Printer: ${name} could not ${opts.command}.`,
+        `${printer.printerName}: could not ${opts.command}.`,
         3000,
         "click"
       );
@@ -320,9 +307,9 @@ export default class OctoPrintClient {
         },
       });
       if (post.status !== 204)  {
-        UI.createAlert("error", `${Validate.getName(printer)}: Could not complete ${action}`, 3000)
+        UI.createAlert("error", `${printer.printerName}: Could not complete ${action}`, 3000)
       } else {
-        UI.createAlert("success", `${Validate.getName(printer)}: Successfully completed ${action}`, 3000)
+        UI.createAlert("success", `${printer.printerName}: Successfully completed ${action}`, 3000)
       }
     } else {
       let post = await fetch(url, {
@@ -335,9 +322,9 @@ export default class OctoPrintClient {
       });
 
       if (post.status !== 204) {
-        UI.createAlert("error", `${Validate.getName(printer)}: Could not complete ${action}`, 3000)
+        UI.createAlert("error", `${printer.printerName}: Could not complete ${action}`, 3000)
       } else {
-        UI.createAlert("success", `${Validate.getName(printer)}: Successfully completed ${action}`, 3000)
+        UI.createAlert("success", `${printer.printerName}: Successfully completed ${action}`, 3000)
       }
     }
     return "done"

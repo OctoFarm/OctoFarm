@@ -53,7 +53,6 @@ export async function returnDropDown(history){
         profileId = _.findIndex(profiles.profiles, function (o) {
             return o._id == spool.profile;
         });
-        console.log(profileId)
         if(spool.weight - spool.used > 0){
             let index = _.findIndex(selected.selected, function(o) {
                 return o == spool._id;

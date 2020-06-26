@@ -1,5 +1,5 @@
 
-async function asyncParse(str) {
+function asyncParse(str) {
     try {
         let info = parse(str)
         return info;
@@ -10,9 +10,15 @@ async function asyncParse(str) {
 
 let source = new EventSource("/printersInfo/get/");
 
-source.onmessage = async function(e) {
+// source.addEventListener("ping", function(event) {
+//     if (e.data != null) {
+//         let res = asyncParse(e.data)
+//         postMessage(res);
+//     }
+// });
+source.onmessage = function(e) {
     if (e.data != null) {
-        let res = await asyncParse(e.data)
+        let res = asyncParse(e.data)
         postMessage(res);
     }
 };

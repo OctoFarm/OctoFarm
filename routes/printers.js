@@ -5,7 +5,10 @@ const { ensureAuthenticated } = require("../config/auth");
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 const Logger = require('../lib/logger.js');
-const logger = new Logger('OctoFarm-API')
+const logger = new Logger('OctoFarm-API');
+const printerClean = require("../lib/dataFunctions/printerClean.js");
+const PrinterClean = printerClean.PrinterClean;
+const _ = require("lodash")
 
 /* //Login Page
 router.get("/login", (req, res) => res.render("login"));
@@ -64,6 +67,7 @@ router.post("/resyncFile", ensureAuthenticated, async (req, res) => {
   } else {
     ret = await Runner.reSyncFile(file.i);
   }
+
   res.send(ret);
 });
 router.post("/stepChange", ensureAuthenticated, async (req, res) => {
@@ -105,92 +109,17 @@ router.get("/groups", ensureAuthenticated, async (req, res) => {
     res.send(groups);
 });
 router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
-  let index = req.body.i;
-  if(typeof index === 'undefined' || index === null){
-    let printers = await Runner.returnFarmPrinters();
+  let id = req.body.i;
+  let printers = await PrinterClean.returnPrintersInformation();
+  if(typeof id === 'undefined' || id === null){
     let printerInfo = [];
-    for (let i = 0; i < printers.length; i++) {
-      let selectedFilament = null;
-      if (typeof printers[i].selectedFilament != "undefined") {
-        selectedFilament = printers[i].selectedFilament;
-      }
-      let printer = {
-        state: printers[i].state,
-        index: printers[i].index,
-        camURL: printers[i].camURL,
-        _id: printers[i]._id,
-        apikey: printers[i].apikey,
-        currentZ: printers[i].currentZ,
-        progress: printers[i].progress,
-        job: printers[i].job,
-        profile: printers[i].profiles,
-        temps: printers[i].temps,
-        flowRate: printers[i].flowRate,
-        feedRate: printers[i].feedRate,
-        stepRate: printers[i].stepRate,
-        filesList: printers[i].fileList,
-        storage: printers[i].storage,
-        logs: printers[i].logs,
-        messages: printers[i].messages,
-        plugins: printers[i].settingsPlugins,
-        gcode: printers[i].settingsScripts,
-        settingsAppearance: printers[i].settingsAppearance,
-        stateColour: printers[i].stateColour,
-        current: printers[i].current,
-        options: printers[i].options,
-        selectedFilament: selectedFilament,
-        settingsWebcam: printers[i].settingsWebcam,
-        webSocket: printers[i].webSocket,
-        octoPrintVersion: printers[i].octoPrintVersion,
-        hostState: printers[i].hostState,
-        hostStateColour: printers[i].hostStateColour,
-        printerURL: printers[i].printerURL,
-        group: printers[i].group,
-        costSettings: printers[i].costSettings,
-      };
-      printerInfo.push(printer);
-    }
     res.send(printerInfo);
   }else{
-    let printers = await Runner.returnFarmPrinters(index);
-    let selectedFilament = null;
-    if (typeof printers.selectedFilament != "undefined") {
-      selectedFilament = printers.selectedFilament;
+    let index = _.findIndex(printers, function(o) { return o._id == id; });
+    let returnPrinter = {
+      storage: printers[index].storage,
+      fileList: printers[index].fileList
     }
-    returnPrinter = {
-      state: printers.state,
-      index: printers.index,
-      _id: printers._id,
-      camURL: printers.camURL,
-      apikey: printers.apikey,
-      currentZ: printers.currentZ,
-      progress: printers.progress,
-      job: printers.job,
-      profile: printers.profiles,
-      temps: printers.temps,
-      flowRate: printers.flowRate,
-      feedRate: printers.feedRate,
-      stepRate: printers.stepRate,
-      filesList: printers.fileList,
-      storage: printers.storage,
-      logs: printers.logs,
-      messages: printers.messages,
-      plugins: printers.settingsPlugins,
-      gcode: printers.settingsScripts,
-      settingsAppearance: printers.settingsAppearance,
-      stateColour: printers.stateColour,
-      current: printers.current,
-      options: printers.options,
-      selectedFilament: selectedFilament,
-      settingsWebcam: printers.settingsWebcam,
-      webSocket: printers.webSocket,
-      octoPrintVersion: printers.octoPrintVersion,
-      hostState: printers.hostState,
-      hostStateColour: printers.hostStateColour,
-      printerURL: printers.printerURL,
-      group: printers.group,
-      costSettings: printers.costSettings,
-    };
     res.send(returnPrinter);
   }
 });
