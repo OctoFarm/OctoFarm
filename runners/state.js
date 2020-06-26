@@ -1,8 +1,6 @@
 const Printers = require("../models/Printer.js");
 const serverSettings = require("../settings/serverSettings.js");
 const ServerSettings = serverSettings.ServerSettings;
-const statisticsCollection = require("../runners/statisticsCollection.js");
-const StatisticsCollection = statisticsCollection.StatisticsCollection;
 const historyCollection = require("./history.js");
 const HistoryCollection = historyCollection.HistoryCollection;
 const fetch = require("node-fetch");
@@ -17,9 +15,6 @@ const ScriptRunner = script.ScriptRunner;
 const EventEmitter = require('events');
 
 let farmPrinters = [];
-
-let statRunner = null;
-let farmStatRunner = null;
 
 //Checking interval for information...
 // setInterval(() => {
@@ -477,18 +472,6 @@ class Runner {
         let timeoutSettings = await ServerSettings.check();
         timeout = timeoutSettings[0].timeout
         farmPrinters = [];
-        statRunner = setInterval(function() {
-            //Update Current Operations
-            StatisticsCollection.currentOperations(farmPrinters);
-        }, 500);
-        farmStatRunner = setInterval(function() {
-            //Update farm statistics
-            StatisticsCollection.octofarmStatistics(farmPrinters);
-            //Update farm information when we have temps
-            StatisticsCollection.farmInformation(farmPrinters);
-            //Update print statistics
-            StatisticsCollection.printStatistics();
-        }, 5000);
 
         //Grab printers from database....
         try {
@@ -567,6 +550,7 @@ class Runner {
                 await Runner.getProfile(id);
                 await Runner.getState(id);
                 await Runner.getFiles(id, "files?recursive=true");
+                farmPrinters[i].systemChecks.api = true;
                 //Connection to API successful, gather initial data and setup websocket.
                 await farmPrinters[i].ws.open(
                     `ws://${farmPrinters[i].printerURL}/sockjs/websocket`,
@@ -651,6 +635,15 @@ class Runner {
         farmPrinters[i].hostDescription = "Setting up your Printer";
         farmPrinters[i].webSocketDescription = "Websocket is Offline";
         farmPrinters[i].stepRate = 10;
+
+        farmPrinters[i].systemChecks = {
+            api: false,
+            files: false,
+            state: false,
+            profile: false,
+            settings: false,
+            system: false
+        }
 
         if(typeof farmPrinters[i].dateAdded === "undefined"){
             let currentTime = new Date();
@@ -831,6 +824,14 @@ class Runner {
             status: null,
             msg: null
         };
+        farmPrinters[index].systemChecks = {
+            api: false,
+            files: false,
+            state: false,
+            profile: false,
+            settings: false,
+            system: false
+        }
         farmPrinters[index].state = "Searching...";
         farmPrinters[index].stateColour = Runner.getColour("Searching...");
         farmPrinters[index].hostState = "Searching...";
@@ -867,11 +868,6 @@ class Runner {
         return "updated";
     }
     static async pause() {
-        logger.info("Stopping farm statistics runner...");
-        clearInterval(farmStatRunner);
-        logger.info("Stopping farm Information runner...");
-        clearInterval(statRunner);
-
         for (let i = 0; i < farmPrinters.length; i++) {
             if (typeof farmPrinters[i].ws !== 'undefined' && typeof farmPrinters[i].ws.instance !== 'undefined') {
                 await farmPrinters[i].ws.instance.close();
@@ -923,8 +919,9 @@ class Runner {
                             if (typeof entry.gcodeAnalysis.estimatedPrintTime !== 'undefined') {
                                 timeStat = entry.gcodeAnalysis.estimatedPrintTime;
                                 //Start collecting multiple tool lengths and information from files....
-                                Object.keys(entry.gcodeAnalysis.filament).forEach(function (item,index) {
-                                    filament[index] = entry.gcodeAnalysis.filament[item].length;
+                                Object.keys(entry.gcodeAnalysis.filament).forEach(function (item,i) {
+
+                                    filament[i] = entry.gcodeAnalysis.filament[item].length;
                                 });
                             } else {
                                 timeStat = "No Time Estimate";
@@ -1035,6 +1032,7 @@ class Runner {
                 farmPrinters[index].stateColour = Runner.getColour(res.current.state);
                 farmPrinters[index].current = res.current;
                 farmPrinters[index].options = res.options;
+                farmPrinters[index].systemChecks.state = true;
                 logger.info("Successfully grabbed Current State for...: " + farmPrinters[index].printerURL);
             })
             .catch(err => {
@@ -1055,6 +1053,7 @@ class Runner {
             .then(res => {
                 //Update info to DB
                 farmPrinters[index].profiles = res.profiles;
+                farmPrinters[index].systemChecks.profile = true;
                 logger.info("Successfully grabbed Profiles.js for...: " + farmPrinters[index].printerURL);
             })
             .catch(err => {
@@ -1128,6 +1127,7 @@ class Runner {
 
                     }
                 }
+                farmPrinters[index].systemChecks.settings = true;
                 logger.info("Successfully grabbed Settings for...: " + farmPrinters[index].printerURL);
             })
             .catch(err => {
@@ -1148,6 +1148,7 @@ class Runner {
             .then(res => {
                 //Update info to DB
                 farmPrinters[index].core = res.core;
+                farmPrinters[index].systemChecks.system = true;
                 logger.info("Successfully grabbed System Information for...: " + farmPrinters[index].printerURL);
             })
             .catch(err => {
@@ -1210,11 +1211,7 @@ class Runner {
         let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
         //Doesn't actually resync just the file... shhh
         let success = await Runner.getFiles(id, "files?recursive=true");
-        if (success) {
-            return success;
-        } else {
-            return false;
-        }
+        return true;
     }
     static async flowRate(id, newRate) {
         let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
@@ -1437,7 +1434,7 @@ class Runner {
                 printer.selectedFilament[tool] = null;
                 farmPrinters[i].selectedFilament[tool] = null;
                 //Find in selected filament list and remove
-                let selected = _.findIndex(selectedFilament, function(o) { return o == filamentId; });
+                let selected = _.findIndex(farmPrinters[i].selectedFilament, function(o) { return o == filamentId; });
         }else{
             if(!Array.isArray(farmPrinters[i].selectedFilament)){
                 //Setup new spool...
@@ -1520,7 +1517,7 @@ class Runner {
         //     printer.save();
         // }
     }
-    static newFile(file) {
+    static async newFile(file) {
         let i = _.findIndex(farmPrinters, function(o) { return o._id == file.index; });
         let date = file.date;
         file = file.files.local;
@@ -1540,9 +1537,15 @@ class Runner {
             name: file.name,
             size: null,
             time: null,
-            date: date
+            date: date,
+            thumbnail: null,
         };
         farmPrinters[i].fileList.files.push(data);
+        await Runner.getFiles(farmPrinters[i]._id, "files?recursive=true");
+        setTimeout(async function(){
+            await Runner.getFiles(farmPrinters[i]._id, "files?recursive=true");
+        }, 5000);
+
     }
     static sortedIndex() {
         let sorted = [];

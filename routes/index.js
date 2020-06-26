@@ -1,3 +1,4 @@
+
 const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
@@ -8,6 +9,7 @@ const prettyHelpers = require("../views/partials/functions/pretty.js");
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 const _ = require("lodash");
+
 const historyClean = require("../lib/dataFunctions/historyClean.js");
 const HistoryClean = historyClean.HistoryClean;
 const filamentClean = require("../lib/dataFunctions/filamentClean.js");
@@ -18,8 +20,6 @@ const SettingsClean = settingsClean.SettingsClean;
 const version = pjson.version + ".6.1";
 
 console.log("db: " + db);
-
-const Roll = require("../models/Filament.js");
 
 //Welcome Page
 async function welcome() {
@@ -49,10 +49,6 @@ welcome();
 //Dashboard Page
 router.get("/dashboard", ensureAuthenticated, async(req, res) => {
     let printers = await Runner.returnFarmPrinters();
-    let sortedPrinters = await Runner.sortedIndex();
-    const farmStatistics = require("../runners/statisticsCollection.js");
-    const FarmStatistics = farmStatistics.StatisticsCollection;
-    let statistics = await FarmStatistics.returnStats();
     const system = require("../runners/systemInfo.js");
     const SystemRunner = system.SystemRunner;
     let systemInformation = await SystemRunner.returnInfo();
@@ -71,9 +67,7 @@ router.get("/dashboard", ensureAuthenticated, async(req, res) => {
         name: user,
         userGroup: group,
         version: version,
-        sortedIndex: sortedPrinters,
         printers: printers,
-        farmInfo: statistics.farmInfo,
         currentOperations: statistics.currentOperations,
         octofarmStatistics: statistics.octofarmStatistics,
         printStatistics: statistics.printStatistics,
@@ -88,7 +82,6 @@ router.get("/dashboard", ensureAuthenticated, async(req, res) => {
 });
 router.get("/printers", ensureAuthenticated, async(req, res) => {
     let printers = await Runner.returnFarmPrinters();
-    let sortedPrinters = await Runner.sortedIndex();
     let serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
@@ -103,8 +96,6 @@ router.get("/printers", ensureAuthenticated, async(req, res) => {
         name: user,
         userGroup: group,
         version: version,
-        sortedIndex: sortedPrinters,
-        printers: printers,
         page: "Printer Manager",
         printerCount: printers.length,
         helpers: prettyHelpers,
@@ -113,10 +104,6 @@ router.get("/printers", ensureAuthenticated, async(req, res) => {
 //File Manager Page
 router.get("/filemanager", ensureAuthenticated, async(req, res) => {
     let printers = await Runner.returnFarmPrinters();
-    let sortedPrinters = await Runner.sortedIndex();
-    const farmStatistics = require("../runners/statisticsCollection.js");
-    const FarmStatistics = farmStatistics.StatisticsCollection;
-    let statistics = await FarmStatistics.returnStats();
     let serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
@@ -127,18 +114,13 @@ router.get("/filemanager", ensureAuthenticated, async(req, res) => {
         user = req.user.name;
         group = req.user.group;
     }
-    res.render("filemanager", {
+    res.render("printerManagement", {
         name: user,
         userGroup: group,
         version: version,
-        printers: printers,
-        sortedIndex: sortedPrinters,
+        page: "Printer Manager",
         printerCount: printers.length,
-        currentOperationsCount: statistics.currentOperationsCount,
-        farmInfo: statistics.fileStatistics,
-        page: "File Manager",
         helpers: prettyHelpers,
-        serverSettings: serverSettings,
     });
 });
 //History Page
@@ -242,7 +224,6 @@ router.get("/mon/list", ensureAuthenticated, async(req, res) => {
     let statistics = await FarmStatistics.returnStats();
     let clientSettings = await SettingsClean.returnClientSettings();
     let serverSettings = await SettingsClean.returnSystemSettings();
-    console.log(clientSettings)
     let user = null;
     let group = null;
     if (serverSettings.server.loginRequired === false) {

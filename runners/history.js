@@ -88,16 +88,18 @@ class HistoryCollection {
       if (printer.selectedFilament !== null && Array.isArray(printer.selectedFilament)) {
         let profileId = [];
         printer.selectedFilament.forEach((spool,index) => {
-          if (serverSettings[0].filamentManager) {
-            profileId = _.findIndex(profiles, function (o) {
-              return o.profile.index == printer.selectedFilament[index].spools.profile;
-            });
-          } else {
-            profileId = _.findIndex(profiles, function (o) {
-              return o._id == printer.selectedFilament[index].spools.profile;
-            });
+          if(spool !== null){
+            if (serverSettings[0].filamentManager) {
+              profileId = _.findIndex(profiles, function (o) {
+                return o.profile.index == printer.selectedFilament[index].spools.profile;
+              });
+            } else {
+              profileId = _.findIndex(profiles, function (o) {
+                return o._id == printer.selectedFilament[index].spools.profile;
+              });
+            }
+            printer.selectedFilament[index].spools.profile = profiles[profileId].profile;
           }
-          printer.selectedFilament[index].spools.profile = profiles[profileId].profile;
         })
       }
       if (historyCollection.length === 0) {
@@ -186,16 +188,18 @@ class HistoryCollection {
       if (printer.selectedFilament !== null && Array.isArray(printer.selectedFilament)) {
         let profileId = [];
         printer.selectedFilament.forEach((spool,index) => {
-          if (serverSettings[0].filamentManager) {
-            profileId = _.findIndex(profiles, function (o) {
-              return o.profile.index == printer.selectedFilament[index].spools.profile;
-            });
-          } else {
-            profileId = _.findIndex(profiles, function (o) {
-              return o._id == printer.selectedFilament[index].spools.profile;
-            });
+          if(spool !== null){
+            if (serverSettings[0].filamentManager) {
+              profileId = _.findIndex(profiles, function (o) {
+                return o.profile.index == printer.selectedFilament[index].spools.profile;
+              });
+            } else {
+              profileId = _.findIndex(profiles, function (o) {
+                return o._id == printer.selectedFilament[index].spools.profile;
+              });
+            }
+            printer.selectedFilament[index].spools.profile = profiles[profileId].profile;
           }
-          printer.selectedFilament[index].spools.profile = profiles[profileId].profile;
         })
       }
       if (historyCollection.length === 0) {

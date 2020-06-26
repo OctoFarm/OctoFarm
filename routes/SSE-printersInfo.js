@@ -10,18 +10,8 @@ const PrinterClean = printerClean.PrinterClean;
 
 let clientId = 0;
 let clients = {}; // <- Keep a map of attached clients
+let interval = false;
 
-
-setInterval(async function() {
-    let printersInformation = await PrinterClean.returnPrintersInformation();
-    let printerControlList = await PrinterClean.returnPrinterControlList();
-    let infoDrop = {
-        printersInformation: printersInformation,
-        printerControlList: printerControlList
-    }
-    clientInformation = await stringify(infoDrop);
-
-}, 500);
 // Called once for each new client. Note, this response is left open!
 router.get("/get/", ensureAuthenticated, function(req, res) {
     //req.socket.setTimeout(Number.MAX_VALUE);
@@ -40,14 +30,22 @@ router.get("/get/", ensureAuthenticated, function(req, res) {
     //console.log("Client: " + Object.keys(clients));
 });
 
-setInterval(async function() {
-    for (clientId in clients) {
-        for (clientId in clients) {
-            clients[clientId].write("data: " + clientInformation + "\n\n"); // <- Push a message to a single attached client
+if(interval === false){
+    setInterval(async function() {
+        let printersInformation = await PrinterClean.returnPrintersInformation();
+        let printerControlList = await PrinterClean.returnPrinterControlList();
+        let infoDrop = {
+            printersInformation: printersInformation,
+            printerControlList: printerControlList
         }
-    }
-}, 500);
-
+        clientInformation = await stringify(infoDrop);
+        for (clientId in clients) {
+            for (clientId in clients) {
+                clients[clientId].write("data: " + clientInformation + "\n\n"); // <- Push a message to a single attached client
+            }
+        }
+    }, 500);
+}
 
 
 module.exports = router;
