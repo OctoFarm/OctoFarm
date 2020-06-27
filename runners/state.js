@@ -979,6 +979,7 @@ class Runner {
                                 entry.path.lastIndexOf("/")
                             );
                         }
+                        folderPaths.display = folderPaths.name.replace("/_/g"," ");
                         printerLocations.push(folderPaths);
                     }
                     farmPrinters[index].fileList = {
@@ -987,17 +988,20 @@ class Runner {
                         folders: printerLocations,
                         folderCount: printerLocations.length
                     };
-
+                    farmPrinters[index].fileList.clean = true;
                     if (isFolder) {
                         _.each(entry.children, function(child) {
                             recursivelyPrintNames(child, depth + 1);
                         });
                     }
                 };
+
                 _.each(res.files, function(entry) {
                     recursivelyPrintNames(entry);
                 });
+
                 logger.info("Successfully grabbed Files for...: " + farmPrinters[index].printerURL);
+                return true;
             })
             .catch(err => {
                 logger.error("Error grabbing files for: " + farmPrinters[index].printerURL + ": Reason: ", err);
@@ -1053,7 +1057,6 @@ class Runner {
             .then(res => {
                 //Update info to DB
                 farmPrinters[index].profiles = res.profiles;
-                farmPrinters[index].systemChecks.profile = true;
                 logger.info("Successfully grabbed Profiles.js for...: " + farmPrinters[index].printerURL);
             })
             .catch(err => {
@@ -1124,7 +1127,6 @@ class Runner {
                         let printer = await Printers.findOne({ index: index });
                         printer.camURL = farmPrinters[index].camURL;
                         printer.save();
-
                     }
                 }
                 farmPrinters[index].systemChecks.settings = true;
@@ -1270,6 +1272,7 @@ class Runner {
         printer.settingsApperance.name = settings.profile.name;
         printer.markModified("settingsAppearance")
         farmPrinters[index].powerSettings = settings.powerCommands;
+
         printer.powerSettings = settings.powerCommands;
         printer.markModified("powerSettings")
 
@@ -1388,10 +1391,12 @@ class Runner {
             path = folder.path;
             name = path + "/" + name;
         }
+        let display = JSON.parse(JSON.stringify(name))
         name = name.replace(/ /g, "_");
         let newFolder = {
             name: name,
-            path: path
+            path: path,
+            display: display,
         };
 
         farmPrinters[i].fileList.folders.push(newFolder);
@@ -1541,9 +1546,9 @@ class Runner {
             thumbnail: null,
         };
         farmPrinters[i].fileList.files.push(data);
-        await Runner.getFiles(farmPrinters[i]._id, "files?recursive=true");
+        Runner.getFiles(farmPrinters[i]._id, "files?recursive=true");
         setTimeout(async function(){
-            await Runner.getFiles(farmPrinters[i]._id, "files?recursive=true");
+            Runner.getFiles(farmPrinters[i]._id, "files?recursive=true");
         }, 5000);
 
     }

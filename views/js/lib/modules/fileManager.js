@@ -21,7 +21,7 @@ setInterval(async () => {
       file.index = current.index;
       file.uploadDate = currentDate.getTime() / 1000;
       let post = await OctoFarmClient.post("printers/newFiles", file);
-      let update = await FileManager.updateFileList(file.index);
+      let update = await FileManager.drawFile(file);
       fileUploads.remove();
       let fileCounts = document.getElementById("fileCounts-" + current.index);
       if(fileCounts && fileCounts.innerHTML == 1){
@@ -241,7 +241,6 @@ export default class FileManager {
       i: printer._id
     });
     let how = await done.json();
-    console.log(how)
     let flashReturn = function() {
       e.target.classList = "btn btn-primary mb-0";
       e.target.innerHTML = "<i class='fas fa-sync'></i> Re-Sync";
@@ -287,239 +286,284 @@ export default class FileManager {
     }
     jplist.refresh();
   }
-  static refreshFiles(printer){
-    if(document.getElementById(`file-${file.fullPath}`)){
-      document.getElementById("")
+  static async drawFile(file){
+    try{
+      let fileElem = document.getElementById("fileList-"+file.index);
+      let fileDate = new Date(file.uploadDate*1000);
+      let dateString = fileDate.toDateString();
+      let timeString = fileDate.toTimeString().substring(0, 8);
+      fileDate = dateString + " " + timeString;
+      let f = ` <a
+            data-jplist-item
+            id="file-${file.files.local.path}"
+            href="#"
+          class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
+            style="display: block;
+            padding: 0.7rem 0.1rem;"
+            >
+            <div class="row">
+                <div
+                id="fileThumbnail-${file.files.local.path}"
+          class="col-lg-2"
+            style="display:flex; justify-content:center; align-items:center;"
+                >
+                <center><i class=\"fas fa-file-code fa-2x\"></i></center>
+                </div>
+                <div class="col-lg-10">
+                <div class="row">
+                <div class="col-12">
+                <h5 class="mb-1 name">${file.files.local.name.replace("/_/g"," ")}</h5>         
+                </div>
+                </div>
+                <div class="row">
+                <div class="col-12">
+                <p class="mb-1 float-right">
+                <i class="fas fa-stopwatch"></i> 
+                <span class="time" id="fileTime-${file.files.local.path}">
+                <i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span> <br> 
+                <i class="fas fa-dollar-sign"></i> 
+                <span title="Expected Printer Cost" class="cost" id="fileCost-${file.files.local.path}">  <i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span>  </span>    <br> 
+            <span title="Expected Filament Cost" > </span>
+
+                </p>
+                <p class="mb-1 float-left">
+                <i class="fas fa-clock"></i><span id="fileDateClean-${file.files.local.path}" class="date d-none"> ${file.uploadDate}</span><span id="fileDate-${file.files.local.path}"> ${fileDate}</span><br>
+                <i class="fas fa-hdd"></i><span class="size" id="fileSize-${file.files.local.path}">  <i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span> </span> <br>
+            <span class="usage" title="Expected Filament Usage/Cost" id="fileTool-${file.files.local.path}">  <i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span>  </span>
+
+                </p> 
+                </div>
+                </div>
+                </div>
+                <div class="col-lg-12">
+                <div
+          class="d-flex btn-group flex-wrap btn-group-sm"
+            role="group"
+            aria-label="Basic example"
+                >
+                <button
+            title="Re-Sync File"
+            id="${file.index}*fileActionUpdate*${file.files.local.path}"
+            role="button"
+          class="btn btn-dark"
+                >
+                <i class="fas fa-sync"></i> Re-Sync
+                </button>
+                <button           title="Start printing file"
+            id="${file.index}*fileActionStart*${file.files.local.path}" type="button" class="btn btn-success">
+          <i class="fas fa-play"></i> Start
+              </button>
+              <button  title="Select file" id="${file.index}*fileActionSelect*${file.files.local.path}" type="button" class="btn btn-info">
+        <i class="fas fa-file-upload"></i> Select
+            </button>
+            <button          title="Move file" id="${file.index}*fileActionMove*${file.files.local.path}" type="button" class="btn btn-warning">
+      <i class="fas fa-people-carry"></i> Move
+          </button>
+          <button          title="Download file" onclick="window.open('${file.files.local.refs.download}')" type="button" class="btn btn-dark">
+    <i class="fas fa-download"></i> Download
+        </button>
+        <button title="Delete file" id="${file.index}*fileActionDelete*${file.files.local.path}" type="button" class="btn btn-danger">
+  <i class="fas fa-trash-alt"></i> Delete
+      </button>
+      </div>
+      </div>
+      </div>
+      </div>
+      </a>`
+      fileElem.insertAdjacentHTML("afterbegin", f)
+      let fileActionBtns = document.querySelectorAll("[id*='*fileAction']");
+      fileActionBtns.forEach(btn => {
+        //Gate Keeper listener for file action buttons
+        btn.addEventListener("click", async e => {
+          let printer = await OctoFarmClient.post("printers/printerInfo", {
+            i: file.index
+          });
+          printer = await printer.json();
+          FileManager.actionBtnGate(printer, btn.id);
+        });
+      })
+      if(fileSortInit){
+        jplist.refresh();
+      }else{
+        jplist.init({
+          storage: 'localStorage', //'localStorage', 'sessionStorage' or 'cookies'
+          storageName: 'file-sorting' //the same storage name can be used to share storage between multiple pages
+        });
+      }
+    }catch(e){
+      console.log(e)
     }
   }
-  static drawFiles(printer, recursive) {
-    let fileElem = document.getElementById("fileList-"+printer._id);
-    if(fileElem){
-      let fileList = printer.fileList.fileList;
-      if (fileList.length === 0) {
-        fileElem.innerHTML = `
-      <div class="noStorage  text-center"><i class="fas fa-file-code fa-5x"></i><br><h5>There are no files in local storage...</h5></div>
-      `;
-      } else {
-        fileElem.innerHTML = "";
+  static async refreshFiles(printer){
+      for(let i = 0; i < printer.fileList.fileList.length; i++){
+        let file = printer.fileList.fileList[i];
         let currentFolder = document.getElementById("currentFolder").innerHTML;
         if (currentFolder.includes("local/")) {
           currentFolder = currentFolder.replace("local/", "");
         }
-        fileList.forEach(file => {
-          let toolInfo = "";
-          file.toolUnits.forEach((unit,index) => {
-            toolInfo += "<i class=\"fas fa-weight\"></i> "+ unit + " / <i class=\"fas fa-dollar-sign\"></i> Cost: "+file.toolCosts[index] + "<br>";
-          })
-          let thumbnail = "<center><i class=\"fas fa-file-code fa-2x\"></i></center>";
-          if(typeof file.thumbnail !== 'undefined' && file.thumbnail !== null ){
-            thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
+        if(file.path === currentFolder){
+          if(document.getElementById(`file-${file.fullPath}`)){
+            let toolInfo = "";
+            file.toolUnits.forEach((unit,index) => {
+              toolInfo += "<i class=\"fas fa-weight\"></i> "+ unit + " / <i class=\"fas fa-dollar-sign\"></i> Cost: "+file.toolCosts[index] + "<br>";
+            })
+            let thumbnail = "<center><i class=\"fas fa-file-code fa-2x\"></i></center>";
+            if(typeof file.thumbnail !== 'undefined' && file.thumbnail !== null ){
+              thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
+            }
+            let fileDate = new Date(file.uploadDate*1000);
+            let dateString = fileDate.toDateString();
+            let timeString = fileDate.toTimeString().substring(0, 8);
+            fileDate = dateString + " " + timeString;
+            document.getElementById(`fileDate-${file.fullPath}`).innerHTML = " " + fileDate;
+            document.getElementById(`fileSize-${file.fullPath}`).innerHTML = " " + Calc.bytes(file.fileSize);
+            document.getElementById(`fileTool-${file.fullPath}`).innerHTML = " " + toolInfo;
+            document.getElementById(`fileTime-${file.fullPath}`).innerHTML = " " + Calc.generateTime(file.expectedPrintTime);
+            document.getElementById(`fileCost-${file.fullPath}`).innerHTML = " " + `Print Cost: ${file.printCost}`;
+            document.getElementById(`fileThumbnail-${file.fullPath}`).innerHTML = " " + thumbnail;
+            document.getElementById(`fileDateClean-${file.fullPath}`).innerHTML = file.uploadDate;
+
           }
-          let fileDate = new Date(file.uploadDate*1000);
-          let dateString = fileDate.toDateString();
-          let timeString = fileDate.toTimeString().substring(0, 8);
-          fileDate = dateString + " " + timeString;
+        }
+      }
 
-            if (typeof recursive != "undefined") {
-
-              fileElem.insertAdjacentHTML(
-                  "beforeend",
-                  `
-           <a
-          data-jplist-item
-          id="file-${file.fullPath}"
-          href="#"
+  }
+  static drawFiles(printer, recursive) {
+    try{
+      let fileElem = document.getElementById("fileList-"+printer._id);
+      if(fileElem){
+        let fileList = printer.fileList;
+        if (!printer.systemChecks.files) {
+          fileElem.innerHTML = `
+            <div class="noStorage  text-center"><i class="fas fa-file-code fa-5x"></i><br><h5>There are no files in local storage...</h5></div>
+      `;
+        } else {
+          fileElem.innerHTML = "";
+          let currentFolder = document.getElementById("currentFolder").innerHTML;
+          if (currentFolder.includes("local/")) {
+            currentFolder = currentFolder.replace("local/", "");
+          }
+          fileList.fileList.forEach(file => {
+            let toolInfo = "";
+            file.toolUnits.forEach((unit,index) => {
+              toolInfo += "<i class=\"fas fa-weight\"></i> "+ unit + " / <i class=\"fas fa-dollar-sign\"></i> Cost: "+file.toolCosts[index] + "<br>";
+            })
+            let thumbnail = "<center><i class=\"fas fa-file-code fa-2x\"></i></center>";
+            if(typeof file.thumbnail !== 'undefined' && file.thumbnail !== null ){
+              thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
+            }
+            let fileDate = new Date(file.uploadDate*1000);
+            let dateString = fileDate.toDateString();
+            let timeString = fileDate.toTimeString().substring(0, 8);
+            fileDate = dateString + " " + timeString;
+            let f = ` <a
+            data-jplist-item
+            id="file-${file.fullPath}"
+            href="#"
           class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
-          style="display: block;
-          padding: 0.7rem 0.1rem;"
-        >
-          <div class="row">
-            <div
-              class="col-lg-2"
-              style="display:flex; justify-content:center; align-items:center;"
+            style="display: block;
+            padding: 0.7rem 0.1rem;"
             >
-                   ${thumbnail}
-            </div>
-            <div class="col-lg-10">
+            <div class="row">
+                <div
+                            id="fileThumbnail-${file.fullPath}"
+          class="col-lg-2"
+            style="display:flex; justify-content:center; align-items:center;"
+                >
+                ${thumbnail}
+                </div>
+                <div class="col-lg-10">
                 <div class="row">
-                    <div class="col-12">
-                                <h5 class="mb-1 name">${file.display}</h5>         
-                    </div>
+                <div class="col-12">
+                <h5 class="mb-1 name">${file.display}</h5>         
+                </div>
                 </div>
                 <div class="row">
-                    <div class="col-12">
-          <p class="mb-1 float-right">
-              <i class="fas fa-stopwatch"></i> 
-                <span class="time">
+                <div class="col-12">
+                <p class="mb-1 float-right">
+                <i class="fas fa-stopwatch"></i> 
+                <span class="time" id="fileTime-${file.fullPath}">
                     ${Calc.generateTime(file.expectedPrintTime)}</span> <br> 
-               <i class="fas fa-dollar-sign"></i> 
-               <span title="Expected Printer Cost" class="cost"> Print Cost: ${file.printCost} </span>    <br> 
-               <span title="Expected Filament Cost"> </span>
+                <i class="fas fa-dollar-sign"></i> 
+                <span title="Expected Printer Cost" class="cost" id="fileCost-${file.fullPath}"> Print Cost: ${file.printCost} </span>    <br> 
+            <span title="Expected Filament Cost"> </span>
 
-          </p>
-          <p class="mb-1 float-left">
-          <i class="fas fa-clock"></i><span class="date d-none"> ${file.uploadDate}</span><span id="fileDate-${file.fullPath}"> ${fileDate}</span><br>
-          <i class="fas fa-hdd"></i><span class="size" id="fileSize-${file.fullPath}"> ${Calc.bytes(file.fileSize)}</span> <br>
-          <span class="usage" title="Expected Filament Usage/Cost"> ${toolInfo} </span>
-          
-          </p> 
-                    </div>
+                </p>
+                <p class="mb-1 float-left">
+                <i class="fas fa-clock"></i><span id="fileDateClean-${file.fullPath}" class="date d-none"> ${file.uploadDate}</span><span id="fileDate-${file.fullPath}"> ${fileDate}</span><br>
+                <i class="fas fa-hdd"></i><span class="size" id="fileSize-${file.fullPath}"> ${Calc.bytes(file.fileSize)}</span> <br>
+            <span class="usage" title="Expected Filament Usage/Cost" id="fileTool-${file.fullPath}"> ${toolInfo} </span>
+
+                </p> 
                 </div>
-              </div>
-            <div class="col-lg-12">
-                   <div
-              class="d-flex btn-group flex-wrap btn-group-sm"
-              role="group"
-              aria-label="Basic example"
-            >
-              <button
-                title="Re-Sync File"
-                id="${printer._id}*fileActionUpdate*${file.fullPath}"
-                role="button"
-                class="btn btn-dark"
-              >
+                </div>
+                </div>
+                <div class="col-lg-12">
+                <div
+          class="d-flex btn-group flex-wrap btn-group-sm"
+            role="group"
+            aria-label="Basic example"
+                >
+                <button
+            title="Re-Sync File"
+            id="${printer._id}*fileActionUpdate*${file.fullPath}"
+            role="button"
+          class="btn btn-dark"
+                >
                 <i class="fas fa-sync"></i> Re-Sync
-              </button>
-              <button           title="Start printing file"
-              id="${printer._id}*fileActionStart*${
-                      file.fullPath
-                  }" type="button" class="btn btn-success">
-                <i class="fas fa-play"></i> Start
+                </button>
+                <button           title="Start printing file"
+            id="${printer._id}*fileActionStart*${
+            file.fullPath
+          }" type="button" class="btn btn-success">
+          <i class="fas fa-play"></i> Start
               </button>
               <button  title="Select file" id="${printer._id}*fileActionSelect*${
-                      file.fullPath
-                  }" type="button" class="btn btn-info">
-                <i class="fas fa-file-upload"></i> Select
-              </button>
-              <button          title="Move file" id="${printer._id}*fileActionMove*${
-                      file.fullPath
-                  }" type="button" class="btn btn-warning">
-                <i class="fas fa-people-carry"></i> Move
-              </button>
-              <button          title="Download file" onclick="window.open('${printer.printerURL}/downloads/files/local/${
-                      file.fullPath
-                  }')" type="button" class="btn btn-dark">
-                <i class="fas fa-download"></i> Download
-              </button>
-              <button title="Delete file" id="${printer.printerURL}*fileActionDelete*${
-                      file.fullPath
-                  }" type="button" class="btn btn-danger">
-                <i class="fas fa-trash-alt"></i> Delete
-              </button>
-              </div>
-              </div>
-            </div>
-          </div>
-        </a>
-          `
+          file.fullPath
+        }" type="button" class="btn btn-info">
+        <i class="fas fa-file-upload"></i> Select
+            </button>
+            <button          title="Move file" id="${printer._id}*fileActionMove*${
+        file.fullPath
+      }" type="button" class="btn btn-warning">
+      <i class="fas fa-people-carry"></i> Move
+          </button>
+          <button          title="Download file" onclick="window.open('${printer.printerURL}/downloads/files/local/${
+      file.fullPath
+    }')" type="button" class="btn btn-dark">
+    <i class="fas fa-download"></i> Download
+        </button>
+        <button title="Delete file" id="${printer.printerURL}*fileActionDelete*${
+    file.fullPath
+  }" type="button" class="btn btn-danger">
+  <i class="fas fa-trash-alt"></i> Delete
+      </button>
+      </div>
+      </div>
+      </div>
+      </div>
+      </a>`
+
+            if (typeof recursive != "undefined") {
+              fileElem.insertAdjacentHTML(
+                  "beforeend",
+                  f
               );
             } else if (file.path == currentFolder) {
               fileElem.insertAdjacentHTML(
                   "beforeend",
-                  `
-          <a
-          data-jplist-item
-          id="file-${file.fullPath}"
-          href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
-          style="display: block;
-          padding: 0.7rem 0.1rem;"
-        >
-          <div class="row">
-            <div
-              class="col-lg-2"
-              style="display:flex; justify-content:center; align-items:center;"
-            >
-                   ${thumbnail}
-            </div>
-            <div class="col-lg-10">
-                <div class="row">
-                    <div class="col-12">
-                                <h5 class="mb-1 name">${file.display}</h5>         
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-          <p class="mb-1 float-right">
-              <i class="fas fa-stopwatch"></i> 
-                <span class="time">
-                    ${Calc.generateTime(file.expectedPrintTime)}</span> <br> 
-               <i class="fas fa-dollar-sign"></i> 
-               <span title="Expected Printer Cost" class="cost"> Print Cost: ${file.printCost} </span>    <br> 
-               <span title="Expected Filament Cost"> </span>
-
-          </p>
-          <p class="mb-1 float-left">
-          <i class="fas fa-clock"></i><span class="date d-none"> ${file.uploadDate}</span><span id="fileDate-${file.fullPath}"> ${fileDate}</span><br>
-          <i class="fas fa-hdd"></i><span class="size"> ${Calc.bytes(file.fileSize)}</span> <br>
-          <span class="usage" title="Expected Filament Usage/Cost"> ${toolInfo} </span>
-          
-          </p> 
-                    </div>
-                </div>
-              </div>
-            <div class="col-lg-12">
-                   <div
-              class="d-flex btn-group flex-wrap btn-group-sm"
-              role="group"
-              aria-label="Basic example"
-            >
-              <button
-                title="Re-Sync File"
-                id="${printer._id}*fileActionUpdate*${file.fullPath}"
-                role="button"
-                class="btn btn-dark"
-              >
-                <i class="fas fa-sync"></i> Re-Sync
-              </button>
-              <button           title="Start printing file"
-              id="${printer._id}*fileActionStart*${
-                      file.fullPath
-                  }" type="button" class="btn btn-success">
-                <i class="fas fa-play"></i> Start
-              </button>
-              <button  title="Select file" id="${printer._id}*fileActionSelect*${
-                      file.fullPath
-                  }" type="button" class="btn btn-info">
-                <i class="fas fa-file-upload"></i> Select
-              </button>
-              <button          title="Move file" id="${printer._id}*fileActionMove*${
-                      file.fullPath
-                  }" type="button" class="btn btn-warning">
-                <i class="fas fa-people-carry"></i> Move
-              </button>
-              <button          title="Download file" onclick="window.open('${printer.printerURL}/downloads/files/local/${
-                      file.fullPath
-                  }')" type="button" class="btn btn-dark">
-                <i class="fas fa-download"></i> Download
-              </button>
-              <button title="Delete file" id="${printer.printerURL}*fileActionDelete*${
-                      file.fullPath
-                  }" type="button" class="btn btn-danger">
-                <i class="fas fa-trash-alt"></i> Delete
-              </button>
-              </div>
-              </div>
-            </div>
-          </div>
-        </a>
-          `
+                  f
               );
             }
 
 
-        });
-        fileList.folders = _.sortBy(fileList.folders, [
-          function(o) {
-            return o.display;
-          }
-        ]);
-        //then draw folders
-        fileList.folders.forEach(folder => {
-          if (folder.path == currentFolder) {
-            fileElem.insertAdjacentHTML(
-                "beforeend",
-                `<a
+          });
+          //then draw folders
+          fileList.folderList.forEach(folder => {
+            if (folder.path == currentFolder) {
+              fileElem.insertAdjacentHTML(
+                  "beforeend",
+                  `<a
               id="file-${folder.name}"
               href="#"
               class="list-group-item list-group-item-action flex-column align-items-start bg-dark folderAction"
@@ -539,7 +583,7 @@ export default class FileManager {
                   >
                   <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1 float-left">
-                      ${folder.name}
+                      ${folder.display}
                     </h5>
                     <div
                       class="float-right btn-group flex-wrap btn-group-sm"
@@ -559,20 +603,24 @@ export default class FileManager {
             </a>
          
             `
-            );
-          }
-        });
-        FileManager.updateListeners(printer);
+              );
+            }
+          });
+          FileManager.updateListeners(printer);
+        }
       }
+      if(fileSortInit){
+        jplist.refresh();
+      }else{
+        jplist.init({
+          storage: 'localStorage', //'localStorage', 'sessionStorage' or 'cookies'
+          storageName: 'file-sorting' //the same storage name can be used to share storage between multiple pages
+        });
+      }
+    }catch(e){
+      console.log(e)
     }
-    if(fileSortInit){
-      jplist.refresh();
-    }else{
-      jplist.init({
-        storage: 'localStorage', //'localStorage', 'sessionStorage' or 'cookies'
-        storageName: 'file-sorting' //the same storage name can be used to share storage between multiple pages
-      });
-    }
+
 
   }
   static search(id){
@@ -582,6 +630,7 @@ export default class FileManager {
     FileActions.createFolder(printer);
   }
   static updateListeners(printer) {
+    console.log(printer)
     let fileElem = document.getElementById("fileList-"+printer._id)
     dragAndDropEnable(fileElem, printer);
     let folders = document.querySelectorAll(".folderAction");
