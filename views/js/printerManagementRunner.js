@@ -710,9 +710,9 @@ class dashUpdate {
                         settingsCheck: document.getElementById("settingsCheck-"+printer._id),
                         systemCheck: document.getElementById("systemCheck-"+printer._id)
                     }
-                    let checkKeys = Object.keys(printer.systemCheck);
+                    let checkKeys = Object.keys(printer.systemChecks);
                     checkKeys.forEach(key => {
-                        if(printer.systemCheck[key]){
+                        if(printer.systemChecks[key]){
                             if(systemChecks[key+"Check"].classList.contains("text-offline")){
                                 systemChecks[key+"Check"].classList.remove("text-offline")
                             }

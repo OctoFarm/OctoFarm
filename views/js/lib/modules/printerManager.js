@@ -14,6 +14,8 @@ let controlDropDown = false;
 
 let currentPrinter = null;
 
+let refreshCounter = 5000;
+
 $("#connectionModal").on("hidden.bs.modal", function(e) {
   if (document.getElementById("connectionAction")) {
     document.getElementById("connectionAction").remove();
@@ -28,7 +30,7 @@ export default class PrinterManager {
         document.getElementById("printerControlCamera").src = "";
       }
 
-      currentIndex = index;
+        currentIndex = index;
         let id = _.findIndex(printers, function(o) { return o._id == index; });
         currentPrinter = printers[id];
         //Load the printer dropdown
@@ -72,10 +74,24 @@ export default class PrinterManager {
       if(document.getElementById("terminal")){
         let id = _.findIndex(printers, function(o) { return o._id == currentIndex; });
         currentPrinter = printers[id];
+        let printerDrop = document.getElementById("printerSelection");
+        printerDrop.value = currentPrinter._id;
         let elements = await PrinterManager.grabPage();
         PrinterManager.applyState(currentPrinter, elements);
         PrinterManager.applyTemps(currentPrinter, elements);
         document.getElementById("printerManagerModal").style.overflow = "auto";
+        //Auto refresh of files
+        if(currentPrinter.fileList.fileList.length < 150){
+          FileManager.refreshFiles(currentPrinter);
+        }else{
+          if(refreshCounter >= 5000){
+            FileManager.refreshFiles(currentPrinter);
+            refreshCounter = 0;
+          }else{
+            refreshCounter = parseInt(refreshCounter) + 500;
+          }
+        }
+
       }
 
     }

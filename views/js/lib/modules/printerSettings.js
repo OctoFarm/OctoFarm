@@ -6,11 +6,9 @@ import Script from "./scriptCheck.js";
 
 let currentIndex = 0;
 
-let previousLog = null;
+let controlDropDown = false;
 
-let lastPrinter = null;
-
-let printDropCheck = false;
+let currentPrinter = null;
 
 //Close modal event listeners...
 $("#PrinterSettingsModal").on("hidden.bs.modal", function(e) {
@@ -24,19 +22,6 @@ $("#connectionModal").on("hidden.bs.modal", function(e) {
 });
 
 export default class PrinterSettings {
-  static grabName(printer){
-    let name = "";
-    if (typeof printer.settingsAppearance != "undefined") {
-      if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
-        name = printer.printerURL;
-      } else {
-        name = printer.settingsAppearance.name;
-      }
-    } else {
-      name = printer.printerURL;
-    }
-    return name;
-  }
   static grabThumb(value){
     if(value === true){
       return "<i class=\"text-success fas fa-thumbs-up\"></i>"
@@ -44,243 +29,141 @@ export default class PrinterSettings {
       return "<i class=\"text-danger fas fa-thumbs-down\"></i>"
     }
   }
-  static async init(printers) {
-    let i = _.findIndex(printers, function (o) {
-      return o._id == currentIndex;
-    });
+  static async init(index, printers, printerControlList) {
+    if(index !== ""){
 
-    let printer = null;
-    if (typeof printers != "undefined" && printers != "") {
-      if (typeof printers.length === "undefined") {
-        printer = printers;
-        lastPrinter = printers;
-      } else {
-        printer = printers[i];
-      }
-
-      if (typeof printer.options === "undefined") {
-        return;
-      }
-
-      const availableBaud = printer.options.baudrates;
-      const availablePort = printer.options.ports;
-      const availableProfile = printer.options.printerProfiles;
-
-      const preferedBaud = printer.options.baudratePreference;
-      const preferedPort = printer.options.portPreference;
-      const preferedProfile = printer.options.printerProfilePreference;
-      const selectedBaud = printer.current.baudrate;
-      const selectedPort = printer.current.port;
-      const selectedProfile = printer.current.printerProfile;
-      //Attempted printer pofile fix...
-      let pProfile = null;
-      if (typeof selectedProfile !== 'undefined' && typeof printer.profile[selectedProfile] !== 'undefined') {
-        pProfile = printer.profile[selectedProfile];
-      } else {
-        pProfile = {
-          model: "Couldn't grab...",
-          volume: {
-            height: "000",
-            width: "000",
-            depth: "000"
-          },
-          extruder: {
-            count: "0",
-            nozzleDiameter: "0",
-          },
-          heatedChamber: false,
-        }
-      }
-
-      if (
-          currentIndex ===
-          document.getElementById("printerSettingsIndex").innerHTML
-      ) {
-      } else {
-        //Load the printer drop down...
-        let printerDrop = document.getElementById("printerSettingsSelection");
+      currentIndex = index;
+      let id = _.findIndex(printers, function(o) { return o._id == index; });
+      currentPrinter = printers[id];
+      //Load the printer dropdown
+      if(!controlDropDown){
+        let printerDrop = document.getElementById("printerSelection");
         printerDrop.innerHTML = "";
-        printers.forEach(printer => {
-          let name = PrinterSettings.grabName(printer);
-          if(printer.stateColour.category !== "Offline"){
+        printerControlList.forEach(list => {
+          if (list.state.category !== "Offline") {
             printerDrop.insertAdjacentHTML('beforeend', `
-                <option value="${printer._id}" selected>${name}</option>
-            `)
+                  <option value="${list.printerID}" selected>${list.printerName}</option>
+              `)
           }
         })
-        printerDrop.value = printer._id;
-        if(!printDropCheck){
-          printerDrop.addEventListener('change', event => {
-            let newIndex = document.getElementById("printerSettingsSelection").value;
-            PrinterSettings.updateIndex(newIndex);
-            PrinterSettings.init(printers)
-          });
-          printDropCheck = true;
-        }
-        //Setup page
-        const printerPort = document.getElementById("psPortDrop");
-        const printerBaud = document.getElementById("psBaudDrop");
-        const printerProfile = document.getElementById("psProfileDrop");
-        const printerConnect = document.getElementById("psConnect");
+        printerDrop.value = currentPrinter._id;
+        printerDrop.addEventListener('change', event => {
+          if(document.getElementById("printerControls")){
+            document.getElementById("printerControls").innerHTML = "";
+          }
+          document.getElementById("pmStatus").innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i>";
+          document.getElementById("pmStatus").className = `btn btn-secondary mb-2`;
+          //Load Connection Panel
+          document.getElementById("printerPortDrop").innerHTML = "";
+          document.getElementById("printerBaudDrop").innerHTML = "";
+          document.getElementById("printerProfileDrop").innerHTML = "";
+          document.getElementById("printerConnect").innerHTML = "";
+          PrinterManager.init(event.target.value, printers, printerControlList);
+        });
+        controlDropDown = true;
+      }
+      const printerDefaultPort = document.getElementById("psDefaultPortDrop");
+      const printerDefaultBaud = document.getElementById("psDefaultBaudDrop");
+      const printerDefaultProfile = document.getElementById("psDefaultProfileDrop");
 
-        // printerPort.innerHTML = `
-        // <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardSerialPort">Port:</label> </div> <select class="custom-select bg-secondary text-light" id="psSerialPort"></select></div>
-        // `;
-        // printerBaud.innerHTML = `
-        // <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardBaudrate">Baudrate:</label> </div> <select class="custom-select bg-secondary text-light" id="psBaudrate"></select></div>
-        // `;
-        // printerProfile.innerHTML = `
-        // <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardPrinterProfile">Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="psProfile"></select></div>
-        // `;
-        // availableBaud.forEach(baud => {
-        //   document
-        //       .getElementById("psBaudrate")
-        //       .insertAdjacentHTML(
-        //           "beforeend",
-        //           `<option value="${baud}">${baud}</option>`
-        //       );
-        // });
-        // if (preferedBaud != null) {
-        //   document.getElementById("psBaudrate").value = preferedBaud;
-        // }
-        // availablePort.forEach(port => {
-        //   document
-        //       .getElementById("psSerialPort")
-        //       .insertAdjacentHTML(
-        //           "beforeend",
-        //           `<option value="${port}">${port}</option>`
-        //       );
-        // });
-        // if (preferedPort != null) {
-        //   document.getElementById("psSerialPort").value = preferedPort;
-        // }
-        // availableProfile.forEach(profile => {
-        //   document
-        //       .getElementById("psProfile")
-        //       .insertAdjacentHTML(
-        //           "beforeend",
-        //           `<option value="${profile.id}">${profile.name}</option>`
-        //       );
-        // });
-        // if (preferedProfile != null) {
-        //   document.getElementById("psProfile").value = preferedProfile;
-        // }
-        //
-        // if (printer.state === "Disconnected") {
-        //   printerConnect.innerHTML =
-        //       '<center> <button id="psConnectBtn" class="btn btn-success inline" value="connect">Connect</button></center>';
-        // } else {
-        //   printerConnect.innerHTML =
-        //       '<center> <button id="psConnectBtn" class="btn btn-danger inline" value="disconnect">Disconnect</button></center>';
-        //   document.getElementById("psSerialPort").disabled = true;
-        //   document.getElementById("psBaudrate").disabled = true;
-        //   document.getElementById("psProfile").disabled = true;
-        // }
-
-        const printerDefaultPort = document.getElementById("psDefaultPortDrop");
-        const printerDefaultBaud = document.getElementById("psDefaultBaudDrop");
-        const printerDefaultProfile = document.getElementById("psDefaultProfileDrop");
-
-        printerDefaultPort.innerHTML = `
+      printerDefaultPort.innerHTML = `
         <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultSerialPort"">Preferred Port:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultSerialPort"></select></div>
         `;
-        printerDefaultBaud.innerHTML = `
+      printerDefaultBaud.innerHTML = `
         <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultBaudrate">Preferred Baudrate:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultBaudrate"></select></div>
         `;
-        printerDefaultProfile.innerHTML = `
+      printerDefaultProfile.innerHTML = `
         <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultProfile">Preferred Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultProfile"></select></div>
         `;
-        document.getElementById("printerSettingsIndex").innerHTML = printer._id;
-        availableBaud.forEach(baud => {
-          document
-              .getElementById("psDefaultBaudrate")
-              .insertAdjacentHTML(
-                  "beforeend",
-                  `<option value="${baud}">${baud}</option>`
-              );
-        });
-        if(preferedBaud === null) {
-          document
-              .getElementById("psDefaultBaudrate")
-              .insertAdjacentHTML(
-                  "afterbegin",
-                  `<option value="0">No Preference</option>`);
-        }
-        availablePort.forEach(port => {
-          document
-              .getElementById("psDefaultSerialPort")
-              .insertAdjacentHTML(
-                  "beforeend",
-                  `<option value="${port}">${port}</option>`
-              );
-        });
-        if(preferedPort === null) {
-          document
-              .getElementById("psDefaultSerialPort")
-              .insertAdjacentHTML(
-                  "afterbegin",
-                  `<option value="0">No Preference</option>`);
-        }
-        availableProfile.forEach(profile => {
-          document
-              .getElementById("psDefaultProfile")
-              .insertAdjacentHTML(
-                  "beforeend",
-                  `<option value="${profile.id}">${profile.name}</option>`
-              );
-        });
-        if(preferedProfile === null) {
-          document
-              .getElementById("psDefaultProfile")
-              .insertAdjacentHTML(
-                  "afterbegin",
-                  `<option value="0">No Preference</option>`);
-        }
-        if (preferedBaud != null) {
+      currentPrinter.connectionOptions.baudrates.forEach(baud => {
+        document
+            .getElementById("psDefaultBaudrate")
+            .insertAdjacentHTML(
+                "beforeend",
+                `<option value="${baud}">${baud}</option>`
+            );
+      });
+      if(currentPrinter.connectionOptions.baudratePreference === null) {
+        document
+            .getElementById("psDefaultBaudrate")
+            .insertAdjacentHTML(
+                "afterbegin",
+                `<option value="0">No Preference</option>`);
+      }
+      currentPrinter.connectionOptions.ports.forEach(port => {
+        document
+            .getElementById("psDefaultSerialPort")
+            .insertAdjacentHTML(
+                "beforeend",
+                `<option value="${port}">${port}</option>`
+            );
+      });
+      if(currentPrinter.connectionOptions.portPreference === null) {
+        document
+            .getElementById("psDefaultSerialPort")
+            .insertAdjacentHTML(
+                "afterbegin",
+                `<option value="0">No Preference</option>`);
+      }
+      currentPrinter.connectionOptions.printerProfiles.forEach(profile => {
+        document
+            .getElementById("psDefaultProfile")
+            .insertAdjacentHTML(
+                "beforeend",
+                `<option value="${profile.id}">${profile.name}</option>`
+            );
+      });
+      if(currentPrinter.connectionOptions.printerProfilePreference === null) {
+        document
+            .getElementById("psDefaultProfile")
+            .insertAdjacentHTML(
+                "afterbegin",
+                `<option value="0">No Preference</option>`);
+      }
+      if (currentPrinter.connectionOptions.baudratePreference != null) {
+        document.getElementById("psDefaultBaudrate").value = currentPrinter.connectionOptions.baudratePreference;
+      }else{
+        document.getElementById("psDefaultBaudrate").value = 0;
+      }
+      if (currentPrinter.connectionOptions.portPreference != null) {
 
-          document.getElementById("psDefaultBaudrate").value = preferedBaud;
-        }else{
-          document.getElementById("psDefaultBaudrate").value = 0;
-        }
-        if (preferedPort != null) {
+        document.getElementById("psDefaultSerialPort").value = currentPrinter.connectionOptions.portPreference;
+      }else{
+        document.getElementById("psDefaultSerialPort").value = 0;
+      }
+      if (currentPrinter.connectionOptions.printerProfilePreference != null) {
+        document.getElementById("psDefaultProfile").value = currentPrinter.connectionOptions.printerProfilePreference;
+      }else{
+        document.getElementById("psDefaultProfile").value = 0;
+      }
 
-          document.getElementById("psDefaultSerialPort").value = preferedPort;
-        }else{
-          document.getElementById("psDefaultSerialPort").value = 0;
-        }
-        if (preferedProfile != null) {
-          document.getElementById("psDefaultProfile").value = preferedProfile;
-        }else{
-          document.getElementById("psDefaultProfile").value = 0;
-        }
-
-        document.getElementById("psPrinterProfiles").innerHTML = `
+      document.getElementById("psPrinterProfiles").innerHTML = `
             <div class="col-12">
                 <button id="editProfileBtn" type="button" class="btn btn-warning">Edit</button></div>
             <div class="col-12 col-lg-4">
             <h6 class="mb-1"><u>Printer</u></h6>
-            <p class="mb-0"><b>Printer Name: </b><span id="printerName" contenteditable="false">${PrinterSettings.grabName(printer)}</span></p>
-            <p class="mb-0"><b>Printer Model: </b><span id="printerModel" contenteditable="false">${pProfile.model}</span></p>
+            <p class="mb-0"><b>Printer Name: </b><span id="printerName" contenteditable="false">${currentPrinter.printerName}</span></p>
+            <p class="mb-0"><b>Printer Model: </b><span id="printerModel" contenteditable="false">${currentPrinter.model}</span></p>
             <h6 class="mb-1"><u>Axis</u></h6>
-            <p class="mb-0"><b>E: </b><span id="printerEAxis" contenteditable="false">${pProfile.axes.e.speed}</span>mm/min<br><form class="was-validated">
+            <p class="mb-0"><b>E: </b><span id="printerEAxis" contenteditable="false">${currentPrinter.currentProfile.axes.e.speed}</span>mm/min<br><form class="was-validated">
                                                     <div class="custom-control custom-checkbox mb-3">
                                                         <input type="checkbox" class="custom-control-input" id="eInverted" required>
                                                         <label class="custom-control-label" for="eInverted">Inverted</label>
                                                     </div>
                                                 </form></p>
-            <p class="mb-0"><b>X: </b><span id="printerXAxis" contenteditable="false">${pProfile.axes.x.speed}</span>mm/min<br><form class="was-validated">
+            <p class="mb-0"><b>X: </b><span id="printerXAxis" contenteditable="false">${currentPrinter.currentProfile.axes.x.speed}</span>mm/min<br><form class="was-validated">
                                                     <div class="custom-control custom-checkbox mb-3">
                                                         <input type="checkbox" class="custom-control-input" id="xInverted" required>
                                                         <label class="custom-control-label" for="xInverted">Inverted</label>
                                                     </div>
                                                 </form></p>
-            <p class="mb-0"><b>Y: </b><span id="printerYAxis" contenteditable="false">${pProfile.axes.y.speed}</span>mm/min<br><form class="was-validated">
+            <p class="mb-0"><b>Y: </b><span id="printerYAxis" contenteditable="false">${currentPrinter.currentProfile.axes.y.speed}</span>mm/min<br><form class="was-validated">
                                                     <div class="custom-control custom-checkbox mb-3">
                                                         <input type="checkbox" class="custom-control-input" id="yInverted" required>
                                                         <label class="custom-control-label" for="yInverted">Inverted</label>
                                                     </div>
                                                 </form></p>
-            <p class="mb-0"><b>Z: </b><span id="printerZAxis" contenteditable="false">${pProfile.axes.z.speed}</span>mm/min<br><form class="was-validated">
+            <p class="mb-0"><b>Z: </b><span id="printerZAxis" contenteditable="false">${currentPrinter.currentProfile.axes.z.speed}</span>mm/min<br><form class="was-validated">
                                                     <div class="custom-control custom-checkbox mb-3">
                                                         <input type="checkbox" class="custom-control-input" id="zInverted" required>
                                                         <label class="custom-control-label" for="zInverted">Inverted</label>
@@ -289,8 +172,8 @@ export default class PrinterSettings {
             </div>
             <div class="col-12 col-lg-4">
             <h6 class="mb-1"><u>Extrusion</u></h6>
-            <p class="mb-0"><b>Extruder Count: </b><span id="extruderCount" contenteditable="false">${pProfile.extruder.count}</span></p>
-            <p class="mb-0"><b>Nozzle Size: </b><span id="nozzleDiameter" contenteditable="false">${pProfile.extruder.nozzleDiameter}</span></p>
+            <p class="mb-0"><b>Extruder Count: </b><span id="extruderCount" contenteditable="false">${currentPrinter.currentProfile.extruder.count}</span></p>
+            <p class="mb-0"><b>Nozzle Size: </b><span id="nozzleDiameter" contenteditable="false">${currentPrinter.currentProfile.extruder.nozzleDiameter}</span></p>
           
             <p class="mb-0"><span><form class="was-validated">
                                                     <div class="custom-control custom-checkbox mb-3">
@@ -301,8 +184,8 @@ export default class PrinterSettings {
             </div>
             <div class="col-12 col-lg-4">
             <h6 class="mb-1"><u>Bed / Chamber</u></h6>
-             <p class="mb-1"><b>Form Factor: </b><span id="extruderFormFactor" contenteditable="false">${pProfile.volume.formFactor}</span></p>                   
-            <p class="mb-1"><b>Dimensions:</b>D: <span id="volumeDepth" contenteditable="false">${pProfile.volume.depth}</span>mm x H: <span id="volumeHeight" contenteditable="false">${pProfile.volume.height}</span>mm x W: <span id="volumeWidth" contenteditable="false">${pProfile.volume.width}</span>mm</p> 
+             <p class="mb-1"><b>Form Factor: </b><span id="extruderFormFactor" contenteditable="false">${currentPrinter.currentProfile.volume.formFactor}</span></p>                   
+            <p class="mb-1"><b>Dimensions:</b>D: <span id="volumeDepth" contenteditable="false">${currentPrinter.currentProfile.volume.depth}</span>mm x H: <span id="volumeHeight" contenteditable="false">${currentPrinter.currentProfile.volume.height}</span>mm x W: <span id="volumeWidth" contenteditable="false">${currentPrinter.currentProfile.volume.width}</span>mm</p> 
                <p class="mb-1"><form class="was-validated">
                                                     <div class="custom-control custom-checkbox mb-3">
                                                         <input type="checkbox" class="custom-control-input" id="heatedBed" required>
@@ -317,58 +200,58 @@ export default class PrinterSettings {
                                                 </form></span></p>  
             </div>
         `;
-        document.getElementById("editProfileBtn").addEventListener('click', event => {
-          let profileEdits = document.getElementById("psPrinterProfiles").querySelectorAll('[contenteditable=false]')
-          profileEdits.forEach(element => {
-            element.classList.add("contentEditable");
-            element.contentEditable = true;
-          })
-        });
-        document.getElementById("eInverted").checked = pProfile.axes.e.inverted;
-        document.getElementById("xInverted").checked = pProfile.axes.x.inverted;
-        document.getElementById("yInverted").checked = pProfile.axes.y.inverted;
-        document.getElementById("zInverted").checked = pProfile.axes.z.inverted;
-        document.getElementById("sharedNozzle").checked = pProfile.extruder.sharedNozzle;
-        document.getElementById("heatedBed").checked = pProfile.heatedBed;
-        document.getElementById("heatedChamber").checked = pProfile.heatedChamber;
+      document.getElementById("editProfileBtn").addEventListener('click', event => {
+        let profileEdits = document.getElementById("psPrinterProfiles").querySelectorAll('[contenteditable=false]')
+        profileEdits.forEach(element => {
+          element.classList.add("contentEditable");
+          element.contentEditable = true;
+        })
+      });
+      document.getElementById("eInverted").checked = currentPrinter.currentProfile.axes.e.inverted;
+      document.getElementById("xInverted").checked = currentPrinter.currentProfile.axes.x.inverted;
+      document.getElementById("yInverted").checked = currentPrinter.currentProfile.axes.y.inverted;
+      document.getElementById("zInverted").checked = currentPrinter.currentProfile.axes.z.inverted;
+      document.getElementById("sharedNozzle").checked = currentPrinter.currentProfile.extruder.sharedNozzle;
+      document.getElementById("heatedBed").checked = currentPrinter.currentProfile.heatedBed;
+      document.getElementById("heatedChamber").checked = currentPrinter.currentProfile.heatedChamber;
 
-        let afterPrintCancelled = "";
-        if (typeof printer.gcode.gcode.afterPrintCancelled != "undefined") {
-          afterPrintCancelled = printer.gcode.gcode.afterPrintCancelled;
-        }
-        let afterPrintDone = "";
-        if (typeof printer.gcode.gcode.afterPrintDone != "undefined") {
-          afterPrintDone = printer.gcode.gcode.afterPrintDone;
-        }
-        let afterPrintPaused = "";
-        if (typeof printer.gcode.gcode.afterPrintPaused != "undefined") {
-          afterPrintPaused = printer.gcode.gcode.afterPrintPaused;
-        }
-        let afterPrinterConnected = "";
-        if (typeof printer.gcode.gcode.afterPrinterConnected != "undefined") {
-          afterPrinterConnected = printer.gcode.gcode.afterPrinterConnected;
-        }
-        let beforePrintResumed = "";
-        if (typeof printer.gcode.gcode.beforePrintResumed != "undefined") {
-          beforePrintResumed = printer.gcode.gcode.beforePrintResumed;
-        }
-        let afterToolChange = "";
-        if (typeof printer.gcode.gcode.afterToolChange != "undefined") {
-          afterToolChange = printer.gcode.gcode.afterToolChange;
-        }
-        let beforePrintStarted = "";
-        if (typeof printer.gcode.gcode.beforePrintStarted != "undefined") {
-          beforePrintStarted = printer.gcode.gcode.beforePrintStarted;
-        }
-        let beforePrinterDisconnected = "";
-        if (typeof printer.gcode.gcode.beforePrinterDisconnected != "undefined") {
-          beforePrinterDisconnected = printer.gcode.gcode.beforePrinterDisconnected;
-        }
-        let beforeToolChange = "";
-        if (typeof printer.gcode.gcode.beforeToolChange != "undefined") {
-          beforeToolChange = printer.gcode.gcode.beforeToolChange;
-        }
-        document.getElementById("psGcodeManagerGcode").innerHTML = `
+      let afterPrintCancelled = "";
+      if (typeof currentPrinter.gcodeScripts.afterPrintCancelled != "undefined") {
+        afterPrintCancelled = currentPrinter.gcodeScripts.afterPrintCancelled;
+      }
+      let afterPrintDone = "";
+      if (typeof currentPrinter.gcodeScripts.afterPrintDone != "undefined") {
+        afterPrintDone = currentPrinter.gcodeScripts.afterPrintDone;
+      }
+      let afterPrintPaused = "";
+      if (typeof currentPrinter.gcodeScripts.afterPrintPaused != "undefined") {
+        afterPrintPaused = currentPrinter.gcodeScripts.afterPrintPaused;
+      }
+      let afterPrinterConnected = "";
+      if (typeof currentPrinter.gcodeScripts.afterPrinterConnected != "undefined") {
+        afterPrinterConnected = currentPrinter.gcodeScripts.afterPrinterConnected;
+      }
+      let beforePrintResumed = "";
+      if (typeof currentPrinter.gcodeScripts.beforePrintResumed != "undefined") {
+        beforePrintResumed = currentPrinter.gcodeScripts.beforePrintResumed;
+      }
+      let afterToolChange = "";
+      if (typeof currentPrinter.gcodeScripts.afterToolChange != "undefined") {
+        afterToolChange = currentPrinter.gcodeScripts.afterToolChange;
+      }
+      let beforePrintStarted = "";
+      if (typeof currentPrinter.gcodeScripts.beforePrintStarted != "undefined") {
+        beforePrintStarted = currentPrinter.gcodeScripts.beforePrintStarted;
+      }
+      let beforePrinterDisconnected = "";
+      if (typeof currentPrinter.gcodeScripts.beforePrinterDisconnected != "undefined") {
+        beforePrinterDisconnected = currentPrinter.gcodeScripts.beforePrinterDisconnected;
+      }
+      let beforeToolChange = "";
+      if (typeof currentPrinter.gcodeScripts.beforeToolChange != "undefined") {
+        beforeToolChange = currentPrinter.gcodeScripts.beforeToolChange;
+      }
+      document.getElementById("psGcodeManagerGcode").innerHTML = `
               <div class="form-group">
               <label for="settingsAfterPrinterCancelled">After Printing Cancelled</label>
               <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterCancelled" rows="2">${afterPrintCancelled}</textarea>
@@ -415,7 +298,7 @@ export default class PrinterSettings {
                <small>Anything you put here will be executed before any tool change commands <code>Tn</code>.</small>
               </div>
         `;
-        document.getElementById("cameraRotation").innerHTML = `
+      document.getElementById("cameraRotation").innerHTML = `
         <form class="was-validated">
         <div class="custom-control custom-checkbox mb-3">
             <input type="checkbox" class="custom-control-input" id="camEnabled" required>
@@ -448,41 +331,42 @@ export default class PrinterSettings {
         </form>
       `;
 
-        document.getElementById("camEnabled").checked =
-            printer.settingsWebcam.webcamEnabled;
-        document.getElementById("camTimelapse").checked =
-            printer.settingsWebcam.timelapseEnabled;
-        document.getElementById("camRot90").checked =
-            printer.settingsWebcam.rotate90;
-        document.getElementById("camFlipH").checked =
-            printer.settingsWebcam.flipH;
-        document.getElementById("camFlipV").checked =
-            printer.settingsWebcam.flipV;
-        let serverRestart = null;
-        let systemRestart = null;
-        let systemShutdown = null;
-        if(printer.settingsServer.commands.serverRestartCommand === null || printer.settingsServer.commands.serverRestartCommand === ""){
+      document.getElementById("camEnabled").checked =
+          currentPrinter.otherSettings.webCamSettings.webcamEnabled;
+      document.getElementById("camTimelapse").checked =
+          currentPrinter.otherSettings.webCamSettings.timelapseEnabled;
+      document.getElementById("camRot90").checked =
+          currentPrinter.otherSettings.webCamSettings.rotate90;
+      document.getElementById("camFlipH").checked =
+          currentPrinter.otherSettings.webCamSettings.flipH;
+      document.getElementById("camFlipV").checked =
+          currentPrinter.otherSettings.webCamSettings.flipV;
+      let serverRestart = "N/A";
+      let systemRestart = "N/A";
+      let systemShutdown = "N/A";
+      if(currentPrinter.powerSettings !== null){
+        if(currentPrinter.otherSettings.system.commands.serverRestartCommand === ""){
           serverRestart = "N/A";
         }else{
-          serverRestart = printer.settingsServer.commands.serverRestartCommand
+          serverRestart = currentPrinter.otherSettings.system.commands.serverRestartCommand
         }
-        if(printer.settingsServer.commands.systemRestartCommand === null || printer.settingsServer.commands.systemRestartCommand === ""){
+        if(currentPrinter.otherSettings.system.commands.systemRestartCommand === ""){
           systemRestart = "N/A";
         }else{
-          systemRestart = printer.settingsServer.commands.systemRestartCommand
+          systemRestart = currentPrinter.otherSettings.system.commands.systemRestartCommand
         }
-        if(printer.settingsServer.commands.systemShutdownCommand === null || printer.settingsServer.commands.systemShutdownCommand === ""){
+        if(currentPrinter.otherSettings.system.commands.systemShutdownCommand === ""){
           systemShutdown = "N/A";
         }else{
-          systemShutdown = printer.settingsServer.commands.systemShutdownCommand
+          systemShutdown = currentPrinter.otherSettings.system.commands.systemShutdownCommand
         }
-
-        document.getElementById("printerSettingsFooter").innerHTML = ``;
-        document.getElementById("printerSettingsFooter").insertAdjacentHTML('beforeend', `
+      }
+      document.getElementById("printerSettingsFooter").innerHTML = ``;
+      document.getElementById("printerSettingsFooter").insertAdjacentHTML('beforeend', `
                             <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
                            <button type="button" class="btn btn-success" id="savePrinterSettings">Save</button>
         `)
-        document.getElementById("psPowerCommands").innerHTML = `
+      document.getElementById("psPowerCommands").innerHTML = `
         <form>
           <div class="form-group">
             <label for="serverRestart">OctoPrint Server Restart</label>
@@ -573,48 +457,48 @@ export default class PrinterSettings {
             </div>
         </form>
         `;
-        if(serverRestart != "N/A"){
-          document.getElementById("serverRestart").value = serverRestart;
-        }
-        if(systemRestart != "N/A"){
-          document.getElementById("systemRestart").value = systemRestart;
-        }
-        if(systemShutdown != "N/A"){
-          document.getElementById("systemShutdown").value = systemShutdown;
-        }
-        if(printer.powerSettings != null){
-          document.getElementById("powerOnCommand").value = printer.powerSettings.powerOnCommand;
-          document.getElementById("powerOnURL").value = printer.powerSettings.powerOnURL;
-          document.getElementById("powerOffCommand").value = printer.powerSettings.powerOffCommand;
-          document.getElementById("powerOffURL").value = printer.powerSettings.powerOffURL;
-          document.getElementById("powerToggleCommand").value = printer.powerSettings.powerToggleCommand;
-          document.getElementById("powerToggleURL").value = printer.powerSettings.powerToggleURL;
-          document.getElementById("powerStateCommand").value = printer.powerSettings.powerStatusCommand;
-          document.getElementById("powerStateURL").value = printer.powerSettings.powerStatusURL;
-        }
-        document.getElementById("tempTriggers").innerHTML = `
+      if(serverRestart != "N/A"){
+        document.getElementById("serverRestart").value = serverRestart;
+      }
+      if(systemRestart != "N/A"){
+        document.getElementById("systemRestart").value = systemRestart;
+      }
+      if(systemShutdown != "N/A"){
+        document.getElementById("systemShutdown").value = systemShutdown;
+      }
+      if(currentPrinter.powerSettings != null){
+        document.getElementById("powerOnCommand").value = currentPrinter.powerSettings.powerOnCommand;
+        document.getElementById("powerOnURL").value = currentPrinter.powerSettings.powerOnURL;
+        document.getElementById("powerOffCommand").value = currentPrinter.powerSettings.powerOffCommand;
+        document.getElementById("powerOffURL").value = currentPrinter.powerSettings.powerOffURL;
+        document.getElementById("powerToggleCommand").value = currentPrinter.powerSettings.powerToggleCommand;
+        document.getElementById("powerToggleURL").value = currentPrinter.powerSettings.powerToggleURL;
+        document.getElementById("powerStateCommand").value = currentPrinter.powerSettings.powerStatusCommand;
+        document.getElementById("powerStateURL").value = currentPrinter.powerSettings.powerStatusURL;
+      }
+      document.getElementById("tempTriggers").innerHTML = `
            <div class="form-group">
               <label for="headtingVariation">Heating Variation</label>
-              <input type="number" class="form-control" id="headtingVariation" placeholder="${printer.tempTriggers.heatingVariation}" step="0.01">
+              <input type="number" class="form-control" id="headtingVariation" placeholder="${currentPrinter.otherSettings.temperatureTriggers.heatingVariation}" step="0.01">
               <small id="passwordHelpBlock" class="form-text text-muted">
                   What temperature variation will trigger orange warning on the temperature display when a printer is Active. <code>Default is 1°C</code>
               </small>
             </div>
             <div class="form-group">
               <label for="coolDown">Cool Down Trigger</label>
-              <input type="number" class="form-control" id="coolDown" placeholder="${printer.tempTriggers.coolDown}" step="0.01">
+              <input type="number" class="form-control" id="coolDown" placeholder="${currentPrinter.otherSettings.temperatureTriggers.coolDown}" step="0.01">
               <small id="passwordHelpBlock" class="form-text text-muted">
                   What temperature limit will trigger the blue status on the temperature display when a printer is Complete and cooling down. <code>Default is 30°C</code>
               </small>
             </div>
         `
-        document.getElementById("psPrinterCost").innerHTML = `
+      document.getElementById("psPrinterCost").innerHTML = `
             <div class="col-6">
                    <h5>Operating Costs</h5>
                    <div class="form-group">
                     <label for="coolDown">Power Consumption</label>
                           <div class="input-group mb-2">
-                                <input type="number" class="form-control" id="powerConsumption" placeholder="${printer.costSettings.powerConsumption}" step="0.01">
+                                <input type="number" class="form-control" id="powerConsumption" placeholder="${currentPrinter.costSettings.powerConsumption}" step="0.01">
                                 <div class="input-group-append">
                                      <div class="input-group-text">kW</div>
                                 </div>
@@ -626,7 +510,7 @@ export default class PrinterSettings {
                   <div class="form-group">
                     <label for="coolDown">Electricity Costs</label>
                          <div class="input-group mb-2">
-                            <input type="number" class="form-control" id="electricityCosts" placeholder="${printer.costSettings.electricityCosts}" step="0.01">
+                            <input type="number" class="form-control" id="electricityCosts" placeholder="${currentPrinter.costSettings.electricityCosts}" step="0.01">
                                 <div class="input-group-append">
                                      <div class="input-group-text"></div>
                                 </div>
@@ -641,7 +525,7 @@ export default class PrinterSettings {
                     <div class="form-group">
                       <label for="coolDown">Purchase Price</label>
                          <div class="input-group mb-2">
-                            <input type="number" class="form-control" id="purchasePrice" placeholder="${printer.costSettings.purchasePrice}" step="0.01">
+                            <input type="number" class="form-control" id="purchasePrice" placeholder="${currentPrinter.costSettings.purchasePrice}" step="0.01">
                                 <div class="input-group-append">
                                      <div class="input-group-text"></div>
                                 </div>
@@ -654,7 +538,7 @@ export default class PrinterSettings {
                     <div class="form-group">
                       <label for="coolDown">Estimated Life Span</label>
                            <div class="input-group mb-2">
-                             <input type="number" class="form-control" id="estimatedLifespan" placeholder="${printer.costSettings.estimateLifespan}" step="0.01">
+                             <input type="number" class="form-control" id="estimatedLifespan" placeholder="${currentPrinter.costSettings.estimateLifespan}" step="0.01">
                                 <div class="input-group-append">
                                      <div class="input-group-text">hours</div>
                                 </div>
@@ -666,7 +550,7 @@ export default class PrinterSettings {
                     <div class="form-group">
                       <label for="coolDown">Maintenance Costs</label>
                            <div class="input-group mb-2">
-                             <input type="number" class="form-control" id="maintenanceCosts" placeholder="${printer.costSettings.maintenanceCosts}" step="0.01">
+                             <input type="number" class="form-control" id="maintenanceCosts" placeholder="${currentPrinter.costSettings.maintenanceCosts}" step="0.01">
                                 <div class="input-group-append">
                                      <div class="input-group-text"><i class="fas fa-wrench"></i> / hour</div>
                                 </div>
@@ -677,20 +561,19 @@ export default class PrinterSettings {
                     </div>                                        
             </div>
         `;
-        let scripts = await OctoFarmClient.get("scripts/get");
-        scripts = await scripts.json();
-        let printerScripts = [];
-        scripts.alerts.forEach(script => {
-          if(script.printer === printer._id || script.printer.length === 0){
-            console.log(script)
-            printerScripts.push({_id: script._id, active: script.active, message: script.message, scriptLocation: script.scriptLocation, trigger: script.trigger})
-          }
-        })
+      let scripts = await OctoFarmClient.get("scripts/get");
+      scripts = await scripts.json();
+      let printerScripts = [];
+      scripts.alerts.forEach(script => {
+        if(script.printer === currentPrinter._id || script.printer.length === 0){
+          printerScripts.push({_id: script._id, active: script.active, message: script.message, scriptLocation: script.scriptLocation, trigger: script.trigger})
+        }
+      })
 
-        let alertsTable = document.getElementById("printerAltersTableBody")
-        alertsTable.innerHTML = "";
-        printerScripts.forEach(async script => {
-          alertsTable.insertAdjacentHTML('beforeend', `
+      let alertsTable = document.getElementById("printerAltersTableBody")
+      alertsTable.innerHTML = "";
+      printerScripts.forEach(async script => {
+        alertsTable.insertAdjacentHTML('beforeend', `
               <tr>
                 <td>
                 <form class="was-validated">
@@ -711,142 +594,136 @@ export default class PrinterSettings {
               </tr>
           
           `)
-          document.getElementById("activePrinter-"+script._id).checked = script.active;
-          let triggerSelect = document.getElementById("triggerPrinter-"+script._id)
-          triggerSelect.innerHTML = await Script.alertsDrop();
-          triggerSelect.value = script.trigger;
-        })
+        document.getElementById("activePrinter-"+script._id).checked = script.active;
+        let triggerSelect = document.getElementById("triggerPrinter-"+script._id)
+        triggerSelect.innerHTML = await Script.alertsDrop();
+        triggerSelect.value = script.trigger;
+      })
 
-        document.getElementById("powerConsumption").value = parseFloat(printer.costSettings.powerConsumption);
-        document.getElementById("electricityCosts").value = parseFloat(printer.costSettings.electricityCosts);
-        document.getElementById("purchasePrice").value = parseFloat(printer.costSettings.purchasePrice);
-        document.getElementById("estimatedLifespan").value = parseFloat(printer.costSettings.estimateLifespan);
-        document.getElementById("maintenanceCosts").value = parseFloat(printer.costSettings.maintenanceCosts);
+      document.getElementById("powerConsumption").value = parseFloat(currentPrinter.costSettings.powerConsumption);
+      document.getElementById("electricityCosts").value = parseFloat(currentPrinter.costSettings.electricityCosts);
+      document.getElementById("purchasePrice").value = parseFloat(currentPrinter.costSettings.purchasePrice);
+      document.getElementById("estimatedLifespan").value = parseFloat(currentPrinter.costSettings.estimateLifespan);
+      document.getElementById("maintenanceCosts").value = parseFloat(currentPrinter.costSettings.maintenanceCosts);
 
-        document.getElementById("savePrinterSettings").addEventListener('click', async event => {
-          let newValues = {
-            printer: {
-              printerURL: printer.printerURL,
-              index: printer._id,
+      document.getElementById("savePrinterSettings").addEventListener('click', async event => {
+        let newValues = {
+          printer: {
+            printerURL: currentPrinter.printerURL,
+            index: currentPrinter._id,
+          },
+          connection: {
+            preferredPort: document.getElementById("psDefaultSerialPort").value,
+            preferredBaud: document.getElementById("psDefaultBaudrate").value,
+            preferredProfile: document.getElementById("psDefaultProfile").value,
+          },
+          profileID: currentPrinter.currentProfile.id,
+          profile: {
+            "name": document.getElementById("printerName").innerHTML,
+            "color": "default",
+            "model": document.getElementById("printerModel").innerHTML,
+            "volume": {
+              "formFactor": document.getElementById("extruderFormFactor").innerHTML,
+              "width": parseInt(document.getElementById("volumeWidth").innerHTML),
+              "depth": parseInt(document.getElementById("volumeDepth").innerHTML),
+              "height": parseInt(document.getElementById("volumeHeight").innerHTML)
             },
-            connection: {
-              preferredPort: document.getElementById("psDefaultSerialPort").value,
-              preferredBaud: document.getElementById("psDefaultBaudrate").value,
-              preferredProfile: document.getElementById("psDefaultProfile").value,
-            },
-            profileID: selectedProfile,
-            profile: {
-              "name": document.getElementById("printerName").innerHTML,
-              "color": "default",
-              "model": document.getElementById("printerModel").innerHTML,
-              "volume": {
-                "formFactor": document.getElementById("extruderFormFactor").innerHTML,
-                "width": parseInt(document.getElementById("volumeWidth").innerHTML),
-                "depth": parseInt(document.getElementById("volumeDepth").innerHTML),
-                "height": parseInt(document.getElementById("volumeHeight").innerHTML)
+            "heatedBed": document.getElementById("heatedBed").checked,
+            "heatedChamber": document.getElementById("heatedChamber").checked,
+            "axes": {
+              "x": {
+                "speed": parseInt(document.getElementById("printerXAxis").innerHTML),
+                "inverted": document.getElementById("xInverted").checked
               },
-              "heatedBed": document.getElementById("heatedBed").checked,
-              "heatedChamber": document.getElementById("heatedChamber").checked,
-              "axes": {
-                "x": {
-                  "speed": parseInt(document.getElementById("printerXAxis").innerHTML),
-                  "inverted": document.getElementById("xInverted").checked
-                },
-                "y": {
-                  "speed": parseInt(document.getElementById("printerYAxis").innerHTML),
-                  "inverted": document.getElementById("yInverted").checked
-                },
-                "z": {
-                  "speed": parseInt(document.getElementById("printerZAxis").innerHTML),
-                  "inverted": document.getElementById("zInverted").checked
-                },
-                "e": {
-                  "speed": parseInt(document.getElementById("printerEAxis").innerHTML),
-                  "inverted": document.getElementById("eInverted").checked
-                }
+              "y": {
+                "speed": parseInt(document.getElementById("printerYAxis").innerHTML),
+                "inverted": document.getElementById("yInverted").checked
               },
-              "extruder": {
-                "count": parseInt(document.getElementById("extruderCount").innerHTML),
-                "nozzleDiameter": parseFloat(document.getElementById("nozzleDiameter").innerHTML),
-                "sharedNozzle": document.getElementById("sharedNozzle").checked,
+              "z": {
+                "speed": parseInt(document.getElementById("printerZAxis").innerHTML),
+                "inverted": document.getElementById("zInverted").checked
+              },
+              "e": {
+                "speed": parseInt(document.getElementById("printerEAxis").innerHTML),
+                "inverted": document.getElementById("eInverted").checked
               }
             },
-            systemCommands: {
-              serverRestart: document.getElementById("serverRestart").value,
-              systemRestart: document.getElementById("systemRestart").value,
-              systemShutdown: document.getElementById("systemShutdown").value,
-            },
-            powerCommands:{
-              powerOnCommand: document.getElementById("powerOnCommand").value,
-              powerOnURL: document.getElementById("powerOnURL").value,
-              powerOffCommand: document.getElementById("powerOffCommand").value,
-              powerOffURL: document.getElementById("powerOffURL").value,
-              powerToggleCommand: document.getElementById("powerToggleCommand").value,
-              powerToggleURL: document.getElementById("powerToggleURL").value,
-              powerStatusCommand: document.getElementById("powerStateCommand").value,
-              powerStatusURL: document.getElementById("powerStateURL").value,
-            },
-            gcode:{
-              afterPrintCancelled: document.getElementById("settingsAfterPrinterCancelled").value,
-              afterPrintDone: document.getElementById("settingsAfterPrinterDone").value,
-              afterPrintPaused: document.getElementById("settingsAfterPrinterPaused").value,
-              afterPrinterConnected: document.getElementById("settingsAfterPrinterConnected").value,
-              afterToolChange: document.getElementById("settingsAfterToolChange").value,
-              beforePrintResumed: document.getElementById("settingsBeforePrinterResumed").value,
-              beforePrintStarted: document.getElementById("settingsBeforePrinterStarted").value,
-              beforePrinterDisconnected: document.getElementById("settingsBeforePrinterDisconnected").value,
-              beforeToolChange: document.getElementById("settingsBeforeToolChange").value,
-            },
-            other: {
-              enableCamera: document.getElementById("camEnabled").checked,
-              rotateCamera: document.getElementById("camRot90").checked,
-              flipHCamera: document.getElementById("camFlipH").checked,
-              flipVCamera: document.getElementById("camFlipV").checked,
-              enableTimeLapse: document.getElementById("camTimelapse").checked,
-              heatingVariation: document.getElementById("headtingVariation").value,
-              coolDown: document.getElementById("coolDown").value,
-            },
-            costSettings: {
-              powerConsumption: parseFloat(document.getElementById("powerConsumption").value),
-              electricityCosts: parseFloat(document.getElementById("electricityCosts").value),
-              purchasePrice: parseFloat(document.getElementById("purchasePrice").value),
-              estimateLifespan: parseFloat(document.getElementById("estimatedLifespan").value),
-              maintenanceCosts: parseFloat(document.getElementById("maintenanceCosts").value)
+            "extruder": {
+              "count": parseInt(document.getElementById("extruderCount").innerHTML),
+              "nozzleDiameter": parseFloat(document.getElementById("nozzleDiameter").innerHTML),
+              "sharedNozzle": document.getElementById("sharedNozzle").checked,
             }
+          },
+          systemCommands: {
+            serverRestart: document.getElementById("serverRestart").value,
+            systemRestart: document.getElementById("systemRestart").value,
+            systemShutdown: document.getElementById("systemShutdown").value,
+          },
+          powerCommands:{
+            powerOnCommand: document.getElementById("powerOnCommand").value,
+            powerOnURL: document.getElementById("powerOnURL").value,
+            powerOffCommand: document.getElementById("powerOffCommand").value,
+            powerOffURL: document.getElementById("powerOffURL").value,
+            powerToggleCommand: document.getElementById("powerToggleCommand").value,
+            powerToggleURL: document.getElementById("powerToggleURL").value,
+            powerStatusCommand: document.getElementById("powerStateCommand").value,
+            powerStatusURL: document.getElementById("powerStateURL").value,
+          },
+          gcode:{
+            afterPrintCancelled: document.getElementById("settingsAfterPrinterCancelled").value,
+            afterPrintDone: document.getElementById("settingsAfterPrinterDone").value,
+            afterPrintPaused: document.getElementById("settingsAfterPrinterPaused").value,
+            afterPrinterConnected: document.getElementById("settingsAfterPrinterConnected").value,
+            afterToolChange: document.getElementById("settingsAfterToolChange").value,
+            beforePrintResumed: document.getElementById("settingsBeforePrinterResumed").value,
+            beforePrintStarted: document.getElementById("settingsBeforePrinterStarted").value,
+            beforePrinterDisconnected: document.getElementById("settingsBeforePrinterDisconnected").value,
+            beforeToolChange: document.getElementById("settingsBeforeToolChange").value,
+          },
+          other: {
+            enableCamera: document.getElementById("camEnabled").checked,
+            rotateCamera: document.getElementById("camRot90").checked,
+            flipHCamera: document.getElementById("camFlipH").checked,
+            flipVCamera: document.getElementById("camFlipV").checked,
+            enableTimeLapse: document.getElementById("camTimelapse").checked,
+            heatingVariation: document.getElementById("headtingVariation").value,
+            coolDown: document.getElementById("coolDown").value,
+          },
+          costSettings: {
+            powerConsumption: parseFloat(document.getElementById("powerConsumption").value),
+            electricityCosts: parseFloat(document.getElementById("electricityCosts").value),
+            purchasePrice: parseFloat(document.getElementById("purchasePrice").value),
+            estimateLifespan: parseFloat(document.getElementById("estimatedLifespan").value),
+            maintenanceCosts: parseFloat(document.getElementById("maintenanceCosts").value)
           }
-            let profileEdits = document.getElementById("psPrinterProfiles").querySelectorAll('[contenteditable=true]')
-            profileEdits.forEach(element => {
-              element.contentEditable = false;
-              element.classList.remove("contentEditable");
-            })
-          let update = await OctoFarmClient.post("printers/updateSettings", newValues);
-          if(update.status === 200){
-            update = await update.json();
-            UI.createAlert("success", "OctoFarm successfully updated for " + Validate.getName(printer), 3000, "clicked")
-            if(update.status.profile === 200){
-              UI.createAlert("success", Validate.getName(printer) + ": profile successfully updated", 3000, "clicked")
-            }else{
-              UI.createAlert("error", Validate.getName(printer) + ": profile failed to updated", 3000, "clicked")
-            }
-            if(update.status.settings === 200){
-              UI.createAlert("success", Validate.getName(printer) + ": settings successfully updated", 3000, "clicked")
-            }else{
-              UI.createAlert("error", Validate.getName(printer) + ": settings failed to updated", 3000, "clicked")
-            }
+        }
+        let profileEdits = document.getElementById("psPrinterProfiles").querySelectorAll('[contenteditable=true]')
+        profileEdits.forEach(element => {
+          element.contentEditable = false;
+          element.classList.remove("contentEditable");
+        })
+        let update = await OctoFarmClient.post("printers/updateSettings", newValues);
+        if(update.status === 200){
+          update = await update.json();
+          UI.createAlert("success", "OctoFarm successfully updated for " + currentPrinter.printerName, 3000, "clicked")
+          if(update.status.profile === 200){
+            UI.createAlert("success", currentPrinter.printerName + ": profile successfully updated", 3000, "clicked")
           }else{
-            UI.createAlert("error", "OctoFarm failed to update " + Validate.getName(printer), 3000, "clicked")
+            UI.createAlert("error", currentPrinter.printerName + ": profile failed to updated", 3000, "clicked")
           }
+          if(update.status.settings === 200){
+            UI.createAlert("success", currentPrinter.printerName + ": settings successfully updated", 3000, "clicked")
+          }else{
+            UI.createAlert("error", currentPrinter.printerName + ": settings failed to updated", 3000, "clicked")
+          }
+        }else{
+          UI.createAlert("error", "OctoFarm failed to update " + currentPrinter.printerName, 3000, "clicked")
+        }
 
 
-        });
-
-
-        //let elements = PrinterSettings.grabPage();
-
-        //PrinterSettings.applyListeners(printer, elements, printers);
-      }
-      PrinterSettings.applyState(printer);
-    }
+      });
+      PrinterSettings.applyState(currentPrinter)
+    }//END
   }
   static compareSave(printer, newValues){
 
@@ -1315,52 +1192,16 @@ export default class PrinterSettings {
     let elements = await PrinterSettings.grabPage();
 
 
-    elements.mainPage.status.innerHTML = printer.state;
-    elements.mainPage.status.className = `btn btn-${printer.stateColour.name} mb-2`;
-
-
-    if (printer.stateColour.category === "Active") {
-
-    } else if (
-        printer.stateColour.category === "Idle" ||
-        printer.stateColour.category === "Complete"
+    elements.mainPage.status.innerHTML = printer.printerState.state;
+    elements.mainPage.status.className = `btn btn-${printer.printerState.colour.name} mb-2`;
+    if (
+        printer.printerState.colour.category === "Offline" ||
+        printer.printerState.colour.category === "Disconnected"
     ) {
-      if (
-          typeof printer.temps != "undefined" &&
-          typeof printer.temps[0].tool0 != "undefined" &&
-          typeof printer.temps[0].tool0.target != "undefined"
-      ) {
-
-      }
-
-      elements.connectPage.printerPort.disabled = true;
-      elements.connectPage.printerBaud.disabled = true;
-      elements.connectPage.printerProfile.disabled = true;
-      if (
-          typeof printer.job != "undefined" &&
-          printer.job.filename === "No File Selected"
-      ) {
-
-      } else {
-        if (printer.state === "Paused") {
-
-        } else {
-
-        }
-      }
-    } else if (
-        printer.stateColour.category === "Offline" ||
-        printer.stateColour.category === "Disconnected"
-    ) {
-
-      if (printer.state === "Offline" || printer.state === "Shutdown" || printer.state === "Searching...") {
+      if (printer.printerState.state === "Offline" || printer.printerState.state === "Shutdown" || printer.printerState.state === "Searching...") {
         $("#PrinterSettingsModal").modal("hide");
       }
     }
   }
 
-
-  static async updateIndex(newIndex) {
-    currentIndex = newIndex;
-  }
 }

@@ -347,10 +347,10 @@ a.notyet {
   z-index: 1023;
 }
 .noStorage {
-  position: fixed;
-  left: 50%;
+  position: relative;
   top: 50%;
-  transform: translate(20%, 0);
+  transform: translate(0%, 0);
+  width: 100%;
   z-index: 1023;
 }
 label {

@@ -67,8 +67,8 @@ router.post("/resyncFile", ensureAuthenticated, async (req, res) => {
   } else {
     ret = await Runner.reSyncFile(file.i);
   }
+  setTimeout(function() {   res.send(ret); }, 5000);
 
-  res.send(ret);
 });
 router.post("/stepChange", ensureAuthenticated, async (req, res) => {
   //Check required fields
@@ -110,18 +110,24 @@ router.get("/groups", ensureAuthenticated, async (req, res) => {
 });
 router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
   let id = req.body.i;
+
   let printers = await PrinterClean.returnPrintersInformation();
-  if(typeof id === 'undefined' || id === null){
-    let printerInfo = [];
-    res.send(printerInfo);
-  }else{
-    let index = _.findIndex(printers, function(o) { return o._id == id; });
-    let returnPrinter = {
-      storage: printers[index].storage,
-      fileList: printers[index].fileList
+    if(typeof id === 'undefined' || id === null){
+      let printerInfo = [];
+      res.send(printerInfo);
+    }else{
+      let index = _.findIndex(printers, function(o) { return o._id == id; });
+      let returnPrinter = {
+        printerName: printers[index].printerName,
+        apikey: printers[index].apikey,
+        _id: printers[index]._id,
+        printerURL: printers[index].printerURL,
+        storage: printers[index].storage,
+        fileList: printers[index].fileList,
+        systemChecks: printers[index].systemChecks
+      }
+      res.send(returnPrinter);
     }
-    res.send(returnPrinter);
-  }
 });
 
 //Register handle for checking for offline printers - Depricated due to websocket full implementation
