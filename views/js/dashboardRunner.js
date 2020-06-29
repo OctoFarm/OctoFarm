@@ -23,7 +23,14 @@ let optionsFarmTemp = {
         },
         background: '#303030'
     },
-    colors: ['#fcc329', '#ff1500', '#009cff', '#ff1800'],
+    colors: [
+        '#fcc329',
+        '#ff1500',
+        '#009cff',
+        '#ff1800',
+        '#37ff00',
+        '#ff1800'
+    ],
     stroke: {
         curve: 'smooth'
     },
@@ -42,6 +49,24 @@ let optionsFarmTemp = {
                 text: "Temp"
             },
             seriesName: "Actual Tool",
+            labels: {
+                formatter: function(value) {
+                    return value + "°C";
+                }
+            },
+        },
+        {
+            seriesName: "Actual Tool",
+            show: false,
+            labels: {
+                formatter: function(value) {
+                    return value + "°C";
+                }
+            },
+        },
+        {
+            seriesName: "Actual Tool",
+            show: false,
             labels: {
                 formatter: function(value) {
                     return value + "°C";
@@ -335,32 +360,27 @@ var currentUtilisation = new ApexCharts(document.querySelector("#currentUtilisat
 currentUtilisation.render();
 
 let worker = null;
-let statsCounter = 10;
+
 //Setup webWorker
 if (window.Worker) {
     // Yes! Web worker support!
     try{
         if (worker === null) {
-            worker = new Worker("./js/lib/modules/serverConnect.js");
-
+            worker = new Worker("./js/lib/modules/workers/dashboardWorker.js");
             worker.onmessage = function(event){
                 if (event.data != false) {
-                    if (event.data.printerInfo.length > 0) {
-                        currentOperations(event.data.currentOperations, event.data.currentOperationsCount, event.data.printerInfo)
-                        if (statsCounter === 10) {
-                            // dashUpdate.systemInformation(res.systemInfo);
-                            dashUpdate.farmInformation(event.data.farmInfo, event.data.heatMap);
-                            dashUpdate.farmUtilisation(event.data.octofarmStatistics)
-                            dashUpdate.currentActivity(event.data.currentOperationsCount)
-                            dashUpdate.currentTemperature(event.data.printerInfo);
-                            dashUpdate.currentStatus(event.data.printerInfo);
-                            dashUpdate.currentProgress(event.data.printerInfo);
-                            dashUpdate.currentUptime(event.data.printerInfo);
-                            statsCounter = 0;
-                        } else {
-                            statsCounter = statsCounter + 1;
-                        }
-                    }
+                        console.log(event.data)
+                        let currentOperationsData = event.data.currentOperations;
+                        let printerInfo = event.data.printerInformation;
+                        let dashboard = event.data.dashStatistics;
+                        currentOperations(currentOperationsData.operations, currentOperationsData.count, printerInfo)
+                        dashUpdate.farmInformation(dashboard.timeEstimates, dashboard.utilisationGraph, dashboard.temperatureGraph);
+                        dashUpdate.farmUtilisation(dashboard.farmUtilisation)
+                        dashUpdate.currentActivity(dashboard.currentStatus, dashboard.currentUtilisation)
+                        dashUpdate.printerStatus(dashboard.printerHeatMaps.heatStatus);
+                        dashUpdate.printerProgress(dashboard.printerHeatMaps.heatProgress);
+                        dashUpdate.printerTemps(dashboard.printerHeatMaps.heatTemps);
+                        dashUpdate.printerUptime(dashboard.printerHeatMaps.heatUtilisation);
                 }else{
                     UI.createAlert(
                         "error",
@@ -384,226 +404,76 @@ if (window.Worker) {
 
 
 class dashUpdate {
-    static farmInformation(farmInfo, heatMap) {
+    static printerStatus(data){
+        let currentStatus = document.getElementById("currentStatus")
+        currentStatus.innerHTML = "";
+        for(let d = 0; d<data.length; d++){
+            currentStatus.insertAdjacentHTML("beforeend", data[d])
+        }
 
+    }
+    static printerProgress(data){
+        let currentStatus = document.getElementById("currentProgress")
+        currentStatus.innerHTML = "";
+        for(let d = 0; d<data.length; d++){
+            currentStatus.insertAdjacentHTML("beforeend", data[d])
+        }
+    }
+    static printerTemps(data){
+        let currentStatus = document.getElementById("currentTemps")
+        currentStatus.innerHTML = "";
+        for(let d = 0; d<data.length; d++){
+            currentStatus.insertAdjacentHTML("beforeend", data[d])
+        }
+    }
+    static printerUptime(data){
+        let currentStatus = document.getElementById("currentUptime")
+        currentStatus.innerHTML = "";
+        for(let d = 0; d<data.length; d++){
+            currentStatus.insertAdjacentHTML("beforeend", data[d])
+        }
+    }
+    static farmInformation(farmInfo, heatMap, temperatureGraph) {
         document.getElementById("globalTemp").innerHTML = `
-            <i class="fas fa-temperature-high"></i> Total Temperature: ${Math.round(farmInfo.totalActualTemperature)} °C
+            <i class="fas fa-temperature-high"></i> Total Temperature: ${Math.round(farmInfo.totalFarmTemp.toFixed(2))} °C
     `;
         document.getElementById("avgEstimatedTime").innerHTML = Calc.generateTime(
-            farmInfo.avgEstimateTime
+            farmInfo.averageEstimated.toFixed(2)
         );
         document.getElementById("avgRemainingTime").innerHTML = Calc.generateTime(
-            farmInfo.avgRemainingTime
+            farmInfo.averageRemaining
         );
         document.getElementById("avgElapsedTime").innerHTML = Calc.generateTime(
-            farmInfo.avgElapsedTime
+            farmInfo.averageElapsed
         );
         document.getElementById("cumEstimatedTime").innerHTML = Calc.generateTime(
-            farmInfo.totalEstimateTime
+            farmInfo.totalEstimated
         );
         document.getElementById("cumRemainingTime").innerHTML = Calc.generateTime(
-            farmInfo.totalRemainingTime
+            farmInfo.totalRemaining
         );
         document.getElementById("cumElapsedTime").innerHTML = Calc.generateTime(
-            farmInfo.totalElapsedTime
+            farmInfo.totalElapsed
         );
-        let totalAvgTime = farmInfo.avgRemainingTime + farmInfo.avgElapsedTime
-        let remaningProgress = farmInfo.avgRemainingTime / totalAvgTime * 100;
-        let elapsedProgress =  farmInfo.avgElapsedTime / totalAvgTime * 100
-        let avgRemainingProgress = document.getElementById("avgRemainingProgress")
-        avgRemainingProgress.style.width = remaningProgress.toFixed(2)+"%";
-        avgRemainingProgress.innerHTML = remaningProgress.toFixed(2)+"%"
-        let avgElapsed = document.getElementById("avgElapsed")
-        avgElapsed.style.width = elapsedProgress.toFixed(2)+"%";
-        avgElapsed.innerHTML = elapsedProgress.toFixed(2)+"%"
 
-        let totalTime = farmInfo.totalRemainingTime + farmInfo.totalElapsedTime
-        let remaningCumProgress = farmInfo.totalRemainingTime / totalTime * 100;
-        let elapsedCumProgress =  farmInfo.totalElapsedTime / totalTime * 100;
-        let cumRemainingProgress = document.getElementById("cumRemainingProgress")
-        cumRemainingProgress.style.width = remaningCumProgress.toFixed(2)+"%";
-        cumRemainingProgress.innerHTML = remaningCumProgress.toFixed(2)+"%"
-        let cumElapsed = document.getElementById("cumElapsed")
-        cumElapsed.style.width = elapsedCumProgress.toFixed(2)+"%";
-        cumElapsed.innerHTML = elapsedCumProgress.toFixed(2)+"%"
+        avgRemainingProgress.style.width = farmInfo.averagePercentRemaining.toFixed(2)+"%";
+        avgRemainingProgress.innerHTML = farmInfo.averagePercentRemaining.toFixed(2)+"%"
+        avgElapsed.style.width = farmInfo.averagePercent.toFixed(2)+"%";
+        avgElapsed.innerHTML = farmInfo.averagePercent.toFixed(2)+"%"
+        cumRemainingProgress.style.width = farmInfo.cumulativePercentRemaining.toFixed(2)+"%";
+        cumRemainingProgress.innerHTML = farmInfo.cumulativePercentRemaining.toFixed(2)+"%"
+        cumElapsed.style.width = farmInfo.cumulativePercent.toFixed(2)+"%";
+        cumElapsed.innerHTML = farmInfo.cumulativePercent.toFixed(2)+"%"
 
-
-
-
-        systemFarmTemp.updateSeries(farmInfo.temp);
+        systemFarmTemp.updateSeries(temperatureGraph);
         activityHeatChart.updateSeries(heatMap);
 
 
 
     }
-    static currentActivity(currCount) {
-        let data = [{
-            data: [currCount.active, currCount.complete, currCount.idle, currCount.disconnected, currCount.offline]
-        }]
-        let farmTotal = currCount.active + currCount.complete + currCount.idle + currCount.disconnected + currCount.offline
-        let activeTotal = currCount.active;
-        let offlineTotal = currCount.offline;
-        let idleTotal = currCount.complete + currCount.idle + currCount.disconnected;
-        let activePer = activeTotal / farmTotal * 100;
-        let idlePer = idleTotal / farmTotal * 100;
-        let offlinePer = offlineTotal;
-
-        currentActivityChart.updateSeries(data)
-        currentUtilisation.updateSeries([activePer, idlePer, offlinePer])
-    }
-
-    static currentUptime(printers){
-        let currentUptime = document.getElementById("currentUptime");
-        printers.forEach(printer => {
-            let dateNow = new Date();
-            dateNow = dateNow.getTime();
-            let timeSpan = dateNow - printer.dateAdded;
-            let percentUp = printer.currentUptime / timeSpan * 100;
-            percentUp = percentUp.toFixed(2)+"%"
-            let progressColour = dashUpdate.getProgressColour(percentUp);
-
-            if(document.getElementById("printerUptime-"+printer._id)){
-                //Exists so just update the values
-                let eProgress = document.getElementById("printerUptime-"+printer._id)
-                eProgress.title = `${Validate.getName(printer)}: ${percentUp}`;
-                eProgress.className = `bg-${progressColour} heatMap`;
-            }else{
-                //Create the elements as doesn't exists
-                currentUptime.insertAdjacentHTML('beforeend',`
-                     <div title="${Validate.getName(printer)}: ${percentUp}" class="bg-${progressColour} heatMap" id="printerUptime-${printer._id}"></div>
-                `)
-
-            }
-
-        })
-
-    }
-
-    static getProgressColour(progress) {
-        progress = progress.replace("%","")
-        progress = parseInt(progress)
-        if (progress === 0) {
-            return "dark"
-        } else if (progress < 25) {
-            return "secondary"
-        } else if (progress >= 25 && progress <= 50) {
-            return "primary"
-        } else if (progress >= 50 && progress <= 75) {
-            return "info"
-        }else if (progress >= 75 && progress < 100) {
-            return "warning"
-        } else if (progress === 100) {
-            return "success"
-        }
-    }
-    static currentProgress(printers){
-        let currentProgress = document.getElementById("currentProgress");
-        printers.forEach(printer => {
-            let progress = 0 + "%";
-
-            if(typeof printer.progress !== 'undefined' && printer.progress.completion !== null){
-                progress = printer.progress.completion.toFixed(2)+"%"
-            }
-            let progressColour = dashUpdate.getProgressColour(progress);
-            let status = printer.stateColour.category;
-            let colour = printer.stateColour.name;
-            if(document.getElementById("printerProgress-"+printer._id)){
-                //Exists so just update the values
-                let eProgress = document.getElementById("printerProgress-"+printer._id)
-                eProgress.title = `${Validate.getName(printer)}: ${progress}`;
-                eProgress.className = `bg-${progressColour} heatMap`;
-            }else{
-                //Create the elements as doesn't exists
-                currentProgress.insertAdjacentHTML('beforeend',`
-                     <div title="${Validate.getName(printer)}: ${progress}" class="bg-${progressColour} heatMap" id="printerProgress-${printer._id}"></div>
-                `)
-
-            }
-
-        })
-    }
-    static currentStatus(printers){
-        let currentStatus = document.getElementById("currentStatus");
-        printers.forEach(printer => {
-            let status = printer.stateColour.category;
-            let colour = printer.stateColour.name;
-            if(printer.stateColour.category === "Offline"){
-                colour = "offline"
-            }
-            if(document.getElementById("printerStatus-"+printer._id)){
-                //Exists so just update the values
-                let eStatus = document.getElementById("printerStatus-"+printer._id)
-                eStatus.title = `${Validate.getName(printer)}: ${status}`;
-                eStatus.className = `bg-${colour} heatMap`;
-            }else{
-                //Create the elements as doesn't exists
-                currentStatus.insertAdjacentHTML('beforeend',`
-                     <div title="${Validate.getName(printer)}: ${status}" class="bg-${colour} heatMap"} heatMap" id="printerStatus-${printer._id}"></div>
-                `)
-
-            }
-
-        })
-    }
-    static currentTemperature(printers){
-        let currentTemps = document.getElementById("currentTemps");
-        printers.forEach(printer => {
-            let toolTarget = 0;
-            let toolActual = 0;
-            let bedTarget = 0;
-            let bedActual = 0;
-            if(typeof printer.temps !== 'undefined' && printer.temps[0].tool0.actual !== null){
-                toolTarget = printer.temps[0].tool0.target;
-                toolActual = printer.temps[0].tool0.actual;
-            }
-
-            if(typeof printer.temps !== 'undefined' && printer.temps[0].bed.actual !== null){
-                bedTarget = printer.temps[0].bed.target;
-                bedActual = printer.temps[0].bed.actual;
-            }
-            if(document.getElementById("printerTemps-"+printer._id)){
-                //Exists so just update the values
-                let tool = document.getElementById("printerTempsTool-" + printer._id)
-                let bed = document.getElementById("printerTempsBed-" + printer._id)
-                tool.title = `${Validate.getName(printer)}: Tool A: ${toolActual}, Tool T: ${toolTarget}`;
-                bed.title = `${Validate.getName(printer)}: Bed A: ${bedActual}, Bed T: ${bedTarget}`;
-                tool.className = `${dashUpdate.checkTempRange(printer.stateColour.category,toolTarget, toolActual, printer.tempTriggers.heatingVariation, printer.tempTriggers.coolDown)} heatMapLeft`
-                bed.className = `${dashUpdate.checkTempRange(printer.stateColour.category, bedTarget, bedActual, printer.tempTriggers.heatingVariation, printer.tempTriggers.coolDown)} heatMapRight`
-            }else{
-                //Create the elements as doesn't exists
-                currentTemps.insertAdjacentHTML("beforeend", `
-                    <div class="d-flex flex-wrap" id="printerTemps-${printer._id}">
-                    </div>
-                `)
-
-                document.getElementById("printerTemps-"+printer._id).insertAdjacentHTML('beforeend',`
-                     <div title="${Validate.getName(printer)}: Tool A: ${toolActual}, Tool T: ${toolTarget}" class="${dashUpdate.checkTempRange(printer.stateColour.category,toolTarget, toolActual, printer.tempTriggers.heatingVariation, printer.tempTriggers.coolDown)} heatMapLeft" id="printerTempsTool-${printer._id}"></div>
-                `)
-                document.getElementById("printerTemps-"+printer._id).insertAdjacentHTML('beforeend',`
-                     <div title="${Validate.getName(printer)}: Bed A: ${bedActual}, Bed T: ${bedTarget}" class="${dashUpdate.checkTempRange(printer.stateColour.category, bedTarget, bedActual, printer.tempTriggers.heatingVariation, printer.tempTriggers.coolDown)} heatMapRight" id="printerTempsBed-${printer._id}"></div>
-                `)
-
-            }
-
-        })
-    }
-    static checkTempRange(state, target, actual, heatingVariation, coolDown){
-        if(state === "Active"){
-            if (actual > target - parseInt(heatingVariation) && actual < target + parseInt(heatingVariation)) {
-               return "tempSuccess"
-            } else {
-                return "tempActive"
-            }
-        }else if (state === "Complete"){
-            if (actual > parseInt(coolDown)) {
-                return "tempCooling"
-            } else {
-                return "tempCool"
-            }
-        }else{
-            //Offline
-            return "tempOffline"
-        }
+    static currentActivity(currentStatus, currentActivity) {
+        currentActivityChart.updateSeries(currentActivity)
+        currentUtilisation.updateSeries(currentStatus)
     }
     static farmUtilisation(stats){
         let activeHours = document.getElementById("activeHours")
@@ -611,32 +481,20 @@ class dashUpdate {
         let idleHours = document.getElementById("idleHours")
         idleHours.innerHTML = '<i class="fas fa-square text-secondary"></i> <b>Idle Hours: </b> ' + Calc.generateTime(stats.idleHours / 1000)
         let failedHours = document.getElementById("failedHours")
-        failedHours.innerHTML = '<i class="fas fa-square text-warning"></i> <b>Failed Hours: </b>' +  Calc.generateTime(stats.downHours / 1000)
+        failedHours.innerHTML = '<i class="fas fa-square text-warning"></i> <b>Failed Hours: </b>' +  Calc.generateTime(stats.failedHours / 1000)
         let offlineHours = document.getElementById("offlineHours")
-        offlineHours.innerHTML = '<i class="fas fa-square text-danger"></i> <b>Offline Hours: </b>' +  Calc.generateTime(stats.offlineTime / 1000)
+        offlineHours.innerHTML = '<i class="fas fa-square text-danger"></i> <b>Offline Hours: </b>' +  Calc.generateTime(stats.offlineHours / 1000)
         let activeProgress = document.getElementById("activeProgress")
-        activeProgress.style.width = stats.activePercent+"%";
-        activeProgress.innerHTML = stats.activePercent+"%"
+        activeProgress.style.width = stats.activeHoursPercent.toFixed(0)+"%";
+        activeProgress.innerHTML = stats.activeHoursPercent.toFixed(0)+"%"
         let idleProgress = document.getElementById("idleProgress")
-        idleProgress.style.width = stats.idlePercent+"%";
-        idleProgress.innerHTML = stats.idlePercent+"%"
+        idleProgress.style.width = stats.idleHoursPercent.toFixed(0)+"%";
+        idleProgress.innerHTML = stats.idleHoursPercent.toFixed(0)+"%"
         let failedProgress = document.getElementById("failedProgress")
-        failedProgress.style.width = stats.downPercent+"%";
-        failedProgress.innerHTML = stats.downPercent+"%"
+        failedProgress.style.width = stats.failedHoursPercent.toFixed(0)+"%";
+        failedProgress.innerHTML = stats.failedHoursPercent.toFixed(0)+"%"
         let offlineProgress = document.getElementById("offlineProgress")
-        offlineProgress.style.width = stats.offlinePercent+"%";
-        offlineProgress.innerHTML = stats.offlinePercent+"%"
-        // let usedStorage = document.getElementById("usedStorage")
-        // let availableStorage = document.getElementById("availableStorage")
-        // let usedProgress = document.getElementById("usedProgress")
-        // let availableProgress = document.getElementById("availableProgress")
-        // usedStorage.innerHTML = '<i class="fas fa-square text-warning"></i> <b>Used: </b>' + Calc.bytes(stats.storageUsed)
-        // usedProgress.style.width = stats.storagePercent+"%";
-        // usedProgress.innerHTML = stats.storagePercent+"%"
-        // availableStorage.innerHTML = '<i class="fas fa-square text-success"></i> <b>Available: </b>' + Calc.bytes(stats.storageRemain)
-        // availableProgress.style.width = 100 - stats.storagePercent+"%";
-        // availableProgress.innerHTML =  100 - stats.storagePercent+"%";
-
-
+        offlineProgress.style.width = stats.offlineHoursPercent.toFixed(0)+"%";
+        offlineProgress.innerHTML = stats.offlineHoursPercent.toFixed(0)+"%"
     }
 }
