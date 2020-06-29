@@ -49,9 +49,6 @@ welcome();
 //Dashboard Page
 router.get("/dashboard", ensureAuthenticated, async(req, res) => {
     let printers = await Runner.returnFarmPrinters();
-    const system = require("../runners/systemInfo.js");
-    const SystemRunner = system.SystemRunner;
-    let systemInformation = await SystemRunner.returnInfo();
     let clientSettings = await SettingsClean.returnClientSettings();
     let serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
@@ -67,17 +64,9 @@ router.get("/dashboard", ensureAuthenticated, async(req, res) => {
         name: user,
         userGroup: group,
         version: version,
-        printers: printers,
-        currentOperations: statistics.currentOperations,
-        octofarmStatistics: statistics.octofarmStatistics,
-        printStatistics: statistics.printStatistics,
         printerCount: printers.length,
-        currentOperationsCount: statistics.currentOperationsCount,
         page: "Dashboard",
         helpers: prettyHelpers,
-        systemInfo: systemInformation,
-        clientSettings: clientSettings,
-        serverSettings: serverSettings,
     });
 });
 router.get("/printers", ensureAuthenticated, async(req, res) => {
