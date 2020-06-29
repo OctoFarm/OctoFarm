@@ -9,11 +9,15 @@ const PrinterSchema = new mongoose.Schema({
     type: Number,
     required: false,
   },
-  currentUptime:{
+  currentIdle:{
     type: Number,
     required: false,
   },
-  currentIdle:{
+  currentActive: {
+    type: Number,
+    required: false,
+  },
+  currentOffline: {
     type: Number,
     required: false,
   },
