@@ -433,7 +433,7 @@ export default class FileManager {
       let fileElem = document.getElementById("fileList-"+printer._id);
       if(fileElem){
         let fileList = printer.fileList;
-        if (!printer.systemChecks.files) {
+        if (!printer.systemChecks.files || !fileList.fileList.length > 0) {
           fileElem.innerHTML = `
             <div class="noStorage  text-center"><i class="fas fa-file-code fa-5x"></i><br><h5>There are no files in local storage...</h5></div>
       `;
