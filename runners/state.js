@@ -16,10 +16,19 @@ const EventEmitter = require('events');
 
 let farmPrinters = [];
 
+let countersInterval = false;
+
+if(countersInterval === false){
+    setInterval(() => {
+        Runner.trackCounters();
+    }, 500)
+}
+
 //Checking interval for information...
 // setInterval(() => {
 //   console.log(farmPrinters[0])
 // }, 10000);
+
 
 
 function WebSocketClient() {
@@ -280,12 +289,6 @@ WebSocketClient.prototype.onmessage = async function(data, flags, number) {
         }
         farmPrinters[this.index].state = data.current.state.text;
         farmPrinters[this.index].stateColour = Runner.getColour(data.current.state.text);
-        if(farmPrinters[this.index].stateColour.category === "Active"){
-            Runner.uptimeCount(this.index)
-        }
-        if(farmPrinters[this.index].stateColour.category === "Idle" || farmPrinters[this.index].stateColour.category === "Complete"){
-            Runner.idleCount(this.index)
-        }
 
         if (typeof data.current.progress !== 'undefined') {
             farmPrinters[this.index].progress = data.current.progress;
@@ -529,13 +532,13 @@ class Runner {
                 if (_.isEmpty(users)) {
                     farmPrinters[i].currentUser = "admin";
                     farmPrinters[i].markModified("currentUser");
-                    farmPrinters[i].update();
+                    farmPrinters[i].updateOne();
                 } else {
                     users.users.forEach(user => {
                         if (user.admin) {
                             farmPrinters[i].currentUser = user.name;
                             farmPrinters[i].markModified("currentUser");
-                            farmPrinters[i].update();
+                            farmPrinters[i].updateOne();
                         }
                     });
                 }
@@ -650,9 +653,6 @@ class Runner {
             currentTime = currentTime.getTime();
             farmPrinters[i].dateAdded = currentTime;
         }
-        if(typeof farmPrinters[i].currentUptime === "undefined"){
-            farmPrinters[i].currentUptime = 0;
-        }
         if(typeof farmPrinters[i].settingsApperance !== 'undefined'){
             farmPrinters[i].settingsAppearance = farmPrinters[i].settingsApperance;
         }
@@ -664,6 +664,12 @@ class Runner {
         }
         if(typeof farmPrinters[i].currentIdle === "undefined") {
             farmPrinters[i].currentIdle = 0;
+        }
+        if(typeof farmPrinters[i].currentActive === "undefined") {
+            farmPrinters[i].currentActive = 0;
+        }
+        if(typeof farmPrinters[i].currentOffline === "undefined") {
+            farmPrinters[i].currentOffline = 0;
         }
         if(typeof farmPrinters[i].selectedFilament === "undefined" && !Array.isArray(farmPrinters[i].selectedFilament)){
             farmPrinters[i].selectedFilament = [];
@@ -723,7 +729,9 @@ class Runner {
         printer.sortIndex = farmPrinters[i].sortIndex;
         printer.tempTriggers = farmPrinters[i].tempTriggers;
         printer.dateAdded = farmPrinters[i].dateAdded;
-        printer.currentUptime = farmPrinters[i].currentUptime;
+        printer.currentIdle = farmPrinters[i].currentIdle;
+        printer.currentActive = farmPrinters[i].currentActive;
+        printer.currentOffline = farmPrinters[i].currentOffline;
         printer.selectedFilament = farmPrinters[i].selectedFilament;
         printer.powerSettings = farmPrinters[i].powerSettings;
         printer.alerts = farmPrinters[i].alerts;
@@ -781,19 +789,21 @@ class Runner {
         logger.info("Re-Scanning printers farm");
         return edited;
     }
-    static async uptimeCount(index){
-        let printer = await Printers.findById(farmPrinters[index]._id);
-        farmPrinters[index].currentUptime = farmPrinters[index].currentUptime + 500;
-        printer.currentUptime = farmPrinters[index].currentUptime;
-        printer.markModified("currentUptime");
-        printer.save();
-    }
-    static async idleCount(index){
-        let printer = await Printers.findById(farmPrinters[index]._id);
-        farmPrinters[index].currentIdle = farmPrinters[index].currentIdle + 500;
-        printer.currentIdle = farmPrinters[index].currentIdle;
-        printer.markModified("currentIdle");
-        printer.save();
+    static async trackCounters(){
+        for(let p = 0; p < farmPrinters.length; p++){
+            if(typeof farmPrinters[p].stateColour !== 'undefined'){
+                if(farmPrinters[p].stateColour.category === "Active"){
+                    farmPrinters[p].currentActive = farmPrinters[p].currentActive + 500;
+                }
+                if(farmPrinters[p].stateColour.category === "Idle" || farmPrinters[p].stateColour.category === "Disconnected" || farmPrinters[p].stateColour.category === "Complete"){
+                    farmPrinters[p].currentIdle = farmPrinters[p].currentIdle + 500;
+                }
+                if(farmPrinters[p].stateColour.category === "Offline"){
+                    farmPrinters[p].currentOffline = farmPrinters[p].currentOffline + 500;
+                }
+                farmPrinters[p].save().catch(e => logger.info("Error Saving Counters, Safe to ignore...", e))
+            }
+        }
     }
     static async removePrinter(indexs) {
         logger.info("Pausing runners to remove printer...");
