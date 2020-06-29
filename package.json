@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "pm2 start app.js --name OctoFarm -o './logs/pm2.log' -e './logs/pm2.error.log' --time",
-    "dev": "nodemon app.js"
+    "dev": "nodemon --trace-warnings app.js"
   },
   "repository": {
     "type": "git",
@@ -49,6 +49,7 @@
     "yieldable-json": "^2.0.0"
   },
   "devDependencies": {
+    "clinic": "^6.0.2",
     "debug": "^4.1.1",
     "dependency-check": "^4.1.0",
     "eslint": "^6.8.0",
