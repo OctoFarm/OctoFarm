@@ -31,7 +31,6 @@ export default class PrinterSettings {
   }
   static async init(index, printers, printerControlList) {
     if(index !== ""){
-
       currentIndex = index;
       let id = _.findIndex(printers, function(o) { return o._id == index; });
       currentPrinter = printers[id];
@@ -58,7 +57,6 @@ export default class PrinterSettings {
           document.getElementById("printerBaudDrop").innerHTML = "";
           document.getElementById("printerProfileDrop").innerHTML = "";
           document.getElementById("printerConnect").innerHTML = "";
-          PrinterManager.init(event.target.value, printers, printerControlList);
         });
         controlDropDown = true;
       }
