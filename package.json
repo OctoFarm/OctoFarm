@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "start": "pm2 start app.js --name OctoFarm -o './logs/pm2.log' -e './logs/pm2.error.log' --time",
-    "dev": "nodemon --trace-warnings app.js"
+    "dev": "pm2-dev start pm2-dev.json"
   },
   "repository": {
     "type": "git",

@@ -19,6 +19,8 @@ All notable changes to this project will be documented in this file.
     - pm2 now outputs full process logs into log folder. 
     - Printer Control now has web and power buttons. 
     - Printers Manager now shows status for the 6 checks an OctoPrint client will go through. API, File, State, Profile, Settings and System. Red shows not yet scanned and green shows scanned. 
+    - Added filters to Terminal output on Printer Control. Same as OctoPrint currently: temp,sd,wait
+    - Terminal output is now colour coded: temp - yellow, sd - grey, wait - red.
     
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 

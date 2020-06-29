@@ -579,6 +579,33 @@ export default class PrinterManager {
                         <button class="btn btn-secondary" id="terminalInputBtn" type="submit">Send</button>
                       </div>
                     </div>
+                    <form class="was-validated">
+                      <div class="custom-control custom-checkbox mb-3">
+                        <input 
+                        type="checkbox" class="custom-control-input" id="tempMessages" required checked>
+                        <label class="custom-control-label" for="tempMessages">Temperature Messages</label>
+                        <div class="valid-feedback">Showing temperature messages</div>
+                        <div class="invalid-feedback">Not showing temperature messages</div>
+                      </div>
+                      </form>
+                      <form class="was-validated">
+                       <div class="custom-control custom-checkbox mb-3">
+                        <input
+                        type="checkbox" class="custom-control-input" id="sdMessages" required checked>
+                        <label class="custom-control-label" for="sdMessages">SD Messages</label>
+                        <div class="valid-feedback">Showing sd messages</div>
+                        <div class="invalid-feedback">Not showing sd messages</div>
+                      </div>
+                      </form>
+                      <form class="was-validated">
+                      <div class="custom-control custom-checkbox mb-3">
+                        <input
+                        type="checkbox" class="custom-control-input" id="waitMessages" required checked>
+                        <label class="custom-control-label" for="waitMessages">Wait Responses</label>
+                        <div class="valid-feedback">Showing wait responses</div>
+                        <div class="invalid-feedback">Not showing wait responses</div>
+                      </div>
+                      </form>
                 </div>
   
             </div>
@@ -1511,11 +1538,54 @@ export default class PrinterManager {
         elements.terminal.terminalWindow.scrollTop + 1;
     elements.terminal.terminalWindow.innerHTML = "";
     if (typeof printer.terminal != "undefined") {
-      printer.terminal.forEach(log => {
-        elements.terminal.terminalWindow.insertAdjacentHTML("beforeend", `
-          <div id="logLine" class="logLine">${log}</div>
+      let waitCheck = document.getElementById("waitMessages").checked;
+      let tempCheck = document.getElementById("tempMessages").checked;
+      let sdCheck = document.getElementById("sdMessages").checked;
+      for(let l = 0; l < printer.terminal.length; l++){
+        let tempMess = /(Send: (N\d+\s+)?M105)|(Recv:\s+(ok\s+)?.*(B|T\d*):\d+)/;
+        let sdMess = /(Send: (N\d+\s+)?M27)|(Recv: SD printing byte)/;
+        let sdMess2 = /Recv: Not SD printing/;
+        let waitMess = /Recv: wait/;
+        if(printer.terminal[l].match(tempMess)){
+            if(tempCheck){
+              elements.terminal.terminalWindow.insertAdjacentHTML("beforeend", `
+          <div id="logLine${l}" class="logLine temperatureMessage">${printer.terminal[l]}</div>
         `)
-      })
+            }else{
+              elements.terminal.terminalWindow.insertAdjacentHTML("beforeend", `
+          <div id="logLine${l}" class="logLine temperatureMessage d-none">${printer.terminal[l]}</div>
+        `)
+            }
+
+          }else if(printer.terminal[l].match(sdMess) || printer.terminal[l].match(sdMess2) ){
+            if(sdCheck){
+              elements.terminal.terminalWindow.insertAdjacentHTML("beforeend", `
+          <div id="logLine${l}" class="logLine sdMessage">${printer.terminal[l]}</div>
+        `)
+            }else{
+              elements.terminal.terminalWindow.insertAdjacentHTML("beforeend", `
+          <div id="logLine${l}" class="logLine sdMessage d-none">${printer.terminal[l]}</div>
+        `)
+            }
+
+        }else if(printer.terminal[l].match(waitMess)){
+          if(waitCheck){
+            elements.terminal.terminalWindow.insertAdjacentHTML("beforeend", `
+          <div id="logLine${l}" class="logLine waitMessage">${printer.terminal[l]}</div>
+        `)
+          }else{
+            elements.terminal.terminalWindow.insertAdjacentHTML("beforeend", `
+          <div id="logLine${l}" class="logLine waitMessage d-none">${printer.terminal[l]}</div>
+        `)
+          }
+
+        }else{
+            elements.terminal.terminalWindow.insertAdjacentHTML("beforeend", `
+          <div id="logLine${l}" class="logLine">${printer.terminal[l]}</div>
+        `)
+          }
+
+      }
     }
 
       if (isScrolledToBottom) {

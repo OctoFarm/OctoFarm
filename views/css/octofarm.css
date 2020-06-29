@@ -353,6 +353,17 @@ a.notyet {
   width: 100%;
   z-index: 1023;
 }
+
+/*Terminal*/
+.temperatureMessage {
+  background-color:#583c0e;
+}
+.sdMessage {
+  background-color:#262626;
+}
+.waitMessage {
+  background-color:#2e0905;
+}
 label {
   cursor: pointer;
   /* Style as you please, it will become the visible UI component. */

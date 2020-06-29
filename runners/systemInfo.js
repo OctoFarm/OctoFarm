@@ -52,6 +52,7 @@ class SystemRunner {
         sysProcess: sysProcess
       };
         return systemInfo;
+
     }
     catch(e){
       console.log(e)

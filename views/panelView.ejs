@@ -6,10 +6,11 @@
     include('./partials/currentOperations.ejs') %> <% }%>
     <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
       <div id="listView" class="row" data-jplist-group="printers">
-        <%- include('./partials/Views/panelView.ejs') %>
+
       </div>
     </div>
   </div>
 <% }else{ %>
   <%- include('./addPrinters.ejs') %>
 <% } %>
+<script src="/js/panelViewRunner.js" type="module"></script>

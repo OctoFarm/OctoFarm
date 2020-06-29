@@ -49,7 +49,6 @@ welcome();
 //Dashboard Page
 router.get("/dashboard", ensureAuthenticated, async(req, res) => {
     let printers = await Runner.returnFarmPrinters();
-    let clientSettings = await SettingsClean.returnClientSettings();
     let serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
@@ -140,11 +139,8 @@ router.get("/history", ensureAuthenticated, async (req, res) => {
 });
 //Panel view  Page
 router.get("/mon/panel", ensureAuthenticated, async(req, res) => {
-    let printers = Runner.returnFarmPrinters();
-    let sortedPrinters = await Runner.sortedIndex();
-    const farmStatistics = require("../runners/statisticsCollection.js");
-    const FarmStatistics = farmStatistics.StatisticsCollection;
-    let statistics = await FarmStatistics.returnStats();
+    let printers = await Runner.returnFarmPrinters();
+    let sortedIndex = await Runner.sortedIndex();
     let clientSettings = await SettingsClean.returnClientSettings();
     let serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
@@ -161,14 +157,11 @@ router.get("/mon/panel", ensureAuthenticated, async(req, res) => {
         userGroup: group,
         version: version,
         printers: printers,
-        sortedIndex: sortedPrinters,
-        currentOperations: statistics.currentOperations,
         printerCount: printers.length,
-        currentOperationsCount: statistics.currentOperationsCount,
+        sortedIndex: sortedIndex,
         page: "Panel View",
         helpers: prettyHelpers,
         clientSettings: clientSettings,
-        serverSettings: serverSettings,
     });
 });
 //Camera view  Page

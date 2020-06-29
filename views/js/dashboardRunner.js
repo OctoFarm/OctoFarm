@@ -369,7 +369,6 @@ if (window.Worker) {
             worker = new Worker("./js/lib/modules/workers/dashboardWorker.js");
             worker.onmessage = function(event){
                 if (event.data != false) {
-                        console.log(event.data)
                         let currentOperationsData = event.data.currentOperations;
                         let printerInfo = event.data.printerInformation;
                         let dashboard = event.data.dashStatistics;
