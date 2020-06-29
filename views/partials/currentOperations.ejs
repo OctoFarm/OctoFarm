@@ -24,7 +24,7 @@
             aria-expanded="false"
             disabled
           >
-            Offline: <%= currentOperationsCount.offline %>
+            Offline: <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
           </button>
           <button id="disconCount"
                   type="button"
@@ -33,7 +33,7 @@
                   aria-expanded="false"
                   disabled
           >
-            Disconnected: <%= currentOperationsCount.disconnected %>
+            Disconnected: <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
           </button>
           <button id="idleCount"
             type="button"
@@ -42,7 +42,7 @@
             aria-expanded="false"
             disabled
           >
-            Idle: <%= currentOperationsCount.idle %>
+            Idle: <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
           </button>
           <button id="activeCount"
             type="button"
@@ -51,7 +51,7 @@
             aria-expanded="false"
             disabled
           >
-            Active: <%= currentOperationsCount.active %>
+            Active: <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
           </button>
           <button id="completeCount"
             type="button"
@@ -60,7 +60,7 @@
             aria-expanded="false"
             disabled
           >
-            Complete: <%= currentOperationsCount.complete %>
+            Complete: <i class="fa fa-spinner fa-spin" aria-hidden="true"></i>
           </button>
       </div>
     </div>
@@ -70,12 +70,12 @@
             <div id="farmProgress"
                  class="progress-bar progress-bar-striped bg-warning"
                  role="progressbar"
-                 style="width: <%= currentOperationsCount.farmProgress %>%"
-                 aria-valuenow="<%= currentOperationsCount.farmProgress %>"
+                 style="width: 0%"
+                 aria-valuenow="0%"
                  aria-valuemin="0"
                  aria-valuemax="100"
             >
-              <%= currentOperationsCount.farmProgress %>%
+              0%
             </div>
           </div>
         </div>
@@ -85,62 +85,6 @@
 
 
     <div class="card-body pt-0 pb-0 d-flex flex-row overflow-x" id="currentOperationsBody">
-      <% currentOperations.forEach(current => { %>
-        <% if(current != null){ %>
-          <% let currentDate = new Date(); %>
-          <% currentDate = currentDate.getTime(); %>
-          <% let futureDateString = new Date(currentDate + current.timeRemaining * 1000).toDateString() %>
-          <% let futureTimeString = new Date(currentDate + current.timeRemaining * 1000).toTimeString() %>
-          <% futureTimeString = futureTimeString.substring(0, 8); %>
-          <% let dateComplete = futureDateString + ": " + futureTimeString; %>
-          <% let finishedPrint = `<button id='currentHarvest-${current.index}' title="Clear your finished print from current operations" type='button' class='tag btn btn-success btn-sm pt-0 pb-0'>Print Harvested?</button>`; %>
-          <% let restartPrint = `<button id='restartCurrentPrint-${current.index}' title="Restart your current selected print" type='button' class='tag btn btn-warning btn-sm pt-0 pb-0'>Restart Print!</button>`; %>
-          <div id="currentOpCard-<%=current.index%>"
-            class="card card-block text-white bg-secondary d-inline-block"
-            style="min-width: 200px; max-width: 200px;"
-          >
-              <div class="card-header pb-1 pt-1 pl-2 pr-2"><%=current.name%></div>
-              <div class="card-body  pb-0 pt-2 pl-2 pr-2 pb-1">
-                <% if(current.progress === 100){ %>
-                <h6 id="currentTime-<%=current.index%>" class="pb-0 text-center d-none" style="font-size:0.6rem;"><%=  helpers.generateTime(current.timeRemaining) %></h6>
-                <h6 id="currentRestart-<%=current.index%>" class="pb-0 text-center" style="font-size:0.6rem;"><%- restartPrint%></h6>
-                <h6 id="futureDate-<%=current.index%>" class="pb-0 text-center d-none" style="font-size:0.6rem;"><%- dateComplete %></h6>
-                <h6 id="finishedPrint-<%=current.index%>" class="pb-0 text-center" style="font-size:0.6rem;"><%- finishedPrint %></h6>
-                <div id="currentProgressMain-<%=current.index%>" class="progress d-none">
-                  <div id="currentProgress-<%=current.index%>"
-                       class="progress-bar progress-bar-striped bg-<%=current.progressColour%>"
-                       role="progressbar"
-                       style="width: <%=current.progress%>%"
-                       aria-valuenow=""
-                       aria-valuemin="0"
-                       aria-valuemax="100"
-                  >
-                    <%=current.progress%>%
-                  </div>
-                </div>
-                <% }else{ %>
-                <h6 id="currentTime-<%=current.index%>" class="pb-0 text-center" style="font-size:0.6rem;"><%=  helpers.generateTime(current.timeRemaining) %></h6>
-                <h6 id="currentRestart-<%=current.index%>" class="pb-0 text-center d-none" style="font-size:0.6rem;"><%- restartPrint%></h6>
-                <h6 id="futureDate-<%=current.index%>" class="pb-0 text-center" style="font-size:0.6rem;"><%- dateComplete %></h6>
-                <h6 id="finishedPrint-<%=current.index%>" class="pb-0 text-center d-none" style="font-size:0.6rem;"><%- finishedPrint %></h6>
-                <div id="currentProgressMain-<%=current.index%>" class="progress">
-                  <div id="currentProgress-<%=current.index%>"
-                       class="progress-bar progress-bar-striped bg-<%=current.progressColour%>"
-                       role="progressbar"
-                       style="width: <%=current.progress%>%"
-                       aria-valuenow=""
-                       aria-valuemin="0"
-                       aria-valuemax="100"
-                  >
-                    <%=current.progress%>%
-                  </div>
-                </div>
-               <% } %>
-
-              </div>
-            </div>
-        <% } %>
-    <%  }) %>
 
     </div>
   </div>

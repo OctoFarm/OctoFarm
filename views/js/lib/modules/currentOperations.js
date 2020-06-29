@@ -4,11 +4,11 @@ import OctoPrintClient from "../octoprint.js";
 let printers = [];
 let resetFile = function(id){
   let i = _.findIndex(printers, function(o) { return o._id == id; });
-  OctoPrintClient.file(printers[i], printers[i].job.file.path, "load");
+  OctoPrintClient.file(printers[i], printers[i].currentJob.filePath, "load");
 }
 let rePrint = function(id){
     let i = _.findIndex(printers, function(o) { return o._id == id; });
-    OctoPrintClient.file(printers[i], printers[i].job.file.path, "print");
+    OctoPrintClient.file(printers[i], printers[i].currentJob.filePath, "print");
 }
 let currentHarvest = document.querySelectorAll("[id^='currentHarvest-']");
 currentHarvest.forEach(harvest => {
