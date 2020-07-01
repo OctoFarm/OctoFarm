@@ -5,14 +5,6 @@ const FarmInfoSchema = new mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    farmInfo: {
-        type: Object,
-        required: false
-    },
-    octofarmStatistics: {
-        type: Object,
-        required: false
-    },
     heatMap: {
         type: Object,
         required: false

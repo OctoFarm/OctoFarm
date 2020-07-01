@@ -325,241 +325,248 @@ WebSocketClient.prototype.onopen = async function (e) {
   this.instance.send(JSON.stringify(throt));
 };
 WebSocketClient.prototype.onmessage = async function (data, flags, number) {
-  // console.log("WebSocketClient: message",arguments);
-  // Listen for print jobs
-  farmPrinters[this.index].hostState = "Online";
-  farmPrinters[this.index].hostStateColour = Runner.getColour("Online");
-  farmPrinters[this.index].hostDescription = "Host is Online";
-  data = await JSON.parse(data);
-  if (typeof data.connected !== "undefined") {
-    farmPrinters[this.index].octoPrintVersion = data.connected.version;
-  }
-  // Listen for printer status
-  if (typeof data.current !== "undefined") {
-    farmPrinters[this.index].webSocket = "success";
-    farmPrinters[this.index].webSocketDescription =
-      "Websocket Alive and Receiving Data";
-    if (data.current.state.text === "Offline") {
-      data.current.state.text = "Disconnected";
-      farmPrinters[this.index].stateDescription =
-        "Your printer is disconnected";
-    } else if (data.current.state.text.includes("Error:")) {
-      farmPrinters[this.index].stateDescription = data.current.state.text;
-      data.current.state.text = "Error!";
-    } else if (data.current.state.text === "Closed") {
-      res.current.state.text = "Disconnected";
-      farmPrinters[this.index].stateDescription =
-        "Your printer is disconnected";
-    } else {
-      farmPrinters[this.index].stateDescription =
-        "Current Status from OctoPrint";
+  try {
+    // console.log("WebSocketClient: message",arguments);
+    // Listen for print jobs
+    farmPrinters[this.index].hostState = "Online";
+    farmPrinters[this.index].hostStateColour = Runner.getColour("Online");
+    farmPrinters[this.index].hostDescription = "Host is Online";
+    data = await JSON.parse(data);
+    if (typeof data.connected !== "undefined") {
+      farmPrinters[this.index].octoPrintVersion = data.connected.version;
     }
-    farmPrinters[this.index].state = data.current.state.text;
-    farmPrinters[this.index].stateColour = Runner.getColour(
-      data.current.state.text
-    );
-
-    if (typeof data.current.progress !== "undefined") {
-      farmPrinters[this.index].progress = data.current.progress;
-    }
-    if (
-      typeof data.current.currentZ !== "undefined" &&
-      data.currentZ !== null
-    ) {
-      farmPrinters[this.index].currentZ = data.current.currentZ;
-    }
-    if (
-      typeof data.current.job !== "undefined" &&
-      data.current.job.user !== null
-    ) {
-      farmPrinters[this.index].job = data.current.job;
-      const currentFileIndex = _.findIndex(
-        farmPrinters[this.index].fileList.files,
-        function (o) {
-          return o.name == data.current.job.file.name;
-        }
-      );
-      if (currentFileIndex > -1) {
-        if (
-          typeof farmPrinters[this.index].fileList.files[currentFileIndex] !==
-            "undefined" &&
-          farmPrinters[this.index].fileList.files[currentFileIndex].thumbnail !=
-            null
-        ) {
-          farmPrinters[this.index].job.file.thumbnail =
-            farmPrinters[this.index].fileList.files[currentFileIndex].thumbnail;
-        }
-        if (
-          typeof farmPrinters[this.index].fileList.files[currentFileIndex] !==
-          "undefined"
-        ) {
-          farmPrinters[this.index].job.file.length =
-            farmPrinters[this.index].fileList.files[currentFileIndex].length;
-        }
+    // Listen for printer status
+    if (typeof data.current !== "undefined") {
+      farmPrinters[this.index].webSocket = "success";
+      farmPrinters[this.index].webSocketDescription =
+        "Websocket Alive and Receiving Data";
+      if (data.current.state.text === "Offline") {
+        data.current.state.text = "Disconnected";
+        farmPrinters[this.index].stateDescription =
+          "Your printer is disconnected";
+      } else if (data.current.state.text.includes("Error:")) {
+        farmPrinters[this.index].stateDescription = data.current.state.text;
+        data.current.state.text = "Error!";
+      } else if (data.current.state.text === "Closed") {
+        res.current.state.text = "Disconnected";
+        farmPrinters[this.index].stateDescription =
+          "Your printer is disconnected";
+      } else {
+        farmPrinters[this.index].stateDescription =
+          "Current Status from OctoPrint";
       }
-      const currentFilament = JSON.parse(
-        JSON.stringify(farmPrinters[this.index].selectedFilament)
-      );
-      for (
-        let s = 0;
-        s < farmPrinters[this.index].selectedFilament.length;
-        s++
-      ) {
-        if (farmPrinters[this.index].selectedFilament[s] !== null) {
-          let profile = null;
-          if (systemSettings.filamentManager) {
-            profile = await Profiles.findOne({
-              "profile.index":
-                farmPrinters[this.index].selectedFilament[s].spools.profile,
-            });
-          } else {
-            profile = await Profiles.findById(
-              farmPrinters[this.index].selectedFilament[s].spools.profile
-            );
-          }
-
-          currentFilament[s].spools.profile = profile.profile;
-        }
-      }
-      JobClean.generate(farmPrinters[this.index], currentFilament);
-    }
-
-    if (typeof data.current.logs !== undefined) {
-      farmPrinters[this.index].logs = data.current.logs;
-    }
-    if (
-      typeof data.current.temps !== "undefined" &&
-      data.current.temps.length !== 0
-    ) {
-      if (typeof data.current.temps[0].tool0 !== "undefined") {
-        farmPrinters[this.index].temps = data.current.temps;
-      }
-    }
-    if (
-      data.current.progress.completion != null &&
-      data.current.progress.completion === 100
-    ) {
-      farmPrinters[this.index].stateColour = Runner.getColour("Complete");
-      farmPrinters[this.index].stateDescription =
-        "Your current print is Completed!";
-    } else {
+      farmPrinters[this.index].state = data.current.state.text;
       farmPrinters[this.index].stateColour = Runner.getColour(
         data.current.state.text
       );
-    }
-  }
-  if (typeof data.event !== "undefined") {
-    if (data.event.type === "PrintPaused") {
-      const that = this;
-      ScriptRunner.check(farmPrinters[that.index], "paused");
-    }
-    if (data.event.type === "PrintFailed") {
-      const that = this;
-      setTimeout(async function () {
-        logger.info(`${data.event.type + that.index}: ${that.url}`);
-        let sendPrinter = {};
-        sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
-        let job = {};
-        job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
-        let files = {};
-        files = JSON.parse(
-          JSON.stringify(farmPrinters[that.index].fileList.files)
-        );
-        // Register cancelled print...
-        await HistoryCollection.failed(
-          data.event.payload,
-          sendPrinter,
-          job,
-          files
-        );
-        await Runner.updateFilament();
-      }, 10000);
-      ScriptRunner.check(farmPrinters[that.index], "failed");
-    }
-    if (data.event.type === "PrintDone") {
-      const that = this;
-      setTimeout(async function () {
-        logger.info(`${data.event.type + that.index}: ${that.url}`);
-        let sendPrinter = {};
-        sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
-        let job = {};
-        job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
-        let files = {};
-        files = JSON.parse(
-          JSON.stringify(farmPrinters[that.index].fileList.files)
-        );
-        // Register cancelled print...
-        await HistoryCollection.complete(
-          data.event.payload,
-          sendPrinter,
-          job,
-          files
-        );
-        await Runner.updateFilament();
-      }, 10000);
-      ScriptRunner.check(farmPrinters[that.index], "done");
-    }
-    if (data.event.type === "Error") {
-      const that = this;
-      setTimeout(async function () {
-        logger.info(`${data.event.type + that.index}: ${that.url}`);
-        let sendPrinter = {};
-        sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
-        let job = {};
-        let files = {};
-        files = JSON.parse(
-          JSON.stringify(farmPrinters[that.index].fileList.files)
-        );
-        if (farmPrinters[that.index].job) {
-          job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
-        }
-        // Register cancelled print...
-        await HistoryCollection.errorLog(
-          data.event.payload,
-          sendPrinter,
-          job,
-          files
-        );
-        await Runner.updateFilament();
-      }, 10000);
-      ScriptRunner.check(farmPrinters[that.index], "error");
-    }
-  }
-  // Event Listeners for state changes
-  if (typeof farmPrinters[this.index].temps !== "undefined") {
-    // When object changes to active, add event listener awaiting cool down.
-    if (farmPrinters[this.index].stateColour.category === "Active") {
-      // Check for existing events object...
-      if (typeof farmPrinters[this.index].events === "undefined") {
-        farmPrinters[this.index].events = new EventEmitter();
+
+      if (typeof data.current.progress !== "undefined") {
+        farmPrinters[this.index].progress = data.current.progress;
       }
       if (
-        typeof farmPrinters[this.index].events._events.cooldown === "undefined"
+        typeof data.current.currentZ !== "undefined" &&
+        data.currentZ !== null
       ) {
-        const that = this;
-        farmPrinters[this.index].events.once("cooldown", (stream) => {
-          ScriptRunner.check(farmPrinters[that.index], "cooldown");
-        });
+        farmPrinters[this.index].currentZ = data.current.currentZ;
+      }
+      if (
+        typeof data.current.job !== "undefined" &&
+        data.current.job.user !== null
+      ) {
+        farmPrinters[this.index].job = data.current.job;
+        const currentFileIndex = _.findIndex(
+          farmPrinters[this.index].fileList.files,
+          function (o) {
+            return o.name == data.current.job.file.name;
+          }
+        );
+        if (currentFileIndex > -1) {
+          if (
+            typeof farmPrinters[this.index].fileList.files[currentFileIndex] !==
+              "undefined" &&
+            farmPrinters[this.index].fileList.files[currentFileIndex]
+              .thumbnail != null
+          ) {
+            farmPrinters[this.index].job.file.thumbnail =
+              farmPrinters[this.index].fileList.files[
+                currentFileIndex
+              ].thumbnail;
+          }
+          if (
+            typeof farmPrinters[this.index].fileList.files[currentFileIndex] !==
+            "undefined"
+          ) {
+            farmPrinters[this.index].job.file.length =
+              farmPrinters[this.index].fileList.files[currentFileIndex].length;
+          }
+        }
+        const currentFilament = JSON.parse(
+          JSON.stringify(farmPrinters[this.index].selectedFilament)
+        );
+        for (
+          let s = 0;
+          s < farmPrinters[this.index].selectedFilament.length;
+          s++
+        ) {
+          if (farmPrinters[this.index].selectedFilament[s] !== null) {
+            let profile = null;
+            if (systemSettings.filamentManager) {
+              profile = await Profiles.findOne({
+                "profile.index":
+                  farmPrinters[this.index].selectedFilament[s].spools.profile,
+              });
+            } else {
+              profile = await Profiles.findById(
+                farmPrinters[this.index].selectedFilament[s].spools.profile
+              );
+            }
+
+            currentFilament[s].spools.profile = profile.profile;
+          }
+        }
+        JobClean.generate(farmPrinters[this.index], currentFilament);
+      }
+
+      if (typeof data.current.logs !== undefined) {
+        farmPrinters[this.index].logs = data.current.logs;
+      }
+      if (
+        typeof data.current.temps !== "undefined" &&
+        data.current.temps.length !== 0
+      ) {
+        if (typeof data.current.temps[0].tool0 !== "undefined") {
+          farmPrinters[this.index].temps = data.current.temps;
+        }
+      }
+      if (
+        data.current.progress.completion != null &&
+        data.current.progress.completion === 100
+      ) {
+        farmPrinters[this.index].stateColour = Runner.getColour("Complete");
+        farmPrinters[this.index].stateDescription =
+          "Your current print is Completed!";
+      } else {
+        farmPrinters[this.index].stateColour = Runner.getColour(
+          data.current.state.text
+        );
       }
     }
-    if (farmPrinters[this.index].stateColour.category === "Complete") {
-      if (typeof farmPrinters[this.index].events !== "undefined") {
-        if (typeof farmPrinters[this.index].temps !== "undefined") {
-          if (
-            parseFloat(farmPrinters[this.index].temps[0].tool0.actual) <
-              parseFloat(farmPrinters[this.index].tempTriggers.coolDown) &&
-            parseFloat(farmPrinters[this.index].temps[0].bed.actual) <
-              parseFloat(farmPrinters[this.index].tempTriggers.coolDown)
-          ) {
-            farmPrinters[this.index].events.emit("cooldown");
+    if (typeof data.event !== "undefined") {
+      if (data.event.type === "PrintPaused") {
+        const that = this;
+        ScriptRunner.check(farmPrinters[that.index], "paused");
+      }
+      if (data.event.type === "PrintFailed") {
+        const that = this;
+        setTimeout(async function () {
+          logger.info(`${data.event.type + that.index}: ${that.url}`);
+          let sendPrinter = {};
+          sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
+          let job = {};
+          job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
+          let files = {};
+          files = JSON.parse(
+            JSON.stringify(farmPrinters[that.index].fileList.files)
+          );
+          // Register cancelled print...
+          await HistoryCollection.failed(
+            data.event.payload,
+            sendPrinter,
+            job,
+            files
+          );
+          await Runner.updateFilament();
+        }, 10000);
+        ScriptRunner.check(farmPrinters[that.index], "failed");
+      }
+      if (data.event.type === "PrintDone") {
+        const that = this;
+        setTimeout(async function () {
+          logger.info(`${data.event.type + that.index}: ${that.url}`);
+          let sendPrinter = {};
+          sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
+          let job = {};
+          job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
+          let files = {};
+          files = JSON.parse(
+            JSON.stringify(farmPrinters[that.index].fileList.files)
+          );
+          // Register cancelled print...
+          await HistoryCollection.complete(
+            data.event.payload,
+            sendPrinter,
+            job,
+            files
+          );
+          await Runner.updateFilament();
+        }, 10000);
+        ScriptRunner.check(farmPrinters[that.index], "done");
+      }
+      if (data.event.type === "Error") {
+        const that = this;
+        setTimeout(async function () {
+          logger.info(`${data.event.type + that.index}: ${that.url}`);
+          let sendPrinter = {};
+          sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
+          let job = {};
+          let files = {};
+          files = JSON.parse(
+            JSON.stringify(farmPrinters[that.index].fileList.files)
+          );
+          if (farmPrinters[that.index].job) {
+            job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
+          }
+          // Register cancelled print...
+          await HistoryCollection.errorLog(
+            data.event.payload,
+            sendPrinter,
+            job,
+            files
+          );
+          await Runner.updateFilament();
+        }, 10000);
+        ScriptRunner.check(farmPrinters[that.index], "error");
+      }
+    }
+    // Event Listeners for state changes
+    if (typeof farmPrinters[this.index].temps !== "undefined") {
+      // When object changes to active, add event listener awaiting cool down.
+      if (farmPrinters[this.index].stateColour.category === "Active") {
+        // Check for existing events object...
+        if (typeof farmPrinters[this.index].events === "undefined") {
+          farmPrinters[this.index].events = new EventEmitter();
+        }
+        if (
+          typeof farmPrinters[this.index].events._events.cooldown ===
+          "undefined"
+        ) {
+          const that = this;
+          farmPrinters[this.index].events.once("cooldown", (stream) => {
+            ScriptRunner.check(farmPrinters[that.index], "cooldown");
+          });
+        }
+      }
+      if (farmPrinters[this.index].stateColour.category === "Complete") {
+        if (typeof farmPrinters[this.index].events !== "undefined") {
+          if (typeof farmPrinters[this.index].temps !== "undefined") {
+            if (
+              parseFloat(farmPrinters[this.index].temps[0].tool0.actual) <
+                parseFloat(farmPrinters[this.index].tempTriggers.coolDown) &&
+              parseFloat(farmPrinters[this.index].temps[0].bed.actual) <
+                parseFloat(farmPrinters[this.index].tempTriggers.coolDown)
+            ) {
+              farmPrinters[this.index].events.emit("cooldown");
+            }
           }
         }
       }
     }
-  }
-  // Information cleaning of farmPrinters
-  if (typeof farmPrinters[this.index] !== "undefined") {
-    PrinterClean.generate(farmPrinters[this.index]);
+    // Information cleaning of farmPrinters
+    if (typeof farmPrinters[this.index] !== "undefined") {
+      PrinterClean.generate(farmPrinters[this.index]);
+    }
+  } catch (e) {
+    console.log(e);
   }
 };
 WebSocketClient.prototype.onerror = function (e) {
@@ -1095,7 +1102,7 @@ class Runner {
         printerId: indexs[i],
       });
       PrinterClean.removePrintersInformation(farmPrinters[index].sortIndex);
-      farmPrinters.splice(index, 1);
+      farmPrinters.splice(farmPrinters[index].sortIndex, 1);
 
       // Splice printer out of farm Array...
       const remove = await Printers.findOneAndDelete({ _id: indexs[i] });
