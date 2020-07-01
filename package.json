@@ -5,7 +5,15 @@
   "main": "app.js",
   "scripts": {
     "start": "pm2 start app.js --name OctoFarm -o './logs/pm2.log' -e './logs/pm2.error.log' --time",
-    "dev": "pm2-dev start pm2-dev.json"
+    "dev": "nodemon app.js"
+  },
+  "nodemonConfig": {
+    "verbose": true,
+    "ignore": [
+      "views/js/*",
+      "logs/*"
+    ],
+    "delay": 2500
   },
   "repository": {
     "type": "git",
@@ -39,11 +47,10 @@
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "pm2": "^4.4.0",
+    "prettier": "^2.0.5",
     "remove": "^0.1.5",
-    "request": "^2.88.2",
     "systeminformation": "^4.26.9",
     "tablefilter": "^0.7.0",
-    "threads": "^1.6.2",
     "winston": "^3.2.1",
     "ws": "^7.3.0",
     "yieldable-json": "^2.0.0"
@@ -52,9 +59,12 @@
     "clinic": "^6.0.2",
     "debug": "^4.1.1",
     "dependency-check": "^4.1.0",
-    "eslint": "^6.8.0",
+    "eslint": "^7.3.1",
     "eslint-config-airbnb-base": "^14.2.0",
+    "eslint-config-prettier": "^6.11.0",
+    "eslint-plugin-ejs-js": "^0.1.0",
     "eslint-plugin-import": "^2.21.2",
+    "eslint-plugin-prettier": "^3.1.4",
     "nodemon": "^2.0.4"
   },
   "nodemonConfig": {
@@ -69,12 +79,6 @@
   "engines": {
     "node": ">= 12.0.0",
     "npm": ">= 6.0.0"
-  },
-  "eslintConfig": {
-    "env": {
-      "browser": true,
-      "node": true
-    }
   },
   "config": {
     "imageRepo": "octofarm/octofarm",
