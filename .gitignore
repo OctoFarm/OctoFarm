@@ -2,5 +2,9 @@ node_modules/
 config/db.js
 TODO.md
 logs/
-
-/.eslintrc.js
+.clinic/
+.eslintrc.json
+.idea/
+.idea/inspectionProfiles/
+.idea/jsLinters/
+.idea/libraries/
