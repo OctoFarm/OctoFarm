@@ -32,7 +32,10 @@
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-
+    <% let noPrinters = "d-none" %>
+    <% if(typeof printerCount !== 'undefined' && printerCount > 0){ %>
+        <% noPrinters = "" %>
+    <% } %>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li id="menuDashboard">
@@ -41,19 +44,19 @@
                 </a>
             </li>
             <li class="nav-item">
-            <a title="Panel Layout Monitoring View" class="nav-link text-light text-center btn-sm" id="menuPanelView" href="/mon/panel"><i class="fas fa-columns"></i>
+            <a title="Panel Layout Monitoring View" class="nav-link text-light text-center btn-sm <%= noPrinters %>" id="menuPanelView" href="/mon/panel"><i class="fas fa-columns"></i>
                 Panel</a>
             </li>
             <li class="nav-item">
-            <a title="List Layout Monitoring View" class="nav-link text-light text-center btn-sm" id="menuListView" href="/mon/list"><i class="fas fa-list"></i> List</a>
+            <a title="List Layout Monitoring View" class="nav-link text-light text-center btn-sm <%= noPrinters %>" id="menuListView" href="/mon/list"><i class="fas fa-list"></i> List</a>
             </li>
             <li class="nav-item">
 
-            <a title="Camera Layout Monitoring View" class="nav-link text-light text-center btn-sm" id="menuCameraView" href="/mon/camera"><i class="fas fa-video"></i>
+            <a title="Camera Layout Monitoring View" class="nav-link text-light text-center btn-sm <%= noPrinters %>" id="menuCameraView" href="/mon/camera"><i class="fas fa-video"></i>
                 Camera</a>
             </li>
             <li class="nav-item">
-            <a title="Current Operations Monitoring Layout View" class="nav-link text-light text-center btn-sm" id="menucurrentOperationsView" href="/mon/currentOp"><i class="fas fa-star"></i>
+            <a title="Current Operations Monitoring Layout View" class="nav-link text-light text-center btn-sm <%= noPrinters %>" id="menucurrentOperationsView" href="/mon/currentOp"><i class="fas fa-star"></i>
                 Current Operations</a>
             </li>
             <% if(page.includes("Camera") || page.includes("List") || page.includes("Panel")){%>

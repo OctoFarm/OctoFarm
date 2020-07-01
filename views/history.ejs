@@ -393,8 +393,8 @@
       <tbody id="historyTable" data-jplist-group="history">
         <% for(let i = 0; i < history.length; i++){ %>
         <tr data-jplist-item>
-          <td class="index" scope="row">
-            <%= history[i].index %>
+          <td class="index">
+                  <%= history[i].index %>
           </td>
           <td class="state">
             <%- history[i].state %>
@@ -506,7 +506,7 @@
 
   </div>
 </div>
-
+  <script src="/js/lib/modules/history.js" type="module"></script>
 <% }else{ %>
   <div class="row mt-5">
     <div class="col-md-6 m-auto">
@@ -674,4 +674,3 @@
     </div>
   </div>
 </div>
-<script src="/js/lib/modules/history.js" type="module"></script>
