@@ -13,6 +13,9 @@ export default class Calculate {
     if (seconds === undefined || isNaN(seconds) || seconds === null) {
       string = "No Time Estimate";
     } else {
+      let years = Math.floor(seconds / (360 * 365))
+
+
       let days = Math.floor(seconds / (3600 * 24));
 
       seconds -= days * 3600 * 24;
@@ -49,7 +52,7 @@ export default class Calculate {
           string = string.replace("0 Days,", "");
         }
       }
-      if (seconds == 0) {
+      if (mnts == 0 && hrs == 0 && days == 0 && seconds == 0) {
         string = string.replace("0 Seconds", "Done");
       }
     }
@@ -60,7 +63,46 @@ export default class Calculate {
   static isBetween(n, a, b) {
     return (n - a) * (n - b) <= 0;
   }
+  static returnFilamentCost(filament, usageElement){
+    let grams = usageElement.replace("g","")
+    grams = parseFloat(grams)
+    if(isNaN(grams)){
+      return `No length to calculate from`
+    }else{
+      if(filament === null || filament == "None chosen..."){
+        return `No filament to calculate from`
+      }else{
+        let cost = (filament.spools.price / filament.spools.weight) * grams
+        return  cost.toFixed(2)
+      }
 
+    }
+  }
+  static returnPrintCost(costSettings, time){
+    if(typeof costSettings === "undefined"){
+      //Attempt to update cost settings in history...
+      return "No cost settings to calculate from"
+    }else{
+      // calculating electricity cost
+      let powerConsumption = parseFloat(costSettings.powerConsumption);
+      let costOfElectricity = parseFloat(costSettings.electricityCosts);
+      let costPerHour = powerConsumption * costOfElectricity;
+      let estimatedPrintTime = time / 3600;  // h
+      let electricityCost = costPerHour * estimatedPrintTime;
+      // calculating printer cost
+      let purchasePrice = parseFloat(costSettings.purchasePrice);
+      let lifespan = parseFloat(costSettings.estimateLifespan);
+      let depreciationPerHour = lifespan > 0 ? purchasePrice / lifespan : 0;
+      let maintenancePerHour = parseFloat(costSettings.maintenanceCosts);
+      let printerCost = (depreciationPerHour + maintenancePerHour) * estimatedPrintTime;
+      // assembling string
+      let estimatedCost = electricityCost + printerCost;
+      return estimatedCost.toFixed(2);
+    }
+
+
+
+  }
   static bytes(a, b) {
     let string = "";
     if (a === undefined || isNaN(a) || a === null) {

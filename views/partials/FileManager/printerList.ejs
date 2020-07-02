@@ -1,8 +1,10 @@
-<% sortedIndex.forEach(sorted => { %>  <% printers[sorted.actualIndex].state%> <%
-if(printers[sorted.actualIndex].state != "Offline" && typeof printers[sorted.actualIndex].current != 'undefined'){ %>
+<% sortedIndex.forEach(sorted => { %> <%
+if(printers[sorted.actualIndex].stateColour.category != "Offline" && typeof printers[sorted.actualIndex].current != 'undefined'){ %>
 <!-- Connected -->
+
   <a
-    id="printer-<%= printers[sorted.actualIndex].index %>"
+    data-jplist-item
+    id="fileManagerPrinter-<%= printers[sorted.actualIndex]._id %>"
     href="#"
     class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
     style="display: block;
@@ -13,16 +15,25 @@ if(printers[sorted.actualIndex].state != "Offline" && typeof printers[sorted.act
         class="col-lg-2"
         style="display:flex; justify-content:center; align-items:center;"
       >
-        <center><i class="fas fa-print fa-2x"></i></center>
+        <center><i class="fas fa-print fa-2x"></i><br>
+        <td><small><span title="<%= printers[sorted.actualIndex].stateDescription %>" id="printerBadge-<%= printers[sorted.actualIndex]._id %>" class="tag badge badge-<%= printers[sorted.actualIndex].stateColour.name %> badge-pill <%= printers[sorted.actualIndex].stateColour.category %>">
+                <%= printers[sorted.actualIndex].state %></span></small></td></center>
       </div>
       <div class="col-lg-10">
         <div class="d-flex w-100 justify-content-between">
           <h5 class="mb-1">
-            <%= printers[sorted.actualIndex].index %>.
-            <span id="printerName-<%= printers[sorted.actualIndex].index %>"
-              ><% if(typeof printers[sorted.actualIndex].settingsApperance != 'undefined'){ %> <%=
-              printers[sorted.actualIndex].settingsApperance.name %> <% } %></span
-            >
+            <span id="printerName-<%= printers[sorted.actualIndex]._id %>">
+              <% if(typeof printers[sorted.actualIndex].settingsApperance !== 'undefined'){ %>
+              <% if(printers[sorted.actualIndex].settingsApperance.name === "" || printers[sorted.actualIndex].settingsApperance.name === null){%>
+                            <%= printers[sorted.actualIndex].printerURL %>
+                <% }else{ %>
+
+                  <%= printers[sorted.actualIndex].settingsApperance.name %>
+                <% }%>
+              <% }else{ %>
+                      <%= printers[sorted.actualIndex].printerURL %>
+              <%  } %></span>
+
           </h5>
           <small>
             <span class="float-right badge badge-dark badge-pill">
@@ -34,6 +45,7 @@ if(printers[sorted.actualIndex].state != "Offline" && typeof printers[sorted.act
             </span></small
           >
         </div>
+
         <div
           class="float-right btn-group flex-wrap btn-group-sm"
           role="group"
@@ -48,26 +60,17 @@ if(printers[sorted.actualIndex].state != "Offline" && typeof printers[sorted.act
         </div>
         <div class="row">
           <div class="col-lg-2">
-            <i class="fas fa-file-upload"></i
-            ><span id="fileCounts-<%= printers[sorted.actualIndex].index %>"> 0 </span>
+            <i class="fas fa-file-upload"></i><span id="fileCounts-<%= printers[sorted.actualIndex]._id %>"> 0 </span>
           </div>
           <div class="col-lg-10">
             <div class="progress">
-              <div
-                id="fileProgress-<%= printers[sorted.actualIndex].index %>"
-                class="progress-bar progress-bar-striped bg-warning"
-                role="progressbar"
-                style="width: 0%"
-                aria-valuenow="0"
-                aria-valuemin="0"
-                aria-valuemax="100"
-              >
+              <div id="fileProgress-<%= printers[sorted.actualIndex]._id %>" class="progress-bar progress-bar-striped bg-warning" role="progressbar" style="width: 0%" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
                 0%
               </div>
             </div>
           </div>
         </div>
-        
+        <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="filamentDrop-<%=printers[sorted.actualIndex]._id%>">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="filamentDrop-<%=printers[sorted.actualIndex]._id%>"><option value="" selected></option></select></div>
         <% if(selectedProfile != null && typeof printers[sorted.actualIndex].profiles[selectedProfile] != 'undefined'){ %>
           <small class="pt-2 float-left"
           ><i class="fas fa-cube"></i> <b>H:</b> <%=

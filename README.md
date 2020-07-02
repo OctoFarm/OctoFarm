@@ -7,9 +7,9 @@
 
 <h3 align="center">Current Feature Requests</h3>
 
-  <p>Please visit <a href="https://features.octofarm.net/">to log a request.</a>
+  <p>Please visit <a href="https://features.octofarm.net">Octofarm's Features Page to log a request.</a>
 
-  <h3 align="center">Version 1.1.4</h3>
+  <h3 align="center">Version 1.1.5</h3>
 <br />
 <p align="center">
   <a href="https://github.com/NotExpectedYet/OctoFarm">
@@ -26,7 +26,7 @@
     <br />
     <a href="https://github.com/NotExpectedYet/OctoFarm/issues">OctoFarm Bug</a>
     ·
-    <a href="https://features.octofarm.net/">Request Feature</a>
+    <a href="https://feathub.com/NotExpectedYet/OctoFarm">Request Feature</a>
   </p>
 </p>
 
@@ -36,12 +36,12 @@
 
 - [About the Project](#about-the-project)
 - [Getting Started](#getting-started)
-  - [Wiki](https://github.com/NotExpectedYet/OctoFarm/wiki)
+  - [Wiki](https://github.com/NotExpectedYet/OctoFarm/wiki/)
+  - [Platform](#platform)
+  - [Supported Browsers](#supported-browsers)
   - [Prerequisites](#prerequisites)
-  - [Installation Docker](#installation-Docker)
-  - [Installation Production](#installation-Production)
-  - [Installation Development](#installation-Development)
-- [Roadmap](#roadmap)
+  - [Installation Production](#installation-production)
+  - [Installation Development](#installation-development)
 - [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
@@ -67,12 +67,20 @@ Should also work on but not tested: MacOS, anything else nodejs will run on.
 
 _Note_: Raspberry Pi's Raspbian OS doesn't officially support running MongoDB yet (MongoDB requires a 64bit kernel, whereas Raspbian's is 32bit), so in that case, you'll need an external database running on some other machine or VM.
 
+### Supported Browsers
+
+Currently OctoFarm only support Chrome, Chromium and Firefox. No other browsers have been tested and may produce bugs. Use one of the supported browsers for the best experience.
+
+ - Firefox currently has a bug where you can't add printers. This is down to firefox not handling editable html fields properly and you will need to use Chrome to input printers.
+
+
+
 ### Prerequisites
 
 - [MongoDB](https://www.mongodb.com/) - v3.6+
 - [NodeJS](https://nodejs.org/) - v12+
 - [NPM](https://www.npmjs.com/) - v6+
-- [OctoPrint](https://octoprint.org) - v1.3.12+
+- [OctoPrint](https://octoprint.org) - v1.3.9+
 
 On your OctoPrint instance
 
@@ -82,87 +90,8 @@ On your OctoPrint instance
 - Restart OctoPrint
 - Repeat for all OctoPrints that will be added to the Farm
 
-### Installation Docker
+#See The WIKI for more detailed instructions than what's available below
 
-### TinkerDad's Version (MongoDB Included)
-
-Instructions can be found: [TheTinkerDad/OctoFarm](https://hub.docker.com/r/thetinkerdad/octofarm)
-
-- Massive thanks to TheTinkerDad for making this, he's also better at keeping up with his documentation. Be sure to send him some love on his [Youtube Channel](https://www.youtube.com/channel/UCNaLzBZhXTCwjsDPU03y-kQ)
-
-### OctoFarm Official (MongoDB Not Included)
-
-BIG thanks to knoker for the help with this!
-
-```sh
-docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -e "TZ=America/Chicago" -p4000:4000 octofarm/octofarm -v '<your persistent folder>/OctoFarm/config/':'/app/serverConfig/':'rw' -v '<your persistent folder>/OctoFarm/logs/':'/app/logs/':'rw'
-```
-
-Environment Variables
-
-- MONGO = contains mongodb connection string
-- TZ = local timezone code e.g. "America/Chicago" ([database of values here](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones))
-
-Ports
-
-- 4000
-
-Paths
-
-```sh
-- <your persistent folder>/OctoFarm/config/':'/app/serverConfig/
-- <your persistent folder>/OctoFarm/logs/':'/app/logs/
-```
-
-### Generic Docker-Compose Installation (Includes a MongoDB Server)
-
-```yml
-version: "3"
-services:
-  mongo:
-    image: mongo
-    restart: always
-    volumes:
-      - <your persistent folder>/MongoDB:/data/db
-
-  octofarm:
-    container_name: octofarm
-    image: octofarm/octofarm
-    restart: always
-    ports:
-      - 4000:4000
-    environment:
-      - MONGO=mongodb://mongo/octofarm
-      - TZ=<your timezone>
-    volumes:
-      - <your persistent folder>/OctoFarm/config:/app/serverConfig
-      - <your persistent folder>/OctoFarm/logs:/app/logs
-
-```
-
-### Windows Specific Docker-Compose Installation (Includes a MongoDB Server)
-
-- NOTE: Docker Dashboard -> Settings -> Resources -> File Sharing -> check the C drive (or wherever you want persistent storage to be)
-
-```yml
-version: "3.1"
-
-services:
-  mongo:
-    image: mongo
-    restart: always
-
-  octofarm:
-    image: octofarm/octofarm
-    restart: always
-    ports:
-      - 4000:4000
-    environment:
-      - MONGO=mongodb://mongo/octofarm
-    volumes:
-      - /c/ProgramData/OctoFarm/serverConfig:/app/serverConfig
-      - /c/ProgramData/OctoFarm/logs:/app/logs
-```
 
 ### Installation Production
 
@@ -282,12 +211,6 @@ npm run dev
 
 These are planned but not available yet...
 
-<!-- ROADMAP -->
-
-## Roadmap
-
-See the [open issues](https://github.com/NotExpectedYet/OctoFarm/issues) for a list of known issues.
-
 <!-- CONTRIBUTING -->
 
 ## Contributing
@@ -318,6 +241,7 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
 - [Derek from 3D Printed Debris](https://www.3dprinteddebris.com/) - Massive big thanks to Derek who has donated a lot of time and money to the project. I don't think I'd have continued at the rate I did without his bug reports and support.
 - All Patreon Supporters and random donations! - Big massive thanks for these, they keep me full of steak!
 - The users calonmer, Insertion and noxin from my discord server! Seriously no end to my thanks for these 3.
+- [JetBrains IDE](https://www.jetbrains.com/webstorm/) - Thanks to JebBrains for allowing a free license to use with developing my application. Their IDE is top notch! 
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->

@@ -2,107 +2,144 @@
 
 <div
   class="col-sm-12 col-md-4 col-lg-3 col-xl-2 hidden"
-  id="panelInstance-<%= printers[sorted.actualIndex].index %>"
+  id="viewPanel-<%= printers[sorted.actualIndex]._id %>"  data-jplist-item
 >
-  <%}else if(printers[sorted.actualIndex].state === "Closed" &&
+  <%}else if(printers[sorted.actualIndex].state === "Disconnected" &&
   clientSettings[0].panelView.hideClosed){%>
   <div
     class="col-sm-12 col-md-4 col-lg-3 col-xl-2 hidden"
-    id="panelInstance-<%= printers[sorted.actualIndex].index %>"
+    id="viewPanel-<%= printers[sorted.actualIndex]._id %>"  data-jplist-item
   >
     <%} else { %>
       <div
         class="col-sm-12 col-md-4 col-lg-3 col-xl-2"
-        id="panelInstance-<%= printers[sorted.actualIndex].index %>"
+        id="viewPanel-<%= printers[sorted.actualIndex]._id %>"  data-jplist-item
       >
-        <%}%> <% let flipH = ""; %> <% let flipV = ""; %> <% let rotate90 = "";
+        <%}%>
+        <% let flipH = ""; %> <% let flipV = ""; %> <% let rotate90 = "";
         %> <% if (typeof printers[sorted.actualIndex].settingsWebcam !=
-        "undefined") { %> <% if
+        "undefined") { %>
+
+          <% if
         (printers[sorted.actualIndex].settingsWebcam.flipH) { %> <% flipH =
-        "flipH"; %> <% } %> <% if
+        "rotateY(180deg)"; %> <% } %> <% if
         (printers[sorted.actualIndex].settingsWebcam.flipV) { %> <% flipV =
-        "flipV"; %> <% } %> <% if
+        "rotateX(180deg)"; %> <% } %> <% if
         (printers[sorted.actualIndex].settingsWebcam.rotate90) { %> <% rotate90
-        = "rotate90"; %> <% } %> <% } %>
-        <div class="card mt-1 mb-1 ml-1 mr-1 text-center">
+        = "rotate(90deg)"; %> <% } %> <% } %>
+
+
+        <% let name = "";%>
+        <% if (typeof printers[sorted.actualIndex].settingsApperance != "undefined") {%>
+          <% if (printers[sorted.actualIndex].settingsApperance.name === "" || printers[sorted.actualIndex].settingsApperance.name === null) {%>
+            <% name = printers[sorted.actualIndex].printerURL;%>
+          <% } else {%>
+            <% name = printers[sorted.actualIndex].settingsApperance.name;%>
+          <% }%>
+        <% } else {%>
+          <% name = printers[sorted.actualIndex].printerURL;%>
+        <%}%>
+        <div class="card mt-1 mb-1 ml-1 mr-1 text-center <%= printers[sorted.actualIndex].group.replace(/ /g,"_")%>">
           <div class="card-header dashHeader">
             <h6
               class="float-left mb-0"
-              id="panIndex-<%= printers[sorted.actualIndex].index %>"
+              id="panIndex-<%= printers[sorted.actualIndex]._id %>"
             >
               <button
-                id="panName-<%= printers[sorted.actualIndex].index %>"
+                id="panName-<%= printers[sorted.actualIndex]._id %>"
                 type="button"
-                class="btn btn-secondary mb-0"
+                class="btn btn-secondary mb-0 btn-sm"
                 role="button"
                 disabled
               >
-                <%= printers[sorted.actualIndex].index %> . <% if(typeof
-                printers[sorted.actualIndex].settingsApperance != 'undefined'){
-                %> <%= printers[sorted.actualIndex].settingsApperance.name
-                %><%}%>
+                <% if(name.includes("http://")){ %>
+                <%  name = name.replace("http://", ""); %>
+                <% }else if(name.includes("https://")){ %>
+                <%  name = name.replace("https://",""); %>
+                <%}  %>
+              <%= name %>
               </button>
             </h6>
-            <% if(printers[sorted.actualIndex].state === "Offline"){ %>
-            <button
-              id="printerButton-<%= printers[sorted.actualIndex].index %>"
-              type="button"
-              class="btn btn-dark float-right"
-              data-toggle="modal"
-              data-target="#printerManagerModal"
-              disabled
-            >
-              <i class="fas fa-cog"></i>
-            </button>
+            <% if(printers[sorted.actualIndex].stateColour.category === "Offline"){ %>
+              <div id="powerBtn-<%= printers[sorted.actualIndex]._id %>" class="btn-group float-right">
+
+              </div>
+              <a title="Open your Printers Web Interface"
+                 id="printerWeb-5ea68355110cfe5ca94265ac"
+                 type="button"
+                 class="tag btn btn-info btn-sm disabled float-right mr-1"
+                 target="_blank" href="<%= printers[sorted.actualIndex].printerURL %>"
+                 role="button">
+                <i class="fas fa-globe-europe"></i>
+              </a>
+              <button
+                      title="Control Your Printer"
+                      id="printerButton-<%= printers[sorted.actualIndex]._id %>"
+                      type="button"
+                      class="tag btn btn-primary float-right btn-sm mr-1"
+                      data-toggle="modal"
+                      data-target="#printerManagerModal" disabled
+              >
+                <i class="fas fa-print"></i>
+              </button>
             <% }else{ %>
-            <button
-              id="printerButton-<%= printers[sorted.actualIndex].index %>"
-              type="button"
-              class="btn btn-dark float-right"
-              data-toggle="modal"
-              data-target="#printerManagerModal"
-            >
-              <i class="fas fa-cog"></i>
-            </button>
+              <div id="powerBtn-<%= printers[sorted.actualIndex]._id %>" class="btn-group float-right">
+
+              </div>
+              <a title="Open your Printers Web Interface"
+                 id="printerWeb-5ea68355110cfe5ca94265ac"
+                 type="button"
+                 class="tag btn btn-info btn-sm float-right mr-1"
+                 target="_blank" href="<%= printers[sorted.actualIndex].printerURL %>"
+                 role="button">
+                <i class="fas fa-globe-europe"></i>
+              </a>
+              <button
+                      title="Control Your Printer"
+                      id="printerButton-<%= printers[sorted.actualIndex]._id %>"
+                      type="button"
+                      class="tag btn btn-primary float-right btn-sm mr-1"
+                      data-toggle="modal"
+                      data-target="#printerManagerModal"
+              >
+                <i class="fas fa-print"></i>
+              </button>
             <% } %>
           </div>
           <div class="card-body pt-1 pb-0 pl-2 pr-2">
             <button
-              id="panFileName-<%= printers[sorted.actualIndex].index %>"
-              type="button"
-              class="btn btn-block btn-secondary mb-0 text-truncate"
-              role="button"
-              disabled
+                    id="panFileName-<%= printers[sorted.actualIndex]._id %>"
+                    type="button"
+                    class="tag btn btn-block btn-secondary mb-0 text-truncate btn-sm"
+                    role="button"
+                    title="Loading..."
+                    disabled
             >
-              <% if(typeof printers[sorted.actualIndex].job != 'undefined' &&
-              typeof printers[sorted.actualIndex].job.file != 'undefined'){ %><i
-                class="fas fa-file-code"
-              ></i>
-              <%= printers[sorted.actualIndex].job.file.name %> <%}else{%><i
-                class="fas fa-file-code"
-              ></i>
-              No File Selected <%}%>
+            <% if(typeof printers[sorted.actualIndex].job != 'undefined' &&
+                    typeof printers[sorted.actualIndex].job.file != 'undefined'){ %>
+                <i class="fas fa-file-code"></i> Loading...<%}else{%>
+                <i class="fas fa-file-code" ></i> No File Selected <%}%>
             </button>
             <% let camURL = ""; %> <% if(printers[sorted.actualIndex].camURL !=
-            ''){ %> <% camURL = "http://" + printers[sorted.actualIndex].camURL;
+            ''){ %> <% camURL = printers[sorted.actualIndex].camURL;
             %> <%}%>
             <div
-              id="cameraContain-<%= printers[sorted.actualIndex].index %>"
+              id="cameraContain-<%= printers[sorted.actualIndex]._id %>"
               class="cameraContain"
             >
               <img
                 loading="lazy"
-                id="panCamera-<%= printers[sorted.actualIndex].index %>"
+                id="panCamera-<%= printers[sorted.actualIndex]._id %>"
                 width="100%"
-                class="<%= flipH %> <%= flipV %> <%= rotate90 %>"
+                style="transform: <%= flipH %> <%= flipV %> <%= rotate90 %>;"
                 src="<%= camURL %>"
                 style="pointer-events: none;"
               />
             </div>
             <div class="progress">
               <div
-                id="panProgress-<%= printers[sorted.actualIndex].index %>"
-                class="progress-bar"
+                id="panProgress-<%= printers[sorted.actualIndex]._id %>"
+                class="progress-bar progress-bar-striped bg-<%=printers[sorted.actualIndex].stateColour.name%> percent"
                 role="progressbar progress-bar-striped"
                 style="width:<% if(typeof printers[sorted.actualIndex].progress!= 'undefined'){ %><%=
             Math.floor(printers[sorted.actualIndex].progress.completion) %><%}%>%"
@@ -117,9 +154,9 @@
               </div>
             </div>
             <button
-              id="panState-<%= printers[sorted.actualIndex].index %>"
+              id="panState-<%= printers[sorted.actualIndex]._id %>"
               type="button"
-              class="btn btn-block <%= printers[sorted.actualIndex].stateColour.category %> mb-1 mt-1"
+              class="btn btn-block <%= printers[sorted.actualIndex].stateColour.category %> mb-1 mt-1 btn-sm"
               role="button"
               disabled
             >
@@ -127,45 +164,50 @@
             </button>
             <center>
               <button
-                id="panPrintStart-<%= printers[sorted.actualIndex].index %>"
+                title="Start your currently selected print"
+                id="panPrintStart-<%= printers[sorted.actualIndex]._id %>"
                 type="button"
-                class="btn btn-success mt-1 mb-1"
+                class="tag btn btn-success mt-1 mb-1 btn-sm"
                 role="button"
                 disabled
               >
                 <i class="fas fa-print"></i> Print
               </button>
               <button
-                id="panPrintPause-<%= printers[sorted.actualIndex].index %>"
+                      title="Pause your current print"
+                id="panPrintPause-<%= printers[sorted.actualIndex]._id %>"
                 type="button"
-                class="btn btn-light mt-1 mb-1"
+                class="tag btn btn-light mt-1 mb-1 btn-sm"
                 role="button"
                 disabled
               >
                 <i class="fas fa-pause"></i> Pause
               </button>
               <button
-                id="panRestart-<%= printers[sorted.actualIndex].index %>"
+                title="Restart your current print"
+                id="panRestart-<%= printers[sorted.actualIndex]._id %>"
                 type="button"
-                class="btn btn-danger mt-1 mb-1 hidden "
+                class="tag btn btn-danger mt-1 mb-1 hidden btn-sm"
                 role="button"
                 disabled
               >
                 <i class="fas fa-undo"></i> Restart
               </button>
               <button
-                id="panResume-<%= printers[sorted.actualIndex].index %>"
+                      title="Resume your current print"
+                id="panResume-<%= printers[sorted.actualIndex]._id %>"
                 type="button"
-                class="btn btn-success mt-1 mb-1 hidden"
+                class="tag btn btn-success mt-1 mb-1 hidden btn-sm"
                 role="button"
                 disabled
               >
                 <i class="fas fa-redo"></i> Resume
               </button>
               <button
-                id="panStop-<%= printers[sorted.actualIndex].index %>"
+                      title="Stop your current print"
+                id="panStop-<%= printers[sorted.actualIndex]._id %>"
                 type="button"
-                class="btn btn-danger mt-1 mb-1 "
+                class="tag btn btn-danger mt-1 mb-1 btn-sm"
                 role="button"
                 disabled
               >
@@ -173,78 +215,88 @@
               </button>
             </center>
           </div>
+          <div id="extraInfo-<%= printers[sorted.actualIndex]._id %>" class="row d-none">
+              <div class="col-6">
+                <h5 class="mb-0"><small>Time Remaining</small></h5>
+                <p class="mb-0"><small class="time" id="timeRemaining-<%= printers[sorted.actualIndex]._id %>">Loading...</small></p>
+              </div>
+              <div class="col-6">
+                <h5 class="mb-0"><small>ETA</small></h5>
+                <p class="mb-0"><small id="eta-<%= printers[sorted.actualIndex]._id %>">Loading...</small></p>
+              </div>
+
+
+
+          </div>
+
 
           <button
             type="button"
-            class="btn btn-block btn-secondary mb-0"
+            class="btn btn-block btn-secondary mb-0  btn-sm"
             role="button"
-            id="listFilament-<%= printers[sorted.actualIndex].index %>"
+            id="listFilament-<%= printers[sorted.actualIndex]._id %>"
           >
-            <% if(typeof printers[sorted.actualIndex].selectedFilament !=
-            'undefined' && printers[sorted.actualIndex].selectedFilament.name !=
-            null){%> <%= printers[sorted.actualIndex].selectedFilament.name %>
-            [<%= printers[sorted.actualIndex].selectedFilament.colour %> / <%=
-            printers[sorted.actualIndex].selectedFilament.type[1] %>]<% }%>
+           Loading...
           </button>
           <div class="card-footer text-muted dashFooter">
             <small
-              id="panE0Temp-<%= printers[sorted.actualIndex].index %>"
+              id="panE0Temp-<%= printers[sorted.actualIndex]._id %>"
               class="mb-0 float-left"
-              id="panT0-<%= printers[sorted.actualIndex].index %>"
+              id="panT0-<%= printers[sorted.actualIndex]._id %>"
             >
               <% if(typeof printers[sorted.actualIndex].temps != 'undefined'){
               %> <% if(typeof printers[sorted.actualIndex].temps[0].tool0 !=
               'undefined'){ %>
               <i
-                id="tool0A-<%= printers[sorted.actualIndex].index %>"
+                id="tool0A-<%= printers[sorted.actualIndex]._id %>"
                 class="far fa-circle"
               ></i>
               <%= printers[sorted.actualIndex].temps[0].tool0.actual %><%}else{
               %>
               <i
-                id="tool0A-<%= printers[sorted.actualIndex].index %>"
+                id="tool0A-<%= printers[sorted.actualIndex]._id %>"
                 class="far fa-circle"
               ></i>
               <%= 0%><%}%>°C <% if(typeof
               printers[sorted.actualIndex].temps[0].tool0 != 'undefined'){ %>
               <i
-                id="tool0T-<%= printers[sorted.actualIndex].index %>"
+                id="tool0T-<%= printers[sorted.actualIndex]._id %>"
                 class="fas fa-bullseye"
               ></i>
               <%= printers[sorted.actualIndex].temps[0].tool0.target%><%}else{
               %>
               <i
-                id="tool0T-<%= printers[sorted.actualIndex].index %>"
+                id="tool0T-<%= printers[sorted.actualIndex]._id %>"
                 class="fas fa-bullseye"
               ></i>
               <%= 0%><%}%>°C <%} %>
             </small>
 
             <small
-              id="panBedTemp-<%= printers[sorted.actualIndex].index %>"
+              id="panBedTemp-<%= printers[sorted.actualIndex]._id %>"
               class="mb-0 float-right"
-              id="panBed-<%= printers[sorted.actualIndex].index %>"
+              id="panBed-<%= printers[sorted.actualIndex]._id %>"
             >
               <% if(typeof printers[sorted.actualIndex].temps != 'undefined'){
               %> <% if(typeof printers[sorted.actualIndex].temps[0].bed !=
               'undefined'){ %><i
-                id="bedA-<%= printers[sorted.actualIndex].index %>"
+                id="bedA-<%= printers[sorted.actualIndex]._id %>"
                 class="far fa-circle"
               ></i>
               <%= printers[sorted.actualIndex].temps[0].bed.actual %><%}else{ %>
               <i
-                id="bedA-<%= printers[sorted.actualIndex].index %>"
+                id="bedA-<%= printers[sorted.actualIndex]._id %>"
                 class="far fa-circle"
               ></i>
               <%= 0%><%}%>°C <% if(typeof
               printers[sorted.actualIndex].temps[0].bed != 'undefined'){ %>
               <i
-                id="bedT-<%= printers[sorted.actualIndex].index %>"
+                id="bedT-<%= printers[sorted.actualIndex]._id %>"
                 class="fas fa-bullseye"
               ></i>
               <%= printers[sorted.actualIndex].temps[0].bed.target %><%}else{ %>
               <i
-                id="bedT-<%= printers[sorted.actualIndex].index %>"
+                id="bedT-<%= printers[sorted.actualIndex]._id %>"
                 class="fas fa-bullseye"
               ></i>
               <%= 0%><%}%>°C <%} %>

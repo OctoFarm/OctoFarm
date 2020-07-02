@@ -7,20 +7,35 @@ class ClientSettings {
         let settings = {
           backgroundURL: null
         };
+        let currentOperationsView = {
+
+        };
+        let dashboard = {
+          currentOp: false,
+        }
         let panelView = {
           currentOp: false,
           hideOff: true,
-          hideClosed: false
+          hideClosed: false,
+          extraInfo: false,
+          powerBtn: false,
+          webBtn: false
         };
         let listView = {
           currentOp: false,
           hideOff: true,
-          hideClosed: false
+          hideClosed: false,
+          extraInfo: false,
+          powerBtn: false,
+          webBtn: false
         };
         let cameraView = {
           currentOp: false,
           cameraRows: 4,
-          hideClosed: false
+          hideClosed: false,
+          extraInfo: false,
+          powerBtn: false,
+          webBtn: false
         };
         let operations = {};
         let filaManager = {};

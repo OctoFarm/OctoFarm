@@ -2,7 +2,33 @@
 html {
   height: 100%;
 }
-
+.heatMapRight {
+  width:19px;
+  height:40px;
+  margin-right:1px;
+  margin-top:1px;
+  margin-bottom:1px;
+  border: 1px solid black;
+}
+.contentEditable{
+  border: 1px inset grey;
+}
+.heatMapLeft {
+  width:19px;
+  height:40px;
+  margin-left:1px;
+  margin-bottom:1px;
+  margin-top:1px;
+  border: 1px solid black;
+}
+.heatMap {
+  width:40px;
+  height:40px;
+  margin-left:1px;
+  margin-bottom:1px;
+  margin-top:1px;
+  border: 1px solid black;
+}
 body {
   background-color: black;
   background-image: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)),
@@ -19,6 +45,7 @@ body {
 button > * {
   pointer-events: none;
 }
+
 hr {
   border-color: inherit;
   margin-top: 4px;
@@ -31,6 +58,7 @@ li {
   margin-left: 0px;
   margin-right: 0px;
 }
+
 .largeWidth {
   margin: 0 auto;
   max-width: 700px;
@@ -51,6 +79,9 @@ li {
 .textComplete {
   color: #006311;
 }
+.text-offline {
+  color: #401418;
+}
 .Idle {
   background-color: #262626;
 }
@@ -60,28 +91,45 @@ li {
 .Offline {
   background-color: #2e0905;
 }
-.Closed {
+.Disconnected {
   background-color: #2e0905;
 }
 .Complete {
   background-color: #00330e;
 }
+
+.tempCool {
+  background-color: cyan;
+}
+.tempCooling {
+  background-color: darkBlue;
+}
+.tempActive {
+  background-color: orange;
+}
+.tempSuccess {
+  background-color: green;
+}
+.tempOffline {
+  background-color: #e74c3c;
+}
+.bg-offline {
+  background-color: #401418;
+}
+
 .MultiSelected {
   background-color: black;
   color: green;
 }
+
 .toolOn {
   color: green;
 }
 .toolOut {
   color: orange;
 }
-
-/*Sticky Table header*/
-.sticky-table {
-  position: sticky;
-  top: 60px;
-  z-index: 1000;
+.toolUnder {
+  color: cyan;
 }
 
 /*Scroll Bar*/
@@ -126,6 +174,7 @@ a.notyet {
 }
 .dashHeader {
   padding: 5px;
+  z-index:100;
 }
 
 .dashBody {
@@ -179,6 +228,10 @@ a.notyet {
   background-color: #444;
 }
 /* json printer import */
+#uploadFileModalContentForm{
+  display:inline-block;
+  margin-bottom: 0px;
+}
 .fileElem {
   display: none;
   padding-left: 5px;
@@ -197,7 +250,10 @@ a.notyet {
   -khtml-user-select: none; /* webkit (konqueror) browsers */
   -ms-user-select: none;
 }
-
+.highlight {
+  box-shadow: 0px 0px 20px 5px rgba(0,0,0,0.2);
+  filter: brightness(20%)
+}
 /*Camera View*/
 .cameraContain {
   position: relative;
@@ -205,10 +261,41 @@ a.notyet {
 }
 .camButtons {
   position: absolute;
-  bottom: 20px;
+  bottom: 37px;
   right: 7px;
 }
+.camName {
+  background-color:black;
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  height: 18px;
+  top:1px;
+  left: -1px;
+  opacity: 0.7;
+}
+.camExtra {
+  background-color:black;
+  position: absolute;
+  z-index: 10;
+  width: 100%;
+  font-size:13px;
+  top:19px;
+  left: -1px;
+  opacity: 0.7;
+}
+.camTemps {
+  background-color:black;
+  position: absolute;
+  z-index: 998;
+  width: 100%;
+  height: 18px;
+  bottom: 15px;
+  left: -1px;
+  opacity: 0.7;
+}
 .camProgress {
+  background-color:black;
   position: absolute;
   z-index: 998;
   width: 100%;
@@ -228,8 +315,8 @@ a.notyet {
 .terminal-window {
   padding: 5px;
   width: 100%;
-  height: 400px;
-  max-height: 400px;
+  height: 440px;
+  max-height: 440px;
   overflow: auto;
 }
 /*SERVER WORK OVERLAY*/
@@ -272,23 +359,17 @@ label {
   position: absolute;
   z-index: -1;
 }
+#fileUploadPrintBtn {
+  opacity: 0;
+  position: absolute;
+  z-index: -1;
+}
 #multiFileUploadBtn {
   opacity: 0;
   position: absolute;
   z-index: -1;
 }
 
-.flipH {
-  transform: rotateY(180deg);
-}
-
-.flipV {
-  transform: rotateX(180deg);
-}
-
-.rotate90 {
-  transform: rotate(90deg);
-}
 .sortableList {
   cursor: move;
 }
@@ -304,78 +385,33 @@ label {
   width: 20% !important;
   float: left !important;
 }
-.sidenav {
-  height: 100%; /* Full-height: remove this if you want "auto" height */
-  width: 20%; /* Set the width of the sidebar */
-  position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  z-index: 1; /* Stay on top */
-  top: 0; /* Stay at the top */
-  left: 0;
-  background-color: #111; /* Black */
-  overflow-x: hidden;
-  overflow-y: scroll;/* Disable horizontal scroll */
-  padding-top: 20px;
-}
-/* Style page content */
-.main {
-  margin-left: 20%; /* Same as the width of the sidebar */
-  padding: 0px 10px;
-}
-/*Small devices (landscape phones, 576px and up)*/
-@media (max-width: 767px) {
-  #oldPrinterList {
-    display: block;
-  }
-  .sidenav {
-    display:none;
-  }
-  /* Style page content */
-  .main {
-    margin-left: 0px; /* Same as the width of the sidebar */
+@media (min-width: 768px) {
+  .modal-xl {
+    max-width: 95% !important;
   }
 }
-
-/* Medium devices (tablets, 768px and up)*/
-@media (min-width: 768px) and (max-width: 991px)  {
-  #oldPrinterList {
-    display: none;
+@media (min-width: 992px) {
+  .modal-xl {
+    max-width: 90% !important;
   }
-  .sidenav {
-    height: 100%; /* Full-height: remove this if you want "auto" height */
-    width: 35%; /* Set the width of the sidebar */
-  }
-  /* Style page content */
-  .main {
-    margin-left: 35%; /* Same as the width of the sidebar */
-  }
-}
-
-/* Large devices (desktops, 992px and up)*/
-@media (min-width: 992px)  and (max-width: 1199px) {
-  #oldPrinterList {
-    display: none;
-  }
-  .sidenav {
-    height: 100%; /* Full-height: remove this if you want "auto" height */
-    width: 30%; /* Set the width of the sidebar */
-  }
-  /* Style page content */
-  .main {
-    margin-left: 30%; /* Same as the width of the sidebar */
+  .sticky-table {
+    min-width:100px;
+    position: sticky;
+    top: 40px;
+    z-index: 1000;
   }
 
 }
-/*Extra large devices (large desktops, 1200px and up)*/
+
 @media (min-width: 1200px) {
-  #oldPrinterList {
-    display: none;
+  .modal-xl {
+    max-width: 85% !important;
   }
-  .sidenav {
-    height: 100%; /* Full-height: remove this if you want "auto" height */
-    width: 20%; /* Set the width of the sidebar */
+  .sticky-table {
+    min-width:100px;
+    position: sticky;
+    top: 40px;
+    z-index: 1000;
   }
-  /* Style page content */
-  .main {
-    margin-left: 20%; /* Same as the width of the sidebar */
-  }
+
 }

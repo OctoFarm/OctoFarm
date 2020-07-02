@@ -4,5 +4,7 @@ COPY . /app
 
 WORKDIR /app
 
+RUN npm install -g pm2
+
 RUN chmod +x docker/entrypoint.sh
 ENTRYPOINT docker/entrypoint.sh

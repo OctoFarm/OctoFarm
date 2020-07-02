@@ -1,3 +1,4 @@
+
 export default class Validate {
     //Check the validity of a URL
     static URL(u) {
@@ -24,4 +25,24 @@ export default class Validate {
             return false;
         }
     }
+    static getName(printer){
+        if (typeof printer.settingsAppearance != "undefined") {
+            if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
+                return printer.printerURL;
+            } else {
+                return printer.settingsAppearance.name;
+            }
+        } else {
+            return printer.printerURL;
+        }
+    }
+    static stripHTML(text){
+        var tmp = document.createElement("DIV");
+        tmp.innerHTML = text;
+        var res = tmp.textContent || tmp.innerText || '';
+        res.replace('\u200B', ''); // zero width space
+        res = res.trim();
+        return res;
+    }
+
 }

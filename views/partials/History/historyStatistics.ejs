@@ -1,9 +1,9 @@
 <div class="row">
   <div class="col-lg-12 text-center text-light">
     <div class="row">
-      <div class="col-lg-6">
-        <b class="mt-1"><i class="fas fa-print"></i> Status</b>
-        <p class="mb-0">
+      <div class="col-lg-2">
+        <b class="mt-1 pb-1"><i class="fas fa-print"></i> Status</b>
+        <p class="mb-0 pt-3">
           <i class="fas fa-square text-success"></i>
           <b>Completed: <%= printStatistics.completed %></b>
           <i class="fas fa-square text-warning"></i>
@@ -45,8 +45,8 @@
         </div>
         </div>
       </div>
-      <div class="col-lg-6">
-        <b class="mt-1"><i class="fas fa-print"></i> Metrics</b>
+      <div class="col-lg-3">
+        <b class="mt-1">Prints</b>
         <div class="row">
           <div class="col-lg-6">
             <b><i class="fas fa-clock"></i> Longest Print Time</b> <br />
@@ -57,8 +57,57 @@
           <div class="col-lg-6">
             <b><i class="fas fa-clock"></i> Average Print Time <br /></b><%=
             helpers.generateTime(printStatistics.averagePrintTime) %><br />
-            <b><i class="fas fa-ruler"></i> Filament Usage <br /></b><%=
-            printStatistics.filamentUsage %><br />
+            <b><i class="fas fa-star"></i> Most Printed File <br /></b><%=
+            printStatistics.mostPrintedFile %><br />
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-1">
+        <b class="mt-1">Printers</b>
+        <div class="row">
+          <div class="col-lg-12">
+            <b><i class="fas fa-star"></i> Most Occurances</b> <br />
+            <%= printStatistics.mostUsedPrinters %><br />
+            <b><i class="fas fa-star-half-alt"></i> Least Occurances</b> <br />
+            <%= printStatistics.leastUsedPrinters %> <br />
+          </div>
+
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <b class="mt-1">Filament</b>
+        <div class="row">
+          <div class="col-lg-6">
+            <b><i class="fas fa-weight"></i> Total Filament Usage</b> <br />
+            <%= printStatistics.totalFilamentUsage.toFixed(2) %>g<br />
+            <b><i class="fas fa-weight"></i> Average Filament Usage</b> <br />
+            <%= printStatistics.averageFilamentUsage.toFixed(2) %>g <br />
+          </div>
+          <div class="col-lg-6">
+            <b><i class="fas fa-weight"></i> Highest Filament Usage <br /></b><%=
+            printStatistics.highestFilamentUsage.toFixed(2) %>g<br />
+            <b><i class="fas fa-weight"></i> Lowest Filament Usage <br /></b><%=
+            printStatistics.lowestFilamentUsage.toFixed(2) %>g<br />
+
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-3">
+        <b class="mt-1">Cost</b>
+        <div class="row">
+          <div class="col-lg-6">
+            <b><i class="fas fa-tag"></i>  Total Cost</b> <br />
+            <%= printStatistics.totalCost.toFixed(2) %> <br />
+            <b><i class="fas fa-tag"></i>  Highest Cost</b> <br />
+            <%= printStatistics.highestCost.toFixed(2) %><br />
+
+          </div>
+          <div class="col-lg-6">
+            <b><i class="fas fa-tag"></i>  Total Printer Cost</b> <br />
+            <%= printStatistics.totalPrinterCost.toFixed(2) %> <br />
+            <b><i class="fas fa-tag"></i>  Highest Printer Cost</b> <br />
+            <%= printStatistics.highestPrinterCost.toFixed(2) %><br />
+
           </div>
         </div>
       </div>

@@ -1,3 +1,5 @@
+const _ = require("lodash");
+
 const bytes = function(a, b) {
   let string = "";
   if (a === undefined || isNaN(a) || a === null) {
@@ -56,14 +58,123 @@ const generateTime = function(seconds) {
         string = string.replace("0 Days,", "");
       }
     }
-    if (seconds == 0) {
+    if (mnts == 0 && hrs == 0 && days == 0 && seconds == 0) {
       string = string.replace("0 Seconds", "Done");
     }
   }
   return string;
 };
+const historyTotals = function(history){
+
+  let historyFileNames = []
+  let historyPrinterNames = []
+  let historySpools = []
+  let paths = [];
+
+  history.forEach(hist => {
+    historyFileNames.push(hist.printHistory.fileName.replace(".gcode", ""));
+    historyPrinterNames.push(hist.printHistory.printerName.replace(/ /g, "_"));
+    if(typeof hist.printHistory.job !== 'undefined'){
+      let path = hist.printHistory.job.file.path.substring(0, hist.printHistory.job.file.path.lastIndexOf("/"))
+      if(path != ''){
+        paths.push(path);
+      }
+    }
+    if(hist.printHistory.filamentSelection != null && typeof hist.printHistory.filamentSelection !== 'undefined' && typeof hist.printHistory.filamentSelection.spools !== 'undefined'){
+      historySpools.push(
+          hist.printHistory.filamentSelection.spools.profile.material.replace(/ /g, "_")
+      );
+    }
+
+  })
+  return {
+    pathList: paths.filter(function (item, i, ar) {
+      return ar.indexOf(item) === i;
+    }),
+    fileNames: historyFileNames.filter(function (item, i, ar) {
+      return ar.indexOf(item) === i;
+    }),
+    printerNames: historyPrinterNames.filter(function (item, i, ar) {
+      return ar.indexOf(item) === i;
+    }),
+    spools: historySpools.filter(function (item, i, ar) {
+      return ar.indexOf(item) === i;
+    }),
+
+  };
+
+}
+const filamentTotals = function(profiles, spools, filamentManager){
+  let materials = [];
+  let materialBreak = [];
+  profiles.forEach(profile => {
+    materials.push(profile.profile.material.replace(/ /g, "_"));
+    let profileID = null
+    if(filamentManager){
+      profileID = profile.profile.index
+    }else{
+      profileID = profile._id
+    }
+    material = {
+      name: profile.profile.material.replace(/ /g, "_"),
+      weight: [],
+      used: [],
+      price: [],
+    }
+    materialBreak.push(material)
+  })
+  materialBreak = _.uniqWith(materialBreak, _.isEqual)
+
+  let used = [];
+  let total = [];
+  let price = [];
+
+  spools.forEach(spool => {
+    used.push(parseFloat(spool.spools.used))
+    total.push(parseFloat(spool.spools.weight))
+    price.push(parseFloat(spool.spools.price))
+    let profInd = null;
+    if(filamentManager){
+      profInd = _.findIndex(profiles, function(o) { return o.profile.index == spool.spools.profile; });
+    }else{
+      profInd = _.findIndex(profiles, function(o) { return o._id == spool.spools.profile; });
+    }
+
+    let index = _.findIndex(materialBreak, function(o) { return o.name == profiles[profInd].profile.material.replace(/ /g, "_"); });
+
+    materialBreak[index].weight.push(parseFloat(spool.spools.weight));
+    materialBreak[index].used.push(parseFloat(spool.spools.used));
+    materialBreak[index].price.push(parseFloat(spool.spools.price));
+  })
+  materialBreakDown = []
+  materialBreak.forEach(material => {
+    let mat = {
+      name: material.name,
+      used: material.used.reduce((a, b) => a + b, 0),
+      total: material.weight.reduce((a, b) => a + b, 0),
+      price: material.price.reduce((a, b) => a + b, 0),
+    }
+    materialBreakDown.push(mat)
+  })
+
+  return {
+    materialList: materials.filter(function (item, i, ar) {
+      return ar.indexOf(item) === i;
+    }),
+    used: used.reduce((a, b) => a + b, 0),
+    total: total.reduce((a, b) => a + b, 0),
+    price: price.reduce((a,b) => a + b, 0),
+    profileCount: profiles.length,
+    spoolCount: spools.length,
+    materialBreakDown: materialBreakDown
+  };
+
+}
+
 module.exports = {
   generateBytes: bytes,
   generateTime: generateTime,
   calculatePercent: calculatePercent,
+  historyTotals: historyTotals,
+  filamentTotals: filamentTotals
 };

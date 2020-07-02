@@ -1,27 +1,51 @@
 const mongoose = require("mongoose");
 
 const PrinterSchema = new mongoose.Schema({
+  category:{
+    type: String,
+    required: false,
+  },
+  dateAdded: {
+    type: Number,
+    required: false,
+  },
+  currentUptime:{
+    type: Number,
+    required: false,
+  },
+  currentIdle:{
+    type: Number,
+    required: false,
+  },
+  type:{
+    type: String,
+    required: false,
+  },
   sortIndex: {
     type: Number,
     required: false
   },
-  index: {
-    type: Number,
-    required: true
-  },
   ip: {
     type: String,
-    required: true
+    required: false
   },
   port: {
     type: String,
-    required: true
+    required: false
   },
   apikey: {
     type: String,
     required: true
   },
   camURL: {
+    type: String,
+    required: false
+  },
+  printerURL: {
+    type: String,
+    required: false
+  },
+  octoPrintVersion: {
     type: String,
     required: false
   },
@@ -43,6 +67,22 @@ const PrinterSchema = new mongoose.Schema({
  },
   currentUser: {
     type: String,
+    required: false
+  },
+  group: {
+    type: String,
+    required: false
+  },
+  tempTriggers: {
+    type: Object,
+    required: false
+  },
+  powerSettings: {
+    type: Object,
+    required: false
+  },
+  costSettings: {
+    type: Object,
     required: false
   }
 });

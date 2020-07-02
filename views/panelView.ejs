@@ -1,9 +1,15 @@
-<div id="listView" class="row">
-  <% if(clientSettings[0].panelView.currentOp){%> <%-
-  include('./partials/currentOperations.ejs') %> <% }%>
-  <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-    <div id="listView" class="row">
-      <%- include('./partials/Views/panelView.ejs') %>
+
+<% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
+
+  <div id="listView" class="row" >
+    <% if(clientSettings[0].panelView.currentOp){%> <%-
+    include('./partials/currentOperations.ejs') %> <% }%>
+    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+      <div id="listView" class="row" data-jplist-group="printers">
+        <%- include('./partials/Views/panelView.ejs') %>
+      </div>
     </div>
   </div>
-</div>
+<% }else{ %>
+  <%- include('./addPrinters.ejs') %>
+<% } %>
