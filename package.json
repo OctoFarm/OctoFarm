@@ -8,7 +8,7 @@
     "dev": "nodemon app.js"
   },
   "nodemonConfig": {
-    "verbose": true,
+    "verbose": false,
     "ignore": [
       "views/js/*",
       "logs/*"
@@ -46,6 +46,7 @@
     "node-fetch": "^2.6.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
+    "passport-remember-me": "0.0.1",
     "pm2": "^4.4.0",
     "prettier": "^2.0.5",
     "remove": "^0.1.5",
@@ -66,14 +67,6 @@
     "eslint-plugin-import": "^2.21.2",
     "eslint-plugin-prettier": "^3.1.4",
     "nodemon": "^2.0.4"
-  },
-  "nodemonConfig": {
-    "verbose": false,
-    "ignore": [
-      "views/js/*",
-      "logs/*"
-    ],
-    "delay": 2500
   },
   "engineStrict": true,
   "engines": {
