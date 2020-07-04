@@ -862,53 +862,6 @@ class dashUpdate {
           const printerSortIndex = document.getElementById(
             `printerSortIndex-${printer._id}`
           );
-          const printerSuccess = document.getElementById(
-            `printerSuccess-${printer._id}`
-          );
-          const printerCancelled = document.getElementById(
-            `printerCancelled-${printer._id}`
-          );
-          const printerFailed = document.getElementById(
-            `printerFailure-${printer._id}`
-          );
-          const systemChecks = {
-            apiCheck: document.getElementById(`apiCheck-${printer._id}`),
-            filesCheck: document.getElementById(`filesCheck-${printer._id}`),
-            stateCheck: document.getElementById(`stateCheck-${printer._id}`),
-            profileCheck: document.getElementById(
-              `profileCheck-${printer._id}`
-            ),
-            settingsCheck: document.getElementById(
-              `settingsCheck-${printer._id}`
-            ),
-            systemCheck: document.getElementById(`systemCheck-${printer._id}`),
-          };
-          const checkKeys = Object.keys(printer.systemChecks);
-          checkKeys.forEach((key) => {
-            if (printer.systemChecks[key]) {
-              if (
-                systemChecks[`${key}Check`].classList.contains("text-offline")
-              ) {
-                systemChecks[`${key}Check`].classList.remove("text-offline");
-              }
-              if (
-                !systemChecks[`${key}Check`].classList.contains("text-success")
-              ) {
-                systemChecks[`${key}Check`].classList.add("text-success");
-              }
-            } else {
-              if (
-                !systemChecks[`${key}Check`].classList.contains("text-offline")
-              ) {
-                systemChecks[`${key}Check`].classList.add("text-offline");
-              }
-              if (
-                systemChecks[`${key}Check`].classList.contains("text-success")
-              ) {
-                systemChecks[`${key}Check`].classList.remove("text-success");
-              }
-            }
-          });
           printerSortIndex.innerHTML = printer.sortIndex;
           printerGroup.innerHTML = printer.group;
           printerURL.innerHTML = printer.printerURL;
@@ -1002,7 +955,7 @@ class dashUpdate {
                 ${printer.printerState.state}</small></span></td>
         <td><small><span data-title="${printer.webSocketState.desc}" id="webSocketIcon-${printer._id}" class="tag badge badge-${printer.webSocketState.colour} badge-pill">
                 <i  class="fas fa-plug"></i></span></td>
-        <td><i title="API Status" id="apiCheck-${printer._id}" class="fas fa-link text-offline"></i><i title="Files Status" id="filesCheck-${printer._id}" class="fas fa-file-code ml-1 text-offline"></i><i title="State Status" id="stateCheck-${printer._id}" class="fas fa-info-circle ml-1 text-offline"></i><i title="Profile Status" id="profileCheck-${printer._id}" class="fas fa-id-card ml-1 text-offline"></i><i title="Settings Status" id="settingsCheck-${printer._id}" class="fas fa-cog ml-1 text-offline"></i><i title="System Status" id="systemCheck-${printer._id}" class="fas fa-server ml-1 text-offline"></i></td>
+   
         <td><div id="printerGroup-${printer._id}" contenteditable="false"></div></td>
         <td><div id="printerURL-${printer._id}" contenteditable="false"></div></td>
         <td><div id="printerCamURL-${printer._id}" contenteditable="false"></div></td>
