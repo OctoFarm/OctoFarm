@@ -3,90 +3,90 @@ import OctoPrintClient from "./lib/octoprint.js";
 import UI from "./lib/functions/ui.js";
 import Validate from "./lib/functions/validate.js";
 import Calc from "./lib/functions/calc.js";
-let jpInit = false;
-let filamentStore = [
-    {
-        code: "pla",
-        display: "PLA",
-        density: "1.24"
-    },
-    {
-        code: "abs",
-        display: "ABS",
-        density: "1.04"
-    },
-    {
-        code: "petg",
-        display: "PETG",
-        density: "1.27"
-    },
-    {
-        code: "nylon",
-        display: "NYLON",
-        density: "1.52"
-    },
-    {
-        code: "tpu",
-        display: "TPU",
-        density: "1.21"
-    },
-    {
-        code: "pc",
-        display: "Polycarbonate (PC)",
-        density: "1.3"
-    },
-    {
-        code: "wood",
-        display: "Wood Fill",
-        density: "1.28"
-    },
-    {
-        code: "carbon",
-        display: "Carbon Fibre",
-        density: "1.3"
-    },
-    {
-        code: "pcabs",
-        display: "PC/ABS",
-        density: "1.19"
-    },
-    {
-        code: "hips",
-        display: "HIPS",
-        density: "1.03"
-    },
-    {
-        code: "pva",
-        display: "PVA",
-        density: "1.23"
-    },
-    {
-        code: "asa",
-        display: "ASA",
-        density: "1.05"
-    },
-    {
-        code: "pp",
-        display: "Polypropylene (PP)",
-        density: "0.9"
-    },
-    {
-        code: "acetal",
-        display: "Acetal (POM)",
-        density: "1.4"
-    },
-    {
-        code: "pmma",
-        display: "PMMA",
-        density: "1.18"
-    },
-    {
-        code: "fpe",
-        display: "Semi Flexible FPE",
-        density: "2.16"
-    }
-];
 
+const jpInit = false;
+const filamentStore = [
+  {
+    code: "pla",
+    display: "PLA",
+    density: "1.24",
+  },
+  {
+    code: "abs",
+    display: "ABS",
+    density: "1.04",
+  },
+  {
+    code: "petg",
+    display: "PETG",
+    density: "1.27",
+  },
+  {
+    code: "nylon",
+    display: "NYLON",
+    density: "1.52",
+  },
+  {
+    code: "tpu",
+    display: "TPU",
+    density: "1.21",
+  },
+  {
+    code: "pc",
+    display: "Polycarbonate (PC)",
+    density: "1.3",
+  },
+  {
+    code: "wood",
+    display: "Wood Fill",
+    density: "1.28",
+  },
+  {
+    code: "carbon",
+    display: "Carbon Fibre",
+    density: "1.3",
+  },
+  {
+    code: "pcabs",
+    display: "PC/ABS",
+    density: "1.19",
+  },
+  {
+    code: "hips",
+    display: "HIPS",
+    density: "1.03",
+  },
+  {
+    code: "pva",
+    display: "PVA",
+    density: "1.23",
+  },
+  {
+    code: "asa",
+    display: "ASA",
+    density: "1.05",
+  },
+  {
+    code: "pp",
+    display: "Polypropylene (PP)",
+    density: "0.9",
+  },
+  {
+    code: "acetal",
+    display: "Acetal (POM)",
+    density: "1.4",
+  },
+  {
+    code: "pmma",
+    display: "PMMA",
+    density: "1.18",
+  },
+  {
+    code: "fpe",
+    display: "Semi Flexible FPE",
+    density: "2.16",
+  },
+];
 
 // export async function returnFilament() {
 //     let post = await OctoFarmclient.get("filament/get");
@@ -116,184 +116,188 @@ let filamentStore = [
 //   let post = await OctoFarmclient.post("printers/selectFilament", id);
 //   post = await post.json();
 // }
-let filamentManager = "";
-
-
 
 async function init() {
-    //Grab data
-    let spoolTable = document.getElementById("addSpoolsTable");
-    let fill = await OctoFarmclient.get("filament/get/filament");
-    fill = await fill.json();
-    let profile = await OctoFarmclient.get("filament/get/profile");
-    profile = await profile.json();
-    //Initialise Spools Listeners
-    console.log(fill)
-    console.log(profile)
-    fill.Spool.forEach(spools => {
-        profile.profiles.forEach(prof => {
-            document.getElementById("spoolsProfile-"+spools._id).insertAdjacentHTML('beforeend',`
+  // Grab data
+  const spoolTable = document.getElementById("addSpoolsTable");
+  let fill = await OctoFarmclient.get("filament/get/filament");
+  fill = await fill.json();
+  let profile = await OctoFarmclient.get("filament/get/profile");
+  profile = await profile.json();
+  // Initialise Spools Listeners
+  console.log(fill);
+  console.log(profile);
+  fill.Spool.forEach((spools) => {
+    profile.profiles.forEach((prof) => {
+      document.getElementById(`spoolsProfile-${spools._id}`).insertAdjacentHTML(
+        "beforeend",
+        `
                      <option value="${prof._id}">${prof.manufacturer} (${prof.material})</option>
-                    `)
-
-        })
-    document.getElementById("spoolsProfile-"+spools._id).value = spools.profile;
-    let prof = _.findIndex(profile.profiles, function(o) { return o._id == spools.profile; });
-    document.getElementById("spoolsProfile-"+spools._id).className = "form-control " + profile.profiles[prof].material.replace(/ /g, "_");
-    })
-    document.getElementById("addSpoolsTable").addEventListener("click", e => {
-        //Remove from UI
-        if(e.target.classList.contains("edit")){
-            editSpool(e.target)
-        }else if(e.target.classList.contains("delete")){
-            deleteSpool(e.target)
-        }else if(e.target.classList.contains("save")){
-            saveSpool(e.target)
-        }
+                    `
+      );
     });
-
-    //Initialise Profile Listeners
-
-
-
-
-//    //Init Spools
-
-//     let spoolTable = document.getElementById("addSpoolsTable");
-//     let profile = await OctoFarmclient.get("filament/get/profile");
-//     profile = await profile.json();
-//     let printers = await OctoFarmclient.post("printers/printerInfo");
-//     printers = await printers.json();
-//     filamentManager = profile.filamentManager;
-//
-//     fill.Spool.forEach(spools => {
-//         profile.profiles.forEach(prof => {
-//             let profileID = null;
-//             if(filamentManager){
-//                 profileID = prof.profile.index
-//             }else{
-//                 profileID = prof._id
-//             }
-//             document.getElementById("spoolsProfile-"+spools._id).insertAdjacentHTML('beforeend',`
-//                      <option value="${profileID}">${prof.profile.manufacturer} (${prof.profile.material})</option>
-//                     `)
-//
-//         })
-//         document.getElementById("spoolsProfile-"+spools._id).value = spools.spools.profile;
-//         if(filamentManager){
-//             let prof = _.findIndex(profile.profiles, function(o) { return o.profile.index == spools.spools.profile; });
-//             document.getElementById("spoolsProfile-"+spools._id).className = "form-control " + profile.profiles[prof].profile.material.replace(/ /g, "_");
-//         }else{
-//             let prof = _.findIndex(profile.profiles, function(o) { return o._id == spools.spools.profile; });
-//
-//             document.getElementById("spoolsProfile-"+spools._id).className = "form-control " + profile.profiles[prof].profile.material.replace(/ /g, "_");
-//         }
-//
-//         let printerListCurrent = document.getElementById("spoolsPrinterAssignment-"+spools._id);
-//
-//         printerListCurrent.insertAdjacentHTML("beforeend", `
-//                         <option value="0">No Selection</option>
-//                    `)
-//             printers.forEach(printer => {
-//                     if(printer.stateColour.category !== "Active"){
-//                         printerListCurrent.insertAdjacentHTML("beforeend", `
-//                         <option value="${printer._id}">${Validate.getName(printer)}</option>
-//                    `)
-//                     }else{
-//                         printerListCurrent.insertAdjacentHTML("beforeend", `
-//                         <option value="${printer._id}" disabled>${Validate.getName(printer)}</option>
-//                    `)
-//                     }
-//                 if(printer.selectedFilament !== null && printer.selectedFilament._id === spools._id){
-//                     printerListCurrent.value = printer._id
-//                     if(printer.stateColour.category === "Active"){
-//                         printerListCurrent.disabled = true;
-//                         document.getElementById("delete-"+spools._id).disabled = true;
-//                         document.getElementById("edit-"+spools._id).disabled = true;
-//                     }
-//                 }
-//             })
-//
-//         printerListCurrent.addEventListener("change", e => {
-//             let data = {
-//                 printerId: e.target.value,
-//                 spoolId: e.target.parentElement.parentElement.firstElementChild.innerHTML.trim()
-//             }
-//             OctoFarmclient.post("filament/select", data)
-//         })
-//     })
-//     //Grab printer list...
-//
-//
-//   //Init Profiles
-//   let post = await OctoFarmclient.get("filament/get/profile");
-//   post = await post.json();
-//   let profileTable = document.getElementById("addProfilesTable");
-//     //profileTable.innerHTML = "";
-//   post.profiles.forEach(profiles => {
-//       let profileID = null;
-//       if(filamentManager){
-//           profileID = profiles.profile.index
-//       }else{
-//           profileID = profiles._id
-//       }
-//     // profileTable.insertAdjacentHTML("beforeend", `
-//     //     <tr data-jplist-item>
-//     //       <td class="d-none" scope="row">
-//     //         ${profileID}
-//     //       </td>
-//     //       <td scope="row">
-//     //          <p contenteditable="false">${profiles.profile.manufacturer}</p>
-//     //       </td>
-//     //        <td>
-//     //         <p contenteditable="false">${profiles.profile.material}</p>
-//     //       </td>
-//     //       <td>
-//     //         <p contenteditable="false">${profiles.profile.density}</p>
-//     //       </td>
-//     //       <td>
-//     //         <p contenteditable="false">${profiles.profile.diameter}</p>
-//     //       </td>
-//     //           <td>
-//     //               <button id="edit-${profileID}" type="button" class="btn btn-sm btn-info edit">
-//     //                 <i class="fas fa-edit editIcon"></i>
-//     //               </button>
-//     //               <button id="save-${profileID}" type="button" class="btn d-none btn-sm btn-success save">
-//     //                 <i class="fas fa-save saveIcon"></i>
-//     //               </button>
-//     //               <button id="delete-${profileID}" type="button" class="btn btn-sm btn-danger delete">
-//     //                 <i class="fas fa-trash deleteIcon"></i>
-//     //               </button>
-//     //           </td>
-//     //     </tr>
-//     // `)
-//
-//       printers.forEach(printer => {
-//           if(printer.selectedFilament !== null && printer.selectedFilament.spools.profile === profileID){
-//               if(printer.stateColour.category === "Active"){
-//                   document.getElementById("delete-"+profileID).disabled = true;
-//                   document.getElementById("edit-"+profileID).disabled = true;
-//               }
-//           }
-//       })
-//   })
-//     document.getElementById("addProfilesTable").addEventListener("click", e => {
-//         //Remove from UI
-//         if(e.target.classList.contains("edit")){
-//             editProfile(e.target)
-//         }else if(e.target.classList.contains("delete")){
-//             deleteProfile(e.target)
-//         }else if(e.target.classList.contains("save")){
-//             saveProfile(e.target)
-//         }
-//     });
-    jplist.init({
-        storage: 'localStorage', //'localStorage', 'sessionStorage' or 'cookies'
-        storageName: 'spools-sorting' //the same storage name can be used to share storage between multiple pages
+    document.getElementById(`spoolsProfile-${spools._id}`).value =
+      spools.profile;
+    const prof = _.findIndex(profile.profiles, function (o) {
+      return o._id == spools.profile;
     });
-//   //Update Profiles Spools Dropdown.
-//   updateProfiles(post)
-//
+    document.getElementById(
+      `spoolsProfile-${spools._id}`
+    ).className = `form-control ${profile.profiles[prof].material.replace(
+      / /g,
+      "_"
+    )}`;
+  });
+  spoolTable.addEventListener("click", (e) => {
+    // Remove from UI
+    if (e.target.classList.contains("edit")) {
+      editSpool(e.target);
+    } else if (e.target.classList.contains("delete")) {
+      deleteSpool(e.target);
+    } else if (e.target.classList.contains("save")) {
+      saveSpool(e.target);
+    }
+  });
+
+  // Initialise Profile Listeners
+
+  //    //Init Spools
+
+  //     let spoolTable = document.getElementById("addSpoolsTable");
+  //     let profile = await OctoFarmclient.get("filament/get/profile");
+  //     profile = await profile.json();
+  //     let printers = await OctoFarmclient.post("printers/printerInfo");
+  //     printers = await printers.json();
+  //     filamentManager = profile.filamentManager;
+  //
+  //     fill.Spool.forEach(spools => {
+  //         profile.profiles.forEach(prof => {
+  //             let profileID = null;
+  //             if(filamentManager){
+  //                 profileID = prof.profile.index
+  //             }else{
+  //                 profileID = prof._id
+  //             }
+  //             document.getElementById("spoolsProfile-"+spools._id).insertAdjacentHTML('beforeend',`
+  //                      <option value="${profileID}">${prof.profile.manufacturer} (${prof.profile.material})</option>
+  //                     `)
+  //
+  //         })
+  //         document.getElementById("spoolsProfile-"+spools._id).value = spools.spools.profile;
+  //         if(filamentManager){
+  //             let prof = _.findIndex(profile.profiles, function(o) { return o.profile.index == spools.spools.profile; });
+  //             document.getElementById("spoolsProfile-"+spools._id).className = "form-control " + profile.profiles[prof].profile.material.replace(/ /g, "_");
+  //         }else{
+  //             let prof = _.findIndex(profile.profiles, function(o) { return o._id == spools.spools.profile; });
+  //
+  //             document.getElementById("spoolsProfile-"+spools._id).className = "form-control " + profile.profiles[prof].profile.material.replace(/ /g, "_");
+  //         }
+  //
+  //         let printerListCurrent = document.getElementById("spoolsPrinterAssignment-"+spools._id);
+  //
+  //         printerListCurrent.insertAdjacentHTML("beforeend", `
+  //                         <option value="0">No Selection</option>
+  //                    `)
+  //             printers.forEach(printer => {
+  //                     if(printer.stateColour.category !== "Active"){
+  //                         printerListCurrent.insertAdjacentHTML("beforeend", `
+  //                         <option value="${printer._id}">${Validate.getName(printer)}</option>
+  //                    `)
+  //                     }else{
+  //                         printerListCurrent.insertAdjacentHTML("beforeend", `
+  //                         <option value="${printer._id}" disabled>${Validate.getName(printer)}</option>
+  //                    `)
+  //                     }
+  //                 if(printer.selectedFilament !== null && printer.selectedFilament._id === spools._id){
+  //                     printerListCurrent.value = printer._id
+  //                     if(printer.stateColour.category === "Active"){
+  //                         printerListCurrent.disabled = true;
+  //                         document.getElementById("delete-"+spools._id).disabled = true;
+  //                         document.getElementById("edit-"+spools._id).disabled = true;
+  //                     }
+  //                 }
+  //             })
+  //
+  //         printerListCurrent.addEventListener("change", e => {
+  //             let data = {
+  //                 printerId: e.target.value,
+  //                 spoolId: e.target.parentElement.parentElement.firstElementChild.innerHTML.trim()
+  //             }
+  //             OctoFarmclient.post("filament/select", data)
+  //         })
+  //     })
+  //     //Grab printer list...
+  //
+  //
+  //   //Init Profiles
+  //   let post = await OctoFarmclient.get("filament/get/profile");
+  //   post = await post.json();
+  //   let profileTable = document.getElementById("addProfilesTable");
+  //     //profileTable.innerHTML = "";
+  //   post.profiles.forEach(profiles => {
+  //       let profileID = null;
+  //       if(filamentManager){
+  //           profileID = profiles.profile.index
+  //       }else{
+  //           profileID = profiles._id
+  //       }
+  //     // profileTable.insertAdjacentHTML("beforeend", `
+  //     //     <tr data-jplist-item>
+  //     //       <td class="d-none" scope="row">
+  //     //         ${profileID}
+  //     //       </td>
+  //     //       <td scope="row">
+  //     //          <p contenteditable="false">${profiles.profile.manufacturer}</p>
+  //     //       </td>
+  //     //        <td>
+  //     //         <p contenteditable="false">${profiles.profile.material}</p>
+  //     //       </td>
+  //     //       <td>
+  //     //         <p contenteditable="false">${profiles.profile.density}</p>
+  //     //       </td>
+  //     //       <td>
+  //     //         <p contenteditable="false">${profiles.profile.diameter}</p>
+  //     //       </td>
+  //     //           <td>
+  //     //               <button id="edit-${profileID}" type="button" class="btn btn-sm btn-info edit">
+  //     //                 <i class="fas fa-edit editIcon"></i>
+  //     //               </button>
+  //     //               <button id="save-${profileID}" type="button" class="btn d-none btn-sm btn-success save">
+  //     //                 <i class="fas fa-save saveIcon"></i>
+  //     //               </button>
+  //     //               <button id="delete-${profileID}" type="button" class="btn btn-sm btn-danger delete">
+  //     //                 <i class="fas fa-trash deleteIcon"></i>
+  //     //               </button>
+  //     //           </td>
+  //     //     </tr>
+  //     // `)
+  //
+  //       printers.forEach(printer => {
+  //           if(printer.selectedFilament !== null && printer.selectedFilament.spools.profile === profileID){
+  //               if(printer.stateColour.category === "Active"){
+  //                   document.getElementById("delete-"+profileID).disabled = true;
+  //                   document.getElementById("edit-"+profileID).disabled = true;
+  //               }
+  //           }
+  //       })
+  //   })
+  //     document.getElementById("addProfilesTable").addEventListener("click", e => {
+  //         //Remove from UI
+  //         if(e.target.classList.contains("edit")){
+  //             editProfile(e.target)
+  //         }else if(e.target.classList.contains("delete")){
+  //             deleteProfile(e.target)
+  //         }else if(e.target.classList.contains("save")){
+  //             saveProfile(e.target)
+  //         }
+  //     });
+  jplist.init({
+    storage: "localStorage", // 'localStorage', 'sessionStorage' or 'cookies'
+    storageName: "spools-sorting", // the same storage name can be used to share storage between multiple pages
+  });
+  //   //Update Profiles Spools Dropdown.
+  //   updateProfiles(post)
+  //
 }
 // async function updateProfiles(post){
 //     let spoolsProfile = document.getElementById("spoolsProfile");
@@ -417,7 +421,7 @@ async function init() {
 //                   <th scope="row"><p contenteditable="false">${post.spools.name}</p></th>
 //                   <td>
 //                        <select id="spoolsProfile-${post._id}" class="form-control" disabled>
-//    
+//
 //                        </select>
 //                    </td>
 //                   <td><p class="price" contenteditable="false">${post.spools.price}</p></td>
@@ -428,7 +432,7 @@ async function init() {
 //                   <td><p contenteditable="false">${post.spools.tempOffset}</p></td>
 //                    <td>
 //                        <select id="spoolsPrinterAssignment-${post._id}" class="form-control">
-//        
+//
 //                        </select>
 //                    </td>
 //                   <td><button id="edit-${post._id}" type="button" class="btn btn-sm btn-info edit">
@@ -771,26 +775,37 @@ async function init() {
 //     }
 // }
 function updateTotals(filtered) {
-    let price = [];
-    let weight = [];
-    let used = [];
-    filtered.forEach(row => {
-        price.push(parseInt(row.getElementsByClassName("price")[0].innerText))
-        weight.push(parseInt(row.getElementsByClassName("weight")[0].innerText))
-        used.push(parseInt(row.getElementsByClassName("used")[0].innerText))
-    })
-    let usedReduced = used.reduce((a, b) => a + b, 0).toFixed(0);
-    let weightReduced = weight.reduce((a, b) => a + b, 0).toFixed(0);
-    document.getElementById("totalPrice").innerHTML = price.reduce((a, b) => a + b, 0).toFixed(0)
-    document.getElementById("totalWeight").innerHTML = weightReduced;
-    document.getElementById("totalUsed").innerHTML = usedReduced;
-    document.getElementById("totalRemaining").innerHTML = (weightReduced - usedReduced).toFixed(0);
-    document.getElementById("totalRemainingPercent").innerHTML = (100 - (usedReduced / weightReduced) * 100).toFixed(0);
+  const price = [];
+  const weight = [];
+  const used = [];
+  filtered.forEach((row) => {
+    price.push(parseInt(row.getElementsByClassName("price")[0].innerText));
+    weight.push(parseInt(row.getElementsByClassName("weight")[0].innerText));
+    used.push(parseInt(row.getElementsByClassName("used")[0].innerText));
+  });
+  const usedReduced = used.reduce((a, b) => a + b, 0).toFixed(0);
+  const weightReduced = weight.reduce((a, b) => a + b, 0).toFixed(0);
+  document.getElementById("totalPrice").innerHTML = price
+    .reduce((a, b) => a + b, 0)
+    .toFixed(0);
+  document.getElementById("totalWeight").innerHTML = weightReduced;
+  document.getElementById("totalUsed").innerHTML = usedReduced;
+  document.getElementById("totalRemaining").innerHTML = (
+    weightReduced - usedReduced
+  ).toFixed(0);
+  document.getElementById("totalRemainingPercent").innerHTML = (
+    100 -
+    (usedReduced / weightReduced) * 100
+  ).toFixed(0);
 }
-const element = document.getElementById('listenerSpools');
-element.addEventListener('jplist.state', (e) => {
-    //the elements list after filtering + pagination
+const element = document.getElementById("listenerSpools");
+element.addEventListener(
+  "jplist.state",
+  (e) => {
+    // the elements list after filtering + pagination
     updateTotals(e.jplistState.filtered);
-}, false);
+  },
+  false
+);
 init();
 // load();
