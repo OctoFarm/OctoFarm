@@ -63,26 +63,6 @@ export default class Calculate {
     return (n - a) * (n - b) <= 0;
   }
 
-  static returnFilamentCost(filament, usageElement) {
-    let grams = usageElement.replace("g", "");
-    grams = parseFloat(grams);
-    if (isNaN(grams)) {
-      return `(No Length)`;
-    }
-    if (
-      typeof filament === "undefined" ||
-      filament === null ||
-      filament == "None chosen..."
-    ) {
-      return `(No Spool)`;
-    }
-    const cost = (
-      (filament.spools.price / filament.spools.weight) *
-      grams
-    ).toFixed(2);
-    return cost;
-  }
-
   static returnPrintCost(costSettings, time) {
     if (typeof costSettings === "undefined") {
       // Attempt to update cost settings in history...
@@ -117,5 +97,10 @@ export default class Calculate {
     const e = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
     const f = Math.floor(Math.log(a) / Math.log(c));
     return `${parseFloat((a / Math.pow(c, f)).toFixed(d))} ${e[f]}`;
+  }
+
+  static dateClean(date) {
+    date = new Date(date);
+    return `${date.getFullYear()}-${date.getMonth()}-${date.getDay()}: ${date.getHours()}:${date.getSeconds()}`;
   }
 }
