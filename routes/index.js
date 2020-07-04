@@ -265,7 +265,6 @@ router.get("/mon/currentOp", ensureAuthenticated, async (req, res) => {
 });
 router.get("/filament", ensureAuthenticated, async (req, res) => {
   const printers = Runner.returnFarmPrinters();
-  const clientSettings = await SettingsClean.returnClientSettings();
   const serverSettings = await SettingsClean.returnSystemSettings();
   const statistics = await FilamentClean.getStatistics();
   const spools = await FilamentClean.getSpools();
@@ -286,7 +285,6 @@ router.get("/filament", ensureAuthenticated, async (req, res) => {
     printerCount: printers.length,
     page: "Filament Manager",
     helpers: prettyHelpers,
-    clientSettings,
     serverSettings,
     spools,
     profiles,
