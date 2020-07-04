@@ -282,7 +282,7 @@ WebSocketClient.prototype.throttle = function (data) {
       `Throttling your websocket connection: ${this.index}: ${this.url} `,
       data
     );
-    farmPrinters[this.index].ws.send(JSON.stringify(data));
+    this.instance.send(JSON.stringify(data));
   } catch (e) {
     logger.error(`Failed to Throttle websocket: ${this.index}: ${this.url}`);
     this.instance.emit("error", e);
@@ -311,6 +311,7 @@ WebSocketClient.prototype.reconnect = async function (e) {
   return true;
 };
 WebSocketClient.prototype.onopen = async function (e) {
+  // eslint-disable-next-line prefer-rest-params
   logger.info("WebSocketClient: open", arguments, `${this.index}: ${this.url}`);
   const Polling = systemSettings.onlinePolling;
   const data = {};
@@ -593,10 +594,6 @@ WebSocketClient.prototype.onclose = function (e) {
     arguments,
     `${this.index}: ${this.url} - ${e}`
   );
-  this.onopen = null;
-  this.onclose = null;
-  this.onerror = null;
-  this.onmessage = null;
   this.instance.removeAllListeners();
   if (typeof farmPrinters[this.index] !== "undefined") {
     PrinterClean.generate(farmPrinters[this.index]);
@@ -698,6 +695,7 @@ class Runner {
     const i = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
+    farmPrinters[i].systemChecks.scanning.api.status = "warning";
     try {
       if (i === -1) {
         const error = {
@@ -726,7 +724,8 @@ class Runner {
         "users"
       );
       if (users.status === 200) {
-        farmPrinters[i].systemChecks.api = true;
+        farmPrinters[i].systemChecks.scanning.api.status = "success";
+        farmPrinters[i].systemChecks.scanning.api.date = new Date();
         users = await users.json();
         if (_.isEmpty(users)) {
           farmPrinters[i].currentUser = "admin";
@@ -879,12 +878,46 @@ class Runner {
     farmPrinters[i].stepRate = 10;
 
     farmPrinters[i].systemChecks = {
-      api: false,
-      files: false,
-      state: false,
-      profile: false,
-      settings: false,
-      system: false,
+      scanning: {
+        api: {
+          status: "danger",
+          date: null,
+        },
+        files: {
+          status: "danger",
+          date: null,
+        },
+        state: {
+          status: "danger",
+          date: null,
+        },
+        profile: {
+          status: "danger",
+          date: null,
+        },
+        settings: {
+          status: "danger",
+          date: null,
+        },
+        system: {
+          status: "danger",
+          date: null,
+        },
+      },
+      cleaning: {
+        information: {
+          status: "danger",
+          date: null,
+        },
+        file: {
+          status: "danger",
+          date: null,
+        },
+        job: {
+          status: "danger",
+          date: null,
+        },
+      },
     };
 
     if (typeof farmPrinters[i].dateAdded === "undefined") {
@@ -1129,14 +1162,13 @@ class Runner {
       status: null,
       msg: null,
     };
-    farmPrinters[index].systemChecks = {
-      api: false,
-      files: false,
-      state: false,
-      profile: false,
-      settings: false,
-      system: false,
-    };
+    farmPrinters[index].systemChecks.scanning.api.status = "danger";
+    farmPrinters[index].systemChecks.scanning.files.status = "danger";
+    farmPrinters[index].systemChecks.scanning.state.status = "danger";
+    farmPrinters[index].systemChecks.scanning.profile.status = "danger";
+    farmPrinters[index].systemChecks.scanning.settings.status = "danger";
+    farmPrinters[index].systemChecks.scanning.system.status = "danger";
+
     farmPrinters[index].state = "Searching...";
     farmPrinters[index].stateColour = Runner.getColour("Searching...");
     farmPrinters[index].hostState = "Searching...";
@@ -1164,6 +1196,9 @@ class Runner {
 
   static async updatePoll() {
     for (let i = 0; i < farmPrinters.length; i++) {
+      // Update the server
+      const server = await ServerSettings.check();
+      systemSettings = server[0];
       const Polling = systemSettings.onlinePolling;
       const throt = {};
       logger.info(
@@ -1174,9 +1209,7 @@ class Runner {
         typeof farmPrinters[i].ws !== "undefined" &&
         typeof farmPrinters[i].ws.instance !== "undefined"
       ) {
-        await farmPrinters[i].ws.throttle(JSON.stringify(throt));
-        this.reScanOcto(farmPrinters[i]._id, true);
-        logger.info("ReScanning Octoprint instance");
+        await farmPrinters[i].ws.instance.terminate();
       }
     }
     return "updated";
@@ -1201,6 +1234,7 @@ class Runner {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
+    farmPrinters[index].systemChecks.scanning.files.status = "warning";
     // Shim to fix undefined on upload files/folders
     farmPrinters[index].fileList = {
       files: [],
@@ -1323,7 +1357,6 @@ class Runner {
           folders: printerLocations,
           folderCount: printerLocations.length,
         };
-        farmPrinters[index].fileList.clean = true;
         const currentFilament = JSON.parse(
           JSON.stringify(farmPrinters[index].selectedFilament)
         );
@@ -1343,6 +1376,8 @@ class Runner {
             currentFilament[s].spools.profile = profile.profile;
           }
         }
+        farmPrinters[index].systemChecks.scanning.files.status = "success";
+        farmPrinters[index].systemChecks.scanning.files.date = new Date();
         FileClean.generate(farmPrinters[index], currentFilament);
         logger.info(
           `Successfully grabbed Files for...: ${farmPrinters[index].printerURL}`
@@ -1362,6 +1397,7 @@ class Runner {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
+    farmPrinters[index].systemChecks.scanning.state.status = "warning";
     return ClientAPI.getRetry(
       farmPrinters[index].printerURL,
       farmPrinters[index].apikey,
@@ -1389,7 +1425,8 @@ class Runner {
         farmPrinters[index].stateColour = Runner.getColour(res.current.state);
         farmPrinters[index].current = res.current;
         farmPrinters[index].options = res.options;
-        farmPrinters[index].systemChecks.state = true;
+        farmPrinters[index].systemChecks.scanning.state.status = "success";
+        farmPrinters[index].systemChecks.scanning.state.date = new Date();
         const currentFilament = JSON.parse(
           JSON.stringify(farmPrinters[index].selectedFilament)
         );
@@ -1427,6 +1464,8 @@ class Runner {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
+    farmPrinters[index].systemChecks.scanning.profile.status = "warning";
+
     return ClientAPI.getRetry(
       farmPrinters[index].printerURL,
       farmPrinters[index].apikey,
@@ -1438,6 +1477,8 @@ class Runner {
       .then((res) => {
         // Update info to DB
         farmPrinters[index].profiles = res.profiles;
+        farmPrinters[index].systemChecks.scanning.profile.status = "success";
+        farmPrinters[index].systemChecks.scanning.profile.date = new Date();
         logger.info(
           `Successfully grabbed Profiles.js for...: ${farmPrinters[index].printerURL}`
         );
@@ -1455,6 +1496,7 @@ class Runner {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
+    farmPrinters[index].systemChecks.scanning.settings.status = "warning";
     return ClientAPI.getRetry(
       farmPrinters[index].printerURL,
       farmPrinters[index].apikey,
@@ -1522,7 +1564,8 @@ class Runner {
             printer.save();
           }
         }
-        farmPrinters[index].systemChecks.settings = true;
+        farmPrinters[index].systemChecks.scanning.settings.status = "success";
+        farmPrinters[index].systemChecks.scanning.settings.date = new Date();
         logger.info(
           `Successfully grabbed Settings for...: ${farmPrinters[index].printerURL}`
         );
@@ -1540,6 +1583,7 @@ class Runner {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
+    farmPrinters[index].systemChecks.scanning.system.status = "warning";
     return ClientAPI.getRetry(
       farmPrinters[index].printerURL,
       farmPrinters[index].apikey,
@@ -1551,7 +1595,8 @@ class Runner {
       .then((res) => {
         // Update info to DB
         farmPrinters[index].core = res.core;
-        farmPrinters[index].systemChecks.system = true;
+        farmPrinters[index].systemChecks.scanning.system.status = "success";
+        farmPrinters[index].systemChecks.scanning.system.date = new Date();
         logger.info(
           `Successfully grabbed System Information for...: ${farmPrinters[index].printerURL}`
         );
