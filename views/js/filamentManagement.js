@@ -5,6 +5,7 @@ import Validate from "./lib/functions/validate.js";
 import Calc from "./lib/functions/calc.js";
 
 const jpInit = false;
+let filamentManager = false;
 const filamentStore = [
   {
     code: "pla",
@@ -116,7 +117,112 @@ const filamentStore = [
 //   let post = await OctoFarmclient.post("printers/selectFilament", id);
 //   post = await post.json();
 // }
+async function addProfile(manufacturer, material, density, diameter) {
+  const errors = [];
 
+  if (manufacturer.value === "") {
+    errors.push({ type: "warning", msg: "Please input manufacturer" });
+  }
+  if (material.value === "") {
+    errors.push({ type: "warning", msg: "Please select or type a material" });
+  }
+  if (density.value === 0) {
+    errors.push({ type: "warning", msg: "Please input a density" });
+  }
+  if (diameter.value === 0) {
+    errors.push({ type: "warning", msg: "Please input a density" });
+  }
+  if (errors.length > 0) {
+    errors.forEach((error) => {
+      UI.createMessage(error, "profilesMessage");
+    });
+    return;
+  }
+  const opts = {
+    manufacturer: manufacturer.value,
+    material: material.value,
+    density: density.value,
+    diameter: diameter.value,
+  };
+  let post = await OctoFarmclient.post("filament/save/profile", opts);
+  if (post.status === 200) {
+    UI.createMessage(
+      {
+        type: "success",
+        msg: "Successfully added new roll to the database...",
+      },
+      "profilesMessage"
+    );
+    post = await post.json();
+    manufacturer.value = "";
+    material.value = "";
+    density.value = 1.25;
+    diameter.value = 1.75;
+    let profileID = null;
+    post = post.dataProfile;
+    filamentManager = post.filamentManager;
+    if (filamentManager) {
+      profileID = post.profile.index;
+    } else {
+      profileID = post._id;
+    }
+    updateProfileDrop();
+    document.getElementById("addProfilesTable").insertAdjacentHTML(
+      "beforeend",
+      `
+                <tr data-jplist-item>
+                  <th style="display: none;">${profileID}</th>
+                  <th scope="row"><p contenteditable="false">${post.profile.manufacturer}</p></th>
+                  <td><p contenteditable="false">${post.profile.material}</p></td>
+                  <td><p contenteditable="false">${post.profile.density}</p></td>
+                  <td><p contenteditable="false">${post.profile.diameter}</p></td>
+                  <td><button id="edit-${profileID}" type="button" class="btn btn-sm btn-info edit">
+                    <i class="fas fa-edit editIcon"></i>
+                  </button>
+                  <button id="save-${profileID}" type="button" class="btn btn-sm d-none btn-success save">
+                    <i class="fas fa-save saveIcon"></i>
+                  </button>
+                  <button id="delete-${profileID}" type="button" class="btn btn-sm btn-danger delete">
+                    <i class="fas fa-trash deleteIcon"></i>
+                  </button></td>
+                </tr>
+                `
+    );
+  } else {
+    UI.createMessage(
+      {
+        type: "error",
+        msg: "Could not add roll to database... is it alive?",
+      },
+      "profilesMessage"
+    );
+  }
+}
+function addSpool() {}
+async function updateProfileDrop() {
+  const spoolsProfile = document.getElementById("spoolsProfile");
+  let profiles = await OctoFarmclient.get("filament/get/profile");
+  profiles = await profiles.json();
+  if (typeof profiles !== "undefined") {
+    spoolsProfile.innerHTML = "";
+
+    profiles.profiles.forEach((profile) => {
+      let profileID = null;
+      if (filamentManager) {
+        profileID = profile.index;
+      } else {
+        profileID = profile._id;
+      }
+      spoolsProfile.insertAdjacentHTML(
+        "beforeend",
+        `
+             <option value="${profileID}">${profile.manufacturer} (${profile.material})</option>
+            `
+      );
+    });
+  }
+}
+function updatePrinterDrops() {}
 async function init() {
   // Grab data
   const spoolTable = document.getElementById("addSpoolsTable");
@@ -124,9 +230,32 @@ async function init() {
   fill = await fill.json();
   let profile = await OctoFarmclient.get("filament/get/profile");
   profile = await profile.json();
+
+  // Initialise materials dropdown
+  const dataList = document.getElementById("profilesMaterial");
+  dataList.addEventListener("change", function (e) {
+    const { value } = this;
+    const selection = _.findIndex(filamentStore, function (o) {
+      return o.code == value.toLowerCase();
+    });
+    if (selection != -1) {
+      this.value = filamentStore[selection].display;
+      document.getElementById("profilesDensity").value =
+        filamentStore[selection].density;
+    }
+  });
+  filamentStore.forEach((filament) => {
+    document.getElementById("huge_list").insertAdjacentHTML(
+      "beforeend",
+      `
+            <option value="${filament.code.toUpperCase()}">${
+        filament.display
+      }</option>
+        `
+    );
+  });
+
   // Initialise Spools Listeners
-  console.log(fill);
-  console.log(profile);
   fill.Spool.forEach((spools) => {
     profile.profiles.forEach((prof) => {
       document.getElementById(`spoolsProfile-${spools._id}`).insertAdjacentHTML(
@@ -158,9 +287,34 @@ async function init() {
       saveSpool(e.target);
     }
   });
-
+  updateProfileDrop();
   // Initialise Profile Listeners
-
+  const profilesBtn = document.getElementById("addProfilesBtn");
+  profilesBtn.addEventListener("click", async (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    document.getElementById("profilesMessage").innerHTML = "";
+    const profilesManufactuer = document.getElementById("profilesManufactuer");
+    const profilesMaterial = document.getElementById("profilesMaterial");
+    const profilesDensity = document.getElementById("profilesDensity");
+    const profilesDiameter = document.getElementById("profilesDiameter");
+    await addProfile(
+      profilesManufactuer,
+      profilesMaterial,
+      profilesDensity,
+      profilesDiameter
+    );
+  });
+  document.getElementById("addProfilesTable").addEventListener("click", (e) => {
+    // Remove from UI
+    if (e.target.classList.contains("edit")) {
+      editProfile(e.target);
+    } else if (e.target.classList.contains("delete")) {
+      deleteProfile(e.target);
+    } else if (e.target.classList.contains("save")) {
+      saveProfile(e.target);
+    }
+  });
   //    //Init Spools
 
   //     let spoolTable = document.getElementById("addSpoolsTable");
@@ -281,53 +435,20 @@ async function init() {
   //           }
   //       })
   //   })
-  //     document.getElementById("addProfilesTable").addEventListener("click", e => {
-  //         //Remove from UI
-  //         if(e.target.classList.contains("edit")){
-  //             editProfile(e.target)
-  //         }else if(e.target.classList.contains("delete")){
-  //             deleteProfile(e.target)
-  //         }else if(e.target.classList.contains("save")){
-  //             saveProfile(e.target)
-  //         }
-  //     });
+
   jplist.init({
     storage: "localStorage", // 'localStorage', 'sessionStorage' or 'cookies'
     storageName: "spools-sorting", // the same storage name can be used to share storage between multiple pages
   });
   //   //Update Profiles Spools Dropdown.
-  //   updateProfiles(post)
+  //   updateProfileDrop(post)
   //
 }
-// async function updateProfiles(post){
-//     let spoolsProfile = document.getElementById("spoolsProfile");
-//     if(typeof post.profiles !== 'undefined'){
-//         spoolsProfile.innerHTML = "";
-//         post.profiles.forEach(profile => {
-//             let profileID = null
-//             if(filamentManager){
-//                 profileID = profile.profile.index
-//             }else{
-//                 profileID = profile._id
-//             }
-//             spoolsProfile.insertAdjacentHTML('beforeend',`
-//              <option value="${profileID}">${profile.profile.manufacturer} (${profile.profile.material})</option>
-//             `)
-//         })
-//     }else{
-//         let profileID = null
-//         if(filamentManager){
-//             profileID = post.profile.index
-//         }else{
-//             profileID = post._id
-//         }
-//         spoolsProfile.insertAdjacentHTML('beforeend',`
-//          <option value="${profileID}">${post.profile.manufacturer} (${post.profile.material})</option>
-//         `)
-//     }
+// async function updateProfileDrop(post){
+//
 // }
 // async function load() {
-//     let dataList = document.getElementById("profilesMaterial")
+//    profilesMaterialprofilesMaterial let dataList = document.getElementById("profilesMaterial")
 //         dataList.addEventListener('change', function(e){
 //             let value = this.value
 //             let selection = _.findIndex(filamentStore, function(o) { return o.code == value.toLowerCase(); });
@@ -516,98 +637,7 @@ async function init() {
 //     //     }
 //     // });
 //     // Grab Profile
-//     document
-//         .getElementById("addProfilesBtn")
-//         .addEventListener("click", async e => {
-//             e.preventDefault();
-//             e.stopPropagation();
-//             document.getElementById("profilesMessage").innerHTML = "";
-//             ;
 //
-//             let profilesManufactuer = document.getElementById("profilesManufactuer");
-//             let profilesMaterial = document.getElementById("profilesMaterial");
-//             let profilesDensity = document.getElementById("profilesDensity");
-//             let profilesDiameter = document.getElementById("profilesDiameter");
-//             let errors = [];
-//
-//             if (profilesManufactuer.value === "") {
-//                 errors.push({type: "warning", msg: "Please input manufacturer"})
-//             }
-//             if (profilesMaterial.value === "") {
-//                 errors.push({type: "warning", msg: "Please select or type a material"})
-//             }
-//             if (profilesDensity.value === 0) {
-//                 errors.push({type: "warning", msg: "Please input a density"})
-//             }
-//             if (profilesDiameter.value === 0) {
-//                 errors.push({type: "warning", msg: "Please input a density"})
-//             }
-//             if (errors.length > 0) {
-//                 errors.forEach(error => {
-//                     UI.createMessage(error, "profilesMessage")
-//                 })
-//                 return;
-//             }
-//             let opts = {
-//                 manufacturer: profilesManufactuer.value,
-//                 material: profilesMaterial.value,
-//                 density: profilesDensity.value,
-//                 diameter: profilesDiameter.value
-//             };
-//             let post = await OctoFarmclient.post("filament/save/profile", opts);
-//             if (post.status === 200) {
-//                 UI.createMessage(
-//                     {
-//                         type: "success",
-//                         msg: "Successfully added new roll to the database..."
-//                     },
-//                     "profilesMessage"
-//                 );
-//                 post = await post.json();
-//
-//                 profilesManufactuer.value = "";
-//                 profilesMaterial.value = "";
-//                 profilesDensity.value = 1.25;
-//                 profilesDiameter.value = 1.75;
-//                 let profileID = null
-//                 if(filamentManager){
-//                     profileID = post.profile.profile.index
-//                 }else{
-//                     profileID = post.profile._id
-//                 }
-//                 post = post.profile;
-//                 updateProfiles(post)
-//                 document.getElementById("addProfilesTable").insertAdjacentHTML(
-//                     "beforeend",
-//                     `
-//                 <tr data-jplist-item>
-//                   <th style="display: none;">${profileID }</th>
-//                   <th scope="row"><p contenteditable="false">${post.profile.manufacturer}</p></th>
-//                   <td><p contenteditable="false">${post.profile.material}</p></td>
-//                   <td><p contenteditable="false">${post.profile.density}</p></td>
-//                   <td><p contenteditable="false">${post.profile.diameter}</p></td>
-//                   <td><button id="edit-${profileID}" type="button" class="btn btn-sm btn-info edit">
-//                     <i class="fas fa-edit editIcon"></i>
-//                   </button>
-//                   <button id="save-${profileID}" type="button" class="btn btn-sm d-none btn-success save">
-//                     <i class="fas fa-save saveIcon"></i>
-//                   </button>
-//                   <button id="delete-${profileID}" type="button" class="btn btn-sm btn-danger delete">
-//                     <i class="fas fa-trash deleteIcon"></i>
-//                   </button></td>
-//                 </tr>
-//                 `
-//                 );
-//             } else {
-//                 UI.createMessage(
-//                     {
-//                         type: "error",
-//                         msg: "Could not add roll to database... is it alive?"
-//                     },
-//                     "profilesMessage"
-//                 );
-//             }
-//         });
 //     // document.getElementById("addProfilesTable").addEventListener("click", e => {
 //     //     //Remove from UI
 //     //     if(e.target.classList.contains("edit")){
@@ -620,67 +650,66 @@ async function init() {
 //     // });
 //
 // }
-// async function editProfile(e) {
-//     let row = e.parentElement.parentElement;
-//     let editable = row.querySelectorAll("[contenteditable]")
-//     let id = e.parentElement.parentElement.firstElementChild.innerHTML.trim()
-//     editable.forEach(edit => {
-//         edit.contentEditable = true;
-//         edit.classList.add("contentEditable");
-//     })
-//     document.getElementById("save-"+id).classList.remove("d-none");
-//     document.getElementById("edit-"+id).classList.add("d-none");
-//
-// }
-// async function editSpool(e) {
-//     let row = e.parentElement.parentElement;
-//     let editable = row.querySelectorAll("[contenteditable]")
-//     let id = e.parentElement.parentElement.firstElementChild.innerHTML.trim()
-//     editable.forEach(edit => {
-//         edit.contentEditable = true;
-//         edit.classList.add("contentEditable");
-//     })
-//     // let profile = await OctoFarmclient.get("filament/get/profile");
-//     // profile = await profile.json();
-//     // document.getElementById("spoolsProfile-"+id).innerHTML = "";
-//     // profile.profiles.forEach(prof => {
-//     //     let profileID = null;
-//     //     if(filamentManager){
-//     //         profileID = prof.profile.index
-//     //     }else{
-//     //         profileID = prof._id
-//     //     }
-//     //     document.getElementById("spoolsProfile-"+id).insertAdjacentHTML('beforeend',`
-//     //                  <option value="${profileID}">${prof.profile.manufacturer} (${prof.profile.material})</option>
-//     //                 `)
-//     // })
-//     document.getElementById("spoolsProfile-"+id).disabled = false;
-//     document.getElementById("save-"+id).classList.remove("d-none");
-//     document.getElementById("edit-"+id).classList.add("d-none");
-// }
-// async function saveProfile(e, filamentManager) {
-//     let row = e.parentElement.parentElement;
-//     let editable = row.querySelectorAll("[contenteditable]")
-//     let id = e.parentElement.parentElement.firstElementChild.innerHTML.trim()
-//     let profile = []
-//     editable.forEach(edit => {
-//         edit.contentEditable = false;
-//         edit.classList.remove("contentEditable");
-//         profile.push(edit.innerHTML.trim());
-//     })
-//     let data = {
-//         id: id,
-//         profile: profile
-//     }
-//     let post = await OctoFarmclient.post("filament/edit/profile", data);
-//     if (post.status === 200) {
-//         post = await post.json();
-//         updateProfiles(post)
-//         document.getElementById("save-" + id).classList.add("d-none");
-//         document.getElementById("edit-" + id).classList.remove("d-none");
-//     }
-//     jplist.refresh();
-// }
+async function editProfile(e) {
+  const row = e.parentElement.parentElement;
+  const editable = row.querySelectorAll("[contenteditable]");
+  const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
+  editable.forEach((edit) => {
+    edit.contentEditable = true;
+    edit.classList.add("contentEditable");
+  });
+  document.getElementById(`save-${id}`).classList.remove("d-none");
+  document.getElementById(`edit-${id}`).classList.add("d-none");
+}
+async function editSpool(e) {
+  const row = e.parentElement.parentElement;
+  const editable = row.querySelectorAll("[contenteditable]");
+  const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
+  editable.forEach((edit) => {
+    edit.contentEditable = true;
+    edit.classList.add("contentEditable");
+  });
+  // let profile = await OctoFarmclient.get("filament/get/profile");
+  // profile = await profile.json();
+  // document.getElementById("spoolsProfile-"+id).innerHTML = "";
+  // profile.profiles.forEach(prof => {
+  //     let profileID = null;
+  //     if(filamentManager){
+  //         profileID = prof.profile.index
+  //     }else{
+  //         profileID = prof._id
+  //     }
+  //     document.getElementById("spoolsProfile-"+id).insertAdjacentHTML('beforeend',`
+  //                  <option value="${profileID}">${prof.profile.manufacturer} (${prof.profile.material})</option>
+  //                 `)
+  // })
+  document.getElementById(`spoolsProfile-${id}`).disabled = false;
+  document.getElementById(`save-${id}`).classList.remove("d-none");
+  document.getElementById(`edit-${id}`).classList.add("d-none");
+}
+async function saveProfile(e) {
+  const row = e.parentElement.parentElement;
+  const editable = row.querySelectorAll("[contenteditable]");
+  const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
+  const profile = [];
+  editable.forEach((edit) => {
+    edit.contentEditable = false;
+    edit.classList.remove("contentEditable");
+    profile.push(edit.innerHTML.trim());
+  });
+  const data = {
+    id,
+    profile,
+  };
+  let post = await OctoFarmclient.post("filament/edit/profile", data);
+  if (post.status === 200) {
+    post = await post.json();
+    updateProfileDrop();
+    document.getElementById(`save-${id}`).classList.add("d-none");
+    document.getElementById(`edit-${id}`).classList.remove("d-none");
+  }
+  jplist.refresh();
+}
 // async function saveSpool(e, filamentManager) {
 //     let row = e.parentElement.parentElement;
 //     let editable = row.querySelectorAll("[contenteditable]")
@@ -707,41 +736,38 @@ async function init() {
 //      }
 //     jplist.refresh();
 // }
-// async function deleteProfile(e, filamentManager) {
-//   document.getElementById("profilesMessage").innerHTML = "";
-//   if (e.classList.contains("delete") || e.classList.contains("deleteIcon")) {
-//
-//     let post = await OctoFarmclient.post("filament/delete/profile", {
-//       id: e.parentElement.parentElement.firstElementChild.innerHTML.trim()
-//     });
-//     if (post.status === 200) {
-//       if (e.classList.contains("deleteIcon")) {
-//           jplist.resetContent(function(){
-//               //remove element with id = el1
-//               e.parentElement.parentElement.parentElement.remove();
-//           })
-//
-//       } else {
-//           jplist.resetContent(function(){
-//               //remove element with id = el1
-//               e.parentElement.parentElement.remove();
-//           })
-//
-//       }
-//       post = await post.json();
-//       updateProfiles(post)
-//
-//     } else {
-//       UI.createMessage(
-//         {
-//           type: "danger",
-//           msg: "Error: Could not delete roll from database, check connection..."
-//         },
-//         "filamentMessage"
-//       );
-//     }
-//   }
-// }
+async function deleteProfile(e) {
+  document.getElementById("profilesMessage").innerHTML = "";
+  if (e.classList.contains("delete") || e.classList.contains("deleteIcon")) {
+    let post = await OctoFarmclient.post("filament/delete/profile", {
+      id: e.parentElement.parentElement.firstElementChild.innerHTML.trim(),
+    });
+    if (post.status === 200) {
+      if (e.classList.contains("deleteIcon")) {
+        jplist.resetContent(function () {
+          // remove element with id = el1
+          e.parentElement.parentElement.parentElement.remove();
+        });
+      } else {
+        jplist.resetContent(function () {
+          // remove element with id = el1
+          e.parentElement.parentElement.remove();
+        });
+      }
+      post = await post.json();
+      updateProfileDrop(post);
+    } else {
+      UI.createMessage(
+        {
+          type: "danger",
+          msg:
+            "Error: Could not delete roll from database, check connection...",
+        },
+        "filamentMessage"
+      );
+    }
+  }
+}
 // async function deleteSpool(e, filamentManager) {
 //     document.getElementById("profilesMessage").innerHTML = "";
 //     if (e.classList.contains("delete") || e.classList.contains("deleteIcon")) {
@@ -774,6 +800,7 @@ async function init() {
 //         }
 //     }
 // }
+
 function updateTotals(filtered) {
   const price = [];
   const weight = [];
