@@ -22,9 +22,10 @@ All notable changes to this project will be documented in this file.
     - Added filters to Terminal output on Printer Control. Same as OctoPrint currently: temp,sd,wait
     - Terminal output is now colour coded: temp - yellow, sd - grey, wait - red.
     
+    
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
-    - Thumbnails if available are now captured when logging history for any file.
+    - Thumbnails if available are now captured when logging history for any file. They will be saved per file in the client images folder.
     - Panel view now shows file thumbnail if available and no camera is set.
     - Printer Control window now shows file thumbnail if available on selected job.
     - State runner now updates octoprint job information with the selected thumbnail and filament length so this information can be used on the client.
@@ -42,6 +43,7 @@ All notable changes to this project will be documented in this file.
     - Filament information now generated on server side then sent to the client, should improve loading times. 
     - Printer Control improvements, now shows loading spinner when loading/switching to a different print. Speeds should be slightly improved``
         - Printer Control now live reloads filament/file changes. Shouldn't need to re-sync nearly as much manually. 
+    - Printer Management buttons have been moved to a card body. 
 ### Fixed
     - Fix file manager bug with default date sorting.
     - Fixed styling issue with the filters and sorting dropdowns on views making the bar bigger.
