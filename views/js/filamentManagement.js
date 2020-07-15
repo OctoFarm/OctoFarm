@@ -533,14 +533,38 @@ async function updateProfileDrop() {
   });
 }
 async function updatePrinterDrops() {
-  let selected = await OctoFarmclient.get("filament/get/printerList");
-  selected = await selected.json();
+  let printerList = await OctoFarmclient.get("filament/get/printerList");
+  printerList = await printerList.json();
   //Generate printer assigment
+  let filament = await OctoFarmclient.get("filament/get/filament");
+  filament = await filament.json();
   const printerDrops = document.querySelectorAll(
     "[id^='spoolsPrinterAssignment-']"
   );
   printerDrops.forEach((drop) => {
-    drop.innerHTML = [...selected.printerList];
+    drop.innerHTML = [...printerList.printerList];
+
+    const split = drop.id.split("-");
+    const spoolID = split[1];
+    const spool = _.findIndex(filament.Spool, function (o) {
+      return o._id == spoolID;
+    });
+    if (filament.Spool[spool].printerAssignment.length > 0) {
+      drop.value =
+        filament.Spool[spool].printerAssignment[0].id +
+        "-" +
+        filament.Spool[spool].printerAssignment[0].tool;
+    }
+
+    // filament.Spool.forEach((spool) => {
+    //   if (Array.isArray(spool.printerAssignment)) {
+    //     drop.value =
+    //       spool.printerAssignment[0].id + "-" + spool.printerAssignment[0].tool;
+    //     console.log(
+    //       spool.printerAssignment[0].id + "-" + spool.printerAssignment[0].tool
+    //     );
+    //   }
+    // });
   });
 }
 async function init() {

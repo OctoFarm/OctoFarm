@@ -131,8 +131,10 @@ router.get("/get/selected", ensureAuthenticated, async (req, res) => {
 router.post("/select", ensureAuthenticated, async (req, res) => {
   const runner = require("../runners/state.js");
   const { Runner } = runner;
-  const serverSettings = await ServerSettings.find({});
-  if (serverSettings[0].filamentManager && req.body.spoolId != 0) {
+  const serverSettings = await SettingsClean.returnSystemSettings();
+  const { filamentManager } = serverSettings;
+  logger.info("Request to change:", req.body.printerId + "selected filament");
+  if (filamentManager && req.body.spoolId != 0) {
     const printerList = Runner.returnFarmPrinters();
     const i = _.findIndex(printerList, function (o) {
       return o._id == req.body.printerId;
@@ -158,6 +160,7 @@ router.post("/select", ensureAuthenticated, async (req, res) => {
     req.body.spoolId,
     req.body.tool
   );
+  FilamentClean.start(filamentManager);
   res.send({ status: 200 });
 });
 
