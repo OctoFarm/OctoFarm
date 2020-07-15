@@ -10,6 +10,10 @@ const settingsClean = require("../lib/dataFunctions/settingsClean.js");
 
 const { SettingsClean } = settingsClean;
 
+const printerClean = require("../lib/dataFunctions/printerClean.js");
+
+const { PrinterClean } = printerClean;
+
 const Logger = require("../lib/logger.js");
 
 const logger = new Logger("OctoFarm-FilamentManager");
@@ -17,8 +21,6 @@ const logger = new Logger("OctoFarm-FilamentManager");
 const filamentClean = require("../lib/dataFunctions/filamentClean.js");
 
 const { FilamentClean } = filamentClean;
-
-const Runner = require("../runners/state.js");
 
 module.exports = router;
 const filamentManagerReSync = async function () {
@@ -110,6 +112,10 @@ const filamentManagerReSync = async function () {
 
   return "success";
 };
+router.get("/get/printerList", ensureAuthenticated, async (req, res) => {
+  const printerList = await PrinterClean.returnFilamentList();
+  res.send({ printerList });
+});
 router.get("/get/profile", ensureAuthenticated, async (req, res) => {
   const profiles = await FilamentClean.getProfiles();
   res.send({ profiles });
@@ -119,8 +125,6 @@ router.get("/get/filament", ensureAuthenticated, async (req, res) => {
   res.send({ Spool: spools });
 });
 router.get("/get/selected", ensureAuthenticated, async (req, res) => {
-  const runner = require("../runners/state.js");
-  const { Runner } = runner;
   const selected = await FilamentClean.getSelected();
   res.send({ status: 200, selected });
 });
@@ -156,6 +160,227 @@ router.post("/select", ensureAuthenticated, async (req, res) => {
   );
   res.send({ status: 200 });
 });
+
+router.post("/save/filament", ensureAuthenticated, async (req, res) => {
+  const serverSettings = await SettingsClean.returnSystemSettings();
+  const { filamentManager } = serverSettings;
+
+  const filament = req.body;
+  logger.info("Saving Filament Manager Spool: ", filament);
+  let filamentManagerID = null;
+
+  if (filamentManager) {
+    const runner = require("../runners/state.js");
+    const { Runner } = runner;
+    const printerList = Runner.returnFarmPrinters();
+    let printer = null;
+
+    for (let i = 0; i < printerList.length; i += 1) {
+      if (
+        printerList[i].stateColour.category === "Disconnected" ||
+        printerList[i].stateColour.category === "Idle" ||
+        printerList[i].stateColour.category === "Active" ||
+        printerList[i].stateColour.category === "Complete"
+      ) {
+        printer = printerList[i];
+        break;
+      }
+    }
+    const profiles = await Profile.find({});
+    const findID = _.findIndex(profiles, function (o) {
+      return o.profile.index == filament.spoolsProfile;
+    });
+
+    const profile = {
+      vendor: profiles[findID].profile.manufacturer,
+      material: profiles[findID].profile.material,
+      density: profiles[findID].profile.density,
+      diameter: profiles[findID].profile.diameter,
+      id: profiles[findID].profile.index,
+    };
+    const spool = {
+      name: filament.spoolsName,
+      profile,
+      cost: filament.spoolsPrice,
+      weight: filament.spoolsWeight,
+      used: filament.spoolsUsed,
+      temp_offset: filament.spoolsTempOffset,
+    };
+    logger.info("Updating OctoPrint: ", spool);
+    const url = `${printer.printerURL}/plugin/filamentmanager/spools`;
+    let updateFilamentManager = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": printer.apikey,
+      },
+      body: JSON.stringify({ spool }),
+    });
+    updateFilamentManager = await updateFilamentManager.json();
+    filamentManagerID = updateFilamentManager.spool.id;
+  }
+  const spools = {
+    name: filament.spoolsName,
+    profile: filament.spoolsProfile,
+    price: filament.spoolsPrice,
+    weight: filament.spoolsWeight,
+    used: filament.spoolsUsed,
+    tempOffset: filament.spoolsTempOffset,
+    fmID: filamentManagerID,
+  };
+  const newFilament = new Spool({
+    spools,
+  });
+  newFilament.save().then(async (e) => {
+    logger.info("New Spool saved successfully: ", newFilament);
+    if (filamentManager) {
+      await filamentManagerReSync();
+    }
+    FilamentClean.start(filamentManager);
+    res.send({ res: "success", spools: newFilament });
+  });
+});
+router.post("/delete/filament", ensureAuthenticated, async (req, res) => {
+  const serverSettings = await SettingsClean.returnSystemSettings();
+  const { filamentManager } = serverSettings;
+
+  let searchId = req.body.id;
+  logger.info("Deleting Filament Manager Profile: ", searchId);
+  if (filamentManager) {
+    const runner = require("../runners/state.js");
+    const { Runner } = runner;
+    const printerList = Runner.returnFarmPrinters();
+    let printer = null;
+    for (let i = 0; i < printerList.length; i++) {
+      if (
+        printerList[i].stateColour.category === "Disconnected" ||
+        printerList[i].stateColour.category === "Idle" ||
+        printerList[i].stateColour.category === "Active" ||
+        printerList[i].stateColour.category === "Complete"
+      ) {
+        printer = printerList[i];
+        break;
+      }
+    }
+
+    searchId = await Spool.findById(searchId);
+    logger.info("Updating Octoprint to remove: ", searchId);
+    const url = `${printer.printerURL}/plugin/filamentmanager/spools/${searchId.spools.fmID}`;
+    const updateFilamentManager = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": printer.apikey,
+      },
+    });
+
+    const rel = await Spool.deleteOne({ _id: searchId }).exec();
+    logger.info("Successfully deleted: ", searchId);
+    rel.status = 200;
+    Spool.find({}).then((spools) => {
+      FilamentClean.start(filamentManager);
+      res.send({ spool: spools });
+    });
+  } else {
+    const rel = await Spool.deleteOne({ _id: searchId }).exec();
+    logger.info("Successfully deleted: ", searchId);
+    rel.status = 200;
+    Spool.find({}).then((spools) => {
+      FilamentClean.start(filamentManager);
+      res.send({ spool: spools });
+    });
+  }
+});
+router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
+  const serverSettings = await SettingsClean.returnSystemSettings();
+  const { filamentManager } = serverSettings;
+  const searchId = req.body.id;
+  logger.info("Request to update spool id: ", searchId);
+  logger.info("New details: ", req.body.spool);
+  const newContent = req.body.spool;
+  const spools = await Spool.findById(searchId);
+  const runner = require("../runners/state.js");
+  const { Runner } = runner;
+  if (filamentManager) {
+    const printerList = Runner.returnFarmPrinters();
+    let printer = null;
+    for (let i = 0; i < printerList.length; i++) {
+      if (
+        printerList[i].stateColour.category === "Disconnected" ||
+        printerList[i].stateColour.category === "Idle" ||
+        printerList[i].stateColour.category === "Active" ||
+        printerList[i].stateColour.category === "Complete"
+      ) {
+        printer = printerList[i];
+        break;
+      }
+    }
+    const filamentManagerID = newContent[5];
+    const profiles = await Profile.find({});
+    const findID = _.findIndex(profiles, function (o) {
+      return o.profile.index == filamentManagerID;
+    });
+
+    const profile = {
+      vendor: profiles[findID].profile.manufacturer,
+      material: profiles[findID].profile.material,
+      density: profiles[findID].profile.density,
+      diameter: profiles[findID].profile.diameter,
+      id: profiles[findID].profile.index,
+    };
+    const spool = {
+      name: newContent[0],
+      profile,
+      cost: newContent[1],
+      weight: newContent[2],
+      used: newContent[3],
+      temp_offset: newContent[4],
+    };
+    logger.info("Updating OctoPrint: ", spool);
+    const url = `${printer.printerURL}/plugin/filamentmanager/spools/${spools.spools.fmID}`;
+    const updateFilamentManager = await fetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": printer.apikey,
+      },
+      body: JSON.stringify({ spool }),
+    });
+  }
+  if (spools.spools.name != newContent[0]) {
+    spools.spools.name = newContent[0];
+    spools.markModified("spools");
+  }
+  if (spools.spools.profile != newContent[5]) {
+    spools.spools.profile = newContent[5];
+    spools.markModified("spools");
+  }
+  if (spools.spools.price != newContent[1]) {
+    spools.spools.price = newContent[1];
+    spools.markModified("spools");
+  }
+  if (spools.spools.weight != newContent[2]) {
+    spools.spools.weight = newContent[2];
+    spools.markModified("spools");
+  }
+  if (spools.spools.used != newContent[3]) {
+    spools.spools.used = newContent[3];
+    spools.markModified("spools");
+  }
+  if (spools.spools.tempOffset != newContent[4]) {
+    spools.spools.tempOffset = newContent[4];
+    spools.markModified("spools");
+  }
+  await spools.save();
+  Runner.updateFilament();
+  Spool.find({}).then((spools) => {
+    logger.info("New spool details saved: ", req.body.spool);
+    FilamentClean.start(filamentManager);
+    Runner.updateFilament();
+    res.send({ spools });
+  });
+});
+
 router.post("/save/profile", ensureAuthenticated, async (req, res) => {
   const serverSettings = await SettingsClean.returnSystemSettings();
   const { filamentManager } = serverSettings;
@@ -225,253 +450,6 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
     })
     .catch((e) => logger.error(e));
 });
-router.post("/save/filament", ensureAuthenticated, async (req, res) => {
-  const serverSettings = await ServerSettings.find({});
-  const filament = req.body;
-
-  let filamentManagerID = null;
-
-  if (serverSettings[0].filamentManager) {
-    const runner = require("../runners/state.js");
-    const { Runner } = runner;
-    const printerList = Runner.returnFarmPrinters();
-    let printer = null;
-
-    for (let i = 0; i < printerList.length; i++) {
-      if (
-        printerList[i].stateColour.category === "Disconnected" ||
-        printerList[i].stateColour.category === "Idle" ||
-        printerList[i].stateColour.category === "Active" ||
-        printerList[i].stateColour.category === "Complete"
-      ) {
-        printer = printerList[i];
-        break;
-      }
-    }
-    const profiles = await Profile.find({});
-    const findID = _.findIndex(profiles, function (o) {
-      return o.profile.index == filament.spoolsProfile;
-    });
-
-    const profile = {
-      vendor: profiles[findID].profile.manufacturer,
-      material: profiles[findID].profile.material,
-      density: profiles[findID].profile.density,
-      diameter: profiles[findID].profile.diameter,
-      id: profiles[findID].profile.index,
-    };
-    const spool = {
-      name: filament.spoolsName,
-      profile,
-      cost: filament.spoolsPrice,
-      weight: filament.spoolsWeight,
-      used: filament.spoolsUsed,
-      temp_offset: filament.spoolsTempOffset,
-    };
-    const url = `${printer.printerURL}/plugin/filamentmanager/spools`;
-    let updateFilamentManager = await fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
-      },
-      body: JSON.stringify({ spool }),
-    });
-    updateFilamentManager = await updateFilamentManager.json();
-    filamentManagerID = updateFilamentManager.spool.id;
-  }
-  const spools = {
-    name: filament.spoolsName,
-    profile: filament.spoolsProfile,
-    price: filament.spoolsPrice,
-    weight: filament.spoolsWeight,
-    used: filament.spoolsUsed,
-    tempOffset: filament.spoolsTempOffset,
-    fmID: filamentManagerID,
-  };
-  const newFilament = new Spool({
-    spools,
-  });
-  newFilament.save().then(async (e) => {
-    if (serverSettings[0].filamentManager) {
-      await filamentManagerReSync();
-    }
-    res.send({ res: "success", spools: newFilament });
-  });
-});
-
-router.post("/delete/filament", ensureAuthenticated, async (req, res) => {
-  const serverSettings = await ServerSettings.find({});
-  let searchId = req.body.id;
-  if (serverSettings[0].filamentManager) {
-    const runner = require("../runners/state.js");
-    const { Runner } = runner;
-    const printerList = Runner.returnFarmPrinters();
-    let printer = null;
-    for (let i = 0; i < printerList.length; i++) {
-      if (
-        printerList[i].stateColour.category === "Disconnected" ||
-        printerList[i].stateColour.category === "Idle" ||
-        printerList[i].stateColour.category === "Active" ||
-        printerList[i].stateColour.category === "Complete"
-      ) {
-        printer = printerList[i];
-        break;
-      }
-    }
-
-    searchId = await Spool.findById(searchId);
-    const url = `${printer.printerURL}/plugin/filamentmanager/spools/${searchId.spools.fmID}`;
-    const updateFilamentManager = await fetch(url, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
-      },
-    });
-
-    const rel = await Spool.deleteOne({ _id: searchId }).exec();
-    rel.status = 200;
-    Spool.find({}).then((spools) => {
-      res.send({ spool: spools });
-    });
-  } else {
-    const rel = await Spool.deleteOne({ _id: searchId }).exec();
-    rel.status = 200;
-    Spool.find({}).then((spools) => {
-      res.send({ spool: spools });
-    });
-  }
-});
-router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
-  const serverSettings = await SettingsClean.returnSystemSettings();
-  const { filamentManager } = serverSettings;
-  const searchId = req.body.id;
-  logger.info("Profile delete request: ", searchId);
-  if (filamentManager) {
-    const runner = require("../runners/state.js");
-    const { Runner } = runner;
-    const printerList = Runner.returnFarmPrinters();
-    let printer = null;
-    for (let i = 0; i < printerList.length; i++) {
-      if (
-        printerList[i].stateColour.category === "Disconnected" ||
-        printerList[i].stateColour.category === "Idle" ||
-        printerList[i].stateColour.category === "Active" ||
-        printerList[i].stateColour.category === "Complete"
-      ) {
-        printer = printerList[i];
-        break;
-      }
-    }
-    const url = `${printer.printerURL}/plugin/filamentmanager/profiles/${searchId}`;
-    const updateFilamentManager = await fetch(url, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
-      },
-    });
-    const profiles = await Profile.find({});
-    const findID = _.findIndex(profiles, function (o) {
-      return o.profile.index == searchId;
-    });
-    const rel = await Profile.deleteOne({ _id: profiles[findID]._id }).exec();
-    rel.status = 200;
-    res.send({ profiles });
-  } else {
-    const rel = await Profile.deleteOne({ _id: searchId }).exec();
-    rel.status = 200;
-    logger.info("Profile deleted successfully");
-    FilamentClean.start();
-    Profile.find({}).then((profiles) => {
-      res.send({ profiles });
-    });
-  }
-});
-router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
-  const serverSettings = await ServerSettings.find({});
-  const searchId = req.body.id;
-  const newContent = req.body.spool;
-  const spools = await Spool.findById(searchId);
-  const runner = require("../runners/state.js");
-  const { Runner } = runner;
-  if (serverSettings[0].filamentManager) {
-    const printerList = Runner.returnFarmPrinters();
-    let printer = null;
-    for (let i = 0; i < printerList.length; i++) {
-      if (
-        printerList[i].stateColour.category === "Disconnected" ||
-        printerList[i].stateColour.category === "Idle" ||
-        printerList[i].stateColour.category === "Active" ||
-        printerList[i].stateColour.category === "Complete"
-      ) {
-        printer = printerList[i];
-        break;
-      }
-    }
-    const filamentManagerID = newContent[5];
-    const profiles = await Profile.find({});
-    const findID = _.findIndex(profiles, function (o) {
-      return o.profile.index == filamentManagerID;
-    });
-
-    const profile = {
-      vendor: profiles[findID].profile.manufacturer,
-      material: profiles[findID].profile.material,
-      density: profiles[findID].profile.density,
-      diameter: profiles[findID].profile.diameter,
-      id: profiles[findID].profile.index,
-    };
-    const spool = {
-      name: newContent[0],
-      profile,
-      cost: newContent[1],
-      weight: newContent[2],
-      used: newContent[3],
-      temp_offset: newContent[4],
-    };
-    const url = `${printer.printerURL}/plugin/filamentmanager/spools/${spools.spools.fmID}`;
-    const updateFilamentManager = await fetch(url, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
-      },
-      body: JSON.stringify({ spool }),
-    });
-  }
-  if (spools.spools.name != newContent[0]) {
-    spools.spools.name = newContent[0];
-    spools.markModified("spools");
-  }
-  if (spools.spools.profile != newContent[5]) {
-    spools.spools.profile = newContent[5];
-    spools.markModified("spools");
-  }
-  if (spools.spools.price != newContent[1]) {
-    spools.spools.price = newContent[1];
-    spools.markModified("spools");
-  }
-  if (spools.spools.weight != newContent[2]) {
-    spools.spools.weight = newContent[2];
-    spools.markModified("spools");
-  }
-  if (spools.spools.used != newContent[3]) {
-    spools.spools.used = newContent[3];
-    spools.markModified("spools");
-  }
-  if (spools.spools.tempOffset != newContent[4]) {
-    spools.spools.tempOffset = newContent[4];
-    spools.markModified("spools");
-  }
-  await spools.save();
-  Runner.updateFilament();
-  Spool.find({}).then((spools) => {
-    Runner.updateFilament();
-    res.send({ spools });
-  });
-});
 router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
   const serverSettings = await SettingsClean.returnSystemSettings();
   const { filamentManager } = serverSettings;
@@ -500,8 +478,8 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
       density: newContent[2],
       diameter: newContent[3],
     };
+    logger.info("Updating OctoPrint: ", profile);
     const url = `${printer.printerURL}/plugin/filamentmanager/profiles/${searchId}`;
-    logger.info("Updating OctoPrint's Filament Manager with: ", profile);
     let updateFilamentManager = await fetch(url, {
       method: "PATCH",
       headers: {
@@ -510,7 +488,12 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
       },
       body: JSON.stringify({ profile }),
     });
+
     updateFilamentManager = await updateFilamentManager.json();
+    logger.info(
+      "New spool created on plugin: ",
+      updateFilamentManager.profile.id
+    );
     filamentManagerID = updateFilamentManager.profile.id;
     const profiles = await Profile.find({});
     const findID = _.findIndex(profiles, function (o) {
@@ -537,11 +520,62 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
   }
   await profile.save();
   logger.info("Profile saved successfully");
-  FilamentClean.start();
+  FilamentClean.start(filamentManager);
   Profile.find({}).then((profiles) => {
     Runner.updateFilament();
     res.send({ profiles });
   });
+});
+router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
+  const serverSettings = await SettingsClean.returnSystemSettings();
+  const { filamentManager } = serverSettings;
+  const searchId = req.body.id;
+  logger.info("Profile delete request: ", searchId);
+  if (filamentManager) {
+    const runner = require("../runners/state.js");
+    const { Runner } = runner;
+    const printerList = Runner.returnFarmPrinters();
+    let printer = null;
+    for (let i = 0; i < printerList.length; i++) {
+      if (
+        printerList[i].stateColour.category === "Disconnected" ||
+        printerList[i].stateColour.category === "Idle" ||
+        printerList[i].stateColour.category === "Active" ||
+        printerList[i].stateColour.category === "Complete"
+      ) {
+        printer = printerList[i];
+        break;
+      }
+    }
+    logger.info("Updating OctoPrint: ", searchId);
+    const url = `${printer.printerURL}/plugin/filamentmanager/profiles/${searchId}`;
+    const updateFilamentManager = await fetch(url, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": printer.apikey,
+      },
+    });
+    const profiles = await Profile.find({});
+    const findID = _.findIndex(profiles, function (o) {
+      return o.profile.index == searchId;
+    });
+    logger.info("Deleting from database: ", searchId);
+    const rel = await Profile.deleteOne({ _id: profiles[findID]._id }).exec();
+    logger.info("Profile deleted successfully");
+    FilamentClean.start(filamentManager);
+    rel.status = 200;
+    res.send({ profiles });
+  } else {
+    logger.info("Deleting from database: ", searchId);
+    const rel = await Profile.deleteOne({ _id: searchId }).exec();
+    rel.status = 200;
+    logger.info("Profile deleted successfully");
+    FilamentClean.start(filamentManager);
+    Profile.find({}).then((profiles) => {
+      res.send({ profiles });
+    });
+  }
 });
 
 router.post("/filamentManagerReSync", ensureAuthenticated, async (req, res) => {

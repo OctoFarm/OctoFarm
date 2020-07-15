@@ -12,74 +12,7 @@
                 >
                     <i  class="fas fa-print"></i> Printer Management: <%= printerCount %>
                 </button>
-                <% if(typeof userGroup != "undefined" && userGroup === "Administrator"){ %>
-                    <button
-                            title="Add Printer to your Farm"
-                            id="addPrinterBtn"
-                            type="button"
-                            class="tag btn btn-success ml-1 p-1"
-                            href="#"
-                            aria-expanded="false"
-                    >
-                        <i class="fas fa-plus fa-sm"></i> Add Printer
-                    </button>
-                    <button
-                            title="Turn on edit mode to edit current printers"
-                            id="editPrinterBtn"
-                            type="button"
-                            class="tag btn btn-warning ml-1 p-1"
-                            href="#"
-                            aria-expanded="false"
-                    >
-                        <i class="fas fa-edit"></i> Edit Printers
-                    </button>
-                    <button
-                            title="Save your current printer edits"
-                            id="saveEditsBtn"
-                            type="button"
-                            class="tag btn btn-success ml-1 p-1 d-none"
-                            href="#"
-                            aria-expanded="false"
-                    >
-                        <i class="fas fa-save"></i> Save Edits
-                    </button>
-                    <form id="uploadFileModalContentForm" class="text-center">
-                        <input
 
-                                class="fileElem"
-                                type="file"
-                                id="importPrinterBtn"
-                                accept=".json"
-                        /><label
-                                title="Import printers from a json file"
-                                class="tag btn btn-primary ml-1 mb-0 p-1"
-                                for="importPrinterBtn"
-                        ><i class="fas fa-file-import"></i> Import Printers</label
-                        >
-                    </form>
-                    <button
-                            title="Export printers from OctoFarm"
-                            id="exportPrinterBtn"
-                            type="button"
-                            class="tag btn btn-info ml-1 p-1"
-                            href="#"
-                            aria-expanded="false"
-                    >
-                        <i class="fas fa-file-export"></i> Export Printers
-                    </button>
-                    <button
-                            title="Save your printer edits"
-                            id="savePrinterBtn"
-                            type="button"
-                            class="tag btn btn-primary ml-1 p-1 d-none"
-                            href="#"
-                            aria-expanded="false"
-                    >
-                        <i class="fas fa-save"></i> Save
-                    </button>
-
-
-                <% }%>
                 <button
                         title="Re-Sync all the printers in your farm to troubleshoot connection issues"
                         id="searchOfflineBtn"
@@ -104,6 +37,87 @@
                 >
                     <i  class="fas fa-print"></i> Selected:
                 </button>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <% if(typeof userGroup != "undefined" && userGroup === "Administrator"){ %>
+                    <div class="col-lg-3 text-center">
+                            <u><h5 class="mb-0">Administration</h5></u><br>
+                            <button
+                                    title="Add Printer to your Farm"
+                                    id="addPrinterBtn"
+                                    type="button"
+                                    class="tag btn btn-success ml-1 p-1"
+                                    href="#"
+                                    aria-expanded="false"
+                            >
+                                <i class="fas fa-plus fa-sm"></i> Add Printer
+                            </button>
+                            <button
+                                    title="Turn on edit mode to edit current printers"
+                                    id="editPrinterBtn"
+                                    type="button"
+                                    class="tag btn btn-warning ml-1 p-1"
+                                    href="#"
+                                    aria-expanded="false"
+                            >
+                                <i class="fas fa-edit"></i> Edit Printers
+                            </button>
+                            <button
+                                    title="Save your current printer edits"
+                                    id="saveEditsBtn"
+                                    type="button"
+                                    class="tag btn btn-success ml-1 p-1 d-none"
+                                    href="#"
+                                    aria-expanded="false"
+                            >
+                                <i class="fas fa-save"></i> Save Edits
+                            </button><br>
+                            <form id="uploadFileModalContentForm" class="text-center">
+                                <input
+
+                                        class="fileElem"
+                                        type="file"
+                                        id="importPrinterBtn"
+                                        accept=".json"
+                                /><label
+                                        title="Import printers from a json file"
+                                        class="tag btn btn-primary mt-2 ml-1 mb-0 p-1"
+                                        for="importPrinterBtn"
+                                ><i class="fas fa-file-import"></i> Import Printers</label
+                                >
+                            </form>
+                            <button
+                                    title="Export printers from OctoFarm"
+                                    id="exportPrinterBtn"
+                                    type="button"
+                                    class="tag btn btn-info ml-1 p-1 mt-2"
+                                    href="#"
+                                    aria-expanded="false"
+                            >
+                                <i class="fas fa-file-export"></i> Export Printers
+                            </button>
+                            <button
+                                    title="Save your printer edits"
+                                    id="savePrinterBtn"
+                                    type="button"
+                                    class="tag btn btn-primary ml-1 p-1 d-none"
+                                    href="#"
+                                    aria-expanded="false"
+                            >
+                                <i class="fas fa-save"></i> Save
+                            </button>
+
+
+
+                    </div>
+                  <% }%>
+                    <div class="col-lg-3 text-center">
+                        <u><h5 class="mb-0">Control</h5></u><br>
+                    </div>
+                    <div class="col-lg-3"></div>
+                    <div class="col-lg-3"></div>
+                </div>
             </div>
         </div>
     </div>

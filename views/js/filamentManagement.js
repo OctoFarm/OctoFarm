@@ -117,6 +117,7 @@ const filamentStore = [
 //   let post = await OctoFarmclient.post("printers/selectFilament", id);
 //   post = await post.json();
 // }
+// Profile functions
 async function addProfile(manufacturer, material, density, diameter) {
   const errors = [];
 
@@ -149,7 +150,7 @@ async function addProfile(manufacturer, material, density, diameter) {
     UI.createMessage(
       {
         type: "success",
-        msg: "Successfully added new roll to the database...",
+        msg: "Successfully added new profile to the database...",
       },
       "profilesMessage"
     );
@@ -198,14 +199,301 @@ async function addProfile(manufacturer, material, density, diameter) {
     );
   }
 }
-function addSpool() {}
+async function editProfile(e) {
+  const row = e.parentElement.parentElement;
+  const editable = row.querySelectorAll("[contenteditable]");
+  const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
+  editable.forEach((edit) => {
+    edit.contentEditable = true;
+    edit.classList.add("contentEditable");
+  });
+  document.getElementById(`save-${id}`).classList.remove("d-none");
+  document.getElementById(`edit-${id}`).classList.add("d-none");
+}
+async function saveProfile(e) {
+  const row = e.parentElement.parentElement;
+  const editable = row.querySelectorAll("[contenteditable]");
+  const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
+  const profile = [];
+  editable.forEach((edit) => {
+    edit.contentEditable = false;
+    edit.classList.remove("contentEditable");
+    profile.push(edit.innerHTML.trim());
+  });
+  const data = {
+    id,
+    profile,
+  };
+  let post = await OctoFarmclient.post("filament/edit/profile", data);
+  if (post.status === 200) {
+    post = await post.json();
+    updateProfileDrop();
+    document.getElementById(`save-${id}`).classList.add("d-none");
+    document.getElementById(`edit-${id}`).classList.remove("d-none");
+  }
+  jplist.refresh();
+}
+async function deleteProfile(e) {
+  document.getElementById("profilesMessage").innerHTML = "";
+  if (e.classList.contains("delete") || e.classList.contains("deleteIcon")) {
+    let post = await OctoFarmclient.post("filament/delete/profile", {
+      id: e.parentElement.parentElement.firstElementChild.innerHTML.trim(),
+    });
+    if (post.status === 200) {
+      if (e.classList.contains("deleteIcon")) {
+        jplist.resetContent(function () {
+          // remove element with id = el1
+          e.parentElement.parentElement.parentElement.remove();
+        });
+      } else {
+        jplist.resetContent(function () {
+          // remove element with id = el1
+          e.parentElement.parentElement.remove();
+        });
+      }
+      post = await post.json();
+      updateProfileDrop(post);
+    } else {
+      UI.createMessage(
+        {
+          type: "danger",
+          msg:
+            "Error: Could not delete roll from database, check connection...",
+        },
+        "filamentMessage"
+      );
+    }
+  }
+}
+
+// Spool functions
+async function addSpool(
+  spoolsName,
+  spoolsProfile,
+  spoolsPrice,
+  spoolsWeight,
+  spoolsUsed,
+  spoolsTempOffset
+) {
+  const errors = [];
+
+  if (spoolsName.value === "") {
+    errors.push({ type: "warning", msg: "Please input a spool name" });
+  }
+  if (spoolsProfile.value === "") {
+    errors.push({ type: "warning", msg: "Please select a profile" });
+  }
+  if (spoolsPrice.value === "") {
+    errors.push({ type: "warning", msg: "Please input a spool price" });
+  }
+  if (spoolsWeight.value === 0 || spoolsWeight.value === "") {
+    errors.push({ type: "warning", msg: "Please input a spool weight" });
+  }
+  if (spoolsUsed.value === "") {
+    errors.push({ type: "warning", msg: "Please input spool used weight" });
+  }
+
+  if (errors.length > 0) {
+    errors.forEach((error) => {
+      UI.createMessage(error, "addSpoolsMessage");
+    });
+    return;
+  }
+  const opts = {
+    spoolsName: spoolsName.value,
+    spoolsProfile: spoolsProfile.value,
+    spoolsPrice: spoolsPrice.value,
+    spoolsWeight: spoolsWeight.value,
+    spoolsUsed: spoolsUsed.value,
+    spoolsTempOffset: spoolsTempOffset.value,
+  };
+  let post = await OctoFarmclient.post("filament/save/filament", opts);
+
+  if (post.status === 200) {
+    UI.createMessage(
+      {
+        type: "success",
+        msg: "Successfully added new roll to the database...",
+      },
+      "addSpoolsMessage"
+    );
+    post = await post.json();
+
+    spoolsName.value = "";
+    spoolsPrice.value = "";
+    spoolsWeight.value = 1000;
+    spoolsUsed.value = 0;
+    spoolsTempOffset.value = 0.0;
+    post = post.spools;
+    let displayNone = "d-none";
+    if (filamentManager) {
+      displayNone = "";
+    }
+    document.getElementById("addSpoolsTable").insertAdjacentHTML(
+      "beforeend",
+      `
+                <tr data-jplist-item>
+                  <th style="display: none;">${post._id}</th>
+                  <th scope="row"><p contenteditable="false">${
+                    post.spools.name
+                  }</p></th>
+                  <td>
+                       <select id="spoolsProfile-${
+                         post._id
+                       }" class="form-control" disabled>
+
+                       </select>
+                   </td>
+                  <td><p class="price" contenteditable="false">${
+                    post.spools.price
+                  }</p></td>
+                  <td><p class="weight" contenteditable="false">${
+                    post.spools.weight
+                  }</p></td>
+                  <td class="${displayNone}"><p class="used" contenteditable="false">${
+        post.spools.used
+      }</p></td>
+                  <td class="grams ${displayNone}">${(
+        post.spools.weight - post.spools.used
+      ).toFixed(0)}</td>
+                  <td class="percent ${displayNone}">${(
+        100 -
+        (post.spools.used / post.spools.weight) * 100
+      ).toFixed(0)}</td>
+                  <td><p contenteditable="false">${
+                    post.spools.tempOffset
+                  }</p></td>
+                   <td>
+                       <select id="spoolsPrinterAssignment-${
+                         post._id
+                       }" class="form-control">
+
+                       </select>
+                   </td>
+                  <td><button id="edit-${
+                    post._id
+                  }" type="button" class="btn btn-sm btn-info edit">
+                    <i class="fas fa-edit editIcon"></i>
+                  </button>
+                  <button id="save-${
+                    post._id
+                  }" type="button" class="btn btn-sm d-none btn-success save">
+                    <i class="fas fa-save saveIcon"></i>
+                  </button>
+                  <button id="delete-${
+                    post._id
+                  }" type="button" class="btn btn-sm btn-danger delete">
+                    <i class="fas fa-trash deleteIcon"></i>
+                  </button></td>
+                </tr>
+                `
+    );
+    updatePrinterDrops();
+    updateProfileDrop();
+  } else {
+    UI.createMessage(
+      {
+        type: "error",
+        msg: "Could not add roll to database... is it alive?",
+      },
+      "addSpoolsMessage"
+    );
+  }
+}
+async function editSpool(e) {
+  const row = e.parentElement.parentElement;
+  const editable = row.querySelectorAll("[contenteditable]");
+  const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
+  editable.forEach((edit) => {
+    edit.contentEditable = true;
+    edit.classList.add("contentEditable");
+  });
+  // let profile = await OctoFarmclient.get("filament/get/profile");
+  // profile = await profile.json();
+  // document.getElementById("spoolsProfile-"+id).innerHTML = "";
+  // profile.profiles.forEach(prof => {
+  //     let profileID = null;
+  //     if(filamentManager){
+  //         profileID = prof.profile.index
+  //     }else{
+  //         profileID = prof._id
+  //     }
+  //     document.getElementById("spoolsProfile-"+id).insertAdjacentHTML('beforeend',`
+  //                  <option value="${profileID}">${prof.profile.manufacturer} (${prof.profile.material})</option>
+  //                 `)
+  // })
+  document.getElementById(`spoolsProfile-${id}`).disabled = false;
+  document.getElementById(`save-${id}`).classList.remove("d-none");
+  document.getElementById(`edit-${id}`).classList.add("d-none");
+}
+async function deleteSpool(e) {
+  document.getElementById("profilesMessage").innerHTML = "";
+  if (e.classList.contains("delete") || e.classList.contains("deleteIcon")) {
+    let post = await OctoFarmclient.post("filament/delete/filament", {
+      id: e.parentElement.parentElement.firstElementChild.innerHTML.trim(),
+    });
+    if (post.status === 200) {
+      if (e.classList.contains("deleteIcon")) {
+        jplist.resetContent(function () {
+          // remove element with id = el1
+          e.parentElement.parentElement.parentElement.remove();
+        });
+      } else {
+        jplist.resetContent(function () {
+          // remove element with id = el1
+          e.parentElement.parentElement.remove();
+        });
+      }
+      post = await post.json();
+    } else {
+      UI.createMessage(
+        {
+          type: "danger",
+          msg:
+            "Error: Could not delete roll from database, check connection...",
+        },
+        "filamentMessage"
+      );
+    }
+  }
+}
+async function saveSpool(e) {
+  const row = e.parentElement.parentElement;
+  const editable = row.querySelectorAll("[contenteditable]");
+  const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
+  const spool = [];
+  editable.forEach((edit) => {
+    edit.contentEditable = false;
+    edit.classList.remove("contentEditable");
+    spool.push(edit.innerHTML.trim());
+  });
+  spool.push(document.getElementById(`spoolsProfile-${id}`).value);
+  const data = {
+    id,
+    spool,
+  };
+  let post = await OctoFarmclient.post("filament/edit/filament", data);
+  if (post.status === 200) {
+    post = await post.json();
+    init();
+    document.getElementById(`spoolsProfile-${id}`).disabled = true;
+    document.getElementById(`save-${id}`).classList.add("d-none");
+    document.getElementById(`edit-${id}`).classList.remove("d-none");
+  }
+  jplist.refresh();
+}
+
 async function updateProfileDrop() {
+  //Update filament selection profile drop
   const spoolsProfile = document.getElementById("spoolsProfile");
   let profiles = await OctoFarmclient.get("filament/get/profile");
   profiles = await profiles.json();
+  let fill = await OctoFarmclient.get("filament/get/filament");
+  fill = await fill.json();
+  let profile = await OctoFarmclient.get("filament/get/profile");
+  profile = await profile.json();
   if (typeof profiles !== "undefined") {
     spoolsProfile.innerHTML = "";
-
     profiles.profiles.forEach((profile) => {
       let profileID = null;
       if (filamentManager) {
@@ -221,16 +509,43 @@ async function updateProfileDrop() {
       );
     });
   }
+  //Generate profile assignment
+  const printerDrops = document.querySelectorAll("[id^='spoolsProfile-']");
+  printerDrops.forEach((drop) => {
+    profiles.profiles.forEach((prof) => {
+      drop.insertAdjacentHTML(
+        "beforeend",
+        `<option value="${prof._id}">${prof.manufacturer} (${prof.material})</option>`
+      );
+    });
+    const spoolID = drop.id.split("-");
+    // eslint-disable-next-line no-undef
+    const spool = _.findIndex(fill.Spool, function (o) {
+      return o._id == spoolID[1];
+    });
+    drop.value = fill.Spool[spool].profile;
+    const profileID = _.findIndex(profiles.profiles, function (o) {
+      return o._id == fill.Spool[spool].profile;
+    });
+    drop.className = `form-control ${profiles.profiles[
+      profileID
+    ].material.replace(/ /g, "_")}`;
+  });
 }
-function updatePrinterDrops() {}
+async function updatePrinterDrops() {
+  let selected = await OctoFarmclient.get("filament/get/printerList");
+  selected = await selected.json();
+  //Generate printer assigment
+  const printerDrops = document.querySelectorAll(
+    "[id^='spoolsPrinterAssignment-']"
+  );
+  printerDrops.forEach((drop) => {
+    drop.innerHTML = [...selected.printerList];
+  });
+}
 async function init() {
   // Grab data
   const spoolTable = document.getElementById("addSpoolsTable");
-  let fill = await OctoFarmclient.get("filament/get/filament");
-  fill = await fill.json();
-  let profile = await OctoFarmclient.get("filament/get/profile");
-  profile = await profile.json();
-
   // Initialise materials dropdown
   const dataList = document.getElementById("profilesMaterial");
   dataList.addEventListener("change", function (e) {
@@ -254,29 +569,6 @@ async function init() {
         `
     );
   });
-
-  // Initialise Spools Listeners
-  fill.Spool.forEach((spools) => {
-    profile.profiles.forEach((prof) => {
-      document.getElementById(`spoolsProfile-${spools._id}`).insertAdjacentHTML(
-        "beforeend",
-        `
-                     <option value="${prof._id}">${prof.manufacturer} (${prof.material})</option>
-                    `
-      );
-    });
-    document.getElementById(`spoolsProfile-${spools._id}`).value =
-      spools.profile;
-    const prof = _.findIndex(profile.profiles, function (o) {
-      return o._id == spools.profile;
-    });
-    document.getElementById(
-      `spoolsProfile-${spools._id}`
-    ).className = `form-control ${profile.profiles[prof].material.replace(
-      / /g,
-      "_"
-    )}`;
-  });
   spoolTable.addEventListener("click", (e) => {
     // Remove from UI
     if (e.target.classList.contains("edit")) {
@@ -288,6 +580,7 @@ async function init() {
     }
   });
   updateProfileDrop();
+  updatePrinterDrops();
   // Initialise Profile Listeners
   const profilesBtn = document.getElementById("addProfilesBtn");
   profilesBtn.addEventListener("click", async (e) => {
@@ -315,71 +608,119 @@ async function init() {
       saveProfile(e.target);
     }
   });
-  //    //Init Spools
 
-  //     let spoolTable = document.getElementById("addSpoolsTable");
-  //     let profile = await OctoFarmclient.get("filament/get/profile");
-  //     profile = await profile.json();
-  //     let printers = await OctoFarmclient.post("printers/printerInfo");
-  //     printers = await printers.json();
-  //     filamentManager = profile.filamentManager;
-  //
-  //     fill.Spool.forEach(spools => {
-  //         profile.profiles.forEach(prof => {
-  //             let profileID = null;
-  //             if(filamentManager){
-  //                 profileID = prof.profile.index
-  //             }else{
-  //                 profileID = prof._id
-  //             }
-  //             document.getElementById("spoolsProfile-"+spools._id).insertAdjacentHTML('beforeend',`
+  //    //Init Spools
+  document
+    .getElementById("addSpoolBtn")
+    .addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      document.getElementById("addSpoolsMessage").innerHTML = "";
+      const spoolsName = document.getElementById("spoolsName");
+      const spoolsProfile = document.getElementById("spoolsProfile");
+      const spoolsPrice = document.getElementById("spoolsPrice");
+      const spoolsWeight = document.getElementById("spoolsWeight");
+      const spoolsUsed = document.getElementById("spoolsRemaining");
+      const spoolsTempOffset = document.getElementById("spoolsTempOffset");
+      addSpool(
+        spoolsName,
+        spoolsProfile,
+        spoolsPrice,
+        spoolsWeight,
+        spoolsUsed,
+        spoolsTempOffset
+      );
+    });
+
+  // fill.Spool.forEach((spools) => {
+  //   profile.profiles.forEach((prof) => {
+  //     let profileID = null;
+  //     if (filamentManager) {
+  //       profileID = prof.profile.index;
+  //     } else {
+  //       profileID = prof._id;
+  //     }
+  //     document.getElementById(`spoolsProfile-${spools._id}`).insertAdjacentHTML(
+  //       "beforeend",
+  //       `
   //                      <option value="${profileID}">${prof.profile.manufacturer} (${prof.profile.material})</option>
-  //                     `)
+  //                     `
+  //     );
+  //   });
+  //   document.getElementById(`spoolsProfile-${spools._id}`).value =
+  //     spools.spools.profile;
+  //   if (filamentManager) {
+  //     const prof = _.findIndex(profile.profiles, function (o) {
+  //       return o.profile.index == spools.spools.profile;
+  //     });
+  //     document.getElementById(
+  //       `spoolsProfile-${spools._id}`
+  //     ).className = `form-control ${profile.profiles[
+  //       prof
+  //     ].profile.material.replace(/ /g, "_")}`;
+  //   } else {
+  //     const prof = _.findIndex(profile.profiles, function (o) {
+  //       return o._id == spools.spools.profile;
+  //     });
   //
-  //         })
-  //         document.getElementById("spoolsProfile-"+spools._id).value = spools.spools.profile;
-  //         if(filamentManager){
-  //             let prof = _.findIndex(profile.profiles, function(o) { return o.profile.index == spools.spools.profile; });
-  //             document.getElementById("spoolsProfile-"+spools._id).className = "form-control " + profile.profiles[prof].profile.material.replace(/ /g, "_");
-  //         }else{
-  //             let prof = _.findIndex(profile.profiles, function(o) { return o._id == spools.spools.profile; });
+  //     document.getElementById(
+  //       `spoolsProfile-${spools._id}`
+  //     ).className = `form-control ${profile.profiles[
+  //       prof
+  //     ].profile.material.replace(/ /g, "_")}`;
+  //   }
   //
-  //             document.getElementById("spoolsProfile-"+spools._id).className = "form-control " + profile.profiles[prof].profile.material.replace(/ /g, "_");
-  //         }
+  //   const printerListCurrent = document.getElementById(
+  //     `spoolsPrinterAssignment-${spools._id}`
+  //   );
   //
-  //         let printerListCurrent = document.getElementById("spoolsPrinterAssignment-"+spools._id);
-  //
-  //         printerListCurrent.insertAdjacentHTML("beforeend", `
+  //   printerListCurrent.insertAdjacentHTML(
+  //     "beforeend",
+  //     `
   //                         <option value="0">No Selection</option>
-  //                    `)
-  //             printers.forEach(printer => {
-  //                     if(printer.stateColour.category !== "Active"){
-  //                         printerListCurrent.insertAdjacentHTML("beforeend", `
-  //                         <option value="${printer._id}">${Validate.getName(printer)}</option>
-  //                    `)
-  //                     }else{
-  //                         printerListCurrent.insertAdjacentHTML("beforeend", `
-  //                         <option value="${printer._id}" disabled>${Validate.getName(printer)}</option>
-  //                    `)
-  //                     }
-  //                 if(printer.selectedFilament !== null && printer.selectedFilament._id === spools._id){
-  //                     printerListCurrent.value = printer._id
-  //                     if(printer.stateColour.category === "Active"){
-  //                         printerListCurrent.disabled = true;
-  //                         document.getElementById("delete-"+spools._id).disabled = true;
-  //                         document.getElementById("edit-"+spools._id).disabled = true;
-  //                     }
-  //                 }
-  //             })
+  //                    `
+  //   );
+  //   printers.forEach((printer) => {
+  //     if (printer.stateColour.category !== "Active") {
+  //       printerListCurrent.insertAdjacentHTML(
+  //         "beforeend",
+  //         `
+  //                         <option value="${printer._id}">${Validate.getName(
+  //           printer
+  //         )}</option>
+  //                    `
+  //       );
+  //     } else {
+  //       printerListCurrent.insertAdjacentHTML(
+  //         "beforeend",
+  //         `
+  //                         <option value="${
+  //                           printer._id
+  //                         }" disabled>${Validate.getName(printer)}</option>
+  //                    `
+  //       );
+  //     }
+  //     if (
+  //       printer.selectedFilament !== null &&
+  //       printer.selectedFilament._id === spools._id
+  //     ) {
+  //       printerListCurrent.value = printer._id;
+  //       if (printer.stateColour.category === "Active") {
+  //         printerListCurrent.disabled = true;
+  //         document.getElementById(`delete-${spools._id}`).disabled = true;
+  //         document.getElementById(`edit-${spools._id}`).disabled = true;
+  //       }
+  //     }
+  //   });
   //
-  //         printerListCurrent.addEventListener("change", e => {
-  //             let data = {
-  //                 printerId: e.target.value,
-  //                 spoolId: e.target.parentElement.parentElement.firstElementChild.innerHTML.trim()
-  //             }
-  //             OctoFarmclient.post("filament/select", data)
-  //         })
-  //     })
+  //   printerListCurrent.addEventListener("change", (e) => {
+  //     const data = {
+  //       printerId: e.target.value,
+  //       spoolId: e.target.parentElement.parentElement.firstElementChild.innerHTML.trim(),
+  //     };
+  //     OctoFarmclient.post("filament/select", data);
+  //   });
+  // });
   //     //Grab printer list...
   //
   //
@@ -465,166 +806,7 @@ async function init() {
 //     })
 //    // Grab Profile
 //
-//     document
-//         .getElementById("addSpoolBtn")
-//         .addEventListener("click", async e => {
-//             e.preventDefault();
-//             e.stopPropagation();
-//             document.getElementById("addSpoolsMessage").innerHTML = "";
-//
-//             let spoolsName = document.getElementById("spoolsName");
-//             let spoolsProfile = document.getElementById("spoolsProfile");
-//             let spoolsPrice = document.getElementById("spoolsPrice");
-//             let spoolsWeight = document.getElementById("spoolsWeight");
-//             let spoolsUsed = document.getElementById("spoolsRemaining");
-//             let spoolsTempOffset = document.getElementById("spoolsTempOffset");
-//             let errors = [];
-//
-//             if (spoolsName.value === "") {
-//                 errors.push({type: "warning", msg: "Please input a spool name"})
-//             }
-//             if (spoolsProfile.value === "") {
-//                 errors.push({type: "warning", msg: "Please select a profile"})
-//             }
-//             if (spoolsPrice.value === "") {
-//                 errors.push({type: "warning", msg: "Please input a spool price"})
-//             }
-//             if (spoolsWeight.value === 0 || spoolsWeight.value === "") {
-//                 errors.push({type: "warning", msg: "Please input a spool weight"})
-//             }
-//             if (spoolsUsed.value === "") {
-//                 errors.push({type: "warning", msg: "Please input spool used weight"})
-//             }
-//
-//             if (errors.length > 0) {
-//                 errors.forEach(error => {
-//                     UI.createMessage(error, "addSpoolsMessage")
-//                 })
-//                 return;
-//             }
-//             let opts = {
-//                 spoolsName: spoolsName.value,
-//                 spoolsProfile: spoolsProfile.value,
-//                 spoolsPrice: spoolsPrice.value,
-//                 spoolsWeight: spoolsWeight.value,
-//                 spoolsUsed: spoolsUsed.value,
-//                 spoolsTempOffset: spoolsTempOffset.value
-//             };
-//             let printers = await OctoFarmclient.post("printers/printerInfo");
-//             printers = await printers.json();
-//             let post = await OctoFarmclient.post("filament/save/filament", opts);
-//
-//             if (post.status === 200) {
-//                 UI.createMessage(
-//                     {
-//                         type: "success",
-//                         msg: "Successfully added new roll to the database..."
-//                     },
-//                     "addSpoolsMessage"
-//                 );
-//                 post = await post.json();
-//
-//                 spoolsName.value = "";
-//                 spoolsPrice.value = "";
-//                 spoolsWeight.value = 1000;
-//                 spoolsUsed.value = 0;
-//                 spoolsTempOffset.value = 0.00;
-//                 post = post.spools;
-//                 let displayNone = "d-none";
-//                 if(filamentManager){
-//                     displayNone = "";
-//                 }
-//                 document.getElementById("addSpoolsTable").insertAdjacentHTML(
-//                     "beforeend",
-//                     `
-//                 <tr data-jplist-item>
-//                   <th style="display: none;">${post._id}</th>
-//                   <th scope="row"><p contenteditable="false">${post.spools.name}</p></th>
-//                   <td>
-//                        <select id="spoolsProfile-${post._id}" class="form-control" disabled>
-//
-//                        </select>
-//                    </td>
-//                   <td><p class="price" contenteditable="false">${post.spools.price}</p></td>
-//                   <td><p class="weight" contenteditable="false">${post.spools.weight}</p></td>
-//                   <td><p class="used ${displayNone}" contenteditable="false">${post.spools.used}</p></td>
-//                   <td class="grams ${displayNone}">${(post.spools.weight - post.spools.used).toFixed(0)}</td>
-//                   <td class="percent ${displayNone}">${(100 - post.spools.used / post.spools.weight * 100).toFixed(0)}</td>
-//                   <td><p contenteditable="false">${post.spools.tempOffset}</p></td>
-//                    <td>
-//                        <select id="spoolsPrinterAssignment-${post._id}" class="form-control">
-//
-//                        </select>
-//                    </td>
-//                   <td><button id="edit-${post._id}" type="button" class="btn btn-sm btn-info edit">
-//                     <i class="fas fa-edit editIcon"></i>
-//                   </button>
-//                   <button id="save-${post._id}" type="button" class="btn btn-sm d-none btn-success save">
-//                     <i class="fas fa-save saveIcon"></i>
-//                   </button>
-//                   <button id="delete-${post._id}" type="button" class="btn btn-sm btn-danger delete">
-//                     <i class="fas fa-trash deleteIcon"></i>
-//                   </button></td>
-//                 </tr>
-//                 `
-//                 );
-//                 document.getElementById("spoolsProfile-"+post._id).value = post.spools.profile;
-//                 // if(filamentManager){
-//                 //     let prof = _.findIndex(fill.Spool, function(o) { return o.profile.index == post.spools.profile; });
-//                 //     document.getElementById("spoolsProfile-"+post.spools._id).className = "form-control " + profile.profiles[prof].profile.material.replace(/ /g, "_");
-//                 // }else{
-//                 //     let prof = _.findIndex(profile.profiles, function(o) { return o._id == post.spools.profile; });
-//                 //
-//                 //     document.getElementById("spoolsProfile-"+post.spools._id).className = "form-control " + profile.profiles[prof].profile.material.replace(/ /g, "_");
-//                 // }
-//                 let printerListCurrent = document.getElementById("spoolsPrinterAssignment-"+post._id);
-//                 printerListCurrent.insertAdjacentHTML("beforeend", `
-//                     <option value = "0" > No Selection </option>
-//                    `)
-//                 printers.forEach(printer => {
-//                     if(printer.stateColour.category !== "Active"){
-//                         printerListCurrent.insertAdjacentHTML("beforeend", `
-//                         <option value="${printer._id}">${Validate.getName(printer)}</option>
-//                    `)
-//                     }else{
-//
-//                         printerListCurrent.insertAdjacentHTML("beforeend", `
-//                         <option value="${printer._id}" disabled>${Validate.getName(printer)}</option>
-//                    `)
-//                     }
-//                 })
-//                 printerListCurrent.addEventListener("change", e => {
-//                     let data = {
-//                         printerId: e.target.value,
-//                         spoolId: e.target.parentElement.parentElement.firstElementChild.innerHTML.trim()
-//                     }
-//                     OctoFarmclient.post("filament/select", data)
-//                 })
-//                 let profile = await OctoFarmclient.get("filament/get/profile");
-//                 profile = await profile.json();
-//
-//                 profile.profiles.forEach(profile => {
-//                     let profileID = null
-//                     if(filamentManager){
-//                         profileID = profile.profile.index
-//                     }else{
-//                         profileID = profile._id
-//                     }
-//                 document.getElementById("spoolsProfile-"+post._id).insertAdjacentHTML('beforeend',`
-//                      <option value="${profileID}">${profile.profile.manufacturer} (${profile.profile.material})</option>
-//                     `)
-//                 })
-//                 document.getElementById("spoolsProfile-"+post._id).value = post.spools.profile;
-//             } else {
-//                 UI.createMessage(
-//                     {
-//                         type: "error",
-//                         msg: "Could not add roll to database... is it alive?"
-//                     },
-//                     "addSpoolsMessage"
-//                 );
-//             }
-//         });
+
 //
 //     // document.getElementById("addSpoolsTable").addEventListener("click", e => {
 //     //     //Remove from UI
@@ -649,156 +831,6 @@ async function init() {
 //     //     }
 //     // });
 //
-// }
-async function editProfile(e) {
-  const row = e.parentElement.parentElement;
-  const editable = row.querySelectorAll("[contenteditable]");
-  const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
-  editable.forEach((edit) => {
-    edit.contentEditable = true;
-    edit.classList.add("contentEditable");
-  });
-  document.getElementById(`save-${id}`).classList.remove("d-none");
-  document.getElementById(`edit-${id}`).classList.add("d-none");
-}
-async function editSpool(e) {
-  const row = e.parentElement.parentElement;
-  const editable = row.querySelectorAll("[contenteditable]");
-  const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
-  editable.forEach((edit) => {
-    edit.contentEditable = true;
-    edit.classList.add("contentEditable");
-  });
-  // let profile = await OctoFarmclient.get("filament/get/profile");
-  // profile = await profile.json();
-  // document.getElementById("spoolsProfile-"+id).innerHTML = "";
-  // profile.profiles.forEach(prof => {
-  //     let profileID = null;
-  //     if(filamentManager){
-  //         profileID = prof.profile.index
-  //     }else{
-  //         profileID = prof._id
-  //     }
-  //     document.getElementById("spoolsProfile-"+id).insertAdjacentHTML('beforeend',`
-  //                  <option value="${profileID}">${prof.profile.manufacturer} (${prof.profile.material})</option>
-  //                 `)
-  // })
-  document.getElementById(`spoolsProfile-${id}`).disabled = false;
-  document.getElementById(`save-${id}`).classList.remove("d-none");
-  document.getElementById(`edit-${id}`).classList.add("d-none");
-}
-async function saveProfile(e) {
-  const row = e.parentElement.parentElement;
-  const editable = row.querySelectorAll("[contenteditable]");
-  const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
-  const profile = [];
-  editable.forEach((edit) => {
-    edit.contentEditable = false;
-    edit.classList.remove("contentEditable");
-    profile.push(edit.innerHTML.trim());
-  });
-  const data = {
-    id,
-    profile,
-  };
-  let post = await OctoFarmclient.post("filament/edit/profile", data);
-  if (post.status === 200) {
-    post = await post.json();
-    updateProfileDrop();
-    document.getElementById(`save-${id}`).classList.add("d-none");
-    document.getElementById(`edit-${id}`).classList.remove("d-none");
-  }
-  jplist.refresh();
-}
-// async function saveSpool(e, filamentManager) {
-//     let row = e.parentElement.parentElement;
-//     let editable = row.querySelectorAll("[contenteditable]")
-//     let id = e.parentElement.parentElement.firstElementChild.innerHTML.trim()
-//     let spool = []
-//     editable.forEach(edit => {
-//         edit.contentEditable = false;
-//         edit.classList.remove("contentEditable");
-//         spool.push(edit.innerHTML.trim());
-//     })
-//     spool.push(document.getElementById("spoolsProfile-"+id).value);
-//     let data = {
-//         id: id,
-//         spool: spool
-//     }
-//      let post = await OctoFarmclient.post("filament/edit/filament", data);
-//      if (post.status === 200) {
-//          post = await post.json();
-//          init();
-//     document.getElementById("spoolsProfile-"+id).disabled = true;
-//     document.getElementById("save-" + id).classList.add("d-none");
-//     document.getElementById("edit-" + id).classList.remove("d-none");
-//
-//      }
-//     jplist.refresh();
-// }
-async function deleteProfile(e) {
-  document.getElementById("profilesMessage").innerHTML = "";
-  if (e.classList.contains("delete") || e.classList.contains("deleteIcon")) {
-    let post = await OctoFarmclient.post("filament/delete/profile", {
-      id: e.parentElement.parentElement.firstElementChild.innerHTML.trim(),
-    });
-    if (post.status === 200) {
-      if (e.classList.contains("deleteIcon")) {
-        jplist.resetContent(function () {
-          // remove element with id = el1
-          e.parentElement.parentElement.parentElement.remove();
-        });
-      } else {
-        jplist.resetContent(function () {
-          // remove element with id = el1
-          e.parentElement.parentElement.remove();
-        });
-      }
-      post = await post.json();
-      updateProfileDrop(post);
-    } else {
-      UI.createMessage(
-        {
-          type: "danger",
-          msg:
-            "Error: Could not delete roll from database, check connection...",
-        },
-        "filamentMessage"
-      );
-    }
-  }
-}
-// async function deleteSpool(e, filamentManager) {
-//     document.getElementById("profilesMessage").innerHTML = "";
-//     if (e.classList.contains("delete") || e.classList.contains("deleteIcon")) {
-//         let post = await OctoFarmclient.post("filament/delete/filament", {
-//             id: e.parentElement.parentElement.firstElementChild.innerHTML.trim()
-//         });
-//         if (post.status === 200) {
-//             if (e.classList.contains("deleteIcon")) {
-//                 jplist.resetContent(function(){
-//                     //remove element with id = el1
-//                     e.parentElement.parentElement.parentElement.remove();
-//                 });
-//
-//             } else {
-//                 jplist.resetContent(function(){
-//                     //remove element with id = el1
-//                     e.parentElement.parentElement.remove();
-//                 });
-//
-//             }
-//             post = await post.json();
-//         } else {
-//             UI.createMessage(
-//                 {
-//                     type: "danger",
-//                     msg: "Error: Could not delete roll from database, check connection..."
-//                 },
-//                 "filamentMessage"
-//             );
-//         }
-//     }
 // }
 
 function updateTotals(filtered) {

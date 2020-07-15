@@ -27,6 +27,10 @@ const fileClean = require("../lib/dataFunctions/fileClean.js");
 
 const { FileClean } = fileClean;
 
+const filamentClean = require("../lib/dataFunctions/filamentClean.js");
+
+const { FilamentClean } = filamentClean;
+
 let farmPrinters = [];
 
 let systemSettings = {};
@@ -564,7 +568,10 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
     }
     // Information cleaning of farmPrinters
     if (typeof farmPrinters[this.index] !== "undefined") {
-      PrinterClean.generate(farmPrinters[this.index]);
+      PrinterClean.generate(
+        farmPrinters[this.index],
+        serverSettings.filamentManager
+      );
     }
   } catch (e) {
     console.log(e);
@@ -584,7 +591,10 @@ WebSocketClient.prototype.onerror = function (e) {
   this.onmessage = null;
   this.instance.removeAllListeners();
   if (typeof farmPrinters[this.index] !== "undefined") {
-    PrinterClean.generate(farmPrinters[this.index]);
+    PrinterClean.generate(
+      farmPrinters[this.index],
+      systemSettings.filamentManager
+    );
   }
 };
 WebSocketClient.prototype.onclose = function (e) {
@@ -596,7 +606,10 @@ WebSocketClient.prototype.onclose = function (e) {
   );
   this.instance.removeAllListeners();
   if (typeof farmPrinters[this.index] !== "undefined") {
-    PrinterClean.generate(farmPrinters[this.index]);
+    PrinterClean.generate(
+      farmPrinters[this.index],
+      systemSettings.filamentManager
+    );
   }
 };
 
@@ -685,9 +698,9 @@ class Runner {
       for (let i = 0; i < farmPrinters.length; i++) {
         // Make sure runners are created ready for each printer to pass between...
         await Runner.setupWebSocket(farmPrinters[i]._id);
+        await PrinterClean.generate(farmPrinters[i]);
       }
     }, 5000);
-
     return `System Runner has checked over ${farmPrinters.length} printers...`;
   }
 
@@ -845,7 +858,10 @@ class Runner {
             );
           }
           if (typeof farmPrinters[this.index] !== "undefined") {
-            PrinterClean.generate(farmPrinters[this.index]);
+            PrinterClean.generate(
+              farmPrinters[this.index],
+              systemSettings.filamentManager
+            );
           }
           timeout = systemSettings.timeout;
           setTimeout(function () {
@@ -1980,7 +1996,6 @@ class Runner {
       printer.selectedFilament[tool] = spool;
       farmPrinters[i].selectedFilament[tool] = spool;
     }
-
     printer.markModified("selectedFilament");
     printer.save();
 
