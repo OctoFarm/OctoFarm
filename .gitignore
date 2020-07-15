@@ -8,3 +8,4 @@ logs/
 .idea/inspectionProfiles/
 .idea/jsLinters/
 .idea/libraries/
+!/views/images/historyCollection/
