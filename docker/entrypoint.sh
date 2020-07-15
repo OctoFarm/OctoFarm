@@ -2,10 +2,7 @@
 
 if [ -d "node_modules" ] 
 then
-    echo "Node modules exist, skipping install" 
-    echo "Making sure node modules are up to date..."
-    npm update
-    npm install
+    echo "Node modules exist, skipping install"
 else
       echo "Installing node packages"
     npm install
