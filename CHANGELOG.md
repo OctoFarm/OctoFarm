@@ -9,7 +9,7 @@ All notable changes to this project will be documented in this file.
 ### Added
     - Power button now asks for confirmation when switching off
     - Seperate smaller width table for adding printers. Should help with adding printers on a smaller screen laptop. 
-    - Thumbnail to history view modal.
+    - Thumbnail to history view modal. Captures and stores it on the webserver. 
     - Added percent bar for Status on History Filters. Will show total failed/success/cancelled percentages on filtered results. 
     - Added hover information to file actions on file list
     - New Monilithic docker builds, builds with MongoDB included.
@@ -22,6 +22,8 @@ All notable changes to this project will be documented in this file.
     - Added filters to Terminal output on Printer Control. Same as OctoPrint currently: temp,sd,wait
     - Terminal output is now colour coded: temp - yellow, sd - grey, wait - red.
     - Filament manager plugin can now be resynced from the filament manager screen.
+    - History now calculates print cost per hour for each print.
+    - History statistics now show average cost per hour in the history filters sections
     
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
