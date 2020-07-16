@@ -415,6 +415,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         ) {
           if (farmPrinters[this.index].selectedFilament[s] !== null) {
             let profile = null;
+
             if (systemSettings.filamentManager) {
               profile = await Profiles.findOne({
                 "profile.index":
@@ -425,7 +426,6 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
                 farmPrinters[this.index].selectedFilament[s].spools.profile
               );
             }
-
             currentFilament[s].spools.profile = profile.profile;
           }
         }

@@ -326,6 +326,7 @@ async function addSpool(
     spoolsTempOffset.value = 0.0;
     post = post.spools;
     let displayNone = "d-none";
+
     if (filamentManager) {
       displayNone = "";
     }
@@ -475,7 +476,6 @@ async function saveSpool(e) {
   let post = await OctoFarmclient.post("filament/edit/filament", data);
   if (post.status === 200) {
     post = await post.json();
-    init();
     document.getElementById(`spoolsProfile-${id}`).disabled = true;
     document.getElementById(`save-${id}`).classList.add("d-none");
     document.getElementById(`edit-${id}`).classList.remove("d-none");
@@ -512,6 +512,7 @@ async function updateProfileDrop() {
   //Generate profile assignment
   const printerDrops = document.querySelectorAll("[id^='spoolsProfile-']");
   printerDrops.forEach((drop) => {
+    drop.innerHTML = "";
     profiles.profiles.forEach((prof) => {
       drop.insertAdjacentHTML(
         "beforeend",
@@ -537,7 +538,9 @@ async function updatePrinterDrops() {
   printerList = await printerList.json();
   //Generate printer assigment
   let filament = await OctoFarmclient.get("filament/get/filament");
+
   filament = await filament.json();
+
   const printerDrops = document.querySelectorAll(
     "[id^='spoolsPrinterAssignment-']"
   );
@@ -555,16 +558,6 @@ async function updatePrinterDrops() {
         "-" +
         filament.Spool[spool].printerAssignment[0].tool;
     }
-
-    // filament.Spool.forEach((spool) => {
-    //   if (Array.isArray(spool.printerAssignment)) {
-    //     drop.value =
-    //       spool.printerAssignment[0].id + "-" + spool.printerAssignment[0].tool;
-    //     console.log(
-    //       spool.printerAssignment[0].id + "-" + spool.printerAssignment[0].tool
-    //     );
-    //   }
-    // });
   });
 }
 async function init() {

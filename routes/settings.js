@@ -10,9 +10,9 @@ const { Runner } = runner;
 
 const systemInfo = require("../runners/systemInfo.js");
 
-const { SystemInfo } = systemInfo;
+const SystemInfo = systemInfo.SystemRunner;
 
-const settingsClean = require("../runners/systemInfo.js");
+const settingsClean = require("../lib/dataFunctions/settingsClean.js");
 
 const { SettingsClean } = settingsClean;
 

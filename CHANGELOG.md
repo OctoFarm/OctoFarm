@@ -44,6 +44,8 @@ All notable changes to this project will be documented in this file.
     - Printer Control improvements, now shows loading spinner when loading/switching to a different print. Speeds should be slightly improved``
         - Printer Control now live reloads filament/file changes. Shouldn't need to re-sync nearly as much manually. 
     - Printer Management buttons have been moved to a card body. 
+    - Docker no longer installs & updates node_modules on start if the folder exists.
+    
 ### Fixed
     - Fix file manager bug with default date sorting.
     - Fixed styling issue with the filters and sorting dropdowns on views making the bar bigger.
@@ -59,6 +61,9 @@ All notable changes to this project will be documented in this file.
     - Filament manager failed on re-syncing due to changes when adding spools/profiles. 
     - Speed improvements with new backend pre-calculation. All information should be prepared ready for client access before access. 
     - Fixed #77 - Farm Utilisation not calculated correctly.
+    - Filament Manager plugin tweaks: Fixed #77 and #74
+        - Filament Manager now keeps up to date when filament is down dated. It will re-sync your filament library after a print.
+        -  
     
 ### Removed
     - History may not now show your selected spool for old records with no job information caught. This is mainly going to be cancelled/failed prints as there is no information caught or prints that start and finish before OctoPrint can generate the job information. OctoFarm now relies on the tool# information provided in this for captured histories to render spool information correctly.     

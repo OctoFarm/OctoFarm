@@ -378,9 +378,21 @@ class ServerSettings {
             if (post.status) {
               filManager.innerHTML =
                 '<i class="fas fa-sync"></i> <br> Sync Filament Manager';
+              filManager.disabled = true;
+              UI.createAlert(
+                "success",
+                "Filament Manager Plugin successfully synced",
+                3000
+              );
             } else {
               filManager.innerHTML =
                 '<i class="fas fa-sync"></i> <br> Sync Filament Manager';
+              filManager.disabled = false;
+              UI.createAlert(
+                "error",
+                "Something went wrong, please check the filament manager logs.",
+                3000
+              );
             }
           });
         } else if (res.filamentManager) {

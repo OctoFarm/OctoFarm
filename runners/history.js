@@ -437,6 +437,8 @@ class HistoryCollection {
       },
     });
   }
+
+  static resyncFilamentManager() {}
 }
 
 const generateTime = function (seconds) {

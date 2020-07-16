@@ -80,20 +80,21 @@
                         <h6>Material Breakdown</h6>
                         <hr>
                         <div class="row">
-                            <p class="m-0 col p-0"><b>Weight:</b><% filamentTotals.materialBreakDown.forEach(used => { %>
-                            <p class="d-inline m-0 col"><b> <%= used.name %>:</b> <%= used.total %>g</p>
+                            <p class="m-0 col-1 p-0"><b>Weight:</b><% filamentTotals.materialBreakDown.forEach(used => { %>
+                            <p class="d-inline m-0 col-2"><b> <%= used.name %>:</b> <%= used.total %>g</p>
                             <%   }) %>
                             </p>
                         </div>
                          <div class="row   <%= displayNone %>">
-                            <p class="m-0 col p-0"><b>Used:</b><% filamentTotals.materialBreakDown.forEach(used => { %>
-                            <p class="d-inline m-0 col"><b> <%= used.name %>:</b> <%= used.used %>g</p>
+
+                            <p class="m-0 col-1 p-0"><b>Used:</b><% filamentTotals.materialBreakDown.forEach(used => { %>
+                            <p class="d-inline m-0 col-2"><b> <%= used.name %>:</b> <%= used.used %>g</p>
                             <%   }) %>
                              </p>
                          </div>
                         <div class="row">
-                            <p class="m-0 col p-0"><b>Price:</b><% filamentTotals.materialBreakDown.forEach(used => { %>
-                            <p class="d-inline m-0 col"><b> <%= used.name %>:</b> <%= used.price %></p>
+                            <p class="m-0 col-1 p-0"><b>Price:</b><% filamentTotals.materialBreakDown.forEach(used => { %>
+                            <p class="d-inline m-0 col-2"><b> <%= used.name %>:</b> <%= used.price %></p>
                             <%   }) %>
                             </p>
                         </div>
