@@ -24,12 +24,6 @@ else
     echo "history collection folder already exists..."
 fi
 
-if [ -d "views/images/historyCollection/thumbs" ]
-then
-    mkdir -p views/images/historyCollection/thumbs
-else
-   echo "history thumbnail folder already exists..."
-fi
 
 cd /app/
 
