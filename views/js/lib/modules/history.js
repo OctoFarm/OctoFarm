@@ -87,6 +87,7 @@ export default class History {
       const lastPrintTime = document.getElementById("lastPrintTime");
       const viewTable = document.getElementById("viewTable");
       const jobCosting = document.getElementById("jobCosting");
+      const jobHourlyCost = document.getElementById("jobHourlyCost");
 
       viewTable.innerHTML = "";
       printerName.innerHTML = " - ";
@@ -106,6 +107,8 @@ export default class History {
       averagePrintTime.placeholder = " - ";
       lastPrintTime.placeholder = " - ";
       jobCosting.placeholder = " - ";
+      jobHourlyCost.placeholder = " - ";
+
       const thumbnail = document.getElementById("history-thumbnail");
       thumbnail.innerHTML = "";
       const index = _.findIndex(historyList.history, function (o) {
@@ -132,6 +135,7 @@ export default class History {
         "<br>"
       )}`;
       printerCost.value = current.printerCost;
+      jobHourlyCost.value = current.costPerHour;
       notes.value = current.notes;
       actualPrintTime.value = Calc.generateTime(current.printTime);
       status.innerHTML = `<b>Status</b><hr>${current.state}`;
@@ -410,6 +414,7 @@ export default class History {
       );
     });
     const totalHourCost = costPerHour.reduce((a, b) => a + b, 0);
+
     const avgHourCost = totalHourCost / costPerHour.length;
     const total =
       statesCancelled.length + statesFailed.length + statesSuccess.length;
