@@ -17,16 +17,16 @@ else
     echo "Logs folder already exists..."
 fi
 
-if [ -d "historyCollection" ]
+if [ -d "views/images/historyCollection" ]
 then
-    mkdir -p historyCollection
+    mkdir -p views/images/historyCollection
 else
     echo "history collection folder already exists..."
 fi
 
-if [ -d "historyCollection/thumbs" ]
+if [ -d "views/images/historyCollection/thumbs" ]
 then
-    mkdir -p historyCollection/thumbs
+    mkdir -p views/images/historyCollection/thumbs
 else
    echo "history thumbnail folder already exists..."
 fi
