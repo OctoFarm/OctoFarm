@@ -12,6 +12,8 @@ const filamentProfiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const Spool = require("../models/Filament.js");
 
+const { filamentManagerReSync } = require("./filamentManagerPlugin.js");
+
 let counter = 0;
 let errorCounter = 0;
 
@@ -44,7 +46,13 @@ class HistoryCollection {
       await spool.save();
       returnSpools.push(spool);
     }
-
+    const reSync = await filamentManagerReSync();
+    // Return success
+    if (reSync === "success") {
+      logger.info("Successfully resynced filament manager");
+    } else {
+      logger.info("Unsuccessfull in resyncing filament manager");
+    }
     return returnSpools;
   }
 
@@ -58,14 +66,14 @@ class HistoryCollection {
     const result = thumbParts[thumbParts.length - 1];
     const splitAgain = result.split("?");
 
-    const path = `./views/images/historyCollection/${splitAgain[0]}`;
+    const path = `./historyCollection/thumbs/${splitAgain[0]}`;
 
     await download(url, path, () => {
       logger.info("Downloaded: ", url);
       logger.info("Saved as: ", splitAgain[0]);
     });
 
-    return `images/historyCollection/${splitAgain[0]}`;
+    return `./historyCollection/thumbs/${splitAgain[0]}`;
   }
 
   static async complete(payload, printer, job, files) {

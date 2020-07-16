@@ -70,7 +70,7 @@ const filamentManagerReSync = async function () {
         tempOffset: sp.temp_offset,
         fmID: sp.id,
       };
-      const oldSpool = await Spool.findOne({ "spools.name": sp.name });
+      const oldSpool = await Spool.findOne({ "spools.fmID": sp.id });
       if (oldSpool !== null) {
         logger.info("Updating Spool: ", spools);
         oldSpool.spools = spools;

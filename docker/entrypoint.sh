@@ -30,6 +30,20 @@ else
     echo "Logs folder already exists..."
 fi
 
+if [ -d "historyCollection" ]
+then
+    mkdir -p historyCollection
+else
+    echo "history collection folder already exists..."
+fi
+
+if [ -d "historyCollection/thumbs" ]
+then
+    mkdir -p historyCollection/thumbs
+else
+    echo "history thumbnail folder already exists..."
+fi
+
 cd app/
 
 pm2 start app.js --name OctoFarm --no-daemon -o './logs/pm2.log' -e './logs/pm2.error.log' --time

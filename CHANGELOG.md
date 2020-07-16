@@ -21,6 +21,7 @@ All notable changes to this project will be documented in this file.
     - Printers Manager now shows status for the 6 checks an OctoPrint client will go through. API, File, State, Profile, Settings and System. Red shows not yet scanned and green shows scanned. 
     - Added filters to Terminal output on Printer Control. Same as OctoPrint currently: temp,sd,wait
     - Terminal output is now colour coded: temp - yellow, sd - grey, wait - red.
+    - Filament manager plugin can now be resynced from the filament manager screen.
     
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
@@ -64,7 +65,7 @@ All notable changes to this project will be documented in this file.
         - Filament Manager now keeps up to date when filament is down dated. It will re-sync your filament library after a print.
         - Improved log output and it's own file. 
         - Server start fires a re-sync to make sure no changes are missed.
-        - Caveat: OctoFarm doesn't know when you change a filament on OctoPrint, you will need to update OctoFarm for this. 
+        - Caveat: OctoFarm doesn't know when you change a filament on OctoPrint, you will need to update OctoFarm for this.
     - Fixed #79 - Duplicate historical entries due to multiple listeners getting assigned on printer edit/delete.
     
 ### Removed
