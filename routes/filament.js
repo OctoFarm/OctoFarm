@@ -248,7 +248,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
   newFilament.save().then(async (e) => {
     logger.info("New Spool saved successfully: ", newFilament);
     FilamentClean.start(filamentManager);
-    res.send({ res: "success", spools: newFilament });
+    res.send({ res: "success", spools: newFilament, filamentManager });
   });
 });
 router.post("/delete/filament", ensureAuthenticated, async (req, res) => {

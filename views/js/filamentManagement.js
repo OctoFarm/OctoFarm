@@ -318,7 +318,7 @@ async function addSpool(
       "addSpoolsMessage"
     );
     post = await post.json();
-
+    filamentManager = post.filamentManager;
     spoolsName.value = "";
     spoolsPrice.value = "";
     spoolsWeight.value = 1000;
