@@ -1380,6 +1380,7 @@ class Runner {
         for (let s = 0; s < farmPrinters[index].selectedFilament.length; s++) {
           if (farmPrinters[index].selectedFilament[s] !== null) {
             let profile = null;
+
             if (systemSettings.filamentManager) {
               profile = await Profiles.findOne({
                 "profile.index":
@@ -1396,6 +1397,7 @@ class Runner {
         farmPrinters[index].systemChecks.scanning.files.status = "success";
         farmPrinters[index].systemChecks.scanning.files.date = new Date();
         FileClean.generate(farmPrinters[index], currentFilament);
+        FileClean.statistics(farmPrinters);
         logger.info(
           `Successfully grabbed Files for...: ${farmPrinters[index].printerURL}`
         );
@@ -1449,18 +1451,18 @@ class Runner {
         );
         for (let s = 0; s < farmPrinters[index].selectedFilament.length; s++) {
           if (farmPrinters[index].selectedFilament[s] !== null) {
-            let profile = null;
-            if (systemSettings.filamentManager) {
-              profile = await Profiles.findOne({
-                "profile.index":
-                  farmPrinters[index].selectedFilament[s].spools.profile,
-              });
-            } else {
-              profile = await Profiles.findById(
-                farmPrinters[index].selectedFilament[s].spools.profile
-              );
-            }
-            currentFilament[s].spools.profile = profile.profile;
+            const profile = null;
+            // if (systemSettings.filamentManager) {
+            //   profile = await Profiles.findOne({
+            //     "profile.index":
+            //       farmPrinters[index].selectedFilament[s].spools.profile,
+            //   });
+            // } else {
+            //   profile = await Profiles.findById(
+            //     farmPrinters[index].selectedFilament[s].spools.profile
+            //   );
+            // }
+            // currentFilament[s].spools.profile = profile.profile;
           }
         }
         JobClean.generate(farmPrinters[index], currentFilament);
@@ -1727,11 +1729,14 @@ class Runner {
 
   static async updateSortIndex(list) {
     // Update the live information
+    console.log(list);
     for (let i = 0; i < farmPrinters.length; i++) {
       const id = _.findIndex(farmPrinters, function (o) {
-        return o._id == list[i];
+        return JSON.stringify(o._id) === JSON.stringify(list[i]);
       });
+      console.log(id);
       farmPrinters[id].sortIndex = i;
+      PrinterClean.generate(farmPrinters[id], systemSettings.filamentManager);
       const printer = await Printers.findById(list[i]);
       printer.sortIndex = i;
       printer.save();
@@ -2090,22 +2095,23 @@ class Runner {
     const currentFilament = JSON.parse(
       JSON.stringify(farmPrinters[i].selectedFilament)
     );
-    for (let s = 0; s < farmPrinters[i].selectedFilament.length; s++) {
-      if (farmPrinters[i].selectedFilament[s] !== null) {
-        let profile = null;
-        if (systemSettings.filamentManager) {
-          profile = await Profiles.findOne({
-            "profile.index": farmPrinters[i].selectedFilament[s].spools.profile,
-          });
-        } else {
-          profile = await Profiles.findById(
-            farmPrinters[i].selectedFilament[s].spools.profile
-          );
-        }
-        currentFilament[s].profile = profile.profile;
-      }
-    }
+    // for (let s = 0; s < farmPrinters[i].selectedFilament.length; s++) {
+    //   // if (farmPrinters[i].selectedFilament[s] !== null) {
+    //   //   let profile = null;
+    //   //   if (systemSettings.filamentManager) {
+    //   //     profile = await Profiles.findOne({
+    //   //       "profile.index": farmPrinters[i].selectedFilament[s].spools.profile,
+    //   //     });
+    //   //   } else {
+    //   //     profile = await Profiles.findById(
+    //   //       farmPrinters[i].selectedFilament[s].spools.profile
+    //   //     );
+    //   //   }
+    //   //   currentFilament[s].profile = profile.profile;
+    //   // }
+    // }
     FileClean.generate(farmPrinters[i], currentFilament);
+    FileClean.statistics(farmPrinters);
     Runner.getFiles(farmPrinters[i]._id, "files?recursive=true");
     setTimeout(async function () {
       Runner.getFiles(farmPrinters[i]._id, "files?recursive=true");
