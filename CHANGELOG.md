@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 # [UnReleased]
 
-## [v1.1.5.6]
+## [v1.1.5.6 - RC1]
 
 ### Added
     - Power button now asks for confirmation when switching off
@@ -21,7 +21,6 @@ All notable changes to this project will be documented in this file.
     - Printers Manager now shows status for the 6 checks an OctoPrint client will go through. API, File, State, Profile, Settings and System. Red shows not yet scanned and green shows scanned. 
     - Added filters to Terminal output on Printer Control. Same as OctoPrint currently: temp,sd,wait
     - Terminal output is now colour coded: temp - yellow, sd - grey, wait - red.
-    
     
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
@@ -64,6 +63,9 @@ All notable changes to this project will be documented in this file.
     - Filament Manager plugin tweaks: Fixed #73 and #74
         - Filament Manager now keeps up to date when filament is down dated. It will re-sync your filament library after a print.
         - Improved log output and it's own file. 
+        - Server start fires a re-sync to make sure no changes are missed.
+        - Caveat: OctoFarm doesn't know when you change a filament on OctoPrint, you will need to update OctoFarm for this. 
+    - Fixed #79 - Duplicate historical entries due to multiple listeners getting assigned on printer edit/delete.
     
 ### Removed
     - History may not now show your selected spool for old records with no job information caught. This is mainly going to be cancelled/failed prints as there is no information caught or prints that start and finish before OctoPrint can generate the job information. OctoFarm now relies on the tool# information provided in this for captured histories to render spool information correctly.     
