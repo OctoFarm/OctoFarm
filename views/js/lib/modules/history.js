@@ -118,7 +118,7 @@ export default class History {
         typeof current.thumbnail !== "undefined" &&
         current.thumbnail != null
       ) {
-        thumbnail.innerHTML = `<center><img src="http://localhost:4000/${current.thumbnail}" class="historyImage mb-2"></center>`;
+        thumbnail.innerHTML = `<center><img src="${current.thumbnail}" class="historyImage mb-2"></center>`;
       }
       startDate.innerHTML = `<b>Started</b><hr>${current.startDate.replace(
         " - ",
@@ -356,6 +356,7 @@ export default class History {
     const statesSuccess = [];
     const totalUsageGrams = [];
     const totalUsageMeter = [];
+    const costPerHour = [];
     filtered.forEach((row) => {
       times.push(parseInt(row.getElementsByClassName("time")[0].innerText));
       if (
@@ -404,7 +405,12 @@ export default class History {
       if (stateText === "Success") {
         statesSuccess.push(stateText);
       }
+      costPerHour.push(
+        parseFloat(row.getElementsByClassName("costPerHour")[0].innerHTML)
+      );
     });
+    const totalHourCost = costPerHour.reduce((a, b) => a + b, 0);
+    const avgHourCost = totalHourCost / costPerHour.length;
     const total =
       statesCancelled.length + statesFailed.length + statesSuccess.length;
     const cancelledPercent = (statesCancelled.length / total) * 100;
@@ -441,6 +447,9 @@ export default class History {
       parseFloat(printerCost.reduce((a, b) => a + b, 0).toFixed(2)) +
       parseFloat(cost.reduce((a, b) => a + b, 0).toFixed(2))
     ).toFixed(2);
+    document.getElementById(
+      "averageCostPerHour"
+    ).innerHTML = avgHourCost.toFixed(2);
   }
 }
 const element = document.getElementById("listenerHistory");

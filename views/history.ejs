@@ -305,6 +305,7 @@
                     <th class="table-dark" scope="col">Filament Cost Total</th>
                     <th class="table-dark" scope="col">Printer Cost Total</th>
                     <th class="table-dark" scope="col">Combined Total</th>
+                    <th class="table-dark" scope="col">Average Cost Per Hour</th>
                   </tr>
                   </thead>
                   <tbody id="historyTableTotals">
@@ -353,6 +354,7 @@
                     <th id="totalCost" class="table-dark" scope="col"></th>
                     <th id="printerTotalCost" class="table-dark" scope="col"></th>
                     <th id="combinedTotalCost" class="table-dark" scope="col"></th>
+                    <th id="averageCostPerHour" class="table-dark" scope="col"></th>
                   </tr>
                   </tbody>
 
@@ -384,6 +386,7 @@
           <th class="table-dark sticky-table table-dark" scope="col" width="400px">Filament Usage</th>
           <th class="table-dark sticky-table table-dark" scope="col" width="400px">Filament Cost</th>
           <th class="table-dark sticky-table table-dark" scope="col">Total Cost</th>
+          <th class="table-dark sticky-table table-dark" scope="col">Cost Per Hour</th>
           <th class="table-dark sticky-table table-dark" scope="col" width="400px">
             Notes
           </th>
@@ -473,6 +476,9 @@
           </td>
           <td class="totalCost" id="totalCost-<%= history[i]._id %>">
             <%= history[i].totalCost %>
+          </td>
+          <td class="costPerHour" id="costPerHour-<%= history[i]._id %>">
+            <%= history[i].costPerHour %>
           </td>
           <td class="notes" class="text-wrap" id="note-<%= history[i]._id %>">
             <%= history[i].notes %>

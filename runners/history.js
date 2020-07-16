@@ -14,38 +14,46 @@ const Spool = require("../models/Filament.js");
 
 const { filamentManagerReSync } = require("./filamentManagerPlugin.js");
 
+const historyClean = require("../lib/dataFunctions/historyClean.js");
+
+const { HistoryClean } = historyClean;
+
 let counter = 0;
 let errorCounter = 0;
 
 class HistoryCollection {
   static async resyncFilament(printer) {
     const returnSpools = [];
+
     for (let i = 0; i < printer.selectedFilament.length; i++) {
-      const spools = await fetch(
-        `${printer.printerURL}/plugin/filamentmanager/spools/${printer.selectedFilament[i].spools.fmID}`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Api-Key": printer.apikey,
-          },
-        }
-      );
-      const spool = await Spool.findById(printer.selectedFilament[i]._id);
-      const sp = await spools.json();
-      spool.spools = {
-        name: sp.spool.name,
-        profile: sp.spool.profile.id,
-        price: sp.spool.cost,
-        weight: sp.spool.weight,
-        used: sp.spool.used,
-        tempOffset: sp.spool.temp_offset,
-        fmID: sp.spool.id,
-      };
-      spool.markModified("spools");
-      await spool.save();
-      returnSpools.push(spool);
+      if (printer.selectedFilament[i] !== null) {
+        const spools = await fetch(
+          `${printer.printerURL}/plugin/filamentmanager/spools/${printer.selectedFilament[i].spools.fmID}`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Api-Key": printer.apikey,
+            },
+          }
+        );
+        const spool = await Spool.findById(printer.selectedFilament[i]._id);
+        const sp = await spools.json();
+        spool.spools = {
+          name: sp.spool.name,
+          profile: sp.spool.profile.id,
+          price: sp.spool.cost,
+          weight: sp.spool.weight,
+          used: sp.spool.used,
+          tempOffset: sp.spool.temp_offset,
+          fmID: sp.spool.id,
+        };
+        spool.markModified("spools");
+        await spool.save();
+        returnSpools.push(spool);
+      }
     }
+
     const reSync = await filamentManagerReSync();
     // Return success
     if (reSync === "success") {
@@ -66,14 +74,19 @@ class HistoryCollection {
     const result = thumbParts[thumbParts.length - 1];
     const splitAgain = result.split("?");
 
-    const path = `./historyCollection/thumbs/${splitAgain[0]}`;
-
+    const path = `./views/images/historyCollection/thumbs/${splitAgain[0]}`;
+    if (!fs.existsSync(`./views/images/historyCollection`)) {
+      fs.mkdirSync(`./views/images/historyCollection`);
+    }
+    if (!fs.existsSync(`./views/images/historyCollection/thumbs`)) {
+      fs.mkdirSync(`./views/images/historyCollection/thumbs`);
+    }
     await download(url, path, () => {
       logger.info("Downloaded: ", url);
       logger.info("Saved as: ", splitAgain[0]);
     });
 
-    return `./historyCollection/thumbs/${splitAgain[0]}`;
+    return `images/historyCollection/thumbs/${splitAgain[0]}`;
   }
 
   static async complete(payload, printer, job, files) {
@@ -197,7 +210,9 @@ class HistoryCollection {
       const saveHistory = new History({
         printHistory,
       });
-      await saveHistory.save();
+      await saveHistory.save().then((e) => {
+        HistoryClean.start();
+      });
 
       logger.info(
         "Completed Print Captured for ",
@@ -325,7 +340,9 @@ class HistoryCollection {
       const saveHistory = new History({
         printHistory,
       });
-      saveHistory.save();
+      await saveHistory.save().then((e) => {
+        HistoryClean.start();
+      });
       logger.info("Failed Print captured ", payload + printer.printerURL);
     } catch (e) {
       console.log(e);
@@ -409,8 +426,9 @@ class HistoryCollection {
       const saveError = new ErrorLog({
         errorLog,
       });
-      saveError.save();
-
+      await saveHistory.save().then((e) => {
+        HistoryClean.start();
+      });
       logger.info("Error captured ", payload + printer.printerURL);
     } catch (e) {
       logger.error(e, `Failed to capture ErrorLog for ${printer.printerURL}`);
