@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
     - Filament manager plugin can now be resynced from the filament manager screen.
     - History now calculates print cost per hour for each print.
     - History statistics now show average cost per hour in the history filters sections
+    - New patreon members lactose, scott and jose. Big thanks for your support!
     
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
@@ -67,8 +68,9 @@ All notable changes to this project will be documented in this file.
         - Filament Manager now keeps up to date when filament is down dated. It will re-sync your filament library after a print.
         - Improved log output and it's own file. 
         - Server start fires a re-sync to make sure no changes are missed.
-        - Caveat: OctoFarm doesn't know when you change a filament on OctoPrint, you will need to update OctoFarm for this.
+        - Caveat: OctoFarm doesn't know when you change a filament on OctoPrint, any changes you make there for filament, you will need to tell OctoFarm with a Re-Sync/Spool selection.
     - Fixed #79 - Duplicate historical entries due to multiple listeners getting assigned on printer edit/delete.
+    - Fixed some dependancy security issues and updated node modules. Please make sure to run npm install / npm update if you've already installed node_modules. 
     
 ### Removed
     - History may not now show your selected spool for old records with no job information caught. This is mainly going to be cancelled/failed prints as there is no information caught or prints that start and finish before OctoPrint can generate the job information. OctoFarm now relies on the tool# information provided in this for captured histories to render spool information correctly.     
