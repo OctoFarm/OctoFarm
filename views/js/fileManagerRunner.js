@@ -160,7 +160,6 @@ class Manager {
   }
 
   static changePrinter(e, target) {
-    console.log(lastId);
     if (!e.target.id.includes("filamentDrop")) {
       //Set old one deselected
       document.getElementById("fileBody").innerHTML = "";

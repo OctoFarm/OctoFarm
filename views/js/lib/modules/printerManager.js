@@ -1414,6 +1414,9 @@ export default class PrinterManager {
         chamber: document.querySelectorAll("[id^='chamber']"),
         tools: document.querySelectorAll("[id^='tool']"),
       },
+      filamentDrops: document.querySelectorAll(
+        "[id$=FilamentManagerFolderSelect]"
+      ),
     };
 
     return printerManager;
@@ -1767,27 +1770,24 @@ export default class PrinterManager {
 
   static async controls(enable, printing) {
     let elements = await PrinterManager.grabPage();
+    const { filamentDrops } = elements;
     elements = elements.printerControls;
     if (typeof printing !== "undefined" && printing) {
-      // elements.e0Target.disabled = !printing;
-      // elements.e0Actual.disabled = !printing;
-      // elements.bedTarget.disabled = !printing;
-      // elements.e0Set.disabled = !printing;
-      // elements.bedSet.disabled = !printing;
       elements.feedRate.disabled = !printing;
       elements.flowRate.disabled = !printing;
       elements.fansOn.disabled = !printing;
       elements.fansOff.disabled = !printing;
+      filamentDrops.forEach((drop) => {
+        drop.disabled = printing;
+      });
     } else {
-      // elements.e0Target.disabled = enable;
-      // elements.e0Actual.disabled = enable;
-      // elements.bedTarget.disabled = enable;
-      // elements.e0Set.disabled = enable;
-      // elements.bedSet.disabled = enable;
       elements.feedRate.disabled = enable;
       elements.flowRate.disabled = enable;
       elements.fansOn.disabled = enable;
       elements.fansOff.disabled = enable;
+      filamentDrops.forEach((drop) => {
+        drop.disabled = enable;
+      });
     }
     elements.xPlus.disabled = enable;
     elements.xMinus.disabled = enable;

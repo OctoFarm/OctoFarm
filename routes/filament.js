@@ -42,8 +42,8 @@ router.get("/get/filament", ensureAuthenticated, async (req, res) => {
   const spools = await FilamentClean.getSpools();
   res.send({ Spool: spools });
 });
-router.get("/get/selected", ensureAuthenticated, async (req, res) => {
-  const selected = await FilamentClean.getSelected();
+router.get("/get/dropDownList", ensureAuthenticated, async (req, res) => {
+  const selected = await FilamentClean.getDropDown();
   res.send({ status: 200, selected });
 });
 router.post("/select", ensureAuthenticated, async (req, res) => {

@@ -46,6 +46,7 @@ All notable changes to this project will be documented in this file.
     - Filament information now generated on server side then sent to the client, should improve loading times. 
     - Printer Control improvements, now shows loading spinner when loading/switching to a different print. Speeds should be slightly improved``
         - Printer Control now live reloads filament/file changes. Shouldn't need to re-sync nearly as much manually. 
+        - First re-sync will happen after 1000ms, trigger by file upload/filament change. Second re-sync on file upload first after 10000ms, this isn't always enough for OctoPrint to generate file meta so manual re-sync maybe required after this.
     - Printer Management buttons have been moved to a card body. 
     - Docker no longer installs & updates node_modules on start if the folder exists.
     
