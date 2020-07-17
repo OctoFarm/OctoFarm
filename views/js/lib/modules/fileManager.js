@@ -179,10 +179,8 @@ export default class FileManager {
                 }
               );
               updatePrinter = await updatePrinter.json();
-              console.log("SECOND REFRESH");
               FileManager.refreshFiles(updatePrinter);
             }, 10000);
-            console.log("FIRST REFRESH");
           }, 1000);
         } else {
           fileUploads.remove();
@@ -634,7 +632,6 @@ export default class FileManager {
 
           // then draw folders
           if (fileList.folderList.length > 0) {
-            console.log("DRAW FOLE");
             fileList.folderList.forEach((folder) => {
               if (folder.path == currentFolder) {
                 fileElem.insertAdjacentHTML(

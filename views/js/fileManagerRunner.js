@@ -27,7 +27,6 @@ class Manager {
         for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
           extruderList += `<div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool${i}-${printer._id}">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool${i}-${printer._id}"></select></div>`;
         }
-        console.log(printer);
         printerList.insertAdjacentHTML(
           "beforeend",
           `
@@ -111,7 +110,7 @@ class Manager {
         listItem.addEventListener("click", (e) => {
           Manager.changePrinter(e, printer._id);
         });
-        lastId = printer._id;
+        lastId = printers[0]._id;
         dragAndDropEnable(listItem, printer);
 
         const item = document.getElementById(
@@ -161,16 +160,22 @@ class Manager {
   }
 
   static changePrinter(e, target) {
+    console.log(lastId);
     if (!e.target.id.includes("filamentDrop")) {
       //Set old one deselected
       document.getElementById("fileBody").innerHTML = "";
       document.getElementById("currentFolder").innerHTML = "local";
       document.getElementById("fileManagerPrinter-" + lastId).className =
         "list-group-item list-group-item-action flex-column align-items-start bg-secondary";
+
       //Update old index to this one
       lastId = target;
       const printerName = document.getElementById("printerName-" + lastId)
         .innerHTML;
+      const panel = document.getElementById("fileManagerPrinter-" + target);
+
+      panel.classList.add("bg-dark");
+      panel.classList.remove("bg-secondary");
       const firstElement = document.getElementById("currentPrinter");
       firstElement.innerHTML = '<i class="fas fa-print"></i> ' + printerName;
       Manager.updatePrinterList(target);
