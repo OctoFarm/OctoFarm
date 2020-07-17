@@ -1,8 +1,6 @@
 import OctoFarmclient from "./lib/octofarm.js";
-import OctoPrintClient from "./lib/octoprint.js";
 import UI from "./lib/functions/ui.js";
-import Validate from "./lib/functions/validate.js";
-import Calc from "./lib/functions/calc.js";
+import { selectFilament } from "./lib/modules/filamentGrab.js";
 
 const jpInit = false;
 let filamentManager = false;
@@ -558,6 +556,14 @@ async function updatePrinterDrops() {
         "-" +
         filament.Spool[spool].printerAssignment[0].tool;
     }
+    drop.addEventListener("change", (e) => {
+      const meta = e.target.value.split("-");
+      const printerId = meta[0];
+      const tool = meta[1];
+      const spoolId = e.target.id.split("-");
+      console.log(printerId, spoolId[1], tool);
+      selectFilament(printerId, spoolId[1], tool);
+    });
   });
 }
 async function init() {
