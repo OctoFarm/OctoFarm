@@ -813,10 +813,8 @@ class dashActions {
 
 class dashUpdate {
   static printers(printers, printerControlList) {
-    console.log(printers);
     printers.forEach((printer) => {
       let printerName = "";
-
       if (typeof printer.printerState !== "undefined") {
         if (typeof printer.printerName !== "undefined") {
           printerName = printer.printerName;

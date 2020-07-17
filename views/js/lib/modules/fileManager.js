@@ -10,6 +10,8 @@ const fileUploads = new Queue();
 const fileSortInit = false;
 
 setInterval(async () => {
+  //Auto refresh of files
+
   // If there are files in the queue, plow through until uploaded... currently single file at a time.
   if (fileUploads.size() > 0) {
     const current = fileUploads.first();
@@ -160,6 +162,28 @@ export default class FileManager {
             3000,
             "clicked"
           );
+          setTimeout(async () => {
+            let updatePrinter = await OctoFarmClient.post(
+              "printers/printerInfo",
+              {
+                i: printerInfo._id,
+              }
+            );
+            updatePrinter = await updatePrinter.json();
+            FileManager.refreshFiles(updatePrinter);
+            setTimeout(async () => {
+              let updatePrinter = await OctoFarmClient.post(
+                "printers/printerInfo",
+                {
+                  i: printerInfo._id,
+                }
+              );
+              updatePrinter = await updatePrinter.json();
+              console.log("SECOND REFRESH");
+              FileManager.refreshFiles(updatePrinter);
+            }, 10000);
+            console.log("FIRST REFRESH");
+          }, 1000);
         } else {
           fileUploads.remove();
           const fileCounts = document.getElementById(`fileCounts-${index}`);
@@ -463,12 +487,7 @@ export default class FileManager {
       const fileElem = document.getElementById(`fileList-${printer._id}`);
       if (fileElem) {
         const { fileList } = printer;
-        console.log(printer.systemChecks.cleaning.file.status);
-        console.log(fileList.fileList.length > 0);
-        if (
-          printer.systemChecks.cleaning.file.status === "danger" ||
-          !fileList.fileList.length > 0
-        ) {
+        if (printer.systemChecks.cleaning.file.status === "danger") {
           fileElem.innerHTML = `
             <div class="noStorage  text-center"><i class="fas fa-file-code fa-5x"></i><br><h5>There are no files in local storage...</h5></div>
       `;
@@ -479,24 +498,25 @@ export default class FileManager {
           if (currentFolder.includes("local/")) {
             currentFolder = currentFolder.replace("local/", "");
           }
-          fileList.fileList.forEach((file) => {
-            let toolInfo = "";
-            file.toolUnits.forEach((unit, index) => {
-              toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
-            });
-            let thumbnail =
-              '<center><i class="fas fa-file-code fa-2x"></i></center>';
-            if (
-              typeof file.thumbnail !== "undefined" &&
-              file.thumbnail !== null
-            ) {
-              thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
-            }
-            let fileDate = new Date(file.uploadDate * 1000);
-            const dateString = fileDate.toDateString();
-            const timeString = fileDate.toTimeString().substring(0, 8);
-            fileDate = `${dateString} ${timeString}`;
-            const f = ` <a
+          if (fileList.fileList.length > 0) {
+            fileList.fileList.forEach((file) => {
+              let toolInfo = "";
+              file.toolUnits.forEach((unit, index) => {
+                toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
+              });
+              let thumbnail =
+                '<center><i class="fas fa-file-code fa-2x"></i></center>';
+              if (
+                typeof file.thumbnail !== "undefined" &&
+                file.thumbnail !== null
+              ) {
+                thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
+              }
+              let fileDate = new Date(file.uploadDate * 1000);
+              const dateString = fileDate.toDateString();
+              const timeString = fileDate.toTimeString().substring(0, 8);
+              fileDate = `${dateString} ${timeString}`;
+              const f = ` <a
             data-jplist-item
             id="file-${file.fullPath}"
             href="#"
@@ -535,8 +555,10 @@ export default class FileManager {
                 <i class="fas fa-clock"></i><span id="fileDateClean-${
                   file.fullPath
                 }" class="date d-none"> ${
-              file.uploadDate
-            }</span><span id="fileDate-${file.fullPath}"> ${fileDate}</span><br>
+                file.uploadDate
+              }</span><span id="fileDate-${
+                file.fullPath
+              }"> ${fileDate}</span><br>
                 <i class="fas fa-hdd"></i><span class="size" id="fileSize-${
                   file.fullPath
                 }"> ${Calc.bytes(file.fileSize)}</span> <br>
@@ -564,36 +586,36 @@ export default class FileManager {
                 </button>
                 <button           title="Start printing file"
             id="${printer._id}*fileActionStart*${
-              file.fullPath
-            }" type="button" class="btn btn-success">
+                file.fullPath
+              }" type="button" class="btn btn-success">
           <i class="fas fa-play"></i> Start
               </button>
               <button  title="Select file" id="${
                 printer._id
               }*fileActionSelect*${
-              file.fullPath
-            }" type="button" class="btn btn-info">
+                file.fullPath
+              }" type="button" class="btn btn-info">
         <i class="fas fa-file-upload"></i> Select
             </button>
             <button          title="Move file" id="${
               printer._id
             }*fileActionMove*${
-              file.fullPath
-            }" type="button" class="btn btn-warning">
+                file.fullPath
+              }" type="button" class="btn btn-warning">
       <i class="fas fa-people-carry"></i> Move
           </button>
           <button          title="Download file" onclick="window.open('${
             printer.printerURL
           }/downloads/files/local/${
-              file.fullPath
-            }')" type="button" class="btn btn-dark">
+                file.fullPath
+              }')" type="button" class="btn btn-dark">
     <i class="fas fa-download"></i> Download
         </button>
         <button title="Delete file" id="${
           printer.printerURL
         }*fileActionDelete*${
-              file.fullPath
-            }" type="button" class="btn btn-danger">
+                file.fullPath
+              }" type="button" class="btn btn-danger">
   <i class="fas fa-trash-alt"></i> Delete
       </button>
       </div>
@@ -602,18 +624,22 @@ export default class FileManager {
       </div>
       </a>`;
 
-            if (typeof recursive !== "undefined") {
-              fileElem.insertAdjacentHTML("beforeend", f);
-            } else if (file.path == currentFolder) {
-              fileElem.insertAdjacentHTML("beforeend", f);
-            }
-          });
+              if (typeof recursive !== "undefined") {
+                fileElem.insertAdjacentHTML("beforeend", f);
+              } else if (file.path == currentFolder) {
+                fileElem.insertAdjacentHTML("beforeend", f);
+              }
+            });
+          }
+
           // then draw folders
-          fileList.folderList.forEach((folder) => {
-            if (folder.path == currentFolder) {
-              fileElem.insertAdjacentHTML(
-                "beforeend",
-                `<a
+          if (fileList.folderList.length > 0) {
+            console.log("DRAW FOLE");
+            fileList.folderList.forEach((folder) => {
+              if (folder.path == currentFolder) {
+                fileElem.insertAdjacentHTML(
+                  "beforeend",
+                  `<a
               id="file-${folder.name}"
               href="#"
               class="list-group-item list-group-item-action flex-column align-items-start bg-dark folderAction"
@@ -653,9 +679,11 @@ export default class FileManager {
             </a>
          
             `
-              );
-            }
-          });
+                );
+              }
+            });
+          }
+
           FileManager.updateListeners(printer);
         }
       }
@@ -681,7 +709,6 @@ export default class FileManager {
   }
 
   static updateListeners(printer) {
-    console.log(printer);
     const fileElem = document.getElementById(`fileList-${printer._id}`);
     dragAndDropEnable(fileElem, printer);
     const folders = document.querySelectorAll(".folderAction");
