@@ -20,9 +20,15 @@ const { FilamentClean } = filamentClean;
 const settingsClean = require("../lib/dataFunctions/settingsClean.js");
 
 const { SettingsClean } = settingsClean;
+const printerClean = require("../lib/dataFunctions/printerClean.js");
 
-const version = `${pjson.version}.6.1`;
+const { PrinterClean } = printerClean;
+const fileClean = require("../lib/dataFunctions/fileClean.js");
 
+const { FileClean } = fileClean;
+
+const version = `${pjson.version}.6.2`;
+console.log(`Version: ${version}`);
 console.log(`db: ${db}`);
 
 // Welcome Page
@@ -97,6 +103,8 @@ router.get("/printers", ensureAuthenticated, async (req, res) => {
 router.get("/filemanager", ensureAuthenticated, async (req, res) => {
   const printers = await Runner.returnFarmPrinters();
   const serverSettings = await SettingsClean.returnSystemSettings();
+  const currentOperations = await PrinterClean.returnCurrentOperations();
+  const fileStatistics = await FileClean.returnStatistics();
   let user = null;
   let group = null;
   if (serverSettings.server.loginRequired === false) {
@@ -113,6 +121,8 @@ router.get("/filemanager", ensureAuthenticated, async (req, res) => {
     page: "Printer Manager",
     printerCount: printers.length,
     helpers: prettyHelpers,
+    currentOperationsCount: currentOperations.count,
+    fileStatistics,
   });
 });
 // History Page
