@@ -3,7 +3,6 @@ import OctoFarmClient from "../octofarm.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import FileManager, { FileActions } from "./fileManager.js";
-import Validate from "../functions/validate.js";
 import { returnDropDown, selectFilament } from "./filamentGrab.js";
 
 import PowerButton from "./powerButton.js";
@@ -94,13 +93,6 @@ export default class PrinterManager {
         PrinterManager.applyState(currentPrinter, elements);
         PrinterManager.applyTemps(currentPrinter, elements);
         document.getElementById("printerManagerModal").style.overflow = "auto";
-        //Auto refresh of files
-        // if (refreshCounter >= 5000) {
-        //   FileManager.refreshFiles(currentPrinter);
-        //   refreshCounter = 0;
-        // } else {
-        //   refreshCounter = parseInt(refreshCounter) + 500;
-        // }
       }
     }
   }
