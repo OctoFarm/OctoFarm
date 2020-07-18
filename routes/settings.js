@@ -67,8 +67,10 @@ router.post("/client/update", ensureAuthenticated, (req, res) => {
     checked[0].panelView = panelView;
     checked[0].listView = listView;
     checked[0].cameraView = cameraView;
-    checked[0].save();
-    SettingsClean.start();
+    checked[0].save().then(() => {
+      SettingsClean.start();
+    });
+
     res.send({ msg: "Settings Saved" });
   });
 });
@@ -85,8 +87,9 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
     checked[0].server = req.body.server;
     checked[0].timeout = req.body.timeout;
     checked[0].filament = req.body.filament;
-    SettingsClean.start();
-    await checked[0].save();
+    await checked[0].save().then(() => {
+      SettingsClean.start();
+    });
     res.send({ msg: "Settings Saved" });
   });
 });
