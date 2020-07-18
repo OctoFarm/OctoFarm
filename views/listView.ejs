@@ -15,11 +15,8 @@
             Manage
           </th>
           <th class="sticky-table table-dark" scope="col" width="700px">Current File</th>
-          <th class="sticky-table table-dark" scope="col" width="500px">
-            Filament
-          </th>
           <th class="sticky-table table-dark" scope="col">Status</th>
-          <th class="sticky-table table-dark" scope="col" width="450px">
+          <th class="sticky-table table-dark" scope="col" width="300px">
             Remaining Print Time
           </th>
           <th id="extraInfoPercent" class="sticky-table table-dark d-none" scope="col" width="100px">
@@ -28,14 +25,14 @@
           <th id="extraInfoTitle" class="sticky-table table-dark d-none" scope="col" width="450px">
             ETA
           </th>
-          <th class="sticky-table table-dark" scope="col" width="250px">
-            Tool 0
+          <th class="sticky-table table-dark" scope="col" width="750px">
+            Tools
           </th>
-          <th class="sticky-table table-dark" scope="col" width="200px">Bed</th>
+          <th class="sticky-table table-dark" scope="col" width="250px">Bed / Chamber</th>
         </tr>
         </thead>
         <tbody id="listViewTable" data-jplist-group="printers">
-        <%- include('./partials/Views/listView.ejs') %>
+
         </tbody>
       </table>
     </div>
@@ -44,3 +41,4 @@
 <% }else{ %>
   <%- include('./addPrinters.ejs') %>
 <% } %>
+<script src="/js/listViewRunner.js" type="module"></script>
