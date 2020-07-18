@@ -180,11 +180,8 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
 });
 // Camera view  Page
 router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
-  const printers = Runner.returnFarmPrinters();
-  const sortedPrinters = await Runner.sortedIndex();
-  const farmStatistics = require("../runners/statisticsCollection.js");
-  const FarmStatistics = farmStatistics.StatisticsCollection;
-  const statistics = await FarmStatistics.returnStats();
+  const printers = await Runner.returnFarmPrinters();
+  const sortedIndex = await Runner.sortedIndex();
   const clientSettings = await SettingsClean.returnClientSettings();
   const serverSettings = await SettingsClean.returnSystemSettings();
   let user = null;
@@ -201,23 +198,17 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
     userGroup: group,
     version,
     printers,
-    sortedIndex: sortedPrinters,
-    currentOperations: statistics.currentOperations,
-    currentOperationsCount: statistics.currentOperationsCount,
     printerCount: printers.length,
-    page: "Camera View",
+    sortedIndex,
+    page: "Panel View",
     helpers: prettyHelpers,
     clientSettings,
-    serverSettings,
   });
 });
 // List view  Page
 router.get("/mon/list", ensureAuthenticated, async (req, res) => {
-  const printers = Runner.returnFarmPrinters();
-  const sortedPrinters = await Runner.sortedIndex();
-  const farmStatistics = require("../runners/statisticsCollection.js");
-  const FarmStatistics = farmStatistics.StatisticsCollection;
-  const statistics = await FarmStatistics.returnStats();
+  const printers = await Runner.returnFarmPrinters();
+  const sortedIndex = await Runner.sortedIndex();
   const clientSettings = await SettingsClean.returnClientSettings();
   const serverSettings = await SettingsClean.returnSystemSettings();
   let user = null;
@@ -234,22 +225,17 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
     userGroup: group,
     version,
     printers,
-    sortedIndex: sortedPrinters,
-    currentOperations: statistics.currentOperations,
-    currentOperationsCount: statistics.currentOperationsCount,
     printerCount: printers.length,
-    page: "List View",
+    sortedIndex,
+    page: "Panel View",
     helpers: prettyHelpers,
     clientSettings,
-    serverSettings,
   });
 });
 router.get("/mon/currentOp", ensureAuthenticated, async (req, res) => {
-  const printers = Runner.returnFarmPrinters();
-  const sortedPrinters = await Runner.sortedIndex();
-  const farmStatistics = require("../runners/statisticsCollection.js");
-  const FarmStatistics = farmStatistics.StatisticsCollection;
-  const statistics = await FarmStatistics.returnStats();
+  const printers = await Runner.returnFarmPrinters();
+  const sortedIndex = await Runner.sortedIndex();
+  const clientSettings = await SettingsClean.returnClientSettings();
   const serverSettings = await SettingsClean.returnSystemSettings();
   let user = null;
   let group = null;
@@ -265,12 +251,11 @@ router.get("/mon/currentOp", ensureAuthenticated, async (req, res) => {
     userGroup: group,
     version,
     printers,
-    sortedIndex: sortedPrinters,
-    currentOperations: statistics.currentOperations,
     printerCount: printers.length,
-    currentOperationsCount: statistics.currentOperationsCount,
-    page: "Current Operations View",
+    sortedIndex,
+    page: "Panel View",
     helpers: prettyHelpers,
+    clientSettings,
   });
 });
 router.get("/filament", ensureAuthenticated, async (req, res) => {
