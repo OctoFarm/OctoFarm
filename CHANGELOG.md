@@ -25,6 +25,9 @@ All notable changes to this project will be documented in this file.
     - History now calculates print cost per hour for each print.
     - History statistics now show average cost per hour in the history filters sections
     - New patreon members lactose, scott and jose. Big thanks for your support!
+    - Views now display "Tool #" next to filament if already displayed on the view. 
+    - Panel & list view now displays individual tool numbers and temps associated, bed and chamber will also be shown if enabled.
+    - Camera view will tally your tool numbers temperatures, so all tool# designations are tallied to Tool and Bed and Chamber designations get tallied into Bed.
     
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
@@ -49,6 +52,8 @@ All notable changes to this project will be documented in this file.
         - First re-sync will happen after 1000ms, trigger by file upload/filament change. Second re-sync on file upload first after 10000ms, this isn't always enough for OctoPrint to generate file meta so manual re-sync maybe required after this.
     - Printer Management buttons have been moved to a card body. 
     - Docker no longer installs & updates node_modules on start if the folder exists.
+    - Camera's on OctoFarm now respect the camera enabled setting within OctoPrint. If disabled it will attempt to display the currently selected files thumbnail, failing both the cameraurl and thumbnail url will not load the camera block.
+    - Filament selection has been combined into the Tools header for list view. 
     
 ### Fixed
     - Fix file manager bug with default date sorting.
