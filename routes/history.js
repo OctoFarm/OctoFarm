@@ -86,16 +86,18 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
     }
   }
   history.markModified("printHistory");
-  history.save();
-  HistoryClean.start();
+  history.save().then(() => {
+    HistoryClean.start();
+  });
   res.send("success");
 });
 //Register Handle for Saving printers
 router.post("/delete", ensureAuthenticated, async (req, res) => {
   //Check required fields
   const deleteHistory = req.body;
-  await History.findOneAndDelete({ _id: deleteHistory.id });
-  HistoryClean.start();
+  await History.findOneAndDelete({ _id: deleteHistory.id }).then(() => {
+    HistoryClean.start();
+  });
   res.send("success");
 });
 router.get("/get", ensureAuthenticated, async (req, res) => {
@@ -138,8 +140,10 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
       costSettings: history.printHistory.costSettings,
     };
     history.markModified("printHistory");
-    history.save();
-    HistoryClean.start();
+    history.save().then(() => {
+      HistoryClean.start();
+    });
+
     res.send(send);
   }
 });

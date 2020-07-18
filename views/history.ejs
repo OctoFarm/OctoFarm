@@ -424,17 +424,17 @@
           </td>
           <% let spoolTypes = "" %>
           <% if(history[i].spools !== null){ %>
-          <% history[i].spools.forEach((spool,index) => { %>
-            <% spoolTypes += spool["tool"+index].type+" " %>
+            <% history[i].spools.forEach((spool,index) => { %>
+            <% spoolTypes += spool[Object.keys(spool)[0]].type+" " %>
           <% })%>
           <% } %>
           <td class="spool <%= spoolTypes %>" id="spool-<%= history[i]._id %>">
             <% if(history[i].spools !== null){ %>
               <% history[i].spools.forEach((spool,index) => { %>
-                <%if(spool["tool"+index].spoolName !== null){%>
-                <b><%= spool["tool"+index].toolName %></b>: <p><%= spool["tool"+index].spoolName %></p>
+                <%if(spool[Object.keys(spool)[0]].spoolName !== null){%>
+                <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p><%= spool[Object.keys(spool)[0]].spoolName %></p>
                 <%}else{%>
-                <b><%= spool["tool"+index].toolName %></b>: <p>(No Spool)</p>
+                <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p>(No Spool)</p>
               <%}%>
               <% })%>
             <% } %>
@@ -443,10 +443,10 @@
             <span class="usage" id="usage-<%= history[i]._id %>">
               <% if(history[i].spools !== null){ %>
                 <% history[i].spools.forEach((spool,index) => { %>
-                <%if(spool["tool"+index].spoolName !== null){%>
-                  <b><%= spool["tool"+index].toolName %></b>: <p><%= spool["tool"+index].weight.toFixed(2) %>g / <%= spool["tool"+index].length.toFixed(2) %>m</p>
+                <%if(spool[Object.keys(spool)[0]].spoolName !== null){%>
+                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p><%= spool[Object.keys(spool)[0]].weight.toFixed(2) %>g / <%= spool[Object.keys(spool)[0]].length.toFixed(2) %>m</p>
                 <%}else{%>
-                  <b><%= spool["tool"+index].toolName %></b>: <p>(No Spool)</p>
+                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p>(No Spool)</p>
                 <%}%>
                 <% })%>
               <% } %>
@@ -462,10 +462,10 @@
             <span class="cost" id="cost-<%= history[i]._id %>">
               <% if(history[i].spools !== null){ %>
                 <% history[i].spools.forEach((spool,index) => { %>
-                <%if(spool["tool"+index].spoolName !== null){%>
-                  <b><%= spool["tool"+index].toolName %></b>: <p><%= spool["tool"+index].cost %></p>
+                <%if(spool[Object.keys(spool)[0]].spoolName !== null){%>
+                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p><%= spool[Object.keys(spool)[0]].cost %></p>
                 <%}else{%>
-                  <b><%= spool["tool"+index].toolName %></b>: <p>(No Spool)</p>
+                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p>(No Spool)</p>
                 <%}%>
                 <% })%>
               <% } %>
