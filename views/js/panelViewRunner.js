@@ -11,7 +11,7 @@ import { checkTemps } from "./lib/modules/temperatureCheck.js";
 import { checkFilamentManager } from "./lib/modules/filamentGrab.js";
 
 let powerTimer = 20000;
-const jpInit = false;
+let jpInit = false;
 let dragDropInit = false;
 let groupInit = false;
 let printerControlList = null;
@@ -208,6 +208,10 @@ async function updateState(printer, clientSettings) {
     elements.progress.innerHTML = Math.floor(printer.currentJob.progress) + "%";
     elements.progress.style.width = printer.currentJob.progress + "%";
     elements.progress.classList = `progress-bar progress-bar-striped bg-${printer.printerState.colour.name} percent`;
+  } else {
+    elements.progress.innerHTML = 0 + "%";
+    elements.progress.style.width = 0 + "%";
+    elements.progress.classList = `progress-bar progress-bar-striped bg-dark percent`;
   }
 
   let hideClosed = "";
@@ -490,20 +494,21 @@ function drawPrinter(printer, clientSettings) {
   let enviroment = "";
   if (printer.currentProfile !== null) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += `<p class="mb-0"><b class="contentEditable m-1">Tool ${e} </b><span class="contentEditable m-1" id="${printer._id}-temperature-${e}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span> <span class="contentEditable m-1" id="${printer._id}-spool-${e}"> No Spool </span></p>`;
+      toolList += `<div class="btn-group btn-block m-0" role="group" aria-label="Basic example">`;
+      toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
+      toolList += `</div>`;
     }
+
     if (printer.currentProfile.heatedBed) {
       enviroment += `<small
-      id="panBedTemp-${printer._id}"
     class="mb-0 float-left"
-          >
+          ><b>Bed: </b><span id="panBedTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span>
           </small>`;
     }
     if (printer.currentProfile.heatedChamber) {
       enviroment += `<small
-      id="panChamberTemp-${printer._id}"
     class="mb-0 float-right"
-
+        ><b>Chamber: </b><span  id="panChamberTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span>
           </small>`;
     }
   }
@@ -538,7 +543,7 @@ function drawPrinter(printer, clientSettings) {
                  id="printerWeb-${printer._id}"
                  type="button"
                  class="tag btn btn-info btn-sm float-right mr-1"
-                 target="_blank" href="${printer.printerURL} %>"
+                 target="_blank" href="${printer.printerURL}"
                  role="button">
                 <i class="fas fa-globe-europe"></i>
               </a>
@@ -554,7 +559,7 @@ function drawPrinter(printer, clientSettings) {
               </button>
           </div>
           <div class="card-body pt-1 pb-0 pl-2 pr-2">
-            <div class="d-none index"</div>
+            <div class="d-none index">${printer.sortIndex}</div>
             <button
                     id="panFileName-${printer._id}"
                     type="button"
@@ -669,14 +674,12 @@ function drawPrinter(printer, clientSettings) {
           </div>
 
 
-          <button
-            type="button"
-            class="btn btn-block btn-secondary mb-0  btn-sm"
-            role="button"
+          <div
             id="listFilament-${printer._id}" disabled
+            class="bg-dark"
           >
            ${toolList}
-          </button>
+          </div>
 
           <div class="card-footer text-muted dashFooter">
                 ${enviroment}
@@ -772,25 +775,26 @@ function drawPrinter(printer, clientSettings) {
 async function init(printers, clientSettings) {
   for (let p = 0; p < printers.length; p++) {
     if (!document.getElementById("viewPanel-" + printers[p]._id)) {
-      drawPrinter(printers[p], clientSettings);
+      if (!jpInit) {
+        drawPrinter(printers[p], clientSettings);
+      }
     } else {
       updateState(printers[p], clientSettings);
     }
   }
-  // if (jpInit) {
-  //   console.log("UPDATE");
-  //   const fullscreenElement =
-  //     document.fullscreenElement ||
-  //     document.mozFullScreenElement ||
-  //     document.webkitFullscreenElement;
-  //   if (!fullscreenElement) {
-  //     jplist.refresh();
-  //   }
-  // } else {
-  //   jpInit = true;
-  //   await jplist.init({
-  //     storage: "localStorage", //'localStorage', 'sessionStorage' or 'cookies'
-  //     storageName: "view-storage",
-  //   });
-  // }
+  if (jpInit) {
+    const fullscreenElement =
+      document.fullscreenElement ||
+      document.mozFullScreenElement ||
+      document.webkitFullscreenElement;
+    if (!fullscreenElement) {
+      jplist.refresh();
+    }
+  } else {
+    jpInit = true;
+    await jplist.init({
+      storage: "localStorage", //'localStorage', 'sessionStorage' or 'cookies'
+      storageName: "view-storage",
+    });
+  }
 }
