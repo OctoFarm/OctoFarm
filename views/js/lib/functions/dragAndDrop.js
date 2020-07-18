@@ -2,8 +2,13 @@ import FileManager from "../modules/fileManager.js";
 import UI from "./ui.js";
 import Validate from "./validate.js";
 
-export async function dragAndDropEnable(element, printer) {
-  console.log();
+let activeFile = false;
+
+export async function dragCheck() {
+  return activeFile;
+}
+
+export function dragAndDropEnable(element, printer) {
   const dropArea = document.getElementById(element.id);
   // Prevent default drag behaviors
   ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
@@ -16,6 +21,7 @@ export async function dragAndDropEnable(element, printer) {
     dropArea.addEventListener(
       eventName,
       (event) => {
+        activeFile = true;
         highlight(event, element);
       },
       false
@@ -25,6 +31,7 @@ export async function dragAndDropEnable(element, printer) {
     dropArea.addEventListener(
       eventName,
       (event) => {
+        activeFile = false;
         unhighlight(event, element);
       },
       false
