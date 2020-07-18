@@ -159,8 +159,6 @@ class HistoryCollection {
                 return o._id == printer.selectedFilament[index].spools.profile;
               });
             }
-            printer.previousFilamentSelection[index].spools.profile =
-              profiles[profileId].profile;
             printer.selectedFilament[index].spools.profile =
               profiles[profileId].profile;
           }
@@ -292,8 +290,6 @@ class HistoryCollection {
                 return o._id == printer.selectedFilament[index].spools.profile;
               });
             }
-            printer.previousFilamentSelection[index].spools.profile =
-              profiles[profileId].profile;
             printer.selectedFilament[index].spools.profile =
               profiles[profileId].profile;
           }

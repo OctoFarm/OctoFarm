@@ -22,7 +22,6 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
     history.printHistory.notes = note;
   }
   for (let f = 0; f < filamentId.length; f++) {
-    console.log(history.printHistory.filamentSelection);
     if (Array.isArray(history.printHistory.filamentSelection)) {
       if (
         typeof history.printHistory.filamentSelection[f] !== "undefined" &&
