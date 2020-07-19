@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 # [UnReleased]
 
+## [v1.1.5.6 - RC2]
+
+### Added
+  
+### Changed
+
+### Fixed
+    - Fixed Add Printer table not clearing correctly.
+    
+### Removed
+   
+
 ## [v1.1.5.6 - RC1]
 
 ### Added
