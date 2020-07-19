@@ -145,21 +145,11 @@ function grabElements(printer) {
 async function updateState(printer, clientSettings) {
   const elements = grabElements(printer);
   elements.state.innerHTML = printer.printerState.state;
-  elements.state.classList = "p-0 " + printer.printerState.colour.category;
+  elements.state.classList = printer.printerState.colour.category;
   elements.name.innerHTML = printer.printerName;
-  elements.row.classList = "p-0 " + printer.printerState.colour.category;
+  elements.row.classList = printer.printerState.colour.category;
 
   if (clientSettings.extraInfo) {
-    if (typeof printer.currentJob !== "undefined") {
-      elements.percent.innerHTML =
-        Math.floor(printer.currentJob.progress) + "%";
-
-      elements.progress.style.width = printer.currentJob.progress + "%";
-    } else {
-      elements.percent.innerHTML = 0 + "%";
-
-      elements.progress.style.width = 0 + "%";
-    }
     elements.progress.classList = `progress-bar progress-bar-striped bg-${printer.printerState.colour.name}`;
     if (elements.extraInfoCol.classList.contains("d-none")) {
       elements.extraInfoCol.classList.remove("d-none");
@@ -173,33 +163,40 @@ async function updateState(printer, clientSettings) {
     if (elements.extraInfoTitle.classList.contains("d-none")) {
       elements.extraInfoTitle.classList.remove("d-none");
     }
+  }
+  if (typeof printer.currentJob !== "undefined") {
+    elements.percent.innerHTML = Math.floor(printer.currentJob.progress) + "%";
 
-    if (
-      typeof printer.currentJob !== "undefined" &&
-      printer.currentJob.printTimeRemaining !== null
-    ) {
-      let currentDate = new Date();
-      currentDate = currentDate.getTime();
-      const futureDateString = new Date(
-        currentDate + printer.currentJob.printTimeRemaining * 1000
-      ).toDateString();
-      let futureTimeString = new Date(
-        currentDate + printer.currentJob.printTimeRemaining * 1000
-      ).toTimeString();
-      futureTimeString = futureTimeString.substring(0, 8);
-      const dateComplete = futureDateString + ": " + futureTimeString;
-      elements.printTime.innerHTML = `
+    elements.progress.style.width = printer.currentJob.progress + "%";
+  } else {
+    elements.percent.innerHTML = 0 + "%";
+
+    elements.progress.style.width = 0 + "%";
+  }
+  if (
+    typeof printer.currentJob !== "undefined" &&
+    printer.currentJob.printTimeRemaining !== null
+  ) {
+    let currentDate = new Date();
+    currentDate = currentDate.getTime();
+    const futureDateString = new Date(
+      currentDate + printer.currentJob.printTimeRemaining * 1000
+    ).toDateString();
+    let futureTimeString = new Date(
+      currentDate + printer.currentJob.printTimeRemaining * 1000
+    ).toTimeString();
+    futureTimeString = futureTimeString.substring(0, 8);
+    const dateComplete = futureDateString + ": " + futureTimeString;
+    elements.printTime.innerHTML = `
           ${Calc.generateTime(printer.currentJob.printTimeRemaining)}
         `;
-      elements.eta.innerHTML = dateComplete;
-    } else {
-      elements.printTime.innerHTML = `
+    elements.eta.innerHTML = dateComplete;
+  } else {
+    elements.printTime.innerHTML = `
           ${Calc.generateTime(null)}
         `;
-      elements.eta.innerHTML = "N/A";
-    }
+    elements.eta.innerHTML = "N/A";
   }
-
   if (typeof printer.currentJob !== "undefined") {
     elements.currentFile.setAttribute("title", printer.currentJob.filePath);
     elements.currentFile.innerHTML =
@@ -272,12 +269,9 @@ async function updateState(printer, clientSettings) {
       if (printer.selectedFilament[i] !== null) {
         const filamentManager = await checkFilamentManager();
         if (filamentManager) {
-          tool.innerHTML = `${printer.selectedFilament[i].spools.name} - ${(
-            printer.selectedFilament[i].spools.weight -
-            printer.selectedFilament[i].spools.used
-          ).toFixed(2)}g - ${printer.selectedFilament[i].spools.material}`;
+          tool.innerHTML = `${printer.selectedFilament[i].spools.material}`;
         } else {
-          tool.innerHTML = `${printer.selectedFilament[i].spools.name} - ${printer.selectedFilament[i].spools.material}`;
+          tool.innerHTML = `${printer.selectedFilament[i].spools.material}`;
         }
       } else {
         tool.innerHTML = `No Spool`;
@@ -408,7 +402,7 @@ function drawPrinter(printer, clientSettings) {
           <td id="listSortIndex-${printer._id}" class="index">
             ${printer.sortIndex}
           </td>
-          <td id="listName-${printer._id}" class="p-0 ${printer.group.replace(
+          <td id="listName-${printer._id}" class="${printer.group.replace(
     / /g,
     "_"
   )}">

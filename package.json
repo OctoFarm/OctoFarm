@@ -52,6 +52,7 @@
     "remove": "^0.1.5",
     "systeminformation": "^4.26.10",
     "tablefilter": "^0.7.2",
+    "wakeonlan": "^0.1.0",
     "winston": "^3.3.3",
     "ws": "^7.3.1",
     "yieldable-json": "^2.0.0"
@@ -63,9 +64,13 @@
     "eslint": "^7.4.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-config-prettier": "^6.11.0",
+    "eslint-config-standard": "^14.1.1",
     "eslint-plugin-ejs-js": "^0.1.0",
     "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^3.1.4",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
     "nodemon": "^2.0.4"
   },
   "engineStrict": true,

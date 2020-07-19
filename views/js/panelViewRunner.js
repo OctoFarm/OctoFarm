@@ -1,102 +1,102 @@
-import OctoPrintClient from "./lib/octoprint.js";
-import UI from "./lib/functions/ui.js";
-import Calc from "./lib/functions/calc.js";
-import currentOperations from "./lib/modules/currentOperations.js";
-import PrinterManager from "./lib/modules/printerManager.js";
-import doubleClickFullScreen from "./lib/functions/fullscreen.js";
-import initGroupSelect from "./lib/modules/groupSelection.js";
-import PowerButton from "./lib/modules/powerButton.js";
-import { dragAndDropEnable, dragCheck } from "./lib/functions/dragAndDrop.js";
-import { checkTemps } from "./lib/modules/temperatureCheck.js";
-import { checkFilamentManager } from "./lib/modules/filamentGrab.js";
+import OctoPrintClient from './lib/octoprint.js'
+import UI from './lib/functions/ui.js'
+import Calc from './lib/functions/calc.js'
+import currentOperations from './lib/modules/currentOperations.js'
+import PrinterManager from './lib/modules/printerManager.js'
+import doubleClickFullScreen from './lib/functions/fullscreen.js'
+import initGroupSelect from './lib/modules/groupSelection.js'
+import PowerButton from './lib/modules/powerButton.js'
+import { dragAndDropEnable, dragCheck } from './lib/functions/dragAndDrop.js'
+import { checkTemps } from './lib/modules/temperatureCheck.js'
+import { checkFilamentManager } from './lib/modules/filamentGrab.js'
 
-let powerTimer = 20000;
-let jpInit = false;
-let dragDropInit = false;
-let groupInit = false;
-let printerControlList = null;
-let printerInfo = "";
-const elems = [];
+let powerTimer = 20000
+let jpInit = false
+let dragDropInit = false
+let groupInit = false
+let printerControlList = null
+let printerInfo = ''
+const elems = []
 
-let worker = null;
-//Setup webWorker
+let worker = null
+// Setup webWorker
 if (window.Worker) {
   // Yes! Web worker support!
   try {
     if (worker === null) {
-      worker = new Worker("/js/lib/modules/workers/monitoringViewsWorker.js");
+      worker = new Worker('/js/lib/modules/workers/monitoringViewsWorker.js')
       worker.onmessage = async function (event) {
         if (event.data != false) {
-          printerInfo = event.data.printersInformation;
-          printerControlList = event.data.printerControlList;
+          printerInfo = event.data.printersInformation
+          printerControlList = event.data.printerControlList
           if (groupInit === false) {
-            initGroupSelect(event.data.printersInformation);
-            groupInit = true;
+            initGroupSelect(event.data.printersInformation)
+            groupInit = true
           }
           if (dragDropInit === false) {
-            const printerList = document.querySelectorAll("[id^='viewPanel-']");
+            const printerList = document.querySelectorAll("[id^='viewPanel-']")
             printerList.forEach((list) => {
-              const ca = list.id.split("-");
+              const ca = list.id.split('-')
               const zeeIndex = _.findIndex(printerInfo, function (o) {
-                return o._id == ca[1];
-              });
-              dragAndDropEnable(list, event.data.printersInformation[zeeIndex]);
-              dragDropInit = true;
-            });
+                return o._id == ca[1]
+              })
+              dragAndDropEnable(list, event.data.printersInformation[zeeIndex])
+              dragDropInit = true
+            })
           }
           if (event.data != false) {
             if (
               document
-                .getElementById("printerManagerModal")
-                .classList.contains("show")
+                .getElementById('printerManagerModal')
+                .classList.contains('show')
             ) {
               PrinterManager.init(
-                "",
+                '',
                 event.data.printersInformation,
                 event.data.printerControlList
-              );
+              )
             } else {
-              printerInfo = event.data.printersInformation;
+              printerInfo = event.data.printersInformation
               if (powerTimer >= 20000) {
                 event.data.printersInformation.forEach((printer) => {
-                  PowerButton.applyBtn(printer);
-                });
-                powerTimer = 0;
+                  PowerButton.applyBtn(printer)
+                })
+                powerTimer = 0
               } else {
-                powerTimer += 500;
+                powerTimer += 500
               }
               if (event.data.clientSettings.panelView.currentOp) {
                 currentOperations(
                   event.data.currentOperations.operations,
                   event.data.currentOperations.count,
                   printerInfo
-                );
+                )
               }
               if (!(await dragCheck())) {
                 init(
                   event.data.printersInformation,
                   event.data.clientSettings.panelView,
                   event.data.printerControlList
-                );
+                )
               }
             }
           }
         } else {
           UI.createAlert(
-            "error",
-            "Communication with the server has been suddenly lost, trying to re-establish connection...",
+            'error',
+            'Communication with the server has been suddenly lost, trying to re-establish connection...',
             10000,
-            "Clicked"
-          );
+            'Clicked'
+          )
         }
-      };
+      }
     }
   } catch (e) {
-    console.log(e);
+    console.log(e)
   }
 } else {
   // Sorry! No Web Worker support..
-  console.log("Web workers not available... sorry!");
+  console.log('Web workers not available... sorry!')
 }
 
 // source.onmessage = async function(e) {
@@ -117,140 +117,140 @@ if (window.Worker) {
 // source.onclose = function(e) {
 // };
 const returnPrinterInfo = (id) => {
-  if (typeof id !== "undefined") {
+  if (typeof id !== 'undefined') {
     const zeeIndex = _.findIndex(printerInfo, function (o) {
-      return o._id == id;
-    });
-    return printerInfo[zeeIndex];
+      return o._id == id
+    })
+    return printerInfo[zeeIndex]
   } else {
-    return printerInfo;
-  }
-};
-
-function grabElements(printer) {
-  if (typeof elems[printer._id] !== "undefined") {
-    return elems[printer._id];
-  } else {
-    const printerElemens = {
-      row: document.getElementById("viewPanel-" + printer._id),
-      index: document.getElementById("panIndex-" + printer._id),
-      name: document.getElementById("panName-" + printer._id),
-      control: document.getElementById("printerButton-" + printer._id),
-      start: document.getElementById("panPrintStart-" + printer._id),
-      stop: document.getElementById("panStop-" + printer._id),
-      restart: document.getElementById("panRestart-" + printer._id),
-      pause: document.getElementById("panPrintPause-" + printer._id),
-      resume: document.getElementById("panResume-" + printer._id),
-      camera: document.getElementById("panCamera" + printer._id),
-      currentFile: document.getElementById("panFileName-" + printer._id),
-      filament: document.getElementById("listFilament-" + printer._id),
-      state: document.getElementById("panState-" + printer._id),
-      progress: document.getElementById("panProgress-" + printer._id),
-      bed: document.getElementById("panBedTemp-" + printer._id),
-      chamber: document.getElementById("panChamberTemp-" + printer._id),
-      extraInfo: document.getElementById("extraInfo-" + printer._id),
-      timeRemaining: document.getElementById("timeRemaining-" + printer._id),
-      eta: document.getElementById("eta-" + printer._id),
-    };
-    elems[printer._id] = printerElemens;
-    return elems[printer._id];
+    return printerInfo
   }
 }
-async function updateState(printer, clientSettings) {
-  const elements = grabElements(printer);
-  elements.state.innerHTML = printer.printerState.state;
-  elements.state.className = `btn btn-block ${printer.printerState.colour.category} mb-1 mt-1`;
+
+function grabElements (printer) {
+  if (typeof elems[printer._id] !== 'undefined') {
+    return elems[printer._id]
+  } else {
+    const printerElemens = {
+      row: document.getElementById('viewPanel-' + printer._id),
+      index: document.getElementById('panIndex-' + printer._id),
+      name: document.getElementById('panName-' + printer._id),
+      control: document.getElementById('printerButton-' + printer._id),
+      start: document.getElementById('panPrintStart-' + printer._id),
+      stop: document.getElementById('panStop-' + printer._id),
+      restart: document.getElementById('panRestart-' + printer._id),
+      pause: document.getElementById('panPrintPause-' + printer._id),
+      resume: document.getElementById('panResume-' + printer._id),
+      camera: document.getElementById('panCamera' + printer._id),
+      currentFile: document.getElementById('panFileName-' + printer._id),
+      filament: document.getElementById('listFilament-' + printer._id),
+      state: document.getElementById('panState-' + printer._id),
+      progress: document.getElementById('panProgress-' + printer._id),
+      bed: document.getElementById('panBedTemp-' + printer._id),
+      chamber: document.getElementById('panChamberTemp-' + printer._id),
+      extraInfo: document.getElementById('extraInfo-' + printer._id),
+      timeRemaining: document.getElementById('timeRemaining-' + printer._id),
+      eta: document.getElementById('eta-' + printer._id)
+    }
+    elems[printer._id] = printerElemens
+    return elems[printer._id]
+  }
+}
+async function updateState (printer, clientSettings) {
+  const elements = grabElements(printer)
+  elements.state.innerHTML = printer.printerState.state
+  elements.state.className = `btn btn-block ${printer.printerState.colour.category} mb-1 mt-1`
   elements.index.innerHTML = `
         <h6 class="float-left mb-0" id="panIndex-${printer._id}">
           <button id="panName-1" type="button" class="btn btn-secondary mb-0" role="button" disabled="">
             ${printer.printerName}
           </button>
         </h6>
-        `;
+        `
   if (clientSettings.extraInfo) {
-    if (elements.extraInfo.classList.contains("d-none")) {
-      elements.extraInfo.classList.remove("d-none");
+    if (elements.extraInfo.classList.contains('d-none')) {
+      elements.extraInfo.classList.remove('d-none')
     }
 
     if (
-      typeof printer.currentJob !== "undefined" &&
+      typeof printer.currentJob !== 'undefined' &&
       printer.currentJob.printTimeRemaining !== null
     ) {
-      let currentDate = new Date();
-      currentDate = currentDate.getTime();
+      let currentDate = new Date()
+      currentDate = currentDate.getTime()
       const futureDateString = new Date(
         currentDate + printer.currentJob.printTimeRemaining * 1000
-      ).toDateString();
+      ).toDateString()
       let futureTimeString = new Date(
         currentDate + printer.currentJob.printTimeRemaining * 1000
-      ).toTimeString();
-      futureTimeString = futureTimeString.substring(0, 8);
-      const dateComplete = futureDateString + ": " + futureTimeString;
+      ).toTimeString()
+      futureTimeString = futureTimeString.substring(0, 8)
+      const dateComplete = futureDateString + ': ' + futureTimeString
       elements.timeRemaining.innerHTML = `
           ${Calc.generateTime(printer.currentJob.printTimeRemaining)}
-        `;
-      elements.eta.innerHTML = dateComplete;
+        `
+      elements.eta.innerHTML = dateComplete
     } else {
       elements.timeRemaining.innerHTML = `
           ${Calc.generateTime(null)}
-        `;
-      elements.eta.innerHTML = "N/A";
+        `
+      elements.eta.innerHTML = 'N/A'
     }
   }
 
-  if (typeof printer.currentJob !== "undefined") {
-    elements.currentFile.setAttribute("title", printer.currentJob.filePath);
+  if (typeof printer.currentJob !== 'undefined') {
+    elements.currentFile.setAttribute('title', printer.currentJob.filePath)
     elements.currentFile.innerHTML =
-      '<i class="fas fa-file-code"></i> ' + printer.currentJob.filePath;
+      '<i class="fas fa-file-code"></i> ' + printer.currentJob.filePath
   }
 
-  if (typeof printer.currentJob !== "undefined") {
-    elements.progress.innerHTML = Math.floor(printer.currentJob.progress) + "%";
-    elements.progress.style.width = printer.currentJob.progress + "%";
-    elements.progress.classList = `progress-bar progress-bar-striped bg-${printer.printerState.colour.name} percent`;
+  if (typeof printer.currentJob !== 'undefined') {
+    elements.progress.innerHTML = Math.floor(printer.currentJob.progress) + '%'
+    elements.progress.style.width = printer.currentJob.progress + '%'
+    elements.progress.classList = `progress-bar progress-bar-striped bg-${printer.printerState.colour.name} percent`
   } else {
-    elements.progress.innerHTML = 0 + "%";
-    elements.progress.style.width = 0 + "%";
-    elements.progress.classList = `progress-bar progress-bar-striped bg-dark percent`;
+    elements.progress.innerHTML = 0 + '%'
+    elements.progress.style.width = 0 + '%'
+    elements.progress.classList = 'progress-bar progress-bar-striped bg-dark percent'
   }
 
-  let hideClosed = "";
-  let hideOffline = "";
+  let hideClosed = ''
+  let hideOffline = ''
   if (clientSettings.hideOff) {
-    hideOffline = "hidden";
+    hideOffline = 'hidden'
   }
   if (clientSettings.hideClosed) {
-    hideClosed = "hidden";
+    hideClosed = 'hidden'
   }
-  let dNone = "";
-  if (elements.row.classList.contains("d-none")) {
-    dNone = "d-none";
+  let dNone = ''
+  if (elements.row.classList.contains('d-none')) {
+    dNone = 'd-none'
   }
   if (printer.tools !== null) {
-    const toolKeys = Object.keys(printer.tools[0]);
+    const toolKeys = Object.keys(printer.tools[0])
     for (let t = 0; t < toolKeys.length; t++) {
-      if (toolKeys[t].includes("tool")) {
-        const toolNumber = toolKeys[t].replace("tool", "");
+      if (toolKeys[t].includes('tool')) {
+        const toolNumber = toolKeys[t].replace('tool', '')
         if (
-          document.getElementById(printer._id + "-temperature-" + toolNumber)
+          document.getElementById(printer._id + '-temperature-' + toolNumber)
         ) {
           checkTemps(
-            document.getElementById(printer._id + "-temperature-" + toolNumber),
+            document.getElementById(printer._id + '-temperature-' + toolNumber),
             printer.tools[0][toolKeys[t]].actual,
             printer.tools[0][toolKeys[t]].target,
             printer.otherSettings.temperatureTriggers,
             printer.printerState.colour.category
-          );
+          )
         } else {
           checkTemps(
-            document.getElementById(printer._id + "-temperature-" + toolNumber),
+            document.getElementById(printer._id + '-temperature-' + toolNumber),
             0,
             0,
             printer.otherSettings.temperatureTriggers,
             printer.printerState.colour.category
-          );
+          )
         }
-      } else if (toolKeys[t].includes("bed")) {
+      } else if (toolKeys[t].includes('bed')) {
         if (elements.bed) {
           checkTemps(
             elements.bed,
@@ -258,9 +258,9 @@ async function updateState(printer, clientSettings) {
             printer.tools[0][toolKeys[t]].target,
             printer.otherSettings.temperatureTriggers,
             printer.printerState.colour.category
-          );
+          )
         }
-      } else if (toolKeys[t].includes("chamber")) {
+      } else if (toolKeys[t].includes('chamber')) {
         if (elements.chamber) {
           checkTemps(
             elements.chamber,
@@ -268,186 +268,185 @@ async function updateState(printer, clientSettings) {
             printer.tools[0][toolKeys[t]].target,
             printer.otherSettings.temperatureTriggers,
             printer.printerState.colour.category
-          );
+          )
         }
       }
     }
   }
   if (Array.isArray(printer.selectedFilament)) {
-    const spoolList = "";
+    const spoolList = ''
     for (let i = 0; i < printer.selectedFilament.length; i++) {
-      const tool = document.getElementById(`${printer._id}-spool-${i}`);
-      if (printer.selectedFilament[i] !== null) {
-        const filamentManager = await checkFilamentManager();
-        if (filamentManager) {
-          tool.innerHTML = `${printer.selectedFilament[i].spools.name} - ${(
-            printer.selectedFilament[i].spools.weight -
-            printer.selectedFilament[i].spools.used
-          ).toFixed(2)}g - ${printer.selectedFilament[i].spools.material}`;
+      const tool = document.getElementById(`${printer._id}-spool-${i}`)
+      if (tool) {
+        if (printer.selectedFilament[i] !== null) {
+          const filamentManager = await checkFilamentManager()
+          if (filamentManager) {
+            tool.innerHTML = `${printer.selectedFilament[i].spools.material}`
+          } else {
+            tool.innerHTML = `${printer.selectedFilament[i].spools.material}`
+          }
         } else {
-          tool.innerHTML = `${printer.selectedFilament[i].spools.name} - ${printer.selectedFilament[i].spools.material}`;
+          tool.innerHTML = 'No Spool'
         }
-      } else {
-        tool.innerHTML = `No Spool`;
       }
     }
   } else {
   }
-  //Set the state
-  if (printer.printerState.colour.category === "Active") {
-    if (printer.camURL != "") {
-      elements.row.className = "col-sm-12 col-md-4 col-lg-3 col-xl-2 " + dNone;
+  // Set the state
+  if (printer.printerState.colour.category === 'Active') {
+    if (printer.camURL != '') {
+      elements.row.className = 'col-sm-12 col-md-4 col-lg-3 col-xl-2 ' + dNone
     }
-    elements.control.disabled = false;
-    elements.start.disabled = true;
-    elements.stop.disabled = false;
-    if (printer.printerState.state === "Pausing") {
-      elements.pause.disabled = true;
-      elements.resume.disabled = true;
-      elements.restart.disabled = true;
-      elements.start.classList.remove("hidden");
-      elements.pause.classList.remove("hidden");
-      elements.resume.classList.add("hidden");
-      elements.restart.classList.add("hidden");
-    } else if (printer.printerState.state === "Paused") {
-      elements.pause.disabled = true;
-      elements.resume.disabled = false;
-      elements.restart.disabled = false;
-      elements.start.classList.add("hidden");
-      elements.pause.classList.add("hidden");
-      elements.resume.classList.remove("hidden");
-      elements.restart.classList.remove("hidden");
+    elements.control.disabled = false
+    elements.start.disabled = true
+    elements.stop.disabled = false
+    if (printer.printerState.state === 'Pausing') {
+      elements.pause.disabled = true
+      elements.resume.disabled = true
+      elements.restart.disabled = true
+      elements.start.classList.remove('hidden')
+      elements.pause.classList.remove('hidden')
+      elements.resume.classList.add('hidden')
+      elements.restart.classList.add('hidden')
+    } else if (printer.printerState.state === 'Paused') {
+      elements.pause.disabled = true
+      elements.resume.disabled = false
+      elements.restart.disabled = false
+      elements.start.classList.add('hidden')
+      elements.pause.classList.add('hidden')
+      elements.resume.classList.remove('hidden')
+      elements.restart.classList.remove('hidden')
     } else {
-      elements.start.classList.remove("hidden");
-      elements.pause.classList.remove("hidden");
-      elements.resume.classList.add("hidden");
-      elements.restart.classList.add("hidden");
-      elements.pause.disabled = false;
-      elements.resume.disabled = true;
-      elements.restart.disabled = true;
+      elements.start.classList.remove('hidden')
+      elements.pause.classList.remove('hidden')
+      elements.resume.classList.add('hidden')
+      elements.restart.classList.add('hidden')
+      elements.pause.disabled = false
+      elements.resume.disabled = true
+      elements.restart.disabled = true
     }
   } else if (
-    printer.printerState.colour.category === "Idle" ||
-    printer.printerState.colour.category === "Complete"
+    printer.printerState.colour.category === 'Idle' ||
+    printer.printerState.colour.category === 'Complete'
   ) {
-    if (printer.camURL != "") {
-      elements.row.className = "col-sm-12 col-md-4 col-lg-3 col-xl-2 " + dNone;
+    if (printer.camURL != '') {
+      elements.row.className = 'col-sm-12 col-md-4 col-lg-3 col-xl-2 ' + dNone
     }
-    elements.control.disabled = false;
+    elements.control.disabled = false
     if (
       printer.currentJob !== null &&
-      printer.currentJob.fileName !== "No File Selected"
+      printer.currentJob.fileName !== 'No File Selected'
     ) {
-      elements.start.disabled = false;
-      elements.stop.disabled = true;
-      elements.pause.disabled = true;
-      elements.resume.disabled = true;
-      elements.restart.disabled = true;
+      elements.start.disabled = false
+      elements.stop.disabled = true
+      elements.pause.disabled = true
+      elements.resume.disabled = true
+      elements.restart.disabled = true
     } else {
-      elements.start.disabled = true;
-      elements.stop.disabled = true;
-      elements.pause.disabled = true;
-      elements.resume.disabled = true;
-      elements.restart.disabled = true;
+      elements.start.disabled = true
+      elements.stop.disabled = true
+      elements.pause.disabled = true
+      elements.resume.disabled = true
+      elements.restart.disabled = true
     }
-    if (printer.printerState.state === "Paused") {
-      elements.pause.disabled = true;
-      elements.resume.disabled = false;
-      elements.restart.disabled = false;
-      elements.start.classList.add("hidden");
-      elements.pause.classList.add("hidden");
-      elements.resume.classList.remove("hidden");
-      elements.restart.classList.remove("hidden");
+    if (printer.printerState.state === 'Paused') {
+      elements.pause.disabled = true
+      elements.resume.disabled = false
+      elements.restart.disabled = false
+      elements.start.classList.add('hidden')
+      elements.pause.classList.add('hidden')
+      elements.resume.classList.remove('hidden')
+      elements.restart.classList.remove('hidden')
     } else {
-      elements.start.classList.remove("hidden");
-      elements.pause.classList.remove("hidden");
-      elements.resume.classList.add("hidden");
-      elements.restart.classList.add("hidden");
-      elements.pause.disabled = true;
-      elements.resume.disabled = true;
-      elements.restart.disabled = true;
+      elements.start.classList.remove('hidden')
+      elements.pause.classList.remove('hidden')
+      elements.resume.classList.add('hidden')
+      elements.restart.classList.add('hidden')
+      elements.pause.disabled = true
+      elements.resume.disabled = true
+      elements.restart.disabled = true
     }
-    if (printer.printerState.colour.category === "Complete") {
+    if (printer.printerState.colour.category === 'Complete') {
     }
-  } else if (printer.printerState.state === "Disconnected") {
-    if (printer.camURL != "") {
+  } else if (printer.printerState.state === 'Disconnected') {
+    if (printer.camURL != '') {
       elements.row.className =
-        "col-sm-12 col-md-4 col-lg-3 col-xl-2" + " " + hideClosed + " " + dNone;
+        'col-sm-12 col-md-4 col-lg-3 col-xl-2' + ' ' + hideClosed + ' ' + dNone
     }
 
-    elements.control.disabled = false;
-    elements.start.disabled = true;
-    elements.stop.disabled = true;
-    elements.pause.disabled = true;
-    elements.resume.disabled = true;
-    elements.restart.disabled = true;
-    elements.start.classList.remove("hidden");
-    elements.pause.classList.remove("hidden");
-    elements.resume.classList.add("hidden");
-    elements.restart.classList.add("hidden");
-  } else if (printer.printerState.colour.category === "Offline") {
-    if (printer.camURL != "") {
+    elements.control.disabled = false
+    elements.start.disabled = true
+    elements.stop.disabled = true
+    elements.pause.disabled = true
+    elements.resume.disabled = true
+    elements.restart.disabled = true
+    elements.start.classList.remove('hidden')
+    elements.pause.classList.remove('hidden')
+    elements.resume.classList.add('hidden')
+    elements.restart.classList.add('hidden')
+  } else if (printer.printerState.colour.category === 'Offline') {
+    if (printer.camURL != '') {
       elements.row.className =
-        "col-sm-12 col-md-4 col-lg-3 col-xl-2" +
-        " " +
+        'col-sm-12 col-md-4 col-lg-3 col-xl-2' +
+        ' ' +
         hideOffline +
-        " " +
-        dNone;
+        ' ' +
+        dNone
     }
 
-    elements.control.disabled = true;
-    elements.start.disabled = true;
-    elements.stop.disabled = true;
-    elements.pause.disabled = true;
-    elements.resume.disabled = true;
-    elements.restart.disabled = true;
-    elements.start.classList.remove("hidden");
-    elements.pause.classList.remove("hidden");
-    elements.resume.classList.add("hidden");
-    elements.restart.classList.add("hidden");
+    elements.control.disabled = true
+    elements.start.disabled = true
+    elements.stop.disabled = true
+    elements.pause.disabled = true
+    elements.resume.disabled = true
+    elements.restart.disabled = true
+    elements.start.classList.remove('hidden')
+    elements.pause.classList.remove('hidden')
+    elements.resume.classList.add('hidden')
+    elements.restart.classList.add('hidden')
   }
 }
-function drawPrinter(printer, clientSettings) {
-  let hidden = "";
+function drawPrinter (printer, clientSettings) {
+  let hidden = ''
   if (
-    printer.printerState.colour.category === "Offline" &&
+    printer.printerState.colour.category === 'Offline' &&
     clientSettings.hideOff
   ) {
-    hidden = "hidden";
+    hidden = 'hidden'
   } else if (
-    printer.printerState.colour.category === "Disconnected" &&
+    printer.printerState.colour.category === 'Disconnected' &&
     clientSettings.hideClosed
   ) {
-    hidden = "hidden";
+    hidden = 'hidden'
   }
-  let flipH = "";
-  let flipV = "";
-  let rotate90 = "";
+  let flipH = ''
+  let flipV = ''
+  let rotate90 = ''
   if (printer.otherSettings.webCamSettings !== null) {
     if (printer.otherSettings.webCamSettings.flipH) {
-      flipH = "rotateY(180deg)";
+      flipH = 'rotateY(180deg)'
     } else if (printer.otherSettings.webCamSettings.flipV) {
-      flipV = "rotateX(180deg)";
+      flipV = 'rotateX(180deg)'
     } else if (printer.otherSettings.webCamSettings.rotate90) {
-      rotate90 = "rotate(90deg)";
+      rotate90 = 'rotate(90deg)'
     }
   }
 
-  let name = printer.printerName;
-  if (name.includes("http://")) {
-    name = name.replace("http://", "");
-  } else if (name.includes("https://")) {
-    name = name.replace("https://", "");
+  let name = printer.printerName
+  if (name.includes('http://')) {
+    name = name.replace('http://', '')
+  } else if (name.includes('https://')) {
+    name = name.replace('https://', '')
   }
-  let cameraBlock = "";
+  let cameraBlock = ''
   if (
     printer.otherSettings.webCamSettings !== null &&
     printer.otherSettings.webCamSettings.webcamEnabled
   ) {
     if (
-      typeof printer.cameraURL !== "undefined" &&
+      typeof printer.cameraURL !== 'undefined' &&
       printer.cameraURL !== null &&
-      printer.cameraURL !== ""
+      printer.cameraURL !== ''
     ) {
       cameraBlock = `
       <img
@@ -457,10 +456,10 @@ function drawPrinter(printer, clientSettings) {
       style="transform: ${flipH} ${flipV} ${rotate90}; pointer-events: none;"
       src="${printer.cameraURL}"
       />
-  `;
+  `
     } else {
       if (
-        typeof printer.currentJob !== "undefined" &&
+        typeof printer.currentJob !== 'undefined' &&
         printer.currentJob.thumbnail !== null
       ) {
         cameraBlock = `
@@ -471,12 +470,12 @@ function drawPrinter(printer, clientSettings) {
       style="transform: ${flipH} ${flipV} ${rotate90}; pointer-events: none;"
       src="${printer.printerURL}/${printer.currentJob.thumbnail}"
       />
-  `;
+  `
       }
     }
   } else {
     if (
-      typeof printer.currentJob !== "undefined" &&
+      typeof printer.currentJob !== 'undefined' &&
       printer.currentJob.thumbnail !== null
     ) {
       cameraBlock = `
@@ -487,29 +486,29 @@ function drawPrinter(printer, clientSettings) {
       style="transform: ${flipH} ${flipV} ${rotate90}; pointer-events: none;"
       src="${printer.printerURL}/${printer.currentJob.thumbnail}"
       />
-  `;
+  `
     }
   }
-  let toolList = "";
-  let enviroment = "";
+  let toolList = ''
+  let enviroment = ''
   if (printer.currentProfile !== null) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += `<div class="btn-group btn-block m-0" role="group" aria-label="Basic example">`;
-      toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
-      toolList += `</div>`;
+      toolList += '<div class="btn-group btn-block m-0" role="group" aria-label="Basic example">'
+      toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`
+      toolList += '</div>'
     }
 
     if (printer.currentProfile.heatedBed) {
       enviroment += `<small
     class="mb-0 float-left"
           ><b>Bed: </b><span id="panBedTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span>
-          </small>`;
+          </small>`
     }
     if (printer.currentProfile.heatedChamber) {
       enviroment += `<small
     class="mb-0 float-right"
         ><b>Chamber: </b><span  id="panChamberTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span>
-          </small>`;
+          </small>`
     }
   }
 
@@ -518,8 +517,8 @@ function drawPrinter(printer, clientSettings) {
           printer._id
         }"  data-jplist-item>
         <div class="card mt-1 mb-1 ml-1 mr-1 text-center ${printer.group.replace(
-          "/_/g",
-          " "
+          '/_/g',
+          ' '
         )}">
           <div class="card-header dashHeader">
             <h6
@@ -686,115 +685,115 @@ function drawPrinter(printer, clientSettings) {
           </div>
         </div>
       </div>
-    `;
+    `
   document
-    .getElementById("listView")
-    .insertAdjacentHTML("beforeend", printerHTML);
-  //Setup page listeners...
-  const printerCard = document.getElementById("viewPanel-" + printer._id);
-  printerCard.addEventListener("click", (e) => {
-    const printerInfo = returnPrinterInfo();
+    .getElementById('listView')
+    .insertAdjacentHTML('beforeend', printerHTML)
+  // Setup page listeners...
+  const printerCard = document.getElementById('viewPanel-' + printer._id)
+  printerCard.addEventListener('click', (e) => {
+    const printerInfo = returnPrinterInfo()
     // eslint-disable-next-line no-underscore-dangle
-    PrinterManager.init(printer._id, printerInfo, printerControlList);
-  });
+    PrinterManager.init(printer._id, printerInfo, printerControlList)
+  })
   document
-    .getElementById("cameraContain-" + printer._id)
-    .addEventListener("dblclick", (e) => {
-      doubleClickFullScreen(e.target);
-    });
+    .getElementById('cameraContain-' + printer._id)
+    .addEventListener('dblclick', (e) => {
+      doubleClickFullScreen(e.target)
+    })
   document
-    .getElementById("panPrintStart-" + printer._id)
-    .addEventListener("click", async (e) => {
-      e.target.disabled = true;
+    .getElementById('panPrintStart-' + printer._id)
+    .addEventListener('click', async (e) => {
+      e.target.disabled = true
       const opts = {
-        command: "start",
-      };
-      const print = returnPrinterInfo(printer._id);
-      OctoPrintClient.jobAction(print, opts, e);
-    });
+        command: 'start'
+      }
+      const print = returnPrinterInfo(printer._id)
+      OctoPrintClient.jobAction(print, opts, e)
+    })
   document
-    .getElementById("panPrintPause-" + printer._id)
-    .addEventListener("click", (e) => {
-      e.target.disabled = true;
+    .getElementById('panPrintPause-' + printer._id)
+    .addEventListener('click', (e) => {
+      e.target.disabled = true
       const opts = {
-        command: "pause",
-        action: "pause",
-      };
-      const print = returnPrinterInfo(printer._id);
-      OctoPrintClient.jobAction(print, opts, e);
-    });
+        command: 'pause',
+        action: 'pause'
+      }
+      const print = returnPrinterInfo(printer._id)
+      OctoPrintClient.jobAction(print, opts, e)
+    })
   document
-    .getElementById("panRestart-" + printer._id)
-    .addEventListener("click", (e) => {
-      e.target.disabled = true;
+    .getElementById('panRestart-' + printer._id)
+    .addEventListener('click', (e) => {
+      e.target.disabled = true
       const opts = {
-        command: "restart",
-      };
-      const print = returnPrinterInfo(printer._id);
-      OctoPrintClient.jobAction(print, opts, e);
-    });
+        command: 'restart'
+      }
+      const print = returnPrinterInfo(printer._id)
+      OctoPrintClient.jobAction(print, opts, e)
+    })
   document
-    .getElementById("panResume-" + printer._id)
-    .addEventListener("click", (e) => {
-      e.target.disabled = true;
+    .getElementById('panResume-' + printer._id)
+    .addEventListener('click', (e) => {
+      e.target.disabled = true
       const opts = {
-        command: "pause",
-        action: "resume",
-      };
-      const print = returnPrinterInfo(printer._id);
-      OctoPrintClient.jobAction(print, opts, e);
-    });
+        command: 'pause',
+        action: 'resume'
+      }
+      const print = returnPrinterInfo(printer._id)
+      OctoPrintClient.jobAction(print, opts, e)
+    })
   document
-    .getElementById("panStop-" + printer._id)
-    .addEventListener("click", (e) => {
-      const print = returnPrinterInfo(printer._id);
-      const name = printer.printerName;
+    .getElementById('panStop-' + printer._id)
+    .addEventListener('click', (e) => {
+      const print = returnPrinterInfo(printer._id)
+      const name = printer.printerName
       bootbox.confirm({
         message: `${name}: <br>Are you sure you want to cancel the ongoing print?`,
         buttons: {
           cancel: {
-            label: '<i class="fa fa-times"></i> Cancel',
+            label: '<i class="fa fa-times"></i> Cancel'
           },
           confirm: {
-            label: '<i class="fa fa-check"></i> Confirm',
-          },
-        },
-        callback(result) {
-          if (result) {
-            e.target.disabled = true;
-            const opts = {
-              command: "cancel",
-            };
-            OctoPrintClient.jobAction(print, opts, e);
+            label: '<i class="fa fa-check"></i> Confirm'
           }
         },
-      });
-    });
-  return "done";
+        callback (result) {
+          if (result) {
+            e.target.disabled = true
+            const opts = {
+              command: 'cancel'
+            }
+            OctoPrintClient.jobAction(print, opts, e)
+          }
+        }
+      })
+    })
+  return 'done'
 }
-async function init(printers, clientSettings) {
+async function init (printers, clientSettings) {
   for (let p = 0; p < printers.length; p++) {
-    if (!document.getElementById("viewPanel-" + printers[p]._id)) {
+    if (!document.getElementById('viewPanel-' + printers[p]._id)) {
       if (!jpInit) {
-        drawPrinter(printers[p], clientSettings);
+        drawPrinter(printers[p], clientSettings)
       }
     } else {
-      updateState(printers[p], clientSettings);
+      updateState(printers[p], clientSettings)
     }
   }
   if (jpInit) {
     const fullscreenElement =
       document.fullscreenElement ||
       document.mozFullScreenElement ||
-      document.webkitFullscreenElement;
+      document.webkitFullscreenElement
     if (!fullscreenElement) {
-      jplist.refresh();
+      jplist.refresh()
     }
   } else {
-    jpInit = true;
+    jpInit = true
     await jplist.init({
-      storage: "localStorage", //'localStorage', 'sessionStorage' or 'cookies'
-      storageName: "view-storage",
-    });
+      storage: 'localStorage', // 'localStorage', 'sessionStorage' or 'cookies'
+      storageName: 'view-storage'
+    })
   }
 }

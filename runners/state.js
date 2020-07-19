@@ -44,6 +44,21 @@ if (countersInterval === false) {
   }, 30000);
 }
 
+// // Wake on lan testing
+// const wol = require("wakeonlan");
+//
+// const opts = {
+//   address: "192.168.1.255",
+//   count: 5,
+//   interval: 200,
+//   port: 9,
+//   from: null,
+// };
+//
+// wol("D8:50:E6:C4:B1:C0", opts).then((e) => {
+//   console.log(e);
+//   console.log("wol sent!");
+// });
 // Checking interval for information...
 // setInterval(() => {
 //   console.log(farmPrinters[0])
