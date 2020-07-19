@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
     - Panel & list view now displays individual tool numbers and temps associated, bed and chamber will also be shown if enabled.
     - Camera view will tally your tool numbers temperatures, so all tool# designations are tallied to Tool and Bed and Chamber designations get tallied into Bed.
     - Added progress bar to list view extra information.
+    - Current operations now displays current file
     
 ### Changed
     - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
