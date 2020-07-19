@@ -45,6 +45,13 @@ if (window.Worker) {
             })
           }
           if (event.data != false) {
+            if (!(await dragCheck())) {
+              init(
+                event.data.printersInformation,
+                event.data.clientSettings.panelView,
+                event.data.printerControlList
+              )
+            }
             if (
               document
                 .getElementById('printerManagerModal')
@@ -59,7 +66,7 @@ if (window.Worker) {
               printerInfo = event.data.printersInformation
               if (powerTimer >= 20000) {
                 event.data.printersInformation.forEach((printer) => {
-                  PowerButton.applyBtn(printer)
+                  PowerButton.applyBtn(printer, 'powerBtn-')
                 })
                 powerTimer = 0
               } else {
@@ -70,13 +77,6 @@ if (window.Worker) {
                   event.data.currentOperations.operations,
                   event.data.currentOperations.count,
                   printerInfo
-                )
-              }
-              if (!(await dragCheck())) {
-                init(
-                  event.data.printersInformation,
-                  event.data.clientSettings.panelView,
-                  event.data.printerControlList
                 )
               }
             }
@@ -99,23 +99,6 @@ if (window.Worker) {
   console.log('Web workers not available... sorry!')
 }
 
-// source.onmessage = async function(e) {
-//   if (e.data != null) {
-//     let res = await asyncParse(e.data);
-
-//   }
-// };
-// source.onerror = function(e) {
-//   UI.createAlert(
-//       "error",
-//       "Communication with the server has been suddenly lost, we will automatically refresh in 10 seconds..."
-//   );
-//   setTimeout(function() {
-//     location.reload();
-//   }, 10000);
-// };
-// source.onclose = function(e) {
-// };
 const returnPrinterInfo = (id) => {
   if (typeof id !== 'undefined') {
     const zeeIndex = _.findIndex(printerInfo, function (o) {
@@ -513,7 +496,7 @@ function drawPrinter (printer, clientSettings) {
   }
 
   const printerHTML = `
-        <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2" id="viewPanel-${
+        <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2 ${hidden}" id="viewPanel-${
           printer._id
         }"  data-jplist-item>
         <div class="card mt-1 mb-1 ml-1 mr-1 text-center ${printer.group.replace(

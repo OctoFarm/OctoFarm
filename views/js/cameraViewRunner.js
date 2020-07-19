@@ -45,6 +45,13 @@ if (window.Worker) {
             })
           }
           if (event.data != false) {
+            if (!(await dragCheck())) {
+              init(
+                event.data.printersInformation,
+                event.data.clientSettings.cameraView,
+                event.data.printerControlList
+              )
+            }
             if (
               document
                 .getElementById('printerManagerModal')
@@ -59,7 +66,7 @@ if (window.Worker) {
               printerInfo = event.data.printersInformation
               if (powerTimer >= 20000) {
                 event.data.printersInformation.forEach((printer) => {
-                  PowerButton.applyBtn(printer)
+                  PowerButton.applyBtn(printer, 'powerBtn-')
                 })
                 powerTimer = 0
               } else {
@@ -70,13 +77,6 @@ if (window.Worker) {
                   event.data.currentOperations.operations,
                   event.data.currentOperations.count,
                   printerInfo
-                )
-              }
-              if (!(await dragCheck())) {
-                init(
-                  event.data.printersInformation,
-                  event.data.clientSettings.cameraView,
-                  event.data.printerControlList
                 )
               }
             }
@@ -379,7 +379,7 @@ function drawPrinter (printer, clientSettings) {
   const printerHTML = `
        <div
       id="viewPanel-${printer._id}"
-      class="col-md-4 col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows}"  data-jplist-item
+      class="col-md-4 col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${hidden}"  data-jplist-item
     >
       <div class="card text-center mb-0 mt-0 ml-0 mr-0">
         <div
