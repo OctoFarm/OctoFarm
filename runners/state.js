@@ -410,11 +410,10 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         ) {
           if (farmPrinters[this.index].selectedFilament[s] !== null) {
             let profile = null
-
             if (systemSettings.filamentManager) {
               profile = await Profiles.findOne({
                 'profile.index':
-                  farmPrinters[this.index].selectedFilament[s].spools.profile
+                  parseInt(farmPrinters[this.index].selectedFilament[s].spools.profile)
               })
             } else {
               profile = await Profiles.findById(
