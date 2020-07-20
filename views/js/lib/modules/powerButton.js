@@ -1,4 +1,5 @@
 import OctoPrintClient from '../octoprint.js'
+import OctoFarmclient from '../octofarm.js'
 
 export default class PowerButton {
   static returnPowerBtn (printer) {
@@ -18,6 +19,7 @@ export default class PowerButton {
                                 <div id="printerDropDownMaker-${printer._id}" class="dropdown-divider d-none"></div>
                                 <a id="printerRestartOctoPrint-${printer._id}" title="Restart OctoPrint Service" class="dropdown-item d-none" href="#"><i class="textActive fas fa-redo"></i> Restart OctoPrint</a>
                                 <a id="printerRestartHost-${printer._id}" title="Reboot OctoPrint Host" class="dropdown-item d-none" href="#"><i class="textActive fas fa-sync-alt"></i> Reboot Host</a>
+                                <a id="printerWakeHost-${printer._id}" title="Wake up OctoPrint Host" class="dropdown-item d-none" href="#"><i class="textComplete fas fa-power-off"></i> Wake Host</a>
                                 <a id="printerShutdownHost-${printer._id}" title="Shutdown OctoPrint Host" class="dropdown-item d-none" href="#"><i class="textOffline fas fa-power-off"></i> Shutdown Host</a>
                             </div>
             `
@@ -61,6 +63,21 @@ export default class PowerButton {
           }
         } else {
           PowerButton.powerButtons(printer)
+        }
+      }
+      if (typeof printer.powerSettings.wol !== 'undefined') {
+        if (printer.powerSettings.wol.enabled) {
+          if (printer.powerSettings.wol.ip === '' || printer.powerSettings.wol.port === '' || printer.powerSettings.wol.interval === '' || printer.powerSettings.wol.count === '') {
+            console.log('ISSUE WITH WAKE ON LAN SETTINGS')
+          } else {
+            const wakeButton = document.getElementById('printerWakeHost-' + printer._id)
+            if (wakeButton.classList.contains('d-none')) {
+              wakeButton.classList.remove('d-none')
+              wakeButton.addEventListener('click', e => {
+                OctoFarmclient.post('printers/wakeHost', printer.powerSettings.wol)
+              })
+            }
+          }
         }
       }
     }
