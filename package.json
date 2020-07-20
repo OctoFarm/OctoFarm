@@ -52,7 +52,7 @@
     "remove": "^0.1.5",
     "systeminformation": "^4.26.10",
     "tablefilter": "^0.7.2",
-    "wakeonlan": "^0.1.0",
+    "wake_on_lan": "^1.0.0",
     "winston": "^3.3.3",
     "ws": "^7.3.1",
     "yieldable-json": "^2.0.0"
