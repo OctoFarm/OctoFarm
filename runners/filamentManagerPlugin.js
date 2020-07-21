@@ -1,66 +1,80 @@
-const runner = import("../runners/state.js");
-const { Runner } = runner;
+const runner = import('../runners/state.js')
+const { Runner } = runner
 
-const filamentClean = require("../lib/dataFunctions/filamentClean.js");
+const filamentClean = require('../lib/dataFunctions/filamentClean.js')
 
-const { FilamentClean } = filamentClean;
+const { FilamentClean } = filamentClean
 
-const Logger = require("../lib/logger.js");
+const Logger = require('../lib/logger.js')
 
-const logger = new Logger("OctoFarm-FilamentManager");
+const logger = new Logger('OctoFarm-FilamentManager')
 
-const Spool = require("../models/Filament.js");
-const Profile = require("../models/Profiles.js");
-const fetch = require("node-fetch");
+const Spool = require('../models/Filament.js')
+const Profile = require('../models/Profiles.js')
+const fetch = require('node-fetch')
 
-const filamentManagerReSync = async function () {
+const filamentManagerReSync = async function (addSpool) {
   try {
-    const runner = require("./state.js");
-    const { Runner } = runner;
-    const printerList = Runner.returnFarmPrinters();
-    let printer = null;
+    const runner = require('./state.js')
+    const { Runner } = runner
+    const printerList = Runner.returnFarmPrinters()
+    let printer = null
     for (let i = 0; i < printerList.length; i++) {
       if (
-        printerList[i].stateColour.category === "Disconnected" ||
-        printerList[i].stateColour.category === "Idle" ||
-        printerList[i].stateColour.category === "Active" ||
-        printerList[i].stateColour.category === "Complete"
+        printerList[i].stateColour.category === 'Disconnected' ||
+        printerList[i].stateColour.category === 'Idle' ||
+        printerList[i].stateColour.category === 'Active' ||
+        printerList[i].stateColour.category === 'Complete'
       ) {
-        printer = printerList[i];
-        break;
+        printer = printerList[i]
+        break
       }
     }
     if (printer === null) {
-      return "error";
+      return 'error'
     }
     const spools = await fetch(
       `${printer.printerURL}/plugin/filamentmanager/spools`,
       {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": printer.apikey,
-        },
+          'Content-Type': 'application/json',
+          'X-Api-Key': printer.apikey
+        }
       }
-    );
+    )
     const profiles = await fetch(
       `${printer.printerURL}/plugin/filamentmanager/profiles`,
       {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": printer.apikey,
-        },
+          'Content-Type': 'application/json',
+          'X-Api-Key': printer.apikey
+        }
       }
-    );
+    )
+
     // Make sure filament manager responds...
     if (spools.status != 200 || profiles.status != 200) {
-      return "FAILED";
+      return { success: false, spools: spools.status, profiles: profiles.status }
     }
-    spoolsFM = await spools.json();
-    profilesFM = await profiles.json();
 
-    spoolsFM.spools.forEach(async (sp) => {
+    const newSpools = []
+    const updatedSpools = []
+    const newProfiles = []
+    const updatedProfiles = []
+
+    const addSpools = []
+    const addProfiles = []
+
+    const spoolsFM = await spools.json()
+    const profilesFM = await profiles.json()
+
+    const S = 'Spool'
+    const P = 'Profile'
+
+    for (let s = 0; s < spoolsFM.spools.length; s++) {
+      const sp = spoolsFM.spools[s]
       const spools = {
         name: sp.name,
         profile: sp.profile.id,
@@ -68,50 +82,68 @@ const filamentManagerReSync = async function () {
         weight: sp.weight,
         used: sp.used,
         tempOffset: sp.temp_offset,
-        fmID: sp.id,
-      };
-      const oldSpool = await Spool.findOne({ "spools.fmID": sp.id });
+        fmID: sp.id
+      }
+      const oldSpool = await Spool.findOne({ 'spools.fmID': sp.id })
       if (oldSpool !== null) {
-        logger.info("Updating Spool: ", spools);
-        oldSpool.spools = spools;
-        oldSpool.markModified("spools");
-        oldSpool.save();
+        updatedSpools.push(S)
+        logger.info('Updating Spool: ', spools)
+        oldSpool.spools = spools
+        oldSpool.markModified('spools')
+        oldSpool.save()
       } else {
         // New Spool
-        logger.info("Saving New Spool: ", spools);
-        const newSpool = await new Spool({ spools });
-        newSpool.save();
+        logger.info('Saving New Spool: ', spools)
+        const newSpool = await new Spool({ spools })
+        await newSpool.save()
+        if (addSpool) {
+          addSpools.push(newSpool)
+        } else {
+          newSpools.push(S)
+        }
       }
-    });
-    profilesFM.profiles.forEach(async (pr) => {
+    }
+
+    for (let p = 0; p < profilesFM.profiles.length; p++) {
+      const pr = profilesFM.profiles[p]
       const profile = {
         index: pr.id,
         density: pr.density,
         diameter: pr.diameter,
         manufacturer: pr.vendor,
-        material: pr.material,
-      };
-      const oldProfile = await Profile.findOne({ "profile.index": pr.id });
+        material: pr.material
+      }
+      const oldProfile = await Profile.findOne({ 'profile.index': pr.id })
       if (oldProfile !== null) {
-        logger.info("Updating Profile: ", profile);
-        oldProfile.profile = profile;
-        oldProfile.markModified("profile");
-        oldProfile.save();
+        updatedProfiles.push(P)
+        logger.info('Updating Profile: ', profile)
+        oldProfile.profile = profile
+        oldProfile.markModified('profile')
+        oldProfile.save()
       } else {
         // New Profile
-        logger.info("Saving New Profile: ", profile);
-        const newProfile = await new Profile({ profile });
-        newProfile.save();
+        logger.info('Saving New Profile: ', profile)
+        const newProfile = await new Profile({ profile })
+        await newProfile.save()
+        if (addSpool) {
+          addProfiles.push(newProfile)
+        } else {
+          newProfiles.push(P)
+        }
       }
-    });
-    FilamentClean.start(true);
-    logger.info("Successfully synced filament manager with octofarm.");
-    return "success";
+    }
+    FilamentClean.start(true)
+    logger.info('Successfully synced filament manager with octofarm.')
+    if (addSpool) {
+      return { success: true, newProfiles: addProfiles[0], newSpools: addSpools[0] }
+    } else {
+      return { success: true, newSpools: newSpools.length, updatedSpools: updatedSpools.length, newProfiles: newProfiles.length, updatedProfiles: updatedProfiles.length }
+    }
   } catch (e) {
-    console.error("SYNC", e);
+    console.error('SYNC', e)
   }
-};
+}
 
 module.exports = {
-  filamentManagerReSync,
-};
+  filamentManagerReSync
+}
