@@ -1684,19 +1684,23 @@ class Runner {
     for (let s = 0; s < selectedFilament.length; s++) {
       if (selectedFilament[s] !== null) {
         let profile = null
-
-        if (systemSettings.filamentManager) {
-          profile = await Profiles.findOne({
-            'profile.index': selectedFilament[s].spools.profile
-          })
-        } else {
-          profile = await Profiles.findById(selectedFilament[s].spools.profile)
+        try {
+          if (systemSettings.filamentManager) {
+            profile = await Profiles.findOne({
+              'profile.index': selectedFilament[s].spools.profile
+            })
+          } else {
+            profile = await Profiles.findById(selectedFilament[s].spools.profile)
+          }
+          currentFilament[s].spools.profile = profile.profile
+          farmPrinters[i].selectedFilament[s].spools.material =
+              profile.profile.material
+        } catch (e) {
+          logger.error("Couldn't find profile", e)
         }
-        currentFilament[s].spools.profile = profile.profile
-        farmPrinters[i].selectedFilament[s].spools.material =
-          profile.profile.material
       }
     }
+    console.log(currentFilament)
     return currentFilament
   }
 
