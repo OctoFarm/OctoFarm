@@ -1700,7 +1700,6 @@ class Runner {
         }
       }
     }
-    console.log(currentFilament)
     return currentFilament
   }
 

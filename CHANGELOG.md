@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 ## [v1.1.5.6 - RC2]
 
 ### Added
+    - Added version output to console log.
+    - WOL Support: Wake on Lan for clients now supported. In your Printers power settings you will have a new option to enable Wake on lan. Enabling puts a new "Wake Host" Option in the normal power dropdown.
   
 ### Changed
 
