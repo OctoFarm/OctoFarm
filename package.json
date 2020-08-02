@@ -32,7 +32,7 @@
     "express-session": "^1.17.0",
     "express-ws": "^4.0.0",
     "flatted": "^2.0.2",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "mongoose": "^5.9.7",
     "node-fetch": "^2.6.0",
     "passport": "^0.4.1",
