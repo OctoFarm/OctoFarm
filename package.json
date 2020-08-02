@@ -71,6 +71,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
+    "mongo-express": "^1.0.0-alpha.1",
     "nodemon": "^2.0.4"
   },
   "engineStrict": true,

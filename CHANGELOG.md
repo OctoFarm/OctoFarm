@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
     - Fixed Add Printer table not clearing correctly.
+    - Fixed connection to OctoPrint for release of 1.4.1. Caveat, can no longer use global API key.
     
 ### Removed
    
