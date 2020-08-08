@@ -334,9 +334,25 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         data = await JSON.parse(data);
         if (typeof data.connected !== 'undefined') {
             farmPrinters[this.index].octoPrintVersion = data.connected.version;
+            farmPrinters[this.index].plugin_hash = data.connected.plugin_hash;
+            farmPrinters[this.index].config_hash = data.connected.config_hash;
+
+            if(data.connected.version.includes("1.4.2")||data.connected.version.includes("1.4.1")){
+                farmPrinters[this.index].webSocket = 'danger';
+                farmPrinters[this.index].webSocketDescription =
+                    'OctoPrint Version 1.4.1+ requires the use of an Application/User API key to connect, please update your instance with that';
+            }
+
+
+        }
+        if(data.history){
+            farmPrinters[this.index].webSocket = 'warning';
+            farmPrinters[this.index].webSocketDescription =
+                'Websocket Connected but in Tentative state until receiving data';
         }
         // Listen for printer status
         if (typeof data.current !== 'undefined') {
+
             farmPrinters[this.index].webSocket = 'success';
             farmPrinters[this.index].webSocketDescription =
         'Websocket Alive and Receiving Data';
@@ -526,6 +542,9 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
                 }, 10000);
                 ScriptRunner.check(farmPrinters[that.index], 'error');
             }
+        }
+        if(data.plugin){
+            console.log(data.plugin);
         }
         // Event Listeners for state changes
         if (typeof farmPrinters[this.index].temps !== 'undefined') {

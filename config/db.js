@@ -1,5 +1,5 @@
 module.exports = {
-    MongoURI: 'mongodb://localhost:27017/octofarm-dev'
+    MongoURI: 'mongodb://localhost:27017/octofarm'
     // MongoURI: 'mongodb://192.168.1.5:27017/JamesFarm'
 };
 // Example Local URL: "mongodb://192.168.1.5:27017/octofarm"
