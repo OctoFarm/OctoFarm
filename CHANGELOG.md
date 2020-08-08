@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
     - Message to websocket icon regarding use of global api key.
   
 ### Changed
+    - Make a note of the plugin/settings hash
 
 ### Fixed
     - Fixed Add Printer table not clearing correctly.
