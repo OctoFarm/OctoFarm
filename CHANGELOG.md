@@ -17,6 +17,7 @@ All notable changes to this project will be documented in this file.
     - Make a note of the plugin/settings hash
     - Adding a printer will now show Printer State as "Awaiting WebSocket" until the websocket updates the printers status.
     - File list is now stored in database to save re-scanning on server load.
+    - Added timeout to file scanning, will only try to update 4 times then await users resync for information.
 
 ### Fixed
     - Fixed Add Printer table not clearing correctly.

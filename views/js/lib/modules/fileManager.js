@@ -180,8 +180,18 @@ export default class FileManager {
                             );
                             updatePrinter = await updatePrinter.json();
                             FileManager.refreshFiles(updatePrinter);
-                        }, 10000);
-                    }, 1000);
+                            setTimeout(async () => {
+                                let updatePrinter = await OctoFarmClient.post(
+                                    "printers/printerInfo",
+                                    {
+                                        i: printerInfo._id,
+                                    }
+                                );
+                                updatePrinter = await updatePrinter.json();
+                                FileManager.refreshFiles(updatePrinter);
+                            }, 5000);
+                        }, 5000);
+                    }, 5500);
                 } else {
                     fileUploads.remove();
                     const fileCounts = document.getElementById(`fileCounts-${index}`);

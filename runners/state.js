@@ -1305,7 +1305,79 @@ class Runner {
         }
         return true;
     }
+    static async getFile(id, location) {
+        const index = _.findIndex(farmPrinters, function(o) {
+            return o._id == id;
+        });
+        // try{
+        const url = `${farmPrinters[index].printerURL}/api/${location}`;
+        const getFileInformation = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Api-Key': farmPrinters[index].apikey
+            }
+        });
 
+        const getJson = await getFileInformation.json();
+
+        let timeStat = null;
+        let filament = [];
+        const entry = getJson;
+        if (typeof entry.gcodeAnalysis !== 'undefined') {
+            if (
+                typeof entry.gcodeAnalysis.estimatedPrintTime !==
+                    'undefined'
+            ) {
+                timeStat = entry.gcodeAnalysis.estimatedPrintTime;
+                // Start collecting multiple tool lengths and information from files....
+                Object.keys(entry.gcodeAnalysis.filament).forEach(function(
+                    item,
+                    i
+                ) {
+                    console.log(item);
+                    console.log(entry.gcodeAnalysis.filament[item]);
+                    filament[i] = entry.gcodeAnalysis.filament[item].length;
+                });
+            } else {
+                timeStat = 'No Time Estimate';
+                filament = null;
+            }
+        } else {
+            timeStat = 'No Time Estimate';
+            filament = null;
+        }
+        let path = null;
+        if (entry.path.indexOf('/') > -1) {
+            path = entry.path.substr(0, entry.path.lastIndexOf('/'));
+        } else {
+            path = 'local';
+        }
+        let thumbnail = null;
+
+        if (typeof entry.thumbnail !== 'undefined') {
+            thumbnail = entry.thumbnail;
+        }
+
+        return {
+            path: path,
+            fullPath: entry.path,
+            display: entry.display,
+            length: filament,
+            name: entry.name,
+            size: entry.size,
+            time: timeStat,
+            date: entry.date,
+            thumbnail: thumbnail
+        };
+        // }catch(err){
+        //     logger.error(
+        //         `Error grabbing file for: ${farmPrinters[index].printerURL}: Reason: `,
+        //         err
+        //     );
+        //     return false;
+        // }
+    }
     static async getFiles (id, location) {
         const index = _.findIndex(farmPrinters, function (o) {
             return o._id == id;
@@ -2167,7 +2239,8 @@ class Runner {
         const i = _.findIndex(farmPrinters, function (o) {
             return o._id == file.index;
         });
-        const { date } = file;
+        const date = new Date();
+
         file = file.files.local;
 
         let path = '';
@@ -2185,37 +2258,58 @@ class Runner {
             name: file.name,
             size: null,
             time: null,
-            date: date,
+            date: date.getTime() / 1000,
             thumbnail: null
         };
         farmPrinters[i].fileList.files.push(data);
-        // for (let s = 0; s < farmPrinters[i].selectedFilament.length; s++) {
-        //   // if (farmPrinters[i].selectedFilament[s] !== null) {
-        //   //   let profile = null;
-        //   //   if (systemSettings.filamentManager) {
-        //   //     profile = await Profiles.findOne({
-        //   //       "profile.index": farmPrinters[i].selectedFilament[s].spools.profile,
-        //   //     });
-        //   //   } else {
-        //   //     profile = await Profiles.findById(
-        //   //       farmPrinters[i].selectedFilament[s].spools.profile
-        //   //     );
-        //   //   }
-        //   //   currentFilament[s].profile = profile.profile;
-        //   // }
-        // }
+        farmPrinters[i].markModified("fileList");
+        farmPrinters[i].save();
         const currentFilament = await Runner.compileSelectedFilament(
             farmPrinters[i].selectedFilament,
             i
         );
         FileClean.generate(farmPrinters[i], currentFilament);
         FileClean.statistics(farmPrinters);
-        Runner.getFiles(farmPrinters[i]._id, 'files?recursive=true');
-        setTimeout(async function () {
-            Runner.getFiles(farmPrinters[i]._id, 'files?recursive=true');
-        }, 7500);
+        await this.updateFile(farmPrinters[i].fileList.files[farmPrinters[i].fileList.files.length-1], i);
     }
-
+    static async updateFile(file, i){
+        if(fileTimeout <= 20000){
+            logger.info(`Updating new file ${farmPrinters[i].fileList.files[farmPrinters[i].fileList.files.length-1].name} for Printer:${farmPrinters[i].printerURL}`);
+            setTimeout(async function () {
+                let path = file.fullPath;
+                if(path.includes("local")){
+                    path = JSON.parse(JSON.stringify(file.fullPath.replace('local',"")));
+                }
+                const fileInformation = await Runner.getFile(farmPrinters[i]._id, `files/local/${path}`);
+                if(fileInformation){
+                    logger.info(`New File Information:`,fileInformation);
+                    farmPrinters[i].fileList.files[farmPrinters[i].fileList.files.length-1] = fileInformation;
+                    farmPrinters[i].markModified("fileList");
+                    farmPrinters[i].save();
+                    if(fileInformation.time === null || fileInformation.time === "No Time Estimate"){
+                        logger.info(`File Information Still Missing Retrying...`);
+                        Runner.updateFile(farmPrinters[i].fileList.files[farmPrinters[i].fileList.files.length-1] ,i);
+                        const currentFilament = await Runner.compileSelectedFilament(
+                            farmPrinters[i].selectedFilament,
+                            i
+                        );
+                        FileClean.generate(farmPrinters[i], currentFilament);
+                        FileClean.statistics(farmPrinters);
+                        return null;
+                    }else{
+                        const currentFilament = await Runner.compileSelectedFilament(
+                            farmPrinters[i].selectedFilament,
+                            i
+                        );
+                        FileClean.generate(farmPrinters[i], currentFilament);
+                        FileClean.statistics(farmPrinters);
+                        return null;
+                    }
+                }
+                fileTimeout = fileTimeout + 5000;
+            }, 5000);
+        }
+    }
     static sortedIndex () {
         const sorted = [];
         for (let p = 0; p < farmPrinters.length; p++) {
@@ -2229,6 +2323,8 @@ class Runner {
         return sorted;
     }
 }
+
+let fileTimeout = 0;
 
 module.exports = {
     Runner
