@@ -108,7 +108,10 @@ class Manager {
                 );
 
                 listItem.addEventListener("click", (e) => {
-                    Manager.changePrinter(e, printer._id);
+
+                    if (!e.target.id.includes("tool")) {
+                        Manager.changePrinter(e, printer._id);
+                    }
                 });
                 lastId = printers[0]._id;
                 dragAndDropEnable(listItem, printer);

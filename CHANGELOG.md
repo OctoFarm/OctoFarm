@@ -25,6 +25,8 @@ All notable changes to this project will be documented in this file.
     - Fixed issue with history showing incorrect cost per hour
     - Fixed camera rotation on views.
     - Fixed not grabbing name from OctoPrint.
+    - Fixed filament Manager loading with 0 spools.
+    - Fixed issue with changing filament dropdown on filemanager selecting printer instead.
         
 ### Removed
    
