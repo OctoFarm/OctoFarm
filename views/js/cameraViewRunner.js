@@ -82,13 +82,6 @@ if (window.Worker) {
                             }
                         }
                     }
-                } else {
-                    UI.createAlert(
-                        'error',
-                        'Communication with the server has been suddenly lost, trying to re-establish connection...',
-                        10000,
-                        'Clicked'
-                    );
                 }
             };
         }

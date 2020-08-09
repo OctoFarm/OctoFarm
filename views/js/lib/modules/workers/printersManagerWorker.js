@@ -1,14 +1,14 @@
 
 function asyncParse(str) {
     try {
-        let info = parse(str)
+        const info = parse(str);
         return info;
     } catch (e) {
         return false;
     }
 }
 
-let source = new EventSource("/printersInfo/get/");
+const source = new EventSource("/printersInfo/get/");
 
 // source.addEventListener("ping", function(event) {
 //     if (e.data != null) {
@@ -18,17 +18,17 @@ let source = new EventSource("/printersInfo/get/");
 // });
 source.onmessage = function(e) {
     if (e.data != null) {
-        let res = asyncParse(e.data)
+        const res = asyncParse(e.data);
         postMessage(res);
     }
 };
 source.onerror = function() {
-        postMessage(false)
+    postMessage(false);
 };
 source.onclose = function() {
-        postMessage(false)
+    postMessage(false);
 };
-var Flatted = (function (Primitive, primitive) {
+const Flatted = (function (Primitive, primitive) {
 
     /*!
      * ISC License
@@ -48,13 +48,13 @@ var Flatted = (function (Primitive, primitive) {
      * PERFORMANCE OF THIS SOFTWARE.
      */
 
-    var Flatted = {
+    const Flatted = {
 
         parse: function parse(text, reviver) {
-            var input = JSON.parse(text, Primitives).map(primitives);
-            var value = input[0];
-            var $ = reviver || noop;
-            var tmp = typeof value === 'object' && value ?
+            const input = JSON.parse(text, Primitives).map(primitives);
+            const value = input[0];
+            const $ = reviver || noop;
+            const tmp = typeof value === 'object' && value ?
                 revive(input, new Set, value, $) :
                 value;
             return $.call({'': tmp}, '', tmp);
@@ -62,31 +62,31 @@ var Flatted = (function (Primitive, primitive) {
 
         stringify: function stringify(value, replacer, space) {
             for (var
-                     firstRun,
-                     known = new Map,
-                     input = [],
-                     output = [],
-                     $ = replacer && typeof replacer === typeof input ?
-                         function (k, v) {
-                             if (k === '' || -1 < replacer.indexOf(k)) return v;
-                         } :
-                         (replacer || noop),
-                     i = +set(known, input, $.call({'': value}, '', value)),
-                     replace = function (key, value) {
-                         if (firstRun) {
-                             firstRun = !firstRun;
-                             return value;
-                         }
-                         var after = $.call(this, key, value);
-                         switch (typeof after) {
-                             case 'object':
-                                 if (after === null) return after;
-                             case primitive:
-                                 return known.get(after) || set(known, input, after);
-                         }
-                         return after;
-                     };
-                 i < input.length; i++
+                firstRun,
+                known = new Map,
+                input = [],
+                output = [],
+                $ = replacer && typeof replacer === typeof input ?
+                    function (k, v) {
+                        if (k === '' || -1 < replacer.indexOf(k)) return v;
+                    } :
+                    (replacer || noop),
+                i = +set(known, input, $.call({'': value}, '', value)),
+                replace = function (key, value) {
+                    if (firstRun) {
+                        firstRun = !firstRun;
+                        return value;
+                    }
+                    const after = $.call(this, key, value);
+                    switch (typeof after) {
+                    case 'object':
+                        if (after === null) return after;
+                    case primitive:
+                        return known.get(after) || set(known, input, after);
+                    }
+                    return after;
+                };
+                i < input.length; i++
             ) {
                 firstRun = true;
                 output[i] = JSON.stringify(input[i], replace, space);
@@ -105,9 +105,9 @@ var Flatted = (function (Primitive, primitive) {
     function revive(input, parsed, output, $) {
         return Object.keys(output).reduce(
             function (output, key) {
-                var value = output[key];
+                const value = output[key];
                 if (value instanceof Primitive) {
-                    var tmp = input[value];
+                    const tmp = input[value];
                     if (typeof tmp === 'object' && !parsed.has(tmp)) {
                         parsed.add(tmp);
                         output[key] = $.call(output, key, revive(input, parsed, tmp, $));
@@ -123,7 +123,7 @@ var Flatted = (function (Primitive, primitive) {
     }
 
     function set(known, input, value) {
-        var index = Primitive(input.push(value) - 1);
+        const index = Primitive(input.push(value) - 1);
         known.set(value, index);
         return index;
     }
@@ -142,4 +142,4 @@ var Flatted = (function (Primitive, primitive) {
 
 }(String, 'string'));
 var parse = Flatted.parse;
-var stringify = Flatted.stringify;
+const stringify = Flatted.stringify;

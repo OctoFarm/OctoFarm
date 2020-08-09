@@ -8,6 +8,7 @@ import FileOperations from './lib/functions/file.js';
 import Validate from './lib/functions/validate.js';
 import PowerButton from './lib/modules/powerButton.js';
 
+
 let printerInfo = '';
 let editMode = false;
 let deletedPrinters = [];

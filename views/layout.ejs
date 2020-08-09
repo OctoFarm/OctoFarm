@@ -333,6 +333,33 @@
         </div>
     </div>
 
+    <div class="modal fade" id="lostServerConnection" tabindex="0" role="dialog" aria-labelledby="lostServerConnection" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog modal-xl" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="lostServerConnection">Lost Connection to Server...</h3>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span class="text-white" aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="container-fluid">
+                        <div class="row">
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center">
+                                <p><i id="lostConnectionSpinner" class="fas fa-spinner fa-spin"></i></p>
+                                <p id="lostConnectionText">Attempting to reconnect...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="connectionActionBtn" class="modal-footer">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
     <div class="modal fade" id="connectionModal" tabindex="0" role="dialog" aria-labelledby="connectionModal" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
             <div class="modal-content">
@@ -367,9 +394,11 @@
     <script src="/js/vendor/bootbox.min.js"></script>
     <script src="/js/vendor/noty.js"></script>
     <script src="/js/vendor/apexcharts.min.js"></script>
+    <script src="/js/lib/modules/workers/serverAliveCheck.js"></script>
     <script src="/js/lib/modules/printerManager.js" type="module"></script>
     <script src="/js/lib/modules/printerSettings.js" type="module"></script>
     <script src="/js/vendor/jpList.js"></script>
+
 </body>
 
 </html>
