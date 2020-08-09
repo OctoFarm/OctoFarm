@@ -349,6 +349,8 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
             farmPrinters[this.index].webSocket = 'warning';
             farmPrinters[this.index].webSocketDescription =
                 'Websocket Connected but in Tentative state until receiving data';
+            farmPrinters[this.index].state = "Disconnected";
+            farmPrinters[this.index].stateColour = Runner.getColour("Disconnected");
         }
         // Listen for printer status
         if (typeof data.current !== 'undefined') {
@@ -2176,14 +2178,14 @@ class Runner {
         }
         const fileDisplay = file.name.replace(/_/g, ' ');
         const data = {
-            path,
+            path: path,
             fullPath: file.path,
             display: fileDisplay,
             length: null,
             name: file.name,
             size: null,
             time: null,
-            date,
+            date: date,
             thumbnail: null
         };
         farmPrinters[i].fileList.files.push(data);
