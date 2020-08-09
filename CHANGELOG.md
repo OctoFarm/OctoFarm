@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file.
     - Fixed issue with print time acuracy calculation in history.
     - Fixed issue with history showing incorrect cost per hour
     - Fixed camera rotation on views.
-
+    - Fixed not grabbing name from OctoPrint.
         
 ### Removed
    

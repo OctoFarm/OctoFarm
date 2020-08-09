@@ -1075,6 +1075,7 @@ class Runner {
             };
         }
         printer.octoPrintVersion = farmPrinters[i].octoPrintVersion;
+        printer.printerName = farmPrinters[i].printerName;
         printer.camURL = farmPrinters[i].camURL;
         printer.printerURL = farmPrinters[i].printerURL;
         printer.feedRate = farmPrinters[i].feedRate;
@@ -1555,27 +1556,11 @@ class Runner {
             .then(async (res) => {
                 // Update info to DB
                 farmPrinters[index].settingsApi = res.api;
-                try {
-                    if (farmPrinters[index].settingsApperance === 'undefined') {
-                        let appearance = null;
-                        appearance = res.appearance;
-                        if (
-                            farmPrinters[index].settingsAppearance.name === '' ||
-              farmPrinters[index].settingsAppearance.name.includes('{Leave')
-                        ) {
-                            // If new name is supplied then update the name...
-                            appearance.name = res.appearance.name;
-                            farmPrinters[index].settingsAppearance = appearance;
-                        }
-                        const printer = await Printers.findById(id);
-                        printer.settingsApperance = farmPrinters[index].settingsAppearance;
-                        printer.save();
-                    } else {
-                        farmPrinters[index].settingsAppearance =
-              farmPrinters[index].settingsApperance;
-                    }
-                } catch (e) {
-                    console.log(e);
+                if(farmPrinters[index].settingsAppearance === 'undefined'){
+                    console.log(res.settingsAppearance.name);
+                    farmPrinters[index].settingsAppearance = res.appearance;
+                }else if(farmPrinters[index].settingsAppearance.name.includes("{Leave to Grab")){
+                    farmPrinters[index].settingsAppearance.name = res.appearance.name;
                 }
 
                 farmPrinters[index].settingsFeature = res.feature;
