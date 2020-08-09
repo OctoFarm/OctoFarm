@@ -418,6 +418,7 @@
           <td>
             <span class="d-none time"><%= history[i].printTime %></span>
             <span><%= helpers.generateTime(history[i].printTime) %></span>
+            <br><code><%= history[i].printHours %></code>
           </td>
           <td class="printerCost" id="printerCost-<%= history[i]._id %>">
             <%= history[i].printerCost %>

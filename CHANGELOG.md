@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
     - Added version output to console log.
     - WOL Support: Wake on Lan for clients now supported. In your Printers power settings you will have a new option to enable Wake on lan. Enabling puts a new "Wake Host" Option in the normal power dropdown.
     - Message to websocket icon regarding use of global api key.
+    - History now shows Print Time in red formatted as {hours}:{minutes}:{seconds} underneith the original format.
   
 ### Changed
     - Make a note of the plugin/settings hash
@@ -19,6 +20,7 @@ All notable changes to this project will be documented in this file.
     - Fixed connection to OctoPrint for release of 1.4.1. Caveat, can no longer use global API key. Fixed #85 & #89
     - Fixed issue with print time acuracy calculation in history.
     - Fixed issue with history showing incorrect cost per hour
+    - Fixed camera rotation on views.
 
         
 ### Removed
