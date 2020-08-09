@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file.
     - WOL Support: Wake on Lan for clients now supported. In your Printers power settings you will have a new option to enable Wake on lan. Enabling puts a new "Wake Host" Option in the normal power dropdown.
     - Message to websocket icon regarding use of global api key.
     - History now shows Print Time in red formatted as {hours}:{minutes}:{seconds} underneith the original format.
+    - Added a true server alive check. Client now polls this whilst active and throws a modal up when connection lost. Will reload the page automatically (manual also) when connection restored. 
   
 ### Changed
     - Make a note of the plugin/settings hash
