@@ -1,5 +1,4 @@
-// eslint-disable-next-line import/extensions
-import UI from "./lib/functions/ui.js";
+
 // eslint-disable-next-line import/extensions
 import Calc from "./lib/functions/calc.js";
 // eslint-disable-next-line import/extensions

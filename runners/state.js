@@ -800,7 +800,19 @@ class Runner {
                     await Runner.getSettings(id);
                     await Runner.getProfile(id);
                     await Runner.getState(id);
-                    await Runner.getFiles(id, 'files?recursive=true');
+                    if(typeof farmPrinters[i].fileList === 'undefined'){
+                        await Runner.getFiles(id, 'files?recursive=true');
+                    }else{
+                        const currentFilament = await Runner.compileSelectedFilament(
+                            farmPrinters[i].selectedFilament,
+                            i
+                        );
+                        FileClean.generate(farmPrinters[i], currentFilament);
+                        farmPrinters[i].systemChecks.scanning.files.status = 'success';
+                        farmPrinters[i].systemChecks.scanning.files.date = new Date();
+                        FileClean.statistics(farmPrinters);
+                    }
+
 
                     // Connection to API successful, gather initial data and setup websocket.
                     await farmPrinters[i].ws.open(
@@ -1321,6 +1333,7 @@ class Runner {
                     free: res.free,
                     total: res.total
                 };
+                farmPrinters[index].markModified("storage");
                 // Setup the files location object to place files...
                 const printerFiles = [];
                 const printerLocations = [];
@@ -1419,6 +1432,8 @@ class Runner {
                     folders: printerLocations,
                     folderCount: printerLocations.length
                 };
+                farmPrinters[index].markModified("fileList");
+                farmPrinters[index].save();
                 const currentFilament = await Runner.compileSelectedFilament(
                     farmPrinters[index].selectedFilament,
                     index
@@ -1469,8 +1484,8 @@ class Runner {
                     farmPrinters[index].stateDescription =
             'Current Status from OctoPrint';
                 }
-                farmPrinters[index].state = res.current.state;
-                farmPrinters[index].stateColour = Runner.getColour(res.current.state);
+                farmPrinters[index].state = "Awaiting WebSocket";
+                farmPrinters[index].stateColour = Runner.getColour("Operational");
                 farmPrinters[index].current = res.current;
                 farmPrinters[index].options = res.options;
                 farmPrinters[index].systemChecks.scanning.state.status = 'success';
@@ -1557,7 +1572,6 @@ class Runner {
                 // Update info to DB
                 farmPrinters[index].settingsApi = res.api;
                 if(farmPrinters[index].settingsAppearance === 'undefined'){
-                    console.log(res.settingsAppearance.name);
                     farmPrinters[index].settingsAppearance = res.appearance;
                 }else if(farmPrinters[index].settingsAppearance.name.includes("{Leave to Grab")){
                     farmPrinters[index].settingsAppearance.name = res.appearance.name;
@@ -2039,7 +2053,6 @@ class Runner {
                     farmPrinters[i].selectedFilament,
                     i
                 );
-                console.log(farmPrinters[i].fileList, currentFilament);
                 FileClean.generate(farmPrinters[i], currentFilament);
             }
         }
