@@ -99,6 +99,7 @@ const serverStart = async () => {
 
     // Routes
     app.use(express.static(`${__dirname}/views`));
+    app.use(`/images`,express.static(`${__dirname}/images`));
     if (db === "") {
         app.use("/", require("./routes/index", { page: "route" }));
     } else {

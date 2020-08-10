@@ -1797,11 +1797,14 @@ class Runner {
         });
         farmPrinters[i].fileList.files.splice(index, 1);
         farmPrinters[i].fileList.fileCount = farmPrinters[i].fileList.files.length;
+        farmPrinters[i].markModified("fileList");
+        farmPrinters[i].save();
         const currentFilament = await Runner.compileSelectedFilament(
             farmPrinters[i].selectedFilament,
             i
         );
         FileClean.generate(farmPrinters[i], currentFilament);
+        FileClean.statistics(farmPrinters);
     }
 
     static async compileSelectedFilament (selectedFilament, i) {
@@ -2002,12 +2005,14 @@ class Runner {
         // farmPrinters[i].fileList.files[file].path = newPath;
         farmPrinters[i].fileList.files[file].path = newPath;
         farmPrinters[i].fileList.files[file].fullPath = fullPath;
+        farmPrinters[i].markModified("fileList");
+        farmPrinters[i].save();
         const currentFilament = await Runner.compileSelectedFilament(
             farmPrinters[i].selectedFilament,
             i
         );
         FileClean.generate(farmPrinters[i], currentFilament);
-    // console.log(farmPrinters[i].fileList.files)
+        FileClean.statistics(farmPrinters);
     }
 
     static async moveFolder (id, oldFolder, fullPath, folderName) {
@@ -2032,11 +2037,14 @@ class Runner {
         });
         farmPrinters[i].fileList.folders[file].name = folderName;
         farmPrinters[i].fileList.folders[file].path = fullPath;
+        farmPrinters[i].markModified("fileList");
+        farmPrinters[i].save();
         const currentFilament = await Runner.compileSelectedFilament(
             farmPrinters[i].selectedFilament,
             i
         );
         FileClean.generate(farmPrinters[i], currentFilament);
+        FileClean.statistics(farmPrinters);
     }
 
     static async deleteFolder (id, fullPath) {
@@ -2060,11 +2068,14 @@ class Runner {
         farmPrinters[i].fileList.fileCount = farmPrinters[i].fileList.files.length;
         farmPrinters[i].fileList.folderCount =
       farmPrinters[i].fileList.folders.length;
+        farmPrinters[i].markModified("fileList");
+        farmPrinters[i].save();
         const currentFilament = await Runner.compileSelectedFilament(
             farmPrinters[i].selectedFilament,
             i
         );
         FileClean.generate(farmPrinters[i], currentFilament);
+        FileClean.statistics(farmPrinters);
     }
 
     static async newFolder (folder) {
@@ -2089,11 +2100,14 @@ class Runner {
         farmPrinters[i].fileList.folders.push(newFolder);
         farmPrinters[i].fileList.folderCount =
       farmPrinters[i].fileList.folders.length;
+        farmPrinters[i].markModified("fileList");
+        farmPrinters[i].save();
         const currentFilament = await Runner.compileSelectedFilament(
             farmPrinters[i].selectedFilament,
             i
         );
         FileClean.generate(farmPrinters[i], currentFilament);
+        FileClean.statistics(farmPrinters);
     }
 
     static async updateFilament () {

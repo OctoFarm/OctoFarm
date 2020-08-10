@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
     - Adding a printer will now show Printer State as "Awaiting WebSocket" until the websocket updates the printers status.
     - File list is now stored in database to save re-scanning on server load.
     - Added timeout to file scanning, will only try to update 4 times then await users resync for information.
+    - Thumbnails are now stored with history in /images/historyCollection/thumbs. The /images folder will need mounting to docker to make this persistent if you want to use this feature. 
 
 ### Fixed
     - Fixed Add Printer table not clearing correctly.
@@ -29,6 +30,8 @@ All notable changes to this project will be documented in this file.
     - Fixed filament Manager loading with 0 spools.
     - Fixed issue with changing filament dropdown on filemanager selecting printer instead.
     - Fixed duplicate listener issue when uploading new files.
+    - Fixed Printer Control Dropdown not updating on modal load.
+    - Fixed Printer Settings not showing Printer Selection dropdown.
         
 ### Removed
    

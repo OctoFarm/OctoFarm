@@ -30,13 +30,6 @@ else
     echo "Logs folder already exists..."
 fi
 
-if [ -d "views/images/historyCollection" ]
-then
-    mkdir -p views/images/historyCollection
-else
-    echo "history collection folder already exists..."
-fi
-
 
 cd app/
 

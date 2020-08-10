@@ -14,7 +14,14 @@ let controlDropDown = false;
 let currentPrinter = null;
 
 const refreshCounter = 5000;
+$('#printerManagerModal').on('hidden.bs.modal', function (e) {
+    // Fix for mjpeg stream not ending when element removed...
 
+    if(document.getElementById("printerControlCamera")){
+        document.getElementById('printerControlCamera').src = '';
+    }
+
+});
 $("#connectionModal").on("hidden.bs.modal", function (e) {
     if (document.getElementById("connectionAction")) {
         document.getElementById("connectionAction").remove();
@@ -88,7 +95,19 @@ export default class PrinterManager {
                 });
                 currentPrinter = printers[id];
                 const printerDrop = document.getElementById("printerSelection");
+                printerDrop.innerHTML = "";
+                printerControlList.forEach((list) => {
+                    if (list.state.category !== "Offline") {
+                        printerDrop.insertAdjacentHTML(
+                            "beforeend",
+                            `
+                  <option value="${list.printerID}" selected>${list.printerName}</option>
+              `
+                        );
+                    }
+                });
                 printerDrop.value = currentPrinter._id;
+
                 const elements = await PrinterManager.grabPage();
                 PrinterManager.applyState(currentPrinter, elements);
                 PrinterManager.applyTemps(currentPrinter, elements);
