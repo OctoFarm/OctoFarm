@@ -2281,6 +2281,8 @@ class Runner {
                     path = JSON.parse(JSON.stringify(file.fullPath.replace('local',"")));
                 }
                 const fileInformation = await Runner.getFile(farmPrinters[i]._id, `files/local/${path}`);
+                fileTimeout = fileTimeout + 5000;
+                console.log("SECOND", fileTimeout);
                 if(fileInformation){
                     logger.info(`New File Information:`,fileInformation);
                     farmPrinters[i].fileList.files[farmPrinters[i].fileList.files.length-1] = fileInformation;
@@ -2306,8 +2308,9 @@ class Runner {
                         return null;
                     }
                 }
-                fileTimeout = fileTimeout + 5000;
             }, 5000);
+        }else{
+            logger.info(`File information took too long to generate, awaiting manual scan...`);
         }
     }
     static sortedIndex () {
