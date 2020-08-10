@@ -340,6 +340,7 @@ export default class FileManager {
                 <div class="row">
                 <div class="col-12">
                 <p class="mb-1 float-right">
+                  <span title="File specific success / failure rate from OctoPrint" id="fileHistoryRate"><i class="fas fa-thumbs-up"></i> <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> / <i class="fas fa-thumbs-down"></i> <i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span><br>
                 <i class="fas fa-stopwatch"></i> 
                 <span class="time" id="fileTime-${file.files.local.path}">
                 <i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span> <br> 
@@ -469,6 +470,7 @@ export default class FileManager {
                     const dateString = fileDate.toDateString();
                     const timeString = fileDate.toTimeString().substring(0, 8);
                     fileDate = `${dateString} ${timeString}`;
+                    document.getElementById("fileHistoryRate").innerHTML = `<i class="fas fa-thumbs-up"></i> ${file.success} / <i class="fas fa-thumbs-down"></i> ${file.failed}`;
                     document.getElementById(
                         `fileDate-${file.fullPath}`
                     ).innerHTML = ` ${fileDate}`;
@@ -526,12 +528,19 @@ export default class FileManager {
                             let fileDate = new Date(file.uploadDate * 1000);
                             const dateString = fileDate.toDateString();
                             const timeString = fileDate.toTimeString().substring(0, 8);
+                            let bgColour = "bg-secondary";
+                            console.log(file.last);
+                            if(file.last === true){
+                                bgColour = "bg-dark-success";
+                            }else if(file.last === false){
+                                bgColour = "bg-dark-failed";
+                            }
                             fileDate = `${dateString} ${timeString}`;
                             const f = ` <a
             data-jplist-item
             id="file-${file.fullPath}"
             href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
+          class="list-group-item list-group-item-action flex-column align-items-start ${bgColour}"
             style="display: block;
             padding: 0.7rem 0.1rem;"
             >
@@ -552,6 +561,7 @@ export default class FileManager {
                 <div class="row">
                 <div class="col-12">
                 <p class="mb-1 float-right">
+                <span title="File specific success / failure rate from OctoPrint" id="fileHistoryRate"><i class="fas fa-thumbs-up"></i> ${file.success} / <i class="fas fa-thumbs-down"></i> ${file.failed}</span><br>
                 <i class="fas fa-stopwatch"></i> 
                 <span class="time" id="fileTime-${file.fullPath}">
                     ${Calc.generateTime(file.expectedPrintTime)}</span> <br> 

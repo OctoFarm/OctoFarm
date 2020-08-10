@@ -13,6 +13,18 @@ html {
 .contentEditable{
   border: 1px inset grey;
 }
+.bg-dark-success{
+  background-color:#0F2400;
+}
+.bg-dark-success:hover{
+  background-color:#183B00;
+}
+.bg-dark-failed{
+  background-color:#240005;
+}
+.bg-dark-failed:hover{
+  background-color:#47000A;
+}
 .historyImage{
   border: 1px solid #ddd;
   border-radius: 4px;

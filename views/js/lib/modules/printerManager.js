@@ -700,6 +700,7 @@ export default class PrinterManager {
                             setTimeout(function () {
                                 FileManager.refreshFiles(currentPrinter);
                             }, 1000);
+
                         });
                     }
                 } else if (keys[t].includes("heatedBed")) {

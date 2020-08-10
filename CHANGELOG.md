@@ -4,9 +4,10 @@ All notable changes to this project will be documented in this file.
 
 # [UnReleased]
 
-## [v1.1.5.6 - RC3]
+## [v1.1.5.6]
 
 ### Added
+    - File Manager now displays the success/failure/last stats from OctoPrint
  
  
 ### Changed
