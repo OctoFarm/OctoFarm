@@ -1359,8 +1359,18 @@ class Runner {
             thumbnail = entry.thumbnail;
         }
 
+        let success = 0;
+        let failed = 0;
+        let last = null;
+
+        if(typeof entry.prints !== 'undefined'){
+            success = entry.prints.success;
+            failed = entry.prints.failure;
+            last = entry.prints.last.success;
+        }
+
         return {
-            path: path,
+            path,
             fullPath: entry.path,
             display: entry.display,
             length: filament,
@@ -1368,7 +1378,10 @@ class Runner {
             size: entry.size,
             time: timeStat,
             date: entry.date,
-            thumbnail: thumbnail
+            thumbnail,
+            success: success,
+            failed: failed,
+            last: last
         };
         // }catch(err){
         //     logger.error(
@@ -1450,6 +1463,17 @@ class Runner {
                         if (typeof entry.thumbnail !== 'undefined') {
                             thumbnail = entry.thumbnail;
                         }
+
+                        let success = 0;
+                        let failed = 0;
+                        let last = null;
+
+                        if(typeof entry.prints !== 'undefined'){
+                            success = entry.prints.success;
+                            failed = entry.prints.failure;
+                            last = entry.prints.last.success;
+                        }
+
                         const file = {
                             path,
                             fullPath: entry.path,
@@ -1459,7 +1483,10 @@ class Runner {
                             size: entry.size,
                             time: timeStat,
                             date: entry.date,
-                            thumbnail
+                            thumbnail,
+                            success: success,
+                            failed: failed,
+                            last: last
                         };
                         printerFiles.push(file);
                     }
