@@ -417,16 +417,19 @@ export default class FileManager {
       </div>
       </a>`;
             fileElem.insertAdjacentHTML("afterbegin", f);
+            let printer = await OctoFarmClient.post("printers/printerInfo", {
+                i: file.index,
+            });
+            printer = await printer.json();
             const fileActionBtns = document.querySelectorAll("[id*='*fileAction']");
             fileActionBtns.forEach((btn) => {
                 // Gate Keeper listener for file action buttons
-                btn.addEventListener("click", async (e) => {
-                    let printer = await OctoFarmClient.post("printers/printerInfo", {
-                        i: file.index,
+                if(btn.id.includes(printer._id)){
+                    btn.addEventListener("click", async (e) => {
+                        FileManager.actionBtnGate(printer, btn.id);
                     });
-                    printer = await printer.json();
-                    FileManager.actionBtnGate(printer, btn.id);
-                });
+                }
+
             });
             if (fileSortInit) {
                 jplist.refresh();

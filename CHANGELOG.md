@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
     - Fixed not grabbing name from OctoPrint.
     - Fixed filament Manager loading with 0 spools.
     - Fixed issue with changing filament dropdown on filemanager selecting printer instead.
+    - Fixed duplicate listener issue when uploading new files.
         
 ### Removed
    
