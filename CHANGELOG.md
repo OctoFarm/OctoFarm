@@ -32,6 +32,9 @@ All notable changes to this project will be documented in this file.
     - Fixed duplicate listener issue when uploading new files.
     - Fixed Printer Control Dropdown not updating on modal load.
     - Fixed Printer Settings not showing Printer Selection dropdown.
+    - Fixed issue of temps colours not showing on camera view.
+    - Fixed stats on history not showing correctly
+    - Fixed filament manager stats not fixing correctly
         
 ### Removed
    
