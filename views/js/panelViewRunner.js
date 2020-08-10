@@ -398,7 +398,8 @@ function drawPrinter (printer, clientSettings) {
     let flipH = "";
     let flipV = "";
     let rotate90 = "";
-    if (printer.otherSettings !== null) {
+    //Shouldn't need this fix!?
+    if (printer.otherSettings !== null && printer.otherSettings.webCamSettings !== null) {
         if (printer.otherSettings.webCamSettings.flipH) {
             flipH = "rotateY(180deg)";
         }

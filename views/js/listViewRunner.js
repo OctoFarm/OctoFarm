@@ -345,7 +345,7 @@ function drawPrinter (printer, clientSettings) {
     ) {
         hidden = 'hidden';
     }
-    console.log(hidden);
+
     let flipH = '';
     let flipV = '';
     let rotate90 = '';

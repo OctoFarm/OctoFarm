@@ -210,19 +210,31 @@ function updateState (printer, clientSettings) {
         }
     }
 
+    if(!isNaN(toolTempsActual)){
+        toolTempsActual = toolTempsActual.toFixed(1);
+    }
+    if(!isNaN(toolTempsTarget)){
+        toolTempsTarget = toolTempsTarget.toFixed(1);
+    }
+    if(!isNaN(enviromentTempsActual)){
+        enviromentTempsActual = enviromentTempsActual.toFixed(1);
+    }
+    if(!isNaN(enviromentTempsTarget)){
+        enviromentTempsTarget = enviromentTempsTarget.toFixed(1);
+    }
     checkTemps(
         elements.tools,
         toolTempsActual,
         toolTempsTarget,
-        printer.otherSettings.tempTriggers,
-        printer.printerState.state
+        printer.otherSettings.temperatureTriggers,
+        printer.printerState.colour.category
     );
     checkTemps(
         elements.enviro,
         enviromentTempsActual,
         enviromentTempsTarget,
-        printer.otherSettings.tempTriggers,
-        printer.printerState.state
+        printer.otherSettings.temperatureTriggers,
+        printer.printerState.colour.category
     );
     if (printer.printerState.colour.category === 'Active') {
         if (printer.camURL != '') {
@@ -292,7 +304,7 @@ function drawPrinter (printer, clientSettings) {
     let flipH = "";
     let flipV = "";
     let rotate90 = "";
-    if (printer.otherSettings !== null) {
+    if (printer.otherSettings !== null && printer.otherSettings.webCamSettings !== null) {
         if (printer.otherSettings.webCamSettings.flipH) {
             flipH = "rotateY(180deg)";
         }
