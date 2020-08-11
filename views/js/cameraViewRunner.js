@@ -11,7 +11,7 @@ import { dragAndDropEnable, dragCheck } from './lib/functions/dragAndDrop.js';
 import { checkTemps } from './lib/modules/temperatureCheck.js';
 
 let powerTimer = 20000;
-let jpInit = false;
+const jpInit = false;
 let dragDropInit = false;
 let groupInit = false;
 let printerControlList = null;
@@ -584,19 +584,19 @@ async function init (printers, clientSettings) {
             updateState(printers[p], clientSettings);
         }
     }
-    if (jpInit) {
-        const fullscreenElement =
-      document.fullscreenElement ||
-      document.mozFullScreenElement ||
-      document.webkitFullscreenElement;
-        if (!fullscreenElement) {
-            jplist.refresh();
-        }
-    } else {
-        jpInit = true;
-        await jplist.init({
-            storage: 'localStorage', // 'localStorage', 'sessionStorage' or 'cookies'
-            storageName: 'view-storage'
-        });
-    }
+    // if (jpInit) {
+    //     const fullscreenElement =
+    //   document.fullscreenElement ||
+    //   document.mozFullScreenElement ||
+    //   document.webkitFullscreenElement;
+    //     if (!fullscreenElement) {
+    //         jplist.refresh();
+    //     }
+    // } else {
+    //     jpInit = true;
+    //     await jplist.init({
+    //         storage: 'localStorage', // 'localStorage', 'sessionStorage' or 'cookies'
+    //         storageName: 'view-storage'
+    //     });
+    // }
 }
