@@ -9,7 +9,7 @@ const printerClean = require("../lib/dataFunctions/printerClean.js");
 const PrinterClean = printerClean.PrinterClean;
 
 let clientId = 0;
-let clients = {}; // <- Keep a map of attached clients
+const clients = {}; // <- Keep a map of attached clients
 let interval = false;
 
 // Called once for each new client. Note, this response is left open!
@@ -32,14 +32,14 @@ router.get("/get/", ensureAuthenticated, function(req, res) {
 
 if(interval === false){
     interval = setInterval(async function() {
-        let currentOperations = await PrinterClean.returnCurrentOperations();
-        let dashStatistics = await PrinterClean.returnDashboardStatistics();
-        let printerInformation = await PrinterClean.returnPrintersInformation();
-        let infoDrop = {
+        const currentOperations = await PrinterClean.returnCurrentOperations();
+        const dashStatistics = await PrinterClean.returnDashboardStatistics();
+        const printerInformation = await PrinterClean.returnPrintersInformation();
+        const infoDrop = {
             printerInformation: printerInformation,
             currentOperations: currentOperations,
             dashStatistics: dashStatistics
-        }
+        };
         clientInformation = await stringify(infoDrop);
         for (clientId in clients) {
             for (clientId in clients) {
