@@ -339,6 +339,105 @@ const optionsUtilisation = {
         },
     },
 };
+const optionsEnviromentalData = {
+    chart: {
+        type: "line",
+        id: "realtime",
+        height: "250px",
+        width: "100%",
+        animations: {
+            enabled: false,
+        },
+        toolbar: {
+            show: false,
+        },
+        zoom: {
+            enabled: false,
+        },
+        background: "#303030",
+    },
+    colors: ["#fcc329", "#ff1500", "#009cff", "#ff1800"],
+    stroke: {
+        curve: "smooth",
+    },
+    toolbar: {
+        show: false,
+    },
+    theme: {
+        mode: "dark",
+    },
+    noData: {
+        text: "Loading...",
+    },
+    series: [],
+    yaxis: [
+        {
+            title: {
+                text: "Temp",
+            },
+            seriesName: "Temperature",
+            labels: {
+                formatter(value) {
+                    return `${value}°C`;
+                },
+            },
+        },
+        {
+            title: {
+                text: "Pressure",
+            },
+            opposite: true,
+            seriesName: "Pressure",
+            show: true,
+            labels: {
+                formatter(value) {
+                    return `${value} hPa`;
+                },
+            },
+        },
+        {
+            title: {
+                text: "Humidity",
+            },
+            seriesName: "Humidity",
+            show: true,
+            labels: {
+                formatter(value) {
+                    return `${value}%`;
+                },
+            },
+        },
+        {
+            title: {
+                text: "Gas",
+            },
+            opposite: true,
+            seriesName: "Gas",
+            show: true,
+            labels: {
+                formatter(value) {
+                    return `${value} KOhms`;
+                },
+            },
+        },
+    ],
+
+    xaxis: {
+        type: "datetime",
+        labels: {
+            formatter(value) {
+                const date = new Date(value);
+                const formatTime = date.toLocaleTimeString();
+                return formatTime;
+            },
+        },
+    },
+};
+const enviromentalData = new ApexCharts(
+    document.querySelector("#enviromentalHistory"),
+    optionsEnviromentalData
+);
+enviromentalData.render();
 const systemFarmTemp = new ApexCharts(
     document.querySelector("#farmTempMap"),
     optionsFarmTemp
@@ -392,6 +491,10 @@ if (window.Worker) {
                     dashUpdate.printerProgress(dashboard.printerHeatMaps.heatProgress);
                     dashUpdate.printerTemps(dashboard.printerHeatMaps.heatTemps);
                     dashUpdate.printerUptime(dashboard.printerHeatMaps.heatUtilisation);
+                    if(dashboard.enviromentalData){
+                        dashUpdate.envriromentalData(dashboard.enviromentalData);
+                    }
+
                 }
             };
         }
@@ -404,6 +507,13 @@ if (window.Worker) {
 }
 
 class dashUpdate {
+    static envriromentalData(data){
+        console.log(data);
+        if(document.getElementById("envrioData").classList.contains("d-none")){
+            document.getElementById("envrioData").classList.remove("d-none");
+        }
+        enviromentalData.updateSeries(data);
+    }
     static printerStatus(data) {
         const currentStatus = document.getElementById("currentStatus");
         currentStatus.innerHTML = "";
