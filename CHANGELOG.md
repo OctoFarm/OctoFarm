@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
     - File Manager now displays the success/failure/last stats from OctoPrint
+    - New API Endpoint for collecting enviromental data. Expected the following JSON format: {temperature: value (°C), pressure: value (hPa), humidity:value (%), gas_resistance: value (KOhms), date: value}. Null values are required when no data present. 
  
  
 ### Changed

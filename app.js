@@ -124,6 +124,7 @@ const serverStart = async () => {
             app.use("/filament", require("./routes/filament", { page: "route" }));
             app.use("/history", require("./routes/history", { page: "route" }));
             app.use("/scripts", require("./routes/scripts", { page: "route" }));
+            app.use("/input", require("./routes/externalDataCollection", { page: "route" }));
         } catch (e) {
             await logger.error(e);
             // eslint-disable-next-line no-console
