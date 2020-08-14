@@ -1,8 +1,7 @@
-
 // eslint-disable-next-line import/extensions
-import Calc from "./lib/functions/calc.js";
+import Calc from './lib/functions/calc.js';
 // eslint-disable-next-line import/extensions
-import currentOperations from "./lib/modules/currentOperations.js";
+import currentOperations from './lib/modules/currentOperations.js';
 
 // Setup charts
 const optionsFarmTemp = {
@@ -99,8 +98,7 @@ const optionsFarmTemp = {
         labels: {
             formatter(value) {
                 const date = new Date(value);
-                const formatTime = date.toLocaleTimeString();
-                return formatTime;
+                return date.toLocaleTimeString();
             },
         },
     },
@@ -391,9 +389,11 @@ const optionsEnviromentalData = {
             show: true,
             labels: {
                 formatter(value) {
-                    return `${value} hPa`;
+                    return `${value} %`;
                 },
             },
+            min: 0,
+            max: 100,
         },
         {
             title: {
@@ -423,12 +423,14 @@ const optionsEnviromentalData = {
                     if(Calc.isBetween(value, 251, 350)){
                         state = "Severely Polluted";
                     }
-                    if(Calc.isBetween(value, 351, 1000)){
+                    if(Calc.isBetween(value, 351, 500)){
                         state = "Extemely Polluted";
                     }
                     return `${value}: ${state}`;
                 },
             },
+            min: 0,
+            max: 500,
         },
     ],
 
