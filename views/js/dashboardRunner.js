@@ -356,12 +356,12 @@ const optionsEnviromentalData = {
         },
         background: "#303030",
     },
-    colors: ["#fcc329", "#ff1500", "#009cff", "#ff1800"],
+    colors: ["#fcc329", "#ff1500", "#009cff"],
     stroke: {
         curve: "smooth",
     },
     toolbar: {
-        show: false,
+        show: true,
     },
     theme: {
         mode: "dark",
@@ -384,10 +384,10 @@ const optionsEnviromentalData = {
         },
         {
             title: {
-                text: "Pressure",
+                text: "Humidity",
             },
-            opposite: true,
-            seriesName: "Pressure",
+            opposite: false,
+            seriesName: "Humidity",
             show: true,
             labels: {
                 formatter(value) {
@@ -397,26 +397,36 @@ const optionsEnviromentalData = {
         },
         {
             title: {
-                text: "Humidity",
-            },
-            seriesName: "Humidity",
-            show: true,
-            labels: {
-                formatter(value) {
-                    return `${value}%`;
-                },
-            },
-        },
-        {
-            title: {
-                text: "Gas",
+                text: "Indoor Air Quality",
             },
             opposite: true,
-            seriesName: "Gas",
+            seriesName: "IAQ",
             show: true,
             labels: {
                 formatter(value) {
-                    return `${value} KOhms`;
+                    let state = null;
+                    if(Calc.isBetween(value, 0, 50)){
+                        state = "Excellent";
+                    }
+                    if(Calc.isBetween(value, 51, 100)){
+                        state = "Good";
+                    }
+                    if(Calc.isBetween(value, 101, 150)){
+                        state = "Lightly Polluted";
+                    }
+                    if(Calc.isBetween(value, 151, 200)){
+                        state = "Moderately Polluted";
+                    }
+                    if(Calc.isBetween(value, 201, 250)){
+                        state = "Heavily Polluted";
+                    }
+                    if(Calc.isBetween(value, 251, 350)){
+                        state = "Severely Polluted";
+                    }
+                    if(Calc.isBetween(value, 351, 1000)){
+                        state = "Extemely Polluted";
+                    }
+                    return `${value}: ${state}`;
                 },
             },
         },
@@ -432,6 +442,60 @@ const optionsEnviromentalData = {
             },
         },
     },
+    annotations: {
+        position: 'front' ,
+        yaxis: [
+            {
+                y: 0,
+                y2: 50,
+                yAxisIndex: 2,
+                borderColor: '#24571f',
+                fillColor: '#133614',
+            },
+            {
+                y: 51,
+                y2: 100,
+                yAxisIndex: 2,
+                borderColor: '#1f574f',
+                fillColor: '#153b35',
+            },
+            {
+                y: 101,
+                y2: 150,
+                yAxisIndex: 2,
+                borderColor: '#213a5c',
+                fillColor: '#15253b',
+            },
+            {
+                y: 151,
+                y2: 200,
+                yAxisIndex: 2,
+                borderColor: '#21225c',
+                fillColor: '#15153b',
+            },
+            {
+                y: 201,
+                y2: 250,
+                yAxisIndex: 2,
+                borderColor: '#37215c',
+                fillColor: '#23153b',
+            },
+            {
+                y: 251,
+                y2: 350,
+                yAxisIndex: 2,
+                borderColor: '#4c215c',
+                fillColor: '#2e1438',
+            },
+            {
+                y: 350,
+                y2: 1000,
+                yAxisIndex: 2,
+                borderColor: '#5e2222',
+                fillColor: '#381414',
+            }
+        ]
+    }
 };
 const enviromentalData = new ApexCharts(
     document.querySelector("#enviromentalHistory"),

@@ -8,8 +8,8 @@ All notable changes to this project will be documented in this file.
 
 ### Added
     - File Manager now displays the success/failure/last stats from OctoPrint
-    - New API Endpoint for collecting enviromental data. Expected the following JSON format: {temperature: value (°C / °F), pressure: value (hPa), humidity:value (%), gas_resistance: value (KOhms), date: value}. Null values are required when no data present. 
-    - Dashboard will now show envriomental history... currently shows hard coded last 1500 records.
+    - New API Endpoint for collecting enviromental data. Expected the following JSON format: {temperature: value (°C / °F), humidity:value (%), gas_resistance: value (KOhms), date: value}. Null values are required when no data present. 
+    - Dashboard will now show envriomental history... currently shows hard coded last 1500 records. From your data you will get a Temperature and Humidity Graph and also an IAQ Score. If you use the BME680 find out more here: https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BME680-DS001.pdf
  
 ### Changed
  
