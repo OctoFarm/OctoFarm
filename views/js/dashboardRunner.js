@@ -379,12 +379,14 @@ const optionsEnviromentalData = {
                     return `${value}°C`;
                 },
             },
+            min: 0,
+            max: 150,
         },
         {
             title: {
                 text: "Humidity",
             },
-            opposite: false,
+            opposite: true,
             seriesName: "Humidity",
             show: true,
             labels: {
@@ -401,7 +403,7 @@ const optionsEnviromentalData = {
             },
             opposite: true,
             seriesName: "IAQ",
-            show: true,
+            show: false,
             labels: {
                 formatter(value) {
                     let state = null;
