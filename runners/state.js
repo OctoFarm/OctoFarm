@@ -493,6 +493,13 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
                         files
                     );
                     await Runner.updateFilament();
+                    setTimeout(async function() {
+                        const file = {
+                            fullPath: farmPrinters[that.index].job.file.path
+                        };
+                        await Runner.updateFile(file, that.index);
+                    }, 5000);
+
                 }, 10000);
                 ScriptRunner.check(farmPrinters[that.index], 'failed');
             }
@@ -516,6 +523,12 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
                         files
                     );
                     await Runner.updateFilament();
+                    setTimeout(async function() {
+                        const file = {
+                            fullPath: farmPrinters[that.index].job.file.path
+                        };
+                        await Runner.updateFile(file, that.index);
+                    }, 5000);
                 }, 10000);
                 ScriptRunner.check(farmPrinters[that.index], 'done');
             }
@@ -541,6 +554,12 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
                         files
                     );
                     await Runner.updateFilament();
+                    setTimeout(async function() {
+                        const file = {
+                            fullPath: farmPrinters[that.index].job.file.path
+                        };
+                        await Runner.updateFile(file, that.index);
+                    }, 5000);
                 }, 10000);
                 ScriptRunner.check(farmPrinters[that.index], 'error');
             }
@@ -2326,7 +2345,6 @@ class Runner {
                 }
                 const fileInformation = await Runner.getFile(farmPrinters[i]._id, `files/local/${path}`);
                 fileTimeout = fileTimeout + 5000;
-                console.log("SECOND", fileTimeout);
                 if(fileInformation){
                     logger.info(`New File Information:`,fileInformation);
                     farmPrinters[i].fileList.files[farmPrinters[i].fileList.files.length-1] = fileInformation;
