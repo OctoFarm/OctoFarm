@@ -42,8 +42,8 @@
     "fetch-base64": "^2.1.2",
     "flatted": "^2.0.2",
     "iaq": "^1.1.0",
-    "lodash": "^4.17.19",
-    "mongoose": "^5.9.24",
+    "lodash": "^4.17.20",
+    "mongoose": "^5.10.0",
     "node-fetch": "^2.6.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
@@ -59,10 +59,10 @@
     "yieldable-json": "^2.0.0"
   },
   "devDependencies": {
-    "clinic": "^6.0.2",
+    "clinic": "^6.0.3",
     "debug": "^4.1.1",
     "dependency-check": "^4.1.0",
-    "eslint": "^7.4.0",
+    "eslint": "^7.7.0",
     "eslint-config-airbnb-base": "^14.2.0",
     "eslint-config-prettier": "^6.11.0",
     "eslint-config-standard": "^14.1.1",
