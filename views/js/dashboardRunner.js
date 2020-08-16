@@ -354,7 +354,7 @@ const optionsEnviromentalData = {
         },
         background: "#303030",
     },
-    colors: ["#fcc329", "#ff1500", "#009cff"],
+    colors: ["#ff1500", "#324bca", "#49ca32"],
     stroke: {
         curve: "smooth",
     },
@@ -380,7 +380,7 @@ const optionsEnviromentalData = {
                 },
             },
             min: 0,
-            max: 150,
+            max: 50,
         },
         {
             title: {
@@ -575,8 +575,7 @@ if (window.Worker) {
 }
 
 class dashUpdate {
-    static envriromentalData(data){
-        console.log(data);
+    static envriromentalData(data, iaq){
         if(document.getElementById("envrioData").classList.contains("d-none")){
             document.getElementById("envrioData").classList.remove("d-none");
         }

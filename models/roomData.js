@@ -21,7 +21,7 @@ const RoomDataSchema = new mongoose.Schema({
         type: Number,
         required: true,
     }
-});
+},{ capped : true, size:10000, max : 900000 });
 
 const RoomData = mongoose.model("RoomData", RoomDataSchema);
 
