@@ -1200,7 +1200,7 @@ export default class PrinterManager {
                 elements.printerControls.extruder.value != undefined &&
         elements.printerControls.extruder.value !== ""
             ) {
-                const select = OctoPrintClient.selectTool(printer, "tool0");
+                const select = OctoPrintClient.selectTool(currentPrinter, "tool0");
                 if (select) {
                     let { value } = elements.printerControls.extruder;
                     value = "-" + value;
@@ -1208,7 +1208,7 @@ export default class PrinterManager {
                         command: "extrude",
                         amount: parseInt(value),
                     };
-                    const post = await OctoPrintClient.post(printer, "printer/tool", opt);
+                    const post = await OctoPrintClient.post(currentPrinter, "printer/tool", opt);
                     if (post.status === 204) {
                         e.target.classList = "btn btn-success";
                         setTimeout(flashReturn, 500);
