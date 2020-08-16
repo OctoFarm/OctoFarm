@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
     - Dashboard will now show envriomental history... currently shows hard coded last 4000 records. From your data you will get a Temperature and Humidity Graph and also an IAQ Score (if you supply gas_resistance, not all sensors read this data.). If you use the BME680 find out more here: https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BME680-DS001.pdf 
  
 ### Changed
+    - history will now update the file after it's generated. History is generated 10 seconds after a print. 
  
 
 ### Fixed
@@ -19,6 +20,7 @@ All notable changes to this project will be documented in this file.
     - Printer Control Dropdown selecting old value.
     - Fix Retract not working in Printer Control.
     - File loaded undefined and didn't really show what was going on... 
+    - File re-resync button actually refreshes a single file information now not the whole lot. 
    
 
 ## [v1.1.5.6 - RC2]
