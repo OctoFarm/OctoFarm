@@ -144,7 +144,8 @@ export default class FileManager {
             xhr.onloadstart = function (e) {
                 FileManager.createUpload(printerInfo._id, file.name, e.loaded, e.total);
             };
-            xhr.onloadend = function (e) {
+            xhr.onloadend = async function (e) {
+                const spinnerIcon = `<i class="fas fa-spinner fa-pulse"></i> Checking Octoprint for information... <br>`;
                 FileManager.createUpload(printerInfo._id, file.name, e.loaded, e.total);
                 setTimeout(() => {
                     FileManager.createUpload(
@@ -170,7 +171,7 @@ export default class FileManager {
                             }
                         );
                         updatePrinter = await updatePrinter.json();
-                        FileManager.refreshFiles(updatePrinter);
+                        FileManager.refreshFiles(updatePrinter, spinnerIcon);
                         setTimeout(async () => {
                             let updatePrinter = await OctoFarmClient.post(
                                 "printers/printerInfo",
@@ -179,7 +180,7 @@ export default class FileManager {
                                 }
                             );
                             updatePrinter = await updatePrinter.json();
-                            FileManager.refreshFiles(updatePrinter);
+                            FileManager.refreshFiles(updatePrinter, spinnerIcon);
                             setTimeout(async () => {
                                 let updatePrinter = await OctoFarmClient.post(
                                     "printers/printerInfo",
@@ -188,7 +189,7 @@ export default class FileManager {
                                     }
                                 );
                                 updatePrinter = await updatePrinter.json();
-                                FileManager.refreshFiles(updatePrinter, "last");
+                                FileManager.refreshFiles(updatePrinter, "");
                             }, 5000);
                         }, 5000);
                     }, 5500);
@@ -340,7 +341,7 @@ export default class FileManager {
                 <div class="row">
                 <div class="col-12">
                 <p class="mb-1 float-right">
-                  <span title="File specific success / failure rate from OctoPrint" id="fileHistoryRate"><i class="fas fa-thumbs-up"></i> <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> / <i class="fas fa-thumbs-down"></i> <i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span><br>
+                  <span title="File specific success / failure rate from OctoPrint" id="fileHistoryRate-${file.files.local.path}"><i class="fas fa-thumbs-up"></i> <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> / <i class="fas fa-thumbs-down"></i> <i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span><br>
                 <i class="fas fa-stopwatch"></i> 
                 <span class="time" id="fileTime-${file.files.local.path}">
                 <i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span> <br> 
@@ -444,11 +445,7 @@ export default class FileManager {
         }
     }
 
-    static async refreshFiles(printer, last) {
-        let spinnerIcon = "";
-        if(!last){
-            spinnerIcon = `<i class="fas fa-spinner fa-pulse"></i> Checking Octoprint for information... <br>`;
-        }
+    static async refreshFiles(printer, spinnerIcon) {
         for (let i = 0; i < printer.fileList.fileList.length; i++) {
             const file = printer.fileList.fileList[i];
             let currentFolder = document.getElementById("currentFolder").innerHTML;
@@ -473,7 +470,7 @@ export default class FileManager {
                     const dateString = fileDate.toDateString();
                     const timeString = fileDate.toTimeString().substring(0, 8);
                     fileDate = `${dateString} ${timeString}`;
-                    document.getElementById("fileHistoryRate").innerHTML = spinnerIcon + `<i class="fas fa-thumbs-up"></i> 0 / <i class="fas fa-thumbs-down"></i> 0`;
+                    document.getElementById("fileHistoryRate-"+file.fullPath).innerHTML = spinnerIcon + `<i class="fas fa-thumbs-up"></i> 0 / <i class="fas fa-thumbs-down"></i> 0`;
                     document.getElementById(
                         `fileDate-${file.fullPath}`
                     ).innerHTML = ` ${fileDate}`;
@@ -563,7 +560,7 @@ export default class FileManager {
                 <div class="row">
                 <div class="col-12">
                 <p class="mb-1 float-right">
-                <span title="File specific success / failure rate from OctoPrint" id="fileHistoryRate"><i class="fas fa-thumbs-up"></i> ${file.success} / <i class="fas fa-thumbs-down"></i> ${file.failed}</span><br>
+                <span title="File specific success / failure rate from OctoPrint" id="fileHistoryRate-${file.fullPath}"><i class="fas fa-thumbs-up"></i> ${file.success} / <i class="fas fa-thumbs-down"></i> ${file.failed}</span><br>
                 <i class="fas fa-stopwatch"></i> 
                 <span class="time" id="fileTime-${file.fullPath}">
                     ${Calc.generateTime(file.expectedPrintTime)}</span> <br> 
@@ -1225,7 +1222,6 @@ export class FileActions {
     }
 
     static moveFolder(printer, fullPath) {
-        console.log(printer);
         const inputOptions = [];
         const loc = {
             text: "local",
