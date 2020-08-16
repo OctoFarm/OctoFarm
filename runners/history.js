@@ -18,6 +18,10 @@ const historyClean = require("../lib/dataFunctions/historyClean.js");
 
 const { HistoryClean } = historyClean;
 
+const runner = require("../runners/state.js");
+const { Runner } = runner;
+
+
 let counter = 0;
 let errorCounter = 0;
 
@@ -214,6 +218,7 @@ class HistoryCollection {
                 HistoryClean.start();
             });
 
+
             logger.info(
                 "Completed Print Captured for ",
                 payload + printer.printerURL
@@ -343,6 +348,8 @@ class HistoryCollection {
             await saveHistory.save().then((e) => {
                 HistoryClean.start();
             });
+
+
             logger.info("Failed Print captured ", payload + printer.printerURL);
         } catch (e) {
             console.log(e);

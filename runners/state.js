@@ -494,10 +494,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
                     );
                     await Runner.updateFilament();
                     setTimeout(async function() {
-                        const file = {
-                            fullPath: farmPrinters[that.index].job.file.path
-                        };
-                        await Runner.updateFile(file, that.index);
+                        await Runner.reSyncFile(farmPrinters[that.index]._id, farmPrinters[that.index].job.file.path);
                     }, 5000);
 
                 }, 10000);
@@ -524,11 +521,8 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
                     );
                     await Runner.updateFilament();
                     setTimeout(async function() {
-                        const file = {
-                            fullPath: farmPrinters[that.index].job.file.path
-                        };
-                        await Runner.updateFile(file, that.index);
-                    }, 5000);
+                        await Runner.reSyncFile(farmPrinters[that.index]._id, farmPrinters[that.index].job.file.path);
+                    }, 500);
                 }, 10000);
                 ScriptRunner.check(farmPrinters[that.index], 'done');
             }
@@ -555,11 +549,8 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
                     );
                     await Runner.updateFilament();
                     setTimeout(async function() {
-                        const file = {
-                            fullPath: farmPrinters[that.index].job.file.path
-                        };
-                        await Runner.updateFile(file, that.index);
-                    }, 5000);
+                        await Runner.reSyncFile(farmPrinters[that.index]._id, farmPrinters[that.index].job.file.path);
+                    }, 500);
                 }, 10000);
                 ScriptRunner.check(farmPrinters[that.index], 'error');
             }
@@ -1328,7 +1319,7 @@ class Runner {
         const index = _.findIndex(farmPrinters, function(o) {
             return o._id == id;
         });
-        // try{
+
         const url = `${farmPrinters[index].printerURL}/api/${location}`;
         const getFileInformation = await fetch(url, {
             method: 'GET',
@@ -1877,12 +1868,25 @@ class Runner {
         return currentFilament;
     }
 
-    static async reSyncFile (id) {
+    static async reSyncFile (id, fullPath) {
         const i = _.findIndex(farmPrinters, function (o) {
             return o._id == id;
         });
+        const fileID = _.findIndex(farmPrinters[i].fileList.files, function (o) {
+            console.log("HELLO", o.fullPath, fullPath);
+            return o.fullPath == fullPath;
+        });
         // Doesn't actually resync just the file... shhh
-        const success = await Runner.getFiles(id, 'files?recursive=true');
+        farmPrinters[i].fileList.files[fileID] = await Runner.getFile(id, 'files/local/'+fullPath);
+        farmPrinters[i].markModified("fileList");
+        farmPrinters[i].save();
+        const currentFilament = await Runner.compileSelectedFilament(
+            farmPrinters[i].selectedFilament,
+            i
+        );
+        FileClean.generate(farmPrinters[i], currentFilament);
+        FileClean.statistics(farmPrinters);
+
         return true;
     }
 
