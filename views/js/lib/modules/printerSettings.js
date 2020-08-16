@@ -64,7 +64,7 @@ export default class PrinterSettings {
                     document.getElementById("printerBaudDrop").innerHTML = "";
                     document.getElementById("printerProfileDrop").innerHTML = "";
                     document.getElementById("printerConnect").innerHTML = "";
-                    PrinterManager.init(event.target.value, printers, printerControlList);
+                    PrinterSettings.init(event.target.value, printers, printerControlList);
                 });
                 controlDropDown = true;
             }
