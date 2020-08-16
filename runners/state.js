@@ -2300,7 +2300,10 @@ class Runner {
             size: null,
             time: null,
             date: date.getTime() / 1000,
-            thumbnail: null
+            thumbnail: null,
+            success: 0,
+            failed: 0,
+            last: null
         };
         farmPrinters[i].fileList.files.push(data);
         farmPrinters[i].markModified("fileList");

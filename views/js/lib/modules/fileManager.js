@@ -188,7 +188,7 @@ export default class FileManager {
                                     }
                                 );
                                 updatePrinter = await updatePrinter.json();
-                                FileManager.refreshFiles(updatePrinter);
+                                FileManager.refreshFiles(updatePrinter, "last");
                             }, 5000);
                         }, 5000);
                     }, 5500);
@@ -365,7 +365,6 @@ export default class FileManager {
             <span class="usage" title="Expected Filament Usage/Cost" id="fileTool-${
     file.files.local.path
 }">  <i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span>  </span>
-
                 </p> 
                 </div>
                 </div>
@@ -445,7 +444,11 @@ export default class FileManager {
         }
     }
 
-    static async refreshFiles(printer) {
+    static async refreshFiles(printer, last) {
+        let spinnerIcon = "";
+        if(!last){
+            spinnerIcon = `<i class="fas fa-spinner fa-pulse"></i> Checking Octoprint for information... <br>`;
+        }
         for (let i = 0; i < printer.fileList.fileList.length; i++) {
             const file = printer.fileList.fileList[i];
             let currentFolder = document.getElementById("currentFolder").innerHTML;
@@ -470,7 +473,7 @@ export default class FileManager {
                     const dateString = fileDate.toDateString();
                     const timeString = fileDate.toTimeString().substring(0, 8);
                     fileDate = `${dateString} ${timeString}`;
-                    document.getElementById("fileHistoryRate").innerHTML = `<i class="fas fa-thumbs-up"></i> ${file.success} / <i class="fas fa-thumbs-down"></i> ${file.failed}`;
+                    document.getElementById("fileHistoryRate").innerHTML = spinnerIcon + `<i class="fas fa-thumbs-up"></i> 0 / <i class="fas fa-thumbs-down"></i> 0`;
                     document.getElementById(
                         `fileDate-${file.fullPath}`
                     ).innerHTML = ` ${fileDate}`;
@@ -529,7 +532,6 @@ export default class FileManager {
                             const dateString = fileDate.toDateString();
                             const timeString = fileDate.toTimeString().substring(0, 8);
                             let bgColour = "bg-secondary";
-                            console.log(file.last);
                             if(file.last === true){
                                 bgColour = "bg-dark-success";
                             }else if(file.last === false){
@@ -1100,7 +1102,7 @@ export class FileActions {
             value: "/",
         };
         inputOptions.push(loc);
-        printer.filesList.folders.forEach((folder) => {
+        printer.fileList.folderList.forEach((folder) => {
             const option = {
                 text: folder.name,
                 value: folder.name,
@@ -1144,17 +1146,24 @@ export class FileActions {
                             fileName: json.name,
                             newFullPath: json.path,
                         };
+                        UI.createAlert(
+                            "warning",
+                            `Moving file... please wait.`,
+                            3000,
+                            "clicked"
+                        );
                         const updateFarm = await OctoFarmClient.post(
                             "printers/moveFile",
                             opts
                         );
-                        FileManager.updateFileList(printer._id);
-                        UI.createAlert(
-                            "success",
-                            `Successfully moved your file...`,
-                            3000,
-                            "clicked"
-                        );
+                        setTimeout(function(){
+                            FileManager.updateFileList(printer._id);
+                            UI.createAlert(
+                                "success",
+                                `Successfully moved your file...`,
+                                3000,
+                                "clicked"
+                            ); }, 3000);
                     }
                 }
             },
@@ -1216,13 +1225,14 @@ export class FileActions {
     }
 
     static moveFolder(printer, fullPath) {
+        console.log(printer);
         const inputOptions = [];
         const loc = {
             text: "local",
             value: "/",
         };
         inputOptions.push(loc);
-        printer.filesList.folders.forEach((folder) => {
+        printer.fileList.folderList.forEach((folder) => {
             const option = {
                 text: folder.name,
                 value: folder.name,
@@ -1267,18 +1277,25 @@ export class FileActions {
                             newFullPath: result,
                             folderName: json.path,
                         };
+                        UI.createAlert(
+                            "warning",
+                            `Moving folder please wait...`,
+                            3000,
+                            "clicked"
+                        );
                         const updateFarm = await OctoFarmClient.post(
                             "printers/moveFolder",
                             opts
                         );
-                        await FileManager.updateFileList(printer._id);
+                        setTimeout(function(){
+                            FileManager.updateFileList(printer._id);
+                            UI.createAlert(
+                                "success",
+                                `Successfully moved your file...`,
+                                3000,
+                                "clicked"
+                            ); }, 3000);
 
-                        UI.createAlert(
-                            "success",
-                            `Successfully moved your folder...`,
-                            3000,
-                            "clicked"
-                        );
                     }
                 }
             },

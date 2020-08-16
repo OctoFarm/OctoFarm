@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
     - Printer Settings Dropdown not working.
     - Printer Control Dropdown selecting old value.
     - Fix Retract not working in Printer Control.
+    - File loaded undefined and didn't really show what was going on... 
    
 
 ## [v1.1.5.6 - RC2]
