@@ -13,6 +13,24 @@ html {
 .contentEditable{
   border: 1px inset grey;
 }
+.bg-dark-success{
+  background-color:#0F2400;
+}
+.bg-dark-success:hover{
+  background-color:#183B00;
+}
+.bg-dark-failed{
+  background-color:#240005;
+}
+.bg-dark-failed:hover{
+  background-color:#47000A;
+}
+.historyImage{
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 5px;
+  width:75%;
+}
 .heatMapLeft {
   width:19px;
   height:40px;
@@ -197,8 +215,8 @@ a.notyet {
 .fileBody {
   padding: 5px;
   overflow-y: scroll;
-  min-height: 77vh;
-  max-height: 77vh;
+  min-height: 65vh;
+  max-height: 65vh;
 }
 
 .fileBody p {
@@ -341,11 +359,22 @@ a.notyet {
   z-index: 1023;
 }
 .noStorage {
-  position: fixed;
-  left: 50%;
+  position: relative;
   top: 50%;
-  transform: translate(20%, 0);
+  transform: translate(0%, 0);
+  width: 100%;
   z-index: 1023;
+}
+
+/*Terminal*/
+.temperatureMessage {
+  background-color:#583c0e;
+}
+.sdMessage {
+  background-color:#262626;
+}
+.waitMessage {
+  background-color:#2e0905;
 }
 label {
   cursor: pointer;

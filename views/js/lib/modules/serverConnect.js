@@ -1,3 +1,27 @@
+
+async function asyncParse(str) {
+    try {
+        let info = parse(str)
+        return info;
+    } catch (e) {
+        return false;
+    }
+}
+
+let source = new EventSource("/sse/dashboardInfo/");
+
+source.onmessage = async function(e) {
+    if (e.data != null) {
+        let res = await asyncParse(e.data)
+        postMessage(res);
+    }
+};
+source.onerror = function() {
+        postMessage(false)
+};
+source.onclose = function() {
+        postMessage(false)
+};
 var Flatted = (function (Primitive, primitive) {
 
     /*!
@@ -111,6 +135,5 @@ var Flatted = (function (Primitive, primitive) {
     }
 
 }(String, 'string'));
-export default Flatted;
-export var parse = Flatted.parse;
-export var stringify = Flatted.stringify;
+var parse = Flatted.parse;
+var stringify = Flatted.stringify;

@@ -1,5 +1,4 @@
 <% if(typeof history.length != 'undefined' && history.length > 0 ) {%>
-
   <% let historyTotals = helpers.historyTotals(history); %>
 <div class="row">
   <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
@@ -300,20 +299,62 @@
                 <table class="table table-dark text-center">
                   <thead>
                   <tr>
+                    <th class="table-dark" scope="col" width="350px">Status</th>
                     <th class="table-dark" scope="col">Print Time Total</th>
                     <th class="table-dark" scope="col">Filament Usage Total</th>
                     <th class="table-dark" scope="col">Filament Cost Total</th>
                     <th class="table-dark" scope="col">Printer Cost Total</th>
                     <th class="table-dark" scope="col">Combined Total</th>
+                    <th class="table-dark" scope="col">Average Cost Per Hour</th>
                   </tr>
                   </thead>
                   <tbody id="historyTableTotals">
                   <tr>
+                    <th class="table-dark" scope="col">
+                      <div class="progress mb-0">
+                        <div
+                                id="totalSuccessPercent"
+                                class="progress-bar progress-bar-striped bg-success"
+                                role="progressbar"
+                                style="width: 0%"
+                                aria-valuenow="0%"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                        >
+
+                        </div>
+                        <div
+                                id="totalCancelledPercent"
+                                class="progress-bar progress-bar-striped bg-warning"
+                                role="progressbar"
+                                style="width: 0%"
+                                aria-valuenow="0%"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                        >
+                          0%
+                        </div>
+                        <div
+                                id="totalFailurePercent"
+                                class="progress-bar progress-bar-striped bg-danger"
+                                role="progressbar"
+                                style="width: <%= printStatistics.failedPercent %>% "
+                                aria-valuenow="0%"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                        >
+                          0%
+                        </div>
+                      </div>
+
+
+                    </th>
                     <th id="totalPrintTime" class="table-dark" scope="col"></th>
                     <th id="totalFilament" class="table-dark" scope="col"></th>
                     <th id="totalCost" class="table-dark" scope="col"></th>
                     <th id="printerTotalCost" class="table-dark" scope="col"></th>
                     <th id="combinedTotalCost" class="table-dark" scope="col"></th>
+                    <th id="averageCostPerHour" class="table-dark" scope="col"></th>
                   </tr>
                   </tbody>
 
@@ -336,15 +377,16 @@
           <th class="table-dark sticky-table table-dark" scope="col">#</th>
           <th class="table-dark sticky-table table-dark" scope="col">State</th>
           <th class="table-dark sticky-table table-dark" scope="col">Printer</th>
-          <th class="table-dark sticky-table table-dark" scope="col">File Name</th>
+          <th class="table-dark sticky-table table-dark" scope="col" width="400px">File Name</th>
           <th class="table-dark sticky-table table-dark" scope="col">Start Date</th>
           <th class="table-dark sticky-table table-dark" scope="col">End Date</th>
           <th class="table-dark sticky-table table-dark" scope="col">Print Time</th>
-          <th class="table-dark sticky-table table-dark" scope="col">Filament Cost</th>
           <th class="table-dark sticky-table table-dark" scope="col">Printer Cost</th>
+          <th class="table-dark sticky-table table-dark" scope="col" width="400px">Spool</th>
+          <th class="table-dark sticky-table table-dark" scope="col" width="400px">Filament Usage</th>
+          <th class="table-dark sticky-table table-dark" scope="col" width="400px">Filament Cost</th>
           <th class="table-dark sticky-table table-dark" scope="col">Total Cost</th>
-          <th class="table-dark sticky-table table-dark" scope="col">Spool</th>
-          <th class="table-dark sticky-table table-dark" scope="col">Filament Usage</th>
+          <th class="table-dark sticky-table table-dark" scope="col">Cost Per Hour</th>
           <th class="table-dark sticky-table table-dark" scope="col" width="400px">
             Notes
           </th>
@@ -354,60 +396,93 @@
       <tbody id="historyTable" data-jplist-group="history">
         <% for(let i = 0; i < history.length; i++){ %>
         <tr data-jplist-item>
-          <td class="index" scope="row">
-            <%= history[i].printHistory.historyIndex %>
-          </td>
-          <td class="state">
-            <% if(history[i].printHistory.success){%>
-            <p class="d-none">Success</p><i class="fas fa-thumbs-up text-success"></i>
-            <% }else{ %> <% if(history[i].printHistory.reason === "cancelled"){ %>
-                <p class="d-none">Cancelled</p><i class="fas fa-thumbs-down text-warning"></i>
-            <% }else{ %>
-                <p class="d-none">Failure</p><i class="fas fa-exclamation text-danger"></i>
-            <% } %> <% } %>
-          </td>
-          <td class="printer <%= history[i].printHistory.printerName.replace(/ /g, "_") %>"><%=
-            history[i].printHistory.printerName %>
-          </td>
-          <%  let path = ""; %>
-          <% if(typeof history[i].printHistory.job !== 'undefined'){%>
-          <%  path = history[i].printHistory.job.file.path.substring(0, history[i].printHistory.job.file.path.lastIndexOf("/"))%>
-          <%}%>
-          <td class="file <%= history[i].printHistory.fileName.replace(".gcode", "") %> <%= path %>" class="text-wrap">
-            <%= history[i].printHistory.fileName.replace(/_/g," ") %>
-          </td>
-          <td class="start">
-            <%= history[i].printHistory.startDate %>
-          </td>
-          <td class="end">
-            <%= history[i].printHistory.endDate %>
+          <td class="index">
+                  <%= history[i].index %>
           </td>
           <td>
-            <span class="d-none time"><%= history[i].printHistory.printTime %></span>
-            <span><%= helpers.generateTime(history[i].printHistory.printTime) %></span>
+            <%- history[i].state %>
           </td>
-          <td class="cost" id="cost-<%= history[i]._id %>">
-            Loading...
+          <td class="printer <%= history[i].printer.replace(/ /g, "_") %>"><%=
+            history[i].printer %>
+          </td>
+          <% let path = history[i].file.path.substring(0, history[i].file.path.lastIndexOf("/"))%>
+          <td class="file <%= history[i].file.name.replace(".gcode", "") %> <%= path %>" class="text-wrap">
+            <%= history[i].file.name.replace(/_/g," ") %>
+          </td>
+          <td class="start">
+            <%= history[i].startDate %>
+          </td>
+          <td class="end">
+            <%= history[i].endDate %>
+          </td>
+          <td>
+            <span class="d-none time"><%= history[i].printTime %></span>
+            <span><%= helpers.generateTime(history[i].printTime) %></span>
+            <br><code><%= history[i].printHours %></code>
           </td>
           <td class="printerCost" id="printerCost-<%= history[i]._id %>">
-            Loading...
+            <%= history[i].printerCost %>
+          </td>
+          <% let spoolTypes = "" %>
+          <% if(history[i].spools !== null){ %>
+            <% history[i].spools.forEach((spool,index) => { %>
+            <% spoolTypes += spool[Object.keys(spool)[0]].type+" " %>
+          <% })%>
+          <% } %>
+          <td class="spool <%= spoolTypes %>" id="spool-<%= history[i]._id %>">
+            <% if(history[i].spools !== null){ %>
+              <% history[i].spools.forEach((spool,index) => { %>
+                <%if(spool[Object.keys(spool)[0]].spoolName !== null){%>
+                <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p><%= spool[Object.keys(spool)[0]].spoolName %></p>
+                <%}else{%>
+                <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p>(No Spool)</p>
+              <%}%>
+              <% })%>
+            <% } %>
+          </td>
+          <td >
+            <span class="usage" id="usage-<%= history[i]._id %>">
+              <% if(history[i].spools !== null){ %>
+                <% history[i].spools.forEach((spool,index) => { %>
+                <%if(spool[Object.keys(spool)[0]].spoolName !== null){%>
+                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p><%= spool[Object.keys(spool)[0]].weight.toFixed(2) %>g / <%= spool[Object.keys(spool)[0]].length.toFixed(2) %>m</p>
+                <%}else{%>
+                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p>(No Spool)</p>
+                <%}%>
+                <% })%>
+              <% } %>
+            </span>
+            <span class="d-none totalUsageMeter" id="totalUsageMeter-<%= history[i]._id %>">
+              <%= history[i].totalLength %>
+            </span>
+            <span class="d-none totalUsageGrams" id="totalUsageGrams-<%= history[i]._id %>">
+              <%= history[i].totalWeight %>
+            </span>
+          </td>
+          <td>
+            <span class="cost" id="cost-<%= history[i]._id %>">
+              <% if(history[i].spools !== null){ %>
+                <% history[i].spools.forEach((spool,index) => { %>
+                <%if(spool[Object.keys(spool)[0]].spoolName !== null){%>
+                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p><%= spool[Object.keys(spool)[0]].cost %></p>
+                <%}else{%>
+                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p>(No Spool)</p>
+                <%}%>
+                <% })%>
+              <% } %>
+            </span>
+            <span class="d-none filamentCost" id="totalFilamentCost-<%= history[i]._id %>">
+              <%= history[i].spoolCost %>
+            </span>
           </td>
           <td class="totalCost" id="totalCost-<%= history[i]._id %>">
-            Loading...
+            <%= history[i].totalCost %>
           </td>
-          <%if(history[i].printHistory.filamentSelection != null && typeof history[i].printHistory.filamentSelection !== 'undefined' && typeof history[i].printHistory.filamentSelection.spools !== 'undefined'){%>
-          <td class="spool <%= history[i].printHistory.filamentSelection.spools.profile.material.replace(/ /g, "_") %>" id="spool-<%= history[i]._id %>">
-          <% }else{%>
-          <td class="spool" id="spool-<%= history[i]._id %>">
-          <%}%>
-
-            Loading...
-          </td>
-          <td class="usage" id="usage-<%= history[i]._id %>">
-            Loading...
+          <td class="costPerHour" id="costPerHour-<%= history[i]._id %>">
+            <%= history[i].costPerHour %>
           </td>
           <td class="notes" class="text-wrap" id="note-<%= history[i]._id %>">
-            <%= history[i].printHistory.notes %>
+            <%= history[i].notes %>
           </td>
           <td>
             <div class="btn-group" role="group" aria-label="Basic example">
@@ -438,7 +513,7 @@
 
   </div>
 </div>
-
+  <script src="/js/lib/modules/history.js" type="module"></script>
 <% }else{ %>
   <div class="row mt-5">
     <div class="col-md-6 m-auto">
@@ -464,97 +539,103 @@
         </button>
       </div>
       <div class="modal-body">
-        <div class="container-fluid">
-          <div class="row text-center">
-            <div class="col-lg-12"><h5 class="mb-1 text-left">Date and Time</h5></div>
-            <div class="col-lg-1"><button id="printStatus" type="button" class="btn btn-secondary float-right d-block" href="#" aria-expanded="false" disabled="">
+        <div class="row">
+          <div class="col-lg-6 p-0 m-0">
+            <div class="row">
+              <div class="col-lg-12"><h5 class="mb-1">Date and Time</h5><hr></div>
+              <div class="col-lg-3 text-center "><button id="printStatus" type="button" class="btn btn-secondary" href="#" aria-expanded="false" disabled="">
 
-              </button></div>
-            <div class="col-lg-4"><button id="startDate" type="button" class="btn btn-secondary float-right d-block" href="#" aria-expanded="false" disabled="">
+                </button></div>
+              <div class="col-lg-3 text-center "><button id="startDate" type="button" class="btn btn-secondary" href="#" aria-expanded="false" disabled="">
 
-              </button></div>
-            <div class="col-lg-3"><button id="printTime" type="button" class="btn btn-secondary float-right d-block" href="#" aria-expanded="false" disabled="">
+                </button></div>
+              <div class="col-lg-3 text-center "><button id="printTime" type="button" class="btn btn-secondary" href="#" aria-expanded="false" disabled="">
 
-              </button></div>
-            <div class="col-lg-4"><button id="endDate" type="button" class="btn btn-secondary float-right d-block" href="#" aria-expanded="false" disabled="">
+                </button></div>
+              <div class="col-lg-3 text-center "><button id="endDate" type="button" class="btn btn-secondary" href="#" aria-expanded="false" disabled="">
 
-              </button></div>
+                </button></div>
+            </div>
           </div>
-          <div class="row">
-            <div class="col-lg-6">
-             <h5 class="mb-1 text-left">Filament</h5>
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="filament">Spool</label>
-                </div>
-                <select id="filament" class="custom-select">
+          <div class="col-lg-6">
+            <div class="row">
+              <div id="history-thumbnail"></div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+                <div class="col-lg-12"><h5 class="mb-1 text-left">Tools</h5><hr></div>
+                <div class="col-lg-12">
+                  <table class="table table-dark text-center">
+                    <thead>
+                    <tr>
+                      <th class="table-dark sticky-table table-dark" scope="col">Tool</th>
+                      <th class="table-dark sticky-table tabl-dark" scope="col">Spool</th>
+                      <th class="table-dark sticky-table table-dark" scope="col">Volume</th>
+                      <th class="table-dark sticky-table table-dark" scope="col">Length</th>
+                      <th class="table-dark sticky-table table-dark" scope="col">Weight</th>
+                      <th class="table-dark sticky-table table-dark" scope="col">Filament Cost</th>
+                    </tr>
+                    </thead>
+                    <tbody id="viewTable">
 
-                </select>
+                    </tbody>
+
+                  </table>
+                </div>
               </div>
-                <div class="input-group mb-1 input-group-sm">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">Volume</span>
-                  </div>
-                  <input id="volume" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                  <div class="input-group-append">
-                    <span class="input-group-text" id="basic-addon2">cm³</span>
-                  </div>
+        <div class="row">
+          <div class="col-lg-12"><h5 class="mb-1 text-left">Extra Information</h5><hr></div>
+          <div class="col-lg-4">
+            <h5 class="mb-1 text-left">Job</h5>
+            <div class="col p-0">
+              <div class="input-group mb-1 input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Printer Cost</span>
                 </div>
-                <div class="input-group mb-1 input-group-sm">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text">Length</span>
-                  </div>
-                  <input id="length" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                  <div class="input-group-append">
-                    <span class="input-group-text" id="basic-addon2">m</span>
-                  </div>
-                </div>
-              <form>
-                <div class="row">
-                  <div class="col p-0">
-                    <div class="input-group mb-1 input-group-sm">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">Filament Cost</span>
-                      </div>
-                      <input id="cost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-<!--                      <div class="input-group-append">-->
-<!--                        <span class="input-group-text" id="basic-addon2"></span>-->
-<!--                      </div>-->
-                    </div>
-                  </div>
-                  <div class="col p-0">
-                    <div class="input-group mb-1 input-group-sm">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">Printer Cost</span>
-                      </div>
-                      <input id="printerCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-<!--                      <div class="input-group-append">-->
-<!--                        <span class="input-group-text" id="basic-addon2"></span>-->
-<!--                      </div>-->
-                    </div>
-                  </div>
-                  <div class="col p-0 pl-1">
-                    <div class="input-group mb-1 input-group-sm">
-                      <div class="input-group-prepend">
-                        <span class="input-group-text">Weight</span>
-                      </div>
-                      <input id="weight" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-                      <div class="input-group-append">
-                        <span class="input-group-text" id="basic-addon2">g</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
+                <input id="printerCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+                <!--                      <div class="input-group-append">-->
+                <!--                        <span class="input-group-text" id="basic-addon2"></span>-->
+                <!--                      </div>-->
+              </div>
             </div>
-            <div class="col-lg-6">
-              <h5>Notes:</h5>
-              <textarea id="notes" class="form-control" aria-label="With textarea" style="margin-top: 0px; margin-bottom: 0px; height: 142px;"></textarea>
+            <div class="col p-0">
+              <div class="input-group mb-1 input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Estimated Print Time</span>
+                </div>
+                <input id="estimatedPrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+              </div>
+              <div class="input-group mb-1 input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Actual Print Time</span>
+                </div>
+                <input id="printerTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+                <!--                      <div class="input-group-append">-->
+                <!--                        <span class="input-group-text" id="basic-addon2"></span>-->
+                <!--                      </div>-->
+              </div>
+              <div class="input-group mb-1 input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Print Time Accuracy</span>
+                </div>
+                <input id="printTimeAccuracy" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+              </div>
+              <div class="input-group mb-1 input-group-sm">
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Total Job Cost</span>
+                </div>
+                <input id="jobCosting" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+                <div class="input-group-prepend">
+                  <span class="input-group-text">Hourly Cost</span>
+                </div>
+                <input id="jobHourlyCost" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+              </div>
             </div>
+
           </div>
-          <div class="row">
-            <div class="col-lg-6">
-              <h5>File Information</h5>
+          <div class="col-lg-4">
+              <h5 class="mb-1 text-left">File</h5>
               <div class="input-group mb-1 input-group-sm">
                 <div class="input-group-prepend">
                   <span class="input-group-text">Upload Date</span>
@@ -575,31 +656,27 @@
                 <div class="input-group-append">
                   <span class="input-group-text" id="basic-addon2">MB</span>
                 </div>
-              </div>
             </div>
-            <div class="col-lg-6">
-              <h5>File Statistics</h5>
-              <div class="input-group mb-1 input-group-sm">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Estimated Print Time</span>
-                </div>
-                <input id="estimatedPrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+            <div class="input-group mb-1 input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Average Print Time</span>
               </div>
-              <div class="input-group mb-1 input-group-sm">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Average Print Time</span>
-                </div>
-                <input id="averagePrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-              </div>
-              <div class="input-group mb-1 input-group-sm">
-                <div class="input-group-prepend">
-                  <span class="input-group-text">Last Print Time</span>
-                </div>
-                <input id="lastPrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
-              </div>
+              <input id="averagePrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
             </div>
-          </div>
+            <div class="input-group mb-1 input-group-sm">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Last Print Time</span>
+              </div>
+              <input id="lastPrintTime" type="text" class="form-control" placeholder="" aria-label="Recipient's username" aria-describedby="basic-addon2" disabled>
+
+            </div>
+
         </div>
+          <div class="col-lg-4">
+            <h5 class="mb-1 text-left">Notes</h5>
+            <textarea id="notes" class="form-control" aria-label="With textarea" style="margin-top: 0px; margin-bottom: 0px; height: 142px;"></textarea>
+          </div>
+      </div>
       </div>
       <div class="modal-footer" id="historySave">
         <button type="button" class="btn btn-light" data-dismiss="modal">
@@ -609,4 +686,3 @@
     </div>
   </div>
 </div>
-<script src="/js/lib/modules/history.js" type="module"></script>

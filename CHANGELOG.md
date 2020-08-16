@@ -2,6 +2,143 @@
 
 All notable changes to this project will be documented in this file.
 
+# [Released]
+
+## [v1.1.5.6]
+
+### Added
+    - File Manager now displays the success/failure/last stats from OctoPrint
+    - New API Endpoint for collecting enviromental data. Expected the following JSON format: {temperature: value (°C), humidity:value (%), gas_resistance: value (KOhms), date: value}. Null values are required when no data present. (MongoDB is NOT a time series database, this is capped at 90000 records... )
+    - Dashboard will now show envriomental history... currently shows hard coded last 4000 records. From your data you will get a Temperature and Humidity Graph and also an IAQ Score (if you supply gas_resistance, not all sensors read this data.). If you use the BME680 find out more here: https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BME680-DS001.pdf 
+ 
+### Changed
+    - history will now update the file after it's generated. History is generated 10 seconds after a print. 
+ 
+
+### Fixed
+    - Printer Settings Dropdown not working.
+    - Printer Control Dropdown selecting old value.
+    - Fix Retract not working in Printer Control.
+    - File loaded undefined and didn't really show what was going on... 
+    - File re-resync button actually refreshes a single file information now not the whole lot. 
+   
+
+## [v1.1.5.6 - RC2]
+
+### Added
+    - Added version output to console log.
+    - WOL Support: Wake on Lan for clients now supported. In your Printers power settings you will have a new option to enable Wake on lan. Enabling puts a new "Wake Host" Option in the normal power dropdown.
+    - Message to websocket icon regarding use of global api key.
+    - History now shows Print Time in red formatted as {hours}:{minutes}:{seconds} underneith the original format.
+    - Added a true server alive check. Client now polls this whilst active and throws a modal up when connection lost. Will reload the page automatically (manual also) when connection restored. 
+  
+### Changed
+    - Make a note of the plugin/settings hash
+    - Adding a printer will now show Printer State as "Awaiting WebSocket" until the websocket updates the printers status.
+    - File list is now stored in database to save re-scanning on server load.
+    - Added timeout to file scanning, will only try to update 4 times then await users resync for information.
+    - Thumbnails are now stored with history in /images/historyCollection/thumbs. The /images folder will need mounting to docker to make this persistent if you want to use this feature. 
+
+### Fixed
+    - Fixed Add Printer table not clearing correctly.
+    - Fixed connection to OctoPrint for release of 1.4.1. Caveat, can no longer use global API key. Fixed #85 & #89
+    - Fixed issue with print time acuracy calculation in history.
+    - Fixed issue with history showing incorrect cost per hour
+    - Fixed camera rotation on views.
+    - Fixed not grabbing name from OctoPrint.
+    - Fixed filament Manager loading with 0 spools.
+    - Fixed issue with changing filament dropdown on filemanager selecting printer instead.
+    - Fixed duplicate listener issue when uploading new files.
+    - Fixed Printer Control Dropdown not updating on modal load.
+    - Fixed Printer Settings not showing Printer Selection dropdown.
+    - Fixed issue of temps colours not showing on camera view.
+    - Fixed stats on history not showing correctly
+    - Fixed filament manager stats not fixing correctly
+        
+### Removed
+   
+
+## [v1.1.5.6 - RC1]
+
+### Added
+    - Power button now asks for confirmation when switching off
+    - Seperate smaller width table for adding printers. Should help with adding printers on a smaller screen laptop. 
+    - Thumbnail to history view modal. Captures and stores it on the webserver. 
+    - Added percent bar for Status on History Filters. Will show total failed/success/cancelled percentages on filtered results. 
+    - Added hover information to file actions on file list
+    - New Monilithic docker builds, builds with MongoDB included.
+    - Printer Control now supports multiple tools
+    - Printer Control now shows "Updated" status for tools. Shows the last time the temperature was grabbed.
+    - History now displays multiple tool information if it was collected in the record. All successful prints will contain this information. 
+    - pm2 now outputs full process logs into log folder. 
+    - Printer Control now has web and power buttons. 
+    - Printers Manager now shows status for the 6 checks an OctoPrint client will go through. API, File, State, Profile, Settings and System. Red shows not yet scanned and green shows scanned. 
+    - Added filters to Terminal output on Printer Control. Same as OctoPrint currently: temp,sd,wait
+    - Terminal output is now colour coded: temp - yellow, sd - grey, wait - red.
+    - Filament manager plugin can now be resynced from the filament manager screen.
+    - History now calculates print cost per hour for each print.
+    - History statistics now show average cost per hour in the history filters sections
+    - New patreon members lactose, scott and jose. Big thanks for your support!
+    - Views now display "Tool #" next to filament if already displayed on the view. 
+    - Panel & list view now displays individual tool numbers and temps associated, bed and chamber will also be shown if enabled.
+    - Camera view will tally your tool numbers temperatures, so all tool# designations are tallied to Tool and Bed and Chamber designations get tallied into Bed.
+    - Added progress bar to list view extra information.
+    - Current operations now displays current file
+    
+### Changed
+    - Moved the file manager management buttons outside of the Printers and Files list. This keeps them at the top whilst scrolling inside your files. 
+    - Thumbnails if available are now captured when logging history for any file. They will be saved per file in the client images folder.
+    - Panel view now shows file thumbnail if available and no camera is set.
+    - Printer Control window now shows file thumbnail if available on selected job.
+    - State runner now updates octoprint job information with the selected thumbnail and filament length so this information can be used on the client.
+    - Started counting individual printer error/cancelled/success ratio
+    - Re-configured the printer control view:
+        - Moved all the elements into new positions. Hopefully this brings more focus on what's used all the time, and it also allows for upcoming modifications to see extra tools/chamber temperatures. 
+        - Converted Terminal input to multi-line input
+    - File List now shows actions buttons as bar across bottom of file.
+    - database configuration now defaults to localhost address for db uri.
+    - The File list now shows Filament Cost and Printer Cost seperate. 
+        - Filament Cost requires a filament to be selected to generate. Re-Sync to update.  
+        - Printer Cost requires your printer costs been filled in in Printer Settings and also requires an expected time to be generated. 
+    - Client now uses service workers for information retrieval. 
+    - History information now generated on server side then sent to the client, should improve loading times. 
+    - Filament information now generated on server side then sent to the client, should improve loading times. 
+    - Printer Control improvements, now shows loading spinner when loading/switching to a different print. Speeds should be slightly improved``
+        - Printer Control now live reloads filament/file changes. Shouldn't need to re-sync nearly as much manually. 
+        - First re-sync will happen after 1000ms, trigger by file upload/filament change. Second re-sync on file upload first after 10000ms, this isn't always enough for OctoPrint to generate file meta so manual re-sync maybe required after this.
+    - Printer Management buttons have been moved to a card body. 
+    - Docker no longer installs & updates node_modules on start if the folder exists.
+    - Camera's on OctoFarm now respect the camera enabled setting within OctoPrint. If disabled it will attempt to display the currently selected files thumbnail, failing both the cameraurl and thumbnail url will not load the camera block.
+    - Filament selection has been combined into the Tools header for list view. 
+    
+### Fixed
+    - Fix file manager bug with default date sorting.
+    - Fixed styling issue with the filters and sorting dropdowns on views making the bar bigger.
+    - Printer Settings didn't apply new content editable css to fields.
+    - Fixed issue with websockets not been gracefully closed. Should help with double alerts/history notifications after editing/changing a printer meta.
+    - Fixed Panel view sorting not returning to index.
+    - Fixed issue with sorting breaking fullscreen elements
+    - Fixed bug with filament manager not turning off editable styling
+    - Fixed issue with profiles not saving on filemant manager
+    - Fixed bug with file manager resetting page scroll when entering folder/choosing printer
+    - Server reboot has a notification and no longer needs page to re-load. Live updating. 
+    - Improved loading times on history with pre-calculating the list values server side. 
+    - Filament manager failed on re-syncing due to changes when adding spools/profiles. 
+    - Speed improvements with new backend pre-calculation. All information should be prepared ready for client access before access. 
+    - Fixed #77 - Farm Utilisation not calculated correctly.
+    - Filament Manager plugin tweaks: Fixed #73 and #74
+        - Filament Manager now keeps up to date when filament is down dated. It will re-sync your filament library after a print.
+        - Improved log output and it's own file. 
+        - Server start fires a re-sync to make sure no changes are missed.
+        - Caveat: OctoFarm doesn't know when you change a filament on OctoPrint, any changes you make there for filament, you will need to tell OctoFarm with a Re-Sync/Spool selection.
+    - Fixed #79 - Duplicate historical entries due to multiple listeners getting assigned on printer edit/delete.
+    - Fixed some dependancy security issues and updated node modules. Please make sure to run npm install / npm update if you've already installed node_modules. 
+    
+### Removed
+    - History may not now show your selected spool for old records with no job information caught. This is mainly going to be cancelled/failed prints as there is no information caught or prints that start and finish before OctoPrint can generate the job information. OctoFarm now relies on the tool# information provided in this for captured histories to render spool information correctly.     
+    
+## [Released]
+
 ## [v1.1.5.5]
 
 ### Added
@@ -370,8 +507,6 @@ All notable changes to this project will be documented in this file.
     - Fixed spacing icon on temperature displays
     - Fixed views not updating temperature for complete/idle printers.
     - Fixed cameras not applying multiple rotate settings
-
-## [Released]
 
 ## [v1.1.4-6-bugfix]
 

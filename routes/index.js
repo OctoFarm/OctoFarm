@@ -1,42 +1,54 @@
-const express = require("express");
+const express = require('express');
+
 const router = express.Router();
-const { ensureAuthenticated } = require("../config/auth");
-const db = require("../config/db").MongoURI;
-const pjson = require("../package.json");
-const ClientSettings = require("../models/ClientSettings.js");
-const ServerSettings = require("../models/ServerSettings.js");
-const prettyHelpers = require("../views/partials/functions/pretty.js");
-const Spools = require("../models/Filament.js");
-const Profiles = require("../models/Profiles.js");
-const runner = require("../runners/state.js");
-const Runner = runner.Runner;
-const _ = require("lodash");
+const { ensureAuthenticated } = require('../config/auth');
+const db = require('../config/db').MongoURI;
+const pjson = require('../package.json');
+const ServerSettings = require('../models/ServerSettings.js');
+const prettyHelpers = require('../views/partials/functions/pretty.js');
+const runner = require('../runners/state.js');
 
-const version = pjson.version + ".5";
+const { Runner } = runner;
+const _ = require('lodash');
 
-console.log("db: " + db);
+const historyClean = require('../lib/dataFunctions/historyClean.js');
 
-const Roll = require("../models/Filament.js");
+const { HistoryClean } = historyClean;
+const filamentClean = require('../lib/dataFunctions/filamentClean.js');
 
-//Welcome Page
-async function welcome() {
-    if (db === "") {
-        //No db setup, show db warning before login.
-        router.get("/", (req, res) =>
-            res.render("database", { page: "Database Warning" })
+const { FilamentClean } = filamentClean;
+const settingsClean = require('../lib/dataFunctions/settingsClean.js');
+
+const { SettingsClean } = settingsClean;
+const printerClean = require('../lib/dataFunctions/printerClean.js');
+
+const { PrinterClean } = printerClean;
+const fileClean = require('../lib/dataFunctions/fileClean.js');
+
+const { FileClean } = fileClean;
+
+const version = `${pjson.version}.6`;
+console.log(`Version: ${version}`);
+console.log(`db: ${db}`);
+
+// Welcome Page
+async function welcome () {
+    if (db === '') {
+    // No db setup, show db warning before login.
+        router.get('/', (req, res) =>
+            res.render('database', { page: 'Database Warning' })
         );
     } else {
-        let settings = await ServerSettings.find({});
-
-        if (settings[0].server.loginRequired === false) {
-            router.get("/", (req, res) => res.redirect("/dashboard"));
+        const serverSettings = await ServerSettings.find({});
+        if (serverSettings[0].server.loginRequired === false) {
+            router.get('/', (req, res) => res.redirect('/dashboard'));
         } else {
-            let registration = settings[0].server.registration;
-            router.get("/", (req, res) =>
-                res.render("welcome", {
-                    page: "Welcome",
-                    registration: registration,
-                    serverSettings: settings,
+            const { registration } = serverSettings[0].server;
+            router.get('/', (req, res) =>
+                res.render('welcome', {
+                    page: 'Welcome',
+                    registration,
+                    serverSettings: serverSettings[0]
                 })
             );
         }
@@ -44,309 +56,258 @@ async function welcome() {
 }
 welcome();
 
-//Dashboard Page
-router.get("/dashboard", ensureAuthenticated, async(req, res) => {
-    let printers = await Runner.returnFarmPrinters();
-    let sortedPrinters = await Runner.sortedIndex();
-    const farmStatistics = require("../runners/statisticsCollection.js");
-    const FarmStatistics = farmStatistics.StatisticsCollection;
-    let statistics = await FarmStatistics.returnStats();
-    const system = require("../runners/systemInfo.js");
-    const SystemRunner = system.SystemRunner;
-    let systemInformation = await SystemRunner.returnInfo();
-    let clientSettings = await ClientSettings.find({});
-    let serverSettings = await ServerSettings.find({});
+// Dashboard Page
+router.get('/dashboard', ensureAuthenticated, async (req, res) => {
+    const printers = await Runner.returnFarmPrinters();
+    const serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
-        user = "No User";
-        group = "Administrator";
+    if (serverSettings.server.loginRequired === false) {
+        user = 'No User';
+        group = 'Administrator';
     } else {
         user = req.user.name;
         group = req.user.group;
     }
-    res.render("dashboard", {
+    res.render('dashboard', {
         name: user,
         userGroup: group,
-        version: version,
-        sortedIndex: sortedPrinters,
-        printers: printers,
-        farmInfo: statistics.farmInfo,
-        currentOperations: statistics.currentOperations,
-        octofarmStatistics: statistics.octofarmStatistics,
-        printStatistics: statistics.printStatistics,
+        version,
         printerCount: printers.length,
-        currentOperationsCount: statistics.currentOperationsCount,
-        page: "Dashboard",
-        helpers: prettyHelpers,
-        systemInfo: systemInformation,
-        clientSettings: clientSettings,
-        serverSettings: serverSettings,
+        page: 'Dashboard',
+        helpers: prettyHelpers
     });
 });
-router.get("/printers", ensureAuthenticated, async(req, res) => {
-    let printers = await Runner.returnFarmPrinters();
-    let sortedPrinters = await Runner.sortedIndex();
-    const farmStatistics = require("../runners/statisticsCollection.js");
-    const FarmStatistics = farmStatistics.StatisticsCollection;
-    let statistics = await FarmStatistics.returnStats();
-    const system = require("../runners/systemInfo.js");
-    const SystemRunner = system.SystemRunner;
-    let systemInformation = await SystemRunner.returnInfo();
-    let clientSettings = await ClientSettings.find({});
-    let serverSettings = await ServerSettings.find({});
+router.get('/printers', ensureAuthenticated, async (req, res) => {
+    const printers = await Runner.returnFarmPrinters();
+    const serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
-        user = "No User";
-        group = "Administrator";
+    if (serverSettings.server.loginRequired === false) {
+        user = 'No User';
+        group = 'Administrator';
     } else {
         user = req.user.name;
         group = req.user.group;
     }
-    res.render("printerManagement", {
+    res.render('printerManagement', {
         name: user,
         userGroup: group,
-        version: version,
-        sortedIndex: sortedPrinters,
-        printers: printers,
-        page: "Printer Manager",
+        version,
+        page: 'Printer Manager',
         printerCount: printers.length,
-        helpers: prettyHelpers,
-        systemInfo: systemInformation,
-        clientSettings: clientSettings,
-        serverSettings: serverSettings,
+        helpers: prettyHelpers
     });
 });
-//File Manager Page
-router.get("/filemanager", ensureAuthenticated, async(req, res) => {
-    let printers = await Runner.returnFarmPrinters();
-    let sortedPrinters = await Runner.sortedIndex();
-    const farmStatistics = require("../runners/statisticsCollection.js");
-    const FarmStatistics = farmStatistics.StatisticsCollection;
-    let statistics = await FarmStatistics.returnStats();
-    let serverSettings = await ServerSettings.find({});
+// File Manager Page
+router.get('/filemanager', ensureAuthenticated, async (req, res) => {
+    const printers = await Runner.returnFarmPrinters();
+    const serverSettings = await SettingsClean.returnSystemSettings();
+    const currentOperations = await PrinterClean.returnCurrentOperations();
+    const fileStatistics = await FileClean.returnStatistics();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
-        user = "No User";
-        group = "Administrator";
+    if (serverSettings.server.loginRequired === false) {
+        user = 'No User';
+        group = 'Administrator';
     } else {
         user = req.user.name;
         group = req.user.group;
     }
-    res.render("filemanager", {
+    res.render('filemanager', {
         name: user,
         userGroup: group,
-        version: version,
-        printers: printers,
-        sortedIndex: sortedPrinters,
+        version,
+        page: 'Printer Manager',
         printerCount: printers.length,
-        currentOperationsCount: statistics.currentOperationsCount,
-        farmInfo: statistics.fileStatistics,
-        page: "File Manager",
         helpers: prettyHelpers,
-        serverSettings: serverSettings,
+        currentOperationsCount: currentOperations.count,
+        fileStatistics
     });
 });
-//History Page
-router.get("/history", ensureAuthenticated, async(req, res) => {
-    let printers = Runner.returnFarmPrinters();
-    let sortedPrinters = await Runner.sortedIndex();
-    const History = require("../models/History.js");
-    let history = await History.find({});
-    const farmStatistics = require("../runners/statisticsCollection.js");
-    const FarmStatistics = farmStatistics.StatisticsCollection;
-    let statistics = await FarmStatistics.returnStats();
-    let serverSettings = await ServerSettings.find({});
+// History Page
+router.get('/history', ensureAuthenticated, async (req, res) => {
+    const printers = Runner.returnFarmPrinters();
+    const history = await HistoryClean.returnHistory();
+    const statistics = await HistoryClean.returnStatistics();
+    const serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
-        user = "No User";
-        group = "Administrator";
+    if (serverSettings.server.loginRequired === false) {
+        user = 'No User';
+        group = 'Administrator';
     } else {
         user = req.user.name;
         group = req.user.group;
     }
-    res.render("history", {
+    res.render('history', {
         name: user,
         userGroup: group,
-        version: version,
-        printers: printers,
-        sortedIndex: sortedPrinters,
+        version,
         printerCount: printers.length,
-        history: history,
-        page: "History",
+        history,
+        printStatistics: statistics,
         helpers: prettyHelpers,
-        printStatistics: statistics.printStatistics,
-        serverSettings: serverSettings,
+        page: 'History'
     });
 });
-//Panel view  Page
-router.get("/mon/panel", ensureAuthenticated, async(req, res) => {
-    let printers = Runner.returnFarmPrinters();
-    let sortedPrinters = await Runner.sortedIndex();
-    const farmStatistics = require("../runners/statisticsCollection.js");
-    const FarmStatistics = farmStatistics.StatisticsCollection;
-    let statistics = await FarmStatistics.returnStats();
-    let clientSettings = await ClientSettings.find({});
-    let serverSettings = await ServerSettings.find({});
+// Panel view  Page
+router.get('/mon/panel', ensureAuthenticated, async (req, res) => {
+    const printers = await Runner.returnFarmPrinters();
+    const sortedIndex = await Runner.sortedIndex();
+    const clientSettings = await SettingsClean.returnClientSettings();
+    const serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
-        user = "No User";
-        group = "Administrator";
+    if (serverSettings.server.loginRequired === false) {
+        user = 'No User';
+        group = 'Administrator';
     } else {
         user = req.user.name;
         group = req.user.group;
     }
-    res.render("panelView", {
+    res.render('panelView', {
         name: user,
         userGroup: group,
-        version: version,
-        printers: printers,
-        sortedIndex: sortedPrinters,
-        currentOperations: statistics.currentOperations,
+        version,
+        printers,
         printerCount: printers.length,
-        currentOperationsCount: statistics.currentOperationsCount,
-        page: "Panel View",
+        sortedIndex,
+        page: 'Panel View',
         helpers: prettyHelpers,
-        clientSettings: clientSettings,
-        serverSettings: serverSettings,
+        clientSettings
     });
 });
-//Camera view  Page
-router.get("/mon/camera", ensureAuthenticated, async(req, res) => {
-    let printers = Runner.returnFarmPrinters();
-    let sortedPrinters = await Runner.sortedIndex();
-    const farmStatistics = require("../runners/statisticsCollection.js");
-    const FarmStatistics = farmStatistics.StatisticsCollection;
-    let statistics = await FarmStatistics.returnStats();
-    let clientSettings = await ClientSettings.find({});
-    let serverSettings = await ServerSettings.find({});
+// Camera view  Page
+router.get('/mon/camera', ensureAuthenticated, async (req, res) => {
+    const printers = await Runner.returnFarmPrinters();
+    const sortedIndex = await Runner.sortedIndex();
+    const clientSettings = await SettingsClean.returnClientSettings();
+    const serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
-        user = "No User";
-        group = "Administrator";
+    if (serverSettings.server.loginRequired === false) {
+        user = 'No User';
+        group = 'Administrator';
     } else {
         user = req.user.name;
         group = req.user.group;
     }
-    res.render("cameraView", {
+    res.render('cameraView', {
         name: user,
         userGroup: group,
-        version: version,
-        printers: printers,
-        sortedIndex: sortedPrinters,
-        currentOperations: statistics.currentOperations,
-        currentOperationsCount: statistics.currentOperationsCount,
+        version,
+        printers,
         printerCount: printers.length,
-        page: "Camera View",
+        sortedIndex,
+        page: 'Camera View',
         helpers: prettyHelpers,
-        clientSettings: clientSettings,
-        serverSettings: serverSettings,
+        clientSettings
     });
 });
-//List view  Page
-router.get("/mon/list", ensureAuthenticated, async(req, res) => {
-    let printers = Runner.returnFarmPrinters();
-    let sortedPrinters = await Runner.sortedIndex();
-    const farmStatistics = require("../runners/statisticsCollection.js");
-    const FarmStatistics = farmStatistics.StatisticsCollection;
-    let statistics = await FarmStatistics.returnStats();
-    let clientSettings = await ClientSettings.find({});
-    let serverSettings = await ServerSettings.find({});
+// List view  Page
+router.get('/mon/list', ensureAuthenticated, async (req, res) => {
+    const printers = await Runner.returnFarmPrinters();
+    const sortedIndex = await Runner.sortedIndex();
+    const clientSettings = await SettingsClean.returnClientSettings();
+    const serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
-        user = "No User";
-        group = "Administrator";
+    if (serverSettings.server.loginRequired === false) {
+        user = 'No User';
+        group = 'Administrator';
     } else {
         user = req.user.name;
         group = req.user.group;
     }
-    res.render("listView", {
+    res.render('listView', {
         name: user,
         userGroup: group,
-        version: version,
-        printers: printers,
-        sortedIndex: sortedPrinters,
-        currentOperations: statistics.currentOperations,
-        currentOperationsCount: statistics.currentOperationsCount,
+        version,
+        printers,
         printerCount: printers.length,
-        page: "List View",
+        sortedIndex,
+        page: 'List View',
         helpers: prettyHelpers,
-        clientSettings: clientSettings,
-        serverSettings: serverSettings,
+        clientSettings
     });
 });
-router.get("/mon/currentOp", ensureAuthenticated, async(req, res) => {
-    let printers = Runner.returnFarmPrinters();
-    let sortedPrinters = await Runner.sortedIndex();
-    const farmStatistics = require("../runners/statisticsCollection.js");
-    const FarmStatistics = farmStatistics.StatisticsCollection;
-    let statistics = await FarmStatistics.returnStats();
-    let clientSettings = await ClientSettings.find({});
-    let serverSettings = await ServerSettings.find({});
+router.get('/mon/currentOp', ensureAuthenticated, async (req, res) => {
+    const printers = await Runner.returnFarmPrinters();
+    const sortedIndex = await Runner.sortedIndex();
+    const clientSettings = await SettingsClean.returnClientSettings();
+    const serverSettings = await SettingsClean.returnSystemSettings();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
-        user = "No User";
-        group = "Administrator";
+    if (serverSettings.server.loginRequired === false) {
+        user = 'No User';
+        group = 'Administrator';
     } else {
         user = req.user.name;
         group = req.user.group;
     }
-    res.render("currentOperationsView", {
+    res.render('currentOperationsView', {
         name: user,
         userGroup: group,
-        version: version,
-        printers: printers,
-        sortedIndex: sortedPrinters,
-        currentOperations: statistics.currentOperations,
+        version,
+        printers,
         printerCount: printers.length,
-        currentOperationsCount: statistics.currentOperationsCount,
-        page: "Current Operations View",
+        sortedIndex,
+        page: 'Current Operations',
         helpers: prettyHelpers,
-        clientSettings: clientSettings,
-        serverSettings: serverSettings,
+        clientSettings
     });
 });
-router.get("/filament", ensureAuthenticated, async(req, res) => {
-    let printers = Runner.returnFarmPrinters();
-    let sortedPrinters = await Runner.sortedIndex();
-    const farmStatistics = require("../runners/statisticsCollection.js");
-    const FarmStatistics = farmStatistics.StatisticsCollection;
-    let statistics = await FarmStatistics.returnStats();
-    let clientSettings = await ClientSettings.find({});
-    let serverSettings = await ServerSettings.find({});
-    let spools = await Spools.find({});
-    let profiles = await Profiles.find({});
+router.get('/filament', ensureAuthenticated, async (req, res) => {
+    const printers = Runner.returnFarmPrinters();
+    const serverSettings = await SettingsClean.returnSystemSettings();
+    const statistics = await FilamentClean.getStatistics();
+    const spools = await FilamentClean.getSpools();
+    const profiles = await FilamentClean.getProfiles();
     let user = null;
     let group = null;
-    if (serverSettings[0].server.loginRequired === false) {
-        user = "No User";
-        group = "Administrator";
+    if (serverSettings.server.loginRequired === false) {
+        user = 'No User';
+        group = 'Administrator';
     } else {
         user = req.user.name;
         group = req.user.group;
     }
-    res.render("filament", {
+    res.render('filament', {
         name: user,
         userGroup: group,
-        version: version,
-        printers: printers,
-        sortedIndex: sortedPrinters,
-        currentOperations: statistics.currentOperations,
+        version,
         printerCount: printers.length,
-        currentOperationsCount: statistics.currentOperationsCount,
-        page: "Filament Manager",
+        page: 'Filament Manager',
         helpers: prettyHelpers,
-        clientSettings: clientSettings,
-        serverSettings: serverSettings,
-        spools: spools,
-        profiles: profiles,
+        serverSettings,
+        spools,
+        profiles,
+        statistics
+    });
+});
+router.get('/system', ensureAuthenticated, async (req, res) => {
+    const clientSettings = await SettingsClean.returnClientSettings();
+    const serverSettings = await SettingsClean.returnSystemSettings();
+    const printers = Runner.returnFarmPrinters();
+    let user = null;
+    let group = null;
+    if (serverSettings.server.loginRequired === false) {
+        user = 'No User';
+        group = 'Administrator';
+    } else {
+        user = req.user.name;
+        group = req.user.group;
+    }
+    res.render('system', {
+        name: user,
+        userGroup: group,
+        version,
+        printerCount: printers.length,
+        page: 'System',
+        helpers: prettyHelpers,
+        clientSettings,
+        serverSettings
     });
 });
 module.exports = router;

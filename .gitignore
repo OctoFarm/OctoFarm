@@ -1,9 +1,11 @@
 node_modules/
 config/db.js
 TODO.md
-production.log
-productionError.log
-serverConfig/
 logs/
-
-/.eslintrc.js
+.clinic/
+.eslintrc.json
+.idea/
+.idea/inspectionProfiles/
+.idea/jsLinters/
+.idea/libraries/
+images/historyCollection/

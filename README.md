@@ -40,6 +40,7 @@
   - [Platform](#platform)
   - [Supported Browsers](#supported-browsers)
   - [Prerequisites](#prerequisites)
+  - [Installation Docker](#installation-docker)
   - [Installation Production](#installation-production)
   - [Installation Development](#installation-development)
 - [Contributing](#contributing)
@@ -92,7 +93,42 @@ On your OctoPrint instance
 
 #See The WIKI for more detailed instructions than what's available below
 
+### Installation Docker
+Currently all docker images are built with linux/amd64 with debian stretch. There are a few different tags available. 
 
+#### Example Docker Run
+`docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -p4000:4000 octofarm/octofarm -e "TZ=America/Chicago" -v '<your persistent folder>/OctoFarm/logs/':'/app/logs/':'rw' -v '<your persistent folder>/OctoFarm/scripts/':'/scripts/':'rw'`
+
+#### Generic Docker-Compose
+
+
+    version: "3"
+    services:
+      octofarm:
+        container_name: octofarm
+        image: octofarm/octofarm
+        restart: always
+        ports:
+          - 4000:4000
+        environment:
+          - MONGO=mongodb://mongo/octofarm
+        volumes:
+          - <your persistent folder>/OctoFarm/logs:/app/logs
+          - <your persistent folder>/OctoFarm/scripts:/scripts
+
+
+#### OctoFarm (Standalone)
+    latest: Pulls the latest master release
+    dev: Pulls the latest development release. (Bleeding edge features, only for testing)
+    {Version Tag}: Pulls a specific version
+    
+    
+#### OctoFarm (Including MongoDB)(Big thanks to MearWolf!)
+    monolithic-latest: Pulls the latest master release
+    monolithic-dev: Pulls the latest development release. (Bleeding edge features, only for testing) 
+    monolithic-{Version Tag}: Pulls a specific version
+    
+  
 ### Installation Production
 
 - Debian/Linux Specific

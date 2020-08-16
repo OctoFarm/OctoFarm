@@ -4,10 +4,10 @@
     <option name="serverConfigurations">
       <list>
         <ServerConfiguration>
-          <option name="label" value="Testing DB" />
+          <option name="label" value="localDev" />
           <option name="serverUrls">
             <list>
-              <option value="192.168.1.5:27017" />
+              <option value="localhost:27017" />
             </list>
           </option>
           <option name="sshTunnelingConfiguration">
@@ -17,5 +17,6 @@
         </ServerConfiguration>
       </list>
     </option>
+    <option name="shellPath" value="/usr/bin/mongo" />
   </component>
 </project>

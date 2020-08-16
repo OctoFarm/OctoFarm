@@ -2,10 +2,7 @@
 
 if [ -d "node_modules" ] 
 then
-    echo "Node modules exist, skipping install" 
-    echo "Making sure node modules are up to date..."
-    npm update
-    npm install
+    echo "Node modules exist, skipping install"
 else
       echo "Installing node packages"
     npm install
@@ -33,6 +30,7 @@ else
     echo "Logs folder already exists..."
 fi
 
+
 cd app/
 
-pm2 start app.js --name OctoFarm --no-daemon
+pm2 start app.js --name OctoFarm --no-daemon -o './logs/pm2.log' -e './logs/pm2.error.log' --time
