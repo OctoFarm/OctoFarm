@@ -11,7 +11,7 @@ import { checkTemps } from './lib/modules/temperatureCheck.js';
 import { checkFilamentManager } from './lib/modules/filamentGrab.js';
 
 let powerTimer = 20000;
-const jpInit = false;
+let jpInit = false;
 let dragDropInit = false;
 let groupInit = false;
 let printerControlList = null;
@@ -136,17 +136,12 @@ async function updateState (printer, clientSettings) {
     const elements = grabElements(printer);
     elements.state.innerHTML = printer.printerState.state;
     elements.state.className = `btn btn-block ${printer.printerState.colour.category} mb-1 mt-1`;
-    elements.index.innerHTML = `
-        <h6 class="float-left mb-0" id="panIndex-${printer._id}">
-          <button id="panName-1" type="button" class="btn btn-secondary mb-0" role="button" disabled="">
-            ${printer.printerName}
-          </button>
-        </h6>
-        `;
+    elements.name.innerHTML = printer.printerName;
     if (clientSettings.extraInfo) {
         if (elements.extraInfo.classList.contains('d-none')) {
             elements.extraInfo.classList.remove('d-none');
         }
+
 
         if (
             typeof printer.currentJob !== 'undefined' &&
@@ -172,6 +167,9 @@ async function updateState (printer, clientSettings) {
         `;
             elements.eta.innerHTML = 'N/A';
         }
+    }else{
+        document.getElementById("timeOption").disabled = true;
+        document.getElementById("timeOption").title = "Only available when Extra Information is activated in System -> Client Settings -> Panel View";
     }
 
     if (typeof printer.currentJob !== 'undefined') {
@@ -501,20 +499,20 @@ function drawPrinter (printer, clientSettings) {
         ' '
     )}">
           <div class="card-header dashHeader">
-            <h6
-              class="float-left mb-0"
+            <span
+              class="mb-0 d-none index"
               id="panIndex-${printer._id}"
-            >
-              <button
+            > ${printer.sortIndex}
+            </span>
+           <button
                 id="panName-${printer._id}"
                 type="button"
-                class="btn btn-secondary mb-0 btn-sm"
+                class="btn btn-secondary mb-0 btn-sm float-left"
                 role="button"
                 disabled
               >
                 ${name}
               </button>
-            </h6>
               <div id="powerBtn-${printer._id}" class="btn-group float-right">
 
               </div>
@@ -573,9 +571,9 @@ function drawPrinter (printer, clientSettings) {
             <button
               id="panState-${printer._id}"
               type="button"
-              class="btn btn-block ${
+              class="btn btn-block mb-1 mt-1 btn-sm ${
     printer.printerState.colour.category
-} mb-1 mt-1 btn-sm"
+}"
               role="button"
               disabled
             >
@@ -761,19 +759,19 @@ async function init (printers, clientSettings) {
             updateState(printers[p], clientSettings);
         }
     }
-    // if (jpInit) {
-    //     const fullscreenElement =
-    //   document.fullscreenElement ||
-    //   document.mozFullScreenElement ||
-    //   document.webkitFullscreenElement;
-    //     if (!fullscreenElement) {
-    //         jplist.refresh();
-    //     }
-    // } else {
-    //     jpInit = true;
-    //     await jplist.init({
-    //         storage: 'localStorage', // 'localStorage', 'sessionStorage' or 'cookies'
-    //         storageName: 'view-storage'
-    //     });
-    // }
+    if (jpInit) {
+        const fullscreenElement =
+      document.fullscreenElement ||
+      document.mozFullScreenElement ||
+      document.webkitFullscreenElement;
+        if (!fullscreenElement) {
+            jplist.refresh();
+        }
+    } else {
+        jpInit = true;
+        await jplist.init({
+            storage: 'localStorage', // 'localStorage', 'sessionStorage' or 'cookies'
+            storageName: 'view-storage'
+        });
+    }
 }
