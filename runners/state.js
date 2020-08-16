@@ -603,7 +603,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
     }
 };
 WebSocketClient.prototype.onerror = function (e) {
-    console.log('ERROR');
+
     logger.error(
         'WebSocketClient: Error',
         // eslint-disable-next-line prefer-rest-params
@@ -1345,8 +1345,7 @@ class Runner {
                     item,
                     i
                 ) {
-                    console.log(item);
-                    console.log(entry.gcodeAnalysis.filament[item]);
+
                     filament[i] = entry.gcodeAnalysis.filament[item].length;
                 });
             } else {
@@ -1873,7 +1872,6 @@ class Runner {
             return o._id == id;
         });
         const fileID = _.findIndex(farmPrinters[i].fileList.files, function (o) {
-            console.log("HELLO", o.fullPath, fullPath);
             return o.fullPath == fullPath;
         });
         // Doesn't actually resync just the file... shhh
