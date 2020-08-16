@@ -159,6 +159,9 @@ function updateState (printer, clientSettings) {
         `;
             elements.eta.innerHTML = 'N/A';
         }
+    }else{
+        document.getElementById("timeOption").disabled = true;
+        document.getElementById("timeOption").title = "Only available when Extra Information is activated in System -> Client Settings -> Panel View";
     }
     if (typeof printer.currentJob !== 'undefined') {
         elements.currentFile.setAttribute('title', printer.currentJob.filePath);

@@ -27,7 +27,7 @@ const fileClean = require('../lib/dataFunctions/fileClean.js');
 
 const { FileClean } = fileClean;
 
-const version = `${pjson.version}.6.8`;
+const version = `${pjson.version}.6`;
 console.log(`Version: ${version}`);
 console.log(`db: ${db}`);
 
