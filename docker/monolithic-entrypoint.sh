@@ -17,6 +17,7 @@ else
     echo "Logs folder already exists..."
 fi
 
+<<<<<<< HEAD
 
 cd /app/
 
