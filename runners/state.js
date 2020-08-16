@@ -1209,34 +1209,45 @@ class Runner {
     static async removePrinter (indexs) {
         logger.info('Pausing runners to remove printer...');
         await this.pause();
-        const removed = [];
-        for (let i = 0; i < indexs.length; i++) {
-            const index = _.findIndex(farmPrinters, function (o) {
-                return o._id == indexs[i];
-            });
+        let removed = [];
+        if(indexs.length !== farmPrinters.length){
+            for (let i = 0; i < indexs.length; i++) {
+                const index = _.findIndex(farmPrinters, function (o) {
+                    return o._id == indexs[i];
+                });
+                console.log(index);
+                if(index > -1){
+                    logger.info(`Removing printer from database: ${farmPrinters[index]._id}`);
+                    removed.push({
+                        printerURL: farmPrinters[index].printerURL,
+                        printerId: indexs[i]
+                    });
+                    await PrinterClean.removePrintersInformation(farmPrinters[index].sortIndex);
+                    farmPrinters.splice(index, 1);
 
-            logger.info(`Removing printer from database: ${farmPrinters[index]._id}`);
-            removed.push({
-                printerURL: farmPrinters[index].printerURL,
-                printerId: indexs[i]
-            });
-            PrinterClean.removePrintersInformation(farmPrinters[index].sortIndex);
-            farmPrinters.splice(farmPrinters[index].sortIndex, 1);
+                    // Splice printer out of farm Array...
+                    const remove = await Printers.findOneAndDelete({ _id: indexs[i] });
+                }
+            }
+            // Regenerate Indexs
+            for (let p = 0; p < farmPrinters.length; p++) {
+                await logger.info(
+                    `Regenerating existing indexes: ${farmPrinters[p].printerURL}`
+                );
+                farmPrinters[p].sortIndex = p;
+                farmPrinters[p].markModified('sortIndex');
+                await farmPrinters[p].save().catch(e => console.log("NONONONONO"));
+            }
+            logger.info('Re-Scanning printers farm');
+            this.init();
+        }else{
+            removed = indexs;
+            farmPrinters = [];
+            await PrinterClean.removePrintersInformation();
+            await Printers.deleteMany({});
+            this.init();
 
-            // Splice printer out of farm Array...
-            const remove = await Printers.findOneAndDelete({ _id: indexs[i] });
         }
-        // Regenerate Indexs
-        for (let p = 0; p < farmPrinters.length; p++) {
-            await logger.info(
-                `Regenerating existing indexes: ${farmPrinters[p].printerURL}`
-            );
-            farmPrinters[p].sortIndex = p;
-            farmPrinters[p].markModified('sortIndex');
-            await farmPrinters[p].save();
-        }
-        logger.info('Re-Scanning printers farm');
-        this.init();
         return removed;
     }
 
@@ -1543,7 +1554,6 @@ class Runner {
                     folderCount: printerLocations.length
                 };
                 farmPrinters[index].markModified("fileList");
-                farmPrinters[index].save();
                 const currentFilament = await Runner.compileSelectedFilament(
                     farmPrinters[index].selectedFilament,
                     index
