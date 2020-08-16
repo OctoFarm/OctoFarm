@@ -1586,7 +1586,7 @@ class Runner {
             'Current Status from OctoPrint';
                 }
                 farmPrinters[index].state = "Awaiting WebSocket";
-                farmPrinters[index].stateColour = Runner.getColour("Operational");
+                farmPrinters[index].stateColour = Runner.getColour("Offline");
                 farmPrinters[index].current = res.current;
                 farmPrinters[index].options = res.options;
                 farmPrinters[index].systemChecks.scanning.state.status = 'success';
