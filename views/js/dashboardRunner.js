@@ -576,7 +576,7 @@ if (window.Worker) {
 
 class dashUpdate {
     static envriromentalData(data, iaq){
-        if(document.getElementById("envrioData").classList.contains("d-none")){
+        if(data[0].data.length !== 0){
             document.getElementById("envrioData").classList.remove("d-none");
         }
         enviromentalData.updateSeries(data);
@@ -721,7 +721,36 @@ const grid = GridStack.init({
     cellHeight: 30
 });
 
+function saveGrid() {
+    const serializedData = [];
+    grid.engine.nodes.forEach(function(node) {
+        serializedData.push({
+            x: node.x,
+            y: node.y,
+            width: node.width,
+            height: node.height,
+            id: node.id
+        });
+    });
+    localStorage.setItem('dashboardConfiguration', JSON.stringify(serializedData));
+    console.log("test")
+    // console.log(JSON.stringify(serializedData, null, '  '))
+};
+function loadGrid() {
+    let dashData = localStorage.getItem('dashboardConfiguration')
+    let serializedData = JSON.parse(dashData)
+    if(serializedData !== null && serializedData.length !== 0){
+        var items = GridStack.Utils.sort(serializedData);
+        grid.batchUpdate();
 
+        // else update existing nodes (instead of calling grid.removeAll())
+        grid.engine.nodes.forEach(function (node) {
+            var item = items.find(function(e) { return e.id === node.id});
+            grid.update(node.el, item.x, item.y, item.width, item.height);
+        });
+        grid.commit();
+    }
+};
 function resizeGrid() {
     var width = document.body.clientWidth;
     if (width < 700) {
@@ -741,8 +770,13 @@ function resizeGrid() {
 };
 
 
-
+loadGrid();
 resizeGrid();
 
-window.addEventListener('resize', function() {resizeGrid()});
+window.addEventListener('resize', function() {
+    resizeGrid()
+});
 
+grid.on('change', function(event, items) {
+    saveGrid();
+});

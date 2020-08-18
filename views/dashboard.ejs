@@ -15,10 +15,7 @@
   </div>
 <div class="grid-stack">
 
-
-
-
-  <div id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="2" data-gs-height="5" data-gs-min-width="2" data-gs-min-height="5">
+  <div data-gs-id="currentUtil" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="2" data-gs-height="5" data-gs-min-width="2" data-gs-min-height="5">
     <div class="grid-stack-item-content card text-white bg-dark h-100">
       <div class="card-header dashHeader p-0">
         <button
@@ -39,7 +36,7 @@
       </div>
     </div>
   </div>
-  <div id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5" data-gs-min-width="2" data-gs-min-height="5">
+  <div data-gs-id="currentStat" id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5" data-gs-min-width="2" data-gs-min-height="5">
     <div class="grid-stack-item-content card text-white bg-dark h-100">
       <div class="card-header dashHeader p-0">
         <button
@@ -59,7 +56,7 @@
       </div>
     </div>
   </div>
-  <div id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5"  data-gs-min-width="3" data-gs-min-height="5">
+  <div data-gs-id="farmUtil" id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5"  data-gs-min-width="3" data-gs-min-height="5">
     <div class="grid-stack-item-content card text-white bg-dark  h-100">
       <div class="card-header dashHeader p-0">
         <button
@@ -80,7 +77,7 @@
       </div>
     </div>
   </div>
-  <div id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true"  data-gs-width="2" data-gs-height="5" data-gs-min-width="2" data-gs-min-height="5">
+  <div data-gs-id="averageTimes" id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true"  data-gs-width="2" data-gs-height="5" data-gs-min-width="2" data-gs-min-height="5">
     <div class="grid-stack-item-content card text-white bg-dark  h-100">
       <div class="card-header dashHeader p-0">
         <button
@@ -101,7 +98,7 @@
       </div>
     </div>
   </div>
-  <div id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="2" data-gs-height="5" data-gs-min-width="2" data-gs-min-height="5">
+  <div data-gs-id="cumulativeTimes" id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="2" data-gs-height="5" data-gs-min-width="2" data-gs-min-height="5">
     <div class="grid-stack-item-content card text-white bg-dark  h-100">
       <div class="card-header dashHeader p-0">
         <button
@@ -123,7 +120,7 @@
     </div>
   </div>
   <!--System/Farm Overview-->
-  <div class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5">
+  <div data-gs-id="printerStatus" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5" data-gs-min-height="1" data-gs-min-width="1">
     <div class="grid-stack-item-content card text-white bg-dark">
       <div class="card-header dashHeader p-0">
         <button
@@ -149,7 +146,7 @@
       </div>
     </div>
   </div>
-  <div class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5">
+  <div data-gs-id="printerProgress" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5" data-gs-min-height="1" data-gs-min-width="1">
     <div class="grid-stack-item-content card text-white bg-dark">
       <div class="card-header dashHeader p-0">
         <button
@@ -177,7 +174,7 @@
       </div>
     </div>
   </div>
-  <div class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5">
+  <div data-gs-id="printerTemps" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5" data-gs-min-height="1" data-gs-min-width="1">
     <div class="grid-stack-item-content card text-white bg-dark">
       <div class="card-header dashHeader p-0">
         <button
@@ -204,7 +201,7 @@
       </div>
     </div>
   </div>
-  <div class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5">
+  <div data-gs-id="printerUtilisation" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5" data-gs-min-height="1" data-gs-min-width="1">
     <div class="grid-stack-item-content card text-white bg-dark">
       <div class="card-header dashHeader p-0">
         <button
@@ -232,35 +229,7 @@
     </div>
   </div>
 
-  <div id="envrioData" class="grid-stack-item d-none" data-gs-autoPosition="true" data-gs-width="12" data-gs-height="7">
-    <div class="grid-stack-item-content card text-white bg-dark h-100">
-      <div class="card-header dashHeader p-0">
-        <button
-                type="button"
-                class="btn btn-secondary d-block ml-1 mr-1 p-1"
-                href="#"
-                aria-expanded="false"
-                disabled
-        >
-          <i class="fas fa-tree"></i> Environmental History
-        </button>
-
-
-      </div>
-      <div class="card-body pb-0 pt-2 pb-0 text-center">
-        <div class="row">
-          <div class="col-lg-12">
-            <div id="enviromentalHistory">
-
-            </div>
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-
-  <div id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="6" data-gs-height="9">
+  <div data-gs-id="weeklyUtil" id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="6" data-gs-height="9" data-gs-min-height="8" data-gs-min-width="3">
     <div class="grid-stack-item-content card text-white bg-dark">
       <div class="card-header dashHeader p-0">
         <button
@@ -280,7 +249,7 @@
       </div>
     </div>
   </div>
-  <div class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="6" data-gs-height="9">
+  <div data-gs-id="hourlyTemper" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="6" data-gs-height="9" data-gs-min-height="8" data-gs-min-width="3">
     <div class="grid-stack-item-content card text-white bg-dark">
       <div class="card-header dashHeader p-0">
         <button
@@ -310,7 +279,33 @@
     </div>
   </div>
 
+  <div data-gs-id="enviroData" id="envrioData" class="grid-stack-item d-none" data-gs-autoPosition="true" data-gs-width="12" data-gs-height="7" data-gs-min-height="8" data-gs-min-width="3">
+    <div class="grid-stack-item-content card text-white bg-dark h-100">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-tree"></i> Environmental History
+        </button>
 
+
+      </div>
+      <div class="card-body pb-0 pt-2 pb-0 text-center">
+        <div class="row">
+          <div class="col-lg-12">
+            <div id="enviromentalHistory">
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
 
 
 
