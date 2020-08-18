@@ -714,11 +714,12 @@ class dashUpdate {
     }
 }
 const grid = GridStack.init({
-    width: 12,
     animate: true,
     disableOneColumnMode: true, // will manually do 1 column
-    oneColumnModeDomSort: true,
-    cellHeight: 30
+    cellHeight: 30,
+    draggable: {
+        handle: '.tag',
+    }
 });
 
 function saveGrid() {
@@ -780,3 +781,4 @@ window.addEventListener('resize', function() {
 grid.on('change', function(event, items) {
     saveGrid();
 });
+
