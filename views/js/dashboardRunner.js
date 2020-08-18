@@ -616,9 +616,9 @@ class dashUpdate {
     static farmInformation(farmInfo, heatMap, temperatureGraph) {
         document.getElementById("globalTemp").innerHTML = `
             <i class="fas fa-temperature-high"></i> Total Temperature: ${Calc.toFixed(
-        farmInfo.totalFarmTemp,
-        0
-    )} °C
+            farmInfo.totalFarmTemp,
+            0
+        )} °C
     `;
         document.getElementById("avgEstimatedTime").innerHTML = Calc.generateTime(
             farmInfo.averageEstimated
@@ -713,3 +713,36 @@ class dashUpdate {
         )}%`;
     }
 }
+const grid = GridStack.init({
+    width: 12,
+    animate: true,
+    disableOneColumnMode: true, // will manually do 1 column
+    oneColumnModeDomSort: true,
+    cellHeight: 30
+});
+
+
+function resizeGrid() {
+    var width = document.body.clientWidth;
+    if (width < 700) {
+        grid.column(1);
+    } else if (width < 850) {
+        grid.column(3);
+    } else if (width < 950) {
+        grid.column(6);
+    } else if (width < 1100) {
+        grid.column(8);
+        console.log("8")
+    } else {
+        grid.column(12);
+        console.log("12")
+    }
+    grid.compact();
+};
+
+
+
+resizeGrid();
+
+window.addEventListener('resize', function() {resizeGrid()});
+

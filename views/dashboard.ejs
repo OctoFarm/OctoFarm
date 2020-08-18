@@ -1,322 +1,323 @@
 
 <% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
   <!--Current Operations-->
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@1.1.2/dist/gridstack.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gridstack@1.2.0/dist/gridstack-extra.css" />
+  <script src="https://cdn.jsdelivr.net/npm/gridstack@1.1.2/dist/gridstack.all.js"></script>
+
+
+
   <div class="row">
-    <div class="col-lg-12">
+    <div class="col-12">
       <%- include('./partials/currentOperations.ejs') %>
     </div>
   </div>
-  <div class="row">
-    <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-2 col-xl-2">
-      <div class="card text-white bg-dark h-100">
-        <div class="card-header dashHeader p-0">
-          <button
-                  type="button"
-                  class="btn btn-secondary d-block ml-1 mr-1 p-1"
-                  href="#"
-                  aria-expanded="false"
-                  disabled
-          >
-            <i class="fas fa-star"></i> Current Utilisation
-          </button>
+<div class="grid-stack">
 
 
-        </div>
-        <div class="card-body pt-2 pb-0 text-center">
-          <div id="currentUtilisation"></div>
 
-        </div>
+
+  <div id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="2" data-gs-height="5" data-gs-min-width="2" data-gs-min-height="5">
+    <div class="grid-stack-item-content card text-white bg-dark h-100">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-star"></i> Current Utilisation
+        </button>
+
+
       </div>
-    </div>
+      <div class="card-body pb-0 pt-2 pb-0 text-center">
+        <div id="currentUtilisation"></div>
 
-    <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-3 col-xl-3">
-      <div class="card text-white bg-dark h-100">
-        <div class="card-header dashHeader p-0">
-          <button
-                  type="button"
-                  class="btn btn-secondary d-block ml-1 mr-1 p-1"
-                  href="#"
-                  aria-expanded="false"
-                  disabled
-          >
-            <i class="fas fa-info-circle"></i> Current Status
-          </button>
-
-
-        </div>
-        <div class="card-body pt-2 pb-0 text-center">
-          <div id="currentActivity"></div>
-        </div>
-      </div>
-    </div>
-    <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-2 col-xl-2">
-      <div class="card text-white bg-dark  h-100">
-        <div class="card-header dashHeader p-0">
-          <button
-                  type="button"
-                  class="btn btn-secondary d-block ml-1 mr-1 p-1"
-                  href="#"
-                  aria-expanded="false"
-                  disabled
-          >
-            <i class="fas fa-stopwatch"></i> Cumulative Times
-          </button>
-
-
-        </div>
-        <div class="card-body text-center">
-          <%- include('./partials/Dashboard/dashboardCumulative.ejs') %>
-
-        </div>
-      </div>
-    </div>
-    <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-2 col-xl-2">
-      <div class="card text-white bg-dark  h-100">
-        <div class="card-header dashHeader p-0">
-          <button
-                  type="button"
-                  class="btn btn-secondary d-block ml-1 mr-1 p-1"
-                  href="#"
-                  aria-expanded="false"
-                  disabled
-          >
-            <i class="fas fa-stopwatch"></i> Average Times
-          </button>
-
-
-        </div>
-        <div class="card-body text-center">
-          <%- include('./partials/Dashboard/dashboardEstimated.ejs') %>
-
-        </div>
-      </div>
-    </div>
-    <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-3 col-xl-3">
-      <div class="card text-white bg-dark  h-100">
-        <div class="card-header dashHeader p-0">
-          <button
-                  type="button"
-                  class="btn btn-secondary d-block ml-1 mr-1 p-1"
-                  href="#"
-                  aria-expanded="false"
-                  disabled
-          >
-            <i class="fas fa-star-half-alt"></i> Farm Utilisation
-          </button>
-
-
-        </div>
-        <div class="card-body text-center">
-
-          <%- include('./partials/Dashboard/dashboardFS.ejs') %>
-        </div>
       </div>
     </div>
   </div>
-  <!--System/Farm Overview-->
-  <div class="row">
-    <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
-      <div class="card text-white bg-dark">
-        <div class="card-header dashHeader p-0">
-          <button
-                  type="button"
-                  class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
-                  href="#"
-                  aria-expanded="false"
-                  disabled
-          >
-            <i class="fas fa-tint"></i> Printer Status
-          </button>
+  <div id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5" data-gs-min-width="2" data-gs-min-height="5">
+    <div class="grid-stack-item-content card text-white bg-dark h-100">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-info-circle"></i> Current Status
+        </button>
 
-        </div>
-        <div class="card-body p-0 text-center">
-          <small><i class="fas fa-square text-warning"></i> Active &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square text-success"></i> Complete &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square text-secondary"></i> Idle &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square text-danger"></i> Disconnected &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square text-offline"></i> Offline &nbsp;&nbsp;</small>
-          <div id="currentStatus" class="row justify-content-sm-center">
 
-          </div>
-        </div>
       </div>
-    </div>
-    <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
-      <div class="card text-white bg-dark">
-        <div class="card-header dashHeader p-0">
-          <button
-                  type="button"
-                  class="btn btn-secondary d-block ml-1 mr-1 p-1"
-                  href="#"
-                  aria-expanded="false"
-                  disabled
-          >
-            <i class="fas fa-spinner"></i> Printer Progress
-          </button>
-
-
-        </div>
-        <div class="card-body p-0 text-center" >
-          <small><i class="fas fa-square" style="color: black;"></i> 0% &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square text-secondary"></i> < 25% &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square text-primary"></i> 26% - 50% &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square text-info"></i> 51% - 75% &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square text-warning"></i> 76% - 99% &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square text-success"></i> 100% &nbsp;&nbsp;</small>
-          <div id="currentProgress" class="row justify-content-sm-center">
-
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
-      <div class="card text-white bg-dark">
-        <div class="card-header dashHeader p-0">
-          <button
-                  type="button"
-                  class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
-                  href="#"
-                  aria-expanded="false"
-                  disabled
-          >
-            <i class="fas fa-thermometer-three-quarters"></i> Printer Temps
-          </button>
-
-        </div>
-        <div class="card-body p-0 text-center">
-          <small><i class="fas fa-square" style="color: green;"></i> Stable Temp &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square" style="color: orange;"></i> Heating &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square" style="color: #e74c3c;"></i> Offline &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square" style="color: darkBlue;"></i> Cooling &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square" style="color: cyan;"></i> Cooled &nbsp;&nbsp;</small>
-
-          <div id="currentTemps" class="row justify-content-sm-center">
-
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
-      <div class="card text-white bg-dark">
-        <div class="card-header dashHeader p-0">
-          <button
-                  type="button"
-                  class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
-                  href="#"
-                  aria-expanded="false"
-                  disabled
-          >
-            <i class="fas fa-star-half-alt"></i>  Printer Utilisation
-          </button>
-
-        </div>
-        <div class="card-body p-0 text-center">
-          <small><i class="fas fa-square text-dark" style="color: black;"></i> 0% &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square text-secondary"></i> < 25% &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square text-primary"></i> 26% - 50% &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square text-info"></i> 51% - 75% &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square text-warning"></i> 76% - 99% &nbsp;&nbsp;</small>
-          <small><i class="fas fa-square text-success"></i> 100% &nbsp;&nbsp;</small>
-          <div id="currentUptime" class="row justify-content-sm-center">
-
-          </div>
-        </div>
+      <div class="card-body pb-0 pt-0 text-center">
+        <div id="currentActivity"></div>
       </div>
     </div>
   </div>
-
-  <div class="row">
-    <div id="envrioData" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 d-none">
-      <div class="card text-white bg-dark h-100">
-        <div class="card-header dashHeader p-0">
-          <button
-                  type="button"
-                  class="btn btn-secondary d-block ml-1 mr-1 p-1"
-                  href="#"
-                  aria-expanded="false"
-                  disabled
-          >
-            <i class="fas fa-tree"></i> Environmental History
-          </button>
+  <div id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5"  data-gs-min-width="3" data-gs-min-height="5">
+    <div class="grid-stack-item-content card text-white bg-dark  h-100">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-star-half-alt"></i> Farm Utilisation
+        </button>
 
 
-        </div>
-        <div class="card-body pt-2 pb-0 text-center">
-          <div class="row">
-            <div class="col-lg-12">
-              <div id="enviromentalHistory">
+      </div>
+      <div class="card-body pb-0 text-center">
 
-              </div>
-            </div>
-            </div>
-          </div>
+        <%- include('./partials/Dashboard/dashboardFS.ejs') %>
+      </div>
+    </div>
+  </div>
+  <div id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true"  data-gs-width="2" data-gs-height="5" data-gs-min-width="2" data-gs-min-height="5">
+    <div class="grid-stack-item-content card text-white bg-dark  h-100">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-stopwatch"></i> Average Times
+        </button>
+
+
+      </div>
+      <div class="card-body pb-0 text-center">
+        <%- include('./partials/Dashboard/dashboardEstimated.ejs') %>
+
+      </div>
+    </div>
+  </div>
+  <div id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="2" data-gs-height="5" data-gs-min-width="2" data-gs-min-height="5">
+    <div class="grid-stack-item-content card text-white bg-dark  h-100">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-stopwatch"></i> Cumulative Times
+        </button>
+
+
+      </div>
+      <div class="card-body pb-0 text-center">
+        <%- include('./partials/Dashboard/dashboardCumulative.ejs') %>
 
       </div>
     </div>
   </div>
   <!--System/Farm Overview-->
-  <div class="row">
-    <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
-      <div class="card text-white bg-dark">
-        <div class="card-header dashHeader p-0">
-          <button
-                  type="button"
-                  class="btn btn-secondary d-block ml-1 mr-1 p-1"
-                  href="#"
-                  aria-expanded="false"
-                  disabled
-          >
-            <i class="fas fa-info-circle"></i> Weekly Utilisation
-          </button>
+  <div class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5">
+    <div class="grid-stack-item-content card text-white bg-dark">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-tint"></i> Printer Status
+        </button>
 
-
-        </div>
-        <div class="card-body p-0" style="min-height:350px;max-height:350px">
-          <%- include('./partials/Dashboard/dashboardHeatMap.ejs') %>
-        </div>
       </div>
-    </div>
-    <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
-      <div class="card text-white bg-dark">
-        <div class="card-header dashHeader p-0">
-          <button
-                  type="button"
-                  class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
-                  href="#"
-                  aria-expanded="false"
-                  disabled
-          >
-            <i class="fas fa-thermometer-three-quarters"></i> Hourly Total Temperature
-          </button>
-          <button
-                  type="button"
-                  class="btn btn-secondary float-right d-block ml-1 mr-1 p-1"
-                  href="#"
-                  aria-expanded="false"
-                  disabled
-          >
-            <span id="globalTemp"> <i class="fas fa-temperature-high"></i> Total Heat: <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> °C </span>
-          </button>
+      <div class="card-body pb-0 p-0 text-center">
+        <small><i class="fas fa-square text-warning"></i> Active &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square text-success"></i> Complete &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square text-secondary"></i> Idle &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square text-danger"></i> Disconnected &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square text-offline"></i> Offline &nbsp;&nbsp;</small>
+        <div id="currentStatus" class="row justify-content-sm-center">
 
-
-        </div>
-        <div class="card-body p-0" style="min-height:350px;max-height:350px">
-          <div id="farmTempMap"></div>
         </div>
       </div>
     </div>
   </div>
+  <div class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5">
+    <div class="grid-stack-item-content card text-white bg-dark">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-spinner"></i> Printer Progress
+        </button>
 
 
+      </div>
+      <div class="card-body pb-0 p-0 text-center" >
+        <small><i class="fas fa-square" style="color: black;"></i> 0% &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square text-secondary"></i> < 25% &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square text-primary"></i> 26% - 50% &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square text-info"></i> 51% - 75% &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square text-warning"></i> 76% - 99% &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square text-success"></i> 100% &nbsp;&nbsp;</small>
+        <div id="currentProgress" class="row justify-content-sm-center">
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5">
+    <div class="grid-stack-item-content card text-white bg-dark">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-thermometer-three-quarters"></i> Printer Temps
+        </button>
+
+      </div>
+      <div class="card-body pb-0 p-0 text-center">
+        <small><i class="fas fa-square" style="color: green;"></i> Stable Temp &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square" style="color: orange;"></i> Heating &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square" style="color: #e74c3c;"></i> Offline &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square" style="color: darkBlue;"></i> Cooling &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square" style="color: cyan;"></i> Cooled &nbsp;&nbsp;</small>
+
+        <div id="currentTemps" class="row justify-content-sm-center">
+
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="3" data-gs-height="5">
+    <div class="grid-stack-item-content card text-white bg-dark">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-star-half-alt"></i>  Printer Utilisation
+        </button>
+
+      </div>
+      <div class="card-body pb-0 p-0 text-center">
+        <small><i class="fas fa-square text-dark" style="color: black;"></i> 0% &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square text-secondary"></i> < 25% &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square text-primary"></i> 26% - 50% &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square text-info"></i> 51% - 75% &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square text-warning"></i> 76% - 99% &nbsp;&nbsp;</small>
+        <small><i class="fas fa-square text-success"></i> 100% &nbsp;&nbsp;</small>
+        <div id="currentUptime" class="row justify-content-sm-center">
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="envrioData" class="grid-stack-item d-none" data-gs-autoPosition="true" data-gs-width="12" data-gs-height="7">
+    <div class="grid-stack-item-content card text-white bg-dark h-100">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-tree"></i> Environmental History
+        </button>
+
+
+      </div>
+      <div class="card-body pb-0 pt-2 pb-0 text-center">
+        <div class="row">
+          <div class="col-lg-12">
+            <div id="enviromentalHistory">
+
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="dashboardInfo" class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="6" data-gs-height="9">
+    <div class="grid-stack-item-content card text-white bg-dark">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-info-circle"></i> Weekly Utilisation
+        </button>
+
+
+      </div>
+      <div class="card-body pb-0 p-0">
+        <%- include('./partials/Dashboard/dashboardHeatMap.ejs') %>
+      </div>
+    </div>
+  </div>
+  <div class="grid-stack-item" data-gs-autoPosition="true" data-gs-width="6" data-gs-height="9">
+    <div class="grid-stack-item-content card text-white bg-dark">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary float-left d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-thermometer-three-quarters"></i> Hourly Total Temperature
+        </button>
+        <button
+                type="button"
+                class="btn btn-secondary float-right d-block ml-1 mr-1 p-1"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <span id="globalTemp"> <i class="fas fa-temperature-high"></i> Total Heat: <i class="fa fa-spinner fa-spin" aria-hidden="true"></i> °C </span>
+        </button>
+
+
+      </div>
+      <div class="card-body pb-0 p-0">
+        <div id="farmTempMap"></div>
+      </div>
+    </div>
   </div>
 
 
-  </div>
-  </div>
+
+
+
   <script src="/js/dashboardRunner.js" type="module"></script>
-<% }else{ %>
-  <%- include('./addPrinters.ejs') %>
-<% } %>
+  <% }else{ %>
+    <%- include('./addPrinters.ejs') %>
+  <% } %>
 
 
 
