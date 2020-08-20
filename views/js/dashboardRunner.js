@@ -835,7 +835,10 @@ function loadGrid() {
         // else update existing nodes (instead of calling grid.removeAll())
         grid.engine.nodes.forEach(function (node) {
             var item = items.find(function(e) { return e.id === node.id});
-            grid.update(node.el, item.x, item.y, item.width, item.height);
+            if(typeof item !== 'undefined'){
+                grid.update(node.el, item.x, item.y, item.width, item.height);
+            }
+
         });
         grid.commit();
     }
