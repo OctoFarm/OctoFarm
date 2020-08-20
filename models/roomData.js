@@ -17,7 +17,7 @@ const RoomDataSchema = new mongoose.Schema({
         type: Number,
         required: true,
     },
-    gas_resistance: {
+    iaq: {
         type: Number,
         required: true,
     }
