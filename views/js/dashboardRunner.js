@@ -8,7 +8,7 @@ const optionsFarmTemp = {
     chart: {
         type: "line",
         id: "realtime",
-        height: "333px",
+        height: "200px",
         width: "100%",
         animations: {
             enabled: false,
@@ -107,7 +107,7 @@ const optionsHeatChart = {
     chart: {
         type: "heatmap",
         id: "realtime",
-        height: "333px",
+        height: "200px",
         width: "100%",
         animations: {
             enabled: true,
@@ -341,7 +341,7 @@ const optionsEnviromentalData = {
     chart: {
         type: "line",
         id: "realtime",
-        height: "250px",
+        height: "200px",
         width: "100%",
         animations: {
             enabled: false,
