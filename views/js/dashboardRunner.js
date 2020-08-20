@@ -354,7 +354,7 @@ const optionsEnviromentalData = {
         },
         background: "#303030",
     },
-    colors: ["#ff1500", "#324bca", "#49ca32"],
+    colors: ["#ff1500", "#324bca", "#caa932", "#49ca32"],
     stroke: {
         curve: "smooth",
     },
@@ -376,11 +376,14 @@ const optionsEnviromentalData = {
             seriesName: "Temperature",
             labels: {
                 formatter(value) {
-                    return `${value}°C`;
+
+                    if(value === null) {
+                        return ''
+                    }else{
+                        return `${value}°C`;
+                    }
                 },
             },
-            min: 0,
-            max: 50,
         },
         {
             title: {
@@ -391,11 +394,32 @@ const optionsEnviromentalData = {
             show: true,
             labels: {
                 formatter(value) {
-                    return `${value} %`;
+                    if(value === null) {
+                        return ''
+                    }else{
+                        return `${value} %`;
+                    }
+
                 },
             },
-            min: 0,
-            max: 100,
+        },
+        {
+            title: {
+                text: "Pressure",
+            },
+            opposite: true,
+            seriesName: "Pressure",
+            show: true,
+            labels: {
+                formatter(value) {
+                    if(value === null) {
+                        return ''
+                    }else{
+                        return `${value} Pa`;
+                    }
+
+                },
+            },
         },
         {
             title: {
@@ -407,32 +431,35 @@ const optionsEnviromentalData = {
             labels: {
                 formatter(value) {
                     let state = null;
-                    if(Calc.isBetween(value, 0, 50)){
-                        state = "Excellent";
-                    }
-                    if(Calc.isBetween(value, 51, 100)){
-                        state = "Good";
-                    }
-                    if(Calc.isBetween(value, 101, 150)){
-                        state = "Lightly Polluted";
-                    }
-                    if(Calc.isBetween(value, 151, 200)){
-                        state = "Moderately Polluted";
-                    }
-                    if(Calc.isBetween(value, 201, 250)){
-                        state = "Heavily Polluted";
-                    }
-                    if(Calc.isBetween(value, 251, 350)){
-                        state = "Severely Polluted";
-                    }
-                    if(Calc.isBetween(value, 351, 500)){
-                        state = "Extemely Polluted";
+                    if(value === null) {
+                        return ''
+                    } else {
+
+                        if(Calc.isBetween(value, 0, 50)){
+                            state = "Excellent";
+                        }
+                        if(Calc.isBetween(value, 51, 100)){
+                            state = "Good";
+                        }
+                        if(Calc.isBetween(value, 101, 150)){
+                            state = "Lightly Polluted";
+                        }
+                        if(Calc.isBetween(value, 151, 200)){
+                            state = "Moderately Polluted";
+                        }
+                        if(Calc.isBetween(value, 201, 250)){
+                            state = "Heavily Polluted";
+                        }
+                        if(Calc.isBetween(value, 251, 350)){
+                            state = "Severely Polluted";
+                        }
+                        if(Calc.isBetween(value, 351, 500)){
+                            state = "Extemely Polluted";
+                        }
                     }
                     return `${value}: ${state}`;
                 },
             },
-            min: 0,
-            max: 500,
         },
     ],
 
