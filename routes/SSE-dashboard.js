@@ -38,12 +38,42 @@ if(interval === false){
         const currentOperations = await PrinterClean.returnCurrentOperations();
         const dashStatistics = await PrinterClean.returnDashboardStatistics();
         const printerInformation = await PrinterClean.returnPrintersInformation();
-        const dashboardSettings = await ClientSettings.returnClientSettings();
+        const clientsSettings = await ClientSettings.returnClientSettings();
+        let dashboardSettings = null;
+        if(typeof clientsSettings.dashboard === 'undefined'){
+            dashboardSettings = {
+                defaultLayout: [{"x":0,"y":0,"width":2,"height":5,"id":"currentUtil"},{"x":5,"y":0,"width":3,"height":5,"id":"farmUtil"},{"x":8,"y":0,"width":2,"height":5,"id":"averageTimes"},{"x":10,"y":0,"width":2,"height":5,"id":"cumulativeTimes"},{"x":2,"y":0,"width":3,"height":5,"id":"currentStat"},{"x":6,"y":5,"width":3,"height":5,"id":"printerTemps"},{"x":9,"y":5,"width":3,"height":5,"id":"printerUtilisation"},{"x":0,"y":5,"width":3,"height":5,"id":"printerStatus"},{"x":3,"y":5,"width":3,"height":5,"id":"printerProgress"},{"x":6,"y":10,"width":6,"height":9,"id":"hourlyTemper"},{"x":0,"y":10,"width":6,"height":9,"id":"weeklyUtil"},{"x":0,"y":19,"width":12,"height":8,"id":"enviroData"}],
+                savedLayout: [],
+                farmActivity: {
+                    currentOperations: false,
+                    cumulativeTimes: true,
+                    averageTimes: true
+                },
+                printerStates: {
+                    printerState: true,
+                    printerTemps: true,
+                    printerUtilisation: true,
+                    printerProgress: true,
+                    currentStatus: true
+                },
+                farmUtilisation: {
+                    currentUtilisation: true,
+                    farmUtilisation: true
+                },
+                historical: {
+                    weeklyUtilisation: true,
+                    hourlyTotalTemperatures: false,
+                    environmentalHistory: false
+                }
+            };
+        }else{
+            dashboardSettings = clientSettings.dashboard
+        }
         const infoDrop = {
             printerInformation: printerInformation,
             currentOperations: currentOperations,
             dashStatistics: dashStatistics,
-            dashboardSettings: dashboardSettings.dashboard
+            dashboardSettings: dashboardSettings
         };
         clientInformation = await stringify(infoDrop);
         for (clientId in clients) {

@@ -19,7 +19,7 @@ All notable changes to this project will be documented in this file.
     
  
 ### Changed
-
+    - Dashboard graphs are now thinner to enable more on the screen when customising. (currently making these larger does nothing due to the graph implementation)
  
 
 ### Fixed

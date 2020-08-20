@@ -749,7 +749,7 @@ class dashUpdate {
         if(settingsUtilisation){
             currentUtilisation.updateSeries(currentStatus);
         }
-        console.log(currentActivity)
+
         if(settingsActivity){
             currentActivityChart.updateSeries(currentActivity);
 
@@ -850,10 +850,8 @@ function resizeGrid() {
         grid.column(6);
     } else if (width < 1100) {
         grid.column(8);
-        console.log("8")
     } else {
         grid.column(12);
-        console.log("12")
     }
     grid.compact();
 };
