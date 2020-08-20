@@ -67,7 +67,7 @@ if(interval === false){
                 }
             };
         }else{
-            dashboardSettings = clientSettings.dashboard
+            dashboardSettings = clientsSettings.dashboard
         }
         const infoDrop = {
             printerInformation: printerInformation,
