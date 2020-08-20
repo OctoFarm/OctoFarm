@@ -8,8 +8,8 @@ const optionsFarmTemp = {
     chart: {
         type: "line",
         id: "realtime",
-        height: "200px",
         width: "100%",
+        height: "85%",
         animations: {
             enabled: false,
         },
@@ -107,8 +107,8 @@ const optionsHeatChart = {
     chart: {
         type: "heatmap",
         id: "realtime",
-        height: "200px",
         width: "100%",
+        height: "85%",
         animations: {
             enabled: true,
             easing: "linear",
@@ -208,6 +208,7 @@ const optionsRadar = {
     chart: {
         type: "bar",
         width: "100%",
+        height: "85%",
         height: "180px",
         toolbar: {
             show: false,
@@ -255,6 +256,7 @@ const optionsUtilisation = {
     chart: {
         type: "donut",
         width: "100%",
+        height: "85%",
         animations: {
             enabled: true,
         },
@@ -341,7 +343,7 @@ const optionsEnviromentalData = {
     chart: {
         type: "line",
         id: "realtime",
-        height: "200px",
+        height: "85%",
         width: "100%",
         animations: {
             enabled: false,
@@ -808,21 +810,9 @@ class dashUpdate {
         )}%`;
     }
 }
-let column = 12
-var width = document.body.clientWidth;
-if (width < 700) {
-    column = 1
-} else if (width < 850) {
-    column = 3
-} else if (width < 950) {
-    column = 6
-} else if (width < 1100) {
-    column = 8
-}
 
 const grid = GridStack.init({
     animate: true,
-    column: column,
     cellHeight: 30,
     draggable: {
         handle: '.tag',
