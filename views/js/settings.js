@@ -296,6 +296,29 @@ class ClientSettings {
           res.listView.hideClosed;
         document.getElementById("listExtraInfoOn").checked =
           res.listView.extraInfo;
+
+        if(typeof res.dashboard !== 'undefined'){
+          console.log(res.dashboard)
+          document.getElementById("currentOperations").checked = res.dashboard.farmActivity.currentOperations
+          document.getElementById("cumulativeTimes").checked = res.dashboard.farmActivity.cumulativeTimes
+          document.getElementById("averageTimes").checked = res.dashboard.farmActivity.averageTimes
+
+
+         document.getElementById("printerState").checked = res.dashboard.printerStates.printerState
+         document.getElementById("printerTemps").checked = res.dashboard.printerStates.printerProgress
+         document.getElementById("printerUtilisation").checked = res.dashboard.printerStates.printerUtilisation
+         document.getElementById("printerProgress").checked = res.dashboard.printerStates.printerProgress
+         document.getElementById("currentStatus").checked = res.dashboard.printerStates.currentStatus
+
+
+         document.getElementById("currentUtilisation").checked = res.dashboard.farmUtilisation.currentUtilisation
+         document.getElementById("farmUtilisation").checked = res.dashboard.farmUtilisation.farmUtilisation
+
+         document.getElementById("weeklyUtilisation").checked = res.dashboard.historical.weeklyUtilisation
+         document.getElementById("hourlyTotalTemperatures").checked = res.dashboard.historical.hourlyTotalTemperatures
+         document.getElementById("environmentalHistory").checked = res.dashboard.historical.environmentalHistory
+        }
+
       });
   }
 
@@ -327,6 +350,31 @@ class ClientSettings {
         hideClosed: document.getElementById("cameraHideClosed").checked,
         extraInfo: document.getElementById("cameraExtraInfoOn").checked,
       },
+      dashboard: {
+        defaultLayout: [{"x":0,"y":0,"width":2,"height":5,"id":"currentUtil"},{"x":5,"y":0,"width":3,"height":5,"id":"farmUtil"},{"x":8,"y":0,"width":2,"height":5,"id":"averageTimes"},{"x":10,"y":0,"width":2,"height":5,"id":"cumulativeTimes"},{"x":2,"y":0,"width":3,"height":5,"id":"currentStat"},{"x":6,"y":5,"width":3,"height":5,"id":"printerTemps"},{"x":9,"y":5,"width":3,"height":5,"id":"printerUtilisation"},{"x":0,"y":5,"width":3,"height":5,"id":"printerStatus"},{"x":3,"y":5,"width":3,"height":5,"id":"printerProgress"},{"x":6,"y":10,"width":6,"height":9,"id":"hourlyTemper"},{"x":0,"y":10,"width":6,"height":9,"id":"weeklyUtil"},{"x":0,"y":19,"width":12,"height":8,"id":"enviroData"}],
+        savedLayout: localStorage.getItem("dashboardConfiguration"),
+        farmActivity: {
+          currentOperations: document.getElementById("currentOperations").checked,
+          cumulativeTimes: document.getElementById("cumulativeTimes").checked,
+          averageTimes: document.getElementById("averageTimes").checked
+        },
+        printerStates: {
+          printerState: document.getElementById("printerState").checked,
+          printerTemps: document.getElementById("printerTemps").checked,
+          printerUtilisation: document.getElementById("printerUtilisation").checked,
+          printerProgress: document.getElementById("printerProgress").checked,
+          currentStatus: document.getElementById("currentStatus").checked
+        },
+        farmUtilisation: {
+          currentUtilisation: document.getElementById("currentUtilisation").checked,
+          farmUtilisation: document.getElementById("farmUtilisation").checked
+        },
+        historical: {
+          weeklyUtilisation: document.getElementById("weeklyUtilisation").checked,
+          hourlyTotalTemperatures: document.getElementById("hourlyTotalTemperatures").checked,
+          environmentalHistory: document.getElementById("environmentalHistory").checked
+        }
+      }
     };
     await Client.post("settings/client/update", opts);
     localStorage.setItem("clientSettings", JSON.stringify(opts));

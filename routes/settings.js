@@ -67,6 +67,7 @@ router.post("/client/update", ensureAuthenticated, (req, res) => {
     checked[0].panelView = panelView;
     checked[0].listView = listView;
     checked[0].cameraView = cameraView;
+    checked[0].dashboard = req.body.dashboard;
     checked[0].save().then(() => {
       SettingsClean.start();
     });

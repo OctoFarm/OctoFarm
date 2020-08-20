@@ -8,6 +8,9 @@ let clientInformation = null;
 const printerClean = require("../lib/dataFunctions/printerClean.js");
 const PrinterClean = printerClean.PrinterClean;
 
+const settingsClean = require("../lib/dataFunctions/settingsClean.js");
+const ClientSettings  = settingsClean.SettingsClean;
+
 let clientId = 0;
 const clients = {}; // <- Keep a map of attached clients
 let interval = false;
@@ -35,10 +38,12 @@ if(interval === false){
         const currentOperations = await PrinterClean.returnCurrentOperations();
         const dashStatistics = await PrinterClean.returnDashboardStatistics();
         const printerInformation = await PrinterClean.returnPrintersInformation();
+        const dashboardSettings = await ClientSettings.returnClientSettings();
         const infoDrop = {
             printerInformation: printerInformation,
             currentOperations: currentOperations,
-            dashStatistics: dashStatistics
+            dashStatistics: dashStatistics,
+            dashboardSettings: dashboardSettings.dashboard
         };
         clientInformation = await stringify(infoDrop);
         for (clientId in clients) {

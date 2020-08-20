@@ -528,31 +528,44 @@ const optionsEnviromentalData = {
         ]
     }
 };
-const enviromentalData = new ApexCharts(
-    document.querySelector("#enviromentalHistory"),
-    optionsEnviromentalData
-);
-enviromentalData.render();
-const systemFarmTemp = new ApexCharts(
-    document.querySelector("#farmTempMap"),
-    optionsFarmTemp
-);
-systemFarmTemp.render();
-const activityHeatChart = new ApexCharts(
-    document.querySelector("#daysActivityHeatMap"),
-    optionsHeatChart
-);
-activityHeatChart.render();
-const currentActivityChart = new ApexCharts(
-    document.querySelector("#currentActivity"),
-    optionsRadar
-);
-currentActivityChart.render();
-const currentUtilisation = new ApexCharts(
-    document.querySelector("#currentUtilisation"),
-    optionsUtilisation
-);
-currentUtilisation.render();
+
+let enviromentalData, systemFarmTemp, activityHeatChart, currentActivityChart, currentUtilisation
+
+if(document.querySelector("#enviromentalHistory")){
+    enviromentalData = new ApexCharts(
+        document.querySelector("#enviromentalHistory"),
+        optionsEnviromentalData
+    );
+    enviromentalData.render();
+}
+if(document.querySelector("#farmTempMap")){
+   systemFarmTemp = new ApexCharts(
+        document.querySelector("#farmTempMap"),
+        optionsFarmTemp
+    );
+    systemFarmTemp.render();
+}
+if(document.querySelector("#daysActivityHeatMap")){
+    activityHeatChart = new ApexCharts(
+        document.querySelector("#daysActivityHeatMap"),
+        optionsHeatChart
+    );
+    activityHeatChart.render();
+}
+if(document.querySelector("#currentActivity")){
+    currentActivityChart = new ApexCharts(
+        document.querySelector("#currentActivity"),
+        optionsRadar
+    );
+    currentActivityChart.render();
+}
+if(document.querySelector("#currentUtilisation")){
+    currentUtilisation = new ApexCharts(
+        document.querySelector("#currentUtilisation"),
+        optionsUtilisation
+    );
+    currentUtilisation.render();
+}
 
 let worker = null;
 
@@ -567,26 +580,49 @@ if (window.Worker) {
                     const currentOperationsData = event.data.currentOperations;
                     const printerInfo = event.data.printerInformation;
                     const dashboard = event.data.dashStatistics;
-                    currentOperations(
-                        currentOperationsData.operations,
-                        currentOperationsData.count,
-                        printerInfo
-                    );
+                    const dashboardSettings = event.data.dashboardSettings;
+                    if(dashboardSettings.farmActivity.currentOperations){
+                        currentOperations(
+                            currentOperationsData.operations,
+                            currentOperationsData.count,
+                            printerInfo
+                        );
+                    }
+
                     dashUpdate.farmInformation(
                         dashboard.timeEstimates,
                         dashboard.utilisationGraph,
-                        dashboard.temperatureGraph
+                        dashboard.temperatureGraph,
+                        dashboardSettings
                     );
-                    dashUpdate.farmUtilisation(dashboard.farmUtilisation);
+                    if(dashboardSettings.farmUtilisation.farmUtilisation){
+                        dashUpdate.farmUtilisation(dashboard.farmUtilisation);
+                    }
+
                     dashUpdate.currentActivity(
                         dashboard.currentStatus,
-                        dashboard.currentUtilisation
+                        dashboard.currentUtilisation,
+                        dashboardSettings.printerStates.currentStatus,
+                        dashboardSettings.farmUtilisation.currentUtilisation
                     );
-                    dashUpdate.printerStatus(dashboard.printerHeatMaps.heatStatus);
-                    dashUpdate.printerProgress(dashboard.printerHeatMaps.heatProgress);
-                    dashUpdate.printerTemps(dashboard.printerHeatMaps.heatTemps);
-                    dashUpdate.printerUptime(dashboard.printerHeatMaps.heatUtilisation);
-                    if(dashboard.enviromentalData){
+
+                    if(dashboardSettings.printerStates.printerState){
+                        dashUpdate.printerStatus(dashboard.printerHeatMaps.heatStatus);
+                    }
+                    if(dashboardSettings.printerStates.printerProgress){
+                        dashUpdate.printerProgress(dashboard.printerHeatMaps.heatProgress);
+                    }
+                    if(dashboardSettings.printerStates.printerTemps){
+                        dashUpdate.printerTemps(dashboard.printerHeatMaps.heatTemps);
+                    }
+                    if(dashboardSettings.printerStates.printerUtilisation){
+                        dashUpdate.printerUptime(dashboard.printerHeatMaps.heatUtilisation);
+                    }
+
+
+
+
+                    if(dashboardSettings.historical.environmentalHistory){
                         dashUpdate.envriromentalData(dashboard.enviromentalData);
                     }
 
@@ -603,9 +639,6 @@ if (window.Worker) {
 
 class dashUpdate {
     static envriromentalData(data, iaq){
-        if(data[0].data.length !== 0){
-            document.getElementById("envrioData").classList.remove("d-none");
-        }
         enviromentalData.updateSeries(data);
     }
     static printerStatus(data) {
@@ -640,60 +673,89 @@ class dashUpdate {
         }
     }
 
-    static farmInformation(farmInfo, heatMap, temperatureGraph) {
-        document.getElementById("globalTemp").innerHTML = `
+    static farmInformation(farmInfo, heatMap, temperatureGraph, dashboardSettings) {
+
+        if(dashboardSettings.farmActivity.averageTimes){
+            document.getElementById("avgEstimatedTime").innerHTML = Calc.generateTime(
+                farmInfo.averageEstimated
+            );
+            document.getElementById("avgRemainingTime").innerHTML = Calc.generateTime(
+                farmInfo.averageRemaining
+            );
+            document.getElementById("avgElapsedTime").innerHTML = Calc.generateTime(
+                farmInfo.averageElapsed
+            );
+            avgRemainingProgress.style.width = `${Calc.toFixed(
+                farmInfo.averagePercentRemaining,
+                2
+            )}%`;
+            avgRemainingProgress.innerHTML = `${Calc.toFixed(
+                farmInfo.averagePercentRemaining,
+                2
+            )}%`;
+            avgElapsed.style.width = `${Calc.toFixed(farmInfo.averagePercent, 2)}%`;
+            avgElapsed.innerHTML = `${Calc.toFixed(farmInfo.averagePercent, 2)}%`;
+
+        }
+
+        if(dashboardSettings.farmActivity.cumulativeTimes){
+            document.getElementById("cumEstimatedTime").innerHTML = Calc.generateTime(
+                farmInfo.totalEstimated
+            );
+            document.getElementById("cumRemainingTime").innerHTML = Calc.generateTime(
+                farmInfo.totalRemaining
+            );
+            document.getElementById("cumElapsedTime").innerHTML = Calc.generateTime(
+                farmInfo.totalElapsed
+            );
+
+
+            cumRemainingProgress.style.width = `${Calc.toFixed(
+                farmInfo.cumulativePercentRemaining,
+                2
+            )}%`;
+            cumRemainingProgress.innerHTML = `${Calc.toFixed(
+                farmInfo.cumulativePercentRemaining,
+                2
+            )}%`;
+            cumElapsed.style.width = `${Calc.toFixed(farmInfo.cumulativePercent, 2)}%`;
+            cumElapsed.innerHTML = `${Calc.toFixed(farmInfo.cumulativePercent, 2)}%`;
+
+
+        }
+
+
+
+
+        if(dashboardSettings.historical.hourlyTotalTemperatures){
+            systemFarmTemp.updateSeries(temperatureGraph);
+            document.getElementById("globalTemp").innerHTML = `
             <i class="fas fa-temperature-high"></i> Total Temperature: ${Calc.toFixed(
-            farmInfo.totalFarmTemp,
-            0
-        )} °C
-    `;
-        document.getElementById("avgEstimatedTime").innerHTML = Calc.generateTime(
-            farmInfo.averageEstimated
-        );
-        document.getElementById("avgRemainingTime").innerHTML = Calc.generateTime(
-            farmInfo.averageRemaining
-        );
-        document.getElementById("avgElapsedTime").innerHTML = Calc.generateTime(
-            farmInfo.averageElapsed
-        );
-        document.getElementById("cumEstimatedTime").innerHTML = Calc.generateTime(
-            farmInfo.totalEstimated
-        );
-        document.getElementById("cumRemainingTime").innerHTML = Calc.generateTime(
-            farmInfo.totalRemaining
-        );
-        document.getElementById("cumElapsedTime").innerHTML = Calc.generateTime(
-            farmInfo.totalElapsed
-        );
+                farmInfo.totalFarmTemp,
+                0
+            )} °C
+             `;
+        }
+        if(dashboardSettings.historical.weeklyUtilisation){
 
-        avgRemainingProgress.style.width = `${Calc.toFixed(
-            farmInfo.averagePercentRemaining,
-            2
-        )}%`;
-        avgRemainingProgress.innerHTML = `${Calc.toFixed(
-            farmInfo.averagePercentRemaining,
-            2
-        )}%`;
-        avgElapsed.style.width = `${Calc.toFixed(farmInfo.averagePercent, 2)}%`;
-        avgElapsed.innerHTML = `${Calc.toFixed(farmInfo.averagePercent, 2)}%`;
-        cumRemainingProgress.style.width = `${Calc.toFixed(
-            farmInfo.cumulativePercentRemaining,
-            2
-        )}%`;
-        cumRemainingProgress.innerHTML = `${Calc.toFixed(
-            farmInfo.cumulativePercentRemaining,
-            2
-        )}%`;
-        cumElapsed.style.width = `${Calc.toFixed(farmInfo.cumulativePercent, 2)}%`;
-        cumElapsed.innerHTML = `${Calc.toFixed(farmInfo.cumulativePercent, 2)}%`;
+            activityHeatChart.updateSeries(heatMap);
+        }
 
-        systemFarmTemp.updateSeries(temperatureGraph);
-        activityHeatChart.updateSeries(heatMap);
+
+
     }
 
-    static currentActivity(currentStatus, currentActivity) {
-        currentActivityChart.updateSeries(currentActivity);
-        currentUtilisation.updateSeries(currentStatus);
+    static currentActivity(currentStatus, currentActivity, settingsActivity, settingsUtilisation) {
+        if(settingsUtilisation){
+            currentUtilisation.updateSeries(currentStatus);
+        }
+        console.log(currentActivity)
+        if(settingsActivity){
+            currentActivityChart.updateSeries(currentActivity);
+
+        }
+
+
     }
 
     static farmUtilisation(stats) {
@@ -761,7 +823,6 @@ function saveGrid() {
         });
     });
     localStorage.setItem('dashboardConfiguration', JSON.stringify(serializedData));
-    console.log("test")
     // console.log(JSON.stringify(serializedData, null, '  '))
 };
 function loadGrid() {

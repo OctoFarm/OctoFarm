@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+# [UnReleased]
+
+## [v1.1.5.7]
+
+### Added
+    - Formalised the data json layout for Environmental Data collection same POST endpoint as before. Must send null values for anything not used: 
+            {
+                temperature: value (°C),
+                humidity: value (%),
+                iaq: value (KOhms),
+                pressure: value (Pa)
+                date: value
+            }.
+    - Configurable dashboard. Allows the elements to be hidden/removed in System -> Client Settings -> Dashboard. You can also re-arrange your elements as well as re-size them to suit your needs.
+    
+ 
+### Changed
+
+ 
+
+### Fixed
+
+   
+
 # [Released]
 
 ## [v1.1.5.6]

@@ -5,6 +5,10 @@ const ClientSettingsSchema = new mongoose.Schema({
     type: Object,
     required: false
   },
+  dashboard: {
+    type: Object,
+    required: false
+  },
   panelView: {
     type: Object,
     required: false
