@@ -384,6 +384,8 @@ const optionsEnviromentalData = {
                     }
                 },
             },
+            min: 0,
+            max: 45,
         },
         {
             title: {
@@ -402,6 +404,8 @@ const optionsEnviromentalData = {
 
                 },
             },
+            min: 0,
+            max: 100,
         },
         {
             title: {
@@ -420,6 +424,8 @@ const optionsEnviromentalData = {
 
                 },
             },
+            min: 0,
+            max: 2000,
         },
         {
             title: {
