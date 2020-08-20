@@ -256,7 +256,7 @@ const optionsUtilisation = {
     chart: {
         type: "donut",
         width: "100%",
-        height: "85%",
+        height: "100%",
         animations: {
             enabled: true,
         },
