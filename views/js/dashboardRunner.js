@@ -808,9 +808,21 @@ class dashUpdate {
         )}%`;
     }
 }
+let column = 12
+var width = document.body.clientWidth;
+if (width < 700) {
+    column = 1
+} else if (width < 850) {
+    column = 3
+} else if (width < 950) {
+    column = 6
+} else if (width < 1100) {
+    column = 8
+}
+
 const grid = GridStack.init({
     animate: true,
-    disableOneColumnMode: true, // will manually do 1 column
+    column: column,
     cellHeight: 30,
     draggable: {
         handle: '.tag',
@@ -850,29 +862,9 @@ function loadGrid() {
         grid.commit();
     }
 };
-function resizeGrid() {
-    var width = document.body.clientWidth;
-    if (width < 700) {
-        grid.column(1);
-    } else if (width < 850) {
-        grid.column(3);
-    } else if (width < 950) {
-        grid.column(6);
-    } else if (width < 1100) {
-        grid.column(8);
-    } else {
-        grid.column(12);
-    }
-    grid.compact();
-};
-
 
 loadGrid();
-resizeGrid();
 
-window.addEventListener('resize', function() {
-    resizeGrid()
-});
 
 grid.on('change', function(event, items) {
     saveGrid();
