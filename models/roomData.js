@@ -7,19 +7,19 @@ const RoomDataSchema = new mongoose.Schema({
     },
     temperature: {
         type: Number,
-        required: true,
+        required: false,
     },
     pressure: {
         type: Number,
-        required: true,
+        required: false,
     },
     humidity: {
         type: Number,
-        required: true,
+        required: false,
     },
     iaq: {
         type: Number,
-        required: true,
+        required: false,
     }
 },{ capped : true, size:10000, max : 900000 });
 
