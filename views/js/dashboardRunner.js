@@ -814,7 +814,8 @@ const grid = GridStack.init({
     cellHeight: 30,
     draggable: {
         handle: '.tag',
-    }
+    },
+    float: true,
 });
 
 function saveGrid() {
