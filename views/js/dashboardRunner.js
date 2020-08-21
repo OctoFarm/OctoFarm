@@ -436,7 +436,7 @@ const optionsEnviromentalData = {
             opposite: false,
             seriesName: "IAQ",
             show: true,
-            min: -100,
+            min: 0,
             max: 100,
             labels: {
                 formatter(value) {
@@ -444,25 +444,25 @@ const optionsEnviromentalData = {
                     if(value === null) {
                         return ''
                     } else {
-                        if(Calc.isBetween(value, -100, -75)){
+                        if(Calc.isBetween(value, 0, 10)){
                             state = "Excellent";
                         }
-                        if(Calc.isBetween(value, -74, -25)){
+                        if(Calc.isBetween(value, 11, 30)){
                             state = "Good";
                         }
-                        if(Calc.isBetween(value, -24, -10)){
+                        if(Calc.isBetween(value, 31, 45)){
                             state = "Lightly Polluted";
                         }
-                        if(Calc.isBetween(value, -9, 9)){
+                        if(Calc.isBetween(value, 46, 60)){
                             state = "Moderately Polluted";
                         }
-                        if(Calc.isBetween(value, 10, 24)){
+                        if(Calc.isBetween(value, 61, 75)){
                             state = "Heavily Polluted";
                         }
-                        if(Calc.isBetween(value, 25, 74)){
+                        if(Calc.isBetween(value, 76, 89)){
                             state = "Severely Polluted";
                         }
-                        if(Calc.isBetween(value, 76, 100)){
+                        if(Calc.isBetween(value, 90, 100)){
                             state = "Extemely Polluted";
                         }
                     }
@@ -487,50 +487,50 @@ const optionsEnviromentalData = {
         position: 'front' ,
         yaxis: [
             {
-                y: -100,
-                y2: -75,
+                y: 0,
+                y2: 10,
                 yAxisIndex: 3,
                 borderColor: '#24571f',
                 fillColor: '#133614',
             },
             {
-                y: -74,
-                y2: -25,
+                y: 11,
+                y2: 30,
                 yAxisIndex: 3,
                 borderColor: '#1f574f',
                 fillColor: '#153b35',
             },
             {
-                y: -24,
-                y2: -10,
+                y: 31,
+                y2: 45,
                 yAxisIndex: 3,
                 borderColor: '#213a5c',
                 fillColor: '#15253b',
             },
             {
-                y: -9,
-                y2: 9,
+                y: 46,
+                y2: 60,
                 yAxisIndex: 3,
                 borderColor: '#21225c',
                 fillColor: '#15153b',
             },
             {
-                y: 10,
-                y2: 24,
+                y: 61,
+                y2: 75,
                 yAxisIndex: 3,
                 borderColor: '#37215c',
                 fillColor: '#23153b',
             },
             {
-                y: 25,
-                y2: 75,
+                y: 76,
+                y2: 89,
                 yAxisIndex: 3,
                 borderColor: '#4c215c',
                 fillColor: '#2e1438',
             },
             {
-                y: 100,
-                y2: 75,
+                y: 90,
+                y2: 100,
                 yAxisIndex: 3,
                 borderColor: '#5e2222',
                 fillColor: '#381414',
