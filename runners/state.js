@@ -549,7 +549,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
                     );
                     await Runner.updateFilament();
                     setTimeout(async function() {
-                        await Runner.reSyncFile(farmPrinters[that.index]._id, farmPrinters[that.index].job.file.path);
+                        await Runner.reSyncFile(farmPrinters[that.index]._id, job.file.path);
                     }, 500);
                 }, 10000);
                 ScriptRunner.check(farmPrinters[that.index], 'error');
@@ -557,6 +557,12 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         }
         if(data.plugin){
             console.log(data.plugin);
+            if(data.plugin.plugin === "klipper"){
+                console.log(data.plugin.data.payload);
+                if(data.plugin.data.payload.includes("Firmware version:")){
+                    farmPrinters[this.index].klipperFirmwareVersion = data.plugin.data.payload.replace("Firmware version: ", "");
+                }
+            }
         }
         // Event Listeners for state changes
         if (typeof farmPrinters[this.index].temps !== 'undefined') {
