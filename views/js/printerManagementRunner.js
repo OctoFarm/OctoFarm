@@ -871,8 +871,12 @@ class dashUpdate {
                     } else {
                         printerCameraURL.innerHTML = printer.cameraURL;
                     }
+                    if(typeof printer.klipperFirmwareVersion !== 'undefined'){
+                        printerOctoPrintVersion.innerHTML = printer.octoPrintVersion+"<br>Klipper: "+ printer.klipperFirmwareVersion;
+                    }else{
+                        printerOctoPrintVersion.innerHTML = printer.octoPrintVersion;
+                    }
 
-                    printerOctoPrintVersion.innerHTML = printer.octoPrintVersion;
 
                     printName.innerHTML = `${printerName}`;
                     printerBadge.innerHTML = printer.printerState.state;
