@@ -10,8 +10,31 @@ document.getElementById("saveServerSettings").addEventListener("click", (e) => {
 });
 document.getElementById("saveSettings").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
-  ClientSettings.update();
+    ClientSettings.update();
 });
+
+const dashData = localStorage.getItem('dashboardConfiguration');
+const serializedData = JSON.parse(dashData);
+if(serializedData !== null && serializedData.length !== 0){
+    serializedData.forEach(data => {
+      document.getElementById("currentDashboardLocationData").insertAdjacentHTML('beforeend', `
+          <code>${data.id}</code> <small>X:</small> <code>${data.x}</code> <small>Y:</small> <code>${data.y}</code> <small>Width:</small> <code>${data.width}</code> <small>Height:</small> <code>${data.height}</code> <br>
+      `);
+    });
+}else{
+  document.getElementById("currentDashboardLocationData").innerHTML = "No saved dashboard <br> <small>Arrange your dashboard using the <span title='Drag to move this panel about' class='sortableList btn btn-light btn-sm'><i class='fas fa-grip-vertical'></i></span> button and resize with the arrors in the bottom left. It will automatically save and store the grid in local storage. You can reset the dashboard to default with the button to the right. You can enable and disable elements to show below.</small>";
+}
+
+document.getElementById("resetDashboardBtn").addEventListener("click", e => {
+    let dashData = localStorage.getItem('dashboardConfiguration')
+    let serializedData = JSON.parse(dashData)
+    if(serializedData !== null && serializedData.length !== 0){
+        localStorage.removeItem('dashboardConfiguration')
+    }
+    UI.createAlert("success", "Dashboard data cleared from browser", 3000, "clicked");
+    document.getElementById("currentDashboardLocationData").innerHTML = "No saved dashboard <br> <small>Arrange your dashboard using the <span title='Drag to move this panel about' class='sortableList btn btn-light btn-sm'><i class='fas fa-grip-vertical'></i></span> button and resize with the arrors in the bottom left. It will automatically save and store the grid in local storage. You can reset the dashboard to default with the button to the right. You can enable and disable elements to show below.</small>";
+});
+
 
 let oldServerSettings = {};
 
@@ -228,6 +251,7 @@ systemChartMemory.render();
 setInterval(async function updateStatus() {
   let systemInfo = await Client.get("settings/sysInfo");
   systemInfo = await systemInfo.json();
+
   if (
     Object.keys(systemInfo).length === 0 &&
     systemInfo.constructor === Object

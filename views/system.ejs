@@ -136,7 +136,15 @@
                                                     <h5>Dashboard Settings</h5>
                                                     <hr>
                                                     <div class="row">
-                                                        <div class="col-3">
+                                                        <div class="col-lg-8">
+                                                            <div id="currentDashboardLocationData"></div>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <button id="resetDashboardBtn" type="button" class="btn btn-danger">Reset Dashboard</button>
+                                                        </div>
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="col-lg-3">
                                                             <h6 title="Current Operations block shows any currently active prints on the farm.">Farm Activity</h6><hr>
                                                             <form class="was-validated">
                                                                 <div class="custom-control custom-checkbox mb-3">
@@ -169,7 +177,7 @@
                                                                 </div>
                                                             </form>
                                                         </div>
-                                                        <div class="col-3">
+                                                        <div class="col-lg-3">
                                                             <h6 title="Printer Status blocks will show the last state grabbed of each instance. (these may need re-sizing to see all printers)">Printer Status</h6><hr>
                                                             <form class="was-validated">
                                                                 <div class="custom-control custom-checkbox mb-3">
@@ -222,7 +230,7 @@
                                                                 </div>
                                                             </form>
                                                         </div>
-                                                        <div class="col-3">
+                                                        <div class="col-lg-3">
                                                             <h6>Farm Utilisation</h6><hr>
                                                             <form class="was-validated">
                                                                 <div class="custom-control custom-checkbox mb-3">
@@ -273,13 +281,13 @@
                                                                     <label class="custom-control-label" for="environmentalHistory">Environmental History</label><br>
                                                                     <div class="valid-feedback">Shown</div>
                                                                     <div class="invalid-feedback">Hidden</div>
-                                                                    <small><i class="fas fa-info-circle"></i> Shows global Environmental data for room temperature/humidity/pressure/IAQ. To setup fire a POST request(requires Auth) to <code>/input/roomData</code> with the following format: <code>{
-                                                                                    temperature: value (°C),
-                                                                                    humidity: value (%),
-                                                                                    iaq: value,
-                                                                                    pressure: value (Pa)
-                                                                                    date: value
-                                                                                    }</code>. Null values are required if data is missing!</small>
+                                                                    <small><i class="fas fa-info-circle"></i> Shows global Environmental data for room temperature/humidity/pressure/IAQ. To setup fire a POST request(requires Auth) to <code>/input/roomData</code> with the following format:<br> <code>{<br>
+                                                                                    temperature: value (°C),<br>
+                                                                                    humidity: value (%),<br>
+                                                                                    iaq: value,<br>
+                                                                                    pressure: value (Pa)<br>
+                                                                                    date: value<br>
+                                                                                    }</code><br> Null values are required if data is missing!</small>
 
                                                                 </div>
                                                             </form>
