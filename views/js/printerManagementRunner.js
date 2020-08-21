@@ -879,7 +879,16 @@ class dashUpdate {
 
 
                     printName.innerHTML = `${printerName}`;
-                    printerBadge.innerHTML = printer.printerState.state;
+
+                    if(typeof printer.corsCheck !== 'undefined'){
+                        if(printer.corsCheck){
+                            printerBadge.innerHTML = printer.printerState.state;
+                        }else{
+                            printerBadge.innerHTML = "CORS NOT ENABLED!";
+                        }
+                    }else{
+                        printerBadge.innerHTML = printer.printerState.state;
+                    }
                     printerBadge.className = `tag badge badge-${printer.printerState.colour.name} badge-pill`;
                     printerBadge.setAttribute('title', printer.printerState.desc);
                     hostBadge.innerHTML = printer.hostState.state;
