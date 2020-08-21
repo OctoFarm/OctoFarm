@@ -53,6 +53,10 @@ const PrinterSchema = new mongoose.Schema({
         type: String,
         required: false
     },
+    klipperFirmwareVersion: {
+        type: String,
+        required: false
+    },
     feedRate: {
         type: Number,
         required: false
