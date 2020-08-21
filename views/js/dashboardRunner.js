@@ -433,42 +433,42 @@ const optionsEnviromentalData = {
             title: {
                 text: "Indoor Air Quality",
             },
-            opposite: true,
+            opposite: false,
             seriesName: "IAQ",
             show: true,
+            min: -100,
+            max: 100,
             labels: {
                 formatter(value) {
                     let state = null;
                     if(value === null) {
                         return ''
                     } else {
-
-                        if(Calc.isBetween(value, 0, 50)){
+                        if(Calc.isBetween(value, -100, -75)){
                             state = "Excellent";
                         }
-                        if(Calc.isBetween(value, 51, 100)){
+                        if(Calc.isBetween(value, -74, -25)){
                             state = "Good";
                         }
-                        if(Calc.isBetween(value, 101, 150)){
+                        if(Calc.isBetween(value, -24, -10)){
                             state = "Lightly Polluted";
                         }
-                        if(Calc.isBetween(value, 151, 200)){
+                        if(Calc.isBetween(value, -9, 9)){
                             state = "Moderately Polluted";
                         }
-                        if(Calc.isBetween(value, 201, 250)){
+                        if(Calc.isBetween(value, 10, 24)){
                             state = "Heavily Polluted";
                         }
-                        if(Calc.isBetween(value, 251, 350)){
+                        if(Calc.isBetween(value, 25, 74)){
                             state = "Severely Polluted";
                         }
-                        if(Calc.isBetween(value, 351, 500)){
+                        if(Calc.isBetween(value, 76, 100)){
                             state = "Extemely Polluted";
                         }
                     }
-                    return `${value}: ${state}`;
+                    return `${value}%: ${state}`;
                 },
-                min: -100,
-                max: 100,
+
             },
         },
     ],
@@ -487,51 +487,51 @@ const optionsEnviromentalData = {
         position: 'front' ,
         yaxis: [
             {
-                y: 0,
-                y2: 50,
-                yAxisIndex: 2,
+                y: -100,
+                y2: -75,
+                yAxisIndex: 3,
                 borderColor: '#24571f',
                 fillColor: '#133614',
             },
             {
-                y: 51,
-                y2: 100,
-                yAxisIndex: 2,
+                y: -74,
+                y2: -25,
+                yAxisIndex: 3,
                 borderColor: '#1f574f',
                 fillColor: '#153b35',
             },
             {
-                y: 101,
-                y2: 150,
-                yAxisIndex: 2,
+                y: -24,
+                y2: -10,
+                yAxisIndex: 3,
                 borderColor: '#213a5c',
                 fillColor: '#15253b',
             },
             {
-                y: 151,
-                y2: 200,
-                yAxisIndex: 2,
+                y: -9,
+                y2: 9,
+                yAxisIndex: 3,
                 borderColor: '#21225c',
                 fillColor: '#15153b',
             },
             {
-                y: 201,
-                y2: 250,
-                yAxisIndex: 2,
+                y: 10,
+                y2: 24,
+                yAxisIndex: 3,
                 borderColor: '#37215c',
                 fillColor: '#23153b',
             },
             {
-                y: 251,
-                y2: 350,
-                yAxisIndex: 2,
+                y: 25,
+                y2: 75,
+                yAxisIndex: 3,
                 borderColor: '#4c215c',
                 fillColor: '#2e1438',
             },
             {
-                y: 350,
-                y2: 1000,
-                yAxisIndex: 2,
+                y: 100,
+                y2: 75,
+                yAxisIndex: 3,
                 borderColor: '#5e2222',
                 fillColor: '#381414',
             }
