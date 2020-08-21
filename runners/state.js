@@ -1696,6 +1696,7 @@ class Runner {
             })
             .then(async (res) => {
                 // Update info to DB
+                farmPrinters[index].corsCheck = res.api.allowCrossOrigin
                 farmPrinters[index].settingsApi = res.api;
                 if(farmPrinters[index].settingsAppearance === 'undefined'){
                     farmPrinters[index].settingsAppearance = res.appearance;
