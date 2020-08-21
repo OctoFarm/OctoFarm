@@ -9,7 +9,7 @@ const optionsFarmTemp = {
         type: "line",
         id: "realtime",
         width: "100%",
-        height: "85%",
+        height: "90%",
         animations: {
             enabled: false,
         },
@@ -108,7 +108,7 @@ const optionsHeatChart = {
         type: "heatmap",
         id: "realtime",
         width: "100%",
-        height: "85%",
+        height: "90%",
         animations: {
             enabled: true,
             easing: "linear",
@@ -343,7 +343,7 @@ const optionsEnviromentalData = {
     chart: {
         type: "line",
         id: "realtime",
-        height: "85%",
+        height: "95%",
         width: "100%",
         animations: {
             enabled: false,
@@ -427,7 +427,7 @@ const optionsEnviromentalData = {
                 },
             },
             min: 0,
-            max: 2000,
+            max: 1100,
         },
         {
             title: {
@@ -435,7 +435,7 @@ const optionsEnviromentalData = {
             },
             opposite: true,
             seriesName: "IAQ",
-            show: false,
+            show: true,
             labels: {
                 formatter(value) {
                     let state = null;
@@ -467,6 +467,8 @@ const optionsEnviromentalData = {
                     }
                     return `${value}: ${state}`;
                 },
+                min: -100,
+                max: 100,
             },
         },
     ],
