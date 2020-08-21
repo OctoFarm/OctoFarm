@@ -343,7 +343,7 @@ const optionsEnviromentalData = {
     chart: {
         type: "line",
         id: "realtime",
-        height: "95%",
+        height: "90%",
         width: "100%",
         animations: {
             enabled: false,
