@@ -25,6 +25,10 @@ const printerClean = require('../lib/dataFunctions/printerClean.js');
 const { PrinterClean } = printerClean;
 const fileClean = require('../lib/dataFunctions/fileClean.js');
 
+const systemInfo = require("../runners/systemInfo.js");
+const SystemInfo = systemInfo.SystemRunner;
+
+
 const { FileClean } = fileClean;
 
 const version = `${pjson.version}.7`;
@@ -89,7 +93,7 @@ router.get('/dashboard', ensureAuthenticated, async (req, res) => {
             }
         };
     }else{
-        dashboardSettings = clientSettings.dashboard
+        dashboardSettings = clientSettings.dashboard;
     }
     let user = null;
     let group = null;
@@ -321,6 +325,7 @@ router.get('/filament', ensureAuthenticated, async (req, res) => {
 router.get('/system', ensureAuthenticated, async (req, res) => {
     const clientSettings = await SettingsClean.returnClientSettings();
     const serverSettings = await SettingsClean.returnSystemSettings();
+    const systemInformation = await SystemInfo.returnInfo();
     const printers = Runner.returnFarmPrinters();
     let user = null;
     let group = null;
@@ -339,7 +344,8 @@ router.get('/system', ensureAuthenticated, async (req, res) => {
         page: 'System',
         helpers: prettyHelpers,
         clientSettings,
-        serverSettings
+        serverSettings,
+        systemInformation
     });
 });
 module.exports = router;

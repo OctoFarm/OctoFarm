@@ -14,29 +14,66 @@
                     </button>
 
                 </div>
-                <div class="card-body">
+                <div class="card-body p-0">
                     <div class="row">
                         <div class="col-12">
                             <div class="row">
-                                <div class="col-12 col-sm-12 col-md-12 col-lg-6 col-xl-6">
-                                        <p class=""><i class="fas fa-hourglass"></i> System Uptime: <span  class="text-light" id="systemUpdate" style="font-size:0.8rem;"></span>
+                                <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 text-center">
+                                    <p class=""><i class="fas fa-hourglass"></i> System Uptime: <br><span  class="text-light" id="systemUptime" style="font-size:0.8rem;">
+                                            <%= helpers.generateTime(systemInformation.sysUptime.uptime) %>
+                                        </span>
+
+                                    </p>
+                                    <p class=""><i class="fas fa-hourglass"></i> OS: <br><span  class="text-light" id="systemArch" style="font-size:0.8rem;">
+                                            <%= systemInformation.osInfo.distro %>
+
+                                        </span>
+
+                                    </p>
+                                        <p class=""><i class="fas fa-hourglass"></i> System Architecture: <br><span  class="text-light" id="systemArch" style="font-size:0.8rem;">
+                                                <%= systemInformation.osInfo.arch %>
+                                            </span>
 
                                         </p>
-                                        <p class=""><i class="fas fa-hourglass"></i> OctoFarm Uptime: <span class="text-light" id="processUpdate" style="font-size:0.8rem;"></span>
+                                    <p class=""><i class="fas fa-hourglass"></i> CPU: <br><span  class="text-light" id="systemArch" style="font-size:0.8rem;"></span>
+                                                <% systemInformation.cpuInfo.speed.cores.forEach((core, index) => {%>
+                                          <small  class="text-light" >  <%= index %>:</small> <code><%= core %>Ghz</code>
+                                                <% }) %>
+                                    </p>
+                                    <p class=""><i class="fas fa-hourglass"></i> Memory: <br><span  class="text-light" id="systemArch" style="font-size:0.8rem;">
+                                                               <%= helpers.generateBytes(systemInformation.memoryInfo.total) %>
+                                        </span>
 
-                                        </p>
-                                    <p><i class="fas fa-code-branch"></i> Version:                                     <a title="OctoFarm Version, will take you to github changelog" class="text-light"
-                                                                                        href="https://github.com/NotExpectedYet/OctoFarm/releases"
-                                                                                        target="_blank"><%= version %></a></p>
-<!--                                    <p><i class="fas fa-code-branch"></i> Latest Version:                                     <a title="OctoFarm Version, will take you to github changelog" class="text-light"-->
-<!--                                                                                                                          href="https://github.com/NotExpectedYet/OctoFarm/releases"-->
-<!--                                                                                                                          target="_blank"></a></p>-->
+                                    </p>
                                 </div>
-                                <hr>
-                                <div class="col-12 col-sm-12 col-md-12 col-lg-3 col-xl-3">
+                                <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 text-center">
+                                    <p class=""><i class="fas fa-hourglass"></i> OctoFarm Uptime: <br><span class="text-light" id="processUpdate" style="font-size:0.8rem;">
+                                                           <%= helpers.generateTime(systemInformation.processUptime) %>
+                                        </span>
+
+                                    </p>
+                                    <p><i class="fas fa-code-branch"></i> Version:                                     <a title="OctoFarm Version, will take you to github changelog" class="text-light"
+                                                                                                                          href="https://github.com/NotExpectedYet/OctoFarm/releases"
+                                                                                                                          target="_blank"><br><%= version %></a></p>
+                                    <!--                                    <p><i class="fas fa-code-branch"></i> Latest Version:                                     <a title="OctoFarm Version, will take you to github changelog" class="text-light"-->
+                                    <!--                                                                                                                          href="https://github.com/NotExpectedYet/OctoFarm/releases"-->
+                                    <!--                                                                                                                          target="_blank"></a></p>-->
+                                    <p class=""><i class="fas fa-hourglass"></i> Timezone: <br><span class="text-light" id="timeZone" style="font-size:0.8rem;">
+                                                         <%= systemInformation.sysUptime.timezoneName %> (<%= systemInformation.sysUptime.timezone %>)
+                                        </span>
+
+                                    </p>
+                                    <p class=""><i class="fas fa-hourglass"></i> Run Command: <br><span class="text-light" id="runCommand" style="font-size:0.8rem;">
+                                                                <%= systemInformation.sysProcess.command %>
+                                        </span>
+
+                                    </p>
+
+                                </div>
+                                <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
                                     <div id="systemChartCPU" ></div>
                                 </div>
-                                <div class="col-12 col-sm-12 col-md-12 col-lg-3 col-xl-3">
+                                <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
                                     <div id="systemChartMemory"></div>
                                 </div>
                             </div>
@@ -63,7 +100,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-12 col-sm-12 col-md-2 col-lg-1 col-xl-1">
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-2 col-xl-2">
                             <div class="list-group" id="list-tab" role="tablist">
                                 <a class="list-group-item list-group-item-action  active" id="system-accounts-list" data-toggle="list" href="#system-accounts" role="tab" aria-controls="panelview"><i class="far fa-user"></i> Accounts</a>
                                 <a class="list-group-item list-group-item-action" id="system-status-list" data-toggle="list" href="#system-logs" role="tab" aria-controls="system"><i class="fas fa-sticky-note"></i> Logs</a>
@@ -74,7 +111,7 @@
                                 <a class="list-group-item list-group-item-action" id="system-about-list" data-toggle="list" href="#system-about" role="tab" aria-controls="listview"><i class="fas fa-address-card"></i> About</a>
                             </div>
                         </div>
-                        <div class="col-12 col-sm-12 col-md-10 col-lg-11 col-xl-11">
+                        <div class="col-12 col-sm-12 col-md-9 col-lg-10 col-xl-10">
                             <div class="tab-content" id="nav-tabContent">
                                 <div class="tab-pane fade" id="system-logs" role="tabpanel" aria-labelledby="server-status-list">
                                     <div class="row">
@@ -101,7 +138,9 @@
                                 <div class="tab-pane fade show active" id="system-accounts" role="tabpanel" aria-labelledby="server-settings-list">
                                     <% if(typeof name != 'undefined'){ %>
                                         <h6 class="dropdown-header">Account</h6>
-                                        <a class="dropdown-item text-center text-light" data-toggle="modal" data-target="#userModal" href="#"><i class="far fa-user"></i> <%= name %></a>
+                                        <p class="text-center"><i class="far fa-user"></i></p><br>
+                                        <a class="dropdown-item text-center text-light" href="#"> <%= name %></a>
+                                        <a class="dropdown-item text-center text-light" data-toggle="modal" data-target="#userModal" href="#"><%= userGroup %></a>
                                         <a class="dropdown-item text-center  text-light" href="/users/logout"><i class="fas fa-sign-out-alt"></i>Sign Out</a>
                                     <% }%>
                                 </div>
