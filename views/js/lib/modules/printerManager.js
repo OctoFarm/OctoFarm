@@ -223,7 +223,7 @@ export default class PrinterManager {
             <button id="pmPrintResume" type="button" class="btn btn-success" role="button"><i class="fas fa-redo"></i> Resume</button>
             <button id="pmPrintStop" type="button" class="btn btn-danger" disabled><i class="fas fa-square"></i> Cancel</button>
             </center></div></div>
-                    <div class="row">
+                 <div id="cameraRow" class="row">
                       <div class="col-12">
                             <center>
                                 <h5>Camera</h5>
@@ -647,7 +647,17 @@ export default class PrinterManager {
             camURL = "../../../images/noCamera.jpg";
         }
         //Load camera
-        document.getElementById("printerControlCamera").src = camURL;
+        const camTitle = document.getElementById("cameraRow");
+        if(printer.otherSettings.webCamSettings.webcamEnabled){
+            document.getElementById("printerControlCamera").src = camURL;
+            if(camTitle.classList.contains("d-none")){
+                camTitle.classList.remove("d-none");
+            }
+        }else{
+            if(!camTitle.classList.contains("d-none")){
+                camTitle.classList.add("d-none");
+            }
+        }
         const printerToolTemps = document.getElementById("pmToolTemps");
         document.getElementById("pmBedTemp").innerHTML = "";
         document.getElementById("pmChamberTemp").innerHTML = "";

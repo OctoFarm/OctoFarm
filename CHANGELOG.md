@@ -17,9 +17,11 @@ All notable changes to this project will be documented in this file.
             }.
     - Configurable dashboard. Allows the elements to be hidden/removed in System -> Client Settings -> Dashboard. You can also re-arrange your elements as well as re-size them to suit your needs.
     - Initial support for Klipper Plugin, OctoFarm will now grab Klippers version information and display it under OctoPrints on the printer management.
- 
+    - Added server side check for CORS activation. UI on printer manager will react...
+    - New Dashboard settings in System -> Client. Shows saved grid, and allows for adding/removing elements and clearing positions/sizes.
+    
 ### Changed
-    - Dashboard graphs are now thinner to enable more on the screen when customising. (currently making these larger does nothing due to the graph implementation)
+    - OctoFarm now reacts to the enabled camera setting on OctoPrint. If you don't use camera's it is best to disable them here. 
  
 
 ### Fixed
@@ -34,7 +36,8 @@ All notable changes to this project will be documented in this file.
     - File Manager now displays the success/failure/last stats from OctoPrint
     - New API Endpoint for collecting enviromental data. Expected the following JSON format: {temperature: value (°C), humidity:value (%), gas_resistance: value (KOhms), date: value}. Null values are required when no data present. (MongoDB is NOT a time series database, this is capped at 90000 records... )
     - Dashboard will now show envriomental history... currently shows hard coded last 4000 records. From your data you will get a Temperature and Humidity Graph and also an IAQ Score (if you supply gas_resistance, not all sensors read this data.). If you use the BME680 find out more here: https://ae-bst.resource.bosch.com/media/_tech/media/datasheets/BST-BME680-DS001.pdf 
-    - New Dashboard settings in System -> Client. Shows saved grid, and allows for adding/removing elements and clearing positions/sizes.
+
+
 ### Changed
     - history will now update the file after it's generated. History is generated 10 seconds after a print. 
  
