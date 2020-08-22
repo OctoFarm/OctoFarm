@@ -2,6 +2,10 @@
 html {
   height: 100%;
 }
+.restricScreenSize {
+  margin: 0 auto;
+  max-width: 2000px;
+}
 .heatMapRight {
   width:19px;
   height:40px;
