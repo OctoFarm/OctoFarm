@@ -255,8 +255,6 @@ setInterval(async function updateStatus() {
 
     systemInfo = await systemInfo.json();
 
-    console.log(systemInfo);
-
     if (
         Object.keys(systemInfo).length === 0 &&
     systemInfo.constructor === Object

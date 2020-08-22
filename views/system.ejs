@@ -1,5 +1,5 @@
 <% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
-    <div class="row">
+        <div class="row">
         <div class="col-lg-12">
             <div class="card text-white bg-dark">
                 <div class="card-header dashHeader p-0">
@@ -35,16 +35,24 @@
                                             </span>
 
                                         </p>
-                                    <p class=""><i class="fas fa-hourglass"></i> CPU: <br><span  class="text-light" id="systemArch" style="font-size:0.8rem;"></span>
+                                    <div class="row">
+                                        <div class="col-6">
+                                            <p class=""><i class="fas fa-hourglass"></i> CPU: <br><span  class="text-light" id="systemArch" style="font-size:0.8rem;"></span>
                                                 <% systemInformation.cpuInfo.speed.cores.forEach((core, index) => {%>
-                                          <small  class="text-light" >  <%= index %>:</small> <code><%= core %>Ghz</code>
+                                                    <small  class="text-light" >  <%= index %>:</small> <code><%= core %>Ghz</code>
                                                 <% }) %>
-                                    </p>
-                                    <p class=""><i class="fas fa-hourglass"></i> Memory: <br><span  class="text-light" id="systemArch" style="font-size:0.8rem;">
+                                            </p>
+                                        </div>
+                                        <div class="col-6">
+                                            <p class=""><i class="fas fa-hourglass"></i> Memory: <br><span  class="text-light" id="systemArch" style="font-size:0.8rem;">
                                                                <%= helpers.generateBytes(systemInformation.memoryInfo.total) %>
                                         </span>
 
-                                    </p>
+                                            </p>
+                                        </div>
+                                    </div>
+
+
                                 </div>
                                 <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 text-center">
                                     <p class=""><i class="fas fa-hourglass"></i> OctoFarm Uptime: <br><span class="text-light" id="processUpdate" style="font-size:0.8rem;">
