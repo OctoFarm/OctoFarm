@@ -1,6 +1,4 @@
-// eslint-disable-next-line import/extensions
 import Calc from './lib/functions/calc.js';
-// eslint-disable-next-line import/extensions
 import currentOperations from './lib/modules/currentOperations.js';
 
 // Setup charts
@@ -209,7 +207,6 @@ const optionsRadar = {
         type: "bar",
         width: "100%",
         height: "85%",
-        height: "180px",
         toolbar: {
             show: false,
         },
@@ -380,7 +377,7 @@ const optionsEnviromentalData = {
                 formatter(value) {
 
                     if(value === null) {
-                        return ''
+                        return '';
                     }else{
                         return `${value}°C`;
                     }
@@ -399,7 +396,7 @@ const optionsEnviromentalData = {
             labels: {
                 formatter(value) {
                     if(value === null) {
-                        return ''
+                        return '';
                     }else{
                         return `${value} %`;
                     }
@@ -419,7 +416,7 @@ const optionsEnviromentalData = {
             labels: {
                 formatter(value) {
                     if(value === null) {
-                        return ''
+                        return '';
                     }else{
                         return `${value} Pa`;
                     }
@@ -442,7 +439,7 @@ const optionsEnviromentalData = {
                 formatter(value) {
                     let state = null;
                     if(value === null) {
-                        return ''
+                        return '';
                     } else {
                         if(Calc.isBetween(value, 0, 10)){
                             state = "Excellent";
@@ -539,7 +536,7 @@ const optionsEnviromentalData = {
     }
 };
 
-let enviromentalData, systemFarmTemp, activityHeatChart, currentActivityChart, currentUtilisation
+let enviromentalData, systemFarmTemp, activityHeatChart, currentActivityChart, currentUtilisation;
 
 if(document.querySelector("#enviromentalHistory")){
     enviromentalData = new ApexCharts(
@@ -549,7 +546,7 @@ if(document.querySelector("#enviromentalHistory")){
     enviromentalData.render();
 }
 if(document.querySelector("#farmTempMap")){
-   systemFarmTemp = new ApexCharts(
+    systemFarmTemp = new ApexCharts(
         document.querySelector("#farmTempMap"),
         optionsFarmTemp
     );
@@ -628,8 +625,6 @@ if (window.Worker) {
                     if(dashboardSettings.printerStates.printerUtilisation){
                         dashUpdate.printerUptime(dashboard.printerHeatMaps.heatUtilisation);
                     }
-
-
 
 
                     if(dashboardSettings.historical.environmentalHistory){
@@ -735,22 +730,19 @@ class dashUpdate {
         }
 
 
-
-
         if(dashboardSettings.historical.hourlyTotalTemperatures){
             systemFarmTemp.updateSeries(temperatureGraph);
             document.getElementById("globalTemp").innerHTML = `
             <i class="fas fa-temperature-high"></i> Total Temperature: ${Calc.toFixed(
-                farmInfo.totalFarmTemp,
-                0
-            )} °C
+        farmInfo.totalFarmTemp,
+        0
+    )} °C
              `;
         }
         if(dashboardSettings.historical.weeklyUtilisation){
 
             activityHeatChart.updateSeries(heatMap);
         }
-
 
 
     }
@@ -837,15 +829,15 @@ function saveGrid() {
     // console.log(JSON.stringify(serializedData, null, '  '))
 };
 function loadGrid() {
-    let dashData = localStorage.getItem('dashboardConfiguration')
-    let serializedData = JSON.parse(dashData)
+    const dashData = localStorage.getItem('dashboardConfiguration');
+    const serializedData = JSON.parse(dashData);
     if(serializedData !== null && serializedData.length !== 0){
-        var items = GridStack.Utils.sort(serializedData);
+        const items = GridStack.Utils.sort(serializedData);
         grid.batchUpdate();
 
         // else update existing nodes (instead of calling grid.removeAll())
         grid.engine.nodes.forEach(function (node) {
-            var item = items.find(function(e) { return e.id === node.id});
+            const item = items.find(function(e) { return e.id === node.id;});
             if(typeof item !== 'undefined'){
                 grid.update(node.el, item.x, item.y, item.width, item.height);
             }
