@@ -61,6 +61,12 @@ OctoFarm was built to fill a need that anyone with multiple 3D printers with Oct
 
 To get a local copy up and running follow these simple steps.
 
+
+## OctoPrint 1.4.1+ 
+
+Currently there are issues with using the Global API Key to connect to these instances of OctoPrint. Please use the first user you setup on OctoPrint and a generated Application / User API key from this user to connect. I will be updating OctoFarm to work better with all permission sets eventually but for now this will allow a connection to be established. 
+
+
 ### Platform
 
 Confirmed working on: Linux (Ubuntu, Debian), RaspberryPi (Rasbian), Windows 10.
