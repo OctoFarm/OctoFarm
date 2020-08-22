@@ -788,6 +788,7 @@ class Runner {
                 farmPrinters[i].systemChecks.scanning.api.status = 'success';
                 farmPrinters[i].systemChecks.scanning.api.date = new Date();
                 users = await users.json();
+                logger.info("users: ", users);
                 if (_.isEmpty(users)) {
                     farmPrinters[i].currentUser = 'admin';
                     farmPrinters[i].markModified('currentUser');
@@ -801,14 +802,17 @@ class Runner {
                         }
                     });
                 }
+                logger.info("Chosen user:", farmPrinters[i].currentUser);
                 const sessionKey = await ClientAPI.post(
                     farmPrinters[i].printerURL,
                     farmPrinters[i].apikey,
                     'login',
                     {passive: true}
                 );
+                logger.info("Session Response", sessionKey);
                 if(sessionKey.status === 200){
                     const sessionJson = await sessionKey.json();
+                    logger.info("sessionKey JSON:", sessionJson);
                     farmPrinters[i].sessionKey = sessionJson.session;
                     // Update info via API
                     farmPrinters[i].hostState = 'Online';
@@ -1696,7 +1700,7 @@ class Runner {
             })
             .then(async (res) => {
                 // Update info to DB
-                farmPrinters[index].corsCheck = res.api.allowCrossOrigin
+                farmPrinters[index].corsCheck = res.api.allowCrossOrigin;
                 farmPrinters[index].settingsApi = res.api;
                 if(farmPrinters[index].settingsAppearance === 'undefined'){
                     farmPrinters[index].settingsAppearance = res.appearance;
