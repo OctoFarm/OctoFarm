@@ -22,7 +22,7 @@ All notable changes to this project will be documented in this file.
     
 ### Changed
     - OctoFarm now reacts to the enabled camera setting on OctoPrint. If you don't use camera's it is best to disable them here. 
- 
+    - OctoFarm will now only respond to a max screen size of 2000px. Anything above this will be limited from stretching to the full horizontal width.
 
 ### Fixed
 
