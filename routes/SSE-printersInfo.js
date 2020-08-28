@@ -8,8 +8,12 @@ let clientInformation = null;
 const printerClean = require("../lib/dataFunctions/printerClean.js");
 const PrinterClean = printerClean.PrinterClean;
 
+const printerTicker = require("../runners/printerTicker.js");
+
+const {PrinterTicker} = printerTicker;
+
 let clientId = 0;
-let clients = {}; // <- Keep a map of attached clients
+const clients = {}; // <- Keep a map of attached clients
 let interval = false;
 
 // Called once for each new client. Note, this response is left open!
@@ -32,12 +36,14 @@ router.get("/get/", ensureAuthenticated, function(req, res) {
 
 if(interval === false){
     interval = setInterval(async function() {
-        let printersInformation = await PrinterClean.returnPrintersInformation();
-        let printerControlList = await PrinterClean.returnPrinterControlList();
-        let infoDrop = {
+        const printersInformation = await PrinterClean.returnPrintersInformation();
+        const printerControlList = await PrinterClean.returnPrinterControlList();
+        const currentTickerList = await PrinterTicker.returnIssue();
+        const infoDrop = {
             printersInformation: printersInformation,
-            printerControlList: printerControlList
-        }
+            printerControlList: printerControlList,
+            currentTickerList: currentTickerList
+        };
         clientInformation = await stringify(infoDrop);
         for (clientId in clients) {
             for (clientId in clients) {

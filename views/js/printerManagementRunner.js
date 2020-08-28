@@ -23,6 +23,10 @@ if (window.Worker) {
             worker = new Worker('./js/lib/modules/workers/printersManagerWorker.js');
             worker.onmessage = function (event) {
                 if (event.data !== false) {
+
+                    if(event.data.currentTickerList.length > 0){
+                        dashUpdate.ticker(event.data.currentTickerList);
+                    }
                     printerInfo = event.data.printersInformation;
                     printerControlList = event.data.printerControlList;
                     if (event.data.printersInformation.length > 0) {
@@ -814,6 +818,20 @@ class dashActions {
 }
 
 class dashUpdate {
+    static ticker(list){
+        const textList = "";
+        const reverseList = list.reverse();
+
+        reverseList.forEach(e => {
+            let date = new Date(e.date);
+            date = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
+            if(!document.getElementById(e.id)){
+                document.getElementById("printerTickerMessageBox").insertAdjacentHTML("afterbegin",`<div id="${e.id}" style="width: 100%;" class="text-left bg-${e.state} text-wrap"> ${e.printer} | ${date} | ${e.message}</div>`);
+            }
+
+        });
+
+    }
     static printers (printers, printerControlList) {
         printers.forEach((printer) => {
             let printerName = '';
