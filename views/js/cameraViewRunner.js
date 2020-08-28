@@ -11,7 +11,6 @@ import { dragAndDropEnable, dragCheck } from './lib/functions/dragAndDrop.js';
 import { checkTemps } from './lib/modules/temperatureCheck.js';
 
 let powerTimer = 20000;
-let jpInit = false;
 let dragDropInit = false;
 let groupInit = false;
 let printerControlList = null;
@@ -45,14 +44,6 @@ if (window.Worker) {
                         });
                     }
                     if (event.data != false) {
-                        if (!(await dragCheck())) {
-                            // eslint-disable-next-line no-use-before-define
-                            init(
-                                event.data.printersInformation,
-                                event.data.clientSettings.cameraView,
-                                event.data.printerControlList
-                            );
-                        }
                         if (
                             document
                                 .getElementById('printerManagerModal')
@@ -65,6 +56,14 @@ if (window.Worker) {
                             );
                         } else {
                             printerInfo = event.data.printersInformation;
+                            if (!(await dragCheck())) {
+                                // eslint-disable-next-line no-use-before-define
+                                init(
+                                    event.data.printersInformation,
+                                    event.data.clientSettings.cameraView,
+                                    event.data.printerControlList
+                                );
+                            }
                             if (powerTimer >= 20000) {
                                 event.data.printersInformation.forEach((printer) => {
                                     PowerButton.applyBtn(printer, 'powerBtn-');
@@ -149,15 +148,11 @@ function updateState (printer, clientSettings) {
             ).toTimeString();
             futureTimeString = futureTimeString.substring(0, 8);
             const dateComplete = `${futureDateString}: ${futureTimeString}`;
-            elements.timeRemaining.innerHTML = `
-          ${Calc.generateTime(printer.currentJob.printTimeRemaining)}
-        `;
-            elements.eta.innerHTML = dateComplete;
+            UI.doesElementNeedUpdating(Calc.generateTime(printer.currentJob.printTimeRemaining), elements.timeRemaining, "innerHTML");
+            UI.doesElementNeedUpdating(dateComplete, elements.eta, "innerHTML");
         } else {
-            elements.timeRemaining.innerHTML = `
-          ${Calc.generateTime(null)}
-        `;
-            elements.eta.innerHTML = 'N/A';
+            UI.doesElementNeedUpdating(Calc.generateTime(null), elements.timeRemaining, "innerHTML");
+            UI.doesElementNeedUpdating('N/A', elements.eta, "innerHTML");
         }
     }else{
         document.getElementById("timeOption").disabled = true;
@@ -165,20 +160,19 @@ function updateState (printer, clientSettings) {
     }
     if (typeof printer.currentJob !== 'undefined') {
         elements.currentFile.setAttribute('title', printer.currentJob.filePath);
-        elements.currentFile.innerHTML = `<i class="fas fa-file-code"></i> ${printer.currentJob.filePath}`;
+        UI.doesElementNeedUpdating(`<i class="fas fa-file-code"></i> ${printer.currentJob.filePath}`, elements.currentFile, "innerHTML");
     }
 
     if (typeof printer.currentJob !== 'undefined') {
-        elements.progress.innerHTML = `${Math.floor(printer.currentJob.progress)}%`;
+        UI.doesElementNeedUpdating(`${Math.floor(printer.currentJob.progress)}%`, elements.progress, "innerHTML");
+        UI.doesElementNeedUpdating(`progress-bar progress-bar-striped bg-${printer.printerState.colour.name} percent`, elements.progress, "classList");
         elements.progress.style.width = `${printer.currentJob.progress}%`;
-        elements.progress.classList = `progress-bar progress-bar-striped bg-${printer.printerState.colour.name} percent`;
     } else {
-        elements.progress.innerHTML = `${0}%`;
+        UI.doesElementNeedUpdating(`${0}%`, elements.progress, "innerHTML");
+        UI.doesElementNeedUpdating('progress-bar progress-bar-striped bg-dark percent', elements.progress, "classList");
         elements.progress.style.width = `${0}%`;
-        elements.progress.classList =
-      'progress-bar progress-bar-striped bg-dark percent';
     }
-    elements.camBackground.className = `card-body cameraContain ${printer.printerState.colour.category}`;
+    UI.doesElementNeedUpdating(`card-body cameraContain ${printer.printerState.colour.category}`, elements.camBackground, "className");
 
     let hideClosed = '';
 
@@ -575,31 +569,12 @@ function drawPrinter (printer, clientSettings) {
 async function init (printers, clientSettings) {
     for (let p = 0; p < printers.length; p++) {
         if (!document.getElementById(`viewPanel-${printers[p]._id}`)) {
-            if (!jpInit) {
-                if (
-                    printers[p].cameraURL !== '' &&
-          printers[p].printerState.colour.category !== 'Offline'
-                ) {
-                    drawPrinter(printers[p], clientSettings);
-                }
+            if (printers[p].cameraURL !== '' && printers[p].printerState.colour.category !== 'Offline'
+            ) {
+                drawPrinter(printers[p], clientSettings);
             }
         } else {
             updateState(printers[p], clientSettings);
         }
-    }
-    if (jpInit) {
-        const fullscreenElement =
-      document.fullscreenElement ||
-      document.mozFullScreenElement ||
-      document.webkitFullscreenElement;
-        if (!fullscreenElement) {
-            jplist.refresh();
-        }
-    } else {
-        jpInit = true;
-        await jplist.init({
-            storage: 'localStorage', // 'localStorage', 'sessionStorage' or 'cookies'
-            storageName: 'view-storage'
-        });
     }
 }

@@ -11,7 +11,6 @@ import { checkTemps } from './lib/modules/temperatureCheck.js';
 import { checkFilamentManager } from './lib/modules/filamentGrab.js';
 
 let powerTimer = 20000;
-let jpInit = false;
 let dragDropInit = false;
 let groupInit = false;
 let printerControlList = null;
@@ -45,13 +44,6 @@ if (window.Worker) {
                         });
                     }
                     if (event.data != false) {
-                        if (!(await dragCheck())) {
-                            init(
-                                event.data.printersInformation,
-                                event.data.clientSettings.panelView,
-                                event.data.printerControlList
-                            );
-                        }
                         if (
                             document
                                 .getElementById('printerManagerModal')
@@ -64,6 +56,13 @@ if (window.Worker) {
                             );
                         } else {
                             printerInfo = event.data.printersInformation;
+                            if (!(await dragCheck())) {
+                                init(
+                                    event.data.printersInformation,
+                                    event.data.clientSettings.panelView,
+                                    event.data.printerControlList
+                                );
+                            }
                             if (powerTimer >= 20000) {
                                 event.data.printersInformation.forEach((printer) => {
                                     PowerButton.applyBtn(printer, 'powerBtn-');
@@ -134,9 +133,10 @@ function grabElements (printer) {
 }
 async function updateState (printer, clientSettings) {
     const elements = grabElements(printer);
-    elements.state.innerHTML = printer.printerState.state;
-    elements.state.className = `btn btn-block ${printer.printerState.colour.category} mb-1 mt-1`;
-    elements.name.innerHTML = printer.printerName;
+    UI.doesElementNeedUpdating(printer.printerState.state, elements.state, "innerHTML");
+    UI.doesElementNeedUpdating(`btn btn-block ${printer.printerState.colour.category} mb-1 mt-1`, elements.state, "className");
+    UI.doesElementNeedUpdating(printer.printerName, elements.name, "innerHTML");
+
     if (clientSettings.extraInfo) {
         if (elements.extraInfo.classList.contains('d-none')) {
             elements.extraInfo.classList.remove('d-none');
@@ -157,35 +157,33 @@ async function updateState (printer, clientSettings) {
             ).toTimeString();
             futureTimeString = futureTimeString.substring(0, 8);
             const dateComplete = futureDateString + ': ' + futureTimeString;
-            elements.timeRemaining.innerHTML = `
-          ${Calc.generateTime(printer.currentJob.printTimeRemaining)}
-        `;
-            elements.eta.innerHTML = dateComplete;
+            UI.doesElementNeedUpdating(printer.currentJob.printTimeRemaining, elements.timeRemaining, "innerHTML");
+            UI.doesElementNeedUpdating(dateComplete, elements.eta, "innerHTML");
+
         } else {
-            elements.timeRemaining.innerHTML = `
-          ${Calc.generateTime(null)}
-        `;
-            elements.eta.innerHTML = 'N/A';
+            UI.doesElementNeedUpdating(Calc.generateTime(null), elements.timeRemaining, "innerHTML");
+            UI.doesElementNeedUpdating('N/A', elements.eta, "innerHTML");
         }
     }else{
-        document.getElementById("timeOption").disabled = true;
-        document.getElementById("timeOption").title = "Only available when Extra Information is activated in System -> Client Settings -> Panel View";
+        const timeOption = document.getElementById("timeOption");
+        timeOption.disabled = true;
+        timeOption.title = "Only available when Extra Information is activated in System -> Client Settings -> Panel View";
     }
 
     if (typeof printer.currentJob !== 'undefined') {
-        elements.currentFile.setAttribute('title', printer.currentJob.filePath);
-        elements.currentFile.innerHTML =
-      '<i class="fas fa-file-code"></i> ' + printer.currentJob.filePath;
+        UI.doesElementNeedUpdating('<i class="fas fa-file-code"></i> ' + printer.currentJob.fileName, elements.currentFile, "innerHTML");
+        elements.currentFile.setAttribute("title", printer.currentJob.filePath);
     }
 
+
     if (typeof printer.currentJob !== 'undefined') {
-        elements.progress.innerHTML = Math.floor(printer.currentJob.progress) + '%';
-        elements.progress.style.width = printer.currentJob.progress + '%';
-        elements.progress.classList = `progress-bar progress-bar-striped bg-${printer.printerState.colour.name} percent`;
+        UI.doesElementNeedUpdating(Math.floor(printer.currentJob.progress) + '%', elements.progress, "innerHTML");
+        UI.doesElementNeedUpdating(`progress-bar progress-bar-striped bg-${printer.printerState.colour.name} percent`, elements.progress, "classList");
+        elements.progress.style.width = Math.floor(printer.currentJob.progress) + '%';
     } else {
-        elements.progress.innerHTML = 0 + '%';
+        UI.doesElementNeedUpdating(0 + '%', elements.progress, "innerHTML");
+        UI.doesElementNeedUpdating(`progress-bar progress-bar-striped bg-dark percent`, elements.progress, "classList");
         elements.progress.style.width = 0 + '%';
-        elements.progress.classList = 'progress-bar progress-bar-striped bg-dark percent';
     }
 
     let hideClosed = '';
@@ -327,6 +325,7 @@ async function updateState (printer, clientSettings) {
             elements.pause.disabled = true;
             elements.resume.disabled = false;
             elements.restart.disabled = false;
+            elements.stop.disabled = false;
             elements.start.classList.add('hidden');
             elements.pause.classList.add('hidden');
             elements.resume.classList.remove('hidden');
@@ -367,7 +366,6 @@ async function updateState (printer, clientSettings) {
         ' ' +
         dNone;
         }
-
         elements.control.disabled = true;
         elements.start.disabled = true;
         elements.stop.disabled = true;
@@ -493,7 +491,7 @@ function drawPrinter (printer, clientSettings) {
     const printerHTML = `
         <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2 ${hidden}" id="viewPanel-${
     printer._id
-}"  data-jplist-item>
+}">
         <div class="card mt-1 mb-1 ml-1 mr-1 text-center ${printer.group.replace(
         '/_/g',
         ' '
@@ -682,12 +680,14 @@ function drawPrinter (printer, clientSettings) {
     document
         .getElementById('panPrintStart-' + printer._id)
         .addEventListener('click', async (e) => {
+
             e.target.disabled = true;
             const opts = {
                 command: 'start'
             };
             const print = returnPrinterInfo(printer._id);
             OctoPrintClient.jobAction(print, opts, e);
+
         });
     document
         .getElementById('panPrintPause-' + printer._id)
@@ -752,26 +752,9 @@ function drawPrinter (printer, clientSettings) {
 async function init (printers, clientSettings) {
     for (let p = 0; p < printers.length; p++) {
         if (!document.getElementById('viewPanel-' + printers[p]._id)) {
-            if (!jpInit) {
-                drawPrinter(printers[p], clientSettings);
-            }
+            drawPrinter(printers[p], clientSettings);
         } else {
             updateState(printers[p], clientSettings);
         }
-    }
-    if (jpInit) {
-        const fullscreenElement =
-      document.fullscreenElement ||
-      document.mozFullScreenElement ||
-      document.webkitFullscreenElement;
-        if (!fullscreenElement) {
-            jplist.refresh();
-        }
-    } else {
-        jpInit = true;
-        await jplist.init({
-            storage: 'localStorage', // 'localStorage', 'sessionStorage' or 'cookies'
-            storageName: 'view-storage'
-        });
     }
 }

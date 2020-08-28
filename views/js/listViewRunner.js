@@ -10,7 +10,6 @@ import { checkTemps } from './lib/modules/temperatureCheck.js';
 import { checkFilamentManager } from './lib/modules/filamentGrab.js';
 
 let powerTimer = 20000;
-let jpInit = false;
 let dragDropInit = false;
 let groupInit = false;
 let printerControlList = null;
@@ -44,13 +43,7 @@ if (window.Worker) {
                         });
                     }
                     if (event.data != false) {
-                        if (!(await dragCheck())) {
-                            init(
-                                event.data.printersInformation,
-                                event.data.clientSettings.listView,
-                                event.data.printerControlList
-                            );
-                        }
+
                         if (
                             document
                                 .getElementById('printerManagerModal')
@@ -63,6 +56,13 @@ if (window.Worker) {
                             );
                         } else {
                             printerInfo = event.data.printersInformation;
+                            if (!(await dragCheck())) {
+                                init(
+                                    event.data.printersInformation,
+                                    event.data.clientSettings.listView,
+                                    event.data.printerControlList
+                                );
+                            }
                             if (powerTimer >= 20000) {
                                 event.data.printersInformation.forEach((printer) => {
                                     PowerButton.applyBtn(printer, 'powerBtn-');
@@ -138,13 +138,13 @@ function grabElements (printer) {
 async function updateState (printer, clientSettings) {
     if (printer.printerState.colour.category !== 'Offline') {
         const elements = grabElements(printer);
-        elements.state.innerHTML = printer.printerState.state;
-        elements.state.classList = printer.printerState.colour.category;
-        elements.name.innerHTML = printer.printerName;
-        elements.row.classList = printer.printerState.colour.category;
+        UI.doesElementNeedUpdating(printer.printerState.state, elements.state, "innerHTML");
+        UI.doesElementNeedUpdating(printer.printerState.colour.category, elements.state, "classList");
+        UI.doesElementNeedUpdating(printer.printerName, elements.name, "innerHTML");
+        UI.doesElementNeedUpdating(printer.printerState.colour.category, elements.row, "classList");
 
         if (clientSettings.extraInfo) {
-            elements.progress.classList = `progress-bar progress-bar-striped bg-${printer.printerState.colour.name}`;
+            UI.doesElementNeedUpdating(`progress-bar progress-bar-striped bg-${printer.printerState.colour.name}`, elements.progress, "classList");
             if (elements.extraInfoCol.classList.contains('d-none')) {
                 elements.extraInfoCol.classList.remove('d-none');
             }
@@ -159,12 +159,10 @@ async function updateState (printer, clientSettings) {
             }
         }
         if (typeof printer.currentJob !== 'undefined') {
-            elements.percent.innerHTML = Math.floor(printer.currentJob.progress) + '%';
-
+            UI.doesElementNeedUpdating(Math.floor(printer.currentJob.progress) + '%', elements.percent, "innerHTML");
             elements.progress.style.width = printer.currentJob.progress + '%';
         } else {
-            elements.percent.innerHTML = 0 + '%';
-
+            UI.doesElementNeedUpdating(0 + '%', elements.percent, "innerHTML");
             elements.progress.style.width = 0 + '%';
         }
         if (
@@ -181,20 +179,17 @@ async function updateState (printer, clientSettings) {
             ).toTimeString();
             futureTimeString = futureTimeString.substring(0, 8);
             const dateComplete = futureDateString + ': ' + futureTimeString;
-            elements.printTime.innerHTML = `
-          ${Calc.generateTime(printer.currentJob.printTimeRemaining)}
-        `;
-            elements.eta.innerHTML = dateComplete;
+            UI.doesElementNeedUpdating(Calc.generateTime(printer.currentJob.printTimeRemaining), elements.printTime, "innerHTML");
+            UI.doesElementNeedUpdating(dateComplete, elements.eta, "innerHTML");
         } else {
-            elements.printTime.innerHTML = `
-          ${Calc.generateTime(null)}
-        `;
-            elements.eta.innerHTML = 'N/A';
+            UI.doesElementNeedUpdating(Calc.generateTime(null), elements.printTime, "innerHTML");
+            UI.doesElementNeedUpdating('N/A', elements.eta, "innerHTML");
         }
         if (typeof printer.currentJob !== 'undefined') {
+            UI.doesElementNeedUpdating(Calc.generateTime(null), elements.printTime, "innerHTML");
             elements.currentFile.setAttribute('title', printer.currentJob.filePath);
             elements.currentFile.innerHTML =
-      '<i class="fas fa-file-code"></i> ' + printer.currentJob.filePath;
+      '<i class="fas fa-file-code"></i> ' + printer.currentJob.fileName;
         }
 
         let hideClosed = '';
@@ -322,15 +317,6 @@ async function updateState (printer, clientSettings) {
             elements.stop.disabled = true;
         }
     }
-    // if (jpInit) {
-    //   jplist.refresh();
-    // } else {
-    //   jpInit = true;
-    //   jplist.init({
-    //     storage: "localStorage", //'localStorage', 'sessionStorage' or 'cookies'
-    //     storageName: "view-storage",
-    //   });
-    // }
 }
 function drawPrinter (printer, clientSettings) {
     let hidden = '';
@@ -530,20 +516,9 @@ function drawPrinter (printer, clientSettings) {
 async function init (printers, clientSettings) {
     for (let p = 0; p < printers.length; p++) {
         if (!document.getElementById('viewPanel-' + printers[p]._id)) {
-            if (!jpInit) {
-                drawPrinter(printers[p], clientSettings);
-            }
+            drawPrinter(printers[p], clientSettings);
         } else {
             updateState(printers[p], clientSettings);
         }
-    }
-    if (jpInit) {
-        jplist.refresh();
-    } else {
-        jpInit = true;
-        await jplist.init({
-            storage: 'localStorage', // 'localStorage', 'sessionStorage' or 'cookies'
-            storageName: 'view-storage'
-        });
     }
 }
