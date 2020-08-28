@@ -1581,6 +1581,8 @@ class Runner {
                 return true;
             })
             .catch((err) => {
+                farmPrinters[index].systemChecks.scanning.files.status = 'danger';
+                farmPrinters[index].systemChecks.scanning.files.date = new Date();
                 logger.error(
                     `Error grabbing files for: ${farmPrinters[index].printerURL}: Reason: `,
                     err
@@ -1648,6 +1650,8 @@ class Runner {
                 );
             })
             .catch((err) => {
+                farmPrinters[index].systemChecks.scanning.state.status = 'danger';
+                farmPrinters[index].systemChecks.scanning.state.date = new Date();
                 logger.error(
                     `Error grabbing state for: ${farmPrinters[index].printerURL}Reason: `,
                     err
@@ -1680,6 +1684,8 @@ class Runner {
                 );
             })
             .catch((err) => {
+                farmPrinters[index].systemChecks.scanning.profile.status = 'danger';
+                farmPrinters[index].systemChecks.scanning.profile.date = new Date();
                 logger.error(
                     `Error grabbing profile for: ${farmPrinters[index].printerURL}: Reason: `,
                     err
@@ -1751,6 +1757,8 @@ class Runner {
                 );
             })
             .catch((err) => {
+                farmPrinters[index].systemChecks.scanning.settings.status = 'danger';
+                farmPrinters[index].systemChecks.scanning.settings.date = new Date();
                 logger.error(
                     `Error grabbing settings for: ${farmPrinters[index].printerURL}: Reason: `,
                     err
@@ -1782,6 +1790,8 @@ class Runner {
                 );
             })
             .catch((err) => {
+                farmPrinters[index].systemChecks.scanning.system.status = 'danger';
+                farmPrinters[index].systemChecks.scanning.system.date = new Date();
                 logger.error(
                     `Error grabbing system for: ${farmPrinters[index].printerURL}: Reason: `,
                     err
