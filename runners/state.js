@@ -31,6 +31,10 @@ const filamentClean = require('../lib/dataFunctions/filamentClean.js');
 
 const { FilamentClean } = filamentClean;
 
+const printerTicker = require("./printerTicker.js");
+
+const {PrinterTicker} = printerTicker;
+
 let farmPrinters = [];
 
 let systemSettings = {};
@@ -1436,6 +1440,7 @@ class Runner {
             folders: [],
             folderCount: 0
         };
+        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbing file information...", "warning");
         const url = `${farmPrinters[index].printerURL}/api/${location}`;
         return fetch(url, {
             method: 'GET',
@@ -1574,6 +1579,7 @@ class Runner {
                 FileClean.generate(farmPrinters[index], currentFilament);
                 farmPrinters[index].systemChecks.scanning.files.status = 'success';
                 farmPrinters[index].systemChecks.scanning.files.date = new Date();
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed file information...", "success");
                 FileClean.statistics(farmPrinters);
                 logger.info(
                     `Successfully grabbed Files for...: ${farmPrinters[index].printerURL}`
@@ -1583,6 +1589,7 @@ class Runner {
             .catch((err) => {
                 farmPrinters[index].systemChecks.scanning.files.status = 'danger';
                 farmPrinters[index].systemChecks.scanning.files.date = new Date();
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Error grabbing file information: ${err}`, "danger");
                 logger.error(
                     `Error grabbing files for: ${farmPrinters[index].printerURL}: Reason: `,
                     err
@@ -1596,6 +1603,7 @@ class Runner {
             return o._id == id;
         });
         farmPrinters[index].systemChecks.scanning.state.status = 'warning';
+        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbing state information...", "warning");
         return ClientAPI.getRetry(
             farmPrinters[index].printerURL,
             farmPrinters[index].apikey,
@@ -1645,6 +1653,7 @@ class Runner {
                     }
                 }
                 JobClean.generate(farmPrinters[index], currentFilament);
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed state information...", "success");
                 logger.info(
                     `Successfully grabbed Current State for...: ${farmPrinters[index].printerURL}`
                 );
@@ -1652,8 +1661,9 @@ class Runner {
             .catch((err) => {
                 farmPrinters[index].systemChecks.scanning.state.status = 'danger';
                 farmPrinters[index].systemChecks.scanning.state.date = new Date();
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Error grabbing state information: ${err}`, "danger");
                 logger.error(
-                    `Error grabbing state for: ${farmPrinters[index].printerURL}Reason: `,
+                    `Error grabbing state for: ${farmPrinters[index].printerURL} Reason: `,
                     err
                 );
                 return false;
@@ -1665,7 +1675,7 @@ class Runner {
             return o._id == id;
         });
         farmPrinters[index].systemChecks.scanning.profile.status = 'warning';
-
+        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbing profile information...", "warning");
         return ClientAPI.getRetry(
             farmPrinters[index].printerURL,
             farmPrinters[index].apikey,
@@ -1679,11 +1689,13 @@ class Runner {
                 farmPrinters[index].profiles = res.profiles;
                 farmPrinters[index].systemChecks.scanning.profile.status = 'success';
                 farmPrinters[index].systemChecks.scanning.profile.date = new Date();
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed profile information...", "success");
                 logger.info(
                     `Successfully grabbed Profiles.js for...: ${farmPrinters[index].printerURL}`
                 );
             })
             .catch((err) => {
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Error grabbing profile information: ${err}`, "danger");
                 farmPrinters[index].systemChecks.scanning.profile.status = 'danger';
                 farmPrinters[index].systemChecks.scanning.profile.date = new Date();
                 logger.error(
@@ -1699,6 +1711,7 @@ class Runner {
             return o._id == id;
         });
         farmPrinters[index].systemChecks.scanning.settings.status = 'warning';
+        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbing settings information...", "warning");
         return ClientAPI.getRetry(
             farmPrinters[index].printerURL,
             farmPrinters[index].apikey,
@@ -1711,6 +1724,7 @@ class Runner {
                 // Update info to DB
                 farmPrinters[index].corsCheck = res.api.allowCrossOrigin;
                 farmPrinters[index].settingsApi = res.api;
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed state information...", "success");
                 if(farmPrinters[index].settingsAppearance === 'undefined'){
                     farmPrinters[index].settingsAppearance = res.appearance;
                 }else if(farmPrinters[index].settingsAppearance.name.includes("{Leave to Grab")){
@@ -1750,6 +1764,8 @@ class Runner {
                         printer.save();
                     }
                 }
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed settings information...", "success");
+
                 farmPrinters[index].systemChecks.scanning.settings.status = 'success';
                 farmPrinters[index].systemChecks.scanning.settings.date = new Date();
                 logger.info(
@@ -1757,6 +1773,8 @@ class Runner {
                 );
             })
             .catch((err) => {
+
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Error grabbing settings information: ${err}`, "danger");
                 farmPrinters[index].systemChecks.scanning.settings.status = 'danger';
                 farmPrinters[index].systemChecks.scanning.settings.date = new Date();
                 logger.error(
@@ -1772,6 +1790,7 @@ class Runner {
             return o._id == id;
         });
         farmPrinters[index].systemChecks.scanning.system.status = 'warning';
+        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbing system information...", "warning");
         return ClientAPI.getRetry(
             farmPrinters[index].printerURL,
             farmPrinters[index].apikey,
@@ -1785,11 +1804,14 @@ class Runner {
                 farmPrinters[index].core = res.core;
                 farmPrinters[index].systemChecks.scanning.system.status = 'success';
                 farmPrinters[index].systemChecks.scanning.system.date = new Date();
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed system information...", "success");
+
                 logger.info(
                     `Successfully grabbed System Information for...: ${farmPrinters[index].printerURL}`
                 );
             })
             .catch((err) => {
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Error grabbing system information: ${err}`, "danger");
                 farmPrinters[index].systemChecks.scanning.system.status = 'danger';
                 farmPrinters[index].systemChecks.scanning.system.date = new Date();
                 logger.error(
