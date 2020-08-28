@@ -1,16 +1,15 @@
 
-let groupSelectionDropDown = document.getElementById("filterStates")
-
+const groupSelectionDropDown = document.getElementById("filterStates");
 
 
 export default function initGroupSelect(printers){
 //Active and fill dropdown...
-    console.log(printers)
-    let currentGroups = [];
+    console.log(printers);
+    const currentGroups = [];
     printers.forEach(printer => {
-       currentGroups.push(printer.group)
-    })
-    let uniqueGroups = _.uniq(currentGroups);
+        currentGroups.push(printer.group);
+    });
+    const uniqueGroups = _.uniq(currentGroups);
     if(uniqueGroups.length === 1){
 
     }else{
@@ -18,9 +17,9 @@ export default function initGroupSelect(printers){
             if(group != ""){
                 groupSelectionDropDown.insertAdjacentHTML('beforeend', `
                       <option href="#" data-path=".${group.replace(/ /g, "_")}" value="${group.replace(/ /g, "_")}">Group: ${group}</option>
-        `)
+        `);
             }
 
-        })
+        });
     }
 }
