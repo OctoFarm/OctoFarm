@@ -75,13 +75,16 @@ const heartBeatInterval = setInterval(function ping () {
         client.ws.instance.readyState !== 2 &&
         client.ws.instance.readyState !== 3
             ) {
-                if (client.ws.isAlive === false) return client.ws.instance.terminate();
-                // Retry connecting if failed...
-                farmPrinters[client.ws.index].webSocket = 'info';
-                farmPrinters[client.ws.index].webSocketDescription =
-          'Checking if Websocket is still alive';
-                client.ws.isAlive = false;
-                client.ws.instance.ping(noop);
+                if(farmPrinters[client.ws.index].stateColour.category === "Active" || farmPrinters[client.ws.index].stateColour.category === "Idle"){
+                    if (client.ws.isAlive === false) return client.ws.instance.terminate();
+
+                    // Retry connecting if failed...
+                    farmPrinters[client.ws.index].webSocket = 'info';
+                    farmPrinters[client.ws.index].webSocketDescription =
+                        'Checking if Websocket is still alive';
+                    client.ws.isAlive = false;
+                    client.ws.instance.ping(noop);
+                };
             }
         }
     });
