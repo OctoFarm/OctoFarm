@@ -1,7 +1,7 @@
 const currentIssues = [];
 
-export default class PrinterTicker{
-    static addIssue(date, message){
+class PrinterTicker{
+    static async addIssue(date, printer, message, state){
         let id = null;
         if(currentIssues.length === 0){
             //first issue
@@ -12,18 +12,24 @@ export default class PrinterTicker{
         const newIssue = {
             id: id,
             date: date,
-            message: message
+            message: message,
+            printer: printer,
+            state: state
         };
         currentIssues.push(newIssue);
-        if(currentIssues.length >= 10){
-            currentIssues.pop();
+        if(currentIssues.length >= 50){
+            currentIssues.shift();
         }
     }
-    static removeIssue(id){
+    static async removeIssue(id){
         const index = _.findIndex(currentIssues, function(o) { return o.id == id; });
         currentIssues.splice(index, 1);
     }
-    static returnIssue(){
+    static async returnIssue(){
         return currentIssues;
     }
 }
+
+module.exports = {
+    PrinterTicker
+};
