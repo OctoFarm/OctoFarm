@@ -84,7 +84,7 @@ const heartBeatInterval = setInterval(function ping () {
                         'Checking if Websocket is still alive';
                     client.ws.isAlive = false;
                     client.ws.instance.ping(noop);
-                };
+                }
             }
         }
     });
