@@ -11,8 +11,10 @@ const settingsClean = require("../lib/dataFunctions/settingsClean.js");
 const SettingsClean = settingsClean.SettingsClean;
 
 let clientId = 0;
-let clients = {}; // <- Keep a map of attached clients
+const clients = {}; // <- Keep a map of attached clients
 let interval = false;
+
+const sorting = false;
 
 // Called once for each new client. Note, this response is left open!
 router.get("/get/", ensureAuthenticated, function(req, res) {
@@ -34,16 +36,17 @@ router.get("/get/", ensureAuthenticated, function(req, res) {
 
 if(interval === false){
     interval = setInterval(async function() {
-        let currentOperations = await PrinterClean.returnCurrentOperations();
-        let printersInformation = await PrinterClean.returnPrintersInformation();
-        let printerControlList = await PrinterClean.returnPrinterControlList();
-        let clientSettings = await SettingsClean.returnClientSettings();
-        let infoDrop = {
+        const currentOperations = await PrinterClean.returnCurrentOperations();
+        const printersInformation = await PrinterClean.returnPrintersInformation();
+
+        const printerControlList = await PrinterClean.returnPrinterControlList();
+        const clientSettings = await SettingsClean.returnClientSettings();
+        const infoDrop = {
             printersInformation: printersInformation,
             currentOperations: currentOperations,
             printerControlList: printerControlList,
             clientSettings: clientSettings
-        }
+        };
         clientInformation = await stringify(infoDrop);
         for (clientId in clients) {
             for (clientId in clients) {
