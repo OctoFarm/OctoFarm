@@ -4,8 +4,9 @@ TODO.md
 logs/
 .clinic/
 .eslintrc.json
-.idea/
-.idea/inspectionProfiles/
-.idea/jsLinters/
-.idea/libraries/
+.idea/*
+.idea/inspectionProfiles/*
+.idea/jsLinters/*
+.idea/libraries/*
 images/historyCollection/
+/.idea/
