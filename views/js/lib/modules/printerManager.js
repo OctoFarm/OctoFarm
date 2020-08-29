@@ -670,9 +670,9 @@ export default class PrinterManager {
                         printerToolTemps.insertAdjacentHTML(
                             "beforeend",
                             `
-                                <div class="col-md-6">
+                                <div class="col-md-12 col-lg-12 col-xl-6">
                                    <div class="md-form input-group mb-3">
-                                       <span class="input-group-text">Tool ${i}</span>
+                                       <span class="input-group-text">${i}</span>
                                       <div title="Actual Tool temperature" class="input-group-prepend">
                                           <span id="tool${i}Actual" class="input-group-text">0°C</span>
                                       </div>
