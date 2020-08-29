@@ -24,9 +24,9 @@ const filamentClean = require('../lib/dataFunctions/filamentClean.js');
 
 const { FilamentClean } = filamentClean;
 
-const {
-    filamentManagerReSync
-} = require('../runners/filamentManagerPlugin.js');
+const filamentManagerPlugin = require('../runners/filamentManagerPlugin.js');
+
+const { FilamentManagerPlugin } = filamentManagerPlugin;
 
 module.exports = router;
 
@@ -138,7 +138,7 @@ router.post('/save/filament', ensureAuthenticated, async (req, res) => {
             body: JSON.stringify({ spool })
         });
         updateFilamentManager = await updateFilamentManager.json();
-        const reSync = await filamentManagerReSync('AddSpool');
+        const reSync = await FilamentManagerPlugin.filamentManagerReSync('AddSpool');
         console.log(reSync);
         res.send({ res: 'success', spools: reSync.newSpools, filamentManager });
     } else {
@@ -156,7 +156,7 @@ router.post('/save/filament', ensureAuthenticated, async (req, res) => {
         });
         newFilament.save().then(async (e) => {
             logger.info('New Spool saved successfully: ', newFilament);
-            await filamentManagerReSync();
+            await FilamentManagerPlugin.filamentManagerReSync();
             FilamentClean.start(filamentManager);
             res.send({ res: 'success', spools: newFilament, filamentManager });
         });
@@ -344,7 +344,7 @@ router.post('/save/profile', ensureAuthenticated, async (req, res) => {
             body: JSON.stringify({ profile })
         });
         updateFilamentManager = await updateFilamentManager.json();
-        const reSync = await filamentManagerReSync('AddSpool');
+        const reSync = await FilamentManagerPlugin.filamentManagerReSync('AddSpool');
         console.log(reSync);
         res.send({ res: 'success', dataProfile: reSync.newProfiles, filamentManager });
     } else {
@@ -500,7 +500,7 @@ router.post('/delete/profile', ensureAuthenticated, async (req, res) => {
 router.post('/filamentManagerReSync', ensureAuthenticated, async (req, res) => {
     // Find first online printer...
     logger.info('Re-Syncing filament manager database');
-    const reSync = await filamentManagerReSync();
+    const reSync = await FilamentManagerPlugin.filamentManagerReSync();
     // Return success
     res.send(reSync);
 });
