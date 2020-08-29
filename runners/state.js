@@ -1432,7 +1432,7 @@ class Runner {
         const index = _.findIndex(farmPrinters, function (o) {
             return o._id == id;
         });
-        farmPrinters[index].systemChecks.scanning.files.status = 'warning';
+        farmPrinters[index].systemChecks.scanning.files.status = 'Active';
         // Shim to fix undefined on upload files/folders
         farmPrinters[index].fileList = {
             files: [],
@@ -1440,7 +1440,7 @@ class Runner {
             folders: [],
             folderCount: 0
         };
-        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbing file information...", "warning");
+        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbing file information...", "Active");
         const url = `${farmPrinters[index].printerURL}/api/${location}`;
         return fetch(url, {
             method: 'GET',
@@ -1577,9 +1577,9 @@ class Runner {
                     index
                 );
                 FileClean.generate(farmPrinters[index], currentFilament);
-                farmPrinters[index].systemChecks.scanning.files.status = 'success';
+                farmPrinters[index].systemChecks.scanning.files.status = 'Complete';
                 farmPrinters[index].systemChecks.scanning.files.date = new Date();
-                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed file information...", "success");
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed file information...", "Complete");
                 FileClean.statistics(farmPrinters);
                 logger.info(
                     `Successfully grabbed Files for...: ${farmPrinters[index].printerURL}`
@@ -1589,7 +1589,7 @@ class Runner {
             .catch((err) => {
                 farmPrinters[index].systemChecks.scanning.files.status = 'danger';
                 farmPrinters[index].systemChecks.scanning.files.date = new Date();
-                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Error grabbing file information: ${err}`, "danger");
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Error grabbing file information: ${err}`, "Disconnected");
                 logger.error(
                     `Error grabbing files for: ${farmPrinters[index].printerURL}: Reason: `,
                     err
@@ -1602,8 +1602,8 @@ class Runner {
         const index = _.findIndex(farmPrinters, function (o) {
             return o._id == id;
         });
-        farmPrinters[index].systemChecks.scanning.state.status = 'warning';
-        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbing state information...", "warning");
+        farmPrinters[index].systemChecks.scanning.state.status = 'Active';
+        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbing state information...", "Active");
         return ClientAPI.getRetry(
             farmPrinters[index].printerURL,
             farmPrinters[index].apikey,
@@ -1631,7 +1631,7 @@ class Runner {
                 farmPrinters[index].stateColour = Runner.getColour("Offline");
                 farmPrinters[index].current = res.current;
                 farmPrinters[index].options = res.options;
-                farmPrinters[index].systemChecks.scanning.state.status = 'success';
+                farmPrinters[index].systemChecks.scanning.state.status = 'Complete';
                 farmPrinters[index].systemChecks.scanning.state.date = new Date();
                 const currentFilament = JSON.parse(
                     JSON.stringify(farmPrinters[index].selectedFilament)
@@ -1653,15 +1653,15 @@ class Runner {
                     }
                 }
                 JobClean.generate(farmPrinters[index], currentFilament);
-                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed state information...", "success");
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed state information...", "Complete");
                 logger.info(
                     `Successfully grabbed Current State for...: ${farmPrinters[index].printerURL}`
                 );
             })
             .catch((err) => {
-                farmPrinters[index].systemChecks.scanning.state.status = 'danger';
+                farmPrinters[index].systemChecks.scanning.state.status = 'Disconnected';
                 farmPrinters[index].systemChecks.scanning.state.date = new Date();
-                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Error grabbing state information: ${err}`, "danger");
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Error grabbing state information: ${err}`, "Disconnected");
                 logger.error(
                     `Error grabbing state for: ${farmPrinters[index].printerURL} Reason: `,
                     err
@@ -1674,8 +1674,8 @@ class Runner {
         const index = _.findIndex(farmPrinters, function (o) {
             return o._id == id;
         });
-        farmPrinters[index].systemChecks.scanning.profile.status = 'warning';
-        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbing profile information...", "warning");
+        farmPrinters[index].systemChecks.scanning.profile.status = 'Active';
+        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbing profile information...", "Active");
         return ClientAPI.getRetry(
             farmPrinters[index].printerURL,
             farmPrinters[index].apikey,
@@ -1687,16 +1687,16 @@ class Runner {
             .then((res) => {
                 // Update info to DB
                 farmPrinters[index].profiles = res.profiles;
-                farmPrinters[index].systemChecks.scanning.profile.status = 'success';
+                farmPrinters[index].systemChecks.scanning.profile.status = 'Complete';
                 farmPrinters[index].systemChecks.scanning.profile.date = new Date();
-                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed profile information...", "success");
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed profile information...", "Complete");
                 logger.info(
                     `Successfully grabbed Profiles.js for...: ${farmPrinters[index].printerURL}`
                 );
             })
             .catch((err) => {
-                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Error grabbing profile information: ${err}`, "danger");
-                farmPrinters[index].systemChecks.scanning.profile.status = 'danger';
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Error grabbing profile information: ${err}`, "Disconnected");
+                farmPrinters[index].systemChecks.scanning.profile.status = 'Disconnected';
                 farmPrinters[index].systemChecks.scanning.profile.date = new Date();
                 logger.error(
                     `Error grabbing profile for: ${farmPrinters[index].printerURL}: Reason: `,
@@ -1710,8 +1710,8 @@ class Runner {
         const index = _.findIndex(farmPrinters, function (o) {
             return o._id == id;
         });
-        farmPrinters[index].systemChecks.scanning.settings.status = 'warning';
-        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbing settings information...", "warning");
+        farmPrinters[index].systemChecks.scanning.settings.status = 'Active';
+        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbing settings information...", "Active");
         return ClientAPI.getRetry(
             farmPrinters[index].printerURL,
             farmPrinters[index].apikey,
@@ -1724,7 +1724,6 @@ class Runner {
                 // Update info to DB
                 farmPrinters[index].corsCheck = res.api.allowCrossOrigin;
                 farmPrinters[index].settingsApi = res.api;
-                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed state information...", "success");
                 if(farmPrinters[index].settingsAppearance === 'undefined'){
                     farmPrinters[index].settingsAppearance = res.appearance;
                 }else if(farmPrinters[index].settingsAppearance.name.includes("{Leave to Grab")){
@@ -1764,9 +1763,9 @@ class Runner {
                         printer.save();
                     }
                 }
-                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed settings information...", "success");
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed settings information...", "Complete");
 
-                farmPrinters[index].systemChecks.scanning.settings.status = 'success';
+                farmPrinters[index].systemChecks.scanning.settings.status = 'Complete';
                 farmPrinters[index].systemChecks.scanning.settings.date = new Date();
                 logger.info(
                     `Successfully grabbed Settings for...: ${farmPrinters[index].printerURL}`
@@ -1774,8 +1773,8 @@ class Runner {
             })
             .catch((err) => {
 
-                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Error grabbing settings information: ${err}`, "danger");
-                farmPrinters[index].systemChecks.scanning.settings.status = 'danger';
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Error grabbing settings information: ${err}`, "Diconnected");
+                farmPrinters[index].systemChecks.scanning.settings.status = 'Diconnected';
                 farmPrinters[index].systemChecks.scanning.settings.date = new Date();
                 logger.error(
                     `Error grabbing settings for: ${farmPrinters[index].printerURL}: Reason: `,
@@ -1789,8 +1788,8 @@ class Runner {
         const index = _.findIndex(farmPrinters, function (o) {
             return o._id == id;
         });
-        farmPrinters[index].systemChecks.scanning.system.status = 'warning';
-        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbing system information...", "warning");
+        farmPrinters[index].systemChecks.scanning.system.status = 'Active';
+        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbing system information...", "Active");
         return ClientAPI.getRetry(
             farmPrinters[index].printerURL,
             farmPrinters[index].apikey,
@@ -1802,17 +1801,17 @@ class Runner {
             .then((res) => {
                 // Update info to DB
                 farmPrinters[index].core = res.core;
-                farmPrinters[index].systemChecks.scanning.system.status = 'success';
+                farmPrinters[index].systemChecks.scanning.system.status = 'Complete';
                 farmPrinters[index].systemChecks.scanning.system.date = new Date();
-                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed system information...", "success");
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Grabbed system information...", "Complete");
 
                 logger.info(
                     `Successfully grabbed System Information for...: ${farmPrinters[index].printerURL}`
                 );
             })
             .catch((err) => {
-                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Error grabbing system information: ${err}`, "danger");
-                farmPrinters[index].systemChecks.scanning.system.status = 'danger';
+                PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Error grabbing system information: ${err}`, "Diconnected");
+                farmPrinters[index].systemChecks.scanning.system.status = 'Diconnected';
                 farmPrinters[index].systemChecks.scanning.system.date = new Date();
                 logger.error(
                     `Error grabbing system for: ${farmPrinters[index].printerURL}: Reason: `,
