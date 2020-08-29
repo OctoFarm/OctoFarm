@@ -809,6 +809,7 @@ class Runner {
                         }
                     });
                 }
+                PrinterTicker.addIssue(new Date(), farmPrinters[i].printerURL,`Attempting passive login with user: ${farmPrinters[i].currentUser}`, "Active");
                 logger.info("Chosen user:", farmPrinters[i].currentUser);
                 const sessionKey = await ClientAPI.post(
                     farmPrinters[i].printerURL,
@@ -844,6 +845,7 @@ class Runner {
 
 
                     // Connection to API successful, gather initial data and setup websocket.
+                    PrinterTicker.addIssue(new Date(), farmPrinters[i].printerURL, `API checks successful`, "Complete");
                     await farmPrinters[i].ws.open(
                         `ws://${farmPrinters[i].printerURL}/sockjs/websocket`,
                         i
@@ -855,6 +857,7 @@ class Runner {
                         errno: '503',
                         code: '503'
                     };
+                    PrinterTicker.addIssue(new Date(), farmPrinters[i].printerURL,`${error.message}`, "Disconnected");
                     throw error;
                 }
             } else if (users.status === 503 || users.status === 404) {
@@ -864,6 +867,7 @@ class Runner {
                     errno: '503',
                     code: '503'
                 };
+                PrinterTicker.addIssue(new Date(), farmPrinters[i].printerURL,`${error.message}`, "Disconnected");
                 throw error;
             } else {
                 const error = {
@@ -872,6 +876,7 @@ class Runner {
                     errno: 'NO-API',
                     code: 'NO-API'
                 };
+                PrinterTicker.addIssue(new Date(), farmPrinters[i].printerURL,`${error.message}`, "Disconnected");
                 throw error;
             }
         } catch (e) {
@@ -968,6 +973,7 @@ class Runner {
             return o._id == id;
         });
         const printer = await Printers.findById(id);
+        PrinterTicker.addIssue(new Date(), farmPrinters[i].printerURL,`Initiating Printer...`, "Active");
         logger.info(`Setting up defaults for Printer: ${printer.printerURL}`);
         farmPrinters[i].state = 'Setting Up';
         farmPrinters[i].stateColour = Runner.getColour('Offline');
@@ -1152,6 +1158,7 @@ class Runner {
     static async updatePrinters (printers) {
     // Updating printer's information
         logger.info('Pausing runners to update printers...');
+        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Updating Printer information...`, "Active");
         const edited = [];
         for (let i = 0; i < printers.length; i++) {
             const index = _.findIndex(farmPrinters, function (o) {
@@ -1194,6 +1201,7 @@ class Runner {
             }
         }
         logger.info('Re-Scanning printers farm');
+        PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL,`Printer information updated successfully...`, "Complete");
         return edited;
     }
 
@@ -1232,7 +1240,6 @@ class Runner {
                 const index = _.findIndex(farmPrinters, function (o) {
                     return o._id == indexs[i];
                 });
-                console.log(index);
                 if(index > -1){
                     logger.info(`Removing printer from database: ${farmPrinters[index]._id}`);
                     removed.push({

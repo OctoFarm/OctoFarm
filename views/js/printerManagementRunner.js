@@ -820,13 +820,12 @@ class dashActions {
 class dashUpdate {
     static ticker(list){
         const textList = "";
-        const reverseList = list.reverse();
 
-        reverseList.forEach(e => {
+        list.forEach(e => {
             let date = new Date(e.date);
             date = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
             if(!document.getElementById(e.id)){
-                document.getElementById("printerTickerMessageBox").insertAdjacentHTML("afterbegin",`<div id="${e.id}" style="width: 100%;" class="text-left bg-${e.state} text-wrap"> ${e.printer} | ${date} | ${e.message}</div>`);
+                document.getElementById("printerTickerMessageBox").insertAdjacentHTML("afterbegin",`<div id="${e.id}" style="width: 100%;" class="text-left ${e.state} text-wrap"> ${e.printer} | ${date} | ${e.message}</div>`);
             }
 
         });
