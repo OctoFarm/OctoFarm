@@ -20,8 +20,10 @@ const sorting = false;
 router.get("/get/", ensureAuthenticated, function(req, res) {
     //req.socket.setTimeout(Number.MAX_VALUE);
     res.writeHead(200, {
-        "Content-Type": "text/event-stream", // <- Important headers
-        "Cache-Control": "no-cache",
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: 0,
         Connection: "keep-alive"
     });
     res.write("\n");

@@ -9,7 +9,7 @@ const printerClean = require("../lib/dataFunctions/printerClean.js");
 const PrinterClean = printerClean.PrinterClean;
 
 const settingsClean = require("../lib/dataFunctions/settingsClean.js");
-const ClientSettings  = settingsClean.SettingsClean;
+const ClientSettings = settingsClean.SettingsClean;
 
 let clientId = 0;
 const clients = {}; // <- Keep a map of attached clients
@@ -19,8 +19,10 @@ let interval = false;
 router.get("/get/", ensureAuthenticated, function(req, res) {
     //req.socket.setTimeout(Number.MAX_VALUE);
     res.writeHead(200, {
-        "Content-Type": "text/event-stream", // <- Important headers
-        "Cache-Control": "no-cache",
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache, no-store, must-revalidate",
+        Pragma: "no-cache",
+        Expires: 0,
         Connection: "keep-alive"
     });
     res.write("\n");
@@ -67,7 +69,7 @@ if(interval === false){
                 }
             };
         }else{
-            dashboardSettings = clientsSettings.dashboard
+            dashboardSettings = clientsSettings.dashboard;
         }
         const infoDrop = {
             printerInformation: printerInformation,
