@@ -857,7 +857,7 @@ class Runner {
                         errno: '503',
                         code: '503'
                     };
-                    PrinterTicker.addIssue(new Date(), farmPrinters[i].printerURL,`${error.message}`, "Disconnected");
+
                     throw error;
                 }
             } else if (users.status === 503 || users.status === 404) {
@@ -867,7 +867,6 @@ class Runner {
                     errno: '503',
                     code: '503'
                 };
-                PrinterTicker.addIssue(new Date(), farmPrinters[i].printerURL,`${error.message}`, "Disconnected");
                 throw error;
             } else {
                 const error = {
@@ -876,7 +875,6 @@ class Runner {
                     errno: 'NO-API',
                     code: 'NO-API'
                 };
-                PrinterTicker.addIssue(new Date(), farmPrinters[i].printerURL,`${error.message}`, "Disconnected");
                 throw error;
             }
         } catch (e) {
@@ -887,6 +885,7 @@ class Runner {
                         e.message,
                         `Couldn't grab initial connection for Printer: ${farmPrinters[i].printerURL}`
                     );
+                    PrinterTicker.addIssue(new Date(), farmPrinters[i].printerURL,`${e.message}`, "Disconnected");
                     farmPrinters[i].state = 'No-API';
                     farmPrinters[i].stateColour = Runner.getColour('No-API');
                     farmPrinters[i].hostState = 'Online';
@@ -908,6 +907,7 @@ class Runner {
                         e.message,
                         `Couldn't grab initial connection for Printer: ${farmPrinters[i].printerURL}`
                     );
+                    PrinterTicker.addIssue(new Date(), farmPrinters[i].printerURL,`${e.message}`, "Disconnected");
                     farmPrinters[i].state = 'Offline';
                     farmPrinters[i].stateColour = Runner.getColour('Offline');
                     farmPrinters[i].hostState = 'Online';
@@ -935,6 +935,7 @@ class Runner {
                         e.message,
                         `Couldn't grab initial connection for Printer: ${farmPrinters[i].printerURL}`
                     );
+                    PrinterTicker.addIssue(new Date(), farmPrinters[i].printerURL,`${e.message}`, "Disconnected");
                     farmPrinters[i].state = 'Offline';
                     farmPrinters[i].stateColour = Runner.getColour('Offline');
                     farmPrinters[i].hostState = 'Shutdown';
