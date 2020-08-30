@@ -291,12 +291,6 @@ class ClientSettings {
             })
             .then((res) => {
                 // localStorage.setItem("clientSettings", JSON.stringify(res));
-                if (res.settings.backgroundURL != null) {
-                    document.getElementById("clientBackground").value =
-            res.settings.backgroundURL;
-
-                    document.body.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url(${res.settings.backgroundURL})`;
-                }
                 document.getElementById("panelCurrentOpOn").checked =
           res.panelView.currentOp;
                 document.getElementById("panelHideOffline").checked =
@@ -350,15 +344,7 @@ class ClientSettings {
     }
 
     static async update() {
-        const bg = document.getElementById("clientBackground").value;
-        let bgVal = null;
-        if (bg != null && bg != "") {
-            bgVal = bg;
-        }
         const opts = {
-            settings: {
-                backgroundURL: bgVal,
-            },
             panelView: {
                 currentOp: document.getElementById("panelCurrentOpOn").checked,
                 hideOff: document.getElementById("panelHideOffline").checked,
