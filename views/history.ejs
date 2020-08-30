@@ -181,8 +181,9 @@
                         data-path="default"
                 >Filter</option>
                 <% historyTotals.printerNames.forEach(printer => { %>
+                  <% const printerEncode = printer.replace(/[^a-zA-Z0-9]/g, "_") %>
                   <option href="#"
-                          data-path=".<%= printer %>"><%= printer.replace(/_/g, " ") %></option>
+                          data-path=".<%= printerEncode %>"><%= printer.replace(/_/g, " ") %></option>
                 <%  }) %>
 
               </select>
@@ -262,7 +263,7 @@
                 >Filter</option>
                 <% historyTotals.pathList.forEach(path => { %>
                   <option href="#"
-                          data-path=".<%= path %>"><%= path %></option>
+                          data-path=".<%= path.replace(/\//g, "_") %>"><%= path %></option>
                 <%  }) %>
 
               </select>
@@ -284,8 +285,9 @@
                         data-path="default"
                 >Filter</option>
                 <% historyTotals.fileNames.forEach(file => { %>
+                  <% const fileEnconde = file.replace(/[^a-zA-Z0-9]/g, "_") %>
                   <option href="#"
-                          data-path=".<%= file %>"><%= file.replace(/_/g, " ") %></option>
+                          data-path=".<%= fileEnconde + "_gcode" %>"><%= file.replace(/_/g, " ") %></option>
                 <%  }) %>
 
               </select>
@@ -402,11 +404,11 @@
           <td>
             <%- history[i].state %>
           </td>
-          <td class="printer <%= history[i].printer.replace(/ /g, "_") %>"><%=
+          <td class="printer <%= history[i].printer.replace(/[^a-zA-Z0-9]/g, "_") %>"><%=
             history[i].printer %>
           </td>
           <% let path = history[i].file.path.substring(0, history[i].file.path.lastIndexOf("/"))%>
-          <td class="file <%= history[i].file.name.replace(".gcode", "") %> <%= path %>" class="text-wrap">
+          <td title="<%= path %>" class="file <%= history[i].file.name.replace(/[^a-zA-Z0-9]/g, "_") %> <%= path.replace(/\//g, "_") %>" class="text-wrap">
             <%= history[i].file.name.replace(/_/g," ") %>
           </td>
           <td class="start">

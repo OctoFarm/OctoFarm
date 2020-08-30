@@ -400,7 +400,6 @@ export default class History {
                 );
             }
             const stateText = row.getElementsByClassName("state")[0].innerText.trim();
-            console.log(stateText);
             if (stateText === "Cancelled") {
                 statesCancelled.push(stateText);
             }
