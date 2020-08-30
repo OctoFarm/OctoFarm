@@ -27,11 +27,15 @@ All notable changes to this project will be documented in this file.
     - Fixed issue #102 - UI Redraw causing missed clicks. 
     - Moved Logs above About on System Side bar. 
     - Files no longer "a" element, can't be clicked anymore. Was confusing, suggested an action.
+    - Implemented new file sorting function. Settings default to name, and will save per client in local storage.
+    - File path now shows on hover if available in History table.
 
 ### Fixed
     - Fixed file path showing on file selection instead of file name
     - Fixed Paused print not allowing cancel on Panel view.
-    - Issue with session not been read when accessing site. Should save uneccassary logins. 
+    - Issue with session not been read when accessing site. Should save uneccassary logins. NOTE: These do not persist a OctoFarm restart.
+    - Fixed issue with Printer Name filter not working with special characters on history
+    - Fixed issue with file name filter not working with special characters on history
 
 ## Removed
     - Client side sorting library on views.
