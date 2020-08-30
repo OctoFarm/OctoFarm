@@ -8,6 +8,7 @@ import { dragAndDropEnable } from "../functions/dragAndDrop.js";
 const fileUploads = new Queue();
 
 const fileSortInit = false;
+const sortableFileList = null;
 
 setInterval(async () => {
     //Auto refresh of files
@@ -303,7 +304,6 @@ export default class FileManager {
                 FileManager.updateFileList(printer._id);
             }
         }
-        jplist.refresh();
     }
 
     static async drawFile(file) {
@@ -313,8 +313,7 @@ export default class FileManager {
             const dateString = fileDate.toDateString();
             const timeString = fileDate.toTimeString().substring(0, 8);
             fileDate = `${dateString} ${timeString}`;
-            const f = ` <a
-            data-jplist-item
+            const f = ` <div
             id="file-${file.files.local.path}"
             href="#"
           class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
@@ -416,7 +415,7 @@ export default class FileManager {
       </div>
       </div>
       </div>
-      </a>`;
+      </div>`;
             fileElem.insertAdjacentHTML("afterbegin", f);
             let printer = await OctoFarmClient.post("printers/printerInfo", {
                 i: file.index,
@@ -432,14 +431,7 @@ export default class FileManager {
                 }
 
             });
-            if (fileSortInit) {
-                jplist.refresh();
-            } else {
-                jplist.init({
-                    storage: "localStorage", // 'localStorage', 'sessionStorage' or 'cookies'
-                    storageName: "file-sorting", // the same storage name can be used to share storage between multiple pages
-                });
-            }
+
         } catch (e) {
             console.log(e);
         }
@@ -511,6 +503,57 @@ export default class FileManager {
                     if (currentFolder.includes("local/")) {
                         currentFolder = currentFolder.replace("local/", "");
                     }
+
+                    // then draw folders
+                    if (fileList.folderList.length > 0) {
+                        fileList.folderList.forEach((folder) => {
+                            if (folder.path == currentFolder) {
+                                fileElem.insertAdjacentHTML(
+                                    "beforeend",
+                                    `<a
+              id="file-${folder.name}"
+              href="#"
+              class="list-group-item list-group-item-action flex-column align-items-start bg-dark folderAction"
+              style="display: block;
+                padding: 0.7rem 0.1rem;"
+            >
+              <div class="row">
+                <div
+                  class="col-lg-1"
+                  style="display:flex; justify-content:center; align-items:center;"
+                >
+                  <center><i class="fas fa-folder fa-2x"></i></center>
+                </div>
+                <div class="col-lg-11">
+                  <small class="float-right"
+                    ><!--Display file and folder count here eventually--></small
+                  >
+                  <div class="d-flex w-100 justify-content-between">
+                    <h5 class="mb-1 float-left">
+                      ${folder.display}
+                    </h5>
+                    <div
+                      class="float-right btn-group flex-wrap btn-group-sm"
+                      role="group"
+                      aria-label="Basic example"
+                    >
+                      <button id="${printer._id}*folderActionMove*${folder.name}" type="button" class="btn btn-warning">
+                        <i class="fas fa-people-carry"></i> Move
+                      </button>
+                      <button id="${printer._id}*folderActionDelete*${folder.name}" type="button" class="btn btn-danger">
+                        <i class="fas fa-trash-alt"></i> Delete
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </a>
+         
+            `
+                                );
+                            }
+                        });
+                    }
                     if (fileList.fileList.length > 0) {
                         fileList.fileList.forEach((file) => {
                             let toolInfo = "";
@@ -535,8 +578,7 @@ export default class FileManager {
                                 bgColour = "bg-dark-failed";
                             }
                             fileDate = `${dateString} ${timeString}`;
-                            const f = ` <a
-            data-jplist-item
+                            const f = ` <div
             id="file-${file.fullPath}"
             href="#"
           class="list-group-item list-group-item-action flex-column align-items-start ${bgColour}"
@@ -642,7 +684,7 @@ export default class FileManager {
       </div>
       </div>
       </div>
-      </a>`;
+      </div>`;
 
                             if (typeof recursive !== "undefined") {
                                 fileElem.insertAdjacentHTML("beforeend", f);
@@ -652,67 +694,8 @@ export default class FileManager {
                         });
                     }
 
-                    // then draw folders
-                    if (fileList.folderList.length > 0) {
-                        fileList.folderList.forEach((folder) => {
-                            if (folder.path == currentFolder) {
-                                fileElem.insertAdjacentHTML(
-                                    "beforeend",
-                                    `<a
-              id="file-${folder.name}"
-              href="#"
-              class="list-group-item list-group-item-action flex-column align-items-start bg-dark folderAction"
-              style="display: block;
-                padding: 0.7rem 0.1rem;"
-            >
-              <div class="row">
-                <div
-                  class="col-lg-1"
-                  style="display:flex; justify-content:center; align-items:center;"
-                >
-                  <center><i class="fas fa-folder fa-2x"></i></center>
-                </div>
-                <div class="col-lg-11">
-                  <small class="float-right"
-                    ><!--Display file and folder count here eventually--></small
-                  >
-                  <div class="d-flex w-100 justify-content-between">
-                    <h5 class="mb-1 float-left">
-                      ${folder.display}
-                    </h5>
-                    <div
-                      class="float-right btn-group flex-wrap btn-group-sm"
-                      role="group"
-                      aria-label="Basic example"
-                    >
-                      <button id="${printer._id}*folderActionMove*${folder.name}" type="button" class="btn btn-warning">
-                        <i class="fas fa-people-carry"></i> Move
-                      </button>
-                      <button id="${printer._id}*folderActionDelete*${folder.name}" type="button" class="btn btn-danger">
-                        <i class="fas fa-trash-alt"></i> Delete
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </a>
-         
-            `
-                                );
-                            }
-                        });
-                    }
-
                     FileManager.updateListeners(printer);
                 }
-            }
-            if (fileSortInit) {
-                jplist.refresh();
-            } else {
-                jplist.init({
-                    storage: "localStorage", // 'localStorage', 'sessionStorage' or 'cookies'
-                    storageName: "file-sorting", // the same storage name can be used to share storage between multiple pages
-                });
             }
         } catch (e) {
             console.log(e);
@@ -1181,10 +1164,6 @@ export class FileActions {
             async callback(result) {
                 if (result) {
                     await OctoPrintClient.file(printer, fullPath, "delete");
-                    jplist.resetContent(function () {
-                        // remove element with id = el1
-                        document.getElementById(`file-${fullPath}`).remove();
-                    });
                 }
             },
         });
@@ -1212,10 +1191,6 @@ export class FileActions {
                         `files/local/${fullPath}`
                     );
                     const del = await OctoFarmClient.post("printers/removefolder", opts);
-                    jplist.resetContent(function () {
-                        // remove element with id = el1
-                        document.getElementById(`file-${fullPath}`).remove();
-                    });
                 }
             },
         });

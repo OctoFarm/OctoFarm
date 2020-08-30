@@ -3,6 +3,7 @@ import Calc from "./lib/functions/calc.js";
 import FileManager from "./lib/modules/fileManager.js";
 import { dragAndDropEnable } from "./lib/functions/dragAndDrop.js";
 import { returnDropDown, selectFilament } from "./lib/modules/filamentGrab.js";
+import FileSorting from "./lib/modules/fileSorting.js";
 
 let lastId = null;
 
@@ -159,6 +160,7 @@ class Manager {
                 }
             }
         });
+        FileSorting.loadSort(printers[0]);
         Manager.updatePrinterList(printers[0]._id);
     }
 
