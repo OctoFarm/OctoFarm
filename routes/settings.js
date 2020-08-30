@@ -42,9 +42,6 @@ router.get("/client/get", ensureAuthenticated, (req, res) => {
 });
 router.post("/client/update", ensureAuthenticated, (req, res) => {
     ClientSettingsDB.find({}).then((checked) => {
-        const settings = {
-            backgroundURL: req.body.settings.backgroundURL,
-        };
         const panelView = {
             currentOp: req.body.panelView.currentOp,
             hideOff: req.body.panelView.hideOff,
@@ -63,7 +60,6 @@ router.post("/client/update", ensureAuthenticated, (req, res) => {
             hideClosed: req.body.cameraView.hideClosed,
             extraInfo: req.body.cameraView.extraInfo,
         };
-        checked[0].settings = settings;
         checked[0].panelView = panelView;
         checked[0].listView = listView;
         checked[0].cameraView = cameraView;
