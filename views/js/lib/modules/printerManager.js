@@ -4,6 +4,7 @@ import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import FileManager, { FileActions } from "./fileManager.js";
 import { returnDropDown, selectFilament } from "./filamentGrab.js";
+import FileSorting from "../modules/fileSorting.js";
 
 import PowerButton from "./powerButton.js";
 
@@ -87,7 +88,6 @@ export default class PrinterManager {
             PrinterManager.applyState(currentPrinter, elements);
             PrinterManager.applyTemps(currentPrinter, elements);
             PrinterManager.applyListeners(elements, printers, filamentDropDown);
-            FileManager.drawFiles(currentPrinter);
         } else {
             if (document.getElementById("terminal")) {
                 const id = _.findIndex(printers, function (o) {
@@ -495,71 +495,27 @@ export default class PrinterManager {
                         <i class="fas fa-chevron-left"></i> Back
                       </button>
                       <!-- Split dropright button -->
-             <div class="dropdown mr-3 float-right"
-                     data-jplist-control="dropdown-sort"
-                     data-opened-class="show"
-                     data-group="files"
-                     data-name="data-file"
-                     data-id="data-file">
+                      <div class="float-right mr-3 btn-group">
+                          <div id="fileSortDropdownMenu" class="btn bg-secondary">Sort</div>
+                          <button type="button" class="btn btn-secondary dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="sr-only">Toggle Dropdown</span>
+                          </button>
+                          <div class="dropdown-menu">
+                            
+                       <a class="dropdown-item" id="sortFileNameDown"><i class="fas fa-sort-alpha-down"></i> File Name</a>
   
-                  <button
-                          data-type="panel"
-                          class="btn btn-primary dropdown-toggle"
-                          type="button">
-                      Sort by
-                  </button>
+                      <a class="dropdown-item" id="sortFileNameUp"><i class="fas fa-sort-alpha-up"></i> File Name</a>
+                             <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" id="sortPrintTimeDown"><i class="fas fa-sort-numeric-down"></i> Print Time</a>
   
-                  <div
-                          data-type="content"
-                          class="dropdown-menu"
-                          aria-labelledby="dropdownMenuButton">
+                      <a class="dropdown-item" id="sortPrintTimeUp"><i class="fas fa-sort-numeric-up"></i> Print Time</a>
+                             <div class="dropdown-divider"></div>
+                      <a class="dropdown-item" id="sortDateDown"><i class="fas fa-sort-numeric-down"></i> Upload Date</a>
   
-                      <a class="dropdown-item"
-                         href="#"
-                         data-path="default">Sort By</a>
-  
-                       <a class="dropdown-item"
-                         data-path=".name"
-                         data-order="asc"
-                         data-type="text"
-                         data-value="1"><i class="fas fa-sort-alpha-down"></i> File Name</a>
-  
-                      <a class="dropdown-item"
-                         data-path=".name"
-                         data-order="desc"
-                         data-type="text"
-                         data-value="2"><i class="fas fa-sort-alpha-up"></i> File Name</a>
-  
-                      <a class="dropdown-item"
-                         data-path=".time"
-                         data-order="asc"
-                         data-type="number"
-                         data-value="3"><i class="fas fa-sort-numeric-down"></i> Print Time</a>
-  
-                      <a class="dropdown-item"
-                         data-path=".time"
-                         data-order="desc"
-                         data-type="number"
-                         data-value="4"><i class="fas fa-sort-numeric-up"></i> Print Time</a>
-  
-                      <a class="dropdown-item"
-                         data-path=".date"
-                         data-order="asc"
-                         data-type="number"
-                         data-value="5"><i class="fas fa-sort-numeric-down"></i> Upload Date</a>
-  
-                      <a class="dropdown-item"
-                         data-path=".date"
-                         data-order="desc"
-                         data-type="number"
-                         data-value="6"><i class="fas fa-sort-numeric-up"></i> Upload Date</a>
-  
-  
-  
-  
-  
-                  </div>
-              </div>
+                      <a class="dropdown-item" id="sortDateUp"><i class="fas fa-sort-numeric-up"></i> Upload Date</a>
+                          </div>
+                        </div>
+
                         <label class="btn btn-success float-left mr-1 mb-0" for="fileUploadBtn"><i class="fas fa-file-import"></i> Upload File(s)</label>
                         <input id="fileUploadBtn" multiple accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left" id="uploadFileBtn">
                         <label class="btn btn-info float-left mr-1 mb-0" for="fileUploadPrintBtn"><i class="fas fa-file-import"></i> Upload and Print</label>
@@ -708,7 +664,7 @@ export default class PrinterManager {
                         pmFilamentDrop.addEventListener("change", (event) => {
                             selectFilament(printer._id, event.target.value, `${i}`);
                             setTimeout(function () {
-                                FileManager.refreshFiles(currentPrinter);
+                                FileManager.refreshFiles(currentPrinter, `<i class="fas fa-spinner fa-pulse"></i> Checking Octoprint for information... <br>`);
                             }, 1000);
 
                         });
@@ -762,6 +718,7 @@ export default class PrinterManager {
                 }
             }
         }
+        FileSorting.loadSort(printer);
         return true;
     }
 
