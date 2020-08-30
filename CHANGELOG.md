@@ -19,18 +19,22 @@ All notable changes to this project will be documented in this file.
     - Initial support for Klipper Plugin, OctoFarm will now grab Klippers version information and display it under OctoPrints on the printer management.
     - Added server side check for CORS activation. UI on printer manager will react...
     - New Dashboard settings in System -> Client. Shows saved grid, and allows for adding/removing elements and clearing positions/sizes.
-    - Added new printer manager section called "Connection Log". Just a ticker with recent API calls for now, errors will show up here and you can investigate in the printer settings. 
+    - Added new printer manager section called "Connection Log". Just a ticker with recent API calls for now, errors will show up here and you can investigate in the printer settings.
+     
 ### Changed
     - OctoFarm now reacts to the enabled camera setting on OctoPrint. If you don't use camera's it is best to disable them here. 
     - OctoFarm will now only respond to a max screen size of 2000px. Anything above this will be limited from stretching to the full horizontal width.
     - Fixed issue #102 - UI Redraw causing missed clicks. 
+    - Moved Logs above About on System Side bar. 
+    - Files no longer "a" element, can't be clicked anymore. Was confusing, suggested an action.
 
 ### Fixed
     - Fixed file path showing on file selection instead of file name
     - Fixed Paused print not allowing cancel on Panel view.
+    - Issue with session not been read when accessing site. Should save uneccassary logins. 
 
 ## Removed
-    - Client side sorting library.
+    - Client side sorting library on views.
 
 # [Released]
 
