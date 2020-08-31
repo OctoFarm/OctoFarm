@@ -32,6 +32,7 @@ app.set("view engine", "ejs");
 app.use(express.urlencoded({ extended: false }));
 
 // Express Session Middleware
+
 app.use(
     session({
         secret: "supersecret",
@@ -43,6 +44,7 @@ app.use(
 // Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 // Connect Flash Middleware
 app.use(flash());

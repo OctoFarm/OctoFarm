@@ -111,11 +111,11 @@
                         <div class="col-12 col-sm-12 col-md-3 col-lg-2 col-xl-2">
                             <div class="list-group" id="list-tab" role="tablist">
                                 <a class="list-group-item list-group-item-action  active" id="system-accounts-list" data-toggle="list" href="#system-accounts" role="tab" aria-controls="panelview"><i class="far fa-user"></i> Accounts</a>
-                                <a class="list-group-item list-group-item-action" id="system-status-list" data-toggle="list" href="#system-logs" role="tab" aria-controls="system"><i class="fas fa-sticky-note"></i> Logs</a>
                                 <a class="list-group-item list-group-item-action" id="system-client-list" data-toggle="list" href="#system-client" role="tab" aria-controls="listview"><i class="fas fa-stopwatch"></i> Client</a>
                                 <a class="list-group-item list-group-item-action" id="system-settings-list" data-toggle="list" href="#system-settings" role="tab" aria-controls="cameraview"><i class="fas fa-server"></i> Server</a>
                                 <a class="list-group-item list-group-item-action" id="system-alerts-list" data-toggle="list" href="#system-alerts" role="tab" aria-controls="listview"><i class="far fa-bell"></i> Alerts</a>
-<!--                                <a class="list-group-item list-group-item-action" id="system-database-list" data-toggle="list" href="#system-database" role="tab" aria-controls="listview"><i class="fas fa-database"></i> Database</a>-->
+                                  <a class="list-group-item list-group-item-action" id="system-database-list" data-toggle="list" href="#system-database" role="tab" aria-controls="listview"><i class="fas fa-database"></i> Database</a>
+                                <a class="list-group-item list-group-item-action" id="system-status-list" data-toggle="list" href="#system-logs" role="tab" aria-controls="system"><i class="fas fa-sticky-note"></i> Logs</a>
                                 <a class="list-group-item list-group-item-action" id="system-about-list" data-toggle="list" href="#system-about" role="tab" aria-controls="listview"><i class="fas fa-address-card"></i> About</a>
                             </div>
                         </div>
@@ -170,14 +170,12 @@
                                                     <h5>Client Settings</h5>
                                                     <hr>
                                                     <p class="font-weight-bold">Change Background</p>
-                                                    <p>Enter a URL below to change the default background of OctoFarm</p>
-                                                    <div class="input-group mb-3">
-                                                        <div class="input-group-prepend">
-                                                            <span class="input-group-text" id="basic-addon1">URL:</span>
+                                                    <p>Click the button below to upload your background image.</p>
+                                                        <div class="custom-file">
+                                                            <input type="file" class="custom-file-input" id="clientBackground">
+                                                            <label class="custom-file-label" for="customFile">Choose image</label>
                                                         </div>
-                                                        <input type="url" class="form-control" placeholder="https://i.redd.it/frehj36ltk101.png" aria-label="Username" aria-describedby="basic-addon1" id="clientBackground" value="">
-                                                    </div>
-                                                    <p><b>URL Example:</b> "https://i.redd.it/frehj36ltk101.png"</p>
+                                                    <p> Supports <code>PNG, SVG, JPG, GIF, WEBP</code></p>
                                                 </div>
                                                 <div class="tab-pane fade" id="system-dashboard" role="tabpanel" aria-labelledby="dashboard-settings-list">
                                                     <h5>Dashboard Settings</h5>
