@@ -6,15 +6,17 @@ export default class FileSorting{
     }
     static loadSort(printer){
         const fileSortStorage = JSON.parse(localStorage.getItem("fileSort"));
-        const reverse = fileSortStorage.reverse;
-        if(fileSortStorage.meta === "file"){
-            this.sortFileName(printer, reverse);
-        }
-        if(fileSortStorage.meta === "date"){
-            this.sortUploadDate(printer, reverse);
-        }
-        if(fileSortStorage.meta === "time"){
-            this.sortPrintTime(printer, reverse);
+        if(fileSortStorage !== null){
+            const reverse = fileSortStorage.reverse;
+            if(fileSortStorage.meta === "file"){
+                this.sortFileName(printer, reverse);
+            }
+            if(fileSortStorage.meta === "date"){
+                this.sortUploadDate(printer, reverse);
+            }
+            if(fileSortStorage.meta === "time"){
+                this.sortPrintTime(printer, reverse);
+            }
         }
         this.setListeners(printer);
     }
