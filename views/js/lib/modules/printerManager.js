@@ -539,7 +539,7 @@ export default class PrinterManager {
   
                   </div>
   
-                      <div id="fileList-${printer._id}" class="list-group" style="height:500px; min-height:500px;max-height:500px; overflow-y:scroll;" data-jplist-group="files">
+                      <div id="fileList-${printer._id}" class="list-group" style="height:500px; min-height:500px;max-height:500px; overflow-y:scroll;">
   
                       </div>
               </div>
@@ -718,6 +718,7 @@ export default class PrinterManager {
                 }
             }
         }
+
         FileSorting.loadSort(printer);
         return true;
     }
