@@ -17,6 +17,8 @@ export default class FileSorting{
             if(fileSortStorage.meta === "time"){
                 this.sortPrintTime(printer, reverse);
             }
+        }else{
+            this.sortUploadDate(printer, false);
         }
         this.setListeners(printer);
     }
