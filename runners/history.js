@@ -12,7 +12,9 @@ const filamentProfiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const Spool = require("../models/Filament.js");
 
-const { filamentManagerReSync } = require("./filamentManagerPlugin.js");
+const FilamentManagerReSync = require("./filamentManagerPlugin.js");
+
+const { FilamentManagerPlugin } = FilamentManagerReSync;
 
 const historyClean = require("../lib/dataFunctions/historyClean.js");
 
@@ -58,7 +60,7 @@ class HistoryCollection {
             }
         }
 
-        const reSync = await filamentManagerReSync();
+        const reSync = await FilamentManagerPlugin.filamentManagerReSync();
         // Return success
         if (reSync === "success") {
             logger.info("Successfully resynced filament manager");
