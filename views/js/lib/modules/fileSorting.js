@@ -18,7 +18,7 @@ export default class FileSorting{
                 this.sortPrintTime(printer, reverse);
             }
         }else{
-            this.sortUploadDate(printer, false);
+            this.sortUploadDate(printer, true);
         }
         this.setListeners(printer);
     }
@@ -62,10 +62,10 @@ export default class FileSorting{
         printer.fileList.fileList = _.sortBy(printer.fileList.fileList, [function(o) { return o.uploadDate; }]);
         if(reverse){
             printer.fileList.fileList = printer.fileList.fileList.reverse();
-            sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-up\"></i> Upload Date";
+            sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-down\"></i> Upload Date";
             this.saveSort("date", true);
         }else{
-            sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-down\"></i> Upload Date";
+            sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-up\"></i> Upload Date";
             this.saveSort("date", false);
         }
         FileManager.drawFiles(printer);
@@ -75,10 +75,10 @@ export default class FileSorting{
         printer.fileList.fileList = _.sortBy(printer.fileList.fileList, [function(o) { return o.expectedPrintTime; }]);
         if(reverse){
             printer.fileList.fileList = printer.fileList.fileList.reverse();
-            sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-down\"></i> Print Time";
+            sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-up\"></i> Print Time";
             this.saveSort("time", false);
         }else{
-            sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-up\"></i> Print Time";
+            sortHeader.innerHTML = "<i class=\"fas fa-sort-numeric-down\"></i> Print Time";
             this.saveSort("time", true);
         }
         FileManager.drawFiles(printer);
