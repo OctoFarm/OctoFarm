@@ -434,36 +434,36 @@ const optionsEnviromentalData = {
             seriesName: "IAQ",
             show: true,
             min: 0,
-            max: 100,
+            max: 500,
             labels: {
                 formatter(value) {
                     let state = null;
                     if(value === null) {
                         return '';
                     } else {
-                        if(Calc.isBetween(value, 0, 10)){
+                        if(Calc.isBetween(value, 0, 50)){
                             state = "Excellent";
                         }
-                        if(Calc.isBetween(value, 11, 30)){
+                        if(Calc.isBetween(value, 51, 100)){
                             state = "Good";
                         }
-                        if(Calc.isBetween(value, 31, 45)){
+                        if(Calc.isBetween(value, 101, 150)){
                             state = "Lightly Polluted";
                         }
-                        if(Calc.isBetween(value, 46, 60)){
+                        if(Calc.isBetween(value, 151, 200)){
                             state = "Moderately Polluted";
                         }
-                        if(Calc.isBetween(value, 61, 75)){
+                        if(Calc.isBetween(value, 201, 250)){
                             state = "Heavily Polluted";
                         }
-                        if(Calc.isBetween(value, 76, 89)){
+                        if(Calc.isBetween(value, 251, 350)){
                             state = "Severely Polluted";
                         }
-                        if(Calc.isBetween(value, 90, 100)){
-                            state = "Extemely Polluted";
+                        if(Calc.isBetween(value, 350, 500)){
+                            state = "Extremely Polluted";
                         }
                     }
-                    return `${value}%: ${state}`;
+                    return `${value}: ${state}`;
                 },
 
             },
@@ -485,52 +485,51 @@ const optionsEnviromentalData = {
         yaxis: [
             {
                 y: 0,
-                y2: 10,
+                y2: 50,
                 yAxisIndex: 3,
                 borderColor: '#24571f',
                 fillColor: '#133614',
             },
             {
-                y: 11,
-                y2: 30,
+                y: 51,
+                y2: 100,
                 yAxisIndex: 3,
-                borderColor: '#1f574f',
-                fillColor: '#153b35',
+                borderColor: '#457a24',
+                fillColor: '#31561a',
             },
             {
-                y: 31,
-                y2: 45,
+                y: 101,
+                y2: 150,
                 yAxisIndex: 3,
-                borderColor: '#213a5c',
-                fillColor: '#15253b',
+                borderColor: '#7a6f24',
+                fillColor: '#564f1a',
             },
             {
-                y: 46,
-                y2: 60,
+                y: 151,
+                y2: 200,
                 yAxisIndex: 3,
-                borderColor: '#21225c',
-                fillColor: '#15153b',
+                borderColor: '#5c3421',
+                fillColor: '#3b3015',
             },
             {
-                y: 61,
-                y2: 75,
+                y: 201,
+                y2: 250,
+                yAxisIndex: 3,
+                borderColor: '#5c2121',
+                fillColor: '#3b1515',
+            },
+            {
+                y: 251,
+                y2: 350,
                 yAxisIndex: 3,
                 borderColor: '#37215c',
                 fillColor: '#23153b',
             },
             {
-                y: 76,
-                y2: 89,
+                y: 350,
                 yAxisIndex: 3,
-                borderColor: '#4c215c',
-                fillColor: '#2e1438',
-            },
-            {
-                y: 90,
-                y2: 100,
-                yAxisIndex: 3,
-                borderColor: '#5e2222',
-                fillColor: '#381414',
+                borderColor: '#280000',
+                fillColor: '#000000',
             }
         ]
     }
@@ -643,8 +642,56 @@ if (window.Worker) {
 }
 
 class dashUpdate {
-    static envriromentalData(data, iaq){
+    static envriromentalData(data){
         enviromentalData.updateSeries(data);
+        let state = null;
+        let impact = "";
+        let suggestedActions = "";
+        const airQualityElement = document.getElementById("indoorAirQualityAlert");
+        if(data[3].data.length > 0){
+            const lastValue = data[3].data[data[3].data.length-1].y;
+            if(airQualityElement.classList.contains("d-none")){
+                airQualityElement.classList.remove("d-none");
+            }
+            if(Calc.isBetween(lastValue, 0, 50)){
+                state = "<i class=\"fas fa-check-circle textComplete\"></i> Excellent";
+                impact = "Pure air; best for well-being";
+                suggestedActions = "";
+            }
+            if(Calc.isBetween(lastValue, 51, 100)){
+                state = "<i class=\"fas fa-check-circle\"></i> Good";
+                impact = "No irritation or impact on well-being";
+                suggestedActions = "";
+            }
+            if(Calc.isBetween(lastValue, 101, 150)){
+                state = "<i class=\"fas fa-exclamation-triangle\"></i>  Lightly Polluted";
+                impact = "Reduction of well-being possible";
+                suggestedActions = "Ventilation suggested";
+            }
+            if(Calc.isBetween(lastValue, 151, 200)){
+                state = "<i class=\"fas fa-exclamation-triangle\"></i>  Moderately Polluted";
+                impact = "More significant irritation possible";
+                suggestedActions = "Increase ventilation with clean air";
+            }
+            if(Calc.isBetween(lastValue, 201, 250)){
+                state = "<i class=\"fas fa-exclamation-triangle\"></i>  Heavily Polluted";
+                impact = "Exposition might lead to effects like headache depending on type of VOCs";
+                suggestedActions = "Optimize ventilation";
+            }
+            if(Calc.isBetween(lastValue, 251, 350)){
+                state = "<i class=\"fas fa-exclamation-triangle\"></i>  Severely Polluted";
+                impact = "More severe health issue possible if harmful VOC present";
+                suggestedActions = "Contamination should be identified if level is reached even w/o presence of people; maximize ventilation & reduce attendance";
+            }
+            if(Calc.isBetween(lastValue, 350, 500)){
+                state = "<i class=\"fas fa-exclamation-triangle\"></i>  Extremely Polluted";
+                impact = "Headaches, additional neurotoxic effects possible";
+                suggestedActions = "Contamination needs to be identified; avoid presence in room and maximize ventilation";
+            }
+            airQualityElement.innerHTML = `Indoor Air Quality: ${lastValue} ${state}`;
+            airQualityElement.title = `${impact}: ${suggestedActions}`;
+        }
+
     }
     static printerStatus(data) {
         const currentStatus = document.getElementById("currentStatus");
