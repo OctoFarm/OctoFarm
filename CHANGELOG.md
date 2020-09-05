@@ -16,10 +16,13 @@ All notable changes to this project will be documented in this file.
                 date: value
             }.
     - Configurable dashboard. Allows the elements to be hidden/removed in System -> Client Settings -> Dashboard. You can also re-arrange your elements as well as re-size them to suit your needs.
-    - Initial support for Klipper Plugin, OctoFarm will now grab Klippers version information and display it under OctoPrints on the printer management.
+    - Initial very basic support for Klipper Plugin, OctoFarm will now grab Klippers version information and display it under OctoPrints on the printer management.
     - Added server side check for CORS activation. UI on printer manager will react...
     - New Dashboard settings in System -> Client. Shows saved grid, and allows for adding/removing elements and clearing positions/sizes.
     - Added new printer manager section called "Connection Log". Just a ticker with recent API calls for now, errors will show up here and you can investigate in the printer settings.
+    - New file manager sorting library. All previous defaults will no longer work, defaults to lastest files first. 
+    - If available last Indoor Air Quality value will be displayed. 
+    - Indoor Air Quality value updated to follow bosch range. 0 - 500 from Excellent air quality to Extremely Polluted.
      
 ### Changed
     - OctoFarm now reacts to the enabled camera setting on OctoPrint. If you don't use camera's it is best to disable them here. 
@@ -36,9 +39,14 @@ All notable changes to this project will be documented in this file.
     - Issue with session not been read when accessing site. Should save uneccassary logins. NOTE: These do not persist a OctoFarm restart.
     - Fixed issue with Printer Name filter not working with special characters on history
     - Fixed issue with file name filter not working with special characters on history
+    - Fixed issue with file manager sorting not allowing update within folders.
+    - Fixed issue with new files not showing above folder. Sorting/re-loading page will re-organise. 
+    - Fixed issue with filament manager failing file import on server start
 
 ## Removed
-    - Client side sorting library on views.
+    - Client side sorting library for printers
+    - Client side sorting library for files.
+    
 
 # [Released]
 
