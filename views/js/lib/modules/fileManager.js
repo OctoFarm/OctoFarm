@@ -4,6 +4,7 @@ import Queue from "./clientQueue.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import { dragAndDropEnable } from "../functions/dragAndDrop.js";
+import FileSorting from "./fileSorting.js";
 
 const fileUploads = new Queue();
 
@@ -280,7 +281,8 @@ export default class FileManager {
             i: index,
         });
         printer = await printer.json();
-        FileManager.drawFiles(printer);
+        FileSorting.loadSort(printer);
+        //FileManager.drawFiles(printer);
         return "done";
     }
 
@@ -956,10 +958,12 @@ export class FileActions {
         if (input.value === "") {
             // No search term so reset view
             document.getElementById("currentFolder").value = "local";
-            FileManager.drawFiles(printer, "Recursive");
+            FileSorting.loadSort(printer);
+            //FileManager.drawFiles(printer, "Recursive");
         } else {
             document.getElementById("currentFolder").value = "local";
-            FileManager.drawFiles(printer, "Recursive");
+            FileSorting.loadSort(printer);
+            //FileManager.drawFiles(printer, "Recursive");
         }
         const button = fileList.querySelectorAll('*[id^="file-"]');
         for (let i = 0; i < button.length; i++) {

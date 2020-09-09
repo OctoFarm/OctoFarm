@@ -235,8 +235,7 @@ class Manager {
             i: id,
         });
         printer = await printer.json();
-
-        FileManager.drawFiles(printer);
+        FileSorting.loadSort(printer);
         document.getElementById("backBtn").innerHTML = `
           <button id="fileBackBtn" type="button" class="btn btn-success">
                   <i class="fas fa-chevron-left"></i> Back
