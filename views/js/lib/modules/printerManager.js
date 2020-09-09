@@ -1412,6 +1412,10 @@ export default class PrinterManager {
             elements.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
                 printer.storage.free
             )} / ${Calc.bytes(printer.storage.total)}`;
+        }else{
+            elements.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
+                0
+            )} / ${Calc.bytes(0)}`;
         }
 
         elements.mainPage.status.innerHTML = printer.printerState.state;

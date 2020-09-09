@@ -254,9 +254,16 @@ class Manager {
             },
         };
         fileButtons.fileManager.fileFolderCount.innerHTML = `<i class="fas fa-file"></i> ${printer.fileList.filecount} <i class="fas fa-folder"></i> ${printer.fileList.folderCount}`;
-        fileButtons.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
-            printer.storage.free
-        )} / ${Calc.bytes(printer.storage.total)}`;
+        if (typeof printer.storage !== "undefined") {
+            fileButtons.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
+                printer.storage.free
+            )} / ${Calc.bytes(printer.storage.total)}`;
+        }else{
+            fileButtons.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
+                0
+            )} / ${Calc.bytes(0)}`;
+        }
+
         fileButtons.fileManager.uploadFiles.addEventListener("change", function () {
             FileManager.handleFiles(this.files, printer);
         });
