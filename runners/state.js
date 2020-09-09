@@ -830,7 +830,7 @@ class Runner {
                     await Runner.getSettings(id);
                     await Runner.getProfile(id);
                     await Runner.getState(id);
-                    if(typeof farmPrinters[i].fileList === 'undefined'){
+                    if(typeof farmPrinters[i].fileList === 'undefined' || typeof farmPrinters[i.storage === 'undefined']){
                         await Runner.getFiles(id, 'files?recursive=true');
                     }else{
                         const currentFilament = await Runner.compileSelectedFilament(
@@ -949,9 +949,9 @@ class Runner {
                         `Couldn't set state of missing printer, safe to ignore: ${farmPrinters[i].index}: ${farmPrinters[i].printerURL}`
                     );
                 }
-                if (typeof farmPrinters[this.index] !== 'undefined') {
+                if (typeof farmPrinters[i] !== 'undefined') {
                     PrinterClean.generate(
-                        farmPrinters[this.index],
+                        farmPrinters[i],
                         systemSettings.filamentManager
                     );
                 }
@@ -1311,7 +1311,7 @@ class Runner {
         }
         const { _id } = farmPrinters[index];
         await this.setupWebSocket(_id, skipAPI);
-        (result.status = 'sucess'),
+        (result.status = 'success');
         (result.msg = 'Your client has been re-synced!');
         return result;
     }
