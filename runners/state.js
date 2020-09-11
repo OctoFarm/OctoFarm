@@ -93,7 +93,7 @@ const heartBeatInterval = setInterval(function ping () {
             }
         }
     });
-}, 30000);
+}, 300000);
 
 WebSocketClient.prototype.open = function (url, index) {
     if (url.includes('http://')) {
