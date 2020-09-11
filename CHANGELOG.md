@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
     - New file manager sorting library. All previous defaults will no longer work, defaults to lastest files first. 
     - If available last Indoor Air Quality value will be displayed. 
     - Indoor Air Quality value updated to follow bosch range. 0 - 500 from Excellent air quality to Extremely Polluted.
+    - Ability to upload a file to replace the background. System -> Client.
      
 ### Changed
     - OctoFarm now reacts to the enabled camera setting on OctoPrint. If you don't use camera's it is best to disable them here. 
@@ -41,11 +42,13 @@ All notable changes to this project will be documented in this file.
     - Fixed issue with file name filter not working with special characters on history
     - Fixed issue with file manager sorting not allowing update within folders.
     - Fixed issue with new files not showing above folder. Sorting/re-loading page will re-organise. 
-    - Fixed issue with filament manager failing file import on server start
+    - Fixed issue with filament manager failing system file import on server start
+    - Fixed issue # 108 reliance on storage key was causing UI to lock up, and system wasn't re-scanning if didn't exist.
 
 ## Removed
     - Client side sorting library for printers
     - Client side sorting library for files.
+    - Ability to set a URL as background. See Added section.
     
 
 # [Released]

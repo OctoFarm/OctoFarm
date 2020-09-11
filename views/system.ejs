@@ -171,11 +171,11 @@
                                                     <hr>
                                                     <p class="font-weight-bold">Change Background</p>
                                                     <p>Click the button below to upload your background image.</p>
-                                                        <div class="custom-file">
-                                                            <input type="file" class="custom-file-input" id="clientBackground">
-                                                            <label class="custom-file-label" for="customFile">Choose image</label>
-                                                        </div>
-                                                    <p> Supports <code>PNG, SVG, JPG, GIF, WEBP</code></p>
+                                                    <form action="/settings/backgroundUpload" enctype="multipart/form-data" method="POST">
+                                                        <input class="btn bg-secondary" type="file" name="myFile" accept="image/jpeg,image/png,image/jpg"/>
+                                                        <input id="backgroundSubmit" class="btn btn-primary" type="submit" value="Upload" accept="image/jpeg,image/png">
+                                                    </form>
+                                                    <p> Supports <code>PNG, JPG</code></p>
                                                 </div>
                                                 <div class="tab-pane fade" id="system-dashboard" role="tabpanel" aria-labelledby="dashboard-settings-list">
                                                     <h5>Dashboard Settings</h5>

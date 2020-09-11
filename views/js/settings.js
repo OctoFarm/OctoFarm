@@ -12,7 +12,12 @@ document.getElementById("saveSettings").addEventListener("click", (e) => {
     // Validate Printer Form, then Add
     ClientSettings.update();
 });
-
+// document.getElementById("backgroundSubmit").addEventListener("click", (e) => {
+//     e.preventDefault();
+//     console.log("FILE UPLOAD");
+//     console.log(e);
+//
+// });
 const dashData = localStorage.getItem('dashboardConfiguration');
 const serializedData = JSON.parse(dashData);
 if(serializedData !== null && serializedData.length !== 0){

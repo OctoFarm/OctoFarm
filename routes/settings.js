@@ -5,6 +5,7 @@ const { ensureAuthenticated } = require("../config/auth");
 const ServerSettingsDB = require("../models/ServerSettings.js");
 const ClientSettingsDB = require("../models/ClientSettings.js");
 const runner = require("../runners/state.js");
+const multer = require('multer');
 
 const { Runner } = runner;
 
@@ -22,6 +23,20 @@ const { Logs } = serverCommands;
 const { SystemCommands } = serverCommands;
 
 module.exports = router;
+
+// var upload = multer({ dest: "Upload_folder_name" })
+// If you do not want to use diskStorage then uncomment it
+
+const Storage = multer.diskStorage({
+    destination: function(req, file, callback) {
+        callback(null, "./images");
+    },
+    filename: function(req, file, callback) {
+        callback(null, "bg.jpg");
+    }
+});
+
+const upload = multer({ storage: Storage });
 
 router.get("/server/get/logs", ensureAuthenticated, async (req, res) => {
     const serverLogs = await Logs.grabLogs();
@@ -71,7 +86,13 @@ router.post("/client/update", ensureAuthenticated, (req, res) => {
         res.send({ msg: "Settings Saved" });
     });
 });
-
+router.post("/backgroundUpload", ensureAuthenticated,upload.single('myFile'), (req, res) => {
+    const file = req.file;
+    if (!file) {
+        res.redirect("/system");
+    }
+    res.redirect("/system");
+});
 router.get("/server/get", ensureAuthenticated, (req, res) => {
     ServerSettingsDB.find({}).then((checked) => {
         res.send(checked[0]);
