@@ -64,7 +64,7 @@ function heartBeat (index) {
         farmPrinters[index].webSocket = 'success';
         farmPrinters[index].webSocketDescription = 'Websocket Connection Online';
     }
-
+    PrinterTicker.addIssue(new Date(), farmPrinters[index].printerURL, "Pong message received from client...", "Complete");
     farmPrinters[index].ws.isAlive = true;
 }
 
@@ -80,6 +80,7 @@ const heartBeatInterval = setInterval(function ping () {
         client.ws.instance.readyState !== 3
             ) {
                 if(farmPrinters[client.ws.index].stateColour.category === "Active" || farmPrinters[client.ws.index].stateColour.category === "Idle"){
+                    PrinterTicker.addIssue(new Date(), farmPrinters[client.ws.index].printerURL, "Sending ping message to websocket...", "Active");
                     if (client.ws.isAlive === false) return client.ws.instance.terminate();
 
                     // Retry connecting if failed...
@@ -103,6 +104,7 @@ WebSocketClient.prototype.open = function (url, index) {
     }
     this.url = url;
     this.index = index;
+    PrinterTicker.addIssue(new Date(), farmPrinters[this.index].printerURL, "Opening clients websocket connection...", "Active");
     farmPrinters[this.index].webSocket = 'warning';
     farmPrinters[this.index].webSocketDescription =
     'Websocket Connected but in Tentative state until receiving data';
@@ -283,6 +285,7 @@ WebSocketClient.prototype.open = function (url, index) {
     return true;
 };
 WebSocketClient.prototype.throttle = function (data) {
+    PrinterTicker.addIssue(new Date(), farmPrinters[this.index].printerURL, "Throttling websocket connection...", "Active");
     try {
         logger.info(
             `Throttling your websocket connection: ${this.index}: ${this.url} `,
@@ -302,6 +305,7 @@ WebSocketClient.prototype.send = function (data, option) {
     }
 };
 WebSocketClient.prototype.reconnect = async function (e) {
+    PrinterTicker.addIssue(new Date(), farmPrinters[this.index].printerURL, "Connection lost... reconnecting...", "Active");
     logger.info(
         `WebSocketClient: retry in ${this.autoReconnectInterval}ms`,
         `${e + this.index}: ${this.url}`
@@ -330,6 +334,7 @@ WebSocketClient.prototype.onopen = async function (e) {
     logger.info(`Sending Auth to Websocket: ${this.index}: ${this.url} `, data);
     this.instance.send(JSON.stringify(data));
     this.instance.send(JSON.stringify(throt));
+    PrinterTicker.addIssue(new Date(), farmPrinters[this.index].printerURL, "Opening the websocket connection...", "Active");
 };
 WebSocketClient.prototype.onmessage = async function (data, flags, number) {
     try {
@@ -358,6 +363,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
                 'Websocket Connected but in Tentative state until receiving data';
             farmPrinters[this.index].state = "Disconnected";
             farmPrinters[this.index].stateColour = Runner.getColour("Disconnected");
+            PrinterTicker.addIssue(new Date(), farmPrinters[this.index].printerURL, "Successfully opened websocket connection...", "Complete");
         }
         // Listen for printer status
         if (typeof data.current !== 'undefined') {
@@ -616,7 +622,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
     }
 };
 WebSocketClient.prototype.onerror = function (e) {
-
+    PrinterTicker.addIssue(new Date(), farmPrinters[this.index].printerURL, "Whoopsy! Big error...", "Offline");
     logger.error(
         'WebSocketClient: Error',
         // eslint-disable-next-line prefer-rest-params
@@ -636,6 +642,7 @@ WebSocketClient.prototype.onerror = function (e) {
     }
 };
 WebSocketClient.prototype.onclose = function (e) {
+    PrinterTicker.addIssue(new Date(), farmPrinters[this.index].printerURL, "Client closed...", "Offline");
     logger.info(
         'WebSocketClient: Closed',
         // eslint-disable-next-line prefer-rest-params
