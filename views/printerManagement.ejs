@@ -38,11 +38,11 @@
                     <i  class="fas fa-print"></i> Selected:
                 </button>
             </div>
-            <div class="card-body">
+            <div class="card-body p-0">
                 <div class="row">
                     <% if(typeof userGroup != "undefined" && userGroup === "Administrator"){ %>
                     <div class="col-lg-3 text-center">
-                            <u><h5 class="mb-0">Administration</h5></u><br>
+                            <u><h5 class="mb-0 pb-1">Administration</h5></u>
                             <button
                                     title="Add Printer to your Farm"
                                     id="addPrinterBtn"
@@ -117,8 +117,8 @@
                     </div>
                     <div class="col-lg-3"></div>
                     <div class="col-lg-3 text-center">
-                        <u><h5 class="mb-0">Connection Log</h5></u><br>
-                        <div id="printerTickerMessageBox" class="bg-secondary" style="height:100px; max-height:100px; overflow-y: scroll;">
+                        <u><h5 class="mb-0 pb-1">Connection Log</h5></u>
+                        <div id="printerTickerMessageBox" class="bg-secondary" style="height:150px; max-height:150px; overflow-y: scroll;">
 
                         </div>
                     </div>
