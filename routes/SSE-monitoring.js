@@ -22,9 +22,9 @@ router.get("/get/", ensureAuthenticated, function(req, res) {
     res.writeHead(200, {
         "Content-Type": "text/event-stream",
         "Cache-Control": "no-cache, no-store, must-revalidate",
-        Pragma: "no-cache",
-        Expires: 0,
-        Connection: "keep-alive"
+        "Pragma": "no-cache",
+        "Expires": 0,
+        "Connection": "keep-alive"
     });
     res.write("\n");
     (function(clientId) {
