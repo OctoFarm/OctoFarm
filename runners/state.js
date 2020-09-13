@@ -623,6 +623,26 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
 };
 WebSocketClient.prototype.onerror = function (e) {
     PrinterTicker.addIssue(new Date(), farmPrinters[this.index].printerURL, "Whoopsy! Big error...", "Offline");
+    const currentFilament = JSON.parse(
+        JSON.stringify(farmPrinters[this.index].selectedFilament)
+    );
+    for (let s = 0; s < farmPrinters[this.index].selectedFilament.length; s++) {
+        if (farmPrinters[this.index].selectedFilament[s] !== null) {
+            const profile = null;
+            // if (systemSettings.filamentManager) {
+            //   profile = await Profiles.findOne({
+            //     "profile.index":
+            //       farmPrinters[index].selectedFilament[s].spools.profile,
+            //   });
+            // } else {
+            //   profile = await Profiles.findById(
+            //     farmPrinters[index].selectedFilament[s].spools.profile
+            //   );
+            // }
+            // currentFilament[s].spools.profile = profile.profile;
+        }
+    }
+    JobClean.generate(farmPrinters[this.index], currentFilament);
     logger.error(
         'WebSocketClient: Error',
         // eslint-disable-next-line prefer-rest-params
@@ -643,6 +663,26 @@ WebSocketClient.prototype.onerror = function (e) {
 };
 WebSocketClient.prototype.onclose = function (e) {
     PrinterTicker.addIssue(new Date(), farmPrinters[this.index].printerURL, "Client closed...", "Offline");
+    const currentFilament = JSON.parse(
+        JSON.stringify(farmPrinters[this.index].selectedFilament)
+    );
+    for (let s = 0; s < farmPrinters[this.index].selectedFilament.length; s++) {
+        if (farmPrinters[this.index].selectedFilament[s] !== null) {
+            const profile = null;
+            // if (systemSettings.filamentManager) {
+            //   profile = await Profiles.findOne({
+            //     "profile.index":
+            //       farmPrinters[index].selectedFilament[s].spools.profile,
+            //   });
+            // } else {
+            //   profile = await Profiles.findById(
+            //     farmPrinters[index].selectedFilament[s].spools.profile
+            //   );
+            // }
+            // currentFilament[s].spools.profile = profile.profile;
+        }
+    }
+    JobClean.generate(farmPrinters[this.index], currentFilament);
     logger.info(
         'WebSocketClient: Closed',
         // eslint-disable-next-line prefer-rest-params
