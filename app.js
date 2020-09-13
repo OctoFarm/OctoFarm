@@ -6,6 +6,8 @@ const session = require("express-session");
 const passport = require("passport");
 const ServerSettingsDB = require("./models/ServerSettings");
 const Logger = require("./lib/logger.js");
+const cookieParser = require("cookie-parser");
+
 
 const logger = new Logger("OctoFarm-Server");
 const printerClean = require("./lib/dataFunctions/printerClean.js");
@@ -29,6 +31,7 @@ app.use(expressLayouts);
 app.set("view engine", "ejs");
 
 // Bodyparser
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
 // Express Session Middleware
@@ -36,6 +39,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(
     session({
         secret: "supersecret",
+        cookie: {},
         resave: true,
         saveUninitialized: true,
     })
@@ -45,6 +49,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Remember Me!
+app.use(passport.authenticate('remember-me'));
 
 // Connect Flash Middleware
 app.use(flash());

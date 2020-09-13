@@ -8,6 +8,10 @@ const ServerSettings = require("../models/ServerSettings.js");
 // User Modal
 const User = require("../models/User.js");
 
+const token = require("../config/token.js");
+
+const { Token } = token;
+
 async function enable() {
     const settings = await ServerSettings.find({});
     // Login Page
@@ -116,16 +120,38 @@ async function enable() {
         });
     }
     // Login Handle
-    router.post("/login", (req, res, next) => {
-        passport.authenticate("local", {
-            successRedirect: "/dashboard",
+    router.post('/login',
+        passport.authenticate('local', {
+            // successRedirect: "/dashboard",
             failureRedirect: "/users/login",
             failureFlash: true,
             page: "Login",
             registration: settings[0].server.registration,
-            serverSettings: settings,
-        })(req, res, true);
-    });
+            serverSettings: settings,}),
+        function(req, res, next) {
+            // Issue a remember me cookie if the option was checked
+            console.log(req.body.remember_me);
+            if (!req.body.remember_me) { return next(); }
+
+            Token.issueToken(req.user, function(err, token) {
+                if (err) { return next(err); }
+                res.cookie('remember_me', token, { path: '/', httpOnly: true, maxAge: 604800000 });
+                return next();
+            });
+        },
+        function(req, res) {
+            res.redirect('/dashboard');
+        });
+    // router.post("/login", (req, res, next) => {
+    //     passport.authenticate("local", {
+    //         successRedirect: "/dashboard",
+    //         failureRedirect: "/users/login",
+    //         failureFlash: true,
+    //         page: "Login",
+    //         registration: settings[0].server.registration,
+    //         serverSettings: settings,
+    //     })(req, res, true);
+    // });
 
     // Logout Handle
     router.get("/logout", (req, res) => {

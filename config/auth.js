@@ -4,9 +4,6 @@ const ServerSettings = require("../models/ServerSettings.js");
 module.exports = {
     async ensureAuthenticated(req, res, next) {
         const serverSettings = await ServerSettings.find({});
-        if(typeof req.session.passport !== 'undefined'){
-            return next();
-        }
         if (serverSettings[0].server.loginRequired === false) {
             return next();
         }
