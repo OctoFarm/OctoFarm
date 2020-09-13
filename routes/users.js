@@ -130,7 +130,6 @@ async function enable() {
             serverSettings: settings,}),
         function(req, res, next) {
             // Issue a remember me cookie if the option was checked
-            console.log(req.body.remember_me);
             if (!req.body.remember_me) { return next(); }
 
             Token.issueToken(req.user, function(err, token) {
