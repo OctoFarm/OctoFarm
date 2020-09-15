@@ -44,16 +44,23 @@ async function welcome () {
         );
     } else {
         const serverSettings = await ServerSettings.find({});
+
         if (serverSettings[0].server.loginRequired === false) {
             router.get('/', (req, res) => res.redirect('/dashboard'));
         } else {
             const { registration } = serverSettings[0].server;
-            router.get('/', (req, res) =>
-                res.render('welcome', {
-                    page: 'Welcome',
-                    registration,
-                    serverSettings: serverSettings[0]
-                })
+            router.get('/', (req, res) => {
+                if(req.isAuthenticated()) {
+                    res.redirect('/dashboard');
+                }else{
+                    res.render('welcome', {
+                        page: 'Welcome',
+                        registration,
+                        serverSettings: serverSettings[0]
+                    });
+                }
+
+            }
             );
         }
     }
