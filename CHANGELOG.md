@@ -24,7 +24,13 @@ All notable changes to this project will be documented in this file.
     - If available last Indoor Air Quality value will be displayed. 
     - Indoor Air Quality value updated to follow bosch range. 0 - 500 from Excellent air quality to Extremely Polluted.
     - Ability to upload a file to replace the background. System -> Client.
-     
+    - Remember me select box on login page, currently will remember your session for 30 days. Does not persist an OctoFarm reboot. More configuration options to be added.
+    - Updated custom NPM commands for OctoFarm: 
+        - "npm start" - Runs OctoFarm service, will now automatically run npm install so this step is no longer required.
+        - "npm stop" - Stops OctoFarm service.
+        - "npm startup" - Generates system startup script so OctoFarm is persistent. You will need to copy and paste the output command into your terminal to activate this. Then use the below script to save the configuration.
+        - "npm saveStartup" - Saves the current configuration generated from "npm startup". 
+    - New section in "System Settings" called "Database". Currently displays the db URL and also allows some basic deleting (tactical nuke) of a database.
 ### Changed
     - OctoFarm now reacts to the enabled camera setting on OctoPrint. If you don't use camera's it is best to disable them here. 
     - OctoFarm will now only respond to a max screen size of 2000px. Anything above this will be limited from stretching to the full horizontal width.
@@ -33,6 +39,7 @@ All notable changes to this project will be documented in this file.
     - Files no longer "a" element, can't be clicked anymore. Was confusing, suggested an action.
     - Implemented new file sorting function. Settings default to name, and will save per client in local storage.
     - File path now shows on hover if available in History table.
+    - Tweaks to SSE browser cache, should force re-update of data rather than blasting the client with a lot of data as it caught up... (Testing and feedback would be awesome)
 
 ### Fixed
     - Fixed file path showing on file selection instead of file name
