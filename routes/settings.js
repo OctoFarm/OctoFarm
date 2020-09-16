@@ -4,6 +4,19 @@ const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
 const ServerSettingsDB = require("../models/ServerSettings.js");
 const ClientSettingsDB = require("../models/ClientSettings.js");
+const HistoryDB = require("../models/History");
+const SpoolsDB = require("../models/Filament.js");
+const ProfilesDB = require("../models/Profiles.js");
+const roomDataDB = require("../models/roomData.js");
+const UserDB = require("../models/User.js");
+const PrinterDB = require("../models/Printer.js");
+const AlertsDB = require("../models/Alerts.js");
+
+const Logger = require('../lib/logger.js');
+
+const logger = new Logger('OctoFarm-API');
+
+
 const runner = require("../runners/state.js");
 const multer = require('multer');
 
@@ -46,6 +59,37 @@ router.get("/server/download/logs/:name", ensureAuthenticated, (req, res) => {
     const download = req.params.name;
     const file = `./logs/${download}`;
     res.download(file, download); // Set disposition and send it.
+});
+router.get("/server/delete/database/:name", ensureAuthenticated, async (req, res) => {
+    const databaseName = req.params.name;
+    console.log(databaseName);
+    await Runner.pause();
+    if(databaseName === "nukeEverything"){
+        await ServerSettingsDB.deleteMany({});
+        await ClientSettingsDB.deleteMany({});
+        await HistoryDB.deleteMany({});
+        await SpoolsDB.deleteMany({});
+        await ProfilesDB.deleteMany({});
+        await roomDataDB.deleteMany({});
+        await UserDB.deleteMany({});
+        await PrinterDB.deleteMany({});
+        await AlertsDB.deleteMany({});
+        res.send({message: "Successfully deleted databases, server will restart..."});
+        logger.info('Database completely wiped.... Restarting server...');
+        SystemCommands.rebootOctoFarm();
+    }else if(databaseName === "FilamentDB"){
+        await SpoolsDB.deleteMany({});
+        await ProfilesDB.deleteMany({});
+        logger.info('Successfully deleted Filament database.... Restarting server...');
+        SystemCommands.rebootOctoFarm();
+    }else{
+        await eval(databaseName).deleteMany({});
+        res.send({message: "Successfully deleted "+databaseName+", server will restart..."});
+        logger.info(databaseName + ' successfully deleted.... Restarting server...');
+        SystemCommands.rebootOctoFarm();
+    }
+
+
 });
 router.get("/server/restart", ensureAuthenticated, (req, res) => {
     SystemCommands.rebootOctoFarm();

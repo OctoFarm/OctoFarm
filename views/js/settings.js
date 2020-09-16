@@ -12,12 +12,42 @@ document.getElementById("saveSettings").addEventListener("click", (e) => {
     // Validate Printer Form, then Add
     ClientSettings.update();
 });
-// document.getElementById("backgroundSubmit").addEventListener("click", (e) => {
-//     e.preventDefault();
-//     console.log("FILE UPLOAD");
-//     console.log(e);
-//
-// });
+document.getElementById("nukeEverything").addEventListener("click", (e) => {
+    // Validate Printer Form, then Add
+    ServerSettings.nukeDatabases("nukeEverything");
+});
+document.getElementById("nukeAlerts").addEventListener("click", (e) => {
+    // Validate Printer Form, then Add
+    ServerSettings.nukeDatabases("AlertsDB");
+});
+document.getElementById("nukeClientSettings").addEventListener("click", (e) => {
+    // Validate Printer Form, then Add
+    ServerSettings.nukeDatabases("ClientSettingsDB");
+});
+document.getElementById("nukeFilament").addEventListener("click", (e) => {
+    // Validate Printer Form, then Add
+    ServerSettings.nukeDatabases("FilamentDB");
+});
+document.getElementById("nukeHistory").addEventListener("click", (e) => {
+    // Validate Printer Form, then Add
+    ServerSettings.nukeDatabases("HistoryDB");
+});
+document.getElementById("nukePrinters").addEventListener("click", (e) => {
+    // Validate Printer Form, then Add
+    ServerSettings.nukeDatabases("PrintersDB");
+});
+document.getElementById("nukeRoomData").addEventListener("click", (e) => {
+    // Validate Printer Form, then Add
+    ServerSettings.nukeDatabases("roomDataDB");
+});
+document.getElementById("nukeServerSettings").addEventListener("click", (e) => {
+    // Validate Printer Form, then Add
+    ServerSettings.nukeDatabases("ServerSettingsDB");
+});
+document.getElementById("nukeUsers").addEventListener("click", (e) => {
+    // Validate Printer Form, then Add
+    ServerSettings.nukeDatabases("UserDB");
+});
 const dashData = localStorage.getItem('dashboardConfiguration');
 const serializedData = JSON.parse(dashData);
 if(serializedData !== null && serializedData.length !== 0){
@@ -404,6 +434,13 @@ class ClientSettings {
     }
 }
 class ServerSettings {
+    static nukeDatabases(database){
+        Client.get("settings/server/delete/database/" + database).then(res => {
+            return res.json();
+        }).then(res => {
+            UI.createAlert("success", res.message, 3000);
+        });
+    }
     static async init() {
         Client.get("settings/server/get")
             .then((res) => {

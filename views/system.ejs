@@ -845,25 +845,30 @@
                                     <h5>Database Settings</h5>
                                     <hr>
                                     <p class="font-weight-bold">Database Connection URL</p>
-                                    <p>Current Database URL used for keeping all your printer information.</p>
+                                    <p>Current Database URL used for keeping all your farm information.</p>
                                     <div class="input-group mb-3">
                                         <div class="input-group-prepend">
-                                            <span class="input-group-text" id="basic-addon3">Database URL:</span>
+                                            <span class="input-group-text" id="basic-addon3">Database URL: </span>
                                         </div>
-                                        <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3" disabled>
+                                        <input type="text" class="form-control" id="basic-url" aria-describedby="basic-addon3" value="<%= db %>" disabled>
                                     </div>
                                     <hr>
                                     <h5>Database Actions</h5>
                                     <p class="mb-1">Actions to perform at the database level. Be warned these are un-reversible without a backup in place.</p>
                                     <small>All these actions will require a server restart.</small>
                                     <center>
-                                        <button type="button" class="btn btn-danger mb-1 btn-lg"><i class="fas fa-database"></i><br> Nuke Everything</button><br>
-                                        <button type="button" class="btn btn-warning btn-lg"><i class="fas fa-history"></i> <br> Nuke History</button>
-                                        <button type="button" class="btn btn-primary btn-lg"><i class="fas fa-toilet-paper"></i><br> Nuke Filament</button>
-                                        <button type="button" class="btn btn-secondary btn-lg"><i class="fas fa-users"></i><br> Nuke Users</button>
-                                        <button type="button" class="btn btn-info btn-lg"><i class="fas fa-cog"></i><br> Nuke Client Settings</button>
-                                        <button type="button" class="btn btn-warning btn-lg"><i class="fas fa-cog"></i><br> Nuke Server Settings</button>
-                                        <button type="button" class="btn btn-danger btn-lg"><i class="fas fa-print"></i><br> Nuke Printers</button></center>
+                                        <button id="nukeEverything" type="button" class="btn btn-danger mb-1 btn-lg"><i class="fas fa-database"></i><br> Nuke Everything</button><br>
+                                        <button id="nukeAlerts" type="button" class="btn btn-warning btn-lg"><i class="fas fa-history"></i> <br> Nuke Alerts</button>
+                                        <button id="nukeClientSettings" type="button" class="btn btn-info btn-lg"><i class="fas fa-cog"></i><br> Nuke Client Settings</button>
+                                        <button id="nukeFilament" type="button" class="btn btn-primary btn-lg"><i class="fas fa-toilet-paper"></i><br> Nuke Filament</button>
+                                        <button id="nukeHistory" type="button" class="btn btn-danger btn-lg"><i class="fas fa-history"></i> <br> Nuke History</button>
+                                        <button id="nukePrinters" type="button" class="btn btn-warning btn-lg"><i class="fas fa-print"></i><br> Nuke Printers</button>
+                                        <button id="nukeRoomData" type="button" class="btn btn-info btn-lg"><i class="fas fa-print"></i><br> Nuke Room Data</button>
+                                        <button id="nukeServerSettings" type="button" class="btn btn-primary btn-lg"><i class="fas fa-cog"></i><br> Nuke Server Settings</button>
+                                        <button id="nukeUsers" type="button" class="btn btn-secondary btn-lg"><i class="fas fa-users"></i><br> Nuke Users</button>
+
+
+</center>
 
                                 </div>
                                 <div class="tab-pane fade" id="system-about" role="tabpanel" aria-labelledby="server-filament-list">
