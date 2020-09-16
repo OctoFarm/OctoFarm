@@ -352,7 +352,8 @@ router.get('/system', ensureAuthenticated, async (req, res) => {
         helpers: prettyHelpers,
         clientSettings,
         serverSettings,
-        systemInformation
+        systemInformation,
+        db
     });
 });
 module.exports = router;
