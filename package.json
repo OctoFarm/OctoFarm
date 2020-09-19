@@ -47,7 +47,7 @@
     "express-ws": "^4.0.0",
     "fetch-base64": "^2.1.2",
     "flatted": "^2.0.2",
-    "iaq": "^1.1.0",
+    "gulp-postcss": "^8.0.0",
     "lodash": "^4.17.20",
     "mongoose": "^5.10.3",
     "multer": "^1.4.2",
@@ -57,7 +57,6 @@
     "passport-local": "^1.0.0",
     "passport-remember-me": "0.0.1",
     "pm2": "^4.4.1",
-    "prettier": "^2.1.1",
     "remove": "^0.1.5",
     "systeminformation": "^4.27.3",
     "tablefilter": "^0.7.2",
@@ -67,7 +66,16 @@
     "yieldable-json": "^2.0.0"
   },
   "devDependencies": {
+    "@babel/cli": "^7.11.6",
+    "@babel/core": "^7.11.6",
+    "@babel/plugin-transform-runtime": "^7.11.5",
+    "@babel/preset-env": "^7.11.5",
+    "autoprefixer": "^9.8.6",
+    "babel-loader": "^8.1.0",
+    "babelify": "^10.0.0",
+    "browserify": "^16.5.2",
     "clinic": "^6.0.3",
+    "cssnano": "^4.1.10",
     "debug": "^4.1.1",
     "dependency-check": "^4.1.0",
     "eslint": "^7.8.1",
@@ -80,8 +88,30 @@
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-promise": "^4.2.1",
     "eslint-plugin-standard": "^4.0.1",
+    "gulp": "^4.0.2",
+    "gulp-concat": "^2.6.1",
+    "gulp-declare": "^0.3.0",
+    "gulp-imagemin": "^7.1.0",
+    "gulp-include": "^2.4.1",
+    "gulp-rename": "^2.0.0",
+    "gulp-sourcemaps": "^2.6.5",
+    "gulp-terser": "^1.4.0",
     "mongo-express": "^1.0.0-alpha.1",
-    "nodemon": "^2.0.4"
+    "nodemon": "^2.0.4",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.1.1",
+    "vinyl-buffer": "^1.0.1",
+    "vinyl-source-stream": "^2.0.0",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  },
+  "babel": {
+    "presets": [
+      [
+        "@babel/preset-env"
+      ]
+    ]
   },
   "engineStrict": true,
   "engines": {
