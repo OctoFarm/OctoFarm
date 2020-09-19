@@ -1,7 +1,7 @@
-import OctoFarmClient from "../octofarm.js";
-import Calc from "../functions/calc.js";
-import UI from "../functions/ui.js";
-import { returnDropDown } from "./filamentGrab.js";
+import OctoFarmClient from "./lib/octofarm.js";
+import Calc from "./lib/functions/calc.js";
+import UI from "./lib/functions/ui.js";
+import { returnDropDown } from "./lib/modules/filamentGrab.js";
 
 // Setup history listeners
 document.getElementById("historyTable").addEventListener("click", (e) => {

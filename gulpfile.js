@@ -27,8 +27,9 @@ const jsPanelView = 'panelViewRunner.js';
 const jsPrinterManagement = 'printerManagementRunner.js';
 const jsSettings = 'serverAliveCheck.js';
 const jsServerAliveCheck = 'settings.js';
+const jsHistory = 'historyRunner.js';
 const jsFolder = 'src/js/';
-const jsFiles = [jsCameraView, jsCurrentOperationsView, jsDashboardView, jsFilamentManager, jsFileManager, jsListView, jsPanelView, jsPrinterManagement, jsSettings, jsServerAliveCheck];
+const jsFiles = [jsCameraView, jsCurrentOperationsView, jsDashboardView, jsFilamentManager, jsFileManager, jsListView, jsPanelView, jsPrinterManagement, jsSettings, jsServerAliveCheck, jsHistory];
 
 const jsDashboardWorker = 'dashboardWorker.js';
 const jsFileManagerWorker = 'fileManagerWorker.js';
