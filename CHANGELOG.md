@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-# [UnReleased]
+# [Released]
 
 ## [v1.1.5.7]
 
@@ -61,8 +61,6 @@ All notable changes to this project will be documented in this file.
     - Client side sorting library for files.
     - Ability to set a URL as background. See Added section.
     
-
-# [Released]
 
 ## [v1.1.5.6]
 

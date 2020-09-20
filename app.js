@@ -39,7 +39,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(
     session({
         secret: "supersecret",
-        cookie: {},
         resave: true,
         saveUninitialized: true,
     })
