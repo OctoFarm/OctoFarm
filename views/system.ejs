@@ -854,8 +854,11 @@
                                     </div>
                                     <hr>
                                     <h5>Database Actions</h5>
-                                    <p class="mb-1">Actions to perform at the database level. Be warned these are un-reversible without a backup in place.</p>
-                                    <small>All these actions will require a server restart.</small>
+                                    <p class="mb-1">Actions to perform at the database level.</p>
+
+                                    <small>All these actions will require a server restart and are un-recoverable without a backup in place outside of OctoFarm.</small><br>
+                                    <code>WARNING! Do not mess around with this unless you have a backup in place and/or know what your doing...</code>
+
                                     <center>
                                         <button id="nukeEverything" type="button" class="btn btn-danger mb-1 btn-lg"><i class="fas fa-database"></i><br> Nuke Everything</button><br>
                                         <button id="nukeAlerts" type="button" class="btn btn-warning btn-lg"><i class="fas fa-history"></i> <br> Nuke Alerts</button>
