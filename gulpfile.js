@@ -38,6 +38,7 @@ const jsPrinterManagerWorker = 'printersManagerWorker.js';
 const workerJsFolder = 'src/js/lib/workers/';
 const workerJsFiles = [jsDashboardWorker, jsFileManagerWorker, jsMonitoringViewsWorker, jsPrinterManagerWorker];
 
+const cssFolder = 'src/css';
 const cssOctoFarm = 'src/css/octofarm.css';
 
 function octofarmImg() {
@@ -92,6 +93,9 @@ function octofarmCSS(){
         .pipe(dest('views/assets/css'));
 }
 
+function watchTask(){
+    watch([cssFolder, jsFolder], {interval: 1000}, parallel(octofarmImg, octofarmJS, octofarmWorkersJS, octofarmCSS, vendorJS, vendorCSS));
+}
 
 exports.octoFarmImg = octofarmImg;
 exports.octofarmJS = octofarmJS;
@@ -99,4 +103,7 @@ exports.vendorJS = vendorJS;
 exports.vendorCSS = vendorCSS;
 exports.octofarmCSS = octofarmCSS;
 exports.octofarmWorkersJS = octofarmWorkersJS;
-exports.default = parallel(octofarmImg, octofarmJS, octofarmWorkersJS, octofarmCSS, vendorJS, vendorCSS);
+exports.default = series(
+    parallel(octofarmImg, octofarmJS, octofarmWorkersJS, octofarmCSS, vendorJS, vendorCSS),
+    watchTask
+);
