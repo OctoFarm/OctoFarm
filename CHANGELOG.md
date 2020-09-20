@@ -31,6 +31,7 @@ All notable changes to this project will be documented in this file.
         - "npm startup" - Generates system startup script so OctoFarm is persistent. You will need to copy and paste the output command into your terminal to activate this. Then use the below script to save the configuration. Same as "pm2 startup"
         - "npm saveStartup" - Saves the current configuration generated from "npm startup". Same as "pm2 save" 
     - New section in "System Settings" called "Database". Currently displays the db URL and also allows some basic deleting (tactical nuke) of a database.
+    - New Printer selection modal, this is currently for Multi-Upload in files manager but will eventually be used in the rest of the UI.
     
 ### Changed
     - OctoFarm now reacts to the enabled camera setting on OctoPrint. If you don't use camera's it is best to disable them here. 
@@ -53,7 +54,8 @@ All notable changes to this project will be documented in this file.
     - Fixed issue with new files not showing above folder. Sorting/re-loading page will re-organise. 
     - Fixed issue with filament manager failing system file import on server start
     - Fixed issue # 108 reliance on storage key was causing UI to lock up, and system wasn't re-scanning if didn't exist.
-
+    - Fixed issue with file manager not removing file.
+    
 ## Removed
     - Client side sorting library for printers
     - Client side sorting library for files.

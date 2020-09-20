@@ -1153,6 +1153,7 @@ export class FileActions {
             async callback(result) {
                 if (result) {
                     await OctoPrintClient.file(printer, fullPath, "delete");
+                    document.getElementById(`file-${fullPath}`).remove();
                 }
             },
         });
@@ -1180,6 +1181,7 @@ export class FileActions {
                         `files/local/${fullPath}`
                     );
                     const del = await OctoFarmClient.post("printers/removefolder", opts);
+                    document.getElementById(`file-${fullPath}`).remove();
                 }
             },
         });
