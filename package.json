@@ -11,14 +11,6 @@
     "saveStartup": "pm2 save",
     "dev": "nodemon app.js"
   },
-  "nodemonConfig": {
-    "verbose": false,
-    "ignore": [
-      "views/js/*",
-      "logs/*"
-    ],
-    "delay": 2500
-  },
   "repository": {
     "type": "git",
     "url": "https://git.notexpectedyet.com/NotExpectedYet/OctoFarm"
@@ -123,5 +115,10 @@
     "imageName": "OctoFarm",
     "imagePort": "4000",
     "internalContainerPort": "4000"
+  },
+  "nodemonConfig": {
+    "verbose": false,
+    "ignore": ["views/assets/*", "logs/*", "src/*"],
+    "delay": "2500"
   }
 }

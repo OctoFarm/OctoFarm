@@ -777,11 +777,7 @@ export default class FileManager {
 
         async function second() {
             // DELETE WHEN FOLDERS WORKING
-            const boxs = document.querySelectorAll('*[id^="multiUpPrinters-"]');
-            selectedPrinters = [].filter.call(boxs, function (el) {
-                return el.checked;
-            });
-
+            selectedPrinters = PrinterSelect.getSelected();
             if (selectedPrinters.length < 2) {
                 UI.createAlert(
                     "error",
@@ -815,20 +811,7 @@ export default class FileManager {
                     const i = _.findIndex(printers, function (o) {
                         return o._id == printer.value.toString();
                     });
-
-                    let name = "";
-                    if (typeof printers[i].settingsAppearance !== "undefined") {
-                        if (
-                            printers[i].settingsAppearance.name === "" ||
-              printers[i].settingsAppearance.name === null
-                        ) {
-                            name = printers[i].printerURL;
-                        } else {
-                            name = printers[i].settingsAppearance.name;
-                        }
-                    } else {
-                        name = printers[i].printerURL;
-                    }
+                    const name = printers[i].printerName;
 
                     document.getElementById("multiSelectedPrinters2").insertAdjacentHTML(
                         "beforeend",
@@ -905,7 +888,7 @@ export default class FileManager {
                     newObject.printerInfo = printer.printerInfo;
                     newObject.upload = FileManager.fileUpload;
                     newObject.currentFolder = selectedFolder;
-
+                    console.log(printAfterUpload);
                     if (printAfterUpload) {
                         newObject.print = true;
                     }
