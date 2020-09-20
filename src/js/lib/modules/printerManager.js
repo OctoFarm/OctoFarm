@@ -1455,7 +1455,7 @@ export default class PrinterManager {
 
         elements.jobStatus.expectedCompletionDate.innerHTML = dateComplete;
 
-        if (printer.currentJob.progress !== null) {
+        if (typeof printer.currentJob !== "undefined" && printer.currentJob.progress !== null) {
             elements.jobStatus.progressBar.innerHTML =
         printer.currentJob.progress.toFixed(0) + "%";
             elements.jobStatus.progressBar.style.width =
