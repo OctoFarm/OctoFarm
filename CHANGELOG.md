@@ -57,7 +57,7 @@ All notable changes to this project will be documented in this file.
     - Fixed issue with file manager not removing file.
     
 ## Removed
-    - Client side sorting library for printers
+    - Client side sorting library for printers - Not added back yet due to been a little more complex than first anticipated. 
     - Client side sorting library for files.
     - Ability to set a URL as background. See Added section.
     
