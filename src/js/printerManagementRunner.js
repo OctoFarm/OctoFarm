@@ -944,7 +944,7 @@ class dashUpdate {
             title="Control Your Printer"
             id="printerButton-${printer._id}"
                      type="button"
-                     class="tag btn btn-primary btn-sm"
+                     class="tag btn btn-primary btn-sm bg-colour-1"
                      data-toggle="modal"
                      data-target="#printerManagerModal" disabled
             ><i class="fas fa-print"></i>
@@ -952,7 +952,7 @@ class dashUpdate {
             <button  title="Change your Printer Settings"
             id="printerSettings-${printer._id}"
                                  type="button"
-                                 class="tag btn btn-secondary btn-sm"
+                                 class="tag btn btn-secondary btn-sm bg-colour-2"
                                  data-toggle="modal"
                                  data-target="#printerSettingsModal" disabled
             ><i class="fas fa-cog"></i>
@@ -960,14 +960,14 @@ class dashUpdate {
             <a title="Open your Printers Web Interface"
                id="printerWeb-${printer._id}"
                type="button"
-               class="tag btn btn-info btn-sm"
+               class="tag btn btn-info btn-sm bg-colour-3"
                target="_blank"
                href="${printer.printerURL}" role="button"><i class="fas fa-globe-europe"></i></a>
             <button  
                      title="Re-Sync your printer"
                      id="printerSyncButton-${printer._id}"
                      type="button"
-                     class="tag btn btn-success btn-sm"
+                     class="tag btn btn-success btn-sm bg-colour-4"
             >
                 <i class="fas fa-sync"></i>
             </button>

@@ -516,14 +516,14 @@ export default class PrinterManager {
                           </div>
                         </div>
 
-                        <label class="btn btn-success float-left mr-1 mb-0" for="fileUploadBtn"><i class="fas fa-file-import"></i> Upload File(s)</label>
-                        <input id="fileUploadBtn" multiple accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left" id="uploadFileBtn">
-                        <label class="btn btn-info float-left mr-1 mb-0" for="fileUploadPrintBtn"><i class="fas fa-file-import"></i> Upload and Print</label>
-                        <input id="fileUploadPrintBtn" accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left" id="uploadFileBtn">
+                        <label class="btn btn-success float-left mr-1 mb-0 bg-colour-1" for="fileUploadBtn"><i class="fas fa-file-import"></i> Upload File(s)</label>
+                        <input id="fileUploadBtn" multiple accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left bg-colour-1" id="uploadFileBtn">
+                        <label class="btn btn-info float-left mr-1 mb-0 bg-colour-2" for="fileUploadPrintBtn"><i class="fas fa-file-import"></i> Upload and Print</label>
+                        <input id="fileUploadPrintBtn" accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left bg-colour-2" id="uploadFileBtn">
                       <button
                         id="createFolderBtn"
                         type="button"
-                        class="btn btn-warning float-left mr-1 mb-0"
+                        class="btn btn-warning float-left mr-1 mb-0 bg-colour-3"
                         data-toggle="collapse"
                         href="#createFolder"
                         role="button"
@@ -532,7 +532,7 @@ export default class PrinterManager {
                       >
                         <i class="fas fa-folder-plus"></i> Create Folder
                       </button>
-                      <button id="fileReSync" type="button" class="btn btn-primary mb-0">
+                      <button id="fileReSync" type="button" class="btn btn-primary mb-0 bg-colour-4">
                         <i class="fas fa-sync"></i> Re-Sync
                       </button>
                       </div>

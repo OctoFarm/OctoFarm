@@ -396,7 +396,7 @@ function drawPrinter (printer, clientSettings) {
             id="camPrinterName-${printer._id}"
             ><button
               type="button"
-              class="btn btn-secondary float-right btn-sm"
+              class="btn btn-secondary float-right btn-sm bg-colour-1"
               data-toggle="modal"
               data-target="#printerManagerModal"
               disabled
@@ -413,7 +413,7 @@ function drawPrinter (printer, clientSettings) {
               title="Open your Printers Web Interface"
               id="printerWeb-${printer._id}"
               type="button"
-              class="tag btn btn-info btn-sm float-right mr-1"
+              class="tag btn btn-info btn-sm float-right mr-1 bg-colour-3"
               target="_blank"
               href="${printer.printerURL}"
               role="button"

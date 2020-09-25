@@ -2,6 +2,21 @@
 
 All notable changes to this project will be documented in this file.
 
+# [UnReleased]
+
+## [v1.1.6]
+
+### Added
+    
+### Changed
+    - Added additional CSS classes to buttons for theming. Applies to actions buttons only, status colours the same. 
+    
+### Fixed
+
+## Removed
+  
+    
+
 # [Released]
 
 ## [v1.1.5.7]

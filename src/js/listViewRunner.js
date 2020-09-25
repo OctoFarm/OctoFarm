@@ -394,7 +394,7 @@ function drawPrinter (printer, clientSettings) {
                 <button title="Control Your Printer"
                         id="printerButton-${printer._id}"
                         type="button"
-                        class="tag btn btn-primary btn-sm"
+                        class="tag btn btn-primary btn-sm bg-colour-1"
                         data-toggle="modal"
                         data-target="#printerManagerModal" disabled
                 >
@@ -403,7 +403,7 @@ function drawPrinter (printer, clientSettings) {
                 <a title="Open your Printers Web Interface"
                         id="printerWeb-${printer._id}"
                    type="button"
-                   class="tag btn btn-info btn-sm"
+                   class="tag btn btn-info btn-sm bg-colour-3"
                    target="_blank" href="${printer.printerURL}"
                    role="button">
                   <i class="fas fa-globe-europe"></i>
