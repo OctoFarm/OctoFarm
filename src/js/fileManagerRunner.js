@@ -19,18 +19,25 @@ class Manager {
         printers = await printers.json();
 
         // Draw first printer list...
-
         const filamentDropDown = await returnDropDown();
         const printerList = document.getElementById("printerList");
-        printers.forEach((printer) => {
-            if (printer.printerState.colour.category !== "Offline") {
-                let extruderList = ``;
-                for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
-                    extruderList += `<div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool${i}-${printer._id}">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool${i}-${printer._id}"></select></div>`;
-                }
-                printerList.insertAdjacentHTML(
-                    "beforeend",
-                    `
+
+        //Get online printers...
+        const onlinePrinterList = [];
+        printers.forEach(printer => {
+            if(printer.printerState.colour.category !== "Offline"){
+                onlinePrinterList.push(printer);
+            }
+        });
+
+        onlinePrinterList.forEach((printer, index) => {
+            let extruderList = ``;
+            for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
+                extruderList += `<div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool${i}-${printer._id}">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool${i}-${printer._id}"></select></div>`;
+            }
+            printerList.insertAdjacentHTML(
+                "beforeend",
+                `
         <a
             data-jplist-item
             id="fileManagerPrinter-${printer._id}"
@@ -102,66 +109,70 @@ class Manager {
           </a>
               
       `
-                );
-                //Setup for first printer
-                const listItem = document.getElementById(
-                    `fileManagerPrinter-${printer._id}`
-                );
+            );
+            //Setup for first printer
+            const listItem = document.getElementById(
+                `fileManagerPrinter-${printer._id}`
+            );
 
-                listItem.addEventListener("click", (e) => {
+            listItem.addEventListener("click", (e) => {
 
-                    if (!e.target.id.includes("tool")) {
-                        Manager.changePrinter(e, printer._id);
-                    }
+                if (!e.target.id.includes("tool")) {
+                    Manager.changePrinter(e, printer._id);
+                }
+            });
+
+            dragAndDropEnable(listItem, printer);
+
+            for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
+                const filamentDrop = document.getElementById(
+                    "tool" + i + "-" + printer._id
+                );
+                filamentDrop.innerHTML = "";
+                filamentDropDown.forEach((filament) => {
+                    filamentDrop.insertAdjacentHTML("beforeend", filament);
                 });
-                lastId = printers[0]._id;
-                dragAndDropEnable(listItem, printer);
+                if (
+                    Array.isArray(printer.selectedFilament) &&
+            printer.selectedFilament.length !== 0
+                ) {
+                    if (
+                        typeof printer.selectedFilament[i] !== "undefined" &&
+              printer.selectedFilament[i] !== null
+                    ) {
+                        filamentDrop.value = printer.selectedFilament[i]._id;
+                    }
+                }
+                filamentDrop.addEventListener("change", async (event) => {
+                    selectFilament(printer._id, event.target.value, i);
+                    setTimeout(async () => {
+                        let updatePrinter = await OctoFarmClient.post(
+                            "printers/printerInfo",
+                            {
+                                i: lastId,
+                            }
+                        );
+                        updatePrinter = await updatePrinter.json();
+                        FileManager.refreshFiles(updatePrinter);
+                    }, 1000);
+                });
+            }
 
+            if(index === 0){
+                lastId = printer._id;
                 const item = document.getElementById(
-                    "fileManagerPrinter-" + printers[0]._id
+                    "fileManagerPrinter-" + printer._id
                 );
                 item.classList.add("bg-dark");
                 item.classList.remove("bg-secondary");
                 const firstElement = document.getElementById("currentPrinter");
                 firstElement.innerHTML =
-          '<i class="fas fa-print"></i> ' + printers[0].printerName;
-                for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
-                    const filamentDrop = document.getElementById(
-                        "tool" + i + "-" + printer._id
-                    );
-                    filamentDrop.innerHTML = "";
-                    filamentDropDown.forEach((filament) => {
-                        filamentDrop.insertAdjacentHTML("beforeend", filament);
-                    });
-                    if (
-                        Array.isArray(printer.selectedFilament) &&
-            printer.selectedFilament.length !== 0
-                    ) {
-                        if (
-                            typeof printer.selectedFilament[i] !== "undefined" &&
-              printer.selectedFilament[i] !== null
-                        ) {
-                            filamentDrop.value = printer.selectedFilament[i]._id;
-                        }
-                    }
-                    filamentDrop.addEventListener("change", async (event) => {
-                        selectFilament(printer._id, event.target.value, i);
-                        setTimeout(async () => {
-                            let updatePrinter = await OctoFarmClient.post(
-                                "printers/printerInfo",
-                                {
-                                    i: lastId,
-                                }
-                            );
-                            updatePrinter = await updatePrinter.json();
-                            FileManager.refreshFiles(updatePrinter);
-                        }, 1000);
-                    });
-                }
+                    '<i class="fas fa-print"></i> ' + printer.printerName;
+                FileSorting.loadSort(printer);
+                Manager.updatePrinterList(printer._id);
             }
+
         });
-        FileSorting.loadSort(printers[0]);
-        Manager.updatePrinterList(printers[0]._id);
     }
 
     static changePrinter(e, target) {
