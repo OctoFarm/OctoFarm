@@ -771,7 +771,6 @@ class Runner {
         const i = _.findIndex(farmPrinters, function (o) {
             return o._id == id;
         });
-        farmPrinters[i].systemChecks.scanning.api.status = 'warning';
         try {
             if (i === -1) {
                 const error = {
@@ -782,6 +781,7 @@ class Runner {
                 };
                 throw error;
             }
+            farmPrinters[i].systemChecks.scanning.api.status = 'warning';
             const ws = new WebSocketClient();
             farmPrinters[i].state = 'Searching...';
             farmPrinters[i].stateColour = Runner.getColour('Searching...');
