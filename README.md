@@ -85,7 +85,7 @@ Currently OctoFarm only support Chrome, Chromium and Firefox. No other browsers 
 ### Prerequisites
 
 - [MongoDB](https://www.mongodb.com/) - v3.6+
-- [NodeJS](https://nodejs.org/) - v12+
+- [NodeJS](https://nodejs.org/) - v12.18.4 (Recomended to use the LTS version)
 - [NPM](https://www.npmjs.com/) - v6+
 - [OctoPrint](https://octoprint.org) - v1.3.9+
 
