@@ -12,7 +12,7 @@ const browserify = require('browserify');
 const babelify = require('babelify');
 const source = require('vinyl-source-stream');
 const buffer = require('vinyl-buffer');
-
+const cache = require('gulp-cached');
 
 const { src, series, parallel, dest, watch } = require('gulp');
 
@@ -41,6 +41,8 @@ const workerJsFiles = [jsDashboardWorker, jsFileManagerWorker, jsMonitoringViews
 const cssFolder = 'src/css';
 const cssOctoFarm = 'src/css/octofarm.css';
 
+const octofarmClient = 'views/assets/';
+
 function octofarmImg() {
     return src('src/images/*').pipe(imagemin()).pipe(gulp.dest('views/images'));
 }
@@ -57,12 +59,13 @@ function octofarmJS(done) {
         }).transform(babelify, {presets:['@babel/env']})
             .bundle()
             .pipe(source(entry))
+            .pipe(cache('clientJS'))
             .pipe(rename({extname: '.min.js'}))
             .pipe(buffer())
             .pipe(sourcemaps.init({loadMaps: true}))
             .pipe(terser())
             .pipe(sourcemaps.write('./'))
-            .pipe(dest('views/assets/js'));
+            .pipe(dest(octofarmClient+'js'));
     });
     done();
 }
@@ -74,12 +77,13 @@ function octofarmWorkersJS(done) {
         }).transform(babelify, {presets:['@babel/env'], plugins: [ ['@babel/plugin-transform-runtime'] ]})
             .bundle()
             .pipe(source(entry))
+            .pipe(cache('clientWorkerJS'))
             .pipe(rename({extname: '.min.js'}))
             .pipe(buffer())
             .pipe(sourcemaps.init({loadMaps: true}))
             .pipe(terser())
             .pipe(sourcemaps.write('./'))
-            .pipe(dest('views/assets/js/workers'));
+            .pipe(dest(octofarmClient+'js/workers'));
     });
     done();
 }
@@ -90,7 +94,7 @@ function octofarmCSS(){
         .pipe(concat('octofarm.css'))
         .pipe(postcss([autoprefixer(), cssnano()]))
         .pipe(sourcemaps.write('./'))
-        .pipe(dest('views/assets/css'));
+        .pipe(dest(octofarmClient+'css'));
 }
 
 function watchTask(){
