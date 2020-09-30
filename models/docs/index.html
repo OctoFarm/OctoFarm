@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+  <link rel="manifest" href="site.webmanifest">
+  <link rel="mask-icon" href="safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=UA-65021261-6"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'UA-65021261-6');
+  </script>
+
+
+  <title>OctoFarm</title>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.11.2/css/all.css">
+  <!-- Bootstrap core CSS -->
+  <link href="css/bootstrap.css" rel="stylesheet">
+  <!-- Material Design Bootstrap -->
+  <link href="css/mdb.css" rel="stylesheet">
+  <!-- Your custom styles (optional) -->
+  <link href="css/style.css" rel="stylesheet">
+  <style type="text/css">
+    html {
+      scroll-behavior: smooth !important;
+    }
+    html,
+    body,
+    header,
+    .carousel {
+      height: 100vh;
+    }
+
+    @media (max-width: 740px) {
+
+      html,
+      body,
+      header,
+      .carousel {
+        height: 100vh;
+      }
+    }
+
+    @media (min-width: 800px) and (max-width: 850px) {
+
+      html,
+      body,
+      header,
+      .carousel {
+        height: 100vh;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+
+<header>
+  <!--Navbar-->
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top navbar-dark">
+
+    <div class="container">
+
+      <a class="navbar-brand" href="https://octofarm.net">
+        <strong>OctoFarm</strong>
+      </a>
+
+      <!-- Collapse button -->
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#basicExampleNav"
+              aria-controls="basicExampleNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <!-- Collapsible content -->
+      <div class="collapse navbar-collapse" id="basicExampleNav">
+        <!-- Links -->
+
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#about">About</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#features">Features</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#comingsoon">Coming Soon!</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#donate">Donate</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#contributors">Sponsors</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#contribute">Merchandise</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/NotExpectedYet/OctoFarm/releases" target="_blank">Download</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://github.com/NotExpectedYet/OctoFarm/wiki" target="_blank">Wiki</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://discord.gg/vjabMUn" target="_blank">Discord</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#merchandise">Merchandise</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://features.octofarm.net" target="_blank">Feature Requests</a>
+          </li>
+        </ul>
+
+      </div>
+      <!-- Collapsible content -->
+
+    </div>
+
+  </nav>
+  <!--/.Navbar-->
+
+
+
+  <div class="view jarallax" data-jarallax='{"speed": 0.2}' style=" background-image: url(img/OctoFarmTest.png); background-repeat: no-repeat; background-size: cover; background-position: center center;">
+    <!-- Mask & flexbox options-->
+    <div class="mask pattern-6 d-flex justify-content-center align-items-center">
+      <!-- Content -->
+      <div class="container">
+        <!--Grid row-->
+        <div class="row">
+          <!--Grid column-->
+          <div class="col-lg-12 white-text text-center pt-5">
+            <h1 class="font-weight-bold zindex-fixed">OctoFarm Version 1.1.5</h1>
+            <h5 class="">Web server and client combo for managing and monitoring multiple Octoprint instances.</h5>
+            <small>Created and maintained by James Mackay from NotExpectedYet</small>
+          </div>
+          <div class="col-lg-6 white-text text-center black-bg">
+            <!-- <center><img class="mt-2 zindex-modal-backdrop" width="100%" src="img/logo/logo.png"></center> -->
+          </div>
+        </div>
+        <!--Grid column-->
+      </div>
+      <!--Grid row-->
+    </div>
+    <!-- Content -->
+  </div>
+  <!-- Mask & flexbox options-->
+  </div>
+
+
+</header>
+<hr  id="about"  class="my-5">
+<!--Main layout-->
+
+
+<div class="container">
+
+  <div class="container my-5  p-5 z-depth-1" style="background-color:#2d3134; background-repeat: no-repeat; background-size: cover; background-position: center center;">
+
+
+    <!--Section: Content-->
+    <section>
+
+      <!-- Section heading -->
+      <h2 class="text-center font-weight-bold mb-4 pb-2">What is OctoFarm?</h2>
+      <!-- Section description -->
+      <p class="text-center lead grey-text mx-auto mb-5">OctoFarm is a web server and client combo for unifying multiple instances of Octoprint. You can manage and monitor as many instances as you want from a single interface giving you full control over your 3D printer farm. </p>
+
+      <!-- Grid row -->
+      <div class="row">
+
+        <!-- Grid column -->
+        <div class="col-md-4 mb-md-0 mb-5">
+
+          <!-- Grid row -->
+          <div class="row">
+
+            <!-- Grid column -->
+            <div class="col-lg-2 col-md-3 col-2">
+              <i class="fas fa-tachometer-alt indigo-text fa-2x"></i>
+            </div>
+            <!-- Grid column -->
+            <i class=""></i>
+            <!-- Grid column -->
+            <div class="col-lg-10 col-md-9 col-10">
+              <h4 class="white-text font-weight-bold">Management</h4>
+              <p class="grey-text">Manage and control every aspect of your octoprint run farm.</p>
+            </div>
+            <!-- Grid column -->
+
+          </div>
+          <!-- Grid row -->
+
+        </div>
+        <!-- Grid column -->
+
+        <!-- Grid column -->
+        <div class="col-md-4 mb-md-0 mb-5">
+
+          <!-- Grid row -->
+          <div class="row">
+
+            <!-- Grid column -->
+            <div class="col-lg-2 col-md-3 col-2">
+              <i class="fas fa-eye indigo-text fa-2x"></i>
+            </div>
+            <!-- Grid column -->
+
+            <!-- Grid column -->
+            <div class="col-lg-10 col-md-9 col-10">
+              <h4 class="white-text font-weight-bold">Monitoring</h4>
+              <p class="grey-text">With a selection of views that enable full farm monitoring.</p>
+            </div>
+            <!-- Grid column -->
+
+          </div>
+          <!-- Grid row -->
+
+        </div>
+        <!-- Grid column -->
+
+        <!-- Grid column -->
+        <div class="col-md-4">
+
+          <!-- Grid row -->
+          <div class="row">
+
+            <!-- Grid column -->
+            <div class="col-lg-2 col-md-3 col-2">
+              <i class="fas fa-history indigo-text fa-2x"></i>
+            </div>
+            <!-- Grid column -->
+
+            <!-- Grid column -->
+            <div class="col-lg-10 col-md-9 col-10">
+              <h4 class="white-text font-weight-bold">History</h4>
+              <p class="grey-text">Keep track of historical successful, failed or cancelled prints.</p>
+            </div>
+            <!-- Grid column -->
+
+          </div>
+          <!-- Grid row -->
+
+        </div>
+        <!-- Grid column -->
+
+      </div>
+      <!-- Grid row -->
+
+    </section>
+    <!--Section: Content-->
+
+
+  </div>
+
+  <hr id="features" class="my-5">
+
+  <div class="container my-5 p-5 z-depth-1" style="background-color:#2d3134; background-repeat: no-repeat; background-size: cover; background-position: center center;">
+
+
+    <!--Section: Content-->
+    <section class="dark-grey-text" >
+
+      <!-- Section heading -->
+      <h2 class="text-center  white-text font-weight-bold mb-4 pb-2">Current Features</h2>
+      <!-- Section description -->
+      <!-- Grid row -->
+      <div class="row">
+
+        <!-- Grid column -->
+        <div class="col-md-4">
+
+          <!-- Grid row -->
+          <div class="row mb-3">
+
+            <!-- Grid column -->
+            <div class="col-2">
+              <i class="fas fa-2x fa-flag-checkered indigo-text"></i>
+            </div>
+            <!-- Grid column -->
+
+            <!-- Grid column -->
+            <div class="col-10">
+              <h5 class="font-weight-bold mb-3 white-text">100% Free and Open Source</h5>
+              <p class="grey-text">All source code is available to check out and you get the entire feature set for free!</p>
+            </div>
+            <!-- Grid column -->
+
+          </div>
+          <!-- Grid row -->
+
+          <!-- Grid row -->
+          <div class="row mb-3">
+
+            <!-- Grid column -->
+            <div class="col-2">
+              <i class="fas fa-2x fa-flask indigo-text"></i>
+            </div>
+            <!-- Grid column -->
+
+            <!-- Grid column -->
+            <div class="col-10">
+              <h5 class="font-weight-bold mb-3 white-text">Dashboard</h5>
+              <p class="grey-text">Get a better insight into your farm and current metrics whilst giving you a quick access to individual printer controls.</p>
+            </div>
+            <!-- Grid column -->
+
+          </div>
+          <!-- Grid row -->
+
+          <!-- Grid row -->
+          <div class="row mb-md-0 mb-3">
+
+            <!-- Grid column -->
+            <div class="col-2">
+              <i class="fas fa-2x fa-glass-martini indigo-text"></i>
+            </div>
+            <!-- Grid column -->
+
+            <!-- Grid column -->
+            <div class="col-10">
+              <h5 class="font-weight-bold mb-3 white-text">Monitoring</h5>
+              <p class="grey-text mb-md-0">Multiple views to monitor your farm. You can manage your printers and keep an eye on everything at once. Now with multi-nozzle and chambers support.</p>
+            </div>
+            <!-- Grid column -->
+
+          </div>
+          <!-- Grid row -->
+
+        </div>
+        <!-- Grid column -->
+
+        <!-- Grid column -->
+        <div class="col-md-4 text-center">
+          <img class="img-fluid" src="img/cf.png"
+               alt="Sample image">
+        </div>
+        <!-- Grid column -->
+
+        <!-- Grid column -->
+        <div class="col-md-4">
+
+          <!-- Grid row -->
+          <div class="row mb-3">
+
+            <!-- Grid column -->
+            <div class="col-2">
+              <i class="far fa-2x fa-heart indigo-text"></i>
+            </div>
+            <!-- Grid column -->
+
+            <!-- Grid column -->
+            <div class="col-10">
+              <h5 class="font-weight-bold mb-3 white-text">File Manager</h5>
+              <p class="grey-text">Quickly switch between multiple printers and manage the files on them.</p>
+            </div>
+            <!-- Grid column -->
+
+          </div>
+          <!-- Grid row -->
+
+          <!-- Grid row -->
+          <div class="row mb-3">
+
+            <!-- Grid column -->
+            <div class="col-2">
+              <i class="fas fa-2x fa-bolt indigo-text"></i>
+            </div>
+            <!-- Grid column -->
+
+            <!-- Grid column -->
+            <div class="col-10">
+              <h5 class="font-weight-bold mb-3 white-text">History</h5>
+              <p class="grey-text">Get a historical look over your farm by keeping notes and tracking success/cancelled/failure rates.</p>
+            </div>
+            <!-- Grid column -->
+
+          </div>
+          <!-- Grid row -->
+
+          <!-- Grid row -->
+          <div class="row">
+
+            <!-- Grid column -->
+            <div class="col-2">
+              <i class="fas fa-2x fa-magic indigo-text"></i>
+            </div>
+            <!-- Grid column -->
+
+            <!-- Grid column -->
+            <div class="col-10">
+              <h5 class="font-weight-bold mb-3 white-text">Filament</h5>
+              <p class="grey-text mb-0">Log your types and colours into the database, set a default colour for a printer and keep a log in history. inc. Filament Manager Plugin support</p>
+            </div>
+            <!-- Grid column -->
+
+          </div>
+          <!-- Grid row -->
+
+        </div>
+        <!-- Grid column -->
+
+      </div>
+      <!-- Grid row -->
+
+    </section>
+    <!--Section: Content-->
+
+
+  </div>
+  <hr id="comingsoon" class="mb-5">
+
+  <!--Section: More-->
+  <section>
+
+
+    <div class="container pt-5 my-5 z-depth-1" style="background-color:#2d3134; background-repeat: no-repeat; background-size: cover; background-position: center center;">
+      <h2 class="my-5 h3 text-center">Coming Soon!</h2>
+      <section class="p-md-3 mx-md-5">
+        <div class="row">
+          <div class="col-lg-4 col-md-6 mb-5">
+            <h4 class="font-weight-bold mb-3">
+              <i class="fas fa-toilet-paper indigo-text pr-2"></i> User controls and permissions
+            </h4>
+            <p class="text-muted">
+              Give your users permissions to only do certain things on your farm.
+            </p>
+          </div>
+          <div class="col-lg-4 col-md-6 mb-5">
+            <h4 class="font-weight-bold mb-3">
+              <i class="fas fa-code-branch indigo-text pr-2"></i> Job/Queue system
+            </h4>
+            <p class="text-muted">
+              Add in and queue up job lists for upcoming projects.
+            </p>
+          </div>
+          <div class="col-lg-4 col-md-6 mb-5">
+            <h4 class="font-weight-bold mb-3">
+              <i class="fas fa-bell indigo-text pr-2"></i> Statistics Page
+            </h4>
+            <p class="text-muted">
+              Pull up your farms statistics by any metric you like with fancy graphs
+            </p>
+          </div>
+          <div class="col-lg-4 col-md-6 mb-5">
+            <h4 class="font-weight-bold mb-3">
+              <i class="fas fa-plug indigo-text pr-2"></i> Online Version
+            </h4>
+            <p class="text-muted mb-lg-0">
+              Full online version with no setup required, just install an OctoPrint plugin, add your printers and go.
+            </p>
+          </div>
+          <div class="col-lg-4 col-md-6 mb-5">
+            <h4 class="font-weight-bold mb-3">
+              <i class="fas fa-temperature-high indigo-text pr-2"></i> Maintenance Logging and Notifications
+            </h4>
+            <p class="text-muted mb-lg-0">
+              Create a log of all maintanance done on individual printers and set notification triggers for them.
+            </p>
+          </div>
+          <div class="col-lg-4 col-md-6 mb-5">
+            <h4 class="font-weight-bold mb-3">
+              <i class="fas fa-temperature-high indigo-text pr-2"></i> Individual printer statistics
+            </h4>
+            <p class="text-muted mb-lg-0">
+              Bring up and investigate any printers statistics
+            </p>
+          </div>
+        </div>
+      </section>
+    </div>
+
+
+    <!--/Second row-->
+    <div id="donate" class="container pt-5 my-5 z-depth-1" style="background-color:#2d3134; background-repeat: no-repeat; background-size: cover; background-position: center center;">
+      <!--Section: Content-->
+      <section class="text-center">
+
+        <!-- Section heading -->
+        <h3 class="font-weight-bold white-text pb-2 mb-4">Donate</h3>
+        <!-- Section description -->
+        <p class="text-muted w-responsive mx-auto mb-5">This project is built by an English bloke in his spare time, around a 9-5 job to boot. If it's in anyway helped you out I'd love it if you'd donate towards the project.</p>
+
+        <!-- Grid row -->
+        <div class="row">
+
+          <!-- Grid column -->
+          <div class="col-lg-4 col-md-4 mb-4">
+
+            <!-- Pricing card -->
+            <div class="card pricing-card white-text">
+
+              <!-- Price -->
+              <div class="indigo rounded-top">
+                <h4 class="option m-2">Paypal</h4>
+              </div>
+
+              <!-- Features -->
+              <div class="card-body striped green-striped card-background px-5">
+
+                <p>Paypal is available as a donation option if you'd like to give something back to the developer James. There are no benefits for you apart from making James very happy, not happy because of the money... but happy because he can spend it on steak!</p>
+                <p>All funding from this source will go towards James himself, he will more than likely be using it to buy steak and fuel his coding exploits that way. It is certainly most appreciated! A massive big thank you to everyone who donates.</p>
+                <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QGBJML3E7268L&source=url"><button class="mb-3 mt-3 btn blue white-text btn-rounded"><i class="fab fa-paypal"></i> Donate!</button></a>
+
+              </div>
+              <!-- Features -->
+
+            </div>
+
+            <!-- Pricing card -->
+
+          </div>
+          <!-- Grid column -->
+
+          <!-- Grid column -->
+          <div class="col-lg-4 col-md-4 mb-4">
+
+            <!-- Pricing card -->
+            <div class="card pricing-card white-text">
+
+              <!-- Price -->
+              <div class="indigo rounded-top">
+                <h4 class="option m-2">Patreon</h4>
+              </div>
+
+              <!-- Features -->
+              <div class="card-body striped orange-striped card-background px-5">
+                <p>My Patreon page is mainly for making a long term set of donations to the project. £10+ you get access to the "secret" discord channel, and also early door previews and code samples.</p>
+                <p>All funding from this source is put back directly into the project. Whether this be forwarding that donation on to Gina at Octoprint (Whom without this project wouldn't exist!) or other projects used in this project, or to pay for web services and printing equipment.</p>
+                <a href="https://www.patreon.com/NotExpectedYet"><button class="mb-3 mt-3 btn red white-text btn-rounded"><i class="fab fa-patreon"></i> Donate!</button></a>
+
+              </div>
+              <!-- Features -->
+
+            </div>
+            <!-- Pricing card -->
+
+          </div>
+
+          <!-- Grid column -->
+          <div class="col-lg-4 col-md-4 mb-4">
+
+            <!-- Pricing card -->
+            <div class="card pricing-card white-text">
+
+              <!-- Price -->
+              <div class="indigo rounded-top">
+                <h4 class="option m-2">Full time sponsor</h4>
+              </div>
+
+              <!-- Features -->
+              <div class="card-body striped green-striped card-background px-5">
+
+                <p>As mentioned above I code this application around my full time job. If any persons or company would like to sponsor me to work on this full time then please contact me using the button below.</p>
+                <p>I have massive plans for the development future of this application and having a full time sponsor would allow me to push updates much more frequently and continue supporting the wonderful OctoPrint and now OctoFarm communities.</p>
+                <a href="mailto:info@notexpectedyet.com"><button class="mb-3 mt-3 btn blue white-text btn-rounded"><i class="fas fa-money-bill"></i> Contact!</button></a>
+
+              </div>
+              <!-- Features -->
+
+            </div>
+
+            <!-- Pricing card -->
+
+          </div>
+          <!-- Grid column -->
+
+        </div>
+      </section>
+
+      <!--Section: More-->
+
+    </div>
+    <!-- Grid column -->
+    <div id="contributors" class="container pt-5 my-5 z-depth-1" style="background-color:#2d3134; background-repeat: no-repeat; background-size: cover; background-position: center center;">
+      <div class="p-md-3 mx-md-5 text-lg-left">
+        <h2 class="text-center font-weight-bold mb-4 pb-1">Sponsors</h2>
+        <p class="text-muted">Big thanks to everyone here and on my other support platforms not listed here. To get your name listed below support me on Patreon on Tier 4+.</p>
+        <div class="row">
+          <div class="col-lg-3 col-sm-4 mb-3">
+            <div class="row d-flex align-items-center">
+              <div
+                      class="col-2 w-100 d-flex justify-content-center align-items-center"
+              >
+                <i style="color:gold;" class="fas fa-trophy"></i>
+              </div>
+              <div class="col-10">
+                <h6 class="font-weight-bold pt-2">Derek</h6>
+                <p class="text-muted">
+                  from<br><a class="" href="https://www.3dprinteddebris.com/"> 3D Printed Debris!</a>
+                </p>
+                <p>I wouldn't have continued this project at the rate did without this man's support and bug reports.</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-3 col-sm-4 mb-3">
+            <div class="row d-flex align-items-center">
+              <div
+                      class="col-2 w-100 d-flex justify-content-center align-items-center"
+              >
+                <i style="color:gold;" class="fas fa-trophy"></i>
+              </div>
+              <div class="col-10">
+                <h6 class="font-weight-bold pt-2">Noxin</h6>
+                <p class="text-muted">
+                  from<br><a class="" href="#"> {Please contact to add}</a>
+                </p>
+                <p>Massively helps around the discord channel with support and keeping me sane.</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-4 mb-3">
+            <div class="row d-flex align-items-center">
+              <div
+                      class="col-2 w-100 d-flex justify-content-center align-items-center"
+              >
+                <i style="color:gold;" class="fas fa-trophy"></i>
+              </div>
+              <div class="col-10">
+                <h6 class="font-weight-bold pt-2">Insertion</h6>
+                <p class="text-muted">
+                  from<br><a class="" href="#"> {Please contact to add}</a>
+                </p>
+                <p>Another big helper from the discord, he is the user who setup the text.octofarm.net instance. </p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-4 mb-3">
+            <div class="row d-flex align-items-center">
+              <div
+                      class="col-2 w-100 d-flex justify-content-center align-items-center"
+              >
+                <i style="color:gold;" class="fas fa-trophy"></i>
+              </div>
+              <div class="col-10">
+                <h6 class="font-weight-bold pt-2">lactose</h6>
+                <p class="text-muted">
+                  from<br><a class="" href="#"> {Please contact to add}</a>
+                </p>
+                <p>Patreon member on a higher tier, big thank you for your support!</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-4 mb-3">
+            <div class="row d-flex align-items-center">
+              <div
+                      class="col-2 w-100 d-flex justify-content-center align-items-center"
+              >
+                <i style="color:gold;" class="fas fa-trophy"></i>
+              </div>
+              <div class="col-10">
+                <h6 class="font-weight-bold pt-2">Calonmerc</h6>
+                <p class="text-muted">
+                  from<br><a class="" href="#"> {Please contact to add}</a>
+                </p>
+                <p>3rd Discord user who has been a massive help to users and myself, he's got a world of experience to pull from!</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-3 col-sm-4 mb-3">
+            <div class="row d-flex align-items-center">
+              <div
+                      class="col-2 w-100 d-flex justify-content-center align-items-center"
+              >
+                <i style="color:gold;" class="fas fa-trophy"></i>
+              </div>
+              <div class="col-10">
+                <h6 class="font-weight-bold pt-2">Paul Helinski</h6>
+                <p class="text-muted">
+                  from<br><a class="" href="#"> {Please contact to add}</a>
+                </p>
+                <p>Patreon member on a higher tier, big thank you for your support!</p>
+              </div>
+            </div>
+          </div>
+        </div>
+  </section>
+</div>
+<div id="merchandise" class="container pt-5 my-5 z-depth-1" style="background-color:#2d3134; background-repeat: no-repeat; background-size: cover; background-position: center center;">
+  <div class="p-md-3 mx-md-5 text-lg-left">
+    <h2 class="text-center font-weight-bold mb-4 pb-1">Merchandise</h2>
+    <p class="text-muted text-center">Give your support to OctoFarm and get some cool apparel at the same time!</p>
+    <div class="row">
+      <div class="col-6">
+        <center>
+          <h3>UK/Europe</h3>
+          <a href="https://shop.spreadshirt.co.uk/octofarm-merchandise/"><img width="100%" src="img/jumper.jpg"></a>
+          <a href="https://shop.spreadshirt.co.uk/octofarm-merchandise/">UK SHOP</a>
+        </center>
+      </div>
+      <div class="col-6">
+        <center>
+          <h3>USA</h3>
+          <a href="https://shop.spreadshirt.com/octofarm-merchandise/"><img width="100%" src="img/jumper.jpg"></a>
+          <a href="https://shop.spreadshirt.com/octofarm-merchandise/">USA SHOP</a>
+        </center>
+      </div>
+    </div>
+    </section>
+  </div>
+</div>
+<!-- Grid row -->
+
+</section>
+<!--Section: Content-->
+</div>
+</main>
+<!--Main layout-->
+
+<!--Footer-->
+<footer class="page-footer text-center font-small mt-4 wow fadeIn" style="background-color:#414045; background-repeat: no-repeat; background-size: cover; background-position: center center;">
+  <hr class="my-4">
+
+  <!-- Social icons -->
+  <div class="pb-4">
+    <a href="https://github.com/NotExpectedYet/OctoFarm" target="_blank">
+      <i class="fab fa-github mr-3 fa-2x"></i>
+    </a>
+    <a href="mailto:info@notexpectedyet.com" target="_blank">
+      <i class="fas fa-envelope mr-3 fa-2x"></i>
+    </a>
+    <a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=QGBJML3E7268L&source=url" target="_blank">
+      <i class="fab fa-paypal mr-3 fa-2x"></i>
+    </a>
+    <a href="https://www.patreon.com/NotExpectedYet" target="_blank">
+      <i class="fab fa-patreon mr-3 fa-2x"></i>
+    </a>
+    <a href="https://www.youtube.com/channel/UClQWO3lxmQRreJVpjTrxELA" target="_blank">
+      <i class="fab fa-youtube mr-3 fa-2x"></i>
+    </a>
+    <a href="https://discord.gg/CkNDRgK" target="_blank">
+      <i class="fab fa-discord fa-2x"></i>
+    </a>
+  </div>
+
+  <!--Copyright-->
+  <div class="footer-copyright py-3" style="background-color:#2d3134; background-repeat: no-repeat; background-size: cover; background-position: center center;">
+    © 2019 Copyright:
+    <a href="https://notexpectedyet.com" target="_blank"> notexpectedyet.com </a>
+  </div>
+  <!--/.Copyright-->
+
+</footer>
+<!--/.Footer-->
+
+<!-- SCRIPTS -->
+<!-- JQuery -->
+<script type="text/javascript" src="js/jquery-3.4.1.min.js"></script>
+<!-- Bootstrap tooltips -->
+<script type="text/javascript" src="js/popper.min.js"></script>
+<!-- Bootstrap core JavaScript -->
+<script type="text/javascript" src="js/bootstrap.min.js"></script>
+<!-- MDB core JavaScript -->
+<script type="text/javascript" src="js/mdb.min.js"></script>
+<!-- Initializations -->
+<script type="text/javascript">
+  // Animations initialization
+  new WOW().init();
+
+</script>
+<script type="text/javascript" src="js/extra.js"></script>
+</body>
+
+</html>
