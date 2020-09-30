@@ -202,9 +202,46 @@
                             <div class="col-12 col-sm-12 col-md-12 col-lg-10 col-xl-10">
                                 <div class="tab-content" id="nav-tabContent">
                                     <div class="tab-pane fade active show" id="printer-connection" role="tabpanel" aria-labelledby="system-panel-view-list">
-                                        <h5>Connection Defaults</h5>
+                                        <p id="offlineMessage"></p>
+                                        <h5>OctoPrint Host</h5>
                                         <hr>
-                                        <p>Set OctoPrints default connection settings. These will be saved to your OctoPrint instance so it will always use these when connecting to your printer.</p>
+                                        <p>Set your OctoPrint Host connection details</p>
+                                        <div id="psPrinterConnection">
+                                            <form>
+                                                <div class="row pb-1">
+                                                    <div class="col">
+                                                        <label for="psOctoPrintUser">OctoPrint User:</label>
+                                                        <input id="psOctoPrintUser" type="text" class="form-control" placeholder="OctoPrint User" disabled>
+                                                        <small class="form-text text-muted">Current OctoPrint User that OctoFarm is using to connect with. (automatic and not editable)</small>
+                                                    </div>
+                                                </div>
+                                                <div class="row pb-1">
+                                                    <div class="col">
+                                                        <label for="psPrinterURL">Printer URL:</label>
+                                                        <input id="psPrinterURL" type="text" class="form-control" placeholder="Printer URL">
+                                                        <small class="form-text text-muted">URL of OctoPrint Host inc. port. Defaults to "http://" if not specified.</small>
+                                                        <small>Example: <code>http://192.168.1.5:81</code></small>
+                                                    </div>
+                                                    <div class="col">
+                                                        <label for="psCamURL">Camera URL:</label>
+                                                        <input id="psCamURL" type="text" class="form-control" placeholder="Camera URL">
+                                                        <small class="form-text text-muted">URL of mjpeg camera stream. Defaults to "http://" if not specified.</small>
+                                                        <small>Example: <code>http://192.168.1.5/webcam/?action=stream</code></small>
+                                                    </div>
+                                                </div>
+                                                <div class="row pb-2">
+                                                    <div class="col">
+                                                        <label for="psAPIKEY">API Key:</label>
+                                                        <input id="psAPIKEY" type="text" class="form-control" placeholder="API Key">
+                                                        <small class="form-text text-muted">OctoPrints API Key. It's recquired to use the User/Application API Key for OctoPrint version 1.4.1+.</small>
+                                                    </div>
+
+                                                </div>
+                                            </form>
+                                        </div>
+                                        <h5>Serial Defaults</h5>
+                                        <hr>
+                                        <p>Set OctoPrints default serial connection settings. These will be saved to your OctoPrint instance so it will always use these when connecting to your printer.</p>
                                         <div id="psConnectionDefaults" class="row">
 
                                             <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4" id="psDefaultPortDrop">

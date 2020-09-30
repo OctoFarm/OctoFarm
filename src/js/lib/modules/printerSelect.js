@@ -31,8 +31,8 @@ const printersTable = `
                                             data-path=".Complete">Complete</option>
                                     <option 
                                              href="#"
-                                            value="diconnected"
-                                            data-path=".Diconnected">Diconnected</option>
+                                            value="disconnected"
+                                            data-path=".Disconnected">Disconnected</option>
                             </select>
                         </div>
     </div>
@@ -52,43 +52,96 @@ const printersTable = `
     <div class="col-md-3">
 
     </div>
-    <div class="col-md-3">
-        <button id="selectAll" type="button" class="btn btn-secondary"><i class="fas fa-check-square"></i> Select All</button>
-        <button id="selectNone" type="button" class="btn btn-secondary"><i class="fas fa-square"></i> Deselect All</button>
+    <div id="selectBtns" class="col-md-3">
+
     </div>
 </div>
 <table class="table table-dark">
   <thead>
     <tr>
-      <th scope="col">Select</th>
+      <th id="selectColumn" scope="col">Select</th>
       <th scope="col">Index</th>
       <th scope="col">Name</th>
-      <th scope="col">State</th>
+      <th scope="col" id="urlColumn" class="d-none">Printer URL</th>
+      <th id="stateColumn" scope="col">State</th>
       <th scope="col">Group</th>
-      <th scope="col">Spool</th>
+      <th id="spoolColumn" scope="col">Spool</th>
+      <th id="cameraColumn" scope="col" class="d-none">Camera URL</th>
+      <th id="apiColumn" scope="col" class="d-none">API KEY</th>
     </tr>
   </thead>
   <tbody id="printerSelectBody" data-jplist-group="printer-list">
 
   </tbody>
 </table>
-
 `;
 
 export default class PrinterSelect{
-    static async create(element){
+    static getSelectableList(printer){
+        return `
+                       <tr id="${printer.id}" class="${printer.state}" data-jplist-item>
+                          <td>
+                                <div class="custom-control custom-checkbox">
+                                  <input type="checkbox" class="custom-control-input Idle" id="checkBox-${printer.id}" value="${printer.id}">
+                                  <label class="custom-control-label" for="checkBox-${printer.id}"></label>
+                                </div>
+                          </td>
+                          <th scope="row">${printer.index}</th>
+                          <td>${printer.name}</td>
+                          <td class="${printer.state}">${printer.state}</td>
+                          <td class="${printer.group.replace(/\s/g, '_')}">${printer.group}</td>
+                          <td>${printer.spool}</td>
+                        </tr>
+                `;
+    }
+    static getEditableList(printer){
+        return `
+                       <tr id="${printer.id}" class="${printer.state}" data-jplist-item>
+                          <th scope="row">${printer.index}</th>
+                          <td><input type="text" class="form-control Idle" placeholder="${printer.name}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input type="text" class="form-control Idle" placeholder="${printer.printerURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td class="${printer.state} d-none">${printer.state}</td>
+                          <td class="${printer.group.replace(/\s/g, '_')}"><input type="text" class="form-control Idle" placeholder="${printer.group}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input type="text" class="form-control Idle" placeholder="${printer.cameraURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input type="text" class="form-control Idle" placeholder="${printer.apikey}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                        </tr>
+                `;
+    }
+    static isOffline(state, editable, override){
+        if(editable){
+            return true;
+        }else if(override){
+            return true;
+        }else{
+            return state !== 'Offline';
+        }
+    }
+    static async create(element, editable, action, callback){
+        if(action){
+            document.getElementById("printerEditLabel").innerHTML = action;
+        }
+        let override = false;
+        console.log(action);
+        if(action === "Printer Deletion"){
+            override = true;
+        }
+
         element.innerHTML = "";
         const printersInfo = await OctoFarmClient.post("printers/printerInfo");
         const printers = await printersInfo.json();
         const groupList = [];
         const printerList = [];
+
         printers.forEach(printer => {
-            if(typeof printer.printerState !== 'undefined' && printer.printerState.colour.category !== 'Offline'){
-                let spoolName = null;
+            if(typeof printer.printerState !== 'undefined' && this.isOffline(printer.printerState.colour.category, editable, override)){
+                let spoolName = "";
                 if(printer.selectedFilament.length !== 0){
-                    spoolName = "";
                     printer.selectedFilament.forEach((spool, index) => {
-                        spoolName += `Tool ${index}: ${spool.spools.name} - ${spool.spools.material} <br>`;
+                        if(spool !== null) {
+                            spoolName += `Tool ${index}: ${spool.spools.name} - ${spool.spools.material} <br>`;
+                        }else{
+                            spoolName += `Tool ${index}: No Spool Selected <br>`;
+                        }
                     });
                 }else{
                     spoolName = "No Spool Selected";
@@ -97,9 +150,12 @@ export default class PrinterSelect{
                     id: printer._id,
                     index: printer.sortIndex,
                     name: printer.printerName,
+                    printerURL: printer.printerURL,
                     state: printer.printerState.colour.category,
                     group: printer.group,
-                    spool: spoolName
+                    spool: spoolName,
+                    cameraURL: printer.cameraURL,
+                    apikey: printer.apikey
                 };
                 printerList.push(forList);
             }
@@ -113,28 +169,28 @@ export default class PrinterSelect{
         });
 
 
-        const groupListUnique = _.uniq(groupList, 'display');
+        const groupListUnique = _.uniq(groupList, 'tag');
         if(printerList.length !== 0){
             //Create printers table
             element.innerHTML = printersTable;
             const tableBody = document.getElementById("printerSelectBody");
-            printerList.forEach(printer => {
-                tableBody.insertAdjacentHTML('beforeend', `
-                       <tr id="${printer.id}" class="${printer.state}" data-jplist-item>
-                          <td>
-                                <div class="custom-control custom-checkbox">
-                                  <input type="checkbox" class="custom-control-input" id="checkBox-${printer.id}" value="${printer.id}">
-                                  <label class="custom-control-label" for="checkBox-${printer.id}"></label>
-                                </div>
-                          </td>
-                          <th scope="row">${printer.index}</th>
-                          <td>${printer.name}</td>
-                          <td class="${printer.state}">${printer.state}</td>
-                          <td class="${printer.group.replace(/\s/g, '_')}">${printer.group}</td>
-                          <td>${printer.spool}</td>
-                        </tr>
-                `);
-            });
+            if(editable){
+                document.getElementById("spoolColumn").classList.add("d-none");
+                document.getElementById("stateColumn").classList.add("d-none");
+                document.getElementById("cameraColumn").classList.remove("d-none");
+                document.getElementById("apiColumn").classList.remove("d-none");
+                document.getElementById("selectColumn").classList.add("d-none");
+                document.getElementById("urlColumn").classList.remove("d-none");
+
+                printerList.forEach(printer => {
+                    tableBody.insertAdjacentHTML('beforeend', this.getEditableList(printer));
+                });
+            }else{
+                printerList.forEach(printer => {
+                    tableBody.insertAdjacentHTML('beforeend', this.getSelectableList(printer));
+                });
+            }
+
             const printerGroupList = document.getElementById("printerGroupList");
             printerGroupList.innerHTML = "";
             printerGroupList.insertAdjacentHTML('beforeend', `
@@ -154,22 +210,31 @@ export default class PrinterSelect{
             const tableBody = document.getElementById("printerSelectBody");
             tableBody.insertAdjacentHTML('beforeend', `<tr><td>No Online Printers</td></tr>`);
         }
-        //get a jPList control element
-        PrinterSelect.addListeners();
+        PrinterSelect.addListeners(editable, callback);
     }
-    static addListeners(){
-        document.getElementById("selectAll").addEventListener('click', e => {
-            const checkBoxes = document.querySelectorAll('input[type="checkbox"]:not(:checked)');
-            checkBoxes.forEach(box => {
-                box.checked = true;
+    static addListeners(editable, callback){
+        if(!editable){
+            document.getElementById("selectBtns").innerHTML = `
+                    <button id="selectAll" type="button" class="btn btn-secondary"><i class="fas fa-check-square"></i> Select All</button>
+                    <button id="selectNone" type="button" class="btn btn-secondary"><i class="fas fa-square"></i> Deselect All</button>
+            `;
+            document.getElementById("selectAll").addEventListener('click', e => {
+                const checkBoxes = document.querySelectorAll('input[type="checkbox"]:not(:checked)');
+                checkBoxes.forEach(box => {
+                    box.checked = true;
+                });
             });
-        });
-        document.getElementById("selectNone").addEventListener('click', e => {
-            const checkBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
-            checkBoxes.forEach(box => {
-                box.checked = false;
+            document.getElementById("selectNone").addEventListener('click', e => {
+                const checkBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
+                checkBoxes.forEach(box => {
+                    box.checked = false;
+                });
             });
-        });
+
+        }
+        if(callback){
+            document.getElementById("saveEditsBtn").addEventListener("click", callback);
+        }
         jplist.init();
     }
     static getSelected(){
