@@ -6,6 +6,7 @@ labels: bug
 assignees: NotExpectedYet
 
 ---
+### To better help the developer understand your issue, please fill in the information below. Failing to do so will waste the developer and your own time in sorting the issue. Thanks!
 
 **Describe the bug**
 A clear and concise description of what the bug is.
