@@ -44,7 +44,11 @@ if(interval === false){
         const printersInformation = await PrinterClean.returnPrintersInformation();
 
         const printerControlList = await PrinterClean.returnPrinterControlList();
-        const clientSettings = await SettingsClean.returnClientSettings();
+        let clientSettings = await SettingsClean.returnClientSettings();
+        if(typeof clientSettings === "undefined"){
+            await SettingsClean.start();
+            clientSettings = await SettingsClean.returnClientSettings();
+        }
         const infoDrop = {
             printersInformation: printersInformation,
             currentOperations: currentOperations,
