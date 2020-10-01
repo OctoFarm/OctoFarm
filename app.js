@@ -74,9 +74,11 @@ const setupServerSettings = async () => {
 const serverStart = async () => {
     try {
         await logger.info("MongoDB Connected...");
-        console.log("WTF");
-        // Find server Settings
+
         // Initialise farm information
+        const farmInformation = await PrinterClean.initFarmInformation();
+        await logger.info(farmInformation);
+        // Find server Settings
         const settings = await ServerSettingsDB.find({});
         const clientSettings = require("./settings/clientSettings.js");
         const { ClientSettings } = clientSettings;
@@ -86,8 +88,7 @@ const serverStart = async () => {
         const runner = require("./runners/state.js");
         const { Runner } = runner;
         const rn = await Runner.init();
-        const farmInformation = await PrinterClean.initFarmInformation();
-        await logger.info(farmInformation);
+
         await logger.info("Printer Runner has been initialised...", rn);
         const PORT = process.env.PORT || settings[0].server.port;
         await logger.info("Starting System Information Runner...");
