@@ -4,12 +4,12 @@ const mongoose = require("mongoose");
 const flash = require("connect-flash");
 const session = require("express-session");
 const passport = require("passport");
-const ServerSettingsDB = require("./models/ServerSettings");
-const Logger = require("./lib/logger.js");
+const ServerSettingsDB = require("./server_src/models/ServerSettings");
+const Logger = require("./server_src/lib/logger.js");
 const cookieParser = require("cookie-parser");
 
 const logger = new Logger("OctoFarm-Server");
-const printerClean = require("./lib/dataFunctions/printerClean.js");
+const printerClean = require("./server_src/lib/dataFunctions/printerClean.js");
 
 const { PrinterClean } = printerClean;
 
@@ -17,7 +17,7 @@ const { PrinterClean } = printerClean;
 const app = express();
 
 // Passport Config
-require("./config/passport.js")(passport);
+require("./server_src/config/passport.js")(passport);
 
 // DB Config
 const db = require("./config/db.js").MongoURI;
@@ -62,7 +62,7 @@ app.use((req, res, next) => {
 });
 
 const setupServerSettings = async () => {
-  const serverSettings = require("./settings/serverSettings.js");
+  const serverSettings = require("./server_src/settings/serverSettings.js");
   const { ServerSettings } = serverSettings;
   await logger.info("Checking Server Settings...");
   const ss = await ServerSettings.init();
@@ -79,19 +79,19 @@ const serverStart = async () => {
     await logger.info(farmInformation);
     // Find server Settings
     const settings = await ServerSettingsDB.find({});
-    const clientSettings = require("./settings/clientSettings.js");
+    const clientSettings = require("./server_src/settings/clientSettings.js");
     const { ClientSettings } = clientSettings;
     await logger.info("Checking Client Settings...");
     const cs = await ClientSettings.init();
     await logger.info(cs);
-    const runner = require("./runners/state.js");
+    const runner = require("./server_src/runners/state.js");
     const { Runner } = runner;
     const rn = await Runner.init();
 
     await logger.info("Printer Runner has been initialised...", rn);
     const PORT = process.env.PORT || settings[0].server.port;
     await logger.info("Starting System Information Runner...");
-    const system = require("./runners/systemInfo.js");
+    const system = require("./server_src/runners/systemInfo.js");
     const { SystemRunner } = system;
     const sr = await SystemRunner.init();
     await logger.info(sr);
@@ -109,35 +109,53 @@ const serverStart = async () => {
   app.use(express.static(`${__dirname}/views`));
   app.use(`/images`, express.static(`${__dirname}/images`));
   if (db === "") {
-    app.use("/", require("./routes/index", { page: "route" }));
+    app.use("/", require("./server_src/routes/index", { page: "route" }));
   } else {
     try {
-      app.use("/", require("./routes/index", { page: "route" }));
+      app.use("/", require("./server_src/routes/index", { page: "route" }));
       app.use(
         "/serverChecks",
-        require("./routes/serverChecks", { page: "route" })
+        require("./server_src/routes/serverChecks", { page: "route" })
       );
-      app.use("/users", require("./routes/users", { page: "route" }));
-      app.use("/printers", require("./routes/printers", { page: "route" }));
-      app.use("/settings", require("./routes/settings", { page: "route" }));
+      app.use(
+        "/users",
+        require("./server_src/routes/users", { page: "route" })
+      );
+      app.use(
+        "/printers",
+        require("./server_src/routes/printers", { page: "route" })
+      );
+      app.use(
+        "/settings",
+        require("./server_src/routes/settings", { page: "route" })
+      );
       app.use(
         "/printersInfo",
-        require("./routes/SSE-printersInfo", { page: "route" })
+        require("./server_src/routes/SSE-printersInfo", { page: "route" })
       );
       app.use(
         "/dashboardInfo",
-        require("./routes/SSE-dashboard", { page: "route" })
+        require("./server_src/routes/SSE-dashboard", { page: "route" })
       );
       app.use(
         "/monitoringInfo",
-        require("./routes/SSE-monitoring", { page: "route" })
+        require("./server_src/routes/SSE-monitoring", { page: "route" })
       );
-      app.use("/filament", require("./routes/filament", { page: "route" }));
-      app.use("/history", require("./routes/history", { page: "route" }));
-      app.use("/scripts", require("./routes/scripts", { page: "route" }));
+      app.use(
+        "/filament",
+        require("./server_src/routes/filament", { page: "route" })
+      );
+      app.use(
+        "/history",
+        require("./server_src/routes/history", { page: "route" })
+      );
+      app.use(
+        "/scripts",
+        require("./server_src/routes/scripts", { page: "route" })
+      );
       app.use(
         "/input",
-        require("./routes/externalDataCollection", { page: "route" })
+        require("./server_src/routes/externalDataCollection", { page: "route" })
       );
     } catch (e) {
       await logger.error(e);

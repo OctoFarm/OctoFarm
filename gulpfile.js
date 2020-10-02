@@ -27,7 +27,7 @@ const jsPrinterManagement = "printerManagementRunner.js";
 const jsSettings = "serverAliveCheck.js";
 const jsServerAliveCheck = "settings.js";
 const jsHistory = "historyRunner.js";
-const jsClientFolder = "src/js/";
+const jsClientFolder = "client_src/js/";
 const jsClientFiles = [
   jsCameraView,
   jsCurrentOperationsView,
@@ -61,7 +61,7 @@ const jsDashboardWorker = "dashboardWorker.js";
 const jsFileManagerWorker = "fileManagerWorker.js";
 const jsMonitoringViewsWorker = "monitoringViewsWorker.js";
 const jsPrinterManagerWorker = "printersManagerWorker.js";
-const workerJsFolder = "src/js/lib/workers/";
+const workerJsFolder = "client_src/js/lib/workers/";
 const workerJsFiles = [
   jsDashboardWorker,
   jsFileManagerWorker,
@@ -69,22 +69,24 @@ const workerJsFiles = [
   jsPrinterManagerWorker,
 ];
 
-const cssFolder = "src/css";
-const cssOctoFarm = "src/css/octofarm.css";
+const cssFolder = "client_src/css";
+const cssOctoFarm = "client_src/css/octofarm.css";
 
 const octofarmClient = "views/assets/";
 
 function octofarmImg() {
-  return src("src/images/*").pipe(imagemin()).pipe(gulp.dest("views/images"));
+  return src("client_src/images/*")
+    .pipe(imagemin())
+    .pipe(gulp.dest("views/images"));
 }
 function vendorJS() {
-  return src("src/js/vendor/*")
+  return src("client_src/js/vendor/*")
     .pipe(sourcemaps.init({ loadMaps: true }))
     .pipe(sourcemaps.write("./"))
     .pipe(gulp.dest("views/assets/js/vendor"));
 }
 function vendorCSS() {
-  return src("src/css/vendor/*")
+  return src("client_src/css/vendor/*")
     .pipe(sourcemaps.init({ loadMaps: true }))
     .pipe(postcss([autoprefixer(), cssnano()]))
     .pipe(sourcemaps.write("./"))
@@ -100,6 +102,7 @@ function octofarmJS(done) {
           [
             "@babel/preset-env",
             {
+              corejs: 2,
               useBuiltIns: "entry",
             },
           ],
@@ -128,6 +131,7 @@ function octofarmWorkersJS(done) {
           [
             "@babel/preset-env",
             {
+              corejs: 2,
               useBuiltIns: "entry",
             },
           ],

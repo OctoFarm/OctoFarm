@@ -18,8 +18,8 @@ All notable changes to this project will be documented in this file.
     - Removed Printer URL/Camera URL/API Key from displaying on Printer Manager and moved onto "Printer Settings" modal. 
     - Allowed Printer Settings Modal to be opened whilst offline. Disables any settings relevant/requiring OctoPrint connection.
     - Export printer json now in human readable format
-    - Do not attempt to reconnect when
     - History now captures printer ID. Any matches going forward will attempt the ID match and then fallback to name as before.
+    - Printer scanning client display greatly improved. Now displays updated host state whilst stuff is going on in the background on the server.
     
 ### Fixed
     - Fixed issue with File Manager not loading if printer in index 0 was offline.

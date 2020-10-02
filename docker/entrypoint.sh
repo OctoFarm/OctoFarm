@@ -1,6 +1,6 @@
 #!/bin/sh
 
-if [ -d "node_modules" ] 
+if [ -d "node_modules" ]
 then
     echo "Node modules exist, skipping install"
 else
@@ -33,4 +33,4 @@ fi
 
 cd /app/
 
-pm2 start app.js --name OctoFarm --no-daemon -o './logs/pm2.log' -e './logs/pm2.error.log' --time
+pm2 start build/app.js --name OctoFarm --no-daemon -o './logs/pm2.log' -e './logs/pm2.error.log' --time

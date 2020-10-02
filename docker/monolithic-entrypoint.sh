@@ -19,4 +19,4 @@ fi
 
 cd /app/
 
-pm2 start app.js --name OctoFarm --no-daemon -o './logs/pm2.log' -e './logs/pm2.error.log' --time
+pm2 start build/app.js --name OctoFarm --no-daemon -o './logs/pm2.log' -e './logs/pm2.error.log' --time
