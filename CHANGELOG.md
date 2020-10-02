@@ -7,15 +7,28 @@ All notable changes to this project will be documented in this file.
 ## [v1.1.6]
 
 ### Added
+    - Added new Printer Manager section called Bulk Controls. This allows for Connect/Disconnect/Delete/Power commands to be sent to your farm.
+    - Q.O.L improvement with modal describing required OctoPrint steps to add a printer. Assumes you already know what your doing if you have printers in your farm...
+    - API issues now show a big red badge under Printer State in Printer Management. This will only show if you Host is online to avoid in correctly alerting you if OctoPrint is shutdown. You can investigate these on the printer settings modal.
+    - Current OctoPrint user is now displayed in "Printer Settings"
     
 ### Changed
     - Added additional CSS classes to buttons for theming. Applies to actions buttons only, status colours the same. 
+    - Removed Printer URL/Camera URL/API Key from displaying on Printer Manager and moved onto "Printer Settings" modal. 
+    - Allowed Printer Settings Modal to be opened whilst offline. Disables any settings relevant/requiring OctoPrint connection.
+    - Export printer json now in human readable format
     
 ### Fixed
+    - Fixed issue with File Manager not loading if printer in index 0 was offline.
+    - Fixed issue with editing printers throwing error trying to update old printer status.
+    - Correctly named "Remember Me" setting
+    - Stopped OctoFarm creating and displaying duplicate terminal information.
+    - Issue with server requiring a restart to pull in setting information.
+    - Docker error when booting regarding cd directory not existing. 
 
 ## Removed
-  
-    
+    - Removed the annoying content editable fields on "Printer Settings" and "Printer Management" and replaced with standard input boxes. 
+    - Removed support for the old import scheme. Now requires to be in human readable format. Please create a new export if you used the older one previously.
 
 # [Released]
 

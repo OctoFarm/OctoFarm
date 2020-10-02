@@ -28,6 +28,9 @@ $('#connectionModal').on('hidden.bs.modal', function (e) {
 export default class PrinterSettings {
     static async init (index, printers, printerControlList) {
         if (index !== '') {
+            const printerProfileBtn = document.getElementById("printer-profile-btn");
+            const printerGcodeBtn = document.getElementById("printer-gcode-btn");
+            const printerOtherSettings = document.getElementById("printer-settings-btn");
             currentIndex = index;
             const id = _.findIndex(printers, function (o) {
                 return o._id == index;
@@ -40,7 +43,6 @@ export default class PrinterSettings {
                 printerDrop.innerHTML = "";
                 printerControlList.forEach((list) => {
                     if (list.state.category !== "Offline") {
-                        console.log(list);
                         printerDrop.insertAdjacentHTML(
                             "beforeend",
                             `
@@ -68,6 +70,37 @@ export default class PrinterSettings {
                 });
                 controlDropDown = true;
             }
+
+            let offline = false;
+            if(currentPrinter.printerState.colour.category === "Offline"){
+                offline = true;
+                printerProfileBtn.disabled = true;
+                printerGcodeBtn.disabled = true;
+                printerOtherSettings.disabled = true;
+                if(!printerProfileBtn.classList.contains("notyet")){
+                    printerProfileBtn.classList.add("notyet");
+                }
+                if(!printerGcodeBtn.classList.contains("notyet")){
+                    printerGcodeBtn.classList.add("notyet");
+                }
+                if(!printerOtherSettings.classList.contains("notyet")){
+                    printerOtherSettings.classList.add("notyet");
+                }
+            }else{
+                printerProfileBtn.disabled = false;
+                printerGcodeBtn.disabled = false;
+                printerOtherSettings.disabled = false;
+                if(printerProfileBtn.classList.contains("notyet")){
+                    printerProfileBtn.classList.remove("notyet");
+                }
+                if(printerGcodeBtn.classList.contains("notyet")){
+                    printerGcodeBtn.classList.remove("notyet");
+                }
+                if(printerOtherSettings.classList.contains("notyet")){
+                    printerOtherSettings.classList.remove("notyet");
+                }
+            }
+
             const printerDefaultPort = document.getElementById('psDefaultPortDrop');
             const printerDefaultBaud = document.getElementById('psDefaultBaudDrop');
             const printerDefaultProfile = document.getElementById(
@@ -83,212 +116,300 @@ export default class PrinterSettings {
             printerDefaultProfile.innerHTML = `
         <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultProfile">Preferred Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultProfile"></select></div>
         `;
-            currentPrinter.connectionOptions.baudrates.forEach((baud) => {
-                document
-                    .getElementById('psDefaultBaudrate')
-                    .insertAdjacentHTML(
-                        'beforeend',
-                        `<option value="${baud}">${baud}</option>`
-                    );
-            });
-            if (currentPrinter.connectionOptions.baudratePreference === null) {
-                document
-                    .getElementById('psDefaultBaudrate')
-                    .insertAdjacentHTML(
-                        'afterbegin',
-                        '<option value="0">No Preference</option>'
-                    );
-            }
-            currentPrinter.connectionOptions.ports.forEach((port) => {
-                document
-                    .getElementById('psDefaultSerialPort')
-                    .insertAdjacentHTML(
-                        'beforeend',
-                        `<option value="${port}">${port}</option>`
-                    );
-            });
-            if (currentPrinter.connectionOptions.portPreference === null) {
-                document
-                    .getElementById('psDefaultSerialPort')
-                    .insertAdjacentHTML(
-                        'afterbegin',
-                        '<option value="0">No Preference</option>'
-                    );
-            }
-            currentPrinter.connectionOptions.printerProfiles.forEach((profile) => {
-                document
-                    .getElementById('psDefaultProfile')
-                    .insertAdjacentHTML(
-                        'beforeend',
-                        `<option value="${profile.id}">${profile.name}</option>`
-                    );
-            });
-            if (currentPrinter.connectionOptions.printerProfilePreference === null) {
-                document
-                    .getElementById('psDefaultProfile')
-                    .insertAdjacentHTML(
-                        'afterbegin',
-                        '<option value="0">No Preference</option>'
-                    );
-            }
-            if (currentPrinter.connectionOptions.baudratePreference != null) {
-                document.getElementById('psDefaultBaudrate').value =
+            document.getElementById("psOctoPrintUser").placeholder = currentPrinter.currentUser;
+            document.getElementById("psPrinterURL").placeholder = currentPrinter.printerURL;
+            document.getElementById("psCamURL").placeholder = currentPrinter.cameraURL;
+            document.getElementById("psAPIKEY").placeholder = currentPrinter.apikey;
+            
+            
+            if(!offline){
+                currentPrinter.connectionOptions.baudrates.forEach((baud) => {
+                    document
+                        .getElementById('psDefaultBaudrate')
+                        .insertAdjacentHTML(
+                            'beforeend',
+                            `<option value="${baud}">${baud}</option>`
+                        );
+                });
+                if (currentPrinter.connectionOptions.baudratePreference === null) {
+                    document
+                        .getElementById('psDefaultBaudrate')
+                        .insertAdjacentHTML(
+                            'afterbegin',
+                            '<option value="0">No Preference</option>'
+                        );
+                }
+                currentPrinter.connectionOptions.ports.forEach((port) => {
+                    document
+                        .getElementById('psDefaultSerialPort')
+                        .insertAdjacentHTML(
+                            'beforeend',
+                            `<option value="${port}">${port}</option>`
+                        );
+                });
+                if (currentPrinter.connectionOptions.portPreference === null) {
+                    document
+                        .getElementById('psDefaultSerialPort')
+                        .insertAdjacentHTML(
+                            'afterbegin',
+                            '<option value="0">No Preference</option>'
+                        );
+                }
+                currentPrinter.connectionOptions.printerProfiles.forEach((profile) => {
+                    document
+                        .getElementById('psDefaultProfile')
+                        .insertAdjacentHTML(
+                            'beforeend',
+                            `<option value="${profile.id}">${profile.name}</option>`
+                        );
+                });
+                if (currentPrinter.connectionOptions.printerProfilePreference === null) {
+                    document
+                        .getElementById('psDefaultProfile')
+                        .insertAdjacentHTML(
+                            'afterbegin',
+                            '<option value="0">No Preference</option>'
+                        );
+                }
+                if (currentPrinter.connectionOptions.baudratePreference != null) {
+                    document.getElementById('psDefaultBaudrate').value =
           currentPrinter.connectionOptions.baudratePreference;
-            } else {
-                document.getElementById('psDefaultBaudrate').value = 0;
-            }
-            if (currentPrinter.connectionOptions.portPreference != null) {
-                document.getElementById('psDefaultSerialPort').value =
+                } else {
+                    document.getElementById('psDefaultBaudrate').value = 0;
+                }
+                if (currentPrinter.connectionOptions.portPreference != null) {
+                    document.getElementById('psDefaultSerialPort').value =
           currentPrinter.connectionOptions.portPreference;
-            } else {
-                document.getElementById('psDefaultSerialPort').value = 0;
-            }
-            if (currentPrinter.connectionOptions.printerProfilePreference != null) {
-                document.getElementById('psDefaultProfile').value =
+                } else {
+                    document.getElementById('psDefaultSerialPort').value = 0;
+                }
+                if (currentPrinter.connectionOptions.printerProfilePreference != null) {
+                    document.getElementById('psDefaultProfile').value =
           currentPrinter.connectionOptions.printerProfilePreference;
-            } else {
-                document.getElementById('psDefaultProfile').value = 0;
-            }
+                } else {
+                    document.getElementById('psDefaultProfile').value = 0;
+                }
 
-            document.getElementById('psPrinterProfiles').innerHTML = `
-            <div class="col-12">
-                <button id="editProfileBtn" type="button" class="btn btn-warning">Edit</button></div>
+
+                document.getElementById('psPrinterProfiles').innerHTML = `
             <div class="col-12 col-lg-4">
-            <h6 class="mb-1"><u>Printer</u></h6>
-            <p class="mb-0"><b>Printer Name: </b><span id="printerName" contenteditable="false">${currentPrinter.printerName}</span></p>
-            <p class="mb-0"><b>Printer Model: </b><span id="printerModel" contenteditable="false">${currentPrinter.model}</span></p>
-            <h6 class="mb-1"><u>Axis</u></h6>
-            <p class="mb-0"><b>E: </b><span id="printerEAxis" contenteditable="false">${currentPrinter.currentProfile.axes.e.speed}</span>mm/min<br><form class="was-validated">
-                                                    <div class="custom-control custom-checkbox mb-3">
-                                                        <input type="checkbox" class="custom-control-input" id="eInverted" required>
-                                                        <label class="custom-control-label" for="eInverted">Inverted</label>
-                                                    </div>
-                                                </form></p>
-            <p class="mb-0"><b>X: </b><span id="printerXAxis" contenteditable="false">${currentPrinter.currentProfile.axes.x.speed}</span>mm/min<br><form class="was-validated">
-                                                    <div class="custom-control custom-checkbox mb-3">
-                                                        <input type="checkbox" class="custom-control-input" id="xInverted" required>
-                                                        <label class="custom-control-label" for="xInverted">Inverted</label>
-                                                    </div>
-                                                </form></p>
-            <p class="mb-0"><b>Y: </b><span id="printerYAxis" contenteditable="false">${currentPrinter.currentProfile.axes.y.speed}</span>mm/min<br><form class="was-validated">
-                                                    <div class="custom-control custom-checkbox mb-3">
-                                                        <input type="checkbox" class="custom-control-input" id="yInverted" required>
-                                                        <label class="custom-control-label" for="yInverted">Inverted</label>
-                                                    </div>
-                                                </form></p>
-            <p class="mb-0"><b>Z: </b><span id="printerZAxis" contenteditable="false">${currentPrinter.currentProfile.axes.z.speed}</span>mm/min<br><form class="was-validated">
-                                                    <div class="custom-control custom-checkbox mb-3">
-                                                        <input type="checkbox" class="custom-control-input" id="zInverted" required>
-                                                        <label class="custom-control-label" for="zInverted">Inverted</label>
-                                                    </div>
-                                                </form></p>
+            <h5 class="mb-1"><u>Printer</u></h5>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Printer Name: </span>
+              </div>
+              <input id="printerName" type="text" class="form-control" placeholder="${currentPrinter.printerName}" aria-label="Username" aria-describedby="basic-addon1">
+            </div>
+            </p>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text">Printer Model: </span>
+                  </div>
+                  <input id="printerModel" type="text" class="form-control" placeholder="${currentPrinter.currentProfile.model}" aria-label="Username" aria-describedby="basic-addon1">
+                </div>
+            </p>
+            <h5 class="mb-1"><u>Axis</u></h5>
+            <form class="was-validated">
+                <div class="custom-control custom-checkbox mb-3">
+                    <input type="checkbox" class="custom-control-input" id="eInverted" required>
+                    <label class="custom-control-label" for="eInverted">E Inverted</label>
+                </div>
+            </form>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">E:</span>
+              </div>
+              <input id="printerEAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.e.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
+              <div class="input-group-append">
+                <span class="input-group-text">mm/min</span>
+              </div>
+            </div>
+            <form class="was-validated">
+                <div class="custom-control custom-checkbox mb-3">
+                    <input type="checkbox" class="custom-control-input" id="xInverted" required>
+                    <label class="custom-control-label" for="xInverted">X Inverted</label>
+                </div>
+            </form>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">X:</span>
+              </div>
+              <input id="printerXAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.x.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
+              <div class="input-group-append">
+                <span class="input-group-text">mm/min</span>
+              </div>
+            </div>
+            <form class="was-validated">
+                <div class="custom-control custom-checkbox mb-3">
+                    <input type="checkbox" class="custom-control-input" id="yInverted" required>
+                    <label class="custom-control-label" for="yInverted">Y Inverted</label>
+                </div>
+            </form>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Y:</span>
+              </div>
+              <input id="printerYAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.y.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
+              <div class="input-group-append">
+                <span class="input-group-text">mm/min</span>
+              </div>
+            </div>
+            <form class="was-validated">
+                <div class="custom-control custom-checkbox mb-3">
+                    <input type="checkbox" class="custom-control-input" id="zInverted" required>
+                    <label class="custom-control-label" for="zInverted">Z Inverted</label>
+                </div>
+            </form>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Z:</span>
+              </div>
+              <input id="printerZAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.z.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
+              <div class="input-group-append">
+                <span class="input-group-text">mm/min</span>
+              </div>
+            </div>
             </div>
             <div class="col-12 col-lg-4">
-            <h6 class="mb-1"><u>Extrusion</u></h6>
-            <p class="mb-0"><b>Extruder Count: </b><span id="extruderCount" contenteditable="false">${currentPrinter.currentProfile.extruder.count}</span></p>
-            <p class="mb-0"><b>Nozzle Size: </b><span id="nozzleDiameter" contenteditable="false">${currentPrinter.currentProfile.extruder.nozzleDiameter}</span></p>
-          
+            <h5 class="mb-1"><u>Extrusion</u></h5>
             <p class="mb-0"><span><form class="was-validated">
-                                                    <div class="custom-control custom-checkbox mb-3">
-                                                        <input type="checkbox" class="custom-control-input" id="sharedNozzle" required>
-                                                        <label class="custom-control-label" for="sharedNozzle">Shared Nozzle</label>
-                                                    </div>
-                                                </form></span></p>
+                                        <div class="custom-control custom-checkbox mb-3">
+                                            <input type="checkbox" class="custom-control-input" id="sharedNozzle" required>
+                                            <label class="custom-control-label" for="sharedNozzle">Shared Nozzle</label>
+                                        </div>
+                                    </form></span></p>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Extruder Count:</span>
+              </div>
+              <input id="extruderCount" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.extruder.count}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
+            </div>
+             <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">Nozzle Size:</span>
+              </div>
+              <input id="nozzleDiameter" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.extruder.nozzleDiameter}" aria-label="Username" aria-describedby="basic-addon1" step="0.1" min="0.1">
+            </div>
             </div>
             <div class="col-12 col-lg-4">
-            <h6 class="mb-1"><u>Bed / Chamber</u></h6>
-             <p class="mb-1"><b>Form Factor: </b><span id="extruderFormFactor" contenteditable="false">${currentPrinter.currentProfile.volume.formFactor}</span></p>                   
-            <p class="mb-1"><b>Dimensions:</b>D: <span id="volumeDepth" contenteditable="false">${currentPrinter.currentProfile.volume.depth}</span>mm x H: <span id="volumeHeight" contenteditable="false">${currentPrinter.currentProfile.volume.height}</span>mm x W: <span id="volumeWidth" contenteditable="false">${currentPrinter.currentProfile.volume.width}</span>mm</p> 
-               <p class="mb-1"><form class="was-validated">
-                                                    <div class="custom-control custom-checkbox mb-3">
-                                                        <input type="checkbox" class="custom-control-input" id="heatedBed" required>
-                                                        <label class="custom-control-label" for="heatedBed">Heated Bed</label>
-                                                    </div>
-                                                </form></span></p>                  
-            <p class="mb-1"><form class="was-validated">
-                                                    <div class="custom-control custom-checkbox mb-3">
-                                                        <input type="checkbox" class="custom-control-input" id="heatedChamber" required>
-                                                        <label class="custom-control-label" for="heatedChamber">Heated Chamber</label>
-                                                    </div>
-                                                </form></span></p>  
+                        <h5 class="mb-1"><u>Bed / Chamber</u></h5>
+           <p class="mb-1"><form class="was-validated">
+                                                <div class="custom-control custom-checkbox mb-3">
+                                                    <input type="checkbox" class="custom-control-input" id="heatedBed" required>
+                                                    <label class="custom-control-label" for="heatedBed">Heated Bed</label>
+                                                </div>
+                                            </form></span></p>                  
+        <p class="mb-1"><form class="was-validated">
+                                                <div class="custom-control custom-checkbox mb-3">
+                                                    <input type="checkbox" class="custom-control-input" id="heatedChamber" required>
+                                                    <label class="custom-control-label" for="heatedChamber">Heated Chamber</label>
+                                                </div>
+                                            </form></span></p>  
+            <h5 class="mb-1"><u>Dimensions</u></h5>
+              <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <label class="input-group-text" for="extruderFormFactor">Form Factor:</label>
+              </div>
+              <select class="custom-select" id="extruderFormFactor">
+                <option value="rectangular">Rectangular</option>
+                <option value="circular">Circular</option>
+              </select>
+            </div>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">D:</span>
+              </div>
+              <input id="volumeDepth" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.volume.depth}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
+              <div class="input-group-append">
+                <span class="input-group-text">mm</span>
+              </div>
+            </div>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">H:</span>
+              </div>
+              <input id="volumeHeight" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.volume.height}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
+              <div class="input-group-append">
+                <span class="input-group-text">mm</span>
+              </div>
+            </div>
+            <div class="input-group mb-3">
+              <div class="input-group-prepend">
+                <span class="input-group-text">W:</span>
+              </div>
+              <input id="volumeWidth" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.volume.width}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
+              <div class="input-group-append">
+                <span class="input-group-text">mm</span>
+              </div>
+            </div>
             </div>
         `;
-            document
-                .getElementById('editProfileBtn')
-                .addEventListener('click', (event) => {
-                    const profileEdits = document
-                        .getElementById('psPrinterProfiles')
-                        .querySelectorAll('[contenteditable=false]');
-                    profileEdits.forEach((element) => {
-                        element.classList.add('contentEditable');
-                        element.contentEditable = true;
-                    });
-                });
-            document.getElementById('eInverted').checked =
+                document.getElementById("extruderFormFactor").value = currentPrinter.currentProfile.volume.formFactor;
+                document.getElementById('eInverted').checked =
         currentPrinter.currentProfile.axes.e.inverted;
-            document.getElementById('xInverted').checked =
+                document.getElementById('xInverted').checked =
         currentPrinter.currentProfile.axes.x.inverted;
-            document.getElementById('yInverted').checked =
+                document.getElementById('yInverted').checked =
         currentPrinter.currentProfile.axes.y.inverted;
-            document.getElementById('zInverted').checked =
+                document.getElementById('zInverted').checked =
         currentPrinter.currentProfile.axes.z.inverted;
-            document.getElementById('sharedNozzle').checked =
+                document.getElementById('sharedNozzle').checked =
         currentPrinter.currentProfile.extruder.sharedNozzle;
-            document.getElementById('heatedBed').checked =
+                document.getElementById('heatedBed').checked =
         currentPrinter.currentProfile.heatedBed;
-            document.getElementById('heatedChamber').checked =
+                document.getElementById('heatedChamber').checked =
         currentPrinter.currentProfile.heatedChamber;
 
-            let afterPrintCancelled = '';
-            if (
-                typeof currentPrinter.gcodeScripts.afterPrintCancelled !== 'undefined'
-            ) {
-                afterPrintCancelled = currentPrinter.gcodeScripts.afterPrintCancelled;
-            }
-            let afterPrintDone = '';
-            if (typeof currentPrinter.gcodeScripts.afterPrintDone !== 'undefined') {
-                afterPrintDone = currentPrinter.gcodeScripts.afterPrintDone;
-            }
-            let afterPrintPaused = '';
-            if (typeof currentPrinter.gcodeScripts.afterPrintPaused !== 'undefined') {
-                afterPrintPaused = currentPrinter.gcodeScripts.afterPrintPaused;
-            }
-            let afterPrinterConnected = '';
-            if (
-                typeof currentPrinter.gcodeScripts.afterPrinterConnected !== 'undefined'
-            ) {
-                afterPrinterConnected =
+                let afterPrintCancelled = '';
+                if (
+                    typeof currentPrinter.gcodeScripts.afterPrintCancelled !== 'undefined'
+                ) {
+                    afterPrintCancelled = currentPrinter.gcodeScripts.afterPrintCancelled;
+                }
+                let afterPrintDone = '';
+                if (typeof currentPrinter.gcodeScripts.afterPrintDone !== 'undefined') {
+                    afterPrintDone = currentPrinter.gcodeScripts.afterPrintDone;
+                }
+                let afterPrintPaused = '';
+                if (typeof currentPrinter.gcodeScripts.afterPrintPaused !== 'undefined') {
+                    afterPrintPaused = currentPrinter.gcodeScripts.afterPrintPaused;
+                }
+                let afterPrinterConnected = '';
+                if (
+                    typeof currentPrinter.gcodeScripts.afterPrinterConnected !== 'undefined'
+                ) {
+                    afterPrinterConnected =
           currentPrinter.gcodeScripts.afterPrinterConnected;
-            }
-            let beforePrintResumed = '';
-            if (
-                typeof currentPrinter.gcodeScripts.beforePrintResumed !== 'undefined'
-            ) {
-                beforePrintResumed = currentPrinter.gcodeScripts.beforePrintResumed;
-            }
-            let afterToolChange = '';
-            if (typeof currentPrinter.gcodeScripts.afterToolChange !== 'undefined') {
-                afterToolChange = currentPrinter.gcodeScripts.afterToolChange;
-            }
-            let beforePrintStarted = '';
-            if (
-                typeof currentPrinter.gcodeScripts.beforePrintStarted !== 'undefined'
-            ) {
-                beforePrintStarted = currentPrinter.gcodeScripts.beforePrintStarted;
-            }
-            let beforePrinterDisconnected = '';
-            if (
-                typeof currentPrinter.gcodeScripts.beforePrinterDisconnected !==
+                }
+                let beforePrintResumed = '';
+                if (
+                    typeof currentPrinter.gcodeScripts.beforePrintResumed !== 'undefined'
+                ) {
+                    beforePrintResumed = currentPrinter.gcodeScripts.beforePrintResumed;
+                }
+                let afterToolChange = '';
+                if (typeof currentPrinter.gcodeScripts.afterToolChange !== 'undefined') {
+                    afterToolChange = currentPrinter.gcodeScripts.afterToolChange;
+                }
+                let beforePrintStarted = '';
+                if (
+                    typeof currentPrinter.gcodeScripts.beforePrintStarted !== 'undefined'
+                ) {
+                    beforePrintStarted = currentPrinter.gcodeScripts.beforePrintStarted;
+                }
+                let beforePrinterDisconnected = '';
+                if (
+                    typeof currentPrinter.gcodeScripts.beforePrinterDisconnected !==
         'undefined'
-            ) {
-                beforePrinterDisconnected =
+                ) {
+                    beforePrinterDisconnected =
           currentPrinter.gcodeScripts.beforePrinterDisconnected;
-            }
-            let beforeToolChange = '';
-            if (typeof currentPrinter.gcodeScripts.beforeToolChange !== 'undefined') {
-                beforeToolChange = currentPrinter.gcodeScripts.beforeToolChange;
-            }
-            document.getElementById('psGcodeManagerGcode').innerHTML = `
+                }
+                let beforeToolChange = '';
+                if (typeof currentPrinter.gcodeScripts.beforeToolChange !== 'undefined') {
+                    beforeToolChange = currentPrinter.gcodeScripts.beforeToolChange;
+                }
+                document.getElementById('psGcodeManagerGcode').innerHTML = `
               <div class="form-group">
               <label for="settingsAfterPrinterCancelled">After Printing Cancelled</label>
               <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterCancelled" rows="2">${afterPrintCancelled}</textarea>
@@ -335,7 +456,7 @@ export default class PrinterSettings {
                <small>Anything you put here will be executed before any tool change commands <code>Tn</code>.</small>
               </div>
         `;
-            document.getElementById('cameraRotation').innerHTML = `
+                document.getElementById('cameraRotation').innerHTML = `
         <form class="was-validated">
         <div class="custom-control custom-checkbox mb-3">
             <input type="checkbox" class="custom-control-input" id="camEnabled" required>
@@ -368,16 +489,22 @@ export default class PrinterSettings {
         </form>
       `;
 
-            document.getElementById('camEnabled').checked =
+                document.getElementById('camEnabled').checked =
         currentPrinter.otherSettings.webCamSettings.webcamEnabled;
-            document.getElementById('camTimelapse').checked =
+                document.getElementById('camTimelapse').checked =
         currentPrinter.otherSettings.webCamSettings.timelapseEnabled;
-            document.getElementById('camRot90').checked =
+                document.getElementById('camRot90').checked =
         currentPrinter.otherSettings.webCamSettings.rotate90;
-            document.getElementById('camFlipH').checked =
+                document.getElementById('camFlipH').checked =
         currentPrinter.otherSettings.webCamSettings.flipH;
-            document.getElementById('camFlipV').checked =
+                document.getElementById('camFlipV').checked =
         currentPrinter.otherSettings.webCamSettings.flipV;
+            }else{
+                document.getElementById("offlineMessage").innerHTML = "<code>NOTE! Your printer is currently offline, any settings requiring an OctoPrint connection have been disabled... Please turn on your OctoPrint instance to re-enabled these.</code>";
+                document.getElementById("psDefaultSerialPort").disabled = true;
+                document.getElementById("psDefaultBaudrate").disabled = true;
+                document.getElementById("psDefaultProfile").disabled = true;
+            }
             let serverRestart = 'N/A';
             let systemRestart = 'N/A';
             let systemShutdown = 'N/A';
@@ -756,8 +883,10 @@ export default class PrinterSettings {
                 .addEventListener('click', async (event) => {
                     const newValues = {
                         printer: {
-                            printerURL: currentPrinter.printerURL,
-                            index: currentPrinter._id
+                            printerURL: document.getElementById("psPrinterURL").value,
+                            index: currentPrinter._id,
+                            cameraURL: document.getElementById("psCamURL").value,
+                            apikey: document.getElementById("psAPIKEY").value
                         },
                         connection: {
                             preferredPort: document.getElementById('psDefaultSerialPort')
@@ -768,20 +897,20 @@ export default class PrinterSettings {
                         },
                         profileID: currentPrinter.currentProfile.id,
                         profile: {
-                            name: document.getElementById('printerName').innerHTML,
+                            name: document.getElementById('printerName').value,
                             color: 'default',
-                            model: document.getElementById('printerModel').innerHTML,
+                            model: document.getElementById('printerModel').value,
                             volume: {
                                 formFactor: document.getElementById('extruderFormFactor')
-                                    .innerHTML,
+                                    .value,
                                 width: parseInt(
-                                    document.getElementById('volumeWidth').innerHTML
+                                    document.getElementById('volumeWidth').value
                                 ),
                                 depth: parseInt(
-                                    document.getElementById('volumeDepth').innerHTML
+                                    document.getElementById('volumeDepth').value
                                 ),
                                 height: parseInt(
-                                    document.getElementById('volumeHeight').innerHTML
+                                    document.getElementById('volumeHeight').value
                                 )
                             },
                             heatedBed: document.getElementById('heatedBed').checked,
@@ -789,35 +918,35 @@ export default class PrinterSettings {
                             axes: {
                                 x: {
                                     speed: parseInt(
-                                        document.getElementById('printerXAxis').innerHTML
+                                        document.getElementById('printerXAxis').value
                                     ),
                                     inverted: document.getElementById('xInverted').checked
                                 },
                                 y: {
                                     speed: parseInt(
-                                        document.getElementById('printerYAxis').innerHTML
+                                        document.getElementById('printerYAxis').value
                                     ),
                                     inverted: document.getElementById('yInverted').checked
                                 },
                                 z: {
                                     speed: parseInt(
-                                        document.getElementById('printerZAxis').innerHTML
+                                        document.getElementById('printerZAxis').value
                                     ),
                                     inverted: document.getElementById('zInverted').checked
                                 },
                                 e: {
                                     speed: parseInt(
-                                        document.getElementById('printerEAxis').innerHTML
+                                        document.getElementById('printerEAxis').value
                                     ),
                                     inverted: document.getElementById('eInverted').checked
                                 }
                             },
                             extruder: {
                                 count: parseInt(
-                                    document.getElementById('extruderCount').innerHTML
+                                    document.getElementById('extruderCount').value
                                 ),
                                 nozzleDiameter: parseFloat(
-                                    document.getElementById('nozzleDiameter').innerHTML
+                                    document.getElementById('nozzleDiameter').value
                                 ),
                                 sharedNozzle: document.getElementById('sharedNozzle').checked
                             }
@@ -904,13 +1033,6 @@ export default class PrinterSettings {
                             )
                         }
                     };
-                    const profileEdits = document
-                        .getElementById('psPrinterProfiles')
-                        .querySelectorAll('[contenteditable=true]');
-                    profileEdits.forEach((element) => {
-                        element.contentEditable = false;
-                        element.classList.remove('contentEditable');
-                    });
                     let update = await OctoFarmClient.post(
                         'printers/updateSettings',
                         newValues
@@ -964,10 +1086,17 @@ export default class PrinterSettings {
                 });
             PrinterSettings.applyState(currentPrinter);
         } else {
+
             const id = _.findIndex(printers, function (o) {
                 return o._id == currentIndex;
             });
             currentPrinter = printers[id];
+            if(currentPrinter.printerState.colour.category !== "Offline"){
+                document.getElementById("offlineMessage").innerHTML = "";
+                document.getElementById("psDefaultSerialPort").disabled = false;
+                document.getElementById("psDefaultBaudrate").disabled = false;
+                document.getElementById("psDefaultProfile").disabled = false;
+            }
             PrinterSettings.applyState(currentPrinter);
         } // END
     }

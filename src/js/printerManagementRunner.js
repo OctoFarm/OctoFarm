@@ -7,11 +7,12 @@ import PrinterSettings from './lib/modules/printerSettings.js';
 import FileOperations from './lib/functions/file.js';
 import Validate from './lib/functions/validate.js';
 import PowerButton from './lib/modules/powerButton.js';
+import PrinterSelect from "./lib/modules/printerSelect";
 
 
 let printerInfo = '';
-let editMode = false;
-let deletedPrinters = [];
+const editMode = false;
+const deletedPrinters = [];
 let worker = null;
 let powerTimer = 20000;
 let printerControlList = null;
@@ -81,8 +82,59 @@ if (window.Worker) {
 
 let newPrintersIndex = 0;
 // Dash control listeners
-const saveEditBtn = document.getElementById('saveEditsBtn');
+// const saveEditBtn = document.getElementById('saveEditsBtn');
 const editBtn = document.getElementById('editPrinterBtn');
+const bulkConnectBtn = document.getElementById('bulkConnectBtn');
+bulkConnectBtn.addEventListener('click', async (e) => {
+    PrinterSelect.create(document.getElementById("multiPrintersSection"), false, "Connect Printers");
+    // searchOffline.innerHTML =
+    // '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
+    //
+    // const post = await OctoFarmClient.post('printers/reScanOcto', {
+    //     id: null
+    // });
+    // searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
+    // UI.createAlert(
+    //     'success',
+    //     'Started a background re-sync of all printers connected to OctoFarm',
+    //     1000,
+    //     'Clicked'
+    // );
+});
+const bulkDisconnectBtn = document.getElementById('bulkDisconnectBtn');
+bulkDisconnectBtn.addEventListener('click', async (e) => {
+    PrinterSelect.create(document.getElementById("multiPrintersSection"), false, "Disconnect Printers");
+    // searchOffline.innerHTML =
+    // '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
+    //
+    // const post = await OctoFarmClient.post('printers/reScanOcto', {
+    //     id: null
+    // });
+    // searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
+    // UI.createAlert(
+    //     'success',
+    //     'Started a background re-sync of all printers connected to OctoFarm',
+    //     1000,
+    //     'Clicked'
+    // );
+});
+const bulkPowerBtn = document.getElementById('bulkPowerBtn');
+bulkPowerBtn.addEventListener('click', async (e) => {
+    PrinterSelect.create(document.getElementById("multiPrintersSection"), false, "Power On/Off Printers");
+    // searchOffline.innerHTML =
+    // '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
+    //
+    // const post = await OctoFarmClient.post('printers/reScanOcto', {
+    //     id: null
+    // });
+    // searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
+    // UI.createAlert(
+    //     'success',
+    //     'Started a background re-sync of all printers connected to OctoFarm',
+    //     1000,
+    //     'Clicked'
+    // );
+});
 const searchOffline = document.getElementById('searchOfflineBtn');
 searchOffline.addEventListener('click', async (e) => {
     searchOffline.innerHTML =
@@ -91,6 +143,7 @@ searchOffline.addEventListener('click', async (e) => {
     const post = await OctoFarmClient.post('printers/reScanOcto', {
         id: null
     });
+    console.log(post);
     searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
     UI.createAlert(
         'success',
@@ -99,181 +152,67 @@ searchOffline.addEventListener('click', async (e) => {
         'Clicked'
     );
 });
-saveEditBtn.addEventListener('click', async (event) => {
-    const saveEdits = document.getElementById('saveEditsBtn');
-    saveEdits.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Saving...';
-    if (deletedPrinters.length > 0) {
-        const post = await OctoFarmClient.post('printers/remove', deletedPrinters);
-        if (post.status === 200) {
-            let printersRemoved = await post.json();
-            printersRemoved = printersRemoved.printersRemoved;
-            printersRemoved.forEach((printer) => {
-                UI.createAlert(
-                    'success',
-                    `Printer: ${printer.printerURL} has successfully been removed from the farm...`,
-                    1000,
-                    'Clicked'
-                );
-            });
-        } else {
-            UI.createAlert(
-                'error',
-                'Something went wrong updating the Server...',
-                3000,
-                'Clicked'
-            );
-            saveButton.innerHTML = '<i class="fas fa-save"></i>';
-        }
-    }
-    let editedPrinters = [];
-    for (let i = 0; i < printerInfo.length; i++) {
-        const printerCard = document.getElementById(
-            `printerCard-${printerInfo[i]._id}`
-        );
-        if (printerCard) {
-            const printerURL = document.getElementById(
-                `printerURL-${printerInfo[i]._id}`
-            );
-            const printerCamURL = document.getElementById(
-                `printerCamURL-${printerInfo[i]._id}`
-            );
-            const printerAPIKEY = document.getElementById(
-                `printerApiKey-${printerInfo[i]._id}`
-            );
-            const printerGroup = document.getElementById(
-                `printerGroup-${printerInfo[i]._id}`
-            );
-            const printerName = document.getElementById(
-                `printerName-${printerInfo[i]._id}`
-            );
-            const printer = new PrintersManagement(
-                Validate.stripHTML(printerURL.textContent),
-                Validate.stripHTML(printerCamURL.textContent),
-                Validate.stripHTML(printerAPIKEY.textContent),
-                Validate.stripHTML(printerGroup.textContent),
-                Validate.stripHTML(printerName.textContent)
-            ).build();
-            printer._id = printerInfo[i]._id;
+// saveEditBtn.addEventListener('click', async (event) => {
 
-            const currentInfoIndex = _.findIndex(printerInfo, function (o) {
-                return o._id === printerInfo[i]._id;
-            });
-            if (
-                printerURL.innerHTML !== printerInfo[currentInfoIndex].printerURL ||
-        printerCamURL.innerHTML !== printerInfo[currentInfoIndex].cameraURL ||
-        printerAPIKEY.innerHTML !== printerInfo[currentInfoIndex].apikey ||
-        printerGroup.innerHTML !== printerInfo[currentInfoIndex].group ||
-        printerName.innerHTML !== printerInfo[currentInfoIndex].printerName
-            ) {
-                editedPrinters.push(printer);
-            }
-        }
-    }
-    if (editedPrinters.length > 0) {
-        const post = await OctoFarmClient.post('printers/update', editedPrinters);
-        if (post.status === 200) {
-            let printersAdded = await post.json();
-            printersAdded = printersAdded.printersAdded;
-            printersAdded.forEach((printer) => {
-                UI.createAlert(
-                    'success',
-                    `Printer: ${printer.printerURL} information has been updated on the farm...`,
-                    1000,
-                    'Clicked'
-                );
-            });
-        } else {
-            UI.createAlert(
-                'error',
-                'Something went wrong updating the Server...',
-                3000,
-                'Clicked'
-            );
-            saveEdits.innerHTML = '<i class="fas fa-save"></i> Save Edits';
-        }
-    }
-
-    saveEdits.innerHTML = '<i class="fas fa-save"></i> Save Edits';
-    editBtn.classList.remove('d-none');
-    saveEditBtn.classList.add('d-none');
-    const deleteBtns = document.querySelectorAll("[id^='deleteButton-']");
-    deleteBtns.forEach((b) => {
-        b.classList.add('d-none');
-    });
-    if (editedPrinters.length === 0 && deletedPrinters.length === 0) {
-        UI.createAlert('warning', "No changes we're made...", 3000, 'Clicked');
-    } else {
-        UI.createAlert(
-            'success',
-            'Printer updates have been saved, edit mode now deactivated. <br> Please await your printer list to reload...',
-            3000,
-            'Clicked'
-        );
-    }
-    const editableFields = document.querySelectorAll('[contenteditable=true]');
-    editableFields.forEach((f) => {
-    // document.getElementById(f.id).contentEditable = true;
-        f.classList.remove('contentEditable');
-        f.contentEditable = false;
-    });
-    deletedPrinters = [];
-    editedPrinters = [];
-    editMode = false;
-});
+// });
 editBtn.addEventListener('click', (event) => {
-    editMode = true;
-    editBtn.classList.add('d-none');
-    saveEditBtn.classList.remove('d-none');
-    const deleteBtns = document.querySelectorAll("[id^='deleteButton-']");
-    deleteBtns.forEach((b) => {
-        b.classList.remove('d-none');
-    });
+    const confirmFunction = function(){
+        
+    };
+    PrinterSelect.create(document.getElementById("multiPrintersSection"), true, "Edit Printers");
+    // editMode = true;
+    // editBtn.classList.add('d-none');
+    // saveEditBtn.classList.remove('d-none');
+    // const deleteBtns = document.querySelectorAll("[id^='deleteButton-']");
+    // deleteBtns.forEach((b) => {
+    //     b.classList.remove('d-none');
+    // });
+    //
+    // const editableFields = document.querySelectorAll('[contenteditable=false]');
+    //
+    // editableFields.forEach((f) => {
+    //     f.classList.add('contentEditable');
+    //     f.contentEditable = true;
+    // });
+    // UI.createAlert(
+    //     'success',
+    //     'Edit Mode turned on, press save once finished. <br> Your printer status will not update whilst in this mode...',
+    //     3000,
+    //     'Clicked'
+    // );
+});
+document.getElementById("deletePrintersBtn").addEventListener('click', (event) => {
+    const printerDelete = function(){
+        //Grab all check boxes
+        const selectedPrinters = PrinterSelect.getSelected();
+        selectedPrinters.forEach(element => {
+            const ca = element.id.split('-');
+            deletedPrinters.push(ca[1]);
+        });
+        PrintersManagement.deletePrinter();
+    };
 
-    const editableFields = document.querySelectorAll('[contenteditable=false]');
 
-    editableFields.forEach((f) => {
-        f.classList.add('contentEditable');
-        f.contentEditable = true;
-    });
-    UI.createAlert(
-        'success',
-        'Edit Mode turned on, press save once finished. <br> Your printer status will not update whilst in this mode...',
-        3000,
-        'Clicked'
-    );
+    PrinterSelect.create(document.getElementById("multiPrintersSection"), false, "Printer Deletion", printerDelete);
 });
 
 document
     .getElementById('exportPrinterBtn')
-    .addEventListener('click', (event) => {
-        const table = document.getElementById('printerList');
-        const printers = new Array();
-        for (let r = 0, n = table.rows.length; r < n; r++) {
-            const index = table.rows[r].id.split('-');
+    .addEventListener('click', async (event) => {
+        let printers = await OctoFarmClient.post("printers/printerInfo", {});
+        printers = await printers.json();
+        const printersExport = [];
+        for (let r = 0; r < printers.length; r++) {
             const printer = {
-                name: document.getElementById(`printerName-${index[1]}`).innerHTML,
-                group: document.getElementById(`printerGroup-${index[1]}`).innerHTML,
-                printerURL: document.getElementById(`printerURL-${index[1]}`).innerHTML,
-                cameraURL: document.getElementById(`printerCamURL-${index[1]}`)
-                    .innerHTML,
-                apikey: document.getElementById(`printerApiKey-${index[1]}`).innerHTML
+                name: printers[r].printerName,
+                group: printers[r].group,
+                printerURL: printers[r].printerURL,
+                cameraURL: printers[r].cameraURL,
+                apikey: printers[r].apikey
             };
-            printers.push(printer);
+            printersExport.push(printer);
         }
-        const reFormat = {};
-        reFormat.name = [];
-        reFormat.group = [];
-        reFormat.printerURL = [];
-        reFormat.cameraURL = [];
-        reFormat.apikey = [];
-        printers.forEach((old) => {
-            reFormat.name.push(old.name);
-            reFormat.group.push(old.group);
-            reFormat.printerURL.push(old.printerURL);
-            reFormat.cameraURL.push(old.cameraURL);
-            reFormat.apikey.push(old.apikey);
-        });
-        FileOperations.download('printers.json', JSON.stringify(reFormat));
+        FileOperations.download('printers.json', JSON.stringify(printersExport));
     });
 document
     .getElementById('importPrinterBtn')
@@ -290,6 +229,53 @@ document
         }
     });
 document.getElementById('addPrinterBtn').addEventListener('click', (event) => {
+    const currentPrinterCount = document.getElementById('printerTable').rows.length;
+    const newPrinterCount = document.getElementById('printerNewTable').rows.length;
+    if(currentPrinterCount === 0 && newPrinterCount === 0){
+        bootbox.alert({
+            title: '<p>It looks like this is your first printer... Each instance you connect to OctoFarm will need the below setting up.<p>',
+            message: `
+            <div class="row">
+                <div class="col-md-3">
+                    <p>1. Make sure CORS is switched on and OctoPrint has been restarted...</p>
+                </div>
+                <div class="col-md-9">
+                         <img width="100%" src="/images/userCORSOctoPrint.png">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-9">
+                    <p>2. Grab your OctoPrint instances API Key.<br> This can be generated in the User Settings dialog.</p>
+                    <code>Note: since OctoPrint version 1.4.1 it is recommended to connect using the Application Key / User Key detailed below. Versions before that are fine using the Global API Key generated by OctoPrint.</code>
+                </div>
+                <div class="col-md-3">
+                         <img src="/images/userSettingsOctoPrint.png">
+                </div>
+            </div>
+             <div class="row">
+                <div class="col-md-5">
+                    <p>2.1 You can generate a API Key from your current user.</p>
+                    <code>Please note, this user currently requires Admin permission rights. If in doubt, it's usually the first user you have created.</code>              
+                </div>
+                <div class="col-md-7">
+                         <img src="/images/userAPIKEYOctoPrint.png">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-5">
+                    <p>2.1 You can generate a API Key for a specific application.</p>
+                    <code>Please note, this user currently requires Admin permission rights. If in doubt, it's usually the first user you have created.</code>         
+                </div>
+                <div class="col-md-7">
+                         <img src="/images/userApplicationKeyOctoPrint.png">
+                </div>
+            </div>
+            `,
+            size: 'large',
+            scrollable: false,
+            closeButton: false
+        });
+    }
     PrintersManagement.addPrinter();
 });
 class Printer {
@@ -329,11 +315,21 @@ class PrintersManagement {
                 'beforebegin',
                 `
          <tr id="newPrinterCard-${newPrintersIndex}">
-              <td><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="true">${newPrinter.name}</div></td>
-              <td><div class="Idle" id="newPrinterGroup-${newPrintersIndex}" contenteditable="true">${newPrinter.group}</div></td>
-              <td><div class="Idle" id="newPrinterURL-${newPrintersIndex}" contenteditable="true">${newPrinter.printerURL}</td>
-              <td><div class="Idle" id="newPrinterCamURL-${newPrintersIndex}" contenteditable="true">${newPrinter.cameraURL}</div></td>
-              <td><div class="Idle" id="newPrinterAPIKEY-${newPrintersIndex}" contenteditable="true" >${newPrinter.apikey}</div></td>
+              <td><div class="input-group mb-3">
+                  <input id="newPrinterName-${newPrintersIndex}" type="text" class="form-control" value="${newPrinter.name}">
+                </div></td>
+                <td><div class="input-group mb-3">
+                  <input id="newPrinterGroup-${newPrintersIndex}" type="text" class="form-control" value="${newPrinter.group}">
+                </div></td>
+                <td><div class="input-group mb-3">
+                  <input id="newPrinterURL-${newPrintersIndex}" type="text" class="form-control" value="${newPrinter.printerURL}">
+                </div></td>
+                <td><div class="input-group mb-3">
+                  <input id="newPrinterCamURL-${newPrintersIndex}" type="text" class="form-control" value="${newPrinter.cameraURL}">
+                </div></td>
+                <td><div class="input-group mb-3">
+                  <input id="newPrinterAPIKEY-${newPrintersIndex}" type="text" class="form-control" value="${newPrinter.apikey}">
+                </div></td>
               <td><button id="saveButton-${newPrintersIndex}" type="button" class="btn btn-success btn-sm">
                       <i class="fas fa-save"></i>
                   </button></td>
@@ -349,11 +345,21 @@ class PrintersManagement {
                 'beforebegin',
                 `
         <tr id="newPrinterCard-${newPrintersIndex}">
-        <td><div class="Idle" id="newPrinterName-${newPrintersIndex}" contenteditable="true">{Leave to Grab from OctoPrint}</div></td>
-        <td><div class="Idle" id="newPrinterGroup-${newPrintersIndex}" contenteditable="true"></div></td>
-        <td><div class="Idle" id="newPrinterURL-${newPrintersIndex}" contenteditable="true"></td>
-        <td><div class="Idle" id="newPrinterCamURL-${newPrintersIndex}" contenteditable="true">{Set blank to grab from OctoPrint}</div></td>
-        <td><div class="Idle" id="newPrinterAPIKEY-${newPrintersIndex}" contenteditable="true" ></div></td>
+        <td><div class="input-group mb-3">
+          <input id="newPrinterName-${newPrintersIndex}" type="text" class="form-control" placeholder="Leave blank to grab from OctoPrint">
+        </div></td>
+        <td><div class="input-group mb-3">
+          <input id="newPrinterGroup-${newPrintersIndex}" type="text" class="form-control" placeholder="">
+        </div></td>
+        <td><div class="input-group mb-3">
+          <input id="newPrinterURL-${newPrintersIndex}" type="text" class="form-control" placeholder="">
+        </div></td>
+        <td><div class="input-group mb-3">
+          <input id="newPrinterCamURL-${newPrintersIndex}" type="text" class="form-control" placeholder="Leave blank to grab from OctoPrint">
+        </div></td>
+        <td><div class="input-group mb-3">
+          <input id="newPrinterAPIKEY-${newPrintersIndex}" type="text" class="form-control" placeholder="">
+        </div></td>
         <td><button id="saveButton-${newPrintersIndex}" type="button" class="btn btn-success btn-sm">
                 <i class="fas fa-save"></i>
             </button></td>
@@ -369,12 +375,6 @@ class PrintersManagement {
             .getElementById(`saveButton-${newPrintersIndex}`)
             .addEventListener('click', (event) => {
                 PrintersManagement.savePrinter(event.target);
-            });
-        document
-            .getElementById(`delButton-${newPrintersIndex}`)
-            .addEventListener('click', (event) => {
-                PrintersManagement.deletePrinter(event.target);
-                newPrintersIndex--;
             });
         const printerName = document.getElementById(
             `newPrinterName-${newPrintersIndex}`
@@ -397,66 +397,37 @@ class PrintersManagement {
             // Initial JSON validation
             if (Validate.JSON(theBytes)) {
                 // If we can parse the file.
+
                 // Grab uploaded file contents into an object
                 const importPrinters = JSON.parse(theBytes);
-                // Check if old import/new import
-                let currentImportList = [];
-                if ('ip' in importPrinters) {
-                    // Convert import old to new
-                    if (
-                        importPrinters.ip.length === importPrinters.port.length &&
-            importPrinters.ip.length === importPrinters.port.length &&
-            importPrinters.ip.length === importPrinters.apikey.length
-                    ) {
-                        const z = {};
-                        z.printerURL = [];
-                        z.cameraURL = [];
-                        z.name = [];
-                        z.group = [];
-                        z.apikey = [];
-                        for (let index = 0; index < importPrinters.ip.length; index++) {
-                            z.printerURL.push(
-                                `http://${importPrinters.ip[index]}:${importPrinters.port[index]}`
-                            );
-                            z.cameraURL.push(importPrinters.camURL[index]);
-                            z.name.push('{Leave to Grab from OctoPrint}');
-                            z.group.push('');
-                            z.apikey.push(importPrinters.apikey[index]);
-                        }
-                        currentImportList = z;
-                    } else {
-                        UI.createAlert(
-                            'error',
-                            'The file you have tried to upload is missing a value.',
-                            3000
-                        );
-                    }
-                } else if (
-                    importPrinters.printerURL.length === importPrinters.name.length &&
-          importPrinters.printerURL.length === importPrinters.group.length &&
-          importPrinters.printerURL.length === importPrinters.apikey.length &&
-          importPrinters.printerURL.length === importPrinters.cameraURL.length
-                ) {
-                    currentImportList = importPrinters;
-                } else {
-                    UI.createAlert(
-                        'error',
-                        'The file you have tried to upload is missing a value.',
-                        3000
-                    );
-                }
+                // Loop over import only importing printers with correct fields.
                 for (
                     let index = 0;
-                    index < currentImportList.printerURL.length;
+                    index < importPrinters.length;
                     index++
                 ) {
                     const printer = {
-                        printerURL: currentImportList.printerURL[index],
-                        cameraURL: currentImportList.cameraURL[index],
-                        name: currentImportList.name[index],
-                        group: currentImportList.group[index],
-                        apikey: currentImportList.apikey[index]
+                        printerURL: "Key not found",
+                        cameraURL: "Key not found",
+                        name: "Key not found",
+                        group: "Key not found",
+                        apikey: "Key not found"
                     };
+                    if(typeof importPrinters[index].name !== 'undefined'){
+                        printer.name = importPrinters[index].name;
+                    }
+                    if(typeof importPrinters[index].printerURL !== 'undefined'){
+                        printer.printerURL = importPrinters[index].printerURL;
+                    }
+                    if(typeof importPrinters[index].cameraURL !== 'undefined'){
+                        printer.cameraURL = importPrinters[index].cameraURL;
+                    }
+                    if(typeof importPrinters[index].group !== 'undefined'){
+                        printer.group = importPrinters[index].group;
+                    }
+                    if(typeof importPrinters[index].apikey !== 'undefined'){
+                        printer.apikey = importPrinters[index].apikey;
+                    }
                     PrintersManagement.addPrinter(printer);
                 }
                 UI.createAlert(
@@ -464,6 +435,7 @@ class PrintersManagement {
                     'Successfully imported your printer list, Please check it over and save when ready.',
                     3000
                 );
+
             } else {
                 UI.createAlert(
                     'error',
@@ -474,38 +446,38 @@ class PrintersManagement {
         };
     }
 
-    static deletePrinter (event) {
-        if (editMode) {
-            bootbox.confirm({
-                message:
-          'Are you sure you want to delete your printer? This will mark your printer for deletion and action on save..',
-                buttons: {
-                    confirm: {
-                        label: 'Yes',
-                        className: 'btn-success'
-                    },
-                    cancel: {
-                        label: 'No',
-                        className: 'btn-danger'
-                    }
-                },
-                async callback (result) {
-                    if (result) {
-                        const ca = event.id.split('-');
-                        deletedPrinters.push(ca[1]);
-                        document.getElementById(`printerCard-${ca[1]}`).remove();
-                    }
-                }
-            });
-        } else {
-            event.parentElement.parentElement.parentElement.remove();
-        }
-        const table = document.getElementById('printerNewTable');
-        console.log(table.rows.length);
-        if (table.rows.length === 1) {
-            if (!table.classList.contains('d-none')) {
-                table.classList.add('d-none');
+    static async deletePrinter () {
+        if(deletedPrinters.length > 0){
+            const post = await OctoFarmClient.post('printers/remove', deletedPrinters);
+            if (post.status === 200) {
+                let printersRemoved = await post.json();
+                console.log(printersRemoved);
+                printersRemoved = printersRemoved.printersRemoved;
+
+                printersRemoved.forEach((printer) => {
+                    UI.createAlert(
+                        'success',
+                        `Printer: ${printer.printerURL} has successfully been removed from the farm...`,
+                        1000,
+                        'Clicked'
+                    );
+                    document.getElementById(`printerCard-${printer.printerId}`).remove();
+                });
+            } else {
+                UI.createAlert(
+                    'error',
+                    'Something went wrong updating the Server...',
+                    3000,
+                    'Clicked'
+                );
             }
+        }else{
+            UI.createAlert(
+                'error',
+                'To delete a printer... one must first select a printer.',
+                3000,
+                'Clicked'
+            );
         }
     }
 
@@ -523,29 +495,29 @@ class PrintersManagement {
 
         const errors = [];
         let printCheck = -1;
-        if (printerURL.innerHTML !== '') {
+        if (printerURL.value !== '') {
             printCheck = _.findIndex(printerInfo, function (o) {
-                return o.printerURL.includes(printerURL.innerHTML);
+                return o.printerURL.includes(printerURL.value);
             });
         }
         // Check information is filled correctly...
         if (
-            printerURL.innerHTML === '' ||
+            printerURL.value === '' ||
       printCheck > -1 ||
-      printerAPIKEY.innerHTML === '' ||
-      printerName.innerHTML === '' ||
-      printerCamURL.innerHTML === ''
+      printerAPIKEY.value === '' ||
+      printerName.value === '' ||
+      printerCamURL.value === ''
         ) {
-            if (printerURL.innerHTML === '') {
+            if (printerURL.value === '') {
                 errors.push({ type: 'warning', msg: 'Please input your printers URL' });
             }
-            if (printerAPIKEY.innerHTML === '') {
+            if (printerAPIKEY.value === '') {
                 errors.push({
                     type: 'warning',
                     msg: 'Please input your printers API Key'
                 });
             }
-            if (printerName.innerHTML === '') {
+            if (printerName.value === '') {
                 errors.push({
                     type: 'warning',
                     msg: 'Please input your printers name'
@@ -554,7 +526,7 @@ class PrintersManagement {
             if (printCheck > -1) {
                 errors.push({
                     type: 'error',
-                    msg: `Printer URL: ${printerURL.innerHTML} already exists on farm`
+                    msg: `Printer URL: ${printerURL.value} already exists on farm`
                 });
             }
         }
@@ -568,11 +540,11 @@ class PrintersManagement {
             saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
             saveButton.disabled = true;
             const printer = new PrintersManagement(
-                printerURL.innerHTML,
-                printerCamURL.innerHTML,
-                printerAPIKEY.innerHTML,
-                printerGroup.innerHTML,
-                printerName.innerHTML
+                printerURL.value,
+                printerCamURL.value,
+                printerAPIKEY.value,
+                printerGroup.value,
+                printerName.value
             ).build();
             printers.push(printer);
             const post = await OctoFarmClient.post('printers/add', printers);
@@ -609,12 +581,7 @@ class PrintersManagement {
 }
 
 // Initial listeners
-document.getElementById('connectAllBtn').addEventListener('click', () => {
-    dashActions.connectAll();
-});
-document.getElementById('disconnectAllBtn').addEventListener('click', () => {
-    dashActions.disconnectAll();
-});
+
 
 class dashActions {
     static async connectionAction (action) {
@@ -848,9 +815,6 @@ class dashUpdate {
                     const printButton = document.getElementById(
                         `printerButton-${printer._id}`
                     );
-                    const settingButton = document.getElementById(
-                        `printerSettings-${printer._id}`
-                    );
                     const webButton = document.getElementById(
                         `printerWeb-${printer._id}`
                     );
@@ -861,18 +825,6 @@ class dashUpdate {
                     const socketBadge = document.getElementById(
                         `webSocketIcon-${printer._id}`
                     );
-                    const printerGroup = document.getElementById(
-                        `printerGroup-${printer._id}`
-                    );
-                    const printerURL = document.getElementById(
-                        `printerURL-${printer._id}`
-                    );
-                    const printerCameraURL = document.getElementById(
-                        `printerCamURL-${printer._id}`
-                    );
-                    const printerAPIKey = document.getElementById(
-                        `printerApiKey-${printer._id}`
-                    );
                     const printerOctoPrintVersion = document.getElementById(
                         `printerOctoPrintVersion-${printer._id}`
                     );
@@ -880,21 +832,11 @@ class dashUpdate {
                         `printerSortIndex-${printer._id}`
                     );
                     printerSortIndex.innerHTML = printer.sortIndex;
-                    printerGroup.innerHTML = printer.group;
-                    printerURL.innerHTML = printer.printerURL;
-                    printerAPIKey.innerHTML = printer.apikey;
-                    if (printer.camURL === 'none') {
-                        printerCameraURL.innerHTML = '';
-                    } else {
-                        printerCameraURL.innerHTML = printer.cameraURL;
-                    }
                     if(typeof printer.klipperFirmwareVersion !== 'undefined'){
                         printerOctoPrintVersion.innerHTML = printer.octoPrintVersion+"<br>Klipper: "+ printer.klipperFirmwareVersion;
                     }else{
                         printerOctoPrintVersion.innerHTML = printer.octoPrintVersion;
                     }
-
-
                     printName.innerHTML = `${printerName}`;
 
                     if(typeof printer.corsCheck !== 'undefined'){
@@ -914,13 +856,30 @@ class dashUpdate {
                     socketBadge.className = `tag badge badge-${printer.webSocketState.colour} badge-pill`;
                     socketBadge.setAttribute('title', printer.webSocketState.desc);
                     webButton.href = printer.printerURL;
-                    if (printer.printerState.colour.category === 'Offline') {
-                        printButton.disabled = true;
-                        settingButton.disabled = true;
-                    } else {
-                        printButton.disabled = false;
-                        settingButton.disabled = false;
+                    if(printer.hostState.state === "Online"){
+                        let apiErrors = 0;
+                        for (const key in printer.systemChecks.scanning) {
+                            if (printer.systemChecks.scanning.hasOwnProperty(key)) {
+                                if(printer.systemChecks.scanning[key].status !== "success"){
+                                    apiErrors = apiErrors +1;
+                                }
+                            }
+                        }
+                        const apiErrorTag = document.getElementById(`scanningIssues-${printer._id}`);
+                        if(apiErrors > 0){
+                            if(!apiErrorTag.classList.contains("badge-danger")){
+                                apiErrorTag.classList.add("tag", "badge", "badge-danger", "badge-pill");
+                                apiErrorTag.innerHTML = "API Issues Detected!";
+                            }
+                        }else{
+                            if(apiErrorTag.classList.contains("badge-danger")){
+                                apiErrorTag.classList.remove("tag", "badge", "badge-danger", "badge-pill");
+                                apiErrorTag.innerHTML = "";
+                            }
+                        }
                     }
+
+                    printButton.disabled = printer.printerState.colour.category === 'Offline';
                 } else {
                     // Insert new printer addition...
                     document.getElementById('printerList').insertAdjacentHTML(
@@ -954,20 +913,36 @@ class dashUpdate {
                                  type="button"
                                  class="tag btn btn-secondary btn-sm bg-colour-2"
                                  data-toggle="modal"
-                                 data-target="#printerSettingsModal" disabled
+                                 data-target="#printerSettingsModal"
             ><i class="fas fa-cog"></i>
+            </button>
+            <button  title="View individual Printer Statistics"
+            id="printerStatistics-${printer._id}"
+                                 type="button"
+                                 class="tag btn btn-secondary btn-sm bg-colour-3"
+                                 data-toggle="modal"
+                                 data-target="#printerStatisticsModal"
+            ><i class="fas fa-chart-pie"></i>
+            </button>
+           <button  title="Setup and track Maintenance Issues with Printers"
+            id="printerMaintenance-${printer._id}"
+                                 type="button"
+                                 class="tag btn btn-secondary btn-sm bg-colour-4"
+                                 data-toggle="modal"
+                                 data-target="#printerMaintenanceModal"
+            ><i class="fas fa-wrench"></i>
             </button>
             <a title="Open your Printers Web Interface"
                id="printerWeb-${printer._id}"
                type="button"
-               class="tag btn btn-info btn-sm bg-colour-3"
+               class="tag btn btn-info btn-sm bg-colour-1"
                target="_blank"
                href="${printer.printerURL}" role="button"><i class="fas fa-globe-europe"></i></a>
             <button  
                      title="Re-Sync your printer"
                      id="printerSyncButton-${printer._id}"
                      type="button"
-                     class="tag btn btn-success btn-sm bg-colour-4"
+                     class="tag btn btn-success btn-sm bg-colour-2"
             >
                 <i class="fas fa-sync"></i>
             </button>
@@ -982,14 +957,11 @@ class dashUpdate {
         <td><small><span data-title="${printer.hostState.desc}" id="hostBadge-${printer._id}" class="tag badge badge-${printer.hostState.colour.name} badge-pill">
                 ${printer.hostState.state}</small></span></td>
         <td><small><span data-title="${printer.printerState.desc}" id="printerBadge-${printer._id}" class="tag badge badge-${printer.printerState.colour.name} badge-pill">
-                ${printer.printerState.state}</small></span></td>
+                ${printer.printerState.state}</small></span><br><span data-title="Check printer settings, API issues detected..." id="scanningIssues-${printer._id}"></small></span></td>
         <td><small><span data-title="${printer.webSocketState.desc}" id="webSocketIcon-${printer._id}" class="tag badge badge-${printer.webSocketState.colour} badge-pill">
                 <i  class="fas fa-plug"></i></span></td>
    
         <td><div id="printerGroup-${printer._id}" contenteditable="false"></div></td>
-        <td><div id="printerURL-${printer._id}" contenteditable="false"></div></td>
-        <td><div id="printerCamURL-${printer._id}" contenteditable="false"></div></td>
-        <td><div id="printerApiKey-${printer._id}" contenteditable="false"></div></td>
         <th id="printerOctoPrintVersion-${printer._id}"></td>
         
         <td><button id="deleteButton-${printer._id}" type="button" class="btn btn-danger btn-sm d-none">
@@ -999,11 +971,6 @@ class dashUpdate {
           `
                     );
                     PowerButton.applyBtn(printer, 'powerBtn-');
-                    document
-                        .getElementById(`deleteButton-${printer._id}`)
-                        .addEventListener('click', (event) => {
-                            PrintersManagement.deletePrinter(event.target);
-                        });
                     document
                     // eslint-disable-next-line no-underscore-dangle
                         .getElementById(`printerSyncButton-${printer._id}`)

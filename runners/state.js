@@ -642,7 +642,10 @@ WebSocketClient.prototype.onerror = function (e) {
     }
 };
 WebSocketClient.prototype.onclose = function (e) {
-    PrinterTicker.addIssue(new Date(), farmPrinters[this.index].printerURL, "Client closed...", "Offline");
+    if(typeof farmPrinters[this.index] !== 'undefined'){
+        PrinterTicker.addIssue(new Date(), farmPrinters[this.index].printerURL, "Client closed...", "Offline");
+    }
+
 
     logger.info(
         'WebSocketClient: Closed',
@@ -926,7 +929,7 @@ class Runner {
                     farmPrinters[i].webSocketDescription = 'Websocket Offline';
                 } catch (e) {
                     logger.error(
-                        `Couldn't set state of missing printer, safe to ignore: ${farmPrinters[i].index}: ${farmPrinters[i].printerURL}`
+                        `Couldn't set state of missing printer, safe to ignore`
                     );
                 }
                 timeout = systemSettings.timeout;
@@ -1109,11 +1112,8 @@ class Runner {
       !farmPrinters[i].camURL.includes('http')
         ) {
             if (
-                (typeof farmPrinters[i].camURL !== 'undefined' &&
-          farmPrinters[i].camURL.includes('{Set')) ||
-        farmPrinters[i].camURL === 'none'
-            ) {
-                farmPrinters[i].camURL = 'none';
+                typeof farmPrinters[i].camURL === 'undefined' && farmPrinters[i].camURL === "" || farmPrinters[i].camURL === 'none') {
+                farmPrinters[i].camURL = '';
             } else {
                 farmPrinters[i].camURL = `http://${farmPrinters[i].camURL}`;
             }
@@ -1188,6 +1188,7 @@ class Runner {
             farmPrinters[index].markModified('settingsApperance');
             logger.info(`Modified Current Name  for: ${farmPrinters[i].printerURL}`);
             farmPrinters[index].printerURL = printers[i].printerURL;
+
             farmPrinters[index].markModified('printerURL');
             logger.info(
                 `Modified current printer URL  for: ${farmPrinters[i].printerURL}`
@@ -1252,9 +1253,11 @@ class Runner {
                     return o._id == indexs[i];
                 });
                 if(index > -1){
+                    const removedURL = JSON.stringify(JSON.parse(farmPrinters[index].printerURL));
                     logger.info(`Removing printer from database: ${farmPrinters[index]._id}`);
+                    PrinterTicker.addIssue(new Date(), removedURL,`Removing printer from database...`, "Active");
                     removed.push({
-                        printerURL: farmPrinters[index].printerURL,
+                        printerURL: removedURL,
                         printerId: indexs[i]
                     });
                     await PrinterClean.removePrintersInformation(farmPrinters[index].sortIndex);
@@ -1262,6 +1265,7 @@ class Runner {
 
                     // Splice printer out of farm Array...
                     const remove = await Printers.findOneAndDelete({ _id: indexs[i] });
+                    PrinterTicker.addIssue(new Date(), removedURL,`Removing printer from database`, "Complete");
                 }
             }
             // Regenerate Indexs
@@ -2012,7 +2016,15 @@ class Runner {
         const index = _.findIndex(farmPrinters, function (o) {
             return o._id == settings.printer.index;
         });
-
+        if(settings.printer.printerURL !== ""){
+            farmPrinters[index].printerURL = settings.printer.printerURL;
+        }
+        if(settings.printer.cameraURL !== ""){
+            farmPrinters[index].camURL = settings.printer.cameraURL;
+        }
+        if(settings.printer.apikey !== ""){
+            farmPrinters[index].apikey = settings.printer.apikey;
+        }
         // Preferred Only update on live
         farmPrinters[index].options.baudratePreference =
       settings.connection.preferredBaud;
@@ -2072,7 +2084,7 @@ class Runner {
                 flipV: settings.other.flipVCamera
             }
         };
-
+        console.log(settings.profile);
         const profile = await fetch(
             `${farmPrinters[index].printerURL}/api/printerprofiles/${settings.profileID}`,
             {

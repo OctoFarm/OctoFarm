@@ -1,7 +1,7 @@
 import Calc from './lib/functions/calc.js';
 import currentOperations from './lib/modules/currentOperations.js';
 
-// Setup charts
+// Setup charts test
 const optionsFarmTemp = {
     chart: {
         type: "line",

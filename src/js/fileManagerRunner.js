@@ -29,7 +29,6 @@ class Manager {
                 onlinePrinterList.push(printer);
             }
         });
-
         onlinePrinterList.forEach((printer, index) => {
             let extruderList = ``;
             for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
