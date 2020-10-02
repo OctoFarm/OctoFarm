@@ -1,3 +1,4 @@
+import "@babel/polyfill";
 import OctoFarmClient from "./lib/octofarm.js";
 import Calc from "./lib/functions/calc.js";
 import FileManager from "./lib/modules/fileManager.js";
@@ -9,34 +10,34 @@ let lastId = null;
 
 //Setup global listeners...
 document.getElementById("multUploadBtn").addEventListener("click", (e) => {
-    FileManager.multiUpload();
+  FileManager.multiUpload();
 });
 
 class Manager {
-    static async init() {
+  static async init() {
     // Draw printers
-        let printers = await OctoFarmClient.post("printers/printerInfo", {});
-        printers = await printers.json();
+    let printers = await OctoFarmClient.post("printers/printerInfo", {});
+    printers = await printers.json();
 
-        // Draw first printer list...
-        const filamentDropDown = await returnDropDown();
-        const printerList = document.getElementById("printerList");
+    // Draw first printer list...
+    const filamentDropDown = await returnDropDown();
+    const printerList = document.getElementById("printerList");
 
-        //Get online printers...
-        const onlinePrinterList = [];
-        printers.forEach(printer => {
-            if(printer.printerState.colour.category !== "Offline"){
-                onlinePrinterList.push(printer);
-            }
-        });
-        onlinePrinterList.forEach((printer, index) => {
-            let extruderList = ``;
-            for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
-                extruderList += `<div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool${i}-${printer._id}">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool${i}-${printer._id}"></select></div>`;
-            }
-            printerList.insertAdjacentHTML(
-                "beforeend",
-                `
+    //Get online printers...
+    const onlinePrinterList = [];
+    printers.forEach((printer) => {
+      if (printer.printerState.colour.category !== "Offline") {
+        onlinePrinterList.push(printer);
+      }
+    });
+    onlinePrinterList.forEach((printer, index) => {
+      let extruderList = ``;
+      for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
+        extruderList += `<div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool${i}-${printer._id}">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool${i}-${printer._id}"></select></div>`;
+      }
+      printerList.insertAdjacentHTML(
+        "beforeend",
+        `
         <a
             data-jplist-item
             id="fileManagerPrinter-${printer._id}"
@@ -108,103 +109,101 @@ class Manager {
           </a>
               
       `
-            );
-            //Setup for first printer
-            const listItem = document.getElementById(
-                `fileManagerPrinter-${printer._id}`
-            );
+      );
+      //Setup for first printer
+      const listItem = document.getElementById(
+        `fileManagerPrinter-${printer._id}`
+      );
 
-            listItem.addEventListener("click", (e) => {
+      listItem.addEventListener("click", (e) => {
+        if (!e.target.id.includes("tool")) {
+          Manager.changePrinter(e, printer._id);
+        }
+      });
 
-                if (!e.target.id.includes("tool")) {
-                    Manager.changePrinter(e, printer._id);
-                }
-            });
+      dragAndDropEnable(listItem, printer);
 
-            dragAndDropEnable(listItem, printer);
-
-            for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
-                const filamentDrop = document.getElementById(
-                    "tool" + i + "-" + printer._id
-                );
-                filamentDrop.innerHTML = "";
-                filamentDropDown.forEach((filament) => {
-                    filamentDrop.insertAdjacentHTML("beforeend", filament);
-                });
-                if (
-                    Array.isArray(printer.selectedFilament) &&
-            printer.selectedFilament.length !== 0
-                ) {
-                    if (
-                        typeof printer.selectedFilament[i] !== "undefined" &&
-              printer.selectedFilament[i] !== null
-                    ) {
-                        filamentDrop.value = printer.selectedFilament[i]._id;
-                    }
-                }
-                filamentDrop.addEventListener("change", async (event) => {
-                    selectFilament(printer._id, event.target.value, i);
-                    setTimeout(async () => {
-                        let updatePrinter = await OctoFarmClient.post(
-                            "printers/printerInfo",
-                            {
-                                i: lastId,
-                            }
-                        );
-                        updatePrinter = await updatePrinter.json();
-                        FileManager.refreshFiles(updatePrinter);
-                    }, 1000);
-                });
-            }
-
-            if(index === 0){
-                lastId = printer._id;
-                const item = document.getElementById(
-                    "fileManagerPrinter-" + printer._id
-                );
-                item.classList.add("bg-dark");
-                item.classList.remove("bg-secondary");
-                const firstElement = document.getElementById("currentPrinter");
-                firstElement.innerHTML =
-                    '<i class="fas fa-print"></i> ' + printer.printerName;
-                FileSorting.loadSort(printer);
-                Manager.updatePrinterList(printer._id);
-            }
-
+      for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
+        const filamentDrop = document.getElementById(
+          "tool" + i + "-" + printer._id
+        );
+        filamentDrop.innerHTML = "";
+        filamentDropDown.forEach((filament) => {
+          filamentDrop.insertAdjacentHTML("beforeend", filament);
         });
-    }
+        if (
+          Array.isArray(printer.selectedFilament) &&
+          printer.selectedFilament.length !== 0
+        ) {
+          if (
+            typeof printer.selectedFilament[i] !== "undefined" &&
+            printer.selectedFilament[i] !== null
+          ) {
+            filamentDrop.value = printer.selectedFilament[i]._id;
+          }
+        }
+        filamentDrop.addEventListener("change", async (event) => {
+          selectFilament(printer._id, event.target.value, i);
+          setTimeout(async () => {
+            let updatePrinter = await OctoFarmClient.post(
+              "printers/printerInfo",
+              {
+                i: lastId,
+              }
+            );
+            updatePrinter = await updatePrinter.json();
+            FileManager.refreshFiles(updatePrinter);
+          }, 1000);
+        });
+      }
 
-    static changePrinter(e, target) {
-        if (!e.target.id.includes("filamentDrop")) {
-            //Set old one deselected
-            document.getElementById("fileBody").innerHTML = "";
-            document.getElementById("currentFolder").innerHTML = "local";
-            document.getElementById("fileManagerPrinter-" + lastId).className =
+      if (index === 0) {
+        lastId = printer._id;
+        const item = document.getElementById(
+          "fileManagerPrinter-" + printer._id
+        );
+        item.classList.add("bg-dark");
+        item.classList.remove("bg-secondary");
+        const firstElement = document.getElementById("currentPrinter");
+        firstElement.innerHTML =
+          '<i class="fas fa-print"></i> ' + printer.printerName;
+        FileSorting.loadSort(printer);
+        Manager.updatePrinterList(printer._id);
+      }
+    });
+  }
+
+  static changePrinter(e, target) {
+    if (!e.target.id.includes("filamentDrop")) {
+      //Set old one deselected
+      document.getElementById("fileBody").innerHTML = "";
+      document.getElementById("currentFolder").innerHTML = "local";
+      document.getElementById("fileManagerPrinter-" + lastId).className =
         "list-group-item list-group-item-action flex-column align-items-start bg-secondary";
 
-            //Update old index to this one
-            lastId = target;
-            const printerName = document.getElementById("printerName-" + lastId)
-                .innerHTML;
-            const panel = document.getElementById("fileManagerPrinter-" + target);
+      //Update old index to this one
+      lastId = target;
+      const printerName = document.getElementById("printerName-" + lastId)
+        .innerHTML;
+      const panel = document.getElementById("fileManagerPrinter-" + target);
 
-            panel.classList.add("bg-dark");
-            panel.classList.remove("bg-secondary");
-            const firstElement = document.getElementById("currentPrinter");
-            firstElement.innerHTML = '<i class="fas fa-print"></i> ' + printerName;
-            Manager.updatePrinterList(target);
-        }
+      panel.classList.add("bg-dark");
+      panel.classList.remove("bg-secondary");
+      const firstElement = document.getElementById("currentPrinter");
+      firstElement.innerHTML = '<i class="fas fa-print"></i> ' + printerName;
+      Manager.updatePrinterList(target);
     }
+  }
 
-    static async updatePrinterList(id) {
-        let fileList = document.getElementById("fileBody");
-        const fileManagerManagement = document.getElementById(
-            "fileManagerManagement"
-        );
-        if (fileManagerManagement) {
-            fileList = fileManagerManagement;
-        }
-        fileList.innerHTML = `
+  static async updatePrinterList(id) {
+    let fileList = document.getElementById("fileBody");
+    const fileManagerManagement = document.getElementById(
+      "fileManagerManagement"
+    );
+    if (fileManagerManagement) {
+      fileList = fileManagerManagement;
+    }
+    fileList.innerHTML = `
          <div class="row mb-1">
           <div class="col-12">
          
@@ -233,67 +232,67 @@ class Manager {
 
         </div>
         `;
-        document.getElementById("fileBody").insertAdjacentHTML(
-            "beforeend",
-            `
+    document.getElementById("fileBody").insertAdjacentHTML(
+      "beforeend",
+      `
             <div id="fileList-${id}" class="list-group" style="max-height:100%; overflow-y:scroll; min-height:1000px;" data-jplist-group="files">
                 
             </div>
         `
-        );
-        let printer = await OctoFarmClient.post("printers/printerInfo", {
-            i: id,
-        });
-        printer = await printer.json();
-        FileSorting.loadSort(printer);
-        document.getElementById("backBtn").innerHTML = `
+    );
+    let printer = await OctoFarmClient.post("printers/printerInfo", {
+      i: id,
+    });
+    printer = await printer.json();
+    FileSorting.loadSort(printer);
+    document.getElementById("backBtn").innerHTML = `
           <button id="fileBackBtn" type="button" class="btn btn-success">
                   <i class="fas fa-chevron-left"></i> Back
                 </button>`;
-        const fileButtons = {
-            fileManager: {
-                printerStorage: document.getElementById("printerStorage"),
-                fileFolderCount: document.getElementById("printerFileCount"),
-                fileSearch: document.getElementById("searchFiles"),
-                uploadFiles: document.getElementById("fileUploadBtn"),
-                uploadPrintFile: document.getElementById("fileUploadPrintBtn"),
-                syncFiles: document.getElementById("fileReSync"),
-                back: document.getElementById("fileBackBtn"),
-                createFolderBtn: document.getElementById("createFolderBtn"),
-            },
-        };
-        fileButtons.fileManager.fileFolderCount.innerHTML = `<i class="fas fa-file"></i> ${printer.fileList.filecount} <i class="fas fa-folder"></i> ${printer.fileList.folderCount}`;
-        if (typeof printer.storage !== "undefined") {
-            fileButtons.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
-                printer.storage.free
-            )} / ${Calc.bytes(printer.storage.total)}`;
-        }else{
-            fileButtons.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
-                0
-            )} / ${Calc.bytes(0)}`;
-        }
-
-        fileButtons.fileManager.uploadFiles.addEventListener("change", function () {
-            FileManager.handleFiles(this.files, printer);
-        });
-        fileButtons.fileManager.createFolderBtn.addEventListener("click", (e) => {
-            FileManager.createFolder(printer);
-        });
-        fileButtons.fileManager.fileSearch.addEventListener("keyup", (e) => {
-            FileManager.search(printer._id);
-        });
-        fileButtons.fileManager.uploadPrintFile.addEventListener(
-            "change",
-            function () {
-                FileManager.handleFiles(this.files, printer, "print");
-            }
-        );
-        fileButtons.fileManager.back.addEventListener("click", (e) => {
-            FileManager.openFolder(undefined, undefined, printer);
-        });
-        fileButtons.fileManager.syncFiles.addEventListener("click", (e) => {
-            FileManager.reSyncFiles(e, printer);
-        });
+    const fileButtons = {
+      fileManager: {
+        printerStorage: document.getElementById("printerStorage"),
+        fileFolderCount: document.getElementById("printerFileCount"),
+        fileSearch: document.getElementById("searchFiles"),
+        uploadFiles: document.getElementById("fileUploadBtn"),
+        uploadPrintFile: document.getElementById("fileUploadPrintBtn"),
+        syncFiles: document.getElementById("fileReSync"),
+        back: document.getElementById("fileBackBtn"),
+        createFolderBtn: document.getElementById("createFolderBtn"),
+      },
+    };
+    fileButtons.fileManager.fileFolderCount.innerHTML = `<i class="fas fa-file"></i> ${printer.fileList.filecount} <i class="fas fa-folder"></i> ${printer.fileList.folderCount}`;
+    if (typeof printer.storage !== "undefined") {
+      fileButtons.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
+        printer.storage.free
+      )} / ${Calc.bytes(printer.storage.total)}`;
+    } else {
+      fileButtons.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
+        0
+      )} / ${Calc.bytes(0)}`;
     }
+
+    fileButtons.fileManager.uploadFiles.addEventListener("change", function () {
+      FileManager.handleFiles(this.files, printer);
+    });
+    fileButtons.fileManager.createFolderBtn.addEventListener("click", (e) => {
+      FileManager.createFolder(printer);
+    });
+    fileButtons.fileManager.fileSearch.addEventListener("keyup", (e) => {
+      FileManager.search(printer._id);
+    });
+    fileButtons.fileManager.uploadPrintFile.addEventListener(
+      "change",
+      function () {
+        FileManager.handleFiles(this.files, printer, "print");
+      }
+    );
+    fileButtons.fileManager.back.addEventListener("click", (e) => {
+      FileManager.openFolder(undefined, undefined, printer);
+    });
+    fileButtons.fileManager.syncFiles.addEventListener("click", (e) => {
+      FileManager.reSyncFiles(e, printer);
+    });
+  }
 }
 Manager.init();

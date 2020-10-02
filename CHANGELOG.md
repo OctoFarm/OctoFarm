@@ -11,12 +11,15 @@ All notable changes to this project will be documented in this file.
     - Q.O.L improvement with modal describing required OctoPrint steps to add a printer. Assumes you already know what your doing if you have printers in your farm...
     - API issues now show a big red badge under Printer State in Printer Management. This will only show if you Host is online to avoid in correctly alerting you if OctoPrint is shutdown. You can investigate these on the printer settings modal.
     - Current OctoPrint user is now displayed in "Printer Settings"
+    - Printer Control now lists AUTO in printer Port options.
     
 ### Changed
     - Added additional CSS classes to buttons for theming. Applies to actions buttons only, status colours the same. 
     - Removed Printer URL/Camera URL/API Key from displaying on Printer Manager and moved onto "Printer Settings" modal. 
     - Allowed Printer Settings Modal to be opened whilst offline. Disables any settings relevant/requiring OctoPrint connection.
     - Export printer json now in human readable format
+    - Do not attempt to reconnect when
+    - History now captures printer ID. Any matches going forward will attempt the ID match and then fallback to name as before.
     
 ### Fixed
     - Fixed issue with File Manager not loading if printer in index 0 was offline.
@@ -25,6 +28,11 @@ All notable changes to this project will be documented in this file.
     - Stopped OctoFarm creating and displaying duplicate terminal information.
     - Issue with server requiring a restart to pull in setting information.
     - Docker error when booting regarding cd directory not existing. 
+    - Weird issue with client server check locking up screen.
+    - Fixed some audit issues, rest are development dependancies and can be ignored
+    - Fixed error logs not saving correctly...
+    - Printer Control now correctly allows port/baud/profile selections when printer is in "Error!" state.
+    - Printer Control no longer throws an error and locks the screen if a bad connection attempt is made.
 
 ## Removed
     - Removed the annoying content editable fields on "Printer Settings" and "Printer Management" and replaced with standard input boxes. 
