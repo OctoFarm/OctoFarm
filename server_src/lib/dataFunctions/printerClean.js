@@ -16,7 +16,7 @@ const RoomData = require("../../models/roomData.js");
 
 const ErrorLogs = require("../../models/ErrorLog.js");
 
-const TempHistory = require("../../models/TempHistory.js");
+const TempHistory = require("../../models/tempHistory.js");
 
 const printerTicker = require("../../runners/printerTicker.js");
 
