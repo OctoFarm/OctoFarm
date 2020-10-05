@@ -125,7 +125,7 @@
     "ignore": [
       "views/assets/*",
       "logs/*",
-      "src/*"
+      "client_src/*"
     ],
     "delay": "2500"
   }

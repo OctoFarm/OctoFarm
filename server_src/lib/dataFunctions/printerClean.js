@@ -14,6 +14,14 @@ const FarmStatistics = require("../../models/FarmStatistics.js");
 
 const RoomData = require("../../models/roomData.js");
 
+const ErrorLogs = require("../../models/ErrorLog.js");
+
+const TempHistory = require("../../models/TempHistory.js");
+
+const printerTicker = require("../../runners/printerTicker.js");
+
+const { PrinterTicker } = printerTicker;
+
 const currentOperations = {
   operations: [],
   count: {
@@ -98,6 +106,10 @@ let printerFilamentList = [];
 
 let interval = false;
 
+let printerConnectionLogs = [];
+
+let fmToggle = false;
+
 class PrinterClean {
   static removePrintersInformation(index) {
     if (typeof index !== "undefined") {
@@ -108,7 +120,13 @@ class PrinterClean {
       printersInformation = [];
     }
   }
-
+  static returnPrinterLogs(sortIndex) {
+    if (typeof sortIndex !== "undefined") {
+      return printerConnectionLogs[sortIndex];
+    } else {
+      return printerConnectionLogs;
+    }
+  }
   static returnPrintersInformation() {
     return printersInformation;
   }
@@ -130,6 +148,7 @@ class PrinterClean {
   }
 
   static async generate(farmPrinter, filamentManager) {
+    fmToggle = filamentManager;
     try {
       if (typeof farmPrinter.systemChecks !== "undefined") {
         farmPrinter.systemChecks.cleaning.information.status = "warning";
@@ -210,7 +229,10 @@ class PrinterClean {
         farmPrinter
       );
       sortedPrinter.storage = farmPrinter.storage;
+      sortedPrinter.tempHistory = farmPrinter.tempHistory;
 
+      sortedPrinter.connectionLog =
+        printerConnectionLogs[farmPrinter.sortIndex];
       if (typeof farmPrinter.klipperFirmwareVersion !== "undefined") {
         sortedPrinter.klipperFirmwareVersion = farmPrinter.klipperFirmwareVersion.substring(
           0,
@@ -240,12 +262,133 @@ class PrinterClean {
       }
 
       printersInformation[farmPrinter.sortIndex] = sortedPrinter;
-      PrinterClean.createPrinterList(printersInformation, filamentManager);
     } catch (e) {
       console.log(e);
     }
   }
+  static async generateConnectionLogs(farmPrinters) {
+    let printerErrorLogs = await ErrorLogs.find({});
+    for (let p = 0; p < farmPrinters.length; p++) {
+      let currentOctoFarmLogs = [];
+      let currentErrorLogs = [];
+      let currentTempLogs = [];
+      for (let e = 0; e < printerErrorLogs.length; e++) {
+        if (
+          typeof printerErrorLogs[e].errorLog.printerID !== "undefined" &&
+          JSON.stringify(printerErrorLogs[e].errorLog.printerID) ===
+            JSON.stringify(farmPrinters[p]._id)
+        ) {
+          let errorFormat = {
+            date: printerErrorLogs[e].errorLog.endDate,
+            message: printerErrorLogs[e].errorLog.reason,
+            printer: farmPrinters[p].printerURL,
+            state: "Offline",
+          };
+          currentErrorLogs.push(errorFormat);
+        }
+      }
+      let currentIssues = await PrinterTicker.returnIssue();
+      for (let i = 0; i < currentIssues.length; i++) {
+        if (
+          JSON.stringify(currentIssues[i].printerID) ===
+          JSON.stringify(farmPrinters[p]._id)
+        ) {
+          let errorFormat = {
+            date: currentIssues[i].date,
+            message: currentIssues[i].message,
+            printer: currentIssues[i].printer,
+            state: currentIssues[i].state,
+          };
+          currentOctoFarmLogs.push(errorFormat);
+        }
+      }
 
+      let tempHistory = await TempHistory.find({
+        printer_id: farmPrinters[p]._id,
+      })
+        .sort({ _id: -1 })
+        .limit(500);
+      if (typeof tempHistory !== "undefined") {
+        for (let h = 0; h < tempHistory.length; h++) {
+          let hist = tempHistory[h].currentTemp;
+          const reFormatTempHistory = async function (tempHistory) {
+            // create a new object to store full name.
+            let keys = Object.keys(tempHistory);
+            let array = [];
+
+            for (let k = 0; k < keys.length; k++) {
+              if (keys[k] !== "time") {
+                let target = {};
+                let actual = {};
+                target = {
+                  name: keys[k] + "-target",
+                  data: [],
+                };
+                actual = {
+                  name: keys[k] + "-actual",
+                  data: [],
+                };
+                array.push(target);
+                array.push(actual);
+              }
+            }
+
+            // return our new object.
+            return array;
+          };
+          currentTempLogs = await reFormatTempHistory(hist);
+        }
+        if (currentTempLogs.length > 0) {
+          for (let h = 0; h < tempHistory.length; h++) {
+            let hist = tempHistory[h].currentTemp;
+            let keys = Object.keys(hist);
+            for (let k = 0; k < keys.length; k++) {
+              if (keys[k] !== "time") {
+                let actual = {
+                  x: hist["time"],
+                  y: hist[keys[k]].actual,
+                };
+                let target = {
+                  x: hist["time"],
+                  y: hist[keys[k]].target,
+                };
+
+                //get array position...
+                let arrayTarget = currentTempLogs
+                  .map(function (e) {
+                    return e.name;
+                  })
+                  .indexOf(keys[k] + "-target");
+                let arrayActual = currentTempLogs
+                  .map(function (e) {
+                    return e.name;
+                  })
+                  .indexOf(keys[k] + "-actual");
+                if (
+                  currentTempLogs[arrayTarget].data.length <= tempHistory.length
+                ) {
+                  currentTempLogs[arrayTarget].data.push(target);
+                }
+                if (
+                  currentTempLogs[arrayActual].data.length <= tempHistory.length
+                ) {
+                  currentTempLogs[arrayActual].data.push(actual);
+                }
+              }
+            }
+          }
+        }
+      }
+
+      currentErrorLogs = _.orderBy(currentErrorLogs, ["date"], ["desc"]);
+      currentOctoFarmLogs = _.orderBy(currentOctoFarmLogs, ["date"], ["desc"]);
+      printerConnectionLogs[farmPrinters[p].sortIndex] = {
+        currentOctoFarmLogs,
+        currentErrorLogs,
+        currentTempLogs,
+      };
+    }
+  }
   static async createPrinterList(farmPrinters, filamentManager) {
     const printerList = ['<option value="0">Not Assigned</option>'];
     farmPrinters.forEach((printer) => {
@@ -299,15 +442,24 @@ class PrinterClean {
       if (typeof currentLogs[i] === "undefined") {
         currentLogs[i] = [];
       } else {
-        for (let l = 0; l < logs.length; l++) {
-          if (currentLogs[i][currentLogs[i].length - 1] !== logs[l]) {
-            currentLogs[i].push(logs[l]);
+        if (logs.length === 1) {
+          if (currentLogs[i][currentLogs[i].length - 1] !== logs[0]) {
+            currentLogs[i].push(logs[0]);
           }
-          if (currentLogs[i].length >= 300) {
+          if (currentLogs[i].length >= 100) {
             currentLogs[i].shift();
           }
+        } else {
+          for (let l = 0; l < logs.length; l++) {
+            if (currentLogs[i][currentLogs[i].length - 1] !== logs[l]) {
+              currentLogs[i].push(logs[l]);
+            }
+            if (currentLogs[i].length >= 100) {
+              currentLogs[i].shift();
+            }
+          }
+          previousLogs[i] = currentLogs[i];
         }
-        previousLogs[i] = currentLogs[i];
       }
     } else {
       currentLogs[i] = [];
@@ -868,7 +1020,7 @@ class PrinterClean {
     };
     //Find min / max values for gas_resistance to tweak calulation...
     RoomData.find({})
-      .sort("-date")
+      .sort({ _id: -1 })
       .limit(500)
       .exec(function (err, posts) {
         const currentEnviromentalData = [
@@ -1209,6 +1361,10 @@ if (interval === false) {
   interval = setInterval(() => {
     PrinterClean.sortCurrentOperations(printersInformation);
     PrinterClean.statisticsStart();
+    PrinterClean.generateConnectionLogs(printersInformation);
+    PrinterClean.createPrinterList(printersInformation, fmToggle);
   }, 1000);
 }
 PrinterClean.statisticsStart();
+PrinterClean.generateConnectionLogs(printersInformation);
+PrinterClean.createPrinterList(printersInformation, fmToggle);

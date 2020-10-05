@@ -1,7 +1,15 @@
 import OctoFarmClient from "../octofarm.js";
+import UI from "../functions/ui.js";
+
+const editMessage = `Update any of the printer values below and press action when you've made your changes. OctoFarm will then update only the changed printers.`;
+const deleteMessage = `Select which printers you'd like to delete. Press action when you have selected all the printers you'd like to remove.`;
+const connectMessage = `Select which printers you'd like to connect to from OctoPrint. Selected printers will attempt a connection with the preferred port settings, if this doesn't exist the connection attempt will fall back to AUTO and could fail/put your printer in an error state.<br><code>NOTE: this can be updated in your printer settings on OctoFarm/OctoPrint. You will need to re-scan if updated on OctoPrint.</code>`;
 
 const printersTable = `
 <div class="row">
+    <div class="col-lg-12">
+      <div class="pb-2" id="selectMessageBox"></div>
+    </div>
     <div class="col-md-3">
                        <div class="input-group mb-3">
                             <div class="input-group-prepend">
@@ -76,179 +84,259 @@ const printersTable = `
 </table>
 `;
 
-export default class PrinterSelect{
-    static getSelectableList(printer){
-        return `
-                       <tr id="${printer.id}" class="${printer.state}" data-jplist-item>
+export default class PrinterSelect {
+  static getSelectableList(printer) {
+    return `
+                       <tr id="${printer.id}" class="${
+      printer.state
+    }" data-jplist-item>
                           <td>
                                 <div class="custom-control custom-checkbox">
-                                  <input type="checkbox" class="custom-control-input Idle" id="checkBox-${printer.id}" value="${printer.id}">
-                                  <label class="custom-control-label" for="checkBox-${printer.id}"></label>
+                                  <input type="checkbox" class="custom-control-input Idle" id="checkBox-${
+                                    printer.id
+                                  }" value="${printer.id}">
+                                  <label class="custom-control-label" for="checkBox-${
+                                    printer.id
+                                  }"></label>
                                 </div>
                           </td>
                           <th scope="row">${printer.index}</th>
                           <td>${printer.name}</td>
                           <td class="${printer.state}">${printer.state}</td>
-                          <td class="${printer.group.replace(/\s/g, '_')}">${printer.group}</td>
+                          <td class="${printer.group.replace(/\s/g, "_")}">${
+      printer.group
+    }</td>
                           <td>${printer.spool}</td>
                         </tr>
                 `;
-    }
-    static getEditableList(printer){
-        return `
-                       <tr id="${printer.id}" class="${printer.state}" data-jplist-item>
+  }
+  static getEditableList(printer) {
+    return `
+                       <tr id="editPrinterCard-${printer.id}" class="${
+      printer.state
+    }" data-jplist-item>
                           <th scope="row">${printer.index}</th>
-                          <td><input type="text" class="form-control Idle" placeholder="${printer.name}" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input type="text" class="form-control Idle" placeholder="${printer.printerURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td class="${printer.state} d-none">${printer.state}</td>
-                          <td class="${printer.group.replace(/\s/g, '_')}"><input type="text" class="form-control Idle" placeholder="${printer.group}" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input type="text" class="form-control Idle" placeholder="${printer.cameraURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input type="text" class="form-control Idle" placeholder="${printer.apikey}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputName-${
+                            printer.id
+                          }" type="text" class="form-control Idle" placeholder="${
+      printer.name
+    }" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputURL-${
+                            printer.id
+                          }" type="text" class="form-control Idle" placeholder="${
+      printer.printerURL
+    }" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td class="${printer.state} d-none">${
+      printer.state
+    }</td>
+                          <td class="${printer.group.replace(
+                            /\s/g,
+                            "_"
+                          )}"><input id="editInputGroup-${
+      printer.id
+    }" type="text" class="form-control Idle" placeholder="${
+      printer.group
+    }" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputCamera-${
+                            printer.id
+                          }" type="text" class="form-control Idle" placeholder="${
+      printer.cameraURL
+    }" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputApikey-${
+                            printer.id
+                          }" type="text" class="form-control Idle" placeholder="${
+      printer.apikey
+    }" aria-label="Username" aria-describedby="basic-addon1"></td>
                         </tr>
                 `;
+  }
+  static isOffline(state, editable, override) {
+    if (editable) {
+      return true;
+    } else if (override) {
+      return true;
+    } else {
+      return state !== "Offline";
     }
-    static isOffline(state, editable, override){
-        if(editable){
-            return true;
-        }else if(override){
-            return true;
-        }else{
-            return state !== 'Offline';
-        }
+  }
+  static async create(element, editable, action, callback) {
+    let saveEditsBtn = document.getElementById("saveEditsBtn");
+    if (saveEditsBtn) {
+      saveEditsBtn.remove();
     }
-    static async create(element, editable, action, callback){
-        if(action){
-            document.getElementById("printerEditLabel").innerHTML = action;
-        }
-        let override = false;
-        console.log(action);
-        if(action === "Printer Deletion"){
-            override = true;
-        }
+    if (action) {
+      document.getElementById("printerEditLabel").innerHTML = action;
+    }
+    //Setup elements
+    element.innerHTML = "";
+    element.innerHTML = printersTable;
+    let messageBox = document.getElementById("selectMessageBox");
+    messageBox.innerHTML = "";
+    let override = false;
+    if (action === "Printer Deletion") {
+      override = true;
+      messageBox.innerHTML = deleteMessage;
+    } else if (action === "Edit Printers") {
+      messageBox.innerHTML = editMessage;
+    } else if (action === "Connect Printers") {
+      messageBox.innerHTML = connectMessage;
+    }
+    const printersInfo = await OctoFarmClient.post("printers/printerInfo");
+    const printers = await printersInfo.json();
+    const groupList = [];
+    const printerList = [];
 
-        element.innerHTML = "";
-        const printersInfo = await OctoFarmClient.post("printers/printerInfo");
-        const printers = await printersInfo.json();
-        const groupList = [];
-        const printerList = [];
+    printers.forEach((printer) => {
+      if (
+        typeof printer.printerState !== "undefined" &&
+        this.isOffline(printer.printerState.colour.category, editable, override)
+      ) {
+        let spoolName = "";
+        if (printer.selectedFilament.length !== 0) {
+          printer.selectedFilament.forEach((spool, index) => {
+            if (spool !== null) {
+              spoolName += `Tool ${index}: ${spool.spools.name} - ${spool.spools.material} <br>`;
+            } else {
+              spoolName += `Tool ${index}: No Spool Selected <br>`;
+            }
+          });
+        } else {
+          spoolName = "No Spool Selected";
+        }
+        const forList = {
+          id: printer._id,
+          index: printer.sortIndex,
+          name: printer.printerName,
+          printerURL: printer.printerURL,
+          state: printer.printerState.colour.category,
+          group: printer.group,
+          spool: spoolName,
+          cameraURL: printer.cameraURL,
+          apikey: printer.apikey,
+        };
+        printerList.push(forList);
+      }
+      if (printer.group !== "") {
+        const group = {
+          display: printer.group,
+          tag: printer.group.replace(/\s/g, "_"),
+        };
+        groupList.push(group);
+      }
+    });
 
-        printers.forEach(printer => {
-            if(typeof printer.printerState !== 'undefined' && this.isOffline(printer.printerState.colour.category, editable, override)){
-                let spoolName = "";
-                if(printer.selectedFilament.length !== 0){
-                    printer.selectedFilament.forEach((spool, index) => {
-                        if(spool !== null) {
-                            spoolName += `Tool ${index}: ${spool.spools.name} - ${spool.spools.material} <br>`;
-                        }else{
-                            spoolName += `Tool ${index}: No Spool Selected <br>`;
-                        }
-                    });
-                }else{
-                    spoolName = "No Spool Selected";
-                }
-                const forList = {
-                    id: printer._id,
-                    index: printer.sortIndex,
-                    name: printer.printerName,
-                    printerURL: printer.printerURL,
-                    state: printer.printerState.colour.category,
-                    group: printer.group,
-                    spool: spoolName,
-                    cameraURL: printer.cameraURL,
-                    apikey: printer.apikey
-                };
-                printerList.push(forList);
-            }
-            if(printer.group !== ""){
-                const group = {
-                    display: printer.group,
-                    tag: printer.group.replace(/\s/g, '_')
-                };
-                groupList.push(group);
-            }
+    const groupListUnique = _.uniq(groupList, "tag");
+    if (printerList.length !== 0) {
+      //Create printers table
+
+      const tableBody = document.getElementById("printerSelectBody");
+      if (editable) {
+        document.getElementById("spoolColumn").classList.add("d-none");
+        document.getElementById("stateColumn").classList.add("d-none");
+        document.getElementById("cameraColumn").classList.remove("d-none");
+        document.getElementById("apiColumn").classList.remove("d-none");
+        document.getElementById("selectColumn").classList.add("d-none");
+        document.getElementById("urlColumn").classList.remove("d-none");
+
+        printerList.forEach((printer) => {
+          tableBody.insertAdjacentHTML(
+            "beforeend",
+            this.getEditableList(printer)
+          );
         });
+      } else {
+        printerList.forEach((printer) => {
+          tableBody.insertAdjacentHTML(
+            "beforeend",
+            this.getSelectableList(printer)
+          );
+        });
+      }
 
-
-        const groupListUnique = _.uniq(groupList, 'tag');
-        if(printerList.length !== 0){
-            //Create printers table
-            element.innerHTML = printersTable;
-            const tableBody = document.getElementById("printerSelectBody");
-            if(editable){
-                document.getElementById("spoolColumn").classList.add("d-none");
-                document.getElementById("stateColumn").classList.add("d-none");
-                document.getElementById("cameraColumn").classList.remove("d-none");
-                document.getElementById("apiColumn").classList.remove("d-none");
-                document.getElementById("selectColumn").classList.add("d-none");
-                document.getElementById("urlColumn").classList.remove("d-none");
-
-                printerList.forEach(printer => {
-                    tableBody.insertAdjacentHTML('beforeend', this.getEditableList(printer));
-                });
-            }else{
-                printerList.forEach(printer => {
-                    tableBody.insertAdjacentHTML('beforeend', this.getSelectableList(printer));
-                });
-            }
-
-            const printerGroupList = document.getElementById("printerGroupList");
-            printerGroupList.innerHTML = "";
-            printerGroupList.insertAdjacentHTML('beforeend', `
+      const printerGroupList = document.getElementById("printerGroupList");
+      printerGroupList.innerHTML = "";
+      printerGroupList.insertAdjacentHTML(
+        "beforeend",
+        `
                                   <option selected
                                         value="all"
                                         data-path="default"
                                 >Filter</option>
-            `);
-            groupListUnique.forEach((group, index) => {
-                printerGroupList.insertAdjacentHTML('beforeend', `
+            `
+      );
+      groupListUnique.forEach((group, index) => {
+        printerGroupList.insertAdjacentHTML(
+          "beforeend",
+          `
                                                         <option
                                                         value="${group.tag.toLowerCase()}"
-                                                        data-path=".${group.tag}">${group.display}</option>
-                `);
-            });
-        }else{
-            const tableBody = document.getElementById("printerSelectBody");
-            tableBody.insertAdjacentHTML('beforeend', `<tr><td>No Online Printers</td></tr>`);
-        }
-        PrinterSelect.addListeners(editable, callback);
+                                                        data-path=".${
+                                                          group.tag
+                                                        }">${
+            group.display
+          }</option>
+                `
+        );
+      });
+    } else {
+      const tableBody = document.getElementById("printerSelectBody");
+      tableBody.insertAdjacentHTML(
+        "beforeend",
+        `<tr><td>No Online Printers</td></tr>`
+      );
     }
-    static addListeners(editable, callback){
-        if(!editable){
-            document.getElementById("selectBtns").innerHTML = `
+    PrinterSelect.addListeners(editable, callback);
+  }
+
+  static addListeners(editable, callback) {
+    if (!editable) {
+      document.getElementById("selectBtns").innerHTML = `
                     <button id="selectAll" type="button" class="btn btn-secondary"><i class="fas fa-check-square"></i> Select All</button>
                     <button id="selectNone" type="button" class="btn btn-secondary"><i class="fas fa-square"></i> Deselect All</button>
             `;
-            document.getElementById("selectAll").addEventListener('click', e => {
-                const checkBoxes = document.querySelectorAll('input[type="checkbox"]:not(:checked)');
-                checkBoxes.forEach(box => {
-                    box.checked = true;
-                });
-            });
-            document.getElementById("selectNone").addEventListener('click', e => {
-                const checkBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
-                checkBoxes.forEach(box => {
-                    box.checked = false;
-                });
-            });
-
-        }
-        if(callback){
-            document.getElementById("saveEditsBtn").addEventListener("click", callback);
-        }
-        jplist.init();
-    }
-    static getSelected(){
-        const checkedBoxes = document.querySelectorAll('input[type="checkbox"]:checked');
-        const printers = [];
-        checkedBoxes.forEach(box => {
-            if(box.id.includes("checkBox")){
-                printers.push(box);
-            }}
+      document.getElementById("selectAll").addEventListener("click", (e) => {
+        const checkBoxes = document.querySelectorAll(
+          'input[type="checkbox"]:not(:checked)'
         );
-        return printers;
+        checkBoxes.forEach((box) => {
+          box.checked = true;
+        });
+      });
+      document.getElementById("selectNone").addEventListener("click", (e) => {
+        const checkBoxes = document.querySelectorAll(
+          'input[type="checkbox"]:checked'
+        );
+        checkBoxes.forEach((box) => {
+          box.checked = false;
+        });
+      });
+    } else {
+      UI.addSelectListeners("editInput");
     }
-    static selectFilter(){
-
+    if (callback) {
+      document.getElementById("saveArea").insertAdjacentHTML(
+        "beforeend",
+        `
+                      <button id="saveEditsBtn" class="btn btn-success" data-dismiss="modal" aria-label="Close">Action</button>
+      `
+      );
+      document
+        .getElementById("saveEditsBtn")
+        .addEventListener("click", callback);
     }
-
+    jplist.init();
+  }
+  static getSelected() {
+    const checkedBoxes = document.querySelectorAll(
+      'input[type="checkbox"]:checked'
+    );
+    const printers = [];
+    checkedBoxes.forEach((box) => {
+      if (box.id.includes("checkBox")) {
+        printers.push(box);
+      }
+    });
+    return printers;
+  }
+  static selectFilter() {}
 }

@@ -8,6 +8,7 @@ import FileOperations from "./lib/functions/file.js";
 import Validate from "./lib/functions/validate.js";
 import PowerButton from "./lib/modules/powerButton.js";
 import PrinterSelect from "./lib/modules/printerSelect";
+import PrinterLogs from "./lib/modules/printerLogs.js";
 
 let printerInfo = "";
 const editMode = false;
@@ -79,50 +80,181 @@ if (window.Worker) {
 }
 
 let newPrintersIndex = 0;
+const removeLine = function (element) {
+  element.remove();
+};
 // Dash control listeners
 // const saveEditBtn = document.getElementById('saveEditsBtn');
 const editBtn = document.getElementById("editPrinterBtn");
 const bulkConnectBtn = document.getElementById("bulkConnectBtn");
 bulkConnectBtn.addEventListener("click", async (e) => {
+  const printerConnect = async function () {
+    let printersToConnect = [];
+    //Grab all check boxes
+    const selectedPrinters = PrinterSelect.getSelected();
+    selectedPrinters.forEach((element) => {
+      const ca = element.id.split("-");
+      printersToConnect.push(ca[1]);
+    });
+    for (let p = 0; p < printersToConnect.length; p++) {
+      const index = _.findIndex(printerInfo, function (o) {
+        return o._id === printersToConnect[p];
+      });
+      if (index > -1) {
+        let data = {};
+        if (typeof printerInfo[index].connectionOptions !== "undefined") {
+          data = {
+            command: "connect",
+            port: printerInfo[index].connectionOptions.portPreference,
+            baudrate: printerInfo[index].connectionOptions.baudratePreference,
+            printerProfile:
+              printerInfo[index].connectionOptions.printerProfilePreference,
+            save: true,
+          };
+        } else {
+          UI.createAlert(
+            "warning",
+            `${printerInfo[index].printerName} has no preferences saved, defaulting to AUTO...`,
+            8000,
+            "Clicked"
+          );
+          data.command = "connect";
+          data.port = "AUTO";
+          data.baudrate = "AUTO";
+          data.printerProfile = "_default";
+          data.save = false;
+        }
+        if (
+          printerInfo[index].printerState.colour.category === "Disconnected"
+        ) {
+          let post = await OctoPrintClient.post(
+            printerInfo[index],
+            "connection",
+            data
+          );
+          if (typeof post !== "undefined") {
+            if (post.status === 204) {
+              UI.createAlert(
+                "success",
+                `Successfully made connection attempt to ${printerInfo[index].printerName}...`,
+                3000,
+                "Clicked"
+              );
+            } else {
+              UI.createAlert(
+                "error",
+                `There was an issue connecting to ${printerInfo[index].printerName} it's either not online, or the connection options supplied are not available...`,
+                3000,
+                "Clicked"
+              );
+            }
+          } else {
+            UI.createAlert(
+              "error",
+              `No response from ${printerInfo[index].printerName}, is it online???`,
+              3000,
+              "Clicked"
+            );
+          }
+        } else {
+          UI.createAlert(
+            "warning",
+            `Printer ${printerInfo[index].printerName} is not in "Disconnected" state... skipping`,
+            3000,
+            "Clicked"
+          );
+        }
+      } else {
+        UI.createAlert(
+          "error",
+          `Could not find ${printerInfo[index].printerName} in your printer in the list of available printers...`,
+          3000,
+          "Clicked"
+        );
+      }
+    }
+  };
+
   PrinterSelect.create(
     document.getElementById("multiPrintersSection"),
     false,
-    "Connect Printers"
+    "Connect Printers",
+    printerConnect
   );
-  // searchOffline.innerHTML =
-  // '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
-  //
-  // const post = await OctoFarmClient.post('printers/reScanOcto', {
-  //     id: null
-  // });
-  // searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
-  // UI.createAlert(
-  //     'success',
-  //     'Started a background re-sync of all printers connected to OctoFarm',
-  //     1000,
-  //     'Clicked'
-  // );
 });
 const bulkDisconnectBtn = document.getElementById("bulkDisconnectBtn");
 bulkDisconnectBtn.addEventListener("click", async (e) => {
+  const printerDisconnect = async function () {
+    let printersToConnect = [];
+    //Grab all check boxes
+    const selectedPrinters = PrinterSelect.getSelected();
+    selectedPrinters.forEach((element) => {
+      const ca = element.id.split("-");
+      printersToConnect.push(ca[1]);
+    });
+    for (let p = 0; p < printersToConnect.length; p++) {
+      const index = _.findIndex(printerInfo, function (o) {
+        return o._id === printersToConnect[p];
+      });
+      if (index > -1) {
+        let data = {
+          command: "disconnect",
+        };
+        if (printerInfo[index].printerState.colour.category === "Idle") {
+          let post = await OctoPrintClient.post(
+            printerInfo[index],
+            "connection",
+            data
+          );
+          if (typeof post !== "undefined") {
+            if (post.status === 204) {
+              UI.createAlert(
+                "success",
+                `Successfully made disconnect attempt to ${printerInfo[index].printerName}...`,
+                3000,
+                "Clicked"
+              );
+            } else {
+              UI.createAlert(
+                "error",
+                `There was an issue disconnecting to ${printerInfo[index].printerName} are you sure it's online?`,
+                3000,
+                "Clicked"
+              );
+            }
+          } else {
+            UI.createAlert(
+              "error",
+              `No response from ${printerInfo[index].printerName}, is it online???`,
+              3000,
+              "Clicked"
+            );
+          }
+        } else {
+          UI.createAlert(
+            "warning",
+            `Printer ${printerInfo[index].printerName} is not in "Idle" state... skipping`,
+            3000,
+            "Clicked"
+          );
+        }
+      } else {
+        UI.createAlert(
+          "error",
+          `Could not find ${printerInfo[index].printerName} in your printer in the list of available printers...`,
+          3000,
+          "Clicked"
+        );
+      }
+    }
+  };
+
   PrinterSelect.create(
     document.getElementById("multiPrintersSection"),
     false,
-    "Disconnect Printers"
+    "Connect Printers",
+    printerDisconnect
   );
-  // searchOffline.innerHTML =
-  // '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
-  //
-  // const post = await OctoFarmClient.post('printers/reScanOcto', {
-  //     id: null
-  // });
-  // searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
-  // UI.createAlert(
-  //     'success',
-  //     'Started a background re-sync of all printers connected to OctoFarm',
-  //     1000,
-  //     'Clicked'
-  // );
 });
 const bulkPowerBtn = document.getElementById("bulkPowerBtn");
 bulkPowerBtn.addEventListener("click", async (e) => {
@@ -153,7 +285,7 @@ searchOffline.addEventListener("click", async (e) => {
   const post = await OctoFarmClient.post("printers/reScanOcto", {
     id: null,
   });
-  console.log(post);
+
   searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
   UI.createAlert(
     "success",
@@ -166,32 +298,85 @@ searchOffline.addEventListener("click", async (e) => {
 
 // });
 editBtn.addEventListener("click", (event) => {
-  const confirmFunction = function () {};
+  const confirmEditFunction = async function () {
+    let editedPrinters = [];
+    let inputBoxes = document.querySelectorAll("*[id^=editPrinterCard-]");
+    for (let i = 0; i < inputBoxes.length; i++) {
+      if (inputBoxes[i]) {
+        let printerID = inputBoxes[i].id;
+        printerID = printerID.split("-");
+        printerID = printerID[1];
+
+        const printerURL = document.getElementById(`editInputURL-${printerID}`);
+        const printerCamURL = document.getElementById(
+          `editInputCamera-${printerID}`
+        );
+        const printerAPIKEY = document.getElementById(
+          `editInputApikey-${printerID}`
+        );
+        const printerGroup = document.getElementById(
+          `editInputGroup-${printerID}`
+        );
+        const printerName = document.getElementById(
+          `editInputName-${printerID}`
+        );
+        //Check if value updated, if not fill in the old value from placeholder
+        if (printerURL.value === "") {
+          printerURL.value = printerURL.placeholder;
+        }
+        if (printerCamURL === "") {
+          printerCamURL.value = printerCamURL.placeholder;
+        }
+        if (printerAPIKEY.value === "") {
+          printerAPIKEY.value = printerAPIKEY.placeholder;
+        }
+        if (printerGroup.value === "") {
+          printerGroup.value = printerAPIKEY.placeholder;
+        }
+        if (printerName.value === "") {
+          printerName.value = printerName.placeholder;
+        }
+        const printer = new PrintersManagement(
+          Validate.stripHTML(printerURL.value),
+          Validate.stripHTML(printerCamURL.value),
+          Validate.stripHTML(printerAPIKEY.value),
+          Validate.stripHTML(printerGroup.value),
+          Validate.stripHTML(printerName.value)
+        ).build();
+        printer._id = printerID;
+        editedPrinters.push(printer);
+      }
+    }
+    if (editedPrinters.length > 0) {
+      const post = await OctoFarmClient.post("printers/update", editedPrinters);
+      if (post.status === 200) {
+        let printersAdded = await post.json();
+        printersAdded = printersAdded.printersAdded;
+        printersAdded.forEach((printer) => {
+          UI.createAlert(
+            "success",
+            `Printer: ${printer.printerURL} information has been updated on the farm...`,
+            1000,
+            "Clicked"
+          );
+        });
+      } else {
+        UI.createAlert(
+          "error",
+          "Something went wrong updating the Server...",
+          3000,
+          "Clicked"
+        );
+        saveEdits.innerHTML = '<i class="fas fa-save"></i> Save Edits';
+      }
+    }
+  };
   PrinterSelect.create(
     document.getElementById("multiPrintersSection"),
     true,
-    "Edit Printers"
+    "Edit Printers",
+    confirmEditFunction
   );
-  // editMode = true;
-  // editBtn.classList.add('d-none');
-  // saveEditBtn.classList.remove('d-none');
-  // const deleteBtns = document.querySelectorAll("[id^='deleteButton-']");
-  // deleteBtns.forEach((b) => {
-  //     b.classList.remove('d-none');
-  // });
-  //
-  // const editableFields = document.querySelectorAll('[contenteditable=false]');
-  //
-  // editableFields.forEach((f) => {
-  //     f.classList.add('contentEditable');
-  //     f.contentEditable = true;
-  // });
-  // UI.createAlert(
-  //     'success',
-  //     'Edit Mode turned on, press save once finished. <br> Your printer status will not update whilst in this mode...',
-  //     3000,
-  //     'Clicked'
-  // );
 });
 document
   .getElementById("deletePrintersBtn")
@@ -462,6 +647,18 @@ class PrintersManagement {
   `
       );
     }
+    let currentIndex = JSON.parse(JSON.stringify(newPrintersIndex));
+    document
+      .getElementById(`delButton-${newPrintersIndex}`)
+      .addEventListener("click", (event) => {
+        removeLine(document.getElementById(`newPrinterCard-${currentIndex}`));
+        const table = document.getElementById("printerNewTable");
+        if (table.rows.length === 1) {
+          if (!table.classList.contains("d-none")) {
+            table.classList.add("d-none");
+          }
+        }
+      });
     document
       .getElementById(`saveButton-${newPrintersIndex}`)
       .addEventListener("click", (event) => {
@@ -470,15 +667,6 @@ class PrintersManagement {
     const printerName = document.getElementById(
       `newPrinterName-${newPrintersIndex}`
     );
-    printerName.addEventListener("focus", (event) => {
-      printerName.innerHTML = "";
-    });
-    const printerCamURL = document.getElementById(
-      `newPrinterCamURL-${newPrintersIndex}`
-    );
-    printerCamURL.addEventListener("focus", (event) => {
-      printerCamURL.innerHTML = "";
-    });
     newPrintersIndex++;
   }
 
@@ -663,206 +851,206 @@ class PrintersManagement {
 
 // Initial listeners
 
-class dashActions {
-  static async connectionAction(action) {
-    $("#connectionModal").modal("hide");
-    const selected = document.querySelectorAll("[id^='printerSel-']");
-    document.getElementById("connectionAction").remove();
-    if (action === "connect") {
-      for (let i = 0; i < selected.length; i++) {
-        if (selected[i].checked === true) {
-          const index = selected[i].id.replace("printerSel-", "");
-          let printerName = "";
-          if (typeof printerInfo[index].settingsAppearance !== "undefined") {
-            printerName = printerInfo[index].settingsAppearance.name;
-          }
-          let preferBaud = printerInfo[index].options.baudratePreference;
-          let preferPort = printerInfo[index].options.portPreference;
-          let preferProfile =
-            printerInfo[index].options.printerProfilePreference;
-          if (preferBaud === null) {
-            preferBaud = "115200";
-          }
-          if (preferPort === null) {
-            preferPort = printerInfo[index].options.ports[0];
-          }
-          if (preferProfile === null) {
-            preferProfile = printerInfo[index].options.printerProfiles[0];
-          }
-          const opts = {
-            command: "connect",
-            port: preferPort,
-            baudrate: parseInt(preferPort),
-            printerProfile: preferProfile,
-            save: true,
-          };
-          let post = null;
-          try {
-            post = await OctoPrintClient.post(
-              printerInfo[index],
-              "connection",
-              opts
-            );
-            if (post.status === 204) {
-              UI.createAlert(
-                "success",
-                `Connected: ${printerInfo[index].index}. ${printerName}`,
-                1000,
-                "clicked"
-              );
-            } else {
-              UI.createAlert(
-                "error",
-                `Couldn't Connect ${printerInfo[index].index}with Port: ${preferPort}, Baud: ${preferBaud}, Profile: ${preferProfile}`,
-                1000,
-                "clicked"
-              );
-            }
-          } catch (e) {
-            console.log(e);
-            UI.createAlert(
-              "error",
-              `Couldn't Connect ${printerInfo[index].index}with Port: ${preferPort}, Baud: ${preferBaud}, Profile: ${preferProfile}`,
-              1000,
-              "clicked"
-            );
-          }
-        }
-      }
-    } else if (action === "disconnect") {
-      for (let i = 0; i < selected.length; i++) {
-        if (selected[i].checked === true) {
-          const index = selected[i].id.replace("printerSel-", "");
-          let printerName = "";
-          if (typeof printerInfo[index].settingsAppearance !== "undefined") {
-            printerName = printerInfo[index].settingsAppearance.name;
-          }
-          const opts = {
-            command: "disconnect",
-          };
-          const post = await OctoPrintClient.post(
-            printerInfo[index],
-            "connection",
-            opts
-          );
-          if (post.status === 204) {
-            UI.createAlert(
-              "success",
-              `Disconnected: ${printerInfo[index].index}. ${printerName}`,
-              1000,
-              "clicked"
-            );
-          } else {
-            UI.createAlert(
-              "error",
-              `Couldn't Disconnect: ${printerInfo[index].index}. ${printerName}`,
-              1000,
-              "clicked"
-            );
-          }
-        }
-      }
-    }
-  }
-
-  static async connectAll() {
-    // Create bootbox confirmation message
-    document.getElementById("connectionActionBtn").insertAdjacentHTML(
-      "beforeBegin",
-      `
-    <button id="connectionAction" type="button" class="btn btn-success" data-dismiss="modal">
-      Connect All
-    </button>
-    `
-    );
-    const message = document.getElementById("printerConnection");
-
-    message.innerHTML =
-      "You must have at least 1 printer in the Disconnected state to use this function...";
-
-    let printersList = "";
-    printerInfo.forEach((printer) => {
-      if (printer.state === "Disconnected") {
-        let printerName = "";
-        if (typeof printer.settingsAppearance !== "undefined") {
-          printerName = printer.settingsAppearance.name;
-        }
-        const print = `
-          <div style="display:inline-block;">
-          <form class="was-validated">
-          <div class="custom-control custom-checkbox mb-3">
-            <input type="checkbox" class="custom-control-input" id="printerSel-${printer.index}" required>
-            <label class="custom-control-label" for="printerSel-${printer.index}">${printer.index}. ${printerName}</label>
-            <div class="valid-feedback">Attempt to connect</div>
-            <div class="invalid-feedback">DO NOT connect</div>
-          </div>
-        </form></div>
-          `;
-        printersList += print;
-        message.innerHTML = printersList;
-      }
-    });
-    const checkBoxes = document.querySelectorAll("[id^='printerSel-']");
-    checkBoxes.forEach((box) => {
-      box.checked = true;
-    });
-    document
-      .getElementById("connectionAction")
-      .addEventListener("click", () => {
-        dashActions.connectionAction("connect");
-      });
-  }
-
-  static async disconnectAll() {
-    // Create bootbox confirmation message
-    document.getElementById("connectionActionBtn").insertAdjacentHTML(
-      "beforeBegin",
-      `
-        <button id="connectionAction" type="button" class="btn btn-success" data-dismiss="modal">
-          Disconnect All
-        </button>
-        `
-    );
-    const message = document.getElementById("printerConnection");
-    message.innerHTML =
-      "You must have at least 1 printer in the Idle category to use this function...";
-    let printersList = "";
-    printerInfo.forEach((printer) => {
-      if (
-        printer.stateColour.category === "Idle" ||
-        printer.stateColour.category === "Complete"
-      ) {
-        let printerName = "";
-        if (typeof printer.settingsAppearance !== "undefined") {
-          printerName = printer.settingsAppearance.name;
-        }
-        const print = `
-              <div style="display:inline-block;">
-              <form class="was-validated">
-              <div class="custom-control custom-checkbox mb-3">
-                <input type="checkbox" class="custom-control-input" id="printerSel-${printer.index}" required>
-                <label class="custom-control-label" for="printerSel-${printer.index}">${printer.index}. ${printerName}</label>
-                <div class="valid-feedback">Attempt to connect</div>
-                <div class="invalid-feedback">DO NOT connect</div>
-              </div>
-            </form></div>
-              `;
-        printersList += print;
-        message.innerHTML = printersList;
-      }
-    });
-
-    const checkBoxes = document.querySelectorAll("[id^='printerSel-']");
-    checkBoxes.forEach((box) => {
-      box.checked = true;
-    });
-    document
-      .getElementById("connectionAction")
-      .addEventListener("click", () => {
-        dashActions.connectionAction("disconnect");
-      });
-  }
-}
+// class dashActions {
+//   static async connectionAction(action) {
+//     $("#connectionModal").modal("hide");
+//     const selected = document.querySelectorAll("[id^='printerSel-']");
+//     document.getElementById("connectionAction").remove();
+//     if (action === "connect") {
+//       for (let i = 0; i < selected.length; i++) {
+//         if (selected[i].checked === true) {
+//           const index = selected[i].id.replace("printerSel-", "");
+//           let printerName = "";
+//           if (typeof printerInfo[index].settingsAppearance !== "undefined") {
+//             printerName = printerInfo[index].settingsAppearance.name;
+//           }
+//           let preferBaud = printerInfo[index].options.baudratePreference;
+//           let preferPort = printerInfo[index].options.portPreference;
+//           let preferProfile =
+//             printerInfo[index].options.printerProfilePreference;
+//           if (preferBaud === null) {
+//             preferBaud = "115200";
+//           }
+//           if (preferPort === null) {
+//             preferPort = printerInfo[index].options.ports[0];
+//           }
+//           if (preferProfile === null) {
+//             preferProfile = printerInfo[index].options.printerProfiles[0];
+//           }
+//           const opts = {
+//             command: "connect",
+//             port: preferPort,
+//             baudrate: parseInt(preferPort),
+//             printerProfile: preferProfile,
+//             save: true,
+//           };
+//           let post = null;
+//           try {
+//             post = await OctoPrintClient.post(
+//               printerInfo[index],
+//               "connection",
+//               opts
+//             );
+//             if (post.status === 204) {
+//               UI.createAlert(
+//                 "success",
+//                 `Connected: ${printerInfo[index].index}. ${printerName}`,
+//                 1000,
+//                 "clicked"
+//               );
+//             } else {
+//               UI.createAlert(
+//                 "error",
+//                 `Couldn't Connect ${printerInfo[index].index}with Port: ${preferPort}, Baud: ${preferBaud}, Profile: ${preferProfile}`,
+//                 1000,
+//                 "clicked"
+//               );
+//             }
+//           } catch (e) {
+//             console.log(e);
+//             UI.createAlert(
+//               "error",
+//               `Couldn't Connect ${printerInfo[index].index}with Port: ${preferPort}, Baud: ${preferBaud}, Profile: ${preferProfile}`,
+//               1000,
+//               "clicked"
+//             );
+//           }
+//         }
+//       }
+//     } else if (action === "disconnect") {
+//       for (let i = 0; i < selected.length; i++) {
+//         if (selected[i].checked === true) {
+//           const index = selected[i].id.replace("printerSel-", "");
+//           let printerName = "";
+//           if (typeof printerInfo[index].settingsAppearance !== "undefined") {
+//             printerName = printerInfo[index].settingsAppearance.name;
+//           }
+//           const opts = {
+//             command: "disconnect",
+//           };
+//           const post = await OctoPrintClient.post(
+//             printerInfo[index],
+//             "connection",
+//             opts
+//           );
+//           if (post.status === 204) {
+//             UI.createAlert(
+//               "success",
+//               `Disconnected: ${printerInfo[index].index}. ${printerName}`,
+//               1000,
+//               "clicked"
+//             );
+//           } else {
+//             UI.createAlert(
+//               "error",
+//               `Couldn't Disconnect: ${printerInfo[index].index}. ${printerName}`,
+//               1000,
+//               "clicked"
+//             );
+//           }
+//         }
+//       }
+//     }
+//   }
+//
+//   static async connectAll() {
+//     // Create bootbox confirmation message
+//     document.getElementById("connectionActionBtn").insertAdjacentHTML(
+//       "beforeBegin",
+//       `
+//     <button id="connectionAction" type="button" class="btn btn-success" data-dismiss="modal">
+//       Connect All
+//     </button>
+//     `
+//     );
+//     const message = document.getElementById("printerConnection");
+//
+//     message.innerHTML =
+//       "You must have at least 1 printer in the Disconnected state to use this function...";
+//
+//     let printersList = "";
+//     printerInfo.forEach((printer) => {
+//       if (printer.state === "Disconnected") {
+//         let printerName = "";
+//         if (typeof printer.settingsAppearance !== "undefined") {
+//           printerName = printer.settingsAppearance.name;
+//         }
+//         const print = `
+//           <div style="display:inline-block;">
+//           <form class="was-validated">
+//           <div class="custom-control custom-checkbox mb-3">
+//             <input type="checkbox" class="custom-control-input" id="printerSel-${printer.index}" required>
+//             <label class="custom-control-label" for="printerSel-${printer.index}">${printer.index}. ${printerName}</label>
+//             <div class="valid-feedback">Attempt to connect</div>
+//             <div class="invalid-feedback">DO NOT connect</div>
+//           </div>
+//         </form></div>
+//           `;
+//         printersList += print;
+//         message.innerHTML = printersList;
+//       }
+//     });
+//     const checkBoxes = document.querySelectorAll("[id^='printerSel-']");
+//     checkBoxes.forEach((box) => {
+//       box.checked = true;
+//     });
+//     document
+//       .getElementById("connectionAction")
+//       .addEventListener("click", () => {
+//         dashActions.connectionAction("connect");
+//       });
+//   }
+//
+//   static async disconnectAll() {
+//     // Create bootbox confirmation message
+//     document.getElementById("connectionActionBtn").insertAdjacentHTML(
+//       "beforeBegin",
+//       `
+//         <button id="connectionAction" type="button" class="btn btn-success" data-dismiss="modal">
+//           Disconnect All
+//         </button>
+//         `
+//     );
+//     const message = document.getElementById("printerConnection");
+//     message.innerHTML =
+//       "You must have at least 1 printer in the Idle category to use this function...";
+//     let printersList = "";
+//     printerInfo.forEach((printer) => {
+//       if (
+//         printer.stateColour.category === "Idle" ||
+//         printer.stateColour.category === "Complete"
+//       ) {
+//         let printerName = "";
+//         if (typeof printer.settingsAppearance !== "undefined") {
+//           printerName = printer.settingsAppearance.name;
+//         }
+//         const print = `
+//               <div style="display:inline-block;">
+//               <form class="was-validated">
+//               <div class="custom-control custom-checkbox mb-3">
+//                 <input type="checkbox" class="custom-control-input" id="printerSel-${printer.index}" required>
+//                 <label class="custom-control-label" for="printerSel-${printer.index}">${printer.index}. ${printerName}</label>
+//                 <div class="valid-feedback">Attempt to connect</div>
+//                 <div class="invalid-feedback">DO NOT connect</div>
+//               </div>
+//             </form></div>
+//               `;
+//         printersList += print;
+//         message.innerHTML = printersList;
+//       }
+//     });
+//
+//     const checkBoxes = document.querySelectorAll("[id^='printerSel-']");
+//     checkBoxes.forEach((box) => {
+//       box.checked = true;
+//     });
+//     document
+//       .getElementById("connectionAction")
+//       .addEventListener("click", () => {
+//         dashActions.connectionAction("disconnect");
+//       });
+//   }
+// }
 
 class dashUpdate {
   static ticker(list) {
@@ -881,8 +1069,7 @@ class dashUpdate {
       }
     });
   }
-  static printers(printers, printerControlList) {
-    console.log(printers.length);
+  static printers(printers) {
     printers.forEach((printer) => {
       let printerName = "";
       if (typeof printer.printerState !== "undefined") {
@@ -987,34 +1174,55 @@ class dashUpdate {
             `
         <tr id="printerCard-${printer._id}">
         <th id="printerSortIndex-${printer._id}">${printer.sortIndex}</td>
-        <td class="d-none">
-            <center>
-            <form class="was-validated form-check-inline form-check d-none">
-                <div class="custom-control custom-checkbox mb-2 pr-2">
-                    <input type="checkbox" class="custom-control-input" id="dashboardSelect-${printer._id}" required>
-                    <label class="custom-control-label" for="dashboardSelect-${printer._id}"></label>
-                </div>
-            </form>
-            </center>
-        </td>
-        <td><div id="printerName-${printer._id}" contenteditable="false">${printerName}</div></td>
+        <td><div id="printerName-${printer._id}" >${printerName}</div></td>
         <td>
             <button  
             title="Control Your Printer"
             id="printerButton-${printer._id}"
                      type="button"
-                     class="tag btn btn-primary btn-sm bg-colour-1"
+                     class="tag btn btn-primary btn-sm"
                      data-toggle="modal"
                      data-target="#printerManagerModal" disabled
             ><i class="fas fa-print"></i>
             </button>
-            <button  title="Change your Printer Settings"
+            <a title="Open your Printers Web Interface"
+               id="printerWeb-${printer._id}"
+               type="button"
+               class="tag btn btn-info btn-sm"
+               target="_blank"
+               href="${printer.printerURL}" role="button"><i class="fas fa-globe-europe"></i></a>
+            <button  
+                     title="Re-Sync your printer"
+                     id="printerSyncButton-${printer._id}"
+                     type="button"
+                     class="tag btn btn-success btn-sm"
+            >
+                <i class="fas fa-sync"></i>
+            </button>
+            <div id="powerBtn-${printer._id}" class="btn-group">
+
+            </div>
+            <span title="Drag and Change your Printers sorting"  id="printerSortButton-${printer._id}"
+                   class="tag btn btn-light btn-sm sortableList"
+            >
+    <i class="fas fa-grip-vertical"></i>
+    </span></td>
+           <td>
+          <button  title="Change your Printer Settings"
             id="printerSettings-${printer._id}"
                                  type="button"
-                                 class="tag btn btn-secondary btn-sm bg-colour-2"
+                                 class="tag btn btn-secondary btn-sm bg-colour-1"
                                  data-toggle="modal"
                                  data-target="#printerSettingsModal"
             ><i class="fas fa-cog"></i>
+            </button>
+            <button  title="View individual Printer Logs for OctoFarm/OctoPrint"
+            id="printerLog-${printer._id}"
+                                 type="button"
+                                 class="tag btn btn-secondary btn-sm bg-colour-2"
+                                 data-toggle="modal"
+                                 data-target="#printerLogsModal"
+            ><i class="fas fa-file-alt"></i>
             </button>
             <button  title="View individual Printer Statistics"
             id="printerStatistics-${printer._id}"
@@ -1032,27 +1240,6 @@ class dashUpdate {
                                  data-target="#printerMaintenanceModal"
             ><i class="fas fa-wrench"></i>
             </button>
-            <a title="Open your Printers Web Interface"
-               id="printerWeb-${printer._id}"
-               type="button"
-               class="tag btn btn-info btn-sm bg-colour-1"
-               target="_blank"
-               href="${printer.printerURL}" role="button"><i class="fas fa-globe-europe"></i></a>
-            <button  
-                     title="Re-Sync your printer"
-                     id="printerSyncButton-${printer._id}"
-                     type="button"
-                     class="tag btn btn-success btn-sm bg-colour-2"
-            >
-                <i class="fas fa-sync"></i>
-            </button>
-            <div id="powerBtn-${printer._id}" class="btn-group">
-
-            </div>
-            <span title="Drag and Change your Printers sorting"  id="printerSortButton-${printer._id}"
-                   class="tag btn btn-light btn-sm sortableList"
-            >
-    <i class="fas fa-grip-vertical"></i>
     </span></td>
         <td><small><span data-title="${printer.hostState.desc}" id="hostBadge-${printer._id}" class="tag badge badge-${printer.hostState.colour.name} badge-pill">
                 ${printer.hostState.state}</small></span></td>
@@ -1061,7 +1248,7 @@ class dashUpdate {
         <td><small><span data-title="${printer.webSocketState.desc}" id="webSocketIcon-${printer._id}" class="tag badge badge-${printer.webSocketState.colour} badge-pill">
                 <i  class="fas fa-plug"></i></span></td>
    
-        <td><div id="printerGroup-${printer._id}" contenteditable="false"></div></td>
+        <td><div id="printerGroup-${printer._id}" ></div></td>
         <th id="printerOctoPrintVersion-${printer._id}"></td>
         
         <td><button id="deleteButton-${printer._id}" type="button" class="btn btn-danger btn-sm d-none">
@@ -1106,6 +1293,14 @@ class dashUpdate {
                 printerInfo,
                 printerControlList
               );
+            });
+          document
+            .getElementById(`printerLog-${printer._id}`)
+            .addEventListener("click", (e) => {
+              const printerInfoSingle = _.findIndex(printerInfo, function (o) {
+                return o._id === printer._id;
+              });
+              PrinterLogs.loadLogs(printerInfo[printerInfoSingle]);
             });
         }
       }

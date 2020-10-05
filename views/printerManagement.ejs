@@ -108,7 +108,7 @@
                                 title="Power On/Off multiple Printers at once."
                                 id="bulkPowerBtn"
                                 type="button"
-                                class="tag btn btn-primary ml-1 p-1 bg-colour-3"
+                                class="tag btn btn-primary ml-1 p-1 bg-colour-3 d-none"
                                 href="#"
                                 aria-expanded="false"
                                 data-toggle="modal" data-target="#printerEditModal"
@@ -164,16 +164,15 @@
         <table id="printerTable" class="table table-dark table-striped text-center">
             <thead>
             <tr>
-                <th scope="col" class=" sticky-table table-dark">Sort Index</th>
-                <th scope="col" class="d-none  sticky-table table-dark">Select</th>
+                <th scope="col" class=" sticky-table table-dark" style="width:50px;">Sort Index</th>
                 <th class=" sticky-table table-dark text-wrap">Name</th>
-                <th scope="col" class=" sticky-table table-dark" style="min-width:300px;">Actions</th>
+                <th scope="col" class=" sticky-table table-dark" style="width:200px;">Actions</th>
+                <th scope="col" class=" sticky-table table-dark" style="width:200px;">Manage</th>
                 <th scope="col" class=" sticky-table table-dark" style="width:50px;">Host State</th>
-                <th scope="col" class=" sticky-table table-dark">Printer State</th>
-                <th scope="col"  class=" sticky-table table-dark"style="min-width:10px;">WebSocket</th>
+                <th scope="col" class=" sticky-table table-dark" style="width:50px;">Printer State</th>
+                <th scope="col"  class=" sticky-table table-dark"style="width:10px;">WebSocket</th>
                 <th scope="col" class=" sticky-table table-dark">Group</th>
-                <th scope="col" class=" sticky-table table-dark" style="min-width:50px;">OctoPrint Version</th>
-                <th scope="col" class=" sticky-table table-dark"></th>
+                <th scope="col" class=" sticky-table table-dark">OctoPrint Version</th>
             </tr>
             </thead>
             <tbody id="printerList" style="height:100%; overflow-y:auto;">
@@ -202,8 +201,89 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button id="saveEditsBtn" class="btn btn-success" data-dismiss="modal" aria-label="Close">Action</button>
+            <div id="saveArea" class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="printerLogsModal" tabindex="0" role="dialog" aria-labelledby="printerLogsModal" aria-hidden="true" data-keyboard="false">
+    <div class="modal-dialog modal-xl" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="printerLogsLabel">Printers</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span class="text-white" aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-2 col-xl-2">
+                            <div class="list-group" id="list-tab" role="tablist">
+                                <a class="list-group-item list-group-item-action active" id="system-logs-list" data-toggle="list" href="#system-logs" role="tab" aria-controls="panelview"><i class="far fa-user"></i> OctoFarm <span id="logCount"></span></a>
+                                <a class="list-group-item list-group-item-action" id="system-error-list" data-toggle="list" href="#system-error" role="tab" aria-controls="listview"><i class="fas fa-stopwatch"></i> OctoPrint Errors <span id="errorCount"></span></a>
+                                <a class="list-group-item list-group-item-action" id="system-temperature-list" data-toggle="list" href="#system-temperature" role="tab" aria-controls="listview"><i class="fas fa-address-card"></i> Printer Temperature <span id="tempCount"></span></a>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-9 col-lg-10 col-xl-10">
+                            <div class="tab-content" id="nav-tabContent">
+                                <div class="tab-pane fade show active" id="system-logs" role="tabpanel" aria-labelledby="server-status-list">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                                    <table id="printerConnectionLogTable" class="table table-dark text-center">
+                                                        <thead>
+                                                        <tr>
+                                                            <th class=" sticky-table table-dark text-wrap">Date</th>
+                                                            <th scope="col" class=" sticky-table table-dark">Printer URL</th>
+                                                            <th scope="col" class=" sticky-table table-dark">Message</th>
+                                                        </tr>
+                                                        </thead>
+                                                        <tbody id="printerConnectionLogRows" style="height:100%; overflow-y:auto;">
+                                                        </tbody>
+                                                    </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="system-error" role="tabpanel" aria-labelledby="server-settings-list">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                                <table id="printerErrorLogTable" class="table table-dark text-center">
+                                                    <thead>
+                                                    <tr>
+                                                        <th class=" sticky-table table-dark text-wrap">Date</th>
+                                                        <th scope="col" class=" sticky-table table-dark">Printer URL</th>
+                                                        <th scope="col" class=" sticky-table table-dark">Message</th>
+                                                    </tr>
+                                                    </thead>
+                                                    <tbody id="printerErrorLogRows" style="height:100%; overflow-y:auto;">
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="tab-pane fade" id="system-temperature" role="tabpanel" aria-labelledby="server-timeout">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                                <div id="printerTempChart"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div id="saveArea" class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>

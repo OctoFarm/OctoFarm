@@ -12,6 +12,14 @@ All notable changes to this project will be documented in this file.
     - API issues now show a big red badge under Printer State in Printer Management. This will only show if you Host is online to avoid in correctly alerting you if OctoPrint is shutdown. You can investigate these on the printer settings modal.
     - Current OctoPrint user is now displayed in "Printer Settings"
     - Printer Control now lists AUTO in printer Port options.
+    - System -> Client Settings -> Dashboard has a new Dashboard Control, will allow for on the fly moving and resizing of your dashboard panels.
+    - New Printer Manager buttons:
+        - Printer Logs: Will show a full log of connections/errors/temperature relating to your OctoPrint instance.
+            - OctoFarm: Shows OctoFarm connection attempts
+            - OctoPrint Errors: Shows OctoPrint usb terminal errors
+            - Printer Temperature: Historical view of printer temperature - Keeps a max of 100,000 records and then will drop the previous in the database. 
+        - Printer Statistics: Will show a basic view of your printer statistics (More to come in future versions)
+        - Printer Maintenence: Will allow for the creation of a maintenance log and alerts for future checks. 
     
 ### Changed
     - Added additional CSS classes to buttons for theming. Applies to actions buttons only, status colours the same. 
@@ -20,7 +28,14 @@ All notable changes to this project will be documented in this file.
     - Export printer json now in human readable format
     - History now captures printer ID. Any matches going forward will attempt the ID match and then fallback to name as before.
     - Printer scanning client display greatly improved. Now displays updated host state whilst stuff is going on in the background on the server.
-    
+    - Combined the Views settings into one tab. All views react now to the same settings for displaying Current Operations, Offline/Disconnected Printer and Extra Information. Note: More customise options coming in a later version.
+    - Updated Printer Manager functions: 
+        - Delete, now brings a selection box with printer status.
+        - Edit, Brings a inline edit box up. Will only update changed printers as before.
+    - Split the Actions header in Printer Manager to "Manage", "Actions"
+        - Actions will all be available on views and will contain "Printer Control", "OctoPrint Web", "Resync" and "Power" if setup.
+        - Manage will contain "Printer Settings" and some new options detailed in #Added.
+
 ### Fixed
     - Fixed issue with File Manager not loading if printer in index 0 was offline.
     - Fixed issue with editing printers throwing error trying to update old printer status.

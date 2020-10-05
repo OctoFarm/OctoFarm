@@ -158,19 +158,15 @@ function octofarmCSS() {
     .pipe(sourcemaps.write("./"))
     .pipe(dest(octofarmClient + "css"));
 }
+function reloadClient(done) {
+  return done();
+}
 
 function watchTask() {
   watch(
     [cssFolder, jsClientFolder],
     { interval: 1000 },
-    parallel(
-      octofarmImg,
-      octofarmJS,
-      octofarmWorkersJS,
-      octofarmCSS,
-      vendorJS,
-      vendorCSS
-    )
+    parallel(octofarmImg, octofarmJS, octofarmWorkersJS, octofarmCSS, vendorJS)
   );
 }
 
