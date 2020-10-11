@@ -16,9 +16,9 @@ let source = new EventSource("/monitoringInfo/get/");
 //         postMessage(res);
 //     }
 // });
-source.onmessage = function (e) {
+source.onmessage = async function (e) {
   if (e.data != null) {
-    let res = asyncParse(e.data);
+    let res = await asyncParse(e.data);
     postMessage(res);
   }
 };

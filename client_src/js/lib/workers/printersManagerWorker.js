@@ -16,9 +16,9 @@ const source = new EventSource("/printersInfo/get/");
 //         postMessage(res);
 //     }
 // });
-source.onmessage = function (e) {
+source.onmessage = async function (e) {
   if (e.data != null) {
-    const res = asyncParse(e.data);
+    const res = await asyncParse(e.data);
     postMessage(res);
   }
 };

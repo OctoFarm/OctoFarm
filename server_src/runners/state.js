@@ -604,11 +604,11 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
           } else {
             if (farmPrinters[this.index].tempTimer >= 2500) {
               data.current.temps[0].time = timeStamp;
-              let tempHistory = {
+              let temps = {
                 currentTemp: data.current.temps[0],
                 printer_id: farmPrinters[this.index]._id,
               };
-              const newTemp = await new TempHistory(tempHistory);
+              const newTemp = await new TempHistory(temps);
               await newTemp.save();
               farmPrinters[this.index].tempTimer = 0;
             } else {
