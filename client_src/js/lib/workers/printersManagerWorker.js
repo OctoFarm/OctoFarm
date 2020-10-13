@@ -1,7 +1,7 @@
 import "@babel/polyfill";
-function asyncParse(str) {
+async function asyncParse(str) {
   try {
-    const info = parse(str);
+    const info = await parse(str);
     return info;
   } catch (e) {
     return false;

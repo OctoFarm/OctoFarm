@@ -35,6 +35,10 @@ All notable changes to this project will be documented in this file.
     - Split the Actions header in Printer Manager to "Manage", "Actions"
         - Actions will all be available on views and will contain "Printer Control", "OctoPrint Web", "Resync" and "Power" if setup.
         - Manage will contain "Printer Settings" and some new options detailed in #Added.
+    - Made tweaks to the client side SSE implementation. Should help lockouts and button presses on less powerful client devices. (tested and seen improvements to my own small tablet)
+        - UI alert when SSE fails. 
+        - Retry the connection if error/closed unexpectedly.    
+       
 
 ### Fixed
     - Fixed issue with File Manager not loading if printer in index 0 was offline.

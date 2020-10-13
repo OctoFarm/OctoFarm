@@ -1,7 +1,7 @@
 import "@babel/polyfill";
-function asyncParse(str) {
+async function asyncParse(str) {
   try {
-    let info = parse(str);
+    const info = await parse(str);
     return info;
   } catch (e) {
     return false;
@@ -18,7 +18,9 @@ let source = new EventSource("/monitoringInfo/get/");
 // });
 source.onmessage = async function (e) {
   if (e.data != null) {
+    console.log(e);
     let res = await asyncParse(e.data);
+
     postMessage(res);
   }
 };

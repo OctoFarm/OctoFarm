@@ -80,6 +80,13 @@ if (window.Worker) {
               }
             }
           }
+        } else {
+          UI.createAlert(
+            "warning",
+            "Server Events closed unexpectedly... Retying in 10 seconds",
+            10000,
+            "Clicked"
+          );
         }
       };
     }

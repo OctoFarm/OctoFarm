@@ -1,6 +1,7 @@
 import "@babel/polyfill";
 import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
+import UI from "./lib/functions/ui";
 
 // Setup charts test
 const optionsFarmTemp = {
@@ -629,6 +630,13 @@ if (window.Worker) {
           if (dashboardSettings.historical.environmentalHistory) {
             dashUpdate.envriromentalData(dashboard.enviromentalData);
           }
+        } else {
+          UI.createAlert(
+            "warning",
+            "Server Events closed unexpectedly... Retying in 10 seconds",
+            10000,
+            "Clicked"
+          );
         }
       };
     }

@@ -32,6 +32,9 @@ router.get("/get/", ensureAuthenticated, function (req, res) {
     req.on("close", function () {
       delete clients[clientId];
     }); // <- Remove this client when he disconnects
+    req.on("error", function () {
+      delete clients[clientId];
+    }); // <- Remove this client when he disconnects
   })(++clientId);
   //console.log("Client: " + Object.keys(clients));
 });
