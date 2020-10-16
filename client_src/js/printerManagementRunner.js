@@ -11,10 +11,9 @@ import PrinterSelect from "./lib/modules/printerSelect";
 import PrinterLogs from "./lib/modules/printerLogs.js";
 
 let printerInfo = "";
-const editMode = false;
 const deletedPrinters = [];
 let worker = null;
-let powerTimer = 20000;
+let powerTimer = 5000;
 let printerControlList = null;
 
 if (window.Worker) {
@@ -51,14 +50,11 @@ if (window.Worker) {
                 event.data.printerControlList
               );
             } else {
-              if (!editMode) {
-                dashUpdate.printers(
-                  event.data.printersInformation,
-                  event.data.printerControlList
-                );
-              }
-
-              if (powerTimer >= 20000) {
+              dashUpdate.printers(
+                event.data.printersInformation,
+                event.data.printerControlList
+              );
+              if (powerTimer >= 5000) {
                 event.data.printersInformation.forEach((printer) => {
                   PowerButton.applyBtn(printer, "powerBtn-");
                 });
@@ -91,7 +87,26 @@ const removeLine = function (element) {
   element.remove();
 };
 // Dash control listeners
-// const saveEditBtn = document.getElementById('saveEditsBtn');
+
+const deleteAllBtn = document.getElementById("delAllBtn");
+
+deleteAllBtn.addEventListener("click", async (e) => {
+  let onScreenButtons = document.querySelectorAll("*[id^=delButton-]");
+  onScreenButtons.forEach((btn) => {
+    console.log("CLICKED");
+    btn.click();
+  });
+});
+const saveAllBtn = document.getElementById("saveAllBtn");
+console.log(saveAllBtn);
+saveAllBtn.addEventListener("click", async (e) => {
+  let onScreenButtons = document.querySelectorAll("*[id^=saveButton-]");
+  onScreenButtons.forEach((btn) => {
+    console.log("CLICKED");
+    btn.click();
+  });
+});
+
 const editBtn = document.getElementById("editPrinterBtn");
 const bulkConnectBtn = document.getElementById("bulkConnectBtn");
 bulkConnectBtn.addEventListener("click", async (e) => {

@@ -20,6 +20,7 @@ All notable changes to this project will be documented in this file.
             - Printer Temperature: Historical view of printer temperature - Keeps a max of 100,000 records and then will drop the previous in the database. 
         - Printer Statistics: Will show a basic view of your printer statistics (More to come in future versions)
         - Printer Maintenence: Will allow for the creation of a maintenance log and alerts for future checks. 
+    - "Save All" button has been added to Printer Manager.
     
 ### Changed
     - Added additional CSS classes to buttons for theming. Applies to actions buttons only, status colours the same. 
@@ -38,7 +39,8 @@ All notable changes to this project will be documented in this file.
     - Made tweaks to the client side SSE implementation. Should help lockouts and button presses on less powerful client devices. (tested and seen improvements to my own small tablet)
         - UI alert when SSE fails. 
         - Retry the connection if error/closed unexpectedly.    
-       
+    - Changed the Power button poll rate to 5 seconds.
+    - Changed server check poll rate to 2.5 seconds.   
 
 ### Fixed
     - Fixed issue with File Manager not loading if printer in index 0 was offline.

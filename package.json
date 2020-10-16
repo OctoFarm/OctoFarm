@@ -4,16 +4,19 @@
   "description": "OctoFarm is a easy to setup and install web interface that unifies your Octoprint instances for easy monitoring of all your printers. OctoFarm allows you to connect to multiple octoprint instances on your network allowing creating a farm management system. You can control, manage, upload files to any of your instances without ever leaving the tab it's open in.",
   "main": "app.js",
   "scripts": {
-    "prestart": "npm install",
+    "prestart": "npm install --production",
     "start": "pm2 start app.js --name OctoFarm -o './logs/pm2.log' -e './logs/pm2.error.log' --time",
     "stop": "pm2 stop OctoFarm",
     "startup": "pm2 startup",
     "saveStartup": "pm2 save",
-    "dev": "nodemon app.js"
+    "dev": "nodemon ./app.js"
   },
   "repository": {
     "type": "git",
     "url": "https://git.notexpectedyet.com/NotExpectedYet/OctoFarm"
+  },
+  "bin": {
+    "octofarm": "./app.js"
   },
   "keywords": [
     "octofarm",
@@ -25,7 +28,6 @@
   "author": "James Mackay (NotExpectedYet)",
   "license": "ISC",
   "dependencies": {
-    "JSONStream": "^1.3.5",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.19.0",
     "bunyan": "^1.8.14",
@@ -36,9 +38,7 @@
     "express-ejs-layouts": "^2.5.0",
     "express-session": "^1.17.1",
     "express-ws": "^4.0.0",
-    "fetch-base64": "^2.1.2",
     "flatted": "^2.0.2",
-    "gulp-postcss": "^8.0.0",
     "lodash": "^4.17.20",
     "mongoose": "^5.10.7",
     "multer": "^1.4.2",
@@ -47,14 +47,10 @@
     "passport-headerapikey": "^1.2.2",
     "passport-local": "^1.0.0",
     "passport-remember-me": "0.0.1",
-    "pm2": "^4.5.0",
-    "remove": "^0.1.5",
     "systeminformation": "^4.27.5",
-    "tablefilter": "^0.7.2",
     "wake_on_lan": "^1.0.0",
     "winston": "^3.3.3",
-    "ws": "^7.3.1",
-    "yieldable-json": "^2.0.0"
+    "ws": "^7.3.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
@@ -87,10 +83,13 @@
     "gulp-imagemin": "^7.1.0",
     "gulp-include": "^2.4.1",
     "gulp-rename": "^2.0.0",
+    "gulp-postcss": "^8.0.0",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-terser": "^1.4.0",
+    "nexe": "^3.3.7",
     "nodemon": "^2.0.4",
     "npm-run-all": "^4.1.5",
+    "pkg": "^4.4.9",
     "prettier": "^2.1.2",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"

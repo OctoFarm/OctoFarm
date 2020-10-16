@@ -66,15 +66,6 @@
                         >
                             <i class="fas fa-trash"></i> Delete
                         </button><br>
-                        <button
-                                title="Delete Printers from your farm"
-                                id="saveAllBtn"
-                                type="button"
-                                class="tag btn btn-success ml-1 p-1 mt-2 d-none"
-                                href="#"
-                        >
-                            <i class="fas fa-trash"></i> Save All
-                        </button>
 
 
 
@@ -145,13 +136,21 @@
         <table id="printerNewTable" class="table table-dark table-striped text-center d-none">
             <thead>
             <tr>
-                <th scope="col" class="d-none sticky-table table-dark">Select</th>
                 <th class="table-dark text-wrap">Name</th>
                 <th scope="col" class="table-dark" width="190px">Group</th>
                 <th scope="col" class="table-dark">Printer URL</th>
                 <th scope="col" class="table-dark">Camera URL</th>
                 <th scope="col" class="table-dark">API KEY</th>
-                <th scope="col" class="table-dark"></th>
+                <th scope="col" class="table-dark">
+                    <button id="saveAllBtn" type="button" class="btn btn-success btn-sm">
+                        <i class="fas fa-save"></i>
+                    </button>
+                </th>
+                <th scope="col" class="table-dark">
+                    <button id="delAllBtn" type="button" class="btn btn-danger btn-sm">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </th>
             </tr>
             </thead>
             <tbody id="printerNewList" style="height:100%; overflow-y:auto;">

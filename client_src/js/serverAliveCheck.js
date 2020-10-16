@@ -50,7 +50,7 @@ const serverAliveCheck = async function () {
             }, 1000);
             setTimeout(async () => {
               reloadWindow();
-            }, 5000);
+            }, 2500);
           }
         }
       } catch (e) {
