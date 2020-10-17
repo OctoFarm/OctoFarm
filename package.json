@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "prestart": "npm install --production",
-    "start": "pm2 start app.js --name OctoFarm -o './logs/pm2.log' -e './logs/pm2.error.log' --time",
+    "start": "pm2 flush && pm2 start app.js --name OctoFarm -e './logs/pm2.error.log' --time",
     "stop": "pm2 stop OctoFarm",
     "startup": "pm2 startup",
     "saveStartup": "pm2 save",
