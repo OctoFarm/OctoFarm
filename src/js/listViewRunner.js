@@ -214,11 +214,6 @@ async function updateState(printer, clientSettings) {
       UI.doesElementNeedUpdating("N/A", elements.eta, "innerHTML");
     }
     if (typeof printer.currentJob !== "undefined") {
-      UI.doesElementNeedUpdating(
-        Calc.generateTime(null),
-        elements.printTime,
-        "innerHTML"
-      );
       elements.currentFile.setAttribute("title", printer.currentJob.filePath);
       elements.currentFile.innerHTML =
         '<i class="fas fa-file-code"></i> ' + printer.currentJob.fileName;
