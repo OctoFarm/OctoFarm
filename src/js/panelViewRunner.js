@@ -166,7 +166,7 @@ async function updateState(printer, clientSettings) {
       futureTimeString = futureTimeString.substring(0, 8);
       const dateComplete = futureDateString + ": " + futureTimeString;
       UI.doesElementNeedUpdating(
-        printer.currentJob.printTimeRemaining,
+        Calc.generateTime(printer.currentJob.printTimeRemaining),
         elements.timeRemaining,
         "innerHTML"
       );
