@@ -64,13 +64,6 @@ if (window.Worker) {
               }
             }
           }
-        } else {
-          UI.createAlert(
-            "warning",
-            "Server Events closed unexpectedly... Retying in 10 seconds",
-            10000,
-            "Clicked"
-          );
         }
       };
     }
@@ -90,21 +83,35 @@ const removeLine = function (element) {
 
 const deleteAllBtn = document.getElementById("delAllBtn");
 
+async function delay(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
 deleteAllBtn.addEventListener("click", async (e) => {
   let onScreenButtons = document.querySelectorAll("*[id^=delButton-]");
-  onScreenButtons.forEach((btn) => {
-    console.log("CLICKED");
+  for (const btn of onScreenButtons) {
     btn.click();
-  });
+  }
 });
 const saveAllBtn = document.getElementById("saveAllBtn");
-console.log(saveAllBtn);
 saveAllBtn.addEventListener("click", async (e) => {
+  saveAllBtn.disabled = true;
   let onScreenButtons = document.querySelectorAll("*[id^=saveButton-]");
-  onScreenButtons.forEach((btn) => {
-    console.log("CLICKED");
+  for (const btn of onScreenButtons) {
+    btn.disabled = true;
+  }
+  UI.createAlert(
+    "warning",
+    "Starting to save all your instances... this may take some time...",
+    onScreenButtons.length * 1500
+  );
+  for (const btn of onScreenButtons) {
     btn.click();
-  });
+    await delay(1500);
+  }
+  UI.createAlert("success", "Successfully saved all your instances", 4000);
+  saveAllBtn.disabled = false;
 });
 
 const editBtn = document.getElementById("editPrinterBtn");

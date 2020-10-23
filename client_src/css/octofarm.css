@@ -3,6 +3,8 @@ html {
   height: 100%;
 }
 
+
+
 .bg-colour-1 {
   background-color: #375a7f;
   border-color: #375a7f;
@@ -51,7 +53,9 @@ html {
   background-color: #008966;
   border-color: #007c5d;
 }
-
+textarea{
+  font-family: monospace;
+}
 
 
 .restricScreenSize {

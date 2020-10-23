@@ -80,13 +80,6 @@ if (window.Worker) {
               }
             }
           }
-        } else {
-          UI.createAlert(
-            "warning",
-            "Server Events closed unexpectedly... Retying in 10 seconds",
-            10000,
-            "Clicked"
-          );
         }
       };
     }
@@ -192,6 +185,7 @@ async function updateState(printer, clientSettings) {
       UI.doesElementNeedUpdating(0 + "%", elements.percent, "innerHTML");
       elements.progress.style.width = 0 + "%";
     }
+
     if (
       typeof printer.currentJob !== "undefined" &&
       printer.currentJob.printTimeRemaining !== null
@@ -221,11 +215,6 @@ async function updateState(printer, clientSettings) {
       UI.doesElementNeedUpdating("N/A", elements.eta, "innerHTML");
     }
     if (typeof printer.currentJob !== "undefined") {
-      UI.doesElementNeedUpdating(
-        Calc.generateTime(null),
-        elements.printTime,
-        "innerHTML"
-      );
       elements.currentFile.setAttribute("title", printer.currentJob.filePath);
       elements.currentFile.innerHTML =
         '<i class="fas fa-file-code"></i> ' + printer.currentJob.fileName;

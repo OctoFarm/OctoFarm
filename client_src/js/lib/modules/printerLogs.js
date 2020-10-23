@@ -4,7 +4,6 @@ let chart = null;
 
 export default class PrinterLogs {
   static loadLogs(printer) {
-    console.log(printer.connectionLog);
     document.getElementById("printerLogsLabel").innerHTML =
       "Printer Logs: " + printer.printerName;
     let printerRows = document.getElementById("printerConnectionLogRows");
@@ -120,7 +119,21 @@ export default class PrinterLogs {
             labels: {
               formatter(value) {
                 const date = new Date(value);
-                return date.toLocaleTimeString();
+                var weekday = new Array(7);
+                weekday[0] = "Sun";
+                weekday[1] = "Mon";
+                weekday[2] = "Tue";
+                weekday[3] = "Wed";
+                weekday[4] = "Thu";
+                weekday[5] = "Fri";
+                weekday[6] = "Sat";
+                return (
+                  weekday[date.getDay()] +
+                  " " +
+                  date.getDate() +
+                  " " +
+                  date.toLocaleTimeString()
+                );
               },
             },
           },

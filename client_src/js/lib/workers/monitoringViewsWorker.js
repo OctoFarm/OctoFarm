@@ -18,7 +18,6 @@ let source = new EventSource("/monitoringInfo/get/");
 // });
 source.onmessage = async function (e) {
   if (e.data != null) {
-    console.log(e);
     let res = await asyncParse(e.data);
 
     postMessage(res);

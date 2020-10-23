@@ -59,29 +59,27 @@ export default class UI {
   }
   static doesElementNeedUpdating(value, element, meta) {
     //Quick check to see if the UI value differs, if so update.
-    if (value !== element[meta]) {
+    if (JSON.stringify(value) !== JSON.stringify(element[meta])) {
       element[meta] = value;
     }
+  }
+  static clearSelect(elementValue) {
+    let inputBoxes = document.querySelectorAll("*[id^=" + elementValue + "]");
+    inputBoxes.forEach((input) => {
+      input.value = "";
+    });
   }
   static addSelectListeners(elementValue) {
     let inputBoxes = document.querySelectorAll("*[id^=" + elementValue + "]");
     inputBoxes.forEach((input) => {
       input.addEventListener("focus", (e) => {
-        console.log("VALUE", input.value);
-        console.log("PLACEHOLDER", input.placeholder);
         if (input.value !== input.placeholder) {
-          input.value = input.value;
-        } else {
           input.value = input.placeholder;
         }
       });
-      input.addEventListener("focusou", (e) => {
-        console.log("VALUE", input.value);
-        console.log("PLACEHOLDER", input.placeholder);
+      input.addEventListener("focusout", (e) => {
         if (input.value !== input.placeholder) {
-          input.value = input.value;
-        } else {
-          input.value = input.placeholder;
+          input.placeholder = input.value;
         }
       });
     });

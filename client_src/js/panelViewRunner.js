@@ -173,7 +173,7 @@ async function updateState(printer, clientSettings) {
       futureTimeString = futureTimeString.substring(0, 8);
       const dateComplete = futureDateString + ": " + futureTimeString;
       UI.doesElementNeedUpdating(
-        printer.currentJob.printTimeRemaining,
+        Calc.generateTime(printer.currentJob.printTimeRemaining),
         elements.timeRemaining,
         "innerHTML"
       );
@@ -531,7 +531,7 @@ function drawPrinter(printer, clientSettings) {
   }
 
   const printerHTML = `
-        <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2 ${hidden}" id="viewPanel-${
+        <div class="col-sm-12 col-md-6 col-lg-4 col-xl-3 ${hidden}" id="viewPanel-${
     printer._id
   }">
         <div class="card mt-1 mb-1 ml-1 mr-1 text-center ${printer.group.replace(

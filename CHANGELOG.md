@@ -41,6 +41,7 @@ All notable changes to this project will be documented in this file.
         - Retry the connection if error/closed unexpectedly.    
     - Changed the Power button poll rate to 5 seconds.
     - Changed server check poll rate to 2.5 seconds.   
+    - pm2 logs are now flushed before starting application, now only captures errors as my logs cover the rest.
 
 ### Fixed
     - Fixed issue with File Manager not loading if printer in index 0 was offline.
@@ -54,6 +55,7 @@ All notable changes to this project will be documented in this file.
     - Fixed error logs not saving correctly...
     - Printer Control now correctly allows port/baud/profile selections when printer is in "Error!" state.
     - Printer Control no longer throws an error and locks the screen if a bad connection attempt is made.
+    - Fixed Panel and List views not displaying time remaining correctly.
 
 ## Removed
     - Removed the annoying content editable fields on "Printer Settings" and "Printer Management" and replaced with standard input boxes. 

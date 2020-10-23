@@ -27,6 +27,7 @@ $("#connectionModal").on("hidden.bs.modal", function (e) {
 export default class PrinterSettings {
   static async init(index, printers, printerControlList) {
     if (index !== "") {
+      UI.clearSelect("ps");
       const printerProfileBtn = document.getElementById("printer-profile-btn");
       const printerGcodeBtn = document.getElementById("printer-gcode-btn");
       const printerOtherSettings = document.getElementById(
@@ -200,7 +201,7 @@ export default class PrinterSettings {
         } else {
           document.getElementById("psDefaultProfile").value = 0;
         }
-
+        console.log(currentPrinter.currentProfile);
         document.getElementById("psPrinterProfiles").innerHTML = `
             <div class="col-12 col-lg-4">
             <h5 class="mb-1"><u>Printer</u></h5>
@@ -208,73 +209,73 @@ export default class PrinterSettings {
               <div class="input-group-prepend">
                 <span class="input-group-text">Profile Name: </span>
               </div>
-              <input id="printerName" type="text" class="form-control" placeholder="${currentPrinter.printerName}" aria-label="Username" aria-describedby="basic-addon1">
+              <input id="psProfileName" type="text" class="form-control" placeholder="${currentPrinter.currentProfile.name}" aria-label="Username" aria-describedby="basic-addon1">
             </div>
             </p>
                 <div class="input-group mb-3">
                   <div class="input-group-prepend">
                     <span class="input-group-text">Printer Model: </span>
                   </div>
-                  <input id="printerModel" type="text" class="form-control" placeholder="${currentPrinter.currentProfile.model}" aria-label="Username" aria-describedby="basic-addon1">
+                  <input id="psPrinterModel" type="text" class="form-control" placeholder="${currentPrinter.currentProfile.model}" aria-label="Username" aria-describedby="basic-addon1">
                 </div>
             </p>
             <h5 class="mb-1"><u>Axis</u></h5>
             <form class="was-validated">
                 <div class="custom-control custom-checkbox mb-3">
-                    <input type="checkbox" class="custom-control-input" id="eInverted" required>
-                    <label class="custom-control-label" for="eInverted">E Inverted</label>
+                    <input type="checkbox" class="custom-control-input" id="psEInverted" required>
+                    <label class="custom-control-label" for="psEInverted">E Inverted</label>
                 </div>
             </form>
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text">E:</span>
               </div>
-              <input id="printerEAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.e.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
+              <input id="psPrinterEAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.e.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
               <div class="input-group-append">
                 <span class="input-group-text">mm/min</span>
               </div>
             </div>
             <form class="was-validated">
                 <div class="custom-control custom-checkbox mb-3">
-                    <input type="checkbox" class="custom-control-input" id="xInverted" required>
-                    <label class="custom-control-label" for="xInverted">X Inverted</label>
+                    <input type="checkbox" class="custom-control-input" id="psXInverted" required>
+                    <label class="custom-control-label" for="psXInverted">X Inverted</label>
                 </div>
             </form>
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text">X:</span>
               </div>
-              <input id="printerXAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.x.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
+              <input id="psPrinterXAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.x.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
               <div class="input-group-append">
                 <span class="input-group-text">mm/min</span>
               </div>
             </div>
             <form class="was-validated">
                 <div class="custom-control custom-checkbox mb-3">
-                    <input type="checkbox" class="custom-control-input" id="yInverted" required>
-                    <label class="custom-control-label" for="yInverted">Y Inverted</label>
+                    <input type="checkbox" class="custom-control-input" id="psYInverted" required>
+                    <label class="custom-control-label" for="psYInverted">Y Inverted</label>
                 </div>
             </form>
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text">Y:</span>
               </div>
-              <input id="printerYAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.y.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
+              <input id="psPrinterYAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.y.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
               <div class="input-group-append">
                 <span class="input-group-text">mm/min</span>
               </div>
             </div>
             <form class="was-validated">
                 <div class="custom-control custom-checkbox mb-3">
-                    <input type="checkbox" class="custom-control-input" id="zInverted" required>
-                    <label class="custom-control-label" for="zInverted">Z Inverted</label>
+                    <input type="checkbox" class="custom-control-input" id="psZInverted" required>
+                    <label class="custom-control-label" for="psZInverted">Z Inverted</label>
                 </div>
             </form>
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text">Z:</span>
               </div>
-              <input id="printerZAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.z.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
+              <input id="psPrinterZAxis" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.axes.z.speed}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="0">
               <div class="input-group-append">
                 <span class="input-group-text">mm/min</span>
               </div>
@@ -284,35 +285,35 @@ export default class PrinterSettings {
             <h5 class="mb-1"><u>Extrusion</u></h5>
             <p class="mb-0"><span><form class="was-validated">
                                         <div class="custom-control custom-checkbox mb-3">
-                                            <input type="checkbox" class="custom-control-input" id="sharedNozzle" required>
-                                            <label class="custom-control-label" for="sharedNozzle">Shared Nozzle</label>
+                                            <input type="checkbox" class="custom-control-input" id="psSharedNozzle" required>
+                                            <label class="custom-control-label" for="psSharedNozzle">Shared Nozzle</label>
                                         </div>
                                     </form></span></p>
             <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text">Extruder Count:</span>
               </div>
-              <input id="extruderCount" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.extruder.count}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
+              <input id="psExtruderCount" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.extruder.count}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
             </div>
              <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text">Nozzle Size:</span>
               </div>
-              <input id="nozzleDiameter" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.extruder.nozzleDiameter}" aria-label="Username" aria-describedby="basic-addon1" step="0.1" min="0.1">
+              <input id="psNozzleDiameter" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.extruder.nozzleDiameter}" aria-label="Username" aria-describedby="basic-addon1" step="0.1" min="0.1">
             </div>
             </div>
             <div class="col-12 col-lg-4">
                         <h5 class="mb-1"><u>Bed / Chamber</u></h5>
            <p class="mb-1"><form class="was-validated">
                                                 <div class="custom-control custom-checkbox mb-3">
-                                                    <input type="checkbox" class="custom-control-input" id="heatedBed" required>
-                                                    <label class="custom-control-label" for="heatedBed">Heated Bed</label>
+                                                    <input type="checkbox" class="custom-control-input" id="psHeatedBed" required>
+                                                    <label class="custom-control-label" for="psHeatedBed">Heated Bed</label>
                                                 </div>
                                             </form></span></p>                  
         <p class="mb-1"><form class="was-validated">
                                                 <div class="custom-control custom-checkbox mb-3">
-                                                    <input type="checkbox" class="custom-control-input" id="heatedChamber" required>
-                                                    <label class="custom-control-label" for="heatedChamber">Heated Chamber</label>
+                                                    <input type="checkbox" class="custom-control-input" id="psHeatedChamber" required>
+                                                    <label class="custom-control-label" for="psHeatedChamber">Heated Chamber</label>
                                                 </div>
                                             </form></span></p>  
             <h5 class="mb-1"><u>Dimensions</u></h5>
@@ -329,7 +330,7 @@ export default class PrinterSettings {
               <div class="input-group-prepend">
                 <span class="input-group-text">D:</span>
               </div>
-              <input id="volumeDepth" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.volume.depth}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
+              <input id="psVolumeDepth" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.volume.depth}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
               <div class="input-group-append">
                 <span class="input-group-text">mm</span>
               </div>
@@ -338,7 +339,7 @@ export default class PrinterSettings {
               <div class="input-group-prepend">
                 <span class="input-group-text">H:</span>
               </div>
-              <input id="volumeHeight" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.volume.height}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
+              <input id="psVolumeHeight" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.volume.height}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
               <div class="input-group-append">
                 <span class="input-group-text">mm</span>
               </div>
@@ -347,7 +348,7 @@ export default class PrinterSettings {
               <div class="input-group-prepend">
                 <span class="input-group-text">W:</span>
               </div>
-              <input id="volumeWidth" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.volume.width}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
+              <input id="psVolumeWidth" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.volume.width}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
               <div class="input-group-append">
                 <span class="input-group-text">mm</span>
               </div>
@@ -356,19 +357,19 @@ export default class PrinterSettings {
         `;
         document.getElementById("extruderFormFactor").value =
           currentPrinter.currentProfile.volume.formFactor;
-        document.getElementById("eInverted").checked =
+        document.getElementById("psEInverted").checked =
           currentPrinter.currentProfile.axes.e.inverted;
-        document.getElementById("xInverted").checked =
+        document.getElementById("psXInverted").checked =
           currentPrinter.currentProfile.axes.x.inverted;
-        document.getElementById("yInverted").checked =
+        document.getElementById("psYInverted").checked =
           currentPrinter.currentProfile.axes.y.inverted;
-        document.getElementById("zInverted").checked =
+        document.getElementById("psZInverted").checked =
           currentPrinter.currentProfile.axes.z.inverted;
-        document.getElementById("sharedNozzle").checked =
+        document.getElementById("psSharedNozzle").checked =
           currentPrinter.currentProfile.extruder.sharedNozzle;
-        document.getElementById("heatedBed").checked =
+        document.getElementById("psHeatedBed").checked =
           currentPrinter.currentProfile.heatedBed;
-        document.getElementById("heatedChamber").checked =
+        document.getElementById("psHeatedChamber").checked =
           currentPrinter.currentProfile.heatedChamber;
 
         let afterPrintCancelled = "";
@@ -429,48 +430,48 @@ export default class PrinterSettings {
         }
         document.getElementById("psGcodeManagerGcode").innerHTML = `
               <div class="form-group">
-              <label for="settingsAfterPrinterCancelled">After Printing Cancelled</label>
-              <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterCancelled" rows="2">${afterPrintCancelled}</textarea>
+              <label for="psSettingsAfterPrinterCancelled">After Printing Cancelled</label>
+              <textarea class="form-control bg-dark text-white" id="psSettingsAfterPrinterCancelled" rows="2" placeholder="${afterPrintCancelled}"></textarea>
               <small>Anything you put here will be executed after any lines in your files.</small>
               </div>
               <div class="form-group">
-              <label for="settingsAfterPrinterDone">After Printing Done</label>
-              <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterDone" rows="2">${afterPrintDone}</textarea>
+              <label for="psSettingsAfterPrinterDone">After Printing Done</label>
+              <textarea class="form-control bg-dark text-white" id="psSettingsAfterPrinterDone" rows="2" placeholder="${afterPrintDone}"></textarea>
                <small>Anything you put here will be executed after any lines in your files.</small>
               </div>
               <div class="form-group">
-              <label for="settingsAfterPrinterPaused">After Printing Paused</label>
-              <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterPaused" rows="2">${afterPrintPaused}</textarea>
+              <label for="psSettingsAfterPrinterPaused">After Printing Paused</label>
+              <textarea class="form-control bg-dark text-white" id="psSettingsAfterPrinterPaused" rows="2" placeholder="${afterPrintPaused}"></textarea>
                <small>Anything you put here will be executed after any lines in your files.</small>
               </div>
               <div class="form-group">
-              <label for="settingsAfterPrinterConnected">After Printer Connected</label>
-              <textarea class="form-control bg-dark text-white" id="settingsAfterPrinterConnected" rows="2">${afterPrinterConnected}</textarea>
+              <label for="psSettingsAfterPrinterConnected">After Printer Connected</label>
+              <textarea class="form-control bg-dark text-white" id="psSettingsAfterPrinterConnected" rows="2" placeholder="${afterPrinterConnected}"></textarea>
                <small> Anything you put here will only be executed after the printer has established a connection.</small>
               </div>
               <div class="form-group">
-              <label for="settingsAfterToolChange">After Tool Change</label>
-              <textarea class="form-control bg-dark text-white" id="settingsAfterToolChange" rows="2">${afterToolChange}</textarea>
+              <label for="psSettingsAfterToolChange">After Tool Change</label>
+              <textarea class="form-control bg-dark text-white" id="psSettingsAfterToolChange" rows="2" placeholder="${afterToolChange}"></textarea>
                <small>Anything you put here will be executed after any tool change commands <code>Tn</code>.</small>
               </div>
               <div class="form-group">
-              <label for="settingsBeforePrinterResumed">Before Printing Resumed</label>
-              <textarea class="form-control bg-dark text-white" id="settingsBeforePrinterResumed" rows="2">${beforePrintResumed}</textarea>
+              <label for="psSettingsBeforePrinterResumed">Before Printing Resumed</label>
+              <textarea class="form-control bg-dark text-white" id="psSettingsBeforePrinterResumed" rows="2" placeholder="${beforePrintResumed}"></textarea>
                <small>Anything you put here will be executed before any lines in your files.</small>
               </div>
               <div class="form-group">
-              <label for="settingsBeforePrinterStarted">Before Printing Started</label>
-              <textarea class="form-control bg-dark text-white" id="settingsBeforePrinterStarted" rows="2">${beforePrintStarted}</textarea>
+              <label for="psSettingsBeforePrinterStarted">Before Printing Started</label>
+              <textarea class="form-control bg-dark text-white" id="psSettingsBeforePrinterStarted" rows="2" placeholder="${beforePrintStarted}"></textarea>
                <small>Anything you put here will be executed before any lines in your files.</small>
               </div>
               <div class="form-group">
-              <label for="settingsBeforePrinterDisconnected">Before Printer Disconnected</label>
-              <textarea class="form-control bg-dark text-white" id="settingsBeforePrinterDisconnected" rows="2">${beforePrinterDisconnected}</textarea>
+              <label for="psSettingsBeforePrinterDisconnected">Before Printer Disconnected</label>
+              <textarea class="form-control bg-dark text-white" id="psSettingsBeforePrinterDisconnected" rows="2" placeholder="${beforePrinterDisconnected}"></textarea>
                <small> Anything you put here will only be executed when closing the connection actively. If the connection to the printer is suddenly lost nothing will be sent.</small>
               </div>
               <div class="form-group">
-              <label for="settingsBeforeToolChange">Before Tool Change</label>
-              <textarea class="form-control bg-dark text-white" id="settingsBeforeToolChange" rows="2">${beforeToolChange}</textarea>
+              <label for="psSettingsBeforeToolChange">Before Tool Change</label>
+              <textarea class="form-control bg-dark text-white" id="psSettingsBeforeToolChange" rows="2" placeholder="${beforeToolChange}"></textarea>
                <small>Anything you put here will be executed before any tool change commands <code>Tn</code>.</small>
               </div>
         `;
@@ -561,8 +562,7 @@ export default class PrinterSettings {
       document.getElementById("printerSettingsFooter").insertAdjacentHTML(
         "beforeend",
         `
-                            <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
-                           <button type="button" class="btn btn-success" id="savePrinterSettings">Save</button>
+                           <button type="button" class="btn btn-success btn-block" id="savePrinterSettings">Save</button>
         `
       );
       let wolEnable = false;
@@ -586,22 +586,22 @@ export default class PrinterSettings {
         <h5><u>OctoPrint Specific Power Commands</u></h5>
         <form>
           <div class="form-group">
-            <label for="serverRestart">OctoPrint Server Restart</label>
-            <input type="text" class="form-control" id="serverRestart" placeholder="${serverRestart}">
+            <label for="psServerRestart">OctoPrint Server Restart</label>
+            <input type="text" class="form-control" id="psServerRestart" placeholder="${serverRestart}">
             <small id="passwordHelpBlock" class="form-text text-muted">
                 Usually your OctoPrint hosts server restart command. i.e: <code>sudo service octoprint restart</code>
             </small>
           </div>
           <div class="form-group">
-            <label for="systemRestart">OctoPrint System Restart</label>
-            <input type="text" class="form-control" id="systemRestart" placeholder="${systemRestart}">
+            <label for="psSystemRestart">OctoPrint System Restart</label>
+            <input type="text" class="form-control" id="psSystemRestart" placeholder="${systemRestart}">
             <small id="passwordHelpBlock" class="form-text text-muted">
                Usually your OctoPrint hosts system restart command. i.e: <code>sudo shutdown -r now</code>
             </small>
           </div>
           <div class="form-group">
-            <label for="systemShutdown">OctoPrint System Shutdown</label>
-            <input type="text" class="form-control" id="systemShutdown" placeholder="${systemShutdown}">
+            <label for="psSystemShutdown">OctoPrint System Shutdown</label>
+            <input type="text" class="form-control" id="psSystemShutdown" placeholder="${systemShutdown}">
             <small id="passwordHelpBlock" class="form-text text-muted">
               Usually your OctoPrint hosts system shutdown command. i.e: <code>sudo shutdown -h now</code>
             </small>
@@ -610,7 +610,7 @@ export default class PrinterSettings {
           <small>Enable and setup the ability for OctoFarm to fire a wake on lan packet to your client. Client MUST support wake on lan for this to work.</small>
         <form class="was-validated">
           <div class="custom-control custom-checkbox mb-3">
-              <input type="checkbox" class="custom-control-input" id="wolEnable" required>
+              <input type="checkbox" class="custom-control-input" id="psWolEnable" required>
               <label class="custom-control-label" for="wolEnable">Enable wake on lan</label>
               <div class="invalid-feedback">Wake on Lan support disabled</div>
               <div class="valid-feedback">Wake on Lan support enabled</div>
@@ -618,31 +618,31 @@ export default class PrinterSettings {
         </form>
          <div class="form-row">
             <div class="col-2">
-              <input id="wolMAC"  type="text" class="form-control" placeholder="" value="${wolMAC}">
+              <input id="psWolMAC"  type="text" class="form-control" placeholder=${wolMAC}"" value="">
                <small class="form-text text-muted">
                     MAC Address to target wake packet sending
                </small>
             </div>
             <div class="col-2">
-              <input id="wolIP"  type="text" class="form-control" placeholder="255.255.255.255" value="${wolIP}">
+              <input id="psWolIP"  type="text" class="form-control" placeholder="${wolIP}" value="">
                <small class="form-text text-muted">
                     Broadcast Address to send wake packet too. <code>(255.255.255.255)</code>
                </small>
             </div>
             <div class="col-2">
-              <input id="wolPort"  type="text" class="form-control" placeholder="9" value="${wolPort}">
+              <input id="psWolPort"  type="text" class="form-control" placeholder="${wolPort}" value="">
                <small class="form-text text-muted">
                 Port to send wake packet too.  <code>(Default: 9)</code>
                </small>
             </div>
             <div class="col-2">
-              <input id="wolInterval"  type="text" class="form-control" placeholder="100" value="${wolInterval}">
+              <input id="psWolInterval"  type="text" class="form-control" placeholder="${wolInterval}" value="">
                <small class="form-text text-muted">
                     Interval between packets. <code>(Default: 100)</code>
                </small>
             </div>
             <div class="col-2">
-              <input id="wolCount"  type="text" class="form-control" placeholder="3" value="${wolCount}">
+              <input id="psWolCount"  type="text" class="form-control" placeholder="${wolCount}" value="">
                <small class="form-text text-muted">
                 Amount of packets to send.  <code>(Default: 3)</code>
                </small>
@@ -657,13 +657,13 @@ export default class PrinterSettings {
           <h6>Power On</h6>
            <div class="form-row">
               <div class="col-4">
-                <input id="powerOnCommand"  type="text" class="form-control" placeholder="Command">
+                <input id="psPowerOnCommand"  type="text" class="form-control" placeholder="Command">
                  <small class="form-text text-muted">
                   This is usually an json object supplied in the following format <code>{"command":"turnOn"}</code>
                  </small>
               </div>
               <div class="col-8">
-                <input id="powerOnURL"  type="text" class="form-control" placeholder="URL">
+                <input id="psPowerOnURL"  type="text" class="form-control" placeholder="URL">
                  <small class="form-text text-muted">
                   The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
                  </small>
@@ -672,13 +672,13 @@ export default class PrinterSettings {
            <h6>Power Off</h6>
             <div class="form-row">
               <div class="col-4">
-                <input id="powerOffCommand" type="text" class="form-control" placeholder="Command">
+                <input id="psPowerOffCommand" type="text" class="form-control" placeholder="Command">
                  <small class="form-text text-muted">
                    This is usually an json object supplied in the following format <code>{"command":"turnOff"}</code>
                  </small>
               </div>
               <div class="col-8">
-                <input  id="powerOffURL" type="text" class="form-control" placeholder="URL">
+                <input  id="psPowerOffURL" type="text" class="form-control" placeholder="URL">
                  <small class="form-text text-muted">
                    The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
                  </small>
@@ -687,13 +687,13 @@ export default class PrinterSettings {
             <h6>Power Toggle</h6>
             <div class="form-row">
               <div class="col-4">
-                <input id="powerToggleCommand"  type="text" class="form-control" placeholder="Command">
+                <input id="psPowerToggleCommand"  type="text" class="form-control" placeholder="Command">
                  <small vclass="form-text text-muted">
                    This is usually an json object supplied in the following format <code>{"command":"toggle"}</code>
                  </small>
               </div>
               <div class="col-8">
-                <input id="powerToggleURL" type="text" class="form-control" placeholder="URL">
+                <input id="psPowerToggleURL" type="text" class="form-control" placeholder="URL">
                  <small class="form-text text-muted">
                     The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
                  </small>
@@ -703,13 +703,13 @@ export default class PrinterSettings {
             <p class="mb-0">This must return a boolean value to work properly. When you enter this in your printer will show it's power state on the power button icon.</p>
             <div class="form-row">
               <div class="col-4">
-                <input id="powerStateCommand" type="text" class="form-control" placeholder="Command">
+                <input id="psPowerStateCommand" type="text" class="form-control" placeholder="Command">
                  <small class="form-text text-muted">
                    This is usually an json object supplied in the following format <code>{"command":"state"}</code>
                  </small>
               </div>
               <div class="col-8">
-                <input id="powerStateURL" type="text" class="form-control" placeholder="URL">
+                <input id="psPowerStateURL" type="text" class="form-control" placeholder="URL">
                  <small class="form-text text-muted">
                     The URL endpoint you would like to make the request too. <code>[PrinterURL]/api/plugin/psucontrol</code>
                  </small>
@@ -717,45 +717,47 @@ export default class PrinterSettings {
             </div>
         </form>
         `;
-      document.getElementById("wolEnable").checked = wolEnable;
+      document.getElementById("psWolEnable").checked = wolEnable;
       if (serverRestart != "N/A") {
-        document.getElementById("serverRestart").value = serverRestart;
+        document.getElementById("psServerRestart").placeholder = serverRestart;
       }
       if (systemRestart != "N/A") {
-        document.getElementById("systemRestart").value = systemRestart;
+        document.getElementById("psSystemRestart").placeholder = systemRestart;
       }
       if (systemShutdown != "N/A") {
-        document.getElementById("systemShutdown").value = systemShutdown;
+        document.getElementById(
+          "psSystemShutdown"
+        ).placeholder = systemShutdown;
       }
       if (currentPrinter.powerSettings != null) {
-        document.getElementById("powerOnCommand").value =
+        document.getElementById("psPowerOnCommand").placeholder =
           currentPrinter.powerSettings.powerOnCommand;
-        document.getElementById("powerOnURL").value =
+        document.getElementById("psPowerOnURL").placeholder =
           currentPrinter.powerSettings.powerOnURL;
-        document.getElementById("powerOffCommand").value =
+        document.getElementById("psPowerOffCommand").placeholder =
           currentPrinter.powerSettings.powerOffCommand;
-        document.getElementById("powerOffURL").value =
+        document.getElementById("psPowerOffURL").placeholder =
           currentPrinter.powerSettings.powerOffURL;
-        document.getElementById("powerToggleCommand").value =
+        document.getElementById("psPowerToggleCommand").placeholder =
           currentPrinter.powerSettings.powerToggleCommand;
-        document.getElementById("powerToggleURL").value =
+        document.getElementById("psPowerToggleURL").placeholder =
           currentPrinter.powerSettings.powerToggleURL;
-        document.getElementById("powerStateCommand").value =
+        document.getElementById("psPowerStateCommand").placeholder =
           currentPrinter.powerSettings.powerStatusCommand;
-        document.getElementById("powerStateURL").value =
+        document.getElementById("psPowerStateURL").placeholder =
           currentPrinter.powerSettings.powerStatusURL;
       }
       document.getElementById("tempTriggers").innerHTML = `
            <div class="form-group">
               <label for="headtingVariation">Heating Variation</label>
-              <input type="number" class="form-control" id="headtingVariation" placeholder="${currentPrinter.otherSettings.temperatureTriggers.heatingVariation}" step="0.01">
+              <input type="number" class="form-control" id="psHeadtingVariation" placeholder="${currentPrinter.otherSettings.temperatureTriggers.heatingVariation}" step="0.01">
               <small id="passwordHelpBlock" class="form-text text-muted">
                   What temperature variation will trigger orange warning on the temperature display when a printer is Active. <code>Default is 1°C</code>
               </small>
             </div>
             <div class="form-group">
               <label for="coolDown">Cool Down Trigger</label>
-              <input type="number" class="form-control" id="coolDown" placeholder="${currentPrinter.otherSettings.temperatureTriggers.coolDown}" step="0.01">
+              <input type="number" class="form-control" id="psCoolDown" placeholder="${currentPrinter.otherSettings.temperatureTriggers.coolDown}" step="0.01">
               <small id="passwordHelpBlock" class="form-text text-muted">
                   What temperature limit will trigger the blue status on the temperature display when a printer is Complete and cooling down. <code>Default is 30°C</code>
               </small>
@@ -767,7 +769,7 @@ export default class PrinterSettings {
                    <div class="form-group">
                     <label for="coolDown">Power Consumption</label>
                           <div class="input-group mb-2">
-                                <input type="number" class="form-control" id="powerConsumption" placeholder="${currentPrinter.costSettings.powerConsumption}" step="0.01">
+                                <input type="number" class="form-control" id="psPowerConsumption" placeholder="${currentPrinter.costSettings.powerConsumption}" step="0.01">
                                 <div class="input-group-append">
                                      <div class="input-group-text">kW</div>
                                 </div>
@@ -779,7 +781,7 @@ export default class PrinterSettings {
                   <div class="form-group">
                     <label for="coolDown">Electricity Costs</label>
                          <div class="input-group mb-2">
-                            <input type="number" class="form-control" id="electricityCosts" placeholder="${currentPrinter.costSettings.electricityCosts}" step="0.01">
+                            <input type="number" class="form-control" id="psElectricityCosts" placeholder="${currentPrinter.costSettings.electricityCosts}" step="0.01">
                                 <div class="input-group-append">
                                      <div class="input-group-text"></div>
                                 </div>
@@ -794,7 +796,7 @@ export default class PrinterSettings {
                     <div class="form-group">
                       <label for="coolDown">Purchase Price</label>
                          <div class="input-group mb-2">
-                            <input type="number" class="form-control" id="purchasePrice" placeholder="${currentPrinter.costSettings.purchasePrice}" step="0.01">
+                            <input type="number" class="form-control" id="psPurchasePrice" placeholder="${currentPrinter.costSettings.purchasePrice}" step="0.01">
                                 <div class="input-group-append">
                                      <div class="input-group-text"></div>
                                 </div>
@@ -807,7 +809,7 @@ export default class PrinterSettings {
                     <div class="form-group">
                       <label for="coolDown">Estimated Life Span</label>
                            <div class="input-group mb-2">
-                             <input type="number" class="form-control" id="estimatedLifespan" placeholder="${currentPrinter.costSettings.estimateLifespan}" step="0.01">
+                             <input type="number" class="form-control" id="psEstimatedLifespan" placeholder="${currentPrinter.costSettings.estimateLifespan}" step="0.01">
                                 <div class="input-group-append">
                                      <div class="input-group-text">hours</div>
                                 </div>
@@ -819,7 +821,7 @@ export default class PrinterSettings {
                     <div class="form-group">
                       <label for="coolDown">Maintenance Costs</label>
                            <div class="input-group mb-2">
-                             <input type="number" class="form-control" id="maintenanceCosts" placeholder="${currentPrinter.costSettings.maintenanceCosts}" step="0.01">
+                             <input type="number" class="form-control" id="psMaintenanceCosts" placeholder="${currentPrinter.costSettings.maintenanceCosts}" step="0.01">
                                 <div class="input-group-append">
                                      <div class="input-group-text"><i class="fas fa-wrench"></i> / hour</div>
                                 </div>
@@ -884,19 +886,19 @@ export default class PrinterSettings {
         triggerSelect.value = script.trigger;
       });
 
-      document.getElementById("powerConsumption").value = parseFloat(
+      document.getElementById("psPowerConsumption").placeholder = parseFloat(
         currentPrinter.costSettings.powerConsumption
       );
-      document.getElementById("electricityCosts").value = parseFloat(
+      document.getElementById("psElectricityCosts").placeholder = parseFloat(
         currentPrinter.costSettings.electricityCosts
       );
-      document.getElementById("purchasePrice").value = parseFloat(
+      document.getElementById("psPurchasePrice").placeholder = parseFloat(
         currentPrinter.costSettings.purchasePrice
       );
-      document.getElementById("estimatedLifespan").value = parseFloat(
+      document.getElementById("psEstimatedLifespan").placeholder = parseFloat(
         currentPrinter.costSettings.estimateLifespan
       );
-      document.getElementById("maintenanceCosts").value = parseFloat(
+      document.getElementById("psMaintenanceCosts").placeholder = parseFloat(
         currentPrinter.costSettings.maintenanceCosts
       );
 
@@ -904,7 +906,9 @@ export default class PrinterSettings {
         .getElementById("savePrinterSettings")
         .addEventListener("click", async (event) => {
           const newValues = {
+            state: currentPrinter.printerState.colour.category,
             printer: {
+              printerName: document.getElementById("psPrinterName").value,
               printerURL: document.getElementById("psPrinterURL").value,
               index: currentPrinter._id,
               cameraURL: document.getElementById("psCamURL").value,
@@ -917,141 +921,158 @@ export default class PrinterSettings {
               preferredProfile: document.getElementById("psDefaultProfile")
                 .value,
             },
-            profileID: currentPrinter.currentProfile.id,
-            profile: {
-              name: document.getElementById("printerName").value,
+            systemCommands: {
+              serverRestart: document.getElementById("psServerRestart").value,
+              systemRestart: document.getElementById("psSystemRestart").value,
+              systemShutdown: document.getElementById("psSystemShutdown").value,
+            },
+            powerCommands: {
+              powerOnCommand: document.getElementById("psPowerOnCommand").value,
+              powerOnURL: document.getElementById("psPowerOnURL").value,
+              powerOffCommand: document.getElementById("psPowerOffCommand")
+                .value,
+              powerOffURL: document.getElementById("psPowerOffURL").value,
+              powerToggleCommand: document.getElementById(
+                "psPowerToggleCommand"
+              ).value,
+              powerToggleURL: document.getElementById("psPowerToggleURL").value,
+              powerStatusCommand: document.getElementById("psPowerStateCommand")
+                .value,
+              powerStatusURL: document.getElementById("psPowerStateURL").value,
+              wol: {
+                enabled: document.getElementById("psWolEnable").checked,
+                ip: document.getElementById("psWolIP").value,
+                port: document.getElementById("psWolPort").value,
+                interval: document.getElementById("psWolInterval").value,
+                count: document.getElementById("psWolCount").value,
+                MAC: document.getElementById("psWolMAC").value,
+              },
+            },
+            costSettings: {
+              powerConsumption: parseFloat(
+                document.getElementById("psPowerConsumption").value
+              ),
+              electricityCosts: parseFloat(
+                document.getElementById("psElectricityCosts").value
+              ),
+              purchasePrice: parseFloat(
+                document.getElementById("psPurchasePrice").value
+              ),
+              estimateLifespan: parseFloat(
+                document.getElementById("psEstimatedLifespan").value
+              ),
+              maintenanceCosts: parseFloat(
+                document.getElementById("psMaintenanceCosts").value
+              ),
+            },
+          };
+          if (currentPrinter.printerState.colour.category !== "Offline") {
+            let printerName = document.getElementById("psProfileName").value;
+            let printerModel = document.getElementById("psPrinterModel").value;
+            if (printerName === "") {
+              printerName = null;
+            }
+            if (printerModel === "") {
+              printerModel = null;
+            }
+            newValues.profileID = currentPrinter.currentProfile.id;
+            newValues.profile = {
+              name: printerName,
               color: "default",
-              model: document.getElementById("printerModel").value,
+              model: printerModel,
               volume: {
                 formFactor: document.getElementById("extruderFormFactor").value,
-                width: parseInt(document.getElementById("volumeWidth").value),
-                depth: parseInt(document.getElementById("volumeDepth").value),
-                height: parseInt(document.getElementById("volumeHeight").value),
+                width: parseInt(document.getElementById("psVolumeWidth").value),
+                depth: parseInt(document.getElementById("psVolumeDepth").value),
+                height: parseInt(
+                  document.getElementById("psVolumeHeight").value
+                ),
               },
-              heatedBed: document.getElementById("heatedBed").checked,
-              heatedChamber: document.getElementById("heatedChamber").checked,
+              heatedBed: document.getElementById("psHeatedBed").checked,
+              heatedChamber: document.getElementById("psHeatedChamber").checked,
               axes: {
                 x: {
                   speed: parseInt(
-                    document.getElementById("printerXAxis").value
+                    document.getElementById("psPrinterXAxis").value
                   ),
-                  inverted: document.getElementById("xInverted").checked,
+                  inverted: document.getElementById("psXInverted").checked,
                 },
                 y: {
                   speed: parseInt(
-                    document.getElementById("printerYAxis").value
+                    document.getElementById("psPrinterYAxis").value
                   ),
-                  inverted: document.getElementById("yInverted").checked,
+                  inverted: document.getElementById("psYInverted").checked,
                 },
                 z: {
                   speed: parseInt(
-                    document.getElementById("printerZAxis").value
+                    document.getElementById("psPrinterZAxis").value
                   ),
-                  inverted: document.getElementById("zInverted").checked,
+                  inverted: document.getElementById("psZInverted").checked,
                 },
                 e: {
                   speed: parseInt(
-                    document.getElementById("printerEAxis").value
+                    document.getElementById("psPrinterEAxis").value
                   ),
-                  inverted: document.getElementById("eInverted").checked,
+                  inverted: document.getElementById("psEInverted").checked,
                 },
               },
               extruder: {
-                count: parseInt(document.getElementById("extruderCount").value),
-                nozzleDiameter: parseFloat(
-                  document.getElementById("nozzleDiameter").value
+                count: parseInt(
+                  document.getElementById("psExtruderCount").value
                 ),
-                sharedNozzle: document.getElementById("sharedNozzle").checked,
+                nozzleDiameter: parseFloat(
+                  document.getElementById("psNozzleDiameter").value
+                ),
+                sharedNozzle: document.getElementById("psSharedNozzle").checked,
               },
-            },
-            systemCommands: {
-              serverRestart: document.getElementById("serverRestart").value,
-              systemRestart: document.getElementById("systemRestart").value,
-              systemShutdown: document.getElementById("systemShutdown").value,
-            },
-            powerCommands: {
-              powerOnCommand: document.getElementById("powerOnCommand").value,
-              powerOnURL: document.getElementById("powerOnURL").value,
-              powerOffCommand: document.getElementById("powerOffCommand").value,
-              powerOffURL: document.getElementById("powerOffURL").value,
-              powerToggleCommand: document.getElementById("powerToggleCommand")
-                .value,
-              powerToggleURL: document.getElementById("powerToggleURL").value,
-              powerStatusCommand: document.getElementById("powerStateCommand")
-                .value,
-              powerStatusURL: document.getElementById("powerStateURL").value,
-              wol: {
-                enabled: document.getElementById("wolEnable").checked,
-                ip: document.getElementById("wolIP").value,
-                port: document.getElementById("wolPort").value,
-                interval: document.getElementById("wolInterval").value,
-                count: document.getElementById("wolCount").value,
-                MAC: document.getElementById("wolMAC").value,
-              },
-            },
-            gcode: {
+            };
+            newValues.gcode = {
               afterPrintCancelled: document.getElementById(
-                "settingsAfterPrinterCancelled"
+                "psSettingsAfterPrinterCancelled"
               ).value,
               afterPrintDone: document.getElementById(
-                "settingsAfterPrinterDone"
+                "psSettingsAfterPrinterDone"
               ).value,
               afterPrintPaused: document.getElementById(
-                "settingsAfterPrinterPaused"
+                "psSettingsAfterPrinterPaused"
               ).value,
               afterPrinterConnected: document.getElementById(
-                "settingsAfterPrinterConnected"
+                "psSettingsAfterPrinterConnected"
               ).value,
               afterToolChange: document.getElementById(
-                "settingsAfterToolChange"
+                "psSettingsAfterToolChange"
               ).value,
               beforePrintResumed: document.getElementById(
-                "settingsBeforePrinterResumed"
+                "psSettingsBeforePrinterResumed"
               ).value,
               beforePrintStarted: document.getElementById(
-                "settingsBeforePrinterStarted"
+                "psSettingsBeforePrinterStarted"
               ).value,
               beforePrinterDisconnected: document.getElementById(
-                "settingsBeforePrinterDisconnected"
+                "psSettingsBeforePrinterDisconnected"
               ).value,
               beforeToolChange: document.getElementById(
-                "settingsBeforeToolChange"
+                "psSettingsBeforeToolChange"
               ).value,
-            },
-            other: {
+            };
+            newValues.other = {
               enableCamera: document.getElementById("camEnabled").checked,
               rotateCamera: document.getElementById("camRot90").checked,
               flipHCamera: document.getElementById("camFlipH").checked,
               flipVCamera: document.getElementById("camFlipV").checked,
               enableTimeLapse: document.getElementById("camTimelapse").checked,
-              heatingVariation: document.getElementById("headtingVariation")
+              heatingVariation: document.getElementById("psHeadtingVariation")
                 .value,
-              coolDown: document.getElementById("coolDown").value,
-            },
-            costSettings: {
-              powerConsumption: parseFloat(
-                document.getElementById("powerConsumption").value
-              ),
-              electricityCosts: parseFloat(
-                document.getElementById("electricityCosts").value
-              ),
-              purchasePrice: parseFloat(
-                document.getElementById("purchasePrice").value
-              ),
-              estimateLifespan: parseFloat(
-                document.getElementById("estimatedLifespan").value
-              ),
-              maintenanceCosts: parseFloat(
-                document.getElementById("maintenanceCosts").value
-              ),
-            },
-          };
+              coolDown: document.getElementById("psCoolDown").value,
+            };
+          }
           let update = await OctoFarmClient.post(
             "printers/updateSettings",
             newValues
           );
           if (update.status === 200) {
             update = await update.json();
+            console.log(update);
             UI.createAlert(
               "success",
               `OctoFarm successfully updated for ${currentPrinter.printerName}`,
@@ -1065,6 +1086,7 @@ export default class PrinterSettings {
                 3000,
                 "clicked"
               );
+            } else if (update.status.profile === 900) {
             } else {
               UI.createAlert(
                 "error",
@@ -1080,6 +1102,7 @@ export default class PrinterSettings {
                 3000,
                 "clicked"
               );
+            } else if (update.status.settings === 900) {
             } else {
               UI.createAlert(
                 "error",
@@ -1098,6 +1121,7 @@ export default class PrinterSettings {
           }
         });
       PrinterSettings.applyState(currentPrinter);
+      UI.addSelectListeners("ps");
     } else {
       const id = _.findIndex(printers, function (o) {
         return o._id == currentIndex;
@@ -1147,7 +1171,6 @@ export default class PrinterSettings {
   static async applyState(printer) {
     // Garbage collection for terminal
     const elements = await PrinterSettings.grabPage();
-    console.log(printer);
     elements.mainPage.status.innerHTML = `<b>Printer Status</b><br>${printer.printerState.state}`;
     elements.mainPage.status.className = `btn btn-${printer.printerState.colour.name} mb-1 btn-block`;
     elements.mainPage.host.innerHTML = `<b>Host Status</b><br>${printer.hostState.state}`;
@@ -1193,16 +1216,23 @@ export default class PrinterSettings {
     )}`;
     elements.connectPage.stateClean.className = `btn btn-${printer.systemChecks.cleaning.job.status} mb-1 btn-block`;
 
-    if (
-      printer.printerState.colour.category === "Offline" ||
-      printer.printerState.colour.category === "Disconnected"
-    ) {
-      if (
-        printer.printerState.state === "Offline" ||
-        printer.printerState.state === "Shutdown" ||
-        printer.printerState.state === "Searching..."
-      ) {
-        $("#PrinterSettingsModal").modal("hide");
+    if (printer.printerState.colour.category === "Offline") {
+      const printerProfileBtn = document.getElementById("printer-profile-btn");
+      const printerGcodeBtn = document.getElementById("printer-gcode-btn");
+      const printerOtherSettings = document.getElementById(
+        "printer-settings-btn"
+      );
+      printerProfileBtn.disabled = true;
+      printerGcodeBtn.disabled = true;
+      printerOtherSettings.disabled = true;
+      if (!printerProfileBtn.classList.contains("notyet")) {
+        printerProfileBtn.classList.add("notyet");
+      }
+      if (!printerGcodeBtn.classList.contains("notyet")) {
+        printerGcodeBtn.classList.add("notyet");
+      }
+      if (!printerOtherSettings.classList.contains("notyet")) {
+        printerOtherSettings.classList.add("notyet");
       }
     }
   }

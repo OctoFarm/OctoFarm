@@ -1361,10 +1361,10 @@ if (interval === false) {
   interval = setInterval(() => {
     PrinterClean.sortCurrentOperations(printersInformation);
     PrinterClean.statisticsStart();
-    PrinterClean.generateConnectionLogs(printersInformation);
+    //PrinterClean.generateConnectionLogs(printersInformation);
     PrinterClean.createPrinterList(printersInformation, fmToggle);
   }, 1000);
 }
 PrinterClean.statisticsStart();
-PrinterClean.generateConnectionLogs(printersInformation);
+//PrinterClean.generateConnectionLogs(printersInformation);
 PrinterClean.createPrinterList(printersInformation, fmToggle);
