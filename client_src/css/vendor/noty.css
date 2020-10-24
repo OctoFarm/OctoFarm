@@ -85,10 +85,10 @@
   position: absolute;
   left: 0;
   bottom: 0;
-  height: 3px;
+  height: 10px;
   width: 100%;
-  background-color: #646464;
-  opacity: 0.2;
+  background-color: #282828;
+  opacity: 0.6;
   filter: alpha(opacity=10); }
 
 .noty_bar {
