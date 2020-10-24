@@ -1325,11 +1325,12 @@ class dashUpdate {
             });
           document
             .getElementById(`printerLog-${printer._id}`)
-            .addEventListener("click", (e) => {
-              const printerInfoSingle = _.findIndex(printerInfo, function (o) {
-                return o._id === printer._id;
-              });
-              PrinterLogs.loadLogs(printerInfo[printerInfoSingle]);
+            .addEventListener("click", async (e) => {
+              let connectionLogs = await OctoFarmClient.get(
+                "printers/connectionLogs/" + printer._id
+              );
+              connectionLogs = await connectionLogs.json();
+              PrinterLogs.loadLogs(printer, connectionLogs);
             });
         }
       }

@@ -3109,6 +3109,16 @@ class Runner {
     sorted.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
     return sorted;
   }
+  static async returnPrinterLogs(printerId) {
+    const i = _.findIndex(farmPrinters, function (o) {
+      return o._id == printerId;
+    });
+
+    let connectionLogs = await PrinterClean.generateConnectionLogs(
+      farmPrinters[i]
+    );
+    return connectionLogs;
+  }
 }
 
 let fileTimeout = 0;

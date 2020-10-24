@@ -3,7 +3,7 @@ import Calc from "../functions/calc.js";
 let chart = null;
 
 export default class PrinterLogs {
-  static loadLogs(printer) {
+  static loadLogs(printer, connectionLogs) {
     document.getElementById("printerLogsLabel").innerHTML =
       "Printer Logs: " + printer.printerName;
     let printerRows = document.getElementById("printerConnectionLogRows");
@@ -20,11 +20,11 @@ export default class PrinterLogs {
     printerErrorRows.innerHTML = "";
     //tempChart.innerHTML = "";
 
-    if (typeof printer.connectionLog === "object") {
-      logCount.innerHTML = `(${printer.connectionLog.currentOctoFarmLogs.length})`;
-      errorCount.innerHTML = `(${printer.connectionLog.currentErrorLogs.length})`;
+    if (typeof connectionLogs.currentOctoFarmLogs === "object") {
+      logCount.innerHTML = `(${connectionLogs.currentOctoFarmLogs.length})`;
+      errorCount.innerHTML = `(${connectionLogs.currentErrorLogs.length})`;
       tempCount.innerHTML = "(0)";
-      printer.connectionLog.currentOctoFarmLogs.forEach((log) => {
+      connectionLogs.currentOctoFarmLogs.forEach((log) => {
         printerRows.insertAdjacentHTML(
           "beforeend",
           `
@@ -36,7 +36,7 @@ export default class PrinterLogs {
       `
         );
       });
-      printer.connectionLog.currentErrorLogs.forEach((log) => {
+      connectionLogs.currentErrorLogs.forEach((log) => {
         printerErrorRows.insertAdjacentHTML(
           "beforeend",
           `
@@ -49,10 +49,10 @@ export default class PrinterLogs {
         );
       });
       if (
-        typeof printer.connectionLog.currentTempLogs !== "undefined" &&
-        printer.connectionLog.currentTempLogs.length > 0
+        typeof connectionLogs.currentTempLogs !== "undefined" &&
+        connectionLogs.currentTempLogs.length > 0
       ) {
-        tempCount.innerHTML = `(${printer.connectionLog.currentTempLogs[0].data.length})`;
+        tempCount.innerHTML = `(${connectionLogs.currentTempLogs[0].data.length})`;
         const options = {
           chart: {
             type: "line",
@@ -138,18 +138,18 @@ export default class PrinterLogs {
             },
           },
         };
-        if (printer.connectionLog.currentTempLogs.length === 0) {
+        if (connectionLogs.currentTempLogs.length === 0) {
           tempChart.innerHTML = "<div class=''>No Records to Show</div>";
         }
         if (chart !== null) {
           chart.destroy();
           chart = new ApexCharts(tempChart, options);
           chart.render();
-          chart.updateSeries(printer.connectionLog.currentTempLogs);
+          chart.updateSeries(connectionLogs.currentTempLogs);
         } else {
           chart = new ApexCharts(tempChart, options);
           chart.render();
-          chart.updateSeries(printer.connectionLog.currentTempLogs);
+          chart.updateSeries(connectionLogs.currentTempLogs);
         }
       }
     }
