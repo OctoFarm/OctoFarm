@@ -16,56 +16,77 @@ let worker = null;
 let powerTimer = 5000;
 let printerControlList = null;
 
+function createWebWorker() {
+  worker = new Worker("/assets/js/workers/printersManagerWorker.min.js");
+  worker.onmessage = function (event) {
+    if (event.data !== false) {
+      if (event.data.currentTickerList.length > 0) {
+        dashUpdate.ticker(event.data.currentTickerList);
+      }
+      printerInfo = event.data.printersInformation;
+      printerControlList = event.data.printerControlList;
+      console.log(event.data.printersInformation.length);
+      if (event.data.printersInformation.length > 0) {
+        if (
+          document
+            .getElementById("printerManagerModal")
+            .classList.contains("show")
+        ) {
+          PrinterManager.init(
+            "",
+            event.data.printersInformation,
+            printerControlList
+          );
+        } else if (
+          document
+            .getElementById("printerSettingsModal")
+            .classList.contains("show")
+        ) {
+          PrinterSettings.init(
+            "",
+            event.data.printersInformation,
+            event.data.printerControlList
+          );
+        } else {
+          dashUpdate.printers(
+            event.data.printersInformation,
+            event.data.printerControlList
+          );
+          if (powerTimer >= 5000) {
+            event.data.printersInformation.forEach((printer) => {
+              PowerButton.applyBtn(printer, "powerBtn-");
+            });
+            powerTimer = 0;
+          } else {
+            powerTimer += 500;
+          }
+        }
+      }
+    }
+  };
+}
+function handleVisibilityChange() {
+  if (document.hidden) {
+    if (worker !== null) {
+      console.log("Screen Abandonded, closing web worker...");
+      worker.terminate();
+      worker = null;
+    }
+  } else {
+    if (worker === null) {
+      console.log("Screen resumed... opening web worker...");
+      createWebWorker();
+    }
+  }
+}
+
+document.addEventListener("visibilitychange", handleVisibilityChange, false);
+
 if (window.Worker) {
   // Yes! Web worker support!
   try {
     if (worker === null) {
-      worker = new Worker("/assets/js/workers/printersManagerWorker.min.js");
-      worker.onmessage = function (event) {
-        if (event.data !== false) {
-          if (event.data.currentTickerList.length > 0) {
-            dashUpdate.ticker(event.data.currentTickerList);
-          }
-          printerInfo = event.data.printersInformation;
-          printerControlList = event.data.printerControlList;
-          if (event.data.printersInformation.length > 0) {
-            if (
-              document
-                .getElementById("printerManagerModal")
-                .classList.contains("show")
-            ) {
-              PrinterManager.init(
-                "",
-                event.data.printersInformation,
-                printerControlList
-              );
-            } else if (
-              document
-                .getElementById("printerSettingsModal")
-                .classList.contains("show")
-            ) {
-              PrinterSettings.init(
-                "",
-                event.data.printersInformation,
-                event.data.printerControlList
-              );
-            } else {
-              dashUpdate.printers(
-                event.data.printersInformation,
-                event.data.printerControlList
-              );
-              if (powerTimer >= 5000) {
-                event.data.printersInformation.forEach((printer) => {
-                  PowerButton.applyBtn(printer, "powerBtn-");
-                });
-                powerTimer = 0;
-              } else {
-                powerTimer += 500;
-              }
-            }
-          }
-        }
-      };
+      createWebWorker();
     }
   } catch (e) {
     console.log(e);
@@ -97,8 +118,13 @@ deleteAllBtn.addEventListener("click", async (e) => {
 const saveAllBtn = document.getElementById("saveAllBtn");
 saveAllBtn.addEventListener("click", async (e) => {
   saveAllBtn.disabled = true;
+  deleteAllBtn.disabled = true;
   let onScreenButtons = document.querySelectorAll("*[id^=saveButton-]");
+  let onScreenDelete = document.querySelectorAll("*[id^=delButton-]");
   for (const btn of onScreenButtons) {
+    btn.disabled = true;
+  }
+  for (const btn of onScreenDelete) {
     btn.disabled = true;
   }
   UI.createAlert(
@@ -107,14 +133,15 @@ saveAllBtn.addEventListener("click", async (e) => {
     onScreenButtons.length * 1500
   );
   for (const btn of onScreenButtons) {
+    btn.disabled = false;
     btn.click();
     await delay(1500);
   }
   UI.createAlert("success", "Successfully saved all your instances", 4000);
   saveAllBtn.disabled = false;
+  deleteAllBtn.disabled = true;
 });
 
-const editBtn = document.getElementById("editPrinterBtn");
 const bulkConnectBtn = document.getElementById("bulkConnectBtn");
 bulkConnectBtn.addEventListener("click", async (e) => {
   const printerConnect = async function () {
@@ -323,9 +350,7 @@ searchOffline.addEventListener("click", async (e) => {
     "Clicked"
   );
 });
-// saveEditBtn.addEventListener('click', async (event) => {
-
-// });
+const editBtn = document.getElementById("editPrinterBtn");
 editBtn.addEventListener("click", (event) => {
   const confirmEditFunction = async function () {
     let editedPrinters = [];

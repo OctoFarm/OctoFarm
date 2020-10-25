@@ -10,6 +10,7 @@ import PowerButton from "./lib/modules/powerButton.js";
 import { dragAndDropEnable, dragCheck } from "./lib/functions/dragAndDrop.js";
 import { checkTemps } from "./lib/modules/temperatureCheck.js";
 import { checkFilamentManager } from "./lib/modules/filamentGrab.js";
+import PrinterSettings from "./lib/modules/printerSettings";
 
 let powerTimer = 20000;
 let dragDropInit = false;
@@ -19,77 +20,98 @@ let printerInfo = "";
 const elems = [];
 
 let worker = null;
+
+function createWebWorker() {
+  worker = new Worker("/assets/js/workers/monitoringViewsWorker.min.js");
+  worker.onmessage = async function (event) {
+    if (event.data != false) {
+      printerInfo = event.data.printersInformation;
+      printerControlList = event.data.printerControlList;
+      if (groupInit === false) {
+        initGroupSelect(event.data.printersInformation);
+        groupInit = true;
+      }
+      if (dragDropInit === false) {
+        const printerList = document.querySelectorAll("[id^='viewPanel-']");
+        printerList.forEach((list) => {
+          const ca = list.id.split("-");
+          const zeeIndex = _.findIndex(printerInfo, function (o) {
+            return o._id == ca[1];
+          });
+          dragAndDropEnable(list, event.data.printersInformation[zeeIndex]);
+          dragDropInit = true;
+        });
+      }
+      if (event.data != false) {
+        if (
+          document
+            .getElementById("printerManagerModal")
+            .classList.contains("show")
+        ) {
+          PrinterManager.init(
+            "",
+            event.data.printersInformation,
+            event.data.printerControlList
+          );
+        } else {
+          printerInfo = event.data.printersInformation;
+          if (!(await dragCheck())) {
+            init(
+              event.data.printersInformation,
+              event.data.clientSettings.panelView,
+              event.data.printerControlList
+            );
+          }
+          if (powerTimer >= 20000) {
+            event.data.printersInformation.forEach((printer) => {
+              PowerButton.applyBtn(printer, "powerBtn-");
+            });
+            powerTimer = 0;
+          } else {
+            powerTimer += 500;
+          }
+          if (event.data.clientSettings.panelView.currentOp) {
+            currentOperations(
+              event.data.currentOperations.operations,
+              event.data.currentOperations.count,
+              printerInfo
+            );
+          }
+        }
+      }
+    } else {
+      UI.createAlert(
+        "warning",
+        "Server Events closed unexpectedly... Retying in 10 seconds",
+        10000,
+        "Clicked"
+      );
+    }
+  };
+}
+function handleVisibilityChange() {
+  if (document.hidden) {
+    if (worker !== null) {
+      console.log("Screen Abandonded, closing web worker...");
+      worker.terminate();
+      worker = null;
+    }
+  } else {
+    if (worker === null) {
+      console.log("Screen resumed... opening web worker...");
+      createWebWorker();
+    }
+  }
+}
+
+document.addEventListener("visibilitychange", handleVisibilityChange, false);
+
 // Setup webWorker
 if (window.Worker) {
   // Yes! Web worker support!
   try {
     if (worker === null) {
-      worker = new Worker("/assets/js/workers/monitoringViewsWorker.min.js");
-      worker.onmessage = async function (event) {
-        if (event.data != false) {
-          printerInfo = event.data.printersInformation;
-          printerControlList = event.data.printerControlList;
-          if (groupInit === false) {
-            initGroupSelect(event.data.printersInformation);
-            groupInit = true;
-          }
-          if (dragDropInit === false) {
-            const printerList = document.querySelectorAll("[id^='viewPanel-']");
-            printerList.forEach((list) => {
-              const ca = list.id.split("-");
-              const zeeIndex = _.findIndex(printerInfo, function (o) {
-                return o._id == ca[1];
-              });
-              dragAndDropEnable(list, event.data.printersInformation[zeeIndex]);
-              dragDropInit = true;
-            });
-          }
-          if (event.data != false) {
-            if (
-              document
-                .getElementById("printerManagerModal")
-                .classList.contains("show")
-            ) {
-              PrinterManager.init(
-                "",
-                event.data.printersInformation,
-                event.data.printerControlList
-              );
-            } else {
-              printerInfo = event.data.printersInformation;
-              if (!(await dragCheck())) {
-                init(
-                  event.data.printersInformation,
-                  event.data.clientSettings.panelView,
-                  event.data.printerControlList
-                );
-              }
-              if (powerTimer >= 20000) {
-                event.data.printersInformation.forEach((printer) => {
-                  PowerButton.applyBtn(printer, "powerBtn-");
-                });
-                powerTimer = 0;
-              } else {
-                powerTimer += 500;
-              }
-              if (event.data.clientSettings.panelView.currentOp) {
-                currentOperations(
-                  event.data.currentOperations.operations,
-                  event.data.currentOperations.count,
-                  printerInfo
-                );
-              }
-            }
-          }
-        } else {
-          UI.createAlert(
-            "warning",
-            "Server Events closed unexpectedly... Retying in 10 seconds",
-            10000,
-            "Clicked"
-          );
-        }
-      };
+      createWebWorker();
     }
   } catch (e) {
     console.log(e);

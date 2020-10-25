@@ -396,6 +396,7 @@ a.notyet {
   height: 440px;
   max-height: 440px;
   overflow: auto;
+  font-family: monospace;
 }
 /*SERVER WORK OVERLAY*/
 #overlay {

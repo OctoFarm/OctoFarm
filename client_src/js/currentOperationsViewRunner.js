@@ -6,29 +6,50 @@ import OctoPrintClient from "./lib/octoprint.js";
 import UI from "./lib/functions/ui.js";
 
 let worker = null;
+
+function createWebWorker() {
+  worker = new Worker("/assets/js/workers/monitoringViewsWorker.min.js");
+  worker.onmessage = async function (event) {
+    if (event.data != false) {
+      // /printerInfo === event.data.printersInformation
+      currentOperationsView(
+        event.data.currentOperations.operations,
+        event.data.currentOperations.count,
+        event.data.printersInformation
+      );
+    } else {
+      UI.createAlert(
+        "warning",
+        "Communication with the server has been suddenly lost, trying to re-establish connection...",
+        10000,
+        "Clicked"
+      );
+    }
+  };
+}
+function handleVisibilityChange() {
+  if (document.hidden) {
+    if (worker !== null) {
+      console.log("Screen Abandonded, closing web worker...");
+      worker.terminate();
+      worker = null;
+    }
+  } else {
+    if (worker === null) {
+      console.log("Screen resumed... opening web worker...");
+      createWebWorker();
+    }
+  }
+}
+
+document.addEventListener("visibilitychange", handleVisibilityChange, false);
+
 // Setup webWorker
 if (window.Worker) {
   // Yes! Web worker support!
   try {
     if (worker === null) {
-      worker = new Worker("/assets/js/workers/monitoringViewsWorker.min.js");
-      worker.onmessage = async function (event) {
-        if (event.data != false) {
-          // /printerInfo === event.data.printersInformation
-          currentOperationsView(
-            event.data.currentOperations.operations,
-            event.data.currentOperations.count,
-            event.data.printersInformation
-          );
-        } else {
-          UI.createAlert(
-            "warning",
-            "Communication with the server has been suddenly lost, trying to re-establish connection...",
-            10000,
-            "Clicked"
-          );
-        }
-      };
+      createWebWorker();
     }
   } catch (e) {
     console.log(e);

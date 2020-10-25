@@ -725,7 +725,6 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
             }
           }, 500);
         }, 10000);
-        ScriptRunner.check(farmPrinters[that.index], "error");
       }
     }
     if (data.plugin) {

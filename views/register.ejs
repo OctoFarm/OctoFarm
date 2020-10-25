@@ -5,6 +5,11 @@
         <i class="fas fa-user-plus"></i> Register
       </h1>
       <%- include('./partials/messages') %>
+      <% if(userCount === 0){ %>
+        <div class="alert alert-warning" role="alert">
+          This looks like your first user... This user will become the Administrator and is the only one allowed to add/remove/edit printers. Any subsequent users created will have the User permission set. (this will be enhanced at a later date.)
+        </div>
+      <% } %>
       <form action="/users/register" method="POST">
         <div class="form-group">
           <label for="name">Name</label>

@@ -1,4 +1,5 @@
 import "@babel/polyfill";
+
 async function asyncParse(str) {
   try {
     const info = parse(str);
@@ -22,6 +23,7 @@ source.onerror = function () {
 source.onclose = function () {
   postMessage(false);
 };
+
 const Flatted = (function (Primitive, primitive) {
   /*!
    * ISC License

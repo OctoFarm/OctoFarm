@@ -56,6 +56,7 @@ All notable changes to this project will be documented in this file.
     - Printer Control now correctly allows port/baud/profile selections when printer is in "Error!" state.
     - Printer Control no longer throws an error and locks the screen if a bad connection attempt is made.
     - Fixed Panel and List views not displaying time remaining correctly.
+    - Fixed issue with Printers Nuke not working.
 
 ## Removed
     - Removed the annoying content editable fields on "Printer Settings" and "Printer Management" and replaced with standard input boxes. 

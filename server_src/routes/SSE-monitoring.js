@@ -59,10 +59,8 @@ if (interval === false) {
     };
     clientInformation = await stringify(infoDrop);
     for (clientId in clients) {
-      for (clientId in clients) {
-        clients[clientId].write("retry:" + 10000 + "\n");
-        clients[clientId].write("data: " + clientInformation + "\n\n"); // <- Push a message to a single attached client
-      }
+      clients[clientId].write("retry:" + 10000 + "\n");
+      clients[clientId].write("data: " + clientInformation + "\n\n"); // <- Push a message to a single attached client
     }
   }, 500);
 }
