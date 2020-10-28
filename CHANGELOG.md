@@ -57,6 +57,8 @@ All notable changes to this project will be documented in this file.
     - Printer Control no longer throws an error and locks the screen if a bad connection attempt is made.
     - Fixed Panel and List views not displaying time remaining correctly.
     - Fixed issue with Printers Nuke not working.
+    - Fixed multiple client connections causing doubling of data sent to client.
+    - Fixed bubbling caused by user navigating away from client screen. Client now checks if screen is active, closes the server connection if not.
 
 ## Removed
     - Removed the annoying content editable fields on "Printer Settings" and "Printer Management" and replaced with standard input boxes. 

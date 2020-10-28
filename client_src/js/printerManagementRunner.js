@@ -25,7 +25,6 @@ function createWebWorker() {
       }
       printerInfo = event.data.printersInformation;
       printerControlList = event.data.printerControlList;
-      console.log(event.data.printersInformation.length);
       if (event.data.printersInformation.length > 0) {
         if (
           document
@@ -375,32 +374,41 @@ editBtn.addEventListener("click", (event) => {
           `editInputName-${printerID}`
         );
         //Check if value updated, if not fill in the old value from placeholder
-        if (printerURL.value === "") {
-          printerURL.value = printerURL.placeholder;
+        if (
+          printerURL.value.length !== 0 ||
+          printerCamURL.value.length !== 0 ||
+          printerAPIKEY.value.length !== 0 ||
+          printerGroup.value.length !== 0 ||
+          printerName.value.length !== 0
+        ) {
+          if (printerURL.value.length === 0) {
+            printerURL.value = printerURL.placeholder;
+          }
+          if (printerCamURL.value.length === 0) {
+            printerCamURL.value = printerCamURL.placeholder;
+          }
+          if (printerAPIKEY.value.length === 0) {
+            printerAPIKEY.value = printerAPIKEY.placeholder;
+          }
+          if (printerGroup.value.length === 0) {
+            printerGroup.value = printerAPIKEY.placeholder;
+          }
+          if (printerName.value.length === 0) {
+            printerName.value = printerName.placeholder;
+          }
+          const printer = new PrintersManagement(
+            Validate.stripHTML(printerURL.value),
+            Validate.stripHTML(printerCamURL.value),
+            Validate.stripHTML(printerAPIKEY.value),
+            Validate.stripHTML(printerGroup.value),
+            Validate.stripHTML(printerName.value)
+          ).build();
+          printer._id = printerID;
+          editedPrinters.push(printer);
         }
-        if (printerCamURL === "") {
-          printerCamURL.value = printerCamURL.placeholder;
-        }
-        if (printerAPIKEY.value === "") {
-          printerAPIKEY.value = printerAPIKEY.placeholder;
-        }
-        if (printerGroup.value === "") {
-          printerGroup.value = printerAPIKEY.placeholder;
-        }
-        if (printerName.value === "") {
-          printerName.value = printerName.placeholder;
-        }
-        const printer = new PrintersManagement(
-          Validate.stripHTML(printerURL.value),
-          Validate.stripHTML(printerCamURL.value),
-          Validate.stripHTML(printerAPIKEY.value),
-          Validate.stripHTML(printerGroup.value),
-          Validate.stripHTML(printerName.value)
-        ).build();
-        printer._id = printerID;
-        editedPrinters.push(printer);
       }
     }
+
     if (editedPrinters.length > 0) {
       const post = await OctoFarmClient.post("printers/update", editedPrinters);
       if (post.status === 200) {
@@ -1109,7 +1117,6 @@ class PrintersManagement {
 class dashUpdate {
   static ticker(list) {
     const textList = "";
-
     list.forEach((e) => {
       let date = new Date(e.date);
       date = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
