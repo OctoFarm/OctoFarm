@@ -165,7 +165,7 @@ function reloadClient(done) {
 function watchTask() {
   watch(
     [cssFolder, jsClientFolder],
-    { interval: 1000 },
+    { interval: 1000, events: "change" },
     parallel(octofarmImg, octofarmJS, octofarmWorkersJS, octofarmCSS, vendorJS)
   );
 }

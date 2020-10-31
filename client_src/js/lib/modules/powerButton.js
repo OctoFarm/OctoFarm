@@ -2,131 +2,11 @@ import OctoPrintClient from "../octoprint.js";
 import OctoFarmclient from "../octofarm.js";
 
 export default class PowerButton {
-  static returnPowerBtn(printer) {
-    const powerBtn = `
-             <button title="Toggle your printers power"
-                                    id="printerPower-${printer._id}"
-                                    class="btn btn-outline-danger btn-sm" type="button" disabled>
-                                <i id="printerStatus-${printer._id}" class="fas fa-power-off" style="color: black;"></i>
-                            </button>
-                            <button title="Other power actions" type="button" class="btn btn-sm btn-outline-danger dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="sr-only">Toggle Dropdown</span>
-                            </button>
-                            <div class="dropdown-menu text-center dropdown-menu-right">
-                                  <a id="printerPowerOn-${printer._id}" title="Turn on your printer" class="dropdown-item d-none" href="#"><i class="textComplete fas fa-power-off"></i> Power On Printer</a>
-                                <a id="printerPowerOff-${printer._id}" title="Turn off your printer" class="dropdown-item d-none" href="#"><i class="textOffline fas fa-power-off"></i> Power Off Printer</a>
-                          
-                                <div id="printerDropDownMaker-${printer._id}" class="dropdown-divider d-none"></div>
-                                <a id="printerRestartOctoPrint-${printer._id}" title="Restart OctoPrint Service" class="dropdown-item d-none" href="#"><i class="textActive fas fa-redo"></i> Restart OctoPrint</a>
-                                <a id="printerRestartHost-${printer._id}" title="Reboot OctoPrint Host" class="dropdown-item d-none" href="#"><i class="textActive fas fa-sync-alt"></i> Reboot Host</a>
-                                <a id="printerWakeHost-${printer._id}" title="Wake up OctoPrint Host" class="dropdown-item d-none" href="#"><i class="textComplete fas fa-power-off"></i> Wake Host</a>
-                                <a id="printerShutdownHost-${printer._id}" title="Shutdown OctoPrint Host" class="dropdown-item d-none" href="#"><i class="textOffline fas fa-power-off"></i> Shutdown Host</a>
-                            </div>
-            `;
-    return powerBtn;
-  }
   static revealBulkPower() {
     let bulkPowerBtn = document.getElementById("bulkPowerBtn");
     if (bulkPowerBtn) {
       if (bulkPowerBtn.classList.contains("d-none")) {
         bulkPowerBtn.classList.remove("d-none");
-      }
-    }
-  }
-  static async applyBtn(printer, element) {
-    if (
-      typeof printer.otherSettings.system !== "undefined" &&
-      !document.getElementById("printerPower-" + printer._id)
-    ) {
-      if (
-        (printer.otherSettings.system.commands.serverRestartCommand !== "" &&
-          printer.otherSettings.system.commands.serverRestartCommand !==
-            null) ||
-        (printer.otherSettings.system.commands.systemRestartCommand !== "" &&
-          printer.otherSettings.system.commands.systemRestartCommand !==
-            null) ||
-        (printer.otherSettings.system.commands.systemShutdownCommand !== "" &&
-          printer.otherSettings.system.commands.systemShutdownCommand !== null)
-      ) {
-        document.getElementById(
-          element + printer._id
-        ).innerHTML = PowerButton.returnPowerBtn(printer);
-        if (
-          printer.otherSettings.system.commands.serverRestartCommand !== "" &&
-          printer.otherSettings.system.commands.serverRestartCommand !== null
-        ) {
-          const restartOctoPrint = document.getElementById(
-            "printerRestartOctoPrint-" + printer._id
-          );
-          restartOctoPrint.classList.remove("d-none");
-          restartOctoPrint.addEventListener("click", (event) => {
-            OctoPrintClient.system(printer, "restart");
-          });
-        }
-        if (
-          printer.otherSettings.system.commands.systemRestartCommand !== "" &&
-          printer.otherSettings.system.commands.systemRestartCommand !== null
-        ) {
-          const restartHost = document.getElementById(
-            "printerRestartHost-" + printer._id
-          );
-          restartHost.classList.remove("d-none");
-          restartHost.addEventListener("click", (event) => {
-            OctoPrintClient.system(printer, "reboot");
-          });
-        }
-
-        if (
-          printer.otherSettings.system.commands.systemShutdownCommand !== "" &&
-          printer.otherSettings.system.commands.systemShutdownCommand !== null
-        ) {
-          const shutdownHost = document.getElementById(
-            "printerShutdownHost-" + printer._id
-          );
-          shutdownHost.classList.remove("d-none");
-          shutdownHost.addEventListener("click", (event) => {
-            OctoPrintClient.system(printer, "shutdown");
-          });
-        }
-      }
-    }
-    if (printer.powerSettings !== null) {
-      if (printer.powerSettings.powerOnCommand !== "") {
-        if (!document.getElementById("printerPower-" + printer._id)) {
-          if (document.getElementById(element + printer._id)) {
-            document.getElementById(
-              element + printer._id
-            ).innerHTML = PowerButton.returnPowerBtn(printer);
-            PowerButton.powerButtons(printer);
-          }
-        } else {
-          PowerButton.powerButtons(printer);
-        }
-      }
-      if (typeof printer.powerSettings.wol !== "undefined") {
-        if (printer.powerSettings.wol.enabled) {
-          if (
-            printer.powerSettings.wol.ip === "" ||
-            printer.powerSettings.wol.port === "" ||
-            printer.powerSettings.wol.interval === "" ||
-            printer.powerSettings.wol.count === ""
-          ) {
-            console.log("ISSUE WITH WAKE ON LAN SETTINGS");
-          } else {
-            const wakeButton = document.getElementById(
-              "printerWakeHost-" + printer._id
-            );
-            if (wakeButton.classList.contains("d-none")) {
-              wakeButton.classList.remove("d-none");
-              wakeButton.addEventListener("click", (e) => {
-                OctoFarmclient.post(
-                  "printers/wakeHost",
-                  printer.powerSettings.wol
-                );
-              });
-            }
-          }
-        }
       }
     }
   }
@@ -313,5 +193,128 @@ export default class PowerButton {
         }
       }
     }
+  }
+
+  static async applyBtn(printer, element) {
+    if (
+      typeof printer.otherSettings.system !== "undefined" &&
+      !document.getElementById("printerPower-" + printer._id)
+    ) {
+      if (
+        (printer.otherSettings.system.commands.serverRestartCommand !== "" &&
+          printer.otherSettings.system.commands.serverRestartCommand !==
+            null) ||
+        (printer.otherSettings.system.commands.systemRestartCommand !== "" &&
+          printer.otherSettings.system.commands.systemRestartCommand !==
+            null) ||
+        (printer.otherSettings.system.commands.systemShutdownCommand !== "" &&
+          printer.otherSettings.system.commands.systemShutdownCommand !== null)
+      ) {
+        document.getElementById(
+          element + printer._id
+        ).innerHTML = PowerButton.printerPowerBtn(printer._id);
+        if (
+          printer.otherSettings.system.commands.serverRestartCommand !== "" &&
+          printer.otherSettings.system.commands.serverRestartCommand !== null
+        ) {
+          const restartOctoPrint = document.getElementById(
+            "printerRestartOctoPrint-" + printer._id
+          );
+          restartOctoPrint.classList.remove("d-none");
+          restartOctoPrint.addEventListener("click", (event) => {
+            OctoPrintClient.system(printer, "restart");
+          });
+        }
+        if (
+          printer.otherSettings.system.commands.systemRestartCommand !== "" &&
+          printer.otherSettings.system.commands.systemRestartCommand !== null
+        ) {
+          const restartHost = document.getElementById(
+            "printerRestartHost-" + printer._id
+          );
+          restartHost.classList.remove("d-none");
+          restartHost.addEventListener("click", (event) => {
+            OctoPrintClient.system(printer, "reboot");
+          });
+        }
+
+        if (
+          printer.otherSettings.system.commands.systemShutdownCommand !== "" &&
+          printer.otherSettings.system.commands.systemShutdownCommand !== null
+        ) {
+          const shutdownHost = document.getElementById(
+            "printerShutdownHost-" + printer._id
+          );
+          shutdownHost.classList.remove("d-none");
+          shutdownHost.addEventListener("click", (event) => {
+            OctoPrintClient.system(printer, "shutdown");
+          });
+        }
+      }
+    }
+    if (printer.powerSettings !== null) {
+      if (printer.powerSettings.powerOnCommand !== "") {
+        if (!document.getElementById("printerPower-" + printer._id)) {
+          if (document.getElementById(element + printer._id)) {
+            document.getElementById(
+              element + printer._id
+            ).innerHTML = PowerButton.printerPowerBtn(printer._id);
+            PowerButton.powerButtons(printer);
+          }
+        } else {
+          PowerButton.powerButtons(printer);
+        }
+      }
+      if (typeof printer.powerSettings.wol !== "undefined") {
+        if (printer.powerSettings.wol.enabled) {
+          if (
+            printer.powerSettings.wol.ip === "" ||
+            printer.powerSettings.wol.port === "" ||
+            printer.powerSettings.wol.interval === "" ||
+            printer.powerSettings.wol.count === ""
+          ) {
+            console.log("ISSUE WITH WAKE ON LAN SETTINGS");
+          } else {
+            const wakeButton = document.getElementById(
+              "printerWakeHost-" + printer._id
+            );
+            if (wakeButton.classList.contains("d-none")) {
+              wakeButton.classList.remove("d-none");
+              wakeButton.addEventListener("click", (e) => {
+                OctoFarmclient.post(
+                  "printers/wakeHost",
+                  printer.powerSettings.wol
+                );
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  static printerPowerBtn(id) {
+    return `
+      
+             <button title="Toggle your printers power"
+                                    id="printerPower-${id}"
+                                    class="btn btn-outline-danger btn-sm" type="button" disabled>
+                                <i id="printerStatus-${id}" class="fas fa-power-off" style="color: black;"></i>
+                            </button>
+                            <button title="Other power actions" type="button" class="btn btn-sm btn-outline-danger dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="sr-only">Toggle Dropdown</span>
+                            </button>
+                            <div class="dropdown-menu text-center dropdown-menu-right">
+                                  <a id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#"><i class="textComplete fas fa-power-off"></i> Power On Printer</a>
+                                <a id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#"><i class="textOffline fas fa-power-off"></i> Power Off Printer</a>
+                          
+                                <div id="printerDropDownMaker-${id}" class="dropdown-divider d-none"></div>
+                                <a id="printerRestartOctoPrint-${id}" title="Restart OctoPrint Service" class="dropdown-item d-none" href="#"><i class="textActive fas fa-redo"></i> Restart OctoPrint</a>
+                                <a id="printerRestartHost-${id}" title="Reboot OctoPrint Host" class="dropdown-item d-none" href="#"><i class="textActive fas fa-sync-alt"></i> Reboot Host</a>
+                                <a id="printerWakeHost-${id}" title="Wake up OctoPrint Host" class="dropdown-item d-none" href="#"><i class="textComplete fas fa-power-off"></i> Wake Host</a>
+                                <a id="printerShutdownHost-${id}" title="Shutdown OctoPrint Host" class="dropdown-item d-none" href="#"><i class="textOffline fas fa-power-off"></i> Shutdown Host</a>
+                            </div>
+        </div>
+    `;
   }
 }

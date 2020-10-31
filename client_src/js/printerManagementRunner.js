@@ -7,6 +7,11 @@ import PrinterSettings from "./lib/modules/printerSettings.js";
 import FileOperations from "./lib/functions/file.js";
 import Validate from "./lib/functions/validate.js";
 import PowerButton from "./lib/modules/powerButton.js";
+import {
+  init as actionButtonInit,
+  printerQuickConnected,
+  printerQuickDisconnected,
+} from "./lib/modules/Printers/actionButtons.js";
 import PrinterSelect from "./lib/modules/printerSelect";
 import PrinterLogs from "./lib/modules/printerLogs.js";
 
@@ -1163,6 +1168,10 @@ class dashUpdate {
           const printerSortIndex = document.getElementById(
             `printerSortIndex-${printer._id}`
           );
+          const printerQuickConnectBtn = document.getElementById(
+            "printerQuickConnect-" + printer._id
+          );
+
           printerSortIndex.innerHTML = printer.sortIndex;
           if (typeof printer.klipperFirmwareVersion !== "undefined") {
             printerOctoPrintVersion.innerHTML =
@@ -1190,6 +1199,7 @@ class dashUpdate {
           hostBadge.className = `tag badge badge-${printer.hostState.colour.name} badge-pill`;
           socketBadge.className = `tag badge badge-${printer.webSocketState.colour} badge-pill`;
           socketBadge.setAttribute("title", printer.webSocketState.desc);
+
           webButton.href = printer.printerURL;
           if (printer.hostState.state === "Online") {
             let apiErrors = 0;
@@ -1225,6 +1235,21 @@ class dashUpdate {
               }
             }
           }
+          printerQuickConnectBtn.disabled =
+            printer.printerState.colour.category === "Offline";
+          if (
+            printer.printerState.colour.category !== "Offline" &&
+            printer.printerState.colour.category === "Disconnected"
+          ) {
+            printerQuickDisconnected(printer._id);
+          } else if (
+            printer.printerState.colour.category !== "Offline" &&
+            printer.printerState.colour.category !== "Disconnected"
+          ) {
+            printerQuickConnected(printer._id);
+          } else {
+            printerQuickDisconnected(printer._id);
+          }
 
           printButton.disabled =
             printer.printerState.colour.category === "Offline";
@@ -1234,41 +1259,14 @@ class dashUpdate {
             "beforeend",
             `
         <tr id="printerCard-${printer._id}">
-        <th id="printerSortIndex-${printer._id}">${printer.sortIndex}</td>
-        <td><div id="printerName-${printer._id}" >${printerName}</div></td>
-        <td>
-            <button  
-            title="Control Your Printer"
-            id="printerButton-${printer._id}"
-                     type="button"
-                     class="tag btn btn-primary btn-sm"
-                     data-toggle="modal"
-                     data-target="#printerManagerModal" disabled
-            ><i class="fas fa-print"></i>
-            </button>
-            <a title="Open your Printers Web Interface"
-               id="printerWeb-${printer._id}"
-               type="button"
-               class="tag btn btn-info btn-sm"
-               target="_blank"
-               href="${printer.printerURL}" role="button"><i class="fas fa-globe-europe"></i></a>
-            <button  
-                     title="Re-Sync your printer"
-                     id="printerSyncButton-${printer._id}"
-                     type="button"
-                     class="tag btn btn-success btn-sm"
-            >
-                <i class="fas fa-sync"></i>
-            </button>
-            <div id="powerBtn-${printer._id}" class="btn-group">
-
-            </div>
-            <span title="Drag and Change your Printers sorting"  id="printerSortButton-${printer._id}"
+        <th><span title="Drag and Change your Printers sorting"  id="printerSortIndex-${printer._id}"
                    class="tag btn btn-light btn-sm sortableList"
             >
-    <i class="fas fa-grip-vertical"></i>
+    ${printer.sortIndex}
     </span></td>
-           <td>
+        <td><div id="printerName-${printer._id}">${printerName}</div></td>
+        <td id="printerActionBtns-${printer._id}"></td>
+        <td>
           <button  title="Change your Printer Settings"
             id="printerSettings-${printer._id}"
                                  type="button"
@@ -1311,14 +1309,115 @@ class dashUpdate {
    
         <td><div id="printerGroup-${printer._id}" ></div></td>
         <th id="printerOctoPrintVersion-${printer._id}"></td>
-        
-        <td><button id="deleteButton-${printer._id}" type="button" class="btn btn-danger btn-sm d-none">
-                <i class="fas fa-trash"></i>
-            </button></td>
+       
     </tr>
           `
           );
-          PowerButton.applyBtn(printer, "powerBtn-");
+
+          actionButtonInit(printer, `printerActionBtns-${printer._id}`);
+          document
+            .getElementById(`printerQuickConnect-${printer._id}`)
+            .addEventListener("click", async (e) => {
+              e.disabled = true;
+              const index = _.findIndex(printerInfo, function (o) {
+                return o._id === printer._id;
+              });
+              if (
+                document
+                  .getElementById("printerQuickConnect-" + printer._id)
+                  .classList.contains("btn-danger")
+              ) {
+                let data = {};
+                if (
+                  typeof printerInfo[index].connectionOptions !== "undefined"
+                ) {
+                  data = {
+                    command: "connect",
+                    port: printerInfo[index].connectionOptions.portPreference,
+                    baudrate:
+                      printerInfo[index].connectionOptions.baudratePreference,
+                    printerProfile:
+                      printerInfo[index].connectionOptions
+                        .printerProfilePreference,
+                    save: true,
+                  };
+                } else {
+                  UI.createAlert(
+                    "warning",
+                    `${printerInfo[index].printerName} has no preferences saved, defaulting to AUTO...`,
+                    8000,
+                    "Clicked"
+                  );
+                  data.command = "connect";
+                  data.port = "AUTO";
+                  data.baudrate = "AUTO";
+                  data.printerProfile = "_default";
+                  data.save = false;
+                }
+                let post = await OctoPrintClient.post(
+                  printerInfo[index],
+                  "connection",
+                  data
+                );
+                if (typeof post !== "undefined") {
+                  if (post.status === 204) {
+                    UI.createAlert(
+                      "success",
+                      `Successfully made connection attempt to ${printerInfo[index].printerName}...`,
+                      3000,
+                      "Clicked"
+                    );
+                  } else {
+                    UI.createAlert(
+                      "error",
+                      `There was an issue connecting to ${printerInfo[index].printerName} it's either not online, or the connection options supplied are not available...`,
+                      3000,
+                      "Clicked"
+                    );
+                  }
+                } else {
+                  UI.createAlert(
+                    "error",
+                    `No response from ${printerInfo[index].printerName}, is it online???`,
+                    3000,
+                    "Clicked"
+                  );
+                }
+              } else {
+                let data = {
+                  command: "disconnect",
+                };
+                let post = await OctoPrintClient.post(
+                  printerInfo[index],
+                  "connection",
+                  data
+                );
+                if (typeof post !== "undefined") {
+                  if (post.status === 204) {
+                    UI.createAlert(
+                      "success",
+                      `Successfully made disconnect attempt to ${printerInfo[index].printerName}...`,
+                      3000,
+                      "Clicked"
+                    );
+                  } else {
+                    UI.createAlert(
+                      "error",
+                      `There was an issue disconnecting to ${printerInfo[index].printerName} are you sure it's online?`,
+                      3000,
+                      "Clicked"
+                    );
+                  }
+                } else {
+                  UI.createAlert(
+                    "error",
+                    `No response from ${printerInfo[index].printerName}, is it online???`,
+                    3000,
+                    "Clicked"
+                  );
+                }
+              }
+            });
           document
             // eslint-disable-next-line no-underscore-dangle
             .getElementById(`printerSyncButton-${printer._id}`)
