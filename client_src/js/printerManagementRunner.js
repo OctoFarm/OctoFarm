@@ -1384,38 +1384,55 @@ class dashUpdate {
                   );
                 }
               } else {
-                let data = {
-                  command: "disconnect",
-                };
-                let post = await OctoPrintClient.post(
-                  printerInfo[index],
-                  "connection",
-                  data
-                );
-                if (typeof post !== "undefined") {
-                  if (post.status === 204) {
-                    UI.createAlert(
-                      "success",
-                      `Successfully made disconnect attempt to ${printerInfo[index].printerName}...`,
-                      3000,
-                      "Clicked"
-                    );
-                  } else {
-                    UI.createAlert(
-                      "error",
-                      `There was an issue disconnecting to ${printerInfo[index].printerName} are you sure it's online?`,
-                      3000,
-                      "Clicked"
-                    );
-                  }
-                } else {
-                  UI.createAlert(
-                    "error",
-                    `No response from ${printerInfo[index].printerName}, is it online???`,
-                    3000,
-                    "Clicked"
-                  );
-                }
+                bootbox.confirm({
+                  message: "Are you sure you want to disconnect your printer?",
+                  buttons: {
+                    confirm: {
+                      label: "Yes",
+                      className: "btn-success",
+                    },
+                    cancel: {
+                      label: "No",
+                      className: "btn-danger",
+                    },
+                  },
+                  callback: async function (result) {
+                    if (result) {
+                      let data = {
+                        command: "disconnect",
+                      };
+                      let post = await OctoPrintClient.post(
+                        printerInfo[index],
+                        "connection",
+                        data
+                      );
+                      if (typeof post !== "undefined") {
+                        if (post.status === 204) {
+                          UI.createAlert(
+                            "success",
+                            `Successfully made disconnect attempt to ${printerInfo[index].printerName}...`,
+                            3000,
+                            "Clicked"
+                          );
+                        } else {
+                          UI.createAlert(
+                            "error",
+                            `There was an issue disconnecting to ${printerInfo[index].printerName} are you sure it's online?`,
+                            3000,
+                            "Clicked"
+                          );
+                        }
+                      } else {
+                        UI.createAlert(
+                          "error",
+                          `No response from ${printerInfo[index].printerName}, is it online???`,
+                          3000,
+                          "Clicked"
+                        );
+                      }
+                    }
+                  },
+                });
               }
             });
           document
