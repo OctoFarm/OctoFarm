@@ -74,10 +74,10 @@ function printerQuickDisconnected(id) {
 
 async function init(printer, element) {
   document.getElementById(element).innerHTML = `
-    ${printerQuickConnect(printer._id)}  
     ${printerControlBtn(printer._id)}  
     ${printerWebBtn(printer._id, printer.printerURL)}  
     ${printerReSyncBtn(printer._id)}  
+    ${printerQuickConnect(printer._id)}  
     ${powerBtnHolder(printer._id)}  
   `;
   await PowerButton.applyBtn(printer, "powerBtn-");

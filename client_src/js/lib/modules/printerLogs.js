@@ -4,26 +4,95 @@ let chart = null;
 
 export default class PrinterLogs {
   static loadLogs(printer, connectionLogs) {
+    console.log(connectionLogs);
     document.getElementById("printerLogsLabel").innerHTML =
       "Printer Logs: " + printer.printerName;
     let printerRows = document.getElementById("printerConnectionLogRows");
     let printerErrorRows = document.getElementById("printerErrorLogRows");
+    let octoprintLogsRows = document.getElementById("octoprintLogsRows");
+    let octologsLogsRows = document.getElementById("octologsLogsRows");
     let logCount = document.getElementById("logCount");
+    let octoCount = document.getElementById("octoCount");
     let errorCount = document.getElementById("errorCount");
+    let octoPrintCount = document.getElementById("octoPrintCount");
     let tempCount = document.getElementById("tempCount");
     let tempChart = document.getElementById("printerTempChart");
 
     logCount.innerHTML = "(0)";
     errorCount.innerHTML = "(0)";
     tempCount.innerHTML = "(0)";
+    octoCount.innerHTML = "(0)";
+    octoPrintCount.innerHTML = "(0)";
+
     printerRows.innerHTML = "";
     printerErrorRows.innerHTML = "";
+    octoprintLogsRows.innerHTML = "";
+    octologsLogsRows.innerHTML = "";
     //tempChart.innerHTML = "";
+    fetch(`${printer.printerURL}/downloads/logs/octoprint.log`)
+      .then(async (resp) => resp.blob())
+      .then(async (blob) => blob.text())
+      .then(async (text) => {
+        let splitText = text.split(/(\r\n|\n|\r)/gm);
+        octoPrintCount.innerHTML = "(" + splitText.length / 2 + ")";
+        for (let i = 0; i < splitText.length; i++) {
+          const isFourthIteration = i % 2 === 0;
+
+          if (isFourthIteration) {
+            let line = splitText[i].split(" - ");
+            let colour = null;
+            if (line[2] === "INFO") {
+              colour = "Info";
+            } else if (line[2] === "WARNING") {
+              colour = "Active";
+            } else {
+              colour = "Offline";
+            }
+            //Filter the unneeded lines at the top of the log file...
+            if (
+              line[0][0] !== "|" &&
+              line[0][0] !== "P" &&
+              line[0][0] !== " " &&
+              line[0][0] !== "T" &&
+              line[0][0] !== "D" &&
+              line[0][0] !== "u" &&
+              line[0][0] !== "s"
+            ) {
+              octologsLogsRows.insertAdjacentHTML(
+                "beforeend",
+                `
+                          <tr class="${colour}">
+                            <th scope="row">${line[0]}</th>
+                            <td>${line[1]}</td>
+                            <td>${line[2]}</td>
+                            <td>${line[3]}</td>
+                          </tr>
+                      `
+              );
+            }
+          }
+        }
+      });
 
     if (typeof connectionLogs.currentOctoFarmLogs === "object") {
       logCount.innerHTML = `(${connectionLogs.currentOctoFarmLogs.length})`;
       errorCount.innerHTML = `(${connectionLogs.currentErrorLogs.length})`;
+      octoCount.innerHTML = `(${connectionLogs.currentOctoPrintLogs.length})`;
+
       tempCount.innerHTML = "(0)";
+      connectionLogs.currentOctoPrintLogs.forEach((log) => {
+        octoprintLogsRows.insertAdjacentHTML(
+          "beforeend",
+          `
+            <tr class="${log.state}">
+              <th scope="row">${Calc.dateClean(log.date)}</th>
+              <td>${log.printer}</td>
+              <td>${log.pluginDisplay}</td>
+              <td>${log.message}</td>
+            </tr>
+        `
+        );
+      });
       connectionLogs.currentOctoFarmLogs.forEach((log) => {
         printerRows.insertAdjacentHTML(
           "beforeend",

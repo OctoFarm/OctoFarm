@@ -186,6 +186,7 @@ class PrinterClean {
         dateAdded: farmPrinter.dateAdded,
         corsCheck: farmPrinter.corsCheck,
         currentUser: farmPrinter.currentUser,
+        updateAvailable: farmPrinter.updateAvailable,
       };
       sortedPrinter.tools = await PrinterClean.sortTemps(farmPrinter.temps);
       sortedPrinter.currentJob = await JobClean.returnJob(
@@ -272,6 +273,7 @@ class PrinterClean {
     let currentOctoFarmLogs = [];
     let currentErrorLogs = [];
     let currentTempLogs = [];
+    let currentOctoPrintLogs = [];
     for (let e = 0; e < printerErrorLogs.length; e++) {
       if (
         typeof printerErrorLogs[e].errorLog.printerID !== "undefined" &&
@@ -300,6 +302,23 @@ class PrinterClean {
           state: currentIssues[i].state,
         };
         currentOctoFarmLogs.push(errorFormat);
+      }
+    }
+
+    let octoprintLogs = await PrinterTicker.returnOctoPrintLogs();
+    for (let i = 0; i < octoprintLogs.length; i++) {
+      if (
+        JSON.stringify(octoprintLogs[i].printerID) ===
+        JSON.stringify(farmPrinter._id)
+      ) {
+        let octoFormat = {
+          date: octoprintLogs[i].date,
+          message: octoprintLogs[i].message,
+          printer: octoprintLogs[i].printer,
+          pluginDisplay: octoprintLogs[i].pluginDisplay,
+          state: octoprintLogs[i].state,
+        };
+        currentOctoPrintLogs.push(octoFormat);
       }
     }
 
@@ -383,8 +402,14 @@ class PrinterClean {
     currentErrorLogs = _.orderBy(currentErrorLogs, ["date"], ["desc"]);
     currentOctoFarmLogs = _.orderBy(currentOctoFarmLogs, ["date"], ["desc"]);
     currentTempLogs = _.orderBy(currentTempLogs, ["date"], ["desc"]);
+    currentOctoPrintLogs = _.orderBy(currentOctoPrintLogs, ["date"], ["desc"]);
 
-    return { currentErrorLogs, currentOctoFarmLogs, currentTempLogs };
+    return {
+      currentErrorLogs,
+      currentOctoFarmLogs,
+      currentTempLogs,
+      currentOctoPrintLogs,
+    };
   }
   static async createPrinterList(farmPrinters, filamentManager) {
     const printerList = ['<option value="0">Not Assigned</option>'];
@@ -1359,7 +1384,7 @@ if (interval === false) {
     PrinterClean.sortCurrentOperations(printersInformation);
     PrinterClean.statisticsStart();
     PrinterClean.createPrinterList(printersInformation, fmToggle);
-  }, 1000);
+  }, 2500);
 }
 PrinterClean.statisticsStart();
 PrinterClean.createPrinterList(printersInformation, fmToggle);

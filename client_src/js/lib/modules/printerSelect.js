@@ -4,6 +4,12 @@ import UI from "../functions/ui.js";
 const editMessage = `Update any of the printer values below and press action when you've made your changes. OctoFarm will then update only the changed printers.`;
 const deleteMessage = `Select which printers you'd like to delete. Press action when you have selected all the printers you'd like to remove.`;
 const connectMessage = `Select which printers you'd like to connect to from OctoPrint. Selected printers will attempt a connection with the preferred port settings, if this doesn't exist the connection attempt will fall back to AUTO and could fail/put your printer in an error state.<br><code>NOTE: this can be updated in your printer settings on OctoFarm/OctoPrint. You will need to re-scan if updated on OctoPrint.</code>`;
+const pluginInstallMessage = `Select which printers you'd like to action a plugin installation on... You will be able to choose multiple plugins on the next pop up.`;
+const powerOnOffMessage = `Select which printers you'd like to action the power command on... You will be able to choose the actual command on the next pop up.<br>
+<div class="alert alert-danger" role="alert">
+  There is no confirmation box for these commands! I will not fire these commands to printers that are classed "Active".
+</div>
+`;
 
 const printersTable = `
 <div class="row">
@@ -180,6 +186,10 @@ export default class PrinterSelect {
       messageBox.innerHTML = editMessage;
     } else if (action === "Connect Printers") {
       messageBox.innerHTML = connectMessage;
+    } else if (action === "Install Plugins") {
+      messageBox.innerHTML = pluginInstallMessage;
+    } else if (action === "Power On/Off Printers") {
+      messageBox.innerHTML = powerOnOffMessage;
     }
     const printersInfo = await OctoFarmClient.post("printers/printerInfo");
     const printers = await printersInfo.json();

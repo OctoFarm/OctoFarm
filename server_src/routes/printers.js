@@ -225,4 +225,10 @@ router.get("/connectionLogs/:id", ensureAuthenticated, async (req, res) => {
 
   res.send(connectionLogs);
 });
+router.get("/pluginList/:id", ensureAuthenticated, async (req, res) => {
+  let id = req.params.id;
+  logger.info("Grabbing plugin list for: ", id);
+  let pluginList = await Runner.returnPluginList(id);
+  res.send(pluginList);
+});
 module.exports = router;

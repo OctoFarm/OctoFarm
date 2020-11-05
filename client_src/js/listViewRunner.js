@@ -9,6 +9,7 @@ import initGroupSelect from "./lib/modules/groupSelection.js";
 import { dragAndDropEnable, dragCheck } from "./lib/functions/dragAndDrop.js";
 import { checkTemps } from "./lib/modules/temperatureCheck.js";
 import { checkFilamentManager } from "./lib/modules/filamentGrab.js";
+import { init as actionButtonInit } from "./lib/modules/Printers/actionButtons";
 
 let powerTimer = 20000;
 let dragDropInit = false;
@@ -443,27 +444,8 @@ function drawPrinter(printer, clientSettings) {
   )}">
             ${printer.printerName}
           </td>
-          <td>
-                <button title="Control Your Printer"
-                        id="printerButton-${printer._id}"
-                        type="button"
-                        class="tag btn btn-primary btn-sm bg-colour-1"
-                        data-toggle="modal"
-                        data-target="#printerManagerModal" disabled
-                >
-                  <i class="fas fa-print"></i>
-                </button>
-                <a title="Open your Printers Web Interface"
-                        id="printerWeb-${printer._id}"
-                   type="button"
-                   class="tag btn btn-info btn-sm bg-colour-3"
-                   target="_blank" href="${printer.printerURL}"
-                   role="button">
-                  <i class="fas fa-globe-europe"></i>
-                </a>
-                <div id="powerBtn-${printer._id}" class="btn-group">
-        
-                </div>
+          <td id="printerActionBtns-${printer._id}">
+
           </td>
           <td>
             <button title="Start your current selected file"
@@ -519,6 +501,7 @@ function drawPrinter(printer, clientSettings) {
   document
     .getElementById("listViewTable")
     .insertAdjacentHTML("beforeend", printerHTML);
+  actionButtonInit(printer, `printerActionBtns-${printer._id}`);
   // Setup page listeners...
   // Setup page listeners...
   const printerCard = document.getElementById(`viewPanel-${printer._id}`);

@@ -11,6 +11,7 @@ import { dragAndDropEnable, dragCheck } from "./lib/functions/dragAndDrop.js";
 import { checkTemps } from "./lib/modules/temperatureCheck.js";
 import { checkFilamentManager } from "./lib/modules/filamentGrab.js";
 import PrinterSettings from "./lib/modules/printerSettings";
+import { init as actionButtonInit } from "./lib/modules/Printers/actionButtons";
 
 let powerTimer = 20000;
 let dragDropInit = false;
@@ -575,27 +576,9 @@ function drawPrinter(printer, clientSettings) {
               >
                 ${name}
               </button>
-              <div id="powerBtn-${printer._id}" class="btn-group float-right">
+          <small class="float-right" id="printerActionBtns-${printer._id}">
 
-              </div>
-              <a title="Open your Printers Web Interface"
-                 id="printerWeb-${printer._id}"
-                 type="button"
-                 class="tag btn btn-info btn-sm float-right mr-1 bg-colour-3"
-                 target="_blank" href="${printer.printerURL}"
-                 role="button">
-                <i class="fas fa-globe-europe"></i>
-              </a>
-              <button
-                      title="Control Your Printer"
-                      id="printerButton-${printer._id}"
-                      type="button"
-                      class="tag btn btn-primary float-right btn-sm mr-1 bg-colour-1"
-                      data-toggle="modal"
-                      data-target="#printerManagerModal" disabled
-              >
-                <i class="fas fa-print"></i>
-              </button>
+          </small>
           </div>
           <div class="card-body pt-1 pb-0 pl-2 pr-2">
             <div class="d-none index">${printer.sortIndex}</div>
@@ -729,6 +712,7 @@ function drawPrinter(printer, clientSettings) {
   document
     .getElementById("listView")
     .insertAdjacentHTML("beforeend", printerHTML);
+  actionButtonInit(printer, `printerActionBtns-${printer._id}`);
   // Setup page listeners...
   const printerCard = document.getElementById("viewPanel-" + printer._id);
   printerCard.addEventListener("click", (e) => {

@@ -48,14 +48,16 @@ export default class UI {
     }
     //This needs a more elegant solution, I think noty is keeping the elements I remove with remove() from the DOM in memory somewhere...
     Noty.setMaxVisible(50);
-    new Noty({
+    let alert = new Noty({
       type: type,
       theme: "bootstrap-v4",
       closeWith: click,
       timeout: delay,
       layout: "bottomRight",
       text: message,
-    }).show();
+    });
+    alert.show();
+    return alert;
   }
   static doesElementNeedUpdating(value, element, meta) {
     //Quick check to see if the UI value differs, if so update.

@@ -728,9 +728,35 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       }
     }
     if (data.plugin) {
-      console.log(data.plugin);
+      //console.log(farmPrinters[this.index].printerURL, data.plugin);
+      if (data.plugin.data.type === "loglines") {
+        data.plugin.data.loglines.forEach((logLine) => {
+          if (logLine.stream === "call" || logLine.stream === "message") {
+            PrinterTicker.addOctoPrintLog(
+              farmPrinters[this.index],
+              logLine.line,
+              "Active",
+              data.plugin.plugin
+            );
+          } else if (logLine.stream === "stdout") {
+            PrinterTicker.addOctoPrintLog(
+              farmPrinters[this.index],
+              logLine.line,
+              "Complete",
+              data.plugin.plugin
+            );
+          } else {
+            PrinterTicker.addOctoPrintLog(
+              farmPrinters[this.index],
+              logLine.line,
+              "Offline",
+              data.plugin.plugin
+            );
+          }
+        });
+      }
       if (data.plugin.plugin === "klipper") {
-        console.log(data.plugin.data.payload);
+        // console.log(data.plugin.data.payload);
         if (data.plugin.data.payload.includes("Firmware version:")) {
           farmPrinters[
             this.index
@@ -890,7 +916,7 @@ class ClientAPI {
     ]);
   }
   static get(printerURL, apikey, item) {
-    const url = `${printerURL}/api/${item}`;
+    const url = `${printerURL}/${item}`;
     return Promise.race([
       fetch(url, {
         method: "GET",
@@ -979,7 +1005,7 @@ class Runner {
       users = await ClientAPI.getRetry(
         farmPrinters[i].printerURL,
         farmPrinters[i].apikey,
-        "users"
+        "api/users"
       );
       if (users.status === 200) {
         farmPrinters[i].systemChecks.scanning.api.status = "success";
@@ -1031,8 +1057,10 @@ class Runner {
           farmPrinters[i].hostDescription = "Host is Online";
           await Runner.getSystem(id);
           await Runner.getSettings(id);
+          await Runner.getUpdates(id);
           await Runner.getProfile(id);
           await Runner.getState(id);
+          await Runner.getPluginList(id);
           if (
             typeof farmPrinters[i].fileList === "undefined" ||
             typeof farmPrinters[i.storage === "undefined"]
@@ -2093,7 +2121,7 @@ class Runner {
     return ClientAPI.getRetry(
       farmPrinters[index].printerURL,
       farmPrinters[index].apikey,
-      "connection"
+      "api/connection"
     )
       .then((res) => {
         return res.json();
@@ -2183,7 +2211,7 @@ class Runner {
     return ClientAPI.getRetry(
       farmPrinters[index].printerURL,
       farmPrinters[index].apikey,
-      "printerprofiles"
+      "api/printerprofiles"
     )
       .then((res) => {
         return res.json();
@@ -2221,7 +2249,71 @@ class Runner {
         return false;
       });
   }
-
+  static getPluginList(id) {
+    const index = _.findIndex(farmPrinters, function (o) {
+      return o._id == id;
+    });
+    PrinterTicker.addIssue(
+      new Date(),
+      farmPrinters[index].printerURL,
+      "Grabbing plugin list",
+      "Active",
+      farmPrinters[index]._id
+    );
+    return ClientAPI.getRetry(
+      farmPrinters[index].printerURL,
+      farmPrinters[index].apikey,
+      "api/plugin/pluginmanager"
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        farmPrinters[index].pluginsList = res.repository.plugins;
+        PrinterTicker.addIssue(
+          new Date(),
+          farmPrinters[index].printerURL,
+          "Grabbed plugin list",
+          "Complete",
+          farmPrinters[index]._id
+        );
+      });
+  }
+  static getUpdates(id) {
+    const index = _.findIndex(farmPrinters, function (o) {
+      return o._id == id;
+    });
+    PrinterTicker.addIssue(
+      new Date(),
+      farmPrinters[index].printerURL,
+      "Checking OctoPrint for updates...",
+      "Active",
+      farmPrinters[index]._id
+    );
+    return ClientAPI.getRetry(
+      farmPrinters[index].printerURL,
+      farmPrinters[index].apikey,
+      "plugin/softwareupdate/check?force=true"
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        if (res.information.octoprint.updateAvailable) {
+          farmPrinters[index].updateAvailable =
+            res.information.octoprint.updateAvailable;
+        } else {
+          farmPrinters[index].updateAvailable = false;
+        }
+        PrinterTicker.addIssue(
+          new Date(),
+          farmPrinters[index].printerURL,
+          "Octoprints checked for updates...",
+          "Complete",
+          farmPrinters[index]._id
+        );
+      });
+  }
   static getSettings(id) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
@@ -2237,7 +2329,7 @@ class Runner {
     return ClientAPI.getRetry(
       farmPrinters[index].printerURL,
       farmPrinters[index].apikey,
-      "settings"
+      "api/settings"
     )
       .then((res) => {
         return res.json();
@@ -2324,7 +2416,7 @@ class Runner {
     return ClientAPI.getRetry(
       farmPrinters[index].printerURL,
       farmPrinters[index].apikey,
-      "system/commands"
+      "api/system/commands"
     )
       .then((res) => {
         return res.json();
@@ -2714,6 +2806,8 @@ class Runner {
 
     await Runner.getProfile(settings.printer.index);
     await Runner.getSettings(settings.printer.index);
+    await Runner.getUpdates(settings.printer.index);
+    await Runner.getPluginList(settings.printer.index);
     PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
     // let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
     //
@@ -3117,6 +3211,13 @@ class Runner {
       farmPrinters[i]
     );
     return connectionLogs;
+  }
+  static async returnPluginList(printerId) {
+    const i = _.findIndex(farmPrinters, function (o) {
+      return o._id == printerId;
+    });
+
+    return farmPrinters[i].pluginsList;
   }
 }
 

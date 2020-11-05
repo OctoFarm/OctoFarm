@@ -4,6 +4,33 @@ import Validate from "./functions/validate.js";
 import { returnDropDown } from "./modules/filamentGrab.js";
 
 export default class OctoPrintClient {
+  static get(printer, item) {
+    const url = `${printer.printerURL}/${item}`;
+    return fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": printer.apikey,
+      },
+    }).catch((e) => {
+      console.log(e);
+    });
+  }
+
+  static postNOAPI(printer, item, data) {
+    const url = `${printer.printerURL}/${item}`;
+    return fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": printer.apikey,
+      },
+      body: JSON.stringify(data),
+    }).catch((e) => {
+      console.log(e);
+    });
+  }
+
   static post(printer, item, data) {
     const url = `${printer.printerURL}/api/${item}`;
     return fetch(url, {
@@ -109,7 +136,10 @@ export default class OctoPrintClient {
       },
     });
   }
-
+  static async systemNoConfirm(printer, action) {
+    const url = "system/commands/core/" + action;
+    return await OctoPrintClient.post(printer, url);
+  }
   static async move(element, printer, action, axis, dir) {
     const flashReturn = function () {
       element.target.classList = "btn btn-light";

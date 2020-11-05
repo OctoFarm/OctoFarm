@@ -160,6 +160,9 @@ li {
 .text-offline {
   color: #401418;
 }
+.Info {
+  background-color: #25386e;
+}
 .Idle {
   background-color: #262626;
 }
@@ -503,5 +506,9 @@ label {
     top: 40px;
     z-index: 1000;
   }
+
+}
+
+.bootbox-input-checkbox{
 
 }

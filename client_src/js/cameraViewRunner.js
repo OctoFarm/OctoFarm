@@ -10,6 +10,11 @@ import initGroupSelect from "./lib/modules/groupSelection.js";
 import PowerButton from "./lib/modules/powerButton.js";
 import { dragAndDropEnable, dragCheck } from "./lib/functions/dragAndDrop.js";
 import { checkTemps } from "./lib/modules/temperatureCheck.js";
+import {
+  init as actionButtonInit,
+  printerQuickConnected,
+  printerQuickDisconnected,
+} from "./lib/modules/Printers/actionButtons";
 
 let powerTimer = 20000;
 let dragDropInit = false;
@@ -151,6 +156,9 @@ function grabElements(printer) {
     extraInfo: document.getElementById(`extraInfo-${printer._id}`),
     timeRemaining: document.getElementById(`timeRemaining-${printer._id}`),
     eta: document.getElementById(`eta-${printer._id}`),
+    printerQuickConnectBtn: document.getElementById(
+      "printerQuickConnect-" + printer._id
+    ),
   };
   elems[printer._id] = printerElemens;
   return elems[printer._id];
@@ -291,6 +299,23 @@ function updateState(printer, clientSettings) {
     printer.otherSettings.temperatureTriggers,
     printer.printerState.colour.category
   );
+
+  printerQuickConnectBtn.disabled =
+    printer.printerState.colour.category === "Offline";
+  if (
+    printer.printerState.colour.category !== "Offline" &&
+    printer.printerState.colour.category === "Disconnected"
+  ) {
+    printerQuickDisconnected(printer._id);
+  } else if (
+    printer.printerState.colour.category !== "Offline" &&
+    printer.printerState.colour.category !== "Disconnected"
+  ) {
+    printerQuickConnected(printer._id);
+  } else {
+    printerQuickDisconnected(printer._id);
+  }
+
   if (printer.printerState.colour.category === "Active") {
     if (printer.camURL != "") {
       elements.row.className = `col-md-4 col-lg-${clientSettings.cameraRows} col-xl-${clientSettings.cameraRows} ${dNone}`;
@@ -465,33 +490,8 @@ function drawPrinter(printer, clientSettings) {
                 ${printer.printerName}
             </button></small>
 
-          <small>
-   
-                <div id="powerBtn-${printer._id}" class="btn-group float-right">
+          <small id="printerActionBtns-${printer._id}">
 
-                </div>
-            <a
-              title="Open your Printers Web Interface"
-              id="printerWeb-${printer._id}"
-              type="button"
-              class="tag btn btn-info btn-sm float-right mr-1 bg-colour-3"
-              target="_blank"
-              href="${printer.printerURL}"
-              role="button"
-            >
-              <i class="fas fa-globe-europe"></i>
-            </a>
-            <button
-              title="Control Your Printer"
-              id="printerButton-${printer._id}"
-              type="button"
-              class="tag btn btn-primary float-right btn-sm mr-1"
-              data-toggle="modal"
-              data-target="#printerManagerModal"
-              disabled
-            >
-              <i class="fas fa-print"></i>
-            </button>
           </small>
         </div>
         <div
@@ -575,7 +575,7 @@ function drawPrinter(printer, clientSettings) {
   document
     .getElementById("camView")
     .insertAdjacentHTML("beforeend", printerHTML);
-
+  actionButtonInit(printer, `printerActionBtns-${printer._id}`);
   const printerCard = document.getElementById(`viewPanel-${printer._id}`);
   printerCard.addEventListener("click", (e) => {
     const printerInfo = returnPrinterInfo();

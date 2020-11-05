@@ -318,24 +318,439 @@ bulkDisconnectBtn.addEventListener("click", async (e) => {
 });
 const bulkPowerBtn = document.getElementById("bulkPowerBtn");
 bulkPowerBtn.addEventListener("click", async (e) => {
+  const printerPower = async function () {
+    bootbox.prompt({
+      title: "Power command!",
+      message: "<p>Please select an option below:</p>",
+      inputType: "radio",
+      inputOptions: [
+        {
+          text: "Restart OctoPrint",
+          value: "restart",
+        },
+        {
+          text: "Reboot Host",
+          value: "reboot",
+        },
+        {
+          text: "Shutdown Host",
+          value: "shutdown",
+        },
+      ],
+      callback: async function (result) {
+        let printersToConnect = [];
+        //Grab all check boxes
+        const selectedPrinters = PrinterSelect.getSelected();
+        selectedPrinters.forEach((element) => {
+          const ca = element.id.split("-");
+          printersToConnect.push(ca[1]);
+        });
+        for (let p = 0; p < printersToConnect.length; p++) {
+          const index = _.findIndex(printerInfo, function (o) {
+            return o._id === printersToConnect[p];
+          });
+          if (index > -1) {
+            if (printerInfo[index].printerState.colour.category !== "Active") {
+              let post = await OctoPrintClient.systemNoConfirm(
+                printerInfo[index],
+                result
+              );
+              if (typeof post !== "undefined") {
+                if (post.status === 204) {
+                  UI.createAlert(
+                    "success",
+                    `Successfully made ${result} attempt to ${printerInfo[index].printerName}...`,
+                    3000,
+                    "Clicked"
+                  );
+                } else {
+                  UI.createAlert(
+                    "error",
+                    `There was an issue sending ${result} to ${printerInfo[index].printerName} are you sure it's online?`,
+                    3000,
+                    "Clicked"
+                  );
+                }
+              } else {
+                UI.createAlert(
+                  "error",
+                  `No response from ${printerInfo[index].printerName}, is it online???`,
+                  3000,
+                  "Clicked"
+                );
+              }
+            } else {
+              UI.createAlert(
+                "warning",
+                `Printer ${printerInfo[index].printerName} is not in "Idle" state... skipping`,
+                3000,
+                "Clicked"
+              );
+            }
+          } else {
+            UI.createAlert(
+              "error",
+              `Could not find your printer in your printer in the list of available printers...`,
+              3000,
+              "Clicked"
+            );
+          }
+        }
+      },
+    });
+  };
+
   PrinterSelect.create(
     document.getElementById("multiPrintersSection"),
     false,
-    "Power On/Off Printers"
+    "Power On/Off Printers",
+    printerPower
   );
-  // searchOffline.innerHTML =
-  // '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
-  //
-  // const post = await OctoFarmClient.post('printers/reScanOcto', {
-  //     id: null
+});
+
+function pluginListTemplate(plugin) {
+  //Also need check inplace for incompatible...
+
+  let abandoned = ``;
+  if (plugin.abandoned === true) {
+    abandoned = `<i class="fa fa-heartbeat" title="Abandoned by its maintainer"></i>`;
+  }
+  let latestRelease = ``;
+
+  if (
+    typeof plugin.github !== "undefined" &&
+    typeof plugin.github.latest_release !== "undefined"
+  ) {
+    latestRelease = `
+    <small class="prop" title="Github stars"><i class="fa fa-star"></i> <span >${plugin.github.stars}</span></small>
+    <small class="prop" title="Last push to main branch"><i class="fa fa-refresh"></i> <span>${plugin.github.stars}</span></small>
+    <small class="prop" title="Latest release &amp; date"><i class="fa fa-tag"></i> <span >${plugin.github.latest_release.tag}</span> (<span >${plugin.github.latest_release.date}</span>)</small>`;
+  }
+
+  return `
+      <div class="entry">
+                        <div class="row-fluid">
+                            <div class="span12">
+                                <div>
+                                    <span>${plugin.title}</span>
+
+                                    ${abandoned}
+                           
+                                </div>
+                                <div class="meta">
+                                    <small class="prop"><i class="fa fa-info"></i>&nbsp;<a target="_blank" href="${
+                                      plugin.page
+                                    }" title="${
+    plugin.page
+  }">Details</a></small>
+                                    <small class="prop"><i class="fa fa-home"></i>&nbsp;<a target="_blank" href="${
+                                      plugin.homepage
+                                    }" title="${
+    plugin.homepage
+  }">Homepage</a></small>
+                                    <small class="prop"><i class="fa fa-user"></i> <span title="${
+                                      plugin.author
+                                    }">${plugin.author}</span></small>
+                                </div>
+                                <div class="muted"><small>${
+                                  plugin.description
+                                }</small></div>
+                                <div class="stats">
+                                    <small class="prop" title="License"><i class="fa fa-gavel"></i> <span>${
+                                      plugin.license
+                                    }</span></small>
+                                    <small class="prop" title="Publication date"><i class="fa fa-birthday-cake"></i> <span>${JSON.stringify(
+                                      plugin.published
+                                    ).substring(1, 11)}</span></small>
+                                    <small class="prop" title="Active instances past month"><i class="fa fa-server"></i> <span >${JSON.stringify(
+                                      plugin.stats.instances_month
+                                    ).substring(0, 11)}</span></small>
+                                    ${latestRelease}
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+  
+  
+  `;
+}
+const pluginAction = async function (action) {
+  let printersToConnect = [];
+  //Grab all check boxes
+  const selectedPrinters = PrinterSelect.getSelected();
+  selectedPrinters.forEach((element) => {
+    const ca = element.id.split("-");
+    printersToConnect.push(ca[1]);
+  });
+  //Grab first printer for now...
+  const index = _.findIndex(printerInfo, function (o) {
+    return o._id === printersToConnect[0];
+  });
+  if (index > -1) {
+    let pluginList = [];
+    let printerPluginList = null;
+    if (action === "install") {
+      printerPluginList = await OctoFarmClient.get(
+        "printers/pluginList/" + printerInfo[index]._id
+      );
+    } else {
+      printerPluginList = await OctoFarmClient.get(
+        "printers/plugins/" + printerInfo[index]._id
+      );
+    }
+
+    printerPluginList = await printerPluginList.json();
+    printerPluginList.forEach((plugin) => {
+      if (action === "install") {
+        pluginList.push({
+          text: pluginListTemplate(plugin),
+          value: plugin.archive,
+        });
+      } else {
+        pluginList.push({
+          text: pluginListTemplate(plugin),
+          value: plugin.title,
+        });
+      }
+    });
+    pluginList = _.sortBy(pluginList, [
+      function (o) {
+        return o.text;
+      },
+    ]);
+    bootbox.prompt({
+      size: "large",
+      title: `Please choose the plugins you'd like to ${action}...`,
+      inputType: "checkbox",
+      multiple: true,
+      inputOptions: pluginList,
+      scrollable: true,
+      callback: async function (result) {
+        let tracker = document.getElementById("pluginTracking");
+        let trackerBtn = document.getElementById("pluginTracking");
+        trackerBtn.classList.remove("d-none");
+        let pluginAmount = result.length * printersToConnect.length;
+        tracker.innerHTML = `
+               Installing Plugins!<br>
+               <i class="fas fa-print"></i>${printersToConnect.length} / <i class="fas fa-plug"></i> ${pluginAmount}
+        `;
+        for (let p = 0; p < printersToConnect.length; p++) {
+          //grab index
+          const index = _.findIndex(printerInfo, function (o) {
+            return o._id === printersToConnect[p];
+          });
+          if (printerInfo[index].printerState.colour.category !== "Active") {
+            for (let r = 0; r < result.length; r++) {
+              let alert = UI.createAlert(
+                "warning",
+                `${printerInfo[index].printerName}: Installing - ${result[r]}<br>Do not navigate away from this screen!`
+              );
+
+              let postData = {
+                command: action,
+                dependency_links: false,
+                url: result[r],
+              };
+
+              let post = await OctoPrintClient.post(
+                printerInfo[index],
+                "plugin/pluginmanager",
+                postData
+              );
+              tracker.innerHTML = `
+                Installing Plugins!<br>
+                <i class="fas fa-print"></i>${
+                  printersToConnect.length - p
+                } / <i class="fas fa-plug"></i> ${pluginAmount}
+              `;
+              pluginAmount = pluginAmount - 1;
+              alert.close();
+              if (post.status == 409) {
+                UI.createAlert(
+                  "error",
+                  "Plugin not installed... Printer could be active...",
+                  4000,
+                  "Clicked"
+                );
+              } else if (post.status == 400) {
+                UI.createAlert(
+                  "error",
+                  "Malformed request... please log an issue...",
+                  4000,
+                  "Clicked"
+                );
+              } else if (post.status === 200) {
+                let response = await post.json();
+                if (response.needs_restart || response.needs_refresh) {
+                  UI.createAlert(
+                    "success",
+                    `${printerInfo[index].printerName}: ${response.plugin.name} - Has successfully been installed... OctoPrint restart is required!`,
+                    4000,
+                    "Clicked"
+                  );
+                } else {
+                  UI.createAlert(
+                    "success",
+                    `${printerInfo[index].printerName}: ${response.plugin.name} - Has successfully been installed... No further action requested...`,
+                    4000,
+                    "Clicked"
+                  );
+                }
+              }
+            }
+          } else {
+            UI.createAlert(
+              "danger",
+              `${printerInfo[index].printerName}: Is active skipping the plugin installation command...`
+            );
+          }
+        }
+        let restartInstance = document.getElementById("restartInstances");
+        restartInstance.classList.remove("d-none");
+        restartInstance.addEventListener("click", async (e) => {
+          restartInstance.classList.add("d-none");
+          for (let p = 0; p < printersToConnect.length; p++) {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printersToConnect[p];
+            });
+            if (index > -1) {
+              if (
+                printerInfo[index].printerState.colour.category !== "Active"
+              ) {
+                let post = await OctoPrintClient.systemNoConfirm(
+                  printerInfo[index],
+                  "restart"
+                );
+                if (typeof post !== "undefined") {
+                  if (post.status === 204) {
+                    UI.createAlert(
+                      "success",
+                      `Successfully made restart attempt to ${printerInfo[index].printerName}...`,
+                      3000,
+                      "Clicked"
+                    );
+                  } else {
+                    UI.createAlert(
+                      "error",
+                      `There was an issue sending restart to ${printerInfo[index].printerName} are you sure it's online?`,
+                      3000,
+                      "Clicked"
+                    );
+                  }
+                } else {
+                  UI.createAlert(
+                    "error",
+                    `No response from ${printerInfo[index].printerName}, is it online???`,
+                    3000,
+                    "Clicked"
+                  );
+                }
+              } else {
+                UI.createAlert(
+                  "warning",
+                  `Printer ${printerInfo[index].printerName} is not in "Idle" state... skipping`,
+                  3000,
+                  "Clicked"
+                );
+              }
+            } else {
+              UI.createAlert(
+                "error",
+                `Could not find your printer in your printer in the list of available printers...`,
+                3000,
+                "Clicked"
+              );
+            }
+          }
+        });
+        trackerBtn.classList.add("d-none");
+      },
+    });
+  } else {
+  }
+
+  // bootbox.prompt({
+  //   title: "Enter the plugin URL you'd like to install below:",
+  //   centerVertical: true,
+  //   callback: async function (result) {
+  //     if (result === "" && result === null) {
+  //       UI.createAlert("warning", "URL blank... ignoring...", 3000);
+  //     } else if (Validate.URL(result)) {
+  //       let printersToConnect = [];
+  //       //Grab all check boxes
+  //       const selectedPrinters = PrinterSelect.getSelected();
+  //       selectedPrinters.forEach((element) => {
+  //         const ca = element.id.split("-");
+  //         printersToConnect.push(ca[1]);
+  //       });
+  //       if (selectedPrinters.length === 0) {
+  //       }
+  //       for (let p = 0; p < printersToConnect.length; p++) {
+  //         const index = _.findIndex(printerInfo, function (o) {
+  //           return o._id === printersToConnect[p];
+  //         });
+  //         if (index > -1) {
+  //           //Success install plugin!
+  //           let get = await OctoPrintClient.get(
+  //             printerInfo[index],
+  //             "plugin/softwareupdate/check?force=true"
+  //           );
+  //           if (typeof get !== "undefined") {
+  //             console.log(get);
+  //             console.log(await get.json());
+  //             if (get.status === 200) {
+  //               UI.createAlert(
+  //                 "success",
+  //                 `Successfully made disconnect attempt to ${printerInfo[index].printerName}...`,
+  //                 3000,
+  //                 "Clicked"
+  //               );
+  //             } else {
+  //               UI.createAlert(
+  //                 "error",
+  //                 `There was an issue disconnecting to ${printerInfo[index].printerName} are you sure it's online?`,
+  //                 3000,
+  //                 "Clicked"
+  //               );
+  //             }
+  //           } else {
+  //             UI.createAlert(
+  //               "error",
+  //               `No response from ${printerInfo[index].printerName}, is it online???`,
+  //               3000,
+  //               "Clicked"
+  //             );
+  //           }
+  //         } else {
+  //           UI.createAlert(
+  //             "error",
+  //             `Could not find ${printerInfo[index].printerName} in your printer in the list of available printers...`,
+  //             3000,
+  //             "Clicked"
+  //           );
+  //         }
+  //       }
+  //     } else {
+  //       UI.createAlert(
+  //         "error",
+  //         "Unable to validate URL... please check and try again...",
+  //         3000
+  //       );
+  //     }
+  //   },
   // });
-  // searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
-  // UI.createAlert(
-  //     'success',
-  //     'Started a background re-sync of all printers connected to OctoFarm',
-  //     1000,
-  //     'Clicked'
-  // );
+};
+const blkPluginsBtn = document.getElementById("blkPluginsInstallBtn");
+blkPluginsBtn.addEventListener("click", async (e) => {
+  PrinterSelect.create(
+    document.getElementById("multiPrintersSection"),
+    false,
+    "Install Plugins",
+    function () {
+      pluginAction("install");
+    }
+  );
 });
 const searchOffline = document.getElementById("searchOfflineBtn");
 searchOffline.addEventListener("click", async (e) => {
@@ -1178,11 +1593,15 @@ class dashUpdate {
               printer.octoPrintVersion +
               "<br>Klipper: " +
               printer.klipperFirmwareVersion;
+          } else if (printer.updateAvailable) {
+            //still testing
+            printerOctoPrintVersion.innerHTML =
+              printer.octoPrintVersion +
+              "<br><button>Update Available!</button>";
           } else {
             printerOctoPrintVersion.innerHTML = printer.octoPrintVersion;
           }
           printName.innerHTML = `${printerName}`;
-
           if (typeof printer.corsCheck !== "undefined") {
             if (printer.corsCheck) {
               printerBadge.innerHTML = printer.printerState.state;
@@ -1213,7 +1632,10 @@ class dashUpdate {
             const apiErrorTag = document.getElementById(
               `scanningIssues-${printer._id}`
             );
-            if (apiErrors > 0) {
+            if (
+              apiErrors > 0 &&
+              printer.printerState.colour.category !== "Offline"
+            ) {
               if (!apiErrorTag.classList.contains("badge-danger")) {
                 apiErrorTag.classList.add(
                   "tag",

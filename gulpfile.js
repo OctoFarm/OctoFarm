@@ -184,6 +184,5 @@ exports.default = series(
     octofarmCSS,
     vendorJS,
     vendorCSS
-  ),
-  watchTask
+  )
 );
