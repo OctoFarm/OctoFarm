@@ -128,6 +128,7 @@ export default class PrinterLogs {
         );
       }
       errorCount.innerHTML = `(${connectionLogs.currentErrorLogs.length})`;
+      tempCount.innerHTML = `(0)`;
       if (
         typeof connectionLogs.currentTempLogs !== "undefined" &&
         connectionLogs.currentTempLogs.length > 0

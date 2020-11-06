@@ -1,13 +1,56 @@
 import OctoFarmClient from "../octofarm.js";
 import UI from "../functions/ui.js";
 
-const editMessage = `Update any of the printer values below and press action when you've made your changes. OctoFarm will then update only the changed printers.`;
-const deleteMessage = `Select which printers you'd like to delete. Press action when you have selected all the printers you'd like to remove.`;
-const connectMessage = `Select which printers you'd like to connect to from OctoPrint. Selected printers will attempt a connection with the preferred port settings, if this doesn't exist the connection attempt will fall back to AUTO and could fail/put your printer in an error state.<br><code>NOTE: this can be updated in your printer settings on OctoFarm/OctoPrint. You will need to re-scan if updated on OctoPrint.</code>`;
-const pluginInstallMessage = `Select which printers you'd like to action a plugin installation on... You will be able to choose multiple plugins on the next pop up.`;
-const powerOnOffMessage = `Select which printers you'd like to action the power command on... You will be able to choose the actual command on the next pop up.<br>
+const editMessage = `
+<div class="alert alert-info" role="alert">
+Update any of the printer values below and press action when you've made your changes.
+</div>
+<div class="alert alert-warning" role="alert">
+ OctoFarm will then update only the changed printers.
+</div>
+`;
+const deleteMessage = `
+<div class="alert alert-info" role="alert">
+Select which printers you'd like to delete. Press action when you have selected all the printers you'd like to remove.
+</div>
 <div class="alert alert-danger" role="alert">
-  There is no confirmation box for these commands! I will not fire these commands to printers that are classed "Active".
+ This is unrecoverable! If you remove the database entry for your printer, any links in the database will be lost... i.e. History/Statistics. Unless you have a backup in place.
+</div>
+`;
+const connectMessage = `
+<div class="alert alert-info" role="alert">
+Please select which printers you'd like to connect to from OctoPrint. Selected printers will attempt a connection with the preferred port settings from OctoPrint.
+</div>
+<div class="alert alert-warning" role="alert">
+This can be updated in your printer settings on OctoFarm/OctoPrint. You will need to re-scan for OctoFarm to detect the changes if updated on OctoPrint.
+</div>
+<div class="alert alert-danger" role="alert">
+ If this doesn't exist the connection attempt will fall back to AUTO and could fail/put your printer in an error state. 
+</div>
+`;
+const disconnectMessage = `
+<div class="alert alert-info" role="alert">
+Please select which printers you'd like to disconnect from OctoPrint.
+</div>
+<div class="alert alert-warning" role="alert">
+This will by default skip Active printers. This is not an emergency stop button!
+</div>
+
+`;
+const pluginInstallMessage = `
+<div class="alert alert-info" role="alert">
+Please select which printers you'd like to action a plugin installation on... You will be able to choose multiple plugins on the next pop up.
+</div>
+<div class="alert alert-warning" role="alert">
+  Do not worry about what is already installed, OctoPrint is rather good at handling the requests and will just re-install a plugin if requested.
+</div>
+`;
+const powerOnOffMessage = `
+<div class="alert alert-info" role="alert">
+Please select your list of printers to action the power command on. You will be able to choose the actual command on the next pop up.
+</div>
+<div class="alert alert-danger" role="alert">
+  These commands will run without user interaction... It will skip by default any active printers.
 </div>
 `;
 
@@ -184,6 +227,8 @@ export default class PrinterSelect {
       messageBox.innerHTML = deleteMessage;
     } else if (action === "Edit Printers") {
       messageBox.innerHTML = editMessage;
+    } else if (action === "Disconnect Printers") {
+      messageBox.innerHTML = disconnectMessage;
     } else if (action === "Connect Printers") {
       messageBox.innerHTML = connectMessage;
     } else if (action === "Install Plugins") {
@@ -324,7 +369,7 @@ export default class PrinterSelect {
       UI.addSelectListeners("editInput");
     }
     if (callback) {
-      document.getElementById("saveArea").insertAdjacentHTML(
+      document.getElementById("selectBtns").insertAdjacentHTML(
         "beforeend",
         `
                       <button id="saveEditsBtn" class="btn btn-success" data-dismiss="modal" aria-label="Close">Action</button>

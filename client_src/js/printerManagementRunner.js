@@ -312,7 +312,7 @@ bulkDisconnectBtn.addEventListener("click", async (e) => {
   PrinterSelect.create(
     document.getElementById("multiPrintersSection"),
     false,
-    "Connect Printers",
+    "Disconnect Printers",
     printerDisconnect
   );
 });
@@ -754,20 +754,18 @@ blkPluginsBtn.addEventListener("click", async (e) => {
 });
 const searchOffline = document.getElementById("searchOfflineBtn");
 searchOffline.addEventListener("click", async (e) => {
+  let alert = UI.createAlert(
+    "success",
+    "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
+  );
   searchOffline.innerHTML =
     '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
 
   const post = await OctoFarmClient.post("printers/reScanOcto", {
     id: null,
   });
-
+  alert.close();
   searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
-  UI.createAlert(
-    "success",
-    "Started a background re-sync of all printers connected to OctoFarm",
-    1000,
-    "Clicked"
-  );
 });
 const editBtn = document.getElementById("editPrinterBtn");
 editBtn.addEventListener("click", (event) => {
