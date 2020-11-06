@@ -608,8 +608,14 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
                 currentTemp: data.current.temps[0],
                 printer_id: farmPrinters[this.index]._id,
               };
-              const newTemp = await new TempHistory(temps);
-              await newTemp.save();
+              if (
+                farmPrinters[this.index].stateColour.category === "Active" ||
+                farmPrinters[this.index].stateColour.category === "Error!"
+              ) {
+                console.log("TEMP");
+                const newTemp = await new TempHistory(temps);
+                await newTemp.save();
+              }
               farmPrinters[this.index].tempTimer = 0;
             } else {
               farmPrinters[this.index].tempTimer =
@@ -2476,7 +2482,7 @@ class Runner {
       return { name: "warning", hex: "#583c0e", category: "Active" };
     }
     if (state === "Error!") {
-      return { name: "danger", hex: "#2e0905", category: "Disconnected" };
+      return { name: "danger", hex: "#2e0905", category: "Error!" };
     }
     if (state === "Offline") {
       return { name: "danger", hex: "#2e0905", category: "Offline" };

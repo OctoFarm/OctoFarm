@@ -1711,6 +1711,7 @@ class dashUpdate {
                                  class="tag btn btn-secondary btn-sm bg-colour-3"
                                  data-toggle="modal"
                                  data-target="#printerStatisticsModal"
+                                 disabled
             ><i class="fas fa-chart-pie"></i>
             </button>
            <button  title="Setup and track Maintenance Issues with Printers"
@@ -1719,6 +1720,7 @@ class dashUpdate {
                                  class="tag btn btn-secondary btn-sm bg-colour-4"
                                  data-toggle="modal"
                                  data-target="#printerMaintenanceModal"
+                                 disabled
             ><i class="fas fa-wrench"></i>
             </button>
     </span></td>

@@ -1,10 +1,13 @@
 import Calc from "../functions/calc.js";
+import OctoFarmClient from "../octofarm";
 
 let chart = null;
+let eventListener = false;
+let currentPrinter = null;
 
 export default class PrinterLogs {
   static loadLogs(printer, connectionLogs) {
-    console.log(connectionLogs);
+    currentPrinter = printer;
     document.getElementById("printerLogsLabel").innerHTML =
       "Printer Logs: " + printer.printerName;
     let printerRows = document.getElementById("printerConnectionLogRows");
@@ -18,11 +21,11 @@ export default class PrinterLogs {
     let tempCount = document.getElementById("tempCount");
     let tempChart = document.getElementById("printerTempChart");
 
-    logCount.innerHTML = "(0)";
-    errorCount.innerHTML = "(0)";
-    tempCount.innerHTML = "(0)";
-    octoCount.innerHTML = "(0)";
-    octoPrintCount.innerHTML = "(0)";
+    logCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
+    errorCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
+    tempCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
+    octoCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
+    octoPrintCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
 
     printerRows.innerHTML = "";
     printerErrorRows.innerHTML = "";
@@ -34,7 +37,6 @@ export default class PrinterLogs {
       .then(async (blob) => blob.text())
       .then(async (text) => {
         let splitText = text.split(/(\r\n|\n|\r)/gm);
-        octoPrintCount.innerHTML = "(" + splitText.length / 2 + ")";
         for (let i = 0; i < splitText.length; i++) {
           const isFourthIteration = i % 2 === 0;
 
@@ -49,15 +51,8 @@ export default class PrinterLogs {
               colour = "Offline";
             }
             //Filter the unneeded lines at the top of the log file...
-            if (
-              line[0][0] !== "|" &&
-              line[0][0] !== "P" &&
-              line[0][0] !== " " &&
-              line[0][0] !== "T" &&
-              line[0][0] !== "D" &&
-              line[0][0] !== "u" &&
-              line[0][0] !== "s"
-            ) {
+            //Seems tabled lines all start with the date for normal logging. Verbose includes the pyton which should just end up in the first column
+            if (!isNaN(line[0][0]) && line[0][0] !== " ") {
               octologsLogsRows.insertAdjacentHTML(
                 "beforeend",
                 `
@@ -69,18 +64,29 @@ export default class PrinterLogs {
                           </tr>
                       `
               );
+            } else {
+              octologsLogsRows.insertAdjacentHTML(
+                "beforeend",
+                `
+                          <tr class="${colour}">
+                            <th scope="row"></th>
+                            <td></td>
+                            <td></td>
+                            <td>${splitText[i]}</td>
+                          </tr>
+                      `
+              );
             }
           }
         }
+        octoPrintCount.innerHTML =
+          "(" + (splitText.length / 2).toFixed(0) + ")";
       });
 
     if (typeof connectionLogs.currentOctoFarmLogs === "object") {
-      logCount.innerHTML = `(${connectionLogs.currentOctoFarmLogs.length})`;
-      errorCount.innerHTML = `(${connectionLogs.currentErrorLogs.length})`;
-      octoCount.innerHTML = `(${connectionLogs.currentOctoPrintLogs.length})`;
-
-      tempCount.innerHTML = "(0)";
-      connectionLogs.currentOctoPrintLogs.forEach((log) => {
+      for (let i = 0; i < connectionLogs.currentOctoPrintLogs.length; i++) {
+        tempCount.innerHTML = `(0)`;
+        let log = connectionLogs.currentOctoPrintLogs[i];
         octoprintLogsRows.insertAdjacentHTML(
           "beforeend",
           `
@@ -92,8 +98,10 @@ export default class PrinterLogs {
             </tr>
         `
         );
-      });
-      connectionLogs.currentOctoFarmLogs.forEach((log) => {
+      }
+      octoCount.innerHTML = `(${connectionLogs.currentOctoPrintLogs.length})`;
+      for (let i = 0; i < connectionLogs.currentOctoFarmLogs.length; i++) {
+        let log = connectionLogs.currentOctoFarmLogs[i];
         printerRows.insertAdjacentHTML(
           "beforeend",
           `
@@ -104,8 +112,10 @@ export default class PrinterLogs {
             </tr>
       `
         );
-      });
-      connectionLogs.currentErrorLogs.forEach((log) => {
+      }
+      logCount.innerHTML = `(${connectionLogs.currentOctoFarmLogs.length})`;
+      for (let i = 0; i < connectionLogs.currentErrorLogs.length; i++) {
+        let log = connectionLogs.currentErrorLogs[i];
         printerErrorRows.insertAdjacentHTML(
           "beforeend",
           `
@@ -116,7 +126,8 @@ export default class PrinterLogs {
             </tr>
       `
         );
-      });
+      }
+      errorCount.innerHTML = `(${connectionLogs.currentErrorLogs.length})`;
       if (
         typeof connectionLogs.currentTempLogs !== "undefined" &&
         connectionLogs.currentTempLogs.length > 0
@@ -221,6 +232,17 @@ export default class PrinterLogs {
           chart.updateSeries(connectionLogs.currentTempLogs);
         }
       }
+    }
+    if (!eventListener) {
+      document
+        .getElementById("system-refresh-list")
+        .addEventListener("click", async (e) => {
+          let connectionLogs = await OctoFarmClient.get(
+            "printers/connectionLogs/" + currentPrinter._id
+          );
+          connectionLogs = await connectionLogs.json();
+          PrinterLogs.loadLogs(currentPrinter, connectionLogs);
+        });
     }
   }
 }

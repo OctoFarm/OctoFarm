@@ -137,6 +137,7 @@
                                 href="#"
                                 aria-expanded="false"
                                 data-toggle="modal" data-target="#printerEditModal"
+                                disabled
                         >
                             <i class="fas fa-plug"></i> Uninstall Plugins
                         </button>
@@ -148,6 +149,7 @@
                                 href="#"
                                 aria-expanded="false"
                                 data-toggle="modal" data-target="#printerEditModal"
+                                disabled
                         >
                             <i class="fas fa-plug"></i> Enable Plugin
                         </button>
@@ -159,6 +161,7 @@
                                 href="#"
                                 aria-expanded="false"
                                 data-toggle="modal" data-target="#printerEditModal"
+                                disabled
                         >
                             <i class="fas fa-plug"></i> Disable Plugin
                         </button><br>
@@ -307,11 +310,12 @@
                     <div class="row">
                         <div class="col-12 col-sm-12 col-md-3 col-lg-2 col-xl-2">
                             <div class="list-group" id="list-tab" role="tablist">
-                                <a class="list-group-item list-group-item-action active" id="system-logs-list" data-toggle="list" href="#system-logs" role="tab" aria-controls="panelview"><i class="far fa-user"></i> OctoFarm <span id="logCount"></span></a>
-                                <a class="list-group-item list-group-item-action" id="system-error-list" data-toggle="list" href="#system-error" role="tab" aria-controls="listview"><i class="fas fa-exclamation-triangle"></i> Printer Errors <span id="errorCount"></span></a>
-                                <a class="list-group-item list-group-item-action" id="system-temperature-list" data-toggle="list" href="#system-temperature" role="tab" aria-controls="listview"><i class="fas fa-chart-line"></i> Printer Temperature <span id="tempCount"></span></a>
-                                <a class="list-group-item list-group-item-action" id="system-octologs-list" data-toggle="list" href="#system-octologs" role="tab" aria-controls="listview"><i class="fas fa-print"></i> OctoPrints Logs <span id="octoPrintCount"></span></a>
-                                <a class="list-group-item list-group-item-action" id="system-octoprint-list" data-toggle="list" href="#system-octoprint" role="tab" aria-controls="listview"><i class="fas fa-plug"></i> OctoPrints Plugin Logs <span id="octoCount"></span></a>
+                                <a class="list-group-item list-group-item-action active" id="system-logs-list" data-toggle="list" href="#system-logs" role="tab" aria-controls="panelview"><i class="far fa-user"></i> OctoFarm <span id="logCount">(<i class="fas fa-spinner fa-spin"></i>)</span></a>
+                                <a class="list-group-item list-group-item-action" id="system-error-list" data-toggle="list" href="#system-error" role="tab" aria-controls="listview"><i class="fas fa-exclamation-triangle"></i> Printer Errors <span id="errorCount">(<i class="fas fa-spinner fa-spin"></i>)</span></a>
+                                <a class="list-group-item list-group-item-action" id="system-temperature-list" data-toggle="list" href="#system-temperature" role="tab" aria-controls="listview"><i class="fas fa-chart-line"></i> Printer Temperature <span id="tempCount">(<i class="fas fa-spinner fa-spin"></i>)</span></a>
+                                <a class="list-group-item list-group-item-action" id="system-octologs-list" data-toggle="list" href="#system-octologs" role="tab" aria-controls="listview"><i class="fas fa-print"></i> OctoPrints Logs <span id="octoPrintCount">(<i class="fas fa-spinner fa-spin"></i>)</span></a>
+                                <a class="list-group-item list-group-item-action" id="system-octoprint-list" data-toggle="list" href="#system-octoprint" role="tab" aria-controls="listview"><i class="fas fa-plug"></i> OctoPrints Plugin Logs <span id="octoCount">(<i class="fas fa-spinner fa-spin"></i>)</span></a>
+                                <button class="btn btn-success" id="system-refresh-list" data-toggle="list" role="tab" aria-controls="listview"><i class="fas fa-sync"></i> Refresh</button>
                             </div>
                         </div>
                         <div class="col-12 col-sm-12 col-md-9 col-lg-10 col-xl-10">
