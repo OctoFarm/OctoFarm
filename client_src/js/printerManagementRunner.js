@@ -1594,12 +1594,15 @@ class dashUpdate {
           //     printer.klipperFirmwareVersion;
           // }
           let octoVersion = printer.octoPrintVersion;
-          if (printer.updateAvailable.octoPrintUpdate) {
-            octoVersion += "<br><button>Update Available!</button>";
+          if (typeof printer.updateAvailable !== "undefined") {
+            if (printer.updateAvailable.octoPrintUpdate) {
+              octoVersion += "<br><button>Update Available!</button>";
+            }
+            if (printer.updateAvailable.pluginUpdates.length > 0) {
+              octoVersion += "<br><button>Plugin Update Available!</button>";
+            }
           }
-          if (printer.updateAvailable.pluginUpdates.length > 0) {
-            octoVersion += "<br><button>Plugin Update Available!</button>";
-          }
+
           printerOctoPrintVersion.innerHTML = octoVersion;
           printName.innerHTML = `${printerName}`;
           if (typeof printer.corsCheck !== "undefined") {

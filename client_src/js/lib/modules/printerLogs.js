@@ -7,8 +7,9 @@ let eventListener = false;
 let currentPrinter = null;
 
 export default class PrinterLogs {
-  static parseLogs(url) {
-    fetch(`${url}`)
+  static parseLogs(printer, url) {
+    url = url.replace(printer.printerURL + "/", "");
+    OctoPrintClient.get(printer, `${url}`)
       .then(async (resp) => resp.blob())
       .then(async (blob) => blob.text())
       .then(async (text) => {
@@ -91,7 +92,7 @@ export default class PrinterLogs {
         }
 
         logSelect.value = res.files[mainLog].refs.download;
-        PrinterLogs.parseLogs(res.files[mainLog].refs.download);
+        PrinterLogs.parseLogs(printer, res.files[mainLog].refs.download);
       })
       .catch((e) => {
         console.log(e);
@@ -253,7 +254,7 @@ export default class PrinterLogs {
 
     if (!eventListener) {
       logSelect.addEventListener("change", (e) => {
-        PrinterLogs.parseLogs(e.target.value);
+        PrinterLogs.parseLogs(printer, e.target.value);
       });
       document
         .getElementById("system-refresh-list")
