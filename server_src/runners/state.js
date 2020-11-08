@@ -2370,7 +2370,36 @@ class Runner {
         } else if (farmPrinters[index].settingsAppearance.name === "") {
           farmPrinters[index].settingsAppearance.name = res.appearance.name;
         }
+        //console.log(res.plugins["psucontrol"]);
+        if (res.plugins["psucontrol"]) {
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            "PSU Control plugin detected... Updating OctoFarm power settings...",
+            "Active",
+            farmPrinters[index]._id
+          );
+          if (_.isEmpty(farmPrinters[index].powerSettings)) {
+            farmPrinters[index].powerSettings = {
+              powerOnCommand: '{"command":"turnPSUOn"}',
+              powerOnURL: "[PrinterURL]/api/plugin/psucontrol",
+              powerOffCommand: '{"command":"turnPSUOff"}',
+              powerOffURL: "[PrinterURL]/api/plugin/psucontrol",
+              powerToggleCommand: '{"command":"togglePSU"}',
+              powerToggleURL: "[PrinterURL]/api/plugin/psucontrol",
+              powerStatusCommand: '{"command":"getPSUState"}',
+              powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
+            };
+          }
 
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            "Successfully saved PSU control settings...",
+            "Complete",
+            farmPrinters[index]._id
+          );
+        }
         farmPrinters[index].settingsFeature = res.feature;
         farmPrinters[index].settingsFolder = res.folder;
         farmPrinters[index].settingsPlugins = res.plugins;
@@ -2393,9 +2422,9 @@ class Runner {
             }
             const printer = await Printers.findOne({ index });
             printer.camURL = farmPrinters[index].camURL;
-            printer.save();
           }
         }
+        printer.save();
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,

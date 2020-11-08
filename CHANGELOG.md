@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
     - Quick connect button to Printer Action button.
     - New Printer Manager Section: Plugins!
         -   Install, Uninstall, Enable, Disable a bulk set of plugins on a bulk set of printers.
+    - PSU Control settings are now grabbed from OctoPrint if they don't already exist in OctoFarm. To edit these going forware you will need to edit inside of OctoFarm as it won't pick up any changes made on OctoPrint after the initial scan.
     
 ### Changed
     - Added additional CSS classes to buttons for theming. Applies to actions buttons only, status colours the same. 
