@@ -2391,7 +2391,8 @@ class Runner {
               powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
             };
           }
-
+          const printer = await Printers.findOne({ index });
+          printer.save();
           PrinterTicker.addIssue(
             new Date(),
             farmPrinters[index].printerURL,
@@ -2422,9 +2423,10 @@ class Runner {
             }
             const printer = await Printers.findOne({ index });
             printer.camURL = farmPrinters[index].camURL;
+            printer.save();
           }
         }
-        printer.save();
+
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
