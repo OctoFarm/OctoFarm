@@ -609,7 +609,6 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
                 printer_id: farmPrinters[this.index]._id,
               };
               if (farmPrinters[this.index].stateColour.category === "Active") {
-                console.log("TEMP");
                 const newTemp = await new TempHistory(temps);
                 await newTemp.save();
               }
