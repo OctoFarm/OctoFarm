@@ -18,6 +18,10 @@ const printerClean = require("./server_src/lib/dataFunctions/printerClean.js");
 
 const { PrinterClean } = printerClean;
 
+const pluginManager = require("./server_src/runners/pluginManager.js");
+
+const { updatePluginList } = pluginManager;
+
 // Server Port
 const app = express();
 
@@ -78,7 +82,9 @@ const setupServerSettings = async () => {
 const serverStart = async () => {
   try {
     await logger.info("MongoDB Connected...");
-
+    await logger.info("Grabbing plugin list from OctoPrint.org");
+    let pluginList = await updatePluginList();
+    await logger.info(pluginList);
     // Initialise farm information
     const farmInformation = await PrinterClean.initFarmInformation();
     await logger.info(farmInformation);

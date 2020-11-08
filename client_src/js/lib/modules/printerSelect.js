@@ -42,7 +42,7 @@ const pluginInstallMessage = `
 Please select which printers you'd like to action a plugin installation on... You will be able to choose multiple plugins on the next pop up.
 </div>
 <div class="alert alert-warning" role="alert">
-  Do not worry about what is already installed, OctoPrint is rather good at handling the requests and will just re-install a plugin if requested.
+  Your plugin installation will be skipped if it's already installed...
 </div>
 `;
 const powerOnOffMessage = `

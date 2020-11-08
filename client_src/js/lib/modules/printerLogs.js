@@ -1,11 +1,47 @@
 import Calc from "../functions/calc.js";
-import OctoFarmClient from "../octofarm";
+import OctoFarmClient from "../octofarm.js";
+import OctoPrintClient from "../octoprint.js";
 
 let chart = null;
 let eventListener = false;
 let currentPrinter = null;
 
 export default class PrinterLogs {
+  static parseLogs(url) {
+    fetch(`${url}`)
+      .then(async (resp) => resp.blob())
+      .then(async (blob) => blob.text())
+      .then(async (text) => {
+        let octologsLogsRows = document.getElementById("octologsLogsRows");
+        octologsLogsRows.innerHTML = "";
+        let octoPrintCount = document.getElementById("octoPrintCount");
+        let splitText = text.split(/(\r\n|\n|\r)/gm);
+        splitText = splitText.reverse();
+        for (let i = 0; i < splitText.length; i++) {
+          let colour = null;
+          if (splitText[i].includes("INFO")) {
+            colour = "Info";
+          } else if (splitText[i].includes("WARNING")) {
+            colour = "Active";
+          } else {
+            colour = "Offline";
+          }
+          //Skip blank rows
+          if (splitText[i].length > 1 && splitText[i] !== " ") {
+            octologsLogsRows.insertAdjacentHTML(
+              "beforeend",
+              `
+                                <tr class="${colour}">
+                                  <th scope="row">${splitText[i]}</th>
+                                </tr>
+                            `
+            );
+          }
+        }
+        octoPrintCount.innerHTML =
+          "(" + (splitText.length / 2).toFixed(0) + ")";
+      });
+  }
   static loadLogs(printer, connectionLogs) {
     currentPrinter = printer;
     document.getElementById("printerLogsLabel").innerHTML =
@@ -20,6 +56,7 @@ export default class PrinterLogs {
     let octoPrintCount = document.getElementById("octoPrintCount");
     let tempCount = document.getElementById("tempCount");
     let tempChart = document.getElementById("printerTempChart");
+    let logSelect = document.getElementById("octoPrintLogsSelect");
 
     logCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
     errorCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
@@ -32,55 +69,32 @@ export default class PrinterLogs {
     octoprintLogsRows.innerHTML = "";
     octologsLogsRows.innerHTML = "";
     //tempChart.innerHTML = "";
-    fetch(`${printer.printerURL}/downloads/logs/octoprint.log`)
-      .then(async (resp) => resp.blob())
-      .then(async (blob) => blob.text())
-      .then(async (text) => {
-        let splitText = text.split(/(\r\n|\n|\r)/gm);
-        for (let i = 0; i < splitText.length; i++) {
-          const isFourthIteration = i % 2 === 0;
-
-          if (isFourthIteration) {
-            let line = splitText[i].split(" - ");
-            let colour = null;
-            if (line[2] === "INFO") {
-              colour = "Info";
-            } else if (line[2] === "WARNING") {
-              colour = "Active";
-            } else {
-              colour = "Offline";
-            }
-            //Filter the unneeded lines at the top of the log file...
-            //Seems tabled lines all start with the date for normal logging. Verbose includes the pyton which should just end up in the first column
-            if (!isNaN(line[0][0]) && line[0][0] !== " ") {
-              octologsLogsRows.insertAdjacentHTML(
-                "beforeend",
-                `
-                          <tr class="${colour}">
-                            <th scope="row">${line[0]}</th>
-                            <td>${line[1]}</td>
-                            <td>${line[2]}</td>
-                            <td>${line[3]}</td>
-                          </tr>
-                      `
-              );
-            } else {
-              octologsLogsRows.insertAdjacentHTML(
-                "beforeend",
-                `
-                          <tr class="${colour}">
-                            <th scope="row"></th>
-                            <td></td>
-                            <td></td>
-                            <td>${splitText[i]}</td>
-                          </tr>
-                      `
-              );
-            }
-          }
+    OctoPrintClient.get(printer, "/plugin/logging/logs")
+      .then(async (res) => res.json())
+      .then(async (res) => {
+        let mainLog = _.findIndex(res.files, function (o) {
+          return o.name === "octoprint.log";
+        });
+        let orderedSelect = _.sortBy(res.files, [
+          function (o) {
+            return o.name;
+          },
+        ]);
+        logSelect.innerHTML = "";
+        for (let i = 0; i < orderedSelect.length; i++) {
+          logSelect.insertAdjacentHTML(
+            "beforeend",
+            `
+            <option value="${orderedSelect[i].refs.download}">${orderedSelect[i].name}</option>
+          `
+          );
         }
-        octoPrintCount.innerHTML =
-          "(" + (splitText.length / 2).toFixed(0) + ")";
+
+        logSelect.value = res.files[mainLog].refs.download;
+        PrinterLogs.parseLogs(res.files[mainLog].refs.download);
+      })
+      .catch((e) => {
+        console.log(e);
       });
 
     if (typeof connectionLogs.currentOctoFarmLogs === "object") {
@@ -232,18 +246,26 @@ export default class PrinterLogs {
           chart.render();
           chart.updateSeries(connectionLogs.currentTempLogs);
         }
+      } else {
+        tempChart.innerHTML = "<div class=''>No Records to Show</div>";
       }
     }
+
     if (!eventListener) {
+      logSelect.addEventListener("change", (e) => {
+        PrinterLogs.parseLogs(e.target.value);
+      });
       document
         .getElementById("system-refresh-list")
         .addEventListener("click", async (e) => {
+          console.log("Refresh!", currentPrinter.printerURL);
           let connectionLogs = await OctoFarmClient.get(
             "printers/connectionLogs/" + currentPrinter._id
           );
           connectionLogs = await connectionLogs.json();
           PrinterLogs.loadLogs(currentPrinter, connectionLogs);
         });
+      eventListener = true;
     }
   }
 }

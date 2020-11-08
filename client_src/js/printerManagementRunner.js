@@ -1586,19 +1586,21 @@ class dashUpdate {
           );
 
           printerSortIndex.innerHTML = printer.sortIndex;
-          if (typeof printer.klipperFirmwareVersion !== "undefined") {
-            printerOctoPrintVersion.innerHTML =
-              printer.octoPrintVersion +
-              "<br>Klipper: " +
-              printer.klipperFirmwareVersion;
-          } else if (printer.updateAvailable) {
-            //still testing
-            printerOctoPrintVersion.innerHTML =
-              printer.octoPrintVersion +
-              "<br><button>Update Available!</button>";
-          } else {
-            printerOctoPrintVersion.innerHTML = printer.octoPrintVersion;
+          //Needs to be displayed somewhere else and possibly bolstered to include marlin and whatever else...
+          // if (typeof printer.klipperFirmwareVersion !== "undefined") {
+          //   printerOctoPrintVersion.innerHTML =
+          //     printer.octoPrintVersion +
+          //     "<br>Klipper: " +
+          //     printer.klipperFirmwareVersion;
+          // }
+          let octoVersion = printer.octoPrintVersion;
+          if (printer.updateAvailable.octoPrintUpdate) {
+            octoVersion += "<br><button>Update Available!</button>";
           }
+          if (printer.updateAvailable.pluginUpdates.length > 0) {
+            octoVersion += "<br><button>Plugin Update Available!</button>";
+          }
+          printerOctoPrintVersion.innerHTML = octoVersion;
           printName.innerHTML = `${printerName}`;
           if (typeof printer.corsCheck !== "undefined") {
             if (printer.corsCheck) {

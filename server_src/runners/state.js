@@ -2285,7 +2285,11 @@ class Runner {
         );
       });
   }
-  static getUpdates(id) {
+  static getUpdates(id, force) {
+    let forceCheck = "";
+    if (force) {
+      forceCheck = "?force=true";
+    }
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
@@ -2299,18 +2303,35 @@ class Runner {
     return ClientAPI.getRetry(
       farmPrinters[index].printerURL,
       farmPrinters[index].apikey,
-      "plugin/softwareupdate/check?force=true"
+      "plugin/softwareupdate/check" + forceCheck
     )
       .then((res) => {
         return res.json();
       })
       .then((res) => {
-        if (res.information.octoprint.updateAvailable) {
-          farmPrinters[index].updateAvailable =
-            res.information.octoprint.updateAvailable;
-        } else {
-          farmPrinters[index].updateAvailable = false;
+        let octoPrintUpdate = false;
+        let pluginUpdates = [];
+        for (var key in res.information) {
+          if (res.information.hasOwnProperty(key)) {
+            if (res.information[key].updateAvailable) {
+              if (key === "octoprint") {
+                octoPrintUpdate = true;
+              } else {
+                pluginUpdates.push({
+                  id: key,
+                  displayName: res.information[key].displayName,
+                  displayVersion: res.information[key].displayVersion,
+                  updateAvailable: res.information[key].updateAvailable,
+                });
+              }
+            }
+          }
         }
+
+        farmPrinters[index].updateAvailable = {
+          octoPrintUpdate,
+          pluginUpdates,
+        };
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
