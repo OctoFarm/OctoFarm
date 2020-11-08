@@ -106,12 +106,13 @@ const printersTable = `
                             </select>
                         </div>
     </div>
-    <div class="col-md-3">
+    <div id="selectBtns" class="col-md-3 text-center">
 
     </div>
-    <div id="selectBtns" class="col-md-3">
-
+    <div id="actionBtn" class="col-md-3  text-center">
+              
     </div>
+
 </div>
 <table class="table table-dark">
   <thead>
@@ -369,7 +370,7 @@ export default class PrinterSelect {
       UI.addSelectListeners("editInput");
     }
     if (callback) {
-      document.getElementById("selectBtns").insertAdjacentHTML(
+      document.getElementById("actionBtn").insertAdjacentHTML(
         "beforeend",
         `
                       <button id="saveEditsBtn" class="btn btn-success" data-dismiss="modal" aria-label="Close">Action</button>
