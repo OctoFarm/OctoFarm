@@ -2391,7 +2391,8 @@ class Runner {
               powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
             };
           }
-          const printer = await Printers.findOne({ index });
+          const printer = await Printers.findById(id);
+
           printer.save();
           PrinterTicker.addIssue(
             new Date(),
@@ -2421,7 +2422,7 @@ class Runner {
               farmPrinters[index].camURL =
                 farmPrinters[index].printerURL + res.webcam.streamUrl;
             }
-            const printer = await Printers.findOne({ index });
+            const printer = await Printers.findById(id);
             printer.camURL = farmPrinters[index].camURL;
             printer.save();
           }
@@ -2446,7 +2447,7 @@ class Runner {
           new Date(),
           farmPrinters[index].printerURL,
           `Error grabbing settings information: ${err}`,
-          "Diconnected",
+          "Offline",
           farmPrinters[index]._id
         );
         farmPrinters[index].systemChecks.scanning.settings.status = "danger";
@@ -2501,7 +2502,7 @@ class Runner {
           new Date(),
           farmPrinters[index].printerURL,
           `Error grabbing system information: ${err}`,
-          "Diconnected",
+          "Offline",
           farmPrinters[index]._id
         );
         farmPrinters[index].systemChecks.scanning.system.status = "danger";
