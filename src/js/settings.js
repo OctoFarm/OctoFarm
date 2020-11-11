@@ -35,7 +35,7 @@ document.getElementById("nukeHistory").addEventListener("click", (e) => {
 });
 document.getElementById("nukePrinters").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
-  ServerSettings.nukeDatabases("PrintersDB");
+  ServerSettings.nukeDatabases("PrinterDB");
 });
 document.getElementById("nukeRoomData").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
