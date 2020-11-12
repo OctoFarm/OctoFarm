@@ -232,6 +232,10 @@ class PrinterClean {
       sortedPrinter.storage = farmPrinter.storage;
       sortedPrinter.tempHistory = farmPrinter.tempHistory;
 
+      if (typeof farmPrinter.octoPi !== "undefined") {
+        sortedPrinter.octoPi = farmPrinter.octoPi;
+      }
+
       sortedPrinter.connectionLog =
         printerConnectionLogs[farmPrinter.sortIndex];
       if (typeof farmPrinter.klipperFirmwareVersion !== "undefined") {
@@ -730,7 +734,6 @@ class PrinterClean {
           let tools = null;
           if (
             printer.printerState.colour.category === "Active" ||
-            printer.printerState.colour.category === "Idle" ||
             printer.printerState.colour.category === "Complete"
           ) {
             tools = printer.tools;

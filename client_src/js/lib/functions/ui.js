@@ -59,10 +59,13 @@ export default class UI {
     alert.show();
     return alert;
   }
+
   static doesElementNeedUpdating(value, element, meta) {
     //Quick check to see if the UI value differs, if so update.
-    if (JSON.stringify(value) !== JSON.stringify(element[meta])) {
-      element[meta] = value;
+    if (element) {
+      if (JSON.stringify(value) !== JSON.stringify(element[meta])) {
+        element[meta] = value;
+      }
     }
   }
   static clearSelect(elementValue) {

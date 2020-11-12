@@ -211,7 +211,8 @@ export default class PrinterLogs {
             },
           ],
           xaxis: {
-            type: "datetime",
+            //tickAmount: "dataPoints",
+            type: "category",
             labels: {
               formatter(value) {
                 const date = new Date(value);

@@ -9,8 +9,7 @@ import Validate from "./lib/functions/validate.js";
 import PowerButton from "./lib/modules/powerButton.js";
 import {
   init as actionButtonInit,
-  printerQuickConnected,
-  printerQuickDisconnected,
+  checkQuickConnectState,
 } from "./lib/modules/Printers/actionButtons.js";
 import PrinterSelect from "./lib/modules/printerSelect";
 import PrinterLogs from "./lib/modules/printerLogs.js";
@@ -495,9 +494,7 @@ const pluginAction = async function (action) {
         "printers/pluginList/" + printerInfo[index]._id
       );
     } else {
-      printerPluginList = await OctoFarmClient.get(
-        "printers/plugins/" + printerInfo[index]._id
-      );
+      printerPluginList = await OctoFarmClient.get("printers/plugins/");
     }
 
     printerPluginList = await printerPluginList.json();
@@ -1584,6 +1581,12 @@ class dashUpdate {
           const printerQuickConnectBtn = document.getElementById(
             "printerQuickConnect-" + printer._id
           );
+          const octoPiVersioning = document.getElementById("octoPiVersioning");
+          if (octoPiVersioning) {
+            octoPiVersioning.innerHTML = `                 
+                  <p>${printer.octoPi.version}</p>
+                  <p>${printer.octoPi.model}</p>`;
+          }
 
           printerSortIndex.innerHTML = printer.sortIndex;
           //Needs to be displayed somewhere else and possibly bolstered to include marlin and whatever else...
@@ -1604,6 +1607,7 @@ class dashUpdate {
           }
 
           printerOctoPrintVersion.innerHTML = octoVersion;
+
           printName.innerHTML = `${printerName}`;
           if (typeof printer.corsCheck !== "undefined") {
             if (printer.corsCheck) {
@@ -1660,25 +1664,28 @@ class dashUpdate {
               }
             }
           }
-          printerQuickConnectBtn.disabled =
-            printer.printerState.colour.category === "Offline";
-          if (
-            printer.printerState.colour.category !== "Offline" &&
-            printer.printerState.colour.category === "Disconnected"
-          ) {
-            printerQuickDisconnected(printer._id);
-          } else if (
-            printer.printerState.colour.category !== "Offline" &&
-            printer.printerState.colour.category !== "Disconnected"
-          ) {
-            printerQuickConnected(printer._id);
-          } else {
-            printerQuickDisconnected(printer._id);
-          }
+          checkQuickConnectState(printer);
 
           printButton.disabled =
             printer.printerState.colour.category === "Offline";
         } else {
+          let octoPiElement = "";
+          if (typeof printer.octoPi !== "undefined") {
+            octoPiElement = `
+                <td id="octoPiVersioning-${printer._id}">
+                  <p>${printer.octoPi.version}</p>
+                  <p>${printer.octoPi.model}</p>
+                </td>
+            `;
+            let tableRow = document.getElementById("octoPiVersions");
+            if (tableRow.classList.contains("d-none")) {
+              tableRow.classList.remove("d-none");
+            }
+          } else {
+            console.log(
+              "OctoPi is undefined, if all yours are on Pi you shouldn't be seeing this..."
+            );
+          }
           // Insert new printer addition...
           document.getElementById("printerList").insertAdjacentHTML(
             "beforeend",
@@ -1735,153 +1742,14 @@ class dashUpdate {
                 <i  class="fas fa-plug"></i></span></td>
    
         <td><div id="printerGroup-${printer._id}" ></div></td>
-        <th id="printerOctoPrintVersion-${printer._id}"></td>
-       
+        <td id="printerOctoPrintVersion-${printer._id}"></td>
+        ${octoPiElement}
     </tr>
           `
           );
 
           actionButtonInit(printer, `printerActionBtns-${printer._id}`);
-          document
-            .getElementById(`printerQuickConnect-${printer._id}`)
-            .addEventListener("click", async (e) => {
-              e.disabled = true;
-              const index = _.findIndex(printerInfo, function (o) {
-                return o._id === printer._id;
-              });
-              if (
-                document
-                  .getElementById("printerQuickConnect-" + printer._id)
-                  .classList.contains("btn-danger")
-              ) {
-                let data = {};
-                if (
-                  typeof printerInfo[index].connectionOptions !== "undefined"
-                ) {
-                  data = {
-                    command: "connect",
-                    port: printerInfo[index].connectionOptions.portPreference,
-                    baudrate:
-                      printerInfo[index].connectionOptions.baudratePreference,
-                    printerProfile:
-                      printerInfo[index].connectionOptions
-                        .printerProfilePreference,
-                    save: true,
-                  };
-                } else {
-                  UI.createAlert(
-                    "warning",
-                    `${printerInfo[index].printerName} has no preferences saved, defaulting to AUTO...`,
-                    8000,
-                    "Clicked"
-                  );
-                  data.command = "connect";
-                  data.port = "AUTO";
-                  data.baudrate = "AUTO";
-                  data.printerProfile = "_default";
-                  data.save = false;
-                }
-                let post = await OctoPrintClient.post(
-                  printerInfo[index],
-                  "connection",
-                  data
-                );
-                if (typeof post !== "undefined") {
-                  if (post.status === 204) {
-                    UI.createAlert(
-                      "success",
-                      `Successfully made connection attempt to ${printerInfo[index].printerName}...`,
-                      3000,
-                      "Clicked"
-                    );
-                  } else {
-                    UI.createAlert(
-                      "error",
-                      `There was an issue connecting to ${printerInfo[index].printerName} it's either not online, or the connection options supplied are not available...`,
-                      3000,
-                      "Clicked"
-                    );
-                  }
-                } else {
-                  UI.createAlert(
-                    "error",
-                    `No response from ${printerInfo[index].printerName}, is it online???`,
-                    3000,
-                    "Clicked"
-                  );
-                }
-              } else {
-                bootbox.confirm({
-                  message: "Are you sure you want to disconnect your printer?",
-                  buttons: {
-                    confirm: {
-                      label: "Yes",
-                      className: "btn-success",
-                    },
-                    cancel: {
-                      label: "No",
-                      className: "btn-danger",
-                    },
-                  },
-                  callback: async function (result) {
-                    if (result) {
-                      let data = {
-                        command: "disconnect",
-                      };
-                      let post = await OctoPrintClient.post(
-                        printerInfo[index],
-                        "connection",
-                        data
-                      );
-                      if (typeof post !== "undefined") {
-                        if (post.status === 204) {
-                          UI.createAlert(
-                            "success",
-                            `Successfully made disconnect attempt to ${printerInfo[index].printerName}...`,
-                            3000,
-                            "Clicked"
-                          );
-                        } else {
-                          UI.createAlert(
-                            "error",
-                            `There was an issue disconnecting to ${printerInfo[index].printerName} are you sure it's online?`,
-                            3000,
-                            "Clicked"
-                          );
-                        }
-                      } else {
-                        UI.createAlert(
-                          "error",
-                          `No response from ${printerInfo[index].printerName}, is it online???`,
-                          3000,
-                          "Clicked"
-                        );
-                      }
-                    }
-                  },
-                });
-              }
-            });
-          document
-            // eslint-disable-next-line no-underscore-dangle
-            .getElementById(`printerSyncButton-${printer._id}`)
-            .addEventListener("click", async (e) => {
-              e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i>";
-              e.target.disabled = true;
-              const data = {
-                id: printer._id,
-              };
-              let post = await OctoFarmClient.post("printers/reScanOcto", data);
-              post = await post.json();
-              if (post.msg.status !== "error") {
-                UI.createAlert("success", post.msg.msg, 3000, "clicked");
-              } else {
-                UI.createAlert("error", post.msg.msg, 3000, "clicked");
-              }
 
-              e.target.innerHTML = "<i class='fas fa-sync'></i>";
-              e.target.disabled = false;
-            });
           document
             .getElementById(`printerButton-${printer._id}`)
             .addEventListener("click", () => {

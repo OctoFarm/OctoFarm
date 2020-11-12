@@ -608,7 +608,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
                 currentTemp: data.current.temps[0],
                 printer_id: farmPrinters[this.index]._id,
               };
-              if (farmPrinters[this.index].stateColour.category === "Active") {
+              if (farmPrinters[this.index].stateColour.category !== "Offline") {
                 const newTemp = await new TempHistory(temps);
                 await newTemp.save();
               }
@@ -2366,16 +2366,79 @@ class Runner {
         } else if (farmPrinters[index].settingsAppearance.name === "") {
           farmPrinters[index].settingsAppearance.name = res.appearance.name;
         }
-        //console.log(res.plugins["psucontrol"]);
-        if (res.plugins["psucontrol"]) {
+        if (res.plugins["pi_support"]) {
+          logger.info("Detected Pi Support!");
           PrinterTicker.addIssue(
             new Date(),
             farmPrinters[index].printerURL,
-            "PSU Control plugin detected... Updating OctoFarm power settings...",
+            "Pi Plugin detected... scanning for version information...",
             "Active",
             farmPrinters[index]._id
           );
+          return ClientAPI.getRetry(
+            farmPrinters[index].printerURL,
+            farmPrinters[index].apikey,
+            "api/plugin/pi_support"
+          )
+            .then((res) => {
+              return res.json();
+            })
+            .then(async (res) => {
+              logger.info("Got from endpoint: ", res);
+              farmPrinters[index].octoPi = {
+                model: res.model,
+                version: res.octopi_version,
+              };
+              logger.info("I captured: ", farmPrinters[index].octoPi);
+              PrinterTicker.addIssue(
+                new Date(),
+                farmPrinters[index].printerURL,
+                "Sucessfully grabbed OctoPi information...",
+                "Complete",
+                farmPrinters[index]._id
+              );
+            });
+        }
+        if (res.plugins["costestimation"]) {
+          if (
+            _.isEmpty(farmPrinters[index].costSettings) ||
+            farmPrinters[index].costSettings.powerConsumption === 0.5
+          ) {
+            PrinterTicker.addIssue(
+              new Date(),
+              farmPrinters[index].printerURL,
+              "Cost Plugin detected... Updating OctoFarms Cost settings",
+              "Active",
+              farmPrinters[index]._id
+            );
+            farmPrinters[index].costSettings = {
+              powerConsumption: res.plugins["costestimation"].powerConsumption,
+              electricityCosts: res.plugins["costestimation"].costOfElectricity,
+              purchasePrice: res.plugins["costestimation"].priceOfPrinter,
+              estimateLifespan: res.plugins["costestimation"].lifespanOfPrinter,
+              maintenanceCosts: res.plugins["costestimation"].maintenanceCosts,
+            };
+            const printer = await Printers.findById(id);
+
+            printer.save();
+            PrinterTicker.addIssue(
+              new Date(),
+              farmPrinters[index].printerURL,
+              "Successfully saved Cost Estimation settings",
+              "Complete",
+              farmPrinters[index]._id
+            );
+          }
+        }
+        if (res.plugins["psucontrol"]) {
           if (_.isEmpty(farmPrinters[index].powerSettings)) {
+            PrinterTicker.addIssue(
+              new Date(),
+              farmPrinters[index].printerURL,
+              "PSU Control plugin detected... Updating OctoFarm power settings...",
+              "Active",
+              farmPrinters[index]._id
+            );
             farmPrinters[index].powerSettings = {
               powerOnCommand: '{"command":"turnPSUOn"}',
               powerOnURL: "[PrinterURL]/api/plugin/psucontrol",
@@ -2386,17 +2449,17 @@ class Runner {
               powerStatusCommand: '{"command":"getPSUState"}',
               powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
             };
-          }
-          const printer = await Printers.findById(id);
+            const printer = await Printers.findById(id);
 
-          printer.save();
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[index].printerURL,
-            "Successfully saved PSU control settings...",
-            "Complete",
-            farmPrinters[index]._id
-          );
+            printer.save();
+            PrinterTicker.addIssue(
+              new Date(),
+              farmPrinters[index].printerURL,
+              "Successfully saved PSU control settings...",
+              "Complete",
+              farmPrinters[index]._id
+            );
+          }
         }
         farmPrinters[index].settingsFeature = res.feature;
         farmPrinters[index].settingsFolder = res.folder;

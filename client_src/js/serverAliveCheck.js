@@ -31,7 +31,6 @@ const serverAliveCheck = async function () {
           const spinner = document.getElementById("lostConnectionSpinner");
           const text = document.getElementById("lostConnectionText");
           spinner.className = "fas fa-spinner";
-
           if (!timer) {
             let countDown = 5;
             timer = true;

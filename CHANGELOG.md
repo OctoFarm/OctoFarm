@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
     - New Printer Manager Section: Plugins!
         -   Install, Uninstall, Enable, Disable a bulk set of plugins on a bulk set of printers.
     - PSU Control settings are now grabbed from OctoPrint if they don't already exist in OctoFarm. To edit these going forware you will need to edit inside of OctoFarm as it won't pick up any changes made on OctoPrint after the initial scan.
+    - OctoFarm now detects the OctoPi verion and Pi model you are using and displays this information in the "Printer Manager" section.
     
 ### Changed
     - Added additional CSS classes to buttons for theming. Applies to actions buttons only, status colours the same. 
@@ -48,6 +49,7 @@ All notable changes to this project will be documented in this file.
     - Changed the Power button poll rate to 5 seconds.
     - Changed server check poll rate to 2.5 seconds.   
     - pm2 logs are now flushed before starting application, now only captures errors as my logs cover the rest.
+    - File Manager link no longer hidden on mobile views.
 
 ### Fixed
     - Fixed issue with File Manager not loading if printer in index 0 was offline.

@@ -324,11 +324,14 @@ class ClientSettings {
           res.panelView.hideOff;
         document.getElementById("panelHideClosed").checked =
           res.panelView.hideClosed;
-        document.getElementById("panelExtraInfoOn").checked =
-          res.panelView.extraInfo;
-
-        document.getElementById("selectCameraGrid").value =
-          res.cameraView.cameraRows;
+        // document.getElementById("panelHideIdle").checked =
+        //   res.panelView.hideIdle;
+        if (res.panelView.printerRows) {
+          document.getElementById("selectCameraGrid").value =
+            res.panelView.printerRows;
+        } else {
+          document.getElementById("selectCameraGrid").value = 2;
+        }
 
         if (typeof res.dashboard !== "undefined") {
           document.getElementById("currentOperations").checked =
@@ -370,7 +373,7 @@ class ClientSettings {
         currentOp: document.getElementById("panelCurrentOpOn").checked,
         hideOff: document.getElementById("panelHideOffline").checked,
         hideClosed: document.getElementById("panelHideClosed").checked,
-        extraInfo: document.getElementById("panelExtraInfoOn").checked,
+        // hideIdle: document.getElementById("panelHideIdle").checked,
       },
       cameraView: {
         cameraRows: document.getElementById("selectCameraGrid").value,

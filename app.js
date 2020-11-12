@@ -8,10 +8,10 @@ const expressLayouts = require("express-ejs-layouts");
 const mongoose = require("mongoose");
 const flash = require("connect-flash");
 const session = require("express-session");
+const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const ServerSettingsDB = require("./server_src/models/ServerSettings");
 const Logger = require("./server_src/lib/logger.js");
-const cookieParser = require("cookie-parser");
 
 const logger = new Logger("OctoFarm-Server");
 const printerClean = require("./server_src/lib/dataFunctions/printerClean.js");
