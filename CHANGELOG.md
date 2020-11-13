@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
     - PSU Control settings are now grabbed from OctoPrint if they don't already exist in OctoFarm. To edit these going forware you will need to edit inside of OctoFarm as it won't pick up any changes made on OctoPrint after the initial scan.
     - OctoFarm now detects the OctoPi verion and Pi model you are using and displays this information in the "Printer Manager" section.
     - OctoFarm now checks for OctoPrint/Plugin updates on a initial scan and re-scan. 
+    - History will now capture an image from the mjpeg stream you input into camera url. 
     
 ### Changed
     - Added additional CSS classes to buttons for theming. Applies to actions buttons only, status colours the same. 
@@ -53,6 +54,7 @@ All notable changes to this project will be documented in this file.
     - File Manager link no longer hidden on mobile views.
     - Changed the time displays for all views, now follows unified format. Applied currently on Panel/List/Camera. 
     - Camera view now hides print information (times / tools) until hovering over. 
+    - History page now displays an image slider when loading the "edit/view" box. You can cycle through the thumbnails from your slicer if you use that plugin, or the captured image of the finished print taken from your webcam.
     
 
 ### Fixed
