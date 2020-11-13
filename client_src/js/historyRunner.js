@@ -110,20 +110,76 @@ export default class History {
       jobCosting.placeholder = " - ";
       jobHourlyCost.placeholder = " - ";
 
-      const thumbnail = document.getElementById("history-thumbnail");
+      const thumbnail = document.getElementById("thumbnails");
+      const thumbnailIndicators = document.getElementById(
+        "thumbnails-indicators"
+      );
       thumbnail.innerHTML = "";
+      thumbnailIndicators.innerHTML = "";
       const index = _.findIndex(historyList.history, function (o) {
         return o._id == e.target.id;
       });
       const current = historyList.history[index];
       printerName.innerHTML = current.printer;
       fileName.innerHTML = current.file.name;
+      let thbs = false;
+      let counter = 0;
+      let active = "active";
+      console.log("SNAP:", current.snapshot);
+      if (typeof current.snapshot !== "undefined" && current.snapshot !== "") {
+        thbs = true;
+        thumbnailIndicators.insertAdjacentHTML(
+          "beforeend",
+          `
+           <li data-target="#carouselExampleIndicators" data-slide-to="${counter}" class="${active}"></li>
+        `
+        );
+        thumbnail.insertAdjacentHTML(
+          "beforeend",
+          `
+              <div class="carousel-item ${active}" style="height:200px; background-image: url('${current.snapshot}')">
+                  <div class="carousel-caption d-none d-md-block">
+                    <h6>Camera Snapshot</h6>
+                    <small>Taken just as your printer finished...</small>
+                  </div>
+                </div>
+          `
+        );
+        counter = counter + 1;
+        active = "";
+      }
+      console.log("THUMB:", current.thumbnail);
       if (
         typeof current.thumbnail !== "undefined" &&
         current.thumbnail != null
       ) {
-        thumbnail.innerHTML = `<center><img src="${current.thumbnail}" class="historyImage mb-2"></center>`;
+        thbs = true;
+        thumbnailIndicators.insertAdjacentHTML(
+          "beforeend",
+          `
+           <li data-target="#carouselExampleIndicators" data-slide-to="${counter}" class="${active}"></li>
+        `
+        );
+        thumbnail.insertAdjacentHTML(
+          "beforeend",
+          `
+              <div class="carousel-item ${active}" style="height:200px; background-image: url('${current.thumbnail}')">
+                  <div class="carousel-caption d-none d-md-block">
+                    <h6>Slicer Thumbnail</h6>
+                    <small>This image was captured from your slicer thumbnail...</small>
+                  </div>
+                </div>
+          `
+        );
+        counter = counter + 1;
       }
+
+      if (thbs) {
+        document.getElementById("galleryElements").style.display = "block";
+      } else {
+        document.getElementById("galleryElements").style.display = "none";
+      }
+
       startDate.innerHTML = `<b>Started</b><hr>${current.startDate.replace(
         " - ",
         "<br>"

@@ -86,9 +86,6 @@ textarea{
   background-color:#47000A;
 }
 .historyImage{
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 5px;
   width:75%;
 }
 .heatMapLeft {
@@ -530,4 +527,14 @@ label {
 
 .bootbox-input-checkbox{
 
+}
+
+.carousel-item {
+  height: 100vh;
+  min-height: 350px;
+  background: no-repeat center center scroll;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
 }

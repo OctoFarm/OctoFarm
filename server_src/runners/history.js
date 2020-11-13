@@ -23,6 +23,8 @@ const { HistoryClean } = historyClean;
 const runner = require("../runners/state.js");
 const { Runner } = runner;
 
+const MjpegDecoder = require("mjpeg-decoder");
+
 let counter = 0;
 let errorCounter = 0;
 
@@ -92,6 +94,22 @@ class HistoryCollection {
     });
 
     return `images/historyCollection/thumbs/${splitAgain[0]}`;
+  }
+  static async snapPictureOfPrinter(url, id, fileDisplay) {
+    if (!fs.existsSync(`./images/historyCollection`)) {
+      fs.mkdirSync(`./images/historyCollection`);
+    }
+    if (!fs.existsSync(`./images/historyCollection/snapshots`)) {
+      fs.mkdirSync(`./images/historyCollection/snapshots`);
+    }
+    const decoder = MjpegDecoder.decoderForSnapshot(url);
+    const frame = await decoder.takeSnapshot();
+    await fs.writeFileSync(
+      `./images/historyCollection/snapshots/${id}-${fileDisplay}.jpg`,
+      frame
+    );
+    logger.info("Downloaded: ", url);
+    logger.info("Saved as: ", `${id}-${fileDisplay}.jpg`);
   }
 
   static async complete(payload, printer, job, files) {
@@ -211,13 +229,25 @@ class HistoryCollection {
         previousFilamentSelection: previousFilament,
         job,
         notes: "",
+        snapshot: "",
       };
 
       const saveHistory = new History({
         printHistory,
       });
-      await saveHistory.save().then((e) => {
-        HistoryClean.start();
+      await saveHistory.save().then(async (r) => {
+        if (printer.camURL !== "") {
+          HistoryClean.start();
+          await HistoryCollection.snapPictureOfPrinter(
+            printer.camURL,
+            saveHistory._id,
+            payload.name
+          );
+
+          saveHistory.printHistory.snapshot = `images/historyCollection/snapshots/${saveHistory._id}-${payload.name}.jpg`;
+          saveHistory.markModified("printHistory.snapshot");
+          saveHistory.save();
+        }
       });
 
       logger.info(
@@ -343,12 +373,24 @@ class HistoryCollection {
         previousFilamentSelection: previousFilament,
         job,
         notes: "",
+        snapshot: "",
       };
       const saveHistory = new History({
         printHistory,
       });
-      await saveHistory.save().then((e) => {
-        HistoryClean.start();
+      await saveHistory.save().then(async (r) => {
+        if (printer.camURL !== "") {
+          HistoryClean.start();
+          await HistoryCollection.snapPictureOfPrinter(
+            printer.camURL,
+            saveHistory._id,
+            payload.name
+          );
+
+          saveHistory.printHistory.snapshot = `images/historyCollection/snapshots/${saveHistory._id}-${payload.name}.jpg`;
+          saveHistory.markModified("printHistory.snapshot");
+          saveHistory.save();
+        }
       });
 
       logger.info("Failed Print captured ", payload + printer.printerURL);
@@ -431,12 +473,24 @@ class HistoryCollection {
         printTime: Math.round(payload.time),
         job: job,
         notes: "",
+        snapshot: "",
       };
       const saveError = new ErrorLog({
         errorLog,
       });
-      await saveError.save().then((e) => {
-        HistoryClean.start();
+      await saveError.save().then(async (r) => {
+        if (printer.camURL !== "") {
+          HistoryClean.start();
+          await HistoryCollection.snapPictureOfPrinter(
+            printer.camURL,
+            saveError._id,
+            payload.name
+          );
+
+          saveError.printHistory.snapshot = `images/historyCollection/snapshots/${saveError._id}-${payload.name}.jpg`;
+          saveError.markModified("printHistory.snapshot");
+          saveError.save();
+        }
       });
       logger.info("Error captured ", payload + printer.printerURL);
     } catch (e) {

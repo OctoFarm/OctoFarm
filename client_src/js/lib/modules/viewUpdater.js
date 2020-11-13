@@ -147,8 +147,12 @@ function imageOrCamera(printer) {
   ) {
     //Check if URL actually exists...
     if (printer.cameraURL !== "") {
-      const cameraURL = printer.cameraURL;
-      return drawCamera({ cameraURL, flipV, flipH, rotate90 });
+      return drawCamera({
+        url: printer.cameraURL,
+        flipV,
+        flipH,
+        rotate90,
+      });
     } else {
       if (
         typeof printer.currentJob !== "undefined" &&
@@ -476,7 +480,7 @@ function drawCameraView(printer, clientSettings) {
  `;
     }
   }
-  console.log(environment);
+
   return `
   <div
       id="panel-${printer._id}"

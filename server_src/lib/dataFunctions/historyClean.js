@@ -70,6 +70,9 @@ class HistoryClean {
           history[h].printHistory.printTime
         ),
       };
+      if (typeof history[h].printHistory.snapshot !== "undefined") {
+        sorted.snapshot = history[h].printHistory.snapshot;
+      }
       let spoolCost = 0;
       let totalVolume = 0;
       let totalLength = 0;
