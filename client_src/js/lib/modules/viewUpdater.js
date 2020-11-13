@@ -115,6 +115,77 @@ function cleanName(printerName) {
   return name;
 }
 
+function checkPrinterRows(clientSettings) {
+  if (
+    typeof clientSettings !== "undefined" &&
+    typeof clientSettings.panelView !== "undefined" &&
+    typeof clientSettings.panelView.printerRows !== "undefined"
+  ) {
+    return clientSettings.panelView.printerRows;
+  } else {
+    return 2;
+  }
+}
+function imageOrCamera(printer) {
+  let drawCamera = ({ url, flipV, flipH, rotate90 }) => {
+    return `<img
+        loading="lazy"
+        id="camera-${printer._id}"
+        width="100%"
+        style="transform: ${flipH} ${flipV} ${rotate90}; pointer-events: none;"
+        src="${url}"
+    />`;
+  };
+  const flip = isRotated(printer.otherSettings);
+  const { flipH, flipV, rotate90 } = flip;
+  //Is octoprints camera settings enabled?
+
+  if (
+    printer.otherSettings !== null &&
+    printer.otherSettings.webCamSettings !== null &&
+    printer.otherSettings.webCamSettings.webcamEnabled
+  ) {
+    //Check if URL actually exists...
+    if (printer.cameraURL !== "") {
+      const cameraURL = printer.cameraURL;
+      return drawCamera({ cameraURL, flipV, flipH, rotate90 });
+    } else {
+      if (
+        typeof printer.currentJob !== "undefined" &&
+        printer.currentJob.thumbnail != null
+      ) {
+        return drawCamera({
+          url: printer.printerURL + "/" + printer.currentJob.thumbnail,
+          flipV,
+          flipH,
+          rotate90,
+        });
+      } else {
+        return drawCamera({
+          url: "../images/noCamera.jpg",
+          flipV,
+          flipH,
+          rotate90,
+        });
+      }
+    }
+  } else {
+    if (
+      typeof printer.currentJob !== "undefined" &&
+      printer.currentJob.thumbnail != null
+    ) {
+      return drawCamera({
+        url: printer.printerURL + "/" + printer.currentJob.thumbnail,
+        flipV,
+        flipH,
+        rotate90,
+      });
+    } else {
+      return drawCamera({ url: "", flipV, flipH, rotate90 });
+    }
+  }
+}
+
 function drawListView(printer, clientSettings) {
   const hidden = isHidden(printer, clientSettings);
   const name = cleanName(printer.printerName);
@@ -219,9 +290,8 @@ function drawListView(printer, clientSettings) {
 function drawPanelView(printer, clientSettings) {
   const hidden = isHidden(printer, clientSettings);
   const name = cleanName(printer.printerName);
-  const flip = isRotated(printer.otherSettings);
-  const { flipH, flipV, rotate90 } = flip;
-
+  const printerRows = checkPrinterRows(clientSettings);
+  let cameraElement = imageOrCamera(printer);
   let toolList = "";
   let environment = "";
   if (printer.currentProfile !== null) {
@@ -247,7 +317,7 @@ function drawPanelView(printer, clientSettings) {
   }
 
   return `
-        <div class="col-lg-${clientSettings.panelView.printerRows} col-xl-${clientSettings.panelView.printerRows}" id="panel-${printer._id}">
+        <div class="col-lg-${printerRows} col-xl-${printerRows} ${hidden}" id="panel-${printer._id}">
         <div class="card mt-1 mb-1 ml-1 mr-1 text-center">
           <div class="card-header dashHeader">
            <button
@@ -275,14 +345,8 @@ function drawPanelView(printer, clientSettings) {
             >
                 <i class="fas fa-file-code" ></i> No File Selected
             </button>
-            <div class="cameraContain">
-                  <img
-                    loading="lazy"
-                    id="camera-${printer._id}"
-                    width="100%"
-                    style="transform: ${flipH} ${flipV} ${rotate90}; pointer-events: none;"
-                    src=""
-                    />
+            <div id="cameraContain-${printer._id}" class="noBlue">
+                ${cameraElement}
             </div>
             <div class="progress">
               <div
@@ -360,10 +424,10 @@ function drawPanelView(printer, clientSettings) {
             </center>
           </div>
           <div class="row">
-            <div class="col-lg-6">
+            <div class="col-xl-6">
                        <span id="printTimeElapsed-${printer._id}">Loading...</span>
             </div>
-            <div class="col-lg-6">
+            <div class="col-xl-6">
                       <span id="remainingTime-${printer._id}">
                 Loading...
             </span>
@@ -385,99 +449,104 @@ function drawPanelView(printer, clientSettings) {
     `;
 }
 function drawCameraView(printer, clientSettings) {
-  const hidden = isHidden(printer, clientSettings);
-  const name = cleanName(printer.printerName);
-  const flip = isRotated(printer.otherSettings);
-  const { flipH, flipV, rotate90 } = flip;
-
-  let noCamera = "";
+  let hidden = isHidden(printer, clientSettings);
   if (printer.cameraURL === "") {
-    noCamera = "d-none";
+    hidden = "hidden";
   }
+  const name = cleanName(printer.printerName);
+  const printerRows = checkPrinterRows(clientSettings);
+  let cameraElement = imageOrCamera(printer);
 
   let toolList = "";
   let environment = "";
-  // if (printer.currentProfile !== null) {
-  //   for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-  //     toolList +=
-  //       '<div class="btn-group btn-block m-0" role="group" aria-label="Basic example">';
-  //     toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
-  //     toolList += "</div>";
-  //   }
-  //
-  //   if (printer.currentProfile.heatedBed) {
-  //     environment += `<small
-  //   class="mb-0 float-left"
-  //         ><b>Bed: </b><span id="bed-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span>
-  //         </small>`;
-  //   }
-  //   if (printer.currentProfile.heatedChamber) {
-  //     environment += `<small
-  //   class="mb-0 float-right"
-  //       ><b>Chamber: </b><span  id="chamber-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span>
-  //         </small>`;
-  //   }
-  // }
+  if (printer.currentProfile !== null) {
+    for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
+      toolList += `<span><b>Tool ${e} </b></span> | <span id="${printer._id}-spool-${e}"> No Spool </span> | <span id="${printer._id}-temperature-${e}" ><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>`;
+    }
+
+    if (printer.currentProfile.heatedBed) {
+      environment += `
+          <b>Bed: </b><span id="bed-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>
+`;
+    }
+    if (printer.currentProfile.heatedChamber) {
+      environment += `
+    class="mb-0"
+        <b>Chamber: </b><span id="chamber-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>
+ `;
+    }
+  }
+  console.log(environment);
   return `
   <div
       id="panel-${printer._id}"
-      class="col-md-4 col-lg-${clientSettings.panelView.printerRows} col-xl-${clientSettings.panelView.printerRows} ${hidden} ${noCamera}"
+      class="col-md-4 col-lg-${printerRows} col-xl-${printerRows} ${hidden}"
     >
       <div class="card text-center mb-0 mt-0 ml-0 mr-0">
         <div
           class="card-header dashHeader"
           id="camHeader-${printer._id}"
         >
-          <small
-            class="float-left"
-            id="name-${printer._id}"
-            ><button
+            <button
+              id="name-${printer._id}"
               type="button"
-              class="btn btn-secondary float-right btn-sm"
+              class="btn btn-secondary float-left"
               data-toggle="modal"
               data-target="#printerManagerModal"
               disabled
             >
                 ${name}
-            </button></small>
+            </button>
           <small id="printerActionBtns-${printer._id}" class="float-right">
           </small>
         </div>
         <div
-          class="card-body cameraContain text-truncate"
-          id="camBody-${printer._id}"
+          class="card-body cameraContain text-truncate noBlue"
+          id="cameraContain-${printer._id}"
         >
-          <div class="d-none index">${printer.sortIndex}</div>
           <div class="camName">
             <small
               class="mb-0 text-center"
               id="currentFile-${printer._id}"
             >
               <i class="fas fa-file-code"></i> Loading... 
-            </small>
+            </small><br>
           </div>
-          <div id="cameraContain">
-          <img
-            loading="lazy"
-            id="camera-${printer._id}"
-            width="100%"
-            style="transform: ${flipH} ${flipV} ${rotate90}"
-            src="${printer.cameraURL}"
-            style="pointer-events: none;"
-          />
+          
+          <div class="camExtra">
+            <div class=" row">
+
+              <div class="col-xl-6">
+                 <span
+                    class="mb-0 text-center"
+                    id="printTimeElapsed-${printer._id}"
+                  >
+
+                  </span>
+              </div>
+              <div class="col-xl-6">
+                          <span
+              class="mb-0 text-center"
+              id="remainingTime-${printer._id}"
+            >
+
+            </span>
+              </div>
+                          
+</div>
+          </div>
+          
+          
+          <div>
+                ${cameraElement}
             </div>
           <div class="camTemps">
             <small
               id="toolTemps-${printer._id}"
-              class="mb-0 float-left"
+              class="mb-0 text-center"
             >
              ${toolList}
-            </small>
-            <small
-              id="enviromentTemps-${printer._id}"
-              class="mb-0 float-right"
-            >
-           ${environment}
+             ${environment}
             </small>
           </div>
           <div class="progress camProgress">
@@ -646,7 +715,7 @@ function grabElements(printer) {
 async function updateState(printer, clientSettings, view) {
   //Grab elements on page
   const elements = grabElements(printer);
-  if (typeof elements.row === "undefined") return;
+  if (typeof elements.row === "undefined") return; //Doesn't exist can skip updating
   //Printer
   checkQuickConnectState(printer);
   elements.control.disabled =
@@ -666,47 +735,6 @@ async function updateState(printer, clientSettings, view) {
     elements.name,
     "innerHTML"
   );
-
-  if (elements.camera) {
-    if (
-      printer.otherSettings.webCamSettings !== null &&
-      printer.otherSettings.webCamSettings.webcamEnabled
-    ) {
-      if (
-        typeof printer.cameraURL !== "undefined" &&
-        printer.cameraURL !== null &&
-        printer.cameraURL !== ""
-      ) {
-        UI.doesElementNeedUpdating(printer.cameraURL, elements.camera, "src");
-      } else {
-        if (
-          typeof printer.currentJob !== "undefined" &&
-          printer.currentJob.thumbnail !== null
-        ) {
-          UI.doesElementNeedUpdating(
-            `${printer.printerURL}/${printer.currentJob.thumbnail}`,
-            elements.camera,
-            "src"
-          );
-        } else {
-          UI.doesElementNeedUpdating(``, elements.camera, "src");
-        }
-      }
-    } else {
-      if (
-        typeof printer.currentJob !== "undefined" &&
-        printer.currentJob.thumbnail !== null
-      ) {
-        UI.doesElementNeedUpdating(
-          `${printer.printerURL}/${printer.currentJob.thumbnail}`,
-          elements.camera,
-          "src"
-        );
-      } else {
-        UI.doesElementNeedUpdating(``, elements.camera, "src");
-      }
-    }
-  }
 
   switch (view) {
     case "list":
@@ -794,9 +822,7 @@ async function updateState(printer, clientSettings, view) {
       `;
       let remainingPrintTimeFormat = `
         <small title="Print Time Remaining">
-            <i class="fas fa-hourglass-end"></i> ${Calc.generateTime(
-              printer.currentJob.printTimeRemaining
-            )}
+            <i class="fas fa-hourglass-end"></i> ${Calc.generateTime(0)}
         </small>
         <br>
         <small title="Estimated Time of Arrival">
@@ -814,28 +840,64 @@ async function updateState(printer, clientSettings, view) {
         "innerHTML"
       );
     } else {
+      let printTimeElapsedFormat = `
+        <small title="Print Time Elapsed">
+            <i class="fas fa-hourglass-start"></i> No Active Print
+        </small>
+        <br>
+        <small title="Expected Print Time">
+            <i class="fas fa-hourglass"></i> No Active Print
+        </small>
+      `;
+      let remainingPrintTimeFormat = `
+        <small title="Print Time Remaining">
+            <i class="fas fa-hourglass-end"></i> No Active Print
+        </small>
+        <br>
+        <small title="Estimated Time of Arrival">
+        <i class="fas fa-calendar-alt"></i> No Active Print
+        </small>
+      `;
       UI.doesElementNeedUpdating(
-        "No Active Job",
+        printTimeElapsedFormat,
         elements.printTimeElapsed,
         "innerHTML"
       );
       UI.doesElementNeedUpdating(
-        "No Active Job",
+        remainingPrintTimeFormat,
         elements.remainingPrintTime,
         "innerHTML"
       );
     }
   } else {
+    let printTimeElapsedFormat = `
+        <small title="Print Time Elapsed">
+            <i class="fas fa-hourglass-start"></i> No Active Print
+        </small>
+        <br>
+        <small title="Expected Print Time">
+            <i class="fas fa-hourglass"></i> No Active Print
+        </small>
+      `;
+    let remainingPrintTimeFormat = `
+        <small title="Print Time Remaining">
+            <i class="fas fa-hourglass-end"></i> No Active Print
+        </small>
+        <br>
+        <small title="Estimated Time of Arrival">
+        <i class="fas fa-calendar-alt"></i> No Active Print
+        </small>
+      `;
     //No Job reset
     UI.doesElementNeedUpdating(0 + "%", elements.progress, "innerHTML");
     elements.progress.style.width = 0 + "%";
     UI.doesElementNeedUpdating(
-      "<span class='my-1'>No Active Job</span>",
+      printTimeElapsedFormat,
       elements.printTimeElapsed,
       "innerHTML"
     );
     UI.doesElementNeedUpdating(
-      "<span class='my-1'>No Active Job</span>",
+      remainingPrintTimeFormat,
       elements.remainingPrintTime,
       "innerHTML"
     );
@@ -843,71 +905,86 @@ async function updateState(printer, clientSettings, view) {
     elements.currentFile.innerHTML =
       '<i class="fas fa-file-code"></i> ' + "No File Selected";
   }
-  if (printer.tools !== null) {
-    const toolKeys = Object.keys(printer.tools[0]);
-    for (let t = 0; t < toolKeys.length; t++) {
-      if (toolKeys[t].includes("tool")) {
-        const toolNumber = toolKeys[t].replace("tool", "");
-        if (
-          document.getElementById(printer._id + "-temperature-" + toolNumber)
-        ) {
-          checkTemps(
-            document.getElementById(printer._id + "-temperature-" + toolNumber),
-            printer.tools[0][toolKeys[t]].actual,
-            printer.tools[0][toolKeys[t]].target,
-            printer.otherSettings.temperatureTriggers,
-            printer.printerState.colour.category
-          );
-        } else {
-          checkTemps(
-            document.getElementById(printer._id + "-temperature-" + toolNumber),
-            0,
-            0,
-            printer.otherSettings.temperatureTriggers,
-            printer.printerState.colour.category
-          );
-        }
-      } else if (toolKeys[t].includes("bed")) {
-        if (elements.bed) {
-          checkTemps(
-            elements.bed,
-            printer.tools[0][toolKeys[t]].actual,
-            printer.tools[0][toolKeys[t]].target,
-            printer.otherSettings.temperatureTriggers,
-            printer.printerState.colour.category
-          );
-        }
-      } else if (toolKeys[t].includes("chamber")) {
-        if (elements.chamber) {
-          checkTemps(
-            elements.chamber,
-            printer.tools[0][toolKeys[t]].actual,
-            printer.tools[0][toolKeys[t]].target,
-            printer.otherSettings.temperatureTriggers,
-            printer.printerState.colour.category
-          );
+
+  switch (view) {
+    case "list":
+    case "panel":
+      if (printer.tools !== null) {
+        const toolKeys = Object.keys(printer.tools[0]);
+        for (let t = 0; t < toolKeys.length; t++) {
+          if (toolKeys[t].includes("tool")) {
+            const toolNumber = toolKeys[t].replace("tool", "");
+            if (
+              document.getElementById(
+                printer._id + "-temperature-" + toolNumber
+              )
+            ) {
+              checkTemps(
+                document.getElementById(
+                  printer._id + "-temperature-" + toolNumber
+                ),
+                printer.tools[0][toolKeys[t]].actual,
+                printer.tools[0][toolKeys[t]].target,
+                printer.otherSettings.temperatureTriggers,
+                printer.printerState.colour.category
+              );
+            } else {
+              checkTemps(
+                document.getElementById(
+                  printer._id + "-temperature-" + toolNumber
+                ),
+                0,
+                0,
+                printer.otherSettings.temperatureTriggers,
+                printer.printerState.colour.category
+              );
+            }
+          } else if (toolKeys[t].includes("bed")) {
+            if (elements.bed) {
+              checkTemps(
+                elements.bed,
+                printer.tools[0][toolKeys[t]].actual,
+                printer.tools[0][toolKeys[t]].target,
+                printer.otherSettings.temperatureTriggers,
+                printer.printerState.colour.category
+              );
+            }
+          } else if (toolKeys[t].includes("chamber")) {
+            if (elements.chamber) {
+              checkTemps(
+                elements.chamber,
+                printer.tools[0][toolKeys[t]].actual,
+                printer.tools[0][toolKeys[t]].target,
+                printer.otherSettings.temperatureTriggers,
+                printer.printerState.colour.category
+              );
+            }
+          }
         }
       }
-    }
-  }
-  if (Array.isArray(printer.selectedFilament)) {
-    const spoolList = "";
-    for (let i = 0; i < printer.selectedFilament.length; i++) {
-      const tool = document.getElementById(`${printer._id}-spool-${i}`);
-      if (printer.selectedFilament[i] !== null) {
-        const filamentManager = await checkFilamentManager();
-        if (filamentManager) {
-          tool.innerHTML = `${printer.selectedFilament[i].spools.material}`;
-        } else {
-          tool.innerHTML = `${printer.selectedFilament[i].spools.material}`;
+      if (Array.isArray(printer.selectedFilament)) {
+        const spoolList = "";
+        for (let i = 0; i < printer.selectedFilament.length; i++) {
+          const tool = document.getElementById(`${printer._id}-spool-${i}`);
+          if (printer.selectedFilament[i] !== null) {
+            const filamentManager = await checkFilamentManager();
+            if (filamentManager) {
+              tool.innerHTML = `${printer.selectedFilament[i].spools.material}`;
+            } else {
+              tool.innerHTML = `${printer.selectedFilament[i].spools.material}`;
+            }
+          } else {
+            tool.innerHTML = "No Spool";
+          }
         }
       } else {
         tool.innerHTML = "No Spool";
       }
-    }
-  } else {
-    tool.innerHTML = "No Spool";
+      break;
+    case "camera":
+      break;
   }
+
   let hideClosed = "";
   let hideOffline = "";
 
@@ -1141,13 +1218,14 @@ async function updateState(printer, clientSettings, view) {
 }
 
 async function init(printers, clientSettings, view) {
+  //Check if printer manager modal is opened
   switch (printerManagerModal.classList.contains("show")) {
     case true:
-      // code block
+      // Run printer manager updater
       PrinterManager.init("", printers, printerControlList);
       break;
     case false:
-      // code block
+      // initialise or start the information updating..
       for (let p = 0; p < printers.length; p++) {
         let printerPanel = document.getElementById("panel-" + printers[p]._id);
         if (!printerPanel) {
@@ -1166,14 +1244,12 @@ async function init(printers, clientSettings, view) {
             );
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else if (view === "camera") {
-            if (printers[p].cameraURL !== "") {
-              let printerHTML = await drawCameraView(
-                printers[p],
-                clientSettings,
-                view
-              );
-              printerArea.insertAdjacentHTML("beforeend", printerHTML);
-            }
+            let printerHTML = await drawCameraView(
+              printers[p],
+              clientSettings,
+              view
+            );
+            printerArea.insertAdjacentHTML("beforeend", printerHTML);
           }
           //Update the printer panel to the actual one
           printerPanel = document.getElementById("panel-" + printers[p]._id);

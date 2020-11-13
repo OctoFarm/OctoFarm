@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
         -   Install, Uninstall, Enable, Disable a bulk set of plugins on a bulk set of printers.
     - PSU Control settings are now grabbed from OctoPrint if they don't already exist in OctoFarm. To edit these going forware you will need to edit inside of OctoFarm as it won't pick up any changes made on OctoPrint after the initial scan.
     - OctoFarm now detects the OctoPi verion and Pi model you are using and displays this information in the "Printer Manager" section.
+    - OctoFarm now checks for OctoPrint/Plugin updates on a initial scan and re-scan. 
     
 ### Changed
     - Added additional CSS classes to buttons for theming. Applies to actions buttons only, status colours the same. 
@@ -36,7 +37,7 @@ All notable changes to this project will be documented in this file.
     - Export printer json now in human readable format
     - History now captures printer ID. Any matches going forward will attempt the ID match and then fallback to name as before.
     - Printer scanning client display greatly improved. Now displays updated host state whilst stuff is going on in the background on the server.
-    - Combined the Views settings into one tab. All views react now to the same settings for displaying Current Operations, Offline/Disconnected Printer and Extra Information. Note: More customise options coming in a later version.
+    - Combined the Views settings into one tab. All views react now to the same settings for displaying Current Operations, Offline/Disconnected Printer. Note: More customise options coming in a later version.
     - Updated Printer Manager functions: 
         - Delete, now brings a selection box with printer status.
         - Edit, Brings a inline edit box up. Will only update changed printers as before.
@@ -50,6 +51,9 @@ All notable changes to this project will be documented in this file.
     - Changed server check poll rate to 2.5 seconds.   
     - pm2 logs are now flushed before starting application, now only captures errors as my logs cover the rest.
     - File Manager link no longer hidden on mobile views.
+    - Changed the time displays for all views, now follows unified format. Applied currently on Panel/List/Camera. 
+    - Camera view now hides print information (times / tools) until hovering over. 
+    
 
 ### Fixed
     - Fixed issue with File Manager not loading if printer in index 0 was offline.
@@ -68,6 +72,7 @@ All notable changes to this project will be documented in this file.
     - Fixed multiple client connections causing doubling of data sent to client.
     - Fixed bubbling caused by user navigating away from client screen. Client now checks if screen is active, closes the server connection if not.
     - Fixed Re-Sync notification only appearing after actioned.. now persists whilst farm re-sync is going on.
+    - Various client issues, full re-factor or Panel/List/Camera. Should be snappier!
 
 ## Removed
     - Removed the annoying content editable fields on "Printer Settings" and "Printer Management" and replaced with standard input boxes. 

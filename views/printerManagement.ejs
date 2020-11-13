@@ -304,9 +304,6 @@
                         <i class="fas fa-trash"></i>
                     </button>
                 </th>
-                <th scope="col" class="table-dark d-none" id="octoPiVersions">
-                    OctoPi Version
-                </th>
             </tr>
             </thead>
             <tbody id="printerNewList" style="height:100%; overflow-y:auto;">
@@ -319,15 +316,18 @@
         <table id="printerTable" class="table table-dark table-striped text-center">
             <thead>
             <tr>
-                <th scope="col" class=" sticky-table table-dark" style="width:50px;">Sort Index</th>
+                <th scope="col" class=" sticky-table table-dark" style="min-width:50px;">Sort Index</th>
                 <th class=" sticky-table table-dark text-wrap">Name</th>
-                <th scope="col" class=" sticky-table table-dark" style="width:300px;">Actions</th>
-                <th scope="col" class=" sticky-table table-dark" style="width:200px;">Manage</th>
-                <th scope="col" class=" sticky-table table-dark" style="width:50px;">Host State</th>
-                <th scope="col" class=" sticky-table table-dark" style="width:150px;">Printer State</th>
-                <th scope="col"  class=" sticky-table table-dark" style="width:10px;">WebSocket</th>
-                <th scope="col" class=" sticky-table table-dark">Group</th>
-                <th scope="col" class=" sticky-table table-dark">OctoPrint Version</th>
+                <th scope="col" class=" sticky-table table-dark" style="min-width:300px;">Actions</th>
+                <th scope="col" class=" sticky-table table-dark" style="min-width:200px;">Manage</th>
+                <th scope="col" class=" sticky-table table-dark" style="min-width:50px;">Host State</th>
+                <th scope="col" class=" sticky-table table-dark" style="min-width:150px;">Printer State</th>
+                <th scope="col"  class=" sticky-table table-dark" style="min-width:10px;">WebSocket</th>
+                <th scope="col" class=" sticky-table table-dark" style="min-width:25px;">Group</th>
+                <th scope="col" class=" sticky-table table-dark" style="min-width:100px;">OctoPrint Version</th>
+                <th scope="col" class="table-dark d-none" id="octoPiVersions" style="min-width:100px;">
+                    OctoPi Version
+                </th>
             </tr>
             </thead>
             <tbody id="printerList" style="height:100%; overflow-y:auto;">

@@ -2375,29 +2375,25 @@ class Runner {
             "Active",
             farmPrinters[index]._id
           );
-          return ClientAPI.getRetry(
+          let piSupport = await ClientAPI.getRetry(
             farmPrinters[index].printerURL,
             farmPrinters[index].apikey,
             "api/plugin/pi_support"
-          )
-            .then((res) => {
-              return res.json();
-            })
-            .then(async (res) => {
-              logger.info("Got from endpoint: ", res);
-              farmPrinters[index].octoPi = {
-                model: res.model,
-                version: res.octopi_version,
-              };
-              logger.info("I captured: ", farmPrinters[index].octoPi);
-              PrinterTicker.addIssue(
-                new Date(),
-                farmPrinters[index].printerURL,
-                "Sucessfully grabbed OctoPi information...",
-                "Complete",
-                farmPrinters[index]._id
-              );
-            });
+          );
+          piSupport = await piSupport.json();
+          logger.info("Got from endpoint: ", piSupport);
+          farmPrinters[index].octoPi = {
+            model: piSupport.model,
+            version: piSupport.octopi_version,
+          };
+          logger.info("I captured: ", farmPrinters[index].octoPi);
+          PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            "Sucessfully grabbed OctoPi information...",
+            "Complete",
+            farmPrinters[index]._id
+          );
         }
         if (res.plugins["costestimation"]) {
           if (

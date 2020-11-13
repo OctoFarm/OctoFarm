@@ -1599,10 +1599,12 @@ class dashUpdate {
           let octoVersion = printer.octoPrintVersion;
           if (typeof printer.updateAvailable !== "undefined") {
             if (printer.updateAvailable.octoPrintUpdate) {
-              octoVersion += "<br><button>Update Available!</button>";
+              octoVersion +=
+                "<br><button class='btn btn-warning btn-small btn-block'>Update Available!</button>";
             }
             if (printer.updateAvailable.pluginUpdates.length > 0) {
-              octoVersion += "<br><button>Plugin Update Available!</button>";
+              octoVersion +=
+                "<br><button class='btn btn-warning btn-small btn-block'>Plugin Update Available!</button>";
             }
           }
 
