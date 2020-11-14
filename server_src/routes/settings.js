@@ -123,7 +123,7 @@ router.post("/client/update", ensureAuthenticated, (req, res) => {
     checked[0].save().then(() => {
       SettingsClean.start();
     });
-
+    console.log("HELLO");
     res.send({ msg: "Settings Saved" });
   });
 });
@@ -151,6 +151,7 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
     checked[0].server = req.body.server;
     checked[0].timeout = req.body.timeout;
     checked[0].filament = req.body.filament;
+    checked[0].history = req.body.history;
     await checked[0].save().then(() => {
       SettingsClean.start();
     });

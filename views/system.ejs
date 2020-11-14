@@ -604,8 +604,9 @@
                                     <div class="row">
                                         <div class="col-12 col-sm-12 col-md-4 col-lg-2 col-xl-2">
                                             <div class="list-group" id="list-tab" role="tablist">
-                                                <a class="list-group-item list-group-item-action active" id="server-settings-list" data-toggle="list" href="#server-settings" role="tab" aria-controls="panelview"><i class="fas fa-cogs"></i> Settings</a>
+                                                <a class="list-group-item list-group-item-action active" id="server-settings-list" data-toggle="list" href="#server-settings" role="tab" aria-controls="panelview"><i class="fas fa-cogs"></i> System</a>
                                                 <a class="list-group-item list-group-item-action" id="server-timeout-list" data-toggle="list" href="#server-timeout" role="tab" aria-controls="listview"><i class="fas fa-stopwatch"></i> Timeout</a>
+                                                <a class="list-group-item list-group-item-action" id="server-history-list" data-toggle="list" href="#server-history" role="tab" aria-controls="listview"><i class="fas fa-history"></i> History</a>
                                                 <a class="list-group-item list-group-item-action" id="server-filament-list" data-toggle="list" href="#server-filament" role="tab" aria-controls="listview"><i class="fas fa-toilet-paper"></i> Filament Manager</a>
                                                 <button type="button" class="btn btn-success btn-block mt-1 bg-colour-2" id="saveServerSettings" data-dismiss="modal">Save</button>
                                             </div>
@@ -781,6 +782,62 @@
                                                             <% }else{ %>
                                                                 <center><br><button id="filamentManagerSyncBtn" type="button" class="btn btn-warning mb-1 btn-lg"><i class="fas fa-sync"></i><br> Sync Filament Manager</button><br></center>
                                                             <% } %>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="server-history" role="tabpanel" aria-labelledby="server-history-list">
+                                                    <h5>History Settings</h5>
+                                                    <hr>
+                                                    <div class="alert alert-info" role="alert">
+                                                        OctoFarm has the ability to save a snapshot/thumbnail into History. These options are turned on by default as it will check if the thumbnail/camera url exist before actually saving.
+                                                    </div>
+                                                    <div class="alert alert-warning" role="alert">
+                                                        If your running on Docker, make sure to mount "/app/images" otherwise these will not persist reboots/upgrades.
+                                                    </div>
+                                                    <div id="filamentManagerSetup" class="row">
+                                                        <div class="col-lg-6">
+                                                            <h6>Printer snapshot capture</h6>
+                                                            <div class="alert alert-warning" role="alert">
+                                                                Requires an active camera URL.
+                                                            </div>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="snapOnComplete" required>
+                                                                    <label class="custom-control-label" for="snapOnComplete">On Complete</label>
+                                                                    <div class="valid-feedback">On Complete snapshot turned on</div>
+                                                                    <div class="invalid-feedback">On Complete snapshot turned off</div>
+                                                                </div>
+                                                            </form>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="snapOnFailure" required>
+                                                                    <label class="custom-control-label" for="snapOnFailure">On Failure</label>
+                                                                    <div class="valid-feedback">On Failure snapshot turned on</div>
+                                                                    <div class="invalid-feedback">On Failure snapshot turned off</div>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                        <div class="col-lg-6">
+                                                            <h6>Prusa/Cura slicer thumbnail capture</h6>
+                                                            <div class="alert alert-warning" role="alert">
+                                                                Requires either the Prusa / Cura thumbnail plugins to be installed.
+                                                            </div>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="thumbOnComplete" required>
+                                                                    <label class="custom-control-label" for="thumbOnComplete">On Complete</label>
+                                                                    <div class="valid-feedback">On Complete snapshot turned on</div>
+                                                                    <div class="invalid-feedback">On Complete snapshot turned off</div>
+                                                                </div>
+                                                            </form>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="thumbOnFailure" required>
+                                                                    <label class="custom-control-label" for="thumbOnFailure">On Failure</label>
+                                                                    <div class="valid-feedback">On Failure snapshot turned on</div>
+                                                                    <div class="invalid-feedback">On Failure snapshot turned off</div>
+                                                                </div>
+                                                            </form>
                                                         </div>
                                                     </div>
                                                 </div>

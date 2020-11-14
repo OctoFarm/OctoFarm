@@ -71,7 +71,7 @@ class HistoryCollection {
     return returnSpools;
   }
 
-  static async grabThumbnail(url, thumbnail) {
+  static async grabThumbnail(url, thumbnail, id) {
     const download = (url, path, callback) => {
       request.head(url, (err, res, body) => {
         request(url).pipe(fs.createWriteStream(path)).on("close", callback);
@@ -81,7 +81,7 @@ class HistoryCollection {
     const result = thumbParts[thumbParts.length - 1];
     const splitAgain = result.split("?");
 
-    const path = `./images/historyCollection/thumbs/${splitAgain[0]}`;
+    const path = `./images/historyCollection/thumbs/${id}-${splitAgain[0]}`;
     if (!fs.existsSync(`./images/historyCollection`)) {
       fs.mkdirSync(`./images/historyCollection`);
     }
@@ -90,10 +90,10 @@ class HistoryCollection {
     }
     await download(url, path, () => {
       logger.info("Downloaded: ", url);
-      logger.info("Saved as: ", splitAgain[0]);
+      logger.info(`images/historyCollection/thumbs/${id}-${splitAgain[0]}`);
     });
 
-    return `images/historyCollection/thumbs/${splitAgain[0]}`;
+    return `images/historyCollection/thumbs/${id}-${splitAgain[0]}`;
   }
   static async snapPictureOfPrinter(url, id, fileDisplay) {
     if (!fs.existsSync(`./images/historyCollection`)) {
@@ -109,7 +109,78 @@ class HistoryCollection {
       frame
     );
     logger.info("Downloaded: ", url);
-    logger.info("Saved as: ", `${id}-${fileDisplay}.jpg`);
+    logger.info(
+      "Saved as: ",
+      `images/historyCollection/snapshots/${id}-${fileDisplay}.jpg`
+    );
+    return `images/historyCollection/snapshots/${id}-${fileDisplay}.jpg`;
+  }
+
+  static async thumbnailCheck(
+    payload,
+    serverSettings,
+    files,
+    id,
+    event,
+    printer
+  ) {
+    let runCapture = async () => {
+      // grab Thumbnail if available.
+      const currentFileIndex = _.findIndex(files, function (o) {
+        return o.name === payload.name;
+      });
+      let base64Thumbnail = null;
+      if (currentFileIndex > -1) {
+        if (
+          typeof files[currentFileIndex] !== "undefined" &&
+          files[currentFileIndex].thumbnail != null
+        ) {
+          base64Thumbnail = await HistoryCollection.grabThumbnail(
+            `${printer.printerURL}/${files[currentFileIndex].thumbnail}`,
+            files[currentFileIndex].thumbnail,
+            id
+          );
+        }
+      }
+      return base64Thumbnail;
+    };
+
+    if (typeof serverSettings.history === "undefined") {
+      //Use default settings, so always capture...
+      return await runCapture();
+    } else {
+      if (serverSettings.history.thumbnails[event]) {
+        return await runCapture();
+      } else {
+        return null;
+      }
+    }
+  }
+  static async snapshotCheck(
+    event,
+    serverSettings,
+    printer,
+    saveHistory,
+    payload
+  ) {
+    if (typeof serverSettings.history === "undefined") {
+      //Use default settings, so always capture...
+      return await HistoryCollection.snapPictureOfPrinter(
+        printer.camURL,
+        saveHistory._id,
+        payload.name
+      );
+    } else {
+      if (serverSettings.history.snapshot[event]) {
+        return await HistoryCollection.snapPictureOfPrinter(
+          printer.camURL,
+          saveHistory._id,
+          payload.name
+        );
+      } else {
+        return null;
+      }
+    }
   }
 
   static async complete(payload, printer, job, files) {
@@ -194,22 +265,6 @@ class HistoryCollection {
           historyCollection[historyCollection.length - 1].printHistory
             .historyIndex + 1;
       }
-      // grab Thumbnail if available.
-      const currentFileIndex = _.findIndex(files, function (o) {
-        return o.name == payload.name;
-      });
-      let base64Thumbnail = null;
-      if (currentFileIndex > -1) {
-        if (
-          typeof files[currentFileIndex] !== "undefined" &&
-          files[currentFileIndex].thumbnail != null
-        ) {
-          base64Thumbnail = await HistoryCollection.grabThumbnail(
-            `${printer.printerURL}/${files[currentFileIndex].thumbnail}`,
-            files[currentFileIndex].thumbnail
-          );
-        }
-      }
 
       const printHistory = {
         historyIndex: counter,
@@ -223,7 +278,7 @@ class HistoryCollection {
         filePath: payload.path,
         startDate,
         endDate,
-        thumbnail: base64Thumbnail,
+        thumbnail: "",
         printTime: Math.round(payload.time),
         filamentSelection: printer.selectedFilament,
         previousFilamentSelection: previousFilament,
@@ -237,16 +292,31 @@ class HistoryCollection {
       });
       await saveHistory.save().then(async (r) => {
         if (printer.camURL !== "") {
-          HistoryClean.start();
-          await HistoryCollection.snapPictureOfPrinter(
-            printer.camURL,
+          const thumbnail = await HistoryCollection.thumbnailCheck(
+            payload,
+            serverSettings[0],
+            files,
             saveHistory._id,
-            payload.name
+            "onFailure",
+            printer
+          );
+          const snapshot = await HistoryCollection.snapshotCheck(
+            "onFailure",
+            serverSettings[0],
+            printer,
+            saveHistory,
+            payload
           );
 
-          saveHistory.printHistory.snapshot = `images/historyCollection/snapshots/${saveHistory._id}-${payload.name}.jpg`;
-          saveHistory.markModified("printHistory.snapshot");
+          saveHistory.printHistory.thumbnail = thumbnail;
+          saveHistory.printHistory.snapshot = snapshot;
+          saveHistory.markModified("printHistory");
           saveHistory.save();
+
+          HistoryClean.start();
+          setTimeout(function () {
+            HistoryClean.start();
+          }, 5000);
         }
       });
 
@@ -338,22 +408,6 @@ class HistoryCollection {
           historyCollection[historyCollection.length - 1].printHistory
             .historyIndex + 1;
       }
-      // grab Thumbnail if available.
-      const currentFileIndex = _.findIndex(files, function (o) {
-        return o.name == payload.name;
-      });
-      let base64Thumbnail = null;
-      if (currentFileIndex > -1) {
-        if (
-          typeof files[currentFileIndex] !== "undefined" &&
-          files[currentFileIndex].thumbnail != null
-        ) {
-          base64Thumbnail = await HistoryCollection.grabThumbnail(
-            `${printer.printerURL}/${files[currentFileIndex].thumbnail}`,
-            files[currentFileIndex].thumbnail
-          );
-        }
-      }
 
       const printHistory = {
         historyIndex: counter,
@@ -367,7 +421,7 @@ class HistoryCollection {
         filePath: payload.path,
         startDate,
         endDate,
-        thumbnail: base64Thumbnail,
+        thumbnail: "",
         printTime: Math.round(payload.time),
         filamentSelection: printer.selectedFilament,
         previousFilamentSelection: previousFilament,
@@ -380,16 +434,31 @@ class HistoryCollection {
       });
       await saveHistory.save().then(async (r) => {
         if (printer.camURL !== "") {
-          HistoryClean.start();
-          await HistoryCollection.snapPictureOfPrinter(
-            printer.camURL,
+          const thumbnail = await HistoryCollection.thumbnailCheck(
+            payload,
+            serverSettings[0],
+            files,
             saveHistory._id,
-            payload.name
+            "onFailure",
+            printer
+          );
+          const snapshot = await HistoryCollection.snapshotCheck(
+            "onFailure",
+            serverSettings[0],
+            printer,
+            saveHistory,
+            payload
           );
 
-          saveHistory.printHistory.snapshot = `images/historyCollection/snapshots/${saveHistory._id}-${payload.name}.jpg`;
-          saveHistory.markModified("printHistory.snapshot");
+          saveHistory.printHistory.thumbnail = thumbnail;
+          saveHistory.printHistory.snapshot = snapshot;
+          saveHistory.markModified("printHistory");
           saveHistory.save();
+
+          HistoryClean.start();
+          setTimeout(function () {
+            HistoryClean.start();
+          }, 5000);
         }
       });
 
@@ -442,23 +511,6 @@ class HistoryCollection {
         errorCounter =
           errorCollection[errorCollection.length - 1].errorLog.historyIndex + 1;
       }
-      // grab Thumbnail if available.
-      // grab Thumbnail if available.
-      const currentFileIndex = _.findIndex(files, function (o) {
-        return o.name == payload.name;
-      });
-      let base64Thumbnail = null;
-      if (currentFileIndex > -1) {
-        if (
-          typeof files[currentFileIndex] !== "undefined" &&
-          files[currentFileIndex].thumbnail != null
-        ) {
-          base64Thumbnail = await HistoryCollection.grabThumbnail(
-            `${printer.printerURL}/${files[currentFileIndex].thumbnail}`,
-            files[currentFileIndex].thumbnail
-          );
-        }
-      }
       const errorLog = {
         historyIndex: errorCounter,
         printerIndex: printer.index,
@@ -469,29 +521,15 @@ class HistoryCollection {
         reason: payload.error,
         startDate,
         endDate,
-        thumbnail: base64Thumbnail,
         printTime: Math.round(payload.time),
         job: job,
         notes: "",
-        snapshot: "",
       };
       const saveError = new ErrorLog({
         errorLog,
       });
-      await saveError.save().then(async (r) => {
-        if (printer.camURL !== "") {
-          HistoryClean.start();
-          await HistoryCollection.snapPictureOfPrinter(
-            printer.camURL,
-            saveError._id,
-            payload.name
-          );
-
-          saveError.printHistory.snapshot = `images/historyCollection/snapshots/${saveError._id}-${payload.name}.jpg`;
-          saveError.markModified("printHistory.snapshot");
-          saveError.save();
-        }
-      });
+      await saveError.save();
+      HistoryClean.start();
       logger.info("Error captured ", payload + printer.printerURL);
     } catch (e) {
       logger.error(e, `Failed to capture ErrorLog for ${printer.printerURL}`);

@@ -531,6 +531,21 @@ class ServerSettings {
             post = await post.json();
           });
         }
+        if (typeof res.history !== "undefined") {
+          document.getElementById("thumbOnComplete").checked =
+            res.history.thumbnails.onComplete;
+          document.getElementById("thumbOnFailure").checked =
+            res.history.thumbnails.onFailure;
+          document.getElementById("snapOnComplete").checked =
+            res.history.snapshot.onComplete;
+          document.getElementById("snapOnFailure").checked =
+            res.history.snapshot.onFailure;
+        } else {
+          document.getElementById("thumbOnComplete").checked = true;
+          document.getElementById("thumbOnFailure").checked = true;
+          document.getElementById("snapOnComplete").checked = true;
+          document.getElementById("snapOnFailure").checked = true;
+        }
       });
     let logList = await Client.get("settings/server/get/logs");
     logList = await logList.json();
@@ -580,6 +595,16 @@ class ServerSettings {
     const filament = {
       filamentCheck: document.getElementById("checkFilament").checked,
     };
+    const history = {
+      snapshot: {
+        onComplete: document.getElementById("snapOnComplete").checked,
+        onFailure: document.getElementById("snapOnFailure").checked,
+      },
+      thumbnails: {
+        onComplete: document.getElementById("thumbOnComplete").checked,
+        onFailure: document.getElementById("thumbOnFailure").checked,
+      },
+    };
     if (
       oldServerSettings.server.port !== server.port ||
       oldServerSettings.server.loginRequired !== server.loginRequired ||
@@ -596,11 +621,18 @@ class ServerSettings {
       server,
       timeout,
       filament,
+      history,
     })
       .then((res) => {
         return res.json();
       })
       .then((res) => {
+        UI.createAlert(
+          "success",
+          "Server settings have successfully been saved!",
+          3000,
+          "Clicked"
+        );
         if (reboot) {
           bootbox.confirm({
             message:

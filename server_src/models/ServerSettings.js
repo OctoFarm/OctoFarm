@@ -3,24 +3,28 @@ const mongoose = require("mongoose");
 const ServerSettingsSchema = new mongoose.Schema({
   onlinePolling: {
     type: Object,
-    required: true
+    required: true,
   },
   server: {
     type: Object,
-    required: false
+    required: false,
   },
   timeout: {
     type: Object,
-    required: false
+    required: false,
   },
   filamentManager: {
     type: Boolean,
-    required: false
+    required: false,
   },
   filament: {
     type: Object,
-    required: false
-  }
+    required: false,
+  },
+  history: {
+    type: Object,
+    required: false,
+  },
 });
 
 const ServerSettings = mongoose.model("ServerSettings", ServerSettingsSchema);
