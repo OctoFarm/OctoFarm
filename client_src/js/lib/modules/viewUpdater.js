@@ -488,9 +488,9 @@ function drawCameraView(printer, clientSettings) {
       id="panel-${printer._id}"
       class="col-md-4 col-lg-${printerRows} col-xl-${printerRows} ${hidden}"
     >
-      <div class="card bg-transparent text-center mb-0 mt-0 ml-0 mr-0">
+      <div class="card text-center mb-0 mt-0 ml-0 mr-0">
         <div
-          class="card-header dashHeader bg-transparent"
+          class="card-header dashHeader"
           id="camHeader-${printer._id}"
         >
             <button
@@ -1011,6 +1011,9 @@ async function updateState(printer, clientSettings, view) {
     //Set the buttons
     if (elements.start) {
       elements.start.disabled = true;
+      if (view === "camera") {
+        elements.start.classList.add("hidden");
+      }
     }
     if (elements.stop) {
       elements.stop.disabled = false;
