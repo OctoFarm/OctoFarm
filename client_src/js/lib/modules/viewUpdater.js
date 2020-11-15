@@ -772,7 +772,7 @@ async function updateState(printer, clientSettings, view) {
   );
   if (typeof printer.currentJob !== "undefined") {
     UI.doesElementNeedUpdating(
-      printer.currentJob.progress + "%",
+      printer.currentJob.progress.toFixed(0) + "%",
       elements.progress,
       "innerHTML"
     );
@@ -1059,7 +1059,7 @@ async function updateState(printer, clientSettings, view) {
       }
     } else {
       if (elements.start) {
-        if (view === "panel") {
+        if (view === "panel" && view === "camera") {
           elements.start.classList.remove("hidden");
         }
       }
