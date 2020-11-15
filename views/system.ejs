@@ -20,8 +20,15 @@
                 <div class="card-body p-0">
                     <div class="row">
                         <div class="col-12">
+                            <% if(typeof systemInformation.warnings.status !== 'undefined'){ %>
+                                    <div class="alert alert-<%= systemInformation.warnings.status %>" role="alert">
+                                        <%= systemInformation.warnings.message %>
+                                    </div>
+                                <% } %>
+
                             <div class="row">
                                 <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 text-center">
+
                                     <p class=""><i class="fas fa-hourglass-half"></i> System Uptime: <br><span  class="text-light" id="systemUptime" style="font-size:0.8rem;">
                                             <%= helpers.generateTime(systemInformation.sysUptime.uptime) %>
                                         </span>
@@ -39,16 +46,23 @@
 
                                         </p>
                                     <div class="row">
-                                        <div class="col-6">
+                                        <div class="col-4">
                                             <p class=""><i class="fas fa-microchip"></i> CPU: <br><span  class="text-light" id="systemArch" style="font-size:0.8rem;"></span>
                                                 <% systemInformation.cpuInfo.speed.cores.forEach((core, index) => {%>
                                                     <small  class="text-light" >  <%= index %>:</small> <code><%= core %>Ghz</code>
                                                 <% }) %>
                                             </p>
                                         </div>
-                                        <div class="col-6">
+                                        <div class="col-4">
                                             <p class=""><i class="fas fa-memory"></i> Memory: <br><span  class="text-light" id="systemArch" style="font-size:0.8rem;">
                                                                <%= helpers.generateBytes(systemInformation.memoryInfo.total) %>
+                                        </span>
+
+                                            </p>
+                                        </div>
+                                        <div class="col-4">
+                                            <p class=""><i class="fas fa-hdd"></i> Main Disk:  <b><%= systemInformation.systemDisk.mount %></b><br><span  class="text-light" id="systemHardDrive" style="font-size:0.8rem;">
+                                                              <%= helpers.generateBytes(systemInformation.systemDisk.used) %>  /  <%= helpers.generateBytes(systemInformation.systemDisk.size) %> |  <%= systemInformation.systemDisk.use.toFixed(2) %>%
                                         </span>
 
                                             </p>
@@ -795,7 +809,7 @@
                                                         If your running on Docker, make sure to mount "/app/images" otherwise these will not persist reboots/upgrades.
                                                     </div>
                                                     <div id="filamentManagerSetup" class="row">
-                                                        <div class="col-lg-6">
+                                                        <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                                                             <h6>Printer snapshot capture</h6>
                                                             <div class="alert alert-warning" role="alert">
                                                                 Requires an active camera URL.
@@ -817,7 +831,7 @@
                                                                 </div>
                                                             </form>
                                                         </div>
-                                                        <div class="col-lg-6">
+                                                        <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                                                             <h6>Prusa/Cura slicer thumbnail capture</h6>
                                                             <div class="alert alert-warning" role="alert">
                                                                 Requires either the Prusa / Cura thumbnail plugins to be installed.
@@ -836,6 +850,39 @@
                                                                     <label class="custom-control-label" for="thumbOnFailure">On Failure</label>
                                                                     <div class="valid-feedback">On Failure snapshot turned on</div>
                                                                     <div class="invalid-feedback">On Failure snapshot turned off</div>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                        <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
+                                                            <h6>Timelapse Capture</h6>
+                                                            <div class="alert alert-warning" role="alert">
+                                                                Timelapse must be turned on in OctoPrint for this to work, then activated below. It is not turned on by default and does not react to your OctoPrint setting.
+                                                            </div>
+                                                            <div class="alert alert-danger" role="alert">
+                                                                This only works with the ".mp4" format for video types. OctoPrint defaults to ".mpg". You can update this under "Advanced Settings" in your OctoPrint instances "Webcam & Timelapse" setting. Change the setting to "libx264".
+                                                            </div>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="timelapseOnComplete" required>
+                                                                    <label class="custom-control-label" for="timelapseOnComplete">On Completion</label>
+                                                                    <div class="valid-feedback">On Complete timelapse will be downloaded to OctoPrint</div>
+                                                                    <div class="invalid-feedback">On Complete timelapse is ignored</div>
+                                                                </div>
+                                                            </form>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="timelapseOnFailure" required>
+                                                                    <label class="custom-control-label" for="timelapseOnFailure">On Failure</label>
+                                                                    <div class="valid-feedback">On Failure timelapse will be downloaded to OctoPrint</div>
+                                                                    <div class="invalid-feedback">On Failure timelapse is ignored</div>
+                                                                </div>
+                                                            </form>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="timelapseDelete" required>
+                                                                    <label class="custom-control-label" for="timelapseDelete">Delete from OctoPrint</label>
+                                                                    <div class="valid-feedback">Timelapses will be deleted once captured</div>
+                                                                    <div class="invalid-feedback">Timelapses are not removed from OctoPrints storage</div>
                                                                 </div>
                                                             </form>
                                                         </div>

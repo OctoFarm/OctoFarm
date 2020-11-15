@@ -540,6 +540,14 @@ class ServerSettings {
             res.history.snapshot.onComplete;
           document.getElementById("snapOnFailure").checked =
             res.history.snapshot.onFailure;
+          if (typeof res.history.timelapse !== "undefined") {
+            document.getElementById("timelapseOnComplete").checked =
+              res.history.timelapse.onComplete;
+            document.getElementById("timelapseOnFailure").checked =
+              res.history.timelapse.onFailure;
+            document.getElementById("timelapseDelete").checked =
+              res.history.timelapse.deleteAfter;
+          }
         } else {
           document.getElementById("thumbOnComplete").checked = true;
           document.getElementById("thumbOnFailure").checked = true;
@@ -603,6 +611,11 @@ class ServerSettings {
       thumbnails: {
         onComplete: document.getElementById("thumbOnComplete").checked,
         onFailure: document.getElementById("thumbOnFailure").checked,
+      },
+      timelapse: {
+        onComplete: document.getElementById("timelapseOnComplete").checked,
+        onFailure: document.getElementById("timelapseOnFailure").checked,
+        deleteAfter: document.getElementById("timelapseDelete").checked,
       },
     };
     if (

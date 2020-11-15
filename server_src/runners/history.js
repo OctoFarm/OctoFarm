@@ -183,6 +183,130 @@ class HistoryCollection {
     }
   }
 
+  static async timelapseCheck(
+    printer,
+    fileName,
+    printTime,
+    serverSettings,
+    id
+  ) {
+    if (printTime >= 10) {
+      let interval = false;
+      const grabTimelapse = async (printer) => {
+        return await fetch(
+          `${printer.printerURL}/api/timelapse?unrendered=true`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Api-Key": printer.apikey,
+            },
+          }
+        );
+      };
+      logger.info("Checking for timelapse...", fileName);
+      if (!interval) {
+        interval = setInterval(async function () {
+          let timelapse = await grabTimelapse(printer);
+          if (timelapse.status === 200) {
+            const timelapseResponse = await timelapse.json();
+            logger.info(
+              "Successfully grabbed timelapse list... Checking for:",
+              fileName
+            );
+            if (timelapseResponse.unrendered.length === 0) {
+              let cleanName = fileName;
+              if (fileName.includes(".gcode")) {
+                cleanName = fileName.replace(".gcode", "");
+              }
+              let orderedTimelapses = _.sortBy(timelapseResponse.files, [
+                function (o) {
+                  return o.date;
+                },
+              ]);
+              let lastTimelapse = _.findLastIndex(orderedTimelapses, function (
+                o
+              ) {
+                return o.name.includes(cleanName);
+              });
+              if (lastTimelapse !== -1) {
+                let lapse = await HistoryCollection.grabTimeLapse(
+                  orderedTimelapses[lastTimelapse].name,
+                  printer.printerURL + orderedTimelapses[lastTimelapse].url,
+                  id,
+                  printer,
+                  serverSettings
+                );
+                //Clearing interval
+                clearInterval(interval);
+
+                const saveHistory = await History.findById(id);
+                saveHistory.printHistory.timelapse = lapse;
+                saveHistory.markModified("printHistory");
+                await saveHistory.save();
+                HistoryClean.start();
+                logger.info("Successfully grabbed timelapse!");
+              } else {
+                return null;
+              }
+            } else {
+              logger.info(
+                "Still rendering time lapse... check again in 5 seconds: ",
+                fileName
+              );
+            }
+          } else {
+            return null;
+          }
+        }, 5000);
+      }
+    } else {
+      return null;
+    }
+  }
+  static async grabTimeLapse(fileName, url, id, printer, serverSettings) {
+    const download = (url, path, callback) => {
+      request.head(url, (err, res, body) => {
+        request(url).pipe(fs.createWriteStream(path)).on("close", callback);
+      });
+    };
+
+    const path = `./images/historyCollection/timelapses/${id}-${fileName}`;
+    if (!fs.existsSync(`./images/historyCollection`)) {
+      fs.mkdirSync(`./images/historyCollection`);
+    }
+    if (!fs.existsSync(`./images/historyCollection/timelapses`)) {
+      fs.mkdirSync(`./images/historyCollection/timelapses`);
+    }
+
+    await download(url, path, () => {
+      logger.info("Downloaded: ", url);
+      logger.info(`images/historyCollection/timelapses/${id}-${fileName}`);
+      if (
+        typeof serverSettings.history !== "undefined" &&
+        typeof serverSettings.history.timelapse !== "undefined" &&
+        serverSettings.history.timelapse.deleteAfter
+      ) {
+        HistoryCollection.deleteTimeLapse(printer, fileName);
+      }
+    });
+
+    return `images/historyCollection/timelapses/${id}-${fileName}`;
+  }
+  static async deleteTimeLapse(printer, fileName) {
+    const deleteTimeLapse = async (fileName) => {
+      return await fetch(`${printer.printerURL}/api/timelapse/${fileName}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Key": printer.apikey,
+        },
+      });
+    };
+    await deleteTimeLapse(fileName);
+    logger.info("Successfully deleted " + fileName + " from OctoPrint.");
+  }
+
   static async complete(payload, printer, job, files) {
     try {
       const serverSettings = await ServerSettings.find({});
@@ -307,7 +431,19 @@ class HistoryCollection {
             saveHistory,
             payload
           );
-
+          if (
+            typeof serverSettings[0].history !== "undefined" &&
+            typeof serverSettings[0].history.timelapse !== "undefined" &&
+            serverSettings[0].history.timelapse.onComplete
+          ) {
+            HistoryCollection.timelapseCheck(
+              printer,
+              payload.name,
+              payload.time,
+              serverSettings[0],
+              saveHistory._id
+            );
+          }
           saveHistory.printHistory.thumbnail = thumbnail;
           saveHistory.printHistory.snapshot = snapshot;
           saveHistory.markModified("printHistory");
@@ -428,6 +564,7 @@ class HistoryCollection {
         job,
         notes: "",
         snapshot: "",
+        timelapse: "",
       };
       const saveHistory = new History({
         printHistory,
@@ -449,11 +586,24 @@ class HistoryCollection {
             saveHistory,
             payload
           );
+          if (
+            typeof serverSettings[0].history !== "undefined" &&
+            typeof serverSettings[0].history.timelapse !== "undefined" &&
+            serverSettings[0].history.timelapse.onFailure
+          ) {
+            HistoryCollection.timelapseCheck(
+              printer,
+              payload.name,
+              payload.time,
+              serverSettings[0],
+              saveHistory._id
+            );
+          }
 
           saveHistory.printHistory.thumbnail = thumbnail;
           saveHistory.printHistory.snapshot = snapshot;
           saveHistory.markModified("printHistory");
-          saveHistory.save();
+          await saveHistory.save();
 
           HistoryClean.start();
           setTimeout(function () {

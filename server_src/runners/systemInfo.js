@@ -12,7 +12,7 @@ class SystemRunner {
     await this.getSystemInfo();
     setInterval(async () => {
       this.getSystemInfo();
-    }, 15000);
+    }, 2500);
 
     return "Started system information collection...";
   }
@@ -45,6 +45,28 @@ class SystemRunner {
           sysProcess = current;
         }
       });
+      const fileSize = await si.fsSize().catch((error) => console.error(error));
+      const systemDisk = fileSize[0];
+
+      let warnings = {};
+
+      if (systemDisk.use >= 99) {
+        warnings = {
+          status: "danger",
+          message: `Danger! Your disk is over 99% full... OctoFarms operations could be effected if you don't clean up some space or move to a larger hard drive.`,
+        };
+      } else if (systemDisk.use >= 95) {
+        warnings = {
+          status: "warning",
+          message: `Warning your disk is over 95% full... Please clean up some space or move to a larger hard drive.`,
+        };
+      } else if (systemDisk.use >= 90) {
+        warnings = {
+          status: "warning",
+          message: `Warning your disk is getting full... Please clean up some space or move to a larger hard drive.`,
+        };
+      }
+
       systemInfo = {
         osInfo,
         cpuInfo,
@@ -53,6 +75,8 @@ class SystemRunner {
         sysUptime: uptime,
         processUptime: process.uptime(),
         sysProcess,
+        systemDisk,
+        warnings,
       };
       return systemInfo;
     } catch (e) {

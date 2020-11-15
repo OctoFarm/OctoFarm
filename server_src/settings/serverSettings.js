@@ -21,12 +21,17 @@ const timeout = {
 const filamentManager = false;
 const history = {
   snapshots: {
-    onCancel: true,
+    onFailure: true,
     onComplete: true,
   },
   thumbnails: {
-    onCancel: true,
+    onFailure: true,
     onComplete: true,
+  },
+  timelapse: {
+    onFailure: false,
+    onComplete: false,
+    deleteAfter: false,
   },
 };
 

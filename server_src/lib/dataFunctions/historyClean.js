@@ -73,6 +73,9 @@ class HistoryClean {
       if (typeof history[h].printHistory.snapshot !== "undefined") {
         sorted.snapshot = history[h].printHistory.snapshot;
       }
+      if (typeof history[h].printHistory.timelapse !== "undefined") {
+        sorted.timelapse = history[h].printHistory.timelapse;
+      }
       let spoolCost = 0;
       let totalVolume = 0;
       let totalLength = 0;

@@ -125,9 +125,12 @@ export default class History {
       let thbs = false;
       let counter = 0;
       let active = "active";
-      console.log("SNAP:", current.snapshot);
-      if (typeof current.snapshot !== "undefined" && current.snapshot !== "") {
-        thbs = true;
+
+      if (
+        typeof current.snapshot !== "undefined" &&
+        current.snapshot !== "" &&
+        current.snapshot !== null
+      ) {
         thumbnailIndicators.insertAdjacentHTML(
           "beforeend",
           `
@@ -137,7 +140,7 @@ export default class History {
         thumbnail.insertAdjacentHTML(
           "beforeend",
           `
-              <div class="carousel-item ${active}" style="height:200px; background-image: url('${current.snapshot}')">
+              <div class="carousel-item ${active} text-center" style="height:600px; background-image: url('${current.snapshot}')">
                   <div class="carousel-caption d-none d-md-block">
                     <h6>Camera Snapshot</h6>
                     <small>Taken just as your printer finished...</small>
@@ -145,15 +148,16 @@ export default class History {
                 </div>
           `
         );
+        thbs = true;
         counter = counter + 1;
         active = "";
       }
-      console.log("THUMB:", current.thumbnail);
+
       if (
         typeof current.thumbnail !== "undefined" &&
-        current.thumbnail != null
+        current.thumbnail != null &&
+        current.thumbnail != ""
       ) {
-        thbs = true;
         thumbnailIndicators.insertAdjacentHTML(
           "beforeend",
           `
@@ -163,7 +167,7 @@ export default class History {
         thumbnail.insertAdjacentHTML(
           "beforeend",
           `
-              <div class="carousel-item ${active}" style="height:200px; background-image: url('${current.thumbnail}')">
+              <div class="carousel-item ${active}  text-center" style="height:600px; background-image: url('${current.thumbnail}')">
                   <div class="carousel-caption d-none d-md-block">
                     <h6>Slicer Thumbnail</h6>
                     <small>This image was captured from your slicer thumbnail...</small>
@@ -171,9 +175,39 @@ export default class History {
                 </div>
           `
         );
+        thbs = true;
+        active = "";
         counter = counter + 1;
       }
-
+      if (
+        typeof current.timelapse !== "undefined" &&
+        current.timelapse !== "" &&
+        current.timelapse !== null
+      ) {
+        thumbnailIndicators.insertAdjacentHTML(
+          "beforeend",
+          `
+           <li data-target="#carouselExampleIndicators" data-slide-to="${counter}" class="${active}"></li>
+        `
+        );
+        thumbnail.insertAdjacentHTML(
+          "beforeend",
+          `
+            <div class="carousel-item ${active}  text-center" style="height:600px;">
+                <video autobuffer="autobuffer" autoplay="autoplay" loop="loop" controls="controls">
+                    <source src='${current.timelapse}'>
+                </video>
+                  <div class="carousel-caption d-none d-md-block">
+                    <h6>Timelapse</h6>
+                    <small>This was taken from OctoPrints timelapse...</small>
+                  </div>
+            </div>
+          `
+        );
+        thbs = true;
+        active = "";
+        counter = counter + 1;
+      }
       if (thbs) {
         document.getElementById("galleryElements").style.display = "block";
       } else {
