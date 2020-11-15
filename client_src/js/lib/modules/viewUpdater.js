@@ -94,12 +94,15 @@ function isRotated(otherSettings) {
   let flipH = "";
   let flipV = "";
   let rotate90 = "";
+
   if (otherSettings.webCamSettings !== null) {
     if (otherSettings.webCamSettings.flipH) {
       flipH = "rotateY(180deg)";
-    } else if (otherSettings.webCamSettings.flipV) {
+    }
+    if (otherSettings.webCamSettings.flipV) {
       flipV = "rotateX(180deg)";
-    } else if (otherSettings.webCamSettings.rotate90) {
+    }
+    if (otherSettings.webCamSettings.rotate90) {
       rotate90 = "rotate(90deg)";
     }
   }
@@ -139,7 +142,6 @@ function imageOrCamera(printer) {
   const flip = isRotated(printer.otherSettings);
   const { flipH, flipV, rotate90 } = flip;
   //Is octoprints camera settings enabled?
-
   if (
     printer.otherSettings !== null &&
     printer.otherSettings.webCamSettings !== null &&
@@ -309,13 +311,13 @@ function drawPanelView(printer, clientSettings) {
     if (printer.currentProfile.heatedBed) {
       environment += `<small
     class="mb-0 float-left"
-          ><b>Bed: </b><span id="bed-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span>
+          ><b>Bed: </b><span id="bedTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span>
           </small>`;
     }
     if (printer.currentProfile.heatedChamber) {
       environment += `<small
     class="mb-0 float-right"
-        ><b>Chamber: </b><span  id="chamber-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span>
+        ><b>Chamber: </b><span  id="chamberTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span>
           </small>`;
     }
   }
@@ -470,13 +472,13 @@ function drawCameraView(printer, clientSettings) {
 
     if (printer.currentProfile.heatedBed) {
       environment += `
-          <b>Bed: </b><span id="bed-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>
+          <b>Bed: </b><span id="bedTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>
 `;
     }
     if (printer.currentProfile.heatedChamber) {
       environment += `
     class="mb-0"
-        <b>Chamber: </b><span id="chamber-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>
+        <b>Chamber: </b><span id="chamberTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>
  `;
     }
   }
@@ -486,9 +488,9 @@ function drawCameraView(printer, clientSettings) {
       id="panel-${printer._id}"
       class="col-md-4 col-lg-${printerRows} col-xl-${printerRows} ${hidden}"
     >
-      <div class="card text-center mb-0 mt-0 ml-0 mr-0">
+      <div class="card bg-transparent text-center mb-0 mt-0 ml-0 mr-0">
         <div
-          class="card-header dashHeader"
+          class="card-header dashHeader bg-transparent"
           id="camHeader-${printer._id}"
         >
             <button
@@ -708,6 +710,7 @@ function grabElements(printer) {
       remainingPrintTime: document.getElementById(
         "remainingTime-" + printer._id
       ),
+      cameraContain: document.getElementById("cameraContain-" + printer._id),
       progress: document.getElementById("progress-" + printer._id),
       bed: document.getElementById("bedTemp-" + printer._id),
       chamber: document.getElementById("chamberTemp-" + printer._id),
@@ -753,6 +756,11 @@ async function updateState(printer, clientSettings, view) {
       );
       break;
     case "camera":
+      UI.doesElementNeedUpdating(
+        `card-body cameraContain text-truncate noBlue ${stateCategory}`,
+        elements.cameraContain,
+        "classList"
+      );
       break;
   }
 
@@ -765,7 +773,7 @@ async function updateState(printer, clientSettings, view) {
   if (typeof printer.currentJob !== "undefined") {
     UI.doesElementNeedUpdating(
       printer.currentJob.progress + "%",
-      elements.percent,
+      elements.progress,
       "innerHTML"
     );
     elements.progress.style.width = printer.currentJob.progress + "%";
@@ -910,83 +918,70 @@ async function updateState(printer, clientSettings, view) {
       '<i class="fas fa-file-code"></i> ' + "No File Selected";
   }
 
-  switch (view) {
-    case "list":
-    case "panel":
-      if (printer.tools !== null) {
-        const toolKeys = Object.keys(printer.tools[0]);
-        for (let t = 0; t < toolKeys.length; t++) {
-          if (toolKeys[t].includes("tool")) {
-            const toolNumber = toolKeys[t].replace("tool", "");
-            if (
-              document.getElementById(
-                printer._id + "-temperature-" + toolNumber
-              )
-            ) {
-              checkTemps(
-                document.getElementById(
-                  printer._id + "-temperature-" + toolNumber
-                ),
-                printer.tools[0][toolKeys[t]].actual,
-                printer.tools[0][toolKeys[t]].target,
-                printer.otherSettings.temperatureTriggers,
-                printer.printerState.colour.category
-              );
-            } else {
-              checkTemps(
-                document.getElementById(
-                  printer._id + "-temperature-" + toolNumber
-                ),
-                0,
-                0,
-                printer.otherSettings.temperatureTriggers,
-                printer.printerState.colour.category
-              );
-            }
-          } else if (toolKeys[t].includes("bed")) {
-            if (elements.bed) {
-              checkTemps(
-                elements.bed,
-                printer.tools[0][toolKeys[t]].actual,
-                printer.tools[0][toolKeys[t]].target,
-                printer.otherSettings.temperatureTriggers,
-                printer.printerState.colour.category
-              );
-            }
-          } else if (toolKeys[t].includes("chamber")) {
-            if (elements.chamber) {
-              checkTemps(
-                elements.chamber,
-                printer.tools[0][toolKeys[t]].actual,
-                printer.tools[0][toolKeys[t]].target,
-                printer.otherSettings.temperatureTriggers,
-                printer.printerState.colour.category
-              );
-            }
-          }
+  if (printer.tools !== null) {
+    const toolKeys = Object.keys(printer.tools[0]);
+    for (let t = 0; t < toolKeys.length; t++) {
+      if (toolKeys[t].includes("tool")) {
+        const toolNumber = toolKeys[t].replace("tool", "");
+        if (
+          document.getElementById(printer._id + "-temperature-" + toolNumber)
+        ) {
+          checkTemps(
+            document.getElementById(printer._id + "-temperature-" + toolNumber),
+            printer.tools[0][toolKeys[t]].actual,
+            printer.tools[0][toolKeys[t]].target,
+            printer.otherSettings.temperatureTriggers,
+            printer.printerState.colour.category
+          );
+        } else {
+          checkTemps(
+            document.getElementById(printer._id + "-temperature-" + toolNumber),
+            0,
+            0,
+            printer.otherSettings.temperatureTriggers,
+            printer.printerState.colour.category
+          );
+        }
+      } else if (toolKeys[t].includes("bed")) {
+        if (elements.bed) {
+          checkTemps(
+            elements.bed,
+            printer.tools[0][toolKeys[t]].actual,
+            printer.tools[0][toolKeys[t]].target,
+            printer.otherSettings.temperatureTriggers,
+            printer.printerState.colour.category
+          );
+        }
+      } else if (toolKeys[t].includes("chamber")) {
+        if (elements.chamber) {
+          checkTemps(
+            elements.chamber,
+            printer.tools[0][toolKeys[t]].actual,
+            printer.tools[0][toolKeys[t]].target,
+            printer.otherSettings.temperatureTriggers,
+            printer.printerState.colour.category
+          );
         }
       }
-      if (Array.isArray(printer.selectedFilament)) {
-        const spoolList = "";
-        for (let i = 0; i < printer.selectedFilament.length; i++) {
-          const tool = document.getElementById(`${printer._id}-spool-${i}`);
-          if (printer.selectedFilament[i] !== null) {
-            const filamentManager = await checkFilamentManager();
-            if (filamentManager) {
-              tool.innerHTML = `${printer.selectedFilament[i].spools.material}`;
-            } else {
-              tool.innerHTML = `${printer.selectedFilament[i].spools.material}`;
-            }
-          } else {
-            tool.innerHTML = "No Spool";
-          }
+    }
+  }
+  if (Array.isArray(printer.selectedFilament)) {
+    const spoolList = "";
+    for (let i = 0; i < printer.selectedFilament.length; i++) {
+      const tool = document.getElementById(`${printer._id}-spool-${i}`);
+      if (printer.selectedFilament[i] !== null) {
+        const filamentManager = await checkFilamentManager();
+        if (filamentManager) {
+          tool.innerHTML = `${printer.selectedFilament[i].spools.material}`;
+        } else {
+          tool.innerHTML = `${printer.selectedFilament[i].spools.material}`;
         }
       } else {
         tool.innerHTML = "No Spool";
       }
-      break;
-    case "camera":
-      break;
+    }
+  } else {
+    tool.innerHTML = "No Spool";
   }
 
   let hideClosed = "";

@@ -229,7 +229,10 @@ class HistoryCollection {
               ) {
                 return o.name.includes(cleanName);
               });
-              if (lastTimelapse !== -1) {
+              if (
+                lastTimelapse !== -1 &&
+                !orderedTimelapses[lastTimelapse].url.includes(".mpg")
+              ) {
                 let lapse = await HistoryCollection.grabTimeLapse(
                   orderedTimelapses[lastTimelapse].name,
                   printer.printerURL + orderedTimelapses[lastTimelapse].url,
