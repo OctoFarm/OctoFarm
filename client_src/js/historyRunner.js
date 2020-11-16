@@ -140,7 +140,7 @@ export default class History {
         thumbnail.insertAdjacentHTML(
           "beforeend",
           `
-              <div class="carousel-item ${active} text-center" style="height:600px; background-image: url('${current.snapshot}')">
+              <div class="carousel-item ${active} text-center" style="height:200px; background-image: url('${current.snapshot}')">
                   <div class="carousel-caption d-none d-md-block">
                     <h6>Camera Snapshot</h6>
                     <small>Taken just as your printer finished...</small>
@@ -167,7 +167,7 @@ export default class History {
         thumbnail.insertAdjacentHTML(
           "beforeend",
           `
-              <div class="carousel-item ${active}  text-center" style="height:600px; background-image: url('${current.thumbnail}')">
+              <div class="carousel-item ${active}  text-center" style="height:200px; background-image: url('${current.thumbnail}')">
                   <div class="carousel-caption d-none d-md-block">
                     <h6>Slicer Thumbnail</h6>
                     <small>This image was captured from your slicer thumbnail...</small>
@@ -193,8 +193,8 @@ export default class History {
         thumbnail.insertAdjacentHTML(
           "beforeend",
           `
-            <div class="carousel-item ${active}  text-center" style="height:600px;">
-                <video autobuffer="autobuffer" autoplay="autoplay" loop="loop" controls="controls">
+            <div class="carousel-item ${active} text-center" style="height:200px;">
+                <video autobuffer="autobuffer" autoplay="autoplay" loop="loop" controls="controls" style="height:350px;">
                     <source src='${current.timelapse}'>
                 </video>
                   <div class="carousel-caption d-none d-md-block">

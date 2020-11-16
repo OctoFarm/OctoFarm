@@ -201,7 +201,7 @@ class HistoryCollection {
           {
             method: "GET",
             headers: {
-              "Content-Type": "application/json",
+              "Content-Type": "video/mp4",
               "X-Api-Key": printer.apikey,
             },
           }
@@ -271,11 +271,19 @@ class HistoryCollection {
     }
   }
   static async grabTimeLapse(fileName, url, id, printer, serverSettings) {
-    const download = (url, path, callback) => {
-      request.head(url, (err, res, body) => {
-        res.headers["content-type"] = "video/mp4";
-        res.headers["x-api-key"] = printer.apikey;
-        request(url).pipe(fs.createWriteStream(path)).on("close", callback);
+    const download = async (url, path, callback) => {
+      const res = await fetch(url, {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Api-Key": printer.apikey,
+        },
+      });
+      const fileStream = fs.createWriteStream(path);
+      await new Promise((resolve, reject) => {
+        res.body.pipe(fileStream);
+        res.body.on("error", reject);
+        fileStream.on("finish", callback);
       });
     };
 

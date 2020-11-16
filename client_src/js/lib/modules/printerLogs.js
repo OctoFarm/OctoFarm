@@ -7,7 +7,7 @@ let eventListener = false;
 let currentPrinter = null;
 
 export default class PrinterLogs {
-  static parseLogs(printer, url) {
+  static async parseLogs(printer, url) {
     url = url.replace(printer.printerURL + "/", "");
     OctoPrintClient.get(printer, `${url}`)
       .then(async (resp) => resp.blob())
@@ -15,10 +15,11 @@ export default class PrinterLogs {
       .then(async (text) => {
         let octologsLogsRows = document.getElementById("octologsLogsRows");
         octologsLogsRows.innerHTML = "";
+        s;
         let octoPrintCount = document.getElementById("octoPrintCount");
-        let splitText = text.split(/(\r\n|\n|\r)/gm);
+        let splitText = await text.split(/(\r\n|\n|\r)/gm);
         splitText = splitText.reverse();
-        for (let i = 0; i < splitText.length; i++) {
+        for (let i = 0; i < 500; i++) {
           let colour = null;
           if (splitText[i].includes("INFO")) {
             colour = "Info";

@@ -772,7 +772,7 @@ async function updateState(printer, clientSettings, view) {
   );
   if (typeof printer.currentJob !== "undefined") {
     let progress = 0;
-    if (isNaN(printer.currentJob.progress)) {
+    if (!isNaN(printer.currentJob.progress)) {
       progress = printer.currentJob.progress.toFixed(0);
     }
     UI.doesElementNeedUpdating(progress + "%", elements.progress, "innerHTML");
