@@ -430,10 +430,10 @@ function drawPanelView(printer, clientSettings) {
             </center>
           </div>
           <div class="row">
-            <div class="col-xl-6">
+            <div class="col-6">
                        <span id="printTimeElapsed-${printer._id}">Loading...</span>
             </div>
-            <div class="col-xl-6">
+            <div class="col-6">
                       <span id="remainingTime-${printer._id}">
                 Loading...
             </span>
@@ -522,7 +522,7 @@ function drawCameraView(printer, clientSettings) {
           <div class="camExtra">
             <div class=" row">
 
-              <div class="col-xl-6">
+              <div class="col-6">
                  <span
                     class="mb-0 text-center"
                     id="printTimeElapsed-${printer._id}"
@@ -530,7 +530,7 @@ function drawCameraView(printer, clientSettings) {
 
                   </span>
               </div>
-              <div class="col-xl-6">
+              <div class="col-6">
                           <span
               class="mb-0 text-center"
               id="remainingTime-${printer._id}"
@@ -771,12 +771,12 @@ async function updateState(printer, clientSettings, view) {
     "classList"
   );
   if (typeof printer.currentJob !== "undefined") {
-    UI.doesElementNeedUpdating(
-      printer.currentJob.progress.toFixed(0) + "%",
-      elements.progress,
-      "innerHTML"
-    );
-    elements.progress.style.width = printer.currentJob.progress + "%";
+    let progress = 0;
+    if (isNaN(printer.currentJob.progress)) {
+      progress = printer.currentJob.progress.toFixed(0);
+    }
+    UI.doesElementNeedUpdating(progress + "%", elements.progress, "innerHTML");
+    elements.progress.style.width = progress + "%";
     elements.currentFile.setAttribute("title", printer.currentJob.filePath);
     elements.currentFile.innerHTML =
       '<i class="fas fa-file-code"></i> ' + printer.currentJob.fileDisplay;

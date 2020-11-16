@@ -71,9 +71,11 @@ class HistoryCollection {
     return returnSpools;
   }
 
-  static async grabThumbnail(url, thumbnail, id) {
+  static async grabThumbnail(url, thumbnail, id, printer) {
     const download = (url, path, callback) => {
       request.head(url, (err, res, body) => {
+        res.headers["content-type"] = "image/png";
+        res.headers["x-api-key"] = printer.apikey;
         request(url).pipe(fs.createWriteStream(path)).on("close", callback);
       });
     };
@@ -138,7 +140,8 @@ class HistoryCollection {
           base64Thumbnail = await HistoryCollection.grabThumbnail(
             `${printer.printerURL}/${files[currentFileIndex].thumbnail}`,
             files[currentFileIndex].thumbnail,
-            id
+            id,
+            printer
           );
         }
       }
@@ -270,6 +273,9 @@ class HistoryCollection {
   static async grabTimeLapse(fileName, url, id, printer, serverSettings) {
     const download = (url, path, callback) => {
       request.head(url, (err, res, body) => {
+        res.headers["content-type"] = "video/mp4";
+        res.headers["x-api-key"] = printer.apikey;
+        console.time("start download");
         request(url).pipe(fs.createWriteStream(path)).on("close", callback);
       });
     };
@@ -282,7 +288,8 @@ class HistoryCollection {
       fs.mkdirSync(`./images/historyCollection/timelapses`);
     }
 
-    await download(url, path, () => {
+    download(url, path, () => {
+      console.time("end download");
       logger.info("Downloaded: ", url);
       logger.info(`images/historyCollection/timelapses/${id}-${fileName}`);
       if (
