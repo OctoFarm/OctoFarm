@@ -275,7 +275,6 @@ class HistoryCollection {
       request.head(url, (err, res, body) => {
         res.headers["content-type"] = "video/mp4";
         res.headers["x-api-key"] = printer.apikey;
-        console.time("start download");
         request(url).pipe(fs.createWriteStream(path)).on("close", callback);
       });
     };
@@ -289,7 +288,6 @@ class HistoryCollection {
     }
 
     download(url, path, () => {
-      console.time("end download");
       logger.info("Downloaded: ", url);
       logger.info(`images/historyCollection/timelapses/${id}-${fileName}`);
       if (
