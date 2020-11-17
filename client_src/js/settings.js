@@ -95,14 +95,15 @@ async function setupOctoPrintClientsforTimelapse() {
               if (sett.status === 200) {
                 UI.createAlert(
                   "success",
-                  "Updated your web camera settings!",
+                  printers[i].printerName +
+                    ": Updated your web camera settings!",
                   1000,
                   "Clicked"
                 );
               } else {
                 UI.createAlert(
                   "danger",
-                  "Failed to update the settings!",
+                  printers[i].printerName + ": Failed to update the settings!",
                   1000,
                   "Clicked"
                 );
@@ -115,14 +116,15 @@ async function setupOctoPrintClientsforTimelapse() {
               if (time.status === 200) {
                 UI.createAlert(
                   "success",
-                  "Updated your timelapse settings!",
+                  printers[i].printerName +
+                    ": Updated your timelapse settings!",
                   1000,
                   "Clicked"
                 );
               } else {
                 UI.createAlert(
                   "danger",
-                  "Failed to timelapse settings!",
+                  printers[i].printerName + ": Failed to timelapse settings!",
                   1000,
                   "Clicked"
                 );
