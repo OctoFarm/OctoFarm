@@ -3,6 +3,7 @@ import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
 import OctoFarmclient from "./lib/octofarm.js";
 import Script from "./lib/modules/scriptCheck.js";
+import OctoPrintClient from "./lib/octoprint";
 // Add listeners to settings
 document.getElementById("saveServerSettings").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
@@ -48,6 +49,101 @@ document.getElementById("nukeUsers").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
   ServerSettings.nukeDatabases("UserDB");
 });
+document
+  .getElementById("setupTimelapseOctoPrint")
+  .addEventListener("click", (e) => {
+    setupOctoPrintClientsforTimelapse();
+  });
+
+async function setupOctoPrintClientsforTimelapse() {
+  let printers = await OctoFarmclient.post("printers/printerInfo");
+
+  if (printers.status === 200) {
+    printers = await printers.json();
+    bootbox.confirm({
+      title: "Are you sure?",
+      message:
+        "If you press yes below your timelapse settings will automatically be updated to work with OctoFarms setup. The script will update any online instances and there shouldn't be a restart necassary. It does however presume you have your ffmpeg path setup with your snapshot URL inputted into OctoPrint. You can edit these in Printer Manager if not.",
+      buttons: {
+        confirm: {
+          label: "Yes",
+          className: "btn-success",
+        },
+        cancel: {
+          label: "No",
+          className: "btn-danger",
+        },
+      },
+      callback: async function (result) {
+        if (result) {
+          let settings = {
+            webcam: {
+              ffmpegVideoCodec: "libx264",
+              webcamEnabled: true,
+            },
+          };
+          let timelapse = {
+            type: "zchange",
+          };
+          for (let i = 0; i < printers.length; i++) {
+            if (printers[i].printerState.colour.category !== "Offline") {
+              let sett = await OctoPrintClient.post(
+                printers[i],
+                "settings",
+                settings
+              );
+              if (sett.status === 200) {
+                UI.createAlert(
+                  "success",
+                  "Updated your web camera settings!",
+                  1000,
+                  "Clicked"
+                );
+              } else {
+                UI.createAlert(
+                  "danger",
+                  "Failed to update the settings!",
+                  1000,
+                  "Clicked"
+                );
+              }
+              let time = await OctoPrintClient.post(
+                printers[i],
+                "timelapse",
+                timelapse
+              );
+              if (time.status === 200) {
+                UI.createAlert(
+                  "success",
+                  "Updated your timelapse settings!",
+                  1000,
+                  "Clicked"
+                );
+              } else {
+                UI.createAlert(
+                  "danger",
+                  "Failed to timelapse settings!",
+                  1000,
+                  "Clicked"
+                );
+              }
+            } else {
+              //Printer offline skipping...
+            }
+          }
+        }
+      },
+    });
+  } else {
+    UI.createAlert(
+      "error",
+      "Sorry OctoFarm is not responding...",
+      3000,
+      "Clicked"
+    );
+  }
+  OctoPrintClient.post;
+}
 
 document.getElementById("resetDashboardBtn").addEventListener("click", (e) => {
   const dashData = localStorage.getItem("dashboardConfiguration");

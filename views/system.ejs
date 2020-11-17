@@ -810,6 +810,40 @@
                                                     </div>
                                                     <div id="filamentManagerSetup" class="row">
                                                         <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
+                                                            <h6>Timelapse Capture</h6>
+                                                            <div class="alert alert-warning" role="alert">
+                                                                Timelapse must be turned on in OctoPrint for this to work, then activated below. It is not turned on by default and does not react to your OctoPrint setting.
+                                                            </div>
+                                                            <div class="alert alert-danger" role="alert">
+                                                                This only works with the ".mp4" format for video types. OctoPrint defaults to ".mpg". You can update this under "Advanced Settings" in your OctoPrint instances "Webcam & Timelapse" setting. Change the setting to "libx264".
+                                                                <button id="setupTimelapseOctoPrint" type="button" class="btn btn-outline-dark btn-block mt-1">Setup Your Farm!</button>
+                                                            </div>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="timelapseOnComplete" required>
+                                                                    <label class="custom-control-label" for="timelapseOnComplete">On Completion</label>
+                                                                    <div class="valid-feedback">On Complete timelapse will be downloaded to OctoPrint</div>
+                                                                    <div class="invalid-feedback">On Complete timelapse is ignored</div>
+                                                                </div>
+                                                            </form>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="timelapseOnFailure" required>
+                                                                    <label class="custom-control-label" for="timelapseOnFailure">On Failure</label>
+                                                                    <div class="valid-feedback">On Failure timelapse will be downloaded to OctoPrint</div>
+                                                                    <div class="invalid-feedback">On Failure timelapse is ignored</div>
+                                                                </div>
+                                                            </form>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="timelapseDelete" required>
+                                                                    <label class="custom-control-label" for="timelapseDelete">Delete from OctoPrint</label>
+                                                                    <div class="valid-feedback">Timelapses will be deleted once captured</div>
+                                                                    <div class="invalid-feedback">Timelapses are not removed from OctoPrints storage</div>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                        <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                                                             <h6>Printer snapshot capture</h6>
                                                             <div class="alert alert-warning" role="alert">
                                                                 Requires an active camera URL.
@@ -850,39 +884,6 @@
                                                                     <label class="custom-control-label" for="thumbOnFailure">On Failure</label>
                                                                     <div class="valid-feedback">On Failure snapshot turned on</div>
                                                                     <div class="invalid-feedback">On Failure snapshot turned off</div>
-                                                                </div>
-                                                            </form>
-                                                        </div>
-                                                        <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
-                                                            <h6>Timelapse Capture</h6>
-                                                            <div class="alert alert-warning" role="alert">
-                                                                Timelapse must be turned on in OctoPrint for this to work, then activated below. It is not turned on by default and does not react to your OctoPrint setting.
-                                                            </div>
-                                                            <div class="alert alert-danger" role="alert">
-                                                                This only works with the ".mp4" format for video types. OctoPrint defaults to ".mpg". You can update this under "Advanced Settings" in your OctoPrint instances "Webcam & Timelapse" setting. Change the setting to "libx264".
-                                                            </div>
-                                                            <form class="was-validated">
-                                                                <div class="custom-control custom-checkbox mb-3">
-                                                                    <input type="checkbox" class="custom-control-input" id="timelapseOnComplete" required>
-                                                                    <label class="custom-control-label" for="timelapseOnComplete">On Completion</label>
-                                                                    <div class="valid-feedback">On Complete timelapse will be downloaded to OctoPrint</div>
-                                                                    <div class="invalid-feedback">On Complete timelapse is ignored</div>
-                                                                </div>
-                                                            </form>
-                                                            <form class="was-validated">
-                                                                <div class="custom-control custom-checkbox mb-3">
-                                                                    <input type="checkbox" class="custom-control-input" id="timelapseOnFailure" required>
-                                                                    <label class="custom-control-label" for="timelapseOnFailure">On Failure</label>
-                                                                    <div class="valid-feedback">On Failure timelapse will be downloaded to OctoPrint</div>
-                                                                    <div class="invalid-feedback">On Failure timelapse is ignored</div>
-                                                                </div>
-                                                            </form>
-                                                            <form class="was-validated">
-                                                                <div class="custom-control custom-checkbox mb-3">
-                                                                    <input type="checkbox" class="custom-control-input" id="timelapseDelete" required>
-                                                                    <label class="custom-control-label" for="timelapseDelete">Delete from OctoPrint</label>
-                                                                    <div class="valid-feedback">Timelapses will be deleted once captured</div>
-                                                                    <div class="invalid-feedback">Timelapses are not removed from OctoPrints storage</div>
                                                                 </div>
                                                             </form>
                                                         </div>
