@@ -207,6 +207,7 @@ class HistoryCollection {
           }
         );
       };
+      let startDate = Date.now();
       logger.info("Checking for timelapse...", fileName);
       if (!interval) {
         interval = setInterval(async function () {
@@ -256,10 +257,27 @@ class HistoryCollection {
                 return null;
               }
             } else {
-              logger.info(
-                "Still rendering time lapse... check again in 5 seconds: ",
-                fileName
-              );
+              console.log(startDate);
+              console.log(Date.now());
+              let dateNow = Date.now();
+              console.log(dateNow - startDate);
+              console.log(dateNow - startDate >= 3600 * 1000);
+              if (dateNow - startDate >= 3600 * 1000) {
+                logger.info(
+                  "It's been over an hour and no word of a rendered timelapse... calling this one dead..."
+                );
+                const updateHistory = await History.findById(id);
+                updateHistory.printHistory.timelapse = "";
+                updateHistory.markModified("printHistory");
+                await updateHistory.save();
+                updateHistory.start();
+                logger.info("Successfully grabbed timelapse!");
+              } else {
+                logger.info(
+                  "Still rendering time lapse... check again in 5 seconds: ",
+                  fileName
+                );
+              }
             }
           } else {
             return null;
