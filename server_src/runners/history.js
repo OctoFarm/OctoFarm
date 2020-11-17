@@ -257,11 +257,7 @@ class HistoryCollection {
                 return null;
               }
             } else {
-              console.log(startDate);
-              console.log(Date.now());
               let dateNow = Date.now();
-              console.log(dateNow - startDate);
-              console.log(dateNow - startDate >= 3600 * 1000);
               if (dateNow - startDate >= 3600 * 1000) {
                 logger.info(
                   "It's been over an hour and no word of a rendered timelapse... calling this one dead..."
