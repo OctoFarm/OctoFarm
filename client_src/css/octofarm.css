@@ -538,3 +538,12 @@ label {
   -o-background-size: cover;
   background-size: cover;
 }
+
+.carousel-caption {
+  top: 0 !important;
+  bottom: auto !important;
+  display: block !important;
+}
+.carousel-caption:hover {
+  display: block !important;
+}

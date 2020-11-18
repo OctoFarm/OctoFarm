@@ -143,7 +143,6 @@ export default class History {
               <div class="carousel-item ${active} text-center" style="height:200px; background-image: url('${current.snapshot}')">
                   <div class="carousel-caption d-none d-md-block">
                     <h6>Camera Snapshot</h6>
-                    <small>Taken just as your printer finished...</small>
                   </div>
                 </div>
           `
@@ -170,7 +169,6 @@ export default class History {
               <div class="carousel-item ${active}  text-center" style="height:200px; background-image: url('${current.thumbnail}')">
                   <div class="carousel-caption d-none d-md-block">
                     <h6>Slicer Thumbnail</h6>
-                    <small>This image was captured from your slicer thumbnail...</small>
                   </div>
                 </div>
           `
@@ -199,7 +197,6 @@ export default class History {
                 </video>
                   <div class="carousel-caption d-none d-md-block">
                     <h6>Timelapse</h6>
-                    <small>This was taken from OctoPrints timelapse...</small>
                   </div>
             </div>
           `

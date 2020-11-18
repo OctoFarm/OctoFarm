@@ -749,6 +749,7 @@ blkPluginsBtn.addEventListener("click", async (e) => {
     }
   );
 });
+
 const searchOffline = document.getElementById("searchOfflineBtn");
 searchOffline.addEventListener("click", async (e) => {
   let alert = UI.createAlert(
@@ -1589,26 +1590,6 @@ class dashUpdate {
           }
 
           printerSortIndex.innerHTML = printer.sortIndex;
-          //Needs to be displayed somewhere else and possibly bolstered to include marlin and whatever else...
-          // if (typeof printer.klipperFirmwareVersion !== "undefined") {
-          //   printerOctoPrintVersion.innerHTML =
-          //     printer.octoPrintVersion +
-          //     "<br>Klipper: " +
-          //     printer.klipperFirmwareVersion;
-          // }
-          let octoVersion = printer.octoPrintVersion;
-          if (typeof printer.updateAvailable !== "undefined") {
-            if (printer.updateAvailable.octoPrintUpdate) {
-              octoVersion +=
-                "<br><button class='btn btn-warning btn-small btn-block'>Update Available!</button>";
-            }
-            if (printer.updateAvailable.pluginUpdates.length > 0) {
-              octoVersion +=
-                "<br><button class='btn btn-warning btn-small btn-block'>Plugin Update Available!</button>";
-            }
-          }
-
-          printerOctoPrintVersion.innerHTML = octoVersion;
 
           printName.innerHTML = `${printerName}`;
           if (typeof printer.corsCheck !== "undefined") {
@@ -1629,6 +1610,27 @@ class dashUpdate {
           socketBadge.setAttribute("title", printer.webSocketState.desc);
 
           webButton.href = printer.printerURL;
+
+          printerOctoPrintVersion.innerHTML = printer.octoPrintVersion;
+          if (typeof printer.updateAvailable !== "undefined") {
+            if (printer.updateAvailable.octoPrintUpdate) {
+              let updateButton = document.getElementById(
+                `octoprintUpdate-${printer._id}`
+              );
+              if (updateButton.classList.contains("d-none")) {
+                updateButton.classList.remove("d-none");
+              }
+            }
+            if (printer.updateAvailable.pluginUpdates.length > 0) {
+              let updateButton = document.getElementById(
+                `octoprintPluginUpdate-${printer._id}`
+              );
+              if (updateButton.classList.contains("d-none")) {
+                updateButton.classList.remove("d-none");
+              }
+            }
+          }
+
           if (printer.hostState.state === "Online") {
             let apiErrors = 0;
             for (const key in printer.systemChecks.scanning) {
@@ -1684,9 +1686,6 @@ class dashUpdate {
               tableRow.classList.remove("d-none");
             }
           } else {
-            console.log(
-              "OctoPi is undefined, if all yours are on Pi you shouldn't be seeing this..."
-            );
           }
           // Insert new printer addition...
           document.getElementById("printerList").insertAdjacentHTML(
@@ -1746,12 +1745,25 @@ class dashUpdate {
         <td><div id="printerGroup-${printer._id}" ></div></td>
         <td id="printerOctoPrintVersion-${printer._id}"></td>
         ${octoPiElement}
+        <td>
+            <button id="octoprintUpdate-${printer._id}" class='btn btn-warning btn-small btn-block d-none'><i class="fab fa-octopus-deploy"></i> OctoPrint Update!</button>
+            <button id="octoprintPluginUpdate-${printer._id}" class='btn btn-warning btn-small btn-block d-none'><i class="fas fa-plug"></i> Plugin Update!</button>
+        </td>
     </tr>
           `
           );
 
           actionButtonInit(printer, `printerActionBtns-${printer._id}`);
-
+          document
+            .getElementById(`octoprintUpdate-${printer._id}`)
+            .addEventListener("click", () => {
+              UI.createAlert("info", "StIlL dOeSn'T dO aNyThInG!", 3000);
+            });
+          document
+            .getElementById(`octoprintPluginUpdate-${printer._id}`)
+            .addEventListener("click", () => {
+              UI.createAlert("info", "StIlL dOeSn'T dO aNyThInG!", 3000);
+            });
           document
             .getElementById(`printerButton-${printer._id}`)
             .addEventListener("click", () => {
