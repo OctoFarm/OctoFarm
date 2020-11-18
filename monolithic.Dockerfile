@@ -18,7 +18,6 @@ WORKDIR /app
 
 RUN npm update
 RUN npm install -g pm2
-RUN npm install
 
 EXPOSE 4000/udp
 
