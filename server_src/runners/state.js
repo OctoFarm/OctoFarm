@@ -347,6 +347,7 @@ WebSocketClient.prototype.open = function (url, index) {
         }
         logger.error(`WebSocket hard failure: ${this.index}: ${this.url}`);
         this.onerror(e);
+        this.reconnectDelay(e);
         break;
     }
   });
@@ -408,7 +409,7 @@ WebSocketClient.prototype.reconnect = async function (e) {
 };
 WebSocketClient.prototype.reconnectDelay = async function (e) {
   //10 minute * 6 = 1 hour
-  const longerTime = 600000 * 6;
+  const longerTime = 600000 / 2;
   PrinterTicker.addIssue(
     new Date(),
     farmPrinters[this.index].printerURL,
@@ -732,30 +733,35 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
     if (data.plugin) {
       //console.log(farmPrinters[this.index].printerURL, data.plugin);
       if (data.plugin.data.type === "loglines") {
-        data.plugin.data.loglines.forEach((logLine) => {
-          if (logLine.stream === "call" || logLine.stream === "message") {
-            PrinterTicker.addOctoPrintLog(
-              farmPrinters[this.index],
-              logLine.line,
-              "Active",
-              data.plugin.plugin
-            );
-          } else if (logLine.stream === "stdout") {
-            PrinterTicker.addOctoPrintLog(
-              farmPrinters[this.index],
-              logLine.line,
-              "Complete",
-              data.plugin.plugin
-            );
-          } else {
-            PrinterTicker.addOctoPrintLog(
-              farmPrinters[this.index],
-              logLine.line,
-              "Offline",
-              data.plugin.plugin
-            );
-          }
-        });
+        if (
+          typeof data.plugin.data !== "undefined" &&
+          typeof data.plugin.data.loglines !== "undefined"
+        ) {
+          data.plugin.data.loglines.forEach((logLine) => {
+            if (logLine.stream === "call" || logLine.stream === "message") {
+              PrinterTicker.addOctoPrintLog(
+                farmPrinters[this.index],
+                logLine.line,
+                "Active",
+                data.plugin.plugin
+              );
+            } else if (logLine.stream === "stdout") {
+              PrinterTicker.addOctoPrintLog(
+                farmPrinters[this.index],
+                logLine.line,
+                "Complete",
+                data.plugin.plugin
+              );
+            } else {
+              PrinterTicker.addOctoPrintLog(
+                farmPrinters[this.index],
+                logLine.line,
+                "Offline",
+                data.plugin.plugin
+              );
+            }
+          });
+        }
       }
       if (data.plugin.plugin === "klipper") {
         // console.log(data.plugin.data.payload);
@@ -2307,17 +2313,27 @@ class Runner {
       .then((res) => {
         let octoPrintUpdate = false;
         let pluginUpdates = [];
+        if (farmPrinters[index].printerURL === "http://192.168.1.124:5002") {
+          console.log(res.information);
+        }
         for (var key in res.information) {
           if (res.information.hasOwnProperty(key)) {
             if (res.information[key].updateAvailable) {
               if (key === "octoprint") {
-                octoPrintUpdate = true;
+                octoPrintUpdate = {
+                  id: key,
+                  displayName: res.information[key].displayName,
+                  displayVersion: res.information[key].displayVersion,
+                  updateAvailable: res.information[key].updateAvailable,
+                  releaseNotesURL: res.information[key].releaseNotes,
+                };
               } else {
                 pluginUpdates.push({
                   id: key,
                   displayName: res.information[key].displayName,
                   displayVersion: res.information[key].displayVersion,
                   updateAvailable: res.information[key].updateAvailable,
+                  releaseNotesURL: res.information[key].releaseNotes,
                 });
               }
             }

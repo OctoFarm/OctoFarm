@@ -1613,20 +1613,28 @@ class dashUpdate {
 
           printerOctoPrintVersion.innerHTML = printer.octoPrintVersion;
           if (typeof printer.updateAvailable !== "undefined") {
-            if (printer.updateAvailable.octoPrintUpdate) {
-              let updateButton = document.getElementById(
-                `octoprintUpdate-${printer._id}`
-              );
+            let updateButton = document.getElementById(
+              `octoprintUpdate-${printer._id}`
+            );
+            let updatePluginButton = document.getElementById(
+              `octoprintPluginUpdate-${printer._id}`
+            );
+            if (printer.updateAvailable.octoPrintUpdate.updateAvailable) {
               if (updateButton.classList.contains("d-none")) {
                 updateButton.classList.remove("d-none");
               }
+            } else {
+              if (!updateButton.classList.contains("d-none")) {
+                updateButton.classList.add("d-none");
+              }
             }
             if (printer.updateAvailable.pluginUpdates.length > 0) {
-              let updateButton = document.getElementById(
-                `octoprintPluginUpdate-${printer._id}`
-              );
-              if (updateButton.classList.contains("d-none")) {
-                updateButton.classList.remove("d-none");
+              if (updatePluginButton.classList.contains("d-none")) {
+                updatePluginButton.classList.remove("d-none");
+              }
+            } else {
+              if (!updatePluginButton.classList.contains("d-none")) {
+                updatePluginButton.classList.add("d-none");
               }
             }
           }
@@ -1756,8 +1764,59 @@ class dashUpdate {
           actionButtonInit(printer, `printerActionBtns-${printer._id}`);
           document
             .getElementById(`octoprintUpdate-${printer._id}`)
-            .addEventListener("click", () => {
-              UI.createAlert("info", "StIlL dOeSn'T dO aNyThInG!", 3000);
+            .addEventListener("click", async () => {
+              const data = {
+                targets: ["octoprint"],
+                force: true,
+              };
+              let updateRequest = await OctoPrintClient.postNOAPI(
+                printer,
+                "plugin/softwareupdate/update",
+                data
+              );
+              if (updateRequest.status === 200) {
+                UI.createAlert(
+                  "success",
+                  `${printer.printerName}: Successfully updated! your instance will restart now.`,
+                  3000,
+                  "Clicked"
+                );
+                let post = await OctoPrintClient.systemNoConfirm(
+                  printer,
+                  "restart"
+                );
+                if (typeof post !== "undefined") {
+                  if (post.status === 204) {
+                    UI.createAlert(
+                      "success",
+                      `Successfully made restart attempt to ${printer.printerName}...`,
+                      3000,
+                      "Clicked"
+                    );
+                  } else {
+                    UI.createAlert(
+                      "error",
+                      `There was an issue sending restart to ${printer.printerName} are you sure it's online?`,
+                      3000,
+                      "Clicked"
+                    );
+                  }
+                } else {
+                  UI.createAlert(
+                    "error",
+                    `No response from ${printer.printerName}, is it online???`,
+                    3000,
+                    "Clicked"
+                  );
+                }
+              } else {
+                UI.createAlert(
+                  "error",
+                  `${printer.printerName}: Failed to update, manual intervention required!`,
+                  3000,
+                  "Clicked"
+                );
+              }
             });
           document
             .getElementById(`octoprintPluginUpdate-${printer._id}`)

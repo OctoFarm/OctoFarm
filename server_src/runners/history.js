@@ -259,6 +259,7 @@ class HistoryCollection {
             } else {
               let dateNow = Date.now();
               if (dateNow - startDate >= 3600 * 1000) {
+                clearInterval(interval);
                 logger.info(
                   "It's been over an hour and no word of a rendered timelapse... calling this one dead..."
                 );
@@ -266,7 +267,7 @@ class HistoryCollection {
                 updateHistory.printHistory.timelapse = "";
                 updateHistory.markModified("printHistory");
                 await updateHistory.save();
-                updateHistory.start();
+                HistoryClean.start();
                 logger.info("Successfully grabbed timelapse!");
               } else {
                 logger.info(

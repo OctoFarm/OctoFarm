@@ -490,13 +490,13 @@ function drawCameraView(printer, clientSettings) {
     >
       <div class="card text-center mb-0 mt-0 ml-0 mr-0">
         <div
-          class="card-header dashHeader"
+          class="card-header dashHeader p-0"
           id="camHeader-${printer._id}"
         >
             <button
               id="name-${printer._id}"
               type="button"
-              class="btn btn-secondary float-left"
+              class="btn btn-secondary float-left p-0 pl-2 pt-1"
               data-toggle="modal"
               data-target="#printerManagerModal"
               disabled
@@ -790,7 +790,7 @@ async function updateState(printer, clientSettings, view) {
         </small>
         <br>
         <small title="Expected Print Time">
-            <i class="fas fa-hourglass"></i> ${Calc.generateTime(
+            <i class="fas fa-clock"></i> ${Calc.generateTime(
               printer.currentJob.expectedPrintTime
             )}
         </small>
@@ -827,14 +827,14 @@ async function updateState(printer, clientSettings, view) {
         </small>
         <br>
         <small title="Expected Print Time">
-            <i class="fas fa-hourglass"></i> ${Calc.generateTime(
+            <i class="fas fa-clock"></i> ${Calc.generateTime(
               printer.currentJob.expectedPrintTime
             )}
         </small>
       `;
       let remainingPrintTimeFormat = `
         <small title="Print Time Remaining">
-            <i class="fas fa-hourglass-end"></i> ${Calc.generateTime(0)}
+            <i class="fas fa-hourglass-end"></i> 0
         </small>
         <br>
         <small title="Estimated Time of Arrival">
@@ -858,7 +858,7 @@ async function updateState(printer, clientSettings, view) {
         </small>
         <br>
         <small title="Expected Print Time">
-            <i class="fas fa-hourglass"></i> No Active Print
+            <i class="fas fa-clock"></i> No Active Print
         </small>
       `;
       let remainingPrintTimeFormat = `
@@ -888,7 +888,7 @@ async function updateState(printer, clientSettings, view) {
         </small>
         <br>
         <small title="Expected Print Time">
-            <i class="fas fa-hourglass"></i> No Active Print
+            <i class="fas fa-clock"></i> No Active Print
         </small>
       `;
     let remainingPrintTimeFormat = `
