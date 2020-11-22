@@ -104,6 +104,42 @@ const removeLine = function (element) {
   element.remove();
 };
 // Dash control listeners
+let bulkPluginsToUpdate = false;
+let bulkPluginUpdateButton = document.getElementById("blkUpdatePluginsBtn");
+bulkPluginUpdateButton.addEventListener("click", async (e) => {});
+
+let bulkOctoPrintsToUpdate = false;
+let bulkOctoPrintUpdateButton = document.getElementById("blkOctoPrintUpdate");
+bulkOctoPrintUpdateButton.addEventListener("click", async (e) => {
+  let onScreenButtons = document.querySelectorAll("*[id^=octoprintUpdate-]");
+
+  let currentUpdates = onScreenButtons.filter(function (el) {
+    return !el.classList.contains("d-none");
+  });
+  bootbox.confirm({
+    message:
+      "This will update any OctoPrint instance with one update available, are you sure?",
+    buttons: {
+      confirm: {
+        label: "Yes",
+        className: "btn-success",
+      },
+      cancel: {
+        label: "No",
+        className: "btn-danger",
+      },
+    },
+    callback: async function (result) {
+      if (result) {
+        for (const btn of currentUpdates) {
+          btn.disabled = false;
+          btn.click();
+          await delay(1000);
+        }
+      }
+    },
+  });
+});
 
 const deleteAllBtn = document.getElementById("delAllBtn");
 
@@ -354,6 +390,7 @@ bulkPowerBtn.addEventListener("click", async (e) => {
                 printerInfo[index],
                 result
               );
+              await delay(1000);
               if (typeof post !== "undefined") {
                 if (post.status === 204) {
                   UI.createAlert(
@@ -1579,9 +1616,7 @@ class dashUpdate {
           const printerSortIndex = document.getElementById(
             `printerSortIndex-${printer._id}`
           );
-          const printerQuickConnectBtn = document.getElementById(
-            "printerQuickConnect-" + printer._id
-          );
+
           const octoPiVersioning = document.getElementById("octoPiVersioning");
           if (octoPiVersioning) {
             octoPiVersioning.innerHTML = `                 
@@ -1619,26 +1654,26 @@ class dashUpdate {
             let updatePluginButton = document.getElementById(
               `octoprintPluginUpdate-${printer._id}`
             );
+
             if (printer.updateAvailable.octoPrintUpdate.updateAvailable) {
-              if (updateButton.classList.contains("d-none")) {
-                updateButton.classList.remove("d-none");
-              }
             } else {
               if (!updateButton.classList.contains("d-none")) {
                 updateButton.classList.add("d-none");
               }
+              // if (!bulkOctoPrintUpdateButton.classList.contains("d-none")) {
+              //   bulkOctoPrintUpdateButton.classList.add("d-none");
+              // }
             }
             if (printer.updateAvailable.pluginUpdates.length > 0) {
-              if (updatePluginButton.classList.contains("d-none")) {
-                updatePluginButton.classList.remove("d-none");
-              }
             } else {
               if (!updatePluginButton.classList.contains("d-none")) {
                 updatePluginButton.classList.add("d-none");
               }
+              // if (!bulkPluginUpdateButton.classList.contains("d-none")) {
+              //   bulkPluginUpdateButton.classList.add("d-none");
+              // }
             }
           }
-
           if (printer.hostState.state === "Online") {
             let apiErrors = 0;
             for (const key in printer.systemChecks.scanning) {
@@ -1789,7 +1824,7 @@ class dashUpdate {
                   if (post.status === 204) {
                     UI.createAlert(
                       "success",
-                      `Successfully made restart attempt to ${printer.printerName}...`,
+                      `Successfully made restart attempt to ${printer.printerName}... You may need to Re-Sync!`,
                       3000,
                       "Clicked"
                     );
@@ -1821,7 +1856,83 @@ class dashUpdate {
           document
             .getElementById(`octoprintPluginUpdate-${printer._id}`)
             .addEventListener("click", () => {
-              UI.createAlert("info", "StIlL dOeSn'T dO aNyThInG!", 3000);
+              let pluginsToUpdate = [];
+              let autoSelect = [];
+              if (printer.updateAvailable.pluginUpdates.length > 0) {
+                printer.updateAvailable.pluginUpdates.forEach((plugin) => {
+                  pluginsToUpdate.push({
+                    text: `${plugin.displayName} - Version: ${plugin.displayVersion}`,
+                    value: plugin.id,
+                  });
+                  autoSelect.push(plugin.id);
+                });
+                bootbox.prompt({
+                  title: "Select the plugins you'd like to update below...",
+                  inputType: "select",
+                  multiple: true,
+                  value: autoSelect,
+                  inputOptions: pluginsToUpdate,
+                  callback: async function (result) {
+                    const data = {
+                      targets: result,
+                      force: true,
+                    };
+                    let updateRequest = await OctoPrintClient.postNOAPI(
+                      printer,
+                      "plugin/softwareupdate/update",
+                      data
+                    );
+                    if (updateRequest.status === 200) {
+                      UI.createAlert(
+                        "success",
+                        `${printer.printerName}: Successfully updated! your instance will restart now.`,
+                        3000,
+                        "Clicked"
+                      );
+                      let post = await OctoPrintClient.systemNoConfirm(
+                        printer,
+                        "restart"
+                      );
+                      if (typeof post !== "undefined") {
+                        if (post.status === 204) {
+                          UI.createAlert(
+                            "success",
+                            `Successfully made restart attempt to ${printer.printerName}... You may need to Re-Sync!`,
+                            3000,
+                            "Clicked"
+                          );
+                        } else {
+                          UI.createAlert(
+                            "error",
+                            `There was an issue sending restart to ${printer.printerName} are you sure it's online?`,
+                            3000,
+                            "Clicked"
+                          );
+                        }
+                      } else {
+                        UI.createAlert(
+                          "error",
+                          `No response from ${printer.printerName}, is it online???`,
+                          3000,
+                          "Clicked"
+                        );
+                      }
+                    } else {
+                      UI.createAlert(
+                        "error",
+                        `${printer.printerName}: Failed to update, manual intervention required!`,
+                        3000,
+                        "Clicked"
+                      );
+                    }
+                  },
+                });
+              } else {
+                UI.createAlert(
+                  "info",
+                  "Please rescan your device as there's no plugins actually available..."
+                );
+              }
             });
           document
             .getElementById(`printerButton-${printer._id}`)
@@ -1848,6 +1959,45 @@ class dashUpdate {
               connectionLogs = await connectionLogs.json();
               PrinterLogs.loadLogs(printer, connectionLogs);
             });
+          if (typeof printer.updateAvailable !== "undefined") {
+            let updateButton = document.getElementById(
+              `octoprintUpdate-${printer._id}`
+            );
+            let updatePluginButton = document.getElementById(
+              `octoprintPluginUpdate-${printer._id}`
+            );
+
+            if (printer.updateAvailable.octoPrintUpdate.updateAvailable) {
+              if (updateButton.classList.contains("d-none")) {
+                updateButton.classList.remove("d-none");
+              }
+              bulkOctoPrintsToUpdate = true;
+            } else {
+              if (!updateButton.classList.contains("d-none")) {
+                updateButton.classList.add("d-none");
+              }
+            }
+            if (printer.updateAvailable.pluginUpdates.length > 0) {
+              if (updatePluginButton.classList.contains("d-none")) {
+                updatePluginButton.classList.remove("d-none");
+              }
+              bulkPluginsToUpdate = true;
+            } else {
+              if (!updatePluginButton.classList.contains("d-none")) {
+                updatePluginButton.classList.add("d-none");
+              }
+            }
+            if (bulkOctoPrintsToUpdate) {
+              if (bulkOctoPrintUpdateButton.classList.contains("d-none")) {
+                bulkOctoPrintUpdateButton.classList.remove("d-none");
+              }
+            }
+            if (bulkPluginsToUpdate) {
+              if (bulkPluginUpdateButton.classList.contains("d-none")) {
+                bulkPluginUpdateButton.classList.remove("d-none");
+              }
+            }
+          }
         }
       }
     });

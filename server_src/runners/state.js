@@ -2313,9 +2313,6 @@ class Runner {
       .then((res) => {
         let octoPrintUpdate = false;
         let pluginUpdates = [];
-        if (farmPrinters[index].printerURL === "http://192.168.1.124:5002") {
-          console.log(res.information);
-        }
         for (var key in res.information) {
           if (res.information.hasOwnProperty(key)) {
             if (res.information[key].updateAvailable) {

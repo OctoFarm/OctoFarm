@@ -92,6 +92,13 @@
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li id="menuPrinters">
+                <% if(process.env.OCTOFARM_VERSION.includes("dev")){%>
+                <a title="Printer Setup"  class="nav-link text-center notyet">
+                    <i class="fas fa-code-branch"></i> <%= process.env.OCTOFARM_VERSION %>
+                </a>
+                <% } %>
+            </li>
+            <li id="menuPrinters">
                 <a title="Printer Setup"  class="nav-link text-center" href="/printers">
                     <i class="fas fa-print"></i> Printers
                 </a>

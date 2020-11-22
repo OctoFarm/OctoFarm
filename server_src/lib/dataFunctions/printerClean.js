@@ -1382,12 +1382,18 @@ class PrinterClean {
 module.exports = {
   PrinterClean,
 };
-if (interval === false) {
-  interval = setInterval(() => {
-    PrinterClean.sortCurrentOperations(printersInformation);
-    PrinterClean.statisticsStart();
-    PrinterClean.createPrinterList(printersInformation, fmToggle);
-  }, 2500);
+
+//Hacky database check due to shoddy layout of code...
+const mongoose = require("mongoose");
+
+if (mongoose.connection.readyState === 1) {
+  if (interval === false) {
+    interval = setInterval(() => {
+      PrinterClean.sortCurrentOperations(printersInformation);
+      PrinterClean.statisticsStart();
+      PrinterClean.createPrinterList(printersInformation, fmToggle);
+    }, 2500);
+  }
+  PrinterClean.statisticsStart();
+  PrinterClean.createPrinterList(printersInformation, fmToggle);
 }
-PrinterClean.statisticsStart();
-PrinterClean.createPrinterList(printersInformation, fmToggle);

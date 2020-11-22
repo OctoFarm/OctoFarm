@@ -25,6 +25,8 @@ const { updatePluginList } = pluginManager;
 // Server Port
 const app = express();
 
+let databaseStatus = 0;
+
 // Passport Config
 require("./server_src/config/passport.js")(passport);
 
@@ -182,6 +184,29 @@ mongoose
     useUnifiedTopology: true,
     useFindAndModify: false,
   })
+  .then(() => {
+    console.log(mongoose.connection.readyState);
+    //Check database actually works...
+    if (!mongoose.connection.readyState === 1) {
+      databaseIssue();
+      let err = "No db connection...";
+      throw err;
+    }
+  })
   .then(() => setupServerSettings())
   .then(() => serverStart())
-  .catch((err) => logger.error(err));
+  .catch((err) => {
+    databaseIssue();
+    logger.error(err);
+  });
+
+const databaseIssue = async () => {
+  app.listen(4000, () => {
+    logger.info(`HTTP server started...`);
+    logger.info(`You can now access your server on port: ${4000}`);
+    // eslint-disable-next-line no-console
+    console.log(`You can now access your server on port: ${4000}`);
+  });
+  app.use(express.static(`${__dirname}/views`));
+  app.use("/", require("./server_src/routes/databaseIssue", { page: "route" }));
+};
