@@ -338,7 +338,7 @@ class HistoryCollection {
     logger.info("Successfully deleted " + fileName + " from OctoPrint.");
   }
 
-  static async complete(payload, printer, job, files) {
+  static async complete(payload, printer, job, files, resends) {
     try {
       const serverSettings = await ServerSettings.find({});
       const previousFilament = JSON.parse(
@@ -440,6 +440,7 @@ class HistoryCollection {
         job,
         notes: "",
         snapshot: "",
+        resends: resends,
       };
 
       const saveHistory = new History({
@@ -496,7 +497,7 @@ class HistoryCollection {
     }
   }
 
-  static async failed(payload, printer, job, files) {
+  static async failed(payload, printer, job, files, resends) {
     try {
       const serverSettings = await ServerSettings.find({});
       const previousFilament = JSON.parse(
@@ -596,6 +597,7 @@ class HistoryCollection {
         notes: "",
         snapshot: "",
         timelapse: "",
+        resends: resends,
       };
       const saveHistory = new History({
         printHistory,

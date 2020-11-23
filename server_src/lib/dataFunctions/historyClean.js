@@ -70,6 +70,13 @@ class HistoryClean {
           history[h].printHistory.printTime
         ),
       };
+
+      if (
+        typeof history[h].printHistory.resends !== "undefined" &&
+        history[h].printHistory.resends !== null
+      ) {
+        sorted.resend = history[h].printHistory.resends;
+      }
       if (typeof history[h].printHistory.snapshot !== "undefined") {
         sorted.snapshot = history[h].printHistory.snapshot;
       }

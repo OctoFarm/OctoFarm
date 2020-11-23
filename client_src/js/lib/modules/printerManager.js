@@ -396,6 +396,11 @@ export default class PrinterManager {
                                  <b class="mb-1">File Name: </b><br><p title="Loading..." class="tag mb-1" id="pmFileName">Loading...</p>
   </center>
   </div>
+                  <div class="col-12">
+                <center>
+                                 <b class="mb-1">Resend Statistics: </b><br><p title="Current job resend ratio" class="tag mb-1 d-none" id="printerResends">Loading...</p>
+  </center>
+  </div>
                   <div class="col-lg-12 col-xl-6">
                      <center>
                   <b>Expected Completion Date: </b><p class="mb-1" id="pmExpectedCompletionDate">Loading...</p>
@@ -1339,6 +1344,7 @@ export default class PrinterManager {
         expectedPrinterCost: document.getElementById("pmExpectedPrinterCost"),
         expectedFilamentCost: document.getElementById("pmExpectedFilamentCost"),
         expectedTotalCosts: document.getElementById("pmJobCosts"),
+        printerResends: document.getElementById("printerResends"),
       },
       connectPage: {
         printerPort: document.getElementById("printerPortDrop"),
@@ -1464,6 +1470,17 @@ export default class PrinterManager {
     }
 
     elements.jobStatus.expectedCompletionDate.innerHTML = dateComplete;
+
+    if (typeof printer.resends !== "undefined" && printer.resends !== null) {
+      if (elements.jobStatus.printerResends.classList.contains("d-none")) {
+        elements.jobStatus.printerResends.classList.remove("d-none");
+      }
+      elements.jobStatus.printerResends.innerHTML = `
+      ${printer.resends.count} / ${
+        printer.resends.transmitted / 1000
+      }K (${printer.resends.ratio.toFixed(0)})
+      `;
+    }
 
     if (
       typeof printer.currentJob !== "undefined" &&

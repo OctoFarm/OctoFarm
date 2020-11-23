@@ -89,6 +89,7 @@ export default class History {
       const viewTable = document.getElementById("viewTable");
       const jobCosting = document.getElementById("jobCosting");
       const jobHourlyCost = document.getElementById("jobHourlyCost");
+      const resendStats = document.getElementById("resendStats");
 
       viewTable.innerHTML = "";
       printerName.innerHTML = " - ";
@@ -109,6 +110,7 @@ export default class History {
       lastPrintTime.placeholder = " - ";
       jobCosting.placeholder = " - ";
       jobHourlyCost.placeholder = " - ";
+      resendStats.placeholder = " - ";
 
       const thumbnail = document.getElementById("thumbnails");
       const thumbnailIndicators = document.getElementById(
@@ -122,6 +124,12 @@ export default class History {
       const current = historyList.history[index];
       printerName.innerHTML = current.printer;
       fileName.innerHTML = current.file.name;
+      if (typeof current.resend !== "undefined" && current.resend !== null) {
+        resendStats.placeholder = `${current.resend.count} / ${
+          current.resend.transmitted / 1000
+        }K (${current.resend.ratio.toFixed(0)})`;
+      }
+
       let thbs = false;
       let counter = 0;
       let active = "active";
@@ -226,7 +234,7 @@ export default class History {
       jobHourlyCost.value = current.costPerHour;
       notes.value = current.notes;
       actualPrintTime.value = Calc.generateTime(current.printTime);
-      status.innerHTML = `<b>Status</b><hr>${current.state}`;
+      status.innerHTML = `${current.state}`;
       if (typeof current.job !== "undefined" && current.job !== null) {
         estimatedPrintTime.value = Calc.generateTime(
           current.job.estimatedPrintTime

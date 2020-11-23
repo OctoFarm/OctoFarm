@@ -188,6 +188,11 @@ class PrinterClean {
         currentUser: farmPrinter.currentUser,
         updateAvailable: farmPrinter.updateAvailable,
       };
+
+      if (typeof farmPrinter.resends !== "undefined") {
+        sortedPrinter.resends = farmPrinter.resends;
+      }
+
       sortedPrinter.tools = await PrinterClean.sortTemps(farmPrinter.temps);
       sortedPrinter.currentJob = await JobClean.returnJob(
         farmPrinter.sortIndex

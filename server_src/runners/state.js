@@ -527,6 +527,9 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       farmPrinters[this.index].stateColour = Runner.getColour(
         data.current.state.text
       );
+      if (typeof data.current.resends !== "undefined") {
+        farmPrinters[this.index].resends = data.current.resends;
+      }
 
       if (typeof data.current.progress !== "undefined") {
         farmPrinters[this.index].progress = data.current.progress;
@@ -658,12 +661,16 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
           files = JSON.parse(
             JSON.stringify(farmPrinters[that.index].fileList.files)
           );
+          let resendStats = JSON.parse(
+            JSON.stringify(farmPrinters[that.index].resends)
+          );
           // Register cancelled print...
           await HistoryCollection.failed(
             data.event.payload,
             sendPrinter,
             job,
-            files
+            files,
+            resendStats
           );
           await Runner.updateFilament();
           setTimeout(async function () {
@@ -687,12 +694,17 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
           files = JSON.parse(
             JSON.stringify(farmPrinters[that.index].fileList.files)
           );
+          let resendStats = JSON.parse(
+            JSON.stringify(farmPrinters[that.index].resends)
+          );
           // Register cancelled print...
+
           await HistoryCollection.complete(
             data.event.payload,
             sendPrinter,
             job,
-            files
+            files,
+            resendStats
           );
           await Runner.updateFilament();
           setTimeout(async function () {
