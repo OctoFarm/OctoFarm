@@ -157,7 +157,11 @@ WebSocketClient.prototype.open = function (url, index) {
   this.instance = new WebSocket(this.url);
   this.instance.on("open", () => {
     this.isAlive = true;
-    this.onopen(this.index);
+    try {
+      this.onopen(this.index);
+    } catch (e) {
+      logger.info(`Cannot re-open web socket... : ${this.index}: ${this.url}`);
+    }
   });
   this.instance.on("pong", () => {
     heartBeat(this.index);
@@ -393,10 +397,12 @@ WebSocketClient.prototype.reconnect = async function (e) {
   );
   this.instance.removeAllListeners();
   const that = this;
-  setTimeout(function () {
+
+  setTimeout(async function () {
     farmPrinters[that.index].hostStateColour = Runner.getColour("Searching...");
     farmPrinters[that.index].hostDescription = "Searching for Host";
     logger.info(`Re-Opening Websocket: ${that.index}: ${that.url}`);
+    await Runner.getUpdates(farmPrinters[that.index]._id);
     if (typeof farmPrinters[that.index] !== "undefined") {
       PrinterClean.generate(
         farmPrinters[that.index],
@@ -409,7 +415,7 @@ WebSocketClient.prototype.reconnect = async function (e) {
 };
 WebSocketClient.prototype.reconnectDelay = async function (e) {
   //10 minute * 6 = 1 hour
-  const longerTime = 600000 / 2;
+  const longerTime = 150000;
   PrinterTicker.addIssue(
     new Date(),
     farmPrinters[this.index].printerURL,
@@ -423,9 +429,10 @@ WebSocketClient.prototype.reconnectDelay = async function (e) {
   );
   this.instance.removeAllListeners();
   const that = this;
-  setTimeout(function () {
+  setTimeout(async function () {
     farmPrinters[that.index].hostStateColour = Runner.getColour("Searching...");
     farmPrinters[that.index].hostDescription = "Searching for Host";
+    await Runner.getUpdates(farmPrinters[that.index]._id);
     if (typeof farmPrinters[that.index] !== "undefined") {
       PrinterClean.generate(
         farmPrinters[that.index],

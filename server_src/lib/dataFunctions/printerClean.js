@@ -1386,14 +1386,14 @@ module.exports = {
 //Hacky database check due to shoddy layout of code...
 const mongoose = require("mongoose");
 
-if (mongoose.connection.readyState === 1) {
-  if (interval === false) {
-    interval = setInterval(() => {
+if (interval === false) {
+  interval = setInterval(() => {
+    if (mongoose.connection.readyState === 1) {
       PrinterClean.sortCurrentOperations(printersInformation);
       PrinterClean.statisticsStart();
       PrinterClean.createPrinterList(printersInformation, fmToggle);
-    }, 2500);
-  }
-  PrinterClean.statisticsStart();
-  PrinterClean.createPrinterList(printersInformation, fmToggle);
+    }
+  }, 2500);
 }
+// PrinterClean.statisticsStart();
+// PrinterClean.createPrinterList(printersInformation, fmToggle);

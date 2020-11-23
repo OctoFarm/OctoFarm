@@ -80,6 +80,7 @@ All notable changes to this project will be documented in this file.
     - Fixed bubbling caused by user navigating away from client screen. Client now checks if screen is active, closes the server connection if not.
     - Fixed Re-Sync notification only appearing after actioned.. now persists whilst farm re-sync is going on.
     - Various client issues, full re-factor or Panel/List/Camera. Should be snappier!
+    - Fixed issue with history deleting record regardless of yes/no answer. 
 
 ## Removed
     - Removed the annoying content editable fields on "Printer Settings" and "Printer Management" and replaced with standard input boxes. 

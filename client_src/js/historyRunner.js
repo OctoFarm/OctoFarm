@@ -411,28 +411,30 @@ export default class History {
           },
         },
         async callback(result) {
-          const histID = {
-            id: e.target.id,
-          };
-          const post = await OctoFarmClient.post("history/delete", histID);
-          if (post.status === 200) {
-            jplist.resetContent(function () {
-              // remove element with id = el1
-              e.target.parentElement.parentElement.parentElement.remove();
-            });
-            UI.createAlert(
-              "success",
-              "Your history entry has been deleted...",
-              3000,
-              "clicked"
-            );
-          } else {
-            UI.createAlert(
-              "error",
-              "Hmmmm seems we couldn't contact the server to delete... is it online?",
-              3000,
-              "clicked"
-            );
+          if (result) {
+            const histID = {
+              id: e.target.id,
+            };
+            const post = await OctoFarmClient.post("history/delete", histID);
+            if (post.status === 200) {
+              jplist.resetContent(function () {
+                // remove element with id = el1
+                e.target.parentElement.parentElement.parentElement.remove();
+              });
+              UI.createAlert(
+                "success",
+                "Your history entry has been deleted...",
+                3000,
+                "clicked"
+              );
+            } else {
+              UI.createAlert(
+                "error",
+                "Hmmmm seems we couldn't contact the server to delete... is it online?",
+                3000,
+                "clicked"
+              );
+            }
           }
         },
       });
