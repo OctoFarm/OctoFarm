@@ -661,9 +661,13 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
           files = JSON.parse(
             JSON.stringify(farmPrinters[that.index].fileList.files)
           );
-          let resendStats = JSON.parse(
-            JSON.stringify(farmPrinters[that.index].resends)
-          );
+          let resendStats = null;
+          if (typeof farmPrinters[that.index].resends !== "undefined") {
+            resendStats = JSON.parse(
+              JSON.stringify(farmPrinters[that.index].resends)
+            );
+          }
+
           // Register cancelled print...
           await HistoryCollection.failed(
             data.event.payload,
@@ -694,9 +698,12 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
           files = JSON.parse(
             JSON.stringify(farmPrinters[that.index].fileList.files)
           );
-          let resendStats = JSON.parse(
-            JSON.stringify(farmPrinters[that.index].resends)
-          );
+          let resendStats = null;
+          if (typeof farmPrinters[that.index].resends !== "undefined") {
+            resendStats = JSON.parse(
+              JSON.stringify(farmPrinters[that.index].resends)
+            );
+          }
           // Register cancelled print...
 
           await HistoryCollection.complete(
