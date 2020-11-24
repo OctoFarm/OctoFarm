@@ -207,9 +207,9 @@ class HistoryCollection {
           }
         );
       };
-      let startDate = Date.now();
       logger.info("Checking for timelapse...", fileName);
       if (!interval) {
+        let unrenderedFileName = null;
         interval = setInterval(async function () {
           let timelapse = await grabTimelapse(printer);
           if (timelapse.status === 200) {
@@ -218,28 +218,27 @@ class HistoryCollection {
               "Successfully grabbed timelapse list... Checking for:",
               fileName
             );
+
             if (timelapseResponse.unrendered.length === 0) {
               let cleanName = fileName;
               if (fileName.includes(".gcode")) {
                 cleanName = fileName.replace(".gcode", "");
               }
-              let orderedTimelapses = _.sortBy(timelapseResponse.files, [
+              let lastTimelapse = _.findIndex(
+                timelapseResponse.files,
                 function (o) {
-                  return o.date;
-                },
-              ]);
-              let lastTimelapse = _.findLastIndex(orderedTimelapses, function (
-                o
-              ) {
-                return o.name.includes(cleanName);
-              });
+                  return o.name.includes(cleanName);
+                }
+              );
+
               if (
                 lastTimelapse !== -1 &&
-                !orderedTimelapses[lastTimelapse].url.includes(".mpg")
+                !timelapseResponse.files[lastTimelapse].url.includes(".mpg")
               ) {
                 let lapse = await HistoryCollection.grabTimeLapse(
-                  orderedTimelapses[lastTimelapse].name,
-                  printer.printerURL + orderedTimelapses[lastTimelapse].url,
+                  timelapseResponse.files[lastTimelapse].name,
+                  printer.printerURL +
+                    timelapseResponse.files[lastTimelapse].url,
                   id,
                   printer,
                   serverSettings
@@ -254,27 +253,27 @@ class HistoryCollection {
                 HistoryClean.start();
                 logger.info("Successfully grabbed timelapse!");
               } else {
-                return null;
-              }
-            } else {
-              let dateNow = Date.now();
-              if (dateNow - startDate >= 3600 * 1000) {
-                clearInterval(interval);
-                logger.info(
-                  "It's been over an hour and no word of a rendered timelapse... calling this one dead..."
-                );
                 const updateHistory = await History.findById(id);
                 updateHistory.printHistory.timelapse = "";
                 updateHistory.markModified("printHistory");
                 await updateHistory.save();
                 HistoryClean.start();
                 logger.info("Successfully grabbed timelapse!");
-              } else {
-                logger.info(
-                  "Still rendering time lapse... check again in 5 seconds: ",
-                  fileName
-                );
+                clearInterval(interval);
+                return null;
               }
+            } else {
+              unrenderedFileName = [...timelapseResponse.unrendered].filter(
+                function (lapse) {
+                  let lapseName = lapse.name.replace(/\s/g, "_");
+                  let checkName = fileName.replace(/\s/g, "_");
+                  if (checkName.includes(".gcode")) {
+                    checkName = fileName.replace(".gcode", "");
+                  }
+                  console.log("Lapse ", lapseName, " Check ", checkName);
+                  return lapseName.includes(checkName);
+                }
+              );
             }
           } else {
             return null;

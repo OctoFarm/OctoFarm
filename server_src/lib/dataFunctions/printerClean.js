@@ -103,7 +103,7 @@ let heatMapCounter = 17280;
 const arrayTotal = [];
 const printerControlList = [];
 let printerFilamentList = [];
-
+let groupList = [];
 let interval = false;
 
 let printerConnectionLogs = [];
@@ -146,6 +146,9 @@ class PrinterClean {
   static returnDashboardStatistics() {
     return dashboardStatistics;
   }
+  static returnGroupList() {
+    return groupList;
+  }
 
   static async generate(farmPrinter, filamentManager) {
     fmToggle = filamentManager;
@@ -187,6 +190,8 @@ class PrinterClean {
         corsCheck: farmPrinter.corsCheck,
         currentUser: farmPrinter.currentUser,
         updateAvailable: farmPrinter.updateAvailable,
+        isFiltered: false,
+        sorted: farmPrinter.sortIndex,
       };
 
       if (typeof farmPrinter.resends !== "undefined") {
@@ -276,6 +281,7 @@ class PrinterClean {
       console.log(e);
     }
   }
+
   static async generateConnectionLogs(farmPrinter) {
     let printerErrorLogs = await ErrorLogs.find({});
 

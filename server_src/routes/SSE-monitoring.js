@@ -13,16 +13,42 @@ const printerClean = require("../lib/dataFunctions/printerClean.js");
 const PrinterClean = printerClean.PrinterClean;
 const settingsClean = require("../lib/dataFunctions/settingsClean.js");
 const SettingsClean = settingsClean.SettingsClean;
-const { getSorting, getFilter } = require("../lib/clientSorting.js");
+const { getSorting, getFilter } = require("../routes/sorting.js");
 
 let clients = [];
 let interval = false;
 
+const sortMe = function (printers) {
+  let sortBy = getSorting();
+  return printers;
+};
+
+const filterMe = function (printers) {
+  let filterBy = getFilter();
+  if (filterBy === "none") {
+    return printers;
+  } else if (filterBy === "Active") {
+    return printers.filter(function (printer) {
+      return printer.printerState.state === "Active";
+    });
+  } else if (filterBy === "Idle") {
+    return printers.filter(function (printer) {
+      return printer.printerState.state === "Idle";
+    });
+  } else if (filterBy === "Offline") {
+    return printers.filter(function (printer) {
+      return printer.printerState.state === "Offline";
+    });
+  }
+};
 if (interval === false) {
   interval = setInterval(async function () {
     const currentOperations = await PrinterClean.returnCurrentOperations();
 
-    const printersInformation = await PrinterClean.returnPrintersInformation();
+    let printersInformation = await PrinterClean.returnPrintersInformation();
+
+    printersInformation = filterMe(printersInformation);
+    printersInformation = sortMe(printersInformation);
 
     const printerControlList = await PrinterClean.returnPrinterControlList();
     let clientSettings = await SettingsClean.returnClientSettings();

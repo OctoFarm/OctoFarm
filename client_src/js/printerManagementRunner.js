@@ -1708,6 +1708,11 @@ class dashUpdate {
           const printerSortIndex = document.getElementById(
             `printerSortIndex-${printer._id}`
           );
+          const printerGroup = document.getElementById(
+            `printerGroup-${printer._id}`
+          );
+
+          printerGroup.innerHTML = printer.group;
 
           const octoPiVersioning = document.getElementById("octoPiVersioning");
           if (octoPiVersioning) {

@@ -1545,7 +1545,9 @@ class Runner {
           changes.push(printers[i]._id);
         }
       }
+
       if (farmPrinters[index].group !== printers[i].group) {
+        farmPrinters[index].group = printers[i].group;
         farmPrinters[index].markModified("group");
         logger.info(
           `Modified current group for: ${farmPrinters[index].printerURL}`
@@ -1554,9 +1556,8 @@ class Runner {
           changes.push(printers[i]._id);
         }
       }
-      farmPrinters;
-      //Testing editing single printers... FORT I@D ALREADY DONE THIS!>!>!>!>
     }
+
     for (let x = 0; x < changes.length; x++) {
       const changeIndex = _.findIndex(farmPrinters, function (o) {
         return o._id == changes[x];
