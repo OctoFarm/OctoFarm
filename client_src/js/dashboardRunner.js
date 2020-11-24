@@ -338,200 +338,6 @@ const optionsUtilisation = {
     },
   },
 };
-const optionsEnviromentalData = {
-  chart: {
-    type: "line",
-    id: "realtime",
-    height: "90%",
-    width: "100%",
-    animations: {
-      enabled: false,
-    },
-    toolbar: {
-      show: false,
-    },
-    zoom: {
-      enabled: false,
-    },
-    background: "#303030",
-  },
-  colors: ["#ff1500", "#324bca", "#caa932", "#49ca32"],
-  stroke: {
-    curve: "smooth",
-  },
-  toolbar: {
-    show: true,
-  },
-  theme: {
-    mode: "dark",
-  },
-  noData: {
-    text: "Loading...",
-  },
-  series: [],
-  yaxis: [
-    {
-      title: {
-        text: "Temp",
-      },
-      seriesName: "Temperature",
-      labels: {
-        formatter(value) {
-          if (value === null) {
-            return "";
-          } else {
-            return `${value}°C`;
-          }
-        },
-      },
-      min: 0,
-      max: 45,
-    },
-    {
-      title: {
-        text: "Humidity",
-      },
-      opposite: true,
-      seriesName: "Humidity",
-      show: true,
-      labels: {
-        formatter(value) {
-          if (value === null) {
-            return "";
-          } else {
-            return `${value} %`;
-          }
-        },
-      },
-      min: 0,
-      max: 100,
-    },
-    {
-      title: {
-        text: "Pressure",
-      },
-      opposite: true,
-      seriesName: "Pressure",
-      show: true,
-      labels: {
-        formatter(value) {
-          if (value === null) {
-            return "";
-          } else {
-            return `${value} Pa`;
-          }
-        },
-      },
-      min: 0,
-      max: 1100,
-    },
-    {
-      title: {
-        text: "Indoor Air Quality",
-      },
-      opposite: false,
-      seriesName: "IAQ",
-      show: true,
-      min: 0,
-      max: 500,
-      labels: {
-        formatter(value) {
-          let state = null;
-          if (value === null) {
-            return "";
-          } else {
-            if (Calc.isBetween(value, 0, 50)) {
-              state = "Excellent";
-            }
-            if (Calc.isBetween(value, 51, 100)) {
-              state = "Good";
-            }
-            if (Calc.isBetween(value, 101, 150)) {
-              state = "Lightly Polluted";
-            }
-            if (Calc.isBetween(value, 151, 200)) {
-              state = "Moderately Polluted";
-            }
-            if (Calc.isBetween(value, 201, 250)) {
-              state = "Heavily Polluted";
-            }
-            if (Calc.isBetween(value, 251, 350)) {
-              state = "Severely Polluted";
-            }
-            if (Calc.isBetween(value, 350, 500)) {
-              state = "Extremely Polluted";
-            }
-          }
-          return `${value}: ${state}`;
-        },
-      },
-    },
-  ],
-
-  xaxis: {
-    type: "datetime",
-    labels: {
-      formatter(value) {
-        const date = new Date(value);
-        const formatTime = date.toLocaleTimeString();
-        return formatTime;
-      },
-    },
-  },
-  annotations: {
-    position: "front",
-    yaxis: [
-      {
-        y: 0,
-        y2: 50,
-        yAxisIndex: 3,
-        borderColor: "#24571f",
-        fillColor: "#133614",
-      },
-      {
-        y: 51,
-        y2: 100,
-        yAxisIndex: 3,
-        borderColor: "#457a24",
-        fillColor: "#31561a",
-      },
-      {
-        y: 101,
-        y2: 150,
-        yAxisIndex: 3,
-        borderColor: "#7a6f24",
-        fillColor: "#564f1a",
-      },
-      {
-        y: 151,
-        y2: 200,
-        yAxisIndex: 3,
-        borderColor: "#5c3421",
-        fillColor: "#3b3015",
-      },
-      {
-        y: 201,
-        y2: 250,
-        yAxisIndex: 3,
-        borderColor: "#5c2121",
-        fillColor: "#3b1515",
-      },
-      {
-        y: 251,
-        y2: 350,
-        yAxisIndex: 3,
-        borderColor: "#37215c",
-        fillColor: "#23153b",
-      },
-      {
-        y: 350,
-        yAxisIndex: 3,
-        borderColor: "#280000",
-        fillColor: "#000000",
-      },
-    ],
-  },
-};
 
 let enviromentalData,
   systemFarmTemp,
@@ -539,13 +345,6 @@ let enviromentalData,
   currentActivityChart,
   currentUtilisation;
 
-if (document.querySelector("#enviromentalHistory")) {
-  enviromentalData = new ApexCharts(
-    document.querySelector("#enviromentalHistory"),
-    optionsEnviromentalData
-  );
-  enviromentalData.render();
-}
 if (document.querySelector("#farmTempMap")) {
   systemFarmTemp = new ApexCharts(
     document.querySelector("#farmTempMap"),
@@ -668,61 +467,295 @@ if (window.Worker) {
   console.log("Web workers not available... sorry!");
 }
 
+let envrioExists = false;
+
 class dashUpdate {
   static envriromentalData(data) {
-    enviromentalData.updateSeries(data);
-    let state = null;
-    let impact = "";
-    let suggestedActions = "";
-    const airQualityElement = document.getElementById("indoorAirQualityAlert");
-    if (data[3].data.length > 0) {
-      const lastValue = data[3].data[data[3].data.length - 1].y;
-      if (airQualityElement.classList.contains("d-none")) {
-        airQualityElement.classList.remove("d-none");
+    let enviromentalData;
+    let optionsEnviromentalData;
+    let availableStats = [];
+    if (!envrioExists) {
+      for (let i = 0; i < data.length; i++) {
+        if (data[i].data.length !== 0) {
+          const tempLabel = {
+            title: {
+              text: "Temp",
+            },
+            seriesName: "Temperature",
+            labels: {
+              formatter(value) {
+                if (value === null) {
+                  return "";
+                } else {
+                  return `${value}°C`;
+                }
+              },
+            },
+            min: 0,
+            max: 45,
+          };
+          const humLabel = {
+            title: {
+              text: "Humidity",
+            },
+            opposite: true,
+            seriesName: "Humidity",
+            show: true,
+            labels: {
+              formatter(value) {
+                if (value === null) {
+                  return "";
+                } else {
+                  return `${value} %`;
+                }
+              },
+            },
+            min: 0,
+            max: 100,
+          };
+          const pressLabel = {
+            title: {
+              text: "Pressure",
+            },
+            opposite: true,
+            seriesName: "Pressure",
+            show: true,
+            labels: {
+              formatter(value) {
+                if (value === null) {
+                  return "";
+                } else {
+                  return `${value} Pa`;
+                }
+              },
+            },
+            min: 0,
+            max: 1100,
+          };
+          const iaqLabel = {
+            title: {
+              text: "Indoor Air Quality",
+            },
+            opposite: false,
+            seriesName: "IAQ",
+            show: true,
+            min: 0,
+            max: 500,
+            labels: {
+              formatter(value) {
+                let state = null;
+                if (value === null) {
+                  return "";
+                } else {
+                  if (Calc.isBetween(value, 0, 50)) {
+                    state = "Excellent";
+                  }
+                  if (Calc.isBetween(value, 51, 100)) {
+                    state = "Good";
+                  }
+                  if (Calc.isBetween(value, 101, 150)) {
+                    state = "Lightly Polluted";
+                  }
+                  if (Calc.isBetween(value, 151, 200)) {
+                    state = "Moderately Polluted";
+                  }
+                  if (Calc.isBetween(value, 201, 250)) {
+                    state = "Heavily Polluted";
+                  }
+                  if (Calc.isBetween(value, 251, 350)) {
+                    state = "Severely Polluted";
+                  }
+                  if (Calc.isBetween(value, 350, 500)) {
+                    state = "Extremely Polluted";
+                  }
+                }
+                return `${value}: ${state}`;
+              },
+            },
+          };
+
+          if (data[i].name === "Temperature") {
+            data[i].name.push(tempLabel);
+          }
+          if (data[i].name === "Humidity") {
+            data[i].name.push(humLabel);
+          }
+          if (data[i].name === "Pressure") {
+            data[i].name.push(pressLabel);
+          }
+          if (data[i].name === "IAQ") {
+            data[i].name.push(iaqLabel);
+          }
+        }
       }
-      if (Calc.isBetween(lastValue, 0, 50)) {
-        state = '<i class="fas fa-check-circle textComplete"></i> Excellent';
-        impact = "Pure air; best for well-being";
-        suggestedActions = "";
+      if (availableStats.length !== 0) {
+        optionsEnviromentalData = {
+          chart: {
+            type: "line",
+            id: "realtime",
+            height: "90%",
+            width: "100%",
+            animations: {
+              enabled: false,
+            },
+            toolbar: {
+              show: false,
+            },
+            zoom: {
+              enabled: false,
+            },
+            background: "#303030",
+          },
+          colors: ["#ff1500", "#324bca", "#caa932", "#49ca32"],
+          stroke: {
+            curve: "smooth",
+          },
+          toolbar: {
+            show: true,
+          },
+          theme: {
+            mode: "dark",
+          },
+          noData: {
+            text: "Loading...",
+          },
+          series: [],
+          yaxis: availableStats,
+
+          xaxis: {
+            type: "datetime",
+            labels: {
+              formatter(value) {
+                const date = new Date(value);
+                const formatTime = date.toLocaleTimeString();
+                return formatTime;
+              },
+            },
+          },
+          annotations: {
+            position: "front",
+            yaxis: [
+              {
+                y: 0,
+                y2: 50,
+                yAxisIndex: 3,
+                borderColor: "#24571f",
+                fillColor: "#133614",
+              },
+              {
+                y: 51,
+                y2: 100,
+                yAxisIndex: 3,
+                borderColor: "#457a24",
+                fillColor: "#31561a",
+              },
+              {
+                y: 101,
+                y2: 150,
+                yAxisIndex: 3,
+                borderColor: "#7a6f24",
+                fillColor: "#564f1a",
+              },
+              {
+                y: 151,
+                y2: 200,
+                yAxisIndex: 3,
+                borderColor: "#5c3421",
+                fillColor: "#3b3015",
+              },
+              {
+                y: 201,
+                y2: 250,
+                yAxisIndex: 3,
+                borderColor: "#5c2121",
+                fillColor: "#3b1515",
+              },
+              {
+                y: 251,
+                y2: 350,
+                yAxisIndex: 3,
+                borderColor: "#37215c",
+                fillColor: "#23153b",
+              },
+              {
+                y: 350,
+                yAxisIndex: 3,
+                borderColor: "#280000",
+                fillColor: "#000000",
+              },
+            ],
+          },
+        };
+        if (document.querySelector("#enviromentalHistory")) {
+          enviromentalData = new ApexCharts(
+            document.querySelector("#enviromentalHistory"),
+            optionsEnviromentalData
+          );
+          enviromentalData.render();
+        }
       }
-      if (Calc.isBetween(lastValue, 51, 100)) {
-        state = '<i class="fas fa-check-circle"></i> Good';
-        impact = "No irritation or impact on well-being";
-        suggestedActions = "";
+
+      envrioExists = true;
+    }
+    if (availableStats.length !== 0) {
+      enviromentalData.updateSeries(data);
+      let state = null;
+      let impact = "";
+      let suggestedActions = "";
+      const airQualityElement = document.getElementById(
+        "indoorAirQualityAlert"
+      );
+      if (data[3].data.length > 0) {
+        const lastValue = data[3].data[data[3].data.length - 1].y;
+        if (airQualityElement.classList.contains("d-none")) {
+          airQualityElement.classList.remove("d-none");
+        }
+        if (Calc.isBetween(lastValue, 0, 50)) {
+          state = '<i class="fas fa-check-circle textComplete"></i> Excellent';
+          impact = "Pure air; best for well-being";
+          suggestedActions = "";
+        }
+        if (Calc.isBetween(lastValue, 51, 100)) {
+          state = '<i class="fas fa-check-circle"></i> Good';
+          impact = "No irritation or impact on well-being";
+          suggestedActions = "";
+        }
+        if (Calc.isBetween(lastValue, 101, 150)) {
+          state =
+            '<i class="fas fa-exclamation-triangle"></i>  Lightly Polluted';
+          impact = "Reduction of well-being possible";
+          suggestedActions = "Ventilation suggested";
+        }
+        if (Calc.isBetween(lastValue, 151, 200)) {
+          state =
+            '<i class="fas fa-exclamation-triangle"></i>  Moderately Polluted';
+          impact = "More significant irritation possible";
+          suggestedActions = "Increase ventilation with clean air";
+        }
+        if (Calc.isBetween(lastValue, 201, 250)) {
+          state =
+            '<i class="fas fa-exclamation-triangle"></i>  Heavily Polluted';
+          impact =
+            "Exposition might lead to effects like headache depending on type of VOCs";
+          suggestedActions = "Optimize ventilation";
+        }
+        if (Calc.isBetween(lastValue, 251, 350)) {
+          state =
+            '<i class="fas fa-exclamation-triangle"></i>  Severely Polluted';
+          impact = "More severe health issue possible if harmful VOC present";
+          suggestedActions =
+            "Contamination should be identified if level is reached even w/o presence of people; maximize ventilation & reduce attendance";
+        }
+        if (Calc.isBetween(lastValue, 350, 500)) {
+          state =
+            '<i class="fas fa-exclamation-triangle"></i>  Extremely Polluted';
+          impact = "Headaches, additional neurotoxic effects possible";
+          suggestedActions =
+            "Contamination needs to be identified; avoid presence in room and maximize ventilation";
+        }
+        airQualityElement.innerHTML = `Indoor Air Quality: ${lastValue} ${state}`;
+        airQualityElement.title = `${impact}: ${suggestedActions}`;
       }
-      if (Calc.isBetween(lastValue, 101, 150)) {
-        state = '<i class="fas fa-exclamation-triangle"></i>  Lightly Polluted';
-        impact = "Reduction of well-being possible";
-        suggestedActions = "Ventilation suggested";
-      }
-      if (Calc.isBetween(lastValue, 151, 200)) {
-        state =
-          '<i class="fas fa-exclamation-triangle"></i>  Moderately Polluted';
-        impact = "More significant irritation possible";
-        suggestedActions = "Increase ventilation with clean air";
-      }
-      if (Calc.isBetween(lastValue, 201, 250)) {
-        state = '<i class="fas fa-exclamation-triangle"></i>  Heavily Polluted';
-        impact =
-          "Exposition might lead to effects like headache depending on type of VOCs";
-        suggestedActions = "Optimize ventilation";
-      }
-      if (Calc.isBetween(lastValue, 251, 350)) {
-        state =
-          '<i class="fas fa-exclamation-triangle"></i>  Severely Polluted';
-        impact = "More severe health issue possible if harmful VOC present";
-        suggestedActions =
-          "Contamination should be identified if level is reached even w/o presence of people; maximize ventilation & reduce attendance";
-      }
-      if (Calc.isBetween(lastValue, 350, 500)) {
-        state =
-          '<i class="fas fa-exclamation-triangle"></i>  Extremely Polluted';
-        impact = "Headaches, additional neurotoxic effects possible";
-        suggestedActions =
-          "Contamination needs to be identified; avoid presence in room and maximize ventilation";
-      }
-      airQualityElement.innerHTML = `Indoor Air Quality: ${lastValue} ${state}`;
-      airQualityElement.title = `${impact}: ${suggestedActions}`;
     }
   }
   static printerStatus(data) {
