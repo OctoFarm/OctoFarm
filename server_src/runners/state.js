@@ -859,10 +859,10 @@ WebSocketClient.prototype.onerror = function (e) {
     arguments,
     `${+this.index}: ${this.url} - ${e}`
   );
-  this.onopen = null;
-  this.onclose = null;
-  this.onerror = null;
-  this.onmessage = null;
+  // this.onopen = null;
+  // this.onclose = null;
+  // this.onerror = null;
+  // this.onmessage = null;
   this.instance.removeAllListeners();
   if (typeof farmPrinters[this.index] !== "undefined") {
     PrinterClean.generate(
@@ -2374,6 +2374,9 @@ class Runner {
           "Complete",
           farmPrinters[index]._id
         );
+      })
+      .catch((e) => {
+        logger.info("Error find updates: ", e);
       });
   }
   static getSettings(id) {
@@ -2783,6 +2786,19 @@ class Runner {
   }
 
   static async updateSettings(settings) {
+    function difference(object, base) {
+      function changes(object, base) {
+        return _.transform(object, function (result, value, key) {
+          if (!_.isEqual(value, base[key])) {
+            result[key] =
+              _.isObject(value) && _.isObject(base[key])
+                ? changes(value, base[key])
+                : value;
+          }
+        });
+      }
+      return changes(object, base);
+    }
     const printer = await Printers.findById(settings.printer.index);
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == settings.printer.index;
@@ -2861,29 +2877,19 @@ class Runner {
         printer.costSettings[key] = settings.costSettings[key];
       }
     }
+
     printer.markModified("costSettings");
-    for (const key in settings.powerCommands) {
-      if (settings.powerCommands[key] !== "") {
-        if (key === "wol") {
-          for (const key2 in settings.powerCommands[key]) {
-            console.log(key2);
-            console.log(
-              "IS IT ME",
-              farmPrinters[index].powerSettings[key][key2]
-            );
-            // if (settings.powerCommands[key][key2] !== "") {
-            //   farmPrinters[index].powerSettings[key][key2] =
-            //     settings.powerCommands[key][key2];
-            //   printer.powerSettings[key][key2] =
-            //     settings.powerCommands[key][key2];
-            // }
-          }
-        } else {
-          farmPrinters[index].powerSettings[key] = settings.powerCommands[key];
-          printer.powerSettings[key] = settings.powerCommands[key];
-        }
+    let differences = difference(
+      settings.costSettings,
+      farmPrinters[index].costSettings
+    );
+
+    for (const key in differences) {
+      if (differences[key] !== null && differences[key] !== "") {
+        farmPrinters[index].costSettings[key] = differences[key];
       }
     }
+
     printer.markModified("powerSettings");
     printer.save();
     let profile = {};
