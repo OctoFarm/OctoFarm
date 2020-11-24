@@ -575,16 +575,16 @@ class dashUpdate {
           };
 
           if (data[i].name === "Temperature") {
-            data[i].name.push(tempLabel);
+            availableStats.push(tempLabel);
           }
           if (data[i].name === "Humidity") {
-            data[i].name.push(humLabel);
+            availableStats.push(humLabel);
           }
           if (data[i].name === "Pressure") {
-            data[i].name.push(pressLabel);
+            availableStats.push(pressLabel);
           }
           if (data[i].name === "IAQ") {
-            data[i].name.push(iaqLabel);
+            availableStats.push(iaqLabel);
           }
         }
       }
