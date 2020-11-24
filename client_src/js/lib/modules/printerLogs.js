@@ -19,8 +19,6 @@ export default class PrinterLogs {
       .then(async (resp) => resp.blob())
       .then(async (blob) => blob.text())
       .then(async (text) => {
-        let octologsLogsRows = document.getElementById("octologsLogsRows");
-        octologsLogsRows.innerHTML = "";
         let octoPrintCount = document.getElementById("octoPrintCount");
         let splitText = await text.split(/(\r\n|\n|\r)/gm);
         splitText = splitText.reverse();
@@ -263,6 +261,9 @@ export default class PrinterLogs {
 
     if (!eventListener) {
       logSelect.addEventListener("change", (e) => {
+        octologsLogsRows.innerHTML = "";
+
+        octoPrintCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
         PrinterLogs.parseLogs(printer, e.target.value);
       });
       document
