@@ -398,7 +398,7 @@ export default class PrinterManager {
   </div>
                   <div class="col-12">
                 <center>
-                                 <b class="mb-1">Resend Statistics: </b><br><p title="Current job resend ratio" class="tag mb-1 d-none" id="printerResends">Loading...</p>
+                                 <b id="resentTitle" class="mb-1 d-none">Resend Statistics: </b><br><p title="Current job resend ratio" class="tag mb-1 d-none" id="printerResends">Loading...</p>
   </center>
   </div>
                   <div class="col-lg-12 col-xl-6">
@@ -1345,6 +1345,7 @@ export default class PrinterManager {
         expectedFilamentCost: document.getElementById("pmExpectedFilamentCost"),
         expectedTotalCosts: document.getElementById("pmJobCosts"),
         printerResends: document.getElementById("printerResends"),
+        resendTitle: document.getElementById("resentTitle"),
       },
       connectPage: {
         printerPort: document.getElementById("printerPortDrop"),
@@ -1442,9 +1443,16 @@ export default class PrinterManager {
       typeof printer.currentJob !== "undefined" &&
       printer.currentJob.thumbnail != null
     ) {
-      camField.innerHTML = `<center><img width="50%" src="${printer.printerURL}/${printer.currentJob.thumbnail}"></center>`;
+      if (
+        camField.innerHTML !==
+        `<center><img width="50%" src="${printer.printerURL}/${printer.currentJob.thumbnail}"></center>`
+      ) {
+        camField.innerHTML = `<center><img width="50%" src="${printer.printerURL}/${printer.currentJob.thumbnail}"></center>`;
+      }
     } else {
-      camField.innerHTML = "";
+      if (camField.innerHTML !== "") {
+        camField.innerHTML = "";
+      }
     }
     if (
       typeof printer.currentJob !== "undefined" &&
@@ -1474,6 +1482,7 @@ export default class PrinterManager {
     if (typeof printer.resends !== "undefined" && printer.resends !== null) {
       if (elements.jobStatus.printerResends.classList.contains("d-none")) {
         elements.jobStatus.printerResends.classList.remove("d-none");
+        elements.jobStatus.resendTitle.classList.remove("d-none");
       }
       elements.jobStatus.printerResends.innerHTML = `
       ${printer.resends.count} / ${

@@ -128,6 +128,17 @@ export default class History {
         resendStats.placeholder = `${current.resend.count} / ${
           current.resend.transmitted / 1000
         }K (${current.resend.ratio.toFixed(0)})`;
+        if (
+          document.getElementById("resendsTitle").classList.contains("d-none")
+        ) {
+          document.getElementById("resendsTitle").classList.remove("d-none");
+        }
+      } else {
+        if (
+          !document.getElementById("resendsTitle").classList.contains("d-none")
+        ) {
+          document.getElementById("resendsTitle").classList.add("d-none");
+        }
       }
 
       let thbs = false;

@@ -204,10 +204,10 @@ let bulkOctoPrintsToUpdate = false;
 let bulkOctoPrintUpdateButton = document.getElementById("blkOctoPrintUpdate");
 bulkOctoPrintUpdateButton.addEventListener("click", async (e) => {
   let onScreenButtons = document.querySelectorAll("*[id^=octoprintUpdate-]");
-
-  let currentUpdates = onScreenButtons.filter(function (el) {
-    return !el.classList.contains("d-none");
+  let currentUpdates = [...onScreenButtons].filter((item) => {
+    return !item.classList.contains("d-none");
   });
+  console.log(currentUpdates);
   bootbox.confirm({
     message:
       "This will update any OctoPrint instance with one update available, are you sure?",

@@ -1013,6 +1013,7 @@ async function updateState(printer, clientSettings, view) {
       elements.start.disabled = true;
       if (view === "camera") {
         elements.start.classList.add("hidden");
+        elements.stop.classList.remove("hidden");
       }
     }
     if (elements.stop) {
@@ -1094,6 +1095,10 @@ async function updateState(printer, clientSettings, view) {
       printer.currentJob !== null &&
       printer.currentJob.fileName !== "No File Selected"
     ) {
+      if (view === "camera") {
+        elements.start.classList.remove("hidden");
+        elements.stop.classList.add("hidden");
+      }
       if (elements.start) {
         elements.start.disabled = false;
       }
@@ -1167,6 +1172,10 @@ async function updateState(printer, clientSettings, view) {
       }
     }
   } else if (printer.printerState.state === "Disconnected") {
+    if (view === "camera") {
+      elements.start.classList.remove("hidden");
+      elements.stop.classList.add("hidden");
+    }
     if (hideClosed !== "") {
       elements.row.classList.add(hideClosed);
     }
@@ -1192,6 +1201,10 @@ async function updateState(printer, clientSettings, view) {
       elements.restart.classList.add("hidden");
     }
   } else if (printer.printerState.colour.category === "Offline") {
+    if (view === "camera") {
+      elements.start.classList.remove("hidden");
+      elements.stop.classList.add("hidden");
+    }
     if (hideOffline !== "") {
       elements.row.classList.add(hideOffline);
     }

@@ -8,25 +8,32 @@ let currentPrinter = null;
 
 export default class PrinterLogs {
   static async parseLogs(printer, url) {
-    url = url.replace(printer.printerURL + "/", "");
-    OctoPrintClient.get(printer, `${url}`)
+    fetch(url, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": printer.apikey,
+        Range: "bytes=-500000",
+      },
+    })
       .then(async (resp) => resp.blob())
       .then(async (blob) => blob.text())
       .then(async (text) => {
         let octologsLogsRows = document.getElementById("octologsLogsRows");
         octologsLogsRows.innerHTML = "";
-        s;
         let octoPrintCount = document.getElementById("octoPrintCount");
         let splitText = await text.split(/(\r\n|\n|\r)/gm);
         splitText = splitText.reverse();
-        for (let i = 0; i < 500; i++) {
+        for (let i = 0; i < splitText.length; i++) {
           let colour = null;
           if (splitText[i].includes("INFO")) {
             colour = "Info";
           } else if (splitText[i].includes("WARNING")) {
             colour = "Active";
-          } else {
+          } else if (splitText[i].includes("DEBUG")) {
             colour = "Offline";
+          } else {
+            colour = "Idle";
           }
           //Skip blank rows
           if (splitText[i].length > 1 && splitText[i] !== " ") {
