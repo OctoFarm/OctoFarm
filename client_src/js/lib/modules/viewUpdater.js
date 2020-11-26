@@ -12,6 +12,7 @@ import { checkTemps } from "../modules/temperatureCheck.js";
 import { checkFilamentManager } from "./filamentGrab.js";
 import currentOperations from "./currentOperations";
 import doubleClickFullScreen from "../functions/fullscreen.js";
+import OctoFarmclient from "../octofarm";
 
 const elems = [];
 let powerTimer = 20000;
@@ -24,6 +25,13 @@ let printerArea = document.getElementById("printerArea");
 let currentView = null;
 
 document.addEventListener("visibilitychange", handleVisibilityChange, false);
+
+document.getElementById("filterStates").addEventListener("change", (e) => {
+  OctoFarmclient.get("client/updateFilter/" + e.target.value);
+});
+document.getElementById("sortStates").addEventListener("change", (e) => {
+  OctoFarmclient.get("client/updateSorting/" + e.target.value);
+});
 
 function handleVisibilityChange() {
   if (document.hidden) {
@@ -723,6 +731,32 @@ async function updateState(printer, clientSettings, view) {
   //Grab elements on page
   const elements = grabElements(printer);
   if (typeof elements.row === "undefined") return; //Doesn't exist can skip updating
+
+  //Check sorting order and update if required...
+  //elements.row.style.order = printer.order;
+
+  //Check display and skip if not displayed...
+  if (printer.display) {
+    if (elements.row.style.display === "none") {
+      switch (view) {
+        case "list":
+          elements.row.style.display = "table";
+          break;
+        case "panel":
+          elements.row.style.display = "block";
+          break;
+        case "camera":
+          elements.row.style.display = "block";
+          break;
+      }
+    }
+  } else {
+    if (elements.row.style.display !== "none") {
+      elements.row.style.display = "none";
+    }
+    return;
+  }
+
   //Printer
   checkQuickConnectState(printer);
   elements.control.disabled =
@@ -746,7 +780,6 @@ async function updateState(printer, clientSettings, view) {
   switch (view) {
     case "list":
       UI.doesElementNeedUpdating(stateCategory, elements.state, "classList");
-      UI.doesElementNeedUpdating(stateCategory, elements.row, "classList");
       break;
     case "panel":
       UI.doesElementNeedUpdating(

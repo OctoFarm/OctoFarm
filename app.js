@@ -170,6 +170,10 @@ const serverStart = async () => {
         "/input",
         require("./server_src/routes/externalDataCollection", { page: "route" })
       );
+      app.use(
+        "/client",
+        require("./server_src/routes/sorting", { page: "route" })
+      );
     } catch (e) {
       await logger.error(e);
       // eslint-disable-next-line no-console

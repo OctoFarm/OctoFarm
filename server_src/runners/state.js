@@ -37,6 +37,7 @@ const printerTicker = require("./printerTicker.js");
 const { PrinterTicker } = printerTicker;
 
 let farmPrinters = [];
+let farmPrintersGroups = [];
 
 let systemSettings = {};
 
@@ -1306,6 +1307,30 @@ class Runner {
     return true;
   }
 
+  static async updateGroupList() {
+    farmPrintersGroups = [];
+    let stateDefaults = [
+      "All Printers",
+      "State: Idle",
+      "State: Active",
+      "State: Complete",
+      "State: Disconnected",
+    ];
+    stateDefaults.forEach((def) => {
+      farmPrintersGroups.push(def);
+    });
+    farmPrinters.forEach((printer) => {
+      if (!farmPrintersGroups.includes(`Group: ${printer.group}`)) {
+        if (!_.isEmpty(printer.group)) {
+          farmPrintersGroups.push(`Group: ${printer.group}`);
+        }
+      }
+    });
+  }
+  static returnGroupList() {
+    return farmPrintersGroups;
+  }
+
   static async setDefaults(id) {
     const i = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
@@ -1426,6 +1451,7 @@ class Runner {
     if (typeof farmPrinters[i].group === "undefined") {
       farmPrinters[i].group = "";
     }
+
     if (typeof farmPrinters[i].printerURL === "undefined") {
       farmPrinters[
         i
@@ -1474,6 +1500,7 @@ class Runner {
     printer.alerts = farmPrinters[i].alerts;
     printer.costSettings = farmPrinters[i].costSettings;
     await printer.save();
+    Runner.updateGroupList();
     return true;
   }
 
@@ -1557,7 +1584,7 @@ class Runner {
         }
       }
     }
-
+    Runner.updateGroupList();
     for (let x = 0; x < changes.length; x++) {
       const changeIndex = _.findIndex(farmPrinters, function (o) {
         return o._id == changes[x];

@@ -13,32 +13,115 @@ const printerClean = require("../lib/dataFunctions/printerClean.js");
 const PrinterClean = printerClean.PrinterClean;
 const settingsClean = require("../lib/dataFunctions/settingsClean.js");
 const SettingsClean = settingsClean.SettingsClean;
-const { getSorting, getFilter } = require("../routes/sorting.js");
+const { getSorting, getFilter } = require("../lib/sorting.js");
+
+// User Modal
+const runner = require("../runners/state.js");
+const Runner = runner.Runner;
 
 let clients = [];
 let interval = false;
 
 const sortMe = function (printers) {
   let sortBy = getSorting();
-  return printers;
+  if (sortBy === "index") {
+    return printers;
+  } else if (sortBy === "percent") {
+    let sortedPrinters = printers.sort(function (a, b) {
+      if (typeof a.currentJob === "undefined") return -1;
+      if (typeof b.currentJob === "undefined") return -1;
+      return (
+        parseFloat(a.currentJob.percent) - parseFloat(b.currentJob.percent)
+      );
+    });
+    let i = 0,
+      len = sortedPrinters.length;
+    while (i + 1 < len + 1) {
+      sortedPrinters[i].order = i;
+      i++;
+    }
+    return sortedPrinters;
+  } else if (sortBy === "time") {
+    let sortedPrinters = printers.sort(function (a, b) {
+      if (typeof a.currentJob === "undefined") return -1;
+      if (typeof b.currentJob === "undefined") return -1;
+      return (
+        parseFloat(a.currentJob.printTimeRemaining) -
+        parseFloat(b.currentJob.printTimeRemaining)
+      );
+    });
+    let i = 0,
+      len = sortedPrinters.length;
+    while (i + 1 < len + 1) {
+      sortedPrinters[i].order = i;
+      i++;
+    }
+    return sortedPrinters;
+  } else {
+    return printers;
+  }
 };
-
 const filterMe = function (printers) {
   let filterBy = getFilter();
-  if (filterBy === "none") {
+  let currentGroups = Runner.returnGroupList();
+  if (filterBy === "All Printers") {
     return printers;
-  } else if (filterBy === "Active") {
-    return printers.filter(function (printer) {
-      return printer.printerState.state === "Active";
-    });
-  } else if (filterBy === "Idle") {
-    return printers.filter(function (printer) {
-      return printer.printerState.state === "Idle";
-    });
-  } else if (filterBy === "Offline") {
-    return printers.filter(function (printer) {
-      return printer.printerState.state === "Offline";
-    });
+  } else if (filterBy === "State: Active") {
+    let i = 0,
+      len = printers.length;
+    while (i < len) {
+      printers[i].display =
+        printers[i].printerState.colour.category === "Active";
+      i++;
+    }
+    return printers;
+  } else if (filterBy === "State: Idle") {
+    let i = 0,
+      len = printers.length;
+    while (i < len) {
+      printers[i].display = printers[i].printerState.colour.category === "Idle";
+      i++;
+    }
+    return printers;
+  } else if (filterBy === "State: Disconnected") {
+    let i = 0,
+      len = printers.length;
+    while (i < len) {
+      printers[i].display =
+        printers[i].printerState.colour.category === "Disconnected";
+      i++;
+    }
+    return printers;
+  } else if (filterBy === "State: Complete") {
+    let i = 0,
+      len = printers.length;
+    while (i < len) {
+      printers[i].display =
+        printers[i].printerState.colour.category === "Complete";
+      i++;
+    }
+    return printers;
+  } else {
+    //Check groups...
+    let current = null;
+    for (let i = 0; i < currentGroups.length; i++) {
+      if (filterBy === currentGroups[i]) {
+        current = currentGroups[i];
+      }
+    }
+    if (current !== null) {
+      let i = 0,
+        len = printers.length;
+      while (i < len) {
+        printers[i].display =
+          printers[i].group === current.replace("Group: ", "");
+        i++;
+      }
+      return printers;
+    } else {
+      //Fall back...
+      return printers;
+    }
   }
 };
 if (interval === false) {
@@ -47,9 +130,8 @@ if (interval === false) {
 
     let printersInformation = await PrinterClean.returnPrintersInformation();
 
-    printersInformation = filterMe(printersInformation);
-    printersInformation = sortMe(printersInformation);
-
+    printersInformation = await filterMe(printersInformation);
+    printersInformation = await sortMe(printersInformation);
     const printerControlList = await PrinterClean.returnPrinterControlList();
     let clientSettings = await SettingsClean.returnClientSettings();
     if (typeof clientSettings === "undefined") {

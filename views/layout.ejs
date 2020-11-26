@@ -59,30 +59,28 @@
                 Current Operations</a>
             </li>
             <% if(page.includes("Camera") || page.includes("List") || page.includes("Panel")){%>
-                <li class="nav-item d-none">
+
+                <li class="nav-item">
                     <div class="input-group p-0 m-0 pr-1  mx-auto">
                         <div class="input-group-prepend">
                             <label class="input-group-text" for="filterStates">Filter: </label>
                         </div>
                         <select class="custom-select" id="filterStates">
-                            <option selected="" href="#" value="all">All Printers</option>
-                            <option href="#">State: Idle</option>
-                            <option href="#">State: Active</option>
-                            <option href="#">State: Complete</option>
-                            <option href="#">State: Disconnected</option>
-
+                            <% for(let i = 0; i < printGroups.length; i++){ %>
+                                <option href="#" value="<%= printGroups[i] %>"><%= printGroups[i] %></option>
+                            <% } %>
                         </select>
                     </div>
                 </li>
-                <li class="nav-item d-none">
-                    <div class="input-group p-0 m-0 pr-1 mx-auto">
+                <li class="nav-item">
+                    <div class="input-group p-0 m-0 pr-1 mx-auto d-none">
                         <div class="input-group-prepend">
                             <label class="input-group-text" for="sortStates">Sort: </label>
                         </div>
                         <select class="custom-select" id="sortStates">
-                            <option href="#">Index</option>
-                            <option href="#">Percent</option>
-                            <option id="timeOption" href="#">Time</option>
+                            <option href="#" value="index">Index</option>
+                            <option href="#" value="percent">Percent</option>
+                            <option id="timeOption" href="#" value="time">Time</option>
                         </select>
                     </div>
                 </li>

@@ -30,6 +30,8 @@ const SystemInfo = systemInfo.SystemRunner;
 
 const { FileClean } = fileClean;
 
+const { getSorting, getFilter } = require("../lib/sorting.js");
+
 const version = process.env.OCTOFARM_VERSION;
 console.log(`Version: ${version}`);
 console.log(`db: ${db}`);
@@ -210,6 +212,15 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
   const sortedIndex = await Runner.sortedIndex();
   const clientSettings = await SettingsClean.returnClientSettings();
   const serverSettings = await SettingsClean.returnSystemSettings();
+
+  const currentSort = await getSorting();
+  const currentFilter = await getFilter();
+
+  let printGroups = await Runner.returnGroupList();
+  if (typeof printGroups === "undefined") {
+    printGroups = [];
+  }
+
   let user = null;
   let group = null;
   if (serverSettings.server.loginRequired === false) {
@@ -229,6 +240,8 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
     page: "Panel View",
     helpers: prettyHelpers,
     clientSettings,
+    printGroups,
+    currentChanges: { currentSort, currentFilter },
   });
 });
 // Camera view  Page
@@ -237,6 +250,15 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
   const sortedIndex = await Runner.sortedIndex();
   const clientSettings = await SettingsClean.returnClientSettings();
   const serverSettings = await SettingsClean.returnSystemSettings();
+
+  const currentSort = await getSorting();
+  const currentFilter = await getFilter();
+
+  let printGroups = await Runner.returnGroupList();
+  if (typeof printGroups === "undefined") {
+    printGroups = [];
+  }
+
   let user = null;
   let group = null;
   if (serverSettings.server.loginRequired === false) {
@@ -256,6 +278,8 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
     page: "Camera View",
     helpers: prettyHelpers,
     clientSettings,
+    printGroups,
+    currentChanges: { currentSort, currentFilter },
   });
 });
 // List view  Page
@@ -264,6 +288,15 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
   const sortedIndex = await Runner.sortedIndex();
   const clientSettings = await SettingsClean.returnClientSettings();
   const serverSettings = await SettingsClean.returnSystemSettings();
+
+  const currentSort = await getSorting();
+  const currentFilter = await getFilter();
+
+  let printGroups = await Runner.returnGroupList();
+  if (typeof printGroups === "undefined") {
+    printGroups = [];
+  }
+
   let user = null;
   let group = null;
   if (serverSettings.server.loginRequired === false) {
@@ -283,6 +316,8 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
     page: "List View",
     helpers: prettyHelpers,
     clientSettings,
+    printGroups,
+    currentChanges: { currentSort, currentFilter },
   });
 });
 router.get("/mon/currentOp", ensureAuthenticated, async (req, res) => {

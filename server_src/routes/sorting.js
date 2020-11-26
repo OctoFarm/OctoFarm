@@ -3,23 +3,15 @@ const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
 
-let filterBy = "none";
+const { updateSorting, updateFilter } = require("../lib/sorting.js");
 
-let sortBy = "index";
+router.get("/updateFilter/:filter", ensureAuthenticated, async (req, res) => {
+  updateFilter(req.params.filter);
+  res.sendStatus(200);
+});
+router.get("/updateSorting/:sorting", ensureAuthenticated, async (req, res) => {
+  updateSorting(req.params.sorting);
+  res.sendStatus(200);
+});
 
-const getSorting = function () {
-  return sortBy;
-};
-
-const getFilter = function () {
-  return filterBy;
-};
-
-const updateSorting = function (sorting) {
-  sortBy = sorting;
-};
-const updateFilter = function (filter) {
-  filterBy = filter;
-};
-exports.getSorting = getSorting;
-exports.getFilter = getFilter;
+module.exports = router;
