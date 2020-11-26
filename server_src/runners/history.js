@@ -209,7 +209,7 @@ class HistoryCollection {
       };
       logger.info("Checking for timelapse...", fileName);
       if (!interval) {
-        let unrenderedFileName = null;
+        console.log("CHECKING", fileName);
         interval = setInterval(async function () {
           let timelapse = await grabTimelapse(printer);
           if (timelapse.status === 200) {
@@ -218,18 +218,31 @@ class HistoryCollection {
               "Successfully grabbed timelapse list... Checking for:",
               fileName
             );
-
+            this.unrenderedFileName = null;
+            console.log("Check", fileName);
             if (timelapseResponse.unrendered.length === 0) {
               let cleanName = fileName;
               if (fileName.includes(".gcode")) {
                 cleanName = fileName.replace(".gcode", "");
               }
-              let lastTimelapse = _.findIndex(
-                timelapseResponse.files,
-                function (o) {
+              let lastTimelapse = null;
+              console.log("Checking for", this.unrenderedFileName);
+              if (this.unrenderedFileName === null) {
+                console.log(
+                  `Unrendered is ${this.unrenderedFileName}... hmmm... fallback to name match on last index...`
+                );
+                lastTimelapse = _.findIndex(timelapseResponse.files, function (
+                  o
+                ) {
                   return o.name.includes(cleanName);
-                }
-              );
+                });
+              } else {
+                lastTimelapse = _.findIndex(timelapseResponse.files, function (
+                  o
+                ) {
+                  return o.name.includes(this.unrenderedFileName);
+                });
+              }
 
               if (
                 lastTimelapse !== -1 &&
@@ -245,7 +258,10 @@ class HistoryCollection {
                 );
                 //Clearing interval
                 clearInterval(interval);
-
+                console.log(
+                  "Saving timelapse... woop!",
+                  this.unrenderedFileName
+                );
                 const saveHistory = await History.findById(id);
                 saveHistory.printHistory.timelapse = lapse;
                 saveHistory.markModified("printHistory");
@@ -260,20 +276,48 @@ class HistoryCollection {
                 HistoryClean.start();
                 logger.info("Successfully grabbed timelapse!");
                 clearInterval(interval);
+                console.log(
+                  "Some failure occured... ",
+                  this.unrenderedFileName
+                );
                 return null;
               }
             } else {
-              unrenderedFileName = [...timelapseResponse.unrendered].filter(
-                function (lapse) {
-                  let lapseName = lapse.name.replace(/\s/g, "_");
-                  let checkName = fileName.replace(/\s/g, "_");
-                  if (checkName.includes(".gcode")) {
-                    checkName = fileName.replace(".gcode", "");
+              console.log("Unrendered", fileName);
+
+              console.log(this.unrenderedFileName);
+              if (this.unrenderedFileName === null) {
+                let unRenderedGrab = [...timelapseResponse.unrendered].filter(
+                  function (lapse) {
+                    let lapseName = lapse.name.replace(/\s/g, "_");
+                    let checkName = fileName.replace(/\s/g, "_");
+                    if (checkName.includes(".gcode")) {
+                      checkName = fileName.replace(".gcode", "");
+                    }
+                    return lapseName.includes(checkName);
                   }
-                  console.log("Lapse ", lapseName, " Check ", checkName);
-                  return lapseName.includes(checkName);
+                );
+                if (unRenderedGrab.length === 1) {
+                  this.unrenderedFileName = unRenderedGrab[0].name;
+                  console.log("Found! Unrendered...", this.unrenderedFileName);
+                  logger.info(
+                    "File is still rendering... awaiting completion:",
+                    this.unrenderedFileName
+                  );
+                } else {
+                  logger.info(
+                    "No un-rendered files... must be complete, attempting download.",
+                    unRenderedGrab
+                  );
                 }
-              );
+              } else {
+                console.log(
+                  `Awaiting ${this.unrenderedFileName} to finish rendering`
+                );
+                logger.info(
+                  `Awaiting ${this.unrenderedFileName} to finish rendering`
+                );
+              }
             }
           } else {
             return null;

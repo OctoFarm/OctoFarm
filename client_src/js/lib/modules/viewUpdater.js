@@ -323,7 +323,7 @@ function drawPanelView(printer, clientSettings) {
   }
 
   return `
-        <div class="col-lg-${printerRows} col-xl-${printerRows} ${hidden}" id="panel-${printer._id}">
+        <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2 ${hidden}" id="panel-${printer._id}">
         <div class="card mt-1 mb-1 ml-1 mr-1 text-center">
           <div class="card-header dashHeader">
            <button

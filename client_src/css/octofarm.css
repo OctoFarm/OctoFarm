@@ -348,7 +348,7 @@ a.notyet {
   position: absolute;
   bottom: 25px;
   right: 7px;
-  z-index: 100000;
+  z-index: 1000;
 }
 .camName {
   pointer-events: none;
