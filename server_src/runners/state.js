@@ -1022,7 +1022,7 @@ class Runner {
         throw error;
       }
       farmPrinters[i].systemChecks.scanning.api.status = "warning";
-      const ws = new WebSocketClient();
+      const ws = new WebSocketClient({ followRedirects: true });
       farmPrinters[i].state = "Searching...";
       farmPrinters[i].stateColour = Runner.getColour("Searching...");
       farmPrinters[i].hostState = "Searching...";
