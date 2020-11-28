@@ -155,7 +155,7 @@ WebSocketClient.prototype.open = function (url, index) {
   farmPrinters[this.index].webSocket = "warning";
   farmPrinters[this.index].webSocketDescription =
     "Websocket Connected but in Tentative state until receiving data";
-  this.instance = new WebSocket(this.url);
+  this.instance = new WebSocket(this.url, { followRedirects: true });
   this.instance.on("open", () => {
     this.isAlive = true;
     try {
@@ -1022,7 +1022,7 @@ class Runner {
         throw error;
       }
       farmPrinters[i].systemChecks.scanning.api.status = "warning";
-      const ws = new WebSocketClient({ followRedirects: true });
+      const ws = new WebSocketClient();
       farmPrinters[i].state = "Searching...";
       farmPrinters[i].stateColour = Runner.getColour("Searching...");
       farmPrinters[i].hostState = "Searching...";
