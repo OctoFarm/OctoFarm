@@ -207,7 +207,6 @@ bulkOctoPrintUpdateButton.addEventListener("click", async (e) => {
   let currentUpdates = [...onScreenButtons].filter((item) => {
     return !item.classList.contains("d-none");
   });
-  console.log(currentUpdates);
   bootbox.confirm({
     message:
       "This will update any OctoPrint instance with one update available, are you sure?",
@@ -936,7 +935,7 @@ editBtn.addEventListener("click", (event) => {
             printerAPIKEY.value = printerAPIKEY.placeholder;
           }
           if (printerGroup.value.length === 0) {
-            printerGroup.value = printerAPIKEY.placeholder;
+            printerGroup.value = printerGroup.placeholder;
           }
           if (printerName.value.length === 0) {
             printerName.value = printerName.placeholder;

@@ -34,6 +34,19 @@ const history = {
     deleteAfter: false,
   },
 };
+const influxExport = {
+  active: false,
+  host: null,
+  port: 8086,
+  database: "OctoFarmExport",
+  username: null,
+  password: null,
+  retentionPolicy: {
+    duration: "365d",
+    replication: 1,
+    defaultRet: true,
+  },
+};
 
 class ServerSettings {
   static async init() {
@@ -63,6 +76,9 @@ class ServerSettings {
     }
     if (typeof settings[0].history === "undefined") {
       settings[0].history = history;
+    }
+    if (typeof settings[0].influxExport === "undefined") {
+      settings[0].influxExport = influxExport;
     }
     await settings[0].save().then((ret) => {
       SettingsClean.start();

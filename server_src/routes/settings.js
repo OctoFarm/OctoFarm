@@ -152,10 +152,41 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
     checked[0].timeout = req.body.timeout;
     checked[0].filament = req.body.filament;
     checked[0].history = req.body.history;
+    checked[0].influxExport = req.body.influxExport;
+    //Check the influx export to see if all information exists... disable if not...
+    let shouldDisableInflux = false;
+    let returnMsg = "";
+    let influx = req.body.influxExport;
+    if (req.body.influxExport.active) {
+      if (influx.host.length === 0) {
+        shouldDisableInflux = true;
+        returnMsg += "Issue: No host information! <br>";
+      }
+      if (influx.port.length === 0) {
+        shouldDisableInflux = true;
+        returnMsg += "Issue: No port information! <br>";
+      }
+      if (influx.database.length === 0 || influx.database.includes(" ")) {
+        shouldDisableInflux = true;
+        returnMsg += "Issue: No database name or contains spaces! <br>";
+      }
+      if (shouldDisableInflux) {
+        checked[0].influxExport.active = false;
+        checked[0].markModified("influxExport");
+      }
+    }
+
     await checked[0].save().then(() => {
       SettingsClean.start();
     });
-    res.send({ msg: "Settings Saved" });
+    if (shouldDisableInflux) {
+      res.send({
+        msg: returnMsg,
+        status: "warning",
+      });
+    } else {
+      res.send({ msg: "Settings Saved", status: "success" });
+    }
   });
 });
 router.get("/sysInfo", ensureAuthenticated, async (req, res) => {

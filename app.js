@@ -16,6 +16,8 @@ const Logger = require("./server_src/lib/logger.js");
 const logger = new Logger("OctoFarm-Server");
 const printerClean = require("./server_src/lib/dataFunctions/printerClean.js");
 
+const { databaseSetup } = require("./server_src/lib/influxExport.js");
+
 const { PrinterClean } = printerClean;
 
 const pluginManager = require("./server_src/runners/pluginManager.js");
@@ -108,6 +110,9 @@ const serverStart = async () => {
     const { SystemRunner } = system;
     const sr = await SystemRunner.init();
     await logger.info(sr);
+
+    await databaseSetup();
+
     app.listen(PORT, () => {
       logger.info(`HTTP server started...`);
       logger.info(`You can now access your server on port: ${PORT}`);

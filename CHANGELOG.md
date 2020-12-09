@@ -62,6 +62,7 @@ All notable changes to this project will be documented in this file.
     - Changed the time displays for all views, now follows unified format. Applied currently on Panel/List/Camera. 
     - Camera view now hides print information (times / tools) until hovering over. 
     - History page now displays an image slider when loading the "edit/view" box. You can cycle through the thumbnails from your slicer if you use that plugin, or the captured image of the finished print taken from your webcam.
+    - Added the option for websockets to follow 301 redirects. Should help with 301 errors. 
 
 ### Fixed
     - Fixed issue with File Manager not loading if printer in index 0 was offline.

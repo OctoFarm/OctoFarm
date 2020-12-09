@@ -14,13 +14,14 @@ const PrinterClean = printerClean.PrinterClean;
 const settingsClean = require("../lib/dataFunctions/settingsClean.js");
 const SettingsClean = settingsClean.SettingsClean;
 const { getSorting, getFilter } = require("../lib/sorting.js");
-
+const { writePoints } = require("../lib/influxExport.js");
 // User Modal
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 
 let clients = [];
 let interval = false;
+let influxCounter = 2000;
 
 const sortMe = function (printers) {
   let sortBy = getSorting();
@@ -28,7 +29,7 @@ const sortMe = function (printers) {
     return printers;
   } else if (sortBy === "percent") {
     let sortedPrinters = printers.sort(function (a, b) {
-      if (typeof a.currentJob === "undefined") return -1;
+      if (typeof a.currentJob === "undefined") return 1;
       if (typeof b.currentJob === "undefined") return -1;
       return (
         parseFloat(a.currentJob.percent) - parseFloat(b.currentJob.percent)
@@ -43,7 +44,7 @@ const sortMe = function (printers) {
     return sortedPrinters;
   } else if (sortBy === "time") {
     let sortedPrinters = printers.sort(function (a, b) {
-      if (typeof a.currentJob === "undefined") return -1;
+      if (typeof a.currentJob === "undefined") return 1;
       if (typeof b.currentJob === "undefined") return -1;
       return (
         parseFloat(a.currentJob.printTimeRemaining) -
@@ -138,6 +139,21 @@ if (interval === false) {
       await SettingsClean.start();
       clientSettings = await SettingsClean.returnClientSettings();
     }
+
+    let serverSettings = await SettingsClean.returnSystemSettings();
+    if (typeof serverSettings === "undefined") {
+      await SettingsClean.start();
+      serverSettings = await SettingsClean.returnSystemSettings();
+    }
+    if (serverSettings.influxExport.active) {
+      if (influxCounter >= 2000) {
+        sendToInflux(printersInformation);
+        influxCounter = 0;
+      } else {
+        influxCounter = influxCounter + 500;
+      }
+      // eslint-disable-next-line no-use-before-define
+    }
     const infoDrop = {
       printersInformation: printersInformation,
       currentOperations: currentOperations,
@@ -182,5 +198,159 @@ router.get("/get/", ensureAuthenticated, function (req, res) {
     clients = clients.filter((c) => c.id !== clientId);
   });
 });
+
+function sendToInflux(printersInformation) {
+  //console.log(printersInformation[0]);
+  printersInformation.forEach((printer) => {
+    const date = Date.now();
+    let group = " ";
+    if (printer.group === "") {
+      group = " ";
+    } else {
+      group = printer.group;
+    }
+    if (printer.cameraURL !== "") {
+    }
+    const tags = {
+      name: printer.printerName,
+      group: group,
+      url: printer.printerURL,
+      state: printer.printerState.state,
+      host_state: printer.hostState.state,
+      websocket_state: printer.webSocketState.colour,
+      octoprint_version: printer.octoPrintVersion,
+    };
+    const printerData = {
+      name: printer.printerName,
+      group: group,
+      url: printer.printerURL,
+      state: printer.printerState.state,
+      host_state: printer.hostState.state,
+      websocket_state: printer.webSocketState.colour,
+      octoprint_version: printer.octoPrintVersion,
+      state: printer.printerState.state,
+      group: group,
+      state_category: printer.printerState.colour.category,
+      current_idle_time: printer.currentIdle,
+      current_active_time: printer.currentActive,
+      current_offline_time: printer.currentOffline,
+      date_added: printer.dateAdded,
+      storage_free: printer.storage.free,
+      storage_total: printer.storage.total,
+      timestamp: date,
+    };
+
+    if (typeof printer.resends !== "undefined") {
+      printerData["job_resends"] = `${printer.resends.count} / ${
+        printer.resends.transmitted / 1000
+      }K (${printer.resends.ratio.toFixed(0)})`;
+    }
+
+    if (
+      typeof printer.currentJob !== "undefined" &&
+      printer.currentJob !== null
+    ) {
+      for (const key in printer.currentJob) {
+        if (printer.currentJob.hasOwnProperty(key)) {
+          if (key === "progress" && printer.currentJob[key] !== null) {
+            printerData["job_progress"] = printer.currentJob[key];
+          }
+          if (key === "fileName" && printer.currentJob[key] !== null) {
+            printerData["job_file_name"] = printer.currentJob[key];
+          }
+          if (key === "fileDisplay" && printer.currentJob[key] !== null) {
+            printerData["job_file_display"] = printer.currentJob[key];
+          }
+          if (key === "filePath" && printer.currentJob[key] !== null) {
+            printerData["job_file_path"] = printer.currentJob[key];
+          }
+          if (
+            key === "expectedCompletionDate" &&
+            printer.currentJob[key] !== null
+          ) {
+            printerData["job_expected_completion_date"] =
+              printer.currentJob[key];
+          }
+          if (key === "expectedPrintTime" && printer.currentJob[key] !== null) {
+            printerData["job_expected_print_time"] = printer.currentJob[key];
+          }
+          if (
+            key === "expectedFilamentCosts" &&
+            printer.currentJob[key] !== null
+          ) {
+          }
+          if (
+            key === "expectedPrinterCosts" &&
+            printer.currentJob[key] !== null
+          ) {
+            printerData["job_expected_print_cost"] = printer.currentJob[key];
+          }
+          if (key === "expectedTotals" && printer.currentJob[key] !== null) {
+          }
+          if (key === "currentZ" && printer.currentJob[key] !== null) {
+            printerData["job_current_z"] = printer.currentJob[key];
+          }
+          if (key === "printTimeElapsed" && printer.currentJob[key] !== null) {
+            printerData["job_print_time_elapsed"] = printer.currentJob[key];
+          }
+          if (
+            key === "printTimeRemaining" &&
+            printer.currentJob[key] !== null
+          ) {
+            printerData["job_print_time_remaining"] = printer.currentJob[key];
+          }
+          if (key === "averagePrintTime" && printer.currentJob[key] !== null) {
+            printerData["job_average_print_time"] = printer.currentJob[key];
+          }
+          if (key === "lastPrintTime" && printer.currentJob[key] !== null) {
+            printerData["job_last_print_time"] = printer.currentJob[key];
+          }
+          if (key === "thumbnail" && printer.currentJob[key] !== null) {
+            printerData["job_thumbnail"] = printer.currentJob[key];
+          }
+        }
+      }
+    }
+
+    if (printer.selectedFilament.length >= 1) {
+      printer.selectedFilament.forEach((spool, index) => {
+        if (spool !== null) {
+          printerData[`tool_${index}_spool_name`] = spool.spools.name;
+          printerData[`tool_${index}_spool_used`] = spool.spools.used;
+          printerData[`tool_${index}_spool_weight`] = spool.spools.weight;
+          printerData[`tool_${index}_spool_temp_offset`] =
+            spool.spools.tempOffset;
+          if (typeof spool.spools.material !== "undefined") {
+            printerData[`tool_${index}_spool_material`] = spool.spools.material;
+          }
+        }
+      });
+    }
+
+    if (
+      typeof printer.tools !== "undefined" &&
+      printer.tools !== null &&
+      printer.tools[0] !== null
+    ) {
+      for (const key in printer.tools[0]) {
+        if (printer.tools[0].hasOwnProperty(key)) {
+          if (key !== "time") {
+            if (printer.tools[0][key].actual !== null) {
+              printerData[key + "_actual"] = printer.tools[0][key].actual;
+            } else {
+              printerData[key + "_actual"] = 0;
+            }
+            if (printer.tools[0][key].target !== null) {
+              printerData[key + "_target"] = printer.tools[0][key].target;
+            } else {
+              printerData[key + "_target"] = 0;
+            }
+          }
+        }
+      }
+    }
+    writePoints(tags, "PrintersInformation", printerData);
+  });
+}
 
 module.exports = router;

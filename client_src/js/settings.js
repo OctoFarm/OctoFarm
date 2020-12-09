@@ -652,6 +652,33 @@ class ServerSettings {
           document.getElementById("snapOnComplete").checked = true;
           document.getElementById("snapOnFailure").checked = true;
         }
+        if (typeof res.influxExport !== "undefined") {
+          document.getElementById("infActivateInfluxExport").checked =
+            res.influxExport.active;
+          if (res.influxExport.host !== null) {
+            document.getElementById("infHostIP").value = res.influxExport.host;
+          }
+          if (res.influxExport.username !== null) {
+            document.getElementById("infUsername").value =
+              res.influxExport.username;
+          }
+          if (res.influxExport.password !== null) {
+            document.getElementById("infPassword").value =
+              res.influxExport.password;
+          }
+          if (res.influxExport.database !== null) {
+            document.getElementById("infDatabase").value =
+              res.influxExport.database;
+          }
+          document.getElementById("infHostPort").value = res.influxExport.port;
+
+          document.getElementById("infDuration").value =
+            res.influxExport.retentionPolicy.duration;
+          document.getElementById("infReplication").value =
+            res.influxExport.retentionPolicy.replication;
+          document.getElementById("infRetention").checked =
+            res.influxExport.retentionPolicy.defaultRet;
+        }
       });
     let logList = await Client.get("settings/server/get/logs");
     logList = await logList.json();
@@ -716,6 +743,19 @@ class ServerSettings {
         deleteAfter: document.getElementById("timelapseDelete").checked,
       },
     };
+    const influxExport = {
+      active: document.getElementById("infActivateInfluxExport").checked,
+      host: document.getElementById("infHostIP").value,
+      port: document.getElementById("infHostPort").value,
+      database: document.getElementById("infDatabase").value,
+      username: document.getElementById("infUsername").value,
+      password: document.getElementById("infPassword").value,
+      retentionPolicy: {
+        duration: document.getElementById("infDuration").value,
+        replication: document.getElementById("infReplication").value,
+        defaultRet: document.getElementById("infRetention").checked,
+      },
+    };
     if (
       oldServerSettings.server.port !== server.port ||
       oldServerSettings.server.loginRequired !== server.loginRequired ||
@@ -723,7 +763,19 @@ class ServerSettings {
       oldServerSettings.timeout.webSocketRetry !== timeout.webSocketRetry ||
       oldServerSettings.timeout.apiTimeout !== timeout.apiTimeout ||
       oldServerSettings.timeout.apiRetryCutoff !== timeout.apiRetryCutoff ||
-      oldServerSettings.timeout.apiRetry !== timeout.apiRetry
+      oldServerSettings.timeout.apiRetry !== timeout.apiRetry ||
+      oldServerSettings.influxExport.active !== influxExport.active ||
+      oldServerSettings.influxExport.host !== influxExport.host ||
+      oldServerSettings.influxExport.port !== influxExport.port ||
+      oldServerSettings.influxExport.database !== influxExport.database ||
+      oldServerSettings.influxExport.username !== influxExport.username ||
+      oldServerSettings.influxExport.password !== influxExport.password ||
+      oldServerSettings.influxExport.retentionPolicy.duration !==
+        influxExport.retentionPolicy.duration ||
+      oldServerSettings.influxExport.retentionPolicy.replication !==
+        influxExport.retentionPolicy.replication ||
+      oldServerSettings.influxExport.retentionPolicy.defaultRet !==
+        influxExport.retentionPolicy.defaultRet
     ) {
       reboot = true;
     }
@@ -733,17 +785,13 @@ class ServerSettings {
       timeout,
       filament,
       history,
+      influxExport,
     })
       .then((res) => {
         return res.json();
       })
       .then((res) => {
-        UI.createAlert(
-          "success",
-          "Server settings have successfully been saved!",
-          3000,
-          "Clicked"
-        );
+        UI.createAlert(`${res.status}`, `${res.msg}`, 3000, "Clicked");
         if (reboot) {
           bootbox.confirm({
             message:

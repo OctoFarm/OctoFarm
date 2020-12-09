@@ -622,6 +622,7 @@
                                                 <a class="list-group-item list-group-item-action" id="server-timeout-list" data-toggle="list" href="#server-timeout" role="tab" aria-controls="listview"><i class="fas fa-stopwatch"></i> Timeout</a>
                                                 <a class="list-group-item list-group-item-action" id="server-history-list" data-toggle="list" href="#server-history" role="tab" aria-controls="listview"><i class="fas fa-history"></i> History</a>
                                                 <a class="list-group-item list-group-item-action" id="server-filament-list" data-toggle="list" href="#server-filament" role="tab" aria-controls="listview"><i class="fas fa-toilet-paper"></i> Filament Manager</a>
+                                                <a class="list-group-item list-group-item-action" id="server-influx-list" data-toggle="list" href="#server-influx" role="tab" aria-controls="listview"><i class="fas fa-database"></i> InfluxDB Export</a>
                                                 <button type="button" class="btn btn-success btn-block mt-1 bg-colour-2" id="saveServerSettings" data-dismiss="modal">Save</button>
                                             </div>
                                         </div>
@@ -802,7 +803,7 @@
                                                 <div class="tab-pane fade" id="server-history" role="tabpanel" aria-labelledby="server-history-list">
                                                     <h5>History Settings</h5>
                                                     <hr>
-                                                    <div class="alert alert-info" role="alert">
+                                                    <div class="alert alert-secondary" role="alert">
                                                         OctoFarm has the ability to save a snapshot/thumbnail into History. These options are turned on by default as it will check if the thumbnail/camera url exist before actually saving.
                                                     </div>
                                                     <div class="alert alert-warning" role="alert">
@@ -886,6 +887,227 @@
                                                                     <div class="invalid-feedback">On Failure snapshot turned off</div>
                                                                 </div>
                                                             </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tab-pane fade" id="server-influx" role="tabpanel" aria-labelledby="server-influx-list">
+                                                    <h5>InfluxDB Export</h5>
+                                                    <hr>
+                                                    <div class="alert alert-secondary" role="alert">
+                                                        OctoFarm can export your printer data to a time series database called InfluxDB. You can use this data to create yourself a dashboard in an application called Grafana or InfluxDB itself. Other options are also available.
+                                                    </div>
+                                                    <div class="alert alert-secondary" role="alert">
+                                                        <p>This will activate the exporting of the following measurements you can grab from InfluxDB: (click a button to expand data view)</p>
+                                                        <p>
+                                                        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample1" aria-expanded="false" aria-controls="collapseExample1">
+                                                            Printers Information (sent every 2 seconds)
+                                                        </button>
+                                                        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample2">
+                                                                History Information (sent every capture)
+                                                        </button>
+                                                        <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample3" aria-expanded="false" aria-controls="collapseExample3">
+                                                                Filament Information (sent on every database update)
+                                                        </button></p>
+                                                        <div class="collapse" id="collapseExample1">
+                                                            <code>
+                                                                state: 'Operational',<br>
+                                                                state_category: 'Idle',<br>
+                                                                camera_url: 'http://192.168.1.5:5005'<br>
+                                                                current_idle_time: 21090000,<br>
+                                                                current_active_time: 0,<br>
+                                                                current_offline_time: 120000,<br>
+                                                                date_added: 1606553431625,<br>
+                                                                storage_free: 27261640704,<br>
+                                                                storage_total: 41214558208,<br>
+                                                                timestamp: 1607515805197,<br>
+                                                                job_resends: '0 / 0.008K (0)',<br>
+                                                                job_file_name: 'Top_-_0.32mm_-_T230-B75.gcode',<br>
+                                                                job_file_display: 'Top - 0.32mm - T230-B75.gcode',<br>
+                                                                job_file_path: 'Top_-_0.32mm_-_T230-B75.gcode',<br>
+                                                                job_expected_completion_date: 'Wed Dec 09 2020: 12:10',<br>
+                                                                job_expected_print_time: 22502.662743896966,<br>
+                                                                job_expected_print_cost: '0.31',<br>
+                                                                job_average_print_time: 1478.9511556103555,<br>
+                                                                job_last_print_time: 1454.8682077580597,<br>
+                                                                job_thumbnail: 'plugin/prusaslicerthumbnails/thumbnail/Top_-_0.32mm_-_T23
+                                                                0-B75.png?20201112052916',<br>
+                                                                tool_0_spool_name: 'Spooler',<br>
+                                                                tool_0_spool_used: '0',<br>
+                                                                tool_0_spool_weight: '1000',<br>
+                                                                tool_0_spool_temp_offset: '0',<br>
+                                                                tool_0_spool_material: 'PETG',<br>
+                                                                tool0_actual: 21.3,<br>
+                                                                tool0_target: 0,<br>
+                                                                bed_actual: 21.3,<br>
+                                                                bed_target: 0,<br>
+                                                                chamber_actual: 0,<br>
+                                                                chamber_target: 0<br>
+                                                                </code>
+                                                        </div>
+                                                        <div class="collapse" id="collapseExample2">
+                                                            <code>
+                                                                state: 'Operational',<br>
+                                                                state_category: 'Idle',<br>
+                                                                current_idle_time: 21090000,<br>
+                                                                current_active_time: 0,<br>
+                                                                current_offline_time: 120000,<br>
+                                                                date_added: 1606553431625,<br>
+                                                                storage_free: 27261640704,<br>
+                                                                storage_total: 41214558208,<br>
+                                                                timestamp: 1607515805197,<br>
+                                                                job_resends: '0 / 0.008K (0)',<br>
+                                                                job_file_name: 'Top_-_0.32mm_-_T230-B75.gcode',<br>
+                                                                job_file_display: 'Top - 0.32mm - T230-B75.gcode',<br>
+                                                                job_file_path: 'Top_-_0.32mm_-_T230-B75.gcode',<br>
+                                                                job_expected_completion_date: 'Wed Dec 09 2020: 12:10',<br>
+                                                                job_expected_print_time: 22502.662743896966,<br>
+                                                                job_expected_print_cost: '0.31',<br>
+                                                                job_average_print_time: 1478.9511556103555,<br>
+                                                                job_last_print_time: 1454.8682077580597,<br>
+                                                                job_thumbnail: 'plugin/prusaslicerthumbnails/thumbnail/Top_-_0.32mm_-_T23
+                                                                0-B75.png?20201112052916',<br>
+                                                                tool_0_spool_name: 'Spooler',<br>
+                                                                tool_0_spool_used: '0',<br>
+                                                                tool_0_spool_weight: '1000',<br>
+                                                                tool_0_spool_temp_offset: '0',<br>
+                                                                tool_0_spool_material: 'PETG',<br>
+                                                                tool0_actual: 21.3,<br>
+                                                                tool0_target: 0,<br>
+                                                                bed_actual: 21.3,<br>
+                                                                bed_target: 0,<br>
+                                                                chamber_actual: 0,<br>
+                                                                chamber_target: 0<br>
+                                                            </code>
+                                                        </div>
+                                                        <div class="collapse" id="collapseExample3">
+                                                            <code>
+                                                                state: 'Operational',<br>
+                                                                state_category: 'Idle',<br>
+                                                                current_idle_time: 21090000,<br>
+                                                                current_active_time: 0,<br>
+                                                                current_offline_time: 120000,<br>
+                                                                date_added: 1606553431625,<br>
+                                                                storage_free: 27261640704,<br>
+                                                                storage_total: 41214558208,<br>
+                                                                timestamp: 1607515805197,<br>
+                                                                job_resends: '0 / 0.008K (0)',<br>
+                                                                job_file_name: 'Top_-_0.32mm_-_T230-B75.gcode',<br>
+                                                                job_file_display: 'Top - 0.32mm - T230-B75.gcode',<br>
+                                                                job_file_path: 'Top_-_0.32mm_-_T230-B75.gcode',<br>
+                                                                job_expected_completion_date: 'Wed Dec 09 2020: 12:10',<br>
+                                                                job_expected_print_time: 22502.662743896966,<br>
+                                                                job_expected_print_cost: '0.31',<br>
+                                                                job_average_print_time: 1478.9511556103555,<br>
+                                                                job_last_print_time: 1454.8682077580597,<br>
+                                                                job_thumbnail: 'plugin/prusaslicerthumbnails/thumbnail/Top_-_0.32mm_-_T23
+                                                                0-B75.png?20201112052916',<br>
+                                                                tool_0_spool_name: 'Spooler',<br>
+                                                                tool_0_spool_used: '0',<br>
+                                                                tool_0_spool_weight: '1000',<br>
+                                                                tool_0_spool_temp_offset: '0',<br>
+                                                                tool_0_spool_material: 'PETG',<br>
+                                                                tool0_actual: 21.3,<br>
+                                                                tool0_target: 0,<br>
+                                                                bed_actual: 21.3,<br>
+                                                                bed_target: 0,<br>
+                                                                chamber_actual: 0,<br>
+                                                                chamber_target: 0<br>
+                                                            </code>
+                                                        </div>
+                                                        <!-- File Manager: -->
+                                                    </div>
+                                                    <div class="alert alert-warning" role="alert">
+                                                        You must already have influxDB setup and working to be able to use this feature. A restart will be required after saving the settings to correctly enable.
+                                                    </div>
+                                                    <div id="filamentManagerSetup" class="row">
+                                                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                                            <h6>Activate</h6>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="infActivateInfluxExport" required>
+                                                                    <label class="custom-control-label" for="infActivateInfluxExport">Activated?</label>
+                                                                    <div class="valid-feedback">InfluxDB Export is activated.</div>
+                                                                    <div class="invalid-feedback">InfluxDB Export is de-activated.</div>
+                                                                </div>
+                                                            </form>
+                                                            <form>
+                                                                <h6>Connection Settings</h6>
+                                                                <div class="row">
+                                                                    <div class="col">
+                                                                        <div class="input-group mb-3">
+                                                                            <div class="input-group-prepend">
+                                                                                <span class="input-group-text" id="infHostIPe">Host IP Address: </span>
+                                                                            </div>
+                                                                            <input id="infHostIP" type="text" class="form-control" placeholder="192.168.1.5" aria-label="Username" aria-describedby="infHostIPe">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <div class="input-group mb-3">
+                                                                            <div class="input-group-prepend">
+                                                                                <span class="input-group-text" id="infHostPorte">Host Port: </span>
+                                                                            </div>
+                                                                            <input id="infHostPort" type="text" class="form-control" placeholder="8086" aria-label="Username" aria-describedby="infHostPorte">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="row">
+                                                                    <div class="col">
+                                                                        <div class="input-group mb-3">
+                                                                            <div class="input-group-prepend">
+                                                                                <span class="input-group-text" id="infUsernamee">Username: </span>
+                                                                            </div>
+                                                                            <input  id="infUsername" type="text" class="form-control" placeholder="" aria-label="Username" aria-describedby="infUsernamee">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <div class="input-group mb-3">
+                                                                            <div class="input-group-prepend">
+                                                                                <span class="input-group-text" id="infPassworde">Password: </span>
+                                                                            </div>
+                                                                            <input id="infPassword" type="text" class="form-control" placeholder="" aria-label="Username" aria-describedby="infPassworde">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <h6>Database Settings</h6>
+                                                                <div class="row">
+                                                                    <div class="col">
+                                                                        <div class="input-group mb-3">
+                                                                            <div class="input-group-prepend">
+                                                                                <span class="input-group-text" id="infDatabasee">Database Name: </span>
+                                                                            </div>
+                                                                            <input id="infDatabase" type="text" class="form-control" placeholder="OctoFarmExport" aria-label="Username" aria-describedby="infDatabasee">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                                <h6>Retention Policy (Advanced)</h6>
+                                                                <div class="row">
+                                                                    <div class="col">
+                                                                        <div class="input-group mb-3">
+                                                                            <div class="input-group-prepend">
+                                                                                <span class="input-group-text" id="infDuration">Duration: </span>
+                                                                            </div>
+                                                                            <input type="text" class="form-control" placeholder="365d" aria-label="Username" aria-describedby="infDuration">
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="col">
+                                                                        <div class="input-group mb-3">
+                                                                            <div class="input-group-prepend">
+                                                                                <span class="input-group-text" id="infReplication">Replication: </span>
+                                                                            </div>
+                                                                            <input type="text" class="form-control" placeholder="1" aria-label="Username" aria-describedby="infReplication">
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </form>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="infRetention" required>
+                                                                    <label class="custom-control-label" for="infRetention">Default Retention?</label>
+                                                                    <div class="valid-feedback">Using default retention settings.</div>
+                                                                    <div class="invalid-feedback">Not using default retention settings.</div>
+                                                                </div>
+                                                            </form>
+
                                                         </div>
                                                     </div>
                                                 </div>

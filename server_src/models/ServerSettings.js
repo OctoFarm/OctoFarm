@@ -25,6 +25,10 @@ const ServerSettingsSchema = new mongoose.Schema({
     type: Object,
     required: false,
   },
+  influxExport: {
+    type: Object,
+    required: false,
+  },
 });
 
 const ServerSettings = mongoose.model("ServerSettings", ServerSettingsSchema);
