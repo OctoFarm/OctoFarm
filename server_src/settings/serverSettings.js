@@ -58,6 +58,7 @@ class ServerSettings {
         timeout,
         filamentManager,
         history,
+        influxExport,
       });
       await defaultSystemSettings.save().then((ret) => {
         SettingsClean.start();

@@ -680,6 +680,19 @@ class ServerSettings {
             res.influxExport.retentionPolicy.defaultRet;
         } else {
           document.getElementById("infRetention").checked = true;
+          oldServerSettings.influxExport = {
+            active: false,
+            host: null,
+            port: 8086,
+            database: "OctoFarmExport",
+            username: null,
+            password: null,
+            retentionPolicy: {
+              duration: "365d",
+              replication: 1,
+              defaultRet: true,
+            },
+          };
         }
       });
     let logList = await Client.get("settings/server/get/logs");
