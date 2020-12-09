@@ -678,6 +678,8 @@ class ServerSettings {
             res.influxExport.retentionPolicy.replication;
           document.getElementById("infRetention").checked =
             res.influxExport.retentionPolicy.defaultRet;
+        } else {
+          document.getElementById("infRetention").checked = true;
         }
       });
     let logList = await Client.get("settings/server/get/logs");
