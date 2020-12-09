@@ -3,7 +3,6 @@ import OctoFarmClient from "./lib/octofarm.js";
 import Calc from "./lib/functions/calc.js";
 import UI from "./lib/functions/ui.js";
 import { returnDropDown } from "./lib/modules/filamentGrab.js";
-const { writePoints } = require("../lib/influxExport.js");
 
 // Setup history listeners
 document.getElementById("historyTable").addEventListener("click", (e) => {
