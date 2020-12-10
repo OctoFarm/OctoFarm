@@ -38,7 +38,12 @@ All notable changes to this project will be documented in this file.
     - Added initial support for OctoPrint 1.5.0 Resend statistics. Currently is captured on history and shown in the printer control view.
     - Added back in the view filters for Panel,List, Control.
     - Alerts can now send through OctoFarms History ID on capture of a Failed,Error,Successful print trigger.
-     
+    - InfluxDB Export: 
+         - exports the following information:
+               - Printers Information - All farm printer information.
+               - History Information - Every log to history is pushed to the database (not back dated).
+               - Filament Information - Every update of the spool (finished/cancelled/errored print).
+
 ### Changed
     - Added additional CSS classes to buttons for theming. Applies to actions buttons only, status colours the same. 
     - Removed Printer URL/Camera URL/API Key from displaying on Printer Manager and moved onto "Printer Settings" modal. 

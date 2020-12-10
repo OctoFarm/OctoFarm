@@ -496,7 +496,7 @@ class HistoryCollection {
             selectedFilament[i].spools.profile.diameter
           ),
         };
-        console.log("WRITTEN");
+
         writePoints(tags, "SpoolInformation", filamentData);
       }
     }
