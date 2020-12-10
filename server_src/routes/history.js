@@ -12,8 +12,6 @@ const historyClean = require("../lib/dataFunctions/historyClean.js");
 
 const { HistoryClean } = historyClean;
 
-const { writePoints } = require("../lib/influxExport.js");
-
 router.post("/update", ensureAuthenticated, async (req, res) => {
   //Check required fields
   const latest = req.body;

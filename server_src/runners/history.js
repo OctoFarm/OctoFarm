@@ -23,6 +23,10 @@ const { HistoryClean } = historyClean;
 const runner = require("../runners/state.js");
 const { Runner } = runner;
 
+const script = require("./scriptCheck.js");
+
+const { ScriptRunner } = script;
+
 const MjpegDecoder = require("mjpeg-decoder");
 
 let counter = 0;
@@ -31,34 +35,40 @@ let errorCounter = 0;
 class HistoryCollection {
   static async resyncFilament(printer) {
     const returnSpools = [];
-
-    for (let i = 0; i < printer.selectedFilament.length; i++) {
-      if (printer.selectedFilament[i] !== null) {
-        const spools = await fetch(
-          `${printer.printerURL}/plugin/filamentmanager/spools/${printer.selectedFilament[i].spools.fmID}`,
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Api-Key": printer.apikey,
-            },
-          }
-        );
-        const spool = await Spool.findById(printer.selectedFilament[i]._id);
-        const sp = await spools.json();
-        spool.spools = {
-          name: sp.spool.name,
-          profile: sp.spool.profile.id,
-          price: sp.spool.cost,
-          weight: sp.spool.weight,
-          used: sp.spool.used,
-          tempOffset: sp.spool.temp_offset,
-          fmID: sp.spool.id,
-        };
-        spool.markModified("spools");
-        await spool.save();
-        returnSpools.push(spool);
+    try {
+      for (let i = 0; i < printer.selectedFilament.length; i++) {
+        if (printer.selectedFilament[i] !== null) {
+          const spools = await fetch(
+            `${printer.printerURL}/plugin/filamentmanager/spools/${printer.selectedFilament[i].spools.fmID}`,
+            {
+              method: "GET",
+              headers: {
+                "Content-Type": "application/json",
+                "X-Api-Key": printer.apikey,
+              },
+            }
+          );
+          const spool = await Spool.findById(printer.selectedFilament[i]._id);
+          const sp = await spools.json();
+          spool.spools = {
+            name: sp.spool.name,
+            profile: sp.spool.profile.id,
+            price: sp.spool.cost,
+            weight: sp.spool.weight,
+            used: sp.spool.used,
+            tempOffset: sp.spool.temp_offset,
+            fmID: sp.spool.id,
+          };
+          spool.markModified("spools");
+          await spool.save();
+          returnSpools.push(spool);
+        }
       }
+    } catch (e) {
+      logger.info(
+        e,
+        `${printers.printerURL}: Issue contacting filament manager... not updating spool`
+      );
     }
 
     const reSync = await FilamentManagerPlugin.filamentManagerReSync();
@@ -380,7 +390,9 @@ class HistoryCollection {
     await deleteTimeLapse(fileName);
     logger.info("Successfully deleted " + fileName + " from OctoPrint.");
   }
-
+  static async updateInfluxDB(historyID) {
+    console.log("UPDATE INFLUX", historyID);
+  }
   static async complete(payload, printer, job, files, resends) {
     try {
       const serverSettings = await ServerSettings.find({});
@@ -523,10 +535,12 @@ class HistoryCollection {
           saveHistory.printHistory.snapshot = snapshot;
           saveHistory.markModified("printHistory");
           saveHistory.save();
-
+          ScriptRunner.check(printer, "done", saveHistory._id);
           HistoryClean.start();
+          HistoryCollection.updateInfluxDB(saveHistory._id);
           setTimeout(function () {
             HistoryClean.start();
+            HistoryCollection.updateInfluxDB(saveHistory._id);
           }, 5000);
         }
       });
@@ -679,11 +693,13 @@ class HistoryCollection {
           saveHistory.printHistory.thumbnail = thumbnail;
           saveHistory.printHistory.snapshot = snapshot;
           saveHistory.markModified("printHistory");
+          ScriptRunner.check(printer, "failed", saveHistory._id);
           await saveHistory.save();
 
           HistoryClean.start();
           setTimeout(function () {
             HistoryClean.start();
+            HistoryCollection.updateInfluxDB(saveHistory._id);
           }, 5000);
         }
       });
@@ -756,6 +772,7 @@ class HistoryCollection {
       });
       await saveError.save();
       HistoryClean.start();
+      ScriptRunner.check(printer, "error", saveError._id);
       logger.info("Error captured ", payload + printer.printerURL);
     } catch (e) {
       logger.error(e, `Failed to capture ErrorLog for ${printer.printerURL}`);
