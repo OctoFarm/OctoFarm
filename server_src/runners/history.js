@@ -29,6 +29,8 @@ const { ScriptRunner } = script;
 
 const MjpegDecoder = require("mjpeg-decoder");
 
+const { writePoints } = require("../lib/influxExport.js");
+
 let counter = 0;
 let errorCounter = 0;
 
@@ -390,8 +392,114 @@ class HistoryCollection {
     await deleteTimeLapse(fileName);
     logger.info("Successfully deleted " + fileName + " from OctoPrint.");
   }
-  static async updateInfluxDB(historyID) {
-    console.log("UPDATE INFLUX", historyID);
+  static async updateInfluxDB(historyID, measurement) {
+    let historyArchive = await HistoryClean.returnHistory();
+    let currentArchive = _.findIndex(historyArchive, function (o) {
+      return JSON.stringify(o._id) === JSON.stringify(historyID);
+    });
+    if (currentArchive > -1) {
+      let workingHistory = historyArchive[currentArchive];
+      let startDateSplit = workingHistory.startDate.split(" ");
+      let endDateSplit = workingHistory.endDate.split(" ");
+      const trueStartDate = Date.parse(
+        `${startDateSplit[2]} ${startDateSplit[1]} ${startDateSplit[3]} ${startDateSplit[5]}`
+      );
+      const trueEndDate = Date.parse(
+        `${endDateSplit[2]} ${endDateSplit[1]} ${endDateSplit[3]} ${endDateSplit[5]}`
+      );
+      let currentState = " ";
+      if (workingHistory.state.includes("Success")) {
+        currentState = "Success";
+      } else if (workingHistory.state.includes("Cancelled")) {
+        currentState = "Cancelled";
+      } else if (workingHistory.state.includes("Failure")) {
+        currentState = "Failure";
+      }
+      let tags = {
+        state: currentState,
+        printer_name: workingHistory.printer,
+        file_name: workingHistory.file.name,
+      };
+      let printerData = {
+        id: JSON.stringify(workingHistory._id),
+        index: parseInt(workingHistory.index),
+        state: currentState,
+        printer_name: workingHistory.printer,
+        start_date: trueStartDate,
+        end_date: trueEndDate,
+        print_time: parseInt(workingHistory.printTime),
+        file_name: workingHistory.file.name,
+        file_upload_date: parseFloat(workingHistory.file.uploadDate),
+        file_path: workingHistory.file.path,
+        file_size: parseInt(workingHistory.file.size),
+        file_average_print_time: parseFloat(
+          workingHistory.file.averagePrintTime
+        ),
+        file_last_print_time: parseFloat(workingHistory.file.lastPrintTime),
+        notes: workingHistory.notes,
+        job_estimated_print_time: parseFloat(
+          workingHistory.job.estimatedPrintTime
+        ),
+        job_actual_print_time: parseFloat(workingHistory.job.actualPrintTime),
+        job_print_time_accuracy: parseFloat(
+          workingHistory.job.printTimeAccuracy
+        ),
+        cost_printer: parseFloat(workingHistory.printerCost),
+        cost_spool: parseFloat(workingHistory.spoolCost),
+        cost_total: parseFloat(workingHistory.totalCost),
+        cost_per_hour: parseFloat(workingHistory.costPerHour),
+        total_volume: parseFloat(workingHistory.totalVolume),
+        total_length: parseFloat(workingHistory.totalLength),
+        total_weight: parseFloat(workingHistory.totalWeight),
+      };
+
+      if (typeof workingHistory.resend !== "undefined") {
+        printerData["job_resends"] = `${workingHistory.resend.count} / ${
+          workingHistory.resend.transmitted / 1000
+        }K (${workingHistory.resend.ratio.toFixed(0)})`;
+      }
+
+      writePoints(tags, "HistoryInformation", printerData);
+    } else {
+      console.log("HU OHHH");
+    }
+  }
+  static async updateFilamentInfluxDB(selectedFilament, history) {
+    for (let i = 0; i < selectedFilament.length; i++) {
+      if (selectedFilament[i] !== null) {
+        let currentState = " ";
+        if (history.success) {
+          currentState = "Success";
+        } else {
+          if (history.reason === "cancelled") {
+            currentState = "Cancelled";
+          } else {
+            currentState = "Failure";
+          }
+        }
+        let tags = {
+          state: currentState,
+          printer_name: history.printerName,
+          file_name: history.fileName,
+        };
+
+        let filamentData = {
+          name: selectedFilament[i].spools.name,
+          price: parseFloat(selectedFilament[i].spools.price),
+          weight: parseFloat(selectedFilament[i].spools.weight),
+          used: parseFloat(selectedFilament[i].spools.used),
+          temp_offset: parseFloat(selectedFilament[i].spools.tempOffset),
+          spool_manufacturer: selectedFilament[i].spools.profile.manufacturer,
+          spool_material: selectedFilament[i].spools.profile.material,
+          spool_density: parseFloat(selectedFilament[i].spools.profile.density),
+          spool_diameter: parseFloat(
+            selectedFilament[i].spools.profile.diameter
+          ),
+        };
+        console.log("WRITTEN");
+        writePoints(tags, "SpoolInformation", filamentData);
+      }
+    }
   }
   static async complete(payload, printer, job, files, resends) {
     try {
@@ -498,6 +606,11 @@ class HistoryCollection {
         resends: resends,
       };
 
+      HistoryCollection.updateFilamentInfluxDB(
+        printer.selectedFilament,
+        printHistory
+      );
+
       const saveHistory = new History({
         printHistory,
       });
@@ -537,10 +650,9 @@ class HistoryCollection {
           saveHistory.save();
           ScriptRunner.check(printer, "done", saveHistory._id);
           HistoryClean.start();
-          HistoryCollection.updateInfluxDB(saveHistory._id);
-          setTimeout(function () {
-            HistoryClean.start();
-            HistoryCollection.updateInfluxDB(saveHistory._id);
+          setTimeout(async function () {
+            await HistoryClean.start();
+            HistoryCollection.updateInfluxDB(saveHistory._id, "history");
           }, 5000);
         }
       });
@@ -659,6 +771,12 @@ class HistoryCollection {
       const saveHistory = new History({
         printHistory,
       });
+
+      HistoryCollection.updateFilamentInfluxDB(
+        printer.selectedFilament,
+        printHistory
+      );
+
       await saveHistory.save().then(async (r) => {
         if (printer.camURL !== "") {
           const thumbnail = await HistoryCollection.thumbnailCheck(
@@ -697,9 +815,9 @@ class HistoryCollection {
           await saveHistory.save();
 
           HistoryClean.start();
-          setTimeout(function () {
-            HistoryClean.start();
-            HistoryCollection.updateInfluxDB(saveHistory._id);
+          setTimeout(async function () {
+            await HistoryClean.start();
+            HistoryCollection.updateInfluxDB(saveHistory._id, "history");
           }, 5000);
         }
       });

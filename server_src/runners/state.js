@@ -692,7 +692,6 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
             );
           }, 5000);
         }, 10000);
-        ScriptRunner.check(farmPrinters[that.index], "failed");
       }
       if (data.event.type === "PrintDone") {
         const that = this;
@@ -729,7 +728,6 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
             );
           }, 500);
         }, 10000);
-        ScriptRunner.check(farmPrinters[that.index], "done");
       }
       if (data.event.type === "Error") {
         const that = this;
