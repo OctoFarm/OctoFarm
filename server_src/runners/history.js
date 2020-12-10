@@ -464,7 +464,11 @@ class HistoryCollection {
       console.log("HU OHHH");
     }
   }
-  static async updateFilamentInfluxDB(selectedFilament, history) {
+  static async updateFilamentInfluxDB(
+    selectedFilament,
+    history,
+    previousFilament
+  ) {
     for (let i = 0; i < selectedFilament.length; i++) {
       if (selectedFilament[i] !== null) {
         let currentState = " ";
@@ -482,12 +486,21 @@ class HistoryCollection {
           printer_name: history.printerName,
           file_name: history.fileName,
         };
+        let used = 0;
+        if (
+          typeof previousFilament !== "undefined" &&
+          previousFilament !== null
+        ) {
+          used =
+            selectedFilament[i].spools.used - previousFilament[i].spools.used;
+        }
 
         let filamentData = {
           name: selectedFilament[i].spools.name,
           price: parseFloat(selectedFilament[i].spools.price),
           weight: parseFloat(selectedFilament[i].spools.weight),
-          used: parseFloat(selectedFilament[i].spools.used),
+          octofarm_used: parseFloat(selectedFilament[i].spools.used),
+          fm_used: parseFloat(selectedFilament[i].spools.used),
           temp_offset: parseFloat(selectedFilament[i].spools.tempOffset),
           spool_manufacturer: selectedFilament[i].spools.profile.manufacturer,
           spool_material: selectedFilament[i].spools.profile.material,
@@ -608,7 +621,8 @@ class HistoryCollection {
 
       HistoryCollection.updateFilamentInfluxDB(
         printer.selectedFilament,
-        printHistory
+        printHistory,
+        previousFilament
       );
 
       const saveHistory = new History({
@@ -774,7 +788,8 @@ class HistoryCollection {
 
       HistoryCollection.updateFilamentInfluxDB(
         printer.selectedFilament,
-        printHistory
+        printHistory,
+        previousFilament
       );
 
       await saveHistory.save().then(async (r) => {
