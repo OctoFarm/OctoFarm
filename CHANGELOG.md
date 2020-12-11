@@ -46,8 +46,6 @@ All notable changes to this project will be documented in this file.
      - Changes to folder display in file manager:
          - Folders when created will stay ordered by creation date. Folders when sorted will be organised first at the top of the list, then files afterwards. There's only folder name information available to sorting for those so for now will stick to name based for all folders. This will be actioned when a page load happens, or the sorting is updated. New folders will not be sorted until that trigger. It follows the A->Z, Z->A ordering of the sorting options now too.
 
-
-
 ### Changed
     - Added additional CSS classes to buttons for theming. Applies to actions buttons only, status colours the same. 
     - Removed Printer URL/Camera URL/API Key from displaying on Printer Manager and moved onto "Printer Settings" modal. 
