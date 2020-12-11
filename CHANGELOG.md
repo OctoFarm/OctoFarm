@@ -38,11 +38,14 @@ All notable changes to this project will be documented in this file.
     - Added initial support for OctoPrint 1.5.0 Resend statistics. Currently is captured on history and shown in the printer control view.
     - Added back in the view filters for Panel,List, Control.
     - Alerts can now send through OctoFarms History ID on capture of a Failed,Error,Successful print trigger.
-    - InfluxDB Export: 
+    - InfluxDB Export: You can find setup instructions/information in System -> Server -> InfluxDB Export.  
          - exports the following information:
-               - Printers Information - All farm printer information.
-               - History Information - Every log to history is pushed to the database (not back dated).
-               - Filament Information - Every update of the spool (finished/cancelled/errored print).
+               - Printers Information - All farm printer information, generated every 2000ms.
+               - History Information - Every log to history is pushed to the database (not back dated), sent on history capture.
+               - Filament Information - Every update of the spool (finished/cancelled/errored print), sent on filament down dating (history capture).
+   - Changes to folder display in file manager:
+         - Folders when created will stay ordered by creation date. Folders when sorted will be organised first at the top of the list, then files afterwards. There's only folder name information available to sorting for those so for now will stick to name based for all folders. This will be actioned when a page load happens, or the sorting is updated. New folders will not be sorted until that trigger. It follows the A->Z, Z->A ordering of the sorting options now too.
+     
 
 ### Changed
     - Added additional CSS classes to buttons for theming. Applies to actions buttons only, status colours the same. 
