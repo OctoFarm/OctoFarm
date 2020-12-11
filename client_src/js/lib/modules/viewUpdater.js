@@ -779,7 +779,7 @@ async function updateState(printer, clientSettings, view) {
 
   switch (view) {
     case "list":
-      UI.doesElementNeedUpdating(stateCategory, elements.state, "classList");
+      UI.doesElementNeedUpdating(stateCategory, elements.row, "classList");
       break;
     case "panel":
       UI.doesElementNeedUpdating(
