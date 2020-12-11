@@ -19,9 +19,7 @@ All notable changes to this project will be documented in this file.
             - OctoPrint Errors: Shows OctoPrint usb terminal errors
             - OctoPrint Logs: Shows a tabled list of OctoPrinters octoprint.logs file
             - OctoPrint Plugin Logs: Shows the output received from OctoPrints events for plugins. Only what is written to stout, call, message and sterr.
-            - Printer Temperature: Historical view of printer temperature - Keeps a max of 100,000 records and then will drop the previous in the database. 
-        - Printer Statistics: Will show a basic view of your printer statistics (More to come in future versions)
-        - Printer Maintenence: Will allow for the creation of a maintenance log and alerts for future checks. 
+            - Printer Temperature: Historical view of printer temperature - Keeps a max of 100,000 records and then will drop the previous in the database.
     - "Save All" & "Delete All" button has been added to Printer Manager.
     - Quick connect button to Printer Action button.
     - New Printer Manager Section: Plugins!

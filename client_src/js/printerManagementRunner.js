@@ -1858,7 +1858,7 @@ class dashUpdate {
             <button  title="View individual Printer Statistics"
             id="printerStatistics-${printer._id}"
                                  type="button"
-                                 class="tag btn btn-secondary btn-sm bg-colour-3"
+                                 class="tag btn btn-secondary btn-sm bg-colour-3 d-none"
                                  data-toggle="modal"
                                  data-target="#printerStatisticsModal"
                                  disabled
@@ -1867,7 +1867,7 @@ class dashUpdate {
            <button  title="Setup and track Maintenance Issues with Printers"
             id="printerMaintenance-${printer._id}"
                                  type="button"
-                                 class="tag btn btn-secondary btn-sm bg-colour-4"
+                                 class="tag btn btn-secondary btn-sm bg-colour-4 d-none"
                                  data-toggle="modal"
                                  data-target="#printerMaintenanceModal"
                                  disabled
