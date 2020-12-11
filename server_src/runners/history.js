@@ -392,6 +392,13 @@ class HistoryCollection {
     await deleteTimeLapse(fileName);
     logger.info("Successfully deleted " + fileName + " from OctoPrint.");
   }
+  static async objectCleanforInflux(obj) {
+    for (var propName in obj) {
+      if (obj[propName] === null) {
+        delete obj[propName];
+      }
+    }
+  }
   static async updateInfluxDB(historyID, measurement) {
     let historyArchive = await HistoryClean.returnHistory();
     let currentArchive = _.findIndex(historyArchive, function (o) {
@@ -432,10 +439,7 @@ class HistoryCollection {
         file_upload_date: parseFloat(workingHistory.file.uploadDate),
         file_path: workingHistory.file.path,
         file_size: parseInt(workingHistory.file.size),
-        file_average_print_time: parseFloat(
-          workingHistory.file.averagePrintTime
-        ),
-        file_last_print_time: parseFloat(workingHistory.file.lastPrintTime),
+
         notes: workingHistory.notes,
         job_estimated_print_time: parseFloat(
           workingHistory.job.estimatedPrintTime
@@ -452,6 +456,14 @@ class HistoryCollection {
         total_length: parseFloat(workingHistory.totalLength),
         total_weight: parseFloat(workingHistory.totalWeight),
       };
+      let averagePrintTime = parseFloat(workingHistory.file.averagePrintTime);
+      if (!isNaN(averagePrintTime)) {
+        printerData["file_average_print_time"] = averagePrintTime;
+      }
+      let lastPrintTime = parseFloat(workingHistory.file.lastPrintTime);
+      if (!isNaN(averagePrintTime)) {
+        printerData["file_last_print_time"] = lastPrintTime;
+      }
 
       if (typeof workingHistory.resend !== "undefined") {
         printerData["job_resends"] = `${workingHistory.resend.count} / ${
@@ -499,8 +511,8 @@ class HistoryCollection {
           name: selectedFilament[i].spools.name,
           price: parseFloat(selectedFilament[i].spools.price),
           weight: parseFloat(selectedFilament[i].spools.weight),
-          octofarm_used: parseFloat(selectedFilament[i].spools.used),
-          fm_used: parseFloat(selectedFilament[i].spools.used),
+          used_difference: parseFloat(selectedFilament[i].spools.used),
+          used_spool: parseFloat(selectedFilament[i].spools.used),
           temp_offset: parseFloat(selectedFilament[i].spools.tempOffset),
           spool_manufacturer: selectedFilament[i].spools.profile.manufacturer,
           spool_material: selectedFilament[i].spools.profile.material,
