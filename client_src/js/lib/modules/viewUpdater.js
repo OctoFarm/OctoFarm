@@ -141,9 +141,10 @@ function imageOrCamera(printer) {
   let drawCamera = ({ url, flipV, flipH, rotate90 }) => {
     return `<img
         loading="lazy"
+        class="camImg"
         id="camera-${printer._id}"
         width="100%"
-        style="transform: ${flipH} ${flipV} ${rotate90}; pointer-events: none;"
+        style="transform: ${flipH} ${flipV} ${rotate90}";
         src="${url}"
     />`;
   };
@@ -549,11 +550,7 @@ function drawCameraView(printer, clientSettings) {
                           
 </div>
           </div>
-          
-          
-          <div>
                 ${cameraElement}
-            </div>
           <div class="camTemps">
             <small
               id="toolTemps-${printer._id}"

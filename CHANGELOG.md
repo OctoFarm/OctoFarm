@@ -43,9 +43,10 @@ All notable changes to this project will be documented in this file.
                - Printers Information - All farm printer information, generated every 2000ms.
                - History Information - Every log to history is pushed to the database (not back dated), sent on history capture.
                - Filament Information - Every update of the spool (finished/cancelled/errored print), sent on filament down dating (history capture).
-   - Changes to folder display in file manager:
+     - Changes to folder display in file manager:
          - Folders when created will stay ordered by creation date. Folders when sorted will be organised first at the top of the list, then files afterwards. There's only folder name information available to sorting for those so for now will stick to name based for all folders. This will be actioned when a page load happens, or the sorting is updated. New folders will not be sorted until that trigger. It follows the A->Z, Z->A ordering of the sorting options now too.
-     
+
+
 
 ### Changed
     - Added additional CSS classes to buttons for theming. Applies to actions buttons only, status colours the same. 
@@ -72,6 +73,7 @@ All notable changes to this project will be documented in this file.
     - Camera view now hides print information (times / tools) until hovering over. 
     - History page now displays an image slider when loading the "edit/view" box. You can cycle through the thumbnails from your slicer if you use that plugin, or the captured image of the finished print taken from your webcam.
     - Added the option for websockets to follow 301 redirects. Should help with 301 errors. 
+    - Camera view now opens overlay with fullscreen. 
 
 ### Fixed
     - Fixed issue with File Manager not loading if printer in index 0 was offline.
@@ -93,6 +95,7 @@ All notable changes to this project will be documented in this file.
     - Various client issues, full re-factor or Panel/List/Camera. Should be snappier!
     - Fixed issue with history deleting record regardless of yes/no answer. 
     - Fixed issue with environmental data graph loading categories that don't exist.
+    - Fixed the camera fullscreen issue not respecting rotation.
 
 ## Removed
     - Removed the annoying content editable fields on "Printer Settings" and "Printer Management" and replaced with standard input boxes. 

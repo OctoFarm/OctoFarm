@@ -341,9 +341,18 @@ a.notyet {
 .cameraContain:-moz-full-screen,
 .cameraContain:-ms-fullscreen,
 .cameraContain:fullscreen {
-  width: 100vw;
-  height: 100vh;
+  width: auto;
+  height: 90vh;
+  object-fit: ;
 }
+/*.camButtons:-webkit-full-screen,*/
+/*.camButtons:-moz-full-screen,*/
+/*.camButtons:-ms-fullscreen,*/
+/*.camButtons:fullscreen {*/
+/*  width: auto;*/
+/*  height: 90vh;*/
+/*}*/
+
 .camButtons {
   position: absolute;
   bottom: 25px;
@@ -370,6 +379,9 @@ a.notyet {
   top:23px;
   left: -1px;
   opacity: 0.7;
+}
+.camImg {
+  pointer-events: none;
 }
 .camTemps {
   display: none;
