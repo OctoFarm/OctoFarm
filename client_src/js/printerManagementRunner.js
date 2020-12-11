@@ -1855,7 +1855,9 @@ class dashUpdate {
                                  data-target="#printerLogsModal"
             ><i class="fas fa-file-alt"></i>
             </button>
-            <button  title="View individual Printer Statistics"
+            <button title="You have an OctoPrint update to install!" id="octoprintUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-3 d-none'><i class="fab fa-octopus-deploy"></i></button>
+            <button title="You have OctoPrint plugin updates to install!" id="octoprintPluginUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-4 d-none'><i class="fas fa-plug"></i></button>
+            <button title="View individual Printer Statistics"
             id="printerStatistics-${printer._id}"
                                  type="button"
                                  class="tag btn btn-secondary btn-sm bg-colour-3 d-none"
@@ -1884,10 +1886,6 @@ class dashUpdate {
         <td><div id="printerGroup-${printer._id}" ></div></td>
         <td id="printerOctoPrintVersion-${printer._id}"></td>
         ${octoPiElement}
-        <td>
-            <button id="octoprintUpdate-${printer._id}" class='btn btn-warning btn-small btn-block d-none'><i class="fab fa-octopus-deploy"></i> OctoPrint Update!</button>
-            <button id="octoprintPluginUpdate-${printer._id}" class='btn btn-warning btn-small btn-block d-none'><i class="fas fa-plug"></i> Plugin Update!</button>
-        </td>
     </tr>
           `
           );
