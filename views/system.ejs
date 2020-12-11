@@ -894,21 +894,42 @@
                                                     <h5>InfluxDB Export</h5>
                                                     <hr>
                                                     <div class="alert alert-secondary" role="alert">
-                                                        OctoFarm can export your printer data to a time series database called InfluxDB. You can use this data to create yourself a dashboard in an application called Grafana or InfluxDB itself. Other options are also available.
+                                                        OctoFarm can export your printer data to a time series database called InfluxDB. You can use this data to create yourself a dashboard in an application called Grafana or InfluxDB itself. Other options are also available. This option is for power users who would like to get more information from the data stored in OctoFarm.
                                                     </div>
-                                                    <div class="alert alert-secondary" role="alert">
+                                                    <div class="alert alert-info" role="alert">
+                                                        I'm quite new to time series databases so if there's a tag or a change/addition to the information format that you'd like please let me know on github issues and I'll see what I can do.
+                                                    </div>
+                                                    <div class="alert alert-warning" role="alert">
+                                                        You must already have influxDB setup and working to be able to use this feature. A restart will be required after saving the settings to correctly enable.
+                                                    </div>
+                                                    <div class="alert alert-secondary" role="alert" id="influxParent">
                                                         <p>This will activate the exporting of the following measurements you can grab from InfluxDB: (click a button to expand data view)</p>
                                                         <p>
                                                         <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample1" aria-expanded="false" aria-controls="collapseExample1">
-                                                            Printers Information (sent every 2 seconds)
+                                                            Printers Information
                                                         </button>
                                                         <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample2" aria-expanded="false" aria-controls="collapseExample2">
-                                                                History Information (sent every capture)
+                                                            History Information
                                                         </button>
                                                         <button class="btn btn-primary" type="button" data-toggle="collapse" data-target="#collapseExample3" aria-expanded="false" aria-controls="collapseExample3">
-                                                                Filament Information (sent on every database update)
+                                                            Filament Information
                                                         </button></p>
-                                                        <div class="collapse" id="collapseExample1">
+                                                        <div class="collapse" id="collapseExample1" data-parent="#influxParent">
+                                                            <div class="alert alert-dark" role="alert">
+                                                                Printer information is dumped every 2000ms (2 seconds). This will dump a record for each printer in your farm with the information below.
+                                                            </div>
+                                                            <h3>Available Tags:</h3>
+                                                            <code>
+                                                                name:<br>
+                                                                group:<br>
+                                                                url:<br>
+                                                                state:<br>
+                                                                stateCategory:<br>
+                                                                host_state:<br>
+                                                                websocket_state:<br>
+                                                                octoprint_version: <br>
+                                                            </code>
+                                                            <h3>Information:</h3>
                                                             <code>
                                                                 state: 'Operational',<br>
                                                                 state_category: 'Idle',<br>
@@ -944,7 +965,20 @@
                                                                 chamber_target: 0<br>
                                                                 </code>
                                                         </div>
-                                                        <div class="collapse" id="collapseExample2">
+                                                        <div class="collapse" id="collapseExample2" data-parent="#influxParent">
+                                                            <div class="alert alert-dark" role="alert">
+                                                                History information will be sent when a print is logged as completed or failed (cancelled / error).
+                                                            </div>
+                                                            <div class="alert alert-warning" role="alert">
+                                                                If you don't use the Filament Manager plugin then there will be 0 grams in the used_difference and used_spool fields as it is not tracked without that.
+                                                            </div>
+                                                            <h3>Available Tags:</h3>
+                                                            <code>
+                                                                state: <br>
+                                                                printer_name: <br>
+                                                                file_name: <br>
+                                                            </code>
+                                                            <h3>Information:</h3>
                                                             <code>
                                                                 id: 5fd22d8e916f61b240b98ff6,<br>
                                                                 index: 248,<br>
@@ -974,14 +1008,28 @@
 
                                                             </code>
                                                         </div>
-                                                        <div class="collapse" id="collapseExample3">
+                                                        <div class="collapse" id="collapseExample3" data-parent="#influxParent">
+                                                            <div class="alert alert-dark" role="alert">
+                                                                Spool information will be logged everytime a print has completed.
+                                                            </div>
+                                                            <div class="alert alert-warning" role="alert">
+                                                                If you don't use the Filament Manager plugin then there will be 0 grams in the "used_difference" and "used_spool" fields as it is not tracked without that.
+                                                            </div>
+                                                            <h3>Available Tags:</h3>
+                                                            <code>
+                                                                state: <br>
+                                                                printer_name: <br>
+                                                                file_name: <br>
+                                                            </code>
+                                                            <h3>Information:</h3>
                                                             <code>
                                                                 name: 'Spooler',<br>
                                                                 price: 25,<br>
                                                                 weight: 1000,<br>
-                                                                used: 0,<br>
+                                                                used_difference: 15.55, <br>
+                                                                used_spool: 225.45, <br>
                                                                 temp_offset: 0,<br>
-                                                                spool_manufacturer: 'Bob',<br>
+                                                                spool_manufacturer: 'Eryone',<br>
                                                                 spool_material: 'PETG',<br>
                                                                 spool_density: 1.27,<br>
                                                                 spool_diameter: 1.75<br>
@@ -990,9 +1038,7 @@
                                                         </div>
                                                         <!-- File Manager: -->
                                                     </div>
-                                                    <div class="alert alert-warning" role="alert">
-                                                        You must already have influxDB setup and working to be able to use this feature. A restart will be required after saving the settings to correctly enable.
-                                                    </div>
+
                                                     <div id="filamentManagerSetup" class="row">
                                                         <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
                                                             <h6>Activate</h6>
