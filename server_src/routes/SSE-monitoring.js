@@ -211,38 +211,39 @@ function sendToInflux(printersInformation) {
     }
 
     const tags = {
-      name: printer.printerName,
-      group: group,
-      url: printer.printerURL,
-      state: printer.printerState.state,
-      stateCategory: printer.printerState.colour.category,
-      host_state: printer.hostState.state,
-      websocket_state: printer.webSocketState.colour,
-      octoprint_version: printer.octoPrintVersion,
+      name: JSON.stringify(printer.printerName),
+      group: JSON.stringify(group),
+      url: JSON.stringify(printer.printerURL),
+      state: JSON.stringify(printer.printerState.state),
+      stateCategory: JSON.stringify(printer.printerState.colour.category),
+      host_state: JSON.stringify(printer.hostState.state),
+      websocket_state: JSON.stringify(printer.webSocketState.colour),
+      octoprint_version: JSON.stringify(printer.octoPrintVersion),
     };
     const printerData = {
-      name: printer.printerName,
-      group: group,
-      url: printer.printerURL,
-      state: printer.printerState.state,
-      host_state: printer.hostState.state,
-      websocket_state: printer.webSocketState.colour,
-      octoprint_version: printer.octoPrintVersion,
-      group: group,
-      state_category: printer.printerState.colour.category,
-      current_idle_time: printer.currentIdle,
-      current_active_time: printer.currentActive,
-      current_offline_time: printer.currentOffline,
-      date_added: printer.dateAdded,
-      storage_free: printer.storage.free,
-      storage_total: printer.storage.total,
+      name: JSON.stringify(printer.printerName),
+      group: JSON.stringify(group),
+      url: JSON.stringify(printer.printerURL),
+      state: JSON.stringify(printer.printerState.state),
+      host_state: JSON.stringify(printer.hostState.state),
+      websocket_state: JSON.stringify(printer.webSocketState.colour),
+      octoprint_version: JSON.stringify(printer.octoPrintVersion),
+      group: JSON.stringify(group),
+      state_category: JSON.stringify(printer.printerState.colour.category),
+      current_idle_time: parseFloat(printer.currentIdle),
+      current_active_time: parseFloat(printer.currentActive),
+      current_offline_time: parseFloat(printer.currentOffline),
+      date_added: parseFloat(printer.dateAdded),
+      storage_free: parseFloat(printer.storage.free),
+      storage_total: parseFloat(printer.storage.total),
       timestamp: date,
     };
-
     if (typeof printer.resends !== "undefined") {
-      printerData["job_resends"] = `${printer.resends.count} / ${
-        printer.resends.transmitted / 1000
-      }K (${printer.resends.ratio.toFixed(0)})`;
+      printerData["job_resends"] = JSON.stringify(
+        `${printer.resends.count} / ${
+          printer.resends.transmitted / 1000
+        }K (${printer.resends.ratio.toFixed(0)})`
+      );
     }
 
     if (
@@ -255,20 +256,27 @@ function sendToInflux(printersInformation) {
             printerData["job_progress"] = parseFloat(printer.currentJob[key]);
           }
           if (key === "fileName" && printer.currentJob[key] !== null) {
-            printerData["job_file_name"] = printer.currentJob[key];
+            printerData["job_file_name"] = JSON.stringify(
+              printer.currentJob[key]
+            );
           }
           if (key === "fileDisplay" && printer.currentJob[key] !== null) {
-            printerData["job_file_display"] = printer.currentJob[key];
+            printerData["job_file_display"] = JSON.stringify(
+              printer.currentJob[key]
+            );
           }
           if (key === "filePath" && printer.currentJob[key] !== null) {
-            printerData["job_file_path"] = printer.currentJob[key];
+            printerData["job_file_path"] = JSON.stringify(
+              printer.currentJob[key]
+            );
           }
           if (
             key === "expectedCompletionDate" &&
             printer.currentJob[key] !== null
           ) {
-            printerData["job_expected_completion_date"] =
-              printer.currentJob[key];
+            printerData["job_expected_completion_date"] = JSON.stringify(
+              printer.currentJob[key]
+            );
           }
           if (key === "expectedPrintTime" && printer.currentJob[key] !== null) {
             printerData["job_expected_print_time"] = parseFloat(
@@ -317,7 +325,9 @@ function sendToInflux(printersInformation) {
             );
           }
           if (key === "thumbnail" && printer.currentJob[key] !== null) {
-            printerData["job_thumbnail"] = printer.currentJob[key];
+            printerData["job_thumbnail"] = JSON.stringify(
+              printer.currentJob[key]
+            );
           }
         }
       }
@@ -326,7 +336,9 @@ function sendToInflux(printersInformation) {
     if (printer.selectedFilament.length >= 1) {
       printer.selectedFilament.forEach((spool, index) => {
         if (spool !== null) {
-          printerData[`tool_${index}_spool_name`] = spool.spools.name;
+          printerData[`tool_${index}_spool_name`] = JSON.stringify(
+            spool.spools.name
+          );
           printerData[`tool_${index}_spool_used`] = parseFloat(
             spool.spools.used
           );
@@ -337,7 +349,9 @@ function sendToInflux(printersInformation) {
             spool.spools.tempOffset
           );
           if (typeof spool.spools.material !== "undefined") {
-            printerData[`tool_${index}_spool_material`] = spool.spools.material;
+            printerData[`tool_${index}_spool_material`] = JSON.stringify(
+              spool.spools.material
+            );
           }
         }
       });
