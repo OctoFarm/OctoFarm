@@ -209,8 +209,7 @@ function sendToInflux(printersInformation) {
     } else {
       group = printer.group;
     }
-    if (printer.cameraURL !== "") {
-    }
+
     const tags = {
       name: printer.printerName,
       group: group,

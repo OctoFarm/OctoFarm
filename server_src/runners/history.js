@@ -422,17 +422,17 @@ class HistoryCollection {
       } else if (workingHistory.state.includes("Failure")) {
         currentState = "Failure";
       }
-
+      let group = " ";
+      if (printer.group === "") {
+        group = " ";
+      } else {
+        group = printer.group;
+      }
       const tags = {
-        name: printer.printerName,
+        printer_name: workingHistory.printerName,
         group: group,
         url: printer.printerURL,
-        state: printer.printerState.state,
-        historyState: currentState,
-        stateCategory: printer.printerState.colour.category,
-        host_state: printer.hostState.state,
-        websocket_state: printer.webSocketState.colour,
-        octoprint_version: printer.octoPrintVersion,
+        history_state: currentState,
         file_name: workingHistory.file.name,
       };
       let printerData = {
@@ -493,6 +493,12 @@ class HistoryCollection {
     for (let i = 0; i < selectedFilament.length; i++) {
       if (selectedFilament[i] !== null) {
         let currentState = " ";
+        let group = " ";
+        if (printer.group === "") {
+          group = " ";
+        } else {
+          group = printer.group;
+        }
         if (history.success) {
           currentState = "Success";
         } else {
@@ -502,16 +508,12 @@ class HistoryCollection {
             currentState = "Failure";
           }
         }
+
         const tags = {
-          name: printer.printerName,
+          printer_name: history.printerName,
           group: group,
           url: printer.printerURL,
-          state: printer.printerState.state,
-          historyState: currentState,
-          stateCategory: printer.printerState.colour.category,
-          host_state: printer.hostState.state,
-          websocket_state: printer.webSocketState.colour,
-          octoprint_version: printer.octoPrintVersion,
+          history_state: currentState,
           file_name: history.fileName,
         };
 
