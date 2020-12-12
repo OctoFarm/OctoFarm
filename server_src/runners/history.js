@@ -436,16 +436,16 @@ class HistoryCollection {
         file_name: workingHistory.file.name,
       };
       let printerData = {
-        id: JSON.stringify(workingHistory._id),
+        id: toString(workingHistory._id),
         index: parseInt(workingHistory.index),
-        state: JSON.stringify(currentState),
-        printer_name: JSON.stringify(workingHistory.printer),
+        state: toString(currentState),
+        printer_name: toString(workingHistory.printer),
         start_date: trueStartDate,
         end_date: trueEndDate,
         print_time: parseInt(workingHistory.printTime),
-        file_name: JSON.stringify(workingHistory.file.name),
+        file_name: toString(workingHistory.file.name),
         file_upload_date: parseFloat(workingHistory.file.uploadDate),
-        file_path: JSON.stringify(workingHistory.file.path),
+        file_path: toString(workingHistory.file.path),
         file_size: parseInt(workingHistory.file.size),
 
         notes: workingHistory.notes,
@@ -474,9 +474,11 @@ class HistoryCollection {
       }
 
       if (typeof workingHistory.resend !== "undefined") {
-        printerData["job_resends"] = JSON.stringify(`${workingHistory.resend.count} / ${
-          workingHistory.resend.transmitted / 1000
-        }K (${workingHistory.resend.ratio.toFixed(0)})`);
+        printerData["job_resends"] = toString(
+          `${workingHistory.resend.count} / ${
+            workingHistory.resend.transmitted / 1000
+          }K (${workingHistory.resend.ratio.toFixed(0)})`
+        );
       }
 
       writePoints(tags, "HistoryInformation", printerData);
@@ -510,11 +512,11 @@ class HistoryCollection {
         }
 
         const tags = {
-          printer_name: JSON.stringify(history.printerName),
-          group: JSON.stringify(group),
-          url: JSON.stringify(printer.printerURL),
-          history_state: JSON.stringify(currentState),
-          file_name: JSON.stringify(history.fileName),
+          printer_name: toString(history.printerName),
+          group: toString(group),
+          url: toString(printer.printerURL),
+          history_state: toString(currentState),
+          file_name: toString(history.fileName),
         };
 
         let used = 0;
@@ -528,7 +530,7 @@ class HistoryCollection {
         }
 
         let filamentData = {
-          name: JSON.stringify(selectedFilament[i].spools.name),
+          name: toString(selectedFilament[i].spools.name),
           price: parseFloat(selectedFilament[i].spools.price),
           weight: parseFloat(selectedFilament[i].spools.weight),
           used_difference: parseFloat(selectedFilament[i].spools.used),

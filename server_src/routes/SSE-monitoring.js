@@ -211,25 +211,25 @@ function sendToInflux(printersInformation) {
     }
 
     const tags = {
-      name: JSON.stringify(printer.printerName),
-      group: JSON.stringify(group),
-      url: JSON.stringify(printer.printerURL),
-      state: JSON.stringify(printer.printerState.state),
-      stateCategory: JSON.stringify(printer.printerState.colour.category),
-      host_state: JSON.stringify(printer.hostState.state),
-      websocket_state: JSON.stringify(printer.webSocketState.colour),
-      octoprint_version: JSON.stringify(printer.octoPrintVersion),
+      name: toString(printer.printerName),
+      group: toString(group),
+      url: toString(printer.printerURL),
+      state: toString(printer.printerState.state),
+      stateCategory: toString(printer.printerState.colour.category),
+      host_state: toString(printer.hostState.state),
+      websocket_state: toString(printer.webSocketState.colour),
+      octoprint_version: toString(printer.octoPrintVersion),
     };
     const printerData = {
-      name: JSON.stringify(printer.printerName),
-      group: JSON.stringify(group),
-      url: JSON.stringify(printer.printerURL),
-      state: JSON.stringify(printer.printerState.state),
-      host_state: JSON.stringify(printer.hostState.state),
-      websocket_state: JSON.stringify(printer.webSocketState.colour),
-      octoprint_version: JSON.stringify(printer.octoPrintVersion),
-      group: JSON.stringify(group),
-      state_category: JSON.stringify(printer.printerState.colour.category),
+      name: toString(printer.printerName),
+      group: toString(group),
+      url: toString(printer.printerURL),
+      state: toString(printer.printerState.state),
+      host_state: toString(printer.hostState.state),
+      websocket_state: toString(printer.webSocketState.colour),
+      octoprint_version: toString(printer.octoPrintVersion),
+      group: toString(group),
+      state_category: toString(printer.printerState.colour.category),
       current_idle_time: parseFloat(printer.currentIdle),
       current_active_time: parseFloat(printer.currentActive),
       current_offline_time: parseFloat(printer.currentOffline),
@@ -239,7 +239,7 @@ function sendToInflux(printersInformation) {
       timestamp: date,
     };
     if (typeof printer.resends !== "undefined") {
-      printerData["job_resends"] = JSON.stringify(
+      printerData["job_resends"] = toString(
         `${printer.resends.count} / ${
           printer.resends.transmitted / 1000
         }K (${printer.resends.ratio.toFixed(0)})`
@@ -256,25 +256,19 @@ function sendToInflux(printersInformation) {
             printerData["job_progress"] = parseFloat(printer.currentJob[key]);
           }
           if (key === "fileName" && printer.currentJob[key] !== null) {
-            printerData["job_file_name"] = JSON.stringify(
-              printer.currentJob[key]
-            );
+            printerData["job_file_name"] = toString(printer.currentJob[key]);
           }
           if (key === "fileDisplay" && printer.currentJob[key] !== null) {
-            printerData["job_file_display"] = JSON.stringify(
-              printer.currentJob[key]
-            );
+            printerData["job_file_display"] = toString(printer.currentJob[key]);
           }
           if (key === "filePath" && printer.currentJob[key] !== null) {
-            printerData["job_file_path"] = JSON.stringify(
-              printer.currentJob[key]
-            );
+            printerData["job_file_path"] = toString(printer.currentJob[key]);
           }
           if (
             key === "expectedCompletionDate" &&
             printer.currentJob[key] !== null
           ) {
-            printerData["job_expected_completion_date"] = JSON.stringify(
+            printerData["job_expected_completion_date"] = toString(
               printer.currentJob[key]
             );
           }
@@ -325,9 +319,7 @@ function sendToInflux(printersInformation) {
             );
           }
           if (key === "thumbnail" && printer.currentJob[key] !== null) {
-            printerData["job_thumbnail"] = JSON.stringify(
-              printer.currentJob[key]
-            );
+            printerData["job_thumbnail"] = toString(printer.currentJob[key]);
           }
         }
       }
@@ -336,9 +328,7 @@ function sendToInflux(printersInformation) {
     if (printer.selectedFilament.length >= 1) {
       printer.selectedFilament.forEach((spool, index) => {
         if (spool !== null) {
-          printerData[`tool_${index}_spool_name`] = JSON.stringify(
-            spool.spools.name
-          );
+          printerData[`tool_${index}_spool_name`] = toString(spool.spools.name);
           printerData[`tool_${index}_spool_used`] = parseFloat(
             spool.spools.used
           );
@@ -349,7 +339,7 @@ function sendToInflux(printersInformation) {
             spool.spools.tempOffset
           );
           if (typeof spool.spools.material !== "undefined") {
-            printerData[`tool_${index}_spool_material`] = JSON.stringify(
+            printerData[`tool_${index}_spool_material`] = toString(
               spool.spools.material
             );
           }
