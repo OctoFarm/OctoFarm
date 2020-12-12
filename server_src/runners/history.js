@@ -510,11 +510,11 @@ class HistoryCollection {
         }
 
         const tags = {
-          printer_name: history.printerName,
-          group: group,
-          url: printer.printerURL,
-          history_state: currentState,
-          file_name: history.fileName,
+          printer_name: JSON.stringify(history.printerName),
+          group: JSON.stringify(group),
+          url: JSON.stringify(printer.printerURL),
+          history_state: JSON.stringify(currentState),
+          file_name: JSON.stringify(history.fileName),
         };
 
         let used = 0;
@@ -522,12 +522,13 @@ class HistoryCollection {
           typeof previousFilament !== "undefined" &&
           previousFilament !== null
         ) {
-          used =
-            selectedFilament[i].spools.used - previousFilament[i].spools.used;
+          used = Math.abs(
+            selectedFilament[i].spools.used - previousFilament[i].spools.used
+          );
         }
 
         let filamentData = {
-          name: selectedFilament[i].spools.name,
+          name: JSON.stringify(selectedFilament[i].spools.name),
           price: parseFloat(selectedFilament[i].spools.price),
           weight: parseFloat(selectedFilament[i].spools.weight),
           used_difference: parseFloat(selectedFilament[i].spools.used),
