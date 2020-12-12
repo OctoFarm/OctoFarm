@@ -399,7 +399,7 @@ class HistoryCollection {
       }
     }
   }
-  static async updateInfluxDB(historyID, measurement) {
+  static async updateInfluxDB(historyID, measurement, printer) {
     let historyArchive = await HistoryClean.returnHistory();
     let currentArchive = _.findIndex(historyArchive, function (o) {
       return JSON.stringify(o._id) === JSON.stringify(historyID);
@@ -422,9 +422,17 @@ class HistoryCollection {
       } else if (workingHistory.state.includes("Failure")) {
         currentState = "Failure";
       }
-      let tags = {
-        state: currentState,
-        printer_name: workingHistory.printer,
+
+      const tags = {
+        name: printer.printerName,
+        group: group,
+        url: printer.printerURL,
+        state: printer.printerState.state,
+        historyState: currentState,
+        stateCategory: printer.printerState.colour.category,
+        host_state: printer.hostState.state,
+        websocket_state: printer.webSocketState.colour,
+        octoprint_version: printer.octoPrintVersion,
         file_name: workingHistory.file.name,
       };
       let printerData = {
@@ -479,7 +487,8 @@ class HistoryCollection {
   static async updateFilamentInfluxDB(
     selectedFilament,
     history,
-    previousFilament
+    previousFilament,
+    printer
   ) {
     for (let i = 0; i < selectedFilament.length; i++) {
       if (selectedFilament[i] !== null) {
@@ -493,11 +502,19 @@ class HistoryCollection {
             currentState = "Failure";
           }
         }
-        let tags = {
-          state: currentState,
-          printer_name: history.printerName,
+        const tags = {
+          name: printer.printerName,
+          group: group,
+          url: printer.printerURL,
+          state: printer.printerState.state,
+          historyState: currentState,
+          stateCategory: printer.printerState.colour.category,
+          host_state: printer.hostState.state,
+          websocket_state: printer.webSocketState.colour,
+          octoprint_version: printer.octoPrintVersion,
           file_name: history.fileName,
         };
+
         let used = 0;
         if (
           typeof previousFilament !== "undefined" &&
@@ -634,7 +651,8 @@ class HistoryCollection {
       HistoryCollection.updateFilamentInfluxDB(
         printer.selectedFilament,
         printHistory,
-        previousFilament
+        previousFilament,
+        printer
       );
 
       const saveHistory = new History({
@@ -678,7 +696,11 @@ class HistoryCollection {
           HistoryClean.start();
           setTimeout(async function () {
             await HistoryClean.start();
-            HistoryCollection.updateInfluxDB(saveHistory._id, "history");
+            HistoryCollection.updateInfluxDB(
+              saveHistory._id,
+              "history",
+              printer
+            );
           }, 5000);
         }
       });
@@ -801,7 +823,8 @@ class HistoryCollection {
       HistoryCollection.updateFilamentInfluxDB(
         printer.selectedFilament,
         printHistory,
-        previousFilament
+        previousFilament,
+        printer
       );
 
       await saveHistory.save().then(async (r) => {
@@ -844,7 +867,11 @@ class HistoryCollection {
           HistoryClean.start();
           setTimeout(async function () {
             await HistoryClean.start();
-            HistoryCollection.updateInfluxDB(saveHistory._id, "history");
+            HistoryCollection.updateInfluxDB(
+              saveHistory._id,
+              "history",
+              printer
+            );
           }, 5000);
         }
       });

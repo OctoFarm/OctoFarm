@@ -253,7 +253,7 @@ function sendToInflux(printersInformation) {
       for (const key in printer.currentJob) {
         if (printer.currentJob.hasOwnProperty(key)) {
           if (key === "progress" && printer.currentJob[key] !== null) {
-            printerData["job_progress"] = printer.currentJob[key];
+            printerData["job_progress"] = parseFloat(printer.currentJob[key]);
           }
           if (key === "fileName" && printer.currentJob[key] !== null) {
             printerData["job_file_name"] = printer.currentJob[key];
@@ -272,7 +272,9 @@ function sendToInflux(printersInformation) {
               printer.currentJob[key];
           }
           if (key === "expectedPrintTime" && printer.currentJob[key] !== null) {
-            printerData["job_expected_print_time"] = printer.currentJob[key];
+            printerData["job_expected_print_time"] = parseFloat(
+              printer.currentJob[key]
+            );
           }
           if (
             key === "expectedFilamentCosts" &&
@@ -283,27 +285,37 @@ function sendToInflux(printersInformation) {
             key === "expectedPrinterCosts" &&
             printer.currentJob[key] !== null
           ) {
-            printerData["job_expected_print_cost"] = printer.currentJob[key];
+            printerData["job_expected_print_cost"] = parseFloat(
+              printer.currentJob[key]
+            );
           }
           if (key === "expectedTotals" && printer.currentJob[key] !== null) {
           }
           if (key === "currentZ" && printer.currentJob[key] !== null) {
-            printerData["job_current_z"] = printer.currentJob[key];
+            printerData["job_current_z"] = parseFloat(printer.currentJob[key]);
           }
           if (key === "printTimeElapsed" && printer.currentJob[key] !== null) {
-            printerData["job_print_time_elapsed"] = printer.currentJob[key];
+            printerData["job_print_time_elapsed"] = parseFloat(
+              printer.currentJob[key]
+            );
           }
           if (
             key === "printTimeRemaining" &&
             printer.currentJob[key] !== null
           ) {
-            printerData["job_print_time_remaining"] = printer.currentJob[key];
+            printerData["job_print_time_remaining"] = parseFloat(
+              printer.currentJob[key]
+            );
           }
           if (key === "averagePrintTime" && printer.currentJob[key] !== null) {
-            printerData["job_average_print_time"] = printer.currentJob[key];
+            printerData["job_average_print_time"] = parseFloat(
+              printer.currentJob[key]
+            );
           }
           if (key === "lastPrintTime" && printer.currentJob[key] !== null) {
-            printerData["job_last_print_time"] = printer.currentJob[key];
+            printerData["job_last_print_time"] = parseFloat(
+              printer.currentJob[key]
+            );
           }
           if (key === "thumbnail" && printer.currentJob[key] !== null) {
             printerData["job_thumbnail"] = printer.currentJob[key];
@@ -316,10 +328,15 @@ function sendToInflux(printersInformation) {
       printer.selectedFilament.forEach((spool, index) => {
         if (spool !== null) {
           printerData[`tool_${index}_spool_name`] = spool.spools.name;
-          printerData[`tool_${index}_spool_used`] = spool.spools.used;
-          printerData[`tool_${index}_spool_weight`] = spool.spools.weight;
-          printerData[`tool_${index}_spool_temp_offset`] =
-            spool.spools.tempOffset;
+          printerData[`tool_${index}_spool_used`] = parseFloat(
+            spool.spools.used
+          );
+          printerData[`tool_${index}_spool_weight`] = parseFloat(
+            spool.spools.weight
+          );
+          printerData[`tool_${index}_spool_temp_offset`] = parseFloat(
+            spool.spools.tempOffset
+          );
           if (typeof spool.spools.material !== "undefined") {
             printerData[`tool_${index}_spool_material`] = spool.spools.material;
           }
@@ -336,12 +353,16 @@ function sendToInflux(printersInformation) {
         if (printer.tools[0].hasOwnProperty(key)) {
           if (key !== "time") {
             if (printer.tools[0][key].actual !== null) {
-              printerData[key + "_actual"] = printer.tools[0][key].actual;
+              printerData[key + "_actual"] = parseFloat(
+                printer.tools[0][key].actual
+              );
             } else {
               printerData[key + "_actual"] = 0;
             }
             if (printer.tools[0][key].target !== null) {
-              printerData[key + "_target"] = printer.tools[0][key].target;
+              printerData[key + "_target"] = parseFloat(
+                printer.tools[0][key].target
+              );
             } else {
               printerData[key + "_target"] = 0;
             }
