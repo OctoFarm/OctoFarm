@@ -429,14 +429,14 @@ class HistoryCollection {
         group = printer.group;
       }
       const tags = {
-        printer_name: workingHistory.printerName,
+        printer_name: workingHistory.printer,
         group: group,
         url: printer.printerURL,
         history_state: currentState,
         file_name: workingHistory.file.name,
       };
       let printerData = {
-        id: workingHistory._id,
+        id: String(workingHistory._id),
         index: parseInt(workingHistory.index),
         state: currentState,
         printer_name: workingHistory.printer,
@@ -453,9 +453,7 @@ class HistoryCollection {
           workingHistory.job.estimatedPrintTime
         ),
         job_actual_print_time: parseFloat(workingHistory.job.actualPrintTime),
-        job_print_time_accuracy: parseFloat(
-          workingHistory.job.printTimeAccuracy
-        ),
+
         cost_printer: parseFloat(workingHistory.printerCost),
         cost_spool: parseFloat(workingHistory.spoolCost),
         cost_total: parseFloat(workingHistory.totalCost),
@@ -480,6 +478,7 @@ class HistoryCollection {
       }
 
       writePoints(tags, "HistoryInformation", printerData);
+      console.log("Written", printerData);
     } else {
       console.log("HU OHHH");
     }

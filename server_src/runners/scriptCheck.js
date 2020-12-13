@@ -215,7 +215,10 @@ class ScriptRunner {
     }
     if (message.includes("[Error!]")) {
       let errMess = "No Error";
-      if (printer.state.includes("Error")) {
+      if (
+        typeof printer.state !== "undefined" &&
+        printer.state.includes("Error")
+      ) {
         errMess = printer.stateDescription;
       }
       message = message.replace(/\[Error!\]/g, errMess);

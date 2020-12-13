@@ -92,6 +92,7 @@ All notable changes to this project will be documented in this file.
     - Fixed issue with history deleting record regardless of yes/no answer. 
     - Fixed issue with environmental data graph loading categories that don't exist.
     - Fixed the camera fullscreen issue not respecting rotation.
+    - Fixed an issue with Error Alerts failing to trigger.
 
 ## Removed
     - Removed the annoying content editable fields on "Printer Settings" and "Printer Management" and replaced with standard input boxes. 
