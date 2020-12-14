@@ -364,6 +364,7 @@ WebSocketClient.prototype.open = function (url, index) {
     return true;
   } catch (e) {
     logger.info(e, "There was an issue opening the websocket... hard fail...");
+    this.reconnect(e);
   }
 };
 WebSocketClient.prototype.throttle = function (data) {

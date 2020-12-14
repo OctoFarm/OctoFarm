@@ -43,13 +43,11 @@ ssdp.on("DeviceFound", (res) => {
                 let name = result.root.device[0].friendlyName[0];
                 if (!name.includes("on")) {
                   name = name.match(/(?:"[^"]*"|^[^"]*$)/)[0].replace(/"/g, "");
-                  console.log(name);
                 } else {
                   name = "Not Named";
                 }
                 logger.info("Captured device", res.location);
-                console.log({ name: name, url: url });
-                let doesExist = discoveredDevices.push({
+                discoveredDevices.push({
                   name: name,
                   url: url,
                 });
@@ -75,8 +73,8 @@ let searchForDevicesOnNetwork = async function () {
     var promise = new Promise(function (resolve, reject) {
       setTimeout(function () {
         ssdp.close;
-        resolve("done!");
-      }, 20000);
+        resolve(discoveredDevices);
+      }, 20001);
     });
     return promise;
   }
@@ -84,13 +82,8 @@ let searchForDevicesOnNetwork = async function () {
   return result;
 };
 
-let functionTest = async () => {
-  await searchForDevicesOnNetwork();
-  console.log(discoveredDevices);
+module.exports = {
+  searchForDevicesOnNetwork,
 };
-
-console.log(functionTest());
-
-module.exports = searchForDevicesOnNetwork;
 
 console.log("AUTO DISC");

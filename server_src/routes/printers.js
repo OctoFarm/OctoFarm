@@ -234,11 +234,11 @@ router.get("/pluginList/:id", ensureAuthenticated, async (req, res) => {
 router.get("/scanNetwork", ensureAuthenticated, async (req, res) => {
   const {
     searchForDevicesOnNetwork,
-  } = require("./server_src/runners/autoDiscovery.js");
+  } = require("../../server_src/runners/autoDiscovery.js");
 
   let devices = await searchForDevicesOnNetwork();
 
-  res.send(devices);
+  res.json(devices);
 });
 
 module.exports = router;

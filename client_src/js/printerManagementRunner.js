@@ -535,6 +535,42 @@ bulkPowerBtn.addEventListener("click", async (e) => {
   );
 });
 
+let scanNetworkBtn = document.getElementById("scanNetworkBtn");
+scanNetworkBtn.addEventListener("click", async (e) => {
+  e.target.disabled = true;
+  UI.createAlert(
+    "warning",
+    "Scanning your network for new devices now... Please wait!",
+    20000
+  );
+  let printers = await OctoFarmClient.get("printers/scanNetwork");
+  let scannedPrinters = await printers.json();
+  for (let index = 0; index < scannedPrinters.length; index++) {
+    const printer = {
+      printerURL: "",
+      cameraURL: "",
+      name: "",
+      group: "",
+      apikey: "",
+    };
+
+    if (typeof scannedPrinters[index].name !== "undefined") {
+      printer.name = scannedPrinters[index].name;
+    }
+    if (typeof scannedPrinters[index].url !== "undefined") {
+      printer.printerURL = scannedPrinters[index].url;
+    }
+    PrintersManagement.addPrinter(printer);
+  }
+  UI.createAlert(
+    "success",
+    "Scanning your network for new devices now... Please wait!",
+    3000,
+    "Clicked"
+  );
+  e.target.disabled = false;
+});
+
 function pluginListTemplate(plugin) {
   //Also need check inplace for incompatible...
 
