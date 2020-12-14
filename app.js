@@ -23,7 +23,7 @@ const { PrinterClean } = printerClean;
 const pluginManager = require("./server_src/runners/pluginManager.js");
 
 const { updatePluginList } = pluginManager;
-
+const autoDiscovery = require("./server_src/runners/autoDiscovery.js");
 // Server Port
 const app = express();
 

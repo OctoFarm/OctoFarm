@@ -45,6 +45,7 @@
     "mongoose": "^5.10.7",
     "multer": "^1.4.2",
     "node-fetch": "^2.6.1",
+    "node-upnp-ssdp": "^0.1.1",
     "passport": "^0.4.1",
     "passport-headerapikey": "^1.2.2",
     "passport-local": "^1.0.0",
@@ -54,7 +55,8 @@
     "systeminformation": "^4.27.5",
     "wake_on_lan": "^1.0.0",
     "winston": "^3.3.3",
-    "ws": "^7.3.1"
+    "ws": "^7.3.1",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@babel/cli": "^7.11.6",
