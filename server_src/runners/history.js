@@ -531,7 +531,7 @@ class HistoryCollection {
           name: selectedFilament[i].spools.name,
           price: parseFloat(selectedFilament[i].spools.price),
           weight: parseFloat(selectedFilament[i].spools.weight),
-          used_difference: parseFloat(selectedFilament[i].spools.used),
+          used_difference: parseFloat(used),
           used_spool: parseFloat(selectedFilament[i].spools.used),
           temp_offset: parseFloat(selectedFilament[i].spools.tempOffset),
           spool_manufacturer: selectedFilament[i].spools.profile.manufacturer,
