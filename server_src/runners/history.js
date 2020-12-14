@@ -509,6 +509,7 @@ class HistoryCollection {
         }
 
         const tags = {
+          name: selectedFilament[i].spools.name,
           printer_name: history.printerName,
           group: group,
           url: printer.printerURL,
