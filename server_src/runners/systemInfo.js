@@ -49,22 +49,23 @@ class SystemRunner {
       const systemDisk = fileSize[0];
 
       let warnings = {};
-
-      if (systemDisk.use >= 99) {
-        warnings = {
-          status: "danger",
-          message: `Danger! Your disk is over 99% full... OctoFarms operations could be effected if you don't clean up some space or move to a larger hard drive.`,
-        };
-      } else if (systemDisk.use >= 95) {
-        warnings = {
-          status: "warning",
-          message: `Warning your disk is over 95% full... Please clean up some space or move to a larger hard drive.`,
-        };
-      } else if (systemDisk.use >= 90) {
-        warnings = {
-          status: "warning",
-          message: `Warning your disk is getting full... Please clean up some space or move to a larger hard drive.`,
-        };
+      if (typeof systemDisk !== "undefined") {
+        if (systemDisk.use >= 99) {
+          warnings = {
+            status: "danger",
+            message: `Danger! Your disk is over 99% full... OctoFarms operations could be effected if you don't clean up some space or move to a larger hard drive.`,
+          };
+        } else if (systemDisk.use >= 95) {
+          warnings = {
+            status: "warning",
+            message: `Warning your disk is over 95% full... Please clean up some space or move to a larger hard drive.`,
+          };
+        } else if (systemDisk.use >= 90) {
+          warnings = {
+            status: "warning",
+            message: `Warning your disk is getting full... Please clean up some space or move to a larger hard drive.`,
+          };
+        }
       }
 
       systemInfo = {

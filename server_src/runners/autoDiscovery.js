@@ -85,5 +85,3 @@ let searchForDevicesOnNetwork = async function () {
 module.exports = {
   searchForDevicesOnNetwork,
 };
-
-console.log("AUTO DISC");
