@@ -35,9 +35,10 @@ async function enable() {
     );
 
     // Register Handle
-    router.post("/register", (req, res) => {
+    router.post("/register", async (req, res) => {
       const { name, username, password, password2 } = req.body;
       const errors = [];
+      let currentUsers = await User.find({});
 
       // Check required fields
       if (!name || !username || !password || !password2) {
@@ -64,6 +65,7 @@ async function enable() {
           username,
           password,
           password2,
+          userCount: currentUsers.length,
         });
       } else {
         // Validation Passed
@@ -80,6 +82,7 @@ async function enable() {
               username,
               password,
               password2,
+              userCount: currentUsers.length,
             });
           } else {
             // Check if first user that's created.
