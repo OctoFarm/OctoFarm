@@ -688,13 +688,35 @@ const pluginAction = async function (action) {
                     <label for="searchPlugins">
                       Please choose the plugin you'd like to install... or: &nbsp;
                     </label>
-                    <input id="searchPlugins" type="text" placeholder="Type your plugin name here..." class="search-control search-control-underlined">
+                    <input width="50%" id="searchPlugins" type="text" placeholder="Type your plugin name here..." class="search-control search-control-underlined">
                   </div>
                 </form>`,
       inputType: "checkbox",
       multiple: true,
       inputOptions: pluginList,
       scrollable: true,
+      onShow: function (e) {
+        let pluginSearch = document.getElementById("searchPlugins");
+        pluginSearch.addEventListener("keyup", (e) => {
+          const fileList = document.getElementsByClassName(
+            `bootbox-checkbox-list`
+          );
+          let input = document
+            .getElementById("searchPlugins")
+            .value.toUpperCase();
+
+          input = input.replace(/ /g, "_");
+          const button = fileList[0].querySelectorAll('*[id^="plugin-"]');
+          for (let i = 0; i < button.length; i++) {
+            const file = button[i].id.replace("plugin-", "");
+            if (file.toUpperCase().indexOf(input) > -1) {
+              button[i].parentNode.parentNode.style.display = "";
+            } else {
+              button[i].parentNode.parentNode.style.display = "none";
+            }
+          }
+        });
+      },
       callback: async function (result) {
         if (result) {
           let tracker = document.getElementById("pluginTracking");
@@ -837,26 +859,6 @@ const pluginAction = async function (action) {
           trackerBtn.classList.add("d-none");
         }
       },
-    });
-    let pluginSearch = document.getElementById("searchPlugins");
-    pluginSearch.addEventListener("onchange", (e) => {
-      const fileList = document.getElementsByClassName(`bootbox-checkbox-list`);
-      let input = document.getElementById("searchFiles").value.toUpperCase();
-
-      input = input.replace(/ /g, "_");
-      if (input.value === "") {
-        // No search term so reset view
-      }
-      const button = fileList.querySelectorAll('*[id^="plugin-"]');
-      for (let i = 0; i < button.length; i++) {
-        const file = button[i].id.replace("plugin-", "");
-
-        if (file.toUpperCase().indexOf(input) > -1) {
-          button[i].style.display = "";
-        } else {
-          button[i].style.display = "none";
-        }
-      }
     });
   } else {
   }
