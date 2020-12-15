@@ -682,150 +682,152 @@ const pluginAction = async function (action) {
     ]);
     bootbox.prompt({
       size: "large",
-      title: `Please choose the plugins you'd like to ${action}...`,
+      title: `Please choose the plugins you'd like to ${action}... <br> <input>`,
       inputType: "checkbox",
       multiple: true,
       inputOptions: pluginList,
       scrollable: true,
       callback: async function (result) {
-        let tracker = document.getElementById("pluginTracking");
-        let trackerBtn = document.getElementById("pluginTracking");
-        trackerBtn.classList.remove("d-none");
-        let pluginAmount = result.length * printersToConnect.length;
-        tracker.innerHTML = `
+        if (result) {
+          let tracker = document.getElementById("pluginTracking");
+          let trackerBtn = document.getElementById("pluginTracking");
+          trackerBtn.classList.remove("d-none");
+          let pluginAmount = result.length * printersToConnect.length;
+          tracker.innerHTML = `
                Installing Plugins!<br>
                <i class="fas fa-print"></i>${printersToConnect.length} / <i class="fas fa-plug"></i> ${pluginAmount}
         `;
-        for (let p = 0; p < printersToConnect.length; p++) {
-          //grab index
-          const index = _.findIndex(printerInfo, function (o) {
-            return o._id === printersToConnect[p];
-          });
-          if (printerInfo[index].printerState.colour.category !== "Active") {
-            for (let r = 0; r < result.length; r++) {
-              let alert = UI.createAlert(
-                "warning",
-                `${printerInfo[index].printerName}: Installing - ${result[r]}<br>Do not navigate away from this screen!`
-              );
+          for (let p = 0; p < printersToConnect.length; p++) {
+            //grab index
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printersToConnect[p];
+            });
+            if (printerInfo[index].printerState.colour.category !== "Active") {
+              for (let r = 0; r < result.length; r++) {
+                let alert = UI.createAlert(
+                  "warning",
+                  `${printerInfo[index].printerName}: Installing - ${result[r]}<br>Do not navigate away from this screen!`
+                );
 
-              let postData = {
-                command: action,
-                dependency_links: false,
-                url: result[r],
-              };
+                let postData = {
+                  command: action,
+                  dependency_links: false,
+                  url: result[r],
+                };
 
-              let post = await OctoPrintClient.post(
-                printerInfo[index],
-                "plugin/pluginmanager",
-                postData
-              );
-              tracker.innerHTML = `
+                let post = await OctoPrintClient.post(
+                  printerInfo[index],
+                  "plugin/pluginmanager",
+                  postData
+                );
+                tracker.innerHTML = `
                 Installing Plugins!<br>
                 <i class="fas fa-print"></i>${
                   printersToConnect.length - p
                 } / <i class="fas fa-plug"></i> ${pluginAmount}
               `;
-              pluginAmount = pluginAmount - 1;
-              alert.close();
-              if (post.status == 409) {
-                UI.createAlert(
-                  "error",
-                  "Plugin not installed... Printer could be active...",
-                  4000,
-                  "Clicked"
-                );
-              } else if (post.status == 400) {
-                UI.createAlert(
-                  "error",
-                  "Malformed request... please log an issue...",
-                  4000,
-                  "Clicked"
-                );
-              } else if (post.status === 200) {
-                let response = await post.json();
-                if (response.needs_restart || response.needs_refresh) {
+                pluginAmount = pluginAmount - 1;
+                alert.close();
+                if (post.status == 409) {
                   UI.createAlert(
-                    "success",
-                    `${printerInfo[index].printerName}: ${response.plugin.name} - Has successfully been installed... OctoPrint restart is required!`,
+                    "error",
+                    "Plugin not installed... Printer could be active...",
                     4000,
                     "Clicked"
                   );
-                } else {
+                } else if (post.status == 400) {
                   UI.createAlert(
-                    "success",
-                    `${printerInfo[index].printerName}: ${response.plugin.name} - Has successfully been installed... No further action requested...`,
+                    "error",
+                    "Malformed request... please log an issue...",
                     4000,
                     "Clicked"
                   );
-                }
-              }
-            }
-          } else {
-            UI.createAlert(
-              "danger",
-              `${printerInfo[index].printerName}: Is active skipping the plugin installation command...`
-            );
-          }
-        }
-        let restartInstance = document.getElementById("restartInstances");
-        restartInstance.classList.remove("d-none");
-        restartInstance.addEventListener("click", async (e) => {
-          restartInstance.classList.add("d-none");
-          for (let p = 0; p < printersToConnect.length; p++) {
-            const index = _.findIndex(printerInfo, function (o) {
-              return o._id === printersToConnect[p];
-            });
-            if (index > -1) {
-              if (
-                printerInfo[index].printerState.colour.category !== "Active"
-              ) {
-                let post = await OctoPrintClient.systemNoConfirm(
-                  printerInfo[index],
-                  "restart"
-                );
-                if (typeof post !== "undefined") {
-                  if (post.status === 204) {
+                } else if (post.status === 200) {
+                  let response = await post.json();
+                  if (response.needs_restart || response.needs_refresh) {
                     UI.createAlert(
                       "success",
-                      `Successfully made restart attempt to ${printerInfo[index].printerName}...`,
-                      3000,
+                      `${printerInfo[index].printerName}: ${response.plugin.name} - Has successfully been installed... OctoPrint restart is required!`,
+                      4000,
                       "Clicked"
                     );
                   } else {
                     UI.createAlert(
+                      "success",
+                      `${printerInfo[index].printerName}: ${response.plugin.name} - Has successfully been installed... No further action requested...`,
+                      4000,
+                      "Clicked"
+                    );
+                  }
+                }
+              }
+            } else {
+              UI.createAlert(
+                "danger",
+                `${printerInfo[index].printerName}: Is active skipping the plugin installation command...`
+              );
+            }
+          }
+          let restartInstance = document.getElementById("restartInstances");
+          restartInstance.classList.remove("d-none");
+          restartInstance.addEventListener("click", async (e) => {
+            restartInstance.classList.add("d-none");
+            for (let p = 0; p < printersToConnect.length; p++) {
+              const index = _.findIndex(printerInfo, function (o) {
+                return o._id === printersToConnect[p];
+              });
+              if (index > -1) {
+                if (
+                  printerInfo[index].printerState.colour.category !== "Active"
+                ) {
+                  let post = await OctoPrintClient.systemNoConfirm(
+                    printerInfo[index],
+                    "restart"
+                  );
+                  if (typeof post !== "undefined") {
+                    if (post.status === 204) {
+                      UI.createAlert(
+                        "success",
+                        `Successfully made restart attempt to ${printerInfo[index].printerName}...`,
+                        3000,
+                        "Clicked"
+                      );
+                    } else {
+                      UI.createAlert(
+                        "error",
+                        `There was an issue sending restart to ${printerInfo[index].printerName} are you sure it's online?`,
+                        3000,
+                        "Clicked"
+                      );
+                    }
+                  } else {
+                    UI.createAlert(
                       "error",
-                      `There was an issue sending restart to ${printerInfo[index].printerName} are you sure it's online?`,
+                      `No response from ${printerInfo[index].printerName}, is it online???`,
                       3000,
                       "Clicked"
                     );
                   }
                 } else {
                   UI.createAlert(
-                    "error",
-                    `No response from ${printerInfo[index].printerName}, is it online???`,
+                    "warning",
+                    `Printer ${printerInfo[index].printerName} is not in "Idle" state... skipping`,
                     3000,
                     "Clicked"
                   );
                 }
               } else {
                 UI.createAlert(
-                  "warning",
-                  `Printer ${printerInfo[index].printerName} is not in "Idle" state... skipping`,
+                  "error",
+                  `Could not find your printer in your printer in the list of available printers...`,
                   3000,
                   "Clicked"
                 );
               }
-            } else {
-              UI.createAlert(
-                "error",
-                `Could not find your printer in your printer in the list of available printers...`,
-                3000,
-                "Clicked"
-              );
             }
-          }
-        });
-        trackerBtn.classList.add("d-none");
+          });
+          trackerBtn.classList.add("d-none");
+        }
       },
     });
   } else {
