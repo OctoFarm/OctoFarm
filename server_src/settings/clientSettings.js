@@ -8,9 +8,6 @@ class ClientSettings {
     ClientSettingsDB.find({})
       .then((settings) => {
         if (settings.length < 1) {
-          const settings = {
-            backgroundURL: null,
-          };
           // const currentOperationsView = {};
           const dashboard = {
             defaultLayout: [
@@ -50,11 +47,27 @@ class ClientSettings {
               environmentalHistory: false,
             },
           };
-          const viewSettings = {
+          const panelView = {
             currentOp: false,
             hideOff: true,
             hideClosed: false,
-            hideIdle: false,
+            extraInfo: false,
+            powerBtn: false,
+            webBtn: false,
+          };
+          const listView = {
+            currentOp: false,
+            hideOff: true,
+            hideClosed: false,
+            extraInfo: false,
+            powerBtn: false,
+            webBtn: false,
+          };
+          const cameraView = {
+            currentOp: false,
+            cameraRows: 4,
+            hideClosed: false,
+            extraInfo: false,
             powerBtn: false,
             webBtn: false,
           };
@@ -63,7 +76,9 @@ class ClientSettings {
           const defaultSystemSettings = new ClientSettingsDB({
             dashboard,
             settings,
-            viewSettings,
+            panelView,
+            listView,
+            cameraView,
           });
           defaultSystemSettings.save();
           return "Server settings have been created...";
