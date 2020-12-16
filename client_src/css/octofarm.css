@@ -336,13 +336,13 @@ a.notyet {
 .cameraContain {
   position: relative;
   padding: 5px;
+  width: auto;
 }
 .cameraContain:-webkit-full-screen,
 .cameraContain:-moz-full-screen,
 .cameraContain:-ms-fullscreen,
 .cameraContain:fullscreen {
   width: auto !important;
-  height: 90vh !important;
   object-fit: contain !important;
 }
 /*.camButtons:-webkit-full-screen,*/
@@ -382,6 +382,7 @@ a.notyet {
 }
 .camImg {
   pointer-events: none;
+  max-height: 100%;
 }
 .camTemps {
   display: none;
@@ -397,7 +398,6 @@ a.notyet {
 .cameraContain:hover .camExtra {
   display: block;
   transition: opacity 0.3s;
-  max-height: 90vh !important;
 }
 .cameraContain:hover .camTemps {
   display: block;
