@@ -397,6 +397,7 @@ a.notyet {
 .cameraContain:hover .camExtra {
   display: block;
   transition: opacity 0.3s;
+  max-height: 90vh !important;
 }
 .cameraContain:hover .camTemps {
   display: block;
