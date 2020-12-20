@@ -542,6 +542,8 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
 
       if (typeof data.current.progress !== "undefined") {
         farmPrinters[this.index].progress = data.current.progress;
+      } else {
+        farmPrinters[this.index].progress = 0;
       }
       if (
         typeof data.current.currentZ !== "undefined" &&
@@ -580,6 +582,32 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
               farmPrinters[this.index].fileList.files[currentFileIndex].length;
           }
         }
+        const currentFilament = JSON.parse(
+          JSON.stringify(farmPrinters[this.index].selectedFilament)
+        );
+        for (
+          let s = 0;
+          s < farmPrinters[this.index].selectedFilament.length;
+          s++
+        ) {
+          if (farmPrinters[this.index].selectedFilament[s] !== null) {
+            let profile = null;
+            if (systemSettings.filamentManager) {
+              profile = await Profiles.findOne({
+                "profile.index": parseInt(
+                  farmPrinters[this.index].selectedFilament[s].spools.profile
+                ),
+              });
+            } else {
+              profile = await Profiles.findById(
+                farmPrinters[this.index].selectedFilament[s].spools.profile
+              );
+            }
+            currentFilament[s].spools.profile = profile.profile;
+          }
+        }
+        JobClean.generate(farmPrinters[this.index], currentFilament);
+      } else {
         const currentFilament = JSON.parse(
           JSON.stringify(farmPrinters[this.index].selectedFilament)
         );
