@@ -227,9 +227,15 @@ router.get("/connectionLogs/:id", ensureAuthenticated, async (req, res) => {
 });
 router.get("/pluginList/:id", ensureAuthenticated, async (req, res) => {
   let id = req.params.id;
-  logger.info("Grabbing plugin list for: ", id);
-  let pluginList = await Runner.returnPluginList(id);
-  res.send(pluginList);
+  if (typeof id !== "undefined") {
+    logger.info("Grabbing plugin list for: ", id);
+    let pluginList = await Runner.returnPluginList(id);
+    res.send(pluginList);
+  } else {
+    logger.info("Grabbing global plugin list");
+    let pluginList = await Runner.returnPluginList();
+    res.send(pluginList);
+  }
 });
 router.get("/scanNetwork", ensureAuthenticated, async (req, res) => {
   const {
