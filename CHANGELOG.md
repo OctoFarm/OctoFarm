@@ -70,6 +70,7 @@ All notable changes to this project will be documented in this file.
     - History page now displays an image slider when loading the "edit/view" box. You can cycle through the thumbnails from your slicer if you use that plugin, or the captured image of the finished print taken from your webcam.
     - Added the option for websockets to follow 301 redirects. Should help with 301 errors. 
     - Camera view now opens overlay with fullscreen. 
+    - Tweaks have been made to the websocket connection system. Should better recover from errors and state if user action required.
 
 ### Fixed
     - Fixed issue with File Manager not loading if printer in index 0 was offline.

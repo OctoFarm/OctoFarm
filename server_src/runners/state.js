@@ -166,18 +166,7 @@ WebSocketClient.prototype.open = function (url, index) {
         logger.info(
           `Cannot re-open web socket... : ${this.index}: ${this.url}`
         );
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[this.index].printerURL,
-          "Client error, setting back up...",
-          "Offline",
-          farmPrinters[this.index]._id
-        );
-        setTimeout(async () => {
-          this.instance.emit("error", e);
-          Runner.reScanOcto(farmPrinters[this.index]._id);
-          logger.info("Error with websockets... resetting up!");
-        }, 5000);
+        this.instance.emit("error", e);
       }
     });
     this.instance.on("pong", () => {
@@ -192,18 +181,7 @@ WebSocketClient.prototype.open = function (url, index) {
           e,
           "There was an issue opening the websocket... hard fail..."
         );
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[this.index].printerURL,
-          "Client error, setting back up...",
-          "Offline",
-          farmPrinters[this.index]._id
-        );
-        setTimeout(async () => {
-          this.instance.emit("error", e);
-          Runner.reScanOcto(farmPrinters[this.index]._id);
-          logger.info("Error with websockets... resetting up!");
-        }, 5000);
+        this.instance.emit("error", e);
       }
     });
     this.instance.on("close", (e) => {
@@ -272,30 +250,17 @@ WebSocketClient.prototype.open = function (url, index) {
           PrinterTicker.addIssue(
             new Date(),
             farmPrinters[this.index].printerURL,
-            "Client error, setting back up...",
+            "Client error, setting back up... in 10000ms",
             "Offline",
             farmPrinters[this.index]._id
           );
           setTimeout(async () => {
             Runner.reScanOcto(farmPrinters[this.index]._id);
             logger.info("Error with websockets... resetting up!");
-          }, 5000);
+          }, 10000);
           break;
         default:
-          this.onclose(e);
-          // Abnormal closure
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            "Client error, setting back up...",
-            "Offline",
-            farmPrinters[this.index]._id
-          );
-          setTimeout(async () => {
-            Runner.reScanOcto(farmPrinters[this.index]._id);
-            logger.info("Error with websockets... resetting up!");
-          }, 3000);
-          break;
+          console.log("ON CLOSE");
       }
 
       return "closed";
@@ -321,18 +286,7 @@ WebSocketClient.prototype.open = function (url, index) {
               `Couldn't set state of missing printer, safe to ignore: ${this.index}: ${this.url}`
             );
           }
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            "Client error, setting back up...",
-            "Offline",
-            farmPrinters[this.index]._id
-          );
-          setTimeout(async () => {
-            console.log("DOES THIS FAIL", farmPrinters[this.index]._id);
-            Runner.reScanOcto(farmPrinters[this.index]._id);
-            logger.info("Error with websockets... resetting up!");
-          }, 3000);
+          this.reconnect(e);
           break;
         case "ECONNRESET":
           logger.error(e, `${this.index}: ${this.url}`);
@@ -353,17 +307,7 @@ WebSocketClient.prototype.open = function (url, index) {
               `Couldn't set state of missing printer, safe to ignore: ${this.index}: ${this.url}`
             );
           }
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            "Client error, setting back up...",
-            "Offline",
-            farmPrinters[this.index]._id
-          );
-          setTimeout(async () => {
-            Runner.reScanOcto(farmPrinters[this.index]._id);
-            logger.info("Error with websockets... resetting up!");
-          }, 3000);
+          this.reconnect(e);
           break;
         case "EHOSTUNREACH":
           logger.error(e, `${this.index}: ${this.url}`);
@@ -384,17 +328,7 @@ WebSocketClient.prototype.open = function (url, index) {
               `Couldn't set state of missing printer, safe to ignore: ${this.index}: ${this.url}`
             );
           }
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            "Client error, setting back up...",
-            "Offline",
-            farmPrinters[this.index]._id
-          );
-          setTimeout(async () => {
-            Runner.reScanOcto(farmPrinters[this.index]._id);
-            logger.info("Error with websockets... resetting up!");
-          }, 3000);
+          this.reconnect(e);
           break;
         case "ENOTFOUND":
           logger.error(e, `${this.index}: ${this.url}`);
@@ -416,18 +350,7 @@ WebSocketClient.prototype.open = function (url, index) {
               `Couldn't set state of missing printer, safe to ignore: ${this.index}: ${this.url}`
             );
           }
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            "Client error, setting back up...",
-            "Offline",
-            farmPrinters[this.index]._id
-          );
-          setTimeout(async () => {
-            console.log("DOES THIS FAIL", farmPrinters[this.index]._id);
-            Runner.reScanOcto(farmPrinters[this.index]._id);
-            logger.info("Error with websockets... resetting up!");
-          }, 3000);
+          this.reconnect(e);
           break;
         default:
           logger.error(e, `${this.index}: ${this.url}`);
@@ -452,17 +375,7 @@ WebSocketClient.prototype.open = function (url, index) {
             );
           }
           logger.error(`WebSocket hard failure: ${this.index}: ${this.url}`);
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[this.index].printerURL,
-            "Client error, setting back up...",
-            "Offline",
-            farmPrinters[this.index]._id
-          );
-          setTimeout(async () => {
-            Runner.reScanOcto(farmPrinters[this.index]._id);
-            logger.info("Error with websockets... resetting up!");
-          }, 3000);
+          this.reconnect(e);
           break;
       }
     });
@@ -472,15 +385,14 @@ WebSocketClient.prototype.open = function (url, index) {
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[this.index].printerURL,
-      "Client error, setting back up...",
+      "Client error, setting back up... in 10000ms",
       "Offline",
       farmPrinters[this.index]._id
     );
     setTimeout(async () => {
-      this.instance.emit("error", e);
       Runner.reScanOcto(farmPrinters[this.index]._id);
       logger.info("Error with websockets... resetting up!");
-    }, 3000);
+    }, 10000);
   }
 };
 WebSocketClient.prototype.throttle = function (data) {
@@ -513,7 +425,7 @@ WebSocketClient.prototype.reconnect = async function (e) {
   PrinterTicker.addIssue(
     new Date(),
     farmPrinters[this.index].printerURL,
-    "Connection lost... reconnecting...",
+    "Connection lost... reconnecting in: " + this.autoReconnectInterval + "ms",
     "Active",
     farmPrinters[this.index]._id
   );
@@ -528,7 +440,6 @@ WebSocketClient.prototype.reconnect = async function (e) {
     farmPrinters[that.index].hostStateColour = Runner.getColour("Searching...");
     farmPrinters[that.index].hostDescription = "Searching for Host";
     logger.info(`Re-Opening Websocket: ${that.index}: ${that.url}`);
-    await Runner.getUpdates(farmPrinters[that.index]._id);
     if (typeof farmPrinters[that.index] !== "undefined") {
       PrinterClean.generate(
         farmPrinters[that.index],
@@ -539,36 +450,7 @@ WebSocketClient.prototype.reconnect = async function (e) {
   }, this.autoReconnectInterval);
   return true;
 };
-WebSocketClient.prototype.reconnectDelay = async function (e) {
-  const longerTime = 150000;
-  PrinterTicker.addIssue(
-    new Date(),
-    farmPrinters[this.index].printerURL,
-    "Connection lost... reconnecting...",
-    "Active",
-    farmPrinters[this.index]._id
-  );
-  logger.info(
-    `WebSocketClient: retry in ${longerTime} ms`,
-    `${e + this.index}: ${this.url}`
-  );
-  this.instance.removeAllListeners();
-  const that = this;
-  setTimeout(async function () {
-    farmPrinters[that.index].hostStateColour = Runner.getColour("Searching...");
-    farmPrinters[that.index].hostDescription = "Searching for Host";
-    await Runner.getUpdates(farmPrinters[that.index]._id);
-    if (typeof farmPrinters[that.index] !== "undefined") {
-      PrinterClean.generate(
-        farmPrinters[that.index],
-        systemSettings.filamentManager
-      );
-    }
-    logger.info(`Re-Opening Websocket: ${that.index}: ${that.url}`);
-    that.open(that.url, that.index);
-  }, longerTime);
-  return true;
-};
+
 WebSocketClient.prototype.onopen = async function (e) {
   // eslint-disable-next-line prefer-rest-params
   logger.info("WebSocketClient: open", arguments, `${this.index}: ${this.url}`);
@@ -586,7 +468,7 @@ WebSocketClient.prototype.onopen = async function (e) {
   PrinterTicker.addIssue(
     new Date(),
     farmPrinters[this.index].printerURL,
-    "Opening the websocket connection...",
+    "Opened the websocket connection...",
     "Active",
     farmPrinters[this.index]._id
   );
@@ -1019,7 +901,17 @@ WebSocketClient.prototype.onerror = function (e) {
   } catch (e) {
     logger.info(e, "Couldn't delete old listeners... must not exist.");
   }
-
+  // PrinterTicker.addIssue(
+  //   new Date(),
+  //   farmPrinters[this.index].printerURL,
+  //   "Client error, setting back up...",
+  //   "Offline",
+  //   farmPrinters[this.index]._id
+  // );
+  // setTimeout(async () => {
+  //   Runner.reScanOcto(farmPrinters[this.index]._id);
+  //   logger.info("Error with websockets... resetting up!");
+  // }, 10000);
   if (typeof farmPrinters[this.index] !== "undefined") {
     PrinterClean.generate(
       farmPrinters[this.index],
@@ -1325,7 +1217,7 @@ class Runner {
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[i].printerURL,
-              `${e.message}`,
+              `${e.message}: API issues... halting!`,
               "Disconnected",
               farmPrinters[i]._id
             );
@@ -1359,7 +1251,7 @@ class Runner {
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[i].printerURL,
-              `${e.message}`,
+              `${e.message}: Connection refused, trying again in: ${systemSettings.timeout.apiRetry}`,
               "Disconnected",
               farmPrinters[i]._id
             );
@@ -1396,7 +1288,7 @@ class Runner {
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[i].printerURL,
-              `${e.message}`,
+              `${e.message}: Host not found, halting...`,
               "Disconnected",
               farmPrinters[i]._id
             );
@@ -1953,7 +1845,13 @@ class Runner {
       typeof farmPrinters[index].ws !== "undefined" &&
       typeof farmPrinters[index].ws.instance !== "undefined"
     ) {
-      console.log(farmPrinters[index].ws.instance.readyState);
+      PrinterTicker.addIssue(
+        new Date(),
+        farmPrinters[index].printerURL,
+        `Websocket state ${farmPrinters[index].ws.instance.readyState}`,
+        "Active",
+        farmPrinters[index]._id
+      );
       if (farmPrinters[index].ws.instance.readyState === 1) {
         PrinterTicker.addIssue(
           new Date(),
@@ -1975,7 +1873,7 @@ class Runner {
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
-          `Socket in tentative state, awaiting for connection attempt to finish... retry in 500ms`,
+          `Socket in tentative state, awaiting for connection attempt to finish... retry in 2000ms`,
           "Active",
           farmPrinters[index]._id
         );
@@ -2003,7 +1901,7 @@ class Runner {
             farmPrinters[index]._id
           );
           Runner.reScanOcto(_id, skipAPI);
-        }, 5000);
+        }, 2000);
       } else {
         PrinterTicker.addIssue(
           new Date(),
