@@ -3,6 +3,9 @@
 const Influx = require("influx");
 const settingsClean = require("../lib/dataFunctions/settingsClean.js");
 const SettingsClean = settingsClean.SettingsClean;
+const Logger = require("../lib/logger.js");
+
+const logger = new Logger("OctoFarm-Server");
 
 let db = null;
 
@@ -16,8 +19,6 @@ async function databaseSetup() {
     typeof serverSettings.influxExport !== "undefined" &&
     serverSettings.influxExport.active
   ) {
-    console.log("Active... setup database...");
-
     let options = {
       username: serverSettings.influxExport.username,
       password: serverSettings.influxExport.password,
@@ -33,19 +34,19 @@ async function databaseSetup() {
     //await updateRetention();
     return "Setup";
   } else {
-    console.log("No settings or disabled for influxdb export");
+    logger.info("No settings or disabled for influxdb export");
   }
 }
 async function checkDatabase(options) {
   const names = await db.getDatabaseNames();
   if (!names.includes(options.database)) {
-    console.log(
+    logger.info(
       "Cannot find database... creating new database: " + options.database
     );
     await db.createDatabase(options.database);
-    return "database created...";
+    return "database created...: " + options.database;
   } else {
-    console.log("Database found!");
+    logger.info("Database found! :" + options.database);
     return "database exists... skipping";
   }
 }
@@ -58,15 +59,19 @@ async function updateRetention() {
   return "BLA";
 }
 function writePoints(tags, measurement, dataPoints) {
-  db.writePoints([
-    {
-      measurement: measurement,
-      tags: tags,
-      fields: dataPoints,
-    },
-  ]).catch((err) => {
-    console.error(`Error saving data to InfluxDB! ${err.stack}`);
-  });
+  if (db !== null) {
+    db.writePoints([
+      {
+        measurement: measurement,
+        tags: tags,
+        fields: dataPoints,
+      },
+    ]).catch((err) => {
+      logger.error(`Error saving data to InfluxDB! ${err.stack}`);
+    });
+  } else {
+    logger.error(`InfluxDB is null... ignoring until setup...`);
+  }
 }
 
 module.exports = { databaseSetup, checkDatabase, writePoints };
