@@ -3462,11 +3462,32 @@ class Runner {
     return connectionLogs;
   }
   static async returnPluginList(printerId) {
-    const i = _.findIndex(farmPrinters, function (o) {
-      return o._id == printerId;
-    });
+    if (printerId) {
+      const i = _.findIndex(farmPrinters, function (o) {
+        return o._id == printerId;
+      });
+      let compatiblePluginList = [];
+      farmPrinters[i].pluginsList.forEach((plugin) => {
+        if (typeof plugin.is_compatible !== "undefined") {
+          let is_compat = plugin.is_compatible;
+          if (is_compat.octoprint || is_compat.os || is_compat.python) {
+            compatiblePluginList.push(plugin);
+          }
+        } else {
+          compatiblePluginList = farmPrinters[i].pluginsList;
+        }
+      });
 
-    return farmPrinters[i].pluginsList;
+      return compatiblePluginList;
+    } else {
+      let pluginList = [];
+
+      farmPrinters.forEach((printer) => {
+        console.log(printer.pluginsList);
+      });
+
+      return pluginList;
+    }
   }
 }
 
