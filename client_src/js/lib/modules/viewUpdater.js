@@ -229,7 +229,7 @@ function drawListView(printer, clientSettings) {
           </small>`;
     } else if (printer.currentProfile.heatedBed) {
       environment = `<div
-      id="bedTemp-${printer._id}"
+      id="badTemp-${printer._id}"
     class="mb-0 float-left"
           >
           </div>`;
@@ -320,7 +320,7 @@ function drawPanelView(printer, clientSettings) {
     if (printer.currentProfile.heatedBed) {
       environment += `<small
     class="mb-0 float-left"
-          ><b>Bed: </b><span id="bedTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span>
+          ><b>Bed: </b><span id="badTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span>
           </small>`;
     }
     if (printer.currentProfile.heatedChamber) {
@@ -481,7 +481,7 @@ function drawCameraView(printer, clientSettings) {
 
     if (printer.currentProfile.heatedBed) {
       environment += `
-          <b>Bed: </b><span id="bedTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>
+          <b>Bed: </b><span id="badTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>
 `;
     }
     if (printer.currentProfile.heatedChamber) {
@@ -717,7 +717,7 @@ function grabElements(printer) {
       ),
       cameraContain: document.getElementById("cameraContain-" + printer._id),
       progress: document.getElementById("progress-" + printer._id),
-      bed: document.getElementById("bedTemp-" + printer._id),
+      bed: document.getElementById("badTemp-" + printer._id),
       chamber: document.getElementById("chamberTemp-" + printer._id),
     };
     return elems[printer._id];
