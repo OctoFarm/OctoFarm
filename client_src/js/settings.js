@@ -63,7 +63,7 @@ async function setupOctoPrintClientsforTimelapse() {
     bootbox.confirm({
       title: "Are you sure?",
       message:
-        "If you press yes below your timelapse settings will automatically be updated to work with OctoFarms setup. The script will update any online instances and there shouldn't be a restart necassary. It does however presume you have your ffmpeg path setup with your snapshot URL inputted into OctoPrint. You can edit these in Printer Manager if not.",
+        "If you press yes below your timelapse settings will automatically be updated to work with OctoFarms setup. The script will update any online instances and there shouldn't be a restart necassary. It does however presume you have your ffmpeg path setup with your snapshot URL inputted into OctoPrint.",
       buttons: {
         confirm: {
           label: "Yes",
