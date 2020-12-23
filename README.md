@@ -9,7 +9,7 @@
 
   <p>Please visit <a href="https://features.octofarm.net">Octofarm's Features Page to log a request.</a>
 
-  <h3 align="center">Version 1.1.5</h3>
+  <h3 align="center">Version 1.1.6</h3>
 <br />
 <p align="center">
   <a href="https://github.com/NotExpectedYet/OctoFarm">
