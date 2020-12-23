@@ -227,7 +227,8 @@ router.get("/connectionLogs/:id", ensureAuthenticated, async (req, res) => {
 });
 router.get("/pluginList/:id", ensureAuthenticated, async (req, res) => {
   let id = req.params.id;
-  if (typeof id !== "undefined") {
+  console.log(id);
+  if (id !== "all") {
     logger.info("Grabbing plugin list for: ", id);
     let pluginList = await Runner.returnPluginList(id);
     res.send(pluginList);

@@ -1153,7 +1153,7 @@ class Runner {
           await Runner.getPluginList(id);
           if (
             typeof farmPrinters[i].fileList === "undefined" ||
-            typeof farmPrinters[i.storage === "undefined"]
+            typeof farmPrinters[i].storage === "undefined"
           ) {
             await Runner.getFiles(id, "files?recursive=true");
           } else {
@@ -3462,6 +3462,18 @@ class Runner {
     return connectionLogs;
   }
   static async returnPluginList(printerId) {
+    function isCompat(is_compat) {
+      if (is_compat.octoprint || is_compat.os || is_compat.python) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+
+    function onlyUnique(value, index, self) {
+      return self.indexOf(value) === index;
+    }
+
     if (printerId) {
       const i = _.findIndex(farmPrinters, function (o) {
         return o._id == printerId;
@@ -3469,8 +3481,7 @@ class Runner {
       let compatiblePluginList = [];
       farmPrinters[i].pluginsList.forEach((plugin) => {
         if (typeof plugin.is_compatible !== "undefined") {
-          let is_compat = plugin.is_compatible;
-          if (is_compat.octoprint || is_compat.os || is_compat.python) {
+          if (isCompat(plugin.is_compatible)) {
             compatiblePluginList.push(plugin);
           }
         } else {
@@ -3480,13 +3491,23 @@ class Runner {
 
       return compatiblePluginList;
     } else {
-      let pluginList = [];
-
+      let compatiblePluginList = [];
       farmPrinters.forEach((printer) => {
-        console.log(printer.pluginsList);
+        for (var key in printer.settingsPlugins) {
+          if (printer.settingsPlugins.hasOwnProperty(key)) {
+            let installedPlugin = _.findIndex(printer.pluginsList, function (
+              o
+            ) {
+              return o.id == key;
+            });
+            if (installedPlugin > -1) {
+              compatiblePluginList.push(printer.pluginsList[installedPlugin]);
+            }
+          }
+        }
       });
 
-      return pluginList;
+      return compatiblePluginList;
     }
   }
 }

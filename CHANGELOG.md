@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-# [UnReleased]
+# [Released]
 
 ## [v1.1.6]
 
@@ -40,7 +40,7 @@ All notable changes to this project will be documented in this file.
          - exports the following information:
                - Printers Information - All farm printer information, generated every 2000ms.
                - History Information - Every log to history is pushed to the database (not back dated), sent on history capture.
-               - Filament Information - Every update of the spool (finished/cancelled/errored print), sent on filament down dating (history capture).
+               - Filament Information - Same as history.
      - Changes to folder display in file manager:
          - Folders when created will stay ordered by creation date. Folders when sorted will be organised first at the top of the list, then files afterwards. There's only folder name information available to sorting for those so for now will stick to name based for all folders. This will be actioned when a page load happens, or the sorting is updated. New folders will not be sorted until that trigger. It follows the A->Z, Z->A ordering of the sorting options now too.
 
@@ -98,8 +98,6 @@ All notable changes to this project will be documented in this file.
 ## Removed
     - Removed the annoying content editable fields on "Printer Settings" and "Printer Management" and replaced with standard input boxes. 
     - Removed support for the old import scheme. Now requires to be in human readable format. Please create a new export if you used the older one previously.
-
-# [Released]
 
 ## [v1.1.5.7]
 
