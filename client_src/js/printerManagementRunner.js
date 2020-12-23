@@ -574,13 +574,12 @@ scanNetworkBtn.addEventListener("click", async (e) => {
 
 function pluginListTemplate(plugin) {
   //Also need check inplace for incompatible...
-
   let abandoned = ``;
   if (plugin.abandoned === true) {
     abandoned = `<i class="fa fa-heartbeat" title="Abandoned by its maintainer"></i>`;
   }
   let latestRelease = ``;
-
+  console.log(plugin);
   if (
     typeof plugin.github !== "undefined" &&
     typeof plugin.github.latest_release !== "undefined"
@@ -659,7 +658,7 @@ const pluginAction = async function (action) {
         "printers/pluginList/" + printerInfo[index]._id
       );
     } else {
-      printerPluginList = await OctoFarmClient.get("printers/plugins/");
+      printerPluginList = await OctoFarmClient.get("printers/pluginList/");
     }
 
     printerPluginList = await printerPluginList.json();
@@ -942,6 +941,20 @@ blkPluginsBtn.addEventListener("click", async (e) => {
     "Install Plugins",
     function () {
       pluginAction("install");
+    }
+  );
+});
+
+const blkPluginsUninstallBtn = document.getElementById(
+  "blkPluginsUnInstallBtn"
+);
+blkPluginsUninstallBtn.addEventListener("click", async (e) => {
+  PrinterSelect.create(
+    document.getElementById("multiPrintersSection"),
+    false,
+    "Uninstall Plugins",
+    function () {
+      pluginAction("uninstall");
     }
   );
 });
@@ -1808,6 +1821,45 @@ class dashUpdate {
           socketBadge.className = `tag badge badge-${printer.webSocketState.colour} badge-pill`;
           socketBadge.setAttribute("title", printer.webSocketState.desc);
 
+          if (typeof printer.updateAvailable !== "undefined") {
+            let updateButton = document.getElementById(
+              `octoprintUpdate-${printer._id}`
+            );
+            let updatePluginButton = document.getElementById(
+              `octoprintPluginUpdate-${printer._id}`
+            );
+            if (printer.updateAvailable.octoPrintUpdate.updateAvailable) {
+              if (updateButton.classList.contains("d-none")) {
+                updateButton.classList.remove("d-none");
+              }
+              bulkOctoPrintsToUpdate = true;
+            } else {
+              if (!updateButton.classList.contains("d-none")) {
+                updateButton.classList.add("d-none");
+              }
+            }
+            if (printer.updateAvailable.pluginUpdates.length > 0) {
+              if (updatePluginButton.classList.contains("d-none")) {
+                updatePluginButton.classList.remove("d-none");
+              }
+              bulkPluginsToUpdate = true;
+            } else {
+              if (!updatePluginButton.classList.contains("d-none")) {
+                updatePluginButton.classList.add("d-none");
+              }
+            }
+            if (bulkOctoPrintsToUpdate) {
+              if (bulkOctoPrintUpdateButton.classList.contains("d-none")) {
+                bulkOctoPrintUpdateButton.classList.remove("d-none");
+              }
+            }
+            if (bulkPluginsToUpdate) {
+              if (bulkPluginUpdateButton.classList.contains("d-none")) {
+                bulkPluginUpdateButton.classList.remove("d-none");
+              }
+            }
+          }
+
           webButton.href = printer.printerURL;
 
           printerOctoPrintVersion.innerHTML = printer.octoPrintVersion;
@@ -2138,45 +2190,6 @@ class dashUpdate {
               connectionLogs = await connectionLogs.json();
               PrinterLogs.loadLogs(printer, connectionLogs);
             });
-          if (typeof printer.updateAvailable !== "undefined") {
-            let updateButton = document.getElementById(
-              `octoprintUpdate-${printer._id}`
-            );
-            let updatePluginButton = document.getElementById(
-              `octoprintPluginUpdate-${printer._id}`
-            );
-
-            if (printer.updateAvailable.octoPrintUpdate.updateAvailable) {
-              if (updateButton.classList.contains("d-none")) {
-                updateButton.classList.remove("d-none");
-              }
-              bulkOctoPrintsToUpdate = true;
-            } else {
-              if (!updateButton.classList.contains("d-none")) {
-                updateButton.classList.add("d-none");
-              }
-            }
-            if (printer.updateAvailable.pluginUpdates.length > 0) {
-              if (updatePluginButton.classList.contains("d-none")) {
-                updatePluginButton.classList.remove("d-none");
-              }
-              bulkPluginsToUpdate = true;
-            } else {
-              if (!updatePluginButton.classList.contains("d-none")) {
-                updatePluginButton.classList.add("d-none");
-              }
-            }
-            if (bulkOctoPrintsToUpdate) {
-              if (bulkOctoPrintUpdateButton.classList.contains("d-none")) {
-                bulkOctoPrintUpdateButton.classList.remove("d-none");
-              }
-            }
-            if (bulkPluginsToUpdate) {
-              if (bulkPluginUpdateButton.classList.contains("d-none")) {
-                bulkPluginUpdateButton.classList.remove("d-none");
-              }
-            }
-          }
         }
       }
     });
