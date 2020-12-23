@@ -847,7 +847,7 @@
                                                         <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                                                             <h6>Printer snapshot capture</h6>
                                                             <div class="alert alert-warning" role="alert">
-                                                                Requires an active camera URL.
+                                                                Requires an active camera URL in OctoFarm.
                                                             </div>
                                                             <form class="was-validated">
                                                                 <div class="custom-control custom-checkbox mb-3">
@@ -867,9 +867,9 @@
                                                             </form>
                                                         </div>
                                                         <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
-                                                            <h6>Prusa/Cura slicer thumbnail capture</h6>
+                                                            <h6>Prusa/Cura slicer thumbnailcapture</h6>
                                                             <div class="alert alert-warning" role="alert">
-                                                                Requires either the Prusa / Cura thumbnail plugins to be installed.
+                                                                Requires either the Prusa / Cura thumbnail plugins to be installed on OctoPrint.
                                                             </div>
                                                             <form class="was-validated">
                                                                 <div class="custom-control custom-checkbox mb-3">
@@ -891,7 +891,8 @@
                                                     </div>
                                                 </div>
                                                 <div class="tab-pane fade" id="server-influx" role="tabpanel" aria-labelledby="server-influx-list">
-                                                    <h5>InfluxDB Export</h5>
+                                                    <h5>InfluxDB Export (v1.x)</h5>
+                                                    <p>(Currently Experimental - May change formatting see blue information note)</p>
                                                     <hr>
                                                     <div class="alert alert-secondary" role="alert">
                                                         OctoFarm can export your printer data to a time series database called InfluxDB. You can use this data to create yourself a dashboard in an application called Grafana or InfluxDB itself. Other options are also available. This option is for power users who would like to get more information from the data stored in OctoFarm.
