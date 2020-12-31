@@ -64,23 +64,26 @@ class ServerSettings {
         SettingsClean.start();
       });
       return "Server settings have been created...";
+    } else {
+      // Server settings exist, but need updating with new ones if they don't exists.
+      if (typeof settings[0].timeout === "undefined") {
+        settings[0].timeout = timeout;
+      }
+      if (typeof settings[0].server === "undefined") {
+        settings[0].server = server;
+      }
+      if (typeof settings[0].filamentManager === "undefined") {
+        settings[0].filamentManager = filamentManager;
+      }
+      if (typeof settings[0].history === "undefined") {
+        settings[0].history = history;
+      }
+      if (typeof settings[0].influxExport === "undefined") {
+        settings[0].influxExport = influxExport;
+      }
+      return "Server settings have been checked...";
     }
-    // Server settings exist, but need updating with new ones if they don't exists.
-    if (typeof settings[0].timeout === "undefined") {
-      settings[0].timeout = timeout;
-    }
-    if (typeof settings[0].server === "undefined") {
-      settings[0].server = server;
-    }
-    if (typeof settings[0].filamentManager === "undefined") {
-      settings[0].filamentManager = filamentManager;
-    }
-    if (typeof settings[0].history === "undefined") {
-      settings[0].history = history;
-    }
-    if (typeof settings[0].influxExport === "undefined") {
-      settings[0].influxExport = influxExport;
-    }
+
     await settings[0].save().then((ret) => {
       SettingsClean.start();
     });
