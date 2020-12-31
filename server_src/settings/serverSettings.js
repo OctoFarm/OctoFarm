@@ -81,13 +81,12 @@ class ServerSettings {
       if (typeof settings[0].influxExport === "undefined") {
         settings[0].influxExport = influxExport;
       }
-      return "Server settings have been checked...";
-    }
 
-    await settings[0].save().then((ret) => {
-      SettingsClean.start();
-    });
-    return "Server settings already exist, loaded existing values...";
+      await settings[0].save().then((ret) => {
+        SettingsClean.start();
+      });
+      return "Server settings already exist, loaded existing values...";
+    }
   }
 
   static check() {
