@@ -282,7 +282,11 @@ class HistoryClean {
       metrics = null;
     } //Get spoolname function
     function spoolName(id) {
-      if (typeof id !== "undefined" && id !== null) {
+      if (
+        typeof id !== "undefined" &&
+        id !== null &&
+        typeof id.spools !== "undefined"
+      ) {
         if (serverSettings[0].filamentManager) {
           return `${id.spools.name} (${(
             id.spools.weight - id.spools.used
