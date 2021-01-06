@@ -66,6 +66,7 @@ class ServerSettings {
       return "Server settings have been created...";
     } else {
       // Server settings exist, but need updating with new ones if they don't exists.
+      //confirmed fix for startup
       if (typeof settings[0].timeout === "undefined") {
         settings[0].timeout = timeout;
       }
