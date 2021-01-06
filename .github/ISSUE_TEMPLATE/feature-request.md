@@ -1,20 +1,10 @@
 ---
 name: Feature Request
-about: Suggest and idea or plan for this project
+about: Please log a discussion for these going forward.
 title: "[FEATURE REQUEST]"
 labels: feature request
 assignees: NotExpectedYet
 
 ---
 
-**Is your feature request related to a problem? Please describe.**
-A clear and concise description of what the problem is. Ex. I'm always frustrated when [...]
-
-**Describe the solution you'd like**
-A clear and concise description of what you want to happen.
-
-**Describe alternatives you've considered**
-A clear and concise description of any alternative solutions or features you've considered.
-
-**Additional context**
-Add any other context or screenshots about the feature request here.
+**Please log a discussion for these going forward, thanks!**
