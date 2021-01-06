@@ -106,6 +106,9 @@ class HistoryClean {
       sorted.costPerHour =
         parseFloat(sorted.totalCost) /
         parseFloat((history[h].printHistory.printTime / 360000) * 100);
+      if (isNaN(sorted.costPerHour)) {
+        sorted.costPerHour = 0;
+      }
       sorted.printHours = await HistoryClean.getHours(
         history[h].printHistory.printTime
       );

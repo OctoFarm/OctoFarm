@@ -525,6 +525,7 @@ export default class History {
     const totalHourCost = costPerHour.reduce((a, b) => a + b, 0);
 
     const avgHourCost = totalHourCost / costPerHour.length;
+
     const total =
       statesCancelled.length + statesFailed.length + statesSuccess.length;
     const cancelledPercent = (statesCancelled.length / total) * 100;
