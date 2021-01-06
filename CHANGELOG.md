@@ -8,10 +8,12 @@ All notable changes to this project will be documented in this file.
 
 ### Added
     - New Bulk Printer Actions on Printer Manager: (big thanks to Scott Presbrey for sponsoring this one!)
-       - Pre-Heat
+       - Pre-Heat: Select your printers and send target temps to your tool/bed/chamber. 
+       - Control:
+       - Gcode: 
    
 ### Changed
-   
+   - OctoFarm now detects any trailing forward slashes in the URL and removes them...
 
 ### Fixed
    - #197: Editing a printer after typing an incorrect connection string would cause a double listener to be created.

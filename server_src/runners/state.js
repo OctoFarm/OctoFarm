@@ -1524,7 +1524,10 @@ class Runner {
     if (
       farmPrinters[i].printerURL[farmPrinters[i].printerURL.length - 1] === "/"
     ) {
-      farmPrinters[i].printerURL = farmPrinters[i].printerURL.replace("/", "");
+      farmPrinters[i].printerURL = farmPrinters[i].printerURL.replace(
+        /\/?$/,
+        ""
+      );
     }
     if (
       typeof farmPrinters[i].camURL !== "undefined" &&
