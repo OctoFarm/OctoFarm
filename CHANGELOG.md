@@ -13,12 +13,12 @@ All notable changes to this project will be documented in this file.
        - Gcode: Select your printers and send multiple gcode commands to multiple printers at once.
    
 ### Changed
-   - OctoFarm now detects any trailing forward slashes in the URL and removes them...
+   - OctoFarm now detects any trailing forward slashes in the printer URL and removes them...
    - #220: Improved the terminal function. Multi-lined commands will now be parsed and split, OctoPrint should run through these sequentially now. 
 
 ### Fixed
    - #197: Editing a printer after typing an incorrect connection string would cause a double listener to be created.
-   - Fixed issue with plugin installation crashing on successful completion when no restart is required.
+   - Fixed issue with plugin installation crashing on successful completion when restart is required.
    - #198: Fixed new system settings not generating defaults on upgrade/start up.
    - #201: Fixed issue with double listener getting generated and not clearing on Re-Sync.
    - #215: Fixed blank camera field not grabbing OctoPrint camera URL. (Please log an issue if this still doesn't work thanks!)
