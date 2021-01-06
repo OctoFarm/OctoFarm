@@ -1326,7 +1326,7 @@ class Runner {
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[i].printerURL,
-              `${e.message}`,
+              `${e.message} retrying in ${timeout.webSocketRetry}`,
               "Disconnected",
               farmPrinters[i]._id
             );
@@ -1519,6 +1519,12 @@ class Runner {
       !farmPrinters[i].printerURL.includes("http://")
     ) {
       farmPrinters[i].printerURL = `http://${farmPrinters[i].printerURL}`;
+    }
+    //Check for trailing slash and remove...
+    if (
+      farmPrinters[i].printerURL[farmPrinters[i].printerURL.length - 1] === "/"
+    ) {
+      farmPrinters[i].printerURL = farmPrinters[i].printerURL.replace("/", "");
     }
     if (
       typeof farmPrinters[i].camURL !== "undefined" &&
