@@ -572,6 +572,223 @@ scanNetworkBtn.addEventListener("click", async (e) => {
   e.target.disabled = false;
 });
 
+let bulkPreHeat = document.getElementById("bulkPreHeat");
+bulkPreHeat.addEventListener("click", async (e) => {
+  const printersPreHeat = async function () {
+    let printersToConnect = [];
+    //Grab all check boxes
+    const selectedPrinters = PrinterSelect.getSelected();
+    selectedPrinters.forEach((element) => {
+      const ca = element.id.split("-");
+      printersToConnect.push(ca[1]);
+    });
+
+    bootbox.dialog({
+      title: "Bulk printer heating...",
+      message: `
+        <form class="form-inline">
+           <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="preHeatToolSelect">Tool #: </label>
+            </div>
+            <select class="custom-select" id="preHeatToolSelect">
+              <option selected value="0">0</option>
+              <option value="0">1</option>
+              <option value="0">2</option>
+              <option value="0">3</option>
+              <option value="0">4</option>
+            </select>
+          </div>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="0" aria-label="0" aria-describedby="basic-addon1" id="preHeatToolTempSelect">
+            <div class="input-group-append">
+              <span class="input-group-text" id="basic-addon1">°C</span>
+            </div>
+          </div>
+          <p>&nbsp;</p>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">Bed</span>
+            </div>
+            <input type="text" class="form-control" placeholder="0" aria-label="0" aria-describedby="basic-addon1" id="preHeatBedTempSelect">
+            <div class="input-group-append">
+              <span class="input-group-text" id="basic-addon1">°C</span>
+            </div>
+          </div>
+          <p>&nbsp;</p>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">Chamber</span>
+            </div>
+            <input type="text" class="form-control" placeholder="0" aria-label="0" aria-describedby="basic-addon1" id="preHeatChamberTempSelect">
+                  <div class="input-group-append">
+              <span class="input-group-text" id="basic-addon1">°C</span>
+            </div>
+          </div>
+        </form>
+        `,
+      size: "large",
+      onEscape: true,
+      backdrop: true,
+      closeButton: true,
+      buttons: {
+        action: {
+          label: '<i class="fas fa-fire"></i> Heat!',
+          className: "btn-success",
+          callback: async function () {
+            let toolNumber = document.getElementById("preHeatToolSelect");
+            let toolTemp = document.getElementById("preHeatToolTempSelect");
+            let bedTemp = document.getElementById("preHeatBedTempSelect");
+            let chamberTemp = document.getElementById(
+              "preHeatChamberTempSelect"
+            );
+            let toolData = {
+              command: "target",
+              targets: {},
+            };
+            let bedData = {
+              command: "target",
+              target: 0,
+            };
+            let chamberData = {
+              command: "target",
+              target: 0,
+            };
+
+            if (toolTemp.value !== "" && !isNaN(toolTemp.value)) {
+              toolData.targets["tool" + toolNumber.value] = parseInt(
+                toolTemp.value
+              );
+            }
+            if (bedTemp.value !== "" && !isNaN(bedTemp.value)) {
+              bedData.target = parseInt(bedTemp.value);
+            }
+            if (chamberTemp.value !== "" && !isNaN(chamberTemp.value)) {
+              chamberData.target = parseInt(chamberTemp.value);
+            }
+            for (let p = 0; p < printersToConnect.length; p++) {
+              const index = _.findIndex(printerInfo, function (o) {
+                return o._id === printersToConnect[p];
+              });
+              if (index > -1) {
+                //Set tool temp
+                if (toolTemp.value !== "" && !isNaN(toolTemp.value)) {
+                  let post = await OctoPrintClient.post(
+                    printerInfo[index],
+                    "printer/tool",
+                    toolData
+                  );
+                  if (typeof post !== "undefined") {
+                    if (post.status === 204) {
+                      UI.createAlert(
+                        "success",
+                        `Successfully set tool${toolNumber.value} target attempt to ${printerInfo[index].printerName}...`,
+                        3000,
+                        "Clicked"
+                      );
+                    } else {
+                      UI.createAlert(
+                        "error",
+                        `There was an issue setting tool${toolNumber.value} target attempt to ${printerInfo[index].printerName} are you sure it's online?`,
+                        3000,
+                        "Clicked"
+                      );
+                    }
+                  } else {
+                    UI.createAlert(
+                      "error",
+                      `No response from ${printerInfo[index].printerName}, is it online???`,
+                      3000,
+                      "Clicked"
+                    );
+                  }
+                }
+                //Set bed temp
+                if (bedTemp.value !== "" && !isNaN(bedTemp.value)) {
+                  let post = await OctoPrintClient.post(
+                    printerInfo[index],
+                    "printer/bed",
+                    bedData
+                  );
+                  if (typeof post !== "undefined") {
+                    if (post.status === 204) {
+                      UI.createAlert(
+                        "success",
+                        `Successfully set bed target attempt to ${printerInfo[index].printerName}...`,
+                        3000,
+                        "Clicked"
+                      );
+                    } else {
+                      UI.createAlert(
+                        "error",
+                        `There was an issue setting bed target attempt to ${printerInfo[index].printerName} are you sure it's online?`,
+                        3000,
+                        "Clicked"
+                      );
+                    }
+                  } else {
+                    UI.createAlert(
+                      "error",
+                      `No response from ${printerInfo[index].printerName}, is it online???`,
+                      3000,
+                      "Clicked"
+                    );
+                  }
+                }
+                //Set chamber temp
+                if (chamberTemp.value !== "" && !isNaN(chamberTemp.value)) {
+                  let post = await OctoPrintClient.post(
+                    printerInfo[index],
+                    "printer/chamber",
+                    chamberData
+                  );
+                  if (typeof post !== "undefined") {
+                    if (post.status === 204) {
+                      UI.createAlert(
+                        "success",
+                        `Successfully set chamber target attempt to ${printerInfo[index].printerName}...`,
+                        3000,
+                        "Clicked"
+                      );
+                    } else {
+                      UI.createAlert(
+                        "error",
+                        `There was an issue setting chamber target attempt to ${printerInfo[index].printerName} are you sure it's online?`,
+                        3000,
+                        "Clicked"
+                      );
+                    }
+                  } else {
+                    UI.createAlert(
+                      "error",
+                      `No response from ${printerInfo[index].printerName}, is it online???`,
+                      3000,
+                      "Clicked"
+                    );
+                  }
+                }
+              }
+            }
+          },
+        },
+      },
+    });
+  };
+
+  PrinterSelect.create(
+    document.getElementById("multiPrintersSection"),
+    false,
+    "Pre-Heat Printers",
+    printersPreHeat
+  );
+});
+
+let bulkControl = document.getElementById("bulkControl");
+bulkControl.addEventListener("click", async (e) => {});
+
+let bulkGcodeCommands = document.getElementById("bulkGcodeCommands");
+bulkGcodeCommands.addEventListener("click", async (e) => {});
+
 function pluginListTemplate(plugin) {
   //Also need check inplace for incompatible...
   let abandoned = ``;
@@ -780,14 +997,14 @@ const pluginAction = async function (action) {
                     if (response.needs_restart || response.needs_refresh) {
                       UI.createAlert(
                         "success",
-                        `${printerInfo[index].printerName}: ${response.plugin.name} - Has successfully been installed... OctoPrint restart is required!`,
+                        `${printerInfo[index].printerName}: ${result[r]} - Has successfully been installed... OctoPrint restart is required!`,
                         4000,
                         "Clicked"
                       );
                     } else {
                       UI.createAlert(
                         "success",
-                        `${printerInfo[index].printerName}: ${response.plugin.name} - Has successfully been installed... No further action requested...`,
+                        `${printerInfo[index].printerName}: ${result[r]} - Has successfully been installed... No further action requested...`,
                         4000,
                         "Clicked"
                       );

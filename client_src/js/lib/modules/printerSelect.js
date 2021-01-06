@@ -53,6 +53,14 @@ Please select your list of printers to action the power command on. You will be 
   These commands will run without user interaction... It will skip by default any active printers.
 </div>
 `;
+const preHeatMessage = `
+<div class="alert alert-info" role="alert">
+  Please select your list of printers to action the pre-heat command. You will configure the temperatures on the next pop up.
+</div>
+<div class="alert alert-danger" role="alert">
+  Due to this allowing for temps to be actioned on the fly it will not check printer state before doing so.
+</div>
+`;
 
 const printersTable = `
 <div class="row">
@@ -236,6 +244,8 @@ export default class PrinterSelect {
       messageBox.innerHTML = pluginInstallMessage;
     } else if (action === "Power On/Off Printers") {
       messageBox.innerHTML = powerOnOffMessage;
+    } else if (action === "Pre-Heat Printers") {
+      messageBox.innerHTML = preHeatMessage;
     }
     const printersInfo = await OctoFarmClient.post("printers/printerInfo");
     const printers = await printersInfo.json();

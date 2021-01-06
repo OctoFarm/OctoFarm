@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 # [Released]
 
+# [v1.1.7]
+
+### Added
+    - New Bulk Printer Actions on Printer Manager: (big thanks to Scott Presbrey for sponsoring this one!)
+       - Pre-Heat
+   
+### Changed
+   
+
+### Fixed
+   - #197: Editing a printer after typing an incorrect connection string would cause a double listener to be created.
+   - Fixed issue with plugin installation crashing on successful completion when no restart is required.
+   - #198: Fixed new system settings not generating defaults on upgrade/start up.
+   - #201: Fixed issue with double listener getting generated and not clearing on Re-Sync.
+
+## Removed
+
 ## [v1.1.6]
 
 ### Added
