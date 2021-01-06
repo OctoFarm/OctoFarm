@@ -375,7 +375,8 @@ WebSocketClient.prototype.open = function (url, index) {
             );
           }
           logger.error(`WebSocket hard failure: ${this.index}: ${this.url}`);
-          this.reconnect(e);
+          // Auto connect here is causing double socket listeners when editing
+          //this.reconnect(e);
           break;
       }
     });
@@ -436,7 +437,7 @@ WebSocketClient.prototype.reconnect = async function (e) {
   this.instance.removeAllListeners();
   const that = this;
 
-  setTimeout(async function () {
+  that.timeout = setTimeout(async function () {
     farmPrinters[that.index].hostStateColour = Runner.getColour("Searching...");
     farmPrinters[that.index].hostDescription = "Searching for Host";
     logger.info(`Re-Opening Websocket: ${that.index}: ${that.url}`);
@@ -1911,6 +1912,7 @@ class Runner {
           farmPrinters[index]._id
         );
         const { _id } = farmPrinters[index];
+        await farmPrinters[index].ws.instance.close();
         await this.setupWebSocket(_id, skipAPI);
       }
     } else {
