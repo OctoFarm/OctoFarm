@@ -62,6 +62,27 @@ const preHeatMessage = `
 </div>
 `;
 
+const controlPrintersMessage = `
+<div class="alert alert-info" role="alert">
+  Please select your list of printers you'd like to bulk control.
+</div>
+<div class="alert alert-danger" role="alert">
+  Due to this allowing for temps to be actioned on the fly it will not check printer state before doing so.
+</div>
+`;
+
+const gcodePrintersMessage = `
+<div class="alert alert-info" role="alert">
+  Please select your list of printers you'd like to send gcode commands to.
+</div>
+<div class="alert alert-info" role="alert">
+  Commands split up by a new line will be sent sequentially to the terminal.
+</div>
+<div class="alert alert-danger" role="alert">
+  Due to this allowing for gcode commands to be sent on the fly it will not check printer state before doing so.
+</div>
+`;
+
 const printersTable = `
 <div class="row">
     <div class="col-lg-12">
@@ -246,6 +267,10 @@ export default class PrinterSelect {
       messageBox.innerHTML = powerOnOffMessage;
     } else if (action === "Pre-Heat Printers") {
       messageBox.innerHTML = preHeatMessage;
+    } else if (action === "Control Printers") {
+      messageBox.innerHTML = controlPrintersMessage;
+    } else if (action === "Send Gcode to Printers") {
+      messageBox.innerHTML = gcodePrintersMessage;
     }
     const printersInfo = await OctoFarmClient.post("printers/printerInfo");
     const printers = await printersInfo.json();

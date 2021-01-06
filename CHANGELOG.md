@@ -7,19 +7,22 @@ All notable changes to this project will be documented in this file.
 # [v1.1.7]
 
 ### Added
-    - New Bulk Printer Actions on Printer Manager: (big thanks to Scott Presbrey for sponsoring this one!)
+    - #221: New Bulk Printer Actions on Printer Manager: (big thanks to Scott Presbrey for sponsoring this one!)
        - Pre-Heat: Select your printers and send target temps to your tool/bed/chamber. 
-       - Control:
-       - Gcode: 
+       - Control: Select your printers and action Home/Jog commands, as well as Start, Cancel, Pause, Resume and Restart commands.
+       - Gcode: Select your printers and send multiple gcode commands to multiple printers at once.
    
 ### Changed
    - OctoFarm now detects any trailing forward slashes in the URL and removes them...
+   - #220: Improved the terminal function. Multi-lined commands will now be parsed and split, OctoPrint should run through these sequentially now. 
 
 ### Fixed
    - #197: Editing a printer after typing an incorrect connection string would cause a double listener to be created.
    - Fixed issue with plugin installation crashing on successful completion when no restart is required.
    - #198: Fixed new system settings not generating defaults on upgrade/start up.
    - #201: Fixed issue with double listener getting generated and not clearing on Re-Sync.
+   - #215: Fixed blank camera field not grabbing OctoPrint camera URL. (Please log an issue if this still doesn't work thanks!)
+   - #220: Fixed issue with terminal commands capitalising Klipper commands.
 
 ## Removed
 

@@ -1263,9 +1263,17 @@ export default class PrinterManager {
       });
     });
     const submitTerminal = async function (e) {
-      let input = elements.terminal.input.value;
-      input = input.toUpperCase();
+      let input = elements.terminal.input.value.match(/[^\r\n]+/g);
+      input = input.map(function (name) {
+        if (!name.includes("=")) {
+          return name.toLocaleUpperCase();
+        } else {
+          return name;
+        }
+      });
+
       elements.terminal.input.value = "";
+
       const flashReturn = function () {
         elements.terminal.sendBtn = "btn btn-secondary";
       };
