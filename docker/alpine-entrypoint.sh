@@ -1,6 +1,5 @@
 #!/bin/sh
 
-set -eux
 cd ~/app
 
 if [ -d "node_modules" ]
