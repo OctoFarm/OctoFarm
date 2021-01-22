@@ -512,6 +512,9 @@ async function updateProfileDrop() {
   const printerListMaterials = document.querySelectorAll(
     "[id^='spoolsListMaterial-']"
   );
+  const spoolsListManufacture = document.querySelectorAll(
+    "[id^='spoolsListManufacture-']"
+  );
   printerDrops.forEach((drop, index) => {
     drop.innerHTML = "";
     profiles.profiles.forEach((prof) => {
@@ -536,6 +539,9 @@ async function updateProfileDrop() {
       printerListMaterials[
         index
       ].innerHTML = `${profiles.profiles[profileID].material}`;
+      spoolsListManufacture[
+        index
+      ].innerHTML = `${profiles.profiles[profileID].manufacturer}`;
     }
   });
 }
@@ -587,6 +593,65 @@ async function updatePrinterDrops() {
   });
 }
 async function init() {
+  //Load Graph
+  let usageOverTimeData = await OctoFarmclient.get("history/usageOverTime");
+  usageOverTimeData = await usageOverTimeData.json();
+  const usageOverTimeOptions = {
+    chart: {
+      type: "line",
+      id: "realtime",
+      width: "100%",
+      height: "90%",
+      animations: {
+        enabled: false,
+      },
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false,
+      },
+      background: "#303030",
+    },
+    colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+    stroke: {
+      curve: "smooth",
+    },
+    toolbar: {
+      show: false,
+    },
+    theme: {
+      mode: "dark",
+    },
+    noData: {
+      text: "Loading...",
+    },
+    series: [],
+    yaxis: [
+      {
+        title: {
+          text: "Temp",
+        },
+      },
+    ],
+    xaxis: {
+      type: "datetime",
+      labels: {
+        formatter(value) {
+          const date = new Date(value);
+          return date.toLocaleTimeString();
+        },
+      },
+    },
+  };
+
+  let systemFarmTemp = new ApexCharts(
+    document.querySelector("#usageOverTime"),
+    usageOverTimeOptions
+  );
+  systemFarmTemp.render();
+
+  systemFarmTemp.updateSeries(usageOverTimeData.history);
   // Grab data
   const spoolTable = document.getElementById("addSpoolsTable");
   // Initialise materials dropdown

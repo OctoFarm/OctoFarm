@@ -127,6 +127,21 @@ class HistoryClean {
     logger.info("History information cleaned and ready for consumption");
   }
 
+  static checkNested(nameKey, myArray) {
+    for (var i = 0; i < myArray.length; i++) {
+      if (myArray[i].name === nameKey) {
+        return myArray[i];
+      }
+    }
+  }
+  static checkNestedIndex(nameKey, myArray) {
+    for (var i = 0; i < myArray.length; i++) {
+      if (myArray[i].name === nameKey) {
+        return i;
+      }
+    }
+  }
+
   static async getStatistics(historyClean) {
     function arrayCounts(arr) {
       const a = [];
@@ -157,6 +172,10 @@ class HistoryClean {
     const printCost = [];
     const filamentCost = [];
     const arrayFailed = [];
+
+    const usageOverTime = [];
+    const totals = [];
+
     for (let h = 0; h < historyClean.length; h++) {
       if (historyClean[h].state.includes("success")) {
         completed.push(true);
@@ -173,13 +192,80 @@ class HistoryClean {
       fileNames.push(historyClean[h].file.name);
 
       printerNames.push(historyClean[h].printer);
+      historyClean[h].spools.forEach((spool) => {
+        //console.log(spool);
+        const keys = Object.keys(spool);
+        for (const key of keys) {
+          //check if type exists
+          let checkNested = this.checkNested(spool[key].type, usageOverTime);
 
+          if (typeof checkNested !== "undefined") {
+            let checkNestedIndex = this.checkNestedIndex(
+              spool[key].type,
+              usageOverTime
+            );
+            let weightCalc = 0;
+            if (
+              typeof usageOverTime[checkNestedIndex].data[0] !== "undefined"
+            ) {
+              weightCalc =
+                usageOverTime[checkNestedIndex].data[
+                  usageOverTime[checkNestedIndex].data.length - 1
+                ].y + historyClean[h].totalWeight;
+            } else {
+              weightCalc = historyClean[h].totalWeight;
+            }
+
+            let dateSplit = historyClean[h].endDate.split(" ");
+
+            let timeSplit = dateSplit[5].split(":");
+            const months = [
+              "Jan",
+              "Feb",
+              "Mar",
+              "Apr",
+              "May",
+              "Jun",
+              "Jul",
+              "Aug",
+              "Sep",
+              "Oct",
+              "Nov",
+              "Dec",
+            ];
+            let month = months.indexOf(dateSplit[1]);
+
+            let dateParse = new Date(
+              parseInt(dateSplit[3]),
+              month,
+              parseInt(dateSplit[2]),
+              timeSplit[0],
+              timeSplit[1],
+              timeSplit[2]
+            );
+            usageOverTime[checkNestedIndex].data.push({
+              x: dateParse,
+              y: weightCalc,
+            });
+          } else {
+            let usageKey = {
+              name: spool[key].type,
+              data: [],
+            };
+
+            if (spool[key].type !== "") {
+              usageOverTime.push(usageKey);
+            }
+          }
+        }
+      });
       filamentWeight.push(historyClean[h].totalWeight);
       filamentLength.push(historyClean[h].totalLength);
 
       printCost.push(parseFloat(historyClean[h].printerCost));
       filamentCost.push(historyClean[h].spoolCost);
     }
+
     const totalFilamentWeight = filamentWeight.reduce((a, b) => a + b, 0);
     const totalFilamentLength = filamentLength.reduce((a, b) => a + b, 0);
     const filesArray = arrayCounts(fileNames);
@@ -203,6 +289,7 @@ class HistoryClean {
       leastUsedPrinter = printerNamesArray[0][minIndexPrinterNames];
     }
     const statTotal = completed.length + cancelled.length + failed.length;
+
     const statistics = {
       completed: completed.length,
       cancelled: cancelled.length,
@@ -243,6 +330,7 @@ class HistoryClean {
       totalPrinterCost: printCost.reduce((a, b) => a + b, 0).toFixed(2),
       highestPrinterCost: Math.max(...printCost).toFixed(2),
       currentFailed: arrayFailed.reduce((a, b) => a + b, 0),
+      usageOverTime: usageOverTime,
     };
     return statistics;
   }

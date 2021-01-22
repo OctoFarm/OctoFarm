@@ -13,9 +13,11 @@ All notable changes to this project will be documented in this file.
          - Filament Statistics UI tweaks.
          - No more content editable fields... firefox should now be able to edit values.
          - New spool overview table. Display only.
-
+         - New Usage over time graph. Incrementally counts up your filament types usage split by material. 
+      
 ### Changed
      - Fixed #228: Quick connect button will only activate once you have setup preferred connection preferences. 
+     - Printer Logs Modal for OctoPrint logs now includes line number 
 
 ### Fixed
      - Fixed #226: Couldn't update OctoPrint instances, restart would get in the way. 
