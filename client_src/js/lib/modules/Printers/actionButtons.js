@@ -242,6 +242,15 @@ function checkQuickConnectState(printer) {
   document.getElementById("printerQuickConnect-" + printer._id).disabled =
     printer.printerState.colour.category === "Offline";
   if (
+    printer.connectionOptions.portPreference === null ||
+    printer.connectionOptions.baudratePreference === null ||
+    printer.connectionOptions.printerProfilePreference === null
+  ) {
+    document.getElementById(
+      "printerQuickConnect-" + printer._id
+    ).disabled = true;
+  }
+  if (
     (printer.printerState.colour.category !== "Offline" &&
       printer.printerState.colour.category === "Disconnected") ||
     printer.printerState.colour.category === "Error!"
