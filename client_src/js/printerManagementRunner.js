@@ -2911,38 +2911,38 @@ class dashUpdate {
                     if (updateRequest.status === 200) {
                       UI.createAlert(
                         "success",
-                        `${printer.printerName}: Successfully updated! your instance will restart now.`,
+                        `${printer.printerName}: Update command fired, you may need to restart OctoPrint once complete.`,
                         3000,
                         "Clicked"
                       );
-                      let post = await OctoPrintClient.systemNoConfirm(
-                        printer,
-                        "restart"
-                      );
-                      if (typeof post !== "undefined") {
-                        if (post.status === 204) {
-                          UI.createAlert(
-                            "success",
-                            `Successfully made restart attempt to ${printer.printerName}... You may need to Re-Sync!`,
-                            3000,
-                            "Clicked"
-                          );
-                        } else {
-                          UI.createAlert(
-                            "error",
-                            `There was an issue sending restart to ${printer.printerName} are you sure it's online?`,
-                            3000,
-                            "Clicked"
-                          );
-                        }
-                      } else {
-                        UI.createAlert(
-                          "error",
-                          `No response from ${printer.printerName}, is it online???`,
-                          3000,
-                          "Clicked"
-                        );
-                      }
+                      // let post = await OctoPrintClient.systemNoConfirm(
+                      //   printer,
+                      //   "restart"
+                      // );
+                      // if (typeof post !== "undefined") {
+                      //   if (post.status === 204) {
+                      //     UI.createAlert(
+                      //       "success",
+                      //       `Successfully made restart attempt to ${printer.printerName}... You may need to Re-Sync!`,
+                      //       3000,
+                      //       "Clicked"
+                      //     );
+                      //   } else {
+                      //     UI.createAlert(
+                      //       "error",
+                      //       `There was an issue sending restart to ${printer.printerName} are you sure it's online?`,
+                      //       3000,
+                      //       "Clicked"
+                      //     );
+                      //   }
+                      // } else {
+                      //   UI.createAlert(
+                      //     "error",
+                      //     `No response from ${printer.printerName}, is it online???`,
+                      //     3000,
+                      //     "Clicked"
+                      //   );
+                      // }
                     } else {
                       UI.createAlert(
                         "error",
