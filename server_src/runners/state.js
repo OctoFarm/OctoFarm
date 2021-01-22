@@ -201,6 +201,12 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].webSocketDescription =
               "Websocket Closed by OctoFarm";
             this.instance.removeAllListeners();
+            if (typeof farmPrinters[this.index] !== "undefined") {
+              PrinterClean.generate(
+                farmPrinters[this.index],
+                systemSettings.filamentManager
+              );
+            }
           } catch (e) {
             logger.info(
               `Couldn't set state of missing printer, safe to ignore: ${this.index}: ${this.url}`
@@ -222,6 +228,12 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].webSocketDescription =
               "Websocket Closed by OctoFarm";
             this.instance.removeAllListeners();
+            if (typeof farmPrinters[this.index] !== "undefined") {
+              PrinterClean.generate(
+                farmPrinters[this.index],
+                systemSettings.filamentManager
+              );
+            }
           } catch (e) {
             logger.info(
               `Couldn't set state of missing printer, safe to ignore: ${this.index}: ${this.url}`
@@ -242,6 +254,12 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].webSocketDescription =
               "Websocket Terminated by OctoFarm, Ping/Pong check fails";
             this.instance.removeAllListeners();
+            if (typeof farmPrinters[this.index] !== "undefined") {
+              PrinterClean.generate(
+                farmPrinters[this.index],
+                systemSettings.filamentManager
+              );
+            }
           } catch (e) {
             logger.info(
               `Ping/Pong failed to get a response, closing and attempted to reconnect: ${this.index}: ${this.url}`
@@ -369,6 +387,13 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].webSocketDescription =
               "Hard Failure, please Re-Sync when Online";
             this.instance.removeAllListeners();
+
+            if (typeof farmPrinters[this.index] !== "undefined") {
+              PrinterClean.generate(
+                farmPrinters[this.index],
+                systemSettings.filamentManager
+              );
+            }
           } catch (e) {
             logger.info(
               `Couldn't set state of missing printer, safe to ignore: ${this.index}: ${this.url}`
@@ -473,6 +498,12 @@ WebSocketClient.prototype.onopen = async function (e) {
     "Active",
     farmPrinters[this.index]._id
   );
+  if (typeof farmPrinters[this.index] !== "undefined") {
+    PrinterClean.generate(
+      farmPrinters[this.index],
+      systemSettings.filamentManager
+    );
+  }
 };
 
 WebSocketClient.prototype.onmessage = async function (data, flags, number) {
