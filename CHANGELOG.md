@@ -7,10 +7,20 @@ All notable changes to this project will be documented in this file.
 # [v1.1.8]
 
 ### Added
+     - Added improved filament manager loggin for history capture. 
+     - Improved the layout of the Filament Manager:
+         - Spools and Profile managers are now under modals. 
+         - Filament Statistics UI tweaks.
+         - No more content editable fields... firefox should now be able to edit values.
 
 ### Changed
+     - Fixed #228: Quick connect button will only activate once you have setup preferred connection preferences. 
 
 ### Fixed
+     - Fixed #226: Couldn't update OctoPrint instances, restart would get in the way. 
+     - Fixed #223: Shutting down printers would incorrectly count towards last printer state on Dashboard Utilisation heat map.
+     - Fixed issue with incorrect object on history error. 
+     - Fixed issue when changing spool filter not updating all dropdowns until refresh.
 
 ## Removed
 

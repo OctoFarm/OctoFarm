@@ -175,10 +175,10 @@ async function addProfile(manufacturer, material, density, diameter) {
       `
                 <tr data-jplist-item>
                   <th style="display: none;">${profileID}</th>
-                  <th scope="row"><p contenteditable="false">${post.profile.manufacturer}</p></th>
-                  <td><p contenteditable="false">${post.profile.material}</p></td>
-                  <td><p contenteditable="false">${post.profile.density}</p></td>
-                  <td><p contenteditable="false">${post.profile.diameter}</p></td>
+                  <th scope="row"><input class="form-control" type="text" placeholder="${post.profile.manufacturer}"></th>
+                  <td><input class="form-control" type="text" placeholder="${post.profile.material}"></td>
+                  <td><input class="form-control" type="text" placeholder="${post.profile.density}"></p></td>
+                  <td><input class="form-control" type="text" placeholder="${post.profile.diameter}"></p></td>
                   <td><button id="edit-${profileID}" type="button" class="btn btn-sm btn-info edit">
                     <i class="fas fa-edit editIcon"></i>
                   </button>
@@ -203,24 +203,23 @@ async function addProfile(manufacturer, material, density, diameter) {
 }
 async function editProfile(e) {
   const row = e.parentElement.parentElement;
-  const editable = row.querySelectorAll("[contenteditable]");
+  const editable = row.querySelectorAll("input");
   const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
   editable.forEach((edit) => {
-    edit.contentEditable = true;
-    edit.classList.add("contentEditable");
+    edit.value = edit.placeholder;
   });
   document.getElementById(`save-${id}`).classList.remove("d-none");
   document.getElementById(`edit-${id}`).classList.add("d-none");
 }
 async function saveProfile(e) {
   const row = e.parentElement.parentElement;
-  const editable = row.querySelectorAll("[contenteditable]");
+  const editable = row.querySelectorAll("input");
   const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
   const profile = [];
   editable.forEach((edit) => {
-    edit.contentEditable = false;
-    edit.classList.remove("contentEditable");
-    profile.push(edit.innerHTML.trim());
+    edit.placeholder = edit.value;
+    profile.push(edit.value);
+    edit.value = "";
   });
   const data = {
     id,
@@ -327,7 +326,6 @@ async function addSpool(
     spoolsUsed.value = 0;
     spoolsTempOffset.value = 0.0;
     post = post.spools;
-    console.log(post);
     let displayNone = "d-none";
 
     if (filamentManager) {
@@ -339,9 +337,9 @@ async function addSpool(
       `
                 <tr data-jplist-item>
                   <th style="display: none;">${post._id}</th>
-                  <th scope="row"><p contenteditable="false">${
+                  <th scope="row"><input class="form-control" type="text" placeholder="${
                     post.spools.name
-                  }</p></th>
+                  }"></th>
                   <td>
                        <select id="spoolsProfile-${
                          post._id
@@ -349,15 +347,15 @@ async function addSpool(
 
                        </select>
                    </td>
-                  <td><p class="price" contenteditable="false">${
+                  <td><input class="form-control" type="text" placeholder="${
                     post.spools.price
-                  }</p></td>
-                  <td><p class="weight" contenteditable="false">${
+                  }"></td>
+                  <td><input class="form-control" type="text" placeholder="${
                     post.spools.weight
-                  }</p></td>
-                  <td class="${displayNone}"><p class="used" contenteditable="false">${
+                  }"></td>
+                  <td class="${displayNone}"><input class="form-control" type="text" placeholder="${
         post.spools.used
-      }</p></td>
+      }"></td>
                   <td class="grams ${displayNone}">${(
         post.spools.weight - post.spools.used
       ).toFixed(0)}</td>
@@ -365,9 +363,9 @@ async function addSpool(
         100 -
         (post.spools.used / post.spools.weight) * 100
       ).toFixed(0)}</td>
-                  <td><p contenteditable="false">${
+                  <td><input class="form-control" type="text" placeholder="${
                     post.spools.tempOffset
-                  }</p></td>
+                  }"></td>
                    <td>
                        <select id="spoolsPrinterAssignment-${
                          post._id
@@ -407,11 +405,10 @@ async function addSpool(
 }
 async function editSpool(e) {
   const row = e.parentElement.parentElement;
-  const editable = row.querySelectorAll("[contenteditable]");
+  const editable = row.querySelectorAll("input");
   const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
   editable.forEach((edit) => {
-    edit.contentEditable = true;
-    edit.classList.add("contentEditable");
+    edit.value = edit.placeholder;
   });
   // let profile = await OctoFarmclient.get("filament/get/profile");
   // profile = await profile.json();
@@ -464,14 +461,15 @@ async function deleteSpool(e) {
 }
 async function saveSpool(e) {
   const row = e.parentElement.parentElement;
-  const editable = row.querySelectorAll("[contenteditable]");
+  const editable = row.querySelectorAll("input");
   const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
   const spool = [];
   editable.forEach((edit) => {
-    edit.contentEditable = false;
-    edit.classList.remove("contentEditable");
-    spool.push(edit.innerHTML.trim());
+    edit.placeholder = edit.value;
+    spool.push(edit.value);
+    edit.value = "";
   });
+
   spool.push(document.getElementById(`spoolsProfile-${id}`).value);
   const data = {
     id,
@@ -809,17 +807,7 @@ async function init() {
   //     //       <td class="d-none" scope="row">
   //     //         ${profileID}
   //     //       </td>
-  //     //       <td scope="row">
-  //     //          <p contenteditable="false">${profiles.profile.manufacturer}</p>
-  //     //       </td>
-  //     //        <td>
-  //     //         <p contenteditable="false">${profiles.profile.material}</p>
-  //     //       </td>
-  //     //       <td>
-  //     //         <p contenteditable="false">${profiles.profile.density}</p>
-  //     //       </td>
-  //     //       <td>
-  //     //         <p contenteditable="false">${profiles.profile.diameter}</p>
+
   //     //       </td>
   //     //           <td>
   //     //               <button id="edit-${profileID}" type="button" class="btn btn-sm btn-info edit">
@@ -906,9 +894,9 @@ function updateTotals(filtered) {
   const weight = [];
   const used = [];
   filtered.forEach((row) => {
-    price.push(parseInt(row.getElementsByClassName("price")[0].innerText));
-    weight.push(parseInt(row.getElementsByClassName("weight")[0].innerText));
-    used.push(parseInt(row.getElementsByClassName("used")[0].innerText));
+    price.push(parseInt(row.getElementsByClassName("price")[0].placeholder));
+    weight.push(parseInt(row.getElementsByClassName("weight")[0].placeholder));
+    used.push(parseInt(row.getElementsByClassName("used")[0].placeholder));
   });
   const usedReduced = used.reduce((a, b) => a + b, 0).toFixed(0);
   const weightReduced = weight.reduce((a, b) => a + b, 0).toFixed(0);
@@ -931,6 +919,8 @@ element.addEventListener(
   (e) => {
     // the elements list after filtering + pagination
     updateTotals(e.jplistState.filtered);
+    updateProfileDrop();
+    updatePrinterDrops();
   },
   false
 );
