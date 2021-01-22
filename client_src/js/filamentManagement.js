@@ -567,11 +567,13 @@ async function updatePrinterDrops() {
           filament.Spool[spool].printerAssignment[0].id +
           "-" +
           filament.Spool[spool].printerAssignment[0].tool;
+        printerAssignments[index].innerHTML =
+          filament.Spool[spool].printerAssignment[0].name +
+          ": " +
+          filament.Spool[spool].printerAssignment[0].tool;
+      } else {
+        printerAssignments[index].innerHTML = "Not Assigned";
       }
-      printerAssignments[index].innerHTML =
-        filament.Spool[spool].printerAssignment[0].name +
-        ": " +
-        filament.Spool[spool].printerAssignment[0].tool;
     }
 
     drop.addEventListener("change", (e) => {

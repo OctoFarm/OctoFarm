@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
      - Fixed issue when changing spool filter not updating all dropdowns until refresh.
 
 ## Removed
+     - Disable Printer Assignment on Filament Manager screen, buggy... needs re-configuring.
 
 # [v1.1.7]
 

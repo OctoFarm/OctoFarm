@@ -605,7 +605,7 @@
                                 <td class="grams <%= displayNone %>"><%=(spool.weight - spool.used).toFixed(0)%></td>
                                 <td class="percent <%= displayNone %>"><%=(100 - spool.used / spool.weight * 100).toFixed(0)%></td>
                                 <td><input class="form-control" type="number" step="any" placeholder="<%= spool.tempOffset %>"></td>
-                                <td><select id="spoolsPrinterAssignment-<%=spool._id%>" class="form-control">
+                                <td><select id="spoolsPrinterAssignment-<%=spool._id%>" class="form-control" disabled>
 
                                     </select></td>
                                 <td><button id="edit-<%=spool._id%>" type="button" class="btn btn-sm btn-info edit bg-colour-1">
