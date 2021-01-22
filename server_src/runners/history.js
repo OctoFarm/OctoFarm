@@ -40,6 +40,9 @@ class HistoryCollection {
     try {
       for (let i = 0; i < printer.selectedFilament.length; i++) {
         if (printer.selectedFilament[i] !== null) {
+          logger.info(
+            `${printer.printerURL}: fetching ${printer.printerURL}/plugin/filamentmanager/spools/${printer.selectedFilament[i].spools.fmID}`
+          );
           const spools = await fetch(
             `${printer.printerURL}/plugin/filamentmanager/spools/${printer.selectedFilament[i].spools.fmID}`,
             {
@@ -50,7 +53,11 @@ class HistoryCollection {
               },
             }
           );
+          logger.info(
+            `${printer.printerURL}: fetched... spool status ${spools.status}`
+          );
           const spool = await Spool.findById(printer.selectedFilament[i]._id);
+
           const sp = await spools.json();
           spool.spools = {
             name: sp.spool.name,
@@ -61,6 +68,9 @@ class HistoryCollection {
             tempOffset: sp.spool.temp_offset,
             fmID: sp.spool.id,
           };
+          logger.info(
+            `${printer.printerURL}: updating... spool status ${spool.spools}`
+          );
           spool.markModified("spools");
           await spool.save();
           returnSpools.push(spool);
@@ -69,17 +79,13 @@ class HistoryCollection {
     } catch (e) {
       logger.info(
         e,
-        `${printers.printerURL}: Issue contacting filament manager... not updating spool`
+        `${printer.printerURL}: Issue contacting filament manager... not updating spool`
       );
     }
 
     const reSync = await FilamentManagerPlugin.filamentManagerReSync();
     // Return success
-    if (reSync === "success") {
-      logger.info("Successfully resynced filament manager");
-    } else {
-      logger.info("Unsuccessfull in resyncing filament manager");
-    }
+    logger.info(reSync);
     return returnSpools;
   }
 
