@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
          - Spools and Profile managers are now under modals. 
          - Filament Statistics UI tweaks.
          - No more content editable fields... firefox should now be able to edit values.
+         - New spool overview table. Display only.
 
 ### Changed
      - Fixed #228: Quick connect button will only activate once you have setup preferred connection preferences. 

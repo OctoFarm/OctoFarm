@@ -509,7 +509,10 @@ async function updateProfileDrop() {
   }
   // Generate profile assignment
   const printerDrops = document.querySelectorAll("[id^='spoolsProfile-']");
-  printerDrops.forEach((drop) => {
+  const printerListMaterials = document.querySelectorAll(
+    "[id^='spoolsListMaterial-']"
+  );
+  printerDrops.forEach((drop, index) => {
     drop.innerHTML = "";
     profiles.profiles.forEach((prof) => {
       drop.insertAdjacentHTML(
@@ -530,6 +533,9 @@ async function updateProfileDrop() {
       drop.className = `form-control ${profiles.profiles[
         profileID
       ].material.replace(/ /g, "_")}`;
+      printerListMaterials[
+        index
+      ].innerHTML = `${profiles.profiles[profileID].material}`;
     }
   });
 }
@@ -544,7 +550,10 @@ async function updatePrinterDrops() {
   const printerDrops = document.querySelectorAll(
     "[id^='spoolsPrinterAssignment-']"
   );
-  printerDrops.forEach((drop) => {
+  const printerAssignments = document.querySelectorAll(
+    "[id^='spoolsListPrinterAssignment-']"
+  );
+  printerDrops.forEach((drop, index) => {
     drop.innerHTML = [...printerList.printerList];
 
     const split = drop.id.split("-");
@@ -559,6 +568,10 @@ async function updatePrinterDrops() {
           "-" +
           filament.Spool[spool].printerAssignment[0].tool;
       }
+      printerAssignments[index].innerHTML =
+        filament.Spool[spool].printerAssignment[0].name +
+        ": " +
+        filament.Spool[spool].printerAssignment[0].tool;
     }
 
     drop.addEventListener("change", (e) => {
