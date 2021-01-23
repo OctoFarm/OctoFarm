@@ -651,7 +651,9 @@ async function init() {
         opacity: 0.9,
       },
       formatter: function (val, opts) {
-        return val.toFixed(2) + "g";
+        if (val !== null) {
+          return val.toFixed(2) + "g";
+        }
       },
     },
     // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
@@ -672,7 +674,9 @@ async function init() {
         },
         labels: {
           formatter: function (val) {
-            return val.toFixed(2) + "g";
+            if (val !== null) {
+              return val.toFixed(2) + "g";
+            }
           },
         },
       },

@@ -640,7 +640,7 @@
                                 <td><span class="d-none price"><%=spool.price%></span><input class="form-control" type="number" step="any" placeholder="<%=spool.price%>"></td>
                                 <td><span class="d-none weight"><%=spool.weight%></span><input class="form-control" type="number" step="1" placeholder="<%=spool.weight%>"></td>
                                 <td class=" <%= displayNone %>"><span class="d-none used"><%=spool.used%></span><input class="form-control" type="number" step="1" placeholder="<%=spool.used%>"></td>
-                                <td class="grams <%= displayNone %>"><%=(spool.used - spool.weight).toFixed(0)%><%=(spool.weight - spool.used).toFixed(0)%></td>
+                                <td class="grams <%= displayNone %>"><%=(spool.weight - spool.used).toFixed(0)%></td>
                                 <td class="percent <%= displayNone %>"><%=(100 - spool.used / spool.weight * 100).toFixed(0)%></td>
                                 <td><input class="form-control" type="number" step="any" placeholder="<%= spool.tempOffset %>"></td>
                                 <td><span class="d-none material" id="spoolsMaterialText-<%=spool._id%>"><%=(spool.weight - spool.used).toFixed(0)%></span>
