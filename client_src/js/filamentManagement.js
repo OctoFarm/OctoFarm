@@ -618,11 +618,18 @@ async function init() {
   usageOverTimeData = await usageOverTimeData.json();
 
   let sortedDays = lastThirtyDays.sort();
+  let newDays = [];
   sortedDays.forEach((date) => {
     date = new Date(date);
     date = date.toLocaleDateString();
+    newDays.push(date);
   });
-  console.log(sortedDays);
+  console.log(newDays);
+  console.log(new Date(sortedDays[0]).toDateString());
+  console.log(new Date(sortedDays[29]).toTimeString());
+
+  let firstDate = new Date(sortedDays[0]);
+  let lastDate = new Date(sortedDays[29]);
 
   const usageOverTimeOptions = {
     chart: {
@@ -695,11 +702,13 @@ async function init() {
       title: {
         text: "Last Month",
       },
-      tickAmount: 15,
-      min: new Date(sortedDays[0]).toTimeString(),
-      max: new Date(sortedDays[29]).toTimeString(),
+      tickAmount: 30,
+      min: firstDate.toLocaleDateString(),
+      max: lastDate.toLocaleDateString(),
       labels: {
         formatter: function (value, timestamp) {
+          console.log(timestamp);
+          console.log(value);
           let dae = new Date(timestamp);
           return dae.toLocaleDateString(); // The formatter function overrides format property
         },

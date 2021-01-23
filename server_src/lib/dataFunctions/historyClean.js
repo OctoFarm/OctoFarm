@@ -143,6 +143,22 @@ class HistoryClean {
   }
 
   static async getStatistics(historyClean) {
+    let lastThirtyDays = [];
+    let today = new Date();
+    today = today.getTime();
+    for (let i = 0; i < 30; i++) {
+      let day = (i + 1) * 1000;
+      let previousDay = new Date(today - day * 60 * 60 * 24 * 2);
+      previousDay = await previousDay.getTime();
+      // previousDay = previousDay.split("/");
+      // lastThirtyDays.push(
+      //   `${previousDay[0]}/${previousDay[1]}/${previousDay[2]}`
+      // );
+      lastThirtyDays.push(previousDay);
+    }
+    let sortedDays = lastThirtyDays.sort();
+    let firstDate = new Date(sortedDays[0]);
+    let lastDate = new Date(sortedDays[29]);
     function arrayCounts(arr) {
       const a = [];
       const b = [];
@@ -236,6 +252,7 @@ class HistoryClean {
             if (weightCalcSan > 0) {
               usageOverTime[checkNestedIndex].data.push({
                 x: dateParse.toLocaleDateString(),
+                originalX: dateParse,
                 y: weightCalcSan,
               });
             }
@@ -262,7 +279,10 @@ class HistoryClean {
       input.reduce(function (res, value) {
         if (!res[value.x]) {
           res[value.x] = { x: value.x, y: 0 };
-          result.push(res[value.x]);
+          let currentDate = new Date(value.originalX).getTime();
+          if (currentDate > firstDate && currentDate < lastDate) {
+            result.push(res[value.x]);
+          }
         }
         res[value.x].y += value.y;
         return res;
@@ -278,6 +298,7 @@ class HistoryClean {
 
     usageOverTime.forEach((usage) => {
       let usageGroup = sumValuesGroupByDate(usage.data);
+      console.log(usageGroup);
       usage.data = usageGroup;
     });
     const totalFilamentWeight = filamentWeight.reduce((a, b) => a + b, 0);
