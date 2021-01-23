@@ -448,7 +448,7 @@
               <% if(history[i].spools !== null){ %>
                 <% history[i].spools.forEach((spool,index) => { %>
                 <%if(spool[Object.keys(spool)[0]].spoolName !== null){%>
-                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p><%= spool[Object.keys(spool)[0]].weight.toFixed(2) %>g / <%= spool[Object.keys(spool)[0]].length.toFixed(2) %>m</p>
+                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p><%= spool[Object.keys(spool)[0]].weight %>g / <%= spool[Object.keys(spool)[0]].length %>m</p>
                 <%}else{%>
                   <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p>(No Spool)</p>
                 <%}%>

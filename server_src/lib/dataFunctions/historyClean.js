@@ -403,7 +403,7 @@ class HistoryClean {
       metrics.filament !== null
     ) {
       if (!success) {
-        printPercentage = (time / metrics.estimatedPrintTime) * 1000;
+        printPercentage = (time / metrics.estimatedPrintTime) * 100;
       }
       metrics = metrics.filament;
     } else {
@@ -444,11 +444,14 @@ class HistoryClean {
             const volume = length * Math.PI * radius * radius;
             let usage = "";
             if (success) {
-              usage = volume * parseFloat(spool.spools.profile.density);
+              usage = (
+                volume * parseFloat(spool.spools.profile.density)
+              ).toFixed(2);
             } else {
-              usage =
-                (volume * parseFloat(spool.spools.profile.density)) /
-                printPercentage;
+              usage = (
+                (printPercentage / 100) *
+                (volume * parseFloat(spool.spools.profile.density))
+              ).toFixed(2);
             }
             return usage;
           }
@@ -465,9 +468,9 @@ class HistoryClean {
             const volume = length * Math.PI * radius * radius;
             let usage = "";
             if (success) {
-              usage = volume * 1.24;
+              usage = (volume * 1.24).toFixed(2);
             } else {
-              usage = (volume * 1.24) / printPercentage;
+              usage = ((printPercentage / 100) * (volume * 1.24)).toFixed(2);
             }
             return usage;
           }
@@ -491,9 +494,9 @@ class HistoryClean {
           );
         } else {
           return (
-            ((spool.spools.price / spool.spools.weight) * grams) /
-            printPercentage
-          ).toFixed(2);
+            (printPercentage / 100) *
+            ((spool.spools.price / spool.spools.weight) * grams).toFixed(2)
+          );
         }
       } else {
         return null;
@@ -511,8 +514,8 @@ class HistoryClean {
               toolName: "Tool " + keys[m].substring(4, 5),
               spoolName: null,
               spoolId: null,
-              volume: metrics[keys[m]].volume,
-              length: metrics[keys[m]].length / 1000,
+              volume: metrics[keys[m]].volume.toFixed(2),
+              length: (metrics[keys[m]].length / 1000).toFixed(2),
               weight: null,
               cost: null,
             },
@@ -523,8 +526,14 @@ class HistoryClean {
               toolName: "Tool " + keys[m].substring(4, 5),
               spoolName: null,
               spoolId: null,
-              volume: metrics[keys[m]].volume / printPercentage,
-              length: metrics[keys[m]].length / 1000 / printPercentage,
+              volume: (
+                (printPercentage / 100) *
+                metrics[keys[m]].volume
+              ).toFixed(2),
+              length: (
+                ((printPercentage / 100) * metrics[keys[m]].length) /
+                1000
+              ).toFixed(2),
               weight: null,
               cost: null,
             },
@@ -542,6 +551,7 @@ class HistoryClean {
             spool[keys[m]].weight,
             filamentSelection[m]
           );
+
           spool[keys[m]].type = getType(filamentSelection[m]);
         } else {
           spool[keys[m]].spoolName = spoolName(filamentSelection);
