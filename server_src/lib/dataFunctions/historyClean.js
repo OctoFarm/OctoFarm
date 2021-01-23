@@ -381,7 +381,8 @@ class HistoryClean {
       metrics.filament !== null
     ) {
       if (!success) {
-        printPercentage = (metrics.estimatedPrintTime / time) * 100;
+        printPercentage = (time / metrics.estimatedPrintTime) * 1000;
+        console.log(printPercentage);
       }
       metrics = metrics.filament;
     } else {

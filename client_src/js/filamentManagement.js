@@ -691,6 +691,12 @@ async function init() {
       tickAmount: 30,
       min: new Date(sortedDays[0]).toTimeString(),
       max: new Date(sortedDays[29]).toTimeString(),
+      labels: {
+        formatter: function (value, timestamp) {
+          let dae = new Date(timestamp);
+          return dae.toLocaleDateString(); // The formatter function overrides format property
+        },
+      },
     },
   };
 
