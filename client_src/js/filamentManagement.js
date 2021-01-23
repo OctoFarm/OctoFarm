@@ -515,6 +515,10 @@ async function updateProfileDrop() {
   const spoolsListManufacture = document.querySelectorAll(
     "[id^='spoolsListManufacture-']"
   );
+  const spoolsMaterialText = document.querySelectorAll(
+    "[id^='spoolsMaterialText-']"
+  );
+
   printerDrops.forEach((drop, index) => {
     drop.innerHTML = "";
     profiles.profiles.forEach((prof) => {
@@ -537,6 +541,9 @@ async function updateProfileDrop() {
         profileID
       ].material.replace(/ /g, "_")}`;
       printerListMaterials[
+        index
+      ].innerHTML = `${profiles.profiles[profileID].material}`;
+      spoolsMaterialText[
         index
       ].innerHTML = `${profiles.profiles[profileID].material}`;
       spoolsListManufacture[
@@ -699,7 +706,6 @@ async function init() {
       },
     },
   };
-  console.log({ min: new Date(sortedDays[0]).toTimeString() });
   let systemFarmTemp = new ApexCharts(
     document.querySelector("#usageOverTime"),
     usageOverTimeOptions
@@ -972,6 +978,7 @@ async function init() {
     storage: "localStorage", // 'localStorage', 'sessionStorage' or 'cookies'
     storageName: "spools-sorting", // the same storage name can be used to share storage between multiple pages
   });
+
   //   //Update Profiles Spools Dropdown.
   //   updateProfileDrop(post)
   //
