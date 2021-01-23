@@ -201,7 +201,7 @@ export default class PrinterSettings {
         } else {
           document.getElementById("psDefaultProfile").value = 0;
         }
-        console.log(currentPrinter.currentProfile);
+
         document.getElementById("psPrinterProfiles").innerHTML = `
             <div class="col-12 col-lg-4">
             <h5 class="mb-1"><u>Printer</u></h5>
@@ -966,6 +966,7 @@ export default class PrinterSettings {
               ),
             },
           };
+
           if (currentPrinter.printerState.colour.category !== "Offline") {
             let printerName = document.getElementById("psProfileName").value;
             let printerModel = document.getElementById("psPrinterModel").value;

@@ -191,7 +191,10 @@ class PrinterClean {
         order: farmPrinter.sortIndex,
       };
 
-      if (typeof farmPrinter.resends !== "undefined") {
+      if (
+        typeof farmPrinter.resends !== "undefined" &&
+        farmPrinter.resends !== null
+      ) {
         sortedPrinter.resends = farmPrinter.resends;
       }
 

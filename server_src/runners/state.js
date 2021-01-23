@@ -3023,6 +3023,20 @@ class Runner {
     }
 
     printer.markModified("powerSettings");
+
+    if (settings.systemCommands.serverRestartCommand !== "") {
+      farmPrinters[index].settingsServer.commands.serverRestartCommand =
+        settings.systemCommands.serverRestartCommand;
+    }
+    if (settings.systemCommands.systemRestartCommand !== "") {
+      farmPrinters[index].settingsServer.commands.systemRestartCommand =
+        settings.systemCommands.systemRestartCommand;
+    }
+    if (settings.systemCommands.systemShutdownCommand !== "") {
+      farmPrinters[index].settingsServer.commands.systemShutdownCommand =
+        settings.systemCommands.systemShutdownCommand;
+    }
+
     printer.save();
     let profile = {};
     let sett = {};
