@@ -688,7 +688,7 @@ async function init() {
       title: {
         text: "Last Month",
       },
-      tickAmount: 30,
+      tickAmount: 15,
       min: new Date(sortedDays[0]).toTimeString(),
       max: new Date(sortedDays[29]).toTimeString(),
       labels: {
@@ -699,7 +699,7 @@ async function init() {
       },
     },
   };
-
+  console.log({ min: new Date(sortedDays[0]).toTimeString() });
   let systemFarmTemp = new ApexCharts(
     document.querySelector("#usageOverTime"),
     usageOverTimeOptions
