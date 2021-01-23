@@ -235,7 +235,7 @@ class HistoryClean {
             );
             if (weightCalcSan > 0) {
               usageOverTime[checkNestedIndex].data.push({
-                x: dateParse,
+                x: dateParse.toLocaleDateString(),
                 y: weightCalcSan,
               });
             }
@@ -257,7 +257,16 @@ class HistoryClean {
       printCost.push(parseFloat(historyClean[h].printerCost));
       filamentCost.push(historyClean[h].spoolCost);
     }
-
+    usageOverTime.forEach((usage) => {
+      let result = Object.values(
+        usage.data.reduce((a, { x, y }) => {
+          a[x] = a[x] || { x, y: 0 };
+          a[x].y = String(Number(a[x].y) + Number(y));
+          return a;
+        }, {})
+      );
+      usage.data = result;
+    });
     const totalFilamentWeight = filamentWeight.reduce((a, b) => a + b, 0);
     const totalFilamentLength = filamentLength.reduce((a, b) => a + b, 0);
     const filesArray = arrayCounts(fileNames);

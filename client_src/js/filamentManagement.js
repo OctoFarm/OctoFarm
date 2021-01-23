@@ -587,23 +587,43 @@ async function updatePrinterDrops() {
       const printerId = meta[0];
       const tool = meta[1];
       const spoolId = e.target.id.split("-");
-      console.log(printerId, spoolId[1], tool);
       selectFilament(printerId, spoolId[1], tool);
     });
   });
 }
 async function init() {
   //Load Graph
+  let today = new Date();
+  today = new Date(today);
+
+  let lastThirtyDays = [];
+  for (let i = 0; i < 29; i++) {
+    let day = (i + 1) * 1000;
+    let previousDay = new Date(today - day * 60 * 60 * 24 * 2);
+    previousDay = await previousDay.toLocaleDateString();
+    previousDay = previousDay.split("/");
+    lastThirtyDays.push(
+      `${previousDay[0]}/${previousDay[1]}/${previousDay[2]}`
+    );
+  }
   let usageOverTimeData = await OctoFarmclient.get("history/usageOverTime");
   usageOverTimeData = await usageOverTimeData.json();
+
+  console.log(lastThirtyDays.sort());
+
   const usageOverTimeOptions = {
     chart: {
-      type: "line",
-      id: "realtime",
+      type: "bar",
       width: "100%",
-      height: "90%",
+      height: "350px",
+      stacked: true,
       animations: {
-        enabled: false,
+        enabled: true,
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+        },
       },
       toolbar: {
         show: false,
@@ -613,10 +633,7 @@ async function init() {
       },
       background: "#303030",
     },
-    colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
-    stroke: {
-      curve: "smooth",
-    },
+    // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
     toolbar: {
       show: false,
     },
@@ -630,7 +647,7 @@ async function init() {
     yaxis: [
       {
         title: {
-          text: "Temp",
+          text: "Weight",
         },
       },
     ],
@@ -638,8 +655,10 @@ async function init() {
       type: "datetime",
       labels: {
         formatter(value) {
+          console.log(value);
           const date = new Date(value);
-          return date.toLocaleTimeString();
+          console.log(date);
+          return date.toLocaleDateString();
         },
       },
     },

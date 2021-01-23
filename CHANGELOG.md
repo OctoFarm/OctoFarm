@@ -13,7 +13,8 @@ All notable changes to this project will be documented in this file.
          - Filament Statistics UI tweaks.
          - No more content editable fields... firefox should now be able to edit values.
          - New spool overview table. Display only.
-         - New Usage over time graph. Incrementally counts up your filament types usage split by material. 
+         - New Usage over time bar graph. Stacks up and groups by day total filament usage by filament material. 
+         - Moved Re-Sync Filament Manager button to show with others (manage profile/spools).
       
 ### Changed
      - Fixed #228: Quick connect button will only activate once you have setup preferred connection preferences. 
@@ -24,6 +25,7 @@ All notable changes to this project will be documented in this file.
      - Fixed #223: Shutting down printers would incorrectly count towards last printer state on Dashboard Utilisation heat map.
      - Fixed issue with incorrect object on history error. 
      - Fixed issue when changing spool filter not updating all dropdowns until refresh.
+     - Fixed issue with File Name not been sent through Alerts.
 
 ## Removed
      - Disable Printer Assignment on Filament Manager screen, buggy... needs re-configuring.
