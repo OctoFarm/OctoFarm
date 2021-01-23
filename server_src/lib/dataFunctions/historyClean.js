@@ -189,7 +189,7 @@ class HistoryClean {
     const arrayFailed = [];
 
     const usageOverTime = [];
-    const totals = [];
+    const totalByDay = [];
 
     for (let h = 0; h < historyClean.length; h++) {
       if (historyClean[h].state.includes("success")) {
@@ -265,6 +265,17 @@ class HistoryClean {
             let usageKey = {
               name: spool[key].type,
               data: [],
+            };
+            let successKey = {
+              name: "Success",
+              data: [],
+            };
+            let cancellKey = {
+              name: "Cancelled",
+              data: [],
+            };
+            let failedKey = {
+              name: "Failed",
             };
 
             if (spool[key].type !== "") {
