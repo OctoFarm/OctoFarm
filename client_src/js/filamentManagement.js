@@ -582,7 +582,7 @@ async function updatePrinterDrops() {
           filament.Spool[spool].printerAssignment[0].tool;
         printerAssignments[index].innerHTML =
           filament.Spool[spool].printerAssignment[0].name +
-          ": " +
+          ": Tool" +
           filament.Spool[spool].printerAssignment[0].tool;
       } else {
         printerAssignments[index].innerHTML = "Not Assigned";
