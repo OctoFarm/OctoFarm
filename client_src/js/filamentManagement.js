@@ -640,11 +640,11 @@ async function init() {
       background: "#303030",
     },
     dataLabels: {
-      enabled: false,
+      enabled: true,
       background: {
         enabled: true,
         foreColor: "#000",
-        padding: 4,
+        padding: 1,
         borderRadius: 2,
         borderWidth: 1,
         borderColor: "#fff",

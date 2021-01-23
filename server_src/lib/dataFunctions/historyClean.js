@@ -280,7 +280,13 @@ class HistoryClean {
         if (!res[value.x]) {
           res[value.x] = { x: value.x, y: 0 };
           let currentDate = new Date(value.originalX).getTime();
-          if (currentDate > firstDate && currentDate < lastDate) {
+          console.log("1st", firstDate);
+          console.log("CUR", currentDate);
+          console.log("lasst", lastDate);
+          if (
+            currentDate > firstDate.getTime() &&
+            currentDate < lastDate.getTime()
+          ) {
             result.push(res[value.x]);
           }
         }
