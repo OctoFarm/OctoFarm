@@ -278,7 +278,6 @@ class HistoryClean {
 
     usageOverTime.forEach((usage) => {
       let usageGroup = sumValuesGroupByDate(usage.data);
-      console.log(usageGroup);
       usage.data = usageGroup;
     });
     const totalFilamentWeight = filamentWeight.reduce((a, b) => a + b, 0);
@@ -382,7 +381,6 @@ class HistoryClean {
     ) {
       if (!success) {
         printPercentage = (time / metrics.estimatedPrintTime) * 1000;
-        console.log(printPercentage);
       }
       metrics = metrics.filament;
     } else {
