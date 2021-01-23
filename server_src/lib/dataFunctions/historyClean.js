@@ -207,6 +207,12 @@ class HistoryClean {
       fileNames.push(historyClean[h].file.name);
 
       printerNames.push(historyClean[h].printer);
+
+      filamentWeight.push(historyClean[h].totalWeight);
+      filamentLength.push(historyClean[h].totalLength);
+
+      printCost.push(parseFloat(historyClean[h].printerCost));
+      filamentCost.push(historyClean[h].spoolCost);
       historyClean[h].spools.forEach((spool) => {
         //console.log(spool);
         const keys = Object.keys(spool);
@@ -267,11 +273,6 @@ class HistoryClean {
           }
         }
       });
-      filamentWeight.push(historyClean[h].totalWeight);
-      filamentLength.push(historyClean[h].totalLength);
-
-      printCost.push(parseFloat(historyClean[h].printerCost));
-      filamentCost.push(historyClean[h].spoolCost);
     }
     function sumValuesGroupByDate(input) {
       var result = [];

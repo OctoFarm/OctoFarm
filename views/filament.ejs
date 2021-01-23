@@ -98,10 +98,7 @@
                             <b class="mb-0 d-inline"><i class="fas fa-square"></i> Total: </b>
                             <p id="fsTotal" class="mb-1 d-inline"><%= filamentTotals.total.toFixed(0) %>g</p>
                         </div>
-                        <div class="col-lg-1">
-
-                        </div>
-                        <div class="col-lg-1">
+                        <div class="col-lg-2">
                             <p><b>Weight:</b> <span class="badge badge-info ml-2"><%= filamentTotals.total.toFixed(0) %>g</span> </p>
                             <p class=" <%= displayNone %>"><b>Used:</b> <span class="badge badge-info ml-2"><%= filamentTotals.used.toFixed(0) %>g</span> </p>
                             <p class=" <%= displayNone %>"><b>Remaining:</b> <span class="badge badge-info ml-2"><%=  filamentTotals.total.toFixed(0) - filamentTotals.used.toFixed(0) %>g</span> </p>
