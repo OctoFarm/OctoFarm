@@ -597,19 +597,25 @@ async function init() {
   today = new Date(today);
 
   let lastThirtyDays = [];
-  for (let i = 0; i < 29; i++) {
+  for (let i = 0; i < 30; i++) {
     let day = (i + 1) * 1000;
     let previousDay = new Date(today - day * 60 * 60 * 24 * 2);
-    previousDay = await previousDay.toLocaleDateString();
-    previousDay = previousDay.split("/");
-    lastThirtyDays.push(
-      `${previousDay[0]}/${previousDay[1]}/${previousDay[2]}`
-    );
+    previousDay = await previousDay.getTime();
+    // previousDay = previousDay.split("/");
+    // lastThirtyDays.push(
+    //   `${previousDay[0]}/${previousDay[1]}/${previousDay[2]}`
+    // );
+    lastThirtyDays.push(previousDay);
   }
   let usageOverTimeData = await OctoFarmclient.get("history/usageOverTime");
   usageOverTimeData = await usageOverTimeData.json();
 
-  console.log(lastThirtyDays.sort());
+  let sortedDays = lastThirtyDays.sort();
+  sortedDays.forEach((date) => {
+    date = new Date(date);
+    date = date.toLocaleDateString();
+  });
+  console.log(sortedDays);
 
   const usageOverTimeOptions = {
     chart: {
@@ -633,6 +639,27 @@ async function init() {
       },
       background: "#303030",
     },
+    dataLabels: {
+      enabled: false,
+      dropShadow: {
+        enabled: true,
+        left: 2,
+        top: 2,
+        opacity: 0.5,
+      },
+      background: {
+        enabled: true,
+        foreColor: "#000",
+        padding: 4,
+        borderRadius: 2,
+        borderWidth: 1,
+        borderColor: "#fff",
+        opacity: 0.9,
+      },
+      formatter: function (val, opts) {
+        return val.toFixed(2) + "g";
+      },
+    },
     // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
     toolbar: {
       show: false,
@@ -649,18 +676,21 @@ async function init() {
         title: {
           text: "Weight",
         },
+        labels: {
+          formatter: function (val) {
+            return val.toFixed(2) + "g";
+          },
+        },
       },
     ],
     xaxis: {
       type: "datetime",
-      labels: {
-        formatter(value) {
-          console.log(value);
-          const date = new Date(value);
-          console.log(date);
-          return date.toLocaleDateString();
-        },
+      title: {
+        text: "Last Month",
       },
+      //tickAmount: 30,
+      // min: new Date(sortedDays[0]).toLocaleDateString(),
+      // max: new Date(sortedDays[29]).toLocaleDateString(),
     },
   };
 

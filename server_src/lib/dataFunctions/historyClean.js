@@ -235,7 +235,7 @@ class HistoryClean {
             );
             if (weightCalcSan > 0) {
               usageOverTime[checkNestedIndex].data.push({
-                x: dateParse.toLocaleDateString(),
+                x: dateParse.getTime(),
                 y: weightCalcSan,
               });
             }
@@ -257,15 +257,19 @@ class HistoryClean {
       printCost.push(parseFloat(historyClean[h].printerCost));
       filamentCost.push(historyClean[h].spoolCost);
     }
+    function sumValuesGroupByDate(input) {
+      var dates = {};
+      input.forEach((dv) => (dates[dv.x] = (dates[dv.x] || 0) + dv.y));
+      return Object.keys(dates).map((date) => ({
+        x: new Date(parseInt(date)).toLocaleDateString(),
+        y: dates[date],
+      }));
+    }
+
     usageOverTime.forEach((usage) => {
-      let result = Object.values(
-        usage.data.reduce((a, { x, y }) => {
-          a[x] = a[x] || { x, y: 0 };
-          a[x].y = String(Number(a[x].y) + Number(y));
-          return a;
-        }, {})
-      );
-      usage.data = result;
+      let usageGroup = sumValuesGroupByDate(usage.data);
+      console.log(usageGroup);
+      usage.data = usageGroup;
     });
     const totalFilamentWeight = filamentWeight.reduce((a, b) => a + b, 0);
     const totalFilamentLength = filamentLength.reduce((a, b) => a + b, 0);
