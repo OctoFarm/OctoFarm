@@ -688,9 +688,9 @@ async function init() {
       title: {
         text: "Last Month",
       },
-      //tickAmount: 30,
-      // min: new Date(sortedDays[0]).toLocaleDateString(),
-      // max: new Date(sortedDays[29]).toLocaleDateString(),
+      tickAmount: 30,
+      min: new Date(sortedDays[0]).toTimeString(),
+      max: new Date(sortedDays[29]).toTimeString(),
     },
   };
 

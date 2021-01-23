@@ -235,7 +235,7 @@ class HistoryClean {
             );
             if (weightCalcSan > 0) {
               usageOverTime[checkNestedIndex].data.push({
-                x: dateParse.getTime(),
+                x: dateParse.toLocaleDateString(),
                 y: weightCalcSan,
               });
             }
@@ -258,12 +258,22 @@ class HistoryClean {
       filamentCost.push(historyClean[h].spoolCost);
     }
     function sumValuesGroupByDate(input) {
-      var dates = {};
-      input.forEach((dv) => (dates[dv.x] = (dates[dv.x] || 0) + dv.y));
-      return Object.keys(dates).map((date) => ({
-        x: new Date(parseInt(date)).toLocaleDateString(),
-        y: dates[date],
-      }));
+      var result = [];
+      input.reduce(function (res, value) {
+        if (!res[value.x]) {
+          res[value.x] = { x: value.x, y: 0 };
+          result.push(res[value.x]);
+        }
+        res[value.x].y += value.y;
+        return res;
+      }, {});
+      return result;
+      // var dates = {};
+      // input.forEach((dv) => (dates[dv.x] = (dates[dv.x] || 0) + dv.y));
+      // return Object.keys(dates).map((date) => ({
+      //   x: new Date(parseInt(date)).toLocaleDateString(),
+      //   y: dates[date],
+      // }));
     }
 
     usageOverTime.forEach((usage) => {
