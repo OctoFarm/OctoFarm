@@ -158,7 +158,6 @@ class HistoryClean {
     }
     let sortedDays = lastThirtyDays.sort();
     let firstDate = new Date(sortedDays[0]);
-    let lastDate = new Date(sortedDays[29]);
     function arrayCounts(arr) {
       const a = [];
       const b = [];
@@ -279,13 +278,17 @@ class HistoryClean {
       input.reduce(function (res, value) {
         if (!res[value.x]) {
           res[value.x] = { x: value.x, y: 0 };
-          let currentDate = new Date(value.originalX).getTime();
+          let currentDate = new Date(value.originalX);
           console.log("1st", firstDate.getTime());
           console.log("CUR", currentDate);
-          console.log("lasst", lastDate.getTime());
+          console.log("lasst", today);
+          console.log(
+            currentDate.getTime() > firstDate.getTime() &&
+              currentDate.getTime() < today
+          );
           if (
-            currentDate > firstDate.getTime() &&
-            currentDate < lastDate.getTime()
+            currentDate.getTime() >= firstDate.getTime() &&
+            currentDate.getTime() <= today
           ) {
             result.push(res[value.x]);
           }

@@ -640,7 +640,7 @@ async function init() {
       background: "#303030",
     },
     dataLabels: {
-      enabled: true,
+      enabled: false,
       background: {
         enabled: true,
         foreColor: "#000",
@@ -652,7 +652,7 @@ async function init() {
       },
       formatter: function (val, opts) {
         if (val !== null) {
-          return val.toFixed(2) + "g";
+          return val.toFixed(0) + "g";
         }
       },
     },
