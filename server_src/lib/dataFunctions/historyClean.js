@@ -204,20 +204,7 @@ class HistoryClean {
               spool[key].type,
               usageOverTime
             );
-            let weightCalc = 0;
-            if (
-              typeof usageOverTime[checkNestedIndex].data[0] !== "undefined"
-            ) {
-              weightCalc =
-                usageOverTime[checkNestedIndex].data[
-                  usageOverTime[checkNestedIndex].data.length - 1
-                ].y + historyClean[h].totalWeight;
-            } else {
-              weightCalc = historyClean[h].totalWeight;
-            }
-
             let dateSplit = historyClean[h].endDate.split(" ");
-
             let timeSplit = dateSplit[5].split(":");
             const months = [
               "Jan",
@@ -243,10 +230,15 @@ class HistoryClean {
               timeSplit[1],
               timeSplit[2]
             );
-            usageOverTime[checkNestedIndex].data.push({
-              x: dateParse,
-              y: weightCalc,
-            });
+            let weightCalcSan = parseFloat(
+              historyClean[h].totalWeight.toFixed(2)
+            );
+            if (weightCalcSan > 0) {
+              usageOverTime[checkNestedIndex].data.push({
+                x: dateParse,
+                y: weightCalcSan,
+              });
+            }
           } else {
             let usageKey = {
               name: spool[key].type,

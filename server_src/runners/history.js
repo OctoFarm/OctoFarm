@@ -701,6 +701,8 @@ class HistoryCollection {
           saveHistory.printHistory.snapshot = snapshot;
           saveHistory.markModified("printHistory");
           saveHistory.save();
+          printer.fileName = payload.display;
+          printer.filePath = payload.path;
           ScriptRunner.check(printer, "done", saveHistory._id);
           HistoryClean.start();
           setTimeout(async function () {
@@ -870,6 +872,8 @@ class HistoryCollection {
           saveHistory.printHistory.thumbnail = thumbnail;
           saveHistory.printHistory.snapshot = snapshot;
           saveHistory.markModified("printHistory");
+          printer.fileName = payload.display;
+          printer.filePath = payload.path;
           ScriptRunner.check(printer, "failed", saveHistory._id);
           await saveHistory.save();
 
