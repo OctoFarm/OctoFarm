@@ -617,20 +617,6 @@ async function init() {
   let usageOverTimeData = await OctoFarmclient.get("history/usageOverTime");
   usageOverTimeData = await usageOverTimeData.json();
 
-  let sortedDays = lastThirtyDays.sort();
-  let newDays = [];
-  sortedDays.forEach((date) => {
-    date = new Date(date);
-    date = date.toLocaleDateString();
-    newDays.push(date);
-  });
-  console.log(newDays);
-  console.log(new Date(sortedDays[0]).toDateString());
-  console.log(new Date(sortedDays[29]).toTimeString());
-
-  let firstDate = new Date(sortedDays[0]);
-  let lastDate = new Date(sortedDays[29]);
-
   const usageOverTimeOptions = {
     chart: {
       type: "bar",
@@ -655,12 +641,6 @@ async function init() {
     },
     dataLabels: {
       enabled: false,
-      dropShadow: {
-        enabled: true,
-        left: 2,
-        top: 2,
-        opacity: 0.5,
-      },
       background: {
         enabled: true,
         foreColor: "#000",
@@ -702,9 +682,7 @@ async function init() {
       title: {
         text: "Last Month",
       },
-      tickAmount: 30,
-      min: firstDate.toLocaleDateString(),
-      max: lastDate.toLocaleDateString(),
+      tickAmount: 10,
       labels: {
         formatter: function (value, timestamp) {
           console.log(timestamp);

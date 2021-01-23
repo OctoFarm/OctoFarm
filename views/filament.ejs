@@ -26,6 +26,9 @@
 
                 </div>
                 <div class="card-body text-center">
+                    <b>Profiles:</b> <span class="badge badge-info"><%= filamentTotals.profileCount %></span>
+                    <b>Spools:</b> <span class="badge badge-info"><%= filamentTotals.spoolCount %></span>
+                    <b>Active:</b> <span class="badge badge-warning"><%= filamentTotals.activeSpoolCount %></span>
                     <button title="Setup and edit your filament profiles."
                             type="button" class="btn btn-secondary m-2" data-toggle="modal" data-target="#profileManagerModal">
                         <i class="far fa-id-card"></i> Profile Manager
@@ -96,9 +99,7 @@
                             <p id="fsTotal" class="mb-1 d-inline"><%= filamentTotals.total.toFixed(0) %>g</p>
                         </div>
                         <div class="col-lg-1">
-                            <p><b>Profiles:</b> <span class="badge badge-info ml-2"><%= filamentTotals.profileCount %></span> </p>
-                            <p><b>Spools:</b> <span class="badge badge-info ml-2"><%= filamentTotals.spoolCount %></span>  </p>
-                            <p><b>Active:</b> <span class="badge badge-info ml-2"><%= filamentTotals.activeSpoolCount %></span>  </p>
+
                         </div>
                         <div class="col-lg-1">
                             <p><b>Weight:</b> <span class="badge badge-info ml-2"><%= filamentTotals.total.toFixed(0) %>g</span> </p>
@@ -639,7 +640,7 @@
                                 <td><span class="d-none price"><%=spool.price%></span><input class="form-control" type="number" step="any" placeholder="<%=spool.price%>"></td>
                                 <td><span class="d-none weight"><%=spool.weight%></span><input class="form-control" type="number" step="1" placeholder="<%=spool.weight%>"></td>
                                 <td class=" <%= displayNone %>"><span class="d-none used"><%=spool.used%></span><input class="form-control" type="number" step="1" placeholder="<%=spool.used%>"></td>
-                                <td class="grams <%= displayNone %>"><%=(spool.weight - spool.used).toFixed(0)%></span><%=(spool.weight - spool.used).toFixed(0)%></td>
+                                <td class="grams <%= displayNone %>"><%=(spool.used - spool.weight).toFixed(0)%><%=(spool.weight - spool.used).toFixed(0)%></td>
                                 <td class="percent <%= displayNone %>"><%=(100 - spool.used / spool.weight * 100).toFixed(0)%></td>
                                 <td><input class="form-control" type="number" step="any" placeholder="<%= spool.tempOffset %>"></td>
                                 <td><span class="d-none material" id="spoolsMaterialText-<%=spool._id%>"><%=(spool.weight - spool.used).toFixed(0)%></span>
