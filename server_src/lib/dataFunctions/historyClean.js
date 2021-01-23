@@ -279,13 +279,6 @@ class HistoryClean {
         if (!res[value.x]) {
           res[value.x] = { x: value.x, y: 0 };
           let currentDate = new Date(value.originalX);
-          console.log("1st", firstDate.getTime());
-          console.log("CUR", currentDate);
-          console.log("lasst", today);
-          console.log(
-            currentDate.getTime() > firstDate.getTime() &&
-              currentDate.getTime() < today
-          );
           if (
             currentDate.getTime() >= firstDate.getTime() &&
             currentDate.getTime() <= today
@@ -307,7 +300,6 @@ class HistoryClean {
 
     usageOverTime.forEach((usage) => {
       let usageGroup = sumValuesGroupByDate(usage.data);
-      console.log(usageGroup);
       usage.data = usageGroup;
     });
     const totalFilamentWeight = filamentWeight.reduce((a, b) => a + b, 0);
