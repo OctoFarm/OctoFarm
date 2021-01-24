@@ -144,20 +144,12 @@ class HistoryClean {
 
   static async getStatistics(historyClean) {
     let lastThirtyDays = [];
-    let today = new Date();
-    today = today.getTime();
-    for (let i = 0; i < 30; i++) {
-      let day = (i + 1) * 1000;
-      let previousDay = new Date(today - day * 60 * 60 * 24 * 2);
-      previousDay = await previousDay.getTime();
-      // previousDay = previousDay.split("/");
-      // lastThirtyDays.push(
-      //   `${previousDay[0]}/${previousDay[1]}/${previousDay[2]}`
-      // );
-      lastThirtyDays.push(previousDay);
-    }
-    let sortedDays = lastThirtyDays.sort();
-    let firstDate = new Date(sortedDays[0]);
+    let date = new Date();
+
+    let thirtyDaysAgo = date.getDate() - 30;
+    date.setDate(thirtyDaysAgo);
+    thirtyDaysAgo = date;
+
     function arrayCounts(arr) {
       const a = [];
       const b = [];
@@ -242,24 +234,24 @@ class HistoryClean {
               "Dec",
             ];
             let month = months.indexOf(dateSplit[1]);
-
             let dateParse = new Date(
               parseInt(dateSplit[3]),
-              month,
-              parseInt(dateSplit[2]),
-              timeSplit[0],
-              timeSplit[1],
-              timeSplit[2]
+              month + 1,
+              parseInt(dateSplit[2])
             );
             let weightCalcSan = parseFloat(
               historyClean[h].totalWeight.toFixed(2)
             );
+            let dateChecked = new Date(thirtyDaysAgo);
+            //Don't include 0 weights
             if (weightCalcSan > 0) {
-              usageOverTime[checkNestedIndex].data.push({
-                x: dateParse.toLocaleDateString(),
-                originalX: dateParse,
-                y: weightCalcSan,
-              });
+              //Check if more than 30 days ago...
+              if (dateParse > dateChecked) {
+                usageOverTime[checkNestedIndex].data.push({
+                  x: dateParse.toLocaleDateString(),
+                  y: weightCalcSan,
+                });
+              }
             }
           } else {
             let usageKey = {
@@ -290,13 +282,7 @@ class HistoryClean {
       input.reduce(function (res, value) {
         if (!res[value.x]) {
           res[value.x] = { x: value.x, y: 0 };
-          let currentDate = new Date(value.originalX);
-          if (
-            currentDate.getTime() >= firstDate.getTime() &&
-            currentDate.getTime() <= today
-          ) {
-            result.push(res[value.x]);
-          }
+          result.push(res[value.x]);
         }
         res[value.x].y += value.y;
         return res;
