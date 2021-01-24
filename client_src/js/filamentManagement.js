@@ -619,6 +619,7 @@ async function init() {
   let usageByDay = historyStatistics.history.totalByDay;
   let usageOverTime = historyStatistics.history.usageOverTime;
   console.log(usageOverTime);
+  console.log(usageByDay);
   const usageOverTimeOptions = {
     chart: {
       type: "bar",
@@ -724,18 +725,18 @@ async function init() {
       },
       background: "#303030",
     },
-    fill: {
-      type: "gradient",
-      gradient: {
-        shade: "dark",
-        gradientToColors: ["#FDD835"],
-        shadeIntensity: 1,
-        type: "horizontal",
-        opacityFrom: 1,
-        opacityTo: 1,
-        stops: [0, 100, 100, 100],
-      },
-    },
+    // fill: {
+    //   type: "gradient",
+    //   gradient: {
+    //     shade: "dark",
+    //     gradientToColors: ["#FDD835"],
+    //     shadeIntensity: 1,
+    //     type: "horizontal",
+    //     opacityFrom: 1,
+    //     opacityTo: 1,
+    //     stops: [0, 100, 100, 100],
+    //   },
+    // },
     markers: {
       size: 4,
       colors: ["#FFA41B"],

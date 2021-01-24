@@ -214,6 +214,24 @@ class HistoryClean {
           let checkNested = this.checkNested(spool[key].type, totalByDay);
 
           if (typeof checkNested !== "undefined") {
+            let checkNestedIndexHistoryRates = null;
+            if (historyClean[h].state.includes("success")) {
+              checkNestedIndexHistoryRates = this.checkNestedIndex(
+                "Success",
+                historyByDay
+              );
+            } else if (historyClean[h].state.includes("warning")) {
+              checkNestedIndexHistoryRates = this.checkNestedIndex(
+                "Success",
+                historyByDay
+              );
+            } else if (historyClean[h].state.includes("danger")) {
+              checkNestedIndexHistoryRates = this.checkNestedIndex(
+                "Success",
+                historyByDay
+              );
+            }
+
             let checkNestedIndexByDay = this.checkNestedIndex(
               spool[key].type,
               usageOverTime
@@ -270,7 +288,7 @@ class HistoryClean {
                   y: weightCalcSan,
                 });
                 usageOverTime[checkNestedIndex].data.push({
-                  x: dateParse,
+                  x: dateParse.toLocaleDateString(),
                   y: usageWeightCalc,
                 });
               }
