@@ -14,6 +14,33 @@ let initNewGraphs = async function () {
   let usageByDay = historyStatistics.history.totalByDay;
   let usageOverTime = historyStatistics.history.usageOverTime;
 
+  let yAxisSeries = [];
+  usageOverTime.forEach((usage, index) => {
+    let obj = null;
+    if (index === 0) {
+      obj = {
+        title: {
+          text: "Weight",
+        },
+        seriesName: usageOverTime[0].name,
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(2) + "g";
+            }
+          },
+        },
+      };
+    } else {
+      obj = {
+        show: false,
+        seriesName: usageOverTime[0].name,
+      };
+    }
+
+    yAxisSeries.push(obj);
+  });
+
   const usageOverTimeOptions = {
     chart: {
       type: "bar",
@@ -64,25 +91,9 @@ let initNewGraphs = async function () {
       text: "Loading...",
     },
     series: [],
-    yaxis: [
-      {
-        title: {
-          text: "Weight",
-        },
-        labels: {
-          formatter: function (val) {
-            if (val !== null) {
-              return val.toFixed(2) + "g";
-            }
-          },
-        },
-      },
-    ],
+    yaxis: yAxisSeries,
     xaxis: {
       type: "datetime",
-      title: {
-        text: "Last Month",
-      },
       tickAmount: 10,
       labels: {
         formatter: function (value, timestamp) {
@@ -110,7 +121,7 @@ let initNewGraphs = async function () {
       background: "#303030",
     },
     dataLabels: {
-      enabled: false,
+      enabled: true,
       background: {
         enabled: true,
         foreColor: "#000",
@@ -141,25 +152,9 @@ let initNewGraphs = async function () {
       text: "Loading...",
     },
     series: [],
-    yaxis: [
-      {
-        title: {
-          text: "Weight",
-        },
-        labels: {
-          formatter: function (val) {
-            if (val !== null) {
-              return val.toFixed(2) + "g";
-            }
-          },
-        },
-      },
-    ],
+    yaxis: yAxisSeries,
     xaxis: {
       type: "datetime",
-      title: {
-        text: "Last Month",
-      },
       tickAmount: 10,
       labels: {
         formatter: function (value, timestamp) {
@@ -174,7 +169,6 @@ let initNewGraphs = async function () {
       type: "line",
       width: "100%",
       height: "250px",
-      stacked: true,
       animations: {
         enabled: true,
       },
@@ -188,7 +182,7 @@ let initNewGraphs = async function () {
     },
     colors: ["#00bc8c", "#f39c12", "#e74c3c"],
     dataLabels: {
-      enabled: false,
+      enabled: true,
       background: {
         enabled: true,
         foreColor: "#000",
@@ -220,12 +214,21 @@ let initNewGraphs = async function () {
           text: "Count",
         },
       },
+      {
+        title: {
+          text: "Count",
+        },
+        show: false,
+      },
+      {
+        title: {
+          text: "Count",
+        },
+        show: false,
+      },
     ],
     xaxis: {
       type: "datetime",
-      title: {
-        text: "Last Month",
-      },
       tickAmount: 10,
       labels: {
         formatter: function (value, timestamp) {

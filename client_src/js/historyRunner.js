@@ -38,6 +38,7 @@ export default class History {
     let historyStatistics = await OctoFarmclient.get("history/statisticsData");
     historyStatistics = await historyStatistics.json();
     let historyGraphData = historyStatistics.history.historyByDay;
+
     const historyGraphOptions = {
       chart: {
         type: "line",
