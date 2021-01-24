@@ -35,6 +35,13 @@ let initNewGraphs = async function () {
       obj = {
         show: false,
         seriesName: usageOverTime[0].name,
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(2) + "g";
+            }
+          },
+        },
       };
     }
 
