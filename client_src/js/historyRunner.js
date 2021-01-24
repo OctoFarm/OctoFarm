@@ -3,6 +3,7 @@ import OctoFarmClient from "./lib/octofarm.js";
 import Calc from "./lib/functions/calc.js";
 import UI from "./lib/functions/ui.js";
 import { returnDropDown } from "./lib/modules/filamentGrab.js";
+import OctoFarmclient from "./lib/octofarm.js";
 
 // Setup history listeners
 document.getElementById("historyTable").addEventListener("click", (e) => {
@@ -33,6 +34,82 @@ export default class History {
     document.getElementById("loading").style.display = "none";
     document.getElementById("wrapper").classList.remove("d-none");
     document.getElementById("historyToolbar").classList.remove("d-none");
+
+    let historyStatistics = await OctoFarmclient.get("history/statisticsData");
+    historyStatistics = await historyStatistics.json();
+    let historyGraph = historyStatistics.history.historyByDay;
+    const usageOverFilamentTimeOptions = {
+      chart: {
+        type: "line",
+        width: "100%",
+        height: "250px",
+        stacked: true,
+        animations: {
+          enabled: true,
+        },
+        toolbar: {
+          show: false,
+        },
+        zoom: {
+          enabled: false,
+        },
+        background: "#303030",
+      },
+      colors: ["#00bc8c", "#f39c12", "#e74c3c"],
+      dataLabels: {
+        enabled: false,
+        background: {
+          enabled: true,
+          foreColor: "#000",
+          padding: 1,
+          borderRadius: 2,
+          borderWidth: 1,
+          borderColor: "#fff",
+          opacity: 0.9,
+        },
+      },
+      // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+      toolbar: {
+        show: false,
+      },
+      stroke: {
+        width: 7,
+        curve: "smooth",
+      },
+      theme: {
+        mode: "dark",
+      },
+      noData: {
+        text: "Loading...",
+      },
+      series: [],
+      yaxis: [
+        {
+          title: {
+            text: "Count",
+          },
+        },
+      ],
+      xaxis: {
+        type: "datetime",
+        title: {
+          text: "Last Month",
+        },
+        tickAmount: 10,
+        labels: {
+          formatter: function (value, timestamp) {
+            let dae = new Date(timestamp);
+            return dae.toLocaleDateString(); // The formatter function overrides format property
+          },
+        },
+      },
+    };
+    let usageOverFilamentTime = new ApexCharts(
+      document.querySelector("#printCompletionByDay"),
+      usageOverFilamentTimeOptions
+    );
+    usageOverFilamentTime.render();
+    usageOverFilamentTime.updateSeries(historyGraph);
   }
 
   static async edit(e) {

@@ -187,6 +187,16 @@ class HistoryClean {
     for (let h = 0; h < historyClean.length; h++) {
       if (historyClean[h].state.includes("success")) {
         completed.push(true);
+        printTimes.push(historyClean[h].printTime);
+
+        fileNames.push(historyClean[h].file.name);
+
+        printerNames.push(historyClean[h].printer);
+
+        filamentWeight.push(historyClean[h].totalWeight);
+        filamentLength.push(historyClean[h].totalLength);
+
+        printCost.push(parseFloat(historyClean[h].printerCost));
       } else if (historyClean[h].state.includes("warning")) {
         cancelled.push(true);
         arrayFailed.push(historyClean[h].printTime);
@@ -195,16 +205,6 @@ class HistoryClean {
         arrayFailed.push(historyClean[h].printTime);
       }
 
-      printTimes.push(historyClean[h].printTime);
-
-      fileNames.push(historyClean[h].file.name);
-
-      printerNames.push(historyClean[h].printer);
-
-      filamentWeight.push(historyClean[h].totalWeight);
-      filamentLength.push(historyClean[h].totalLength);
-
-      printCost.push(parseFloat(historyClean[h].printerCost));
       filamentCost.push(historyClean[h].spoolCost);
       historyClean[h].spools.forEach((spool) => {
         //console.log(spool);
@@ -222,12 +222,12 @@ class HistoryClean {
               );
             } else if (historyClean[h].state.includes("warning")) {
               checkNestedIndexHistoryRates = this.checkNestedIndex(
-                "Success",
+                "Cancelled",
                 historyByDay
               );
             } else if (historyClean[h].state.includes("danger")) {
               checkNestedIndexHistoryRates = this.checkNestedIndex(
-                "Success",
+                "Failed",
                 historyByDay
               );
             }
@@ -291,6 +291,12 @@ class HistoryClean {
                   x: dateParse.toLocaleDateString(),
                   y: usageWeightCalc,
                 });
+                // console.log(checkNestedIndexHistoryRates);
+                // console.log(historyByDay[checkNestedIndexHistoryRates].name);
+                historyByDay[checkNestedIndexHistoryRates].data.push({
+                  x: dateParse.toLocaleDateString(),
+                  y: 1,
+                });
               }
             }
           } else {
@@ -321,9 +327,11 @@ class HistoryClean {
             if (spool[key].type !== "") {
               usageOverTime.push(usageByKey);
             }
-            historyByDay.push(successKey);
-            historyByDay.push(cancellKey);
-            historyByDay.push(failedKey);
+            if (typeof historyByDay[0] === "undefined") {
+              historyByDay.push(successKey);
+              historyByDay.push(cancellKey);
+              historyByDay.push(failedKey);
+            }
           }
         }
       });
@@ -348,6 +356,9 @@ class HistoryClean {
     }
 
     totalByDay.forEach((usage) => {
+      usage.data = sumValuesGroupByDate(usage.data);
+    });
+    historyByDay.forEach((usage) => {
       usage.data = sumValuesGroupByDate(usage.data);
     });
     const totalFilamentWeight = filamentWeight.reduce((a, b) => a + b, 0);
@@ -416,6 +427,7 @@ class HistoryClean {
       currentFailed: arrayFailed.reduce((a, b) => a + b, 0),
       totalByDay: totalByDay,
       usageOverTime: usageOverTime,
+      historyByDay: historyByDay,
     };
     return statistics;
   }

@@ -13,8 +13,10 @@ All notable changes to this project will be documented in this file.
          - Filament Statistics UI tweaks.
          - No more content editable fields... firefox should now be able to edit values.
          - New spool overview table. Display only.
-         - New Usage over time bar graph. Stacks up and groups by day total filament usage by filament material. 
+         - New Usage By Day chart - will show stacked values totaled by day of filament usage.
+         - New Usage Over Time chart - will show incrementing total filemant usage by day. 
          - Moved Re-Sync Filament Manager button to show with others (manage profile/spools).
+     - New History Chart - Will show daily totals of success / cancelled and failed prints.
       
 ### Changed
      - Fixed #228: Quick connect button will only activate once you have setup preferred connection preferences. 
