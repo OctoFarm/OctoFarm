@@ -43,7 +43,6 @@ export default class History {
         type: "line",
         width: "100%",
         height: "250px",
-        stacked: true,
         animations: {
           enabled: true,
         },
@@ -57,7 +56,7 @@ export default class History {
       },
       colors: ["#00bc8c", "#f39c12", "#e74c3c"],
       dataLabels: {
-        enabled: false,
+        enabled: true,
         background: {
           enabled: true,
           foreColor: "#000",
@@ -89,12 +88,21 @@ export default class History {
             text: "Count",
           },
         },
+        {
+          title: {
+            text: "Count",
+          },
+          show: false,
+        },
+        {
+          title: {
+            text: "Count",
+          },
+          show: false,
+        },
       ],
       xaxis: {
         type: "datetime",
-        title: {
-          text: "Last Month",
-        },
         tickAmount: 10,
         labels: {
           formatter: function (value, timestamp) {
