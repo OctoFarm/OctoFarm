@@ -225,7 +225,7 @@ let initNewGraphs = async function () {
       show: false,
     },
     stroke: {
-      width: 2,
+      width: 4,
       curve: "smooth",
     },
     theme: {

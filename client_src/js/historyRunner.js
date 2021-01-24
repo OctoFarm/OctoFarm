@@ -73,7 +73,7 @@ export default class History {
         show: false,
       },
       stroke: {
-        width: 7,
+        width: 4,
         curve: "smooth",
       },
       theme: {
