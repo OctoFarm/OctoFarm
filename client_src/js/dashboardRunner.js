@@ -1,12 +1,12 @@
 import "@babel/polyfill";
 import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
-import UI from "./lib/functions/ui";
-import OctoFarmclient from "./lib/octofarm";
+import UI from "./lib/functions/ui.js";
+import OctoFarmclient from "./lib/octofarm.js";
 
 //On Load API call for new graphs
 let historyStatistics = await OctoFarmclient.get("history/statisticsData");
-historyStatistics = await historyStatistics.json();
+let historyStatistics = await historyStatistics.json();
 let historyGraphData = historyStatistics.history.historyByDay;
 let usageByDay = historyStatistics.history.totalByDay;
 let usageOverTime = historyStatistics.history.usageOverTime;
@@ -621,7 +621,7 @@ if (document.querySelector("#usageOverTime")) {
   systemFarmTemp.render();
   systemFarmTemp.updateSeries(usageByDay);
 }
-console.log(document.querySelector("#printCompletionByDay"));
+
 if (document.querySelector("#printCompletionByDay")) {
   let historyGraph = new ApexCharts(
     document.querySelector("#printCompletionByDay"),
@@ -669,6 +669,7 @@ function createWebWorker() {
       if (dashboardSettings.printerStates.printerState) {
         dashUpdate.printerStatus(dashboard.printerHeatMaps.heatStatus);
       }
+      console.log("HL");
       if (dashboardSettings.printerStates.printerProgress) {
         dashUpdate.printerProgress(dashboard.printerHeatMaps.heatProgress);
       }
