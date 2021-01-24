@@ -461,6 +461,12 @@ class ClientSettings {
             res.dashboard.historical.hourlyTotalTemperatures;
           document.getElementById("environmentalHistory").checked =
             res.dashboard.historical.environmentalHistory;
+          document.getElementById("filamentUsageCheck").checked =
+            res.dashboard.historical.filamentUsageByDay;
+          document.getElementById("printCompletionCheck").checked =
+            res.dashboard.historical.historyCompletionByDay;
+          document.getElementById("filamentUsageOverTimeCheck").checked =
+            res.dashboard.historical.filamentUsageOverTime;
         }
       });
   }
@@ -490,6 +496,21 @@ class ClientSettings {
           { x: 6, y: 10, width: 6, height: 9, id: "hourlyTemper" },
           { x: 0, y: 10, width: 6, height: 9, id: "weeklyUtil" },
           { x: 0, y: 19, width: 12, height: 8, id: "enviroData" },
+          {
+            x: 0,
+            y: 19,
+            width: 12,
+            height: 8,
+            id: "filamentUsageOverTime",
+          },
+          { x: 0, y: 19, width: 12, height: 8, id: "filamentUsageByDay" },
+          {
+            x: 0,
+            y: 19,
+            width: 12,
+            height: 8,
+            id: "historyCompletionByDay",
+          },
         ],
         savedLayout: localStorage.getItem("dashboardConfiguration"),
         farmActivity: {
@@ -519,6 +540,14 @@ class ClientSettings {
           ).checked,
           environmentalHistory: document.getElementById("environmentalHistory")
             .checked,
+          historyCompletionByDay: document.getElementById(
+            "printCompletionCheck"
+          ).checked,
+          filamentUsageByDay: document.getElementById("filamentUsageCheck")
+            .checked,
+          filamentUsageOverTime: document.getElementById(
+            "filamentUsageOverTimeCheck"
+          ).checked,
         },
       },
     };

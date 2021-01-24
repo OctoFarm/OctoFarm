@@ -277,7 +277,7 @@
                                                             <h5>Enable/Disable</h5><hr>
                                                             <p>Select which sections of your dasboard you'd like enabled or disabled. Disabling a dashboard panel will hide it from view.</p>
                                                         </div>
-                                                        <div class="col-lg-3">
+                                                        <div class="col-lg-4">
                                                             <h6 title="Current Operations block shows any currently active prints on the farm.">Farm Activity</h6><hr>
 
                                                             <form class="was-validated">
@@ -311,7 +311,7 @@
                                                                 </div>
                                                             </form>
                                                         </div>
-                                                        <div class="col-lg-3">
+                                                        <div class="col-lg-4">
                                                             <h6 title="Printer Status blocks will show the last state grabbed of each instance. (these may need re-sizing to see all printers)">Printer Status</h6><hr>
                                                             <form class="was-validated">
                                                                 <div class="custom-control custom-checkbox mb-3">
@@ -364,8 +364,18 @@
                                                                 </div>
                                                             </form>
                                                         </div>
-                                                        <div class="col-lg-3">
+                                                        <div class="col-lg-4">
                                                             <h6>Farm Utilisation</h6><hr>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="weeklyUtilisation" checked required>
+                                                                    <label class="custom-control-label" for="weeklyUtilisation">Weekly Utilisation</label><br>
+
+                                                                    <div class="valid-feedback">Shown</div>
+                                                                    <div class="invalid-feedback">Hidden</div>
+                                                                    <small><i class="fas fa-info-circle"></i> Heat map showing the total percentages of printer states on the farm. Shows previous 7 days.</small>
+                                                                </div>
+                                                            </form>
                                                             <form class="was-validated">
                                                                 <div class="custom-control custom-checkbox mb-3">
                                                                     <input type="checkbox" class="custom-control-input" id="currentUtilisation" checked required>
@@ -387,18 +397,8 @@
                                                                 </div>
                                                             </form>
                                                         </div>
-                                                        <div class="col-3">
+                                                        <div class="col-lg-4">
                                                             <h6>Historical</h6><hr>
-                                                            <form class="was-validated">
-                                                                <div class="custom-control custom-checkbox mb-3">
-                                                                    <input type="checkbox" class="custom-control-input" id="weeklyUtilisation" checked required>
-                                                                    <label class="custom-control-label" for="weeklyUtilisation">Weekly Utilisation</label><br>
-
-                                                                    <div class="valid-feedback">Shown</div>
-                                                                    <div class="invalid-feedback">Hidden</div>
-                                                                    <small><i class="fas fa-info-circle"></i> Heat map showing the total percentages of printer states on the farm. Shows previous 7 days.</small>
-                                                                </div>
-                                                            </form>
                                                             <form class="was-validated">
                                                                 <div class="custom-control custom-checkbox mb-3">
                                                                     <input type="checkbox" class="custom-control-input" id="hourlyTotalTemperatures" required>
@@ -409,6 +409,39 @@
 
                                                                 </div>
                                                             </form>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="printCompletionCheck" required>
+                                                                    <label class="custom-control-label" for="printCompletionCheck">Print Completion By Day</label><br>
+                                                                    <div class="valid-feedback">Shown</div>
+                                                                    <div class="invalid-feedback">Hidden</div>
+                                                                    <small><i class="fas fa-info-circle"></i> Graph showing counts of daily print completion totalled by day.</small>
+
+                                                                </div>
+                                                            </form>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="filamentUsageCheck" required>
+                                                                    <label class="custom-control-label" for="filamentUsageCheck">Filament Usage By Day</label><br>
+                                                                    <div class="valid-feedback">Shown</div>
+                                                                    <div class="invalid-feedback">Hidden</div>
+                                                                    <small><i class="fas fa-info-circle"></i> Graph showing filament usage totally by day.</small>
+
+                                                                </div>
+                                                            </form>
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="filamentUsageOverTimeCheck" required>
+                                                                    <label class="custom-control-label" for="filamentUsageOverTimeCheck">Filament Usage Over Time</label><br>
+                                                                    <div class="valid-feedback">Shown</div>
+                                                                    <div class="invalid-feedback">Hidden</div>
+                                                                    <small><i class="fas fa-info-circle"></i> Graph showing filament usage summed up by day over time.</small>
+
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                        <div class="col-lg-4">
+                                                            <h6>Environmental</h6><hr>
                                                             <form class="was-validated">
                                                                 <div class="custom-control custom-checkbox mb-3">
                                                                     <input type="checkbox" class="custom-control-input" id="environmentalHistory" required>
@@ -595,6 +628,36 @@
 
 
                                                                 <% } %>
+                                                                    <% if(dashboardSettings.historical.filamentUsageOverTime){ %>
+                                                                        <div data-gs-id="filamentUsageOverTime" id="filamentUsageOverTime" class="grid-stack-item"  data-gs-width="12" data-gs-height="6" data-gs-min-height="6" data-gs-max-height="10" data-gs-min-width="3">
+                                                                            <div class="grid-stack-item-content card text-white bg-secondary h-100">
+
+                                                                                <span class="tag sortableList "><i class="fas fa-info-circle"></i> Filament Usage Over Time</span>
+
+
+                                                                            </div>
+                                                                        </div>
+                                                                    <% } %>
+                                                                    <% if(dashboardSettings.historical.filamentUsageByDay){ %>
+                                                                        <div data-gs-id="filamentUsageByDay" id="filamentUsageByDay" class="grid-stack-item"  data-gs-width="12" data-gs-height="6" data-gs-min-height="6" data-gs-max-height="10" data-gs-min-width="3">
+                                                                            <div class="grid-stack-item-content card text-white bg-secondary h-100">
+
+                                                                                <span class="tag sortableList "><i class="fas fa-info-circle"></i> Filament Usage By Day</span>
+
+
+                                                                            </div>
+                                                                        </div>
+                                                                    <% } %>
+                                                                    <% if(dashboardSettings.historical.historyCompletionByDay){ %>
+                                                                        <div data-gs-id="historyCompletionByDay" id="historyCompletionByDay" class="grid-stack-item"  data-gs-width="12" data-gs-height="6" data-gs-min-height="6" data-gs-max-height="10" data-gs-min-width="3">
+                                                                            <div class="grid-stack-item-content card text-white bg-secondary h-100">
+
+                                                                                <span class="tag sortableList "><i class="fas fa-info-circle"></i> Print Completion By Day</span>
+
+
+                                                                            </div>
+                                                                        </div>
+                                                                    <% } %>
 
 
 

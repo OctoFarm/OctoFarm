@@ -37,8 +37,8 @@ export default class History {
 
     let historyStatistics = await OctoFarmclient.get("history/statisticsData");
     historyStatistics = await historyStatistics.json();
-    let historyGraph = historyStatistics.history.historyByDay;
-    const usageOverFilamentTimeOptions = {
+    let historyGraphData = historyStatistics.history.historyByDay;
+    const historyGraphOptions = {
       chart: {
         type: "line",
         width: "100%",
@@ -104,12 +104,12 @@ export default class History {
         },
       },
     };
-    let usageOverFilamentTime = new ApexCharts(
+    let historyGraph = new ApexCharts(
       document.querySelector("#printCompletionByDay"),
-      usageOverFilamentTimeOptions
+      historyGraphOptions
     );
-    usageOverFilamentTime.render();
-    usageOverFilamentTime.updateSeries(historyGraph);
+    historyGraph.render();
+    historyGraph.updateSeries(historyGraphData);
   }
 
   static async edit(e) {
