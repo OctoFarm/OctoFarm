@@ -213,16 +213,37 @@ let initNewGraphs = async function () {
         title: {
           text: "Count",
         },
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(0);
+            }
+          },
+        },
       },
       {
         title: {
           text: "Count",
+        },
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(0);
+            }
+          },
         },
         show: false,
       },
       {
         title: {
           text: "Count",
+        },
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(0);
+            }
+          },
         },
         show: false,
       },

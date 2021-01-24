@@ -343,7 +343,7 @@ class HistoryClean {
           res[value.x] = { x: value.x, y: 0 };
           result.push(res[value.x]);
         }
-        res[value.x].y += value.y;
+        res[value.x].y += parseFloat(value.y);
         return res;
       }, {});
       return result;
