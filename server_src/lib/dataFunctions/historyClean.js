@@ -182,6 +182,7 @@ class HistoryClean {
 
     const usageOverTime = [];
     const totalByDay = [];
+    const historyByDay = [];
 
     for (let h = 0; h < historyClean.length; h++) {
       if (historyClean[h].state.includes("success")) {
@@ -210,15 +211,32 @@ class HistoryClean {
         const keys = Object.keys(spool);
         for (const key of keys) {
           //check if type exists
-          let checkNested = this.checkNested(spool[key].type, usageOverTime);
+          let checkNested = this.checkNested(spool[key].type, totalByDay);
 
           if (typeof checkNested !== "undefined") {
-            let checkNestedIndex = this.checkNestedIndex(
+            let checkNestedIndexByDay = this.checkNestedIndex(
               spool[key].type,
               usageOverTime
             );
+            let usageWeightCalc = 0;
+
+            if (
+              typeof usageOverTime[checkNestedIndexByDay].data[0] !==
+              "undefined"
+            ) {
+              usageWeightCalc =
+                usageOverTime[checkNestedIndexByDay].data[
+                  usageOverTime[checkNestedIndexByDay].data.length - 1
+                ].y + historyClean[h].totalWeight;
+            } else {
+              usageWeightCalc = historyClean[h].totalWeight;
+            }
+
+            let checkNestedIndex = this.checkNestedIndex(
+              spool[key].type,
+              totalByDay
+            );
             let dateSplit = historyClean[h].endDate.split(" ");
-            let timeSplit = dateSplit[5].split(":");
             const months = [
               "Jan",
               "Feb",
@@ -247,14 +265,22 @@ class HistoryClean {
             if (weightCalcSan > 0) {
               //Check if more than 30 days ago...
               if (dateParse > dateChecked) {
-                usageOverTime[checkNestedIndex].data.push({
+                totalByDay[checkNestedIndex].data.push({
                   x: dateParse.toLocaleDateString(),
                   y: weightCalcSan,
+                });
+                usageOverTime[checkNestedIndex].data.push({
+                  x: dateParse,
+                  y: usageWeightCalc,
                 });
               }
             }
           } else {
             let usageKey = {
+              name: spool[key].type,
+              data: [],
+            };
+            let usageByKey = {
               name: spool[key].type,
               data: [],
             };
@@ -268,11 +294,18 @@ class HistoryClean {
             };
             let failedKey = {
               name: "Failed",
+              data: [],
             };
 
             if (spool[key].type !== "") {
-              usageOverTime.push(usageKey);
+              totalByDay.push(usageKey);
             }
+            if (spool[key].type !== "") {
+              usageOverTime.push(usageByKey);
+            }
+            historyByDay.push(successKey);
+            historyByDay.push(cancellKey);
+            historyByDay.push(failedKey);
           }
         }
       });
@@ -296,9 +329,8 @@ class HistoryClean {
       // }));
     }
 
-    usageOverTime.forEach((usage) => {
-      let usageGroup = sumValuesGroupByDate(usage.data);
-      usage.data = usageGroup;
+    totalByDay.forEach((usage) => {
+      usage.data = sumValuesGroupByDate(usage.data);
     });
     const totalFilamentWeight = filamentWeight.reduce((a, b) => a + b, 0);
     const totalFilamentLength = filamentLength.reduce((a, b) => a + b, 0);
@@ -364,6 +396,7 @@ class HistoryClean {
       totalPrinterCost: printCost.reduce((a, b) => a + b, 0).toFixed(2),
       highestPrinterCost: Math.max(...printCost).toFixed(2),
       currentFailed: arrayFailed.reduce((a, b) => a + b, 0),
+      totalByDay: totalByDay,
       usageOverTime: usageOverTime,
     };
     return statistics;
