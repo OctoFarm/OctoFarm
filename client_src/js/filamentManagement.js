@@ -658,7 +658,7 @@ async function init() {
       type: "bar",
       width: "100%",
       height: "250px",
-      stacked: false,
+      stacked: true,
       stroke: {
         show: true,
         curve: "smooth",
