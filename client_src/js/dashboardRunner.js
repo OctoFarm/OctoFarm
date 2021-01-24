@@ -87,7 +87,17 @@ let initNewGraphs = async function () {
         }
       },
     },
-    // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+    colors: [
+      "#ff0000",
+      "#ff8400",
+      "#ffd500",
+      "#88ff00",
+      "#00ff88",
+      "#00b7ff",
+      "#4400ff",
+      "#8000ff",
+      "#ff00f2",
+    ],
     toolbar: {
       show: false,
     },
@@ -144,12 +154,22 @@ let initNewGraphs = async function () {
         }
       },
     },
-    // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+    colors: [
+      "#ff0000",
+      "#ff8400",
+      "#ffd500",
+      "#88ff00",
+      "#00ff88",
+      "#00b7ff",
+      "#4400ff",
+      "#8000ff",
+      "#ff00f2",
+    ],
     toolbar: {
       show: false,
     },
     stroke: {
-      width: 7,
+      width: 2,
       curve: "smooth",
     },
     theme: {
@@ -205,7 +225,7 @@ let initNewGraphs = async function () {
       show: false,
     },
     stroke: {
-      width: 7,
+      width: 2,
       curve: "smooth",
     },
     theme: {
@@ -434,14 +454,6 @@ const optionsHeatChart = {
       fontWeight: "bold",
       colors: ["#000000"],
     },
-  },
-  stroke: {
-    show: true,
-    curve: "smooth",
-    lineCap: "butt",
-    colors: ["#303030"],
-    width: 2,
-    dashArray: 0,
   },
   plotOptions: {
     heatmap: {

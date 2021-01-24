@@ -658,7 +658,14 @@ async function init() {
       type: "bar",
       width: "100%",
       height: "250px",
-      stacked: true,
+      stacked: false,
+      stroke: {
+        show: true,
+        curve: "smooth",
+        lineCap: "butt",
+        width: 1,
+        dashArray: 0,
+      },
       animations: {
         enabled: true,
       },
@@ -692,7 +699,17 @@ async function init() {
         }
       },
     },
-    // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+    colors: [
+      "#ff0000",
+      "#ff8400",
+      "#ffd500",
+      "#88ff00",
+      "#00ff88",
+      "#00b7ff",
+      "#4400ff",
+      "#8000ff",
+      "#ff00f2",
+    ],
     toolbar: {
       show: false,
     },
@@ -755,12 +772,22 @@ async function init() {
         }
       },
     },
-    // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+    colors: [
+      "#ff0000",
+      "#ff8400",
+      "#ffd500",
+      "#88ff00",
+      "#00ff88",
+      "#00b7ff",
+      "#4400ff",
+      "#8000ff",
+      "#ff00f2",
+    ],
     toolbar: {
       show: false,
     },
     stroke: {
-      width: 7,
+      width: 2,
       curve: "smooth",
     },
     theme: {
