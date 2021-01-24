@@ -5,11 +5,264 @@ import UI from "./lib/functions/ui.js";
 import OctoFarmclient from "./lib/octofarm.js";
 
 //On Load API call for new graphs
-let historyStatistics = await OctoFarmclient.get("history/statisticsData");
-let historyStatistics = await historyStatistics.json();
-let historyGraphData = historyStatistics.history.historyByDay;
-let usageByDay = historyStatistics.history.totalByDay;
-let usageOverTime = historyStatistics.history.usageOverTime;
+
+let initNewGraphs = async function () {
+  let historyStatistics = await OctoFarmclient.get("history/statisticsData");
+  historyStatistics = await historyStatistics.json();
+
+  let historyGraphData = historyStatistics.history.historyByDay;
+  let usageByDay = historyStatistics.history.totalByDay;
+  let usageOverTime = historyStatistics.history.usageOverTime;
+
+  const usageOverTimeOptions = {
+    chart: {
+      type: "bar",
+      width: "100%",
+      height: "250px",
+      stacked: true,
+      animations: {
+        enabled: true,
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+        },
+      },
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false,
+      },
+      background: "#303030",
+    },
+    dataLabels: {
+      enabled: false,
+      background: {
+        enabled: true,
+        foreColor: "#000",
+        padding: 1,
+        borderRadius: 2,
+        borderWidth: 1,
+        borderColor: "#fff",
+        opacity: 0.9,
+      },
+      formatter: function (val, opts) {
+        if (val !== null) {
+          return val.toFixed(0) + "g";
+        }
+      },
+    },
+    // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+    toolbar: {
+      show: false,
+    },
+    theme: {
+      mode: "dark",
+    },
+    noData: {
+      text: "Loading...",
+    },
+    series: [],
+    yaxis: [
+      {
+        title: {
+          text: "Weight",
+        },
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(2) + "g";
+            }
+          },
+        },
+      },
+    ],
+    xaxis: {
+      type: "datetime",
+      title: {
+        text: "Last Month",
+      },
+      tickAmount: 10,
+      labels: {
+        formatter: function (value, timestamp) {
+          let dae = new Date(timestamp);
+          return dae.toLocaleDateString(); // The formatter function overrides format property
+        },
+      },
+    },
+  };
+  const usageOverFilamentTimeOptions = {
+    chart: {
+      type: "line",
+      width: "100%",
+      height: "250px",
+      stacked: true,
+      animations: {
+        enabled: true,
+      },
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false,
+      },
+      background: "#303030",
+    },
+    dataLabels: {
+      enabled: false,
+      background: {
+        enabled: true,
+        foreColor: "#000",
+        padding: 1,
+        borderRadius: 2,
+        borderWidth: 1,
+        borderColor: "#fff",
+        opacity: 0.9,
+      },
+      formatter: function (val, opts) {
+        if (val !== null) {
+          return val.toFixed(0) + "g";
+        }
+      },
+    },
+    // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+    toolbar: {
+      show: false,
+    },
+    stroke: {
+      width: 7,
+      curve: "smooth",
+    },
+    theme: {
+      mode: "dark",
+    },
+    noData: {
+      text: "Loading...",
+    },
+    series: [],
+    yaxis: [
+      {
+        title: {
+          text: "Weight",
+        },
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(2) + "g";
+            }
+          },
+        },
+      },
+    ],
+    xaxis: {
+      type: "datetime",
+      title: {
+        text: "Last Month",
+      },
+      tickAmount: 10,
+      labels: {
+        formatter: function (value, timestamp) {
+          let dae = new Date(timestamp);
+          return dae.toLocaleDateString(); // The formatter function overrides format property
+        },
+      },
+    },
+  };
+  const historyGraphOptions = {
+    chart: {
+      type: "line",
+      width: "100%",
+      height: "250px",
+      stacked: true,
+      animations: {
+        enabled: true,
+      },
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false,
+      },
+      background: "#303030",
+    },
+    colors: ["#00bc8c", "#f39c12", "#e74c3c"],
+    dataLabels: {
+      enabled: false,
+      background: {
+        enabled: true,
+        foreColor: "#000",
+        padding: 1,
+        borderRadius: 2,
+        borderWidth: 1,
+        borderColor: "#fff",
+        opacity: 0.9,
+      },
+    },
+    // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+    toolbar: {
+      show: false,
+    },
+    stroke: {
+      width: 7,
+      curve: "smooth",
+    },
+    theme: {
+      mode: "dark",
+    },
+    noData: {
+      text: "Loading...",
+    },
+    series: [],
+    yaxis: [
+      {
+        title: {
+          text: "Count",
+        },
+      },
+    ],
+    xaxis: {
+      type: "datetime",
+      title: {
+        text: "Last Month",
+      },
+      tickAmount: 10,
+      labels: {
+        formatter: function (value, timestamp) {
+          let dae = new Date(timestamp);
+          return dae.toLocaleDateString(); // The formatter function overrides format property
+        },
+      },
+    },
+  };
+
+  if (document.querySelector("#usageOverFilamentTime")) {
+    let usageOverFilamentTime = new ApexCharts(
+      document.querySelector("#usageOverFilamentTime"),
+      usageOverFilamentTimeOptions
+    );
+    usageOverFilamentTime.render();
+
+    usageOverFilamentTime.updateSeries(usageOverTime);
+  }
+  if (document.querySelector("#usageOverTime")) {
+    let systemFarmTemp = new ApexCharts(
+      document.querySelector("#usageOverTime"),
+      usageOverTimeOptions
+    );
+    systemFarmTemp.render();
+    systemFarmTemp.updateSeries(usageByDay);
+  }
+
+  if (document.querySelector("#printCompletionByDay")) {
+    let historyGraph = new ApexCharts(
+      document.querySelector("#printCompletionByDay"),
+      historyGraphOptions
+    );
+    historyGraph.render();
+    historyGraph.updateSeries(historyGraphData);
+  }
+};
 
 // Setup charts test
 const optionsFarmTemp = {
@@ -347,228 +600,6 @@ const optionsUtilisation = {
   },
 };
 
-const usageOverTimeOptions = {
-  chart: {
-    type: "bar",
-    width: "100%",
-    height: "250px",
-    stacked: true,
-    animations: {
-      enabled: true,
-    },
-    plotOptions: {
-      bar: {
-        horizontal: false,
-      },
-    },
-    toolbar: {
-      show: false,
-    },
-    zoom: {
-      enabled: false,
-    },
-    background: "#303030",
-  },
-  dataLabels: {
-    enabled: false,
-    background: {
-      enabled: true,
-      foreColor: "#000",
-      padding: 1,
-      borderRadius: 2,
-      borderWidth: 1,
-      borderColor: "#fff",
-      opacity: 0.9,
-    },
-    formatter: function (val, opts) {
-      if (val !== null) {
-        return val.toFixed(0) + "g";
-      }
-    },
-  },
-  // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
-  toolbar: {
-    show: false,
-  },
-  theme: {
-    mode: "dark",
-  },
-  noData: {
-    text: "Loading...",
-  },
-  series: [],
-  yaxis: [
-    {
-      title: {
-        text: "Weight",
-      },
-      labels: {
-        formatter: function (val) {
-          if (val !== null) {
-            return val.toFixed(2) + "g";
-          }
-        },
-      },
-    },
-  ],
-  xaxis: {
-    type: "datetime",
-    title: {
-      text: "Last Month",
-    },
-    tickAmount: 10,
-    labels: {
-      formatter: function (value, timestamp) {
-        let dae = new Date(timestamp);
-        return dae.toLocaleDateString(); // The formatter function overrides format property
-      },
-    },
-  },
-};
-const usageOverFilamentTimeOptions = {
-  chart: {
-    type: "line",
-    width: "100%",
-    height: "250px",
-    stacked: true,
-    animations: {
-      enabled: true,
-    },
-    toolbar: {
-      show: false,
-    },
-    zoom: {
-      enabled: false,
-    },
-    background: "#303030",
-  },
-  dataLabels: {
-    enabled: false,
-    background: {
-      enabled: true,
-      foreColor: "#000",
-      padding: 1,
-      borderRadius: 2,
-      borderWidth: 1,
-      borderColor: "#fff",
-      opacity: 0.9,
-    },
-    formatter: function (val, opts) {
-      if (val !== null) {
-        return val.toFixed(0) + "g";
-      }
-    },
-  },
-  // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
-  toolbar: {
-    show: false,
-  },
-  stroke: {
-    width: 7,
-    curve: "smooth",
-  },
-  theme: {
-    mode: "dark",
-  },
-  noData: {
-    text: "Loading...",
-  },
-  series: [],
-  yaxis: [
-    {
-      title: {
-        text: "Weight",
-      },
-      labels: {
-        formatter: function (val) {
-          if (val !== null) {
-            return val.toFixed(2) + "g";
-          }
-        },
-      },
-    },
-  ],
-  xaxis: {
-    type: "datetime",
-    title: {
-      text: "Last Month",
-    },
-    tickAmount: 10,
-    labels: {
-      formatter: function (value, timestamp) {
-        let dae = new Date(timestamp);
-        return dae.toLocaleDateString(); // The formatter function overrides format property
-      },
-    },
-  },
-};
-const historyGraphOptions = {
-  chart: {
-    type: "line",
-    width: "100%",
-    height: "250px",
-    stacked: true,
-    animations: {
-      enabled: true,
-    },
-    toolbar: {
-      show: false,
-    },
-    zoom: {
-      enabled: false,
-    },
-    background: "#303030",
-  },
-  colors: ["#00bc8c", "#f39c12", "#e74c3c"],
-  dataLabels: {
-    enabled: false,
-    background: {
-      enabled: true,
-      foreColor: "#000",
-      padding: 1,
-      borderRadius: 2,
-      borderWidth: 1,
-      borderColor: "#fff",
-      opacity: 0.9,
-    },
-  },
-  // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
-  toolbar: {
-    show: false,
-  },
-  stroke: {
-    width: 7,
-    curve: "smooth",
-  },
-  theme: {
-    mode: "dark",
-  },
-  noData: {
-    text: "Loading...",
-  },
-  series: [],
-  yaxis: [
-    {
-      title: {
-        text: "Count",
-      },
-    },
-  ],
-  xaxis: {
-    type: "datetime",
-    title: {
-      text: "Last Month",
-    },
-    tickAmount: 10,
-    labels: {
-      formatter: function (value, timestamp) {
-        let dae = new Date(timestamp);
-        return dae.toLocaleDateString(); // The formatter function overrides format property
-      },
-    },
-  },
-};
-
 let enviromentalData,
   systemFarmTemp,
   activityHeatChart,
@@ -602,33 +633,6 @@ if (document.querySelector("#currentUtilisation")) {
     optionsUtilisation
   );
   currentUtilisation.render();
-}
-
-if (document.querySelector("#usageOverFilamentTime")) {
-  let usageOverFilamentTime = new ApexCharts(
-    document.querySelector("#usageOverFilamentTime"),
-    usageOverFilamentTimeOptions
-  );
-  usageOverFilamentTime.render();
-
-  usageOverFilamentTime.updateSeries(usageOverTime);
-}
-if (document.querySelector("#usageOverTime")) {
-  let systemFarmTemp = new ApexCharts(
-    document.querySelector("#usageOverTime"),
-    usageOverTimeOptions
-  );
-  systemFarmTemp.render();
-  systemFarmTemp.updateSeries(usageByDay);
-}
-
-if (document.querySelector("#printCompletionByDay")) {
-  let historyGraph = new ApexCharts(
-    document.querySelector("#printCompletionByDay"),
-    historyGraphOptions
-  );
-  historyGraph.render();
-  historyGraph.updateSeries(historyGraphData);
 }
 
 let worker = null;
@@ -669,7 +673,7 @@ function createWebWorker() {
       if (dashboardSettings.printerStates.printerState) {
         dashUpdate.printerStatus(dashboard.printerHeatMaps.heatStatus);
       }
-      console.log("HL");
+
       if (dashboardSettings.printerStates.printerProgress) {
         dashUpdate.printerProgress(dashboard.printerHeatMaps.heatProgress);
       }
@@ -1223,6 +1227,7 @@ function loadGrid() {
 }
 
 loadGrid();
+initNewGraphs();
 
 grid.on("change", function (event, items) {
   saveGrid();
