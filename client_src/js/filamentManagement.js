@@ -607,14 +607,18 @@ async function init() {
   for (let i = 0; i < 30; i++) {
     let day = (i + 1) * 1000;
     let previousDay = new Date(today - day * 60 * 60 * 24 * 2);
-    previousDay = await previousDay.getTime();
+    previousDay = await previousDay;
     // previousDay = previousDay.split("/");
     // lastThirtyDays.push(
     //   `${previousDay[0]}/${previousDay[1]}/${previousDay[2]}`
     // );
     lastThirtyDays.push(previousDay);
   }
-  console.log(lastThirtyDays);
+  lastThirtyDays.sort();
+  let lastThirtyDaysText = [];
+  lastThirtyDays.forEach((day) => {
+    lastThirtyDaysText.push(day.toLocaleDateString());
+  });
   let historyStatistics = await OctoFarmclient.get("history/statisticsData");
   historyStatistics = await historyStatistics.json();
   let usageByDay = historyStatistics.history.totalByDay;
@@ -738,7 +742,7 @@ async function init() {
     ],
     xaxis: {
       type: "category",
-
+      categories: lastThirtyDaysText,
       tickAmount: 10,
       labels: {
         formatter: function (value, timestamp) {
