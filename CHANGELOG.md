@@ -1,6 +1,22 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+# [Unreleased]
+
+# [v1.1.9]
+
+### Added
+
+
+### Changed
+
+
+### Fixed
+   Fixed #234 - Adding Power commands would be overwritten on save. (also affected appearance name on OctoPrint)
+   Fixed - Graph for filament daily usage would not stack values by day 
+
+## Removed
+   
 
 # [Released]
 
