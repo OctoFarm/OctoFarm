@@ -124,7 +124,7 @@ let initNewGraphs = async function () {
         labels: {
           formatter: function (val) {
             if (val !== null) {
-              return val.toFixed(2) + "g";
+              return val.toFixed(0) + "g";
             }
           },
         },
@@ -132,11 +132,12 @@ let initNewGraphs = async function () {
     ],
     xaxis: {
       type: "category",
+
       tickAmount: 10,
       labels: {
         formatter: function (value, timestamp) {
           let dae = new Date(timestamp);
-          return dae.toLocaleDateString(); // The formatter function overrides format property
+          return value; // The formatter function overrides format property
         },
       },
     },
@@ -202,7 +203,7 @@ let initNewGraphs = async function () {
     series: [],
     yaxis: yAxisSeries,
     xaxis: {
-      type: "category",
+      type: "datetime",
       tickAmount: 10,
       labels: {
         formatter: function (value, timestamp) {
@@ -261,6 +262,7 @@ let initNewGraphs = async function () {
         title: {
           text: "Count",
         },
+        seriesName: "Success",
         labels: {
           formatter: function (val) {
             if (val !== null) {
@@ -273,6 +275,7 @@ let initNewGraphs = async function () {
         title: {
           text: "Count",
         },
+        seriesName: "Success",
         labels: {
           formatter: function (val) {
             if (val !== null) {
@@ -286,6 +289,7 @@ let initNewGraphs = async function () {
         title: {
           text: "Count",
         },
+        seriesName: "Success",
         labels: {
           formatter: function (val) {
             if (val !== null) {

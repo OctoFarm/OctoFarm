@@ -614,6 +614,7 @@ async function init() {
     // );
     lastThirtyDays.push(previousDay);
   }
+  console.log(lastThirtyDays);
   let historyStatistics = await OctoFarmclient.get("history/statisticsData");
   historyStatistics = await historyStatistics.json();
   let usageByDay = historyStatistics.history.totalByDay;
@@ -631,7 +632,7 @@ async function init() {
         labels: {
           formatter: function (val) {
             if (val !== null) {
-              return val.toFixed(2) + "g";
+              return val.toFixed(0) + "g";
             }
           },
         },
@@ -643,7 +644,7 @@ async function init() {
         labels: {
           formatter: function (val) {
             if (val !== null) {
-              return val.toFixed(2) + "g";
+              return val.toFixed(0) + "g";
             }
           },
         },
@@ -729,7 +730,7 @@ async function init() {
         labels: {
           formatter: function (val) {
             if (val !== null) {
-              return val.toFixed(2) + "g";
+              return val.toFixed(0) + "g";
             }
           },
         },
@@ -737,11 +738,12 @@ async function init() {
     ],
     xaxis: {
       type: "category",
+
       tickAmount: 10,
       labels: {
         formatter: function (value, timestamp) {
           let dae = new Date(timestamp);
-          return dae.toLocaleDateString(); // The formatter function overrides format property
+          return value; // The formatter function overrides format property
         },
       },
     },

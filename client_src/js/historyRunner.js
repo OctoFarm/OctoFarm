@@ -88,6 +88,7 @@ export default class History {
           title: {
             text: "Count",
           },
+          seriesName: "Success",
           labels: {
             formatter: function (val) {
               if (val !== null) {
@@ -100,6 +101,7 @@ export default class History {
           title: {
             text: "Count",
           },
+          seriesName: "Success",
           labels: {
             formatter: function (val) {
               if (val !== null) {
@@ -113,6 +115,7 @@ export default class History {
           title: {
             text: "Count",
           },
+          seriesName: "Success",
           labels: {
             formatter: function (val) {
               if (val !== null) {
