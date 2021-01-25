@@ -3024,17 +3024,26 @@ class Runner {
 
     printer.markModified("powerSettings");
 
-    if (settings.systemCommands.serverRestartCommand !== "") {
+    if (settings.systemCommands.serverRestart !== "") {
       farmPrinters[index].settingsServer.commands.serverRestartCommand =
-        settings.systemCommands.serverRestartCommand;
+        settings.systemCommands.serverRestart;
+    } else {
+      settings.systemCommands.serverRestart =
+        farmPrinters[index].settingsServer.commands.serverRestartCommand;
     }
-    if (settings.systemCommands.systemRestartCommand !== "") {
+    if (settings.systemCommands.systemRestart !== "") {
       farmPrinters[index].settingsServer.commands.systemRestartCommand =
-        settings.systemCommands.systemRestartCommand;
+        settings.systemCommands.systemRestart;
+    } else {
+      settings.systemCommands.systemRestart =
+        farmPrinters[index].settingsServer.commands.systemRestartCommand;
     }
-    if (settings.systemCommands.systemShutdownCommand !== "") {
+    if (settings.systemCommands.systemShutdown !== "") {
       farmPrinters[index].settingsServer.commands.systemShutdownCommand =
-        settings.systemCommands.systemShutdownCommand;
+        settings.systemCommands.systemShutdown;
+    } else {
+      settings.systemCommands.systemShutdown =
+        farmPrinters[index].settingsServer.commands.systemShutdownCommand;
     }
 
     printer.save();
@@ -3051,7 +3060,7 @@ class Runner {
       }
       const opts = {
         settingsAppearance: {
-          name: settings.printer.printerName,
+          name: farmPrinters[index].settingsAppearance.name,
         },
         scripts: {
           gcode: updateOctoPrintGcode,
@@ -3081,7 +3090,7 @@ class Runner {
           .value(); // get value
       };
 
-      let cleanProfile = removeObjectsWithNull(settings.profile);
+      let cleanProfile = removeObjectsWithNull(opts);
 
       profile = await fetch(
         `${farmPrinters[index].printerURL}/api/printerprofiles/${settings.profileID}`,
