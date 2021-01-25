@@ -54,6 +54,13 @@ let initNewGraphs = async function () {
       width: "100%",
       height: "250px",
       stacked: true,
+      stroke: {
+        show: true,
+        curve: "smooth",
+        lineCap: "butt",
+        width: 1,
+        dashArray: 0,
+      },
       animations: {
         enabled: true,
       },
@@ -108,9 +115,23 @@ let initNewGraphs = async function () {
       text: "Loading...",
     },
     series: [],
-    yaxis: yAxisSeries,
+    yaxis: [
+      {
+        title: {
+          text: "Weight",
+        },
+        seriesName: usageOverTime[0].name,
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(2) + "g";
+            }
+          },
+        },
+      },
+    ],
     xaxis: {
-      type: "datetime",
+      type: "category",
       tickAmount: 10,
       labels: {
         formatter: function (value, timestamp) {
@@ -181,7 +202,7 @@ let initNewGraphs = async function () {
     series: [],
     yaxis: yAxisSeries,
     xaxis: {
-      type: "datetime",
+      type: "category",
       tickAmount: 10,
       labels: {
         formatter: function (value, timestamp) {

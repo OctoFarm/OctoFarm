@@ -720,9 +720,23 @@ async function init() {
       text: "Loading...",
     },
     series: [],
-    yaxis: yAxisSeries,
+    yaxis: [
+      {
+        title: {
+          text: "Weight",
+        },
+        seriesName: usageOverTime[0].name,
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(2) + "g";
+            }
+          },
+        },
+      },
+    ],
     xaxis: {
-      type: "datetime",
+      type: "category",
       tickAmount: 10,
       labels: {
         formatter: function (value, timestamp) {
