@@ -3019,7 +3019,87 @@ class Runner {
     for (const key in differences) {
       if (differences[key] !== null && differences[key] !== "") {
         farmPrinters[index].costSettings[key] = differences[key];
+        printer.costSettings[key] = differences[key];
       }
+    }
+    console.log(settings.powerCommands);
+    if (
+      settings.powerCommands.powerOnCommand !== "" &&
+      settings.powerCommands.powerOnCommand !==
+        farmPrinters[index].powerSettings.powerOnCommand
+    ) {
+      farmPrinters[index].powerSettings.powerOnCommand =
+        settings.powerCommands.powerOnCommand;
+      printer.powerSettings.powerOnCommand =
+        settings.powerCommands.powerOnCommand;
+    }
+    if (
+      settings.powerCommands.powerOnURL !== "" &&
+      settings.powerCommands.powerOnURL !==
+        farmPrinters[index].powerSettings.powerOnURL
+    ) {
+      farmPrinters[index].powerSettings.powerOnURL =
+        settings.powerCommands.powerOnURL;
+      printer.powerSettings.powerOnURL = settings.powerCommands.powerOnURL;
+    }
+    if (
+      settings.powerCommands.powerOffCommand !== "" &&
+      settings.powerCommands.powerOffCommand !==
+        farmPrinters[index].powerSettings.powerOffCommand
+    ) {
+      farmPrinters[index].powerSettings.powerOffCommand =
+        settings.powerCommands.powerOffCommand;
+      printer.powerSettings.powerOffCommand =
+        settings.powerCommands.powerOffCommand;
+    }
+    if (
+      settings.powerCommands.powerOffURL !== "" &&
+      settings.powerCommands.powerOffURL !==
+        farmPrinters[index].powerSettings.powerOffURL
+    ) {
+      printer.powerSettings.powerOffURL = settings.powerCommands.powerOffURL;
+      farmPrinters[index].powerSettings.powerOffURL =
+        settings.powerCommands.powerOffURL;
+    }
+    if (
+      settings.powerCommands.powerToggleCommand !== "" &&
+      settings.powerCommands.powerToggleCommand !==
+        farmPrinters[index].powerSettings.powerToggleCommand
+    ) {
+      printer.powerSettings.powerToggleCommand =
+        settings.powerCommands.powerToggleCommand;
+      farmPrinters[index].powerSettings.powerToggleCommand =
+        settings.powerCommands.powerToggleCommand;
+    }
+    if (
+      settings.powerCommands.powerToggleURL !== "" &&
+      settings.powerCommands.powerToggleURL !==
+        farmPrinters[index].powerSettings.powerToggleURL
+    ) {
+      printer.powerSettings.powerToggleURL =
+        settings.powerCommands.powerToggleURL;
+      farmPrinters[index].powerSettings.powerToggleURL =
+        settings.powerCommands.powerToggleURL;
+    }
+    if (
+      settings.powerCommands.powerStatusCommand !== "" &&
+      settings.powerCommands.powerStatusCommand !==
+        farmPrinters[index].powerSettings.powerStatusCommand
+    ) {
+      farmPrinters[index].powerSettings.powerStatusCommand =
+        settings.powerCommands.powerStatusCommand;
+      printer.powerSettings.powerStatusCommand =
+        settings.powerCommands.powerStatusCommand;
+    }
+    if (
+      settings.powerCommands.powerStatusURL !== "" &&
+      settings.powerCommands.powerStatusURL !==
+        farmPrinters[index].powerSettings.powerStatusURL
+    ) {
+      farmPrinters[index].powerSettings.powerStatusURL =
+        settings.powerCommands.powerStatusURL;
+      printer.powerSettings.powerStatusURL =
+        settings.powerCommands.powerStatusURL;
     }
 
     printer.markModified("powerSettings");
