@@ -2649,7 +2649,7 @@ class Runner {
               farmPrinters[index].camURL = res.webcam.streamUrl;
             } else {
               farmPrinters[index].camURL =
-                farmPrinters[index].printerURL + ":8080" + res.webcam.streamUrl;
+                farmPrinters[index].printerURL + res.webcam.streamUrl;
             }
             const printer = await Printers.findById(id);
             printer.camURL = farmPrinters[index].camURL;
