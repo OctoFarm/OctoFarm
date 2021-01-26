@@ -614,10 +614,11 @@ async function init() {
     // );
     lastThirtyDays.push(previousDay);
   }
+
   lastThirtyDays.sort();
   let lastThirtyDaysText = [];
   lastThirtyDays.forEach((day) => {
-    lastThirtyDaysText.push(day.toLocaleDateString());
+    lastThirtyDaysText.push(day.getTime());
   });
   let historyStatistics = await OctoFarmclient.get("history/statisticsData");
   historyStatistics = await historyStatistics.json();
@@ -743,11 +744,12 @@ async function init() {
     xaxis: {
       type: "category",
       categories: lastThirtyDaysText,
-      tickAmount: 10,
+      tickAmount: 15,
       labels: {
         formatter: function (value, timestamp) {
-          let dae = new Date(timestamp);
-          return value; // The formatter function overrides format property
+          let dae = new Date(value).toLocaleDateString();
+
+          return dae; // The formatter function overrides format property
         },
       },
     },
@@ -819,12 +821,14 @@ async function init() {
     series: [],
     yaxis: yAxisSeries,
     xaxis: {
-      type: "datetime",
-      tickAmount: 10,
+      type: "category",
+      categories: lastThirtyDaysText,
+      tickAmount: 15,
       labels: {
         formatter: function (value, timestamp) {
-          let dae = new Date(timestamp);
-          return dae.toLocaleDateString(); // The formatter function overrides format property
+          let dae = new Date(value).toLocaleDateString();
+
+          return dae; // The formatter function overrides format property
         },
       },
     },
