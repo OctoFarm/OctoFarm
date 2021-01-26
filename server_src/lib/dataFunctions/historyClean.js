@@ -376,11 +376,11 @@ class HistoryClean {
       usageOverTime.forEach((usage) => {
         usage.data = sumValuesGroupByDate(usage.data);
       });
-      console.log("BEFORE", usageOverTime[0].data);
+
       usageOverTime.forEach((usage) => {
         usage.data = convertIncremental(usage.data);
       });
-      console.log("AFTER", usageOverTime[0].data);
+
       historyByDay.forEach((usage) => {
         usage.data = sumValuesGroupByDate(usage.data);
       });

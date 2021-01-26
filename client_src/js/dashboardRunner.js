@@ -7,6 +7,28 @@ import OctoFarmclient from "./lib/octofarm.js";
 //On Load API call for new graphs
 
 let initNewGraphs = async function () {
+  //Load Graph
+  let today = new Date();
+  today = new Date(today);
+
+  let lastThirtyDays = [];
+  for (let i = 0; i < 30; i++) {
+    let day = (i + 1) * 1000;
+    let previousDay = new Date(today - day * 60 * 60 * 24 * 2);
+    previousDay = await previousDay;
+    // previousDay = previousDay.split("/");
+    // lastThirtyDays.push(
+    //   `${previousDay[0]}/${previousDay[1]}/${previousDay[2]}`
+    // );
+    lastThirtyDays.push(previousDay);
+  }
+
+  lastThirtyDays.sort();
+  let lastThirtyDaysText = [];
+  lastThirtyDays.forEach((day) => {
+    lastThirtyDaysText.push(day.getTime());
+  });
+
   let historyStatistics = await OctoFarmclient.get("history/statisticsData");
   historyStatistics = await historyStatistics.json();
 
@@ -132,12 +154,13 @@ let initNewGraphs = async function () {
     ],
     xaxis: {
       type: "category",
-
-      tickAmount: 10,
+      categories: lastThirtyDaysText,
+      tickAmount: 15,
       labels: {
         formatter: function (value, timestamp) {
-          let dae = new Date(timestamp);
-          return value; // The formatter function overrides format property
+          let dae = new Date(value).toLocaleDateString();
+
+          return dae; // The formatter function overrides format property
         },
       },
     },
@@ -203,12 +226,14 @@ let initNewGraphs = async function () {
     series: [],
     yaxis: yAxisSeries,
     xaxis: {
-      type: "datetime",
-      tickAmount: 10,
+      type: "category",
+      categories: lastThirtyDaysText,
+      tickAmount: 15,
       labels: {
         formatter: function (value, timestamp) {
-          let dae = new Date(timestamp);
-          return dae.toLocaleDateString(); // The formatter function overrides format property
+          let dae = new Date(value).toLocaleDateString();
+
+          return dae; // The formatter function overrides format property
         },
       },
     },
