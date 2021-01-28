@@ -215,7 +215,7 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
   const sortedIndex = await Runner.sortedIndex();
   const clientSettings = await SettingsClean.returnClientSettings();
   const serverSettings = await SettingsClean.returnSystemSettings();
-
+  const dashStatistics = await PrinterClean.returnDashboardStatistics();
   const currentSort = await getSorting();
   const currentFilter = await getFilter();
 
@@ -245,6 +245,7 @@ router.get("/mon/panel", ensureAuthenticated, async (req, res) => {
     clientSettings,
     printGroups,
     currentChanges: { currentSort, currentFilter },
+    dashboardStatistics: dashStatistics,
   });
 });
 // Camera view  Page
@@ -253,7 +254,7 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
   const sortedIndex = await Runner.sortedIndex();
   const clientSettings = await SettingsClean.returnClientSettings();
   const serverSettings = await SettingsClean.returnSystemSettings();
-
+  const dashStatistics = await PrinterClean.returnDashboardStatistics();
   const currentSort = await getSorting();
   const currentFilter = await getFilter();
 
@@ -283,6 +284,7 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
     clientSettings,
     printGroups,
     currentChanges: { currentSort, currentFilter },
+    dashboardStatistics: dashStatistics,
   });
 });
 // List view  Page
@@ -291,7 +293,7 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
   const sortedIndex = await Runner.sortedIndex();
   const clientSettings = await SettingsClean.returnClientSettings();
   const serverSettings = await SettingsClean.returnSystemSettings();
-
+  const dashStatistics = await PrinterClean.returnDashboardStatistics();
   const currentSort = await getSorting();
   const currentFilter = await getFilter();
 
@@ -321,6 +323,7 @@ router.get("/mon/list", ensureAuthenticated, async (req, res) => {
     clientSettings,
     printGroups,
     currentChanges: { currentSort, currentFilter },
+    dashboardStatistics: dashStatistics,
   });
 });
 router.get("/mon/currentOp", ensureAuthenticated, async (req, res) => {

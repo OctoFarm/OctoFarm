@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 # [v1.1.9]
 
 ### Added
-
+     - Last values from environmental data are displayed in the navigation bar when available. This will update every 5 seconds.
 
 ### Changed
 
