@@ -90,13 +90,13 @@
                     <% if(typeof dashboardStatistics !== "undefined"){%>
                         <% console.log(dashboardStatistics) %>
                         <% if(typeof dashboardStatistics.currentTemperature !== "undefined"  && dashboardStatistics.currentTemperature !== null){%>
-                            <i class="fas fa-temperature-high"></i> <%= dashboardStatistics.currentTemperature %>
+                            <i class="fas fa-temperature-high"></i> <%= dashboardStatistics.currentTemperature %>°C
                         <% }%>
                         <% if(typeof dashboardStatistics.currentHumidity !== "undefined" && dashboardStatistics.currentHumidity !== null){%>
-                            | <i class="fas fa-tint"></i> <%= dashboardStatistics.currentHumidity %>
+                            | <i class="fas fa-tint"></i> <%= dashboardStatistics.currentHumidity %>%
                         <% }%>
                         <% if(typeof dashboardStatistics.currentPressure !== "undefined"  && dashboardStatistics.currentPressure !== null){%>
-                            | <i class="fas fa-lungs"></i> <%= dashboardStatistics.currentPressure %>
+                            | <i class="fas fa-percent"></i> <%= dashboardStatistics.currentPressure %>hPa
                         <% }%>
                         <% if(typeof dashboardStatistics.currentIAQ !== "undefined"  && dashboardStatistics.currentIAQ !== null){%>
                             | <i class="fas fa-tint"></i> <%= dashboardStatistics.currentIAQ %>
