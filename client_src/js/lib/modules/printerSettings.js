@@ -966,7 +966,7 @@ export default class PrinterSettings {
               ),
             },
           };
-
+          console.log(currentPrinter);
           if (currentPrinter.printerState.colour.category !== "Offline") {
             let printerName = document.getElementById("psProfileName").value;
             let printerModel = document.getElementById("psPrinterModel").value;
@@ -1087,7 +1087,6 @@ export default class PrinterSettings {
                 3000,
                 "clicked"
               );
-            } else if (update.status.profile === 900) {
             } else {
               UI.createAlert(
                 "error",
@@ -1103,7 +1102,6 @@ export default class PrinterSettings {
                 3000,
                 "clicked"
               );
-            } else if (update.status.settings === 900) {
             } else {
               UI.createAlert(
                 "error",
