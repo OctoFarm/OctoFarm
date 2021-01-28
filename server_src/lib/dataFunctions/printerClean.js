@@ -43,6 +43,10 @@ const dashboardStatistics = {
   printerHeatMaps: {},
   utilisationGraph: {},
   temperatureGraph: {},
+  currentIAQ: null,
+  currentTemperature: null,
+  currentPressure: null,
+  currentHumidity: null,
 };
 let printersInformation = [];
 

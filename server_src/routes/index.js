@@ -124,6 +124,7 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
     user = req.user.name;
     group = req.user.group;
   }
+
   res.render("dashboard", {
     name: user,
     userGroup: group,
