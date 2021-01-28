@@ -241,15 +241,22 @@ function addEventListeners(printer) {
 function checkQuickConnectState(printer) {
   document.getElementById("printerQuickConnect-" + printer._id).disabled =
     printer.printerState.colour.category === "Offline";
-  if (
-    printer.connectionOptions.portPreference === null ||
-    printer.connectionOptions.baudratePreference === null ||
-    printer.connectionOptions.printerProfilePreference === null
-  ) {
+  if (typeof printer.connectionOptions !== "undefined") {
+    if (
+      printer.connectionOptions.portPreference === null ||
+      printer.connectionOptions.baudratePreference === null ||
+      printer.connectionOptions.printerProfilePreference === null
+    ) {
+      document.getElementById(
+        "printerQuickConnect-" + printer._id
+      ).disabled = true;
+    }
+  } else {
     document.getElementById(
       "printerQuickConnect-" + printer._id
     ).disabled = true;
   }
+
   if (
     (printer.printerState.colour.category !== "Offline" &&
       printer.printerState.colour.category === "Disconnected") ||
