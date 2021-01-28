@@ -1092,10 +1092,9 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: enviromentalData[i].temperature.toFixed(2),
             });
-            dashboardStatistics.currentTemperature =
-              currentEnviromentalData[0].data[
-                currentEnviromentalData[0].data.length
-              ];
+            dashboardStatistics.currentTemperature = enviromentalData[
+              i
+            ].temperature.toFixed(2);
           } else {
             currentEnviromentalData[0].data.push({
               x: enviromentalData[i].date,
@@ -1110,15 +1109,12 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: enviromentalData[i].humidity.toFixed(0),
             });
+            dashboardStatistics.currentHumidity = enviromentalData[i].humidity;
           } else {
             currentEnviromentalData[1].data.push({
               x: enviromentalData[i].date,
               y: null,
             });
-            dashboardStatistics.currentHumidity =
-              currentEnviromentalData[1].data[
-                currentEnviromentalData[1].data.length
-              ];
           }
           if (
             typeof enviromentalData[i].pressure !== "undefined" &&
@@ -1128,10 +1124,9 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: enviromentalData[i].pressure.toFixed(0),
             });
-            dashboardStatistics.currentPressure =
-              currentEnviromentalData[2].data[
-                currentEnviromentalData[2].data.length
-              ];
+            dashboardStatistics.currentPressure = enviromentalData[
+              i
+            ].pressure.toFixed(0);
           } else {
             currentEnviromentalData[2].data.push({
               x: enviromentalData[i].date,
@@ -1146,10 +1141,7 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: enviromentalData[i].iaq.toFixed(0),
             });
-            dashboardStatistics.currentIAQ =
-              currentEnviromentalData[3].data[
-                currentEnviromentalData[3].data.length
-              ];
+            dashboardStatistics.currentIAQ = enviromentalData[i].iaq.toFixed(0);
           } else {
             currentEnviromentalData[3].data.push({
               x: enviromentalData[i].date,
