@@ -1088,6 +1088,10 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: enviromentalData[i].temperature.toFixed(2),
             });
+            dashboardStatistics.currentTemperature =
+              currentEnviromentalData[0].data[
+                currentEnviromentalData[0].data.length
+              ];
           } else {
             currentEnviromentalData[0].data.push({
               x: enviromentalData[i].date,
@@ -1107,6 +1111,10 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: null,
             });
+            dashboardStatistics.currentHumidity =
+              currentEnviromentalData[1].data[
+                currentEnviromentalData[1].data.length
+              ];
           }
           if (
             typeof enviromentalData[i].pressure !== "undefined" &&
@@ -1116,6 +1124,10 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: enviromentalData[i].pressure.toFixed(0),
             });
+            dashboardStatistics.currentPressure =
+              currentEnviromentalData[2].data[
+                currentEnviromentalData[2].data.length
+              ];
           } else {
             currentEnviromentalData[2].data.push({
               x: enviromentalData[i].date,
@@ -1130,6 +1142,10 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: enviromentalData[i].iaq.toFixed(0),
             });
+            dashboardStatistics.currentIAQ =
+              currentEnviromentalData[3].data[
+                currentEnviromentalData[3].data.length
+              ];
           } else {
             currentEnviromentalData[3].data.push({
               x: enviromentalData[i].date,
@@ -1138,7 +1154,6 @@ class PrinterClean {
           }
         }
         dashboardStatistics.enviromentalData = currentEnviromentalData;
-        //dashboardStatistics.currentIAQ = currentIAQ;
       });
   }
 

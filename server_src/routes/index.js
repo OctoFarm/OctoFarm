@@ -71,6 +71,7 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
   const printers = await Runner.returnFarmPrinters();
   const clientSettings = await SettingsClean.returnClientSettings();
   const serverSettings = await SettingsClean.returnSystemSettings();
+  const dashStatistics = await PrinterClean.returnDashboardStatistics();
   let dashboardSettings = null;
   if (typeof clientSettings.dashboard === "undefined") {
     dashboardSettings = {
@@ -131,6 +132,7 @@ router.get("/dashboard", ensureAuthenticated, async (req, res) => {
     page: "Dashboard",
     helpers: prettyHelpers,
     dashboardSettings: dashboardSettings,
+    dashboardStatistics: dashStatistics,
   });
 });
 router.get("/printers", ensureAuthenticated, async (req, res) => {

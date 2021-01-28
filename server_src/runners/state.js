@@ -286,7 +286,7 @@ WebSocketClient.prototype.open = function (url, index) {
     this.instance.on("error", (e) => {
       switch (e.code) {
         case "ECONNREFUSED":
-          logger.error(e, `${this.index}: ${this.url}`);
+          logger.error(JSON.stringify(e), `${this.index}: ${this.url}`);
           try {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
@@ -307,7 +307,7 @@ WebSocketClient.prototype.open = function (url, index) {
           this.reconnect(e);
           break;
         case "ECONNRESET":
-          logger.error(e, `${this.index}: ${this.url}`);
+          logger.error(JSON.stringify(e), `${this.index}: ${this.url}`);
           try {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
@@ -328,7 +328,7 @@ WebSocketClient.prototype.open = function (url, index) {
           this.reconnect(e);
           break;
         case "EHOSTUNREACH":
-          logger.error(e, `${this.index}: ${this.url}`);
+          logger.error(JSON.stringify(e), `${this.index}: ${this.url}`);
           try {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
@@ -349,7 +349,7 @@ WebSocketClient.prototype.open = function (url, index) {
           this.reconnect(e);
           break;
         case "ENOTFOUND":
-          logger.error(e, `${this.index}: ${this.url}`);
+          logger.error(JSON.stringify(e), `${this.index}: ${this.url}`);
           try {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
@@ -371,7 +371,7 @@ WebSocketClient.prototype.open = function (url, index) {
           this.reconnect(e);
           break;
         default:
-          logger.error(e, `${this.index}: ${this.url}`);
+          logger.error(JSON.stringify(e), `${this.index}: ${this.url}`);
           try {
             farmPrinters[this.index].state = "Re-Sync";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
@@ -407,7 +407,10 @@ WebSocketClient.prototype.open = function (url, index) {
     });
     return true;
   } catch (e) {
-    logger.info(e, "There was an issue opening the websocket... hard fail...");
+    logger.info(
+      JSON.stringify(e),
+      "There was an issue opening the websocket... hard fail..."
+    );
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[this.index].printerURL,
@@ -931,7 +934,10 @@ WebSocketClient.prototype.onerror = function (e) {
     this.onerror = null;
     this.onmessage = null;
   } catch (e) {
-    logger.info(e, "Couldn't delete old listeners... must not exist.");
+    logger.info(
+      JSON.stringify(e),
+      "Couldn't delete old listeners... must not exist."
+    );
   }
   // PrinterTicker.addIssue(
   //   new Date(),
@@ -975,7 +981,10 @@ WebSocketClient.prototype.onclose = function (e) {
     this.onerror = null;
     this.onmessage = null;
   } catch (e) {
-    logger.info(e, "Couldn't delete old listeners... must not exist.");
+    logger.info(
+      JSON.stringify(e),
+      "Couldn't delete old listeners... must not exist."
+    );
   }
 
   if (typeof farmPrinters[this.index] !== "undefined") {
@@ -3144,7 +3153,7 @@ class Runner {
       );
 
       printer.save().catch((e) => {
-        logger.error(e, "ERROR savin power settings.");
+        logger.error(JSON.stringify(e), "ERROR savin power settings.");
       });
       let profile = {};
       let sett = {};

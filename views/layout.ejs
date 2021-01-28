@@ -59,7 +59,6 @@
                 Current Operations</a>
             </li>
             <% if(page.includes("Camera") || page.includes("List") || page.includes("Panel")){%>
-
                 <li class="nav-item">
                     <div class="input-group p-0 m-0 pr-1  mx-auto">
                         <div class="input-group-prepend">
@@ -86,7 +85,26 @@
                 </li>
 
             <% }%>
+            <li class="nav-item">
+                <span title="Panel Layout Monitoring View" class="nav-link text-light text-center btn-sm <%= noPrinters %>" id="menuPanelView">
+                    <% if(typeof dashboardStatistics !== "undefined"){%>
+                        <% if(typeof dashboardStatistics.currentTemperature !== "undefined"){%>
+                            <i class="fas fa-temperature-high"></i> <% dashboardStatistics.currentTemperature %>
+                        <% }%>
+                        <% if(typeof dashboardStatistics.currentHumidity !== "undefined"){%>
+                            | <i class="fas fa-tint"></i> <% dashboardStatistics.currentHumidity %>
+                        <% }%>
+                        <% if(typeof dashboardStatistics.currentPressure !== "undefined"){%>
+                            | <i class="fas fa-lungs"></i> <% dashboardStatistics.currentPressure %>
+                        <% }%>
+                        <% if(typeof dashboardStatistics.currentIAQ !== "undefined"){%>
+                            | <i class="fas fa-tint"></i> <% dashboardStatistics.currentIAQ %>
+                        <% }%>
 
+
+                    <% }%>
+                </span>
+            </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
             <li id="menuPrinters">
