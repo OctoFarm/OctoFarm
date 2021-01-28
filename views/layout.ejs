@@ -89,17 +89,17 @@
                 <span title="Panel Layout Monitoring View" class="nav-link text-light text-center btn-sm <%= noPrinters %>" id="menuPanelView">
                     <% if(typeof dashboardStatistics !== "undefined"){%>
                         <% console.log(dashboardStatistics) %>
-                        <% if(typeof dashboardStatistics.currentTemperature !== "undefined"){%>
-                            <i class="fas fa-temperature-high"></i> <% dashboardStatistics.currentTemperature %>
+                        <% if(typeof dashboardStatistics.currentTemperature !== "undefined"  && dashboardStatistics.currentTemperature !== null){%>
+                            <i class="fas fa-temperature-high"></i> <%= dashboardStatistics.currentTemperature %>
                         <% }%>
-                        <% if(typeof dashboardStatistics.currentHumidity !== "undefined"){%>
-                            | <i class="fas fa-tint"></i> <% dashboardStatistics.currentHumidity %>
+                        <% if(typeof dashboardStatistics.currentHumidity !== "undefined" && dashboardStatistics.currentHumidity !== null){%>
+                            | <i class="fas fa-tint"></i> <%= dashboardStatistics.currentHumidity %>
                         <% }%>
-                        <% if(typeof dashboardStatistics.currentPressure !== "undefined"){%>
-                            | <i class="fas fa-lungs"></i> <% dashboardStatistics.currentPressure %>
+                        <% if(typeof dashboardStatistics.currentPressure !== "undefined"  && dashboardStatistics.currentPressure !== null){%>
+                            | <i class="fas fa-lungs"></i> <%= dashboardStatistics.currentPressure %>
                         <% }%>
-                        <% if(typeof dashboardStatistics.currentIAQ !== "undefined"){%>
-                            | <i class="fas fa-tint"></i> <% dashboardStatistics.currentIAQ %>
+                        <% if(typeof dashboardStatistics.currentIAQ !== "undefined"  && dashboardStatistics.currentIAQ !== null){%>
+                            | <i class="fas fa-tint"></i> <%= dashboardStatistics.currentIAQ %>
                         <% }%>
 
 
