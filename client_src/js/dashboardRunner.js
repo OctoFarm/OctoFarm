@@ -5,6 +5,14 @@ import UI from "./lib/functions/ui.js";
 import OctoFarmclient from "./lib/octofarm.js";
 
 //On Load API call for new graphs
+let enviromentalData,
+  systemFarmTemp,
+  activityHeatChart,
+  currentActivityChart,
+  currentUtilisation,
+  usageOverFilamentTime,
+  historyGraph,
+  filamentUsage;
 
 let initNewGraphs = async function () {
   //Load Graph
@@ -338,7 +346,7 @@ let initNewGraphs = async function () {
   };
 
   if (document.querySelector("#usageOverFilamentTime")) {
-    let usageOverFilamentTime = new ApexCharts(
+    usageOverFilamentTime = new ApexCharts(
       document.querySelector("#usageOverFilamentTime"),
       usageOverFilamentTimeOptions
     );
@@ -347,16 +355,16 @@ let initNewGraphs = async function () {
     usageOverFilamentTime.updateSeries(usageOverTime);
   }
   if (document.querySelector("#usageOverTime")) {
-    let systemFarmTemp = new ApexCharts(
+    filamentUsage = new ApexCharts(
       document.querySelector("#usageOverTime"),
       usageOverTimeOptions
     );
-    systemFarmTemp.render();
-    systemFarmTemp.updateSeries(usageByDay);
+    filamentUsage.render();
+    filamentUsage.updateSeries(usageByDay);
   }
 
   if (document.querySelector("#printCompletionByDay")) {
-    let historyGraph = new ApexCharts(
+    historyGraph = new ApexCharts(
       document.querySelector("#printCompletionByDay"),
       historyGraphOptions
     );
@@ -701,12 +709,6 @@ const optionsUtilisation = {
   },
 };
 
-let enviromentalData,
-  systemFarmTemp,
-  activityHeatChart,
-  currentActivityChart,
-  currentUtilisation;
-
 if (document.querySelector("#farmTempMap")) {
   systemFarmTemp = new ApexCharts(
     document.querySelector("#farmTempMap"),
@@ -740,7 +742,7 @@ let worker = null;
 
 function createWebWorker() {
   worker = new Worker("/assets/js/workers/dashboardWorker.min.js");
-  worker.onmessage = function (event) {
+  worker.onmessage = async function (event) {
     if (event.data != false) {
       const currentOperationsData = event.data.currentOperations;
       const printerInfo = event.data.printerInformation;
@@ -787,6 +789,25 @@ function createWebWorker() {
 
       if (dashboardSettings.historical.environmentalHistory) {
         dashUpdate.envriromentalData(dashboard.enviromentalData);
+      }
+      let historyStatistics = await OctoFarmclient.get(
+        "history/statisticsData"
+      );
+      historyStatistics = await historyStatistics.json();
+
+      let historyGraphData = historyStatistics.history.historyByDay;
+      let usageByDay = historyStatistics.history.totalByDay;
+      let usageOverTime = historyStatistics.history.usageOverTime;
+
+      if (document.querySelector("#usageOverFilamentTime")) {
+        usageOverFilamentTime.updateSeries(usageOverTime);
+      }
+      if (document.querySelector("#usageOverTime")) {
+        filamentUsage.updateSeries(usageByDay);
+      }
+
+      if (document.querySelector("#printCompletionByDay")) {
+        historyGraph.updateSeries(historyGraphData);
       }
     } else {
       UI.createAlert(
@@ -1307,7 +1328,7 @@ function saveGrid() {
   );
   // console.log(JSON.stringify(serializedData, null, '  '))
 }
-function loadGrid() {
+async function loadGrid() {
   const dashData = localStorage.getItem("dashboardConfiguration");
   const serializedData = JSON.parse(dashData);
   if (serializedData !== null && serializedData.length !== 0) {
@@ -1342,7 +1363,7 @@ grid.on("change", async function (event, items) {
     usageOverFilamentTime.updateSeries(usageOverTime);
   }
   if (document.querySelector("#usageOverTime")) {
-    systemFarmTemp.updateSeries(usageByDay);
+    filamentUsage.updateSeries(usageByDay);
   }
 
   if (document.querySelector("#printCompletionByDay")) {
