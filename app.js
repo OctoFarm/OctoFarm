@@ -20,9 +20,9 @@ const { databaseSetup } = require("./server_src/lib/influxExport.js");
 
 const { PrinterClean } = printerClean;
 
-const pluginManager = require("./server_src/runners/pluginManager.js");
+// const Manager = require("./server_src/runners/pluginManager.js");
 
-const { updatePluginList } = pluginManager;
+// const { updatePluginList } = pluginManager;
 const autoDiscovery = require("./server_src/runners/autoDiscovery.js");
 // Server Port
 const app = express();
@@ -86,9 +86,9 @@ const setupServerSettings = async () => {
 const serverStart = async () => {
   try {
     await logger.info("MongoDB Connected...");
-    await logger.info("Grabbing plugin list from OctoPrint.org");
-    let pluginList = await updatePluginList();
-    await logger.info(pluginList);
+//     await logger.info("Grabbing plugin list from OctoPrint.org");
+//     let pluginList = await updatePluginList();
+//     await logger.info(pluginList);
     // Initialise farm information
     const farmInformation = await PrinterClean.initFarmInformation();
     await logger.info(farmInformation);
