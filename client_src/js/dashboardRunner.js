@@ -1329,7 +1329,23 @@ function loadGrid() {
 
 loadGrid();
 initNewGraphs();
-
-grid.on("change", function (event, items) {
+grid.on("change", async function (event, items) {
   saveGrid();
+  let historyStatistics = await OctoFarmclient.get("history/statisticsData");
+  historyStatistics = await historyStatistics.json();
+
+  let historyGraphData = historyStatistics.history.historyByDay;
+  let usageByDay = historyStatistics.history.totalByDay;
+  let usageOverTime = historyStatistics.history.usageOverTime;
+
+  if (document.querySelector("#usageOverFilamentTime")) {
+    usageOverFilamentTime.updateSeries(usageOverTime);
+  }
+  if (document.querySelector("#usageOverTime")) {
+    systemFarmTemp.updateSeries(usageByDay);
+  }
+
+  if (document.querySelector("#printCompletionByDay")) {
+    historyGraph.updateSeries(historyGraphData);
+  }
 });
