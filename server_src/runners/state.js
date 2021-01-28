@@ -2918,6 +2918,7 @@ class Runner {
   }
 
   static async updateSettings(settings) {
+    logger.info("Attempting to save: ", settings);
     function difference(object, base) {
       function changes(object, base) {
         return _.transform(object, function (result, value, key) {
@@ -3022,7 +3023,7 @@ class Runner {
         printer.costSettings[key] = differences[key];
       }
     }
-    console.log(settings.powerCommands);
+
     if (
       settings.powerCommands.powerOnCommand !== "" &&
       settings.powerCommands.powerOnCommand !==
@@ -3102,6 +3103,9 @@ class Runner {
         settings.powerCommands.powerStatusURL;
     }
 
+    logger.info("LIive power settings", farmPrinters[index].powerSettings);
+    logger.info("Database power settings", printer.powerSettings);
+
     printer.markModified("powerSettings");
 
     if (settings.systemCommands.serverRestart !== "") {
@@ -3125,8 +3129,14 @@ class Runner {
       settings.systemCommands.systemShutdown =
         farmPrinters[index].settingsServer.commands.systemShutdownCommand;
     }
+    logger.info(
+      "OctoPrint power settings: ",
+      farmPrinters[index].systemCommands
+    );
 
-    printer.save();
+    printer.save().catch((e) => {
+      logger.error(e, "ERROR savin power settings.");
+    });
     let profile = {};
     let sett = {};
     if (settings.state !== "Offline") {

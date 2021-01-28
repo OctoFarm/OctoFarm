@@ -16,6 +16,8 @@ All notable changes to this project will be documented in this file.
    Fixed - Graph for filament daily usage would not stack values by day 
    Fixed - Auto grab of OctoPrint camera URL would incorrectly add :8080 to the url.
    Fixed - Date range and conversion issue with filament graphs 
+   Fixed #235 - Filament / History graphs failing to generate data...
+
 
 ## Removed
    
