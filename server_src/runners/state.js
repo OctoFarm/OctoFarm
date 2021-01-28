@@ -3247,7 +3247,8 @@ class Runner {
         printer,
       };
     } catch (e) {
-      logger.error("HEY THE ERROR WERE LOOKING FOR!", e);
+      logger.error("HEY THE ERROR WERE LOOKING FOR!", JSON.stringify(e));
+      logger.error("ERROR MESSAGE", JSON.stringify(e.message));
     }
   }
 
