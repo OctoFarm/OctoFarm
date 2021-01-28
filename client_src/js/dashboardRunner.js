@@ -505,6 +505,14 @@ const optionsHeatChart = {
       colors: ["#000000"],
     },
   },
+  stroke: {
+    show: true,
+    curve: "smooth",
+    lineCap: "butt",
+    colors: ["#303030"],
+    width: 2,
+    dashArray: 0,
+  },
   plotOptions: {
     heatmap: {
       shadeIntensity: 0.7,
