@@ -433,9 +433,11 @@ export default class OctoPrintClient {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-Api-Key": printer.apikey,
         },
       });
       if (post.status !== 200 || post.status !== 204) {
+
         return "No Status";
       } else {
         post = await post.json();
