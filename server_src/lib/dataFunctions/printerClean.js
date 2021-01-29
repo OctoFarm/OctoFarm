@@ -672,7 +672,8 @@ class PrinterClean {
   }
 
   static async statisticsStart() {
-    const history = HistoryClean.returnStatistics();
+    const history = await HistoryClean.returnStatistics();
+
     dashboardStatistics.currentUtilisation = [
       {
         data: [
@@ -1034,6 +1035,7 @@ class PrinterClean {
     const activeHours = arrayActive.reduce((a, b) => a + b, 0);
     const idleHours = arrayIdle.reduce((a, b) => a + b, 0);
     const offlineHours = arrayOffline.reduce((a, b) => a + b, 0);
+    console.log(history)
     const failedHours = history.currentFailed;
     const totalHours =
       history.currentFailed + activeHours + idleHours + offlineHours;

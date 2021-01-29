@@ -36,11 +36,17 @@ class HistoryClean {
 
   static async start() {
     logger.info("Running history Cleaning");
+    try{
+
+
     const history = await History.find({}, null, {
       sort: { historyIndex: -1 },
     });
     const historyArray = [];
     for (let h = 0; h < history.length; h++) {
+      if(history[h].printHistory.historyIndex === 8){
+        console.log(history[h])
+      }
       const sorted = {
         _id: history[h]._id,
         index: history[h].printHistory.historyIndex,
@@ -125,6 +131,9 @@ class HistoryClean {
     historyClean = historyArray;
     statisticsClean = await HistoryClean.getStatistics(historyArray);
     logger.info("History information cleaned and ready for consumption");
+    }catch(e){
+      logger.error("Failed to generate clean history...", e.message);
+    }
   }
 
   static checkNested(nameKey, myArray) {
@@ -217,158 +226,162 @@ class HistoryClean {
         }
 
         filamentCost.push(historyClean[h].spoolCost);
-        historyClean[h].spools.forEach((spool) => {
-          //console.log(spool);
-          try {
-            const keys = Object.keys(spool);
-            for (const key of keys) {
-              //check if type exists
-              let checkNested = this.checkNested(
-                JSON.parse(JSON.stringify(spool[key].type)),
-                totalByDay
-              );
 
-              if (typeof checkNested !== "undefined") {
-                let checkNestedIndexHistoryRates = null;
-                if (historyClean[h].state.includes("success")) {
-                  checkNestedIndexHistoryRates = this.checkNestedIndex(
-                    "Success",
-                    historyByDay
-                  );
-                } else if (historyClean[h].state.includes("warning")) {
-                  checkNestedIndexHistoryRates = this.checkNestedIndex(
-                    "Cancelled",
-                    historyByDay
-                  );
-                } else if (historyClean[h].state.includes("danger")) {
-                  checkNestedIndexHistoryRates = this.checkNestedIndex(
-                    "Failed",
-                    historyByDay
-                  );
-                } else {
-                  return;
-                }
-
-                let checkNestedIndexByDay = this.checkNestedIndex(
-                  JSON.parse(JSON.stringify(spool[key].type)),
-                  usageOverTime
-                );
-                let usageWeightCalc = 0;
-
-                if (
-                  typeof usageOverTime[checkNestedIndexByDay].data[0] !==
-                  "undefined"
-                ) {
-                  usageWeightCalc =
-                    usageOverTime[checkNestedIndexByDay].data[
-                      usageOverTime[checkNestedIndexByDay].data.length - 1
-                    ].y +
-                    JSON.parse(JSON.stringify(historyClean[h].totalWeight));
-                } else {
-                  usageWeightCalc = JSON.parse(
-                    JSON.stringify(historyClean[h].totalWeight)
-                  );
-                }
-
-                let checkNestedIndex = this.checkNestedIndex(
-                  JSON.parse(JSON.stringify(spool[key].type)),
-                  totalByDay
-                );
-                let historyDate = JSON.parse(
-                  JSON.stringify(historyClean[h].endDate)
+        if(historyClean[h].spools !== null){
+          historyClean[h].spools.forEach((spool) => {
+            //console.log(spool);
+            try {
+              const keys = Object.keys(spool);
+              for (const key of keys) {
+                //check if type exists
+                let checkNested = this.checkNested(
+                    JSON.parse(JSON.stringify(spool[key].type)),
+                    totalByDay
                 );
 
-                let dateSplit = historyDate.split(" ");
-                const months = [
-                  "Jan",
-                  "Feb",
-                  "Mar",
-                  "Apr",
-                  "May",
-                  "Jun",
-                  "Jul",
-                  "Aug",
-                  "Sep",
-                  "Oct",
-                  "Nov",
-                  "Dec",
-                ];
-                let month = months.indexOf(dateSplit[1]);
-                let dateString = `${parseInt(dateSplit[3])}-${
-                  month + 1
-                }-${parseInt(dateSplit[2])}`;
+                if (typeof checkNested !== "undefined") {
+                  let checkNestedIndexHistoryRates = null;
+                  if (historyClean[h].state.includes("success")) {
+                    checkNestedIndexHistoryRates = this.checkNestedIndex(
+                        "Success",
+                        historyByDay
+                    );
+                  } else if (historyClean[h].state.includes("warning")) {
+                    checkNestedIndexHistoryRates = this.checkNestedIndex(
+                        "Cancelled",
+                        historyByDay
+                    );
+                  } else if (historyClean[h].state.includes("danger")) {
+                    checkNestedIndexHistoryRates = this.checkNestedIndex(
+                        "Failed",
+                        historyByDay
+                    );
+                  } else {
+                    return;
+                  }
 
-                let dateParse = new Date(dateString);
+                  let checkNestedIndexByDay = this.checkNestedIndex(
+                      JSON.parse(JSON.stringify(spool[key].type)),
+                      usageOverTime
+                  );
+                  let usageWeightCalc = 0;
 
-                let weightCalcSan = parseFloat(
-                  JSON.parse(
-                    JSON.stringify(historyClean[h].totalWeight.toFixed(2))
-                  )
-                );
-                let dateChecked = new Date(thirtyDaysAgo);
-                //Don't include 0 weights
-                if (weightCalcSan > 0) {
-                  //Check if more than 90 days ago...
-                  weightCalcSan = JSON.parse(JSON.stringify(weightCalcSan));
                   if (
-                    parseInt(dateParse.getTime()) >
-                    parseInt(dateChecked.getTime())
+                      typeof usageOverTime[checkNestedIndexByDay].data[0] !==
+                      "undefined"
                   ) {
-                    totalByDay[checkNestedIndex].data.push({
-                      x: dateParse,
-                      y: weightCalcSan,
-                    });
-                    usageOverTime[checkNestedIndex].data.push({
-                      x: dateParse,
-                      y: weightCalcSan,
-                    });
-                    // console.log(checkNestedIndexHistoryRates);
-                    // console.log(historyByDay[checkNestedIndexHistoryRates].name);
-                    historyByDay[checkNestedIndexHistoryRates].data.push({
-                      x: dateParse,
-                      y: 1,
-                    });
+                    usageWeightCalc =
+                        usageOverTime[checkNestedIndexByDay].data[
+                        usageOverTime[checkNestedIndexByDay].data.length - 1
+                            ].y +
+                        JSON.parse(JSON.stringify(historyClean[h].totalWeight));
+                  } else {
+                    usageWeightCalc = JSON.parse(
+                        JSON.stringify(historyClean[h].totalWeight)
+                    );
+                  }
+
+                  let checkNestedIndex = this.checkNestedIndex(
+                      JSON.parse(JSON.stringify(spool[key].type)),
+                      totalByDay
+                  );
+                  let historyDate = JSON.parse(
+                      JSON.stringify(historyClean[h].endDate)
+                  );
+
+                  let dateSplit = historyDate.split(" ");
+                  const months = [
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
+                  ];
+                  let month = months.indexOf(dateSplit[1]);
+                  let dateString = `${parseInt(dateSplit[3])}-${
+                      month + 1
+                  }-${parseInt(dateSplit[2])}`;
+
+                  let dateParse = new Date(dateString);
+
+                  let weightCalcSan = parseFloat(
+                      JSON.parse(
+                          JSON.stringify(historyClean[h].totalWeight.toFixed(2))
+                      )
+                  );
+                  let dateChecked = new Date(thirtyDaysAgo);
+                  //Don't include 0 weights
+                  if (weightCalcSan > 0) {
+                    //Check if more than 90 days ago...
+                    weightCalcSan = JSON.parse(JSON.stringify(weightCalcSan));
+                    if (
+                        dateParse.getTime() >
+                        dateChecked.getTime()
+                    ) {
+                      totalByDay[checkNestedIndex].data.push({
+                        x: dateParse,
+                        y: weightCalcSan,
+                      });
+                      usageOverTime[checkNestedIndex].data.push({
+                        x: dateParse,
+                        y: weightCalcSan,
+                      });
+                      // console.log(checkNestedIndexHistoryRates);
+                      // console.log(historyByDay[checkNestedIndexHistoryRates].name);
+                      historyByDay[checkNestedIndexHistoryRates].data.push({
+                        x: dateParse,
+                        y: 1,
+                      });
+                    }
+                  }
+                } else {
+                  let usageKey = {
+                    name: JSON.parse(JSON.stringify(spool[key].type)),
+                    data: [],
+                  };
+                  let usageByKey = {
+                    name: JSON.parse(JSON.stringify(spool[key].type)),
+                    data: [],
+                  };
+                  let successKey = {
+                    name: "Success",
+                    data: [],
+                  };
+                  let cancellKey = {
+                    name: "Cancelled",
+                    data: [],
+                  };
+                  let failedKey = {
+                    name: "Failed",
+                    data: [],
+                  };
+
+                  if (spool[key].type !== "") {
+                    totalByDay.push(usageKey);
+                  }
+                  if (spool[key].type !== "") {
+                    usageOverTime.push(usageByKey);
+                  }
+                  if (typeof historyByDay[0] === "undefined") {
+                    historyByDay.push(successKey);
+                    historyByDay.push(cancellKey);
+                    historyByDay.push(failedKey);
                   }
                 }
-              } else {
-                let usageKey = {
-                  name: JSON.parse(JSON.stringify(spool[key].type)),
-                  data: [],
-                };
-                let usageByKey = {
-                  name: JSON.parse(JSON.stringify(spool[key].type)),
-                  data: [],
-                };
-                let successKey = {
-                  name: "Success",
-                  data: [],
-                };
-                let cancellKey = {
-                  name: "Cancelled",
-                  data: [],
-                };
-                let failedKey = {
-                  name: "Failed",
-                  data: [],
-                };
-
-                if (spool[key].type !== "") {
-                  totalByDay.push(usageKey);
-                }
-                if (spool[key].type !== "") {
-                  usageOverTime.push(usageByKey);
-                }
-                if (typeof historyByDay[0] === "undefined") {
-                  historyByDay.push(successKey);
-                  historyByDay.push(cancellKey);
-                  historyByDay.push(failedKey);
-                }
               }
+            } catch (e) {
+              logger.error("something went wrong looping through spools...", e.message);
             }
-          } catch (e) {
-            logger.error("something went wrong looping through spools...", e);
-          }
-        });
+          });
+        }
+
       }
       const totalFilamentWeight = filamentWeight.reduce((a, b) => a + b, 0);
       const totalFilamentLength = filamentLength.reduce((a, b) => a + b, 0);
@@ -488,9 +501,11 @@ class HistoryClean {
       };
       return statistics;
     } catch (e) {
-      logger.error("Error Generating statistics: Error:", e);
+      logger.error("Error Generating statistics: Error:", e.message);
+      return [];
     } finally {
       logger.info("Finished generating statistics", statistics);
+
     }
   }
   static async getHours(printTime) {

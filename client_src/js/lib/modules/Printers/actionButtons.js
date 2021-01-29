@@ -118,7 +118,6 @@ function addEventListeners(printer) {
           .classList.contains("btn-danger")
       ) {
         let data = {};
-        console.log("CON OP", printer.connectionOptions)
         if (typeof printer.connectionOptions !== "undefined") {
           data = {
             command: "connect",
@@ -138,7 +137,6 @@ function addEventListeners(printer) {
           data.baudrate = "AUTO";
           data.printerProfile = "_default";
         }
-        console.log(data)
         let post = await OctoPrintClient.post(printer, "connection", data);
         if (typeof post !== "undefined") {
           if (post.status === 204) {

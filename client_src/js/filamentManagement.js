@@ -658,189 +658,191 @@ async function init() {
 
     yAxisSeries.push(obj);
   });
-
-  const usageOverTimeOptions = {
-    chart: {
-      type: "bar",
-      width: "100%",
-      height: "250px",
-      stacked: true,
-      stroke: {
-        show: true,
-        curve: "smooth",
-        lineCap: "butt",
-        width: 1,
-        dashArray: 0,
+  if(typeof usageOverTime[0] !== "undefined"){
+    const usageOverTimeOptions = {
+      chart: {
+        type: "bar",
+        width: "100%",
+        height: "250px",
+        stacked: true,
+        stroke: {
+          show: true,
+          curve: "smooth",
+          lineCap: "butt",
+          width: 1,
+          dashArray: 0,
+        },
+        animations: {
+          enabled: true,
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+          },
+        },
+        toolbar: {
+          show: false,
+        },
+        zoom: {
+          enabled: false,
+        },
+        background: "#303030",
       },
-      animations: {
-        enabled: true,
-      },
-      plotOptions: {
-        bar: {
-          horizontal: false,
+      dataLabels: {
+        enabled: false,
+        background: {
+          enabled: true,
+          foreColor: "#000",
+          padding: 1,
+          borderRadius: 2,
+          borderWidth: 1,
+          borderColor: "#fff",
+          opacity: 0.9,
+        },
+        formatter: function (val, opts) {
+          if (val !== null) {
+            return val.toFixed(0) + "g";
+          }
         },
       },
+      colors: [
+        "#ff0000",
+        "#ff8400",
+        "#ffd500",
+        "#88ff00",
+        "#00ff88",
+        "#00b7ff",
+        "#4400ff",
+        "#8000ff",
+        "#ff00f2",
+      ],
       toolbar: {
         show: false,
       },
-      zoom: {
-        enabled: false,
+      theme: {
+        mode: "dark",
       },
-      background: "#303030",
-    },
-    dataLabels: {
-      enabled: false,
-      background: {
-        enabled: true,
-        foreColor: "#000",
-        padding: 1,
-        borderRadius: 2,
-        borderWidth: 1,
-        borderColor: "#fff",
-        opacity: 0.9,
+      noData: {
+        text: "Loading...",
       },
-      formatter: function (val, opts) {
-        if (val !== null) {
-          return val.toFixed(0) + "g";
-        }
-      },
-    },
-    colors: [
-      "#ff0000",
-      "#ff8400",
-      "#ffd500",
-      "#88ff00",
-      "#00ff88",
-      "#00b7ff",
-      "#4400ff",
-      "#8000ff",
-      "#ff00f2",
-    ],
-    toolbar: {
-      show: false,
-    },
-    theme: {
-      mode: "dark",
-    },
-    noData: {
-      text: "Loading...",
-    },
-    series: [],
-    yaxis: [
-      {
-        title: {
-          text: "Weight",
+      series: [],
+      yaxis: [
+        {
+          title: {
+            text: "Weight",
+          },
+          seriesName: usageOverTime[0].name,
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0) + "g";
+              }
+            },
+          },
         },
-        seriesName: usageOverTime[0].name,
+      ],
+      xaxis: {
+        type: "category",
+        categories: lastThirtyDaysText,
+        tickAmount: 15,
         labels: {
-          formatter: function (val) {
-            if (val !== null) {
-              return val.toFixed(0) + "g";
-            }
+          formatter: function (value, timestamp) {
+            let dae = new Date(value).toLocaleDateString();
+
+            return dae; // The formatter function overrides format property
           },
         },
       },
-    ],
-    xaxis: {
-      type: "category",
-      categories: lastThirtyDaysText,
-      tickAmount: 15,
-      labels: {
-        formatter: function (value, timestamp) {
-          let dae = new Date(value).toLocaleDateString();
+    };
+    let systemFarmTemp = new ApexCharts(
+        document.querySelector("#usageOverTime"),
+        usageOverTimeOptions
+    );
+    systemFarmTemp.render();
 
-          return dae; // The formatter function overrides format property
+    const usageOverFilamentTimeOptions = {
+      chart: {
+        type: "line",
+        width: "100%",
+        height: "250px",
+        stacked: true,
+        animations: {
+          enabled: true,
+        },
+        toolbar: {
+          show: false,
+        },
+        zoom: {
+          enabled: false,
+        },
+        background: "#303030",
+      },
+      dataLabels: {
+        enabled: true,
+        background: {
+          enabled: true,
+          foreColor: "#000",
+          padding: 1,
+          borderRadius: 2,
+          borderWidth: 1,
+          borderColor: "#fff",
+          opacity: 0.9,
+        },
+        formatter: function (val, opts) {
+          if (val !== null) {
+            return val.toFixed(0) + "g";
+          }
         },
       },
-    },
-  };
-  let systemFarmTemp = new ApexCharts(
-    document.querySelector("#usageOverTime"),
-    usageOverTimeOptions
-  );
-  systemFarmTemp.render();
-
-  const usageOverFilamentTimeOptions = {
-    chart: {
-      type: "line",
-      width: "100%",
-      height: "250px",
-      stacked: true,
-      animations: {
-        enabled: true,
-      },
+      colors: [
+        "#ff0000",
+        "#ff8400",
+        "#ffd500",
+        "#88ff00",
+        "#00ff88",
+        "#00b7ff",
+        "#4400ff",
+        "#8000ff",
+        "#ff00f2",
+      ],
       toolbar: {
         show: false,
       },
-      zoom: {
-        enabled: false,
+      stroke: {
+        width: 2,
+        curve: "smooth",
       },
-      background: "#303030",
-    },
-    dataLabels: {
-      enabled: true,
-      background: {
-        enabled: true,
-        foreColor: "#000",
-        padding: 1,
-        borderRadius: 2,
-        borderWidth: 1,
-        borderColor: "#fff",
-        opacity: 0.9,
+      theme: {
+        mode: "dark",
       },
-      formatter: function (val, opts) {
-        if (val !== null) {
-          return val.toFixed(0) + "g";
-        }
+      noData: {
+        text: "Loading...",
       },
-    },
-    colors: [
-      "#ff0000",
-      "#ff8400",
-      "#ffd500",
-      "#88ff00",
-      "#00ff88",
-      "#00b7ff",
-      "#4400ff",
-      "#8000ff",
-      "#ff00f2",
-    ],
-    toolbar: {
-      show: false,
-    },
-    stroke: {
-      width: 2,
-      curve: "smooth",
-    },
-    theme: {
-      mode: "dark",
-    },
-    noData: {
-      text: "Loading...",
-    },
-    series: [],
-    yaxis: yAxisSeries,
-    xaxis: {
-      type: "category",
-      categories: lastThirtyDaysText,
-      tickAmount: 15,
-      labels: {
-        formatter: function (value, timestamp) {
-          let dae = new Date(value).toLocaleDateString();
+      series: [],
+      yaxis: yAxisSeries,
+      xaxis: {
+        type: "category",
+        categories: lastThirtyDaysText,
+        tickAmount: 15,
+        labels: {
+          formatter: function (value, timestamp) {
+            let dae = new Date(value).toLocaleDateString();
 
-          return dae; // The formatter function overrides format property
+            return dae; // The formatter function overrides format property
+          },
         },
       },
-    },
-  };
-  let usageOverFilamentTime = new ApexCharts(
-    document.querySelector("#usageOverFilamentTime"),
-    usageOverFilamentTimeOptions
-  );
-  usageOverFilamentTime.render();
+    };
+    let usageOverFilamentTime = new ApexCharts(
+        document.querySelector("#usageOverFilamentTime"),
+        usageOverFilamentTimeOptions
+    );
+    usageOverFilamentTime.render();
 
-  usageOverFilamentTime.updateSeries(usageOverTime);
-  systemFarmTemp.updateSeries(usageByDay);
+    usageOverFilamentTime.updateSeries(usageOverTime);
+    systemFarmTemp.updateSeries(usageByDay);
+  }
+
   // Grab data
   const spoolTable = document.getElementById("addSpoolsTable");
   // Initialise materials dropdown

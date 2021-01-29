@@ -6,7 +6,8 @@ All notable changes to this project will be documented in this file.
 # [v1.1.9]
 
 ### Added
-     - Last values from environmental data are displayed in the navigation bar when available. This will update every 5 seconds.
+     - Last values from environmental data are displayed in the navigation bar when available. This will update every 5 seconds.  
+     - Gave gmccauley (and possibly others) the new Filament and History graphs.
 
 ### Changed
 
@@ -19,7 +20,9 @@ All notable changes to this project will be documented in this file.
     - Fixed #235 - Filament / History graphs failing to generate data...
     - Fixed - Port preference undefined, would happen on printer management when offline printer was added.
     - Fixed - Fixed server start on some systems not correctly attaching to ipv4 interface. 
-
+    - Fixed - Issue with quick connect button sending the port as a string causing a 500 response. 
+    - Fixed - Spool manager not loading without spools
+    - Fixed - Spool manager loading graphs and table without spools.
 
 ## Removed
     - Removed system settings dashboard control. Uneeded overhead.
