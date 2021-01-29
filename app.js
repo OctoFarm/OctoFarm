@@ -113,7 +113,7 @@ const serverStart = async () => {
 
     await databaseSetup();
 
-    app.listen(PORT, () => {
+    app.listen(PORT, "0.0.0.0",() => {
       logger.info(`HTTP server started...`);
       logger.info(`You can now access your server on port: ${PORT}`);
       // eslint-disable-next-line no-console
