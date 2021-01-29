@@ -45,7 +45,7 @@ export default class PowerButton {
                   "Power Off",
                   printer.powerSettings.powerOffCommand
                 );
-                if(printer.powerSettings.powerStatusURL !== null){
+                if(printer.powerSettings.powerStatusURL !== ""){
                   await OctoPrintClient.getPowerStatus(
                       printer,
                       printer.powerSettings.powerStatusURL,
