@@ -7,10 +7,10 @@ All notable changes to this project will be documented in this file.
 
 ### Added
      - Last values from environmental data are displayed in the navigation bar when available. This will update every 5 seconds.  
-     - Gave gmccauley (and possibly others) the new Filament and History graphs.
+     - Gave gmccauley (and possibly others) the new Filament and History graphs. Big Thanks for your data basically... I'm a dodo at times XD
 
 ### Changed
-
+    - Changed the ability to fire custom api power commands without command object to octoprints api.
 
 ### Fixed
     - Fixed #234 - Adding Power commands would be overwritten on save. (also affected appearance name on OctoPrint & wakeonlan settings and grabbing default power settings from OctoPrint on a new printer.)
@@ -21,8 +21,9 @@ All notable changes to this project will be documented in this file.
     - Fixed - Port preference undefined, would happen on printer management when offline printer was added.
     - Fixed - Fixed server start on some systems not correctly attaching to ipv4 interface. 
     - Fixed - Issue with quick connect button sending the port as a string causing a 500 response. 
-    - Fixed - Spool manager not loading without spools
-    - Fixed - Spool manager loading graphs and table without spools.
+    - Fixed - Spool manager not loading without spools. (only affected ancient data, pre COVID XD)
+    - Fixed - Spool manager loading graphs and table without spools. (only affected ancient data, pre COVID XD)
+
 
 ## Removed
     - Removed system settings dashboard control. Uneeded overhead.
