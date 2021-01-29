@@ -18,7 +18,7 @@ All notable changes to this project will be documented in this file.
     - Fixed - Date range and conversion issue with filament graphs 
     - Fixed #235 - Filament / History graphs failing to generate data...
     - Fixed - Port preference undefined, would happen on printer management when offline printer was added.
-    - Fixed - TODO #server start when no internet...
+    - Fixed - Fixed server start on some systems not correctly attaching to ipv4 interface. 
 
 
 ## Removed
