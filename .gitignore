@@ -10,3 +10,7 @@ logs/
 .idea/libraries/*
 images/historyCollection/
 /.idea/
+*.env
+*docker-compose.yml
+/.build
+/.cache
