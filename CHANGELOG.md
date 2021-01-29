@@ -8,6 +8,8 @@ All notable changes to this project will be documented in this file.
 ### Added
      - Last values from environmental data are displayed in the navigation bar when available. This will update every 5 seconds.  
      - Gave gmccauley (and possibly others) the new Filament and History graphs. Big Thanks for your data basically... I'm a dodo at times XD
+     - New docker container for alpine linux. tags: alpine-latest, alpine-dev, alpine-{version}. This is a skinnier version than the original OctoFarm ones and will require and external mongodb database same as the main image.
+     - Added .dockerignore should cut down on build size of the container a little. 
 
 ### Changed
     - Changed the ability to fire custom api power commands without command object to octoprints api.
