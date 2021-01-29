@@ -966,7 +966,6 @@ export default class PrinterSettings {
               ),
             },
           };
-          console.log(currentPrinter);
           if (currentPrinter.printerState.colour.category !== "Offline") {
             let printerName = document.getElementById("psProfileName").value;
             let printerModel = document.getElementById("psPrinterModel").value;
@@ -1073,7 +1072,6 @@ export default class PrinterSettings {
           );
           if (update.status === 200) {
             update = await update.json();
-            console.log(update);
             UI.createAlert(
               "success",
               `OctoFarm successfully updated for ${currentPrinter.printerName}`,
@@ -1087,7 +1085,7 @@ export default class PrinterSettings {
                 3000,
                 "clicked"
               );
-            } else {
+            } else if(update.status.profile === 900){}else {
               UI.createAlert(
                 "error",
                 `${currentPrinter.printerName}: profile failed to updated`,
@@ -1102,7 +1100,7 @@ export default class PrinterSettings {
                 3000,
                 "clicked"
               );
-            } else {
+            } else if(update.status.profile === 900){}else {
               UI.createAlert(
                 "error",
                 `${currentPrinter.printerName}: settings failed to updated`,
@@ -1113,7 +1111,7 @@ export default class PrinterSettings {
           } else {
             UI.createAlert(
               "error",
-              `OctoFarm failed to update ${currentPrinter.printerName}`,
+              `OctoFarm failed to update ${currentPrinter.printerName}, please log a bug at github.com/OctoFarm/issues!`,
               3000,
               "clicked"
             );

@@ -2965,7 +2965,13 @@ class Runner {
         printer.settingsAppearance.name = settings.printer.printerName;
         printer.markModified("settingsApperance");
         updatePrinter = true;
+      }else{
+
       }
+      let profile = {};
+      let sett = {};
+      profile.status = 900;
+      sett.status = 900;
       if (
         settings.printer.printerURL !== "" &&
         settings.printer.printerURL !== farmPrinters[index].printerURL
@@ -3155,8 +3161,6 @@ class Runner {
       printer.save().catch((e) => {
         logger.error(JSON.stringify(e), "ERROR savin power settings.");
       });
-      let profile = {};
-      let sett = {};
       if (settings.state !== "Offline") {
         // Gocde update printer and Live
         let updateOctoPrintGcode = {};
@@ -3222,9 +3226,6 @@ class Runner {
           },
           body: JSON.stringify(opts),
         });
-      } else {
-        profile.status = 900;
-        sett.status = 900;
       }
 
       await Runner.getProfile(settings.printer.index);
@@ -3252,12 +3253,14 @@ class Runner {
         Runner.reScanOcto(farmPrinters[index]._id, false);
       }
       return {
-        status: { profile: profile.status, settings: sett.status },
+        status: { octofarm: 200, profile: profile.status, settings: sett.status },
         printer,
       };
     } catch (e) {
-      logger.error("HEY THE ERROR WERE LOOKING FOR!", JSON.stringify(e));
-      logger.error("ERROR MESSAGE", JSON.stringify(e.message));
+      logger.error("ERROR updating printer ", JSON.stringify(e.message));
+      return {
+        status: { octofarm: 400, profile: 900, settings: 900 },
+      };
     }
   }
 
