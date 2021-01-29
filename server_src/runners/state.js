@@ -1504,9 +1504,27 @@ class Runner {
     if (typeof farmPrinters[i].alerts === "undefined") {
       farmPrinters[i].alerts = null;
     }
-    if (typeof farmPrinters[i].powerSettings === "undefined") {
-      farmPrinters[i].powerSettings = null;
+    if (typeof farmPrinters[i].powerSettings === "undefined" || farmPrinters[i].powerSettings === null) {
+      farmPrinters[i].powerSettings = {
+        powerOnCommand: "",
+        powerOnURL: "",
+        powerOffCommand: "",
+        powerOffURL: "",
+        powerToggleCommand: "",
+        powerToggleURL: "",
+        powerStatusCommand: "",
+        powerStatusURL: "",
+        wol: {
+          enabled: false,
+          ip: "255.255.255.0",
+          packets: "3",
+          port: "9",
+          interval: "100",
+          MAC: ""
+        }
+      };
     }
+
     if (typeof farmPrinters[i].currentIdle === "undefined") {
       farmPrinters[i].currentIdle = 0;
     }
@@ -1602,6 +1620,7 @@ class Runner {
     printer.currentOffline = farmPrinters[i].currentOffline;
     printer.selectedFilament = farmPrinters[i].selectedFilament;
     printer.powerSettings = farmPrinters[i].powerSettings;
+    console.log("LOADED!", farmPrinters[i].powerSettings)
     printer.alerts = farmPrinters[i].alerts;
     printer.costSettings = farmPrinters[i].costSettings;
     await printer.save();
@@ -2609,6 +2628,7 @@ class Runner {
             );
           }
         }
+
         if (res.plugins["psucontrol"]) {
           if (_.isEmpty(farmPrinters[index].powerSettings)) {
             PrinterTicker.addIssue(

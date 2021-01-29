@@ -252,8 +252,9 @@ export default class PowerButton {
         }
       }
     }
-    if (printer.powerSettings !== null) {
-      if (printer.powerSettings.powerOnCommand !== "") {
+
+    if (printer.powerSettings !== null && !_.isEmpty(printer.powerSettings)) {
+      if (printer.powerSettings.powerOnURL !== "") {
         if (!document.getElementById("printerPower-" + printer._id)) {
           if (document.getElementById(element + printer._id)) {
             document.getElementById(

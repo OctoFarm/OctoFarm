@@ -572,7 +572,7 @@ export default class PrinterSettings {
       let wolCount = "3";
       let wolMAC = "";
       if (
-        currentPrinter.powerSettings !== null &&
+        currentPrinter.powerSettings !== null || _.isEmpty(currentPrinter.powerSettings) &&
         typeof currentPrinter.powerSettings.wol !== "undefined"
       ) {
         wolEnable = currentPrinter.powerSettings.wol.enabled;
@@ -729,7 +729,7 @@ export default class PrinterSettings {
           "psSystemShutdown"
         ).placeholder = systemShutdown;
       }
-      if (currentPrinter.powerSettings != null) {
+      if (!currentPrinter.powerSettings != null && !_.isEmpty(currentPrinter.powerSettings) ) {
         document.getElementById("psPowerOnCommand").placeholder =
           currentPrinter.powerSettings.powerOnCommand;
         document.getElementById("psPowerOnURL").placeholder =
