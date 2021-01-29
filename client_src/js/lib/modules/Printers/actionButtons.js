@@ -118,13 +118,13 @@ function addEventListeners(printer) {
           .classList.contains("btn-danger")
       ) {
         let data = {};
+        console.log("CON OP", printer.connectionOptions)
         if (typeof printer.connectionOptions !== "undefined") {
           data = {
             command: "connect",
             port: printer.connectionOptions.portPreference,
-            baudrate: printer.connectionOptions.baudratePreference,
+            baudrate: parseInt(printer.connectionOptions.baudratePreference),
             printerProfile: printer.connectionOptions.printerProfilePreference,
-            save: true,
           };
         } else {
           UI.createAlert(
@@ -137,8 +137,8 @@ function addEventListeners(printer) {
           data.port = "AUTO";
           data.baudrate = "AUTO";
           data.printerProfile = "_default";
-          data.save = false;
         }
+        console.log(data)
         let post = await OctoPrintClient.post(printer, "connection", data);
         if (typeof post !== "undefined") {
           if (post.status === 204) {
