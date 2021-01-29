@@ -422,6 +422,7 @@ export default class OctoPrintClient {
   }
 
   static async getPowerStatus(printer, url, command) {
+    console.log(printer)
     if (url.includes("[PrinterURL]")) {
       url = url.replace("[PrinterURL]", printer.printerURL);
     }

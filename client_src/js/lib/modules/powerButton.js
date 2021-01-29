@@ -45,21 +45,24 @@ export default class PowerButton {
                   "Power Off",
                   printer.powerSettings.powerOffCommand
                 );
-                await OctoPrintClient.getPowerStatus(
-                  printer,
-                  printer.powerSettings.powerStatusURL,
-                  printer.powerSettings.powerStatusCommand
-                );
-                await OctoPrintClient.getPowerStatus(
-                  printer,
-                  printer.powerSettings.powerStatusURL,
-                  printer.powerSettings.powerStatusCommand
-                );
-                await OctoPrintClient.getPowerStatus(
-                  printer,
-                  printer.powerSettings.powerStatusURL,
-                  printer.powerSettings.powerStatusCommand
-                );
+                if(printer.powerSettings.powerStatusURL !== null){
+                  await OctoPrintClient.getPowerStatus(
+                      printer,
+                      printer.powerSettings.powerStatusURL,
+                      printer.powerSettings.powerStatusCommand
+                  );
+                  await OctoPrintClient.getPowerStatus(
+                      printer,
+                      printer.powerSettings.powerStatusURL,
+                      printer.powerSettings.powerStatusCommand
+                  );
+                  await OctoPrintClient.getPowerStatus(
+                      printer,
+                      printer.powerSettings.powerStatusURL,
+                      printer.powerSettings.powerStatusCommand
+                  );
+                }
+
               }
             },
           });
