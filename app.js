@@ -108,7 +108,7 @@ const serverStart = async () => {
 
     await databaseSetup();
 
-    app.listen(PORT, () => {
+    app.listen(PORT, "0.0.0.0", () => {
       logger.info(`HTTP server started...`);
       logger.info(`You can now access your server on port: ${PORT}`);
       // eslint-disable-next-line no-console
@@ -205,7 +205,7 @@ mongoose
   });
 
 const databaseIssue = async () => {
-  app.listen(4000, () => {
+  app.listen(4000, "0.0.0.0", () => {
     logger.info(`HTTP server started...`);
     logger.info(`You can now access your server on port: ${4000}`);
     // eslint-disable-next-line no-console
