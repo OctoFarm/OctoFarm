@@ -120,6 +120,8 @@ router.post("/client/update", ensureAuthenticated, (req, res) => {
     };
     checked[0].panelView = panelView;
     checked[0].dashboard = req.body.dashboard;
+    checked[0].controlSettings = req.body.controlSettings;
+    checked[0].markModified("controlSettings");
     checked[0].save().then(() => {
       SettingsClean.start();
     });
@@ -191,7 +193,6 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
 });
 router.get("/sysInfo", ensureAuthenticated, async (req, res) => {
   const systemInformation = await SystemInfo.returnInfo();
-  // There is a circular structure in here somewhere!?
   let sysInfo = null;
   if (typeof systemInformation !== "undefined") {
     sysInfo = {

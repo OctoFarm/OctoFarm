@@ -179,6 +179,7 @@
                                                 <a class="list-group-item list-group-item-action  active" id="client-settings-list" data-toggle="list" href="#client-settings" role="tab" aria-controls="system">General</a>
                                                 <a class="list-group-item list-group-item-action" id="system-monitoring-list" data-toggle="list" href="#system-monitoring" role="tab" aria-controls="dashboard">Views</a>
                                                 <a class="list-group-item list-group-item-action" id="system-dashboard-list" data-toggle="list" href="#system-dashboard" role="tab" aria-controls="dashboard">Dashboard</a>
+                                                <a class="list-group-item list-group-item-action" id="system-printer-control-list" data-toggle="list" href="#system-printer-control" role="tab" aria-controls="dashboard">Printer Control</a>
                                                 <button type="button" class="btn btn-success btn-block mt-1 bg-colour-2" id="saveSettings">Save</button>
                                             </div>
                                         </div>
@@ -456,6 +457,23 @@
                                                                             date: value<br>
                                                                             }</code><br> Null values are required if data is missing!</small>
 
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+
+                                                </div>
+                                                <div class="tab-pane fade" id="system-printer-control" role="tabpanel" aria-labelledby="dashboard-settings-list">
+                                                    <h5>Printer Control Settings</h5>
+                                                    <hr>
+                                                    <div class="row">
+                                                        <div class="col-3">
+                                                            <form class="was-validated">
+                                                                <div class="custom-control custom-checkbox mb-3">
+                                                                    <input type="checkbox" class="custom-control-input" id="printerControlFilesFirst" required>
+                                                                    <label class="custom-control-label" for="printerControlFilesFirst">Files First</label>
+                                                                    <div class="valid-feedback">Show files at the top of the Printer Control Modal</div>
+                                                                    <div class="invalid-feedback">Show files under Printer Status on the Printer Control Modal</div>
                                                                 </div>
                                                             </form>
                                                         </div>

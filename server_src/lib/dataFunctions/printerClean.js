@@ -1035,7 +1035,6 @@ class PrinterClean {
     const activeHours = arrayActive.reduce((a, b) => a + b, 0);
     const idleHours = arrayIdle.reduce((a, b) => a + b, 0);
     const offlineHours = arrayOffline.reduce((a, b) => a + b, 0);
-    console.log(history)
     const failedHours = history.currentFailed;
     const totalHours =
       history.currentFailed + activeHours + idleHours + offlineHours;
@@ -1095,7 +1094,7 @@ class PrinterClean {
               y: enviromentalData[i].temperature.toFixed(2),
             });
             dashboardStatistics.currentTemperature = enviromentalData[
-              i
+              0
             ].temperature.toFixed(2);
           } else {
             currentEnviromentalData[0].data.push({
@@ -1111,7 +1110,7 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: enviromentalData[i].humidity.toFixed(0),
             });
-            dashboardStatistics.currentHumidity = enviromentalData[i].humidity;
+            dashboardStatistics.currentHumidity = enviromentalData[0].humidity;
           } else {
             currentEnviromentalData[1].data.push({
               x: enviromentalData[i].date,
@@ -1127,7 +1126,7 @@ class PrinterClean {
               y: enviromentalData[i].pressure.toFixed(0),
             });
             dashboardStatistics.currentPressure = enviromentalData[
-              i
+              0
             ].pressure.toFixed(0);
           } else {
             currentEnviromentalData[2].data.push({
@@ -1143,7 +1142,7 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: enviromentalData[i].iaq.toFixed(0),
             });
-            dashboardStatistics.currentIAQ = enviromentalData[i].iaq.toFixed(0);
+            dashboardStatistics.currentIAQ = enviromentalData[0].iaq.toFixed(0);
           } else {
             currentEnviromentalData[3].data.push({
               x: enviromentalData[i].date,

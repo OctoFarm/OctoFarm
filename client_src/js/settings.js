@@ -468,6 +468,11 @@ class ClientSettings {
           document.getElementById("filamentUsageOverTimeCheck").checked =
             res.dashboard.historical.filamentUsageOverTime;
         }
+
+        if (typeof res.controlSettings !== "undefined") {
+          document.getElementById("printerControlFilesFirst").checked =
+            res.controlSettings.filesTop;
+        }
       });
   }
 
@@ -481,6 +486,9 @@ class ClientSettings {
       },
       cameraView: {
         cameraRows: document.getElementById("selectCameraGrid").value,
+      },
+      controlSettings: {
+        filesTop: document.getElementById("printerControlFilesFirst").checked,
       },
       dashboard: {
         defaultLayout: [

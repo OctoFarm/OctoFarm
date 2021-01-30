@@ -36,102 +36,97 @@ class HistoryClean {
 
   static async start() {
     logger.info("Running history Cleaning");
-    try{
+    try {
+      const history = await History.find({}, null, {
+        sort: { historyIndex: -1 },
+      });
+      const historyArray = [];
+      for (let h = 0; h < history.length; h++) {
+        const sorted = {
+          _id: history[h]._id,
+          index: history[h].printHistory.historyIndex,
+          state: HistoryClean.getState(
+            history[h].printHistory.success,
+            history[h].printHistory.reason
+          ),
+          printer: history[h].printHistory.printerName,
+          file: HistoryClean.getFile(history[h].printHistory),
+          startDate: history[h].printHistory.startDate,
+          endDate: history[h].printHistory.endDate,
+          printTime: history[h].printHistory.printTime,
+          notes: history[h].printHistory.notes,
+          printerCost: HistoryClean.getPrintCost(
+            history[h].printHistory.printTime,
+            history[h].printHistory.costSettings
+          ),
+          spools: await HistoryClean.getSpool(
+            history[h].printHistory.filamentSelection,
+            history[h].printHistory.job,
+            history[h].printHistory.success,
+            history[h].printHistory.printTime
+          ),
+          thumbnail: history[h].printHistory.thumbnail,
+          job: await HistoryClean.getJob(
+            history[h].printHistory.job,
+            history[h].printHistory.printTime
+          ),
+        };
 
-
-    const history = await History.find({}, null, {
-      sort: { historyIndex: -1 },
-    });
-    const historyArray = [];
-    for (let h = 0; h < history.length; h++) {
-      if(history[h].printHistory.historyIndex === 8){
-        console.log(history[h])
-      }
-      const sorted = {
-        _id: history[h]._id,
-        index: history[h].printHistory.historyIndex,
-        state: HistoryClean.getState(
-          history[h].printHistory.success,
-          history[h].printHistory.reason
-        ),
-        printer: history[h].printHistory.printerName,
-        file: HistoryClean.getFile(history[h].printHistory),
-        startDate: history[h].printHistory.startDate,
-        endDate: history[h].printHistory.endDate,
-        printTime: history[h].printHistory.printTime,
-        notes: history[h].printHistory.notes,
-        printerCost: HistoryClean.getPrintCost(
-          history[h].printHistory.printTime,
-          history[h].printHistory.costSettings
-        ),
-        spools: await HistoryClean.getSpool(
-          history[h].printHistory.filamentSelection,
-          history[h].printHistory.job,
-          history[h].printHistory.success,
-          history[h].printHistory.printTime
-        ),
-        thumbnail: history[h].printHistory.thumbnail,
-        job: await HistoryClean.getJob(
-          history[h].printHistory.job,
-          history[h].printHistory.printTime
-        ),
-      };
-
-      if (
-        typeof history[h].printHistory.resends !== "undefined" &&
-        history[h].printHistory.resends !== null
-      ) {
-        sorted.resend = history[h].printHistory.resends;
-      }
-      if (typeof history[h].printHistory.snapshot !== "undefined") {
-        sorted.snapshot = history[h].printHistory.snapshot;
-      }
-      if (typeof history[h].printHistory.timelapse !== "undefined") {
-        sorted.timelapse = history[h].printHistory.timelapse;
-      }
-      let spoolCost = 0;
-      let totalVolume = 0;
-      let totalLength = 0;
-      let totalWeight = 0;
-      const numOr0 = (n) => (isNaN(n) ? 0 : parseFloat(n));
-      if (typeof sorted.spools !== "undefined" && sorted.spools !== null) {
-        const keys = Object.keys(sorted.spools);
-        for (let s = 0; s < sorted.spools.length; s++) {
-          if (typeof sorted.spools[s]["tool" + keys[s]] !== "undefined") {
-            spoolCost += numOr0(sorted.spools[s]["tool" + keys[s]].cost);
-            totalVolume += numOr0(sorted.spools[s]["tool" + keys[s]].volume);
-            totalLength += numOr0(sorted.spools[s]["tool" + keys[s]].length);
-            totalWeight += numOr0(sorted.spools[s]["tool" + keys[s]].weight);
+        if (
+          typeof history[h].printHistory.resends !== "undefined" &&
+          history[h].printHistory.resends !== null
+        ) {
+          sorted.resend = history[h].printHistory.resends;
+        }
+        if (typeof history[h].printHistory.snapshot !== "undefined") {
+          sorted.snapshot = history[h].printHistory.snapshot;
+        }
+        if (typeof history[h].printHistory.timelapse !== "undefined") {
+          sorted.timelapse = history[h].printHistory.timelapse;
+        }
+        let spoolCost = 0;
+        let totalVolume = 0;
+        let totalLength = 0;
+        let totalWeight = 0;
+        const numOr0 = (n) => (isNaN(n) ? 0 : parseFloat(n));
+        if (typeof sorted.spools !== "undefined" && sorted.spools !== null) {
+          const keys = Object.keys(sorted.spools);
+          for (let s = 0; s < sorted.spools.length; s++) {
+            if (typeof sorted.spools[s]["tool" + keys[s]] !== "undefined") {
+              spoolCost += numOr0(sorted.spools[s]["tool" + keys[s]].cost);
+              totalVolume += numOr0(sorted.spools[s]["tool" + keys[s]].volume);
+              totalLength += numOr0(sorted.spools[s]["tool" + keys[s]].length);
+              totalWeight += numOr0(sorted.spools[s]["tool" + keys[s]].weight);
+            }
           }
         }
-      }
-      spoolCost = numOr0(spoolCost);
-      sorted.totalCost = (
-        parseFloat(sorted.printerCost) + parseFloat(spoolCost)
-      ).toFixed(2);
-      sorted.costPerHour =
-        parseFloat(sorted.totalCost) /
-        parseFloat((history[h].printHistory.printTime / 360000) * 100);
-      if (isNaN(sorted.costPerHour)) {
-        sorted.costPerHour = 0;
-      }
-      sorted.printHours = await HistoryClean.getHours(
-        history[h].printHistory.printTime
-      );
-      if (!isNaN(sorted.costPerHour)) {
-        sorted.costPerHour = sorted.costPerHour.toFixed(2);
-      }
-      sorted.totalVolume = parseFloat(totalVolume);
+        spoolCost = numOr0(spoolCost);
+        sorted.totalCost = (
+          parseFloat(sorted.printerCost) + parseFloat(spoolCost)
+        ).toFixed(2);
+        sorted.costPerHour =
+          parseFloat(sorted.totalCost) /
+          parseFloat((history[h].printHistory.printTime / 360000) * 100);
+        if (isNaN(sorted.costPerHour)) {
+          sorted.costPerHour = 0;
+        }
+        sorted.printHours = await HistoryClean.getHours(
+          history[h].printHistory.printTime
+        );
+        if (!isNaN(sorted.costPerHour)) {
+          sorted.costPerHour = sorted.costPerHour.toFixed(2);
+        }
+        sorted.totalVolume = parseFloat(totalVolume);
 
-      sorted.totalLength = parseFloat(totalLength);
-      sorted.totalWeight = parseFloat(totalWeight);
-      sorted.spoolCost = parseFloat(spoolCost);
-      historyArray.push(sorted);
-    }
-    historyClean = historyArray;
-    statisticsClean = await HistoryClean.getStatistics(historyArray);
-    logger.info("History information cleaned and ready for consumption");
-    }catch(e){
+        sorted.totalLength = parseFloat(totalLength);
+        sorted.totalWeight = parseFloat(totalWeight);
+        sorted.spoolCost = parseFloat(spoolCost);
+        historyArray.push(sorted);
+      }
+      historyClean = historyArray;
+      statisticsClean = await HistoryClean.getStatistics(historyArray);
+      logger.info("History information cleaned and ready for consumption");
+    } catch (e) {
       logger.error("Failed to generate clean history...", e.message);
     }
   }
@@ -227,7 +222,7 @@ class HistoryClean {
 
         filamentCost.push(historyClean[h].spoolCost);
 
-        if(historyClean[h].spools !== null){
+        if (historyClean[h].spools !== null) {
           historyClean[h].spools.forEach((spool) => {
             //console.log(spool);
             try {
@@ -235,58 +230,58 @@ class HistoryClean {
               for (const key of keys) {
                 //check if type exists
                 let checkNested = this.checkNested(
-                    JSON.parse(JSON.stringify(spool[key].type)),
-                    totalByDay
+                  JSON.parse(JSON.stringify(spool[key].type)),
+                  totalByDay
                 );
 
                 if (typeof checkNested !== "undefined") {
                   let checkNestedIndexHistoryRates = null;
                   if (historyClean[h].state.includes("success")) {
                     checkNestedIndexHistoryRates = this.checkNestedIndex(
-                        "Success",
-                        historyByDay
+                      "Success",
+                      historyByDay
                     );
                   } else if (historyClean[h].state.includes("warning")) {
                     checkNestedIndexHistoryRates = this.checkNestedIndex(
-                        "Cancelled",
-                        historyByDay
+                      "Cancelled",
+                      historyByDay
                     );
                   } else if (historyClean[h].state.includes("danger")) {
                     checkNestedIndexHistoryRates = this.checkNestedIndex(
-                        "Failed",
-                        historyByDay
+                      "Failed",
+                      historyByDay
                     );
                   } else {
                     return;
                   }
 
                   let checkNestedIndexByDay = this.checkNestedIndex(
-                      JSON.parse(JSON.stringify(spool[key].type)),
-                      usageOverTime
+                    JSON.parse(JSON.stringify(spool[key].type)),
+                    usageOverTime
                   );
                   let usageWeightCalc = 0;
 
                   if (
-                      typeof usageOverTime[checkNestedIndexByDay].data[0] !==
-                      "undefined"
+                    typeof usageOverTime[checkNestedIndexByDay].data[0] !==
+                    "undefined"
                   ) {
                     usageWeightCalc =
-                        usageOverTime[checkNestedIndexByDay].data[
+                      usageOverTime[checkNestedIndexByDay].data[
                         usageOverTime[checkNestedIndexByDay].data.length - 1
-                            ].y +
-                        JSON.parse(JSON.stringify(historyClean[h].totalWeight));
+                      ].y +
+                      JSON.parse(JSON.stringify(historyClean[h].totalWeight));
                   } else {
                     usageWeightCalc = JSON.parse(
-                        JSON.stringify(historyClean[h].totalWeight)
+                      JSON.stringify(historyClean[h].totalWeight)
                     );
                   }
 
                   let checkNestedIndex = this.checkNestedIndex(
-                      JSON.parse(JSON.stringify(spool[key].type)),
-                      totalByDay
+                    JSON.parse(JSON.stringify(spool[key].type)),
+                    totalByDay
                   );
                   let historyDate = JSON.parse(
-                      JSON.stringify(historyClean[h].endDate)
+                    JSON.stringify(historyClean[h].endDate)
                   );
 
                   let dateSplit = historyDate.split(" ");
@@ -306,25 +301,22 @@ class HistoryClean {
                   ];
                   let month = months.indexOf(dateSplit[1]);
                   let dateString = `${parseInt(dateSplit[3])}-${
-                      month + 1
+                    month + 1
                   }-${parseInt(dateSplit[2])}`;
 
                   let dateParse = new Date(dateString);
 
                   let weightCalcSan = parseFloat(
-                      JSON.parse(
-                          JSON.stringify(historyClean[h].totalWeight.toFixed(2))
-                      )
+                    JSON.parse(
+                      JSON.stringify(historyClean[h].totalWeight.toFixed(2))
+                    )
                   );
                   let dateChecked = new Date(thirtyDaysAgo);
                   //Don't include 0 weights
                   if (weightCalcSan > 0) {
                     //Check if more than 90 days ago...
                     weightCalcSan = JSON.parse(JSON.stringify(weightCalcSan));
-                    if (
-                        dateParse.getTime() >
-                        dateChecked.getTime()
-                    ) {
+                    if (dateParse.getTime() > dateChecked.getTime()) {
                       totalByDay[checkNestedIndex].data.push({
                         x: dateParse,
                         y: weightCalcSan,
@@ -377,11 +369,13 @@ class HistoryClean {
                 }
               }
             } catch (e) {
-              logger.error("something went wrong looping through spools...", e.message);
+              logger.error(
+                "something went wrong looping through spools...",
+                e.message
+              );
             }
           });
         }
-
       }
       const totalFilamentWeight = filamentWeight.reduce((a, b) => a + b, 0);
       const totalFilamentLength = filamentLength.reduce((a, b) => a + b, 0);
@@ -505,7 +499,6 @@ class HistoryClean {
       return [];
     } finally {
       logger.info("Finished generating statistics", statistics);
-
     }
   }
   static async getHours(printTime) {

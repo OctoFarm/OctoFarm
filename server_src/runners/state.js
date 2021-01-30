@@ -1620,7 +1620,6 @@ class Runner {
     printer.currentOffline = farmPrinters[i].currentOffline;
     printer.selectedFilament = farmPrinters[i].selectedFilament;
     printer.powerSettings = farmPrinters[i].powerSettings;
-    console.log("LOADED!", farmPrinters[i].powerSettings)
     printer.alerts = farmPrinters[i].alerts;
     printer.costSettings = farmPrinters[i].costSettings;
     await printer.save();

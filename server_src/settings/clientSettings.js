@@ -89,6 +89,9 @@ class ClientSettings {
             powerBtn: false,
             webBtn: false,
           };
+          const controlSettings = {
+            filesTop: false
+          }
           // const operations = {};
           // const filaManager = {};
           const defaultSystemSettings = new ClientSettingsDB({
@@ -97,6 +100,7 @@ class ClientSettings {
             panelView,
             listView,
             cameraView,
+            controlSettings
           });
           defaultSystemSettings.save();
           return "Server settings have been created...";
