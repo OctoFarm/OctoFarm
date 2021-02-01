@@ -1,8 +1,88 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
-
 # [Released]
+
+# [v1.1.9]
+
+### Added
+     - Last values from environmental data are displayed in the navigation bar when available. This will update every 5 seconds.  
+     - Gave gmccauley (and possibly others) the new Filament and History graphs. Big Thanks for your data basically... I'm a dodo at times XD
+     - New Client Settings - Control Panel File Top: Checking this as true will put the file section at the top of printer control. Print Status and Tools underneigth.
+
+### Changed
+    - Changed the ability to fire custom api power commands without command object to octoprints api.
+
+### Fixed
+    - Fixed #234 - Adding Power commands would be overwritten on save. (also affected appearance name on OctoPrint & wakeonlan settings and grabbing default power settings from OctoPrint on a new printer.)
+    - Fixed - Graph for filament daily usage would not stack values by day 
+    - Fixed - Auto grab of OctoPrint camera URL would incorrectly add :8080 to the url.
+    - Fixed - Date range and conversion issue with filament graphs 
+    - Fixed #235 - Filament / History graphs failing to generate data...
+    - Fixed - Port preference undefined, would happen on printer management when offline printer was added.
+    - Fixed - Fixed server start on some systems not correctly attaching to ipv4 interface. 
+    - Fixed - Issue with quick connect button sending the port as a string causing a 500 response. 
+    - Fixed - Spool manager not loading without spools. (only affected ancient data, pre COVID XD)
+    - Fixed - Spool manager loading graphs and table without spools. (only affected ancient data, pre COVID XD)
+    - Fixed error with file length/weight not getting parsed from text on Printer Control. 
+    - Fixed error with terminal erroring on enter command with no text.
+
+
+## Removed
+    - Removed system settings dashboard control. Uneeded overhead.
+
+# [v1.1.8]
+
+### Added
+     - Added improved filament manager loggin for history capture. 
+     - Improved the layout of the Filament Manager:
+         - Spools and Profile managers are now under modals. 
+         - Filament Statistics UI tweaks.
+         - No more content editable fields... firefox should now be able to edit values.
+         - New spool overview table. Display only.
+         - New Usage By Day chart - will show stacked values totaled by day of filament usage.
+         - New Usage Over Time chart - will show incrementing total filemant usage by day. 
+         - Moved Re-Sync Filament Manager button to show with others (manage profile/spools).
+     - New History Chart - Will show daily totals of success / cancelled and failed prints.
+     - Dashboard has the 3 new charts detailed above available. 
+      
+### Changed
+     - Fixed #228: Quick connect button will only activate once you have setup preferred connection preferences. 
+     - Printer Logs Modal for OctoPrint logs now includes line number 
+     - Re-organised the System dashboard settings page to include new graph options
+     - History statistics now only take into account successful prints.
+
+### Fixed
+     - Fixed #226: Couldn't update OctoPrint instances, restart would get in the way. 
+     - Fixed #223: Shutting down printers would incorrectly count towards last printer state on Dashboard Utilisation heat map.
+     - Fixed issue with incorrect object on history error. 
+     - Fixed issue when changing spool filter not updating all dropdowns until refresh.
+     - Fixed issue with File Name not been sent through Alerts.
+
+## Removed
+     - Disable Printer Assignment on Filament Manager screen, buggy... needs re-configuring.
+
+# [v1.1.7]
+
+### Added
+    - #221: New Bulk Printer Actions on Printer Manager: (big thanks to Scott Presbrey for sponsoring this one!)
+       - Pre-Heat: Select your printers and send target temps to your tool/bed/chamber. 
+       - Control: Select your printers and action Home/Jog commands, as well as Start, Cancel, Pause, Resume and Restart commands.
+       - Gcode: Select your printers and send multiple gcode commands to multiple printers at once.
+   
+### Changed
+   - OctoFarm now detects any trailing forward slashes in the printer URL and removes them...
+   - #220: Improved the terminal function. Multi-lined commands will now be parsed and split, OctoPrint should run through these sequentially now. 
+
+### Fixed
+   - #197: Editing a printer after typing an incorrect connection string would cause a double listener to be created.
+   - Fixed issue with plugin installation crashing on successful completion when restart is required.
+   - #198: Fixed new system settings not generating defaults on upgrade/start up.
+   - #201: Fixed issue with double listener getting generated and not clearing on Re-Sync.
+   - #215: Fixed blank camera field not grabbing OctoPrint camera URL. (Please log an issue if this still doesn't work thanks!)
+   - #220: Fixed issue with terminal commands capitalising Klipper commands.
+
+## Removed
 
 ## [v1.1.6]
 

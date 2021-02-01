@@ -175,10 +175,10 @@ async function addProfile(manufacturer, material, density, diameter) {
       `
                 <tr data-jplist-item>
                   <th style="display: none;">${profileID}</th>
-                  <th scope="row"><p contenteditable="false">${post.profile.manufacturer}</p></th>
-                  <td><p contenteditable="false">${post.profile.material}</p></td>
-                  <td><p contenteditable="false">${post.profile.density}</p></td>
-                  <td><p contenteditable="false">${post.profile.diameter}</p></td>
+                  <th scope="row"><input class="form-control" type="text" placeholder="${post.profile.manufacturer}"></th>
+                  <td><input class="form-control" type="text" placeholder="${post.profile.material}"></td>
+                  <td><input class="form-control" type="text" placeholder="${post.profile.density}"></p></td>
+                  <td><input class="form-control" type="text" placeholder="${post.profile.diameter}"></p></td>
                   <td><button id="edit-${profileID}" type="button" class="btn btn-sm btn-info edit">
                     <i class="fas fa-edit editIcon"></i>
                   </button>
@@ -203,24 +203,23 @@ async function addProfile(manufacturer, material, density, diameter) {
 }
 async function editProfile(e) {
   const row = e.parentElement.parentElement;
-  const editable = row.querySelectorAll("[contenteditable]");
+  const editable = row.querySelectorAll("input");
   const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
   editable.forEach((edit) => {
-    edit.contentEditable = true;
-    edit.classList.add("contentEditable");
+    edit.value = edit.placeholder;
   });
   document.getElementById(`save-${id}`).classList.remove("d-none");
   document.getElementById(`edit-${id}`).classList.add("d-none");
 }
 async function saveProfile(e) {
   const row = e.parentElement.parentElement;
-  const editable = row.querySelectorAll("[contenteditable]");
+  const editable = row.querySelectorAll("input");
   const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
   const profile = [];
   editable.forEach((edit) => {
-    edit.contentEditable = false;
-    edit.classList.remove("contentEditable");
-    profile.push(edit.innerHTML.trim());
+    edit.placeholder = edit.value;
+    profile.push(edit.value);
+    edit.value = "";
   });
   const data = {
     id,
@@ -327,7 +326,6 @@ async function addSpool(
     spoolsUsed.value = 0;
     spoolsTempOffset.value = 0.0;
     post = post.spools;
-    console.log(post);
     let displayNone = "d-none";
 
     if (filamentManager) {
@@ -339,9 +337,9 @@ async function addSpool(
       `
                 <tr data-jplist-item>
                   <th style="display: none;">${post._id}</th>
-                  <th scope="row"><p contenteditable="false">${
+                  <th scope="row"><input class="form-control" type="text" placeholder="${
                     post.spools.name
-                  }</p></th>
+                  }"></th>
                   <td>
                        <select id="spoolsProfile-${
                          post._id
@@ -349,15 +347,15 @@ async function addSpool(
 
                        </select>
                    </td>
-                  <td><p class="price" contenteditable="false">${
+                  <td><input class="form-control" type="text" placeholder="${
                     post.spools.price
-                  }</p></td>
-                  <td><p class="weight" contenteditable="false">${
+                  }"></td>
+                  <td><input class="form-control" type="text" placeholder="${
                     post.spools.weight
-                  }</p></td>
-                  <td class="${displayNone}"><p class="used" contenteditable="false">${
+                  }"></td>
+                  <td class="${displayNone}"><input class="form-control" type="text" placeholder="${
         post.spools.used
-      }</p></td>
+      }"></td>
                   <td class="grams ${displayNone}">${(
         post.spools.weight - post.spools.used
       ).toFixed(0)}</td>
@@ -365,9 +363,9 @@ async function addSpool(
         100 -
         (post.spools.used / post.spools.weight) * 100
       ).toFixed(0)}</td>
-                  <td><p contenteditable="false">${
+                  <td><input class="form-control" type="text" placeholder="${
                     post.spools.tempOffset
-                  }</p></td>
+                  }"></td>
                    <td>
                        <select id="spoolsPrinterAssignment-${
                          post._id
@@ -407,11 +405,10 @@ async function addSpool(
 }
 async function editSpool(e) {
   const row = e.parentElement.parentElement;
-  const editable = row.querySelectorAll("[contenteditable]");
+  const editable = row.querySelectorAll("input");
   const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
   editable.forEach((edit) => {
-    edit.contentEditable = true;
-    edit.classList.add("contentEditable");
+    edit.value = edit.placeholder;
   });
   // let profile = await OctoFarmclient.get("filament/get/profile");
   // profile = await profile.json();
@@ -464,14 +461,15 @@ async function deleteSpool(e) {
 }
 async function saveSpool(e) {
   const row = e.parentElement.parentElement;
-  const editable = row.querySelectorAll("[contenteditable]");
+  const editable = row.querySelectorAll("input");
   const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
   const spool = [];
   editable.forEach((edit) => {
-    edit.contentEditable = false;
-    edit.classList.remove("contentEditable");
-    spool.push(edit.innerHTML.trim());
+    edit.placeholder = edit.value;
+    spool.push(edit.value);
+    edit.value = "";
   });
+
   spool.push(document.getElementById(`spoolsProfile-${id}`).value);
   const data = {
     id,
@@ -511,7 +509,17 @@ async function updateProfileDrop() {
   }
   // Generate profile assignment
   const printerDrops = document.querySelectorAll("[id^='spoolsProfile-']");
-  printerDrops.forEach((drop) => {
+  const printerListMaterials = document.querySelectorAll(
+    "[id^='spoolsListMaterial-']"
+  );
+  const spoolsListManufacture = document.querySelectorAll(
+    "[id^='spoolsListManufacture-']"
+  );
+  const spoolsMaterialText = document.querySelectorAll(
+    "[id^='spoolsMaterialText-']"
+  );
+
+  printerDrops.forEach((drop, index) => {
     drop.innerHTML = "";
     profiles.profiles.forEach((prof) => {
       drop.insertAdjacentHTML(
@@ -532,6 +540,15 @@ async function updateProfileDrop() {
       drop.className = `form-control ${profiles.profiles[
         profileID
       ].material.replace(/ /g, "_")}`;
+      printerListMaterials[
+        index
+      ].innerHTML = `${profiles.profiles[profileID].material}`;
+      spoolsMaterialText[
+        index
+      ].innerHTML = `${profiles.profiles[profileID].material}`;
+      spoolsListManufacture[
+        index
+      ].innerHTML = `${profiles.profiles[profileID].manufacturer}`;
     }
   });
 }
@@ -546,7 +563,10 @@ async function updatePrinterDrops() {
   const printerDrops = document.querySelectorAll(
     "[id^='spoolsPrinterAssignment-']"
   );
-  printerDrops.forEach((drop) => {
+  const printerAssignments = document.querySelectorAll(
+    "[id^='spoolsListPrinterAssignment-']"
+  );
+  printerDrops.forEach((drop, index) => {
     drop.innerHTML = [...printerList.printerList];
 
     const split = drop.id.split("-");
@@ -560,6 +580,12 @@ async function updatePrinterDrops() {
           filament.Spool[spool].printerAssignment[0].id +
           "-" +
           filament.Spool[spool].printerAssignment[0].tool;
+        printerAssignments[index].innerHTML =
+          filament.Spool[spool].printerAssignment[0].name +
+          ": Tool" +
+          filament.Spool[spool].printerAssignment[0].tool;
+      } else {
+        printerAssignments[index].innerHTML = "Not Assigned";
       }
     }
 
@@ -568,12 +594,255 @@ async function updatePrinterDrops() {
       const printerId = meta[0];
       const tool = meta[1];
       const spoolId = e.target.id.split("-");
-      console.log(printerId, spoolId[1], tool);
       selectFilament(printerId, spoolId[1], tool);
     });
   });
 }
 async function init() {
+  //Load Graph
+  let today = new Date();
+  today = new Date(today);
+
+  let lastThirtyDays = [];
+  for (let i = 0; i < 30; i++) {
+    let day = (i + 1) * 1000;
+    let previousDay = new Date(today - day * 60 * 60 * 24 * 2);
+    previousDay = await previousDay;
+    // previousDay = previousDay.split("/");
+    // lastThirtyDays.push(
+    //   `${previousDay[0]}/${previousDay[1]}/${previousDay[2]}`
+    // );
+    lastThirtyDays.push(previousDay);
+  }
+
+  lastThirtyDays.sort();
+  let lastThirtyDaysText = [];
+  lastThirtyDays.forEach((day) => {
+    lastThirtyDaysText.push(day.getTime());
+  });
+  let historyStatistics = await OctoFarmclient.get("history/statisticsData");
+  historyStatistics = await historyStatistics.json();
+  let usageByDay = historyStatistics.history.totalByDay;
+  let usageOverTime = historyStatistics.history.usageOverTime;
+
+  let yAxisSeries = [];
+  usageOverTime.forEach((usage, index) => {
+    let obj = null;
+    if (index === 0) {
+      obj = {
+        title: {
+          text: "Weight",
+        },
+        seriesName: usageOverTime[0].name,
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(0) + "g";
+            }
+          },
+        },
+      };
+    } else {
+      obj = {
+        show: false,
+        seriesName: usageOverTime[0].name,
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(0) + "g";
+            }
+          },
+        },
+      };
+    }
+
+    yAxisSeries.push(obj);
+  });
+  if(typeof usageOverTime[0] !== "undefined"){
+    const usageOverTimeOptions = {
+      chart: {
+        type: "bar",
+        width: "100%",
+        height: "250px",
+        stacked: true,
+        stroke: {
+          show: true,
+          curve: "smooth",
+          lineCap: "butt",
+          width: 1,
+          dashArray: 0,
+        },
+        animations: {
+          enabled: true,
+        },
+        plotOptions: {
+          bar: {
+            horizontal: false,
+          },
+        },
+        toolbar: {
+          show: false,
+        },
+        zoom: {
+          enabled: false,
+        },
+        background: "#303030",
+      },
+      dataLabels: {
+        enabled: false,
+        background: {
+          enabled: true,
+          foreColor: "#000",
+          padding: 1,
+          borderRadius: 2,
+          borderWidth: 1,
+          borderColor: "#fff",
+          opacity: 0.9,
+        },
+        formatter: function (val, opts) {
+          if (val !== null) {
+            return val.toFixed(0) + "g";
+          }
+        },
+      },
+      colors: [
+        "#ff0000",
+        "#ff8400",
+        "#ffd500",
+        "#88ff00",
+        "#00ff88",
+        "#00b7ff",
+        "#4400ff",
+        "#8000ff",
+        "#ff00f2",
+      ],
+      toolbar: {
+        show: false,
+      },
+      theme: {
+        mode: "dark",
+      },
+      noData: {
+        text: "Loading...",
+      },
+      series: [],
+      yaxis: [
+        {
+          title: {
+            text: "Weight",
+          },
+          seriesName: usageOverTime[0].name,
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0) + "g";
+              }
+            },
+          },
+        },
+      ],
+      xaxis: {
+        type: "category",
+        categories: lastThirtyDaysText,
+        tickAmount: 15,
+        labels: {
+          formatter: function (value, timestamp) {
+            let dae = new Date(value).toLocaleDateString();
+
+            return dae; // The formatter function overrides format property
+          },
+        },
+      },
+    };
+    let systemFarmTemp = new ApexCharts(
+        document.querySelector("#usageOverTime"),
+        usageOverTimeOptions
+    );
+    systemFarmTemp.render();
+
+    const usageOverFilamentTimeOptions = {
+      chart: {
+        type: "line",
+        width: "100%",
+        height: "250px",
+        stacked: true,
+        animations: {
+          enabled: true,
+        },
+        toolbar: {
+          show: false,
+        },
+        zoom: {
+          enabled: false,
+        },
+        background: "#303030",
+      },
+      dataLabels: {
+        enabled: true,
+        background: {
+          enabled: true,
+          foreColor: "#000",
+          padding: 1,
+          borderRadius: 2,
+          borderWidth: 1,
+          borderColor: "#fff",
+          opacity: 0.9,
+        },
+        formatter: function (val, opts) {
+          if (val !== null) {
+            return val.toFixed(0) + "g";
+          }
+        },
+      },
+      colors: [
+        "#ff0000",
+        "#ff8400",
+        "#ffd500",
+        "#88ff00",
+        "#00ff88",
+        "#00b7ff",
+        "#4400ff",
+        "#8000ff",
+        "#ff00f2",
+      ],
+      toolbar: {
+        show: false,
+      },
+      stroke: {
+        width: 2,
+        curve: "smooth",
+      },
+      theme: {
+        mode: "dark",
+      },
+      noData: {
+        text: "Loading...",
+      },
+      series: [],
+      yaxis: yAxisSeries,
+      xaxis: {
+        type: "category",
+        categories: lastThirtyDaysText,
+        tickAmount: 15,
+        labels: {
+          formatter: function (value, timestamp) {
+            let dae = new Date(value).toLocaleDateString();
+
+            return dae; // The formatter function overrides format property
+          },
+        },
+      },
+    };
+    let usageOverFilamentTime = new ApexCharts(
+        document.querySelector("#usageOverFilamentTime"),
+        usageOverFilamentTimeOptions
+    );
+    usageOverFilamentTime.render();
+
+    usageOverFilamentTime.updateSeries(usageOverTime);
+    systemFarmTemp.updateSeries(usageByDay);
+  }
+
   // Grab data
   const spoolTable = document.getElementById("addSpoolsTable");
   // Initialise materials dropdown
@@ -809,17 +1078,7 @@ async function init() {
   //     //       <td class="d-none" scope="row">
   //     //         ${profileID}
   //     //       </td>
-  //     //       <td scope="row">
-  //     //          <p contenteditable="false">${profiles.profile.manufacturer}</p>
-  //     //       </td>
-  //     //        <td>
-  //     //         <p contenteditable="false">${profiles.profile.material}</p>
-  //     //       </td>
-  //     //       <td>
-  //     //         <p contenteditable="false">${profiles.profile.density}</p>
-  //     //       </td>
-  //     //       <td>
-  //     //         <p contenteditable="false">${profiles.profile.diameter}</p>
+
   //     //       </td>
   //     //           <td>
   //     //               <button id="edit-${profileID}" type="button" class="btn btn-sm btn-info edit">
@@ -849,6 +1108,7 @@ async function init() {
     storage: "localStorage", // 'localStorage', 'sessionStorage' or 'cookies'
     storageName: "spools-sorting", // the same storage name can be used to share storage between multiple pages
   });
+
   //   //Update Profiles Spools Dropdown.
   //   updateProfileDrop(post)
   //
@@ -906,9 +1166,9 @@ function updateTotals(filtered) {
   const weight = [];
   const used = [];
   filtered.forEach((row) => {
-    price.push(parseInt(row.getElementsByClassName("price")[0].innerText));
-    weight.push(parseInt(row.getElementsByClassName("weight")[0].innerText));
-    used.push(parseInt(row.getElementsByClassName("used")[0].innerText));
+    price.push(parseInt(row.getElementsByClassName("price")[0].placeholder));
+    weight.push(parseInt(row.getElementsByClassName("weight")[0].placeholder));
+    used.push(parseInt(row.getElementsByClassName("used")[0].placeholder));
   });
   const usedReduced = used.reduce((a, b) => a + b, 0).toFixed(0);
   const weightReduced = weight.reduce((a, b) => a + b, 0).toFixed(0);
@@ -931,6 +1191,8 @@ element.addEventListener(
   (e) => {
     // the elements list after filtering + pagination
     updateTotals(e.jplistState.filtered);
+    updateProfileDrop();
+    updatePrinterDrops();
   },
   false
 );

@@ -20,9 +20,6 @@ const { databaseSetup } = require("./server_src/lib/influxExport.js");
 
 const { PrinterClean } = printerClean;
 
-const pluginManager = require("./server_src/runners/pluginManager.js");
-
-const { updatePluginList } = pluginManager;
 const autoDiscovery = require("./server_src/runners/autoDiscovery.js");
 // Server Port
 const app = express();
@@ -86,9 +83,7 @@ const setupServerSettings = async () => {
 const serverStart = async () => {
   try {
     await logger.info("MongoDB Connected...");
-    await logger.info("Grabbing plugin list from OctoPrint.org");
-    let pluginList = await updatePluginList();
-    await logger.info(pluginList);
+
     // Initialise farm information
     const farmInformation = await PrinterClean.initFarmInformation();
     await logger.info(farmInformation);
@@ -113,7 +108,7 @@ const serverStart = async () => {
 
     await databaseSetup();
 
-    app.listen(PORT, () => {
+    app.listen(PORT, "0.0.0.0", () => {
       logger.info(`HTTP server started...`);
       logger.info(`You can now access your server on port: ${PORT}`);
       // eslint-disable-next-line no-console
@@ -210,7 +205,7 @@ mongoose
   });
 
 const databaseIssue = async () => {
-  app.listen(4000, () => {
+  app.listen(4000, "0.0.0.0", ()=> {
     logger.info(`HTTP server started...`);
     logger.info(`You can now access your server on port: ${4000}`);
     // eslint-disable-next-line no-console

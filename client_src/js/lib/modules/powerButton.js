@@ -45,21 +45,24 @@ export default class PowerButton {
                   "Power Off",
                   printer.powerSettings.powerOffCommand
                 );
-                await OctoPrintClient.getPowerStatus(
-                  printer,
-                  printer.powerSettings.powerStatusURL,
-                  printer.powerSettings.powerStatusCommand
-                );
-                await OctoPrintClient.getPowerStatus(
-                  printer,
-                  printer.powerSettings.powerStatusURL,
-                  printer.powerSettings.powerStatusCommand
-                );
-                await OctoPrintClient.getPowerStatus(
-                  printer,
-                  printer.powerSettings.powerStatusURL,
-                  printer.powerSettings.powerStatusCommand
-                );
+                if(printer.powerSettings.powerStatusURL !== ""){
+                  await OctoPrintClient.getPowerStatus(
+                      printer,
+                      printer.powerSettings.powerStatusURL,
+                      printer.powerSettings.powerStatusCommand
+                  );
+                  await OctoPrintClient.getPowerStatus(
+                      printer,
+                      printer.powerSettings.powerStatusURL,
+                      printer.powerSettings.powerStatusCommand
+                  );
+                  await OctoPrintClient.getPowerStatus(
+                      printer,
+                      printer.powerSettings.powerStatusURL,
+                      printer.powerSettings.powerStatusCommand
+                  );
+                }
+
               }
             },
           });
@@ -252,8 +255,9 @@ export default class PowerButton {
         }
       }
     }
-    if (printer.powerSettings !== null) {
-      if (printer.powerSettings.powerOnCommand !== "") {
+
+    if (printer.powerSettings !== null && !_.isEmpty(printer.powerSettings)) {
+      if (printer.powerSettings.powerOnURL !== "") {
         if (!document.getElementById("printerPower-" + printer._id)) {
           if (document.getElementById(element + printer._id)) {
             document.getElementById(

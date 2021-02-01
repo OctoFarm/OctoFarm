@@ -461,6 +461,17 @@ class ClientSettings {
             res.dashboard.historical.hourlyTotalTemperatures;
           document.getElementById("environmentalHistory").checked =
             res.dashboard.historical.environmentalHistory;
+          document.getElementById("filamentUsageCheck").checked =
+            res.dashboard.historical.filamentUsageByDay;
+          document.getElementById("printCompletionCheck").checked =
+            res.dashboard.historical.historyCompletionByDay;
+          document.getElementById("filamentUsageOverTimeCheck").checked =
+            res.dashboard.historical.filamentUsageOverTime;
+        }
+
+        if (typeof res.controlSettings !== "undefined") {
+          document.getElementById("printerControlFilesFirst").checked =
+            res.controlSettings.filesTop;
         }
       });
   }
@@ -476,6 +487,9 @@ class ClientSettings {
       cameraView: {
         cameraRows: document.getElementById("selectCameraGrid").value,
       },
+      controlSettings: {
+        filesTop: document.getElementById("printerControlFilesFirst").checked,
+      },
       dashboard: {
         defaultLayout: [
           { x: 0, y: 0, width: 2, height: 5, id: "currentUtil" },
@@ -490,6 +504,21 @@ class ClientSettings {
           { x: 6, y: 10, width: 6, height: 9, id: "hourlyTemper" },
           { x: 0, y: 10, width: 6, height: 9, id: "weeklyUtil" },
           { x: 0, y: 19, width: 12, height: 8, id: "enviroData" },
+          {
+            x: 0,
+            y: 19,
+            width: 12,
+            height: 8,
+            id: "filamentUsageOverTime",
+          },
+          { x: 0, y: 19, width: 12, height: 8, id: "filamentUsageByDay" },
+          {
+            x: 0,
+            y: 19,
+            width: 12,
+            height: 8,
+            id: "historyCompletionByDay",
+          },
         ],
         savedLayout: localStorage.getItem("dashboardConfiguration"),
         farmActivity: {
@@ -519,6 +548,14 @@ class ClientSettings {
           ).checked,
           environmentalHistory: document.getElementById("environmentalHistory")
             .checked,
+          historyCompletionByDay: document.getElementById(
+            "printCompletionCheck"
+          ).checked,
+          filamentUsageByDay: document.getElementById("filamentUsageCheck")
+            .checked,
+          filamentUsageOverTime: document.getElementById(
+            "filamentUsageOverTimeCheck"
+          ).checked,
         },
       },
     };
@@ -840,54 +877,3 @@ class ServerSettings {
 ServerSettings.init();
 ClientSettings.init();
 Script.get();
-
-const grid = GridStack.init({
-  animate: true,
-  cellHeight: 30,
-  draggable: {
-    handle: ".tag",
-  },
-  float: true,
-});
-function saveGrid() {
-  const serializedData = [];
-  grid.engine.nodes.forEach(function (node) {
-    serializedData.push({
-      x: node.x,
-      y: node.y,
-      width: node.width,
-      height: node.height,
-      id: node.id,
-    });
-  });
-  localStorage.setItem(
-    "dashboardConfiguration",
-    JSON.stringify(serializedData)
-  );
-  // console.log(JSON.stringify(serializedData, null, '  '))
-}
-function loadGrid() {
-  const dashData = localStorage.getItem("dashboardConfiguration");
-  const serializedData = JSON.parse(dashData);
-  if (serializedData !== null && serializedData.length !== 0) {
-    const items = GridStack.Utils.sort(serializedData);
-    grid.batchUpdate();
-
-    // else update existing nodes (instead of calling grid.removeAll())
-    grid.engine.nodes.forEach(function (node) {
-      const item = items.find(function (e) {
-        return e.id === node.id;
-      });
-      if (typeof item !== "undefined") {
-        grid.update(node.el, item.x, item.y, item.width, item.height);
-      }
-    });
-    grid.commit();
-  }
-}
-
-loadGrid();
-
-grid.on("change", function (event, items) {
-  saveGrid();
-});

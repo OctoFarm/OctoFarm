@@ -104,6 +104,12 @@ router.get("/get", ensureAuthenticated, async (req, res) => {
 
   res.send({ history: sorted });
 });
+router.get("/statisticsData", ensureAuthenticated, async (req, res) => {
+  const sorted = await HistoryClean.returnHistory();
+  const stats = await HistoryClean.getStatistics(sorted);
+
+  res.send({ history: stats });
+});
 router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
   //Check required fields
   const latest = req.body;

@@ -381,6 +381,81 @@
         </div>
       </div>
     <% } %>
+      <% if(dashboardSettings.historical.filamentUsageOverTime){ %>
+          <div data-gs-id="filamentUsageOverTime" id="filamentUsageOverTime" class="grid-stack-item"  data-gs-width="12" data-gs-height="7" data-gs-min-height="7" data-gs-max-height="10" data-gs-min-width="3">
+              <div class="grid-stack-item-content card text-white bg-dark h-100">
+                  <div class="card-header dashHeader p-0">
+                      <button
+                              type="button"
+                              class="btn btn-secondary d-block ml-1 mr-1 p-1 float-left"
+                              href="#"
+                              aria-expanded="false"
+                              disabled
+                      >
+                          <i class="fas fa-star-half-alt"></i> Filament Usage Over Time
+                      </button>
+
+                      <span title="Drag to move this panel about" id="printerSortButton-5f3925f1f9b3090e04bcf2d8" class="tag sortableList btn btn-light btn-sm float-right">
+           <i class="fas fa-grip-vertical"></i>
+        </span>
+                  </div>
+                  <div class="card-body pb-0 pt-2 pb-0 text-center">
+                      <div id="usageOverFilamentTime"></div>
+                  </div>
+
+              </div>
+          </div>
+      <% } %>
+      <% if(dashboardSettings.historical.filamentUsageByDay){ %>
+          <div data-gs-id="filamentUsageByDay" id="filamentUsageByDay" class="grid-stack-item"  data-gs-width="12" data-gs-height="7" data-gs-min-height="7" data-gs-max-height="10" data-gs-min-width="3">
+              <div class="grid-stack-item-content card text-white bg-dark h-100">
+                  <div class="card-header dashHeader p-0">
+                      <button
+                              type="button"
+                              class="btn btn-secondary d-block ml-1 mr-1 p-1 float-left"
+                              href="#"
+                              aria-expanded="false"
+                              disabled
+                      >
+                          <i class="fas fa-star-half-alt"></i> Filament Usage By Day
+                      </button>
+
+                      <span title="Drag to move this panel about" id="printerSortButton-5f3925f1f9b3090e04bcf2d8" class="tag sortableList btn btn-light btn-sm float-right">
+           <i class="fas fa-grip-vertical"></i>
+        </span>
+                  </div>
+                  <div class="card-body pb-0 pt-2 pb-0 text-center">
+                      <div id="usageOverTime"></div>
+                  </div>
+
+              </div>
+          </div>
+      <% } %>
+      <% if(dashboardSettings.historical.historyCompletionByDay){ %>
+          <div data-gs-id="historyCompletionByDay" id="historyCompletionByDay" class="grid-stack-item"  data-gs-width="12" data-gs-height="7" data-gs-min-height="7" data-gs-max-height="10" data-gs-min-width="3">
+              <div class="grid-stack-item-content card text-white bg-dark h-100">
+                  <div class="card-header dashHeader p-0">
+                      <button
+                              type="button"
+                              class="btn btn-secondary d-block ml-1 mr-1 p-1 float-left"
+                              href="#"
+                              aria-expanded="false"
+                              disabled
+                      >
+                          <i class="fas fa-star-half-alt"></i> Print Completion By Day
+                      </button>
+
+                      <span title="Drag to move this panel about" id="printerSortButton-5f3925f1f9b3090e04bcf2d8" class="tag sortableList btn btn-light btn-sm float-right">
+           <i class="fas fa-grip-vertical"></i>
+        </span>
+                  </div>
+                  <div class="card-body pb-0 pt-2 pb-0 text-center">
+                      <div id="printCompletionByDay"></div>
+                  </div>
+
+              </div>
+          </div>
+      <% } %>
 
 
 

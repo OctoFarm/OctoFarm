@@ -170,10 +170,10 @@ class ScriptRunner {
       message = message.replace(/\[CurrentTime\]/g, dateNow);
     }
     if (message.includes("[CurrentFile]")) {
-      message = message.replace(/\[CurrentFile\]/g, job.file.display);
+      message = message.replace(/\[CurrentFile\]/g, printer.fileName);
     }
     if (message.includes("[CurrentFilePath]")) {
-      message = message.replace(/\[CurrentFilePath\]/g, job.file.path);
+      message = message.replace(/\[CurrentFilePath\]/g, printer.filePath);
     }
     if (message.includes("[Tool0Temp]")) {
       if (

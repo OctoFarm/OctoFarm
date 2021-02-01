@@ -3,6 +3,7 @@ import OctoFarmClient from "./lib/octofarm.js";
 import Calc from "./lib/functions/calc.js";
 import UI from "./lib/functions/ui.js";
 import { returnDropDown } from "./lib/modules/filamentGrab.js";
+import OctoFarmclient from "./lib/octofarm.js";
 
 // Setup history listeners
 document.getElementById("historyTable").addEventListener("click", (e) => {
@@ -33,6 +34,115 @@ export default class History {
     document.getElementById("loading").style.display = "none";
     document.getElementById("wrapper").classList.remove("d-none");
     document.getElementById("historyToolbar").classList.remove("d-none");
+
+    let historyStatistics = await OctoFarmclient.get("history/statisticsData");
+    historyStatistics = await historyStatistics.json();
+    let historyGraphData = historyStatistics.history.historyByDay;
+
+    const historyGraphOptions = {
+      chart: {
+        type: "line",
+        width: "100%",
+        height: "250px",
+        animations: {
+          enabled: true,
+        },
+        toolbar: {
+          show: false,
+        },
+        zoom: {
+          enabled: false,
+        },
+        background: "#303030",
+      },
+      colors: ["#00bc8c", "#f39c12", "#e74c3c"],
+      dataLabels: {
+        enabled: true,
+        background: {
+          enabled: true,
+          foreColor: "#000",
+          padding: 1,
+          borderRadius: 2,
+          borderWidth: 1,
+          borderColor: "#fff",
+          opacity: 0.9,
+        },
+      },
+      // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+      toolbar: {
+        show: false,
+      },
+      stroke: {
+        width: 4,
+        curve: "smooth",
+      },
+      theme: {
+        mode: "dark",
+      },
+      noData: {
+        text: "Loading...",
+      },
+      series: [],
+      yaxis: [
+        {
+          title: {
+            text: "Count",
+          },
+          seriesName: "Success",
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0);
+              }
+            },
+          },
+        },
+        {
+          title: {
+            text: "Count",
+          },
+          seriesName: "Success",
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0);
+              }
+            },
+          },
+          show: false,
+        },
+        {
+          title: {
+            text: "Count",
+          },
+          seriesName: "Success",
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0);
+              }
+            },
+          },
+          show: false,
+        },
+      ],
+      xaxis: {
+        type: "datetime",
+        tickAmount: 10,
+        labels: {
+          formatter: function (value, timestamp) {
+            let dae = new Date(timestamp);
+            return dae.toLocaleDateString(); // The formatter function overrides format property
+          },
+        },
+      },
+    };
+    let historyGraph = new ApexCharts(
+      document.querySelector("#printCompletionByDay"),
+      historyGraphOptions
+    );
+    historyGraph.render();
+    historyGraph.updateSeries(historyGraphData);
   }
 
   static async edit(e) {
@@ -525,6 +635,7 @@ export default class History {
     const totalHourCost = costPerHour.reduce((a, b) => a + b, 0);
 
     const avgHourCost = totalHourCost / costPerHour.length;
+
     const total =
       statesCancelled.length + statesFailed.length + statesSuccess.length;
     const cancelledPercent = (statesCancelled.length / total) * 100;

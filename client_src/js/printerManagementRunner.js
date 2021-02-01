@@ -572,6 +572,666 @@ scanNetworkBtn.addEventListener("click", async (e) => {
   e.target.disabled = false;
 });
 
+let bulkPreHeat = document.getElementById("bulkPreHeat");
+bulkPreHeat.addEventListener("click", async (e) => {
+  const printersPreHeat = async function () {
+    let printersToConnect = [];
+    //Grab all check boxes
+    const selectedPrinters = PrinterSelect.getSelected();
+    selectedPrinters.forEach((element) => {
+      const ca = element.id.split("-");
+      printersToConnect.push(ca[1]);
+    });
+
+    bootbox.dialog({
+      title: "Bulk printer heating...",
+      message: `
+        <form class="form-inline">
+           <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <label class="input-group-text" for="preHeatToolSelect">Tool #: </label>
+            </div>
+            <select class="custom-select" id="preHeatToolSelect">
+              <option selected value="0">0</option>
+              <option value="0">1</option>
+              <option value="0">2</option>
+              <option value="0">3</option>
+              <option value="0">4</option>
+            </select>
+          </div>
+          <div class="input-group mb-3">
+            <input type="text" class="form-control" placeholder="0" aria-label="0" aria-describedby="basic-addon1" id="preHeatToolTempSelect">
+            <div class="input-group-append">
+              <span class="input-group-text" id="basic-addon1">°C</span>
+            </div>
+          </div>
+          <p>&nbsp;</p>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">Bed</span>
+            </div>
+            <input type="text" class="form-control" placeholder="0" aria-label="0" aria-describedby="basic-addon1" id="preHeatBedTempSelect">
+            <div class="input-group-append">
+              <span class="input-group-text" id="basic-addon1">°C</span>
+            </div>
+          </div>
+          <p>&nbsp;</p>
+          <div class="input-group mb-3">
+            <div class="input-group-prepend">
+              <span class="input-group-text" id="basic-addon1">Chamber</span>
+            </div>
+            <input type="text" class="form-control" placeholder="0" aria-label="0" aria-describedby="basic-addon1" id="preHeatChamberTempSelect">
+                  <div class="input-group-append">
+              <span class="input-group-text" id="basic-addon1">°C</span>
+            </div>
+          </div>
+        </form>
+        `,
+      size: "large",
+      onEscape: true,
+      backdrop: true,
+      closeButton: true,
+      buttons: {
+        action: {
+          label: '<i class="fas fa-fire"></i> Heat!',
+          className: "btn-success",
+          callback: async function () {
+            let toolNumber = document.getElementById("preHeatToolSelect");
+            let toolTemp = document.getElementById("preHeatToolTempSelect");
+            let bedTemp = document.getElementById("preHeatBedTempSelect");
+            let chamberTemp = document.getElementById(
+              "preHeatChamberTempSelect"
+            );
+            let toolData = {
+              command: "target",
+              targets: {},
+            };
+            let bedData = {
+              command: "target",
+              target: 0,
+            };
+            let chamberData = {
+              command: "target",
+              target: 0,
+            };
+
+            if (toolTemp.value !== "" && !isNaN(toolTemp.value)) {
+              toolData.targets["tool" + toolNumber.value] = parseInt(
+                toolTemp.value
+              );
+            }
+            if (bedTemp.value !== "" && !isNaN(bedTemp.value)) {
+              bedData.target = parseInt(bedTemp.value);
+            }
+            if (chamberTemp.value !== "" && !isNaN(chamberTemp.value)) {
+              chamberData.target = parseInt(chamberTemp.value);
+            }
+            for (let p = 0; p < printersToConnect.length; p++) {
+              const index = _.findIndex(printerInfo, function (o) {
+                return o._id === printersToConnect[p];
+              });
+              if (index > -1) {
+                //Set tool temp
+                if (toolTemp.value !== "" && !isNaN(toolTemp.value)) {
+                  let post = await OctoPrintClient.post(
+                    printerInfo[index],
+                    "printer/tool",
+                    toolData
+                  );
+                  if (typeof post !== "undefined") {
+                    if (post.status === 204) {
+                      UI.createAlert(
+                        "success",
+                        `Successfully set tool${toolNumber.value} target attempt to ${printerInfo[index].printerName}...`,
+                        3000,
+                        "Clicked"
+                      );
+                    } else {
+                      UI.createAlert(
+                        "error",
+                        `There was an issue setting tool${toolNumber.value} target attempt to ${printerInfo[index].printerName} are you sure it's online?`,
+                        3000,
+                        "Clicked"
+                      );
+                    }
+                  } else {
+                    UI.createAlert(
+                      "error",
+                      `No response from ${printerInfo[index].printerName}, is it online???`,
+                      3000,
+                      "Clicked"
+                    );
+                  }
+                }
+                //Set bed temp
+                if (bedTemp.value !== "" && !isNaN(bedTemp.value)) {
+                  let post = await OctoPrintClient.post(
+                    printerInfo[index],
+                    "printer/bed",
+                    bedData
+                  );
+                  if (typeof post !== "undefined") {
+                    if (post.status === 204) {
+                      UI.createAlert(
+                        "success",
+                        `Successfully set bed target attempt to ${printerInfo[index].printerName}...`,
+                        3000,
+                        "Clicked"
+                      );
+                    } else {
+                      UI.createAlert(
+                        "error",
+                        `There was an issue setting bed target attempt to ${printerInfo[index].printerName} are you sure it's online?`,
+                        3000,
+                        "Clicked"
+                      );
+                    }
+                  } else {
+                    UI.createAlert(
+                      "error",
+                      `No response from ${printerInfo[index].printerName}, is it online???`,
+                      3000,
+                      "Clicked"
+                    );
+                  }
+                }
+                //Set chamber temp
+                if (chamberTemp.value !== "" && !isNaN(chamberTemp.value)) {
+                  let post = await OctoPrintClient.post(
+                    printerInfo[index],
+                    "printer/chamber",
+                    chamberData
+                  );
+                  if (typeof post !== "undefined") {
+                    if (post.status === 204) {
+                      UI.createAlert(
+                        "success",
+                        `Successfully set chamber target attempt to ${printerInfo[index].printerName}...`,
+                        3000,
+                        "Clicked"
+                      );
+                    } else {
+                      UI.createAlert(
+                        "error",
+                        `There was an issue setting chamber target attempt to ${printerInfo[index].printerName} are you sure it's online?`,
+                        3000,
+                        "Clicked"
+                      );
+                    }
+                  } else {
+                    UI.createAlert(
+                      "error",
+                      `No response from ${printerInfo[index].printerName}, is it online???`,
+                      3000,
+                      "Clicked"
+                    );
+                  }
+                }
+              }
+            }
+          },
+        },
+      },
+    });
+  };
+
+  PrinterSelect.create(
+    document.getElementById("multiPrintersSection"),
+    false,
+    "Pre-Heat Printers",
+    printersPreHeat
+  );
+});
+
+let bulkControl = document.getElementById("bulkControl");
+bulkControl.addEventListener("click", async (e) => {
+  const printersControl = async function () {
+    let printersToConnect = [];
+    //Grab all check boxes
+    const selectedPrinters = PrinterSelect.getSelected();
+    selectedPrinters.forEach((element) => {
+      const ca = element.id.split("-");
+      printersToConnect.push(ca[1]);
+    });
+    let cameraBlock = ``;
+
+    printersToConnect.forEach((printer) => {
+      const index = _.findIndex(printerInfo, function (o) {
+        return o._id === printer;
+      });
+      if (index > -1) {
+        cameraBlock += `
+        <div class="col-lg-3">
+            <img width="100%" src="${printerInfo[index].cameraURL}">
+        </div>
+        `;
+      }
+    });
+
+    bootbox.dialog({
+      title: "Bulk printer control...",
+      message: `
+      <div id="printerControls" class="row">
+            <div class="col-lg-12">
+              <div class="row">
+                 ${cameraBlock}
+              </div>
+            </div>
+            <div class="col-md-6">
+                            <div class="row">
+                    <div class="col-9">
+                        <center>
+                            <h5>X/Y</h5>
+                        </center>
+                        <hr>
+                    </div>
+                    <div class="col-3">
+                        <center>
+                            <h5>Z</h5>
+                        </center>
+                        <hr>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3"></div>
+                    <div class="col-3">
+                        <center><button id="pcYpos" type="button" class="btn btn-light"><i class="fas fa-arrow-up"></i></button></center>
+                    </div>
+                    <div class="col-3"></div>
+                    <div class="col-3">
+                        <center><button id="pcZpos" type="button" class="btn btn-light"><i class="fas fa-arrow-up"></i></button></center>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3">
+                        <center><button id="pcXneg" type="button" class="btn btn-light"><i class="fas fa-arrow-left"></i></button></center>
+                    </div>
+                    <div class="col-3">
+                        <center><button id="pcXYhome" type="button" class="btn btn-light"><i class="fas fa-home"></i></button></center>
+                    </div>
+                    <div class="col-3">
+                        <center><button id="pcXpos" type="button" class="btn btn-light"><i class="fas fa-arrow-right"></i></button></center>
+                    </div>
+                    <div class="col-3">
+                        <center><button id="pcZhome" type="button" class="btn btn-light"><i class="fas fa-home"></i></button></center>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-3"></div>
+                    <div class="col-3">
+                        <center><button id="pcYneg" type="button" class="btn btn-light"><i class="fas fa-arrow-down"></i></button></center>
+                    </div>
+                    <div class="col-3"></div>
+                    <div class="col-3">
+                        <center><button id="pcZneg" type="button" class="btn btn-light"><i class="fas fa-arrow-down"></i></button></center>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <center>
+                            <div id="pcAxisSteps" class="btn-group" role="group">
+                                <button id="pcAxisSteps01" type="button" class="btn btn-light" value="01">0.1</button>
+                                <button id="pcAxisSteps1" type="button" class="btn btn-light" value="1">1</button>
+                                <button id="pcAxisSteps10" type="button" class="btn btn-dark active" value="10">10</button>
+                                <button id="pcAxisSteps100" type="button" class="btn btn-light" value="100">100</button>
+                            </div>
+                        </center>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+            <center>
+            <button id="pmPrintStart" type="button" class="btn btn-success mb-1" role="button" style="display: inline-block;"><i class="fas fa-print"></i> Print</button> <br>
+            <button id="pmPrintPause" type="button" class="btn btn-light mb-1" role="button" style="display: inline-block;"><i class="fas fa-pause"></i> Pause</button> <br>
+            <button id="pmPrintRestart" type="button" class="btn btn-warning mb-1" role="button"  style="display: inline-block;"><i class="fas fa-undo"></i> Restart</button> <br>
+            <button id="pmPrintResume" type="button" class="btn btn-info mb-1" role="button"  style="display: inline-block;"><i class="fas fa-redo"></i> Resume</button> <br>
+            <button id="pmPrintStop" type="button" class="btn btn-danger mb-1" style="display: inline-block;"><i class="fas fa-square"></i> Cancel</button> <br>
+            </center>
+            </div>
+        `,
+      size: "large",
+      onEscape: true,
+      backdrop: true,
+      closeButton: true,
+      onShow: function (e) {
+        //Grab Page
+        const printerControls = {
+          xPlus: document.getElementById("pcXpos"),
+          xMinus: document.getElementById("pcXneg"),
+          yPlus: document.getElementById("pcYpos"),
+          yMinus: document.getElementById("pcYneg"),
+          xyHome: document.getElementById("pcXYhome"),
+          zPlus: document.getElementById("pcZpos"),
+          zMinus: document.getElementById("pcZneg"),
+          zHome: document.getElementById("pcZhome"),
+          step01: document.getElementById("pcAxisSteps01"),
+          step1: document.getElementById("pcAxisSteps1"),
+          step10: document.getElementById("pcAxisSteps10"),
+          step100: document.getElementById("pcAxisSteps100"),
+          printStart: document.getElementById("pmPrintStart"),
+          printPause: document.getElementById("pmPrintPause"),
+          printRestart: document.getElementById("pmPrintRestart"),
+          printResume: document.getElementById("pmPrintResume"),
+          printStop: document.getElementById("pmPrintStop"),
+        };
+        printerControls.printStart.addEventListener("click", async (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              e.target.disabled = true;
+              const opts = {
+                command: "start",
+              };
+
+              OctoPrintClient.jobAction(printerInfo[index], opts, e);
+            }
+          });
+        });
+        printerControls.printPause.addEventListener("click", (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              e.target.disabled = true;
+              const opts = {
+                command: "pause",
+                action: "pause",
+              };
+              OctoPrintClient.jobAction(printerInfo[index], opts, e);
+            }
+          });
+        });
+        printerControls.printRestart.addEventListener("click", (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              e.target.disabled = true;
+              const opts = {
+                command: "restart",
+              };
+              OctoPrintClient.jobAction(printerInfo[index], opts, e);
+            }
+          });
+        });
+        printerControls.printResume.addEventListener("click", (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              e.target.disabled = true;
+              const opts = {
+                command: "pause",
+                action: "resume",
+              };
+              OctoPrintClient.jobAction(printerInfo[index], opts, e);
+            }
+          });
+        });
+        printerControls.printStop.addEventListener("click", (e) => {
+          bootbox.confirm({
+            message: `Are you sure you want to cancel all of your ongoing print?`,
+            buttons: {
+              cancel: {
+                label: '<i class="fa fa-times"></i> Cancel',
+              },
+              confirm: {
+                label: '<i class="fa fa-check"></i> Confirm',
+              },
+            },
+            callback(result) {
+              if (result) {
+                printersToConnect.forEach((printer) => {
+                  const index = _.findIndex(printerInfo, function (o) {
+                    return o._id === printer;
+                  });
+                  if (index > -1) {
+                    e.target.disabled = true;
+                    const opts = {
+                      command: "cancel",
+                    };
+                    OctoPrintClient.jobAction(printerInfo[index], opts, e);
+                  }
+                });
+              }
+            },
+          });
+        });
+
+        printerControls.xPlus.addEventListener("click", (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              OctoPrintClient.move(e, printerInfo[index], "jog", "x");
+            }
+          });
+        });
+        printerControls.xMinus.addEventListener("click", (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              OctoPrintClient.move(e, printerInfo[index], "jog", "x", "-");
+            }
+          });
+        });
+        printerControls.yPlus.addEventListener("click", (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              OctoPrintClient.move(e, printerInfo[index], "jog", "y");
+            }
+          });
+        });
+        printerControls.yMinus.addEventListener("click", (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              OctoPrintClient.move(e, printerInfo[index], "jog", "y", "-");
+            }
+          });
+        });
+        printerControls.xyHome.addEventListener("click", (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              OctoPrintClient.move(e, printerInfo[index], "home", ["x", "y"]);
+            }
+          });
+        });
+        printerControls.zPlus.addEventListener("click", (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              OctoPrintClient.move(e, printerInfo[index], "jog", "z");
+            }
+          });
+        });
+        printerControls.zMinus.addEventListener("click", (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              OctoPrintClient.move(e, printerInfo[index], "jog", "z", "-");
+            }
+          });
+        });
+        printerControls.zHome.addEventListener("click", (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              OctoPrintClient.move(e, printerInfo[index], "home", ["z"]);
+            }
+          });
+        });
+        printerControls.step01.addEventListener("click", (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              OctoFarmClient.post("printers/stepChange", {
+                printer: printerInfo[index]._id,
+                newSteps: "01",
+              });
+            }
+          });
+
+          printerControls.step01.className = "btn btn-dark active";
+          printerControls.step1.className = "btn btn-light";
+          printerControls.step10.className = "btn btn-light";
+          printerControls.step100.className = "btn btn-light";
+        });
+        printerControls.step1.addEventListener("click", (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              OctoFarmClient.post("printers/stepChange", {
+                printer: printerInfo[index]._id,
+                newSteps: "1",
+              });
+            }
+          });
+
+          printerControls.step1.className = "btn btn-dark active";
+          printerControls.step01.className = "btn btn-light";
+          printerControls.step10.className = "btn btn-light";
+          printerControls.step100.className = "btn btn-light";
+        });
+        printerControls.step10.addEventListener("click", (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              OctoFarmClient.post("printers/stepChange", {
+                printer: printerInfo[index]._id,
+                newSteps: "10",
+              });
+            }
+          });
+
+          printerControls.step10.className = "btn btn-dark active";
+          printerControls.step1.className = "btn btn-light";
+          printerControls.step01.className = "btn btn-light";
+          printerControls.step100.className = "btn btn-light";
+        });
+        printerControls.step100.addEventListener("click", (e) => {
+          printersToConnect.forEach((printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              OctoFarmClient.post("printers/stepChange", {
+                printer: printerInfo[index]._id,
+                newSteps: "100",
+              });
+            }
+          });
+
+          printerControls.step100.className = "btn btn-dark active";
+          printerControls.step1.className = "btn btn-light";
+          printerControls.step10.className = "btn btn-light";
+          printerControls.step01.className = "btn btn-light";
+        });
+      },
+    });
+  };
+
+  PrinterSelect.create(
+    document.getElementById("multiPrintersSection"),
+    false,
+    "Control Printers",
+    printersControl
+  );
+});
+
+let bulkGcodeCommands = document.getElementById("bulkGcodeCommands");
+bulkGcodeCommands.addEventListener("click", async (e) => {
+  const printersControl = async function () {
+    let printersToConnect = [];
+    //Grab all check boxes
+    const selectedPrinters = PrinterSelect.getSelected();
+    selectedPrinters.forEach((element) => {
+      const ca = element.id.split("-");
+      printersToConnect.push(ca[1]);
+    });
+    bootbox.prompt({
+      size: "small",
+      title: "What gcode commands would you like sent?",
+      inputType: "textarea",
+      callback: function (result) {
+        printersToConnect.forEach(async (printer) => {
+          const index = _.findIndex(printerInfo, function (o) {
+            return o._id === printer;
+          });
+          if (index > -1) {
+            let lines = result.match(/[^\r\n]+/g);
+            lines = lines.map(function (name) {
+              if (!name.includes("=")) {
+                return name.toLocaleUpperCase();
+              } else {
+                return name;
+              }
+            });
+            const opt = {
+              commands: lines,
+            };
+            const post = await OctoPrintClient.post(
+              printerInfo[index],
+              "printer/command",
+              opt
+            );
+            if (post.status === 204) {
+              UI.createAlert(
+                "success",
+                "Your gcode commands have successfully been sent!",
+                3000,
+                "Clicked"
+              );
+            } else {
+              UI.createAlert(
+                "danger",
+                "Your gcode failed to send! Please check the printer is able to receive these commands.",
+                3000,
+                "Clicked"
+              );
+            }
+          }
+        });
+      },
+    });
+  };
+
+  PrinterSelect.create(
+    document.getElementById("multiPrintersSection"),
+    false,
+    "Send Gcode to Printers",
+    printersControl
+  );
+});
+
 function pluginListTemplate(plugin) {
   //Also need check inplace for incompatible...
   let abandoned = ``;
@@ -780,14 +1440,14 @@ const pluginAction = async function (action) {
                     if (response.needs_restart || response.needs_refresh) {
                       UI.createAlert(
                         "success",
-                        `${printerInfo[index].printerName}: ${response.plugin.name} - Has successfully been installed... OctoPrint restart is required!`,
+                        `${printerInfo[index].printerName}: ${result[r]} - Has successfully been installed... OctoPrint restart is required!`,
                         4000,
                         "Clicked"
                       );
                     } else {
                       UI.createAlert(
                         "success",
-                        `${printerInfo[index].printerName}: ${response.plugin.name} - Has successfully been installed... No further action requested...`,
+                        `${printerInfo[index].printerName}: ${result[r]} - Has successfully been installed... No further action requested...`,
                         4000,
                         "Clicked"
                       );
@@ -2251,38 +2911,38 @@ class dashUpdate {
                     if (updateRequest.status === 200) {
                       UI.createAlert(
                         "success",
-                        `${printer.printerName}: Successfully updated! your instance will restart now.`,
+                        `${printer.printerName}: Update command fired, you may need to restart OctoPrint once complete.`,
                         3000,
                         "Clicked"
                       );
-                      let post = await OctoPrintClient.systemNoConfirm(
-                        printer,
-                        "restart"
-                      );
-                      if (typeof post !== "undefined") {
-                        if (post.status === 204) {
-                          UI.createAlert(
-                            "success",
-                            `Successfully made restart attempt to ${printer.printerName}... You may need to Re-Sync!`,
-                            3000,
-                            "Clicked"
-                          );
-                        } else {
-                          UI.createAlert(
-                            "error",
-                            `There was an issue sending restart to ${printer.printerName} are you sure it's online?`,
-                            3000,
-                            "Clicked"
-                          );
-                        }
-                      } else {
-                        UI.createAlert(
-                          "error",
-                          `No response from ${printer.printerName}, is it online???`,
-                          3000,
-                          "Clicked"
-                        );
-                      }
+                      // let post = await OctoPrintClient.systemNoConfirm(
+                      //   printer,
+                      //   "restart"
+                      // );
+                      // if (typeof post !== "undefined") {
+                      //   if (post.status === 204) {
+                      //     UI.createAlert(
+                      //       "success",
+                      //       `Successfully made restart attempt to ${printer.printerName}... You may need to Re-Sync!`,
+                      //       3000,
+                      //       "Clicked"
+                      //     );
+                      //   } else {
+                      //     UI.createAlert(
+                      //       "error",
+                      //       `There was an issue sending restart to ${printer.printerName} are you sure it's online?`,
+                      //       3000,
+                      //       "Clicked"
+                      //     );
+                      //   }
+                      // } else {
+                      //   UI.createAlert(
+                      //     "error",
+                      //     `No response from ${printer.printerName}, is it online???`,
+                      //     3000,
+                      //     "Clicked"
+                      //   );
+                      // }
                     } else {
                       UI.createAlert(
                         "error",

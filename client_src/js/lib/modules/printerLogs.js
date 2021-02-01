@@ -39,7 +39,9 @@ export default class PrinterLogs {
               "beforeend",
               `
                                 <tr class="${colour}">
-                                  <th scope="row">${splitText[i]}</th>
+                                  <th scope="row">${splitText.length - i}: ${
+                splitText[i]
+              }</th>
                                 </tr>
                             `
             );

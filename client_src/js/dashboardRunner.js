@@ -1,7 +1,377 @@
 import "@babel/polyfill";
 import Calc from "./lib/functions/calc.js";
 import currentOperations from "./lib/modules/currentOperations.js";
-import UI from "./lib/functions/ui";
+import UI from "./lib/functions/ui.js";
+import OctoFarmclient from "./lib/octofarm.js";
+
+//On Load API call for new graphs
+let enviromentalData,
+  systemFarmTemp,
+  activityHeatChart,
+  currentActivityChart,
+  currentUtilisation,
+  usageOverFilamentTime,
+  historyGraph,
+  filamentUsage;
+
+let initNewGraphs = async function () {
+  //Load Graph
+  let today = new Date();
+  today = new Date(today);
+
+  let lastThirtyDays = [];
+  for (let i = 0; i < 30; i++) {
+    let day = (i + 1) * 1000;
+    let previousDay = new Date(today - day * 60 * 60 * 24 * 2);
+    previousDay = await previousDay;
+    // previousDay = previousDay.split("/");
+    // lastThirtyDays.push(
+    //   `${previousDay[0]}/${previousDay[1]}/${previousDay[2]}`
+    // );
+    lastThirtyDays.push(previousDay);
+  }
+
+  lastThirtyDays.sort();
+  let lastThirtyDaysText = [];
+  lastThirtyDays.forEach((day) => {
+    lastThirtyDaysText.push(day.getTime());
+  });
+
+  let historyStatistics = await OctoFarmclient.get("history/statisticsData");
+  historyStatistics = await historyStatistics.json();
+
+  let historyGraphData = historyStatistics.history.historyByDay;
+  let usageByDay = historyStatistics.history.totalByDay;
+  let usageOverTime = historyStatistics.history.usageOverTime;
+
+  let yAxisSeries = [];
+  usageOverTime.forEach((usage, index) => {
+    let obj = null;
+    if (index === 0) {
+      obj = {
+        title: {
+          text: "Weight",
+        },
+        seriesName: usageOverTime[0].name,
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(2) + "g";
+            }
+          },
+        },
+      };
+    } else {
+      obj = {
+        show: false,
+        seriesName: usageOverTime[0].name,
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(2) + "g";
+            }
+          },
+        },
+      };
+    }
+
+    yAxisSeries.push(obj);
+  });
+
+  const usageOverTimeOptions = {
+    chart: {
+      type: "bar",
+      width: "100%",
+      height: "250px",
+      stacked: true,
+      stroke: {
+        show: true,
+        curve: "smooth",
+        lineCap: "butt",
+        width: 1,
+        dashArray: 0,
+      },
+      animations: {
+        enabled: true,
+      },
+      plotOptions: {
+        bar: {
+          horizontal: false,
+        },
+      },
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false,
+      },
+      background: "#303030",
+    },
+    dataLabels: {
+      enabled: false,
+      background: {
+        enabled: true,
+        foreColor: "#000",
+        padding: 1,
+        borderRadius: 2,
+        borderWidth: 1,
+        borderColor: "#fff",
+        opacity: 0.9,
+      },
+      formatter: function (val, opts) {
+        if (val !== null) {
+          return val.toFixed(0) + "g";
+        }
+      },
+    },
+    colors: [
+      "#ff0000",
+      "#ff8400",
+      "#ffd500",
+      "#88ff00",
+      "#00ff88",
+      "#00b7ff",
+      "#4400ff",
+      "#8000ff",
+      "#ff00f2",
+    ],
+    toolbar: {
+      show: false,
+    },
+    theme: {
+      mode: "dark",
+    },
+    noData: {
+      text: "Loading...",
+    },
+    series: [],
+    yaxis: [
+      {
+        title: {
+          text: "Weight",
+        },
+        seriesName: usageOverTime[0].name,
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(0) + "g";
+            }
+          },
+        },
+      },
+    ],
+    xaxis: {
+      type: "category",
+      categories: lastThirtyDaysText,
+      tickAmount: 15,
+      labels: {
+        formatter: function (value, timestamp) {
+          let dae = new Date(value).toLocaleDateString();
+
+          return dae; // The formatter function overrides format property
+        },
+      },
+    },
+  };
+  const usageOverFilamentTimeOptions = {
+    chart: {
+      type: "line",
+      width: "100%",
+      height: "250px",
+      stacked: true,
+      animations: {
+        enabled: true,
+      },
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false,
+      },
+      background: "#303030",
+    },
+    dataLabels: {
+      enabled: true,
+      background: {
+        enabled: true,
+        foreColor: "#000",
+        padding: 1,
+        borderRadius: 2,
+        borderWidth: 1,
+        borderColor: "#fff",
+        opacity: 0.9,
+      },
+      formatter: function (val, opts) {
+        if (val !== null) {
+          return val.toFixed(0) + "g";
+        }
+      },
+    },
+    colors: [
+      "#ff0000",
+      "#ff8400",
+      "#ffd500",
+      "#88ff00",
+      "#00ff88",
+      "#00b7ff",
+      "#4400ff",
+      "#8000ff",
+      "#ff00f2",
+    ],
+    toolbar: {
+      show: false,
+    },
+    stroke: {
+      width: 2,
+      curve: "smooth",
+    },
+    theme: {
+      mode: "dark",
+    },
+    noData: {
+      text: "Loading...",
+    },
+    series: [],
+    yaxis: yAxisSeries,
+    xaxis: {
+      type: "category",
+      categories: lastThirtyDaysText,
+      tickAmount: 15,
+      labels: {
+        formatter: function (value, timestamp) {
+          let dae = new Date(value).toLocaleDateString();
+
+          return dae; // The formatter function overrides format property
+        },
+      },
+    },
+  };
+  const historyGraphOptions = {
+    chart: {
+      type: "line",
+      width: "100%",
+      height: "250px",
+      animations: {
+        enabled: true,
+      },
+      toolbar: {
+        show: false,
+      },
+      zoom: {
+        enabled: false,
+      },
+      background: "#303030",
+    },
+    colors: ["#00bc8c", "#f39c12", "#e74c3c"],
+    dataLabels: {
+      enabled: true,
+      background: {
+        enabled: true,
+        foreColor: "#000",
+        padding: 1,
+        borderRadius: 2,
+        borderWidth: 1,
+        borderColor: "#fff",
+        opacity: 0.9,
+      },
+    },
+    // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+    toolbar: {
+      show: false,
+    },
+    stroke: {
+      width: 4,
+      curve: "smooth",
+    },
+    theme: {
+      mode: "dark",
+    },
+    noData: {
+      text: "Loading...",
+    },
+    series: [],
+    yaxis: [
+      {
+        title: {
+          text: "Count",
+        },
+        seriesName: "Success",
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(0);
+            }
+          },
+        },
+      },
+      {
+        title: {
+          text: "Count",
+        },
+        seriesName: "Success",
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(0);
+            }
+          },
+        },
+        show: false,
+      },
+      {
+        title: {
+          text: "Count",
+        },
+        seriesName: "Success",
+        labels: {
+          formatter: function (val) {
+            if (val !== null) {
+              return val.toFixed(0);
+            }
+          },
+        },
+        show: false,
+      },
+    ],
+    xaxis: {
+      type: "datetime",
+      tickAmount: 10,
+      labels: {
+        formatter: function (value, timestamp) {
+          let dae = new Date(timestamp);
+          return dae.toLocaleDateString(); // The formatter function overrides format property
+        },
+      },
+    },
+  };
+
+  if (document.querySelector("#usageOverFilamentTime")) {
+    usageOverFilamentTime = new ApexCharts(
+      document.querySelector("#usageOverFilamentTime"),
+      usageOverFilamentTimeOptions
+    );
+    usageOverFilamentTime.render();
+
+    usageOverFilamentTime.updateSeries(usageOverTime);
+  }
+  if (document.querySelector("#usageOverTime")) {
+    filamentUsage = new ApexCharts(
+      document.querySelector("#usageOverTime"),
+      usageOverTimeOptions
+    );
+    filamentUsage.render();
+    filamentUsage.updateSeries(usageByDay);
+  }
+
+  if (document.querySelector("#printCompletionByDay")) {
+    historyGraph = new ApexCharts(
+      document.querySelector("#printCompletionByDay"),
+      historyGraphOptions
+    );
+    historyGraph.render();
+    historyGraph.updateSeries(historyGraphData);
+  }
+};
 
 // Setup charts test
 const optionsFarmTemp = {
@@ -339,12 +709,6 @@ const optionsUtilisation = {
   },
 };
 
-let enviromentalData,
-  systemFarmTemp,
-  activityHeatChart,
-  currentActivityChart,
-  currentUtilisation;
-
 if (document.querySelector("#farmTempMap")) {
   systemFarmTemp = new ApexCharts(
     document.querySelector("#farmTempMap"),
@@ -378,7 +742,7 @@ let worker = null;
 
 function createWebWorker() {
   worker = new Worker("/assets/js/workers/dashboardWorker.min.js");
-  worker.onmessage = function (event) {
+  worker.onmessage = async function (event) {
     if (event.data != false) {
       const currentOperationsData = event.data.currentOperations;
       const printerInfo = event.data.printerInformation;
@@ -412,6 +776,7 @@ function createWebWorker() {
       if (dashboardSettings.printerStates.printerState) {
         dashUpdate.printerStatus(dashboard.printerHeatMaps.heatStatus);
       }
+
       if (dashboardSettings.printerStates.printerProgress) {
         dashUpdate.printerProgress(dashboard.printerHeatMaps.heatProgress);
       }
@@ -424,6 +789,25 @@ function createWebWorker() {
 
       if (dashboardSettings.historical.environmentalHistory) {
         dashUpdate.envriromentalData(dashboard.enviromentalData);
+      }
+      let historyStatistics = await OctoFarmclient.get(
+        "history/statisticsData"
+      );
+      historyStatistics = await historyStatistics.json();
+
+      let historyGraphData = historyStatistics.history.historyByDay;
+      let usageByDay = historyStatistics.history.totalByDay;
+      let usageOverTime = historyStatistics.history.usageOverTime;
+
+      if (document.querySelector("#usageOverFilamentTime")) {
+        usageOverFilamentTime.updateSeries(usageOverTime);
+      }
+      if (document.querySelector("#usageOverTime")) {
+        filamentUsage.updateSeries(usageByDay);
+      }
+
+      if (document.querySelector("#printCompletionByDay")) {
+        historyGraph.updateSeries(historyGraphData);
       }
     } else {
       UI.createAlert(
@@ -944,7 +1328,7 @@ function saveGrid() {
   );
   // console.log(JSON.stringify(serializedData, null, '  '))
 }
-function loadGrid() {
+async function loadGrid() {
   const dashData = localStorage.getItem("dashboardConfiguration");
   const serializedData = JSON.parse(dashData);
   if (serializedData !== null && serializedData.length !== 0) {
@@ -965,7 +1349,24 @@ function loadGrid() {
 }
 
 loadGrid();
-
-grid.on("change", function (event, items) {
+initNewGraphs();
+grid.on("change", async function (event, items) {
   saveGrid();
+  let historyStatistics = await OctoFarmclient.get("history/statisticsData");
+  historyStatistics = await historyStatistics.json();
+
+  let historyGraphData = historyStatistics.history.historyByDay;
+  let usageByDay = historyStatistics.history.totalByDay;
+  let usageOverTime = historyStatistics.history.usageOverTime;
+
+  if (document.querySelector("#usageOverFilamentTime")) {
+    usageOverFilamentTime.updateSeries(usageOverTime);
+  }
+  if (document.querySelector("#usageOverTime")) {
+    filamentUsage.updateSeries(usageByDay);
+  }
+
+  if (document.querySelector("#printCompletionByDay")) {
+    historyGraph.updateSeries(historyGraphData);
+  }
 });

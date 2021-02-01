@@ -17,6 +17,10 @@ const ClientSettingsSchema = new mongoose.Schema({
     type: Object,
     required: false,
   },
+  controlSettings: {
+    type: Object,
+    require: false,
+  },
 });
 
 const ClientSettings = mongoose.model("ClientSettings", ClientSettingsSchema);

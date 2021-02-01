@@ -122,9 +122,8 @@ function addEventListeners(printer) {
           data = {
             command: "connect",
             port: printer.connectionOptions.portPreference,
-            baudrate: printer.connectionOptions.baudratePreference,
+            baudrate: parseInt(printer.connectionOptions.baudratePreference),
             printerProfile: printer.connectionOptions.printerProfilePreference,
-            save: true,
           };
         } else {
           UI.createAlert(
@@ -137,7 +136,6 @@ function addEventListeners(printer) {
           data.port = "AUTO";
           data.baudrate = "AUTO";
           data.printerProfile = "_default";
-          data.save = false;
         }
         let post = await OctoPrintClient.post(printer, "connection", data);
         if (typeof post !== "undefined") {
@@ -241,6 +239,22 @@ function addEventListeners(printer) {
 function checkQuickConnectState(printer) {
   document.getElementById("printerQuickConnect-" + printer._id).disabled =
     printer.printerState.colour.category === "Offline";
+  if (typeof printer.connectionOptions !== "undefined") {
+    if (
+      printer.connectionOptions.portPreference === null ||
+      printer.connectionOptions.baudratePreference === null ||
+      printer.connectionOptions.printerProfilePreference === null
+    ) {
+      document.getElementById(
+        "printerQuickConnect-" + printer._id
+      ).disabled = true;
+    }
+  } else {
+    document.getElementById(
+      "printerQuickConnect-" + printer._id
+    ).disabled = true;
+  }
+
   if (
     (printer.printerState.colour.category !== "Offline" &&
       printer.printerState.colour.category === "Disconnected") ||

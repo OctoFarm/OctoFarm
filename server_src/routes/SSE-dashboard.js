@@ -64,6 +64,21 @@ if (interval === false) {
           { x: 6, y: 10, width: 6, height: 9, id: "hourlyTemper" },
           { x: 0, y: 10, width: 6, height: 9, id: "weeklyUtil" },
           { x: 0, y: 19, width: 12, height: 8, id: "enviroData" },
+          {
+            x: 0,
+            y: 19,
+            width: 12,
+            height: 8,
+            id: "filamentUsageOverTime",
+          },
+          { x: 0, y: 19, width: 12, height: 8, id: "filamentUsageByDay" },
+          {
+            x: 0,
+            y: 19,
+            width: 12,
+            height: 8,
+            id: "historyCompletionByDay",
+          },
         ],
         savedLayout: [],
         farmActivity: {
@@ -86,6 +101,9 @@ if (interval === false) {
           weeklyUtilisation: true,
           hourlyTotalTemperatures: false,
           environmentalHistory: false,
+          filamentUsageOverTime: false,
+          filamentUsageByDay: false,
+          historyCompletionByDay: false,
         },
       };
     } else {

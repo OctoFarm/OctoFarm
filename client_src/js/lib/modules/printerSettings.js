@@ -201,7 +201,7 @@ export default class PrinterSettings {
         } else {
           document.getElementById("psDefaultProfile").value = 0;
         }
-        console.log(currentPrinter.currentProfile);
+
         document.getElementById("psPrinterProfiles").innerHTML = `
             <div class="col-12 col-lg-4">
             <h5 class="mb-1"><u>Printer</u></h5>
@@ -528,7 +528,7 @@ export default class PrinterSettings {
       let serverRestart = "N/A";
       let systemRestart = "N/A";
       let systemShutdown = "N/A";
-      if (currentPrinter.powerSettings !== null) {
+      if (currentPrinter.otherSettings !== null) {
         if (
           currentPrinter.otherSettings.system.commands.serverRestartCommand ===
           ""
@@ -572,7 +572,7 @@ export default class PrinterSettings {
       let wolCount = "3";
       let wolMAC = "";
       if (
-        currentPrinter.powerSettings !== null &&
+        currentPrinter.powerSettings !== null || _.isEmpty(currentPrinter.powerSettings) &&
         typeof currentPrinter.powerSettings.wol !== "undefined"
       ) {
         wolEnable = currentPrinter.powerSettings.wol.enabled;
@@ -729,7 +729,7 @@ export default class PrinterSettings {
           "psSystemShutdown"
         ).placeholder = systemShutdown;
       }
-      if (currentPrinter.powerSettings != null) {
+      if (!currentPrinter.powerSettings != null && !_.isEmpty(currentPrinter.powerSettings) ) {
         document.getElementById("psPowerOnCommand").placeholder =
           currentPrinter.powerSettings.powerOnCommand;
         document.getElementById("psPowerOnURL").placeholder =
@@ -1072,7 +1072,6 @@ export default class PrinterSettings {
           );
           if (update.status === 200) {
             update = await update.json();
-            console.log(update);
             UI.createAlert(
               "success",
               `OctoFarm successfully updated for ${currentPrinter.printerName}`,
@@ -1086,8 +1085,7 @@ export default class PrinterSettings {
                 3000,
                 "clicked"
               );
-            } else if (update.status.profile === 900) {
-            } else {
+            } else if(update.status.profile === 900){}else {
               UI.createAlert(
                 "error",
                 `${currentPrinter.printerName}: profile failed to updated`,
@@ -1102,8 +1100,7 @@ export default class PrinterSettings {
                 3000,
                 "clicked"
               );
-            } else if (update.status.settings === 900) {
-            } else {
+            } else if(update.status.profile === 900){}else {
               UI.createAlert(
                 "error",
                 `${currentPrinter.printerName}: settings failed to updated`,
@@ -1114,7 +1111,7 @@ export default class PrinterSettings {
           } else {
             UI.createAlert(
               "error",
-              `OctoFarm failed to update ${currentPrinter.printerName}`,
+              `OctoFarm failed to update ${currentPrinter.printerName}, please log a bug at github.com/OctoFarm/issues!`,
               3000,
               "clicked"
             );

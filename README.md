@@ -9,7 +9,7 @@
 
   <p>Please visit <a href="https://features.octofarm.net">Octofarm's Features Page to log a request.</a>
 
-  <h3 align="center">Version 1.1.5</h3>
+  <h3 align="center">Version 1.1.x</h3>
 <br />
 <p align="center">
   <a href="https://github.com/NotExpectedYet/OctoFarm">
@@ -40,8 +40,7 @@
   - [Platform](#platform)
   - [Supported Browsers](#supported-browsers)
   - [Prerequisites](#prerequisites)
-  - [Installation Docker](#installation-docker)
-  - [Installation Production](#installation-production)
+  - [Installation](#installation-production)
   - [Installation Development](#installation-development)
 - [Contributing](#contributing)
 - [License](#license)
@@ -54,6 +53,7 @@
 
 OctoFarm was built to fill a need that anyone with multiple 3D printers with Octoprint will have run into. How do I manage multiple printers from one place? That's where OctoFarm steps in, add your OctoPrint instances to the system and it will scan and keep you up to date on the status of your printers.
 ![Dashboard View](https://github.com/NotExpectedYet/OctoFarm/blob/master/screenshots/dashboard.png)
+
 
 <!-- GETTING STARTED -->
 
@@ -76,10 +76,7 @@ _Note_: Raspberry Pi's Raspbian OS doesn't officially support running MongoDB ye
 
 ### Supported Browsers
 
-Currently OctoFarm only support Chrome, Chromium and Firefox. No other browsers have been tested and may produce bugs. Use one of the supported browsers for the best experience.
-
- - Firefox currently has a bug where you can't add printers. This is down to firefox not handling editable html fields properly and you will need to use Chrome to input printers.
-
+All browsers should now be supported in OctoFarm. Please log an issue if this is not the case. 
 
 
 ### Prerequisites
@@ -91,124 +88,19 @@ Currently OctoFarm only support Chrome, Chromium and Firefox. No other browsers 
 
 On your OctoPrint instance
 
-- Settings -> API
-- Copy the API Key someplace easy to get to
+- User Name -> User Settings
+- Copy the API Key some place easy to get to
 - Enabled the "Allow Cross Origin Resource Sharing (CORS)
 - Restart OctoPrint
 - Repeat for all OctoPrints that will be added to the Farm
 
 #See The WIKI for more detailed instructions than what's available below
 
-### Installation Docker
-Currently all docker images are built with linux/amd64 with debian stretch. There are a few different tags available. 
+### Installation
+All user documentation is now moving to OctoFarm.net. Development documentation below. 
 
-#### Example Docker Run
-`docker run -d --name octofarm -e "MONGO=mongodb://172.17.0.2/octofarm" -p4000:4000 octofarm/octofarm -e "TZ=America/Chicago" -v '<your persistent folder>/OctoFarm/logs/':'/app/logs/':'rw' -v '<your persistent folder>/OctoFarm/scripts/':'/scripts/':'rw'`
+https://octofarm.net
 
-#### Generic Docker-Compose
-
-
-    version: "3"
-    services:
-      octofarm:
-        container_name: octofarm
-        image: octofarm/octofarm
-        restart: always
-        ports:
-          - 4000:4000
-        environment:
-          - MONGO=mongodb://mongo/octofarm
-        volumes:
-          - <your persistent folder>/OctoFarm/logs:/app/logs
-          - <your persistent folder>/OctoFarm/scripts:/scripts
-
-
-#### OctoFarm (Standalone)
-    latest: Pulls the latest master release
-    dev: Pulls the latest development release. (Bleeding edge features, only for testing)
-    {Version Tag}: Pulls a specific version
-    
-    
-#### OctoFarm (Including MongoDB)(Big thanks to MearWolf!)
-    monolithic-latest: Pulls the latest master release
-    monolithic-dev: Pulls the latest development release. (Bleeding edge features, only for testing) 
-    monolithic-{Version Tag}: Pulls a specific version
-    
-  
-### Installation Production
-
-- Debian/Linux Specific
-
-1. Install the Pre-requisites
-
-```sh
-curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
-sudo apt-get install -y nodejs
-sudo apt install mongodb
-sudo apt install git
-```
-
-- Alternative
-
-```sh
-curl -sL https://deb.nodesource.com/setup_13.x | sudo -E bash -
-sudo apt-get install -y nodejs
-wget https://repo.mongodb.org/apt/ubuntu/dists/bionic/mongodb-org/4.2/multiverse/binary-amd64/mongodb-org-server_4.2.5_amd64.deb
-sudo dpkg -i mongodb-org-server_4.2.5_amd64.deb
-sudo apt install git
-```
-
-1. Clone the OctoFarm and cd into it's directory.
-
-```sh
-git clone https://github.com/NotExpectedYet/OctoFarm.git
-
-cd OctoFarm
-
-```
-
-2. Install NPM packages
-
-```sh
-npm install
-```
-
-3. Edit the /config/db.js file with your database and grab your hosts IP.
-
-```sh
-nano config/db.js
-```
-
-#### Change 192.168.1.5 to the mongodb server's IP Address (127.0.0.1 if you installed on the same machine, the actual IP Address otherwise), Save the File
-
-#### hostname -I (Take note of the IP Address returned here)
-
-4. Start the system
-
-```sh
-npm start
-```
-
-#### If the last message you see is '> node app.js > production.log 2> productionError.log' You did it correctly!
-
-5. Load up a browser and add your printers.
-
-```sh
-Open a browser and go to http://<IP from hostname -I>:4000
-Register a New User ## Password must be six characters
-Login as that new User
-Click the Setup Printers button
-Enter Your First Printers information
- - IP
- - Port (Typically 80)
- - Camera URL (Typically IP:8081/webcam/?action=stream if using a USB camera or Pi Camera )
- - APIKey (Gathered during the PreRequisites)
- - Click Add Printer
- - Repeat for all your OctoPrint Instances
- - Click Save
-```
-
-- The production version will run without interaction, but currently there are no way to persist other than something like screen on linux, or using a service you create yourself. The logs will be outputted to /logs folder for error and standard operations. Check the error log if your server unexpectedly halts.
 
 ### Installation Development
 

@@ -23,6 +23,21 @@ class ClientSettings {
               { x: 6, y: 10, width: 6, height: 9, id: "hourlyTemper" },
               { x: 0, y: 10, width: 6, height: 9, id: "weeklyUtil" },
               { x: 0, y: 19, width: 12, height: 8, id: "enviroData" },
+              {
+                x: 0,
+                y: 19,
+                width: 12,
+                height: 8,
+                id: "filamentUsageOverTime",
+              },
+              { x: 0, y: 19, width: 12, height: 8, id: "filamentUsageByDay" },
+              {
+                x: 0,
+                y: 19,
+                width: 12,
+                height: 8,
+                id: "historyCompletionByDay",
+              },
             ],
             savedLayout: [],
             farmActivity: {
@@ -45,6 +60,9 @@ class ClientSettings {
               weeklyUtilisation: true,
               hourlyTotalTemperatures: true,
               environmentalHistory: false,
+              filamentUsageOverTime: false,
+              filamentUsageByDay: false,
+              historyCompletionByDay: false,
             },
           };
           const panelView = {
@@ -71,6 +89,9 @@ class ClientSettings {
             powerBtn: false,
             webBtn: false,
           };
+          const controlSettings = {
+            filesTop: false
+          }
           // const operations = {};
           // const filaManager = {};
           const defaultSystemSettings = new ClientSettingsDB({
@@ -79,6 +100,7 @@ class ClientSettings {
             panelView,
             listView,
             cameraView,
+            controlSettings
           });
           defaultSystemSettings.save();
           return "Server settings have been created...";

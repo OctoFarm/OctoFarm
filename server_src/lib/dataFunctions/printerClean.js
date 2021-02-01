@@ -43,6 +43,10 @@ const dashboardStatistics = {
   printerHeatMaps: {},
   utilisationGraph: {},
   temperatureGraph: {},
+  currentIAQ: null,
+  currentTemperature: null,
+  currentPressure: null,
+  currentHumidity: null,
 };
 let printersInformation = [];
 
@@ -191,7 +195,10 @@ class PrinterClean {
         order: farmPrinter.sortIndex,
       };
 
-      if (typeof farmPrinter.resends !== "undefined") {
+      if (
+        typeof farmPrinter.resends !== "undefined" &&
+        farmPrinter.resends !== null
+      ) {
         sortedPrinter.resends = farmPrinter.resends;
       }
 
@@ -665,7 +672,8 @@ class PrinterClean {
   }
 
   static async statisticsStart() {
-    const history = HistoryClean.returnStatistics();
+    const history = await HistoryClean.returnStatistics();
+
     dashboardStatistics.currentUtilisation = [
       {
         data: [
@@ -1085,6 +1093,9 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: enviromentalData[i].temperature.toFixed(2),
             });
+            dashboardStatistics.currentTemperature = enviromentalData[
+              0
+            ].temperature.toFixed(2);
           } else {
             currentEnviromentalData[0].data.push({
               x: enviromentalData[i].date,
@@ -1099,6 +1110,7 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: enviromentalData[i].humidity.toFixed(0),
             });
+            dashboardStatistics.currentHumidity = enviromentalData[0].humidity;
           } else {
             currentEnviromentalData[1].data.push({
               x: enviromentalData[i].date,
@@ -1113,6 +1125,9 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: enviromentalData[i].pressure.toFixed(0),
             });
+            dashboardStatistics.currentPressure = enviromentalData[
+              0
+            ].pressure.toFixed(0);
           } else {
             currentEnviromentalData[2].data.push({
               x: enviromentalData[i].date,
@@ -1127,6 +1142,7 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: enviromentalData[i].iaq.toFixed(0),
             });
+            dashboardStatistics.currentIAQ = enviromentalData[0].iaq.toFixed(0);
           } else {
             currentEnviromentalData[3].data.push({
               x: enviromentalData[i].date,
@@ -1135,7 +1151,6 @@ class PrinterClean {
           }
         }
         dashboardStatistics.enviromentalData = currentEnviromentalData;
-        //dashboardStatistics.currentIAQ = currentIAQ;
       });
   }
 

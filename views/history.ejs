@@ -25,6 +25,27 @@
   </div>
 </div>
 <div class="row">
+  <div class="col-lg-12">
+    <div class="card text-white bg-dark  h-100">
+      <div class="card-header dashHeader p-0">
+        <button
+                type="button"
+                class="btn btn-secondary d-block ml-1 mr-1 p-1 float-left"
+                href="#"
+                aria-expanded="false"
+                disabled
+        >
+          <i class="fas fa-star-half-alt"></i> Print Completion By Day
+        </button>
+
+
+
+      </div>
+      <div class="card-body pb-0 text-center">
+        <div id="printCompletionByDay"></div>
+      </div>
+    </div>
+  </div>
   <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
     <div class="card text-white bg-dark h-100">
       <div class="card-header dashHeader p-0">
@@ -299,7 +320,7 @@
           </div>
               <div class="col-lg-12 table-responsive-sm table-responsive-md">
 
-                <table class="table table-dark text-center">
+                <table class="table-hover table table-dark text-center">
                   <thead>
                   <tr>
                     <th class="table-dark" scope="col" width="350px">Status</th>
@@ -448,7 +469,7 @@
               <% if(history[i].spools !== null){ %>
                 <% history[i].spools.forEach((spool,index) => { %>
                 <%if(spool[Object.keys(spool)[0]].spoolName !== null){%>
-                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p><%= spool[Object.keys(spool)[0]].weight.toFixed(2) %>g / <%= spool[Object.keys(spool)[0]].length.toFixed(2) %>m</p>
+                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p><%= spool[Object.keys(spool)[0]].weight %>g / <%= spool[Object.keys(spool)[0]].length %>m</p>
                 <%}else{%>
                   <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p>(No Spool)</p>
                 <%}%>
@@ -584,7 +605,7 @@
         <div class="row  table-responsive">
           <div class="col-lg-12"><h5 class="mb-1 text-left">Tools</h5><hr></div>
           <div class="col-lg-12">
-            <table class="table table-dark text-center">
+            <table class="table-hover table table-dark text-center">
               <thead>
               <tr>
                 <th class="table-dark sticky-table table-dark" scope="col">Tool</th>

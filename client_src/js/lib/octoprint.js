@@ -422,8 +422,6 @@ export default class OctoPrintClient {
   }
 
   static async getPowerStatus(printer, url, command) {
-    console.log(printer.printerURL);
-    console.log(url);
     if (url.includes("[PrinterURL]")) {
       url = url.replace("[PrinterURL]", printer.printerURL);
     }
@@ -435,9 +433,11 @@ export default class OctoPrintClient {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-Api-Key": printer.apikey,
         },
       });
       if (post.status !== 200 || post.status !== 204) {
+
         return "No Status";
       } else {
         post = await post.json();

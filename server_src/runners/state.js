@@ -201,6 +201,12 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].webSocketDescription =
               "Websocket Closed by OctoFarm";
             this.instance.removeAllListeners();
+            if (typeof farmPrinters[this.index] !== "undefined") {
+              PrinterClean.generate(
+                farmPrinters[this.index],
+                systemSettings.filamentManager
+              );
+            }
           } catch (e) {
             logger.info(
               `Couldn't set state of missing printer, safe to ignore: ${this.index}: ${this.url}`
@@ -222,6 +228,12 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].webSocketDescription =
               "Websocket Closed by OctoFarm";
             this.instance.removeAllListeners();
+            if (typeof farmPrinters[this.index] !== "undefined") {
+              PrinterClean.generate(
+                farmPrinters[this.index],
+                systemSettings.filamentManager
+              );
+            }
           } catch (e) {
             logger.info(
               `Couldn't set state of missing printer, safe to ignore: ${this.index}: ${this.url}`
@@ -242,6 +254,12 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].webSocketDescription =
               "Websocket Terminated by OctoFarm, Ping/Pong check fails";
             this.instance.removeAllListeners();
+            if (typeof farmPrinters[this.index] !== "undefined") {
+              PrinterClean.generate(
+                farmPrinters[this.index],
+                systemSettings.filamentManager
+              );
+            }
           } catch (e) {
             logger.info(
               `Ping/Pong failed to get a response, closing and attempted to reconnect: ${this.index}: ${this.url}`
@@ -268,7 +286,7 @@ WebSocketClient.prototype.open = function (url, index) {
     this.instance.on("error", (e) => {
       switch (e.code) {
         case "ECONNREFUSED":
-          logger.error(e, `${this.index}: ${this.url}`);
+          logger.error(JSON.stringify(e), `${this.index}: ${this.url}`);
           try {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
@@ -289,7 +307,7 @@ WebSocketClient.prototype.open = function (url, index) {
           this.reconnect(e);
           break;
         case "ECONNRESET":
-          logger.error(e, `${this.index}: ${this.url}`);
+          logger.error(JSON.stringify(e), `${this.index}: ${this.url}`);
           try {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
@@ -310,7 +328,7 @@ WebSocketClient.prototype.open = function (url, index) {
           this.reconnect(e);
           break;
         case "EHOSTUNREACH":
-          logger.error(e, `${this.index}: ${this.url}`);
+          logger.error(JSON.stringify(e), `${this.index}: ${this.url}`);
           try {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
@@ -331,7 +349,7 @@ WebSocketClient.prototype.open = function (url, index) {
           this.reconnect(e);
           break;
         case "ENOTFOUND":
-          logger.error(e, `${this.index}: ${this.url}`);
+          logger.error(JSON.stringify(e), `${this.index}: ${this.url}`);
           try {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
@@ -353,7 +371,7 @@ WebSocketClient.prototype.open = function (url, index) {
           this.reconnect(e);
           break;
         default:
-          logger.error(e, `${this.index}: ${this.url}`);
+          logger.error(JSON.stringify(e), `${this.index}: ${this.url}`);
           try {
             farmPrinters[this.index].state = "Re-Sync";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
@@ -369,19 +387,30 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].webSocketDescription =
               "Hard Failure, please Re-Sync when Online";
             this.instance.removeAllListeners();
+
+            if (typeof farmPrinters[this.index] !== "undefined") {
+              PrinterClean.generate(
+                farmPrinters[this.index],
+                systemSettings.filamentManager
+              );
+            }
           } catch (e) {
             logger.info(
               `Couldn't set state of missing printer, safe to ignore: ${this.index}: ${this.url}`
             );
           }
           logger.error(`WebSocket hard failure: ${this.index}: ${this.url}`);
-          this.reconnect(e);
+          // Auto connect here is causing double socket listeners when editing
+          //this.reconnect(e);
           break;
       }
     });
     return true;
   } catch (e) {
-    logger.info(e, "There was an issue opening the websocket... hard fail...");
+    logger.info(
+      JSON.stringify(e),
+      "There was an issue opening the websocket... hard fail..."
+    );
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[this.index].printerURL,
@@ -436,7 +465,7 @@ WebSocketClient.prototype.reconnect = async function (e) {
   this.instance.removeAllListeners();
   const that = this;
 
-  setTimeout(async function () {
+  that.timeout = setTimeout(async function () {
     farmPrinters[that.index].hostStateColour = Runner.getColour("Searching...");
     farmPrinters[that.index].hostDescription = "Searching for Host";
     logger.info(`Re-Opening Websocket: ${that.index}: ${that.url}`);
@@ -472,6 +501,12 @@ WebSocketClient.prototype.onopen = async function (e) {
     "Active",
     farmPrinters[this.index]._id
   );
+  if (typeof farmPrinters[this.index] !== "undefined") {
+    PrinterClean.generate(
+      farmPrinters[this.index],
+      systemSettings.filamentManager
+    );
+  }
 };
 
 WebSocketClient.prototype.onmessage = async function (data, flags, number) {
@@ -899,7 +934,10 @@ WebSocketClient.prototype.onerror = function (e) {
     this.onerror = null;
     this.onmessage = null;
   } catch (e) {
-    logger.info(e, "Couldn't delete old listeners... must not exist.");
+    logger.info(
+      JSON.stringify(e),
+      "Couldn't delete old listeners... must not exist."
+    );
   }
   // PrinterTicker.addIssue(
   //   new Date(),
@@ -943,7 +981,10 @@ WebSocketClient.prototype.onclose = function (e) {
     this.onerror = null;
     this.onmessage = null;
   } catch (e) {
-    logger.info(e, "Couldn't delete old listeners... must not exist.");
+    logger.info(
+      JSON.stringify(e),
+      "Couldn't delete old listeners... must not exist."
+    );
   }
 
   if (typeof farmPrinters[this.index] !== "undefined") {
@@ -1325,7 +1366,7 @@ class Runner {
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[i].printerURL,
-              `${e.message}`,
+              `${e.message} retrying in ${timeout.webSocketRetry}`,
               "Disconnected",
               farmPrinters[i]._id
             );
@@ -1463,9 +1504,27 @@ class Runner {
     if (typeof farmPrinters[i].alerts === "undefined") {
       farmPrinters[i].alerts = null;
     }
-    if (typeof farmPrinters[i].powerSettings === "undefined") {
-      farmPrinters[i].powerSettings = null;
+    if (typeof farmPrinters[i].powerSettings === "undefined" || farmPrinters[i].powerSettings === null) {
+      farmPrinters[i].powerSettings = {
+        powerOnCommand: "",
+        powerOnURL: "",
+        powerOffCommand: "",
+        powerOffURL: "",
+        powerToggleCommand: "",
+        powerToggleURL: "",
+        powerStatusCommand: "",
+        powerStatusURL: "",
+        wol: {
+          enabled: false,
+          ip: "255.255.255.0",
+          packets: "3",
+          port: "9",
+          interval: "100",
+          MAC: ""
+        }
+      };
     }
+
     if (typeof farmPrinters[i].currentIdle === "undefined") {
       farmPrinters[i].currentIdle = 0;
     }
@@ -1518,6 +1577,15 @@ class Runner {
       !farmPrinters[i].printerURL.includes("http://")
     ) {
       farmPrinters[i].printerURL = `http://${farmPrinters[i].printerURL}`;
+    }
+    //Check for trailing slash and remove...
+    if (
+      farmPrinters[i].printerURL[farmPrinters[i].printerURL.length - 1] === "/"
+    ) {
+      farmPrinters[i].printerURL = farmPrinters[i].printerURL.replace(
+        /\/?$/,
+        ""
+      );
     }
     if (
       typeof farmPrinters[i].camURL !== "undefined" &&
@@ -1911,6 +1979,7 @@ class Runner {
           farmPrinters[index]._id
         );
         const { _id } = farmPrinters[index];
+        await farmPrinters[index].ws.instance.close();
         await this.setupWebSocket(_id, skipAPI);
       }
     } else {
@@ -2558,6 +2627,7 @@ class Runner {
             );
           }
         }
+
         if (res.plugins["psucontrol"]) {
           if (_.isEmpty(farmPrinters[index].powerSettings)) {
             PrinterTicker.addIssue(
@@ -2876,209 +2946,341 @@ class Runner {
   }
 
   static async updateSettings(settings) {
+    logger.info("Attempting to save: ", settings);
     function difference(object, base) {
       function changes(object, base) {
-        return _.transform(object, function (result, value, key) {
-          if (!_.isEqual(value, base[key])) {
-            result[key] =
-              _.isObject(value) && _.isObject(base[key])
-                ? changes(value, base[key])
-                : value;
-          }
-        });
-      }
-      return changes(object, base);
-    }
-    const printer = await Printers.findById(settings.printer.index);
-    const index = _.findIndex(farmPrinters, function (o) {
-      return o._id == settings.printer.index;
-    });
-    let updatePrinter = false;
-    if (
-      settings.printer.printerName !== "" &&
-      settings.printer.printerName !==
-        farmPrinters[index].settingsAppearance.name
-    ) {
-      farmPrinters[index].settingsAppearance.name =
-        settings.printer.printerName;
-      printer.settingsAppearance.name = settings.printer.printerName;
-      printer.markModified("settingsApperance");
-      updatePrinter = true;
-    }
-    if (
-      settings.printer.printerURL !== "" &&
-      settings.printer.printerURL !== farmPrinters[index].printerURL
-    ) {
-      farmPrinters[index].printerURL = settings.printer.printerURL;
-      printer.printerURL = settings.printer.printerURL;
-      printer.markModified("printerURL");
-      updatePrinter = true;
-    }
-    if (
-      settings.printer.cameraURL !== "" &&
-      settings.printer.cameraURL !== farmPrinters[index].camURL
-    ) {
-      farmPrinters[index].camURL = settings.printer.cameraURL;
-      printer.camURL = settings.printer.cameraURL;
-      printer.markModified("camURL");
-    }
-    if (
-      settings.printer.apikey !== "" &&
-      settings.printer.apikey !== farmPrinters[index].apikey
-    ) {
-      farmPrinters[index].apikey = settings.printer.apikey;
-      printer.apikey = settings.printer.apikey;
-      printer.markModified("apikey");
-      updatePrinter = true;
-    }
-    // Preferred Only update on live
-    farmPrinters[index].options.baudratePreference =
-      settings.connection.preferredBaud;
-    farmPrinters[index].options.portPreference =
-      settings.connection.preferredPort;
-    farmPrinters[index].options.printerProfilePreference =
-      settings.connection.preferredProfile;
-
-    if (
-      typeof settings.other !== "undefined" &&
-      settings.other.coolDown != ""
-    ) {
-      farmPrinters[index].tempTriggers.coolDown = parseInt(
-        settings.other.coolDown
-      );
-      printer.tempTriggers.coolDown = parseInt(settings.other.coolDown);
-      printer.markModified("tempTriggers");
-    }
-    if (
-      typeof settings.other !== "undefined" &&
-      settings.other.heatingVariation != ""
-    ) {
-      farmPrinters[index].tempTriggers.heatingVariation = parseFloat(
-        settings.other.heatingVariation
-      );
-      printer.tempTriggers.heatingVariation = parseFloat(
-        settings.other.heatingVariation
-      );
-      printer.markModified("tempTriggers");
-    }
-    for (const key in settings.costSettings) {
-      if (!_.isNull(settings.costSettings[key])) {
-        farmPrinters[index].costSettings[key] = settings.costSettings[key];
-        printer.costSettings[key] = settings.costSettings[key];
-      }
-    }
-
-    printer.markModified("costSettings");
-    let differences = difference(
-      settings.costSettings,
-      farmPrinters[index].costSettings
-    );
-
-    for (const key in differences) {
-      if (differences[key] !== null && differences[key] !== "") {
-        farmPrinters[index].costSettings[key] = differences[key];
-      }
-    }
-
-    printer.markModified("powerSettings");
-    printer.save();
-    let profile = {};
-    let sett = {};
-    if (settings.state !== "Offline") {
-      // Gocde update printer and Live
-      let updateOctoPrintGcode = {};
-      for (const key in settings.gcode) {
-        if (settings.gcode[key].length !== 0) {
-          updateOctoPrintGcode[key] = settings.gcode[key];
-          farmPrinters[index].settingsScripts.gcode[key] = settings.gcode[key];
+        try {
+          return _.transform(object, function (result, value, key) {
+            if (!_.isEqual(value, base[key])) {
+              result[key] =
+                _.isObject(value) && _.isObject(base[key])
+                  ? changes(value, base[key])
+                  : value;
+            }
+          });
+        } catch (e) {
+          logger.error("Error detecting changes", e);
         }
       }
-      const opts = {
-        settingsAppearance: {
-          name: settings.printer.printerName,
-        },
-        scripts: {
-          gcode: updateOctoPrintGcode,
-        },
-        server: {
-          commands: {
-            systemShutdownCommand: settings.systemCommands.systemShutdown,
-            systemRestartCommand: settings.systemCommands.systemRestart,
-            serverRestartCommand: settings.systemCommands.serverRestart,
+      try {
+        return changes(object, base);
+      } catch (e) {
+        logger.error("Error detecting changes", e);
+      }
+    }
+    try {
+      const printer = await Printers.findById(settings.printer.index);
+      const index = _.findIndex(farmPrinters, function (o) {
+        return o._id == settings.printer.index;
+      });
+      let updatePrinter = false;
+      if (
+        settings.printer.printerName !== "" &&
+        settings.printer.printerName !==
+          farmPrinters[index].settingsAppearance.name
+      ) {
+        farmPrinters[index].settingsAppearance.name =
+          settings.printer.printerName;
+        printer.settingsAppearance.name = settings.printer.printerName;
+        printer.markModified("settingsApperance");
+        updatePrinter = true;
+      }else{
+
+      }
+      let profile = {};
+      let sett = {};
+      profile.status = 900;
+      sett.status = 900;
+      if (
+        settings.printer.printerURL !== "" &&
+        settings.printer.printerURL !== farmPrinters[index].printerURL
+      ) {
+        farmPrinters[index].printerURL = settings.printer.printerURL;
+        printer.printerURL = settings.printer.printerURL;
+        printer.markModified("printerURL");
+        updatePrinter = true;
+      }
+      if (
+        settings.printer.cameraURL !== "" &&
+        settings.printer.cameraURL !== farmPrinters[index].camURL
+      ) {
+        farmPrinters[index].camURL = settings.printer.cameraURL;
+        printer.camURL = settings.printer.cameraURL;
+        printer.markModified("camURL");
+      }
+      if (
+        settings.printer.apikey !== "" &&
+        settings.printer.apikey !== farmPrinters[index].apikey
+      ) {
+        farmPrinters[index].apikey = settings.printer.apikey;
+        printer.apikey = settings.printer.apikey;
+        printer.markModified("apikey");
+        updatePrinter = true;
+      }
+      // Preferred Only update on live
+      farmPrinters[index].options.baudratePreference =
+        settings.connection.preferredBaud;
+      farmPrinters[index].options.portPreference =
+        settings.connection.preferredPort;
+      farmPrinters[index].options.printerProfilePreference =
+        settings.connection.preferredProfile;
+
+      if (
+        typeof settings.other !== "undefined" &&
+        settings.other.coolDown != ""
+      ) {
+        farmPrinters[index].tempTriggers.coolDown = parseInt(
+          settings.other.coolDown
+        );
+        printer.tempTriggers.coolDown = parseInt(settings.other.coolDown);
+        printer.markModified("tempTriggers");
+      }
+      if (
+        typeof settings.other !== "undefined" &&
+        settings.other.heatingVariation != ""
+      ) {
+        farmPrinters[index].tempTriggers.heatingVariation = parseFloat(
+          settings.other.heatingVariation
+        );
+        printer.tempTriggers.heatingVariation = parseFloat(
+          settings.other.heatingVariation
+        );
+        printer.markModified("tempTriggers");
+      }
+      for (const key in settings.costSettings) {
+        if (!_.isNull(settings.costSettings[key])) {
+          farmPrinters[index].costSettings[key] = settings.costSettings[key];
+          printer.costSettings[key] = settings.costSettings[key];
+        }
+      }
+
+      printer.markModified("costSettings");
+      let differences = difference(
+        settings.costSettings,
+        farmPrinters[index].costSettings
+      );
+
+      for (const key in differences) {
+        if (differences[key] !== null && differences[key] !== "") {
+          farmPrinters[index].costSettings[key] = differences[key];
+          printer.costSettings[key] = differences[key];
+        }
+      }
+
+      if (
+        settings.powerCommands.powerOnCommand !== "" &&
+        settings.powerCommands.powerOnCommand !==
+          farmPrinters[index].powerSettings.powerOnCommand
+      ) {
+        farmPrinters[index].powerSettings.powerOnCommand =
+          settings.powerCommands.powerOnCommand;
+        printer.powerSettings.powerOnCommand =
+          settings.powerCommands.powerOnCommand;
+      }
+      if (
+        settings.powerCommands.powerOnURL !== "" &&
+        settings.powerCommands.powerOnURL !==
+          farmPrinters[index].powerSettings.powerOnURL
+      ) {
+        farmPrinters[index].powerSettings.powerOnURL =
+          settings.powerCommands.powerOnURL;
+        printer.powerSettings.powerOnURL = settings.powerCommands.powerOnURL;
+      }
+      if (
+        settings.powerCommands.powerOffCommand !== "" &&
+        settings.powerCommands.powerOffCommand !==
+          farmPrinters[index].powerSettings.powerOffCommand
+      ) {
+        farmPrinters[index].powerSettings.powerOffCommand =
+          settings.powerCommands.powerOffCommand;
+        printer.powerSettings.powerOffCommand =
+          settings.powerCommands.powerOffCommand;
+      }
+      if (
+        settings.powerCommands.powerOffURL !== "" &&
+        settings.powerCommands.powerOffURL !==
+          farmPrinters[index].powerSettings.powerOffURL
+      ) {
+        printer.powerSettings.powerOffURL = settings.powerCommands.powerOffURL;
+        farmPrinters[index].powerSettings.powerOffURL =
+          settings.powerCommands.powerOffURL;
+      }
+      if (
+        settings.powerCommands.powerToggleCommand !== "" &&
+        settings.powerCommands.powerToggleCommand !==
+          farmPrinters[index].powerSettings.powerToggleCommand
+      ) {
+        printer.powerSettings.powerToggleCommand =
+          settings.powerCommands.powerToggleCommand;
+        farmPrinters[index].powerSettings.powerToggleCommand =
+          settings.powerCommands.powerToggleCommand;
+      }
+      if (
+        settings.powerCommands.powerToggleURL !== "" &&
+        settings.powerCommands.powerToggleURL !==
+          farmPrinters[index].powerSettings.powerToggleURL
+      ) {
+        printer.powerSettings.powerToggleURL =
+          settings.powerCommands.powerToggleURL;
+        farmPrinters[index].powerSettings.powerToggleURL =
+          settings.powerCommands.powerToggleURL;
+      }
+      if (
+        settings.powerCommands.powerStatusCommand !== "" &&
+        settings.powerCommands.powerStatusCommand !==
+          farmPrinters[index].powerSettings.powerStatusCommand
+      ) {
+        farmPrinters[index].powerSettings.powerStatusCommand =
+          settings.powerCommands.powerStatusCommand;
+        printer.powerSettings.powerStatusCommand =
+          settings.powerCommands.powerStatusCommand;
+      }
+      if (
+        settings.powerCommands.powerStatusURL !== "" &&
+        settings.powerCommands.powerStatusURL !==
+          farmPrinters[index].powerSettings.powerStatusURL
+      ) {
+        farmPrinters[index].powerSettings.powerStatusURL =
+          settings.powerCommands.powerStatusURL;
+        printer.powerSettings.powerStatusURL =
+          settings.powerCommands.powerStatusURL;
+      }
+
+      logger.info("LIive power settings", farmPrinters[index].powerSettings);
+      logger.info("Database power settings", printer.powerSettings);
+
+      printer.markModified("powerSettings");
+
+      if (settings.systemCommands.serverRestart !== "") {
+        farmPrinters[index].settingsServer.commands.serverRestartCommand =
+          settings.systemCommands.serverRestart;
+      } else {
+        settings.systemCommands.serverRestart =
+          farmPrinters[index].settingsServer.commands.serverRestartCommand;
+      }
+      if (settings.systemCommands.systemRestart !== "") {
+        farmPrinters[index].settingsServer.commands.systemRestartCommand =
+          settings.systemCommands.systemRestart;
+      } else {
+        settings.systemCommands.systemRestart =
+          farmPrinters[index].settingsServer.commands.systemRestartCommand;
+      }
+      if (settings.systemCommands.systemShutdown !== "") {
+        farmPrinters[index].settingsServer.commands.systemShutdownCommand =
+          settings.systemCommands.systemShutdown;
+      } else {
+        settings.systemCommands.systemShutdown =
+          farmPrinters[index].settingsServer.commands.systemShutdownCommand;
+      }
+      logger.info(
+        "OctoPrint power settings: ",
+        farmPrinters[index].systemCommands
+      );
+
+      printer.save().catch((e) => {
+        logger.error(JSON.stringify(e), "ERROR savin power settings.");
+      });
+      if (settings.state !== "Offline") {
+        // Gocde update printer and Live
+        let updateOctoPrintGcode = {};
+        for (const key in settings.gcode) {
+          if (settings.gcode[key].length !== 0) {
+            updateOctoPrintGcode[key] = settings.gcode[key];
+            farmPrinters[index].settingsScripts.gcode[key] =
+              settings.gcode[key];
+          }
+        }
+        const opts = {
+          settingsAppearance: {
+            name: farmPrinters[index].settingsAppearance.name,
           },
-        },
-        webcam: {
-          webcamEnabled: settings.other.enableCamera,
-          timelapseEnabled: settings.other.enableTimeLapse,
-          rotate90: settings.other.rotateCamera,
-          flipH: settings.other.flipHCamera,
-          flipV: settings.other.flipVCamera,
-        },
-      };
+          scripts: {
+            gcode: updateOctoPrintGcode,
+          },
+          server: {
+            commands: {
+              systemShutdownCommand: settings.systemCommands.systemShutdown,
+              systemRestartCommand: settings.systemCommands.systemRestart,
+              serverRestartCommand: settings.systemCommands.serverRestart,
+            },
+          },
+          webcam: {
+            webcamEnabled: settings.other.enableCamera,
+            timelapseEnabled: settings.other.enableTimeLapse,
+            rotate90: settings.other.rotateCamera,
+            flipH: settings.other.flipHCamera,
+            flipV: settings.other.flipVCamera,
+          },
+        };
 
-      const removeObjectsWithNull = (obj) => {
-        return _(obj)
-          .pickBy(_.isObject) // get only objects
-          .mapValues(removeObjectsWithNull) // call only for values as objects
-          .assign(_.omitBy(obj, _.isObject)) // save back result that is not object
-          .omitBy(_.isNil) // remove null and undefined from object
-          .value(); // get value
-      };
+        const removeObjectsWithNull = (obj) => {
+          return _(obj)
+            .pickBy(_.isObject) // get only objects
+            .mapValues(removeObjectsWithNull) // call only for values as objects
+            .assign(_.omitBy(obj, _.isObject)) // save back result that is not object
+            .omitBy(_.isNil) // remove null and undefined from object
+            .value(); // get value
+        };
 
-      let cleanProfile = removeObjectsWithNull(settings.profile);
+        let cleanProfile = removeObjectsWithNull(opts);
 
-      profile = await fetch(
-        `${farmPrinters[index].printerURL}/api/printerprofiles/${settings.profileID}`,
-        {
-          method: "PATCH",
+        profile = await fetch(
+          `${farmPrinters[index].printerURL}/api/printerprofiles/${settings.profileID}`,
+          {
+            method: "PATCH",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Api-Key": farmPrinters[index].apikey,
+            },
+            body: JSON.stringify({ profile: cleanProfile }),
+          }
+        );
+
+        // Update octoprint profile...
+        sett = await fetch(`${farmPrinters[index].printerURL}/api/settings`, {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
             "X-Api-Key": farmPrinters[index].apikey,
           },
-          body: JSON.stringify({ profile: cleanProfile }),
-        }
+          body: JSON.stringify(opts),
+        });
+      }
+
+      await Runner.getProfile(settings.printer.index);
+      await Runner.getSettings(settings.printer.index);
+      await Runner.getUpdates(settings.printer.index);
+      await Runner.getPluginList(settings.printer.index);
+      PrinterClean.generate(
+        farmPrinters[index],
+        systemSettings.filamentManager
       );
-
-      // Update octoprint profile...
-      sett = await fetch(`${farmPrinters[index].printerURL}/api/settings`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": farmPrinters[index].apikey,
-        },
-        body: JSON.stringify(opts),
-      });
-    } else {
-      profile.status = 900;
-      sett.status = 900;
+      // let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
+      //
+      // console.log()
+      //
+      // farmPrinters[i].settingsScripts.gcode = opts.scripts.gcode;
+      // farmPrinters[i].settingsAppearance.name = opts.appearance.name;
+      // farmPrinters[i].settingsWebcam = opts.webcam;
+      // farmPrinters[i].camURL = opts.camURL;
+      // let printer = await Printers.findOne({ index: i });
+      // printer.settingsWebcam = farmPrinters[i].settingsWebcam;
+      // printer.camURL = farmPrinters[i].camURL;
+      // printer.settingsApperarance.name = farmPrinters[i].settingsAppearance.name;
+      // printer.save();
+      if (updatePrinter) {
+        Runner.reScanOcto(farmPrinters[index]._id, false);
+      }
+      return {
+        status: { octofarm: 200, profile: profile.status, settings: sett.status },
+        printer,
+      };
+    } catch (e) {
+      logger.error("ERROR updating printer ", JSON.stringify(e.message));
+      return {
+        status: { octofarm: 400, profile: 900, settings: 900 },
+      };
     }
-
-    await Runner.getProfile(settings.printer.index);
-    await Runner.getSettings(settings.printer.index);
-    await Runner.getUpdates(settings.printer.index);
-    await Runner.getPluginList(settings.printer.index);
-    PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
-    // let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
-    //
-    // console.log()
-    //
-    // farmPrinters[i].settingsScripts.gcode = opts.scripts.gcode;
-    // farmPrinters[i].settingsAppearance.name = opts.appearance.name;
-    // farmPrinters[i].settingsWebcam = opts.webcam;
-    // farmPrinters[i].camURL = opts.camURL;
-    // let printer = await Printers.findOne({ index: i });
-    // printer.settingsWebcam = farmPrinters[i].settingsWebcam;
-    // printer.camURL = farmPrinters[i].camURL;
-    // printer.settingsApperarance.name = farmPrinters[i].settingsAppearance.name;
-    // printer.save();
-    if (updatePrinter) {
-      Runner.reScanOcto(farmPrinters[index]._id, false);
-    }
-
-    return {
-      status: { profile: profile.status, settings: sett.status },
-      printer,
-    };
   }
 
   static async moveFile(id, newPath, fullPath, filename) {
