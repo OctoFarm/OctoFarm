@@ -11,6 +11,7 @@ const roomDataDB = require("../models/roomData.js");
 const UserDB = require("../models/User.js");
 const PrinterDB = require("../models/Printer.js");
 const AlertsDB = require("../models/Alerts.js");
+const GcodeDB = require("../models/CustomGcode.js");
 
 const Logger = require("../lib/logger.js");
 
@@ -76,6 +77,7 @@ router.get(
       await UserDB.deleteMany({});
       await PrinterDB.deleteMany({});
       await AlertsDB.deleteMany({});
+      await GcodeDB.deleteMany({});
       res.send({
         message: "Successfully deleted databases, server will restart...",
       });
@@ -207,3 +209,11 @@ router.get("/sysInfo", ensureAuthenticated, async (req, res) => {
   }
   res.send(sysInfo);
 });
+router.post("/customGcode", ensureAuthenticated, async(req, res) => {
+  console.log(req.body)
+  //res.send(all)
+});
+router.get("/customGcode", ensureAuthenticated, async(req, res) => {
+  const all = await GcodeDB.find();
+  res.send(all)
+})
