@@ -685,9 +685,11 @@ class HistoryCollection {
             payload
           );
           if (
+              typeof serverSettings[0] !== "undefined" &&
             typeof serverSettings[0].history !== "undefined" &&
             typeof serverSettings[0].history.timelapse !== "undefined" &&
-            serverSettings[0].history.timelapse.onComplete
+            typeof serverSettings[0].history.timelapse.onComplete !== "undefined" &&
+              serverSettings[0].history.timelapse.onComplete
           ) {
             HistoryCollection.timelapseCheck(
               printer,
@@ -855,10 +857,11 @@ class HistoryCollection {
             saveHistory,
             payload
           );
-          if (
+          if (typeof serverSettings[0] !== "undefined" &&
             typeof serverSettings[0].history !== "undefined" &&
             typeof serverSettings[0].history.timelapse !== "undefined" &&
-            serverSettings[0].history.timelapse.onFailure
+            typeof serverSettings[0].history.timelapse.onFailure !== "undefined" &&
+              serverSettings[0].history.timelapse.onFailure
           ) {
             HistoryCollection.timelapseCheck(
               printer,
