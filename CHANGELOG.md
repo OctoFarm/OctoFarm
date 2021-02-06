@@ -3,12 +3,13 @@
 All notable changes to this project will be documented in this file.
 # [Released]
 
-# [v1.1.9]
+# [v1.1.10]
 
 ### Added
      - Last values from environmental data are displayed in the navigation bar when available. This will update every 5 seconds.  
      - Gave gmccauley (and possibly others) the new Filament and History graphs. Big Thanks for your data basically... I'm a dodo at times XD
      - New Client Settings - Control Panel File Top: Checking this as true will put the file section at the top of printer control. Print Status and Tools underneigth.
+     - Added #252 - OctoPrint feed rate settings now allows for 10% to 300% inline with OctoPrint.
 
 ### Changed
     - Changed the ability to fire custom api power commands without command object to octoprints api.
@@ -26,6 +27,7 @@ All notable changes to this project will be documented in this file.
     - Fixed - Spool manager loading graphs and table without spools. (only affected ancient data, pre COVID XD)
     - Fixed error with file length/weight not getting parsed from text on Printer Control. 
     - Fixed error with terminal erroring on enter command with no text.
+    - Fixed #245 - File manager recursive again
 
 
 ## Removed
