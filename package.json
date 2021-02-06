@@ -1,14 +1,12 @@
 {
   "name": "octofarm",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "OctoFarm is a easy to setup and install web interface that unifies your Octoprint instances for easy monitoring of all your printers. OctoFarm allows you to connect to multiple octoprint instances on your network allowing creating a farm management system. You can control, manage, upload files to any of your instances without ever leaving the tab it's open in.",
   "main": "app.js",
   "scripts": {
     "prestart": "npm install --production",
-    "start": "pm2 flush && pm2 start app.js --name OctoFarm -e logs/pm2.error.log --time",
+    "start": "pm2 flush && pm2 start app.js --name OctoFarm -e 'logs/pm2.error.log' --time",
     "stop": "pm2 stop OctoFarm",
-    "startup": "pm2 startup",
-    "saveStartup": "pm2 save",
     "dev": "nodemon ./app.js"
   },
   "repository": {
@@ -50,7 +48,6 @@
     "passport-headerapikey": "^1.2.2",
     "passport-local": "^1.0.0",
     "passport-remember-me": "0.0.1",
-    "pm2": "^4.5.0",
     "request": "^2.88.2",
     "systeminformation": "^4.34.9",
     "wake_on_lan": "^1.0.0",
@@ -112,6 +109,15 @@
         }
       ]
     ]
+  },
+  "eslintConfig": {
+    "parser": "babel-eslint",
+    "rules": {
+    },
+    "env": {
+      "node": true,
+      "browser": true
+    }
   },
   "engineStrict": true,
   "engines": {

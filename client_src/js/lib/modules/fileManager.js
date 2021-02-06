@@ -943,11 +943,11 @@ export class FileActions {
         if (input.value === "") {
             // No search term so reset view
             document.getElementById("currentFolder").value = "local";
-            FileSorting.loadSort(printer);
+            FileSorting.loadSort(printer, "recursive");
             //FileManager.drawFiles(printer, "Recursive");
         } else {
             document.getElementById("currentFolder").value = "local";
-            FileSorting.loadSort(printer);
+            FileSorting.loadSort(printer, "recursive");
             //FileManager.drawFiles(printer, "Recursive");
         }
         const button = fileList.querySelectorAll('*[id^="file-"]');
