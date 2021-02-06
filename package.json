@@ -50,7 +50,6 @@
     "passport-headerapikey": "^1.2.2",
     "passport-local": "^1.0.0",
     "passport-remember-me": "0.0.1",
-    "pm2": "^4.5.0",
     "request": "^2.88.2",
     "systeminformation": "^4.34.9",
     "wake_on_lan": "^1.0.0",
