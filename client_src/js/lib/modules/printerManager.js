@@ -1002,7 +1002,9 @@ export default class PrinterManager {
                       </div>
                       </form>
                 </div>
-                  <div class="row" id="customGcodeCommandsArea"></div>
+                <div class="row">
+                    <div id="customGcodeCommandsArea" class="col-lg-12"></div>
+                </div>
             </div>
             `;
       }

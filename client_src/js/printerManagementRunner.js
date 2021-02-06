@@ -1292,7 +1292,6 @@ createNewScriptBtn.addEventListener("click", async (e) => {
         }
       });
     let post = await OctoFarmClient.post("settings/customGcode", newScript);
-    console.log(post)
     if(post.status === 200){
       post = await post.json();
       drawScriptTable(post)
@@ -1312,7 +1311,7 @@ function drawScriptTable(scripts){
     })
 
     scriptTable.insertAdjacentHTML("beforeend", `
-             <tr>
+             <tr id="scriptRow-${scripts._id}" >
                 <td class="d-none">${scripts._id}</td>
                 <td>${scripts.name}</td>
                 <td>${scripts.description}</td>
@@ -1334,6 +1333,7 @@ function drawScriptTable(scripts){
       let delt = await OctoFarmClient.get("settings/customGcode/delete/"+scripts._id);
       if(delt.status === 200){
         UI.createAlert("success", "Successfully deleted your script...", 3000, "Clicked")
+        document.getElementById("scriptRow-"+scripts._id).remove();
       }else {
         UI.createAlert("error", "Something went wrong, is the OctoFarm server online?", 3000, "Clicked")
       }
