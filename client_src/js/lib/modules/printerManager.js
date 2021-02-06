@@ -5,6 +5,7 @@ import UI from "../functions/ui.js";
 import FileManager, { FileActions } from "./fileManager.js";
 import { returnDropDown, selectFilament } from "./filamentGrab.js";
 import FileSorting from "../modules/fileSorting.js";
+import CustomGenerator from "./customScripts.js";
 
 import PowerButton from "./powerButton.js";
 
@@ -607,7 +608,9 @@ export default class PrinterManager {
                       </div>
                       </form>
                 </div>
-  
+                <div class="row" >
+                    <div id="customGcodeCommandsArea" class="col-lg-12"></div>
+                </div>
             </div>
             `;
       } else {
@@ -999,7 +1002,7 @@ export default class PrinterManager {
                       </div>
                       </form>
                 </div>
-  
+                  <div class="row" id="customGcodeCommandsArea"></div>
             </div>
             `;
       }
@@ -1133,12 +1136,21 @@ export default class PrinterManager {
       }
 
       FileSorting.loadSort(printer);
+
+
+      CustomGenerator.generateButtons([printer]);
+
+
+
       return true;
+
+
+
     }catch(e){
       UI.createAlert(
           "error",
-          "Something has gone wrong with loading the Printer Manager... Hard Failure, please submit as a bug on github:" + e,
-          3000,
+          "Something has gone wrong with loading the Printer Manager... Hard Failure, please submit as a bug on github: " + e,
+          0,
           "clicked"
       );
       console.error(e)

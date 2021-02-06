@@ -10,7 +10,7 @@ const CustomGcodeSchema = new mongoose.Schema({
         required: true
     },
     gcode: {
-        type: String,
+        type: Array,
         required: true
     },
 });

@@ -209,9 +209,35 @@ router.get("/sysInfo", ensureAuthenticated, async (req, res) => {
   }
   res.send(sysInfo);
 });
+router.get("/customGcode/delete/:id", ensureAuthenticated, async(req, res) => {
+  const scriptId = req.params.id;
+  GcodeDB.findByIdAndDelete(scriptId, function (err) {
+    if(err){
+      res.send(err)
+    }
+    else{
+      res.send(scriptId)
+    }
+  });
+});
+router.get("/customGcode/edit/:id", ensureAuthenticated, async(req, res) => {
+  const scriptId = req.params.id;
+  const newObj = req.body;
+  GcodeDB.findByIdAndUpdate({scriptId},newObj, function(err, result){
+    if(err){
+      res.send(err)
+    }
+    else{
+      res.send(result)
+    }
+
+  })
+});
 router.post("/customGcode", ensureAuthenticated, async(req, res) => {
-  console.log(req.body)
-  //res.send(all)
+  let newScript = req.body
+  const saveScript = new GcodeDB(newScript)
+  console.log(saveScript)
+  saveScript.save().then(res.send("created")).catch(e => res.send(e));
 });
 router.get("/customGcode", ensureAuthenticated, async(req, res) => {
   const all = await GcodeDB.find();

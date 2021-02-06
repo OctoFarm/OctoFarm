@@ -10,9 +10,13 @@ All notable changes to this project will be documented in this file.
      - Gave gmccauley (and possibly others) the new Filament and History graphs. Big Thanks for your data basically... I'm a dodo at times XD
      - New Client Settings - Control Panel File Top: Checking this as true will put the file section at the top of printer control. Print Status and Tools underneigth.
      - Added #252 - OctoPrint feed rate settings now allows for 10% to 300% inline with OctoPrint.
+     - Added - New button in Printer manager called "Gcode Scripts". Allows for creating pre-defined gcode scripts that can be used from Printer Contol under the terminal + Bulk Gcode button. Thanks to @MTrab Discussion #250 + Issue #253 
+         - NOTE: Editing of the scripts is not available yet. Wanted to get this release pushed with the bug fixes. Delete and re-create for now, will sort edit for next release. 
 
 ### Changed
     - Changed the ability to fire custom api power commands without command object to octoprints api.
+    - Gcode scripts modal has been enlarged to accomodate possible button configurations for new feature above.
+    - Printer Manager will now warn of a specific issue and tell you to log me a bug!
 
 ### Fixed
     - Fixed #234 - Adding Power commands would be overwritten on save. (also affected appearance name on OctoPrint & wakeonlan settings and grabbing default power settings from OctoPrint on a new printer.)
@@ -28,6 +32,7 @@ All notable changes to this project will be documented in this file.
     - Fixed error with file length/weight not getting parsed from text on Printer Control. 
     - Fixed error with terminal erroring on enter command with no text.
     - Fixed #245 - File manager recursive again
+    - Fixed Printer Control completely failing when 1 component didn't have data. (related to change above)
 
 
 ## Removed
