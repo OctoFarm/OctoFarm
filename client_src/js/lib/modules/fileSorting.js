@@ -70,7 +70,7 @@ export default class FileSorting {
       sortHeader.innerHTML = '<i class="fas fa-sort-alpha-down"></i> File Name';
       this.saveSort("file", false);
     }
-    FileManager.drawFiles(printer);
+    FileManager.drawFiles(printer, "recursive");
   }
   static sortUploadDate(printer, reverse) {
     const sortHeader = document.getElementById("fileSortDropdownMenu");
@@ -95,7 +95,7 @@ export default class FileSorting {
         '<i class="fas fa-sort-numeric-up"></i> Upload Date';
       this.saveSort("date", false);
     }
-    FileManager.drawFiles(printer);
+    FileManager.drawFiles(printer, "recursive");
   }
   static sortPrintTime(printer, reverse) {
     const sortHeader = document.getElementById("fileSortDropdownMenu");
@@ -120,6 +120,6 @@ export default class FileSorting {
         '<i class="fas fa-sort-numeric-down"></i> Print Time';
       this.saveSort("time", true);
     }
-    FileManager.drawFiles(printer);
+    FileManager.drawFiles(printer, "recursive");
   }
 }
