@@ -237,7 +237,7 @@ router.post("/customGcode", ensureAuthenticated, async(req, res) => {
   let newScript = req.body
   const saveScript = new GcodeDB(newScript)
   console.log(saveScript)
-  saveScript.save().then(res.send("created")).catch(e => res.send(e));
+  saveScript.save().then(res.send(saveScript)).catch(e => res.send(e));
 });
 router.get("/customGcode", ensureAuthenticated, async(req, res) => {
   const all = await GcodeDB.find();
