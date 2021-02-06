@@ -340,7 +340,7 @@ export default class PrinterManager {
                   <div class="row">
                     <div class="col-10 col-lg-8 col-xl-8">
                         <label for="pcFeed">Feed Rate: <span id="pcFeedValue">${printer.feedRate}%</span></label>
-                        <input type="range" class="octoRange custom-range" min="50" max="150" step="1" id="pcFeed" value="${printer.feedRate}">
+                        <input type="range" class="octoRange custom-range" min="10" max="300" step="1" id="pcFeed" value="${printer.feedRate}">
                     </div>
                     <div class="col-2 col-lg-4 col-xl-4">
                         <button id="pcFeedRate" type="button" class="btn btn-light">Update</button>
