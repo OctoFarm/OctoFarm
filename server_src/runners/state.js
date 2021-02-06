@@ -1004,10 +1004,10 @@ class ClientAPI {
       const apiConnect = await ClientAPI.get(printerURL, apikey, item);
       return apiConnect;
     } catch (err) {
-      logger.error(err);
+      logger.error(`Error attempting to connect to API: ${item} | ${printerURL} | timeout: ${timeout.apiTimeout}`, JSON.stringify(err.message));
       // If timeout exceeds max cut off then give up... Printer is considered offline.
       if (timeout.apiTimeout >= timeout.apiRetryCutoff) {
-        logger.info(`Timeout Exceeded: ${item} | ${printerURL}`);
+        logger.warn(`Timeout Exceeded: ${item} | ${printerURL}`);
         // Reset timeout for next printer...
         timeout.apiTimeout = Number(timeout.apiTimeout) - 9000;
         throw err;
