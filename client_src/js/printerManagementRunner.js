@@ -2330,7 +2330,7 @@ class PrintersManagement {
     let printCheck = -1;
     if (printerURL.value !== "") {
       printCheck = _.findIndex(printerInfo, function (o) {
-        return o.printerURL.includes(printerURL.value);
+        return JSON.stringify(o.printerURL) === JSON.stringify(printerURL.value);
       });
     }
     // Check information is filled correctly...
