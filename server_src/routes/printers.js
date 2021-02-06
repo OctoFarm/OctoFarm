@@ -69,7 +69,6 @@ router.post("/resyncFile", ensureAuthenticated, async (req, res) => {
   const file = req.body;
   logger.info("File Re-sync request for: ", file);
   let ret = null;
-  console.log(file);
   if (typeof file.fullPath !== "undefined") {
     ret = await Runner.reSyncFile(file.i, file.fullPath);
   } else {
@@ -228,7 +227,7 @@ router.get("/connectionLogs/:id", ensureAuthenticated, async (req, res) => {
 });
 router.get("/pluginList/:id", ensureAuthenticated, async (req, res) => {
   let id = req.params.id;
-  console.log(id);
+
   if (id !== "all") {
     logger.info("Grabbing plugin list for: ", id);
     let pluginList = await Runner.returnPluginList(id);
