@@ -10,7 +10,9 @@ class LoggerService {
     this.route = route;
     const logger = winston.createLogger({
       transports: [
-        new winston.transports.Console(),
+        new winston.transports.Console({
+          level: 'warn'
+        }),
         new winston.transports.File({
           filename: `./logs/${route}.log`,
           maxsize: "5000000",
@@ -35,25 +37,25 @@ class LoggerService {
   setLogData(log_data) {
     this.log_data = log_data;
   }
-  async info(message) {
-    this.logger.log("info", message);
-  }
+  // async info(message) {
+  //   this.logger.log("info", message);
+  // }
   async info(message, obj) {
     this.logger.log("info", message, {
       obj,
     });
   }
-  async debug(message) {
-    this.logger.log("debug", message);
-  }
+  // async debug(message) {
+  //   this.logger.log("debug", message);
+  // }
   async debug(message, obj) {
     this.logger.log("debug", message, {
       obj,
     });
   }
-  async error(message) {
-    this.logger.log("error", message);
-  }
+  // async error(message) {
+  //   this.logger.log("error", message);
+  // }
   async error(message, obj) {
     this.logger.log("error", message, {
       obj,
