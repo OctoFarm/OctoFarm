@@ -110,10 +110,7 @@ const heartBeatInterval = setInterval(function ping() {
         client.ws.instance.readyState !== 2 &&
         client.ws.instance.readyState !== 3
       ) {
-        if (
-          farmPrinters[client.ws.index].stateColour.category === "Active" ||
-          farmPrinters[client.ws.index].stateColour.category === "Idle"
-        ) {
+
           PrinterTicker.addIssue(
             new Date(),
             farmPrinters[client.ws.index].printerURL,
@@ -130,7 +127,7 @@ const heartBeatInterval = setInterval(function ping() {
             "Checking if Websocket is still alive";
           client.ws.isAlive = false;
           client.ws.instance.ping(noop);
-        }
+
       }
     }
   });
