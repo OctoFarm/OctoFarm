@@ -1,10 +1,13 @@
-FROM node:13.0.1-stretch
+FROM node:13.0.1-stretch-slim
 
-COPY . /app
+RUN npm install -g pm2
+
+COPY --chown=node:node . /app
 
 WORKDIR /app
 
-RUN npm install -g pm2
+USER node
+RUN npm install --only=production
 
 RUN chmod +x docker/entrypoint.sh
 ENTRYPOINT docker/entrypoint.sh
