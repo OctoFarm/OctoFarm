@@ -31,7 +31,7 @@ require("./server_src/config/passport.js")(passport);
 
 // DB Config
 const db = require("./config/db.js").MongoURI;
-console.log(db);
+
 // JSON
 app.use(express.json());
 
@@ -112,7 +112,7 @@ const serverStart = async () => {
       logger.info(`HTTP server started...`);
       logger.info(`You can now access your server on port: ${PORT}`);
       // eslint-disable-next-line no-console
-      console.log(`You can now access your server on port: ${PORT}`);
+      process.send('ready');
     });
   } catch (err) {
     await logger.error(err);
@@ -176,8 +176,6 @@ const serverStart = async () => {
       );
     } catch (e) {
       await logger.error(e);
-      // eslint-disable-next-line no-console
-      console.log(e);
     }
   }
 };
@@ -189,7 +187,6 @@ mongoose
     useFindAndModify: false,
   })
   .then(() => {
-    console.log(mongoose.connection.readyState);
     //Check database actually works...
     if (!mongoose.connection.readyState === 1) {
       databaseIssue();
@@ -209,7 +206,7 @@ const databaseIssue = async () => {
     logger.info(`HTTP server started...`);
     logger.info(`You can now access your server on port: ${4000}`);
     // eslint-disable-next-line no-console
-    console.log(`You can now access your server on port: ${4000}`);
+    process.send('ready');
   });
   app.use(express.static(`${__dirname}/views`));
   app.use("/", require("./server_src/routes/databaseIssue", { page: "route" }));

@@ -13,7 +13,8 @@ import {
 } from "./lib/modules/Printers/actionButtons.js";
 import PrinterSelect from "./lib/modules/printerSelect";
 import PrinterLogs from "./lib/modules/printerLogs.js";
-import FileSorting from "./lib/modules/fileSorting";
+import FileSorting from "./lib/modules/fileSorting.js";
+import CustomGenerator from "./lib/modules/customScripts.js";
 
 let printerInfo = "";
 const deletedPrinters = [];
@@ -1177,49 +1178,68 @@ bulkGcodeCommands.addEventListener("click", async (e) => {
       const ca = element.id.split("-");
       printersToConnect.push(ca[1]);
     });
+
     bootbox.prompt({
-      size: "small",
+      size: "large",
       title: "What gcode commands would you like sent?",
       inputType: "textarea",
-      callback: function (result) {
+      onShow: function(e) {
+        let textArea = document.getElementsByClassName("bootbox-input bootbox-input-textarea form-control");
+        const customGcodeEE = "<div class='mb-1' id='customGcodeCommandsArea'></div>";
+        textArea[0].insertAdjacentHTML("beforebegin", customGcodeEE)
+        let buttonPrinters = [];
         printersToConnect.forEach(async (printer) => {
           const index = _.findIndex(printerInfo, function (o) {
             return o._id === printer;
           });
           if (index > -1) {
-            let lines = result.match(/[^\r\n]+/g);
-            lines = lines.map(function (name) {
-              if (!name.includes("=")) {
-                return name.toLocaleUpperCase();
-              } else {
-                return name;
-              }
-            });
-            const opt = {
-              commands: lines,
-            };
-            const post = await OctoPrintClient.post(
-              printerInfo[index],
-              "printer/command",
-              opt
-            );
-            if (post.status === 204) {
-              UI.createAlert(
-                "success",
-                "Your gcode commands have successfully been sent!",
-                3000,
-                "Clicked"
-              );
-            } else {
-              UI.createAlert(
-                "danger",
-                "Your gcode failed to send! Please check the printer is able to receive these commands.",
-                3000,
-                "Clicked"
-              );
-            }
+            buttonPrinters.push(printerInfo[index]);
           }
-        });
+        })
+        CustomGenerator.generateButtons(buttonPrinters);
+      },
+      callback: function (result) {
+        if(result !== null){
+          printersToConnect.forEach(async (printer) => {
+            const index = _.findIndex(printerInfo, function (o) {
+              return o._id === printer;
+            });
+            if (index > -1) {
+              let lines = result.match(/[^\r\n]+/g);
+              lines = lines.map(function (name) {
+                if (!name.includes("=")) {
+                  return name.toLocaleUpperCase();
+                } else {
+                  return name;
+                }
+              });
+              const opt = {
+                commands: lines,
+              };
+              const post = await OctoPrintClient.post(
+                  printerInfo[index],
+                  "printer/command",
+                  opt
+              );
+              if (post.status === 204) {
+                UI.createAlert(
+                    "success",
+                    "Your gcode commands have successfully been sent!",
+                    3000,
+                    "Clicked"
+                );
+              } else {
+                UI.createAlert(
+                    "danger",
+                    "Your gcode failed to send! Please check the printer is able to receive these commands.",
+                    3000,
+                    "Clicked"
+                );
+              }
+            }
+          });
+        }
+
       },
     });
   };
@@ -1232,6 +1252,93 @@ bulkGcodeCommands.addEventListener("click", async (e) => {
   );
 });
 
+const customGcodeScripts = document.getElementById("customGcodeBtn");
+customGcodeScripts.addEventListener("click", async (e) => {
+    let customScripts = await OctoFarmClient.get("settings/customGcode")
+    customScripts = await customScripts.json();
+
+    //Draw Scripts
+    let scriptTable = document.getElementById("gcodeScriptTable");
+    scriptTable.innerHTML = "";
+    customScripts.forEach(scripts => {
+      drawScriptTable(scripts)
+    })
+
+
+});
+const createNewScriptBtn = document.getElementById("createNewScriptBtn");
+createNewScriptBtn.addEventListener("click", async (e) => {
+  let newScript = {
+    name: document.getElementById("gcodeScriptName").value,
+    description: document.getElementById("gcodeScriptDescription").value,
+    gcode: document.getElementById("gcodeScriptScript").value,
+  }
+  const keys = Object.keys(newScript)
+  let errors = [];
+  for (const key of keys) {
+    if(newScript[key] === ""){
+      errors.push(key);
+    }
+  }
+  if(errors.length !== 0){
+    UI.createAlert("error", "You have blank fields sony jim!, sort them out...", 3000, "Clicked")
+  }else{
+      let lines = document.getElementById("gcodeScriptScript").value.match(/[^\r\n]+/g);
+      newScript.gcode = lines.map(function (name) {
+        if (!name.includes("=")) {
+          return name.toLocaleUpperCase();
+        } else {
+          return name;
+        }
+      });
+    let post = await OctoFarmClient.post("settings/customGcode", newScript);
+    if(post.status === 200){
+      post = await post.json();
+      drawScriptTable(post)
+    }else{
+      UI.createAlert("error", "Something went wrong updating, is the server online?")
+    }
+  }
+
+
+})
+function drawScriptTable(scripts){
+  let scriptTable = document.getElementById("gcodeScriptTable");
+    let scriptLines = "";
+
+    scripts.gcode.forEach(e => {
+      scriptLines += `<p class="py-0 my-0"><small class="py-0 my-0">${e}</small></p>`
+    })
+
+    scriptTable.insertAdjacentHTML("beforeend", `
+             <tr id="scriptRow-${scripts._id}" >
+                <td class="d-none">${scripts._id}</td>
+                <td>${scripts.name}</td>
+                <td>${scripts.description}</td>
+                <td>${scriptLines}</td>
+                <td>                                
+                <button id="editScript-${scripts._id}" type="button" class="btn btn-sm btn-info edit bg-colour-1 d-none">
+                    <i class="fas fa-edit editIcon"></i>
+                </button>
+                <button id="saveScript-${scripts._id}" type="button" class="btn d-none btn-sm btn-success save bg-colour-2  d-none">
+                    <i class="fas fa-save saveIcon"></i>
+                </button>
+                <button id="deleteScript-${scripts._id}" type="button" class="btn btn-sm btn-danger delete">
+                    <i class="fas fa-trash deleteIcon"></i>
+                </button>
+                </td>
+            </tr>
+      `)
+    document.getElementById("deleteScript-"+scripts._id).addEventListener("click", async (e) => {
+      let delt = await OctoFarmClient.get("settings/customGcode/delete/"+scripts._id);
+      if(delt.status === 200){
+        UI.createAlert("success", "Successfully deleted your script...", 3000, "Clicked")
+        document.getElementById("scriptRow-"+scripts._id).remove();
+      }else {
+        UI.createAlert("error", "Something went wrong, is the OctoFarm server online?", 3000, "Clicked")
+      }
+    })
+}
 function pluginListTemplate(plugin) {
   //Also need check inplace for incompatible...
   let abandoned = ``;
@@ -2330,7 +2437,7 @@ class PrintersManagement {
     let printCheck = -1;
     if (printerURL.value !== "") {
       printCheck = _.findIndex(printerInfo, function (o) {
-        return o.printerURL.includes(printerURL.value);
+        return JSON.stringify(o.printerURL) === JSON.stringify(printerURL.value);
       });
     }
     // Check information is filled correctly...

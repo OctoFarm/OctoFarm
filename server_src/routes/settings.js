@@ -11,6 +11,7 @@ const roomDataDB = require("../models/roomData.js");
 const UserDB = require("../models/User.js");
 const PrinterDB = require("../models/Printer.js");
 const AlertsDB = require("../models/Alerts.js");
+const GcodeDB = require("../models/CustomGcode.js");
 
 const Logger = require("../lib/logger.js");
 
@@ -76,6 +77,7 @@ router.get(
       await UserDB.deleteMany({});
       await PrinterDB.deleteMany({});
       await AlertsDB.deleteMany({});
+      await GcodeDB.deleteMany({});
       res.send({
         message: "Successfully deleted databases, server will restart...",
       });
@@ -207,3 +209,37 @@ router.get("/sysInfo", ensureAuthenticated, async (req, res) => {
   }
   res.send(sysInfo);
 });
+router.get("/customGcode/delete/:id", ensureAuthenticated, async(req, res) => {
+  const scriptId = req.params.id;
+  GcodeDB.findByIdAndDelete(scriptId, function (err) {
+    if(err){
+      res.send(err)
+    }
+    else{
+      res.send(scriptId)
+    }
+  });
+});
+router.get("/customGcode/edit/:id", ensureAuthenticated, async(req, res) => {
+  const scriptId = req.params.id;
+  const newObj = req.body;
+  GcodeDB.findByIdAndUpdate({scriptId},newObj, function(err, result){
+    if(err){
+      res.send(err)
+    }
+    else{
+      res.send(result)
+    }
+
+  })
+});
+router.post("/customGcode", ensureAuthenticated, async(req, res) => {
+  let newScript = req.body
+  const saveScript = new GcodeDB(newScript)
+  console.log(saveScript)
+  saveScript.save().then(res.send(saveScript)).catch(e => res.send(e));
+});
+router.get("/customGcode", ensureAuthenticated, async(req, res) => {
+  const all = await GcodeDB.find();
+  res.send(all)
+})
