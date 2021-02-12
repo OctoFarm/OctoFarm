@@ -14,7 +14,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
    - #223: Shutting down printers unexpectedly would keep printer in last state. - Big thanks to Chrismettal for helping me chase this one down. 
    - #226: Failing to fire commands to enclosure plugin using the Power Settings.
-
+   - Attempted fix for air gapped farms. Awaiting feedback. 
 
 # [v1.1.10]
 
