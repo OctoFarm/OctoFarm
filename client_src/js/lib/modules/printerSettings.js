@@ -59,10 +59,10 @@ export default class PrinterSettings {
             document.getElementById("printerControls").innerHTML = "";
           }
           document.getElementById("pmStatus").innerHTML =
-            '<i class="fas fa-spinner fa-spin"></i>';
+            "<i class=\"fas fa-spinner fa-spin\"></i>";
           document.getElementById(
             "pmStatus"
-          ).className = `btn btn-secondary mb-2`;
+          ).className = "btn btn-secondary mb-2";
           //Load Connection Panel
           document.getElementById("printerPortDrop").innerHTML = "";
           document.getElementById("printerBaudDrop").innerHTML = "";
@@ -146,7 +146,7 @@ export default class PrinterSettings {
             .getElementById("psDefaultBaudrate")
             .insertAdjacentHTML(
               "afterbegin",
-              '<option value="0">No Preference</option>'
+              "<option value=\"0\">No Preference</option>"
             );
         }
         currentPrinter.connectionOptions.ports.forEach((port) => {
@@ -162,7 +162,7 @@ export default class PrinterSettings {
             .getElementById("psDefaultSerialPort")
             .insertAdjacentHTML(
               "afterbegin",
-              '<option value="0">No Preference</option>'
+              "<option value=\"0\">No Preference</option>"
             );
         }
         currentPrinter.connectionOptions.printerProfiles.forEach((profile) => {
@@ -180,7 +180,7 @@ export default class PrinterSettings {
             .getElementById("psDefaultProfile")
             .insertAdjacentHTML(
               "afterbegin",
-              '<option value="0">No Preference</option>'
+              "<option value=\"0\">No Preference</option>"
             );
         }
         if (currentPrinter.connectionOptions.baudratePreference != null) {
@@ -688,7 +688,7 @@ export default class PrinterSettings {
             <div class="form-row">
               <div class="col-4">
                 <input id="psPowerToggleCommand"  type="text" class="form-control" placeholder="Command">
-                 <small vclass="form-text text-muted">
+                 <small class="form-text text-muted">
                    This is usually an json object supplied in the following format <code>{"command":"toggle"}</code>
                  </small>
               </div>
