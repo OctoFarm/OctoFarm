@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 # [Released]
 
+# [v1.1.11]
+
+### Added
+ 
+### Changed
+   - Improved the power status error logging.
+
+
+### Fixed
+   - #223: Shutting down printers unexpectedly would keep printer in last state. - Big thanks to Chrismettal for helping me chase this one down. 
+   - #226: Failing to fire commands to enclosure plugin using the Power Settings.
+
+
 # [v1.1.10]
 
 ### Added
