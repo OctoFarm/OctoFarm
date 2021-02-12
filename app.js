@@ -109,10 +109,10 @@ const serverStart = async () => {
     await databaseSetup();
 
     app.listen(PORT, "0.0.0.0", () => {
-      logger.info(`HTTP server started...`);
+      logger.info("HTTP server started...");
       logger.info(`You can now access your server on port: ${PORT}`);
       // eslint-disable-next-line no-console
-      process.send('ready');
+      process.send("ready");
     });
   } catch (err) {
     await logger.error(err);
@@ -120,7 +120,7 @@ const serverStart = async () => {
 
   // Routes
   app.use(express.static(`${__dirname}/views`));
-  app.use(`/images`, express.static(`${__dirname}/images`));
+  app.use("/images", express.static(`${__dirname}/images`));
   if (db === "") {
     app.use("/", require("./server_src/routes/index", { page: "route" }));
   } else {
@@ -203,10 +203,10 @@ mongoose
 
 const databaseIssue = async () => {
   app.listen(4000, "0.0.0.0", ()=> {
-    logger.info(`HTTP server started...`);
+    logger.info("HTTP server started...");
     logger.info(`You can now access your server on port: ${4000}`);
     // eslint-disable-next-line no-console
-    process.send('ready');
+    process.send("ready");
   });
   app.use(express.static(`${__dirname}/views`));
   app.use("/", require("./server_src/routes/databaseIssue", { page: "route" }));
