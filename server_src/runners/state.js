@@ -1185,10 +1185,10 @@ class Runner {
           farmPrinters[i].hostDescription = "Host is Online";
           await Runner.getSystem(id);
           await Runner.getSettings(id);
-          await Runner.getUpdates(id);
+          Runner.getUpdates(id);
           await Runner.getProfile(id);
           await Runner.getState(id);
-          await Runner.getPluginList(id);
+          Runner.getPluginList(id);
           if (
             typeof farmPrinters[i].fileList === "undefined" ||
             typeof farmPrinters[i].storage === "undefined"
@@ -1209,7 +1209,7 @@ class Runner {
           PrinterTicker.addIssue(
             new Date(),
             farmPrinters[i].printerURL,
-            `API checks successful`,
+            "API checks successful",
             "Complete",
             farmPrinters[i]._id
           );
@@ -1309,7 +1309,7 @@ class Runner {
             }
           } catch (e) {
             logger.error(
-              `Couldn't set state of missing printer, safe to ignore`
+              "Couldn't set state of missing printer, safe to ignore"
             );
           }
           timeout = systemSettings.timeout;
@@ -1346,7 +1346,7 @@ class Runner {
             }
           } catch (e) {
             logger.error(
-              `Couldn't set state of missing printer, safe to ignore`
+              "Couldn't set state of missing printer, safe to ignore"
             );
           }
           timeout = systemSettings.timeout;
@@ -1432,7 +1432,7 @@ class Runner {
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[i].printerURL,
-      `Initiating Printer...`,
+      "Initiating Printer...",
       "Active",
       farmPrinters[i]._id
     );
@@ -1724,7 +1724,7 @@ class Runner {
       PrinterTicker.addIssue(
         new Date(),
         farmPrinters[changeIndex].printerURL,
-        `Updating Printer information...`,
+        "Updating Printer information...",
         "Active",
         farmPrinters[changeIndex]._id
       );
@@ -1741,7 +1741,7 @@ class Runner {
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[changeIndex].printerURL,
-          `Printer information updated successfully...`,
+          "Printer information updated successfully...",
           "Complete",
           farmPrinters[changeIndex]._id
         );
@@ -1796,7 +1796,7 @@ class Runner {
           PrinterTicker.addIssue(
             new Date(),
             removedURL,
-            `Removing printer from database...`,
+            "Removing printer from database...",
             "Active",
             removedIP
           );
@@ -1811,7 +1811,7 @@ class Runner {
           PrinterTicker.addIssue(
             new Date(),
             removedURL,
-            `Successfully removed from database...`,
+            "Successfully removed from database...",
             "Complete",
             removedIP
           );
@@ -1865,7 +1865,7 @@ class Runner {
       PrinterTicker.addIssue(
         new Date(),
         "All Printers",
-        `Successfully removed from the database...`,
+        "Successfully removed from the database...",
         "Complete",
         ""
       );
@@ -1885,7 +1885,7 @@ class Runner {
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[index].printerURL,
-      `ReScan Requested... checking socket state`,
+      "ReScan Requested... checking socket state",
       "Active",
       farmPrinters[index]._id
     );
@@ -1921,7 +1921,7 @@ class Runner {
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
-          `Socket currently active, closing and re-setting back up...`,
+          "Socket currently active, closing and re-setting back up...",
           "Active",
           farmPrinters[index]._id
         );
@@ -1938,7 +1938,7 @@ class Runner {
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
-          `Socket in tentative state, awaiting for connection attempt to finish... retry in 2000ms`,
+          "Socket in tentative state, awaiting for connection attempt to finish... retry in 2000ms",
           "Active",
           farmPrinters[index]._id
         );
@@ -1961,7 +1961,7 @@ class Runner {
           PrinterTicker.addIssue(
             new Date(),
             farmPrinters[index].printerURL,
-            `Retrying socket...`,
+            "Retrying socket...",
             "Active",
             farmPrinters[index]._id
           );
@@ -1971,7 +1971,7 @@ class Runner {
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
-          `Socket currently closed... Re-opening...`,
+          "Socket currently closed... Re-opening...",
           "Active",
           farmPrinters[index]._id
         );
@@ -1983,7 +1983,7 @@ class Runner {
       PrinterTicker.addIssue(
         new Date(),
         farmPrinters[index].printerURL,
-        `Socket currently closed... Re-opening...`,
+        "Socket currently closed... Re-opening...",
         "Active",
         farmPrinters[index]._id
       );
@@ -2443,6 +2443,7 @@ class Runner {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
+    farmPrinters[index].pluginsList = [];
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[index].printerURL,
@@ -2477,6 +2478,10 @@ class Runner {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
+    farmPrinters[index].updateAvailable = {
+      octoPrintUpdate: [],
+      pluginUpdates: [],
+    };
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[index].printerURL,
@@ -2635,13 +2640,13 @@ class Runner {
               farmPrinters[index]._id
             );
             farmPrinters[index].powerSettings = {
-              powerOnCommand: '{"command":"turnPSUOn"}',
+              powerOnCommand: "{\"command\":\"turnPSUOn\"}",
               powerOnURL: "[PrinterURL]/api/plugin/psucontrol",
-              powerOffCommand: '{"command":"turnPSUOff"}',
+              powerOffCommand: "{\"command\":\"turnPSUOff\"}",
               powerOffURL: "[PrinterURL]/api/plugin/psucontrol",
-              powerToggleCommand: '{"command":"togglePSU"}',
+              powerToggleCommand: "{\"command\":\"togglePSU\"}",
               powerToggleURL: "[PrinterURL]/api/plugin/psucontrol",
-              powerStatusCommand: '{"command":"getPSUState"}',
+              powerStatusCommand: "{\"command\":\"getPSUState\"}",
               powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
             };
             const printer = await Printers.findById(id);
@@ -3246,8 +3251,8 @@ class Runner {
 
       await Runner.getProfile(settings.printer.index);
       await Runner.getSettings(settings.printer.index);
-      await Runner.getUpdates(settings.printer.index);
-      await Runner.getPluginList(settings.printer.index);
+      Runner.getUpdates(settings.printer.index);
+      Runner.getPluginList(settings.printer.index);
       PrinterClean.generate(
         farmPrinters[index],
         systemSettings.filamentManager
@@ -3597,7 +3602,7 @@ class Runner {
         );
         fileTimeout = fileTimeout + 5000;
         if (fileInformation) {
-          logger.info(`New File Information:`, fileInformation);
+          logger.info("New File Information:", fileInformation);
           farmPrinters[i].fileList.files[
             farmPrinters[i].fileList.files.length - 1
           ] = fileInformation;
@@ -3607,7 +3612,7 @@ class Runner {
             fileInformation.time === null ||
             fileInformation.time === "No Time Estimate"
           ) {
-            logger.info(`File Information Still Missing Retrying...`);
+            logger.info("File Information Still Missing Retrying...");
             Runner.updateFile(
               farmPrinters[i].fileList.files[
                 farmPrinters[i].fileList.files.length - 1
@@ -3634,7 +3639,7 @@ class Runner {
       }, 5000);
     } else {
       logger.info(
-        `File information took too long to generate, awaiting manual scan...`
+        "File information took too long to generate, awaiting manual scan..."
       );
     }
   }
