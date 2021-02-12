@@ -6,15 +6,19 @@ All notable changes to this project will be documented in this file.
 # [v1.1.11]
 
 ### Added
+   - #274: Added full file path to file display card.
  
 ### Changed
-   - Improved the power status error logging.
+   - Improved the power status error logging. 
+   - #272: Improvements to the alpine image, now runs as none-root and went from around 1Gb to 268Mb in size! Big thank you to user @torresmvl for those PR's. Don't forget to email about your free t-shirt.
 
 
 ### Fixed
    - #223: Shutting down printers unexpectedly would keep printer in last state. - Big thanks to Chrismettal for helping me chase this one down. 
    - #226: Failing to fire commands to enclosure plugin using the Power Settings.
    - Attempted fix for air gapped farms. Awaiting feedback. 
+   - #236: File Manager would fail to return to non-recursive search on blank input.
+
 
 # [v1.1.10]
 

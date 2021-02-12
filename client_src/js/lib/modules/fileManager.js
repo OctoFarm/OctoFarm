@@ -600,6 +600,7 @@ export default class FileManager {
                 <div class="row">
                 <div class="col-12">
                 <h5 class="mb-1 name">${file.display}</h5>         
+                <small class="mb-1 name">${file.fullPath}</small>         
                 </div>
                 </div>
                 <div class="row">
@@ -938,9 +939,7 @@ export class FileActions {
 
         const fileList = document.getElementById(`fileList-${id}`);
         let input = document.getElementById("searchFiles").value.toUpperCase();
-        console.log(input)
         input = input.replace(/ /g, "_");
-        console.log(input)
         if (input === "") {
             // No search term so reset view
             document.getElementById("currentFolder").value = "local/";

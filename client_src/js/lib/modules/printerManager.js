@@ -62,10 +62,10 @@ export default class PrinterManager {
             document.getElementById("printerControls").innerHTML = "";
           }
           document.getElementById("pmStatus").innerHTML =
-            '<i class="fas fa-spinner fa-spin"></i>';
+            "<i class=\"fas fa-spinner fa-spin\"></i>";
           document.getElementById(
             "pmStatus"
-          ).className = `btn btn-secondary mb-2`;
+          ).className = "btn btn-secondary mb-2";
           //Load Connection Panel
           document.getElementById("printerPortDrop").innerHTML = "";
           document.getElementById("printerBaudDrop").innerHTML = "";
@@ -176,21 +176,21 @@ export default class PrinterManager {
           printer.printerState.state === "Error!"
       ) {
         printerConnect.innerHTML =
-            '<center> <button id="pmConnect" class="btn btn-success inline" value="connect">Connect</button><a title="Open your Printers Web Interface" id="pmWebBtn" type="button" class="tag btn btn-info ml-1" target="_blank" href="' +
+            "<center> <button id=\"pmConnect\" class=\"btn btn-success inline\" value=\"connect\">Connect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
             printer.printerURL +
-            '" role="button"><i class="fas fa-globe-europe"></i></a><div id="powerBtn-' +
+            "\" role=\"button\"><i class=\"fas fa-globe-europe\"></i></a><div id=\"powerBtn-" +
             printer._id +
-            '" class="btn-group ml-1"></div></center>';
+            "\" class=\"btn-group ml-1\"></div></center>";
         document.getElementById("pmSerialPort").disabled = false;
         document.getElementById("pmBaudrate").disabled = false;
         document.getElementById("pmProfile").disabled = false;
       } else {
         printerConnect.innerHTML =
-            '<center> <button id="pmConnect" class="btn btn-danger inline" value="disconnect">Disconnect</button><a title="Open your Printers Web Interface" id="pmWebBtn" type="button" class="tag btn btn-info ml-1" target="_blank" href="' +
+            "<center> <button id=\"pmConnect\" class=\"btn btn-danger inline\" value=\"disconnect\">Disconnect</button><a title=\"Open your Printers Web Interface\" id=\"pmWebBtn\" type=\"button\" class=\"tag btn btn-info ml-1\" target=\"_blank\" href=\"" +
             printer.printerURL +
-            '" role="button"><i class="fas fa-globe-europe"></i></a><div id="pmPowerBtn-' +
+            "\" role=\"button\"><i class=\"fas fa-globe-europe\"></i></a><div id=\"pmPowerBtn-" +
             printer._id +
-            '" class="btn-group ml-1"></div></center>';
+            "\" class=\"btn-group ml-1\"></div></center>";
         document.getElementById("pmSerialPort").disabled = true;
         document.getElementById("pmBaudrate").disabled = true;
         document.getElementById("pmProfile").disabled = true;
@@ -740,7 +740,7 @@ export default class PrinterManager {
                   <div class="row">
                     <div class="col-10 col-lg-8 col-xl-8">
                         <label for="pcFeed">Feed Rate: <span id="pcFeedValue">${printer.feedRate}%</span></label>
-                        <input type="range" class="octoRange custom-range" min="50" max="150" step="1" id="pcFeed" value="${printer.feedRate}">
+                        <input type="range" class="octoRange custom-range" min="10" max="300" step="1" id="pcFeed" value="${printer.feedRate}">
                     </div>
                     <div class="col-2 col-lg-4 col-xl-4">
                         <button id="pcFeedRate" type="button" class="btn btn-light">Update</button>
@@ -1082,7 +1082,7 @@ export default class PrinterManager {
                 setTimeout(function () {
                   FileManager.refreshFiles(
                       currentPrinter,
-                      `<i class="fas fa-spinner fa-pulse"></i> Checking Octoprint for information... <br>`
+                      "<i class=\"fas fa-spinner fa-pulse\"></i> Checking Octoprint for information... <br>"
                   );
                 }, 1000);
               });
@@ -1672,10 +1672,10 @@ export default class PrinterManager {
         message: `${currentPrinter.printerName}: <br>Are you sure you want to cancel the ongoing print?`,
         buttons: {
           cancel: {
-            label: '<i class="fa fa-times"></i> Cancel',
+            label: "<i class=\"fa fa-times\"></i> Cancel",
           },
           confirm: {
-            label: '<i class="fa fa-check"></i> Confirm',
+            label: "<i class=\"fa fa-check\"></i> Confirm",
           },
         },
         callback(result) {
@@ -1985,8 +1985,8 @@ export default class PrinterManager {
         elements.jobStatus.expectedTotalCosts.innerHTML =
           printer.currentJob.expectedTotals.totalCost;
       } else {
-        usageDisplay = `No File Selected`;
-        elements.jobStatus.expectedTotalCosts.innerHTML = `No File Selected`;
+        usageDisplay = "No File Selected";
+        elements.jobStatus.expectedTotalCosts.innerHTML = "No File Selected";
       }
       if (typeof printer.currentJob.expectedFilamentCosts === "object") {
         if (printer.currentJob.expectedFilamentCosts !== null) {
@@ -2206,7 +2206,7 @@ export default class PrinterManager {
     if (printer.tools !== null) {
       const currentTemp = printer.tools[0];
       elements.temperatures.tempTime.innerHTML =
-        'Updated: <i class="far fa-clock"></i> ' +
+        "Updated: <i class=\"far fa-clock\"></i> " +
         new Date(currentTemp.time * 1000).toTimeString().substring(1, 8);
       if (currentTemp.bed.actual !== null) {
         elements.temperatures.bed[0].innerHTML = currentTemp.bed.actual + "°C";
