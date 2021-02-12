@@ -379,9 +379,10 @@ export default class OctoPrintClient {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          "X-Api-Key": printer.apikey,
         },
       });
-      if (post.status !== 204) {
+      if (post.status !== 200) {
         UI.createAlert(
           "error",
           `${printer.printerName}: Could not complete ${action}`,
@@ -404,7 +405,7 @@ export default class OctoPrintClient {
         body: command,
       });
 
-      if (post.status !== 204) {
+      if (post.status !== 200) {
         UI.createAlert(
           "error",
           `${printer.printerName}: Could not complete ${action}`,
