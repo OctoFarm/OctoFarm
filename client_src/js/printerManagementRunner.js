@@ -1282,7 +1282,7 @@ async function newGcodeScript(newScript){
     UI.createAlert("error", "You have blank fields sony jim!, sort them out...", 3000, "Clicked");
     return false;
   }else{
-    let lines = document.getElementById("gcodeScriptScript").value.match(/[^\r\n]+/g);
+    let lines = newScript.gcode.match(/[^\r\n]+/g);
     newScript.gcode = lines.map(function (name) {
       if (!name.includes("=")) {
         return name.toLocaleUpperCase();
@@ -1290,13 +1290,23 @@ async function newGcodeScript(newScript){
         return name;
       }
     });
-    let post = await OctoFarmClient.post("settings/customGcode", newScript);
-    if(post.status === 200){
-      post = await post.json();
-      drawScriptTable(post)
+    if(newScript.id){
+      let post = await OctoFarmClient.post("settings/customGcode/edit", newScript);
+      if(post.status === 200){
+        post = await post.json();
+      }else{
+        UI.createAlert("error", "Something went wrong updating, is the server online?")
+      }
     }else{
-      UI.createAlert("error", "Something went wrong updating, is the server online?")
+      let post = await OctoFarmClient.post("settings/customGcode", newScript);
+      if(post.status === 200){
+        post = await post.json();
+        drawScriptTable(post)
+      }else{
+        UI.createAlert("error", "Something went wrong updating, is the server online?")
+      }
     }
+
   }
   return true;
 }
@@ -1322,7 +1332,7 @@ function drawScriptTable(scripts){
 
     scriptTable.insertAdjacentHTML("beforeend", `
              <tr id="scriptRow-${scripts._id}" >
-                <td class="d-none">${scripts._id}</td>
+                <td id="script_id_${scripts._id}" class="d-none">${scripts._id}</td>
                 <td><input type="text" class="form-control" id="script_name_${scripts._id}" placeholder="${scripts.name}" disabled></input></td>
                 <td><input type="text" class="form-control" id="script_desc_${scripts._id}"  placeholder="${scripts.description}" disabled></input></td>
                 <td><textarea type="text" class="form-control" id="script_lines_${scripts._id}"  placeholder="${scriptLines}" disabled></textarea></td>
@@ -1349,7 +1359,7 @@ function drawScriptTable(scripts){
       }
     })
   document.getElementById("editScript-"+scripts._id).addEventListener("click", async (e) => {
-    console.log("HELLO", scripts._id)
+
     document.getElementById(`script_name_${scripts._id}`).disabled = false;
     document.getElementById(`script_desc_${scripts._id}`).disabled = false;
     document.getElementById(`script_lines_${scripts._id}`).disabled = false;
@@ -1361,15 +1371,20 @@ function drawScriptTable(scripts){
   });
   document.getElementById("saveScript-"+scripts._id).addEventListener("click", async (e) => {
     let newScript = {
+      id: document.getElementById(`script_id_${scripts._id}`).innerHTML,
       name: document.getElementById(`script_name_${scripts._id}`).value,
       description: document.getElementById(`script_desc_${scripts._id}`).value,
       gcode: document.getElementById(`script_lines_${scripts._id}`).value,
     }
+    console.log(newScript)
     let save = await newGcodeScript(newScript);
     if(save){
       document.getElementById(`script_name_${scripts._id}`).placeholder = document.getElementById(`script_name_${scripts._id}`).value;
       document.getElementById(`script_desc_${scripts._id}`).placeholder = document.getElementById(`script_desc_${scripts._id}`).value;
       document.getElementById(`script_lines_${scripts._id}`).placeholder = document.getElementById(`script_lines_${scripts._id}`).value;
+      document.getElementById(`script_name_${scripts._id}`).value = "";
+      document.getElementById(`script_desc_${scripts._id}`).value = "";
+      document.getElementById(`script_lines_${scripts._id}`).value = "";
       document.getElementById(`script_name_${scripts._id}`).disabled = true;
       document.getElementById(`script_desc_${scripts._id}`).disabled = true;
       document.getElementById(`script_lines_${scripts._id}`).disabled = true;
