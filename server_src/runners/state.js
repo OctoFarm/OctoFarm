@@ -1663,6 +1663,14 @@ class Runner {
         }
       }
       if (farmPrinters[index].printerURL !== printers[i].printerURL) {
+        if (
+            printers[i].printerURL[printers[i].printerURL.length - 1] === "/"
+        ) {
+          printers[i].printerURL = printers[i].printerURL.replace(
+              /\/?$/,
+              ""
+          );
+        }
         farmPrinters[index].printerURL = printers[i].printerURL;
         farmPrinters[index].markModified("printerURL");
         logger.info(
@@ -2997,6 +3005,7 @@ class Runner {
         settings.printer.printerURL !== "" &&
         settings.printer.printerURL !== farmPrinters[index].printerURL
       ) {
+
         farmPrinters[index].printerURL = settings.printer.printerURL;
         printer.printerURL = settings.printer.printerURL;
         printer.markModified("printerURL");

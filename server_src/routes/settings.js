@@ -221,7 +221,6 @@ router.get("/customGcode/delete/:id", ensureAuthenticated, async(req, res) => {
   });
 });
 router.post("/customGcode/edit", ensureAuthenticated, async(req, res) => {
-
   const newObj = req.body;
   let script = await GcodeDB.findById(newObj.id);
   script.gcode = newObj.gcode;
