@@ -1,0 +1,2 @@
+- name: Lint Action
+  uses: wearerequired/lint-action@v1.7.0
