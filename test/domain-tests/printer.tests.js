@@ -1,4 +1,4 @@
-const Printer = require("../../models/Printer");
+const Printer = require("../../server_src/models/Printer");
 const expect = require("chai").expect;
 
 describe("printer", function () {
@@ -18,6 +18,8 @@ describe("printer", function () {
 
     m.validate(function (err) {
       expect(err.errors.printerURL).to.exist;
+      expect(err.errors.printerURL).to.not.contain("myawesomeprinter/");
+      expect(err.errors.printerURL).to.eq("myawesomeprinter");
       done();
     });
   });
