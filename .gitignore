@@ -14,3 +14,5 @@ images/historyCollection/
 /.build
 /.cache
 /dist/
+/views/assets/
+/.run/

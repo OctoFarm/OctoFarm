@@ -7,13 +7,10 @@ import PrinterSettings from "./lib/modules/printerSettings.js";
 import FileOperations from "./lib/functions/file.js";
 import Validate from "./lib/functions/validate.js";
 import PowerButton from "./lib/modules/powerButton.js";
-import {
-  init as actionButtonInit,
-  checkQuickConnectState,
-} from "./lib/modules/Printers/actionButtons.js";
+import {checkQuickConnectState, init as actionButtonInit} from "./lib/modules/Printers/actionButtons.js";
 import PrinterSelect from "./lib/modules/printerSelect";
 import PrinterLogs from "./lib/modules/printerLogs.js";
-import FileSorting from "./lib/modules/fileSorting.js";
+import Sortable from './vendor/sortable';
 import CustomGenerator from "./lib/modules/customScripts.js";
 
 let printerInfo = "";
