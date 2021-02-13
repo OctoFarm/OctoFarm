@@ -1,6 +1,7 @@
 const ServerSettings = require("../../models/ServerSettings.js");
 const History = require("../../models/History.js");
 const Logger = require("../logger.js");
+const PrinterClean = require("../dataFunctions/printerClean.js");
 
 const logger = new Logger("OctoFarm-InformationCleaning");
 let historyClean = [];
@@ -152,11 +153,6 @@ class HistoryClean {
     } catch (e) {
       logger.error("Couldn't check nested index...", JSON.stringify(e));
     }
-  }
-
-  static async generatePrinterStatistics(){
-    let currentHistory = JSON.parse(JSON.stringify(historyClean))
-    console.log(currentHistory)
   }
 
   static async getStatistics(historyClean) {

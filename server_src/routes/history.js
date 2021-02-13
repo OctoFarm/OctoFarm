@@ -9,8 +9,10 @@ const Spools = require("../models/Filament.js");
 const Profiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const historyClean = require("../lib/dataFunctions/historyClean.js");
+const printerClean = require("../lib/dataFunctions/printerClean.js");
 
 const { HistoryClean } = historyClean;
+const { PrinterClean } = printerClean;
 
 router.post("/update", ensureAuthenticated, async (req, res) => {
   //Check required fields
@@ -154,7 +156,7 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
 });
 router.get("/statistics/:id", ensureAuthenticated, async function(req, res) {
   const printerID = req.params.id;
-  let stats = await HistoryClean.generatePrinterStatistics(printerID);
+  let stats = await PrinterClean.generatePrinterStatistics(printerID);
   res.send(stats)
 });
 // router.get("/info/", ensureAuthenticated, function(req, res) {

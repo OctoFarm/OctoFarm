@@ -1242,8 +1242,7 @@ class Runner {
           errno: "ECONNREFUSED",
           code: "ECONNREFUSED",
         };
-      }
-      {
+      } else {
         const error = {
           message: `Could not Establish API Connection: ${users.status}${farmPrinters[i].printerURL}`,
           type: "system",
@@ -1287,7 +1286,6 @@ class Runner {
               `Couldn't set state of missing printer, safe to ignore: ${farmPrinters[i].index}: ${farmPrinters[i].printerURL}`
             );
           }
-
           break;
         case "ECONNREFUSED":
           try {

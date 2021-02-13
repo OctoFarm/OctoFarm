@@ -151,6 +151,160 @@ class PrinterClean {
     return dashboardStatistics;
   }
 
+  static async generatePrinterStatistics(id) {
+    let currentHistory = JSON.parse(
+      JSON.stringify(await HistoryClean.returnHistory())
+    );
+    let currentPrinters = printersInformation;
+    const i = _.findIndex(currentPrinters, function (o) {
+      return JSON.stringify(o._id) === JSON.stringify(id);
+    });
+    let printer = Object.assign({}, currentPrinters[i]);
+
+    // Calculate time printer has existed...
+    let dateAdded = new Date(printer.dateAdded);
+    let todaysDate = new Date();
+    let dateDifference = parseInt(todaysDate - dateAdded);
+    let sevenDaysAgo = new Date(
+      todaysDate.getTime() - 100 * 24 * 60 * 60 * 1000
+    );
+    // Filter down the history arrays for total/daily/weekly
+    let historyDaily = [];
+    let historyWeekly = [];
+
+    // Create the statistics object to be sent back to client
+    let printerStatistics = {
+      printerName: printer.printerName,
+      timeTotal: dateDifference,
+      activeTimeTotal: printer.currentActive,
+      idleTimeTotal: printer.currentIdle,
+      offlineTimeTotal: printer.currentOffline,
+      filamentUsedWeightTotal: [],
+      filamentUsedLengthTotal: [],
+      printerCostTotal: [],
+      filamentCostTotal: [],
+      filamentUsedWeightWeek: [],
+      filamentUsedLengthWeek: [],
+      printerCostWeek: [],
+      filamentCostWeek: [],
+      filamentUsedWeightDay: [],
+      filamentUsedLengthDay: [],
+      printerCostDay: [],
+      filamentCostDay: [],
+      printSuccessTotal: [],
+      printCancelTotal: [],
+      printErrorTotal: [],
+      printSuccessDay: [],
+      printCancelDay: [],
+      printErrorDay: [],
+      printerSuccessWeek: [],
+      printerCancelWeek: [],
+      printerErrorWeek: [],
+      printerResendRatioTotal: [],
+      printerResendRatioDaily: [],
+      printerResendRatioWeekly: [],
+    };
+
+    currentHistory.forEach((h) => {
+      // Parse the date from history....
+      let dateSplit = h.endDate.split(" ");
+      const months = [
+        "Jan",
+        "Feb",
+        "Mar",
+        "Apr",
+        "May",
+        "Jun",
+        "Jul",
+        "Aug",
+        "Sep",
+        "Oct",
+        "Nov",
+        "Dec",
+      ];
+      let month = months.indexOf(dateSplit[1]);
+      let dateString = `${parseInt(dateSplit[3])}-${month + 1}-${parseInt(
+        dateSplit[2]
+      )}`;
+      let dateParse = new Date(dateString);
+      if (h.printer === printerStatistics.printerName) {
+        //Collate totals
+        printerStatistics.filamentUsedWeightTotal.push(h.totalWeight);
+        printerStatistics.filamentUsedLengthTotal.push(h.totalLength);
+        printerStatistics.printerCostTotal.push(parseFloat(h.totalCost));
+        printerStatistics.filamentCostTotal.push(h.spoolCost);
+        if (typeof h.resend !== "undefined") {
+          printerStatistics.printerResendRatioTotal.push(h.resend.ratio);
+        }
+
+        if (h.state.includes("success")) {
+          printerStatistics.printSuccessTotal.push(1);
+        } else if (h.state.includes("warning")) {
+          printerStatistics.printCancelTotal.push(1);
+        } else if (h.state.includes("danger")) {
+          printerStatistics.printErrorTotal.push(1);
+        }
+
+        if (dateParse.getTime() > todaysDate.getTime()) {
+          historyDaily.push(h);
+        }
+        // Capture Weekly..
+        if (dateParse.getTime() > sevenDaysAgo.getTime()) {
+          historyWeekly.push(h);
+        }
+      }
+    });
+
+    // Collate daily stats
+    historyDaily.forEach((d) => {
+      printerStatistics.filamentUsedWeightDay.push(d.totalWeight);
+      printerStatistics.filamentUsedLengthDay.push(d.totalLength);
+      printerStatistics.printerCostDay.push(parseFloat(d.totalCost));
+      printerStatistics.filamentCostDay.push(d.spoolCost);
+      if (typeof d.resend !== "undefined") {
+        printerStatistics.printerResendRatioDaily.push(d.resend.ratio);
+      }
+
+      if (d.state.includes("success")) {
+        printerStatistics.printSuccessDay.push(1);
+      } else if (d.state.includes("warning")) {
+        printerStatistics.printCancelDay.push(1);
+      } else if (d.state.includes("danger")) {
+        printerStatistics.printErrorDay.push(1);
+      }
+    });
+
+    // Collate weekly stats
+    historyWeekly.forEach((w) => {
+      printerStatistics.filamentUsedWeightWeek.push(w.totalWeight);
+      printerStatistics.filamentUsedLengthWeek.push(w.totalLength);
+      printerStatistics.printerCostWeek.push(parseFloat(w.totalCost));
+      printerStatistics.filamentCostWeek.push(w.spoolCost);
+      if (typeof w.resend !== "undefined") {
+        printerStatistics.printerResendRatioWeekly.push(w.resend.ratio);
+      }
+
+      if (w.state.includes("success")) {
+        printerStatistics.printerSuccessWeek.push(1);
+      } else if (w.state.includes("warning")) {
+        printerStatistics.printerCancelWeek.push(1);
+      } else if (w.state.includes("danger")) {
+        printerStatistics.printerErrorWeek.push(1);
+      }
+    });
+    // Reduce all the values and update the variable.
+    Object.keys(printerStatistics).forEach(function (key) {
+      if (Array.isArray(printerStatistics[key])) {
+        printerStatistics[key] = printerStatistics[key].reduce(
+          (a, b) => a + b,
+          0
+        );
+      }
+    });
+
+    return printerStatistics;
+  }
+
   static async generate(farmPrinter, filamentManager) {
     fmToggle = filamentManager;
     try {
@@ -260,7 +414,7 @@ class PrinterClean {
       }
 
       const printerIndex = _.findIndex(printerControlList, function (o) {
-        return o.printerName == sortedPrinter.printerName;
+        return o.printerName === sortedPrinter.printerName;
       });
       if (printerIndex !== -1) {
         printerControlList[printerIndex] = {
@@ -285,8 +439,6 @@ class PrinterClean {
       console.log(e);
     }
   }
-
-
 
   static async generateConnectionLogs(farmPrinter) {
     let printerErrorLogs = await ErrorLogs.find({});
@@ -1095,9 +1247,9 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: enviromentalData[i].temperature.toFixed(2),
             });
-            dashboardStatistics.currentTemperature = enviromentalData[
-              0
-            ].temperature.toFixed(2);
+            dashboardStatistics.currentTemperature = enviromentalData[0].temperature.toFixed(
+              2
+            );
           } else {
             currentEnviromentalData[0].data.push({
               x: enviromentalData[i].date,
@@ -1127,9 +1279,9 @@ class PrinterClean {
               x: enviromentalData[i].date,
               y: enviromentalData[i].pressure.toFixed(0),
             });
-            dashboardStatistics.currentPressure = enviromentalData[
+            dashboardStatistics.currentPressure = enviromentalData[0].pressure.toFixed(
               0
-            ].pressure.toFixed(0);
+            );
           } else {
             currentEnviromentalData[2].data.push({
               x: enviromentalData[i].date,
