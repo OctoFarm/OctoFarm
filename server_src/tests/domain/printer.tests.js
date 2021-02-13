@@ -13,7 +13,7 @@ describe("printer", function () {
 
   it("should be invalid if printerURL ends with slash", function (done) {
     const m = new Printer({
-      printerURL: "http://myawesomeprinter/",
+      printerURL: "myawesomeprinter/",
     });
 
     m.validate(function (err) {
