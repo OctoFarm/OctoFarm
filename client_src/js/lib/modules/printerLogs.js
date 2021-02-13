@@ -281,9 +281,80 @@ export default class PrinterLogs {
       eventListener = true;
     }
   }
-  static async loadStatistics(id){
-      let get = await OctoFarmClient.get("history/statistics/"+id);
-      console.log(get)
-      console.log(await get.json())
+  static async returnPrinterStatsTemplate(stats) {
+    return `
+
+            <div class="col-md-6 col-lg-3">
+            <h5>Printer Usage</h5>
+             <span><i class="fas fa-square text-success"></i> <b>Active Hours: </b> <br> ${Calc.generateTime(
+               stats.activeTimeTotal / 1000
+             )}</span>
+              <br>
+              <span><i class="fas fa-square text-secondary"></i> <b>Idle Hours: </b> <br> ${Calc.generateTime(
+                stats.idleTimeTotal / 1000
+              )}</span>
+              <br>
+              <span class="pb-4"><i class="fas fa-square text-danger"></i> <b>Offline Hours: </b><br> ${Calc.generateTime(
+                stats.offlineTimeTotal / 1000
+              )}</span>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <h5>Print Totals for Today</h5>
+               <span><i class="fas fa-square text-success"></i> <b>Successful Prints Today: </b> <br> ${
+                 stats.printSuccessDay
+               }</span>
+              <br>
+              <span><i class="fas fa-square text-secondary"></i> <b>Cancelled Prints Today : </b> <br> ${
+                stats.printCancelDay
+              }</span>
+              <br>
+              <span class="pb-4"><i class="fas fa-square text-danger"></i> <b>Failed Prints Today: </b><br> ${
+                stats.printErrorDay
+              }</span>
+            
+            </div>
+            <div class="col-md-6 col-lg-3">
+                            <h5>Print Totals for Last Seven Days</h5>
+               <span><i class="fas fa-square text-success"></i> <b>Successful Prints Today: </b> <br> ${
+                 stats.printerSuccessWeek
+               }</span>
+                        <br>
+                        <span><i class="fas fa-square text-secondary"></i> <b>Cancelled Prints Today : </b> <br> ${
+                          stats.printerCancelWeek
+                        }</span>
+                        <br>
+                        <span class="pb-4"><i class="fas fa-square text-danger"></i> <b>Failed Prints Today: </b><br> ${
+                          stats.printerErrorWeek
+                        }</span>
+            
+            </div>
+            <div class="col-md-6 col-lg-3">
+                                        <h5>Print Totals All Time</h5>
+               <span><i class="fas fa-square text-success"></i> <b>Successful Prints Today: </b> <br> ${
+                 stats.printSuccessTotal
+               }</span>
+                <br>
+                <span><i class="fas fa-square text-secondary"></i> <b>Cancelled Prints Today : </b> <br> ${
+                  stats.printCancelTotal
+                }</span>
+                <br>
+                <span class="pb-4"><i class="fas fa-square text-danger"></i> <b>Failed Prints Today: </b><br> ${
+                  stats.printErrorTotal
+                }</span>
+                        
+            </div>
+    
+    
+    `;
+  }
+  static async loadStatistics(id) {
+    let get = await OctoFarmClient.get("history/statistics/" + id);
+    get = await get.json();
+    console.log(get);
+    let printerStatsWrapper = document.getElementById("printerStatistics");
+    printerStatsWrapper.innerHTML = "";
+    printerStatsWrapper.innerHTML = await this.returnPrinterStatsTemplate(get);
+    document.getElementById("printerStatisticsTitle").innerHTML =
+      "Printer Statistics: " + get.printerName;
   }
 }

@@ -165,9 +165,7 @@ class PrinterClean {
     let dateAdded = new Date(printer.dateAdded);
     let todaysDate = new Date();
     let dateDifference = parseInt(todaysDate - dateAdded);
-    let sevenDaysAgo = new Date(
-      todaysDate.getTime() - 100 * 24 * 60 * 60 * 1000
-    );
+    let sevenDaysAgo = new Date(todaysDate.getTime() - 7 * 24 * 60 * 60 * 1000);
     // Filter down the history arrays for total/daily/weekly
     let historyDaily = [];
     let historyWeekly = [];
@@ -301,6 +299,146 @@ class PrinterClean {
         );
       }
     });
+
+    // const historyByDay = [];
+    // let checkNested = this.checkNested(
+    //     JSON.parse(JSON.stringify(spool[key].type)),
+    //     totalByDay
+    // );
+    //
+    // if (typeof checkNested !== "undefined") {
+    //   let checkNestedIndexHistoryRates = null;
+    //   if (historyClean[h].state.includes("success")) {
+    //     checkNestedIndexHistoryRates = this.checkNestedIndex(
+    //         "Success",
+    //         historyByDay
+    //     );
+    //   } else if (historyClean[h].state.includes("warning")) {
+    //     checkNestedIndexHistoryRates = this.checkNestedIndex(
+    //         "Cancelled",
+    //         historyByDay
+    //     );
+    //   } else if (historyClean[h].state.includes("danger")) {
+    //     checkNestedIndexHistoryRates = this.checkNestedIndex(
+    //         "Failed",
+    //         historyByDay
+    //     );
+    //   } else {
+    //     return;
+    //   }
+    //
+    //   let checkNestedIndexByDay = this.checkNestedIndex(
+    //       JSON.parse(JSON.stringify(spool[key].type)),
+    //       usageOverTime
+    //   );
+    //   let usageWeightCalc = 0;
+    //
+    //   if (
+    //       typeof usageOverTime[checkNestedIndexByDay].data[0] !==
+    //       "undefined"
+    //   ) {
+    //     usageWeightCalc =
+    //         usageOverTime[checkNestedIndexByDay].data[
+    //         usageOverTime[checkNestedIndexByDay].data.length - 1
+    //             ].y +
+    //         JSON.parse(JSON.stringify(historyClean[h].totalWeight));
+    //   } else {
+    //     usageWeightCalc = JSON.parse(
+    //         JSON.stringify(historyClean[h].totalWeight)
+    //     );
+    //   }
+    //
+    //   let checkNestedIndex = this.checkNestedIndex(
+    //       JSON.parse(JSON.stringify(spool[key].type)),
+    //       totalByDay
+    //   );
+    //   let historyDate = JSON.parse(
+    //       JSON.stringify(historyClean[h].endDate)
+    //   );
+    //
+    //   let dateSplit = historyDate.split(" ");
+    //   const months = [
+    //     "Jan",
+    //     "Feb",
+    //     "Mar",
+    //     "Apr",
+    //     "May",
+    //     "Jun",
+    //     "Jul",
+    //     "Aug",
+    //     "Sep",
+    //     "Oct",
+    //     "Nov",
+    //     "Dec",
+    //   ];
+    //   let month = months.indexOf(dateSplit[1]);
+    //   let dateString = `${parseInt(dateSplit[3])}-${
+    //       month + 1
+    //   }-${parseInt(dateSplit[2])}`;
+    //
+    //   let dateParse = new Date(dateString);
+    //
+    //   let weightCalcSan = parseFloat(
+    //       JSON.parse(
+    //           JSON.stringify(historyClean[h].totalWeight.toFixed(2))
+    //       )
+    //   );
+    //   let dateChecked = new Date(thirtyDaysAgo);
+    //   //Don't include 0 weights
+    //   if (weightCalcSan > 0) {
+    //     //Check if more than 90 days ago...
+    //     weightCalcSan = JSON.parse(JSON.stringify(weightCalcSan));
+    //     if (dateParse.getTime() > dateChecked.getTime()) {
+    //       totalByDay[checkNestedIndex].data.push({
+    //         x: dateParse,
+    //         y: weightCalcSan,
+    //       });
+    //       usageOverTime[checkNestedIndex].data.push({
+    //         x: dateParse,
+    //         y: weightCalcSan,
+    //       });
+    //       // console.log(checkNestedIndexHistoryRates);
+    //       // console.log(historyByDay[checkNestedIndexHistoryRates].name);
+    //       historyByDay[checkNestedIndexHistoryRates].data.push({
+    //         x: dateParse,
+    //         y: 1,
+    //       });
+    //     }
+    //   }
+    // } else {
+    //   let usageKey = {
+    //     name: JSON.parse(JSON.stringify(spool[key].type)),
+    //     data: [],
+    //   };
+    //   let usageByKey = {
+    //     name: JSON.parse(JSON.stringify(spool[key].type)),
+    //     data: [],
+    //   };
+    //   let successKey = {
+    //     name: "Success",
+    //     data: [],
+    //   };
+    //   let cancellKey = {
+    //     name: "Cancelled",
+    //     data: [],
+    //   };
+    //   let failedKey = {
+    //     name: "Failed",
+    //     data: [],
+    //   };
+    //
+    //   if (spool[key].type !== "") {
+    //     totalByDay.push(usageKey);
+    //   }
+    //   if (spool[key].type !== "") {
+    //     usageOverTime.push(usageByKey);
+    //   }
+    //   if (typeof historyByDay[0] === "undefined") {
+    //     historyByDay.push(successKey);
+    //     historyByDay.push(cancellKey);
+    //     historyByDay.push(failedKey);
+    //   }
+    // }
 
     return printerStatistics;
   }
