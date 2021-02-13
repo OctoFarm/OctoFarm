@@ -2548,6 +2548,30 @@ class Runner {
         logger.info("Error find updates: ", e);
       });
   }
+  static async killPowerSettings(printerID){
+    try{
+      const index = _.findIndex(farmPrinters, function (o) {
+        return o._id == printerID;
+      });
+      farmPrinters[index].powerSettings = {
+        powerOnCommand: "",
+        powerOnURL: "",
+        powerOffCommand: "",
+        powerOffURL: "",
+        powerToggleCommand: "",
+        powerToggleURL: "",
+        powerStatusCommand: "",
+        powerStatusURL: "",
+      };
+      const printer = await Printers.findById(farmPrinters[index]._id);
+      printer.powerSettings = farmPrinters[index].powerSettings;
+      printer.save();
+      return true;
+    }catch(e){
+      return false;
+    }
+
+  }
   static getSettings(id) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;

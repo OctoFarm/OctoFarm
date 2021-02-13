@@ -105,6 +105,12 @@ router.post("/updateSettings", ensureAuthenticated, async (req, res) => {
 
   res.send({ status: updateSettings.status, printer: updateSettings.printer });
 });
+router.get("/killPowerSettings/:id", ensureAuthenticated, async (req, res) => {
+  // Check required fields
+  const printerID = req.params.id;
+  const updateSettings = await Runner.killPowerSettings(printerID);
+  res.send({updateSettings});
+});
 router.get("/groups", ensureAuthenticated, async (req, res) => {
   const printers = await Runner.returnFarmPrinters();
   const groups = [];

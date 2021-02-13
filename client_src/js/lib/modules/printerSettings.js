@@ -579,7 +579,7 @@ export default class PrinterSettings {
         wolIP = currentPrinter.powerSettings.wol.ip;
         wolPort = currentPrinter.powerSettings.wol.port;
         wolInterval = currentPrinter.powerSettings.wol.interval;
-        wolCount = currentPrinter.powerSettings.wol.count;
+        wolCount = currentPrinter.powerSettings.wol.packets;
         wolMAC = currentPrinter.powerSettings.wol.MAC;
       }
       document.getElementById("psPowerCommands").innerHTML = `
@@ -651,9 +651,10 @@ export default class PrinterSettings {
           <hr>
           <h5><u>Custom Power Commands</u></h5>
           <p class="mb-0">Setup a custom POST request to an API endpoint, instructions for such will be in your plugin/device instructions. Setting this up will activate the power button toggle on all Views and allow Power On and Power Off selections in the dropdown.</p>
-           <p class="mb-0">If you'd like to enter in a full URL command then leave the command blank and it will skip the requirement and just make a POST to the URL provided similar to CURL. You can use the following placeholders:</p>
+           <p class="mb-0">If you'd like to enter in a full URL command then leave the command blank and it will skip the requirement and just make a POST to the URL provided similar to CURL. <br>You can use the following placeholders:</p>
           <p class="mb-0">Printer URL: <code>[PrinterURL]</code></p>
-          <p class="mb-0">Printer api-key: <code>[PrinterAPI]</code></p
+          <p class="mb-0">Printer API-KEY: <code>[PrinterAPI]</code></p>
+          <button id="resetPowerFields" title="The dev coded himself into a corner here... Use this button to reset the below commands to blank." type="button" class="btn btn-danger mb-2">Reset Fields</button>
           <h6>Power On</h6>
            <div class="form-row">
               <div class="col-4">
@@ -717,6 +718,7 @@ export default class PrinterSettings {
             </div>
         </form>
         `;
+
       document.getElementById("psWolEnable").checked = wolEnable;
       if (serverRestart != "N/A") {
         document.getElementById("psServerRestart").placeholder = serverRestart;
@@ -901,7 +903,20 @@ export default class PrinterSettings {
       document.getElementById("psMaintenanceCosts").placeholder = parseFloat(
         currentPrinter.costSettings.maintenanceCosts
       );
+      document.getElementById("resetPowerFields").addEventListener("click", async () => {
+        let post = await OctoFarmClient.get("printers/killPowerSettings/"+currentPrinter._id);
+        if(post.status !== 200){
+          post = await post.json();
+          if(post.updateSettings){
+            UI.createAlert("success", "Successfully cleared Power Settings",  3000, "clicked");
+          }else{
+            UI.createAlert("error", "Successfully cleared Power Settings",  3000, "clicked");
+          }
 
+        }else{
+          UI.createAlert("error", "Failed to contact server is it online?",  3000, "clicked");
+        }
+      })
       document
         .getElementById("savePrinterSettings")
         .addEventListener("click", async (event) => {
@@ -944,7 +959,7 @@ export default class PrinterSettings {
                 ip: document.getElementById("psWolIP").value,
                 port: document.getElementById("psWolPort").value,
                 interval: document.getElementById("psWolInterval").value,
-                count: document.getElementById("psWolCount").value,
+                packets: document.getElementById("psWolCount").value,
                 MAC: document.getElementById("psWolMAC").value,
               },
             },

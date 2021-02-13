@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Added
    - #274: Added full file path to file display card.
    - Gcode Scripts are now editable.
+   - 
  
 ### Changed
    - Improved the power status error logging. 
@@ -22,7 +23,9 @@ All notable changes to this project will be documented in this file.
    - Fixed the slider not showing the 10/300% changes for feedrate. 
    - Fixed enclosure plugin commands not firing with a GET request. 
    - #277: Fixed issue when person re-edited final slash back in... 
-
+   - Fixed: WOL packets been undefined.
+   - Fixed: Update cost match in history would fail.
+   - #276 - Patched issue were a user couldn't send blank fields to clear Custom Power Settings. 
 
 
 # [v1.1.10]
