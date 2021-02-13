@@ -2562,6 +2562,14 @@ class Runner {
         powerToggleURL: "",
         powerStatusCommand: "",
         powerStatusURL: "",
+        wol: {
+          enabled: farmPrinters[index].powerSettings.wol.enabled,
+          ip: farmPrinters[index].powerSettings.wol.ip,
+          packets: farmPrinters[index].powerSettings.wol.packets,
+          port: farmPrinters[index].powerSettings.wol.port,
+          interval: farmPrinters[index].powerSettings.wol.interval,
+          MAC: farmPrinters[index].powerSettings.wol.MAC
+        }
       };
       const printer = await Printers.findById(farmPrinters[index]._id);
       printer.powerSettings = farmPrinters[index].powerSettings;
@@ -2680,6 +2688,14 @@ class Runner {
               powerToggleURL: "[PrinterURL]/api/plugin/psucontrol",
               powerStatusCommand: "{\"command\":\"getPSUState\"}",
               powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
+              wol: {
+                enabled: farmPrinters[index].powerSettings.wol.enabled,
+                ip: farmPrinters[index].powerSettings.wol.ip,
+                packets: farmPrinters[index].powerSettings.wol.packets,
+                port: farmPrinters[index].powerSettings.wol.port,
+                interval: farmPrinters[index].powerSettings.wol.interval,
+                MAC: farmPrinters[index].powerSettings.wol.MAC
+              }
             };
             const printer = await Printers.findById(id);
 
@@ -3181,7 +3197,9 @@ class Runner {
           settings.powerCommands.powerStatusURL;
       }
 
-      logger.info("LIive power settings", farmPrinters[index].powerSettings);
+      farmPrinters[index].powerSettings.wol = settings.powerCommands.wol;
+
+      logger.info("Live power settings", farmPrinters[index].powerSettings);
       logger.info("Database power settings", printer.powerSettings);
 
       printer.markModified("powerSettings");

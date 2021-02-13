@@ -10,7 +10,7 @@ let controlDropDown = false;
 let currentPrinter = null;
 
 // Close modal event listeners...
-$("#PrinterSettingsModal").on("hidden.bs.modal", function (e) {
+$("#PrinterSettingsModal").on("hidden.bs.modal", function () {
   // Fix for mjpeg stream not ending when element removed...
   document.getElementById("printerControlCamera").src = "";
   if (document.getElementById("printerSelection")) {
@@ -18,7 +18,7 @@ $("#PrinterSettingsModal").on("hidden.bs.modal", function (e) {
     controlDropDown = false;
   }
 });
-$("#connectionModal").on("hidden.bs.modal", function (e) {
+$("#connectionModal").on("hidden.bs.modal", function () {
   if (document.getElementById("connectionAction")) {
     document.getElementById("connectionAction").remove();
   }
@@ -26,6 +26,9 @@ $("#connectionModal").on("hidden.bs.modal", function (e) {
 
 export default class PrinterSettings {
   static async init(index, printers, printerControlList) {
+    try{
+
+
     if (index !== "") {
       UI.clearSelect("ps");
       const printerProfileBtn = document.getElementById("printer-profile-btn");
@@ -35,7 +38,7 @@ export default class PrinterSettings {
       );
       currentIndex = index;
       const id = _.findIndex(printers, function (o) {
-        return o._id == index;
+        return o._id === index;
       });
       currentPrinter = printers[id];
 
@@ -582,6 +585,7 @@ export default class PrinterSettings {
         wolCount = currentPrinter.powerSettings.wol.packets;
         wolMAC = currentPrinter.powerSettings.wol.MAC;
       }
+
       document.getElementById("psPowerCommands").innerHTML = `
         <h5><u>OctoPrint Specific Power Commands</u></h5>
         <form>
@@ -618,7 +622,7 @@ export default class PrinterSettings {
         </form>
          <div class="form-row">
             <div class="col-2">
-              <input id="psWolMAC"  type="text" class="form-control" placeholder=${wolMAC}"" value="">
+              <input id="psWolMAC" type="text" class="form-control" placeholder="${wolMAC}">
                <small class="form-text text-muted">
                     MAC Address to target wake packet sending
                </small>
@@ -720,18 +724,18 @@ export default class PrinterSettings {
         `;
 
       document.getElementById("psWolEnable").checked = wolEnable;
-      if (serverRestart != "N/A") {
+      if (serverRestart !== "N/A") {
         document.getElementById("psServerRestart").placeholder = serverRestart;
       }
-      if (systemRestart != "N/A") {
+      if (systemRestart !== "N/A") {
         document.getElementById("psSystemRestart").placeholder = systemRestart;
       }
-      if (systemShutdown != "N/A") {
+      if (systemShutdown !== "N/A") {
         document.getElementById(
           "psSystemShutdown"
         ).placeholder = systemShutdown;
       }
-      if (!currentPrinter.powerSettings != null && !_.isEmpty(currentPrinter.powerSettings) ) {
+      if (currentPrinter.powerSettings !== null && !_.isEmpty(currentPrinter.powerSettings) ) {
         document.getElementById("psPowerOnCommand").placeholder =
           currentPrinter.powerSettings.powerOnCommand;
         document.getElementById("psPowerOnURL").placeholder =
@@ -912,14 +916,13 @@ export default class PrinterSettings {
           }else{
             UI.createAlert("error", "Successfully cleared Power Settings",  3000, "clicked");
           }
-
         }else{
           UI.createAlert("error", "Failed to contact server is it online?",  3000, "clicked");
         }
       })
       document
         .getElementById("savePrinterSettings")
-        .addEventListener("click", async (event) => {
+        .addEventListener("click", async () => {
           const newValues = {
             state: currentPrinter.printerState.colour.category,
             printer: {
@@ -1132,11 +1135,11 @@ export default class PrinterSettings {
             );
           }
         });
-      PrinterSettings.applyState(currentPrinter);
+      await PrinterSettings.applyState(currentPrinter);
       UI.addSelectListeners("ps");
     } else {
       const id = _.findIndex(printers, function (o) {
-        return o._id == currentIndex;
+        return o._id === currentIndex;
       });
       currentPrinter = printers[id];
       if (currentPrinter.printerState.colour.category !== "Offline") {
@@ -1145,8 +1148,16 @@ export default class PrinterSettings {
         document.getElementById("psDefaultBaudrate").disabled = false;
         document.getElementById("psDefaultProfile").disabled = false;
       }
-      PrinterSettings.applyState(currentPrinter);
+      await PrinterSettings.applyState(currentPrinter);
     } // END
+    }catch(e){
+      UI.createAlert(
+          "error",
+          "Something has gone wrong with loading the Printer Manager... Hard Failure, please submit as a bug on github: " + e,
+          0,
+          "clicked"
+      );
+    }
   }
 
   static compareSave(printer, newValues) {}

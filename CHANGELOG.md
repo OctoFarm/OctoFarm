@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Added
    - #274: Added full file path to file display card.
    - Gcode Scripts are now editable.
-   - 
+   - Reset Fields Button to power settings to enable a reset of them...
  
 ### Changed
    - Improved the power status error logging. 
@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
    - Fixed: WOL packets been undefined.
    - Fixed: Update cost match in history would fail.
    - #276 - Patched issue were a user couldn't send blank fields to clear Custom Power Settings. 
+   - Fixed: Issue with autodetection of PSU control plugin causing wol settings to be destroyed.
 
 
 # [v1.1.10]
