@@ -16,21 +16,25 @@ const Logger = require("./server_src/lib/logger.js");
 const logger = new Logger("OctoFarm-Server");
 const printerClean = require("./server_src/lib/dataFunctions/printerClean.js");
 
-const { databaseSetup } = require("./server_src/lib/influxExport.js");
+const {databaseSetup} = require("./server_src/lib/influxExport.js");
 
-const { PrinterClean } = printerClean;
+const {PrinterClean} = printerClean;
 
 const autoDiscovery = require("./server_src/runners/autoDiscovery.js");
+
 // Server Port
 const app = express();
-
-let databaseStatus = 0;
 
 // Passport Config
 require("./server_src/config/passport.js")(passport);
 
-// DB Config
-const db = require("./config/db.js").MongoURI;
+// .env Config
+require("dotenv").config();
+
+let dbConnectionString = require("./config/db.js").MongoURI;
+if (!dbConnectionString) {
+    dbConnectionString = process.env.MONGO;
+}
 
 // JSON
 app.use(express.json());
@@ -121,7 +125,7 @@ const serverStart = async () => {
   // Routes
   app.use(express.static(`${__dirname}/views`));
   app.use("/images", express.static(`${__dirname}/images`));
-  if (db === "") {
+    if (dbConnectionString === "") {
     app.use("/", require("./server_src/routes/index", { page: "route" }));
   } else {
     try {
@@ -181,7 +185,7 @@ const serverStart = async () => {
 };
 // Mongo Connect
 mongoose
-  .connect(db, {
+    .connect(dbConnectionString, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
@@ -205,8 +209,12 @@ const databaseIssue = async () => {
   app.listen(4000, "0.0.0.0", ()=> {
     logger.info("HTTP server started...");
     logger.info(`You can now access your server on port: ${4000}`);
-    // eslint-disable-next-line no-console
-    process.send("ready");
+
+        // This only works when this is a child process (like when managed by PM2 f.e.)
+        if (typeof process.send === "function") {
+            // eslint-disable-next-line no-console
+            process.send("ready");
+        }
   });
   app.use(express.static(`${__dirname}/views`));
   app.use("/", require("./server_src/routes/databaseIssue", { page: "route" }));
