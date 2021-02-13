@@ -1,3 +1,4 @@
+//ESLINT CONFIG
 module.exports = {
   root: true,
   env: {
