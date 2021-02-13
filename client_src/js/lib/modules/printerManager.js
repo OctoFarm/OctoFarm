@@ -1712,6 +1712,7 @@ export default class PrinterManager {
       const opt = {
         commands: [input],
       };
+      console.log(opt)
       const post = await OctoPrintClient.post(
         currentPrinter,
         "printer/command",
@@ -1729,7 +1730,6 @@ export default class PrinterManager {
       if (e.key === "Enter" && !e.shiftKey) {
         submitTerminal(e);
       }
-      console.log(e.key);
     });
     elements.terminal.sendBtn.addEventListener("click", async (e) => {
       submitTerminal(e);
