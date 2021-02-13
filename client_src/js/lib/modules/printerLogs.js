@@ -67,11 +67,11 @@ export default class PrinterLogs {
     let tempChart = document.getElementById("printerTempChart");
     let logSelect = document.getElementById("octoPrintLogsSelect");
 
-    logCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
-    errorCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
-    tempCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
-    octoCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
-    octoPrintCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
+    logCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
+    errorCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
+    tempCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
+    octoCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
+    octoPrintCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
 
     printerRows.innerHTML = "";
     printerErrorRows.innerHTML = "";
@@ -108,7 +108,7 @@ export default class PrinterLogs {
 
     if (typeof connectionLogs.currentOctoFarmLogs === "object") {
       for (let i = 0; i < connectionLogs.currentOctoPrintLogs.length; i++) {
-        tempCount.innerHTML = `(0)`;
+        tempCount.innerHTML = "(0)";
         let log = connectionLogs.currentOctoPrintLogs[i];
         octoprintLogsRows.insertAdjacentHTML(
           "beforeend",
@@ -151,7 +151,7 @@ export default class PrinterLogs {
         );
       }
       errorCount.innerHTML = `(${connectionLogs.currentErrorLogs.length})`;
-      tempCount.innerHTML = `(0)`;
+      tempCount.innerHTML = "(0)";
       if (
         typeof connectionLogs.currentTempLogs !== "undefined" &&
         connectionLogs.currentTempLogs.length > 0
@@ -265,7 +265,7 @@ export default class PrinterLogs {
       logSelect.addEventListener("change", (e) => {
         octologsLogsRows.innerHTML = "";
 
-        octoPrintCount.innerHTML = '(<i class="fas fa-spinner fa-spin"></i>)';
+        octoPrintCount.innerHTML = "(<i class=\"fas fa-spinner fa-spin\"></i>)";
         PrinterLogs.parseLogs(printer, e.target.value);
       });
       document
@@ -280,5 +280,10 @@ export default class PrinterLogs {
         });
       eventListener = true;
     }
+  }
+  static async loadStatistics(id){
+      let get = await OctoFarmClient.get("history/statistics/"+id);
+      console.log(get)
+      console.log(await get.json())
   }
 }

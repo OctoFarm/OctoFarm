@@ -286,6 +286,8 @@ class PrinterClean {
     }
   }
 
+
+
   static async generateConnectionLogs(farmPrinter) {
     let printerErrorLogs = await ErrorLogs.find({});
 
@@ -431,7 +433,7 @@ class PrinterClean {
     };
   }
   static async createPrinterList(farmPrinters, filamentManager) {
-    const printerList = ['<option value="0">Not Assigned</option>'];
+    const printerList = ["<option value=\"0\">Not Assigned</option>"];
     farmPrinters.forEach((printer) => {
       if (
         typeof printer.currentProfile !== "undefined" &&
@@ -894,7 +896,7 @@ class PrinterClean {
               0
             );
             const totalOtherTarget = arrayToolActual.reduce((a, b) => a + b, 0);
-            let actualString = '<div class="d-flex flex-wrap"><div title="';
+            let actualString = "<div class=\"d-flex flex-wrap\"><div title=\"";
             for (let l = 0; l < leftString.length; l++) {
               actualString += `${leftString[l]}`;
             }
@@ -905,7 +907,7 @@ class PrinterClean {
               printer.otherSettings.temperatureTriggers.heatingVariation,
               printer.otherSettings.temperatureTriggers.coolDownf
             )} heatMapLeft"></div>`;
-            actualString += '<div title="';
+            actualString += "<div title=\"";
             for (let r = 0; r < rightString.length; r++) {
               actualString += `${rightString[r]}`;
             }

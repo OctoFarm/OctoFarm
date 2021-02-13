@@ -9,11 +9,13 @@ All notable changes to this project will be documented in this file.
    - #274: Added full file path to file display card.
    - Gcode Scripts are now editable.
    - Reset Fields Button to power settings to enable a reset of them...
+   - Individual Printer Statistics: New option under the Manage section for viewing statistics about your printer.
  
 ### Changed
    - Improved the power status error logging. 
    - #272: Improvements to the alpine image, now runs as none-root and went from around 1Gb to 268Mb in size! Big thank you to user @torresmvl for those PR's. Don't forget to email about your free t-shirt.
    - Gcode scripts no longer require a description.
+   - Made gcode scripts wider for comments and better data input.
 
 ### Fixed
    - #223: Shutting down printers unexpectedly would keep printer in last state. - Big thanks to Chrismettal for helping me chase this one down. 

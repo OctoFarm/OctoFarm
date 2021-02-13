@@ -3013,10 +3013,9 @@ class dashUpdate {
             <button title="View individual Printer Statistics"
             id="printerStatistics-${printer._id}"
                                  type="button"
-                                 class="tag btn btn-secondary btn-sm bg-colour-3 d-none"
+                                 class="tag btn btn-secondary btn-sm bg-colour-3"
                                  data-toggle="modal"
                                  data-target="#printerStatisticsModal"
-                                 disabled
             ><i class="fas fa-chart-pie"></i>
             </button>
            <button  title="Setup and track Maintenance Issues with Printers"
@@ -3223,11 +3222,21 @@ class dashUpdate {
               connectionLogs = await connectionLogs.json();
               PrinterLogs.loadLogs(printer, connectionLogs);
             });
+
+          document
+              .getElementById(`printerStatistics-${printer._id}`)
+              .addEventListener("click", async (e) => {
+                PrinterLogs.loadStatistics(printer._id);
+              });
         }
       }
     });
   }
 }
+
+
+
+
 const el = document.getElementById("printerList");
 const sortable = Sortable.create(el, {
   handle: ".sortableList",

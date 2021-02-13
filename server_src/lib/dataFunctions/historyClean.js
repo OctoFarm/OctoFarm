@@ -154,6 +154,11 @@ class HistoryClean {
     }
   }
 
+  static async generatePrinterStatistics(){
+    let currentHistory = JSON.parse(JSON.stringify(historyClean))
+    console.log(currentHistory)
+  }
+
   static async getStatistics(historyClean) {
     logger.info("Generating history statistics!");
     let statistics = {};
@@ -751,12 +756,12 @@ class HistoryClean {
 
   static getState(state, reason) {
     if (state) {
-      return '<p class="d-none state">Success</p><i class="fas fa-thumbs-up text-success fa-3x"></i>';
+      return "<p class=\"d-none state\">Success</p><i class=\"fas fa-thumbs-up text-success fa-3x\"></i>";
     } else {
       if (reason === "cancelled") {
-        return '<p class="d-none state">Cancelled</p><i class="fas fa-thumbs-down text-warning fa-3x"></i>';
+        return "<p class=\"d-none state\">Cancelled</p><i class=\"fas fa-thumbs-down text-warning fa-3x\"></i>";
       } else {
-        return '<p class="d-none state">Failure</p><i class="fas fa-exclamation text-danger fa-3x"></i>';
+        return "<p class=\"d-none state\">Failure</p><i class=\"fas fa-exclamation text-danger fa-3x\"></i>";
       }
     }
   }

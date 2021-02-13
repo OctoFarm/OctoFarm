@@ -152,6 +152,11 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
     res.send(send);
   }
 });
+router.get("/statistics/:id", ensureAuthenticated, async function(req, res) {
+  const printerID = req.params.id;
+  let stats = await HistoryClean.generatePrinterStatistics(printerID);
+  res.send(stats)
+});
 // router.get("/info/", ensureAuthenticated, function(req, res) {
 //   //req.socket.setTimeout(Number.MAX_VALUE);
 //   res.writeHead(200, {
