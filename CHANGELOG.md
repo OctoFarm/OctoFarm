@@ -27,6 +27,8 @@ All notable changes to this project will be documented in this file.
    - Fixed: Update cost match in history would fail.
    - #276 - Patched issue were a user couldn't send blank fields to clear Custom Power Settings. 
    - Fixed: Issue with autodetection of PSU control plugin causing wol settings to be destroyed.
+   - Fixed: Issue with Weekly Utilisation chart showing incorrect colours on a Float value.
+   - Fixed: #236 - Colours on Weekly Utilisation chart we're loading too dark.
 
 
 # [v1.1.10]
