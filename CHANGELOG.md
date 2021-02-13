@@ -32,6 +32,7 @@ All notable changes to this project will be documented in this file.
    - Fixed: Issue with autodetection of PSU control plugin causing wol settings to be destroyed.
    - Fixed: Issue with Weekly Utilisation chart showing incorrect colours on a Float value.
    - Fixed: #236 - Colours on Weekly Utilisation chart we're loading too dark.
+   - Fixed: #279 - API connection checked too early after powering up.
 
 
 # [v1.1.10]

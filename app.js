@@ -16,9 +16,9 @@ const Logger = require("./server_src/lib/logger.js");
 const logger = new Logger("OctoFarm-Server");
 const printerClean = require("./server_src/lib/dataFunctions/printerClean.js");
 
-const {databaseSetup} = require("./server_src/lib/influxExport.js");
+const { databaseSetup } = require("./server_src/lib/influxExport.js");
 
-const {PrinterClean} = printerClean;
+const { PrinterClean } = printerClean;
 
 const autoDiscovery = require("./server_src/runners/autoDiscovery.js");
 
@@ -33,7 +33,7 @@ require("dotenv").config();
 
 let dbConnectionString = require("./config/db.js").MongoURI;
 if (!dbConnectionString) {
-    dbConnectionString = process.env.MONGO;
+  dbConnectionString = process.env.MONGO;
 }
 
 // JSON
@@ -115,6 +115,7 @@ const serverStart = async () => {
     app.listen(PORT, "0.0.0.0", () => {
       logger.info("HTTP server started...");
       logger.info(`You can now access your server on port: ${PORT}`);
+      console.log(`You can now access your server on port: ${PORT}`);
       // eslint-disable-next-line no-console
       process.send("ready");
     });
@@ -125,7 +126,7 @@ const serverStart = async () => {
   // Routes
   app.use(express.static(`${__dirname}/views`));
   app.use("/images", express.static(`${__dirname}/images`));
-    if (dbConnectionString === "") {
+  if (dbConnectionString === "") {
     app.use("/", require("./server_src/routes/index", { page: "route" }));
   } else {
     try {
@@ -185,7 +186,7 @@ const serverStart = async () => {
 };
 // Mongo Connect
 mongoose
-    .connect(dbConnectionString, {
+  .connect(dbConnectionString, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
@@ -206,15 +207,16 @@ mongoose
   });
 
 const databaseIssue = async () => {
-  app.listen(4000, "0.0.0.0", ()=> {
+  app.listen(4000, "0.0.0.0", () => {
     logger.info("HTTP server started...");
-    logger.info(`You can now access your server on port: ${4000}`);
+    logger.info(`You have database issues... web interface loaded on: ${4000}`);
+    console.log(`You have database issues... web interface loaded on: ${4000}`);
 
-        // This only works when this is a child process (like when managed by PM2 f.e.)
-        if (typeof process.send === "function") {
-            // eslint-disable-next-line no-console
-            process.send("ready");
-        }
+    // This only works when this is a child process (like when managed by PM2 f.e.)
+    if (typeof process.send === "function") {
+      // eslint-disable-next-line no-console
+      process.send("ready");
+    }
   });
   app.use(express.static(`${__dirname}/views`));
   app.use("/", require("./server_src/routes/databaseIssue", { page: "route" }));
