@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
    - #236: File Manager would fail to return to non-recursive search on blank input.
    - Fixed the slider not showing the 10/300% changes for feedrate. 
    - Fixed enclosure plugin commands not firing with a GET request. 
+   - Fixed: #273 Recursive search doesn't return to root folder...  
    - #277: Fixed issue when person re-edited final slash back in... 
    - Fixed: WOL packets been undefined.
    - Fixed: Update cost match in history would fail.
