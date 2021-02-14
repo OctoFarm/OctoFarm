@@ -31,9 +31,9 @@ require("./server_src/config/passport.js")(passport);
 // .env Config
 require("dotenv").config();
 
-let dbConnectionString = require("./config/db.js").MongoURI;
+let dbConnectionString = process.env.MONGO;
 if (!dbConnectionString) {
-  dbConnectionString = process.env.MONGO;
+  dbConnectionString = require("./config/db.js").MongoURI;
 }
 
 // JSON
