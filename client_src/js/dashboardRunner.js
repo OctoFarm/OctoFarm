@@ -52,7 +52,7 @@ let initNewGraphs = async function () {
         title: {
           text: "Weight",
         },
-        seriesName: usageOverTime[0].name,
+        seriesName: usageOverTime[0]?.name,
         labels: {
           formatter: function (val) {
             if (val !== null) {
@@ -64,7 +64,7 @@ let initNewGraphs = async function () {
     } else {
       obj = {
         show: false,
-        seriesName: usageOverTime[0].name,
+        seriesName: usageOverTime[0]?.name,
         labels: {
           formatter: function (val) {
             if (val !== null) {
@@ -150,7 +150,7 @@ let initNewGraphs = async function () {
         title: {
           text: "Weight",
         },
-        seriesName: usageOverTime[0].name,
+        seriesName: usageOverTime[0]?.name,
         labels: {
           formatter: function (val) {
             if (val !== null) {
