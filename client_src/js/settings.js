@@ -672,9 +672,9 @@ class ServerSettings {
           document.getElementById("thumbOnFailure").checked =
             res.history.thumbnails.onFailure;
           document.getElementById("snapOnComplete").checked =
-            res.history.snapshot.onComplete;
+            res.history.snapshots.onComplete;
           document.getElementById("snapOnFailure").checked =
-            res.history.snapshot.onFailure;
+            res.history.snapshots.onFailure;
           if (typeof res.history.timelapse !== "undefined") {
             document.getElementById("timelapseOnComplete").checked =
               res.history.timelapse.onComplete;
