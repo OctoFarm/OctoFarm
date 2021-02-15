@@ -614,7 +614,6 @@ export default class PrinterLogs {
   static async loadStatistics(id) {
     let get = await OctoFarmClient.get("history/statistics/" + id);
     get = await get.json();
-    console.log(get);
     //Setup page
     let printerStatsWrapper = document.getElementById("printerStatistics");
     printerStatsWrapper.innerHTML = "";

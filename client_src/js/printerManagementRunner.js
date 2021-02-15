@@ -2897,20 +2897,26 @@ class dashUpdate {
 
           printerGroup.innerHTML = printer.group;
 
-          console.log(printer);
-          printerPrinterInformation.innerHTML = "";
           if (typeof printer.octoPrintSystemInfo !== "undefined") {
-            printerOctoPrintInformation.innerHTML =
-              printer.octoPrintSystemInfo["printer.firmware"];
+            if (
+              typeof printer.currentProfile !== "undefined" &&
+              printer.currentProfile !== null
+            ) {
+              printerPrinterInformation.innerHTML = `
+             <small><b>Firmware: </b>${printer.octoPrintSystemInfo["printer.firmware"]}</small><br>
+             <small><b>Name: </b>${printer.currentProfile.name}</small><br>
+             <small><b>Model: </b>${printer.currentProfile.model}</small><br>
+            `;
+            }
           }
           if (typeof printer.octoPi !== "undefined") {
             printerOctoPrintInformation.innerHTML = `
-          <small><b>OctoPi: </b>${printer.octoPrintVersion}</small><br>
+          <small><b>OctoPrint: </b>${printer.octoPrintVersion}</small><br>
           <small><b>OctoPi: </b>${printer.octoPi.version}</small><br>
           <small><b>RaspberryPi: </b>${printer.octoPi.model}</small>`;
           } else {
             printerOctoPrintInformation.innerHTML = `
-          <small><b>OctoPi: </b>${printer.octoPrintVersion}</small><br>
+          <small><b>OctoPrint: </b>${printer.octoPrintVersion}</small><br>
           `;
           }
 
@@ -3054,9 +3060,9 @@ class dashUpdate {
             >
     ${printer.sortIndex}
     </span></td>
-        <td><div id="printerName-${printer._id}">${printerName}</div></td>
-        <td id="printerActionBtns-${printer._id}"></td>
-        <td>
+        <td class="align-middle"><div id="printerName-${printer._id}">${printerName}</div></td>
+        <td class="align-middle" id="printerActionBtns-${printer._id}"></td>
+        <td class="align-middle">
           <button  title="Change your Printer Settings"
             id="printerSettings-${printer._id}"
                                  type="button"
@@ -3093,16 +3099,16 @@ class dashUpdate {
             ><i class="fas fa-wrench"></i>
             </button>
     </span></td>
-        <td><small><span data-title="${printer.hostState.desc}" id="hostBadge-${printer._id}" class="tag badge badge-${printer.hostState.colour.name} badge-pill">
+        <td class="align-middle"><small><span data-title="${printer.hostState.desc}" id="hostBadge-${printer._id}" class="tag badge badge-${printer.hostState.colour.name} badge-pill">
                 ${printer.hostState.state}</small></span></td>
-        <td><small><span data-title="${printer.printerState.desc}" id="printerBadge-${printer._id}" class="tag badge badge-${printer.printerState.colour.name} badge-pill">
+        <td class="align-middle"><small><span data-title="${printer.printerState.desc}" id="printerBadge-${printer._id}" class="tag badge badge-${printer.printerState.colour.name} badge-pill">
                 ${printer.printerState.state}</small></span><br><span data-title="Check printer settings, API issues detected..." id="scanningIssues-${printer._id}"></small></span></td>
-        <td><small><span data-title="${printer.webSocketState.desc}" id="webSocketIcon-${printer._id}" class="tag badge badge-${printer.webSocketState.colour} badge-pill">
+        <td class="align-middle"><small><span data-title="${printer.webSocketState.desc}" id="webSocketIcon-${printer._id}" class="tag badge badge-${printer.webSocketState.colour} badge-pill">
                 <i  class="fas fa-plug"></i></span></td>
 
-        <td><div id="printerGroup-${printer._id}" ></div></td>
-        <td id="printerPrinterInformation-${printer._id}"></td>
-        <td id="printerOctoPrintInformation-${printer._id}"></td>
+        <td class="align-middle"><div id="printerGroup-${printer._id}" ></div></td>
+        <td class="align-middle" id="printerPrinterInformation-${printer._id}"></td>
+        <td class="align-middle" id="printerOctoPrintInformation-${printer._id}"></td>
     </tr>
           `
           );
