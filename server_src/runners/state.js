@@ -2707,7 +2707,10 @@ class Runner {
         }
 
         if (res.plugins["psucontrol"]) {
-          if (_.isEmpty(farmPrinters[index].powerSettings)) {
+          if (
+            _.isEmpty(farmPrinters[index].powerSettings) &&
+            farmPrinters[index].powerSettings.powerOffCommand === ""
+          ) {
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[index].printerURL,
@@ -2725,12 +2728,12 @@ class Runner {
               powerStatusCommand: "{\"command\":\"getPSUState\"}",
               powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
               wol: {
-                enabled: farmPrinters[index].powerSettings.wol.enabled,
-                ip: farmPrinters[index].powerSettings.wol.ip,
-                packets: farmPrinters[index].powerSettings.wol.packets,
-                port: farmPrinters[index].powerSettings.wol.port,
-                interval: farmPrinters[index].powerSettings.wol.interval,
-                MAC: farmPrinters[index].powerSettings.wol.MAC,
+                enabled: false,
+                ip: "255.255.255.0",
+                packets: "3",
+                port: "9",
+                interval: "100",
+                MAC: "",
               },
             };
             const printer = await Printers.findById(id);
@@ -3230,8 +3233,9 @@ class Runner {
         printer.powerSettings.powerStatusURL =
           settings.powerCommands.powerStatusURL;
       }
-
-      farmPrinters[index].powerSettings.wol = settings.powerCommands.wol;
+      if (settings.powerCommands.wol.enabled) {
+        farmPrinters[index].powerSettings.wol = settings.powerCommands.wol;
+      }
 
       logger.info("Live power settings", farmPrinters[index].powerSettings);
       logger.info("Database power settings", printer.powerSettings);
