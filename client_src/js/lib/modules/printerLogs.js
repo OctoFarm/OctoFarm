@@ -782,23 +782,25 @@ export default class PrinterLogs {
         },
       },
     };
-    if (historyPieChart !== null) {
-      historyPieChart.destroy();
-      historyPieChart = new ApexCharts(
-        document.querySelector("#printerUtilisationGraph"),
-        optionsUtilisation
-      );
+    if (document.querySelector("#printerUtilisationGraph")) {
+      if (historyPieChart !== null) {
+        historyPieChart.destroy();
+        historyPieChart = new ApexCharts(
+          document.querySelector("#printerUtilisationGraph"),
+          optionsUtilisation
+        );
+        historyPieChart.render();
+        historyPieChart.updateSeries(get.printerUtilisation);
+      } else {
+        historyPieChart = new ApexCharts(
+          document.querySelector("#printerUtilisationGraph"),
+          optionsUtilisation
+        );
+      }
       historyPieChart.render();
       historyPieChart.updateSeries(get.printerUtilisation);
-    } else {
-      historyPieChart = new ApexCharts(
-        document.querySelector("#printerUtilisationGraph"),
-        optionsUtilisation
-      );
+      historyBarChart.render();
+      historyBarChart.updateSeries(get.historyByDay);
     }
-    historyPieChart.render();
-    historyPieChart.updateSeries(get.printerUtilisation);
-    historyBarChart.render();
-    historyBarChart.updateSeries(get.historyByDay);
   }
 }
