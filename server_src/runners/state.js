@@ -2707,7 +2707,10 @@ class Runner {
         }
 
         if (res.plugins["psucontrol"]) {
-          if (_.isEmpty(farmPrinters[index].powerSettings)) {
+          if (
+            _.isEmpty(farmPrinters[index].powerSettings) ||
+            farmPrinters[index].powerSettings.powerOffCommand === ""
+          ) {
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[index].printerURL,
