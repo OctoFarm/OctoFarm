@@ -228,6 +228,7 @@ class PrinterClean {
       printerResendRatioWeekly: [],
       historyByDay: [],
       historyByDayIncremental: [],
+      octoPrintSystemInfo: printer.octoPrintSystemInfo,
     };
     //Generate utilisation chart
     const totalTime =
@@ -493,6 +494,7 @@ class PrinterClean {
         updateAvailable: farmPrinter.updateAvailable,
         display: true,
         order: farmPrinter.sortIndex,
+        octoPrintSystemInfo: farmPrinter.octoPrintSystemInfo,
       };
 
       if (

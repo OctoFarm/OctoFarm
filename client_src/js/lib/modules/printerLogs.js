@@ -284,22 +284,78 @@ export default class PrinterLogs {
     }
   }
   static async returnPrinterStatsTemplate(stats) {
-    let display = "<div id='historyGraph'></div>";
+    let display = "";
+    let noHistoryMessage = "";
+    let safeModeCheck = "";
+    if (stats.octoPrintSystemInfo["octoprint.safe_mode"]) {
+      safeModeCheck = `
+      <i title="You are not in safe mode, all is fine" class="fas fa-thumbs-down text-success"></i>
+      `;
+    } else {
+      safeModeCheck = `
+      <i title="Something wrong with your system? Detecting safe mode" class="fas fa-thumbs-up text-success"></i>
+      `;
+    }
     if (stats.historyByDay.length === 0) {
-      display = `<div class='row'>
+      noHistoryMessage = `<div class='row'>
                     <div class="col-12"><h5>Sorry but your printer currently has no history captured. Please run some prints to generate information here.</h5></div>
                 </div>`;
+      display = "d-none";
     }
     return `
-            <div class="col-md-12 col-lg-3">
+            <div class="col-md-12 col-lg-4">
               <div class="card text-white bg-dark mb-3" >
                               <div class="card-header">Information</div>
                               <div class="card-body">
-                                <p class="card-text"></p>
+                              <p class="card-text">
+                              <div class="row">
+                                <div class="col-md-12 col-lg-6">
+                                   <small><b>OctoPrint Version:</b> ${
+                                     stats.octoPrintSystemInfo[
+                                       "octoprint.version"
+                                     ]
+                                   }</small><br>
+                                    <small><b>Printer Firmware:</b> ${
+                                      stats.octoPrintSystemInfo[
+                                        "printer.firmware"
+                                      ]
+                                    }</small><br>
+                                    <small><b>Python Version:</b> ${
+                                      stats.octoPrintSystemInfo[
+                                        "env.python.version"
+                                      ]
+                                    }</small>   <br>     
+                                       <small><b>pip Version:</b> ${
+                                         stats.octoPrintSystemInfo[
+                                           "env.python.pip"
+                                         ]
+                                       }</small>        <br>                          
+                                </div>
+                                  <div class="col-md-12 col-lg-6">
+                                   <small><b>OS Platform:</b> ${
+                                     stats.octoPrintSystemInfo[
+                                       "env.os.platform"
+                                     ]
+                                   }</small><br>
+                                   <small><b>OS Cores:</b> ${
+                                     stats.octoPrintSystemInfo[
+                                       "env.hardware.cores"
+                                     ]
+                                   }</small><br>
+                                    <small><b>OS ram:</b> ${Calc.bytes(
+                                      stats.octoPrintSystemInfo[
+                                        "env.hardware.ram"
+                                      ]
+                                    )}</small><br>
+                                     <small><b>Safe Mode Check:</b> ${safeModeCheck} </small><br>
+                                </div>
+                              </div>
+     
+                                </p>
                 </div>
               </div>
             </div>
-            <div class="col-md-12 col-lg-3">
+            <div class="col-md-12 col-lg-4">
               <div class="card text-white bg-dark mb-3" >
                               <div class="card-header">Utilisation</div>
                               <div class="card-body">
@@ -307,7 +363,7 @@ export default class PrinterLogs {
                 </div>
               </div>
             </div>
-            <div class="col-md-12 col-lg-6">
+            <div class="col-md-12 col-lg-4">
                 <div class="card text-white bg-dark mb-3">
                               <div class="card-header">Printer Issues</div>
                            
@@ -395,7 +451,8 @@ export default class PrinterLogs {
               </div>
             </div>
             <div class="col-12">
-                ${display}
+                ${noHistoryMessage}
+                <div class="${display}" id='historyGraph'></div>
             </div>
             <div class="col-md-6 col-lg-3">
             
@@ -787,25 +844,23 @@ export default class PrinterLogs {
         },
       },
     };
-    if (document.getElementById("#printerUtilisationGraph")) {
-      if (historyPieChart !== null) {
-        historyPieChart.destroy();
-        historyPieChart = new ApexCharts(
-          document.querySelector("#printerUtilisationGraph"),
-          optionsUtilisation
-        );
-        historyPieChart.render();
-        historyPieChart.updateSeries(get.printerUtilisation);
-      } else {
-        historyPieChart = new ApexCharts(
-          document.querySelector("#printerUtilisationGraph"),
-          optionsUtilisation
-        );
-      }
+    if (historyPieChart !== null) {
+      historyPieChart.destroy();
+      historyPieChart = new ApexCharts(
+        document.querySelector("#printerUtilisationGraph"),
+        optionsUtilisation
+      );
       historyPieChart.render();
       historyPieChart.updateSeries(get.printerUtilisation);
-      historyBarChart.render();
-      historyBarChart.updateSeries(get.historyByDay);
+    } else {
+      historyPieChart = new ApexCharts(
+        document.querySelector("#printerUtilisationGraph"),
+        optionsUtilisation
+      );
     }
+    historyPieChart.render();
+    historyPieChart.updateSeries(get.printerUtilisation);
+    historyBarChart.render();
+    historyBarChart.updateSeries(get.historyByDay);
   }
 }
