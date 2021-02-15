@@ -1185,10 +1185,11 @@ class Runner {
           farmPrinters[i].hostDescription = "Host is Online";
           await Runner.getSystem(id);
           await Runner.getSettings(id);
-          Runner.getUpdates(id);
           await Runner.getProfile(id);
           await Runner.getState(id);
+          await Runner.getOctoPrintSystenInfo(id);
           Runner.getPluginList(id);
+          Runner.getUpdates(id);
           if (
             typeof farmPrinters[i].fileList === "undefined" ||
             typeof farmPrinters[i].storage === "undefined"
@@ -2482,6 +2483,38 @@ class Runner {
         );
       });
   }
+  static getOctoPrintSystenInfo(id) {
+    const index = _.findIndex(farmPrinters, function (o) {
+      return o._id == id;
+    });
+    farmPrinters[index].octoPrintSystemInfo = {};
+    PrinterTicker.addIssue(
+      new Date(),
+      farmPrinters[index].printerURL,
+      "Grabbing OctoPrint's System Information",
+      "Active",
+      farmPrinters[index]._id
+    );
+    return ClientAPI.getRetry(
+      farmPrinters[index].printerURL,
+      farmPrinters[index].apikey,
+      "api/system/info"
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        farmPrinters[index].octoPrintSystemInfo = res.systeminfo;
+        console.log(farmPrinters[index].octoPrintSystemInfo);
+        PrinterTicker.addIssue(
+          new Date(),
+          farmPrinters[index].printerURL,
+          "Grabbed OctoPrints System Info",
+          "Complete",
+          farmPrinters[index]._id
+        );
+      });
+  }
   static getUpdates(id, force) {
     let forceCheck = "";
     if (force) {
@@ -3303,6 +3336,7 @@ class Runner {
 
       await Runner.getProfile(settings.printer.index);
       await Runner.getSettings(settings.printer.index);
+      await Runner.getOctoPrintSystenInfo(settings.printer.index);
       Runner.getUpdates(settings.printer.index);
       Runner.getPluginList(settings.printer.index);
       PrinterClean.generate(
