@@ -2708,7 +2708,7 @@ class Runner {
 
         if (res.plugins["psucontrol"]) {
           if (
-            _.isEmpty(farmPrinters[index].powerSettings) ||
+            _.isEmpty(farmPrinters[index].powerSettings) &&
             farmPrinters[index].powerSettings.powerOffCommand === ""
           ) {
             PrinterTicker.addIssue(
