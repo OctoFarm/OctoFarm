@@ -150,7 +150,28 @@ class PrinterClean {
   static returnDashboardStatistics() {
     return dashboardStatistics;
   }
-
+  static checkNested(nameKey, myArray) {
+    try {
+      for (var i = 0; i < myArray.length; i++) {
+        if (myArray[i].name === nameKey) {
+          return myArray[i];
+        }
+      }
+    } catch (e) {
+      logger.error("Couldn't check nested....", JSON.stringify(e));
+    }
+  }
+  static checkNestedIndex(nameKey, myArray) {
+    try {
+      for (var i = 0; i < myArray.length; i++) {
+        if (myArray[i].name === nameKey) {
+          return i;
+        }
+      }
+    } catch (e) {
+      logger.error("Couldn't check nested index...", JSON.stringify(e));
+    }
+  }
   static async generatePrinterStatistics(id) {
     let currentHistory = JSON.parse(
       JSON.stringify(await HistoryClean.returnHistory())
@@ -165,8 +186,9 @@ class PrinterClean {
     let dateAdded = new Date(printer.dateAdded);
     let todaysDate = new Date();
     let dateDifference = parseInt(todaysDate - dateAdded);
-    let sevenDaysAgo = new Date(
-      todaysDate.getTime() - 100 * 24 * 60 * 60 * 1000
+    let sevenDaysAgo = new Date(todaysDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+    let ninetyDaysAgo = new Date(
+      todaysDate.getTime() - 90 * 24 * 60 * 60 * 1000
     );
     // Filter down the history arrays for total/daily/weekly
     let historyDaily = [];
@@ -179,6 +201,7 @@ class PrinterClean {
       activeTimeTotal: printer.currentActive,
       idleTimeTotal: printer.currentIdle,
       offlineTimeTotal: printer.currentOffline,
+      printerUtilisation: [],
       filamentUsedWeightTotal: [],
       filamentUsedLengthTotal: [],
       printerCostTotal: [],
@@ -203,7 +226,22 @@ class PrinterClean {
       printerResendRatioTotal: [],
       printerResendRatioDaily: [],
       printerResendRatioWeekly: [],
+      historyByDay: [],
+      historyByDayIncremental: [],
+      octoPrintSystemInfo: printer.octoPrintSystemInfo,
     };
+    //Generate utilisation chart
+    const totalTime =
+      printer.currentActive + printer.currentIdle + printer.currentOffline;
+    printerStatistics.printerUtilisation.push(
+      (printer.currentActive / totalTime) * 100
+    );
+    printerStatistics.printerUtilisation.push(
+      (printer.currentIdle / totalTime) * 100
+    );
+    printerStatistics.printerUtilisation.push(
+      (printer.currentOffline / totalTime) * 100
+    );
 
     currentHistory.forEach((h) => {
       // Parse the date from history....
@@ -252,6 +290,69 @@ class PrinterClean {
         if (dateParse.getTime() > sevenDaysAgo.getTime()) {
           historyWeekly.push(h);
         }
+        let checkNested = this.checkNested(
+          "Success",
+          printerStatistics.historyByDay
+        );
+        //
+        if (typeof checkNested !== "undefined") {
+          let checkNestedIndexHistoryRates = null;
+          if (h.state.includes("success")) {
+            checkNestedIndexHistoryRates = this.checkNestedIndex(
+              "Success",
+              printerStatistics.historyByDay
+            );
+          } else if (h.state.includes("warning")) {
+            checkNestedIndexHistoryRates = this.checkNestedIndex(
+              "Cancelled",
+              printerStatistics.historyByDay
+            );
+          } else if (h.state.includes("danger")) {
+            checkNestedIndexHistoryRates = this.checkNestedIndex(
+              "Failed",
+              printerStatistics.historyByDay
+            );
+          } else {
+            return;
+          }
+
+          //Check if more than 30 days ago...
+          if (dateParse.getTime() > ninetyDaysAgo.getTime()) {
+            printerStatistics.historyByDay[
+              checkNestedIndexHistoryRates
+            ].data.push({
+              x: dateParse,
+              y: 1,
+            });
+            // printerStatistics.historyByDayIncremental[
+            //   checkNestedIndexHistoryRates
+            // ].data.push({
+            //   x: dateParse,
+            //   y: 1,
+            // });
+          }
+        } else {
+          let successKey = {
+            name: "Success",
+            data: [],
+          };
+          let cancellKey = {
+            name: "Cancelled",
+            data: [],
+          };
+          let failedKey = {
+            name: "Failed",
+            data: [],
+          };
+          if (typeof printerStatistics.historyByDay[0] === "undefined") {
+            printerStatistics.historyByDay.push(successKey);
+            printerStatistics.historyByDay.push(cancellKey);
+            printerStatistics.historyByDay.push(failedKey);
+            // printerStatistics.historyByDayIncremental.push(successKey);
+            // printerStatistics.historyByDayIncremental.push(cancellKey);
+            // printerStatistics.historyByDayIncremental.push(failedKey);
+          }
+        }
       }
     });
 
@@ -295,12 +396,58 @@ class PrinterClean {
     // Reduce all the values and update the variable.
     Object.keys(printerStatistics).forEach(function (key) {
       if (Array.isArray(printerStatistics[key])) {
-        printerStatistics[key] = printerStatistics[key].reduce(
-          (a, b) => a + b,
-          0
-        );
+        if (
+          key !== "historyByDay" &&
+          key !== "historyByDayIncremental" &&
+          key !== "printerUtilisation"
+        ) {
+          printerStatistics[key] = printerStatistics[key].reduce(
+            (a, b) => a + b,
+            0
+          );
+        }
       }
     });
+    function convertIncremental(input) {
+      try {
+        let usageWeightCalc = 0;
+        let newObj = [];
+        for (let i = 0; i < input.length; i++) {
+          if (typeof newObj[i - 1] !== "undefined") {
+            usageWeightCalc = newObj[i - 1].y + input[i].y;
+          } else {
+            usageWeightCalc = input[i].y;
+          }
+          newObj.push({ x: input[i].x, y: usageWeightCalc });
+        }
+        return newObj;
+      } catch (e) {
+        logger.error(e, "ERROR with convert incremental");
+      }
+    }
+    function sumValuesGroupByDate(input) {
+      try {
+        var dates = {};
+        input.forEach((dv) => (dates[dv.x] = (dates[dv.x] || 0) + dv.y));
+        return Object.keys(dates).map((date) => ({
+          x: new Date(date),
+          y: dates[date],
+        }));
+      } catch (e) {
+        logger.error(e, "Error with summing group values...");
+      }
+    }
+    printerStatistics.historyByDay.forEach((usage) => {
+      usage.data = sumValuesGroupByDate(usage.data);
+    });
+
+    // printerStatistics.historyByDayIncremental.forEach((usage) => {
+    //   usage.data = sumValuesGroupByDate(usage.data);
+    // });
+    //
+    // printerStatistics.historyByDayIncremental.forEach((usage) => {
+    //   usage.data = convertIncremental(usage.data);
+    // });
 
     return printerStatistics;
   }
@@ -347,6 +494,7 @@ class PrinterClean {
         updateAvailable: farmPrinter.updateAvailable,
         display: true,
         order: farmPrinter.sortIndex,
+        octoPrintSystemInfo: farmPrinter.octoPrintSystemInfo,
       };
 
       if (

@@ -344,16 +344,16 @@
             <tr>
                 <th scope="col" class=" sticky-table table-dark" style="min-width:50px;">Sort Index</th>
                 <th class=" sticky-table table-dark text-wrap">Name</th>
-                <th scope="col" class=" sticky-table table-dark" style="min-width:300px;">Actions</th>
+                <th scope="col" class=" sticky-table table-dark" style="min-width:200px;">Actions</th>
                 <th scope="col" class=" sticky-table table-dark" style="min-width:200px;">Manage</th>
                 <th scope="col" class=" sticky-table table-dark" style="min-width:50px;">Host State</th>
                 <th scope="col" class=" sticky-table table-dark" style="min-width:150px;">Printer State</th>
                 <th scope="col"  class=" sticky-table table-dark" style="min-width:10px;">WebSocket</th>
                 <th scope="col" class=" sticky-table table-dark" style="min-width:25px;">Group</th>
-                <th scope="col" class=" sticky-table table-dark" style="min-width:100px;">OctoPrint Version</th>
-                <th scope="col" class="table-dark d-none" id="octoPiVersions" style="min-width:100px;">
-                    OctoPi Version
+                <th scope="col" class=" sticky-table table-dark" style="min-width:100px;">
+                    Printer
                 </th>
+                <th scope="col" class=" sticky-table table-dark" style="min-width:100px;">OctoPrint</th>
             </tr>
             </thead>
             <tbody id="printerList" style="height:100%; overflow-y:auto;">
@@ -777,12 +777,12 @@
 <div class="modal fade" id="printerStatisticsModal" tabindex="-1" role="dialog" aria-labelledby="printerStatisticsModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content bg-dark text-light">
-            <div class="modal-header px-3 pt-3 pb-2">
+            <div class="modal-header px-3 pt-3 pb-2" id="printerStatisticsTitle">
                 Printer Statistics
             </div>
             <div class="modal-body">
                 <div class="container-fluid">
-                    <div class="row text-center" >
+                    <div class="row text-center" id="printerStatistics">
                     </div>
                 </div>
             </div>

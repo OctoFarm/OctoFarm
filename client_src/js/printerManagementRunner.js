@@ -976,7 +976,8 @@ bulkControl.addEventListener("click", async (e) => {
         });
         printerControls.printStop.addEventListener("click", (e) => {
           bootbox.confirm({
-            message: "Are you sure you want to cancel all of your ongoing print?",
+            message:
+              "Are you sure you want to cancel all of your ongoing print?",
             buttons: {
               cancel: {
                 label: "<i class=\"fa fa-times\"></i> Cancel",
@@ -1183,10 +1184,13 @@ bulkGcodeCommands.addEventListener("click", async (e) => {
       size: "large",
       title: "What gcode commands would you like sent?",
       inputType: "textarea",
-      onShow: function(e) {
-        let textArea = document.getElementsByClassName("bootbox-input bootbox-input-textarea form-control");
-        const customGcodeEE = "<div class='mb-1' id='customGcodeCommandsArea'></div>";
-        textArea[0].insertAdjacentHTML("beforebegin", customGcodeEE)
+      onShow: function (e) {
+        let textArea = document.getElementsByClassName(
+          "bootbox-input bootbox-input-textarea form-control"
+        );
+        const customGcodeEE =
+          "<div class='mb-1' id='customGcodeCommandsArea'></div>";
+        textArea[0].insertAdjacentHTML("beforebegin", customGcodeEE);
         let buttonPrinters = [];
         printersToConnect.forEach(async (printer) => {
           const index = _.findIndex(printerInfo, function (o) {
@@ -1195,11 +1199,11 @@ bulkGcodeCommands.addEventListener("click", async (e) => {
           if (index > -1) {
             buttonPrinters.push(printerInfo[index]);
           }
-        })
+        });
         CustomGenerator.generateButtons(buttonPrinters);
       },
       callback: function (result) {
-        if(result !== null){
+        if (result !== null) {
           printersToConnect.forEach(async (printer) => {
             const index = _.findIndex(printerInfo, function (o) {
               return o._id === printer;
@@ -1217,29 +1221,28 @@ bulkGcodeCommands.addEventListener("click", async (e) => {
                 commands: lines,
               };
               const post = await OctoPrintClient.post(
-                  printerInfo[index],
-                  "printer/command",
-                  opt
+                printerInfo[index],
+                "printer/command",
+                opt
               );
               if (post.status === 204) {
                 UI.createAlert(
-                    "success",
-                    "Your gcode commands have successfully been sent!",
-                    3000,
-                    "Clicked"
+                  "success",
+                  "Your gcode commands have successfully been sent!",
+                  3000,
+                  "Clicked"
                 );
               } else {
                 UI.createAlert(
-                    "danger",
-                    "Your gcode failed to send! Please check the printer is able to receive these commands.",
-                    3000,
-                    "Clicked"
+                  "danger",
+                  "Your gcode failed to send! Please check the printer is able to receive these commands.",
+                  3000,
+                  "Clicked"
                 );
               }
             }
           });
         }
-
       },
     });
   };
@@ -1254,34 +1257,37 @@ bulkGcodeCommands.addEventListener("click", async (e) => {
 
 const customGcodeScripts = document.getElementById("customGcodeBtn");
 customGcodeScripts.addEventListener("click", async (e) => {
-    let customScripts = await OctoFarmClient.get("settings/customGcode")
-    customScripts = await customScripts.json();
+  let customScripts = await OctoFarmClient.get("settings/customGcode");
+  customScripts = await customScripts.json();
 
-    //Draw Scripts
-    let scriptTable = document.getElementById("gcodeScriptTable");
-    scriptTable.innerHTML = "";
-    customScripts.forEach(scripts => {
-      drawScriptTable(scripts)
-    })
-
-
+  //Draw Scripts
+  let scriptTable = document.getElementById("gcodeScriptTable");
+  scriptTable.innerHTML = "";
+  customScripts.forEach((scripts) => {
+    drawScriptTable(scripts);
+  });
 });
 const createNewScriptBtn = document.getElementById("createNewScriptBtn");
-async function newGcodeScript(newScript){
-  const keys = Object.keys(newScript)
+async function newGcodeScript(newScript) {
+  const keys = Object.keys(newScript);
   let errors = [];
   for (const key of keys) {
-    if(newScript["name"] === ""){
+    if (newScript["name"] === "") {
       errors.push(key);
     }
-    if(newScript["gcode"] === ""){
+    if (newScript["gcode"] === "") {
       errors.push(key);
     }
   }
-  if(errors.length !== 0){
-    UI.createAlert("error", "You have blank fields sony jim!, sort them out...", 3000, "Clicked");
+  if (errors.length !== 0) {
+    UI.createAlert(
+      "error",
+      "You have blank fields sony jim!, sort them out...",
+      3000,
+      "Clicked"
+    );
     return false;
-  }else{
+  } else {
     let lines = newScript.gcode.match(/[^\r\n]+/g);
     newScript.gcode = lines.map(function (name) {
       if (!name.includes("=")) {
@@ -1290,23 +1296,31 @@ async function newGcodeScript(newScript){
         return name;
       }
     });
-    if(newScript.id){
-      let post = await OctoFarmClient.post("settings/customGcode/edit", newScript);
-      if(post.status === 200){
+    if (newScript.id) {
+      let post = await OctoFarmClient.post(
+        "settings/customGcode/edit",
+        newScript
+      );
+      if (post.status === 200) {
         post = await post.json();
-      }else{
-        UI.createAlert("error", "Something went wrong updating, is the server online?")
+      } else {
+        UI.createAlert(
+          "error",
+          "Something went wrong updating, is the server online?"
+        );
       }
-    }else{
+    } else {
       let post = await OctoFarmClient.post("settings/customGcode", newScript);
-      if(post.status === 200){
+      if (post.status === 200) {
         post = await post.json();
-        drawScriptTable(post)
-      }else{
-        UI.createAlert("error", "Something went wrong updating, is the server online?")
+        drawScriptTable(post);
+      } else {
+        UI.createAlert(
+          "error",
+          "Something went wrong updating, is the server online?"
+        );
       }
     }
-
   }
   return true;
 }
@@ -1315,22 +1329,23 @@ createNewScriptBtn.addEventListener("click", async (e) => {
     name: document.getElementById("gcodeScriptName").value,
     description: document.getElementById("gcodeScriptDescription").value,
     gcode: document.getElementById("gcodeScriptScript").value,
-  }
+  };
   await newGcodeScript(newScript);
   document.getElementById("gcodeScriptName").value = "";
   document.getElementById("gcodeScriptDescription").value = "";
   document.getElementById("gcodeScriptScript").value = "";
-
-})
-function drawScriptTable(scripts){
+});
+function drawScriptTable(scripts) {
   let scriptTable = document.getElementById("gcodeScriptTable");
-    let scriptLines = "";
+  let scriptLines = "";
 
-    scripts.gcode.forEach(e => {
-      scriptLines += `${e}\n`
-    })
+  scripts.gcode.forEach((e) => {
+    scriptLines += `${e}\n`;
+  });
 
-    scriptTable.insertAdjacentHTML("beforeend", `
+  scriptTable.insertAdjacentHTML(
+    "beforeend",
+    `
              <tr id="scriptRow-${scripts._id}" >
                 <td id="script_id_${scripts._id}" class="d-none">${scripts._id}</td>
                 <td><input type="text" class="form-control" id="script_name_${scripts._id}" placeholder="${scripts.name}" disabled></input></td>
@@ -1348,58 +1363,108 @@ function drawScriptTable(scripts){
                 </button>
                 </td>
             </tr>
-      `)
-    document.getElementById("deleteScript-"+scripts._id).addEventListener("click", async (e) => {
-      let delt = await OctoFarmClient.get("settings/customGcode/delete/"+scripts._id);
-      if(delt.status === 200){
-        UI.createAlert("success", "Successfully deleted your script...", 3000, "Clicked")
-        document.getElementById("scriptRow-"+scripts._id).remove();
-      }else {
-        UI.createAlert("error", "Something went wrong, is the OctoFarm server online?", 3000, "Clicked")
+      `
+  );
+  document
+    .getElementById("deleteScript-" + scripts._id)
+    .addEventListener("click", async (e) => {
+      let delt = await OctoFarmClient.get(
+        "settings/customGcode/delete/" + scripts._id
+      );
+      if (delt.status === 200) {
+        UI.createAlert(
+          "success",
+          "Successfully deleted your script...",
+          3000,
+          "Clicked"
+        );
+        document.getElementById("scriptRow-" + scripts._id).remove();
+      } else {
+        UI.createAlert(
+          "error",
+          "Something went wrong, is the OctoFarm server online?",
+          3000,
+          "Clicked"
+        );
       }
-    })
-  document.getElementById("editScript-"+scripts._id).addEventListener("click", async (e) => {
-
-    document.getElementById(`script_name_${scripts._id}`).disabled = false;
-    document.getElementById(`script_desc_${scripts._id}`).disabled = false;
-    document.getElementById(`script_lines_${scripts._id}`).disabled = false;
-    document.getElementById(`script_name_${scripts._id}`).value = document.getElementById(`script_name_${scripts._id}`).placeholder;
-    document.getElementById(`script_desc_${scripts._id}`).value = document.getElementById(`script_desc_${scripts._id}`).placeholder;
-    document.getElementById(`script_lines_${scripts._id}`).value = document.getElementById(`script_lines_${scripts._id}`).placeholder;
-    document.getElementById(`editScript-${scripts._id}`).classList.toggle("d-none");
-    document.getElementById(`saveScript-${scripts._id}`).classList.toggle("d-none");
-  });
-  document.getElementById("saveScript-"+scripts._id).addEventListener("click", async (e) => {
-    let newScript = {
-      id: document.getElementById(`script_id_${scripts._id}`).innerHTML,
-      name: document.getElementById(`script_name_${scripts._id}`).value,
-      description: document.getElementById(`script_desc_${scripts._id}`).value,
-      gcode: document.getElementById(`script_lines_${scripts._id}`).value,
-    }
-    console.log(newScript)
-    let save = await newGcodeScript(newScript);
-    if(save){
-      document.getElementById(`script_name_${scripts._id}`).placeholder = document.getElementById(`script_name_${scripts._id}`).value;
-      document.getElementById(`script_desc_${scripts._id}`).placeholder = document.getElementById(`script_desc_${scripts._id}`).value;
-      document.getElementById(`script_lines_${scripts._id}`).placeholder = document.getElementById(`script_lines_${scripts._id}`).value;
-      document.getElementById(`script_name_${scripts._id}`).value = "";
-      document.getElementById(`script_desc_${scripts._id}`).value = "";
-      document.getElementById(`script_lines_${scripts._id}`).value = "";
-      document.getElementById(`script_name_${scripts._id}`).disabled = true;
-      document.getElementById(`script_desc_${scripts._id}`).disabled = true;
-      document.getElementById(`script_lines_${scripts._id}`).disabled = true;
-      document.getElementById(`editScript-${scripts._id}`).classList.toggle("d-none");
-      document.getElementById(`saveScript-${scripts._id}`).classList.toggle("d-none");
-    }
-
-
-  });
+    });
+  document
+    .getElementById("editScript-" + scripts._id)
+    .addEventListener("click", async (e) => {
+      document.getElementById(`script_name_${scripts._id}`).disabled = false;
+      document.getElementById(`script_desc_${scripts._id}`).disabled = false;
+      document.getElementById(`script_lines_${scripts._id}`).disabled = false;
+      document.getElementById(
+        `script_name_${scripts._id}`
+      ).value = document.getElementById(
+        `script_name_${scripts._id}`
+      ).placeholder;
+      document.getElementById(
+        `script_desc_${scripts._id}`
+      ).value = document.getElementById(
+        `script_desc_${scripts._id}`
+      ).placeholder;
+      document.getElementById(
+        `script_lines_${scripts._id}`
+      ).value = document.getElementById(
+        `script_lines_${scripts._id}`
+      ).placeholder;
+      document
+        .getElementById(`editScript-${scripts._id}`)
+        .classList.toggle("d-none");
+      document
+        .getElementById(`saveScript-${scripts._id}`)
+        .classList.toggle("d-none");
+    });
+  document
+    .getElementById("saveScript-" + scripts._id)
+    .addEventListener("click", async (e) => {
+      let newScript = {
+        id: document.getElementById(`script_id_${scripts._id}`).innerHTML,
+        name: document.getElementById(`script_name_${scripts._id}`).value,
+        description: document.getElementById(`script_desc_${scripts._id}`)
+          .value,
+        gcode: document.getElementById(`script_lines_${scripts._id}`).value,
+      };
+      console.log(newScript);
+      let save = await newGcodeScript(newScript);
+      if (save) {
+        document.getElementById(
+          `script_name_${scripts._id}`
+        ).placeholder = document.getElementById(
+          `script_name_${scripts._id}`
+        ).value;
+        document.getElementById(
+          `script_desc_${scripts._id}`
+        ).placeholder = document.getElementById(
+          `script_desc_${scripts._id}`
+        ).value;
+        document.getElementById(
+          `script_lines_${scripts._id}`
+        ).placeholder = document.getElementById(
+          `script_lines_${scripts._id}`
+        ).value;
+        document.getElementById(`script_name_${scripts._id}`).value = "";
+        document.getElementById(`script_desc_${scripts._id}`).value = "";
+        document.getElementById(`script_lines_${scripts._id}`).value = "";
+        document.getElementById(`script_name_${scripts._id}`).disabled = true;
+        document.getElementById(`script_desc_${scripts._id}`).disabled = true;
+        document.getElementById(`script_lines_${scripts._id}`).disabled = true;
+        document
+          .getElementById(`editScript-${scripts._id}`)
+          .classList.toggle("d-none");
+        document
+          .getElementById(`saveScript-${scripts._id}`)
+          .classList.toggle("d-none");
+      }
+    });
 }
 function pluginListTemplate(plugin) {
   //Also need check inplace for incompatible...
   let abandoned = "";
   if (plugin.abandoned === true) {
-    abandoned = "<i class=\"fa fa-heartbeat\" title=\"Abandoned by its maintainer\"></i>";
+    abandoned =
+      "<i class=\"fa fa-heartbeat\" title=\"Abandoned by its maintainer\"></i>";
   }
   let latestRelease = "";
   if (
@@ -2492,7 +2557,9 @@ class PrintersManagement {
     let printCheck = -1;
     if (printerURL.value !== "") {
       printCheck = _.findIndex(printerInfo, function (o) {
-        return JSON.stringify(o.printerURL) === JSON.stringify(printerURL.value);
+        return (
+          JSON.stringify(o.printerURL) === JSON.stringify(printerURL.value)
+        );
       });
     }
     // Check information is filled correctly...
@@ -2815,8 +2882,11 @@ class dashUpdate {
           const socketBadge = document.getElementById(
             `webSocketIcon-${printer._id}`
           );
-          const printerOctoPrintVersion = document.getElementById(
-            `printerOctoPrintVersion-${printer._id}`
+          const printerPrinterInformation = document.getElementById(
+            `printerPrinterInformation-${printer._id}`
+          );
+          const printerOctoPrintInformation = document.getElementById(
+            `printerOctoPrintInformation-${printer._id}`
           );
           const printerSortIndex = document.getElementById(
             `printerSortIndex-${printer._id}`
@@ -2827,11 +2897,27 @@ class dashUpdate {
 
           printerGroup.innerHTML = printer.group;
 
-          const octoPiVersioning = document.getElementById("octoPiVersioning");
-          if (octoPiVersioning) {
-            octoPiVersioning.innerHTML = `                 
-                  <p>${printer.octoPi.version}</p>
-                  <p>${printer.octoPi.model}</p>`;
+          if (typeof printer.octoPrintSystemInfo !== "undefined") {
+            if (
+              typeof printer.currentProfile !== "undefined" &&
+              printer.currentProfile !== null
+            ) {
+              printerPrinterInformation.innerHTML = `
+             <small><b>Firmware: </b>${printer.octoPrintSystemInfo["printer.firmware"]}</small><br>
+             <small><b>Name: </b>${printer.currentProfile.name}</small><br>
+             <small><b>Model: </b>${printer.currentProfile.model}</small><br>
+            `;
+            }
+          }
+          if (typeof printer.octoPi !== "undefined") {
+            printerOctoPrintInformation.innerHTML = `
+          <small><b>OctoPrint: </b>${printer.octoPrintVersion}</small><br>
+          <small><b>OctoPi: </b>${printer.octoPi.version}</small><br>
+          <small><b>RaspberryPi: </b>${printer.octoPi.model}</small>`;
+          } else {
+            printerOctoPrintInformation.innerHTML = `
+          <small><b>OctoPrint: </b>${printer.octoPrintVersion}</small><br>
+          `;
           }
 
           printerSortIndex.innerHTML = printer.sortIndex;
@@ -2895,7 +2981,6 @@ class dashUpdate {
 
           webButton.href = printer.printerURL;
 
-          printerOctoPrintVersion.innerHTML = printer.octoPrintVersion;
           if (typeof printer.updateAvailable !== "undefined") {
             let updateButton = document.getElementById(
               `octoprintUpdate-${printer._id}`
@@ -2965,20 +3050,6 @@ class dashUpdate {
           printButton.disabled =
             printer.printerState.colour.category === "Offline";
         } else {
-          let octoPiElement = "";
-          if (typeof printer.octoPi !== "undefined") {
-            octoPiElement = `
-                <td id="octoPiVersioning-${printer._id}">
-                  <p>${printer.octoPi.version}</p>
-                  <p>${printer.octoPi.model}</p>
-                </td>
-            `;
-            let tableRow = document.getElementById("octoPiVersions");
-            if (tableRow.classList.contains("d-none")) {
-              tableRow.classList.remove("d-none");
-            }
-          } else {
-          }
           // Insert new printer addition...
           document.getElementById("printerList").insertAdjacentHTML(
             "beforeend",
@@ -2989,9 +3060,9 @@ class dashUpdate {
             >
     ${printer.sortIndex}
     </span></td>
-        <td><div id="printerName-${printer._id}">${printerName}</div></td>
-        <td id="printerActionBtns-${printer._id}"></td>
-        <td>
+        <td class="align-middle"><div id="printerName-${printer._id}">${printerName}</div></td>
+        <td class="align-middle" id="printerActionBtns-${printer._id}"></td>
+        <td class="align-middle">
           <button  title="Change your Printer Settings"
             id="printerSettings-${printer._id}"
                                  type="button"
@@ -3028,16 +3099,16 @@ class dashUpdate {
             ><i class="fas fa-wrench"></i>
             </button>
     </span></td>
-        <td><small><span data-title="${printer.hostState.desc}" id="hostBadge-${printer._id}" class="tag badge badge-${printer.hostState.colour.name} badge-pill">
+        <td class="align-middle"><small><span data-title="${printer.hostState.desc}" id="hostBadge-${printer._id}" class="tag badge badge-${printer.hostState.colour.name} badge-pill">
                 ${printer.hostState.state}</small></span></td>
-        <td><small><span data-title="${printer.printerState.desc}" id="printerBadge-${printer._id}" class="tag badge badge-${printer.printerState.colour.name} badge-pill">
+        <td class="align-middle"><small><span data-title="${printer.printerState.desc}" id="printerBadge-${printer._id}" class="tag badge badge-${printer.printerState.colour.name} badge-pill">
                 ${printer.printerState.state}</small></span><br><span data-title="Check printer settings, API issues detected..." id="scanningIssues-${printer._id}"></small></span></td>
-        <td><small><span data-title="${printer.webSocketState.desc}" id="webSocketIcon-${printer._id}" class="tag badge badge-${printer.webSocketState.colour} badge-pill">
+        <td class="align-middle"><small><span data-title="${printer.webSocketState.desc}" id="webSocketIcon-${printer._id}" class="tag badge badge-${printer.webSocketState.colour} badge-pill">
                 <i  class="fas fa-plug"></i></span></td>
-   
-        <td><div id="printerGroup-${printer._id}" ></div></td>
-        <td id="printerOctoPrintVersion-${printer._id}"></td>
-        ${octoPiElement}
+
+        <td class="align-middle"><div id="printerGroup-${printer._id}" ></div></td>
+        <td class="align-middle" id="printerPrinterInformation-${printer._id}"></td>
+        <td class="align-middle" id="printerOctoPrintInformation-${printer._id}"></td>
     </tr>
           `
           );
@@ -3224,18 +3295,15 @@ class dashUpdate {
             });
 
           document
-              .getElementById(`printerStatistics-${printer._id}`)
-              .addEventListener("click", async (e) => {
-                PrinterLogs.loadStatistics(printer._id);
-              });
+            .getElementById(`printerStatistics-${printer._id}`)
+            .addEventListener("click", async (e) => {
+              PrinterLogs.loadStatistics(printer._id);
+            });
         }
       }
     });
   }
 }
-
-
-
 
 const el = document.getElementById("printerList");
 const sortable = Sortable.create(el, {

@@ -16,6 +16,9 @@ All notable changes to this project will be documented in this file.
    - #272: Improvements to the alpine image, now runs as none-root and went from around 1Gb to 268Mb in size! Big thank you to user @torresmvl for those PR's. Don't forget to email about your free t-shirt.
    - Gcode scripts no longer require a description.
    - Made gcode scripts wider for comments and better data input.
+   - Printer Manager Table has been updated to include Printer, OctoPrint designations:
+         - Printer: Shows current printer firmware version, model and name.
+         - OctoPrint: Shows current OctoPrint version and if on OctoPi, the version and Pi model.
 
 ### Fixed
    - #223: Shutting down printers unexpectedly would keep printer in last state. - Big thanks to Chrismettal for helping me with this one.

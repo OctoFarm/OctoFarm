@@ -121,4 +121,11 @@ export default class Calculate {
       months[date.getMonth()]
     } ${date.getFullYear()} - ${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
   }
+  static generateCost(cost) {
+    if (cost) {
+      return cost.toFixed(2);
+    } else {
+      return 0;
+    }
+  }
 }
