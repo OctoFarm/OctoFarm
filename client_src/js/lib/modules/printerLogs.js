@@ -284,8 +284,13 @@ export default class PrinterLogs {
     }
   }
   static async returnPrinterStatsTemplate(stats) {
+    let display = "<div id='historyGraph'></div>";
+    if (stats.historyByDay.length === 0) {
+      display = `<div class='row'>
+                    <div class="col-12"><h5>Sorry but your printer currently has no history captured. Please run some prints to generate information here.</h5></div>
+                </div>`;
+    }
     return `
-
             <div class="col-md-12 col-lg-3">
               <div class="card text-white bg-dark mb-3" >
                               <div class="card-header">Information</div>
@@ -298,7 +303,7 @@ export default class PrinterLogs {
               <div class="card text-white bg-dark mb-3" >
                               <div class="card-header">Utilisation</div>
                               <div class="card-body">
-                                <div class="card-text" id="printerUtilisationGraph"></div>
+                                <div class='card-text' id='printerUtilisationGraph'></div>
                 </div>
               </div>
             </div>
@@ -390,7 +395,7 @@ export default class PrinterLogs {
               </div>
             </div>
             <div class="col-12">
-                <div id="historyGraph"></div>
+                ${display}
             </div>
             <div class="col-md-6 col-lg-3">
             
@@ -782,7 +787,7 @@ export default class PrinterLogs {
         },
       },
     };
-    if (document.querySelector("#printerUtilisationGraph")) {
+    if (document.getElementById("#printerUtilisationGraph")) {
       if (historyPieChart !== null) {
         historyPieChart.destroy();
         historyPieChart = new ApexCharts(
