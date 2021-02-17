@@ -286,6 +286,43 @@ router.get("/mon/camera", ensureAuthenticated, async (req, res) => {
     dashboardStatistics: dashStatistics,
   });
 });
+router.get("/mon/printerMap", ensureAuthenticated, async (req, res) => {
+  const printers = await Runner.returnFarmPrinters();
+  const sortedIndex = await Runner.sortedIndex();
+  const clientSettings = await SettingsClean.returnClientSettings();
+  const serverSettings = await SettingsClean.returnSystemSettings();
+
+  const currentSort = await getSorting();
+  const currentFilter = await getFilter();
+
+  let printGroups = await Runner.returnGroupList();
+  if (typeof printGroups === "undefined") {
+    printGroups = [];
+  }
+
+  let user = null;
+  let group = null;
+  if (serverSettings.server.loginRequired === false) {
+    user = "No User";
+    group = "Administrator";
+  } else {
+    user = req.user.name;
+    group = req.user.group;
+  }
+  res.render("printerMap", { 
+    name: user,
+    userGroup: group,
+    version,
+    printers,
+    printerCount: printers.length,
+    sortedIndex,
+    page: "Printer Map",
+    helpers: prettyHelpers,
+    clientSettings,
+    printGroups,
+    currentChanges: { currentSort, currentFilter },
+  });
+});
 // List view  Page
 router.get("/mon/list", ensureAuthenticated, async (req, res) => {
   const printers = await Runner.returnFarmPrinters();

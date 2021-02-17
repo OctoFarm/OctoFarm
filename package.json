@@ -8,7 +8,7 @@
     "start": "pm2 flush && pm2 start app.js --name OctoFarm -e 'logs/pm2.error.log' --time",
     "stop": "pm2 stop OctoFarm",
     "dev": "nodemon ./app.js",
-    "test": "mocha --recursive"
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -65,10 +65,10 @@
     "@babel/polyfill": "^7.11.5",
     "@babel/preset-env": "^7.11.5",
     "autoprefixer": "^9.8.6",
+    "babel-jest": "^26.6.3",
     "babel-loader": "^8.1.0",
     "babelify": "^10.0.0",
     "browserify": "^16.5.2",
-    "chai": "^4.3.0",
     "clinic": "^6.0.3",
     "cssnano": "^4.1.10",
     "debug": "^4.2.0",
@@ -93,39 +93,22 @@
     "gulp-rename": "^2.0.0",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-terser": "^1.4.0",
-    "mocha": "^8.3.0",
+    "jest": "^26.6.3",
+    "mongodb-memory-server": "^6.9.3",
     "nodemon": "^2.0.4",
     "npm-run-all": "^4.1.5",
     "pkg": "^4.4.9",
     "prettier": "^2.1.2",
-    "sinon": "^9.2.4",
     "vinyl-buffer": "^1.0.1",
     "vinyl-source-stream": "^2.0.0"
   },
   "pkg": {
     "assets": "views/**/*"
   },
-  "babel": {
-    "presets": [
-      [
-        "@babel/preset-env",
-        {
-          "debug": true,
-          "useBuiltIns": "entry"
-        }
-      ]
-    ]
-  },
   "engineStrict": true,
   "engines": {
     "node": ">= 12.0.0",
     "npm": ">= 6.0.0"
-  },
-  "config": {
-    "imageRepo": "octofarm/octofarm",
-    "imageName": "OctoFarm",
-    "imagePort": "4000",
-    "internalContainerPort": "4000"
   },
   "nodemonConfig": {
     "verbose": false,
