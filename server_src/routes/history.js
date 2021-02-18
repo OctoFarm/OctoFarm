@@ -9,10 +9,8 @@ const Spools = require("../models/Filament.js");
 const Profiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const historyClean = require("../lib/dataFunctions/historyClean.js");
-const printerClean = require("../lib/dataFunctions/printerClean.js");
 
 const { HistoryClean } = historyClean;
-const { PrinterClean } = printerClean;
 
 router.post("/update", ensureAuthenticated, async (req, res) => {
   //Check required fields
@@ -121,7 +119,7 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
   //match history name to printer ID
   const printers = await Printers.find({});
   const printer = _.findIndex(printers, function (o) {
-    return o.settingsApperance.name == history.printHistory.printerName;
+    return o.settingsAppearance.name == history.printHistory.printerName;
   });
   if (printer > -1) {
     history.printHistory.costSettings = printers[printer].costSettings;
@@ -153,11 +151,6 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
 
     res.send(send);
   }
-});
-router.get("/statistics/:id", ensureAuthenticated, async function(req, res) {
-  const printerID = req.params.id;
-  let stats = await PrinterClean.generatePrinterStatistics(printerID);
-  res.send(stats)
 });
 // router.get("/info/", ensureAuthenticated, function(req, res) {
 //   //req.socket.setTimeout(Number.MAX_VALUE);

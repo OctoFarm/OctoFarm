@@ -52,7 +52,7 @@ let initNewGraphs = async function () {
         title: {
           text: "Weight",
         },
-        seriesName: usageOverTime[0]?.name,
+        seriesName: usageOverTime[0].name,
         labels: {
           formatter: function (val) {
             if (val !== null) {
@@ -64,7 +64,7 @@ let initNewGraphs = async function () {
     } else {
       obj = {
         show: false,
-        seriesName: usageOverTime[0]?.name,
+        seriesName: usageOverTime[0].name,
         labels: {
           formatter: function (val) {
             if (val !== null) {
@@ -150,7 +150,7 @@ let initNewGraphs = async function () {
         title: {
           text: "Weight",
         },
-        seriesName: usageOverTime[0]?.name,
+        seriesName: usageOverTime[0].name,
         labels: {
           formatter: function (val) {
             if (val !== null) {
@@ -523,37 +523,37 @@ const optionsHeatChart = {
   },
   plotOptions: {
     heatmap: {
-      shadeIntensity: 0.5,
+      shadeIntensity: 0.7,
       radius: 0,
-      useFillColorAsStroke: true,
+      useFillColorAsStroke: false,
       colorScale: {
         ranges: [
           {
             from: 0,
             to: 1,
             name: "none",
-            color: "#848484",
+            color: "#444",
           },
           {
-            from: 2,
+            from: 1,
             to: 25,
             name: "low",
             color: "#375a7f",
           },
           {
-            from: 26,
+            from: 25,
             to: 60,
             name: "medium",
             color: "#f39c12",
           },
           {
-            from: 61,
+            from: 60,
             to: 75,
             name: "high",
             color: "#00bc8c",
           },
           {
-            from: 76,
+            from: 75,
             to: 100,
             name: "extreme",
             color: "#e74c3c",
@@ -1095,44 +1095,44 @@ class dashUpdate {
           airQualityElement.classList.remove("d-none");
         }
         if (Calc.isBetween(lastValue, 0, 50)) {
-          state = "<i class=\"fas fa-check-circle textComplete\"></i> Excellent";
+          state = '<i class="fas fa-check-circle textComplete"></i> Excellent';
           impact = "Pure air; best for well-being";
           suggestedActions = "";
         }
         if (Calc.isBetween(lastValue, 51, 100)) {
-          state = "<i class=\"fas fa-check-circle\"></i> Good";
+          state = '<i class="fas fa-check-circle"></i> Good';
           impact = "No irritation or impact on well-being";
           suggestedActions = "";
         }
         if (Calc.isBetween(lastValue, 101, 150)) {
           state =
-            "<i class=\"fas fa-exclamation-triangle\"></i>  Lightly Polluted";
+            '<i class="fas fa-exclamation-triangle"></i>  Lightly Polluted';
           impact = "Reduction of well-being possible";
           suggestedActions = "Ventilation suggested";
         }
         if (Calc.isBetween(lastValue, 151, 200)) {
           state =
-            "<i class=\"fas fa-exclamation-triangle\"></i>  Moderately Polluted";
+            '<i class="fas fa-exclamation-triangle"></i>  Moderately Polluted';
           impact = "More significant irritation possible";
           suggestedActions = "Increase ventilation with clean air";
         }
         if (Calc.isBetween(lastValue, 201, 250)) {
           state =
-            "<i class=\"fas fa-exclamation-triangle\"></i>  Heavily Polluted";
+            '<i class="fas fa-exclamation-triangle"></i>  Heavily Polluted';
           impact =
             "Exposition might lead to effects like headache depending on type of VOCs";
           suggestedActions = "Optimize ventilation";
         }
         if (Calc.isBetween(lastValue, 251, 350)) {
           state =
-            "<i class=\"fas fa-exclamation-triangle\"></i>  Severely Polluted";
+            '<i class="fas fa-exclamation-triangle"></i>  Severely Polluted';
           impact = "More severe health issue possible if harmful VOC present";
           suggestedActions =
             "Contamination should be identified if level is reached even w/o presence of people; maximize ventilation & reduce attendance";
         }
         if (Calc.isBetween(lastValue, 350, 500)) {
           state =
-            "<i class=\"fas fa-exclamation-triangle\"></i>  Extremely Polluted";
+            '<i class="fas fa-exclamation-triangle"></i>  Extremely Polluted';
           impact = "Headaches, additional neurotoxic effects possible";
           suggestedActions =
             "Contamination needs to be identified; avoid presence in room and maximize ventilation";
