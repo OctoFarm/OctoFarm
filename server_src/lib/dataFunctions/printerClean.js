@@ -13,6 +13,8 @@ const { HistoryClean } = historyClean;
 const FarmStatistics = require("../../models/FarmStatistics.js");
 
 const RoomData = require("../../models/roomData.js");
+const PrinterGroup = require("../../models/PrinterGroup.js");
+const Printer = require("../../models/Printer.js");
 
 const ErrorLogs = require("../../models/ErrorLog.js");
 
@@ -458,6 +460,12 @@ class PrinterClean {
       if (typeof farmPrinter.systemChecks !== "undefined") {
         farmPrinter.systemChecks.cleaning.information.status = "warning";
       }
+
+            // Append the groups by JOIN
+            const printerGroups = await PrinterGroup.find({
+                printers: farmPrinter._id,
+            }).exec();
+
       const sortedPrinter = {
         // eslint-disable-next-line no-underscore-dangle
         _id: farmPrinter._id,
@@ -477,6 +485,7 @@ class PrinterClean {
           desc: farmPrinter.webSocketDescription,
         },
         group: farmPrinter.group,
+                groups: printerGroups,
         printerURL: farmPrinter.printerURL,
         cameraURL: farmPrinter.camURL,
         apikey: farmPrinter.apikey,

@@ -3,7 +3,7 @@ import OctoPrintClient from "../octoprint.js";
 import Queue from "./clientQueue.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
-import { dragAndDropEnable } from "../functions/dragAndDrop.js";
+import { dragAndDropEnableMultiplePrinters } from "../functions/dragAndDrop.js";
 import FileSorting from "./fileSorting.js";
 import PrinterSelect from "./printerSelect.js";
 
@@ -443,7 +443,11 @@ export default class FileManager {
     static async refreshFiles(printer, spinnerIcon) {
         for (let i = 0; i < printer.fileList.fileList.length; i++) {
             const file = printer.fileList.fileList[i];
-            let currentFolder = document.getElementById("currentFolder").innerHTML;
+            let currentFolder = document.getElementById("currentFolder")?.innerHTML;
+            if(!currentFolder) {
+                // Null-ref is tolerable
+                continue;
+            }
             if (currentFolder.includes("local/")) {
                 currentFolder = currentFolder.replace("local/", "");
             }
@@ -716,7 +720,7 @@ export default class FileManager {
 
     static updateListeners(printer) {
         const fileElem = document.getElementById(`fileList-${printer._id}`);
-        dragAndDropEnable(fileElem, printer);
+        dragAndDropEnableMultiplePrinters(fileElem, printer);
         const folders = document.querySelectorAll(".folderAction");
         folders.forEach((folder) => {
             folder.addEventListener("click", (e) => {
