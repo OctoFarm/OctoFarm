@@ -220,23 +220,18 @@ router.get("/customGcode/delete/:id", ensureAuthenticated, async(req, res) => {
     }
   });
 });
-router.get("/customGcode/edit/:id", ensureAuthenticated, async(req, res) => {
-  const scriptId = req.params.id;
+router.post("/customGcode/edit", ensureAuthenticated, async(req, res) => {
   const newObj = req.body;
-  GcodeDB.findByIdAndUpdate({scriptId},newObj, function(err, result){
-    if(err){
-      res.send(err)
-    }
-    else{
-      res.send(result)
-    }
-
-  })
+  let script = await GcodeDB.findById(newObj.id);
+  script.gcode = newObj.gcode;
+  script.name = newObj.name;
+  script.description = newObj.description
+  script.save();
+  res.send(script)
 });
 router.post("/customGcode", ensureAuthenticated, async(req, res) => {
   let newScript = req.body
   const saveScript = new GcodeDB(newScript)
-  console.log(saveScript)
   saveScript.save().then(res.send(saveScript)).catch(e => res.send(e));
 });
 router.get("/customGcode", ensureAuthenticated, async(req, res) => {

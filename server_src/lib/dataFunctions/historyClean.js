@@ -1,6 +1,7 @@
 const ServerSettings = require("../../models/ServerSettings.js");
 const History = require("../../models/History.js");
 const Logger = require("../logger.js");
+const PrinterClean = require("../dataFunctions/printerClean.js");
 
 const logger = new Logger("OctoFarm-InformationCleaning");
 let historyClean = [];
@@ -751,12 +752,12 @@ class HistoryClean {
 
   static getState(state, reason) {
     if (state) {
-      return '<p class="d-none state">Success</p><i class="fas fa-thumbs-up text-success fa-3x"></i>';
+      return "<p class=\"d-none state\">Success</p><i class=\"fas fa-thumbs-up text-success fa-3x\"></i>";
     } else {
       if (reason === "cancelled") {
-        return '<p class="d-none state">Cancelled</p><i class="fas fa-thumbs-down text-warning fa-3x"></i>';
+        return "<p class=\"d-none state\">Cancelled</p><i class=\"fas fa-thumbs-down text-warning fa-3x\"></i>";
       } else {
-        return '<p class="d-none state">Failure</p><i class="fas fa-exclamation text-danger fa-3x"></i>';
+        return "<p class=\"d-none state\">Failure</p><i class=\"fas fa-exclamation text-danger fa-3x\"></i>";
       }
     }
   }

@@ -1,10 +1,9 @@
 FROM node:13.0.1-stretch
-
-COPY . /app
-
 WORKDIR /app
 
+COPY . .
 RUN npm install -g pm2
 
-RUN chmod +x docker/entrypoint.sh
-ENTRYPOINT docker/entrypoint.sh
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["bash", "/usr/local/bin/entrypoint.sh"]

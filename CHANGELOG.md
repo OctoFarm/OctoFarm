@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 # [Released]
 
+# [v1.1.11]
+
+### Added
+   - #274: Added full file path to file display card.
+   - Gcode Scripts are now editable.
+   - Reset Fields Button to power settings to enable a reset of them...
+   - Individual Printer Statistics: New option under the Manage section for viewing statistics about your printer.
+ 
+### Changed
+   - Improved the power status error logs.
+   - #272: Improvements to the alpine image, now runs as none-root and went from around 1Gb to 268Mb in size! Big thank you to user @torresmvl for those PR's. Don't forget to email about your free t-shirt.
+   - Gcode scripts no longer require a description.
+   - Made gcode scripts wider for comments and better data input.
+   - Printer Manager Table has been updated to include Printer, OctoPrint designations:
+         - Printer: Shows current printer firmware version, model and name.
+         - OctoPrint: Shows current OctoPrint version and if on OctoPi, the version and Pi model.
+
+### Fixed
+   - #223: Shutting down printers unexpectedly would keep printer in last state. - Big thanks to Chrismettal for helping me with this one.
+   - #226: Failing to fire commands to enclosure plugin using the Power Settings.
+   - Attempted fix for air gapped farms. Awaiting feedback. 
+   - #236: File Manager would fail to return to non-recursive search on blank input.
+   - Fixed the slider not showing the 10/300% changes for feedrate. 
+   - Fixed enclosure plugin commands not firing with a GET request. 
+   - Fixed: #273 Recursive search doesn't return to root folder...  
+   - #277: Fixed issue when person re-edited final slash back in... 
+   - Fixed: WOL packets been undefined.
+   - Fixed: Update cost match in history would fail.
+   - #276 - Patched issue were a user couldn't send blank fields to clear Custom Power Settings. 
+   - Fixed: Issue with autodetection of PSU control plugin causing wol settings to be destroyed.
+   - Fixed: Issue with Weekly Utilisation chart showing incorrect colours on a Float value.
+   - Fixed: #236 - Colours on Weekly Utilisation chart we're loading too dark.
+   - Fixed: #279 - API connection checked too early after powering up.
+   - Fixed: #292 - Printer Settings would fail due to missing wol settings.
+
+
 # [v1.1.10]
 
 ### Added

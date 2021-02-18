@@ -1,19 +1,19 @@
 const express = require("express");
 
 const router = express.Router();
-const { ensureAuthenticated } = require("../config/auth");
+const {ensureAuthenticated} = require("../config/auth");
 // User Modal
 const runner = require("../runners/state.js");
 
-const { Runner } = runner;
+const {Runner} = runner;
 const Logger = require("../lib/logger.js");
 
 const logger = new Logger("OctoFarm-API");
 const printerClean = require("../lib/dataFunctions/printerClean.js");
 
-const { PrinterClean } = printerClean;
+const {PrinterClean} = printerClean;
 
-const { Script } = require("../lib/serverCommands.js");
+const {Script} = require("../lib/serverCommands.js");
 
 const _ = require("lodash");
 
@@ -28,7 +28,7 @@ router.post("/add", ensureAuthenticated, async (req, res) => {
   logger.info("Update printers request: ", printers);
   const p = await Runner.addPrinters(printers);
   // Return printers added...
-  res.send({ printersAdded: p, status: 200 });
+  res.send({printersAdded: p, status: 200});
 });
 router.post("/update", ensureAuthenticated, async (req, res) => {
   // Grab the API body
@@ -37,7 +37,7 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
   logger.info("Update printers request: ", printers);
   const p = await Runner.updatePrinters(printers);
   // Return printers added...
-  res.send({ printersAdded: p, status: 200 });
+  res.send({printersAdded: p, status: 200});
 });
 router.post("/remove", ensureAuthenticated, async (req, res) => {
   // Grab the API body
@@ -46,7 +46,7 @@ router.post("/remove", ensureAuthenticated, async (req, res) => {
   logger.info("Delete printers request: ", printers);
   const p = await Runner.removePrinter(printers);
   // Return printers added...
-  res.send({ printersRemoved: p, status: 200 });
+  res.send({printersRemoved: p, status: 200});
 });
 
 // Register Handle for Saving printers
@@ -101,9 +101,16 @@ router.post("/updateSettings", ensureAuthenticated, async (req, res) => {
 
   const settings = req.body;
   logger.info("Update printers request: ", settings);
+  console.log(settings);
   const updateSettings = await Runner.updateSettings(settings);
 
-  res.send({ status: updateSettings.status, printer: updateSettings.printer });
+  res.send({status: updateSettings.status, printer: updateSettings.printer});
+});
+router.get("/killPowerSettings/:id", ensureAuthenticated, async (req, res) => {
+  // Check required fields
+  const printerID = req.params.id;
+  const updateSettings = await Runner.killPowerSettings(printerID);
+  res.send({updateSettings});
 });
 router.get("/groups", ensureAuthenticated, async (req, res) => {
   const printers = await Runner.returnFarmPrinters();
@@ -160,7 +167,7 @@ router.post("/moveFile", ensureAuthenticated, async (req, res) => {
   }
   logger.info("Move file request: ", data);
   Runner.moveFile(data.index, data.newPath, data.newFullPath, data.fileName);
-  res.send({ msg: "success" });
+  res.send({msg: "success"});
 });
 router.post("/moveFolder", ensureAuthenticated, async (req, res) => {
   const data = req.body;
@@ -169,27 +176,27 @@ router.post("/moveFolder", ensureAuthenticated, async (req, res) => {
     data.index,
     data.oldFolder,
     data.newFullPath,
-    data.folderName
+    data.folderName,
   );
-  res.send({ msg: "success" });
+  res.send({msg: "success"});
 });
 router.post("/newFolder", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   logger.info("New folder request: ", data);
   Runner.newFolder(data);
-  res.send({ msg: "success" });
+  res.send({msg: "success"});
 });
 router.post("/newFiles", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   logger.info("Adding a new file to server: ", data);
   Runner.newFile(data);
-  res.send({ msg: "success" });
+  res.send({msg: "success"});
 });
 router.post("/selectFilament", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   logger.info("Change filament request: ", data);
   const roll = await Runner.selectedFilament(data);
-  res.send({ msg: roll });
+  res.send({msg: roll});
 });
 router.post("/reScanOcto", ensureAuthenticated, async (req, res) => {
   const data = req.body;
@@ -200,12 +207,12 @@ router.post("/reScanOcto", ensureAuthenticated, async (req, res) => {
       await Runner.reScanOcto(printers[i]._id);
     }
     logger.info("Full re-scan of OctoFarm completed");
-    res.send({ msg: "Started a full farm rescan." });
+    res.send({msg: "Started a full farm rescan."});
   } else {
     logger.info("Rescan OctoPrint Requests: ", data);
     const reScan = await Runner.reScanOcto(data.id);
     logger.info("Rescan OctoPrint complete: ", reScan);
-    res.send({ msg: reScan });
+    res.send({msg: reScan});
   }
 });
 router.post("/wakeHost", ensureAuthenticated, async (req, res) => {

@@ -3,7 +3,7 @@ import OctoPrintClient from "../octoprint.js";
 import Queue from "./clientQueue.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
-import { dragAndDropEnable } from "../functions/dragAndDrop.js";
+import { dragAndDropEnableMultiplePrinters } from "../functions/dragAndDrop.js";
 import FileSorting from "./fileSorting.js";
 import PrinterSelect from "./printerSelect.js";
 
@@ -148,7 +148,7 @@ export default class FileManager {
                 FileManager.createUpload(printerInfo._id, file.name, e.loaded, e.total);
             };
             xhr.onloadend = async function (e) {
-                const spinnerIcon = `<i class="fas fa-spinner fa-pulse"></i> Checking Octoprint for information... <br>`;
+                const spinnerIcon = "<i class=\"fas fa-spinner fa-pulse\"></i> Checking Octoprint for information... <br>";
                 FileManager.createUpload(printerInfo._id, file.name, e.loaded, e.total);
                 setTimeout(() => {
                     FileManager.createUpload(
@@ -443,7 +443,11 @@ export default class FileManager {
     static async refreshFiles(printer, spinnerIcon) {
         for (let i = 0; i < printer.fileList.fileList.length; i++) {
             const file = printer.fileList.fileList[i];
-            let currentFolder = document.getElementById("currentFolder").innerHTML;
+            let currentFolder = document.getElementById("currentFolder")?.innerHTML;
+            if(!currentFolder) {
+                // Null-ref is tolerable
+                continue;
+            }
             if (currentFolder.includes("local/")) {
                 currentFolder = currentFolder.replace("local/", "");
             }
@@ -454,7 +458,7 @@ export default class FileManager {
                         toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
                     });
                     let thumbnail =
-            '<center><i class="fas fa-file-code fa-2x"></i></center>';
+            "<center><i class=\"fas fa-file-code fa-2x\"></i></center>";
                     if (
                         typeof file.thumbnail !== "undefined" &&
             file.thumbnail !== null
@@ -465,7 +469,7 @@ export default class FileManager {
                     const dateString = fileDate.toDateString();
                     const timeString = fileDate.toTimeString().substring(0, 8);
                     fileDate = `${dateString} ${timeString}`;
-                    document.getElementById("fileHistoryRate-"+file.fullPath).innerHTML = spinnerIcon + `<i class="fas fa-thumbs-up"></i> 0 / <i class="fas fa-thumbs-down"></i> 0`;
+                    document.getElementById("fileHistoryRate-"+file.fullPath).innerHTML = spinnerIcon + "<i class=\"fas fa-thumbs-up\"></i> 0 / <i class=\"fas fa-thumbs-down\"></i> 0";
                     document.getElementById(
                         `fileDate-${file.fullPath}`
                     ).innerHTML = ` ${fileDate}`;
@@ -564,7 +568,7 @@ export default class FileManager {
                                 toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
                             });
                             let thumbnail =
-                '<center><i class="fas fa-file-code fa-2x"></i></center>';
+                "<center><i class=\"fas fa-file-code fa-2x\"></i></center>";
                             if (
                                 typeof file.thumbnail !== "undefined" &&
                 file.thumbnail !== null
@@ -600,6 +604,7 @@ export default class FileManager {
                 <div class="row">
                 <div class="col-12">
                 <h5 class="mb-1 name">${file.display}</h5>         
+                <small class="mb-1 name">${file.fullPath}</small>         
                 </div>
                 </div>
                 <div class="row">
@@ -715,7 +720,7 @@ export default class FileManager {
 
     static updateListeners(printer) {
         const fileElem = document.getElementById(`fileList-${printer._id}`);
-        dragAndDropEnable(fileElem, printer);
+        dragAndDropEnableMultiplePrinters(fileElem, printer);
         const folders = document.querySelectorAll(".folderAction");
         folders.forEach((folder) => {
             folder.addEventListener("click", (e) => {
@@ -766,7 +771,7 @@ export default class FileManager {
             document.getElementById("multiPrintersSection").classList.add("hidden");
             document.getElementById("multiFolderSection").classList.remove("hidden");
             document.getElementById("multiUploadFooter").innerHTML =
-        '<button id="multiUpSubmitBtn" type="button" class="btn btn-warning float-right">Next</button>';
+        "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-warning float-right\">Next</button>";
             document
                 .getElementById("multiUpSubmitBtn")
                 .addEventListener("click", (e) => {
@@ -793,7 +798,7 @@ export default class FileManager {
             document.getElementById("multiPrintersSection").classList.add("hidden");
             document.getElementById("multiFolderSection").classList.remove("hidden");
             document.getElementById("multiUploadFooter").innerHTML =
-        '<button id="multiUpSubmitBtn" type="button" class="btn btn-warning float-right">Next</button>';
+        "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-warning float-right\">Next</button>";
             document
                 .getElementById("multiUpSubmitBtn")
                 .addEventListener("click", (e) => {
@@ -830,7 +835,7 @@ export default class FileManager {
             document.getElementById("multiFileSection").classList.remove("hidden");
             document.getElementById("multiFolderSection").classList.add("hidden");
             document.getElementById("multiUploadFooter").innerHTML =
-        '<button id="multiUpSubmitBtn" type="button" class="btn btn-success float-right" data-dismiss="modal">Start!</button>';
+        "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-success float-right\" data-dismiss=\"modal\">Start!</button>";
             document
                 .getElementById("multiUpSubmitBtn")
                 .addEventListener("click", (e) => {
@@ -853,13 +858,13 @@ export default class FileManager {
                         fileBtn.removeAttribute("multiple", "");
                         fileBtn.setAttribute("single", "");
                         fileBtnLabel.innerHTML =
-              '<i class="fas fa-file-import"></i> Upload File';
+              "<i class=\"fas fa-file-import\"></i> Upload File";
                         printAfterUpload = true;
                     } else {
                         fileBtn.setAttribute("multiple", "");
                         fileBtn.removeAttribute("single", "");
                         fileBtnLabel.innerHTML =
-              '<i class="fas fa-file-import"></i> Upload Files';
+              "<i class=\"fas fa-file-import\"></i> Upload Files";
                         printAfterUpload = false;
                     }
                 });
@@ -921,7 +926,7 @@ export default class FileManager {
         document.getElementById("multiFolderSection").classList.add("hidden");
         document.getElementById("multiFileSection").classList.add("hidden");
         document.getElementById("multiUploadFooter").innerHTML =
-      '<button id="multiUpSubmitBtn" type="button" class="btn btn-warning float-right">Next</button>';
+      "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-warning float-right\">Next</button>";
         document
             .getElementById("multiUpSubmitBtn")
             .addEventListener("click", (e) => {
@@ -938,19 +943,18 @@ export class FileActions {
 
         const fileList = document.getElementById(`fileList-${id}`);
         let input = document.getElementById("searchFiles").value.toUpperCase();
-
         input = input.replace(/ /g, "_");
-        if (input.value === "") {
+        if (input === "") {
             // No search term so reset view
-            document.getElementById("currentFolder").value = "local";
-            FileSorting.loadSort(printer, "recursive");
+            document.getElementById("currentFolder").value = "local/";
+            FileSorting.loadSort(printer);
             //FileManager.drawFiles(printer, "Recursive");
         } else {
-            document.getElementById("currentFolder").value = "local";
+            document.getElementById("currentFolder").value = "local/";
             FileSorting.loadSort(printer, "recursive");
             //FileManager.drawFiles(printer, "Recursive");
         }
-        const button = fileList.querySelectorAll('*[id^="file-"]');
+        const button = fileList.querySelectorAll("*[id^=\"file-\"]");
         for (let i = 0; i < button.length; i++) {
             const file = button[i].id.replace("file-", "");
 
@@ -1044,14 +1048,14 @@ export class FileActions {
     static async updateFile(printer, btn, fullPath) {
         const refreshBtn = document.getElementById(btn);
         const btnName = null;
-        refreshBtn.innerHTML = `<i class="fas fa-sync fa-spin"></i> Refreshing...`;
+        refreshBtn.innerHTML = "<i class=\"fas fa-sync fa-spin\"></i> Refreshing...";
         const done = await OctoFarmClient.post("printers/resyncFile", {
             i: printer._id,
             fullPath,
         });
         const how = await done.json();
         FileManager.updateFileList(printer._id);
-        refreshBtn.innerHTML = `<i class="fas fa-sync"></i> Refresh`;
+        refreshBtn.innerHTML = "<i class=\"fas fa-sync\"></i> Refresh";
         const flashReturn = function () {
             refreshBtn.classList = "btn btn-dark";
         };
@@ -1096,14 +1100,14 @@ export class FileActions {
                     if (post.status === 404) {
                         UI.createAlert(
                             "error",
-                            `We could not find the location, does it exist?`,
+                            "We could not find the location, does it exist?",
                             3000,
                             "clicked"
                         );
                     } else if (post.status === 409) {
                         UI.createAlert(
                             "error",
-                            `There was a conflict, file already exists or is in use...`,
+                            "There was a conflict, file already exists or is in use...",
                             3000,
                             "clicked"
                         );
@@ -1117,7 +1121,7 @@ export class FileActions {
                         };
                         UI.createAlert(
                             "warning",
-                            `Moving file... please wait.`,
+                            "Moving file... please wait.",
                             3000,
                             "clicked"
                         );
@@ -1129,7 +1133,7 @@ export class FileActions {
                             FileManager.updateFileList(printer._id);
                             UI.createAlert(
                                 "success",
-                                `Successfully moved your file...`,
+                                "Successfully moved your file...",
                                 3000,
                                 "clicked"
                             ); }, 3000);
@@ -1144,10 +1148,10 @@ export class FileActions {
             message: `Are you sure you want to delete ${fullPath}?`,
             buttons: {
                 cancel: {
-                    label: '<i class="fa fa-times"></i> Cancel',
+                    label: "<i class=\"fa fa-times\"></i> Cancel",
                 },
                 confirm: {
-                    label: '<i class="fa fa-check"></i> Confirm',
+                    label: "<i class=\"fa fa-check\"></i> Confirm",
                 },
             },
             async callback(result) {
@@ -1164,10 +1168,10 @@ export class FileActions {
             message: `Are you sure you want to delete ${fullPath}?`,
             buttons: {
                 cancel: {
-                    label: '<i class="fa fa-times"></i> Cancel',
+                    label: "<i class=\"fa fa-times\"></i> Cancel",
                 },
                 confirm: {
-                    label: '<i class="fa fa-check"></i> Confirm',
+                    label: "<i class=\"fa fa-check\"></i> Confirm",
                 },
             },
             async callback(result) {
@@ -1220,14 +1224,14 @@ export class FileActions {
                     if (post.status === 404) {
                         UI.createAlert(
                             "error",
-                            `We could not find the location, does it exist?`,
+                            "We could not find the location, does it exist?",
                             3000,
                             "clicked"
                         );
                     } else if (post.status === 409) {
                         UI.createAlert(
                             "error",
-                            `There was a conflict, file already exists or is in use...`,
+                            "There was a conflict, file already exists or is in use...",
                             3000,
                             "clicked"
                         );
@@ -1241,7 +1245,7 @@ export class FileActions {
                         };
                         UI.createAlert(
                             "warning",
-                            `Moving folder please wait...`,
+                            "Moving folder please wait...",
                             3000,
                             "clicked"
                         );
@@ -1253,7 +1257,7 @@ export class FileActions {
                             FileManager.updateFileList(printer._id);
                             UI.createAlert(
                                 "success",
-                                `Successfully moved your file...`,
+                                "Successfully moved your file...",
                                 3000,
                                 "clicked"
                             ); }, 3000);

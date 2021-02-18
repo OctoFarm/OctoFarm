@@ -10,7 +10,7 @@ let controlDropDown = false;
 let currentPrinter = null;
 
 // Close modal event listeners...
-$("#PrinterSettingsModal").on("hidden.bs.modal", function (e) {
+$("#PrinterSettingsModal").on("hidden.bs.modal", function () {
   // Fix for mjpeg stream not ending when element removed...
   document.getElementById("printerControlCamera").src = "";
   if (document.getElementById("printerSelection")) {
@@ -18,7 +18,7 @@ $("#PrinterSettingsModal").on("hidden.bs.modal", function (e) {
     controlDropDown = false;
   }
 });
-$("#connectionModal").on("hidden.bs.modal", function (e) {
+$("#connectionModal").on("hidden.bs.modal", function () {
   if (document.getElementById("connectionAction")) {
     document.getElementById("connectionAction").remove();
   }
@@ -26,183 +26,191 @@ $("#connectionModal").on("hidden.bs.modal", function (e) {
 
 export default class PrinterSettings {
   static async init(index, printers, printerControlList) {
-    if (index !== "") {
-      UI.clearSelect("ps");
-      const printerProfileBtn = document.getElementById("printer-profile-btn");
-      const printerGcodeBtn = document.getElementById("printer-gcode-btn");
-      const printerOtherSettings = document.getElementById(
-        "printer-settings-btn"
-      );
-      currentIndex = index;
-      const id = _.findIndex(printers, function (o) {
-        return o._id == index;
-      });
-      currentPrinter = printers[id];
+    try {
+      if (index !== "") {
+        UI.clearSelect("ps");
+        const printerProfileBtn = document.getElementById(
+          "printer-profile-btn"
+        );
+        const printerGcodeBtn = document.getElementById("printer-gcode-btn");
+        const printerOtherSettings = document.getElementById(
+          "printer-settings-btn"
+        );
+        currentIndex = index;
+        const id = _.findIndex(printers, function (o) {
+          return o._id === index;
+        });
+        currentPrinter = printers[id];
 
-      // Load the printer dropdown
-      if (!controlDropDown) {
-        const printerDrop = document.getElementById("printerSettingsSelection");
-        printerDrop.innerHTML = "";
-        printerControlList.forEach((list) => {
-          if (list.state.category !== "Offline") {
-            printerDrop.insertAdjacentHTML(
-              "beforeend",
-              `
+        // Load the printer dropdown
+        if (!controlDropDown) {
+          const printerDrop = document.getElementById(
+            "printerSettingsSelection"
+          );
+          printerDrop.innerHTML = "";
+          printerControlList.forEach((list) => {
+            if (list.state.category !== "Offline") {
+              printerDrop.insertAdjacentHTML(
+                "beforeend",
+                `
                   <option value="${list.printerID}" selected>${list.printerName}</option>
               `
+              );
+            }
+          });
+          printerDrop.value = currentPrinter._id;
+          printerDrop.addEventListener("change", (event) => {
+            if (document.getElementById("printerControls")) {
+              document.getElementById("printerControls").innerHTML = "";
+            }
+            document.getElementById("pmStatus").innerHTML =
+              "<i class=\"fas fa-spinner fa-spin\"></i>";
+            document.getElementById("pmStatus").className =
+              "btn btn-secondary mb-2";
+            //Load Connection Panel
+            document.getElementById("printerPortDrop").innerHTML = "";
+            document.getElementById("printerBaudDrop").innerHTML = "";
+            document.getElementById("printerProfileDrop").innerHTML = "";
+            document.getElementById("printerConnect").innerHTML = "";
+            PrinterSettings.init(
+              event.target.value,
+              printers,
+              printerControlList
             );
+          });
+          controlDropDown = true;
+        }
+
+        let offline = false;
+        if (currentPrinter.printerState.colour.category === "Offline") {
+          offline = true;
+          printerProfileBtn.disabled = true;
+          printerGcodeBtn.disabled = true;
+          printerOtherSettings.disabled = true;
+          if (!printerProfileBtn.classList.contains("notyet")) {
+            printerProfileBtn.classList.add("notyet");
           }
-        });
-        printerDrop.value = currentPrinter._id;
-        printerDrop.addEventListener("change", (event) => {
-          if (document.getElementById("printerControls")) {
-            document.getElementById("printerControls").innerHTML = "";
+          if (!printerGcodeBtn.classList.contains("notyet")) {
+            printerGcodeBtn.classList.add("notyet");
           }
-          document.getElementById("pmStatus").innerHTML =
-            '<i class="fas fa-spinner fa-spin"></i>';
-          document.getElementById(
-            "pmStatus"
-          ).className = `btn btn-secondary mb-2`;
-          //Load Connection Panel
-          document.getElementById("printerPortDrop").innerHTML = "";
-          document.getElementById("printerBaudDrop").innerHTML = "";
-          document.getElementById("printerProfileDrop").innerHTML = "";
-          document.getElementById("printerConnect").innerHTML = "";
-          PrinterSettings.init(
-            event.target.value,
-            printers,
-            printerControlList
-          );
-        });
-        controlDropDown = true;
-      }
+          if (!printerOtherSettings.classList.contains("notyet")) {
+            printerOtherSettings.classList.add("notyet");
+          }
+        } else {
+          printerProfileBtn.disabled = false;
+          printerGcodeBtn.disabled = false;
+          printerOtherSettings.disabled = false;
+          if (printerProfileBtn.classList.contains("notyet")) {
+            printerProfileBtn.classList.remove("notyet");
+          }
+          if (printerGcodeBtn.classList.contains("notyet")) {
+            printerGcodeBtn.classList.remove("notyet");
+          }
+          if (printerOtherSettings.classList.contains("notyet")) {
+            printerOtherSettings.classList.remove("notyet");
+          }
+        }
 
-      let offline = false;
-      if (currentPrinter.printerState.colour.category === "Offline") {
-        offline = true;
-        printerProfileBtn.disabled = true;
-        printerGcodeBtn.disabled = true;
-        printerOtherSettings.disabled = true;
-        if (!printerProfileBtn.classList.contains("notyet")) {
-          printerProfileBtn.classList.add("notyet");
-        }
-        if (!printerGcodeBtn.classList.contains("notyet")) {
-          printerGcodeBtn.classList.add("notyet");
-        }
-        if (!printerOtherSettings.classList.contains("notyet")) {
-          printerOtherSettings.classList.add("notyet");
-        }
-      } else {
-        printerProfileBtn.disabled = false;
-        printerGcodeBtn.disabled = false;
-        printerOtherSettings.disabled = false;
-        if (printerProfileBtn.classList.contains("notyet")) {
-          printerProfileBtn.classList.remove("notyet");
-        }
-        if (printerGcodeBtn.classList.contains("notyet")) {
-          printerGcodeBtn.classList.remove("notyet");
-        }
-        if (printerOtherSettings.classList.contains("notyet")) {
-          printerOtherSettings.classList.remove("notyet");
-        }
-      }
+        const printerDefaultPort = document.getElementById("psDefaultPortDrop");
+        const printerDefaultBaud = document.getElementById("psDefaultBaudDrop");
+        const printerDefaultProfile = document.getElementById(
+          "psDefaultProfileDrop"
+        );
 
-      const printerDefaultPort = document.getElementById("psDefaultPortDrop");
-      const printerDefaultBaud = document.getElementById("psDefaultBaudDrop");
-      const printerDefaultProfile = document.getElementById(
-        "psDefaultProfileDrop"
-      );
-
-      printerDefaultPort.innerHTML = `
+        printerDefaultPort.innerHTML = `
         <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultSerialPort"">Preferred Port:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultSerialPort"></select></div>
         `;
-      printerDefaultBaud.innerHTML = `
+        printerDefaultBaud.innerHTML = `
         <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultBaudrate">Preferred Baudrate:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultBaudrate"></select></div>
         `;
-      printerDefaultProfile.innerHTML = `
+        printerDefaultProfile.innerHTML = `
         <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultProfile">Preferred Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultProfile"></select></div>
         `;
-      document.getElementById("psOctoPrintUser").placeholder =
-        currentPrinter.currentUser;
-      document.getElementById("psPrinterName").placeholder =
-        currentPrinter.printerName;
-      document.getElementById("psPrinterURL").placeholder =
-        currentPrinter.printerURL;
-      document.getElementById("psCamURL").placeholder =
-        currentPrinter.cameraURL;
-      document.getElementById("psAPIKEY").placeholder = currentPrinter.apikey;
+        document.getElementById("psOctoPrintUser").placeholder =
+          currentPrinter.currentUser;
+        document.getElementById("psPrinterName").placeholder =
+          currentPrinter.printerName;
+        document.getElementById("psPrinterURL").placeholder =
+          currentPrinter.printerURL;
+        document.getElementById("psCamURL").placeholder =
+          currentPrinter.cameraURL;
+        document.getElementById("psAPIKEY").placeholder = currentPrinter.apikey;
 
-      if (!offline) {
-        currentPrinter.connectionOptions.baudrates.forEach((baud) => {
-          document
-            .getElementById("psDefaultBaudrate")
-            .insertAdjacentHTML(
-              "beforeend",
-              `<option value="${baud}">${baud}</option>`
-            );
-        });
-        if (currentPrinter.connectionOptions.baudratePreference === null) {
-          document
-            .getElementById("psDefaultBaudrate")
-            .insertAdjacentHTML(
-              "afterbegin",
-              '<option value="0">No Preference</option>'
-            );
-        }
-        currentPrinter.connectionOptions.ports.forEach((port) => {
-          document
-            .getElementById("psDefaultSerialPort")
-            .insertAdjacentHTML(
-              "beforeend",
-              `<option value="${port}">${port}</option>`
-            );
-        });
-        if (currentPrinter.connectionOptions.portPreference === null) {
-          document
-            .getElementById("psDefaultSerialPort")
-            .insertAdjacentHTML(
-              "afterbegin",
-              '<option value="0">No Preference</option>'
-            );
-        }
-        currentPrinter.connectionOptions.printerProfiles.forEach((profile) => {
-          document
-            .getElementById("psDefaultProfile")
-            .insertAdjacentHTML(
-              "beforeend",
-              `<option value="${profile.id}">${profile.name}</option>`
-            );
-        });
-        if (
-          currentPrinter.connectionOptions.printerProfilePreference === null
-        ) {
-          document
-            .getElementById("psDefaultProfile")
-            .insertAdjacentHTML(
-              "afterbegin",
-              '<option value="0">No Preference</option>'
-            );
-        }
-        if (currentPrinter.connectionOptions.baudratePreference != null) {
-          document.getElementById("psDefaultBaudrate").value =
-            currentPrinter.connectionOptions.baudratePreference;
-        } else {
-          document.getElementById("psDefaultBaudrate").value = 0;
-        }
-        if (currentPrinter.connectionOptions.portPreference != null) {
-          document.getElementById("psDefaultSerialPort").value =
-            currentPrinter.connectionOptions.portPreference;
-        } else {
-          document.getElementById("psDefaultSerialPort").value = 0;
-        }
-        if (currentPrinter.connectionOptions.printerProfilePreference != null) {
-          document.getElementById("psDefaultProfile").value =
-            currentPrinter.connectionOptions.printerProfilePreference;
-        } else {
-          document.getElementById("psDefaultProfile").value = 0;
-        }
+        if (!offline) {
+          currentPrinter.connectionOptions.baudrates.forEach((baud) => {
+            document
+              .getElementById("psDefaultBaudrate")
+              .insertAdjacentHTML(
+                "beforeend",
+                `<option value="${baud}">${baud}</option>`
+              );
+          });
+          if (currentPrinter.connectionOptions.baudratePreference === null) {
+            document
+              .getElementById("psDefaultBaudrate")
+              .insertAdjacentHTML(
+                "afterbegin",
+                "<option value=\"0\">No Preference</option>"
+              );
+          }
+          currentPrinter.connectionOptions.ports.forEach((port) => {
+            document
+              .getElementById("psDefaultSerialPort")
+              .insertAdjacentHTML(
+                "beforeend",
+                `<option value="${port}">${port}</option>`
+              );
+          });
+          if (currentPrinter.connectionOptions.portPreference === null) {
+            document
+              .getElementById("psDefaultSerialPort")
+              .insertAdjacentHTML(
+                "afterbegin",
+                "<option value=\"0\">No Preference</option>"
+              );
+          }
+          currentPrinter.connectionOptions.printerProfiles.forEach(
+            (profile) => {
+              document
+                .getElementById("psDefaultProfile")
+                .insertAdjacentHTML(
+                  "beforeend",
+                  `<option value="${profile.id}">${profile.name}</option>`
+                );
+            }
+          );
+          if (
+            currentPrinter.connectionOptions.printerProfilePreference === null
+          ) {
+            document
+              .getElementById("psDefaultProfile")
+              .insertAdjacentHTML(
+                "afterbegin",
+                "<option value=\"0\">No Preference</option>"
+              );
+          }
+          if (currentPrinter.connectionOptions.baudratePreference != null) {
+            document.getElementById("psDefaultBaudrate").value =
+              currentPrinter.connectionOptions.baudratePreference;
+          } else {
+            document.getElementById("psDefaultBaudrate").value = 0;
+          }
+          if (currentPrinter.connectionOptions.portPreference != null) {
+            document.getElementById("psDefaultSerialPort").value =
+              currentPrinter.connectionOptions.portPreference;
+          } else {
+            document.getElementById("psDefaultSerialPort").value = 0;
+          }
+          if (
+            currentPrinter.connectionOptions.printerProfilePreference != null
+          ) {
+            document.getElementById("psDefaultProfile").value =
+              currentPrinter.connectionOptions.printerProfilePreference;
+          } else {
+            document.getElementById("psDefaultProfile").value = 0;
+          }
 
-        document.getElementById("psPrinterProfiles").innerHTML = `
+          document.getElementById("psPrinterProfiles").innerHTML = `
             <div class="col-12 col-lg-4">
             <h5 class="mb-1"><u>Printer</u></h5>
             <div class="input-group mb-3">
@@ -355,80 +363,86 @@ export default class PrinterSettings {
             </div>
             </div>
         `;
-        document.getElementById("extruderFormFactor").value =
-          currentPrinter.currentProfile.volume.formFactor;
-        document.getElementById("psEInverted").checked =
-          currentPrinter.currentProfile.axes.e.inverted;
-        document.getElementById("psXInverted").checked =
-          currentPrinter.currentProfile.axes.x.inverted;
-        document.getElementById("psYInverted").checked =
-          currentPrinter.currentProfile.axes.y.inverted;
-        document.getElementById("psZInverted").checked =
-          currentPrinter.currentProfile.axes.z.inverted;
-        document.getElementById("psSharedNozzle").checked =
-          currentPrinter.currentProfile.extruder.sharedNozzle;
-        document.getElementById("psHeatedBed").checked =
-          currentPrinter.currentProfile.heatedBed;
-        document.getElementById("psHeatedChamber").checked =
-          currentPrinter.currentProfile.heatedChamber;
+          document.getElementById("extruderFormFactor").value =
+            currentPrinter.currentProfile.volume.formFactor;
+          document.getElementById("psEInverted").checked =
+            currentPrinter.currentProfile.axes.e.inverted;
+          document.getElementById("psXInverted").checked =
+            currentPrinter.currentProfile.axes.x.inverted;
+          document.getElementById("psYInverted").checked =
+            currentPrinter.currentProfile.axes.y.inverted;
+          document.getElementById("psZInverted").checked =
+            currentPrinter.currentProfile.axes.z.inverted;
+          document.getElementById("psSharedNozzle").checked =
+            currentPrinter.currentProfile.extruder.sharedNozzle;
+          document.getElementById("psHeatedBed").checked =
+            currentPrinter.currentProfile.heatedBed;
+          document.getElementById("psHeatedChamber").checked =
+            currentPrinter.currentProfile.heatedChamber;
 
-        let afterPrintCancelled = "";
-        if (
-          typeof currentPrinter.gcodeScripts.afterPrintCancelled !== "undefined"
-        ) {
-          afterPrintCancelled = currentPrinter.gcodeScripts.afterPrintCancelled;
-        }
-        let afterPrintDone = "";
-        if (typeof currentPrinter.gcodeScripts.afterPrintDone !== "undefined") {
-          afterPrintDone = currentPrinter.gcodeScripts.afterPrintDone;
-        }
-        let afterPrintPaused = "";
-        if (
-          typeof currentPrinter.gcodeScripts.afterPrintPaused !== "undefined"
-        ) {
-          afterPrintPaused = currentPrinter.gcodeScripts.afterPrintPaused;
-        }
-        let afterPrinterConnected = "";
-        if (
-          typeof currentPrinter.gcodeScripts.afterPrinterConnected !==
-          "undefined"
-        ) {
-          afterPrinterConnected =
-            currentPrinter.gcodeScripts.afterPrinterConnected;
-        }
-        let beforePrintResumed = "";
-        if (
-          typeof currentPrinter.gcodeScripts.beforePrintResumed !== "undefined"
-        ) {
-          beforePrintResumed = currentPrinter.gcodeScripts.beforePrintResumed;
-        }
-        let afterToolChange = "";
-        if (
-          typeof currentPrinter.gcodeScripts.afterToolChange !== "undefined"
-        ) {
-          afterToolChange = currentPrinter.gcodeScripts.afterToolChange;
-        }
-        let beforePrintStarted = "";
-        if (
-          typeof currentPrinter.gcodeScripts.beforePrintStarted !== "undefined"
-        ) {
-          beforePrintStarted = currentPrinter.gcodeScripts.beforePrintStarted;
-        }
-        let beforePrinterDisconnected = "";
-        if (
-          typeof currentPrinter.gcodeScripts.beforePrinterDisconnected !==
-          "undefined"
-        ) {
-          beforePrinterDisconnected =
-            currentPrinter.gcodeScripts.beforePrinterDisconnected;
-        }
-        let beforeToolChange = "";
-        if (
-          typeof currentPrinter.gcodeScripts.beforeToolChange !== "undefined"
-        ) {
-          beforeToolChange = currentPrinter.gcodeScripts.beforeToolChange;
-        }
-        document.getElementById("psGcodeManagerGcode").innerHTML = `
+          let afterPrintCancelled = "";
+          if (
+            typeof currentPrinter.gcodeScripts.afterPrintCancelled !==
+            "undefined"
+          ) {
+            afterPrintCancelled =
+              currentPrinter.gcodeScripts.afterPrintCancelled;
+          }
+          let afterPrintDone = "";
+          if (
+            typeof currentPrinter.gcodeScripts.afterPrintDone !== "undefined"
+          ) {
+            afterPrintDone = currentPrinter.gcodeScripts.afterPrintDone;
+          }
+          let afterPrintPaused = "";
+          if (
+            typeof currentPrinter.gcodeScripts.afterPrintPaused !== "undefined"
+          ) {
+            afterPrintPaused = currentPrinter.gcodeScripts.afterPrintPaused;
+          }
+          let afterPrinterConnected = "";
+          if (
+            typeof currentPrinter.gcodeScripts.afterPrinterConnected !==
+            "undefined"
+          ) {
+            afterPrinterConnected =
+              currentPrinter.gcodeScripts.afterPrinterConnected;
+          }
+          let beforePrintResumed = "";
+          if (
+            typeof currentPrinter.gcodeScripts.beforePrintResumed !==
+            "undefined"
+          ) {
+            beforePrintResumed = currentPrinter.gcodeScripts.beforePrintResumed;
+          }
+          let afterToolChange = "";
+          if (
+            typeof currentPrinter.gcodeScripts.afterToolChange !== "undefined"
+          ) {
+            afterToolChange = currentPrinter.gcodeScripts.afterToolChange;
+          }
+          let beforePrintStarted = "";
+          if (
+            typeof currentPrinter.gcodeScripts.beforePrintStarted !==
+            "undefined"
+          ) {
+            beforePrintStarted = currentPrinter.gcodeScripts.beforePrintStarted;
+          }
+          let beforePrinterDisconnected = "";
+          if (
+            typeof currentPrinter.gcodeScripts.beforePrinterDisconnected !==
+            "undefined"
+          ) {
+            beforePrinterDisconnected =
+              currentPrinter.gcodeScripts.beforePrinterDisconnected;
+          }
+          let beforeToolChange = "";
+          if (
+            typeof currentPrinter.gcodeScripts.beforeToolChange !== "undefined"
+          ) {
+            beforeToolChange = currentPrinter.gcodeScripts.beforeToolChange;
+          }
+          document.getElementById("psGcodeManagerGcode").innerHTML = `
               <div class="form-group">
               <label for="psSettingsAfterPrinterCancelled">After Printing Cancelled</label>
               <textarea class="form-control bg-dark text-white" id="psSettingsAfterPrinterCancelled" rows="2" placeholder="${afterPrintCancelled}"></textarea>
@@ -475,7 +489,7 @@ export default class PrinterSettings {
                <small>Anything you put here will be executed before any tool change commands <code>Tn</code>.</small>
               </div>
         `;
-        document.getElementById("cameraRotation").innerHTML = `
+          document.getElementById("cameraRotation").innerHTML = `
         <form class="was-validated">
         <div class="custom-control custom-checkbox mb-3">
             <input type="checkbox" class="custom-control-input" id="camEnabled" required>
@@ -508,81 +522,85 @@ export default class PrinterSettings {
         </form>
       `;
 
-        document.getElementById("camEnabled").checked =
-          currentPrinter.otherSettings.webCamSettings.webcamEnabled;
-        document.getElementById("camTimelapse").checked =
-          currentPrinter.otherSettings.webCamSettings.timelapseEnabled;
-        document.getElementById("camRot90").checked =
-          currentPrinter.otherSettings.webCamSettings.rotate90;
-        document.getElementById("camFlipH").checked =
-          currentPrinter.otherSettings.webCamSettings.flipH;
-        document.getElementById("camFlipV").checked =
-          currentPrinter.otherSettings.webCamSettings.flipV;
-      } else {
-        document.getElementById("offlineMessage").innerHTML =
-          "<code>NOTE! Your printer is currently offline, any settings requiring an OctoPrint connection have been disabled... Please turn on your OctoPrint instance to re-enabled these.</code>";
-        document.getElementById("psDefaultSerialPort").disabled = true;
-        document.getElementById("psDefaultBaudrate").disabled = true;
-        document.getElementById("psDefaultProfile").disabled = true;
-      }
-      let serverRestart = "N/A";
-      let systemRestart = "N/A";
-      let systemShutdown = "N/A";
-      if (currentPrinter.otherSettings !== null) {
-        if (
-          currentPrinter.otherSettings.system.commands.serverRestartCommand ===
-          ""
-        ) {
-          serverRestart = "N/A";
+          document.getElementById("camEnabled").checked =
+            currentPrinter.otherSettings.webCamSettings.webcamEnabled;
+          document.getElementById("camTimelapse").checked =
+            currentPrinter.otherSettings.webCamSettings.timelapseEnabled;
+          document.getElementById("camRot90").checked =
+            currentPrinter.otherSettings.webCamSettings.rotate90;
+          document.getElementById("camFlipH").checked =
+            currentPrinter.otherSettings.webCamSettings.flipH;
+          document.getElementById("camFlipV").checked =
+            currentPrinter.otherSettings.webCamSettings.flipV;
         } else {
-          serverRestart =
-            currentPrinter.otherSettings.system.commands.serverRestartCommand;
+          document.getElementById("offlineMessage").innerHTML =
+            "<code>NOTE! Your printer is currently offline, any settings requiring an OctoPrint connection have been disabled... Please turn on your OctoPrint instance to re-enabled these.</code>";
+          document.getElementById("psDefaultSerialPort").disabled = true;
+          document.getElementById("psDefaultBaudrate").disabled = true;
+          document.getElementById("psDefaultProfile").disabled = true;
         }
-        if (
-          currentPrinter.otherSettings.system.commands.systemRestartCommand ===
-          ""
-        ) {
-          systemRestart = "N/A";
-        } else {
-          systemRestart =
-            currentPrinter.otherSettings.system.commands.systemRestartCommand;
+        let serverRestart = "N/A";
+        let systemRestart = "N/A";
+        let systemShutdown = "N/A";
+        if (currentPrinter.otherSettings !== null) {
+          if (
+            currentPrinter.otherSettings.system.commands
+              .serverRestartCommand === ""
+          ) {
+            serverRestart = "N/A";
+          } else {
+            serverRestart =
+              currentPrinter.otherSettings.system.commands.serverRestartCommand;
+          }
+          if (
+            currentPrinter.otherSettings.system.commands
+              .systemRestartCommand === ""
+          ) {
+            systemRestart = "N/A";
+          } else {
+            systemRestart =
+              currentPrinter.otherSettings.system.commands.systemRestartCommand;
+          }
+          if (
+            currentPrinter.otherSettings.system.commands
+              .systemShutdownCommand === ""
+          ) {
+            systemShutdown = "N/A";
+          } else {
+            systemShutdown =
+              currentPrinter.otherSettings.system.commands
+                .systemShutdownCommand;
+          }
         }
-        if (
-          currentPrinter.otherSettings.system.commands.systemShutdownCommand ===
-          ""
-        ) {
-          systemShutdown = "N/A";
-        } else {
-          systemShutdown =
-            currentPrinter.otherSettings.system.commands.systemShutdownCommand;
-        }
-      }
 
-      document.getElementById("printerSettingsFooter").innerHTML = "";
-      document.getElementById("printerSettingsFooter").insertAdjacentHTML(
-        "beforeend",
-        `
+        document.getElementById("printerSettingsFooter").innerHTML = "";
+        document.getElementById("printerSettingsFooter").insertAdjacentHTML(
+          "beforeend",
+          `
                            <button type="button" class="btn btn-success btn-block" id="savePrinterSettings">Save</button>
         `
-      );
-      let wolEnable = false;
-      let wolIP = "255.255.255.255";
-      let wolPort = "9";
-      let wolInterval = "100";
-      let wolCount = "3";
-      let wolMAC = "";
-      if (
-        currentPrinter.powerSettings !== null || _.isEmpty(currentPrinter.powerSettings) &&
-        typeof currentPrinter.powerSettings.wol !== "undefined"
-      ) {
-        wolEnable = currentPrinter.powerSettings.wol.enabled;
-        wolIP = currentPrinter.powerSettings.wol.ip;
-        wolPort = currentPrinter.powerSettings.wol.port;
-        wolInterval = currentPrinter.powerSettings.wol.interval;
-        wolCount = currentPrinter.powerSettings.wol.count;
-        wolMAC = currentPrinter.powerSettings.wol.MAC;
-      }
-      document.getElementById("psPowerCommands").innerHTML = `
+        );
+        let wolEnable = false;
+        let wolIP = "255.255.255.255";
+        let wolPort = "9";
+        let wolInterval = "100";
+        let wolCount = "3";
+        let wolMAC = "";
+        console.log(currentPrinter);
+        if (
+          currentPrinter.powerSettings !== null ||
+          (_.isEmpty(currentPrinter.powerSettings) &&
+            typeof currentPrinter.powerSettings.wol !== "undefined")
+        ) {
+          wolEnable = currentPrinter.powerSettings.wol.enabled;
+          wolIP = currentPrinter.powerSettings.wol.ip;
+          wolPort = currentPrinter.powerSettings.wol.port;
+          wolInterval = currentPrinter.powerSettings.wol.interval;
+          wolCount = currentPrinter.powerSettings.wol.packets;
+          wolMAC = currentPrinter.powerSettings.wol.MAC;
+        }
+
+        document.getElementById("psPowerCommands").innerHTML = `
         <h5><u>OctoPrint Specific Power Commands</u></h5>
         <form>
           <div class="form-group">
@@ -618,7 +636,7 @@ export default class PrinterSettings {
         </form>
          <div class="form-row">
             <div class="col-2">
-              <input id="psWolMAC"  type="text" class="form-control" placeholder=${wolMAC}"" value="">
+              <input id="psWolMAC" type="text" class="form-control" placeholder="${wolMAC}">
                <small class="form-text text-muted">
                     MAC Address to target wake packet sending
                </small>
@@ -651,9 +669,10 @@ export default class PrinterSettings {
           <hr>
           <h5><u>Custom Power Commands</u></h5>
           <p class="mb-0">Setup a custom POST request to an API endpoint, instructions for such will be in your plugin/device instructions. Setting this up will activate the power button toggle on all Views and allow Power On and Power Off selections in the dropdown.</p>
-           <p class="mb-0">If you'd like to enter in a full URL command then leave the command blank and it will skip the requirement and just make a POST to the URL provided similar to CURL. You can use the following placeholders:</p>
+           <p class="mb-0">If you'd like to enter in a full URL command then leave the command blank and it will skip the requirement and just make a POST to the URL provided similar to CURL. <br>You can use the following placeholders:</p>
           <p class="mb-0">Printer URL: <code>[PrinterURL]</code></p>
-          <p class="mb-0">Printer api-key: <code>[PrinterAPI]</code></p
+          <p class="mb-0">Printer API-KEY: <code>[PrinterAPI]</code></p>
+          <button id="resetPowerFields" title="The dev coded himself into a corner here... Use this button to reset the below commands to blank." type="button" class="btn btn-danger mb-2">Reset Fields</button>
           <h6>Power On</h6>
            <div class="form-row">
               <div class="col-4">
@@ -688,7 +707,7 @@ export default class PrinterSettings {
             <div class="form-row">
               <div class="col-4">
                 <input id="psPowerToggleCommand"  type="text" class="form-control" placeholder="Command">
-                 <small vclass="form-text text-muted">
+                 <small class="form-text text-muted">
                    This is usually an json object supplied in the following format <code>{"command":"toggle"}</code>
                  </small>
               </div>
@@ -717,37 +736,45 @@ export default class PrinterSettings {
             </div>
         </form>
         `;
-      document.getElementById("psWolEnable").checked = wolEnable;
-      if (serverRestart != "N/A") {
-        document.getElementById("psServerRestart").placeholder = serverRestart;
-      }
-      if (systemRestart != "N/A") {
-        document.getElementById("psSystemRestart").placeholder = systemRestart;
-      }
-      if (systemShutdown != "N/A") {
-        document.getElementById(
-          "psSystemShutdown"
-        ).placeholder = systemShutdown;
-      }
-      if (!currentPrinter.powerSettings != null && !_.isEmpty(currentPrinter.powerSettings) ) {
-        document.getElementById("psPowerOnCommand").placeholder =
-          currentPrinter.powerSettings.powerOnCommand;
-        document.getElementById("psPowerOnURL").placeholder =
-          currentPrinter.powerSettings.powerOnURL;
-        document.getElementById("psPowerOffCommand").placeholder =
-          currentPrinter.powerSettings.powerOffCommand;
-        document.getElementById("psPowerOffURL").placeholder =
-          currentPrinter.powerSettings.powerOffURL;
-        document.getElementById("psPowerToggleCommand").placeholder =
-          currentPrinter.powerSettings.powerToggleCommand;
-        document.getElementById("psPowerToggleURL").placeholder =
-          currentPrinter.powerSettings.powerToggleURL;
-        document.getElementById("psPowerStateCommand").placeholder =
-          currentPrinter.powerSettings.powerStatusCommand;
-        document.getElementById("psPowerStateURL").placeholder =
-          currentPrinter.powerSettings.powerStatusURL;
-      }
-      document.getElementById("tempTriggers").innerHTML = `
+
+        document.getElementById("psWolEnable").checked = wolEnable;
+        if (serverRestart !== "N/A") {
+          document.getElementById(
+            "psServerRestart"
+          ).placeholder = serverRestart;
+        }
+        if (systemRestart !== "N/A") {
+          document.getElementById(
+            "psSystemRestart"
+          ).placeholder = systemRestart;
+        }
+        if (systemShutdown !== "N/A") {
+          document.getElementById(
+            "psSystemShutdown"
+          ).placeholder = systemShutdown;
+        }
+        if (
+          currentPrinter.powerSettings !== null &&
+          !_.isEmpty(currentPrinter.powerSettings)
+        ) {
+          document.getElementById("psPowerOnCommand").placeholder =
+            currentPrinter.powerSettings.powerOnCommand;
+          document.getElementById("psPowerOnURL").placeholder =
+            currentPrinter.powerSettings.powerOnURL;
+          document.getElementById("psPowerOffCommand").placeholder =
+            currentPrinter.powerSettings.powerOffCommand;
+          document.getElementById("psPowerOffURL").placeholder =
+            currentPrinter.powerSettings.powerOffURL;
+          document.getElementById("psPowerToggleCommand").placeholder =
+            currentPrinter.powerSettings.powerToggleCommand;
+          document.getElementById("psPowerToggleURL").placeholder =
+            currentPrinter.powerSettings.powerToggleURL;
+          document.getElementById("psPowerStateCommand").placeholder =
+            currentPrinter.powerSettings.powerStatusCommand;
+          document.getElementById("psPowerStateURL").placeholder =
+            currentPrinter.powerSettings.powerStatusURL;
+        }
+        document.getElementById("tempTriggers").innerHTML = `
            <div class="form-group">
               <label for="headtingVariation">Heating Variation</label>
               <input type="number" class="form-control" id="psHeadtingVariation" placeholder="${currentPrinter.otherSettings.temperatureTriggers.heatingVariation}" step="0.01">
@@ -763,7 +790,7 @@ export default class PrinterSettings {
               </small>
             </div>
         `;
-      document.getElementById("psPrinterCost").innerHTML = `
+        document.getElementById("psPrinterCost").innerHTML = `
             <div class="col-6">
                    <h5>Operating Costs</h5>
                    <div class="form-group">
@@ -832,30 +859,30 @@ export default class PrinterSettings {
                     </div>                                        
             </div>
         `;
-      let scripts = await OctoFarmClient.get("scripts/get");
-      scripts = await scripts.json();
-      const printerScripts = [];
-      scripts.alerts.forEach((script) => {
-        if (
-          script.printer === currentPrinter._id ||
-          script.printer.length === 0
-        ) {
-          printerScripts.push({
-            _id: script._id,
-            active: script.active,
-            message: script.message,
-            scriptLocation: script.scriptLocation,
-            trigger: script.trigger,
-          });
-        }
-      });
+        let scripts = await OctoFarmClient.get("scripts/get");
+        scripts = await scripts.json();
+        const printerScripts = [];
+        scripts.alerts.forEach((script) => {
+          if (
+            script.printer === currentPrinter._id ||
+            script.printer.length === 0
+          ) {
+            printerScripts.push({
+              _id: script._id,
+              active: script.active,
+              message: script.message,
+              scriptLocation: script.scriptLocation,
+              trigger: script.trigger,
+            });
+          }
+        });
 
-      const alertsTable = document.getElementById("printerAltersTableBody");
-      alertsTable.innerHTML = "";
-      printerScripts.forEach(async (script) => {
-        alertsTable.insertAdjacentHTML(
-          "beforeend",
-          `
+        const alertsTable = document.getElementById("printerAltersTableBody");
+        alertsTable.innerHTML = "";
+        printerScripts.forEach(async (script) => {
+          alertsTable.insertAdjacentHTML(
+            "beforeend",
+            `
               <tr>
                 <td>
                 <form class="was-validated">
@@ -876,262 +903,319 @@ export default class PrinterSettings {
               </tr>
           
           `
-        );
-        document.getElementById(`activePrinter-${script._id}`).checked =
-          script.active;
-        const triggerSelect = document.getElementById(
-          `triggerPrinter-${script._id}`
-        );
-        triggerSelect.innerHTML = await Script.alertsDrop();
-        triggerSelect.value = script.trigger;
-      });
-
-      document.getElementById("psPowerConsumption").placeholder = parseFloat(
-        currentPrinter.costSettings.powerConsumption
-      );
-      document.getElementById("psElectricityCosts").placeholder = parseFloat(
-        currentPrinter.costSettings.electricityCosts
-      );
-      document.getElementById("psPurchasePrice").placeholder = parseFloat(
-        currentPrinter.costSettings.purchasePrice
-      );
-      document.getElementById("psEstimatedLifespan").placeholder = parseFloat(
-        currentPrinter.costSettings.estimateLifespan
-      );
-      document.getElementById("psMaintenanceCosts").placeholder = parseFloat(
-        currentPrinter.costSettings.maintenanceCosts
-      );
-
-      document
-        .getElementById("savePrinterSettings")
-        .addEventListener("click", async (event) => {
-          const newValues = {
-            state: currentPrinter.printerState.colour.category,
-            printer: {
-              printerName: document.getElementById("psPrinterName").value,
-              printerURL: document.getElementById("psPrinterURL").value,
-              index: currentPrinter._id,
-              cameraURL: document.getElementById("psCamURL").value,
-              apikey: document.getElementById("psAPIKEY").value,
-            },
-            connection: {
-              preferredPort: document.getElementById("psDefaultSerialPort")
-                .value,
-              preferredBaud: document.getElementById("psDefaultBaudrate").value,
-              preferredProfile: document.getElementById("psDefaultProfile")
-                .value,
-            },
-            systemCommands: {
-              serverRestart: document.getElementById("psServerRestart").value,
-              systemRestart: document.getElementById("psSystemRestart").value,
-              systemShutdown: document.getElementById("psSystemShutdown").value,
-            },
-            powerCommands: {
-              powerOnCommand: document.getElementById("psPowerOnCommand").value,
-              powerOnURL: document.getElementById("psPowerOnURL").value,
-              powerOffCommand: document.getElementById("psPowerOffCommand")
-                .value,
-              powerOffURL: document.getElementById("psPowerOffURL").value,
-              powerToggleCommand: document.getElementById(
-                "psPowerToggleCommand"
-              ).value,
-              powerToggleURL: document.getElementById("psPowerToggleURL").value,
-              powerStatusCommand: document.getElementById("psPowerStateCommand")
-                .value,
-              powerStatusURL: document.getElementById("psPowerStateURL").value,
-              wol: {
-                enabled: document.getElementById("psWolEnable").checked,
-                ip: document.getElementById("psWolIP").value,
-                port: document.getElementById("psWolPort").value,
-                interval: document.getElementById("psWolInterval").value,
-                count: document.getElementById("psWolCount").value,
-                MAC: document.getElementById("psWolMAC").value,
-              },
-            },
-            costSettings: {
-              powerConsumption: parseFloat(
-                document.getElementById("psPowerConsumption").value
-              ),
-              electricityCosts: parseFloat(
-                document.getElementById("psElectricityCosts").value
-              ),
-              purchasePrice: parseFloat(
-                document.getElementById("psPurchasePrice").value
-              ),
-              estimateLifespan: parseFloat(
-                document.getElementById("psEstimatedLifespan").value
-              ),
-              maintenanceCosts: parseFloat(
-                document.getElementById("psMaintenanceCosts").value
-              ),
-            },
-          };
-          if (currentPrinter.printerState.colour.category !== "Offline") {
-            let printerName = document.getElementById("psProfileName").value;
-            let printerModel = document.getElementById("psPrinterModel").value;
-            if (printerName === "") {
-              printerName = null;
-            }
-            if (printerModel === "") {
-              printerModel = null;
-            }
-            newValues.profileID = currentPrinter.currentProfile.id;
-            newValues.profile = {
-              name: printerName,
-              color: "default",
-              model: printerModel,
-              volume: {
-                formFactor: document.getElementById("extruderFormFactor").value,
-                width: parseInt(document.getElementById("psVolumeWidth").value),
-                depth: parseInt(document.getElementById("psVolumeDepth").value),
-                height: parseInt(
-                  document.getElementById("psVolumeHeight").value
-                ),
-              },
-              heatedBed: document.getElementById("psHeatedBed").checked,
-              heatedChamber: document.getElementById("psHeatedChamber").checked,
-              axes: {
-                x: {
-                  speed: parseInt(
-                    document.getElementById("psPrinterXAxis").value
-                  ),
-                  inverted: document.getElementById("psXInverted").checked,
-                },
-                y: {
-                  speed: parseInt(
-                    document.getElementById("psPrinterYAxis").value
-                  ),
-                  inverted: document.getElementById("psYInverted").checked,
-                },
-                z: {
-                  speed: parseInt(
-                    document.getElementById("psPrinterZAxis").value
-                  ),
-                  inverted: document.getElementById("psZInverted").checked,
-                },
-                e: {
-                  speed: parseInt(
-                    document.getElementById("psPrinterEAxis").value
-                  ),
-                  inverted: document.getElementById("psEInverted").checked,
-                },
-              },
-              extruder: {
-                count: parseInt(
-                  document.getElementById("psExtruderCount").value
-                ),
-                nozzleDiameter: parseFloat(
-                  document.getElementById("psNozzleDiameter").value
-                ),
-                sharedNozzle: document.getElementById("psSharedNozzle").checked,
-              },
-            };
-            newValues.gcode = {
-              afterPrintCancelled: document.getElementById(
-                "psSettingsAfterPrinterCancelled"
-              ).value,
-              afterPrintDone: document.getElementById(
-                "psSettingsAfterPrinterDone"
-              ).value,
-              afterPrintPaused: document.getElementById(
-                "psSettingsAfterPrinterPaused"
-              ).value,
-              afterPrinterConnected: document.getElementById(
-                "psSettingsAfterPrinterConnected"
-              ).value,
-              afterToolChange: document.getElementById(
-                "psSettingsAfterToolChange"
-              ).value,
-              beforePrintResumed: document.getElementById(
-                "psSettingsBeforePrinterResumed"
-              ).value,
-              beforePrintStarted: document.getElementById(
-                "psSettingsBeforePrinterStarted"
-              ).value,
-              beforePrinterDisconnected: document.getElementById(
-                "psSettingsBeforePrinterDisconnected"
-              ).value,
-              beforeToolChange: document.getElementById(
-                "psSettingsBeforeToolChange"
-              ).value,
-            };
-            newValues.other = {
-              enableCamera: document.getElementById("camEnabled").checked,
-              rotateCamera: document.getElementById("camRot90").checked,
-              flipHCamera: document.getElementById("camFlipH").checked,
-              flipVCamera: document.getElementById("camFlipV").checked,
-              enableTimeLapse: document.getElementById("camTimelapse").checked,
-              heatingVariation: document.getElementById("psHeadtingVariation")
-                .value,
-              coolDown: document.getElementById("psCoolDown").value,
-            };
-          }
-          let update = await OctoFarmClient.post(
-            "printers/updateSettings",
-            newValues
           );
-          if (update.status === 200) {
-            update = await update.json();
-            UI.createAlert(
-              "success",
-              `OctoFarm successfully updated for ${currentPrinter.printerName}`,
-              3000,
-              "clicked"
-            );
-            if (update.status.profile === 200) {
-              UI.createAlert(
-                "success",
-                `${currentPrinter.printerName}: profile successfully updated`,
-                3000,
-                "clicked"
-              );
-            } else if(update.status.profile === 900){}else {
-              UI.createAlert(
-                "error",
-                `${currentPrinter.printerName}: profile failed to updated`,
-                3000,
-                "clicked"
-              );
-            }
-            if (update.status.settings === 200) {
-              UI.createAlert(
-                "success",
-                `${currentPrinter.printerName}: settings successfully updated`,
-                3000,
-                "clicked"
-              );
-            } else if(update.status.profile === 900){}else {
-              UI.createAlert(
-                "error",
-                `${currentPrinter.printerName}: settings failed to updated`,
-                3000,
-                "clicked"
-              );
-            }
-          } else {
-            UI.createAlert(
-              "error",
-              `OctoFarm failed to update ${currentPrinter.printerName}, please log a bug at github.com/OctoFarm/issues!`,
-              3000,
-              "clicked"
-            );
-          }
+          document.getElementById(`activePrinter-${script._id}`).checked =
+            script.active;
+          const triggerSelect = document.getElementById(
+            `triggerPrinter-${script._id}`
+          );
+          triggerSelect.innerHTML = await Script.alertsDrop();
+          triggerSelect.value = script.trigger;
         });
-      PrinterSettings.applyState(currentPrinter);
-      UI.addSelectListeners("ps");
-    } else {
-      const id = _.findIndex(printers, function (o) {
-        return o._id == currentIndex;
-      });
-      currentPrinter = printers[id];
-      if (currentPrinter.printerState.colour.category !== "Offline") {
-        document.getElementById("offlineMessage").innerHTML = "";
-        document.getElementById("psDefaultSerialPort").disabled = false;
-        document.getElementById("psDefaultBaudrate").disabled = false;
-        document.getElementById("psDefaultProfile").disabled = false;
-      }
-      PrinterSettings.applyState(currentPrinter);
-    } // END
+
+        document.getElementById("psPowerConsumption").placeholder = parseFloat(
+          currentPrinter.costSettings.powerConsumption
+        );
+        document.getElementById("psElectricityCosts").placeholder = parseFloat(
+          currentPrinter.costSettings.electricityCosts
+        );
+        document.getElementById("psPurchasePrice").placeholder = parseFloat(
+          currentPrinter.costSettings.purchasePrice
+        );
+        document.getElementById("psEstimatedLifespan").placeholder = parseFloat(
+          currentPrinter.costSettings.estimateLifespan
+        );
+        document.getElementById("psMaintenanceCosts").placeholder = parseFloat(
+          currentPrinter.costSettings.maintenanceCosts
+        );
+        document
+          .getElementById("resetPowerFields")
+          .addEventListener("click", async () => {
+            let post = await OctoFarmClient.get(
+              "printers/killPowerSettings/" + currentPrinter._id
+            );
+            if (post.status !== 200) {
+              post = await post.json();
+              if (post.updateSettings) {
+                UI.createAlert(
+                  "success",
+                  "Successfully cleared Power Settings",
+                  3000,
+                  "clicked"
+                );
+              } else {
+                UI.createAlert(
+                  "error",
+                  "Successfully cleared Power Settings",
+                  3000,
+                  "clicked"
+                );
+              }
+            } else {
+              UI.createAlert(
+                "error",
+                "Failed to contact server is it online?",
+                3000,
+                "clicked"
+              );
+            }
+          });
+        document
+          .getElementById("savePrinterSettings")
+          .addEventListener("click", async () => {
+            const newValues = {
+              state: currentPrinter.printerState.colour.category,
+              printer: {
+                printerName: document.getElementById("psPrinterName").value,
+                printerURL: document.getElementById("psPrinterURL").value,
+                index: currentPrinter._id,
+                cameraURL: document.getElementById("psCamURL").value,
+                apikey: document.getElementById("psAPIKEY").value,
+              },
+              connection: {
+                preferredPort: document.getElementById("psDefaultSerialPort")
+                  .value,
+                preferredBaud: document.getElementById("psDefaultBaudrate")
+                  .value,
+                preferredProfile: document.getElementById("psDefaultProfile")
+                  .value,
+              },
+              systemCommands: {
+                serverRestart: document.getElementById("psServerRestart").value,
+                systemRestart: document.getElementById("psSystemRestart").value,
+                systemShutdown: document.getElementById("psSystemShutdown")
+                  .value,
+              },
+              powerCommands: {
+                powerOnCommand: document.getElementById("psPowerOnCommand")
+                  .value,
+                powerOnURL: document.getElementById("psPowerOnURL").value,
+                powerOffCommand: document.getElementById("psPowerOffCommand")
+                  .value,
+                powerOffURL: document.getElementById("psPowerOffURL").value,
+                powerToggleCommand: document.getElementById(
+                  "psPowerToggleCommand"
+                ).value,
+                powerToggleURL: document.getElementById("psPowerToggleURL")
+                  .value,
+                powerStatusCommand: document.getElementById(
+                  "psPowerStateCommand"
+                ).value,
+                powerStatusURL: document.getElementById("psPowerStateURL")
+                  .value,
+                wol: {
+                  enabled: document.getElementById("psWolEnable").checked,
+                  ip: document.getElementById("psWolIP").value,
+                  port: document.getElementById("psWolPort").value,
+                  interval: document.getElementById("psWolInterval").value,
+                  packets: document.getElementById("psWolCount").value,
+                  MAC: document.getElementById("psWolMAC").value,
+                },
+              },
+              costSettings: {
+                powerConsumption: parseFloat(
+                  document.getElementById("psPowerConsumption").value
+                ),
+                electricityCosts: parseFloat(
+                  document.getElementById("psElectricityCosts").value
+                ),
+                purchasePrice: parseFloat(
+                  document.getElementById("psPurchasePrice").value
+                ),
+                estimateLifespan: parseFloat(
+                  document.getElementById("psEstimatedLifespan").value
+                ),
+                maintenanceCosts: parseFloat(
+                  document.getElementById("psMaintenanceCosts").value
+                ),
+              },
+            };
+            if (currentPrinter.printerState.colour.category !== "Offline") {
+              let printerName = document.getElementById("psProfileName").value;
+              let printerModel = document.getElementById("psPrinterModel")
+                .value;
+              if (printerName === "") {
+                printerName = null;
+              }
+              if (printerModel === "") {
+                printerModel = null;
+              }
+              newValues.profileID = currentPrinter.currentProfile.id;
+              newValues.profile = {
+                name: printerName,
+                color: "default",
+                model: printerModel,
+                volume: {
+                  formFactor: document.getElementById("extruderFormFactor")
+                    .value,
+                  width: parseInt(
+                    document.getElementById("psVolumeWidth").value
+                  ),
+                  depth: parseInt(
+                    document.getElementById("psVolumeDepth").value
+                  ),
+                  height: parseInt(
+                    document.getElementById("psVolumeHeight").value
+                  ),
+                },
+                heatedBed: document.getElementById("psHeatedBed").checked,
+                heatedChamber: document.getElementById("psHeatedChamber")
+                  .checked,
+                axes: {
+                  x: {
+                    speed: parseInt(
+                      document.getElementById("psPrinterXAxis").value
+                    ),
+                    inverted: document.getElementById("psXInverted").checked,
+                  },
+                  y: {
+                    speed: parseInt(
+                      document.getElementById("psPrinterYAxis").value
+                    ),
+                    inverted: document.getElementById("psYInverted").checked,
+                  },
+                  z: {
+                    speed: parseInt(
+                      document.getElementById("psPrinterZAxis").value
+                    ),
+                    inverted: document.getElementById("psZInverted").checked,
+                  },
+                  e: {
+                    speed: parseInt(
+                      document.getElementById("psPrinterEAxis").value
+                    ),
+                    inverted: document.getElementById("psEInverted").checked,
+                  },
+                },
+                extruder: {
+                  count: parseInt(
+                    document.getElementById("psExtruderCount").value
+                  ),
+                  nozzleDiameter: parseFloat(
+                    document.getElementById("psNozzleDiameter").value
+                  ),
+                  sharedNozzle: document.getElementById("psSharedNozzle")
+                    .checked,
+                },
+              };
+              newValues.gcode = {
+                afterPrintCancelled: document.getElementById(
+                  "psSettingsAfterPrinterCancelled"
+                ).value,
+                afterPrintDone: document.getElementById(
+                  "psSettingsAfterPrinterDone"
+                ).value,
+                afterPrintPaused: document.getElementById(
+                  "psSettingsAfterPrinterPaused"
+                ).value,
+                afterPrinterConnected: document.getElementById(
+                  "psSettingsAfterPrinterConnected"
+                ).value,
+                afterToolChange: document.getElementById(
+                  "psSettingsAfterToolChange"
+                ).value,
+                beforePrintResumed: document.getElementById(
+                  "psSettingsBeforePrinterResumed"
+                ).value,
+                beforePrintStarted: document.getElementById(
+                  "psSettingsBeforePrinterStarted"
+                ).value,
+                beforePrinterDisconnected: document.getElementById(
+                  "psSettingsBeforePrinterDisconnected"
+                ).value,
+                beforeToolChange: document.getElementById(
+                  "psSettingsBeforeToolChange"
+                ).value,
+              };
+              newValues.other = {
+                enableCamera: document.getElementById("camEnabled").checked,
+                rotateCamera: document.getElementById("camRot90").checked,
+                flipHCamera: document.getElementById("camFlipH").checked,
+                flipVCamera: document.getElementById("camFlipV").checked,
+                enableTimeLapse: document.getElementById("camTimelapse")
+                  .checked,
+                heatingVariation: document.getElementById("psHeadtingVariation")
+                  .value,
+                coolDown: document.getElementById("psCoolDown").value,
+              };
+            }
+            let update = await OctoFarmClient.post(
+              "printers/updateSettings",
+              newValues
+            );
+            if (update.status === 200) {
+              update = await update.json();
+              UI.createAlert(
+                "success",
+                `OctoFarm successfully updated for ${currentPrinter.printerName}`,
+                3000,
+                "clicked"
+              );
+              if (update.status.profile === 200) {
+                UI.createAlert(
+                  "success",
+                  `${currentPrinter.printerName}: profile successfully updated`,
+                  3000,
+                  "clicked"
+                );
+              } else if (update.status.profile === 900) {
+              } else {
+                UI.createAlert(
+                  "error",
+                  `${currentPrinter.printerName}: profile failed to updated`,
+                  3000,
+                  "clicked"
+                );
+              }
+              if (update.status.settings === 200) {
+                UI.createAlert(
+                  "success",
+                  `${currentPrinter.printerName}: settings successfully updated`,
+                  3000,
+                  "clicked"
+                );
+              } else if (update.status.profile === 900) {
+              } else {
+                UI.createAlert(
+                  "error",
+                  `${currentPrinter.printerName}: settings failed to updated`,
+                  3000,
+                  "clicked"
+                );
+              }
+            } else {
+              UI.createAlert(
+                "error",
+                `OctoFarm failed to update ${currentPrinter.printerName}, please log a bug at github.com/OctoFarm/issues!`,
+                3000,
+                "clicked"
+              );
+            }
+          });
+        await PrinterSettings.applyState(currentPrinter);
+        UI.addSelectListeners("ps");
+      } else {
+        const id = _.findIndex(printers, function (o) {
+          return o._id === currentIndex;
+        });
+        currentPrinter = printers[id];
+        if (currentPrinter.printerState.colour.category !== "Offline") {
+          document.getElementById("offlineMessage").innerHTML = "";
+          document.getElementById("psDefaultSerialPort").disabled = false;
+          document.getElementById("psDefaultBaudrate").disabled = false;
+          document.getElementById("psDefaultProfile").disabled = false;
+        }
+        await PrinterSettings.applyState(currentPrinter);
+      } // END
+    } catch (e) {
+      UI.createAlert(
+        "error",
+        "Something has gone wrong with loading the Printer Manager... Hard Failure, please submit as a bug on github: " +
+          e,
+        0,
+        "clicked"
+      );
+    }
   }
 
   static compareSave(printer, newValues) {}
