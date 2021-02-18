@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const {ensureAuthenticated} = require("../config/auth");
-const {stringify} = require("flatted/cjs");
+const { ensureAuthenticated } = require("../config/auth");
+const { parse, stringify } = require("flatted/cjs");
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
 let clientInformation = null;
 
@@ -10,7 +10,7 @@ const PrinterClean = printerClean.PrinterClean;
 
 const printerTicker = require("../runners/printerTicker.js");
 
-const {PrinterTicker} = printerTicker;
+const { PrinterTicker } = printerTicker;
 
 let clientId = 0;
 const clients = {}; // <- Keep a map of attached clients
