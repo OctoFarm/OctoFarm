@@ -28,7 +28,6 @@ export class MatchConstraint implements ValidatorConstraintInterface {
     }
 
     defaultMessage(validationArguments?: ValidationArguments) {
-
-        return 'asd';
+        return 'fields do not match';
     }
 }
