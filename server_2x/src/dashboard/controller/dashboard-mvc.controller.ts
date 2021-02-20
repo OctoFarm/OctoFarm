@@ -1,6 +1,6 @@
 import {Controller, Get, Req, Res} from "@nestjs/common";
 import {ApiTags} from "@nestjs/swagger";
-import {Public} from "../../auth/decorators/auth.decorators";
+import {Public} from "../../utils/auth.decorators";
 import {ClientSettingsService} from "../../settings/services/client-settings.service";
 import {PrintersService} from "../../printers/services/printers.service";
 import {ServerSettingsService} from "../../settings/services/server-settings.service";

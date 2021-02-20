@@ -1,5 +1,5 @@
 import {Controller, Get, Res} from "@nestjs/common";
-import {Public} from "../auth/decorators/auth.decorators";
+import {Public} from "../utils/auth.decorators";
 import {ApiService} from "../api/api.service";
 
 @Controller()
@@ -22,9 +22,8 @@ export class BootController {
     root(@Res() res) {
         if (ApiService.databaseStartupErrorOccurred) {
             res.render("database", {page: "Database Warning"});
-        }
-        else {
-            res.redirect("users/login");
+        } else {
+            res.redirect("auth/login");
         }
     }
 }

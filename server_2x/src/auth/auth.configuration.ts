@@ -1,7 +1,7 @@
 import {registerAs} from "@nestjs/config";
 import {Logger} from "@nestjs/common";
 
-export let JWT_OPTIONS: string = 'JWT_MODULE_OPTIONS';
+export const JWT_OPTIONS = 'JWT_MODULE_OPTIONS';
 export const JWT_EXPIRES_IN_KEY = 'JWT_EXPIRES_IN';
 export const JWT_SECRET_KEY = 'JWT_SECRET';
 
@@ -22,3 +22,5 @@ export const AuthConfiguration = registerAs(JWT_OPTIONS, () => {
         expiresIn: parsedExpirySeconds
     }
 });
+
+export const DefaultAdminPassword = "PleasePrintMeAnOctopus";

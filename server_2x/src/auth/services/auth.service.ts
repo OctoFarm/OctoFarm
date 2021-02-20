@@ -38,7 +38,6 @@ export class AuthService {
             throw new UnauthorizedException();
         }
         const isValid = await this.cryptoService.comparePasswordHash(password, user.passwordHash);
-
         if (!isValid) {
             throw new UnauthorizedException();
         }
