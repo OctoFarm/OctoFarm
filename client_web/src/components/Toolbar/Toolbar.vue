@@ -8,8 +8,8 @@
       <v-app-bar-nav-icon @click.stop="mini = !mini" />
 
       <v-spacer />
-      <UserNotifications />
-      <UserMenu />
+      <!--      <UserNotifications />-->
+      <!--      <UserMenu />-->
     </v-app-bar>
     <v-navigation-drawer
       app
