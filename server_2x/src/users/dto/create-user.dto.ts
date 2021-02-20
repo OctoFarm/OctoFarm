@@ -1,6 +1,5 @@
-import {IsEnum, IsNotEmpty, IsString, MinLength, validate} from "class-validator";
+import {IsEnum, IsNotEmpty, IsString, MinLength} from "class-validator";
 import {GroupEnum} from "../types/group.enum";
-import {ValidationException} from "../../providers/validation.exception";
 import {USER_CONSTANTS} from "../users.constants";
 
 export class CreateUserDto {

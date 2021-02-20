@@ -1,4 +1,4 @@
-import {IsNotEmpty, IsString, Min, MinLength} from "class-validator";
+import {IsNotEmpty, IsString, MinLength} from "class-validator";
 import {Matches} from "../../utils/validations.util";
 import {nameof} from "../../utils/property-reflection.util";
 import {USER_CONSTANTS} from "../users.constants";

@@ -5,24 +5,30 @@ import {Printer} from "./entities/printer.entity";
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {PrintersMvcController} from "./controllers/printers-mvc.controller";
 import {SettingsModule} from "../settings/settings.module";
+import {PrinterGroupsController} from './controllers/printer-groups.controller';
+import {PrinterGroupsService} from './services/printer-groups.service';
+import {PrinterGroup} from "./entities/printer-group.entity";
+import {ConfigModule} from "@nestjs/config";
+import {PrintersConfig} from "./printers.config";
 
 @Module({
     imports: [
-        TypeOrmModule.forFeature([Printer]),
-        SettingsModule
+        ConfigModule.forFeature(PrintersConfig),
+        TypeOrmModule.forFeature([Printer, PrinterGroup]),
+        SettingsModule,
     ],
     providers: [
-        PrintersService
+        PrintersService,
+        PrinterGroupsService
     ],
     exports: [
         PrintersService
     ],
     controllers: [
         PrintersController,
-        PrintersMvcController
+        PrintersMvcController,
+        PrinterGroupsController
     ]
 })
 export class PrintersModule {
-    constructor() {
-    }
 }

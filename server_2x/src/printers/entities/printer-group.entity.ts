@@ -1,9 +1,9 @@
-import {validate} from "class-validator";
+import {IsArray, IsDefined, validate} from "class-validator";
 import {BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, ObjectID, ObjectIdColumn} from "typeorm";
 import {ValidationException} from "../../providers/validation.exception";
 
 @Entity()
-export class Printer {
+export class PrinterGroup {
     @ObjectIdColumn()
     id: ObjectID;
 
@@ -14,9 +14,16 @@ export class Printer {
     creationTime: Date;
 
     @Column()
-    apiKey: string;
+    @IsArray()
+    // @MinLength(1) gotta have fallback if we go minimum 1
+    @IsDefined({each: true})
+    printers: ObjectID[] = [];
 
-    constructor(partialPrinter?: Partial<Printer>) {
+    // TODO OOOOH INTERESTING THOUGHT
+    // @Column()
+    // apiKey: string;
+
+    constructor(partialPrinter?: Partial<PrinterGroup>) {
         partialPrinter && Object.assign(this, partialPrinter);
     }
 
@@ -25,6 +32,6 @@ export class Printer {
     async validate() {
         const errors = await validate(this);
         if (!!errors && errors.length > 0)
-            throw new ValidationException(errors, Printer.name);
+            throw new ValidationException(errors, PrinterGroup.name);
     }
 }

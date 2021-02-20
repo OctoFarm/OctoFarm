@@ -1,5 +1,3 @@
-const _ = require("lodash");
-
 const bytes = function (a, b) {
     let string = "";
     if (a === undefined || isNaN(a) || a === null) {
@@ -19,11 +17,10 @@ const calculatePercent = function (use, total) {
     return Math.round(percent);
 };
 const generateTime = function (seconds) {
-    let string = "";
+    let string;
     if (seconds === undefined || isNaN(seconds) || seconds === null) {
         string = "No Time Estimate";
     } else {
-        const years = Math.floor(seconds / (360 * 365));
         const days = Math.floor(seconds / (3600 * 24));
 
         seconds -= days * 3600 * 24;

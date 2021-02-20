@@ -11,6 +11,11 @@ import * as expressLayouts from 'express-ejs-layouts';
 import {join} from "path";
 import {ApiService} from "./api/api.service";
 import {MongoClient as IMongoClient} from "typeorm";
+import {MongoClient} from "mongodb";
+import * as cookieParser from "cookie-parser";
+import * as flash from "connect-flash";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const db = require("../ormconfig");
 
 const APP_HOST = "127.0.0.1";
 const APP_PORT = process.env.OCTOFARM_PORT || 3000;
@@ -42,26 +47,22 @@ function printPreBootMessage(error = null) {
     }
 }
 
-function printPostBootMessage(logger: Logger, app: INestApplication) {
+function printPostBootMessage(logger: Logger) {
     logger.log(`Server is listening on http://${APP_HOST}:${APP_PORT}`);
     logger.log(`${Y}Happy printing!${D}`);
 }
 
 async function testDatabase() {
     // Test yourself before you wreck yourself
-    const MongoClient = require('mongodb').MongoClient as IMongoClient;
-    const db = require('../ormconfig');
+    const typedMongoClient = MongoClient as IMongoClient;
     const url = `${db.type}://${db.username}:${db.password}@${db.hostname}/${db.database}?authSource=admin`;
-    const result = await MongoClient.connect(url);
+    const result = await typedMongoClient.connect(url);
     await result.close();
     logger.log("Database connection test was a great success! Seems like it's your day today.");
     return;
 }
 
 function legacyMiddleware(app: NestExpressApplication) {
-    const flash = require("connect-flash");
-    const cookieParser = require("cookie-parser");
-
     // Bodyparser
     app.use(cookieParser());
     // app.use(express.urlencoded({extended: false}));
@@ -134,7 +135,7 @@ async function bootstrap<T>(Module: T) {
     AddSwagger(app);
 
     await app.listen(APP_PORT, APP_HOST, async () => {
-        await printPostBootMessage(logger, app);
+        await printPostBootMessage(logger);
         if (process.env["PRINT_ROUTES_DEBUG"] === "true") {
             logRoutes(app);
         }
@@ -142,7 +143,7 @@ async function bootstrap<T>(Module: T) {
 }
 
 testDatabase()
-    .then(_ => {
+    .then(() => {
         printPreBootMessage();
         bootstrap(AppModule).then();
     }, error => {

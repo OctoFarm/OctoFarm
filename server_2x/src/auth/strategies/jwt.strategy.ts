@@ -19,6 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         });
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-types
     async validate(payload: UserPayload, done: Function) {
         const user = await this.authService.validateTokenClaims(payload);
         if (!user) {

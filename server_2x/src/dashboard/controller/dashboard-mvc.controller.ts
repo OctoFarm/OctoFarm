@@ -8,7 +8,7 @@ import {prettyHelpers} from "../js/pretty";
 import {interval, Observable} from "rxjs";
 import {map} from "rxjs/operators";
 import {ConfigType} from "@nestjs/config";
-import {DashboardConfig} from "../dashboard.config";
+import {DashboardConfig, UpdateEventStreamPeriodDefault} from "../dashboard.config";
 import {DashboardSseMessageDto} from "../dto/sse-message.dto";
 import {stringify} from "flatted";
 
@@ -23,7 +23,7 @@ export class DashboardMvcController {
         private printersService: PrintersService,
         @Inject(DashboardConfig.KEY) private dashboardOptions: ConfigType<typeof DashboardConfig>,
     ) {
-        this.ssePeriod = this.dashboardOptions?.updateEventStreamPeriod || 5000;
+        this.ssePeriod = this.dashboardOptions?.updateEventStreamPeriod || UpdateEventStreamPeriodDefault;
     }
 
     @Sse("update-sse")

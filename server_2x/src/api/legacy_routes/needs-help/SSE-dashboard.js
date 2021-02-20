@@ -118,14 +118,14 @@ const ClientSettings = settingsClean.SettingsClean;
 //     } else {
 //       dashboardSettings = clientsSettings.dashboard;
 //     }
+// const infoDrop = {
 // ==== END DONE ===
-// DONE     const infoDrop = {
       printerInformation: printerInformation,
       currentOperations: currentOperations,
       dashStatistics: dashStatistics,
-      // DONE dashboardSettings: dashboardSettings,
-    // DONE };
 // ==== DONE ===
+//       dashboardSettings: dashboardSettings,
+// };
 //     clientInformation = await stringify(infoDrop);
 //     for (clientId in clients) {
 //       clients[clientId].write("retry:" + 10000 + "\n");

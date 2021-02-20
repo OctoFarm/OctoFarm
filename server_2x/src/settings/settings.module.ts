@@ -5,10 +5,6 @@ import {ClientSettings} from "./entities/client-settings.entity";
 import {ClientSettingsService} from "./services/client-settings.service";
 import {ServerSettingsService} from "./services/server-settings.service";
 
-function ClientSettingsController() {
-
-}
-
 @Module({
     imports: [
         TypeOrmModule.forFeature([ServerSettings, ClientSettings])

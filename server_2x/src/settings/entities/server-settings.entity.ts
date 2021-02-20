@@ -21,19 +21,19 @@ export class ServerSettings {
     };
 
     @Column()
-    timeout: Object = {}; // TODO model
+    timeout: any = {}; // TODO model
 
     @Column()
     filamentManager: boolean;
 
     @Column()
-    filament: Object = {}; // TODO model;
+    filament: any = {}; // TODO model;
 
     @Column()
-    history: Object = {}; // TODO model;
+    history: any = {}; // TODO model;
 
     @Column()
-    influxExport: Object = {}; // TODO model;
+    influxExport: any = {}; // TODO model;
 
     constructor(partialInput?: Partial<ServerSettings>) {
         partialInput && Object.assign(this, partialInput);

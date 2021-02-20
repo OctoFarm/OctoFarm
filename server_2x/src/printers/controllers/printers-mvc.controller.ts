@@ -9,7 +9,7 @@ import {map} from "rxjs/operators";
 import {stringify} from "flatted";
 import {PrintersSseMessageDto} from "../dto/printers-sse-message.dto";
 import {ConfigType} from "@nestjs/config";
-import {PrintersConfig} from "../printers.config";
+import {PrintersConfig, UpdateEventStreamPeriodDefault} from "../printers.config";
 
 @Controller("printers")
 @ApiTags(PrintersMvcController.name)
@@ -21,7 +21,7 @@ export class PrintersMvcController {
         private serverSettingsService: ServerSettingsService,
         @Inject(PrintersConfig.KEY) private printersOptions: ConfigType<typeof PrintersConfig>,
     ) {
-        this.ssePeriod = this.printersOptions?.updateEventStreamPeriod || 1000;
+        this.ssePeriod = this.printersOptions?.updateEventStreamPeriod || UpdateEventStreamPeriodDefault;
     }
 
     // ======= LEGACY MVC ENDPOINTS BELOW - PHASED OUT SOON ======
@@ -74,6 +74,7 @@ export class PrintersMvcController {
 
     @Post("printerInfo")
     @Public()
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     async getPrinterInfo(@Req() req, @Res() res) {
         // const id = req.body.i;
         //
