@@ -15,31 +15,38 @@ import {stringify} from "flatted";
 @Controller("dashboard")
 @ApiTags(DashboardMvcController.name)
 export class DashboardMvcController {
+    readonly ssePeriod: number;
+
     constructor(
         private clientSettingsService: ClientSettingsService,
         private serverSettingsService: ServerSettingsService,
         private printersService: PrintersService,
         @Inject(DashboardConfig.KEY) private dashboardOptions: ConfigType<typeof DashboardConfig>,
     ) {
+        this.ssePeriod = this.dashboardOptions?.updateEventStreamPeriod || 5000;
     }
 
     @Sse("update-sse")
     @Public()
-    async updateDashboard(): Promise<Observable<string | DashboardSseMessageDto>> {
+    async updateDashboard(): Promise<Observable<string>> {
+        // TODO NotExpectedYet oi mate it's all you's 'ere!
         // const currentOperations = await PrinterClean.returnCurrentOperations();
         // const dashStatistics = await PrinterClean.returnDashboardStatistics();
         // const printerInformation = await PrinterClean.returnPrintersInformation();
         const clientSettings = await this.clientSettingsService.getOrAddDashboardSettings();
 
-        return interval(1000)
+        const returnedUpdate: DashboardSseMessageDto = {
+            printerInformation: null,
+            currentOperations: null,
+            dashStatistic: null,
+            dashboardSettings: clientSettings.dashboard,
+        };
+        return interval(this.ssePeriod)
             .pipe(
-                map(_ => {
-                        return stringify({
-                            printerInformation: null,
-                            currentOperations: null,
-                            dashStatistic: null,
-                            dashboardSettings: clientSettings.dashboard,
-                        });
+                map(() => {
+                        // TODO NotExpectedYet oi mate it's all you's 'ere!
+                        // Do we really need flattening? I think we should focus on serialization-first models
+                        return stringify(returnedUpdate);
                     }
                 )
             );
@@ -52,7 +59,7 @@ export class DashboardMvcController {
         const serverSettings = await this.serverSettingsService.findFirstOrAdd();
         const printers = await this.printersService.list();
 
-        // NotExpectedYet oi mate it's all you's 'ere!
+        // TODO NotExpectedYet oi mate it's all you's 'ere!
         // const dashStatistics = await PrinterClean.returnDashboardStatistics();
 
         let user = null;
