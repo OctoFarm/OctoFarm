@@ -89,46 +89,46 @@ async function enable() {
       //       });
       //     } else {
             // Check if first user that's created.
-            User.find({}).then((user) => {
-              let userGroup = "";
-              if (user.length < 1) {
-                userGroup = "Administrator";
-              } else {
-                userGroup = "User";
-              }
-              const newUser = new User({
-                name,
-                username,
-                password,
-                group: userGroup,
-              });
-              // Hash Password
-              bcrypt.genSalt(10, (error, salt) =>
-                bcrypt.hash(newUser.password, salt, (err, hash) => {
-                  if (err) throw err;
-                  // Set password to hashed
-                  newUser.password = hash;
-                  // Save new User
-                  newUser
-                    .save()
-                    .then((user) => {
-                      req.flash(
-                        "success_msg",
-                        "You are now registered and can login"
-                      );
-                      const page = "login";
-                      res.redirect("/users/login");
-                    })
-                    .catch((err) => console.log(err));
-                })
-              );
-            });
-          }
-        });
+            // User.find({}).then((user) => {
+            //   let userGroup = "";
+            //   if (user.length < 1) {
+            //     userGroup = "Administrator";
+            //   } else {
+            //     userGroup = "User";
+            //   }
+            //   const newUser = new User({
+            //     name,
+            //     username,
+            //     password,
+            //     group: userGroup,
+            //   });
+            //   // Hash Password
+            //   bcrypt.genSalt(10, (error, salt) =>
+            //     bcrypt.hash(newUser.password, salt, (err, hash) => {
+            //       if (err) throw err;
+            //       // Set password to hashed
+            //       newUser.password = hash;
+            //       // Save new User
+            //       newUser
+            //         .save()
+            //         .then((user) => {
+            //           req.flash(
+            //             "success_msg",
+            //             "You are now registered and can login"
+            //           );
+            //           const page = "login";
+            //           res.redirect("/users/login");
+            //         })
+            //         .catch((err) => console.log(err));
+            //     })
+            //   );
+        //     });
+        //   }
+        // });
+//       }
+//     });
+//   }
 // ==== END DONE ===
-      }
-    });
-  }
   // Login Handle
   router.post(
     "/login",

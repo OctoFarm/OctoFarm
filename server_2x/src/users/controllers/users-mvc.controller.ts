@@ -1,4 +1,4 @@
-import {Body, Controller, Get, Post, Res} from "@nestjs/common";
+import {Body, Controller, Get, Post, Req, Res} from "@nestjs/common";
 import {ApiTags} from "@nestjs/swagger";
 import {ServerSettingsService} from "../../settings/services/server-settings.service";
 import {settings} from "cluster";
@@ -42,7 +42,13 @@ export class UsersMvcController {
 
 
     @Post("register")
-    async registerSubmit(@Body() validatedInput: RegisterInputDto) {
-        return await this.usersService.register(validatedInput);
+    async registerSubmit(@Body() validatedInput: RegisterInputDto, @Req() req, @Res() res) {
+        await this.usersService.register(validatedInput);
+
+        req.flash(
+            "success_msg",
+            "You are now registered and can login"
+        );
+        res.redirect("/auth/login");
     }
 }
