@@ -1,36 +1,37 @@
-import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common';
-import { MonitoringService } from '../services/monitoring.service';
-import { CreateMonitoringDto } from '../dto/create-monitoring.dto';
-import { UpdateMonitoringDto } from '../dto/update-monitoring.dto';
+import {Body, Controller, Delete, Get, Param, Post, Put} from '@nestjs/common';
+import {CreateMonitoringDto} from '../dto/create-monitoring.dto';
+import {UpdateMonitoringDto} from '../dto/update-monitoring.dto';
 import {ApiTags} from "@nestjs/swagger";
+import {AlertsService} from "../services/alerts.service";
 
 @Controller('alerts')
 @ApiTags(AlertsController.name)
 export class AlertsController {
-  constructor(private readonly monitoringService: MonitoringService) {}
+    constructor(private readonly alertsService: AlertsService) {
+    }
 
-  @Post()
-  create(@Body() createMonitoringDto: CreateMonitoringDto) {
-    return this.monitoringService.create(createMonitoringDto);
-  }
+    @Post()
+    create(@Body() createMonitoringDto: CreateMonitoringDto) {
+        return this.alertsService.create(createMonitoringDto);
+    }
 
-  @Get()
-  findAll() {
-    return this.monitoringService.findAll();
-  }
+    @Get()
+    findAll() {
+        return this.alertsService.findAll();
+    }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.monitoringService.findOne(+id);
-  }
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.alertsService.findOne(+id);
+    }
 
-  @Put(':id')
-  update(@Param('id') id: string, @Body() updateMonitoringDto: UpdateMonitoringDto) {
-    return this.monitoringService.update(+id, updateMonitoringDto);
-  }
+    @Put(':id')
+    update(@Param('id') id: string, @Body() updateMonitoringDto: UpdateMonitoringDto) {
+        return this.alertsService.update(+id, updateMonitoringDto);
+    }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.monitoringService.remove(+id);
-  }
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.alertsService.remove(+id);
+    }
 }
