@@ -10,10 +10,10 @@ import History from "../views/History.vue";
 import About from "../views/About.vue";
 import Alerts from "../views/admin/Alerts.vue";
 import DatabaseManager from "../views/admin/DatabaseManager.vue";
-import Logs from "../views/admin/Alerts.vue";
+import Logs from "../views/admin/Logs.vue";
 import UserAccounts from "../views/admin/UserAccounts.vue";
 import ServerSettings from "../views/admin/ServerSettings.vue";
-import JobQueues from "../views/JobQueues.vue";
+// import JobQueues from "../views/JobQueues.vue";
 
 Vue.use(VueRouter);
 
@@ -24,12 +24,12 @@ const routes = [
     icon: "mdi-view-dashboard-variant",
     component: Dashboard,
   },
-  {
-    path: "/schedule",
-    name: "Scheduler",
-    icon: "mdi-calendar-text",
-    component: JobQueues,
-  },
+  // {
+  //   path: "/schedule",
+  //   name: "Scheduler",
+  //   icon: "mdi-calendar-text",
+  //   component: JobQueues,
+  // },
   {
     name: "Monitoring",
     icon: "mdi-eye",
