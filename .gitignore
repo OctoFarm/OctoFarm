@@ -21,3 +21,15 @@
 /server_1x/views/images/
 
 # V2 Server
+
+server_2x/node_modules/
+
+server_2x/dist/
+
+server_2x/assets/public/assets/
+
+server_2x/.env
+
+logs/
+
+.idea/
