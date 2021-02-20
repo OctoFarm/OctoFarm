@@ -2,14 +2,17 @@
   <v-col>
     <v-data-table
       :headers="headers"
-      :items="desserts"
-      sort-by="calories"
+      :items="printers"
+      sort-by="sort"
       class="elevation-1"
     >
       <template v-slot:top>
-        <v-toolbar flat>
+        <v-toolbar
+          flat
+          dense
+        >
           <v-toolbar-title>
-            <v-icon>mdi-printer-3d</v-icon> Printer Manager
+            <v-icon>mdi-printer-3d</v-icon>
           </v-toolbar-title>
           <v-divider
             class="mx-4"
@@ -19,17 +22,15 @@
           <v-spacer />
           <v-dialog
             v-model="dialog"
-            max-width="500px"
           >
             <template v-slot:activator="{ on, attrs }">
               <v-btn
-                color="primary"
-                dark
-                class="mb-2"
+                color="success"
+                class="ma-1"
                 v-bind="attrs"
                 v-on="on"
               >
-                New Item
+                <v-icon>mdi-plus</v-icon> Add
               </v-btn>
             </template>
             <v-card>
@@ -56,8 +57,8 @@
                       md="4"
                     >
                       <v-text-field
-                        v-model="editedItem.calories"
-                        label="Calories"
+                        v-model="editedItem.printer_url"
+                        label="Printer URL"
                       />
                     </v-col>
                     <v-col
@@ -66,8 +67,8 @@
                       md="4"
                     >
                       <v-text-field
-                        v-model="editedItem.fat"
-                        label="Fat (g)"
+                        v-model="editedItem.groups"
+                        label="Groups"
                       />
                     </v-col>
                     <v-col
@@ -76,8 +77,8 @@
                       md="4"
                     >
                       <v-text-field
-                        v-model="editedItem.carbs"
-                        label="Carbs (g)"
+                        v-model="editedItem.cam_url"
+                        label="Camera URL"
                       />
                     </v-col>
                     <v-col
@@ -86,8 +87,8 @@
                       md="4"
                     >
                       <v-text-field
-                        v-model="editedItem.protein"
-                        label="Protein (g)"
+                        v-model="editedItem.apikey"
+                        label="API KEY"
                       />
                     </v-col>
                   </v-row>
@@ -113,6 +114,48 @@
               </v-card-actions>
             </v-card>
           </v-dialog>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                color="info"
+                class="ma-1"
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon>mdi-application-import</v-icon> Import
+              </v-btn>
+            </template>
+            <span>Import your current printer list</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                color="warning"
+                class="ma-1"
+
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon>mdi-application-export</v-icon> Export
+              </v-btn>
+            </template>
+            <span>Export your current printer list</span>
+          </v-tooltip>
+          <v-tooltip bottom>
+            <template v-slot:activator="{ on, attrs }">
+              <v-btn
+                color="success"
+                class="ma-1"
+
+                v-bind="attrs"
+                v-on="on"
+              >
+                <v-icon>mdi-printer-3d-nozzle</v-icon> Search
+              </v-btn>
+            </template>
+            <span>Attempt a network scan to find local printers</span>
+          </v-tooltip>
+
           <v-dialog
             v-model="dialogDelete"
             max-width="500px"
@@ -148,25 +191,21 @@
       <template v-slot:item.actions="{ item }">
         <v-icon
           small
-          class="mr-2"
+          color="warning"
           @click="editItem(item)"
         >
           mdi-pencil
         </v-icon>
         <v-icon
           small
+          color="error"
           @click="deleteItem(item)"
         >
           mdi-delete
         </v-icon>
       </template>
       <template v-slot:no-data>
-        <v-btn
-          color="primary"
-          @click="initialize"
-        >
-          Reset
-        </v-btn>
+        <h1>Please add some printers to get started</h1>
       </template>
     </v-data-table>
   </v-col>
@@ -175,30 +214,39 @@
 <script>
 export default {
   name: "Navigation",
+  props: {
+    printers: {
+      type: Array,
+    },
+  },
   data: () => ({
     dialog: false,
     dialogDelete: false,
     headers: [
       {
-        text: "Dessert (100g serving)",
+        text: "Sort",
         align: "start",
-        sortable: false,
-        value: "name",
+        sortable: true,
+        value: "sort_index",
       },
-      { text: "Calories", value: "calories" },
-      { text: "Fat (g)", value: "fat" },
-      { text: "Carbs (g)", value: "carbs" },
-      { text: "Protein (g)", value: "protein" },
-      { text: "Actions", value: "actions", sortable: false },
+      { text: "Name", value: "name" },
+      { text: "Control", value: "controls" },
+      { text: "Manage", value: "manage" },
+      { text: "Host State", value: "host_state" },
+      { text: "Printer State", value: "printer_state" },
+      { text: "WebSocket", value: "websocket_state" },
+      { text: "Groups", value: "groups" },
+      { text: "Firmware", value: "printer_firmware" },
+      { text: "OctoPrint", value: "octoprint_version" },
+      { text: "Actions", value: "actions" },
     ],
-    desserts: [],
     editedIndex: -1,
     editedItem: {
       name: "",
-      calories: 0,
-      fat: 0,
-      carbs: 0,
-      protein: 0,
+      url: "",
+      groups: "",
+      camera_url: 0,
+      apikey: 0,
     },
     defaultItem: {
       name: "",
@@ -227,98 +275,24 @@ export default {
   created() {
     this.initialize();
   },
-
   methods: {
     initialize() {
-      console.log("HELLO");
-      this.desserts = [
-        {
-          name: "Frozen Yogurt",
-          calories: 159,
-          fat: 6.0,
-          carbs: 24,
-          protein: 4.0,
-        },
-        {
-          name: "Ice cream sandwich",
-          calories: 237,
-          fat: 9.0,
-          carbs: 37,
-          protein: 4.3,
-        },
-        {
-          name: "Eclair",
-          calories: 262,
-          fat: 16.0,
-          carbs: 23,
-          protein: 6.0,
-        },
-        {
-          name: "Cupcake",
-          calories: 305,
-          fat: 3.7,
-          carbs: 67,
-          protein: 4.3,
-        },
-        {
-          name: "Gingerbread",
-          calories: 356,
-          fat: 16.0,
-          carbs: 49,
-          protein: 3.9,
-        },
-        {
-          name: "Jelly bean",
-          calories: 375,
-          fat: 0.0,
-          carbs: 94,
-          protein: 0.0,
-        },
-        {
-          name: "Lollipop",
-          calories: 392,
-          fat: 0.2,
-          carbs: 98,
-          protein: 0,
-        },
-        {
-          name: "Honeycomb",
-          calories: 408,
-          fat: 3.2,
-          carbs: 87,
-          protein: 6.5,
-        },
-        {
-          name: "Donut",
-          calories: 452,
-          fat: 25.0,
-          carbs: 51,
-          protein: 4.9,
-        },
-        {
-          name: "KitKat",
-          calories: 518,
-          fat: 26.0,
-          carbs: 65,
-          protein: 7,
-        },
-      ];
     },
 
     editItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.printers.indexOf(item);
       this.editedItem = { ...item };
       this.dialog = true;
     },
 
     deleteItem(item) {
-      this.editedIndex = this.desserts.indexOf(item);
+      this.editedIndex = this.printers.indexOf(item);
       this.editedItem = { ...item };
       this.dialogDelete = true;
     },
 
     deleteItemConfirm() {
-      this.desserts.splice(this.editedIndex, 1);
+      this.printers.splice(this.editedIndex, 1);
       this.closeDelete();
     },
 
@@ -340,9 +314,9 @@ export default {
 
     save() {
       if (this.editedIndex > -1) {
-        Object.assign(this.desserts[this.editedIndex], this.editedItem);
+        Object.assign(this.printers[this.editedIndex], this.editedItem);
       } else {
-        this.desserts.push(this.editedItem);
+        this.printers.push(this.editedItem);
       }
       this.close();
     },

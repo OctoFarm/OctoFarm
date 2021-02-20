@@ -1,10 +1,13 @@
 <template>
-  <v-card>
+  <v-card
+    min-height="100%"
+    class="overflow-y-auto"
+  >
+    <v-card-title>
+      User Directory
+    </v-card-title>
     <v-list-item three-line>
       <v-list-item-content>
-        <div class="overline">
-          OctoPrint Plugins
-        </div>
         <v-col>
           <v-tooltip bottom>
             <template v-slot:activator="{ on, attrs }">
