@@ -5,18 +5,16 @@
 [![GitHub stars](https://img.shields.io/github/stars/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/stargazers)
 [![GitHub license](https://img.shields.io/github/license/NotExpectedYet/OctoFarm?style=for-the-badge)](https://github.com/NotExpectedYet/OctoFarm/blob/master/LICENSE.txt)
 
-<h3 align="center">Current Feature Requests</h3>
-
-  <p>Please visit <a href="https://features.octofarm.net">Octofarm's Features Page to log a request.</a>
-
-  <h3 align="center">Version 1.1.x</h3>
+  <h3 align="center">Version 2.X</h3>
 <br />
 <p align="center">
   <a href="https://github.com/NotExpectedYet/OctoFarm">
-    <img src="views/images/logo.png" alt="Logo" width="60%">
+    <img src="server/views/images/logo.png" alt="Logo" width="60%">
   </a>
 
   <h3 align="center">OctoFarm</h3>
+
+  <h2 align="center">Current Work in Progress to bring OctoFarm into the 30th Century</h2>
 
   <p align="center">
     OctoFarm is an easy to setup and install web server and client for unifying multiple instances of Octoprint. You can manage and monitor as many instances as you want from a single interface giving you full control over your 3D printer farm.
@@ -60,12 +58,6 @@ OctoFarm was built to fill a need that anyone with multiple 3D printers with Oct
 ## Getting Started
 
 To get a local copy up and running follow these simple steps.
-
-
-## OctoPrint 1.4.1+ 
-
-Currently there are issues with using the Global API Key to connect to these instances of OctoPrint. Please use the first user you setup on OctoPrint and a generated Application / User API key from this user to connect. I will be updating OctoFarm to work better with all permission sets eventually but for now this will allow a connection to be established. 
-
 
 ### Platform
 
@@ -149,8 +141,8 @@ These are planned but not available yet...
 
 ## Contributing
 
-I am currently not accepting any contribution to the code. I started this project to teach myself nodejs and Javascript better. With my current plans I will have exhausted most learning opportunities by Version 1.2 and will be happy to take pull requests from people then. Thanks for understanding.
-
+If you would like to contribute to the project, please pop over to the discord server and request developer access. We can discuss and set you up for contribution.
+- Discord: [Discord](https://discord.gg/vjabMUn)
 <!-- LICENSE -->
 
 ## License
@@ -174,7 +166,6 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
 - [Gina Häußge](https://octoprint.org/) - Without OctoPrint none of this would be possible. Massive thanks to the work of Gina and everyone who helps out with that.
 - [Derek from 3D Printed Debris](https://www.3dprinteddebris.com/) - Massive big thanks to Derek who has donated a lot of time and money to the project. I don't think I'd have continued at the rate I did without his bug reports and support.
 - All Patreon Supporters and random donations! - Big massive thanks for these, they keep me full of steak!
-- The users calonmer, Insertion and noxin from my discord server! Seriously no end to my thanks for these 3.
 - [JetBrains IDE](https://www.jetbrains.com/webstorm/) - Thanks to JebBrains for allowing a free license to use with developing my application. Their IDE is top notch! 
 
 <!-- MARKDOWN LINKS & IMAGES -->
