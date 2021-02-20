@@ -179,8 +179,8 @@ async function enable() {
     req.flash("success_msg", "You are logged out");
     res.redirect("/users/login");
   });
-}
-
-enable();
-
-module.exports = router;
+// }
+//
+// enable();
+//
+// module.exports = router;

@@ -5,7 +5,7 @@ import {CryptoService} from "../../crypto/crypto.service";
 import {User} from "../../users/entities/user.entity";
 import {JwtService} from "@nestjs/jwt";
 import {UserPayload} from "../interfaces/user-payload.model";
-import {AuthConfiguration} from "../auth.configuration";
+import {AuthConfig} from "../auth.config";
 import {ConfigType} from "@nestjs/config";
 
 @Injectable()
@@ -13,7 +13,7 @@ export class AuthService {
     private readonly logger = new Logger(AuthService.name);
 
     constructor(
-        @Inject(AuthConfiguration.KEY) private jwtOptions: ConfigType<typeof AuthConfiguration>,
+        @Inject(AuthConfig.KEY) private jwtOptions: ConfigType<typeof AuthConfig>,
         private readonly cryptoService: CryptoService,
         private readonly usersService: UsersService,
         private jwtService: JwtService

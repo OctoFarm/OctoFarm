@@ -7,7 +7,7 @@ export const JWT_SECRET_KEY = 'JWT_SECRET';
 
 const logger = new Logger('AuthConfiguration');
 
-export const AuthConfiguration = registerAs(JWT_OPTIONS, () => {
+export const AuthConfig = registerAs(JWT_OPTIONS, () => {
     if (!process.env[JWT_SECRET_KEY]) {
         throw new Error(`Please configure '${JWT_SECRET_KEY}' environment variable as a strong secret string and restart.`);
     }

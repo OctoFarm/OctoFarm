@@ -1,10 +1,14 @@
-import {Controller, Get, Req, Res} from "@nestjs/common";
+import {Controller, Get, Inject, Req, Res, Sse} from "@nestjs/common";
 import {ApiTags} from "@nestjs/swagger";
 import {Public} from "../../utils/auth.decorators";
 import {ClientSettingsService} from "../../settings/services/client-settings.service";
 import {PrintersService} from "../../printers/services/printers.service";
 import {ServerSettingsService} from "../../settings/services/server-settings.service";
 import {prettyHelpers} from "../js/pretty";
+import {interval} from "rxjs";
+import {map} from "rxjs/operators";
+import {ConfigType} from "@nestjs/config";
+import {DashboardConfig} from "../dashboard.config";
 
 @Controller("dashboard")
 @ApiTags(DashboardMvcController.name)
@@ -12,8 +16,25 @@ export class DashboardMvcController {
     constructor(
         private clientSettingsService: ClientSettingsService,
         private serverSettingsService: ServerSettingsService,
-        private printersService: PrintersService
+        private printersService: PrintersService,
+        @Inject(DashboardConfig.KEY) private dashboardOptions: ConfigType<typeof DashboardConfig>,
     ) {
+    }
+
+    @Sse("update-sse")
+    @Public()
+    async updateDashboard() {
+        return interval(1000)
+            .pipe(
+                map(_ => {
+                        return {
+                            data: {
+                                hello: 'world'
+                            }
+                        };
+                    }
+                )
+            );
     }
 
     @Get()
