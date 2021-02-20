@@ -1,21 +1,23 @@
-node_modules/
-config/db.js
-TODO.md
-logs/
-.clinic/
-.idea/*
-.idea/inspectionProfiles/*
-.idea/jsLinters/*
-.idea/libraries/*
-images/historyCollection/
-/.idea/
-*.env
-*docker-compose.yml
-/.build
-/.cache
+#.gitignore
 
-views/assets/js/
+# Client
+/web-client/node_modules/
 
-views/assets/css/
+# Old Server Client
+/server_1x/node_modules/
+/server_1x/logs/
+/server_1x/.clinic/
+/server_1x/.idea/
+/server_1x/images/historyCollection/
+/server_1x/*.env
+/server_1x/*docker-compose.yml
+/server_1x/.build
+/server_1x/.cache
 
-views/images/
+/server_1x/views/assets/js/
+
+/server_1x/views/assets/css/
+
+/server_1x/views/images/
+
+# V2 Server
