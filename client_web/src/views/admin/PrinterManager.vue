@@ -1,23 +1,20 @@
 <template>
   <v-container fluid>
-    <v-row>
-      <v-col align="center">
-        <h1>{{ this.$route.name }}</h1>
-      </v-col>
+    <v-row no-gutters>
+      <printer-management />
     </v-row>
     <v-row>
-      <v-col align="center">
-        <printer-table></printer-table>
-      </v-col>
+      <printer-table />
     </v-row>
   </v-container>
 </template>
 <script>
 import PrinterTable from "@/components/PrinterManager/PrinterTable.vue";
+import Management from "@/components/PrinterManager/Management.vue";
 
 export default {
   name: "PrinterManager",
-  components: { "printer-table": PrinterTable },
+  components: { "printer-table": PrinterTable, "printer-management": Management },
   data: () => ({
     printers: [
       {
@@ -33,9 +30,9 @@ export default {
         websocket_state: "connected",
         group: "UPS1",
         octoprint_version: "1.5.3",
-        printer_firmware: "Klipper v9.0"
-      }
-    ]
-  })
+        printer_firmware: "Klipper v9.0",
+      },
+    ],
+  }),
 };
 </script>

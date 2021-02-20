@@ -3,16 +3,16 @@
     <v-col
       cols="12"
       md="6"
-      lg="4"
-      xl="3"
+      lg="3"
+      xl="4"
     >
       <management-card />
     </v-col>
     <v-col
       cols="12"
       md="6"
-      lg="4"
-      xl="3"
+      lg="3"
+      xl="4"
     >
       <octoprint-card />
     </v-col>

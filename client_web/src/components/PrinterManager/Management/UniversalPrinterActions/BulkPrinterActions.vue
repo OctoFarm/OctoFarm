@@ -1,5 +1,5 @@
 <template>
-  <v-card>
+  <v-card min-height="100%">
     <v-list-item three-line>
       <v-list-item-content>
         <div class="overline">
