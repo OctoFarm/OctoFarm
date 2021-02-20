@@ -15,76 +15,79 @@ const { Token } = token;
 async function enable() {
   const settings = await ServerSettings.find({});
   // Login Page
-  router.get("/login", (req, res) =>
-    res.render("login", {
-      page: "Login",
-      registration: settings[0].server.registration,
-      serverSettings: settings,
-    })
-  );
+  // ==== DONE ===
+  // router.get("/login", (req, res) =>
+  //   res.render("login", {
+  //     page: "Login",
+  //     registration: settings[0].server.registration,
+  //     serverSettings: settings,
+  //   })
+  // );
+  // ==== END DONE ===
   if (settings[0].server.registration === true) {
+    // ==== DONE ===
     // Register Page
-    let currentUsers = await User.find({});
-
-    router.get("/register", (req, res) =>
-      res.render("register", {
-        page: "Register",
-        serverSettings: settings,
-        userCount: currentUsers.length,
-      })
-    );
+    // let currentUsers = await User.find({});
+    // router.get("/register", (req, res) =>
+    //   res.render("register", {
+    //     page: "Register",
+    //     serverSettings: settings,
+    //     userCount: currentUsers.length,
+    //   })
+    // );
+    // ==== END DONE ===
 
     // Register Handle
     router.post("/register", async (req, res) => {
-      const { name, username, password, password2 } = req.body;
-      const errors = [];
-      let currentUsers = await User.find({});
-
-      // Check required fields
-      if (!name || !username || !password || !password2) {
-        errors.push({ msg: "Please fill in all fields..." });
-      }
-
+// DONE
+//       const { name, username, password, password2 } = req.body;
+//       const errors = [];
+//       let currentUsers = await User.find({});
+//
+//       // Check required fields
+//       if (!name || !username || !password || !password2) {
+//         errors.push({ msg: "Please fill in all fields..." });
+//       }
       // Check passwords match
-      if (password !== password2) {
-        errors.push({ msg: "Passwords do not match..." });
-      }
-
-      // Password at least 6 characters
-      if (password.length < 6) {
-        errors.push({ msg: "Password should be at least 6 characters..." });
-      }
-
-      if (errors.length > 0) {
-        res.render("register", {
-          page: "Login",
-          registration: settings[0].server.registration,
-          serverSettings: settings,
-          errors,
-          name,
-          username,
-          password,
-          password2,
-          userCount: currentUsers.length,
-        });
-      } else {
-        // Validation Passed
-        User.findOne({ username }).then((user) => {
-          if (user) {
-            // User exists
-            errors.push({ msg: "Username is already registered" });
-            res.render("register", {
-              page: "Login",
-              registration: settings[0].server.registration,
-              serverSettings: settings,
-              errors,
-              name,
-              username,
-              password,
-              password2,
-              userCount: currentUsers.length,
-            });
-          } else {
+      // if (password !== password2) {
+      //   errors.push({ msg: "Passwords do not match..." });
+      // }
+      //
+      // // Password at least 6 characters
+      // if (password.length < 6) {
+      //   errors.push({ msg: "Password should be at least 6 characters..." });
+      // }
+      //
+      // if (errors.length > 0) {
+      //   res.render("register", {
+      //     page: "Login",
+      //     registration: settings[0].server.registration,
+      //     serverSettings: settings,
+      //     errors,
+      //     name,
+      //     username,
+      //     password,
+      //     password2,
+      //     userCount: currentUsers.length,
+      //   });
+      // } else {
+      //   // Validation Passed
+      //   User.findOne({ username }).then((user) => {
+      //     if (user) {
+      //       // User exists
+      //       errors.push({ msg: "Username is already registered" });
+      //       res.render("register", {
+      //         page: "Login",
+      //         registration: settings[0].server.registration,
+      //         serverSettings: settings,
+      //         errors,
+      //         name,
+      //         username,
+      //         password,
+      //         password2,
+      //         userCount: currentUsers.length,
+      //       });
+      //     } else {
             // Check if first user that's created.
             User.find({}).then((user) => {
               let userGroup = "";
@@ -122,6 +125,7 @@ async function enable() {
             });
           }
         });
+// ==== END DONE ===
       }
     });
   }

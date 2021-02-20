@@ -1,12 +1,14 @@
-import {Controller, Get, Res} from "@nestjs/common";
+import {Body, Controller, Get, Post, Res} from "@nestjs/common";
 import {ApiTags} from "@nestjs/swagger";
 import {ServerSettingsService} from "../../settings/services/server-settings.service";
 import {settings} from "cluster";
-import {Public} from "../../auth/decorators/auth.decorators";
+import {Public} from "../../utils/auth.decorators";
 import {UsersService} from "../services/users.service";
+import {RegisterInputDto} from "../dto/register-input.dto";
 
 @Controller("users")
 @ApiTags(UsersMvcController.name)
+@Public() // TODO change to different auth (session/jwt/cookie)
 export class UsersMvcController {
     constructor(
         private serverSettingsService: ServerSettingsService,
@@ -15,19 +17,16 @@ export class UsersMvcController {
     }
 
     // ======= LEGACY MVC ENDPOINTS BELOW - PHASED OUT SOON ======
-    @Public()
-    @Get("login")
-    async login(@Res() res) {
-        const settings = await this.serverSettingsService.findFirstOrAdd();
-        /* OLD FILE server_src/routes/users.js*/
-        res.render("login", {
-            page: "Login",
-            registration: settings.server.registration,
-            serverSettings: settings,
-        });
+    @Post("login")
+    async loginUserSubmit(@Res() res) {
+        await res.redirect("/auth/login");
     }
 
-    @Public()
+    @Get("login")
+    async loginUser(@Res() res) {
+        await res.redirect("/auth/login");
+    }
+
     @Get("register")
     async register(@Res() res) {
         const serverSettings = await this.serverSettingsService.findFirstOrAdd();
@@ -39,5 +38,11 @@ export class UsersMvcController {
                 userCount
             });
         }
+    }
+
+
+    @Post("register")
+    async registerSubmit(@Body() validatedInput: RegisterInputDto) {
+        return await this.usersService.register(validatedInput);
     }
 }

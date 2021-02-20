@@ -118,7 +118,7 @@ function logRoutes(app: INestApplication) {
 
 async function bootstrap<T>(Module: T) {
     const app = await NestFactory.create<NestExpressApplication>(Module, {
-        logger: ["error", "warn"], //"log"
+        logger: ["error", "warn", "log"],
         abortOnError: true
     });
 
@@ -127,7 +127,10 @@ async function bootstrap<T>(Module: T) {
     app.setViewEngine('ejs');
 
     legacyMiddleware(app);
-    app.useGlobalPipes(new ValidationPipe({exceptionFactory: (errors) => new ValidationException(errors, "API")}));
+    app.useGlobalPipes(new ValidationPipe({
+        exceptionFactory: (errors) => new ValidationException(errors, "API"),
+        whitelist: true
+    }));
     AddSwagger(app);
 
     await app.listen(APP_PORT, APP_HOST, async () => {

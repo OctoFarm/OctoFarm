@@ -7,7 +7,7 @@ import {AuthController} from "./controllers/auth.controller";
 import {UsersModule} from "../users/users.module";
 import {CryptoModule} from "../crypto/crypto.module";
 import {ConfigModule} from "@nestjs/config";
-import {AuthConfiguration} from "./auth.configuration";
+import {AuthConfiguration, DefaultAdminPassword} from "./auth.configuration";
 import {APP_GUARD} from "@nestjs/core";
 import {JwtAuthGuard} from "./guards/jwt-auth.guard";
 import {UsersService} from "../users/services/users.service";
@@ -53,9 +53,9 @@ export class AuthModule {
         if (!user) {
             await this.userService.create({
                 group: GroupEnum.Admin,
-                name: 'admin',
-                username: 'root',
-                password: 'asd'
+                name: "admin",
+                username: "admin",
+                password: DefaultAdminPassword
             });
         }
     }

@@ -1,6 +1,6 @@
 import {Controller, Get} from '@nestjs/common';
 import {ApiService} from './api.service';
-import {Public} from "../auth/decorators/auth.decorators";
+import {Public} from "../utils/auth.decorators";
 
 @Controller("api")
 export class ApiController {
