@@ -17,8 +17,8 @@ const cache = require("gulp-cached");
 const {src, series, parallel, dest, watch} = require("gulp");
 
 const ASSETS_FOLDER_OLD = './views/assets';
-const ASSETS_FOLDER = '../server_2x/assets/public/assets';
-
+const ASSETS_FOLDER_NEW = '../server_2x/assets/public/assets';
+const ASSETS_FOLDER = ASSETS_FOLDER_NEW;
 const jsCameraView = "cameraViewRunner.js";
 const jsCurrentOperationsView = "currentOperationsViewRunner.js";
 const jsDashboardView = "dashboardRunner.js";

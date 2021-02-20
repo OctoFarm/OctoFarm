@@ -5,10 +5,12 @@ import {ClientSettingsService} from "../../settings/services/client-settings.ser
 import {PrintersService} from "../../printers/services/printers.service";
 import {ServerSettingsService} from "../../settings/services/server-settings.service";
 import {prettyHelpers} from "../js/pretty";
-import {interval} from "rxjs";
+import {interval, Observable} from "rxjs";
 import {map} from "rxjs/operators";
 import {ConfigType} from "@nestjs/config";
 import {DashboardConfig} from "../dashboard.config";
+import {DashboardSseMessageDto} from "../dto/sse-message.dto";
+import {stringify} from "flatted";
 
 @Controller("dashboard")
 @ApiTags(DashboardMvcController.name)
@@ -23,15 +25,21 @@ export class DashboardMvcController {
 
     @Sse("update-sse")
     @Public()
-    async updateDashboard() {
+    async updateDashboard(): Promise<Observable<string | DashboardSseMessageDto>> {
+        // const currentOperations = await PrinterClean.returnCurrentOperations();
+        // const dashStatistics = await PrinterClean.returnDashboardStatistics();
+        // const printerInformation = await PrinterClean.returnPrintersInformation();
+        const clientSettings = await this.clientSettingsService.getOrAddDashboardSettings();
+
         return interval(1000)
             .pipe(
                 map(_ => {
-                        return {
-                            data: {
-                                hello: 'world'
-                            }
-                        };
+                        return stringify({
+                            printerInformation: null,
+                            currentOperations: null,
+                            dashStatistic: null,
+                            dashboardSettings: clientSettings.dashboard,
+                        });
                     }
                 )
             );

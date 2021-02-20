@@ -1,6 +1,7 @@
 import {BeforeInsert, BeforeUpdate, Column, Entity, ObjectID, ObjectIdColumn} from "typeorm";
 import {IsDefined, validate} from "class-validator";
 import {ValidationException} from "../../providers/validation.exception";
+import {ClientDashboardSettings} from "../models/client-dashboard/client-dashboard.settings";
 
 @Entity()
 export class ClientSettings {
@@ -9,19 +10,19 @@ export class ClientSettings {
 
     @Column()
     @IsDefined()
-    dashboard: Object; // TODO model
+    dashboard: ClientDashboardSettings; // TODO model
 
     @Column()
-    panelView: Object = {}; // TODO model
+    panelView: any = {}; // TODO model
 
     @Column()
-    listView: Object = {}; // TODO model
+    listView: any = {}; // TODO model
 
     @Column()
-    cameraView: Object = {}; // TODO model;
+    cameraView: any = {}; // TODO model;
 
     @Column()
-    controlSettings: Object = {}; // TODO model;
+    controlSettings: any = {}; // TODO model;
 
     constructor(partialInput?: Partial<ClientSettings>) {
         partialInput && Object.assign(this, partialInput);

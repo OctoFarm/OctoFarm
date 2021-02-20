@@ -162,6 +162,7 @@ async function enable() {
       res.redirect("/dashboard");
     }
   );
+  // ==== DONE ===
   // router.post("/login", (req, res, next) => {
   //     passport.authenticate("local", {
   //         successRedirect: "/dashboard",
@@ -172,6 +173,7 @@ async function enable() {
   //         serverSettings: settings,
   //     })(req, res, true);
   // });
+  // ==== END DONE ===
 
   // Logout Handle
   router.get("/logout", (req, res) => {
