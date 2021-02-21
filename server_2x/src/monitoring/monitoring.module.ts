@@ -1,6 +1,5 @@
 import {Module} from '@nestjs/common';
-import {MonitoringService} from './services/monitoring.service';
-import {MonitoringController} from './controllers/monitoring.controller';
+import {MonitoringMvcController} from './controllers/monitoring-mvc.controller';
 import {TypeOrmModule} from "@nestjs/typeorm";
 import {Alert} from "./entities/alert.entity";
 import {ErrorLog} from "./entities/error-log.entity";
@@ -11,20 +10,26 @@ import {FarmStatisticsService} from "./services/farm-statistics.service";
 import {FarmStatisticsController} from "./controllers/farm-statistics.controller";
 import {AlertsController} from "./controllers/alerts.controller";
 import {AlertsService} from "./services/alerts.service";
+import {ConfigModule} from "@nestjs/config";
+import {MonitoringConfig} from "./monitoring.config";
+import {SettingsModule} from "../settings/settings.module";
 
 @Module({
-    imports: [TypeOrmModule.forFeature([Alert, ErrorLog, FarmStatistics])],
+    imports: [
+        TypeOrmModule.forFeature([Alert, ErrorLog, FarmStatistics]),
+        ConfigModule.forFeature(MonitoringConfig),
+        SettingsModule
+    ],
     controllers: [
-        MonitoringController,
+        MonitoringMvcController,
         ErrorLogController,
         FarmStatisticsController,
         AlertsController
     ],
     providers: [
-        MonitoringService,
         ErrorLogService,
         FarmStatisticsService,
-        AlertsService
+        AlertsService,
     ]
 })
 export class MonitoringModule {
