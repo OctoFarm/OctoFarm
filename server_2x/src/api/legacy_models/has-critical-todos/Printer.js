@@ -1,8 +1,10 @@
 const mongoose = require("mongoose");
 const Schema = require('mongoose/lib/schema');
 const {arrayValidator} = require('../../server/src/printers/utils/validators');
-const {arrayLengthValidator} = require('./PrinterGroup');
+const {arrayLengthValidator} = require('../done/PrinterGroup');
 
+// === WIP ===
+// TODO in the new printers module
 const PrinterSchema = new mongoose.Schema({
   category: {
     type: String,

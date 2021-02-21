@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+// === WIP ===
+// TODO in the new printers module
 const TempHistorySchema = new mongoose.Schema(
   {
     currentTemp: {

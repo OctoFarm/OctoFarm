@@ -19,7 +19,7 @@ export class PrinterGroup {
     @IsDefined({each: true})
     printers: ObjectID[] = [];
 
-    // TODO OOOOH INTERESTING THOUGHT
+    // TODO OOOOH INTERESTING THOUGHT - do consider negative effect (chaos)
     // @Column()
     // apiKey: string;
 
