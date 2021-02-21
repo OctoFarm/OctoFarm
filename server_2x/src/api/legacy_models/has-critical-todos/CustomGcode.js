@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+// === WIP ===
+// TODO in the new printers module + renamed schema/table
 const CustomGcodeSchema = new mongoose.Schema({
     name: {
         type: String,

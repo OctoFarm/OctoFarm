@@ -1,7 +1,7 @@
 import {IsNotEmpty, IsString, MinLength} from "class-validator";
 import {Matches} from "../../utils/validations.util";
 import {nameof} from "../../utils/property-reflection.util";
-import {USER_CONSTANTS} from "../users.constants";
+import {UserConstants} from "../users.constants";
 
 export class RegisterInputDto {
     @IsNotEmpty()
@@ -10,12 +10,12 @@ export class RegisterInputDto {
 
     @IsNotEmpty()
     @IsString()
-    @MinLength(USER_CONSTANTS.usernameLengthMinimum)
+    @MinLength(UserConstants.usernameLengthMinimum)
     username: string;
 
     @IsNotEmpty()
     @IsString()
-    @MinLength(USER_CONSTANTS.passwordLengthMinimum)
+    @MinLength(UserConstants.passwordLengthMinimum)
     password: string;
 
     @IsNotEmpty()

@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+// === WIP ===
+// TODO in the new users module
 const UserSchema = new mongoose.Schema({
     name: {
         type: String,

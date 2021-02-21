@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+// === WIP ===
+// TODO in the new monitoring module
 const FarmInfoSchema = new mongoose.Schema({
     farmStart: {
         type: Date,

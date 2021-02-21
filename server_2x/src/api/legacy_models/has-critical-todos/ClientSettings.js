@@ -1,5 +1,7 @@
 const mongoose = require("mongoose");
 
+// === WIP ===
+// TODO in the new settings module
 const ClientSettingsSchema = new mongoose.Schema({
   dashboard: {
     type: Object,

@@ -26,16 +26,17 @@ import {DashboardModule} from "./dashboard/dashboard.module";
             isGlobal: true,
             envFilePath: [".env", ".env.development", ".env.production"],
         }),
-        PrintersModule,
-        SettingsModule,
-        UsersModule,
-        DashboardModule,
-        ApiModule,
-        AuthModule,
-        CryptoModule,
         TypeOrmModule.forRoot(),
         MigrationsModule,
-        MonitoringModule
+        ApiModule,
+        CryptoModule,
+        AuthModule,
+        UsersModule,
+        SettingsModule,
+        PrintersModule,
+        DashboardModule,
+        MonitoringModule,
+        // FileManagementModule
     ],
     controllers: [BootController]
 })
