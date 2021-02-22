@@ -179,7 +179,7 @@ export default class PrinterSelect {
   <td><input id="editInputName-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.name}" aria-label="Username" aria-describedby="basic-addon1"></td>
                           <td><input id="editInputURL-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.printerURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
                           <td class="${printer.state} d-none">${printer.state}</td>
-                          <input id="editInputGroup-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.group}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputGroup-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.group}" aria-label="Username" aria-describedby="basic-addon1"></td>
                           <td><input id="editInputCamera-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.cameraURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
                           <td><input id="editInputApikey-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.apikey}" aria-label="Username" aria-describedby="basic-addon1"></td>
     </tr>`;

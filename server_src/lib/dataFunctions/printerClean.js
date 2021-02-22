@@ -460,11 +460,12 @@ class PrinterClean {
       if (typeof farmPrinter.systemChecks !== "undefined") {
         farmPrinter.systemChecks.cleaning.information.status = "warning";
       }
-
-            // Append the groups by JOIN
-            const printerGroups = await PrinterGroup.find({
-                printers: farmPrinter._id,
-            }).exec();
+      // Clearing out in prep for 1.1.11
+      const printerGroups = [];
+      // // Append the groups by JOIN
+      // const printerGroups = await PrinterGroup.find({
+      //     printers: farmPrinter._id,
+      // }).exec();
 
       const sortedPrinter = {
         // eslint-disable-next-line no-underscore-dangle
@@ -485,7 +486,7 @@ class PrinterClean {
           desc: farmPrinter.webSocketDescription,
         },
         group: farmPrinter.group,
-                groups: printerGroups,
+        groups: printerGroups,
         printerURL: farmPrinter.printerURL,
         cameraURL: farmPrinter.camURL,
         apikey: farmPrinter.apikey,
