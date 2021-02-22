@@ -156,7 +156,9 @@ export default class PrinterSelect {
 <tr id="${printer.id}" class="${printer.state}" data-jplist-item>
     <td>
         <div class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input Idle" id="checkBox-${printer.id}" value="${printer.id}">
+            <input type="checkbox" class="custom-control-input Idle" id="checkBox-${
+              printer.id
+            }" value="${printer.id}">
             <label class="custom-control-label" for="checkBox-${printer.id}">
             </label>
         </div>
@@ -174,38 +176,12 @@ export default class PrinterSelect {
     return `
 <tr id="editPrinterCard-${printer.id}" class="${printer.state}" data-jplist-item>
   <th scope="row">${printer.index}</th>
-  <td><input id="editInputName-${
-      printer.id
-    }" type="text" class="form-control Idle" placeholder="${
-      printer.name
-    }" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input id="editInputURL-${
-      printer.id
-    }" type="text" class="form-control Idle" placeholder="${
-      printer.printerURL
-    }" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td class="${printer.state} d-none">${
-      printer.state
-    }</td>
-                          <td class="${printer.group.replace(
-      /\s/g,
-      "_",
-    )}">
-        <select id="editInputGroup-${printer.id}"
-                class="custom-select">
-<!--                Added dynamically later -->
-        </select>
-      </td>
-                          <td><input id="editInputCamera-${
-      printer.id
-    }" type="text" class="form-control Idle" placeholder="${
-      printer.cameraURL
-    }" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input id="editInputApikey-${
-      printer.id
-    }" type="text" class="form-control Idle" placeholder="${
-      printer.apikey
-    }" aria-label="Username" aria-describedby="basic-addon1"></td>
+  <td><input id="editInputName-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.name}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputURL-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.printerURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td class="${printer.state} d-none">${printer.state}</td>
+                          <input id="editInputGroup-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.group}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputCamera-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.cameraURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputApikey-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.apikey}" aria-label="Username" aria-describedby="basic-addon1"></td>
     </tr>`;
   }
 
@@ -254,7 +230,7 @@ export default class PrinterSelect {
       messageBox.innerHTML = gcodePrintersMessage;
     }
     const printersInfo = await OctoFarmClient.post("printers/printerInfo");
-    const groups = await OctoFarmClient.get("groups/list");
+    // const groups = await OctoFarmClient.get("groups/list");
 
     const printers = await printersInfo.json();
     const groupList = [];
@@ -315,14 +291,14 @@ export default class PrinterSelect {
         printerList.forEach((printer) => {
           tableBody.insertAdjacentHTML(
             "beforeend",
-            this.getEditableList(printer),
+            this.getEditableList(printer)
           );
         });
       } else {
         printerList.forEach((printer) => {
           tableBody.insertAdjacentHTML(
             "beforeend",
-            this.getSelectableList(printer),
+            this.getSelectableList(printer)
           );
         });
       }
@@ -331,24 +307,30 @@ export default class PrinterSelect {
       printerGroupList.innerHTML = "";
       printerGroupList.insertAdjacentHTML(
         "beforeend",
-        '<option selected value="all" data-path="default">Filter</option>',
+        '<option selected value="all" data-path="default">Filter</option>'
       );
       groupListUnique.forEach((group, index) => {
         printerGroupList.insertAdjacentHTML(
           "beforeend",
-          `<option value="${group.tag.toLowerCase()}" data-path=".${group.tag}">${group.display}</option>`,
+          `<option value="${group.tag.toLowerCase()}" data-path=".${
+            group.tag
+          }">${group.display}</option>`
         );
       });
 
       // Printer group dropdown
-      printers.forEach(printer => {
-        const printerGroupAssignSelect = document.getElementById(`editInputGroup-${printer._id}`);
+      printers.forEach((printer) => {
+        const printerGroupAssignSelect = document.getElementById(
+          `editInputGroup-${printer._id}`
+        );
         if (!printerGroupAssignSelect) return;
 
         groupListUnique.forEach((group, index) => {
           printerGroupAssignSelect.insertAdjacentHTML(
             "beforeend",
-            `<option value="${group.tag.toLowerCase()}" data-path=".${group.tag}">${group.display}</option>`,
+            `<option value="${group.tag.toLowerCase()}" data-path=".${
+              group.tag
+            }">${group.display}</option>`
           );
         });
       });
@@ -356,7 +338,7 @@ export default class PrinterSelect {
       const tableBody = document.getElementById("printerSelectBody");
       tableBody.insertAdjacentHTML(
         "beforeend",
-        "<tr><td>No Online Printers</td></tr>",
+        "<tr><td>No Online Printers</td></tr>"
       );
     }
     PrinterSelect.addListeners(editable, callback);
@@ -370,7 +352,7 @@ export default class PrinterSelect {
             `;
       document.getElementById("selectAll").addEventListener("click", (e) => {
         const checkBoxes = document.querySelectorAll(
-          "input[type=\"checkbox\"]:not(:checked)",
+          "input[type=\"checkbox\"]:not(:checked)"
         );
         checkBoxes.forEach((box) => {
           box.checked = true;
@@ -378,7 +360,7 @@ export default class PrinterSelect {
       });
       document.getElementById("selectNone").addEventListener("click", (e) => {
         const checkBoxes = document.querySelectorAll(
-          'input[type="checkbox"]:checked',
+          'input[type="checkbox"]:checked'
         );
         checkBoxes.forEach((box) => {
           box.checked = false;
@@ -392,7 +374,7 @@ export default class PrinterSelect {
         "beforeend",
         `
                       <button id="saveEditsBtn" class="btn btn-success" data-dismiss="modal" aria-label="Close">Action</button>
-      `,
+      `
       );
       document
         .getElementById("saveEditsBtn")
@@ -403,7 +385,7 @@ export default class PrinterSelect {
 
   static getSelected() {
     const checkedBoxes = document.querySelectorAll(
-      "input[type=\"checkbox\"]:checked",
+      "input[type=\"checkbox\"]:checked"
     );
     const printers = [];
     checkedBoxes.forEach((box) => {
@@ -414,6 +396,5 @@ export default class PrinterSelect {
     return printers;
   }
 
-  static selectFilter() {
-  }
+  static selectFilter() {}
 }
