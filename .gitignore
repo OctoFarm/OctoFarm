@@ -13,9 +13,3 @@ images/historyCollection/
 *docker-compose.yml
 /.build
 /.cache
-
-views/assets/js/
-
-views/assets/css/
-
-views/images/
