@@ -13,6 +13,7 @@ import {BootController} from "./boot/boot.controller";
 import {SettingsModule} from "./settings/settings.module";
 import {MonitoringModule} from "./monitoring/monitoring.module";
 import {DashboardModule} from "./dashboard/dashboard.module";
+import {OctoprintModule} from "./octoprint/octoprint.module";
 
 @Module({
     providers: [
@@ -36,6 +37,7 @@ import {DashboardModule} from "./dashboard/dashboard.module";
         PrintersModule,
         DashboardModule,
         MonitoringModule,
+        OctoprintModule
         // FileManagementModule
     ],
     controllers: [BootController]

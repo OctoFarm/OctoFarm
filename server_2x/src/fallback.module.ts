@@ -1,5 +1,6 @@
 import {Module} from "@nestjs/common";
 import {BootController} from "./boot/boot.controller";
+import { OctoprintModule } from './octoprint/octoprint.module';
 
 // A safety module in case of startup errors
 @Module({
@@ -11,5 +12,5 @@ import {BootController} from "./boot/boot.controller";
     // ],
     controllers: [BootController]
 })
-export class AppFallbackModule {
+export class FallbackModule {
 }

@@ -20,7 +20,7 @@ const historyClean = require("../../server/src/printers/lib/dataFunctions/histor
 
 const { HistoryClean } = historyClean;
 
-const runner = require("./state.js");
+const runner = require("./progress/state.js");
 const { Runner } = runner;
 
 const script = require("./scriptCheck.js");

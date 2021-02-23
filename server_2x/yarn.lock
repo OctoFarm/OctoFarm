@@ -633,6 +633,14 @@
     multer "1.4.2"
     tslib "2.1.0"
 
+"@nestjs/platform-ws@^7.6.12":
+  version "7.6.12"
+  resolved "https://registry.yarnpkg.com/@nestjs/platform-ws/-/platform-ws-7.6.12.tgz#b2b8816aa03b5b8490dd866b1757be6957b65341"
+  integrity sha512-hh3CAqOF693OZ6FOEVuhWwCRKafGGibGG8cM7to/FHwce654fiokWY06VjfUmv+SGbkvpfDKAVirZ1mS46a8rQ==
+  dependencies:
+    tslib "2.1.0"
+    ws "7.4.3"
+
 "@nestjs/schematics@^7.1.0", "@nestjs/schematics@^7.1.3":
   version "7.2.7"
   resolved "https://registry.yarnpkg.com/@nestjs/schematics/-/schematics-7.2.7.tgz#22cd9d687afbbce068a7d20df02806c6f85832a8"
@@ -681,6 +689,14 @@
   integrity sha512-utE1FkYM/gyCXUqw3zKYYS0YZ3DfkAnzsCx4T48cNnSDTCeWS+u3yt0FMDFjwSiQSaLrzpiSff/FaxJQvRlYow==
   dependencies:
     uuid "8.3.1"
+
+"@nestjs/websockets@^7.6.12":
+  version "7.6.12"
+  resolved "https://registry.yarnpkg.com/@nestjs/websockets/-/websockets-7.6.12.tgz#d053967d972fe5bd86bb83cbf82db86116e0eaf5"
+  integrity sha512-vR/fI1EXn1jXjxc6kcyVWVo1nRAm1pjm0Z+Bw6cgYb/Fn9JWzu45K941dc6+chfsK8WPF+DJElX8MBXXDsVNmA==
+  dependencies:
+    iterare "1.2.1"
+    tslib "2.1.0"
 
 "@nodelib/fs.scandir@2.1.4":
   version "2.1.4"
@@ -1036,6 +1052,13 @@
     "@types/uglify-js" "*"
     "@types/webpack-sources" "*"
     source-map "^0.6.0"
+
+"@types/ws@^7.4.0":
+  version "7.4.0"
+  resolved "https://registry.yarnpkg.com/@types/ws/-/ws-7.4.0.tgz#499690ea08736e05a8186113dac37769ab251a0e"
+  integrity sha512-Y29uQ3Uy+58bZrFLhX36hcI3Np37nqWE7ky5tjiDoy1GDZnIwVxS0CgF+s+1bXMzjKBFy+fqaRfb708iNzdinw==
+  dependencies:
+    "@types/node" "*"
 
 "@types/yargs-parser@*":
   version "20.2.0"
@@ -6818,7 +6841,7 @@ write-file-atomic@^3.0.0:
     signal-exit "^3.0.2"
     typedarray-to-buffer "^3.1.5"
 
-ws@^7.2.3:
+ws@7.4.3, ws@^7.2.3:
   version "7.4.3"
   resolved "https://registry.yarnpkg.com/ws/-/ws-7.4.3.tgz#1f9643de34a543b8edb124bdcbc457ae55a6e5cd"
   integrity sha512-hr6vCR76GsossIRsr8OLR9acVVm1jyfEWvhbNjtgPOrfvAlKzvyeg/P6r8RuDjRyrcQoPQT7K0DGEPc7Ae6jzA==

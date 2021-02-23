@@ -5,7 +5,7 @@ import {D, Y} from "./utils/logging.util";
 import {NestExpressApplication} from '@nestjs/platform-express';
 import {DocumentBuilder, SwaggerModule} from "@nestjs/swagger";
 import {ValidationException} from "./providers/validation.exception";
-import {AppFallbackModule} from "./app-fallback.module";
+import {FallbackModule} from "./fallback.module";
 import * as session from 'express-session';
 import * as expressLayouts from 'express-ejs-layouts';
 import {join} from "path";
@@ -14,6 +14,7 @@ import {MongoClient as IMongoClient} from "typeorm";
 import {MongoClient} from "mongodb";
 import * as cookieParser from "cookie-parser";
 import * as flash from "connect-flash";
+import {WsAdapter} from "@nestjs/platform-ws";
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const db = require("../ormconfig");
 
@@ -127,6 +128,8 @@ async function bootstrap<T>(Module: T) {
     app.setBaseViewsDir('views');
     app.setViewEngine('ejs');
 
+    app.useWebSocketAdapter(new WsAdapter(app));
+
     legacyMiddleware(app);
     app.useGlobalPipes(new ValidationPipe({
         exceptionFactory: (errors) => new ValidationException(errors, "API"),
@@ -150,5 +153,5 @@ testDatabase()
         // Our database test failed
         printPreBootMessage(error);
         ApiService.databaseStartupErrorOccurred = true; // dirty way of propagating the error inside the app...
-        bootstrap(AppFallbackModule).then();
+        bootstrap(FallbackModule).then();
     });
