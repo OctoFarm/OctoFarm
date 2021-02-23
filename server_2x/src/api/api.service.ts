@@ -4,7 +4,7 @@ import {InjectConnection} from "@nestjs/typeorm";
 
 @Injectable()
 export class ApiService {
-    public static databaseStartupErrorOccurred: boolean = false;
+    public static databaseStartupErrorOccurred = false;
     constructor(
         @InjectConnection() private readonly connection: Connection
     ) {

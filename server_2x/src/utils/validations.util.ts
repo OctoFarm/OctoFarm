@@ -27,7 +27,9 @@ export class MatchConstraint implements ValidatorConstraintInterface {
         return value === relatedValue;
     }
 
-    defaultMessage(validationArguments?: ValidationArguments) {
+    defaultMessage(
+        // validationArguments?: ValidationArguments
+    ) {
         return 'fields do not match';
     }
 }

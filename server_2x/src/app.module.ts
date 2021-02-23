@@ -11,6 +11,7 @@ import {ApiModule} from './api/api.module';
 import {MigrationsModule} from "./migrations/migrations.module";
 import {BootController} from "./boot/boot.controller";
 import {SettingsModule} from "./settings/settings.module";
+import {MonitoringModule} from "./monitoring/monitoring.module";
 import {DashboardModule} from "./dashboard/dashboard.module";
 
 @Module({
@@ -25,15 +26,17 @@ import {DashboardModule} from "./dashboard/dashboard.module";
             isGlobal: true,
             envFilePath: [".env", ".env.development", ".env.production"],
         }),
-        PrintersModule,
-        SettingsModule,
-        UsersModule,
-        DashboardModule,
-        ApiModule,
-        AuthModule,
-        CryptoModule,
         TypeOrmModule.forRoot(),
         MigrationsModule,
+        ApiModule,
+        CryptoModule,
+        AuthModule,
+        UsersModule,
+        SettingsModule,
+        PrintersModule,
+        DashboardModule,
+        MonitoringModule,
+        // FileManagementModule
     ],
     controllers: [BootController]
 })

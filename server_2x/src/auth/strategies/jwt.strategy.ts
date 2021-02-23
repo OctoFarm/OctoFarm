@@ -4,13 +4,13 @@ import {Inject, Injectable, UnauthorizedException} from '@nestjs/common';
 import {JwtOptions} from "../interfaces/jwt-options.model";
 import {AuthService} from "../services/auth.service";
 import {UserPayload} from "../interfaces/user-payload.model";
-import {AuthConfiguration} from "../auth.configuration";
+import {AuthConfig} from "../auth.config";
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor(
         private readonly authService: AuthService,
-        @Inject(AuthConfiguration.KEY) jwtOptions: JwtOptions,
+        @Inject(AuthConfig.KEY) jwtOptions: JwtOptions,
     ) {
         super({
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -19,6 +19,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
         });
     }
 
+    // eslint-disable-next-line @typescript-eslint/ban-types
     async validate(payload: UserPayload, done: Function) {
         const user = await this.authService.validateTokenClaims(payload);
         if (!user) {

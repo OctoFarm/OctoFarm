@@ -20,6 +20,7 @@ export class ClientSettingsService {
         } else {
             this.logger.warn("Created ServerSettings by default as it was not provided");
             return await this.clientSettingsRepository.save(new ClientSettings({
+                // TODO expand model
                 dashboard: new ClientDashboardSettings()
             }));
         }

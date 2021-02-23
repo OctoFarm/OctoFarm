@@ -28,6 +28,10 @@ export class ClientDashboardSettings {
             {x: 6, y: 10, width: 6, height: 9, id: "hourlyTemper"},
             {x: 0, y: 10, width: 6, height: 9, id: "weeklyUtil"},
             {x: 0, y: 19, width: 12, height: 8, id: "enviroData"},
+            // TODO defined by dashboard (not by printers view)?
+            {x: 0, y: 19, width: 12, height: 8, id: "filamentUsageOverTime"},
+            {x: 0, y: 19, width: 12, height: 8, id: "filamentUsageByDay"},
+            {x: 0,y: 19,width: 12,height: 8,id: "historyCompletionByDay",},
         ];
         this.savedLayout = [];
         this.farmActivity = {
@@ -50,6 +54,10 @@ export class ClientDashboardSettings {
             weeklyUtilisation: true,
             hourlyTotalTemperatures: false,
             environmentalHistory: false,
+            // TODO defined by dashboard (not by printers view)?
+            filamentUsageOverTime: false,
+            filamentUsageByDay: false,
+            historyCompletionByDay: false,
         };
     }
 }

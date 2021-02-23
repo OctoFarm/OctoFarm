@@ -1,7 +1,6 @@
-import {IsEnum, IsNotEmpty, IsString, MinLength, validate} from "class-validator";
+import {IsEnum, IsNotEmpty, IsString, MinLength} from "class-validator";
 import {GroupEnum} from "../types/group.enum";
-import {ValidationException} from "../../providers/validation.exception";
-import {USER_CONSTANTS} from "../users.constants";
+import {UserConstants} from "../users.constants";
 
 export class CreateUserDto {
     @IsString()
@@ -9,12 +8,12 @@ export class CreateUserDto {
 
     @IsNotEmpty()
     @IsString()
-    @MinLength(USER_CONSTANTS.usernameLengthMinimum)
+    @MinLength(UserConstants.usernameLengthMinimum)
     username: string;
 
     @IsNotEmpty()
     @IsString()
-    @MinLength(USER_CONSTANTS.passwordLengthMinimum)
+    @MinLength(UserConstants.passwordLengthMinimum)
     password: string;
 
     @IsNotEmpty()

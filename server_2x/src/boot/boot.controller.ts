@@ -4,9 +4,6 @@ import {ApiService} from "../api/api.service";
 
 @Controller()
 export class BootController {
-    constructor() {
-    }
-
     // TODO make timeout-based on frontend so be dont go CPU 100%
     @Get('serverchecks/amialive')
     @Public()

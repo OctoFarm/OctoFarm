@@ -7,7 +7,7 @@ import {AuthController} from "./controllers/auth.controller";
 import {UsersModule} from "../users/users.module";
 import {CryptoModule} from "../crypto/crypto.module";
 import {ConfigModule} from "@nestjs/config";
-import {AuthConfiguration, DefaultAdminPassword} from "./auth.configuration";
+import {AuthConfig, DefaultAdminPassword} from "./auth.config";
 import {APP_GUARD} from "@nestjs/core";
 import {JwtAuthGuard} from "./guards/jwt-auth.guard";
 import {UsersService} from "../users/services/users.service";
@@ -26,9 +26,9 @@ import {SettingsModule} from "../settings/settings.module";
     ],
     imports: [
         PassportModule,
-        ConfigModule.forFeature(AuthConfiguration),
+        ConfigModule.forFeature(AuthConfig),
         JwtModule.registerAsync({
-            useFactory: AuthConfiguration
+            useFactory: AuthConfig
         }),
         UsersModule,
         SettingsModule,
