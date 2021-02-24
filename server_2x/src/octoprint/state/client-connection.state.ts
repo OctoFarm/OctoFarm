@@ -34,7 +34,7 @@ export class ClientConnectionState {
     }
 
     getState() {
-        return Object.seal(this.state); // Reduce
+        return Object.freeze(this.state); // Reduce
     }
 
     isApiKeyStateAccepted() {

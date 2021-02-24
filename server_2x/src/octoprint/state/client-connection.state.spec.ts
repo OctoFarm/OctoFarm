@@ -42,4 +42,10 @@ describe(ClientConnectionState.name, () => {
         service.initState();
         expect(() => service.initState()).toThrowError("Can't initialize already known state.");
     });
+
+    it('should get frozen state', () => {
+        service.initState();
+        const frozenState = service.getState();
+        expect(Object.isFrozen(frozenState)).toBe(true);
+    });
 });
