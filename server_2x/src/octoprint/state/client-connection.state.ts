@@ -6,8 +6,19 @@ import {Observable} from "rxjs";
 import {ClientConnectionStateModel} from "../models/client-connection-state.model";
 import {ConnectionParamsModel} from "../models/connection-params.model";
 
-export class PrinterConnectionState {
-    state: ClientConnectionStateModel;
+export class ClientConnectionState {
+    public static defaultState: ClientConnectionStateModel = {
+        apiKeyAccepted: false,
+        apiKeyIsGlobal: false,
+        apiKeyProvided: false,
+        apiKeyValid: false,
+        corsEnabled: false,
+        userHasRequiredRoles: false,
+        websocketConnected: false,
+        websocketHealthy: false
+        // Defaults
+    };
+    private state: ClientConnectionStateModel;
 
     constructor(
         private octoPrintClientService: OctoPrintClientService
@@ -16,24 +27,14 @@ export class PrinterConnectionState {
 
     initState() {
         if (!this.state) {
-            this.state = {
-                apiKeyAccepted: false,
-                apiKeyIsGlobal: false,
-                apiKeyProvided: false,
-                apiKeyValid: false,
-                corsEnabled: false,
-                userHasRequiredRoles: false,
-                websocketConnected: false,
-                websocketHealthy: false
-                // Defaults
-            };
+            this.state = {...ClientConnectionState.defaultState};
         } else {
             throw Error("Can't initialize already known state.");
         }
     }
 
     getState() {
-        return Object.freeze(this.state); // Reduce
+        return Object.seal(this.state); // Reduce
     }
 
     isApiKeyStateAccepted() {
@@ -50,7 +51,7 @@ export class PrinterConnectionState {
             && this.state.userHasRequiredRoles;
     }
 
-    setCorsEnabled(params:ConnectionParamsModel): Observable<any> {
+    setCorsEnabled(params: ConnectionParamsModel): Observable<any> {
         if (this.userHasRequiredRoles()) {
             return this.octoPrintClientService
                 .setCORSEnabled(params)

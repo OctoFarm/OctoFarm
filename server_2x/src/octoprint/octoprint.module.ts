@@ -2,7 +2,7 @@ import {HttpModule, Module} from '@nestjs/common';
 import {OctoPrintClientService} from './services/octoprint-client.service';
 import {OctoprintGateway} from './gateway/octoprint.gateway';
 
-import {PrinterConnectionState} from "./state/client-connection.state";
+import {ClientConnectionState} from "./state/client-connection.state";
 import {ConnectionParamsModel} from "./models/connection-params.model";
 
 
@@ -11,7 +11,7 @@ import {ConnectionParamsModel} from "./models/connection-params.model";
     providers: [
         OctoprintGateway,
         OctoPrintClientService,
-        PrinterConnectionState
+        ClientConnectionState
     ]
 })
 export class OctoprintModule {
