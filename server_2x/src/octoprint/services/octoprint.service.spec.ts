@@ -1,15 +1,15 @@
 import {Test, TestingModule} from '@nestjs/testing';
-import {OctoprintService} from './octoprint.service';
+import {OctoPrintClientService} from './octoprint-client.service';
 
-describe(OctoprintService.name, () => {
-    let service: OctoprintService;
+describe(OctoPrintClientService.name, () => {
+    let service: OctoPrintClientService;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
-            providers: [OctoprintService],
+            providers: [OctoPrintClientService],
         }).compile();
 
-        service = module.get<OctoprintService>(OctoprintService);
+        service = module.get<OctoPrintClientService>(OctoPrintClientService);
     });
 
     it('should be defined', () => {

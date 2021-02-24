@@ -1,10 +1,10 @@
 import {WebSocketGateway} from '@nestjs/websockets';
-import {OctoprintService} from '../services/octoprint.service';
+import {OctoPrintClientService} from '../services/octoprint-client.service';
 
 @WebSocketGateway()
 export class OctoprintGateway {
     constructor(
-        private readonly octoprintService: OctoprintService
+        private readonly octoprintService: OctoPrintClientService
     ) {
         this.connectOctoPrintClient();
     }

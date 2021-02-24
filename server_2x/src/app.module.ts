@@ -14,6 +14,7 @@ import {SettingsModule} from "./settings/settings.module";
 import {MonitoringModule} from "./monitoring/monitoring.module";
 import {DashboardModule} from "./dashboard/dashboard.module";
 import {OctoprintModule} from "./octoprint/octoprint.module";
+import {ScheduleModule} from "@nestjs/schedule";
 
 @Module({
     providers: [
@@ -23,6 +24,7 @@ import {OctoprintModule} from "./octoprint/octoprint.module";
         },
     ],
     imports: [
+        ScheduleModule.forRoot(),
         ConfigModule.forRoot({
             isGlobal: true,
             envFilePath: [".env", ".env.development", ".env.production"],

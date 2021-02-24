@@ -13,6 +13,7 @@ import {PrintersConfig} from "./printers.config";
 import {PrinterProfile} from "./entities/printer-profile.entity";
 import {PrinterRoomData} from "./entities/printer-room-data.entity";
 import {PrinterTempHistory} from "./entities/printer-temp-history.entity";
+import {PrinterQueryTask} from "./tasks/printer-query.task";
 
 @Module({
     imports: [
@@ -28,7 +29,8 @@ import {PrinterTempHistory} from "./entities/printer-temp-history.entity";
     ],
     providers: [
         PrintersService,
-        PrinterGroupsService
+        PrinterGroupsService,
+        PrinterQueryTask
     ],
     exports: [
         PrintersService
