@@ -3,6 +3,7 @@ import {OctoPrintClientService} from './services/octoprint-client.service';
 import {OctoprintGateway} from './gateway/octoprint.gateway';
 
 import {PrinterConnectionState} from "./state/client-connection.state";
+import {ConnectionParamsModel} from "./models/connection-params.model";
 
 
 @Module({
@@ -21,14 +22,22 @@ export class OctoprintModule {
     }
 
     onModuleInit() {
-                // import * as fs from "fs";
-                // import {transform} from 'json-to-typescript';
-                // Transform the response to a model in TypeScript
-                // console.warn(result.status, 'Writing file to proxy folder.');
-                // fs.writeFileSync("src/octoprint/proxy/op-response-output.json", JSON.stringify(result.data, null, 2));
-                // transform('OctoPrintSettingsDto', result.data)
-                //     .then(transformation => {
-                //         fs.writeFileSync("src/octoprint/proxy/op-response.schema.ts", transformation);
-                //     });
+        const testPrinterConnectionParams = this.getEnvTestPrinter();
+        this.service.getSettings(testPrinterConnectionParams)
+            .subscribe(result => {
+                testPrinterConnectionParams.printerKey
+                console.warn("Global key provided", result.data.api.key === testPrinterConnectionParams.printerKey);
+            });
+    }
+
+    private getEnvTestPrinter(): ConnectionParamsModel {
+        const envTestPrinterURL = process.env["TEST_PRINTER_URL"];
+        const envTestPrinterKey = process.env["TEST_PRINTER_KEY"];
+        if (!!envTestPrinterURL && !!envTestPrinterKey) {
+            return {
+                printerURL: envTestPrinterURL,
+                printerKey: envTestPrinterKey
+            }
+        } else return null;
     }
 }

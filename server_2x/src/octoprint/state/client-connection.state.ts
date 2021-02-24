@@ -4,6 +4,7 @@ import {OctoPrintClientService} from "../services/octoprint-client.service";
 import {tap} from "rxjs/operators";
 import {Observable} from "rxjs";
 import {ClientConnectionStateModel} from "../models/client-connection-state.model";
+import {ConnectionParamsModel} from "../models/connection-params.model";
 
 export class PrinterConnectionState {
     state: ClientConnectionStateModel;
@@ -49,10 +50,10 @@ export class PrinterConnectionState {
             && this.state.userHasRequiredRoles;
     }
 
-    setCorsEnabled(value = true): Observable<any> {
+    setCorsEnabled(params:ConnectionParamsModel): Observable<any> {
         if (this.userHasRequiredRoles()) {
             return this.octoPrintClientService
-                .setCORSEnabled("prusa/")
+                .setCORSEnabled(params)
                 .pipe(tap(_ => {
                     this.patchState({
                         corsEnabled: true
