@@ -1,3 +1,6 @@
+// This is meant to become a tool for converting an API to a Typescript set of models
+// Do note how it is limited to the roles and plugins installed on OctoPrint, but that can be corrected easily.
+
 // import * as fs from "fs";
 // import {transform} from 'json-to-typescript';
 // Transform the response to a model in TypeScript

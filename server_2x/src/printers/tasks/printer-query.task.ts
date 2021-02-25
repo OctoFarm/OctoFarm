@@ -1,5 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
-import { Cron, Interval, Timeout } from '@nestjs/schedule';
+import {Injectable, Logger} from '@nestjs/common';
 
 @Injectable()
 export class PrinterQueryTask {
@@ -22,8 +21,8 @@ export class PrinterQueryTask {
     //     this.logger.warn('Called every 233 milli-seconds');
     // }
 
-    @Timeout(5000)
-    handleTimeout() {
-        this.logger.warn('Called once after 5 seconds');
-    }
+    // @Timeout(5000)
+    // handleTimeout() {
+    //     this.logger.warn('Called once after 5 seconds');
+    // }
 }
