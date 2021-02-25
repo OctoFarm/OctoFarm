@@ -6,10 +6,9 @@ export class OctoprintGateway {
     constructor(
         private readonly octoprintService: OctoPrintClientService
     ) {
-        this.connectOctoPrintClient();
     }
 
-    connectOctoPrintClient() {
+    // connectOctoPrintClient() {
         // const socket = new WebSocket('ws://prusa');
         // socket.onopen = function () {
         //     console.log('Connected');
@@ -23,5 +22,5 @@ export class OctoprintGateway {
         //         console.log(data);
         //     };
         // };
-    }
+    // }
 }

@@ -1,5 +1,3 @@
-// We will assume for brevity that this state belongs to one specific printer
-// It is therefore already reduced for simplicity
 import {OctoPrintClientService} from "../services/octoprint-client.service";
 import {tap} from "rxjs/operators";
 import {Observable} from "rxjs";
@@ -16,7 +14,6 @@ export class ClientConnectionState {
         userHasRequiredRoles: false,
         websocketConnected: false,
         websocketHealthy: false
-        // Defaults
     };
     private state: ClientConnectionStateModel;
 

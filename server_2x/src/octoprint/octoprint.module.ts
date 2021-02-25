@@ -4,6 +4,7 @@ import {OctoprintGateway} from './gateway/octoprint.gateway';
 
 import {ClientConnectionState} from "./state/client-connection.state";
 import {ConnectionParamsModel} from "./models/connection-params.model";
+import {TEST_PRINTER_KEY, TEST_PRINTER_URL} from "./octoprint.constants";
 
 
 @Module({
@@ -26,13 +27,13 @@ export class OctoprintModule {
         this.service.getSettings(testPrinterConnectionParams)
             .subscribe(result => {
                 testPrinterConnectionParams.printerKey
-                console.warn("Global key provided", result.data.api.key === testPrinterConnectionParams.printerKey);
+                // console.warn("Global key provided", result.data.api.key === testPrinterConnectionParams.printerKey);
             });
     }
 
     private getEnvTestPrinter(): ConnectionParamsModel {
-        const envTestPrinterURL = process.env["TEST_PRINTER_URL"];
-        const envTestPrinterKey = process.env["TEST_PRINTER_KEY"];
+        const envTestPrinterURL = process.env[TEST_PRINTER_URL];
+        const envTestPrinterKey = process.env[TEST_PRINTER_KEY];
         if (!!envTestPrinterURL && !!envTestPrinterKey) {
             return {
                 printerURL: envTestPrinterURL,
