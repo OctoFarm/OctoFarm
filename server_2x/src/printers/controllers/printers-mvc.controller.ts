@@ -12,6 +12,7 @@ import {ConfigType} from "@nestjs/config";
 import {PrintersConfig, UpdateEventStreamPeriodDefault} from "../printers.config";
 
 @Controller("printers")
+@Public()
 @ApiTags(PrintersMvcController.name)
 export class PrintersMvcController {
     readonly ssePeriod: number;
@@ -26,7 +27,6 @@ export class PrintersMvcController {
 
     // ======= LEGACY MVC ENDPOINTS BELOW - PHASED OUT SOON ======
     @Get()
-    @Public()
     async getPrinters(@Req() req, @Res() res) {
         const printers = await this.printersService.list();
         const serverSettings = await this.serverSettingsService.findFirstOrAdd();
