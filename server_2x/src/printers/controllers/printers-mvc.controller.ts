@@ -42,7 +42,7 @@ export class PrintersMvcController {
         }
         res.render("printerManagement", {
             name: user,
-            userGroup: group,
+            userGroup: group || "Administrator",
             version: process.env.npm_package_version,
             page: "Printer Manager",
             printerCount: printers.length,
@@ -53,12 +53,13 @@ export class PrintersMvcController {
     @Sse("update-sse")
     async updatePrinters(): Promise<Observable<string | PrintersSseMessageDto>> {
         // TODO NotExpectedYet oi mate it's all you's 'ere!
+        const printers = await this.printersService.list();
         // const printersInformation = await PrinterClean.returnPrintersInformation();
         // const printerControlList = await PrinterClean.returnPrinterControlList();
         // const currentTickerList = await PrinterTicker.returnIssue();
 
         const returnedUpdate: PrintersSseMessageDto = {
-            printersInformation: null,
+            printersInformation: printers,
             printerControlList: null,
             currentTickerList: null,
         }
