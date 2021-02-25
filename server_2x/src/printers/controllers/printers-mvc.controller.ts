@@ -1,4 +1,4 @@
-import {Controller, Get, Inject, Post, Req, Res, Sse} from "@nestjs/common";
+import {Body, Controller, Get, Inject, Post, Req, Res, Sse} from "@nestjs/common";
 import {ApiTags} from "@nestjs/swagger";
 import {PrintersService} from "../services/printers.service";
 import {Public} from "../../utils/auth.decorators";
@@ -10,6 +10,7 @@ import {stringify} from "flatted";
 import {PrintersSseMessageDto} from "../dto/printers-sse-message.dto";
 import {ConfigType} from "@nestjs/config";
 import {PrintersConfig, UpdateEventStreamPeriodDefault} from "../printers.config";
+import {CreateMultiplePrintersDtot} from "../dto/create-multiple-printers.dtot";
 
 @Controller("printers")
 @Public()
@@ -70,6 +71,12 @@ export class PrintersMvcController {
                     }
                 )
             );
+    }
+
+    @Post("add")
+    @Public()
+    async addPrinter(@Body() input: CreateMultiplePrintersDtot) {
+        await this.printersService.createMultiple(input);
     }
 
     @Post("printerInfo")
