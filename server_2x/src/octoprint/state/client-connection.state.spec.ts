@@ -30,21 +30,31 @@ describe(ClientConnectionsState.name, () => {
         expect(service).toBeDefined();
     });
 
-    it('can call init with defaulting state resulting', () => {
-        service.initState();
+    it('can call init with defaulting state resulting', async () => {
+        await service.initState({
+            printerKey: "TESTTESTTESTTESTTESTTESTTESTTEST",
+            printerURL: "http://notexistedyet"
+        });
         const clientConnectionState = service.getState();
         expect(clientConnectionState).toBeTruthy();
-        expect(clientConnectionState.websocketConnected).toEqual(false);
-        expect(clientConnectionState).toEqual(ClientConnectionsState.defaultState);
+        expect(clientConnectionState.websocketConnected).toEqual(null);
+        expect(clientConnectionState.apiKeyValid).toEqual(true);
     });
 
-    it('cannot call init again without error', () => {
-        service.initState();
-        expect(() => service.initState()).toThrowError("Can't initialize already known state.");
+    it('cannot call init again without error', async () => {
+        const params = {
+            printerKey: "TESTTESTTESTTESTTESTTESTTESTTEST",
+            printerURL: "http://notexistedyet"
+        }
+        await service.initState(params);
+        await expect(service.initState(params)).rejects.toThrow("Can't initialize already known state.");
     });
 
-    it('should get frozen state', () => {
-        service.initState();
+    it('should get frozen state', async () => {
+        await service.initState({
+            printerKey: "TESTTESTTESTTESTTESTTESTTESTTEST",
+            printerURL: "http://notexistedyet"
+        });
         const frozenState = service.getState();
         expect(Object.isFrozen(frozenState)).toBe(true);
     });
