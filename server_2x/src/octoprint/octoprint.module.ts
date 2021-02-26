@@ -43,10 +43,7 @@ export class OctoprintModule {
         const envTestPrinterURL = process.env[TEST_PRINTER_URL];
         const envTestPrinterKey = process.env[TEST_PRINTER_KEY];
         if (!!envTestPrinterURL && !!envTestPrinterKey) {
-            return {
-                printerURL: envTestPrinterURL,
-                printerKey: envTestPrinterKey
-            }
+            return new ConnectionParams(envTestPrinterURL, envTestPrinterKey);
         } else return null;
     }
 }

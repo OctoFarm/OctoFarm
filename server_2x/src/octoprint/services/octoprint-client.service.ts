@@ -12,7 +12,6 @@ export class OctoPrintClientService {
     ) {
     }
 
-
     getSettings(params: ConnectionParams): Observable<OctoPrintSettingsDto> {
         this.checkConnectionParams(params);
 

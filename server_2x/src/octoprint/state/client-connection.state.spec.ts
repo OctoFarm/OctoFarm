@@ -37,7 +37,6 @@ describe(ClientConnectionsState.name, () => {
         const clientConnectionState = service.getState();
         expect(clientConnectionState).toBeTruthy();
         expect(clientConnectionState.websocketConnected).toEqual(null);
-        console.warn(clientConnectionState);
         expect(clientConnectionState.apiKeyValid).toEqual(true);
     });
 
