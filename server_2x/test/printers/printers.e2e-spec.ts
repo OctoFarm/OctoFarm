@@ -1,9 +1,10 @@
 import {Test, TestingModule} from '@nestjs/testing';
 import {INestApplication} from '@nestjs/common';
 import * as request from 'supertest';
-import {AppModule} from '../src/app.module';
+import {PrintersModule} from "../../dist/printers/printers.module";
+import {AppModule} from "../../src/app.module";
 
-describe('AppController (e2e)', () => {
+describe('PrintersController (e2e)', () => {
     let app: INestApplication;
 
     beforeEach(async () => {
@@ -15,16 +16,10 @@ describe('AppController (e2e)', () => {
         await app.init();
     });
 
-    it('/ (GET)', () => {
+    it('/printers (GET)', () => {
         return request(app.getHttpServer())
-            .get('/')
+            .get('/printers')
             .expect(200)
             .expect('Hello World!');
-    });
-
-    it('/health (GET)', () => {
-        return request(app.getHttpServer())
-            .get('/health')
-            .expect(200);
     });
 });

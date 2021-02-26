@@ -136,19 +136,15 @@ class PrinterClean {
   static returnPrintersInformation() {
     return printersInformation;
   }
-
   static returnPrinterControlList() {
     return printerControlList;
   }
-
   static returnFilamentList() {
     return printerFilamentList;
   }
-
   static returnCurrentOperations() {
     return currentOperations;
   }
-
   static returnDashboardStatistics() {
     return dashboardStatistics;
   }
@@ -453,7 +449,6 @@ class PrinterClean {
 
     return printerStatistics;
   }
-
   static async generate(farmPrinter, filamentManager) {
     fmToggle = filamentManager;
     try {
@@ -596,7 +591,6 @@ class PrinterClean {
       console.log(e);
     }
   }
-
   static async generateConnectionLogs(farmPrinter) {
     let printerErrorLogs = await ErrorLogs.find({});
 
@@ -770,7 +764,6 @@ class PrinterClean {
 
     printerFilamentList = printerList;
   }
-
   static sortOtherSettings(temp, webcam, system) {
     const otherSettings = {
       temperatureTriggers: null,
@@ -788,7 +781,6 @@ class PrinterClean {
 
     return otherSettings;
   }
-
   static async sortTerminal(i, logs) {
     if (typeof logs !== "undefined") {
       if (typeof currentLogs[i] === "undefined") {
@@ -818,14 +810,12 @@ class PrinterClean {
     }
     return currentLogs[i];
   }
-
   static async sortGCODE(settings) {
     if (typeof settings !== "undefined") {
       return settings.gcode;
     }
     return null;
   }
-
   static async sortConnection(current) {
     if (typeof current !== "undefined") {
       return {
@@ -836,7 +826,6 @@ class PrinterClean {
     }
     return null;
   }
-
   static async sortProfile(profile, current) {
     if (typeof profile !== "undefined") {
       if (typeof current !== "undefined") {
@@ -846,14 +835,12 @@ class PrinterClean {
       return null;
     }
   }
-
   static async sortTemps(temps) {
     if (typeof temps !== "undefined") {
       return temps;
     }
     return null;
   }
-
   static grabPrinterName(printer) {
     let name = null;
     if (typeof printer.settingsAppearance !== "undefined") {
@@ -870,7 +857,6 @@ class PrinterClean {
     }
     return name;
   }
-
   static async sortCurrentOperations(farmPrinters) {
     const complete = [];
     const active = [];
@@ -981,7 +967,6 @@ class PrinterClean {
       console.log(`Current Operations issue: ${err}`);
     }
   }
-
   static async statisticsStart() {
     const history = await HistoryClean.returnStatistics();
 
@@ -1464,7 +1449,6 @@ class PrinterClean {
         dashboardStatistics.enviromentalData = currentEnviromentalData;
       });
   }
-
   static getDay(value) {
     value = value.getDay();
     let actualDay = null;
@@ -1626,7 +1610,6 @@ class PrinterClean {
       console.log("HEAT MAP ISSUE", e);
     }
   }
-
   static getProgressColour(progress) {
     progress = parseInt(progress);
     if (progress === 0) {
@@ -1648,7 +1631,6 @@ class PrinterClean {
       return "success";
     }
   }
-
   static checkTempRange(state, target, actual, heatingVariation, coolDown) {
     if (state === "Active" || state === "Idle") {
       if (
@@ -1668,7 +1650,6 @@ class PrinterClean {
     // Offline
     return "tempOffline";
   }
-
   static async initFarmInformation() {
     farmStats = await FarmStatistics.find({});
     if (typeof farmStats === undefined || farmStats.length < 1) {

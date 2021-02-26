@@ -1,6 +1,7 @@
-import {IsPositive, Length, validate} from "class-validator";
+import {IsAlphanumeric, IsNumber, Length, validate} from "class-validator";
 import {BeforeInsert, BeforeUpdate, Column, CreateDateColumn, Entity, ObjectID, ObjectIdColumn} from "typeorm";
 import {ValidationException} from "../../providers/validation.exception";
+import {ApiKeyLengthMinimumDefault} from "../printers.config";
 
 @Entity()
 export class Printer {
@@ -32,7 +33,7 @@ export class Printer {
 
     // TODO define sortIndex constraints (IsPositive, contextual IsDefined)
     @Column()
-    @IsPositive()
+    @IsNumber()
     sortIndex: number;
 
     // TODO sanitize ip, define strict type/regex, triage duplication vs printerURL
@@ -45,7 +46,8 @@ export class Printer {
 
     // TODO constrain length limits (verify OP settings)
     @Column()
-    @Length(32)
+    @IsAlphanumeric()
+    @Length(ApiKeyLengthMinimumDefault)
     apiKey: string;
 
     // TODO Sanitize URL - allow default empty

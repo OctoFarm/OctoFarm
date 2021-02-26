@@ -474,7 +474,6 @@ WebSocketClient.prototype.reconnect = async function (e) {
   }, this.autoReconnectInterval);
   return true;
 };
-
 WebSocketClient.prototype.onopen = async function (e) {
   // eslint-disable-next-line prefer-rest-params
   logger.info("WebSocketClient: open", arguments, `${this.index}: ${this.url}`);
@@ -503,7 +502,6 @@ WebSocketClient.prototype.onopen = async function (e) {
     );
   }
 };
-
 WebSocketClient.prototype.onmessage = async function (data, flags, number) {
   try {
     // console.log("WebSocketClient: message",arguments);

@@ -5,7 +5,7 @@ const Logger = require("../../server/src/printers/lib/logger.js");
 
 const logger = new Logger("OctoFarm-Server");
 
-const runner = require("./state.js");
+const runner = require("./progress/state.js");
 
 const { Runner } = runner;
 

@@ -1,4 +1,4 @@
-import {Controller, Get, Inject, Post, Req, Res, Sse} from "@nestjs/common";
+import {Body, Controller, Get, Inject, Post, Req, Res, Sse} from "@nestjs/common";
 import {ApiTags} from "@nestjs/swagger";
 import {PrintersService} from "../services/printers.service";
 import {Public} from "../../utils/auth.decorators";
@@ -10,8 +10,10 @@ import {stringify} from "flatted";
 import {PrintersSseMessageDto} from "../dto/printers-sse-message.dto";
 import {ConfigType} from "@nestjs/config";
 import {PrintersConfig, UpdateEventStreamPeriodDefault} from "../printers.config";
+import {CreateMultiplePrintersDtot} from "../dto/create-multiple-printers.dtot";
 
 @Controller("printers")
+@Public()
 @ApiTags(PrintersMvcController.name)
 export class PrintersMvcController {
     readonly ssePeriod: number;
@@ -26,7 +28,6 @@ export class PrintersMvcController {
 
     // ======= LEGACY MVC ENDPOINTS BELOW - PHASED OUT SOON ======
     @Get()
-    @Public()
     async getPrinters(@Req() req, @Res() res) {
         const printers = await this.printersService.list();
         const serverSettings = await this.serverSettingsService.findFirstOrAdd();
@@ -41,7 +42,7 @@ export class PrintersMvcController {
         }
         res.render("printerManagement", {
             name: user,
-            userGroup: group,
+            userGroup: group || "Administrator",
             version: process.env.npm_package_version,
             page: "Printer Manager",
             printerCount: printers.length,
@@ -52,12 +53,13 @@ export class PrintersMvcController {
     @Sse("update-sse")
     async updatePrinters(): Promise<Observable<string | PrintersSseMessageDto>> {
         // TODO NotExpectedYet oi mate it's all you's 'ere!
+        const printers = await this.printersService.list();
         // const printersInformation = await PrinterClean.returnPrintersInformation();
         // const printerControlList = await PrinterClean.returnPrinterControlList();
         // const currentTickerList = await PrinterTicker.returnIssue();
 
         const returnedUpdate: PrintersSseMessageDto = {
-            printersInformation: null,
+            printersInformation: printers,
             printerControlList: null,
             currentTickerList: null,
         }
@@ -70,6 +72,12 @@ export class PrintersMvcController {
                     }
                 )
             );
+    }
+
+    @Post("add")
+    @Public()
+    async addPrinter(@Body() input: CreateMultiplePrintersDtot) {
+        await this.printersService.createMultiple(input);
     }
 
     @Post("printerInfo")

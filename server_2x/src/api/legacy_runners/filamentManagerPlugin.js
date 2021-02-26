@@ -1,4 +1,4 @@
-const runner = require('./state.js');
+const runner = require('./progress/state.js');
 const { Runner } = runner;
 
 const filamentClean = require('../../server/src/printers/lib/dataFunctions/filamentClean.js');
@@ -15,7 +15,7 @@ const fetch = require('node-fetch');
 class FilamentManagerPlugin {
     static async filamentManagerReSync(addSpool) {
         try {
-            const runner = require('./state.js');
+            const runner = require('./progress/state.js');
             const { Runner } = runner;
             const printerList = Runner.returnFarmPrinters();
             let printer = null;
