@@ -3,15 +3,12 @@ import {ClientConnectionsState} from "./client-connections.state";
 import {OctoPrintClientService} from "../services/octoprint-client.service";
 import {HttpService} from "@nestjs/common";
 import {of} from "rxjs";
-import {ConnectionParamsModel} from "../models/connection-params.model";
+import {ConnectionParams} from "../models/connection.params";
 
 describe(ClientConnectionsState.name, () => {
     let service: ClientConnectionsState;
 
-    const testParams = {
-        printerKey: "TESTTESTTESTTESTTESTTESTTESTTEST",
-        printerURL: "http://notexistedyet"
-    };
+    const testParams = new ConnectionParams("http://notexistedyet", "TESTTESTTESTTESTTESTTESTTESTTEST");
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -40,6 +37,7 @@ describe(ClientConnectionsState.name, () => {
         const clientConnectionState = service.getState();
         expect(clientConnectionState).toBeTruthy();
         expect(clientConnectionState.websocketConnected).toEqual(null);
+        console.warn(clientConnectionState);
         expect(clientConnectionState.apiKeyValid).toEqual(true);
     });
 
@@ -49,18 +47,9 @@ describe(ClientConnectionsState.name, () => {
     });
 
     it('improper apiKey will show up as invalid state', async () => {
-        const illegalTestParams = new ConnectionParamsModel("WAYTOOSHORT", "http://notexistedyet");
+        const illegalTestParams = new ConnectionParams("http://notexistedyet", "WAYTOOSHORT");
         await service.initState(illegalTestParams);
         expect(service.getState().apiKeyValid).toEqual(false);
-    });
-
-    it('anonymous type will not fail validation', async () => {
-        const illegalTestParams = {
-            printerKey: "TESTTEST123ESTTESTTESTTESTTEST",
-            printerURL: "http://notexistedyet"
-        };
-        await service.initState(illegalTestParams);
-        expect(service.getState().apiKeyValid).toEqual(true);
     });
 
     it('should get frozen state', async () => {

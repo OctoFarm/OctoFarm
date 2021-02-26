@@ -4,7 +4,7 @@
 import * as fs from "fs";
 import {transform} from 'json-to-typescript';
 import {HttpService, Injectable} from "@nestjs/common";
-import {ConnectionParamsModel} from "../../src/octoprint/models/connection-params.model";
+import {ConnectionParams} from "../../src/octoprint/models/connection.params";
 import {TEST_PRINTER_KEY, TEST_PRINTER_URL} from "../../src/octoprint/octoprint.constants";
 import {OctoPrintClientService} from "../../src/octoprint/services/octoprint-client.service";
 import * as path from "path";
@@ -20,7 +20,7 @@ export class ProxyApiGeneratorService {
     ) {
     }
 
-    getEnvSettings(): ConnectionParamsModel {
+    getEnvSettings(): ConnectionParams {
         return {
             printerURL: process.env[TEST_PRINTER_URL],
             printerKey: process.env[TEST_PRINTER_KEY]

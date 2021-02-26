@@ -3,7 +3,7 @@ import {OctoPrintClientService} from './services/octoprint-client.service';
 import {OctoprintGateway} from './gateway/octoprint.gateway';
 
 import {ClientConnectionsState} from "./state/client-connections.state";
-import {ConnectionParamsModel} from "./models/connection-params.model";
+import {ConnectionParams} from "./models/connection.params";
 import {TEST_PRINTER_KEY, TEST_PRINTER_URL} from "./octoprint.constants";
 
 
@@ -39,7 +39,7 @@ export class OctoprintModule {
         }
     }
 
-    private getEnvTestPrinter(): ConnectionParamsModel {
+    private getEnvTestPrinter(): ConnectionParams {
         const envTestPrinterURL = process.env[TEST_PRINTER_URL];
         const envTestPrinterKey = process.env[TEST_PRINTER_KEY];
         if (!!envTestPrinterURL && !!envTestPrinterKey) {

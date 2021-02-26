@@ -2,7 +2,7 @@ import {OctoPrintClientService} from "../services/octoprint-client.service";
 import {tap} from "rxjs/operators";
 import {Observable} from "rxjs";
 import {ClientConnectionStateModel} from "../models/client-connection-state.model";
-import {ConnectionParamsModel} from "../models/connection-params.model";
+import {ConnectionParams} from "../models/connection.params";
 import {Injectable} from "@nestjs/common";
 import {validate} from "class-validator";
 
@@ -17,7 +17,7 @@ export class ClientConnectionsState {
         websocketConnected: null,
         websocketHealthy: null
     };
-    private connectionParams: ConnectionParamsModel;
+    private connectionParams: ConnectionParams;
     private state: ClientConnectionStateModel;
 
     constructor(
@@ -25,7 +25,7 @@ export class ClientConnectionsState {
     ) {
     }
 
-    public async initState(connectionParams: ConnectionParamsModel) {
+    public async initState(connectionParams: ConnectionParams) {
         if (!this.state) {
             this.state = {...ClientConnectionsState.defaultState};
             this.connectionParams = connectionParams;
@@ -111,6 +111,7 @@ export class ClientConnectionsState {
 
     private async validateConnectionParams() {
         const errors = await validate(this.connectionParams);
+        console.log(errors);
         this.patchState({
             apiKeyValid: errors?.length === 0
         });
