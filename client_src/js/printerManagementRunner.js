@@ -2915,11 +2915,22 @@ class dashUpdate {
               typeof printer.currentProfile !== "undefined" &&
               printer.currentProfile !== null
             ) {
-              printerPrinterInformation.innerHTML = `
+              if (
+                typeof printer.octoPrintSystemInfo["printer.firmware"] ===
+                "undefined"
+              ) {
+                printerPrinterInformation.innerHTML = `
+             <small title="Please connect and resync to display printer firmware"><b>Firmware: </b>Unknown</small><br>
+             <small><b>Name: </b>${printer.currentProfile.name}</small><br>
+             <small><b>Model: </b>${printer.currentProfile.model}</small><br>
+            `;
+              } else {
+                printerPrinterInformation.innerHTML = `
              <small><b>Firmware: </b>${printer.octoPrintSystemInfo["printer.firmware"]}</small><br>
              <small><b>Name: </b>${printer.currentProfile.name}</small><br>
              <small><b>Model: </b>${printer.currentProfile.model}</small><br>
             `;
+              }
             }
           }
           if (typeof printer.octoPi !== "undefined") {
