@@ -13,6 +13,9 @@ import {TEST_PRINTER_KEY, TEST_PRINTER_URL} from "./octoprint.constants";
         OctoprintGateway,
         OctoPrintClientService,
         ClientConnectionsState
+    ],
+    exports: [
+        OctoPrintClientService
     ]
 })
 export class OctoprintModule {

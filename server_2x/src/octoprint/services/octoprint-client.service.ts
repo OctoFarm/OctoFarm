@@ -12,14 +12,12 @@ export class OctoPrintClientService {
     ) {
     }
 
+
     getSettings(params: ConnectionParamsModel): Observable<OctoPrintSettingsDto> {
         this.checkConnectionParams(params);
 
         const url = new URL('api/settings', params.printerURL).toString();
-        return this.connectWithParams<OctoPrintSettingsDto>(params, "GET", url)
-            .pipe(
-                map(result => result.data)
-            );
+        return this.connectWithParams<OctoPrintSettingsDto>(params, "GET", url);
     }
 
     getCurrentUser(params: ConnectionParamsModel): Observable<any> {
@@ -38,10 +36,7 @@ export class OctoPrintClientService {
                 "allowCrossOrigin": true
             }
         };
-        return this.connectWithParams<OctoPrintSettingsDto>(params, "POST", url, data)
-            .pipe(
-                map(result => result.data)
-            );
+        return this.connectWithParams<OctoPrintSettingsDto>(params, "POST", url, data);
     }
 
     protected connectWithParams<R>(params: ConnectionParamsModel, method: "GET" | "POST" | "PUT" | "DELETE", url: string, body?: any) {
@@ -53,13 +48,13 @@ export class OctoPrintClientService {
         console.log(method, connectionConfig, url);
         switch (method) {
             case "GET":
-                return this.httpService.get<R>(url, connectionConfig);
+                return this.httpService.get<R>(url, connectionConfig).pipe(map(r => r.data));
             case "POST":
-                return this.httpService.post<R>(url, body, connectionConfig);
+                return this.httpService.post<R>(url, body, connectionConfig).pipe(map(r => r.data));
             case "PUT":
-                return this.httpService.delete<R>(url, connectionConfig);
+                return this.httpService.delete<R>(url, connectionConfig).pipe(map(r => r.data));
             case "DELETE":
-                return this.httpService.delete<R>(url, connectionConfig);
+                return this.httpService.delete<R>(url, connectionConfig).pipe(map(r => r.data));
         }
     }
 

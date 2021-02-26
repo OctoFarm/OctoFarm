@@ -60,8 +60,8 @@ export class ClientConnectionsState {
             corsEnabled
         });
 
-        const currentUser = await this.octoPrintClientService.getCurrentUser(this.connectionParams).toPromise();
-        console.warn(currentUser);
+        const currentUser = await this.octoPrintClientService.getCurrentUser(this.connectionParams).toPromise()
+        // console.warn(currentUser);
     }
 
     public getState() {
