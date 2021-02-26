@@ -54,7 +54,7 @@ class JobClean {
       lastPrintTime: null,
       thumbnail: null,
     };
-    if (typeof printer.job !== "undefined") {
+    if (typeof printer.job !== "undefined" && printer.job !== null) {
       currentJob.fileName = printer.job.file.name;
       const fileIndex = _.findIndex(printer.fileList.files, function (o) {
         return o.name == printer.job.file.name;
@@ -120,6 +120,7 @@ class JobClean {
         totalWeight: parseFloat(totalWeight),
         spoolCost: parseFloat(spoolCost),
       };
+    } else {
     }
 
     if (typeof printer.progress !== "undefined") {
@@ -135,6 +136,7 @@ class JobClean {
       farmPrinter.systemChecks.cleaning.job.status = "success";
       farmPrinter.systemChecks.cleaning.job.date = new Date();
     }
+    console.log(currentJob);
     cleanJobs[printer.sortIndex] = currentJob;
   }
 }

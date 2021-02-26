@@ -945,6 +945,9 @@ WebSocketClient.prototype.onerror = function (e) {
   //   logger.info("Error with websockets... resetting up!");
   // }, 10000);
   if (typeof farmPrinters[this.index] !== "undefined") {
+    //Reset job to null on error...
+    farmPrinters[this.index].job = null;
+    JobClean.generate(farmPrinters[this.index]);
     PrinterClean.generate(
       farmPrinters[this.index],
       systemSettings.filamentManager
@@ -982,6 +985,9 @@ WebSocketClient.prototype.onclose = function (e) {
   }
 
   if (typeof farmPrinters[this.index] !== "undefined") {
+    //Reset job to null on error...
+    farmPrinters[this.index].job = null;
+    JobClean.generate(farmPrinters[this.index]);
     PrinterClean.generate(
       farmPrinters[this.index],
       systemSettings.filamentManager
@@ -2353,6 +2359,7 @@ class Runner {
         farmPrinters[index].stateColour = Runner.getColour("Offline");
         farmPrinters[index].current = res.current;
         farmPrinters[index].options = res.options;
+        farmPrinters[index].job = null;
         farmPrinters[index].systemChecks.scanning.state.status = "success";
         farmPrinters[index].systemChecks.scanning.state.date = new Date();
         const currentFilament = JSON.parse(
