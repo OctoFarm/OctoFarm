@@ -3,10 +3,15 @@ import {ClientConnectionsState} from "./client-connections.state";
 import {OctoPrintClientService} from "../services/octoprint-client.service";
 import {HttpService} from "@nestjs/common";
 import {of} from "rxjs";
+import {ConnectionParamsModel} from "../models/connection-params.model";
 
 describe(ClientConnectionsState.name, () => {
     let service: ClientConnectionsState;
 
+    const testParams = {
+        printerKey: "TESTTESTTESTTESTTESTTESTTESTTEST",
+        printerURL: "http://notexistedyet"
+    };
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -31,10 +36,7 @@ describe(ClientConnectionsState.name, () => {
     });
 
     it('can call init with defaulting state resulting', async () => {
-        await service.initState({
-            printerKey: "TESTTESTTESTTESTTESTTESTTESTTEST",
-            printerURL: "http://notexistedyet"
-        });
+        await service.initState(testParams);
         const clientConnectionState = service.getState();
         expect(clientConnectionState).toBeTruthy();
         expect(clientConnectionState.websocketConnected).toEqual(null);
@@ -42,19 +44,27 @@ describe(ClientConnectionsState.name, () => {
     });
 
     it('cannot call init again without error', async () => {
-        const params = {
-            printerKey: "TESTTESTTESTTESTTESTTESTTESTTEST",
+        await service.initState(testParams);
+        await expect(service.initState(testParams)).rejects.toThrow("Can't initialize already known state.");
+    });
+
+    it('improper apiKey will show up as invalid state', async () => {
+        const illegalTestParams = new ConnectionParamsModel("WAYTOOSHORT", "http://notexistedyet");
+        await service.initState(illegalTestParams);
+        expect(service.getState().apiKeyValid).toEqual(false);
+    });
+
+    it('anonymous type will not fail validation', async () => {
+        const illegalTestParams = {
+            printerKey: "TESTTEST123ESTTESTTESTTESTTEST",
             printerURL: "http://notexistedyet"
-        }
-        await service.initState(params);
-        await expect(service.initState(params)).rejects.toThrow("Can't initialize already known state.");
+        };
+        await service.initState(illegalTestParams);
+        expect(service.getState().apiKeyValid).toEqual(true);
     });
 
     it('should get frozen state', async () => {
-        await service.initState({
-            printerKey: "TESTTESTTESTTESTTESTTESTTESTTEST",
-            printerURL: "http://notexistedyet"
-        });
+        await service.initState(testParams);
         const frozenState = service.getState();
         expect(Object.isFrozen(frozenState)).toBe(true);
     });

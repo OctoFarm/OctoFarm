@@ -4,8 +4,12 @@ import {ApiKeyLengthMinimumDefault} from "../../printers/printers.config";
 export class ConnectionParamsModel {
     @IsNotEmpty()
     printerURL: string;
-
     @Length(ApiKeyLengthMinimumDefault)
     @IsAlphanumeric()
     printerKey: string;
+
+    constructor(printerURL, printerKey) {
+        this.printerURL = printerURL;
+        this.printerKey = printerKey;
+    }
 }
