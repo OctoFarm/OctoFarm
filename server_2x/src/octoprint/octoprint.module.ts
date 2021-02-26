@@ -2,7 +2,7 @@ import {HttpModule, Module} from '@nestjs/common';
 import {OctoPrintClientService} from './services/octoprint-client.service';
 import {OctoprintGateway} from './gateway/octoprint.gateway';
 
-import {ClientConnectionState} from "./state/client-connection.state";
+import {ClientConnectionsState} from "./state/client-connections.state";
 import {ConnectionParamsModel} from "./models/connection-params.model";
 import {TEST_PRINTER_KEY, TEST_PRINTER_URL} from "./octoprint.constants";
 
@@ -12,23 +12,28 @@ import {TEST_PRINTER_KEY, TEST_PRINTER_URL} from "./octoprint.constants";
     providers: [
         OctoprintGateway,
         OctoPrintClientService,
-        ClientConnectionState
+        ClientConnectionsState
     ]
 })
 export class OctoprintModule {
     constructor(
-        private service: OctoPrintClientService
+        private service: OctoPrintClientService,
+        private clientConnectionsState: ClientConnectionsState
     ) {
 
     }
 
-    onModuleInit() {
+    async onModuleInit() {
         const testPrinterConnectionParams = this.getEnvTestPrinter();
-        this.service.getSettings(testPrinterConnectionParams)
-            .subscribe(result => {
-                testPrinterConnectionParams.printerKey
-                // console.warn("Global key provided", result.data.api.key === testPrinterConnectionParams.printerKey);
-            });
+        if (!!testPrinterConnectionParams) {
+            await this.clientConnectionsState.initState(testPrinterConnectionParams);
+            await this.clientConnectionsState.testClientConnection();
+            // this.service.getSettings(testPrinterConnectionParams)
+            //     .subscribe(result => {
+            //         testPrinterConnectionParams.printerKey
+            //         // console.warn("Global key provided", result.data.api.key === testPrinterConnectionParams.printerKey);
+            //     });
+        }
     }
 
     private getEnvTestPrinter(): ConnectionParamsModel {

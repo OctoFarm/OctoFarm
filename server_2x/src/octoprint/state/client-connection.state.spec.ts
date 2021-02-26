@@ -1,16 +1,16 @@
 import {Test, TestingModule} from '@nestjs/testing';
-import {ClientConnectionState} from "./client-connection.state";
+import {ClientConnectionsState} from "./client-connections.state";
 import {OctoPrintClientService} from "../services/octoprint-client.service";
 import {HttpService} from "@nestjs/common";
 import {of} from "rxjs";
 
-describe(ClientConnectionState.name, () => {
-    let service: ClientConnectionState;
+describe(ClientConnectionsState.name, () => {
+    let service: ClientConnectionsState;
 
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
-                ClientConnectionState,
+                ClientConnectionsState,
                 OctoPrintClientService,
                 {
                     provide: HttpService,
@@ -23,7 +23,7 @@ describe(ClientConnectionState.name, () => {
             ]
         }).compile();
 
-        service = module.get<ClientConnectionState>(ClientConnectionState);
+        service = module.get<ClientConnectionsState>(ClientConnectionsState);
     });
 
     it('should be defined', () => {
@@ -35,7 +35,7 @@ describe(ClientConnectionState.name, () => {
         const clientConnectionState = service.getState();
         expect(clientConnectionState).toBeTruthy();
         expect(clientConnectionState.websocketConnected).toEqual(false);
-        expect(clientConnectionState).toEqual(ClientConnectionState.defaultState);
+        expect(clientConnectionState).toEqual(ClientConnectionsState.defaultState);
     });
 
     it('cannot call init again without error', () => {
