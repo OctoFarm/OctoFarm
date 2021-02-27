@@ -90,94 +90,84 @@ function vendorJS() {
   );
 }
 function vendorCSS() {
-  return (
-    src("client_src/css/vendor/*")
-      // .pipe(sourcemaps.init({ loadMaps: true }))
-      .pipe(postcss([autoprefixer(), cssnano()]))
-      // .pipe(sourcemaps.write("./"))
-      .pipe(gulp.dest("views/assets/css/vendor"))
-  );
+  return src("client_src/css/vendor/*")
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(postcss([autoprefixer(), cssnano()]))
+    .pipe(sourcemaps.write("./"))
+    .pipe(gulp.dest("views/assets/css/vendor"));
 }
 function vendorFonts() {
-  return (
-    src("client_src/css/webfonts/*")
-      // .pipe(sourcemaps.init({ loadMaps: true }))
-      // .pipe(postcss([autoprefixer(), cssnano()]))
-      // .pipe(sourcemaps.write("./"))
-      .pipe(gulp.dest("views/assets/css/webfonts"))
-  );
+  return src("client_src/css/webfonts/*")
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(postcss([autoprefixer(), cssnano()]))
+    .pipe(sourcemaps.write("./"))
+    .pipe(gulp.dest("views/assets/css/webfonts"));
 }
 function octofarmJS(done) {
   jsClientFiles.map(function (entry) {
-    return (
-      browserify({
-        entries: [jsClientFolder + entry],
-      })
-        .transform(babelify, {
-          presets: [
-            [
-              "@babel/preset-env",
-              {
-                corejs: 2,
-                useBuiltIns: "entry",
-              },
-            ],
+    return browserify({
+      entries: [jsClientFolder + entry],
+    })
+      .transform(babelify, {
+        presets: [
+          [
+            "@babel/preset-env",
+            {
+              corejs: 2,
+              useBuiltIns: "entry",
+            },
           ],
-        })
-        .bundle()
-        .pipe(source(entry))
-        .pipe(cache("clientJS"))
-        .pipe(rename({ extname: ".min.js" }))
-        // .pipe(buffer())
-        // .pipe(sourcemaps.init({ loadMaps: true }))
-        // .pipe(terser())
-        // .pipe(sourcemaps.write("./"))
-        .pipe(dest(octofarmClient + "js"))
-    );
+        ],
+      })
+      .bundle()
+      .pipe(source(entry))
+      .pipe(cache("clientJS"))
+      .pipe(rename({ extname: ".min.js" }))
+      .pipe(buffer())
+      .pipe(sourcemaps.init({ loadMaps: true }))
+      .pipe(terser())
+      .pipe(sourcemaps.write("./"))
+      .pipe(dest(octofarmClient + "js"));
   });
   done();
 }
 
 function octofarmWorkersJS(done) {
   workerJsFiles.map(function (entry) {
-    return (
-      browserify({
-        entries: [workerJsFolder + entry],
-      })
-        .transform(babelify, {
-          presets: [
-            [
-              "@babel/preset-env",
-              {
-                corejs: 2,
-                useBuiltIns: "entry",
-              },
-            ],
+    return browserify({
+      entries: [workerJsFolder + entry],
+    })
+      .transform(babelify, {
+        presets: [
+          [
+            "@babel/preset-env",
+            {
+              corejs: 2,
+              useBuiltIns: "entry",
+            },
           ],
-        })
-        .bundle()
-        .pipe(source(entry))
-        .pipe(cache("clientWorkerJS"))
-        .pipe(rename({ extname: ".min.js" }))
-        // .pipe(buffer())
-        // .pipe(sourcemaps.init({ loadMaps: true }))
-        // .pipe(terser())
-        // .pipe(sourcemaps.write("./"))
-        .pipe(dest(octofarmClient + "js/workers"))
-    );
+        ],
+      })
+      .bundle()
+      .pipe(source(entry))
+      .pipe(cache("clientWorkerJS"))
+      .pipe(rename({ extname: ".min.js" }))
+      .pipe(buffer())
+      .pipe(sourcemaps.init({ loadMaps: true }))
+      .pipe(terser())
+      .pipe(sourcemaps.write("./"))
+      .pipe(dest(octofarmClient + "js/workers"));
   });
   done();
 }
 
 function octofarmCSS() {
-  return (
-    src(cssOctoFarm)
-      // .pipe(sourcemaps.init({ loadMaps: true }))
-      .pipe(concat("octofarm.css"))
-      .pipe(postcss([autoprefixer(), cssnano()]))
-      // .pipe(sourcemaps.write("./"))
-      .pipe(dest(octofarmClient + "css"))
-  );
+  return src(cssOctoFarm)
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(concat("octofarm.css"))
+    .pipe(postcss([autoprefixer(), cssnano()]))
+    .pipe(sourcemaps.write("./"))
+    .pipe(dest(octofarmClient + "css"));
 }
 function reloadClient(done) {
   return done();
