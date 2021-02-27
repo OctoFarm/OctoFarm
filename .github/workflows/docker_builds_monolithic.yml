@@ -8,6 +8,7 @@ on:
       - 'development'
 jobs:
   docker_monolithic:
+    name: "Docker build monolithic"
     runs-on: ubuntu-latest
     steps:
       - name: "Decide tags to use"

@@ -9,6 +9,7 @@ on:
 jobs:
   docker_alpine:
     runs-on: ubuntu-latest    
+    name: "Docker build alpine"
     steps:
       - name: "Decide tags to use"
         run: |

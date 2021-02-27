@@ -3,12 +3,15 @@ name: ci
 on:
   pull_request:
   push:
+    tags:
+      - '*'
     branches:
       - 'master'
       - 'development'
 jobs:
   docker:
     runs-on: ubuntu-latest
+    name: "Docker build"
     steps:
       - name: "Decide tags to use"
         run: |
