@@ -1110,28 +1110,35 @@ class Runner {
 
   static async compareEnteredKeyToGlobalKey(printer) {
     // Compare entered API key to settings API Key...
-    let globalAPIKeyCheck = null;
-    globalAPIKeyCheck = await ClientAPI.getRetry(
+    const globalAPIKeyCheck = await ClientAPI.getRetry(
       printer.printerURL,
       printer.apikey,
       "api/settings"
     );
-
+    const errorCode = {
+      message:
+        "Global API Key detected... unable to authenticate websocket connection",
+      type: "system",
+      errno: "999",
+      code: "999",
+    };
     if (globalAPIKeyCheck.status === 200) {
       //Safe to continue check
-      let settingsData = await globalAPIKeyCheck.json();
-      if (settingsData.api.key === printer.apikey) {
-        return {
-          message:
-            "Global API Key detected... unable to authenticate websocket connection",
-          type: "system",
-          errno: "999",
-          code: "999",
-        };
-      } else {
-        // All is well to continue with rest of checks
-        return true;
+      const settingsData = await globalAPIKeyCheck.json();
+      if (!settingsData) {
+        logger.error(`Settings json does not exist: ${printer.printerURL}`);
+        return errorCode;
       }
+      if (!settingsData.api) {
+        logger.error(`API key does not exist: ${printer.printerURL}`);
+        return errorCode;
+      }
+      if (settingsData.api.key === printer.apikey) {
+        logger.error(`API Key matched global API key: ${printer.printerURL}`);
+        return errorCode;
+      }
+
+      return true;
     } else {
       // Hard failure as can't contact api
       return {
