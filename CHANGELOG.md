@@ -42,6 +42,7 @@ All notable changes to this project will be documented in this file.
    - Fixed: #326 - Job doesn't reset when OctoPrint goes offline.
    - Fixed: Printer Settings modal opening would throw error when OctoPrint has never been connected to farm.
    - Fixed: Error grabbing octoprint plugin list/system/updates wouldn't correctly log an error.
+   - Fixed: Bubbling server check interval causing client to massively hang and break CPU's...
 
 ### Removed
    - Printer Settings drop down, was buggy and half implemented causing issues and is less used than the Printer Control one.
