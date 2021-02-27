@@ -302,6 +302,10 @@ export default class PrinterLogs {
                 </div>`;
       display = "d-none";
     }
+    let printerFirmware = "Unknown";
+    if (typeof stats.octoPrintSystemInfo["printer.firmware"] !== "undefined") {
+      printerFirmware = stats.octoPrintSystemInfo["printer.firmware"];
+    }
     return `
             <div class="col-md-12 col-lg-4">
               <div class="card text-white bg-dark mb-3" >
@@ -315,11 +319,7 @@ export default class PrinterLogs {
                                        "octoprint.version"
                                      ]
                                    }</small><br>
-                                    <small><b>Printer Firmware:</b> ${
-                                      stats.octoPrintSystemInfo[
-                                        "printer.firmware"
-                                      ]
-                                    }</small><br>
+                                    <small><b>Printer Firmware:</b> ${printerFirmware}</small><br>
                                     <small><b>Python Version:</b> ${
                                       stats.octoPrintSystemInfo[
                                         "env.python.version"

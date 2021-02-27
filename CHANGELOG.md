@@ -10,7 +10,9 @@ All notable changes to this project will be documented in this file.
    - Gcode Scripts are now editable.
    - Reset Fields Button to power settings to enable a reset of them...
    - Individual Printer Statistics: New option under the Manage section for viewing statistics about your printer.
- 
+   - Added check against global API Key usage. Will now throw an error warning the user it is incorrect... and to generate a User or Application Key inside OctoPrint.
+   - Added the ability to export any of the database collections into a .json file to bolster any issue reports.
+
 ### Changed
    - Improved the power status error logs.
    - #272: Improvements to the alpine image, now runs as none-root and went from around 1Gb to 268Mb in size! Big thank you to user @torresmvl for those PR's. Don't forget to email about your free t-shirt.
@@ -19,6 +21,7 @@ All notable changes to this project will be documented in this file.
    - Printer Manager Table has been updated to include Printer, OctoPrint designations:
          - Printer: Shows current printer firmware version, model and name.
          - OctoPrint: Shows current OctoPrint version and if on OctoPi, the version and Pi model.
+   - Printer Hourly Temperature Graph on Dashboard now only reacts when target is set. Will skip any room temperature readings.  
 
 ### Fixed
    - #223: Shutting down printers unexpectedly would keep printer in last state. - Big thanks to Chrismettal for helping me with this one.
@@ -37,6 +40,19 @@ All notable changes to this project will be documented in this file.
    - Fixed: #236 - Colours on Weekly Utilisation chart we're loading too dark.
    - Fixed: #279 - API connection checked too early after powering up.
    - Fixed: #292 - Printer Settings would fail due to missing wol settings.
+   - Fixed: #326 - Job doesn't reset when OctoPrint goes offline.
+   - Fixed: Printer Settings modal opening would throw error when OctoPrint has never been connected to farm.
+   - Fixed: Error grabbing octoprint plugin list/system/updates wouldn't correctly log an error.
+   - Fixed: Bubbling server check interval causing client to massively hang and break CPU's...
+   - Fixed: Issue with history card not loading spools tables
+   - Fixed: #297 - Issue with temperature not been applied from spool at start of a print.  
+   - Fixed: #327 - Issue with not been able to change a spool mid print/paused when not using Filament Manager Plugin.
+   - Fixed: #309 - Regression with toggle button to check filament spool is loaded before print start. 
+
+
+### Removed
+   - Printer Settings drop down, was buggy and half implemented causing issues and is less used than the Printer Control one.
+
 
 
 # [v1.1.10]

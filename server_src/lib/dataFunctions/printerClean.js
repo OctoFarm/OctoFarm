@@ -460,11 +460,12 @@ class PrinterClean {
       if (typeof farmPrinter.systemChecks !== "undefined") {
         farmPrinter.systemChecks.cleaning.information.status = "warning";
       }
-
-            // Append the groups by JOIN
-            const printerGroups = await PrinterGroup.find({
-                printers: farmPrinter._id,
-            }).exec();
+      // Clearing out in prep for 1.1.11
+      const printerGroups = [];
+      // // Append the groups by JOIN
+      // const printerGroups = await PrinterGroup.find({
+      //     printers: farmPrinter._id,
+      // }).exec();
 
       const sortedPrinter = {
         // eslint-disable-next-line no-underscore-dangle
@@ -485,7 +486,7 @@ class PrinterClean {
           desc: farmPrinter.webSocketDescription,
         },
         group: farmPrinter.group,
-                groups: printerGroups,
+        groups: printerGroups,
         printerURL: farmPrinter.printerURL,
         cameraURL: farmPrinter.camURL,
         apikey: farmPrinter.apikey,
@@ -1098,7 +1099,8 @@ class PrinterClean {
                   let target = "";
                   if (
                     printer.tools !== null &&
-                    printer.tools[0][keys[k]].actual !== null
+                    printer.tools[0][keys[k]].actual !== null &&
+                    printer.tools[0][keys[k]].target >= 10
                   ) {
                     actual = `Chamber A: ${
                       printer.tools[0][keys[k]].actual
@@ -1112,7 +1114,8 @@ class PrinterClean {
                   }
                   if (
                     printer.tools !== null &&
-                    printer.tools[0][keys[k]].target !== null
+                    printer.tools[0][keys[k]].target !== null &&
+                    printer.tools[0][keys[k]].target >= 10
                   ) {
                     target = `Chamber T: ${
                       printer.tools[0][keys[k]].target
@@ -1135,7 +1138,8 @@ class PrinterClean {
                   let target = "";
                   if (
                     printer.tools !== null &&
-                    printer.tools[0][keys[k]].actual !== null
+                    printer.tools[0][keys[k]].actual !== null &&
+                    printer.tools[0][keys[k]].target >= 10
                   ) {
                     actual = `Bed A: ${printer.tools[0][keys[k]].actual}°C `;
                     arrayOtherActual.push(printer.tools[0][keys[k]].actual);
@@ -1147,7 +1151,8 @@ class PrinterClean {
                   }
                   if (
                     printer.tools !== null &&
-                    printer.tools[0][keys[k]].target !== null
+                    printer.tools[0][keys[k]].target !== null &&
+                    printer.tools[0][keys[k]].target >= 10
                   ) {
                     target = `Bed T: ${printer.tools[0][keys[k]].target}°C `;
                     arrayOtherTarget.push(printer.tools[0][keys[k]].target);
@@ -1165,7 +1170,8 @@ class PrinterClean {
                   let target = "";
                   if (
                     printer.tools !== null &&
-                    printer.tools[0][keys[k]].actual !== null
+                    printer.tools[0][keys[k]].actual !== null &&
+                    printer.tools[0][keys[k]].target >= 10
                   ) {
                     actual = `Tool ${toolNumber} A: ${
                       printer.tools[0][keys[k]].actual
@@ -1179,7 +1185,8 @@ class PrinterClean {
                   }
                   if (
                     printer.tools !== null &&
-                    printer.tools[0][keys[k]].target !== null
+                    printer.tools[0][keys[k]].target !== null &&
+                    printer.tools[0][keys[k]].target >= 10
                   ) {
                     target = `Tool ${toolNumber} T: ${
                       printer.tools[0][keys[k]].target

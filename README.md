@@ -82,7 +82,7 @@ All browsers should now be supported in OctoFarm. Please log an issue if this is
 ### Prerequisites
 
 - [MongoDB](https://www.mongodb.com/) - v3.6+
-- [NodeJS](https://nodejs.org/) - v12.18.4 (Recomended to use the LTS version)
+- [NodeJS](https://nodejs.org/) - v12.18.4 (Recomended to use the LTS version) NOTE: Not checked with LTS V14 yet... better to use V12 for now. 
 - [NPM](https://www.npmjs.com/) - v6+
 - [OctoPrint](https://octoprint.org) - v1.3.9+
 
@@ -90,7 +90,7 @@ On your OctoPrint instance
 
 - User Name -> User Settings
 - Copy the API Key some place easy to get to
-- Enabled the "Allow Cross Origin Resource Sharing (CORS)
+- Enabled the Allow Cross Origin Resource Sharing (CORS)
 - Restart OctoPrint
 - Repeat for all OctoPrints that will be added to the Farm
 
@@ -149,7 +149,7 @@ These are planned but not available yet...
 
 ## Contributing
 
-I am currently not accepting any contribution to the code. I started this project to teach myself nodejs and Javascript better. With my current plans I will have exhausted most learning opportunities by Version 1.2 and will be happy to take pull requests from people then. Thanks for understanding.
+Version 2.0 is underway. If anyone would like to join the fun please head over to discord with the following link: - Discord: [Discord](https://discord.gg/vjabMUn) and speak to us in Developer Discussions. Thanks! 
 
 <!-- LICENSE -->
 
@@ -176,6 +176,7 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
 - All Patreon Supporters and random donations! - Big massive thanks for these, they keep me full of steak!
 - The users calonmer, Insertion and noxin from my discord server! Seriously no end to my thanks for these 3.
 - [JetBrains IDE](https://www.jetbrains.com/webstorm/) - Thanks to JebBrains for allowing a free license to use with developing my application. Their IDE is top notch! 
+- [DavidZwa] - Big help for the massive push from him to get V2 underway. Brought a lot of knowledge to the table that I was lacking. 
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->

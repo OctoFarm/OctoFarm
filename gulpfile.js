@@ -83,16 +83,21 @@ function octofarmImg() {
 }
 function vendorJS() {
   return src("client_src/js/vendor/*")
-    // .pipe(sourcemaps.init({ loadMaps: true }))
-    // .pipe(sourcemaps.write("./"))
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(sourcemaps.write("./"))
     .pipe(gulp.dest("views/assets/js/vendor"));
 }
 function vendorCSS() {
   return src("client_src/css/vendor/*")
-    // .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(sourcemaps.init({ loadMaps: true }))
     .pipe(postcss([autoprefixer(), cssnano()]))
-    // .pipe(sourcemaps.write("./"))
+    .pipe(sourcemaps.write("./"))
     .pipe(gulp.dest("views/assets/css/vendor"));
+}
+function vendorFonts() {
+  return src("client_src/css/webfonts/*").pipe(
+    gulp.dest("views/assets/css/webfonts")
+  );
 }
 function octofarmJS(done) {
   jsClientFiles.map(function (entry) {
@@ -114,10 +119,10 @@ function octofarmJS(done) {
       .pipe(source(entry))
       .pipe(cache("clientJS"))
       .pipe(rename({ extname: ".min.js" }))
-      // .pipe(buffer())
-      // .pipe(sourcemaps.init({ loadMaps: true }))
-      // .pipe(terser())
-      // .pipe(sourcemaps.write("./"))
+      .pipe(buffer())
+      .pipe(sourcemaps.init({ loadMaps: true }))
+      .pipe(terser())
+      .pipe(sourcemaps.write("./"))
       .pipe(dest(octofarmClient + "js"));
   });
   done();
@@ -143,10 +148,10 @@ function octofarmWorkersJS(done) {
       .pipe(source(entry))
       .pipe(cache("clientWorkerJS"))
       .pipe(rename({ extname: ".min.js" }))
-      // .pipe(buffer())
-      // .pipe(sourcemaps.init({ loadMaps: true }))
-      // .pipe(terser())
-      // .pipe(sourcemaps.write("./"))
+      .pipe(buffer())
+      .pipe(sourcemaps.init({ loadMaps: true }))
+      .pipe(terser())
+      .pipe(sourcemaps.write("./"))
       .pipe(dest(octofarmClient + "js/workers"));
   });
   done();
@@ -154,10 +159,10 @@ function octofarmWorkersJS(done) {
 
 function octofarmCSS() {
   return src(cssOctoFarm)
-    // .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(sourcemaps.init({ loadMaps: true }))
     .pipe(concat("octofarm.css"))
     .pipe(postcss([autoprefixer(), cssnano()]))
-    // .pipe(sourcemaps.write("./"))
+    .pipe(sourcemaps.write("./"))
     .pipe(dest(octofarmClient + "css"));
 }
 function reloadClient(done) {
@@ -169,18 +174,18 @@ function watchTask() {
     [cssFolder, jsClientFolder],
     { interval: 2000, events: "change" },
     parallel(
-      // octofarmImg, 
-      octofarmJS, 
-      octofarmWorkersJS, 
-      octofarmCSS, 
+      octofarmImg,
+      octofarmJS,
+      octofarmWorkersJS,
+      octofarmCSS,
       vendorJS,
       vendorCSS
-      )
+    )
   );
 }
 
 watchTask();
-// exports.octoFarmImg = octofarmImg;
+exports.octoFarmImg = octofarmImg;
 exports.octofarmJS = octofarmJS;
 exports.vendorJS = vendorJS;
 exports.vendorCSS = vendorCSS;
@@ -188,7 +193,8 @@ exports.octofarmCSS = octofarmCSS;
 exports.octofarmWorkersJS = octofarmWorkersJS;
 exports.default = series(
   parallel(
-    // octofarmImg,
+    vendorFonts,
+    octofarmImg,
     octofarmJS,
     octofarmWorkersJS,
     octofarmCSS,

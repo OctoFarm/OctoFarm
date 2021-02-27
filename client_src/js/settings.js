@@ -4,6 +4,8 @@ import Calc from "./lib/functions/calc.js";
 import OctoFarmclient from "./lib/octofarm.js";
 import Script from "./lib/modules/scriptCheck.js";
 import OctoPrintClient from "./lib/octoprint";
+import FileOperations from "./lib/functions/file.js";
+
 // Add listeners to settings
 document.getElementById("saveServerSettings").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
@@ -49,6 +51,44 @@ document.getElementById("nukeUsers").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
   ServerSettings.nukeDatabases("UserDB");
 });
+
+document.getElementById("exportAlerts").addEventListener("click", (e) => {
+  // Validate Printer Form, then Add
+  ServerSettings.exportDatabases("AlertsDB");
+});
+document
+  .getElementById("exportClientSettings")
+  .addEventListener("click", (e) => {
+    // Validate Printer Form, then Add
+    ServerSettings.exportDatabases("ClientSettingsDB");
+  });
+document.getElementById("exportFilament").addEventListener("click", (e) => {
+  // Validate Printer Form, then Add
+  ServerSettings.exportDatabases("FilamentDB");
+});
+document.getElementById("exportHistory").addEventListener("click", (e) => {
+  // Validate Printer Form, then Add
+  ServerSettings.exportDatabases("HistoryDB");
+});
+document.getElementById("exportPrinters").addEventListener("click", (e) => {
+  // Validate Printer Form, then Add
+  ServerSettings.exportDatabases("PrinterDB");
+});
+document.getElementById("exportRoomData").addEventListener("click", (e) => {
+  // Validate Printer Form, then Add
+  ServerSettings.exportDatabases("roomDataDB");
+});
+document
+  .getElementById("exportServerSettings")
+  .addEventListener("click", (e) => {
+    // Validate Printer Form, then Add
+    ServerSettings.exportDatabases("ServerSettingsDB");
+  });
+document.getElementById("exportUsers").addEventListener("click", (e) => {
+  // Validate Printer Form, then Add
+  ServerSettings.exportDatabases("UserDB");
+});
+
 document
   .getElementById("setupTimelapseOctoPrint")
   .addEventListener("click", (e) => {
@@ -578,6 +618,36 @@ class ServerSettings {
         UI.createAlert("success", res.message, 3000);
       });
   }
+  static exportDatabases(database) {
+    Client.get("settings/server/get/database/" + database)
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        if (!res || res.database.length === 0) {
+          UI.createAlert(
+            "error",
+            "Database could not be contacted",
+            3000,
+            "clicked"
+          );
+          return;
+        }
+        if (res.databases[0].length !== 0) {
+          FileOperations.download(
+            database + ".json",
+            JSON.stringify(res.databases)
+          );
+        } else {
+          UI.createAlert(
+            "warning",
+            "Database is empty, will not export...",
+            3000,
+            "clicked"
+          );
+        }
+      });
+  }
   static async init() {
     Client.get("settings/server/get")
       .then((res) => {
@@ -672,9 +742,9 @@ class ServerSettings {
           document.getElementById("thumbOnFailure").checked =
             res.history.thumbnails.onFailure;
           document.getElementById("snapOnComplete").checked =
-            res.history.snapshots.onComplete;
+            res.history.snapshot.onComplete;
           document.getElementById("snapOnFailure").checked =
-            res.history.snapshots.onFailure;
+            res.history.snapshot.onFailure;
           if (typeof res.history.timelapse !== "undefined") {
             document.getElementById("timelapseOnComplete").checked =
               res.history.timelapse.onComplete;

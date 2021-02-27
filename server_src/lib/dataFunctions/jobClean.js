@@ -54,7 +54,7 @@ class JobClean {
       lastPrintTime: null,
       thumbnail: null,
     };
-    if (typeof printer.job !== "undefined") {
+    if (typeof printer.job !== "undefined" && printer.job !== null) {
       currentJob.fileName = printer.job.file.name;
       const fileIndex = _.findIndex(printer.fileList.files, function (o) {
         return o.name == printer.job.file.name;
