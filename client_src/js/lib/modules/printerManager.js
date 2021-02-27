@@ -14,7 +14,6 @@ let controlDropDown = false;
 let currentPrinter = null;
 
 let filamentManager = false;
-let spoolCheck = false;
 
 const refreshCounter = 5000;
 $("#printerManagerModal").on("hidden.bs.modal", function (e) {
@@ -219,7 +218,7 @@ export default class PrinterManager {
       serverSettings = await serverSettings.json();
 
       filamentManager = serverSettings.filamentManager;
-      spoolCheck = serverSettings.filament.filamentCheck;
+
       let controlSettings = systemSettings.controlSettings;
       //Load tools
       if (typeof controlSettings !== "undefined" && controlSettings.filesTop) {
@@ -1692,7 +1691,7 @@ export default class PrinterManager {
     });
     const submitTerminal = async function (e) {
       let input = elements.terminal.input.value.match(/[^\r\n]+/g);
-      console.log(input);
+
       if (input !== null) {
         input = input.map(function (name) {
           if (!name.includes("=")) {
@@ -1713,7 +1712,7 @@ export default class PrinterManager {
       const opt = {
         commands: [input],
       };
-      console.log(opt);
+
       const post = await OctoPrintClient.post(
         currentPrinter,
         "printer/command",

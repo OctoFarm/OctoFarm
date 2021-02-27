@@ -189,6 +189,7 @@ export default class OctoPrintClient {
         print: false,
       };
       post = await OctoPrintClient.post(printer, url, opt);
+      return true;
     } else if (action === "print") {
       const opt = {
         command: "select",
@@ -287,8 +288,7 @@ export default class OctoPrintClient {
           },
         },
         async callback(result) {
-          if (result) {
-          } else {
+          if (!result) {
             if (
               printer.selectedFilament != null &&
               Array.isArray(printer.selectedFilament)
@@ -299,7 +299,9 @@ export default class OctoPrintClient {
               };
               printer.selectedFilament.forEach((spool, index) => {
                 if (spool != null) {
-                  offset.offsets["tool" + index] = spool.spools.tempOffset;
+                  offset.offsets["tool" + index] = parseInt(
+                    spool.spools.tempOffset
+                  );
                 }
               });
 
@@ -308,17 +310,43 @@ export default class OctoPrintClient {
                 "printer/tool",
                 offset
               );
+              console.log(offset);
             }
             await OctoPrintClient.post(printer, "printer/printhead", feed);
             const post = await OctoPrintClient.post(printer, "job", opts);
-            element.target.disabled = false;
+            if (element) {
+              element.target.disabled = false;
+            }
           }
         },
       });
     } else {
       await OctoPrintClient.post(printer, "printer/printhead", feed);
       const post = await OctoPrintClient.post(printer, "job", opts);
-      element.target.disabled = false;
+      if (
+        printer.selectedFilament != null &&
+        Array.isArray(printer.selectedFilament)
+      ) {
+        const offset = {
+          command: "offset",
+          offsets: {},
+        };
+        printer.selectedFilament.forEach((spool, index) => {
+          if (spool != null) {
+            offset.offsets["tool" + index] = parseInt(spool.spools.tempOffset);
+          }
+        });
+
+        const post = await OctoPrintClient.post(
+          printer,
+          "printer/tool",
+          offset
+        );
+        console.log(offset);
+      }
+      if (element) {
+        element.target.disabled = false;
+      }
     }
   }
 
@@ -375,7 +403,7 @@ export default class OctoPrintClient {
       url = url.replace("[PrinterAPI]", printer.apikey);
     }
     if (typeof command === "undefined" || command.length === 0) {
-      try{
+      try {
         const post = await fetch(url, {
           method: "GET",
           headers: {
@@ -385,26 +413,26 @@ export default class OctoPrintClient {
         });
         if (post.status !== 200 || post.status !== 204) {
           UI.createAlert(
-              "error",
-              `${printer.printerName}: Could not complete ${action}`,
-              3000
+            "error",
+            `${printer.printerName}: Could not complete ${action}`,
+            3000
           );
         } else {
           UI.createAlert(
-              "success",
-              `${printer.printerName}: Successfully completed ${action}`,
-              3000
+            "success",
+            `${printer.printerName}: Successfully completed ${action}`,
+            3000
           );
         }
-      }catch(e){
+      } catch (e) {
         UI.createAlert(
-            "error",
-            `${printer.printerName}: Could not complete ${action} - Error: ${e}`,
-            3000
+          "error",
+          `${printer.printerName}: Could not complete ${action} - Error: ${e}`,
+          3000
         );
       }
     } else {
-      try{
+      try {
         const post = await fetch(url, {
           method: "POST",
           headers: {
@@ -415,25 +443,24 @@ export default class OctoPrintClient {
         });
         if (post.status !== 200 || post.status !== 204) {
           UI.createAlert(
-              "error",
-              `${printer.printerName}: Could not complete ${action}`,
-              3000
+            "error",
+            `${printer.printerName}: Could not complete ${action}`,
+            3000
           );
         } else {
           UI.createAlert(
-              "success",
-              `${printer.printerName}: Successfully completed ${action}`,
-              3000
+            "success",
+            `${printer.printerName}: Successfully completed ${action}`,
+            3000
           );
         }
-      }catch(e){
+      } catch (e) {
         UI.createAlert(
-            "error",
-            `${printer.printerName}: Could not complete ${action} - Error: ${e}`,
-            3000
+          "error",
+          `${printer.printerName}: Could not complete ${action} - Error: ${e}`,
+          3000
         );
       }
-
     }
     return "done";
   }
