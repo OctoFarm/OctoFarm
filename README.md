@@ -176,6 +176,7 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
 - All Patreon Supporters and random donations! - Big massive thanks for these, they keep me full of steak!
 - The users calonmer, Insertion and noxin from my discord server! Seriously no end to my thanks for these 3.
 - [JetBrains IDE](https://www.jetbrains.com/webstorm/) - Thanks to JebBrains for allowing a free license to use with developing my application. Their IDE is top notch! 
+- [DavidZwa] - Big help for the massive push from him to get V2 underway. Brought a lot of knowledge to the table that I was lacking. 
 
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
