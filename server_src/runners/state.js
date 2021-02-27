@@ -1726,6 +1726,8 @@ class Runner {
     await newPrinter.save();
     logger.info(`Saved new Printer: ${newPrinter.printerURL}`);
     farmPrinters.push(newPrinter);
+    // Regenerate sort index on printer add...
+    await this.reGenerateSortIndex();
     await this.setDefaults(newPrinter._id);
     await this.setupWebSocket(newPrinter._id);
     return [newPrinter];
@@ -1844,7 +1846,8 @@ class Runner {
       }
     }
     logger.info("Re-Scanning printers farm");
-
+    // Regenerate sort index on printer update...
+    await this.reGenerateSortIndex();
     return changes;
   }
 
@@ -1873,7 +1876,27 @@ class Runner {
       }
     }
   }
-
+  static async reGenerateSortIndex() {
+    for (let p = 0; p < farmPrinters.length; p++) {
+      await logger.info(
+        `Regenerating existing indexes: ${farmPrinters[p].printerURL}`
+      );
+      PrinterTicker.addIssue(
+        new Date(),
+        farmPrinters[p].printerURL,
+        `Regenerating Printer Index: ${p}`,
+        "Active",
+        farmPrinters[p]._id
+      );
+      farmPrinters[p].sortIndex = p;
+      const filter = { _id: farmPrinters[p]._id };
+      const update = { sortIndex: p };
+      await Printers.findOneAndUpdate(filter, update, {
+        returnOriginal: false,
+      });
+    }
+    return;
+  }
   static async removePrinter(indexs) {
     logger.info("Pausing runners to remove printer...");
     await this.pause();
