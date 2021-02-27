@@ -706,7 +706,7 @@ export default class PrinterSettings {
             <div class="form-row">
               <div class="col-4">
                 <input id="psPowerToggleCommand"  type="text" class="form-control" placeholder="Command">
-                 <small vclass="form-text text-muted">
+                 <small class="form-text text-muted">
                    This is usually an json object supplied in the following format <code>{"command":"toggle"}</code>
                  </small>
               </div>
