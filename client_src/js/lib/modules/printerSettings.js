@@ -544,7 +544,7 @@ export default class PrinterSettings {
         let serverRestart = "N/A";
         let systemRestart = "N/A";
         let systemShutdown = "N/A";
-        if (currentPrinter.otherSettings !== null) {
+        if (currentPrinter.otherSettings !== null && !offline) {
           if (
             currentPrinter.otherSettings.system.commands
               .serverRestartCommand === ""

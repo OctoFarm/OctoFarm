@@ -2568,6 +2568,22 @@ class Runner {
           "Complete",
           farmPrinters[index]._id
         );
+      })
+      .catch((err) => {
+        PrinterTicker.addIssue(
+          new Date(),
+          farmPrinters[index].printerURL,
+          `Error grabbing plugin list information: ${err}`,
+          "Disconnected",
+          farmPrinters[index]._id
+        );
+        farmPrinters[index].systemChecks.scanning.profile.status = "danger";
+        farmPrinters[index].systemChecks.scanning.profile.date = new Date();
+        logger.error(
+          `Error grabbing plugin list for: ${farmPrinters[index].printerURL}: Reason: `,
+          err
+        );
+        return false;
       });
   }
 
@@ -2600,6 +2616,22 @@ class Runner {
           "Complete",
           farmPrinters[index]._id
         );
+      })
+      .catch((err) => {
+        PrinterTicker.addIssue(
+          new Date(),
+          farmPrinters[index].printerURL,
+          `Error grabbing system information: ${err}`,
+          "Disconnected",
+          farmPrinters[index]._id
+        );
+        farmPrinters[index].systemChecks.scanning.profile.status = "danger";
+        farmPrinters[index].systemChecks.scanning.profile.date = new Date();
+        logger.error(
+          `Error grabbing system for: ${farmPrinters[index].printerURL}: Reason: `,
+          err
+        );
+        return false;
       });
   }
 
@@ -2669,8 +2701,21 @@ class Runner {
           farmPrinters[index]._id
         );
       })
-      .catch((e) => {
-        logger.info("Error find updates: ", e);
+      .catch((err) => {
+        PrinterTicker.addIssue(
+          new Date(),
+          farmPrinters[index].printerURL,
+          `Error grabbing octoprint updates information: ${err}`,
+          "Disconnected",
+          farmPrinters[index]._id
+        );
+        farmPrinters[index].systemChecks.scanning.profile.status = "danger";
+        farmPrinters[index].systemChecks.scanning.profile.date = new Date();
+        logger.error(
+          `Error grabbing octoprint updates for: ${farmPrinters[index].printerURL}: Reason: `,
+          err
+        );
+        return false;
       });
   }
 

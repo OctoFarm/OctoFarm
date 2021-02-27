@@ -40,6 +40,8 @@ All notable changes to this project will be documented in this file.
    - Fixed: #279 - API connection checked too early after powering up.
    - Fixed: #292 - Printer Settings would fail due to missing wol settings.
    - Fixed: #326 - Job doesn't reset when OctoPrint goes offline.
+   - Fixed: Printer Settings modal opening would throw error when OctoPrint has never been connected to farm.
+   - Fixed: Error grabbing octoprint plugin list/system/updates wouldn't correctly log an error.
 
 ### Removed
    - Printer Settings drop down, was buggy and half implemented causing issues and is less used than the Printer Control one.
