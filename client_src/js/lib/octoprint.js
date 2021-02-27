@@ -342,7 +342,6 @@ export default class OctoPrintClient {
           "printer/tool",
           offset
         );
-        console.log(offset);
       }
       if (element) {
         element.target.disabled = false;
