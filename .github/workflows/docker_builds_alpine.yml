@@ -15,8 +15,10 @@ jobs:
         run: |
           if ${{ github.ref == 'refs/heads/master' }} == true; then
             echo 'TAG_EDGE=alpine-latest' >> $GITHUB_ENV
-          else
+          elif ${{ github.ref == 'refs/heads/development' }} == true; then
             echo 'TAG_EDGE=alpine-dev' >> $GITHUB_ENV
+          else
+            echo 'TAG_EDGE=alpine-alpha' >> $GITHUB_ENV
           fi
       -
         name: Docker meta

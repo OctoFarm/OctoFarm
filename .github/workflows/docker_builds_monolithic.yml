@@ -15,8 +15,10 @@ jobs:
         run: |
           if ${{ github.ref == 'refs/heads/master' }} == true; then
             echo 'TAG_EDGE=monolithic-latest' >> $GITHUB_ENV
-          else
+          elif ${{ github.ref == 'refs/heads/development' }} == true; then
             echo 'TAG_EDGE=monolithic-dev' >> $GITHUB_ENV
+          else
+            echo 'TAG_EDGE=monolithic-alpha' >> $GITHUB_ENV
           fi
       -
         name: Docker meta
