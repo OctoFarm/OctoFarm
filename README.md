@@ -90,7 +90,7 @@ On your OctoPrint instance
 
 - User Name -> User Settings
 - Copy the API Key some place easy to get to
-- Enabled the "Allow Cross Origin Resource Sharing (CORS)
+- Enabled the Allow Cross Origin Resource Sharing (CORS)
 - Restart OctoPrint
 - Repeat for all OctoPrints that will be added to the Farm
 
@@ -149,7 +149,7 @@ These are planned but not available yet...
 
 ## Contributing
 
-I am currently not accepting any contribution to the code. I started this project to teach myself nodejs and Javascript better. With my current plans I will have exhausted most learning opportunities by Version 1.2 and will be happy to take pull requests from people then. Thanks for understanding.
+Version 2.0 is underway. If anyone would like to join the fun please head over to discord with the following link: - Discord: [Discord](https://discord.gg/vjabMUn) and speak to us in Developer Discussions. Thanks! 
 
 <!-- LICENSE -->
 
