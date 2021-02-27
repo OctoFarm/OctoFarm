@@ -624,6 +624,15 @@ class ServerSettings {
         return res.json();
       })
       .then((res) => {
+        if (!res || res.database.length === 0) {
+          UI.createAlert(
+            "error",
+            "Database could not be contacted",
+            3000,
+            "clicked"
+          );
+          return;
+        }
         if (res.databases[0].length !== 0) {
           FileOperations.download(
             database + ".json",
