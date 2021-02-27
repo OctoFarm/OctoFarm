@@ -3,8 +3,10 @@ import {tap} from "rxjs/operators";
 import {Observable} from "rxjs";
 import {ClientConnectionStateModel} from "../models/client-connection-state.model";
 import {ConnectionParams} from "../models/connection.params";
-import {Injectable} from "@nestjs/common";
+import {Injectable, Logger} from "@nestjs/common";
 import {validate} from "class-validator";
+import {AxiosError} from "axios";
+import HttpStatusCode from "../../utils/http-status-codes.enum";
 
 @Injectable()
 export class ClientConnectionsState {
@@ -14,11 +16,13 @@ export class ClientConnectionsState {
         apiKeyIsGlobal: null,
         corsEnabled: null,
         userHasRequiredRoles: null,
+        apiConnected: null,
         websocketConnected: null,
         websocketHealthy: null
     };
     private connectionParams: ConnectionParams;
     private state: ClientConnectionStateModel;
+    private logger = new Logger(ClientConnectionsState.name);
 
     constructor(
         private octoPrintClientService: OctoPrintClientService
@@ -40,28 +44,68 @@ export class ClientConnectionsState {
             throw new Error("Call initState(connectionParams) before testing the client connection.");
         }
 
-        const settings = await this.octoPrintClientService.getSettings(this.connectionParams).toPromise();
-        if (!settings.api)
-            throw new Error("Client settings response did not contain the api section. Cant validate client connection.");
+        const jsonParams = JSON.stringify(this.connectionParams);
+        await this.octoPrintClientService.getSettings(this.connectionParams)
+            .subscribe(
+                async settings => {
+                    if (!settings.api)
+                        throw new Error("Client settings response did not contain the api section. Cant validate client connection.");
 
-        this.patchState({
-            apiKeyAccepted: true
-        });
+                    this.patchState({
+                        apiKeyAccepted: true
+                    });
 
-        const apiKey = settings.api.key;
-        if (apiKey === undefined)
-            throw new Error("Client settings api:apiKey was not found. Cant test connection. Aborting.");
-        this.validateKeyIsNotGlobalKey(apiKey);
+                    const apiKey = settings.api.key;
+                    if (apiKey === undefined)
+                        throw new Error("Client settings api:apiKey was not found. Cant test connection. Aborting.");
+                    this.validateKeyIsNotGlobalKey(apiKey);
 
-        const corsEnabled = settings.api.allowCrossOrigin;
-        if (corsEnabled === undefined)
-            throw new Error("Client settings api:allowCrossOrigin was not found. Cant test connection. Aborting.");
-        this.patchState({
-            corsEnabled
-        });
+                    const corsEnabled = settings.api.allowCrossOrigin;
+                    if (corsEnabled === undefined)
+                        throw new Error("Client settings api:allowCrossOrigin was not found. Cant test connection. Aborting.");
+                    this.patchState({
+                        corsEnabled
+                    });
 
-        const currentUser = await this.octoPrintClientService.getCurrentUser(this.connectionParams).toPromise()
-        // console.warn(currentUser);
+                    const currentUser = await this.octoPrintClientService.getCurrentUser(this.connectionParams).toPromise()
+                    // console.warn(currentUser);
+
+                }, (error: AxiosError) => {
+                    if (error.isAxiosError) {
+                        if (!error?.response || error?.response.status === null || error?.response.status === undefined) {
+                            this.logger.error("AxiosResponse:response field was empty or didn't contain a status code, so the error cannot be handled properly.");
+                            return;
+                        }
+
+                        const status = error.response.status;
+                        switch (status as HttpStatusCode) {
+                            case HttpStatusCode.FORBIDDEN:
+                                this.patchState({
+                                    apiKeyAccepted: false
+                                });
+                                this.logger.error("This API key was not accepted by OctoPrint using these parameters:\n\t"
+                                    + jsonParams, error.stack);
+                                break;
+                            case HttpStatusCode.BAD_GATEWAY:
+                                this.logger.error("OctoPrint return BAD_GATEWAY. Make sure it is fully started and running.\n\t"
+                                    + jsonParams, error.stack);
+                                break;
+                            case HttpStatusCode.NOT_FOUND || HttpStatusCode.BAD_REQUEST:
+                                this.logger.error("The OctoPrint API returned error (bad request or not found):\n\tCode:"
+                                    + status, error.stack);
+                                break;
+                            default:
+                                this.logger.error("OctoPrint client responded with an unknown status when using the following parameters: "
+                                    + this.connectionParams, error.stack);
+                                break;
+                        }
+
+                        console.warn('state', this.getState());
+                    } else {
+                        this.logger.error("Couldn't call the OctoPrint connector service due to internal error. " + jsonParams, error.stack);
+                    }
+                }
+            );
     }
 
     public getState() {
@@ -111,7 +155,6 @@ export class ClientConnectionsState {
 
     private async validateConnectionParams() {
         const errors = await validate(this.connectionParams);
-        console.log(errors);
         this.patchState({
             apiKeyValid: errors?.length === 0
         });

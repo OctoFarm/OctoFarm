@@ -44,7 +44,6 @@ export class OctoPrintClientService {
                 "x-api-key": params.printerKey
             }
         };
-        console.log(method, connectionConfig, url);
         switch (method) {
             case "GET":
                 return this.httpService.get<R>(url, connectionConfig).pipe(map(r => r.data));
