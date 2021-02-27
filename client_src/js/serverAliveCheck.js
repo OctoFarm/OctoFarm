@@ -19,7 +19,6 @@ const reloadWindow = async function () {
 };
 
 const serverAliveCheck = async function () {
-  console.log(interval);
   if (!interval) {
     interval = setInterval(async () => {
       const modal = document.getElementById("lostServerConnection");
