@@ -39,6 +39,9 @@ All notable changes to this project will be documented in this file.
    - Fixed: #292 - Printer Settings would fail due to missing wol settings.
    - Fixed: #326 - Job doesn't reset when OctoPrint goes offline.
 
+### Removed
+   - Printer Settings drop down, was buggy and half implemented causing issues and is less used than the Printer Control one.
+
 
 
 # [v1.1.10]

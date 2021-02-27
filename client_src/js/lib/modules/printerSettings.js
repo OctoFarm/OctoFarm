@@ -5,20 +5,21 @@ import Calc from "../functions/calc.js";
 
 let currentIndex = 0;
 
-let controlDropDown = false;
+// let controlDropDown = false;
 
 let currentPrinter = null;
 
 // Close modal event listeners...
-$("#PrinterSettingsModal").on("hidden.bs.modal", function () {
+$("#PrinterSettingsModal").on("hidden.bs.modal", function (e) {
   // Fix for mjpeg stream not ending when element removed...
   document.getElementById("printerControlCamera").src = "";
-  if (document.getElementById("printerSelection")) {
-    document.getElementById("printerSelection").remove();
-    controlDropDown = false;
-  }
+  // Remove buggy drop down
+  // if (document.getElementById("printerSelection")) {
+  //   document.getElementById("printerSelection").remove();
+  //   controlDropDown = false;
+  // }
 });
-$("#connectionModal").on("hidden.bs.modal", function () {
+$("#connectionModal").on("hidden.bs.modal", function (e) {
   if (document.getElementById("connectionAction")) {
     document.getElementById("connectionAction").remove();
   }
@@ -38,48 +39,49 @@ export default class PrinterSettings {
         );
         currentIndex = index;
         const id = _.findIndex(printers, function (o) {
-          return o._id === index;
+          return o._id == index;
         });
         currentPrinter = printers[id];
-
-        // Load the printer dropdown
-        if (!controlDropDown) {
-          const printerDrop = document.getElementById(
-            "printerSettingsSelection"
-          );
-          printerDrop.innerHTML = "";
-          printerControlList.forEach((list) => {
-            if (list.state.category !== "Offline") {
-              printerDrop.insertAdjacentHTML(
-                "beforeend",
-                `
-                  <option value="${list.printerID}" selected>${list.printerName}</option>
-              `
-              );
-            }
-          });
-          printerDrop.value = currentPrinter._id;
-          printerDrop.addEventListener("change", (event) => {
-            if (document.getElementById("printerControls")) {
-              document.getElementById("printerControls").innerHTML = "";
-            }
-            document.getElementById("pmStatus").innerHTML =
-              "<i class=\"fas fa-spinner fa-spin\"></i>";
-            document.getElementById("pmStatus").className =
-              "btn btn-secondary mb-2";
-            //Load Connection Panel
-            document.getElementById("printerPortDrop").innerHTML = "";
-            document.getElementById("printerBaudDrop").innerHTML = "";
-            document.getElementById("printerProfileDrop").innerHTML = "";
-            document.getElementById("printerConnect").innerHTML = "";
-            PrinterSettings.init(
-              event.target.value,
-              printers,
-              printerControlList
-            );
-          });
-          controlDropDown = true;
-        }
+        const printerDrop = document.getElementById("printerSettingsSelection");
+        printerDrop.innerHTML = `Printer Settings: ${currentPrinter.printerName}`;
+        // Remove dropdown
+        // if (!controlDropDown) {
+        //   const printerDrop = document.getElementById(
+        //     "printerSettingsSelection"
+        //   );
+        //   printerDrop.innerHTML = "";
+        //   printerControlList.forEach((list) => {
+        //     if (list.state.category !== "Offline") {
+        //       printerDrop.insertAdjacentHTML(
+        //         "beforeend",
+        //         `
+        //           <option value="${list.printerID}" selected>${list.printerName}</option>
+        //       `
+        //       );
+        //     }
+        //   });
+        //   printerDrop.value = currentPrinter._id;
+        //   printerDrop.addEventListener("change", (event) => {
+        //     if (document.getElementById("printerControls")) {
+        //       document.getElementById("printerControls").innerHTML = "";
+        //     }
+        //     document.getElementById("pmStatus").innerHTML =
+        //       "<i class=\"fas fa-spinner fa-spin\"></i>";
+        //     document.getElementById("pmStatus").className =
+        //       "btn btn-secondary mb-2";
+        //     //Load Connection Panel
+        //     document.getElementById("printerPortDrop").innerHTML = "";
+        //     document.getElementById("printerBaudDrop").innerHTML = "";
+        //     document.getElementById("printerProfileDrop").innerHTML = "";
+        //     document.getElementById("printerConnect").innerHTML = "";
+        //     PrinterSettings.init(
+        //       event.target.value,
+        //       printers,
+        //       printerControlList
+        //     );
+        //   });
+        //   controlDropDown = true;
+        // }
 
         let offline = false;
         if (currentPrinter.printerState.colour.category === "Offline") {
@@ -166,7 +168,7 @@ export default class PrinterSettings {
               .getElementById("psDefaultSerialPort")
               .insertAdjacentHTML(
                 "afterbegin",
-                "<option value=\"0\">No Preference</option>"
+                '<option value="0">No Preference</option>'
               );
           }
           currentPrinter.connectionOptions.printerProfiles.forEach(
@@ -186,7 +188,7 @@ export default class PrinterSettings {
               .getElementById("psDefaultProfile")
               .insertAdjacentHTML(
                 "afterbegin",
-                "<option value=\"0\">No Preference</option>"
+                '<option value="0">No Preference</option>'
               );
           }
           if (currentPrinter.connectionOptions.baudratePreference != null) {
@@ -586,7 +588,6 @@ export default class PrinterSettings {
         let wolInterval = "100";
         let wolCount = "3";
         let wolMAC = "";
-        console.log(currentPrinter);
         if (
           currentPrinter.powerSettings !== null ||
           (_.isEmpty(currentPrinter.powerSettings) &&
@@ -596,10 +597,9 @@ export default class PrinterSettings {
           wolIP = currentPrinter.powerSettings.wol.ip;
           wolPort = currentPrinter.powerSettings.wol.port;
           wolInterval = currentPrinter.powerSettings.wol.interval;
-          wolCount = currentPrinter.powerSettings.wol.packets;
+          wolCount = currentPrinter.powerSettings.wol.count;
           wolMAC = currentPrinter.powerSettings.wol.MAC;
         }
-
         document.getElementById("psPowerCommands").innerHTML = `
         <h5><u>OctoPrint Specific Power Commands</u></h5>
         <form>
@@ -636,7 +636,7 @@ export default class PrinterSettings {
         </form>
          <div class="form-row">
             <div class="col-2">
-              <input id="psWolMAC" type="text" class="form-control" placeholder="${wolMAC}">
+              <input id="psWolMAC"  type="text" class="form-control" placeholder=${wolMAC}"" value="">
                <small class="form-text text-muted">
                     MAC Address to target wake packet sending
                </small>
@@ -669,10 +669,9 @@ export default class PrinterSettings {
           <hr>
           <h5><u>Custom Power Commands</u></h5>
           <p class="mb-0">Setup a custom POST request to an API endpoint, instructions for such will be in your plugin/device instructions. Setting this up will activate the power button toggle on all Views and allow Power On and Power Off selections in the dropdown.</p>
-           <p class="mb-0">If you'd like to enter in a full URL command then leave the command blank and it will skip the requirement and just make a POST to the URL provided similar to CURL. <br>You can use the following placeholders:</p>
+           <p class="mb-0">If you'd like to enter in a full URL command then leave the command blank and it will skip the requirement and just make a POST to the URL provided similar to CURL. You can use the following placeholders:</p>
           <p class="mb-0">Printer URL: <code>[PrinterURL]</code></p>
-          <p class="mb-0">Printer API-KEY: <code>[PrinterAPI]</code></p>
-          <button id="resetPowerFields" title="The dev coded himself into a corner here... Use this button to reset the below commands to blank." type="button" class="btn btn-danger mb-2">Reset Fields</button>
+          <p class="mb-0">Printer api-key: <code>[PrinterAPI]</code></p
           <h6>Power On</h6>
            <div class="form-row">
               <div class="col-4">
@@ -707,7 +706,7 @@ export default class PrinterSettings {
             <div class="form-row">
               <div class="col-4">
                 <input id="psPowerToggleCommand"  type="text" class="form-control" placeholder="Command">
-                 <small class="form-text text-muted">
+                 <small vclass="form-text text-muted">
                    This is usually an json object supplied in the following format <code>{"command":"toggle"}</code>
                  </small>
               </div>
@@ -736,25 +735,24 @@ export default class PrinterSettings {
             </div>
         </form>
         `;
-
         document.getElementById("psWolEnable").checked = wolEnable;
-        if (serverRestart !== "N/A") {
+        if (serverRestart != "N/A") {
           document.getElementById(
             "psServerRestart"
           ).placeholder = serverRestart;
         }
-        if (systemRestart !== "N/A") {
+        if (systemRestart != "N/A") {
           document.getElementById(
             "psSystemRestart"
           ).placeholder = systemRestart;
         }
-        if (systemShutdown !== "N/A") {
+        if (systemShutdown != "N/A") {
           document.getElementById(
             "psSystemShutdown"
           ).placeholder = systemShutdown;
         }
         if (
-          currentPrinter.powerSettings !== null &&
+          !currentPrinter.powerSettings != null &&
           !_.isEmpty(currentPrinter.powerSettings)
         ) {
           document.getElementById("psPowerOnCommand").placeholder =
@@ -889,13 +887,11 @@ export default class PrinterSettings {
                       <div class="custom-control custom-checkbox mb-3">
                             <input type="checkbox" class="custom-control-input" id="activePrinter-${script._id}" required="">
                             <label class="custom-control-label" for="activePrinter-${script._id}"></label>
-
                         </div>
                     </form>
                 </td>
                 <td> 
                 <select class="custom-select" id="triggerPrinter-${script._id}" disabled>
-
                  </select>
                        </td>
                 <td>${script.scriptLocation} </td>
@@ -928,41 +924,10 @@ export default class PrinterSettings {
         document.getElementById("psMaintenanceCosts").placeholder = parseFloat(
           currentPrinter.costSettings.maintenanceCosts
         );
-        document
-          .getElementById("resetPowerFields")
-          .addEventListener("click", async () => {
-            let post = await OctoFarmClient.get(
-              "printers/killPowerSettings/" + currentPrinter._id
-            );
-            if (post.status !== 200) {
-              post = await post.json();
-              if (post.updateSettings) {
-                UI.createAlert(
-                  "success",
-                  "Successfully cleared Power Settings",
-                  3000,
-                  "clicked"
-                );
-              } else {
-                UI.createAlert(
-                  "error",
-                  "Successfully cleared Power Settings",
-                  3000,
-                  "clicked"
-                );
-              }
-            } else {
-              UI.createAlert(
-                "error",
-                "Failed to contact server is it online?",
-                3000,
-                "clicked"
-              );
-            }
-          });
+
         document
           .getElementById("savePrinterSettings")
-          .addEventListener("click", async () => {
+          .addEventListener("click", async (event) => {
             const newValues = {
               state: currentPrinter.printerState.colour.category,
               printer: {
@@ -1008,7 +973,7 @@ export default class PrinterSettings {
                   ip: document.getElementById("psWolIP").value,
                   port: document.getElementById("psWolPort").value,
                   interval: document.getElementById("psWolInterval").value,
-                  packets: document.getElementById("psWolCount").value,
+                  count: document.getElementById("psWolCount").value,
                   MAC: document.getElementById("psWolMAC").value,
                 },
               },
@@ -1192,11 +1157,11 @@ export default class PrinterSettings {
               );
             }
           });
-        await PrinterSettings.applyState(currentPrinter);
+        PrinterSettings.applyState(currentPrinter);
         UI.addSelectListeners("ps");
       } else {
         const id = _.findIndex(printers, function (o) {
-          return o._id === currentIndex;
+          return o._id == currentIndex;
         });
         currentPrinter = printers[id];
         if (currentPrinter.printerState.colour.category !== "Offline") {
@@ -1205,16 +1170,17 @@ export default class PrinterSettings {
           document.getElementById("psDefaultBaudrate").disabled = false;
           document.getElementById("psDefaultProfile").disabled = false;
         }
-        await PrinterSettings.applyState(currentPrinter);
+        PrinterSettings.applyState(currentPrinter);
       } // END
     } catch (e) {
       UI.createAlert(
         "error",
-        "Something has gone wrong with loading the Printer Manager... Hard Failure, please submit as a bug on github: " +
+        "Something has gone wrong with loading the Printer Settings... Hard Failure, please submit as a bug on github: " +
           e,
         0,
         "clicked"
       );
+      console.error(e);
     }
   }
 
