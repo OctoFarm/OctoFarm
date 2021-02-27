@@ -3,7 +3,7 @@ import OctoFarmClient from "../octofarm.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import FileManager from "./fileManager.js";
-import {returnDropDown, selectFilament} from "./filamentGrab.js";
+import { returnDropDown, selectFilament } from "./filamentGrab.js";
 import FileSorting from "../modules/fileSorting.js";
 import CustomGenerator from "./customScripts.js";
 
@@ -50,7 +50,7 @@ export default class PrinterManager {
               "beforeend",
               `
                   <option value="${list.printerID}" selected>${list.printerName}</option>
-              `,
+              `
             );
           }
         });
@@ -76,7 +76,7 @@ export default class PrinterManager {
       const done = await PrinterManager.loadPrinter(
         currentPrinter,
         printerControlList,
-        filamentDropDown,
+        filamentDropDown
       );
       const elements = PrinterManager.grabPage();
       elements.terminal.terminalWindow.innerHTML = "";
@@ -99,7 +99,7 @@ export default class PrinterManager {
               "beforeend",
               `
                   <option value="${list.printerID}" selected>${list.printerName}</option>
-              `,
+              `
             );
           }
         });
@@ -136,7 +136,7 @@ export default class PrinterManager {
           .getElementById("pmBaudrate")
           .insertAdjacentHTML(
             "beforeend",
-            `<option value="${baud}">${baud}</option>`,
+            `<option value="${baud}">${baud}</option>`
           );
       });
       if (printer.connectionOptions.baudratePreference != null) {
@@ -148,7 +148,7 @@ export default class PrinterManager {
           .getElementById("pmSerialPort")
           .insertAdjacentHTML(
             "beforeend",
-            `<option value="${port}">${port}</option>`,
+            `<option value="${port}">${port}</option>`
           );
       });
       if (printer.connectionOptions.portPreference != null) {
@@ -160,7 +160,7 @@ export default class PrinterManager {
           .getElementById("pmProfile")
           .insertAdjacentHTML(
             "beforeend",
-            `<option value="${profile.id}">${profile.name}</option>`,
+            `<option value="${profile.id}">${profile.name}</option>`
           );
       });
       if (printer.connectionOptions.printerProfilePreference != null) {
@@ -1056,10 +1056,10 @@ export default class PrinterManager {
                                 <div class="col-md-6">
                                  <div class="input-group mb-1"><div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool${i}FilamentManagerFolderSelect">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool${i}FilamentManagerFolderSelect"><option value="" selected></option></select></div>
                                 </div>
-                                `,
+                                `
               );
               const pmFilamentDrop = document.getElementById(
-                `tool${i}FilamentManagerFolderSelect`,
+                `tool${i}FilamentManagerFolderSelect`
               );
               pmFilamentDrop.innerHTML = "";
               filamentDropDown.forEach((filament) => {
@@ -1106,7 +1106,7 @@ export default class PrinterManager {
                               </div>
                           </div>
                             </div>
-                         `,
+                         `
               );
             }
           } else if (keys[t].includes("heatedChamber")) {
@@ -1129,7 +1129,7 @@ export default class PrinterManager {
                               </div>
                           </div>
                             </div>
-                         `,
+                         `
               );
             }
           }
@@ -1145,9 +1145,9 @@ export default class PrinterManager {
       UI.createAlert(
         "error",
         "Something has gone wrong with loading the Printer Manager... Hard Failure, please submit as a bug on github: " +
-        e,
+          e,
         0,
-        "clicked",
+        "clicked"
       );
       console.error(e);
     }
@@ -1165,7 +1165,7 @@ export default class PrinterManager {
         elements.connectPage.connectButton.disabled = true;
         OctoPrintClient.connect(
           elements.connectPage.connectButton.value,
-          currentPrinter,
+          currentPrinter
         );
       });
     } else {
@@ -1173,7 +1173,7 @@ export default class PrinterManager {
         elements.connectPage.connectButton.disabled = true;
         OctoPrintClient.connect(
           elements.connectPage.connectButton.value,
-          currentPrinter,
+          currentPrinter
         );
       });
     }
@@ -1257,7 +1257,7 @@ export default class PrinterManager {
                 document.getElementById("tool" + i + "Set").className =
                   "btn btn-md btn-light m-0 p-1";
               };
-              let {value} = document.getElementById("tool" + i + "Target");
+              let { value } = document.getElementById("tool" + i + "Target");
               document.getElementById("tool" + i + "Target").value = "";
               if (value === "Off") {
                 value = 0;
@@ -1271,7 +1271,7 @@ export default class PrinterManager {
               const post = await OctoPrintClient.post(
                 currentPrinter,
                 "printer/tool",
-                opt,
+                opt
               );
               if (post.status === 204) {
                 document.getElementById("tool" + i + "Set").className =
@@ -1310,7 +1310,7 @@ export default class PrinterManager {
                 elements.temperatures.bed[2].classList =
                   "btn btn-md btn-light m-0 p-1";
               };
-              let {value} = elements.temperatures.bed[1];
+              let { value } = elements.temperatures.bed[1];
 
               elements.temperatures.bed[1].value = "";
               if (value === "Off") {
@@ -1323,7 +1323,7 @@ export default class PrinterManager {
               const post = await OctoPrintClient.post(
                 currentPrinter,
                 "printer/bed",
-                opt,
+                opt
               );
               if (post.status === 204) {
                 elements.temperatures.bed[2].className =
@@ -1344,7 +1344,7 @@ export default class PrinterManager {
                   if (elements.temperatures.bed[1].value <= 0) {
                     elements.temperatures.bed[1].value = "";
                   }
-                },
+                }
               );
             }
 
@@ -1374,7 +1374,7 @@ export default class PrinterManager {
                 elements.temperatures.chamber[2].classList =
                   "btn btn-md btn-light m-0 p-1";
               };
-              let {value} = elements.temperatures.chamber[1];
+              let { value } = elements.temperatures.chamber[1];
 
               elements.temperatures.chamber[1].value = "";
               if (value === "Off") {
@@ -1387,7 +1387,7 @@ export default class PrinterManager {
               const post = await OctoPrintClient.post(
                 currentPrinter,
                 "printer/chamber",
-                opt,
+                opt
               );
               if (post.status === 204) {
                 elements.temperatures.chamber[2].className =
@@ -1406,7 +1406,7 @@ export default class PrinterManager {
                   if (elements.temperatures.chamber[1].value <= 0) {
                     elements.temperatures.chamber[1].value = "";
                   }
-                },
+                }
               );
             }
 
@@ -1450,7 +1450,7 @@ export default class PrinterManager {
       const post = await OctoPrintClient.post(
         currentPrinter,
         "printer/printhead",
-        opt,
+        opt
       );
       if (post.status === 204) {
         e.target.classList = "btn btn-success";
@@ -1477,7 +1477,7 @@ export default class PrinterManager {
       const post = await OctoPrintClient.post(
         currentPrinter,
         "printer/tool",
-        opt,
+        opt
       );
       if (post.status === 204) {
         e.target.classList = "btn btn-success";
@@ -1497,7 +1497,7 @@ export default class PrinterManager {
       const post = await OctoPrintClient.post(
         currentPrinter,
         "printer/command",
-        opt,
+        opt
       );
       if (post.status === 204) {
         e.target.classList = "btn btn-success";
@@ -1523,7 +1523,7 @@ export default class PrinterManager {
       const post = await OctoPrintClient.post(
         currentPrinter,
         "printer/command",
-        opt,
+        opt
       );
       if (post.status === 204) {
         e.target.classList = "btn btn-success";
@@ -1543,7 +1543,7 @@ export default class PrinterManager {
       const post = await OctoPrintClient.post(
         currentPrinter,
         "printer/command",
-        opt,
+        opt
       );
       if (post.status === 204) {
         e.target.classList = "btn btn-success";
@@ -1563,7 +1563,7 @@ export default class PrinterManager {
       ) {
         const select = OctoPrintClient.selectTool(currentPrinter, "tool0");
         if (select) {
-          const {value} = elements.printerControls.extruder;
+          const { value } = elements.printerControls.extruder;
           const opt = {
             command: "extrude",
             amount: parseInt(value),
@@ -1571,7 +1571,7 @@ export default class PrinterManager {
           const post = await OctoPrintClient.post(
             currentPrinter,
             "printer/tool",
-            opt,
+            opt
           );
           if (post.status === 204) {
             e.target.classList = "btn btn-success";
@@ -1586,7 +1586,7 @@ export default class PrinterManager {
           "error",
           "You haven't told octoprint how much you'd like to extrude...",
           3000,
-          "clicked",
+          "clicked"
         );
       }
     });
@@ -1600,7 +1600,7 @@ export default class PrinterManager {
       ) {
         const select = OctoPrintClient.selectTool(currentPrinter, "tool0");
         if (select) {
-          let {value} = elements.printerControls.extruder;
+          let { value } = elements.printerControls.extruder;
           value = "-" + value;
           const opt = {
             command: "extrude",
@@ -1609,7 +1609,7 @@ export default class PrinterManager {
           const post = await OctoPrintClient.post(
             currentPrinter,
             "printer/tool",
-            opt,
+            opt
           );
           if (post.status === 204) {
             e.target.classList = "btn btn-success";
@@ -1624,7 +1624,7 @@ export default class PrinterManager {
           "error",
           "You haven't told octoprint how much you'd like to retract...",
           3000,
-          "clicked",
+          "clicked"
         );
       }
     });
@@ -1708,7 +1708,7 @@ export default class PrinterManager {
       const post = await OctoPrintClient.post(
         currentPrinter,
         "printer/command",
-        opt,
+        opt
       );
       if (post.status === 204) {
         elements.terminal.sendBtn = "btn btn-success";
@@ -1730,10 +1730,10 @@ export default class PrinterManager {
       UI.createAlert(
         "warning",
         "Your files for Printer: " +
-        currentPrinter.printerName +
-        " has begun. Please do not navigate away from this page.",
+          currentPrinter.printerName +
+          " has begun. Please do not navigate away from this page.",
         3000,
-        "Clicked",
+        "Clicked"
       );
       FileManager.handleFiles(this.files, currentPrinter);
     });
@@ -1747,7 +1747,7 @@ export default class PrinterManager {
       "change",
       function () {
         FileManager.handleFiles(this.files, currentPrinter, "print");
-      },
+      }
     );
     elements.fileManager.back.addEventListener("click", (e) => {
       FileManager.openFolder(undefined, undefined, currentPrinter);
@@ -1765,7 +1765,7 @@ export default class PrinterManager {
       },
       jobStatus: {
         expectedCompletionDate: document.getElementById(
-          "pmExpectedCompletionDate",
+          "pmExpectedCompletionDate"
         ),
         expectedTime: document.getElementById("pmExpectedTime"),
         remainingTime: document.getElementById("pmTimeRemain"),
@@ -1845,7 +1845,7 @@ export default class PrinterManager {
         tools: document.querySelectorAll("[id^='tool']"),
       },
       filamentDrops: document.querySelectorAll(
-        "[id$=FilamentManagerFolderSelect]",
+        "[id$=FilamentManagerFolderSelect]"
       ),
     };
 
@@ -1860,11 +1860,11 @@ export default class PrinterManager {
 
     if (typeof printer.storage !== "undefined") {
       elements.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
-        printer.storage.free,
+        printer.storage.free
       )} / ${Calc.bytes(printer.storage.total)}`;
     } else {
       elements.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
-        0,
+        0
       )} / ${Calc.bytes(0)}`;
     }
 
@@ -1898,10 +1898,10 @@ export default class PrinterManager {
       } else {
         currentDate = currentDate.getTime();
         const futureDateString = new Date(
-          currentDate + printer.currentJob.printTimeRemaining * 1000,
+          currentDate + printer.currentJob.printTimeRemaining * 1000
         ).toDateString();
         let futureTimeString = new Date(
-          currentDate + printer.currentJob.printTimeRemaining * 1000,
+          currentDate + printer.currentJob.printTimeRemaining * 1000
         ).toTimeString();
         futureTimeString = futureTimeString.substring(0, 8);
         dateComplete = futureDateString + ": " + futureTimeString;
@@ -1938,13 +1938,13 @@ export default class PrinterManager {
     }
 
     elements.jobStatus.expectedTime.innerHTML = Calc.generateTime(
-      printer.currentJob.expectedPrintTime,
+      printer.currentJob.expectedPrintTime
     );
     elements.jobStatus.remainingTime.innerHTML = Calc.generateTime(
-      printer.currentJob.printTimeRemaining,
+      printer.currentJob.printTimeRemaining
     );
     elements.jobStatus.elapsedTime.innerHTML = Calc.generateTime(
-      printer.currentJob.printTimeElapsed,
+      printer.currentJob.printTimeElapsed
     );
     if (printer.currentJob.currentZ === null) {
       elements.jobStatus.currentZ.innerHTML = "No Active Print";
@@ -1960,7 +1960,7 @@ export default class PrinterManager {
     } else {
       elements.jobStatus.fileName.setAttribute(
         "title",
-        printer.currentJob.filePath,
+        printer.currentJob.filePath
       );
       let fileName = printer.currentJob.fileDisplay;
       if (fileName.length > 49) {
@@ -1972,7 +1972,7 @@ export default class PrinterManager {
       let filamentCost = "";
       if (printer.currentJob.expectedTotals !== null) {
         usageDisplay += `<p class="mb-0"><b>Total: </b>${printer.currentJob.expectedTotals.totalLength.toFixed(
-          2,
+          2
         )}m / ${printer.currentJob.expectedTotals.totalWeight.toFixed(2)}g</p>`;
         elements.jobStatus.expectedTotalCosts.innerHTML =
           printer.currentJob.expectedTotals.totalCost;
@@ -1992,7 +1992,7 @@ export default class PrinterManager {
           });
 
           filamentCost += `<p class="mb-0"><b>Total: </b>${printer.currentJob.expectedTotals.spoolCost.toFixed(
-            2,
+            2
           )}</p>`;
           printer.currentJob.expectedFilamentCosts.forEach((unit) => {
             const firstKey = Object.keys(unit)[0];
@@ -2113,7 +2113,7 @@ export default class PrinterManager {
 
     const isScrolledToBottom =
       elements.terminal.terminalWindow.scrollHeight -
-      elements.terminal.terminalWindow.clientHeight <=
+        elements.terminal.terminalWindow.clientHeight <=
       elements.terminal.terminalWindow.scrollTop + 1;
     elements.terminal.terminalWindow.innerHTML = "";
     if (typeof printer.terminal !== "undefined") {
@@ -2131,14 +2131,14 @@ export default class PrinterManager {
               "beforeend",
               `
           <div id="logLine${l}" class="logLine temperatureMessage">${printer.terminal[l]}</div>
-        `,
+        `
             );
           } else {
             elements.terminal.terminalWindow.insertAdjacentHTML(
               "beforeend",
               `
           <div id="logLine${l}" class="logLine temperatureMessage d-none">${printer.terminal[l]}</div>
-        `,
+        `
             );
           }
         } else if (
@@ -2150,14 +2150,14 @@ export default class PrinterManager {
               "beforeend",
               `
           <div id="logLine${l}" class="logLine sdMessage">${printer.terminal[l]}</div>
-        `,
+        `
             );
           } else {
             elements.terminal.terminalWindow.insertAdjacentHTML(
               "beforeend",
               `
           <div id="logLine${l}" class="logLine sdMessage d-none">${printer.terminal[l]}</div>
-        `,
+        `
             );
           }
         } else if (printer.terminal[l].match(waitMess)) {
@@ -2166,14 +2166,14 @@ export default class PrinterManager {
               "beforeend",
               `
           <div id="logLine${l}" class="logLine waitMessage">${printer.terminal[l]}</div>
-        `,
+        `
             );
           } else {
             elements.terminal.terminalWindow.insertAdjacentHTML(
               "beforeend",
               `
           <div id="logLine${l}" class="logLine waitMessage d-none">${printer.terminal[l]}</div>
-        `,
+        `
             );
           }
         } else {
@@ -2181,7 +2181,7 @@ export default class PrinterManager {
             "beforeend",
             `
           <div id="logLine${l}" class="logLine">${printer.terminal[l]}</div>
-        `,
+        `
           );
         }
       }
@@ -2232,7 +2232,7 @@ export default class PrinterManager {
 
   static async controls(enable, printing) {
     let elements = await PrinterManager.grabPage();
-    const {filamentDrops} = elements;
+    const { filamentDrops } = elements;
     elements = elements.printerControls;
     if (typeof printing !== "undefined" && printing) {
       elements.feedRate.disabled = !printing;

@@ -136,7 +136,6 @@ class JobClean {
       farmPrinter.systemChecks.cleaning.job.status = "success";
       farmPrinter.systemChecks.cleaning.job.date = new Date();
     }
-    console.log(currentJob);
     cleanJobs[printer.sortIndex] = currentJob;
   }
 }

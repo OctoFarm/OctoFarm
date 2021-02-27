@@ -101,7 +101,6 @@ router.post("/updateSettings", ensureAuthenticated, async (req, res) => {
 
   const settings = req.body;
   logger.info("Update printers request: ", settings);
-  console.log(settings);
   const updateSettings = await Runner.updateSettings(settings);
 
   res.send({ status: updateSettings.status, printer: updateSettings.printer });
