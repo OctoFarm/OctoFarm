@@ -6,5 +6,6 @@ WORKDIR /app
 
 RUN npm install -g pm2
 
-RUN chmod +x docker/entrypoint.sh
-ENTRYPOINT docker/entrypoint.sh
+COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["bash", "/usr/local/bin/entrypoint.sh"]
