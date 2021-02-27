@@ -82,7 +82,7 @@ All browsers should now be supported in OctoFarm. Please log an issue if this is
 ### Prerequisites
 
 - [MongoDB](https://www.mongodb.com/) - v3.6+
-- [NodeJS](https://nodejs.org/) - v12.18.4 (Recomended to use the LTS version)
+- [NodeJS](https://nodejs.org/) - v12.18.4 (Recomended to use the LTS version) NOTE: Not checked with LTS V14 yet... better to use V12 for now. 
 - [NPM](https://www.npmjs.com/) - v6+
 - [OctoPrint](https://octoprint.org) - v1.3.9+
 

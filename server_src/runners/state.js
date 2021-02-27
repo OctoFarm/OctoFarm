@@ -1108,6 +1108,41 @@ class Runner {
     return `System Runner has checked over ${farmPrinters.length} printers...`;
   }
 
+  static async compareEnteredKeyToGlobalKey(printer) {
+    // Compare entered API key to settings API Key...
+    let globalAPIKeyCheck = null;
+    globalAPIKeyCheck = await ClientAPI.getRetry(
+      printer.printerURL,
+      printer.apikey,
+      "api/settings"
+    );
+
+    if (globalAPIKeyCheck.status === 200) {
+      //Safe to continue check
+      let settingsData = await globalAPIKeyCheck.json();
+      if (settingsData.api.key === printer.apikey) {
+        return {
+          message:
+            "Global API Key detected... unable to authenticate websocket connection",
+          type: "system",
+          errno: "999",
+          code: "999",
+        };
+      } else {
+        // All is well to continue with rest of checks
+        return true;
+      }
+    } else {
+      // Hard failure as can't contact api
+      return {
+        message: "Could not Establish connection to OctoPrint Returned",
+        type: "system",
+        errno: "503",
+        code: "503",
+      };
+    }
+  }
+
   static async setupWebSocket(id, skipAPICheck) {
     const i = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
@@ -1135,6 +1170,12 @@ class Runner {
       farmPrinters[i].ws = ws;
       if (typeof farmPrinters[i] !== "undefined") {
         PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
+      }
+      let globalAPICheck = await this.compareEnteredKeyToGlobalKey(
+        farmPrinters[i]
+      );
+      if (typeof globalAPICheck === "object") {
+        throw globalAPICheck;
       }
       // Make a connection attempt, and grab current user.
       let users = null;
@@ -1195,9 +1236,9 @@ class Runner {
           await Runner.getSettings(id);
           await Runner.getProfile(id);
           await Runner.getState(id);
-          Runner.getOctoPrintSystenInfo(id);
-          Runner.getPluginList(id);
-          Runner.getUpdates(id);
+          await Runner.getOctoPrintSystenInfo(id);
+          await Runner.getPluginList(id);
+          await Runner.getUpdates(id);
           if (
             typeof farmPrinters[i].fileList === "undefined" ||
             typeof farmPrinters[i].storage === "undefined"
@@ -1293,6 +1334,39 @@ class Runner {
           } catch (e) {
             logger.error(
               `Couldn't set state of missing printer, safe to ignore: ${farmPrinters[i].index}: ${farmPrinters[i].printerURL}`
+            );
+          }
+          break;
+        case "999":
+          try {
+            logger.error(
+              e.message,
+              `Please generate an Application or User API Key to connect: ${farmPrinters[i].printerURL}`
+            );
+            PrinterTicker.addIssue(
+              new Date(),
+              farmPrinters[i].printerURL,
+              `${e.message}: Please generate an Application or User API Key to connect...`,
+              "Disconnected",
+              farmPrinters[i]._id
+            );
+            farmPrinters[i].state = "Incorrect API Key";
+            farmPrinters[i].stateColour = Runner.getColour("Offline");
+            farmPrinters[i].hostState = "Online";
+            farmPrinters[i].hostStateColour = Runner.getColour("Online");
+            farmPrinters[i].webSocket = "danger";
+            farmPrinters[i].stateDescription = "OctoPrint is Offline";
+            farmPrinters[i].hostDescription = "Host is Online";
+            farmPrinters[i].webSocketDescription = "Websocket Offline";
+            if (typeof farmPrinters[i] !== "undefined") {
+              PrinterClean.generate(
+                farmPrinters[i],
+                systemSettings.filamentManager
+              );
+            }
+          } catch (e) {
+            logger.error(
+              "Couldn't set state of missing printer, safe to ignore"
             );
           }
           break;

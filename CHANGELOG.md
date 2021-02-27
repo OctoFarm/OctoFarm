@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
    - Gcode Scripts are now editable.
    - Reset Fields Button to power settings to enable a reset of them...
    - Individual Printer Statistics: New option under the Manage section for viewing statistics about your printer.
+   - Added check against global API Key usage. Will now throw an error warning the user it is incorrect... and to generate a User or Application Key inside OctoPrint.
  
 ### Changed
    - Improved the power status error logs.
@@ -19,6 +20,7 @@ All notable changes to this project will be documented in this file.
    - Printer Manager Table has been updated to include Printer, OctoPrint designations:
          - Printer: Shows current printer firmware version, model and name.
          - OctoPrint: Shows current OctoPrint version and if on OctoPi, the version and Pi model.
+   - Printer Hourly Temperature Graph on Dashboard now only reacts when target is set. Will skip any room temperature readings.  
 
 ### Fixed
    - #223: Shutting down printers unexpectedly would keep printer in last state. - Big thanks to Chrismettal for helping me with this one.
