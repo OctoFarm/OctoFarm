@@ -82,12 +82,10 @@ function octofarmImg() {
     .pipe(gulp.dest("views/images"));
 }
 function vendorJS() {
-  return (
-    src("client_src/js/vendor/*")
-      // .pipe(sourcemaps.init({ loadMaps: true }))
-      // .pipe(sourcemaps.write("./"))
-      .pipe(gulp.dest("views/assets/js/vendor"))
-  );
+  return src("client_src/js/vendor/*")
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(sourcemaps.write("./"))
+    .pipe(gulp.dest("views/assets/js/vendor"));
 }
 function vendorCSS() {
   return src("client_src/css/vendor/*")
@@ -97,11 +95,9 @@ function vendorCSS() {
     .pipe(gulp.dest("views/assets/css/vendor"));
 }
 function vendorFonts() {
-  return src("client_src/css/webfonts/*")
-    .pipe(sourcemaps.init({ loadMaps: true }))
-    .pipe(postcss([autoprefixer(), cssnano()]))
-    .pipe(sourcemaps.write("./"))
-    .pipe(gulp.dest("views/assets/css/webfonts"));
+  return src("client_src/css/webfonts/*").pipe(
+    gulp.dest("views/assets/css/webfonts")
+  );
 }
 function octofarmJS(done) {
   jsClientFiles.map(function (entry) {

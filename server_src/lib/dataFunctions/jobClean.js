@@ -120,7 +120,6 @@ class JobClean {
         totalWeight: parseFloat(totalWeight),
         spoolCost: parseFloat(spoolCost),
       };
-    } else {
     }
 
     if (typeof printer.progress !== "undefined") {
