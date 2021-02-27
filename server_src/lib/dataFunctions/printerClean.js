@@ -1099,7 +1099,8 @@ class PrinterClean {
                   let target = "";
                   if (
                     printer.tools !== null &&
-                    printer.tools[0][keys[k]].actual !== null
+                    printer.tools[0][keys[k]].actual !== null &&
+                    printer.tools[0][keys[k]].target >= 10
                   ) {
                     actual = `Chamber A: ${
                       printer.tools[0][keys[k]].actual
@@ -1113,7 +1114,8 @@ class PrinterClean {
                   }
                   if (
                     printer.tools !== null &&
-                    printer.tools[0][keys[k]].target !== null
+                    printer.tools[0][keys[k]].target !== null &&
+                    printer.tools[0][keys[k]].target >= 10
                   ) {
                     target = `Chamber T: ${
                       printer.tools[0][keys[k]].target
@@ -1136,7 +1138,8 @@ class PrinterClean {
                   let target = "";
                   if (
                     printer.tools !== null &&
-                    printer.tools[0][keys[k]].actual !== null
+                    printer.tools[0][keys[k]].actual !== null &&
+                    printer.tools[0][keys[k]].target >= 10
                   ) {
                     actual = `Bed A: ${printer.tools[0][keys[k]].actual}°C `;
                     arrayOtherActual.push(printer.tools[0][keys[k]].actual);
@@ -1148,7 +1151,8 @@ class PrinterClean {
                   }
                   if (
                     printer.tools !== null &&
-                    printer.tools[0][keys[k]].target !== null
+                    printer.tools[0][keys[k]].target !== null &&
+                    printer.tools[0][keys[k]].target >= 10
                   ) {
                     target = `Bed T: ${printer.tools[0][keys[k]].target}°C `;
                     arrayOtherTarget.push(printer.tools[0][keys[k]].target);
@@ -1166,7 +1170,8 @@ class PrinterClean {
                   let target = "";
                   if (
                     printer.tools !== null &&
-                    printer.tools[0][keys[k]].actual !== null
+                    printer.tools[0][keys[k]].actual !== null &&
+                    printer.tools[0][keys[k]].target >= 10
                   ) {
                     actual = `Tool ${toolNumber} A: ${
                       printer.tools[0][keys[k]].actual
@@ -1180,7 +1185,8 @@ class PrinterClean {
                   }
                   if (
                     printer.tools !== null &&
-                    printer.tools[0][keys[k]].target !== null
+                    printer.tools[0][keys[k]].target !== null &&
+                    printer.tools[0][keys[k]].target >= 10
                   ) {
                     target = `Tool ${toolNumber} T: ${
                       printer.tools[0][keys[k]].target
