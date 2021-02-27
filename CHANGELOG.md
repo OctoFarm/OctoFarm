@@ -45,6 +45,10 @@ All notable changes to this project will be documented in this file.
    - Fixed: Error grabbing octoprint plugin list/system/updates wouldn't correctly log an error.
    - Fixed: Bubbling server check interval causing client to massively hang and break CPU's...
    - Fixed: Issue with history card not loading spools tables
+   - Fixed: #297 - Issue with temperature not been applied from spool at start of a print.  
+   - Fixed: #327 - Issue with not been able to change a spool mid print/paused when not using Filament Manager Plugin.
+   - Fixed: #309 - Regression with toggle button to check filament spool is loaded before print start. 
+
 
 ### Removed
    - Printer Settings drop down, was buggy and half implemented causing issues and is less used than the Printer Control one.
