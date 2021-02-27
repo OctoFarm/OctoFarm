@@ -24,12 +24,13 @@ jobs:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - 
-        name: Build and push
-        id: docker_build
+        name: Build and push (monolithic)
+        id: docker_build_monolithic
         uses: docker/build-push-action@v2
         with:
           push: ${{ github.event_name != 'pull_request' }}
-          tags: octofarm/octofarm:dev       
+          file: monolithic.Dockerfile
+          tags: octofarm/octofarm:dev-monolithic             
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
