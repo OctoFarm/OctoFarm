@@ -3103,9 +3103,7 @@ class dashUpdate {
                                  data-target="#printerLogsModal"
             ><i class="fas fa-file-alt"></i>
             </button>
-            <button title="You have an OctoPrint update to install!" id="octoprintUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-3 d-none'><i class="fas fa-wrench"></i> Update!</button>
-            <button title="You have OctoPrint plugin updates to install!" id="octoprintPluginUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-4 d-none'><i class="fas fa-plug"></i> Update!</button>
-            <button title="View individual Printer Statistics"
+          <button title="View individual Printer Statistics"
             id="printerStatistics-${printer._id}"
                                  type="button"
                                  class="tag btn btn-secondary btn-sm bg-colour-3"
@@ -3122,6 +3120,9 @@ class dashUpdate {
                                  disabled
             ><i class="fas fa-wrench"></i>
             </button>
+            <button title="You have an OctoPrint update to install!" id="octoprintUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-3 d-none'><i class="fas fa-wrench"></i> Update!</button>
+            <button title="You have OctoPrint plugin updates to install!" id="octoprintPluginUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-4 d-none'><i class="fas fa-plug"></i> Update!</button>
+    
     </span></td>
         <td class="align-middle"><small><span data-title="${printer.hostState.desc}" id="hostBadge-${printer._id}" class="tag badge badge-${printer.hostState.colour.name} badge-pill">
                 ${printer.hostState.state}</small></span></td>
