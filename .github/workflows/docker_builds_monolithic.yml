@@ -4,12 +4,28 @@ on:
   pull_request:
   push:
     branches:
-      # - 'master'
+      - 'master'
       - 'development'
 jobs:
   docker_monolithic:
     runs-on: ubuntu-latest
     steps:
+      - name: "Decide tags to use"
+        run: |
+          if ${{ github.ref == 'refs/heads/master' }} == true; then
+            echo 'TAG_EDGE=monolithic-latest' >> $GITHUB_ENV
+          else
+            echo 'TAG_EDGE=monolithic-dev' >> $GITHUB_ENV
+          fi
+      -
+        name: Docker meta
+        id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: octofarm/octofarm
+          tag-latest: false
+          tag-custom: |
+            ${{env.TAG_EDGE}}
       - 
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -23,6 +39,9 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }} 
+      - name: "Show docker tags"
+        run: |
+          echo '${{ steps.docker_meta.outputs.tags }}'          
       - 
         name: Build and push (monolithic)
         id: docker_build_monolithic
@@ -30,7 +49,8 @@ jobs:
         with:
           push: ${{ github.event_name != 'pull_request' }}
           file: monolithic.Dockerfile
-          tags: octofarm/octofarm:dev-monolithic             
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}    
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}

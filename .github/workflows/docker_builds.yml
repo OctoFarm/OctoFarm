@@ -4,12 +4,29 @@ on:
   pull_request:
   push:
     branches:
-      # - 'master'
+      - 'master'
       - 'development'
 jobs:
   docker:
     runs-on: ubuntu-latest
     steps:
+      - name: "Decide tags to use"
+        run: |
+          if ${{ github.ref == 'refs/heads/master' }} == true; then
+            echo 'TAG_EDGE=latest' >> $GITHUB_ENV
+          else
+            echo 'TAG_EDGE=dev' >> $GITHUB_ENV
+          fi
+      -
+        name: Docker meta
+        id: docker_meta
+        uses: crazy-max/ghaction-docker-meta@v1
+        with:
+          images: octofarm/octofarm
+          # x.y.z versioning (not strictly 'vx.y.z' semver)
+          tag-match: ^(\d+\.)?(\d+\.)?(\*|\d+)$
+          tag-custom: |
+            ${{env.TAG_EDGE}} 
       - 
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -23,13 +40,18 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_TOKEN }}
+      - name: "Show docker tags"
+        run: |
+          echo '${{ steps.docker_meta.outputs.tags }}'          
       - 
         name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
         with:
           push: ${{ github.event_name != 'pull_request' }}
-          tags: octofarm/octofarm:dev       
+          file: Dockerfile
+          tags: ${{ steps.docker_meta.outputs.tags }}
+          labels: ${{ steps.docker_meta.outputs.labels }}  
       -
         name: Image digest
         run: echo ${{ steps.docker_build.outputs.digest }}
