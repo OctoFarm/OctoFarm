@@ -390,13 +390,13 @@ export default class History {
                   </div>
               </td>
               <td>
-              ${spool[sp].volume.toFixed(2)}m3
+              ${spool[sp].volume}m3
               </td>
               <td>
-              ${spool[sp].length.toFixed(2)}m
+              ${spool[sp].length}m
               </td>
               <td>
-                 ${spool[sp].weight.toFixed(2)}g
+                 ${spool[sp].weight}g
               </td>
               <td>
                  ${spool[sp].cost}
