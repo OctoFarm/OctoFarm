@@ -184,7 +184,7 @@ function watchTask() {
   );
 }
 
-watchTask();
+// watchTask();
 exports.octoFarmImg = octofarmImg;
 exports.octofarmJS = octofarmJS;
 exports.vendorJS = vendorJS;

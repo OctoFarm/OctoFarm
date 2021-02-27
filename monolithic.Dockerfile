@@ -16,10 +16,11 @@ RUN rm -rf /var/lib/apt/lists/
 COPY . /app
 WORKDIR /app
 
-RUN npm update
+RUN npm install --only=production
 RUN npm install -g pm2
 
 EXPOSE 4000/udp
 
-RUN chmod +x docker/monolithic-entrypoint.sh
-ENTRYPOINT docker/monolithic-entrypoint.sh
+COPY docker/monolithic-entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["bash", "/usr/local/bin/entrypoint.sh"]
