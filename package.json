@@ -1,13 +1,14 @@
 {
   "name": "octofarm",
-  "version": "1.1.10",
+  "version": "1.1.11",
   "description": "OctoFarm is a easy to setup and install web interface that unifies your Octoprint instances for easy monitoring of all your printers. OctoFarm allows you to connect to multiple octoprint instances on your network allowing creating a farm management system. You can control, manage, upload files to any of your instances without ever leaving the tab it's open in.",
   "main": "app.js",
   "scripts": {
     "prestart": "npm install --production",
     "start": "pm2 flush && pm2 start app.js --name OctoFarm -e 'logs/pm2.error.log' --time",
     "stop": "pm2 stop OctoFarm",
-    "dev": "nodemon ./app.js"
+    "dev": "nodemon ./app.js",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,7 @@
     "bunyan": "^1.8.14",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.5",
+    "dotenv": "^8.2.0",
     "ejs": "^3.1.5",
     "express": "^4.17.1",
     "express-ejs-layouts": "^2.5.0",
@@ -58,10 +60,12 @@
   "devDependencies": {
     "@babel/cli": "^7.11.6",
     "@babel/core": "^7.11.6",
+    "@babel/eslint-parser": "^7.12.16",
     "@babel/plugin-transform-runtime": "^7.11.5",
     "@babel/polyfill": "^7.11.5",
     "@babel/preset-env": "^7.11.5",
     "autoprefixer": "^9.8.6",
+    "babel-jest": "^26.6.3",
     "babel-loader": "^8.1.0",
     "babelify": "^10.0.0",
     "browserify": "^16.5.2",
@@ -89,6 +93,8 @@
     "gulp-rename": "^2.0.0",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-terser": "^1.4.0",
+    "jest": "^26.6.3",
+    "mongodb-memory-server": "^6.9.3",
     "nodemon": "^2.0.4",
     "npm-run-all": "^4.1.5",
     "pkg": "^4.4.9",
@@ -99,36 +105,10 @@
   "pkg": {
     "assets": "views/**/*"
   },
-  "babel": {
-    "presets": [
-      [
-        "@babel/preset-env",
-        {
-          "debug": true,
-          "useBuiltIns": "entry"
-        }
-      ]
-    ]
-  },
-  "eslintConfig": {
-    "parser": "babel-eslint",
-    "rules": {
-    },
-    "env": {
-      "node": true,
-      "browser": true
-    }
-  },
   "engineStrict": true,
   "engines": {
     "node": ">= 12.0.0",
     "npm": ">= 6.0.0"
-  },
-  "config": {
-    "imageRepo": "octofarm/octofarm",
-    "imageName": "OctoFarm",
-    "imagePort": "4000",
-    "internalContainerPort": "4000"
   },
   "nodemonConfig": {
     "verbose": false,

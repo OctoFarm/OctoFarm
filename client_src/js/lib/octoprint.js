@@ -105,10 +105,10 @@ export default class OctoPrintClient {
       message: `Are your sure you want to ${action} ${printer.printerName}?`,
       buttons: {
         cancel: {
-          label: '<i class="fa fa-times"></i> No',
+          label: "<i class=\"fa fa-times\"></i> No",
         },
         confirm: {
-          label: '<i class="fa fa-check"></i> Yes',
+          label: "<i class=\"fa fa-check\"></i> Yes",
         },
       },
       async callback(result) {
@@ -189,6 +189,7 @@ export default class OctoPrintClient {
         print: false,
       };
       post = await OctoPrintClient.post(printer, url, opt);
+      return true;
     } else if (action === "print") {
       const opt = {
         command: "select",
@@ -287,8 +288,7 @@ export default class OctoPrintClient {
           },
         },
         async callback(result) {
-          if (result) {
-          } else {
+          if (!result) {
             if (
               printer.selectedFilament != null &&
               Array.isArray(printer.selectedFilament)
@@ -299,7 +299,9 @@ export default class OctoPrintClient {
               };
               printer.selectedFilament.forEach((spool, index) => {
                 if (spool != null) {
-                  offset.offsets["tool" + index] = spool.spools.tempOffset;
+                  offset.offsets["tool" + index] = parseInt(
+                    spool.spools.tempOffset
+                  );
                 }
               });
 
@@ -308,17 +310,42 @@ export default class OctoPrintClient {
                 "printer/tool",
                 offset
               );
+              console.log(offset);
             }
             await OctoPrintClient.post(printer, "printer/printhead", feed);
             const post = await OctoPrintClient.post(printer, "job", opts);
-            element.target.disabled = false;
+            if (element) {
+              element.target.disabled = false;
+            }
           }
         },
       });
     } else {
       await OctoPrintClient.post(printer, "printer/printhead", feed);
       const post = await OctoPrintClient.post(printer, "job", opts);
-      element.target.disabled = false;
+      if (
+        printer.selectedFilament != null &&
+        Array.isArray(printer.selectedFilament)
+      ) {
+        const offset = {
+          command: "offset",
+          offsets: {},
+        };
+        printer.selectedFilament.forEach((spool, index) => {
+          if (spool != null) {
+            offset.offsets["tool" + index] = parseInt(spool.spools.tempOffset);
+          }
+        });
+
+        const post = await OctoPrintClient.post(
+          printer,
+          "printer/tool",
+          offset
+        );
+      }
+      if (element) {
+        element.target.disabled = false;
+      }
     }
   }
 
@@ -375,45 +402,61 @@ export default class OctoPrintClient {
       url = url.replace("[PrinterAPI]", printer.apikey);
     }
     if (typeof command === "undefined" || command.length === 0) {
-      const post = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-      if (post.status !== 204) {
+      try {
+        const post = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Api-Key": printer.apikey,
+          },
+        });
+        if (post.status !== 200 || post.status !== 204) {
+          UI.createAlert(
+            "error",
+            `${printer.printerName}: Could not complete ${action}`,
+            3000
+          );
+        } else {
+          UI.createAlert(
+            "success",
+            `${printer.printerName}: Successfully completed ${action}`,
+            3000
+          );
+        }
+      } catch (e) {
         UI.createAlert(
           "error",
-          `${printer.printerName}: Could not complete ${action}`,
-          3000
-        );
-      } else {
-        UI.createAlert(
-          "success",
-          `${printer.printerName}: Successfully completed ${action}`,
+          `${printer.printerName}: Could not complete ${action} - Error: ${e}`,
           3000
         );
       }
     } else {
-      const post = await fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": printer.apikey,
-        },
-        body: command,
-      });
-
-      if (post.status !== 204) {
+      try {
+        const post = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-Api-Key": printer.apikey,
+          },
+          body: command,
+        });
+        if (post.status !== 200 || post.status !== 204) {
+          UI.createAlert(
+            "error",
+            `${printer.printerName}: Could not complete ${action}`,
+            3000
+          );
+        } else {
+          UI.createAlert(
+            "success",
+            `${printer.printerName}: Successfully completed ${action}`,
+            3000
+          );
+        }
+      } catch (e) {
         UI.createAlert(
           "error",
-          `${printer.printerName}: Could not complete ${action}`,
-          3000
-        );
-      } else {
-        UI.createAlert(
-          "success",
-          `${printer.printerName}: Successfully completed ${action}`,
+          `${printer.printerName}: Could not complete ${action} - Error: ${e}`,
           3000
         );
       }
@@ -428,16 +471,15 @@ export default class OctoPrintClient {
     if (url.includes("[PrinterAPI]")) {
       url = url.replace("[PrinterAPI]", printer.apikey);
     }
-    if (typeof command === "undefined" || command == "") {
+    if (typeof command === "undefined" || command === "" || command === null) {
       let post = await fetch(url, {
-        method: "POST",
+        method: "GET",
         headers: {
           "Content-Type": "application/json",
           "X-Api-Key": printer.apikey,
         },
       });
       if (post.status !== 200 || post.status !== 204) {
-
         return "No Status";
       } else {
         post = await post.json();

@@ -20,7 +20,7 @@ const reloadWindow = async function () {
 
 const serverAliveCheck = async function () {
   if (!interval) {
-    setInterval(async () => {
+    interval = setInterval(async () => {
       const modal = document.getElementById("lostServerConnection");
       try {
         let alive = await fetch("/serverChecks/amialive");

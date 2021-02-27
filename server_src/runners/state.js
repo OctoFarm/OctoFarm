@@ -110,24 +110,21 @@ const heartBeatInterval = setInterval(function ping() {
         client.ws.instance.readyState !== 2 &&
         client.ws.instance.readyState !== 3
       ) {
+        PrinterTicker.addIssue(
+          new Date(),
+          farmPrinters[client.ws.index].printerURL,
+          "Sending ping message to websocket...",
+          "Active",
+          farmPrinters[client.ws.index]._id
+        );
+        if (client.ws.isAlive === false) return client.ws.instance.terminate();
 
-          PrinterTicker.addIssue(
-            new Date(),
-            farmPrinters[client.ws.index].printerURL,
-            "Sending ping message to websocket...",
-            "Active",
-            farmPrinters[client.ws.index]._id
-          );
-          if (client.ws.isAlive === false)
-            return client.ws.instance.terminate();
-
-          // Retry connecting if failed...
-          farmPrinters[client.ws.index].webSocket = "info";
-          farmPrinters[client.ws.index].webSocketDescription =
-            "Checking if Websocket is still alive";
-          client.ws.isAlive = false;
-          client.ws.instance.ping(noop);
-
+        // Retry connecting if failed...
+        farmPrinters[client.ws.index].webSocket = "info";
+        farmPrinters[client.ws.index].webSocketDescription =
+          "Checking if Websocket is still alive";
+        client.ws.isAlive = false;
+        client.ws.instance.ping(noop);
       }
     }
   });
@@ -589,7 +586,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         const currentFileIndex = _.findIndex(
           farmPrinters[this.index].fileList.files,
           function (o) {
-            return o.name == data.current.job.file.name;
+            return o.name === data.current.job.file.name;
           }
         );
         if (currentFileIndex > -1) {
@@ -948,6 +945,9 @@ WebSocketClient.prototype.onerror = function (e) {
   //   logger.info("Error with websockets... resetting up!");
   // }, 10000);
   if (typeof farmPrinters[this.index] !== "undefined") {
+    //Reset job to null on error...
+    farmPrinters[this.index].job = null;
+    JobClean.generate(farmPrinters[this.index]);
     PrinterClean.generate(
       farmPrinters[this.index],
       systemSettings.filamentManager
@@ -985,6 +985,9 @@ WebSocketClient.prototype.onclose = function (e) {
   }
 
   if (typeof farmPrinters[this.index] !== "undefined") {
+    //Reset job to null on error...
+    farmPrinters[this.index].job = null;
+    JobClean.generate(farmPrinters[this.index]);
     PrinterClean.generate(
       farmPrinters[this.index],
       systemSettings.filamentManager
@@ -1001,7 +1004,10 @@ class ClientAPI {
       const apiConnect = await ClientAPI.get(printerURL, apikey, item);
       return apiConnect;
     } catch (err) {
-      logger.error(`Error attempting to connect to API: ${item} | ${printerURL} | timeout: ${timeout.apiTimeout}`, JSON.stringify(err.message));
+      logger.error(
+        `Error attempting to connect to API: ${item} | ${printerURL} | timeout: ${timeout.apiTimeout}`,
+        JSON.stringify(err.message)
+      );
       // If timeout exceeds max cut off then give up... Printer is considered offline.
       if (timeout.apiTimeout >= timeout.apiRetryCutoff) {
         logger.info(`Timeout Exceeded: ${item} | ${printerURL}`);
@@ -1027,6 +1033,7 @@ class ClientAPI {
       },
     });
   }
+
   static post(printerURL, apikey, item, data) {
     const url = `${printerURL}/api/${item}`;
     return Promise.race([
@@ -1043,6 +1050,7 @@ class ClientAPI {
       ),
     ]);
   }
+
   static get(printerURL, apikey, item) {
     const url = `${printerURL}/${item}`;
     return Promise.race([
@@ -1100,6 +1108,48 @@ class Runner {
     return `System Runner has checked over ${farmPrinters.length} printers...`;
   }
 
+  static async compareEnteredKeyToGlobalKey(printer) {
+    // Compare entered API key to settings API Key...
+    const globalAPIKeyCheck = await ClientAPI.getRetry(
+      printer.printerURL,
+      printer.apikey,
+      "api/settings"
+    );
+    const errorCode = {
+      message:
+        "Global API Key detected... unable to authenticate websocket connection",
+      type: "system",
+      errno: "999",
+      code: "999",
+    };
+    if (globalAPIKeyCheck.status === 200) {
+      //Safe to continue check
+      const settingsData = await globalAPIKeyCheck.json();
+      if (!settingsData) {
+        logger.error(`Settings json does not exist: ${printer.printerURL}`);
+        return errorCode;
+      }
+      if (!settingsData.api) {
+        logger.error(`API key does not exist: ${printer.printerURL}`);
+        return errorCode;
+      }
+      if (settingsData.api.key === printer.apikey) {
+        logger.error(`API Key matched global API key: ${printer.printerURL}`);
+        return errorCode;
+      }
+
+      return true;
+    } else {
+      // Hard failure as can't contact api
+      return {
+        message: "Could not Establish connection to OctoPrint Returned",
+        type: "system",
+        errno: "503",
+        code: "503",
+      };
+    }
+  }
+
   static async setupWebSocket(id, skipAPICheck) {
     const i = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
@@ -1127,6 +1177,12 @@ class Runner {
       farmPrinters[i].ws = ws;
       if (typeof farmPrinters[i] !== "undefined") {
         PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
+      }
+      let globalAPICheck = await this.compareEnteredKeyToGlobalKey(
+        farmPrinters[i]
+      );
+      if (typeof globalAPICheck === "object") {
+        throw globalAPICheck;
       }
       // Make a connection attempt, and grab current user.
       let users = null;
@@ -1185,10 +1241,11 @@ class Runner {
           farmPrinters[i].hostDescription = "Host is Online";
           await Runner.getSystem(id);
           await Runner.getSettings(id);
-          await Runner.getUpdates(id);
           await Runner.getProfile(id);
           await Runner.getState(id);
+          await Runner.getOctoPrintSystenInfo(id);
           await Runner.getPluginList(id);
+          await Runner.getUpdates(id);
           if (
             typeof farmPrinters[i].fileList === "undefined" ||
             typeof farmPrinters[i].storage === "undefined"
@@ -1209,7 +1266,7 @@ class Runner {
           PrinterTicker.addIssue(
             new Date(),
             farmPrinters[i].printerURL,
-            `API checks successful`,
+            "API checks successful",
             "Complete",
             farmPrinters[i]._id
           );
@@ -1235,6 +1292,13 @@ class Runner {
           code: "503",
         };
         throw error;
+      } else if (users.status === 502) {
+        const error = {
+          message: `Bad gateway! Gather OcotPrint is still booting: ${users.status}: ${farmPrinters[i].printerURL}`,
+          type: "system",
+          errno: "ECONNREFUSED",
+          code: "ECONNREFUSED",
+        };
       } else {
         const error = {
           message: `Could not Establish API Connection: ${users.status}${farmPrinters[i].printerURL}`,
@@ -1280,6 +1344,39 @@ class Runner {
             );
           }
           break;
+        case "999":
+          try {
+            logger.error(
+              e.message,
+              `Please generate an Application or User API Key to connect: ${farmPrinters[i].printerURL}`
+            );
+            PrinterTicker.addIssue(
+              new Date(),
+              farmPrinters[i].printerURL,
+              `${e.message}: Please generate an Application or User API Key to connect...`,
+              "Disconnected",
+              farmPrinters[i]._id
+            );
+            farmPrinters[i].state = "Incorrect API Key";
+            farmPrinters[i].stateColour = Runner.getColour("Offline");
+            farmPrinters[i].hostState = "Online";
+            farmPrinters[i].hostStateColour = Runner.getColour("Online");
+            farmPrinters[i].webSocket = "danger";
+            farmPrinters[i].stateDescription = "OctoPrint is Offline";
+            farmPrinters[i].hostDescription = "Host is Online";
+            farmPrinters[i].webSocketDescription = "Websocket Offline";
+            if (typeof farmPrinters[i] !== "undefined") {
+              PrinterClean.generate(
+                farmPrinters[i],
+                systemSettings.filamentManager
+              );
+            }
+          } catch (e) {
+            logger.error(
+              "Couldn't set state of missing printer, safe to ignore"
+            );
+          }
+          break;
         case "ECONNREFUSED":
           try {
             logger.error(
@@ -1309,7 +1406,7 @@ class Runner {
             }
           } catch (e) {
             logger.error(
-              `Couldn't set state of missing printer, safe to ignore`
+              "Couldn't set state of missing printer, safe to ignore"
             );
           }
           timeout = systemSettings.timeout;
@@ -1346,10 +1443,9 @@ class Runner {
             }
           } catch (e) {
             logger.error(
-              `Couldn't set state of missing printer, safe to ignore`
+              "Couldn't set state of missing printer, safe to ignore"
             );
           }
-          timeout = systemSettings.timeout;
           break;
         case "DELETED":
           logger.error(e.message, "Printer Deleted... Do not retry to connect");
@@ -1420,6 +1516,7 @@ class Runner {
       }
     });
   }
+
   static returnGroupList() {
     return farmPrintersGroups;
   }
@@ -1432,7 +1529,7 @@ class Runner {
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[i].printerURL,
-      `Initiating Printer...`,
+      "Initiating Printer...",
       "Active",
       farmPrinters[i]._id
     );
@@ -1501,7 +1598,10 @@ class Runner {
     if (typeof farmPrinters[i].alerts === "undefined") {
       farmPrinters[i].alerts = null;
     }
-    if (typeof farmPrinters[i].powerSettings === "undefined" || farmPrinters[i].powerSettings === null) {
+    if (
+      typeof farmPrinters[i].powerSettings === "undefined" ||
+      farmPrinters[i].powerSettings === null
+    ) {
       farmPrinters[i].powerSettings = {
         powerOnCommand: "",
         powerOnURL: "",
@@ -1517,8 +1617,8 @@ class Runner {
           packets: "3",
           port: "9",
           interval: "100",
-          MAC: ""
-        }
+          MAC: "",
+        },
       };
     }
 
@@ -1633,6 +1733,8 @@ class Runner {
     await newPrinter.save();
     logger.info(`Saved new Printer: ${newPrinter.printerURL}`);
     farmPrinters.push(newPrinter);
+    // Regenerate sort index on printer add...
+    await this.reGenerateSortIndex();
     await this.setDefaults(newPrinter._id);
     await this.setupWebSocket(newPrinter._id);
     return [newPrinter];
@@ -1663,6 +1765,9 @@ class Runner {
         }
       }
       if (farmPrinters[index].printerURL !== printers[i].printerURL) {
+        if (printers[i].printerURL[printers[i].printerURL.length - 1] === "/") {
+          printers[i].printerURL = printers[i].printerURL.replace(/\/?$/, "");
+        }
         farmPrinters[index].printerURL = printers[i].printerURL;
         farmPrinters[index].markModified("printerURL");
         logger.info(
@@ -1724,7 +1829,7 @@ class Runner {
       PrinterTicker.addIssue(
         new Date(),
         farmPrinters[changeIndex].printerURL,
-        `Updating Printer information...`,
+        "Updating Printer information...",
         "Active",
         farmPrinters[changeIndex]._id
       );
@@ -1741,14 +1846,15 @@ class Runner {
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[changeIndex].printerURL,
-          `Printer information updated successfully...`,
+          "Printer information updated successfully...",
           "Complete",
           farmPrinters[changeIndex]._id
         );
       }
     }
     logger.info("Re-Scanning printers farm");
-
+    // Regenerate sort index on printer update...
+    await this.reGenerateSortIndex();
     return changes;
   }
 
@@ -1777,7 +1883,27 @@ class Runner {
       }
     }
   }
-
+  static async reGenerateSortIndex() {
+    for (let p = 0; p < farmPrinters.length; p++) {
+      await logger.info(
+        `Regenerating existing indexes: ${farmPrinters[p].printerURL}`
+      );
+      PrinterTicker.addIssue(
+        new Date(),
+        farmPrinters[p].printerURL,
+        `Regenerating Printer Index: ${p}`,
+        "Active",
+        farmPrinters[p]._id
+      );
+      farmPrinters[p].sortIndex = p;
+      const filter = { _id: farmPrinters[p]._id };
+      const update = { sortIndex: p };
+      await Printers.findOneAndUpdate(filter, update, {
+        returnOriginal: false,
+      });
+    }
+    return;
+  }
   static async removePrinter(indexs) {
     logger.info("Pausing runners to remove printer...");
     await this.pause();
@@ -1796,7 +1922,7 @@ class Runner {
           PrinterTicker.addIssue(
             new Date(),
             removedURL,
-            `Removing printer from database...`,
+            "Removing printer from database...",
             "Active",
             removedIP
           );
@@ -1811,7 +1937,7 @@ class Runner {
           PrinterTicker.addIssue(
             new Date(),
             removedURL,
-            `Successfully removed from database...`,
+            "Successfully removed from database...",
             "Complete",
             removedIP
           );
@@ -1865,7 +1991,7 @@ class Runner {
       PrinterTicker.addIssue(
         new Date(),
         "All Printers",
-        `Successfully removed from the database...`,
+        "Successfully removed from the database...",
         "Complete",
         ""
       );
@@ -1885,7 +2011,7 @@ class Runner {
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[index].printerURL,
-      `ReScan Requested... checking socket state`,
+      "ReScan Requested... checking socket state",
       "Active",
       farmPrinters[index]._id
     );
@@ -1921,7 +2047,7 @@ class Runner {
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
-          `Socket currently active, closing and re-setting back up...`,
+          "Socket currently active, closing and re-setting back up...",
           "Active",
           farmPrinters[index]._id
         );
@@ -1938,7 +2064,7 @@ class Runner {
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
-          `Socket in tentative state, awaiting for connection attempt to finish... retry in 2000ms`,
+          "Socket in tentative state, awaiting for connection attempt to finish... retry in 2000ms",
           "Active",
           farmPrinters[index]._id
         );
@@ -1961,7 +2087,7 @@ class Runner {
           PrinterTicker.addIssue(
             new Date(),
             farmPrinters[index].printerURL,
-            `Retrying socket...`,
+            "Retrying socket...",
             "Active",
             farmPrinters[index]._id
           );
@@ -1971,7 +2097,7 @@ class Runner {
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
-          `Socket currently closed... Re-opening...`,
+          "Socket currently closed... Re-opening...",
           "Active",
           farmPrinters[index]._id
         );
@@ -1983,7 +2109,7 @@ class Runner {
       PrinterTicker.addIssue(
         new Date(),
         farmPrinters[index].printerURL,
-        `Socket currently closed... Re-opening...`,
+        "Socket currently closed... Re-opening...",
         "Active",
         farmPrinters[index]._id
       );
@@ -2030,6 +2156,7 @@ class Runner {
     }
     return true;
   }
+
   static async getFile(id, location) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
@@ -2108,6 +2235,7 @@ class Runner {
     //     return false;
     // }
   }
+
   static async getFiles(id, location) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
@@ -2335,6 +2463,7 @@ class Runner {
         farmPrinters[index].stateColour = Runner.getColour("Offline");
         farmPrinters[index].current = res.current;
         farmPrinters[index].options = res.options;
+        farmPrinters[index].job = null;
         farmPrinters[index].systemChecks.scanning.state.status = "success";
         farmPrinters[index].systemChecks.scanning.state.date = new Date();
         const currentFilament = JSON.parse(
@@ -2439,10 +2568,12 @@ class Runner {
         return false;
       });
   }
+
   static getPluginList(id) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
+    farmPrinters[index].pluginsList = [];
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[index].printerURL,
@@ -2467,8 +2598,73 @@ class Runner {
           "Complete",
           farmPrinters[index]._id
         );
+      })
+      .catch((err) => {
+        PrinterTicker.addIssue(
+          new Date(),
+          farmPrinters[index].printerURL,
+          `Error grabbing plugin list information: ${err}`,
+          "Disconnected",
+          farmPrinters[index]._id
+        );
+        farmPrinters[index].systemChecks.scanning.profile.status = "danger";
+        farmPrinters[index].systemChecks.scanning.profile.date = new Date();
+        logger.error(
+          `Error grabbing plugin list for: ${farmPrinters[index].printerURL}: Reason: `,
+          err
+        );
+        return false;
       });
   }
+
+  static getOctoPrintSystenInfo(id) {
+    const index = _.findIndex(farmPrinters, function (o) {
+      return o._id == id;
+    });
+    farmPrinters[index].octoPrintSystemInfo = {};
+    PrinterTicker.addIssue(
+      new Date(),
+      farmPrinters[index].printerURL,
+      "Grabbing OctoPrint's System Information",
+      "Active",
+      farmPrinters[index]._id
+    );
+    return ClientAPI.getRetry(
+      farmPrinters[index].printerURL,
+      farmPrinters[index].apikey,
+      "api/system/info"
+    )
+      .then((res) => {
+        return res.json();
+      })
+      .then((res) => {
+        farmPrinters[index].octoPrintSystemInfo = res.systeminfo;
+        PrinterTicker.addIssue(
+          new Date(),
+          farmPrinters[index].printerURL,
+          "Grabbed OctoPrints System Info",
+          "Complete",
+          farmPrinters[index]._id
+        );
+      })
+      .catch((err) => {
+        PrinterTicker.addIssue(
+          new Date(),
+          farmPrinters[index].printerURL,
+          `Error grabbing system information: ${err}`,
+          "Disconnected",
+          farmPrinters[index]._id
+        );
+        farmPrinters[index].systemChecks.scanning.profile.status = "danger";
+        farmPrinters[index].systemChecks.scanning.profile.date = new Date();
+        logger.error(
+          `Error grabbing system for: ${farmPrinters[index].printerURL}: Reason: `,
+          err
+        );
+        return false;
+      });
+  }
+
   static getUpdates(id, force) {
     let forceCheck = "";
     if (force) {
@@ -2477,6 +2673,10 @@ class Runner {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
+    farmPrinters[index].updateAvailable = {
+      octoPrintUpdate: [],
+      pluginUpdates: [],
+    };
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[index].printerURL,
@@ -2531,10 +2731,56 @@ class Runner {
           farmPrinters[index]._id
         );
       })
-      .catch((e) => {
-        logger.info("Error find updates: ", e);
+      .catch((err) => {
+        PrinterTicker.addIssue(
+          new Date(),
+          farmPrinters[index].printerURL,
+          `Error grabbing octoprint updates information: ${err}`,
+          "Disconnected",
+          farmPrinters[index]._id
+        );
+        farmPrinters[index].systemChecks.scanning.profile.status = "danger";
+        farmPrinters[index].systemChecks.scanning.profile.date = new Date();
+        logger.error(
+          `Error grabbing octoprint updates for: ${farmPrinters[index].printerURL}: Reason: `,
+          err
+        );
+        return false;
       });
   }
+
+  static async killPowerSettings(printerID) {
+    try {
+      const index = _.findIndex(farmPrinters, function (o) {
+        return o._id == printerID;
+      });
+      farmPrinters[index].powerSettings = {
+        powerOnCommand: "",
+        powerOnURL: "",
+        powerOffCommand: "",
+        powerOffURL: "",
+        powerToggleCommand: "",
+        powerToggleURL: "",
+        powerStatusCommand: "",
+        powerStatusURL: "",
+        wol: {
+          enabled: farmPrinters[index].powerSettings.wol.enabled,
+          ip: farmPrinters[index].powerSettings.wol.ip,
+          packets: farmPrinters[index].powerSettings.wol.packets,
+          port: farmPrinters[index].powerSettings.wol.port,
+          interval: farmPrinters[index].powerSettings.wol.interval,
+          MAC: farmPrinters[index].powerSettings.wol.MAC,
+        },
+      };
+      const printer = await Printers.findById(farmPrinters[index]._id);
+      printer.powerSettings = farmPrinters[index].powerSettings;
+      printer.save();
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
   static getSettings(id) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
@@ -2626,7 +2872,10 @@ class Runner {
         }
 
         if (res.plugins["psucontrol"]) {
-          if (_.isEmpty(farmPrinters[index].powerSettings)) {
+          if (
+            _.isEmpty(farmPrinters[index].powerSettings) &&
+            farmPrinters[index].powerSettings.powerOffCommand === ""
+          ) {
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[index].printerURL,
@@ -2635,14 +2884,22 @@ class Runner {
               farmPrinters[index]._id
             );
             farmPrinters[index].powerSettings = {
-              powerOnCommand: '{"command":"turnPSUOn"}',
+              powerOnCommand: "{\"command\":\"turnPSUOn\"}",
               powerOnURL: "[PrinterURL]/api/plugin/psucontrol",
-              powerOffCommand: '{"command":"turnPSUOff"}',
+              powerOffCommand: "{\"command\":\"turnPSUOff\"}",
               powerOffURL: "[PrinterURL]/api/plugin/psucontrol",
-              powerToggleCommand: '{"command":"togglePSU"}',
+              powerToggleCommand: "{\"command\":\"togglePSU\"}",
               powerToggleURL: "[PrinterURL]/api/plugin/psucontrol",
-              powerStatusCommand: '{"command":"getPSUState"}',
+              powerStatusCommand: "{\"command\":\"getPSUState\"}",
               powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
+              wol: {
+                enabled: false,
+                ip: "255.255.255.0",
+                packets: "3",
+                port: "9",
+                interval: "100",
+                MAC: "",
+              },
             };
             const printer = await Printers.findById(id);
 
@@ -2944,6 +3201,7 @@ class Runner {
 
   static async updateSettings(settings) {
     logger.info("Attempting to save: ", settings);
+
     function difference(object, base) {
       function changes(object, base) {
         try {
@@ -2959,12 +3217,14 @@ class Runner {
           logger.error("Error detecting changes", e);
         }
       }
+
       try {
         return changes(object, base);
       } catch (e) {
         logger.error("Error detecting changes", e);
       }
     }
+
     try {
       const printer = await Printers.findById(settings.printer.index);
       const index = _.findIndex(farmPrinters, function (o) {
@@ -2981,8 +3241,7 @@ class Runner {
         printer.settingsAppearance.name = settings.printer.printerName;
         printer.markModified("settingsApperance");
         updatePrinter = true;
-      }else{
-
+      } else {
       }
       let profile = {};
       let sett = {};
@@ -3142,8 +3401,11 @@ class Runner {
         printer.powerSettings.powerStatusURL =
           settings.powerCommands.powerStatusURL;
       }
+      if (settings.powerCommands.wol.enabled) {
+        farmPrinters[index].powerSettings.wol = settings.powerCommands.wol;
+      }
 
-      logger.info("LIive power settings", farmPrinters[index].powerSettings);
+      logger.info("Live power settings", farmPrinters[index].powerSettings);
       logger.info("Database power settings", printer.powerSettings);
 
       printer.markModified("powerSettings");
@@ -3246,8 +3508,10 @@ class Runner {
 
       await Runner.getProfile(settings.printer.index);
       await Runner.getSettings(settings.printer.index);
-      await Runner.getUpdates(settings.printer.index);
-      await Runner.getPluginList(settings.printer.index);
+      await Runner.getOctoPrintSystenInfo(settings.printer.index);
+      Runner.getOctoPrintSystenInfo(settings.printer.index);
+      Runner.getUpdates(settings.printer.index);
+      Runner.getPluginList(settings.printer.index);
       PrinterClean.generate(
         farmPrinters[index],
         systemSettings.filamentManager
@@ -3269,7 +3533,11 @@ class Runner {
         Runner.reScanOcto(farmPrinters[index]._id, false);
       }
       return {
-        status: { octofarm: 200, profile: profile.status, settings: sett.status },
+        status: {
+          octofarm: 200,
+          profile: profile.status,
+          settings: sett.status,
+        },
         printer,
       };
     } catch (e) {
@@ -3577,6 +3845,7 @@ class Runner {
       i
     );
   }
+
   static async updateFile(file, i) {
     if (fileTimeout <= 20000) {
       logger.info(
@@ -3597,7 +3866,7 @@ class Runner {
         );
         fileTimeout = fileTimeout + 5000;
         if (fileInformation) {
-          logger.info(`New File Information:`, fileInformation);
+          logger.info("New File Information:", fileInformation);
           farmPrinters[i].fileList.files[
             farmPrinters[i].fileList.files.length - 1
           ] = fileInformation;
@@ -3607,7 +3876,7 @@ class Runner {
             fileInformation.time === null ||
             fileInformation.time === "No Time Estimate"
           ) {
-            logger.info(`File Information Still Missing Retrying...`);
+            logger.info("File Information Still Missing Retrying...");
             Runner.updateFile(
               farmPrinters[i].fileList.files[
                 farmPrinters[i].fileList.files.length - 1
@@ -3634,10 +3903,11 @@ class Runner {
       }, 5000);
     } else {
       logger.info(
-        `File information took too long to generate, awaiting manual scan...`
+        "File information took too long to generate, awaiting manual scan..."
       );
     }
   }
+
   static sortedIndex() {
     const sorted = [];
     for (let p = 0; p < farmPrinters.length; p++) {
@@ -3650,6 +3920,7 @@ class Runner {
     sorted.sort((a, b) => (a.sortIndex > b.sortIndex ? 1 : -1));
     return sorted;
   }
+
   static async returnPrinterLogs(printerId) {
     const i = _.findIndex(farmPrinters, function (o) {
       return o._id == printerId;
@@ -3660,6 +3931,7 @@ class Runner {
     );
     return connectionLogs;
   }
+
   static async returnPluginList(printerId) {
     function isCompat(is_compat) {
       if (is_compat.octoprint || is_compat.os || is_compat.python) {

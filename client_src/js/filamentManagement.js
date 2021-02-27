@@ -658,7 +658,8 @@ async function init() {
 
     yAxisSeries.push(obj);
   });
-  if(typeof usageOverTime[0] !== "undefined"){
+
+  if (typeof usageOverTime[0] !== "undefined") {
     const usageOverTimeOptions = {
       chart: {
         type: "bar",
@@ -755,8 +756,8 @@ async function init() {
       },
     };
     let systemFarmTemp = new ApexCharts(
-        document.querySelector("#usageOverTime"),
-        usageOverTimeOptions
+      document.querySelector("#usageOverTime"),
+      usageOverTimeOptions
     );
     systemFarmTemp.render();
 
@@ -834,8 +835,8 @@ async function init() {
       },
     };
     let usageOverFilamentTime = new ApexCharts(
-        document.querySelector("#usageOverFilamentTime"),
-        usageOverFilamentTimeOptions
+      document.querySelector("#usageOverFilamentTime"),
+      usageOverFilamentTimeOptions
     );
     usageOverFilamentTime.render();
 

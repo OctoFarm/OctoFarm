@@ -3,7 +3,6 @@ config/db.js
 TODO.md
 logs/
 .clinic/
-.eslintrc.json
 .idea/*
 .idea/inspectionProfiles/*
 .idea/jsLinters/*

@@ -3,7 +3,7 @@ FROM alpine:3.12 as base
 RUN apk add --no-cache --virtual .base-deps \
     nodejs \
     npm \
-    tini 
+    tini
 
 RUN npm install -g pm2
 

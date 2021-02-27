@@ -8,12 +8,11 @@ import FileOperations from "./lib/functions/file.js";
 import Validate from "./lib/functions/validate.js";
 import PowerButton from "./lib/modules/powerButton.js";
 import {
-  init as actionButtonInit,
   checkQuickConnectState,
+  init as actionButtonInit,
 } from "./lib/modules/Printers/actionButtons.js";
 import PrinterSelect from "./lib/modules/printerSelect";
 import PrinterLogs from "./lib/modules/printerLogs.js";
-import FileSorting from "./lib/modules/fileSorting.js";
 import CustomGenerator from "./lib/modules/customScripts.js";
 
 let printerInfo = "";
@@ -70,6 +69,7 @@ function createWebWorker() {
     }
   };
 }
+
 function handleVisibilityChange() {
   if (document.hidden) {
     if (worker !== null) {
@@ -241,6 +241,7 @@ async function delay(ms) {
     setTimeout(resolve, ms);
   });
 }
+
 deleteAllBtn.addEventListener("click", async (e) => {
   let onScreenButtons = document.querySelectorAll("*[id^=delButton-]");
   for (const btn of onScreenButtons) {
@@ -519,7 +520,7 @@ bulkPowerBtn.addEventListener("click", async (e) => {
           } else {
             UI.createAlert(
               "error",
-              `Could not find your printer in your printer in the list of available printers...`,
+              "Could not find your printer in your printer in the list of available printers...",
               3000,
               "Clicked"
             );
@@ -634,7 +635,7 @@ bulkPreHeat.addEventListener("click", async (e) => {
       closeButton: true,
       buttons: {
         action: {
-          label: '<i class="fas fa-fire"></i> Heat!',
+          label: "<i class=\"fas fa-fire\"></i> Heat!",
           className: "btn-success",
           callback: async function () {
             let toolNumber = document.getElementById("preHeatToolSelect");
@@ -794,7 +795,7 @@ bulkControl.addEventListener("click", async (e) => {
       const ca = element.id.split("-");
       printersToConnect.push(ca[1]);
     });
-    let cameraBlock = ``;
+    let cameraBlock = "";
 
     printersToConnect.forEach((printer) => {
       const index = _.findIndex(printerInfo, function (o) {
@@ -976,13 +977,14 @@ bulkControl.addEventListener("click", async (e) => {
         });
         printerControls.printStop.addEventListener("click", (e) => {
           bootbox.confirm({
-            message: `Are you sure you want to cancel all of your ongoing print?`,
+            message:
+              "Are you sure you want to cancel all of your ongoing print?",
             buttons: {
               cancel: {
-                label: '<i class="fa fa-times"></i> Cancel',
+                label: "<i class=\"fa fa-times\"></i> Cancel",
               },
               confirm: {
-                label: '<i class="fa fa-check"></i> Confirm',
+                label: "<i class=\"fa fa-check\"></i> Confirm",
               },
             },
             callback(result) {
@@ -1183,10 +1185,13 @@ bulkGcodeCommands.addEventListener("click", async (e) => {
       size: "large",
       title: "What gcode commands would you like sent?",
       inputType: "textarea",
-      onShow: function(e) {
-        let textArea = document.getElementsByClassName("bootbox-input bootbox-input-textarea form-control");
-        const customGcodeEE = "<div class='mb-1' id='customGcodeCommandsArea'></div>";
-        textArea[0].insertAdjacentHTML("beforebegin", customGcodeEE)
+      onShow: function (e) {
+        let textArea = document.getElementsByClassName(
+          "bootbox-input bootbox-input-textarea form-control"
+        );
+        const customGcodeEE =
+          "<div class='mb-1' id='customGcodeCommandsArea'></div>";
+        textArea[0].insertAdjacentHTML("beforebegin", customGcodeEE);
         let buttonPrinters = [];
         printersToConnect.forEach(async (printer) => {
           const index = _.findIndex(printerInfo, function (o) {
@@ -1195,11 +1200,11 @@ bulkGcodeCommands.addEventListener("click", async (e) => {
           if (index > -1) {
             buttonPrinters.push(printerInfo[index]);
           }
-        })
+        });
         CustomGenerator.generateButtons(buttonPrinters);
       },
       callback: function (result) {
-        if(result !== null){
+        if (result !== null) {
           printersToConnect.forEach(async (printer) => {
             const index = _.findIndex(printerInfo, function (o) {
               return o._id === printer;
@@ -1217,29 +1222,28 @@ bulkGcodeCommands.addEventListener("click", async (e) => {
                 commands: lines,
               };
               const post = await OctoPrintClient.post(
-                  printerInfo[index],
-                  "printer/command",
-                  opt
+                printerInfo[index],
+                "printer/command",
+                opt
               );
               if (post.status === 204) {
                 UI.createAlert(
-                    "success",
-                    "Your gcode commands have successfully been sent!",
-                    3000,
-                    "Clicked"
+                  "success",
+                  "Your gcode commands have successfully been sent!",
+                  3000,
+                  "Clicked"
                 );
               } else {
                 UI.createAlert(
-                    "danger",
-                    "Your gcode failed to send! Please check the printer is able to receive these commands.",
-                    3000,
-                    "Clicked"
+                  "danger",
+                  "Your gcode failed to send! Please check the printer is able to receive these commands.",
+                  3000,
+                  "Clicked"
                 );
               }
             }
           });
         }
-
       },
     });
   };
@@ -1254,73 +1258,108 @@ bulkGcodeCommands.addEventListener("click", async (e) => {
 
 const customGcodeScripts = document.getElementById("customGcodeBtn");
 customGcodeScripts.addEventListener("click", async (e) => {
-    let customScripts = await OctoFarmClient.get("settings/customGcode")
-    customScripts = await customScripts.json();
+  let customScripts = await OctoFarmClient.get("settings/customGcode");
+  customScripts = await customScripts.json();
 
-    //Draw Scripts
-    let scriptTable = document.getElementById("gcodeScriptTable");
-    scriptTable.innerHTML = "";
-    customScripts.forEach(scripts => {
-      drawScriptTable(scripts)
-    })
-
-
+  //Draw Scripts
+  let scriptTable = document.getElementById("gcodeScriptTable");
+  scriptTable.innerHTML = "";
+  customScripts.forEach((scripts) => {
+    drawScriptTable(scripts);
+  });
 });
 const createNewScriptBtn = document.getElementById("createNewScriptBtn");
+
+async function newGcodeScript(newScript) {
+  const keys = Object.keys(newScript);
+  let errors = [];
+  for (const key of keys) {
+    if (newScript["name"] === "") {
+      errors.push(key);
+    }
+    if (newScript["gcode"] === "") {
+      errors.push(key);
+    }
+  }
+  if (errors.length !== 0) {
+    UI.createAlert(
+      "error",
+      "You have blank fields sony jim!, sort them out...",
+      3000,
+      "Clicked"
+    );
+    return false;
+  } else {
+    let lines = newScript.gcode.match(/[^\r\n]+/g);
+    newScript.gcode = lines.map(function (name) {
+      if (!name.includes("=")) {
+        return name.toLocaleUpperCase();
+      } else {
+        return name;
+      }
+    });
+    if (newScript.id) {
+      let post = await OctoFarmClient.post(
+        "settings/customGcode/edit",
+        newScript
+      );
+      if (post.status === 200) {
+        post = await post.json();
+      } else {
+        UI.createAlert(
+          "error",
+          "Something went wrong updating, is the server online?"
+        );
+      }
+    } else {
+      let post = await OctoFarmClient.post("settings/customGcode", newScript);
+      if (post.status === 200) {
+        post = await post.json();
+        drawScriptTable(post);
+      } else {
+        UI.createAlert(
+          "error",
+          "Something went wrong updating, is the server online?"
+        );
+      }
+    }
+  }
+  return true;
+}
+
 createNewScriptBtn.addEventListener("click", async (e) => {
   let newScript = {
     name: document.getElementById("gcodeScriptName").value,
     description: document.getElementById("gcodeScriptDescription").value,
     gcode: document.getElementById("gcodeScriptScript").value,
-  }
-  const keys = Object.keys(newScript)
-  let errors = [];
-  for (const key of keys) {
-    if(newScript[key] === ""){
-      errors.push(key);
-    }
-  }
-  if(errors.length !== 0){
-    UI.createAlert("error", "You have blank fields sony jim!, sort them out...", 3000, "Clicked")
-  }else{
-      let lines = document.getElementById("gcodeScriptScript").value.match(/[^\r\n]+/g);
-      newScript.gcode = lines.map(function (name) {
-        if (!name.includes("=")) {
-          return name.toLocaleUpperCase();
-        } else {
-          return name;
-        }
-      });
-    let post = await OctoFarmClient.post("settings/customGcode", newScript);
-    if(post.status === 200){
-      post = await post.json();
-      drawScriptTable(post)
-    }else{
-      UI.createAlert("error", "Something went wrong updating, is the server online?")
-    }
-  }
+  };
+  await newGcodeScript(newScript);
+  document.getElementById("gcodeScriptName").value = "";
+  document.getElementById("gcodeScriptDescription").value = "";
+  document.getElementById("gcodeScriptScript").value = "";
+});
 
-
-})
-function drawScriptTable(scripts){
+function drawScriptTable(scripts) {
   let scriptTable = document.getElementById("gcodeScriptTable");
-    let scriptLines = "";
+  let scriptLines = "";
 
-    scripts.gcode.forEach(e => {
-      scriptLines += `<p class="py-0 my-0"><small class="py-0 my-0">${e}</small></p>`
-    })
+  scripts.gcode.forEach((e) => {
+    scriptLines += `${e}\n`;
+  });
 
-    scriptTable.insertAdjacentHTML("beforeend", `
+  scriptTable.insertAdjacentHTML(
+    "beforeend",
+    `
              <tr id="scriptRow-${scripts._id}" >
-                <td class="d-none">${scripts._id}</td>
-                <td>${scripts.name}</td>
-                <td>${scripts.description}</td>
-                <td>${scriptLines}</td>
+                <td id="script_id_${scripts._id}" class="d-none">${scripts._id}</td>
+                <td><input type="text" class="form-control" id="script_name_${scripts._id}" placeholder="${scripts.name}" disabled></input></td>
+                <td><input type="text" class="form-control" id="script_desc_${scripts._id}"  placeholder="${scripts.description}" disabled></input></td>
+                <td><textarea type="text" class="form-control" id="script_lines_${scripts._id}"  placeholder="${scriptLines}" disabled></textarea></td>
                 <td>                                
-                <button id="editScript-${scripts._id}" type="button" class="btn btn-sm btn-info edit bg-colour-1 d-none">
+                <button id="editScript-${scripts._id}" type="button" class="btn btn-sm btn-info edit bg-colour-1">
                     <i class="fas fa-edit editIcon"></i>
                 </button>
-                <button id="saveScript-${scripts._id}" type="button" class="btn d-none btn-sm btn-success save bg-colour-2  d-none">
+                <button id="saveScript-${scripts._id}" type="button" class="btn btn-sm btn-success save bg-colour-2 d-none">
                     <i class="fas fa-save saveIcon"></i>
                 </button>
                 <button id="deleteScript-${scripts._id}" type="button" class="btn btn-sm btn-danger delete">
@@ -1328,25 +1367,111 @@ function drawScriptTable(scripts){
                 </button>
                 </td>
             </tr>
-      `)
-    document.getElementById("deleteScript-"+scripts._id).addEventListener("click", async (e) => {
-      let delt = await OctoFarmClient.get("settings/customGcode/delete/"+scripts._id);
-      if(delt.status === 200){
-        UI.createAlert("success", "Successfully deleted your script...", 3000, "Clicked")
-        document.getElementById("scriptRow-"+scripts._id).remove();
-      }else {
-        UI.createAlert("error", "Something went wrong, is the OctoFarm server online?", 3000, "Clicked")
+      `
+  );
+  document
+    .getElementById("deleteScript-" + scripts._id)
+    .addEventListener("click", async (e) => {
+      let delt = await OctoFarmClient.get(
+        "settings/customGcode/delete/" + scripts._id
+      );
+      if (delt.status === 200) {
+        UI.createAlert(
+          "success",
+          "Successfully deleted your script...",
+          3000,
+          "Clicked"
+        );
+        document.getElementById("scriptRow-" + scripts._id).remove();
+      } else {
+        UI.createAlert(
+          "error",
+          "Something went wrong, is the OctoFarm server online?",
+          3000,
+          "Clicked"
+        );
       }
-    })
+    });
+  document
+    .getElementById("editScript-" + scripts._id)
+    .addEventListener("click", async (e) => {
+      document.getElementById(`script_name_${scripts._id}`).disabled = false;
+      document.getElementById(`script_desc_${scripts._id}`).disabled = false;
+      document.getElementById(`script_lines_${scripts._id}`).disabled = false;
+      document.getElementById(
+        `script_name_${scripts._id}`
+      ).value = document.getElementById(
+        `script_name_${scripts._id}`
+      ).placeholder;
+      document.getElementById(
+        `script_desc_${scripts._id}`
+      ).value = document.getElementById(
+        `script_desc_${scripts._id}`
+      ).placeholder;
+      document.getElementById(
+        `script_lines_${scripts._id}`
+      ).value = document.getElementById(
+        `script_lines_${scripts._id}`
+      ).placeholder;
+      document
+        .getElementById(`editScript-${scripts._id}`)
+        .classList.toggle("d-none");
+      document
+        .getElementById(`saveScript-${scripts._id}`)
+        .classList.toggle("d-none");
+    });
+  document
+    .getElementById("saveScript-" + scripts._id)
+    .addEventListener("click", async (e) => {
+      let newScript = {
+        id: document.getElementById(`script_id_${scripts._id}`).innerHTML,
+        name: document.getElementById(`script_name_${scripts._id}`).value,
+        description: document.getElementById(`script_desc_${scripts._id}`)
+          .value,
+        gcode: document.getElementById(`script_lines_${scripts._id}`).value,
+      };
+      console.log(newScript);
+      let save = await newGcodeScript(newScript);
+      if (save) {
+        document.getElementById(
+          `script_name_${scripts._id}`
+        ).placeholder = document.getElementById(
+          `script_name_${scripts._id}`
+        ).value;
+        document.getElementById(
+          `script_desc_${scripts._id}`
+        ).placeholder = document.getElementById(
+          `script_desc_${scripts._id}`
+        ).value;
+        document.getElementById(
+          `script_lines_${scripts._id}`
+        ).placeholder = document.getElementById(
+          `script_lines_${scripts._id}`
+        ).value;
+        document.getElementById(`script_name_${scripts._id}`).value = "";
+        document.getElementById(`script_desc_${scripts._id}`).value = "";
+        document.getElementById(`script_lines_${scripts._id}`).value = "";
+        document.getElementById(`script_name_${scripts._id}`).disabled = true;
+        document.getElementById(`script_desc_${scripts._id}`).disabled = true;
+        document.getElementById(`script_lines_${scripts._id}`).disabled = true;
+        document
+          .getElementById(`editScript-${scripts._id}`)
+          .classList.toggle("d-none");
+        document
+          .getElementById(`saveScript-${scripts._id}`)
+          .classList.toggle("d-none");
+      }
+    });
 }
+
 function pluginListTemplate(plugin) {
   //Also need check inplace for incompatible...
-  let abandoned = ``;
+  let abandoned = "";
   if (plugin.abandoned === true) {
-    abandoned = `<i class="fa fa-heartbeat" title="Abandoned by its maintainer"></i>`;
+    abandoned =
+      "<i class=\"fa fa-heartbeat\" title=\"Abandoned by its maintainer\"></i>";
   }
-  let latestRelease = ``;
-  console.log(plugin);
+  let latestRelease = "";
   if (
     typeof plugin.github !== "undefined" &&
     typeof plugin.github.latest_release !== "undefined"
@@ -1405,6 +1530,7 @@ function pluginListTemplate(plugin) {
   
   `;
 }
+
 const pluginAction = async function (action) {
   let printersToConnect = [];
   //Grab all check boxes
@@ -1467,14 +1593,14 @@ const pluginAction = async function (action) {
           let pluginSearch = document.getElementById("searchPlugins");
           pluginSearch.addEventListener("keyup", (e) => {
             const fileList = document.getElementsByClassName(
-              `bootbox-checkbox-list`
+              "bootbox-checkbox-list"
             );
             let input = document
               .getElementById("searchPlugins")
               .value.toUpperCase();
 
             input = input.replace(/ /g, "_");
-            const button = fileList[0].querySelectorAll('*[id^="plugin-"]');
+            const button = fileList[0].querySelectorAll("*[id^=\"plugin-\"]");
             for (let i = 0; i < button.length; i++) {
               const file = button[i].id.replace("plugin-", "");
               if (file.toUpperCase().indexOf(input) > -1) {
@@ -1619,7 +1745,7 @@ const pluginAction = async function (action) {
                 } else {
                   UI.createAlert(
                     "error",
-                    `Could not find your printer in your printer in the list of available printers...`,
+                    "Could not find your printer in your printer in the list of available printers...",
                     3000,
                     "Clicked"
                   );
@@ -1649,14 +1775,14 @@ const pluginAction = async function (action) {
           let pluginSearch = document.getElementById("searchPlugins");
           pluginSearch.addEventListener("keyup", (e) => {
             const fileList = document.getElementsByClassName(
-              `bootbox-checkbox-list`
+              "bootbox-checkbox-list"
             );
             let input = document
               .getElementById("searchPlugins")
               .value.toUpperCase();
 
             input = input.replace(/ /g, "_");
-            const button = fileList[0].querySelectorAll('*[id^="plugin-"]');
+            const button = fileList[0].querySelectorAll("*[id^=\"plugin-\"]");
             for (let i = 0; i < button.length; i++) {
               const file = button[i].id.replace("plugin-", "");
               if (file.toUpperCase().indexOf(input) > -1) {
@@ -1801,7 +1927,7 @@ const pluginAction = async function (action) {
                 } else {
                   UI.createAlert(
                     "error",
-                    `Could not find your printer in your printer in the list of available printers...`,
+                    "Could not find your printer in your printer in the list of available printers...",
                     3000,
                     "Clicked"
                   );
@@ -1944,13 +2070,13 @@ searchOffline.addEventListener("click", async (e) => {
     "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
   );
   searchOffline.innerHTML =
-    '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
+    "<i class=\"fas fa-redo fa-sm fa-spin\"></i> Syncing...";
 
   const post = await OctoFarmClient.post("printers/reScanOcto", {
     id: null,
   });
   alert.close();
-  searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
+  searchOffline.innerHTML = "<i class=\"fas fa-redo fa-sm\"></i> Re-Sync";
 });
 const editBtn = document.getElementById("editPrinterBtn");
 editBtn.addEventListener("click", (event) => {
@@ -2032,7 +2158,7 @@ editBtn.addEventListener("click", (event) => {
           3000,
           "Clicked"
         );
-        saveEdits.innerHTML = '<i class="fas fa-save"></i> Save Edits';
+        saveEdits.innerHTML = "<i class=\"fas fa-save\"></i> Save Edits";
       }
     }
   };
@@ -2210,6 +2336,7 @@ document.getElementById("addPrinterBtn").addEventListener("click", (event) => {
   }
   PrintersManagement.addPrinter();
 });
+
 class Printer {
   constructor(printerURL, camURL, apikey, group, name) {
     this.settingsAppearance = {
@@ -2225,13 +2352,10 @@ class Printer {
     this.group = group;
   }
 }
+
 class PrintersManagement {
   constructor(printerURL, camURL, apikey, group, name) {
     this.printer = new Printer(printerURL, camURL, apikey, group, name);
-  }
-
-  build() {
-    return this.printer;
   }
 
   static addPrinter(newPrinter) {
@@ -2253,6 +2377,10 @@ class PrintersManagement {
                 </div></td>
                 <td><div class="input-group mb-3">
                   <input id="newPrinterGroup-${newPrintersIndex}" type="text" class="form-control" value="${newPrinter.group}">
+
+                </div></td>
+                <td><div class="input-group mb-3">
+                  <input id="newPrinterGroups-${newPrintersIndex}" type="text" class="form-control" value="${newPrinter.groups}">
 
                 </div></td>
                 <td><div class="input-group mb-3">
@@ -2437,7 +2565,9 @@ class PrintersManagement {
     let printCheck = -1;
     if (printerURL.value !== "") {
       printCheck = _.findIndex(printerInfo, function (o) {
-        return JSON.stringify(o.printerURL) === JSON.stringify(printerURL.value);
+        return (
+          JSON.stringify(o.printerURL) === JSON.stringify(printerURL.value)
+        );
       });
     }
     // Check information is filled correctly...
@@ -2471,7 +2601,7 @@ class PrintersManagement {
     } else {
       const printers = [];
       const saveButton = document.getElementById(`saveButton-${newId}`);
-      saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+      saveButton.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i>";
       saveButton.disabled = true;
       const printer = new PrintersManagement(
         printerURL.value,
@@ -2501,7 +2631,7 @@ class PrintersManagement {
           3000,
           "Clicked"
         );
-        saveButton.innerHTML = '<i class="fas fa-save"></i>';
+        saveButton.innerHTML = "<i class=\"fas fa-save\"></i>";
         saveButton.disabled = false;
       }
     }
@@ -2511,6 +2641,10 @@ class PrintersManagement {
         table.classList.add("d-none");
       }
     }
+  }
+
+  build() {
+    return this.printer;
   }
 }
 
@@ -2733,6 +2867,7 @@ class dashUpdate {
       }
     });
   }
+
   static printers(printers) {
     printers.forEach((printer) => {
       let printerName = "";
@@ -2760,8 +2895,11 @@ class dashUpdate {
           const socketBadge = document.getElementById(
             `webSocketIcon-${printer._id}`
           );
-          const printerOctoPrintVersion = document.getElementById(
-            `printerOctoPrintVersion-${printer._id}`
+          const printerPrinterInformation = document.getElementById(
+            `printerPrinterInformation-${printer._id}`
+          );
+          const printerOctoPrintInformation = document.getElementById(
+            `printerOctoPrintInformation-${printer._id}`
           );
           const printerSortIndex = document.getElementById(
             `printerSortIndex-${printer._id}`
@@ -2770,13 +2908,40 @@ class dashUpdate {
             `printerGroup-${printer._id}`
           );
 
-          printerGroup.innerHTML = printer.group;
+          printerGroup.innerHTML = printer.groups.map((g) => g.name).join();
 
-          const octoPiVersioning = document.getElementById("octoPiVersioning");
-          if (octoPiVersioning) {
-            octoPiVersioning.innerHTML = `                 
-                  <p>${printer.octoPi.version}</p>
-                  <p>${printer.octoPi.model}</p>`;
+          if (typeof printer.octoPrintSystemInfo !== "undefined") {
+            if (
+              typeof printer.currentProfile !== "undefined" &&
+              printer.currentProfile !== null
+            ) {
+              if (
+                typeof printer.octoPrintSystemInfo["printer.firmware"] ===
+                "undefined"
+              ) {
+                printerPrinterInformation.innerHTML = `
+             <small title="Please connect and resync to display printer firmware"><b>Firmware: </b>Unknown</small><br>
+             <small><b>Name: </b>${printer.currentProfile.name}</small><br>
+             <small><b>Model: </b>${printer.currentProfile.model}</small><br>
+            `;
+              } else {
+                printerPrinterInformation.innerHTML = `
+             <small><b>Firmware: </b>${printer.octoPrintSystemInfo["printer.firmware"]}</small><br>
+             <small><b>Name: </b>${printer.currentProfile.name}</small><br>
+             <small><b>Model: </b>${printer.currentProfile.model}</small><br>
+            `;
+              }
+            }
+          }
+          if (typeof printer.octoPi !== "undefined") {
+            printerOctoPrintInformation.innerHTML = `
+          <small><b>OctoPrint: </b>${printer.octoPrintVersion}</small><br>
+          <small><b>OctoPi: </b>${printer.octoPi.version}</small><br>
+          <small><b>RaspberryPi: </b>${printer.octoPi.model}</small>`;
+          } else {
+            printerOctoPrintInformation.innerHTML = `
+          <small><b>OctoPrint: </b>${printer.octoPrintVersion}</small><br>
+          `;
           }
 
           printerSortIndex.innerHTML = printer.sortIndex;
@@ -2840,7 +3005,6 @@ class dashUpdate {
 
           webButton.href = printer.printerURL;
 
-          printerOctoPrintVersion.innerHTML = printer.octoPrintVersion;
           if (typeof printer.updateAvailable !== "undefined") {
             let updateButton = document.getElementById(
               `octoprintUpdate-${printer._id}`
@@ -2910,20 +3074,6 @@ class dashUpdate {
           printButton.disabled =
             printer.printerState.colour.category === "Offline";
         } else {
-          let octoPiElement = "";
-          if (typeof printer.octoPi !== "undefined") {
-            octoPiElement = `
-                <td id="octoPiVersioning-${printer._id}">
-                  <p>${printer.octoPi.version}</p>
-                  <p>${printer.octoPi.model}</p>
-                </td>
-            `;
-            let tableRow = document.getElementById("octoPiVersions");
-            if (tableRow.classList.contains("d-none")) {
-              tableRow.classList.remove("d-none");
-            }
-          } else {
-          }
           // Insert new printer addition...
           document.getElementById("printerList").insertAdjacentHTML(
             "beforeend",
@@ -2934,9 +3084,9 @@ class dashUpdate {
             >
     ${printer.sortIndex}
     </span></td>
-        <td><div id="printerName-${printer._id}">${printerName}</div></td>
-        <td id="printerActionBtns-${printer._id}"></td>
-        <td>
+        <td class="align-middle"><div id="printerName-${printer._id}">${printerName}</div></td>
+        <td class="align-middle" id="printerActionBtns-${printer._id}"></td>
+        <td class="align-middle">
           <button  title="Change your Printer Settings"
             id="printerSettings-${printer._id}"
                                  type="button"
@@ -2953,15 +3103,12 @@ class dashUpdate {
                                  data-target="#printerLogsModal"
             ><i class="fas fa-file-alt"></i>
             </button>
-            <button title="You have an OctoPrint update to install!" id="octoprintUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-3 d-none'><i class="fas fa-wrench"></i> Update!</button>
-            <button title="You have OctoPrint plugin updates to install!" id="octoprintPluginUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-4 d-none'><i class="fas fa-plug"></i> Update!</button>
-            <button title="View individual Printer Statistics"
+          <button title="View individual Printer Statistics"
             id="printerStatistics-${printer._id}"
                                  type="button"
-                                 class="tag btn btn-secondary btn-sm bg-colour-3 d-none"
+                                 class="tag btn btn-secondary btn-sm bg-colour-3"
                                  data-toggle="modal"
                                  data-target="#printerStatisticsModal"
-                                 disabled
             ><i class="fas fa-chart-pie"></i>
             </button>
            <button  title="Setup and track Maintenance Issues with Printers"
@@ -2973,17 +3120,20 @@ class dashUpdate {
                                  disabled
             ><i class="fas fa-wrench"></i>
             </button>
+            <button title="You have an OctoPrint update to install!" id="octoprintUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-3 d-none'><i class="fas fa-wrench"></i> Update!</button>
+            <button title="You have OctoPrint plugin updates to install!" id="octoprintPluginUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-4 d-none'><i class="fas fa-plug"></i> Update!</button>
+    
     </span></td>
-        <td><small><span data-title="${printer.hostState.desc}" id="hostBadge-${printer._id}" class="tag badge badge-${printer.hostState.colour.name} badge-pill">
+        <td class="align-middle"><small><span data-title="${printer.hostState.desc}" id="hostBadge-${printer._id}" class="tag badge badge-${printer.hostState.colour.name} badge-pill">
                 ${printer.hostState.state}</small></span></td>
-        <td><small><span data-title="${printer.printerState.desc}" id="printerBadge-${printer._id}" class="tag badge badge-${printer.printerState.colour.name} badge-pill">
+        <td class="align-middle"><small><span data-title="${printer.printerState.desc}" id="printerBadge-${printer._id}" class="tag badge badge-${printer.printerState.colour.name} badge-pill">
                 ${printer.printerState.state}</small></span><br><span data-title="Check printer settings, API issues detected..." id="scanningIssues-${printer._id}"></small></span></td>
-        <td><small><span data-title="${printer.webSocketState.desc}" id="webSocketIcon-${printer._id}" class="tag badge badge-${printer.webSocketState.colour} badge-pill">
+        <td class="align-middle"><small><span data-title="${printer.webSocketState.desc}" id="webSocketIcon-${printer._id}" class="tag badge badge-${printer.webSocketState.colour} badge-pill">
                 <i  class="fas fa-plug"></i></span></td>
-   
-        <td><div id="printerGroup-${printer._id}" ></div></td>
-        <td id="printerOctoPrintVersion-${printer._id}"></td>
-        ${octoPiElement}
+
+        <td class="align-middle"><div id="printerGroup-${printer._id}" ></div></td>
+        <td class="align-middle" id="printerPrinterInformation-${printer._id}"></td>
+        <td class="align-middle" id="printerOctoPrintInformation-${printer._id}"></td>
     </tr>
           `
           );
@@ -3168,11 +3318,18 @@ class dashUpdate {
               connectionLogs = await connectionLogs.json();
               PrinterLogs.loadLogs(printer, connectionLogs);
             });
+
+          document
+            .getElementById(`printerStatistics-${printer._id}`)
+            .addEventListener("click", async (e) => {
+              PrinterLogs.loadStatistics(printer._id);
+            });
         }
       }
     });
   }
 }
+
 const el = document.getElementById("printerList");
 const sortable = Sortable.create(el, {
   handle: ".sortableList",

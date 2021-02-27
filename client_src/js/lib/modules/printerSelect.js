@@ -89,59 +89,46 @@ const printersTable = `
       <div class="pb-2" id="selectMessageBox"></div>
     </div>
     <div class="col-md-3">
-                       <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="printerStateList">State: </label>
-                            </div>
-                            <select class="custom-select" id="printerStateList"
-                                    data-jplist-control="select-filter"
-                                    data-group="printer-list"
-                                    data-name="state"
-                            >
-                                <option selected
-                                         href="#"
-                                        data-value="all"
-                                        data-path="default"
-                                >Filter</option>
-                                    <option 
-                                            href="#"
-                                            value="active"
-                                            data-path=".Active">Active</option>
-                                    <option 
-                                            href="#"
-                                            value="idle"
-                                            data-path=".Idle">Idle</option>
-                                    <option 
-                                            href="#"
-                                            value="complete"
-                                            data-path=".Complete">Complete</option>
-                                    <option 
-                                             href="#"
-                                            value="disconnected"
-                                            data-path=".Disconnected">Disconnected</option>
-                            </select>
-                        </div>
+      <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <label class="input-group-text" for="printerStateList">State: </label>
+        </div>
+        <select class="custom-select" id="printerStateList" data-jplist-control="select-filter" data-group="printer-list" data-name="state">
+          <option selected href="#" data-value="all"data-path="default">
+            Filter
+          </option>
+          <option href="#" value="active" data-path=".Active">
+            Active
+          </option>
+          <option href="#" value="idle" data-path=".Idle">
+            Idle
+          </option>
+          <option href="#" value="complete" data-path=".Complete">
+            Complete
+          </option>
+          <option href="#" value="disconnected"data-path=".Disconnected">
+            Disconnected
+          </option>
+        </select>
+      </div>
     </div>
     <div class="col-md-3">
-                         <div class="input-group mb-3">
-                            <div class="input-group-prepend">
-                                <label class="input-group-text" for="printerGroupList">Group: </label>
-                            </div>
-                            <select class="custom-select" id="printerGroupList"
-                                    data-jplist-control="select-filter"
-                                    data-group="printer-list"
-                                    data-name="group"
-                            >
-                            </select>
-                        </div>
+     <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <label class="input-group-text" for="printerGroupList">Group: </label>
+        </div>
+        <select class="custom-select" id="printerGroupList"
+                data-jplist-control="select-filter"
+                data-group="printer-list"
+                data-name="group">
+<!--                            Filled dynamically -->
+        </select>
+      </div>
     </div>
     <div id="selectBtns" class="col-md-3 text-center">
-
     </div>
     <div id="actionBtn" class="col-md-3  text-center">
-              
     </div>
-
 </div>
 <table class="table table-dark">
   <thead>
@@ -158,7 +145,7 @@ const printersTable = `
     </tr>
   </thead>
   <tbody id="printerSelectBody" data-jplist-group="printer-list">
-
+<!-- Filled dynamically -->
   </tbody>
 </table>
 `;
@@ -166,69 +153,38 @@ const printersTable = `
 export default class PrinterSelect {
   static getSelectableList(printer) {
     return `
-                       <tr id="${printer.id}" class="${
-      printer.state
-    }" data-jplist-item>
-                          <td>
-                                <div class="custom-control custom-checkbox">
-                                  <input type="checkbox" class="custom-control-input Idle" id="checkBox-${
-                                    printer.id
-                                  }" value="${printer.id}">
-                                  <label class="custom-control-label" for="checkBox-${
-                                    printer.id
-                                  }"></label>
-                                </div>
-                          </td>
-                          <th scope="row">${printer.index}</th>
-                          <td>${printer.name}</td>
-                          <td class="${printer.state}">${printer.state}</td>
-                          <td class="${printer.group.replace(/\s/g, "_")}">${
-      printer.group
-    }</td>
-                          <td>${printer.spool}</td>
-                        </tr>
-                `;
+<tr id="${printer.id}" class="${printer.state}" data-jplist-item>
+    <td>
+        <div class="custom-control custom-checkbox">
+            <input type="checkbox" class="custom-control-input Idle" id="checkBox-${
+              printer.id
+            }" value="${printer.id}">
+            <label class="custom-control-label" for="checkBox-${printer.id}">
+            </label>
+        </div>
+    </td>
+    <th scope="row">${printer.index}</th>
+    <td>${printer.name}</td>
+    <td class="${printer.state}">${printer.state}</td>
+    <td class="${printer.group.replace(/\s/g, "_")}">${printer.group}</td>
+    <td>${printer.spool}</td>
+</tr>
+`;
   }
+
   static getEditableList(printer) {
     return `
-                       <tr id="editPrinterCard-${printer.id}" class="${
-      printer.state
-    }" data-jplist-item>
-                          <th scope="row">${printer.index}</th>
-                          <td><input id="editInputName-${
-                            printer.id
-                          }" type="text" class="form-control Idle" placeholder="${
-      printer.name
-    }" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input id="editInputURL-${
-                            printer.id
-                          }" type="text" class="form-control Idle" placeholder="${
-      printer.printerURL
-    }" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td class="${printer.state} d-none">${
-      printer.state
-    }</td>
-                          <td class="${printer.group.replace(
-                            /\s/g,
-                            "_"
-                          )}"><input id="editInputGroup-${
-      printer.id
-    }" type="text" class="form-control Idle" placeholder="${
-      printer.group
-    }" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input id="editInputCamera-${
-                            printer.id
-                          }" type="text" class="form-control Idle" placeholder="${
-      printer.cameraURL
-    }" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input id="editInputApikey-${
-                            printer.id
-                          }" type="text" class="form-control Idle" placeholder="${
-      printer.apikey
-    }" aria-label="Username" aria-describedby="basic-addon1"></td>
-                        </tr>
-                `;
+<tr id="editPrinterCard-${printer.id}" class="${printer.state}" data-jplist-item>
+  <th scope="row">${printer.index}</th>
+  <td><input id="editInputName-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.name}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputURL-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.printerURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td class="${printer.state} d-none">${printer.state}</td>
+                          <td><input id="editInputGroup-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.group}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputCamera-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.cameraURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputApikey-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.apikey}" aria-label="Username" aria-describedby="basic-addon1"></td>
+    </tr>`;
   }
+
   static isOffline(state, editable, override) {
     if (editable) {
       return true;
@@ -238,6 +194,7 @@ export default class PrinterSelect {
       return state !== "Offline";
     }
   }
+
   static async create(element, editable, action, callback) {
     let saveEditsBtn = document.getElementById("saveEditsBtn");
     if (saveEditsBtn) {
@@ -273,6 +230,8 @@ export default class PrinterSelect {
       messageBox.innerHTML = gcodePrintersMessage;
     }
     const printersInfo = await OctoFarmClient.post("printers/printerInfo");
+    // const groups = await OctoFarmClient.get("groups/list");
+
     const printers = await printersInfo.json();
     const groupList = [];
     const printerList = [];
@@ -348,32 +307,38 @@ export default class PrinterSelect {
       printerGroupList.innerHTML = "";
       printerGroupList.insertAdjacentHTML(
         "beforeend",
-        `
-                                  <option selected
-                                        value="all"
-                                        data-path="default"
-                                >Filter</option>
-            `
+        '<option selected value="all" data-path="default">Filter</option>'
       );
       groupListUnique.forEach((group, index) => {
         printerGroupList.insertAdjacentHTML(
           "beforeend",
-          `
-                                                        <option
-                                                        value="${group.tag.toLowerCase()}"
-                                                        data-path=".${
-                                                          group.tag
-                                                        }">${
-            group.display
-          }</option>
-                `
+          `<option value="${group.tag.toLowerCase()}" data-path=".${
+            group.tag
+          }">${group.display}</option>`
         );
+      });
+
+      // Printer group dropdown
+      printers.forEach((printer) => {
+        const printerGroupAssignSelect = document.getElementById(
+          `editInputGroup-${printer._id}`
+        );
+        if (!printerGroupAssignSelect) return;
+
+        groupListUnique.forEach((group, index) => {
+          printerGroupAssignSelect.insertAdjacentHTML(
+            "beforeend",
+            `<option value="${group.tag.toLowerCase()}" data-path=".${
+              group.tag
+            }">${group.display}</option>`
+          );
+        });
       });
     } else {
       const tableBody = document.getElementById("printerSelectBody");
       tableBody.insertAdjacentHTML(
         "beforeend",
-        `<tr><td>No Online Printers</td></tr>`
+        "<tr><td>No Online Printers</td></tr>"
       );
     }
     PrinterSelect.addListeners(editable, callback);
@@ -387,7 +352,7 @@ export default class PrinterSelect {
             `;
       document.getElementById("selectAll").addEventListener("click", (e) => {
         const checkBoxes = document.querySelectorAll(
-          'input[type="checkbox"]:not(:checked)'
+          "input[type=\"checkbox\"]:not(:checked)"
         );
         checkBoxes.forEach((box) => {
           box.checked = true;
@@ -417,9 +382,10 @@ export default class PrinterSelect {
     }
     jplist.init();
   }
+
   static getSelected() {
     const checkedBoxes = document.querySelectorAll(
-      'input[type="checkbox"]:checked'
+      "input[type=\"checkbox\"]:checked"
     );
     const printers = [];
     checkedBoxes.forEach((box) => {
@@ -429,5 +395,6 @@ export default class PrinterSelect {
     });
     return printers;
   }
+
   static selectFilter() {}
 }

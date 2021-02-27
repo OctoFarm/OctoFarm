@@ -1,12 +1,14 @@
 ---
 name: Issue Report
 about: Please fill this in to better help the dev help you.
-title: "[BUG]"
+title: ""
 labels: bug
-assignees: NotExpectedYet
 
 ---
 ### To better help the developer understand your issue, please fill in the information below. Failing to do so will waste the developer and your own time in sorting the issue. Thanks!
+
+**Client or Server side error** 
+Which part of the serve does this effect? If you don't know/client side then please add screenshots with the browser console "F12" open.
 
 **Describe the bug**
 A clear and concise description of what the bug is.

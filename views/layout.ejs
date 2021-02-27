@@ -18,7 +18,7 @@
     <link rel="stylesheet" href="/assets/css/vendor/noty.css"/>
     <link rel="stylesheet" href="/assets/css/vendor/balloon.css"/>
     <link rel="stylesheet" href="/assets/css/vendor/jplist.css"/>
-
+    <link rel="stylesheet" href="/assets/css/vendor/font-awesome.css"/>
     <title>OctoFarm: <%= page %></title>
 </head>
 
@@ -50,15 +50,18 @@
             <a title="List Layout Monitoring View" class="nav-link text-light text-center btn-sm <%= noPrinters %>" id="menuListView" href="/mon/list"><i class="fas fa-list"></i> List</a>
             </li>
             <li class="nav-item">
-
             <a title="Camera Layout Monitoring View" class="nav-link text-light text-center btn-sm <%= noPrinters %>" id="menuCameraView" href="/mon/camera"><i class="fas fa-video"></i>
                 Camera</a>
+            </li>
+            <li class="nav-item">
+                <a title="Davids super power tool" class="nav-link text-light text-center btn-sm d-none" id="menuListView" href="/mon/printerMap"><i class="fas fa-list"></i> Map</a>
             </li>
             <li class="nav-item">
             <a title="Current Operations Monitoring Layout View" class="nav-link text-light text-center btn-sm <%= noPrinters %>" id="menucurrentOperationsView" href="/mon/currentOp"><i class="fas fa-star"></i>
                 Current Operations</a>
             </li>
-            <% if(page.includes("Camera") || page.includes("List") || page.includes("Panel")){%>
+            <% if(page.includes("Camera") || page.includes("List") || page.includes("Panel") || page.includes("Printer Map")){%>
+
                 <li class="nav-item">
                     <div class="input-group p-0 m-0 pr-1  mx-auto">
                         <div class="input-group-prepend">

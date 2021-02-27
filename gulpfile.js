@@ -23,6 +23,7 @@ const jsFilamentManager = "filamentManagement.js";
 const jsFileManager = "fileManagerRunner.js";
 const jsListView = "listViewRunner.js";
 const jsPanelView = "panelViewRunner.js";
+const jsPrinterMapView = "printerMapViewRunner.js";
 const jsPrinterManagement = "printerManagementRunner.js";
 const jsSettings = "serverAliveCheck.js";
 const jsServerAliveCheck = "settings.js";
@@ -36,6 +37,7 @@ const jsClientFiles = [
   jsFileManager,
   jsListView,
   jsPanelView,
+  jsPrinterMapView,
   jsPrinterManagement,
   jsSettings,
   jsServerAliveCheck,
@@ -91,6 +93,11 @@ function vendorCSS() {
     .pipe(postcss([autoprefixer(), cssnano()]))
     .pipe(sourcemaps.write("./"))
     .pipe(gulp.dest("views/assets/css/vendor"));
+}
+function vendorFonts() {
+  return src("client_src/css/webfonts/*").pipe(
+    gulp.dest("views/assets/css/webfonts")
+  );
 }
 function octofarmJS(done) {
   jsClientFiles.map(function (entry) {
@@ -166,10 +173,18 @@ function watchTask() {
   watch(
     [cssFolder, jsClientFolder],
     { interval: 2000, events: "change" },
-    parallel(octofarmImg, octofarmJS, octofarmWorkersJS, octofarmCSS, vendorJS)
+    parallel(
+      octofarmImg,
+      octofarmJS,
+      octofarmWorkersJS,
+      octofarmCSS,
+      vendorJS,
+      vendorCSS
+    )
   );
 }
 
+watchTask();
 exports.octoFarmImg = octofarmImg;
 exports.octofarmJS = octofarmJS;
 exports.vendorJS = vendorJS;
@@ -178,6 +193,7 @@ exports.octofarmCSS = octofarmCSS;
 exports.octofarmWorkersJS = octofarmWorkersJS;
 exports.default = series(
   parallel(
+    vendorFonts,
     octofarmImg,
     octofarmJS,
     octofarmWorkersJS,

@@ -1,9 +1,8 @@
 ---
 name: Documentation Issue
 about: Something is wrong with the documentation
-title: "[DOCUMENTATION]"
+title: ""
 labels: documentation
-assignees: NotExpectedYet
 
 ---
 
