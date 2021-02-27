@@ -37,6 +37,8 @@ All notable changes to this project will be documented in this file.
    - Fixed: #236 - Colours on Weekly Utilisation chart we're loading too dark.
    - Fixed: #279 - API connection checked too early after powering up.
    - Fixed: #292 - Printer Settings would fail due to missing wol settings.
+   - Fixed: #326 - Job doesn't reset when OctoPrint goes offline.
+
 
 
 # [v1.1.10]
