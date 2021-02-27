@@ -4,6 +4,7 @@ import {OctoPrintSettingsDto} from "../dto/octoprint-settings.dto";
 import {ConnectionParams} from "../models/connection.params";
 import {map} from "rxjs/operators";
 import {AxiosRequestConfig} from "axios";
+import {OctoPrintCurrentUserDto} from "../dto/octoprint-currentuser.dto";
 
 @Injectable()
 export class OctoPrintClientService {
@@ -19,11 +20,11 @@ export class OctoPrintClientService {
         return this.connectWithParams<OctoPrintSettingsDto>(params, "GET", url);
     }
 
-    getCurrentUser(params: ConnectionParams): Observable<any> {
+    getCurrentUser(params: ConnectionParams): Observable<OctoPrintCurrentUserDto> {
         this.checkConnectionParams(params);
 
         const url = new URL('api/currentuser', params.printerURL).toString();
-        return this.connectWithParams<any>(params, "GET", url);
+        return this.connectWithParams<OctoPrintCurrentUserDto>(params, "GET", url);
     }
 
     setCORSEnabled(params: ConnectionParams): Observable<OctoPrintSettingsDto> {

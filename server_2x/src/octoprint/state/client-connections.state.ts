@@ -7,6 +7,7 @@ import {Injectable, Logger} from "@nestjs/common";
 import {validate} from "class-validator";
 import {AxiosError} from "axios";
 import HttpStatusCode from "../../utils/http-status-codes.enum";
+import {OctoprintGroupType} from "../types/octoprint-group.type";
 
 @Injectable()
 export class ClientConnectionsState {
@@ -15,7 +16,7 @@ export class ClientConnectionsState {
         apiKeyAccepted: null,
         apiKeyIsGlobal: null,
         corsEnabled: null,
-        userHasRequiredRoles: null,
+        userHasRequiredGroups: null,
         apiConnected: null,
         websocketConnected: null,
         websocketHealthy: null
@@ -68,8 +69,14 @@ export class ClientConnectionsState {
                     });
 
                     const currentUser = await this.octoPrintClientService.getCurrentUser(this.connectionParams).toPromise()
-                    // console.warn(currentUser);
+                    const userFulfillsRequiredGroups = currentUser.groups.includes(OctoprintGroupType.ADMIN.toString())
+                        && currentUser.groups.includes(OctoprintGroupType.USERS.toString());
+                    this.patchState({
+                        userHasRequiredGroups: userFulfillsRequiredGroups
+                    })
+                    console.warn(currentUser.groups, OctoprintGroupType.USERS.toString());
 
+                    console.warn('state', this.getState());
                 }, (error: AxiosError) => {
                     if (error.isAxiosError) {
                         if (!error?.response || error?.response.status === null || error?.response.status === undefined) {
@@ -83,8 +90,7 @@ export class ClientConnectionsState {
                                 this.patchState({
                                     apiKeyAccepted: false
                                 });
-                                this.logger.error("This API key was not accepted by OctoPrint using these parameters:\n\t"
-                                    + jsonParams, error.stack);
+                                this.logger.error("This API key was not accepted by OctoPrint using these parameters:\n\t" + jsonParams);
                                 break;
                             case HttpStatusCode.BAD_GATEWAY:
                                 this.logger.error("OctoPrint return BAD_GATEWAY. Make sure it is fully started and running.\n\t"
@@ -125,7 +131,7 @@ export class ClientConnectionsState {
     userHasRequiredRoles() {
         // Alternatively we could scan the permissions, but that's much more work.
         return this.isApiKeyStateAccepted()
-            && this.state.userHasRequiredRoles;
+            && this.state.userHasRequiredGroups;
     }
 
     ensureCorsEnabled(): Observable<any> {
