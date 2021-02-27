@@ -13,6 +13,9 @@ let controlDropDown = false;
 
 let currentPrinter = null;
 
+let filamentManager = false;
+let spoolCheck = false;
+
 const refreshCounter = 5000;
 $("#printerManagerModal").on("hidden.bs.modal", function (e) {
   // Fix for mjpeg stream not ending when element removed...
@@ -211,6 +214,12 @@ export default class PrinterManager {
       let systemSettings = await OctoFarmClient.get("settings/client/get");
 
       systemSettings = await systemSettings.json();
+
+      let serverSettings = await OctoFarmClient.get("settings/server/get");
+      serverSettings = await serverSettings.json();
+
+      filamentManager = serverSettings.filamentManager;
+      spoolCheck = serverSettings.filament.filamentCheck;
       let controlSettings = systemSettings.controlSettings;
       //Load tools
       if (typeof controlSettings !== "undefined" && controlSettings.filesTop) {
@@ -2234,13 +2243,18 @@ export default class PrinterManager {
     let elements = await PrinterManager.grabPage();
     const { filamentDrops } = elements;
     elements = elements.printerControls;
+    let spool = true;
+    if (!filamentManager) {
+      spool = false;
+    }
+
     if (typeof printing !== "undefined" && printing) {
       elements.feedRate.disabled = !printing;
       elements.flowRate.disabled = !printing;
       elements.fansOn.disabled = !printing;
       elements.fansOff.disabled = !printing;
       filamentDrops.forEach((drop) => {
-        drop.disabled = printing;
+        drop.disabled = spool;
       });
     } else {
       elements.feedRate.disabled = enable;
