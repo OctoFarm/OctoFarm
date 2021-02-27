@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
    - Reset Fields Button to power settings to enable a reset of them...
    - Individual Printer Statistics: New option under the Manage section for viewing statistics about your printer.
    - Added check against global API Key usage. Will now throw an error warning the user it is incorrect... and to generate a User or Application Key inside OctoPrint.
- 
+   - Added the ability to export any of the database collections into a .json file to bolster any issue reports.
 ### Changed
    - Improved the power status error logs.
    - #272: Improvements to the alpine image, now runs as none-root and went from around 1Gb to 268Mb in size! Big thank you to user @torresmvl for those PR's. Don't forget to email about your free t-shirt.

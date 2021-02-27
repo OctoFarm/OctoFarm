@@ -309,7 +309,7 @@ router.get("/mon/printerMap", ensureAuthenticated, async (req, res) => {
     user = req.user.name;
     group = req.user.group;
   }
-  res.render("printerMap", { 
+  res.render("printerMap", {
     name: user,
     userGroup: group,
     version,
@@ -394,6 +394,8 @@ router.get("/filament", ensureAuthenticated, async (req, res) => {
   const statistics = await FilamentClean.getStatistics();
   const spools = await FilamentClean.getSpools();
   const profiles = await FilamentClean.getProfiles();
+  const sorted = await HistoryClean.returnHistory();
+  const historyStats = await HistoryClean.getStatistics(sorted);
   let user = null;
   let group = null;
   if (serverSettings.server.loginRequired === false) {
@@ -414,6 +416,7 @@ router.get("/filament", ensureAuthenticated, async (req, res) => {
     spools,
     profiles,
     statistics,
+    historyStats,
   });
 });
 router.get("/system", ensureAuthenticated, async (req, res) => {
