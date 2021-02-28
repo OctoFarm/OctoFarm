@@ -1,8 +1,7 @@
-import {stop} from "mongo-unit";
-
-console.log('DB teardown');
+import {getUrl, stop} from "mongo-unit";
 
 export default async () => {
-    const dbURL = await stop();
-    console.log('DB stopped', dbURL);
+    console.log('DB teardown', getUrl());
+    await stop();
+    console.log('DB stopped');
 }
