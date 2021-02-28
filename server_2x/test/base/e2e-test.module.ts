@@ -6,7 +6,7 @@ import {TestProviders} from "./test.provider";
     imports: [
         TypeOrmModule.forRoot({
                 type: 'mongodb',
-                host: 'localhost',
+                host: '127.0.0.1',
                 useUnifiedTopology: true,
                 port: 27018,
                 entities: ["./src/**/*.entity{.ts,.js}"],
