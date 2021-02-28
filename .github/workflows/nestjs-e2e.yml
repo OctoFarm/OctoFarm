@@ -18,8 +18,8 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: yarn install --frozen-lockfile
         working-directory: "server_2x"
-      - run: npm run build --if-present
+      - run: yarn run build --if-present
         working-directory: "server_2x"
-      - run: npm run test:e2e
+      - run: yarn run test:e2e
         name: "Run end-to-end tests"
         working-directory: "server_2x"
