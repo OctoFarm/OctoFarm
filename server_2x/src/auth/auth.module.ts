@@ -64,11 +64,9 @@ export class AuthModule {
                     password: DefaultAdminPassword
                 });
             } catch (e: any) {
+                // Ignore concurrency issues (when testing)
                 if (!e.message.includes("duplicate key error dup key"))
                     throw e;
-                // // Usually occurs in tests, should not be a problem.
-                // console.warn('Caught error:', e);
-                // console.info(e);
             }
         } else {
             this.logger.log("Admin user found - skipping recreate");
