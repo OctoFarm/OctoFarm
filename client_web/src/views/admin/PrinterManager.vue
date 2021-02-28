@@ -1,7 +1,7 @@
 <template>
   <v-container fluid>
     <v-row no-gutters>
-      <printer-management :connection_log="connection_log" />
+      <printer-management :connection_log="connection_log"/>
     </v-row>
     <v-row>
       <printer-table
@@ -16,7 +16,7 @@ import Management from "@/components/PrinterManager/Management.vue";
 
 export default {
   name: "PrinterManager",
-  components: { "printer-table": PrinterTable, "printer-management": Management },
+  components: {"printer-table": PrinterTable, "printer-management": Management},
   data: () => ({
     printers: [
       {
