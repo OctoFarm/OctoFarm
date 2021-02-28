@@ -7,7 +7,7 @@ import {E2eTestModule} from "../base/e2e-test.module";
 describe('PrintersController (e2e)', () => {
     let app: NestExpressApplication;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
             imports: [
                 E2eTestModule,
@@ -19,7 +19,11 @@ describe('PrintersController (e2e)', () => {
         app.setViewEngine('ejs');
         app.setBaseViewsDir('./views');
         await app.init();
-    }, 10000);
+    });
+
+    afterAll(async () => {
+        await app.close();
+    });
 
     it('/printers (GET)', () => {
         return request(app.getHttpServer())

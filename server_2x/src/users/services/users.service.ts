@@ -30,6 +30,7 @@ export class UsersService {
 
         const passwordHash = await this.cryptoService.hashPasswordAsync(createUserDto.password);
         delete createUserDto.password;
+
         const user = new User({
             ...createUserDto,
             passwordHash
