@@ -51,7 +51,6 @@ export class AuthModule {
         await this.ensureAdminUserExists()
     }
 
-    // @Timeout(0)
     async ensureAdminUserExists() {
         const user = await this.userService.findOne({username: "admin"});
         if (!user) {
