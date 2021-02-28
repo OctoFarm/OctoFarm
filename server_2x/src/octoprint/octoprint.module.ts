@@ -2,8 +2,8 @@ import {HttpModule, Module} from '@nestjs/common';
 import {OctoPrintClientService} from './services/octoprint-client.service';
 import {OctoprintGateway} from './gateway/octoprint.gateway';
 
-import {ClientConnectionState} from "./state/client-connection.state";
-import {ConnectionParamsModel} from "./models/connection-params.model";
+import {ClientConnectionsState} from "./state/client-connections.state";
+import {ConnectionParams} from "./models/connection.params";
 import {TEST_PRINTER_KEY, TEST_PRINTER_URL} from "./octoprint.constants";
 
 
@@ -12,33 +12,33 @@ import {TEST_PRINTER_KEY, TEST_PRINTER_URL} from "./octoprint.constants";
     providers: [
         OctoprintGateway,
         OctoPrintClientService,
-        ClientConnectionState
+        ClientConnectionsState
+    ],
+    exports: [
+        OctoPrintClientService
     ]
 })
 export class OctoprintModule {
     constructor(
-        private service: OctoPrintClientService
+        private service: OctoPrintClientService,
+        private clientConnectionsState: ClientConnectionsState
     ) {
 
     }
 
-    onModuleInit() {
+    async onModuleInit() {
         const testPrinterConnectionParams = this.getEnvTestPrinter();
-        this.service.getSettings(testPrinterConnectionParams)
-            .subscribe(result => {
-                testPrinterConnectionParams.printerKey
-                // console.warn("Global key provided", result.data.api.key === testPrinterConnectionParams.printerKey);
-            });
+        if (!!testPrinterConnectionParams) {
+            await this.clientConnectionsState.initState(testPrinterConnectionParams);
+            await this.clientConnectionsState.testClientConnection();
+        }
     }
 
-    private getEnvTestPrinter(): ConnectionParamsModel {
+    private getEnvTestPrinter(): ConnectionParams {
         const envTestPrinterURL = process.env[TEST_PRINTER_URL];
         const envTestPrinterKey = process.env[TEST_PRINTER_KEY];
         if (!!envTestPrinterURL && !!envTestPrinterKey) {
-            return {
-                printerURL: envTestPrinterURL,
-                printerKey: envTestPrinterKey
-            }
+            return new ConnectionParams(envTestPrinterURL, envTestPrinterKey);
         } else return null;
     }
 }

@@ -1,5 +1,13 @@
 {
   "collection": "@nestjs/schematics",
   "sourceRoot": "src",
-  "compilerOptions": {}
+  "compilerOptions": {},
+  "projects": {
+    "proxy-gen": {
+      "type": "application",
+      "root": "tools",
+      "entryFile": "proxy-api-generator.main",
+      "sourceRoot": "tools/proxy-api-generator"
+    }
+  }
 }

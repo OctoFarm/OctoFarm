@@ -1,4 +1,6 @@
 #.gitignore
+logs/
+.idea/
 
 # Client
 /web-client/node_modules/
@@ -13,23 +15,15 @@
 /server_1x/*docker-compose.yml
 /server_1x/.build
 /server_1x/.cache
-
 /server_1x/views/assets/js/
-
 /server_1x/views/assets/css/
-
 /server_1x/views/images/
 
 # V2 Server
-
 server_2x/node_modules/
-
 server_2x/dist/
-
 server_2x/assets/public/assets/
-
 server_2x/.env
 
-logs/
 
-.idea/
+docker-compose.yml
