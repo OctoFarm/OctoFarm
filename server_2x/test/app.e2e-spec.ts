@@ -1,30 +1,49 @@
 import {Test, TestingModule} from '@nestjs/testing';
-import {INestApplication} from '@nestjs/common';
 import * as request from 'supertest';
 import {AppModule} from '../src/app.module';
+import {E2eTestModule} from "./base/e2e-test.module";
+import {NestExpressApplication} from "@nestjs/platform-express";
+
 
 describe('AppController (e2e)', () => {
-    let app: INestApplication;
+    let app: NestExpressApplication;
 
-    beforeEach(async () => {
+    beforeAll(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [AppModule],
+            imports: [
+                E2eTestModule,
+                AppModule
+            ],
         }).compile();
 
-        app = moduleFixture.createNestApplication();
+        app = moduleFixture.createNestApplication<NestExpressApplication>();
+        app.setViewEngine('ejs');
+        app.setBaseViewsDir('../views');
         await app.init();
     });
 
-    it('/ (GET)', () => {
+    it('/ (GET) - redirect to login', () => {
         return request(app.getHttpServer())
             .get('/')
-            .expect(200)
-            .expect('Hello World!');
+            .expect(302)
+            .expect('Location', /auth\/login/);
     });
 
     it('/health (GET)', () => {
         return request(app.getHttpServer())
             .get('/health')
-            .expect(200);
+            .expect(200)
+            .then(result => {
+                expect(result.body).toHaveProperty('status', 'ok');
+            });
+    });
+
+    it('/printer-groups/list (GET)', () => {
+        return request(app.getHttpServer())
+            .get('/printer-groups/list')
+            .expect(200)
+            .then(result => {
+                // expect(result.body).toHaveProperty('status', 'ok');
+            });
     });
 });

@@ -1,25 +1,29 @@
 import {Test, TestingModule} from '@nestjs/testing';
-import {INestApplication} from '@nestjs/common';
 import * as request from 'supertest';
-import {PrintersModule} from "../../dist/printers/printers.module";
 import {AppModule} from "../../src/app.module";
+import {NestExpressApplication} from "@nestjs/platform-express";
+import {E2eTestModule} from "../base/e2e-test.module";
 
 describe('PrintersController (e2e)', () => {
-    let app: INestApplication;
+    let app: NestExpressApplication;
 
     beforeEach(async () => {
         const moduleFixture: TestingModule = await Test.createTestingModule({
-            imports: [AppModule],
+            imports: [
+                E2eTestModule,
+                AppModule,
+            ],
         }).compile();
 
-        app = moduleFixture.createNestApplication();
+        app = moduleFixture.createNestApplication<NestExpressApplication>();
+        app.setViewEngine('ejs');
+        app.setBaseViewsDir('../views');
         await app.init();
-    });
+    }, 10000);
 
     it('/printers (GET)', () => {
         return request(app.getHttpServer())
             .get('/printers')
-            .expect(200)
-            .expect('Hello World!');
+            .expect(200);
     });
 });

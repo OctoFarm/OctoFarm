@@ -1,4 +1,4 @@
-import {Module} from "@nestjs/common";
+import {Logger, Module} from "@nestjs/common";
 import {AuthService} from "./services/auth.service";
 import {JwtModule} from "@nestjs/jwt";
 import {PassportModule} from "@nestjs/passport";
@@ -14,6 +14,7 @@ import {UsersService} from "../users/services/users.service";
 import {GroupEnum} from "../users/types/group.enum";
 import {AuthMvcController} from "./controllers/auth-mvc.controller";
 import {SettingsModule} from "../settings/settings.module";
+import {Timeout} from "@nestjs/schedule";
 
 @Module({
     providers: [
@@ -41,22 +42,32 @@ import {SettingsModule} from "../settings/settings.module";
     exports: [AuthService, JwtModule]
 })
 export class AuthModule {
+    private logger = new Logger(AuthModule.name);
+
     constructor(private userService: UsersService) {
     }
 
-    async onModuleInit() {
-        await this.ensureAdminUserExists();
-    }
-
+    @Timeout(0)
     async ensureAdminUserExists() {
-        const user = await this.userService.findOne({group: GroupEnum.Admin});
+        const user = await this.userService.findOne({username: "admin"});
         if (!user) {
-            await this.userService.create({
-                group: GroupEnum.Admin,
-                name: "admin",
-                username: "admin",
-                password: DefaultAdminPassword
-            });
+            this.logger.warn("Creating admin user");
+            try {
+                await this.userService.create({
+                    group: GroupEnum.Admin,
+                    name: "admin",
+                    username: "admin",
+                    password: DefaultAdminPassword
+                });
+            } catch (e: any) {
+                if (!e.message.includes("duplicate key error dup key"))
+                    throw e;
+                // // Usually occurs in tests, should not be a problem.
+                // console.warn('Caught error:', e);
+                // console.info(e);
+            }
+        } else {
+            this.logger.log("Admin user found - skipping recreate");
         }
     }
 }
