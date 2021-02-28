@@ -9,7 +9,7 @@ import {TestProviders} from "./test.provider";
                 host: 'localhost',
                 useUnifiedTopology: true,
                 port: 27018,
-                entities: ["../src/**/*.entity{.ts,.js}"],
+                entities: ["./src/**/*.entity{.ts,.js}"],
                 database: 'test',
                 synchronize: true,
             }

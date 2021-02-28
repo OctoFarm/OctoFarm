@@ -17,7 +17,7 @@ describe('PrintersController (e2e)', () => {
 
         app = moduleFixture.createNestApplication<NestExpressApplication>();
         app.setViewEngine('ejs');
-        app.setBaseViewsDir('../views');
+        app.setBaseViewsDir('./views');
         await app.init();
     }, 10000);
 
