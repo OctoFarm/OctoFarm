@@ -31,11 +31,6 @@ export class OctoprintModule {
         if (!!testPrinterConnectionParams) {
             await this.clientConnectionsState.initState(testPrinterConnectionParams);
             await this.clientConnectionsState.testClientConnection();
-            // this.service.getSettings(testPrinterConnectionParams)
-            //     .subscribe(result => {
-            //         testPrinterConnectionParams.printerKey
-            //         // console.warn("Global key provided", result.data.api.key === testPrinterConnectionParams.printerKey);
-            //     });
         }
     }
 
