@@ -6,8 +6,14 @@
     :close-on-content-click="closeOnContentClick"
   >
     <template v-slot:activator="{ on }">
-      <v-btn icon v-on="on" @click="forceRerender">
-        <v-icon color="primary">mdi-bell</v-icon>
+      <v-btn
+        icon
+        v-on="on"
+        @click="forceRerender"
+      >
+        <v-icon color="primary">
+          mdi-bell
+        </v-icon>
       </v-btn>
     </template>
     <v-card class="mx-auto">
@@ -29,12 +35,16 @@
             >
               <v-row align="center">
                 <v-col class="grow">
-                  <p class="mb-0 pb-0">{{ item.message }}</p>
+                  <p class="mb-0 pb-0">
+                    {{ item.message }}
+                  </p>
                 </v-col>
                 <v-col class="shrink">
-                  <v-subheader
-                    ><time-since v-bind:timeSet="item.date"
-                  /></v-subheader>
+                  <v-subheader>
+                    <time-since
+                      :time-set="item.date"
+                    />
+                  </v-subheader>
                 </v-col>
               </v-row>
             </v-alert>
@@ -62,7 +72,7 @@ export default {
         icon: "mdi-printer-3d-nozzle-alert",
         type: "success",
         date: new Date(),
-        message: "Bob Saget has finished printing"
+        message: "Bob Saget has finished printing",
       },
       {
         index: 1,
@@ -72,7 +82,7 @@ export default {
         icon: "mdi-printer-3d-nozzle-alert",
         type: "success",
         date: new Date(),
-        message: "Bob Saget has finished printing"
+        message: "Bob Saget has finished printing",
       },
       {
         index: 3,
@@ -82,7 +92,7 @@ export default {
         icon: "mdi-printer-3d-nozzle-alert",
         type: "success",
         date: new Date(),
-        message: "Bob Saget has finished printing"
+        message: "Bob Saget has finished printing",
       },
       {
         index: 4,
@@ -92,7 +102,7 @@ export default {
         icon: "mdi-printer-3d-nozzle-alert",
         type: "success",
         date: new Date(),
-        message: "Bob Saget has finished printing"
+        message: "Bob Saget has finished printing",
       },
       {
         index: 5,
@@ -102,7 +112,7 @@ export default {
         icon: "mdi-printer-3d-nozzle-alert",
         type: "success",
         date: new Date(),
-        message: "Bob Saget has finished printing"
+        message: "Bob Saget has finished printing",
       },
       {
         index: 6,
@@ -112,16 +122,16 @@ export default {
         icon: "mdi-printer-3d-nozzle-alert",
         type: "success",
         date: new Date(),
-        message: "Bob Saget has finished printing"
-      }
-    ]
+        message: "Bob Saget has finished printing",
+      },
+    ],
   }),
   methods: {
     forceRerender() {
-      this.notifications.forEach(noti => {
-        noti.index = noti.index + 1;
+      this.notifications.forEach((noti) => {
+        noti.index += 1;
       });
-    }
-  }
+    },
+  },
 };
 </script>
