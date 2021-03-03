@@ -1,14 +1,12 @@
 module.exports = {
-  apps : [{
-    name: "OctoFarm",
-    script: 'app.js',
-    listen_timeout: 10000,
-    watch: '.'
-  }, {
-    script: './service-worker/',
-    watch: ['./service-worker']
-  }],
-
+  apps : [
+	  {
+	    name: "OctoFarm",
+	    script: 'app.js',
+	    listen_timeout: 10000,
+	    watch: '.'
+	  }
+  ],
   deploy : {
     production : {
       user : 'SSH_USERNAME',
