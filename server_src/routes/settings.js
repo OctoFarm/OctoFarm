@@ -65,7 +65,6 @@ router.get(
   ensureAuthenticated,
   async (req, res) => {
     const databaseName = req.params.name;
-    console.log(databaseName);
     await Runner.pause();
     if (databaseName === "nukeEverything") {
       await ServerSettingsDB.deleteMany({});
@@ -144,7 +143,6 @@ router.post("/client/update", ensureAuthenticated, (req, res) => {
     checked[0].save().then(() => {
       SettingsClean.start();
     });
-    console.log("HELLO");
     res.send({ msg: "Settings Saved" });
   });
 });
