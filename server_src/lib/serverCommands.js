@@ -8,13 +8,22 @@ var wol = require("wake_on_lan");
 class SystemCommands {
   static async rebootOctoFarm() {
     logger.info("Restart OctoFarm server requests");
+    let checkForNamedService = false;
+    // Bit hacky... Make sure OctoFarm has a pid under pm2.... Had to stagger the actual restart command so the return would send to client. - Open to suggestions
     try {
-      const { stdout, stderr } = await exec("pm2 restart OctoFarm");
+      //Attempts to find the named service
+      const { stdout, stderr } = await exec("pm2 pid OctoFarm");
+      if (isNaN(parseInt(stdout))) {
+        throw "No process number returned";
+      }
       logger.info("stdout:", stdout);
-      logger.info("stderr:", stderr);
+      checkForNamedService = true;
+      // If the process had a integer pid succeeded then we are ok to restart, errors are caught by the try, catch
+      exec("pm2 restart OctoFarm");
     } catch (err) {
       logger.error(err);
     }
+    return checkForNamedService;
   }
 }
 

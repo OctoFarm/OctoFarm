@@ -65,7 +65,6 @@ router.get(
   ensureAuthenticated,
   async (req, res) => {
     const databaseName = req.params.name;
-    console.log(databaseName);
     await Runner.pause();
     if (databaseName === "nukeEverything") {
       await ServerSettingsDB.deleteMany({});
@@ -120,8 +119,9 @@ router.get(
     res.send({ databases: returnedObjects });
   }
 );
-router.get("/server/restart", ensureAuthenticated, (req, res) => {
-  SystemCommands.rebootOctoFarm();
+router.get("/server/restart", ensureAuthenticated, async (req, res) => {
+  let serviceRestarted = await SystemCommands.rebootOctoFarm();
+  res.send(serviceRestarted);
 });
 router.get("/client/get", ensureAuthenticated, (req, res) => {
   ClientSettingsDB.find({}).then((checked) => {
@@ -144,7 +144,6 @@ router.post("/client/update", ensureAuthenticated, (req, res) => {
     checked[0].save().then(() => {
       SettingsClean.start();
     });
-    console.log("HELLO");
     res.send({ msg: "Settings Saved" });
   });
 });
