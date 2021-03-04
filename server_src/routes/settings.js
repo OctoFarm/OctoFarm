@@ -119,8 +119,9 @@ router.get(
     res.send({ databases: returnedObjects });
   }
 );
-router.get("/server/restart", ensureAuthenticated, (req, res) => {
-  SystemCommands.rebootOctoFarm();
+router.get("/server/restart", ensureAuthenticated, async (req, res) => {
+  let serviceRestarted = await SystemCommands.rebootOctoFarm();
+  res.send(serviceRestarted);
 });
 router.get("/client/get", ensureAuthenticated, (req, res) => {
   ClientSettingsDB.find({}).then((checked) => {

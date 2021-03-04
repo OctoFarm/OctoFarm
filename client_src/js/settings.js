@@ -54,14 +54,32 @@ document.getElementById("nukeUsers").addEventListener("click", (e) => {
 document
   .getElementById("restartOctoFarmBtn")
   .addEventListener("click", async (e) => {
-    let serverRestart = await OctoFarmclient.get("settings/server/restart");
-    console.log(serverRestart);
-    // UI.createAlert(
-    //   "warning",
-    //   "Performing a server restart, please wait for it to come back online.",
-    //   6000,
-    //   "Clicked"
-    // );
+    let systemRestart = await OctoFarmclient.get("settings/server/restart");
+    if (systemRestart.status !== 200) {
+      // This alert is pretty mute as the serverAliveCheck will notify before...
+      UI.createAlert(
+        "error",
+        "Server could not be contacted... is it online?",
+        3000
+      );
+      return;
+    }
+    systemRestart = await systemRestart.json();
+    if (systemRestart) {
+      UI.createAlert(
+        "success",
+        "System restart command was successful,the server will restart in 5 seconds...",
+        5000,
+        "clicked"
+      );
+    } else {
+      UI.createAlert(
+        "error",
+        "System restart command failed... This will not work unless pm2 is monitoring OctoFarm as detailed in the instructions: <a href='https://octofarm.net/installation'>Click Here</a>",
+        0,
+        "clicked"
+      );
+    }
   });
 
 document.getElementById("exportAlerts").addEventListener("click", (e) => {
