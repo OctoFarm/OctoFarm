@@ -87,7 +87,7 @@ class SystemRunner {
         systemDisk,
         warnings,
       };
-      console.log(systemInfo);
+
       return systemInfo;
     } catch (e) {
       logger.error(
