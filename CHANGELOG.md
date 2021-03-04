@@ -1,7 +1,26 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+
 # [Released]
+
+## [v1.1.12]
+
+### Added
+   - Added a button to System page to restart OctoFarm server.
+
+### Changed
+   - Added logging around system information as there was none originally, also a warning message when failing to generate.
+   - Pre-start script now uses 'npm ci' to make sure packages are on the latest version inside package-lock.json. 
+   - Server restart commands will no longer silently fail... It will alert you if you haven't set up OctoFarm correctly under the pm2 named service.
+
+### Fixed
+    - #342: Quotes causing issue for Windows 10 systems in package.json start up scripts.
+    - #341: System information was failing to generate on some ubuntu systems due to an outdated package. Package has been updated.
+            - The new systeminformation changed some key value pairs. Please run npm 
+    - #337: Fixed issue with file manager not loading files due to recursion issue.  
+
+### Security
 
 # [v1.1.11]
 

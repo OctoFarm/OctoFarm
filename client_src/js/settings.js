@@ -51,6 +51,9 @@ document.getElementById("nukeUsers").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
   ServerSettings.nukeDatabases("UserDB");
 });
+document.getElementById("restartOctoFarmBtn").addEventListener("click", (e) => {
+  ServerSettings.serviceRestart();
+});
 
 document.getElementById("exportAlerts").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
@@ -103,6 +106,7 @@ async function setupOctoPrintClientsforTimelapse() {
     bootbox.confirm({
       title: "Are you sure?",
       message:
+        // eslint-disable-next-line max-len
         "If you press yes below your timelapse settings will automatically be updated to work with OctoFarms setup. The script will update any online instances and there shouldn't be a restart necassary. It does however presume you have your ffmpeg path setup with your snapshot URL inputted into OctoPrint.",
       buttons: {
         confirm: {
@@ -433,15 +437,16 @@ setInterval(async function updateStatus() {
       systemInfo.processUptime
     );
     // labels: ['System', 'OctoFarm', 'User', 'Free'],
-    const cpuLoad = systemInfo.cpuLoad.currentload_system;
-    const octoLoad = systemInfo.sysProcess.pcpu;
-    const userLoad = systemInfo.cpuLoad.currentload_user;
+    const cpuLoad = systemInfo.cpuLoad.currentLoadSystem;
+    const octoLoad = systemInfo.sysProcess.cpuu;
+    const userLoad = systemInfo.cpuLoad.currentLoadUser;
     const remain = cpuLoad + octoLoad + userLoad;
+
     systemChartCPU.updateSeries([cpuLoad, octoLoad, userLoad, 100 - remain]);
 
     const otherRAM = systemInfo.memoryInfo.total - systemInfo.memoryInfo.free;
     const octoRAM =
-      (systemInfo.memoryInfo.total / 100) * systemInfo.sysProcess.pmem;
+      (systemInfo.memoryInfo.total / 100) * systemInfo.sysProcess.mem;
     const freeRAM = systemInfo.memoryInfo.free;
 
     systemChartMemory.updateSeries([otherRAM, octoRAM, freeRAM]);
@@ -829,7 +834,51 @@ class ServerSettings {
         });
     });
   }
+  static async serviceRestart() {
+    let systemRestartBtn = document.getElementById("restartOctoFarmBtn");
+    // Make sure the system button is disabled whilst the restart is happening.
+    if (systemRestartBtn) {
+      systemRestartBtn.disabled = true;
+    }
 
+    let systemRestart = await OctoFarmclient.get("settings/server/restart");
+    //Make sure response from server is received, and make sure the status is 200
+    if (systemRestart && systemRestart.status !== 200) {
+      // This alert is pretty mute as the serverAliveCheck will notify before...
+      UI.createAlert(
+        "error",
+        "Server could not be contacted... is it online?",
+        3000
+      );
+      setTimeout(() => {
+        if (systemRestartBtn) {
+          systemRestartBtn.disabled = false;
+        }
+      }, 5000);
+      return;
+    }
+    systemRestart = await systemRestart.json();
+    if (systemRestart) {
+      UI.createAlert(
+        "success",
+        "System restart command was successful,the server will restart in 5 seconds...",
+        5000,
+        "clicked"
+      );
+    } else {
+      UI.createAlert(
+        "error",
+        "System restart command failed... This will not work unless pm2 is monitoring OctoFarm as detailed in the instructions: <a href='https://octofarm.net/installation' target='_blank'>Click Here</a>",
+        0,
+        "clicked"
+      );
+    }
+    setTimeout(() => {
+      if (systemRestartBtn) {
+        systemRestartBtn.disabled = false;
+      }
+    }, 5000);
+  }
   static update() {
     let reboot = false;
     const onlinePoll = document.getElementById("webSocketThrottle").value;
@@ -928,13 +977,7 @@ class ServerSettings {
             },
             callback(result) {
               if (result) {
-                OctoFarmclient.get("settings/server/restart");
-                UI.createAlert(
-                  "warning",
-                  "Performing a server restart, please wait for it to come back online.",
-                  6000,
-                  "Clicked"
-                );
+                ServerSettings.serviceRestart();
               }
             },
           });
