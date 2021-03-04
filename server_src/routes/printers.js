@@ -132,7 +132,7 @@ router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
   } else {
     const index = _.findIndex(printers, function (o) {
       //Make sure ID's are both strings to stop recursion issues
-      return JSON.stringify(o._id) === JSON.stringify(id);
+      return o._id == id;
     });
     const returnPrinter = {
       printerName: printers[index].printerName,
