@@ -9,33 +9,21 @@ class SystemCommands {
   static async rebootOctoFarm() {
     logger.info("Restart OctoFarm server requests");
     let checkForNamedService = false;
-    //Bit hacky, open to suggestions... the restart command fired here would not notify the user it was successful. The catch successfully captures any errors, and the server does restart...
+    // Bit hacky... Make sure OctoFarm has a pid under pm2.... Had to stagger the actual restart command so the return would send to client. - Open to suggestions
     try {
-      //Attempts to stop the named OctoFarm service...
-      const { stdoutList, stderrList } = await exec("pm2 stop OctoFarm");
-      logger.info("stdout:", stdoutList);
+      //Attempts to find the named service
+      const { stdout, stderr } = await exec("pm2 pid OctoFarm");
+      if (isNaN(parseInt(stdout))) {
+        throw "No process number returned";
+      }
+      logger.info("stdout:", stdout);
       checkForNamedService = true;
-      // If the stop succeeded then we are ok to restart.
-      const { stdoutRestart, stderrRestart } = exec("pm2 restart OctoFarm");
-      logger.info("stdout:", stdoutRestart);
+      // If the stop succeeded then we are ok to restart, errors are caught by the try, catch
+      exec("pm2 restart OctoFarm");
     } catch (err) {
       logger.error(err);
     }
     return checkForNamedService;
-  }
-  static async checkOctoFarmIsNamedService() {
-    logger.info("Checking OctoFarm Named Service...");
-    let areWeUnderPm2NamedService = false;
-    try {
-      const { stdout, stderr } = await exec("pm2 restart OctoFarm");
-      logger.info("stdout:", stdout);
-      // Unneeded
-      // logger.info("stderr:", stderr);
-      areWeUnderPm2NamedService = true;
-    } catch (err) {
-      logger.error(err);
-    }
-    return areWeUnderPm2NamedService;
   }
 }
 
