@@ -51,36 +51,9 @@ document.getElementById("nukeUsers").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
   ServerSettings.nukeDatabases("UserDB");
 });
-document
-  .getElementById("restartOctoFarmBtn")
-  .addEventListener("click", async (e) => {
-    let systemRestart = await OctoFarmclient.get("settings/server/restart");
-    if (systemRestart.status !== 200) {
-      // This alert is pretty mute as the serverAliveCheck will notify before...
-      UI.createAlert(
-        "error",
-        "Server could not be contacted... is it online?",
-        3000
-      );
-      return;
-    }
-    systemRestart = await systemRestart.json();
-    if (systemRestart) {
-      UI.createAlert(
-        "success",
-        "System restart command was successful,the server will restart in 5 seconds...",
-        5000,
-        "clicked"
-      );
-    } else {
-      UI.createAlert(
-        "error",
-        "System restart command failed... This will not work unless pm2 is monitoring OctoFarm as detailed in the instructions: <a href='https://octofarm.net/installation'>Click Here</a>",
-        0,
-        "clicked"
-      );
-    }
-  });
+document.getElementById("restartOctoFarmBtn").addEventListener("click", (e) => {
+  ServerSettings.serviceRestart();
+});
 
 document.getElementById("exportAlerts").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
@@ -861,7 +834,35 @@ class ServerSettings {
         });
     });
   }
-
+  static async serviceRestart() {
+    let systemRestart = await OctoFarmclient.get("settings/server/restart");
+    //Make sure response from server is received, and make sure the status is 200
+    if (systemRestart && systemRestart.status !== 200) {
+      // This alert is pretty mute as the serverAliveCheck will notify before...
+      UI.createAlert(
+        "error",
+        "Server could not be contacted... is it online?",
+        3000
+      );
+      return;
+    }
+    systemRestart = await systemRestart.json();
+    if (systemRestart) {
+      UI.createAlert(
+        "success",
+        "System restart command was successful,the server will restart in 5 seconds...",
+        5000,
+        "clicked"
+      );
+    } else {
+      UI.createAlert(
+        "error",
+        "System restart command failed... This will not work unless pm2 is monitoring OctoFarm as detailed in the instructions: <a href='https://octofarm.net/installation'>Click Here</a>",
+        0,
+        "clicked"
+      );
+    }
+  }
   static update() {
     let reboot = false;
     const onlinePoll = document.getElementById("webSocketThrottle").value;
@@ -960,13 +961,7 @@ class ServerSettings {
             },
             callback(result) {
               if (result) {
-                OctoFarmclient.get("settings/server/restart");
-                UI.createAlert(
-                  "warning",
-                  "Performing a server restart, please wait for it to come back online.",
-                  6000,
-                  "Clicked"
-                );
+                ServerSettings.serviceRestart();
               }
             },
           });
