@@ -857,7 +857,7 @@ class ServerSettings {
     } else {
       UI.createAlert(
         "error",
-        "System restart command failed... This will not work unless pm2 is monitoring OctoFarm as detailed in the instructions: <a href='https://octofarm.net/installation'>Click Here</a>",
+        "System restart command failed... This will not work unless pm2 is monitoring OctoFarm as detailed in the instructions: <a href='https://octofarm.net/installation' target='_blank'>Click Here</a>",
         0,
         "clicked"
       );
