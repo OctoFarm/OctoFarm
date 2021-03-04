@@ -31,10 +31,10 @@ class SystemRunner {
       const cpuLoad = await si
         .currentLoad()
         .catch((error) => logger.error(error));
-      // const cpuInfo = {
-      //   cpu,
-      //   speed: cpuCurrentSpeed,
-      // };
+      const cpuInfo = {
+        cpu,
+        speed: cpuCurrentSpeed,
+      };
 
       const memoryInfo = await si.mem().catch((error) => logger.error(error));
       const uptime = si.time();
