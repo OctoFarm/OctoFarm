@@ -51,7 +51,7 @@
     "passport-local": "^1.0.0",
     "passport-remember-me": "0.0.1",
     "request": "^2.88.2",
-    "systeminformation": "^4.34.15",
+    "systeminformation": "^5.6.1",
     "wake_on_lan": "^1.0.0",
     "winston": "^3.3.3",
     "ws": "^7.4.3",
