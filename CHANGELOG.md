@@ -11,7 +11,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
    - Added logging around system information as there was none originally, also a warning message when failing to generate.
-   - Pre-start script now uses npm update to make sure packages are on the latest version inside package-lock.json. 
+   - Pre-start script now uses 'npm ci' to make sure packages are on the latest version inside package-lock.json. 
    - Server restart commands will no longer silently fail... It will alert you if you haven't set up OctoFarm correctly under the pm2 named service.
 
 ### Fixed
