@@ -18,7 +18,7 @@ class SystemCommands {
       }
       logger.info("stdout:", stdout);
       checkForNamedService = true;
-      // If the stop succeeded then we are ok to restart, errors are caught by the try, catch
+      // If the process had a integer pid succeeded then we are ok to restart, errors are caught by the try, catch
       exec("pm2 restart OctoFarm");
     } catch (err) {
       logger.error(err);
