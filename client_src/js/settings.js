@@ -835,6 +835,12 @@ class ServerSettings {
     });
   }
   static async serviceRestart() {
+    let systemRestartBtn = document.getElementById("restartOctoFarmBtn");
+    // Make sure the system button is disabled whilst the restart is happening.
+    if (systemRestartBtn) {
+      systemRestartBtn.disabled = true;
+    }
+
     let systemRestart = await OctoFarmclient.get("settings/server/restart");
     //Make sure response from server is received, and make sure the status is 200
     if (systemRestart && systemRestart.status !== 200) {
@@ -844,6 +850,11 @@ class ServerSettings {
         "Server could not be contacted... is it online?",
         3000
       );
+      setTimeout(() => {
+        if (systemRestartBtn) {
+          systemRestartBtn.disabled = false;
+        }
+      }, 5000);
       return;
     }
     systemRestart = await systemRestart.json();
@@ -862,6 +873,11 @@ class ServerSettings {
         "clicked"
       );
     }
+    setTimeout(() => {
+      if (systemRestartBtn) {
+        systemRestartBtn.disabled = false;
+      }
+    }, 5000);
   }
   static update() {
     let reboot = false;
