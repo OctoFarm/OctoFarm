@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "prestart": "npm install --production",
-    "start": "pm2 flush && pm2 start app.js --name OctoFarm -e 'logs/pm2.error.log' --time",
+    "start": "pm2 flush && pm2 start app.js --name OctoFarm -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time",
     "stop": "pm2 stop OctoFarm",
     "dev": "nodemon ./app.js",
     "test": "jest"
