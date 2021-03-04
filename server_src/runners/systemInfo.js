@@ -26,7 +26,7 @@ class SystemRunner {
       const cpu = await si.cpu().catch((error) => logger.error(error));
 
       const cpuCurrentSpeed = await si
-        .cpuCurrentspeed()
+        .cpuCurrentSpeed()
         .catch((error) => logger.error(error));
       const cpuLoad = await si
         .currentLoad()
