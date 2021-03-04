@@ -51,6 +51,18 @@ document.getElementById("nukeUsers").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
   ServerSettings.nukeDatabases("UserDB");
 });
+document
+  .getElementById("restartOctoFarmBtn")
+  .addEventListener("click", async (e) => {
+    let serverRestart = await OctoFarmclient.get("settings/server/restart");
+    console.log(serverRestart);
+    // UI.createAlert(
+    //   "warning",
+    //   "Performing a server restart, please wait for it to come back online.",
+    //   6000,
+    //   "Clicked"
+    // );
+  });
 
 document.getElementById("exportAlerts").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
@@ -103,6 +115,7 @@ async function setupOctoPrintClientsforTimelapse() {
     bootbox.confirm({
       title: "Are you sure?",
       message:
+        // eslint-disable-next-line max-len
         "If you press yes below your timelapse settings will automatically be updated to work with OctoFarms setup. The script will update any online instances and there shouldn't be a restart necassary. It does however presume you have your ffmpeg path setup with your snapshot URL inputted into OctoPrint.",
       buttons: {
         confirm: {
@@ -433,15 +446,16 @@ setInterval(async function updateStatus() {
       systemInfo.processUptime
     );
     // labels: ['System', 'OctoFarm', 'User', 'Free'],
-    const cpuLoad = systemInfo.cpuLoad.currentload_system;
-    const octoLoad = systemInfo.sysProcess.pcpu;
-    const userLoad = systemInfo.cpuLoad.currentload_user;
+    const cpuLoad = systemInfo.cpuLoad.currentLoadSystem;
+    const octoLoad = systemInfo.sysProcess.cpuu;
+    const userLoad = systemInfo.cpuLoad.currentLoadUser;
     const remain = cpuLoad + octoLoad + userLoad;
+
     systemChartCPU.updateSeries([cpuLoad, octoLoad, userLoad, 100 - remain]);
 
     const otherRAM = systemInfo.memoryInfo.total - systemInfo.memoryInfo.free;
     const octoRAM =
-      (systemInfo.memoryInfo.total / 100) * systemInfo.sysProcess.pmem;
+      (systemInfo.memoryInfo.total / 100) * systemInfo.sysProcess.mem;
     const freeRAM = systemInfo.memoryInfo.free;
 
     systemChartMemory.updateSeries([otherRAM, octoRAM, freeRAM]);

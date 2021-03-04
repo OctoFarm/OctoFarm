@@ -62,7 +62,7 @@
                                                     </p>
                                                 </div>
                                                 <div class="col-4">
-                                                    <p class=""><i class="fas fa-hdd"></i> Main Disk:  <b><%= systemInformation.systemDisk.mount %></b><br><span  class="text-light" id="systemHardDrive" style="font-size:0.8rem;">
+                                                    <p class=""><i class="fas fa-hdd"></i> Main Disk:  <b><%= systemInformation.systemDisk.mount %></b><br><b>Disk Patrtition: </b><%= systemInformation.systemDisk.fs%><br><span  class="text-light" id="systemHardDrive" style="font-size:0.8rem;">
                                                               <%= helpers.generateBytes(systemInformation.systemDisk.used) %>  /  <%= helpers.generateBytes(systemInformation.systemDisk.size) %> |  <%= systemInformation.systemDisk.use.toFixed(2) %>%
                                         </span>
 
@@ -528,7 +528,7 @@
                                                 <div class="tab-pane fade show active" id="server-settings" role="tabpanel" aria-labelledby="server-settings-list">
                                                     <h5>System Actions</h5>
                                                     <hr>
-                                                    <button title="Performs a restart of the OctoFarm service" id="restartOctoFarmBtn" type="button" class="btn btn-danger mb-3 btn-lg" disabled><i class="fas fa-sync"></i>Restart</button>
+                                                    <button title="Performs a restart of the OctoFarm service" id="restartOctoFarmBtn" type="button" class="btn btn-danger mb-3 btn-lg"><i class="fas fa-sync"></i>Restart</button>
                                                     <h5>Server Settings</h5>
                                                     <hr>
                                                     <p class="font-weight-bold">Server Port</p>
