@@ -72,17 +72,16 @@ Currently there are issues with using the Global API Key to connect to these ins
 Confirmed working on: Linux (Ubuntu, Debian), RaspberryPi (Rasbian), Windows 10.
 Should also work on but not tested: MacOS, anything else nodejs will run on.
 
-_Note_: Raspberry Pi's Raspbian OS doesn't officially support running MongoDB yet (MongoDB requires a 64bit kernel, whereas Raspbian's is 32bit), so in that case, you'll need an external database running on some other machine or VM.
+_Note_: Raspberry Pi's Raspbian OS doesn't officially support running MongoDB yet (MongoDB requires a 64bit kernel, whereas Raspbian's is 32bit), so in that case, you'll need a 32-bit MongoDB version, an external database running on some other machine, or VM.
 
 ### Supported Browsers
 
 All browsers should now be supported in OctoFarm. Please log an issue if this is not the case. 
 
-
 ### Prerequisites
 
 - [MongoDB](https://www.mongodb.com/) - v3.6+
-- [NodeJS](https://nodejs.org/) - v12.18.4 (Recomended to use the LTS version) NOTE: Not checked with LTS V14 yet... better to use V12 for now. 
+- [NodeJS](https://nodejs.org/) - v12.18.4 (Recomended to use the LTS versions. V14 is being actively tested as we speak.)
 - [NPM](https://www.npmjs.com/) - v6+
 - [OctoPrint](https://octoprint.org) - v1.3.9+
 
@@ -116,8 +115,15 @@ git clone https://github.com/NotExpectedYet/OctoFarm.git
 npm install
 ```
 
-3. Edit the /config/db.js file with your database.
-
+3. Create an .env file (takes precedence over the /config/db.js `MongoURI` file automatically!) with the MONGO variable:
+```
+MONGO=mongodb://192.168.1.5:27017/octofarm
+```
+3b. If you have different parameters (credentials, authSource):
+```
+MONGO=mongodb://USERNAME:PASSWORD@HOST:PORT/octofarm?authSource=admin
+```
+3c. (Deprecated) override /config/db.js file
 ```sh
 module.exports = {
   MongoURI: "mongodb://192.168.1.5:27017/octofarm"
@@ -149,7 +155,7 @@ These are planned but not available yet...
 
 ## Contributing
 
-Version 2.0 is underway. If anyone would like to join the fun please head over to discord with the following link: - Discord: [Discord](https://discord.gg/vjabMUn) and speak to us in Developer Discussions. Thanks! 
+Version 2.0 is underway on the `alpha-2x` branch. If anyone would like to join the fun please head over to discord with the following link: - Discord: [Discord](https://discord.gg/vjabMUn) and speak to us in Developer Discussions. Thanks! 
 
 <!-- LICENSE -->
 
