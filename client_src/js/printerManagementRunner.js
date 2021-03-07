@@ -2370,38 +2370,30 @@ class PrintersManagement {
       document.getElementById("printerNewList").insertAdjacentHTML(
         "beforebegin",
         `
-         <tr id="newPrinterCard-${newPrintersIndex}">
-              <td><div class="input-group mb-3">
-                  <input id="newPrinterName-${newPrintersIndex}" type="text" class="form-control" value="${newPrinter.name}">
+   <tr id="newPrinterCard-${newPrintersIndex}">
+        <td><div class="mb-0">
+          <input id="newPrinterName-${newPrintersIndex}" type="text" class="form-control" placeholder="Leave blank to grab from OctoPrint" value="${newPrinter.name}">
+        </div></td>
+        <td><div class="mb-0">
+          <input id="newPrinterGroup-${newPrintersIndex}" type="text" class="form-control" placeholder="" value="${newPrinter.group}">
+        </div></td>
+        <td><div class="mb-0">
+          <input id="newPrinterURL-${newPrintersIndex}" type="text" class="form-control" placeholder="" value="${newPrinter.printerURL}">
+        </div></td>
+        <td><div class="mb-0">
+          <input id="newPrinterCamURL-${newPrintersIndex}" type="text" class="form-control" placeholder="Leave blank to grab from OctoPrint" value="${newPrinter.cameraURL}">
+        </div></td>
+        <td><div class="mb-0">
+          <input id="newPrinterAPIKEY-${newPrintersIndex}" type="text" class="form-control" placeholder="" value="${newPrinter.apikey}">
+        </div></td>
+        <td><button id="saveButton-${newPrintersIndex}" type="button" class="btn btn-success btn-sm">
+                <i class="fas fa-save"></i>
+            </button></td>
+        <td><button id="delButton-${newPrintersIndex}" type="button" class="btn btn-danger btn-sm">
+                <i class="fas fa-trash"></i>
+            </button></td>
 
-                </div></td>
-                <td><div class="input-group mb-3">
-                  <input id="newPrinterGroup-${newPrintersIndex}" type="text" class="form-control" value="${newPrinter.group}">
-
-                </div></td>
-                <td><div class="input-group mb-3">
-                  <input id="newPrinterGroups-${newPrintersIndex}" type="text" class="form-control" value="${newPrinter.groups}">
-
-                </div></td>
-                <td><div class="input-group mb-3">
-                  <input id="newPrinterURL-${newPrintersIndex}" type="text" class="form-control" value="${newPrinter.printerURL}">
-
-                </div></td>
-                <td><div class="input-group mb-3">
-                  <input id="newPrinterCamURL-${newPrintersIndex}" type="text" class="form-control" value="${newPrinter.cameraURL}">
-
-                </div></td>
-                <td><div class="input-group mb-3">
-                  <input id="newPrinterAPIKEY-${newPrintersIndex}" type="text" class="form-control" value="${newPrinter.apikey}">
-                </div></td>
-              <td><button id="saveButton-${newPrintersIndex}" type="button" class="btn btn-success btn-sm">
-                      <i class="fas fa-save"></i>
-                  </button></td>
-              <td><button id="delButton-${newPrintersIndex}" type="button" class="btn btn-danger btn-sm">
-                      <i class="fas fa-trash"></i>
-                  </button></td>
-      
-          </tr>
+    </tr>
   `
       );
     } else {
