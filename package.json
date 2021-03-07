@@ -7,6 +7,8 @@
     "prestart": "npm ci",
     "start": "pm2 flush && pm2 start app.js --name OctoFarm -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time",
     "stop": "pm2 stop OctoFarm",
+    "restart": "pm2 stop OctoFarm && pm2 start OctoFarm",
+    "update": "git pull && npm ci && npm run restart",
     "dev": "nodemon ./app.js",
     "test": "jest"
   },

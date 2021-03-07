@@ -1,6 +1,19 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+# [WIP]
+## [v1.1.13]
+
+### Added
+    - New run commands
+        - "npm run restart" - Restarts the OctoFarm service.
+        - "npm run update" - Pulls the latest code from OctoFarms github, updates the local dependencies and then restarts the srevice.
+
+### Changed
+
+### Fixed
+    - #354 - Printer import was loading old table. Updated to new format. 
+
 
 # [Released]
 
