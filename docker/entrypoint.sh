@@ -5,7 +5,7 @@ then
     echo "Node modules exist, skipping install"
 else
       echo "Installing node packages"
-    npm install
+    npm ci --production
 fi
 
 if [ -z "$MONGO" ]
