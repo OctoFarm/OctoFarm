@@ -3,7 +3,6 @@ const imagemin = require("gulp-imagemin");
 const concat = require("gulp-concat");
 const terser = require("gulp-terser");
 const sourcemaps = require("gulp-sourcemaps");
-const declare = require("gulp-declare");
 const rename = require("gulp-rename");
 const postcss = require("gulp-postcss");
 const autoprefixer = require("autoprefixer");
