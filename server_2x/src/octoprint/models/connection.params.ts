@@ -1,4 +1,4 @@
-import {IsAlphanumeric, IsNotEmpty, Length, validate} from "class-validator";
+import {IsAlphanumeric, IsNotEmpty, Length, validateSync} from "class-validator";
 import {ApiKeyLengthMinimumDefault} from "../../printers/printers.config";
 
 export class ConnectionParams {
@@ -15,7 +15,7 @@ export class ConnectionParams {
     }
 
     // This make sure we cant pass interface types - dont remove
-    async validateParams() {
-        return await validate(this);
+    public validateParams() {
+        return validateSync(this);
     }
 }

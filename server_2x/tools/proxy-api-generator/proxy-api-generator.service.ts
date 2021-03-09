@@ -1,14 +1,11 @@
-// This is meant to become a tool for converting an API to a Typescript set of models
-// Do note how it is limited to the roles and plugins installed on OctoPrint, but that can be corrected easily.
-
 import * as fs from "fs";
 import {transform} from 'json-to-typescript';
-import {HttpService, Injectable} from "@nestjs/common";
-import {ConnectionParams} from "../../src/octoprint/models/connection.params";
-import {TEST_PRINTER_KEY, TEST_PRINTER_URL} from "../../src/octoprint/octoprint.constants";
+import {HttpService, Inject, Injectable} from "@nestjs/common";
 import {OctoPrintClientService} from "../../src/octoprint/services/octoprint-client.service";
 import * as path from "path";
 import {Observable} from "rxjs";
+import {OctoPrintConfig} from "../../src/octoprint/octoprint.config";
+import {ConfigType} from "@nestjs/config";
 
 @Injectable()
 export class ProxyApiGeneratorService {
@@ -16,21 +13,13 @@ export class ProxyApiGeneratorService {
 
     constructor(
         private httpService: HttpService,
-        private octoprint: OctoPrintClientService
+        private octoprint: OctoPrintClientService,
+        @Inject(OctoPrintConfig.KEY) private testPrinterConnectionParams: ConfigType<typeof OctoPrintConfig>,
     ) {
     }
 
-    getEnvSettings(): ConnectionParams {
-        return new ConnectionParams(
-            process.env[TEST_PRINTER_URL],
-            process.env[TEST_PRINTER_KEY]
-        );
-    }
-
     async generateSchemas(folder: string) {
-        console.log("CWD: ", process.cwd(), 'Writing files to folder', folder);
-        const params = this.getEnvSettings();
-
+        const params = this.testPrinterConnectionParams;
         this.outputFolder = path.join(folder, "temp");
         this.generateOutputFolder();
 
@@ -44,6 +33,12 @@ export class ProxyApiGeneratorService {
             this.octoprint.getCurrentUser(params),
             "octoprint-currentuser.dto.ts",
             "OctoPrintCurrentUserDto"
+        );
+
+        await this.generateSchema(
+            this.octoprint.loginUserSession(params),
+            "octoprint-session.dto.ts",
+            "OctoPrintSessionDto"
         );
     }
 

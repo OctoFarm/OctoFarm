@@ -5,6 +5,7 @@ import {ConfigModule} from "@nestjs/config";
 import {OctoprintModule} from "../../src/octoprint/octoprint.module";
 import {BootController} from "../../src/boot/boot.controller";
 import {ProxyApiGeneratorService} from "./proxy-api-generator.service";
+import {OctoPrintConfig} from "../../src/octoprint/octoprint.config";
 
 @Module({
     providers: [
@@ -19,6 +20,7 @@ import {ProxyApiGeneratorService} from "./proxy-api-generator.service";
             isGlobal: true,
             envFilePath: [".env", ".env.development", ".env.production"],
         }),
+        ConfigModule.forFeature(OctoPrintConfig),
         OctoprintModule,
         HttpModule
     ],

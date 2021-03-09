@@ -8,20 +8,24 @@ import {validate} from "class-validator";
 import {AxiosError} from "axios";
 import HttpStatusCode from "../../utils/http-status-codes.enum";
 import {OctoprintGroupType} from "../types/octoprint-group.type";
+import {SessionConnectionParams} from "../models/session-connection.params";
+import {OctoprintGateway} from "../../../tools/octoprint-websocket-mock/gateway/octoprint.gateway";
 
 @Injectable()
 export class ClientConnectionsState {
     public static defaultState: ClientConnectionStateModel = {
-        apiKeyValid: null,
-        apiKeyAccepted: null,
-        apiKeyIsGlobal: null,
-        corsEnabled: null,
-        userHasRequiredGroups: null,
-        apiConnected: null,
-        websocketConnected: null,
-        websocketHealthy: null
+        apiKeyValid: undefined,
+        apiKeyAccepted: undefined,
+        apiKeyIsGlobal: undefined,
+        apiConnected: undefined,
+        sessionKeyAcquired: undefined,
+        corsEnabled: undefined,
+        userHasRequiredGroups: undefined,
+        websocketConnected: undefined,
+        websocketHealthy: undefined
     };
     private connectionParams: ConnectionParams;
+    private sessionConnectionParams?: SessionConnectionParams;
     private state: ClientConnectionStateModel;
     private logger = new Logger(ClientConnectionsState.name);
 
@@ -40,7 +44,7 @@ export class ClientConnectionsState {
         }
     }
 
-    public async testClientConnection() {
+    public async testClientConnection(messageClb?: OctoprintGateway) {
         if (!this.state) {
             throw new Error("Call initState(connectionParams) before testing the client connection.");
         }
@@ -53,6 +57,7 @@ export class ClientConnectionsState {
                         throw new Error("Client settings response did not contain the api section. Cant validate client connection.");
 
                     this.patchState({
+                        apiConnected: true,
                         apiKeyAccepted: true
                     });
 
@@ -68,15 +73,37 @@ export class ClientConnectionsState {
                         corsEnabled
                     });
 
-                    const currentUser = await this.octoPrintClientService.getCurrentUser(this.connectionParams).toPromise()
-                    const userFulfillsRequiredGroups = currentUser.groups.includes(OctoprintGroupType.ADMIN.toString())
-                        && currentUser.groups.includes(OctoprintGroupType.USERS.toString());
+                    const userSession = await this.octoPrintClientService.loginUserSession(this.connectionParams).toPromise();
+                    if (!userSession.session) {
+                        throw new Error("Could not acquire valid session key from OctoPrint API.");
+                    }
+                    const sessionKey = userSession.session;
+                    this.patchState({
+                        sessionKeyAcquired: !!sessionKey
+                    });
+
+                    const userFulfillsRequiredGroups = userSession.groups.includes(OctoprintGroupType.ADMIN.toString())
+                        && userSession.groups.includes(OctoprintGroupType.USERS.toString());
                     this.patchState({
                         userHasRequiredGroups: userFulfillsRequiredGroups
-                    })
-                    console.warn(currentUser.groups, OctoprintGroupType.USERS.toString());
+                    });
+                    if (!userFulfillsRequiredGroups) {
+                        throw new Error("User does not have the required groups to operate OctoPrint remotely from OctoFarm.");
+                    }
 
-                    console.warn('state', this.getState());
+                    this.sessionConnectionParams = new SessionConnectionParams(
+                        this.connectionParams.printerURL, userSession.session, userSession.name);
+                    try {
+                        const socket = this.octoPrintClientService.getWebSocketClient(this.sessionConnectionParams, messageClb);
+                        if (!!socket.OPEN) {
+                            this.patchState({
+                                websocketConnected: true,
+                                websocketHealthy: true,
+                            })
+                        }
+                    } catch (e) {
+                        console.log('erreur', e);
+                    }
                 }, (error: AxiosError) => {
                     if (error.isAxiosError) {
                         if (!error?.response || error?.response.status === null || error?.response.status === undefined) {
@@ -88,15 +115,24 @@ export class ClientConnectionsState {
                         switch (status as HttpStatusCode) {
                             case HttpStatusCode.FORBIDDEN:
                                 this.patchState({
+                                    apiConnected: true,
                                     apiKeyAccepted: false
                                 });
                                 this.logger.error("This API key was not accepted by OctoPrint using these parameters:\n\t" + jsonParams);
                                 break;
-                            case HttpStatusCode.BAD_GATEWAY:
-                                this.logger.error("OctoPrint return BAD_GATEWAY. Make sure it is fully started and running.\n\t"
+                            case HttpStatusCode.BAD_GATEWAY || 0:
+                                this.patchState({
+                                    apiConnected: false,
+                                    apiKeyAccepted: null
+                                });
+                                this.logger.error("OctoPrint return BAD_GATEWAY or we didnt have network access. Make sure connections to OctoPrint are fine.\n\t"
                                     + jsonParams, error.stack);
                                 break;
                             case HttpStatusCode.NOT_FOUND || HttpStatusCode.BAD_REQUEST:
+                                this.patchState({
+                                    apiConnected: true,
+                                    apiKeyAccepted: null
+                                });
                                 this.logger.error("The OctoPrint API returned error (bad request or not found):\n\tCode:"
                                     + status, error.stack);
                                 break;

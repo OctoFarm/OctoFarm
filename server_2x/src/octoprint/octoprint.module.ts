@@ -1,16 +1,17 @@
-import {HttpModule, Module} from '@nestjs/common';
+import {HttpModule, Inject, Module} from '@nestjs/common';
 import {OctoPrintClientService} from './services/octoprint-client.service';
-import {OctoprintGateway} from './gateway/octoprint.gateway';
 
 import {ClientConnectionsState} from "./state/client-connections.state";
-import {ConnectionParams} from "./models/connection.params";
-import {TEST_PRINTER_KEY, TEST_PRINTER_URL} from "./octoprint.constants";
+import {ConfigModule, ConfigType} from "@nestjs/config";
+import {OctoPrintConfig} from "./octoprint.config";
 
 
 @Module({
-    imports: [HttpModule],
+    imports: [
+        HttpModule,
+        ConfigModule.forFeature(OctoPrintConfig),
+    ],
     providers: [
-        OctoprintGateway,
         OctoPrintClientService,
         ClientConnectionsState
     ],
@@ -21,24 +22,15 @@ import {TEST_PRINTER_KEY, TEST_PRINTER_URL} from "./octoprint.constants";
 export class OctoprintModule {
     constructor(
         private service: OctoPrintClientService,
-        private clientConnectionsState: ClientConnectionsState
+        private clientConnectionsState: ClientConnectionsState,
+        @Inject(OctoPrintConfig.KEY) private testPrinterConnectionParams: ConfigType<typeof OctoPrintConfig>,
     ) {
-
     }
 
     async onModuleInit() {
-        const testPrinterConnectionParams = this.getEnvTestPrinter();
-        if (!!testPrinterConnectionParams) {
-            await this.clientConnectionsState.initState(testPrinterConnectionParams);
+        if (!!this.testPrinterConnectionParams) {
+            await this.clientConnectionsState.initState(this.testPrinterConnectionParams);
             await this.clientConnectionsState.testClientConnection();
         }
-    }
-
-    private getEnvTestPrinter(): ConnectionParams {
-        const envTestPrinterURL = process.env[TEST_PRINTER_URL];
-        const envTestPrinterKey = process.env[TEST_PRINTER_KEY];
-        if (!!envTestPrinterURL && !!envTestPrinterKey) {
-            return new ConnectionParams(envTestPrinterURL, envTestPrinterKey);
-        } else return null;
     }
 }

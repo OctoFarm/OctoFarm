@@ -14,7 +14,6 @@ import {UsersService} from "../users/services/users.service";
 import {GroupEnum} from "../users/types/group.enum";
 import {AuthMvcController} from "./controllers/auth-mvc.controller";
 import {SettingsModule} from "../settings/settings.module";
-import {Timeout} from "@nestjs/schedule";
 
 @Module({
     providers: [

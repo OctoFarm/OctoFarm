@@ -5,9 +5,21 @@ import {ConnectionParams} from "../models/connection.params";
 import {map} from "rxjs/operators";
 import {AxiosRequestConfig} from "axios";
 import {OctoPrintCurrentUserDto} from "../dto/octoprint-currentuser.dto";
+import * as WebSocket from 'ws';
+import {OctoPrintSessionDto} from "../dto/octoprint-session.dto";
+import {SessionConnectionParams} from "../models/session-connection.params";
+import {ConnectionMessageDto} from "../dto/websocket/connection-message.dto";
+import {HistoryMessageDto} from "../dto/websocket/history-message.dto";
+import {TimelapseMessageDto} from "../dto/websocket/timelapse-message.dto";
+import {CurrentMessageDto} from "../dto/websocket/current-message.dto";
+import {EventMessageDto} from "../dto/websocket/event-message.dto";
+import {PluginMessageDto} from "../dto/websocket/plugin-message.dto";
+import {OctoprintGateway} from "../../../tools/octoprint-websocket-mock/gateway/octoprint.gateway";
 
 @Injectable()
 export class OctoPrintClientService {
+    private messageCount = 0;
+
     constructor(
         private httpService: HttpService
     ) {
@@ -25,6 +37,96 @@ export class OctoPrintClientService {
 
         const url = new URL('api/currentuser', params.printerURL).toString();
         return this.connectWithParams<OctoPrintCurrentUserDto>(params, "GET", url);
+    }
+
+    loginUserSession(params: ConnectionParams): Observable<OctoPrintSessionDto> {
+        this.checkConnectionParams(params);
+
+        const url = new URL('api/login?passive=true', params.printerURL).toString();
+        return this.connectWithParams<OctoPrintSessionDto>(params, "POST", url);
+    }
+
+    /**
+     * Get an OctoPrint WebSocket client instance
+     * @param {ConnectionParams} params - connection parameters
+     * @param proxyGateway
+     */
+    getWebSocketClient(params: SessionConnectionParams, proxyGateway?: OctoprintGateway) {
+        this.checkConnectionParams(params);
+
+        const constructedURL = new URL(params.printerURL);
+        const websocketURL = `ws://${constructedURL.host}/sockjs/websocket`;
+        const socket = new WebSocket(websocketURL, {followRedirects: false});
+        socket.onerror = (event: WebSocket.ErrorEvent) => {
+            console.log('ws error', event.message);
+        };
+        socket.onopen = (event) => {
+            socket.send(JSON.stringify({
+                auth: 'prusa:' + params.sessionKey
+            }), (result) => {
+                if (!!result) {
+                    console.log('authentication ws failed:', result);
+                }
+            });
+
+            socket.send(JSON.stringify({
+                throttle: 2
+            }), (result) => {
+                if (!!result) {
+                    console.log('throttle ws failed:', result);
+                }
+            });
+        };
+        socket.onclose = () => {
+            console.warn('socket closed');
+        }
+
+        socket.onmessage = async (event) => {
+            const jsonMessage = JSON.parse(event.data.toString()) as
+                ConnectionMessageDto
+                | HistoryMessageDto
+                | TimelapseMessageDto
+                | CurrentMessageDto
+                | EventMessageDto
+                | PluginMessageDto;
+            let analysedType = "";
+            if (jsonMessage.connected !== undefined) {
+                console.log('connection message. version:', jsonMessage.connected.version);
+                analysedType = "connected";
+            } else if (jsonMessage.history !== undefined) {
+                console.log('history message. completion:', jsonMessage.history.progress.completion);
+                analysedType = "history";
+            } else if (jsonMessage.timelapse !== undefined) {
+                console.log('timelapse message. timelapse:', jsonMessage.timelapse);
+                analysedType = "timelapse";
+            } else if (jsonMessage.current !== undefined) {
+                console.log('current message. servertime:', jsonMessage.current.serverTime);
+                analysedType = "current";
+            } else if (jsonMessage.event !== undefined) {
+                console.log('event message. type:', jsonMessage.event.type);
+                analysedType = "event";
+            } else if (jsonMessage.plugin !== undefined) {
+                console.log('plugin message. plugin:', jsonMessage.plugin.plugin);
+                analysedType = "plugin";
+            } else {
+                console.log('unknown message type');
+
+                // Used to generate dto's - keep
+                // const schemaDtoFile = path.join("./src/octoprint/dto/", "ws-model" + this.messageCount++ + ".ts");
+                // transform("wsMessageModel" + this.messageCount + "Dto", JSON.parse(event.data.toString()))
+                //     .then(transformation => {
+                //         fs.writeFileSync(schemaDtoFile, transformation);
+                //     });
+            }
+            if (!!proxyGateway?.handleBroadcastEvent) {
+                proxyGateway.handleBroadcastEvent({
+                    type: analysedType,
+                    payload: jsonMessage
+                });
+            }
+        };
+        // Listen for messages
+        return socket;
     }
 
     setCORSEnabled(params: ConnectionParams): Observable<OctoPrintSettingsDto> {
@@ -57,12 +159,15 @@ export class OctoPrintClientService {
         }
     }
 
-    private checkConnectionParams(connectionParams: ConnectionParams) {
+    private checkConnectionParams(connectionParams: ConnectionParams | SessionConnectionParams) {
         if (!connectionParams.printerURL) {
-            throw Error("Can't connect to printer without URL");
+            throw Error("Can't test your printer's API without URL");
         }
-        if (!connectionParams.printerKey) {
-            throw Error("Can't connect to printer without printer API Key");
+
+        const errors = connectionParams.validateParams();
+        if (errors.length > 0) {
+            throw Error("Can't reach your printer's API or WebSocket without proper connection parameters. "
+                + JSON.stringify(connectionParams));
         }
     }
 }

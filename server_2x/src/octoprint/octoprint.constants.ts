@@ -1,2 +1,0 @@
-export const TEST_PRINTER_URL = "TEST_PRINTER_URL";
-export const TEST_PRINTER_KEY = "TEST_PRINTER_KEY";

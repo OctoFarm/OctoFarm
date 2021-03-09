@@ -36,7 +36,7 @@ describe(ClientConnectionsState.name, () => {
         await service.initState(testParams);
         const clientConnectionState = service.getState();
         expect(clientConnectionState).toBeTruthy();
-        expect(clientConnectionState.websocketConnected).toEqual(null);
+        expect(clientConnectionState.websocketConnected).toEqual(undefined);
         expect(clientConnectionState.apiKeyValid).toEqual(true);
     });
 
