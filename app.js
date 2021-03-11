@@ -43,7 +43,7 @@ app.use(express.json());
 app.use(expressLayouts);
 app.set("view engine", "ejs");
 
-// Bodyparser
+// Cookie parsing and URL decoding
 app.use(cookieParser());
 app.use(express.urlencoded({extended: false}));
 
