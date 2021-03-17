@@ -5,7 +5,7 @@ dateFormat = () => {
 };
 
 class LoggerService {
-  constructor(route) {
+  constructor(route, enableFileLogs = true) {
     this.log_data = null;
     this.route = route;
     const logger = winston.createLogger({
@@ -13,11 +13,15 @@ class LoggerService {
         new winston.transports.Console({
           level: 'warn'
         }),
-        new winston.transports.File({
-          filename: `./logs/${route}.log`,
-          maxsize: "5000000",
-          maxFiles: 5,
-        }),
+        ...(
+          enableFileLogs ?
+            [new winston.transports.File({
+              filename: `./logs/${route}.log`,
+              maxsize: "5000000",
+              maxFiles: 5,
+            })]
+            : []
+        ),
       ],
       format: winston.format.printf((info) => {
         let message = `${dateFormat()} | ${info.level.toUpperCase()} | ${route}.log | ${
@@ -34,9 +38,11 @@ class LoggerService {
     });
     this.logger = logger;
   }
+
   setLogData(log_data) {
     this.log_data = log_data;
   }
+
   // async info(message) {
   //   this.logger.log("info", message);
   // }
@@ -45,6 +51,7 @@ class LoggerService {
       obj,
     });
   }
+
   // async debug(message) {
   //   this.logger.log("debug", message);
   // }
@@ -53,6 +60,7 @@ class LoggerService {
       obj,
     });
   }
+
   // async error(message) {
   //   this.logger.log("error", message);
   // }

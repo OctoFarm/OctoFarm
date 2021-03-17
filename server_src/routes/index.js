@@ -32,8 +32,10 @@ const { FileClean } = fileClean;
 
 const { getSorting, getFilter } = require("../lib/sorting.js");
 
+const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
+
 const version = process.env.OCTOFARM_VERSION;
-console.log(`Version: ${version}`);
+console.log(`Version: ${version} (server started)`);
 
 // Welcome Page
 async function welcome() {
@@ -490,4 +492,11 @@ router.get("/system", ensureAuthenticated, async (req, res) => {
     dashboardSettings: dashboardSettings,
   });
 });
+
+softwareUpdateChecker
+  .syncLatestOctoFarmRelease(false || process.env.OCTOFARM_PRERELEASE)
+  .then(() => {
+    softwareUpdateChecker.checkReleaseAndLogUpdate();
+  });
+
 module.exports = router;
