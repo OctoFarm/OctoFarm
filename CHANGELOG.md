@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.1.13]
+
+### Added
+    - Fixed #358: Spool Manager not allowing input of decimal places
+### Changed
+
+### Fixed
+
+
+
 # [Released]
 
 ## [v1.1.12]
