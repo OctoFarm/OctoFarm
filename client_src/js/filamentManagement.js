@@ -347,7 +347,7 @@ async function addSpool(
 
                        </select>
                    </td>
-                  <td><input class="form-control" type="text" placeholder="${
+                  <td><input class="form-control" type="text" step="0.01" placeholder="${
                     post.spools.price
                   }"></td>
                   <td><input class="form-control" type="text" placeholder="${
