@@ -1,6 +1,10 @@
 import "@babel/polyfill";
+import UI from "./lib/functions/ui";
+
 let interval = false;
 let timer = false;
+const notificationMarkReadSessionKey = "octofarm-updatemsg-read";
+let pageReloadPersistedRead = false;
 
 const drawModal = async function () {
   $("#lostServerConnection").modal("show");
@@ -18,6 +22,55 @@ const reloadWindow = async function () {
   }
 };
 
+function checkUpdateAndNotify(updateResponse) {
+  if (!!updateResponse?.update_available && !pageReloadPersistedRead) {
+    // Show the notification once per page load
+    pageReloadPersistedRead = true;
+    // Disregard notification if it it's version is already stored
+    let parsedStorageReleaseInfo;
+    try {
+      parsedStorageReleaseInfo = JSON.parse(localStorage.getItem(notificationMarkReadSessionKey));
+    } catch (e) {
+      parsedStorageReleaseInfo = null;
+    }
+
+    // Process the full notification or a shorter reminder
+    if (!parsedStorageReleaseInfo || parsedStorageReleaseInfo?.tag_name !== updateResponse?.latestReleaseKnown?.tag_name) {
+      var n = new Noty({
+        type: "success",
+        theme: "bootstrap-v4",
+        layout: "bottomRight",
+        text: updateResponse?.message,
+        buttons: [
+          Noty.button(
+            "UPDATE",
+            "btn btn-success disabled",
+            function () {
+              // sessionStorage.setItem(notificationMarkReadSessionKey, alive.update.latestReleaseKnown);
+              // console.log("button 1 clicked");
+            },
+            {id: "button1", "data-status": "ok"}
+          ),
+          Noty.button("Mark read", "btn btn-error", function () {
+            // Update the stored version to become the newest
+            localStorage.setItem(notificationMarkReadSessionKey, JSON.stringify(updateResponse.latestReleaseKnown));
+            n.close();
+          }),
+          Noty.button("Later", "btn btn-error", function () {
+            n.close();
+          }),
+        ],
+      });
+      n.show();
+    } else {
+      UI.createAlert("success",
+        `A small reminder: OctoFarm update available from ${updateResponse.current_version} to ${updateResponse?.latestReleaseKnown?.tag_name} ;)`,
+        1000,
+        "clicked");
+    }
+  }
+}
+
 const serverAliveCheck = async function () {
   if (!interval) {
     interval = setInterval(async () => {
@@ -26,6 +79,14 @@ const serverAliveCheck = async function () {
         let alive = await fetch("/serverChecks/amialive");
         if (alive.status !== 200) throw "No Server Connection";
         alive = await alive.json();
+        if (alive?.update) {
+          try {
+            checkUpdateAndNotify(alive.update);
+          } catch (e) {
+            console.warn("Could not succesfully parse OctoFarm update notification");
+          }
+        }
+
         if (modal.classList.contains("show")) {
           //Connection recovered, re-load printer page
           const spinner = document.getElementById("lostConnectionSpinner");
