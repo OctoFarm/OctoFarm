@@ -1,7 +1,3 @@
-//APP Version
-const pjson = require("./package.json");
-process.env.OCTOFARM_VERSION = `${pjson.version}`;
-
 //Requires
 const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
@@ -16,11 +12,23 @@ const Logger = require("./server_src/lib/logger.js");
 const logger = new Logger("OctoFarm-Server");
 const printerClean = require("./server_src/lib/dataFunctions/printerClean.js");
 
-const { databaseSetup } = require("./server_src/lib/influxExport.js");
+const {databaseSetup} = require("./server_src/lib/influxExport.js");
 
-const { PrinterClean } = printerClean;
+const {PrinterClean} = printerClean;
 
 const autoDiscovery = require("./server_src/runners/autoDiscovery.js");
+
+const envUtils = require("./server_src/utils/env.utils")
+const result = envUtils.verifyPackageJsonRequirements(
+  __dirname
+);
+if (!result) {
+  if (envUtils.isPm2()) {
+    console.warn("Removing PM2 service");
+    execSync("pm2 delete OctoFarm");
+  }
+  throw new Error("Aborting OctoFarm server.");
+}
 
 // Server Port
 const app = express();
@@ -45,7 +53,7 @@ app.set("view engine", "ejs");
 
 // Cookie parsing and URL decoding
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({extended: false}));
 
 // Express Session Middleware
 
@@ -77,7 +85,7 @@ app.use((req, res, next) => {
 
 const setupServerSettings = async () => {
   const serverSettings = require("./server_src/settings/serverSettings.js");
-  const { ServerSettings } = serverSettings;
+  const {ServerSettings} = serverSettings;
   await logger.info("Checking Server Settings...");
   const ss = await ServerSettings.init();
   // Setup Settings
@@ -94,19 +102,19 @@ const serverStart = async () => {
     // Find server Settings
     const settings = await ServerSettingsDB.find({});
     const clientSettings = require("./server_src/settings/clientSettings.js");
-    const { ClientSettings } = clientSettings;
+    const {ClientSettings} = clientSettings;
     await logger.info("Checking Client Settings...");
     const cs = await ClientSettings.init();
     await logger.info(cs);
     const runner = require("./server_src/runners/state.js");
-    const { Runner } = runner;
+    const {Runner} = runner;
     const rn = await Runner.init();
 
     await logger.info("Printer Runner has been initialised...", rn);
     const PORT = process.env.PORT || settings[0].server.port;
     await logger.info("Starting System Information Runner...");
     const system = require("./server_src/runners/systemInfo.js");
-    const { SystemRunner } = system;
+    const {SystemRunner} = system;
     const sr = await SystemRunner.init();
     await logger.info(sr);
 
@@ -124,64 +132,64 @@ const serverStart = async () => {
   }
 
   // Routes
-  app.use(express.static(`${__dirname}/views`));
-  app.use("/images", express.static(`${__dirname}/images`));
+  app.use(express.static(`./views`));
+  app.use("/images", express.static(`./images`));
   if (dbConnectionString === "") {
-    app.use("/", require("./server_src/routes/index", { page: "route" }));
+    app.use("/", require("./server_src/routes/index", {page: "route"}));
   } else {
     try {
-      app.use("/", require("./server_src/routes/index", { page: "route" }));
+      app.use("/", require("./server_src/routes/index", {page: "route"}));
       app.use(
         "/serverChecks",
-        require("./server_src/routes/serverChecks", { page: "route" })
+        require("./server_src/routes/serverChecks", {page: "route"})
       );
       app.use(
         "/users",
-        require("./server_src/routes/users", { page: "route" })
+        require("./server_src/routes/users", {page: "route"})
       );
       app.use(
         "/printers",
-        require("./server_src/routes/printers", { page: "route" })
+        require("./server_src/routes/printers", {page: "route"})
       );
       app.use(
         "/groups",
-        require("./server_src/routes/printerGroups", { page: "route" })
+        require("./server_src/routes/printerGroups", {page: "route"})
       );
       app.use(
         "/settings",
-        require("./server_src/routes/settings", { page: "route" })
+        require("./server_src/routes/settings", {page: "route"})
       );
       app.use(
         "/printersInfo",
-        require("./server_src/routes/SSE-printersInfo", { page: "route" })
+        require("./server_src/routes/SSE-printersInfo", {page: "route"})
       );
       app.use(
         "/dashboardInfo",
-        require("./server_src/routes/SSE-dashboard", { page: "route" })
+        require("./server_src/routes/SSE-dashboard", {page: "route"})
       );
       app.use(
         "/monitoringInfo",
-        require("./server_src/routes/SSE-monitoring", { page: "route" })
+        require("./server_src/routes/SSE-monitoring", {page: "route"})
       );
       app.use(
         "/filament",
-        require("./server_src/routes/filament", { page: "route" })
+        require("./server_src/routes/filament", {page: "route"})
       );
       app.use(
         "/history",
-        require("./server_src/routes/history", { page: "route" })
+        require("./server_src/routes/history", {page: "route"})
       );
       app.use(
         "/scripts",
-        require("./server_src/routes/scripts", { page: "route" })
+        require("./server_src/routes/scripts", {page: "route"})
       );
       app.use(
         "/input",
-        require("./server_src/routes/externalDataCollection", { page: "route" })
+        require("./server_src/routes/externalDataCollection", {page: "route"})
       );
       app.use(
         "/client",
-        require("./server_src/routes/sorting", { page: "route" })
+        require("./server_src/routes/sorting", {page: "route"})
       );
     } catch (e) {
       await logger.error(e);
@@ -223,6 +231,6 @@ const databaseIssue = async () => {
       process.send("ready");
     }
   });
-  app.use(express.static(`${__dirname}/views`));
-  app.use("/", require("./server_src/routes/databaseIssue", { page: "route" }));
+  app.use(express.static(`./views`));
+  app.use("/", require("./server_src/routes/databaseIssue", {page: "route"}));
 };

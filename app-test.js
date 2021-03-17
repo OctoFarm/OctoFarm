@@ -1,7 +1,3 @@
-//APP Version
-const pjson = require("./package.json");
-process.env.OCTOFARM_VERSION = `${pjson.version}`;
-
 //Requires
 const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
@@ -120,8 +116,8 @@ const serverStart = async () => {
   }
 
   // Routes
-  app.use(express.static(`${__dirname}/views`));
-  app.use("/images", express.static(`${__dirname}/images`));
+  app.use(express.static(`./views`));
+  app.use("/images", express.static(`./images`));
   try {
     app.use("/", require("./server_src/routes/index", {page: "route"}));
     app.use(
