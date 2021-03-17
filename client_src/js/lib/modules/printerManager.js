@@ -1707,7 +1707,7 @@ export default class PrinterManager {
       elements.terminal.input.value = "";
 
       const flashReturn = function () {
-        elements.terminal.sendBtn = "btn btn-secondary";
+        elements.terminal.sendBtn.classList = "btn btn-secondary";
       };
       const opt = {
         commands: [input],
