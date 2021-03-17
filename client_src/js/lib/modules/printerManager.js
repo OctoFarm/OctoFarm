@@ -1710,7 +1710,7 @@ export default class PrinterManager {
         elements.terminal.sendBtn.classList = "btn btn-secondary";
       };
       const opt = {
-        commands: [input],
+        commands: input,
       };
 
       const post = await OctoPrintClient.post(
