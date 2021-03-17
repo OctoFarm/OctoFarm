@@ -1712,7 +1712,7 @@ export default class PrinterManager {
       const opt = {
         commands: input,
       };
-
+      console.log(opt)
       const post = await OctoPrintClient.post(
         currentPrinter,
         "printer/command",
