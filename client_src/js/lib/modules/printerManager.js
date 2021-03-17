@@ -1719,10 +1719,10 @@ export default class PrinterManager {
         opt
       );
       if (post.status === 204) {
-        elements.terminal.sendBtn = "btn btn-success";
+        elements.terminal.sendBtn.classList = "btn btn-success";
         setTimeout(flashReturn, 500);
       } else {
-        elements.terminal.sendBtn = "btn btn-danger";
+        elements.terminal.sendBtn.classList = "btn btn-danger";
         setTimeout(flashReturn, 500);
       }
     };
