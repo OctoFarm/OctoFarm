@@ -356,10 +356,10 @@ async function addSpool(
                   <td class="${displayNone}"><input class="form-control" type="text" placeholder="${
         post.spools.used
       }"></td>
-                              <td class="grams ${displayNone}">${(
+                  <td class="grams ${displayNone}">${(
         post.spools.weight - post.spools.used
       ).toFixed(0)}</td>
-                              <td class="percent ${displayNone}">${(
+                  <td class="percent ${displayNone}">${(
         100 -
         (post.spools.used / post.spools.weight) * 100
       ).toFixed(0)}</td>
