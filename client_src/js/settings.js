@@ -54,6 +54,9 @@ document.getElementById("nukeUsers").addEventListener("click", (e) => {
 document.getElementById("restartOctoFarmBtn").addEventListener("click", (e) => {
   ServerSettings.serviceRestart();
 });
+document.getElementById("updateOctoFarmBtn").addEventListener("click", (e) => {
+  ServerSettings.updateOctoFarm();
+});
 
 document.getElementById("exportAlerts").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
@@ -876,6 +879,66 @@ class ServerSettings {
     setTimeout(() => {
       if (systemRestartBtn) {
         systemRestartBtn.disabled = false;
+      }
+    }, 5000);
+  }
+  static async updateOctoFarm() {
+    let updateOctoFarmBtn = document.getElementById("updateOctoFarmBtn");
+    // Make sure the system button is disabled whilst the restart is happening.
+    if (updateOctoFarmBtn) {
+      updateOctoFarmBtn.disabled = true;
+    }
+
+    let updateOctoFarm = await OctoFarmclient.get("settings/server/update");
+    //Make sure response from server is received, and make sure the status is 200
+    if (updateOctoFarm && updateOctoFarm.status !== 200) {
+      // This alert is pretty mute as the serverAliveCheck will notify before...
+      UI.createAlert(
+        "error",
+        "Server could not be contacted... is it online?",
+        3000
+      );
+      setTimeout(() => {
+        if (updateOctoFarmBtn) {
+          updateOctoFarmBtn.disabled = false;
+        }
+      }, 5000);
+      return;
+    }
+    updateOctoFarm = await updateOctoFarm.json();
+    if (
+      !!updateOctoFarm?.haveWeSuccessfullyUpdatedOctoFarm ||
+      !updateOctoFarm?.messageForUser ||
+      !updateOctoFarm?.statusTypeForUser
+    ) {
+      UI.createAlert(
+        "error",
+        "Something went wrong on the server side, please check your logs.",
+        0,
+        "clicked"
+      );
+      setTimeout(() => {
+        if (updateOctoFarmBtn) {
+          updateOctoFarmBtn.disabled = false;
+        }
+      }, 5000);
+      return;
+    }
+
+    UI.createAlert(
+      `${updateOctoFarm.statusTypeForUser}`,
+      `${updateOctoFarm.messageForUser}`,
+      3000,
+      "clicked"
+    );
+
+    if (updateOctoFarm?.haveWeSuccessfullyUpdatedOctoFarm){
+      this.serviceRestart();
+    }
+
+    setTimeout(() => {
+      if (updateOctoFarmBtn) {
+        updateOctoFarmBtn.disabled = false;
       }
     }, 5000);
   }
