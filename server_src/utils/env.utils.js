@@ -18,10 +18,6 @@ function verifyPackageJsonRequirements(directoryPath) {
   const hasPackageJson = dirConts.includes("package.json");
   if (!hasPackageJson) {
     console.error(`FAILURE. Could not find 'package.json' in root folder ${directoryPath}`);
-    if (isPm2()) {
-      console.warn("Removing PM2 service");
-      execSync("pm2 delete OctoFarm");
-    }
     return false;
   } else {
     console.info("✓ found 'package.json'");

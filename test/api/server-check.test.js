@@ -2,6 +2,8 @@ const dbHandler = require("../db-handler");
 const request = require("supertest");
 const {setupTestApp, getServer} = require("../../app-test");
 const isDocker = require("is-docker");
+const envUtils = require("../../server_src/utils/env.utils");
+const path = require('path');
 
 let app = null;
 /**
@@ -103,5 +105,13 @@ describe("AmIAlive Endpoint", () => {
     expect(res.body.update.update_available).toEqual(false);
 
     delete process.env.test_airgapped;
+  });
+});
+
+describe("Env util package.json check", () => {
+  it('should pass validation', () => {
+    expect(() => envUtils.verifyPackageJsonRequirements('./')).toThrow();
+
+    expect(envUtils.verifyPackageJsonRequirements(path.join(__dirname, "mock-data"))).toEqual(true);
   });
 });
