@@ -5,13 +5,13 @@ All notable changes to this project will be documented in this file.
 ## [v1.1.13]
 
 ### Added
-    - Fixed #358: Spool Manager not allowing input of decimal places
+
 ### Changed
 
 ### Fixed
-
-
-
+    - Fixed #240: Commands sent from the Printer Control Terminal would double wrap array.
+    - Fixed #358: Spool Manager not allowing input of decimal places
+    
 # [Released]
 
 ## [v1.1.12]
