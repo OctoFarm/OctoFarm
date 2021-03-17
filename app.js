@@ -1,7 +1,3 @@
-//APP Version
-const pjson = require("./package.json");
-process.env.OCTOFARM_VERSION = `${pjson.version}`;
-
 //Requires
 const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
@@ -21,6 +17,13 @@ const { databaseSetup } = require("./server_src/lib/influxExport.js");
 const { PrinterClean } = printerClean;
 
 const autoDiscovery = require("./server_src/runners/autoDiscovery.js");
+
+const result = require("./server_src/utils/env.utils").verifyPackageJsonRequirements(
+  __dirname
+);
+if (!result) {
+  throw new Error("Aborting OctoFarm server.");
+}
 
 // Server Port
 const app = express();

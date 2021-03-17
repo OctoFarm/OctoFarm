@@ -1,7 +1,3 @@
-//APP Version
-const pjson = require("./package.json");
-process.env.OCTOFARM_VERSION = `${pjson.version}`;
-
 //Requires
 const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
