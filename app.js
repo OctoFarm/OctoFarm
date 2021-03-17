@@ -29,6 +29,7 @@ if (!result) {
   }
   throw new Error("Aborting OctoFarm server.");
 }
+envUtils.ensureBackgroundImageExists(__dirname);
 
 // Server Port
 const app = express();
