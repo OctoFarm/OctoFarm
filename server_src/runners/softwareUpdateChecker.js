@@ -30,7 +30,7 @@ async function syncLatestOctoFarmRelease(includePrereleases = false) {
               (r.prerelease === false || includePrereleases)
           );
           // Whether the package version exists at all - developer at work if not!
-          installedReleaseFound = githubReleases.find((r) => r.tag_name === process.env.npm_package_version);
+          installedReleaseFound = !!githubReleases.find((r) => r.tag_name === process.env.npm_package_version);
           if (!!latestRelease && !!latestRelease.tag_name) {
             delete latestRelease.body;
             delete latestRelease.author;

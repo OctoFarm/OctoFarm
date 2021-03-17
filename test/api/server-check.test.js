@@ -41,9 +41,9 @@ const softwareUpdateChecker = require("../../server_src/runners/softwareUpdateCh
 
 describe("AmIAlive Endpoint", () => {
   it("should return ok and no update", async () => {
-    app = await getOrCreateApp();
     process.env.npm_package_version = require("../../package.json").version;
     process.env.testlatest_package_version = require("../../package.json").version;
+    app = await getOrCreateApp();
     await softwareUpdateChecker.syncLatestOctoFarmRelease();
 
     const res = await request(app).get("/serverchecks/amialive").send();
@@ -52,6 +52,7 @@ describe("AmIAlive Endpoint", () => {
     expect(res.body.isDockerContainer).toEqual(isDocker());
     expect(res.body.isPm2).toEqual(false);
     expect(res.body).toHaveProperty("update");
+    expect(res.body.update.installed_release_found).toEqual(true);
     expect(res.body.update.update_available).toEqual(false);
   }, 15000);
 
@@ -70,8 +71,8 @@ describe("AmIAlive Endpoint", () => {
     expect(res.body).toHaveProperty("update");
     expect(res.body.isDockerContainer).toEqual(isDocker());
     expect(res.body.isPm2).toEqual(false);
-    expect(res.body.update.update_available).toEqual(true);
-    expect(res.body.update.latestReleaseKnown.tag_name).toEqual(process.env.testlatest_package_version);
+    expect(res.body.update.update_available).toEqual(false);
+    expect(res.body.update.installed_release_found).toEqual(false);
   }, 15000);
 
   it("should tolerate undefined package version", async () => {
@@ -85,8 +86,8 @@ describe("AmIAlive Endpoint", () => {
     const res = await request(app).get("/serverchecks/amialive").send();
 
     // Assert response
-    expect(res.body.update.update_available).toEqual(true);
-    expect(res.body.update.latestReleaseKnown.tag_name).toEqual(process.env.testlatest_package_version);
+    expect(res.body.update.installed_release_found).toEqual(false);
+    expect(res.body.update.update_available).toEqual(false);
   }, 15000);
 
   it('should tolerate being air-gapped silently', async () => {
