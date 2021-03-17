@@ -1,9 +1,14 @@
 const fs = require("fs");
+const path = require("path");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 const Logger = require("../lib/logger.js");
 const logger = new Logger("OctoFarm-Scripts");
-var wol = require("wake_on_lan");
+const wol = require("wake_on_lan");
+
+function isGitSync(dir) {
+  return fs.existsSync(path.join(dir, ".git"));
+}
 
 class SystemCommands {
   static async rebootOctoFarm() {
@@ -24,6 +29,45 @@ class SystemCommands {
       logger.error(err);
     }
     return checkForNamedService;
+  }
+  // This will need changing when .deb / installation script becomes a thing. It's built to deal with the current implementation.
+  static async updateOctoFarm() {
+    logger.info("Update OctoFarm server requests");
+    let haveWeSuccessfullyUpdatedOctoFarm = false;
+    let statusTypeForUser = null;
+    let messageForUser = null;
+    try {
+      // Check to see if current dir contains a git folder... hard fail otherwise.
+      let doWeHaveAGitFolder = await isGitSync("./");
+      if (!doWeHaveAGitFolder) {
+        let notGitRepoError = "Not a git repository, manual update required...";
+        messageForUser = notGitRepoError;
+        statusTypeForUser = "error";
+        throw notGitRepoError;
+      }
+      logger.info("Root location contain a git folder: ", doWeHaveAGitFolder);
+
+      // We are inside a folder which was created with git... okay to continue the pull
+      const { stdout, stderr } = await exec("git pull");
+      if (stdout.includes("Already up-to-date")) {
+        let alreadyUpToDateError =
+          "Already up to date! Ignoring update request...";
+        statusTypeForUser = "warning";
+        messageForUser = alreadyUpToDateError;
+        throw alreadyUpToDateError;
+      }
+      if (stderr) {
+        throw "No process number returned";
+      }
+      haveWeSuccessfullyUpdatedOctoFarm = true;
+    } catch (err) {
+      logger.error(err);
+    }
+    return {
+      haveWeSuccessfullyUpdatedOctoFarm,
+      statusTypeForUser,
+      messageForUser,
+    };
   }
 }
 
