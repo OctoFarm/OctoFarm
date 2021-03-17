@@ -34,7 +34,7 @@ const { getSorting, getFilter } = require("../lib/sorting.js");
 
 const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
 
-const version = process.env.OCTOFARM_VERSION;
+const version = process.env.npm_package_version;
 console.log(`Version: ${version} (server started)`);
 
 // Welcome Page

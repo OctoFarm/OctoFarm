@@ -2,6 +2,8 @@ const dbHandler = require("../db-handler");
 const request = require("supertest");
 const {setupTestApp, getServer} = require("../../app-test");
 const isDocker = require("is-docker");
+const envUtils = require("../../server_src/utils/env.utils");
+const path = require('path');
 
 let app = null;
 /**
@@ -41,9 +43,9 @@ const softwareUpdateChecker = require("../../server_src/runners/softwareUpdateCh
 
 describe("AmIAlive Endpoint", () => {
   it("should return ok and no update", async () => {
-    app = await getOrCreateApp();
     process.env.npm_package_version = require("../../package.json").version;
     process.env.testlatest_package_version = require("../../package.json").version;
+    app = await getOrCreateApp();
     await softwareUpdateChecker.syncLatestOctoFarmRelease();
 
     const res = await request(app).get("/serverchecks/amialive").send();
@@ -52,6 +54,7 @@ describe("AmIAlive Endpoint", () => {
     expect(res.body.isDockerContainer).toEqual(isDocker());
     expect(res.body.isPm2).toEqual(false);
     expect(res.body).toHaveProperty("update");
+    expect(res.body.update.installed_release_found).toEqual(true);
     expect(res.body.update.update_available).toEqual(false);
   }, 15000);
 
@@ -70,8 +73,8 @@ describe("AmIAlive Endpoint", () => {
     expect(res.body).toHaveProperty("update");
     expect(res.body.isDockerContainer).toEqual(isDocker());
     expect(res.body.isPm2).toEqual(false);
-    expect(res.body.update.update_available).toEqual(true);
-    expect(res.body.update.latestReleaseKnown.tag_name).toEqual(process.env.testlatest_package_version);
+    expect(res.body.update.update_available).toEqual(false);
+    expect(res.body.update.installed_release_found).toEqual(false);
   }, 15000);
 
   it("should tolerate undefined package version", async () => {
@@ -85,8 +88,8 @@ describe("AmIAlive Endpoint", () => {
     const res = await request(app).get("/serverchecks/amialive").send();
 
     // Assert response
-    expect(res.body.update.update_available).toEqual(true);
-    expect(res.body.update.latestReleaseKnown.tag_name).toEqual(process.env.testlatest_package_version);
+    expect(res.body.update.installed_release_found).toEqual(false);
+    expect(res.body.update.update_available).toEqual(false);
   }, 15000);
 
   it('should tolerate being air-gapped silently', async () => {
@@ -102,5 +105,25 @@ describe("AmIAlive Endpoint", () => {
     expect(res.body.update.update_available).toEqual(false);
 
     delete process.env.test_airgapped;
+  });
+});
+
+describe("Dashboard rendering", () => {
+  it('should show login page by redirect', async () => {
+    app = await getOrCreateApp();
+    const res = await request(app).get("/dashboard")
+      .send() // We should be redirected to login by default
+      .expect(302)
+      .then(response => {
+        expect(response.text).toEqual("Found. Redirecting to /users/login");
+      });
+  });
+});
+
+describe("Env util package.json check", () => {
+  it('should pass validation', () => {
+    expect(() => envUtils.verifyPackageJsonRequirements('./')).toThrow();
+
+    expect(envUtils.verifyPackageJsonRequirements(path.join(__dirname, "mock-data"))).toEqual(true);
   });
 });
