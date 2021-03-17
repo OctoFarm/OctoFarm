@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [v1.1.13]
 
 ### Added
-
+    - Added #361: OctoFarm release check and notification sets ground work for automatic updates. 
 ### Changed
 
 ### Fixed
