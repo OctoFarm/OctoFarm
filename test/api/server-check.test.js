@@ -108,6 +108,18 @@ describe("AmIAlive Endpoint", () => {
   });
 });
 
+describe("Dashboard rendering", () => {
+  it('should show login page by redirect', async () => {
+    app = await getOrCreateApp();
+    const res = await request(app).get("/dashboard")
+      .send() // We should be redirected to login by default
+      .expect(302)
+      .then(response => {
+        expect(response.text).toEqual("Found. Redirecting to /users/login");
+      });
+  });
+});
+
 describe("Env util package.json check", () => {
   it('should pass validation', () => {
     expect(() => envUtils.verifyPackageJsonRequirements('./')).toThrow();
