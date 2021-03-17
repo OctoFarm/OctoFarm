@@ -19,7 +19,7 @@ const {PrinterClean} = printerClean;
 const autoDiscovery = require("./server_src/runners/autoDiscovery.js");
 
 const envUtils = require("./server_src/utils/env.utils")
-envUtils.verifyPackageJsonRequirements(
+const result = envUtils.verifyPackageJsonRequirements(
   __dirname
 );
 if (!result) {
