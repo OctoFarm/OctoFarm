@@ -123,6 +123,10 @@ router.get("/server/restart", ensureAuthenticated, async (req, res) => {
   let serviceRestarted = await SystemCommands.rebootOctoFarm();
   res.send(serviceRestarted);
 });
+router.get("/server/update", ensureAuthenticated, async (req, res) => {
+  let octoFarmUpdated = await SystemCommands.updateOctoFarm();
+  res.send(octoFarmUpdated);
+});
 router.get("/client/get", ensureAuthenticated, (req, res) => {
   ClientSettingsDB.find({}).then((checked) => {
     res.send(checked[0]);
