@@ -8,6 +8,7 @@ let lastReleaseCheckFailed = null;
 let lastReleaseCheckError = null;
 let airGapped = null;
 let loadedWithPrereleases = null;
+let installedReleaseFound = null;
 let notificationReady = false;
 
 /**
@@ -28,7 +29,8 @@ async function syncLatestOctoFarmRelease(includePrereleases = false) {
               r.draft === false &&
               (r.prerelease === false || includePrereleases)
           );
-
+          // Whether the package version exists at all - developer at work if not!
+          installedReleaseFound = !!githubReleases.find((r) => r.tag_name === process.env.npm_package_version);
           if (!!latestRelease && !!latestRelease.tag_name) {
             delete latestRelease.body;
             delete latestRelease.author;
@@ -37,7 +39,7 @@ async function syncLatestOctoFarmRelease(includePrereleases = false) {
             lastReleaseCheckFailed = false;
             latestReleaseKnown = latestRelease;
             notificationReady =
-              latestRelease.tag_name !== process.env.npm_package_version;
+              latestRelease.tag_name !== process.env.npm_package_version && !!installedReleaseFound;
           } else if (!latestRelease.tag_name) {
             // Falsy tag_name is very unlikely - probably tests only
             lastReleaseCheckFailed = false;
@@ -80,6 +82,7 @@ function getUpdateNotificationIfAny() {
     const latestReleaseCheckState = getLastReleaseSyncState();
     return {
       update_available: true,
+      installed_release_found: installedReleaseFound,
       message:
         "You can update OctoFarm to the latest version available: " +
         latestReleaseCheckState.latestReleaseKnown.tag_name,
@@ -89,6 +92,7 @@ function getUpdateNotificationIfAny() {
   } else {
     return {
       update_available: false,
+      installed_release_found: installedReleaseFound,
       air_gapped: airGapped,
       current_version: process.env.npm_package_version
     };
@@ -112,6 +116,16 @@ function checkReleaseAndLogUpdate() {
   }
 
   const latestReleaseTag = latestRelease.tag_name;
+  if (!installedReleaseFound) {
+    console.warn(
+      `\x1b[36mAre you a god? A new release ey? Bloody terrific mate!\x1b[0m
+    Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
+    Here's your release tag: \x1b[32m${process.env.npm_package_version}\x1b[0m
+    Appreciate the hard work, you rock!`
+    );
+    return;
+  }
+
   if (
     !!process.env.npm_package_version &&
     process.env.npm_package_version !== latestReleaseTag

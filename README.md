@@ -54,7 +54,6 @@
 OctoFarm was built to fill a need that anyone with multiple 3D printers with Octoprint will have run into. How do I manage multiple printers from one place? That's where OctoFarm steps in, add your OctoPrint instances to the system and it will scan and keep you up to date on the status of your printers.
 ![Dashboard View](https://github.com/NotExpectedYet/OctoFarm/blob/master/screenshots/dashboard.png)
 
-
 <!-- GETTING STARTED -->
 
 ## Getting Started
@@ -199,4 +198,4 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
 [license-url]: https://github.com/NotExpectedYet/OctoFarm/blob/master/LICENSE.txt
 [linkedin-shield]: https://img.shields.io/badge/-LinkedIn-black.svg?style=flat-square&logo=linkedin&colorB=555
 [linkedin-url]: https://www.linkedin.com/in/james-mackay-b1bbb3124/
-[product-screenshot]: images/screenshot.png
+[product-screenshot]: screenshots/dashboard.png
