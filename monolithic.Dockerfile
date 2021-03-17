@@ -19,7 +19,7 @@ WORKDIR /app
 RUN npm install --only=production
 RUN npm install -g pm2
 
-EXPOSE 4000/udp
+EXPOSE 4000
 
 COPY docker/monolithic-entrypoint.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
