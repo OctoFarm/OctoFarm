@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
     - Added #361: OctoFarm release check and notification sets ground work for automatic updates. 
+    - Added #351: Background image now ignored and copied from default if not present at start.
 ### Changed
 
 ### Fixed
