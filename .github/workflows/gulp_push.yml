@@ -1,4 +1,4 @@
-name: Gulp build and commit updated stylesheets
+name: Gulp build and commit updated assets
 
 on: [push]
 
@@ -17,4 +17,4 @@ jobs:
       - name: Commit changes
         uses: elstudio/actions-js-build/commit@v4
         with:
-          commitMessage: Regenerate assets for views
+          commitMessage: Regenerate gulp assets
