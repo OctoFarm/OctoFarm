@@ -50,7 +50,8 @@ class SystemCommands {
       const { stdout, stderr } = await exec("git pull");
       // Throw on any error, nobody should be editing their local github folder after this release is made. If they do, they need to manually update.
       if (stderr) {
-        let manualChangesError = "Manual changes to local OctoFarm folder detected, manual update required...";
+        let manualChangesError =
+          "Manual changes to local OctoFarm folder detected, manual update required...";
         messageForUser = manualChangesError;
         statusTypeForUser = "error";
         throw stderr;
