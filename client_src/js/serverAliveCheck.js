@@ -34,11 +34,11 @@ function checkUpdateAndNotify(updateResponse) {
       parsedStorageReleaseInfo = null;
     }
     // If the update button is available, we are on the system page. React to available updates accordingly.
-    let forceCheckForUpdatesBtn = document.getElementById(
-        "checkUpdatesForOctoFarmBtn"
+    let updateOctoFarmBtn = document.getElementById(
+        "updateOctoFarmBtn"
     );
-    if (forceCheckForUpdatesBtn) {
-      forceCheckForUpdatesBtn.disabled = false;
+    if (updateOctoFarmBtn) {
+      updateOctoFarmBtn.disabled = false;
     }
     // Process the full notification or a shorter reminder
     if (!parsedStorageReleaseInfo || parsedStorageReleaseInfo?.tag_name !== updateResponse?.latestReleaseKnown?.tag_name) {
