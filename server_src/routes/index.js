@@ -33,6 +33,8 @@ const { FileClean } = fileClean;
 const { getSorting, getFilter } = require("../lib/sorting.js");
 
 const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
+const isDocker = require("is-docker");
+const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
 
 const version = process.env.npm_package_version;
 console.log(`Version: ${version} (server started)`);
@@ -369,6 +371,7 @@ router.get("/mon/currentOp", ensureAuthenticated, async (req, res) => {
   const sortedIndex = await Runner.sortedIndex();
   const clientSettings = await SettingsClean.returnClientSettings();
   const serverSettings = await SettingsClean.returnSystemSettings();
+
   let user = null;
   let group = null;
   if (serverSettings.server.loginRequired === false) {
@@ -426,6 +429,7 @@ router.get("/system", ensureAuthenticated, async (req, res) => {
   const serverSettings = await SettingsClean.returnSystemSettings();
   const systemInformation = await SystemInfo.returnInfo();
   const printers = Runner.returnFarmPrinters();
+  const softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
   let dashboardSettings = null;
   if (typeof clientSettings.dashboard === "undefined") {
     dashboardSettings = {
@@ -490,6 +494,13 @@ router.get("/system", ensureAuthenticated, async (req, res) => {
     systemInformation,
     db,
     dashboardSettings: dashboardSettings,
+    serviceInformation: {
+      isDockerContainer: isDocker(),
+      isNodemon: isNodemon(),
+      isNode: isNode(),
+      isPm2: isPm2(),
+      update: softwareUpdateNotification,
+    },
   });
 });
 
