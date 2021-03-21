@@ -57,6 +57,11 @@ document.getElementById("restartOctoFarmBtn").addEventListener("click", (e) => {
 document.getElementById("updateOctoFarmBtn").addEventListener("click", (e) => {
   ServerSettings.updateOctoFarm();
 });
+document
+  .getElementById("checkUpdatesForOctoFarmBtn")
+  .addEventListener("click", (e) => {
+    ServerSettings.checkForOctoFarmUpdates();
+  });
 
 document.getElementById("exportAlerts").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
@@ -884,7 +889,7 @@ class ServerSettings {
   }
   static async updateOctoFarm() {
     let updateOctoFarmBtn = document.getElementById("updateOctoFarmBtn");
-    // Make sure the system button is disabled whilst the restart is happening.
+    // Make sure the update OctoFarm button is disabled after keypress
     if (updateOctoFarmBtn) {
       updateOctoFarmBtn.disabled = true;
     }
@@ -932,13 +937,72 @@ class ServerSettings {
       "clicked"
     );
 
-    if (updateOctoFarm?.haveWeSuccessfullyUpdatedOctoFarm){
+    if (updateOctoFarm?.haveWeSuccessfullyUpdatedOctoFarm) {
+      UI.createAlert(
+        "success",
+        "We have successfully updated... OctoFarm will restart now.",
+        0,
+        "Clicked"
+      );
       this.serviceRestart();
+    }
+  }
+  static async checkForOctoFarmUpdates() {
+    let forceCheckForUpdatesBtn = document.getElementById(
+      "checkUpdatesForOctoFarmBtn"
+    );
+    // Make sure check button is disbaled after key press
+    if (forceCheckForUpdatesBtn) {
+      forceCheckForUpdatesBtn.disabled = true;
+    }
+
+    let updateCheck = await OctoFarmclient.get("settings/server/update/check");
+    //Make sure response from server is received, and make sure the status is 200
+    if (updateCheck && updateCheck.status !== 200) {
+      // This alert is pretty mute as the serverAliveCheck will notify before...
+      UI.createAlert(
+        "error",
+        "Something went wrong on the server side, please check your logs.",
+        0,
+        "clicked"
+      );
+      setTimeout(() => {
+        if (forceCheckForUpdatesBtn) {
+          forceCheckForUpdatesBtn.disabled = false;
+        }
+      }, 5000);
+      return;
+    }
+    // Made server check for update... notify user and await amialive check to produce a pop up
+    updateCheck = await updateCheck.json();
+
+    if (updateCheck?.air_gapped) {
+      UI.createAlert(
+        "error",
+        "Your farm has no internet connection, this function requires an active connection to check for releases...",
+        5000,
+        "Clicked"
+      );
+    }
+    if (updateCheck?.update_available) {
+      UI.createAlert(
+        "success",
+        "We found a new update, please use the update button to action!",
+        5000,
+        "Clicked"
+      );
+    } else {
+      UI.createAlert(
+        "warning",
+        "Sorry there are no new updates available!",
+        5000,
+        "Clicked"
+      );
     }
 
     setTimeout(() => {
-      if (updateOctoFarmBtn) {
-        updateOctoFarmBtn.disabled = false;
+      if (forceCheckForUpdatesBtn) {
+        forceCheckForUpdatesBtn.disabled = false;
       }
     }, 5000);
   }
