@@ -14,3 +14,6 @@ images/historyCollection/
 /.build
 /.cache
 /images
+
+# Ignore any local release zips
+octofarm.zip
