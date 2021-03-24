@@ -64,7 +64,6 @@ class JobClean {
       }
       currentJob.fileDisplay = printer.job.file.display;
       currentJob.filePath = printer.job.file.path;
-      currentJob.expectedPrintTime = printer.job.estimatedPrintTime;
       currentJob.averagePrintTime = printer.job.averagePrintTime;
       currentJob.lastPrintTime = printer.job.lastPrintTime;
       if (typeof printer.currentZ !== "undefined") {
@@ -123,9 +122,10 @@ class JobClean {
     }
 
     if (typeof printer.progress !== "undefined") {
-      currentJob.progress = printer.progress.completion;
+      currentJob.progress = Math.floor(printer.progress.completion);
       currentJob.printTimeRemaining = printer.progress.printTimeLeft;
       currentJob.printTimeElapsed = printer.progress.printTime;
+      currentJob.expectedPrintTime = Math.round((printer.progress.printTimeLeft + printer.progress.printTime)/1000)*1000;
       currentJob.expectedCompletionDate = await JobClean.getCompletionDate(
         printer.progress.printTimeLeft,
         printer.progress.completion
