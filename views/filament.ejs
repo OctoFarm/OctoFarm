@@ -657,20 +657,22 @@
                                 <th style="display: none;"><%= spool._id %></th>
                                 <th scope="row"><input class="form-control name" type="text" placeholder="<%=spool.name%>" disabled></th>
                                 <td>
+                                    <span class="d-none material" id="spoolsMaterialText-<%=spool._id%>"><%=(spool.weight - spool.used).toFixed(0)%></span>
                                     <select id="spoolsProfile-<%=spool._id%>" class="form-control" disabled>
 
                                     </select>
                                 </td>
                                 <td><span class="d-none price"><%=spool.price%></span><input class="form-control" type="number" step="0.01" placeholder="<%=spool.price%>" disabled></td>
                                 <td><span class="d-none weight"><%=spool.weight%></span><input class="form-control" type="number" step="1" placeholder="<%=spool.weight%>" disabled></td>
-                                <td class=" <%= displayNone %>"><span class="d-none used"><%=spool.used%></span><input class="form-control" type="number" step="1" placeholder="<%=spool.used%>"></td>
+                                <td class=" <%= displayNone %>"><span class="d-none used"><%=spool.used%></span><input class="form-control" type="number" step="1" placeholder="<%=spool.used%>" disabled></td>
                                 <td class="grams <%= displayNone %>"><%=(spool.weight - spool.used).toFixed(0)%></td>
                                 <td class="percent <%= displayNone %>"><%=(100 - spool.used / spool.weight * 100).toFixed(0)%></td>
                                 <td><input class="form-control" type="number" step="any" placeholder="<%= spool.tempOffset %>" disabled></td>
-                                <td><span class="d-none material" id="spoolsMaterialText-<%=spool._id%>"><%=(spool.weight - spool.used).toFixed(0)%></span>
+                                <td>
                                     <select id="spoolsPrinterAssignment-<%=spool._id%>" class="form-control" disabled>
 
-                                    </select></td>
+                                    </select>
+                                </td>
                                 <td><button id="edit-<%=spool._id%>" type="button" class="btn btn-sm btn-info edit bg-colour-1">
                                         <i class="fas fa-edit editIcon"></i>
                                     </button>
