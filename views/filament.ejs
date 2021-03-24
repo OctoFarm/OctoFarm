@@ -262,48 +262,50 @@
                 </button>
             </div>
             <div class="modal-body">
-                    <div id="profilesMessage"></div>
-                    <form>
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="profilesManufactuer">Manufacturer</label>
-                                <input type="text" class="form-control" id="profilesManufactuer">
+                <div class="row">
+                    <div class="col-12">
+                        <div id="profilesMessage"></div>
+                        <form>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="profilesManufactuer">Manufacturer</label>
+                                    <input type="text" class="form-control" id="profilesManufactuer">
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="profilesMaterial">Material</label>
+                                    <input autocomplete="off" list="huge_list" type="text" class="form-control" id="profilesMaterial">
+                                    <datalist id="huge_list" class="bg-secondary">
+                                    </datalist>
+                                </div>
                             </div>
-                            <div class="form-group col-md-6">
-                                <label for="profilesMaterial">Material</label>
-                                <input autocomplete="off" list="huge_list" type="text" class="form-control" id="profilesMaterial">
-                                <datalist id="huge_list" class="bg-secondary">
-                                </datalist>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group col-md-6">
-                                <label for="profilesDensity">Density</label>
-                                <div class="input-group mb-3">
-                                    <input id="profilesDensity" type="number" class="form-control" value="1.25" step="0.01" aria-label="profilesDansity" aria-describedby="basic-addon2">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text" id="basic-addon2">g/cm3</span>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="profilesDensity">Density</label>
+                                    <div class="input-group mb-3">
+                                        <input id="profilesDensity" type="number" class="form-control" value="1.25" step="0.01" aria-label="profilesDansity" aria-describedby="basic-addon2">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="basic-addon2">g/cm3</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="profilesDiameter">Diameter</label>
+                                    <div class="input-group mb-3">
+                                        <input id="profilesDiameter" type="number" class="form-control" value="1.75" step="0.01" aria-label="" aria-describedby="profilesDiameter">
+                                        <div class="input-group-append">
+                                            <span class="input-group-text" id="basic-addon2">mm</span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group col-md-6">
-                                <label for="profilesDiameter">Diameter</label>
-                                <div class="input-group mb-3">
-                                    <input id="profilesDiameter" type="number" class="form-control" value="1.75" step="0.01" aria-label="" aria-describedby="profilesDiameter">
-                                    <div class="input-group-append">
-                                        <span class="input-group-text" id="basic-addon2">mm</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <button id="addProfilesBtn" type="submit" class="btn btn-success">Add</button>
-                    </form>
+                            <button id="addProfilesBtn" type="submit" class="btn btn-success">Add</button>
+                        </form>
 
-                    <br>
-                    <hr>
-                    <br>
-                    <div class="row align-center">
-                        <center>
+                        <br>
+                        <hr>
+                        <br>
+                    </div>
+                    <div class="col-12 text-center">
                             <nav
                                     id="listenerProfiles"
                                     data-jplist-control="pagination"
@@ -348,58 +350,59 @@
 
                                 <!-- information labels -->
                                 <span data-type="info" class="badge badge-secondary ml-3 p-2">
-                    Page {pageNumber} of {pagesNumber}
-              </span>
+                                        Page {pageNumber} of {pagesNumber}
+                                </span>
 
                             </nav>
-                        </center>
+                    </div>
+                    <div class="col-12">
+                        <table class="table-hover table table-responsive-sm table-responsive-md">
+                            <thead>
+                            <tr>
+                                <th scope="col">Manufacturer</th>
+                                <th scope="col">Material</th>
+                                <th scope="col">Density</th>
+                                <th scope="col">Diameter</th>
+                                <th scope="col" width="200px"></th>
+                            </tr>
+                            </thead>
+                            <tbody id="addProfilesTable" data-jplist-group="profiles">
+                            <% profiles.forEach(profile => { %>
+                                <% let profileID = profile._id  %>
+                                <tr data-jplist-item>
+                                    <td class="d-none" scope="row">
+                                        <%= profileID %>
+                                    </td>
+                                    <td scope="row">
+                                        <input class="form-control"  type="text" placeholder="<%=profile.manufacturer%>" disabled>
+                                    </td>
+                                    <td>
+                                        <input class="form-control"  type="text" placeholder="<%=profile.material%>" disabled>
+                                    </td>
+                                    <td>
+                                        <input class="form-control"  type="number" step="0.01" placeholder="<%=profile.density%>" disabled>
+                                    </td>
+                                    <td>
+                                        <input class="form-control"  type="number" step="0.01" placeholder="<%=profile.diameter%>" disabled>
+                                    </td>
+                                    <td>
+                                        <button id="edit-<%=profileID%>" type="button" class="btn btn-sm btn-info edit bg-colour-1">
+                                            <i class="fas fa-edit editIcon"></i>
+                                        </button>
+                                        <button id="save-<%=profileID%>" type="button" class="btn d-none btn-sm btn-success save bg-colour-2">
+                                            <i class="fas fa-save saveIcon"></i>
+                                        </button>
+                                        <button id="delete-<%=profileID%>" type="button" class="btn btn-sm btn-danger delete">
+                                            <i class="fas fa-trash deleteIcon"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            <%  }) %>
+                            </tbody>
+                        </table>
                     </div>
 
-           <table class="table-hover table table-responsive-sm table-responsive-md col-lg-12">
-                        <thead>
-                        <tr>
-                            <th scope="col">Manufacturer</th>
-                            <th scope="col">Material</th>
-                            <th scope="col">Density</th>
-                            <th scope="col">Diameter</th>
-                            <th scope="col" width="200px"></th>
-                        </tr>
-                        </thead>
-
-                        <tbody id="addProfilesTable" data-jplist-group="profiles">
-                        <% profiles.forEach(profile => { %>
-                            <% let profileID = profile._id  %>
-                            <tr data-jplist-item>
-                                <td class="d-none" scope="row">
-                                    <%= profileID %>
-                                </td>
-                                <td scope="row">
-                                    <input class="form-control"  type="text" placeholder="<%=profile.manufacturer%>">
-                                </td>
-                                <td>
-                                    <input class="form-control"  type="text" placeholder="<%=profile.material%>">
-                                </td>
-                                <td>
-                                    <input class="form-control"  type="number" step="0.01" placeholder="<%=profile.density%>">
-                                </td>
-                                <td>
-                                    <input class="form-control"  type="number" step="0.01" placeholder="<%=profile.diameter%>">
-                                </td>
-                                <td>
-                                    <button id="edit-<%=profileID%>" type="button" class="btn btn-sm btn-info edit bg-colour-1">
-                                        <i class="fas fa-edit editIcon"></i>
-                                    </button>
-                                    <button id="save-<%=profileID%>" type="button" class="btn d-none btn-sm btn-success save bg-colour-2">
-                                        <i class="fas fa-save saveIcon"></i>
-                                    </button>
-                                    <button id="delete-<%=profileID%>" type="button" class="btn btn-sm btn-danger delete">
-                                        <i class="fas fa-trash deleteIcon"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        <%  }) %>
-                        </tbody>
-                    </table>
+                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -652,22 +655,24 @@
                         <% spools.forEach(spool => { %>
                             <tr data-jplist-item>
                                 <th style="display: none;"><%= spool._id %></th>
-                                <th scope="row"><input class="form-control name" type="text" placeholder="<%=spool.name%>"></th>
+                                <th scope="row"><input class="form-control name" type="text" placeholder="<%=spool.name%>" disabled></th>
                                 <td>
+                                    <span class="d-none material" id="spoolsMaterialText-<%=spool._id%>"></span>
                                     <select id="spoolsProfile-<%=spool._id%>" class="form-control" disabled>
 
                                     </select>
                                 </td>
-                                <td><span class="d-none price"><%=spool.price%></span><input class="form-control" type="number" step="any" placeholder="<%=spool.price%>"></td>
-                                <td><span class="d-none weight"><%=spool.weight%></span><input class="form-control" type="number" step="1" placeholder="<%=spool.weight%>"></td>
-                                <td class=" <%= displayNone %>"><span class="d-none used"><%=spool.used%></span><input class="form-control" type="number" step="1" placeholder="<%=spool.used%>"></td>
+                                <td><span class="d-none price"><%=spool.price%></span><input class="form-control" type="number" step="0.01" placeholder="<%=spool.price%>" disabled></td>
+                                <td><span class="d-none weight"><%=spool.weight%></span><input class="form-control" type="number" step="1" placeholder="<%=spool.weight%>" disabled></td>
+                                <td class=" <%= displayNone %>"><span class="d-none used"><%=spool.used%></span><input class="form-control" type="number" step="1" placeholder="<%=spool.used%>" disabled></td>
                                 <td class="grams <%= displayNone %>"><%=(spool.weight - spool.used).toFixed(0)%></td>
                                 <td class="percent <%= displayNone %>"><%=(100 - spool.used / spool.weight * 100).toFixed(0)%></td>
-                                <td><input class="form-control" type="number" step="any" placeholder="<%= spool.tempOffset %>"></td>
-                                <td><span class="d-none material" id="spoolsMaterialText-<%=spool._id%>"><%=(spool.weight - spool.used).toFixed(0)%></span>
+                                <td><input class="form-control" type="number" step="any" placeholder="<%= spool.tempOffset %>" disabled></td>
+                                <td>
                                     <select id="spoolsPrinterAssignment-<%=spool._id%>" class="form-control" disabled>
 
-                                    </select></td>
+                                    </select>
+                                </td>
                                 <td><button id="edit-<%=spool._id%>" type="button" class="btn btn-sm btn-info edit bg-colour-1">
                                         <i class="fas fa-edit editIcon"></i>
                                     </button>

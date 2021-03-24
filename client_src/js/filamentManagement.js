@@ -206,6 +206,7 @@ async function editProfile(e) {
   const editable = row.querySelectorAll("input");
   const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
   editable.forEach((edit) => {
+    edit.disabled = false;
     edit.value = edit.placeholder;
   });
   document.getElementById(`save-${id}`).classList.remove("d-none");
@@ -217,6 +218,7 @@ async function saveProfile(e) {
   const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
   const profile = [];
   editable.forEach((edit) => {
+    edit.disabled = true;
     edit.placeholder = edit.value;
     profile.push(edit.value);
     edit.value = "";
@@ -336,55 +338,56 @@ async function addSpool(
       "afterbegin",
       `
                 <tr data-jplist-item>
-                  <th style="display: none;">${post._id}</th>
+                  <th style="display: none;">${post?._id}</th>
                   <th scope="row"><input class="form-control" type="text" placeholder="${
-                    post.spools.name
+                    post?.spools?.name
                   }"></th>
                   <td>
+                       <span class="d-none material" id="spoolsMaterialText-<%=spool._id%>"></span>
                        <select id="spoolsProfile-${
-                         post._id
+                         post?._id
                        }" class="form-control" disabled>
 
                        </select>
                    </td>
                   <td><input class="form-control" type="text" step="0.01" placeholder="${
-                    post.spools.price
-                  }"></td>
+                    post?.spools?.price
+                  }" disabled></td>
                   <td><input class="form-control" type="text" placeholder="${
-                    post.spools.weight
-                  }"></td>
+                    post?.spools?.weight
+                  }" disabled></td>
                   <td class="${displayNone}"><input class="form-control" type="text" placeholder="${
-        post.spools.used
+        post?.spools?.used
       }"></td>
                   <td class="grams ${displayNone}">${(
-        post.spools.weight - post.spools.used
+        post?.spools?.weight - post?.spools?.used
       ).toFixed(0)}</td>
                   <td class="percent ${displayNone}">${(
         100 -
-        (post.spools.used / post.spools.weight) * 100
+        (post?.spools?.used / post?.spools?.weight) * 100
       ).toFixed(0)}</td>
                   <td><input class="form-control" type="text" placeholder="${
-                    post.spools.tempOffset
-                  }"></td>
+                    post?.spools?.tempOffset
+                  }" disabled></td>
                    <td>
                        <select id="spoolsPrinterAssignment-${
-                         post._id
-                       }" class="form-control">
+                         post?._id
+                       }" class="form-control" disabled>
 
                        </select>
                    </td>
                   <td><button id="edit-${
-                    post._id
+                    post?._id
                   }" type="button" class="btn btn-sm btn-info edit">
                     <i class="fas fa-edit editIcon"></i>
                   </button>
                   <button id="save-${
-                    post._id
+                    post?._id
                   }" type="button" class="btn btn-sm d-none btn-success save">
                     <i class="fas fa-save saveIcon"></i>
                   </button>
                   <button id="delete-${
-                    post._id
+                    post?._id
                   }" type="button" class="btn btn-sm btn-danger delete">
                     <i class="fas fa-trash deleteIcon"></i>
                   </button></td>
@@ -408,6 +411,7 @@ async function editSpool(e) {
   const editable = row.querySelectorAll("input");
   const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
   editable.forEach((edit) => {
+    edit.disabled = false;
     edit.value = edit.placeholder;
   });
   // let profile = await OctoFarmclient.get("filament/get/profile");
@@ -465,6 +469,7 @@ async function saveSpool(e) {
   const id = e.parentElement.parentElement.firstElementChild.innerHTML.trim();
   const spool = [];
   editable.forEach((edit) => {
+    edit.disabled = true;
     edit.placeholder = edit.value;
     spool.push(edit.value);
     edit.value = "";
@@ -498,11 +503,11 @@ async function updateProfileDrop() {
     spoolsProfile.innerHTML = "";
     profiles.profiles.forEach((profile) => {
       let profileID = null;
-      profileID = profile._id;
+      profileID = profile?._id;
       spoolsProfile.insertAdjacentHTML(
         "beforeend",
         `
-             <option value="${profileID}">${profile.manufacturer} (${profile.material})</option>
+             <option value="${profileID}">${profile?.manufacturer} (${profile?.material})</option>
             `
       );
     });
@@ -518,39 +523,53 @@ async function updateProfileDrop() {
   const spoolsMaterialText = document.querySelectorAll(
     "[id^='spoolsMaterialText-']"
   );
-
   printerDrops.forEach((drop, index) => {
     drop.innerHTML = "";
-    profiles.profiles.forEach((prof) => {
+    profiles?.profiles.forEach((prof) => {
       drop.insertAdjacentHTML(
         "beforeend",
-        `<option value="${prof._id}">${prof.manufacturer} (${prof.material})</option>`
+        `<option value="${prof?._id}">${prof?.manufacturer} (${prof?.material})</option>`
       );
     });
-    const spoolID = drop.id.split("-");
-    // eslint-disable-next-line no-undef
-    const spool = _.findIndex(fill.Spool, function (o) {
-      return o._id == spoolID[1];
+    const spoolID = drop?.id.split("-");
+    const spool = _.findIndex(fill?.Spool, function (o) {
+      return o?._id == spoolID[1];
     });
-    if (typeof fill.Spool[spool] !== "undefined") {
-      drop.value = fill.Spool[spool].profile;
-      const profileID = _.findIndex(profiles.profiles, function (o) {
-        return o._id == fill.Spool[spool].profile;
+    if (typeof fill?.Spool[spool] !== "undefined") {
+      drop.value = fill?.Spool[spool].profile;
+      const profileID = _.findIndex(profiles?.profiles, function (o) {
+        return o._id == fill?.Spool[spool].profile;
       });
-      drop.className = `form-control ${profiles.profiles[
-        profileID
-      ].material.replace(/ /g, "_")}`;
-      printerListMaterials[
-        index
-      ].innerHTML = `${profiles.profiles[profileID].material}`;
-      spoolsMaterialText[
-        index
-      ].innerHTML = `${profiles.profiles[profileID].material}`;
-      spoolsListManufacture[
-        index
-      ].innerHTML = `${profiles.profiles[profileID].manufacturer}`;
+      drop.className = `form-control ${profiles?.profiles[profileID]?.material.replace(/ /g, "_")}`;
+      spoolsMaterialText[index].innerHTML = `${profiles?.profiles[profileID]?.material}`;
     }
   });
+  //Fix for not updating main spool list with correct information, not skipping fo shizzle
+  spoolsListManufacture.forEach(text => {
+    const spoolID = text.id.split("-");
+    const spool = _.findIndex(fill?.Spool, function (o) {
+      return o._id == spoolID[1];
+    });
+    if (typeof fill?.Spool[spool] !== "undefined") {
+      const profileID = _.findIndex(profiles?.profiles, function (o) {
+        return o._id == fill?.Spool[spool]?.profile;
+      });
+      text.innerHTML = `${profiles?.profiles[profileID]?.manufacturer}`;
+    }
+  })
+  printerListMaterials.forEach(text => {
+    const spoolID = text.id.split("-");
+    const spool = _.findIndex(fill?.Spool, function (o) {
+      return o._id == spoolID[1];
+    });
+    if (typeof fill?.Spool[spool] !== "undefined") {
+      const profileID = _.findIndex(profiles?.profiles, function (o) {
+        return o._id == fill?.Spool[spool]?.profile;
+      });
+      text.innerHTML = `${profiles?.profiles[profileID]?.material}`;
+    }
+  })
+
 }
 async function updatePrinterDrops() {
   let printerList = await OctoFarmclient.get("filament/get/printerList");
@@ -567,35 +586,61 @@ async function updatePrinterDrops() {
     "[id^='spoolsListPrinterAssignment-']"
   );
   printerDrops.forEach((drop, index) => {
-    drop.innerHTML = [...printerList.printerList];
+    // Left over from when Printer Assignment actually worked.
+    // printerList?.printerList.forEach((printer) => {
+    //   console.log(printer)
+    //   // drop.insertAdjacentHTML(
+    //   //     "beforeend",
+    //   //     `<option value="${prof?._id}">${prof?.manufacturer} (${prof?.material})</option>`
+    //   // );
+    // });
 
     const split = drop.id.split("-");
     const spoolID = split[1];
-    const spool = _.findIndex(filament.Spool, function (o) {
-      return o._id == spoolID;
+    const spool = _.findIndex(filament?.Spool, function (o) {
+      return o?._id == spoolID;
     });
     if (typeof filament.Spool[spool] !== "undefined") {
-      if (filament.Spool[spool].printerAssignment.length > 0) {
-        drop.value =
-          filament.Spool[spool].printerAssignment[0].id +
-          "-" +
-          filament.Spool[spool].printerAssignment[0].tool;
-        printerAssignments[index].innerHTML =
-          filament.Spool[spool].printerAssignment[0].name +
-          ": Tool" +
-          filament.Spool[spool].printerAssignment[0].tool;
+      if (filament?.Spool[spool]?.printerAssignment.length > 0) {
+        drop.innerHTML =
+          `<option>${filament?.Spool[spool]?.printerAssignment[0]?.name}: Tool ${filament?.Spool[spool]?.printerAssignment[0]?.tool}</option>`;
       } else {
-        printerAssignments[index].innerHTML = "Not Assigned";
+        drop.innerHTML = `<option>Not Assigned</option>`
       }
     }
-
-    drop.addEventListener("change", (e) => {
-      const meta = e.target.value.split("-");
-      const printerId = meta[0];
-      const tool = meta[1];
-      const spoolId = e.target.id.split("-");
-      selectFilament(printerId, spoolId[1], tool);
+    // Not needed until bring back selecting spool function server side
+    // drop.addEventListener("change", (e) => {
+    //   const meta = e.target.value.split("-");
+    //   const printerId = meta[0];
+    //   const tool = meta[1];
+    //   const spoolId = e.target.id.split("-");
+    //   selectFilament(printerId, spoolId[1], tool);
+    // });
+  });
+  printerAssignments.forEach((text, index) => {
+    const split = text.id.split("-");
+    const spoolID = split[1];
+    const spool = _.findIndex(filament?.Spool, function (o) {
+      return o?._id == spoolID;
     });
+    if (typeof filament?.Spool[spool] !== "undefined") {
+      if (filament?.Spool[spool]?.printerAssignment.length > 0) {
+        text.innerHTML =
+            filament?.Spool[spool]?.printerAssignment[0]?.name +
+            ": Tool" +
+            filament?.Spool[spool]?.printerAssignment[0]?.tool;
+      } else {
+        text.innerHTML = "Not Assigned";
+      }
+    }
+    // Not needed until bring back selecting spool function server side
+    // drop.addEventListener("change", (e) => {
+    //   const meta = e.target.value.split("-");
+    //   const printerId = meta[0];
+    //   const tool = meta[1];
+    //   const spoolId = e.target.id.split("-");
+    //   selectFilament(printerId, spoolId[1], tool);
+    // });
   });
 }
 async function init() {
@@ -943,7 +988,6 @@ async function init() {
         '<i class="fas fa-sync"></i> Re-Sync Filament Manager';
       if (post.status === 200) {
         const meta = await post.json();
-        console.log(meta);
         if (meta.success) {
           UI.createAlert(
             "success",
@@ -1166,10 +1210,11 @@ function updateTotals(filtered) {
   const price = [];
   const weight = [];
   const used = [];
+
   filtered.forEach((row) => {
-    price.push(parseInt(row.getElementsByClassName("price")[0].placeholder));
-    weight.push(parseInt(row.getElementsByClassName("weight")[0].placeholder));
-    used.push(parseInt(row.getElementsByClassName("used")[0].placeholder));
+    price.push(parseInt(row.getElementsByClassName("price")[0].innerHTML));
+    weight.push(parseInt(row.getElementsByClassName("weight")[0].innerHTML));
+    used.push(parseInt(row.getElementsByClassName("used")[0].innerHTML));
   });
   const usedReduced = used.reduce((a, b) => a + b, 0).toFixed(0);
   const weightReduced = weight.reduce((a, b) => a + b, 0).toFixed(0);
