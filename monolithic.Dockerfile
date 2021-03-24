@@ -16,7 +16,7 @@ RUN rm -rf /var/lib/apt/lists/
 COPY . /app
 WORKDIR /app
 
-RUN npm ci --production
+RUN npm install --only=production
 RUN npm install -g pm2
 
 EXPOSE 4000
