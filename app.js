@@ -8,20 +8,18 @@ const cookieParser = require("cookie-parser");
 const passport = require("passport");
 const ServerSettingsDB = require("./server_src/models/ServerSettings");
 const Logger = require("./server_src/lib/logger.js");
-
 const logger = new Logger("OctoFarm-Server");
 const printerClean = require("./server_src/lib/dataFunctions/printerClean.js");
-
-const {databaseSetup} = require("./server_src/lib/influxExport.js");
-
-const {PrinterClean} = printerClean;
-
+const { databaseSetup } = require("./server_src/lib/influxExport.js");
+const { PrinterClean } = printerClean;
+const path = require("path");
+const { ensureEnvPancaked } = require("./app-pancaked");
 const autoDiscovery = require("./server_src/runners/autoDiscovery.js");
 
-const envUtils = require("./server_src/utils/env.utils")
-const result = envUtils.verifyPackageJsonRequirements(
-  __dirname
-);
+ensureEnvPancaked();
+const envUtils = require("./server_src/utils/env.utils");
+
+const result = envUtils.verifyPackageJsonRequirements(__dirname);
 if (!result) {
   if (envUtils.isPm2()) {
     console.warn("Removing PM2 service");
@@ -38,23 +36,36 @@ const app = express();
 require("./server_src/config/passport.js")(passport);
 
 // .env Config
-require("dotenv").config();
+const configOutput = require("dotenv").config();
+console.info("✓ Parsed .env file");
 
 let dbConnectionString = process.env.MONGO;
 if (!dbConnectionString) {
+  console.info("X MONGO env not set");
   dbConnectionString = require("./config/db.js").MongoURI;
+} else {
+  console.info("✓ MONGO env set!");
 }
+
+// Trickery
+// require("views");
+console.log("Running in directory:", __dirname);
+const viewsPath = path.join(__dirname, "./views");
+console.log("Views expected in:", viewsPath);
 
 // JSON
 app.use(express.json());
 
 // EJS
-app.use(expressLayouts);
+app.set("views", viewsPath);
 app.set("view engine", "ejs");
+app.use(expressLayouts);
+app.use(express.static(viewsPath));
+app.use("/images", express.static("./images"));
 
 // Cookie parsing and URL decoding
 app.use(cookieParser());
-app.use(express.urlencoded({extended: false}));
+app.use(express.urlencoded({ extended: false }));
 
 // Express Session Middleware
 
@@ -62,7 +73,7 @@ app.use(
   session({
     secret: "supersecret",
     resave: true,
-    saveUninitialized: true,
+    saveUninitialized: true
   })
 );
 
@@ -86,7 +97,7 @@ app.use((req, res, next) => {
 
 const setupServerSettings = async () => {
   const serverSettings = require("./server_src/settings/serverSettings.js");
-  const {ServerSettings} = serverSettings;
+  const { ServerSettings } = serverSettings;
   await logger.info("Checking Server Settings...");
   const ss = await ServerSettings.init();
   // Setup Settings
@@ -103,19 +114,19 @@ const serverStart = async () => {
     // Find server Settings
     const settings = await ServerSettingsDB.find({});
     const clientSettings = require("./server_src/settings/clientSettings.js");
-    const {ClientSettings} = clientSettings;
+    const { ClientSettings } = clientSettings;
     await logger.info("Checking Client Settings...");
     const cs = await ClientSettings.init();
     await logger.info(cs);
     const runner = require("./server_src/runners/state.js");
-    const {Runner} = runner;
+    const { Runner } = runner;
     const rn = await Runner.init();
 
     await logger.info("Printer Runner has been initialised...", rn);
     const PORT = process.env.PORT || settings[0].server.port;
     await logger.info("Starting System Information Runner...");
     const system = require("./server_src/runners/systemInfo.js");
-    const {SystemRunner} = system;
+    const { SystemRunner } = system;
     const sr = await SystemRunner.init();
     await logger.info(sr);
 
@@ -125,72 +136,72 @@ const serverStart = async () => {
       logger.info("HTTP server started...");
       logger.info(`You can now access your server on port: ${PORT}`);
       console.log(`You can now access your server on port: ${PORT}`);
-      // eslint-disable-next-line no-console
-      process.send("ready");
+      if (typeof process.send === "function") {
+        // eslint-disable-next-line no-console
+        process.send("ready");
+      }
     });
   } catch (err) {
     await logger.error(err);
   }
 
   // Routes
-  app.use(express.static(`./views`));
-  app.use("/images", express.static(`./images`));
   if (dbConnectionString === "") {
-    app.use("/", require("./server_src/routes/index", {page: "route"}));
+    app.use("/", require("./server_src/routes/index", { page: "route" }));
   } else {
     try {
-      app.use("/", require("./server_src/routes/index", {page: "route"}));
+      app.use("/", require("./server_src/routes/index", { page: "route" }));
       app.use(
         "/serverChecks",
-        require("./server_src/routes/serverChecks", {page: "route"})
+        require("./server_src/routes/serverChecks", { page: "route" })
       );
       app.use(
         "/users",
-        require("./server_src/routes/users", {page: "route"})
+        require("./server_src/routes/users", { page: "route" })
       );
       app.use(
         "/printers",
-        require("./server_src/routes/printers", {page: "route"})
+        require("./server_src/routes/printers", { page: "route" })
       );
       app.use(
         "/groups",
-        require("./server_src/routes/printerGroups", {page: "route"})
+        require("./server_src/routes/printerGroups", { page: "route" })
       );
       app.use(
         "/settings",
-        require("./server_src/routes/settings", {page: "route"})
+        require("./server_src/routes/settings", { page: "route" })
       );
       app.use(
         "/printersInfo",
-        require("./server_src/routes/SSE-printersInfo", {page: "route"})
+        require("./server_src/routes/SSE-printersInfo", { page: "route" })
       );
       app.use(
         "/dashboardInfo",
-        require("./server_src/routes/SSE-dashboard", {page: "route"})
+        require("./server_src/routes/SSE-dashboard", { page: "route" })
       );
       app.use(
         "/monitoringInfo",
-        require("./server_src/routes/SSE-monitoring", {page: "route"})
+        require("./server_src/routes/SSE-monitoring", { page: "route" })
       );
       app.use(
         "/filament",
-        require("./server_src/routes/filament", {page: "route"})
+        require("./server_src/routes/filament", { page: "route" })
       );
       app.use(
         "/history",
-        require("./server_src/routes/history", {page: "route"})
+        require("./server_src/routes/history", { page: "route" })
       );
       app.use(
         "/scripts",
-        require("./server_src/routes/scripts", {page: "route"})
+        require("./server_src/routes/scripts", { page: "route" })
       );
       app.use(
         "/input",
-        require("./server_src/routes/externalDataCollection", {page: "route"})
+        require("./server_src/routes/externalDataCollection", { page: "route" })
       );
       app.use(
         "/client",
-        require("./server_src/routes/sorting", {page: "route"})
+        require("./server_src/routes/sorting", { page: "route" })
       );
     } catch (e) {
       await logger.error(e);
@@ -203,21 +214,22 @@ mongoose
   .connect(dbConnectionString, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    useFindAndModify: false,
+    useFindAndModify: false
   })
-  .then(() => {
+  .then(async () => {
     //Check database actually works...
-    if (!mongoose.connection.readyState === 1) {
-      databaseIssue();
+    if (mongoose.connection.readyState !== 1) {
+      await databaseIssue();
       let err = "No db connection...";
       throw err;
     }
   })
   .then(() => setupServerSettings())
   .then(() => serverStart())
-  .catch((err) => {
-    databaseIssue();
+  .catch(async (err) => {
+    console.error("\n\n\nDATABASE ISSUE!!!");
     logger.error(err);
+    await databaseIssue();
   });
 
 const databaseIssue = async () => {
@@ -225,13 +237,16 @@ const databaseIssue = async () => {
     logger.info("HTTP server started...");
     logger.info(`You have database issues... web interface loaded on: ${4000}`);
     console.log(`You have database issues... web interface loaded on: ${4000}`);
-
     // This only works when this is a child process (like when managed by PM2 f.e.)
     if (typeof process.send === "function") {
       // eslint-disable-next-line no-console
       process.send("ready");
     }
   });
-  app.use(express.static(`./views`));
-  app.use("/", require("./server_src/routes/databaseIssue", {page: "route"}));
+
+  app.use("/", require("./server_src/routes/databaseIssue", { page: "route" }));
+  app.use("/serverChecks", require("./server_src/routes/serverChecks", { page: "route" }));
+  app.get("*", function(req, res) {
+    res.redirect("/");
+  });
 };
