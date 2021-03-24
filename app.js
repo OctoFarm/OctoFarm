@@ -203,6 +203,9 @@ const serverStart = async () => {
         "/client",
         require("./server_src/routes/sorting", { page: "route" })
       );
+      app.get("*", function(req, res) {
+        res.redirect("/");
+      });
     } catch (e) {
       await logger.error(e);
     }
