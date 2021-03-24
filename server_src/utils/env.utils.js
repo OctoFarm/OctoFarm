@@ -65,6 +65,8 @@ function ensureBackgroundImageExists(rootPath) {
       console.info("everything good", defaultBgPath, targetBgPath);
     }
 
+    // This is the reason why we dont copy under PKG
+    // https://github.com/vercel/pkg/issues/420#issuecomment-397392619
     const fileBuffer = fs.readFileSync(path.resolve(__dirname, defaultBgPath));
     fs.writeFileSync(targetBgPath, fileBuffer);
     // fs.copyFileSync(defaultBgPath, "C:\\Users\\david\\Projects\\NodeJS\\OctoFarm\\package\\images\\roll.jpg");
