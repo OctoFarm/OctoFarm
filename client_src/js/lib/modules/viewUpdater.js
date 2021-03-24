@@ -803,7 +803,7 @@ async function updateState(printer, clientSettings, view) {
   if (typeof printer.currentJob !== "undefined") {
     let progress = 0;
     if (typeof printer.currentJob.progress === "number") {
-      progress = printer.currentJob.progress.toFixed(0);
+      progress = printer.currentJob.progress;
     }
     UI.doesElementNeedUpdating(progress + "%", elements.progress, "innerHTML");
     elements.progress.style.width = progress + "%";
