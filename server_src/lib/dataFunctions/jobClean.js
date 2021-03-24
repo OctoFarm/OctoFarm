@@ -125,7 +125,7 @@ class JobClean {
       currentJob.progress = printer.progress.completion;
       currentJob.printTimeRemaining = printer.progress.printTimeLeft;
       currentJob.printTimeElapsed = printer.progress.printTime;
-      currentJob.expectedPrintTime = printer.progress.printTimeLeft + printer.progress.printTime;
+      currentJob.expectedPrintTime = Math.round((printer.progress.printTimeLeft + printer.progress.printTime)/1000)*1000;
       currentJob.expectedCompletionDate = await JobClean.getCompletionDate(
         printer.progress.printTimeLeft,
         printer.progress.completion
