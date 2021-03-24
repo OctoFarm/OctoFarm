@@ -657,7 +657,7 @@
                                 <th style="display: none;"><%= spool._id %></th>
                                 <th scope="row"><input class="form-control name" type="text" placeholder="<%=spool.name%>" disabled></th>
                                 <td>
-                                    <span class="d-none material" id="spoolsMaterialText-<%=spool._id%>"><%=(spool.weight - spool.used).toFixed(0)%></span>
+                                    <span class="d-none material" id="spoolsMaterialText-<%=spool._id%>"></span>
                                     <select id="spoolsProfile-<%=spool._id%>" class="form-control" disabled>
 
                                     </select>

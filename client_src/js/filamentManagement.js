@@ -338,55 +338,56 @@ async function addSpool(
       "afterbegin",
       `
                 <tr data-jplist-item>
-                  <th style="display: none;">${post._id}</th>
+                  <th style="display: none;">${post?._id}</th>
                   <th scope="row"><input class="form-control" type="text" placeholder="${
-                    post.spools.name
+                    post?.spools?.name
                   }"></th>
                   <td>
+                       <span class="d-none material" id="spoolsMaterialText-<%=spool._id%>"></span>
                        <select id="spoolsProfile-${
-                         post._id
+                         post?._id
                        }" class="form-control" disabled>
 
                        </select>
                    </td>
                   <td><input class="form-control" type="text" step="0.01" placeholder="${
-                    post.spools.price
-                  }"></td>
+                    post?.spools?.price
+                  }" disabled></td>
                   <td><input class="form-control" type="text" placeholder="${
-                    post.spools.weight
-                  }"></td>
+                    post?.spools?.weight
+                  }" disabled></td>
                   <td class="${displayNone}"><input class="form-control" type="text" placeholder="${
-        post.spools.used
+        post?.spools?.used
       }"></td>
                   <td class="grams ${displayNone}">${(
-        post.spools.weight - post.spools.used
+        post?.spools?.weight - post?.spools?.used
       ).toFixed(0)}</td>
                   <td class="percent ${displayNone}">${(
         100 -
-        (post.spools.used / post.spools.weight) * 100
+        (post?.spools?.used / post?.spools?.weight) * 100
       ).toFixed(0)}</td>
                   <td><input class="form-control" type="text" placeholder="${
-                    post.spools.tempOffset
-                  }"></td>
+                    post?.spools?.tempOffset
+                  }" disabled></td>
                    <td>
                        <select id="spoolsPrinterAssignment-${
-                         post._id
-                       }" class="form-control">
+                         post?._id
+                       }" class="form-control" disabled>
 
                        </select>
                    </td>
                   <td><button id="edit-${
-                    post._id
+                    post?._id
                   }" type="button" class="btn btn-sm btn-info edit">
                     <i class="fas fa-edit editIcon"></i>
                   </button>
                   <button id="save-${
-                    post._id
+                    post?._id
                   }" type="button" class="btn btn-sm d-none btn-success save">
                     <i class="fas fa-save saveIcon"></i>
                   </button>
                   <button id="delete-${
-                    post._id
+                    post?._id
                   }" type="button" class="btn btn-sm btn-danger delete">
                     <i class="fas fa-trash deleteIcon"></i>
                   </button></td>
@@ -480,7 +481,6 @@ async function saveSpool(e) {
     spool,
   };
   let post = await OctoFarmclient.post("filament/edit/filament", data);
-  console.log(post)
   if (post.status === 200) {
     post = await post.json();
     document.getElementById(`spoolsProfile-${id}`).disabled = true;
@@ -1210,10 +1210,11 @@ function updateTotals(filtered) {
   const price = [];
   const weight = [];
   const used = [];
+
   filtered.forEach((row) => {
-    price.push(parseInt(row.getElementsByClassName("price")[0].placeholder));
-    weight.push(parseInt(row.getElementsByClassName("weight")[0].placeholder));
-    used.push(parseInt(row.getElementsByClassName("used")[0].placeholder));
+    price.push(parseInt(row.getElementsByClassName("price")[0].innerHTML));
+    weight.push(parseInt(row.getElementsByClassName("weight")[0].innerHTML));
+    used.push(parseInt(row.getElementsByClassName("used")[0].innerHTML));
   });
   const usedReduced = used.reduce((a, b) => a + b, 0).toFixed(0);
   const weightReduced = weight.reduce((a, b) => a + b, 0).toFixed(0);
