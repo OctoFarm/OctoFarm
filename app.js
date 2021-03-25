@@ -1,4 +1,32 @@
-//Requires
+// ENVIRONMENT FIXES
+const { ensureEnvPancaked } = require("./app-env");
+ensureEnvPancaked();
+const path = require("path");
+// Extra .env Config
+const configOutput = require("dotenv").config();
+console.info("✓ Parsed .env file");
+let dbConnectionString = process.env.MONGO;
+if (!dbConnectionString) {
+  console.info("X MONGO env not set");
+  dbConnectionString = require("./config/db.js").MongoURI;
+} else {
+  console.info("✓ MONGO env set!");
+}
+const envUtils = require("./server_src/utils/env.utils");
+const result = envUtils.verifyPackageJsonRequirements(__dirname);
+if (!result) {
+  if (envUtils.isPm2()) {
+    console.warn("Removing PM2 service");
+    execSync("pm2 delete OctoFarm");
+  }
+  throw new Error("Aborting OctoFarm server.");
+}
+envUtils.ensureBackgroundImageExists(__dirname);
+console.log("Running in directory:", __dirname);
+const viewsPath = path.join(__dirname, "./views");
+console.log("Views expected in:", viewsPath);
+
+// SERVER
 const express = require("express");
 const expressLayouts = require("express-ejs-layouts");
 const mongoose = require("mongoose");
@@ -12,46 +40,13 @@ const logger = new Logger("OctoFarm-Server");
 const printerClean = require("./server_src/lib/dataFunctions/printerClean.js");
 const { databaseSetup } = require("./server_src/lib/influxExport.js");
 const { PrinterClean } = printerClean;
-const path = require("path");
-const { ensureEnvPancaked } = require("./app-pancaked");
 const autoDiscovery = require("./server_src/runners/autoDiscovery.js");
-
-ensureEnvPancaked();
-const envUtils = require("./server_src/utils/env.utils");
-
-const result = envUtils.verifyPackageJsonRequirements(__dirname);
-if (!result) {
-  if (envUtils.isPm2()) {
-    console.warn("Removing PM2 service");
-    execSync("pm2 delete OctoFarm");
-  }
-  throw new Error("Aborting OctoFarm server.");
-}
-envUtils.ensureBackgroundImageExists(__dirname);
 
 // Server Port
 const app = express();
 
 // Passport Config
 require("./server_src/config/passport.js")(passport);
-
-// .env Config
-const configOutput = require("dotenv").config();
-console.info("✓ Parsed .env file");
-
-let dbConnectionString = process.env.MONGO;
-if (!dbConnectionString) {
-  console.info("X MONGO env not set");
-  dbConnectionString = require("./config/db.js").MongoURI;
-} else {
-  console.info("✓ MONGO env set!");
-}
-
-// Trickery
-// require("views");
-console.log("Running in directory:", __dirname);
-const viewsPath = path.join(__dirname, "./views");
-console.log("Views expected in:", viewsPath);
 
 // JSON
 app.use(express.json());
@@ -68,7 +63,6 @@ app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
 // Express Session Middleware
-
 app.use(
   session({
     secret: "supersecret",
