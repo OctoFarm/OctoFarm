@@ -17,3 +17,4 @@ images/historyCollection/
 
 # Ignore any local release zips
 octofarm.zip
+package/
