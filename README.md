@@ -43,38 +43,96 @@
 - [Contact](#contact)
 - [Acknowledgements](#acknowledgements)
 
-## About The Project
+## Getting Started
+We provide a couple of ways for you to run OctoFarm. Choose freely:
+- Docker 
+  - Windows 10
+  - Ubuntu
+  - Most Unix systems
+- NodeJS v14+
+  - PM2 (monitored service)
+  - PKG version
+  - Nodemon (developer only)
+- (Coming soon) installation
+  - Windows 10 (setup .exe)
+  - Ubuntu (.deb)
+  - Most Unix systems
 
+### docker-compose.yml
+```
+# Just pick a compose spec version >3
+version: '3.4' 
+
+# (Optional) named database volume (uncomment in case you dont want a local database volume folder, see below)
+# volumes:
+#   mongodb-data:
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: MONGO_ROOTUSER_HERE
+      MONGO_INITDB_ROOT_PASSWORD: MONGO_PASSWORD_HERE
+      MONGO_INITDB_DATABASE: octofarm
+    ports:
+     # HOST:CONTAINER
+    - 27017:27017
+    volumes:
+    # Local volume (change to mongodb-data for a named volume folder)
+    - ./mongodb-data:/data/db
+    restart: unless_stopped
+
+  octofarm:
+    container_name: octofarm
+    # octofarm/octofarm:alpine-latest is also available!    
+    image: octofarm/octofarm:latest
+    restart: always
+    ports:
+    # HOST:CONTAINER
+    - 4000:4000
+    environment:
+    - MONGO=mongodb://MONGO_ROOTUSER_HERE:MONGO_PASSWORD_HERE@host.docker.internal:27017/octofarm?authSource=admin&readPreference=primary&ssl=false
+    volumes:
+    # Local volumes, can be made named - not advised
+    - ./OctoFarm/logs:/app/logs
+    - ./OctoFarm/scripts:/scripts
+```
+The monolithic image does not require mongo externally, but it also has less control:
+```
+ octofarm-monolithic:
+    container_name: octofarm-monolithic
+    image: octofarm/octofarm:dev-monolithic
+    restart: always
+    volumes:
+    # Local volumes, can be made named - not advised
+    - ./OctoFarm/logs:/app/logs    
+    ports:
+    - 4001:4000
+```
+
+## About The Project
 OctoFarm was built to fill a need that anyone with multiple 3D printers with Octoprint will have run into. How do I
 manage multiple printers from one place? That's where OctoFarm steps in, add your OctoPrint instances to the system and
 it will scan and keep you up to date on the status of your printers.
 
-
 ![OctoFarm Dashboard][DashboardScreenshot]
 
 ## Setup version (.exe, .deb, etc.)
-
 We are really close to providing installable versions of OctoFarm! Bear with us for version 1.1.14. We will provide the
 following:
-
 - Windows 10 (OctoFarm_setup.exe)
 - Unix (OctoFarm_setup.deb)
 
 The links to these files will be provided once available!
 
-## Getting Started
-
-To get a local copy up and running follow these simple steps.
-
 ## OctoPrint 1.4.1+
-
 Currently there are issues with using the Global API Key to connect to these instances of OctoPrint. Please use the
 first user you setup on OctoPrint and a generated Application / User API key from this user to connect. I will be
 updating OctoFarm to work better with all permission sets eventually but for now this will allow a connection to be
 established.
 
 ### Platform
-
 Confirmed working on: Linux (Ubuntu, Debian), RaspberryPi (Rasbian), Windows 10. Should also work on but not tested:
 MacOS, anything else nodejs will run on.
 
@@ -83,13 +141,10 @@ whereas Raspbian's is 32bit), so in that case, you'll need a 32-bit MongoDB vers
 some other machine, or VM.
 
 ### Supported Browsers
-
 All browsers should now be supported in OctoFarm. Please log an issue if this is not the case.
 
 ### Prerequisites
-
 In order to have
-
 - [MongoDB](https://www.mongodb.com/) - v3.6+
 - [NodeJS](https://nodejs.org/) - v14.0.0 (Latest tested: v14.16.0)
 - [NPM](https://www.npmjs.com/) - v6.10.0+ (Latest tested: v7.6.3)
@@ -103,8 +158,7 @@ On your OctoPrint instance
 - Restart OctoPrint
 - Repeat for all OctoPrints that will be added to the Farm
 
-# See The WIKI for more detailed instructions than what's available below
-
+## See The WIKI for more detailed instructions than what's available below
 ### Installation
 
 All user documentation is now moving to OctoFarm.net. Development documentation below.
