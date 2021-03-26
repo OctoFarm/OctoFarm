@@ -32,6 +32,7 @@
 
 - [About the Project](#about-the-project)
 - [Getting Started](#getting-started)
+    - [Running with docker-compose.yml](https://github.com/NotExpectedYet/OctoFarm/Running%20with%20docker-compose.yml/)
     - [Wiki](https://github.com/NotExpectedYet/OctoFarm/wiki/)
     - [Platform](#platform)
     - [Supported Browsers](#supported-browsers)
@@ -42,6 +43,11 @@
 - [License](#license)
 - [Contact](#contact)
 - [Acknowledgements](#acknowledgements)
+
+## About The Project
+OctoFarm was built to fill a need that anyone with multiple 3D printers with Octoprint will have run into. How do I
+manage multiple printers from one place? That's where OctoFarm steps in, add your OctoPrint instances to the system and
+it will scan and keep you up to date on the status of your printers.
 
 ## Getting Started
 We provide a couple of ways for you to run OctoFarm. Choose freely:
@@ -58,7 +64,7 @@ We provide a couple of ways for you to run OctoFarm. Choose freely:
   - Ubuntu (.deb)
   - Most Unix systems
 
-### docker-compose.yml
+### Running with docker-compose.yml
 ```
 # Just pick a compose spec version >3
 version: '3.4' 
@@ -108,13 +114,8 @@ The monolithic image does not require mongo externally, but it also has less con
     # Local volumes, can be made named - not advised
     - ./OctoFarm/logs:/app/logs    
     ports:
-    - 4001:4000
+    - 4000:4000
 ```
-
-## About The Project
-OctoFarm was built to fill a need that anyone with multiple 3D printers with Octoprint will have run into. How do I
-manage multiple printers from one place? That's where OctoFarm steps in, add your OctoPrint instances to the system and
-it will scan and keep you up to date on the status of your printers.
 
 ![OctoFarm Dashboard][DashboardScreenshot]
 
