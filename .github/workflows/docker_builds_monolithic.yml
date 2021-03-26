@@ -1,5 +1,4 @@
-name: ci
-
+name: Docker Monolithic
 on:
   pull_request:
   push:
