@@ -29,10 +29,9 @@
 </div>
 
 ## Table of Contents
-
 - [About the Project](#about-the-project)
 - [Getting Started](#getting-started)
-    - [Running with docker-compose.yml](https://github.com/NotExpectedYet/OctoFarm/Running%20with%20docker-compose.yml/)
+    - [Running with docker-compose.yml](#running-with-docker-composeyml)
     - [Wiki](https://github.com/NotExpectedYet/OctoFarm/wiki/)
     - [Platform](#platform)
     - [Supported Browsers](#supported-browsers)
