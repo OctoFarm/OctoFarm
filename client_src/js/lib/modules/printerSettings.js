@@ -303,13 +303,13 @@ export default class PrinterSettings {
               <div class="input-group-prepend">
                 <span class="input-group-text">Extruder Count:</span>
               </div>
-              <input id="psExtruderCount" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.extruder.count}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
+              <input id="psExtruderCount" type="number" class="form-control" placeholder="${currentPrinter?.currentProfile?.extruder?.packets}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
             </div>
              <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text">Nozzle Size:</span>
               </div>
-              <input id="psNozzleDiameter" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.extruder.nozzleDiameter}" aria-label="Username" aria-describedby="basic-addon1" step="0.1" min="0.1">
+              <input id="psNozzleDiameter" type="number" class="form-control" placeholder="${currentPrinter?.currentProfile?.extruder?.nozzleDiameter}" aria-label="Username" aria-describedby="basic-addon1" step="0.1" min="0.1">
             </div>
             </div>
             <div class="col-12 col-lg-4">
@@ -588,17 +588,14 @@ export default class PrinterSettings {
         let wolInterval = "100";
         let wolCount = "3";
         let wolMAC = "";
-        if (
-          currentPrinter.powerSettings !== null ||
-          (_.isEmpty(currentPrinter.powerSettings) &&
-            typeof currentPrinter.powerSettings.wol !== "undefined")
-        ) {
-          wolEnable = currentPrinter.powerSettings.wol.enabled;
-          wolIP = currentPrinter.powerSettings.wol.ip;
-          wolPort = currentPrinter.powerSettings.wol.port;
-          wolInterval = currentPrinter.powerSettings.wol.interval;
-          wolCount = currentPrinter.powerSettings.wol.count;
-          wolMAC = currentPrinter.powerSettings.wol.MAC;
+        const currentWolSubsettings = currentPrinter?.powerSettings?.wol;
+        if (!!currentWolSubsettings) {
+          wolEnable = currentWolSubsettings.enabled;
+          wolIP = currentWolSubsettings.ip;
+          wolPort = currentWolSubsettings.port;
+          wolInterval = currentWolSubsettings.interval;
+          wolCount = currentWolSubsettings.packets;
+          wolMAC = currentWolSubsettings.MAC;
         }
         document.getElementById("psPowerCommands").innerHTML = `
         <h5><u>OctoPrint Specific Power Commands</u></h5>
@@ -671,7 +668,8 @@ export default class PrinterSettings {
           <p class="mb-0">Setup a custom POST request to an API endpoint, instructions for such will be in your plugin/device instructions. Setting this up will activate the power button toggle on all Views and allow Power On and Power Off selections in the dropdown.</p>
            <p class="mb-0">If you'd like to enter in a full URL command then leave the command blank and it will skip the requirement and just make a POST to the URL provided similar to CURL. You can use the following placeholders:</p>
           <p class="mb-0">Printer URL: <code>[PrinterURL]</code></p>
-          <p class="mb-0">Printer api-key: <code>[PrinterAPI]</code></p
+          <p class="mb-0">Printer API-KEY: <code>[PrinterAPI]</code></p>
+          <button id="resetPowerFields" title="The dev coded himself into a corner here... Use this button to reset the below commands to blank." type="button" class="btn btn-danger mb-2">Reset Fields</button>
           <h6>Power On</h6>
            <div class="form-row">
               <div class="col-4">
@@ -924,7 +922,38 @@ export default class PrinterSettings {
         document.getElementById("psMaintenanceCosts").placeholder = parseFloat(
           currentPrinter.costSettings.maintenanceCosts
         );
-
+        document
+          .getElementById("resetPowerFields")
+          .addEventListener("click", async () => {
+            let post = await OctoFarmClient.get(
+              "printers/killPowerSettings/" + currentPrinter?._id
+            );
+            if (post?.status === 200) {
+              post = await post.json();
+              if (post?.updateSettings) {
+                UI.createAlert(
+                  "success",
+                  "Successfully cleared Power Settings",
+                  3000,
+                  "clicked"
+                );
+              } else {
+                UI.createAlert(
+                  "error",
+                  "Failed to clear Power Settings",
+                  3000,
+                  "clicked"
+                );
+              }
+            } else {
+              UI.createAlert(
+                "error",
+                "Failed to contact server is it online?",
+                3000,
+                "clicked"
+              );
+            }
+          });
         document
           .getElementById("savePrinterSettings")
           .addEventListener("click", async (event) => {
@@ -973,7 +1002,7 @@ export default class PrinterSettings {
                   ip: document.getElementById("psWolIP").value,
                   port: document.getElementById("psWolPort").value,
                   interval: document.getElementById("psWolInterval").value,
-                  count: document.getElementById("psWolCount").value,
+                  packets: document.getElementById("psWolCount").value,
                   MAC: document.getElementById("psWolMAC").value,
                 },
               },

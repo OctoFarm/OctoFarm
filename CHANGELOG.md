@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
     - Fixed #240: Commands sent from the Printer Control Terminal would double wrap array.
     - Fixed #358: Spool Manager not allowing input of decimal places
+    - Fixed #398: Added back in power reset buttons
     
 # [Released]
 
