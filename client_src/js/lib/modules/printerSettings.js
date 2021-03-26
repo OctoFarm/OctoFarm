@@ -303,13 +303,13 @@ export default class PrinterSettings {
               <div class="input-group-prepend">
                 <span class="input-group-text">Extruder Count:</span>
               </div>
-              <input id="psExtruderCount" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.extruder.packets}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
+              <input id="psExtruderCount" type="number" class="form-control" placeholder="${currentPrinter?.currentProfile?.extruder?.packets}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
             </div>
              <div class="input-group mb-3">
               <div class="input-group-prepend">
                 <span class="input-group-text">Nozzle Size:</span>
               </div>
-              <input id="psNozzleDiameter" type="number" class="form-control" placeholder="${currentPrinter.currentProfile.extruder.nozzleDiameter}" aria-label="Username" aria-describedby="basic-addon1" step="0.1" min="0.1">
+              <input id="psNozzleDiameter" type="number" class="form-control" placeholder="${currentPrinter?.currentProfile?.extruder?.nozzleDiameter}" aria-label="Username" aria-describedby="basic-addon1" step="0.1" min="0.1">
             </div>
             </div>
             <div class="col-12 col-lg-4">
@@ -590,15 +590,15 @@ export default class PrinterSettings {
         let wolMAC = "";
         if (
           currentPrinter.powerSettings !== null ||
-          (_.isEmpty(currentPrinter.powerSettings) &&
-            typeof currentPrinter.powerSettings.wol !== "undefined")
+          (_.isEmpty(currentPrinter?.powerSettings) &&
+            typeof currentPrinter?.powerSettings?.wol !== "undefined")
         ) {
-          wolEnable = currentPrinter.powerSettings.wol.enabled;
-          wolIP = currentPrinter.powerSettings.wol.ip;
-          wolPort = currentPrinter.powerSettings.wol.port;
-          wolInterval = currentPrinter.powerSettings.wol.interval;
-          wolCount = currentPrinter.powerSettings.wol.packets;
-          wolMAC = currentPrinter.powerSettings.wol.MAC;
+          wolEnable = currentPrinter?.powerSettings?.wol?.enabled;
+          wolIP = currentPrinter?.powerSettings?.wol?.ip;
+          wolPort = currentPrinter?.powerSettings?.wol?.port;
+          wolInterval = currentPrinter?.powerSettings?.wol?.interval;
+          wolCount = currentPrinter?.powerSettings?.wol?.packets;
+          wolMAC = currentPrinter?.powerSettings?.wol?.MAC;
         }
         document.getElementById("psPowerCommands").innerHTML = `
         <h5><u>OctoPrint Specific Power Commands</u></h5>
@@ -927,7 +927,6 @@ export default class PrinterSettings {
         );
         document.getElementById("resetPowerFields").addEventListener("click", async () => {
           let post = await OctoFarmClient.get("printers/killPowerSettings/"+currentPrinter?._id);
-          console.log(post)
           if(post?.status === 200){
             post = await post.json();
             if(post?.updateSettings){
