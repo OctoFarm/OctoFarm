@@ -588,17 +588,14 @@ export default class PrinterSettings {
         let wolInterval = "100";
         let wolCount = "3";
         let wolMAC = "";
-        if (
-          currentPrinter.powerSettings !== null ||
-          (_.isEmpty(currentPrinter?.powerSettings) &&
-            typeof currentPrinter?.powerSettings?.wol !== "undefined")
-        ) {
-          wolEnable = currentPrinter?.powerSettings?.wol?.enabled;
-          wolIP = currentPrinter?.powerSettings?.wol?.ip;
-          wolPort = currentPrinter?.powerSettings?.wol?.port;
-          wolInterval = currentPrinter?.powerSettings?.wol?.interval;
-          wolCount = currentPrinter?.powerSettings?.wol?.packets;
-          wolMAC = currentPrinter?.powerSettings?.wol?.MAC;
+        const currentWolSubsettings = currentPrinter?.powerSettings?.wol;
+        if (!!currentWolSubsettings) {
+          wolEnable = currentWolSubsettings.enabled;
+          wolIP = currentWolSubsettings.ip;
+          wolPort = currentWolSubsettings.port;
+          wolInterval = currentWolSubsettings.interval;
+          wolCount = currentWolSubsettings.packets;
+          wolMAC = currentWolSubsettings.MAC;
         }
         document.getElementById("psPowerCommands").innerHTML = `
         <h5><u>OctoPrint Specific Power Commands</u></h5>
@@ -925,19 +922,38 @@ export default class PrinterSettings {
         document.getElementById("psMaintenanceCosts").placeholder = parseFloat(
           currentPrinter.costSettings.maintenanceCosts
         );
-        document.getElementById("resetPowerFields").addEventListener("click", async () => {
-          let post = await OctoFarmClient.get("printers/killPowerSettings/"+currentPrinter?._id);
-          if(post?.status === 200){
-            post = await post.json();
-            if(post?.updateSettings){
-              UI.createAlert("success", "Successfully cleared Power Settings",  3000, "clicked");
-            }else{
-              UI.createAlert("error", "Failed to clear Power Settings",  3000, "clicked");
+        document
+          .getElementById("resetPowerFields")
+          .addEventListener("click", async () => {
+            let post = await OctoFarmClient.get(
+              "printers/killPowerSettings/" + currentPrinter?._id
+            );
+            if (post?.status === 200) {
+              post = await post.json();
+              if (post?.updateSettings) {
+                UI.createAlert(
+                  "success",
+                  "Successfully cleared Power Settings",
+                  3000,
+                  "clicked"
+                );
+              } else {
+                UI.createAlert(
+                  "error",
+                  "Failed to clear Power Settings",
+                  3000,
+                  "clicked"
+                );
+              }
+            } else {
+              UI.createAlert(
+                "error",
+                "Failed to contact server is it online?",
+                3000,
+                "clicked"
+              );
             }
-          }else{
-            UI.createAlert("error", "Failed to contact server is it online?",  3000, "clicked");
-          }
-        })
+          });
         document
           .getElementById("savePrinterSettings")
           .addEventListener("click", async (event) => {
