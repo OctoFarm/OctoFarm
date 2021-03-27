@@ -48,22 +48,44 @@ OctoFarm was built to fill a need that anyone with multiple 3D printers with Oct
 manage multiple printers from one place? That's where OctoFarm steps in, add your OctoPrint instances to the system and
 it will scan and keep you up to date on the status of your printers.
 
+![OctoFarm Dashboard][DashboardScreenshot]
+
 ## Getting Started
-We provide a couple of ways for you to run OctoFarm. Choose freely:
-- Docker 
-  - Windows 10
-  - Ubuntu
-  - Most Unix systems
+We provide many ways for you to run OctoFarm, however we do realize that some ways like using Docker can be complex or new for some users.
+If that applies to your case, we offer to install NodeJS 14+ directly and to clone the source code from git (see [prerequisites](#prerequisites) below)
+1) Are you new to git, github or docker?
+> Make sure to install git on your system
+> 
+> Go for ``git clone -branch master https://github.com/OctoFarm/OctoFarm.git``
+
+the easiest is to run our installer 
+
+Choose freely:
+- Standalone installer
+  - Windows 64-bits (coming soon...)
+  - Ubuntu 64-bits (coming soon...)
+  - Raspberry Pi ARM64 (coming soon...)
 - NodeJS v14+
   - PM2 (monitored service)
-  - PKG version
   - Nodemon (developer only)
+- Docker (docker-compose below)
+  - Windows 10 (we advice [WSL2](https://docs.docker.com/docker-for-windows/install/) and BIOS virtualization)
+  - Ubuntu 18.04+
+  - Most other 64-bits Unix systems
 - (Coming soon) installation
   - Windows 10 (setup .exe)
   - Ubuntu (.deb)
   - Most Unix systems
 
-### Running with docker-compose.yml
+## Running with docker-compose.yml
+1) NOTE we assume you are familiar with `docker` and `docker-compose`. These are great tools for isolating your software deployment, but it can come at the cost of complexity.
+We do not or cannot support each custom scenario or setup! 
+Take good care of checking your device's memory limits, architecture and CPU power.
+2) NOTE we provide `octofarm/octofarm:latest`, `octofarm/octofarm:alpin-latest` and `octofarm/octofarm:monolithic-latest`
+   - `latest` and `alpine-latest` require you to run MongoDB or a MongoDB container (see compose below)
+   - `monolithic`
+
+### Docker images :latest or :alpine-latest with MongoDb
 ```
 # Just pick a compose spec version >3
 version: '3.4' 
@@ -90,33 +112,35 @@ services:
 
   octofarm:
     container_name: octofarm
-    # octofarm/octofarm:alpine-latest is also available!    
+    # choose octofarm/octofarm:latest or octofarm/octofarm:alpine-latest    
     image: octofarm/octofarm:latest
     restart: always
     ports:
-    # HOST:CONTAINER
+    # SYSTEM:CONTAINER
     - 4000:4000
     environment:
-    - MONGO=mongodb://MONGO_ROOTUSER_HERE:MONGO_PASSWORD_HERE@host.docker.internal:27017/octofarm?authSource=admin&readPreference=primary&ssl=false
+    - MONGO=mongodb://MONGO_ROOTUSER_HERE:MONGO_PASSWORD_HERE@mongodb:27017/octofarm?authSource=admin
     volumes:
     # Local volumes, can be made named - not advised
     - ./OctoFarm/logs:/app/logs
-    - ./OctoFarm/scripts:/scripts
+    - ./OctoFarm/scripts:/app/scripts
 ```
+### Docker image :monolithic-latest
 The monolithic image does not require mongo externally, but it also has less control:
 ```
  octofarm-monolithic:
     container_name: octofarm-monolithic
-    image: octofarm/octofarm:dev-monolithic
+    image: octofarm/octofarm:monolithic-latest
     restart: always
     volumes:
-    # Local volumes, can be made named - not advised
-    - ./OctoFarm/logs:/app/logs    
+    # Local volumes, can be made named
+    - ./OctoFarm/logs:/app/logs   
+    - ./OctoFarm/scripts:/app/scripts
+    - ./mongodb-data:/data/db 
     ports:
+    # SYSTEM:CONTAINER
     - 4000:4000
 ```
-
-![OctoFarm Dashboard][DashboardScreenshot]
 
 ## Setup version (.exe, .deb, etc.)
 We are really close to providing installable versions of OctoFarm! Bear with us for version 1.1.14. We will provide the
@@ -165,7 +189,7 @@ All user documentation is now moving to OctoFarm.net. Development documentation 
 
 https://octofarm.net
 
-### Installation Development
+### Installation for Development
 
 1. Clone the OctoFarm
 
@@ -179,17 +203,10 @@ git clone https://github.com/NotExpectedYet/OctoFarm.git
 npm install
 ```
 
-3. Create an .env file (takes precedence over the /config/db.js `MongoURI` file automatically!) with the MONGO variable:
+3. Create an .env file with the MONGO variable:
 
 ```
 MONGO=mongodb://127.0.0.1:4000/octofarm
-```
-
-OR (`host.docker.internal` works inside and outside docker subnetwork)
-
-```
-# Docker
-MONGO=mongodb://host.docker.internal:4000/octofarm
 ```
 
 OR (custom parameters, like from a `docker-compose.yml` file)
@@ -222,7 +239,7 @@ npm run dev
 
 ## Contributing
 Version 2.0 is underway on the `alpha-2x` branch. If anyone would like to join the fun please head over to discord with
-the following link: - Discord: [Discord](https://discord.gg/vjabMUn) and speak to us in Developer Discussions. Thanks!
+the following link: [Discord](https://discord.gg/vjabMUn) and speak to us in Developer Discussions. Thanks!
 
 ## License
 Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more information.
