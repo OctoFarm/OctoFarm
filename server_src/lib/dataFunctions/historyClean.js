@@ -1,7 +1,10 @@
-const ServerSettings = require("../../models/ServerSettings.js");
-const Logger = require("../logger.js");
+const { checkNested, checkNestedIndex } = require("../utils/array.util");
+const { getPrintCost } = require("../utils/print-cost.util");
 const { getHistoryCleanDefault } = require("../providers/history.constants");
+const ServerSettings = require("../../models/ServerSettings.js");
 const historyService = require("../../services/history.service");
+
+const Logger = require("../logger.js");
 
 class HistoryClean {
   enableLogging = false;
@@ -17,30 +20,6 @@ class HistoryClean {
       logLevel,
     );
     this.enableLogging = enableFileLogging || false;
-  }
-
-  static checkNested(nameKey, myArray) {
-    try {
-      for (var i = 0; i < myArray.length; i++) {
-        if (myArray[i].name === nameKey) {
-          return myArray[i];
-        }
-      }
-    } catch (e) {
-      logger.error("Couldn't check nested....", JSON.stringify(e));
-    }
-  }
-
-  static checkNestedIndex(nameKey, myArray) {
-    try {
-      for (var i = 0; i < myArray.length; i++) {
-        if (myArray[i].name === nameKey) {
-          return i;
-        }
-      }
-    } catch (e) {
-      logger.error("Couldn't check nested index...", JSON.stringify(e));
-    }
   }
 
   static async getHours(printTime) {
@@ -100,6 +79,7 @@ class HistoryClean {
       }
     }
 
+    // TODO remove as it is simply a nullable call
     //Get spoolid function
     function spoolID(id) {
       if (typeof id !== "undefined" && id !== null) {
@@ -251,30 +231,6 @@ class HistoryClean {
     }
   }
 
-  static getPrintCost(printTime, costSettings) {
-    if (typeof costSettings === "undefined") {
-      //Attempt to update cost settings in history...
-      return "No cost settings to calculate from";
-    } else {
-      // calculating electricity cost
-      const powerConsumption = parseFloat(costSettings.powerConsumption);
-      const costOfElectricity = parseFloat(costSettings.electricityCosts);
-      const costPerHour = powerConsumption * costOfElectricity;
-      const estimatedPrintTime = printTime / 3600; // h
-      const electricityCost = costPerHour * estimatedPrintTime;
-      // calculating printer cost
-      const purchasePrice = parseFloat(costSettings.purchasePrice);
-      const lifespan = parseFloat(costSettings.estimateLifespan);
-      const depreciationPerHour = lifespan > 0 ? purchasePrice / lifespan : 0;
-      const maintenancePerHour = parseFloat(costSettings.maintenanceCosts);
-      const printerCost =
-        (depreciationPerHour + maintenancePerHour) * estimatedPrintTime;
-      // assembling string
-      const estimatedCost = electricityCost + printerCost;
-      return estimatedCost.toFixed(2);
-    }
-  }
-
   static getFile(history) {
     const file = {
       name: history.fileName,
@@ -371,7 +327,7 @@ class HistoryClean {
               const keys = Object.keys(spool);
               for (const key of keys) {
                 //check if type exists
-                let checkNested = this.checkNested(
+                let checkNested = checkNested(
                   JSON.parse(JSON.stringify(spool[key].type)),
                   totalByDay,
                 );
@@ -379,17 +335,17 @@ class HistoryClean {
                 if (typeof checkNested !== "undefined") {
                   let checkNestedIndexHistoryRates = null;
                   if (historyClean[h].state.includes("success")) {
-                    checkNestedIndexHistoryRates = this.checkNestedIndex(
+                    checkNestedIndexHistoryRates = checkNestedIndex(
                       "Success",
                       historyByDay,
                     );
                   } else if (historyClean[h].state.includes("warning")) {
-                    checkNestedIndexHistoryRates = this.checkNestedIndex(
+                    checkNestedIndexHistoryRates = checkNestedIndex(
                       "Cancelled",
                       historyByDay,
                     );
                   } else if (historyClean[h].state.includes("danger")) {
-                    checkNestedIndexHistoryRates = this.checkNestedIndex(
+                    checkNestedIndexHistoryRates = checkNestedIndex(
                       "Failed",
                       historyByDay,
                     );
@@ -397,7 +353,7 @@ class HistoryClean {
                     return;
                   }
 
-                  let checkNestedIndexByDay = this.checkNestedIndex(
+                  let checkNestedIndexByDay = checkNestedIndex(
                     JSON.parse(JSON.stringify(spool[key].type)),
                     usageOverTime,
                   );
@@ -418,7 +374,7 @@ class HistoryClean {
                     );
                   }
 
-                  let checkNestedIndex = this.checkNestedIndex(
+                  let checkNestedIndex = checkNestedIndex(
                     JSON.parse(JSON.stringify(spool[key].type)),
                     totalByDay,
                   );
@@ -467,8 +423,6 @@ class HistoryClean {
                         x: dateParse,
                         y: weightCalcSan,
                       });
-                      // console.log(checkNestedIndexHistoryRates);
-                      // console.log(historyByDay[checkNestedIndexHistoryRates].name);
                       historyByDay[checkNestedIndexHistoryRates].data.push({
                         x: dateParse,
                         y: 1,
@@ -682,7 +636,7 @@ class HistoryClean {
           endDate: currHistory.endDate,
           printTime: currHistory.printTime,
           notes: currHistory.notes,
-          printerCost: HistoryClean.getPrintCost(
+          printerCost: getPrintCost(
             currHistory.printTime,
             currHistory.costSettings,
           ),

@@ -1,9 +1,11 @@
+const { checkNested, checkNestedIndex } = require("../utils/array.util");
+
 const _ = require("lodash");
 const { JobClean } = require("./jobClean.js");
 const fileClean = require("./fileClean.js");
 const { FileClean } = fileClean;
 const { HistoryClean } = require("./historyClean.js");
- const FarmStatistics = require("../../models/FarmStatistics.js");
+const FarmStatistics = require("../../models/FarmStatistics.js");
 const RoomData = require("../../models/roomData.js");
 const ErrorLogs = require("../../models/ErrorLog.js");
 const TempHistory = require("../../models/TempHistory.js");
@@ -111,6 +113,7 @@ class PrinterClean {
       printersInformation = [];
     }
   }
+
   static returnPrinterLogs(sortIndex) {
     if (typeof sortIndex !== "undefined") {
       return printerConnectionLogs[sortIndex];
@@ -118,6 +121,7 @@ class PrinterClean {
       return printerConnectionLogs;
     }
   }
+
   static returnPrintersInformation() {
     return printersInformation;
   }
@@ -137,31 +141,10 @@ class PrinterClean {
   static returnDashboardStatistics() {
     return dashboardStatistics;
   }
-  static checkNested(nameKey, myArray) {
-    try {
-      for (var i = 0; i < myArray.length; i++) {
-        if (myArray[i].name === nameKey) {
-          return myArray[i];
-        }
-      }
-    } catch (e) {
-      logger.error("Couldn't check nested....", JSON.stringify(e));
-    }
-  }
-  static checkNestedIndex(nameKey, myArray) {
-    try {
-      for (var i = 0; i < myArray.length; i++) {
-        if (myArray[i].name === nameKey) {
-          return i;
-        }
-      }
-    } catch (e) {
-      logger.error("Couldn't check nested index...", JSON.stringify(e));
-    }
-  }
+
   static async generatePrinterStatistics(id) {
     let currentHistory = JSON.parse(
-      JSON.stringify(await HistoryClean.returnHistory())
+      JSON.stringify(await HistoryClean.returnHistory()),
     );
     let currentPrinters = printersInformation;
     const i = _.findIndex(currentPrinters, function (o) {
@@ -175,7 +158,7 @@ class PrinterClean {
     let dateDifference = parseInt(todaysDate - dateAdded);
     let sevenDaysAgo = new Date(todaysDate.getTime() - 7 * 24 * 60 * 60 * 1000);
     let ninetyDaysAgo = new Date(
-      todaysDate.getTime() - 90 * 24 * 60 * 60 * 1000
+      todaysDate.getTime() - 90 * 24 * 60 * 60 * 1000,
     );
     // Filter down the history arrays for total/daily/weekly
     let historyDaily = [];
@@ -221,13 +204,13 @@ class PrinterClean {
     const totalTime =
       printer.currentActive + printer.currentIdle + printer.currentOffline;
     printerStatistics.printerUtilisation.push(
-      (printer.currentActive / totalTime) * 100
+      (printer.currentActive / totalTime) * 100,
     );
     printerStatistics.printerUtilisation.push(
-      (printer.currentIdle / totalTime) * 100
+      (printer.currentIdle / totalTime) * 100,
     );
     printerStatistics.printerUtilisation.push(
-      (printer.currentOffline / totalTime) * 100
+      (printer.currentOffline / totalTime) * 100,
     );
 
     currentHistory.forEach((h) => {
@@ -249,7 +232,7 @@ class PrinterClean {
       ];
       let month = months.indexOf(dateSplit[1]);
       let dateString = `${parseInt(dateSplit[3])}-${month + 1}-${parseInt(
-        dateSplit[2]
+        dateSplit[2],
       )}`;
       let dateParse = new Date(dateString);
       if (h.printer === printerStatistics.printerName) {
@@ -277,27 +260,27 @@ class PrinterClean {
         if (dateParse.getTime() > sevenDaysAgo.getTime()) {
           historyWeekly.push(h);
         }
-        let checkNested = this.checkNested(
+        let checkNested = checkNested(
           "Success",
-          printerStatistics.historyByDay
+          printerStatistics.historyByDay,
         );
         //
         if (typeof checkNested !== "undefined") {
           let checkNestedIndexHistoryRates = null;
           if (h.state.includes("success")) {
-            checkNestedIndexHistoryRates = this.checkNestedIndex(
+            checkNestedIndexHistoryRates = checkNestedIndex(
               "Success",
-              printerStatistics.historyByDay
+              printerStatistics.historyByDay,
             );
           } else if (h.state.includes("warning")) {
-            checkNestedIndexHistoryRates = this.checkNestedIndex(
+            checkNestedIndexHistoryRates = checkNestedIndex(
               "Cancelled",
-              printerStatistics.historyByDay
+              printerStatistics.historyByDay,
             );
           } else if (h.state.includes("danger")) {
-            checkNestedIndexHistoryRates = this.checkNestedIndex(
+            checkNestedIndexHistoryRates = checkNestedIndex(
               "Failed",
-              printerStatistics.historyByDay
+              printerStatistics.historyByDay,
             );
           } else {
             return;

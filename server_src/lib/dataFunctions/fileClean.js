@@ -1,5 +1,6 @@
 const _ = require("lodash");
 const Logger = require("../logger.js");
+const { getPrintCost } = require("../utils/print-cost.util");
 
 const logger = new Logger("OctoFarm-InformationCleaning");
 
@@ -131,7 +132,7 @@ class FileClean {
               failed: file.failed,
               last: file.last,
               expectedPrintTime: file.time,
-              printCost: await FileClean.getPrintCost(file.time, printCost),
+              printCost: getPrintCost(file.time, printCost),
             };
             sortedFile.toolUnits = await FileClean.getUnits(
               selectedFilament,
@@ -221,29 +222,6 @@ class FileClean {
       return strings;
     }
     return [];
-  }
-
-  static async getPrintCost(printTime, costSettings) {
-    if (typeof costSettings === "undefined") {
-      // Attempt to update cost settings in history...
-      return "No cost settings to calculate from";
-    }
-    // calculating electricity cost
-    const powerConsumption = parseFloat(costSettings.powerConsumption);
-    const costOfElectricity = parseFloat(costSettings.electricityCosts);
-    const costPerHour = powerConsumption * costOfElectricity;
-    const estimatedPrintTime = printTime / 3600; // h
-    const electricityCost = costPerHour * estimatedPrintTime;
-    // calculating printer cost
-    const purchasePrice = parseFloat(costSettings.purchasePrice);
-    const lifespan = parseFloat(costSettings.estimateLifespan);
-    const depreciationPerHour = lifespan > 0 ? purchasePrice / lifespan : 0;
-    const maintenancePerHour = parseFloat(costSettings.maintenanceCosts);
-    const printerCost =
-      (depreciationPerHour + maintenancePerHour) * estimatedPrintTime;
-    // assembling string
-    const estimatedCost = electricityCost + printerCost;
-    return estimatedCost.toFixed(2);
   }
 
   static async getCost(filamentSelection, units) {
