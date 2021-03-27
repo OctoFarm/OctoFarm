@@ -73,7 +73,7 @@ class JobClean {
         printer.job.estimatedPrintTime,
         printer.costSettings
       );
-      currentJob.expectedFilamentCosts = await HistoryClean.getSpool(
+      currentJob.expectedFilamentCosts = await HistoryClean.getSpoolAsync(
         selectedFilament,
         printer.job,
         true,

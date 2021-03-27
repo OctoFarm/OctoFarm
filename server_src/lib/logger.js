@@ -5,13 +5,13 @@ dateFormat = () => {
 };
 
 class LoggerService {
-  constructor(route, enableFileLogs = true) {
+  constructor(route, enableFileLogs = true, logFilterLevel = 'warn') {
     this.log_data = null;
     this.route = route;
     const logger = winston.createLogger({
       transports: [
         new winston.transports.Console({
-          level: 'warn'
+          level: logFilterLevel
         }),
         ...(
           enableFileLogs ?

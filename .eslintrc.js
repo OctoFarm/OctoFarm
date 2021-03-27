@@ -12,6 +12,7 @@ module.exports = {
     parser: "babel-eslint",
     sourceType: "module",
   },
+  ignorePatterns: [".eslintrc.js"],
   rules: {
     "prettier/prettier": "error",
     "max-len": [
