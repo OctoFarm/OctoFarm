@@ -1,15 +1,33 @@
 export enum EventType {
-    "UserLoggedIn",
-    "ClientOpened",
-    "ClientClosed",
     "ClientAuthed",
-    "PrinterStateChanged",
-    "Connected",
-    "FirmwareData",
-    "Disconnecting",
-    "UpdatedFiles",
-    "Disconnected",
+    "ClientClosed",
+    "ClientOpened",
+    "Connected",  // Not modeled yet
+    "Disconnecting",  // Not modeled yet
+    "Disconnected",  // Not modeled yet
+    "Dwelling",
+    "FileAdded",
+    "FileDeselected",
     "FileRemoved",
+    "FirmwareData",  // Not modeled yet
     "FolderAdded",
-    "FolderRemoved"
+    "FolderRemoved", // Not modeled yet
+    "Home",
+    "MetadataAnalysisFinished",
+    "MetadataAnalysisStarted",
+    "MetadataStatisticsUpdated",
+    "PositionUpdate",
+    "PrintCancelled",
+    "PrintCancelling",
+    "PrintDone",
+    "PrintFailed",
+    "PrintPaused",
+    "PrintStarted",
+    "PrinterStateChanged",
+    "TransferDone",
+    "TransferStarted",
+    "UpdatedFiles",
+    "Upload",
+    "UserLoggedIn",
+    "ZChange",
 }

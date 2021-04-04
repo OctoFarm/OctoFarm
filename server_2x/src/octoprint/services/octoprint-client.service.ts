@@ -21,7 +21,7 @@ import * as fs from "fs";
 
 @Injectable()
 export class OctoPrintClientService {
-    private messageCount = 0;
+    private enableMessageTransforms = false;
     private knownEventTypes = [];
 
     constructor(
@@ -108,21 +108,19 @@ export class OctoPrintClientService {
                 analysedType = "current";
             } else if (jsonMessage.event !== undefined) {
                 const eventType = jsonMessage.event.type;
-                if (!this.knownEventTypes.includes(eventType)) {
+
+                // Triggers transform to file in DEV mode (will restart NestJS in watch mode, so not too easy to use in that case)
+                if (!this.knownEventTypes.includes(eventType) && this.enableMessageTransforms) {
                     this.knownEventTypes.push(eventType);
-
                     const fileName = eventType.replace(/[A-Z]/g, (match, offset) => (offset > 0 ? '-' : '') + match.toLowerCase()) + ".dto.ts";
-
                     const dtoInterfaceName = eventType + "Dto";
                     if (!fileName || !dtoInterfaceName) {
                         console.error('Failed to process new event message! Type:', eventType, dtoInterfaceName, fileName);
-                    }
-                    else {
+                    } else {
                         console.log('New event message! Type:', eventType, dtoInterfaceName, fileName);
                         this.writeDto(jsonMessage.event.payload, fileName, dtoInterfaceName);
                     }
-                }
-                else {
+                } else {
                     console.log('Known event message. type:', eventType);
                 }
                 analysedType = "event";
@@ -143,6 +141,12 @@ export class OctoPrintClientService {
         return socket;
     }
 
+    /**
+     * Developer mode only, write message DTOs.
+     * @param dtoData
+     * @param fileName
+     * @param interfaceName
+     */
     writeDto(dtoData: any, fileName, interfaceName) {
         // Used to generate dto's - keep
         const schemaDtoFile = path.join("./src/octoprint/dto/websocket/events/", fileName);
