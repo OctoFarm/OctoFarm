@@ -145,7 +145,7 @@ export class OctoPrintClientService {
 
     writeDto(dtoData: any, fileName, interfaceName) {
         // Used to generate dto's - keep
-        const schemaDtoFile = path.join("./src/octoprint/dto/websocket/events/", fileName + ".ts");
+        const schemaDtoFile = path.join("./src/octoprint/dto/websocket/events/", fileName);
         transform(interfaceName, dtoData)
             .then(transformation => {
                 fs.writeFileSync(schemaDtoFile, transformation);
