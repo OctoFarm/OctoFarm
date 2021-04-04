@@ -12,6 +12,7 @@ import {PluginMessageDto} from "../dto/websocket-output/plugin-message.dto";
 import path from "path";
 import {transform} from "json-to-typescript/index";
 import fs from "fs";
+import {backoff} from "../providers/backoff.generator";
 
 @Injectable()
 export class WebsocketClientService {
@@ -34,9 +35,8 @@ export class WebsocketClientService {
         if (!!throttleRate) {
             this.constructURL(params, websocketProtocol);
             this.octoprintParams = params;
-            this.createSocket();
-            this.bindSocket(throttleRate);
 
+            await this.connectWithBackoff(throttleRate);
             return this.socket.OPEN;
         } else {
             throw new Error("Illegal throttle rate provided. Needs to be 1 or higher.");
@@ -62,6 +62,12 @@ export class WebsocketClientService {
         }
     }
 
+    private async connectWithBackoff(throttleRate: ThrottleRate) {
+        await backoff(10, async () => {
+            await this.bindRegenerativeSocket(throttleRate);
+        }, 5000);
+    }
+
     /**
      * Developer mode only, write message DTOs.
      * @param dtoData
@@ -77,19 +83,22 @@ export class WebsocketClientService {
             });
     }
 
-    private sendAuth(input: AuthMessage) {
+    private async sendAuth(input: AuthMessage) {
         if (!input.validateAuth()) {
             throw Error("Invalid authentication input provided to connect with OctoPrint Websocket");
         }
-        this.sendGeneric(input, (error) => {
-            if (!!error) {
-                this.authState = "FAILURE";
-                this.logger.error('OctoPrint WebSocket authentication failed:', error);
-            } else {
-                this.authState = "SUCCESS";
-                this.logger.log("Auth success");
-            }
-        });
+        return new Promise((resolve, reject) => this.sendGeneric(input, (error) => {
+                if (!!error) {
+                    this.authState = "FAILURE";
+                    this.logger.error("X OctoPrint WebSocket authentication failed:", error);
+                    reject();
+                } else {
+                    this.authState = "SUCCESS";
+                    this.logger.log("✓ OctoPrint WebSocket authentication success");
+                    resolve(this.authState);
+                }
+            })
+        );
     }
 
     private sendThrottle(input: ThrottleMessage) {
@@ -102,7 +111,7 @@ export class WebsocketClientService {
         });
     }
 
-    private createSocket() {
+    private createSocketSafely() {
         if (!this.socketURL) {
             throw new Error("WebSocket URL not provided. Error on setting up socket.");
         }
@@ -110,28 +119,43 @@ export class WebsocketClientService {
             throw new Error("WebSocket URL did not contain 'ws://' or 'wss://' transport prefix. Error on setting up socket.");
         }
 
+        if (!!this.socket) {
+            this.socket.removeAllListeners();
+        }
         this.socket = new WebSocket(this.socketURL);
     }
 
-    private bindSocket(throttleRate: ThrottleRate) {
-        this.socket.onerror = (event: WebSocket.ErrorEvent) => {
-            this.logger.warn("WebSocket error received", event.message);
-        };
-        this.socket.onopen = (event) => {
-            this.logger.debug("WebSocket opened");
+    private bindRegenerativeSocket(throttleRate: ThrottleRate) {
+        return new Promise((resolve, reject) => {
+            this.createSocketSafely();
 
-            const authKeyMessage = new AuthMessage(this.octoprintParams.username || 'prusa', this.octoprintParams.sessionKey);
-            this.sendAuth(authKeyMessage);
-            if (this.authState == "SUCCESS") {
-                this.setThrottleRate(throttleRate);
+            this.socket.onerror = (event: WebSocket.ErrorEvent) => {
+                this.logger.warn("WebSocket error received", event.message);
+            };
+            this.socket.onopen = async (event) => {
+                this.logger.debug("WebSocket opened");
+
+                const authKeyMessage = new AuthMessage(this.octoprintParams.username || 'prusa', this.octoprintParams.sessionKey);
+                await this.sendAuth(authKeyMessage);
+                if (this.authState == "SUCCESS") {
+                    this.setThrottleRate(throttleRate);
+                    resolve(this.authState);
+                } else {
+                    reject(this.authState);
+                }
+            };
+            this.socket.onmessage = (event) => {
+                this.handleSocketMessage(event?.data);
             }
-        };
-        this.socket.onmessage = (event) => {
-            this.handleSocketMessage(event?.data);
-        }
-        this.socket.onclose = () => {
-            this.logger.log("Websocket closed.");
-        };
+            this.socket.onclose = async () => {
+                this.logger.log("Websocket closed.");
+
+                // I hate this recursive nesting... is there really no better way?
+                await setTimeout(async () => {
+                    await this.connectWithBackoff(throttleRate);
+                }, throttleRate * 500);
+            };
+        });
     }
 
     private handleSocketMessage(data: any) {

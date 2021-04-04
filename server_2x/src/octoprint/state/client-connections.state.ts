@@ -111,7 +111,7 @@ export class ClientConnectionsState {
                 }, (error: AxiosError) => {
                     if (error.isAxiosError) {
                         if (!error?.response || error?.response.status === null || error?.response.status === undefined) {
-                            this.logger.error("AxiosResponse:response field was empty or didn't contain a status code, so the error cannot be handled properly.");
+                            this.logger.error("OctoPrint did not respond. AxiosResponse:response field was empty or didn't contain a status code, so the error cannot be handled properly.");
                             return;
                         }
 
