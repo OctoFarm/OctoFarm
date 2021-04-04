@@ -1,6 +1,6 @@
 import {IsAlphanumeric, IsNotEmpty, validateSync} from "class-validator";
 
-export class SessionConnectionParams {
+export class WebsocketConnectionParams {
     @IsNotEmpty()
     printerURL: string;
 

@@ -6,7 +6,7 @@
  */
 
 export interface ConnectionMessageDto {
-  connected?: {
+  connected: {
     version?: string;
     display_version?: string;
     branch?: string;

@@ -6,13 +6,10 @@
  */
 
 export interface EventMessageDto {
-  event?: {
-    type?: string;
-    payload?: {
-      username?: string;
-      [k: string]: any;
+    event: {
+        type: string;
+        payload: any;
     };
+
     [k: string]: any;
-  };
-  [k: string]: any;
 }

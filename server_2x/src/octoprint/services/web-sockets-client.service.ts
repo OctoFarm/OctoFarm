@@ -1,11 +1,13 @@
 import {Injectable} from "@nestjs/common";
+import {ThrottleMessage} from "../dto/websocket-input/throttle.message";
+import {AuthMessage} from "../dto/websocket-input/auth.message";
+
 // import * as WebSocket from "ws";
 
 @Injectable()
 export class WebSocketsClientService {
     // https://stackoverflow.com/questions/61652247/connect-nestjs-to-a-websocket-server
-    // wss://echo.websocket.org is a test websocket server
-    // private ws = new WebSocket("wss://echo.websocket.org");
+    socket: any;
 
     constructor() {
         // this.ws.on("open", () => {
@@ -17,13 +19,15 @@ export class WebSocketsClientService {
         // });
     }
 
-    // send(data: any) {
-    //     this.ws.send(data);
-    // }
-    //
-    // onMessage(handler: () => void) {
-    //     // ...
-    // }
+    sendGeneric(payload: any) {
 
-    // ...
+    }
+
+    sendAuth(input: AuthMessage) {
+
+    }
+
+    sendThrottle(input: ThrottleMessage) {
+
+    }
 }

@@ -1,7 +1,7 @@
 import {IsAlphanumeric, IsNotEmpty, Length, validateSync} from "class-validator";
 import {ApiKeyLengthMinimumDefault} from "../../printers/printers.config";
 
-export class ConnectionParams {
+export class RestConnectionParams {
     @IsNotEmpty()
     printerURL: string;
 

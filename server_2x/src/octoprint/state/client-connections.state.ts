@@ -2,13 +2,13 @@ import {OctoPrintClientService} from "../services/octoprint-client.service";
 import {tap} from "rxjs/operators";
 import {Observable} from "rxjs";
 import {ClientConnectionStateModel} from "../models/client-connection-state.model";
-import {ConnectionParams} from "../models/connection.params";
+import {RestConnectionParams} from "../models/rest-connection.params";
 import {Injectable, Logger} from "@nestjs/common";
 import {validate} from "class-validator";
 import {AxiosError} from "axios";
 import HttpStatusCode from "../../utils/http-status-codes.enum";
 import {OctoprintGroupType} from "../types/octoprint-group.type";
-import {SessionConnectionParams} from "../models/session-connection.params";
+import {WebsocketConnectionParams} from "../models/websocket-connection.params";
 import {OctoprintGateway} from "../../../tools/octoprint-websocket-mock/gateway/octoprint.gateway";
 
 @Injectable()
@@ -24,8 +24,8 @@ export class ClientConnectionsState {
         websocketConnected: undefined,
         websocketHealthy: undefined
     };
-    private connectionParams: ConnectionParams;
-    private sessionConnectionParams?: SessionConnectionParams;
+    private connectionParams: RestConnectionParams;
+    private sessionConnectionParams?: WebsocketConnectionParams;
     private state: ClientConnectionStateModel;
     private logger = new Logger(ClientConnectionsState.name);
 
@@ -34,7 +34,7 @@ export class ClientConnectionsState {
     ) {
     }
 
-    public async initState(connectionParams: ConnectionParams) {
+    public async initState(connectionParams: RestConnectionParams) {
         if (!this.state) {
             this.state = {...ClientConnectionsState.defaultState};
             this.connectionParams = connectionParams;
@@ -91,7 +91,7 @@ export class ClientConnectionsState {
                         throw new Error("User does not have the required groups to operate OctoPrint remotely from OctoFarm.");
                     }
 
-                    this.sessionConnectionParams = new SessionConnectionParams(
+                    this.sessionConnectionParams = new WebsocketConnectionParams(
                         this.connectionParams.printerURL, userSession.session, userSession.name);
                     try {
                         const socket = this.octoPrintClientService.getWebSocketClient(this.sessionConnectionParams, messageClb);

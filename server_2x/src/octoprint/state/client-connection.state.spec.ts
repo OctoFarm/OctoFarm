@@ -3,12 +3,12 @@ import {ClientConnectionsState} from "./client-connections.state";
 import {OctoPrintClientService} from "../services/octoprint-client.service";
 import {HttpService} from "@nestjs/common";
 import {of} from "rxjs";
-import {ConnectionParams} from "../models/connection.params";
+import {RestConnectionParams} from "../models/rest-connection.params";
 
 describe(ClientConnectionsState.name, () => {
     let service: ClientConnectionsState;
 
-    const testParams = new ConnectionParams("http://notexistedyet", "TESTTESTTESTTESTTESTTESTTESTTEST");
+    const testParams = new RestConnectionParams("http://notexistedyet", "TESTTESTTESTTESTTESTTESTTESTTEST");
     beforeEach(async () => {
         const module: TestingModule = await Test.createTestingModule({
             providers: [
@@ -46,7 +46,7 @@ describe(ClientConnectionsState.name, () => {
     });
 
     it('improper apiKey will show up as invalid state', async () => {
-        const illegalTestParams = new ConnectionParams("http://notexistedyet", "WAYTOOSHORT");
+        const illegalTestParams = new RestConnectionParams("http://notexistedyet", "WAYTOOSHORT");
         await service.initState(illegalTestParams);
         expect(service.getState().apiKeyValid).toEqual(false);
     });

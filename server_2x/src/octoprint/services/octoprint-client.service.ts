@@ -1,19 +1,19 @@
 import {HttpService, Injectable} from '@nestjs/common';
 import {Observable} from "rxjs";
 import {OctoPrintSettingsDto} from "../dto/octoprint-settings.dto";
-import {ConnectionParams} from "../models/connection.params";
+import {RestConnectionParams} from "../models/rest-connection.params";
 import {map} from "rxjs/operators";
 import {AxiosRequestConfig} from "axios";
 import {OctoPrintCurrentUserDto} from "../dto/octoprint-currentuser.dto";
 import * as WebSocket from 'ws';
 import {OctoPrintSessionDto} from "../dto/octoprint-session.dto";
-import {SessionConnectionParams} from "../models/session-connection.params";
-import {ConnectionMessageDto} from "../dto/websocket/connection-message.dto";
-import {HistoryMessageDto} from "../dto/websocket/history-message.dto";
-import {TimelapseMessageDto} from "../dto/websocket/timelapse-message.dto";
-import {CurrentMessageDto} from "../dto/websocket/current-message.dto";
-import {EventMessageDto} from "../dto/websocket/event-message.dto";
-import {PluginMessageDto} from "../dto/websocket/plugin-message.dto";
+import {WebsocketConnectionParams} from "../models/websocket-connection.params";
+import {ConnectionMessageDto} from "../dto/websocket-output/connection-message.dto";
+import {HistoryMessageDto} from "../dto/websocket-output/history-message.dto";
+import {TimelapseMessageDto} from "../dto/websocket-output/timelapse-message.dto";
+import {CurrentMessageDto} from "../dto/websocket-output/current-message.dto";
+import {EventMessageDto} from "../dto/websocket-output/event-message.dto";
+import {PluginMessageDto} from "../dto/websocket-output/plugin-message.dto";
 import {OctoprintGateway} from "../../../tools/octoprint-websocket-mock/gateway/octoprint.gateway";
 import {transform} from "json-to-typescript";
 import * as path from "path";
@@ -29,21 +29,21 @@ export class OctoPrintClientService {
     ) {
     }
 
-    getSettings(params: ConnectionParams): Observable<OctoPrintSettingsDto> {
+    getSettings(params: RestConnectionParams): Observable<OctoPrintSettingsDto> {
         this.checkConnectionParams(params);
 
         const url = new URL('api/settings', params.printerURL).toString();
         return this.connectWithParams<OctoPrintSettingsDto>(params, "GET", url);
     }
 
-    getCurrentUser(params: ConnectionParams): Observable<OctoPrintCurrentUserDto> {
+    getCurrentUser(params: RestConnectionParams): Observable<OctoPrintCurrentUserDto> {
         this.checkConnectionParams(params);
 
         const url = new URL('api/currentuser', params.printerURL).toString();
         return this.connectWithParams<OctoPrintCurrentUserDto>(params, "GET", url);
     }
 
-    loginUserSession(params: ConnectionParams): Observable<OctoPrintSessionDto> {
+    loginUserSession(params: RestConnectionParams): Observable<OctoPrintSessionDto> {
         this.checkConnectionParams(params);
 
         const url = new URL('api/login?passive=true', params.printerURL).toString();
@@ -52,10 +52,10 @@ export class OctoPrintClientService {
 
     /**
      * Get an OctoPrint WebSocket client instance
-     * @param {ConnectionParams} params - connection parameters
+     * @param {RestConnectionParams} params - connection parameters
      * @param proxyGateway
      */
-    getWebSocketClient(params: SessionConnectionParams, proxyGateway?: OctoprintGateway) {
+    getWebSocketClient(params: WebsocketConnectionParams, proxyGateway?: OctoprintGateway) {
         this.checkConnectionParams(params);
 
         const constructedURL = new URL(params.printerURL);
@@ -156,7 +156,7 @@ export class OctoPrintClientService {
             });
     }
 
-    setCORSEnabled(params: ConnectionParams): Observable<OctoPrintSettingsDto> {
+    setCORSEnabled(params: RestConnectionParams): Observable<OctoPrintSettingsDto> {
         this.checkConnectionParams(params);
 
         const url = new URL('api/settings', params.printerURL).toString();
@@ -168,7 +168,7 @@ export class OctoPrintClientService {
         return this.connectWithParams<OctoPrintSettingsDto>(params, "POST", url, data);
     }
 
-    protected connectWithParams<R>(params: ConnectionParams, method: "GET" | "POST" | "PUT" | "DELETE", url: string, body?: any) {
+    protected connectWithParams<R>(params: RestConnectionParams, method: "GET" | "POST" | "PUT" | "DELETE", url: string, body?: any) {
         const connectionConfig: AxiosRequestConfig = {
             headers: {
                 "x-api-key": params.printerKey
@@ -186,7 +186,7 @@ export class OctoPrintClientService {
         }
     }
 
-    private checkConnectionParams(connectionParams: ConnectionParams | SessionConnectionParams) {
+    private checkConnectionParams(connectionParams: RestConnectionParams | WebsocketConnectionParams) {
         if (!connectionParams.printerURL) {
             throw Error("Can't test your printer's API without URL");
         }

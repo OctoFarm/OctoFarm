@@ -1,5 +1,5 @@
 import {registerAs} from "@nestjs/config";
-import {ConnectionParams} from "./models/connection.params";
+import {RestConnectionParams} from "./models/rest-connection.params";
 import {Logger} from "@nestjs/common";
 
 export const TEST_PRINTER_URL = "TEST_PRINTER_URL";
@@ -7,11 +7,11 @@ export const TEST_PRINTER_KEY = "TEST_PRINTER_KEY";
 
 export const OCTOPRINT_CONFIG = "OCTOPRINT_CONFIG_KEY";
 
-function getEnvTestPrinter(): ConnectionParams {
+function getEnvTestPrinter(): RestConnectionParams {
     const envTestPrinterURL = process.env[TEST_PRINTER_URL];
     const envTestPrinterKey = process.env[TEST_PRINTER_KEY];
     if (!!envTestPrinterURL && !!envTestPrinterKey) {
-        return new ConnectionParams(envTestPrinterURL, envTestPrinterKey);
+        return new RestConnectionParams(envTestPrinterURL, envTestPrinterKey);
     } else return null;
 }
 
