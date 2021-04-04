@@ -99,8 +99,9 @@ export class ClientConnectionsState {
                             this.patchState({
                                 websocketConnected: true,
                                 websocketHealthy: true,
-                            })
+                            });
                         }
+                        console.log(this.state);
                     } catch (e) {
                         console.log('erreur', e);
                     }

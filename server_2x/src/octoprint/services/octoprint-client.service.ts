@@ -15,10 +15,14 @@ import {CurrentMessageDto} from "../dto/websocket/current-message.dto";
 import {EventMessageDto} from "../dto/websocket/event-message.dto";
 import {PluginMessageDto} from "../dto/websocket/plugin-message.dto";
 import {OctoprintGateway} from "../../../tools/octoprint-websocket-mock/gateway/octoprint.gateway";
+import {transform} from "json-to-typescript";
+import * as path from "path";
+import * as fs from "fs";
 
 @Injectable()
 export class OctoPrintClientService {
     private messageCount = 0;
+    private knownEventTypes = [];
 
     constructor(
         private httpService: HttpService
@@ -100,23 +104,33 @@ export class OctoPrintClientService {
                 console.log('timelapse message. timelapse:', jsonMessage.timelapse);
                 analysedType = "timelapse";
             } else if (jsonMessage.current !== undefined) {
-                console.log('current message. servertime:', jsonMessage.current.serverTime);
+                // console.log('current message. servertime:', jsonMessage.current.serverTime);
                 analysedType = "current";
             } else if (jsonMessage.event !== undefined) {
-                console.log('event message. type:', jsonMessage.event.type);
+                const eventType = jsonMessage.event.type;
+                if (!this.knownEventTypes.includes(eventType)) {
+                    this.knownEventTypes.push(eventType);
+
+                    const fileName = eventType.replace(/[A-Z]/g, (match, offset) => (offset > 0 ? '-' : '') + match.toLowerCase()) + ".dto.ts";
+
+                    const dtoInterfaceName = eventType + "Dto";
+                    if (!fileName || !dtoInterfaceName) {
+                        console.error('Failed to process new event message! Type:', eventType, dtoInterfaceName, fileName);
+                    }
+                    else {
+                        console.log('New event message! Type:', eventType, dtoInterfaceName, fileName);
+                        this.writeDto(jsonMessage.event.payload, fileName, dtoInterfaceName);
+                    }
+                }
+                else {
+                    console.log('Known event message. type:', eventType);
+                }
                 analysedType = "event";
             } else if (jsonMessage.plugin !== undefined) {
                 console.log('plugin message. plugin:', jsonMessage.plugin.plugin);
                 analysedType = "plugin";
             } else {
                 console.log('unknown message type');
-
-                // Used to generate dto's - keep
-                // const schemaDtoFile = path.join("./src/octoprint/dto/", "ws-model" + this.messageCount++ + ".ts");
-                // transform("wsMessageModel" + this.messageCount + "Dto", JSON.parse(event.data.toString()))
-                //     .then(transformation => {
-                //         fs.writeFileSync(schemaDtoFile, transformation);
-                //     });
             }
             if (!!proxyGateway?.handleBroadcastEvent) {
                 proxyGateway.handleBroadcastEvent({
@@ -127,6 +141,15 @@ export class OctoPrintClientService {
         };
         // Listen for messages
         return socket;
+    }
+
+    writeDto(dtoData: any, fileName, interfaceName) {
+        // Used to generate dto's - keep
+        const schemaDtoFile = path.join("./src/octoprint/dto/websocket/events/", fileName + ".ts");
+        transform(interfaceName, dtoData)
+            .then(transformation => {
+                fs.writeFileSync(schemaDtoFile, transformation);
+            });
     }
 
     setCORSEnabled(params: ConnectionParams): Observable<OctoPrintSettingsDto> {
