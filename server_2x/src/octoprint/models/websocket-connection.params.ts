@@ -2,7 +2,7 @@ import {IsAlphanumeric, IsNotEmpty, validateSync} from "class-validator";
 
 export class WebsocketConnectionParams {
     @IsNotEmpty()
-    printerURL: string;
+    printerWsURL: string;
 
     @IsNotEmpty()
     username: string;
@@ -12,7 +12,7 @@ export class WebsocketConnectionParams {
     sessionKey: string;
 
     constructor(printerURL, sessionKey, username) {
-        this.printerURL = printerURL;
+        this.printerWsURL = printerURL;
         this.sessionKey = sessionKey;
         this.username = username;
     }

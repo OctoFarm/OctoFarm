@@ -40,7 +40,7 @@ export class OctoprintWebsocketMockModule {
     }
 
     async onModuleInit() {
-        await this.clientConnectionsState.initState(this.testPrinterConnectionParams);
+        await this.clientConnectionsState.initState(this.testPrinterConnectionParams, 'ws');
         await this.clientConnectionsState.testClientConnection(this.octoprintGateway);
     }
 

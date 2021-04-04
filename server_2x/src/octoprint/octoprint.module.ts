@@ -4,6 +4,7 @@ import {OctoPrintClientService} from './services/octoprint-client.service';
 import {ClientConnectionsState} from "./state/client-connections.state";
 import {ConfigModule, ConfigType} from "@nestjs/config";
 import {OctoPrintConfig} from "./octoprint.config";
+import {WebsocketClientService} from "./services/websocket-client.service";
 
 
 @Module({
@@ -13,10 +14,12 @@ import {OctoPrintConfig} from "./octoprint.config";
     ],
     providers: [
         OctoPrintClientService,
+        WebsocketClientService,
         ClientConnectionsState
     ],
     exports: [
-        OctoPrintClientService
+        OctoPrintClientService,
+        WebsocketClientService
     ]
 })
 export class OctoprintModule {
@@ -29,7 +32,7 @@ export class OctoprintModule {
 
     async onModuleInit() {
         if (!!this.testPrinterConnectionParams) {
-            await this.clientConnectionsState.initState(this.testPrinterConnectionParams);
+            await this.clientConnectionsState.initState(this.testPrinterConnectionParams, 'ws');
             await this.clientConnectionsState.testClientConnection();
         }
     }

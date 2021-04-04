@@ -10,6 +10,7 @@ import HttpStatusCode from "../../utils/http-status-codes.enum";
 import {OctoprintGroupType} from "../types/octoprint-group.type";
 import {WebsocketConnectionParams} from "../models/websocket-connection.params";
 import {OctoprintGateway} from "../../../tools/octoprint-websocket-mock/gateway/octoprint.gateway";
+import {WebsocketClientService} from "../services/websocket-client.service";
 
 @Injectable()
 export class ClientConnectionsState {
@@ -25,20 +26,23 @@ export class ClientConnectionsState {
         websocketHealthy: undefined
     };
     private connectionParams: RestConnectionParams;
+    private websocketProtocol: 'ws' | 'wss';
     private sessionConnectionParams?: WebsocketConnectionParams;
     private state: ClientConnectionStateModel;
     private logger = new Logger(ClientConnectionsState.name);
 
     constructor(
-        private octoPrintClientService: OctoPrintClientService
+        private octoPrintClientService: OctoPrintClientService,
+        private websocketClientService: WebsocketClientService
     ) {
     }
 
-    public async initState(connectionParams: RestConnectionParams) {
+    public async initState(connectionParams: RestConnectionParams, websocketProtocol: 'ws' | 'wss') {
         if (!this.state) {
             this.state = {...ClientConnectionsState.defaultState};
             this.connectionParams = connectionParams;
             await this.validateConnectionParams();
+            this.websocketProtocol = websocketProtocol;
         } else {
             throw Error("Can't initialize already known state.");
         }
@@ -94,16 +98,15 @@ export class ClientConnectionsState {
                     this.sessionConnectionParams = new WebsocketConnectionParams(
                         this.connectionParams.printerURL, userSession.session, userSession.name);
                     try {
-                        const socket = this.octoPrintClientService.getWebSocketClient(this.sessionConnectionParams, messageClb);
-                        if (!!socket.OPEN) {
+                        const socketOpen = await this.websocketClientService.start(this.sessionConnectionParams, this.websocketProtocol, 2);
+                        if (!!socketOpen) {
                             this.patchState({
                                 websocketConnected: true,
                                 websocketHealthy: true,
                             });
                         }
-                        console.log(this.state);
                     } catch (e) {
-                        console.log('erreur', e);
+                        this.logger.error('Client state error', e);
                     }
                 }, (error: AxiosError) => {
                     if (error.isAxiosError) {

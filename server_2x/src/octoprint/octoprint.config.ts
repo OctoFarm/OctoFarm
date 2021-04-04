@@ -10,6 +10,7 @@ export const OCTOPRINT_CONFIG = "OCTOPRINT_CONFIG_KEY";
 function getEnvTestPrinter(): RestConnectionParams {
     const envTestPrinterURL = process.env[TEST_PRINTER_URL];
     const envTestPrinterKey = process.env[TEST_PRINTER_KEY];
+
     if (!!envTestPrinterURL && !!envTestPrinterKey) {
         return new RestConnectionParams(envTestPrinterURL, envTestPrinterKey);
     } else return null;
@@ -20,7 +21,7 @@ export const OctoPrintConfig = registerAs(OCTOPRINT_CONFIG, () => {
     if (!testPrinterConnectionParams) {
         new Logger().warn(
             `You have registered a test octoprint connection sucessfully with environment variables
-                ${TEST_PRINTER_URL} and ${TEST_PRINTER_KEY}!`);
+                url:${TEST_PRINTER_URL} and key:****!`);
     }
     return testPrinterConnectionParams;
 });
