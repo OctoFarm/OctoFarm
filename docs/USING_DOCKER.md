@@ -5,7 +5,7 @@ Docker is a great tool! Using `docker-compose` is better and `portainer` is most
     - We cannot support each custom scenario or setup!
     - Take good care of checking your device's memory limits, architecture and CPU power (`docker stats` and for example `mem_limit: 400m` for 400MB limit in docker-compose)
     - If your device's CPU hits high percentages a lot or memory usage is high, please check your OctoFarm network timeout settings and inspect your OctoPrint/network latencies. 
-2) NOTE we provide `octofarm/octofarm:latest`, `octofarm/octofarm:alpin-latest` and `octofarm/octofarm:monolithic-latest`
+2) NOTE we provide `octofarm/octofarm:latest`, `octofarm/octofarm:alpine-latest` and `octofarm/octofarm:monolithic-latest`
     - `latest` and `alpine-latest` require you to run MongoDB or a MongoDB container (see compose below)
     - `monolithic` does not require a separate MongoDB, but we at OctoFarm personally like MongoDB to be separate (docker = isolation remember?).
 
