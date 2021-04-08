@@ -7,6 +7,9 @@ All notable changes to this project will be documented in this file.
 ### Added
     - Added #361: OctoFarm release check and notification sets ground work for automatic updates. 
     - Added #351: Background image now ignored and copied from default if not present at start.
+    - Added #382: Add in ability for OctoFarm to update itself with the current pm2/git implementation.
+        - This is actioned by two new section inside Server -> System. Two new buttons "Force Check", "Update". 
+
 ### Changed
 
 ### Fixed

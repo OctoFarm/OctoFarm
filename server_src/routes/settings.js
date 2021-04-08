@@ -35,6 +35,11 @@ const serverCommands = require("../lib/serverCommands.js");
 const { Logs } = serverCommands;
 const { SystemCommands } = serverCommands;
 
+const {
+  checkReleaseAndLogUpdate,
+  getUpdateNotificationIfAny
+} = require("../runners/softwareUpdateChecker.js");
+
 module.exports = router;
 
 // var upload = multer({ dest: "Upload_folder_name" })
@@ -122,6 +127,15 @@ router.get(
 router.get("/server/restart", ensureAuthenticated, async (req, res) => {
   let serviceRestarted = await SystemCommands.rebootOctoFarm();
   res.send(serviceRestarted);
+});
+router.get("/server/update", ensureAuthenticated, async (req, res) => {
+  let octoFarmUpdated = await SystemCommands.updateOctoFarm();
+  res.send(octoFarmUpdated);
+});
+router.get("/server/update/check", ensureAuthenticated, async (req, res) => {
+  await checkReleaseAndLogUpdate();
+  const softwareUpdateNotification = getUpdateNotificationIfAny();
+  res.send(softwareUpdateNotification);
 });
 router.get("/client/get", ensureAuthenticated, (req, res) => {
   ClientSettingsDB.find({}).then((checked) => {

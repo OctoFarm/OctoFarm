@@ -26,6 +26,12 @@
                                             <%= systemInformation.warnings.message %>
                                         </div>
                                     <% } %>
+                                    <% if(serviceInformation.isPm2 !== 'undefined' && !serviceInformation.isPm2){ %>
+                                            <div class="alert alert-warning" role="alert">
+                                                Your system is not running with PM2! Some commands below may not work... Please setup your system correctly as instructed here: <a href='https://octofarm.net/installation' target='_blank'>Click Here</a>
+                                            </div>
+
+                                    <% } %>
 
                                     <div class="row">
                                         <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 text-center">
@@ -73,28 +79,48 @@
 
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3 text-center">
-                                            <p class=""><i class="fas fa-hourglass-half"></i> OctoFarm Uptime: <br><span class="text-light" id="processUpdate" style="font-size:0.8rem;">
+                                            <div class="row">
+                                                <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 text-center">
+                                                    <p class=""><i class="fas fa-hourglass-half"></i> OctoFarm Uptime: <br><span class="text-light" id="processUpdate" style="font-size:0.8rem;">
                                                            <%= helpers.generateTime(systemInformation.processUptime) %>
-                                        </span>
+                                                    </span>
 
-                                            </p>
-                                            <p><i class="fas fa-code-branch"></i> Version:                                     <a title="OctoFarm Version, will take you to github changelog" class="text-light"
-                                                                                                                                  href="https://github.com/NotExpectedYet/OctoFarm/releases"
-                                                                                                                                  target="_blank"><br><%= version %></a></p>
-                                            <!--                                    <p><i class="fas fa-code-branch"></i> Latest Version:                                     <a title="OctoFarm Version, will take you to github changelog" class="text-light"-->
-                                            <!--                                                                                                                          href="https://github.com/NotExpectedYet/OctoFarm/releases"-->
-                                            <!--                                                                                                                          target="_blank"></a></p>-->
-                                            <p class=""><i class="far fa-clock"></i> Timezone: <br><span class="text-light" id="timeZone" style="font-size:0.8rem;">
+                                                    </p>
+                                                    <p><i class="fas fa-code-branch"></i> Version: <a title="OctoFarm Version, will take you to github releases page" class="text-light"
+                                                                                                      href="https://github.com/NotExpectedYet/OctoFarm/releases"
+                                                                                                      target="_blank"><br><%= version %></a></p>
+                                                    <p class=""><i class="far fa-clock"></i> Timezone: <br><span class="text-light" id="timeZone" style="font-size:0.8rem;">
                                                          <%= systemInformation.sysUptime.timezoneName %> (<%= systemInformation.sysUptime.timezone %>)
-                                        </span>
+                                                    </span>
 
-                                            </p>
-                                            <p class=""><i class="fas fa-terminal"></i> Run Command: <br><span class="text-light" id="runCommand" style="font-size:0.8rem;">
+                                                    </p>
+                                                    <p class=""><i class="fas fa-terminal"></i> Run Command: <br><span class="text-light" id="runCommand" style="font-size:0.8rem;">
                                                                 <%= systemInformation.sysProcess.command %>
-                                        </span>
+                                                    </span>
 
-                                            </p>
-
+                                                    </p>
+                                                </div>
+                                                <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 text-center">
+                                                    <p><i class="fas fa-layer-group"></i> Service Information:
+                                                    <% if(serviceInformation.isDockerContainer !== 'undefined' && serviceInformation.isDockerContainer){ %>
+                                                        <p class="text-light"> <i class="fab fa-docker"></i></p>
+                                                    <% } %>
+                                                    <% if(serviceInformation.isNode !== 'undefined' && serviceInformation.isNode){ %>
+                                                        <p class="text-light">Powered by <i class="fab fa-node fa-2x"></i></p>
+                                                    <% } %>
+                                                    <% if(serviceInformation.update !== 'undefined' && serviceInformation.update.air_gapped !== 'undefined' && serviceInformation.update.air_gapped) { %>
+                                                        <p class="text-light"> <i class="fas fa-air-freshener"></i> Farm is air-gapped</p>
+                                                    <% } %>
+                                                    <% if(serviceInformation.isPm2 !== 'undefined' && serviceInformation.isPm2){ %>
+                                                        <p class="text-light"> <i class="far fa-eye"></i></i> Running under pm2</p>
+                                                    <% } %>
+                                                    <% if(serviceInformation.isNodemon !== 'undefined' && serviceInformation.isNodemon){ %>
+                                                        <p class="text-light"> <i class="far fa-eye"></i> Running under nodemon</p>
+                                                        <p class="text-light"> <i class="fas fa-heart"></i> Hey lovely developer! Thanks for helping make OctoFarm great!</p>
+                                                    <% } %>
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
                                             <div id="systemChartCPU" ></div>
@@ -528,7 +554,11 @@
                                                 <div class="tab-pane fade show active" id="server-settings" role="tabpanel" aria-labelledby="server-settings-list">
                                                     <h5>System Actions</h5>
                                                     <hr>
-                                                    <button title="Performs a restart of the OctoFarm service" id="restartOctoFarmBtn" type="button" class="btn btn-danger mb-3 btn-lg"><i class="fas fa-sync"></i>Restart</button>
+                                                    <button title="Performs a restart of the OctoFarm service" id="restartOctoFarmBtn" type="button" class="btn btn-danger mb-3 btn-lg"><i class="fas fa-sync"></i> Restart</button>
+                                                    <h5>Update OctoFarm</h5>
+                                                    <hr>
+                                                    <button title="Performs a check for latest updates of OctoFarm" id="checkUpdatesForOctoFarmBtn" type="button" class="btn btn-info mb-3 btn-lg"><i class="fab fa-github"></i> Force Check</button>
+                                                    <button title="Performs an update command on OctoFarm to the latest version" id="updateOctoFarmBtn" type="button" class="btn btn-success mb-3 btn-lg" disabled><i class="fas fa-thumbs-up"></i> Update</button>
                                                     <h5>Server Settings</h5>
                                                     <hr>
                                                     <p class="font-weight-bold">Server Port</p>
