@@ -14,7 +14,7 @@ class SystemRunner {
   static async init() {
     await this.getSystemInfo();
     setInterval(async () => {
-      this.getSystemInfo();
+      await this.getSystemInfo();
     }, 2500);
 
     return "Started system information collection...";

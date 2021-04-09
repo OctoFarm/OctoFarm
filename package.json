@@ -52,7 +52,7 @@
     "passport-local": "^1.0.0",
     "passport-remember-me": "0.0.1",
     "request": "^2.88.2",
-    "systeminformation": "^5.6.1",
+    "systeminformation": "^5.6.10",
     "wake_on_lan": "^1.0.0",
     "winston": "^3.3.3",
     "ws": "^7.4.3",
@@ -120,6 +120,6 @@
       "logs/*",
       "client_src/*"
     ],
-    "delay": "2500"
+    "delay": 2500
   }
 }

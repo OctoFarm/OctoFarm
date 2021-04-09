@@ -1,7 +1,7 @@
 import Client from "./lib/octofarm.js";
+import OctoFarmclient from "./lib/octofarm.js";
 import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
-import OctoFarmclient from "./lib/octofarm.js";
 import Script from "./lib/modules/scriptCheck.js";
 import OctoPrintClient from "./lib/octoprint";
 import FileOperations from "./lib/functions/file.js";
@@ -94,8 +94,8 @@ document.getElementById("exportUsers").addEventListener("click", (e) => {
 
 document
   .getElementById("setupTimelapseOctoPrint")
-  .addEventListener("click", (e) => {
-    setupOctoPrintClientsforTimelapse();
+  .addEventListener("click", async (e) => {
+    await setupOctoPrintClientsforTimelapse();
   });
 
 async function setupOctoPrintClientsforTimelapse() {
@@ -188,7 +188,8 @@ async function setupOctoPrintClientsforTimelapse() {
       "Clicked"
     );
   }
-  OctoPrintClient.post;
+  // ?
+  // OctoPrintClient.post;
 }
 
 document.getElementById("resetDashboardBtn").addEventListener("click", (e) => {
@@ -421,7 +422,6 @@ const systemChartMemory = new ApexCharts(
 systemChartMemory.render();
 setInterval(async function updateStatus() {
   let systemInfo = await Client.get("settings/sysInfo");
-
   systemInfo = await systemInfo.json();
 
   if (
@@ -436,20 +436,27 @@ setInterval(async function updateStatus() {
     document.getElementById("processUpdate").innerHTML = Calc.generateTime(
       systemInfo.processUptime
     );
-    // labels: ['System', 'OctoFarm', 'User', 'Free'],
+
     const cpuLoad = systemInfo.cpuLoad.currentLoadSystem;
     const octoLoad = systemInfo.sysProcess.cpuu;
     const userLoad = systemInfo.cpuLoad.currentLoadUser;
     const remain = cpuLoad + octoLoad + userLoad;
 
+    // labels: ['System', 'OctoFarm', 'User', 'Free'],
     systemChartCPU.updateSeries([cpuLoad, octoLoad, userLoad, 100 - remain]);
 
-    const otherRAM = systemInfo.memoryInfo.total - systemInfo.memoryInfo.free;
-    const octoRAM =
-      (systemInfo.memoryInfo.total / 100) * systemInfo.sysProcess.mem;
+    const systemUsedRAM = systemInfo.memoryInfo.used;
     const freeRAM = systemInfo.memoryInfo.free;
-
-    systemChartMemory.updateSeries([otherRAM, octoRAM, freeRAM]);
+    let octoFarmRAM = systemInfo.sysProcess.memRss * 1000;
+    if (systemInfo.sysProcess.memRss === undefined) {
+      octoFarmRAM = (systemInfo.memoryInfo.total / 100) * systemInfo.sysProcess.mem;
+    }
+    // isNaN checks be like
+    console.log(systemUsedRAM/1E6, octoFarmRAM/1E6, freeRAM/1E6);
+    if (octoFarmRAM === octoFarmRAM) {
+      // labels: ['System', 'OctoFarm', 'Free'],
+      systemChartMemory.updateSeries([systemUsedRAM, octoFarmRAM, freeRAM]);
+    }
   }
 }, 5000);
 
@@ -613,6 +620,7 @@ class ClientSettings {
     // return JSON.parse(localStorage.getItem("clientSettings"));
   }
 }
+
 class ServerSettings {
   static nukeDatabases(database) {
     Client.get("settings/server/delete/database/" + database)
@@ -623,6 +631,7 @@ class ServerSettings {
         UI.createAlert("success", res.message, 3000);
       });
   }
+
   static exportDatabases(database) {
     Client.get("settings/server/get/database/" + database)
       .then((res) => {
@@ -653,6 +662,7 @@ class ServerSettings {
         }
       });
   }
+
   static async init() {
     Client.get("settings/server/get")
       .then((res) => {
@@ -684,7 +694,7 @@ class ServerSettings {
           const filManager = document.getElementById("filamentManagerSyncBtn");
           filManager.addEventListener("click", async (event) => {
             filManager.innerHTML =
-              '<i class="fas fa-sync fa-spin"></i> <br> Syncing <br> Please Wait...';
+              "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing <br> Please Wait...";
             let post = await OctoFarmclient.post(
               "filament/filamentManagerSync",
               { activate: true }
@@ -692,7 +702,7 @@ class ServerSettings {
             post = await post.json();
             if (post.status) {
               filManager.innerHTML =
-                '<i class="fas fa-sync"></i> <br> Sync Filament Manager';
+                "<i class=\"fas fa-sync\"></i> <br> Sync Filament Manager";
               filManager.disabled = true;
               UI.createAlert(
                 "success",
@@ -701,7 +711,7 @@ class ServerSettings {
               );
             } else {
               filManager.innerHTML =
-                '<i class="fas fa-sync"></i> <br> Sync Filament Manager';
+                "<i class=\"fas fa-sync\"></i> <br> Sync Filament Manager";
               filManager.disabled = false;
               UI.createAlert(
                 "error",
@@ -715,18 +725,18 @@ class ServerSettings {
           filManager.addEventListener("click", async (event) => {
             filManager.disabled = true;
             filManager.innerHTML =
-              '<i class="fas fa-sync fa-spin"></i> <br> Syncing... <br> Please Wait...';
+              "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing... <br> Please Wait...";
             let post = await OctoFarmclient.post(
               "filament/filamentManagerReSync"
             );
             post = await post.json();
             if (post.status) {
               filManager.innerHTML =
-                '<i class="fas fa-sync"></i> <br> Re-Sync Database';
+                "<i class=\"fas fa-sync\"></i> <br> Re-Sync Database";
               filManager.disabled = false;
             } else {
               filManager.innerHTML =
-                '<i class="fas fa-sync"></i> <br> Re-Sync Database';
+                "<i class=\"fas fa-sync\"></i> <br> Re-Sync Database";
               filManager.disabled = false;
             }
           });
@@ -819,8 +829,8 @@ class ServerSettings {
                 <td>${new Date(logs.modified).toString().substring(0, 21)}</td>
                 <td>${Calc.bytes(logs.size)}</td>
                 <td><button id="${
-                  logs.name
-                }" type="button" class="btn btn-sm btn-primary"><i class="fas fa-download"></i></button></td>
+          logs.name
+        }" type="button" class="btn btn-sm btn-primary"><i class="fas fa-download"></i></button></td>
             </tr>
         `
       );
@@ -834,6 +844,7 @@ class ServerSettings {
         });
     });
   }
+
   static async serviceRestart() {
     let systemRestartBtn = document.getElementById("restartOctoFarmBtn");
     // Make sure the system button is disabled whilst the restart is happening.
@@ -879,6 +890,7 @@ class ServerSettings {
       }
     }, 5000);
   }
+
   static update() {
     let reboot = false;
     const onlinePoll = document.getElementById("webSocketThrottle").value;
@@ -942,11 +954,11 @@ class ServerSettings {
       oldServerSettings.influxExport.username !== influxExport.username ||
       oldServerSettings.influxExport.password !== influxExport.password ||
       oldServerSettings.influxExport.retentionPolicy.duration !==
-        influxExport.retentionPolicy.duration ||
+      influxExport.retentionPolicy.duration ||
       oldServerSettings.influxExport.retentionPolicy.replication !==
-        influxExport.retentionPolicy.replication ||
+      influxExport.retentionPolicy.replication ||
       oldServerSettings.influxExport.retentionPolicy.defaultRet !==
-        influxExport.retentionPolicy.defaultRet
+      influxExport.retentionPolicy.defaultRet
     ) {
       reboot = true;
     }
@@ -969,10 +981,10 @@ class ServerSettings {
               "Your settings changes require a restart, would you like to do this now?",
             buttons: {
               cancel: {
-                label: '<i class="fa fa-times"></i> Cancel',
+                label: "<i class=\"fa fa-times\"></i> Cancel",
               },
               confirm: {
-                label: '<i class="fa fa-check"></i> Confirm',
+                label: "<i class=\"fa fa-check\"></i> Confirm",
               },
             },
             callback(result) {
