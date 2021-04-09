@@ -87,8 +87,9 @@ Please choose the direct NodeJS installation or the Docker image.
 3) Installation for Development (Node 14+, Nodemon)
 
 ### Installation - for Development only!
+_This is for devs or testers only! It is not practical to use `nodemon` for normal usage as `nodemon` does not add a service like `pm2` (option 1) or `docker` (option 1 and 2). Please, if you are a normal user, check out [OctoFarm.net installation instructions](https://octofarm.net/installation) instead!_
 
-So nice that you want to test or develop OctoFarm! If you are a user, please check out [OctoFarm.net installation instructions](https://octofarm.net/installation) instead!
+So nice that you want to test or develop OctoFarm!
 
 1. Clone the OctoFarm
 
@@ -105,10 +106,10 @@ npm install
 3. Create an .env file with the MONGO variable:
 
 ```
-MONGO=mongodb://127.0.0.1:4000/octofarm
+MONGO=mongodb://127.0.0.1:27017/octofarm
 ```
 
-OR (custom parameters, like from a `docker-compose.yml` file)
+3a. Custom MongoDB parameters, like from a `docker-compose.yml` file. In that case, see [docker or docker-compose usage instructions](./docs/USING_DOCKER.md) but we do expect you to be able to adapt what is needed.
 
 ```
 # Docker alternative
