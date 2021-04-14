@@ -99,7 +99,6 @@
                 <span title="Panel Layout Monitoring View"
                       class="nav-link text-light text-center btn-sm <%= noPrinters %>" id="menuPanelView">
                     <% if(typeof dashboardStatistics !== "undefined"){ %>
-                        <% console.log(dashboardStatistics) %>
                         <% if(typeof dashboardStatistics.currentTemperature !== "undefined" && dashboardStatistics.currentTemperature !== null){ %>
                             <i class="fas fa-temperature-high"></i> <%= dashboardStatistics.currentTemperature %>°C
                         <% } %>
