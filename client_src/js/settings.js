@@ -449,10 +449,9 @@ setInterval(async function updateStatus() {
     const freeRAM = systemInfo.memoryInfo.free;
     let octoFarmRAM = systemInfo.sysProcess.memRss * 1000;
     if (systemInfo.sysProcess.memRss === undefined) {
-      octoFarmRAM = (systemInfo.memoryInfo.total / 100) * systemInfo.sysProcess.mem;
+      octoFarmRAM =
+        (systemInfo.memoryInfo.total / 100) * systemInfo.sysProcess.mem;
     }
-    // isNaN checks be like
-    console.log(systemUsedRAM/1E6, octoFarmRAM/1E6, freeRAM/1E6);
     if (octoFarmRAM === octoFarmRAM) {
       // labels: ['System', 'OctoFarm', 'Free'],
       systemChartMemory.updateSeries([systemUsedRAM, octoFarmRAM, freeRAM]);
