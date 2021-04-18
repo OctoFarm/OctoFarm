@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
     - Fixed #358: Spool Manager not allowing input of decimal places
     - Fixed #398: Added back in power reset buttons
     - Fixed #353: Filament Manager Spools list is not ignoring Spools Modal pagination.
+    - Fixed #386: Server update notification would show to all users, not just Administrator group.
     
 # [Released]
 
