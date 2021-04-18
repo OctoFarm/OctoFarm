@@ -176,7 +176,7 @@ router.post(
     try {
       octoFarmUpdated = await SystemCommands.updateOctoFarm(force);
     } catch (e) {
-      octoFarmUpdated = e;
+      octoFarmUpdated = e.serverResponse;
       // Log error with html tags removed if contained in response message
       logger.error(
         "Issue with updating | ",
