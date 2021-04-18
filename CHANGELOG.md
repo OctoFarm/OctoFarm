@@ -7,13 +7,20 @@ All notable changes to this project will be documented in this file.
 ### Added
     - Added #361: OctoFarm release check and notification sets ground work for automatic updates. 
     - Added #351: Background image now ignored and copied from default if not present at start.
+    - Added #382: Add in ability for OctoFarm to update itself with the current pm2/git implementation.
+        - This is actioned by two new section inside Server -> System. Two new buttons "Force Check", "Update". 
+    - Added #421: OctoFarm data dump. Generates a bundled zip file for download that includes all system logs and a service_information.txt file.
+
 ### Changed
+    - Disabled Restart button when not using pm2 process manager.
 
 ### Fixed
     - Fixed #240: Commands sent from the Printer Control Terminal would double wrap array.
     - Fixed #358: Spool Manager not allowing input of decimal places
     - Fixed #398: Added back in power reset buttons
-    
+    - Fixed #353: Filament Manager Spools list is not ignoring Spools Modal pagination.
+    - Fixed #386: Server update notification would show to all users, not just Administrator group.
+    - Fixed #430: Replace user and group check with middleware. 
 # [Released]
 
 ## [v1.1.12]

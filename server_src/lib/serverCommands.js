@@ -1,83 +1,131 @@
 const fs = require("fs");
+const path = require("path");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
-const Logger = require("../lib/logger.js");
-const logger = new Logger("OctoFarm-Scripts");
-var wol = require("wake_on_lan");
+const { isPm2 } = require("../utils/env.utils.js");
+const { isNodemon } = require("../utils/env.utils.js");
+
+function isGitSync(dir) {
+  return fs.existsSync(path.join(dir, ".git"));
+}
 
 class SystemCommands {
-  static async rebootOctoFarm() {
-    logger.info("Restart OctoFarm server requests");
+  static rebootOctoFarm() {
     let checkForNamedService = false;
-    // Bit hacky... Make sure OctoFarm has a pid under pm2.... Had to stagger the actual restart command so the return would send to client. - Open to suggestions
-    try {
-      //Attempts to find the named service
-      const { stdout, stderr } = await exec("pm2 pid OctoFarm");
-      if (isNaN(parseInt(stdout))) {
-        throw "No process number returned";
-      }
-      logger.info("stdout:", stdout);
+    // If we're on pm2, then restart buddy!
+    if (isPm2()) {
+      exec("pm2 restart OctoFarm").catch((stderr) => {
+        throw "Error with pm2 restart command: " + stderr;
+      });
       checkForNamedService = true;
-      // If the process had a integer pid succeeded then we are ok to restart, errors are caught by the try, catch
-      exec("pm2 restart OctoFarm");
-    } catch (err) {
-      logger.error(err);
     }
+    if (isNodemon()) {
+      exec("touch ./app.js").catch((stderr) => {
+        throw "Error with nodemon restart command: " + stderr;
+      });
+      checkForNamedService = true;
+    }
+
     return checkForNamedService;
   }
-}
-
-class Script {
-  static async fire(scriptLocation, message) {
-    logger.info("Script: ", scriptLocation);
-    logger.info("Message: ", message);
-    try {
-      const { stdout, stderr } = await exec(`${scriptLocation} ${message}`);
-      logger.info("stdout:", stdout);
-      logger.info("stderr:", stderr);
-      return scriptLocation + ": " + stdout;
-    } catch (err) {
-      logger.error(err);
-      return err;
-    }
-  }
-
-  static async wol(wolSettings) {
-    const opts = {
-      address: wolSettings.ip,
-      num_packets: wolSettings.count,
-      interval: wolSettings.interval,
-      port: wolSettings.port,
+  // This will need changing when .deb / installation script becomes a thing. It's built to deal with the current implementation.
+  static async updateOctoFarm(force) {
+    let serverResponse = {
+      haveWeSuccessfullyUpdatedOctoFarm: false,
+      statusTypeForUser: "error",
+      message: null,
     };
-    const mac = wolSettings.MAC;
 
-    wol.wake(mac, function (error) {
-      if (error) {
-        logger.error("Couldn't fire wake packet", error);
-      } else {
-        logger.info("Successfully fired wake packet: ", mac, opts);
-      }
-    });
-  }
-}
-
-// Grab Logs
-class Logs {
-  static async grabLogs() {
-    const fileArray = [];
-    const testFolder = "./logs/";
-    const folderContents = await fs.readdirSync(testFolder);
-    for (let i = 0; i < folderContents.length; i++) {
-      const stats = await fs.statSync(testFolder + folderContents[i]);
-      const logFile = {};
-      logFile.name = folderContents[i];
-      logFile.size = stats.size;
-      logFile.modified = stats.mtime;
-      logFile.created = stats.birthtime;
-      fileArray.push(logFile);
+    if (!force || typeof force?.forceCheck !== "boolean") {
+      serverResponse.message = "Force boolean not supplied!";
+      throw serverResponse;
     }
-    return fileArray;
+
+    // Check to see if current dir contains a git folder... hard fail otherwise.
+    let doWeHaveAGitFolder = await isGitSync("./");
+    if (!doWeHaveAGitFolder) {
+      serverResponse.message =
+        "Not a git repository, manual update required...";
+      throw serverResponse;
+    }
+
+    const { stdout, stderr } = await exec("git status");
+
+    if (stderr) {
+      serverResponse.message = `Git returned an error, user intervention required | Error: ${stderr}`;
+      throw serverResponse;
+    }
+
+    if (stdout) {
+      // Check if branch has local changes. Return response to user, ask if they'd like to force overwrite the local changes, check for force flag and overwrite local changes..
+      if (
+        stdout.includes("Your branch is ahead of") ||
+        stdout.includes("Changes not staged for commit")
+      ) {
+        if (stdout.includes("nothing to commit, working tree clean")) {
+          serverResponse.message =
+            "<span class='text-warning'>The update is failing due to local changes been detected. Seems you've committed your files, Thanks for making OctoFarm great! <br><br>" +
+            "<b class='text-success'>Override:</b> Will just run a <code>git pull</code> command if you continue.<br><br>" +
+            "<b class='text-danger'>Cancel:</b> This option will cancel the update process.<br><br>";
+          serverResponse.statusTypeForUser = "warning";
+          return serverResponse;
+        }
+        if (!force?.forceCheck) {
+          // Default case without forcing the update
+          serverResponse.message =
+            "<span class='text-warning'>The update is failing due to local changes been detected. Please check the file list below for what has been modified. </span><br><br>" +
+            "<b class='text-success'>Override:</b> This option will ignore the local changes and run the OctoFarm Update process. (You will lose your changes with this option)<br><br>" +
+            "<b class='text-danger'>Cancel:</b> This option will cancel the update process keeping your local changes. No update will run and manual intervention by the user is required. <br><br>";
+          serverResponse.statusTypeForUser = "warning";
+          const matchChangedFilesRegex = new RegExp("(modified:.*)", "g");
+          const changedFilesList = [...stdout.match(matchChangedFilesRegex)];
+
+          changedFilesList.forEach((line) => {
+            serverResponse.message += `<div class="alert alert-secondary m-1 p-2" role="alert"><i class="fas fa-file"></i>${line.replace(
+              "modified: ",
+              ""
+            )} </div>`;
+          });
+
+          return serverResponse;
+        }
+        if (force?.forceCheck) {
+          // User wants to force the update
+          await exec("git reset --hard");
+          // All been well, let's pull the update!
+          await exec("git pull");
+          // Everything went well, enjoy the tasty updates!
+          serverResponse.haveWeSuccessfullyUpdatedOctoFarm = true;
+          serverResponse.statusTypeForUser = "success";
+          serverResponse.message =
+            "Update command has run successfully, OctoFarm will restart.";
+
+          return serverResponse;
+        }
+      }
+
+      // Check if branch is already up to date. Nothing to do, return response to user.
+      if (
+        stdout.includes("Your branch is up-to-date with") ||
+        stdout.includes("Your branch is up to date with")
+      ) {
+        serverResponse.haveWeSuccessfullyUpdatedOctoFarm = false;
+        serverResponse.message =
+          "OctoFarm is already up to date! Your good to go!";
+        serverResponse.statusTypeForUser = "success";
+        return serverResponse;
+      }
+      // All been well, let's pull the update!
+      await exec("git pull");
+      // Everything went well, enjoy the tasty updates!
+      serverResponse.haveWeSuccessfullyUpdatedOctoFarm = true;
+      serverResponse.statusTypeForUser = "success";
+      serverResponse.message =
+        "Update command has run successfully, OctoFarm will restart.";
+
+      return serverResponse;
+    }
   }
 }
 
-module.exports = { Logs, SystemCommands, Script };
+module.exports = { SystemCommands };
