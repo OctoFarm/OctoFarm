@@ -97,7 +97,9 @@ class SystemCommands {
       if (
         stdout.includes("Your branch is up-to-date with") ||
         stdout.includes("Your branch is up to date with")
-      ) {
+      )
+        serverResponse.haveWeSuccessfullyUpdatedOctoFarm = true;
+      {
         serverResponse.message =
           "OctoFarm is already up to date! Your good to go!";
         serverResponse.statusTypeForUser = "success";
@@ -109,7 +111,7 @@ class SystemCommands {
       serverResponse.haveWeSuccessfullyUpdatedOctoFarm = true;
       serverResponse.statusTypeForUser = "success";
       serverResponse.message =
-        "Update command has run successfully, you will be asked to restart OctoFarm.";
+        "Update command has run successfully, OctoFarm will restart.";
 
       return {
         serverResponse,
