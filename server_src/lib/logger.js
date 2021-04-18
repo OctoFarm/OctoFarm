@@ -11,17 +11,17 @@ class LoggerService {
     const logger = winston.createLogger({
       transports: [
         new winston.transports.Console({
-          level: 'warn'
+          level: "warn",
         }),
-        ...(
-          enableFileLogs ?
-            [new winston.transports.File({
-              filename: `./logs/${route}.log`,
-              maxsize: "5000000",
-              maxFiles: 5,
-            })]
-            : []
-        ),
+        ...(enableFileLogs
+          ? [
+              new winston.transports.File({
+                filename: `./logs/${route}.log`,
+                maxsize: "5000000",
+                maxFiles: 5,
+              }),
+            ]
+          : []),
       ],
       format: winston.format.printf((info) => {
         let message = `${dateFormat()} | ${info.level.toUpperCase()} | ${route}.log | ${
@@ -48,6 +48,15 @@ class LoggerService {
   // }
   async info(message, obj) {
     this.logger.log("info", message, {
+      obj,
+    });
+  }
+
+  // async warning(message) {
+  //   this.logger.log("warning", message);
+  // }
+  async warning(message, obj) {
+    this.logger.log("warning", message, {
       obj,
     });
   }

@@ -13,7 +13,7 @@ const printerClean = require("../lib/dataFunctions/printerClean.js");
 
 const { PrinterClean } = printerClean;
 
-const { Script } = require("../lib/serverCommands.js");
+const { Script } = require("../lib/serverScripts.js");
 
 const _ = require("lodash");
 

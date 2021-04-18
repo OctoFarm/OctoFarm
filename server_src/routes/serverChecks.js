@@ -1,12 +1,19 @@
 const express = require("express");
 
 const router = express.Router();
+const { ensureCurrentUserAndGroup } = require("../config/users.js");
 const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
 const isDocker = require("is-docker");
-const {isPm2, isNodemon, isNode} = require("../utils/env.utils");
+const { isPm2, isNodemon, isNode } = require("../utils/env.utils");
 
-router.get("/amialive", async (req, res) => {
-  const softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
+router.get("/amialive", ensureCurrentUserAndGroup, async (req, res) => {
+  let softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
+
+  // ensure update_vailable can only be true when Administrator group found
+  if (req?.user?.group !== "Administrator") {
+    softwareUpdateNotification.update_available = false;
+  }
+
   res.json({
     ok: true,
     isDockerContainer: isDocker(),
@@ -22,7 +29,7 @@ router.get("/amialive", async (req, res) => {
     // numberOfProcessors: process.env.NUMBER_OF_PROCESSORS,
     // processorIdentifier: process.env.PROCESSOR_IDENTIFIER,
     os: process.env.OS,
-    update: softwareUpdateNotification
+    update: softwareUpdateNotification,
   });
 });
 
