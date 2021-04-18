@@ -99,7 +99,7 @@ class SystemCommands {
         stdout.includes("Your branch is up to date with")
       )
       {
-        serverResponse.haveWeSuccessfullyUpdatedOctoFarm = true;
+        serverResponse.haveWeSuccessfullyUpdatedOctoFarm = false;
         serverResponse.message =
           "OctoFarm is already up to date! Your good to go!";
         serverResponse.statusTypeForUser = "success";
