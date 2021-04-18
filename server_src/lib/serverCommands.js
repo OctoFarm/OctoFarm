@@ -58,7 +58,10 @@ class SystemCommands {
 
     if (stdout) {
       // Check if branch is already up to date. Nothing to do, return response to user.
-      if (stdout.includes("Your branch is up-to-date with")) {
+      if (
+        stdout.includes("Your branch is up-to-date with") ||
+        stdout.includes("Your branch is up to date with")
+      ) {
         serverResponse.message =
           "OctoFarm is already up to date! Your good to go!";
         serverResponse.statusTypeForUser = "success";
