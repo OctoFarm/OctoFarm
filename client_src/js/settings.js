@@ -938,7 +938,6 @@ class ServerSettings {
       return;
     }
     updateOctoFarm = await updateOctoFarm.json();
-
     
     // Local changes are detected, question whether we overwrite or cancel..
     if (
