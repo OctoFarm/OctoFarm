@@ -743,7 +743,7 @@ class PrinterClean {
     };
   }
   static async createPrinterList(farmPrinters, filamentManager) {
-    const printerList = ["<option value=\"0\">Not Assigned</option>"];
+    const printerList = ['<option value="0">Not Assigned</option>'];
     farmPrinters.forEach((printer) => {
       if (
         typeof printer.currentProfile !== "undefined" &&
@@ -1212,7 +1212,7 @@ class PrinterClean {
               0
             );
             const totalOtherTarget = arrayToolActual.reduce((a, b) => a + b, 0);
-            let actualString = "<div class=\"d-flex flex-wrap\"><div title=\"";
+            let actualString = '<div class="d-flex flex-wrap"><div title="';
             for (let l = 0; l < leftString.length; l++) {
               actualString += `${leftString[l]}`;
             }
@@ -1223,7 +1223,7 @@ class PrinterClean {
               printer.otherSettings.temperatureTriggers.heatingVariation,
               printer.otherSettings.temperatureTriggers.coolDownf
             )} heatMapLeft"></div>`;
-            actualString += "<div title=\"";
+            actualString += '<div title="';
             for (let r = 0; r < rightString.length; r++) {
               actualString += `${rightString[r]}`;
             }
@@ -1429,7 +1429,8 @@ class PrinterClean {
                 x: enviromentalData[i].date,
                 y: enviromentalData[i].humidity.toFixed(0),
               });
-              dashboardStatistics.currentHumidity = enviromentalData[0].humidity;
+              dashboardStatistics.currentHumidity =
+                enviromentalData[0].humidity;
             } else {
               currentEnviromentalData[1].data.push({
                 x: enviromentalData[i].date,
@@ -1461,7 +1462,9 @@ class PrinterClean {
                 x: enviromentalData[i].date,
                 y: enviromentalData[i].iaq.toFixed(0),
               });
-              dashboardStatistics.currentIAQ = enviromentalData[0].iaq.toFixed(0);
+              dashboardStatistics.currentIAQ = enviromentalData[0].iaq.toFixed(
+                0
+              );
             } else {
               currentEnviromentalData[3].data.push({
                 x: enviromentalData[i].date,
@@ -1720,6 +1723,16 @@ class PrinterClean {
       }
     }
     return "Farm information inititialised...";
+  }
+  static returnAllOctoPrintVersions() {
+    const printers = this.returnPrintersInformation();
+
+    const versionArray = [];
+
+    printers.forEach((printer) => {
+      versionArray.push(printer.octoPrintVersion);
+    });
+    return versionArray;
   }
 }
 module.exports = {

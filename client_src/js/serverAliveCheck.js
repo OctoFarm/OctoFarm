@@ -33,7 +33,13 @@ function checkUpdateAndNotify(updateResponse) {
     } catch (e) {
       parsedStorageReleaseInfo = null;
     }
-
+    // If the update button is available, we are on the system page. React to available updates accordingly.
+    let updateOctoFarmBtn = document.getElementById(
+        "updateOctoFarmBtn"
+    );
+    if (updateOctoFarmBtn) {
+      updateOctoFarmBtn.disabled = false;
+    }
     // Process the full notification or a shorter reminder
     if (!parsedStorageReleaseInfo || parsedStorageReleaseInfo?.tag_name !== updateResponse?.latestReleaseKnown?.tag_name) {
       var n = new Noty({
@@ -79,6 +85,7 @@ const serverAliveCheck = async function () {
         let alive = await fetch("/serverChecks/amialive");
         if (alive.status !== 200) throw "No Server Connection";
         alive = await alive.json();
+
         if (alive?.update) {
           try {
             checkUpdateAndNotify(alive.update);

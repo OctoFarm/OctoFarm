@@ -54,6 +54,14 @@ document.getElementById("nukeUsers").addEventListener("click", (e) => {
 document.getElementById("restartOctoFarmBtn").addEventListener("click", (e) => {
   ServerSettings.serviceRestart();
 });
+document.getElementById("updateOctoFarmBtn").addEventListener("click", (e) => {
+  ServerSettings.updateOctoFarmCommand(false);
+});
+document
+  .getElementById("checkUpdatesForOctoFarmBtn")
+  .addEventListener("click", (e) => {
+    ServerSettings.checkForOctoFarmUpdates();
+  });
 
 document.getElementById("exportAlerts").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
@@ -96,6 +104,12 @@ document
   .getElementById("setupTimelapseOctoPrint")
   .addEventListener("click", async (e) => {
     await setupOctoPrintClientsforTimelapse();
+  });
+
+document
+  .getElementById("logDumpGenerateBtn")
+  .addEventListener("click", async (e) => {
+    await ServerSettings.generateLogFileDump();
   });
 
 async function setupOctoPrintClientsforTimelapse() {
@@ -693,7 +707,7 @@ class ServerSettings {
           const filManager = document.getElementById("filamentManagerSyncBtn");
           filManager.addEventListener("click", async (event) => {
             filManager.innerHTML =
-              "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing <br> Please Wait...";
+              '<i class="fas fa-sync fa-spin"></i> <br> Syncing <br> Please Wait...';
             let post = await OctoFarmclient.post(
               "filament/filamentManagerSync",
               { activate: true }
@@ -701,7 +715,7 @@ class ServerSettings {
             post = await post.json();
             if (post.status) {
               filManager.innerHTML =
-                "<i class=\"fas fa-sync\"></i> <br> Sync Filament Manager";
+                '<i class="fas fa-sync"></i> <br> Sync Filament Manager';
               filManager.disabled = true;
               UI.createAlert(
                 "success",
@@ -710,7 +724,7 @@ class ServerSettings {
               );
             } else {
               filManager.innerHTML =
-                "<i class=\"fas fa-sync\"></i> <br> Sync Filament Manager";
+                '<i class="fas fa-sync"></i> <br> Sync Filament Manager';
               filManager.disabled = false;
               UI.createAlert(
                 "error",
@@ -724,18 +738,18 @@ class ServerSettings {
           filManager.addEventListener("click", async (event) => {
             filManager.disabled = true;
             filManager.innerHTML =
-              "<i class=\"fas fa-sync fa-spin\"></i> <br> Syncing... <br> Please Wait...";
+              '<i class="fas fa-sync fa-spin"></i> <br> Syncing... <br> Please Wait...';
             let post = await OctoFarmclient.post(
               "filament/filamentManagerReSync"
             );
             post = await post.json();
             if (post.status) {
               filManager.innerHTML =
-                "<i class=\"fas fa-sync\"></i> <br> Re-Sync Database";
+                '<i class="fas fa-sync"></i> <br> Re-Sync Database';
               filManager.disabled = false;
             } else {
               filManager.innerHTML =
-                "<i class=\"fas fa-sync\"></i> <br> Re-Sync Database";
+                '<i class="fas fa-sync"></i> <br> Re-Sync Database';
               filManager.disabled = false;
             }
           });
@@ -816,7 +830,7 @@ class ServerSettings {
           };
         }
       });
-    let logList = await Client.get("settings/server/get/logs");
+    let logList = await Client.get("settings/server/logs");
     logList = await logList.json();
     const logTable = document.getElementById("serverLogs");
     logList.forEach((logs) => {
@@ -828,18 +842,15 @@ class ServerSettings {
                 <td>${new Date(logs.modified).toString().substring(0, 21)}</td>
                 <td>${Calc.bytes(logs.size)}</td>
                 <td><button id="${
-          logs.name
-        }" type="button" class="btn btn-sm btn-primary"><i class="fas fa-download"></i></button></td>
+                  logs.name
+                }" type="button" class="btn btn-sm btn-primary"><i class="fas fa-download"></i></button></td>
             </tr>
         `
       );
       document
         .getElementById(logs.name)
         .addEventListener("click", async (event) => {
-          const body = {
-            logName: logs.name,
-          };
-          window.open(`/settings/server/download/logs/${logs.name}`);
+          window.open(`/settings/server/logs/${logs.name}`);
         });
     });
   }
@@ -851,7 +862,7 @@ class ServerSettings {
       systemRestartBtn.disabled = true;
     }
 
-    let systemRestart = await OctoFarmclient.get("settings/server/restart");
+    let systemRestart = await OctoFarmclient.post("settings/server/restart");
     //Make sure response from server is received, and make sure the status is 200
     if (systemRestart && systemRestart.status !== 200) {
       // This alert is pretty mute as the serverAliveCheck will notify before...
@@ -890,6 +901,166 @@ class ServerSettings {
     }, 5000);
   }
 
+  static async updateOctoFarmCommand(doWeForceCheck) {
+    let updateOctoFarmBtn = document.getElementById("updateOctoFarmBtn");
+    // Make sure the update OctoFarm button is disabled after keypress
+    if (updateOctoFarmBtn) {
+      updateOctoFarmBtn.disabled = true;
+    }
+    let updateData = null;
+    if (!doWeForceCheck) {
+      updateData = {
+        forceCheck: false,
+      };
+    } else {
+      updateData = {
+        forceCheck: true,
+      };
+    }
+
+    let updateOctoFarm = await OctoFarmclient.post(
+      "settings/server/update/octofarm",
+      updateData
+    );
+    //Make sure response from server is received, and make sure the status is 200
+    if (updateOctoFarm && updateOctoFarm.status !== 200) {
+      // This alert is pretty mute as the serverAliveCheck will notify before...
+      UI.createAlert(
+        "error",
+        "Server could not be contacted... is it online?",
+        5000
+      );
+      setTimeout(() => {
+        if (updateOctoFarmBtn) {
+          updateOctoFarmBtn.disabled = false;
+        }
+      }, 5000);
+      return;
+    }
+    updateOctoFarm = await updateOctoFarm.json();
+    if (
+      !!updateOctoFarm?.haveWeSuccessfullyUpdatedOctoFarm ||
+      !updateOctoFarm?.message ||
+      !updateOctoFarm?.statusTypeForUser
+    ) {
+      UI.createAlert(
+        "error",
+        "Something went wrong on the server side, please check your logs.",
+        0,
+        "clicked"
+      );
+      setTimeout(() => {
+        if (updateOctoFarmBtn) {
+          updateOctoFarmBtn.disabled = false;
+        }
+      }, 5000);
+      return;
+    }
+
+    // Local changes are detected, question whether we overwrite or cancel..
+    if (
+      updateOctoFarm.message.includes(
+        "The update is failing due to local changes been detected."
+      )
+    ) {
+      bootbox.confirm({
+        title: '<span class="text-warning">Local file changes detected!</span>',
+        message: updateOctoFarm?.message,
+        buttons: {
+          cancel: {
+            className: "btn-danger",
+            label: '<i class="fa fa-times"></i> Cancel',
+          },
+          confirm: {
+            className: "btn-success",
+            label: '<i class="fa fa-check"></i> Override',
+          },
+        },
+        callback: function (result) {
+          if (result) {
+            ServerSettings.updateOctoFarmCommand(true);
+          }
+        },
+      });
+      return;
+    }
+
+    UI.createAlert(
+      `${updateOctoFarm?.statusTypeForUser}`,
+      `${updateOctoFarm?.message}`,
+      0,
+      "clicked"
+    );
+
+    if (updateOctoFarm?.haveWeSuccessfullyUpdatedOctoFarm) {
+      UI.createAlert(
+        "success",
+        "We have successfully updated... OctoFarm will restart now.",
+        0,
+        "Clicked"
+      );
+      this.serviceRestart();
+    }
+  }
+  static async checkForOctoFarmUpdates() {
+    let forceCheckForUpdatesBtn = document.getElementById(
+      "checkUpdatesForOctoFarmBtn"
+    );
+    // Make sure check button is disbaled after key press
+    if (forceCheckForUpdatesBtn) {
+      forceCheckForUpdatesBtn.disabled = true;
+    }
+
+    let updateCheck = await OctoFarmclient.get("settings/server/update/check");
+    //Make sure response from server is received, and make sure the status is 200
+    if (updateCheck && updateCheck.status !== 200) {
+      // This alert is pretty mute as the serverAliveCheck will notify before...
+      UI.createAlert(
+        "error",
+        "Something went wrong on the server side, please check your logs.",
+        0,
+        "clicked"
+      );
+      setTimeout(() => {
+        if (forceCheckForUpdatesBtn) {
+          forceCheckForUpdatesBtn.disabled = false;
+        }
+      }, 5000);
+      return;
+    }
+    // Made server check for update... notify user and await amialive check to produce a pop up
+    updateCheck = await updateCheck.json();
+
+    if (updateCheck?.air_gapped) {
+      UI.createAlert(
+        "error",
+        "Your farm has no internet connection, this function requires an active connection to check for releases...",
+        5000,
+        "Clicked"
+      );
+    }
+    if (updateCheck?.update_available) {
+      UI.createAlert(
+        "success",
+        "We found a new update, please use the update button to action!",
+        5000,
+        "Clicked"
+      );
+    } else {
+      UI.createAlert(
+        "warning",
+        "Sorry there are no new updates available!",
+        5000,
+        "Clicked"
+      );
+    }
+
+    setTimeout(() => {
+      if (forceCheckForUpdatesBtn) {
+        forceCheckForUpdatesBtn.disabled = false;
+      }
+    }, 5000);
+  }
   static update() {
     let reboot = false;
     const onlinePoll = document.getElementById("webSocketThrottle").value;
@@ -953,11 +1124,11 @@ class ServerSettings {
       oldServerSettings.influxExport.username !== influxExport.username ||
       oldServerSettings.influxExport.password !== influxExport.password ||
       oldServerSettings.influxExport.retentionPolicy.duration !==
-      influxExport.retentionPolicy.duration ||
+        influxExport.retentionPolicy.duration ||
       oldServerSettings.influxExport.retentionPolicy.replication !==
-      influxExport.retentionPolicy.replication ||
+        influxExport.retentionPolicy.replication ||
       oldServerSettings.influxExport.retentionPolicy.defaultRet !==
-      influxExport.retentionPolicy.defaultRet
+        influxExport.retentionPolicy.defaultRet
     ) {
       reboot = true;
     }
@@ -980,10 +1151,10 @@ class ServerSettings {
               "Your settings changes require a restart, would you like to do this now?",
             buttons: {
               cancel: {
-                label: "<i class=\"fa fa-times\"></i> Cancel",
+                label: '<i class="fa fa-times"></i> Cancel',
               },
               confirm: {
-                label: "<i class=\"fa fa-check\"></i> Confirm",
+                label: '<i class="fa fa-check"></i> Confirm',
               },
             },
             callback(result) {
@@ -994,6 +1165,69 @@ class ServerSettings {
           });
         }
       });
+  }
+  static async generateLogFileDump() {
+    const spinner = document.getElementById("logDumpSpinner");
+    if (spinner) {
+      spinner.classList.remove("d-none");
+    }
+    let logDumpResponse = await OctoFarmclient.post(
+      "settings/server/logs/generateLogDump",
+      {}
+    );
+    // Safely assume the spinner is done with here after response from server...
+    if (spinner) {
+      spinner.classList.add("d-none");
+    }
+    if (!logDumpResponse || logDumpResponse?.status !== 200) {
+      UI.createAlert(
+        "error",
+        "Unable to contact server, is it online?",
+        0,
+        "clicked"
+      );
+      return;
+    }
+
+    logDumpResponse = await logDumpResponse.json();
+
+    if (
+      !logDumpResponse?.status ||
+      !logDumpResponse?.msg ||
+      !logDumpResponse?.zipDumpPath
+    ) {
+      UI.createAlert(
+        "error",
+        "There was an issue with the servers response, please check your logs",
+        0,
+        "clicked"
+      );
+      return;
+    }
+
+    UI.createAlert(
+      logDumpResponse.status,
+      logDumpResponse.msg,
+      5000,
+      "clicked"
+    );
+
+    // Error detected so no need to create button.
+    if (logDumpResponse.status === "error") {
+      return;
+    }
+
+    const logDumpDownloadBtn = document.getElementById("logDumpDownloadBtn");
+
+    if (logDumpDownloadBtn) {
+      logDumpDownloadBtn.classList.remove("d-none");
+      logDumpDownloadBtn.addEventListener("click", (e) => {
+        setTimeout(() => {
+          logDumpDownloadBtn.classList.add("d-none");
+        }, 5000);
+        window.open(`/settings/server/${logDumpResponse.zipDumpPath}`);
+      });
+    }
   }
 }
 

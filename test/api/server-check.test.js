@@ -1,9 +1,9 @@
 const dbHandler = require("../db-handler");
 const request = require("supertest");
-const {setupTestApp, getServer} = require("../../app-test");
+const { setupTestApp, getServer } = require("../../app-test");
 const isDocker = require("is-docker");
 const envUtils = require("../../server_src/utils/env.utils");
-const path = require('path');
+const path = require("path");
 
 let app = null;
 /**
@@ -92,7 +92,7 @@ describe("AmIAlive Endpoint", () => {
     expect(res.body.update.update_available).toEqual(false);
   }, 15000);
 
-  it('should tolerate being air-gapped silently', async () => {
+  it("should tolerate being air-gapped silently", async () => {
     process.env.test_airgapped = true;
     process.env.npm_package_version = undefined;
     app = await getOrCreateApp();
@@ -109,21 +109,24 @@ describe("AmIAlive Endpoint", () => {
 });
 
 describe("Dashboard rendering", () => {
-  it('should show login page by redirect', async () => {
+  it("should show login page by redirect", async () => {
     app = await getOrCreateApp();
-    const res = await request(app).get("/dashboard")
+    const res = await request(app)
+      .get("/dashboard")
       .send() // We should be redirected to login by default
       .expect(302)
-      .then(response => {
+      .then((response) => {
         expect(response.text).toEqual("Found. Redirecting to /users/login");
       });
   });
 });
 
 describe("Env util package.json check", () => {
-  it('should pass validation', () => {
+  it("should pass validation", () => {
     expect(envUtils.verifyPackageJsonRequirements(__dirname)).toEqual(false);
 
-    expect(envUtils.verifyPackageJsonRequirements(path.join(__dirname, "mock-data"))).toEqual(true);
+    expect(
+      envUtils.verifyPackageJsonRequirements(path.join(__dirname, "mock-data"))
+    ).toEqual(true);
   });
 });

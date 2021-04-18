@@ -30,10 +30,13 @@ const settingsClean = require("../lib/dataFunctions/settingsClean.js");
 
 const { SettingsClean } = settingsClean;
 
-const serverCommands = require("../lib/serverCommands.js");
+const { Logs } = require("../lib/serverLogs.js");
+const { SystemCommands } = require("../lib/serverCommands.js");
 
-const { Logs } = serverCommands;
-const { SystemCommands } = serverCommands;
+const {
+  checkReleaseAndLogUpdate,
+  getUpdateNotificationIfAny,
+} = require("../runners/softwareUpdateChecker.js");
 
 module.exports = router;
 
@@ -51,15 +54,42 @@ const Storage = multer.diskStorage({
 
 const upload = multer({ storage: Storage });
 
-router.get("/server/get/logs", ensureAuthenticated, async (req, res) => {
+router.get("/server/logs", ensureAuthenticated, async (req, res) => {
   const serverLogs = await Logs.grabLogs();
   res.send(serverLogs);
 });
-router.get("/server/download/logs/:name", ensureAuthenticated, (req, res) => {
+router.get("/server/logs/:name", ensureAuthenticated, (req, res) => {
   const download = req.params.name;
   const file = `./logs/${download}`;
   res.download(file, download); // Set disposition and send it.
 });
+router.post(
+  "/server/logs/generateLogDump",
+  ensureAuthenticated,
+  async (req, res) => {
+    // Will use in a future update to configure the dump.
+    // let settings = req.body;
+    // Generate the log package
+    let zipDumpResponse = {
+      status: "error",
+      msg:
+        "Unable to generate zip file, please check 'OctoFarm-API.log' file for more information.",
+      zipDumpPath: "",
+    };
+
+    try {
+      zipDumpResponse.zipDumpPath = await Logs.generateOctoFarmLogDump();
+      zipDumpResponse.status = "success";
+      zipDumpResponse.msg =
+        "Successfully generated zip file, please click the download button.";
+    } catch (e) {
+      logger.error("Error Generating Log Dump Zip File | ", e);
+    }
+
+    res.send(zipDumpResponse);
+  }
+);
+
 router.get(
   "/server/delete/database/:name",
   ensureAuthenticated,
@@ -119,9 +149,47 @@ router.get(
     res.send({ databases: returnedObjects });
   }
 );
-router.get("/server/restart", ensureAuthenticated, async (req, res) => {
-  let serviceRestarted = await SystemCommands.rebootOctoFarm();
+router.post("/server/restart", ensureAuthenticated, async (req, res) => {
+  let serviceRestarted = false;
+  try {
+    serviceRestarted = await SystemCommands.rebootOctoFarm();
+  } catch (e) {
+    logger.error(e);
+  }
   res.send(serviceRestarted);
+});
+
+router.post(
+  "/server/update/octofarm",
+  ensureAuthenticated,
+  async (req, res) => {
+    let octoFarmUpdated;
+    let force = req?.body;
+
+    if (!force || typeof force?.forceCheck !== "boolean") {
+      res.sendStatus(400);
+      throw new Error(
+        "forceCheck object not correctly provided or not boolean"
+      );
+    }
+
+    try {
+      octoFarmUpdated = await SystemCommands.updateOctoFarm(forceCheck);
+    } catch (e) {
+      octoFarmUpdated = e;
+      // Log error with html tags removed if contained in response message
+      logger.error(
+        "Issue with updating | ",
+        e?.message.replace(/(<([^>]+)>)/gi, "")
+      );
+    }
+    res.send(octoFarmUpdated);
+  }
+);
+router.get("/server/update/check", ensureAuthenticated, async (req, res) => {
+  await checkReleaseAndLogUpdate();
+  const softwareUpdateNotification = getUpdateNotificationIfAny();
+  res.send(softwareUpdateNotification);
 });
 router.get("/client/get", ensureAuthenticated, (req, res) => {
   ClientSettingsDB.find({}).then((checked) => {
