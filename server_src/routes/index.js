@@ -3,7 +3,6 @@ const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth.js");
 const { ensureCurrentUserAndGroup } = require("../config/users.js");
-const db = require("../../config/db").MongoURI;
 
 const ServerSettings = require("../models/ServerSettings.js");
 const prettyHelpers = require("../../views/partials/functions/pretty.js");
@@ -450,7 +449,7 @@ router.get(
       clientSettings,
       serverSettings,
       systemInformation,
-      db,
+      db: process.env.MONGO,
       dashboardSettings: dashboardSettings,
       serviceInformation: {
         isDockerContainer: isDocker(),
