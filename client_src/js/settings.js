@@ -979,6 +979,10 @@ class ServerSettings {
         callback: function (result) {
           if (result) {
             ServerSettings.updateOctoFarmCommand(true);
+          } else {
+            if (updateOctoFarmBtn) {
+              updateOctoFarmBtn.disabled = false;
+            }
           }
         },
       });
