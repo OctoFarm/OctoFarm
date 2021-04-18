@@ -90,10 +90,7 @@ class SystemCommands {
           return serverResponse;
         } else if (force?.forceCheck) {
           // User wants to force the update
-          await exec("git reset --hard").catch((stderr) => {
-            serverResponse.message = `Could not reset git to remote branch, user intervention required | Error: ${stderr}`;
-            throw serverResponse;
-          });
+          await exec("git reset --hard");
         }
       }
       // Check if branch is already up to date. Nothing to do, return response to user.
@@ -107,10 +104,7 @@ class SystemCommands {
         return serverResponse;
       }
       // All been well, let's pull the update!
-      await exec("git pull").catch((stderr) => {
-        serverResponse.message = `Could not update OctoFarm, user intervention required | Error: ${stderr}`;
-        throw serverResponse;
-      });
+      await exec("git pull");
       // Everything went well, enjoy the tasty updates!
       serverResponse.haveWeSuccessfullyUpdatedOctoFarm = true;
       serverResponse.statusTypeForUser = "success";
