@@ -938,24 +938,6 @@ class ServerSettings {
       return;
     }
     updateOctoFarm = await updateOctoFarm.json();
-    if (
-      !!updateOctoFarm?.haveWeSuccessfullyUpdatedOctoFarm ||
-      !updateOctoFarm?.message ||
-      !updateOctoFarm?.statusTypeForUser
-    ) {
-      UI.createAlert(
-        "error",
-        "Something went wrong on the server side, please check your logs.",
-        0,
-        "clicked"
-      );
-      setTimeout(() => {
-        if (updateOctoFarmBtn) {
-          updateOctoFarmBtn.disabled = false;
-        }
-      }, 5000);
-      return;
-    }
 
     // Local changes are detected, question whether we overwrite or cancel..
     if (
