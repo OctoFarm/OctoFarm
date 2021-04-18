@@ -174,7 +174,7 @@ router.post(
     }
 
     try {
-      octoFarmUpdated = await SystemCommands.updateOctoFarm(force?.forceCheck);
+      octoFarmUpdated = await SystemCommands.updateOctoFarm(force);
     } catch (e) {
       octoFarmUpdated = e;
       // Log error with html tags removed if contained in response message
