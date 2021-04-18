@@ -57,26 +57,18 @@ class SystemCommands {
     }
 
     if (stdout) {
-      // Check if branch is already up to date. Nothing to do, return response to user.
-      if (
-        stdout.includes("Your branch is up-to-date with") ||
-        stdout.includes("Your branch is up to date with")
-      ) {
-        serverResponse.message =
-          "OctoFarm is already up to date! Your good to go!";
-        serverResponse.statusTypeForUser = "success";
-        throw serverResponse;
-      }
-
       // Check if branch has local changes. Return response to user, ask if they'd like to force overwrite the local changes, check for force flag and overwrite local changes..
-      if (stdout.includes("Your branch is ahead of")) {
+      if (
+        stdout.includes("Your branch is ahead of") ||
+        stdout.includes("Changes not staged for commit")
+      ) {
         if (stdout.includes("nothing to commit, working tree clean")) {
           serverResponse.message =
             "<span class='text-warning'>The update is failing due to local changes been detected. Seems you've committed your files, Thanks for making OctoFarm great! <br><br>" +
             "<b class='text-success'>Override:</b> Will just run a <code>git pull</code> command if you continue.<br><br>" +
             "<b class='text-danger'>Cancel:</b> This option will cancel the update process.<br><br>";
           serverResponse.statusTypeForUser = "warning";
-          throw serverResponse;
+          return serverResponse;
         }
         if (!force?.forceCheck) {
           // Default case without forcing the update
@@ -95,7 +87,7 @@ class SystemCommands {
             )} </div>`;
           });
 
-          throw serverResponse;
+          return serverResponse;
         } else if (force?.forceCheck) {
           // User wants to force the update
           await exec("git reset --hard").catch((stderr) => {
@@ -104,7 +96,16 @@ class SystemCommands {
           });
         }
       }
-
+      // Check if branch is already up to date. Nothing to do, return response to user.
+      if (
+        stdout.includes("Your branch is up-to-date with") ||
+        stdout.includes("Your branch is up to date with")
+      ) {
+        serverResponse.message =
+          "OctoFarm is already up to date! Your good to go!";
+        serverResponse.statusTypeForUser = "success";
+        return serverResponse;
+      }
       // All been well, let's pull the update!
       await exec("git pull").catch((stderr) => {
         serverResponse.message = `Could not update OctoFarm, user intervention required | Error: ${stderr}`;
@@ -115,6 +116,7 @@ class SystemCommands {
       serverResponse.statusTypeForUser = "success";
       serverResponse.message =
         "Update command has run successfully, you will be asked to restart OctoFarm.";
+
       return {
         serverResponse,
       };
