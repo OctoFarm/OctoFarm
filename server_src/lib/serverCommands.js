@@ -88,9 +88,19 @@ class SystemCommands {
           });
 
           return serverResponse;
-        } else if (force?.forceCheck) {
+        }
+        if (force?.forceCheck) {
           // User wants to force the update
           await exec("git reset --hard");
+          // All been well, let's pull the update!
+          await exec("git pull");
+          // Everything went well, enjoy the tasty updates!
+          serverResponse.haveWeSuccessfullyUpdatedOctoFarm = true;
+          serverResponse.statusTypeForUser = "success";
+          serverResponse.message =
+            "Update command has run successfully, OctoFarm will restart.";
+
+          return serverResponse;
         }
       }
 
