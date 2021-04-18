@@ -1,32 +1,41 @@
 const winston = require("winston");
 
+const isProduction = process.env.NODE_ENV === "production";
+
+const dtFormat = new Intl.DateTimeFormat('en-GB', {
+  timeStyle: 'medium',
+  dateStyle: 'short',
+  timeZone: 'UTC'
+});
+
 dateFormat = () => {
-  return new Date(Date.now()).toUTCString();
+  return dtFormat.format(new Date());
 };
 
 class LoggerService {
   constructor(route, enableFileLogs = true) {
     this.log_data = null;
     this.route = route;
-    const logger = winston.createLogger({
+    this.logger = winston.createLogger({
       transports: [
         new winston.transports.Console({
-          level: "warn",
+          level: "info",
         }),
         ...(enableFileLogs
           ? [
-              new winston.transports.File({
-                filename: `./logs/${route}.log`,
-                maxsize: "5000000",
-                maxFiles: 5,
-              }),
-            ]
+            new winston.transports.File({
+              level: isProduction ? "warn" : "info",
+              filename: `./logs/${route}.log`,
+              maxsize: "5000000",
+              maxFiles: 5,
+            }),
+          ]
           : []),
       ],
       format: winston.format.printf((info) => {
-        let message = `${dateFormat()} | ${info.level.toUpperCase()} | ${route}.log | ${
+        let message = `${dateFormat()} | ${info.level.toUpperCase()} | ${route} | ${
           info.message
-        } | `;
+        }`;
         message = info.obj
           ? message + `data:${JSON.stringify(info.obj)} | `
           : message;
@@ -36,44 +45,31 @@ class LoggerService {
         return message;
       }),
     });
-    this.logger = logger;
   }
 
   setLogData(log_data) {
     this.log_data = log_data;
   }
 
-  // async info(message) {
-  //   this.logger.log("info", message);
-  // }
-  async info(message, obj) {
+  info(message, obj) {
     this.logger.log("info", message, {
       obj,
     });
   }
 
-  // async warning(message) {
-  //   this.logger.log("warning", message);
-  // }
-  async warning(message, obj) {
+  warning(message, obj) {
     this.logger.log("warning", message, {
       obj,
     });
   }
 
-  // async debug(message) {
-  //   this.logger.log("debug", message);
-  // }
-  async debug(message, obj) {
+  debug(message, obj) {
     this.logger.log("debug", message, {
       obj,
     });
   }
 
-  // async error(message) {
-  //   this.logger.log("error", message);
-  // }
-  async error(message, obj) {
+  error(message, obj) {
     this.logger.log("error", message, {
       obj,
     });

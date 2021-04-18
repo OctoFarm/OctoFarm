@@ -38,4 +38,4 @@ USER octofarm
 WORKDIR /app
 
 ENTRYPOINT [ "/sbin/tini", "--" ]
-CMD [ "./docker/alpine-entrypoint.sh" ]
+CMD [ "./docker/entrypoint.sh" ]
