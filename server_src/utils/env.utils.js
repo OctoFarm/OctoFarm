@@ -45,7 +45,7 @@ function stringifyDotEnv(obj) {
 function writeVariableToEnvFile(absoluteEnvPath, variableKey, jsonObject) {
   const latestDotEnvConfig = dotenv.config();
   if (!!latestDotEnvConfig.error) {
-    throw new Error("Could not parse .env file. Please ensure the file contains lines with each looking like 'OCTOFARM_PORT=4000' and so on.");
+    throw new Error("Could not parse current .env file. Please ensure the file contains lines with each looking like 'OCTOFARM_PORT=4000' and so on.");
   }
 
   const newDotEnv = {

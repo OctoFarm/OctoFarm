@@ -119,7 +119,8 @@ function ensurePortSet() {
  */
 function setupEnvConfig(skipDotEnv = false) {
   if (!skipDotEnv) {
-    dotenv.config();
+    // This needs to be CWD of app.js, so be careful not to move this call.
+    dotenv.config({ path: path.join(__dirname, '.env') });
   }
 
   logger.info("✓ Parsed environment and (optional) .env file");
