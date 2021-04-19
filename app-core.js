@@ -69,7 +69,7 @@ async function ensureSystemSettingsInitiated() {
 }
 
 function serveDatabaseIssueFallback(app) {
-  app.listen(parseInt(process.env.OCTOFARM_PORT), "0.0.0.0", () => {
+  let listenerHttpServer = app.listen(parseInt(process.env.OCTOFARM_PORT), "0.0.0.0", () => {
     const msg = `You have database connection issues... open our webpage at http://127.0.0.1:${process.env.OCTOFARM_PORT}`;
     logger.info(msg);
 
@@ -86,6 +86,8 @@ function serveDatabaseIssueFallback(app) {
   app.get("*", function (req, res) {
     res.redirect("/");
   });
+
+  return listenerHttpServer;
 }
 
 async function serveOctoFarmNormally(app) {
