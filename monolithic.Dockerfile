@@ -1,4 +1,4 @@
-FROM node:13.0.1-stretch
+FROM node:14.16-stretch
 
 # Update Local Repository Index
 RUN apt-get update
