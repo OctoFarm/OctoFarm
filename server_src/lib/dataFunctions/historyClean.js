@@ -762,7 +762,7 @@ class HistoryClean {
     }
   }
 }
-HistoryClean.start();
+
 module.exports = {
   HistoryClean,
 };

@@ -130,3 +130,10 @@ describe("Env util package.json check", () => {
     ).toEqual(true);
   });
 });
+
+// ["/dashboard","/printers","/filemanager","/history","/mon/panel","/mon/camera","/mon/printerMap","/mon/list","/mon/currentOp","/filament","/system","/serverChecks/amialive","/printers/add","/printers/update","/printers/remove","/printers/removefile","/printers/removefolder","/printers/resyncFile","/prin
+//   ters/stepChange","/printers/flowChange","/printers/feedChange","/printers/updateSettings","/printers/killPowerSettings/:id","/printers/groups","/printers/printerInfo","/printers/runner/checkOffline","/printers/moveFile","/printers/moveFolder","/printers/newFolder","/printers/newFiles","/printers/selectFilament","/printers/reScanOcto","/printers/wakeH
+// ost","/printers/updateSortIndex","/printers/connectionLogs/:id","/printers/pluginList/:id","/printers/scanNetwork","/groups/list","/settings/server/logs","/settings/server/logs/:name","/settings/server/logs/generateLogDump","/settings/server/delete/database/:name","/settings/server/get/database/:name","/settings/server/restart","/settings/server/upda
+// te","/settings/server/update/check","/settings/client/get","/settings/client/update","/settings/backgroundUpload","/settings/server/get","/settings/sysInfo","/settings/customGcode/delete/:id","/settings/customGcode/edit","/settings/customGcode","/printersInfo/get/","/dashboardInfo/get/","/monitoringInfo/get/","/filament/get/printerList","/filament/ge
+// t/profile","/filament/get/filament","/filament/get/dropDownList","/filament/select","/filament/save/filament","/filament/delete/filament","/filament/edit/filament","/filament/save/profile","/filament/edit/profile","/filament/delete/profile","/filament/filamentManagerReSync","/filament/filamentManagerSync","/filament/disableFilamentPlugin","/history/u
+// pdate","/history/delete","/history/get","/history/statisticsData","/history/updateCostMatch","/history/statistics/:id","/scripts/get","/scripts/delete/:id","/scripts/test","/scripts/save","/scripts/edit","/input/roomData","/client/updateFilter/:filter","/client/updateSorting/:sorting","*"]

@@ -3,7 +3,6 @@ const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth.js");
 const { ensureCurrentUserAndGroup } = require("../config/users.js");
-const db = require("../../config/db").MongoURI;
 
 const ServerSettings = require("../models/ServerSettings.js");
 const prettyHelpers = require("../../views/partials/functions/pretty.js");
@@ -42,8 +41,8 @@ console.log(`Version: ${version} (server started)`);
 
 // Welcome Page
 async function welcome() {
-  if (db === "") {
-    // No db setup, show db warning before login.
+  if (process.env.MONGO === "") {
+    // No MONGO variable set, show database warning page.
     router.get("/", (req, res) =>
       res.render("database", { page: "Database Warning" })
     );
@@ -450,7 +449,7 @@ router.get(
       clientSettings,
       serverSettings,
       systemInformation,
-      db,
+      db: process.env.MONGO,
       dashboardSettings: dashboardSettings,
       serviceInformation: {
         isDockerContainer: isDocker(),
@@ -464,9 +463,27 @@ router.get(
 );
 
 softwareUpdateChecker
-  .syncLatestOctoFarmRelease(false || process.env.OCTOFARM_PRERELEASE)
+  .syncLatestOctoFarmRelease(false || process.env.OCTOFARM_ALLOW_PRERELEASE_INSTALL)
   .then(() => {
     softwareUpdateChecker.checkReleaseAndLogUpdate();
   });
+
+HistoryClean.start();
+
+//Hacky database check due to shoddy layout of code...
+const mongoose = require("mongoose");
+const serverSettings = require("../settings/serverSettings");
+
+let interval = false;
+if (interval === false) {
+  interval = setInterval(async () => {
+    if (mongoose.connection.readyState === 1) {
+      const printersInformation = PrinterClean.returnPrintersInformation();
+      await PrinterClean.sortCurrentOperations(printersInformation);
+      await PrinterClean.statisticsStart();
+      await PrinterClean.createPrinterList(printersInformation, serverSettings.filamentManager);
+    }
+  }, 2500);
+}
 
 module.exports = router;

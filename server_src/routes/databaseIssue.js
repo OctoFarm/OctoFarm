@@ -1,7 +1,159 @@
 const express = require("express");
+const path = require("path");
+const { execSync, exec } = require("child_process");
+const mongoose = require("mongoose");
+const Logger = require("../../server_src/lib/logger.js");
+const ServerSettingsDB = require("../models/ServerSettings");
+const isDocker = require("is-docker");
+const envUtils = require("../utils/env.utils");
 
 const router = express.Router();
+const logger = new Logger("OctoFarm-Server");
+
+function validateMongoURL(mongoURL) {
+  const mongoString = mongoURL.toLowerCase();
+  const hasMongoPrefix = mongoString.toLowerCase().includes("mongodb://") || mongoString.toLowerCase().includes("mongodb+srv://");
+  const hasOctoFarmTable = mongoString.includes("/octofarm");
+
+  return {
+    hasMongoPrefix,
+    hasOctoFarmTable,
+    isValid: hasOctoFarmTable || hasMongoPrefix,
+  };
+}
+
 router.get("/", (req, res) =>
-  res.render("database", { page: "Database Warning" })
+  res.render("databaseIssue",
+    {
+      page: "Database Warning",
+      isDocker: isDocker(),
+      isPm2: envUtils.isPm2(),
+      isNodemon: envUtils.isNodemon(),
+      os: process.env.OS,
+      npmPackageJson: process.env.npm_package_version,
+      nodeVersion: process.version,
+      mongoURL: process.env.MONGO,
+    }),
 );
+
+router.post("/test-connection", async (req, res) => {
+  const body = req.body;
+  const connectionURL = body.connectionURL;
+
+  if (!connectionURL || !validateMongoURL(connectionURL)) {
+    res.statusCode = 400;
+    return res.send({
+      connectionURL,
+      reason: "Not a valid connection string",
+      succeeded: false,
+    });
+  }
+
+  let connSucceeded = false;
+  logger.info("Testing database with new URL");
+  await mongoose.disconnect();
+  await mongoose.connect(connectionURL, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useFindAndModify: false,
+    serverSelectionTimeoutMS: 2500,
+  })
+    .then(r => {
+      connSucceeded = !!r;
+    })
+    .catch(r => {
+      connSucceeded = false;
+    });
+
+  if (!connSucceeded) {
+    res.statusCode = 400;
+    return res.send({
+      connectionURL,
+      reason: "Could not connect",
+      succeeded: connSucceeded,
+    });
+  }
+
+  return await ServerSettingsDB.find({})
+    .then((r) => {
+      return res.send({
+        connectionURL,
+        succeeded: connSucceeded,
+      });
+    })
+    .catch((e) => {
+      connSucceeded = false;
+      if (e.message.includes("command find requires authentication")) {
+        return res.send({
+          connectionURL,
+          reason: "MongoDB connected just fine, but you should check your authentication (username/password)",
+          succeeded: connSucceeded,
+        });
+      } else {
+        return res.send({
+          connectionURL,
+          reason: e.message,
+          succeeded: connSucceeded,
+        });
+      }
+    });
+});
+
+router.post("/save-connection-env", async (req, res) => {
+  if (isDocker()) {
+    res.statusCode = 500;
+    return res.send({
+      reason: "The OctoFarm docker container cannot change this setting. Change the MONGO variable yourself.",
+      succeeded: false,
+    });
+  }
+
+  const body = req.body;
+  const connectionURL = body.connectionURL;
+  if (!connectionURL || !validateMongoURL(connectionURL)) {
+    res.statusCode = 400;
+    return res.send({
+      connectionURL,
+      reason: "Not a valid connection string",
+      succeeded: false,
+    });
+  }
+
+  try {
+    envUtils.writeVariableToEnvFile(path.join(__dirname + "/../../.env"), "MONGO", connectionURL);
+  } catch (e) {
+    res.statusCode = 500;
+    return res.send({
+      reason: e.message,
+      succeeded: false,
+    });
+  }
+
+  logger.info("Saved MONGO env variable to .env file");
+
+  if (envUtils.isNodemon()) {
+    res.send({
+      reason: "Succesfully saved MONGO environment variable to .env file. Please restart OctoFarm manually!",
+      succeeded: true,
+    });
+  } else {
+    res.send({
+      reason: "Succesfully saved MONGO environment variable to .env file. Stopping OctoFarm service, please start it again!",
+      succeeded: true,
+    });
+  }
+
+  if (envUtils.isPm2()) {
+    logger.info("Updating Pm2 service for Octofarm");
+    const pidResponse = execSync("pm2 pid OctoFarm").toString();
+    if (isNaN(parseInt(pidResponse))) {
+      logger.error("Could not parse PID for Pm2 service of OctoFarm");
+      throw new Error("Could not parse PID for Pm2 service of OctoFarm");
+    }
+
+    logger.info("Restarting Octofarm");
+    execSync("pm2 restart OctoFarm").toString();
+  }
+});
+
 module.exports = router;

@@ -17,7 +17,6 @@ module.exports = function (passport) {
 
                 if (err) { return done(err); }
                 if (!uid) { return done(null, false); }
-                console.log(uid);
                 User.findById(uid, (err, user) => {
                     if (err) { return done(err); }
                     if (!user) { return done(null, false); }
