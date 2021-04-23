@@ -21,6 +21,8 @@ All notable changes to this project will be documented in this file.
     - Fixed #353: Filament Manager Spools list is not ignoring Spools Modal pagination.
     - Fixed #386: Server update notification would show to all users, not just Administrator group.
     - Fixed #430: Replace user and group check with middleware. 
+    - Fixed #438: File manager fails to load due to toFixed error.
+
 # [Released]
 
 ## [v1.1.12]
