@@ -1,4 +1,4 @@
-//Support for influx v1.X
+// Support for influx v1.X
 
 const Influx = require("influx");
 const settingsClean = require("../lib/dataFunctions/settingsClean.js");
@@ -9,7 +9,7 @@ const logger = new Logger("OctoFarm-Server");
 
 let db = null;
 
-async function databaseSetup() {
+async function optionalInfluxDatabaseSetup() {
   let serverSettings = await SettingsClean.returnSystemSettings();
   if (typeof clientSettings === "undefined") {
     await SettingsClean.start();
@@ -28,15 +28,14 @@ async function databaseSetup() {
     };
 
     db = new Influx.InfluxDB(options);
-    // eslint-disable-next-line no-use-before-define
     await checkDatabase(options);
-    // eslint-disable-next-line no-use-before-define
-    //await updateRetention();
+
     return "Setup";
   } else {
     logger.info("No settings or disabled for influxdb export");
   }
 }
+
 async function checkDatabase(options) {
   const names = await db.getDatabaseNames();
   if (!names.includes(options.database)) {
@@ -50,14 +49,7 @@ async function checkDatabase(options) {
     return "database exists... skipping";
   }
 }
-async function updateRetention() {
-  const retention = await db.alterRetentionPolicy(octofarm, {
-    duration: retentionPolicy.duation,
-    replication: retentionPolicy.replication,
-    default: retentionPolicy.default,
-  });
-  return "BLA";
-}
+
 function writePoints(tags, measurement, dataPoints) {
   if (db !== null) {
     db.writePoints([
@@ -74,4 +66,8 @@ function writePoints(tags, measurement, dataPoints) {
   }
 }
 
-module.exports = { databaseSetup, checkDatabase, writePoints };
+module.exports = {
+  optionalInfluxDatabaseSetup,
+  checkDatabase,
+  writePoints,
+};

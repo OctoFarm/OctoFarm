@@ -3,12 +3,7 @@ mkdir -p /data/db
 nohup sh -c mongod --dbpath /data/db &
 
 pwd
-echo "" > config/db.js
-tee config/db.js <<EOF >/dev/null
-module.exports = {
-MongoURI: "mongodb://127.0.0.1:27017/octofarm"
-};
-EOF
+ENV MONGO=mongodb://127.0.0.1:27017/octofarm
 
 if [ -d "logs" ]
 then

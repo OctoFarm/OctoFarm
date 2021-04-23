@@ -108,4 +108,5 @@ class ServerSettings {
 
 module.exports = {
   ServerSettings,
+  filamentManager
 };

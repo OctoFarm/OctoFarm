@@ -4,11 +4,6 @@ const parseString = require("xml2js").parseString;
 const Logger = require("../lib/logger.js");
 
 const logger = new Logger("OctoFarm-Server");
-
-const runner = require("../runners/state.js");
-
-const { Runner } = runner;
-
 let discoveredDevices = [];
 
 ssdp.on("DeviceFound", (res) => {
@@ -61,25 +56,20 @@ ssdp.on("DeviceFound", (res) => {
       });
   }
 });
-// ssdp.on("DeviceAvailable", console.log);
-// ssdp.on("DeviceUnavailable", console.log);
-// ssdp.on("DeviceUpdate", console.log);
 
 let searchForDevicesOnNetwork = async function () {
   logger.info("Running automatic scan...");
   discoveredDevices = [];
   ssdp.mSearch();
   function x() {
-    var promise = new Promise(function (resolve, reject) {
-      setTimeout(function () {
+    return new Promise(function(resolve, reject) {
+      setTimeout(function() {
         ssdp.close;
         resolve(discoveredDevices);
       }, 20001);
     });
-    return promise;
   }
-  const result = await x();
-  return result;
+  return await x();
 };
 
 module.exports = {

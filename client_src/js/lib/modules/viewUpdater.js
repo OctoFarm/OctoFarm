@@ -996,7 +996,6 @@ async function updateState(printer, clientSettings, view) {
     }
   }
   if (Array.isArray(printer.selectedFilament)) {
-    const spoolList = "";
     for (let i = 0; i < printer.selectedFilament.length; i++) {
       const tool = document.getElementById(`${printer._id}-spool-${i}`);
       if (printer.selectedFilament[i] !== null) {

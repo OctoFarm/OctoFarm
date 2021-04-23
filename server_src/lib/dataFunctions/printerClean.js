@@ -110,7 +110,7 @@ const arrayTotal = [];
 const printerControlList = [];
 let printerFilamentList = [];
 
-let interval = false;
+
 
 let printerConnectionLogs = [];
 
@@ -1735,21 +1735,7 @@ class PrinterClean {
     return versionArray;
   }
 }
+
 module.exports = {
   PrinterClean,
 };
-
-//Hacky database check due to shoddy layout of code...
-const mongoose = require("mongoose");
-
-if (interval === false) {
-  interval = setInterval(() => {
-    if (mongoose.connection.readyState === 1) {
-      PrinterClean.sortCurrentOperations(printersInformation);
-      PrinterClean.statisticsStart();
-      PrinterClean.createPrinterList(printersInformation, fmToggle);
-    }
-  }, 2500);
-}
-// PrinterClean.statisticsStart();
-// PrinterClean.createPrinterList(printersInformation, fmToggle);
