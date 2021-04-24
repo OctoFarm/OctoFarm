@@ -28,11 +28,11 @@
             </div>
         </center>
         <b class="mb-0 d-inline"><i class="fas fa-square text-warning d-inline"></i> Used: </b>
-        <p id="fsUsed" class="mb-1 d-inline"><%= helpers.generateBytes(fileStatistics.storageUsed.toFixed(2)) %></p> /
+        <p id="fsUsed" class="mb-1 d-inline"><%= helpers.generateBytes(fileStatistics.storageUsed) %></p> /
         <b class="mb-0 d-inline"><i class="fas fa-square text-success"></i> Remaining: </b>
-        <p id="fsRemain" class="mb-1 d-inline"><%= helpers.generateBytes((fileStatistics.storageTotal - fileStatistics.storageUsed).toFixed(2)) %></p> /
+        <p id="fsRemain" class="mb-1 d-inline"><%= helpers.generateBytes((fileStatistics.storageTotal - fileStatistics.storageUsed)) %></p> /
         <b class="mb-0 d-inline"><i class="fas fa-square"></i> Total: </b>
-        <p id="fsTotal" class="mb-1 d-inline"><%=helpers.generateBytes( fileStatistics.storageTotal.toFixed(2)) %></p>
+        <p id="fsTotal" class="mb-1 d-inline"><%=helpers.generateBytes( fileStatistics.storageTotal) %></p>
     </div>
 <div class="col-12">
     <div class="row">
@@ -44,20 +44,20 @@
         <div class="col-lg-3">
             <h6>Largest</h6>
             <hr>
-            <b>Size: </b><%=helpers.generateBytes( fileStatistics.biggestFile.toFixed(2)) %><br>
+            <b>Size: </b><%=helpers.generateBytes( fileStatistics.biggestFile) %><br>
             <b>Length: </b><%= (fileStatistics.biggestLength).toFixed(2)  %>m
 
         </div>
         <div class="col-lg-3">
             <h6>Smallest</h6>
             <hr>
-            <b>Size: </b><%=helpers.generateBytes( fileStatistics.smallestFile.toFixed(2)) %><br>
+            <b>Size: </b><%=helpers.generateBytes( fileStatistics.smallestFile) %><br>
             <b>Length: </b><%= (fileStatistics.smallestLength).toFixed(2) %>m
         </div>
         <div class="col-lg-3">
             <h6>Average</h6>
             <hr>
-            <b>Size: </b><%=helpers.generateBytes( fileStatistics.averageFile.toFixed(2)) %><br>
+            <b>Size: </b><%=helpers.generateBytes( fileStatistics.averageFile) %><br>
             <b>Length: </b><%= (fileStatistics.averageLength).toFixed(2)%>m
         </div>
     </div>
