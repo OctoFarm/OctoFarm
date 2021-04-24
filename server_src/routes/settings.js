@@ -165,14 +165,16 @@ router.post(
   async (req, res) => {
     let octoFarmUpdated;
     let force = req?.body;
-
-    if (!force || typeof force?.forceCheck !== "boolean") {
+    if (
+      !force ||
+      typeof force?.forcePull !== "boolean" ||
+      typeof force?.doWeInstallPackages !== "boolean"
+    ) {
       res.sendStatus(400);
       throw new Error(
         "forceCheck object not correctly provided or not boolean"
       );
     }
-   
 
     try {
       octoFarmUpdated = await SystemCommands.updateOctoFarm(force);

@@ -827,7 +827,7 @@
                                                     <h5>System Actions</h5>
                                                     <hr>
                                                     <% let systemButtonsDisabled = false; %>
-                                                    <% if(!serviceInformation?.isPm2){ %>
+                                                    <% if(!serviceInformation?.isNodemon && !serviceInformation?.isPm2){ %>
                                                         <div class="alert alert-warning" role="alert">
                                                             The below buttons have all been disabled due to not been
                                                             able to detect the use of the pm2 process manager.
@@ -854,8 +854,8 @@
                                                     </button>
                                                     <button title="Performs an update command on OctoFarm to the latest version"
                                                             id="updateOctoFarmBtn" type="button"
-                                                            <%= systemButtonsDisabled ? "disabled" : "" %>
-                                                            class="btn btn-success mb-3 btn-lg">
+                                                            class="btn btn-success mb-3 btn-lg"
+                                                            disabled>
                                                         <i class="fas fa-thumbs-up"></i> Update OctoFarm
                                                     </button>
                                                     <h5>Server Settings</h5>
