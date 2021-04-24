@@ -8,13 +8,16 @@ const isDocker = require("is-docker");
 const envUtils = require("../utils/env.utils");
 const { AppConstants } = require("../app.constants");
 const { fetchMongoDBConnectionString } = require("../../app-env");
+const { SystemCommands } = require("../lib/serverCommands.js");
 
 const router = express.Router();
 const logger = new Logger("OctoFarm-Server");
 
 function validateMongoURL(mongoURL) {
   const mongoString = mongoURL.toLowerCase();
-  const hasMongoPrefix = mongoString.toLowerCase().includes("mongodb://") || mongoString.toLowerCase().includes("mongodb+srv://");
+  const hasMongoPrefix =
+    mongoString.toLowerCase().includes("mongodb://") ||
+    mongoString.toLowerCase().includes("mongodb+srv://");
   const hasOctoFarmTable = mongoString.includes("/octofarm");
 
   return {
@@ -25,18 +28,17 @@ function validateMongoURL(mongoURL) {
 }
 
 router.get("/", (req, res) =>
-  res.render("databaseIssue",
-    {
-      page: "Database Warning",
-      isDocker: isDocker(),
-      isPm2: envUtils.isPm2(),
-      defaultMongoConnectionString: AppConstants.defaultMongoStringUnauthenticated,
-      isNodemon: envUtils.isNodemon(),
-      os: process.env.OS,
-      npmPackageJson: process.env.npm_package_version,
-      nodeVersion: process.version,
-      mongoURL: fetchMongoDBConnectionString(),
-    }),
+  res.render("databaseIssue", {
+    page: "Database Warning",
+    isDocker: isDocker(),
+    isPm2: envUtils.isPm2(),
+    defaultMongoConnectionString: AppConstants.defaultMongoStringUnauthenticated,
+    isNodemon: envUtils.isNodemon(),
+    os: process.env.OS,
+    npmPackageJson: process.env.npm_package_version,
+    nodeVersion: process.version,
+    mongoURL: fetchMongoDBConnectionString(),
+  })
 );
 
 router.post("/test-connection", async (req, res) => {
@@ -55,16 +57,17 @@ router.post("/test-connection", async (req, res) => {
   let connSucceeded = false;
   logger.info("Testing database with new URL");
   await mongoose.disconnect();
-  await mongoose.connect(connectionURL, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useFindAndModify: false,
-    serverSelectionTimeoutMS: 2500,
-  })
-    .then(r => {
+  await mongoose
+    .connect(connectionURL, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+      useFindAndModify: false,
+      serverSelectionTimeoutMS: 2500,
+    })
+    .then((r) => {
       connSucceeded = !!r;
     })
-    .catch(r => {
+    .catch((r) => {
       connSucceeded = false;
     });
 
@@ -89,7 +92,8 @@ router.post("/test-connection", async (req, res) => {
       if (e.message.includes("command find requires authentication")) {
         return res.send({
           connectionURL,
-          reason: "MongoDB connected just fine, but you should check your authentication (username/password)",
+          reason:
+            "MongoDB connected just fine, but you should check your authentication (username/password)",
           succeeded: connSucceeded,
         });
       } else {
@@ -145,18 +149,16 @@ router.post("/save-connection-env", async (req, res) => {
       succeeded: true,
     });
   }
+});
 
-  if (envUtils.isPm2()) {
-    logger.info("Updating Pm2 service for Octofarm");
-    const pidResponse = execSync("pm2 pid OctoFarm").toString();
-    if (isNaN(parseInt(pidResponse))) {
-      logger.error("Could not parse PID for Pm2 service of OctoFarm");
-      throw new Error("Could not parse PID for Pm2 service of OctoFarm");
-    }
-
-    logger.info("Restarting Octofarm");
-    execSync("pm2 restart OctoFarm").toString();
+router.post("/restart-octofarm", async (req, res) => {
+  let serviceRestarted = false;
+  try {
+    serviceRestarted = await SystemCommands.rebootOctoFarm();
+  } catch (e) {
+    logger.error(e);
   }
+  res.send(serviceRestarted);
 });
 
 module.exports = router;

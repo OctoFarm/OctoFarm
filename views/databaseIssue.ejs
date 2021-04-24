@@ -15,27 +15,27 @@
                 <%- include('./partials/messages') %>
                 <span>
                     Docker mode:
-                    <span class="badge badge-dark"><%= isDocker ;%></span>
+                    <span class="badge badge-dark"><%= isDocker; %></span>
                 </span>
                 <span>
                     Pm2 mode:
-                    <span class="badge badge-dark"><%= isPm2 ;%></span>
+                    <span class="badge badge-dark"><%= isPm2; %></span>
                 </span>
                 <span>
                     Nodemon mode:
-                    <span class="badge badge-dark"><%= isNodemon ;%></span>
+                    <span class="badge badge-dark"><%= isNodemon; %></span>
                 </span>
                 <span>
                     OctoFarm version:
-                    <span class="badge badge-dark"><%= npmPackageJson ;%></span>
+                    <span class="badge badge-dark"><%= npmPackageJson; %></span>
                 </span>
                 <span>
                     NodeJS version:
-                    <span class="badge badge-dark"><%= nodeVersion ;%></span>
+                    <span class="badge badge-dark"><%= nodeVersion; %></span>
                 </span>
                 <span>
                     OS:
-                    <span class="badge badge-dark"><%= os ;%></span>
+                    <span class="badge badge-dark"><%= os; %></span>
                 </span>
                 <br />
 
@@ -54,13 +54,14 @@
                                    placeholder="" />
                         </div>
                         <small id="connection-string-invalid" class="form-text text-danger">
-                            Your connection string seems to have invalid format. <br/>
+                            Your connection string seems to have invalid format. <br />
                             <ul>
                                 <li>Must start with <small class="badge">'mongodb://'</small></li>
                                 <li>Must contain <small class="badge">'/octofarm'</small></li>
                                 <li>
                                     Read more about connection string in
-                                    <a href="https://docs.mongodb.com/manual/reference/connection-string/" target="_blank">
+                                    <a href="https://docs.mongodb.com/manual/reference/connection-string/"
+                                       target="_blank">
                                         MongoDB Connection String URI Format documentation
                                     </a>...
                                 </li>
@@ -69,17 +70,6 @@
                         <small id="connection-string-valid" class="form-text text-success">
                             Your connection string seems properly formatted.
                         </small>
-                        <!--                        <small id="usernamePasswordHelp" class="form-text text-muted">-->
-                        <!--                            Make sure to add your username/password (if applicable). Here's a more complete example:-->
-                        <!--                        </small>-->
-                        <!--                        <h3 class="badge badge-info">-->
-                        <!--                            mongodb://username:password@host:port/octofarm?authSource=admin-->
-                        <!--                        </h3>-->
-                        <!--                        <small id="authSourceHelp" class="form-text text-muted">-->
-                        <!--                            For authentication the authSource parameter might be required. Add the-->
-                        <!--                            following in that case:-->
-                        <!--                        </small>-->
-                        <!--                        <h3 class="badge badge-info">?authSource=admin</h3>-->
                     </div>
                     <br />
                     <button type="button"
@@ -100,15 +90,29 @@
                             disabled>
                         Save connection setting
                     </button>
-                    <% if (!isDocker) { %>
+                    <button
+                            type="button"
+                            id="restart-server-button"
+                            class="btn btn-danger"
+                            onclick="postRestartServer()"
+                            <% if (isDocker) { %>
+                            hidden
+                            <% } %>
+                            disabled>
+                        Restart OctoFarm
+                    </button>
                     <small id="not-yet-validated-connection" class="form-text text-warning">
                         Test your connection before saving.
                     </small>
-                    <% } else { %>
+                    <br/>
+                    <% if (isDocker) { %>
                         <div class="text-warning">
-                            Running OctoFarm in a docker container. Update the MONGO variable in your docker command `-e MONGO=...` or docker-compose.yml file's `environment:` section.
-                            <br/>
-                            You can still use the test button above. Make sure to restart the container after you've managed to establish a successful connection here.
+                            <strong>Running OctoFarm in a docker container.</strong>
+                            <br/> Update the MONGO variable in your docker command `-e
+                            MONGO=...` or docker-compose.yml file's `environment:` section.
+                            <br />
+                            You can still use the test button above. Make sure to restart the container after you've
+                            managed to establish a successful connection here.
                         </div>
                     <% } %>
 
@@ -142,7 +146,8 @@
       saveButton: document.getElementById("save-connection-button"),
       invalidErrorElem: document.getElementById("connection-string-invalid"),
       validErrorElem: document.getElementById("connection-string-valid"),
-      connectionResponse: document.getElementById("connection-string-server-response")
+      connectionResponse: document.getElementById("connection-string-server-response"),
+      restartOctoFarmButton: document.getElementById("restart-server-button")
     }
   }
 
@@ -189,6 +194,12 @@
     }
   }
 
+  function setLastMessageBox(message, isErrors) {
+    const messageElem = getPageElements().connectionResponse;
+    messageElem.innerText = message;
+    messageElem.classList = [isErrors ? "text-danger" : "text-success"];
+  }
+
   function postTestConnection() {
     const fetchOptions = getValidatedMongoStringAsFetchOptions();
     if (!fetchOptions) {
@@ -198,25 +209,19 @@
     fetch("/test-connection", fetchOptions)
       .then(r => r.json())
       .catch(e => {
-        const messageElem = getPageElements().connectionResponse;
-        messageElem.innerText = "Could not test because of lost connection... is OctoFarm still alive and kicking?";
-        messageElem.classList = ["text-danger"];
+        setLastMessageBox("Could not test because of lost connection... is OctoFarm still alive and kicking?", true);
       })
       .then(b => {
         if (b.succeeded === true) {
           notYetValidatedConnection = false;
-          const messageElem = getPageElements().connectionResponse;
-          messageElem.innerText = "Successfully tested, you can save this setting!";
-          messageElem.classList = ["text-success"];
+          setLastMessageBox("Successfully tested, you can save this setting!", false);
         } else {
-          const messageElem = getPageElements().connectionResponse;
-          messageElem.innerText = "Test failed! Reason '" + b.reason + "'";
-          messageElem.classList = ["text-danger"];
+          setLastMessageBox("Test failed! Reason '" + b.reason + "'", true);
         }
       })
-        .finally(() => {
-            getPageElements().saveButton.disabled = notYetValidatedConnection;
-        });
+      .finally(() => {
+        getPageElements().saveButton.disabled = notYetValidatedConnection;
+      });
   }
 
   function postSaveConnection() {
@@ -227,20 +232,36 @@
     fetch("/save-connection-env", fetchOptions)
       .then(r => r.json())
       .catch(e => {
-        const messageElem = getPageElements().connectionResponse;
-        messageElem.innerText = "Could not test because of lost connection... is OctoFarm still alive and kicking?";
-        messageElem.classList = ["text-danger"];
+        setLastMessageBox("Could not test because of lost connection... is OctoFarm still alive and kicking?", true);
       })
       .then(b => {
         if (b.succeeded === true) {
-          const messageElem = getPageElements().connectionResponse;
-          messageElem.innerText = b.reason;
-          messageElem.classList = ["text-success"];
+          setLastMessageBox(b.reason, false);
+        } else {
+          setLastMessageBox("Failed to save connection setting. Reason '" + b.reason + "'", true);
         }
-        else {
-          const messageElem = getPageElements().connectionResponse;
-          messageElem.innerText = "Failed to save connection setting. Reason '" + b.reason + "'";
-          messageElem.classList = ["text-danger"];
+      })
+      .finally(() => {
+        getPageElements().restartOctoFarmButton.disabled = notYetValidatedConnection;
+      });
+  }
+
+  function postRestartServer() {
+    const fetchOptions = getValidatedMongoStringAsFetchOptions();
+    if (!fetchOptions) {
+      return;
+    }
+    fetch("/restart-octofarm", fetchOptions)
+      .then(r => r.json())
+      .catch(e => {
+        setLastMessageBox("Could not restart because of lost connection... is OctoFarm still alive and kicking?", true);
+      })
+      .then(b => {
+        if (b === true) {
+          setLastMessageBox("System restart command was successful,the server will restart in 5 seconds... Please refresh page or wait for automatic refresh in 10 seconds.", false);
+          setTimeout(() => location.reload(), 10 * 1000)
+        } else {
+          setLastMessageBox("Failed to Restart OctoFarm. Reason:'" + b + "'", true);
         }
       });
   }
