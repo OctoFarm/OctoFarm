@@ -84,7 +84,7 @@ function fetchMongoDBConnectionString(persistToEnv = false) {
     printInstructionsURL();
     process.env[AppConstants.MONGO_KEY] = AppConstants.defaultMongoStringUnauthenticated;
 
-    // is not isDocker just to be sure
+    // is not isDocker just to be sure, also checked in writeVariableToEnvFile
     if (persistToEnv && !isDocker()) {
       envUtils.writeVariableToEnvFile(
         path.resolve(dotEnvPath),
@@ -103,7 +103,7 @@ function fetchOctoFarmPort() {
       `~ The ${AppConstants.OCTOFARM_PORT_KEY} setting was not a correct port number: >= 0 and < 65536. Actual value: ${port}.`
     );
 
-    // is not isDocker just to be sure
+    // is not isDocker just to be sure, also checked in writeVariableToEnvFile
     if (!isDocker()) {
       envUtils.writeVariableToEnvFile(
         path.resolve(dotEnvPath),
