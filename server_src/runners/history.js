@@ -7,7 +7,7 @@ const History = require("../models/History.js");
 const ErrorLog = require("../models/ErrorLog.js");
 const Logger = require("../lib/logger.js");
 
-const logger = new Logger("OctoFarm-HistoryCollection");
+
 const filamentProfiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const Spool = require("../models/Filament.js");
@@ -20,17 +20,16 @@ const historyClean = require("../lib/dataFunctions/historyClean.js");
 
 const { HistoryClean } = historyClean;
 
-const runner = require("../runners/state.js");
-const { Runner } = runner;
-
 const script = require("./scriptCheck.js");
 
 const { ScriptRunner } = script;
 
 const MjpegDecoder = require("mjpeg-decoder");
+const { downloadFromOctoPrint } = require("../utils/download.util");
 
 const { writePoints } = require("../lib/influxExport.js");
 
+const logger = new Logger("OctoFarm-HistoryCollection");
 let counter = 0;
 let errorCounter = 0;
 
@@ -102,11 +101,11 @@ class HistoryCollection {
     const splitAgain = result.split("?");
 
     const path = `./images/historyCollection/thumbs/${id}-${splitAgain[0]}`;
-    if (!fs.existsSync(`./images/historyCollection`)) {
-      fs.mkdirSync(`./images/historyCollection`);
+    if (!fs.existsSync("./images/historyCollection")) {
+      fs.mkdirSync("./images/historyCollection");
     }
-    if (!fs.existsSync(`./images/historyCollection/thumbs`)) {
-      fs.mkdirSync(`./images/historyCollection/thumbs`);
+    if (!fs.existsSync("./images/historyCollection/thumbs")) {
+      fs.mkdirSync("./images/historyCollection/thumbs");
     }
     await download(url, path, () => {
       logger.info("Downloaded: ", url);
@@ -116,11 +115,11 @@ class HistoryCollection {
     return `images/historyCollection/thumbs/${id}-${splitAgain[0]}`;
   }
   static async snapPictureOfPrinter(url, id, fileDisplay) {
-    if (!fs.existsSync(`./images/historyCollection`)) {
-      fs.mkdirSync(`./images/historyCollection`);
+    if (!fs.existsSync("./images/historyCollection")) {
+      fs.mkdirSync("./images/historyCollection");
     }
-    if (!fs.existsSync(`./images/historyCollection/snapshots`)) {
-      fs.mkdirSync(`./images/historyCollection/snapshots`);
+    if (!fs.existsSync("./images/historyCollection/snapshots")) {
+      fs.mkdirSync("./images/historyCollection/snapshots");
     }
     const decoder = MjpegDecoder.decoderForSnapshot(url);
     const frame = await decoder.takeSnapshot();
@@ -227,7 +226,6 @@ class HistoryCollection {
       };
       logger.info("Checking for timelapse...", fileName);
       if (!interval) {
-        console.log("CHECKING", fileName);
         interval = setInterval(async function () {
           let timelapse = await grabTimelapse(printer);
           if (timelapse.status === 200) {
@@ -236,30 +234,27 @@ class HistoryCollection {
               "Successfully grabbed timelapse list... Checking for:",
               fileName
             );
-            this.unrenderedFileName = null;
-            console.log("Check", fileName);
+            let unrenderedFileName = null;
             if (timelapseResponse.unrendered.length === 0) {
               let cleanName = fileName;
               if (fileName.includes(".gcode")) {
                 cleanName = fileName.replace(".gcode", "");
               }
               let lastTimelapse = null;
-              console.log("Checking for", this.unrenderedFileName);
-              if (this.unrenderedFileName === null) {
-                console.log(
-                  `Unrendered is ${this.unrenderedFileName}... hmmm... fallback to name match on last index...`
+              if (unrenderedFileName === null) {
+                lastTimelapse = _.findIndex(
+                  timelapseResponse.files,
+                  function (o) {
+                    return o.name.includes(cleanName);
+                  }
                 );
-                lastTimelapse = _.findIndex(timelapseResponse.files, function (
-                  o
-                ) {
-                  return o.name.includes(cleanName);
-                });
               } else {
-                lastTimelapse = _.findIndex(timelapseResponse.files, function (
-                  o
-                ) {
-                  return o.name.includes(this.unrenderedFileName);
-                });
+                lastTimelapse = _.findIndex(
+                  timelapseResponse.files,
+                  function (o) {
+                    return o.name.includes(unrenderedFileName);
+                  }
+                );
               }
 
               if (
@@ -276,35 +271,24 @@ class HistoryCollection {
                 );
                 //Clearing interval
                 clearInterval(interval);
-                console.log(
-                  "Saving timelapse... woop!",
-                  this.unrenderedFileName
-                );
                 const saveHistory = await History.findById(id);
                 saveHistory.printHistory.timelapse = lapse;
                 saveHistory.markModified("printHistory");
                 await saveHistory.save();
-                HistoryClean.start();
+                await HistoryClean.start();
                 logger.info("Successfully grabbed timelapse!");
               } else {
                 const updateHistory = await History.findById(id);
                 updateHistory.printHistory.timelapse = "";
                 updateHistory.markModified("printHistory");
                 await updateHistory.save();
-                HistoryClean.start();
+                await HistoryClean.start();
                 logger.info("Successfully grabbed timelapse!");
                 clearInterval(interval);
-                console.log(
-                  "Some failure occured... ",
-                  this.unrenderedFileName
-                );
                 return null;
               }
             } else {
-              console.log("Unrendered", fileName);
-
-              console.log(this.unrenderedFileName);
-              if (this.unrenderedFileName === null) {
+              if (unrenderedFileName === null) {
                 let unRenderedGrab = [...timelapseResponse.unrendered].filter(
                   function (lapse) {
                     let lapseName = lapse.name.replace(/\s/g, "_");
@@ -316,11 +300,10 @@ class HistoryCollection {
                   }
                 );
                 if (unRenderedGrab.length === 1) {
-                  this.unrenderedFileName = unRenderedGrab[0].name;
-                  console.log("Found! Unrendered...", this.unrenderedFileName);
+                  unrenderedFileName = unRenderedGrab[0].name;
                   logger.info(
                     "File is still rendering... awaiting completion:",
-                    this.unrenderedFileName
+                    unrenderedFileName
                   );
                 } else {
                   logger.info(
@@ -329,11 +312,8 @@ class HistoryCollection {
                   );
                 }
               } else {
-                console.log(
-                  `Awaiting ${this.unrenderedFileName} to finish rendering`
-                );
                 logger.info(
-                  `Awaiting ${this.unrenderedFileName} to finish rendering`
+                  `Awaiting ${unrenderedFileName} to finish rendering`
                 );
               }
             }
@@ -346,45 +326,37 @@ class HistoryCollection {
       return null;
     }
   }
+
+  /**
+   * Grabs the timelapse by downloading it from OctoPrint's API
+   * @param fileName
+   * @param url
+   * @param id
+   * @param printer
+   * @param serverSettings
+   * @returns {Promise<string>}
+   */
   static async grabTimeLapse(fileName, url, id, printer, serverSettings) {
-    const download = async (url, path, callback) => {
-      const res = await fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": printer.apikey,
-        },
-      });
-      const fileStream = fs.createWriteStream(path);
-      await new Promise((resolve, reject) => {
-        res.body.pipe(fileStream);
-        res.body.on("error", reject);
-        fileStream.on("finish", callback);
-      });
-    };
 
     const path = `./images/historyCollection/timelapses/${id}-${fileName}`;
-    if (!fs.existsSync(`./images/historyCollection`)) {
-      fs.mkdirSync(`./images/historyCollection`);
+    if (!fs.existsSync("./images/historyCollection")) {
+      fs.mkdirSync("./images/historyCollection");
     }
-    if (!fs.existsSync(`./images/historyCollection/timelapses`)) {
-      fs.mkdirSync(`./images/historyCollection/timelapses`);
+    if (!fs.existsSync("./images/historyCollection/timelapses")) {
+      fs.mkdirSync("./images/historyCollection/timelapses");
     }
 
-    download(url, path, () => {
+    await downloadFromOctoPrint(url, path, () => {
       logger.info("Downloaded: ", url);
       logger.info(`images/historyCollection/timelapses/${id}-${fileName}`);
-      if (
-        typeof serverSettings.history !== "undefined" &&
-        typeof serverSettings.history.timelapse !== "undefined" &&
-        serverSettings.history.timelapse.deleteAfter
-      ) {
+      if (serverSettings?.history?.timelapse?.deleteAfter) {
         HistoryCollection.deleteTimeLapse(printer, fileName);
       }
-    });
+    }, printer.apikey);
 
     return `images/historyCollection/timelapses/${id}-${fileName}`;
   }
+
   static async deleteTimeLapse(printer, fileName) {
     const deleteTimeLapse = async (fileName) => {
       return await fetch(`${printer.printerURL}/api/timelapse/${fileName}`, {
@@ -484,9 +456,6 @@ class HistoryCollection {
       }
 
       writePoints(tags, "HistoryInformation", printerData);
-      console.log("Written", printerData);
-    } else {
-      console.log("HU OHHH");
     }
   }
   static async updateFilamentInfluxDB(
@@ -554,7 +523,7 @@ class HistoryCollection {
   }
   static async complete(payload, printer, job, files, resends) {
     try {
-      const serverSettings = await ServerSettings.find({});
+      let serverSettings = await ServerSettings.find({});
       const previousFilament = JSON.parse(
         JSON.stringify(printer.selectedFilament)
       );
@@ -572,8 +541,8 @@ class HistoryCollection {
         name = printer.printerURL;
       }
       if (
-        serverSettings[0].filamentManager &&
-        Array.isArray(printer.selectedFilament)
+        serverSettings[0]?.filamentManager &&
+        Array.isArray(printer?.selectedFilament)
       ) {
         printer.selectedFilament = await HistoryCollection.resyncFilament(
           printer
@@ -610,7 +579,7 @@ class HistoryCollection {
         let profileId = [];
         printer.selectedFilament.forEach((spool, index) => {
           if (spool !== null) {
-            if (serverSettings[0].filamentManager) {
+            if (serverSettings[0]?.filamentManager) {
               profileId = _.findIndex(profiles, function (o) {
                 return (
                   o.profile.index ==
@@ -668,54 +637,46 @@ class HistoryCollection {
         printHistory,
       });
       await saveHistory.save().then(async (r) => {
+        const thumbnail = await HistoryCollection.thumbnailCheck(
+          payload,
+          serverSettings[0],
+          files,
+          saveHistory._id,
+          "onComplete",
+          printer
+        );
+        let snapshot = "";
         if (printer.camURL !== "") {
-          const thumbnail = await HistoryCollection.thumbnailCheck(
-            payload,
-            serverSettings[0],
-            files,
-            saveHistory._id,
-            "onFailure",
-            printer
-          );
-          const snapshot = await HistoryCollection.snapshotCheck(
-            "onFailure",
+          snapshot = await HistoryCollection.snapshotCheck(
+            "onComplete",
             serverSettings[0],
             printer,
             saveHistory,
             payload
           );
-          if (
-              typeof serverSettings[0] !== "undefined" &&
-            typeof serverSettings[0].history !== "undefined" &&
-            typeof serverSettings[0].history.timelapse !== "undefined" &&
-            typeof serverSettings[0].history.timelapse.onComplete !== "undefined" &&
-              serverSettings[0].history.timelapse.onComplete
-          ) {
-            HistoryCollection.timelapseCheck(
-              printer,
-              payload.name,
-              payload.time,
-              serverSettings[0],
-              saveHistory._id
-            );
-          }
-          saveHistory.printHistory.thumbnail = thumbnail;
-          saveHistory.printHistory.snapshot = snapshot;
-          saveHistory.markModified("printHistory");
-          saveHistory.save();
-          printer.fileName = payload.display;
-          printer.filePath = payload.path;
-          ScriptRunner.check(printer, "done", saveHistory._id);
-          HistoryClean.start();
-          setTimeout(async function () {
-            await HistoryClean.start();
-            HistoryCollection.updateInfluxDB(
-              saveHistory._id,
-              "history",
-              printer
-            );
-          }, 5000);
         }
+
+        if (serverSettings[0]?.history?.timelapse?.onComplete) {
+          HistoryCollection.timelapseCheck(
+            printer,
+            payload.name,
+            payload.time,
+            serverSettings[0],
+            saveHistory._id
+          );
+        }
+        saveHistory.printHistory.thumbnail = thumbnail;
+        saveHistory.printHistory.snapshot = snapshot;
+        saveHistory.markModified("printHistory");
+        saveHistory.save();
+        printer.fileName = payload.display;
+        printer.filePath = payload.path;
+        ScriptRunner.check(printer, "done", saveHistory._id);
+        HistoryClean.start();
+        setTimeout(async function () {
+          await HistoryClean.start();
+          HistoryCollection.updateInfluxDB(saveHistory._id, "history", printer);
+        }, 5000);
       });
 
       logger.info(
@@ -733,7 +694,7 @@ class HistoryCollection {
       const previousFilament = JSON.parse(
         JSON.stringify(printer.selectedFilament)
       );
-      if (serverSettings[0].filamentManager) {
+      if (serverSettings[0]?.filamentManager) {
         printer.selectedFilament = await HistoryCollection.resyncFilament(
           printer
         );
@@ -782,7 +743,7 @@ class HistoryCollection {
         let profileId = [];
         printer.selectedFilament.forEach((spool, index) => {
           if (spool !== null) {
-            if (serverSettings[0].filamentManager) {
+            if (serverSettings[0]?.filamentManager) {
               profileId = _.findIndex(profiles, function (o) {
                 return (
                   o.profile.index ==
@@ -841,60 +802,51 @@ class HistoryCollection {
       );
 
       await saveHistory.save().then(async (r) => {
+        const thumbnail = await HistoryCollection.thumbnailCheck(
+          payload,
+          serverSettings[0],
+          files,
+          saveHistory._id,
+          "onFailure",
+          printer
+        );
+        let snapshot = "";
         if (printer.camURL !== "") {
-          const thumbnail = await HistoryCollection.thumbnailCheck(
-            payload,
-            serverSettings[0],
-            files,
-            saveHistory._id,
-            "onFailure",
-            printer
-          );
-          const snapshot = await HistoryCollection.snapshotCheck(
+          snapshot = await HistoryCollection.snapshotCheck(
             "onFailure",
             serverSettings[0],
             printer,
             saveHistory,
             payload
           );
-          if (typeof serverSettings[0] !== "undefined" &&
-            typeof serverSettings[0].history !== "undefined" &&
-            typeof serverSettings[0].history.timelapse !== "undefined" &&
-            typeof serverSettings[0].history.timelapse.onFailure !== "undefined" &&
-              serverSettings[0].history.timelapse.onFailure
-          ) {
-            HistoryCollection.timelapseCheck(
-              printer,
-              payload.name,
-              payload.time,
-              serverSettings[0],
-              saveHistory._id
-            );
-          }
-
-          saveHistory.printHistory.thumbnail = thumbnail;
-          saveHistory.printHistory.snapshot = snapshot;
-          saveHistory.markModified("printHistory");
-          printer.fileName = payload.display;
-          printer.filePath = payload.path;
-          ScriptRunner.check(printer, "failed", saveHistory._id);
-          await saveHistory.save();
-
-          HistoryClean.start();
-          setTimeout(async function () {
-            await HistoryClean.start();
-            HistoryCollection.updateInfluxDB(
-              saveHistory._id,
-              "history",
-              printer
-            );
-          }, 5000);
         }
+        if (serverSettings[0]?.history?.timelapse?.onFailure) {
+          HistoryCollection.timelapseCheck(
+            printer,
+            payload.name,
+            payload.time,
+            serverSettings[0],
+            saveHistory._id
+          );
+        }
+
+        saveHistory.printHistory.thumbnail = thumbnail;
+        saveHistory.printHistory.snapshot = snapshot;
+        saveHistory.markModified("printHistory");
+        printer.fileName = payload.display;
+        printer.filePath = payload.path;
+        ScriptRunner.check(printer, "failed", saveHistory._id);
+        await saveHistory.save();
+
+        HistoryClean.start();
+        setTimeout(async function () {
+          await HistoryClean.start();
+          HistoryCollection.updateInfluxDB(saveHistory._id, "history", printer);
+        }, 5000);
       });
 
       logger.info("Failed Print captured ", payload + printer.printerURL);
     } catch (e) {
-      console.log(e);
       logger.error(e, `Failed to capture history for ${printer.printerURL}`);
     }
   }
@@ -1034,6 +986,7 @@ const generateTime = function (seconds) {
 
   return string;
 };
+
 module.exports = {
   HistoryCollection,
 };
