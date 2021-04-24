@@ -22,7 +22,9 @@ All notable changes to this project will be documented in this file.
     - Fixed #386: Server update notification would show to all users, not just Administrator group.
     - Fixed #430: Replace user and group check with middleware. 
     - Fixed #438: File manager fails to load due to toFixed error.
-
+    - Fixed #442: Re-Input catch statements for "git" commands on updater logic.
+    - Fixed #444: Add in npm functions for updater command to keep packages up to date.
+    
 # [Released]
 
 ## [v1.1.12]
