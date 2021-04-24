@@ -16,13 +16,16 @@ All notable changes to this project will be documented in this file.
 
 ### Fixed
     - Fixed #240: Commands sent from the Printer Control Terminal would double wrap array.
-    - Fixed #358: Spool Manager not allowing input of decimal places
-    - Fixed #398: Added back in power reset buttons
+    - Fixed #358: Spool Manager not allowing input of decimal places.
+    - Fixed #398: Added back in power reset buttons.
     - Fixed #353: Filament Manager Spools list is not ignoring Spools Modal pagination.
     - Fixed #386: Server update notification would show to all users, not just Administrator group.
-    - Fixed #430: Replace user and group check with middleware. 
+    - Fixed #430: Replace user and group check with middleware.
+    - Fixed #396: History cleaner wouldn't run after print capture.
+    - Fixed #397: Thumbnails wouldn't capture on history, even with setting on.
+    - Fixed #414: History failing to generate due to missing default settings.
     - Fixed #438: File manager fails to load due to toFixed error.
-
+    
 # [Released]
 
 ## [v1.1.12]
