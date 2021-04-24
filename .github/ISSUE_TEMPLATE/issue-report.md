@@ -5,39 +5,31 @@ title: ""
 labels: bug
 ---
 
-**OctoFarm and system**
-- NodeJS Version [e.g. 13]:
-- OctoFarm Version [e.g. 1.5.5.7]:
-- OctoPrint Version [e.g. 1.4.1]:
-- Docker or pm2:
-- OS:
-- OctoPrint Plugins [e.g. bed visualiser, octoklipper, printtimegenius]: 
+### Versions
 
-**Where is the OctoFarm problem?**
-> Server, NodeJS, MongoDb database or  Website
--
-  
-**Reproduction**
-> To get the problem I had to:
--
+* Your **OctoFarm version** (latest 1.1.13):
+* Your **OctoPrint version** (latest 1.5.3):
+* Docker or pm2:
+* **NodeJS version** 14 or 15 (not for docker):
+* Operating System (f.e. Raspberry Pi OS, Ubuntu, Windows):
+* OctoPrint Plugins (e.g. bed visualiser, octoklipper, printtimegenius): 
 
-**Description**
-To better help the developer understand your issue, please fill in the information below. **Accurately.**
-> The problem:
--    
-> (Optional) To avoid the problem I had to:
-- 
+### Reproduction
 
-**Expected behavior**
-> A clear and concise description of what you expected to happen.
-- 
+* **Location** of the problem (choose Server, NodeJS, MongoDb database or local website)
+* Description of the problem:
+* Steps needed to **reproduce** the problem.
+* Expected behavior:
+* (Optional) To avoid the problem I had to:
 
-**OctoFarm Logs**
+### OctoFarm Logs
+
 If you've got access to the System screen it's better to just upload the log dump file as it will
-contain all relevant information for the developers. If this is checked you can skip the **Versions** section below.
+contain all relevant information for the developers.
 
-1) **OctoFarm Server logs** Add the system page logs .zip file (or just your `./logs` folder content)
+1) **OctoFarm Server logs** Add the system page logs .zip file (if you cant access it, upload your `./logs` folder content here)
 2) **Console logs** in your browser.
    (How to: https://javascript.info/devtools)
 3) **Screenshots**
-   If applicable, add screenshots to help explain your problem.
+   These are always effective, add screenshots to help explain your problem.
+
