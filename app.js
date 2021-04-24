@@ -1,4 +1,4 @@
-const { setupEnvConfig } = require("./app-env");
+const { setupEnvConfig, fetchMongoDBConnectionString, fetchOctoFarmPort } = require("./app-env");
 const Logger = require("./server_src/lib/logger.js");
 const mongoose = require("mongoose");
 const {
@@ -18,17 +18,17 @@ setupEnvConfig();
 const octoFarmServer = setupExpressServer();
 
 mongoose
-  .connect(process.env.MONGO, {
+  .connect(fetchMongoDBConnectionString(), {
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
     serverSelectionTimeoutMS: 2500,
   })
   .then(() => ensureSystemSettingsInitiated())
-  .then(() => serveOctoFarmNormally(octoFarmServer))
+  .then(() => serveOctoFarmNormally(octoFarmServer, fetchOctoFarmPort()))
   .catch(async (err) => {
     logger.error(err);
-    serveDatabaseIssueFallback(octoFarmServer);
+    serveDatabaseIssueFallback(octoFarmServer, fetchOctoFarmPort());
   });
 
 bootAutoDiscovery();

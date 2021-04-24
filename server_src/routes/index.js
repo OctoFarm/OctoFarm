@@ -1,72 +1,55 @@
 const express = require("express");
-
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth.js");
 const { ensureCurrentUserAndGroup } = require("../config/users.js");
-
 const ServerSettings = require("../models/ServerSettings.js");
 const prettyHelpers = require("../../views/partials/functions/pretty.js");
 const runner = require("../runners/state.js");
-
 const { Runner } = runner;
 const _ = require("lodash");
-
 const historyClean = require("../lib/dataFunctions/historyClean.js");
-
 const { HistoryClean } = historyClean;
 const filamentClean = require("../lib/dataFunctions/filamentClean.js");
-
 const { FilamentClean } = filamentClean;
 const settingsClean = require("../lib/dataFunctions/settingsClean.js");
-
 const { SettingsClean } = settingsClean;
 const printerClean = require("../lib/dataFunctions/printerClean.js");
-
 const { PrinterClean } = printerClean;
 const fileClean = require("../lib/dataFunctions/fileClean.js");
-
-const systemInfo = require("../runners/systemInfo.js");
-const SystemInfo = systemInfo.SystemRunner;
-
 const { FileClean } = fileClean;
-
+const systemInfo = require("../runners/systemInfo.js");
 const { getSorting, getFilter } = require("../lib/sorting.js");
-
 const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
 const isDocker = require("is-docker");
+const { fetchMongoDBConnectionString } = require("../../app-env");
 const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
 
+const SystemInfo = systemInfo.SystemRunner;
 const version = process.env.npm_package_version;
 console.log(`Version: ${version} (server started)`);
 
 // Welcome Page
 async function welcome() {
-  if (process.env.MONGO === "") {
-    // No MONGO variable set, show database warning page.
-    router.get("/", (req, res) =>
-      res.render("database", { page: "Database Warning" })
-    );
-  } else {
-    const serverSettings = await ServerSettings.find({});
+  const serverSettings = await ServerSettings.find({});
 
-    if (serverSettings[0].server.loginRequired === false) {
-      router.get("/", (req, res) => res.redirect("/dashboard"));
-    } else {
-      const { registration } = serverSettings[0].server;
-      router.get("/", (req, res) => {
-        if (req.isAuthenticated()) {
-          res.redirect("/dashboard");
-        } else {
-          res.render("welcome", {
-            page: "Welcome",
-            registration,
-            serverSettings: serverSettings[0],
-          });
-        }
-      });
-    }
+  if (serverSettings[0].server.loginRequired === false) {
+    router.get("/", (req, res) => res.redirect("/dashboard"));
+  } else {
+    const { registration } = serverSettings[0].server;
+    router.get("/", (req, res) => {
+      if (req.isAuthenticated()) {
+        res.redirect("/dashboard");
+      } else {
+        res.render("welcome", {
+          page: "Welcome",
+          registration,
+          serverSettings: serverSettings[0],
+        });
+      }
+    });
   }
 }
+
 welcome();
 
 // Dashboard Page
@@ -449,7 +432,7 @@ router.get(
       clientSettings,
       serverSettings,
       systemInformation,
-      db: process.env.MONGO,
+      db: fetchMongoDBConnectionString(),
       dashboardSettings: dashboardSettings,
       serviceInformation: {
         isDockerContainer: isDocker(),

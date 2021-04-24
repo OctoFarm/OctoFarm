@@ -68,15 +68,22 @@ async function ensureSystemSettingsInitiated() {
   await logger.info(serverSettings);
 }
 
-function serveDatabaseIssueFallback(app) {
-  let listenerHttpServer = app.listen(parseInt(process.env.OCTOFARM_PORT), "0.0.0.0", () => {
-    const msg = `You have database connection issues... open our webpage at http://127.0.0.1:${process.env.OCTOFARM_PORT}`;
-    logger.info(msg);
+function serveDatabaseIssueFallback(app, port) {
+  if (!port || Number.isNaN(parseInt(port))) {
+    throw new Error("The server database-issue mode requires a numeric port input argument");
+  }
+  let listenerHttpServer = app.listen(
+    port,
+    "0.0.0.0",
+    () => {
+      const msg = `You have database connection issues... open our webpage at http://127.0.0.1:${port}`;
+      logger.info(msg);
 
-    if (envUtils.isPm2()) {
-      process.send("ready");
+      if (envUtils.isPm2()) {
+        process.send("ready");
+      }
     }
-  });
+  );
 
   app.use("/", require("./server_src/routes/databaseIssue", { page: "route" }));
   app.use(
@@ -90,7 +97,11 @@ function serveDatabaseIssueFallback(app) {
   return listenerHttpServer;
 }
 
-async function serveOctoFarmNormally(app) {
+async function serveOctoFarmNormally(app, port) {
+  if (!port || Number.isNaN(parseInt(port))) {
+    throw new Error("The server database-issue mode requires a numeric port input argument");
+  }
+
   let listenerHttpServer = null;
 
   logger.info("Initialising FarmInformation...");
@@ -111,11 +122,11 @@ async function serveOctoFarmNormally(app) {
   await optionalInfluxDatabaseSetup();
 
   listenerHttpServer = app.listen(
-    parseInt(process.env.OCTOFARM_PORT),
+    port,
     "0.0.0.0",
     () => {
       logger.info(
-        `Server started... open it at http://127.0.0.1:${process.env.OCTOFARM_PORT}`
+        `Server started... open it at http://127.0.0.1:${port}`
       );
       if (typeof process.send === "function") {
         process.send("ready");
@@ -124,60 +135,55 @@ async function serveOctoFarmNormally(app) {
   );
 
   app.use("/", require("./server_src/routes/index", { page: "route" }));
-  if (!(!process.env.MONGO || process.env.MONGO === "")) {
-    app.use(
-      "/serverChecks",
-      require("./server_src/routes/serverChecks", { page: "route" })
-    );
-    app.use("/users", require("./server_src/routes/users", { page: "route" }));
-    app.use(
-      "/printers",
-      require("./server_src/routes/printers", { page: "route" })
-    );
-    app.use(
-      "/groups",
-      require("./server_src/routes/printerGroups", { page: "route" })
-    );
-    app.use(
-      "/settings",
-      require("./server_src/routes/settings", { page: "route" })
-    );
-    app.use(
-      "/printersInfo",
-      require("./server_src/routes/SSE-printersInfo", { page: "route" })
-    );
-    app.use(
-      "/dashboardInfo",
-      require("./server_src/routes/SSE-dashboard", { page: "route" })
-    );
-    app.use(
-      "/monitoringInfo",
-      require("./server_src/routes/SSE-monitoring", { page: "route" })
-    );
-    app.use(
-      "/filament",
-      require("./server_src/routes/filament", { page: "route" })
-    );
-    app.use(
-      "/history",
-      require("./server_src/routes/history", { page: "route" })
-    );
-    app.use(
-      "/scripts",
-      require("./server_src/routes/scripts", { page: "route" })
-    );
-    app.use(
-      "/input",
-      require("./server_src/routes/externalDataCollection", { page: "route" })
-    );
-    app.use(
-      "/client",
-      require("./server_src/routes/sorting", { page: "route" })
-    );
-    app.get("*", function (req, res) {
-      res.redirect("/");
-    });
-  }
+  app.use(
+    "/serverChecks",
+    require("./server_src/routes/serverChecks", { page: "route" })
+  );
+  app.use("/users", require("./server_src/routes/users", { page: "route" }));
+  app.use(
+    "/printers",
+    require("./server_src/routes/printers", { page: "route" })
+  );
+  app.use(
+    "/groups",
+    require("./server_src/routes/printerGroups", { page: "route" })
+  );
+  app.use(
+    "/settings",
+    require("./server_src/routes/settings", { page: "route" })
+  );
+  app.use(
+    "/printersInfo",
+    require("./server_src/routes/SSE-printersInfo", { page: "route" })
+  );
+  app.use(
+    "/dashboardInfo",
+    require("./server_src/routes/SSE-dashboard", { page: "route" })
+  );
+  app.use(
+    "/monitoringInfo",
+    require("./server_src/routes/SSE-monitoring", { page: "route" })
+  );
+  app.use(
+    "/filament",
+    require("./server_src/routes/filament", { page: "route" })
+  );
+  app.use(
+    "/history",
+    require("./server_src/routes/history", { page: "route" })
+  );
+  app.use(
+    "/scripts",
+    require("./server_src/routes/scripts", { page: "route" })
+  );
+  app.use(
+    "/input",
+    require("./server_src/routes/externalDataCollection", { page: "route" })
+  );
+  app.use("/client", require("./server_src/routes/sorting", { page: "route" }));
+  app.get("*", function (req, res) {
+    res.redirect("/");
+  });
 
   return listenerHttpServer;
 }
@@ -188,5 +194,5 @@ module.exports = {
   setupExpressServer,
   ensureSystemSettingsInitiated,
   serveOctoFarmNormally,
-  serveDatabaseIssueFallback
+  serveDatabaseIssueFallback,
 };

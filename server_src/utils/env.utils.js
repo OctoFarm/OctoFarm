@@ -39,13 +39,17 @@ function stringifyDotEnv(obj) {
 }
 
 /**
- * Write a new MONGO value to .env file
+ * Write a new key-value to .env file
  * Note: assumes in Nodemon, pm2 or PKG mode.
  */
 function writeVariableToEnvFile(absoluteEnvPath, variableKey, jsonObject) {
   const latestDotEnvConfig = dotenv.config();
-  if (!!latestDotEnvConfig.error) {
-    throw new Error("Could not parse current .env file. Please ensure the file contains lines with each looking like 'OCTOFARM_PORT=4000' and so on.");
+  if (latestDotEnvConfig?.error?.code === "ENOENT") {
+    logger.warning("Creating .env file for you as it was not found.");
+  }
+  else if (!!latestDotEnvConfig.error) {
+    console.log(JSON.stringify(latestDotEnvConfig.error));
+    throw new Error("Could not parse current .env file. Please ensure the file contains lines with each looking like 'MONGO=http://mongo/octofarm' and 'OCTOFARM_PORT=4000' and so on.");
   }
 
   const newDotEnv = {
@@ -106,7 +110,7 @@ function ensureBackgroundImageExists(rootPath) {
     fs.writeFileSync(targetBgPath, fileBuffer);
 
     // Bug in PKG
-    // fs.copyFileSync(defaultBgPath, "C:\\Users\\david\\Projects\\NodeJS\\OctoFarm\\package\\images\\roll.jpg");
+    // fs.copyFileSync(defaultBgPath, "C:\\Users\\USER_HERE\\Projects\\NodeJS\\OctoFarm\\package\\images\\roll.jpg");
 
     logger.info(`✓ Copyied default background image to ${targetBgPath} as it was not found.`);
   }

@@ -125,10 +125,10 @@
 </div>
 
 <script>
-  const defaultMongoDBString = "mongodb://127.0.0.1:27017/octofarm";
+  const defaultMongoDBString = "<% defaultMongoConnectionString %>>";
   const defaultPlaceholder = "Add your 'mongodb://.../octofarm' string";
   const isDocker = <%= isDocker %>;
-  const isPm2 = "<%= isDocker %>";
+  const isPm2 = "<%= isPm2 %>";
 
   // State
   let notYetValidatedConnection = true;
