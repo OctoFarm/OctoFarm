@@ -901,21 +901,23 @@ class ServerSettings {
     }, 5000);
   }
 
-  static async updateOctoFarmCommand(doWeForceCheck) {
+  static async updateOctoFarmCommand(doWeForcePull, doWeInstallPackages) {
     let updateOctoFarmBtn = document.getElementById("updateOctoFarmBtn");
     // Make sure the update OctoFarm button is disabled after keypress
     if (updateOctoFarmBtn) {
       updateOctoFarmBtn.disabled = true;
+      updateOctoFarmBtn.innerHTML =
+        '<i class="fas fa-thumbs-up"></i> Update OctoFarm <i class="fas fa-spinner fa-spin"></i>';
     }
-    let updateData = null;
-    if (!doWeForceCheck) {
-      updateData = {
-        forceCheck: false,
-      };
-    } else {
-      updateData = {
-        forceCheck: true,
-      };
+    let updateData = {
+      forcePull: false,
+      doWeInstallPackages: false,
+    };
+    if (doWeForcePull) {
+      updateData.forcePull = true;
+    }
+    if (doWeInstallPackages) {
+      updateData.doWeInstallPackages = true;
     }
 
     let updateOctoFarm = await OctoFarmclient.post(
@@ -930,11 +932,11 @@ class ServerSettings {
         "Server could not be contacted... is it online?",
         5000
       );
-      setTimeout(() => {
-        if (updateOctoFarmBtn) {
-          updateOctoFarmBtn.disabled = false;
-        }
-      }, 5000);
+      if (updateOctoFarmBtn) {
+        updateOctoFarmBtn.innerHTML =
+          '<i class="fas fa-thumbs-up"></i> Update OctoFarm';
+        updateOctoFarmBtn.disabled = false;
+      }
       return;
     }
     updateOctoFarm = await updateOctoFarm.json();
@@ -963,6 +965,42 @@ class ServerSettings {
             ServerSettings.updateOctoFarmCommand(true);
           } else {
             if (updateOctoFarmBtn) {
+              updateOctoFarmBtn.innerHTML =
+                '<i class="fas fa-thumbs-up"></i> Update OctoFarm';
+              updateOctoFarmBtn.disabled = false;
+            }
+          }
+        },
+      });
+      return;
+    }
+    // Local changes are detected, question whether we overwrite or cancel..
+    if (
+      updateOctoFarm.message.includes(
+        "You have missing dependencies that are required, Do you want to update these?"
+      )
+    ) {
+      bootbox.confirm({
+        title:
+          '<span class="text-warning">Missing dependencies detected!</span>',
+        message: updateOctoFarm?.message,
+        buttons: {
+          cancel: {
+            className: "btn-danger",
+            label: '<i class="fa fa-times"></i> Cancel',
+          },
+          confirm: {
+            className: "btn-success",
+            label: '<i class="fa fa-check"></i> Confirm',
+          },
+        },
+        callback: function (result) {
+          if (result) {
+            ServerSettings.updateOctoFarmCommand(false, true);
+          } else {
+            if (updateOctoFarmBtn) {
+              updateOctoFarmBtn.innerHTML =
+                '<i class="fas fa-thumbs-up"></i> Update OctoFarm';
               updateOctoFarmBtn.disabled = false;
             }
           }
@@ -977,6 +1015,10 @@ class ServerSettings {
       0,
       "clicked"
     );
+    if (updateOctoFarmBtn) {
+      updateOctoFarmBtn.innerHTML =
+        '<i class="fas fa-thumbs-up"></i> Update OctoFarm';
+    }
 
     if (updateOctoFarm?.haveWeSuccessfullyUpdatedOctoFarm) {
       UI.createAlert(
