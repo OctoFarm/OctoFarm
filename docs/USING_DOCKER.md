@@ -55,6 +55,7 @@ services:
     # Volumes as local relative folders (validate with 'docker-compose config')
     - ./OctoFarm/logs:/app/logs
     - ./OctoFarm/scripts:/app/scripts
+    - ./OctoFarm/images:/app/images
 ```
 ### Docker image 'monolithic-latest'
 The monolithic image does not require MongoDB externally, but it also has less control over MongoDB setup:
@@ -67,6 +68,7 @@ The monolithic image does not require MongoDB externally, but it also has less c
     # Local volumes, can be made named
     - ./OctoFarm/logs:/app/logs   
     - ./OctoFarm/scripts:/app/scripts
+    - ./OctoFarm/images:/app/images
     - ./mongodb-data:/data/db 
     ports:
     # SYSTEM:CONTAINER
