@@ -27,7 +27,7 @@ async function setupDatabaseIssueApp() {
   setupEnvConfig(true);
 
   const octoFarmTestServer = setupExpressServer();
-  httpListener = await serveDatabaseIssueFallback(octoFarmTestServer);
+  httpListener = await serveDatabaseIssueFallback(octoFarmTestServer, fetchOctoFarmPort());
 
   const stringRouteMap = JSON.stringify(getEndpoints(octoFarmTestServer).map(r => r.path));
   console.log("Server db issue routes:" , stringRouteMap);
