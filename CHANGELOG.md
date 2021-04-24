@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
     - Fixed #438: File manager fails to load due to toFixed error.
     - Fixed #442: Re-Input catch statements for "git" commands on updater logic.
     - Fixed #444: Add in npm functions for updater command to keep packages up to date.
+    - Fixed #439: Views not updating due to offline printer in first instance.
     
 # [Released]
 

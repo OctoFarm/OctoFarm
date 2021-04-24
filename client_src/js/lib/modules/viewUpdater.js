@@ -1000,17 +1000,15 @@ async function updateState(printer, clientSettings, view) {
       const tool = document.getElementById(`${printer._id}-spool-${i}`);
       if (printer.selectedFilament[i] !== null) {
         const filamentManager = await checkFilamentManager();
-        if (filamentManager) {
-          tool.innerHTML = `${printer.selectedFilament[i].spools.material}`;
-        } else {
+        if (tool) {
           tool.innerHTML = `${printer.selectedFilament[i].spools.material}`;
         }
       } else {
-        tool.innerHTML = "No Spool";
+        if (tool) {
+          tool.innerHTML = "No Spool";
+        }
       }
     }
-  } else {
-    tool.innerHTML = "No Spool";
   }
 
   let hideClosed = "";
