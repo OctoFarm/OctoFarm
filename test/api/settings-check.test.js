@@ -46,7 +46,7 @@ describe("ServerUpdate Endpoint", () => {
       .send();
     expect(res.statusCode).toEqual(302);
     done();
-  });
+  }, 10000);
 });
 
 describe("Dashboard rendering", () => {

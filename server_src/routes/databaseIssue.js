@@ -1,11 +1,13 @@
 const express = require("express");
 const path = require("path");
-const { execSync, exec } = require("child_process");
+const { execSync } = require("child_process");
 const mongoose = require("mongoose");
 const Logger = require("../../server_src/lib/logger.js");
 const ServerSettingsDB = require("../models/ServerSettings");
 const isDocker = require("is-docker");
 const envUtils = require("../utils/env.utils");
+const { AppConstants } = require("../app.constants");
+const { fetchMongoDBConnectionString } = require("../../app-env");
 
 const router = express.Router();
 const logger = new Logger("OctoFarm-Server");
@@ -28,11 +30,12 @@ router.get("/", (req, res) =>
       page: "Database Warning",
       isDocker: isDocker(),
       isPm2: envUtils.isPm2(),
+      defaultMongoConnectionString: AppConstants.defaultMongoStringUnauthenticated,
       isNodemon: envUtils.isNodemon(),
       os: process.env.OS,
       npmPackageJson: process.env.npm_package_version,
       nodeVersion: process.version,
-      mongoURL: process.env.MONGO,
+      mongoURL: fetchMongoDBConnectionString(),
     }),
 );
 
@@ -103,7 +106,7 @@ router.post("/save-connection-env", async (req, res) => {
   if (isDocker()) {
     res.statusCode = 500;
     return res.send({
-      reason: "The OctoFarm docker container cannot change this setting. Change the MONGO variable yourself.",
+      reason: `The OctoFarm docker container cannot change this setting. Change the ${AppConstants.MONGO_KEY} variable yourself.`,
       succeeded: false,
     });
   }
@@ -120,7 +123,7 @@ router.post("/save-connection-env", async (req, res) => {
   }
 
   try {
-    envUtils.writeVariableToEnvFile(path.join(__dirname + "/../../.env"), "MONGO", connectionURL);
+    envUtils.writeVariableToEnvFile(path.join(__dirname, "../../.env"), AppConstants.MONGO_KEY, connectionURL);
   } catch (e) {
     res.statusCode = 500;
     return res.send({
@@ -129,16 +132,16 @@ router.post("/save-connection-env", async (req, res) => {
     });
   }
 
-  logger.info("Saved MONGO env variable to .env file");
+  logger.info(`Saved ${AppConstants.MONGO_KEY} env variable to .env file`);
 
   if (envUtils.isNodemon()) {
     res.send({
-      reason: "Succesfully saved MONGO environment variable to .env file. Please restart OctoFarm manually!",
+      reason: `Succesfully saved ${AppConstants.MONGO_KEY} environment variable to .env file. Please restart OctoFarm manually!`,
       succeeded: true,
     });
   } else {
     res.send({
-      reason: "Succesfully saved MONGO environment variable to .env file. Stopping OctoFarm service, please start it again!",
+      reason: `Succesfully saved ${AppConstants.MONGO_KEY} environment variable to .env file. Restarting OctoFarm service, please start it again if that fails!`,
       succeeded: true,
     });
   }
