@@ -1,5 +1,6 @@
 const ServerSettingsDB = require("../models/ServerSettings.js");
 const settingsClean = require("../lib/dataFunctions/settingsClean.js");
+const { AppConstants } = require("../app.constants");
 
 const { SettingsClean } = settingsClean;
 
@@ -8,7 +9,7 @@ const onlinePolling = {
   seconds: 0.5,
 };
 const server = {
-  port: 4000,
+  port: AppConstants.defaultOctoFarmPort,
   registration: true,
   loginRequired: true,
 };
@@ -101,7 +102,7 @@ class ServerSettings {
         checked[0].save;
       })
       .then((ret) => {
-        SettingsClean.start();
+        return SettingsClean.start();
       });
   }
 }

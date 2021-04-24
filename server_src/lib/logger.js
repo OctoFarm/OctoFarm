@@ -58,7 +58,7 @@ class LoggerService {
   }
 
   warning(message, obj) {
-    this.logger.log("warning", message, {
+    this.logger.log("warn", message, {
       obj,
     });
   }
