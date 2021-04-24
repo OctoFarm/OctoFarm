@@ -2,6 +2,8 @@ const path = require("path");
 const fs = require("fs");
 const Logger = require("../lib/logger.js");
 const dotenv = require("dotenv");
+const isDocker = require("is-docker");
+
 const logger = new Logger("OF-Utils-Env", false);
 
 function isPm2() {
