@@ -43,6 +43,10 @@ function stringifyDotEnv(obj) {
  * Note: assumes in Nodemon, pm2 or PKG mode.
  */
 function writeVariableToEnvFile(absoluteEnvPath, variableKey, jsonObject) {
+  if (isDocker()) {
+    logger.error("Tried to persist setting to .env in docker mode. Avoided that.");
+    return;
+  }
   const latestDotEnvConfig = dotenv.config();
   if (latestDotEnvConfig?.error?.code === "ENOENT") {
     logger.warning("Creating .env file for you as it was not found.");
