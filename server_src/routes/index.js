@@ -21,6 +21,7 @@ const systemInfo = require("../runners/systemInfo.js");
 const { getSorting, getFilter } = require("../lib/sorting.js");
 const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
 const isDocker = require("is-docker");
+const { AppConstants } = require("../app.constants");
 const { fetchMongoDBConnectionString } = require("../../app-env");
 const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
 
@@ -446,7 +447,7 @@ router.get(
 );
 
 softwareUpdateChecker
-  .syncLatestOctoFarmRelease(false || process.env.OCTOFARM_ALLOW_PRERELEASE_INSTALL)
+  .syncLatestOctoFarmRelease(false || process.env[AppConstants.OCTOFARM_ALLOW_PRERELEASE_INSTALL_KEY])
   .then(() => {
     softwareUpdateChecker.checkReleaseAndLogUpdate();
   });
