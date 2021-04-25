@@ -105,33 +105,27 @@ const ServerSettingsSchema = new mongoose.Schema({
   influxExport: {
     active: {
       type: Boolean,
-      default: false
+      default: false,
       required: true
     },
     host: {
-      type: String,
-      required: true
+      type: String
     },
     port: {
-      type: String,
-      required: true
+      type: String
     },
     database: {
-      type: String,
-      required: true
+      type: String
     },
     username: {
-      type: String,
-      required: true
+      type: String
     },
     password: {
-      type: String,
-      required: true
+      type: String
     },
     retentionPolicy: {
       defaultRet: {
-        type: Boolean,
-        required: true
+        type: Boolean
       }
     },
   },
