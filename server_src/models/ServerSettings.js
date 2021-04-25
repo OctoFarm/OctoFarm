@@ -2,32 +2,138 @@ const mongoose = require("mongoose");
 
 const ServerSettingsSchema = new mongoose.Schema({
   onlinePolling: {
-    type: Object,
-    required: true,
+    seconds: {
+      type: String,
+      default: "0.5",
+      required: true
+    },
   },
   server: {
-    type: Object,
-    required: false,
+    port: {
+      type: Number,
+      default: 4000,
+      required: true,
+    },
+    loginRequired: {
+      type: Boolean,
+      default: true,
+      required: true
+    },
+    registration: {
+      type: Boolean,
+      default: true,
+      required: true
+    }
   },
   timeout: {
-    type: Object,
-    required: false,
+    apiTimeout: {
+      type: Number,
+      default: 1000,
+      required: true
+    },
+    apiRetryCutoff: {
+      type: Number,
+      default: 10000,
+      required: true
+    },
+    apiRetry: {
+      type: Number,
+      default: 30000,
+      required: true
+    },
+    webSocketRetry: {
+      type: Number,
+      default: 5000,
+      required: true
+    },
   },
   filamentManager: {
     type: Boolean,
+    default: false,
     required: false,
   },
   filament: {
-    type: Object,
-    required: false,
+    filamentCheck: {
+      type: Boolean,
+      default: false,
+      require: true,
+    }
   },
   history: {
-    type: Object,
-    required: false,
+    snapshot: {
+      onComplete: {
+        type: Boolean,
+        default: false,
+        required: true
+      },
+      onFailure: {
+        type: Boolean,
+        default: false,
+        required: true
+      }
+    },
+    thumbnails: {
+      onComplete: {
+        type: Boolean,
+        default: false,
+        required: true
+      },
+      onFailure: {
+        type: Boolean,
+        default: false,
+        required: true
+      }
+    },
+    timelapse: {
+      onComplete: {
+        type: Boolean,
+        default: false,
+        required: true
+      },
+      onFailure: {
+        type: Boolean,
+        default: false,
+        required: true
+      },
+      deleteAfter: {
+        type: Boolean,
+        default: false,
+        required: true
+      }
+    },
   },
   influxExport: {
-    type: Object,
-    required: false,
+    active: {
+      type: Boolean,
+      default: false
+      required: true
+    },
+    host: {
+      type: String,
+      required: true
+    },
+    port: {
+      type: String,
+      required: true
+    },
+    database: {
+      type: String,
+      required: true
+    },
+    username: {
+      type: String,
+      required: true
+    },
+    password: {
+      type: String,
+      required: true
+    },
+    retentionPolicy: {
+      defaultRet: {
+        type: Boolean,
+        required: true
+      }
+    },
   },
 });
 
