@@ -86,7 +86,7 @@ const serverAliveCheck = async function () {
         if (alive.status !== 200) throw "No Server Connection";
         alive = await alive.json();
 
-        if (alive?.update) {
+        if (alive?.update && !alive.isDockerContainer) {
           try {
             checkUpdateAndNotify(alive.update);
           } catch (e) {
