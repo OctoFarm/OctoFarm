@@ -464,8 +464,8 @@ setInterval(async function updateStatus() {
 
     let octoFarmRAM = systemInfo.sysProcess.memRss * 1000;
 
-    if (!systemInfo?.sysProcess?.memRSS) {
-      octoFarmRAM = (systemInfo?.memoryInfo?.total / 100) * systemInfo?.sysProcess?.mem;
+    if (!systemInfo.sysProcess.memRSS) {
+      octoFarmRAM = (systemInfo.memoryInfo.total / 100) * systemInfo.sysProcess.mem;
     }
     // labels: ['System', 'OctoFarm', 'Free'],
     systemChartMemory.updateSeries([systemUsedRAM, octoFarmRAM, freeRAM]);
