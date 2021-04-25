@@ -11,6 +11,15 @@ let loadedWithPrereleases = null;
 let installedReleaseFound = null;
 let notificationReady = false;
 
+function findGithubRelease(releases, prerelease = false, tag_name = null) {
+  return releases.find(
+    (r) =>
+      r.draft === false &&
+      (tag_name ? r.tag_name === tag_name : true) &&
+      (r.prerelease === false || prerelease),
+  );
+}
+
 /**
  * Connection-safe acquire data about the installed and latest released OctoFarm versions.
  * @param includePrereleases
@@ -24,17 +33,9 @@ async function syncLatestOctoFarmRelease(includePrereleases = false) {
         return Promise.resolve(null);
       } else {
         if (!!githubReleases && githubReleases.length > 0) {
-          const latestRelease = githubReleases.find(
-            (r) =>
-              r.draft === false &&
-              (r.prerelease === false || includePrereleases),
-          );
+          const latestRelease = findGithubRelease(githubReleases, includePrereleases);
           // Whether the package version exists at all - developer at work if not!
-          installedReleaseFound = !!githubReleases.find((r) =>
-            r.draft === false &&
-            (r.prerelease === false || includePrereleases) &&
-            r.tag_name === process.env.npm_package_version,
-          );
+          installedReleaseFound = !!findGithubRelease(githubReleases, includePrereleases, process.env.npm_package_version);
           if (!!latestRelease && !!latestRelease.tag_name) {
             delete latestRelease.body;
             delete latestRelease.author;
