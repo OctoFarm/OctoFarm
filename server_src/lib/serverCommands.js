@@ -14,20 +14,26 @@ function isGitSync(dir) {
 }
 
 class SystemCommands {
-  static rebootOctoFarm() {
+  static async rebootOctoFarm() {
     let checkForNamedService = false;
+
     // If we're on pm2, then restart buddy!
     if (isPm2()) {
-      exec("pm2 restart OctoFarm").catch((stderr) => {
-        throw "Error with pm2 restart command: " + stderr;
-      });
-      checkForNamedService = true;
+      try{
+        await exec("pm2 restart OctoFarm")
+        checkForNamedService = true;
+      }catch (e){
+        throw "Error with pm2 restart command: " + e;
+      }
     }
+
     if (isNodemon()) {
-      exec("touch ./app.js").catch((stderr) => {
-        throw "Error with nodemon restart command: " + stderr;
-      });
-      checkForNamedService = true;
+      try{
+        await exec("touch ./app.js")
+        checkForNamedService = true;
+      }catch(e){
+        throw "Error with pm2 restart command: " + e;
+      }
     }
 
     return checkForNamedService;
@@ -105,16 +111,20 @@ class SystemCommands {
         }
         if (force?.forcePull) {
           // User wants to force the update
-          await exec("git reset --hard").catch((stderr) => {
+          try{
+            await exec("git reset --hard")
+          }catch(e){
             serverResponse.message = `Could not reset the current repository, user intervention required | Error: ${stderr}`;
             throw serverResponse;
-          });
+          }
         }
         // All been well, let's pull the update!
-        await exec("git pull").catch((stderr) => {
+        try{
+          await exec("git pull")
+        }catch(e){
           serverResponse.message = `Could not pull the latest files, user intervention required | Error: ${stderr}`;
           throw serverResponse;
-        });
+        }
       }
 
       // Check to see if npm packages are missing and if so install them...
