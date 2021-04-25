@@ -1,5 +1,5 @@
 const Logger = require("../lib/logger.js");
-const {getGithubReleasesPromise} = require("./githubClient");
+const { getGithubReleasesPromise } = require("./githubClient");
 
 const logger = new Logger("OctoFarm-SoftwareUpdateChecker");
 let lastSuccessfulReleaseCheckMoment = null;
@@ -10,6 +10,15 @@ let airGapped = null;
 let loadedWithPrereleases = null;
 let installedReleaseFound = null;
 let notificationReady = false;
+
+function findGithubRelease(releases, prerelease = false, tag_name = null) {
+  return releases.find(
+    (r) =>
+      r.draft === false &&
+      (tag_name ? r.tag_name === tag_name : true) &&
+      (r.prerelease === false || prerelease),
+  );
+}
 
 /**
  * Connection-safe acquire data about the installed and latest released OctoFarm versions.
@@ -24,13 +33,9 @@ async function syncLatestOctoFarmRelease(includePrereleases = false) {
         return Promise.resolve(null);
       } else {
         if (!!githubReleases && githubReleases.length > 0) {
-          const latestRelease = githubReleases.find(
-            (r) =>
-              r.draft === false &&
-              (r.prerelease === false || includePrereleases)
-          );
+          const latestRelease = findGithubRelease(githubReleases, includePrereleases);
           // Whether the package version exists at all - developer at work if not!
-          installedReleaseFound = !!githubReleases.find((r) => r.tag_name === process.env.npm_package_version);
+          installedReleaseFound = !!findGithubRelease(githubReleases, includePrereleases, process.env.npm_package_version);
           if (!!latestRelease && !!latestRelease.tag_name) {
             delete latestRelease.body;
             delete latestRelease.author;
@@ -69,7 +74,7 @@ function getLastReleaseSyncState() {
     lastReleaseCheckFailed,
     loadedWithPrereleases,
     airGapped,
-    ...(lastReleaseCheckFailed && {lastReleaseCheckError}),
+    ...(lastReleaseCheckFailed && { lastReleaseCheckError }),
   };
 }
 
@@ -87,14 +92,14 @@ function getUpdateNotificationIfAny() {
         "You can update OctoFarm to the latest version available: " +
         latestReleaseCheckState.latestReleaseKnown.tag_name,
       current_version: process.env.npm_package_version,
-      ...latestReleaseCheckState
+      ...latestReleaseCheckState,
     };
   } else {
     return {
       update_available: false,
       installed_release_found: installedReleaseFound,
       air_gapped: airGapped,
-      current_version: process.env.npm_package_version
+      current_version: process.env.npm_package_version,
     };
   }
 }
@@ -105,7 +110,7 @@ function getUpdateNotificationIfAny() {
 function checkReleaseAndLogUpdate() {
   if (!!lastReleaseCheckFailed) {
     logger.error(
-      "Cant check release as it was not fetched yet or the last fetch failed. Call and await 'syncLatestOctoFarmRelease' first."
+      "Cant check release as it was not fetched yet or the last fetch failed. Call and await 'syncLatestOctoFarmRelease' first.",
     );
     return;
   }
@@ -121,7 +126,7 @@ function checkReleaseAndLogUpdate() {
       `\x1b[36mAre you a god? A new release ey? Bloody terrific mate!\x1b[0m
     Here's github's latest released: \x1b[32m${latestReleaseTag}\x1b[0m
     Here's your release tag: \x1b[32m${process.env.npm_package_version}\x1b[0m
-    Appreciate the hard work, you rock!`
+    Appreciate the hard work, you rock!`,
     );
     return;
   }
@@ -132,28 +137,28 @@ function checkReleaseAndLogUpdate() {
   ) {
     if (!!airGapped) {
       logger.warn(
-        `Installed release: ${process.env.npm_package_version}. Skipping update check (air-gapped/disconnected from internet)`
+        `Installed release: ${process.env.npm_package_version}. Skipping update check (air-gapped/disconnected from internet)`,
       );
     } else {
       logger.info(
-        `Update available! New version: ${latestReleaseTag} (prerelease: ${latestRelease.prerelease})`
+        `Update available! New version: ${latestReleaseTag} (prerelease: ${latestRelease.prerelease})`,
       );
       console.log(
         `Installed release: ${process.env.npm_package_version}. Update available!
       New version: ${latestReleaseTag} (prerelease: ${latestRelease.prerelease})
-      Release page: ${latestRelease.html_url}`
+      Release page: ${latestRelease.html_url}`,
       );
     }
   } else if (!process.env.npm_package_version) {
     return logger.error(
-      "Cant check release as 'npm_package_version' environment variable is not set. Make sure OctoFarm is run from a 'package.json' or NPM context."
+      "Cant check release as 'npm_package_version' environment variable is not set. Make sure OctoFarm is run from a 'package.json' or NPM context.",
     );
   } else {
     console.log(
-      `Installed release: ${process.env.npm_package_version}. You are up to date!`
+      `Installed release: ${process.env.npm_package_version}. You are up to date!`,
     );
     return logger.info(
-      `Installed release: ${process.env.npm_package_version}. You are up to date!`
+      `Installed release: ${process.env.npm_package_version}. You are up to date!`,
     );
   }
 }
@@ -163,5 +168,5 @@ module.exports = {
   syncLatestOctoFarmRelease,
   getUpdateNotificationIfAny,
   getLastReleaseSyncState,
-  checkReleaseAndLogUpdate
+  checkReleaseAndLogUpdate,
 };
