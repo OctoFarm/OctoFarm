@@ -1,5 +1,5 @@
 ---
-name: reporting bug or improvement
+name: Reporting Bug
 about: Please fill this in to better help the dev help you.
 title: ""
 labels: bug
