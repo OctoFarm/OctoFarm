@@ -461,15 +461,14 @@ setInterval(async function updateStatus() {
 
     const systemUsedRAM = systemInfo.memoryInfo.used;
     const freeRAM = systemInfo.memoryInfo.free;
+
     let octoFarmRAM = systemInfo.sysProcess.memRss * 1000;
-    if (systemInfo.sysProcess.memRss === undefined) {
-      octoFarmRAM =
-        (systemInfo.memoryInfo.total / 100) * systemInfo.sysProcess.mem;
+
+    if (!systemInfo?.sysProcess?.memRSS) {
+      octoFarmRAM = (systemInfo?.memoryInfo?.total / 100) * systemInfo?.sysProcess?.mem;
     }
-    if (octoFarmRAM === octoFarmRAM) {
-      // labels: ['System', 'OctoFarm', 'Free'],
-      systemChartMemory.updateSeries([systemUsedRAM, octoFarmRAM, freeRAM]);
-    }
+    // labels: ['System', 'OctoFarm', 'Free'],
+    systemChartMemory.updateSeries([systemUsedRAM, octoFarmRAM, freeRAM]);
   }
 }, 5000);
 

@@ -37,6 +37,7 @@ class SystemRunner {
       };
 
       const memoryInfo = await si.mem().catch((error) => logger.error(error));
+
       const uptime = si.time();
       const osInfo = await si.osInfo().catch((error) => logger.error(error));
       const currentProcess = await si
@@ -48,6 +49,7 @@ class SystemRunner {
           sysProcess = current;
         }
       });
+
       const fileSize = await si.fsSize().catch((error) => logger.error(error));
       const systemDisk = fileSize[0];
 
