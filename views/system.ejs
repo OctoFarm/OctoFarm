@@ -95,18 +95,30 @@
 
                                             </p>
                                             <p><i class="fas fa-code-branch"></i> Current Version: <a
-                                                        title="OctoFarm Version, will take you to github releases page"
+                                                        title="OctoFarm current version, will take you to github releases page"
                                                         class="text-light"
                                                         href="https://github.com/NotExpectedYet/OctoFarm/releases"
                                                         target="_blank"><br><%= serviceInformation?.update?.current_version; %></a></p>
-                                            <p><i class="fas fa-code-branch"></i> Latest Version:
-                                                <a
-                                                        title="OctoFarm Version, will take you to github releases page"
+
+                                            <% if(!serviceInformation?.update?.latestReleaseKnown){ %>
+                                                <p><i class="fas fa-code-branch"></i> Latest Version: <a
+                                                        title="OctoFarm latest version, will take you to github releases page"
                                                         class="text-light"
-                                                        href="<%= serviceInformation?.update?.latestReleaseKnown.url;  %>"
-                                                        target="_blank"><br><%= serviceInformation?.update?.latestReleaseKnown.name; %>
-                                                    <br><%= serviceInformation?.update?.latestReleaseKnown.tag_name; %>
-                                                </a></p>
+                                                        href="https://github.com/NotExpectedYet/OctoFarm/releases"
+                                                        target="_blank"><br><%= serviceInformation?.update?.current_version; %></a></p>
+
+                                           <% }else{ %>
+
+                                            <p><i class="fas fa-code-branch"></i> Latest Version:
+                                                    <a
+                                                    title="OctoFarm latest version, will take you to github releases page"
+                                                    class="text-light"
+                                                    href="<%= serviceInformation?.update?.latestReleaseKnown?.url;  %>"
+                                            target="_blank"><br><%= serviceInformation?.update?.latestReleaseKnown?.name; %>
+                                            <br><%= serviceInformation?.update?.latestReleaseKnown?.tag_name; %>
+                                            </a></p>
+                                           <% } %>
+
 
                                             <p class=""><i class="far fa-clock"></i> Timezone: <br><span
                                                         class="text-light" id="timeZone" style="font-size:0.8rem;">
