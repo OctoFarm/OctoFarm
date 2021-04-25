@@ -2,7 +2,7 @@ const fetch = require("node-fetch");
 
 async function getGithubReleasesPromise() {
   const connected = await fetch("https://google.com", {
-    method: "FET",
+    method: "GET",
     cache: "no-cache",
     headers: {"Content-Type": "application/json"},
     referrerPolicy: "no-referrer",
