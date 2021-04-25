@@ -2252,8 +2252,8 @@ document.getElementById("addPrinterBtn").addEventListener("click", (event) => {
                 <div class="card card-body">
                   <div class="row pb-1">
                      <div class="col">
-                          <label for="psPrinterURL">Name:</label>
-                          <input id="psPrinterURL" type="text" class="form-control" placeholder="Printer URL" disabled>
+                          <label for="psPrinterName">Name:</label>
+                          <input id="psPrinterName" type="text" class="form-control" placeholder="Printer Name" disabled>
                           <small class="form-text text-muted">Custom name for your OctoPrint instance, leave this blank to grab from OctoPrint -> Settings -> Appearance Name.</small>
                           <small class="form-text text-muted">If this is blank and no name is found then it will default to the Printer URL.</small>
                           <small>Example: <code>My Awesome Printer Name</code></small>
@@ -2274,8 +2274,8 @@ document.getElementById("addPrinterBtn").addEventListener("click", (event) => {
                   </div>
                   <div class="row pb-2">
                       <div class="col">
-                          <label for="psPrinterURL">Group:</label>
-                          <input id="psPrinterURL" type="text" class="form-control" placeholder="Printer URL" disabled>
+                          <label for="psPrinterGroup">Group:</label>
+                          <input id="psPrinterGroup" type="text" class="form-control" placeholder="Printer Group" disabled>
                           <small class="form-text text-muted">OctoFarm allows for groups </small>
                           <small>Example: <code>http://192.168.1.5:81</code></small>
                       </div>
