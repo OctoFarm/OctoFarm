@@ -1,6 +1,7 @@
 const MONGO_KEY = "MONGO";
 const OCTOFARM_PORT_KEY = "OCTOFARM_PORT";
 const NON_NPM_MODE_KEY = "NON_NPM_MODE";
+const OCTOFARM_SITE_TITLE_KEY = "OCTOFARM_SITE_TITLE";
 const defaultMongoStringUnauthenticated = "mongodb://127.0.0.1:27017/octofarm";
 const defaultOctoFarmPort = 4000;
 const defaultOctoFarmPagetitle = "OctoFarm";
