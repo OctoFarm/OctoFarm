@@ -20,11 +20,13 @@ class SystemRunner {
     return "Started system information collection...";
   }
 
+  /**
+   * //Collect some system information
+   * @returns {Promise<boolean|{sysUptime: *, sysProcess: {}, cpuLoad: any, memoryInfo: any, osInfo: any, systemDisk, warnings: {}, processUptime: number, cpuInfo: {cpu: any, speed: any}}>}
+   */
   static async getSystemInfo() {
     try {
-      //Collect some system information
       const cpu = await si.cpu().catch((error) => logger.error(error));
-
       const cpuCurrentSpeed = await si
         .cpuCurrentSpeed()
         .catch((error) => logger.error(error));
@@ -35,27 +37,25 @@ class SystemRunner {
         cpu,
         speed: cpuCurrentSpeed,
       };
-
       const memoryInfo = await si.mem().catch((error) => logger.error(error));
-
       const uptime = si.time();
       const osInfo = await si.osInfo().catch((error) => logger.error(error));
-      const currentProcess = await si
+      const systemProcesses = await si
         .processes()
         .catch((error) => logger.error(error));
-      let sysProcess = {};
-      currentProcess.list.forEach((current) => {
-        if (current.pid === process.pid) {
-          sysProcess = current;
+
+      let currentProcess = undefined;
+      // Find our process and assign it
+      systemProcesses.list.forEach((systemProcess) => {
+        if (systemProcess.pid === process.pid) {
+          currentProcess = systemProcess;
         }
       });
 
-      const fileSize = await si.fsSize().catch((error) => logger.error(error));
-      const systemDisk = fileSize[0];
-
       //This maybe related to node 13.12.0 possibly. Issue #341.
       let warnings = {};
-
+      const fileSize = await si.fsSize().catch((error) => logger.error(error));
+      const systemDisk = fileSize[0];
       if (typeof systemDisk !== "undefined") {
         if (systemDisk.use >= 99) {
           warnings = {
@@ -85,7 +85,7 @@ class SystemRunner {
         memoryInfo,
         sysUptime: uptime,
         processUptime: process.uptime(),
-        sysProcess,
+        currentProcess,
         systemDisk,
         warnings,
       };
@@ -101,6 +101,7 @@ class SystemRunner {
     }
   }
 }
+
 module.exports = {
   SystemRunner,
 };
