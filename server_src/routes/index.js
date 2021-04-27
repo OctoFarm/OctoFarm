@@ -43,6 +43,7 @@ async function welcome() {
       } else {
         res.render("welcome", {
           page: "Welcome",
+          octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
           registration,
           serverSettings: serverSettings[0],
         });
@@ -107,12 +108,14 @@ router.get(
       dashboardSettings = clientSettings.dashboard;
     }
 
+    console.log(await AppConstants.defaultOctoFarmPagetitle)
     res.render("dashboard", {
       name: req.user.name,
       userGroup: req.user.group,
       version,
       printerCount: printers.length,
       page: "Dashboard",
+      octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
       helpers: prettyHelpers,
       dashboardSettings: dashboardSettings,
       dashboardStatistics: dashStatistics,
@@ -131,6 +134,7 @@ router.get(
       userGroup: req.user.group,
       version,
       page: "Printer Manager",
+      octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
       printerCount: printers.length,
       helpers: prettyHelpers,
     });
@@ -151,6 +155,7 @@ router.get(
       userGroup: req.user.group,
       version,
       page: "Printer Manager",
+      octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
       printerCount: printers.length,
       helpers: prettyHelpers,
       currentOperationsCount: currentOperations.count,
@@ -177,6 +182,7 @@ router.get(
       printStatistics: statistics,
       helpers: prettyHelpers,
       page: "History",
+      octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
     });
   }
 );
@@ -207,6 +213,7 @@ router.get(
       printerCount: printers.length,
       sortedIndex,
       page: "Panel View",
+      octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
       helpers: prettyHelpers,
       clientSettings,
       printGroups,
@@ -242,6 +249,7 @@ router.get(
       printerCount: printers.length,
       sortedIndex,
       page: "Camera View",
+      octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
       helpers: prettyHelpers,
       clientSettings,
       printGroups,
@@ -276,6 +284,7 @@ router.get(
       printerCount: printers.length,
       sortedIndex,
       page: "Printer Map",
+      octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
       helpers: prettyHelpers,
       clientSettings,
       printGroups,
@@ -310,6 +319,7 @@ router.get(
       printerCount: printers.length,
       sortedIndex,
       page: "List View",
+      octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
       helpers: prettyHelpers,
       clientSettings,
       printGroups,
@@ -336,6 +346,7 @@ router.get(
       printerCount: printers.length,
       sortedIndex,
       page: "Current Operations",
+      octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
       helpers: prettyHelpers,
       clientSettings,
     });
@@ -360,6 +371,7 @@ router.get(
       version,
       printerCount: printers.length,
       page: "Filament Manager",
+      octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
       helpers: prettyHelpers,
       serverSettings,
       spools,
@@ -429,6 +441,7 @@ router.get(
       version,
       printerCount: printers.length,
       page: "System",
+      octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
       helpers: prettyHelpers,
       clientSettings,
       serverSettings,

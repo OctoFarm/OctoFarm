@@ -18,6 +18,7 @@ async function enable() {
   router.get("/login", (req, res) =>
     res.render("login", {
       page: "Login",
+      octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
       registration: settings[0].server.registration,
       serverSettings: settings,
     })
@@ -29,6 +30,7 @@ async function enable() {
     router.get("/register", (req, res) =>
       res.render("register", {
         page: "Register",
+        octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
         serverSettings: settings,
         userCount: currentUsers.length,
       })
@@ -58,6 +60,7 @@ async function enable() {
       if (errors.length > 0) {
         res.render("register", {
           page: "Login",
+          octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
           registration: settings[0].server.registration,
           serverSettings: settings,
           errors,
@@ -75,6 +78,7 @@ async function enable() {
             errors.push({ msg: "Username is already registered" });
             res.render("register", {
               page: "Login",
+              octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
               registration: settings[0].server.registration,
               serverSettings: settings,
               errors,
@@ -133,6 +137,7 @@ async function enable() {
       failureRedirect: "/users/login",
       failureFlash: true,
       page: "Login",
+      octoFarmPageTitle: process.env.OCTOFARM_SITE_TITLE,
       registration: settings[0].server.registration,
       serverSettings: settings,
     }),
