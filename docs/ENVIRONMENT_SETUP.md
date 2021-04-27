@@ -1,27 +1,28 @@
 # OctoFarm Server Environment Variables
-OctoFarm Server can be configured with environment variables. In each setup there are ways to do this:
-- specify a `.env` file. This works for all setups:
-    - node, nodemon and pm2
-    - docker-compose: using the `environment` section [(Read docker-compose environment)](https://docs.docker.com/compose/environment-variables/)
-        - docker: using the `--env-file ./.env` command [(Read docker options)](https://docs.docker.com/engine/reference/commandline/run/#options)
+OctoFarm Server can be configured with environment variables. There's different ways to do this **for each setup**:
+- specify a `.env` file. This works for these setups:
+    - NodeJS with `pm2` 
+    - NodeJS with `nodemon`
     - (FUTURE) windows setup (not available yet)
     - (FUTURE) Unix setup (not available yet)
-- specify each variable separately, this can become tedious:
+- docker - specify each variable separately, this can become tedious:
     - docker: using the `-e VARIABLE=value` command repeatedly
+- docker - all at once
+    - docker: using the `--env-file ./.env` command [(Read docker options)](https://docs.docker.com/engine/reference/commandline/run/#options)    
+    - docker-compose: using the `environment` section [(Read docker-compose environment)](https://docs.docker.com/compose/environment-variables/)
+    
 
 ## Required and optional variables
 The following variables are read and used by OctoFarm at startup. Always restart your server after a change.
 
-- MONGO (Required) **the connection to mongodb**
+- MONGO (Required) **the connection to mongodb**. For example:
 > MONGO=mongodb://127.0.0.1:27017/octofarm
-- OCTOFARM_PORT (Optional, default=4000) **the port of the local OctoFarm website**
+- OCTOFARM_PORT (Optional, default=4000) **the port of the local OctoFarm website**. For example:
 > 
 > OCTOFARM_PORT=4000
-- OCTOFARM_ALLOW_PRERELEASE_INSTALL **you want to have the latest premature releases as well, accepting unstable code.**
-> OCTOFARM_PORT=true_or_anything_which_is_not_empty
 
-## (Optional) .env file
-A very simple text file with a variable per line. The following `.env`is already enough to make sure OctoFarm works as you like:
+## The `.env` file
+A very simple text file with a variable per line. The following `.env` is often already enough to make sure OctoFarm works as you like:
 ```
 MONGO=mongodb://127.0.0.1:27017/octofarm
 OCTOFARM_PORT=4000
@@ -44,8 +45,21 @@ Be aware of the following notes:
 Entirely up to you!
 
 Here is how the environment section in docker would look.
-
-to specify variables or use a `.env` file. Note that this .env file will not work like before, you still have to apply those variables.
+```
+services:
+  octofarm:
+    # ... other sections here
+    
+    # environment using colon syntax
+    environment:
+      - MONGO: mongodb://127.0.0.1:27017/octofarm
+      - OCTOFARM_PORT: 4000
+    
+    # ... alternative (watch for whitespace!!) 
+    environment:
+      MONGO=mongodb://127.0.0.1:27017/octofarm
+      OCTOFARM_PORT=4000
+```
 ### Docker 
 Please add each environment variable in a file named `.env` in the folder where you run you docker command.
 If you don't like a file, `-e VARIABLE_NAME=value` is a possible fix, although it is quite hard to maintain it like that.
