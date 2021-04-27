@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
     - Added #382: Add in ability for OctoFarm to update itself with the current pm2/git implementation.
         - This is actioned by two new section inside Server -> System. Two new buttons "Force Check", "Update". 
     - Added #421: OctoFarm data dump. Generates a bundled zip file for download that includes all system logs and a service_information.txt file.
+    - Added #296: Ability to define your own page title with an Environment Variable
 
 ### Changed
     - Disabled Restart button when not using pm2 process manager.
