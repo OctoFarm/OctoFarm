@@ -237,10 +237,6 @@ function getViewsPath() {
 
 function ensurePageTitle() {
   if (!process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY]) {
-    logger.info(
-        `~ ${AppConstants.OCTOFARM_SITE_TITLE_KEY} environment variable is not set. Assuming default: ${AppConstants.OCTOFARM_SITE_TITLE_KEY}=${AppConstants.defaultOctoFarmPageTitle}.`
-    );
-
     process.env[
         AppConstants.OCTOFARM_SITE_TITLE_KEY
         ] = AppConstants.defaultOctoFarmPageTitle.toString();
