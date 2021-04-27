@@ -16,7 +16,7 @@ class AppConstants {
   }
   
   static get defaultOctoFarmPageTitle() {
-    return defaultOctoFarmPagetitle;
+    return defaultOctoFarmPageTitle;
   }
 
   static get MONGO_KEY() {
