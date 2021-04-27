@@ -5,7 +5,7 @@
   "main": "app.js",
   "scripts": {
     "prestart": "npm ci --production",
-    "start": "pm2 flush && pm2 start app.js --name OctoFarm -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time",
+    "start": "pm2 flush && pm2 start app.js --name OctoFarm -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --exp-backoff-restart-delay=1500",
     "restart": "pm2 restart OctoFarm",
     "pupdate": "pm2 update",
     "stop": "pm2 stop OctoFarm",
@@ -30,7 +30,7 @@
     "pi",
     "node"
   ],
-  "author": "James Mackay (NotExpectedYet) & David Zwa",
+  "author": "James Mackay (NotExpectedYet) & David Zwart (davidzwa)",
   "license": "ISC",
   "dependencies": {
     "archiver": "^5.3.0",
