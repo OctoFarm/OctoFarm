@@ -182,7 +182,6 @@ function ensurePortSet() {
     logger.info(
       `~ ${AppConstants.OCTOFARM_PORT_KEY} environment variable is not set. Assuming default: ${AppConstants.OCTOFARM_PORT_KEY}=${AppConstants.defaultOctoFarmPort}.`
     );
-    printInstructionsURL();
     process.env[
       AppConstants.OCTOFARM_PORT_KEY
     ] = AppConstants.defaultOctoFarmPort.toString();
