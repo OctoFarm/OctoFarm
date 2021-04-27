@@ -447,7 +447,7 @@ router.get(
 );
 
 softwareUpdateChecker
-  .syncLatestOctoFarmRelease(false || process.env[AppConstants.OCTOFARM_ALLOW_PRERELEASE_INSTALL_KEY])
+  .syncLatestOctoFarmRelease(false)
   .then(() => {
     softwareUpdateChecker.checkReleaseAndLogUpdate();
   });
