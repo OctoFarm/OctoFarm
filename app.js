@@ -1,4 +1,10 @@
-if (parseInt(process.version.replace("v", "").split(".")[0]) < 14) {
+let majorVersion = null;
+try {
+  majorVersion = parseInt(process.version?.replace("v", "").split(".")[0]);
+} catch (e) {
+  // We dont abort on parsing failures
+}
+if (!!majorVersion && majorVersion < 14) {
   throw "Please make sure Node 14 or higher is installed to run the latest OctoFarm.";
 }
 
@@ -9,7 +15,7 @@ const {
   setupExpressServer,
   serveDatabaseIssueFallback,
   serveOctoFarmNormally,
-  ensureSystemSettingsInitiated,
+  ensureSystemSettingsInitiated
 } = require("./app-core");
 
 function bootAutoDiscovery() {
@@ -26,7 +32,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
-    serverSelectionTimeoutMS: 2500,
+    serverSelectionTimeoutMS: 2500
   })
   .then(() => ensureSystemSettingsInitiated())
   .then(() => serveOctoFarmNormally(octoFarmServer, fetchOctoFarmPort()))
