@@ -426,50 +426,64 @@ const optionsCPU = {
 };
 const systemChartCPU = new ApexCharts(
   document.querySelector("#systemChartCPU"),
-  optionsCPU
+  optionsCPU,
 );
 systemChartCPU.render();
 const systemChartMemory = new ApexCharts(
   document.querySelector("#systemChartMemory"),
-  optionsMemory
+  optionsMemory,
 );
 systemChartMemory.render();
 setInterval(async function updateStatus() {
   let systemInfo = await Client.get("settings/sysInfo");
   systemInfo = await systemInfo.json();
 
-  if (
-    Object.keys(systemInfo).length === 0 &&
-    systemInfo.constructor === Object
-  ) {
-  } else {
-    document.getElementById("systemUptime").innerHTML = Calc.generateTime(
-      systemInfo.sysUptime.uptime
-    );
+  const sysUptimeElem = document.getElementById("systemUptime");
+  const procUptimeElem = document.getElementById("processUpdate");
 
-    document.getElementById("processUpdate").innerHTML = Calc.generateTime(
-      systemInfo.processUptime
-    );
+  if (systemInfo.sysUptime?.uptime && !!sysUptimeElem) {
+    sysUptimeElem.innerHTML = Calc.generateTime(systemInfo.sysUptime.uptime);
+  }
 
-    const cpuLoad = systemInfo.cpuLoad.currentLoadSystem;
-    const octoLoad = systemInfo.sysProcess.cpuu;
-    const userLoad = systemInfo.cpuLoad.currentLoadUser;
-    const remain = cpuLoad + octoLoad + userLoad;
+  if (systemInfo.sysUptime?.uptime && !!sysUptimeElem) {
+    procUptimeElem.innerHTML = Calc.generateTime(systemInfo.processUptime);
+  }
+
+  const currentProc = systemInfo?.currentProcess;
+  const cpuLoad = systemInfo?.cpuLoad;
+  if (!!cpuLoad?.currentLoadSystem && !!cpuLoad?.currentLoadUser) {
+    const systemLoad = cpuLoad.currentLoadSystem;
+    const userLoad = cpuLoad.currentLoadUser;
+    const octoLoad = !!currentProc?.cpuu ? currentProc.cpuu : 0;
+    const remain = systemLoad + octoLoad + userLoad;
 
     // labels: ['System', 'OctoFarm', 'User', 'Free'],
-    systemChartCPU.updateSeries([cpuLoad, octoLoad, userLoad, 100 - remain]);
+    systemChartCPU.updateSeries([systemLoad, octoLoad, userLoad, 100 - remain]);
+  }
 
-    const systemUsedRAM = systemInfo.memoryInfo.used;
-    const freeRAM = systemInfo.memoryInfo.free;
-    let octoFarmRAM = systemInfo.sysProcess.memRss * 1000;
-    if (systemInfo.sysProcess.memRss === undefined) {
-      octoFarmRAM =
-        (systemInfo.memoryInfo.total / 100) * systemInfo.sysProcess.mem;
+  const memoryInfo = systemInfo?.memoryInfo;
+  if (!!memoryInfo) {
+    const systemUsedRAM = memoryInfo.used;
+    const freeRAM = memoryInfo.free;
+
+    if (!!(currentProc?.memRss || currentProc?.mem)) {
+      let octoFarmRAM = currentProc?.memRss * 1000;
+      if (!currentProc.memRss || Number.isNaN(octoFarmRAM)) {
+        octoFarmRAM = (memoryInfo.total / 100) * currentProc?.mem;
+      }
+
+      if (Number.isNaN(octoFarmRAM)) {
+        // labels: ['System', 'OctoFarm', 'Free'],
+        systemChartMemory.updateSeries([systemUsedRAM, 0, freeRAM]);
+      } else {
+        systemChartMemory.updateSeries([systemUsedRAM, octoFarmRAM, freeRAM]);
+      }
     }
-    if (octoFarmRAM === octoFarmRAM) {
-      // labels: ['System', 'OctoFarm', 'Free'],
-      systemChartMemory.updateSeries([systemUsedRAM, octoFarmRAM, freeRAM]);
+    else {
+      systemChartMemory.updateSeries([systemUsedRAM, 0, freeRAM]);
     }
+  } else {
+    systemChartMemory.updateSeries([0, 0, 0]);
   }
 }, 5000);
 
