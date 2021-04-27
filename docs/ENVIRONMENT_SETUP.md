@@ -18,7 +18,10 @@ The following variables are read and used by OctoFarm at startup. Always restart
 > 
 > OCTOFARM_PORT=4000
 - OCTOFARM_ALLOW_PRERELEASE_INSTALL **you want to have the latest premature releases as well, accepting unstable code.**
-> OCTOFARM_PORT=true_or_anything_which_is_not_empty
+> OCTOFARM_ALLOW_PRERELEASE_INSTALL=true_or_anything_which_is_not_empty
+> 
+- OCTOFARM_SITE_TITLE **Custom site title for OctoFarm**
+> OCTOFARM_SITE_TITLE=OctoFarm
 
 ## (Optional) .env file
 A very simple text file with a variable per line. The following `.env`is already enough to make sure OctoFarm works as you like:
