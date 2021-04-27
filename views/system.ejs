@@ -101,6 +101,7 @@
                                                         target="_blank"><br><%= serviceInformation?.update?.current_version; %></a></p>
 
                                             <% if(!serviceInformation?.update?.latestReleaseKnown){ %>
+                                            
                                                 <p><i class="fas fa-code-branch"></i> Latest Version: <a
                                                         title="OctoFarm latest version, will take you to github releases page"
                                                         class="text-light"
@@ -113,12 +114,11 @@
                                                     <a
                                                     title="OctoFarm latest version, will take you to github releases page"
                                                     class="text-light"
-                                                    href="<%= serviceInformation?.update?.latestReleaseKnown?.url;  %>"
-                                            target="_blank"><br><%= serviceInformation?.update?.latestReleaseKnown?.name; %>
-                                            <br><%= serviceInformation?.update?.latestReleaseKnown?.tag_name; %>
+                                                    href="<%= serviceInformation?.update?.latestReleaseKnown.url;  %>"
+                                            target="_blank"><br><%= serviceInformation?.update?.latestReleaseKnown.name; %>
+                                            <br><%= serviceInformation?.update?.latestReleaseKnown.tag_name; %>
                                             </a></p>
                                            <% } %>
-
 
                                             <p class=""><i class="far fa-clock"></i> Timezone: <br><span
                                                         class="text-light" id="timeZone" style="font-size:0.8rem;">
@@ -128,7 +128,7 @@
                                             </p>
                                             <p class=""><i class="fas fa-terminal"></i> Run Command: <br><span
                                                         class="text-light" id="runCommand" style="font-size:0.8rem;">
-                                                                <%= systemInformation.sysProcess.command; %>
+                                                                <%= systemInformation.currentProcess?.command; %>
                                                     </span>
 
                                             </p>

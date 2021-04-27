@@ -13,26 +13,44 @@ const diskFormats = [
 ];
 
 function clientCPUCalc(systemInfo) {
-  const cpuLoad = systemInfo.cpuLoad.currentLoadSystem;
-  const octoLoad = systemInfo.sysProcess.cpuu;
-  const userLoad = systemInfo.cpuLoad.currentLoadUser;
-  const remain = cpuLoad + octoLoad + userLoad;
-  return [cpuLoad, octoLoad, userLoad, 100 - remain];
+  const currentProc = systemInfo?.currentProcess;
+  const cpuLoad = systemInfo?.cpuLoad;
+  if (!!cpuLoad?.currentLoadSystem && !!cpuLoad?.currentLoadUser) {
+    const systemLoad = cpuLoad.currentLoadSystem;
+    const userLoad = cpuLoad.currentLoadUser;
+    const octoLoad = !!currentProc?.cpuu ? currentProc.cpuu : 0;
+    const remain = systemLoad + octoLoad + userLoad;
+
+    // labels: ['System', 'OctoFarm', 'User', 'Free'],
+    return [systemLoad, octoLoad, userLoad, 100 - remain];
+  }
 }
 
 function clientMemCalc(systemInfo) {
-  const systemUsedRAM = systemInfo.memoryInfo.used;
-  const freeRAM = systemInfo.memoryInfo.free;
-  // MemRSS is in kB, and total from memoryInfo is in bytes.
-  let octoFarmRAM = systemInfo.sysProcess.memRss * 1000;
-  if (systemInfo.sysProcess.memRss === undefined) {
-    octoFarmRAM = (systemInfo.memoryInfo.total / 100) * systemInfo.sysProcess.mem;
-  }
+  const currentProc = systemInfo?.currentProcess;
+  const memoryInfo = systemInfo?.memoryInfo;
+  if (!!memoryInfo) {
+    const systemUsedRAM = memoryInfo.used;
+    const freeRAM = memoryInfo.free;
 
-  if (octoFarmRAM !== octoFarmRAM) {
-    return null;
+    if (!!(currentProc?.memRss || currentProc?.mem)) {
+      let octoFarmRAM = currentProc?.memRss * 1000;
+      if (!currentProc.memRss || Number.isNaN(octoFarmRAM)) {
+        octoFarmRAM = (memoryInfo.total / 100) * currentProc?.mem;
+      }
+
+      if (Number.isNaN(octoFarmRAM)) {
+        // labels: ['System', 'OctoFarm', 'Free'],
+        return [systemUsedRAM, 0, freeRAM];
+      } else {
+        return [systemUsedRAM, octoFarmRAM, freeRAM];
+      }
+    }
+    else {
+      return [systemUsedRAM, 0, freeRAM];
+    }
   } else {
-    return [systemUsedRAM, octoFarmRAM, freeRAM];
+    return [0, 0, 0];
   }
 }
 
@@ -50,18 +68,18 @@ describe("SystemRunner", () => {
     // Assert client used props
     expect(systemInfo.cpuLoad.currentLoadSystem).toEqual(expect.any(Number)); // Used by client
     expect(systemInfo.cpuLoad.currentLoadSystem).toBeGreaterThan(0);
-    expect(systemInfo.sysProcess.cpuu).toEqual(expect.any(Number));
-    expect(systemInfo.sysProcess.cpuu).toBeGreaterThan(0);
+    expect(systemInfo.currentProcess.cpuu).toEqual(expect.any(Number));
+    expect(systemInfo.currentProcess.cpuu).toBeGreaterThan(0);
     expect(systemInfo.cpuLoad.currentLoadUser).toEqual(expect.any(Number));
     expect(systemInfo.cpuLoad.currentLoadUser).toBeGreaterThan(0);
     expect(systemInfo.memoryInfo.total).toBeTruthy();
     expect(systemInfo.memoryInfo.free).toBeTruthy();
-    if (!systemInfo.sysProcess.memRss) {
-      expect(systemInfo.sysProcess.mem).toBeTruthy();
+    if (!systemInfo.currentProcess.memRss) {
+      expect(systemInfo.currentProcess.mem).toBeTruthy();
     } else {
       // Rss is useful
-      expect(systemInfo.sysProcess.memRss).toBeTruthy();
-      expect(systemInfo.sysProcess.memVsz).toBeTruthy(); // Not actually needed, but nice to know
+      expect(systemInfo.currentProcess.memRss).toBeTruthy();
+      expect(systemInfo.currentProcess.memVsz).toBeTruthy(); // Not actually needed, but nice to know
     }
 
     // Assert client calculations
@@ -92,8 +110,8 @@ describe("SystemRunner", () => {
     expect(systemInfo.sysUptime.current).toBeGreaterThan(1617880660070); // ms time as of writing this test ^^
     expect(systemInfo.sysUptime.timezone).toBeTruthy();
     expect(systemInfo.processUptime).toEqual(expect.any(Number));
-    expect(systemInfo.sysProcess.pid).toBeGreaterThan(1);
-    expect(systemInfo.sysProcess.name).toEqual(expect.any(String));
+    expect(systemInfo.currentProcess.pid).toBeGreaterThan(1);
+    expect(systemInfo.currentProcess.name).toEqual(expect.any(String));
 
     expect(diskFormats).toContain(systemInfo.systemDisk.type);
     expect(systemInfo.warnings).toBeTruthy();
