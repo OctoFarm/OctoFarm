@@ -19,7 +19,7 @@ class LoggerService {
     this.logger = winston.createLogger({
       transports: [
         new winston.transports.Console({
-          level: "info",
+          level: isProduction ? "warn" : "info",
         }),
         ...(enableFileLogs
           ? [

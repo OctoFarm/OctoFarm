@@ -1,11 +1,11 @@
 {
   "name": "octofarm",
-  "version": "1.1.13-prerelease",
+  "version": "1.1.13",
   "description": "OctoFarm is a easy to setup and install web interface that unifies your Octoprint instances for easy monitoring of all your printers. OctoFarm allows you to connect to multiple octoprint instances on your network allowing creating a farm management system. You can control, manage, upload files to any of your instances without ever leaving the tab it's open in.",
   "main": "app.js",
   "scripts": {
     "prestart": "npm ci --production",
-    "start": "pm2 flush && pm2 start app.js --name OctoFarm -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time",
+    "start": "pm2 flush && pm2 start app.js --name OctoFarm -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --exp-backoff-restart-delay=1500",
     "restart": "pm2 restart OctoFarm",
     "pupdate": "pm2 update",
     "stop": "pm2 stop OctoFarm",
@@ -30,7 +30,7 @@
     "pi",
     "node"
   ],
-  "author": "James Mackay (NotExpectedYet) & David Zwa",
+  "author": "James Mackay (NotExpectedYet) & David Zwart (davidzwa)",
   "license": "ISC",
   "dependencies": {
     "archiver": "^5.3.0",
@@ -56,7 +56,7 @@
     "passport-local": "^1.0.0",
     "passport-remember-me": "0.0.1",
     "request": "^2.88.2",
-    "systeminformation": "^5.6.10",
+    "systeminformation": "^5.6.12",
     "wake_on_lan": "^1.0.0",
     "winston": "^3.3.3",
     "ws": "^7.4.3",
@@ -113,7 +113,7 @@
       "views/**/*"
     ]
   },
-  "engineStrict": true,
+  "engine-strict": true,
   "engines": {
     "node": ">= 14.0.0",
     "npm": ">= 6.10.0"
