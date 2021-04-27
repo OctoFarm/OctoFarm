@@ -30,6 +30,7 @@ function validateMongoURL(mongoURL) {
 router.get("/", (req, res) =>
   res.render("databaseIssue", {
     page: "Database Warning",
+    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     isDocker: isDocker(),
     isPm2: envUtils.isPm2(),
     defaultMongoConnectionString: AppConstants.defaultMongoStringUnauthenticated,

@@ -5,14 +5,21 @@ All notable changes to this project will be documented in this file.
 ## [v1.1.13]
 
 ### Added
-    - Added #361: OctoFarm release check and notification sets ground work for automatic updates. 
+    - Added #361: OctoFarm release check and notification sets ground work for automatic updates.
+    - Added #373: Migrated MongoUri in config/db.js to new .env file format as MONGO=...
+    - Added #374: Migrated server port to .env file as OCTOFARM_PORT=...
     - Added #351: Background image now ignored and copied from default if not present at start.
     - Added #382: Add in ability for OctoFarm to update itself with the current pm2/git implementation.
         - This is actioned by two new section inside Server -> System. Two new buttons "Force Check", "Update". 
     - Added #421: OctoFarm data dump. Generates a bundled zip file for download that includes all system logs and a service_information.txt file.
+    - Added #296: Ability to define your own page title with an Environment Variable
 
 ### Changed
     - Disabled Restart button when not using pm2 process manager.
+    - Node 12 now not supported. Node 14 is a minimum requirement.
+
+### Removed
+    - Ability to change the port in the UI. This is now managed by environment variables. UI option will be back soon.
 
 ### Fixed
     - Fixed #240: Commands sent from the Printer Control Terminal would double wrap array.
@@ -28,6 +35,15 @@ All notable changes to this project will be documented in this file.
     - Fixed #442: Re-Input catch statements for "git" commands on updater logic.
     - Fixed #444: Add in npm functions for updater command to keep packages up to date.
     - Fixed #439: Views not updating due to offline printer in first instance.
+    - Fixed #414: History would fail to capture due to missing settings. 
+    - Fixed #475: Loading system page would cause error in console due to missing settings.
+    - Fixed #459: Duplicate Id's on printer manager page. 
+    - Fixed #472: System page would crash if release check didn't find a release. 
+    - Fixed #460: Update and Restart commands not correctly erroring and returning to client.
+    - Fixed #468: Disable update notification and buttons to docker installs. 
+    - Fixed #452: Docker documnetation was missing path for /images.
+    - Fixed #478: Abort with a friendly message if Node version less than 14 is detected.
+    - Fixed #429 and #378: Memory/CPU graphs in system page now tolerant to missing values so it can show no matter what. 
     
 # [Released]
 
