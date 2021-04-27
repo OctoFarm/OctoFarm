@@ -182,6 +182,7 @@ function ensurePortSet() {
     logger.info(
       `~ ${AppConstants.OCTOFARM_PORT_KEY} environment variable is not set. Assuming default: ${AppConstants.OCTOFARM_PORT_KEY}=${AppConstants.defaultOctoFarmPort}.`
     );
+    printInstructionsURL();
     process.env[
       AppConstants.OCTOFARM_PORT_KEY
     ] = AppConstants.defaultOctoFarmPort.toString();
@@ -239,6 +240,7 @@ function ensurePageTitle() {
     logger.info(
         `~ ${AppConstants.OCTOFARM_SITE_TITLE_KEY} environment variable is not set. Assuming default: ${AppConstants.OCTOFARM_SITE_TITLE_KEY}=${AppConstants.defaultOctoFarmPageTitle}.`
     );
+
     process.env[
         AppConstants.OCTOFARM_SITE_TITLE_KEY
         ] = AppConstants.defaultOctoFarmPageTitle.toString();
