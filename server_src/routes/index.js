@@ -108,7 +108,6 @@ router.get(
       dashboardSettings = clientSettings.dashboard;
     }
 
-    console.log(await AppConstants.defaultOctoFarmPagetitle)
     res.render("dashboard", {
       name: req.user.name,
       userGroup: req.user.group,
