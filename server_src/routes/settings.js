@@ -12,24 +12,13 @@ const UserDB = require("../models/User.js");
 const PrinterDB = require("../models/Printer.js");
 const AlertsDB = require("../models/Alerts.js");
 const GcodeDB = require("../models/CustomGcode.js");
-
 const Logger = require("../lib/logger.js");
-
 const logger = new Logger("OctoFarm-API");
-
 const runner = require("../runners/state.js");
 const multer = require("multer");
-
 const { Runner } = runner;
-
-const systemInfo = require("../runners/systemInfo.js");
-
-const SystemInfo = systemInfo.SystemRunner;
-
-const settingsClean = require("../lib/dataFunctions/settingsClean.js");
-
-const { SettingsClean } = settingsClean;
-
+const { SystemRunner } = require("../runners/systemInfo.js");
+const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 const { Logs } = require("../lib/serverLogs.js");
 const { SystemCommands } = require("../lib/serverCommands.js");
 
@@ -280,22 +269,28 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
     }
   });
 });
+
+/**
+ * Acquire system information from system info runner
+ */
 router.get("/sysInfo", ensureAuthenticated, async (req, res) => {
-  const systemInformation = await SystemInfo.returnInfo();
+  const systemInformation = await SystemRunner.returnInfo();
   let sysInfo = null;
-  if (typeof systemInformation !== "undefined") {
+
+  if (!!systemInformation) {
     sysInfo = {
       osInfo: systemInformation.osInfo,
       cpuInfo: systemInformation.cpuInfo,
       cpuLoad: systemInformation.cpuLoad,
       memoryInfo: systemInformation.memoryInfo,
       sysUptime: systemInformation.sysUptime,
-      sysProcess: systemInformation.sysProcess,
+      currentProcess: systemInformation.currentProcess,
       processUptime: systemInformation.processUptime,
     };
   }
   res.send(sysInfo);
 });
+
 router.get("/customGcode/delete/:id", ensureAuthenticated, async (req, res) => {
   const scriptId = req.params.id;
   GcodeDB.findByIdAndDelete(scriptId, function (err) {
