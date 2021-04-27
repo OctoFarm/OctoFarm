@@ -22,7 +22,7 @@ class SystemRunner {
 
   /**
    * //Collect some system information
-   * @returns {Promise<boolean|{sysUptime: *, sysProcess: {}, cpuLoad: any, memoryInfo: any, osInfo: any, systemDisk, warnings: {}, processUptime: number, cpuInfo: {cpu: any, speed: any}}>}
+   * @returns {Promise<boolean|{sysUptime: *, currentProcess: {}, cpuLoad: any, memoryInfo: any, osInfo: any, systemDisk, warnings: {}, processUptime: number, cpuInfo: {cpu: any, speed: any}}>}
    */
   static async getSystemInfo() {
     try {
