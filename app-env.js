@@ -205,6 +205,7 @@ function setupEnvConfig(skipDotEnv = false) {
   ensureMongoDBConnectionStringSet();
   ensurePortSet();
   envUtils.ensureBackgroundImageExists(__dirname);
+  ensurePageTitle();
 }
 
 function getViewsPath() {
@@ -232,6 +233,14 @@ function getViewsPath() {
     logger.info("✓ Views folder found:", viewsPath);
   }
   return viewsPath;
+}
+
+function ensurePageTitle() {
+  if (!process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY]) {
+    process.env[
+        AppConstants.OCTOFARM_SITE_TITLE_KEY
+        ] = AppConstants.defaultOctoFarmPageTitle?.toString();
+  }
 }
 
 module.exports = {

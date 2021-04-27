@@ -4,6 +4,7 @@ const router = express.Router();
 const bcrypt = require("bcryptjs");
 const passport = require("passport");
 const ServerSettings = require("../models/ServerSettings.js");
+const { AppConstants } = require("../app.constants");
 
 // User Modal
 const User = require("../models/User.js");
@@ -18,6 +19,7 @@ async function enable() {
   router.get("/login", (req, res) =>
     res.render("login", {
       page: "Login",
+      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       registration: settings[0].server.registration,
       serverSettings: settings,
     })
@@ -29,6 +31,7 @@ async function enable() {
     router.get("/register", (req, res) =>
       res.render("register", {
         page: "Register",
+        octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
         serverSettings: settings,
         userCount: currentUsers.length,
       })
@@ -58,6 +61,7 @@ async function enable() {
       if (errors.length > 0) {
         res.render("register", {
           page: "Login",
+          octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
           registration: settings[0].server.registration,
           serverSettings: settings,
           errors,
@@ -75,6 +79,7 @@ async function enable() {
             errors.push({ msg: "Username is already registered" });
             res.render("register", {
               page: "Login",
+              octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
               registration: settings[0].server.registration,
               serverSettings: settings,
               errors,
@@ -133,6 +138,7 @@ async function enable() {
       failureRedirect: "/users/login",
       failureFlash: true,
       page: "Login",
+      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       registration: settings[0].server.registration,
       serverSettings: settings,
     }),
