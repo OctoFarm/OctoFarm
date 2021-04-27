@@ -15,10 +15,9 @@ class AppConstants {
     return defaultOctoFarmPort;
   }
   
-  static get defaultOctoFarmPagetitle() {
+  static get defaultOctoFarmPageTitle() {
     return defaultOctoFarmPagetitle;
   }
-
 
   static get MONGO_KEY() {
     return MONGO_KEY;

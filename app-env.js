@@ -239,7 +239,7 @@ function ensurePageTitle() {
   if (!process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY]) {
     process.env[
         AppConstants.OCTOFARM_SITE_TITLE_KEY
-        ] = AppConstants.defaultOctoFarmPageTitle.toString();
+        ] = AppConstants.defaultOctoFarmPageTitle?.toString();
   }
 }
 
