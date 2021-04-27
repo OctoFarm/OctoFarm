@@ -20,6 +20,8 @@ The following variables are read and used by OctoFarm at startup. Always restart
 - OCTOFARM_PORT (Optional, default=4000) **the port of the local OctoFarm website**. For example:
 > 
 > OCTOFARM_PORT=4000
+- OCTOFARM_SITE_TITLE **Custom site title for OctoFarm**
+> OCTOFARM_SITE_TITLE=OctoFarm
 
 ## The `.env` file
 A very simple text file with a variable per line. The following `.env` is often already enough to make sure OctoFarm works as you like:
