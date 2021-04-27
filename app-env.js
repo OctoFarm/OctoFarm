@@ -77,7 +77,7 @@ function removeDeprecatedMongoURIConfigFile() {
 }
 
 function fetchMongoDBConnectionString(persistToEnv = false) {
-  if (!process?.env[AppConstants.MONGO_KEY]) {
+  if (!process.env[AppConstants.MONGO_KEY]) {
     logger.warning(
       `~ ${AppConstants.MONGO_KEY} environment variable is not set. Assuming default: ${AppConstants.MONGO_KEY}=${AppConstants.defaultMongoStringUnauthenticated}`
     );
