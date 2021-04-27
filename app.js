@@ -1,3 +1,7 @@
+if (parseInt(process.version.replace("v", "").split(".")[0]) < 14) {
+  throw "Please make sure Node 14 or higher is installed to run the latest OctoFarm.";
+}
+
 const { setupEnvConfig, fetchMongoDBConnectionString, fetchOctoFarmPort } = require("./app-env");
 const Logger = require("./server_src/lib/logger.js");
 const mongoose = require("mongoose");
