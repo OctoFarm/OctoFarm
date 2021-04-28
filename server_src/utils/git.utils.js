@@ -1,6 +1,10 @@
 const simpleGit = require("simple-git");
 const git = simpleGit();
 
+function checkIfWereInAGitRepo(){
+  return git.checkIsRepo();
+}
+
 function returnCurrentGitStatus() {
   return git.status();
 }
@@ -36,4 +40,5 @@ module.exports = {
   isBranchInfront,
   doesBranchContainModifiedFiles,
   pullLatestRepository,
+  checkIfWereInAGitRepo
 };

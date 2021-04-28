@@ -14,6 +14,7 @@ const {
   isBranchInfront,
   doesBranchContainModifiedFiles,
   pullLatestRepository,
+  checkIfWereInAGitRepo
 } = require("../utils/git.utils.js");
 
 function isGitSync(dir) {
@@ -48,8 +49,8 @@ class SystemCommands {
   // This will need changing when .deb / installation script becomes a thing. It's built to deal with the current implementation.
   static async checkIfOctoFarmNeedsUpdatingAndUpdate(serverResponse, force) {
     // Check to see if current dir contains a git folder... hard fail otherwise.
-    let doWeHaveAGitFolder = await isGitSync("./");
-    if (!doWeHaveAGitFolder) {
+    let isThisAGitRepo = await checkIfWereInAGitRepo();
+    if (!isThisAGitRepo) {
       serverResponse.message =
         "Not a git repository, user intervention required! You will have to re-download OctoFarm and re-unpack it over this directory. Make sure to backup your images folder!";
       return serverResponse;
@@ -58,7 +59,7 @@ class SystemCommands {
     const gitCurrentStatus = await returnCurrentGitStatus();
 
     // We can safely skip these checks if either of these are true as they should have been run by the time these get flagged.
-    if (!force.doWeInstallPackages || !force.forcePull) {
+    if (!force.doWeInstallPackages && !force.forcePull) {
       // Check if branch is already up to date. Nothing to do, return response to user.
       const gitBranchUpToDate = isBranchUpToDate(gitCurrentStatus);
       if (gitBranchUpToDate) {
