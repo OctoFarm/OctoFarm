@@ -1,7 +1,7 @@
 const { exec } = require("child_process");
 const { isPm2 } = require("../utils/env.utils.js");
 const { isNodemon } = require("../utils/env.utils.js");
-const {lookpath} = require("lookpath")
+const { lookpath } = require("lookpath");
 
 const {
   doWeHaveMissingPackages,
@@ -26,14 +26,12 @@ class SystemCommands {
         let doesFunctionExist = await lookpath("pm2");
 
         if (doesFunctionExist) {
-          
           setTimeout(async () => {
             await exec("pm2 restart OctoFarm");
           }, 5000);
-          
+
           checkForNamedService = true;
         }
-          
       } catch (e) {
         throw "Error with pm2 restart command: " + e;
       }
@@ -44,24 +42,22 @@ class SystemCommands {
         let doesFunctionExist = await lookpath("touch");
 
         if (doesFunctionExist) {
-          
           setTimeout(async () => {
             await exec("touch ./app.js");
           }, 5000);
-          
+
           checkForNamedService = true;
         }
       } catch (e) {
         throw "Error with pm2 restart command: " + e;
       }
     }
-
+    console.log(checkForNamedService)
     return checkForNamedService;
   }
 
   // This will need changing when .deb / installation script becomes a thing. It's built to deal with the current implementation.
   static async checkIfOctoFarmNeedsUpdatingAndUpdate(clientResponse, force) {
-    
     // Check to see if current dir contains a git folder... hard fail otherwise.
     let isThisAGitRepo = await checkIfWereInAGitRepo();
     if (!isThisAGitRepo) {
@@ -87,9 +83,7 @@ class SystemCommands {
       //The below checks should only run if the branch is not up to date... pointless otherwise
 
       // Check if modified files exist and alert the user
-      const modifiedFilesList = getListOfModifiedFiles(
-        gitCurrentStatus
-      );
+      const modifiedFilesList = getListOfModifiedFiles(gitCurrentStatus);
       if (modifiedFilesList.length > 0) {
         const gitBranchInFront = isBranchInfront(gitCurrentStatus);
         if (gitBranchInFront) {
