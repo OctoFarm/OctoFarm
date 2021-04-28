@@ -1,7 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const util = require("util");
-const exec = util.promisify(require("child_process").exec);
+const {exec} = require("child_process");
 const { isPm2 } = require("../utils/env.utils.js");
 const { isNodemon } = require("../utils/env.utils.js");
 const {
