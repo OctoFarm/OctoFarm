@@ -58,7 +58,7 @@ class SystemCommands {
     const gitCurrentStatus = await returnCurrentGitStatus();
 
     // We can safely skip these checks if either of these are true as they should have been run by the time these get flagged.
-    if (force?.doWeInstallPackages && force?.forcePull) {
+    if (!(force?.doWeInstallPackages && force?.forcePull)) {
       // Check if branch is already up to date. Nothing to do, return response to user.
       const gitBranchUpToDate = isBranchUpToDate(gitCurrentStatus);
       if (gitBranchUpToDate) {
