@@ -152,7 +152,11 @@ router.post(
   "/server/update/octofarm",
   ensureAuthenticated,
   async (req, res) => {
-    let octoFarmUpdated;
+    let clientResponse = {
+      haveWeSuccessfullyUpdatedOctoFarm: false,
+      statusTypeForUser: "error",
+      message: "",
+    };
     let force = req?.body;
     if (
       !force ||
@@ -166,16 +170,20 @@ router.post(
     }
 
     try {
-      octoFarmUpdated = await SystemCommands.updateOctoFarm(force);
+      clientResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate(
+        clientResponse, force
+      );
     } catch (e) {
-      octoFarmUpdated = e;
+      clientResponse.message =
+        "Issue with updating | " + e?.message.replace(/(<([^>]+)>)/gi, "");
       // Log error with html tags removed if contained in response message
       logger.error(
         "Issue with updating | ",
         e?.message.replace(/(<([^>]+)>)/gi, "")
       );
+    } finally {
+      res.send(clientResponse);
     }
-    res.send(octoFarmUpdated);
   }
 );
 router.get("/server/update/check", ensureAuthenticated, async (req, res) => {

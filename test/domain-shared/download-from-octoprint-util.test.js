@@ -23,13 +23,14 @@ afterAll(async () => {
 
 describe("DownloadUtil", () => {
   const errorOnDownload = "Download was rejected";
-  jest.mock("node-fetch", () =>
-    () => Promise.resolve({
+  jest.mock("node-fetch", () => () =>
+    Promise.resolve({
       body: {
         pipe: () => null,
         on: (type, reject) => reject(errorOnDownload),
       },
-    }));
+    })
+  );
   jest.mock("fs", () => {
     return {
       createWriteStream: () => {
@@ -42,26 +43,29 @@ describe("DownloadUtil", () => {
     };
   });
 
-  it('should be able to catch download errors (mocked)', async () => {
-    const { downloadFromOctoPrint } = require("../../server_src/utils/download.util");
+  it("should be able to catch download errors (mocked)", async () => {
+    const {
+      downloadFromOctoPrint,
+    } = require("../../server_src/utils/download.util");
 
     const testPath = "test.file";
     const testUrl = "totally.illegal test.url";
     const callback = () => {};
-    const apikey = 'allen key';
+    const apikey = "allen key";
 
     let wasCaught = false;
 
-    await expect(async () =>
-      await downloadFromOctoPrint(testUrl,testPath,callback,apikey)
-        .then(() => {
-          // This is a test to make sure we dont hit this point.
-          expect(true).toBe(false);
-        })
-        .catch(e => {
-          expect(e).toEqual(errorOnDownload)
-          wasCaught = true;
-        })
+    await expect(
+      async () =>
+        await downloadFromOctoPrint(testUrl, testPath, callback, apikey)
+          .then(() => {
+            // This is a test to make sure we dont hit this point.
+            expect(true).toBe(false);
+          })
+          .catch((e) => {
+            expect(e).toEqual(errorOnDownload);
+            wasCaught = true;
+          })
     ).not.toThrow();
-  })
+  });
 });
