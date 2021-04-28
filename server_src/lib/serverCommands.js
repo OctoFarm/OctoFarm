@@ -8,6 +8,10 @@ const {
   doWeHaveMissingPackages,
   installMissingNpmDependencies,
 } = require("../utils/npm.utils.js");
+const {
+  checkIfFunctionExistsInPath,
+  systemRoot,
+} = require("../utils/system-paths.utils.js");
 
 function isGitSync(dir) {
   return fs.existsSync(path.join(dir, ".git"));
@@ -19,22 +23,38 @@ class SystemCommands {
 
     // If we're on pm2, then restart buddy!
     if (isPm2()) {
-      try{
-        await exec("pm2 restart OctoFarm")
-        checkForNamedService = true;
-      }catch (e){
+      try {
+        let doesFunctionExist = await checkIfFunctionExistsInPath("pm2");
+
+        if (doesFunctionExist) {
+          setTimeout(async () => {
+            await exec("pm2 restart OctoFarm");
+          }, 5000);
+        } else {
+          return false;
+        }
+      } catch (e) {
         throw "Error with pm2 restart command: " + e;
       }
     }
 
     if (isNodemon()) {
-      try{
-        await exec("touch ./app.js")
-        checkForNamedService = true;
-      }catch(e){
+      try {
+        let doesFunctionExist = await checkIfFunctionExistsInPath("touch");
+
+        if (doesFunctionExist) {
+          setTimeout(async () => {
+            await exec("touch ./app.js");
+          }, 5000);
+        } else {
+          return false;
+        }
+      } catch (e) {
         throw "Error with pm2 restart command: " + e;
       }
     }
+
+    checkForNamedService = true;
 
     return checkForNamedService;
   }
@@ -47,7 +67,7 @@ class SystemCommands {
     };
 
     // Check to see if current dir contains a git folder... hard fail otherwise.
-    let doWeHaveAGitFolder = await isGitSync("./");
+    let doWeHaveAGitFolder = await isGitSync(systemRoot);
     if (!doWeHaveAGitFolder) {
       serverResponse.message =
         "Not a git repository, user intervention required! You will have to re-download OctoFarm and re-unpack it over this directory. Make sure to backup your images folder!";
@@ -111,17 +131,17 @@ class SystemCommands {
         }
         if (force?.forcePull) {
           // User wants to force the update
-          try{
-            await exec("git reset --hard")
-          }catch(e){
+          try {
+            await exec("git reset --hard");
+          } catch (e) {
             serverResponse.message = `Could not reset the current repository, user intervention required | Error: ${stderr}`;
             throw serverResponse;
           }
         }
         // All been well, let's pull the update!
-        try{
-          await exec("git pull")
-        }catch(e){
+        try {
+          await exec("git pull");
+        } catch (e) {
           serverResponse.message = `Could not pull the latest files, user intervention required | Error: ${stderr}`;
           throw serverResponse;
         }
