@@ -1,6 +1,4 @@
-const fs = require("fs");
-const path = require("path");
-const {exec} = require("child_process");
+const { exec } = require("child_process");
 const { isPm2 } = require("../utils/env.utils.js");
 const { isNodemon } = require("../utils/env.utils.js");
 const {
@@ -13,12 +11,8 @@ const {
   isBranchInfront,
   doesBranchContainModifiedFiles,
   pullLatestRepository,
-  checkIfWereInAGitRepo
+  checkIfWereInAGitRepo,
 } = require("../utils/git.utils.js");
-
-function isGitSync(dir) {
-  return fs.existsSync(path.join(dir, ".git"));
-}
 
 class SystemCommands {
   static async rebootOctoFarm() {
@@ -45,6 +39,7 @@ class SystemCommands {
 
     return checkForNamedService;
   }
+
   // This will need changing when .deb / installation script becomes a thing. It's built to deal with the current implementation.
   static async checkIfOctoFarmNeedsUpdatingAndUpdate(serverResponse, force) {
     // Check to see if current dir contains a git folder... hard fail otherwise.

@@ -1,13 +1,66 @@
 const simpleGit = require("simple-git");
 const git = simpleGit();
 
-describe('ServerCommands', () =>{
+const scenarioUpToDate = {
+    modified: [],
+    ahead: 0,
+    behind: 0,
+}
+
+describe('ServerCommands', () => {
+    const scenarioModifiedOutput = {
+        modified: [
+            "package-lock.json",
+            "package.json",
+            "server_src/lib/serverCommands.js",
+        ],
+        ahead: 0,
+        behind: 0,
+    };
+
     jest.mock("child_process", () => {
         return {
             exec: () => Promise.resolve()
         }
     });
+
+    let wasReset = null;
+    let currentScenario = scenarioUpToDate;
+    jest.mock("simple-git", () => {
+        return () => {
+            return {
+                status: () => Promise.resolve(
+                    currentScenario
+                ),
+                pull: () => Promise.resolve(),
+                reset: (input) => {
+                    wasReset = true;
+                    return Promise.resolve();
+                },
+                checkIfWereInAGitRepo: () => true
+            }
+        }
+    });
+
+    jest.mock("npm-git", () => {
+        return () => {
+            return {
+                doWeHaveMissingPackages: () => Promise.resolve(true),
+                installMissingNpmDependencies: () => Promise.resolve(true),
+            }
+        };
+    });
+
     const {SystemCommands} = require("../../server_src/lib/serverCommands");
+
+    it("should be able to see non-pushed commits", async () => {
+        const serverResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate({}, true);
+        console.log(serverResponse);
+        expect(serverResponse.message).toBeTruthy();
+    });
+
+    it("should be able to see uninstalled packages", async () => {
+    });
 
     it("should be able to see that we have a git repo", async () => {
         const isRepo = await git.checkIsRepo();
@@ -34,12 +87,5 @@ describe('ServerCommands', () =>{
         const outputNodemon = await SystemCommands.rebootOctoFarm();
         expect(outputNodemon).toBe(true);
         delete process.env.npm_lifecycle_script;
-    });
-
-    it("should be able to see non-pushed commits", async () => {
-        expect(process.env.NODE_ENV).toBe("test");
-    });
-
-    it("should be able to see uninstalled packages", async () => {
     });
 });
