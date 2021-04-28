@@ -101,6 +101,7 @@
     "jest": "^26.6.3",
     "jest-util": "^26.6.2",
     "mongodb-memory-server": "^6.9.3",
+    "node-deb": "^0.10.7",
     "nodemon": "^2.0.7",
     "npm-run-all": "^4.1.5",
     "pkg": "^5.1.0",
@@ -128,5 +129,20 @@
       "client_src/*"
     ],
     "delay": 2500
+  },
+  "node_deb": {
+    "dependencies": "apparmor",
+    "maintainer": "James Mackay",
+    "entrypoints": {
+      "daemon": "app.js --daemon"
+    },
+    "templates": {
+      "control": "node-deb/control",
+      "preinst": "node-deb/preinst",
+      "postinst": "node-deb/postinst",
+      "systemd_service": "node-deb/systemd.service",
+      "sysv_init": "node-deb/sysv-init",
+      "upstart_conf": "node-deb/upstart.conf"
+    }
   }
 }

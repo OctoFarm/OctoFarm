@@ -1,0 +1,8 @@
+Package: {{ node_deb_package_name }}
+Version: {{ node_deb_package_version }}
+Section: base
+Priority: optional
+Architecture: {{ node_deb_package_architecture }}
+Depends: coreutils, bash, dpkg
+Maintainer: {{ node_deb_package_maintainer }}
+Description: {{ node_deb_package_description }}
