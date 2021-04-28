@@ -61,8 +61,7 @@
     "wake_on_lan": "^1.0.0",
     "winston": "^3.3.3",
     "ws": "^7.4.3",
-    "xml2js": "^0.4.23",
-    "random": "^3.0.6",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "@babel/cli": "^7.13.0",
