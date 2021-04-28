@@ -41,7 +41,13 @@ class SystemCommands {
   }
 
   // This will need changing when .deb / installation script becomes a thing. It's built to deal with the current implementation.
-  static async checkIfOctoFarmNeedsUpdatingAndUpdate(serverResponse, force) {
+  static async checkIfOctoFarmNeedsUpdatingAndUpdate(force) {
+    let serverResponse = {
+      haveWeSuccessfullyUpdatedOctoFarm: false,
+      statusTypeForUser: "error",
+      message: "",
+    };
+
     // Check to see if current dir contains a git folder... hard fail otherwise.
     let isThisAGitRepo = await checkIfWereInAGitRepo();
     if (!isThisAGitRepo) {

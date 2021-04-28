@@ -54,7 +54,7 @@ describe('ServerCommands', () => {
     const {SystemCommands} = require("../../server_src/lib/serverCommands");
 
     it("should be able to see non-pushed commits", async () => {
-        const serverResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate({}, true);
+        const serverResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate( true);
         expect(serverResponse.message).toBe("OctoFarm is already up to date! Your good to go!");
         expect(serverResponse.haveWeSuccessfullyUpdatedOctoFarm).toBe(false);
         expect(serverResponse.statusTypeForUser).toBe('success');
