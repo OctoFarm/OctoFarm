@@ -22,7 +22,7 @@ function getListOfModifiedFiles(status) {
 }
 
 async function pullLatestRepository(force) {
-  if (!force) {
+  if (force) {
     await git.reset("hard");
     return git.pull();
   } else {
