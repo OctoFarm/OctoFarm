@@ -10,7 +10,7 @@ function isBranchUpToDate(status) {
 }
 
 function isBranchInfront(status) {
-  return status.ahead === 0;
+  return status.ahead !== 0;
 }
 
 function doesBranchContainModifiedFiles(status) {
@@ -21,9 +21,19 @@ function doesBranchContainModifiedFiles(status) {
   }
 }
 
+async function pullLatestRepository(force) {
+  if (force.forcePull) {
+    return git.pull();
+  } else {
+    await git.reset("hard");
+    return git.pull();
+  }
+}
+
 module.exports = {
   returnCurrentGitStatus,
   isBranchUpToDate,
   isBranchInfront,
   doesBranchContainModifiedFiles,
+  pullLatestRepository,
 };
