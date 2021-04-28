@@ -1,6 +1,8 @@
 const { exec } = require("child_process");
 const { isPm2 } = require("../utils/env.utils.js");
 const { isNodemon } = require("../utils/env.utils.js");
+const {lookpath} = require("lookpath")
+
 const {
   doWeHaveMissingPackages,
   installMissingNpmDependencies,
