@@ -1,7 +1,7 @@
 const simpleGit = require("simple-git");
 const git = simpleGit();
 
-function checkIfWereInAGitRepo(){
+function checkIfWereInAGitRepo() {
   return git.checkIsRepo();
 }
 
@@ -26,13 +26,14 @@ function doesBranchContainModifiedFiles(status) {
 }
 
 async function pullLatestRepository(force) {
-  if (!force.forcePull) {
+  if (!force) {
+    await git.reset("hard");
     return git.pull();
   } else {
-    await git.reset("hard");
     return git.pull();
   }
 }
+async function forcePullLatestRepository() {}
 
 module.exports = {
   returnCurrentGitStatus,
