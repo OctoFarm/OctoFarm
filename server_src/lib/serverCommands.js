@@ -2,15 +2,14 @@ const fs = require("fs");
 const path = require("path");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
+const { lookpath } = require("lookpath");
 const { isPm2 } = require("../utils/env.utils.js");
 const { isNodemon } = require("../utils/env.utils.js");
 const {
   doWeHaveMissingPackages,
   installMissingNpmDependencies,
 } = require("../utils/npm.utils.js");
-const {
-  checkIfFunctionExistsInPath,
-  systemRoot,
+const {systemRoot
 } = require("../utils/system-paths.utils.js");
 
 function isGitSync(dir) {
@@ -24,7 +23,7 @@ class SystemCommands {
     // If we're on pm2, then restart buddy!
     if (isPm2()) {
       try {
-        let doesFunctionExist = await checkIfFunctionExistsInPath("pm2");
+        let doesFunctionExist = await lookpath("pm2");
 
         if (doesFunctionExist) {
           setTimeout(async () => {
@@ -40,7 +39,7 @@ class SystemCommands {
 
     if (isNodemon()) {
       try {
-        let doesFunctionExist = await checkIfFunctionExistsInPath("touch");
+        let doesFunctionExist = await lookpath("touch");
 
         if (doesFunctionExist) {
           setTimeout(async () => {
