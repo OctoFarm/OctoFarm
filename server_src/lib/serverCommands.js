@@ -9,9 +9,8 @@ const {
   returnCurrentGitStatus,
   isBranchUpToDate,
   isBranchInfront,
-  doesBranchContainModifiedFiles,
+  getListOfModifiedFiles,
   pullLatestRepository,
-  forcePullLatestRepository,
   checkIfWereInAGitRepo,
 } = require("../utils/git.utils.js");
 
@@ -69,10 +68,10 @@ class SystemCommands {
       //The below checks should only run if the branch is not up to date... pointless otherwise
 
       // Check if modified files exist and alert the user
-      const gitBranchHasModifiedFiles = doesBranchContainModifiedFiles(
+      const modifiedFilesList = getListOfModifiedFiles(
         gitCurrentStatus
       );
-      if (gitBranchHasModifiedFiles) {
+      if (modifiedFilesList.length > 0) {
         const gitBranchInFront = isBranchInfront(gitCurrentStatus);
         if (gitBranchInFront) {
           //If the branch is not front of current branch, then we need to relay the developer message.
@@ -90,7 +89,7 @@ class SystemCommands {
             "<b class='text-danger'>Cancel:</b> This option will cancel the update process keeping your local changes. No update will run and manual intervention by the user is required. <br><br>";
           clientResponse.statusTypeForUser = "warning";
 
-          gitBranchHasModifiedFiles.forEach((line) => {
+          modifiedFilesList.forEach((line) => {
             clientResponse.message += `<div class="alert alert-secondary m-1 p-2" role="alert"><i class="fas fa-file"></i> ${line.replace(
               "modified: ",
               ""
