@@ -22,7 +22,7 @@ function doesBranchContainModifiedFiles(status) {
 }
 
 async function pullLatestRepository(force) {
-  if (force.forcePull) {
+  if (!force.forcePull) {
     return git.pull();
   } else {
     await git.reset("hard");
