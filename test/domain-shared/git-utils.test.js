@@ -56,10 +56,10 @@ describe("GitUtils", () => {
     });
 
     it("should be able to reset changes when force is true", async () => {
-        let wasReset = null;
-
         await pullLatestRepository({forcePull: false});
         expect(wasReset).toBe(true);
+        wasReset = null;
         await pullLatestRepository({forcePull: true});
+        expect(wasReset).toBe(null);
     });
 });
