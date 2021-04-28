@@ -37,12 +37,12 @@ describe('ServerCommands', () => {
                     wasReset = true;
                     return Promise.resolve();
                 },
-                checkIfWereInAGitRepo: () => true
+                checkIsRepo: () => true
             }
         }
     });
 
-    jest.mock("npm-git", () => {
+    jest.mock("../../server_src/utils/npm.utils", () => {
         return () => {
             return {
                 doWeHaveMissingPackages: () => Promise.resolve(true),
@@ -55,11 +55,15 @@ describe('ServerCommands', () => {
 
     it("should be able to see non-pushed commits", async () => {
         const serverResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate({}, true);
-        console.log(serverResponse);
-        expect(serverResponse.message).toBeTruthy();
+        expect(serverResponse.message).toBe("OctoFarm is already up to date! Your good to go!");
+        expect(serverResponse.haveWeSuccessfullyUpdatedOctoFarm).toBe(false);
+        expect(serverResponse.statusTypeForUser).toBe('success');
     });
 
-    it("should be able to see uninstalled packages", async () => {
+    it("should be able to detect and fix uninstalled packages", async () => {
+    });
+
+    it("should be able to detect and fix uninstalled packages", async () => {
     });
 
     it("should be able to see that we have a git repo", async () => {
