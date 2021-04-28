@@ -49,10 +49,10 @@ class SystemCommands {
           checkForNamedService = true;
         }
       } catch (e) {
-        throw "Error with pm2 restart command: " + e;
+        throw "Error with nodemon restart command: " + e;
       }
     }
-    console.log(checkForNamedService)
+
     return checkForNamedService;
   }
 
