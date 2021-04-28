@@ -3,6 +3,8 @@ let simpleGitMock = jest.createMockFromModule("simple-git");
 let currentScenario = null;
 let isGitRepo = true;
 let wasReset = null;
+let wasPulled = false;
+let wasForceReset = false;
 
 simpleGitMock = () => {
     return {
@@ -10,7 +12,11 @@ simpleGitMock = () => {
             currentScenario
         ),
 
-        pull: () => Promise.resolve(),
+        pull: (force) => {
+            wasForceReset = force;
+            wasPulled = true;
+            return Promise.resolve()
+        },
         reset: (input) => {
             wasReset = true;
             return Promise.resolve();
@@ -18,7 +24,9 @@ simpleGitMock = () => {
 
         // Mock helper functions below
         checkIsRepo: () => isGitRepo,
-        testGetWasRest: () => wasReset,
+        testGetWasReset: () => wasReset,
+        getWasForceReset: () => wasForceReset,
+        getWasPulled: () => wasPulled,
         setTestScenario: (input) => {
             currentScenario = input
         },
