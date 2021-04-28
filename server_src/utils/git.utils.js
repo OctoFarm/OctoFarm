@@ -29,7 +29,6 @@ async function pullLatestRepository(force) {
     return git.pull();
   }
 }
-async function forcePullLatestRepository() {}
 
 module.exports = {
   returnCurrentGitStatus,
