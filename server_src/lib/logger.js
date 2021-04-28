@@ -1,6 +1,7 @@
 const winston = require("winston");
 
 const isProduction = process.env.NODE_ENV === "production";
+const isTest = process.env.NODE_ENV === "test";
 
 const dtFormat = new Intl.DateTimeFormat('en-GB', {
   timeStyle: 'medium',
@@ -19,12 +20,12 @@ class LoggerService {
     this.logger = winston.createLogger({
       transports: [
         new winston.transports.Console({
-          level: isProduction ? "warn" : "info",
+          level: (isProduction || isTest) ? "warn" : "info",
         }),
         ...(enableFileLogs
           ? [
             new winston.transports.File({
-              level: isProduction ? "warn" : "info",
+              level: (isProduction || isTest) ? "warn" : "info",
               filename: `./logs/${route}.log`,
               maxsize: "5000000",
               maxFiles: 5,
