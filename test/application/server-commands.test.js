@@ -11,6 +11,13 @@ describe("ServerCommands", () => {
   const npmUtils = require("../../server_src/utils/npm.utils");
   const { SystemCommands } = require("../../server_src/lib/serverCommands");
 
+  jest.mock("lookpath", () => {
+    return {
+      lookpath: () => Promise.resolve("/usr/random/path"),
+    };
+  });
+  const { lookpath } = require("lookpath");
+
   describe("package updates, modifications and pull", () => {
     const scenarioModifiedOutput = {
       modified: [

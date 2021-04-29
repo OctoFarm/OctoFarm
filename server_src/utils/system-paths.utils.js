@@ -1,5 +1,4 @@
 const { join } = require("path");
-
 const systemRoot = "./";
 const logFolder = "logs";
 
