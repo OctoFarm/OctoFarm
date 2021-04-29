@@ -23,11 +23,11 @@ function ensureEnvNpmVersionSet() {
   if (!process.env.npm_package_version) {
     process.env.npm_package_version = require(packageJsonPath).version;
     process.env[AppConstants.NON_NPM_MODE_KEY] = "true";
-    logger.info(
+    logger.debug(
       `✓ Running OctoFarm version ${process.env.npm_package_version} in non-NPM mode!`
     );
   } else {
-    logger.info(
+    logger.debug(
       `✓ Running OctoFarm version ${process.env.npm_package_version} in NPM mode!`
     );
   }
@@ -110,7 +110,7 @@ function fetchOctoFarmPort() {
         AppConstants.OCTOFARM_PORT_KEY,
         AppConstants.defaultOctoFarmPort
       );
-      logger.info(
+      logger.debug(
         `~ Written ${AppConstants.OCTOFARM_PORT_KEY}=${AppConstants.defaultOctoFarmPort} setting to .env file.`
       );
     }
@@ -171,7 +171,7 @@ function ensureMongoDBConnectionStringSet() {
       );
       removeDeprecatedMongoURIConfigFile();
     }
-    logger.info(`✓ ${AppConstants.MONGO_KEY} environment variable set!`);
+    logger.debug(`✓ ${AppConstants.MONGO_KEY} environment variable set!`);
   }
 }
 

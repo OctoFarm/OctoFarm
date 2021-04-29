@@ -54,7 +54,7 @@ function writeVariableToEnvFile(absoluteEnvPath, variableKey, jsonObject) {
     logger.warning("Creating .env file for you as it was not found.");
   }
   else if (!!latestDotEnvConfig.error) {
-    console.log(JSON.stringify(latestDotEnvConfig.error));
+    logger.warning(JSON.stringify(latestDotEnvConfig.error));
     throw new Error("Could not parse current .env file. Please ensure the file contains lines with each looking like 'MONGO=http://mongo/octofarm' and 'OCTOFARM_PORT=4000' and so on.");
   }
 
