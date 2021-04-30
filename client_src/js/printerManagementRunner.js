@@ -2863,7 +2863,8 @@ class dashUpdate {
   static printers(printers) {
     printers.forEach((printer) => {
       let printerName = "";
-      if (typeof printer.printerState !== "undefined") {
+
+      if (!!printer?.printerState) {
         if (typeof printer.printerName !== "undefined") {
           printerName = printer.printerName;
         }
