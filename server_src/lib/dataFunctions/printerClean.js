@@ -594,7 +594,7 @@ class PrinterClean {
 
       printersInformation[farmPrinter.sortIndex] = sortedPrinter;
     } catch (e) {
-      console.log(e);
+      logger.error(e)
     }
   }
 
@@ -979,7 +979,7 @@ class PrinterClean {
         ["desc"]
       );
     } catch (err) {
-      console.log(`Current Operations issue: ${err}`);
+      logger.error(`Current Operations issue: ${err}`);
     }
   }
 
@@ -1633,9 +1633,9 @@ class PrinterClean {
       farmStats[0].heatMap = heatMap;
       dashboardStatistics.utilisationGraph = heatMap;
       farmStats[0].markModified("heatMap");
-      farmStats[0].save().catch((e) => console.log(e));
+      farmStats[0].save().catch((e) => logger.error(e));
     } catch (e) {
-      console.log("HEAT MAP ISSUE", e);
+      logger.error("HEAT MAP ISSUE", e);
     }
   }
 
