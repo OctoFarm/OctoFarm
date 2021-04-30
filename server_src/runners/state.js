@@ -578,10 +578,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       ) {
         farmPrinters[this.index].currentZ = data.current.currentZ;
       }
-      if (
-        typeof data.current.job !== "undefined" &&
-        data.current.job.user !== null
-      ) {
+      if (data?.current?.job) {
         farmPrinters[this.index].job = data.current.job;
         const currentFileIndex = _.findIndex(
           farmPrinters[this.index].fileList.files,
@@ -3130,6 +3127,11 @@ class Runner {
   }
 
   static async reSyncFile(id, fullPath) {
+    if(!fullPath){
+      logger.error("No file path to re-sync");
+      return
+    }
+
     const i = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
