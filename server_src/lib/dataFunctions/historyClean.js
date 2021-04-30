@@ -510,7 +510,7 @@ class HistoryClean {
     return `${h}:${m}`;
   }
   static async getJob(job, printTime) {
-    if (typeof job !== "undefined") {
+    if (!!job) {
       const accuracy =
         ((printTime - job.estimatedPrintTime) / printTime) * 10000;
       const newJob = {
@@ -529,7 +529,7 @@ class HistoryClean {
     let printPercentage = 0;
     //Fix for old records
     if (
-      typeof metrics !== "undefined" &&
+      typeof metrics !== "undefined" && metrics !== null &&
       typeof metrics.filament !== "undefined" &&
       metrics.filament !== null
     ) {
@@ -738,10 +738,12 @@ class HistoryClean {
       averagePrintTime: null,
       lastPrintTime: null,
     };
-    if (typeof history.job !== "undefined" && typeof history.job.file) {
-      file.uploadDate = history.job.file.date;
-      file.path = history.job.file.path;
-      file.size = history.job.file.size;
+    if (history?.job) {
+      if (history.job?.file){
+        file.uploadDate = history.job.file.date;
+        file.path = history.job.file.path;
+        file.size = history.job.file.size;
+      }
       file.averagePrintTime = history.job.averagePrintTime;
       file.lastPrintTime = history.job.lastPrintTime;
     } else {
