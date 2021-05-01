@@ -56,7 +56,7 @@ body:
       - Server
       - NodeJS
       - MongoDb
-      - Client
+      - Web Interface
       - Not sure
   validations:
     required: true
