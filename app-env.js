@@ -23,7 +23,7 @@ const dotEnvPath = "./.env";
 function ensureEnvNpmVersionSet() {
     const packageJsonVersion = require(packageJsonPath).version;
     if (!process.env[AppConstants.VERSION_KEY]) {
-        process.env[AppConstants.VERSION_KEY] = require(packageJsonPath).version;
+        process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
         process.env[AppConstants.NON_NPM_MODE_KEY] = "true";
         logger.info(
             `✓ Running OctoFarm version ${process.env[AppConstants.VERSION_KEY]} in non-NPM mode!`
@@ -33,8 +33,8 @@ function ensureEnvNpmVersionSet() {
     }
 
     if (process.env[AppConstants.VERSION_KEY] !== packageJsonVersion) {
-        logger.warning(`~ Had to synchronize OctoFarm version ${process.env[AppConstants.VERSION_KEY]} in NPM mode!`);
-        process.env[AppConstants.VERSION_KEY] = require(packageJsonPath).version;
+        process.env[AppConstants.VERSION_KEY] = packageJsonVersion;
+        logger.warning(`~ Had to synchronize OctoFarm version to '${packageJsonVersion}' as it was outdated.`);
     }
 }
 
