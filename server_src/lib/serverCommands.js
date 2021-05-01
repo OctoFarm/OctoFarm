@@ -68,8 +68,6 @@ class SystemCommands {
       return clientResponse;
     }
 
-
-
     // We can safely skip these checks if either of these are true as they should have been run by the time these get flagged.
     if (!force.doWeInstallPackages && !force.forcePull) {
       // Make sure branch is up to date with remote.
