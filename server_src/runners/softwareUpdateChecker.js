@@ -2,7 +2,7 @@ const Logger = require("../lib/logger.js");
 const {AppConstants} = require("../app.constants");
 const {getGithubReleasesPromise} = require("./githubClient");
 
-const logger = new Logger("OF-SoftwareUpdateChecker");
+const logger = new Logger("OctoFarm-SoftwareUpdateChecker");
 let lastSuccessfulReleaseCheckMoment = null;
 let latestReleaseKnown = null;
 let lastReleaseCheckFailed = null;
