@@ -5,14 +5,14 @@ body:
 - type: markdown
   attributes:
     value: |
-      "**Big thanks for helping OctoFarm grow!**
+        ### Big thanks for helping OctoFarm grow!
 
         The OctoFarm developers would prefer people pointing out bugs they find so we can make OctoFarm
         a much more stable platform.
 
         Plese fill out all required field (*) below to better help the developers understand your issue!
 
-        Failing to do so will waste the developer and your own time in sorting the issue. Thanks!"
+        Failing to do so will waste the developer and your own time in sorting the issue. Thanks!
 - type: input
   id: octofarm-version
   attributes:
@@ -103,11 +103,12 @@ body:
 - type: markdown
   attributes:
     value: |
+      ### Logs
       If you've got access to the System screen it's better to just upload the log dump file as it will
       contain all relevant information for the developers.
 
       1) **OctoFarm Server logs** Add the system page logs .zip file (if you cant access it, upload your `./logs` folder content here)
       2) **Console logs** in your browser.
-    (How to: https://javascript.info/devtools)
+      (How to: https://javascript.info/devtools)
       3) **Screenshots**
       These are always effective, add screenshots to help explain your problem.
