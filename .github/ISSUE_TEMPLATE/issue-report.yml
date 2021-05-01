@@ -48,17 +48,15 @@ body:
   attributes:
     label: OctoPrint Plugins
     placeholder: "e.g. bed visualiser, octoklipper, printtimegenius"
-  validations:
-    required: true
 - type: dropdown
   id: current-location
   attributes:
-    label: "**Location** of the problem"
+    label: "Location of the problem"
     options:
       - Server
       - NodeJS
       - MongoDb
-      - Client
+      - Web Interface
       - Not sure
   validations:
     required: true
