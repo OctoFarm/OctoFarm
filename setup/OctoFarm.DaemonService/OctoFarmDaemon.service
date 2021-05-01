@@ -1,0 +1,9 @@
+﻿[Unit]
+Description=OctoFarm DaemonService
+
+[Service]
+Type=notify
+ExecStart=/usr/sbin/octofarm-daemon
+
+[Install]
+WantedBy=multi-user.target

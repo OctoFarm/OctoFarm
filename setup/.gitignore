@@ -1,0 +1,77 @@
+# Autosave files
+*~
+.dockerdata
+build_staging
+
+# build
+[Oo]bj/
+[Bb]in/
+API/build_staging
+**/*.dll
+**/*.so
+**/*.pdb
+packages/
+TestResults/
+
+# globs
+Makefile.in
+*.DS_Store
+*.sln.cache
+*.suo
+*.cache
+*.pidb
+*.userprefs
+*.usertasks
+config.log
+config.make
+config.status
+aclocal.m4
+install-sh
+autom4te.cache/
+*.user
+*.tar.gz
+tarballs/
+test-results/
+Thumbs.db
+
+# Mac bundle stuff
+*.dmg
+*.app
+
+# resharper
+*_Resharper.*
+*.Resharper
+
+# dotCover
+*.dotCover
+.idea/
+node_modules/
+.vs/
+.vscode/solution-explorer
+build/
+
+# dev appSettings
+API/appSettings.Development.json
+LocalMigrations/wordpress2.sql
+LocalMigrations/cleandb.py
+API/appsettings.Development.json
+
+obj
+out/*
+!*/script.sql
+API/thorapp_firebase_adminsdk\.json
+
+Scripts/deployments/
+Scripts/id_rsa
+Scripts/known_deployments.xml
+Scripts/smtp/smtp-test.py
+Scripts/logs/
+*.sql
+Scripts/builds/
+Scripts/*/server-setup-*.zip
+Scripts/server-setup/server-setup-*.zip
+**/Logs/*
+.docker/
+Teamsite.Web/ClientApp/dist/
+angular/debug.log
+.env
