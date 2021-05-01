@@ -2,6 +2,7 @@ const dbHandler = require("../db-handler");
 const request = require("supertest");
 const { setupTestApp, getServer } = require("../../app-test");
 const isDocker = require("is-docker");
+const {AppConstants} = require("../../server_src/app.constants");
 const envUtils = require("../../server_src/utils/env.utils");
 const path = require("path");
 
@@ -43,7 +44,7 @@ const softwareUpdateChecker = require("../../server_src/runners/softwareUpdateCh
 
 describe("AmIAlive Endpoint", () => {
   it("should return ok and no update", async () => {
-    process.env.npm_package_version = require("../../package.json").version;
+    process.env[AppConstants.VERSION_KEY] = require("../../package.json").version;
     process.env.testlatest_package_version = require("../../package.json").version;
     app = await getOrCreateApp();
     await softwareUpdateChecker.syncLatestOctoFarmRelease();
@@ -61,7 +62,7 @@ describe("AmIAlive Endpoint", () => {
   it("should look for octofarm update", async () => {
     // Ensure that the update sync has completed by explicit call
     process.env.testlatest_package_version = "0.0.0-TEST";
-    process.env.npm_package_version = "1.1.1-TEST";
+    process.env[AppConstants.VERSION_KEY] = "1.1.1-TEST";
     app = await getOrCreateApp();
     await softwareUpdateChecker.syncLatestOctoFarmRelease();
 
@@ -80,7 +81,7 @@ describe("AmIAlive Endpoint", () => {
   it("should tolerate undefined package version", async () => {
     // Ensure that the update sync has completed by explicit call
     process.env.testlatest_package_version = "0.0.0-TEST";
-    process.env.npm_package_version = undefined;
+    process.env[AppConstants.VERSION_KEY] = undefined;
     app = await getOrCreateApp();
     await softwareUpdateChecker.syncLatestOctoFarmRelease();
 
@@ -94,7 +95,7 @@ describe("AmIAlive Endpoint", () => {
 
   it("should tolerate being air-gapped silently", async () => {
     process.env.test_airgapped = true;
-    process.env.npm_package_version = undefined;
+    process.env[AppConstants.VERSION_KEY] = undefined;
     app = await getOrCreateApp();
     await softwareUpdateChecker.syncLatestOctoFarmRelease();
 

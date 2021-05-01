@@ -1,11 +1,11 @@
 {
   "name": "octofarm",
-  "version": "1.1.13",
+  "version": "1.1.15",
   "description": "OctoFarm is a easy to setup and install web interface that unifies your Octoprint instances for easy monitoring of all your printers. OctoFarm allows you to connect to multiple octoprint instances on your network allowing creating a farm management system. You can control, manage, upload files to any of your instances without ever leaving the tab it's open in.",
   "main": "app.js",
   "scripts": {
     "prestart": "npm ci --production",
-    "start": "pm2 flush && pm2 start app.js --name OctoFarm -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --exp-backoff-restart-delay=1500",
+    "start": "pm2 flush && pm2 start app.js --name OctoFarm -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --update-env --exp-backoff-restart-delay=1500",
     "restart": "pm2 restart OctoFarm",
     "pupdate": "pm2 update",
     "stop": "pm2 stop OctoFarm",
