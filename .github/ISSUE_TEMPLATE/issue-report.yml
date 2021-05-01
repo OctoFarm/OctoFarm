@@ -3,15 +3,16 @@ description: Please fill this in to better help the dev help you.
 labels: bug
 body:
 - type: markdown
-  value: |
-  "**Big thanks for helping OctoFarm grow!**
+  attributes:
+    value: |
+      "**Big thanks for helping OctoFarm grow!**
 
-    The OctoFarm developers would prefer people pointing out bugs they find so we can make OctoFarm
-    a much more stable platform.
+        The OctoFarm developers would prefer people pointing out bugs they find so we can make OctoFarm
+        a much more stable platform.
 
-    Plese fill out all required field (*) below to better help the developers understand your issue!
+        Plese fill out all required field (*) below to better help the developers understand your issue!
 
-    Failing to do so will waste the developer and your own time in sorting the issue. Thanks!"
+        Failing to do so will waste the developer and your own time in sorting the issue. Thanks!"
 - type: dropdown
   attributes:
     label: Which part of OctoFarm does this effect?
