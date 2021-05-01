@@ -100,3 +100,14 @@ body:
     value: |
       ...
     render: bash
+- type: markdown
+  attributes:
+    value: |
+      If you've got access to the System screen it's better to just upload the log dump file as it will
+      contain all relevant information for the developers.
+
+      1) **OctoFarm Server logs** Add the system page logs .zip file (if you cant access it, upload your `./logs` folder content here)
+      2) **Console logs** in your browser.
+    (How to: https://javascript.info/devtools)
+      3) **Screenshots**
+      These are always effective, add screenshots to help explain your problem.
