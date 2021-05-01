@@ -297,7 +297,7 @@ bulkConnectBtn.addEventListener("click", async (e) => {
             port: printerInfo[index].connectionOptions.portPreference,
             baudrate: printerInfo[index].connectionOptions.baudratePreference,
             printerProfile:
-            printerInfo[index].connectionOptions.printerProfilePreference,
+              printerInfo[index].connectionOptions.printerProfilePreference,
             save: true,
           };
         } else {
@@ -635,7 +635,7 @@ bulkPreHeat.addEventListener("click", async (e) => {
       closeButton: true,
       buttons: {
         action: {
-          label: "<i class=\"fas fa-fire\"></i> Heat!",
+          label: '<i class="fas fa-fire"></i> Heat!',
           className: "btn-success",
           callback: async function () {
             let toolNumber = document.getElementById("preHeatToolSelect");
@@ -981,10 +981,10 @@ bulkControl.addEventListener("click", async (e) => {
               "Are you sure you want to cancel all of your ongoing print?",
             buttons: {
               cancel: {
-                label: "<i class=\"fa fa-times\"></i> Cancel",
+                label: '<i class="fa fa-times"></i> Cancel',
               },
               confirm: {
-                label: "<i class=\"fa fa-check\"></i> Confirm",
+                label: '<i class="fa fa-check"></i> Confirm',
               },
             },
             callback(result) {
@@ -1469,7 +1469,7 @@ function pluginListTemplate(plugin) {
   let abandoned = "";
   if (plugin.abandoned === true) {
     abandoned =
-      "<i class=\"fa fa-heartbeat\" title=\"Abandoned by its maintainer\"></i>";
+      '<i class="fa fa-heartbeat" title="Abandoned by its maintainer"></i>';
   }
   let latestRelease = "";
   if (
@@ -1494,32 +1494,32 @@ function pluginListTemplate(plugin) {
                                 </div>
                                 <div class="meta">
                                     <small class="prop"><i class="fa fa-info"></i>&nbsp;<a target="_blank" href="${
-    plugin.page
-  }" title="${
-    plugin.page
-  }">Details</a></small>
+                                      plugin.page
+                                    }" title="${
+                                     plugin.page
+                                    }">Details</a></small>
                                     <small class="prop"><i class="fa fa-home"></i>&nbsp;<a target="_blank" href="${
-    plugin.homepage
-  }" title="${
-    plugin.homepage
-  }">Homepage</a></small>
+                                      plugin.homepage
+                                    }" title="${
+                                      plugin.homepage
+                                    }">Homepage</a></small>
                                     <small class="prop"><i class="fa fa-user"></i> <span title="${
-    plugin.author
-  }">${plugin.author}</span></small>
+                                      plugin.author
+                                    }">${plugin.author}</span></small>
                                 </div>
                                 <div class="muted"><small>${
-    plugin.description
-  }</small></div>
+                                  plugin.description
+                                }</small></div>
                                 <div class="stats">
                                     <small class="prop" title="License"><i class="fa fa-gavel"></i> <span>${
-    plugin.license
-  }</span></small>
+                                      plugin.license
+                                    }</span></small>
                                     <small class="prop" title="Publication date"><i class="fa fa-birthday-cake"></i> <span>${JSON.stringify(
-    plugin.published
-  ).substring(1, 11)}</span></small>
+                                      plugin.published
+                                    ).substring(1, 11)}</span></small>
                                     <small class="prop" title="Active instances past month"><i class="fa fa-server"></i> <span >${JSON.stringify(
-    plugin.stats.instances_month
-  ).substring(0, 11)}</span></small>
+                                      plugin.stats.instances_month
+                                    ).substring(0, 11)}</span></small>
                                     ${latestRelease}
                                 </div>
                             </div>
@@ -1600,7 +1600,7 @@ const pluginAction = async function (action) {
               .value.toUpperCase();
 
             input = input.replace(/ /g, "_");
-            const button = fileList[0].querySelectorAll("*[id^=\"plugin-\"]");
+            const button = fileList[0].querySelectorAll('*[id^="plugin-"]');
             for (let i = 0; i < button.length; i++) {
               const file = button[i].id.replace("plugin-", "");
               if (file.toUpperCase().indexOf(input) > -1) {
@@ -1649,8 +1649,8 @@ const pluginAction = async function (action) {
                   tracker.innerHTML = `
                 Installing Plugins!<br>
                 <i class="fas fa-print"></i>${
-                    printersToConnect.length - p
-                  } / <i class="fas fa-plug"></i> ${pluginAmount}
+                  printersToConnect.length - p
+                } / <i class="fas fa-plug"></i> ${pluginAmount}
               `;
                   pluginAmount = pluginAmount - 1;
                   alert.close();
@@ -1782,7 +1782,7 @@ const pluginAction = async function (action) {
               .value.toUpperCase();
 
             input = input.replace(/ /g, "_");
-            const button = fileList[0].querySelectorAll("*[id^=\"plugin-\"]");
+            const button = fileList[0].querySelectorAll('*[id^="plugin-"]');
             for (let i = 0; i < button.length; i++) {
               const file = button[i].id.replace("plugin-", "");
               if (file.toUpperCase().indexOf(input) > -1) {
@@ -1831,8 +1831,8 @@ const pluginAction = async function (action) {
                   tracker.innerHTML = `
                     Installing Plugins!<br>
                     <i class="fas fa-print"></i>${
-                    printersToConnect.length - p
-                  } / <i class="fas fa-plug"></i> ${pluginAmount}
+                      printersToConnect.length - p
+                    } / <i class="fas fa-plug"></i> ${pluginAmount}
                   `;
                   pluginAmount = pluginAmount - 1;
                   alert.close();
@@ -2070,13 +2070,13 @@ searchOffline.addEventListener("click", async (e) => {
     "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
   );
   searchOffline.innerHTML =
-    "<i class=\"fas fa-redo fa-sm fa-spin\"></i> Syncing...";
+    '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
 
   const post = await OctoFarmClient.post("printers/reScanOcto", {
     id: null,
   });
   alert.close();
-  searchOffline.innerHTML = "<i class=\"fas fa-redo fa-sm\"></i> Re-Sync";
+  searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
 });
 const editBtn = document.getElementById("editPrinterBtn");
 editBtn.addEventListener("click", (event) => {
@@ -2158,7 +2158,7 @@ editBtn.addEventListener("click", (event) => {
           3000,
           "Clicked"
         );
-        saveEdits.innerHTML = "<i class=\"fas fa-save\"></i> Save Edits";
+        saveEdits.innerHTML = '<i class="fas fa-save"></i> Save Edits';
       }
     }
   };
@@ -2593,7 +2593,7 @@ class PrintersManagement {
     } else {
       const printers = [];
       const saveButton = document.getElementById(`saveButton-${newId}`);
-      saveButton.innerHTML = "<i class=\"fas fa-spinner fa-spin\"></i>";
+      saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
       saveButton.disabled = true;
       const printer = new PrintersManagement(
         printerURL.value,
@@ -2623,7 +2623,7 @@ class PrintersManagement {
           3000,
           "Clicked"
         );
-        saveButton.innerHTML = "<i class=\"fas fa-save\"></i>";
+        saveButton.innerHTML = '<i class="fas fa-save"></i>';
         saveButton.disabled = false;
       }
     }
@@ -2881,7 +2881,9 @@ class dashUpdate {
             const webButton = document.getElementById(
               `printerWeb-${printer._id}`
             );
-            const hostBadge = document.getElementById(`hostBadge-${printer._id}`);
+            const hostBadge = document.getElementById(
+              `hostBadge-${printer._id}`
+            );
             const printerBadge = document.getElementById(
               `printerBadge-${printer._id}`
             );
@@ -3290,7 +3292,11 @@ class dashUpdate {
               .getElementById(`printerButton-${printer._id}`)
               .addEventListener("click", () => {
                 // eslint-disable-next-line no-underscore-dangle
-                PrinterManager.init(printer._id, printerInfo, printerControlList);
+                PrinterManager.init(
+                  printer._id,
+                  printerInfo,
+                  printerControlList
+                );
               });
             document
               .getElementById(`printerSettings-${printer._id}`)
