@@ -7,7 +7,7 @@ const dotenv = require("dotenv");
 const Logger = require("./server_src/lib/logger.js");
 const {AppConstants} = require("./server_src/app.constants");
 
-const logger = new Logger("OF-Environment", false);
+const logger = new Logger("OctoFarm-Environment", false);
 
 // Constants and definition
 const instructionsReferralURL =
