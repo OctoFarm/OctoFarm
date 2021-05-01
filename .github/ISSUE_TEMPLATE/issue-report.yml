@@ -13,3 +13,10 @@ body:
         Plese fill out all required field (*) below to better help the developers understand your issue!
 
         Failing to do so will waste the developer and your own time in sorting the issue. Thanks!"
+- type: input
+  id: octofarm-version
+  attributes:
+    label: OctoFarm Version
+    placeholder: "latest 1.1.13"
+  validations:
+    required: true
