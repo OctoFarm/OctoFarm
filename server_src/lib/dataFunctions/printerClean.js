@@ -14,7 +14,6 @@ const FarmStatistics = require("../../models/FarmStatistics.js");
 
 const RoomData = require("../../models/roomData.js");
 const PrinterGroup = require("../../models/PrinterGroup.js");
-const Printer = require("../../models/Printer.js");
 
 const ErrorLogs = require("../../models/ErrorLog.js");
 
@@ -23,6 +22,10 @@ const TempHistory = require("../../models/TempHistory.js");
 const printerTicker = require("../../runners/printerTicker.js");
 
 const { PrinterTicker } = printerTicker;
+
+const Logger = require("../logger.js");
+const logger = new Logger("OctoFarm-InformationCleaning");
+
 
 const currentOperations = {
   operations: [],
@@ -322,7 +325,7 @@ class PrinterClean {
           if (dateParse.getTime() > ninetyDaysAgo.getTime()) {
             printerStatistics.historyByDay[
               checkNestedIndexHistoryRates
-            ].data.push({
+              ].data.push({
               x: dateParse,
               y: 1,
             });
@@ -594,7 +597,7 @@ class PrinterClean {
 
       printersInformation[farmPrinter.sortIndex] = sortedPrinter;
     } catch (e) {
-      console.log(e);
+      logger.error(e);
     }
   }
 
@@ -609,7 +612,7 @@ class PrinterClean {
       if (
         typeof printerErrorLogs[e].errorLog.printerID !== "undefined" &&
         JSON.stringify(printerErrorLogs[e].errorLog.printerID) ===
-          JSON.stringify(farmPrinter._id)
+        JSON.stringify(farmPrinter._id)
       ) {
         let errorFormat = {
           date: printerErrorLogs[e].errorLog.endDate,
@@ -979,7 +982,7 @@ class PrinterClean {
         ["desc"]
       );
     } catch (err) {
-      console.log(`Current Operations issue: ${err}`);
+      logger.error(`Current Operations issue: ${err}`);
     }
   }
 
@@ -1633,9 +1636,9 @@ class PrinterClean {
       farmStats[0].heatMap = heatMap;
       dashboardStatistics.utilisationGraph = heatMap;
       farmStats[0].markModified("heatMap");
-      farmStats[0].save().catch((e) => console.log(e));
+      farmStats[0].save().catch((e) => logger.error(e));
     } catch (e) {
-      console.log("HEAT MAP ISSUE", e);
+      logger.error("HEAT MAP ISSUE", e);
     }
   }
 
