@@ -23,8 +23,9 @@ const printerTicker = require("../../runners/printerTicker.js");
 
 const { PrinterTicker } = printerTicker;
 
-const logger = new Logger("OctoFarm-InformationCleaning");
 const Logger = require("../logger.js");
+const logger = new Logger("OctoFarm-InformationCleaning");
+
 
 const currentOperations = {
   operations: [],
