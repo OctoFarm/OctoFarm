@@ -140,12 +140,22 @@ export default class PrinterSettings {
 
         if (!offline) {
           currentPrinter.connectionOptions.baudrates.forEach((baud) => {
-            document
-              .getElementById("psDefaultBaudrate")
-              .insertAdjacentHTML(
-                "beforeend",
-                `<option value="${baud}">${baud}</option>`
-              );
+            if (baud !== 0) {
+              document
+                .getElementById("psDefaultBaudrate")
+                .insertAdjacentHTML(
+                  "beforeend",
+                  `<option value="${baud}">${baud}</option>`
+                );
+
+            } else {
+              document
+                .getElementById("psDefaultBaudrate")
+                .insertAdjacentHTML(
+                  "beforeend",
+                  `<option value="${baud}">AUTO</option>`
+                );
+            }
           });
           if (currentPrinter.connectionOptions.baudratePreference === null) {
             document
