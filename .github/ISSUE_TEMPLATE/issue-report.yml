@@ -20,3 +20,83 @@ body:
     placeholder: "latest 1.1.13"
   validations:
     required: true
+- type: input
+  id: octoprint-version
+  attributes:
+    label: OctoPrint Version(s)
+    placeholder: "1.5.3, 1.6.0"
+  validations:
+    required: true
+- type: dropdown
+  id: process
+  attributes:
+    label: "pm2 or docker?"
+    options:
+      - pm2
+      - docker
+  validations:
+    required: true
+- type: input
+  id: system
+  attributes:
+    label: Operating System
+    placeholder: "e.g. Raspberry Pi OS, Ubuntu, Windows"
+  validations:
+    required: true
+- type: input
+  id: plugins-octoprint
+  attributes:
+    label: OctoPrint Plugins
+    placeholder: "e.g. bed visualiser, octoklipper, printtimegenius"
+  validations:
+    required: true
+- type: dropdown
+  id: process
+  attributes:
+    label: "**Location** of the problem"
+    options:
+      - Server
+      - NodeJS
+      - MongoDb
+      - Client
+      - Not sure
+  validations:
+    required: true
+- type: textarea
+  id: problem_desc
+  attributes:
+    label: Description of the problem
+    value: |
+      ...
+    render: bash
+  validations:
+    required: true
+- type: textarea
+  id: repro
+  attributes:
+    label: Steps taken to reproduce
+    description: "How do you trigger this bug? Please walk us through it step by step."
+    value: |
+      1.
+      2.
+      3.
+      ...
+    render: bash
+  validations:
+    required: true
+- type: textarea
+  id: epected_behaviour
+  attributes:
+    label: What did you expect to happen
+    value: |
+      ...
+    render: bash
+  validations:
+    required: true
+- type: textarea
+  id: avoid
+  attributes:
+    label: To avoid the problem I had to
+    value: |
+      ...
+    render: bash
