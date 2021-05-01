@@ -1,6 +1,10 @@
 const simpleGit = require("simple-git");
 const git = simpleGit();
 
+function makeSureBranchIsUpToDateWithRemote() {
+  return git.fetch();
+}
+
 function checkIfWereInAGitRepo() {
   return git.checkIsRepo();
 }
@@ -37,4 +41,5 @@ module.exports = {
   getListOfModifiedFiles,
   pullLatestRepository,
   checkIfWereInAGitRepo,
+  makeSureBranchIsUpToDateWithRemote,
 };

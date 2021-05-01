@@ -2,6 +2,23 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.1.13-hotfix]
+
+### Added
+    - Ability to use the AUTO option for baudrate. 
+
+### Changed
+    - Completely re-worked the updater mechanism.
+
+### Removed
+
+### Fixed
+    - Fixed #500: Connection to printer would fail when both baudrate and port are set to "AUTO"
+    - Fixed #501: Restart command fired too fast which resulted in no confirmation/error notification on client. 
+    - Fixed #495: Check for update would result in double notifications for airgapped farms.
+    - Fixed #498: Fix package version not always preset and synced correctly when not running npm commands, f.e. pm2.
+
+
 ## [v1.1.13]
 
 ### Added
@@ -43,7 +60,7 @@ All notable changes to this project will be documented in this file.
     - Fixed #468: Disable update notification and buttons to docker installs. 
     - Fixed #452: Docker documnetation was missing path for /images.
     - Fixed #478: Abort with a friendly message if Node version less than 14 is detected.
-    - Fixed #429 and #378: Memory/CPU graphs in system page now tolerant to missing values so it can show no matter what. 
+    - Fixed #429 and #378: Memory/CPU graphs in system page now tolerant to missing values so it can show no matter what.
     
 # [Released]
 

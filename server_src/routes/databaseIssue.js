@@ -36,7 +36,7 @@ router.get("/", (req, res) =>
     defaultMongoConnectionString: AppConstants.defaultMongoStringUnauthenticated,
     isNodemon: envUtils.isNodemon(),
     os: process.env.OS,
-    npmPackageJson: process.env.npm_package_version,
+    npmPackageJson: process.env[AppConstants.VERSION_KEY],
     nodeVersion: process.version,
     mongoURL: fetchMongoDBConnectionString(),
   })
