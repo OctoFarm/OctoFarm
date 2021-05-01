@@ -1080,6 +1080,7 @@ class ServerSettings {
         5000,
         "Clicked"
       );
+      return;
     }
     if (updateCheck?.update_available) {
       UI.createAlert(
