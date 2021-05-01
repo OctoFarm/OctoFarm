@@ -11,7 +11,7 @@ simpleGitMock = () => {
         status: () => Promise.resolve(
             currentScenario
         ),
-
+        fetch: () => Promise.resolve(),
         pull: (force) => {
             wasForceReset = force;
             wasPulled = true;
