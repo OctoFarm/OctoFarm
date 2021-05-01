@@ -9,18 +9,12 @@ const {
   getUpdateNotificationIfAny,
 } = require("../runners/softwareUpdateChecker.js");
 
-const printerClean = require("../lib/dataFunctions/printerClean.js");
-
-const { PrinterClean } = printerClean;
-
+const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
 const systemInfo = require("../runners/systemInfo.js");
-
 const SystemInfo = systemInfo.SystemRunner;
-
 const prettyHelpers = require("../../views/partials/functions/pretty.js");
-
-const currentVersion = process?.env?.npm_package_version;
-
+const {AppConstants} = require("../app.constants");
+const currentVersion = process?.env[AppConstants.VERSION_KEY];
 const systemInformationFileName = "system_information.txt";
 
 const {
