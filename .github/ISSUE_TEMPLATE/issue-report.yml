@@ -37,7 +37,7 @@ body:
   validations:
     required: true
 - type: input
-  id: system
+  id: current-system
   attributes:
     label: Operating System
     placeholder: "e.g. Raspberry Pi OS, Ubuntu, Windows"
@@ -51,7 +51,7 @@ body:
   validations:
     required: true
 - type: dropdown
-  id: process
+  id: current-location
   attributes:
     label: "**Location** of the problem"
     options:
@@ -63,7 +63,7 @@ body:
   validations:
     required: true
 - type: textarea
-  id: problem_desc
+  id: problem-desc
   attributes:
     label: Description of the problem
     value: |
@@ -72,7 +72,7 @@ body:
   validations:
     required: true
 - type: textarea
-  id: repro
+  id: repro-steps
   attributes:
     label: Steps taken to reproduce
     description: "How do you trigger this bug? Please walk us through it step by step."
@@ -85,7 +85,7 @@ body:
   validations:
     required: true
 - type: textarea
-  id: epected_behaviour
+  id: epected-behaviour
   attributes:
     label: What did you expect to happen
     value: |
@@ -94,7 +94,7 @@ body:
   validations:
     required: true
 - type: textarea
-  id: avoid
+  id: avoid-problem
   attributes:
     label: To avoid the problem I had to
     value: |
