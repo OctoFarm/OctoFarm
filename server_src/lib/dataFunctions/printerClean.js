@@ -532,10 +532,12 @@ class PrinterClean {
         farmPrinter.current
       );
       sortedPrinter.connectionOptions = farmPrinter.options;
+
       if (
-        typeof sortedPrinter.connectionOptions !== "undefined" &&
+        !!sortedPrinter?.connectionOptions &&
         !sortedPrinter.connectionOptions.ports.includes("AUTO")
       ) {
+        sortedPrinter.connectionOptions.baudrates.unshift(0);
         sortedPrinter.connectionOptions.ports.unshift("AUTO");
       }
       sortedPrinter.terminal = await PrinterClean.sortTerminal(
