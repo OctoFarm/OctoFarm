@@ -14,6 +14,7 @@ const {
   getListOfModifiedFiles,
   pullLatestRepository,
   checkIfWereInAGitRepo,
+  makeSureBranchIsUpToDateWithRemote,
 } = require("../utils/git.utils.js");
 
 class SystemCommands {
@@ -67,10 +68,14 @@ class SystemCommands {
       return clientResponse;
     }
 
-    const gitCurrentStatus = await returnCurrentGitStatus();
+
 
     // We can safely skip these checks if either of these are true as they should have been run by the time these get flagged.
     if (!force.doWeInstallPackages && !force.forcePull) {
+      // Make sure branch is up to date with remote.
+      await makeSureBranchIsUpToDateWithRemote();
+
+      const gitCurrentStatus = await returnCurrentGitStatus();
       // Check if branch is already up to date. Nothing to do, return response to user.
       const gitBranchUpToDate = isBranchUpToDate(gitCurrentStatus);
       if (gitBranchUpToDate) {
