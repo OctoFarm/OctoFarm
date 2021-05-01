@@ -26,8 +26,7 @@ const { fetchMongoDBConnectionString } = require("../../app-env");
 const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
 
 const SystemInfo = systemInfo.SystemRunner;
-const version = process.env.npm_package_version;
-console.log(`Version: ${version} (server started)`);
+const version = process.env[AppConstants.VERSION_KEY];
 
 // Welcome Page
 async function welcome() {
