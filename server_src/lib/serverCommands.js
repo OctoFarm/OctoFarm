@@ -4,8 +4,8 @@ const { isNodemon } = require("../utils/env.utils.js");
 const { lookpath } = require("lookpath");
 
 const {
-  returnListOfMissingPackages,
-  installNpmDependencies,
+  doWeHaveMissingPackages,
+  installMissingNpmDependencies,
 } = require("../utils/npm.utils.js");
 const {
   returnCurrentGitStatus,
@@ -119,10 +119,10 @@ class SystemCommands {
     await pullLatestRepository(force.forcePull);
 
     // Check to see if npm packages are missing and if so install them...
-    const missingPackagesList = await returnListOfMissingPackages();
+    const missingPackages = await doWeHaveMissingPackages();
 
     // If we have missing packages alert the user and wait for their response, if response given then install missing deps.
-    if (missingPackagesList) {
+    if (missingPackages) {
       if (!force?.doWeInstallPackages) {
         clientResponse.statusTypeForUser = "warning";
         clientResponse.message =
@@ -131,12 +131,7 @@ class SystemCommands {
           "<b class='text-danger'>Cancel:</b> This option will cancel the update process and not install the required dependencies. No update will run and manual intervention by the user is required. <br><br>";
         return clientResponse;
       } else {
-        if (missingPackagesList.length > 0) {
-          for (let i = 0; i > missingPackagesList.length; i++) {
-            await installNpmDependencies(missingPackagesList[i]);
-          }
-        }
-
+        await installMissingNpmDependencies();
       }
     }
 
