@@ -134,12 +134,22 @@ export default class PrinterManager {
     <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="dashboardPrinterProfile">Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="pmProfile"></select></div>
     `;
       printer.connectionOptions.baudrates.forEach((baud) => {
-        document
-          .getElementById("pmBaudrate")
-          .insertAdjacentHTML(
-            "beforeend",
-            `<option value="${baud}">${baud}</option>`
-          );
+        if (baud !== 0) {
+          document
+            .getElementById("pmBaudrate")
+            .insertAdjacentHTML(
+              "beforeend",
+              `<option value="${baud}">${baud}</option>`
+            );
+
+        } else {
+          document
+            .getElementById("pmBaudrate")
+            .insertAdjacentHTML(
+              "beforeend",
+              `<option value="${baud}">AUTO</option>`
+            );
+        }
       });
       if (printer.connectionOptions.baudratePreference != null) {
         document.getElementById("pmBaudrate").value =

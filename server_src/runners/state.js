@@ -3456,6 +3456,10 @@ class Runner {
           scripts: {
             gcode: updateOctoPrintGcode,
           },
+          serial: {
+            port: settings.connection.preferredPort,
+            baudrate: settings.connection.preferredBaud,
+          },
           server: {
             commands: {
               systemShutdownCommand: settings.systemCommands.systemShutdown,

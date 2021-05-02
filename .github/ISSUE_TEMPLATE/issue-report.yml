@@ -1,12 +1,11 @@
 name: Issue Report
-about: Please fill this in to better help the dev help you.
-title: ""
+description: Please fill this in to better help the dev help you.
 labels: bug
 body:
-    - type: markdown
-      attributes:
-        value: >
-        **Big thanks for helping OctoFarm grow!**
+- type: markdown
+  attributes:
+    value: |
+        ### Big thanks for helping OctoFarm grow!
 
         The OctoFarm developers would prefer people pointing out bugs they find so we can make OctoFarm
         a much more stable platform.
@@ -14,92 +13,100 @@ body:
         Plese fill out all required field (*) below to better help the developers understand your issue!
 
         Failing to do so will waste the developer and your own time in sorting the issue. Thanks!
+- type: input
+  id: octofarm-version
+  attributes:
+    label: OctoFarm Version
+    placeholder: "latest 1.1.13"
+  validations:
+    required: true
+- type: input
+  id: octoprint-version
+  attributes:
+    label: OctoPrint Version(s)
+    placeholder: "1.5.3, 1.6.0"
+  validations:
+    required: true
+- type: dropdown
+  id: process
+  attributes:
+    label: "pm2 or docker?"
+    options:
+      - pm2
+      - docker
+  validations:
+    required: true
+- type: input
+  id: current-system
+  attributes:
+    label: Operating System
+    placeholder: "e.g. Raspberry Pi OS, Ubuntu, Windows"
+  validations:
+    required: true
+- type: input
+  id: plugins-octoprint
+  attributes:
+    label: OctoPrint Plugins
+    placeholder: "e.g. bed visualiser, octoklipper, printtimegenius"
+- type: dropdown
+  id: current-location
+  attributes:
+    label: "Location of the problem"
+    options:
+      - Server
+      - NodeJS
+      - MongoDb
+      - Web Interface
+      - Not sure
+  validations:
+    required: true
+- type: textarea
+  id: problem-desc
+  attributes:
+    label: Description of the problem
+    value: |
+      ...
+    render: bash
+  validations:
+    required: true
+- type: textarea
+  id: repro-steps
+  attributes:
+    label: Steps taken to reproduce
+    description: "How do you trigger this bug? Please walk us through it step by step."
+    value: |
+      1.
+      2.
+      3.
+      ...
+    render: bash
+  validations:
+    required: true
+- type: textarea
+  id: epected-behaviour
+  attributes:
+    label: What did you expect to happen
+    value: |
+      ...
+    render: bash
+  validations:
+    required: true
+- type: textarea
+  id: avoid-problem
+  attributes:
+    label: To avoid the problem I had to
+    value: |
+      ...
+    render: bash
+- type: markdown
+  attributes:
+    value: |
+      ### Logs
+      If you've got access to the System screen it's better to just upload the log dump file as it will
+      contain all relevant information for the developers.
 
-    - type: dropdown
-      attributes:
-        label: Which part of OctoFarm does this effect?
-        description: >-
-          This just helps the developers narrow down your issue and more quickly identify the area of concern. Please select "Don't know" if you do not know!
-        options:
-          - Client
-          - Server
-          - Both!
-          - Don't know
-      validations:
-        required: true
-    - type: textarea
-      attributes:
-        label: Describe the bug / issue
-        description: >-
-           Please give a clear and concise explanation of what specifically the bug is.
-
-           As much detail as possible please.
-        placeholder: |
-          1. ...
-          2. ...
-          3. ...
-      validations:
-         required: true
-    - type: textarea
-      attributes:
-        label: Steps To Reproduce
-        description: >-
-          What steps do you take to reproduce the bug? Please be explicit as possible.
-        placeholder: |
-          1. Go to '...'
-          2. Click on '....'
-          3. Scroll down to '....'
-          4. See error
-      validations:
-        required: true
-    - type: textarea
-      attributes:
-        label: Expected behavior
-        description: >-
-          Please give a clear and concise description of what you expected to happen.
-        placeholder: |
-          1. ...
-          2. ...
-          3. ...
-      validations:
-        required: true
-    - type: input
-      attributes:
-        label: OctoFarm Version
-        description: >-
-            Please input your current OctoFarm version number. This can be found at the top of the "System" page.
-       validations:
-          required: true
-    - type: input
-       attributes:
-         label: NodeJS Version
-         description: >-
-           Please input your current nodeJS version. This can usually be found with the command "node --version"
-           on your systems cli (Command line interface).
-    - type: input
-      attributes:
-        label: OctoPrint Version
-        description: >-
-          Please input your current OctoPrint version number. This can be found on OctoFarm's "Printers" page.
-          If multiple versions please seperate with a comma e.g. 1.4.1, 1.5.0
-      validations:
-        required: true
-    - type: input
-      attributes:
-        label: OctoPrint Plugins
-        description: >-
-          If your using any OctoPrint plugins then please input them here. e.g. bed visualiser, octoklipper, printtimegenius
-    - type: checkboxes
-      attributes:
-        label: Checklist of files that will help
-        description: >-
-          You can now dump a octofarm_logs.zip file to give the developers a deeper insight into your system.
-          This can be actioned on the "System" page.
-        options:
-          - label: octofarm_dump.zip
-          - label: Screenshots from the client dipicting issue.
-          - label: Screenshot of your browsers console log (usually F12) Please always include for a client issue.
-    - type: markdown
-      attributes:
-        value: |
-          ## Any addition context / logs / screenshots that my help the developers
+      1) **OctoFarm Server logs** Add the system page logs .zip file (if you cant access it, upload your `./logs` folder content here)
+      2) **Console logs** in your browser.
+      (How to: https://javascript.info/devtools)
+      3) **Screenshots**
+      These are always effective, add screenshots to help explain your problem.

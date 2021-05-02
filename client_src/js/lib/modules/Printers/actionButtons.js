@@ -134,7 +134,7 @@ function addEventListeners(printer) {
           );
           data.command = "connect";
           data.port = "AUTO";
-          data.baudrate = "AUTO";
+          data.baudrate = 0;
           data.printerProfile = "_default";
         }
         let post = await OctoPrintClient.post(printer, "connection", data);

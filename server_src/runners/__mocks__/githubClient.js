@@ -1,3 +1,4 @@
+const {AppConstants} = require("../../app.constants");
 const githubClient = jest.createMockFromModule('../githubClient');
 
 /**
@@ -11,7 +12,7 @@ async function getGithubReleasesPromise(includePrereleases = false) {
   }
   return Promise.resolve(
     [{
-      tag_name: process.env.testlatest_package_version || process.env.npm_package_version,
+      tag_name: process.env.testlatest_package_version || process.env[AppConstants.VERSION_KEY],
       draft: false,
       prerelease: false
     }]

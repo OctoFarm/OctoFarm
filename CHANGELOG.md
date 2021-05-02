@@ -2,6 +2,25 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.1.13-hotfix]
+
+### Added
+    - Ability to use the AUTO option for baudrate.
+    - Ability to click update button to go to system page.
+
+### Changed
+    - Completely re-worked the auto updater mechanism.
+    - Completely re-worked the npm check and installation mechanism for the auto updater 
+
+### Removed
+
+### Fixed
+    - Fixed #500: Connection to printer would fail when both baudrate and port are set to "AUTO"
+    - Fixed #501: Restart command fired too fast which resulted in no confirmation/error notification on client. 
+    - Fixed #495: Check for update would result in double notifications for airgapped farms.
+    - Fixed #498: Fix package version not always preset and synced correctly when not running npm commands, f.e. pm2.
+
+
 ## [v1.1.13]
 
 ### Added

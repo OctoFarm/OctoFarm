@@ -1,0 +1,25 @@
+name: Developer Task
+description: A problem or issue found whilst developing. (Developer use only!)
+labels: bug
+body:
+- type: markdown
+  attributes:
+    value: |
+      Developer issue/note for something to fix.
+- type: textarea
+  id: problem-desc
+  attributes:
+    label: Description of the problem
+    value: |
+      ...
+    render: bash
+  validations:
+    required: true
+- type: textarea
+  id: problem-repro
+  attributes:
+    label: Reproduction of the problem
+    value: |
+      ...
+    render: bash
+  validations:
