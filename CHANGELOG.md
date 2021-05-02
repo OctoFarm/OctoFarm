@@ -8,7 +8,8 @@ All notable changes to this project will be documented in this file.
     - Ability to use the AUTO option for baudrate. 
 
 ### Changed
-    - Completely re-worked the updater mechanism.
+    - Completely re-worked the auto updater mechanism.
+    - Completely re-worked the npm check and installation mechanism for the auto updater
 
 ### Removed
 

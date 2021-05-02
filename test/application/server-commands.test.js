@@ -114,7 +114,7 @@ describe("ServerCommands", () => {
     beforeEach(() => {
       mockedSimpleGit.setTestScenario(scenarioUpToDate);
       mockedSimpleGit.setIsRepo(true);
-      npmUtils.setHasMissingPackages(false);
+      npmUtils.setHasMissingPackages([]);
     });
 
     it("should be able to detect no updates", async () => {
@@ -130,7 +130,7 @@ describe("ServerCommands", () => {
 
     it("should be able to complete when no uninstalled packages and behind in commits", async () => {
       mockedSimpleGit.setTestScenario(scenarioBehindOutput);
-      npmUtils.setHasMissingPackages(false);
+      npmUtils.setHasMissingPackages([]);
       const serverResponse2 = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate(
         {},
         true
@@ -141,7 +141,7 @@ describe("ServerCommands", () => {
 
     it("should be able to detect but not fix missing npm packages without force.doWeInstallPackages", async () => {
       mockedSimpleGit.setTestScenario(scenarioBehindOutput);
-      npmUtils.setHasMissingPackages(true);
+      npmUtils.setHasMissingPackages(["random"]);
       const serverResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate(
         {},
         true
@@ -152,7 +152,7 @@ describe("ServerCommands", () => {
 
     it("should be able to detect and fix missing npm packages", async () => {
       mockedSimpleGit.setTestScenario(scenarioBehindOutput);
-      npmUtils.setHasMissingPackages(true);
+      npmUtils.setHasMissingPackages(["random"]);
       const serverResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate(
         {},
         { doWeInstallPackages: true }
