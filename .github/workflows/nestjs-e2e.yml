@@ -1,4 +1,4 @@
-name: NestJS CI - e2e
+name: NestJS CI
 
 on:
   push:
