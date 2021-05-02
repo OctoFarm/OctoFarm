@@ -25,7 +25,7 @@ async function returnListOfMissingPackages() {
   }
 }
 
-async function installNpmDependencies(dependency) {
+async function installNpmDependency(dependency) {
   try {
     await exec(`npm install ${dependency}`);
   } catch (e) {
@@ -35,5 +35,5 @@ async function installNpmDependencies(dependency) {
 
 module.exports = {
   returnListOfMissingPackages,
-  installNpmDependencies,
+  installNpmDependency,
 };

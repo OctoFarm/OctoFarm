@@ -5,7 +5,7 @@ const { lookpath } = require("lookpath");
 
 const {
   returnListOfMissingPackages,
-  installNpmDependencies,
+  installNpmDependency,
 } = require("../utils/npm.utils.js");
 const {
   returnCurrentGitStatus,
@@ -131,7 +131,7 @@ class SystemCommands {
         return clientResponse;
       } else {
         for (let i = 0; i > missingPackagesList.length; i++) {
-          await installNpmDependencies(missingPackagesList[i]);
+          await installNpmDependency(missingPackagesList[i]);
         }
       }
     }
