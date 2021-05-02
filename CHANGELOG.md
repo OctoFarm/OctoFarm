@@ -5,11 +5,12 @@ All notable changes to this project will be documented in this file.
 ## [v1.1.13-hotfix]
 
 ### Added
-    - Ability to use the AUTO option for baudrate. 
+    - Ability to use the AUTO option for baudrate.
+    - Ability to click update button to go to system page.
 
 ### Changed
     - Completely re-worked the auto updater mechanism.
-    - Completely re-worked the npm check and installation mechanism for the auto updater
+    - Completely re-worked the npm check and installation mechanism for the auto updater 
 
 ### Removed
 

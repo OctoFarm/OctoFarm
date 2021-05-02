@@ -42,6 +42,10 @@ function checkUpdateAndNotify(updateResponse) {
     }
     // Process the full notification or a shorter reminder
     if (!parsedStorageReleaseInfo || parsedStorageReleaseInfo?.tag_name !== updateResponse?.latestReleaseKnown?.tag_name) {
+      if (window.location?.href.includes('/system')) {
+        return;
+      }
+
       var n = new Noty({
         type: "success",
         theme: "bootstrap-v4",
@@ -50,10 +54,9 @@ function checkUpdateAndNotify(updateResponse) {
         buttons: [
           Noty.button(
             "UPDATE",
-            "btn btn-success disabled",
+            "btn btn-success",
             function () {
-              // sessionStorage.setItem(notificationMarkReadSessionKey, alive.update.latestReleaseKnown);
-              // console.log("button 1 clicked");
+              window.location = '/system';
             },
             {id: "button1", "data-status": "ok"}
           ),
