@@ -16,6 +16,8 @@ All notable changes to this project will be documented in this file.
     - Fixed #500: Connection to printer would fail when both baudrate and port are set to "AUTO"
     - Fixed #501: Restart command fired too fast which resulted in no confirmation/error notification on client. 
     - Fixed #495: Check for update would result in double notifications for airgapped farms.
+    - Fixed #498: Fix package version not always preset and synced correctly when not running npm commands, f.e. pm2.
+
 
 ## [v1.1.13]
 
