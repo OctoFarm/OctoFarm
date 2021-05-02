@@ -1,10 +1,10 @@
 const npmUtils = jest.createMockFromModule("../npm.utils");
 
-let hasMissingPackages = false;
+let hasMissingPackages = ["random"];
 let targetedStateAfterPull = true; // Default: pulling will successfully change state to up-to-date
 
-npmUtils.doWeHaveMissingPackages = async () => hasMissingPackages;
-npmUtils.installMissingNpmDependencies = async () => {hasMissingPackages = targetedStateAfterPull};
+npmUtils.returnListOfMissingPackages = async () => hasMissingPackages;
+npmUtils.installNpmDependencies = async () => {hasMissingPackages = targetedStateAfterPull};
 
 // Test helper
 npmUtils.setHasMissingPackages = (missingPackages) => hasMissingPackages = missingPackages;
