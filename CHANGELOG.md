@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
     - Completely re-worked the updater mechanism.
+    - Completely re-worked the npm installation mechanism
 
 ### Removed
 
