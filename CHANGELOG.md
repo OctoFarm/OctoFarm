@@ -61,7 +61,7 @@ All notable changes to this project will be documented in this file.
     - Fixed #468: Disable update notification and buttons to docker installs. 
     - Fixed #452: Docker documnetation was missing path for /images.
     - Fixed #478: Abort with a friendly message if Node version less than 14 is detected.
-    - Fixed #429 and #378: Memory/CPU graphs in system page now tolerant to missing values so it can show no matter what.
+    - Fixed #429 and #378: Memory/CPU graphs in system page now tolerant to missing values so it can show no matter what. 
     
 # [Released]
 

@@ -309,7 +309,7 @@ bulkConnectBtn.addEventListener("click", async (e) => {
           );
           data.command = "connect";
           data.port = "AUTO";
-          data.baudrate = "AUTO";
+          data.baudrate = 0;
           data.printerProfile = "_default";
           data.save = false;
         }
