@@ -1,6 +1,7 @@
 import OctoFarmClient from "../octofarm_client.js";
 import UI from "../functions/ui.js";
 import Calc from "../functions/calc.js";
+import Script from "./scriptCheck.js";
 
 let currentPrinterIndex = null;
 let errorNotificationDisplayed = false;
