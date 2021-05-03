@@ -134,16 +134,29 @@ router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
       //Make sure ID's are both strings to stop recursion issues
       return o._id == id;
     });
-    const returnPrinter = {
-      printerName: printers[index].printerName,
-      apikey: printers[index].apikey,
-      _id: printers[index]._id,
-      printerURL: printers[index].printerURL,
-      storage: printers[index].storage,
-      fileList: printers[index].fileList,
-      systemChecks: printers[index].systemChecks,
-    };
+    const returnPrinter = printers[index];
     res.send(returnPrinter);
+  }
+});
+
+router.post("/updatePrinterSettings", ensureAuthenticated, async (req, res) => {
+  const id = req.body.i;
+  if (!id) {
+    logger.error("Printer Settings: No ID key was provided");
+    res.statusMessage = "No ID key was provided";
+    res.sendStatus(400);
+    return;
+  }
+  try {
+    // Update the printers cached settings from OctoPrint
+    await Runner.getSettings(id);
+    // Update the printers cached system settings from OctoPrint
+    await Runner.getSystem(id);
+    res.sendStatus(204);
+  } catch (e) {
+    logger.error(`The server couldn't update your printer settings! ${e}`);
+    res.statusMessage = `The server couldn't update your printer settings! ${e}`;
+    res.sendStatus(500);
   }
 });
 

@@ -3,7 +3,7 @@ import OctoPrintClient from "./lib/octoprint.js";
 import OctoFarmClient from "./lib/octofarm.js";
 import UI from "./lib/functions/ui.js";
 import PrinterManager from "./lib/modules/printerManager.js";
-import PrinterSettings from "./lib/modules/printerSettings.js";
+import { updatePrinterSettingsModal } from "./lib/modules/printerSettings.js";
 import FileOperations from "./lib/functions/file.js";
 import Validate from "./lib/functions/validate.js";
 import PowerButton from "./lib/modules/powerButton.js";
@@ -20,6 +20,7 @@ const deletedPrinters = [];
 let worker = null;
 let powerTimer = 5000;
 let printerControlList = null;
+let webWorkerErrorAlert = false;
 
 function createWebWorker() {
   worker = new Worker("/assets/js/workers/printersManagerWorker.min.js");
@@ -46,11 +47,7 @@ function createWebWorker() {
             .getElementById("printerSettingsModal")
             .classList.contains("show")
         ) {
-          PrinterSettings.init(
-            "",
-            event.data.printersInformation,
-            event.data.printerControlList
-          );
+          updatePrinterSettingsModal(event.data.printersInformation);
         } else {
           dashUpdate.printers(
             event.data.printersInformation,
@@ -94,11 +91,23 @@ if (window.Worker) {
       createWebWorker();
     }
   } catch (e) {
-    console.log(e);
+    UI.createAlert(
+      "error",
+      "Sorry web workers are not supported in your browser, please check the supported browser list.",
+      0
+    );
+    console.error(
+      `Couldn't create the web worker, please log a github issue... <br> ${e}`
+    );
   }
 } else {
   // Sorry! No Web Worker support..
-  console.log("Web workers not available... sorry!");
+  UI.createAlert(
+    "error",
+    "Sorry web workers are not supported in your browser, please check the supported browser list.",
+    0
+  );
+  console.error(`Web workers not available... sorry! <br> ${e}`);
 }
 
 let newPrintersIndex = 0;
@@ -1496,13 +1505,13 @@ function pluginListTemplate(plugin) {
                                     <small class="prop"><i class="fa fa-info"></i>&nbsp;<a target="_blank" href="${
                                       plugin.page
                                     }" title="${
-                                     plugin.page
-                                    }">Details</a></small>
+    plugin.page
+  }">Details</a></small>
                                     <small class="prop"><i class="fa fa-home"></i>&nbsp;<a target="_blank" href="${
                                       plugin.homepage
                                     }" title="${
-                                      plugin.homepage
-                                    }">Homepage</a></small>
+    plugin.homepage
+  }">Homepage</a></small>
                                     <small class="prop"><i class="fa fa-user"></i> <span title="${
                                       plugin.author
                                     }">${plugin.author}</span></small>
@@ -3301,11 +3310,10 @@ class dashUpdate {
             document
               .getElementById(`printerSettings-${printer._id}`)
               .addEventListener("click", (e) => {
-                PrinterSettings.init(
-                  // eslint-disable-next-line no-underscore-dangle
-                  printer._id,
+                updatePrinterSettingsModal(
                   printerInfo,
-                  printerControlList
+                  // eslint-disable-next-line no-underscore-dangle
+                  printer._id
                 );
               });
             document
