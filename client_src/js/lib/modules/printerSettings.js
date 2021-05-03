@@ -5,20 +5,9 @@ import Calc from "../functions/calc.js";
 
 let currentIndex = 0;
 
-// let controlDropDown = false;
-
 let currentPrinter = null;
 
 // Close modal event listeners...
-$("#PrinterSettingsModal").on("hidden.bs.modal", function (e) {
-  // Fix for mjpeg stream not ending when element removed...
-  document.getElementById("printerControlCamera").src = "";
-  // Remove buggy drop down
-  // if (document.getElementById("printerSelection")) {
-  //   document.getElementById("printerSelection").remove();
-  //   controlDropDown = false;
-  // }
-});
 $("#connectionModal").on("hidden.bs.modal", function (e) {
   if (document.getElementById("connectionAction")) {
     document.getElementById("connectionAction").remove();
@@ -44,44 +33,6 @@ export default class PrinterSettings {
         currentPrinter = printers[id];
         const printerDrop = document.getElementById("printerSettingsSelection");
         printerDrop.innerHTML = `Printer Settings: ${currentPrinter.printerName}`;
-        // Remove dropdown
-        // if (!controlDropDown) {
-        //   const printerDrop = document.getElementById(
-        //     "printerSettingsSelection"
-        //   );
-        //   printerDrop.innerHTML = "";
-        //   printerControlList.forEach((list) => {
-        //     if (list.state.category !== "Offline") {
-        //       printerDrop.insertAdjacentHTML(
-        //         "beforeend",
-        //         `
-        //           <option value="${list.printerID}" selected>${list.printerName}</option>
-        //       `
-        //       );
-        //     }
-        //   });
-        //   printerDrop.value = currentPrinter._id;
-        //   printerDrop.addEventListener("change", (event) => {
-        //     if (document.getElementById("printerControls")) {
-        //       document.getElementById("printerControls").innerHTML = "";
-        //     }
-        //     document.getElementById("pmStatus").innerHTML =
-        //       "<i class=\"fas fa-spinner fa-spin\"></i>";
-        //     document.getElementById("pmStatus").className =
-        //       "btn btn-secondary mb-2";
-        //     //Load Connection Panel
-        //     document.getElementById("printerPortDrop").innerHTML = "";
-        //     document.getElementById("printerBaudDrop").innerHTML = "";
-        //     document.getElementById("printerProfileDrop").innerHTML = "";
-        //     document.getElementById("printerConnect").innerHTML = "";
-        //     PrinterSettings.init(
-        //       event.target.value,
-        //       printers,
-        //       printerControlList
-        //     );
-        //   });
-        //   controlDropDown = true;
-        // }
 
         let offline = false;
         if (currentPrinter.printerState.colour.category === "Offline") {
