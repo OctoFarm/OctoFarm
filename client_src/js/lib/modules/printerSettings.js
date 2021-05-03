@@ -16,16 +16,29 @@ $("#connectionModal").on("hidden.bs.modal", function (e) {
 async function updatePrinterSettingsModal(printersInformation, printerID) {
   // Make sure we have page elements
   PrinterSettings.grabPageElements();
-  // Check if printer ID is provided and currentPrinterIndex is available
-  try {
-    if (!printerID) {
-      // No printer ID we are updating the state...
+  // Check if printer ID is provided
 
-      PrinterSettings.updateStateElements(
-        printersInformation[currentPrinterIndex]
-      );
-    } else {
+  if (!printerID) {
+    // No printer ID we are updating the state...
+
+    PrinterSettings.updateStateElements(
+      printersInformation[currentPrinterIndex]
+    );
+  } else {
+    let currentPrinter;
+    try {
       PrinterSettings.updateCurrentPrinterIndex(printersInformation, printerID);
+    } catch (e) {
+      console.error(e);
+      UI.createAlert(
+        "error",
+        `Failed to find your printer from server, please log a github issue: <br> ${e}`,
+        0,
+        "clicked"
+      );
+    }
+
+    try {
       // Resync Printer Settings to latest values and continue to setup page.
       let opts = {
         i: printerID,
@@ -33,45 +46,118 @@ async function updatePrinterSettingsModal(printersInformation, printerID) {
       // Update printer settings
       await OctoFarmClient.post("printers/updatePrinterSettings", opts);
       // Make sure we have latest updated data...
-      const currentPrinter = await OctoFarmClient.post(
-        "printers/printerInfo",
-        opts
-      );
-      // Clear the page of old values.
-      UI.clearSelect("ps");
-
-      // Setup Connection Tab
-      PrinterSettings.setupConnectionTab(currentPrinter);
-
-      // Setup Cost Tab
-      PrinterSettings.setupCostTab(currentPrinter);
-
-      // Setup Profile Tab
-      PrinterSettings.setupProfileTab(currentPrinter);
-
-      // Setup Power Tab
-      PrinterSettings.setupPowerTab(currentPrinter);
-
-      // Setup Alerts Tab
-      await PrinterSettings.setupAlertsTab(currentPrinter);
-
-      // Setup Gcode Script Tab
-      PrinterSettings.setupGcodeTab(currentPrinter);
-
-      // Setup Other Settings Tab
-      PrinterSettings.setupOtherSettingsTab(currentPrinter);
-
-      // Setup Save Settings button
-      PrinterSettings.setupSaveButton(currentPrinter);
-
-      // Apply Stats
-      PrinterSettings.updateStateElements(currentPrinter);
-    }
-  } catch (e) {
-    if (!errorNotificationDisplayed) {
+      currentPrinter = await OctoFarmClient.post("printers/printerInfo", opts);
+    } catch (e) {
       console.error(e);
-      UI.createAlert("error", e.message, 0, "clicked");
-      errorNotificationDisplayed = true;
+      UI.createAlert(
+        "warning",
+        "Failed to update OctoPrint settings, falling back to previous...",
+        0,
+        "clicked"
+      );
+    }
+    // Clear the page of old values.
+    UI.clearSelect("ps");
+
+    // Setup Connection Tab
+    try {
+      PrinterSettings.setupConnectionTab(currentPrinter);
+    } catch (e) {
+      console.error(e);
+      UI.createAlert(
+        "warning",
+        "Failed to generate the Connection tab... skipping",
+        0,
+        "clicked"
+      );
+    }
+
+    // Setup Cost Tab
+    try {
+      PrinterSettings.setupCostTab(currentPrinter);
+    } catch (e) {
+      console.error(e);
+      UI.createAlert(
+        "warning",
+        "Failed to generate the Cost tab... skipping",
+        0,
+        "clicked"
+      );
+    }
+    // Setup Profile Tab
+    try {
+      PrinterSettings.setupProfileTab(currentPrinter);
+    } catch (e) {
+      console.error(e);
+      UI.createAlert(
+        "warning",
+        "Failed to generate the Profile tab... skipping",
+        0,
+        "clicked"
+      );
+    }
+    // Setup Power Tab
+    try {
+      PrinterSettings.setupPowerTab(currentPrinter);
+    } catch (e) {
+      console.error(e);
+      UI.createAlert(
+        "warning",
+        "Failed to generate the Power tab... skipping",
+        0,
+        "clicked"
+      );
+    }
+    // Setup Alerts Tab
+    try {
+      await PrinterSettings.setupAlertsTab(currentPrinter);
+    } catch (e) {
+      console.error(e);
+      UI.createAlert(
+        "warning",
+        "Failed to generate the Alerts tab... skipping",
+        0,
+        "clicked"
+      );
+    }
+    // Setup Gcode Script Tab
+    try {
+      PrinterSettings.setupGcodeTab(currentPrinter);
+    } catch (e) {
+      console.error(e);
+      UI.createAlert(
+        "warning",
+        "Failed to generate the Gcode Scripts tab... skipping",
+        0,
+        "clicked"
+      );
+    }
+    // Setup Other Settings Tab
+    try {
+      PrinterSettings.setupOtherSettingsTab(currentPrinter);
+    } catch (e) {
+      console.error(e);
+      UI.createAlert(
+        "warning",
+        "Failed to generate the Other Settings tab... skipping",
+        0,
+        "clicked"
+      );
+    }
+    // Setup Save Settings button
+    PrinterSettings.setupSaveButton(currentPrinter);
+
+    // Apply Stats
+    try {
+      PrinterSettings.updateStateElements(currentPrinter);
+    } catch (e) {
+      console.error(e);
+      UI.createAlert(
+        "danger",
+        `Failed to generate the update the state... please log a bug at github: ${e}`,
+        0,
+        "clicked"
+      );
     }
   }
 }
