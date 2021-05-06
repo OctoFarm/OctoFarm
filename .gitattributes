@@ -1,4 +1,5 @@
-/test export-ignore  
+/test export-ignore
+/server_2x export-ignore
 app-test.js export-ignore
 gulpfile.js export-ignore
 babel.config.js export-ignore

@@ -1,14 +1,12 @@
+"use strict";
+
+const _ = require("lodash");
+const Logger = require("../logger.js");
 const Spools = require("../../models/Filament.js");
 const Profiles = require("../../models/Profiles.js");
-
-const Logger = require("../logger.js");
+const { PrinterClean } = require("./printerClean.js");
 
 const logger = new Logger("OctoFarm-InformationCleaning");
-const printerClean = require("./printerClean.js");
-
-const { PrinterClean } = printerClean;
-const _ = require("lodash");
-
 let spoolsClean = [];
 let profilesClean = [];
 let statisticsClean = [];
@@ -17,7 +15,6 @@ let dropDownList = {
   normalDropDown: [],
   historyDropDown: [],
 };
-const materialList = [];
 
 class FilamentClean {
   static getSpools() {
@@ -76,7 +73,7 @@ class FilamentClean {
         tempOffset: spools[sp].spools.tempOffset,
         printerAssignment: await FilamentClean.getPrinterAssignment(
           spools[sp]._id,
-          farmPrinters
+          farmPrinters,
         ),
         fmID: spools[sp].spools.fmID,
       };
@@ -89,14 +86,14 @@ class FilamentClean {
     const statistics = await FilamentClean.createStatistics(
       spoolsArray,
       profilesArray,
-      selectedFilamentList
+      selectedFilamentList,
     );
     statisticsClean = statistics;
     await FilamentClean.dropDownList(
       spools,
       profiles,
       filamentManager,
-      selectedFilamentList
+      selectedFilamentList,
     );
     logger.info("Filament information cleaned and ready for consumption...");
   }
@@ -283,6 +280,7 @@ class FilamentClean {
     return assignments;
   }
 }
+
 FilamentClean.start();
 module.exports = {
   FilamentClean,

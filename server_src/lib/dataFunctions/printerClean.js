@@ -1,120 +1,39 @@
+"use strict";
+
+const { checkNested, checkNestedIndex } = require("../utils/array.util");
+const {
+  getDefaultDashboardStatisticsObject,
+  getEmptyHeatmap,
+  getEmptyToolTemperatureArray,
+  getEmptyOperationsObject,
+  ALL_MONTHS,
+} = require("../providers/cleaner.constants");
+const { getHistoryCache } = require("../../cache/history.cache");
 const _ = require("lodash");
-
-const jobClean = require("./jobClean.js");
-
-const { JobClean } = jobClean;
+const { JobClean } = require("./jobClean.js");
 const fileClean = require("./fileClean.js");
-
 const { FileClean } = fileClean;
-const historyClean = require("./historyClean.js");
-
-const { HistoryClean } = historyClean;
-
 const FarmStatistics = require("../../models/FarmStatistics.js");
-
-const RoomData = require("../../models/roomData.js");
-const PrinterGroup = require("../../models/PrinterGroup.js");
-
+const RoomData = require("../../models/RoomData.js");
 const ErrorLogs = require("../../models/ErrorLog.js");
-
 const TempHistory = require("../../models/TempHistory.js");
-
-const printerTicker = require("../../runners/printerTicker.js");
-
-const { PrinterTicker } = printerTicker;
+const { PrinterTicker } = require("../../runners/printerTicker.js");
 
 const Logger = require("../logger.js");
 const logger = new Logger("OctoFarm-InformationCleaning");
 
-
-const currentOperations = {
-  operations: [],
-  count: {
-    printerCount: 0,
-    complete: 0,
-    offline: 0,
-    active: 0,
-    idle: 0,
-    disconnected: 0,
-    farmProgress: 0,
-    farmProgressColour: "danger",
-  },
-};
-const dashboardStatistics = {
-  currentUtilisation: {},
-  currentStatus: {},
-  timeEstimates: {},
-  farmUtilisation: {},
-  printerHeatMaps: {},
-  utilisationGraph: {},
-  temperatureGraph: {},
-  currentIAQ: null,
-  currentTemperature: null,
-  currentPressure: null,
-  currentHumidity: null,
-};
+const currentOperations = getEmptyOperationsObject();
+const dashboardStatistics = getDefaultDashboardStatisticsObject();
+let heatMap = getEmptyHeatmap();
+const currentHistoryTemp = getEmptyToolTemperatureArray();
 let printersInformation = [];
-
 const currentLogs = [];
 const previousLogs = [];
-
 let farmStats = null;
-let heatMap = [
-  {
-    name: "Completed",
-    data: [],
-  },
-  {
-    name: "Active",
-    data: [],
-  },
-  {
-    name: "Idle",
-    data: [],
-  },
-  {
-    name: "Offline",
-    data: [],
-  },
-  {
-    name: "Disconnected",
-    data: [],
-  },
-];
-const currentHistoryTemp = [
-  {
-    name: "Actual Tool",
-    data: [],
-  },
-  {
-    name: "Target Tool",
-    data: [],
-  },
-  {
-    name: "Actual Bed",
-    data: [],
-  },
-  {
-    name: "Target Bed",
-    data: [],
-  },
-  {
-    name: "Actual Chamber",
-    data: [],
-  },
-  {
-    name: "Target Chamber",
-    data: [],
-  },
-];
-
 let heatMapCounter = 17280;
 const arrayTotal = [];
 const printerControlList = [];
 let printerFilamentList = [];
-
-
-
 let printerConnectionLogs = [];
 
 let fmToggle = false;
@@ -129,6 +48,7 @@ class PrinterClean {
       printersInformation = [];
     }
   }
+
   static returnPrinterLogs(sortIndex) {
     if (typeof sortIndex !== "undefined") {
       return printerConnectionLogs[sortIndex];
@@ -136,51 +56,59 @@ class PrinterClean {
       return printerConnectionLogs;
     }
   }
+
+  /**
+   * @deprecated Use cache/printer.cache.js instead
+   * @returns {[]}
+   */
   static returnPrintersInformation() {
     return printersInformation;
   }
 
+  /**
+   * @deprecated Use cache/printer.cache.js instead
+   * @returns {[]}
+   */
   static returnPrinterControlList() {
     return printerControlList;
   }
 
+  /**
+   * @deprecated Use cache/printer.cache.js instead
+   * @returns {[]}
+   */
   static returnFilamentList() {
     return printerFilamentList;
   }
 
+  /**
+   * @deprecated Use cache/printer.cache.js instead
+   * @returns {{operations: [], count: {offline: number, disconnected: number, farmProgressColour: string, printerCount: number, idle: number, farmProgress: number, active: number, complete: number}}|{operations: [], count: {offline: number, disconnected: number, farmProgressColour: string, printerCount: number, idle: number, farmProgress: number, active: number, complete: number}}}
+   */
   static returnCurrentOperations() {
     return currentOperations;
   }
 
+  /**
+   * @deprecated Use cache/printer.cache.js instead
+   * @returns {{printerHeatMaps: {}, currentPressure: null, timeEstimates: {}, farmUtilisation: {}, currentTemperature: null, currentUtilisation: {}, utilisationGraph: {}, currentStatus: {}, currentIAQ: null, currentHumidity: null, temperatureGraph: {}}}
+   */
   static returnDashboardStatistics() {
     return dashboardStatistics;
   }
-  static checkNested(nameKey, myArray) {
-    try {
-      for (var i = 0; i < myArray.length; i++) {
-        if (myArray[i].name === nameKey) {
-          return myArray[i];
-        }
-      }
-    } catch (e) {
-      logger.error("Couldn't check nested....", JSON.stringify(e));
-    }
+
+  static sumValuesGroupByDate(input) {
+    const dates = {};
+    input.forEach((dv) => (dates[dv.x] = (dates[dv.x] || 0) + dv.y));
+    return Object.keys(dates).map((date) => ({
+      x: new Date(date),
+      y: dates[date],
+    }));
   }
-  static checkNestedIndex(nameKey, myArray) {
-    try {
-      for (var i = 0; i < myArray.length; i++) {
-        if (myArray[i].name === nameKey) {
-          return i;
-        }
-      }
-    } catch (e) {
-      logger.error("Couldn't check nested index...", JSON.stringify(e));
-    }
-  }
+
   static async generatePrinterStatistics(id) {
-    let currentHistory = JSON.parse(
-      JSON.stringify(await HistoryClean.returnHistory())
-    );
+    const historyCache = getHistoryCache().historyClean;
+    let currentHistory = JSON.parse(JSON.stringify(historyCache));
     let currentPrinters = printersInformation;
     const i = _.findIndex(currentPrinters, function (o) {
       return JSON.stringify(o._id) === JSON.stringify(id);
@@ -193,7 +121,7 @@ class PrinterClean {
     let dateDifference = parseInt(todaysDate - dateAdded);
     let sevenDaysAgo = new Date(todaysDate.getTime() - 7 * 24 * 60 * 60 * 1000);
     let ninetyDaysAgo = new Date(
-      todaysDate.getTime() - 90 * 24 * 60 * 60 * 1000
+      todaysDate.getTime() - 90 * 24 * 60 * 60 * 1000,
     );
     // Filter down the history arrays for total/daily/weekly
     let historyDaily = [];
@@ -239,35 +167,21 @@ class PrinterClean {
     const totalTime =
       printer.currentActive + printer.currentIdle + printer.currentOffline;
     printerStatistics.printerUtilisation.push(
-      (printer.currentActive / totalTime) * 100
+      (printer.currentActive / totalTime) * 100,
     );
     printerStatistics.printerUtilisation.push(
-      (printer.currentIdle / totalTime) * 100
+      (printer.currentIdle / totalTime) * 100,
     );
     printerStatistics.printerUtilisation.push(
-      (printer.currentOffline / totalTime) * 100
+      (printer.currentOffline / totalTime) * 100,
     );
 
     currentHistory.forEach((h) => {
       // Parse the date from history....
       let dateSplit = h.endDate.split(" ");
-      const months = [
-        "Jan",
-        "Feb",
-        "Mar",
-        "Apr",
-        "May",
-        "Jun",
-        "Jul",
-        "Aug",
-        "Sep",
-        "Oct",
-        "Nov",
-        "Dec",
-      ];
-      let month = months.indexOf(dateSplit[1]);
+      let month = ALL_MONTHS.indexOf(dateSplit[1]);
       let dateString = `${parseInt(dateSplit[3])}-${month + 1}-${parseInt(
-        dateSplit[2]
+        dateSplit[2],
       )}`;
       let dateParse = new Date(dateString);
       if (h.printer === printerStatistics.printerName) {
@@ -295,27 +209,27 @@ class PrinterClean {
         if (dateParse.getTime() > sevenDaysAgo.getTime()) {
           historyWeekly.push(h);
         }
-        let checkNested = this.checkNested(
+        let checkNested = checkNested(
           "Success",
-          printerStatistics.historyByDay
+          printerStatistics.historyByDay,
         );
         //
         if (typeof checkNested !== "undefined") {
           let checkNestedIndexHistoryRates = null;
           if (h.state.includes("success")) {
-            checkNestedIndexHistoryRates = this.checkNestedIndex(
+            checkNestedIndexHistoryRates = checkNestedIndex(
               "Success",
-              printerStatistics.historyByDay
+              printerStatistics.historyByDay,
             );
           } else if (h.state.includes("warning")) {
-            checkNestedIndexHistoryRates = this.checkNestedIndex(
+            checkNestedIndexHistoryRates = checkNestedIndex(
               "Cancelled",
-              printerStatistics.historyByDay
+              printerStatistics.historyByDay,
             );
           } else if (h.state.includes("danger")) {
-            checkNestedIndexHistoryRates = this.checkNestedIndex(
+            checkNestedIndexHistoryRates = checkNestedIndex(
               "Failed",
-              printerStatistics.historyByDay
+              printerStatistics.historyByDay,
             );
           } else {
             return;
@@ -408,70 +322,27 @@ class PrinterClean {
         ) {
           printerStatistics[key] = printerStatistics[key].reduce(
             (a, b) => a + b,
-            0
+            0,
           );
         }
       }
     });
-    function convertIncremental(input) {
-      try {
-        let usageWeightCalc = 0;
-        let newObj = [];
-        for (let i = 0; i < input.length; i++) {
-          if (typeof newObj[i - 1] !== "undefined") {
-            usageWeightCalc = newObj[i - 1].y + input[i].y;
-          } else {
-            usageWeightCalc = input[i].y;
-          }
-          newObj.push({ x: input[i].x, y: usageWeightCalc });
-        }
-        return newObj;
-      } catch (e) {
-        logger.error(e, "ERROR with convert incremental");
-      }
-    }
-    function sumValuesGroupByDate(input) {
-      try {
-        var dates = {};
-        input.forEach((dv) => (dates[dv.x] = (dates[dv.x] || 0) + dv.y));
-        return Object.keys(dates).map((date) => ({
-          x: new Date(date),
-          y: dates[date],
-        }));
-      } catch (e) {
-        logger.error(e, "Error with summing group values...");
-      }
-    }
+
     printerStatistics.historyByDay.forEach((usage) => {
       usage.data = sumValuesGroupByDate(usage.data);
     });
 
-    // printerStatistics.historyByDayIncremental.forEach((usage) => {
-    //   usage.data = sumValuesGroupByDate(usage.data);
-    // });
-    //
-    // printerStatistics.historyByDayIncremental.forEach((usage) => {
-    //   usage.data = convertIncremental(usage.data);
-    // });
-
     return printerStatistics;
   }
 
-  static async generate(farmPrinter, filamentManager) {
+  static generate(farmPrinter, filamentManager) {
     fmToggle = filamentManager;
     try {
       if (typeof farmPrinter.systemChecks !== "undefined") {
         farmPrinter.systemChecks.cleaning.information.status = "warning";
       }
-      // Clearing out in prep for 1.1.11
-      const printerGroups = [];
-      // // Append the groups by JOIN
-      // const printerGroups = await PrinterGroup.find({
-      //     printers: farmPrinter._id,
-      // }).exec();
 
       const sortedPrinter = {
-        // eslint-disable-next-line no-underscore-dangle
         _id: farmPrinter._id,
         sortIndex: farmPrinter.sortIndex,
         hostState: {
@@ -489,7 +360,7 @@ class PrinterClean {
           desc: farmPrinter.webSocketDescription,
         },
         group: farmPrinter.group,
-        groups: printerGroups,
+        groups: [], // TODO unfinished feature
         printerURL: farmPrinter.printerURL,
         cameraURL: farmPrinter.camURL,
         apikey: farmPrinter.apikey,
@@ -516,23 +387,17 @@ class PrinterClean {
       ) {
         sortedPrinter.resends = farmPrinter.resends;
       }
-
-      sortedPrinter.tools = await PrinterClean.sortTemps(farmPrinter.temps);
-      sortedPrinter.currentJob = await JobClean.returnJob(
-        farmPrinter.sortIndex
-      );
+      sortedPrinter.tools = PrinterClean.sortTemps(farmPrinter.temps);
+      sortedPrinter.currentJob = JobClean.returnJob(farmPrinter.sortIndex);
       sortedPrinter.selectedFilament = farmPrinter.selectedFilament;
 
-      sortedPrinter.fileList = await FileClean.returnFiles(
-        farmPrinter.sortIndex
-      );
-
-      sortedPrinter.currentProfile = await PrinterClean.sortProfile(
+      sortedPrinter.fileList = FileClean.returnFiles(farmPrinter.sortIndex);
+      sortedPrinter.currentProfile = PrinterClean.sortProfile(
         farmPrinter.profiles,
-        farmPrinter.current
+        farmPrinter.current,
       );
-      sortedPrinter.currentConnection = await PrinterClean.sortConnection(
-        farmPrinter.current
+      sortedPrinter.currentConnection = PrinterClean.sortConnection(
+        farmPrinter.current,
       );
       sortedPrinter.connectionOptions = farmPrinter.options;
 
@@ -543,39 +408,35 @@ class PrinterClean {
         sortedPrinter.connectionOptions.baudrates.unshift(0);
         sortedPrinter.connectionOptions.ports.unshift("AUTO");
       }
-      sortedPrinter.terminal = await PrinterClean.sortTerminal(
+      sortedPrinter.terminal = PrinterClean.sortTerminal(
         farmPrinter.sortIndex,
-        farmPrinter.logs
+        farmPrinter.logs,
       );
       sortedPrinter.costSettings = farmPrinter.costSettings;
       sortedPrinter.powerSettings = farmPrinter.powerSettings;
-      sortedPrinter.gcodeScripts = await PrinterClean.sortGCODE(
-        farmPrinter.settingsScripts
+      sortedPrinter.gcodeScripts = PrinterClean.sortGCODE(
+        farmPrinter.settingsScripts,
       );
-      sortedPrinter.otherSettings = await PrinterClean.sortOtherSettings(
+      sortedPrinter.otherSettings = PrinterClean.sortOtherSettings(
         farmPrinter.tempTriggers,
         farmPrinter.settingsWebcam,
-        farmPrinter.settingsServer
+        farmPrinter.settingsServer,
       );
-      sortedPrinter.printerName = await PrinterClean.grabPrinterName(
-        farmPrinter
-      );
+      sortedPrinter.printerName = PrinterClean.grabPrinterName(farmPrinter);
       sortedPrinter.storage = farmPrinter.storage;
       sortedPrinter.tempHistory = farmPrinter.tempHistory;
 
       if (typeof farmPrinter.octoPi !== "undefined") {
         sortedPrinter.octoPi = farmPrinter.octoPi;
       }
-
       sortedPrinter.connectionLog =
         printerConnectionLogs[farmPrinter.sortIndex];
       if (typeof farmPrinter.klipperFirmwareVersion !== "undefined") {
         sortedPrinter.klipperFirmwareVersion = farmPrinter.klipperFirmwareVersion.substring(
           0,
-          6
+          6,
         );
       }
-
       const printerIndex = _.findIndex(printerControlList, function (o) {
         return o.printerName === sortedPrinter.printerName;
       });
@@ -596,7 +457,6 @@ class PrinterClean {
         farmPrinter.systemChecks.cleaning.information.status = "success";
         farmPrinter.systemChecks.cleaning.information.date = new Date();
       }
-
       printersInformation[farmPrinter.sortIndex] = sortedPrinter;
     } catch (e) {
       logger.error(e);
@@ -747,6 +607,7 @@ class PrinterClean {
       currentOctoPrintLogs,
     };
   }
+
   static async createPrinterList(farmPrinters, filamentManager) {
     const printerList = ['<option value="0">Not Assigned</option>'];
     farmPrinters.forEach((printer) => {
@@ -843,7 +704,7 @@ class PrinterClean {
     return null;
   }
 
-  static async sortProfile(profile, current) {
+  static sortProfile(profile, current) {
     if (typeof profile !== "undefined") {
       if (typeof current !== "undefined") {
         return profile[current.printerProfile];
@@ -853,7 +714,7 @@ class PrinterClean {
     }
   }
 
-  static async sortTemps(temps) {
+  static sortTemps(temps) {
     if (typeof temps !== "undefined") {
       return temps;
     }
@@ -944,7 +805,7 @@ class PrinterClean {
       const actProg = progress.reduce((a, b) => a + b, 0);
 
       currentOperations.count.farmProgress = Math.floor(
-        actProg / progress.length
+        actProg / progress.length,
       );
 
       if (isNaN(currentOperations.count.farmProgress)) {
@@ -963,7 +824,7 @@ class PrinterClean {
           currentOperations.count.active,
           currentOperations.count.offline,
           currentOperations.count.idle,
-          currentOperations.count.disconnected
+          currentOperations.count.disconnected,
         );
 
         heatMapCounter = 0;
@@ -981,7 +842,7 @@ class PrinterClean {
       currentOperations.operations = _.orderBy(
         operations,
         ["progress"],
-        ["desc"]
+        ["desc"],
       );
     } catch (err) {
       logger.error(`Current Operations issue: ${err}`);
@@ -989,7 +850,7 @@ class PrinterClean {
   }
 
   static async statisticsStart() {
-    const history = await HistoryClean.returnStatistics();
+    const historyStats = getHistoryCache().statisticsClean;
 
     dashboardStatistics.currentUtilisation = [
       {
@@ -1062,7 +923,7 @@ class PrinterClean {
             colour = "offline";
           }
           heatStatus.push(
-            `<div title="${printer.printerName}: ${status}" class="bg-${colour} heatMap"></div>`
+            `<div title="${printer.printerName}: ${status}" class="bg-${colour} heatMap"></div>`,
           );
           let tools = null;
           if (
@@ -1112,7 +973,7 @@ class PrinterClean {
                     }°C `;
                     arrayOtherActual.push(printer.tools[0][keys[k]].actual);
                     arrayGlobalChamberTempActual.push(
-                      printer.tools[0][keys[k]].actual
+                      printer.tools[0][keys[k]].actual,
                     );
                   } else {
                     actual = `Chamber A: ${0}°C`;
@@ -1127,7 +988,7 @@ class PrinterClean {
                     }°C `;
                     arrayOtherTarget.push(printer.tools[0][keys[k]].target);
                     arrayGlobalChamberTempTarget.push(
-                      printer.tools[0][keys[k]].target
+                      printer.tools[0][keys[k]].target,
                     );
                   } else {
                     target = `Chamber T: ${0}°C`;
@@ -1149,7 +1010,7 @@ class PrinterClean {
                     actual = `Bed A: ${printer.tools[0][keys[k]].actual}°C `;
                     arrayOtherActual.push(printer.tools[0][keys[k]].actual);
                     arrayGlobalBedTempActual.push(
-                      printer.tools[0][keys[k]].actual
+                      printer.tools[0][keys[k]].actual,
                     );
                   } else {
                     actual = `Bed A: ${0}°C`;
@@ -1162,7 +1023,7 @@ class PrinterClean {
                     target = `Bed T: ${printer.tools[0][keys[k]].target}°C `;
                     arrayOtherTarget.push(printer.tools[0][keys[k]].target);
                     arrayGlobalBedTempTarget.push(
-                      printer.tools[0][keys[k]].target
+                      printer.tools[0][keys[k]].target,
                     );
                   } else {
                     target = `Bed T: ${0}°C`;
@@ -1183,7 +1044,7 @@ class PrinterClean {
                     }°C `;
                     arrayToolActual.push(printer.tools[0][keys[k]].actual);
                     arrayGlobalToolTempActual.push(
-                      printer.tools[0][keys[k]].actual
+                      printer.tools[0][keys[k]].actual,
                     );
                   } else {
                     actual = `Tool ${toolNumber} A: 0°C`;
@@ -1198,7 +1059,7 @@ class PrinterClean {
                     }°C `;
                     arrayToolTarget.push(printer.tools[0][keys[k]].target);
                     arrayGlobalToolTempTarget.push(
-                      printer.tools[0][keys[k]].target
+                      printer.tools[0][keys[k]].target,
                     );
                   } else {
                     target = `Tool ${toolNumber} T: 0°C`;
@@ -1214,7 +1075,7 @@ class PrinterClean {
             const totalToolTarget = arrayToolTarget.reduce((a, b) => a + b, 0);
             const totalOtherActual = arrayOtherActual.reduce(
               (a, b) => a + b,
-              0
+              0,
             );
             const totalOtherTarget = arrayToolActual.reduce((a, b) => a + b, 0);
             let actualString = '<div class="d-flex flex-wrap"><div title="';
@@ -1226,7 +1087,7 @@ class PrinterClean {
               totalToolTarget,
               totalToolActual,
               printer.otherSettings.temperatureTriggers.heatingVariation,
-              printer.otherSettings.temperatureTriggers.coolDownf
+              printer.otherSettings.temperatureTriggers.coolDownf,
             )} heatMapLeft"></div>`;
             actualString += '<div title="';
             for (let r = 0; r < rightString.length; r++) {
@@ -1237,7 +1098,7 @@ class PrinterClean {
               totalOtherTarget,
               totalOtherActual,
               printer.otherSettings.temperatureTriggers.heatingVariation,
-              printer.otherSettings.temperatureTriggers.coolDown
+              printer.otherSettings.temperatureTriggers.coolDown,
             )} heatMapLeft"></div></div>`;
             heatTemps.push(actualString);
           }
@@ -1252,8 +1113,8 @@ class PrinterClean {
             `<div title="${
               printer.printerName
             }: ${progress}%" class="bg-${PrinterClean.getProgressColour(
-              progress
-            )} heatMap"></div>`
+              progress,
+            )} heatMap"></div>`,
           );
         }
         const printerUptime =
@@ -1261,10 +1122,10 @@ class PrinterClean {
         const percentUp = (printer.currentActive / printerUptime) * 100;
         heatUtilisation.push(
           `<div title="${printer.printerName}: ${percentUp.toFixed(
-            0
+            0,
           )}" class="bg-${PrinterClean.getProgressColour(
-            percentUp
-          )} heatMap"></div>`
+            percentUp,
+          )} heatMap"></div>`,
         );
       }
     }
@@ -1272,27 +1133,27 @@ class PrinterClean {
     timeStamp = timeStamp.getTime();
     const totalGlobalToolTempActual = arrayGlobalToolTempActual.reduce(
       (a, b) => a + b,
-      0
+      0,
     );
     const totalGlobalToolTempTarget = arrayGlobalToolTempTarget.reduce(
       (a, b) => a + b,
-      0
+      0,
     );
     const totalGlobalBedTempActual = arrayGlobalBedTempActual.reduce(
       (a, b) => a + b,
-      0
+      0,
     );
     const totalGlobalBedTempTarget = arrayGlobalBedTempTarget.reduce(
       (a, b) => a + b,
-      0
+      0,
     );
     const totalGlobalChamberTempActual = arrayGlobalChamberTempActual.reduce(
       (a, b) => a + b,
-      0
+      0,
     );
     const totalGlobalChamberTempTarget = arrayGlobalChamberTempTarget.reduce(
       (a, b) => a + b,
-      0
+      0,
     );
     const totalGlobalTemp =
       totalGlobalToolTempActual +
@@ -1358,9 +1219,9 @@ class PrinterClean {
     const activeHours = arrayActive.reduce((a, b) => a + b, 0);
     const idleHours = arrayIdle.reduce((a, b) => a + b, 0);
     const offlineHours = arrayOffline.reduce((a, b) => a + b, 0);
-    const failedHours = history.currentFailed;
+    const failedHours = historyStats.currentFailed;
     const totalHours =
-      history.currentFailed + activeHours + idleHours + offlineHours;
+      historyStats.currentFailed + activeHours + idleHours + offlineHours;
     const activePercent = (activeHours / totalHours) * 100;
     const offlinePercent = (offlineHours / totalHours) * 100;
     const idlePercent = (idleHours / totalHours) * 100;
@@ -1418,7 +1279,7 @@ class PrinterClean {
                 y: enviromentalData[i].temperature.toFixed(2),
               });
               dashboardStatistics.currentTemperature = enviromentalData[0].temperature.toFixed(
-                2
+                2,
               );
             } else {
               currentEnviromentalData[0].data.push({
@@ -1451,7 +1312,7 @@ class PrinterClean {
                 y: enviromentalData[i].pressure.toFixed(0),
               });
               dashboardStatistics.currentPressure = enviromentalData[0].pressure.toFixed(
-                0
+                0,
               );
             } else {
               currentEnviromentalData[2].data.push({
@@ -1468,7 +1329,7 @@ class PrinterClean {
                 y: enviromentalData[i].iaq.toFixed(0),
               });
               dashboardStatistics.currentIAQ = enviromentalData[0].iaq.toFixed(
-                0
+                0,
               );
             } else {
               currentEnviromentalData[3].data.push({
