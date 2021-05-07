@@ -12,7 +12,7 @@
     "stop:delete": "pm2 delete OctoFarm",
     "prerelease": "gulp",
     "release": "git archive -o octofarm.zip HEAD",
-    "package": "pkg --out-path package package.json",
+    "package": "pkg --compress --out-path package package.json",
     "dev": "nodemon ./app.js",
     "test": "jest --forceExit"
   },
