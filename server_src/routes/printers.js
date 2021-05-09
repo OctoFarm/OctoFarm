@@ -105,7 +105,7 @@ router.post("/updateSettings", ensureAuthenticated, async (req, res) => {
   res.sendStatus(200);
   res.send({ status: updateSettings.status, printer: updateSettings.printer });
 });
-router.get("/killPowerSettings/:id", ensureAuthenticated, async (req, res) => {
+router.post("/killPowerSettings/:id", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const printerID = req.params.id;
   const updateSettings = await Runner.killPowerSettings(printerID);

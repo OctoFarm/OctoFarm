@@ -776,6 +776,28 @@ class PrinterSettings {
       document.getElementById("psPowerStateURL").placeholder =
         currentPrinter.powerSettings.powerStatusURL;
     }
+    document
+      .getElementById("resetPowerFields")
+      .addEventListener("click", async () => {
+        try {
+          let post = await OctoFarmClient.post(
+            "printers/killPowerSettings/" + currentPrinter?._id
+          );
+          UI.createAlert(
+            "success",
+            "Successfully cleared Power Settings",
+            3000,
+            "clicked"
+          );
+        } catch (e) {
+          UI.createAlert(
+            "error",
+            `Unable to clear power settings... Error: ${e}`,
+            3000,
+            "clicked"
+          );
+        }
+      });
   }
 
   static async setupAlertsTab(currentPrinter) {
