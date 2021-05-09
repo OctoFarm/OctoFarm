@@ -9,7 +9,6 @@ module.exports = {
     'plugin:vue/strongly-recommended',
     '@vue/airbnb',
   ],
-
   parserOptions: {
     ecmaVersion: 2020,
     parser: 'babel-eslint',
