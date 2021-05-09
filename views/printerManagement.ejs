@@ -653,6 +653,7 @@
                                     </div>
                                     <h5>Serial Defaults</h5>
                                     <hr>
+                                    <p id="portNotAvailableMessage"></p>
                                     <p>Set OctoPrints default serial connection settings. These will be saved to your
                                         OctoPrint instance so it will always use these when connecting to your
                                         printer.</p>
@@ -674,14 +675,17 @@
                                             <h5>Current Status</h5>
                                             <hr>
                                             <button id="psHost" type="button" class="btn btn-warning mb-1 btn-block"
-                                                    href="#" target="_blank" disabled>Checking..
+                                                    href="#" target="_blank" disabled> <i
+                                                        class="fas fa-spinner fa-spin"></i> Checking..
                                             </button>
                                             <button id="psStatus" type="button" class="btn btn-warning mb-1 btn-block"
-                                                    href="#" target="_blank" disabled>Checking..
+                                                    href="#" target="_blank" disabled> <i
+                                                        class="fas fa-spinner fa-spin"></i> Checking..
                                             </button>
                                             <button id="psWebSocket" type="button"
                                                     class="btn btn-warning mb-1 btn-block" href="#" target="_blank"
-                                                    disabled>Checking..
+                                                    disabled> <i
+                                                        class="fas fa-spinner fa-spin"></i> Checking..
                                             </button>
                                         </div>
                                         <div class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-4">

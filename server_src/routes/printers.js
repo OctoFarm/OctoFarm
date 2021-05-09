@@ -102,7 +102,7 @@ router.post("/updateSettings", ensureAuthenticated, async (req, res) => {
   const settings = req.body;
   logger.info("Update printers request: ", settings);
   const updateSettings = await Runner.updateSettings(settings);
-
+  res.sendStatus(200);
   res.send({ status: updateSettings.status, printer: updateSettings.printer });
 });
 router.get("/killPowerSettings/:id", ensureAuthenticated, async (req, res) => {
