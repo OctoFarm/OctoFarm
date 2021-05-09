@@ -98,11 +98,9 @@ router.post("/feedChange", ensureAuthenticated, async (req, res) => {
 });
 router.post("/updateSettings", ensureAuthenticated, async (req, res) => {
   // Check required fields
-
   const settings = req.body;
   logger.info("Update printers request: ", settings);
   const updateSettings = await Runner.updateSettings(settings);
-  res.sendStatus(200);
   res.send({ status: updateSettings.status, printer: updateSettings.printer });
 });
 router.post("/killPowerSettings/:id", ensureAuthenticated, async (req, res) => {

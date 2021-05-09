@@ -1,3 +1,4 @@
+/* eslint-disable quotes */
 import OctoFarmClient from "../octofarm_client.js";
 import UI from "../functions/ui.js";
 import Calc from "../functions/calc.js";
@@ -260,10 +261,10 @@ class PrinterSettings {
       });
       // If port not available then we need to add the port preference to the list.
       if (!portAvailable) {
-        this.setPortAvailability(serialPortDropDown, false);
+        this.setPortAvailability(serialPortDropDown, portAvailable);
         serialPortDropDown.insertAdjacentHTML(
           "beforeend",
-          `<option value="portNotAvailable">${currentPrinter.connectionOptions.portPreference}</option>`
+          `<option value="${currentPrinter.connectionOptions.portPreference}">${currentPrinter.connectionOptions.portPreference}</option>`
         );
       }
       if (!!currentPrinter.connectionOptions.portPreference) {
@@ -290,9 +291,7 @@ class PrinterSettings {
       } else {
         baudrateDropdown.value = 0;
       }
-      if (!portAvailable) {
-        serialPortDropDown.value = "portNotAvailable";
-      } else if (!!currentPrinter.connectionOptions.portPreference) {
+      if (!!currentPrinter.connectionOptions.portPreference) {
         serialPortDropDown.value =
           currentPrinter.connectionOptions.portPreference;
       } else {
@@ -358,9 +357,9 @@ class PrinterSettings {
                     </small>
                   </div>
                   <div class="form-group">
-                    <label for="psPurchasePrice">Estimated Life Span</label>
+                    <label for="psEstimatedLifespan">Estimated Life Span</label>
                          <div class="input-group mb-2">
-                           <input type="number" class="form-control" id="psPurchasePrice" placeholder="${currentPrinter.costSettings.estimateLifespan}" step="0.01">
+                           <input type="number" class="form-control" id="psEstimatedLifespan" placeholder="${currentPrinter.costSettings.estimateLifespan}" step="0.01">
                               <div class="input-group-append">
                                    <div class="input-group-text">hours</div>
                               </div>
@@ -477,7 +476,7 @@ class PrinterSettings {
             <div class="input-group-prepend">
               <span class="input-group-text">Extruder Count:</span>
             </div>
-            <input id="psExtruderCount" type="number" class="form-control" placeholder="${currentPrinter?.currentProfile?.extruder?.packets}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
+            <input id="psExtruderCount" type="number" class="form-control" placeholder="${currentPrinter?.currentProfile?.extruder?.count}" aria-label="Username" aria-describedby="basic-addon1" step="1" min="1">
           </div>
            <div class="input-group mb-3">
             <div class="input-group-prepend">
@@ -756,7 +755,7 @@ class PrinterSettings {
       document.getElementById("psSystemShutdown").placeholder = systemShutdown;
     }
     if (
-      !currentPrinter.powerSettings != null &&
+      currentPrinter.powerSettings &&
       !_.isEmpty(currentPrinter.powerSettings)
     ) {
       document.getElementById("psPowerOnCommand").placeholder =
@@ -780,7 +779,7 @@ class PrinterSettings {
       .getElementById("resetPowerFields")
       .addEventListener("click", async () => {
         try {
-          let post = await OctoFarmClient.post(
+          await OctoFarmClient.post(
             "printers/killPowerSettings/" + currentPrinter?._id
           );
           UI.createAlert(
@@ -837,7 +836,7 @@ class PrinterSettings {
               <select class="custom-select" id="triggerPrinter-${s._id}" disabled>
                </select>
                      </td>
-              <td>${s.sLocation} </td>
+              <td>${s.scriptLocation} </td>
               <td>${s.message}</td>
             </tr>
 
@@ -992,15 +991,15 @@ class PrinterSettings {
     document.getElementById("tempTriggers").innerHTML = `
          <div class="form-group">
             <label for="headtingVariation">Heating Variation</label>
-            <input type="number" class="form-control" id="psHeadtingVariation" placeholder="${currentPrinter.otherSettings.temperatureTriggers.heatingVariation}" step="0.01">
-            <small id="passwordHelpBlock" class="form-text text-muted">
+            <input type="number" class="form-control" id="psHeatingVariation" placeholder="${currentPrinter.otherSettings.temperatureTriggers.heatingVariation}" step="0.01">
+            <small class="form-text text-muted">
                 What temperature variation will trigger orange warning on the temperature display when a printer is Active. <code>Default is 1°C</code>
             </small>
           </div>
           <div class="form-group">
             <label for="coolDown">Cool Down Trigger</label>
             <input type="number" class="form-control" id="psCoolDown" placeholder="${currentPrinter.otherSettings.temperatureTriggers.coolDown}" step="0.01">
-            <small id="passwordHelpBlock" class="form-text text-muted">
+            <small class="form-text text-muted">
                 What temperature limit will trigger the blue status on the temperature display when a printer is Complete and cooling down. <code>Default is 30°C</code>
             </small>
           </div>
@@ -1008,76 +1007,72 @@ class PrinterSettings {
   }
 
   static setupSaveButton(currentPrinter) {
+    console.log(currentPrinter);
     pageElements.menu.printerMenuFooter.innerHTML = "";
-    pageElements.menu.printerMenuFooter.insertAdjacentHTML(
-      "beforeend",
-      '<button type="button" class="btn btn-success btn-block" id="savePrinterSettings">Save</button>'
-    );
-    try {
-      document
-        .getElementById("savePrinterSettings")
-        .addEventListener("click", async (e) => {
-          console.log(e);
-          console.log("GET PAGE VALUES");
-          const printerSettingsValues = this.getPageValues(currentPrinter);
-          console.log("WHY WON'T YOU WORK");
-          console.log(printerSettingsValues);
-          try {
-            let updateSettings = await OctoFarmClient.post(
-              "printers/updateSettings",
-              printerSettingsValues
-            );
-            console.log(updateSettings);
-            if (updateSettings?.status.profile === 200) {
-              UI.createAlert(
-                "success",
-                `${currentPrinter.printerName}: profile successfully updated`,
-                3000,
-                "clicked"
-              );
-            } else if (updateSettings?.status.profile === 900) {
-              // Skip as no changes we're made
-            } else {
-              UI.createAlert(
-                "error",
-                `${currentPrinter.printerName}: profile failed to updated`,
-                3000,
-                "clicked"
-              );
-            }
-            if (updateSettings?.status.settings === 200) {
-              UI.createAlert(
-                "success",
-                `${currentPrinter.printerName}: settings successfully updated`,
-                3000,
-                "clicked"
-              );
-            } else if (updateSettings?.status.profile === 900) {
-              // Skip as no changes we're made
-            } else {
-              UI.createAlert(
-                "error",
-                `${currentPrinter.printerName}: settings failed to updated`,
-                3000,
-                "clicked"
-              );
-            }
-          } catch (e) {
-            UI.createAlert(
-              "error",
-              `Could not update your settings... Error: ${e}`,
-              5000,
-              "clicked"
-            );
-          }
-        });
-    } catch (e) {
-      console.error(e);
-    }
+    pageElements.menu.printerMenuFooter.innerHTML =
+      '<button type="button" class="btn btn-success btn-block" id="savePrinterSettings">Save</button>';
+
+    console.log(document.getElementById("savePrinterSettings"));
+
+    document
+      .getElementById("savePrinterSettings")
+      .addEventListener("click", (e) => {
+        console.log(e);
+        console.log("FIRE");
+        //   const printerSettingsValues = this.getPageValues(currentPrinter);
+        //   try {
+        //     let updateSettings = await OctoFarmClient.post(
+        //       "printers/updateSettings",
+        //       printerSettingsValues
+        //     );
+        //     if (updateSettings?.status.profile === 200) {
+        //       UI.createAlert(
+        //         "success",
+        //         `${currentPrinter.printerName}: profile successfully updated`,
+        //         3000,
+        //         "clicked"
+        //       );
+        //     } else if (updateSettings?.status.profile === 900) {
+        //       // Skip as no changes we're made
+        //     } else {
+        //       UI.createAlert(
+        //         "error",
+        //         `${currentPrinter.printerName}: profile failed to updated`,
+        //         3000,
+        //         "clicked"
+        //       );
+        //     }
+        //     if (updateSettings?.status.settings === 200) {
+        //       UI.createAlert(
+        //         "success",
+        //         `${currentPrinter.printerName}: settings successfully updated`,
+        //         3000,
+        //         "clicked"
+        //       );
+        //     } else if (updateSettings?.status.profile === 900) {
+        //       // Skip as no changes we're made
+        //     } else {
+        //       UI.createAlert(
+        //         "error",
+        //         `${currentPrinter.printerName}: settings failed to updated`,
+        //         3000,
+        //         "clicked"
+        //       );
+        //     }
+        //   } catch (e) {
+        //     UI.createAlert(
+        //       "error",
+        //       `Could not update your settings... Error: ${e}`,
+        //       5000,
+        //       "clicked"
+        //     );
+        //   }
+      });
+    console.log(document.getElementById("savePrinterSettings"));
   }
 
   static getPageValues(currentPrinter) {
-    const newPrinterSettingsValues = {
+    let newPrinterSettingsValues = {
       state: currentPrinter.printerState.colour.category,
       printer: {
         printerName: document.getElementById("psPrinterName").value,
@@ -1214,7 +1209,7 @@ class PrinterSettings {
         flipHCamera: document.getElementById("camFlipH").checked,
         flipVCamera: document.getElementById("camFlipV").checked,
         enableTimeLapse: document.getElementById("camTimelapse").checked,
-        heatingVariation: document.getElementById("psHeadtingVariation").value,
+        heatingVariation: document.getElementById("psHeatingVariation").value,
         coolDown: document.getElementById("psCoolDown").value,
       };
     }
@@ -1227,7 +1222,13 @@ class PrinterSettings {
       serialPortDropDown.classList = "custom-select  bg-secondary text-light";
     } else {
       pageElements.connectPage.portNotAvailableMessage.innerHTML =
-        '<div class="alert alert-danger" role="alert">Your port preference is not available... Is your printer turned on?</div>';
+        '<div class="alert alert-danger" role="alert">Your port preference is not available... Is your printer turned on? ' +
+        'Please <button id="settingsPageRefreshButton" type="button" class="btn btn-danger btn-small">Click Here!</button> to refresh once the issue is rectified</div>';
+      document
+        .getElementById("settingsPageRefreshButton")
+        .addEventListener("click", () => {
+          console.log("RE");
+        });
       serialPortDropDown.classList = "custom-select bg-danger";
     }
   }
