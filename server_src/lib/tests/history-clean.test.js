@@ -143,10 +143,10 @@ describe("historyClean", function () {
       "currentFailed": 247,
       "historyByDay": [{
         data: [{
-          "x": new Date("2021-01-23T23:00:00.000Z"),
+          "x": new Date("2021-01-24T00:00:00.000Z"),
           "y": 1,
         }, {
-          "x": new Date("2021-03-25T23:00:00.000Z"),
+          "x": new Date("2021-03-26T00:00:00.000Z"),
           "y": 1,
         }],
         name: "Success"
@@ -155,33 +155,33 @@ describe("historyClean", function () {
         name: "Failed"
       }, {
         data: [{
-          "x": new Date("2021-03-25T23:00:00.000Z"),
+          "x": new Date("2021-03-26T00:00:00.000Z"),
           "y": 2,
         }],
         name: "Cancelled"
       }],
       "totalByDay": [{
         data: [{
-          "x": new Date("2021-01-23T23:00:00.000Z"),
+          "x": new Date("2021-01-24T00:00:00.000Z"),
           "y": 68.5,
         }],
         name: "PETG"
       }, {
         data: [{
-          "x": new Date("2021-03-25T23:00:00.000Z"),
+          "x": new Date("2021-03-26T00:00:00.000Z"),
           "y": 2.3499999999999996,
         }],
         name: "PLA"
       }],
       "usageOverTime": [{
         data: [{
-          "x": new Date("2021-01-23T23:00:00.000Z"),
+          "x": new Date("2021-01-24T00:00:00.000Z"),
           "y": 68.5,
         }],
         name: "PETG"
       }, {
         data: [{
-          "x": new Date("2021-03-25T23:00:00.000Z"),
+          "x": new Date("2021-03-26T00:00:00.000Z"),
           "y": 2.3499999999999996,
         }],
         name: "PLA"
@@ -279,6 +279,8 @@ describe("historyClean", function () {
  * Most of these functions below are easily tested in isolation
  */
 describe("historyClean:Static", () => {
+  let HistoryClean = require("../dataFunctions/historyClean").HistoryClean;
+
   it("assignYCumSum tolerate falsy y values and skips falsy entries", () => {
     const undefinedYInput = [
       {x: 0, y: undefined},
