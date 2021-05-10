@@ -124,7 +124,7 @@ describe("historyClean", function () {
       "mostPrintedFile": "file.gcode",
       "printerMost": "PRINTER2",
       "printerLoad": "PRINTER1",
-      "totalFilamentUsage": "376.81g / 95.56m",
+      "totalFilamentUsage": "286.66g / 95.56m",
       "averageFilamentUsage": "28.67g / 9.56m",
       "highestFilamentUsage": "68.50g / 22.42m",
       "lowestFilamentUsage": "0.00g / 0.00m",
