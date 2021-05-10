@@ -14,6 +14,10 @@ import {PrinterProfile} from "./entities/printer-profile.entity";
 import {PrinterRoomData} from "./entities/printer-room-data.entity";
 import {PrinterTempHistory} from "./entities/printer-temp-history.entity";
 import {PrinterQueryTask} from "./tasks/printer-query.task";
+import {HistoryCacheService} from "./services/history-cache.service";
+import {HistoryService} from "./services/history.service";
+import {PrinterHistory} from "./entities/printer-history.entity";
+import {HistoryCache} from "./services/history.cache";
 
 @Module({
     imports: [
@@ -21,6 +25,7 @@ import {PrinterQueryTask} from "./tasks/printer-query.task";
         TypeOrmModule.forFeature([
             Printer,
             PrinterGroup,
+            PrinterHistory,
             PrinterProfile,
             PrinterRoomData,
             PrinterTempHistory
@@ -29,11 +34,15 @@ import {PrinterQueryTask} from "./tasks/printer-query.task";
     ],
     providers: [
         PrintersService,
+        HistoryCache,
+        HistoryCacheService,
+        HistoryService,
         PrinterGroupsService,
         PrinterQueryTask
     ],
     exports: [
-        PrintersService
+        PrintersService,
+        HistoryCacheService,
     ],
     controllers: [
         PrintersController,
