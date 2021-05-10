@@ -2,7 +2,6 @@ jest.mock("../../services/history.service");
 const mockHistoryService = require("../../services/history.service");
 const {noCostSettingsMessage} = require("../utils/print-cost.util");
 const {isPromise} = require("jest-util");
-const {HistoryClean} = require("../dataFunctions/historyClean");
 
 const illegalHistoryCache = [{printHistory2: null}];
 const emptyLegalHistoryCache = [{printHistory: {}}];
@@ -51,7 +50,21 @@ beforeEach(() => {
   mockHistoryService.resetMockData();
 });
 
+beforeEach(() => {
+  // Temporarily allow us to alter timezone calculation for testing
+  /*eslint no-extend-native: "off"*/
+  Date.prototype.getTimezoneOffset = jest.fn(() => 0);
+});
+
+afterEach(() => {
+  jest.resetAllMocks();
+});
+
 describe("historyClean", function () {
+  Date.now = () => 1618059562000;
+  process.env.TZ = "UTC";
+
+  let HistoryClean = require("../dataFunctions/historyClean").HistoryClean;
   it("should initiate and finish within 5 sec for empty history", async function () {
     expect(await mockHistoryService.find({})).toHaveLength(0);
 
@@ -106,11 +119,6 @@ describe("historyClean", function () {
     const stats = historyState.generateStatistics();
     expect(stats).toBeTruthy();
 
-    // Differs from old code
-    // "totalFilamentUsage": "34942.53g / 11662.13m",
-    // "averageFilamentUsage": "40.54g / 13.53m",
-    // "highestFilamentUsage": "294.82g / 98.85m",
-
     expect(stats).toEqual({
       "completed": 10,
       "cancelled": 4,
@@ -135,7 +143,10 @@ describe("historyClean", function () {
       "currentFailed": 247,
       "historyByDay": [{
         data: [{
-          "x": new Date("2021-03-26T00:00:00.000Z"),
+          "x": new Date("2021-01-23T23:00:00.000Z"),
+          "y": 1,
+        }, {
+          "x": new Date("2021-03-25T23:00:00.000Z"),
           "y": 1,
         }],
         name: "Success"
@@ -144,27 +155,33 @@ describe("historyClean", function () {
         name: "Failed"
       }, {
         data: [{
-          "x": new Date("2021-03-26T00:00:00.000Z"),
+          "x": new Date("2021-03-25T23:00:00.000Z"),
           "y": 2,
         }],
         name: "Cancelled"
       }],
       "totalByDay": [{
-        data: [],
+        data: [{
+          "x": new Date("2021-01-23T23:00:00.000Z"),
+          "y": 68.5,
+        }],
         name: "PETG"
       }, {
         data: [{
-          "x": new Date("2021-03-26T00:00:00.000Z"),
+          "x": new Date("2021-03-25T23:00:00.000Z"),
           "y": 2.3499999999999996,
         }],
         name: "PLA"
       }],
       "usageOverTime": [{
-        data: [],
+        data: [{
+          "x": new Date("2021-01-23T23:00:00.000Z"),
+          "y": 68.5,
+        }],
         name: "PETG"
       }, {
         data: [{
-          "x": new Date("2021-03-26T00:00:00.000Z"),
+          "x": new Date("2021-03-25T23:00:00.000Z"),
           "y": 2.3499999999999996,
         }],
         name: "PLA"
@@ -175,9 +192,9 @@ describe("historyClean", function () {
     expect(stats.historyByDay[0].data.length).toBeGreaterThan(0); // Success
     expect(stats.historyByDay[1].data.length).toBe(0); // Cancelled
     expect(stats.historyByDay[2].data.length).toBe(1); // Failed
-    expect(stats.usageOverTime[0].data.length).toBe(0);
+    expect(stats.usageOverTime[0].data.length).toBe(1);
     expect(stats.usageOverTime[1].data.length).toBe(1);
-    expect(stats.totalByDay[0].data.length).toBe(0); // PETG usage === 0
+    expect(stats.totalByDay[0].data.length).toBe(1); // PETG usage > 1
     expect(stats.totalByDay[1].data.length).toBeGreaterThan(0);
     expect(stats.totalSpoolCost).not.toBe("NaN");
     expect(stats.highestSpoolCost).not.toBe("NaN");
