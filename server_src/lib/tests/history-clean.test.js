@@ -340,6 +340,62 @@ describe("historyClean:Static", () => {
 
     expect(isPromise(result)).toEqual(false);
   });
+
+  it("should calculate spool weight with calcSpoolWeightAsString equivalently to getWeight function", () => {
+    function getWeight(length, spool, printPercentage, success) {
+      if (typeof spool !== "undefined" && spool !== null) {
+        if (typeof length !== "undefined") {
+          if (length === 0) {
+            return length;
+          } else {
+            const radius = parseFloat(spool.spools.profile.diameter) / 2;
+            const volume = length * Math.PI * radius * radius;
+            let usage = "";
+            if (success) {
+              usage = (
+                  volume * parseFloat(spool.spools.profile.density)
+              ).toFixed(2);
+            } else {
+              usage = (
+                  (printPercentage / 100) *
+                  (volume * parseFloat(spool.spools.profile.density))
+              ).toFixed(2);
+            }
+            return usage;
+          }
+        } else {
+          return 0;
+        }
+      } else {
+        if (typeof length !== "undefined") {
+          length = length;
+          if (length === 0) {
+            return length;
+          } else {
+            const radius = 1.75 / 2;
+            const volume = length * Math.PI * radius * radius;
+            let usage = "";
+            if (success) {
+              usage = (volume * 1.24).toFixed(2);
+            } else {
+              usage = ((printPercentage / 100) * (volume * 1.24)).toFixed(2);
+            }
+            return usage;
+          }
+        } else {
+          return 0;
+        }
+      }
+    }
+
+    const length1 = 18.648094819996633;
+    expect(getWeight(length1, undefined, 100, 0))
+        .toEqual(HistoryClean.calcSpoolWeightAsString(length1, undefined, 1));
+    expect(getWeight(length1, undefined, 50, 0))
+        .toEqual(HistoryClean.calcSpoolWeightAsString(length1, undefined, 0.5));
+    expect(getWeight(length1, undefined, 50, 1))
+        .toEqual(HistoryClean.calcSpoolWeightAsString(length1, undefined, 1));
+  });
 });
 
 /**
