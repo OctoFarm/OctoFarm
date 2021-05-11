@@ -63,6 +63,7 @@ export default class Calculate {
     return (n - a) * (n - b) <= 0;
   }
 
+  // TODO EXACT COPY FROM SERVER print-cost.util.js!!
   static returnPrintCost(costSettings, time) {
     if (typeof costSettings === "undefined") {
       // Attempt to update cost settings in history...

@@ -1,8 +1,9 @@
-const historyClean = require("./historyClean.js");
+"use strict";
 
-const { HistoryClean } = historyClean;
-// eslint-disable-next-line import/order
 const _ = require("lodash");
+const { getPrintCostNumeric } = require("../utils/print-cost.util");
+const { HistoryClean } = require("./historyClean.js");
+const { floatOrZero } = require("../utils/number.util");
 
 const cleanJobs = [];
 
@@ -69,7 +70,7 @@ class JobClean {
       if (typeof printer.currentZ !== "undefined") {
         currentJob.currentZ = printer.currentZ;
       }
-      currentJob.expectedPrinterCosts = await HistoryClean.getPrintCost(
+      currentJob.expectedPrinterCosts = getPrintCostNumeric(
         printer.job.estimatedPrintTime,
         printer.costSettings
       );
@@ -79,7 +80,6 @@ class JobClean {
         true,
         printer.job.estimatedPrintTime
       );
-      const numOr0 = (n) => (isNaN(n) ? 0 : parseFloat(n));
       let spoolCost = 0;
       let totalVolume = 0;
       let totalLength = 0;
@@ -94,22 +94,22 @@ class JobClean {
             typeof currentJob.expectedFilamentCosts[s][`tool${keys[s]}`] !==
             "undefined"
           ) {
-            spoolCost += numOr0(
-              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].cost
+            spoolCost += floatOrZero(
+              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].cost,
             );
-            totalVolume += numOr0(
-              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].volume
+            totalVolume += floatOrZero(
+              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].volume,
             );
-            totalLength += numOr0(
-              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].length
+            totalLength += floatOrZero(
+              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].length,
             );
-            totalWeight += numOr0(
-              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].weight
+            totalWeight += floatOrZero(
+              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].weight,
             );
           }
         }
       }
-      spoolCost = numOr0(spoolCost);
+      spoolCost = floatOrZero(spoolCost);
       currentJob.expectedTotals = {
         totalCost: (
           parseFloat(currentJob.expectedPrinterCosts) + parseFloat(spoolCost)
@@ -125,7 +125,10 @@ class JobClean {
       currentJob.progress = Math.floor(printer.progress.completion);
       currentJob.printTimeRemaining = printer.progress.printTimeLeft;
       currentJob.printTimeElapsed = printer.progress.printTime;
-      currentJob.expectedPrintTime = Math.round((printer.progress.printTimeLeft + printer.progress.printTime)/1000)*1000;
+      currentJob.expectedPrintTime =
+        Math.round(
+          (printer.progress.printTimeLeft + printer.progress.printTime) / 1000,
+        ) * 1000;
       currentJob.expectedCompletionDate = await JobClean.getCompletionDate(
         printer.progress.printTimeLeft,
         printer.progress.completion
@@ -138,6 +141,7 @@ class JobClean {
     cleanJobs[printer.sortIndex] = currentJob;
   }
 }
+
 module.exports = {
   JobClean,
 };

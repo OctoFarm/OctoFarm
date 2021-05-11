@@ -1,23 +1,16 @@
+"use strict";
+
 const _ = require("lodash");
 const Logger = require("../logger.js");
+const { getPrintCostNumeric } = require("../utils/print-cost.util");
+
+const {
+  getDefaultFileCleanStatistics,
+} = require("../providers/cleaner.constants");
 
 const logger = new Logger("OctoFarm-InformationCleaning");
-
 const cleanFileList = [];
-const fileStatistics = {
-  storageUsed: 0,
-  storageTotal: 0,
-  storageRemain: 0,
-  storagePercent: 0,
-  fileCount: 0,
-  folderCount: 0,
-  biggestFile: 0,
-  smallestFile: 0,
-  biggestLength: 0,
-  smallestLength: 0,
-  averageFile: 0,
-  averageLength: 0,
-};
+const fileStatistics = getDefaultFileCleanStatistics();
 
 class FileClean {
   static returnFiles(p) {
@@ -65,7 +58,6 @@ class FileClean {
     });
 
     const uniqueDevices = _.uniqBy(devices, "printerURL");
-
     uniqueDevices.forEach((device) => {
       storageFree.push(device.storage.free);
       storageTotal.push(device.storage.total);
@@ -77,10 +69,11 @@ class FileClean {
     fileStatistics.storageTotal = storageTotalTotal;
     fileStatistics.storageRemain = storageFreeTotal;
     fileStatistics.storagePercent = Math.floor(
-      (fileStatistics.storageUsed / storageTotalTotal) * 100
+      (fileStatistics.storageUsed / storageTotalTotal) * 100,
     );
     fileStatistics.fileCount = fileCount.length;
     fileStatistics.folderCount = folderCount.length;
+    // TODO repeated calls?
     if (fileSizes.length !== 0) {
       fileStatistics.biggestFile = fileSizes.reduce(function (a, b) {
         return Math.max(a, b);
@@ -131,15 +124,15 @@ class FileClean {
               failed: file.failed,
               last: file.last,
               expectedPrintTime: file.time,
-              printCost: await FileClean.getPrintCost(file.time, printCost),
+              printCost: getPrintCostNumeric(file.time, printCost),
             };
             sortedFile.toolUnits = await FileClean.getUnits(
               selectedFilament,
-              file.length
+              file.length,
             );
             sortedFile.toolCosts = await FileClean.getCost(
               selectedFilament,
-              sortedFile.toolUnits
+              sortedFile.toolUnits,
             );
             sortedFileList.push(sortedFile);
             // console.log(sortedFileList);
@@ -187,7 +180,7 @@ class FileClean {
             lengthArray.push(length);
             weightArray.push(usage);
             strings.push(
-              `<b>Tool ${l}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`
+              `<b>Tool ${l}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`,
             );
           } else if (typeof filamentSelection[l] !== "undefined") {
             const radius =
@@ -198,7 +191,7 @@ class FileClean {
             lengthArray.push(length);
             weightArray.push(usage);
             strings.push(
-              `<b>Tool ${l}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`
+              `<b>Tool ${l}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`,
             );
           } else {
             lengthArray.push(0);
@@ -215,35 +208,12 @@ class FileClean {
       const totalLength = lengthArray.reduce((a, b) => a + b, 0);
       const totalGrams = weightArray.reduce((a, b) => a + b, 0);
       const total = `<b>Total: </b>${totalLength.toFixed(
-        2
+        2,
       )}m / ${totalGrams.toFixed(2)}g`;
       strings.unshift(total);
       return strings;
     }
     return [];
-  }
-
-  static async getPrintCost(printTime, costSettings) {
-    if (typeof costSettings === "undefined") {
-      // Attempt to update cost settings in history...
-      return "No cost settings to calculate from";
-    }
-    // calculating electricity cost
-    const powerConsumption = parseFloat(costSettings.powerConsumption);
-    const costOfElectricity = parseFloat(costSettings.electricityCosts);
-    const costPerHour = powerConsumption * costOfElectricity;
-    const estimatedPrintTime = printTime / 3600; // h
-    const electricityCost = costPerHour * estimatedPrintTime;
-    // calculating printer cost
-    const purchasePrice = parseFloat(costSettings.purchasePrice);
-    const lifespan = parseFloat(costSettings.estimateLifespan);
-    const depreciationPerHour = lifespan > 0 ? purchasePrice / lifespan : 0;
-    const maintenancePerHour = parseFloat(costSettings.maintenanceCosts);
-    const printerCost =
-      (depreciationPerHour + maintenancePerHour) * estimatedPrintTime;
-    // assembling string
-    const estimatedCost = electricityCost + printerCost;
-    return estimatedCost.toFixed(2);
   }
 
   static async getCost(filamentSelection, units) {
@@ -289,152 +259,9 @@ class FileClean {
     const totalCost = costArray.reduce((a, b) => a + b, 0);
     strings.unshift(totalCost.toFixed(2));
     return strings;
-
-    // console.log(filamentSelection, lengths, time)
-
-    // let printPercentage = 0;
-    // //Fix for old records
-    // if(typeof metrics !== 'undefined' && typeof metrics.filament !== 'undefined' && metrics.filament !== null){
-    //     if(!success){
-    //         printPercentage = (metrics.estimatedPrintTime / time) * 100;
-    //     }
-    //     metrics = metrics.filament
-    // }else{
-    //     metrics = null
-    // }        //Get spoolname function
-    // function spoolName(id){
-    //     if(typeof id !== 'undefined' && id !== null ){
-    //         if(serverSettings[0].filamentManager){
-    //             return `${id.spools.name} (${(id.spools.weight - id.spools.used).toFixed(0)}g) - ${id.spools.profile.material}`;
-    //         }else{
-    //             return `${id.spools.name} - ${id.spools.profile.material}`;
-    //         }
-    //     }else{
-    //         return null;
-    //     }
-    // }
-    // //Get spoolid function
-    // function spoolID(id){
-    //     if(typeof id !== 'undefined' && id !== null ){
-    //         return id._id
-    //     }else{
-    //         return null;
-    //     }
-    // }
-    // function getWeight(length, spool){
-    //     if(typeof spool !== 'undefined' && spool !== null ){
-    //         if(typeof length !== 'undefined'){
-    //             if (length === 0) {
-    //                 return length;
-    //             } else {
-    //                 let radius = parseFloat(spool.spools.profile.diameter) / 2
-    //                 let volume = (length * Math.PI * radius * radius)
-    //                 let usage = "";
-    //                 if(success){
-    //                     usage = volume * parseFloat(spool.spools.profile.density)
-    //                 }else {
-    //                     usage = volume * parseFloat(spool.spools.profile.density) / printPercentage;
-    //                 }
-    //                 return usage;
-    //
-    //             }
-    //         }else{
-    //             return 0;
-    //         }
-    //     }else{
-    //         if(typeof length !== 'undefined'){
-    //             length = length;
-    //             if (length === 0) {
-    //                 return length;
-    //             } else {
-    //                 let radius = 1.75 / 2
-    //                 let volume = (length * Math.PI * radius * radius)
-    //                 let usage = "";
-    //                 if(success){
-    //                     usage = volume * 1.24
-    //                 }else {
-    //                     usage = volume * 1.24 / printPercentage;
-    //                 }
-    //                 return usage;
-    //             }
-    //         }else{
-    //             return 0;
-    //         }
-    //     }
-    //
-    // }
-    // function getType(spool){
-    //     if(typeof spool !== 'undefined' && spool !== null){
-    //         return spool.spools.profile.material;
-    //     }else{
-    //         return "";
-    //     }
-    // }
-    // function getCost(grams, spool){
-    //     if(typeof spool !== 'undefined' && spool !== null ){
-    //         if(success){
-    //             return ((spool.spools.price / spool.spools.weight) * grams).toFixed(2)
-    //         }else{
-    //             return (((spool.spools.price / spool.spools.weight) * grams) / printPercentage).toFixed(2);
-    //         }
-    //
-    //     }else{
-    //         return null;
-    //     }
-    // }
-    //
-    // let spools = [];
-    // if(typeof metrics !== 'undefined' && metrics !== null){
-    //     let keys = Object.keys(metrics)
-    //     for(let m = 0; m < keys.length; m++){
-    //         let spool = {};
-    //         if(success){
-    //             spool = {
-    //                 [keys[m]]: {
-    //                     toolName: "Tool " + keys[m].substring(4, 5),
-    //                     spoolName: null,
-    //                     spoolId: null,
-    //                     volume: metrics[keys[m]].volume,
-    //                     length: metrics[keys[m]].length / 1000,
-    //                     weight: null,
-    //                     cost: null
-    //                 }
-    //             }
-    //         }else{
-    //             spool = {
-    //                 [keys[m]]: {
-    //                     toolName: "Tool " + keys[m].substring(4, 5),
-    //                     spoolName: null,
-    //                     spoolId: null,
-    //                     volume: metrics[keys[m]].volume / printPercentage,
-    //                     length: (metrics[keys[m]].length / 1000) / printPercentage,
-    //                     weight: null,
-    //                     cost: null
-    //                 }
-    //             }
-    //         }
-    //
-    //         if(Array.isArray(filamentSelection)){
-    //             spool[keys[m]].spoolName = spoolName(filamentSelection[m]);
-    //             spool[keys[m]].spoolId = spoolID(filamentSelection[m]);
-    //             spool[keys[m]].weight = getWeight(metrics[keys[m]].length / 1000, filamentSelection[m])
-    //             spool[keys[m]].cost = getCost(spool[keys[m]].weight, filamentSelection[m])
-    //             spool[keys[m]].type = getType(filamentSelection[m])
-    //         }else{
-    //             spool[keys[m]].spoolName = spoolName(filamentSelection);
-    //             spool[keys[m]].spoolId = spoolID(filamentSelection);
-    //             spool[keys[m]].weight = getWeight(metrics[keys[m]].length / 1000, filamentSelection)
-    //             spool[keys[m]].cost = getCost(spool[keys[m]].weight, filamentSelection)
-    //             spool[keys[m]].type = getType(filamentSelection)
-    //         }
-    //         spools.push(spool)
-    //     }
-    //     return spools;
-    // }else{
-    //     return null
-    // }
   }
 }
+
 module.exports = {
   FileClean,
 };

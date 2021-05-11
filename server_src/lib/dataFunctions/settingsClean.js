@@ -1,3 +1,5 @@
+"use strict";
+
 const ClientSettings = require("../../models/ClientSettings.js");
 const ServerSettings = require("../../models/ServerSettings.js");
 
