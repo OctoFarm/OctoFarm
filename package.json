@@ -75,7 +75,6 @@
     "babel-loader": "^8.2.2",
     "babelify": "^10.0.0",
     "browserify": "^16.5.2",
-    "clinic": "^6.0.3",
     "cssnano": "^4.1.10",
     "debug": "^4.3.1",
     "dependency-check": "^4.1.0",
