@@ -19,5 +19,4 @@ package/
 /web-client/
 
 # V2 Server
-server_2x/
 server_2x/assets/public/assets/
