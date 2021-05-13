@@ -8,6 +8,7 @@
 **/docker-compose.yml
 **/.build
 **/.cache
+**/coverage
 /images
 
 # Ignore any local release zips
@@ -18,5 +19,4 @@ package/
 /web-client/
 
 # V2 Server
-server_2x/
 server_2x/assets/public/assets/

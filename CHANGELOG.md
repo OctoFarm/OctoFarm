@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.1.14-rc1]
+
+### Added
+
+### Changed
+    - Completely reworked history cache, prepared and tested for OctoFarm V2
+
+### Removed
+
+### Fixed
+    
+
 ## [v1.1.13-hotfix]
 
 ### Added

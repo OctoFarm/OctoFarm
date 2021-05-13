@@ -1,44 +1,26 @@
-const Profiles = require("../models/Profiles.js");
-const TempHistory = require("../models/TempHistory.js");
-const historyCollection = require("./history.js");
-
-const { HistoryCollection } = historyCollection;
-const serverSettings = require("../settings/serverSettings.js");
-
-const { ServerSettings } = serverSettings;
-const fetch = require("node-fetch");
 const _ = require("lodash");
+const EventEmitter = require("events");
+const fetch = require("node-fetch");
 const WebSocket = require("ws");
-const Printers = require("../models/Printer.js");
-const Filament = require("../models/Filament.js");
 const Logger = require("../lib/logger.js");
 
+const Profiles = require("../models/Profiles.js");
+const Printers = require("../models/Printer.js");
+const Filament = require("../models/Filament.js");
+const TempHistory = require("../models/TempHistory.js");
+
+const { HistoryCollection } = require("./history.js");
+const { ServerSettings, filamentManagerEnabled } = require("../settings/serverSettings.js");
+const { ScriptRunner } = require("./scriptCheck.js");
+const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
+const { JobClean } = require("../lib/dataFunctions/jobClean.js");
+const { FileClean } = require("../lib/dataFunctions/fileClean.js");
+const { FilamentClean } = require("../lib/dataFunctions/filamentClean.js");
+const { PrinterTicker } = require("./printerTicker.js");
+
 const logger = new Logger("OctoFarm-State");
-const script = require("./scriptCheck.js");
-
-const { ScriptRunner } = script;
-const EventEmitter = require("events");
-const printerClean = require("../lib/dataFunctions/printerClean.js");
-
-const { PrinterClean } = printerClean;
-const jobClean = require("../lib/dataFunctions/jobClean.js");
-
-const { JobClean } = jobClean;
-const fileClean = require("../lib/dataFunctions/fileClean.js");
-
-const { FileClean } = fileClean;
-
-const filamentClean = require("../lib/dataFunctions/filamentClean.js");
-
-const { FilamentClean } = filamentClean;
-
-const printerTicker = require("./printerTicker.js");
-
-const { PrinterTicker } = printerTicker;
-
 let farmPrinters = [];
 let farmPrintersGroups = [];
-
 let systemSettings = {};
 
 const countersInterval = false;
@@ -900,7 +882,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
     if (typeof farmPrinters[this.index] !== "undefined") {
       PrinterClean.generate(
         farmPrinters[this.index],
-        serverSettings.filamentManager
+        filamentManagerEnabled
       );
     }
   } catch (e) {
@@ -2227,13 +2209,6 @@ class Runner {
       failed: failed,
       last: last,
     };
-    // }catch(err){
-    //     logger.error(
-    //         `Error grabbing file for: ${farmPrinters[index].printerURL}: Reason: `,
-    //         err
-    //     );
-    //     return false;
-    // }
   }
 
   static async getFiles(id, location) {
@@ -3518,7 +3493,7 @@ class Runner {
       Runner.getPluginList(settings.printer.index);
       PrinterClean.generate(
         farmPrinters[index],
-        systemSettings.filamentManager
+        filamentManagerEnabled
       );
       // let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
       //
@@ -3744,66 +3719,6 @@ class Runner {
       );
       FileClean.generate(farmPrinters[i], currentFilament);
     });
-    // FileClean.generate(farmPrinters[i], systemSettings.filamentManager);
-    // if (printerId == 0) {
-    //     //Deselecting a spool
-    //     //Find the printer spool is attached too
-    //     let i = _.findIndex(farmPrinters, function(o) {
-    //             if(o.selectedFilament !== null && o.selectedFilament._id == filamentId){
-    //                 return o.selectedFilament._id;
-    //             }
-    //     });
-    //     if(i > -1){
-    //         let printer = await Printers.findById(farmPrinters[i]._id);
-    //         printer.selectedFilament = null;
-    //         farmPrinters[i].selectedFilament = null;
-    //         printer.save();
-    //         //remove from selected filament list
-    //         let selectedFilamentId = _.findIndex(selectedFilament, function(o) {
-    //             return o == filamentId;
-    //         });
-    //         if(selectedFilamentId > -1){
-    //             selectedFilament.splice(selectedFilamentId, 1)
-    //         }
-    //     }
-    // } else {
-    //     //Selecting a spool
-    //     let printer = await Printers.findById(printerId);
-    //     let i = _.findIndex(farmPrinters, function(o) { return o._id == printerId; });
-    //
-    //     if(farmPrinters[i].selectedFilament != null){
-    //         if(filamentId == 0){
-    //             let selectedFilamentId = _.findIndex(selectedFilament, function(o) {
-    //                 return o._id == farmPrinters[i].selectedFilament._id;
-    //             });
-    //             if(selectedFilamentId > -1){
-    //                 selectedFilament.splice(selectedFilamentId, 1)
-    //             }
-    //             printer.selectedFilament = null;
-    //             farmPrinters[i].selectedFilament = null;
-    //         }else{
-    //             //farm printer already has filament, remove before updating...
-    //             let selectedFilamentId = _.findIndex(selectedFilament, function(o) {
-    //                 return o._id == farmPrinters[i].selectedFilament._id;
-    //             });
-    //             if(selectedFilamentId > -1){
-    //                 selectedFilament.splice(selectedFilamentId, 1)
-    //             }
-    //             let spool = await Filament.findById(filamentId);
-    //             printer.selectedFilament = spool;
-    //             farmPrinters[i].selectedFilament = spool;
-    //             selectedFilament.push(spool._id);
-    //         }
-    //
-    //     }else{
-    //         let spool = await Filament.findById(filamentId);
-    //         printer.selectedFilament = spool;
-    //         farmPrinters[i].selectedFilament = spool;
-    //         selectedFilament.push(spool._id);
-    //     }
-    //     printer.markModified("selectedFilament")
-    //     printer.save();
-    // }
   }
 
   static async newFile(file) {

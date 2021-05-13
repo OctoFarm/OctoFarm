@@ -1,8 +1,6 @@
 const ServerSettingsDB = require("../models/ServerSettings.js");
-const settingsClean = require("../lib/dataFunctions/settingsClean.js");
+const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 const { AppConstants } = require("../app.constants");
-
-const { SettingsClean } = settingsClean;
 
 // Default Settings
 const onlinePolling = {
@@ -19,6 +17,7 @@ const timeout = {
   apiRetry: 30000,
   webSocketRetry: 5000,
 };
+// TODO rename to filamentManagerEnabled
 const filamentManager = false;
 const history = {
   snapshots: {
@@ -109,5 +108,5 @@ class ServerSettings {
 
 module.exports = {
   ServerSettings,
-  filamentManager
+  filamentManagerEnabled: filamentManager
 };

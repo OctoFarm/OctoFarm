@@ -2,31 +2,18 @@ const _ = require("lodash");
 const fetch = require("node-fetch");
 const fs = require("fs");
 const request = require("request");
-
 const History = require("../models/History.js");
 const ErrorLog = require("../models/ErrorLog.js");
 const Logger = require("../lib/logger.js");
-
-
 const filamentProfiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const Spool = require("../models/Filament.js");
-
-const FilamentManagerReSync = require("./filamentManagerPlugin.js");
-
-const { FilamentManagerPlugin } = FilamentManagerReSync;
-
-const historyClean = require("../lib/dataFunctions/historyClean.js");
-
-const { HistoryClean } = historyClean;
-
-const script = require("./scriptCheck.js");
-
-const { ScriptRunner } = script;
-
+const { FilamentManagerPlugin } = require("./filamentManagerPlugin.js");
+const { HistoryClean } = require("../lib/dataFunctions/historyClean.js");
+const { ScriptRunner } = require("./scriptCheck.js");
 const MjpegDecoder = require("mjpeg-decoder");
 const { downloadFromOctoPrint } = require("../utils/download.util");
-
+const { getHistoryCache } = require("../cache/history.cache");
 const { writePoints } = require("../lib/influxExport.js");
 
 const logger = new Logger("OctoFarm-HistoryCollection");
@@ -39,19 +26,15 @@ class HistoryCollection {
     try {
       for (let i = 0; i < printer.selectedFilament.length; i++) {
         if (printer.selectedFilament[i] !== null) {
-          logger.info(
-            `${printer.printerURL}: fetching ${printer.printerURL}/plugin/filamentmanager/spools/${printer.selectedFilament[i].spools.fmID}`
-          );
-          const spools = await fetch(
-            `${printer.printerURL}/plugin/filamentmanager/spools/${printer.selectedFilament[i].spools.fmID}`,
-            {
-              method: "GET",
-              headers: {
-                "Content-Type": "application/json",
-                "X-Api-Key": printer.apikey,
-              },
-            }
-          );
+          const fetchUrl = `${printer.printerURL}/plugin/filamentmanager/spools/${printer.selectedFilament[i].spools.fmID}`;
+          logger.info(`${printer.printerURL}: fetching ${fetchUrl}`);
+          const spools = await fetch(fetchUrl, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              "X-Api-Key": printer.apikey,
+            },
+          });
           logger.info(
             `${printer.printerURL}: fetched... spool status ${spools.status}`
           );
@@ -275,14 +258,14 @@ class HistoryCollection {
                 saveHistory.printHistory.timelapse = lapse;
                 saveHistory.markModified("printHistory");
                 await saveHistory.save();
-                await HistoryClean.start();
+                await getHistoryCache().initCache();
                 logger.info("Successfully grabbed timelapse!");
               } else {
                 const updateHistory = await History.findById(id);
                 updateHistory.printHistory.timelapse = "";
                 updateHistory.markModified("printHistory");
                 await updateHistory.save();
-                await HistoryClean.start();
+                await getHistoryCache().initCache();
                 logger.info("Successfully grabbed timelapse!");
                 clearInterval(interval);
                 return null;
@@ -370,6 +353,7 @@ class HistoryCollection {
     await deleteTimeLapse(fileName);
     logger.info("Successfully deleted " + fileName + " from OctoPrint.");
   }
+
   static async objectCleanforInflux(obj) {
     for (var propName in obj) {
       if (obj[propName] === null) {
@@ -377,8 +361,9 @@ class HistoryCollection {
       }
     }
   }
+
   static async updateInfluxDB(historyID, measurement, printer) {
-    let historyArchive = await HistoryClean.returnHistory();
+    let historyArchive = getHistoryCache().historyClean;
     let currentArchive = _.findIndex(historyArchive, function (o) {
       return JSON.stringify(o._id) === JSON.stringify(historyID);
     });
@@ -672,9 +657,9 @@ class HistoryCollection {
         printer.fileName = payload.display;
         printer.filePath = payload.path;
         ScriptRunner.check(printer, "done", saveHistory._id);
-        HistoryClean.start();
+        await getHistoryCache().initCache();
         setTimeout(async function () {
-          await HistoryClean.start();
+          await getHistoryCache().initCache();
           HistoryCollection.updateInfluxDB(saveHistory._id, "history", printer);
         }, 5000);
       });
@@ -838,9 +823,9 @@ class HistoryCollection {
         ScriptRunner.check(printer, "failed", saveHistory._id);
         await saveHistory.save();
 
-        HistoryClean.start();
+        await getHistoryCache().initCache();
         setTimeout(async function () {
-          await HistoryClean.start();
+          await getHistoryCache().initCache();
           HistoryCollection.updateInfluxDB(saveHistory._id, "history", printer);
         }, 5000);
       });
@@ -911,7 +896,7 @@ class HistoryCollection {
         errorLog,
       });
       await saveError.save();
-      HistoryClean.start();
+      await getHistoryCache().initCache();
       ScriptRunner.check(printer, "error", saveError._id);
       logger.info("Error captured ", payload + printer.printerURL);
     } catch (e) {
@@ -947,45 +932,7 @@ class HistoryCollection {
       },
     });
   }
-
-  static resyncFilamentManager() {}
 }
-
-const generateTime = function (seconds) {
-  let string = "";
-  if (seconds === undefined || isNaN(seconds)) {
-    string = "Done";
-  } else {
-    const days = Math.floor(seconds / (3600 * 24));
-
-    seconds -= days * 3600 * 24;
-    const hrs = Math.floor(seconds / 3600);
-
-    seconds -= hrs * 3600;
-    const mnts = Math.floor(seconds / 60);
-
-    seconds -= mnts * 60;
-    seconds = Math.floor(seconds);
-
-    string = `${days} Days, ${hrs} Hrs, ${mnts} Mins, ${seconds} Seconds`;
-
-    if (string.includes("0 Days")) {
-      string = string.replace("0 Days,", "");
-    }
-    if (string.includes("0 Hrs")) {
-      string = string.replace(" 0 Hrs,", "");
-    }
-    if (string.includes("0 Mins")) {
-      string = string.replace(" 0 Mins,", "");
-    }
-    if (mnts > 0 || hrs > 0 || days > 0 || seconds > 0) {
-    } else {
-      string = string.replace("0 Seconds", "Done");
-    }
-  }
-
-  return string;
-};
 
 module.exports = {
   HistoryCollection,

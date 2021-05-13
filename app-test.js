@@ -18,8 +18,7 @@ async function setupTestApp() {
   // Save listener as state for tests
   httpListener = await serveOctoFarmNormally(octoFarmTestServer, fetchOctoFarmPort());
 
-  const stringRouteMap = JSON.stringify(getEndpoints(octoFarmTestServer).map(r => r.path));
-  console.log("Server routes:" , stringRouteMap);
+  // const stringRouteMap = JSON.stringify(getEndpoints(octoFarmTestServer).map(r => r.path));
   return octoFarmTestServer;
 }
 
