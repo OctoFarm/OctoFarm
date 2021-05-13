@@ -8,10 +8,13 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
     - Completely reworked history cache, prepared and tested for OctoFarm V2
+    - Reworked the Settings modal to be more resiliant to failure and cleaned up code. 
 
 ### Removed
 
 ### Fixed
+    - Fixed #531 - Updated settings are not grabbed when opening settings modal
+    - Fixed #532 - Actual save port is not checked against live ports on OctoPrint on settings Modal
     
 
 ## [v1.1.13-hotfix]

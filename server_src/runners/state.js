@@ -10,7 +10,10 @@ const Filament = require("../models/Filament.js");
 const TempHistory = require("../models/TempHistory.js");
 
 const { HistoryCollection } = require("./history.js");
-const { ServerSettings, filamentManagerEnabled } = require("../settings/serverSettings.js");
+const {
+  ServerSettings,
+  filamentManagerEnabled,
+} = require("../settings/serverSettings.js");
 const { ScriptRunner } = require("./scriptCheck.js");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
 const { JobClean } = require("../lib/dataFunctions/jobClean.js");
@@ -880,10 +883,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
     }
     // Information cleaning of farmPrinters
     if (typeof farmPrinters[this.index] !== "undefined") {
-      PrinterClean.generate(
-        farmPrinters[this.index],
-        filamentManagerEnabled
-      );
+      PrinterClean.generate(farmPrinters[this.index], filamentManagerEnabled);
     }
   } catch (e) {
     console.log("Safe to ignore", e);
@@ -2434,8 +2434,6 @@ class Runner {
           farmPrinters[index].stateDescription =
             "Current Status from OctoPrint";
         }
-        farmPrinters[index].state = "Awaiting WebSocket";
-        farmPrinters[index].stateColour = Runner.getColour("Offline");
         farmPrinters[index].current = res.current;
         farmPrinters[index].options = res.options;
         farmPrinters[index].job = null;
@@ -3000,6 +2998,23 @@ class Runner {
         return false;
       });
   }
+  // Patch for updating OctoPrint's settings for now until re-work of printer cache with state.js.
+  static async getLatestOctoPrintSettingsValues(id) {
+    const index = _.findIndex(farmPrinters, function (o) {
+      return o._id == id;
+    });
+    // This is why the settings we're not updating! Forgot that connection options and preferences come in state, not settings/system.
+    await Runner.getState(id);
+    // Update the printers cached settings from OctoPrint
+    await Runner.getSettings(id);
+    // Update the printers cached system settings from OctoPrint
+    await Runner.getSystem(id);
+    // Re-generate the printer clean information - This is just cautionary, my tests showed it wasn't needed.
+    await PrinterClean.generate(
+      farmPrinters[index],
+      systemSettings.filamentManager
+    );
+  }
 
   static getColour(state) {
     if (state === "Operational") {
@@ -3061,11 +3076,12 @@ class Runner {
     const i = _.findIndex(farmPrinters, function (o) {
       return o._id == printer._id;
     });
-    const index = await _.findIndex(farmPrinters[i].fileList.files, function (
-      o
-    ) {
-      return o.fullPath === fullPath;
-    });
+    const index = await _.findIndex(
+      farmPrinters[i].fileList.files,
+      function (o) {
+        return o.fullPath === fullPath;
+      }
+    );
     farmPrinters[i].fileList.files.splice(index, 1);
     farmPrinters[i].fileList.fileCount = farmPrinters[i].fileList.files.length;
     farmPrinters[i].markModified("fileList");
@@ -3491,10 +3507,7 @@ class Runner {
       Runner.getOctoPrintSystenInfo(settings.printer.index);
       Runner.getUpdates(settings.printer.index);
       Runner.getPluginList(settings.printer.index);
-      PrinterClean.generate(
-        farmPrinters[index],
-        filamentManagerEnabled
-      );
+      PrinterClean.generate(farmPrinters[index], filamentManagerEnabled);
       // let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
       //
       // console.log()
@@ -3690,11 +3703,12 @@ class Runner {
       printer.selectedFilament[tool] = null;
       farmPrinters[i].selectedFilament[tool] = null;
       // Find in selected filament list and remove
-      const selected = _.findIndex(farmPrinters[i].selectedFilament, function (
-        o
-      ) {
-        return o == filamentId;
-      });
+      const selected = _.findIndex(
+        farmPrinters[i].selectedFilament,
+        function (o) {
+          return o == filamentId;
+        }
+      );
     } else if (!Array.isArray(farmPrinters[i].selectedFilament)) {
       // Setup new spool...
       // Make sure selectedFilament is an array
@@ -3885,11 +3899,12 @@ class Runner {
       farmPrinters.forEach((printer) => {
         for (var key in printer.settingsPlugins) {
           if (printer.settingsPlugins.hasOwnProperty(key)) {
-            let installedPlugin = _.findIndex(printer.pluginsList, function (
-              o
-            ) {
-              return o.id == key;
-            });
+            let installedPlugin = _.findIndex(
+              printer.pluginsList,
+              function (o) {
+                return o.id == key;
+              }
+            );
             if (installedPlugin > -1) {
               compatiblePluginList.push(printer.pluginsList[installedPlugin]);
             }

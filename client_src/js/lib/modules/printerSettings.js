@@ -64,10 +64,13 @@ async function updatePrinterSettingsModal(printersInformation, printerID) {
         i: printerID,
       };
       // Update printer settings
-      await OctoFarmClient.post("printers/updatePrinterSettings", opts);
-      // Make sure we have latest updated data...
-      currentPrinter = await OctoFarmClient.post("printers/printerInfo", opts);
+      currentPrinter = await OctoFarmClient.post(
+        "printers/updatePrinterSettings",
+        opts
+      );
     } catch (e) {
+      // Fall back ensure printer data is loaded if new data couldn't be updated.
+      currentPrinter = printersInformation[currentPrinterIndex];
       console.error(e);
       UI.createAlert(
         "warning",
@@ -76,6 +79,7 @@ async function updatePrinterSettingsModal(printersInformation, printerID) {
         "clicked"
       );
     }
+
     //Convert online state to a boolean
     printerOnline = currentPrinter.printerState.colour.category !== "Offline";
 
@@ -1216,20 +1220,21 @@ class PrinterSettings {
     return newPrinterSettingsValues;
   }
   // Will move this to it's own file and do a require when enabled in the printer modal. May move the whole connection dropdown there thinking about it.
-  static setPortAvailability(serialPortDropDown, available) {
+  static setPortAvailability(serialPortDropDownElement, available) {
     if (available) {
       pageElements.connectPage.portNotAvailableMessage.innerHTML = "";
-      serialPortDropDown.classList = "custom-select  bg-secondary text-light";
+      serialPortDropDownElement.classList =
+        "custom-select  bg-secondary text-light";
     } else {
       pageElements.connectPage.portNotAvailableMessage.innerHTML =
         '<div class="alert alert-danger" role="alert">Your port preference is not available... Is your printer turned on? ' +
-        'Please <button id="settingsPageRefreshButton" type="button" class="btn btn-danger btn-small">Click Here!</button> to refresh once the issue is rectified</div>';
+        'Please <button id="settingsPageRefreshButton" type="button" class="btn btn-info btn-small">Click Here!</button> to refresh once the issue is rectified</div>';
       document
         .getElementById("settingsPageRefreshButton")
         .addEventListener("click", () => {
           console.log("RE");
         });
-      serialPortDropDown.classList = "custom-select bg-danger";
+      serialPortDropDownElement.classList = "custom-select bg-danger";
     }
   }
 

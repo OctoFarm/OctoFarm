@@ -9,9 +9,13 @@ const { Runner } = runner;
 const Logger = require("../lib/logger.js");
 
 const logger = new Logger("OctoFarm-API");
+
 const printerClean = require("../lib/dataFunctions/printerClean.js");
 
 const { PrinterClean } = printerClean;
+
+// Doesn't returns undefined, note to use is incorrect...
+// const { returnPrintersInformation } = require("../cache/printer.cache.js");
 
 const { Script } = require("../lib/serverScripts.js");
 
@@ -123,18 +127,8 @@ router.get("/groups", ensureAuthenticated, async (req, res) => {
 });
 router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
   const id = req.body.i;
-
-  const printers = await PrinterClean.returnPrintersInformation();
-  if (typeof id === "undefined" || id === null) {
-    res.send(printers);
-  } else {
-    const index = _.findIndex(printers, function (o) {
-      //Make sure ID's are both strings to stop recursion issues
-      return o._id == id;
-    });
-    const returnPrinter = printers[index];
-    res.send(returnPrinter);
-  }
+  const returnPrinter = await PrinterClean.returnPrintersInformation(id);
+  res.send(returnPrinter);
 });
 
 router.post("/updatePrinterSettings", ensureAuthenticated, async (req, res) => {
@@ -146,11 +140,9 @@ router.post("/updatePrinterSettings", ensureAuthenticated, async (req, res) => {
     return;
   }
   try {
-    // Update the printers cached settings from OctoPrint
-    await Runner.getSettings(id);
-    // Update the printers cached system settings from OctoPrint
-    await Runner.getSystem(id);
-    res.sendStatus(204);
+    await Runner.getLatestOctoPrintSettingsValues(id);
+    let printerInformation = PrinterClean.returnPrintersInformation(id);
+    res.send(printerInformation);
   } catch (e) {
     logger.error(`The server couldn't update your printer settings! ${e}`);
     res.statusMessage = `The server couldn't update your printer settings! ${e}`;
