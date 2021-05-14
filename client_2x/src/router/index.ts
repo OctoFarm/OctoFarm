@@ -8,8 +8,10 @@ const routes: Array<RouteConfig> = [
   {
     path: "/",
     name: "Dashboard",
-    icon: "mdi-view-dashboard-variant",
     component: Dashboard,
+    meta: {
+      icon: "mdi-view-dashboard-variant"
+    }
   },
    // {
   //   path: "/schedule",
@@ -19,87 +21,111 @@ const routes: Array<RouteConfig> = [
   // },
   {
     name: "Monitoring",
-    icon: "mdi-eye",
     path: "/monitoring",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/Monitoring.vue"),
+    meta: {
+      icon: "mdi-eye"
+    }
   },
   {
     name: "File Manager",
-    icon: "mdi-file-code",
     path: "/file-manager",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/FileManager.vue"),
+    meta: {
+      icon: "mdi-file-code"
+    }
   },
   {
     name: "History",
-    icon: "mdi-history",
     path: "/history",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/History.vue"),
+    meta: {
+      icon: "mdi-history"
+    }
   },
   // {
   //   name: "Stock Manager",
-  //   icon: "mdi-warehouse",
   //   path: "/stock",
   //   component: () =>
   //    import(/* webpackChunkName: "about" */ "../views/Monitoring.vue"),
+  // meta: {
+  //   icon: "mdi-warehouse"
+  // }
   // },
   // {
   //   name: "Maintenance",
-  //   icon: "mdi-hammer-wrench",
   //   path: "/maintenance",
   //   component: () =>
   //    import(/* webpackChunkName: "about" */ "../views/Monitoring.vue"),
+  // meta: {
+  //   icon: "mdi-hammer-wrench"
+  // }
   // },
   {
     name: "Printer Manager",
-    icon: "mdi-printer-3d",
     path: "/printers",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/admin/PrinterManager.vue"),
+    meta: {
+      icon: "mdi-printer-3d"
+    }
   },
   {
     name: "User Accounts",
-    icon: "mdi-account-reactivate",
     path: "/admin/users",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/admin/UserAccounts.vue"),
+    meta: {
+      icon: "mdi-account-reactivate"
+    }
   },
   {
     name: "Notifications",
-    icon: "mdi-shield-alert",
     path: "/admin/alerts",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/admin/Notifications.vue"),
+    meta: {
+      icon: "mdi-shield-alert"
+    }
   },
   {
     name: "System Settings",
-    icon: "mdi-cog",
     path: "/admin/server",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/admin/SystemSettings.vue"),
+    meta: {
+      icon: "mdi-cog"
+    }
   },
   {
     name: "Database Manager",
-    icon: "mdi-database-edit",
     path: "/admin/database",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/admin/DatabaseManager.vue"),
+    meta: {
+      icon: "mdi-database-edit"
+    }
   },
   {
     name: "Logs",
-    icon: "mdi-card-text",
     path: "/admin/logs",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/admin/Logs.vue"),
+    meta: {
+      icon: "mdi-card-text"
+    }
   },
   {
     name: "About",
-    icon: "mdi-information",
     path: "/about",
     component: () =>
       import(/* webpackChunkName: "about" */ "../views/About.vue"),
+    meta: {
+      icon: "mdi-information"
+    }
   },
 ];
 
