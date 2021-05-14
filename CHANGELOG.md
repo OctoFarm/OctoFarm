@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
     - Completely reworked history cache, prepared and tested for OctoFarm V2
+    - Slightly reworked file cache, prepared for V2 and made it robust  
 
 ### Removed
 

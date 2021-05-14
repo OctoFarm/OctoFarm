@@ -2,7 +2,7 @@
 
 const _ = require("lodash");
 const Logger = require("../logger.js");
-const { getPrintCostNumeric } = require("../utils/print-cost.util");
+const {getPrintCostNumeric} = require("../utils/print-cost.util");
 
 const {
   getDefaultFileCleanStatistics
@@ -21,7 +21,7 @@ class FileClean {
     return fileStatistics;
   }
 
-  static async statistics(farmPrinters) {
+  static statistics(farmPrinters) {
     const storageFree = [];
     const storageTotal = [];
     const devices = [];
@@ -32,7 +32,7 @@ class FileClean {
 
     // Collect unique devices - Total for farm storage should not duplicate storage on instances running on same devices.
     farmPrinters.forEach((printer, index) => {
-      if (typeof printer.storage !== "undefined") {
+      if (!!printer.storage) {
         const device = {
           ip: printer.printerURL,
           index: printer.index,
@@ -40,8 +40,8 @@ class FileClean {
         };
         devices.push(device);
       }
-      if (typeof printer.fileList !== "undefined") {
-        printer.fileList.files.forEach((file) => {
+      if (!!printer.fileList) {
+        printer.fileList.files?.forEach((file) => {
           if (!isNaN(file.size)) {
             fileSizes.push(file.size);
           }
@@ -51,7 +51,7 @@ class FileClean {
 
           fileCount.push(file);
         });
-        printer.fileList.folders.forEach((file) => {
+        printer.fileList.folders?.forEach((file) => {
           folderCount.push(file);
         });
       }
@@ -68,110 +68,116 @@ class FileClean {
     fileStatistics.storageUsed = storageTotalTotal - storageFreeTotal;
     fileStatistics.storageTotal = storageTotalTotal;
     fileStatistics.storageRemain = storageFreeTotal;
-    fileStatistics.storagePercent = Math.floor(
-      (fileStatistics.storageUsed / storageTotalTotal) * 100
+    fileStatistics.storagePercent = storageTotalTotal === 0 ? 0 : Math.floor(
+      (fileStatistics.storageUsed / storageTotalTotal) * 100,
     );
     fileStatistics.fileCount = fileCount.length;
     fileStatistics.folderCount = folderCount.length;
     // TODO repeated calls?
     if (fileSizes.length !== 0) {
-      fileStatistics.biggestFile = fileSizes.reduce(function (a, b) {
-        return Math.max(a, b);
-      });
-      fileStatistics.smallestFile = fileSizes.reduce(function (a, b) {
-        return Math.max(a, b);
-      });
-      fileStatistics.averageFile =
-        fileSizes.reduce((a, b) => a + b, 0) / fileCount.length;
+      fileStatistics.biggestFile = Math.max(...fileSizes);
+      fileStatistics.smallestFile = Math.min(...fileSizes);
+      fileStatistics.averageFile = fileSizes.reduce((a, b) => a + b, 0) / fileCount.length;
     }
     if (fileLengths.length !== 0) {
-      fileStatistics.biggestLength = fileLengths.reduce(function (a, b) {
-        return Math.max(a, b);
-      });
-
-      fileStatistics.smallestLength = fileLengths.reduce(function (a, b) {
-        return Math.max(a, b);
-      });
-      fileStatistics.averageLength =
-        fileLengths.reduce((a, b) => a + b, 0) / fileCount.length;
+      fileStatistics.biggestLength = Math.max(...fileLengths);
+      fileStatistics.smallestLength = Math.min(...fileLengths);
+      fileStatistics.averageLength = fileLengths.reduce((a, b) => a + b, 0) / fileCount.length;
     }
   }
 
-  static async generate(farmPrinter, selectedFilament) {
+  static generate(farmPrinter, selectedFilament) {
     logger.info("Running File Cleaning");
-    try {
-      const { fileList } = farmPrinter;
-      if (typeof farmPrinter.systemChecks !== "undefined") {
-        farmPrinter.systemChecks.cleaning.file.status = "warning";
-      }
-      const printCost = farmPrinter.costSettings;
-      const sortedFileList = [];
-      if (typeof fileList !== "undefined") {
-        try {
-          for (let f = 0; f < fileList.files.length; f++) {
-            const file = fileList.files[f];
-            const sortedFile = {
-              path: file.path,
-              fullPath: file.fullPath,
-              display: file.display,
-              name: file.name,
-              uploadDate: file.date,
-              fileSize: file.size,
-              thumbnail: file.thumbnail,
-              toolUnits: "",
-              toolCosts: "",
-              success: file.success,
-              failed: file.failed,
-              last: file.last,
-              expectedPrintTime: file.time,
-              printCost: getPrintCostNumeric(file.time, printCost)
-            };
-            sortedFile.toolUnits = await FileClean.getUnits(
-              selectedFilament,
-              file.length
-            );
-            sortedFile.toolCosts = await FileClean.getCost(
-              selectedFilament,
-              sortedFile.toolUnits
-            );
-            sortedFileList.push(sortedFile);
-            // console.log(sortedFileList);
-          }
-        } catch (e) {
-          console.log(e);
-        }
-      }
-      const newFileList = {
-        fileList: sortedFileList,
-        filecount: 0,
-        folderList: [],
-        folderCount: 0
-      };
-      newFileList.filecount = fileList.fileCount;
-      newFileList.folderList = fileList.folders;
-      newFileList.folderCount = fileList.folderCount;
-      cleanFileList[farmPrinter.sortIndex] = newFileList;
-      if (typeof farmPrinter.systemChecks !== "undefined") {
-        farmPrinter.systemChecks.cleaning.file.status = "success";
-        farmPrinter.systemChecks.cleaning.file.date = new Date();
-      }
-      logger.info("File Information cleaned and ready for consumption...");
-      return true;
-    } catch (e) {
-      console.log("MASSIVE FILE ERROR!!!!", e);
+    const { fileList, sortIndex } = farmPrinter;
+
+    if (!fileList) {
+      logger.error("File Cleaner failed: farmPrinter:fileList not defined.");
+      return;
     }
+
+    // NaN, object, undefined here
+    if (Number.isNaN(sortIndex) || isNaN(sortIndex)) {
+      logger.error(`File Cleaner failed: farmPrinter:sortIndex is NaN (${sortIndex})`);
+      return;
+    }
+
+    // null, string caught here
+    if (!sortIndex && !Number.isInteger(sortIndex)) {
+      logger.error(`File Cleaner failed: farmPrinter:sortIndex not defined (${sortIndex})`);
+      return;
+    }
+
+    if (sortIndex < 0) {
+      logger.error(`File Cleaner failed: farmPrinter:sortIndex cannot be negative (${sortIndex})`);
+      return;
+    }
+
+    if (!!farmPrinter.systemChecks) {
+      farmPrinter.systemChecks.cleaning.file.status = "warning";
+    }
+    const printCost = farmPrinter.costSettings;
+    const sortedFileList = [];
+    if (!!fileList?.files) {
+      for (let file of fileList.files) {
+        const sortedFile = {
+          path: file.path,
+          fullPath: file.fullPath,
+          display: file.display,
+          name: file.name,
+          uploadDate: file.date,
+          fileSize: file.size,
+          thumbnail: file.thumbnail,
+          toolUnits: "",
+          toolCosts: "",
+          success: file.success,
+          failed: file.failed,
+          last: file.last,
+          expectedPrintTime: file.time,
+          printCost: getPrintCostNumeric(file.time, printCost),
+        };
+        sortedFile.toolUnits = FileClean.getUnits(
+          selectedFilament,
+          file.length,
+        );
+        sortedFile.toolCosts = FileClean.getCost(
+          selectedFilament,
+          sortedFile.toolUnits,
+        );
+        sortedFileList.push(sortedFile);
+      }
+    }
+
+    // TODO oof not the sortIndex again... this is SUPER BUG PRONE
+    // sortIndex should be a supporting math tool, not an array accessor
+    cleanFileList[sortIndex] = {
+      fileList: sortedFileList,
+      filecount: fileList.fileCount || 0,
+      folderList: fileList.folders || [],
+      folderCount: fileList.folderCount || 0,
+    };
+    if (!!farmPrinter.systemChecks) {
+      farmPrinter.systemChecks.cleaning.file.status = "success";
+      farmPrinter.systemChecks.cleaning.file.date = new Date();
+    }
+    logger.info("File Information cleaned and ready for consumption...");
   }
 
-  static async getUnits(filamentSelection, lengths) {
+  /**
+   * TODO get units of what? Be explicit.
+   * @param filamentSelection
+   * @param fileLength
+   * @returns {*[]}
+   */
+  static getUnits(filamentSelection, fileLength) {
     const strings = [];
     const lengthArray = [];
     const weightArray = [];
-    if (lengths !== null) {
-      for (let l = 0; l < lengths.length; l++) {
-        const length = lengths[l] / 1000;
+    if (!!fileLength) {
+      for (let l = 0; l < fileLength.length; l++) {
+        const length = fileLength[l] / 1000;
         if (
-          typeof filamentSelection !== "undefined" &&
-          Array.isArray(filamentSelection)
+            typeof filamentSelection !== "undefined" &&
+            Array.isArray(filamentSelection)
         ) {
           if (filamentSelection[l] === null) {
             const radius = 1.75 / 2;
@@ -216,36 +222,42 @@ class FileClean {
     return [];
   }
 
-  static async getCost(filamentSelection, units) {
+  /**
+   * TODO get cost of what? Be explicit.
+   * @param filamentSelection
+   * @param units
+   * @returns {*[]}
+   */
+  static getCost(filamentSelection, units) {
     units = JSON.parse(JSON.stringify(units));
-    filamentSelection = JSON.parse(JSON.stringify(filamentSelection));
-    filamentSelection.unshift("SKIP");
-    const strings = [];
-    const costArray = [];
-    if (units.length === 0) {
+    if (!Array.isArray(units) || units.length === 0) {
       return [];
     }
+
+    const strings = [];
+    const costArray = [];
+    filamentSelection = JSON.parse(JSON.stringify(filamentSelection));
+    filamentSelection.unshift("SKIP");
     for (let u = 0; u < units.length; u++) {
       if (
-        typeof filamentSelection !== "undefined" &&
-        Array.isArray(filamentSelection)
+          typeof filamentSelection !== "undefined" &&
+          Array.isArray(filamentSelection)
       ) {
         if (filamentSelection[u] === "SKIP") {
         } else if (
-          typeof filamentSelection[u] !== "undefined" &&
-          filamentSelection[u] !== null
+            typeof filamentSelection[u] !== "undefined" &&
+            filamentSelection[u] !== null
         ) {
           let newUnit = units[u].split(" / ");
           newUnit = newUnit[1].replace("g", "");
           if (!units[u].includes("Total")) {
             const cost = (
-              (filamentSelection[u].spools.price /
-                filamentSelection[u].spools.weight) *
-              parseFloat(newUnit)
+                (filamentSelection[u].spools.price /
+                    filamentSelection[u].spools.weight) *
+                parseFloat(newUnit)
             ).toFixed(2);
             costArray.push(parseFloat(cost));
-            const string = cost;
-            strings.push(string);
+            strings.push(cost);
           }
         } else {
           costArray.push(0);
