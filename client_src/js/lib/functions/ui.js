@@ -90,9 +90,11 @@ export default class UI {
     });
   }
   static removeLoaderFromElementInnerHTML(element) {
-    element.innerHTML = element.innerHTML.replace(
-      '<i class="fas fa-spinner fa-spin"></i>',
-      ""
-    );
+    if (element.innerHTML.includes("spinner")) {
+      element.innerHTML = element.innerHTML.replace(
+        '<i class="fas fa-spinner fa-spin"></i>',
+        ""
+      );
+    }
   }
 }
