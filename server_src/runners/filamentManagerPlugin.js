@@ -1,6 +1,3 @@
-const runner = require('../runners/state.js');
-const { Runner } = runner;
-
 const filamentClean = require('../lib/dataFunctions/filamentClean.js');
 
 const { FilamentClean } = filamentClean;

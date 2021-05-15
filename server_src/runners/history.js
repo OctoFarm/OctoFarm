@@ -9,7 +9,6 @@ const filamentProfiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const Spool = require("../models/Filament.js");
 const { FilamentManagerPlugin } = require("./filamentManagerPlugin.js");
-const { HistoryClean } = require("../lib/dataFunctions/historyClean.js");
 const { ScriptRunner } = require("./scriptCheck.js");
 const MjpegDecoder = require("mjpeg-decoder");
 const { downloadFromOctoPrint } = require("../utils/download.util");
