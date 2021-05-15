@@ -1,6 +1,6 @@
 "use strict";
 
-const { checkNested, checkNestedIndex } = require("../utils/array.util");
+const {checkNested, checkNestedIndex} = require("../utils/array.util");
 const {
   getDefaultDashboardStatisticsObject,
   getEmptyHeatmap,
@@ -8,16 +8,17 @@ const {
   getEmptyOperationsObject,
   ALL_MONTHS,
 } = require("../providers/cleaner.constants");
-const { getHistoryCache } = require("../../cache/history.cache");
+const {getHistoryCache} = require("../../cache/history.cache");
 const _ = require("lodash");
-const { JobClean } = require("./jobClean.js");
+const {JobClean} = require("./jobClean.js");
 const fileClean = require("./fileClean.js");
-const { FileClean } = fileClean;
+const {FileClean} = fileClean;
 const FarmStatistics = require("../../models/FarmStatistics.js");
+const FarmStatisticsService = require("../../services/farm-statistics.service");
 const RoomData = require("../../models/RoomData.js");
 const ErrorLogs = require("../../models/ErrorLog.js");
 const TempHistory = require("../../models/TempHistory.js");
-const { PrinterTicker } = require("../../runners/printerTicker.js");
+const {PrinterTicker} = require("../../runners/printerTicker.js");
 
 const Logger = require("../logger.js");
 const logger = new Logger("OctoFarm-InformationCleaning");
@@ -1548,48 +1549,21 @@ class PrinterClean {
   }
 
   static async initFarmInformation() {
-    farmStats = await FarmStatistics.find({});
-    if (typeof farmStats === undefined || farmStats.length < 1) {
+    farmStats = await FarmStatisticsService.list({});
+    if (typeof farmStats === "undefined" || farmStats.length < 1) {
       const farmStart = new Date();
-      const newfarmStats = new FarmStatistics({
-        farmStart,
-        heatMap,
-      });
-      farmStats[0] = newfarmStats;
-      newfarmStats.save();
+
+      farmStats[0] = await FarmStatisticsService.create(farmStart, heatMap);
     } else if (typeof farmStats[0].heatMap === "undefined") {
       farmStats[0].heatMap = heatMap;
       dashboardStatistics.utilisationGraph = heatMap;
       farmStats[0].markModified("heatMap");
-      farmStats[0].save();
-    } else {
-      heatMap = farmStats[0].heatMap;
-      // Make sure array total is updated...
-      const today = PrinterClean.getDay(new Date());
-      for (let i = 0; i < heatMap.length; i++) {
-        // If x = today add that fucker up!
-        const lastInArray = heatMap[i].data.length - 1;
-        if (heatMap[i].data[lastInArray].x === today) {
-          if (heatMap[i].name === "Completed") {
-            arrayTotal[0] = heatMap[i].data[lastInArray].figure;
-          }
-          if (heatMap[i].name === "Active") {
-            arrayTotal[1] = heatMap[i].data[lastInArray].figure;
-          }
-          if (heatMap[i].name === "Offline") {
-            arrayTotal[2] = heatMap[i].data[lastInArray].figure;
-          }
-          if (heatMap[i].name === "Idle") {
-            arrayTotal[3] = heatMap[i].data[lastInArray].figure;
-          }
-          if (heatMap[i].name === "Disconnected") {
-            arrayTotal[4] = heatMap[i].data[lastInArray].figure;
-          }
-        }
-      }
+      await farmStats[0].save();
     }
+
     return "Farm information inititialised...";
   }
+
   static returnAllOctoPrintVersions() {
     const printers = this.returnPrintersInformation();
 
