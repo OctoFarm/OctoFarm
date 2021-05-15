@@ -97,4 +97,9 @@ export default class UI {
       );
     }
   }
+  static addLoaderToElementsInnerHTML(element) {
+    if (!element.innerHTML.includes("spinner")) {
+      element.innerHTML += ' <i class="fas fa-spinner fa-spin"></i>';
+    }
+  }
 }

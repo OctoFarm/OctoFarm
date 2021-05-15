@@ -3329,7 +3329,7 @@ class dashUpdate {
             document
               .getElementById(`printerStatistics-${printer._id}`)
               .addEventListener("click", async (e) => {
-                PrinterLogs.loadStatistics(printer._id);
+                await PrinterLogs.loadStatistics(printer._id);
               });
           }
         }
