@@ -1250,6 +1250,12 @@ class PrinterSettings {
             [currentPrinter],
             currentPrinter._id
           );
+          UI.createAlert(
+            "success",
+            "Successfully reloaded your OctoPrint Settings",
+            3000,
+            "clicked"
+          );
         });
       serialPortDropDownElement.classList = "custom-select bg-danger";
     }
