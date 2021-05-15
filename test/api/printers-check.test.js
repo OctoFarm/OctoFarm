@@ -1,8 +1,8 @@
 const dbHandler = require("../db-handler");
 const request = require("supertest");
 const { setupTestApp, getServer } = require("../../app-test");
-const passport = require("passport");
 
+jest.mock("../../server_src/config/auth");
 let app = null;
 /**
  * Connect to a new in-memory database before running any tests.
@@ -37,14 +37,17 @@ async function getOrCreateApp() {
 }
 
 describe("Printer Update Endpoint", () => {
-  it("should return 302 redirect when no user is logged in", async function (done) {
-    process.env.npm_package_version = require("../../package.json").version;
-    process.env.testlatest_package_version = require("../../package.json").version;
+  it("should return 400 error when wrong input is provided", async function (done) {
+    const app = await getOrCreateApp();
+
     app = await getOrCreateApp();
     const res = await request(app)
       .post("/printers/updatePrinterSettings")
       .send();
-    expect(res.statusCode).toEqual(302);
+
+    // Assert input validation failed
+    expect(res.statusCode).toEqual(400);
+
     done();
   }, 10000);
 });

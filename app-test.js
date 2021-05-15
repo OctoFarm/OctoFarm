@@ -18,7 +18,6 @@ async function setupTestApp() {
   // Save listener as state for tests
   httpListener = await serveOctoFarmNormally(octoFarmTestServer, fetchOctoFarmPort());
 
-  // const stringRouteMap = JSON.stringify(getEndpoints(octoFarmTestServer).map(r => r.path));
   return octoFarmTestServer;
 }
 
@@ -28,8 +27,6 @@ async function setupDatabaseIssueApp() {
   const octoFarmTestServer = setupExpressServer();
   httpListener = await serveDatabaseIssueFallback(octoFarmTestServer, fetchOctoFarmPort());
 
-  const stringRouteMap = JSON.stringify(getEndpoints(octoFarmTestServer).map(r => r.path));
-  console.log("Server db issue routes:" , stringRouteMap);
   return octoFarmTestServer;
 }
 
