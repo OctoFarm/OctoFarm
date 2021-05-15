@@ -6,6 +6,7 @@ import Script from "./scriptCheck.js";
 
 let currentPrinterIndex;
 let printerOnline;
+let currentPrinter;
 let hasErrorNotificationBeenTriggered = false;
 let pageElements;
 
@@ -46,7 +47,6 @@ async function updatePrinterSettingsModal(printersInformation, printerID) {
       }
     }
   } else {
-    let currentPrinter;
     try {
       PrinterSettings.updateCurrentPrinterIndex(printersInformation, printerID);
     } catch (e) {
@@ -1020,36 +1020,36 @@ class PrinterSettings {
     document
       .getElementById("savePrinterSettingsBtn")
       .addEventListener("click", async (event) => {
-        UI.addLoaderToElementsInnerHTML(event.srcElement);
+        UI.addLoaderToElementsInnerHTML(event.target);
         const printerSettingsValues = this.getPageValues(currentPrinter);
         try {
-          let updateSettings = await OctoFarmClient.post(
+          let updatedSettings = await OctoFarmClient.post(
             "printers/updateSettings",
             printerSettingsValues
           );
-          if (updateSettings.status.octofarm === 200) {
+          if (updatedSettings.status.octofarm === 200) {
             UI.createAlert(
               "success",
-              `${currentPrinter.printerName}: profile successfully updated`,
+              `${currentPrinter.printerName}: OctoFarm successfully updated`,
               3000,
               "clicked"
             );
           } else {
             UI.createAlert(
               "error",
-              `${currentPrinter.printerName}: profile failed to updated`,
+              `${currentPrinter.printerName}: OctoFarm failed to updated`,
               3000,
               "clicked"
             );
           }
-          if (updateSettings.status.profile === 200) {
+          if (updatedSettings.status.profile === 200) {
             UI.createAlert(
               "success",
               `${currentPrinter.printerName}: profile successfully updated`,
               3000,
               "clicked"
             );
-          } else if (updateSettings.status.profile === 900) {
+          } else if (updatedSettings.status.profile === 900) {
             // Skip as no changes we're made
           } else {
             UI.createAlert(
@@ -1059,14 +1059,14 @@ class PrinterSettings {
               "clicked"
             );
           }
-          if (updateSettings.status.settings === 200) {
+          if (updatedSettings.status.settings === 200) {
             UI.createAlert(
               "success",
               `${currentPrinter.printerName}: settings successfully updated`,
               3000,
               "clicked"
             );
-          } else if (updateSettings.status.profile === 900) {
+          } else if (updatedSettings.status.profile === 900) {
             // Skip as no changes we're made
           } else {
             UI.createAlert(
@@ -1083,8 +1083,9 @@ class PrinterSettings {
             5000,
             "clicked"
           );
+        } finally {
+          UI.removeLoaderFromElementInnerHTML(event.target);
         }
-        UI.addLoaderToElementsInnerHTML(event.srcElement);
       });
   }
 
@@ -1244,8 +1245,11 @@ class PrinterSettings {
         'Please <button id="settingsPageRefreshButton" type="button" role="tab" data-toggle="list" class="btn btn-info btn-small p-1">Click Here!</button> to refresh once the issue is rectified</div>';
       document
         .getElementById("settingsPageRefreshButton")
-        .addEventListener("click", () => {
-          console.log("RE");
+        .addEventListener("click", async () => {
+          await updatePrinterSettingsModal(
+            [currentPrinter],
+            currentPrinter._id
+          );
         });
       serialPortDropDownElement.classList = "custom-select bg-danger";
     }
