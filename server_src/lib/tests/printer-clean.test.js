@@ -76,4 +76,10 @@ describe("PrinterClean", function () {
     expect(farmStats[0].heatMap[0].name).toEqual("Completed");
     expect(message).toEqual("Farm information inititialised...");
   });
+
+  it('should generate printer statistics without errors', async () => {
+    // TODO does not throw any error because of input validation right now
+    const returnedStats = await PrinterClean.generatePrinterStatistics();
+    expect(returnedStats).toBeTruthy();
+  });
 });
