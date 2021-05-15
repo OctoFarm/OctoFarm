@@ -38,8 +38,6 @@ async function getOrCreateApp() {
 
 describe("Printer Update Endpoint", () => {
   it("should return 400 error when wrong input is provided", async function (done) {
-    const app = await getOrCreateApp();
-
     app = await getOrCreateApp();
     const res = await request(app)
       .post("/printers/updatePrinterSettings")
