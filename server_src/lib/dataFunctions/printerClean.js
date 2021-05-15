@@ -216,12 +216,9 @@ class PrinterClean {
         if (dateParse.getTime() > sevenDaysAgo.getTime()) {
           historyWeekly.push(h);
         }
-        let checkNested = checkNested(
-          "Success",
-          printerStatistics.historyByDay
-        );
+        let isNested = checkNested("Success", printerStatistics.historyByDay);
         //
-        if (typeof checkNested !== "undefined") {
+        if (typeof isNested !== "undefined") {
           let checkNestedIndexHistoryRates = null;
           if (h.state.includes("success")) {
             checkNestedIndexHistoryRates = checkNestedIndex(
@@ -336,7 +333,7 @@ class PrinterClean {
     });
 
     printerStatistics.historyByDay.forEach((usage) => {
-      usage.data = sumValuesGroupByDate(usage.data);
+      usage.data = this.sumValuesGroupByDate(usage.data);
     });
 
     return printerStatistics;
