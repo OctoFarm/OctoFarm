@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
     - Fixed #531 - Updated settings are not grabbed when opening settings modal
     - Fixed #532 - Actual save port is not checked against live ports on OctoPrint on settings Modal
     - Fixed #576, #577: correct some function calls in PrinterClean
+    - Fixed #542, #381: ensureIndex mongoose warning and circular Runner import resolved 
 
 ## [v1.1.13-hotfix]
 
