@@ -26,10 +26,9 @@ import Toolbar from "@/components/Toolbar/Toolbar.vue";
     Toolbar
   }
 })
-
 export default class OctoFarm extends Vue {
 
-};
+}
 </script>
 
 <style>

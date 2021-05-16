@@ -29,10 +29,9 @@
 import { Component, Vue } from 'vue-property-decorator'
 
 @Component({
-  name: "Navigation",
+  name: UserMenu.name,
 })
-
-export default class Toolbar extends Vue {
+export default class UserMenu extends Vue {
     private navigation: Array<unknown> = []
     private toggle_tool_bar(toggle: boolean){
         this.$emit("update_nav_drawer", toggle)
@@ -40,5 +39,5 @@ export default class Toolbar extends Vue {
     beforeMount(){
         this.navigation = this.$router.options.routes ?? [];
     }
-};
+}
 </script>

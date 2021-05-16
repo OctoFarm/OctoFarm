@@ -39,8 +39,7 @@ export default {
       if (interval > 1) {
         return Math.floor(interval) + " minutes";
       }
-      let value = Math.floor(seconds) + " seconds";
-      that.timeSince = value;
+      that.timeSince = Math.floor(seconds) + " seconds";
     }
   },
   beforeMount: function() {

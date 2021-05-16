@@ -33,12 +33,11 @@ import Navigation from "./Navigation.vue"
       Navigation
   }
 })
-
 export default class Toolbar extends Vue {
     private mini = true
     private menu_reload_key = 0
     private update_drawer(toggle: boolean): void {
         this.mini = toggle
     }
-};
+}
 </script>
