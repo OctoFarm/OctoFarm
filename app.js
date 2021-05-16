@@ -32,6 +32,7 @@ mongoose
     useNewUrlParser: true,
     useUnifiedTopology: true,
     useFindAndModify: false,
+    useCreateIndex: true,
     serverSelectionTimeoutMS: 2500
   })
   .then(() => ensureSystemSettingsInitiated())
