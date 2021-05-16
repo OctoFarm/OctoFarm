@@ -48,7 +48,7 @@
     "lodash": "^4.17.21",
     "lookpath": "^1.2.0",
     "mjpeg-decoder": "^1.0.3",
-    "mongoose": "^5.11.18",
+    "mongoose": "^5.12.9",
     "multer": "^1.4.2",
     "node-fetch": "^2.6.1",
     "node-upnp-ssdp": "^0.1.1",
