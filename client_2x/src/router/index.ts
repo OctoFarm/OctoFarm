@@ -4,7 +4,7 @@ import Dashboard from "../views/Dashboard.vue";
 
 Vue.use(VueRouter);
 
-const routes: Array<RouteConfig> = [
+const routes: RouteConfig[] = [
   {
     path: "/",
     name: "Dashboard",

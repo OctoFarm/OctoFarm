@@ -13,7 +13,7 @@
           @click="toggle_tool_bar(true)"
         >
           <v-list-item-icon>
-            <v-icon v-text="nav.icon" />
+            <v-icon>{{ nav.meta.icon }}</v-icon>
           </v-list-item-icon>
 
           <v-list-item-content>
