@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
     - Slightly reworked file cache, prepared for V2 and made it robust
     - Made API tests less prone to unnecessary failure
     - Reworked the Settings modal to be more resiliant to failure and cleaned up code. 
+    - Slightly reworked job cache, prepared for V2
 
 ### Removed
 
