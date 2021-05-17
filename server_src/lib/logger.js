@@ -42,10 +42,10 @@ class LoggerService {
           info.message
         }`;
         message = info.obj
-          ? message + `data:${JSON.stringify(info.obj)} | `
+          ? message + ` data:${JSON.stringify(info.obj)} | `
           : message;
         message = this.log_data
-          ? message + `log_data:${JSON.stringify(this.log_data)} | `
+          ? message + ` log_data:${JSON.stringify(this.log_data)} | `
           : message;
         return message;
       })

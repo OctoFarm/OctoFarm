@@ -2,7 +2,7 @@ const currentIssues = [];
 const octoprintLogs = [];
 
 class PrinterTicker {
-  static async addOctoPrintLog(printer, message, state, plugin) {
+  static addOctoPrintLog(printer, message, state, plugin) {
     let id = null;
     if (octoprintLogs.length === 0) {
       //first issue
@@ -47,16 +47,18 @@ class PrinterTicker {
     }
   }
 
-  static async removeIssue(id) {
+  static removeIssue(id) {
     const index = _.findIndex(currentIssues, function (o) {
       return o.id == id;
     });
     currentIssues.splice(index, 1);
   }
-  static async returnOctoPrintLogs() {
+
+  static returnOctoPrintLogs() {
     return octoprintLogs;
   }
-  static async returnIssue() {
+
+  static returnIssue() {
     return currentIssues;
   }
 }
