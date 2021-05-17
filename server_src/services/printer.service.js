@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-const printerModel = require('../models/Printer');
+const printerModel = require("../models/Printer");
 
 /**
  * Stores a new printer into the database.

@@ -61,16 +61,16 @@ router.post("/select", ensureAuthenticated, async (req, res) => {
     const spool = await Spool.findById(req.body.spoolId);
     const selection = {
       tool: req.body.tool,
-      spool: { id: spool.spools.fmID },
+      spool: { id: spool.spools.fmID }
     };
     const url = `${printer.printerURL}/plugin/filamentmanager/selections/0`;
     const updateFilamentManager = await fetch(url, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
+        "X-Api-Key": printer.apikey
       },
-      body: JSON.stringify({ selection }),
+      body: JSON.stringify({ selection })
     });
   }
   const printerList = await Runner.selectedFilament(
@@ -117,7 +117,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
       material: profiles[findID].profile.material,
       density: profiles[findID].profile.density,
       diameter: profiles[findID].profile.diameter,
-      id: profiles[findID].profile.index,
+      id: profiles[findID].profile.index
     };
     const spool = {
       name: filament.spoolsName,
@@ -125,7 +125,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
       cost: filament.spoolsPrice,
       weight: filament.spoolsWeight,
       used: filament.spoolsUsed,
-      temp_offset: filament.spoolsTempOffset,
+      temp_offset: filament.spoolsTempOffset
     };
     logger.info("Updating OctoPrint: ", spool);
     const url = `${printer.printerURL}/plugin/filamentmanager/spools`;
@@ -133,9 +133,9 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
+        "X-Api-Key": printer.apikey
       },
-      body: JSON.stringify({ spool }),
+      body: JSON.stringify({ spool })
     });
     updateFilamentManager = await updateFilamentManager.json();
     const reSync = await FilamentManagerPlugin.filamentManagerReSync(
@@ -151,10 +151,10 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
       weight: filament.spoolsWeight,
       used: filament.spoolsUsed,
       tempOffset: filament.spoolsTempOffset,
-      fmID: filamentManagerID,
+      fmID: filamentManagerID
     };
     const newFilament = new Spool({
-      spools,
+      spools
     });
     newFilament.save().then(async (e) => {
       logger.info("New Spool saved successfully: ", newFilament);
@@ -194,8 +194,8 @@ router.post("/delete/filament", ensureAuthenticated, async (req, res) => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
-      },
+        "X-Api-Key": printer.apikey
+      }
     });
 
     const rel = await Spool.deleteOne({ _id: searchId }).exec();
@@ -250,7 +250,7 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
       material: profiles[findID].profile.material,
       density: profiles[findID].profile.density,
       diameter: profiles[findID].profile.diameter,
-      id: profiles[findID].profile.index,
+      id: profiles[findID].profile.index
     };
     const spool = {
       name: newContent[0],
@@ -258,7 +258,7 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
       cost: newContent[1],
       weight: newContent[2],
       used: newContent[3],
-      temp_offset: newContent[4],
+      temp_offset: newContent[4]
     };
     logger.info("Updating OctoPrint: ", spool);
     const url = `${printer.printerURL}/plugin/filamentmanager/spools/${spools.spools.fmID}`;
@@ -266,9 +266,9 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
+        "X-Api-Key": printer.apikey
       },
-      body: JSON.stringify({ spool }),
+      body: JSON.stringify({ spool })
     });
     console.log(updateFilamentManager);
   }
@@ -333,7 +333,7 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
       vendor: newProfile.manufacturer,
       material: newProfile.material,
       density: newProfile.density,
-      diameter: newProfile.diameter,
+      diameter: newProfile.diameter
     };
     logger.info("Updating OctoPrint: ", profile);
     const url = `${printer.printerURL}/plugin/filamentmanager/profiles`;
@@ -341,9 +341,9 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
+        "X-Api-Key": printer.apikey
       },
-      body: JSON.stringify({ profile }),
+      body: JSON.stringify({ profile })
     });
     updateFilamentManager = await updateFilamentManager.json();
     const reSync = await FilamentManagerPlugin.filamentManagerReSync(
@@ -353,7 +353,7 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
     res.send({
       res: "success",
       dataProfile: reSync.newProfiles,
-      filamentManager,
+      filamentManager
     });
   } else {
     const profile = {
@@ -361,10 +361,10 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
       manufacturer: newProfile.manufacturer,
       material: newProfile.material,
       density: newProfile.density,
-      diameter: newProfile.diameter,
+      diameter: newProfile.diameter
     };
     const dataProfile = new Profile({
-      profile,
+      profile
     });
 
     dataProfile
@@ -406,7 +406,7 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
       vendor: newContent[0],
       material: newContent[1],
       density: newContent[2],
-      diameter: newContent[3],
+      diameter: newContent[3]
     };
     logger.info("Updating OctoPrint: ", profile);
     const url = `${printer.printerURL}/plugin/filamentmanager/profiles/${searchId}`;
@@ -414,9 +414,9 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
+        "X-Api-Key": printer.apikey
       },
-      body: JSON.stringify({ profile }),
+      body: JSON.stringify({ profile })
     });
 
     updateFilamentManager = await updateFilamentManager.json();
@@ -483,8 +483,8 @@ router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
-      },
+        "X-Api-Key": printer.apikey
+      }
     });
     const profiles = await Profile.find({});
     const findID = _.findIndex(profiles, function (o) {
@@ -552,8 +552,8 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
-      },
+        "X-Api-Key": printer.apikey
+      }
     }
   );
   logger.info("Grabbing Profiles");
@@ -563,8 +563,8 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
-      },
+        "X-Api-Key": printer.apikey
+      }
     }
   );
   logger.info("Grabbing Spools");
@@ -591,10 +591,10 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
       weight: sp.weight,
       used: sp.used,
       tempOffset: sp.temp_offset,
-      fmID: sp.id,
+      fmID: sp.id
     };
     const newS = new Spool({
-      spools,
+      spools
     });
     newS.save();
   });
@@ -605,10 +605,10 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
       density: sp.density,
       diameter: sp.diameter,
       manufacturer: sp.vendor,
-      material: sp.material,
+      material: sp.material
     };
     const newP = new Profile({
-      profile,
+      profile
     });
     newP.save();
   });

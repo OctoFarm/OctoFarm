@@ -31,5 +31,5 @@ function getPrintCostNumeric(printTime, costSettings) {
 
 module.exports = {
   noCostSettingsMessage,
-  getPrintCostNumeric,
+  getPrintCostNumeric
 };

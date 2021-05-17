@@ -5,7 +5,7 @@ const Logger = require("../logger.js");
 const { getPrintCostNumeric } = require("../utils/print-cost.util");
 
 const {
-  getDefaultFileCleanStatistics,
+  getDefaultFileCleanStatistics
 } = require("../providers/cleaner.constants");
 
 const logger = new Logger("OctoFarm-InformationCleaning");
@@ -36,7 +36,7 @@ class FileClean {
         const device = {
           ip: printer.printerURL,
           index: printer.index,
-          storage: printer.storage,
+          storage: printer.storage
         };
         devices.push(device);
       }
@@ -69,7 +69,7 @@ class FileClean {
     fileStatistics.storageTotal = storageTotalTotal;
     fileStatistics.storageRemain = storageFreeTotal;
     fileStatistics.storagePercent = Math.floor(
-      (fileStatistics.storageUsed / storageTotalTotal) * 100,
+      (fileStatistics.storageUsed / storageTotalTotal) * 100
     );
     fileStatistics.fileCount = fileCount.length;
     fileStatistics.folderCount = folderCount.length;
@@ -124,15 +124,15 @@ class FileClean {
               failed: file.failed,
               last: file.last,
               expectedPrintTime: file.time,
-              printCost: getPrintCostNumeric(file.time, printCost),
+              printCost: getPrintCostNumeric(file.time, printCost)
             };
             sortedFile.toolUnits = await FileClean.getUnits(
               selectedFilament,
-              file.length,
+              file.length
             );
             sortedFile.toolCosts = await FileClean.getCost(
               selectedFilament,
-              sortedFile.toolUnits,
+              sortedFile.toolUnits
             );
             sortedFileList.push(sortedFile);
             // console.log(sortedFileList);
@@ -145,7 +145,7 @@ class FileClean {
         fileList: sortedFileList,
         filecount: 0,
         folderList: [],
-        folderCount: 0,
+        folderCount: 0
       };
       newFileList.filecount = fileList.fileCount;
       newFileList.folderList = fileList.folders;
@@ -180,7 +180,7 @@ class FileClean {
             lengthArray.push(length);
             weightArray.push(usage);
             strings.push(
-              `<b>Tool ${l}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`,
+              `<b>Tool ${l}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`
             );
           } else if (typeof filamentSelection[l] !== "undefined") {
             const radius =
@@ -191,7 +191,7 @@ class FileClean {
             lengthArray.push(length);
             weightArray.push(usage);
             strings.push(
-              `<b>Tool ${l}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`,
+              `<b>Tool ${l}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`
             );
           } else {
             lengthArray.push(0);
@@ -208,7 +208,7 @@ class FileClean {
       const totalLength = lengthArray.reduce((a, b) => a + b, 0);
       const totalGrams = weightArray.reduce((a, b) => a + b, 0);
       const total = `<b>Total: </b>${totalLength.toFixed(
-        2,
+        2
       )}m / ${totalGrams.toFixed(2)}g`;
       strings.unshift(total);
       return strings;
@@ -263,5 +263,5 @@ class FileClean {
 }
 
 module.exports = {
-  FileClean,
+  FileClean
 };

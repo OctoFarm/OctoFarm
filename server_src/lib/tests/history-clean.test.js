@@ -1,10 +1,10 @@
 jest.mock("../../services/history.service");
 const mockHistoryService = require("../../services/history.service");
-const {noCostSettingsMessage} = require("../utils/print-cost.util");
-const {isPromise} = require("jest-util");
+const { noCostSettingsMessage } = require("../utils/print-cost.util");
+const { isPromise } = require("jest-util");
 
-const illegalHistoryCache = [{printHistory2: null}];
-const emptyLegalHistoryCache = [{printHistory: {}}];
+const illegalHistoryCache = [{ printHistory2: null }];
+const emptyLegalHistoryCache = [{ printHistory: {} }];
 const realisticHistoryCache = require("./mock-data/Histories.json");
 const interestingButWeirdHistoryCache = [
   {
@@ -16,20 +16,20 @@ const interestingButWeirdHistoryCache = [
         spools: {
           profile: {
             diameter: 5,
-            density: 3,
-          },
-        },
+            density: 3
+          }
+        }
       },
       job: {
-        filament: "pla",
+        filament: "pla"
       },
       spools: {
         pla: {
-          type: "pla",
-        },
-      },
-    },
-  },
+          type: "pla"
+        }
+      }
+    }
+  }
 ];
 
 function legacyConvertIncremental(input) {
@@ -41,7 +41,7 @@ function legacyConvertIncremental(input) {
     } else {
       usageWeightCalc = input[i].y;
     }
-    newObj.push({x: input[i].x, y: usageWeightCalc});
+    newObj.push({ x: input[i].x, y: usageWeightCalc });
   }
   return newObj;
 }
@@ -83,7 +83,7 @@ describe("historyClean", function () {
     mockHistoryService.saveMockData(emptyLegalHistoryCache);
 
     expect(await mockHistoryService.find({})).toStrictEqual(
-        emptyLegalHistoryCache,
+      emptyLegalHistoryCache
     );
 
     const historyState = new HistoryClean(false, "info");
@@ -96,15 +96,15 @@ describe("historyClean", function () {
     mockHistoryService.saveMockData(realisticHistoryCache);
 
     expect(await mockHistoryService.find({})).toStrictEqual(
-        realisticHistoryCache,
+      realisticHistoryCache
     );
 
     const historyState = new HistoryClean(false, "info");
     await historyState.initCache();
 
     const historyClean = historyState.historyClean;
-    expect(historyClean.length).toEqual(realisticHistoryCache.length)
-    historyClean.forEach(h => {
+    expect(historyClean.length).toEqual(realisticHistoryCache.length);
+    historyClean.forEach((h) => {
       expect(h.printer).toContain("PRINTER");
       expect(h.notes).not.toBeUndefined();
       // TODO ... jeez
@@ -120,72 +120,95 @@ describe("historyClean", function () {
     expect(stats).toBeTruthy();
 
     expect(stats).toEqual({
-      "completed": 10,
-      "cancelled": 4,
-      "failed": 0,
-      "completedPercent": "71.43",
-      "cancelledPercent": "28.57",
-      "failedPercent": "0.00",
-      "longestPrintTime": "20900.00",
-      "shortestPrintTime": "64.00",
-      "averagePrintTime": "11014.10",
-      "mostPrintedFile": "file.gcode",
-      "printerMost": "PRINTER2",
-      "printerLoad": "PRINTER1",
-      "totalFilamentUsage": "286.66g / 95.56m",
-      "averageFilamentUsage": "28.67g / 9.56m",
-      "highestFilamentUsage": "68.50g / 22.42m",
-      "lowestFilamentUsage": "0.00g / 0.00m",
-      "totalSpoolCost": "1.99",
-      "highestSpoolCost": "1.85",
-      "totalPrinterCost": "7.62",
-      "highestPrinterCost": "1.89",
-      "currentFailed": 247,
-      "historyByDay": [{
-        data: [{
-          "x": new Date("2021-01-24T00:00:00.000Z"),
-          "y": 1,
-        }, {
-          "x": new Date("2021-03-26T00:00:00.000Z"),
-          "y": 1,
-        }],
-        name: "Success"
-      }, {
-        data: [],
-        name: "Failed"
-      }, {
-        data: [{
-          "x": new Date("2021-03-26T00:00:00.000Z"),
-          "y": 2,
-        }],
-        name: "Cancelled"
-      }],
-      "totalByDay": [{
-        data: [{
-          "x": new Date("2021-01-24T00:00:00.000Z"),
-          "y": 68.5,
-        }],
-        name: "PETG"
-      }, {
-        data: [{
-          "x": new Date("2021-03-26T00:00:00.000Z"),
-          "y": 2.3499999999999996,
-        }],
-        name: "PLA"
-      }],
-      "usageOverTime": [{
-        data: [{
-          "x": new Date("2021-01-24T00:00:00.000Z"),
-          "y": 68.5,
-        }],
-        name: "PETG"
-      }, {
-        data: [{
-          "x": new Date("2021-03-26T00:00:00.000Z"),
-          "y": 2.3499999999999996,
-        }],
-        name: "PLA"
-      }]
+      completed: 10,
+      cancelled: 4,
+      failed: 0,
+      completedPercent: "71.43",
+      cancelledPercent: "28.57",
+      failedPercent: "0.00",
+      longestPrintTime: "20900.00",
+      shortestPrintTime: "64.00",
+      averagePrintTime: "11014.10",
+      mostPrintedFile: "file.gcode",
+      printerMost: "PRINTER2",
+      printerLoad: "PRINTER1",
+      totalFilamentUsage: "286.66g / 95.56m",
+      averageFilamentUsage: "28.67g / 9.56m",
+      highestFilamentUsage: "68.50g / 22.42m",
+      lowestFilamentUsage: "0.00g / 0.00m",
+      totalSpoolCost: "1.99",
+      highestSpoolCost: "1.85",
+      totalPrinterCost: "7.62",
+      highestPrinterCost: "1.89",
+      currentFailed: 247,
+      historyByDay: [
+        {
+          data: [
+            {
+              x: new Date("2021-01-24T00:00:00.000Z"),
+              y: 1
+            },
+            {
+              x: new Date("2021-03-26T00:00:00.000Z"),
+              y: 1
+            }
+          ],
+          name: "Success"
+        },
+        {
+          data: [],
+          name: "Failed"
+        },
+        {
+          data: [
+            {
+              x: new Date("2021-03-26T00:00:00.000Z"),
+              y: 2
+            }
+          ],
+          name: "Cancelled"
+        }
+      ],
+      totalByDay: [
+        {
+          data: [
+            {
+              x: new Date("2021-01-24T00:00:00.000Z"),
+              y: 68.5
+            }
+          ],
+          name: "PETG"
+        },
+        {
+          data: [
+            {
+              x: new Date("2021-03-26T00:00:00.000Z"),
+              y: 2.3499999999999996
+            }
+          ],
+          name: "PLA"
+        }
+      ],
+      usageOverTime: [
+        {
+          data: [
+            {
+              x: new Date("2021-01-24T00:00:00.000Z"),
+              y: 68.5
+            }
+          ],
+          name: "PETG"
+        },
+        {
+          data: [
+            {
+              x: new Date("2021-03-26T00:00:00.000Z"),
+              y: 2.3499999999999996
+            }
+          ],
+          name: "PLA"
+        }
+      ]
     });
 
     expect(stats.historyByDay).toHaveLength(3);
@@ -223,10 +246,12 @@ describe("historyClean", function () {
     const historyState2 = new HistoryClean(false, "info");
     // Expect void resolve
     await expect(historyState2.initCache()).resolves.toBeFalsy();
-    expect(historyState2.historyClean[0].printerCost).toEqual(noCostSettingsMessage);
+    expect(historyState2.historyClean[0].printerCost).toEqual(
+      noCostSettingsMessage
+    );
     // Expect the rabbit hole to be deep.
     expect(historyState2.historyClean[0].index).toEqual(
-        interestingButWeirdHistoryCache[0].printHistory.historyIndex,
+      interestingButWeirdHistoryCache[0].printHistory.historyIndex
     );
     // Act
     const historyStats = historyState.generateStatistics();
@@ -246,7 +271,9 @@ describe("historyClean", function () {
     expect(historyState.historyClean).toHaveLength(14);
     // A case where a tool is not set
     expect(historyState.historyClean[3].spools).toBeNull();
-    expect(historyState.historyClean[13].spools[0].tool0.toolName).toBe("Tool 0");
+    expect(historyState.historyClean[13].spools[0].tool0.toolName).toBe(
+      "Tool 0"
+    );
   });
 
   it("should not return NaN in printHours", async () => {
@@ -256,7 +283,7 @@ describe("historyClean", function () {
     await historyState.initCache();
 
     expect(historyState.historyClean[0].printHours).not.toContain("NaN");
-    expect(historyState.historyClean[0].printHours).toEqual('?');
+    expect(historyState.historyClean[0].printHours).toEqual("?");
   });
 
   it("should allow process spools to return associative array when spools is non-empty", async () => {
@@ -266,11 +293,14 @@ describe("historyClean", function () {
     await expect(await historyState.initCache()).resolves;
 
     const resultingSpoolsReport = HistoryClean.processHistorySpools(
-        historyState.historyClean[0], [], [], []
+      historyState.historyClean[0],
+      [],
+      [],
+      []
     );
     expect(resultingSpoolsReport.historyByDay).toContainEqual({
       name: "Success",
-      data: [],
+      data: []
     });
   });
 });
@@ -283,79 +313,84 @@ describe("historyClean:Static", () => {
 
   it("assignYCumSum tolerate falsy y values and skips falsy entries", () => {
     const undefinedYInput = [
-      {x: 0, y: undefined},
-      {x: 0, y: 1},
-      {x: 0, y: undefined},
-      {x: 0},
-      {x: 0, y: 1},
+      { x: 0, y: undefined },
+      { x: 0, y: 1 },
+      { x: 0, y: undefined },
+      { x: 0 },
+      { x: 0, y: 1 }
     ];
     const missingYInput = [
-      {x: 0},
-      {x: 0, y: 1},
-      {x: 0, y: 1},
-      {x: 0},
-      {x: 0, y: 1},
+      { x: 0 },
+      { x: 0, y: 1 },
+      { x: 0, y: 1 },
+      { x: 0 },
+      { x: 0, y: 1 }
     ];
     const falsyContainingInput = [
       null,
-      {x: 0, y: 1},
-      {x: 0},
+      { x: 0, y: 1 },
+      { x: 0 },
       undefined,
-      {x: 0, y: 1},
+      { x: 0, y: 1 }
     ];
     // Prove that the old function was buggy
     expect(legacyConvertIncremental(undefinedYInput)[4]).toStrictEqual({
       x: 0,
-      y: NaN,
+      y: NaN
     });
     expect(legacyConvertIncremental(missingYInput)[4]).toStrictEqual({
       x: 0,
-      y: NaN,
+      y: NaN
     });
     expect(() => legacyConvertIncremental(falsyContainingInput)[4]).toThrow();
 
     // Prove that the new function outputs something useful
     expect(HistoryClean.assignYCumSum(undefinedYInput)[4]).toStrictEqual({
       x: 0,
-      y: 2,
+      y: 2
     });
     expect(HistoryClean.assignYCumSum(missingYInput)[4]).toStrictEqual({
       x: 0,
-      y: 3,
+      y: 3
     });
 
     // Prove that the new function outputs for only defined x properties, but tolerates falsy y
     const gappyCumSum = HistoryClean.assignYCumSum(falsyContainingInput);
     expect(gappyCumSum.length).toEqual(3);
-    expect(gappyCumSum[2]).toStrictEqual({x: 0, y: 2});
+    expect(gappyCumSum[2]).toStrictEqual({ x: 0, y: 2 });
   });
 
   it("assignYCumSum is equivalent to map-cumulativeSum operator", () => {
     const input = [
-      {x: 0, y: 1},
-      {x: 0, y: 1},
-      {x: 0, y: 1},
-      {x: 0, y: 1},
-      {x: 0, y: 1},
+      { x: 0, y: 1 },
+      { x: 0, y: 1 },
+      { x: 0, y: 1 },
+      { x: 0, y: 1 },
+      { x: 0, y: 1 }
     ];
     const unitUnderTestResult = legacyConvertIncremental(input);
     expect(unitUnderTestResult).toHaveLength(5);
-    expect(unitUnderTestResult[4]).toStrictEqual({x: 0, y: 5});
+    expect(unitUnderTestResult[4]).toStrictEqual({ x: 0, y: 5 });
 
     const operatorComparedResult = HistoryClean.assignYCumSum(input);
     expect(operatorComparedResult).toStrictEqual(unitUnderTestResult);
   });
 
   it("should not return Promise on static processHistorySpools", () => {
-    const result = HistoryClean.processHistorySpools({
-      spools: [
-        {
-          pla: {
-            type: "abs",
-          },
-        },
-      ],
-    }, [], [], []);
+    const result = HistoryClean.processHistorySpools(
+      {
+        spools: [
+          {
+            pla: {
+              type: "abs"
+            }
+          }
+        ]
+      },
+      [],
+      [],
+      []
+    );
 
     expect(isPromise(result)).toEqual(false);
   });
@@ -372,12 +407,12 @@ describe("historyClean:Static", () => {
             let usage = "";
             if (success) {
               usage = (
-                  volume * parseFloat(spool.spools.profile.density)
+                volume * parseFloat(spool.spools.profile.density)
               ).toFixed(2);
             } else {
               usage = (
-                  (printPercentage / 100) *
-                  (volume * parseFloat(spool.spools.profile.density))
+                (printPercentage / 100) *
+                (volume * parseFloat(spool.spools.profile.density))
               ).toFixed(2);
             }
             return usage;
@@ -408,12 +443,15 @@ describe("historyClean:Static", () => {
     }
 
     const length1 = 18.648094819996633;
-    expect(getWeight(length1, undefined, 100, 0))
-        .toEqual(HistoryClean.calcSpoolWeightAsString(length1, undefined, 1));
-    expect(getWeight(length1, undefined, 50, 0))
-        .toEqual(HistoryClean.calcSpoolWeightAsString(length1, undefined, 0.5));
-    expect(getWeight(length1, undefined, 50, 1))
-        .toEqual(HistoryClean.calcSpoolWeightAsString(length1, undefined, 1));
+    expect(getWeight(length1, undefined, 100, 0)).toEqual(
+      HistoryClean.calcSpoolWeightAsString(length1, undefined, 1)
+    );
+    expect(getWeight(length1, undefined, 50, 0)).toEqual(
+      HistoryClean.calcSpoolWeightAsString(length1, undefined, 0.5)
+    );
+    expect(getWeight(length1, undefined, 50, 1)).toEqual(
+      HistoryClean.calcSpoolWeightAsString(length1, undefined, 1)
+    );
   });
 });
 
