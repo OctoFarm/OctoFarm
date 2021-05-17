@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [v1.1.14-rc1]
 
 ### Added
+    - Added #546: Node 13 or lower issue webpage with instructions, doesnt restart server anymore  
 
 ### Changed
     - Completely reworked history cache, prepared and tested for OctoFarm V2
@@ -15,6 +16,7 @@ All notable changes to this project will be documented in this file.
     - Fixed #567: heatmap error (race condition) in PrinterClean for any newly created database
     - Fixed #576, #577: correct some function calls in PrinterClean
     - Fixed #542, #381: ensureIndex mongoose warning and circular Runner import resolved 
+
 
 ## [v1.1.13-hotfix]
 

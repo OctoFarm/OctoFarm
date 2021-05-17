@@ -102,7 +102,7 @@ function fetchMongoDBConnectionString(persistToEnv = false) {
 }
 
 function fetchOctoFarmPort() {
-    const port = process.env[AppConstants.OCTOFARM_PORT_KEY];
+    let port = process.env[AppConstants.OCTOFARM_PORT_KEY];
     if (Number.isNaN(parseInt(port))) {
         logger.warning(
             `~ The ${AppConstants.OCTOFARM_PORT_KEY} setting was not a correct port number: >= 0 and < 65536. Actual value: ${port}.`
@@ -124,6 +124,7 @@ function fetchOctoFarmPort() {
         process.env[
             AppConstants.OCTOFARM_PORT_KEY
             ] = AppConstants.defaultOctoFarmPort.toString();
+        port = process.env[AppConstants.OCTOFARM_PORT_KEY];
     }
     return port;
 }
