@@ -13,10 +13,10 @@ const source = require("vinyl-source-stream");
 const buffer = require("vinyl-buffer");
 const cache = require("gulp-cached");
 
-const {src, series, parallel, dest, watch} = require("gulp");
+const { src, series, parallel, dest, watch } = require("gulp");
 
-const ASSETS_FOLDER_OLD = './views/assets';
-const ASSETS_FOLDER_NEW = '../server_2x/assets/public/assets';
+const ASSETS_FOLDER_OLD = "./views/assets";
+const ASSETS_FOLDER_NEW = "../server_2x/assets/public/assets";
 
 // Select the targeted output folder
 const ASSETS_FOLDER = ASSETS_FOLDER_OLD;
@@ -46,7 +46,7 @@ const jsClientFiles = [
   jsPrinterManagement,
   jsSettings,
   jsServerAliveCheck,
-  jsHistory,
+  jsHistory
 ];
 
 const jsServerFolder = "server/";
@@ -61,7 +61,7 @@ const jsServerFiles = [
   jsPrinterManagement,
   jsSettings,
   jsServerAliveCheck,
-  jsHistory,
+  jsHistory
 ];
 
 const jsDashboardWorker = "dashboardWorker.js";
@@ -73,59 +73,59 @@ const workerJsFiles = [
   jsDashboardWorker,
   jsFileManagerWorker,
   jsMonitoringViewsWorker,
-  jsPrinterManagerWorker,
+  jsPrinterManagerWorker
 ];
 
 const cssFolder = "client_src/css";
 const jsFolder = "client_src/js";
 const cssOctoFarm = "client_src/css/octofarm.css";
 
-
 function vendorJS() {
   return src(jsFolder + "/vendor/*")
-      .pipe(sourcemaps.init({loadMaps: true}))
-      .pipe(sourcemaps.write("./"))
-      .pipe(gulp.dest(ASSETS_FOLDER + "/js/vendor"));
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(sourcemaps.write("./"))
+    .pipe(gulp.dest(ASSETS_FOLDER + "/js/vendor"));
 }
 
 function vendorCSS() {
   return src(cssFolder + "/vendor/*")
-      .pipe(sourcemaps.init({loadMaps: true}))
-      .pipe(postcss([autoprefixer(), cssnano()]))
-      .pipe(sourcemaps.write("./"))
-      .pipe(gulp.dest(ASSETS_FOLDER + "/css/vendor"));
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(postcss([autoprefixer(), cssnano()]))
+    .pipe(sourcemaps.write("./"))
+    .pipe(gulp.dest(ASSETS_FOLDER + "/css/vendor"));
 }
 
 function vendorFonts() {
-  return src(cssFolder + "/webfonts/*")
-      .pipe(gulp.dest(ASSETS_FOLDER + "/css/webfonts"));
+  return src(cssFolder + "/webfonts/*").pipe(
+    gulp.dest(ASSETS_FOLDER + "/css/webfonts")
+  );
 }
 
 function octofarmJS(done) {
   jsClientFiles.map(function (entry) {
     return browserify({
-      entries: [jsClientFolder + entry],
+      entries: [jsClientFolder + entry]
     })
-        .transform(babelify, {
-          presets: [
-            [
-              "@babel/preset-env",
-              {
-                corejs: 2,
-                useBuiltIns: "entry",
-              },
-            ],
-          ],
-        })
-        .bundle()
-        .pipe(source(entry))
-        .pipe(cache("clientJS"))
-        .pipe(rename({extname: ".min.js"}))
-        .pipe(buffer())
-        .pipe(sourcemaps.init({loadMaps: true}))
-        .pipe(terser())
-        .pipe(sourcemaps.write("./"))
-        .pipe(dest(ASSETS_FOLDER + "/js"));
+      .transform(babelify, {
+        presets: [
+          [
+            "@babel/preset-env",
+            {
+              corejs: 2,
+              useBuiltIns: "entry"
+            }
+          ]
+        ]
+      })
+      .bundle()
+      .pipe(source(entry))
+      .pipe(cache("clientJS"))
+      .pipe(rename({ extname: ".min.js" }))
+      .pipe(buffer())
+      .pipe(sourcemaps.init({ loadMaps: true }))
+      .pipe(terser())
+      .pipe(sourcemaps.write("./"))
+      .pipe(dest(ASSETS_FOLDER + "/js"));
   });
   done();
 }
@@ -133,52 +133,46 @@ function octofarmJS(done) {
 function octofarmWorkersJS(done) {
   workerJsFiles.map(function (entry) {
     return browserify({
-      entries: [workerJsFolder + entry],
+      entries: [workerJsFolder + entry]
     })
-        .transform(babelify, {
-          presets: [
-            [
-              "@babel/preset-env",
-              {
-                corejs: 2,
-                useBuiltIns: "entry",
-              },
-            ],
-          ],
-        })
-        .bundle()
-        .pipe(source(entry))
-        .pipe(cache("clientWorkerJS"))
-        .pipe(rename({extname: ".min.js"}))
-        .pipe(buffer())
-        .pipe(sourcemaps.init({loadMaps: true}))
-        .pipe(terser())
-        .pipe(sourcemaps.write("./"))
-        .pipe(dest(ASSETS_FOLDER + "/js/workers"));
+      .transform(babelify, {
+        presets: [
+          [
+            "@babel/preset-env",
+            {
+              corejs: 2,
+              useBuiltIns: "entry"
+            }
+          ]
+        ]
+      })
+      .bundle()
+      .pipe(source(entry))
+      .pipe(cache("clientWorkerJS"))
+      .pipe(rename({ extname: ".min.js" }))
+      .pipe(buffer())
+      .pipe(sourcemaps.init({ loadMaps: true }))
+      .pipe(terser())
+      .pipe(sourcemaps.write("./"))
+      .pipe(dest(ASSETS_FOLDER + "/js/workers"));
   });
   done();
 }
 
 function octofarmCSS() {
   return src(cssOctoFarm)
-      .pipe(sourcemaps.init({loadMaps: true}))
-      .pipe(concat("octofarm.css"))
-      .pipe(postcss([autoprefixer(), cssnano()]))
-      .pipe(sourcemaps.write("./"))
-      .pipe(dest(ASSETS_FOLDER + "/css"));
+    .pipe(sourcemaps.init({ loadMaps: true }))
+    .pipe(concat("octofarm.css"))
+    .pipe(postcss([autoprefixer(), cssnano()]))
+    .pipe(sourcemaps.write("./"))
+    .pipe(dest(ASSETS_FOLDER + "/css"));
 }
 
 function watchTask() {
   watch(
-      [cssFolder, jsClientFolder],
-      {interval: 2000, events: "change"},
-      parallel(
-          octofarmJS,
-          octofarmWorkersJS,
-          octofarmCSS,
-          vendorJS,
-          vendorCSS
-      )
+    [cssFolder, jsClientFolder],
+    { interval: 2000, events: "change" },
+    parallel(octofarmJS, octofarmWorkersJS, octofarmCSS, vendorJS, vendorCSS)
   );
 }
 
@@ -189,12 +183,12 @@ exports.vendorCSS = vendorCSS;
 exports.octofarmCSS = octofarmCSS;
 exports.octofarmWorkersJS = octofarmWorkersJS;
 exports.default = series(
-    parallel(
-        vendorFonts,
-        octofarmJS,
-        octofarmWorkersJS,
-        octofarmCSS,
-        vendorJS,
-        vendorCSS
-    )
+  parallel(
+    vendorFonts,
+    octofarmJS,
+    octofarmWorkersJS,
+    octofarmCSS,
+    vendorJS,
+    vendorCSS
+  )
 );
