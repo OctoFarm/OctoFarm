@@ -27,25 +27,25 @@ describe("DownloadUtil", () => {
     Promise.resolve({
       body: {
         pipe: () => null,
-        on: (type, reject) => reject(errorOnDownload),
-      },
+        on: (type, reject) => reject(errorOnDownload)
+      }
     })
   );
   jest.mock("fs", () => {
     return {
       createWriteStream: () => {
         return {
-          on: (type, cb) => cb(),
+          on: (type, cb) => cb()
         };
       },
       existsSync: () => true,
-      stat: () => true,
+      stat: () => true
     };
   });
 
   it("should be able to catch download errors (mocked)", async () => {
     const {
-      downloadFromOctoPrint,
+      downloadFromOctoPrint
     } = require("../../server_src/utils/download.util");
 
     const testPath = "test.file";

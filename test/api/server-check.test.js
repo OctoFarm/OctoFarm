@@ -2,7 +2,7 @@ const dbHandler = require("../db-handler");
 const request = require("supertest");
 const { setupTestApp, getServer } = require("../../app-test");
 const isDocker = require("is-docker");
-const {AppConstants} = require("../../server_src/app.constants");
+const { AppConstants } = require("../../server_src/app.constants");
 const envUtils = require("../../server_src/utils/env.utils");
 const path = require("path");
 
@@ -44,7 +44,9 @@ const softwareUpdateChecker = require("../../server_src/runners/softwareUpdateCh
 
 describe("AmIAlive Endpoint", () => {
   it("should return ok and no update", async () => {
-    process.env[AppConstants.VERSION_KEY] = require("../../package.json").version;
+    process.env[
+      AppConstants.VERSION_KEY
+    ] = require("../../package.json").version;
     process.env.testlatest_package_version = require("../../package.json").version;
     app = await getOrCreateApp();
     await softwareUpdateChecker.syncLatestOctoFarmRelease();

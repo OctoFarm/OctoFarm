@@ -24,5 +24,5 @@ class SettingsClean {
 }
 
 module.exports = {
-  SettingsClean,
+  SettingsClean
 };

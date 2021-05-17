@@ -119,7 +119,7 @@ router.get("/groups", ensureAuthenticated, async (req, res) => {
   for (let i = 0; i < printers.length; i++) {
     await groups.push({
       _id: printers[i]._id,
-      group: printers[i].group,
+      group: printers[i].group
     });
   }
 
@@ -158,7 +158,7 @@ router.post("/runner/checkOffline", ensureAuthenticated, async (req, res) => {
   }
   res.send({
     printers: "All",
-    msg: " Were successfully rescanned...",
+    msg: " Were successfully rescanned..."
   });
 });
 
@@ -250,7 +250,7 @@ router.get("/pluginList/:id", ensureAuthenticated, async (req, res) => {
 });
 router.get("/scanNetwork", ensureAuthenticated, async (req, res) => {
   const {
-    searchForDevicesOnNetwork,
+    searchForDevicesOnNetwork
   } = require("../../server_src/runners/autoDiscovery.js");
 
   let devices = await searchForDevicesOnNetwork();

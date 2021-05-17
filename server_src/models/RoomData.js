@@ -4,24 +4,24 @@ const RoomDataSchema = new mongoose.Schema(
   {
     date: {
       type: Date,
-      required: true,
+      required: true
     },
     temperature: {
       type: Number,
-      required: false,
+      required: false
     },
     pressure: {
       type: Number,
-      required: false,
+      required: false
     },
     humidity: {
       type: Number,
-      required: false,
+      required: false
     },
     iaq: {
       type: Number,
-      required: false,
-    },
+      required: false
+    }
   },
   { capped: true, size: 10000, max: 1000000 }
 );

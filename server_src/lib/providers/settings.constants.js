@@ -12,9 +12,9 @@ function getDefaultLayout() {
     { x: 6, y: 10, width: 6, height: 9, id: "hourlyTemper" },
     { x: 0, y: 10, width: 6, height: 9, id: "weeklyUtil" },
     { x: 0, y: 19, width: 12, height: 8, id: "enviroData" },
-    { x: 0, y: 19, width: 12, height: 8, id: "filamentUsageOverTime", },
+    { x: 0, y: 19, width: 12, height: 8, id: "filamentUsageOverTime" },
     { x: 0, y: 19, width: 12, height: 8, id: "filamentUsageByDay" },
-    { x: 0, y: 19, width: 12, height: 8, id: "historyCompletionByDay", },
+    { x: 0, y: 19, width: 12, height: 8, id: "historyCompletionByDay" }
   ];
 }
 function getDefaultDashboardSettings() {
@@ -24,18 +24,18 @@ function getDefaultDashboardSettings() {
     farmActivity: {
       currentOperations: false,
       cumulativeTimes: true,
-      averageTimes: true,
+      averageTimes: true
     },
     printerStates: {
       printerState: true,
       printerTemps: true,
       printerUtilisation: true,
       printerProgress: true,
-      currentStatus: true,
+      currentStatus: true
     },
     farmUtilisation: {
       currentUtilisation: true,
-      farmUtilisation: true,
+      farmUtilisation: true
     },
     historical: {
       weeklyUtilisation: true,
@@ -43,11 +43,11 @@ function getDefaultDashboardSettings() {
       environmentalHistory: false,
       filamentUsageOverTime: false,
       filamentUsageByDay: false,
-      historyCompletionByDay: false,
-    },
+      historyCompletionByDay: false
+    }
   };
 }
 
 module.exports = {
-  getDefaultDashboardSettings,
+  getDefaultDashboardSettings
 };

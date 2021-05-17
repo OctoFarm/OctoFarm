@@ -10,7 +10,7 @@ const ALL_MONTHS = [
   "Sep",
   "Oct",
   "Nov",
-  "Dec",
+  "Dec"
 ];
 
 /**
@@ -30,7 +30,7 @@ function getDefaultFileCleanStatistics() {
     biggestLength: 0,
     smallestLength: 0,
     averageFile: 0,
-    averageLength: 0,
+    averageLength: 0
   };
 }
 
@@ -50,7 +50,7 @@ function getDefaultDashboardStatisticsObject() {
     currentIAQ: null,
     currentTemperature: null,
     currentPressure: null,
-    currentHumidity: null,
+    currentHumidity: null
   };
 }
 
@@ -79,7 +79,7 @@ function getDefaultHistoryStatistics() {
     highestSpoolCost: 0,
     totalPrinterCost: 0,
     highestPrinterCost: 0,
-    currentFailed: 0,
+    currentFailed: 0
   };
 }
 
@@ -91,24 +91,24 @@ function getEmptyHeatmap() {
   return [
     {
       name: "Completed",
-      data: [],
+      data: []
     },
     {
       name: "Active",
-      data: [],
+      data: []
     },
     {
       name: "Idle",
-      data: [],
+      data: []
     },
     {
       name: "Offline",
-      data: [],
+      data: []
     },
     {
       name: "Disconnected",
-      data: [],
-    },
+      data: []
+    }
   ];
 }
 
@@ -120,28 +120,28 @@ function getEmptyToolTemperatureArray() {
   return [
     {
       name: "Actual Tool",
-      data: [],
+      data: []
     },
     {
       name: "Target Tool",
-      data: [],
+      data: []
     },
     {
       name: "Actual Bed",
-      data: [],
+      data: []
     },
     {
       name: "Target Bed",
-      data: [],
+      data: []
     },
     {
       name: "Actual Chamber",
-      data: [],
+      data: []
     },
     {
       name: "Target Chamber",
-      data: [],
-    },
+      data: []
+    }
   ];
 }
 
@@ -156,8 +156,8 @@ function getEmptyOperationsObject() {
       idle: 0,
       disconnected: 0,
       farmProgress: 0,
-      farmProgressColour: "danger",
-    },
+      farmProgressColour: "danger"
+    }
   };
 }
 

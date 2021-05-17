@@ -17,7 +17,7 @@ class AppConstants {
   static get defaultOctoFarmPort() {
     return defaultOctoFarmPort;
   }
-  
+
   static get defaultOctoFarmPageTitle() {
     return defaultOctoFarmPageTitle;
   }
@@ -44,5 +44,5 @@ class AppConstants {
 }
 
 module.exports = {
-  AppConstants,
+  AppConstants
 };

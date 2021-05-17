@@ -12,7 +12,7 @@ const TempHistory = require("../models/TempHistory.js");
 const { HistoryCollection } = require("./history.js");
 const {
   ServerSettings,
-  filamentManagerEnabled,
+  filamentManager
 } = require("../settings/serverSettings.js");
 const { ScriptRunner } = require("./scriptCheck.js");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
@@ -608,7 +608,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
               profile = await Profiles.findOne({
                 "profile.index": parseInt(
                   farmPrinters[this.index].selectedFilament[s].spools.profile
-                ),
+                )
               });
             } else {
               profile = await Profiles.findById(
@@ -634,7 +634,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
               profile = await Profiles.findOne({
                 "profile.index": parseInt(
                   farmPrinters[this.index].selectedFilament[s].spools.profile
-                ),
+                )
               });
             } else {
               profile = await Profiles.findById(
@@ -666,7 +666,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
               data.current.temps[0].time = timeStamp;
               let temps = {
                 currentTemp: data.current.temps[0],
-                printer_id: farmPrinters[this.index]._id,
+                printer_id: farmPrinters[this.index]._id
               };
               if (farmPrinters[this.index].stateColour.category !== "Offline") {
                 const newTemp = await new TempHistory(temps);
@@ -883,7 +883,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
     }
     // Information cleaning of farmPrinters
     if (typeof farmPrinters[this.index] !== "undefined") {
-      PrinterClean.generate(farmPrinters[this.index], filamentManagerEnabled);
+      PrinterClean.generate(farmPrinters[this.index], filamentManager);
     }
   } catch (e) {
     console.log("Safe to ignore", e);
@@ -1011,8 +1011,8 @@ class ClientAPI {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": apikey,
-      },
+        "X-Api-Key": apikey
+      }
     });
   }
 
@@ -1023,13 +1023,13 @@ class ClientAPI {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "X-Api-Key": apikey,
+          "X-Api-Key": apikey
         },
-        body: JSON.stringify(data),
+        body: JSON.stringify(data)
       }),
       new Promise((_, reject) =>
         setTimeout(() => reject(new Error("timeout")), timeout.apiTimeout)
-      ),
+      )
     ]);
   }
 
@@ -1040,12 +1040,12 @@ class ClientAPI {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "X-Api-Key": apikey,
-        },
+          "X-Api-Key": apikey
+        }
       }),
       new Promise((_, reject) =>
         setTimeout(() => reject(new Error("timeout")), timeout.apiTimeout)
-      ),
+      )
     ]);
   }
 }
@@ -1059,7 +1059,7 @@ class Runner {
     // Grab printers from database....
     try {
       farmPrinters = await Printers.find({}, null, {
-        sort: { sortIndex: 1 },
+        sort: { sortIndex: 1 }
       });
       logger.info(`Grabbed ${farmPrinters.length} for checking`);
 
@@ -1072,7 +1072,7 @@ class Runner {
         err: err.message,
         action: "Database connection failed... No action taken",
         userAction:
-          "Please make sure the database URL is inputted and can be reached... 'file located at: config/db.js'",
+          "Please make sure the database URL is inputted and can be reached... 'file located at: config/db.js'"
       };
       logger.error(err);
       console.log(err);
@@ -1102,7 +1102,7 @@ class Runner {
         "Global API Key detected... unable to authenticate websocket connection",
       type: "system",
       errno: "999",
-      code: "999",
+      code: "999"
     };
     if (globalAPIKeyCheck.status === 200) {
       //Safe to continue check
@@ -1127,7 +1127,7 @@ class Runner {
         message: "Could not Establish connection to OctoPrint Returned",
         type: "system",
         errno: "503",
-        code: "503",
+        code: "503"
       };
     }
   }
@@ -1142,7 +1142,7 @@ class Runner {
           message: "Could not find printer...:",
           type: "system",
           errno: "DELETED",
-          code: "DELETED",
+          code: "DELETED"
         };
         throw error;
       }
@@ -1261,7 +1261,7 @@ class Runner {
             message: `Could not Establish connection to OctoPrint Returned: ${users.status}: ${farmPrinters[i].printerURL}`,
             type: "system",
             errno: "503",
-            code: "503",
+            code: "503"
           };
 
           throw error;
@@ -1271,7 +1271,7 @@ class Runner {
           message: `Could not Establish connection to OctoPrint Returned: ${users.status}: ${farmPrinters[i].printerURL}`,
           type: "system",
           errno: "503",
-          code: "503",
+          code: "503"
         };
         throw error;
       } else if (users.status === 502) {
@@ -1279,14 +1279,14 @@ class Runner {
           message: `Bad gateway! Gather OcotPrint is still booting: ${users.status}: ${farmPrinters[i].printerURL}`,
           type: "system",
           errno: "ECONNREFUSED",
-          code: "ECONNREFUSED",
+          code: "ECONNREFUSED"
         };
       } else {
         const error = {
           message: `Could not Establish API Connection: ${users.status}${farmPrinters[i].printerURL}`,
           type: "system",
           errno: "NO-API",
-          code: "NO-API",
+          code: "NO-API"
         };
         throw error;
       }
@@ -1485,7 +1485,7 @@ class Runner {
       "State: Idle",
       "State: Active",
       "State: Complete",
-      "State: Disconnected",
+      "State: Disconnected"
     ];
     stateDefaults.forEach((def) => {
       farmPrintersGroups.push(def);
@@ -1530,43 +1530,43 @@ class Runner {
       scanning: {
         api: {
           status: "danger",
-          date: null,
+          date: null
         },
         files: {
           status: "danger",
-          date: null,
+          date: null
         },
         state: {
           status: "danger",
-          date: null,
+          date: null
         },
         profile: {
           status: "danger",
-          date: null,
+          date: null
         },
         settings: {
           status: "danger",
-          date: null,
+          date: null
         },
         system: {
           status: "danger",
-          date: null,
-        },
+          date: null
+        }
       },
       cleaning: {
         information: {
           status: "danger",
-          date: null,
+          date: null
         },
         file: {
           status: "danger",
-          date: null,
+          date: null
         },
         job: {
           status: "danger",
-          date: null,
-        },
-      },
+          date: null
+        }
+      }
     };
 
     if (typeof farmPrinters[i].dateAdded === "undefined") {
@@ -1599,8 +1599,8 @@ class Runner {
           packets: "3",
           port: "9",
           interval: "100",
-          MAC: "",
-        },
+          MAC: ""
+        }
       };
     }
 
@@ -1625,7 +1625,7 @@ class Runner {
     if (typeof farmPrinters[i].tempTriggers === "undefined") {
       farmPrinters[i].tempTriggers = {
         heatingVariation: 1,
-        coolDown: 30,
+        coolDown: 30
       };
     }
     if (typeof farmPrinters[i].feedRate === "undefined") {
@@ -1682,7 +1682,7 @@ class Runner {
         electricityCosts: 0.15,
         purchasePrice: 500,
         estimateLifespan: 43800,
-        maintenanceCosts: 0.25,
+        maintenanceCosts: 0.25
       };
     }
     printer.octoPrintVersion = farmPrinters[i].octoPrintVersion;
@@ -1820,7 +1820,7 @@ class Runner {
         const filter = { _id: farmPrinters[changeIndex]._id };
         const update = farmPrinters[changeIndex];
         await Printers.findOneAndUpdate(filter, update, {
-          returnOriginal: false,
+          returnOriginal: false
         });
         if (typeof farmPrinters[changeIndex] !== "undefined") {
           PrinterClean.generate(farmPrinters[changeIndex]);
@@ -1881,7 +1881,7 @@ class Runner {
       const filter = { _id: farmPrinters[p]._id };
       const update = { sortIndex: p };
       await Printers.findOneAndUpdate(filter, update, {
-        returnOriginal: false,
+        returnOriginal: false
       });
     }
     return;
@@ -1910,10 +1910,10 @@ class Runner {
           );
           removed.push({
             printerURL: removedURL,
-            printerId: removedIP,
+            printerId: removedIP
           });
           await Printers.findOneAndDelete({
-            _id: removedIP,
+            _id: removedIP
           });
           farmPrinters.splice(index, 1);
           PrinterTicker.addIssue(
@@ -1951,7 +1951,7 @@ class Runner {
         const filter = { _id: farmPrinters[p]._id };
         const update = { sortIndex: p };
         await Printers.findOneAndUpdate(filter, update, {
-          returnOriginal: false,
+          returnOriginal: false
         });
       }
       //Reset PrintersInformation for reload
@@ -1963,7 +1963,7 @@ class Runner {
       for (let i = 0; i < indexs.length; i++) {
         removed.push({
           printerURL: "",
-          printerId: indexs[i],
+          printerId: indexs[i]
         });
       }
       farmPrinters = [];
@@ -1988,7 +1988,7 @@ class Runner {
     });
     const result = {
       status: null,
-      msg: null,
+      msg: null
     };
     PrinterTicker.addIssue(
       new Date(),
@@ -2149,8 +2149,8 @@ class Runner {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": farmPrinters[index].apikey,
-      },
+        "X-Api-Key": farmPrinters[index].apikey
+      }
     });
 
     const getJson = await getFileInformation.json();
@@ -2207,7 +2207,7 @@ class Runner {
       thumbnail,
       success: success,
       failed: failed,
-      last: last,
+      last: last
     };
   }
 
@@ -2221,7 +2221,7 @@ class Runner {
       files: [],
       fileCount: 0,
       folders: [],
-      folderCount: 0,
+      folderCount: 0
     };
     PrinterTicker.addIssue(
       new Date(),
@@ -2235,8 +2235,8 @@ class Runner {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": farmPrinters[index].apikey,
-      },
+        "X-Api-Key": farmPrinters[index].apikey
+      }
     })
       .then((res) => {
         return res.json();
@@ -2245,7 +2245,7 @@ class Runner {
         // Setup the files json storage object
         farmPrinters[index].storage = {
           free: res.free,
-          total: res.total,
+          total: res.total
         };
         farmPrinters[index].markModified("storage");
         // Setup the files location object to place files...
@@ -2313,14 +2313,14 @@ class Runner {
               thumbnail,
               success: success,
               failed: failed,
-              last: last,
+              last: last
             };
             printerFiles.push(file);
           }
 
           const folderPaths = {
             name: "",
-            path: "",
+            path: ""
           };
           if (isFolder) {
             if (entry.path.indexOf("/") > -1) {
@@ -2358,7 +2358,7 @@ class Runner {
           files: printerFiles,
           fileCount: printerFiles.length,
           folders: printerLocations,
-          folderCount: printerLocations.length,
+          folderCount: printerLocations.length
         };
         farmPrinters[index].markModified("fileList");
         const currentFilament = await Runner.compileSelectedFilament(
@@ -2648,7 +2648,7 @@ class Runner {
     });
     farmPrinters[index].updateAvailable = {
       octoPrintUpdate: [],
-      pluginUpdates: [],
+      pluginUpdates: []
     };
     PrinterTicker.addIssue(
       new Date(),
@@ -2677,7 +2677,7 @@ class Runner {
                   displayName: res.information[key].displayName,
                   displayVersion: res.information[key].displayVersion,
                   updateAvailable: res.information[key].updateAvailable,
-                  releaseNotesURL: res.information[key].releaseNotes,
+                  releaseNotesURL: res.information[key].releaseNotes
                 };
               } else {
                 pluginUpdates.push({
@@ -2685,7 +2685,7 @@ class Runner {
                   displayName: res.information[key].displayName,
                   displayVersion: res.information[key].displayVersion,
                   updateAvailable: res.information[key].updateAvailable,
-                  releaseNotesURL: res.information[key].releaseNotes,
+                  releaseNotesURL: res.information[key].releaseNotes
                 });
               }
             }
@@ -2694,7 +2694,7 @@ class Runner {
 
         farmPrinters[index].updateAvailable = {
           octoPrintUpdate,
-          pluginUpdates,
+          pluginUpdates
         };
         PrinterTicker.addIssue(
           new Date(),
@@ -2742,8 +2742,8 @@ class Runner {
           packets: farmPrinters[index].powerSettings.wol.packets,
           port: farmPrinters[index].powerSettings.wol.port,
           interval: farmPrinters[index].powerSettings.wol.interval,
-          MAC: farmPrinters[index].powerSettings.wol.MAC,
-        },
+          MAC: farmPrinters[index].powerSettings.wol.MAC
+        }
       };
       const printer = await Printers.findById(farmPrinters[index]._id);
       printer.powerSettings = farmPrinters[index].powerSettings;
@@ -2801,7 +2801,7 @@ class Runner {
           logger.info("Got from endpoint: ", piSupport);
           farmPrinters[index].octoPi = {
             model: piSupport.model,
-            version: piSupport.octopi_version,
+            version: piSupport.octopi_version
           };
           logger.info("I captured: ", farmPrinters[index].octoPi);
           PrinterTicker.addIssue(
@@ -2829,7 +2829,7 @@ class Runner {
               electricityCosts: res.plugins["costestimation"].costOfElectricity,
               purchasePrice: res.plugins["costestimation"].priceOfPrinter,
               estimateLifespan: res.plugins["costestimation"].lifespanOfPrinter,
-              maintenanceCosts: res.plugins["costestimation"].maintenanceCosts,
+              maintenanceCosts: res.plugins["costestimation"].maintenanceCosts
             };
             const printer = await Printers.findById(id);
 
@@ -2857,13 +2857,13 @@ class Runner {
               farmPrinters[index]._id
             );
             farmPrinters[index].powerSettings = {
-              powerOnCommand: "{\"command\":\"turnPSUOn\"}",
+              powerOnCommand: '{"command":"turnPSUOn"}',
               powerOnURL: "[PrinterURL]/api/plugin/psucontrol",
-              powerOffCommand: "{\"command\":\"turnPSUOff\"}",
+              powerOffCommand: '{"command":"turnPSUOff"}',
               powerOffURL: "[PrinterURL]/api/plugin/psucontrol",
-              powerToggleCommand: "{\"command\":\"togglePSU\"}",
+              powerToggleCommand: '{"command":"togglePSU"}',
               powerToggleURL: "[PrinterURL]/api/plugin/psucontrol",
-              powerStatusCommand: "{\"command\":\"getPSUState\"}",
+              powerStatusCommand: '{"command":"getPSUState"}',
               powerStatusURL: "[PrinterURL]/api/plugin/psucontrol",
               wol: {
                 enabled: false,
@@ -2871,8 +2871,8 @@ class Runner {
                 packets: "3",
                 port: "9",
                 interval: "100",
-                MAC: "",
-              },
+                MAC: ""
+              }
             };
             const printer = await Printers.findById(id);
 
@@ -3102,7 +3102,7 @@ class Runner {
         try {
           if (systemSettings.filamentManager) {
             profile = await Profiles.findOne({
-              "profile.index": selectedFilament[s].spools.profile,
+              "profile.index": selectedFilament[s].spools.profile
             });
           } else {
             profile = await Profiles.findById(
@@ -3442,29 +3442,29 @@ class Runner {
         }
         const opts = {
           settingsAppearance: {
-            name: farmPrinters[index].settingsAppearance.name,
+            name: farmPrinters[index].settingsAppearance.name
           },
           scripts: {
-            gcode: updateOctoPrintGcode,
+            gcode: updateOctoPrintGcode
           },
           serial: {
             port: settings.connection.preferredPort,
-            baudrate: settings.connection.preferredBaud,
+            baudrate: settings.connection.preferredBaud
           },
           server: {
             commands: {
               systemShutdownCommand: settings.systemCommands.systemShutdown,
               systemRestartCommand: settings.systemCommands.systemRestart,
-              serverRestartCommand: settings.systemCommands.serverRestart,
-            },
+              serverRestartCommand: settings.systemCommands.serverRestart
+            }
           },
           webcam: {
             webcamEnabled: settings.other.enableCamera,
             timelapseEnabled: settings.other.enableTimeLapse,
             rotate90: settings.other.rotateCamera,
             flipH: settings.other.flipHCamera,
-            flipV: settings.other.flipVCamera,
-          },
+            flipV: settings.other.flipVCamera
+          }
         };
 
         const removeObjectsWithNull = (obj) => {
@@ -3484,9 +3484,9 @@ class Runner {
             method: "PATCH",
             headers: {
               "Content-Type": "application/json",
-              "X-Api-Key": farmPrinters[index].apikey,
+              "X-Api-Key": farmPrinters[index].apikey
             },
-            body: JSON.stringify({ profile: cleanProfile }),
+            body: JSON.stringify({ profile: cleanProfile })
           }
         );
 
@@ -3495,9 +3495,9 @@ class Runner {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Api-Key": farmPrinters[index].apikey,
+            "X-Api-Key": farmPrinters[index].apikey
           },
-          body: JSON.stringify(opts),
+          body: JSON.stringify(opts)
         });
       }
 
@@ -3507,7 +3507,7 @@ class Runner {
       Runner.getOctoPrintSystenInfo(settings.printer.index);
       Runner.getUpdates(settings.printer.index);
       Runner.getPluginList(settings.printer.index);
-      PrinterClean.generate(farmPrinters[index], filamentManagerEnabled);
+      PrinterClean.generate(farmPrinters[index], filamentManager);
       // let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
       //
       // console.log()
@@ -3528,14 +3528,14 @@ class Runner {
         status: {
           octofarm: 200,
           profile: profile.status,
-          settings: sett.status,
+          settings: sett.status
         },
-        printer,
+        printer
       };
     } catch (e) {
       logger.error("ERROR updating printer ", JSON.stringify(e.message));
       return {
-        status: { octofarm: 400, profile: 900, settings: 900 },
+        status: { octofarm: 400, profile: 900, settings: 900 }
       };
     }
   }
@@ -3639,7 +3639,7 @@ class Runner {
     const newFolder = {
       name,
       path,
-      display,
+      display
     };
 
     farmPrinters[i].fileList.folders.push(newFolder);
@@ -3762,7 +3762,7 @@ class Runner {
       thumbnail: null,
       success: 0,
       failed: 0,
-      last: null,
+      last: null
     };
     farmPrinters[i].fileList.files.push(data);
     farmPrinters[i].markModified("fileList");
@@ -3846,7 +3846,7 @@ class Runner {
     for (let p = 0; p < farmPrinters.length; p++) {
       const sort = {
         sortIndex: farmPrinters[p].sortIndex,
-        actualIndex: p,
+        actualIndex: p
       };
       sorted.push(sort);
     }
@@ -3920,5 +3920,5 @@ class Runner {
 let fileTimeout = 0;
 
 module.exports = {
-  Runner,
+  Runner
 };

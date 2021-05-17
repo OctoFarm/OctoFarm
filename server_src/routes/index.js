@@ -7,8 +7,6 @@ const prettyHelpers = require("../../views/partials/functions/pretty.js");
 const runner = require("../runners/state.js");
 const { Runner } = runner;
 const _ = require("lodash");
-const historyClean = require("../lib/dataFunctions/historyClean.js");
-const { HistoryClean } = historyClean;
 const filamentClean = require("../lib/dataFunctions/filamentClean.js");
 const { FilamentClean } = filamentClean;
 const settingsClean = require("../lib/dataFunctions/settingsClean.js");
@@ -26,7 +24,7 @@ const { fetchMongoDBConnectionString } = require("../../app-env");
 const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
 const { initHistoryCache } = require("../cache/history.cache");
 const {
-  getDefaultDashboardSettings,
+  getDefaultDashboardSettings
 } = require("../lib/providers/settings.constants");
 const { getHistoryCache } = require("../cache/history.cache");
 
@@ -49,7 +47,7 @@ async function welcome() {
           page: "Welcome",
           octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
           registration,
-          serverSettings: serverSettings[0],
+          serverSettings: serverSettings[0]
         });
       }
     });
@@ -79,7 +77,7 @@ router.get(
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       helpers: prettyHelpers,
       dashboardSettings: dashboardSettings,
-      dashboardStatistics: dashStatistics,
+      dashboardStatistics: dashStatistics
     });
   }
 );
@@ -97,7 +95,7 @@ router.get(
       page: "Printer Manager",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       printerCount: printers.length,
-      helpers: prettyHelpers,
+      helpers: prettyHelpers
     });
   }
 );
@@ -120,7 +118,7 @@ router.get(
       printerCount: printers.length,
       helpers: prettyHelpers,
       currentOperationsCount: currentOperations.count,
-      fileStatistics,
+      fileStatistics
     });
   }
 );
@@ -144,7 +142,7 @@ router.get(
       printStatistics: statistics,
       helpers: prettyHelpers,
       page: "History",
-      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY]
     });
   }
 );
@@ -179,7 +177,7 @@ router.get(
       clientSettings,
       printGroups,
       currentChanges: { currentSort, currentFilter },
-      dashboardStatistics: dashStatistics,
+      dashboardStatistics: dashStatistics
     });
   }
 );
@@ -215,7 +213,7 @@ router.get(
       clientSettings,
       printGroups,
       currentChanges: { currentSort, currentFilter },
-      dashboardStatistics: dashStatistics,
+      dashboardStatistics: dashStatistics
     });
   }
 );
@@ -249,7 +247,7 @@ router.get(
       helpers: prettyHelpers,
       clientSettings,
       printGroups,
-      currentChanges: { currentSort, currentFilter },
+      currentChanges: { currentSort, currentFilter }
     });
   }
 );
@@ -284,7 +282,7 @@ router.get(
       clientSettings,
       printGroups,
       currentChanges: { currentSort, currentFilter },
-      dashboardStatistics: dashStatistics,
+      dashboardStatistics: dashStatistics
     });
   }
 );
@@ -307,7 +305,7 @@ router.get(
       page: "Current Operations",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       helpers: prettyHelpers,
-      clientSettings,
+      clientSettings
     });
   }
 );
@@ -337,7 +335,7 @@ router.get(
       spools,
       profiles,
       statistics,
-      historyStats,
+      historyStats
     });
   }
 );
@@ -372,17 +370,15 @@ router.get(
         isNodemon: isNodemon(),
         isNode: isNode(),
         isPm2: isPm2(),
-        update: softwareUpdateNotification,
-      },
+        update: softwareUpdateNotification
+      }
     });
   }
 );
 
-softwareUpdateChecker
-  .syncLatestOctoFarmRelease(false)
-  .then(() => {
-    softwareUpdateChecker.checkReleaseAndLogUpdate();
-  });
+softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
+  softwareUpdateChecker.checkReleaseAndLogUpdate();
+});
 
 // Hacky database check due to shoddy layout of code...
 const mongoose = require("mongoose");
@@ -395,14 +391,16 @@ if (interval === false) {
       const printersInformation = PrinterClean.returnPrintersInformation();
       await PrinterClean.sortCurrentOperations(printersInformation);
       await PrinterClean.statisticsStart();
-      await PrinterClean.createPrinterList(printersInformation, serverSettings.filamentManager);
+      await PrinterClean.createPrinterList(
+        printersInformation,
+        serverSettings.filamentManager
+      );
     }
   }, 2500);
 }
 
-initHistoryCache()
-  .catch((e) => {
-    console.error("✓ HistoryCache failed to initiate. " + e);
-  });
+initHistoryCache().catch((e) => {
+  console.error("✓ HistoryCache failed to initiate. " + e);
+});
 
 module.exports = router;

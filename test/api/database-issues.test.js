@@ -29,8 +29,12 @@ describe("DatabaseIssue server", () => {
 
     const res = await request(app).get("/").send();
     expect(res.statusCode).toEqual(200);
-    expect(res.text).toContain("Docker mode:\n" +
-      "                    <span class=\"badge badge-dark\">false</span>");
-    expect(res.text).toContain("const defaultMongoDBString = \"mongodb://127.0.0.1:27017/octofarm\";");
+    expect(res.text).toContain(
+      "Docker mode:\n" +
+        '                    <span class="badge badge-dark">false</span>'
+    );
+    expect(res.text).toContain(
+      'const defaultMongoDBString = "mongodb://127.0.0.1:27017/octofarm";'
+    );
   }, 15000);
 });

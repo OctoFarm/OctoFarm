@@ -235,7 +235,7 @@ function getViewsPath() {
             );
         }
     } else {
-        logger.info("✓ Views folder found:", viewsPath);
+        logger.debug("✓ Views folder found:", viewsPath);
     }
     return viewsPath;
 }

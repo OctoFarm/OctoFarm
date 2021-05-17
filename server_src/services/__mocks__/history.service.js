@@ -16,7 +16,7 @@ historyService.find = async () => {
 historyService.saveMockData = (inputData) => {
   if (!Array.isArray(inputData)) {
     throw new Error(
-      "Mate you cant even properly provide an array input to a MOCK TEST??? Dude, git gud.",
+      "Mate you cant even properly provide an array input to a MOCK TEST??? Dude, git gud."
     );
   }
   testHistory = inputData;

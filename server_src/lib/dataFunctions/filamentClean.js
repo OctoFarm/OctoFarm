@@ -13,7 +13,7 @@ let statisticsClean = [];
 let selectedFilamentList = [];
 let dropDownList = {
   normalDropDown: [],
-  historyDropDown: [],
+  historyDropDown: []
 };
 
 class FilamentClean {
@@ -50,7 +50,7 @@ class FilamentClean {
         manufacturer: profiles[pr].profile.manufacturer,
         material: profiles[pr].profile.material,
         density: profiles[pr].profile.density,
-        diameter: profiles[pr].profile.diameter,
+        diameter: profiles[pr].profile.diameter
       };
       if (filamentManager) {
         profile._id = profiles[pr].profile.index;
@@ -73,9 +73,9 @@ class FilamentClean {
         tempOffset: spools[sp].spools.tempOffset,
         printerAssignment: await FilamentClean.getPrinterAssignment(
           spools[sp]._id,
-          farmPrinters,
+          farmPrinters
         ),
-        fmID: spools[sp].spools.fmID,
+        fmID: spools[sp].spools.fmID
       };
       spoolsArray.push(spool);
     }
@@ -86,14 +86,14 @@ class FilamentClean {
     const statistics = await FilamentClean.createStatistics(
       spoolsArray,
       profilesArray,
-      selectedFilamentList,
+      selectedFilamentList
     );
     statisticsClean = statistics;
     await FilamentClean.dropDownList(
       spools,
       profiles,
       filamentManager,
-      selectedFilamentList,
+      selectedFilamentList
     );
     logger.info("Filament information cleaned and ready for consumption...");
   }
@@ -116,12 +116,12 @@ class FilamentClean {
     const normalDropObject = [
       `
                     <option value="0">No Spool Selected</option>
-                `,
+                `
     ];
     const historyDropObject = [
       `
                     <option value="0">No Spool Selected</option>
-                `,
+                `
     ];
     spools.forEach((spool) => {
       let profileId = null;
@@ -171,7 +171,7 @@ class FilamentClean {
     });
     dropDownList = {
       normalDropDown: normalDropObject,
-      historyDropDown: historyDropObject,
+      historyDropDown: historyDropObject
     };
   }
 
@@ -201,7 +201,7 @@ class FilamentClean {
         name: profiles[p].material.replace(/ /g, "_"),
         weight: [],
         used: [],
-        price: [],
+        price: []
       };
       materialBreak.push(material);
     }
@@ -234,7 +234,7 @@ class FilamentClean {
         name: materialBreak[m].name,
         used: materialBreak[m].used.reduce((a, b) => a + b, 0),
         total: materialBreak[m].weight.reduce((a, b) => a + b, 0),
-        price: materialBreak[m].price.reduce((a, b) => a + b, 0),
+        price: materialBreak[m].price.reduce((a, b) => a + b, 0)
       };
       materialBreakDown.push(mat);
     }
@@ -249,7 +249,7 @@ class FilamentClean {
       spoolCount: spools.length,
       activeSpools: selectedFilament,
       activeSpoolCount: selectedFilament.length,
-      materialBreakDown,
+      materialBreakDown
     };
   }
 
@@ -269,7 +269,7 @@ class FilamentClean {
               const printer = {
                 id: farmPrinters[p]._id,
                 tool: s,
-                name: farmPrinters[p].printerName,
+                name: farmPrinters[p].printerName
               };
               assignments.push(printer);
             }
@@ -283,5 +283,5 @@ class FilamentClean {
 
 FilamentClean.start();
 module.exports = {
-  FilamentClean,
+  FilamentClean
 };

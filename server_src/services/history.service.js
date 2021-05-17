@@ -8,7 +8,7 @@ const historyModel = require("../models/History");
  */
 async function find(input) {
   return historyModel.find(input, null, {
-    sort: { historyIndex: -1 },
+    sort: { historyIndex: -1 }
   });
 }
 
@@ -27,7 +27,7 @@ function getFileFromHistoricJob(history) {
     path: historyJobFile?.path || history.filePath, // TODO discuss this alternative
     size: historyJobFile?.size || null,
     averagePrintTime: historyJob?.averagePrintTime || null,
-    lastPrintTime: historyJob?.lastPrintTime || null,
+    lastPrintTime: historyJob?.lastPrintTime || null
   };
 }
 
