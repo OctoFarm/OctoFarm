@@ -1,22 +1,23 @@
 const {
   setupExpressServer,
   serveOctoFarmNormally,
-  serveDatabaseIssueFallback,
-  ensureSystemSettingsInitiated,
+  ensureSystemSettingsInitiated
 } = require("./app-core");
 const { setupEnvConfig, fetchOctoFarmPort } = require("./app-env");
-const getEndpoints = require('express-list-endpoints');
+const { serveDatabaseIssueFallback } = require("./app-fallbacks");
 
 let httpListener;
 
 async function setupTestApp() {
   setupEnvConfig(true);
   const octoFarmTestServer = setupExpressServer();
-  await ensureSystemSettingsInitiated()
-    .catch();
+  await ensureSystemSettingsInitiated().catch();
 
   // Save listener as state for tests
-  httpListener = await serveOctoFarmNormally(octoFarmTestServer, fetchOctoFarmPort());
+  httpListener = await serveOctoFarmNormally(
+    octoFarmTestServer,
+    fetchOctoFarmPort()
+  );
 
   return octoFarmTestServer;
 }
@@ -25,8 +26,10 @@ async function setupDatabaseIssueApp() {
   setupEnvConfig(true);
 
   const octoFarmTestServer = setupExpressServer();
-  httpListener = await serveDatabaseIssueFallback(octoFarmTestServer, fetchOctoFarmPort());
-
+  httpListener = await serveDatabaseIssueFallback(
+    octoFarmTestServer,
+    fetchOctoFarmPort()
+  );
   return octoFarmTestServer;
 }
 
@@ -37,5 +40,5 @@ function getServer() {
 module.exports = {
   setupTestApp,
   setupDatabaseIssueApp,
-  getServer,
+  getServer
 };

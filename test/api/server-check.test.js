@@ -44,10 +44,10 @@ const softwareUpdateChecker = require("../../server_src/runners/softwareUpdateCh
 
 describe("AmIAlive Endpoint", () => {
   it("should return ok and no update", async () => {
-    process.env[
-      AppConstants.VERSION_KEY
-    ] = require("../../package.json").version;
-    process.env.testlatest_package_version = require("../../package.json").version;
+    process.env[AppConstants.VERSION_KEY] =
+      require("../../package.json").version;
+    process.env.testlatest_package_version =
+      require("../../package.json").version;
     app = await getOrCreateApp();
     await softwareUpdateChecker.syncLatestOctoFarmRelease();
 

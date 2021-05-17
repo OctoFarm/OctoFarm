@@ -23,13 +23,15 @@ afterAll(async () => {
 
 describe("DownloadUtil", () => {
   const errorOnDownload = "Download was rejected";
-  jest.mock("node-fetch", () => () =>
-    Promise.resolve({
-      body: {
-        pipe: () => null,
-        on: (type, reject) => reject(errorOnDownload)
-      }
-    })
+  jest.mock(
+    "node-fetch",
+    () => () =>
+      Promise.resolve({
+        body: {
+          pipe: () => null,
+          on: (type, reject) => reject(errorOnDownload)
+        }
+      })
   );
   jest.mock("fs", () => {
     return {

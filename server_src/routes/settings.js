@@ -61,8 +61,7 @@ router.post(
     // Generate the log package
     let zipDumpResponse = {
       status: "error",
-      msg:
-        "Unable to generate zip file, please check 'OctoFarm-API.log' file for more information.",
+      msg: "Unable to generate zip file, please check 'OctoFarm-API.log' file for more information.",
       zipDumpPath: ""
     };
 
@@ -170,10 +169,11 @@ router.post(
     }
 
     try {
-      clientResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate(
-        clientResponse,
-        force
-      );
+      clientResponse =
+        await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate(
+          clientResponse,
+          force
+        );
     } catch (e) {
       clientResponse.message =
         "Issue with updating | " + e?.message.replace(/(<([^>]+)>)/gi, "");

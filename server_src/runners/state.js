@@ -171,9 +171,8 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Shutdown";
-            farmPrinters[this.index].hostStateColour = Runner.getColour(
-              "Shutdown"
-            );
+            farmPrinters[this.index].hostStateColour =
+              Runner.getColour("Shutdown");
             farmPrinters[this.index].webSocket = "danger";
             farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
             farmPrinters[this.index].hostDescription = "Host is Shutdown";
@@ -198,9 +197,8 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Shutdown";
-            farmPrinters[this.index].hostStateColour = Runner.getColour(
-              "Shutdown"
-            );
+            farmPrinters[this.index].hostStateColour =
+              Runner.getColour("Shutdown");
             farmPrinters[this.index].webSocket = "danger";
             farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
             farmPrinters[this.index].hostDescription = "Host is Shutdown";
@@ -224,9 +222,8 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Shutdown";
-            farmPrinters[this.index].hostStateColour = Runner.getColour(
-              "Shutdown"
-            );
+            farmPrinters[this.index].hostStateColour =
+              Runner.getColour("Shutdown");
             farmPrinters[this.index].webSocket = "danger";
             farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
             farmPrinters[this.index].hostDescription = "Host is Shutdown";
@@ -270,9 +267,8 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Connection Refused";
-            farmPrinters[this.index].hostStateColour = Runner.getColour(
-              "Online"
-            );
+            farmPrinters[this.index].hostStateColour =
+              Runner.getColour("Online");
             farmPrinters[this.index].webSocket = "danger";
             farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
             farmPrinters[this.index].hostDescription = "Host is Shutdown";
@@ -291,9 +287,8 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Connection Reset";
-            farmPrinters[this.index].hostStateColour = Runner.getColour(
-              "Shutdown"
-            );
+            farmPrinters[this.index].hostStateColour =
+              Runner.getColour("Shutdown");
             farmPrinters[this.index].webSocket = "danger";
             farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
             farmPrinters[this.index].hostDescription = "Host is Offline";
@@ -312,9 +307,8 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Host Unreachable";
-            farmPrinters[this.index].hostStateColour = Runner.getColour(
-              "Shutdown"
-            );
+            farmPrinters[this.index].hostStateColour =
+              Runner.getColour("Shutdown");
             farmPrinters[this.index].webSocket = "danger";
             farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
             farmPrinters[this.index].hostDescription = "Host is Shutdown";
@@ -333,9 +327,8 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Host not found";
-            farmPrinters[this.index].hostStateColour = Runner.getColour(
-              "Shutdown"
-            );
+            farmPrinters[this.index].hostStateColour =
+              Runner.getColour("Shutdown");
             farmPrinters[this.index].webSocket = "danger";
             farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
             farmPrinters[this.index].hostDescription =
@@ -355,9 +348,8 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Re-Sync";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Error!";
-            farmPrinters[this.index].hostStateColour = Runner.getColour(
-              "Offline"
-            );
+            farmPrinters[this.index].hostStateColour =
+              Runner.getColour("Offline");
             farmPrinters[this.index].webSocket = "danger";
             farmPrinters[this.index].stateDescription =
               "Hard Failure, please Re-Sync when Online";
@@ -839,12 +831,8 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       if (data.plugin.plugin === "klipper") {
         // console.log(data.plugin.data.payload);
         if (data.plugin.data.payload.includes("Firmware version:")) {
-          farmPrinters[
-            this.index
-          ].klipperFirmwareVersion = data.plugin.data.payload.replace(
-            "Firmware version: ",
-            ""
-          );
+          farmPrinters[this.index].klipperFirmwareVersion =
+            data.plugin.data.payload.replace("Firmware version: ", "");
         }
       }
     }
@@ -1799,9 +1787,8 @@ class Runner {
       farmPrinters[changeIndex].state = "Searching...";
       farmPrinters[changeIndex].stateColour = Runner.getColour("Searching...");
       farmPrinters[changeIndex].hostState = "Searching...";
-      farmPrinters[changeIndex].hostStateColour = Runner.getColour(
-        "Searching..."
-      );
+      farmPrinters[changeIndex].hostStateColour =
+        Runner.getColour("Searching...");
       farmPrinters[changeIndex].webSocket = "danger";
       farmPrinters[changeIndex].stateDescription =
         "Re-Scanning your OctoPrint Instance";

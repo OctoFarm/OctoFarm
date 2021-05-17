@@ -348,7 +348,8 @@ router.get(
     const serverSettings = await SettingsClean.returnSystemSettings();
     const systemInformation = await SystemInfo.returnInfo();
     const printers = Runner.returnFarmPrinters();
-    const softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
+    const softwareUpdateNotification =
+      softwareUpdateChecker.getUpdateNotificationIfAny();
     let dashboardSettings =
       clientSettings?.dashboard || getDefaultDashboardSettings();
 
