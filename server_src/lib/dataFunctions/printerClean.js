@@ -1,6 +1,6 @@
 "use strict";
 
-const {checkNested, checkNestedIndex} = require("../utils/array.util");
+const { checkNested, checkNestedIndex } = require("../utils/array.util");
 const {
   getDefaultDashboardStatisticsObject,
   getEmptyHeatmap,
@@ -8,17 +8,17 @@ const {
   getEmptyOperationsObject,
   ALL_MONTHS
 } = require("../providers/cleaner.constants");
-const {getHistoryCache} = require("../../cache/history.cache");
+const { getHistoryCache } = require("../../cache/history.cache");
 const _ = require("lodash");
-const {JobClean} = require("./jobClean.js");
+const { JobClean } = require("./jobClean.js");
 const fileClean = require("./fileClean.js");
-const {FileClean} = fileClean;
+const { FileClean } = fileClean;
 const FarmStatistics = require("../../models/FarmStatistics.js");
 const FarmStatisticsService = require("../../services/farm-statistics.service");
 const RoomData = require("../../models/RoomData.js");
 const ErrorLogs = require("../../models/ErrorLog.js");
 const TempHistory = require("../../models/TempHistory.js");
-const {PrinterTicker} = require("../../runners/printerTicker.js");
+const { PrinterTicker } = require("../../runners/printerTicker.js");
 
 const Logger = require("../logger.js");
 const logger = new Logger("OctoFarm-InformationCleaning");

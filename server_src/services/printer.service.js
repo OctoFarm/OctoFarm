@@ -8,8 +8,7 @@ const printerModel = require("../models/Printer");
  * @throws {Error} If the printer is not correctly provided.
  */
 const create = async (printer) => {
-  if (!printer)
-    throw new Error('Missing printer');
+  if (!printer) throw new Error("Missing printer");
 
   return printerModel.create(printer);
 };
@@ -19,9 +18,9 @@ const create = async (printer) => {
  */
 const list = async () => {
   return printerModel.find({});
-}
+};
 
 module.exports = {
   create,
   list
-}
+};

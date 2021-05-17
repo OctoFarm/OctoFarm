@@ -1,6 +1,6 @@
-'use strict';
+"use strict";
 
-const FarmStatistics = require('../models/FarmStatistics');
+const FarmStatistics = require("../models/FarmStatistics");
 
 /**
  * Lists saved farm statistics in the database.
@@ -8,7 +8,7 @@ const FarmStatistics = require('../models/FarmStatistics');
  */
 const list = async (filter) => {
   return FarmStatistics.find(filter);
-}
+};
 
 /**
  * Initiate farm information entry for a certain date
@@ -19,15 +19,15 @@ const list = async (filter) => {
 const create = async (startDate, heatmapArray) => {
   const newfarmStatisticsEntry = new FarmStatistics({
     farmStart: startDate,
-    heatMap: heatmapArray,
+    heatMap: heatmapArray
   });
 
   await newfarmStatisticsEntry.save();
 
   return newfarmStatisticsEntry;
-}
+};
 
 module.exports = {
   list,
   create
-}
+};
