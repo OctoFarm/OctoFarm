@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
 ### Removed
 
 ### Fixed
+    - Fixed #567: heatmap error (race condition) in PrinterClean for any newly created database
     - Fixed #576, #577: correct some function calls in PrinterClean
     - Fixed #542, #381: ensureIndex mongoose warning and circular Runner import resolved 
 

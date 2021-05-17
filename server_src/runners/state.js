@@ -10,7 +10,7 @@ const Filament = require("../models/Filament.js");
 const TempHistory = require("../models/TempHistory.js");
 
 const { HistoryCollection } = require("./history.js");
-const { ServerSettings, filamentManagerEnabled } = require("../settings/serverSettings.js");
+const { ServerSettings, filamentManager } = require("../settings/serverSettings.js");
 const { ScriptRunner } = require("./scriptCheck.js");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
 const { JobClean } = require("../lib/dataFunctions/jobClean.js");
@@ -882,7 +882,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
     if (typeof farmPrinters[this.index] !== "undefined") {
       PrinterClean.generate(
         farmPrinters[this.index],
-        filamentManagerEnabled
+        filamentManager
       );
     }
   } catch (e) {
@@ -3493,7 +3493,7 @@ class Runner {
       Runner.getPluginList(settings.printer.index);
       PrinterClean.generate(
         farmPrinters[index],
-        filamentManagerEnabled
+        filamentManager
       );
       // let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
       //

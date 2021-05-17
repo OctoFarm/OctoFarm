@@ -73,7 +73,7 @@ class HistoryClean {
     }
 
     let spoolLeftoverConditional = "";
-    if (serverSettingsCache.filamentManagerEnabled) {
+    if (serverSettingsCache.filamentManager) {
       const spoolWeight = (spool.weight - spool.used).toFixed(0);
       spoolLeftoverConditional = `(${spoolWeight}g)`;
     }

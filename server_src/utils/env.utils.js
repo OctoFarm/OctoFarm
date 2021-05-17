@@ -74,7 +74,7 @@ function verifyPackageJsonRequirements(rootPath) {
     logger.error(`FAILURE. Could not find 'package.json' in root folder ${rootPath}`);
     return false;
   } else {
-    logger.info("✓ found 'package.json'");
+    logger.debug("✓ found 'package.json'");
     const packageName = require("../../package.json").name;
     if (!packageName) {
       logger.error(
@@ -88,7 +88,7 @@ function verifyPackageJsonRequirements(rootPath) {
       return false;
     }
   }
-  logger.info("✓ Correctly validated octofarm package.json file!");
+  logger.debug("✓ Correctly validated octofarm package.json file!");
   return true;
 }
 

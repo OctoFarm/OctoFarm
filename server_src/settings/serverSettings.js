@@ -108,5 +108,5 @@ class ServerSettings {
 
 module.exports = {
   ServerSettings,
-  filamentManagerEnabled: filamentManager
+  filamentManager
 };
