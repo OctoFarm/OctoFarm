@@ -1,4 +1,4 @@
-const {FileClean} = require("../dataFunctions/fileClean");
+const { FileClean } = require("../dataFunctions/fileClean");
 
 describe("generate", function () {
   it("doesnt throw error on illegal printer array", async function () {
@@ -8,7 +8,7 @@ describe("generate", function () {
 
   it("should not generate file statistics when printer sortIndex is undefined, null, string or NaN", function () {
     const fakeIshPrinter = {
-      fileList: [1],
+      fileList: [1]
     };
     FileClean.generate(fakeIshPrinter, null);
     expect(FileClean.returnFiles(0)).toBeUndefined();
@@ -70,10 +70,12 @@ describe("generate", function () {
   it("should generate file statistics for proper printer", function () {
     const fakeIshPrinter = {
       fileList: {
-        files: [{
-          fileSize: 100,
-          name: 'test'
-        }],
+        files: [
+          {
+            fileSize: 100,
+            name: "test"
+          }
+        ],
         fileCount: 150120310230 // absurdism
       },
       sortIndex: 0
@@ -85,40 +87,44 @@ describe("generate", function () {
     expect(fileStats).toBeTruthy();
     expect(fileStats.filecount).toEqual(150120310230);
     expect(Array.isArray(fileStats.fileList)).toBeTruthy();
-    expect(fileStats.fileList[0].name).toEqual('test');
+    expect(fileStats.fileList[0].name).toEqual("test");
     expect(Array.isArray(fileStats.fileList[0].toolUnits)).toBeTruthy();
     expect(Array.isArray(fileStats.fileList[0].toolCosts)).toBeTruthy();
-    const fakeIshFarmPrinters = [{
-      fileList: {
-        files: [{
-          size: 100,
-          length: 500
-        }]
-      },
-      storage: {
-        free: 100,
-        total: 500
-      },
-      sortIndex: 0
-    }];
+    const fakeIshFarmPrinters = [
+      {
+        fileList: {
+          files: [
+            {
+              size: 100,
+              length: 500
+            }
+          ]
+        },
+        storage: {
+          free: 100,
+          total: 500
+        },
+        sortIndex: 0
+      }
+    ];
     expect(FileClean.statistics(fakeIshFarmPrinters)).toBeUndefined();
 
     const stats = FileClean.returnStatistics();
     expect(stats).toBeTruthy();
     expect(stats.storagePercent).not.toBeNaN();
     expect(stats).toEqual({
-      "storageUsed": 400,
-      "storageTotal": 500,
-      "storageRemain": 100,
-      "storagePercent": 80,
-      "fileCount": 1,
-      "folderCount": 0,
-      "biggestFile": 100,
-      "smallestFile": 100,
-      "biggestLength": 0.5,
-      "smallestLength": 0.5,
-      "averageFile": 100,
-      "averageLength": 0.5
+      storageUsed: 400,
+      storageTotal: 500,
+      storageRemain: 100,
+      storagePercent: 80,
+      fileCount: 1,
+      folderCount: 0,
+      biggestFile: 100,
+      smallestFile: 100,
+      biggestLength: 0.5,
+      smallestLength: 0.5,
+      averageFile: 100,
+      averageLength: 0.5
     });
   });
 });
