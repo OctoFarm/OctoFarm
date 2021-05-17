@@ -11,7 +11,7 @@ class ScriptRunner {
       trigger: trigger,
       message: message,
       scriptLocation: scriptLocation,
-      printers: printer,
+      printers: printer
     };
     let newAlert = await new Alerts(alert);
     logger.info("Saving: " + trigger + " " + scriptLocation + " " + message);
@@ -67,10 +67,10 @@ class ScriptRunner {
         file: {
           name: "No File Selected",
           display: "No File Selected",
-          path: "No File Selected",
+          path: "No File Selected"
         },
         estimatedPrintTime: 0,
-        lastPrintTime: 0,
+        lastPrintTime: 0
       };
     }
     let progress = "";
@@ -85,7 +85,7 @@ class ScriptRunner {
         completion: 0,
         filepos: 0,
         printTime: "No Time Left",
-        printTimeLeft: "No Time Left",
+        printTimeLeft: "No Time Left"
       };
     }
 
@@ -275,5 +275,5 @@ const generateTime = function (seconds) {
   return string;
 };
 module.exports = {
-  ScriptRunner: ScriptRunner,
+  ScriptRunner: ScriptRunner
 };

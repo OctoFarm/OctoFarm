@@ -24,7 +24,7 @@ const { SystemCommands } = require("../lib/serverCommands.js");
 
 const {
   checkReleaseAndLogUpdate,
-  getUpdateNotificationIfAny,
+  getUpdateNotificationIfAny
 } = require("../runners/softwareUpdateChecker.js");
 
 module.exports = router;
@@ -38,7 +38,7 @@ const Storage = multer.diskStorage({
   },
   filename: function (req, file, callback) {
     callback(null, "bg.jpg");
-  },
+  }
 });
 
 const upload = multer({ storage: Storage });
@@ -63,7 +63,7 @@ router.post(
       status: "error",
       msg:
         "Unable to generate zip file, please check 'OctoFarm-API.log' file for more information.",
-      zipDumpPath: "",
+      zipDumpPath: ""
     };
 
     try {
@@ -97,7 +97,7 @@ router.get(
       await AlertsDB.deleteMany({});
       await GcodeDB.deleteMany({});
       res.send({
-        message: "Successfully deleted databases, server will restart...",
+        message: "Successfully deleted databases, server will restart..."
       });
       logger.info("Database completely wiped.... Restarting server...");
       SystemCommands.rebootOctoFarm();
@@ -112,7 +112,7 @@ router.get(
       await eval(databaseName).deleteMany({});
       res.send({
         message:
-          "Successfully deleted " + databaseName + ", server will restart...",
+          "Successfully deleted " + databaseName + ", server will restart..."
       });
       logger.info(
         databaseName + " successfully deleted.... Restarting server..."
@@ -155,7 +155,7 @@ router.post(
     let clientResponse = {
       haveWeSuccessfullyUpdatedOctoFarm: false,
       statusTypeForUser: "error",
-      message: "",
+      message: ""
     };
     let force = req?.body;
     if (
@@ -171,7 +171,8 @@ router.post(
 
     try {
       clientResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate(
-        clientResponse, force
+        clientResponse,
+        force
       );
     } catch (e) {
       clientResponse.message =
@@ -203,7 +204,7 @@ router.post("/client/update", ensureAuthenticated, (req, res) => {
       hideOff: req.body.panelView.hideOff,
       hideClosed: req.body.panelView.hideClosed,
       hideIdle: req.body.panelView.hideIdle,
-      printerRows: req.body.cameraView.cameraRows,
+      printerRows: req.body.cameraView.cameraRows
     };
     checked[0].panelView = panelView;
     checked[0].dashboard = req.body.dashboard;
@@ -270,7 +271,7 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
     if (shouldDisableInflux) {
       res.send({
         msg: returnMsg,
-        status: "warning",
+        status: "warning"
       });
     } else {
       res.send({ msg: "Settings Saved", status: "success" });
@@ -293,7 +294,7 @@ router.get("/sysInfo", ensureAuthenticated, async (req, res) => {
       memoryInfo: systemInformation.memoryInfo,
       sysUptime: systemInformation.sysUptime,
       currentProcess: systemInformation.currentProcess,
-      processUptime: systemInformation.processUptime,
+      processUptime: systemInformation.processUptime
     };
   }
   res.send(sysInfo);

@@ -21,7 +21,7 @@ router.get("/amialive", ensureCurrentUserAndGroup, async (req, res) => {
     isNode: isNode(),
     isPm2: isPm2(),
     os: process.env.OS,
-    update: softwareUpdateNotification,
+    update: softwareUpdateNotification
   });
 });
 

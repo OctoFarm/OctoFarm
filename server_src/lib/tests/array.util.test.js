@@ -1,7 +1,7 @@
 const {
   arrayCounts,
   checkNestedIndex,
-  checkNested,
+  checkNested
 } = require("../utils/array.util");
 
 describe("checkNested", function () {
@@ -39,7 +39,7 @@ describe("checkNestedIndex", function () {
   });
 
   it("checkNestedIndex should return similar to find equivalent", async function () {
-    const testArray = [{ name: "asd" },{ name: "asd" },{ name: "asd3" }];
+    const testArray = [{ name: "asd" }, { name: "asd" }, { name: "asd3" }];
     const testName = "asd";
     const testName3 = "asd3";
     const resultIndex = checkNestedIndex(testName, testArray);

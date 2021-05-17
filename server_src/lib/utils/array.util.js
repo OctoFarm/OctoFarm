@@ -50,5 +50,5 @@ function arrayCounts(arr) {
 module.exports = {
   checkNested,
   checkNestedIndex,
-  arrayCounts,
+  arrayCounts
 };

@@ -17,5 +17,5 @@ async function initHistoryCache() {
 
 module.exports = {
   getHistoryCache,
-  initHistoryCache,
+  initHistoryCache
 };

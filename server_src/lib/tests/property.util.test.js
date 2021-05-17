@@ -6,7 +6,7 @@ function conditionUnderTest(prop) {
 
 function unitUnderTest(someCondition, value, key) {
   return {
-    ...(someCondition ? { [key]: value } : {}),
+    ...(someCondition ? { [key]: value } : {})
   };
 }
 
@@ -19,14 +19,14 @@ describe("toDefinedKeyValue", function () {
     const result = unitUnderTest(
       conditionUnderTest(undefinedValue),
       undefinedValue,
-      key,
+      key
     );
     expect(result).toEqual({});
 
     const result2 = unitUnderTest(
       conditionUnderTest(trueValue),
       trueValue,
-      key,
+      key
     );
     expect(result2).toEqual({ [key]: trueValue });
   });

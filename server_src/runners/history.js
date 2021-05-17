@@ -31,8 +31,8 @@ class HistoryCollection {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
-              "X-Api-Key": printer.apikey,
-            },
+              "X-Api-Key": printer.apikey
+            }
           });
           logger.info(
             `${printer.printerURL}: fetched... spool status ${spools.status}`
@@ -47,7 +47,7 @@ class HistoryCollection {
             weight: sp.spool.weight,
             used: sp.spool.used,
             tempOffset: sp.spool.temp_offset,
-            fmID: sp.spool.id,
+            fmID: sp.spool.id
           };
           logger.info(
             `${printer.printerURL}: updating... spool status ${spool.spools}`
@@ -201,8 +201,8 @@ class HistoryCollection {
             method: "GET",
             headers: {
               "Content-Type": "video/mp4",
-              "X-Api-Key": printer.apikey,
-            },
+              "X-Api-Key": printer.apikey
+            }
           }
         );
       };
@@ -319,7 +319,6 @@ class HistoryCollection {
    * @returns {Promise<string>}
    */
   static async grabTimeLapse(fileName, url, id, printer, serverSettings) {
-
     const path = `./images/historyCollection/timelapses/${id}-${fileName}`;
     if (!fs.existsSync("./images/historyCollection")) {
       fs.mkdirSync("./images/historyCollection");
@@ -328,13 +327,18 @@ class HistoryCollection {
       fs.mkdirSync("./images/historyCollection/timelapses");
     }
 
-    await downloadFromOctoPrint(url, path, () => {
-      logger.info("Downloaded: ", url);
-      logger.info(`images/historyCollection/timelapses/${id}-${fileName}`);
-      if (serverSettings?.history?.timelapse?.deleteAfter) {
-        HistoryCollection.deleteTimeLapse(printer, fileName);
-      }
-    }, printer.apikey);
+    await downloadFromOctoPrint(
+      url,
+      path,
+      () => {
+        logger.info("Downloaded: ", url);
+        logger.info(`images/historyCollection/timelapses/${id}-${fileName}`);
+        if (serverSettings?.history?.timelapse?.deleteAfter) {
+          HistoryCollection.deleteTimeLapse(printer, fileName);
+        }
+      },
+      printer.apikey
+    );
 
     return `images/historyCollection/timelapses/${id}-${fileName}`;
   }
@@ -345,8 +349,8 @@ class HistoryCollection {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
-          "X-Api-Key": printer.apikey,
-        },
+          "X-Api-Key": printer.apikey
+        }
       });
     };
     await deleteTimeLapse(fileName);
@@ -395,7 +399,7 @@ class HistoryCollection {
         group: group,
         url: printer.printerURL,
         history_state: currentState,
-        file_name: workingHistory.file.name,
+        file_name: workingHistory.file.name
       };
       let printerData = {
         id: String(workingHistory._id),
@@ -422,7 +426,7 @@ class HistoryCollection {
         cost_per_hour: parseFloat(workingHistory.costPerHour),
         total_volume: parseFloat(workingHistory.totalVolume),
         total_length: parseFloat(workingHistory.totalLength),
-        total_weight: parseFloat(workingHistory.totalWeight),
+        total_weight: parseFloat(workingHistory.totalWeight)
       };
       let averagePrintTime = parseFloat(workingHistory.file.averagePrintTime);
       if (!isNaN(averagePrintTime)) {
@@ -473,7 +477,7 @@ class HistoryCollection {
           group: group,
           url: printer.printerURL,
           history_state: currentState,
-          file_name: history.fileName,
+          file_name: history.fileName
         };
 
         let used = 0;
@@ -498,7 +502,7 @@ class HistoryCollection {
           spool_density: parseFloat(selectedFilament[i].spools.profile.density),
           spool_diameter: parseFloat(
             selectedFilament[i].spools.profile.diameter
-          ),
+          )
         };
 
         writePoints(tags, "SpoolInformation", filamentData);
@@ -607,7 +611,7 @@ class HistoryCollection {
         job,
         notes: "",
         snapshot: "",
-        resends: resends,
+        resends: resends
       };
 
       HistoryCollection.updateFilamentInfluxDB(
@@ -618,7 +622,7 @@ class HistoryCollection {
       );
 
       const saveHistory = new History({
-        printHistory,
+        printHistory
       });
       await saveHistory.save().then(async (r) => {
         const thumbnail = await HistoryCollection.thumbnailCheck(
@@ -772,10 +776,10 @@ class HistoryCollection {
         notes: "",
         snapshot: "",
         timelapse: "",
-        resends: resends,
+        resends: resends
       };
       const saveHistory = new History({
-        printHistory,
+        printHistory
       });
 
       HistoryCollection.updateFilamentInfluxDB(
@@ -889,10 +893,10 @@ class HistoryCollection {
         endDate,
         printTime: Math.round(payload.time),
         job: job,
-        notes: "",
+        notes: ""
       };
       const saveError = new ErrorLog({
-        errorLog,
+        errorLog
       });
       await saveError.save();
       await getHistoryCache().initCache();
@@ -916,7 +920,7 @@ class HistoryCollection {
       spoolUsed: "",
       filamentLength: 0,
       filamentVolume: 0,
-      notes: "",
+      notes: ""
     };
     return printHistory;
   }
@@ -927,12 +931,12 @@ class HistoryCollection {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": apikey,
-      },
+        "X-Api-Key": apikey
+      }
     });
   }
 }
 
 module.exports = {
-  HistoryCollection,
+  HistoryCollection
 };

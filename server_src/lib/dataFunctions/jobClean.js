@@ -53,7 +53,7 @@ class JobClean {
       printTimeRemaining: null,
       averagePrintTime: null,
       lastPrintTime: null,
-      thumbnail: null,
+      thumbnail: null
     };
     if (typeof printer.job !== "undefined" && printer.job !== null) {
       currentJob.fileName = printer.job.file.name;
@@ -95,16 +95,16 @@ class JobClean {
             "undefined"
           ) {
             spoolCost += floatOrZero(
-              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].cost,
+              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].cost
             );
             totalVolume += floatOrZero(
-              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].volume,
+              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].volume
             );
             totalLength += floatOrZero(
-              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].length,
+              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].length
             );
             totalWeight += floatOrZero(
-              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].weight,
+              currentJob.expectedFilamentCosts[s][`tool${keys[s]}`].weight
             );
           }
         }
@@ -117,7 +117,7 @@ class JobClean {
         totalVolume: parseFloat(totalVolume),
         totalLength: parseFloat(totalLength),
         totalWeight: parseFloat(totalWeight),
-        spoolCost: parseFloat(spoolCost),
+        spoolCost: parseFloat(spoolCost)
       };
     }
 
@@ -127,7 +127,7 @@ class JobClean {
       currentJob.printTimeElapsed = printer.progress.printTime;
       currentJob.expectedPrintTime =
         Math.round(
-          (printer.progress.printTimeLeft + printer.progress.printTime) / 1000,
+          (printer.progress.printTimeLeft + printer.progress.printTime) / 1000
         ) * 1000;
       currentJob.expectedCompletionDate = await JobClean.getCompletionDate(
         printer.progress.printTimeLeft,
@@ -143,5 +143,5 @@ class JobClean {
 }
 
 module.exports = {
-  JobClean,
+  JobClean
 };

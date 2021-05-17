@@ -124,7 +124,7 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
     const send = {
       status: 200,
       printTime: historyEntity.printHistory.printTime,
-      costSettings: printers[printer].costSettings,
+      costSettings: printers[printer].costSettings
     };
     res.send(send);
   } else {
@@ -133,12 +133,12 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
       electricityCosts: 0.15,
       purchasePrice: 500,
       estimateLifespan: 43800,
-      maintenanceCosts: 0.25,
+      maintenanceCosts: 0.25
     };
     const send = {
       status: 400,
       printTime: historyEntity.printHistory.printTime,
-      costSettings: historyEntity.printHistory.costSettings,
+      costSettings: historyEntity.printHistory.costSettings
     };
     historyEntity.markModified("printHistory");
     historyEntity.save().then(() => {

@@ -1,4 +1,6 @@
-const farmStatisticsService = jest.createMockFromModule("../farm-statistics.service");
+const farmStatisticsService = jest.createMockFromModule(
+  "../farm-statistics.service"
+);
 const realModule = jest.requireActual("../farm-statistics.service");
 
 let testFarmStatistics = [];
@@ -8,21 +10,21 @@ let testFarmStatistics = [];
  */
 farmStatisticsService.list = async () => {
   return testFarmStatistics;
-}
+};
 
 farmStatisticsService.create = async (startDate, heatmapArray) => {
   const newEntry = {
     farmStart: startDate,
-    heatMap: heatmapArray,
+    heatMap: heatmapArray
   };
   testFarmStatistics.push(newEntry);
   return Promise.resolve(newEntry);
-}
+};
 
 farmStatisticsService.saveMockData = (inputData) => {
   if (!Array.isArray(inputData)) {
     throw new Error(
-        "Mate you cant even properly provide an array input to a MOCK TEST??? Dude, git gud.",
+      "Mate you cant even properly provide an array input to a MOCK TEST??? Dude, git gud."
     );
   }
   testFarmStatistics = inputData;

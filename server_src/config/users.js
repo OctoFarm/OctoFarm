@@ -9,9 +9,9 @@ module.exports = {
     if (!serverSettings?.server?.loginRequired) {
       req.user = {
         name: "No User",
-        group: "Administrator",
+        group: "Administrator"
       };
     }
     next();
-  },
+  }
 };

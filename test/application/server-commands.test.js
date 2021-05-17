@@ -1,7 +1,7 @@
 describe("ServerCommands", () => {
   jest.mock("child_process", () => {
     return {
-      exec: () => Promise.resolve(),
+      exec: () => Promise.resolve()
     };
   });
   jest.mock("../../server_src/utils/npm.utils");
@@ -13,7 +13,7 @@ describe("ServerCommands", () => {
 
   jest.mock("lookpath", () => {
     return {
-      lookpath: () => Promise.resolve("/usr/random/path"),
+      lookpath: () => Promise.resolve("/usr/random/path")
     };
   });
   const { lookpath } = require("lookpath");
@@ -23,48 +23,48 @@ describe("ServerCommands", () => {
       modified: [
         "package-lock.json",
         "package.json",
-        "server_src/lib/serverCommands.js",
+        "server_src/lib/serverCommands.js"
       ],
       ahead: 0,
-      behind: 0,
+      behind: 0
     };
 
     const scenarioModifiedBehindOutput = {
       modified: [
         "package-lock.json",
         "package.json",
-        "server_src/lib/serverCommands.js",
+        "server_src/lib/serverCommands.js"
       ],
       ahead: 0,
-      behind: 1,
+      behind: 1
     };
 
     const scenarioModifiedAheadOutput = {
       modified: [
         "package-lock.json",
         "package.json",
-        "server_src/lib/serverCommands.js",
+        "server_src/lib/serverCommands.js"
       ],
       ahead: 1,
-      behind: 0,
+      behind: 0
     };
 
     const scenarioAheadOutput = {
       modified: [],
       ahead: 1,
-      behind: 0,
+      behind: 0
     };
 
     const scenarioBehindOutput = {
       modified: [],
       ahead: 0,
-      behind: 1,
+      behind: 1
     };
 
     const scenarioUpToDate = {
       modified: [],
       ahead: 0,
-      behind: 0,
+      behind: 0
     };
 
     const successType = "success";
@@ -83,32 +83,32 @@ describe("ServerCommands", () => {
         name: "should not complain about modifications",
         scenario: scenarioModifiedOutput,
         type: successType,
-        containsMessage: upToDateMessage,
+        containsMessage: upToDateMessage
       },
       {
         name: "should warn about modifications when behind",
         scenario: scenarioModifiedBehindOutput,
         type: warningType,
-        containsMessage: modificationsDetectedMessage,
+        containsMessage: modificationsDetectedMessage
       },
       {
         name: "should not take not of being ahead",
         scenario: scenarioAheadOutput,
         type: successType,
-        containsMessage: upToDateMessage,
+        containsMessage: upToDateMessage
       },
       {
         name: "should not take not of being ahead with modifications",
         scenario: scenarioModifiedAheadOutput,
         type: successType,
-        containsMessage: upToDateMessage,
+        containsMessage: upToDateMessage
       },
       {
         name: "should try to pull when behind",
         scenario: scenarioBehindOutput,
         type: successType,
-        containsMessage: upDateCompletedMessage,
-      },
+        containsMessage: upDateCompletedMessage
+      }
     ];
 
     beforeEach(() => {

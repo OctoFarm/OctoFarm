@@ -17,7 +17,7 @@ class PrinterTicker {
       printerID: printer._id,
       printer: printer.printerURL,
       state: state,
-      pluginDisplay: plugin,
+      pluginDisplay: plugin
     };
     octoprintLogs.push(newLog);
     if (octoprintLogs.length >= 2000) {
@@ -39,7 +39,7 @@ class PrinterTicker {
       message: message,
       printerID: printerID,
       printer: printer,
-      state: state,
+      state: state
     };
     currentIssues.push(newIssue);
     if (currentIssues.length >= 10000) {
@@ -61,5 +61,5 @@ class PrinterTicker {
 }
 
 module.exports = {
-  PrinterTicker,
+  PrinterTicker
 };

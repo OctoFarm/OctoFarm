@@ -6,8 +6,8 @@ const downloadFromOctoPrint = async (url, path, callback, apiKey) => {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "X-Api-Key": apiKey,
-    },
+      "X-Api-Key": apiKey
+    }
   });
   const fileStream = fs.createWriteStream(path);
   await new Promise((resolve, reject) => {
@@ -19,4 +19,4 @@ const downloadFromOctoPrint = async (url, path, callback, apiKey) => {
 
 module.exports = {
   downloadFromOctoPrint
-}
+};

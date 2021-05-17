@@ -24,7 +24,7 @@ class Script {
       address: wolSettings.ip,
       num_packets: wolSettings.count,
       interval: wolSettings.interval,
-      port: wolSettings.port,
+      port: wolSettings.port
     };
     const mac = wolSettings.MAC;
 

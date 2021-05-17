@@ -5,7 +5,7 @@ const { ensureAuthenticated } = require("../config/auth");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 const {
-  getDefaultDashboardSettings,
+  getDefaultDashboardSettings
 } = require("../lib/providers/settings.constants");
 
 // Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
@@ -22,7 +22,7 @@ router.get("/get/", ensureAuthenticated, function (req, res) {
     "Cache-Control": "no-cache, no-store, must-revalidate",
     Pragma: "no-cache",
     Expires: 0,
-    Connection: "keep-alive",
+    Connection: "keep-alive"
   });
   res.write("\n");
   (function (clientId) {
@@ -56,7 +56,7 @@ if (interval === false) {
       printerInformation,
       currentOperations,
       dashStatistics,
-      dashboardSettings,
+      dashboardSettings
     };
 
     clientInformation = await stringify(infoDrop);
