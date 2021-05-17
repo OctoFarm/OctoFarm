@@ -433,10 +433,8 @@ class PrinterClean {
       sortedPrinter.connectionLog =
         printerConnectionLogs[farmPrinter.sortIndex];
       if (typeof farmPrinter.klipperFirmwareVersion !== "undefined") {
-        sortedPrinter.klipperFirmwareVersion = farmPrinter.klipperFirmwareVersion.substring(
-          0,
-          6
-        );
+        sortedPrinter.klipperFirmwareVersion =
+          farmPrinter.klipperFirmwareVersion.substring(0, 6);
       }
       const printerIndex = _.findIndex(printerControlList, function (o) {
         return o.printerName === sortedPrinter.printerName;
@@ -1279,9 +1277,8 @@ class PrinterClean {
                 x: enviromentalData[i].date,
                 y: enviromentalData[i].temperature.toFixed(2)
               });
-              dashboardStatistics.currentTemperature = enviromentalData[0].temperature.toFixed(
-                2
-              );
+              dashboardStatistics.currentTemperature =
+                enviromentalData[0].temperature.toFixed(2);
             } else {
               currentEnviromentalData[0].data.push({
                 x: enviromentalData[i].date,
@@ -1312,9 +1309,8 @@ class PrinterClean {
                 x: enviromentalData[i].date,
                 y: enviromentalData[i].pressure.toFixed(0)
               });
-              dashboardStatistics.currentPressure = enviromentalData[0].pressure.toFixed(
-                0
-              );
+              dashboardStatistics.currentPressure =
+                enviromentalData[0].pressure.toFixed(0);
             } else {
               currentEnviromentalData[2].data.push({
                 x: enviromentalData[i].date,
@@ -1329,9 +1325,8 @@ class PrinterClean {
                 x: enviromentalData[i].date,
                 y: enviromentalData[i].iaq.toFixed(0)
               });
-              dashboardStatistics.currentIAQ = enviromentalData[0].iaq.toFixed(
-                0
-              );
+              dashboardStatistics.currentIAQ =
+                enviromentalData[0].iaq.toFixed(0);
             } else {
               currentEnviromentalData[3].data.push({
                 x: enviromentalData[i].date,

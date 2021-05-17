@@ -19,12 +19,12 @@ if (!!majorVersion && majorVersion < 14) {
 const {
   setupExpressServer,
   serveOctoFarmNormally,
-  ensureSystemSettingsInitiated,
+  ensureSystemSettingsInitiated
 } = require("./app-core");
 const {
   setupEnvConfig,
   fetchMongoDBConnectionString,
-  fetchOctoFarmPort,
+  fetchOctoFarmPort
 } = require("./app-env");
 
 const Logger = require("./server_src/lib/logger.js");

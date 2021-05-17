@@ -7,11 +7,11 @@ const ServerSettingsDB = require("./server_src/models/ServerSettings");
 const expressLayouts = require("express-ejs-layouts");
 const Logger = require("./server_src/lib/logger.js");
 const {
-  optionalInfluxDatabaseSetup,
+  optionalInfluxDatabaseSetup
 } = require("./server_src/lib/influxExport.js");
 const { getViewsPath } = require("./app-env");
 const {
-  PrinterClean,
+  PrinterClean
 } = require("./server_src/lib/dataFunctions/printerClean.js");
 const { ServerSettings } = require("./server_src/settings/serverSettings.js");
 const { SystemRunner } = require("./server_src/runners/systemInfo.js");
@@ -35,7 +35,7 @@ function setupExpressServer() {
     session({
       secret: "supersecret",
       resave: true,
-      saveUninitialized: true,
+      saveUninitialized: true
     })
   );
   app.use(passport.initialize());
@@ -70,7 +70,9 @@ async function ensureSystemSettingsInitiated() {
 
 async function serveOctoFarmNormally(app, port) {
   if (!port || Number.isNaN(parseInt(port))) {
-    throw new Error("The server database-issue mode requires a numeric port input argument");
+    throw new Error(
+      "The server database-issue mode requires a numeric port input argument"
+    );
   }
 
   let listenerHttpServer = null;
@@ -92,18 +94,12 @@ async function serveOctoFarmNormally(app, port) {
 
   await optionalInfluxDatabaseSetup();
 
-  listenerHttpServer = app.listen(
-    port,
-    "0.0.0.0",
-    () => {
-      logger.info(
-        `Server started... open it at http://127.0.0.1:${port}`
-      );
-      if (typeof process.send === "function") {
-        process.send("ready");
-      }
+  listenerHttpServer = app.listen(port, "0.0.0.0", () => {
+    logger.info(`Server started... open it at http://127.0.0.1:${port}`);
+    if (typeof process.send === "function") {
+      process.send("ready");
     }
-  );
+  });
 
   app.use("/", require("./server_src/routes/index", { page: "route" }));
   app.use(
@@ -164,5 +160,5 @@ const logger = new Logger("OctoFarm-Server");
 module.exports = {
   setupExpressServer,
   ensureSystemSettingsInitiated,
-  serveOctoFarmNormally,
+  serveOctoFarmNormally
 };

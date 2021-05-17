@@ -39,7 +39,8 @@ async function getOrCreateApp() {
 describe("ServerUpdate Endpoint", () => {
   it("should return 302 redirect when no user is logged in", async function (done) {
     process.env.npm_package_version = require("../../package.json").version;
-    process.env.testlatest_package_version = require("../../package.json").version;
+    process.env.testlatest_package_version =
+      require("../../package.json").version;
     app = await getOrCreateApp();
     const res = await request(app)
       .post("/settings/server/update/octofarm")
