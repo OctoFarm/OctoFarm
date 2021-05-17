@@ -118,10 +118,11 @@ const heartBeatInterval = setInterval(function ping() {
 WebSocketClient.prototype.open = function (url, index) {
   try {
     if (url.includes("http://")) {
-      url = url.replace("http://", "");
-    }
-    if (url.includes("https://")) {
-      url = url.replace("https://", "");
+      url = url.replace("http://", "ws://");
+    } else if (url.includes("https://")) {
+      url = url.replace("https://", "wss://");
+    } else if (!url.includes("ws://")) {
+      url = "ws://" + url;
     }
     this.url = url;
     this.index = index;
@@ -1241,7 +1242,7 @@ class Runner {
             farmPrinters[i]._id
           );
           await farmPrinters[i].ws.open(
-            `ws://${farmPrinters[i].printerURL}/sockjs/websocket`,
+            `${farmPrinters[i].printerURL}/sockjs/websocket`,
             i
           );
         } else {
