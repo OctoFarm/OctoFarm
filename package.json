@@ -13,6 +13,7 @@
     "prerelease": "gulp",
     "release": "git archive -o octofarm.zip HEAD",
     "package": "pkg --compress --out-path package package.json",
+    "prettier": "prettier --write .",
     "dev": "nodemon ./app.js",
     "test": "jest --forceExit"
   },
@@ -114,9 +115,6 @@
     "assets": [
       "views/**/*"
     ]
-  },
-  "prettier": {
-    "trailingComma": "none"
   },
   "engine-strict": true,
   "engines": {

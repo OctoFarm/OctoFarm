@@ -1,0 +1,26 @@
+# Ignore transient folders
+.git
+logs
+OctoFarm
+package
+
+# Ignore unuseful folders
+.github
+docker
+docs
+images
+node_modules
+screenshots
+server_2x
+setup
+views
+
+# Ignore client for now
+client_2x
+client_src
+
+# Ignore root files
+CHANGELOG.md
+README.md
+testPrinter.json
+testPrinters.json
