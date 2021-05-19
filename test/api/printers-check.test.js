@@ -6,7 +6,7 @@ jest.mock("../../server_src/config/auth");
 
 let app = null;
 const requestBody = {
-  i: "a0a569d20dd308890a1c06",
+  i: "a0a569d20dd308890a1c06"
 };
 
 /**

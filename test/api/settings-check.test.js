@@ -43,8 +43,8 @@ describe("ServerUpdate Endpoint", () => {
       require("../../package.json").version;
     app = await getOrCreateApp();
     const res = await request(app)
-        .post("/settings/server/update/octofarm")
-        .send();
+      .post("/settings/server/update/octofarm")
+      .send();
     expect(res.statusCode).toEqual(302);
     done();
   }, 10000);
@@ -54,11 +54,11 @@ describe("Dashboard rendering", () => {
   it("should show login page by redirect", async () => {
     app = await getOrCreateApp();
     const res = await request(app)
-        .get("/system")
-        .send() // We should be redirected to login by default
-        .expect(302)
-        .then((response) => {
-          expect(response.text).toEqual("Found. Redirecting to /users/login");
-        });
+      .get("/system")
+      .send() // We should be redirected to login by default
+      .expect(302)
+      .then((response) => {
+        expect(response.text).toEqual("Found. Redirecting to /users/login");
+      });
   });
 });
