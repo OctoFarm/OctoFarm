@@ -1,4 +1,3 @@
-/* eslint-disable quotes */
 import OctoFarmClient from "../octofarm_client.js";
 import UI from "../functions/ui.js";
 import Calc from "../functions/calc.js";
@@ -180,6 +179,8 @@ async function updatePrinterSettingsModal(printersInformation, printerID) {
         );
       }
     }
+    // Setup Refresh Settings Button
+    await PrinterSettings.setupRefreshButton(currentPrinter);
     // Setup Save Settings button
     await PrinterSettings.setupSaveButton(currentPrinter);
 
@@ -249,7 +250,7 @@ class PrinterSettings {
       if (!!currentPrinter.connectionOptions.baudratePreference) {
         baudrateDropdown.insertAdjacentHTML(
           "afterbegin",
-          '<option value="0">No Preference</option>'
+          "<option value=\"0\">No Preference</option>"
         );
       }
       let portAvailable = this.checkPortIsAvailable(
@@ -271,10 +272,10 @@ class PrinterSettings {
           `<option value="${currentPrinter.connectionOptions.portPreference}">${currentPrinter.connectionOptions.portPreference}</option>`
         );
       }
-      if (!!currentPrinter.connectionOptions.portPreference) {
+      if (currentPrinter.connectionOptions.portPreference === null) {
         serialPortDropDown.insertAdjacentHTML(
           "afterbegin",
-          '<option value="0">No Preference</option>'
+          "<option value=\"0\">No Preference</option>"
         );
       }
       currentPrinter.connectionOptions.printerProfiles.forEach((profile) => {
@@ -283,10 +284,10 @@ class PrinterSettings {
           `<option value="${profile.id}">${profile.name}</option>`
         );
       });
-      if (!!currentPrinter.connectionOptions.printerProfilePreference) {
+      if (currentPrinter.connectionOptions.printerProfilePreference  === null) {
         profileDropDown.insertAdjacentHTML(
           "afterbegin",
-          '<option value="0">No Preference</option>'
+          "<option value=\"0\">No Preference</option>"
         );
       }
       if (!!currentPrinter.connectionOptions.baudratePreference) {
@@ -309,7 +310,7 @@ class PrinterSettings {
       }
     } else {
       pageElements.mainPage.offlineMessage.innerHTML =
-        '<div class="alert alert-danger" role="alert">NOTE! Your printer is currently offline, any settings requiring an OctoPrint connection have been disabled... Please turn on your OctoPrint instance to re-enabled these.</div>';
+        "<div class=\"alert alert-danger\" role=\"alert\">NOTE! Your printer is currently offline, any settings requiring an OctoPrint connection have been disabled... Please turn on your OctoPrint instance to re-enabled these.</div>";
       baudrateDropdown.disabled = true;
       serialPortDropDown.disabled = true;
       profileDropDown.disabled = true;
@@ -1011,10 +1012,9 @@ class PrinterSettings {
   }
 
   static async setupSaveButton(currentPrinter) {
-    pageElements.menu.printerMenuFooter.innerHTML = "";
     pageElements.menu.printerMenuFooter.insertAdjacentHTML(
       "beforeend",
-      `<button type="button" class="btn btn-success btn-block" id="savePrinterSettingsBtn">Save</button>`
+      "<button id=\"savePrinterSettingsBtn\" type=\"button\" class=\"btn btn-success btn-block\" id=\"savePrinterSettingsBtn\">Save Settings</button>"
     );
 
     document
@@ -1086,6 +1086,31 @@ class PrinterSettings {
         } finally {
           UI.removeLoaderFromElementInnerHTML(event.target);
         }
+      });
+  }
+
+  static async setupRefreshButton(currentPrinter) {
+    pageElements.menu.printerMenuFooter.innerHTML = "";
+    pageElements.menu.printerMenuFooter.insertAdjacentHTML(
+      "beforeend",
+      "<button id=\"settingsPageRefreshButton\" type=\"button\" class=\"btn btn-warning btn-block\" id=\"savePrinterSettingsBtn\">Refresh Settings</button>"
+    );
+
+    document
+      .getElementById("settingsPageRefreshButton")
+      .addEventListener("click", async (event) => {
+        UI.addLoaderToElementsInnerHTML(event.target);
+        await updatePrinterSettingsModal(
+          [currentPrinter],
+          currentPrinter._id
+        );
+        UI.createAlert(
+          "success",
+          "Successfully reloaded your OctoPrint Settings",
+          3000,
+          "clicked"
+        );
+        UI.removeLoaderFromElementInnerHTML(event.target);
       });
   }
 
@@ -1238,25 +1263,11 @@ class PrinterSettings {
     if (available) {
       pageElements.connectPage.portNotAvailableMessage.innerHTML = "";
       serialPortDropDownElement.classList =
-        "custom-select  bg-secondary text-light";
+        "custom-select bg-secondary text-light";
     } else {
       pageElements.connectPage.portNotAvailableMessage.innerHTML =
-        '<div class="alert alert-danger" role="alert">Your port preference is not available... Is your printer turned on? ' +
-        'Please <button id="settingsPageRefreshButton" type="button" role="tab" data-toggle="list" class="btn btn-info btn-small p-1">Click Here!</button> to refresh once the issue is rectified</div>';
-      document
-        .getElementById("settingsPageRefreshButton")
-        .addEventListener("click", async () => {
-          await updatePrinterSettingsModal(
-            [currentPrinter],
-            currentPrinter._id
-          );
-          UI.createAlert(
-            "success",
-            "Successfully reloaded your OctoPrint Settings",
-            3000,
-            "clicked"
-          );
-        });
+        "<div class=\"alert alert-danger\" role=\"alert\">Your port preference is not available... Is your printer turned on? " +
+        "Please click the refresh button once the issue is rectified</div>";
       serialPortDropDownElement.classList = "custom-select bg-danger";
     }
   }
@@ -1275,6 +1286,8 @@ class PrinterSettings {
   }
 
   static checkPortIsAvailable(portList, portPreference) {
+    // If port preference is null, then we have no preference from OctoPrint so no need to check if available
+    if(portPreference === null) return true;
     return !!portList.includes(portPreference);
   }
 
