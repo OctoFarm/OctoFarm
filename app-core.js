@@ -145,6 +145,8 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
   }
 
   serveOctoFarmRoutes(app);
+
+  return app;
 }
 
 const logger = new Logger("OctoFarm-Server");
