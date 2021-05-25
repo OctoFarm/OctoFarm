@@ -83,4 +83,3 @@ describe("AmIAlive Endpoint", () => {
     delete process.env.test_airgapped;
   });
 });
-
