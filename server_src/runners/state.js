@@ -2558,7 +2558,7 @@ class Runner {
         await PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
-          "Grabbed plugin list",
+          `Grabbed plugin list (OctoPrint compatibility: ${farmPrinters[index].octoPrintVersion})`,
           "Complete",
           farmPrinters[index]._id
         );
