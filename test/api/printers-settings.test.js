@@ -19,7 +19,7 @@ beforeAll(async () => {
 
 describe("Printer Settings Update Endpoint", () => {
   it("should return 400 error when wrong input is provided", async function (done) {
-    const res = await request(app)
+    const res = await request
       .post("/printers/updatePrinterSettings")
       .send();
 
@@ -32,7 +32,7 @@ describe("Printer Settings Update Endpoint", () => {
   }, 10000);
 
   it("should return 500 if server fails to update printer settings", async function (done) {
-    const res = await request(app)
+    const res = await request
       .post("/printers/updatePrinterSettings")
       .send(requestBody);
 
