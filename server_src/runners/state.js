@@ -20,6 +20,7 @@ const { JobClean } = require("../lib/dataFunctions/jobClean.js");
 const { FileClean } = require("../lib/dataFunctions/fileClean.js");
 const { FilamentClean } = require("../lib/dataFunctions/filamentClean.js");
 const { PrinterTicker } = require("./printerTicker.js");
+const {checkPluginManagerAPIDeprecation} = require("../utils/compatibility.utils");
 
 const logger = new Logger("OctoFarm-State");
 let farmPrinters = [];
@@ -2541,16 +2542,19 @@ class Runner {
       "Active",
       farmPrinters[index]._id
     );
+
+    const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(farmPrinters[index].octoPrintVersion);
+
     return ClientAPI.getRetry(
       farmPrinters[index].printerURL,
       farmPrinters[index].apikey,
-      "plugin/pluginmanager/plugins"
+        printerManagerApiCompatible ? "plugin/pluginmanager/repository" : "api/plugin/pluginmanager"
     )
       .then((res) => {
         return res.json();
       })
       .then(async (res) => {
-        farmPrinters[index].pluginsList = res.plugins;
+        farmPrinters[index].pluginsList = res.repository.plugins;
         await PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
@@ -2772,7 +2776,7 @@ class Runner {
         }
         if (res.plugins["pi_support"]) {
           logger.info("Detected Pi Support!");
-          await PrinterTicker.addIssue(
+          PrinterTicker.addIssue(
             new Date(),
             farmPrinters[index].printerURL,
             "Pi Plugin detected... scanning for version information...",
@@ -2791,7 +2795,7 @@ class Runner {
             version: piSupport.octopi_version
           };
           logger.info("I captured: ", farmPrinters[index].octoPi);
-          await PrinterTicker.addIssue(
+          PrinterTicker.addIssue(
             new Date(),
             farmPrinters[index].printerURL,
             "Sucessfully grabbed OctoPi information...",
@@ -2804,7 +2808,7 @@ class Runner {
             _.isEmpty(farmPrinters[index].costSettings) ||
             farmPrinters[index].costSettings.powerConsumption === 0.5
           ) {
-            await PrinterTicker.addIssue(
+            PrinterTicker.addIssue(
               new Date(),
               farmPrinters[index].printerURL,
               "Cost Plugin detected... Updating OctoFarms Cost settings",
