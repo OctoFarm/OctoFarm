@@ -4,8 +4,8 @@ export default class OctoFarmClient {
     const get = await fetch(url, {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
-      },
+        "Content-Type": "application/json"
+      }
     });
     if (get.status === 400) {
       throw new Error(
@@ -23,9 +23,9 @@ export default class OctoFarmClient {
     const post = await fetch(url, {
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify(data),
+      body: JSON.stringify(data)
     });
     if (post.status === 400) {
       throw new Error(
