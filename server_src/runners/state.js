@@ -2544,14 +2544,14 @@ class Runner {
     return ClientAPI.getRetry(
       farmPrinters[index].printerURL,
       farmPrinters[index].apikey,
-      "api/plugin/pluginmanager"
+      "plugin/pluginmanager/plugins"
     )
       .then((res) => {
         return res.json();
       })
-      .then((res) => {
-        farmPrinters[index].pluginsList = res.repository.plugins;
-        PrinterTicker.addIssue(
+      .then(async (res) => {
+        farmPrinters[index].pluginsList = res.plugins;
+        await PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
           "Grabbed plugin list",
@@ -2559,8 +2559,8 @@ class Runner {
           farmPrinters[index]._id
         );
       })
-      .catch((err) => {
-        PrinterTicker.addIssue(
+      .catch(async (err) => {
+        await PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
           `Error grabbing plugin list information: ${err}`,
@@ -2765,14 +2765,14 @@ class Runner {
         // Update info to DB
         farmPrinters[index].corsCheck = res.api.allowCrossOrigin;
         farmPrinters[index].settingsApi = res.api;
-        if (farmPrinters[index].settingsAppearance === "undefined") {
+        if (!farmPrinters[index].settingsAppearance) {
           farmPrinters[index].settingsAppearance = res.appearance;
         } else if (farmPrinters[index].settingsAppearance.name === "") {
           farmPrinters[index].settingsAppearance.name = res.appearance.name;
         }
         if (res.plugins["pi_support"]) {
           logger.info("Detected Pi Support!");
-          PrinterTicker.addIssue(
+          await PrinterTicker.addIssue(
             new Date(),
             farmPrinters[index].printerURL,
             "Pi Plugin detected... scanning for version information...",
@@ -2791,7 +2791,7 @@ class Runner {
             version: piSupport.octopi_version
           };
           logger.info("I captured: ", farmPrinters[index].octoPi);
-          PrinterTicker.addIssue(
+          await PrinterTicker.addIssue(
             new Date(),
             farmPrinters[index].printerURL,
             "Sucessfully grabbed OctoPi information...",
@@ -2804,7 +2804,7 @@ class Runner {
             _.isEmpty(farmPrinters[index].costSettings) ||
             farmPrinters[index].costSettings.powerConsumption === 0.5
           ) {
-            PrinterTicker.addIssue(
+            await PrinterTicker.addIssue(
               new Date(),
               farmPrinters[index].printerURL,
               "Cost Plugin detected... Updating OctoFarms Cost settings",
@@ -2864,7 +2864,7 @@ class Runner {
             const printer = await Printers.findById(id);
 
             printer.save();
-            PrinterTicker.addIssue(
+            await PrinterTicker.addIssue(
               new Date(),
               farmPrinters[index].printerURL,
               "Successfully saved PSU control settings...",
@@ -2899,7 +2899,7 @@ class Runner {
           }
         }
 
-        PrinterTicker.addIssue(
+        await PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
           "Grabbed settings information...",
@@ -2913,8 +2913,8 @@ class Runner {
           `Successfully grabbed Settings for...: ${farmPrinters[index].printerURL}`
         );
       })
-      .catch((err) => {
-        PrinterTicker.addIssue(
+      .catch(async (err) => {
+        await PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
           `Error grabbing settings information: ${err}`,
