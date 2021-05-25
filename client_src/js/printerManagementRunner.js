@@ -9,7 +9,7 @@ import Validate from "./lib/functions/validate.js";
 import PowerButton from "./lib/modules/powerButton.js";
 import {
   checkQuickConnectState,
-  init as actionButtonInit,
+  init as actionButtonInit
 } from "./lib/modules/Printers/actionButtons.js";
 import PrinterSelect from "./lib/modules/printerSelect";
 import PrinterLogs from "./lib/modules/printerLogs.js";
@@ -129,7 +129,7 @@ bulkPluginUpdateButton.addEventListener("click", async (e) => {
         message += currentPrinter.printerName + "<br>";
         let prepPrinter = {
           printer: currentPrinter,
-          plugins: [],
+          plugins: []
         };
         toUpdate.push(prepPrinter);
         for (
@@ -155,7 +155,7 @@ bulkPluginUpdateButton.addEventListener("click", async (e) => {
         for (let i = 0; i < toUpdate.length; i++) {
           const data = {
             targets: toUpdate[i].plugins,
-            force: true,
+            force: true
           };
           let updateRequest = await OctoPrintClient.postNOAPI(
             toUpdate[i].printer,
@@ -207,7 +207,7 @@ bulkPluginUpdateButton.addEventListener("click", async (e) => {
           }
         }
       }
-    },
+    }
   });
 });
 
@@ -224,12 +224,12 @@ bulkOctoPrintUpdateButton.addEventListener("click", async (e) => {
     buttons: {
       confirm: {
         label: "Yes",
-        className: "btn-success",
+        className: "btn-success"
       },
       cancel: {
         label: "No",
-        className: "btn-danger",
-      },
+        className: "btn-danger"
+      }
     },
     callback: async function (result) {
       if (result) {
@@ -239,7 +239,7 @@ bulkOctoPrintUpdateButton.addEventListener("click", async (e) => {
           await delay(1000);
         }
       }
-    },
+    }
   });
 });
 
@@ -307,7 +307,7 @@ bulkConnectBtn.addEventListener("click", async (e) => {
             baudrate: printerInfo[index].connectionOptions.baudratePreference,
             printerProfile:
               printerInfo[index].connectionOptions.printerProfilePreference,
-            save: true,
+            save: true
           };
         } else {
           UI.createAlert(
@@ -396,7 +396,7 @@ bulkDisconnectBtn.addEventListener("click", async (e) => {
       });
       if (index > -1) {
         let data = {
-          command: "disconnect",
+          command: "disconnect"
         };
         if (printerInfo[index].printerState.colour.category === "Idle") {
           let post = await OctoPrintClient.post(
@@ -464,16 +464,16 @@ bulkPowerBtn.addEventListener("click", async (e) => {
       inputOptions: [
         {
           text: "Restart OctoPrint",
-          value: "restart",
+          value: "restart"
         },
         {
           text: "Reboot Host",
-          value: "reboot",
+          value: "reboot"
         },
         {
           text: "Shutdown Host",
-          value: "shutdown",
-        },
+          value: "shutdown"
+        }
       ],
       callback: async function (result) {
         let printersToConnect = [];
@@ -535,7 +535,7 @@ bulkPowerBtn.addEventListener("click", async (e) => {
             );
           }
         }
-      },
+      }
     });
   };
 
@@ -563,7 +563,7 @@ scanNetworkBtn.addEventListener("click", async (e) => {
       cameraURL: "",
       name: "",
       group: "",
-      apikey: "",
+      apikey: ""
     };
 
     if (typeof scannedPrinters[index].name !== "undefined") {
@@ -655,15 +655,15 @@ bulkPreHeat.addEventListener("click", async (e) => {
             );
             let toolData = {
               command: "target",
-              targets: {},
+              targets: {}
             };
             let bedData = {
               command: "target",
-              target: 0,
+              target: 0
             };
             let chamberData = {
               command: "target",
-              target: 0,
+              target: 0
             };
 
             if (toolTemp.value !== "" && !isNaN(toolTemp.value)) {
@@ -780,9 +780,9 @@ bulkPreHeat.addEventListener("click", async (e) => {
                 }
               }
             }
-          },
-        },
-      },
+          }
+        }
+      }
     });
   };
 
@@ -923,7 +923,7 @@ bulkControl.addEventListener("click", async (e) => {
           printPause: document.getElementById("pmPrintPause"),
           printRestart: document.getElementById("pmPrintRestart"),
           printResume: document.getElementById("pmPrintResume"),
-          printStop: document.getElementById("pmPrintStop"),
+          printStop: document.getElementById("pmPrintStop")
         };
         printerControls.printStart.addEventListener("click", async (e) => {
           printersToConnect.forEach((printer) => {
@@ -933,7 +933,7 @@ bulkControl.addEventListener("click", async (e) => {
             if (index > -1) {
               e.target.disabled = true;
               const opts = {
-                command: "start",
+                command: "start"
               };
 
               OctoPrintClient.jobAction(printerInfo[index], opts, e);
@@ -949,7 +949,7 @@ bulkControl.addEventListener("click", async (e) => {
               e.target.disabled = true;
               const opts = {
                 command: "pause",
-                action: "pause",
+                action: "pause"
               };
               OctoPrintClient.jobAction(printerInfo[index], opts, e);
             }
@@ -963,7 +963,7 @@ bulkControl.addEventListener("click", async (e) => {
             if (index > -1) {
               e.target.disabled = true;
               const opts = {
-                command: "restart",
+                command: "restart"
               };
               OctoPrintClient.jobAction(printerInfo[index], opts, e);
             }
@@ -978,7 +978,7 @@ bulkControl.addEventListener("click", async (e) => {
               e.target.disabled = true;
               const opts = {
                 command: "pause",
-                action: "resume",
+                action: "resume"
               };
               OctoPrintClient.jobAction(printerInfo[index], opts, e);
             }
@@ -990,11 +990,11 @@ bulkControl.addEventListener("click", async (e) => {
               "Are you sure you want to cancel all of your ongoing print?",
             buttons: {
               cancel: {
-                label: '<i class="fa fa-times"></i> Cancel',
+                label: '<i class="fa fa-times"></i> Cancel'
               },
               confirm: {
-                label: '<i class="fa fa-check"></i> Confirm',
-              },
+                label: '<i class="fa fa-check"></i> Confirm'
+              }
             },
             callback(result) {
               if (result) {
@@ -1005,13 +1005,13 @@ bulkControl.addEventListener("click", async (e) => {
                   if (index > -1) {
                     e.target.disabled = true;
                     const opts = {
-                      command: "cancel",
+                      command: "cancel"
                     };
                     OctoPrintClient.jobAction(printerInfo[index], opts, e);
                   }
                 });
               }
-            },
+            }
           });
         });
 
@@ -1103,7 +1103,7 @@ bulkControl.addEventListener("click", async (e) => {
             if (index > -1) {
               OctoFarmClient.post("printers/stepChange", {
                 printer: printerInfo[index]._id,
-                newSteps: "01",
+                newSteps: "01"
               });
             }
           });
@@ -1121,7 +1121,7 @@ bulkControl.addEventListener("click", async (e) => {
             if (index > -1) {
               OctoFarmClient.post("printers/stepChange", {
                 printer: printerInfo[index]._id,
-                newSteps: "1",
+                newSteps: "1"
               });
             }
           });
@@ -1139,7 +1139,7 @@ bulkControl.addEventListener("click", async (e) => {
             if (index > -1) {
               OctoFarmClient.post("printers/stepChange", {
                 printer: printerInfo[index]._id,
-                newSteps: "10",
+                newSteps: "10"
               });
             }
           });
@@ -1157,7 +1157,7 @@ bulkControl.addEventListener("click", async (e) => {
             if (index > -1) {
               OctoFarmClient.post("printers/stepChange", {
                 printer: printerInfo[index]._id,
-                newSteps: "100",
+                newSteps: "100"
               });
             }
           });
@@ -1167,7 +1167,7 @@ bulkControl.addEventListener("click", async (e) => {
           printerControls.step10.className = "btn btn-light";
           printerControls.step01.className = "btn btn-light";
         });
-      },
+      }
     });
   };
 
@@ -1228,7 +1228,7 @@ bulkGcodeCommands.addEventListener("click", async (e) => {
                 }
               });
               const opt = {
-                commands: lines,
+                commands: lines
               };
               const post = await OctoPrintClient.post(
                 printerInfo[index],
@@ -1253,7 +1253,7 @@ bulkGcodeCommands.addEventListener("click", async (e) => {
             }
           });
         }
-      },
+      }
     });
   };
 
@@ -1340,7 +1340,7 @@ createNewScriptBtn.addEventListener("click", async (e) => {
   let newScript = {
     name: document.getElementById("gcodeScriptName").value,
     description: document.getElementById("gcodeScriptDescription").value,
-    gcode: document.getElementById("gcodeScriptScript").value,
+    gcode: document.getElementById("gcodeScriptScript").value
   };
   await newGcodeScript(newScript);
   document.getElementById("gcodeScriptName").value = "";
@@ -1407,21 +1407,12 @@ function drawScriptTable(scripts) {
       document.getElementById(`script_name_${scripts._id}`).disabled = false;
       document.getElementById(`script_desc_${scripts._id}`).disabled = false;
       document.getElementById(`script_lines_${scripts._id}`).disabled = false;
-      document.getElementById(
-        `script_name_${scripts._id}`
-      ).value = document.getElementById(
-        `script_name_${scripts._id}`
-      ).placeholder;
-      document.getElementById(
-        `script_desc_${scripts._id}`
-      ).value = document.getElementById(
-        `script_desc_${scripts._id}`
-      ).placeholder;
-      document.getElementById(
-        `script_lines_${scripts._id}`
-      ).value = document.getElementById(
-        `script_lines_${scripts._id}`
-      ).placeholder;
+      document.getElementById(`script_name_${scripts._id}`).value =
+        document.getElementById(`script_name_${scripts._id}`).placeholder;
+      document.getElementById(`script_desc_${scripts._id}`).value =
+        document.getElementById(`script_desc_${scripts._id}`).placeholder;
+      document.getElementById(`script_lines_${scripts._id}`).value =
+        document.getElementById(`script_lines_${scripts._id}`).placeholder;
       document
         .getElementById(`editScript-${scripts._id}`)
         .classList.toggle("d-none");
@@ -1437,26 +1428,17 @@ function drawScriptTable(scripts) {
         name: document.getElementById(`script_name_${scripts._id}`).value,
         description: document.getElementById(`script_desc_${scripts._id}`)
           .value,
-        gcode: document.getElementById(`script_lines_${scripts._id}`).value,
+        gcode: document.getElementById(`script_lines_${scripts._id}`).value
       };
       console.log(newScript);
       let save = await newGcodeScript(newScript);
       if (save) {
-        document.getElementById(
-          `script_name_${scripts._id}`
-        ).placeholder = document.getElementById(
-          `script_name_${scripts._id}`
-        ).value;
-        document.getElementById(
-          `script_desc_${scripts._id}`
-        ).placeholder = document.getElementById(
-          `script_desc_${scripts._id}`
-        ).value;
-        document.getElementById(
-          `script_lines_${scripts._id}`
-        ).placeholder = document.getElementById(
-          `script_lines_${scripts._id}`
-        ).value;
+        document.getElementById(`script_name_${scripts._id}`).placeholder =
+          document.getElementById(`script_name_${scripts._id}`).value;
+        document.getElementById(`script_desc_${scripts._id}`).placeholder =
+          document.getElementById(`script_desc_${scripts._id}`).value;
+        document.getElementById(`script_lines_${scripts._id}`).placeholder =
+          document.getElementById(`script_lines_${scripts._id}`).value;
         document.getElementById(`script_name_${scripts._id}`).value = "";
         document.getElementById(`script_desc_${scripts._id}`).value = "";
         document.getElementById(`script_lines_${scripts._id}`).value = "";
@@ -1502,16 +1484,22 @@ function pluginListTemplate(plugin) {
                            
                                 </div>
                                 <div class="meta">
-                                    <small class="prop"><i class="fa fa-info"></i>&nbsp;<a target="_blank" href="${
-                                      plugin.page
-                                    }" title="${
-    plugin.page
-  }">Details</a></small>
-                                    <small class="prop"><i class="fa fa-home"></i>&nbsp;<a target="_blank" href="${
-                                      plugin.homepage
-                                    }" title="${
-    plugin.homepage
-  }">Homepage</a></small>
+                                    <small class="prop">
+                                      <i class="fa fa-info"></i>
+                                      &nbsp;<a target="_blank" href="${
+                                        plugin.page
+                                      }" title="${plugin.page}">
+                                      Details
+                                      </a>
+                                    </small>
+                                    <small class="prop">
+                                        <i class="fa fa-home"></i>
+                                        &nbsp;<a target="_blank" href="${
+                                          plugin.homepage
+                                        }" title="${plugin.homepage}">
+                                        Homepage
+                                        </a>
+                                      </small>
                                     <small class="prop"><i class="fa fa-user"></i> <span title="${
                                       plugin.author
                                     }">${plugin.author}</span></small>
@@ -1535,8 +1523,6 @@ function pluginListTemplate(plugin) {
 
                         </div>
                     </div>
-  
-  
   `;
 }
 
@@ -1568,19 +1554,19 @@ const pluginAction = async function (action) {
       if (action === "install") {
         pluginList.push({
           text: pluginListTemplate(plugin),
-          value: plugin.archive,
+          value: plugin.archive
         });
       } else {
         pluginList.push({
           text: pluginListTemplate(plugin),
-          value: plugin.id,
+          value: plugin.id
         });
       }
     });
     pluginList = _.sortBy(pluginList, [
       function (o) {
         return o.text;
-      },
+      }
     ]);
     //Install Promt
     if (action === "install") {
@@ -1647,7 +1633,7 @@ const pluginAction = async function (action) {
                   let postData = {
                     command: action,
                     dependency_links: false,
-                    url: result[r],
+                    url: result[r]
                   };
 
                   let post = await OctoPrintClient.post(
@@ -1763,7 +1749,7 @@ const pluginAction = async function (action) {
             });
             trackerBtn.classList.add("d-none");
           }
-        },
+        }
       });
     } else {
       bootbox.prompt({
@@ -1829,7 +1815,7 @@ const pluginAction = async function (action) {
 
                   let postData = {
                     command: action,
-                    plugin: result[r],
+                    plugin: result[r]
                   };
 
                   let post = await OctoPrintClient.post(
@@ -1945,7 +1931,7 @@ const pluginAction = async function (action) {
             });
             trackerBtn.classList.add("d-none");
           }
-        },
+        }
       });
     }
   } else {
@@ -2082,7 +2068,7 @@ searchOffline.addEventListener("click", async (e) => {
     '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
 
   const post = await OctoFarmClient.post("printers/reScanOcto", {
-    id: null,
+    id: null
   });
   alert.close();
   searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
@@ -2211,7 +2197,7 @@ document
         group: printers[r].group,
         printerURL: printers[r].printerURL,
         cameraURL: printers[r].cameraURL,
-        apikey: printers[r].apikey,
+        apikey: printers[r].apikey
       };
       printersExport.push(printer);
     }
@@ -2232,10 +2218,10 @@ document
     }
   });
 document.getElementById("addPrinterBtn").addEventListener("click", (event) => {
-  const currentPrinterCount = document.getElementById("printerTable").rows
-    .length;
-  const newPrinterCount = document.getElementById("printerNewTable").rows
-    .length;
+  const currentPrinterCount =
+    document.getElementById("printerTable").rows.length;
+  const newPrinterCount =
+    document.getElementById("printerNewTable").rows.length;
   if (currentPrinterCount === 1 && newPrinterCount === 1) {
     bootbox.alert({
       message: `
@@ -2340,7 +2326,7 @@ document.getElementById("addPrinterBtn").addEventListener("click", (event) => {
 
             `,
       size: "large",
-      scrollable: false,
+      scrollable: false
     });
   }
   PrintersManagement.addPrinter();
@@ -2353,7 +2339,7 @@ class Printer {
       colorTransparent: false,
       defaultLanguage: "_default",
       name,
-      showFahrenheitAlso: false,
+      showFahrenheitAlso: false
     };
     this.printerURL = printerURL;
     this.camURL = camURL;
@@ -2480,7 +2466,7 @@ class PrintersManagement {
             cameraURL: "Key not found",
             name: "Key not found",
             group: "Key not found",
-            apikey: "Key not found",
+            apikey: "Key not found"
           };
           if (typeof importPrinters[index].name !== "undefined") {
             printer.name = importPrinters[index].name;
@@ -2585,13 +2571,13 @@ class PrintersManagement {
       if (printerAPIKEY.value === "") {
         errors.push({
           type: "warning",
-          msg: "Please input your printers API Key",
+          msg: "Please input your printers API Key"
         });
       }
       if (printCheck > -1) {
         errors.push({
           type: "error",
-          msg: `Printer URL: ${printerURL.value} already exists on farm`,
+          msg: `Printer URL: ${printerURL.value} already exists on farm`
         });
       }
     }
@@ -3151,18 +3137,18 @@ class dashUpdate {
                   buttons: {
                     confirm: {
                       label: "Yes",
-                      className: "btn-success",
+                      className: "btn-success"
                     },
                     cancel: {
                       label: "No",
-                      className: "btn-danger",
-                    },
+                      className: "btn-danger"
+                    }
                   },
                   callback: async function (result) {
                     if (result) {
                       const data = {
                         targets: ["octoprint"],
-                        force: true,
+                        force: true
                       };
                       let updateRequest = await OctoPrintClient.postNOAPI(
                         printer,
@@ -3213,7 +3199,7 @@ class dashUpdate {
                         );
                       }
                     }
-                  },
+                  }
                 });
               });
             document
@@ -3225,7 +3211,7 @@ class dashUpdate {
                   printer.updateAvailable.pluginUpdates.forEach((plugin) => {
                     pluginsToUpdate.push({
                       text: `${plugin.displayName} - Version: ${plugin.displayVersion}`,
-                      value: plugin.id,
+                      value: plugin.id
                     });
                     autoSelect.push(plugin.id);
                   });
@@ -3238,7 +3224,7 @@ class dashUpdate {
                     callback: async function (result) {
                       const data = {
                         targets: result,
-                        force: true,
+                        force: true
                       };
                       let updateRequest = await OctoPrintClient.postNOAPI(
                         printer,
@@ -3288,7 +3274,7 @@ class dashUpdate {
                           "Clicked"
                         );
                       }
-                    },
+                    }
                   });
                 } else {
                   UI.createAlert(
@@ -3352,5 +3338,5 @@ const sortable = Sortable.create(el, {
       listID.push(ca[1]);
     });
     OctoFarmClient.post("printers/updateSortIndex", listID);
-  },
+  }
 });
