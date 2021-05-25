@@ -65,42 +65,13 @@ async function ensureSystemSettingsInitiated() {
 
   // Setup Settings as connection is established
   const serverSettings = await ServerSettings.init();
-  await logger.info(serverSettings);
+  await ClientSettings.init();
+  logger.info(serverSettings);
+
+  return serverSettings;
 }
 
-async function serveOctoFarmNormally(app, port) {
-  if (!port || Number.isNaN(parseInt(port))) {
-    throw new Error(
-      "The server database-issue mode requires a numeric port input argument"
-    );
-  }
-
-  let listenerHttpServer = null;
-
-  logger.info("Initialising FarmInformation...");
-  await PrinterClean.initFarmInformation();
-
-  logger.info("Initialising Client Settings...");
-  await ClientSettings.init();
-
-  logger.info("Initialising OctoFarm State...");
-  const { Runner } = require("./server_src/runners/state.js");
-  const stateRunnerReport = await Runner.init();
-  logger.info("OctoFarm State returned", stateRunnerReport);
-
-  logger.info("Initialising SystemRunner...");
-  const sr = await SystemRunner.init();
-  logger.info("OctoFarm SystemRunner returned", sr);
-
-  await optionalInfluxDatabaseSetup();
-
-  listenerHttpServer = app.listen(port, "0.0.0.0", () => {
-    logger.info(`Server started... open it at http://127.0.0.1:${port}`);
-    if (typeof process.send === "function") {
-      process.send("ready");
-    }
-  });
-
+function serveOctoFarmRoutes(app) {
   app.use("/", require("./server_src/routes/index", { page: "route" }));
   app.use(
     "/serverChecks",
@@ -151,8 +122,31 @@ async function serveOctoFarmNormally(app, port) {
   app.get("*", function (req, res) {
     res.redirect("/");
   });
+}
 
-  return listenerHttpServer;
+async function serveOctoFarmNormally(app, quick_boot = false) {
+  if (!quick_boot) {
+    logger.info("Initialising FarmInformation...");
+    await PrinterClean.initFarmInformation();
+
+    logger.info("Initialising Client Settings...");
+    await ClientSettings.init();
+
+    logger.info("Initialising OctoFarm State...");
+    const { Runner } = require("./server_src/runners/state.js");
+    const stateRunnerReport = await Runner.init();
+    logger.info("OctoFarm State returned", stateRunnerReport);
+
+    logger.info("Initialising SystemRunner...");
+    const sr = await SystemRunner.init();
+    logger.info("OctoFarm SystemRunner returned", sr);
+
+    await optionalInfluxDatabaseSetup();
+  }
+
+  serveOctoFarmRoutes(app);
+
+  return app;
 }
 
 const logger = new Logger("OctoFarm-Server");
@@ -160,5 +154,6 @@ const logger = new Logger("OctoFarm-Server");
 module.exports = {
   setupExpressServer,
   ensureSystemSettingsInitiated,
+  serveOctoFarmRoutes,
   serveOctoFarmNormally
 };

@@ -74,6 +74,17 @@ function serveNodeVersionFallback(app) {
   return listenerHttpServer;
 }
 
+function serveDatabaseIssueFallbackRoutes(app) {
+  app.use("/", require("./server_src/routes/databaseIssue", { page: "route" }));
+  app.use(
+    "/serverChecks",
+    require("./server_src/routes/serverChecks", { page: "route" })
+  );
+  app.get("*", function (req, res) {
+    res.redirect("/");
+  });
+}
+
 function serveDatabaseIssueFallback(app, port) {
   if (!port || Number.isNaN(parseInt(port))) {
     throw new Error(
@@ -85,14 +96,7 @@ function serveDatabaseIssueFallback(app, port) {
     logger.info(msg);
   });
 
-  app.use("/", require("./server_src/routes/databaseIssue", { page: "route" }));
-  app.use(
-    "/serverChecks",
-    require("./server_src/routes/serverChecks", { page: "route" })
-  );
-  app.get("*", function (req, res) {
-    res.redirect("/");
-  });
+  serveDatabaseIssueFallbackRoutes(app);
 
   return listenerHttpServer;
 }
@@ -100,5 +104,6 @@ function serveDatabaseIssueFallback(app, port) {
 module.exports = {
   serveDatabaseIssueFallback,
   serveNodeVersionFallback,
-  setupFallbackExpressServer
+  setupFallbackExpressServer,
+  serveDatabaseIssueFallbackRoutes
 };
