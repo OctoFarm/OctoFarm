@@ -1,49 +1,24 @@
-const dbHandler = require("../db-handler");
-const request = require("supertest");
-const { setupTestApp, getServer } = require("../../app-test");
-
 jest.mock("../../server_src/config/auth");
 
-let app = null;
 const requestBody = {
   i: "a0a569d20dd308890a1c06"
 };
 
-/**
- * Connect to a new in-memory database before running any tests.
- */
+const dbHandler = require("../db-handler");
+const supertest = require("supertest");
+const { setupTestApp } = require("../../app-test");
+
+let request;
+
 beforeAll(async () => {
   await dbHandler.connect();
-});
+  const server = await setupTestApp();
 
-/**
- * Clear all test data after every test.
- */
-afterEach(async () => {
-  //await dbHandler.clearDatabase();
+  request = supertest(server);
 });
-
-/**
- * Remove and close the db and server.
- */
-afterAll(async () => {
-  if (!!app) {
-    getServer().close();
-  }
-  await dbHandler.closeDatabase();
-  jest.clearAllTimers();
-});
-
-async function getOrCreateApp() {
-  if (!app) {
-    app = await setupTestApp();
-  }
-  return app;
-}
 
 describe("Printer Settings Update Endpoint", () => {
   it("should return 400 error when wrong input is provided", async function (done) {
-    app = await getOrCreateApp();
     const res = await request(app)
       .post("/printers/updatePrinterSettings")
       .send();
@@ -57,7 +32,6 @@ describe("Printer Settings Update Endpoint", () => {
   }, 10000);
 
   it("should return 500 if server fails to update printer settings", async function (done) {
-    app = await getOrCreateApp();
     const res = await request(app)
       .post("/printers/updatePrinterSettings")
       .send(requestBody);
