@@ -40,7 +40,7 @@ class FilamentClean {
   static async start(filamentManager) {
     const profiles = await Profiles.find({});
     const spools = await Spools.find({});
-    const farmPrinters = await PrinterClean.returnPrintersInformation();
+    const farmPrinters = await PrinterClean.listPrintersInformation();
     const spoolsArray = [];
     const profilesArray = [];
 

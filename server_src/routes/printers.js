@@ -127,7 +127,7 @@ router.get("/groups", ensureAuthenticated, async (req, res) => {
 });
 router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
   const id = req.body.i;
-  const returnPrinter = await PrinterClean.returnPrintersInformation(id);
+  const returnPrinter = await PrinterClean.getPrintersInformationById(id);
   res.send(returnPrinter);
 });
 
@@ -141,7 +141,7 @@ router.post("/updatePrinterSettings", ensureAuthenticated, async (req, res) => {
   }
   try {
     await Runner.getLatestOctoPrintSettingsValues(id);
-    let printerInformation = PrinterClean.returnPrintersInformation(id);
+    let printerInformation = PrinterClean.getPrintersInformationById(id);
     res.send(printerInformation);
   } catch (e) {
     logger.error(`The server couldn't update your printer settings! ${e}`);

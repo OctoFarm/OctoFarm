@@ -41,7 +41,7 @@ router.get("/get/", ensureAuthenticated, function (req, res) {
 
 if (interval === false) {
   interval = setInterval(async function () {
-    const printersInformation = await PrinterClean.returnPrintersInformation();
+    const printersInformation = await PrinterClean.listPrintersInformation();
     const printerControlList = await PrinterClean.returnPrinterControlList();
     const currentTickerList = await PrinterTicker.returnIssue();
 

@@ -129,7 +129,7 @@ if (interval === false) {
   interval = setInterval(async function () {
     const currentOperations = await PrinterClean.returnCurrentOperations();
 
-    let printersInformation = await PrinterClean.returnPrintersInformation();
+    let printersInformation = await PrinterClean.listPrintersInformation();
 
     printersInformation = await filterMe(printersInformation);
     printersInformation = await sortMe(printersInformation);

@@ -62,14 +62,19 @@ class PrinterClean {
    * @deprecated Use cache/printer.cache.js instead
    * @returns {[]}
    */
-  static returnPrintersInformation(id) {
-    if (!id) {
+  static listPrintersInformation() {
       return printersInformation;
-    } else {
-      const index = _.findIndex(printersInformation, function (o) {
+  }
+
+  /**
+   * @deprecated Use cache/printer.cache.js instead
+   * @returns {{}|undefined}
+   */
+  static getPrintersInformationById(id) {
+    if (!!id) {
+      return _.find(printersInformation, function (o) {
         return o._id == id;
       });
-      return printersInformation[index];
     }
   }
 
@@ -1566,7 +1571,7 @@ class PrinterClean {
   }
 
   static returnAllOctoPrintVersions() {
-    const printers = this.returnPrintersInformation();
+    const printers = this.listPrintersInformation();
 
     const versionArray = [];
 

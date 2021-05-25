@@ -51,7 +51,7 @@ if (interval === false) {
 
     const currentOperations = await PrinterClean.returnCurrentOperations();
     const dashStatistics = await PrinterClean.returnDashboardStatistics();
-    const printerInformation = await PrinterClean.returnPrintersInformation();
+    const printerInformation = await PrinterClean.listPrintersInformation();
     const infoDrop = {
       printerInformation,
       currentOperations,
