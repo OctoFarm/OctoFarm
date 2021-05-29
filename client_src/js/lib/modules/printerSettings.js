@@ -20,7 +20,6 @@ async function updatePrinterSettingsModal(printersInformation, printerID) {
   // Make sure we have page elements
   PrinterSettings.grabPageElements();
   // Check if printer ID is provided
-
   if (!printerID) {
     // No printer ID we are updating the state...
     // The SSE Event doesn't stop on an error, so we need to make sure the update event skips an error occurring...
@@ -60,7 +59,7 @@ async function updatePrinterSettingsModal(printersInformation, printerID) {
     try {
       // Resync Printer Settings to latest values and continue to setup page.
       let opts = {
-        i: printerID,
+        i: printerID
       };
       // Update printer settings
       currentPrinter = await OctoFarmClient.post(
@@ -250,7 +249,7 @@ class PrinterSettings {
       if (!!currentPrinter.connectionOptions.baudratePreference) {
         baudrateDropdown.insertAdjacentHTML(
           "afterbegin",
-          "<option value=\"0\">No Preference</option>"
+          '<option value="0">No Preference</option>'
         );
       }
       let portAvailable = this.checkPortIsAvailable(
@@ -275,7 +274,7 @@ class PrinterSettings {
       if (currentPrinter.connectionOptions.portPreference === null) {
         serialPortDropDown.insertAdjacentHTML(
           "afterbegin",
-          "<option value=\"0\">No Preference</option>"
+          '<option value="0">No Preference</option>'
         );
       }
       currentPrinter.connectionOptions.printerProfiles.forEach((profile) => {
@@ -284,10 +283,10 @@ class PrinterSettings {
           `<option value="${profile.id}">${profile.name}</option>`
         );
       });
-      if (currentPrinter.connectionOptions.printerProfilePreference  === null) {
+      if (currentPrinter.connectionOptions.printerProfilePreference === null) {
         profileDropDown.insertAdjacentHTML(
           "afterbegin",
-          "<option value=\"0\">No Preference</option>"
+          '<option value="0">No Preference</option>'
         );
       }
       if (!!currentPrinter.connectionOptions.baudratePreference) {
@@ -310,7 +309,7 @@ class PrinterSettings {
       }
     } else {
       pageElements.mainPage.offlineMessage.innerHTML =
-        "<div class=\"alert alert-danger\" role=\"alert\">NOTE! Your printer is currently offline, any settings requiring an OctoPrint connection have been disabled... Please turn on your OctoPrint instance to re-enabled these.</div>";
+        '<div class="alert alert-danger" role="alert">NOTE! Your printer is currently offline, any settings requiring an OctoPrint connection have been disabled... Please turn on your OctoPrint instance to re-enabled these.</div>';
       baudrateDropdown.disabled = true;
       serialPortDropDown.disabled = true;
       profileDropDown.disabled = true;
@@ -817,7 +816,7 @@ class PrinterSettings {
           active: script.active,
           message: script.message,
           scriptLocation: script.scriptLocation,
-          trigger: script.trigger,
+          trigger: script.trigger
         });
       }
     });
@@ -1014,7 +1013,7 @@ class PrinterSettings {
   static async setupSaveButton(currentPrinter) {
     pageElements.menu.printerMenuFooter.insertAdjacentHTML(
       "beforeend",
-      "<button id=\"savePrinterSettingsBtn\" type=\"button\" class=\"btn btn-success btn-block\" id=\"savePrinterSettingsBtn\">Save Settings</button>"
+      '<button id="savePrinterSettingsBtn" type="button" class="btn btn-success btn-block" id="savePrinterSettingsBtn">Save Settings</button>'
     );
 
     document
@@ -1027,55 +1026,16 @@ class PrinterSettings {
             "printers/updateSettings",
             printerSettingsValues
           );
-          if (updatedSettings.status.octofarm === 200) {
-            UI.createAlert(
-              "success",
-              `${currentPrinter.printerName}: OctoFarm successfully updated`,
-              3000,
-              "clicked"
+          const serverResponseMessage =
+            this.createServerResponseMessageForSaveAction(
+              currentPrinter.printerName,
+              updatedSettings
             );
-          } else {
-            UI.createAlert(
-              "error",
-              `${currentPrinter.printerName}: OctoFarm failed to updated`,
-              3000,
-              "clicked"
-            );
-          }
-          if (updatedSettings.status.profile === 200) {
-            UI.createAlert(
-              "success",
-              `${currentPrinter.printerName}: profile successfully updated`,
-              3000,
-              "clicked"
-            );
-          } else if (updatedSettings.status.profile === 900) {
-            // Skip as no changes we're made
-          } else {
-            UI.createAlert(
-              "error",
-              `${currentPrinter.printerName}: profile failed to updated`,
-              3000,
-              "clicked"
-            );
-          }
-          if (updatedSettings.status.settings === 200) {
-            UI.createAlert(
-              "success",
-              `${currentPrinter.printerName}: settings successfully updated`,
-              3000,
-              "clicked"
-            );
-          } else if (updatedSettings.status.profile === 900) {
-            // Skip as no changes we're made
-          } else {
-            UI.createAlert(
-              "error",
-              `${currentPrinter.printerName}: settings failed to updated`,
-              3000,
-              "clicked"
-            );
-          }
+          UI.createAlert("info", serverResponseMessage, 5000, "clicked");
+          await updatePrinterSettingsModal(
+            [currentPrinter],
+            currentPrinter._id
+          );
         } catch (e) {
           UI.createAlert(
             "error",
@@ -1093,17 +1053,14 @@ class PrinterSettings {
     pageElements.menu.printerMenuFooter.innerHTML = "";
     pageElements.menu.printerMenuFooter.insertAdjacentHTML(
       "beforeend",
-      "<button id=\"settingsPageRefreshButton\" type=\"button\" class=\"btn btn-warning btn-block\" id=\"savePrinterSettingsBtn\">Refresh Settings</button>"
+      '<button id="settingsPageRefreshButton" type="button" class="btn btn-warning btn-block mt-2" id="savePrinterSettingsBtn">Refresh Settings</button>'
     );
 
     document
       .getElementById("settingsPageRefreshButton")
       .addEventListener("click", async (event) => {
         UI.addLoaderToElementsInnerHTML(event.target);
-        await updatePrinterSettingsModal(
-          [currentPrinter],
-          currentPrinter._id
-        );
+        await updatePrinterSettingsModal([currentPrinter], currentPrinter._id);
         UI.createAlert(
           "success",
           "Successfully reloaded your OctoPrint Settings",
@@ -1114,6 +1071,37 @@ class PrinterSettings {
       });
   }
 
+  static createServerResponseMessageForSaveAction(
+    currentPrinterName,
+    response
+  ) {
+    let serverResponseMessage = `${currentPrinterName}: Settings Saved <br>`;
+
+    if (response.status.octofarm === 200) {
+      serverResponseMessage +=
+        '<i class="fas fa-check-circle text-success"></i> OctoFarm<br>';
+    } else {
+      serverResponseMessage +=
+        '<i class="fas fa-exclamation-circle text-danger"></i> OctoFarm<br>';
+    }
+    if (response.status.profile === 200) {
+      serverResponseMessage +=
+        '<i class="fas fa-check-circle text-success"></i> OctoPrint Profile<br>';
+    } else {
+      serverResponseMessage +=
+        '<i class="fas fa-exclamation-circle text-danger"></i> OctoPrint Profile<br>';
+    }
+    if (response.status.settings === 200) {
+      serverResponseMessage +=
+        '<i class="fas fa-check-circle text-success"></i> OctoPrint Settings <br>';
+    } else {
+      serverResponseMessage +=
+        '<i class="fas fa-exclamation-circle text-danger"></i> OctoPrint Profile <br>';
+    }
+
+    return serverResponseMessage;
+  }
+
   static getPageValues(currentPrinter) {
     let newPrinterSettingsValues = {
       state: currentPrinter.printerState.colour.category,
@@ -1122,17 +1110,17 @@ class PrinterSettings {
         printerURL: document.getElementById("psPrinterURL").value,
         index: currentPrinter._id,
         cameraURL: document.getElementById("psCamURL").value,
-        apikey: document.getElementById("psAPIKEY").value,
+        apikey: document.getElementById("psAPIKEY").value
       },
       connection: {
         preferredPort: document.getElementById("psDefaultSerialPort").value,
         preferredBaud: document.getElementById("psDefaultBaudrate").value,
-        preferredProfile: document.getElementById("psDefaultProfile").value,
+        preferredProfile: document.getElementById("psDefaultProfile").value
       },
       systemCommands: {
         serverRestart: document.getElementById("psServerRestart").value,
         systemRestart: document.getElementById("psSystemRestart").value,
-        systemShutdown: document.getElementById("psSystemShutdown").value,
+        systemShutdown: document.getElementById("psSystemShutdown").value
       },
       powerCommands: {
         powerOnCommand: document.getElementById("psPowerOnCommand").value,
@@ -1151,8 +1139,8 @@ class PrinterSettings {
           port: document.getElementById("psWolPort").value,
           interval: document.getElementById("psWolInterval").value,
           packets: document.getElementById("psWolCount").value,
-          MAC: document.getElementById("psWolMAC").value,
-        },
+          MAC: document.getElementById("psWolMAC").value
+        }
       },
       costSettings: {
         powerConsumption: parseFloat(
@@ -1169,8 +1157,8 @@ class PrinterSettings {
         ),
         maintenanceCosts: parseFloat(
           document.getElementById("psMaintenanceCosts").value
-        ),
-      },
+        )
+      }
     };
     if (printerOnline) {
       let printerName = document.getElementById("psProfileName").value;
@@ -1190,35 +1178,35 @@ class PrinterSettings {
           formFactor: document.getElementById("extruderFormFactor").value,
           width: parseInt(document.getElementById("psVolumeWidth").value),
           depth: parseInt(document.getElementById("psVolumeDepth").value),
-          height: parseInt(document.getElementById("psVolumeHeight").value),
+          height: parseInt(document.getElementById("psVolumeHeight").value)
         },
         heatedBed: document.getElementById("psHeatedBed").checked,
         heatedChamber: document.getElementById("psHeatedChamber").checked,
         axes: {
           x: {
             speed: parseInt(document.getElementById("psPrinterXAxis").value),
-            inverted: document.getElementById("psXInverted").checked,
+            inverted: document.getElementById("psXInverted").checked
           },
           y: {
             speed: parseInt(document.getElementById("psPrinterYAxis").value),
-            inverted: document.getElementById("psYInverted").checked,
+            inverted: document.getElementById("psYInverted").checked
           },
           z: {
             speed: parseInt(document.getElementById("psPrinterZAxis").value),
-            inverted: document.getElementById("psZInverted").checked,
+            inverted: document.getElementById("psZInverted").checked
           },
           e: {
             speed: parseInt(document.getElementById("psPrinterEAxis").value),
-            inverted: document.getElementById("psEInverted").checked,
-          },
+            inverted: document.getElementById("psEInverted").checked
+          }
         },
         extruder: {
           count: parseInt(document.getElementById("psExtruderCount").value),
           nozzleDiameter: parseFloat(
             document.getElementById("psNozzleDiameter").value
           ),
-          sharedNozzle: document.getElementById("psSharedNozzle").checked,
-        },
+          sharedNozzle: document.getElementById("psSharedNozzle").checked
+        }
       };
       newPrinterSettingsValues.gcode = {
         afterPrintCancelled: document.getElementById(
@@ -1244,7 +1232,7 @@ class PrinterSettings {
           "psSettingsBeforePrinterDisconnected"
         ).value,
         beforeToolChange: document.getElementById("psSettingsBeforeToolChange")
-          .value,
+          .value
       };
       newPrinterSettingsValues.other = {
         enableCamera: document.getElementById("camEnabled").checked,
@@ -1253,7 +1241,7 @@ class PrinterSettings {
         flipVCamera: document.getElementById("camFlipV").checked,
         enableTimeLapse: document.getElementById("camTimelapse").checked,
         heatingVariation: document.getElementById("psHeatingVariation").value,
-        coolDown: document.getElementById("psCoolDown").value,
+        coolDown: document.getElementById("psCoolDown").value
       };
     }
     return newPrinterSettingsValues;
@@ -1266,7 +1254,7 @@ class PrinterSettings {
         "custom-select bg-secondary text-light";
     } else {
       pageElements.connectPage.portNotAvailableMessage.innerHTML =
-        "<div class=\"alert alert-danger\" role=\"alert\">Your port preference is not available... Is your printer turned on? " +
+        '<div class="alert alert-danger" role="alert">Your port preference is not available... Is your printer turned on? ' +
         "Please click the refresh button once the issue is rectified</div>";
       serialPortDropDownElement.classList = "custom-select bg-danger";
     }
@@ -1287,7 +1275,7 @@ class PrinterSettings {
 
   static checkPortIsAvailable(portList, portPreference) {
     // If port preference is null, then we have no preference from OctoPrint so no need to check if available
-    if(portPreference === null) return true;
+    if (portPreference === null) return true;
     return !!portList.includes(portPreference);
   }
 
@@ -1299,7 +1287,7 @@ class PrinterSettings {
           title: document.getElementById("printerSettingsSelection"),
           status: document.getElementById("psStatus"),
           host: document.getElementById("psHost"),
-          socket: document.getElementById("psWebSocket"),
+          socket: document.getElementById("psWebSocket")
         },
         connectPage: {
           printerPort: document.getElementById("printerPortDrop"),
@@ -1319,7 +1307,7 @@ class PrinterSettings {
           stateClean: document.getElementById("stateClean"),
           portNotAvailableMessage: document.getElementById(
             "portNotAvailableMessage"
-          ),
+          )
         },
         menu: {
           printerConnectionBtn: document.getElementById(
@@ -1332,8 +1320,8 @@ class PrinterSettings {
           printerGcodeBtn: document.getElementById("printer-gcode-btn"),
           printerSettingsBtn: document.getElementById("printer-settings-btn"),
           printerOtherSettings: document.getElementById("printer-settings-btn"),
-          printerMenuFooter: document.getElementById("printerSettingsFooter"),
-        },
+          printerMenuFooter: document.getElementById("printerSettingsFooter")
+        }
       };
     }
   }
@@ -1412,5 +1400,5 @@ class PrinterSettings {
   }
 }
 module.exports = {
-  updatePrinterSettingsModal,
+  updatePrinterSettingsModal
 };
