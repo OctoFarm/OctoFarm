@@ -89,4 +89,17 @@ export default class UI {
       });
     });
   }
+  static removeLoaderFromElementInnerHTML(element) {
+    if (element.innerHTML.includes("spinner")) {
+      element.innerHTML = element.innerHTML.replace(
+        '<i class="fas fa-spinner fa-spin"></i>',
+        ""
+      );
+    }
+  }
+  static addLoaderToElementsInnerHTML(element) {
+    if (!element.innerHTML.includes("spinner")) {
+      element.innerHTML += ' <i class="fas fa-spinner fa-spin"></i>';
+    }
+  }
 }

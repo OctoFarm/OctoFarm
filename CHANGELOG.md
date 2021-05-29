@@ -11,10 +11,13 @@ All notable changes to this project will be documented in this file.
     - Completely reworked history cache, prepared and tested for OctoFarm V2
     - Slightly reworked file cache, prepared for V2 and made it robust
     - Made API tests less prone to unnecessary failure
+    - Reworked the Settings modal to be more resiliant to failure and cleaned up code. 
 
 ### Removed
 
 ### Fixed
+    - Fixed #531 - Updated settings are not grabbed when opening settings modal
+    - Fixed #532 - Actual save port is not checked against live ports on OctoPrint on settings Modal
     - Fixed #567: heatmap error (race condition) in PrinterClean for any newly created database
     - Fixed #576, #577: correct some function calls in PrinterClean
     - Fixed #542, #381: ensureIndex mongoose warning and circular Runner import resolved 

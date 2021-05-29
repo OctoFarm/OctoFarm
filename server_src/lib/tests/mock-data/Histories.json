@@ -34,9 +34,7 @@
           "display": "first_file.gcode",
           "size": 6361164,
           "thumbnail": "thumbs/thumb1.png?20200717174337",
-          "length": [
-            18648.094819996633
-          ]
+          "length": [18648.094819996633]
         },
         "estimatedPrintTime": 10014.00194758631,
         "filament": {
@@ -85,9 +83,7 @@
           "display": "second_file.gcode",
           "size": 6361328,
           "thumbnail": "thumbs/thumb2.png?20200717085824",
-          "length": [
-            18648.094389996553
-          ]
+          "length": [18648.094389996553]
         },
         "estimatedPrintTime": 10018.322112052609,
         "filament": {
@@ -135,9 +131,7 @@
           "path": "other_path/third_file.gcode",
           "display": "third_file.gcode",
           "size": 21287,
-          "length": [
-            503.17929999999876
-          ]
+          "length": [503.17929999999876]
         },
         "estimatedPrintTime": 760.4709266367871,
         "filament": {
@@ -319,9 +313,7 @@
           "display": "file.gcode",
           "size": 6421672,
           "thumbnail": "thumbs/thumb.png?20200917004002",
-          "length": [
-            16784.36719999938
-          ]
+          "length": [16784.36719999938]
         },
         "estimatedPrintTime": 10498.622579430934,
         "filament": {
@@ -370,9 +362,7 @@
           "size": 5567740,
           "date": 1607995106,
           "thumbnail": "thumbs/thumb.png?20201214191826",
-          "length": [
-            11411.290749999993
-          ]
+          "length": [11411.290749999993]
         },
         "estimatedPrintTime": 8870.761914983494,
         "averagePrintTime": 12508.434024509043,
@@ -462,9 +452,7 @@
           "size": 4938479,
           "date": 1610849477,
           "thumbnail": "thumbs/thumb.png?20210117021117",
-          "length": [
-            20429.859949987236
-          ]
+          "length": [20429.859949987236]
         },
         "estimatedPrintTime": 13018.768281201495,
         "averagePrintTime": null,
@@ -559,9 +547,7 @@
           "size": 4556792,
           "date": 1603485325,
           "thumbnail": "thumbs/thumb.png?20201023213525",
-          "length": [
-            22422.7950600103
-          ]
+          "length": [22422.7950600103]
         },
         "estimatedPrintTime": 17716.559339527903,
         "averagePrintTime": 20893.441149471528,
@@ -654,9 +640,7 @@
           "origin": "local",
           "size": 3227734,
           "date": 1609919794,
-          "length": [
-            16195.92339999955
-          ]
+          "length": [16195.92339999955]
         },
         "estimatedPrintTime": 7099.200454855606,
         "averagePrintTime": 464.27159347249835,
@@ -750,9 +734,7 @@
           "size": 124307,
           "date": 1616596079,
           "thumbnail": "thumbs/thumb.png?20210324142759",
-          "length": [
-            688.4987299999997
-          ]
+          "length": [688.4987299999997]
         },
         "estimatedPrintTime": 529.2216390923936,
         "averagePrintTime": 58.202425627457906,
@@ -846,9 +828,7 @@
           "size": 124307,
           "date": 1616596079,
           "thumbnail": "thumbs/thumb.png?20210324142759",
-          "length": [
-            688.4987299999997
-          ]
+          "length": [688.4987299999997]
         },
         "estimatedPrintTime": 529.2216390923936,
         "averagePrintTime": 58.202425627457906,
@@ -941,9 +921,7 @@
           "size": 124307,
           "date": 1616596079,
           "thumbnail": "thumbs/thumb.png?20210324142759",
-          "length": [
-            688.4987299999997
-          ]
+          "length": [688.4987299999997]
         },
         "estimatedPrintTime": 529.2216390923936,
         "averagePrintTime": 58.65013972575434,

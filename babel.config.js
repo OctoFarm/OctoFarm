@@ -1,19 +1,19 @@
-module.exports = api => {
+module.exports = (api) => {
   // https://jestjs.io/docs/en/getting-started#using-babel
-  const isTest = api.env('test');
+  const isTest = api.env("test");
   // You can use isTest to determine what presets and plugins to use.
   if (isTest) {
     return {};
   }
   return {
-    "presets": [
+    presets: [
       [
         "@babel/preset-env",
         {
-          "debug": true,
-          "useBuiltIns": "entry",
-        },
-      ],
-    ],
+          debug: true,
+          useBuiltIns: "entry"
+        }
+      ]
+    ]
   };
 };

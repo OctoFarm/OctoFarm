@@ -389,7 +389,7 @@ let interval = false;
 if (interval === false) {
   interval = setInterval(async () => {
     if (mongoose.connection.readyState === 1) {
-      const printersInformation = PrinterClean.returnPrintersInformation();
+      const printersInformation = PrinterClean.listPrintersInformation();
       await PrinterClean.sortCurrentOperations(printersInformation);
       await PrinterClean.statisticsStart();
       await PrinterClean.createPrinterList(
