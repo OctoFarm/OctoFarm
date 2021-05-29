@@ -3178,8 +3178,6 @@ class Runner {
   }
 
   static async updateSettings(settings) {
-    logger.info("Attempting to save: ", settings);
-
     function difference(object, base) {
       function changes(object, base) {
         try {
@@ -3383,9 +3381,6 @@ class Runner {
         farmPrinters[index].powerSettings.wol = settings.powerCommands.wol;
       }
 
-      logger.info("Live power settings", farmPrinters[index].powerSettings);
-      logger.info("Database power settings", printer.powerSettings);
-
       printer.markModified("powerSettings");
 
       if (settings.systemCommands.serverRestart !== "") {
@@ -3409,10 +3404,6 @@ class Runner {
         settings.systemCommands.systemShutdown =
           farmPrinters[index].settingsServer.commands.systemShutdownCommand;
       }
-      logger.info(
-        "OctoPrint power settings: ",
-        farmPrinters[index].systemCommands
-      );
 
       printer.save().catch((e) => {
         logger.error(JSON.stringify(e), "ERROR savin power settings.");
@@ -3488,26 +3479,7 @@ class Runner {
         });
       }
 
-      await Runner.getProfile(settings.printer.index);
-      await Runner.getSettings(settings.printer.index);
-      await Runner.getOctoPrintSystenInfo(settings.printer.index);
-      Runner.getOctoPrintSystenInfo(settings.printer.index);
-      Runner.getUpdates(settings.printer.index);
-      Runner.getPluginList(settings.printer.index);
       PrinterClean.generate(farmPrinters[index], filamentManager);
-      // let i = _.findIndex(farmPrinters, function(o) { return o._id == id; });
-      //
-      // console.log()
-      //
-      // farmPrinters[i].settingsScripts.gcode = opts.scripts.gcode;
-      // farmPrinters[i].settingsAppearance.name = opts.appearance.name;
-      // farmPrinters[i].settingsWebcam = opts.webcam;
-      // farmPrinters[i].camURL = opts.camURL;
-      // let printer = await Printers.findOne({ index: i });
-      // printer.settingsWebcam = farmPrinters[i].settingsWebcam;
-      // printer.camURL = farmPrinters[i].camURL;
-      // printer.settingsApperarance.name = farmPrinters[i].settingsAppearance.name;
-      // printer.save();
       if (updatePrinter) {
         Runner.reScanOcto(farmPrinters[index]._id, false);
       }
