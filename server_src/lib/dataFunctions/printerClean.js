@@ -376,6 +376,7 @@ class PrinterClean {
         group: farmPrinter.group,
         groups: [], // TODO unfinished feature
         printerURL: farmPrinter.printerURL,
+        webSocketURL: farmPrinter.webSocketURL,
         cameraURL: farmPrinter.camURL,
         apikey: farmPrinter.apikey,
         octoPrintVersion: farmPrinter.octoPrintVersion,
