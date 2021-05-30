@@ -27,7 +27,7 @@ All notable changes to this project will be documented in this file.
     - Fixed #598: printer settingsAppearance missing will not cause failure anymore
     - Fixed #596: changed OctoPrint plugin manager repository to new route with backwards compatibility version check 
     - Fixed #587: Changing printer URL doesn't rescan for changes when using settings modal.
-
+    - Fixed #592: Printer host is marked Online when URL is not correct / fake
 ## [v1.1.13-hotfix]
 
 ### Added
