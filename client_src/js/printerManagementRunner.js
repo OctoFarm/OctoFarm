@@ -121,16 +121,17 @@ bulkPluginUpdateButton.addEventListener("click", async (e) => {
   currentPrinterList = await currentPrinterList.json();
   let message = "";
   let toUpdate = [];
+  let pluginList = [];
   for (let printer = 0; printer < currentPrinterList.length; printer++) {
     let currentPrinter = currentPrinterList[printer];
     if (typeof currentPrinter.updateAvailable !== "undefined") {
       if (currentPrinter.updateAvailable.pluginUpdates.length > 0) {
         message += currentPrinter.printerName + "<br>";
-        let prepPrinter = {
-          printer: currentPrinter,
-          plugins: []
-        };
-        toUpdate.push(prepPrinter);
+        toUpdate.push({
+          printerURL: currentPrinter.printerURL,
+          printerName: currentPrinter.printerName,
+          apikey: currentPrinter.apikey
+        });
         for (
           let plugin = 0;
           plugin < currentPrinter.updateAvailable.pluginUpdates.length;
@@ -138,7 +139,7 @@ bulkPluginUpdateButton.addEventListener("click", async (e) => {
         ) {
           let currentPlugin =
             currentPrinter.updateAvailable.pluginUpdates[plugin];
-          toUpdate[toUpdate.length - 1].plugins.push(currentPlugin.id);
+          pluginList.push(currentPlugin.id);
         }
       }
     }
@@ -153,37 +154,37 @@ bulkPluginUpdateButton.addEventListener("click", async (e) => {
       if (result) {
         for (let i = 0; i < toUpdate.length; i++) {
           const data = {
-            targets: toUpdate[i].plugins,
+            targets: pluginList,
             force: true
           };
           let updateRequest = await OctoPrintClient.postNOAPI(
-            toUpdate[i].printer,
+            toUpdate[i],
             "plugin/softwareupdate/update",
             data
           );
           if (updateRequest.status === 200) {
             UI.createAlert(
               "success",
-              `${toUpdate[i].printer.printerName}: Successfully updated! your instance will restart now.`,
+              `${toUpdate[i].printerName}: Successfully updated! your instance will restart now.`,
               3000,
               "Clicked"
             );
             let post = await OctoPrintClient.systemNoConfirm(
-              toUpdate[i].printer,
+              toUpdate[i],
               "restart"
             );
             if (typeof post !== "undefined") {
               if (post.status === 204) {
                 UI.createAlert(
                   "success",
-                  `Successfully made restart attempt to ${toUpdate[i].printer.printerName}... You may need to Re-Sync!`,
+                  `Successfully made restart attempt to ${toUpdate[i].printerName}... You may need to Re-Sync!`,
                   3000,
                   "Clicked"
                 );
               } else {
                 UI.createAlert(
                   "error",
-                  `There was an issue sending restart to ${toUpdate[i].printer.printerName} are you sure it's online?`,
+                  `There was an issue sending restart to ${toUpdate[i].printerName} are you sure it's online?`,
                   3000,
                   "Clicked"
                 );
@@ -191,7 +192,7 @@ bulkPluginUpdateButton.addEventListener("click", async (e) => {
             } else {
               UI.createAlert(
                 "error",
-                `No response from ${toUpdate[i].printer.printerName}, is it online???`,
+                `No response from ${toUpdate[i].printerName}, is it online???`,
                 3000,
                 "Clicked"
               );
@@ -199,7 +200,7 @@ bulkPluginUpdateButton.addEventListener("click", async (e) => {
           } else {
             UI.createAlert(
               "error",
-              `${toUpdate[i].printer.printerName}: Failed to update, manual intervention required!`,
+              `${toUpdate[i].printerName}: Failed to update, manual intervention required!`,
               3000,
               "Clicked"
             );
@@ -212,29 +213,56 @@ bulkPluginUpdateButton.addEventListener("click", async (e) => {
 
 let bulkOctoPrintUpdateButton = document.getElementById("blkOctoPrintUpdate");
 bulkOctoPrintUpdateButton.addEventListener("click", async (e) => {
-  let onScreenButtons = document.querySelectorAll("*[id^=octoprintUpdate-]");
-  let currentUpdates = [...onScreenButtons].filter((item) => {
-    return !item.classList.contains("d-none");
-  });
+  let currentPrinterList = await OctoFarmClient.post("printers/printerInfo");
+  currentPrinterList = await currentPrinterList.json();
+  let message = "";
+  let toUpdate = [];
+  for (let printer = 0; printer < currentPrinterList.length; printer++) {
+    let currentPrinter = currentPrinterList[printer];
+    if (currentPrinter?.updateAvailable.octoPrintUpdate.updateAvailable) {
+      message += currentPrinter.printerName + "<br>";
+
+      toUpdate.push({
+        printerURL: currentPrinter.printerURL,
+        printerName: currentPrinter.printerName,
+        apikey: currentPrinter.apikey
+      });
+    }
+  }
+
+  message += "Are you sure?";
   bootbox.confirm({
-    message:
-      "This will update any OctoPrint instance with one update available, are you sure?",
-    buttons: {
-      confirm: {
-        label: "Yes",
-        className: "btn-success"
-      },
-      cancel: {
-        label: "No",
-        className: "btn-danger"
-      }
-    },
+    size: "medium",
+    title: "This will update the following OctoPrint Installs...",
+    message: message,
     callback: async function (result) {
       if (result) {
-        for (const btn of currentUpdates) {
-          btn.disabled = false;
-          btn.click();
-          await delay(1000);
+        for (let i = 0; i < toUpdate.length; i++) {
+          const data = {
+            targets: ["octoprint"],
+            force: true
+          };
+          console.log(toUpdate[i].printerURL);
+          let updateRequest = await OctoPrintClient.postNOAPI(
+            toUpdate[i],
+            "plugin/softwareupdate/update",
+            data
+          );
+          if (updateRequest.status === 200) {
+            UI.createAlert(
+              "success",
+              `${toUpdate[i].printerName}: Update command fired, you may need to restart OctoPrint once complete.`,
+              3000,
+              "Clicked"
+            );
+          } else {
+            UI.createAlert(
+              "error",
+              `${toUpdate[i].printerName}: Failed to update, manual intervention required!`,
+              3000,
+              "Clicked"
+            );
+          }
         }
       }
     }
@@ -2996,6 +3024,9 @@ class dashUpdate {
                 if (!updateButton.classList.contains("d-none")) {
                   updateButton.classList.add("d-none");
                 }
+                if (!bulkOctoPrintUpdateButton.classList.contains("d-none")) {
+                  bulkOctoPrintUpdateButton.classList.add("d-none");
+                }
               }
               if (printer.updateAvailable.pluginUpdates.length > 0) {
                 if (bulkPluginUpdateButton.classList.contains("d-none")) {
@@ -3004,6 +3035,9 @@ class dashUpdate {
               } else {
                 if (!updatePluginButton.classList.contains("d-none")) {
                   updatePluginButton.classList.add("d-none");
+                }
+                if (!bulkPluginUpdateButton.classList.contains("d-none")) {
+                  bulkPluginUpdateButton.classList.add("d-none");
                 }
               }
             }
@@ -3147,34 +3181,6 @@ class dashUpdate {
                           3000,
                           "Clicked"
                         );
-                        // let post = await OctoPrintClient.systemNoConfirm(
-                        //   printer,
-                        //   "restart"
-                        // );
-                        // if (typeof post !== "undefined") {
-                        //   if (post.status === 204) {
-                        //     UI.createAlert(
-                        //       "success",
-                        //       `Successfully made restart attempt to ${printer.printerName}... You may need to Re-Sync!`,
-                        //       3000,
-                        //       "Clicked"
-                        //     );
-                        //   } else {
-                        //     UI.createAlert(
-                        //       "error",
-                        //       `There was an issue sending restart to ${printer.printerName} are you sure it's online?`,
-                        //       3000,
-                        //       "Clicked"
-                        //     );
-                        //   }
-                        // } else {
-                        //   UI.createAlert(
-                        //     "error",
-                        //     `No response from ${printer.printerName}, is it online???`,
-                        //     3000,
-                        //     "Clicked"
-                        //   );
-                        // }
                       } else {
                         UI.createAlert(
                           "error",
