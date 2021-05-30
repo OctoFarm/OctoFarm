@@ -20,7 +20,9 @@ const { JobClean } = require("../lib/dataFunctions/jobClean.js");
 const { FileClean } = require("../lib/dataFunctions/fileClean.js");
 const { FilamentClean } = require("../lib/dataFunctions/filamentClean.js");
 const { PrinterTicker } = require("./printerTicker.js");
-const {checkPluginManagerAPIDeprecation} = require("../utils/compatibility.utils");
+const {
+  checkPluginManagerAPIDeprecation
+} = require("../utils/compatibility.utils");
 
 const logger = new Logger("OctoFarm-State");
 let farmPrinters = [];
@@ -2543,12 +2545,16 @@ class Runner {
       farmPrinters[index]._id
     );
 
-    const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(farmPrinters[index].octoPrintVersion);
+    const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(
+      farmPrinters[index].octoPrintVersion
+    );
 
     return ClientAPI.getRetry(
       farmPrinters[index].printerURL,
       farmPrinters[index].apikey,
-        printerManagerApiCompatible ? "plugin/pluginmanager/repository" : "api/plugin/pluginmanager"
+      printerManagerApiCompatible
+        ? "plugin/pluginmanager/repository"
+        : "api/plugin/pluginmanager"
     )
       .then((res) => {
         return res.json();
@@ -3049,6 +3055,9 @@ class Runner {
     }
     if (state === "Online") {
       return { name: "success", hex: "#00330e", category: "Idle" };
+    }
+    if (state === "Offline after error") {
+      return { name: "danger", hex: "#2e0905", category: "Error!" };
     }
     return { name: "warning", hex: "#583c0e", category: "Active" };
   }
