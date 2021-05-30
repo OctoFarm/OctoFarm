@@ -11,8 +11,9 @@ All notable changes to this project will be documented in this file.
     - Completely reworked history cache, prepared and tested for OctoFarm V2
     - Slightly reworked file cache, prepared for V2 and made it robust
     - Made API tests less prone to unnecessary failure
-    - Reworked the Settings modal to be more resiliant to failure and cleaned up code. 
+    - Reworked the Settings modal to be more resiliant to failure and cleaned up code
     - Slightly reworked job cache, prepared for V2
+    - Amended the functions for Global OctoPrint update and Global OctoPrint plugin update
 
 ### Removed
 
@@ -24,7 +25,7 @@ All notable changes to this project will be documented in this file.
     - Fixed #542, #381: ensureIndex mongoose warning and circular Runner import resolved 
     - Fixed #598: printer settingsAppearance missing will not cause failure anymore
     - Fixed #596: changed OctoPrint plugin manager repository to new route with backwards compatibility version check 
-
+    - Fixed #608: Global update button was not appearing
 
 ## [v1.1.13-hotfix]
 
