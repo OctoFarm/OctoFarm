@@ -2553,9 +2553,9 @@ class Runner {
       .then((res) => {
         return res.json();
       })
-      .then(async (res) => {
+      .then((res) => {
         farmPrinters[index].pluginsList = res.repository.plugins;
-        await PrinterTicker.addIssue(
+        PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
           `Grabbed plugin list (OctoPrint compatibility: ${farmPrinters[index].octoPrintVersion})`,
@@ -2563,8 +2563,8 @@ class Runner {
           farmPrinters[index]._id
         );
       })
-      .catch(async (err) => {
-        await PrinterTicker.addIssue(
+      .catch((err) => {
+        PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
           `Error grabbing plugin list information: ${err}`,
@@ -2745,7 +2745,7 @@ class Runner {
     }
   }
 
-  static getSettings(id) {
+  async static getSettings(id) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
@@ -2824,7 +2824,7 @@ class Runner {
             };
             const printer = await Printers.findById(id);
 
-            printer.save();
+            await printer.save();
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[index].printerURL,
@@ -2867,8 +2867,8 @@ class Runner {
             };
             const printer = await Printers.findById(id);
 
-            printer.save();
-            await PrinterTicker.addIssue(
+            await printer.save();
+            PrinterTicker.addIssue(
               new Date(),
               farmPrinters[index].printerURL,
               "Successfully saved PSU control settings...",
@@ -2899,11 +2899,11 @@ class Runner {
             }
             const printer = await Printers.findById(id);
             printer.camURL = farmPrinters[index].camURL;
-            printer.save();
+            await printer.save();
           }
         }
 
-        await PrinterTicker.addIssue(
+        PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
           "Grabbed settings information...",
@@ -2917,8 +2917,8 @@ class Runner {
           `Successfully grabbed Settings for...: ${farmPrinters[index].printerURL}`
         );
       })
-      .catch(async (err) => {
-        await PrinterTicker.addIssue(
+      .catch((err) => {
+        PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
           `Error grabbing settings information: ${err}`,
