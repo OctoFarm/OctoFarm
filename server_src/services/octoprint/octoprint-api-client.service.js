@@ -1,6 +1,8 @@
+const {checkPluginManagerAPIDeprecation} = require("../../utils/compatibility.utils");
 const { OctoprintApiService } = require("./octoprint-api.service");
 
-const apiBase = "/api";
+const octoPrintBase = "/";
+const apiBase = octoPrintBase + "api";
 const apiSettingsPart = apiBase + "/settings";
 const apiFile = (path) => apiBase + "/files/local/" + path;
 const apiFiles = (recursive = true) =>
@@ -15,8 +17,9 @@ const apiLogin = (passive = true) =>
   apiBase + "/login" + (passive ? "?passive=true" : "");
 
 const apiPluginManager = apiBase + "/plugin/pluginmanager";
+const apiPluginManagerRepository1_6_0 = octoPrintBase + "plugin/pluginmanager/repository";
 const apiSoftwareUpdateCheck = (force) =>
-  "/plugin/softwareupdate/check" + (force ? "?force=true" : "");
+    octoPrintBase + "plugin/softwareupdate/check" + (force ? "?force=true" : "");
 const apiPluginPiSupport = apiBase + "/plugin/pi_support";
 
 const printerValidationErrorMessage = "printer apiKey or URL undefined";
@@ -83,7 +86,11 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async getPluginManager(printer, retry = false) {
-    return this.getWithOptionalRetry(printer, apiPluginManager, retry);
+    const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(printer.octoPrintVersion);
+
+    const route = printerManagerApiCompatible ? apiPluginManagerRepository1_6_0 : apiPluginManager;
+
+    return this.getWithOptionalRetry(printer, route, retry);
   }
 
   async getSystemInfo(printer, retry = false) {

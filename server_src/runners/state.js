@@ -25,9 +25,6 @@ const { JobClean } = require("../lib/dataFunctions/jobClean.js");
 const { FileClean } = require("../lib/dataFunctions/fileClean.js");
 const { FilamentClean } = require("../lib/dataFunctions/filamentClean.js");
 const { PrinterTicker } = require("./printerTicker.js");
-const {
-  checkPluginManagerAPIDeprecation
-} = require("../utils/compatibility.utils");
 
 const logger = new Logger("OctoFarm-State");
 let farmPrinters = [];
