@@ -401,7 +401,9 @@ class PrinterClean {
         sortedPrinter.resends = farmPrinter.resends;
       }
       sortedPrinter.tools = PrinterClean.sortTemps(farmPrinter.temps);
-      sortedPrinter.currentJob = JobClean.returnJob(farmPrinter.sortIndex);
+      sortedPrinter.currentJob = JobClean.getCleanJobAtIndex(
+        farmPrinter.sortIndex
+      );
       sortedPrinter.selectedFilament = farmPrinter.selectedFilament;
 
       sortedPrinter.fileList = FileClean.returnFiles(farmPrinter.sortIndex);

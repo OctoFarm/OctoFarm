@@ -25,7 +25,7 @@ class PrinterTicker {
     }
   }
 
-  static async addIssue(date, printer, message, state, printerID) {
+  static addIssue(date, printer, message, state, printerID) {
     let id = null;
     if (currentIssues.length === 0) {
       //first issue
@@ -46,6 +46,7 @@ class PrinterTicker {
       currentIssues.shift();
     }
   }
+
   static async removeIssue(id) {
     const index = _.findIndex(currentIssues, function (o) {
       return o.id == id;
