@@ -2030,7 +2030,6 @@ class Runner {
         const { _id } = farmPrinters[index];
         await this.setupWebSocket(_id, skipAPI);
       } else if (
-        farmPrinters[index].ws.instance.readyState === 0 ||
         farmPrinters[index].ws.instance.readyState === 2
       ) {
         PrinterTicker.addIssue(
