@@ -2745,7 +2745,7 @@ class Runner {
     }
   }
 
-  async static getSettings(id) {
+  static async getSettings(id) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
