@@ -8,6 +8,7 @@ const Profiles = require("../models/Profiles.js");
 const Printers = require("../models/Printer.js");
 const Filament = require("../models/Filament.js");
 const TempHistory = require("../models/TempHistory.js");
+const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 
 const { HistoryCollection } = require("./history.js");
 const {
@@ -117,16 +118,8 @@ const heartBeatInterval = setInterval(function ping() {
 
 WebSocketClient.prototype.open = function (url, index) {
   try {
-    if (url.includes("http://")) {
-      url = url.replace("http://", "ws://");
-    } else if (url.includes("https://")) {
-      url = url.replace("https://", "wss://");
-    } else if (!url.includes("ws://")) {
-      url = "ws://" + url;
-    }
     this.url = url;
     this.index = index;
-
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[this.index].printerURL,
@@ -1242,7 +1235,7 @@ class Runner {
             farmPrinters[i]._id
           );
           await farmPrinters[i].ws.open(
-            `${farmPrinters[i].printerURL}/sockjs/websocket`,
+            `${farmPrinters[i].webSocketURL}/sockjs/websocket`,
             i
           );
         } else {
@@ -1655,6 +1648,11 @@ class Runner {
         ""
       );
     }
+    if (!farmPrinters[i].webSocketURL) {
+      farmPrinters[i].webSocketURL = convertHttpUrlToWebsocket(
+        farmPrinters[i].printerURL
+      );
+    }
     if (
       typeof farmPrinters[i].camURL !== "undefined" &&
       farmPrinters[i].camURL !== "" &&
@@ -1678,6 +1676,7 @@ class Runner {
     printer.printerName = farmPrinters[i].printerName;
     printer.camURL = farmPrinters[i].camURL;
     printer.printerURL = farmPrinters[i].printerURL;
+    printer.webSocketURL = farmPrinters[i].webSocketURL;
     printer.feedRate = farmPrinters[i].feedRate;
     printer.flowRate = farmPrinters[i].flowRate;
     printer.sortIndex = farmPrinters[i].sortIndex;
