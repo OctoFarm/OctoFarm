@@ -220,6 +220,11 @@ class PrinterSettings {
       currentPrinter.printerName;
     document.getElementById("psPrinterURL").placeholder =
       currentPrinter.printerURL;
+    // Convert websocket url into a url object
+    const webSocketURL = new URL(currentPrinter.webSocketURL);
+    // Grab out the protocol and select it on the select box.
+    document.getElementById("psWebSocketProtocol").value =
+      webSocketURL.protocol + "//";
     document.getElementById("psCamURL").placeholder = currentPrinter.cameraURL;
     document.getElementById("psAPIKEY").placeholder = currentPrinter.apikey;
 
@@ -1108,6 +1113,7 @@ class PrinterSettings {
       printer: {
         printerName: document.getElementById("psPrinterName").value,
         printerURL: document.getElementById("psPrinterURL").value,
+        webSocketProtocol: document.getElementById("psWebSocketProtocol").value,
         index: currentPrinter._id,
         cameraURL: document.getElementById("psCamURL").value,
         apikey: document.getElementById("psAPIKEY").value

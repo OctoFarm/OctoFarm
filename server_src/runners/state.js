@@ -8,6 +8,7 @@ const Profiles = require("../models/Profiles.js");
 const Printers = require("../models/Printer.js");
 const Filament = require("../models/Filament.js");
 const TempHistory = require("../models/TempHistory.js");
+const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 
 const { HistoryCollection } = require("./history.js");
 const {
@@ -120,15 +121,8 @@ const heartBeatInterval = setInterval(function ping() {
 
 WebSocketClient.prototype.open = function (url, index) {
   try {
-    if (url.includes("http://")) {
-      url = url.replace("http://", "");
-    }
-    if (url.includes("https://")) {
-      url = url.replace("https://", "");
-    }
     this.url = url;
     this.index = index;
-
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[this.index].printerURL,
@@ -1247,7 +1241,7 @@ class Runner {
             farmPrinters[i]._id
           );
           await farmPrinters[i].ws.open(
-            `ws://${farmPrinters[i].printerURL}/sockjs/websocket`,
+            `${farmPrinters[i].webSocketURL}/sockjs/websocket`,
             i
           );
         } else {
@@ -1660,6 +1654,11 @@ class Runner {
         ""
       );
     }
+    if (!farmPrinters[i].webSocketURL) {
+      farmPrinters[i].webSocketURL = convertHttpUrlToWebsocket(
+        farmPrinters[i].printerURL
+      );
+    }
     if (
       typeof farmPrinters[i].camURL !== "undefined" &&
       farmPrinters[i].camURL !== "" &&
@@ -1683,6 +1682,7 @@ class Runner {
     printer.printerName = farmPrinters[i].printerName;
     printer.camURL = farmPrinters[i].camURL;
     printer.printerURL = farmPrinters[i].printerURL;
+    printer.webSocketURL = farmPrinters[i].webSocketURL;
     printer.feedRate = farmPrinters[i].feedRate;
     printer.flowRate = farmPrinters[i].flowRate;
     printer.sortIndex = farmPrinters[i].sortIndex;
@@ -2033,7 +2033,6 @@ class Runner {
         const { _id } = farmPrinters[index];
         await this.setupWebSocket(_id, skipAPI);
       } else if (
-        farmPrinters[index].ws.instance.readyState === 0 ||
         farmPrinters[index].ws.instance.readyState === 2
       ) {
         PrinterTicker.addIssue(
@@ -3224,9 +3223,9 @@ class Runner {
       });
       let updatePrinter = false;
       if (
-        settings.printer.printerName !== "" &&
-        settings.printer.printerName !==
-          farmPrinters[index].settingsAppearance.name
+        settings.printer.printerName.toString() !== "" &&
+        settings.printer.toString() !==
+          farmPrinters[index].settingsAppearance.name.toString()
       ) {
         farmPrinters[index].settingsAppearance.name =
           settings.printer.printerName;
@@ -3240,12 +3239,26 @@ class Runner {
       profile.status = 900;
       sett.status = 900;
       if (
-        settings.printer.printerURL !== "" &&
-        settings.printer.printerURL !== farmPrinters[index].printerURL
+        settings.printer.printerURL.toString() !== "" &&
+        settings.printer.printerURL.toString() !==
+          farmPrinters[index].printerURL.toString()
       ) {
         farmPrinters[index].printerURL = settings.printer.printerURL;
         printer.printerURL = settings.printer.printerURL;
         printer.markModified("printerURL");
+        updatePrinter = true;
+      }
+      const currentWebSocketURL = new URL(farmPrinters[index].webSocketURL);
+      if (
+        settings.printer.webSocketProtocol.toString() !==
+        currentWebSocketURL.protocol + "//".toString()
+      ) {
+        // If we detect q difference then rebuild the websocket URL and mark for scan.
+        printer.webSocketURL =
+          settings.printer.webSocketProtocol + currentWebSocketURL.host;
+        farmPrinters[index].webSocketURL =
+          settings.printer.webSocketProtocol + currentWebSocketURL.host;
+        printer.markModified("webSocketURL");
         updatePrinter = true;
       }
       if (
