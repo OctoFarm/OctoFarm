@@ -21,7 +21,9 @@ const { JobClean } = require("../lib/dataFunctions/jobClean.js");
 const { FileClean } = require("../lib/dataFunctions/fileClean.js");
 const { FilamentClean } = require("../lib/dataFunctions/filamentClean.js");
 const { PrinterTicker } = require("./printerTicker.js");
-const {checkPluginManagerAPIDeprecation} = require("../utils/compatibility.utils");
+const {
+  checkPluginManagerAPIDeprecation
+} = require("../utils/compatibility.utils");
 
 const logger = new Logger("OctoFarm-State");
 let farmPrinters = [];
@@ -2543,12 +2545,16 @@ class Runner {
       farmPrinters[index]._id
     );
 
-    const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(farmPrinters[index].octoPrintVersion);
+    const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(
+      farmPrinters[index].octoPrintVersion
+    );
 
     return ClientAPI.getRetry(
       farmPrinters[index].printerURL,
       farmPrinters[index].apikey,
-        printerManagerApiCompatible ? "plugin/pluginmanager/repository" : "api/plugin/pluginmanager"
+      printerManagerApiCompatible
+        ? "plugin/pluginmanager/repository"
+        : "api/plugin/pluginmanager"
     )
       .then((res) => {
         return res.json();
@@ -3212,9 +3218,9 @@ class Runner {
       });
       let updatePrinter = false;
       if (
-        settings.printer.printerName !== "" &&
-        settings.printer.printerName !==
-          farmPrinters[index].settingsAppearance.name
+        settings.printer.printerName.toString() !== "" &&
+        settings.printer.toString() !==
+          farmPrinters[index].settingsAppearance.name.toString()
       ) {
         farmPrinters[index].settingsAppearance.name =
           settings.printer.printerName;
@@ -3228,12 +3234,24 @@ class Runner {
       profile.status = 900;
       sett.status = 900;
       if (
-        settings.printer.printerURL !== "" &&
-        settings.printer.printerURL !== farmPrinters[index].printerURL
+        settings.printer.printerURL.toString() !== "" &&
+        settings.printer.printerURL.toString() !==
+          farmPrinters[index].printerURL.toString()
       ) {
         farmPrinters[index].printerURL = settings.printer.printerURL;
         printer.printerURL = settings.printer.printerURL;
         printer.markModified("printerURL");
+        updatePrinter = true;
+      }
+      const currentWebSocketURL = new URL(farmPrinters[index].webSocketURL);
+      if (
+        settings.printer.webSocketProtocol.toString() !==
+        currentWebSocketURL.protocol + "//".toString()
+      ) {
+        // If we detect q difference then rebuild the websocket URL and mark for scan.
+        printer.webSocketURL =
+          settings.printer.webSocketProtocol + currentWebSocketURL.host;
+        printer.markModified("webSocketURL");
         updatePrinter = true;
       }
       if (

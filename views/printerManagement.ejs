@@ -601,7 +601,7 @@
                                     <div id="psPrinterConnection">
                                         <form>
                                             <div class="row pb-1">
-                                                <div class="col">
+                                                <div class="col-12 col-md-6">
                                                     <label for="psPrinterName">Printer Name:</label>
                                                     <input id="psPrinterName" type="text" class="form-control"
                                                            placeholder="OctoPrint User">
@@ -609,7 +609,7 @@
                                                         Saving this will update OctoPrints Settings => Appearance Name
                                                         if available.</small>
                                                 </div>
-                                                <div class="col">
+                                                <div class="col-12 col-md-6">
                                                     <label for="psOctoPrintUser">OctoPrint User:</label>
                                                     <input id="psOctoPrintUser" type="text" class="form-control"
                                                            placeholder="OctoPrint User" disabled>
@@ -619,7 +619,7 @@
                                                 </div>
                                             </div>
                                             <div class="row pb-1">
-                                                <div class="col">
+                                                <div class="col-12 col-md-6">
                                                     <label for="psPrinterURL">Printer URL:</label>
                                                     <input id="psPrinterURL" type="text" class="form-control"
                                                            placeholder="Printer URL">
@@ -627,7 +627,26 @@
                                                         Defaults to "http://" if not specified.</small>
                                                     <small>Example: <code>http://192.168.1.5:81</code></small>
                                                 </div>
-                                                <div class="col">
+                                                <div class="col-12 col-md-6">
+                                                    <label for="psWebSocketProtocol">Printer WebSocket Prefix:</label>
+                                                    <select id="psWebSocketProtocol" class="custom-select">
+                                                        <option value="ws://">ws://</option>
+                                                        <option value="wss://">wss://</option>
+                                                    </select>
+                                                    <small class="form-text text-muted">Websocket connection prefix. Automatically selected based on Printer URL. Override here.</small>
+                                                    <small>Example: <code>"ws://" or "wss://" </code></small>
+                                                </div>
+                                            </div>
+                                            <div class="row pb-2">
+                                                <div class="col-12 col-md-6">
+                                                    <label for="psAPIKEY">API Key:</label>
+                                                    <input id="psAPIKEY" type="text" class="form-control"
+                                                           placeholder="API Key">
+                                                    <small class="form-text text-muted">OctoPrints API Key. It's
+                                                        recquired to use the User/Application API Key for OctoPrint
+                                                        version 1.4.1+.</small>
+                                                </div>
+                                                <div class="col-12 col-md-6">
                                                     <label for="psCamURL">Camera URL:</label>
                                                     <input id="psCamURL" type="text" class="form-control"
                                                            placeholder="Camera URL">
@@ -636,17 +655,6 @@
                                                     <small>Example:
                                                         <code>http://192.168.1.5/webcam/?action=stream</code></small>
                                                 </div>
-                                            </div>
-                                            <div class="row pb-2">
-                                                <div class="col">
-                                                    <label for="psAPIKEY">API Key:</label>
-                                                    <input id="psAPIKEY" type="text" class="form-control"
-                                                           placeholder="API Key">
-                                                    <small class="form-text text-muted">OctoPrints API Key. It's
-                                                        recquired to use the User/Application API Key for OctoPrint
-                                                        version 1.4.1+.</small>
-                                                </div>
-
                                             </div>
                                         </form>
                                     </div>
