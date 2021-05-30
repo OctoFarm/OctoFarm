@@ -528,7 +528,10 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         data.current.state.text = "Disconnected";
         farmPrinters[this.index].stateDescription =
           "Your printer is disconnected";
-      } else if (data.current.state.text.includes("Error:")) {
+      } else if (
+        data.current.state.text.includes("Error:") ||
+        data.current.state.text.includes("error")
+      ) {
         farmPrinters[this.index].stateDescription = data.current.state.text;
         data.current.state.text = "Error!";
       } else if (data.current.state.text === "Closed") {
