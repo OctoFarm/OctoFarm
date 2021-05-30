@@ -3251,6 +3251,8 @@ class Runner {
         // If we detect q difference then rebuild the websocket URL and mark for scan.
         printer.webSocketURL =
           settings.printer.webSocketProtocol + currentWebSocketURL.host;
+        farmPrinters[index].webSocketURL =
+          settings.printer.webSocketProtocol + currentWebSocketURL.host;
         printer.markModified("webSocketURL");
         updatePrinter = true;
       }
