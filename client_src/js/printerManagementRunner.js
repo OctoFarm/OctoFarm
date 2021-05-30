@@ -115,7 +115,6 @@ const removeLine = function (element) {
   element.remove();
 };
 // Dash control listeners
-let bulkPluginsToUpdate = false;
 let bulkPluginUpdateButton = document.getElementById("blkUpdatePluginsBtn");
 bulkPluginUpdateButton.addEventListener("click", async (e) => {
   let currentPrinterList = await OctoFarmClient.post("printers/printerInfo");
@@ -211,7 +210,6 @@ bulkPluginUpdateButton.addEventListener("click", async (e) => {
   });
 });
 
-let bulkOctoPrintsToUpdate = false;
 let bulkOctoPrintUpdateButton = document.getElementById("blkOctoPrintUpdate");
 bulkOctoPrintUpdateButton.addEventListener("click", async (e) => {
   let onScreenButtons = document.querySelectorAll("*[id^=octoprintUpdate-]");
@@ -2954,7 +2952,7 @@ class dashUpdate {
             socketBadge.className = `tag badge badge-${printer.webSocketState.colour} badge-pill`;
             socketBadge.setAttribute("title", printer.webSocketState.desc);
 
-            if (typeof printer.updateAvailable !== "undefined") {
+            if (printer.updateAvailable) {
               let updateButton = document.getElementById(
                 `octoprintUpdate-${printer._id}`
               );
@@ -2965,7 +2963,6 @@ class dashUpdate {
                 if (updateButton.classList.contains("d-none")) {
                   updateButton.classList.remove("d-none");
                 }
-                bulkOctoPrintsToUpdate = true;
               } else {
                 if (!updateButton.classList.contains("d-none")) {
                   updateButton.classList.add("d-none");
@@ -2975,20 +2972,9 @@ class dashUpdate {
                 if (updatePluginButton.classList.contains("d-none")) {
                   updatePluginButton.classList.remove("d-none");
                 }
-                bulkPluginsToUpdate = true;
               } else {
                 if (!updatePluginButton.classList.contains("d-none")) {
                   updatePluginButton.classList.add("d-none");
-                }
-              }
-              if (bulkOctoPrintsToUpdate) {
-                if (bulkOctoPrintUpdateButton.classList.contains("d-none")) {
-                  bulkOctoPrintUpdateButton.classList.remove("d-none");
-                }
-              }
-              if (bulkPluginsToUpdate) {
-                if (bulkPluginUpdateButton.classList.contains("d-none")) {
-                  bulkPluginUpdateButton.classList.remove("d-none");
                 }
               }
             }
@@ -3002,24 +2988,23 @@ class dashUpdate {
               let updatePluginButton = document.getElementById(
                 `octoprintPluginUpdate-${printer._id}`
               );
-
               if (printer.updateAvailable.octoPrintUpdate.updateAvailable) {
+                if (bulkOctoPrintUpdateButton.classList.contains("d-none")) {
+                  bulkOctoPrintUpdateButton.classList.remove("d-none");
+                }
               } else {
                 if (!updateButton.classList.contains("d-none")) {
                   updateButton.classList.add("d-none");
                 }
-                // if (!bulkOctoPrintUpdateButton.classList.contains("d-none")) {
-                //   bulkOctoPrintUpdateButton.classList.add("d-none");
-                // }
               }
               if (printer.updateAvailable.pluginUpdates.length > 0) {
+                if (bulkPluginUpdateButton.classList.contains("d-none")) {
+                  bulkPluginUpdateButton.classList.remove("d-none");
+                }
               } else {
                 if (!updatePluginButton.classList.contains("d-none")) {
                   updatePluginButton.classList.add("d-none");
                 }
-                // if (!bulkPluginUpdateButton.classList.contains("d-none")) {
-                //   bulkPluginUpdateButton.classList.add("d-none");
-                // }
               }
             }
             if (printer.hostState.state === "Online") {

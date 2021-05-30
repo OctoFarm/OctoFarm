@@ -63,7 +63,7 @@ class PrinterClean {
    * @returns {[]}
    */
   static listPrintersInformation() {
-      return printersInformation;
+    return printersInformation;
   }
 
   /**
@@ -71,11 +71,12 @@ class PrinterClean {
    * @returns {{}|undefined}
    */
   static getPrintersInformationById(id) {
-    if (!!id) {
-      return _.find(printersInformation, function (o) {
-        return o._id == id;
-      });
+    if (!id) {
+      return printersInformation;
     }
+    return _.find(printersInformation, function (o) {
+      return o._id == id;
+    });
   }
 
   /**
