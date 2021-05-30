@@ -24,7 +24,7 @@ All notable changes to this project will be documented in this file.
     - Fixed #542, #381: ensureIndex mongoose warning and circular Runner import resolved 
     - Fixed #598: printer settingsAppearance missing will not cause failure anymore
     - Fixed #596: changed OctoPrint plugin manager repository to new route with backwards compatibility version check 
-
+    - Fixed #609: Bulk printer functions wouldn't load due to gingers goof on development! 
 
 ## [v1.1.13-hotfix]
 
