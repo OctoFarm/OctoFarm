@@ -21,7 +21,7 @@ async function enable() {
       page: "Login",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       registration: settings[0].server.registration,
-      serverSettings: settings,
+      serverSettings: settings
     })
   );
   if (settings[0].server.registration === true) {
@@ -33,7 +33,7 @@ async function enable() {
         page: "Register",
         octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
         serverSettings: settings,
-        userCount: currentUsers.length,
+        userCount: currentUsers.length
       })
     );
 
@@ -69,7 +69,7 @@ async function enable() {
           username,
           password,
           password2,
-          userCount: currentUsers.length,
+          userCount: currentUsers.length
         });
       } else {
         // Validation Passed
@@ -79,7 +79,8 @@ async function enable() {
             errors.push({ msg: "Username is already registered" });
             res.render("register", {
               page: "Login",
-              octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+              octoFarmPageTitle:
+                process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
               registration: settings[0].server.registration,
               serverSettings: settings,
               errors,
@@ -87,7 +88,7 @@ async function enable() {
               username,
               password,
               password2,
-              userCount: currentUsers.length,
+              userCount: currentUsers.length
             });
           } else {
             // Check if first user that's created.
@@ -102,7 +103,7 @@ async function enable() {
                 name,
                 username,
                 password,
-                group: userGroup,
+                group: userGroup
               });
               // Hash Password
               bcrypt.genSalt(10, (error, salt) =>
@@ -140,7 +141,7 @@ async function enable() {
       page: "Login",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       registration: settings[0].server.registration,
-      serverSettings: settings,
+      serverSettings: settings
     }),
     function (req, res, next) {
       // Issue a remember me cookie if the option was checked
@@ -155,7 +156,7 @@ async function enable() {
         res.cookie("remember_me", token, {
           path: "/",
           httpOnly: true,
-          maxAge: 604800000,
+          maxAge: 604800000
         });
         return next();
       });

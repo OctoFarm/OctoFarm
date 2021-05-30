@@ -1,23 +1,20 @@
+"use strict";
+
+const _ = require("lodash");
+const Logger = require("../logger.js");
 const Spools = require("../../models/Filament.js");
 const Profiles = require("../../models/Profiles.js");
-
-const Logger = require("../logger.js");
+const { PrinterClean } = require("./printerClean.js");
 
 const logger = new Logger("OctoFarm-InformationCleaning");
-const printerClean = require("./printerClean.js");
-
-const { PrinterClean } = printerClean;
-const _ = require("lodash");
-
 let spoolsClean = [];
 let profilesClean = [];
 let statisticsClean = [];
 let selectedFilamentList = [];
 let dropDownList = {
   normalDropDown: [],
-  historyDropDown: [],
+  historyDropDown: []
 };
-const materialList = [];
 
 class FilamentClean {
   static getSpools() {
@@ -43,7 +40,7 @@ class FilamentClean {
   static async start(filamentManager) {
     const profiles = await Profiles.find({});
     const spools = await Spools.find({});
-    const farmPrinters = await PrinterClean.returnPrintersInformation();
+    const farmPrinters = await PrinterClean.listPrintersInformation();
     const spoolsArray = [];
     const profilesArray = [];
 
@@ -53,7 +50,7 @@ class FilamentClean {
         manufacturer: profiles[pr].profile.manufacturer,
         material: profiles[pr].profile.material,
         density: profiles[pr].profile.density,
-        diameter: profiles[pr].profile.diameter,
+        diameter: profiles[pr].profile.diameter
       };
       if (filamentManager) {
         profile._id = profiles[pr].profile.index;
@@ -78,7 +75,7 @@ class FilamentClean {
           spools[sp]._id,
           farmPrinters
         ),
-        fmID: spools[sp].spools.fmID,
+        fmID: spools[sp].spools.fmID
       };
       spoolsArray.push(spool);
     }
@@ -119,12 +116,12 @@ class FilamentClean {
     const normalDropObject = [
       `
                     <option value="0">No Spool Selected</option>
-                `,
+                `
     ];
     const historyDropObject = [
       `
                     <option value="0">No Spool Selected</option>
-                `,
+                `
     ];
     spools.forEach((spool) => {
       let profileId = null;
@@ -174,7 +171,7 @@ class FilamentClean {
     });
     dropDownList = {
       normalDropDown: normalDropObject,
-      historyDropDown: historyDropObject,
+      historyDropDown: historyDropObject
     };
   }
 
@@ -204,7 +201,7 @@ class FilamentClean {
         name: profiles[p].material.replace(/ /g, "_"),
         weight: [],
         used: [],
-        price: [],
+        price: []
       };
       materialBreak.push(material);
     }
@@ -237,7 +234,7 @@ class FilamentClean {
         name: materialBreak[m].name,
         used: materialBreak[m].used.reduce((a, b) => a + b, 0),
         total: materialBreak[m].weight.reduce((a, b) => a + b, 0),
-        price: materialBreak[m].price.reduce((a, b) => a + b, 0),
+        price: materialBreak[m].price.reduce((a, b) => a + b, 0)
       };
       materialBreakDown.push(mat);
     }
@@ -252,7 +249,7 @@ class FilamentClean {
       spoolCount: spools.length,
       activeSpools: selectedFilament,
       activeSpoolCount: selectedFilament.length,
-      materialBreakDown,
+      materialBreakDown
     };
   }
 
@@ -272,7 +269,7 @@ class FilamentClean {
               const printer = {
                 id: farmPrinters[p]._id,
                 tool: s,
-                name: farmPrinters[p].printerName,
+                name: farmPrinters[p].printerName
               };
               assignments.push(printer);
             }
@@ -283,7 +280,8 @@ class FilamentClean {
     return assignments;
   }
 }
+
 FilamentClean.start();
 module.exports = {
-  FilamentClean,
+  FilamentClean
 };

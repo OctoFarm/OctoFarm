@@ -7,8 +7,6 @@ const prettyHelpers = require("../../views/partials/functions/pretty.js");
 const runner = require("../runners/state.js");
 const { Runner } = runner;
 const _ = require("lodash");
-const historyClean = require("../lib/dataFunctions/historyClean.js");
-const { HistoryClean } = historyClean;
 const filamentClean = require("../lib/dataFunctions/filamentClean.js");
 const { FilamentClean } = filamentClean;
 const settingsClean = require("../lib/dataFunctions/settingsClean.js");
@@ -24,6 +22,11 @@ const isDocker = require("is-docker");
 const { AppConstants } = require("../app.constants");
 const { fetchMongoDBConnectionString } = require("../../app-env");
 const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
+const { initHistoryCache } = require("../cache/history.cache");
+const {
+  getDefaultDashboardSettings
+} = require("../lib/providers/settings.constants");
+const { getHistoryCache } = require("../cache/history.cache");
 
 const SystemInfo = systemInfo.SystemRunner;
 const version = process.env[AppConstants.VERSION_KEY];
@@ -44,7 +47,7 @@ async function welcome() {
           page: "Welcome",
           octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
           registration,
-          serverSettings: serverSettings[0],
+          serverSettings: serverSettings[0]
         });
       }
     });
@@ -61,51 +64,9 @@ router.get(
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
     const clientSettings = await SettingsClean.returnClientSettings();
-    const serverSettings = await SettingsClean.returnSystemSettings();
     const dashStatistics = await PrinterClean.returnDashboardStatistics();
-    let dashboardSettings = null;
-    if (typeof clientSettings.dashboard === "undefined") {
-      dashboardSettings = {
-        defaultLayout: [
-          { x: 0, y: 0, width: 2, height: 5, id: "currentUtil" },
-          { x: 5, y: 0, width: 3, height: 5, id: "farmUtil" },
-          { x: 8, y: 0, width: 2, height: 5, id: "averageTimes" },
-          { x: 10, y: 0, width: 2, height: 5, id: "cumulativeTimes" },
-          { x: 2, y: 0, width: 3, height: 5, id: "currentStat" },
-          { x: 6, y: 5, width: 3, height: 5, id: "printerTemps" },
-          { x: 9, y: 5, width: 3, height: 5, id: "printerUtilisation" },
-          { x: 0, y: 5, width: 3, height: 5, id: "printerStatus" },
-          { x: 3, y: 5, width: 3, height: 5, id: "printerProgress" },
-          { x: 6, y: 10, width: 6, height: 9, id: "hourlyTemper" },
-          { x: 0, y: 10, width: 6, height: 9, id: "weeklyUtil" },
-          { x: 0, y: 19, width: 12, height: 8, id: "enviroData" },
-        ],
-        savedLayout: [],
-        farmActivity: {
-          currentOperations: false,
-          cumulativeTimes: true,
-          averageTimes: true,
-        },
-        printerStates: {
-          printerState: true,
-          printerTemps: true,
-          printerUtilisation: true,
-          printerProgress: true,
-          currentStatus: true,
-        },
-        farmUtilisation: {
-          currentUtilisation: true,
-          farmUtilisation: true,
-        },
-        historical: {
-          weeklyUtilisation: true,
-          hourlyTotalTemperatures: false,
-          environmentalHistory: false,
-        },
-      };
-    } else {
-      dashboardSettings = clientSettings.dashboard;
-    }
+    let dashboardSettings =
+      clientSettings?.dashboard || getDefaultDashboardSettings();
 
     res.render("dashboard", {
       name: req.user.name,
@@ -116,7 +77,7 @@ router.get(
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       helpers: prettyHelpers,
       dashboardSettings: dashboardSettings,
-      dashboardStatistics: dashStatistics,
+      dashboardStatistics: dashStatistics
     });
   }
 );
@@ -134,7 +95,7 @@ router.get(
       page: "Printer Manager",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       printerCount: printers.length,
-      helpers: prettyHelpers,
+      helpers: prettyHelpers
     });
   }
 );
@@ -157,7 +118,7 @@ router.get(
       printerCount: printers.length,
       helpers: prettyHelpers,
       currentOperationsCount: currentOperations.count,
-      fileStatistics,
+      fileStatistics
     });
   }
 );
@@ -168,9 +129,10 @@ router.get(
   ensureCurrentUserAndGroup,
   async (req, res) => {
     const printers = Runner.returnFarmPrinters();
-    const history = await HistoryClean.returnHistory();
-    const statistics = await HistoryClean.returnStatistics();
-    const serverSettings = await SettingsClean.returnSystemSettings();
+    const historyCache = getHistoryCache();
+    const history = historyCache.historyClean;
+    const statistics = historyCache.statisticsClean;
+
     res.render("history", {
       name: req.user.name,
       userGroup: req.user.group,
@@ -180,7 +142,7 @@ router.get(
       printStatistics: statistics,
       helpers: prettyHelpers,
       page: "History",
-      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY]
     });
   }
 );
@@ -193,7 +155,6 @@ router.get(
     const printers = await Runner.returnFarmPrinters();
     const sortedIndex = await Runner.sortedIndex();
     const clientSettings = await SettingsClean.returnClientSettings();
-    const serverSettings = await SettingsClean.returnSystemSettings();
     const dashStatistics = await PrinterClean.returnDashboardStatistics();
     const currentSort = await getSorting();
     const currentFilter = await getFilter();
@@ -216,7 +177,7 @@ router.get(
       clientSettings,
       printGroups,
       currentChanges: { currentSort, currentFilter },
-      dashboardStatistics: dashStatistics,
+      dashboardStatistics: dashStatistics
     });
   }
 );
@@ -252,7 +213,7 @@ router.get(
       clientSettings,
       printGroups,
       currentChanges: { currentSort, currentFilter },
-      dashboardStatistics: dashStatistics,
+      dashboardStatistics: dashStatistics
     });
   }
 );
@@ -286,7 +247,7 @@ router.get(
       helpers: prettyHelpers,
       clientSettings,
       printGroups,
-      currentChanges: { currentSort, currentFilter },
+      currentChanges: { currentSort, currentFilter }
     });
   }
 );
@@ -299,7 +260,6 @@ router.get(
     const printers = await Runner.returnFarmPrinters();
     const sortedIndex = await Runner.sortedIndex();
     const clientSettings = await SettingsClean.returnClientSettings();
-    const serverSettings = await SettingsClean.returnSystemSettings();
     const dashStatistics = await PrinterClean.returnDashboardStatistics();
     const currentSort = await getSorting();
     const currentFilter = await getFilter();
@@ -322,7 +282,7 @@ router.get(
       clientSettings,
       printGroups,
       currentChanges: { currentSort, currentFilter },
-      dashboardStatistics: dashStatistics,
+      dashboardStatistics: dashStatistics
     });
   }
 );
@@ -334,7 +294,6 @@ router.get(
     const printers = await Runner.returnFarmPrinters();
     const sortedIndex = await Runner.sortedIndex();
     const clientSettings = await SettingsClean.returnClientSettings();
-    const serverSettings = await SettingsClean.returnSystemSettings();
 
     res.render("currentOperationsView", {
       name: req.user.name,
@@ -346,7 +305,7 @@ router.get(
       page: "Current Operations",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       helpers: prettyHelpers,
-      clientSettings,
+      clientSettings
     });
   }
 );
@@ -355,13 +314,14 @@ router.get(
   ensureAuthenticated,
   ensureCurrentUserAndGroup,
   async (req, res) => {
+    const historyCache = getHistoryCache();
+    const historyStats = historyCache.generateStatistics();
+
     const printers = Runner.returnFarmPrinters();
     const serverSettings = await SettingsClean.returnSystemSettings();
     const statistics = await FilamentClean.getStatistics();
     const spools = await FilamentClean.getSpools();
     const profiles = await FilamentClean.getProfiles();
-    const sorted = await HistoryClean.returnHistory();
-    const historyStats = await HistoryClean.getStatistics(sorted);
 
     res.render("filament", {
       name: req.user.name,
@@ -375,7 +335,7 @@ router.get(
       spools,
       profiles,
       statistics,
-      historyStats,
+      historyStats
     });
   }
 );
@@ -388,50 +348,10 @@ router.get(
     const serverSettings = await SettingsClean.returnSystemSettings();
     const systemInformation = await SystemInfo.returnInfo();
     const printers = Runner.returnFarmPrinters();
-    const softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
-    let dashboardSettings = null;
-    if (typeof clientSettings.dashboard === "undefined") {
-      dashboardSettings = {
-        defaultLayout: [
-          { x: 0, y: 0, width: 2, height: 5, id: "currentUtil" },
-          { x: 5, y: 0, width: 3, height: 5, id: "farmUtil" },
-          { x: 8, y: 0, width: 2, height: 5, id: "averageTimes" },
-          { x: 10, y: 0, width: 2, height: 5, id: "cumulativeTimes" },
-          { x: 2, y: 0, width: 3, height: 5, id: "currentStat" },
-          { x: 6, y: 5, width: 3, height: 5, id: "printerTemps" },
-          { x: 9, y: 5, width: 3, height: 5, id: "printerUtilisation" },
-          { x: 0, y: 5, width: 3, height: 5, id: "printerStatus" },
-          { x: 3, y: 5, width: 3, height: 5, id: "printerProgress" },
-          { x: 6, y: 10, width: 6, height: 9, id: "hourlyTemper" },
-          { x: 0, y: 10, width: 6, height: 9, id: "weeklyUtil" },
-          { x: 0, y: 19, width: 12, height: 8, id: "enviroData" },
-        ],
-        savedLayout: [],
-        farmActivity: {
-          currentOperations: false,
-          cumulativeTimes: true,
-          averageTimes: true,
-        },
-        printerStates: {
-          printerState: true,
-          printerTemps: true,
-          printerUtilisation: true,
-          printerProgress: true,
-          currentStatus: true,
-        },
-        farmUtilisation: {
-          currentUtilisation: true,
-          farmUtilisation: true,
-        },
-        historical: {
-          weeklyUtilisation: true,
-          hourlyTotalTemperatures: false,
-          environmentalHistory: false,
-        },
-      };
-    } else {
-      dashboardSettings = clientSettings.dashboard;
-    }
+    const softwareUpdateNotification =
+      softwareUpdateChecker.getUpdateNotificationIfAny();
+    let dashboardSettings =
+      clientSettings?.dashboard || getDefaultDashboardSettings();
 
     res.render("system", {
       name: req.user.name,
@@ -451,21 +371,17 @@ router.get(
         isNodemon: isNodemon(),
         isNode: isNode(),
         isPm2: isPm2(),
-        update: softwareUpdateNotification,
-      },
+        update: softwareUpdateNotification
+      }
     });
   }
 );
 
-softwareUpdateChecker
-  .syncLatestOctoFarmRelease(false)
-  .then(() => {
-    softwareUpdateChecker.checkReleaseAndLogUpdate();
-  });
+softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
+  softwareUpdateChecker.checkReleaseAndLogUpdate();
+});
 
-HistoryClean.start();
-
-//Hacky database check due to shoddy layout of code...
+// Hacky database check due to shoddy layout of code...
 const mongoose = require("mongoose");
 const serverSettings = require("../settings/serverSettings");
 
@@ -473,12 +389,19 @@ let interval = false;
 if (interval === false) {
   interval = setInterval(async () => {
     if (mongoose.connection.readyState === 1) {
-      const printersInformation = PrinterClean.returnPrintersInformation();
+      const printersInformation = PrinterClean.listPrintersInformation();
       await PrinterClean.sortCurrentOperations(printersInformation);
       await PrinterClean.statisticsStart();
-      await PrinterClean.createPrinterList(printersInformation, serverSettings.filamentManager);
+      await PrinterClean.createPrinterList(
+        printersInformation,
+        serverSettings.filamentManager
+      );
     }
   }, 2500);
 }
+
+initHistoryCache().catch((e) => {
+  console.error("✓ HistoryCache failed to initiate. " + e);
+});
 
 module.exports = router;

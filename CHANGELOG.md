@@ -2,6 +2,30 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.1.14-rc1]
+
+### Added
+    - Added #546: Node 13 or lower issue webpage with instructions, doesnt restart server anymore  
+
+### Changed
+    - Completely reworked history cache, prepared and tested for OctoFarm V2
+    - Slightly reworked file cache, prepared for V2 and made it robust
+    - Made API tests less prone to unnecessary failure
+    - Reworked the Settings modal to be more resiliant to failure and cleaned up code. 
+    - Slightly reworked job cache, prepared for V2
+
+### Removed
+
+### Fixed
+    - Fixed #531 - Updated settings are not grabbed when opening settings modal
+    - Fixed #532 - Actual save port is not checked against live ports on OctoPrint on settings Modal
+    - Fixed #567: heatmap error (race condition) in PrinterClean for any newly created database
+    - Fixed #576, #577: correct some function calls in PrinterClean
+    - Fixed #542, #381: ensureIndex mongoose warning and circular Runner import resolved 
+    - Fixed #598: printer settingsAppearance missing will not cause failure anymore
+    - Fixed #596: changed OctoPrint plugin manager repository to new route with backwards compatibility version check 
+
+
 ## [v1.1.13-hotfix]
 
 ### Added

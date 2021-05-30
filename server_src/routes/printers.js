@@ -9,9 +9,13 @@ const { Runner } = runner;
 const Logger = require("../lib/logger.js");
 
 const logger = new Logger("OctoFarm-API");
+
 const printerClean = require("../lib/dataFunctions/printerClean.js");
 
 const { PrinterClean } = printerClean;
+
+// Doesn't returns undefined, note to use is incorrect...
+// const { returnPrintersInformation } = require("../cache/printer.cache.js");
 
 const { Script } = require("../lib/serverScripts.js");
 
@@ -98,14 +102,12 @@ router.post("/feedChange", ensureAuthenticated, async (req, res) => {
 });
 router.post("/updateSettings", ensureAuthenticated, async (req, res) => {
   // Check required fields
-
   const settings = req.body;
   logger.info("Update printers request: ", settings);
   const updateSettings = await Runner.updateSettings(settings);
-
   res.send({ status: updateSettings.status, printer: updateSettings.printer });
 });
-router.get("/killPowerSettings/:id", ensureAuthenticated, async (req, res) => {
+router.post("/killPowerSettings/:id", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const printerID = req.params.id;
   const updateSettings = await Runner.killPowerSettings(printerID);
@@ -117,7 +119,7 @@ router.get("/groups", ensureAuthenticated, async (req, res) => {
   for (let i = 0; i < printers.length; i++) {
     await groups.push({
       _id: printers[i]._id,
-      group: printers[i].group,
+      group: printers[i].group
     });
   }
 
@@ -125,25 +127,26 @@ router.get("/groups", ensureAuthenticated, async (req, res) => {
 });
 router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
   const id = req.body.i;
+  const returnPrinter = await PrinterClean.getPrintersInformationById(id);
+  res.send(returnPrinter);
+});
 
-  const printers = await PrinterClean.returnPrintersInformation();
-  if (typeof id === "undefined" || id === null) {
-    res.send(printers);
-  } else {
-    const index = _.findIndex(printers, function (o) {
-      //Make sure ID's are both strings to stop recursion issues
-      return o._id == id;
-    });
-    const returnPrinter = {
-      printerName: printers[index].printerName,
-      apikey: printers[index].apikey,
-      _id: printers[index]._id,
-      printerURL: printers[index].printerURL,
-      storage: printers[index].storage,
-      fileList: printers[index].fileList,
-      systemChecks: printers[index].systemChecks,
-    };
-    res.send(returnPrinter);
+router.post("/updatePrinterSettings", ensureAuthenticated, async (req, res) => {
+  const id = req.body.i;
+  if (!id) {
+    logger.error("Printer Settings: No ID key was provided");
+    res.statusMessage = "No ID key was provided";
+    res.sendStatus(400);
+    return;
+  }
+  try {
+    await Runner.getLatestOctoPrintSettingsValues(id);
+    let printerInformation = PrinterClean.getPrintersInformationById(id);
+    res.send(printerInformation);
+  } catch (e) {
+    logger.error(`The server couldn't update your printer settings! ${e}`);
+    res.statusMessage = `The server couldn't update your printer settings! ${e}`;
+    res.sendStatus(500);
   }
 });
 
@@ -155,7 +158,7 @@ router.post("/runner/checkOffline", ensureAuthenticated, async (req, res) => {
   }
   res.send({
     printers: "All",
-    msg: " Were successfully rescanned...",
+    msg: " Were successfully rescanned..."
   });
 });
 
@@ -247,7 +250,7 @@ router.get("/pluginList/:id", ensureAuthenticated, async (req, res) => {
 });
 router.get("/scanNetwork", ensureAuthenticated, async (req, res) => {
   const {
-    searchForDevicesOnNetwork,
+    searchForDevicesOnNetwork
   } = require("../../server_src/runners/autoDiscovery.js");
 
   let devices = await searchForDevicesOnNetwork();

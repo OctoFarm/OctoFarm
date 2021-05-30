@@ -27,12 +27,20 @@ describe("History:Runner", () => {
 
   const testFilename = "test.file";
   const testUrl = "totally.illegal test.url";
-  const testId = "totally.illegal id with code fs.removeFile(\"~/.ssh/authorizedKeys\")";
+  const testId =
+    'totally.illegal id with code fs.removeFile("~/.ssh/authorizedKeys")';
   const totallyInvalidServerSettings = {};
 
   it("should be able to download an OctoPrint timelapse", async () => {
-    const response = await HistoryCollection.grabTimeLapse(testFilename, testUrl, testId, totallyInvalidServerSettings);
+    const response = await HistoryCollection.grabTimeLapse(
+      testFilename,
+      testUrl,
+      testId,
+      totallyInvalidServerSettings
+    );
 
-    expect(response).toContain(`images/historyCollection/timelapses/${testId}-${testFilename}`);
+    expect(response).toContain(
+      `images/historyCollection/timelapses/${testId}-${testFilename}`
+    );
   });
 });
