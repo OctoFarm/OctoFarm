@@ -20,6 +20,7 @@ const { JobClean } = require("../lib/dataFunctions/jobClean.js");
 const { FileClean } = require("../lib/dataFunctions/fileClean.js");
 const { FilamentClean } = require("../lib/dataFunctions/filamentClean.js");
 const { PrinterTicker } = require("./printerTicker.js");
+const {checkPluginManagerAPIDeprecation} = require("../utils/compatibility.utils");
 
 const logger = new Logger("OctoFarm-State");
 let farmPrinters = [];
@@ -2541,10 +2542,13 @@ class Runner {
       "Active",
       farmPrinters[index]._id
     );
+
+    const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(farmPrinters[index].octoPrintVersion);
+
     return ClientAPI.getRetry(
       farmPrinters[index].printerURL,
       farmPrinters[index].apikey,
-      "api/plugin/pluginmanager"
+        printerManagerApiCompatible ? "plugin/pluginmanager/repository" : "api/plugin/pluginmanager"
     )
       .then((res) => {
         return res.json();
@@ -2554,7 +2558,7 @@ class Runner {
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
-          "Grabbed plugin list",
+          `Grabbed plugin list (OctoPrint compatibility: ${farmPrinters[index].octoPrintVersion})`,
           "Complete",
           farmPrinters[index]._id
         );
@@ -2741,7 +2745,7 @@ class Runner {
     }
   }
 
-  static getSettings(id) {
+  static async getSettings(id) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
@@ -2765,7 +2769,7 @@ class Runner {
         // Update info to DB
         farmPrinters[index].corsCheck = res.api.allowCrossOrigin;
         farmPrinters[index].settingsApi = res.api;
-        if (farmPrinters[index].settingsAppearance === "undefined") {
+        if (!farmPrinters[index].settingsAppearance) {
           farmPrinters[index].settingsAppearance = res.appearance;
         } else if (farmPrinters[index].settingsAppearance.name === "") {
           farmPrinters[index].settingsAppearance.name = res.appearance.name;
@@ -2820,7 +2824,7 @@ class Runner {
             };
             const printer = await Printers.findById(id);
 
-            printer.save();
+            await printer.save();
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[index].printerURL,
@@ -2863,7 +2867,7 @@ class Runner {
             };
             const printer = await Printers.findById(id);
 
-            printer.save();
+            await printer.save();
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[index].printerURL,
@@ -2895,7 +2899,7 @@ class Runner {
             }
             const printer = await Printers.findById(id);
             printer.camURL = farmPrinters[index].camURL;
-            printer.save();
+            await printer.save();
           }
         }
 
