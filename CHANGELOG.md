@@ -27,6 +27,7 @@ All notable changes to this project will be documented in this file.
     - Fixed #542, #381: ensureIndex mongoose warning and circular Runner import resolved 
     - Fixed #598: printer settingsAppearance missing will not cause failure anymore
     - Fixed #596: changed OctoPrint plugin manager repository to new route with backwards compatibility version check 
+    - Fixed #555: Offline after error not caught by OctoFarm. 1.6.0+
     - Fixed #609: Bulk printer functions wouldn't load due to small regression bug
     - Fixed #587: Changing printer URL doesn't rescan for changes when using settings modal.
     - Fixed #592: Printer host is marked Online when URL is not correct / fake

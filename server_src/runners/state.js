@@ -522,7 +522,10 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         data.current.state.text = "Disconnected";
         farmPrinters[this.index].stateDescription =
           "Your printer is disconnected";
-      } else if (data.current.state.text.includes("Error:")) {
+      } else if (
+        data.current.state.text.includes("Error:") ||
+        data.current.state.text.includes("error")
+      ) {
         farmPrinters[this.index].stateDescription = data.current.state.text;
         data.current.state.text = "Error!";
       } else if (data.current.state.text === "Closed") {
@@ -3056,6 +3059,9 @@ class Runner {
     }
     if (state === "Online") {
       return { name: "success", hex: "#00330e", category: "Idle" };
+    }
+    if (state === "Offline after error") {
+      return { name: "danger", hex: "#2e0905", category: "Error!" };
     }
     return { name: "warning", hex: "#583c0e", category: "Active" };
   }
