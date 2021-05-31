@@ -64,11 +64,11 @@ async function ensureSystemSettingsInitiated() {
   });
 
   // Setup Settings as connection is established
-  const serverSettings = await ServerSettings.init();
+  const serverSettingsStatus = await ServerSettings.init();
   await ClientSettings.init();
-  logger.info(serverSettings);
+  logger.info(serverSettingsStatus);
 
-  return serverSettings;
+  return serverSettingsStatus;
 }
 
 function serveOctoFarmRoutes(app) {
