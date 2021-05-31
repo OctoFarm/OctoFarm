@@ -242,7 +242,6 @@ bulkOctoPrintUpdateButton.addEventListener("click", async (e) => {
             targets: ["octoprint"],
             force: true
           };
-          console.log(toUpdate[i].printerURL);
           let updateRequest = await OctoPrintClient.postNOAPI(
             toUpdate[i],
             "plugin/softwareupdate/update",
