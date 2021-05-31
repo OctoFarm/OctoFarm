@@ -73,7 +73,7 @@ describe("State", () => {
       apikey: "allaroundtheglobal",
       printerURL: "http://someurl/"
     });
-    
+
     expect(comparisonResult3).toEqual(true);
   });
 
