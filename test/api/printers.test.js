@@ -19,10 +19,8 @@ describe("Printers", () => {
         .post("/printers/printerInfo")
         .send();
 
-    // Assert input validation failed
     expect(res.statusCode).toEqual(200);
     expect(res.body).toEqual([]);
-    // expect(res.res.statusMessage).toEqual("No ID key was provided");
 
     done();
   }, 10000);
@@ -34,7 +32,6 @@ describe("Printers", () => {
           i: 'asd'
         });
 
-    // Assert input validation failed
     expect(res.statusCode).toEqual(200);
     expect(res.body).toEqual({});
 
