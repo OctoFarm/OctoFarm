@@ -52,6 +52,10 @@ const PrinterSchema = new mongoose.Schema({
     type: String,
     required: false
   },
+  webSocketURL: {
+    type: String,
+    required: false
+  },
   octoPrintVersion: {
     type: String,
     required: false
