@@ -71,9 +71,6 @@ class PrinterClean {
    * @returns {{}|undefined}
    */
   static getPrintersInformationById(id) {
-    if (!id) {
-      return printersInformation;
-    }
     return _.find(printersInformation, function (o) {
       return o._id == id;
     });

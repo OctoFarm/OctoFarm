@@ -127,8 +127,15 @@ router.get("/groups", ensureAuthenticated, async (req, res) => {
 });
 router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
   const id = req.body.i;
-  const returnPrinter = await PrinterClean.getPrintersInformationById(id);
-  res.send(returnPrinter);
+  let returnedPrinterInformation;
+  if (!id) {
+    returnedPrinterInformation = PrinterClean.listPrintersInformation();
+  } else {
+    returnedPrinterInformation = await PrinterClean.getPrintersInformationById(
+      id
+    );
+  }
+  res.send(returnedPrinterInformation);
 });
 
 router.post("/updatePrinterSettings", ensureAuthenticated, async (req, res) => {
