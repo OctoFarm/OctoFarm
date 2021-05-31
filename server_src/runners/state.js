@@ -3281,6 +3281,8 @@ class Runner {
       }
 
       // Update the baudrate preferences.
+      // This would also currently need silly blank checking in place due to the client. Will sort in the refactor.
+      // TODO: Update this mechanism in the refactor... and the rest XD
       farmPrinters[index].options = {
         baudratePreference: settings.connection.preferredBaud,
         portPreference: settings.connection.preferredPort,
