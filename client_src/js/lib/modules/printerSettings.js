@@ -1385,7 +1385,7 @@ class PrinterSettings {
       currentPrinter.systemChecks.cleaning.job.date
     )}`;
     pageElements.connectPage.stateClean.className = `btn btn-${currentPrinter.systemChecks.cleaning.job.status} mb-1 btn-block`;
-
+    printerOnline = currentPrinter.printerState.colour.category !== "Offline";
     if (!printerOnline) {
       pageElements.menu.printerProfileBtn.disabled = true;
       pageElements.menu.printerGcodeBtn.disabled = true;
@@ -1401,6 +1401,21 @@ class PrinterSettings {
         !pageElements.menu.printerOtherSettings.classList.contains("notyet")
       ) {
         pageElements.menu.printerOtherSettings.classList.add("notyet");
+      }
+    } else {
+      pageElements.mainPage.offlineMessage.innerHTML = "";
+      pageElements.menu.printerProfileBtn.disabled = false;
+      pageElements.menu.printerGcodeBtn.disabled = false;
+      pageElements.menu.printerOtherSettings.disabled = false;
+
+      if (pageElements.menu.printerProfileBtn.classList.contains("notyet")) {
+        pageElements.menu.printerProfileBtn.classList.remove("notyet");
+      }
+      if (pageElements.menu.printerGcodeBtn.classList.contains("notyet")) {
+        pageElements.menu.printerGcodeBtn.classList.remove("notyet");
+      }
+      if (pageElements.menu.printerOtherSettings.classList.contains("notyet")) {
+        pageElements.menu.printerOtherSettings.classList.remove("notyet");
       }
     }
   }

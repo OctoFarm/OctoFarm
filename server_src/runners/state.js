@@ -2029,9 +2029,7 @@ class Runner {
         );
         const { _id } = farmPrinters[index];
         await this.setupWebSocket(_id, skipAPI);
-      } else if (
-        farmPrinters[index].ws.instance.readyState === 2
-      ) {
+      } else if (farmPrinters[index].ws.instance.readyState === 2) {
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
@@ -2999,13 +2997,17 @@ class Runner {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
-    // This is why the settings we're not updating! Forgot that connection options and preferences come in state, not settings/system.
-    await Runner.getState(id);
-    // Update the printers cached settings from OctoPrint
-    await Runner.getSettings(id);
-    // Update the printers cached system settings from OctoPrint
-    await Runner.getSystem(id);
-    // Re-generate the printer clean information - This is just cautionary, my tests showed it wasn't needed.
+    // This was causing slowdown of settings pages when loading, we should only be running this command when printer is considered online.
+    if (farmPrinters[index].state !== "Offline") {
+      // This is why the settings we're not updating! Forgot that connection options and preferences come in state, not settings/system.
+      await Runner.getState(id);
+      // Update the printers cached settings from OctoPrint
+      await Runner.getSettings(id);
+      // Update the printers cached system settings from OctoPrint
+      await Runner.getSystem(id);
+      // Re-generate the printer clean information - This is just cautionary, my tests showed it wasn't needed.
+    }
+
     await PrinterClean.generate(
       farmPrinters[index],
       systemSettings.filamentManager
@@ -3217,35 +3219,34 @@ class Runner {
       });
       let updatePrinter = false;
       if (
-        settings.printer.printerName.toString() !== "" &&
-        settings.printer.toString() !==
-          farmPrinters[index].settingsAppearance.name.toString()
+        settings.printer.printerName !== "" &&
+        settings.printer.printerName !==
+          farmPrinters[index].settingsAppearance.name
       ) {
         farmPrinters[index].settingsAppearance.name =
           settings.printer.printerName;
         printer.settingsAppearance.name = settings.printer.printerName;
         printer.markModified("settingsApperance");
         updatePrinter = true;
-      } else {
       }
       let profile = {};
       let sett = {};
       profile.status = 900;
       sett.status = 900;
       if (
-        settings.printer.printerURL.toString() !== "" &&
-        settings.printer.printerURL.toString() !==
-          farmPrinters[index].printerURL.toString()
+        settings.printer.printerURL !== "" &&
+        settings.printer.printerURL !== farmPrinters[index].printerURL
       ) {
         farmPrinters[index].printerURL = settings.printer.printerURL;
         printer.printerURL = settings.printer.printerURL;
         printer.markModified("printerURL");
         updatePrinter = true;
       }
+
       const currentWebSocketURL = new URL(farmPrinters[index].webSocketURL);
       if (
-        settings.printer.webSocketProtocol.toString() !==
-        currentWebSocketURL.protocol + "//".toString()
+        settings.printer.webSocketProtocol !==
+        currentWebSocketURL.protocol + "//"
       ) {
         // If we detect q difference then rebuild the websocket URL and mark for scan.
         printer.webSocketURL =
@@ -3263,6 +3264,7 @@ class Runner {
         printer.camURL = settings.printer.cameraURL;
         printer.markModified("camURL");
       }
+      // Moved the update printer before the API print calls as it was causing errors to be caught in the api calls when offline... This was why it wasn't updating I believe as it was never firing the rescan code due to the catch.
       if (
         settings.printer.apikey !== "" &&
         settings.printer.apikey !== farmPrinters[index].apikey
@@ -3272,13 +3274,18 @@ class Runner {
         printer.markModified("apikey");
         updatePrinter = true;
       }
+
+      // Make sure OctoPrint status is updated before continuing on with settings...
+      if (updatePrinter) {
+        await Runner.reScanOcto(farmPrinters[index]._id, false);
+      }
+
       // Preferred Only update on live
-      farmPrinters[index].options.baudratePreference =
-        settings.connection.preferredBaud;
-      farmPrinters[index].options.portPreference =
-        settings.connection.preferredPort;
-      farmPrinters[index].options.printerProfilePreference =
-        settings.connection.preferredProfile;
+      farmPrinters[index].options = {
+        baudratePreference: settings.connection.preferredBaud,
+        portPreference: settings.connection.preferredPort,
+        printerProfilePreference: settings.connection.preferredProfile
+      };
 
       if (
         typeof settings.other !== "undefined" &&
@@ -3409,29 +3416,21 @@ class Runner {
       if (settings.systemCommands.serverRestart !== "") {
         farmPrinters[index].settingsServer.commands.serverRestartCommand =
           settings.systemCommands.serverRestart;
-      } else {
-        settings.systemCommands.serverRestart =
-          farmPrinters[index].settingsServer.commands.serverRestartCommand;
       }
       if (settings.systemCommands.systemRestart !== "") {
         farmPrinters[index].settingsServer.commands.systemRestartCommand =
           settings.systemCommands.systemRestart;
-      } else {
-        settings.systemCommands.systemRestart =
-          farmPrinters[index].settingsServer.commands.systemRestartCommand;
       }
       if (settings.systemCommands.systemShutdown !== "") {
         farmPrinters[index].settingsServer.commands.systemShutdownCommand =
           settings.systemCommands.systemShutdown;
-      } else {
-        settings.systemCommands.systemShutdown =
-          farmPrinters[index].settingsServer.commands.systemShutdownCommand;
       }
 
       printer.save().catch((e) => {
         logger.error(JSON.stringify(e), "ERROR savin power settings.");
       });
-      if (settings.state !== "Offline") {
+      // Made the state check from the server, not the client...
+      if (farmPrinters[index].state !== "Offline") {
         // Gocde update printer and Live
         let updateOctoPrintGcode = {};
         for (const key in settings.gcode) {
@@ -3459,12 +3458,13 @@ class Runner {
               serverRestartCommand: settings.systemCommands.serverRestart
             }
           },
+          // Due to now grabbing the updated state, the client won't have actually sent the "Other" settings tab so these would be undefined.
           webcam: {
-            webcamEnabled: settings.other.enableCamera,
-            timelapseEnabled: settings.other.enableTimeLapse,
-            rotate90: settings.other.rotateCamera,
-            flipH: settings.other.flipHCamera,
-            flipV: settings.other.flipVCamera
+            webcamEnabled: settings.other?.enableCamera,
+            timelapseEnabled: settings.other?.enableTimeLapse,
+            rotate90: settings.other?.rotateCamera,
+            flipH: settings.other?.flipHCamera,
+            flipV: settings.other?.flipVCamera
           }
         };
 
@@ -3503,9 +3503,7 @@ class Runner {
       }
 
       PrinterClean.generate(farmPrinters[index], filamentManager);
-      if (updatePrinter) {
-        Runner.reScanOcto(farmPrinters[index]._id, false);
-      }
+
       return {
         status: {
           octofarm: 200,

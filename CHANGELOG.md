@@ -15,6 +15,7 @@ All notable changes to this project will be documented in this file.
     - Reworked the Settings modal to be more resiliant to failure and cleaned up code. 
     - Slightly reworked job cache, prepared for V2
     - Added the ability to override the automatic wss:// select for HTTPS in printer settings modal. 
+    - Added the ability for settings dialog to return to "Printer Online" view when printer comes online in background / from settings changes.
 
 ### Removed
 
