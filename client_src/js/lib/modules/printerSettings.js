@@ -1385,7 +1385,7 @@ class PrinterSettings {
       currentPrinter.systemChecks.cleaning.job.date
     )}`;
     pageElements.connectPage.stateClean.className = `btn btn-${currentPrinter.systemChecks.cleaning.job.status} mb-1 btn-block`;
-    printerOnline = currentPrinter.printerState.colour.category !== "Offline";
+
     if (!printerOnline) {
       pageElements.menu.printerProfileBtn.disabled = true;
       pageElements.menu.printerGcodeBtn.disabled = true;
