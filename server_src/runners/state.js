@@ -1954,9 +1954,7 @@ class Runner {
         );
         const { _id } = farmPrinters[index];
         await this.setupWebSocket(_id, skipAPI);
-      } else if (
-        farmPrinters[index].ws.instance.readyState === 2
-      ) {
+      } else if (farmPrinters[index].ws.instance.readyState === 2) {
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
@@ -2454,7 +2452,7 @@ class Runner {
       "Active",
       farmPrinters[index]._id
     );
-    
+
     return this.octoPrintService
       .getPluginManager(farmPrinters[index], true)
       .then((res) => {
