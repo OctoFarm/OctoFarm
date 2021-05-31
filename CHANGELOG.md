@@ -12,9 +12,10 @@ All notable changes to this project will be documented in this file.
     - Completely reworked history cache, prepared and tested for OctoFarm V2
     - Slightly reworked file cache, prepared for V2 and made it robust
     - Made API tests less prone to unnecessary failure
-    - Reworked the Settings modal to be more resiliant to failure and cleaned up code. 
+    - Reworked the Settings modal to be more resiliant to failure and cleaned up code
     - Slightly reworked job cache, prepared for V2
-    - Added the ability to override the automatic wss:// select for HTTPS in printer settings modal. 
+    - Added the ability to override the automatic wss:// select for HTTPS in printer settings modal
+    - The core `state` of OctoFarm is split off of OctoPrint and added possibilities to test it fully 
 
 ### Removed
 
@@ -28,44 +29,45 @@ All notable changes to this project will be documented in this file.
     - Fixed #596: changed OctoPrint plugin manager repository to new route with backwards compatibility version check 
     - Fixed #555: Offline after error not caught by OctoFarm. 1.6.0+
     - Fixed #609: Bulk printer functions wouldn't load due to small regression bug
-    - Fixed #587: Changing printer URL doesn't rescan for changes when using settings modal.
+    - Fixed #587: Changing printer URL doesn't rescan for changes when using settings modal
     - Fixed #592: Printer host is marked Online when URL is not correct / fake
+    - Fixed #574: Reworked the statejs OctoPrint client and added tests
 
 
 ## [v1.1.13-hotfix]
 
 ### Added
-    - Ability to use the AUTO option for baudrate.
-    - Ability to click update button to go to system page.
+    - Ability to use the AUTO option for baudrate
+    - Ability to click update button to go to system page
 
 ### Changed
-    - Completely re-worked the auto updater mechanism.
+    - Completely re-worked the auto updater mechanism
     - Completely re-worked the npm check and installation mechanism for the auto updater 
 
 ### Removed
 
 ### Fixed
     - Fixed #500: Connection to printer would fail when both baudrate and port are set to "AUTO"
-    - Fixed #501: Restart command fired too fast which resulted in no confirmation/error notification on client. 
-    - Fixed #495: Check for update would result in double notifications for airgapped farms.
-    - Fixed #498: Fix package version not always preset and synced correctly when not running npm commands, f.e. pm2.
+    - Fixed #501: Restart command fired too fast which resulted in no confirmation/error notification on client.
+    - Fixed #495: Check for update would result in double notifications for airgapped farms
+    - Fixed #498: Fix package version not always preset and synced correctly when not running npm commands, f.e. pm2
 
 
 ## [v1.1.13]
 
 ### Added
-    - Added #361: OctoFarm release check and notification sets ground work for automatic updates.
+    - Added #361: OctoFarm release check and notification sets ground work for automatic updates
     - Added #373: Migrated MongoUri in config/db.js to new .env file format as MONGO=...
     - Added #374: Migrated server port to .env file as OCTOFARM_PORT=...
     - Added #351: Background image now ignored and copied from default if not present at start.
-    - Added #382: Add in ability for OctoFarm to update itself with the current pm2/git implementation.
-        - This is actioned by two new section inside Server -> System. Two new buttons "Force Check", "Update". 
-    - Added #421: OctoFarm data dump. Generates a bundled zip file for download that includes all system logs and a service_information.txt file.
+    - Added #382: Add in ability for OctoFarm to update itself with the current pm2/git implementation
+        - This is actioned by two new section inside Server -> System. Two new buttons "Force Check", "Update".
+    - Added #421: OctoFarm data dump. Generates a bundled zip file for download that includes all system logs and a service_information.txt file
     - Added #296: Ability to define your own page title with an Environment Variable
 
 ### Changed
-    - Disabled Restart button when not using pm2 process manager.
-    - Node 12 now not supported. Node 14 is a minimum requirement.
+    - Disabled Restart button when not using pm2 process manager
+    - Node 12 now not supported. Node 14 is a minimum requirement
 
 ### Removed
     - Ability to change the port in the UI. This is now managed by environment variables. UI option will be back soon.
