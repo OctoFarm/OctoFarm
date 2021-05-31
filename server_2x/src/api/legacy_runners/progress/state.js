@@ -1206,7 +1206,7 @@ class Runner {
                         farmPrinters[i]._id,
                     );
                     await farmPrinters[i].ws.open(
-                        `ws://${farmPrinters[i].printerURL}/sockjs/websocket`,
+                        `${farmPrinters[i].printerURL}/sockjs/websocket`,
                         i,
                     );
                 } else {

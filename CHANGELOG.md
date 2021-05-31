@@ -5,7 +5,8 @@ All notable changes to this project will be documented in this file.
 ## [v1.1.14-rc1]
 
 ### Added
-    - Added #546: Node 13 or lower issue webpage with instructions, doesnt restart server anymore  
+    - Added #546: Node 13 or lower issue webpage with instructions, doesnt restart server anymore 
+    - Added #509: HTTP/HTTPS support for websocket connections
 
 ### Changed
     - Completely reworked history cache, prepared and tested for OctoFarm V2
@@ -13,6 +14,7 @@ All notable changes to this project will be documented in this file.
     - Made API tests less prone to unnecessary failure
     - Reworked the Settings modal to be more resiliant to failure and cleaned up code. 
     - Slightly reworked job cache, prepared for V2
+    - Added the ability to override the automatic wss:// select for HTTPS in printer settings modal. 
 
 ### Removed
 
@@ -24,8 +26,8 @@ All notable changes to this project will be documented in this file.
     - Fixed #542, #381: ensureIndex mongoose warning and circular Runner import resolved 
     - Fixed #598: printer settingsAppearance missing will not cause failure anymore
     - Fixed #596: changed OctoPrint plugin manager repository to new route with backwards compatibility version check 
-
-
+    - Fixed #587: Changing printer URL doesn't rescan for changes when using settings modal.
+    - Fixed #592: Printer host is marked Online when URL is not correct / fake
 ## [v1.1.13-hotfix]
 
 ### Added
