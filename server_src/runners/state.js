@@ -3280,7 +3280,7 @@ class Runner {
         await Runner.reScanOcto(farmPrinters[index]._id, false);
       }
 
-      // Preferred Only update on live
+      // Update the baudrate preferences.
       farmPrinters[index].options = {
         baudratePreference: settings.connection.preferredBaud,
         portPreference: settings.connection.preferredPort,
