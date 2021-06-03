@@ -440,7 +440,14 @@ export class HistoryCache implements IHistoryCache {
         };
     }
 
-    private getSpool(filamentSelection, job, success, time) {
+    /**
+     * Util, could be moved
+     * @param filamentSelection
+     * @param job
+     * @param success
+     * @param time
+     */
+    public getSpool(filamentSelection, job, success, time) {
         // Fix for old database states
         if (!job?.filament) {
             return null;
