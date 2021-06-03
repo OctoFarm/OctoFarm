@@ -1,13 +1,13 @@
 import { JobStatisticsModel } from "../models/job-statistics.model";
-import { IJobCache } from "../interfaces/job-cache-interface";
 import { getPrintCostNumeric } from "../utils/print-cost.util";
 import { HistoryCache } from "./history.cache";
 import { floatOrZero } from "../utils/number.util";
 import {Injectable} from "@nestjs/common";
+import {IJobStatisticsService} from "../interfaces/job-statistics-service-interface";
 const { DateTime } = require("luxon");
 
 @Injectable()
-export class JobStatisticsService implements IJobCache {
+export class JobStatisticsService implements IJobStatisticsService {
   cleanJobs: JobStatisticsModel[];
 
   constructor(private historyCache: HistoryCache) {
