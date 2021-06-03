@@ -1,20 +1,20 @@
 import { JobStatisticsModel } from "../models/job-statistics.model";
 import { IJobCache } from "../interfaces/job-cache-interface";
-import {getPrintCostNumeric} from "../utils/print-cost.util";
-import {HistoryCache} from "./history.cache";
-import {floatOrZero} from "../utils/number.util";
+import { getPrintCostNumeric } from "../utils/print-cost.util";
+import { HistoryCache } from "./history.cache";
+import { floatOrZero } from "../utils/number.util";
+import {Injectable} from "@nestjs/common";
 const { DateTime } = require("luxon");
 
-export class JobCache implements IJobCache {
+@Injectable()
+export class JobStatisticsService implements IJobCache {
   cleanJobs: JobStatisticsModel[];
 
-  constructor(
-      private historyCache: HistoryCache
-  ) {
+  constructor(private historyCache: HistoryCache) {
     this.cleanJobs = [];
   }
 
-  getCompletionDate(printTimeLeftSeconds, completion) {
+  static getCompletionDate(printTimeLeftSeconds, completion) {
     if (completion === 100) {
       return "No Active Job";
     }
@@ -26,6 +26,7 @@ export class JobCache implements IJobCache {
   getCleanJobAtIndex(p): JobStatisticsModel {
     return this.cleanJobs[p];
   }
+
   /**
    * Generate current job report
    */
@@ -121,7 +122,7 @@ export class JobCache implements IJobCache {
         Math.round(
           (printerProgress.printTimeLeft + printerProgress.printTime) / 1000
         ) * 1000;
-      currentJob.expectedCompletionDate = this.getCompletionDate(
+      currentJob.expectedCompletionDate = JobStatisticsService.getCompletionDate(
         printerProgress.printTimeLeft,
         printerProgress.completion
       );
