@@ -60,7 +60,7 @@
     "systeminformation": "^5.6.12",
     "wake_on_lan": "^1.0.0",
     "winston": "^3.3.3",
-    "ws": "^7.4.3",
+    "ws": "^7.4.6",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {
