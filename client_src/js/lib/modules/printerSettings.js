@@ -80,7 +80,7 @@ async function updatePrinterSettingsModal(printersInformation, printerID) {
 
     //Convert online state to a boolean
     printerOnline = currentPrinter.printerState.colour.category !== "Offline";
-
+    PrinterSettings.updateStateElements(currentPrinter);
     // Clear the page of old values.
     UI.clearSelect("ps");
 
@@ -179,9 +179,12 @@ async function updatePrinterSettingsModal(printersInformation, printerID) {
       }
     }
     // Setup Refresh Settings Button
-    await PrinterSettings.setupRefreshButton(currentPrinter);
+    await PrinterSettings.setupRefreshButton(
+      currentPrinter,
+      printersInformation
+    );
     // Setup Save Settings button
-    await PrinterSettings.setupSaveButton(currentPrinter);
+    await PrinterSettings.setupSaveButton(currentPrinter, printersInformation);
 
     // Remove any loadng elements left over
     Object.values(pageElements.menu).map((e) => {
@@ -196,7 +199,6 @@ class PrinterSettings {
     const printersIndex = _.findIndex(printersInformation, function (o) {
       return o._id == printerID;
     });
-
     if (printersIndex !== -1) {
       currentPrinterIndex = printersIndex;
     } else {
@@ -1015,7 +1017,7 @@ class PrinterSettings {
       `;
   }
 
-  static async setupSaveButton(currentPrinter) {
+  static async setupSaveButton(currentPrinter, printersInformation) {
     pageElements.menu.printerMenuFooter.insertAdjacentHTML(
       "beforeend",
       '<button id="savePrinterSettingsBtn" type="button" class="btn btn-success btn-block" id="savePrinterSettingsBtn">Save Settings</button>'
@@ -1038,7 +1040,7 @@ class PrinterSettings {
             );
           UI.createAlert("info", serverResponseMessage, 5000, "clicked");
           await updatePrinterSettingsModal(
-            [currentPrinter],
+            printersInformation,
             currentPrinter._id
           );
         } catch (e) {
@@ -1054,7 +1056,7 @@ class PrinterSettings {
       });
   }
 
-  static async setupRefreshButton(currentPrinter) {
+  static async setupRefreshButton(currentPrinter, printersInformation) {
     pageElements.menu.printerMenuFooter.innerHTML = "";
     pageElements.menu.printerMenuFooter.insertAdjacentHTML(
       "beforeend",
@@ -1065,7 +1067,10 @@ class PrinterSettings {
       .getElementById("settingsPageRefreshButton")
       .addEventListener("click", async (event) => {
         UI.addLoaderToElementsInnerHTML(event.target);
-        await updatePrinterSettingsModal([currentPrinter], currentPrinter._id);
+        await updatePrinterSettingsModal(
+          printersInformation,
+          currentPrinter._id
+        );
         UI.createAlert(
           "success",
           "Successfully reloaded your OctoPrint Settings",
@@ -1340,7 +1345,7 @@ class PrinterSettings {
       });
       throw new Error("Cannot apply state as no printer index can be found...");
     }
-
+    pageElements.mainPage.title.innerHTML = `Printer Settings: ${currentPrinter.printerName}`;
     pageElements.mainPage.status.innerHTML = `<b>Printer Status</b><br>${currentPrinter.printerState.state}`;
     pageElements.mainPage.status.className = `btn btn-${currentPrinter.printerState.colour.name} mb-1 btn-block`;
     pageElements.mainPage.host.innerHTML = `<b>Host Status</b><br>${currentPrinter.hostState.state}`;
