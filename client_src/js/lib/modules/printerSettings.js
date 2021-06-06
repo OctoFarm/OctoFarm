@@ -8,6 +8,7 @@ let printerOnline;
 let currentPrinter;
 let hasErrorNotificationBeenTriggered = false;
 let pageElements;
+let currentPrintersInformation;
 
 // Close modal event listeners...
 $("#connectionModal").on("hidden.bs.modal", function (e) {
@@ -179,12 +180,9 @@ async function updatePrinterSettingsModal(printersInformation, printerID) {
       }
     }
     // Setup Refresh Settings Button
-    await PrinterSettings.setupRefreshButton(
-      currentPrinter,
-      printersInformation
-    );
+    await PrinterSettings.setupRefreshButton(currentPrinter);
     // Setup Save Settings button
-    await PrinterSettings.setupSaveButton(currentPrinter, printersInformation);
+    await PrinterSettings.setupSaveButton(currentPrinter);
 
     // Remove any loadng elements left over
     Object.values(pageElements.menu).map((e) => {
@@ -195,6 +193,7 @@ async function updatePrinterSettingsModal(printersInformation, printerID) {
 
 class PrinterSettings {
   static updateCurrentPrinterIndex(printersInformation, printerID) {
+    currentPrintersInformation = printersInformation;
     // Printer ID we need to initialise the page.
     const printersIndex = _.findIndex(printersInformation, function (o) {
       return o._id == printerID;
@@ -1017,7 +1016,7 @@ class PrinterSettings {
       `;
   }
 
-  static async setupSaveButton(currentPrinter, printersInformation) {
+  static async setupSaveButton(currentPrinter) {
     pageElements.menu.printerMenuFooter.insertAdjacentHTML(
       "beforeend",
       '<button id="savePrinterSettingsBtn" type="button" class="btn btn-success btn-block" id="savePrinterSettingsBtn">Save Settings</button>'
@@ -1040,7 +1039,7 @@ class PrinterSettings {
             );
           UI.createAlert("info", serverResponseMessage, 5000, "clicked");
           await updatePrinterSettingsModal(
-            printersInformation,
+            currentPrintersInformation,
             currentPrinter._id
           );
         } catch (e) {
@@ -1056,7 +1055,7 @@ class PrinterSettings {
       });
   }
 
-  static async setupRefreshButton(currentPrinter, printersInformation) {
+  static async setupRefreshButton(currentPrinter) {
     pageElements.menu.printerMenuFooter.innerHTML = "";
     pageElements.menu.printerMenuFooter.insertAdjacentHTML(
       "beforeend",
@@ -1068,7 +1067,7 @@ class PrinterSettings {
       .addEventListener("click", async (event) => {
         UI.addLoaderToElementsInnerHTML(event.target);
         await updatePrinterSettingsModal(
-          printersInformation,
+          currentPrintersInformation,
           currentPrinter._id
         );
         UI.createAlert(
