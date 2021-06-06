@@ -4,7 +4,7 @@ import {TestProviders} from "../../../test/base/test.provider";
 import {getRepositoryToken} from "@nestjs/typeorm";
 import {PrinterGroup} from "../entities/printer-group.entity";
 
-describe('PrinterGroupsService', () => {
+describe(PrinterGroupsService.name, () => {
     let service: PrinterGroupsService;
 
     beforeEach(async () => {
