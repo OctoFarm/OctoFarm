@@ -1960,7 +1960,6 @@ const pluginAction = async function (action) {
       });
     }
   }
-
 };
 const blkPluginsBtn = document.getElementById("blkPluginsInstallBtn");
 blkPluginsBtn.addEventListener("click", async (e) => {
