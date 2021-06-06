@@ -387,7 +387,8 @@ class PrinterClean {
         dateAdded: farmPrinter.dateAdded,
         corsCheck: farmPrinter.corsCheck,
         currentUser: farmPrinter.currentUser,
-        updateAvailable: farmPrinter.updateAvailable,
+        octoPrintUpdate: farmPrinter.octoPrintUpdate,
+        octoPrintPluginUpdates: farmPrinter.octoPrintPluginUpdates,
         display: true,
         order: farmPrinter.sortIndex,
         octoPrintSystemInfo: farmPrinter.octoPrintSystemInfo

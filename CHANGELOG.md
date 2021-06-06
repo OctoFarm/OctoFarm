@@ -14,6 +14,8 @@ All notable changes to this project will be documented in this file.
     - Made API tests less prone to unnecessary failure
     - Reworked the Settings modal to be more resiliant to failure and cleaned up code
     - Slightly reworked job cache, prepared for V2
+    - Amended the functions for Global OctoPrint update and Global OctoPrint plugin update
+    - Added the ability to override the automatic wss:// select for HTTPS in printer settings modal
     - Added the ability to override the automatic wss:// select for HTTPS in printer settings modal
     - The core `state` of OctoFarm is split off of OctoPrint and added possibilities to test it fully 
 
@@ -27,6 +29,7 @@ All notable changes to this project will be documented in this file.
     - Fixed #542, #381: ensureIndex mongoose warning and circular Runner import resolved 
     - Fixed #598: printer settingsAppearance missing will not cause failure anymore
     - Fixed #596: changed OctoPrint plugin manager repository to new route with backwards compatibility version check 
+    - Fixed #608: Global update button was not appearing
     - Fixed #555: Offline after error not caught by OctoFarm. 1.6.0+
     - Fixed #609: Bulk printer functions wouldn't load due to small regression bug
     - Fixed #587: Changing printer URL doesn't rescan for changes when using settings modal

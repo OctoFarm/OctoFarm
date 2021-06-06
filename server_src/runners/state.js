@@ -2535,10 +2535,9 @@ class Runner {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
-    farmPrinters[index].updateAvailable = {
-      octoPrintUpdate: [],
-      pluginUpdates: []
-    };
+    farmPrinters[index].octoPrintUpdate = [];
+    farmPrinters[index].octoPrintPluginUpdates = [];
+
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[index].printerURL,
@@ -2578,11 +2577,9 @@ class Runner {
             }
           }
         }
+        farmPrinters[index].octoPrintUpdate = octoPrintUpdate;
+        farmPrinters[index].octoPrintPluginUpdates = pluginUpdates;
 
-        farmPrinters[index].updateAvailable = {
-          octoPrintUpdate,
-          pluginUpdates
-        };
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
