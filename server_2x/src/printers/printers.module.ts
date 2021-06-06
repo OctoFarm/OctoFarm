@@ -18,6 +18,7 @@ import {HistoryCacheService} from "./services/history-cache.service";
 import {HistoryService} from "./services/history.service";
 import {PrinterHistory} from "./entities/printer-history.entity";
 import {HistoryCache} from "./services/history.cache";
+import {JobStatisticsService} from "./services/job-statistics.service";
 
 @Module({
     imports: [
@@ -37,12 +38,14 @@ import {HistoryCache} from "./services/history.cache";
         HistoryCache,
         HistoryCacheService,
         HistoryService,
+        JobStatisticsService,
         PrinterGroupsService,
         PrinterQueryTask
     ],
     exports: [
         PrintersService,
         HistoryCacheService,
+        JobStatisticsService
     ],
     controllers: [
         PrintersController,
