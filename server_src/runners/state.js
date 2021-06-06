@@ -1,6 +1,7 @@
+"use strict";
+
 const _ = require("lodash");
 const EventEmitter = require("events");
-const fetch = require("node-fetch");
 const WebSocket = require("ws");
 const Logger = require("../lib/logger.js");
 
@@ -10,6 +11,9 @@ const Filament = require("../models/Filament.js");
 const TempHistory = require("../models/TempHistory.js");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 
+const {
+  OctoprintApiClientService
+} = require("../services/octoprint/octoprint-api-client.service");
 const { HistoryCollection } = require("./history.js");
 const {
   ServerSettings,
@@ -21,9 +25,6 @@ const { JobClean } = require("../lib/dataFunctions/jobClean.js");
 const { FileClean } = require("../lib/dataFunctions/fileClean.js");
 const { FilamentClean } = require("../lib/dataFunctions/filamentClean.js");
 const { PrinterTicker } = require("./printerTicker.js");
-const {
-  checkPluginManagerAPIDeprecation
-} = require("../utils/compatibility.utils");
 
 const logger = new Logger("OctoFarm-State");
 let farmPrinters = [];
@@ -965,85 +966,17 @@ WebSocketClient.prototype.onclose = function (e) {
   }
 };
 
-class ClientAPI {
-  static async getRetry(printerURL, apikey, item) {
-    try {
-      logger.info(
-        `Attempting to connect to API: ${item} | ${printerURL} | timeout: ${timeout.apiTimeout}`
-      );
-      const apiConnect = await ClientAPI.get(printerURL, apikey, item);
-      return apiConnect;
-    } catch (err) {
-      logger.error(
-        `Error attempting to connect to API: ${item} | ${printerURL} | timeout: ${timeout.apiTimeout}`,
-        JSON.stringify(err.message)
-      );
-      // If timeout exceeds max cut off then give up... Printer is considered offline.
-      if (timeout.apiTimeout >= timeout.apiRetryCutoff) {
-        logger.info(`Timeout Exceeded: ${item} | ${printerURL}`);
-        // Reset timeout for next printer...
-        timeout.apiTimeout = Number(timeout.apiTimeout) - 9000;
-        throw err;
-      }
-      timeout.apiTimeout += 9000;
-      logger.info(
-        `Attempting to re-connect to API: ${item} | ${printerURL} | timeout: ${timeout.apiTimeout}`
-      );
-      return await ClientAPI.getRetry(printerURL, apikey, item);
-    }
-  }
-
-  static files(printerURL, apikey, item) {
-    const url = `${printerURL}/api/${item}`;
-    fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": apikey
-      }
-    });
-  }
-
-  static post(printerURL, apikey, item, data) {
-    const url = `${printerURL}/api/${item}`;
-    return Promise.race([
-      fetch(url, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": apikey
-        },
-        body: JSON.stringify(data)
-      }),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("timeout")), timeout.apiTimeout)
-      )
-    ]);
-  }
-
-  static get(printerURL, apikey, item) {
-    const url = `${printerURL}/${item}`;
-    return Promise.race([
-      fetch(url, {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Api-Key": apikey
-        }
-      }),
-      new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("timeout")), timeout.apiTimeout)
-      )
-    ]);
-  }
-}
-
 class Runner {
+  static octoPrintService = undefined;
+
   static async init() {
     farmPrinters = [];
     const server = await ServerSettings.check();
     systemSettings = server[0];
     timeout = systemSettings.timeout;
+
+    Runner.octoPrintService = new OctoprintApiClientService(timeout);
+
     // Grab printers from database....
     try {
       farmPrinters = await Printers.find({}, null, {
@@ -1080,11 +1013,7 @@ class Runner {
 
   static async compareEnteredKeyToGlobalKey(printer) {
     // Compare entered API key to settings API Key...
-    const globalAPIKeyCheck = await ClientAPI.getRetry(
-      printer.printerURL,
-      printer.apikey,
-      "api/settings"
-    );
+    const globalAPIKeyCheck = await this.octoPrintService.getSettings(printer);
     const errorCode = {
       message:
         "Global API Key detected... unable to authenticate websocket connection",
@@ -1155,12 +1084,7 @@ class Runner {
         throw globalAPICheck;
       }
       // Make a connection attempt, and grab current user.
-      let users = null;
-      users = await ClientAPI.getRetry(
-        farmPrinters[i].printerURL,
-        farmPrinters[i].apikey,
-        "api/users"
-      );
+      let users = await this.octoPrintService.getUsers(farmPrinters[i], true);
       if (users.status === 200) {
         farmPrinters[i].systemChecks.scanning.api.status = "success";
         farmPrinters[i].systemChecks.scanning.api.date = new Date();
@@ -1187,11 +1111,9 @@ class Runner {
           farmPrinters[i]._id
         );
         logger.info("Chosen user:", farmPrinters[i].currentUser);
-        const sessionKey = await ClientAPI.post(
-          farmPrinters[i].printerURL,
-          farmPrinters[i].apikey,
-          "login",
-          { passive: true }
+        const sessionKey = await this.octoPrintService.login(
+          farmPrinters[i],
+          true
         );
         logger.info("Session Response", sessionKey);
         if (sessionKey.status === 200) {
@@ -1877,8 +1799,8 @@ class Runner {
         returnOriginal: false
       });
     }
-    return;
   }
+
   static async removePrinter(indexs) {
     logger.info("Pausing runners to remove printer...");
     await this.pause();
@@ -2032,9 +1954,7 @@ class Runner {
         );
         const { _id } = farmPrinters[index];
         await this.setupWebSocket(_id, skipAPI);
-      } else if (
-        farmPrinters[index].ws.instance.readyState === 2
-      ) {
+      } else if (farmPrinters[index].ws.instance.readyState === 2) {
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
@@ -2131,20 +2051,16 @@ class Runner {
     return true;
   }
 
-  static async getFile(id, location) {
+  static async getFile(id, fullPath) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
 
-    const url = `${farmPrinters[index].printerURL}/api/${location}`;
-    const getFileInformation = await fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": farmPrinters[index].apikey
-      }
-    });
-
+    const printer = farmPrinters[index];
+    const getFileInformation = await this.octoPrintService.getFile(
+      printer,
+      fullPath
+    );
     const getJson = await getFileInformation.json();
 
     let timeStat = null;
@@ -2203,7 +2119,7 @@ class Runner {
     };
   }
 
-  static async getFiles(id, location) {
+  static async getFiles(id, recursive) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
@@ -2222,14 +2138,10 @@ class Runner {
       "Active",
       farmPrinters[index]._id
     );
-    const url = `${farmPrinters[index].printerURL}/api/${location}`;
-    return fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": farmPrinters[index].apikey
-      }
-    })
+    const printer = farmPrinters[index];
+
+    return await this.octoPrintService
+      .getFiles(printer, recursive)
       .then((res) => {
         return res.json();
       })
@@ -2403,11 +2315,8 @@ class Runner {
       "Active",
       farmPrinters[index]._id
     );
-    return ClientAPI.getRetry(
-      farmPrinters[index].printerURL,
-      farmPrinters[index].apikey,
-      "api/connection"
-    )
+    return this.octoPrintService
+      .getConnection(farmPrinters[index], true)
       .then((res) => {
         return res.json();
       })
@@ -2492,11 +2401,8 @@ class Runner {
       "Active",
       farmPrinters[index]._id
     );
-    return ClientAPI.getRetry(
-      farmPrinters[index].printerURL,
-      farmPrinters[index].apikey,
-      "api/printerprofiles"
-    )
+    return this.octoPrintService
+      .getPrinterProfiles(farmPrinters[index], true)
       .then((res) => {
         return res.json();
       })
@@ -2547,17 +2453,8 @@ class Runner {
       farmPrinters[index]._id
     );
 
-    const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(
-      farmPrinters[index].octoPrintVersion
-    );
-
-    return ClientAPI.getRetry(
-      farmPrinters[index].printerURL,
-      farmPrinters[index].apikey,
-      printerManagerApiCompatible
-        ? "plugin/pluginmanager/repository"
-        : "api/plugin/pluginmanager"
-    )
+    return this.octoPrintService
+      .getPluginManager(farmPrinters[index], true)
       .then((res) => {
         return res.json();
       })
@@ -2601,11 +2498,8 @@ class Runner {
       "Active",
       farmPrinters[index]._id
     );
-    return ClientAPI.getRetry(
-      farmPrinters[index].printerURL,
-      farmPrinters[index].apikey,
-      "api/system/info"
-    )
+    return this.octoPrintService
+      .getSystemInfo(farmPrinters[index], true)
       .then((res) => {
         return res.json();
       })
@@ -2637,11 +2531,7 @@ class Runner {
       });
   }
 
-  static getUpdates(id, force) {
-    let forceCheck = "";
-    if (force) {
-      forceCheck = "?force=true";
-    }
+  static getUpdates(id, force = false) {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
@@ -2656,11 +2546,9 @@ class Runner {
       "Active",
       farmPrinters[index]._id
     );
-    return ClientAPI.getRetry(
-      farmPrinters[index].printerURL,
-      farmPrinters[index].apikey,
-      "plugin/softwareupdate/check" + forceCheck
-    )
+
+    return this.octoPrintService
+      .getSoftwareUpdateCheck(farmPrinters[index], force, true)
       .then((res) => {
         return res.json();
       })
@@ -2765,11 +2653,8 @@ class Runner {
       "Active",
       farmPrinters[index]._id
     );
-    return ClientAPI.getRetry(
-      farmPrinters[index].printerURL,
-      farmPrinters[index].apikey,
-      "api/settings"
-    )
+    return this.octoPrintService
+      .getSettings(farmPrinters[index], true)
       .then((res) => {
         return res.json();
       })
@@ -2791,10 +2676,9 @@ class Runner {
             "Active",
             farmPrinters[index]._id
           );
-          let piSupport = await ClientAPI.getRetry(
-            farmPrinters[index].printerURL,
-            farmPrinters[index].apikey,
-            "api/plugin/pi_support"
+
+          let piSupport = await this.octoPrintService.getPluginPiSupport(
+            farmPrinters[index]
           );
           piSupport = await piSupport.json();
           logger.info("Got from endpoint: ", piSupport);
@@ -2955,11 +2839,8 @@ class Runner {
       "Active",
       farmPrinters[index]._id
     );
-    return ClientAPI.getRetry(
-      farmPrinters[index].printerURL,
-      farmPrinters[index].apikey,
-      "api/system/commands"
-    )
+    return this.octoPrintService
+      .getSystemCommands(farmPrinters[index], true)
       .then((res) => {
         return res.json();
       })
@@ -3130,10 +3011,7 @@ class Runner {
       return o.fullPath == fullPath;
     });
     // Doesn't actually resync just the file... shhh
-    farmPrinters[i].fileList.files[fileID] = await Runner.getFile(
-      id,
-      "files/local/" + fullPath
-    );
+    farmPrinters[i].fileList.files[fileID] = await Runner.getFile(id, fullPath);
     farmPrinters[i].markModified("fileList");
     farmPrinters[i].save();
     const currentFilament = await Runner.compileSelectedFilament(
@@ -3485,27 +3363,27 @@ class Runner {
 
         let cleanProfile = removeObjectsWithNull(opts);
 
-        profile = await fetch(
-          `${farmPrinters[index].printerURL}/api/printerprofiles/${settings.profileID}`,
-          {
-            method: "PATCH",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Api-Key": farmPrinters[index].apikey
-            },
-            body: JSON.stringify({ profile: cleanProfile })
-          }
+        const printerUrl = farmPrinters[index].printerURL;
+        const printerApiKey = farmPrinters[index].apikey;
+        const patchApiResource = `/api/printerprofiles/${settings.profileID}`;
+        const profilePatch = { profile: cleanProfile };
+        profile = await this.octoPrintService.patch(
+          printerUrl,
+          printerApiKey,
+          patchApiResource,
+          profilePatch,
+          false
         );
 
-        // Update octoprint profile...
-        sett = await fetch(`${farmPrinters[index].printerURL}/api/settings`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Api-Key": farmPrinters[index].apikey
-          },
-          body: JSON.stringify(opts)
-        });
+        // Update octoprint settings
+        const settingsApiRoute = `/api/settings`;
+        sett = await this.octoPrintService.post(
+          printerUrl,
+          printerApiKey,
+          settingsApiRoute,
+          opts,
+          false
+        );
       }
 
       PrinterClean.generate(farmPrinters[index], filamentManager);
@@ -3781,10 +3659,7 @@ class Runner {
         if (path.includes("local")) {
           path = JSON.parse(JSON.stringify(file.fullPath.replace("local", "")));
         }
-        const fileInformation = await Runner.getFile(
-          farmPrinters[i]._id,
-          `files/local/${path}`
-        );
+        const fileInformation = await Runner.getFile(farmPrinters[i]._id, path);
         fileTimeout = fileTimeout + 5000;
         if (fileInformation) {
           logger.info("New File Information:", fileInformation);
