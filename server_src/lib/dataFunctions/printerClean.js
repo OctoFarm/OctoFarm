@@ -416,7 +416,7 @@ class PrinterClean {
       );
       sortedPrinter.connectionOptions = farmPrinter.options;
       if (
-        !!sortedPrinter?.connectionOptions &&
+        !!sortedPrinter?.connectionOptions?.ports &&
         !sortedPrinter.connectionOptions.ports.includes("AUTO")
       ) {
         sortedPrinter.connectionOptions.baudrates.unshift(0);
