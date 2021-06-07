@@ -125,7 +125,8 @@ class OctoprintApiService {
       url,
       "PATCH",
       apiKey,
-      timeout ? this.timeout.apiTimeout : false
+      timeout ? this.timeout.apiTimeout : false,
+      data
     );
   }
 
