@@ -6,7 +6,7 @@ const History = require("../models/History.js");
 const ErrorLog = require("../models/ErrorLog.js");
 const Logger = require("../lib/logger.js");
 const filamentProfiles = require("../models/Profiles.js");
-const ServerSettings = require("../models/ServerSettings.js");
+const { getServerSettingsCache } = require("../cache/server-settings.cache.js");
 const Spool = require("../models/Filament.js");
 const { FilamentManagerPlugin } = require("./filamentManagerPlugin.js");
 const { ScriptRunner } = require("./scriptCheck.js");
@@ -117,14 +117,7 @@ class HistoryCollection {
     return `images/historyCollection/snapshots/${id}-${fileDisplay}.jpg`;
   }
 
-  static async thumbnailCheck(
-    payload,
-    serverSettings,
-    files,
-    id,
-    event,
-    printer
-  ) {
+  static async thumbnailCheck(payload, files, id, event, printer) {
     let runCapture = async () => {
       // grab Thumbnail if available.
       const currentFileIndex = _.findIndex(files, function (o) {
@@ -147,51 +140,25 @@ class HistoryCollection {
       return base64Thumbnail;
     };
 
-    if (typeof serverSettings.history === "undefined") {
-      //Use default settings, so always capture...
+    if (getServerSettingsCache().historyCollectionSettings.thumbnails[event]) {
       return await runCapture();
     } else {
-      if (serverSettings.history.thumbnails[event]) {
-        return await runCapture();
-      } else {
-        return null;
-      }
+      return null;
     }
   }
-  static async snapshotCheck(
-    event,
-    serverSettings,
-    printer,
-    saveHistory,
-    payload
-  ) {
-    if (typeof serverSettings.history === "undefined") {
-      //Use default settings, so always capture...
+  static async snapshotCheck(event, printer, saveHistory, payload) {
+    if (getServerSettingsCache().historyCollectionSettings.snapshot[event]) {
       return await HistoryCollection.snapPictureOfPrinter(
         printer.camURL,
         saveHistory._id,
         payload.name
       );
     } else {
-      if (serverSettings.history.snapshot[event]) {
-        return await HistoryCollection.snapPictureOfPrinter(
-          printer.camURL,
-          saveHistory._id,
-          payload.name
-        );
-      } else {
-        return null;
-      }
+      return null;
     }
   }
 
-  static async timelapseCheck(
-    printer,
-    fileName,
-    printTime,
-    serverSettings,
-    id
-  ) {
+  static async timelapseCheck(printer, fileName, printTime, id) {
     if (printTime >= 10) {
       let interval = false;
       const grabTimelapse = async (printer) => {
@@ -248,8 +215,7 @@ class HistoryCollection {
                   printer.printerURL +
                     timelapseResponse.files[lastTimelapse].url,
                   id,
-                  printer,
-                  serverSettings
+                  printer
                 );
                 //Clearing interval
                 clearInterval(interval);
@@ -315,10 +281,9 @@ class HistoryCollection {
    * @param url
    * @param id
    * @param printer
-   * @param serverSettings
    * @returns {Promise<string>}
    */
-  static async grabTimeLapse(fileName, url, id, printer, serverSettings) {
+  static async grabTimeLapse(fileName, url, id, printer) {
     const path = `./images/historyCollection/timelapses/${id}-${fileName}`;
     if (!fs.existsSync("./images/historyCollection")) {
       fs.mkdirSync("./images/historyCollection");
@@ -333,7 +298,10 @@ class HistoryCollection {
       () => {
         logger.info("Downloaded: ", url);
         logger.info(`images/historyCollection/timelapses/${id}-${fileName}`);
-        if (serverSettings?.history?.timelapse?.deleteAfter) {
+        if (
+          getServerSettingsCache().historyCollectionSettings.timelapse
+            .deleteAfter
+        ) {
           HistoryCollection.deleteTimeLapse(printer, fileName);
         }
       },
@@ -511,7 +479,6 @@ class HistoryCollection {
   }
   static async complete(payload, printer, job, files, resends) {
     try {
-      let serverSettings = await ServerSettings.find({});
       const previousFilament = JSON.parse(
         JSON.stringify(printer.selectedFilament)
       );
@@ -529,7 +496,7 @@ class HistoryCollection {
         name = printer.printerURL;
       }
       if (
-        serverSettings[0]?.filamentManager &&
+        getServerSettingsCache().updateOctoPrintFilamentManagerPluginSettings &&
         Array.isArray(printer?.selectedFilament)
       ) {
         printer.selectedFilament = await HistoryCollection.resyncFilament(
@@ -567,7 +534,10 @@ class HistoryCollection {
         let profileId = [];
         printer.selectedFilament.forEach((spool, index) => {
           if (spool !== null) {
-            if (serverSettings[0]?.filamentManager) {
+            if (
+              getServerSettingsCache()
+                .updateOctoPrintFilamentManagerPluginSettings
+            ) {
               profileId = _.findIndex(profiles, function (o) {
                 return (
                   o.profile.index ==
@@ -627,7 +597,6 @@ class HistoryCollection {
       await saveHistory.save().then(async (r) => {
         const thumbnail = await HistoryCollection.thumbnailCheck(
           payload,
-          serverSettings[0],
           files,
           saveHistory._id,
           "onComplete",
@@ -637,19 +606,20 @@ class HistoryCollection {
         if (printer.camURL !== "") {
           snapshot = await HistoryCollection.snapshotCheck(
             "onComplete",
-            serverSettings[0],
             printer,
             saveHistory,
             payload
           );
         }
 
-        if (serverSettings[0]?.history?.timelapse?.onComplete) {
+        if (
+          getServerSettingsCache().historyCollectionSettings.timelapse
+            .onComplete
+        ) {
           HistoryCollection.timelapseCheck(
             printer,
             payload.name,
             payload.time,
-            serverSettings[0],
             saveHistory._id
           );
         }
@@ -678,11 +648,12 @@ class HistoryCollection {
 
   static async failed(payload, printer, job, files, resends) {
     try {
-      const serverSettings = await ServerSettings.find({});
       const previousFilament = JSON.parse(
         JSON.stringify(printer.selectedFilament)
       );
-      if (serverSettings[0]?.filamentManager) {
+      if (
+        getServerSettingsCache().updateOctoPrintFilamentManagerPluginSettings
+      ) {
         printer.selectedFilament = await HistoryCollection.resyncFilament(
           printer
         );
@@ -731,7 +702,10 @@ class HistoryCollection {
         let profileId = [];
         printer.selectedFilament.forEach((spool, index) => {
           if (spool !== null) {
-            if (serverSettings[0]?.filamentManager) {
+            if (
+              getServerSettingsCache()
+                .updateOctoPrintFilamentManagerPluginSettings
+            ) {
               profileId = _.findIndex(profiles, function (o) {
                 return (
                   o.profile.index ==
@@ -792,7 +766,6 @@ class HistoryCollection {
       await saveHistory.save().then(async (r) => {
         const thumbnail = await HistoryCollection.thumbnailCheck(
           payload,
-          serverSettings[0],
           files,
           saveHistory._id,
           "onFailure",
@@ -802,18 +775,18 @@ class HistoryCollection {
         if (printer.camURL !== "") {
           snapshot = await HistoryCollection.snapshotCheck(
             "onFailure",
-            serverSettings[0],
             printer,
             saveHistory,
             payload
           );
         }
-        if (serverSettings[0]?.history?.timelapse?.onFailure) {
+        if (
+          getServerSettingsCache().historyCollectionSettings.timelapse.onFailure
+        ) {
           HistoryCollection.timelapseCheck(
             printer,
             payload.name,
             payload.time,
-            serverSettings[0],
             saveHistory._id
           );
         }

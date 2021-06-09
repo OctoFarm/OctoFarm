@@ -1,8 +1,9 @@
 const express = require("express");
 
 const router = express.Router();
+
 const { ensureAuthenticated } = require("../config/auth");
-const ServerSettingsDB = require("../models/ServerSettings.js");
+const { getServerSettingsCache } = require("../cache/server-settings.cache.js");
 const ClientSettingsDB = require("../models/ClientSettings.js");
 const HistoryDB = require("../models/History");
 const SpoolsDB = require("../models/Filament.js");
@@ -78,14 +79,13 @@ router.post(
   }
 );
 
-router.get(
-  "/server/delete/database/:name",
+router.delete(
+  "/server/database/:name",
   ensureAuthenticated,
   async (req, res) => {
     const databaseName = req.params.name;
-    await Runner.pause();
-    if (databaseName === "nukeEverything") {
-      await ServerSettingsDB.deleteMany({});
+    if (!databaseName) {
+      await getServerSettingsCache().resetServerSettingsToDefault;
       await ClientSettingsDB.deleteMany({});
       await HistoryDB.deleteMany({});
       await SpoolsDB.deleteMany({});
@@ -99,16 +99,21 @@ router.get(
         message: "Successfully deleted databases, server will restart..."
       });
       logger.info("Database completely wiped.... Restarting server...");
-      SystemCommands.rebootOctoFarm();
+      await SystemCommands.rebootOctoFarm();
     } else if (databaseName === "FilamentDB") {
       await SpoolsDB.deleteMany({});
       await ProfilesDB.deleteMany({});
       logger.info(
         "Successfully deleted Filament database.... Restarting server..."
       );
-      SystemCommands.rebootOctoFarm();
+      await SystemCommands.rebootOctoFarm();
     } else {
-      await eval(databaseName).deleteMany({});
+      // Eventually we should be able to change the params here for each database...
+      if (databaseName === "ServerSettings") {
+        await getServerSettingsCache().resetServerSettingsToDefault;
+      } else {
+        await eval(databaseName).deleteMany({});
+      }
       res.send({
         message:
           "Successfully deleted " + databaseName + ", server will restart..."
@@ -116,7 +121,7 @@ router.get(
       logger.info(
         databaseName + " successfully deleted.... Restarting server..."
       );
-      SystemCommands.rebootOctoFarm();
+      await SystemCommands.rebootOctoFarm();
     }
   }
 );
@@ -229,9 +234,9 @@ router.post(
   }
 );
 router.get("/server/get", ensureAuthenticated, (req, res) => {
-  ServerSettingsDB.find({}).then((checked) => {
-    res.send(checked[0]);
-  });
+  const serverSettingsCache = getServerSettingsCache().systemSettings;
+  console.log(serverSettingsCache);
+  res.send(serverSettingsCache);
 });
 router.post("/server/update", ensureAuthenticated, (req, res) => {
   ServerSettingsDB.find({}).then(async (checked) => {
@@ -265,9 +270,6 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
       }
     }
 
-    await checked[0].save().then(() => {
-      SettingsClean.start();
-    });
     if (shouldDisableInflux) {
       res.send({
         msg: returnMsg,

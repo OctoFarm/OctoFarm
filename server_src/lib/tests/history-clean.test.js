@@ -6,6 +6,12 @@ const { isPromise } = require("jest-util");
 const illegalHistoryCache = [{ printHistory2: null }];
 const emptyLegalHistoryCache = [{ printHistory: {} }];
 const realisticHistoryCache = require("./mock-data/Histories.json");
+
+jest.mock("../../cache/server-settings.cache.js");
+const {
+  getServerSettingsCache
+} = require("../../cache/server-settings.cache.js");
+
 const interestingButWeirdHistoryCache = [
   {
     printHistory: {
@@ -68,7 +74,7 @@ describe("historyClean", function () {
   it("should initiate and finish within 5 sec for empty history", async function () {
     expect(await mockHistoryService.find({})).toHaveLength(0);
 
-    const historyState = new HistoryClean(false, "info");
+    const historyState = new HistoryClean(true, "info");
     expect(historyState.logger).toBeDefined();
     const voidResponse = await historyState.initCache();
     expect(voidResponse).toBeFalsy();

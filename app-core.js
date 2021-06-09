@@ -3,9 +3,17 @@ const flash = require("connect-flash");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
-const ServerSettingsDB = require("./server_src/models/ServerSettings");
+const {
+  initializeServerSettingsCache
+} = require("./server_src/cache/server-settings.cache.js");
+const {
+  ensureSystemSettingsCache
+} = require("./server_src/config/settings.js");
+const { ensureCurrentUserAndGroup } = require("./server_src/config/users.js");
+const envUtils = require("./server_src/utils/env.utils");
 const expressLayouts = require("express-ejs-layouts");
 const Logger = require("./server_src/lib/logger.js");
+
 const {
   optionalInfluxDatabaseSetup
 } = require("./server_src/lib/influxExport.js");
@@ -13,7 +21,6 @@ const { getViewsPath } = require("./app-env");
 const {
   PrinterClean
 } = require("./server_src/lib/dataFunctions/printerClean.js");
-const { ServerSettings } = require("./server_src/settings/serverSettings.js");
 const { SystemRunner } = require("./server_src/runners/systemInfo.js");
 const { ClientSettings } = require("./server_src/settings/clientSettings.js");
 
@@ -55,20 +62,21 @@ function setupExpressServer() {
 async function ensureSystemSettingsInitiated() {
   logger.info("Checking Server Settings...");
 
-  await ServerSettingsDB.find({}).catch((e) => {
-    if (e.message.includes("command find requires authentication")) {
-      throw "Database authentication failed.";
-    } else {
-      throw "Database connection failed.";
-    }
-  });
-
   // Setup Settings as connection is established
-  const serverSettingsStatus = await ServerSettings.init();
-  await ClientSettings.init();
-  logger.info(serverSettingsStatus);
+  const serverSettingsInitialisation = await initializeServerSettingsCache();
+  logger.info(serverSettingsInitialisation);
 
-  return serverSettingsStatus;
+  return serverSettingsInitialisation;
+}
+
+function ensureOctoFarmMiddleWareInitiated(app) {
+  logger.info("Initiating Middleware");
+
+  // Make sure settings are grabbed from the cache in middleware
+  app.use(ensureSystemSettingsCache);
+
+  // Make sure current user and group are set in middleware
+  app.use(ensureCurrentUserAndGroup);
 }
 
 function serveOctoFarmRoutes(app) {
@@ -155,5 +163,6 @@ module.exports = {
   setupExpressServer,
   ensureSystemSettingsInitiated,
   serveOctoFarmRoutes,
-  serveOctoFarmNormally
+  serveOctoFarmNormally,
+  ensureOctoFarmMiddleWareInitiated
 };

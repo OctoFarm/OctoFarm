@@ -4,7 +4,7 @@ const { ensureSystemSettingsInitiated } = require("../../app-core");
 beforeAll(async () => {
   await dbHandler.connect();
   const settings = await ensureSystemSettingsInitiated();
-  expect(settings).toEqual("Server settings have been created...");
+  expect(settings).toEqual("Default server settings have been created");
 });
 
 afterAll(async () => {
@@ -90,7 +90,7 @@ describe("State", () => {
     // TODO the conclusion from the code under test is incorrect
     expect(comparisonResult3).toEqual({
       message:
-          "Global API Key detected... unable to authenticate websocket connection",
+        "Global API Key detected... unable to authenticate websocket connection",
       type: "system",
       errno: "999",
       code: "999"

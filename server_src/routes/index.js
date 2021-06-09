@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth.js");
-const { ensureCurrentUserAndGroup } = require("../config/users.js");
-const ServerSettings = require("../models/ServerSettings.js");
+const { getServerSettingsCache } = require("../cache/server-settings.cache.js");
 const prettyHelpers = require("../../views/partials/functions/pretty.js");
 const runner = require("../runners/state.js");
 const { Runner } = runner;
@@ -33,12 +32,9 @@ const version = process.env[AppConstants.VERSION_KEY];
 
 // Welcome Page
 async function welcome() {
-  const serverSettings = await ServerSettings.find({});
-
-  if (serverSettings[0].server.loginRequired === false) {
+  if (!getServerSettingsCache().systemSettings.loginRequired) {
     router.get("/", (req, res) => res.redirect("/dashboard"));
   } else {
-    const { registration } = serverSettings[0].server;
     router.get("/", (req, res) => {
       if (req.isAuthenticated()) {
         res.redirect("/dashboard");
@@ -46,8 +42,7 @@ async function welcome() {
         res.render("welcome", {
           page: "Welcome",
           octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-          registration,
-          serverSettings: serverSettings[0]
+          registration: getServerSettingsCache().systemSettings.registration
         });
       }
     });
@@ -60,7 +55,7 @@ welcome();
 router.get(
   "/dashboard",
   ensureAuthenticated,
-  ensureCurrentUserAndGroup,
+
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
     const clientSettings = await SettingsClean.returnClientSettings();
@@ -84,10 +79,9 @@ router.get(
 router.get(
   "/printers",
   ensureAuthenticated,
-  ensureCurrentUserAndGroup,
+
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
-    const serverSettings = await SettingsClean.returnSystemSettings();
     res.render("printerManagement", {
       name: req.user.name,
       userGroup: req.user.group,
@@ -103,10 +97,9 @@ router.get(
 router.get(
   "/filemanager",
   ensureAuthenticated,
-  ensureCurrentUserAndGroup,
+
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
-    const serverSettings = await SettingsClean.returnSystemSettings();
     const currentOperations = await PrinterClean.returnCurrentOperations();
     const fileStatistics = await FileClean.returnStatistics();
     res.render("filemanager", {
@@ -126,7 +119,7 @@ router.get(
 router.get(
   "/history",
   ensureAuthenticated,
-  ensureCurrentUserAndGroup,
+
   async (req, res) => {
     const printers = Runner.returnFarmPrinters();
     const historyCache = getHistoryCache();
@@ -150,7 +143,7 @@ router.get(
 router.get(
   "/mon/panel",
   ensureAuthenticated,
-  ensureCurrentUserAndGroup,
+
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
     const sortedIndex = await Runner.sortedIndex();
@@ -185,12 +178,11 @@ router.get(
 router.get(
   "/mon/camera",
   ensureAuthenticated,
-  ensureCurrentUserAndGroup,
+
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
     const sortedIndex = await Runner.sortedIndex();
     const clientSettings = await SettingsClean.returnClientSettings();
-    const serverSettings = await SettingsClean.returnSystemSettings();
     const dashStatistics = await PrinterClean.returnDashboardStatistics();
     const currentSort = await getSorting();
     const currentFilter = await getFilter();
@@ -220,12 +212,11 @@ router.get(
 router.get(
   "/mon/printerMap",
   ensureAuthenticated,
-  ensureCurrentUserAndGroup,
+
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
     const sortedIndex = await Runner.sortedIndex();
     const clientSettings = await SettingsClean.returnClientSettings();
-    const serverSettings = await SettingsClean.returnSystemSettings();
 
     const currentSort = await getSorting();
     const currentFilter = await getFilter();
@@ -255,7 +246,7 @@ router.get(
 router.get(
   "/mon/list",
   ensureAuthenticated,
-  ensureCurrentUserAndGroup,
+
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
     const sortedIndex = await Runner.sortedIndex();
@@ -289,7 +280,7 @@ router.get(
 router.get(
   "/mon/currentOp",
   ensureAuthenticated,
-  ensureCurrentUserAndGroup,
+
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
     const sortedIndex = await Runner.sortedIndex();
@@ -312,13 +303,12 @@ router.get(
 router.get(
   "/filament",
   ensureAuthenticated,
-  ensureCurrentUserAndGroup,
+
   async (req, res) => {
     const historyCache = getHistoryCache();
     const historyStats = historyCache.generateStatistics();
 
     const printers = Runner.returnFarmPrinters();
-    const serverSettings = await SettingsClean.returnSystemSettings();
     const statistics = await FilamentClean.getStatistics();
     const spools = await FilamentClean.getSpools();
     const profiles = await FilamentClean.getProfiles();
@@ -331,7 +321,7 @@ router.get(
       page: "Filament Manager",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       helpers: prettyHelpers,
-      serverSettings,
+      filamentManagerEnabled: req.serverSettingsCache.filamentManager,
       spools,
       profiles,
       statistics,
@@ -339,43 +329,37 @@ router.get(
     });
   }
 );
-router.get(
-  "/system",
-  ensureAuthenticated,
-  ensureCurrentUserAndGroup,
-  async (req, res) => {
-    const clientSettings = await SettingsClean.returnClientSettings();
-    const serverSettings = await SettingsClean.returnSystemSettings();
-    const systemInformation = await SystemInfo.returnInfo();
-    const printers = Runner.returnFarmPrinters();
-    const softwareUpdateNotification =
-      softwareUpdateChecker.getUpdateNotificationIfAny();
-    let dashboardSettings =
-      clientSettings?.dashboard || getDefaultDashboardSettings();
+router.get("/system", ensureAuthenticated, async (req, res) => {
+  const clientSettings = await SettingsClean.returnClientSettings();
+  const systemInformation = await SystemInfo.returnInfo();
+  const printers = Runner.returnFarmPrinters();
+  const softwareUpdateNotification =
+    softwareUpdateChecker.getUpdateNotificationIfAny();
+  let dashboardSettings =
+    clientSettings?.dashboard || getDefaultDashboardSettings();
 
-    res.render("system", {
-      name: req.user.name,
-      userGroup: req.user.group,
-      version,
-      printerCount: printers.length,
-      page: "System",
-      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-      helpers: prettyHelpers,
-      clientSettings,
-      serverSettings,
-      systemInformation,
-      db: fetchMongoDBConnectionString(),
-      dashboardSettings: dashboardSettings,
-      serviceInformation: {
-        isDockerContainer: isDocker(),
-        isNodemon: isNodemon(),
-        isNode: isNode(),
-        isPm2: isPm2(),
-        update: softwareUpdateNotification
-      }
-    });
-  }
-);
+  res.render("system", {
+    name: req.user.name,
+    userGroup: req.user.group,
+    version,
+    printerCount: printers.length,
+    page: "System",
+    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+    helpers: prettyHelpers,
+    clientSettings,
+    serverSettingsCache: req.serverSettingsCache,
+    systemInformation,
+    db: fetchMongoDBConnectionString(),
+    dashboardSettings: dashboardSettings,
+    serviceInformation: {
+      isDockerContainer: isDocker(),
+      isNodemon: isNodemon(),
+      isNode: isNode(),
+      isPm2: isPm2(),
+      update: softwareUpdateNotification
+    }
+  });
+});
 
 softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
   softwareUpdateChecker.checkReleaseAndLogUpdate();
@@ -383,7 +367,6 @@ softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
 
 // Hacky database check due to shoddy layout of code...
 const mongoose = require("mongoose");
-const serverSettings = require("../settings/serverSettings");
 
 let interval = false;
 if (interval === false) {
@@ -394,7 +377,7 @@ if (interval === false) {
       await PrinterClean.statisticsStart();
       await PrinterClean.createPrinterList(
         printersInformation,
-        serverSettings.filamentManager
+        getServerSettingsCache().octoPrintFilamentManagerPluginSettings
       );
     }
   }, 2500);

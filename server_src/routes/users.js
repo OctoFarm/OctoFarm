@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const passport = require("passport");
-const ServerSettings = require("../models/ServerSettings.js");
+const { getServerSettingsCache } = require("../cache/server-settings.cache.js");
 const { AppConstants } = require("../app.constants");
 
 // User Modal
@@ -14,17 +14,15 @@ const token = require("../config/token.js");
 const { Token } = token;
 
 async function enable() {
-  const settings = await ServerSettings.find({});
   // Login Page
   router.get("/login", (req, res) =>
     res.render("login", {
       page: "Login",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-      registration: settings[0].server.registration,
-      serverSettings: settings
+      registration: req.serverSettingsCache.server.registration
     })
   );
-  if (settings[0].server.registration === true) {
+  if (getServerSettingsCache().systemSettings.registration) {
     // Register Page
     let currentUsers = await User.find({});
 
@@ -32,7 +30,7 @@ async function enable() {
       res.render("register", {
         page: "Register",
         octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-        serverSettings: settings,
+        registration: req.serverSettingsCache.server.registration,
         userCount: currentUsers.length
       })
     );
@@ -62,8 +60,7 @@ async function enable() {
         res.render("register", {
           page: "Login",
           octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-          registration: settings[0].server.registration,
-          serverSettings: settings,
+          registration: req.serverSettingsCache.server.registration,
           errors,
           name,
           username,
@@ -81,8 +78,7 @@ async function enable() {
               page: "Login",
               octoFarmPageTitle:
                 process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-              registration: settings[0].server.registration,
-              serverSettings: settings,
+              registration: req.serverSettingsCache.server.registration,
               errors,
               name,
               username,
@@ -140,8 +136,7 @@ async function enable() {
       failureFlash: true,
       page: "Login",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-      registration: settings[0].server.registration,
-      serverSettings: settings
+      registration: getServerSettingsCache().systemSettings.registration
     }),
     function (req, res, next) {
       // Issue a remember me cookie if the option was checked

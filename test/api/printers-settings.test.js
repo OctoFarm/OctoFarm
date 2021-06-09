@@ -19,9 +19,7 @@ beforeAll(async () => {
 
 describe("Printer Settings Update Endpoint", () => {
   it("should return 400 error when wrong input is provided", async function (done) {
-    const res = await request
-      .post("/printers/updatePrinterSettings")
-      .send();
+    const res = await request.post("/printers/updatePrinterSettings").send();
 
     // Assert input validation failed
     expect(res.statusCode).toEqual(400);

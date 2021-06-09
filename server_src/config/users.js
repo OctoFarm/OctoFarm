@@ -1,12 +1,7 @@
-const settingsClean = require("../lib/dataFunctions/settingsClean.js");
-
-const { SettingsClean } = settingsClean;
-
 module.exports = {
-  async ensureCurrentUserAndGroup(req, res, next) {
-    const serverSettings = await SettingsClean.returnSystemSettings();
+  ensureCurrentUserAndGroup: function (req, res, next) {
     // If login is not required, set default user and admin otherwise pass current user/group.
-    if (!serverSettings?.server?.loginRequired) {
+    if (!req.serverSettingsCache.server.loginRequired) {
       req.user = {
         name: "No User",
         group: "Administrator"

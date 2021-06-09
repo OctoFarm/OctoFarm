@@ -1,10 +1,6 @@
 <% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
-<%let filamentManager = false;%>
 <% let displayNone = "d-none" %>
-<% if(typeof serverSettings != 'undefined'){ %>
-    <%filamentManager = serverSettings.filamentManager%>
-<% } %>
-<% if(filamentManager){ %>
+<% if(filamentManagerEnabled){ %>
 <% displayNone = ""; %>
 <% } %>
 <% let filamentTotals = statistics %>
