@@ -21,10 +21,6 @@ const { Script } = require("../lib/serverScripts.js");
 
 const _ = require("lodash");
 
-/* //Login Page
-router.get("/login", (req, res) => res.render("login"));
-//Register Page
-router.get("/register", (req, res) => res.render("register")); */
 router.post("/add", ensureAuthenticated, async (req, res) => {
   // Grab the API body
   const printers = req.body;
@@ -34,6 +30,7 @@ router.post("/add", ensureAuthenticated, async (req, res) => {
   // Return printers added...
   res.send({ printersAdded: p, status: 200 });
 });
+
 router.post("/update", ensureAuthenticated, async (req, res) => {
   // Grab the API body
   const printers = req.body;

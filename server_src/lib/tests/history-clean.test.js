@@ -32,6 +32,20 @@ const interestingButWeirdHistoryCache = [
   }
 ];
 
+const nullJobHistoryCache = [
+  {
+    printHistory: {
+      job: null
+    }
+  },
+  {
+    printHistory: {
+      success: true,
+      job: null
+    }
+  }
+]
+
 function legacyConvertIncremental(input) {
   let usageWeightCalc = 0;
   let newObj = [];
@@ -303,6 +317,18 @@ describe("historyClean", function () {
       data: []
     });
   });
+
+  it("should not throw when job property is null", async () => {
+    mockHistoryService.saveMockData(nullJobHistoryCache);
+
+    const historyState = new HistoryClean(false, "info");
+    await expect(await historyState.initCache()).resolves;
+    const stats = await historyState.generateStatistics();
+
+    expect(stats).toBeTruthy();
+    expect(stats.completed).toEqual(1);
+    expect(stats.failed).toEqual(1);
+  })
 });
 
 /**

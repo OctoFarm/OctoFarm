@@ -1,64 +1,149 @@
 const express = require("express");
-
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const passport = require("passport");
 const ServerSettings = require("../models/ServerSettings.js");
 const { AppConstants } = require("../app.constants");
 
-// User Modal
 const User = require("../models/User.js");
+const { Token } = require("../config/token.js");
 
-const token = require("../config/token.js");
+let settings;
+let currentUsers;
 
-const { Token } = token;
+async function fetchServerSettings() {
+  if (!settings) {
+    settings = await ServerSettings.find({});
+  }
 
-async function enable() {
-  const settings = await ServerSettings.find({});
-  // Login Page
-  router.get("/login", (req, res) =>
-    res.render("login", {
+  return settings;
+}
+
+async function fetchUsers(force = false) {
+  if (!currentUsers || force) {
+    currentUsers = await User.find({});
+  }
+  return currentUsers;
+}
+
+// Login Page
+router.get("/login", async (req, res) => {
+  settings = await fetchServerSettings();
+  res.render("login", {
+    page: "Login",
+    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+    registration: settings[0].server.registration,
+    serverSettings: settings
+  });
+});
+
+// Login Handle
+router.post(
+  "/login",
+  async (req, res, next) => {
+    settings = await fetchServerSettings();
+
+    passport.authenticate(
+      "local",
+      {
+        failureRedirect: "/users/login",
+        failureFlash: true,
+        page: "Login",
+        octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+        registration: settings[0].server.registration,
+        serverSettings: settings
+      },
+      function (err, user, info) {
+        if (info?.message === "Missing credentials") {
+          res.status(400);
+          res.send(info);
+          return next();
+        }
+        // Issue a remember me cookie if the option was checked
+        if (!req.body.remember_me) {
+          res.redirect("/dashboard");
+          return next();
+        }
+
+        Token.issueToken(user, function (err, token) {
+          if (err) {
+            return next(err);
+          }
+          res.cookie("remember_me", token, {
+            path: "/",
+            httpOnly: true,
+            maxAge: 604800000
+          });
+          res.redirect("/dashboard");
+          return next();
+        });
+      }
+    )(req, res, next);
+  }
+  // This redirect is not refined
+  // function (req, res) {
+  //   res.redirect("/dashboard");
+  // }
+);
+
+// Register Page
+router.get("/register", async (req, res) => {
+  let settings = await fetchServerSettings();
+  if (settings[0].server.registration !== true) {
+    return res.redirect("login");
+  }
+
+  let currentUsers = await fetchUsers();
+  res.render("register", {
+    page: "Register",
+    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+    serverSettings: settings,
+    userCount: currentUsers.length
+  });
+});
+
+// Register Handle
+router.post("/register", async (req, res) => {
+  const { name, username, password, password2 } = req.body;
+  const errors = [];
+
+  let settings = await fetchServerSettings();
+  let currentUsers = await fetchUsers(true);
+
+  // Check required fields
+  if (!name || !username || !password || !password2) {
+    errors.push({ msg: "Please fill in all fields..." });
+  }
+
+  // Check passwords match
+  if (password !== password2) {
+    errors.push({ msg: "Passwords do not match..." });
+  }
+
+  // Password at least 6 characters
+  if (password.length < 6) {
+    errors.push({ msg: "Password should be at least 6 characters..." });
+  }
+
+  if (errors.length > 0) {
+    res.render("register", {
       page: "Login",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       registration: settings[0].server.registration,
-      serverSettings: settings
-    })
-  );
-  if (settings[0].server.registration === true) {
-    // Register Page
-    let currentUsers = await User.find({});
-
-    router.get("/register", (req, res) =>
-      res.render("register", {
-        page: "Register",
-        octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-        serverSettings: settings,
-        userCount: currentUsers.length
-      })
-    );
-
-    // Register Handle
-    router.post("/register", async (req, res) => {
-      const { name, username, password, password2 } = req.body;
-      const errors = [];
-      let currentUsers = await User.find({});
-
-      // Check required fields
-      if (!name || !username || !password || !password2) {
-        errors.push({ msg: "Please fill in all fields..." });
-      }
-
-      // Check passwords match
-      if (password !== password2) {
-        errors.push({ msg: "Passwords do not match..." });
-      }
-
-      // Password at least 6 characters
-      if (password.length < 6) {
-        errors.push({ msg: "Password should be at least 6 characters..." });
-      }
-
-      if (errors.length > 0) {
+      serverSettings: settings,
+      errors,
+      name,
+      username,
+      password,
+      password2,
+      userCount: currentUsers.length
+    });
+  } else {
+    // Validation Passed
+    User.findOne({ username }).then((user) => {
+      if (user) {
+        // User exists
+        errors.push({ msg: "Username is already registered" });
         res.render("register", {
           page: "Login",
           octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
@@ -72,118 +157,51 @@ async function enable() {
           userCount: currentUsers.length
         });
       } else {
-        // Validation Passed
-        User.findOne({ username }).then((user) => {
-          if (user) {
-            // User exists
-            errors.push({ msg: "Username is already registered" });
-            res.render("register", {
-              page: "Login",
-              octoFarmPageTitle:
-                process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-              registration: settings[0].server.registration,
-              serverSettings: settings,
-              errors,
-              name,
-              username,
-              password,
-              password2,
-              userCount: currentUsers.length
-            });
+        // Check if first user that's created.
+        User.find({}).then((user) => {
+          let userGroup = "";
+          if (user.length < 1) {
+            userGroup = "Administrator";
           } else {
-            // Check if first user that's created.
-            User.find({}).then((user) => {
-              let userGroup = "";
-              if (user.length < 1) {
-                userGroup = "Administrator";
-              } else {
-                userGroup = "User";
-              }
-              const newUser = new User({
-                name,
-                username,
-                password,
-                group: userGroup
-              });
-              // Hash Password
-              bcrypt.genSalt(10, (error, salt) =>
-                bcrypt.hash(newUser.password, salt, (err, hash) => {
-                  if (err) throw err;
-                  // Set password to hashed
-                  newUser.password = hash;
-                  // Save new User
-                  newUser
-                    .save()
-                    .then((user) => {
-                      req.flash(
-                        "success_msg",
-                        "You are now registered and can login"
-                      );
-                      const page = "login";
-                      res.redirect("/users/login");
-                    })
-                    .catch((err) => console.log(err));
-                })
-              );
-            });
+            userGroup = "User";
           }
+          const newUser = new User({
+            name,
+            username,
+            password,
+            group: userGroup
+          });
+          // Hash Password
+          bcrypt.genSalt(10, (error, salt) =>
+            bcrypt.hash(newUser.password, salt, (err, hash) => {
+              if (err) throw err;
+              // Set password to hashed
+              newUser.password = hash;
+              // Save new User
+              newUser
+                .save()
+                .then((user) => {
+                  req.flash(
+                    "success_msg",
+                    "You are now registered and can login"
+                  );
+                  const page = "login";
+                  res.redirect("/users/login");
+                })
+                .catch((err) => console.log(err));
+            })
+          );
         });
       }
     });
   }
-  // Login Handle
-  router.post(
-    "/login",
-    passport.authenticate("local", {
-      // successRedirect: "/dashboard",
-      failureRedirect: "/users/login",
-      failureFlash: true,
-      page: "Login",
-      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-      registration: settings[0].server.registration,
-      serverSettings: settings
-    }),
-    function (req, res, next) {
-      // Issue a remember me cookie if the option was checked
-      if (!req.body.remember_me) {
-        return next();
-      }
+});
 
-      Token.issueToken(req.user, function (err, token) {
-        if (err) {
-          return next(err);
-        }
-        res.cookie("remember_me", token, {
-          path: "/",
-          httpOnly: true,
-          maxAge: 604800000
-        });
-        return next();
-      });
-    },
-    function (req, res) {
-      res.redirect("/dashboard");
-    }
-  );
-  // router.post("/login", (req, res, next) => {
-  //     passport.authenticate("local", {
-  //         successRedirect: "/dashboard",
-  //         failureRedirect: "/users/login",
-  //         failureFlash: true,
-  //         page: "Login",
-  //         registration: settings[0].server.registration,
-  //         serverSettings: settings,
-  //     })(req, res, true);
-  // });
-
-  // Logout Handle
-  router.get("/logout", (req, res) => {
-    req.logout();
-    req.flash("success_msg", "You are logged out");
-    res.redirect("/users/login");
-  });
-}
-
-enable();
+// Logout Handle
+router.get("/logout", (req, res) => {
+  req.logout();
+  req.flash("success_msg", "You are logged out");
+  res.redirect("/users/login");
+});
 
 module.exports = router;
