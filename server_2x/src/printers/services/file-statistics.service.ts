@@ -3,7 +3,8 @@ import {FileStatisticsModel} from "../models/file-statistics.model";
 import {FileAnalysisModel} from "../models/file-analysis.model";
 import {getPrintCostNumeric} from "../utils/print-cost.util";
 import {FileModel} from "../models/file.model";
-import _ from "lodash";
+import {uniqBy} from "lodash";
+import {getDefaultFileCleanStatistics} from "../printers.constants";
 
 @Injectable()
 export class FileStatisticsService {
@@ -13,6 +14,7 @@ export class FileStatisticsService {
 
     constructor() {
         this.fileList = [];
+        this.fileStats = getDefaultFileCleanStatistics();
     }
 
     /**
@@ -170,7 +172,7 @@ export class FileStatisticsService {
             }
         });
 
-        const uniqueDevices = _.uniqBy(devices, "printerURL");
+        const uniqueDevices = uniqBy(devices, "printerURL");
         uniqueDevices.forEach((device) => {
             storageFree.push(device.storage.free);
             storageTotal.push(device.storage.total);
