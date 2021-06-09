@@ -9,7 +9,7 @@ const { AppConstants } = require("../app.constants");
 // User Modal
 const User = require("../models/User.js");
 
-const token = require("../config/token.js");
+const token = require("../middleware/token.js");
 
 const { Token } = token;
 

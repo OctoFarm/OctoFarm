@@ -1,4 +1,4 @@
-jest.mock("../../server_src/config/auth");
+jest.mock("../../server_src/middleware/auth");
 
 const requestBody = {
   i: "a0a569d20dd308890a1c06"

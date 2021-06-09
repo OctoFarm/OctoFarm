@@ -8,8 +8,8 @@ const {
 } = require("./server_src/cache/server-settings.cache.js");
 const {
   ensureSystemSettingsCache
-} = require("./server_src/config/settings.js");
-const { ensureCurrentUserAndGroup } = require("./server_src/config/users.js");
+} = require("./server_src/middleware/settings.js");
+const { ensureCurrentUserAndGroup } = require("./server_src/middleware/users.js");
 const envUtils = require("./server_src/utils/env.utils");
 const expressLayouts = require("express-ejs-layouts");
 const Logger = require("./server_src/lib/logger.js");
@@ -27,7 +27,7 @@ const { ClientSettings } = require("./server_src/settings/clientSettings.js");
 function setupExpressServer() {
   let app = express();
 
-  require("./server_src/config/passport.js")(passport);
+  require("./server_src/middleware/passport.js")(passport);
   app.use(express.json());
 
   const viewsPath = getViewsPath();

@@ -1,7 +1,7 @@
 const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcryptjs");
 const RememberMeStrategy = require("passport-remember-me").Strategy;
-const token = require("../config/token.js");
+const token = require("./token.js");
 
 const { Token } = token;
 

@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated } = require("../config/auth");
+const { ensureAuthenticated } = require("../middleware/auth");
 const { stringify } = require("flatted/cjs");
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
 let clientInformation = null;

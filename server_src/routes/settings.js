@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 
-const { ensureAuthenticated } = require("../config/auth");
+const { ensureAuthenticated } = require("../middleware/auth");
 const { getServerSettingsCache } = require("../cache/server-settings.cache.js");
 const ClientSettingsDB = require("../models/ClientSettings.js");
 const HistoryDB = require("../models/History");

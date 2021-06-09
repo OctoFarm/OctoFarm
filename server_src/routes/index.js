@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated } = require("../config/auth.js");
+const { ensureAuthenticated } = require("../middleware/auth.js");
 const { getServerSettingsCache } = require("../cache/server-settings.cache.js");
 const prettyHelpers = require("../../views/partials/functions/pretty.js");
 const runner = require("../runners/state.js");

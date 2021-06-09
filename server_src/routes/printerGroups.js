@@ -1,5 +1,5 @@
 const express = require("express");
-const { ensureAuthenticated } = require("../config/auth");
+const { ensureAuthenticated } = require("../middleware/auth");
 const router = express.Router();
 const printerGroupService = require("../services/printer-group.service");
 router.get("/list", ensureAuthenticated, async (req, res) => {
