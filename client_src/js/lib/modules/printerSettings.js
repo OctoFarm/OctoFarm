@@ -8,6 +8,7 @@ let printerOnline;
 let currentPrinter;
 let hasErrorNotificationBeenTriggered = false;
 let pageElements;
+let currentPrintersInformation;
 
 // Close modal event listeners...
 $("#connectionModal").on("hidden.bs.modal", function (e) {
@@ -80,7 +81,7 @@ async function updatePrinterSettingsModal(printersInformation, printerID) {
 
     //Convert online state to a boolean
     printerOnline = currentPrinter.printerState.colour.category !== "Offline";
-
+    PrinterSettings.updateStateElements(currentPrinter);
     // Clear the page of old values.
     UI.clearSelect("ps");
 
@@ -192,11 +193,11 @@ async function updatePrinterSettingsModal(printersInformation, printerID) {
 
 class PrinterSettings {
   static updateCurrentPrinterIndex(printersInformation, printerID) {
+    currentPrintersInformation = printersInformation;
     // Printer ID we need to initialise the page.
     const printersIndex = _.findIndex(printersInformation, function (o) {
       return o._id == printerID;
     });
-
     if (printersIndex !== -1) {
       currentPrinterIndex = printersIndex;
     } else {
@@ -1038,7 +1039,7 @@ class PrinterSettings {
             );
           UI.createAlert("info", serverResponseMessage, 5000, "clicked");
           await updatePrinterSettingsModal(
-            [currentPrinter],
+            currentPrintersInformation,
             currentPrinter._id
           );
         } catch (e) {
@@ -1065,7 +1066,10 @@ class PrinterSettings {
       .getElementById("settingsPageRefreshButton")
       .addEventListener("click", async (event) => {
         UI.addLoaderToElementsInnerHTML(event.target);
-        await updatePrinterSettingsModal([currentPrinter], currentPrinter._id);
+        await updatePrinterSettingsModal(
+          currentPrintersInformation,
+          currentPrinter._id
+        );
         UI.createAlert(
           "success",
           "Successfully reloaded your OctoPrint Settings",
@@ -1340,7 +1344,7 @@ class PrinterSettings {
       });
       throw new Error("Cannot apply state as no printer index can be found...");
     }
-
+    pageElements.mainPage.title.innerHTML = `Printer Settings: ${currentPrinter.printerName}`;
     pageElements.mainPage.status.innerHTML = `<b>Printer Status</b><br>${currentPrinter.printerState.state}`;
     pageElements.mainPage.status.className = `btn btn-${currentPrinter.printerState.colour.name} mb-1 btn-block`;
     pageElements.mainPage.host.innerHTML = `<b>Host Status</b><br>${currentPrinter.hostState.state}`;
@@ -1401,6 +1405,21 @@ class PrinterSettings {
         !pageElements.menu.printerOtherSettings.classList.contains("notyet")
       ) {
         pageElements.menu.printerOtherSettings.classList.add("notyet");
+      }
+    } else {
+      pageElements.mainPage.offlineMessage.innerHTML = "";
+      pageElements.menu.printerProfileBtn.disabled = false;
+      pageElements.menu.printerGcodeBtn.disabled = false;
+      pageElements.menu.printerOtherSettings.disabled = false;
+
+      if (pageElements.menu.printerProfileBtn.classList.contains("notyet")) {
+        pageElements.menu.printerProfileBtn.classList.remove("notyet");
+      }
+      if (pageElements.menu.printerGcodeBtn.classList.contains("notyet")) {
+        pageElements.menu.printerGcodeBtn.classList.remove("notyet");
+      }
+      if (pageElements.menu.printerOtherSettings.classList.contains("notyet")) {
+        pageElements.menu.printerOtherSettings.classList.remove("notyet");
       }
     }
   }

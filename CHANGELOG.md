@@ -14,9 +14,9 @@ All notable changes to this project will be documented in this file.
     - Made API tests less prone to unnecessary failure
     - Reworked the Settings modal to be more resiliant to failure and cleaned up code
     - Slightly reworked job cache, prepared for V2
+    - Added the ability to override the automatic wss:// select for HTTPS in printer settings modal. 
+    - Added the ability for settings dialog to return to "Printer Online" view when printer comes online in background / from settings changes.
     - Amended the functions for Global OctoPrint update and Global OctoPrint plugin update
-    - Added the ability to override the automatic wss:// select for HTTPS in printer settings modal
-    - Added the ability to override the automatic wss:// select for HTTPS in printer settings modal
     - The core `state` of OctoFarm is split off of OctoPrint and added possibilities to test it fully 
 
 ### Removed
