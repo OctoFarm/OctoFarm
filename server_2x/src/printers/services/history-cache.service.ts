@@ -1,6 +1,5 @@
-import {Injectable, NotImplementedException} from "@nestjs/common";
+import {Injectable} from "@nestjs/common";
 import {HistoryCache} from "./history.cache";
-import {IHistoryCache} from "../interfaces/history-cache.interface";
 
 @Injectable()
 export class HistoryCacheService {
