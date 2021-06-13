@@ -54,8 +54,6 @@ describe("Sorting", () => {
   it("should default to defaultFilterBy constant", async () => {
     const filtering = getSorting();
     expect(filtering).toEqual(defaultSortBy);
-
-    
   });
 
   // TODO this test shows that this API endpoint is weakly constrained

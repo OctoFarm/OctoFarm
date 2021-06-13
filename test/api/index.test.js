@@ -1,7 +1,6 @@
 const dbHandler = require("../db-handler");
 const supertest = require("supertest");
 const { setupTestApp } = require("../../app-test");
-const { AppConstants } = require("../../server_src/app.constants");
 
 let request;
 
