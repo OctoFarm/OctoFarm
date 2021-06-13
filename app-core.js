@@ -60,11 +60,13 @@ function setupExpressServer() {
 }
 
 async function ensureSystemSettingsInitiated() {
-  logger.info("Checking Server Settings...");
+  logger.info("Initialising Server Settings...");
 
   // Setup Settings as connection is established
-  const serverSettingsInitialisation = await initializeServerSettingsCache();
-  logger.info(serverSettingsInitialisation);
+  const serverSettingsInitialisation = await initializeServerSettingsCache().catch(e => {
+    logger.error("Error initialising Server Settings... ", e);
+  });
+
 
   return serverSettingsInitialisation;
 }

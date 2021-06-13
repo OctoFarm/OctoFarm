@@ -10,8 +10,8 @@ function getServerSettingsCache() {
 
 async function initializeServerSettingsCache() {
   serverSettingsCache = new ServerSettingsService();
-  serverSettingsCache.init();
-  return "Server settings cache initiated..."
+
+  return serverSettingsCache.init();
 }
 
 module.exports = { initializeServerSettingsCache, getServerSettingsCache };
