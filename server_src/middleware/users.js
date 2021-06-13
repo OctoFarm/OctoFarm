@@ -1,20 +1,11 @@
 module.exports = {
   ensureCurrentUserAndGroup: function (req, res, next) {
-    // Make sure cache is initiated... don't fill in user if so.
-    switch(!req?.serverSettingsCache.server.loginRequired) {
-      case undefined:
-        // Server settings doesn't seem to be initialised skip
-        break;
-      case false:
-        // code block
-        req.user = {
-          name: "No User",
-          group: "Administrator"
-        };
-        break;
-      default:
-        break;
-        // code block
+    // If login is not required, set default user and admin otherwise pass current user/group.
+    if (!req.serverSettingsCache.server.loginRequired) {
+      req.user = {
+        name: "No User",
+        group: "Administrator"
+      };
     }
     next();
   }
