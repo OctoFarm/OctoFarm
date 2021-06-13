@@ -136,6 +136,7 @@ router.get(
     if (databaseName === "FilamentDB") {
       returnedObjects.push(await ProfilesDB.find({}));
       returnedObjects.push(await SpoolsDB.find({}));
+      // The below else, will replace the final else... needs to check for now until rest of db's migrated to cache.
     } else if (databaseName === "ServerSettings") {
       returnedObjects.push(await eval(`get${databaseName}Cache().entire${databaseName}Object`));
     } else {
