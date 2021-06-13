@@ -138,6 +138,7 @@ router.get(
     });
   }
 );
+
 // Panel view  Page
 router.get(
   "/mon/panel",
@@ -148,8 +149,8 @@ router.get(
     const sortedIndex = await Runner.sortedIndex();
     const clientSettings = await SettingsClean.returnClientSettings();
     const dashStatistics = await PrinterClean.returnDashboardStatistics();
-    const currentSort = await getSorting();
-    const currentFilter = await getFilter();
+    const currentSort = getSorting();
+    const currentFilter = getFilter();
 
     let printGroups = await Runner.returnGroupList();
     if (typeof printGroups === "undefined") {
@@ -184,8 +185,8 @@ router.get(
     const clientSettings = await SettingsClean.returnClientSettings();
     const serverSettings = await SettingsClean.returnSystemSettings();
     const dashStatistics = await PrinterClean.returnDashboardStatistics();
-    const currentSort = await getSorting();
-    const currentFilter = await getFilter();
+    const currentSort = getSorting();
+    const currentFilter = getFilter();
 
     let printGroups = await Runner.returnGroupList();
     if (typeof printGroups === "undefined") {
@@ -219,8 +220,8 @@ router.get(
     const clientSettings = await SettingsClean.returnClientSettings();
     const serverSettings = await SettingsClean.returnSystemSettings();
 
-    const currentSort = await getSorting();
-    const currentFilter = await getFilter();
+    const currentSort = getSorting();
+    const currentFilter = getFilter();
 
     let printGroups = await Runner.returnGroupList();
     if (typeof printGroups === "undefined") {
@@ -253,8 +254,8 @@ router.get(
     const sortedIndex = await Runner.sortedIndex();
     const clientSettings = await SettingsClean.returnClientSettings();
     const dashStatistics = await PrinterClean.returnDashboardStatistics();
-    const currentSort = await getSorting();
-    const currentFilter = await getFilter();
+    const currentSort = getSorting();
+    const currentFilter = getFilter();
 
     let printGroups = await Runner.returnGroupList();
     if (typeof printGroups === "undefined") {

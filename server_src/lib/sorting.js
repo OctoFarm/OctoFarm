@@ -1,6 +1,8 @@
-let filterBy = "All Printers";
+const {defaultSortBy, defaultFilterBy} = require("./providers/filter-sorting.constants");
 
-let sortBy = "index";
+let filterBy = defaultFilterBy;
+
+let sortBy = defaultSortBy;
 
 const getSorting = function () {
   return sortBy;
