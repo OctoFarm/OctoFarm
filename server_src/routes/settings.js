@@ -132,9 +132,12 @@ router.get(
     const databaseName = req.params.name;
     logger.info("Client requests export of " + databaseName);
     let returnedObjects = [];
+    console.log(databaseName)
     if (databaseName === "FilamentDB") {
       returnedObjects.push(await ProfilesDB.find({}));
       returnedObjects.push(await SpoolsDB.find({}));
+    } else if (databaseName === "ServerSettings") {
+      returnedObjects.push(await eval(`get${databaseName}Cache().entire${databaseName}Object`));
     } else {
       returnedObjects.push(await eval(databaseName).find({}));
     }
@@ -238,7 +241,9 @@ router.get("/server/get", ensureAuthenticated, (req, res) => {
   console.log(serverSettingsCache);
   res.send(serverSettingsCache);
 });
-router.post("/server/update", ensureAuthenticated, (req, res) => {
+router.post("/server/update", ensureAuthenticated, async (req, res) => {
+
+
   ServerSettingsDB.find({}).then(async (checked) => {
     checked[0].onlinePolling = req.body.onlinePolling;
     Runner.updatePoll();

@@ -92,7 +92,7 @@ document
   .getElementById("exportServerSettings")
   .addEventListener("click", (e) => {
     // Validate Printer Form, then Add
-    ServerSettings.exportDatabases("ServerSettingsDB");
+    ServerSettings.exportDatabases("ServerSettings");
   });
 document.getElementById("exportUsers").addEventListener("click", (e) => {
   // Validate Printer Form, then Add

@@ -9,7 +9,7 @@ class ServerSettingsService {
    * Returns the entire settings object from catch
    * @returns {Object} Object from cache for all of OctoFarms settings
    */
-  get entireSettingsObject() {
+  get entireServerSettingsObject() {
     return this.currentServerSettings;
   }
 
@@ -77,7 +77,7 @@ class ServerSettingsService {
   async init() {
     let currentSettings;
     try {
-      currentSettings = await this.returnDatabaseValues();
+      currentSettings = await this.listServerSettingsDocs();
       if (currentSettings.length < 1) {
         let defaultServerSettings = new ServerSettingsDB({});
         await defaultServerSettings.save();
@@ -102,7 +102,8 @@ class ServerSettingsService {
    * Resets server settings to default and updates the internal cache
    */
   async resetServerSettingsToDefault() {
-    const currentDatabaseSettings = await this.returnDatabaseValues({});
+    const currentDatabaseSettings = await this.listServerSettingsDocs({});
+    console.log(currentDatabaseSettings)
     await currentDatabaseSettings.deleteMany({});
     await currentDatabaseSettings.save();
     this.currentServerSettings = currentDatabaseSettings;
@@ -114,7 +115,7 @@ class ServerSettingsService {
    * @param {Object} options object to change the database options
    * @returns {Object} Object containing the filtered settings / full settings
    */
-  returnDatabaseValues({ filter = {}, options = {} } = {}) {
+  listServerSettingsDocs({ filter = {}, options = {} } = {}) {
     return ServerSettingsDB.find(filter, {}, options);
   }
 
