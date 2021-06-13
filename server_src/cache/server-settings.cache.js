@@ -1,5 +1,5 @@
 const {
-  ServerSettings
+  ServerSettingsService
 } = require("../services/database/server-settings.service.js");
 
 let serverSettingsCache;
@@ -9,8 +9,9 @@ function getServerSettingsCache() {
 }
 
 async function initializeServerSettingsCache() {
-  serverSettingsCache = new ServerSettings();
-  return serverSettingsCache.init();
+  serverSettingsCache = new ServerSettingsService();
+  serverSettingsCache.init();
+  return "Server settings cache initiated..."
 }
 
 module.exports = { initializeServerSettingsCache, getServerSettingsCache };

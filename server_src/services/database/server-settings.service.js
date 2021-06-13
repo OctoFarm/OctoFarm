@@ -2,7 +2,7 @@ const ServerSettingsDB = require("../../models/ServerSettings.js");
 
 const { isEmpty } = require("lodash");
 
-class ServerSettings {
+class ServerSettingsService {
   currentServerSettings;
 
   /**
@@ -124,18 +124,18 @@ class ServerSettings {
    * @throws {Error} value not provided or empty.
    * @returns {Object} containing the new settings value
    */
-  async updateOctoPrintWebsocketPollingSettings(value = {}) {
+  async updateOctoPrintWebsocketPollSettings(value = {}) {
     const model = new ServerSettingsDB(value);
 
     const validatedModel = model.validateSync();
     if (!!validatedModel) throw validatedModel;
 
     //Filter out the current settings from cache
-    const filter = this.currentServerSettings._id;
+    const settingsDatabaseID = this.currentServerSettings._id;
 
     // Find the filter and update the server settings with the new value...
     const updatedSettings = await ServerSettingsDB.findOneAndUpdate(
-      { _id: filter },
+      { _id: settingsDatabaseID },
       { onlinePolling: value },
       {
         new: true
@@ -158,11 +158,11 @@ class ServerSettings {
       throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
-    const filter = this.currentServerSettings._id;
+    const settingsDatabaseID = this.currentServerSettings._id;
 
     // Find the filter and update the server settings with the new value...
     const updatedSettings = await ServerSettingsDB.findOneAndUpdate(
-      { _id: filter },
+      { _id: settingsDatabaseID },
       { server: value },
       {
         new: true
@@ -185,7 +185,7 @@ class ServerSettings {
       throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
-    const filter = this.currentServerSettings._id;
+    const settingsDatabaseID = this.currentServerSettings._id;
 
     // Find the filter and update the server settings with the new value...
     const updatedSettings = await ServerSettingsDB.findOneAndUpdate(
@@ -212,11 +212,11 @@ class ServerSettings {
       throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
-    const filter = this.currentServerSettings._id;
+    const settingsDatabaseID = this.currentServerSettings._id;
 
     // Find the filter and update the server settings with the new value...
     const updatedSettings = await ServerSettingsDB.findOneAndUpdate(
-      { _id: filter },
+      { _id: settingsDatabaseID },
       { filament: value },
       {
         new: true
@@ -239,7 +239,7 @@ class ServerSettings {
       throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
-    const filter = this.currentServerSettings._id;
+    const settingsDatabaseID = this.currentServerSettings._id;
 
     // Find the filter and update the server settings with the new value...
     const updatedSettings = await ServerSettingsDB.findOneAndUpdate(
@@ -266,11 +266,11 @@ class ServerSettings {
       throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
-    const filter = this.currentServerSettings._id;
+    const settingsDatabaseID = this.currentServerSettings._id;
 
     // Find the filter and update the server settings with the new value...
     const updatedSettings = await ServerSettingsDB.findOneAndUpdate(
-      { _id: filter },
+      { _id: settingsDatabaseID },
       { influxExport: value },
       {
         new: true
@@ -289,11 +289,11 @@ class ServerSettings {
    */
   async updateOctoPrintFilamentManagerPluginSettings(value = false) {
     //Filter out the current settings from cache
-    const filter = this.currentServerSettings._id;
+    const settingsDatabaseID = this.currentServerSettings._id;
 
     // Find the filter and update the server settings with the new value...
     const updatedSettings = await ServerSettingsDB.findOneAndUpdate(
-      { _id: filter },
+      { _id: settingsDatabaseID },
       { filamentManager: value },
       {
         new: true
@@ -307,5 +307,5 @@ class ServerSettings {
 }
 
 module.exports = {
-  ServerSettings
+  ServerSettingsService
 };
