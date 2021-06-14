@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 const Schema = require("mongoose/lib/schema");
-const { arrayValidator } = require("../utils/validators");
+const { arrayValidator } = require("../utils/validators.utils.js");
 
 const PrinterGroupSchema = new mongoose.Schema({
   name: {

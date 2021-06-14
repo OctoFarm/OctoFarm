@@ -2,8 +2,8 @@ const _ = require("lodash");
 const fetch = require("node-fetch");
 const fs = require("fs");
 const request = require("request");
-const History = require("../models/History.js");
 const ErrorLog = require("../models/ErrorLog.js");
+
 const Logger = require("../lib/logger.js");
 const filamentProfiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
@@ -18,6 +18,113 @@ const { writePoints } = require("../lib/influxExport.js");
 const logger = new Logger("OctoFarm-HistoryCollection");
 let counter = 0;
 let errorCounter = 0;
+
+const {
+  generateHistoryIndex,
+  generateHistoryState,
+  generateHistoryReason,
+  generateHistoryFileInformation,
+  generateHistoryDate,
+  generateHistoryPrintTime,
+  generateHistoryResendStatistics,
+  generateHistoryJobStatistics,
+} = require("../services/history.service.js");
+
+const { definePrinterName } = require("../services/printer.service.js");
+
+const {
+  checkForValidPrinterCostSettings,
+} = require("../services/printer-settings.service.js");
+
+const {
+  octoprintGrabThumbnail,
+} = require("../services/octoprint/octoprint-plugins.service.js");
+
+const {
+  objectIDValidator,
+  generateObjectId,
+} = require("../utils/database.utils.js");
+
+class History {
+  _id;
+  historyIndex;
+  printerName;
+  printerID;
+  costSettings;
+  success;
+  reason;
+  fileName;
+  fileDisplay;
+  filePath;
+  startDate;
+  endDate;
+  thumbnail;
+  printTime;
+  filamentSelection;
+  previousFilamentSelection;
+  job;
+  notes;
+  snapshot;
+  resends;
+
+  // Function to create a new history record
+  // Will be able to cut this down when state.js refactor
+  async createNewHistoryRecord({
+    printer = undefined,
+    state = undefined,
+    payload = undefined,
+    job = undefined,
+    files = undefined,
+    resendStats = undefined,
+  }) {
+    this._id = await generateObjectId();
+    this.historyIndex = await generateHistoryIndex();
+    this.printerName = await definePrinterName(
+      printer.printerURL,
+      printer.settingsApperance.name
+    );
+
+    this.printerID = await objectIDValidator(printer._id);
+    this.costSettings = await checkForValidPrinterCostSettings(
+      printer.costSettings
+    );
+    this.success = await generateHistoryState(state);
+    this.reason = await generateHistoryReason(payload.reason);
+    this.fileName = await generateHistoryFileInformation("name", payload);
+    this.fileDisplay = await generateHistoryFileInformation("display", payload);
+    this.filePath = await generateHistoryFileInformation("path", payload);
+    this.startDate = await generateHistoryDate("start-date", payload.time);
+    this.endDate = await generateHistoryDate("end-date", payload.time);
+    this.thumbnail = await octoprintGrabThumbnail(
+      state,
+      files,
+      payload.name,
+      this._id,
+      printer.printerURL,
+      printer.apikey
+    );
+    this.printTime = await generateHistoryPrintTime(payload.time);
+    this.filamentSelection;
+    this.previousFilamentSelection;
+    this.job = await generateHistoryJobStatistics(job);
+    // There are no notes on creation
+    this.notes = "";
+    this.snapshot;
+    this.resends = await generateHistoryResendStatistics(resendStats);
+    this.timelapse;
+    console.log(this);
+    //this.saveRecord(this);
+  }
+
+  //Function to generate a new error record
+  async createNewErrorRecord() {}
+
+  // Save the record to the database
+  async saveRecord(historyRecord) {}
+
+  // Save the record to influxDB Database
+  async logToInfluxDB() {}
+}
 
 class HistoryCollection {
   static async resyncFilament(printer) {
@@ -96,6 +203,7 @@ class HistoryCollection {
 
     return `images/historyCollection/thumbs/${id}-${splitAgain[0]}`;
   }
+
   static async snapPictureOfPrinter(url, id, fileDisplay) {
     if (!fs.existsSync("./images/historyCollection")) {
       fs.mkdirSync("./images/historyCollection");
@@ -158,6 +266,7 @@ class HistoryCollection {
       }
     }
   }
+
   static async snapshotCheck(
     event,
     serverSettings,
@@ -446,6 +555,7 @@ class HistoryCollection {
       writePoints(tags, "HistoryInformation", printerData);
     }
   }
+
   static async updateFilamentInfluxDB(
     selectedFilament,
     history,
@@ -509,28 +619,17 @@ class HistoryCollection {
       }
     }
   }
+
   static async complete(payload, printer, job, files, resends) {
     try {
-      let serverSettings = await ServerSettings.find({});
+      const serverSettings = await ServerSettings.find({});
       const previousFilament = JSON.parse(
         JSON.stringify(printer.selectedFilament)
       );
-      let name = null;
-      if (typeof printer.settingsApperance !== "undefined") {
-        if (
-          printer.settingsApperance.name === "" ||
-          printer.settingsApperance.name === null
-        ) {
-          name = printer.printerURL;
-        } else {
-          name = printer.settingsApperance.name;
-        }
-      } else {
-        name = printer.printerURL;
-      }
+
       if (
-        serverSettings[0]?.filamentManager &&
-        Array.isArray(printer?.selectedFilament)
+        serverSettings[0].filamentManager &&
+        Array.isArray(printer.selectedFilament)
       ) {
         printer.selectedFilament = await HistoryCollection.resyncFilament(
           printer
@@ -567,7 +666,7 @@ class HistoryCollection {
         let profileId = [];
         printer.selectedFilament.forEach((spool, index) => {
           if (spool !== null) {
-            if (serverSettings[0]?.filamentManager) {
+            if (serverSettings[0].filamentManager) {
               profileId = _.findIndex(profiles, function (o) {
                 return (
                   o.profile.index ==
@@ -625,23 +724,54 @@ class HistoryCollection {
         printHistory
       });
       await saveHistory.save().then(async (r) => {
-        const thumbnail = await HistoryCollection.thumbnailCheck(
-          payload,
-          serverSettings[0],
-          files,
-          saveHistory._id,
-          "onComplete",
-          printer
-        );
-        let snapshot = "";
         if (printer.camURL !== "") {
-          snapshot = await HistoryCollection.snapshotCheck(
-            "onComplete",
+          const thumbnail = await HistoryCollection.thumbnailCheck(
+            payload,
+            serverSettings[0],
+            files,
+            saveHistory._id,
+            "onFailure",
+            printer
+          );
+          const snapshot = await HistoryCollection.snapshotCheck(
+            "onFailure",
             serverSettings[0],
             printer,
             saveHistory,
             payload
           );
+          if (
+            typeof serverSettings[0] !== "undefined" &&
+            typeof serverSettings[0].history !== "undefined" &&
+            typeof serverSettings[0].history.timelapse !== "undefined" &&
+            typeof serverSettings[0].history.timelapse.onComplete !==
+              "undefined" &&
+            serverSettings[0].history.timelapse.onComplete
+          ) {
+            HistoryCollection.timelapseCheck(
+              printer,
+              payload.name,
+              payload.time,
+              serverSettings[0],
+              saveHistory._id
+            );
+          }
+          saveHistory.printHistory.thumbnail = thumbnail;
+          saveHistory.printHistory.snapshot = snapshot;
+          saveHistory.markModified("printHistory");
+          saveHistory.save();
+          printer.fileName = payload.display;
+          printer.filePath = payload.path;
+          ScriptRunner.check(printer, "done", saveHistory._id);
+          HistoryClean.start();
+          setTimeout(async function () {
+            await HistoryClean.start();
+            HistoryCollection.updateInfluxDB(
+              saveHistory._id,
+              "history",
+              printer
+            );
+          }, 5000);
         }
 
         if (serverSettings[0]?.history?.timelapse?.onComplete) {
@@ -938,5 +1068,6 @@ class HistoryCollection {
 }
 
 module.exports = {
-  HistoryCollection
+  HistoryCollection,
+  History,
 };

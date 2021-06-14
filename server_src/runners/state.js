@@ -695,29 +695,36 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         const that = this;
         setTimeout(async function () {
           logger.info(`${data.event.type + that.index}: ${that.url}`);
-          let sendPrinter = {};
-          sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
-          let job = {};
-          job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
-          let files = {};
-          files = JSON.parse(
+          const printer = JSON.parse(JSON.stringify(farmPrinters[that.index]));
+          const payload = data?.event?.payload;
+          const job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
+          const files = JSON.parse(
             JSON.stringify(farmPrinters[that.index].fileList.files)
           );
-          let resendStats = null;
+          let resendStats;
           if (typeof farmPrinters[that.index].resends !== "undefined") {
             resendStats = JSON.parse(
               JSON.stringify(farmPrinters[that.index].resends)
             );
           }
-
+          const state = false;
           // Register cancelled print...
-          await HistoryCollection.failed(
-            data.event.payload,
-            sendPrinter,
+          const newHistoryTest = new History();
+          newHistoryTest.createNewHistoryRecord({
+            printer,
+            state,
+            payload,
             job,
             files,
-            resendStats
-          );
+            resendStats,
+          });
+          // await HistoryCollection.complete(
+          //   data.event.payload,
+          //   sendPrinter,
+          //   job,
+          //   files,
+          //   resendStats
+          // );
           await Runner.updateFilament();
           setTimeout(async function () {
             await Runner.reSyncFile(
@@ -731,29 +738,36 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         const that = this;
         setTimeout(async function () {
           logger.info(`${data.event.type + that.index}: ${that.url}`);
-          let sendPrinter = {};
-          sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
-          let job = {};
-          job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
-          let files = {};
-          files = JSON.parse(
+          const printer = JSON.parse(JSON.stringify(farmPrinters[that.index]));
+          const payload = data?.event?.payload;
+          const job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
+          const files = JSON.parse(
             JSON.stringify(farmPrinters[that.index].fileList.files)
           );
-          let resendStats = null;
+          let resendStats;
           if (typeof farmPrinters[that.index].resends !== "undefined") {
             resendStats = JSON.parse(
               JSON.stringify(farmPrinters[that.index].resends)
             );
           }
+          const state = false;
           // Register cancelled print...
-
-          await HistoryCollection.complete(
-            data.event.payload,
-            sendPrinter,
+          const newHistoryTest = new History();
+          newHistoryTest.createNewHistoryRecord({
+            printer,
+            state,
+            payload,
             job,
             files,
-            resendStats
-          );
+            resendStats,
+          });
+          // await HistoryCollection.complete(
+          //   data.event.payload,
+          //   sendPrinter,
+          //   job,
+          //   files,
+          //   resendStats
+          // );
           await Runner.updateFilament();
           setTimeout(async function () {
             await Runner.reSyncFile(
