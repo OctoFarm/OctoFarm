@@ -137,9 +137,9 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
     const stateRunnerReport = await Runner.init();
     logger.info("OctoFarm State returned", stateRunnerReport);
 
-    logger.info("Initialising SystemRunner...");
-    const sr = await SystemRunner.init();
-    logger.info("OctoFarm SystemRunner returned", sr);
+    // logger.info("Initialising SystemRunner...");
+    // const sr = await SystemRunner.init();
+    // logger.info("OctoFarm SystemRunner returned", sr);
 
     await optionalInfluxDatabaseSetup();
   }

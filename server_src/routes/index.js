@@ -15,7 +15,7 @@ const printerClean = require("../lib/dataFunctions/printerClean.js");
 const { PrinterClean } = printerClean;
 const fileClean = require("../lib/dataFunctions/fileClean.js");
 const { FileClean } = fileClean;
-const systemInfo = require("../runners/systemInfo.js");
+// const systemInfo = require("../runners/systemInfo.js");
 const { getSorting, getFilter } = require("../lib/sorting.js");
 const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
 const isDocker = require("is-docker");
@@ -28,7 +28,7 @@ const {
 } = require("../lib/providers/settings.constants");
 const { getHistoryCache } = require("../cache/history.cache");
 
-const SystemInfo = systemInfo.SystemRunner;
+// const SystemInfo = systemInfo.SystemRunner;
 const version = process.env[AppConstants.VERSION_KEY];
 
 // Welcome Page
@@ -346,7 +346,7 @@ router.get(
   async (req, res) => {
     const clientSettings = await SettingsClean.returnClientSettings();
     const serverSettings = await SettingsClean.returnSystemSettings();
-    const systemInformation = await SystemInfo.returnInfo();
+    // const systemInformation = await SystemInfo.returnInfo();
     const printers = Runner.returnFarmPrinters();
     const softwareUpdateNotification =
       softwareUpdateChecker.getUpdateNotificationIfAny();
@@ -363,7 +363,7 @@ router.get(
       helpers: prettyHelpers,
       clientSettings,
       serverSettings,
-      systemInformation,
+      // systemInformation,
       db: fetchMongoDBConnectionString(),
       dashboardSettings: dashboardSettings,
       serviceInformation: {

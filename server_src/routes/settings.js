@@ -17,7 +17,7 @@ const logger = new Logger("OctoFarm-API");
 const runner = require("../runners/state.js");
 const multer = require("multer");
 const { Runner } = runner;
-const { SystemRunner } = require("../runners/systemInfo.js");
+// const { SystemRunner } = require("../runners/systemInfo.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 const { Logs } = require("../lib/serverLogs.js");
 const { SystemCommands } = require("../lib/serverCommands.js");
@@ -283,20 +283,20 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
  * Acquire system information from system info runner
  */
 router.get("/sysInfo", ensureAuthenticated, async (req, res) => {
-  const systemInformation = await SystemRunner.returnInfo();
+  // const systemInformation = await SystemRunner.returnInfo();
   let sysInfo = null;
 
-  if (!!systemInformation) {
-    sysInfo = {
-      osInfo: systemInformation.osInfo,
-      cpuInfo: systemInformation.cpuInfo,
-      cpuLoad: systemInformation.cpuLoad,
-      memoryInfo: systemInformation.memoryInfo,
-      sysUptime: systemInformation.sysUptime,
-      currentProcess: systemInformation.currentProcess,
-      processUptime: systemInformation.processUptime
-    };
-  }
+  // if (!!systemInformation) {
+  //   sysInfo = {
+  //     osInfo: systemInformation.osInfo,
+  //     cpuInfo: systemInformation.cpuInfo,
+  //     cpuLoad: systemInformation.cpuLoad,
+  //     memoryInfo: systemInformation.memoryInfo,
+  //     sysUptime: systemInformation.sysUptime,
+  //     currentProcess: systemInformation.currentProcess,
+  //     processUptime: systemInformation.processUptime
+  //   };
+  // }
   res.send(sysInfo);
 });
 
