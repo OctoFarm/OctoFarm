@@ -3,8 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const prettyHelpers = require("../../views/partials/functions/pretty.js");
-const system = require("../runners/systemInfo.js");
-const SystemInfo = system.SystemRunner;
+const { SystemRunner } = require("../runners/systemInfo.js");
 
 const isDocker = require("is-docker");
 const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
@@ -26,7 +25,7 @@ router.get(
   async (req, res) => {
     const clientSettings = await SettingsClean.returnClientSettings();
     const serverSettings = await SettingsClean.returnSystemSettings();
-    const systemInformation = await SystemInfo.getSystemInfo();
+    const systemInformation = await SystemRunner.getSystemInfo();
     const printers = Runner.returnFarmPrinters();
     const softwareUpdateNotification =
       softwareUpdateChecker.getUpdateNotificationIfAny();
@@ -61,7 +60,7 @@ router.get(
  * Acquire system information from system info runner
  */
 router.get("/info", ensureAuthenticated, async (req, res) => {
-  // const systemInformation = await SystemRunner.returnInfo();
+  const systemInformation = await SystemRunner.returnInfo();
   // if (!!systemInformation) {
   //   sysInfo = {
   //     osInfo: systemInformation.osInfo,
@@ -73,7 +72,7 @@ router.get("/info", ensureAuthenticated, async (req, res) => {
   //     processUptime: systemInformation.processUptime
   //   };
   // }
-  res.send({});
+  res.send(systemInformation);
 });
 
 module.exports = router;

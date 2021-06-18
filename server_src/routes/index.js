@@ -335,6 +335,7 @@ router.get(
   }
 );
 
+// TODO race condition
 softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
   softwareUpdateChecker.checkReleaseAndLogUpdate();
 });
