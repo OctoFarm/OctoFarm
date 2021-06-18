@@ -279,27 +279,6 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
   });
 });
 
-/**
- * Acquire system information from system info runner
- */
-router.get("/sysInfo", ensureAuthenticated, async (req, res) => {
-  // const systemInformation = await SystemRunner.returnInfo();
-  let sysInfo = null;
-
-  // if (!!systemInformation) {
-  //   sysInfo = {
-  //     osInfo: systemInformation.osInfo,
-  //     cpuInfo: systemInformation.cpuInfo,
-  //     cpuLoad: systemInformation.cpuLoad,
-  //     memoryInfo: systemInformation.memoryInfo,
-  //     sysUptime: systemInformation.sysUptime,
-  //     currentProcess: systemInformation.currentProcess,
-  //     processUptime: systemInformation.processUptime
-  //   };
-  // }
-  res.send(sysInfo);
-});
-
 router.get("/customGcode/delete/:id", ensureAuthenticated, async (req, res) => {
   const scriptId = req.params.id;
   GcodeDB.findByIdAndDelete(scriptId, function (err) {

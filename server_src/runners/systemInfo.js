@@ -11,15 +11,6 @@ class SystemRunner {
     return systemInfo;
   }
 
-  // static async init() {
-  //   await this.getSystemInfo();
-  //   setInterval(async () => {
-  //     await this.getSystemInfo();
-  //   }, 2500);
-  //
-  //   return "Started system information collection...";
-  // }
-
   /**
    * //Collect some system information
    * @returns {Promise<boolean|{sysUptime: *, currentProcess: {}, cpuLoad: any, memoryInfo: any, osInfo: any, systemDisk, warnings: {}, processUptime: number, cpuInfo: {cpu: any, speed: any}}>}

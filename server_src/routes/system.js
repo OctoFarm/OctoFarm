@@ -57,4 +57,23 @@ router.get(
   }
 );
 
+/**
+ * Acquire system information from system info runner
+ */
+router.get("/info", ensureAuthenticated, async (req, res) => {
+  // const systemInformation = await SystemRunner.returnInfo();
+  // if (!!systemInformation) {
+  //   sysInfo = {
+  //     osInfo: systemInformation.osInfo,
+  //     cpuInfo: systemInformation.cpuInfo,
+  //     cpuLoad: systemInformation.cpuLoad,
+  //     memoryInfo: systemInformation.memoryInfo,
+  //     sysUptime: systemInformation.sysUptime,
+  //     currentProcess: systemInformation.currentProcess,
+  //     processUptime: systemInformation.processUptime
+  //   };
+  // }
+  res.send({});
+});
+
 module.exports = router;
