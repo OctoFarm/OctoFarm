@@ -15,20 +15,15 @@ const printerClean = require("../lib/dataFunctions/printerClean.js");
 const { PrinterClean } = printerClean;
 const fileClean = require("../lib/dataFunctions/fileClean.js");
 const { FileClean } = fileClean;
-// const systemInfo = require("../runners/systemInfo.js");
 const { getSorting, getFilter } = require("../lib/sorting.js");
 const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
-const isDocker = require("is-docker");
 const { AppConstants } = require("../app.constants");
-const { fetchMongoDBConnectionString } = require("../../app-env");
-const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
 const { initHistoryCache } = require("../cache/history.cache");
 const {
   getDefaultDashboardSettings
 } = require("../lib/providers/settings.constants");
 const { getHistoryCache } = require("../cache/history.cache");
 
-// const SystemInfo = systemInfo.SystemRunner;
 const version = process.env[AppConstants.VERSION_KEY];
 
 // Welcome Page
@@ -336,43 +331,6 @@ router.get(
       profiles,
       statistics,
       historyStats
-    });
-  }
-);
-router.get(
-  "/system",
-  ensureAuthenticated,
-  ensureCurrentUserAndGroup,
-  async (req, res) => {
-    const clientSettings = await SettingsClean.returnClientSettings();
-    const serverSettings = await SettingsClean.returnSystemSettings();
-    // const systemInformation = await SystemInfo.returnInfo();
-    const printers = Runner.returnFarmPrinters();
-    const softwareUpdateNotification =
-      softwareUpdateChecker.getUpdateNotificationIfAny();
-    let dashboardSettings =
-      clientSettings?.dashboard || getDefaultDashboardSettings();
-
-    res.render("system", {
-      name: req.user.name,
-      userGroup: req.user.group,
-      version,
-      printerCount: printers.length,
-      page: "System",
-      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-      helpers: prettyHelpers,
-      clientSettings,
-      serverSettings,
-      // systemInformation,
-      db: fetchMongoDBConnectionString(),
-      dashboardSettings: dashboardSettings,
-      serviceInformation: {
-        isDockerContainer: isDocker(),
-        isNodemon: isNodemon(),
-        isNode: isNode(),
-        isPm2: isPm2(),
-        update: softwareUpdateNotification
-      }
     });
   }
 );
