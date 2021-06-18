@@ -58,7 +58,7 @@
                                             <p class=""><i class="fas fa-microchip"></i> CPU: <br><span
                                                         class="text-light" id="systemArch"
                                                         style="font-size:0.8rem;"></span>
-                                                <% systemInformation.cpuInfo.speed.cores.forEach((core, index) => { %>
+                                                <% systemInformation.cpuCurrentSpeed.cores.forEach((core, index) => { %>
                                                     <small class="text-light">  <%= index; %>:</small>
                                                     <code><%= core; %>Ghz</code>
                                                 <% }); %>

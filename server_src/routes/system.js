@@ -25,7 +25,7 @@ router.get(
   async (req, res) => {
     const clientSettings = await SettingsClean.returnClientSettings();
     const serverSettings = await SettingsClean.returnSystemSettings();
-    const systemInformation = await SystemRunner.getSystemInfo();
+    const systemInformation = await SystemRunner.querySystemInfo();
     const printers = Runner.returnFarmPrinters();
     const softwareUpdateNotification =
       softwareUpdateChecker.getUpdateNotificationIfAny();
@@ -60,18 +60,7 @@ router.get(
  * Acquire system information from system info runner
  */
 router.get("/info", ensureAuthenticated, async (req, res) => {
-  const systemInformation = await SystemRunner.returnInfo();
-  // if (!!systemInformation) {
-  //   sysInfo = {
-  //     osInfo: systemInformation.osInfo,
-  //     cpuInfo: systemInformation.cpuInfo,
-  //     cpuLoad: systemInformation.cpuLoad,
-  //     memoryInfo: systemInformation.memoryInfo,
-  //     sysUptime: systemInformation.sysUptime,
-  //     currentProcess: systemInformation.currentProcess,
-  //     processUptime: systemInformation.processUptime
-  //   };
-  // }
+  const systemInformation = await SystemRunner.queryWithFreshCurrentProcess();
   res.send(systemInformation);
 });
 

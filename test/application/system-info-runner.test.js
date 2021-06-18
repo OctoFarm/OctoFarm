@@ -58,7 +58,7 @@ describe("SystemRunner", () => {
    * Tests that valid system information is passed from the SystemRunner
    */
   it("should return valid system information with memory correctly calculated", async () => {
-    const systemInfo = await SystemRunner.getSystemInfo();
+    const systemInfo = await SystemRunner.querySystemInfo();
 
     // Mimic client validation
     expect(systemInfo).toBeTruthy();
@@ -67,24 +67,24 @@ describe("SystemRunner", () => {
     // Assert client used props
     expect(systemInfo.cpuLoad.currentLoadSystem).toEqual(expect.any(Number)); // Used by client
     expect(systemInfo.cpuLoad.currentLoadSystem).toBeGreaterThan(0);
-    // expect(systemInfo.currentProcess.cpuu).toEqual(expect.any(Number));
-    // expect(systemInfo.currentProcess.cpuu).toBeGreaterThan(0);
+    expect(systemInfo.currentProcess.cpuu).toEqual(expect.any(Number));
+    expect(systemInfo.currentProcess.cpuu).toBeGreaterThan(0);
     expect(systemInfo.cpuLoad.currentLoadUser).toEqual(expect.any(Number));
     expect(systemInfo.cpuLoad.currentLoadUser).toBeGreaterThan(0);
     expect(systemInfo.memoryInfo.total).toBeTruthy();
     expect(systemInfo.memoryInfo.free).toBeTruthy();
-    // if (!systemInfo.currentProcess.memRss) {
-    //   expect(systemInfo.currentProcess.mem).toBeTruthy();
-    // } else {
-    //   // Rss is useful
-    //   expect(systemInfo.currentProcess.memRss).toBeTruthy();
-    //   expect(systemInfo.currentProcess.memVsz).toBeTruthy(); // Not actually needed, but nice to know
-    // }
+    if (!systemInfo.currentProcess.memRss) {
+      expect(systemInfo.currentProcess.mem).toBeTruthy();
+    } else {
+      // Rss is useful
+      expect(systemInfo.currentProcess.memRss).toBeTruthy();
+      expect(systemInfo.currentProcess.memVsz).toBeTruthy(); // Not actually needed, but nice to know
+    }
 
     // Assert client calculations
     const arrayData = clientCPUCalc(systemInfo);
     expect(arrayData[0]).toBeGreaterThan(0);
-    // expect(arrayData[1]).toBeGreaterThan(0);
+    expect(arrayData[1]).toBeGreaterThan(0);
     expect(arrayData[2]).toBeGreaterThan(0);
     expect(arrayData[3]).not.toBeNaN();
 
@@ -92,15 +92,11 @@ describe("SystemRunner", () => {
 
     expect(memArrayData[0]).toBeGreaterThan(0);
     expect(memArrayData[1]).not.toBeNaN();
-    // expect(memArrayData[1]).toBeGreaterThan(1e6);
+    expect(memArrayData[1]).toBeGreaterThan(1e6);
     expect(memArrayData[1]).toBeLessThan(500e6);
     expect(memArrayData[2]).toBeGreaterThan(0);
 
     // Assert random other properties
-    // expect(systemInfo.osInfo.platform).toEqual(process.platform);
-    // expect(systemInfo.cpuInfo.cpu.manufacturer).toBeTruthy();
-    // expect(systemInfo.cpuInfo.cpu.processors).toEqual(expect.any(Number));
-    // expect(systemInfo.cpuInfo.cpu.cores).toEqual(expect.any(Number));
     expect(systemInfo.cpuLoad.currentLoad).toEqual(expect.any(Number));
     expect(systemInfo.cpuLoad.currentLoadIdle).toEqual(expect.any(Number));
     expect(systemInfo.memoryInfo.total).toEqual(expect.any(Number));
@@ -109,8 +105,8 @@ describe("SystemRunner", () => {
     expect(systemInfo.sysUptime.current).toBeGreaterThan(1617880660070); // ms time as of writing this test ^^
     expect(systemInfo.sysUptime.timezone).toBeTruthy();
     expect(systemInfo.processUptime).toEqual(expect.any(Number));
-    // expect(systemInfo.currentProcess.pid).toBeGreaterThan(1);
-    // expect(systemInfo.currentProcess.name).toEqual(expect.any(String));
+    expect(systemInfo.currentProcess.pid).toBeGreaterThan(1);
+    expect(systemInfo.currentProcess.name).toEqual(expect.any(String));
 
     expect(diskFormats).toContain(systemInfo.systemDisk.type);
     expect(systemInfo.warnings).toBeTruthy();
