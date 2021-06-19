@@ -16,7 +16,7 @@ document.getElementById("saveSettings").addEventListener("click", (e) => {
 });
 document.getElementById("nukeEverything").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
-  ServerSettings.nukeDatabases("nukeEverything");
+  ServerSettings.nukeDatabases();
 });
 document.getElementById("nukeAlerts").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
@@ -648,7 +648,7 @@ class ClientSettings {
 
 class ServerSettings {
   static nukeDatabases(database) {
-    OctoFarmClient.get("settings/server/delete/database/" + database)
+    OctoFarmClient.get("system/delete/database/" + database)
       .then((res) => {
         return res.json();
       })
@@ -658,7 +658,7 @@ class ServerSettings {
   }
 
   static exportDatabases(database) {
-    OctoFarmClient.get("settings/server/get/database/" + database)
+    OctoFarmClient.get("system/get/database/" + database)
       .then((res) => {
         return res.json();
       })
@@ -689,7 +689,7 @@ class ServerSettings {
   }
 
   static async init() {
-    OctoFarmClient.get("settings/server/get")
+    OctoFarmClient.get("system/get")
       .then((res) => {
         return res.json();
       })
@@ -756,7 +756,7 @@ class ServerSettings {
         }
       });
     try {
-      let logList = await OctoFarmClient.get("settings/server/logs");
+      let logList = await OctoFarmClient.get("system/logs");
       const logTable = document.getElementById("serverLogs");
       logList.forEach((logs) => {
         logTable.insertAdjacentHTML(
@@ -775,7 +775,7 @@ class ServerSettings {
         document
           .getElementById(logs.name)
           .addEventListener("click", async (event) => {
-            window.open(`/settings/server/logs/${logs.name}`);
+            window.open(`/system/logs/${logs.name}`);
           });
       });
     } catch (e) {
@@ -794,7 +794,7 @@ class ServerSettings {
       systemRestartBtn.disabled = true;
     }
     try {
-      let systemRestart = await OctoFarmClient.post("settings/server/restart");
+      let systemRestart = await OctoFarmClient.post("system/restart");
       if (systemRestart) {
         UI.createAlert(
           "success",
@@ -845,7 +845,7 @@ class ServerSettings {
     }
 
     let updateOctoFarm = await OctoFarmClient.post(
-      "settings/server/update/octofarm",
+      "system/update/octofarm",
       updateData
     );
     //Make sure response from server is received, and make sure the status is 200
@@ -963,7 +963,7 @@ class ServerSettings {
       forceCheckForUpdatesBtn.disabled = true;
     }
 
-    let updateCheck = await OctoFarmClient.get("settings/server/update/check");
+    let updateCheck = await OctoFarmClient.get("system/update/check");
     //Make sure response from server is received, and make sure the status is 200
     if (updateCheck && updateCheck.status !== 200) {
       // This alert is pretty mute as the serverAliveCheck will notify before...
@@ -1085,7 +1085,7 @@ class ServerSettings {
     ) {
       reboot = true;
     }
-    OctoFarmClient.post("settings/server/update", {
+    OctoFarmClient.post("system/update", {
       onlinePolling,
       server,
       timeout,
@@ -1125,7 +1125,7 @@ class ServerSettings {
       spinner.classList.remove("d-none");
     }
     let logDumpResponse = await OctoFarmClient.post(
-      "settings/server/logs/generateLogDump",
+      "system/logs/generateLogDump",
       {}
     );
     // Safely assume the spinner is done with here after response from server...
@@ -1178,7 +1178,7 @@ class ServerSettings {
         setTimeout(() => {
           logDumpDownloadBtn.classList.add("d-none");
         }, 5000);
-        window.open(`/settings/server/${logDumpResponse.zipDumpPath}`);
+        window.open(`/system/${logDumpResponse.zipDumpPath}`);
       });
     }
   }

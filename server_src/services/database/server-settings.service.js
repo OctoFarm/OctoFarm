@@ -126,10 +126,8 @@ class ServerSettingsService {
    * @returns {Object} containing the new settings value
    */
   async updateOctoPrintWebsocketPollSettings(value = {}) {
-    const model = new ServerSettingsDB(value);
-
-    const validatedModel = model.validateSync();
-    if (!!validatedModel) throw validatedModel;
+    if (isEmpty(value))
+      throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
     const settingsDatabaseID = this.currentServerSettings._id;
@@ -155,7 +153,7 @@ class ServerSettingsService {
    * @returns {Object} containing the new settings value
    */
   async updateSystemSettings(value = {}) {
-    if (!value || isEmpty(value))
+    if (isEmpty(value))
       throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
@@ -182,7 +180,7 @@ class ServerSettingsService {
    * @returns {Object} containing the new settings value
    */
   async updateOctoPrintTimeoutSettings(value = {}) {
-    if (!value || isEmpty(value))
+    if (isEmpty(value))
       throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
@@ -209,7 +207,7 @@ class ServerSettingsService {
    * @returns {Object} containing the new settings value
    */
   async updateFilamentManagerSettings(value = {}) {
-    if (!value || isEmpty(value))
+    if (isEmpty(value))
       throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
@@ -236,7 +234,7 @@ class ServerSettingsService {
    * @returns {Object} containing the new settings value
    */
   async updateHistoryCollectionSettings(value = {}) {
-    if (!value || isEmpty(value))
+    if (isEmpty(value))
       throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
@@ -263,7 +261,7 @@ class ServerSettingsService {
    * @returns {Object} containing the new settings value
    */
   async updateInfluxDatabaseSettings(value = {}) {
-    if (!value || isEmpty(value))
+    if (isEmpty(value))
       throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache

@@ -9,7 +9,9 @@ const {
 const {
   ensureSystemSettingsCache
 } = require("./server_src/middleware/settings.js");
-const { ensureCurrentUserAndGroup } = require("./server_src/middleware/users.js");
+const {
+  ensureCurrentUserAndGroup
+} = require("./server_src/middleware/users.js");
 const envUtils = require("./server_src/utils/env.utils");
 const expressLayouts = require("express-ejs-layouts");
 const Logger = require("./server_src/lib/logger.js");
@@ -63,10 +65,10 @@ async function ensureSystemSettingsInitiated() {
   logger.info("Initialising Server Settings...");
 
   // Setup Settings as connection is established
-  const serverSettingsInitialisation = await initializeServerSettingsCache().catch(e => {
-    logger.error("Error initialising Server Settings... ", e);
-  });
-
+  const serverSettingsInitialisation =
+    await initializeServerSettingsCache().catch((e) => {
+      logger.error("Error initialising Server Settings... ", e);
+    });
 
   return serverSettingsInitialisation;
 }
@@ -96,6 +98,11 @@ function serveOctoFarmRoutes(app) {
     "/groups",
     require("./server_src/routes/printerGroups", { page: "route" })
   );
+  app.use(
+    "/system",
+    require("./server_src/routes/systemSettings", { page: "route" })
+  );
+  // TODO: Set for deprication for another PR with client settings focus.
   app.use(
     "/settings",
     require("./server_src/routes/settings", { page: "route" })
