@@ -22,8 +22,8 @@ const { SystemRunner } = require("../runners/systemInfo.js");
 
 const isDocker = require("is-docker");
 const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
-const { ensureAuthenticated } = require("../config/auth");
-const { ensureCurrentUserAndGroup } = require("../config/users");
+const { ensureAuthenticated } = require("../middleware/auth.js");
+const { ensureCurrentUserAndGroup } = require("../middleware/users.js");
 const { AppConstants } = require("../app.constants");
 const {
   getDefaultDashboardSettings
@@ -39,6 +39,18 @@ const {
   checkReleaseAndLogUpdate,
   getUpdateNotificationIfAny
 } = require("../runners/softwareUpdateChecker.js");
+const HistoryDB = require("../models/History.js");
+const SpoolsDB = require("../models/Filament.js");
+const ProfilesDB = require("../models/Profiles.js");
+const roomDataDB = require("../models/RoomData.js");
+const UserDB = require("../models/User.js");
+const PrinterDB = require("../models/Printer.js");
+const AlertsDB = require("../models/Alerts.js");
+const ClientSettingsDB = require("../models/ClientSettings.js");
+const GcodeDB = require("../models/CustomGcode.js");
+
+const Logger = require("../lib/logger.js");
+const logger = new Logger("OctoFarm-API", true, "error");
 
 router.get(
   "/",
@@ -46,7 +58,6 @@ router.get(
   ensureCurrentUserAndGroup,
   async (req, res) => {
     const clientSettings = await SettingsClean.returnClientSettings();
-    const serverSettings = await SettingsClean.returnSystemSettings();
     const systemInformation = await SystemRunner.querySystemInfo();
     const printers = Runner.returnFarmPrinters();
     const softwareUpdateNotification =
@@ -63,7 +74,7 @@ router.get(
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       helpers: prettyHelpers,
       clientSettings,
-      serverSettings,
+      serverSettingsCache: req.serverSettingsCache,
       systemInformation,
       db: fetchMongoDBConnectionString(),
       dashboardSettings: dashboardSettings,
@@ -85,22 +96,6 @@ router.get("/info", ensureAuthenticated, async (req, res) => {
   const systemInformation = await SystemRunner.queryWithFreshCurrentProcess();
   res.send(systemInformation);
 });
-
-const HistoryDB = require("../models/History.js");
-const SpoolsDB = require("../models/Filament.js");
-const ProfilesDB = require("../models/Profiles.js");
-const roomDataDB = require("../models/RoomData.js");
-const UserDB = require("../models/User.js");
-const PrinterDB = require("../models/Printer.js");
-const AlertsDB = require("../models/Alerts.js");
-const ClientSettingsDB = require("../models/ClientSettings.js");
-const GcodeDB = require("../models/CustomGcode.js");
-
-const runner = require("../runners/state.js");
-const { Runner } = runner;
-
-const Logger = require("../lib/logger.js");
-const logger = new Logger("OctoFarm-API", true, "error");
 
 /**
  * System Settings Endpoints
@@ -225,15 +220,16 @@ router.post("/update", ensureAuthenticated, async (req, res) => {
 /**
  * System Log Endpoints
  */
-router.get("/logs", ensureAuthenticated, async (req, res) => {
-  const serverLogs = await Logs.grabLogs();
-  res.send(serverLogs);
-});
 
-router.get("/logs/:name", ensureAuthenticated, (req, res) => {
+router.get("/log/:name", ensureAuthenticated, (req, res) => {
   const download = req.params.name;
   const file = `./logs/${download}`;
   res.download(file, download); // Set disposition and send it.
+});
+
+router.get("/logs", ensureAuthenticated, async (req, res) => {
+  const serverLogs = await Logs.grabLogs();
+  res.send(serverLogs);
 });
 
 router.post("/logs/generateLogDump", ensureAuthenticated, async (req, res) => {
@@ -260,23 +256,6 @@ router.post("/logs/generateLogDump", ensureAuthenticated, async (req, res) => {
 /**
  * Database Action Endpoints
  */
-router.get("/get/database/:name", ensureAuthenticated, async (req, res) => {
-  const databaseName = req.params.name;
-  let returnedObjects = [];
-  if (databaseName === "FilamentDB") {
-    returnedObjects.push(await ProfilesDB.find({}));
-    returnedObjects.push(await SpoolsDB.find({}));
-    // TODO: The below else, will replace the final else... needs to check for now until rest of db's migrated to cache.
-  } else if (databaseName === "ServerSettings") {
-    returnedObjects.push(
-      await eval(`get${databaseName}Cache().entire${databaseName}Object`)
-    );
-  } else {
-    returnedObjects.push(await eval(databaseName).find({}));
-  }
-  res.send({ databases: returnedObjects });
-});
-
 router.delete("/databases", ensureAuthenticated, async (req, res) => {
   await getServerSettingsCache().resetServerSettingsToDefault;
   await ClientSettingsDB.deleteMany({});
@@ -296,6 +275,23 @@ router.delete("/databases", ensureAuthenticated, async (req, res) => {
     message: "Successfully deleted " + databaseName + ", server will restart..."
   });
   await SystemCommands.rebootOctoFarm();
+});
+
+router.get("/database/:name", ensureAuthenticated, async (req, res) => {
+  const databaseName = req.params.name;
+  let returnedObjects = [];
+  if (databaseName === "FilamentDB") {
+    returnedObjects.push(await ProfilesDB.find({}));
+    returnedObjects.push(await SpoolsDB.find({}));
+    // TODO: The below else, will replace the final else... needs to check for now until rest of db's migrated to cache.
+  } else if (databaseName === "ServerSettings") {
+    returnedObjects.push(
+      await eval(`get${databaseName}Cache().entire${databaseName}Object`)
+    );
+  } else {
+    returnedObjects.push(await eval(databaseName).find({}));
+  }
+  res.send({ databases: returnedObjects });
 });
 
 router.delete("/database/:name", ensureAuthenticated, async (req, res) => {
@@ -320,6 +316,5 @@ router.delete("/database/:name", ensureAuthenticated, async (req, res) => {
     await SystemCommands.rebootOctoFarm();
   }
 });
-
 
 module.exports = router;
