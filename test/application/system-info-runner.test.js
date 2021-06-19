@@ -58,7 +58,7 @@ describe("SystemRunner", () => {
    * Tests that valid system information is passed from the SystemRunner
    */
   it("should return valid system information with memory correctly calculated", async () => {
-    const systemInfo = await SystemRunner.getSystemInfo();
+    const systemInfo = await SystemRunner.querySystemInfo();
 
     // Mimic client validation
     expect(systemInfo).toBeTruthy();
@@ -97,10 +97,6 @@ describe("SystemRunner", () => {
     expect(memArrayData[2]).toBeGreaterThan(0);
 
     // Assert random other properties
-    expect(systemInfo.osInfo.platform).toEqual(process.platform);
-    expect(systemInfo.cpuInfo.cpu.manufacturer).toBeTruthy();
-    expect(systemInfo.cpuInfo.cpu.processors).toEqual(expect.any(Number));
-    expect(systemInfo.cpuInfo.cpu.cores).toEqual(expect.any(Number));
     expect(systemInfo.cpuLoad.currentLoad).toEqual(expect.any(Number));
     expect(systemInfo.cpuLoad.currentLoadIdle).toEqual(expect.any(Number));
     expect(systemInfo.memoryInfo.total).toEqual(expect.any(Number));
