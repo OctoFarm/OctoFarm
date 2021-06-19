@@ -1,14 +1,11 @@
 const express = require("express");
-
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const passport = require("passport");
 const { getServerSettingsCache } = require("../cache/server-settings.cache.js");
 const { AppConstants } = require("../app.constants");
 
-// User Modal
 const User = require("../models/User.js");
-
 const { Token } = require("../middleware/token.js");
 
 let currentUsers;
@@ -77,23 +74,24 @@ router.post(
 
 // Register Page
 router.get("/register", async (req, res) => {
-  if (req.serverSettingsCache.server.registration) {
+  if (!req.serverSettingsCache.server.registration) {
     return res.redirect("login");
   }
 
-  router.get("/register", (req, res) =>
-    res.render("register", {
-      page: "Register",
-      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-      registration: req.serverSettingsCache.server.registration,
-      userCount: currentUsers.length
-    })
-  );
+  let currentUsers = await fetchUsers();
+  res.render("register", {
+    page: "Register",
+    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+    registration: req.serverSettingsCache.server.registration,
+    userCount: currentUsers.length
+  });
 });
+
 // Register Handle
 router.post("/register", async (req, res) => {
   const { name, username, password, password2 } = req.body;
   const errors = [];
+
   let currentUsers = await fetchUsers(true);
 
   // Check required fields
