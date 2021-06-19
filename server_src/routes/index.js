@@ -26,31 +26,26 @@ const { getHistoryCache } = require("../cache/history.cache");
 const version = process.env[AppConstants.VERSION_KEY];
 
 // Welcome Page
-async function welcome() {
+router.get("/", async (req, res) => {
   if (!getServerSettingsCache().systemSettings.loginRequired) {
-    router.get("/", (req, res) => res.redirect("/dashboard"));
+    res.redirect("/dashboard");
   } else {
-    router.get("/", (req, res) => {
-      if (req.isAuthenticated()) {
-        res.redirect("/dashboard");
-      } else {
-        res.render("welcome", {
-          page: "Welcome",
-          octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-          registration: getServerSettingsCache().systemSettings.registration
-        });
-      }
-    });
+    if (req.isAuthenticated()) {
+      res.redirect("/dashboard");
+    } else {
+      res.render("welcome", {
+        page: "Welcome",
+        octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+        registration: getServerSettingsCache().systemSettings.registration
+      });
+    }
   }
-}
-
-welcome();
+});
 
 // Dashboard Page
 router.get(
   "/dashboard",
   ensureAuthenticated,
-
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
     const clientSettings = await SettingsClean.returnClientSettings();
@@ -74,7 +69,6 @@ router.get(
 router.get(
   "/printers",
   ensureAuthenticated,
-
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
     res.render("printerManagement", {
@@ -92,7 +86,6 @@ router.get(
 router.get(
   "/filemanager",
   ensureAuthenticated,
-
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
     const currentOperations = await PrinterClean.returnCurrentOperations();
@@ -114,7 +107,6 @@ router.get(
 router.get(
   "/history",
   ensureAuthenticated,
-
   async (req, res) => {
     const printers = Runner.returnFarmPrinters();
     const historyCache = getHistoryCache();
@@ -134,18 +126,18 @@ router.get(
     });
   }
 );
+
 // Panel view  Page
 router.get(
   "/mon/panel",
   ensureAuthenticated,
-
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
     const sortedIndex = await Runner.sortedIndex();
     const clientSettings = await SettingsClean.returnClientSettings();
     const dashStatistics = await PrinterClean.returnDashboardStatistics();
-    const currentSort = await getSorting();
-    const currentFilter = await getFilter();
+    const currentSort = getSorting();
+    const currentFilter = getFilter();
 
     let printGroups = await Runner.returnGroupList();
     if (typeof printGroups === "undefined") {
@@ -173,17 +165,16 @@ router.get(
 router.get(
   "/mon/camera",
   ensureAuthenticated,
-
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
     const sortedIndex = await Runner.sortedIndex();
     const clientSettings = await SettingsClean.returnClientSettings();
     const dashStatistics = await PrinterClean.returnDashboardStatistics();
-    const currentSort = await getSorting();
-    const currentFilter = await getFilter();
+    const currentSort = getSorting();
+    const currentFilter = getFilter();
 
     let printGroups = await Runner.returnGroupList();
-    if (typeof printGroups === "undefined") {
+    if (!printGroups) {
       printGroups = [];
     }
 
@@ -207,14 +198,13 @@ router.get(
 router.get(
   "/mon/printerMap",
   ensureAuthenticated,
-
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
     const sortedIndex = await Runner.sortedIndex();
     const clientSettings = await SettingsClean.returnClientSettings();
 
-    const currentSort = await getSorting();
-    const currentFilter = await getFilter();
+    const currentSort = getSorting();
+    const currentFilter = getFilter();
 
     let printGroups = await Runner.returnGroupList();
     if (typeof printGroups === "undefined") {
@@ -241,14 +231,13 @@ router.get(
 router.get(
   "/mon/list",
   ensureAuthenticated,
-
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
     const sortedIndex = await Runner.sortedIndex();
     const clientSettings = await SettingsClean.returnClientSettings();
     const dashStatistics = await PrinterClean.returnDashboardStatistics();
-    const currentSort = await getSorting();
-    const currentFilter = await getFilter();
+    const currentSort = getSorting();
+    const currentFilter = getFilter();
 
     let printGroups = await Runner.returnGroupList();
     if (typeof printGroups === "undefined") {
@@ -275,7 +264,6 @@ router.get(
 router.get(
   "/mon/currentOp",
   ensureAuthenticated,
-
   async (req, res) => {
     const printers = await Runner.returnFarmPrinters();
     const sortedIndex = await Runner.sortedIndex();
@@ -298,7 +286,6 @@ router.get(
 router.get(
   "/filament",
   ensureAuthenticated,
-
   async (req, res) => {
     const historyCache = getHistoryCache();
     const historyStats = historyCache.generateStatistics();

@@ -54,7 +54,7 @@ export default class UI {
       closeWith: click,
       timeout: delay,
       layout: "bottomRight",
-      text: message,
+      text: message
     });
     alert.show();
     return alert;

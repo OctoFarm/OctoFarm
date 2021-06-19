@@ -116,7 +116,7 @@ export default class Calculate {
       "Sep",
       "Oct",
       "Nov",
-      "Dec",
+      "Dec"
     ];
     return `${days[date.getDay()]} ${
       months[date.getMonth()]

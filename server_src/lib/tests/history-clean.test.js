@@ -38,6 +38,20 @@ const interestingButWeirdHistoryCache = [
   }
 ];
 
+const nullJobHistoryCache = [
+  {
+    printHistory: {
+      job: null
+    }
+  },
+  {
+    printHistory: {
+      success: true,
+      job: null
+    }
+  }
+];
+
 function legacyConvertIncremental(input) {
   let usageWeightCalc = 0;
   let newObj = [];
@@ -151,11 +165,11 @@ describe("historyClean", function () {
         {
           data: [
             {
-              x: new Date("2021-01-24T00:00:00.000Z"),
+              x: expect.any(Date),
               y: 1
             },
             {
-              x: new Date("2021-03-26T00:00:00.000Z"),
+              x: expect.any(Date),
               y: 1
             }
           ],
@@ -168,7 +182,7 @@ describe("historyClean", function () {
         {
           data: [
             {
-              x: new Date("2021-03-26T00:00:00.000Z"),
+              x: expect.any(Date),
               y: 2
             }
           ],
@@ -179,7 +193,7 @@ describe("historyClean", function () {
         {
           data: [
             {
-              x: new Date("2021-01-24T00:00:00.000Z"),
+              x: expect.any(Date),
               y: 68.5
             }
           ],
@@ -188,7 +202,7 @@ describe("historyClean", function () {
         {
           data: [
             {
-              x: new Date("2021-03-26T00:00:00.000Z"),
+              x: expect.any(Date),
               y: 2.3499999999999996
             }
           ],
@@ -199,7 +213,7 @@ describe("historyClean", function () {
         {
           data: [
             {
-              x: new Date("2021-01-24T00:00:00.000Z"),
+              x: expect.any(Date),
               y: 68.5
             }
           ],
@@ -208,7 +222,7 @@ describe("historyClean", function () {
         {
           data: [
             {
-              x: new Date("2021-03-26T00:00:00.000Z"),
+              x: expect.any(Date),
               y: 2.3499999999999996
             }
           ],
@@ -308,6 +322,18 @@ describe("historyClean", function () {
       name: "Success",
       data: []
     });
+  });
+
+  it("should not throw when job property is null", async () => {
+    mockHistoryService.saveMockData(nullJobHistoryCache);
+
+    const historyState = new HistoryClean(false, "info");
+    await expect(await historyState.initCache()).resolves;
+    const stats = await historyState.generateStatistics();
+
+    expect(stats).toBeTruthy();
+    expect(stats.completed).toEqual(1);
+    expect(stats.failed).toEqual(1);
   });
 });
 

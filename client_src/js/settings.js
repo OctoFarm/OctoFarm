@@ -828,28 +828,20 @@ class ServerSettings {
       systemRestartBtn.disabled = true;
     }
     try {
-      let systemRestart = await OctoFarmClient.post("system/restart");
-      if (systemRestart) {
-        UI.createAlert(
-          "success",
-          "System restart command was successful, the server will restart in 5 seconds...",
-          5000,
-          "clicked"
-        );
-      } else {
-        UI.createAlert(
-          "error",
-          "System restart command failed... This will not work unless pm2 is monitoring OctoFarm as detailed in the instructions: <a href='https://octofarm.net/installation' target='_blank'>Click Here</a>",
-          0,
-          "clicked"
-        );
-      }
+      await OctoFarmClient.post("system/restart");
+      UI.createAlert(
+        "success",
+        "System restart command was successful, the server will restart in 5 seconds...",
+        5000,
+        "clicked"
+      );
     } catch (e) {
       console.error(e);
       UI.createAlert(
         "error",
-        "Something went wrong, please check the server logs",
-        3000
+        "System restart command failed... This will not work unless pm2 is monitoring OctoFarm as detailed in the instructions: <a href='https://octofarm.net/installation' target='_blank'>Click Here</a>",
+        0,
+        "clicked"
       );
     } finally {
       setTimeout(() => {
@@ -865,8 +857,7 @@ class ServerSettings {
     // Make sure the update OctoFarm button is disabled after keypress
     if (updateOctoFarmBtn) {
       updateOctoFarmBtn.disabled = true;
-      updateOctoFarmBtn.innerHTML =
-        '<i class="fas fa-thumbs-up"></i> Update OctoFarm <i class="fas fa-spinner fa-spin"></i>';
+      UI.addLoaderToElementsInnerHTML(updateOctoFarmBtn);
     }
     let updateData = {
       forcePull: false,
@@ -878,112 +869,120 @@ class ServerSettings {
     if (doWeInstallPackages) {
       updateData.doWeInstallPackages = true;
     }
+    try {
+      let updateOctoFarm = await OctoFarmClient.post(
+        "system/update",
+        updateData
+      );
+      //Make sure response from server is received, and make sure the status is 200
+      if (updateOctoFarm && updateOctoFarm.status !== 200) {
+        // This alert is pretty mute as the serverAliveCheck will notify before...
+        UI.createAlert(
+          "error",
+          "Server could not be contacted... is it online?",
+          5000
+        );
+        if (updateOctoFarmBtn) {
+          updateOctoFarmBtn.innerHTML =
+            "<i class=\"fas fa-thumbs-up\"></i> Update OctoFarm";
+          updateOctoFarmBtn.disabled = false;
+        }
+        return;
+      }
+      updateOctoFarm = await updateOctoFarm.json();
 
-    let updateOctoFarm = await OctoFarmClient.post("system/update", updateData);
-    //Make sure response from server is received, and make sure the status is 200
-    if (updateOctoFarm && updateOctoFarm.status !== 200) {
-      // This alert is pretty mute as the serverAliveCheck will notify before...
+      // Local changes are detected, question whether we overwrite or cancel..
+      if (
+        updateOctoFarm.message.includes(
+          "The update is failing due to local changes been detected."
+        )
+      ) {
+        bootbox.confirm({
+          title:
+            '<span class="text-warning">Local file changes detected!</span>',
+          message: updateOctoFarm?.message,
+          buttons: {
+            cancel: {
+              className: "btn-danger",
+              label: '<i class="fa fa-times"></i> Cancel'
+            },
+            confirm: {
+              className: "btn-success",
+              label: '<i class="fa fa-check"></i> Override'
+            }
+          },
+          callback: function (result) {
+            if (result) {
+              ServerSettings.updateOctoFarmCommand(true);
+            } else {
+              if (updateOctoFarmBtn) {
+                updateOctoFarmBtn.innerHTML =
+                  "<i class=\"fas fa-thumbs-up\"></i> Update OctoFarm";
+                updateOctoFarmBtn.disabled = false;
+              }
+            }
+          }
+        });
+        return;
+      }
+      // Local changes are detected, question whether we overwrite or cancel..
+      if (
+        updateOctoFarm.message.includes(
+          "You have missing dependencies that are required, Do you want to update these?"
+        )
+      ) {
+        bootbox.confirm({
+          title:
+            '<span class="text-warning">Missing dependencies detected!</span>',
+          message: updateOctoFarm?.message,
+          buttons: {
+            cancel: {
+              className: "btn-danger",
+              label: '<i class="fa fa-times"></i> Cancel'
+            },
+            confirm: {
+              className: "btn-success",
+              label: '<i class="fa fa-check"></i> Confirm'
+            }
+          },
+          callback: function (result) {
+            if (result) {
+              ServerSettings.updateOctoFarmCommand(false, true);
+            } else {
+              if (updateOctoFarmBtn) {
+                updateOctoFarmBtn.innerHTML =
+                  '<i class="fas fa-thumbs-up"></i> Update OctoFarm';
+                updateOctoFarmBtn.disabled = false;
+              }
+            }
+          }
+        });
+        return;
+      }
+
+      UI.createAlert(
+        `${updateOctoFarm?.statusTypeForUser}`,
+        `${updateOctoFarm?.message}`,
+        0,
+        "clicked"
+      );
+      UI.removeLoaderFromElementInnerHTML(updateOctoFarmBtn);
+
+      if (updateOctoFarm?.haveWeSuccessfullyUpdatedOctoFarm) {
+        UI.createAlert(
+          "success",
+          "We have successfully updated... OctoFarm will restart now.",
+          0,
+          "Clicked"
+        );
+        this.serviceRestart();
+      }
+    } catch (e) {
+      console.error(e);
       UI.createAlert(
         "error",
-        "Server could not be contacted... is it online?",
-        5000
+        "The update has failed to run, please check the logs"
       );
-      if (updateOctoFarmBtn) {
-        updateOctoFarmBtn.innerHTML =
-          '<i class="fas fa-thumbs-up"></i> Update OctoFarm';
-        updateOctoFarmBtn.disabled = false;
-      }
-      return;
-    }
-    updateOctoFarm = await updateOctoFarm.json();
-
-    // Local changes are detected, question whether we overwrite or cancel..
-    if (
-      updateOctoFarm.message.includes(
-        "The update is failing due to local changes been detected."
-      )
-    ) {
-      bootbox.confirm({
-        title: '<span class="text-warning">Local file changes detected!</span>',
-        message: updateOctoFarm?.message,
-        buttons: {
-          cancel: {
-            className: "btn-danger",
-            label: '<i class="fa fa-times"></i> Cancel'
-          },
-          confirm: {
-            className: "btn-success",
-            label: '<i class="fa fa-check"></i> Override'
-          }
-        },
-        callback: function (result) {
-          if (result) {
-            ServerSettings.updateOctoFarmCommand(true);
-          } else {
-            if (updateOctoFarmBtn) {
-              updateOctoFarmBtn.innerHTML =
-                '<i class="fas fa-thumbs-up"></i> Update OctoFarm';
-              updateOctoFarmBtn.disabled = false;
-            }
-          }
-        }
-      });
-      return;
-    }
-    // Local changes are detected, question whether we overwrite or cancel..
-    if (
-      updateOctoFarm.message.includes(
-        "You have missing dependencies that are required, Do you want to update these?"
-      )
-    ) {
-      bootbox.confirm({
-        title:
-          '<span class="text-warning">Missing dependencies detected!</span>',
-        message: updateOctoFarm?.message,
-        buttons: {
-          cancel: {
-            className: "btn-danger",
-            label: '<i class="fa fa-times"></i> Cancel'
-          },
-          confirm: {
-            className: "btn-success",
-            label: '<i class="fa fa-check"></i> Confirm'
-          }
-        },
-        callback: function (result) {
-          if (result) {
-            ServerSettings.updateOctoFarmCommand(false, true);
-          } else {
-            if (updateOctoFarmBtn) {
-              updateOctoFarmBtn.innerHTML =
-                '<i class="fas fa-thumbs-up"></i> Update OctoFarm';
-              updateOctoFarmBtn.disabled = false;
-            }
-          }
-        }
-      });
-      return;
-    }
-
-    UI.createAlert(
-      `${updateOctoFarm?.statusTypeForUser}`,
-      `${updateOctoFarm?.message}`,
-      0,
-      "clicked"
-    );
-    if (updateOctoFarmBtn) {
-      updateOctoFarmBtn.innerHTML =
-        '<i class="fas fa-thumbs-up"></i> Update OctoFarm';
-    }
-
-    if (updateOctoFarm?.haveWeSuccessfullyUpdatedOctoFarm) {
-      UI.createAlert(
-        "success",
-        "We have successfully updated... OctoFarm will restart now.",
-        0,
-        "Clicked"
-      );
-      this.serviceRestart();
     }
   }
   static async checkForOctoFarmUpdates() {
