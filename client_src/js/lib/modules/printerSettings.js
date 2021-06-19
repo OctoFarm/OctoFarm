@@ -17,7 +17,10 @@ $("#connectionModal").on("hidden.bs.modal", function (e) {
   }
 });
 
-async function updatePrinterSettingsModal(printersInformation, printerID) {
+export async function updatePrinterSettingsModal(
+  printersInformation,
+  printerID
+) {
   // Make sure we have page elements
   PrinterSettings.grabPageElements();
   // Check if printer ID is provided
@@ -1256,6 +1259,7 @@ class PrinterSettings {
     }
     return newPrinterSettingsValues;
   }
+
   // Will move this to it's own file and do a require when enabled in the printer modal. May move the whole connection dropdown there thinking about it.
   static setPortAvailability(serialPortDropDownElement, available) {
     if (available) {
@@ -1424,6 +1428,3 @@ class PrinterSettings {
     }
   }
 }
-module.exports = {
-  updatePrinterSettingsModal
-};
