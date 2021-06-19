@@ -38,8 +38,6 @@ export default class OctoPrintClient {
         "X-Api-Key": printer.apikey
       },
       body: JSON.stringify(data)
-    }).catch((e) => {
-      console.log(e);
     });
   }
 

@@ -1,16 +1,14 @@
-import {
-  dragAndDropEnable,
-  dragAndDropEnableMultiplePrinters,
-  dragCheck
-} from "../functions/dragAndDrop.js";
+import { dragAndDropEnable, dragAndDropEnableMultiplePrinters, dragCheck } from "../functions/dragAndDrop.js";
 import PrinterManager from "./printerManager.js";
 import UI from "../functions/ui.js";
 import currentOperations from "./currentOperations";
 import OctoFarmclient from "../octofarm";
+import OctoPrintClient from "../octoprint";
 
 // Group parsing constants
 const groupStartNames = ["rij", "row", "group", "groep"];
 const selectableTilePrefix = "panel-selectable";
+const stopButtonIdPrefix = "stop-";
 const massDragAndDropId = "mass-drag-and-drop";
 const massDragAndDropStatusId = "mass-drag-and-drop-status";
 const groupSplitString = "_";
@@ -64,7 +62,7 @@ function parseGroupLocation(printer) {
   const splitPrinterGroupName = printerGroupCut.split(groupSplitString);
   if (!splitPrinterGroupName?.length > 1) {
     throw new Error(
-      `Printer group name is not according to x_x location convention. Contact DEV~ID.`
+      "Printer group name is not according to x_x location convention. Contact DEV~ID."
     );
   }
   return splitPrinterGroupName.map((gn) => parseInt(gn));
@@ -85,20 +83,74 @@ function handleVisibilityChange() {
   }
 }
 
-const returnPrinterInfo = (id) => {
-  if (typeof id !== "undefined") {
-    const zeeIndex = _.findIndex(printerInfo, function (o) {
-      return o._id == id;
-    });
-    return printerInfo[zeeIndex];
-  } else {
-    return printerInfo;
+function attachEventToStopButton(printer) {
+  const elementId = stopButtonIdPrefix + printer._id;
+  let cancelBtn = document.getElementById(elementId);
+  if (!cancelBtn) {
+    console.error("Could not attach to click of stop-button as the element selector was not found:", elementId);
+    return;
   }
-};
+  cancelBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const print = printerInfo.find(pi => pi._id === printer._id);
+    const name = printer.printerName;
+    bootbox.confirm({
+      message: `${name}: <br>Are you sure you want to cancel the ongoing print?`,
+      buttons: {
+        cancel: {
+          label: "<i class=\"fa fa-times\"></i> Cancel"
+        },
+        confirm: {
+          label: "<i class=\"fa fa-check\"></i> Confirm"
+        }
+      },
+      callback(result) {
+        if (result) {
+          e.target.disabled = true;
+          const opts = {
+            command: "cancel"
+          };
+
+          OctoPrintClient.post(print, "job", opts)
+            .then((r) => {
+              if (r.status === 200 || r.status === 201 || r.status === 204) {
+                // Error
+                UI.createAlert(
+                  "success",
+                  `Successfully informed OctoPrint to cancel job!`,
+                  4000,
+                  "Clicked"
+                );
+              } else {
+                UI.createAlert(
+                  "error",
+                  `Failed to cancel job, it was probably not running. Code: ${r.status}`,
+                  4000,
+                  "Clicked"
+                );
+              }
+
+              e.target.disabled = false;
+            })
+            .catch((e) => {
+              e.target.disabled = false;
+              UI.createAlert(
+                "error",
+                `Failed to cancel job! Error: ${e}`,
+                4000,
+                "Clicked"
+              );
+            });
+        }
+      }
+    });
+  });
+}
+
 export default function createWebWorker(view) {
   currentView = view;
   worker = new Worker("/assets/dist/monitoringViewsWorker.min.js");
-  worker.onmessage = async function (event) {
+  worker.onmessage = async function(event) {
     if (event.data != false) {
       //Update global variables with latest information...
       printerInfo = event.data.printersInformation;
@@ -128,26 +180,13 @@ function cleanPrinterName(printer) {
   if (!printer) {
     return "";
   }
-  const printerName = printer.printerName;
-  let name = printerName;
+  let name = printer.printerName;
   if (name.includes("http://")) {
     name = name.replace("http://", "");
   } else if (name.includes("https://")) {
     name = name.replace("https://", "");
   }
   return `${name}`;
-}
-
-function checkPrinterRows(clientSettings) {
-  if (
-    typeof clientSettings !== "undefined" &&
-    typeof clientSettings.panelView !== "undefined" &&
-    typeof clientSettings.panelView.printerRows !== "undefined"
-  ) {
-    return clientSettings.panelView.printerRows;
-  } else {
-    return 2;
-  }
 }
 
 function massDragAndDropPanel() {
@@ -159,7 +198,7 @@ function massDragAndDropPanel() {
       </div>
       <div class="card-body pt-1 pb-0 pl-2 pr-2">
         <div id="${massDragAndDropStatusId}">
-          Currently 0 printers selected. No use in dropping file in this state.
+          <span class="badge badge-danger">0 selected</span> select a printer first to mass-upload.
         </div>
       </div>
     </div>
@@ -172,35 +211,40 @@ function drawPanelView(
   realCoord,
   clientSettings,
   isLeftOfGutter,
-  isRightOfGutter,
-  markState
+  isRightOfGutter
 ) {
-  const printerLoc = `<strong>${realCoord[0]} ${realCoord[1]}</strong>`;
   const name = cleanPrinterName(printer);
   const gutterStyle = isLeftOfGutter
     ? `style="margin-right:${gutterHalfSize}; margin-left:-${gutterHalfSize};"`
     : isRightOfGutter
-    ? `style="margin-right:-${gutterHalfSize}; margin-left:${gutterHalfSize};"`
-    : "";
+      ? `style="margin-right:-${gutterHalfSize}; margin-left:${gutterHalfSize};"`
+      : "";
   const stubOrNotClass = !!printer.stub
     ? "printer-map-tile-stub"
     : "printer-map-tile";
+  const isIdle = printer.printerState?.colour.category === "Idle";
+  const printerStateColor = printer.printerState?.colour.category === "Idle" ? "Complete" : printer.printerState?.colour.category;
   return `
-      <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3 ${stubOrNotClass} ${markState}" id="panel-${printer._id}" ${gutterStyle}>
-        <div class="card mt-1 mb-1 ml-1 mr-1 text-center ${printer.printerState?.colour.category}" id="${selectableTilePrefix}-${printer._id}">
-          <div class="card-header dashHeader">
-           <span id="name-${printer._id}" class="mb-0 btn-sm float-left">
-                ${name}
-            </span>
-            <span id="coord-X${realCoord[0]}-Y{${realCoord[1]}" class="mb-0 btn-sm float-right">
-              ${printerLoc}
-            </span>
+      <div class="col-sm-3 col-md-3 col-lg-3 col-xl-3 ${stubOrNotClass}" id="panel-${printer._id}" ${gutterStyle}>
+        <div class="card mt-1 mb-1 ml-1 mr-1 text-center ${printerStateColor}" id="${selectableTilePrefix}-${printer._id}">
+          <div class="card-header dashHeader ${printerStateColor}">
+            <span id="name-${printer._id}" class="badge badge-light float-left">${name}</span>
+            <button
+                title="Stop your current print"
+                id="${stopButtonIdPrefix}${printer._id}"
+                type="button"
+                class="tag btn btn-danger mt-1 mb-1 btn-sm float-right ${!!printer.stub ? "disabled" : ""}"
+                role="button"
+              >
+                <i class="fas fa-square"></i>
+            </button>
           </div>
           <div class="card-body pt-1 pb-0 pl-2 pr-2">
             <div class="progress">
+              <span style="color:white">${isIdle ? "IDLE - " : ""}</span>&nbsp;
               <div
                 id="progress-${printer._id}"
-                class="progress-bar progress-bar-striped bg-${printer.printerState?.colour.name} percent"
+                class="progress-bar progress-bar-striped bg-${printerStateColor} percent"
                 role="progressbar progress-bar-striped"
                 style="width: 0%"
                 aria-valuenow="0"
@@ -218,21 +262,20 @@ function addListeners(printer, allPrinters) {
   printer.isSelected = false;
   let panel = document.getElementById(`${selectableTilePrefix}-${printer._id}`);
   if (panel) {
+    attachEventToStopButton(printer);
     panel.addEventListener("click", (e) => {
-      const tokenPresent = panel.classList.toggle("printer-map-tile-selected");
-      printer.isSelected = tokenPresent;
+      printer.isSelected = panel.classList.toggle("printer-map-tile-selected");
 
       const massDragAndDropStatusPanel = document.getElementById(
         massDragAndDropStatusId
       );
       if (massDragAndDropStatusPanel) {
-        const selectedPrinterCount = allPrinters.filter(
-          (p) => !!p.isSelected
-        )?.length;
+        const selectedPrinterCount = allPrinters.filter((p) => !!p.isSelected)
+          ?.length;
         if (selectedPrinterCount === 0) {
-          massDragAndDropStatusPanel.innerHTML = `Currently ${selectedPrinterCount} printers selected. No use in dropping file in this state.`;
+          massDragAndDropStatusPanel.innerHTML = `<span class="badge badge-danger">${selectedPrinterCount} selected</span> select a printer first to mass-upload.`;
         } else {
-          massDragAndDropStatusPanel.innerHTML = `Currently ${selectedPrinterCount} printers selected. Time to print!`;
+          massDragAndDropStatusPanel.innerHTML = `<span class="badge badge-success">${selectedPrinterCount} selected</span> Time to print!`;
         }
       } else {
         throw new Error("Element not found! ID: " + massDragAndDropStatusPanel);
@@ -322,8 +365,8 @@ async function updateState(printer, clientSettings, view) {
     UI.doesElementNeedUpdating(progress + "%", elements.progress, "innerHTML");
     elements.progress.style.width = progress + "%";
   } else {
-    let printTimeElapsedFormat = ``;
-    let remainingPrintTimeFormat = ``;
+    let printTimeElapsedFormat = "";
+    let remainingPrintTimeFormat = "";
     //No Job reset
     UI.doesElementNeedUpdating("", elements.progress, "innerHTML");
     elements.progress.style.width = 0 + "%";
@@ -351,14 +394,20 @@ function findPrinterWithBlockCoordinate(parsedPrinters, coordinateXY) {
   );
 }
 
-function convertPrinterNameToXYCoordinate(printer) {
+function convertPrinterURLToXYCoordinate(printer) {
   if (!printer) return [-1, -1];
-  const printerName = printer.printerName;
-  const splitNamePort = printerName.split(":");
-  if (!splitNamePort?.length > 1) {
-    return [-1, -1];
+  const printerIPPort = printer.printerURL
+    .replace("http://", "")
+    .replace("https://", "");
+  const splitIPPort = printerIPPort.split(":");
+  if (!splitIPPort) {
+    return;
   }
-  const parsedPort = parseInt(splitNamePort[2]) % 10;
+  // No specifier found
+  if (splitIPPort.length === 1) {
+    return [1, 1];
+  }
+  const parsedPort = parseInt(splitIPPort[1]) % 10;
   if (parsedPort > blockCountMax) {
     console.warn(
       "This printer's port is not recognizable in the 0,1,2,3 block index. Contact DEV~ID."
@@ -404,7 +453,7 @@ async function init(printers, clientSettings, view) {
       const parsedPrinters = [
         ...printers.map((p) => {
           const parsedGroupCoord = parseGroupLocation(p);
-          const printerSubCoordinate = convertPrinterNameToXYCoordinate(p);
+          const printerSubCoordinate = convertPrinterURLToXYCoordinate(p);
           return {
             printer: p,
             coord: parsedGroupCoord,
@@ -422,7 +471,7 @@ async function init(printers, clientSettings, view) {
             parsedPrinters,
             [realX, realY]
           );
-          const printer = null;
+          let printer = null;
           if (!printerWithCoord) {
             // We construct a fakey
             printer = {
@@ -461,7 +510,9 @@ async function init(printers, clientSettings, view) {
             //Grab elements
             await grabElements(printer);
             //Initialise Drag and Drop
-            await dragAndDropEnable(printerPanel, printer);
+            if (!printer.stub) {
+              await dragAndDropEnable(printerPanel, printer);
+            }
           } else {
             if (!printerManagerModal.classList.contains("show")) {
               if (!(await dragCheck())) {

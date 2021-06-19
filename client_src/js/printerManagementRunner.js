@@ -2603,7 +2603,7 @@ class dashUpdate {
               `printerGroup-${printer._id}`
             );
 
-            printerGroup.innerHTML = printer.groups.map((g) => g.name).join();
+            printerGroup.innerHTML = printer.groups.map((g) => g.name).join() || printer.group;
 
             if (typeof printer.octoPrintSystemInfo !== "undefined") {
               if (
@@ -2796,11 +2796,10 @@ class dashUpdate {
         <td class="align-middle"><small><span data-title="${printer.webSocketState.desc}" id="webSocketIcon-${printer._id}" class="tag badge badge-${printer.webSocketState.colour} badge-pill">
                 <i  class="fas fa-plug"></i></span></td>
 
-        <td class="align-middle"><div id="printerGroup-${printer._id}" ></div></td>
-        <td class="align-middle" id="printerPrinterInformation-${printer._id}"></td>
-        <td class="align-middle" id="printerOctoPrintInformation-${printer._id}"></td>
-    </tr>
-          `
+        <td class="align-middle"><div id="printerGroup-${printer._id}" style="padding:0"></div></td>
+        <td class="align-middle" id="printerPrinterInformation-${printer._id}" style="padding:0"></td>
+        <td class="align-middle" id="printerOctoPrintInformation-${printer._id}" style="padding:0"></td>
+    </tr>`
             );
 
             actionButtonInit(printer, `printerActionBtns-${printer._id}`);
