@@ -98,10 +98,6 @@ function serveOctoFarmRoutes(app) {
     "/groups",
     require("./server_src/routes/printerGroups", { page: "route" })
   );
-  app.use(
-    "/system",
-    require("./server_src/routes/systemSettings", { page: "route" })
-  );
   // TODO: Set for deprication for another PR with client settings focus.
   app.use(
     "/settings",
