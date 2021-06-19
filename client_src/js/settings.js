@@ -444,7 +444,7 @@ setInterval(async function updateStatus() {
     sysUptimeElem.innerHTML = Calc.generateTime(systemInfo.sysUptime.uptime);
   }
 
-  if (systemInfo.sysUptime?.uptime && !!sysUptimeElem) {
+  if (systemInfo.processUptime && !!sysUptimeElem) {
     procUptimeElem.innerHTML = Calc.generateTime(systemInfo.processUptime);
   }
 

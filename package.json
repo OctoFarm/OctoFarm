@@ -60,7 +60,7 @@
     "request": "^2.88.2",
     "semver": "^6.3.0",
     "simple-git": "^2.38.0",
-    "systeminformation": "^5.6.12",
+    "systeminformation": "^5.7.7",
     "wake_on_lan": "^1.0.0",
     "winston": "^3.3.3",
     "ws": "^7.4.6",

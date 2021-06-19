@@ -5,7 +5,6 @@ const router = express.Router();
 const { ensureAuthenticated } = require("../middleware/auth");
 const ClientSettingsDB = require("../models/ClientSettings.js");
 const GcodeDB = require("../models/CustomGcode.js");
-const { SystemRunner } = require("../runners/systemInfo.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 
 // TODO: move to own file...
@@ -35,28 +34,6 @@ router.post("/client/update", ensureAuthenticated, (req, res) => {
   });
 });
 
-/**
- * Acquire system information from system info runner
- */
-router.get("/sysInfo", ensureAuthenticated, async (req, res) => {
-  const systemInformation = await SystemRunner.returnInfo();
-  let sysInfo = null;
-
-  if (!!systemInformation) {
-    sysInfo = {
-      osInfo: systemInformation.osInfo,
-      cpuInfo: systemInformation.cpuInfo,
-      cpuLoad: systemInformation.cpuLoad,
-      memoryInfo: systemInformation.memoryInfo,
-      sysUptime: systemInformation.sysUptime,
-      currentProcess: systemInformation.currentProcess,
-      processUptime: systemInformation.processUptime
-    };
-  }
-  res.send(sysInfo);
-});
-
-// Think this should be it's own route personally.
 router.get("/customGcode/delete/:id", ensureAuthenticated, async (req, res) => {
   const scriptId = req.params.id;
   GcodeDB.findByIdAndDelete(scriptId, function (err) {

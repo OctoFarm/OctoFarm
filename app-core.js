@@ -135,6 +135,7 @@ function serveOctoFarmRoutes(app) {
     "/input",
     require("./server_src/routes/externalDataCollection", { page: "route" })
   );
+  app.use("/system", require("./server_src/routes/system", { page: "route" }));
   app.use("/client", require("./server_src/routes/sorting", { page: "route" }));
   app.get("*", function (req, res) {
     res.redirect("/");
@@ -153,10 +154,6 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
     const { Runner } = require("./server_src/runners/state.js");
     const stateRunnerReport = await Runner.init();
     logger.info("OctoFarm State returned", stateRunnerReport);
-
-    logger.info("Initialising SystemRunner...");
-    const sr = await SystemRunner.init();
-    logger.info("OctoFarm SystemRunner returned", sr);
 
     await optionalInfluxDatabaseSetup();
   }
