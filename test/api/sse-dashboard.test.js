@@ -1,4 +1,4 @@
-jest.mock("../../server_src/config/auth");
+jest.mock("../../server_src/middleware/auth");
 
 const EventSource = require("eventsource");
 const { parse } = require("flatted/cjs");
@@ -90,76 +90,76 @@ describe("SSE-dashboard", () => {
               data: [
                 {
                   x: expect.any(Number),
-                  y: expect.any(Number),
+                  y: expect.any(Number)
                 },
                 {
                   x: expect.any(Number),
-                  y: expect.any(Number),
+                  y: expect.any(Number)
                 }
               ]
             },
             {
-              "name": "Target Tool",
-              "data": [
+              name: "Target Tool",
+              data: [
                 {
                   x: expect.any(Number),
-                  y: expect.any(Number),
+                  y: expect.any(Number)
                 },
                 {
                   x: expect.any(Number),
-                  y: expect.any(Number),
+                  y: expect.any(Number)
                 }
               ]
             },
             {
-              "name": "Actual Bed",
-              "data": [
+              name: "Actual Bed",
+              data: [
                 {
                   x: expect.any(Number),
-                  y: expect.any(Number),
+                  y: expect.any(Number)
                 },
                 {
                   x: expect.any(Number),
-                  y: expect.any(Number),
+                  y: expect.any(Number)
                 }
               ]
             },
             {
-              "name": "Target Bed",
-              "data": [
+              name: "Target Bed",
+              data: [
                 {
                   x: expect.any(Number),
-                  y: expect.any(Number),
+                  y: expect.any(Number)
                 },
                 {
                   x: expect.any(Number),
-                  y: expect.any(Number),
+                  y: expect.any(Number)
                 }
               ]
             },
             {
-              "name": "Actual Chamber",
-              "data": [
+              name: "Actual Chamber",
+              data: [
                 {
                   x: expect.any(Number),
-                  y: expect.any(Number),
+                  y: expect.any(Number)
                 },
                 {
                   x: expect.any(Number),
-                  y: expect.any(Number),
+                  y: expect.any(Number)
                 }
               ]
             },
             {
-              "name": "Target Chamber",
-              "data": [
+              name: "Target Chamber",
+              data: [
                 {
                   x: expect.any(Number),
-                  y: expect.any(Number),
+                  y: expect.any(Number)
                 },
                 {
                   x: expect.any(Number),
-                  y: expect.any(Number),
+                  y: expect.any(Number)
                 }
               ]
             }

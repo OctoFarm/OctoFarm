@@ -1,4 +1,4 @@
-jest.mock("../../server_src/config/auth");
+jest.mock("../../server_src/middleware/auth");
 
 const EventSource = require("eventsource");
 const { parse } = require("flatted/cjs");
