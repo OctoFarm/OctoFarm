@@ -27,29 +27,26 @@ const { getHistoryCache } = require("../cache/history.cache");
 const version = process.env[AppConstants.VERSION_KEY];
 
 // Welcome Page
-async function welcome() {
+router.get("/", async (req, res) => {
   const serverSettings = await ServerSettings.find({});
 
   if (serverSettings[0].server.loginRequired === false) {
-    router.get("/", (req, res) => res.redirect("/dashboard"));
+    res.redirect("/dashboard");
   } else {
     const { registration } = serverSettings[0].server;
-    router.get("/", (req, res) => {
-      if (req.isAuthenticated()) {
-        res.redirect("/dashboard");
-      } else {
-        res.render("welcome", {
-          page: "Welcome",
-          octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-          registration,
-          serverSettings: serverSettings[0]
-        });
-      }
-    });
-  }
-}
 
-welcome();
+    if (req.isAuthenticated()) {
+      res.redirect("/dashboard");
+    } else {
+      res.render("welcome", {
+        page: "Welcome",
+        octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+        registration,
+        serverSettings: serverSettings[0]
+      });
+    }
+  }
+});
 
 // Dashboard Page
 router.get(
@@ -141,6 +138,7 @@ router.get(
     });
   }
 );
+
 // Panel view  Page
 router.get(
   "/mon/panel",
@@ -151,8 +149,8 @@ router.get(
     const sortedIndex = await Runner.sortedIndex();
     const clientSettings = await SettingsClean.returnClientSettings();
     const dashStatistics = await PrinterClean.returnDashboardStatistics();
-    const currentSort = await getSorting();
-    const currentFilter = await getFilter();
+    const currentSort = getSorting();
+    const currentFilter = getFilter();
 
     let printGroups = await Runner.returnGroupList();
     if (typeof printGroups === "undefined") {
@@ -187,8 +185,8 @@ router.get(
     const clientSettings = await SettingsClean.returnClientSettings();
     const serverSettings = await SettingsClean.returnSystemSettings();
     const dashStatistics = await PrinterClean.returnDashboardStatistics();
-    const currentSort = await getSorting();
-    const currentFilter = await getFilter();
+    const currentSort = getSorting();
+    const currentFilter = getFilter();
 
     let printGroups = await Runner.returnGroupList();
     if (typeof printGroups === "undefined") {
@@ -222,8 +220,8 @@ router.get(
     const clientSettings = await SettingsClean.returnClientSettings();
     const serverSettings = await SettingsClean.returnSystemSettings();
 
-    const currentSort = await getSorting();
-    const currentFilter = await getFilter();
+    const currentSort = getSorting();
+    const currentFilter = getFilter();
 
     let printGroups = await Runner.returnGroupList();
     if (typeof printGroups === "undefined") {
@@ -256,8 +254,8 @@ router.get(
     const sortedIndex = await Runner.sortedIndex();
     const clientSettings = await SettingsClean.returnClientSettings();
     const dashStatistics = await PrinterClean.returnDashboardStatistics();
-    const currentSort = await getSorting();
-    const currentFilter = await getFilter();
+    const currentSort = getSorting();
+    const currentFilter = getFilter();
 
     let printGroups = await Runner.returnGroupList();
     if (typeof printGroups === "undefined") {
