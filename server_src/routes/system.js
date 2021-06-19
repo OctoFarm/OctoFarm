@@ -33,7 +33,7 @@ const { fetchMongoDBConnectionString } = require("../../app-env");
 const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
 const { getServerSettingsCache } = require("../cache/server-settings.cache.js");
-const { Logs } = require("../lib/logger.js");
+const { Logs } = require("../lib/serverLogs.js");
 const { SystemCommands } = require("../lib/serverCommands.js");
 const {
   checkReleaseAndLogUpdate,
@@ -114,9 +114,7 @@ router.post(
 );
 
 router.get("/settings", ensureAuthenticated, (req, res) => {
-  const serverSettingsCache = getServerSettingsCache().systemSettings;
-  console.log(serverSettingsCache);
-  res.send(serverSettingsCache);
+  res.send(getServerSettingsCache().entireServerSettingsObject);
 });
 
 router.post("/settings", ensureAuthenticated, async (req, res) => {
