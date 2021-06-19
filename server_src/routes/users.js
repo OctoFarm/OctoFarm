@@ -25,7 +25,7 @@ router.get("/login", async (req, res) => {
   res.render("login", {
     page: "Login",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-    registration: req.serverSettingsCache.server.registration,
+    registration: req.serverSettingsCache.server.registration
   });
 });
 
@@ -40,7 +40,7 @@ router.post(
         failureFlash: true,
         page: "Login",
         octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-        registration: req.serverSettingsCache.server.registration,
+        registration: req.serverSettingsCache.server.registration
       },
       function (err, user, info) {
         if (info?.message === "Missing credentials") {
@@ -77,19 +77,19 @@ router.post(
 
 // Register Page
 router.get("/register", async (req, res) => {
-  if (req.serverSettingsCache.server.registration,) {
+  if (req.serverSettingsCache.server.registration) {
     return res.redirect("login");
   }
 
-    router.get("/register", (req, res) =>
-      res.render("register", {
-        page: "Register",
-        octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-        registration: req.serverSettingsCache.server.registration,
-        userCount: currentUsers.length
-      })
-    );
-
+  router.get("/register", (req, res) =>
+    res.render("register", {
+      page: "Register",
+      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+      registration: req.serverSettingsCache.server.registration,
+      userCount: currentUsers.length
+    })
+  );
+});
 // Register Handle
 router.post("/register", async (req, res) => {
   const { name, username, password, password2 } = req.body;
