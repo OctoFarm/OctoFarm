@@ -90,7 +90,7 @@ describe("State", () => {
     // TODO the conclusion from the code under test is incorrect
     expect(comparisonResult3).toEqual({
       message:
-          "Global API Key detected... unable to authenticate websocket connection",
+        "Global API Key detected... unable to authenticate websocket connection",
       type: "system",
       errno: "999",
       code: "999"

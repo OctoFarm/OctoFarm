@@ -6,7 +6,6 @@ const { ensureSystemSettingsInitiated } = require(rootPath + "app-core");
 beforeAll(async () => {
   await dbHandler.connect();
   await ensureSystemSettingsInitiated();
-
 });
 
 afterEach(async () => {
@@ -36,14 +35,20 @@ describe("OctoPrint-API-Client-Service", () => {
 
     // TODO Not human-friendly
     expect(
-        async () => await instance.getSettings({apikey: 'surewhynot', printerURL: "some uwrl"})
+      async () =>
+        await instance.getSettings({
+          apikey: "surewhynot",
+          printerURL: "some uwrl"
+        })
     ).rejects.toHaveProperty("code", "ERR_INVALID_URL");
   });
 
   it("should not throw error on getSettings with incorrect printerURL", async () => {
-    const instance = new OctoprintApiClientService({apiTimeout: 1});
+    const instance = new OctoprintApiClientService({ apiTimeout: 1 });
 
-    const settings = await instance.getSettings({apikey: 'surewhynot', printerURL: "http://someurl/"});
-
+    const settings = await instance.getSettings({
+      apikey: "surewhynot",
+      printerURL: "http://someurl/"
+    });
   });
 });

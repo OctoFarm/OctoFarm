@@ -16,7 +16,7 @@ class OctoprintApiService {
     return Promise.resolve({
       status: OctoprintApiService.mockStatus,
       json: () => {
-        return OctoprintApiService.mockResponse
+        return OctoprintApiService.mockResponse;
       }
     });
   }

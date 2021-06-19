@@ -130,9 +130,7 @@ router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
   if (!id) {
     returnedPrinterInformation = PrinterClean.listPrintersInformation();
   } else {
-    returnedPrinterInformation = PrinterClean.getPrintersInformationById(
-      id
-    );
+    returnedPrinterInformation = PrinterClean.getPrintersInformationById(id);
   }
   res.send(returnedPrinterInformation);
 });

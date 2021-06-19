@@ -89,7 +89,7 @@ const Flatted = (function (Primitive, primitive) {
         output[i] = JSON.stringify(input[i], replace, space);
       }
       return "[" + output.join(",") + "]";
-    },
+    }
   };
 
   return Flatted;
