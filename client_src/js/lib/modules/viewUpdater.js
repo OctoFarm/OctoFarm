@@ -5,7 +5,7 @@ import UI from "../functions/ui.js";
 import Calc from "../functions/calc.js";
 import {
   checkQuickConnectState,
-  init as actionButtonInit,
+  init as actionButtonInit
 } from "./Printers/actionButtons.js";
 import OctoPrintClient from "../octoprint.js";
 import { checkTemps } from "../modules/temperatureCheck.js";
@@ -162,7 +162,7 @@ function imageOrCamera(printer) {
         url: printer.cameraURL,
         flipV,
         flipH,
-        rotate90,
+        rotate90
       });
     } else {
       if (
@@ -173,14 +173,14 @@ function imageOrCamera(printer) {
           url: printer.printerURL + "/" + printer.currentJob.thumbnail,
           flipV,
           flipH,
-          rotate90,
+          rotate90
         });
       } else {
         return drawCamera({
           url: "../images/noCamera.jpg",
           flipV,
           flipH,
-          rotate90,
+          rotate90
         });
       }
     }
@@ -193,7 +193,7 @@ function imageOrCamera(printer) {
         url: printer.printerURL + "/" + printer.currentJob.thumbnail,
         flipV,
         flipH,
-        rotate90,
+        rotate90
       });
     } else {
       return drawCamera({ url: "", flipV, flipH, rotate90 });
@@ -611,7 +611,7 @@ function addListeners(printer) {
     playBtn.addEventListener("click", (e) => {
       e.target.disabled = true;
       const opts = {
-        command: "start",
+        command: "start"
       };
       const print = returnPrinterInfo(printer._id);
       OctoPrintClient.jobAction(print, opts, e);
@@ -626,21 +626,21 @@ function addListeners(printer) {
         message: `${name}: <br>Are you sure you want to cancel the ongoing print?`,
         buttons: {
           cancel: {
-            label: '<i class="fa fa-times"></i> Cancel',
+            label: '<i class="fa fa-times"></i> Cancel'
           },
           confirm: {
-            label: '<i class="fa fa-check"></i> Confirm',
-          },
+            label: '<i class="fa fa-check"></i> Confirm'
+          }
         },
         callback(result) {
           if (result) {
             e.target.disabled = true;
             const opts = {
-              command: "cancel",
+              command: "cancel"
             };
             OctoPrintClient.jobAction(print, opts, e);
           }
-        },
+        }
       });
     });
   }
@@ -649,7 +649,7 @@ function addListeners(printer) {
     restartBtn.addEventListener("click", (e) => {
       e.target.disabled = true;
       const opts = {
-        command: "restart",
+        command: "restart"
       };
       const print = returnPrinterInfo(printer._id);
       OctoPrintClient.jobAction(print, opts, e);
@@ -661,7 +661,7 @@ function addListeners(printer) {
       e.target.disabled = true;
       const opts = {
         command: "pause",
-        action: "pause",
+        action: "pause"
       };
       const print = returnPrinterInfo(printer._id);
       OctoPrintClient.jobAction(print, opts, e);
@@ -673,7 +673,7 @@ function addListeners(printer) {
       e.target.disabled = true;
       const opts = {
         command: "pause",
-        action: "resume",
+        action: "resume"
       };
       const print = returnPrinterInfo(printer._id);
       OctoPrintClient.jobAction(print, opts, e);
@@ -718,7 +718,7 @@ function grabElements(printer) {
       cameraContain: document.getElementById("cameraContain-" + printer._id),
       progress: document.getElementById("progress-" + printer._id),
       bed: document.getElementById("badTemp-" + printer._id),
-      chamber: document.getElementById("chamberTemp-" + printer._id),
+      chamber: document.getElementById("chamberTemp-" + printer._id)
     };
     return elems[printer._id];
   }

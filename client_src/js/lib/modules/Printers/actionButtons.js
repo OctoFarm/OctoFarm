@@ -123,7 +123,7 @@ function addEventListeners(printer) {
             command: "connect",
             port: printer.connectionOptions.portPreference,
             baudrate: parseInt(printer.connectionOptions.baudratePreference),
-            printerProfile: printer.connectionOptions.printerProfilePreference,
+            printerProfile: printer.connectionOptions.printerProfilePreference
           };
         } else {
           UI.createAlert(
@@ -168,17 +168,17 @@ function addEventListeners(printer) {
           buttons: {
             confirm: {
               label: "Yes",
-              className: "btn-success",
+              className: "btn-success"
             },
             cancel: {
               label: "No",
-              className: "btn-danger",
-            },
+              className: "btn-danger"
+            }
           },
           callback: async function (result) {
             if (result) {
               let data = {
-                command: "disconnect",
+                command: "disconnect"
               };
               let post = await OctoPrintClient.post(
                 printer,
@@ -210,7 +210,7 @@ function addEventListeners(printer) {
                 );
               }
             }
-          },
+          }
         });
       }
     });
@@ -221,7 +221,7 @@ function addEventListeners(printer) {
       e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i>";
       e.target.disabled = true;
       const data = {
-        id: printer._id,
+        id: printer._id
       };
       let post = await OctoFarmClient.post("printers/reScanOcto", data);
       post = await post.json();
@@ -276,5 +276,5 @@ export {
   init,
   printerQuickConnected,
   printerQuickDisconnected,
-  checkQuickConnectState,
+  checkQuickConnectState
 };
