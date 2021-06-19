@@ -29,20 +29,24 @@ function checkUpdateAndNotify(updateResponse) {
     // Disregard notification if it it's version is already stored
     let parsedStorageReleaseInfo;
     try {
-      parsedStorageReleaseInfo = JSON.parse(localStorage.getItem(notificationMarkReadSessionKey));
+      parsedStorageReleaseInfo = JSON.parse(
+        localStorage.getItem(notificationMarkReadSessionKey)
+      );
     } catch (e) {
       parsedStorageReleaseInfo = null;
     }
     // If the update button is available, we are on the system page. React to available updates accordingly.
-    let updateOctoFarmBtn = document.getElementById(
-        "updateOctoFarmBtn"
-    );
+    let updateOctoFarmBtn = document.getElementById("updateOctoFarmBtn");
     if (updateOctoFarmBtn) {
       updateOctoFarmBtn.disabled = false;
     }
     // Process the full notification or a shorter reminder
-    if (!parsedStorageReleaseInfo || parsedStorageReleaseInfo?.tag_name !== updateResponse?.latestReleaseKnown?.tag_name) {
-      if (window.location?.href.includes('/system')) {
+    if (
+      !parsedStorageReleaseInfo ||
+      parsedStorageReleaseInfo?.tag_name !==
+        updateResponse?.latestReleaseKnown?.tag_name
+    ) {
+      if (window.location?.href.includes("/system")) {
         return;
       }
 
@@ -56,26 +60,31 @@ function checkUpdateAndNotify(updateResponse) {
             "UPDATE",
             "btn btn-success",
             function () {
-              window.location = '/system';
+              window.location = "/system";
             },
-            {id: "button1", "data-status": "ok"}
+            { id: "button1", "data-status": "ok" }
           ),
           Noty.button("Mark read", "btn btn-error", function () {
             // Update the stored version to become the newest
-            localStorage.setItem(notificationMarkReadSessionKey, JSON.stringify(updateResponse.latestReleaseKnown));
+            localStorage.setItem(
+              notificationMarkReadSessionKey,
+              JSON.stringify(updateResponse.latestReleaseKnown)
+            );
             n.close();
           }),
           Noty.button("Later", "btn btn-error", function () {
             n.close();
-          }),
-        ],
+          })
+        ]
       });
       n.show();
     } else {
-      UI.createAlert("success",
+      UI.createAlert(
+        "success",
         `A small reminder: OctoFarm update available from ${updateResponse.current_version} to ${updateResponse?.latestReleaseKnown?.tag_name} ;)`,
         1000,
-        "clicked");
+        "clicked"
+      );
     }
   }
 }
@@ -93,7 +102,9 @@ const serverAliveCheck = async function () {
           try {
             checkUpdateAndNotify(alive.update);
           } catch (e) {
-            console.warn("Could not succesfully parse OctoFarm update notification");
+            console.warn(
+              "Could not succesfully parse OctoFarm update notification"
+            );
           }
         }
 

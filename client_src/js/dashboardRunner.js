@@ -50,7 +50,7 @@ let initNewGraphs = async function () {
     if (index === 0) {
       obj = {
         title: {
-          text: "Weight",
+          text: "Weight"
         },
         seriesName: usageOverTime[0]?.name,
         labels: {
@@ -58,8 +58,8 @@ let initNewGraphs = async function () {
             if (val !== null) {
               return val.toFixed(2) + "g";
             }
-          },
-        },
+          }
+        }
       };
     } else {
       obj = {
@@ -70,8 +70,8 @@ let initNewGraphs = async function () {
             if (val !== null) {
               return val.toFixed(2) + "g";
             }
-          },
-        },
+          }
+        }
       };
     }
 
@@ -89,23 +89,23 @@ let initNewGraphs = async function () {
         curve: "smooth",
         lineCap: "butt",
         width: 1,
-        dashArray: 0,
+        dashArray: 0
       },
       animations: {
-        enabled: true,
+        enabled: true
       },
       plotOptions: {
         bar: {
-          horizontal: false,
-        },
+          horizontal: false
+        }
       },
       toolbar: {
-        show: false,
+        show: false
       },
       zoom: {
-        enabled: false,
+        enabled: false
       },
-      background: "#303030",
+      background: "#303030"
     },
     dataLabels: {
       enabled: false,
@@ -116,13 +116,13 @@ let initNewGraphs = async function () {
         borderRadius: 2,
         borderWidth: 1,
         borderColor: "#fff",
-        opacity: 0.9,
+        opacity: 0.9
       },
       formatter: function (val, opts) {
         if (val !== null) {
           return val.toFixed(0) + "g";
         }
-      },
+      }
     },
     colors: [
       "#ff0000",
@@ -133,22 +133,22 @@ let initNewGraphs = async function () {
       "#00b7ff",
       "#4400ff",
       "#8000ff",
-      "#ff00f2",
+      "#ff00f2"
     ],
     toolbar: {
-      show: false,
+      show: false
     },
     theme: {
-      mode: "dark",
+      mode: "dark"
     },
     noData: {
-      text: "Loading...",
+      text: "Loading..."
     },
     series: [],
     yaxis: [
       {
         title: {
-          text: "Weight",
+          text: "Weight"
         },
         seriesName: usageOverTime[0]?.name,
         labels: {
@@ -156,9 +156,9 @@ let initNewGraphs = async function () {
             if (val !== null) {
               return val.toFixed(0) + "g";
             }
-          },
-        },
-      },
+          }
+        }
+      }
     ],
     xaxis: {
       type: "category",
@@ -169,9 +169,9 @@ let initNewGraphs = async function () {
           let dae = new Date(value).toLocaleDateString();
 
           return dae; // The formatter function overrides format property
-        },
-      },
-    },
+        }
+      }
+    }
   };
   const usageOverFilamentTimeOptions = {
     chart: {
@@ -180,15 +180,15 @@ let initNewGraphs = async function () {
       height: "250px",
       stacked: true,
       animations: {
-        enabled: true,
+        enabled: true
       },
       toolbar: {
-        show: false,
+        show: false
       },
       zoom: {
-        enabled: false,
+        enabled: false
       },
-      background: "#303030",
+      background: "#303030"
     },
     dataLabels: {
       enabled: true,
@@ -199,13 +199,13 @@ let initNewGraphs = async function () {
         borderRadius: 2,
         borderWidth: 1,
         borderColor: "#fff",
-        opacity: 0.9,
+        opacity: 0.9
       },
       formatter: function (val, opts) {
         if (val !== null) {
           return val.toFixed(0) + "g";
         }
-      },
+      }
     },
     colors: [
       "#ff0000",
@@ -216,20 +216,20 @@ let initNewGraphs = async function () {
       "#00b7ff",
       "#4400ff",
       "#8000ff",
-      "#ff00f2",
+      "#ff00f2"
     ],
     toolbar: {
-      show: false,
+      show: false
     },
     stroke: {
       width: 2,
-      curve: "smooth",
+      curve: "smooth"
     },
     theme: {
-      mode: "dark",
+      mode: "dark"
     },
     noData: {
-      text: "Loading...",
+      text: "Loading..."
     },
     series: [],
     yaxis: yAxisSeries,
@@ -242,9 +242,9 @@ let initNewGraphs = async function () {
           let dae = new Date(value).toLocaleDateString();
 
           return dae; // The formatter function overrides format property
-        },
-      },
-    },
+        }
+      }
+    }
   };
   const historyGraphOptions = {
     chart: {
@@ -252,15 +252,15 @@ let initNewGraphs = async function () {
       width: "100%",
       height: "250px",
       animations: {
-        enabled: true,
+        enabled: true
       },
       toolbar: {
-        show: false,
+        show: false
       },
       zoom: {
-        enabled: false,
+        enabled: false
       },
-      background: "#303030",
+      background: "#303030"
     },
     colors: ["#00bc8c", "#f39c12", "#e74c3c"],
     dataLabels: {
@@ -272,28 +272,28 @@ let initNewGraphs = async function () {
         borderRadius: 2,
         borderWidth: 1,
         borderColor: "#fff",
-        opacity: 0.9,
-      },
+        opacity: 0.9
+      }
     },
     // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
     toolbar: {
-      show: false,
+      show: false
     },
     stroke: {
       width: 4,
-      curve: "smooth",
+      curve: "smooth"
     },
     theme: {
-      mode: "dark",
+      mode: "dark"
     },
     noData: {
-      text: "Loading...",
+      text: "Loading..."
     },
     series: [],
     yaxis: [
       {
         title: {
-          text: "Count",
+          text: "Count"
         },
         seriesName: "Success",
         labels: {
@@ -301,12 +301,12 @@ let initNewGraphs = async function () {
             if (val !== null) {
               return val.toFixed(0);
             }
-          },
-        },
+          }
+        }
       },
       {
         title: {
-          text: "Count",
+          text: "Count"
         },
         seriesName: "Success",
         labels: {
@@ -314,13 +314,13 @@ let initNewGraphs = async function () {
             if (val !== null) {
               return val.toFixed(0);
             }
-          },
+          }
         },
-        show: false,
+        show: false
       },
       {
         title: {
-          text: "Count",
+          text: "Count"
         },
         seriesName: "Success",
         labels: {
@@ -328,10 +328,10 @@ let initNewGraphs = async function () {
             if (val !== null) {
               return val.toFixed(0);
             }
-          },
+          }
         },
-        show: false,
-      },
+        show: false
+      }
     ],
     xaxis: {
       type: "datetime",
@@ -340,9 +340,9 @@ let initNewGraphs = async function () {
         formatter: function (value, timestamp) {
           let dae = new Date(timestamp);
           return dae.toLocaleDateString(); // The formatter function overrides format property
-        },
-      },
-    },
+        }
+      }
+    }
   };
 
   if (document.querySelector("#usageOverFilamentTime")) {
@@ -381,41 +381,41 @@ const optionsFarmTemp = {
     width: "100%",
     height: "90%",
     animations: {
-      enabled: false,
+      enabled: false
     },
     toolbar: {
-      show: false,
+      show: false
     },
     zoom: {
-      enabled: false,
+      enabled: false
     },
-    background: "#303030",
+    background: "#303030"
   },
   colors: ["#fcc329", "#ff1500", "#009cff", "#ff1800", "#37ff00", "#ff1800"],
   stroke: {
-    curve: "smooth",
+    curve: "smooth"
   },
   toolbar: {
-    show: false,
+    show: false
   },
   theme: {
-    mode: "dark",
+    mode: "dark"
   },
   noData: {
-    text: "Loading...",
+    text: "Loading..."
   },
   series: [],
   yaxis: [
     {
       title: {
-        text: "Temp",
+        text: "Temp"
       },
       seriesName: "Actual Tool",
       labels: {
         formatter(value) {
           return `${value}°C`;
-        },
-      },
+        }
+      }
     },
     {
       seriesName: "Actual Tool",
@@ -423,8 +423,8 @@ const optionsFarmTemp = {
       labels: {
         formatter(value) {
           return `${value}°C`;
-        },
-      },
+        }
+      }
     },
     {
       seriesName: "Actual Tool",
@@ -432,8 +432,8 @@ const optionsFarmTemp = {
       labels: {
         formatter(value) {
           return `${value}°C`;
-        },
-      },
+        }
+      }
     },
     {
       seriesName: "Actual Tool",
@@ -441,8 +441,8 @@ const optionsFarmTemp = {
       labels: {
         formatter(value) {
           return `${value}°C`;
-        },
-      },
+        }
+      }
     },
     {
       seriesName: "Actual Tool",
@@ -450,8 +450,8 @@ const optionsFarmTemp = {
       labels: {
         formatter(value) {
           return `${value}°C`;
-        },
-      },
+        }
+      }
     },
     {
       seriesName: "Actual Tool",
@@ -459,9 +459,9 @@ const optionsFarmTemp = {
       labels: {
         formatter(value) {
           return `${value}°C`;
-        },
-      },
-    },
+        }
+      }
+    }
   ],
   xaxis: {
     type: "datetime",
@@ -469,9 +469,9 @@ const optionsFarmTemp = {
       formatter(value) {
         const date = new Date(value);
         return date.toLocaleTimeString();
-      },
-    },
-  },
+      }
+    }
+  }
 };
 const optionsHeatChart = {
   chart: {
@@ -483,22 +483,22 @@ const optionsHeatChart = {
       enabled: true,
       easing: "linear",
       dynamicAnimation: {
-        speed: 1000,
-      },
+        speed: 1000
+      }
     },
     toolbar: {
-      show: false,
+      show: false
     },
     zoom: {
-      enabled: false,
+      enabled: false
     },
-    background: "#303030",
+    background: "#303030"
   },
   theme: {
-    mode: "dark",
+    mode: "dark"
   },
   noData: {
-    text: "Loading...",
+    text: "Loading..."
   },
   series: [],
   dataLabels: {
@@ -510,8 +510,8 @@ const optionsHeatChart = {
       fontSize: "14px",
       fontFamily: "Helvetica, Arial, sans-serif",
       fontWeight: "bold",
-      colors: ["#000000"],
-    },
+      colors: ["#000000"]
+    }
   },
   stroke: {
     show: true,
@@ -519,7 +519,7 @@ const optionsHeatChart = {
     lineCap: "butt",
     colors: ["#303030"],
     width: 2,
-    dashArray: 0,
+    dashArray: 0
   },
   plotOptions: {
     heatmap: {
@@ -532,46 +532,46 @@ const optionsHeatChart = {
             from: 0,
             to: 1,
             name: "none",
-            color: "#848484",
+            color: "#848484"
           },
           {
             from: 2,
             to: 25,
             name: "low",
-            color: "#375a7f",
+            color: "#375a7f"
           },
           {
             from: 26,
             to: 60,
             name: "medium",
-            color: "#f39c12",
+            color: "#f39c12"
           },
           {
             from: 61,
             to: 75,
             name: "high",
-            color: "#00bc8c",
+            color: "#00bc8c"
           },
           {
             from: 76,
             to: 100,
             name: "extreme",
-            color: "#e74c3c",
-          },
-        ],
-      },
-    },
+            color: "#e74c3c"
+          }
+        ]
+      }
+    }
   },
   tooltip: {
     y: {
       formatter(val) {
         return `${Math.round(val * 10) / 10}%`;
-      },
-    },
+      }
+    }
   },
   xaxis: {
-    reversed: true,
-  },
+    reversed: true
+  }
 };
 const optionsRadar = {
   series: [],
@@ -580,46 +580,46 @@ const optionsRadar = {
     width: "100%",
     height: "85%",
     toolbar: {
-      show: false,
+      show: false
     },
     animations: {
-      enabled: false,
+      enabled: false
     },
-    background: "#303030",
+    background: "#303030"
   },
   theme: {
-    mode: "dark",
+    mode: "dark"
   },
   plotOptions: {
     bar: {
-      horizontal: true,
-    },
+      horizontal: true
+    }
   },
   noData: {
-    text: "Loading...",
+    text: "Loading..."
   },
   dataLabels: {
     enabled: false,
     formatter(val) {
       return val;
-    },
+    }
   },
   xaxis: {
-    categories: ["Active", "Complete", "Idle", "Disconnected", "Offline"],
+    categories: ["Active", "Complete", "Idle", "Disconnected", "Offline"]
   },
   tooltip: {
     theme: "dark",
     x: {
-      show: false,
+      show: false
     },
     y: {
       title: {
         formatter(val, opt) {
           return `${opt.w.globals.labels[opt.dataPointIndex]}:  `;
-        },
-      },
-    },
-  },
+        }
+      }
+    }
+  }
 };
 const optionsUtilisation = {
   chart: {
@@ -627,37 +627,37 @@ const optionsUtilisation = {
     width: "100%",
     height: "100%",
     animations: {
-      enabled: true,
+      enabled: true
     },
-    background: "#303030",
+    background: "#303030"
   },
   theme: {
-    mode: "dark",
+    mode: "dark"
   },
   plotOptions: {
     pie: {
       expandOnClick: false,
       dataLabels: {
         offset: 10,
-        minAngleToShowLabel: 15,
-      },
-    },
+        minAngleToShowLabel: 15
+      }
+    }
   },
   stroke: {
-    show: false,
+    show: false
   },
   tooltip: {
     y: {
       formatter(val) {
         return `${Math.round(val * 10) / 10}%`;
-      },
-    },
+      }
+    }
   },
   noData: {
-    text: "Loading...",
+    text: "Loading..."
   },
   dataLabels: {
-    enabled: false,
+    enabled: false
   },
   series: [],
   labels: ["Active", "Idle", "Offline"],
@@ -682,7 +682,7 @@ const optionsUtilisation = {
     offsetY: 0,
     labels: {
       colors: undefined,
-      useSeriesColors: false,
+      useSeriesColors: false
     },
     markers: {
       width: 9,
@@ -694,19 +694,19 @@ const optionsUtilisation = {
       customHTML: undefined,
       onClick: undefined,
       offsetX: 0,
-      offsetY: 0,
+      offsetY: 0
     },
     itemMargin: {
       horizontal: 1,
-      vertical: 0,
+      vertical: 0
     },
     onItemClick: {
-      toggleDataSeries: false,
+      toggleDataSeries: false
     },
     onItemHover: {
-      highlightDataSeries: false,
-    },
-  },
+      highlightDataSeries: false
+    }
+  }
 };
 
 if (document.querySelector("#farmTempMap")) {
@@ -863,7 +863,7 @@ class dashUpdate {
         if (data[i].data.length !== 0) {
           const tempLabel = {
             title: {
-              text: "Temp",
+              text: "Temp"
             },
             seriesName: "Temperature",
             labels: {
@@ -873,14 +873,14 @@ class dashUpdate {
                 } else {
                   return `${value}°C`;
                 }
-              },
+              }
             },
             min: 0,
-            max: 45,
+            max: 45
           };
           const humLabel = {
             title: {
-              text: "Humidity",
+              text: "Humidity"
             },
             opposite: true,
             seriesName: "Humidity",
@@ -892,14 +892,14 @@ class dashUpdate {
                 } else {
                   return `${value} %`;
                 }
-              },
+              }
             },
             min: 0,
-            max: 100,
+            max: 100
           };
           const pressLabel = {
             title: {
-              text: "Pressure",
+              text: "Pressure"
             },
             opposite: true,
             seriesName: "Pressure",
@@ -911,14 +911,14 @@ class dashUpdate {
                 } else {
                   return `${value} Pa`;
                 }
-              },
+              }
             },
             min: 0,
-            max: 1100,
+            max: 1100
           };
           const iaqLabel = {
             title: {
-              text: "Indoor Air Quality",
+              text: "Indoor Air Quality"
             },
             opposite: false,
             seriesName: "IAQ",
@@ -954,8 +954,8 @@ class dashUpdate {
                   }
                 }
                 return `${value}: ${state}`;
-              },
-            },
+              }
+            }
           };
 
           if (data[i].name === "Temperature") {
@@ -980,28 +980,28 @@ class dashUpdate {
             height: "90%",
             width: "100%",
             animations: {
-              enabled: false,
+              enabled: false
             },
             toolbar: {
-              show: false,
+              show: false
             },
             zoom: {
-              enabled: false,
+              enabled: false
             },
-            background: "#303030",
+            background: "#303030"
           },
           colors: ["#ff1500", "#324bca", "#caa932", "#49ca32"],
           stroke: {
-            curve: "smooth",
+            curve: "smooth"
           },
           toolbar: {
-            show: true,
+            show: true
           },
           theme: {
-            mode: "dark",
+            mode: "dark"
           },
           noData: {
-            text: "Loading...",
+            text: "Loading..."
           },
           series: [],
           yaxis: availableStats,
@@ -1013,8 +1013,8 @@ class dashUpdate {
                 const date = new Date(value);
                 const formatTime = date.toLocaleTimeString();
                 return formatTime;
-              },
-            },
+              }
+            }
           },
           annotations: {
             position: "front",
@@ -1024,51 +1024,51 @@ class dashUpdate {
                 y2: 50,
                 yAxisIndex: 3,
                 borderColor: "#24571f",
-                fillColor: "#133614",
+                fillColor: "#133614"
               },
               {
                 y: 51,
                 y2: 100,
                 yAxisIndex: 3,
                 borderColor: "#457a24",
-                fillColor: "#31561a",
+                fillColor: "#31561a"
               },
               {
                 y: 101,
                 y2: 150,
                 yAxisIndex: 3,
                 borderColor: "#7a6f24",
-                fillColor: "#564f1a",
+                fillColor: "#564f1a"
               },
               {
                 y: 151,
                 y2: 200,
                 yAxisIndex: 3,
                 borderColor: "#5c3421",
-                fillColor: "#3b3015",
+                fillColor: "#3b3015"
               },
               {
                 y: 201,
                 y2: 250,
                 yAxisIndex: 3,
                 borderColor: "#5c2121",
-                fillColor: "#3b1515",
+                fillColor: "#3b1515"
               },
               {
                 y: 251,
                 y2: 350,
                 yAxisIndex: 3,
                 borderColor: "#37215c",
-                fillColor: "#23153b",
+                fillColor: "#23153b"
               },
               {
                 y: 350,
                 yAxisIndex: 3,
                 borderColor: "#280000",
-                fillColor: "#000000",
-              },
-            ],
-          },
+                fillColor: "#000000"
+              }
+            ]
+          }
         };
         if (document.querySelector("#enviromentalHistory")) {
           enviromentalData = new ApexCharts(
@@ -1095,44 +1095,44 @@ class dashUpdate {
           airQualityElement.classList.remove("d-none");
         }
         if (Calc.isBetween(lastValue, 0, 50)) {
-          state = "<i class=\"fas fa-check-circle textComplete\"></i> Excellent";
+          state = '<i class="fas fa-check-circle textComplete"></i> Excellent';
           impact = "Pure air; best for well-being";
           suggestedActions = "";
         }
         if (Calc.isBetween(lastValue, 51, 100)) {
-          state = "<i class=\"fas fa-check-circle\"></i> Good";
+          state = '<i class="fas fa-check-circle"></i> Good';
           impact = "No irritation or impact on well-being";
           suggestedActions = "";
         }
         if (Calc.isBetween(lastValue, 101, 150)) {
           state =
-            "<i class=\"fas fa-exclamation-triangle\"></i>  Lightly Polluted";
+            '<i class="fas fa-exclamation-triangle"></i>  Lightly Polluted';
           impact = "Reduction of well-being possible";
           suggestedActions = "Ventilation suggested";
         }
         if (Calc.isBetween(lastValue, 151, 200)) {
           state =
-            "<i class=\"fas fa-exclamation-triangle\"></i>  Moderately Polluted";
+            '<i class="fas fa-exclamation-triangle"></i>  Moderately Polluted';
           impact = "More significant irritation possible";
           suggestedActions = "Increase ventilation with clean air";
         }
         if (Calc.isBetween(lastValue, 201, 250)) {
           state =
-            "<i class=\"fas fa-exclamation-triangle\"></i>  Heavily Polluted";
+            '<i class="fas fa-exclamation-triangle"></i>  Heavily Polluted';
           impact =
             "Exposition might lead to effects like headache depending on type of VOCs";
           suggestedActions = "Optimize ventilation";
         }
         if (Calc.isBetween(lastValue, 251, 350)) {
           state =
-            "<i class=\"fas fa-exclamation-triangle\"></i>  Severely Polluted";
+            '<i class="fas fa-exclamation-triangle"></i>  Severely Polluted';
           impact = "More severe health issue possible if harmful VOC present";
           suggestedActions =
             "Contamination should be identified if level is reached even w/o presence of people; maximize ventilation & reduce attendance";
         }
         if (Calc.isBetween(lastValue, 350, 500)) {
           state =
-            "<i class=\"fas fa-exclamation-triangle\"></i>  Extremely Polluted";
+            '<i class="fas fa-exclamation-triangle"></i>  Extremely Polluted';
           impact = "Headaches, additional neurotoxic effects possible";
           suggestedActions =
             "Contamination needs to be identified; avoid presence in room and maximize ventilation";
@@ -1306,9 +1306,9 @@ const grid = GridStack.init({
   animate: true,
   cellHeight: 30,
   draggable: {
-    handle: ".tag",
+    handle: ".tag"
   },
-  float: true,
+  float: true
 });
 
 function saveGrid() {
@@ -1319,7 +1319,7 @@ function saveGrid() {
       y: node.y,
       width: node.width,
       height: node.height,
-      id: node.id,
+      id: node.id
     });
   });
   localStorage.setItem(
