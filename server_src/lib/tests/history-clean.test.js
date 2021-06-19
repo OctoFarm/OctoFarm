@@ -44,7 +44,7 @@ const nullJobHistoryCache = [
       job: null
     }
   }
-]
+];
 
 function legacyConvertIncremental(input) {
   let usageWeightCalc = 0;
@@ -159,11 +159,11 @@ describe("historyClean", function () {
         {
           data: [
             {
-              x: new Date("2021-01-24T00:00:00.000Z"),
+              x: expect.any(Date),
               y: 1
             },
             {
-              x: new Date("2021-03-26T00:00:00.000Z"),
+              x: expect.any(Date),
               y: 1
             }
           ],
@@ -176,7 +176,7 @@ describe("historyClean", function () {
         {
           data: [
             {
-              x: new Date("2021-03-26T00:00:00.000Z"),
+              x: expect.any(Date),
               y: 2
             }
           ],
@@ -187,7 +187,7 @@ describe("historyClean", function () {
         {
           data: [
             {
-              x: new Date("2021-01-24T00:00:00.000Z"),
+              x: expect.any(Date),
               y: 68.5
             }
           ],
@@ -196,7 +196,7 @@ describe("historyClean", function () {
         {
           data: [
             {
-              x: new Date("2021-03-26T00:00:00.000Z"),
+              x: expect.any(Date),
               y: 2.3499999999999996
             }
           ],
@@ -207,7 +207,7 @@ describe("historyClean", function () {
         {
           data: [
             {
-              x: new Date("2021-01-24T00:00:00.000Z"),
+              x: expect.any(Date),
               y: 68.5
             }
           ],
@@ -216,7 +216,7 @@ describe("historyClean", function () {
         {
           data: [
             {
-              x: new Date("2021-03-26T00:00:00.000Z"),
+              x: expect.any(Date),
               y: 2.3499999999999996
             }
           ],
@@ -328,7 +328,7 @@ describe("historyClean", function () {
     expect(stats).toBeTruthy();
     expect(stats.completed).toEqual(1);
     expect(stats.failed).toEqual(1);
-  })
+  });
 });
 
 /**
