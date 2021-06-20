@@ -36,6 +36,7 @@ All notable changes to this project will be documented in this file.
     - Fixed #592: Printer host is marked Online when URL is not correct / fake
     - Fixed #574: Reworked the statejs OctoPrint client and added tests
     - Fixed #630: System Info calls took huge amount of event-loop time (>2000ms) on Windows with a 2500ms interval period. Disabled for huge performance loss.
+    - Fixed #638: Fixed login not working anymore after refactor
 
 
 ## [v1.1.13-hotfix]
