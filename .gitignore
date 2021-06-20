@@ -13,6 +13,8 @@
 
 # Ignore any local release zips
 octofarm.zip
+/dist/
+/views/assets/dist/
 package/
 
 # Client

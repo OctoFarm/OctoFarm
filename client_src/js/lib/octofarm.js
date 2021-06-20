@@ -1,4 +1,8 @@
 export default class OctoFarmclient {
+  static async getHistoryStatistics() {
+    return this.get("history/statisticsData").then((r) => r.json());
+  }
+
   static get(item) {
     const url = `/${item}`;
     return fetch(url, {

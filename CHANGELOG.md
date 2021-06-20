@@ -2,7 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
-## [v1.1.14-rc1]
+## [v1.2-rc2]
+
+### Added
+    - NPM published package @octofarm/octofarm-frontend for frontend package
+    - NPM package download and install 
+
+### Changed
+    - Rewrote imports and entrypoint of frontend javascript for webpack
+    - Added Webpack to replace Gulp frontend bundler
+    - Rewrote dashboard page and completely refactored javascript code in browser
+
+### Removed
+    - Gulp packages and gulp as bundler
+
+
+## [v1.2-rc1]
 
 ### Added
     - Added #546: Node 13 or lower issue webpage with instructions, doesnt restart server anymore 

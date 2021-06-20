@@ -4,4 +4,4 @@ const defaultSortBy = "index";
 module.exports = {
   defaultFilterBy,
   defaultSortBy
-}
+};

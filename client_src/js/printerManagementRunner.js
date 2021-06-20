@@ -1,4 +1,3 @@
-import "@babel/polyfill";
 import OctoPrintClient from "./lib/octoprint.js";
 import OctoFarmClient from "./lib/octofarm.js";
 import UI from "./lib/functions/ui.js";
@@ -14,6 +13,7 @@ import {
 import PrinterSelect from "./lib/modules/printerSelect";
 import PrinterLogs from "./lib/modules/printerLogs.js";
 import CustomGenerator from "./lib/modules/customScripts.js";
+import Sortable from "./vendor/sortable";
 
 let printerInfo = "";
 const deletedPrinters = [];
@@ -24,7 +24,7 @@ let webWorkerErrorAlert = false;
 let sseErrorMessageTriggered = false;
 
 function createWebWorker() {
-  worker = new Worker("/assets/js/workers/printersManagerWorker.min.js");
+  worker = new Worker("/assets/dist/printersManagerWorker.min.js");
   worker.onmessage = function (event) {
     if (event.data !== false) {
       if (event.data.currentTickerList.length > 0) {

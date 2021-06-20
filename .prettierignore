@@ -14,7 +14,7 @@ node_modules
 screenshots
 server_2x
 setup
-views
+views/assets
 
 # Ignore client for now
 client_2x

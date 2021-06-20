@@ -5,7 +5,7 @@ import Calc from "./lib/functions/calc.js";
 import Script from "./lib/modules/scriptCheck.js";
 import OctoPrintClient from "./lib/octoprint";
 import FileOperations from "./lib/functions/file.js";
-
+import ApexCharts from "apexcharts";
 // Add listeners to settings
 document.getElementById("saveServerSettings").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
@@ -783,9 +783,9 @@ class ServerSettings {
           document.getElementById("thumbOnFailure").checked =
             res.history.thumbnails.onFailure;
           document.getElementById("snapOnComplete").checked =
-            res.history.snapshot.onComplete;
+            res.history.snapshots.onComplete;
           document.getElementById("snapOnFailure").checked =
-            res.history.snapshot.onFailure;
+            res.history.snapshots.onFailure;
           if (typeof res.history.timelapse !== "undefined") {
             document.getElementById("timelapseOnComplete").checked =
               res.history.timelapse.onComplete;

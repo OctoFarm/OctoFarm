@@ -1,4 +1,3 @@
-import "@babel/polyfill";
 import UI from "./lib/functions/ui";
 
 let interval = false;

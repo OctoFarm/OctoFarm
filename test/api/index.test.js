@@ -21,11 +21,11 @@ describe("Index", () => {
     // response.url
   });
 
-  it("should load dashboard", async() => {
+  it("should load dashboard", async () => {
     const response = await request.get("/dashboard").send();
 
     expect(response.headers.location).not.toBe("/users/login");
     expect(response.headers.location).toBeUndefined();
     expect(response.statusCode).toEqual(200);
-  })
+  });
 });

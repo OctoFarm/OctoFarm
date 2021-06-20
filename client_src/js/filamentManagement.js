@@ -1,10 +1,11 @@
-import "@babel/polyfill";
 import OctoFarmclient from "./lib/octofarm.js";
 import UI from "./lib/functions/ui.js";
 import {
   selectFilament,
   checkFilamentManager
 } from "./lib/modules/filamentGrab.js";
+import * as ApexCharts from "apexcharts";
+import { getLastThirtyDaysText } from "./utils/time.util";
 
 const jpInit = false;
 let filamentManager = false;
@@ -644,29 +645,9 @@ async function updatePrinterDrops() {
   });
 }
 async function init() {
-  //Load Graph
-  let today = new Date();
-  today = new Date(today);
+  let lastThirtyDaysText = getLastThirtyDaysText();
 
-  let lastThirtyDays = [];
-  for (let i = 0; i < 30; i++) {
-    let day = (i + 1) * 1000;
-    let previousDay = new Date(today - day * 60 * 60 * 24 * 2);
-    previousDay = await previousDay;
-    // previousDay = previousDay.split("/");
-    // lastThirtyDays.push(
-    //   `${previousDay[0]}/${previousDay[1]}/${previousDay[2]}`
-    // );
-    lastThirtyDays.push(previousDay);
-  }
-
-  lastThirtyDays.sort();
-  let lastThirtyDaysText = [];
-  lastThirtyDays.forEach((day) => {
-    lastThirtyDaysText.push(day.getTime());
-  });
-  let historyStatistics = await OctoFarmclient.get("history/statisticsData");
-  historyStatistics = await historyStatistics.json();
+  let historyStatistics = await OctoFarmclient.getHistoryStatistics();
   let usageByDay = historyStatistics.history.totalByDay;
   let usageOverTime = historyStatistics.history.usageOverTime;
 

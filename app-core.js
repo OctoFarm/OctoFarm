@@ -23,10 +23,18 @@ function setupExpressServer() {
   app.use(express.json());
 
   const viewsPath = getViewsPath();
+
+  if (process.env.NODE_ENV === "production") {
+    const { getOctoFarmUiPath } = require("@octofarm/client");
+    const bundlePath = getOctoFarmUiPath();
+    app.use("/assets/dist", express.static(bundlePath));
+  }
+
   app.set("views", viewsPath);
   app.set("view engine", "ejs");
   app.use(expressLayouts);
   app.use(express.static(viewsPath));
+
   app.use("/images", express.static("./images"));
   app.use(cookieParser());
   app.use(express.urlencoded({ extended: false }));
@@ -120,6 +128,13 @@ function serveOctoFarmRoutes(app) {
   app.use("/system", require("./server_src/routes/system", { page: "route" }));
   app.use("/client", require("./server_src/routes/sorting", { page: "route" }));
   app.get("*", function (req, res) {
+    console.debug("Had to redirect resource request:", req.originalUrl);
+    if (req.originalUrl.endsWith(".min.js")) {
+      logger.error("Javascript resource was not found " + req.originalUrl);
+      res.status(404);
+      res.send("Resource not found " + req.originalUrl);
+      return;
+    }
     res.redirect("/");
   });
 }
