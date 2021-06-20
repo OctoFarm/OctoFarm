@@ -26,6 +26,8 @@ const { FilamentManagerPlugin } = filamentManagerPlugin;
 
 module.exports = router;
 
+// TODO: clean up this mess!
+
 router.get("/get/printerList", ensureAuthenticated, async (req, res) => {
   const printerList = await PrinterClean.returnFilamentList();
   res.send({ printerList });
@@ -558,10 +560,10 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
       break;
     }
   }
-
   if (printer === null) {
     logger.info("No printer online, please connect a printer...");
     res.send({ status: false });
+    return;
   }
   let spools = await fetch(
     `${printer.printerURL}/plugin/filamentmanager/spools`,
