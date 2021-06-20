@@ -6,7 +6,7 @@ const { getServerSettingsCache } = require("../cache/server-settings.cache.js");
 const { AppConstants } = require("../app.constants");
 
 const User = require("../models/User.js");
-const { Token } = require("../middleware/token.js");
+const { Token } = require("../config/token.js");
 
 let currentUsers;
 

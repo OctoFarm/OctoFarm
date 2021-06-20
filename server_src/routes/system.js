@@ -22,7 +22,7 @@ const { SystemRunner } = require("../runners/systemInfo.js");
 
 const isDocker = require("is-docker");
 const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
-const { ensureAuthenticated } = require("../middleware/auth.js");
+const { ensureAuthenticated } = require("../config/auth.js");
 const { ensureCurrentUserAndGroup } = require("../middleware/users.js");
 const { AppConstants } = require("../app.constants");
 const {

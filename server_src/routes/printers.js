@@ -1,7 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
-const { ensureAuthenticated } = require("../middleware/auth");
+const { ensureAuthenticated } = require("../config/auth");
 // User Modal
 const runner = require("../runners/state.js");
 
@@ -124,6 +124,7 @@ router.get("/groups", ensureAuthenticated, async (req, res) => {
 });
 
 // TODO why is this not GET method?
+// It was before I knew about params! Is heavily embedded in the client.
 router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
   const id = req.body.i;
   let returnedPrinterInformation;

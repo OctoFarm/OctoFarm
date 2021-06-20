@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated } = require("../middleware/auth");
+const { ensureAuthenticated } = require("../config/auth");
 // User Modal
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;

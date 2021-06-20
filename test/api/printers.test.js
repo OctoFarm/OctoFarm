@@ -1,4 +1,4 @@
-jest.mock("../../server_src/middleware/auth");
+jest.mock("../../server_src/config/auth");
 
 const dbHandler = require("../db-handler");
 const supertest = require("supertest");
@@ -52,7 +52,7 @@ describe("Printers", () => {
     const res = await request.post("/printers/printerInfo").send();
 
     expect(res.statusCode).toEqual(200);
-    expect(res.body).toEqual([]);
+    expect(res.body).toEqual(expect.any(Array));
 
     done();
   }, 10000);

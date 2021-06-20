@@ -1,4 +1,4 @@
-jest.mock("../../server_src/middleware/auth");
+jest.mock("../../server_src/config/auth");
 
 const EventSource = require("eventsource");
 const { parse } = require("flatted/cjs");
@@ -297,7 +297,7 @@ describe("SSE-dashboard", () => {
           },
           historical: {
             weeklyUtilisation: true,
-            hourlyTotalTemperatures: true,
+            hourlyTotalTemperatures: false,
             environmentalHistory: false,
             filamentUsageOverTime: false,
             filamentUsageByDay: false,

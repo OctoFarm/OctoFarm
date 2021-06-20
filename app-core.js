@@ -29,7 +29,7 @@ const { ClientSettings } = require("./server_src/settings/clientSettings.js");
 function setupExpressServer() {
   let app = express();
 
-  require("./server_src/middleware/passport.js")(passport);
+  require("./server_src/config/passport.js")(passport);
   app.use(express.json());
 
   const viewsPath = getViewsPath();

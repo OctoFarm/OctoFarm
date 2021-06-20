@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated } = require("../middleware/auth");
+const { ensureAuthenticated } = require("../config/auth");
 const { parse, stringify } = require("flatted/cjs");
 const _ = require("lodash");
 const Logger = require("../lib/logger.js");

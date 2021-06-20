@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 
-const { ensureAuthenticated } = require("../middleware/auth");
+const { ensureAuthenticated } = require("../config/auth");
 const ClientSettingsDB = require("../models/ClientSettings.js");
 const GcodeDB = require("../models/CustomGcode.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");

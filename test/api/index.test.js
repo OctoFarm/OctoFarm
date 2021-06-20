@@ -5,7 +5,7 @@ const { setupTestApp } = require("../../app-test");
 let request;
 
 beforeAll(async () => {
-  jest.mock("../../server_src/middleware/auth");
+  jest.mock("../../server_src/config/auth");
   await dbHandler.connect();
   const server = await setupTestApp();
 

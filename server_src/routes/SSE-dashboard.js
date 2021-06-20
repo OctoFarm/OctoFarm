@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { stringify } = require("flatted/cjs");
-const { ensureAuthenticated } = require("../middleware/auth");
+const { ensureAuthenticated } = require("../config/auth");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 const {
