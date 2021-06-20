@@ -21,6 +21,7 @@ let worker = null;
 let powerTimer = 5000;
 let printerControlList = null;
 let webWorkerErrorAlert = false;
+let sseErrorMessageTriggered = false;
 
 function createWebWorker() {
   worker = new Worker("/assets/js/workers/printersManagerWorker.min.js");
@@ -216,7 +217,7 @@ bulkOctoPrintUpdateButton.addEventListener("click", async (e) => {
   let toUpdate = [];
   for (let printer = 0; printer < currentPrinterList.length; printer++) {
     let currentPrinter = currentPrinterList[printer];
-    if (currentPrinter?.octoPrintUpdate.updateAvailable) {
+    if (currentPrinter.octoPrintUpdate.updateAvailable) {
       message += currentPrinter.printerName + "<br>";
 
       toUpdate.push({
@@ -2709,7 +2710,7 @@ class dashUpdate {
             let updatePluginButton = document.getElementById(
               `octoprintPluginUpdate-${printer._id}`
             );
-            if (printer.octoPrintUpdate?.updateAvailable) {
+            if (printer?.octoPrintUpdate?.updateAvailable) {
               if (updateButton.classList.contains("d-none")) {
                 updateButton.classList.remove("d-none");
               }
@@ -2724,7 +2725,11 @@ class dashUpdate {
                 bulkOctoPrintUpdateButton.classList.add("d-none");
               }
             }
-            if (printer.octoPrintPluginUpdates.length > 0) {
+            // && check Required to stop the console been spammed with TypeError's
+            if (
+              printer.octoPrintPluginUpdates &&
+              printer.octoPrintPluginUpdates.length > 0
+            ) {
               if (updatePluginButton.classList.contains("d-none")) {
                 updatePluginButton.classList.remove("d-none");
               }
@@ -3009,7 +3014,12 @@ class dashUpdate {
           }
         }
       } catch (e) {
-        console.log(e);
+        //TODO: Rework this file, this is dangerous and stops any error messages been able to be read without crashing the console...
+        // patched for now so only triggeres once encase we do encounter errors...
+        if (!sseErrorMessageTriggered) {
+          console.error(e);
+          sseErrorMessageTriggered = true;
+        }
       }
     });
   }
