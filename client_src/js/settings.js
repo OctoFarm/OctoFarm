@@ -503,7 +503,7 @@ class ClientSettings {
   static async init() {
     try {
       const clientSettings = await OctoFarmClient.get("settings/client/get");
-      // localStorage.setItem("clientSettings", JSON.stringify(res));
+      //// localStorage.setItem("clientSettings", JSON.stringify(res));
       document.getElementById("panelCurrentOpOn").checked =
         clientSettings.panelView.currentOp;
       document.getElementById("panelHideOffline").checked =

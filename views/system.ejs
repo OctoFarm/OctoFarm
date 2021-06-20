@@ -1121,18 +1121,12 @@
                                                                 setup with a postgres database. Without this you will
                                                                 not be able to select filament on every
                                                                 instance.</small>
-                                                            <% if(serverSettingsCache.filamentManager){ %>
+                                                            <% if(!serverSettingsCache.filamentManager){ %>
                                                                 <center>
                                                                     <br>
                                                                     <button id="resyncFilamentManagerBtn" type="button"
                                                                             class="btn btn-warning mb-1 btn-lg"><i
                                                                                 class="fas fa-sync"></i><br> Enable Filament Manager Plugin Sync
-                                                                    </button>
-                                                                    <br>
-                                                                    <button id="disableFilamentManager" type="button"
-                                                                            class="btn btn-danger mb-1 btn-lg"><i
-                                                                                class="fas fa-skull-crossbones"></i><br>
-                                                                        Disable Filament Manager
                                                                     </button>
                                                                 </center>
                                                             <% }else{ %>
@@ -1142,7 +1136,13 @@
                                                                             class="btn btn-warning mb-1 btn-lg"><i
                                                                                 class="fas fa-sync"></i><br> Resync Spools / Profiles
                                                                     </button>
-                                                                    <br></center>
+                                                                    <br>
+                                                                    <button id="disableFilamentManager" type="button"
+                                                                            class="btn btn-danger mb-1 btn-lg"><i
+                                                                                class="fas fa-skull-crossbones"></i><br>
+                                                                        Disable Filament Manager
+                                                                    </button>
+                                                                </center>
                                                             <% } %>
                                                         </div>
                                                     </div>

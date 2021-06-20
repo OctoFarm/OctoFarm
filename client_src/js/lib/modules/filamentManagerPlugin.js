@@ -21,10 +21,27 @@ export function setupFilamentManagerDisableBtn() {
   );
   disableFilManagerBtn.addEventListener("click", async (event) => {
     try {
-      await OctoFarmClient.post("filament/disableFilamentPlugin", {
-        activate: true
-      });
+      let filamentManagerDisabled = await OctoFarmClient.post(
+        "filament/disableFilamentPlugin",
+        {
+          activate: true
+        }
+      );
+      if (filamentManagerDisabled) {
+        UI.createAlert(
+          "success",
+          "Successfully disabled filament manager and removed all spools / profiles.",
+          3000
+        );
+      } else {
+        UI.createAlert(
+          "error",
+          "Unable to disable filament manager please check the filament manager logs.",
+          3000
+        );
+      }
     } catch (e) {
+      console.error(e);
       UI.createAlert(
         "error",
         "Something went wrong, please check the filament manager logs: " + e,
@@ -42,9 +59,25 @@ export function setupFilamentManagerSyncBtn() {
     UI.addLoaderToElementsInnerHTML(filamentManagerSyncBtn);
     filamentManagerSyncBtn.disabled = true;
     try {
-      await OctoFarmClient.post("filament/filamentManagerSync", {
-        activate: true
-      });
+      const filamentManagerSyncEnabled = await OctoFarmClient.post(
+        "filament/filamentManagerSync",
+        {
+          activate: true
+        }
+      );
+      if (filamentManagerSyncEnabled) {
+        UI.createAlert(
+          "success",
+          "Successfully disabled filament manager and removed all spools / profiles.",
+          3000
+        );
+      } else {
+        UI.createAlert(
+          "error",
+          "Unable to disable filament manager please check the filament manager logs.",
+          3000
+        );
+      }
     } catch (e) {
       console.error(e);
       UI.createAlert(
@@ -71,7 +104,7 @@ export function setupFilamentManagerReSyncBtn() {
         );
         UI.createAlert(
           "success",
-          `Successfully synced filament manager! <br> Profiles - Updated: ${meta.updatedProfiles} / New: ${meta.newProfiles} <br> Spools - Updated: ${meta.updatedSpools} / New: ${meta.newSpools}`,
+          `Successfully synced filament manager! <br> Profiles - Updated: ${post.updatedProfiles} / New: ${post.newProfiles} <br> Spools - Updated: ${post.updatedSpools} / New: ${post.newSpools}`,
           4000,
           "Clicked"
         );
