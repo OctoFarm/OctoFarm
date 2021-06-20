@@ -15,7 +15,7 @@
     "url": "https://github.com/OctoFarm/OctoFarm"
   },
   "bin": {
-    "octofarm": "./app.js"
+    "octofarm": "./index.js"
   },
   "keywords": [
     "octofarm",
