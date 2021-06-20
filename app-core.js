@@ -14,7 +14,6 @@ const {
   PrinterClean
 } = require("./server_src/lib/dataFunctions/printerClean.js");
 const { ServerSettings } = require("./server_src/settings/serverSettings.js");
-const { SystemRunner } = require("./server_src/runners/systemInfo.js");
 const { ClientSettings } = require("./server_src/settings/clientSettings.js");
 
 function setupExpressServer() {
