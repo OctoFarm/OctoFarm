@@ -125,7 +125,7 @@ bulkPluginUpdateButton.addEventListener("click", async (e) => {
   let pluginList = [];
   for (let printer = 0; printer < currentPrinterList.length; printer++) {
     let currentPrinter = currentPrinterList[printer];
-    if (currentPrinter?.octoPrintPluginUpdates.length > 0) {
+    if (currentPrinter.octoPrintPluginUpdates.length > 0) {
       message += currentPrinter.printerName + "<br>";
       toUpdate.push({
         printerURL: currentPrinter.printerURL,
@@ -134,10 +134,10 @@ bulkPluginUpdateButton.addEventListener("click", async (e) => {
       });
       for (
         let plugin = 0;
-        plugin < currentPrinter?.octoPrintPluginUpdates.length;
+        plugin < currentPrinter.octoPrintPluginUpdates.length;
         plugin++
       ) {
-        let currentPlugin = currentPrinter?.octoPrintPluginUpdates[plugin];
+        let currentPlugin = currentPrinter.octoPrintPluginUpdates[plugin];
         pluginList.push(currentPlugin.id);
       }
     }
@@ -217,7 +217,7 @@ bulkOctoPrintUpdateButton.addEventListener("click", async (e) => {
   let toUpdate = [];
   for (let printer = 0; printer < currentPrinterList.length; printer++) {
     let currentPrinter = currentPrinterList[printer];
-    if (currentPrinter?.octoPrintUpdate.updateAvailable) {
+    if (currentPrinter.octoPrintUpdate.updateAvailable) {
       message += currentPrinter.printerName + "<br>";
 
       toUpdate.push({
@@ -2901,8 +2901,8 @@ class dashUpdate {
               .addEventListener("click", () => {
                 let pluginsToUpdate = [];
                 let autoSelect = [];
-                if (printer?.octoPrintPluginUpdates.length > 0) {
-                  printer?.octoPrintPluginUpdates.forEach((plugin) => {
+                if (printer.octoPrintPluginUpdates.length > 0) {
+                  printer.octoPrintPluginUpdates.forEach((plugin) => {
                     pluginsToUpdate.push({
                       text: `${plugin.displayName} - Version: ${plugin.displayVersion}`,
                       value: plugin.id
