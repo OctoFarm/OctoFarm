@@ -1,6 +1,6 @@
 {
   "name": "@octofarm/client",
-  "version": "0.1.0-rc2",
+  "version": "0.1.0-rc3",
   "description": "The website client for OctoFarm bundled using webpack.",
   "scripts": {
     "build": "webpack",
@@ -28,6 +28,8 @@
   "author": "David Zwart (davidzwa) & James Mackay (NotExpectedYet)",
   "license": "ISC",
   "dependencies": {
+  },
+  "devDependencies": {
     "apexcharts": "^3.24.0",
     "bootbox": "^5.4.0",
     "bootstrap": "^4.3.1",
@@ -37,9 +39,7 @@
     "jquery": "^3.5.1",
     "lodash": "^4.17.21",
     "luxon": "^1.26.0",
-    "noty": "^3.2.0-beta"
-  },
-  "devDependencies": {
+    "noty": "^3.2.0-beta",
     "@babel/cli": "^7.13.0",
     "@babel/core": "^7.14.0",
     "@babel/eslint-parser": "^7.13.8",

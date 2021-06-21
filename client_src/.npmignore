@@ -10,3 +10,11 @@
 config.gypi
 CVS
 npm-debug.log
+
+# We dont want code in production
+webpack.config.js
+babel.config.js
+jest.config.js
+js
+css
+images
