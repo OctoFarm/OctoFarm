@@ -10,6 +10,7 @@
 config.gypi
 CVS
 npm-debug.log
+*.tgz
 
 # We dont want code in production
 webpack.config.js
