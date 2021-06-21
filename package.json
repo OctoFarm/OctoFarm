@@ -15,9 +15,7 @@
     "package": "pkg --compress --out-path package package.json",
     "prettier": "prettier --write \"./server_src/**/*.js\" \"./test/**/*.js\" \"./client_src/**/*.js\"",
     "dev": "nodemon ./app.js",
-    "test": "jest --forceExit",
-    "webpack": "webpack",
-    "webpack:watch": "webpack --watch"
+    "test": "jest --forceExit"
   },
   "repository": {
     "type": "git",
