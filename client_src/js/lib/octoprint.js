@@ -1,7 +1,5 @@
 import UI from "./functions/ui.js";
 import OctoFarmClient from "./octofarm.js";
-import Validate from "./functions/validate.js";
-import { returnDropDown } from "./modules/filamentGrab.js";
 
 export default class OctoPrintClient {
   static get(printer, item) {

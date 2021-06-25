@@ -3,9 +3,12 @@ jest.mock("../../server_src/config/auth");
 const dbHandler = require("../db-handler");
 const supertest = require("supertest");
 const getEndpoints = require("express-list-endpoints");
-const {defaultFilterBy, defaultSortBy} = require("../../server_src/lib/providers/filter-sorting.constants");
-const {getSorting} = require("../../server_src/lib/sorting");
-const {getFilter} = require("../../server_src/lib/sorting");
+const {
+  defaultFilterBy,
+  defaultSortBy
+} = require("../../server_src/lib/providers/filter-sorting.constants");
+const { getSorting } = require("../../server_src/lib/sorting");
+const { getFilter } = require("../../server_src/lib/sorting");
 const { setupTestApp } = require("../../app-test");
 
 let request;
