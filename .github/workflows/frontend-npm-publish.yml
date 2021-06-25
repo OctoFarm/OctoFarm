@@ -23,4 +23,4 @@ jobs:
         with:
           dry-run: true
           token: ${{ secrets.NPM_TOKEN }}
-          working-directory: ./client_src
+          package: ./client_src/package.json
