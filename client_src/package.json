@@ -4,7 +4,7 @@
   "description": "The website client for OctoFarm bundled using webpack.",
   "scripts": {
     "build": "webpack",
-    "prettier": "prettier --write \"./server_src/**/*.js\" \"./test/**/*.js\" \"./client_src/**/*.js\"",
+    "prettier": "prettier --write \"./test/**/*.js\" \"./js/**/*.js\"",
     "test": "jest --passWithNoTests",
     "webpack": "webpack",
     "webpack:prod": "webpack --mode=production",

@@ -11,5 +11,5 @@ module.export = {
   jplist,
   lodash,
   Noty,
-  Sortable,
+  Sortable
 };
