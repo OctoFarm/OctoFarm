@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
     - Added #546: Node 13 or lower issue webpage with instructions, doesnt restart server anymore 
     - Added #509: HTTP/HTTPS support for websocket connections
-    - #628 Split client package.json and published package @octofarm/octofarm-frontend to NPM 
+    - #628 Split client package.json and published package @octofarm/client to NPM 
 
 ### Changed
     - Completely reworked history cache, prepared and tested for OctoFarm V2
