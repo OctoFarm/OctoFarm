@@ -1,4 +1,5 @@
 import UI from "./lib/functions/ui";
+import Noty from "noty";
 
 let interval = false;
 let timer = false;
