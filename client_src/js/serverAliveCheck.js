@@ -1,4 +1,5 @@
 import UI from "./lib/functions/ui";
+import Noty from "noty";
 
 let interval = false;
 let timer = false;
@@ -49,13 +50,13 @@ function checkUpdateAndNotify(updateResponse) {
         return;
       }
 
-      var n = new noty({
+      var n = new Noty({
         type: "success",
         theme: "bootstrap-v4",
         layout: "bottomRight",
         text: updateResponse?.message,
         buttons: [
-          noty.button(
+          Noty.button(
             "UPDATE",
             "btn btn-success",
             function () {
@@ -63,7 +64,7 @@ function checkUpdateAndNotify(updateResponse) {
             },
             { id: "button1", "data-status": "ok" }
           ),
-          noty.button("Mark read", "btn btn-error", function () {
+          Noty.button("Mark read", "btn btn-error", function () {
             // Update the stored version to become the newest
             localStorage.setItem(
               notificationMarkReadSessionKey,
@@ -71,7 +72,7 @@ function checkUpdateAndNotify(updateResponse) {
             );
             n.close();
           }),
-          noty.button("Later", "btn btn-error", function () {
+          Noty.button("Later", "btn btn-error", function () {
             n.close();
           })
         ]
