@@ -47,8 +47,8 @@ export default class UI {
       click = [];
     }
     //This needs a more elegant solution, I think noty is keeping the elements I remove with remove() from the DOM in memory somewhere...
-    Noty.setMaxVisible(50);
-    let alert = new Noty({
+    noty.setMaxVisible(50);
+    let alert = new noty({
       type: type,
       theme: "bootstrap-v4",
       closeWith: click,

@@ -49,13 +49,13 @@ function checkUpdateAndNotify(updateResponse) {
         return;
       }
 
-      var n = new Noty({
+      var n = new noty({
         type: "success",
         theme: "bootstrap-v4",
         layout: "bottomRight",
         text: updateResponse?.message,
         buttons: [
-          Noty.button(
+          noty.button(
             "UPDATE",
             "btn btn-success",
             function () {
@@ -63,7 +63,7 @@ function checkUpdateAndNotify(updateResponse) {
             },
             { id: "button1", "data-status": "ok" }
           ),
-          Noty.button("Mark read", "btn btn-error", function () {
+          noty.button("Mark read", "btn btn-error", function () {
             // Update the stored version to become the newest
             localStorage.setItem(
               notificationMarkReadSessionKey,
@@ -71,7 +71,7 @@ function checkUpdateAndNotify(updateResponse) {
             );
             n.close();
           }),
-          Noty.button("Later", "btn btn-error", function () {
+          noty.button("Later", "btn btn-error", function () {
             n.close();
           })
         ]
