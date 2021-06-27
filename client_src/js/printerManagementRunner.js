@@ -2615,9 +2615,7 @@ class dashUpdate {
                   "undefined"
                 ) {
                   printerPrinterInformation.innerHTML = `
-             <small title="Please connect and resync to display printer firmware"><b>Firmware: </b>Unknown</small><br>
-             <small><b>Name: </b>${printer.currentProfile.name}</small><br>
-             <small><b>Model: </b>${printer.currentProfile.model}</small><br>
+             <small title="Please connect and resync to display printer firmware">Unknown</small><br>
             `;
                 } else {
                   printerPrinterInformation.innerHTML = `
