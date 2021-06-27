@@ -201,7 +201,7 @@ export default class PrinterSelect {
       saveEditsBtn.remove();
     }
     if (action) {
-      document.getElementById("printerEditLabel").innerHTML = action;
+      document.getElementById("printerSelectTitle").innerHTML = action;
     }
     //Setup elements
     element.innerHTML = "";
