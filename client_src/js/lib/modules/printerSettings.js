@@ -1298,7 +1298,7 @@ class PrinterSettings {
       pageElements = {
         mainPage: {
           offlineMessage: document.getElementById("offlineMessage"),
-          title: document.getElementById("printerSettingsSelection"),
+          title: document.getElementById("printerSettingsTitle"),
           status: document.getElementById("psStatus"),
           host: document.getElementById("psHost"),
           socket: document.getElementById("psWebSocket")
