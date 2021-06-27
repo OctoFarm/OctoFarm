@@ -1,6 +1,7 @@
 import Calc from "../functions/calc.js";
 import OctoFarmClient from "../octofarm.js";
 import OctoPrintClient from "../octoprint.js";
+import ApexCharts from "apexcharts";
 
 let chart = null;
 let historyBarChart = null;
@@ -55,7 +56,7 @@ export default class PrinterLogs {
   }
   static loadLogs(printer, connectionLogs) {
     currentPrinter = printer;
-    document.getElementById("printerLogsLabel").innerHTML =
+    document.getElementById("printerLogsTitle").innerHTML =
       "Printer Logs: " + printer.printerName;
     let printerRows = document.getElementById("printerConnectionLogRows");
     let printerErrorRows = document.getElementById("printerErrorLogRows");
