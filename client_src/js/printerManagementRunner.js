@@ -2621,21 +2621,19 @@ class dashUpdate {
             `;
                 } else {
                   printerPrinterInformation.innerHTML = `
-             <small><b>Firmware: </b>${printer.octoPrintSystemInfo["printer.firmware"]}</small><br>
-             <small><b>Name: </b>${printer.currentProfile.name}</small><br>
-             <small><b>Model: </b>${printer.currentProfile.model}</small><br>
+             <small>${printer.octoPrintSystemInfo["printer.firmware"]}</small><br>
             `;
                 }
               }
             }
             if (typeof printer.octoPi !== "undefined") {
               printerOctoPrintInformation.innerHTML = `
-          <small><b>OctoPrint: </b>${printer.octoPrintVersion}</small><br>
-          <small><b>OctoPi: </b>${printer.octoPi.version}</small><br>
-          <small><b>RaspberryPi: </b>${printer.octoPi.model}</small>`;
+          <small>${printer.octoPrintVersion}</small><br>
+          <small>${printer.octoPi.version}</small><br>
+          <small>${printer.octoPi.model}</small>`;
             } else {
               printerOctoPrintInformation.innerHTML = `
-          <small><b>OctoPrint: </b>${printer.octoPrintVersion}</small><br>
+          <small>${printer.octoPrintVersion}</small><br>
           `;
             }
 
@@ -2748,8 +2746,8 @@ class dashUpdate {
               "beforeend",
               `
         <tr id="printerCard-${printer._id}">
-        <th><span title="Drag and Change your Printers sorting"  id="printerSortIndex-${printer._id}"
-                   class="tag btn btn-light btn-sm sortableList"
+        <td class="align-middle"><span title="Drag and Change your Printers sorting"  id="printerSortIndex-${printer._id}"
+                   class="btn btn-light btn-sm sortableList" style="vertical-align: middle"
             >
     ${printer.sortIndex}
     </span></td>
@@ -2789,8 +2787,8 @@ class dashUpdate {
                                  disabled
             ><i class="fas fa-wrench"></i>
             </button>
-            <button title="You have an OctoPrint update to install!" id="octoprintUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-3 d-none'><i class="fas fa-wrench"></i> Update!</button>
-            <button title="You have OctoPrint plugin updates to install!" id="octoprintPluginUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-4 d-none'><i class="fas fa-plug"></i> Update!</button>
+            <button title="You have an OctoPrint update to install!" id="octoprintUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-3 d-none'><i class="fas fa-wrench"></i></button>
+            <button title="You have OctoPrint plugin updates to install!" id="octoprintPluginUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-4 d-none'><i class="fas fa-plug"></i></button>
     
     </span></td>
         <td class="align-middle"><small><span data-title="${printer.hostState.desc}" id="hostBadge-${printer._id}" class="tag badge badge-${printer.hostState.colour.name} badge-pill">

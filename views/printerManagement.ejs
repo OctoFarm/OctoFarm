@@ -7,38 +7,17 @@
 <div class="row">
 <%- include(card, {
     tile:{
-    id:"printerManagementBtns",i:"fa-sticky-note",title:"Connection Log",class:"col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8"
+    id:"printerManagementBtns",i:"fa-print",title:"Managment",class:"col-12 col-sm-12 col-md-4 col-lg-3 col-xl-2",
+    },
+    bodyFile:'./PrinterManager/printerManagementContent.ejs'
+    })
+%>
+<%- include(card, {
+    tile:{
+    id:"printerManagementBtns",i:"fa-sticky-note",title:"Connection Log",class:"col-12 col-sm-12 col-md-8 col-lg-9 col-xl-10"
     },
     bodyFile:'./PrinterManager/printerConnectionLog.ejs'
     })
-%>
-<%- include(card, {
-    tile:{
-    id:"printerStatus",i:"fa-question",title:"Farm Status",class:"col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4",
-    },
-    bodyFile:'./PrinterManager/farmStatus.ejs'
-    })
-%>
-<%- include(card, {
-    tile:{
-    id:"printerManagementBtns",i:"fa-print",title:"Managment",class:"col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4",
-    },
-    bodyFile:'./PrinterManager/printerManagementBtns.ejs'
-    })
-%>
-<%- include(card, {
-    tile:{
-    id:"printerManagementBtns",i:"fa-crosshairs",title:"Bulk Actions",class:"col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4",
-    },
-    bodyFile:'./PrinterManager/printerBulkActionsBtns.ejs'
-})
-%>
-<%- include(card, {
-    tile:{
-    id:"printerManagementBtns",i:"fa-print",title:"OctoPrint",class:"col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4",
-    },
-    bodyFile:'./PrinterManager/octoPrintActionBtns.ejs'
-})
 %>
 <% } %>
 </div>

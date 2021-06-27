@@ -45,7 +45,7 @@ All notable changes to this project will be documented in this file.
     - Fixed #638: Fixed login not working anymore after refactor
     - Fixed `snapshots` instead of `snapshot` bug on client system Javascript bundle
     - Fixed #625 - Incorrect html tags on Printer Manager
-    - Fixed #548 - Smaller screen aciton buttons wrapped incorrectly on Printer Manager
+    - Fixed #548 - Smaller screen action buttons wrapped incorrectly on Printer Manager
 
 ## [v1.1.13-hotfix]
 
