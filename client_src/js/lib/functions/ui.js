@@ -1,3 +1,5 @@
+import Noty from "noty";
+
 export default class UI {
   //Colour function
   static getColour(state) {
@@ -46,9 +48,9 @@ export default class UI {
     } else {
       click = [];
     }
-    //This needs a more elegant solution, I think noty is keeping the elements I remove with remove() from the DOM in memory somewhere...
-    noty.setMaxVisible(50);
-    let alert = new noty({
+    //This needs a more elegant solution, I think Noty is keeping the elements I remove with remove() from the DOM in memory somewhere...
+    Noty.setMaxVisible(50);
+    let alert = new Noty({
       type: type,
       theme: "bootstrap-v4",
       closeWith: click,
