@@ -44,6 +44,7 @@ All notable changes to this project will be documented in this file.
     - Fixed #641: Opening the console on the Printers Page with offline printers would crash the browser due to spam.
     - Fixed #638: Fixed login not working anymore after refactor
     - Fixed `snapshots` instead of `snapshot` bug on client system Javascript bundle
+    - Fixed #655: Server-sent events were failing due to breaking import path of the flatted package. Fixed that path server-side.
 
 ## [v1.1.13-hotfix]
 
