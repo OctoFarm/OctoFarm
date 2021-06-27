@@ -23,51 +23,6 @@ let printerControlList = null;
 let webWorkerErrorAlert = false;
 let sseErrorMessageTriggered = false;
 
-function createWebWorker() {
-  worker = new Worker("/assets/dist/printersManagerWorker.min.js");
-  worker.onmessage = function (event) {
-    if (event.data !== false) {
-      if (event.data.currentTickerList.length > 0) {
-        dashUpdate.ticker(event.data.currentTickerList);
-      }
-      printerInfo = event.data.printersInformation;
-      printerControlList = event.data.printerControlList;
-      if (event.data.printersInformation.length > 0) {
-        if (
-          document
-            .getElementById("printerManagerModal")
-            .classList.contains("show")
-        ) {
-          PrinterManager.init(
-            "",
-            event.data.printersInformation,
-            printerControlList
-          );
-        } else if (
-          document
-            .getElementById("printerSettingsModal")
-            .classList.contains("show")
-        ) {
-          updatePrinterSettingsModal(event.data.printersInformation);
-        } else {
-          dashUpdate.printers(
-            event.data.printersInformation,
-            event.data.printerControlList
-          );
-          if (powerTimer >= 5000) {
-            event.data.printersInformation.forEach((printer) => {
-              PowerButton.applyBtn(printer, "powerBtn-");
-            });
-            powerTimer = 0;
-          } else {
-            powerTimer += 500;
-          }
-        }
-      }
-    }
-  };
-}
-
 function handleVisibilityChange() {
   if (document.hidden) {
     if (worker !== null) {
@@ -2589,16 +2544,18 @@ class PrintersManagement {
 class dashUpdate {
   static ticker(list) {
     const textList = "";
+    let tickerMessageBox = document.getElementById("printerTickerMessageBox");
+    if (tickerMessageBox.classList.contains("d-flex")) {
+      tickerMessageBox.classList.remove("d-flex");
+    }
     list.forEach((e) => {
       let date = new Date(e.date);
       date = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}`;
       if (!document.getElementById(e.id)) {
-        document
-          .getElementById("printerTickerMessageBox")
-          .insertAdjacentHTML(
-            "afterbegin",
-            `<div id="${e.id}" style="width: 100%; font-size:11px;" class="text-left ${e.state} text-wrap"> ${date} | ${e.printer} | ${e.message}</div>`
-          );
+        tickerMessageBox.insertAdjacentHTML(
+          "afterbegin",
+          `<div id="${e.id}" style="width: 100%; font-size:11px;" class="text-left ${e.state} text-wrap"> ${date} | ${e.printer} | ${e.message}</div>`
+        );
       }
     });
   }
@@ -2658,27 +2615,23 @@ class dashUpdate {
                   "undefined"
                 ) {
                   printerPrinterInformation.innerHTML = `
-             <small title="Please connect and resync to display printer firmware"><b>Firmware: </b>Unknown</small><br>
-             <small><b>Name: </b>${printer.currentProfile.name}</small><br>
-             <small><b>Model: </b>${printer.currentProfile.model}</small><br>
+             <small title="Please connect and resync to display printer firmware">Unknown</small><br>
             `;
                 } else {
                   printerPrinterInformation.innerHTML = `
-             <small><b>Firmware: </b>${printer.octoPrintSystemInfo["printer.firmware"]}</small><br>
-             <small><b>Name: </b>${printer.currentProfile.name}</small><br>
-             <small><b>Model: </b>${printer.currentProfile.model}</small><br>
+             <small>${printer.octoPrintSystemInfo["printer.firmware"]}</small><br>
             `;
                 }
               }
             }
             if (typeof printer.octoPi !== "undefined") {
               printerOctoPrintInformation.innerHTML = `
-          <small><b>OctoPrint: </b>${printer.octoPrintVersion}</small><br>
-          <small><b>OctoPi: </b>${printer.octoPi.version}</small><br>
-          <small><b>RaspberryPi: </b>${printer.octoPi.model}</small>`;
+          <small>${printer.octoPrintVersion}</small><br>
+          <small>${printer.octoPi.version}</small><br>
+          <small>${printer.octoPi.model}</small>`;
             } else {
               printerOctoPrintInformation.innerHTML = `
-          <small><b>OctoPrint: </b>${printer.octoPrintVersion}</small><br>
+          <small>${printer.octoPrintVersion}</small><br>
           `;
             }
 
@@ -2791,8 +2744,8 @@ class dashUpdate {
               "beforeend",
               `
         <tr id="printerCard-${printer._id}">
-        <th><span title="Drag and Change your Printers sorting"  id="printerSortIndex-${printer._id}"
-                   class="tag btn btn-light btn-sm sortableList"
+        <td class="align-middle"><span title="Drag and Change your Printers sorting"  id="printerSortIndex-${printer._id}"
+                   class="btn btn-light btn-sm sortableList" style="vertical-align: middle"
             >
     ${printer.sortIndex}
     </span></td>
@@ -2832,8 +2785,8 @@ class dashUpdate {
                                  disabled
             ><i class="fas fa-wrench"></i>
             </button>
-            <button title="You have an OctoPrint update to install!" id="octoprintUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-3 d-none'><i class="fas fa-wrench"></i> Update!</button>
-            <button title="You have OctoPrint plugin updates to install!" id="octoprintPluginUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-4 d-none'><i class="fas fa-plug"></i> Update!</button>
+            <button title="You have an OctoPrint update to install!" id="octoprintUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-3 d-none'><i class="fas fa-wrench"></i></button>
+            <button title="You have OctoPrint plugin updates to install!" id="octoprintPluginUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-4 d-none'><i class="fas fa-plug"></i></button>
     
     </span></td>
         <td class="align-middle"><small><span data-title="${printer.hostState.desc}" id="hostBadge-${printer._id}" class="tag badge badge-${printer.hostState.colour.name} badge-pill">
@@ -3039,3 +2992,48 @@ const sortable = Sortable.create(el, {
     OctoFarmClient.post("printers/updateSortIndex", listID);
   }
 });
+
+function createWebWorker() {
+  worker = new Worker("/assets/dist/printersManagerWorker.min.js");
+  worker.onmessage = function (event) {
+    if (event.data !== false) {
+      if (event.data.currentTickerList.length > 0) {
+        dashUpdate.ticker(event.data.currentTickerList);
+      }
+      printerInfo = event.data.printersInformation;
+      printerControlList = event.data.printerControlList;
+      if (event.data.printersInformation.length > 0) {
+        if (
+          document
+            .getElementById("printerManagerModal")
+            .classList.contains("show")
+        ) {
+          PrinterManager.init(
+            "",
+            event.data.printersInformation,
+            printerControlList
+          );
+        } else if (
+          document
+            .getElementById("printerSettingsModal")
+            .classList.contains("show")
+        ) {
+          updatePrinterSettingsModal(event.data.printersInformation);
+        } else {
+          dashUpdate.printers(
+            event.data.printersInformation,
+            event.data.printerControlList
+          );
+          if (powerTimer >= 5000) {
+            event.data.printersInformation.forEach((printer) => {
+              PowerButton.applyBtn(printer, "powerBtn-");
+            });
+            powerTimer = 0;
+          } else {
+            powerTimer += 500;
+          }
+        }
+      }
+    }
+  };
+}
