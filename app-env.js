@@ -4,9 +4,9 @@ const { execSync } = require("child_process");
 const isDocker = require("is-docker");
 const envUtils = require("./server_src/utils/env.utils");
 const dotenv = require("dotenv");
-const Logger = require("./server_src/lib/logger.js");
 const { AppConstants } = require("./server_src/app.constants");
 
+const Logger = require("./server_src/lib/logger.js");
 const logger = new Logger("OctoFarm-Environment", false);
 
 // Constants and definition
@@ -16,6 +16,32 @@ const deprecatedConfigFolder = "./config";
 const deprecatedConfigFilePath = deprecatedConfigFolder + "/db.js";
 const packageJsonPath = "./package.json";
 const dotEnvPath = "./.env";
+
+/**
+ * Set and write the environment name to file, if applicable
+ * @returns {*}
+ */
+function ensureNodeEnvSet() {
+  const environment = process.env[AppConstants.NODE_ENV_KEY];
+  if (!environment || !AppConstants.knownEnvNames.includes(environment)) {
+    const newEnvName = AppConstants.defaultProductionEnv;
+    process.env[AppConstants.NODE_ENV_KEY] = newEnvName;
+    logger.warning(
+      `NODE_ENV=${environment} was not set, or not known. Defaulting to NODE_ENV=${newEnvName}`
+    );
+
+    // Avoid writing to .env in case of docker
+    if (isDocker()) return;
+
+    envUtils.writeVariableToEnvFile(
+      path.resolve(dotEnvPath),
+      AppConstants.NODE_ENV_KEY,
+      newEnvName
+    );
+  } else {
+    logger.info(`✓ NODE_ENV variable correctly set (${environment})!`);
+  }
+}
 
 /**
  * Ensures that `process.env[AppConstants.VERSION_KEY]` is never undefined
@@ -211,9 +237,10 @@ function setupEnvConfig(skipDotEnv = false) {
   if (!skipDotEnv) {
     // This needs to be CWD of app.js, so be careful not to move this call.
     dotenv.config({ path: path.join(__dirname, ".env") });
+    logger.info("✓ Parsed environment and (optional) .env file");
   }
 
-  logger.info("✓ Parsed environment and (optional) .env file");
+  ensureNodeEnvSet();
   setupPackageJsonVersionOrThrow();
   ensureEnvNpmVersionSet();
   ensureMongoDBConnectionStringSet();
@@ -256,7 +283,14 @@ function ensurePageTitle() {
   }
 }
 
+function isEnvProd() {
+  return (
+    process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultProductionEnv
+  );
+}
+
 module.exports = {
+  isEnvProd,
   setupEnvConfig,
   fetchMongoDBConnectionString,
   fetchOctoFarmPort,
