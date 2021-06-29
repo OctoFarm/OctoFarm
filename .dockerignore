@@ -12,9 +12,10 @@
 /.cache
 Makefile
 /node_modules
+/coverage
+/.clinic
 
 /server_2x
 /screenshots
-/test
 /OctoFarm
 /logs
