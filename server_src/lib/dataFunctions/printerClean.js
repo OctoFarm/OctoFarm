@@ -13,7 +13,6 @@ const _ = require("lodash");
 const { JobClean } = require("./jobClean.js");
 const fileClean = require("./fileClean.js");
 const { FileClean } = fileClean;
-const FarmStatistics = require("../../models/FarmStatistics.js");
 const FarmStatisticsService = require("../../services/farm-statistics.service");
 const RoomData = require("../../models/RoomData.js");
 const ErrorLogs = require("../../models/ErrorLog.js");
@@ -21,6 +20,7 @@ const TempHistory = require("../../models/TempHistory.js");
 const { PrinterTicker } = require("../../runners/printerTicker.js");
 
 const Logger = require("../logger.js");
+const { getDayName } = require("../utils/time.util");
 const logger = new Logger("OctoFarm-InformationCleaning");
 
 const currentOperations = getEmptyOperationsObject();
@@ -108,6 +108,7 @@ class PrinterClean {
     return dashboardStatistics;
   }
 
+  // TODO remove or util
   static sumValuesGroupByDate(input) {
     const dates = {};
     input.forEach((dv) => (dates[dv.x] = (dates[dv.x] || 0) + dv.y));
@@ -759,8 +760,8 @@ class PrinterClean {
     const progress = [];
     const operations = [];
     try {
-      for (let o = 0; o < farmPrinters.length; o++) {
-        const printer = farmPrinters[o];
+      for (let i = 0; i < farmPrinters.length; i++) {
+        const printer = farmPrinters[i];
         if (typeof printer !== "undefined") {
           const name = printer.printerName;
 
@@ -780,6 +781,7 @@ class PrinterClean {
             typeof printer.printerState !== "undefined" &&
             printer.currentJob != null
           ) {
+            // TODO toString error if not present
             let id = printer._id;
             id = id.toString();
             if (printer.printerState.colour.category === "Complete") {
@@ -1255,6 +1257,8 @@ class PrinterClean {
       heatTemps,
       heatUtilisation
     };
+
+    // TODO this is old old code
     //Find min / max values for gas_resistance to tweak calulation...
     RoomData.find({})
       .sort({ _id: -1 })
@@ -1278,7 +1282,7 @@ class PrinterClean {
             data: []
           }
         ];
-        const currentIAQ = [];
+
         const enviromentalData = posts;
         if (!!enviromentalData) {
           for (let i = 0; i < enviromentalData.length; i++) {
@@ -1352,37 +1356,19 @@ class PrinterClean {
       });
   }
 
-  static getDay(value) {
-    value = value.getDay();
-    let actualDay = null;
-    if (value === 1) {
-      actualDay = "Monday";
-    }
-    if (value === 2) {
-      actualDay = "Tuesday";
-    }
-    if (value === 3) {
-      actualDay = "Wednesday";
-    }
-    if (value === 4) {
-      actualDay = "Thursday";
-    }
-    if (value === 5) {
-      actualDay = "Friday";
-    }
-    if (value === 6) {
-      actualDay = "Saturday";
-    }
-    if (value === 0) {
-      actualDay = "Sunday";
-    }
-    return actualDay;
-  }
-
-  // eslint-disable-next-line require-jsdoc
+  /**
+   *
+   * @param complete
+   * @param active
+   * @param offline
+   * @param idle
+   * @param disconnected
+   * @returns {Promise<void>}
+   */
   static async heatMapping(complete, active, offline, idle, disconnected) {
+    // TODO this function is ... in need of a complete redo (run twice, get 2 errors)
     try {
-      const today = PrinterClean.getDay(new Date());
+      const today = getDayName();
       const CompleteCount = {
         x: today,
         y: 0,
@@ -1505,12 +1491,14 @@ class PrinterClean {
         heatMap[3].data.shift();
         heatMap[4].data.shift();
       }
+
+      // TODO this line throws errors regularly when its not queried yet
       farmStats[0].heatMap = heatMap;
       dashboardStatistics.utilisationGraph = heatMap;
       farmStats[0].markModified("heatMap");
       farmStats[0].save().catch((e) => logger.error(e));
     } catch (e) {
-      logger.error("HEAT MAP ISSUE", e);
+      logger.error("HEAT MAP ISSUE - farmStats[0] is empty", e.message);
     }
   }
 
@@ -1525,10 +1513,10 @@ class PrinterClean {
     if (progress >= 25 && progress <= 50) {
       return "primary";
     }
-    if (progress >= 50 && progress <= 75) {
+    if (progress > 50 && progress <= 75) {
       return "info";
     }
-    if (progress >= 75 && progress < 100) {
+    if (progress > 75 && progress < 100) {
       return "warning";
     }
     if (progress === 100) {
@@ -1563,6 +1551,7 @@ class PrinterClean {
 
       farmStats[0] = await FarmStatisticsService.create(farmStart, heatMap);
     } else if (typeof farmStats[0].heatMap === "undefined") {
+      // TODO move to a service so it can be mocked - also: this is a one-time runner job to do between database versions
       farmStats[0].heatMap = heatMap;
       dashboardStatistics.utilisationGraph = heatMap;
       farmStats[0].markModified("heatMap");

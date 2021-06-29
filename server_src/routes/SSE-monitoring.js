@@ -145,7 +145,7 @@ if (interval === false) {
       await SettingsClean.start();
       serverSettings = await SettingsClean.returnSystemSettings();
     }
-    if (serverSettings.influxExport.active) {
+    if (!!serverSettings.influxExport?.active) {
       if (influxCounter >= 2000) {
         sendToInflux(printersInformation);
         influxCounter = 0;

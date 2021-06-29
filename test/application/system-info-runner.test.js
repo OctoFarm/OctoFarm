@@ -93,7 +93,7 @@ describe("SystemRunner", () => {
     expect(memArrayData[0]).toBeGreaterThan(0);
     expect(memArrayData[1]).not.toBeNaN();
     expect(memArrayData[1]).toBeGreaterThan(1e6);
-    expect(memArrayData[1]).toBeLessThan(500e6);
+    expect(memArrayData[1]).toBeLessThan(1100e6);
     expect(memArrayData[2]).toBeGreaterThan(0);
 
     // Assert random other properties
