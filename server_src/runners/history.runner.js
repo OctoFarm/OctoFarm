@@ -46,50 +46,78 @@ function ensureBaseFolderExists() {
 }
 
 class HistoryCollection {
-  static async resyncFilament(printer) {
-    const returnSpools = [];
-    try {
-      for (let i = 0; i < printer.selectedFilament.length; i++) {
-        if (printer.selectedFilament[i] !== null) {
-          const fetchUrl = `${printer.printerURL}/plugin/filamentmanager/spools/${printer.selectedFilament[i].spools.fmID}`;
-          logger.info(`${printer.printerURL}: fetching ${fetchUrl}`);
-          const spools = await fetch(fetchUrl, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              "X-Api-Key": printer.apikey
-            }
-          });
-          logger.info(
-            `${printer.printerURL}: fetched... spool status ${spools.status}`
-          );
-          const spool = await Spool.findById(printer.selectedFilament[i]._id);
+  static octoPrintService;
 
-          const sp = await spools.json();
-          spool.spools = {
-            name: sp.spool.name,
-            profile: sp.spool.profile.id,
-            price: sp.spool.cost,
-            weight: sp.spool.weight,
-            used: sp.spool.used,
-            tempOffset: sp.spool.temp_offset,
-            fmID: sp.spool.id
-          };
-          logger.info(
-            `${printer.printerURL}: updating... spool status ${spool.spools}`
-          );
-          spool.markModified("spools");
-          await spool.save();
-          returnSpools.push(spool);
-        }
-      }
-    } catch (e) {
-      logger.info(
-        e,
-        `${printer.printerURL}: Issue contacting filament manager... not updating spool`
-      );
+  /**
+   * Without dependency injection this is what we've got
+   * @param service
+   * @returns {Promise<void>}
+   */
+  static async inject(service) {
+    this.octoPrintService = service;
+  }
+
+  /**
+   * Until we have V2 DI we must do it ourselves
+   */
+  static validateProviders() {
+    if (!this.octoPrintService) {
+      throw "OctoPrint Client Connector not instantiated. Report please.";
     }
+  }
 
+  static async resyncFilament(printer) {
+    this.validateProviders();
+
+    const returnSpools = [];
+    // try {
+    for (let i = 0; i < printer.selectedFilament.length; i++) {
+      if (printer.selectedFilament[i] !== null) {
+        const filamentID = printer.selectedFilament[i].spools.fmID;
+        if (!filamentID) {
+          throw `Could not query OctoPrint FilamentManager for filament. FilamentID '${filamentID}' not found.`;
+        }
+        const response =
+          await this.octoPrintService.getPluginFilamentManagerFilament(
+            printer,
+            filamentID
+          );
+
+        logger.info(
+          `${printer.printerURL}: spools fetched. Status: ${response.status}`
+        );
+        const sp = await response.json();
+
+        const spoolID = printer.selectedFilament[i]._id;
+        const spoolEntity = await Spool.findById(spoolID);
+        if (!spoolEntity) {
+          throw `Spool database entity by ID '${spoolID}' not found. Cant update filament.`;
+        }
+        spoolEntity.spools = {
+          name: sp.spool.name,
+          profile: sp.spool.profile.id,
+          price: sp.spool.cost,
+          weight: sp.spool.weight,
+          used: sp.spool.used,
+          tempOffset: sp.spool.temp_offset,
+          fmID: sp.spool.id
+        };
+        logger.info(
+          `${printer.printerURL}: updating... spool status ${spoolEntity.spools}`
+        );
+        spoolEntity.markModified("spools");
+        await spoolEntity.save();
+        returnSpools.push(spoolEntity);
+      }
+    }
+    // } catch (e) {
+    //   logger.info(
+    //     e,
+    //     `${printer.printerURL}: Issue contacting filament manager... not updating spool`
+    //   );
+    // }
+
+    // TODO dynamic circular import to State/Runner
     const reSync = await FilamentManagerPlugin.filamentManagerReSync();
     // Return success
     logger.info(reSync);
@@ -127,6 +155,16 @@ class HistoryCollection {
     return filePath;
   }
 
+  /**
+   * TODO speechless... this function...
+   * @param payload
+   * @param serverSettings
+   * @param files
+   * @param id
+   * @param event
+   * @param printer
+   * @returns {Promise<null>}
+   */
   static async thumbnailCheck(
     payload,
     serverSettings,
@@ -157,15 +195,13 @@ class HistoryCollection {
       return base64Thumbnail;
     };
 
-    if (typeof serverSettings.history === "undefined") {
-      //Use default settings, so always capture...
+    if (
+      typeof serverSettings.history === "undefined" ||
+      serverSettings.history.thumbnails[event]
+    ) {
       return await runCapture();
     } else {
-      if (serverSettings.history.thumbnails[event]) {
-        return await runCapture();
-      } else {
-        return null;
-      }
+      return null;
     }
   }
 
@@ -176,23 +212,18 @@ class HistoryCollection {
     saveHistory,
     payload
   ) {
-    if (typeof serverSettings.history === "undefined") {
-      //Use default settings, so always capture...
+    // Use default settings if not present
+    if (
+      typeof serverSettings.history === "undefined" ||
+      serverSettings.history.snapshot[event]
+    ) {
       return await HistoryCollection.snapPictureOfPrinter(
         printer.camURL,
         saveHistory._id,
         payload.name
       );
     } else {
-      if (serverSettings.history.snapshot[event]) {
-        return await HistoryCollection.snapPictureOfPrinter(
-          printer.camURL,
-          saveHistory._id,
-          payload.name
-        );
-      } else {
-        return null;
-      }
+      return null;
     }
   }
 

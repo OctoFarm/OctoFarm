@@ -14,7 +14,7 @@ const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const {
   OctoprintApiClientService
 } = require("../services/octoprint/octoprint-api-client.service");
-const { HistoryCollection } = require("./history.js");
+const { HistoryCollection } = require("./history.runner.js");
 const {
   ServerSettings,
   filamentManager
@@ -975,7 +975,8 @@ class Runner {
     systemSettings = server[0];
     timeout = systemSettings.timeout;
 
-    Runner.octoPrintService = new OctoprintApiClientService(timeout);
+    this.octoPrintService = new OctoprintApiClientService(timeout);
+    await HistoryCollection.inject(this.octoPrintService);
 
     // Grab printers from database....
     try {

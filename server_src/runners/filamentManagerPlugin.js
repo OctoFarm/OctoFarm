@@ -12,8 +12,7 @@ const fetch = require("node-fetch");
 class FilamentManagerPlugin {
   static async filamentManagerReSync(addSpool) {
     try {
-      const runner = require("./state.js");
-      const { Runner } = runner;
+      const { Runner } = require("./state.js");
       const printerList = Runner.returnFarmPrinters();
       let printer = null;
       for (let i = 0; i < printerList.length; i++) {
