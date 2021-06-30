@@ -2,40 +2,86 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.2-rc1]
+
+### Added
+    - Added #546: Node 13 or lower issue webpage with instructions, doesnt restart server anymore 
+    - Added #509: HTTP/HTTPS support for websocket connections
+    - #628 Split client package.json and published package @octofarm/client to NPM 
+
+### Changed
+    - Completely reworked history cache, prepared and tested for OctoFarm V2
+    - Slightly reworked file cache, prepared for V2 and made it robust
+    - Made API tests less prone to unnecessary failure
+    - Reworked the Settings modal to be more resiliant to failure and cleaned up code
+    - Slightly reworked job cache, prepared for V2
+    - Added the ability to override the automatic wss:// select for HTTPS in printer settings modal. 
+    - Added the ability for settings dialog to return to "Printer Online" view when printer comes online in background / from settings changes.
+    - Amended the functions for Global OctoPrint update and Global OctoPrint plugin update
+    - The core `state` of OctoFarm is split off of OctoPrint and added possibilities to test it fully 
+    - Rewrote imports and entrypoint of frontend javascript for webpack
+    - Added Webpack to replace Gulp frontend bundler
+    - Rewrote dashboard page and completely refactored javascript code in browser
+
+### Removed
+    - Gulp packages and gulp as bundler
+
+### Fixed
+    - Fixed #531 - Updated settings are not grabbed when opening settings modal
+    - Fixed #532 - Actual save port is not checked against live ports on OctoPrint on settings Modal
+    - Fixed #567: heatmap error (race condition) in PrinterClean for any newly created database
+    - Fixed #576, #577: correct some function calls in PrinterClean
+    - Fixed #542, #381: ensureIndex mongoose warning and circular Runner import resolved 
+    - Fixed #598: printer settingsAppearance missing will not cause failure anymore
+    - Fixed #596: changed OctoPrint plugin manager repository to new route with backwards compatibility version check 
+    - Fixed #608: Global update button was not appearing
+    - Fixed #555: Offline after error not caught by OctoFarm. 1.6.0+
+    - Fixed #609: Bulk printer functions wouldn't load due to small regression bug
+    - Fixed #587: Changing printer URL doesn't rescan for changes when using settings modal
+    - Fixed #592: Printer host is marked Online when URL is not correct / fake
+    - Fixed #574: Reworked the statejs OctoPrint client and added tests
+    - Fixed #630: System Info calls took huge amount of event-loop time (>2000ms) on Windows with a 2500ms interval period. Disabled for huge performance loss.
+    - Fixed #641: Opening the console on the Printers Page with offline printers would crash the browser due to spam.
+    - Fixed #638: Fixed login not working anymore after refactor
+    - Fixed `snapshots` instead of `snapshot` bug on client system Javascript bundle
+    - Fixed #655: Server-sent events were failing due to breaking import path of the flatted package. Fixed that path server-side.
+    - Fixed #625 - Incorrect html tags on Printer Manager
+    - Fixed #548 - Smaller screen action buttons wrapped incorrectly on Printer Manager
+
 ## [v1.1.13-hotfix]
 
 ### Added
-    - Ability to use the AUTO option for baudrate.
-    - Ability to click update button to go to system page.
+    - Ability to use the AUTO option for baudrate
+    - Ability to click update button to go to system page
 
 ### Changed
-    - Completely re-worked the auto updater mechanism.
+    - Completely re-worked the auto updater mechanism
     - Completely re-worked the npm check and installation mechanism for the auto updater 
 
 ### Removed
 
 ### Fixed
     - Fixed #500: Connection to printer would fail when both baudrate and port are set to "AUTO"
-    - Fixed #501: Restart command fired too fast which resulted in no confirmation/error notification on client. 
-    - Fixed #495: Check for update would result in double notifications for airgapped farms.
-    - Fixed #498: Fix package version not always preset and synced correctly when not running npm commands, f.e. pm2.
+    - Fixed #501: Restart command fired too fast which resulted in no confirmation/error notification on client.
+    - Fixed #495: Check for update would result in double notifications for airgapped farms
+    - Fixed #498: Fix package version not always preset and synced correctly when not running npm commands, f.e. pm2
 
 
 ## [v1.1.13]
 
 ### Added
-    - Added #361: OctoFarm release check and notification sets ground work for automatic updates.
+    - Added #361: OctoFarm release check and notification sets ground work for automatic updates
     - Added #373: Migrated MongoUri in config/db.js to new .env file format as MONGO=...
     - Added #374: Migrated server port to .env file as OCTOFARM_PORT=...
     - Added #351: Background image now ignored and copied from default if not present at start.
-    - Added #382: Add in ability for OctoFarm to update itself with the current pm2/git implementation.
-        - This is actioned by two new section inside Server -> System. Two new buttons "Force Check", "Update". 
-    - Added #421: OctoFarm data dump. Generates a bundled zip file for download that includes all system logs and a service_information.txt file.
+    - Added #382: Add in ability for OctoFarm to update itself with the current pm2/git implementation
+        - This is actioned by two new section inside Server -> System. Two new buttons "Force Check", "Update".
+    - Added #421: OctoFarm data dump. Generates a bundled zip file for download that includes all system logs and a service_information.txt file
     - Added #296: Ability to define your own page title with an Environment Variable
 
 ### Changed
-    - Disabled Restart button when not using pm2 process manager.
-    - Node 12 now not supported. Node 14 is a minimum requirement.
+    - Disabled Restart button when not using pm2 process manager
+    - Node 12 now not supported. Node 14 is a minimum requirement
 
 ### Removed
     - Ability to change the port in the UI. This is now managed by environment variables. UI option will be back soon.

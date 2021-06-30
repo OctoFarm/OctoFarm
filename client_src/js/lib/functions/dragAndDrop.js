@@ -77,7 +77,7 @@ export function dragAndDropEnableMultiplePrinters(element, printers) {
   dropArea.addEventListener(
     "drop",
     (event) => {
-      const selectedOnlyPrinters = printers.filter(p => !!p.isSelected);
+      const selectedOnlyPrinters = printers.filter((p) => !!p.isSelected);
       handleMassDrop(event, selectedOnlyPrinters);
     },
     false
@@ -103,7 +103,12 @@ function handleMassDrop(e, printers, currentElement) {
   const { files } = dt;
   handleFiles(files, printers, currentElement);
 }
-function sendFilesToPrinter(singleFileOnly, printAfterUpload, uploadableFiles, printer) {
+function sendFilesToPrinter(
+  singleFileOnly,
+  printAfterUpload,
+  uploadableFiles,
+  printer
+) {
   UI.createAlert(
     "warning",
     `${Validate.getName(printer)}: started upload`,
@@ -114,8 +119,7 @@ function sendFilesToPrinter(singleFileOnly, printAfterUpload, uploadableFiles, p
   // Only single files can be sent to be printed immediately after upload
   if (printAfterUpload && singleFileOnly) {
     FileManager.handleFiles(uploadableFiles, printer, "print");
-  }
-  else {
+  } else {
     FileManager.handleFiles(uploadableFiles, printer);
   }
 }
@@ -130,21 +134,21 @@ export function handleFiles(uploadableFiles, printerArray) {
       buttons: {
         confirm: {
           label: "Yes",
-          className: "btn-success",
+          className: "btn-success"
         },
         cancel: {
           label: "No",
-          className: "btn-danger",
-        },
+          className: "btn-danger"
+        }
       },
       callback(bootBoxConfirmed) {
-        printerArray.forEach(printer => {
+        printerArray.forEach((printer) => {
           sendFilesToPrinter(true, bootBoxConfirmed, uploadableFiles, printer);
         });
-      },
+      }
     });
   } else {
-    printerArray.forEach(printer => {
+    printerArray.forEach((printer) => {
       sendFilesToPrinter(false, false, uploadableFiles, printer);
     });
   }

@@ -1,4 +1,3 @@
-import "@babel/polyfill";
 import OctoFarmClient from "./lib/octofarm.js";
 import Calc from "./lib/functions/calc.js";
 import FileManager from "./lib/modules/fileManager.js";
@@ -148,7 +147,7 @@ class Manager {
             let updatePrinter = await OctoFarmClient.post(
               "printers/printerInfo",
               {
-                i: lastId,
+                i: lastId
               }
             );
             updatePrinter = await updatePrinter.json();
@@ -183,8 +182,9 @@ class Manager {
 
       //Update old index to this one
       lastId = target;
-      const printerName = document.getElementById("printerName-" + lastId)
-        .innerHTML;
+      const printerName = document.getElementById(
+        "printerName-" + lastId
+      ).innerHTML;
       const panel = document.getElementById("fileManagerPrinter-" + target);
 
       panel.classList.add("bg-dark");
@@ -241,7 +241,7 @@ class Manager {
         `
     );
     let printer = await OctoFarmClient.post("printers/printerInfo", {
-      i: id,
+      i: id
     });
     printer = await printer.json();
     FileSorting.loadSort(printer);
@@ -258,8 +258,8 @@ class Manager {
         uploadPrintFile: document.getElementById("fileUploadPrintBtn"),
         syncFiles: document.getElementById("fileReSync"),
         back: document.getElementById("fileBackBtn"),
-        createFolderBtn: document.getElementById("createFolderBtn"),
-      },
+        createFolderBtn: document.getElementById("createFolderBtn")
+      }
     };
     fileButtons.fileManager.fileFolderCount.innerHTML = `<i class="fas fa-file"></i> ${printer.fileList.filecount} <i class="fas fa-folder"></i> ${printer.fileList.folderCount}`;
     if (typeof printer.storage !== "undefined") {
@@ -295,4 +295,5 @@ class Manager {
     });
   }
 }
+
 Manager.init();

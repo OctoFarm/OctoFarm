@@ -1,3 +1,5 @@
+import Noty from "noty";
+
 export default class UI {
   //Colour function
   static getColour(state) {
@@ -46,7 +48,7 @@ export default class UI {
     } else {
       click = [];
     }
-    //This needs a more elegant solution, I think noty is keeping the elements I remove with remove() from the DOM in memory somewhere...
+    //This needs a more elegant solution, I think Noty is keeping the elements I remove with remove() from the DOM in memory somewhere...
     Noty.setMaxVisible(50);
     let alert = new Noty({
       type: type,
@@ -54,7 +56,7 @@ export default class UI {
       closeWith: click,
       timeout: delay,
       layout: "bottomRight",
-      text: message,
+      text: message
     });
     alert.show();
     return alert;
@@ -88,5 +90,18 @@ export default class UI {
         }
       });
     });
+  }
+  static removeLoaderFromElementInnerHTML(element) {
+    if (element.innerHTML.includes("spinner")) {
+      element.innerHTML = element.innerHTML.replace(
+        '<i class="fas fa-spinner fa-spin"></i>',
+        ""
+      );
+    }
+  }
+  static addLoaderToElementsInnerHTML(element) {
+    if (!element.innerHTML.includes("spinner")) {
+      element.innerHTML += ' <i class="fas fa-spinner fa-spin"></i>';
+    }
   }
 }

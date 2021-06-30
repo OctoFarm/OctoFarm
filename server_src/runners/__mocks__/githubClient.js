@@ -1,5 +1,5 @@
-const {AppConstants} = require("../../app.constants");
-const githubClient = jest.createMockFromModule('../githubClient');
+const { AppConstants } = require("../../app.constants");
+const githubClient = jest.createMockFromModule("../githubClient");
 
 /**
  * Test version of: connection-safe acquire data about the installed and latest released OctoFarm versions.
@@ -10,13 +10,15 @@ async function getGithubReleasesPromise(includePrereleases = false) {
   if (process.env.test_airgapped) {
     return Promise.resolve(null);
   }
-  return Promise.resolve(
-    [{
-      tag_name: process.env.testlatest_package_version || process.env[AppConstants.VERSION_KEY],
+  return Promise.resolve([
+    {
+      tag_name:
+        process.env.testlatest_package_version ||
+        process.env[AppConstants.VERSION_KEY],
       draft: false,
       prerelease: false
-    }]
-  );
+    }
+  ]);
 }
 
 githubClient.getGithubReleasesPromise = getGithubReleasesPromise;
