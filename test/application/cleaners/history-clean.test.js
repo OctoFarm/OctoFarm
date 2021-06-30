@@ -1,6 +1,8 @@
-jest.mock("../../services/history.service");
-const mockHistoryService = require("../../services/history.service");
-const { noCostSettingsMessage } = require("../utils/print-cost.util");
+jest.mock("../../../server_src/services/history.service");
+const mockHistoryService = require("../../../server_src/services/history.service");
+const {
+  noCostSettingsMessage
+} = require("../../../server_src/lib/utils/print-cost.util");
 const { isPromise } = require("jest-util");
 
 const illegalHistoryCache = [{ printHistory2: null }];
@@ -78,7 +80,8 @@ describe("historyClean", function () {
   Date.now = () => 1618059562000;
   process.env.TZ = "UTC";
 
-  let HistoryClean = require("../dataFunctions/historyClean").HistoryClean;
+  let HistoryClean =
+    require("../../../server_src/lib/dataFunctions/historyClean").HistoryClean;
   it("should initiate and finish within 5 sec for empty history", async function () {
     expect(await mockHistoryService.find({})).toHaveLength(0);
 
@@ -335,7 +338,8 @@ describe("historyClean", function () {
  * Most of these functions below are easily tested in isolation
  */
 describe("historyClean:Static", () => {
-  let HistoryClean = require("../dataFunctions/historyClean").HistoryClean;
+  let HistoryClean =
+    require("../../../server_src/lib/dataFunctions/historyClean").HistoryClean;
 
   it("assignYCumSum tolerate falsy y values and skips falsy entries", () => {
     const undefinedYInput = [

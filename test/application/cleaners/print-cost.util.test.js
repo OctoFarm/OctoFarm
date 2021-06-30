@@ -1,7 +1,7 @@
 const {
   getPrintCostNumeric,
   noCostSettingsMessage
-} = require("../utils/print-cost.util");
+} = require("../../../server_src/lib/utils/print-cost.util");
 
 const defaultCostSettings = {
   powerConsumption: 0.05,

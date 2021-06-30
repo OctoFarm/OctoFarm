@@ -7,6 +7,9 @@ const ServerSettingsDB = require("./server_src/models/ServerSettings");
 const expressLayouts = require("express-ejs-layouts");
 const Logger = require("./server_src/lib/logger.js");
 const {
+  FilamentClean
+} = require("./server_src/lib/dataFunctions/filamentClean");
+const {
   optionalInfluxDatabaseSetup
 } = require("./server_src/lib/influxExport.js");
 const { getViewsPath } = require("./app-env");
@@ -151,6 +154,8 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
     const { Runner } = require("./server_src/runners/state.js");
     const stateRunnerReport = await Runner.init();
     logger.info("OctoFarm State returned", stateRunnerReport);
+
+    await FilamentClean.start();
 
     await optionalInfluxDatabaseSetup();
   }

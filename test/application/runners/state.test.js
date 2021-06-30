@@ -1,5 +1,5 @@
-const dbHandler = require("../db-handler");
-const { ensureSystemSettingsInitiated } = require("../../app-core");
+const dbHandler = require("../../db-handler");
+const { ensureSystemSettingsInitiated } = require("../../../app-core");
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -12,11 +12,11 @@ afterAll(async () => {
 });
 
 describe("State", () => {
-  jest.mock("../../server_src/services/octoprint/octoprint-api.service");
+  jest.mock("../../../server_src/services/octoprint/octoprint-api.service");
   const {
     OctoprintApiService
-  } = require("../../server_src/services/octoprint/octoprint-api.service");
-  const { Runner } = require("../../server_src/runners/state");
+  } = require("../../../server_src/services/octoprint/octoprint-api.service");
+  const { Runner } = require("../../../server_src/runners/state");
 
   it("should init with 0 printers", async () => {
     // Requires system settings to be present

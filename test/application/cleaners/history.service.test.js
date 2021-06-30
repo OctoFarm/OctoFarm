@@ -26,7 +26,7 @@ function legacyGetFile(history) {
 
 describe("getFile_unmocked", function () {
   const realHistoryService = jest.requireActual(
-    "../../services/history.service"
+    "../../../server_src/services/history.service"
   );
   it("should tolerate on empty input or props as input", () => {
     const testInput = {};

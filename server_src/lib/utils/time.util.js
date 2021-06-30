@@ -10,6 +10,13 @@ function toTimeFormat(printTime) {
   return `${h}:${m}`;
 }
 
+function getDayName() {
+  return new Intl.DateTimeFormat(["en"], {
+    weekday: "long" // ?? what should I put here
+  }).format(new Date());
+}
+
 module.exports = {
-  toTimeFormat
+  toTimeFormat,
+  getDayName
 };

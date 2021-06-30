@@ -22,6 +22,7 @@ All notable changes to this project will be documented in this file.
     - Rewrote imports and entrypoint of frontend javascript for webpack
     - Added Webpack to replace Gulp frontend bundler
     - Rewrote dashboard page and completely refactored javascript code in browser
+    - Moved filament cleaner startup to app-core
 
 ### Removed
     - Gulp packages and gulp as bundler

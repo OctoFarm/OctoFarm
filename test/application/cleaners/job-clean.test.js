@@ -1,4 +1,4 @@
-const { JobClean } = require("../dataFunctions/jobClean");
+const { JobClean } = require("../../../server_src/lib/dataFunctions/jobClean");
 const { DateTime } = require("luxon");
 
 // Before luxon
@@ -25,7 +25,15 @@ describe("getCompletionDate", function () {
   it("should calculate formatted completion date", async function () {
     const completionDate = JobClean.getCompletionDate(10, 99);
     expect(completionDate).toBeTruthy();
-    expect(completionDate).toEqual(legacyUUTGetCompletionDate(10, 99));
+    const cutoffDate = completionDate.substring(
+      0,
+      completionDate.length - 1 - 4
+    );
+    const refCutoffDate = legacyUUTGetCompletionDate(10, 99).substring(
+      0,
+      completionDate.length - 1 - 4
+    );
+    expect(cutoffDate).toEqual(refCutoffDate);
   });
 
   it("should generate printer job report", async function () {
