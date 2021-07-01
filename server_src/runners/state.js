@@ -1006,7 +1006,7 @@ class Runner {
         await Runner.setupWebSocket(farmPrinters[i]._id);
         PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
       }
-      FilamentClean.start(systemSettings.filamentManager);
+      // FilamentClean.start(systemSettings.filamentManager);
     }, 5000);
     return `System Runner has checked over ${farmPrinters.length} printers...`;
   }

@@ -6,9 +6,8 @@ const passport = require("passport");
 const ServerSettingsDB = require("./server_src/models/ServerSettings");
 const expressLayouts = require("express-ejs-layouts");
 const Logger = require("./server_src/lib/logger.js");
-const {
-  FilamentClean
-} = require("./server_src/lib/dataFunctions/filamentClean");
+const softwareUpdateChecker = require("./server_src/runners/softwareUpdateChecker");
+const { initHistoryCache } = require("./server_src/cache/history.cache");
 const {
   optionalInfluxDatabaseSetup
 } = require("./server_src/lib/influxExport.js");
@@ -155,7 +154,36 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
     const stateRunnerReport = await Runner.init();
     logger.info("OctoFarm State returned", stateRunnerReport);
 
-    await FilamentClean.start();
+    // await FilamentClean.start();
+    // TODO race condition
+    await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
+      softwareUpdateChecker.checkReleaseAndLogUpdate();
+    });
+
+    // Hacky database check due to shoddy layout of code...
+    // const mongoose = require("mongoose");
+    const serverSettings = require("./server_src/settings/serverSettings");
+
+    const printersInformation = PrinterClean.listPrintersInformation();
+    await PrinterClean.sortCurrentOperations(printersInformation);
+    await PrinterClean.statisticsStart();
+    await PrinterClean.createPrinterList(
+      printersInformation,
+      serverSettings.filamentManager
+    );
+
+    // let interval = false;
+    // if (interval === false) {
+    //   interval = setInterval(async () => {
+    //     if (mongoose.connection.readyState === 1) {
+    //
+    //     }
+    //   }, 2500);
+    // }
+
+    await initHistoryCache().catch((e) => {
+      console.error("X HistoryCache failed to initiate. " + e);
+    });
 
     await optionalInfluxDatabaseSetup();
   }
