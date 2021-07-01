@@ -1,6 +1,6 @@
 {
   "name": "octofarm",
-  "version": "1.1.14-rc1",
+  "version": "1.2-rc1",
   "description": "OctoFarm is a easy to setup and install web interface that unifies your Octoprint instances for easy monitoring of all your printers. OctoFarm allows you to connect to multiple octoprint instances on your network allowing creating a farm management system. You can control, manage, upload files to any of your instances without ever leaving the tab it's open in.",
   "main": "app.js",
   "scripts": {
@@ -34,7 +34,7 @@
   "author": "James Mackay (NotExpectedYet) & David Zwart (davidzwa)",
   "license": "ISC",
   "dependencies": {
-    "@octofarm/client": "^0.1.0-rc1-build2506-2036",
+    "@octofarm/client": "^0.1.0-rc1-build0107-2125",
     "archiver": "^5.3.0",
     "bcryptjs": "^2.4.3",
     "connect-flash": "^0.1.1",
