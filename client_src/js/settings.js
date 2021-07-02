@@ -242,7 +242,7 @@ const optionsMemory = {
   },
   chart: {
     type: "donut",
-    width: "100%",
+    height: "300px",
     animations: {
       enabled: false
     },
@@ -342,7 +342,7 @@ const optionsCPU = {
   },
   chart: {
     type: "donut",
-    width: "100%",
+    height: "300px",
     animations: {
       enabled: true
     },

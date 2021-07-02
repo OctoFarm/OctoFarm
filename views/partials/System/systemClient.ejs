@@ -1,33 +1,35 @@
 <div class="row">
-    <div class="col-12 col-sm-12 col-md-4 col-lg-2 col-xl-2">
-        <div class="list-group" id="list-tab" role="tablist">
-            <a class="list-group-item list-group-item-action  active"
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active"
                id="client-settings-list" data-toggle="list" href="#client-settings"
-               role="tab" aria-controls="system">General</a>
-            <a class="list-group-item list-group-item-action"
+               role="tab" aria-controls="system"><i class="fas fa-desktop"></i> General</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
                id="system-monitoring-list" data-toggle="list"
                href="#system-monitoring" role="tab"
-               aria-controls="dashboard">Views</a>
-            <a class="list-group-item list-group-item-action"
+               aria-controls="dashboard"><i class="fas fa-eye"></i> Views</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
                id="system-dashboard-list" data-toggle="list"
-               href="#system-dashboard" role="tab" aria-controls="dashboard">Dashboard</a>
-            <a class="list-group-item list-group-item-action"
+               href="#system-dashboard" role="tab" aria-controls="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
                id="system-printer-control-list" data-toggle="list"
-               href="#system-printer-control" role="tab" aria-controls="dashboard">Printer
+               href="#system-printer-control" role="tab" aria-controls="dashboard"><i class="fas fa-gamepad"></i> Printer
                 Control</a>
-            <button type="button" class="btn btn-success btn-block mt-1 bg-colour-2"
-                    id="saveSettings">Save
-            </button>
-        </div>
-    </div>
-    <div class="col-12 col-sm-12 col-md-8 col-lg-10 col-xl-10">
+        </li>
+    </ul>
+
+    <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
         <div class="tab-content" id="nav-tabContent">
             <div class="tab-pane fade show active" id="client-settings"
                  role="tabpanel" aria-labelledby="client-settings-list">
-                <h5>General</h5>
-                <hr>
                 <div class="row">
-                    <div class="col-12">
+                    <div class="col-12 col-md-4">
                         <p class="font-weight-bold">Change Background</p>
                         <p>Click the button below to upload your background
                             image.</p>
@@ -44,12 +46,13 @@
                         </form>
                         <p> Supports <code>PNG, JPG</code></p>
                     </div>
+                    <div class="col-12 col-md-4">
+                        <img width="100%" src="/images/bg.jpg">
+                    </div>
                 </div>
             </div>
             <div class="tab-pane fade" id="system-monitoring" role="tabpanel"
                  aria-labelledby="dashboard-monitoring-list">
-                <h5>Montitoring</h5>
-                <hr>
                 <p>Enable and disable different parts of the UI on the views
                     pages.</p>
                 <div class="row">
@@ -115,7 +118,7 @@
                     <!--                                                        </form>-->
                     <!--                                                    </div>-->
                     <div class="col-12">
-                        <p>Select how many columns you would like on each view
+                        <p>Select how many columns you would like on camera view
                             (excl. List View)</p>
                         <div class="alert alert-warning" role="alert">
                             This only takes effect on screen sizes larger than a
@@ -140,8 +143,6 @@
             </div>
             <div class="tab-pane fade" id="system-dashboard" role="tabpanel"
                  aria-labelledby="dashboard-settings-list">
-                <h5>Dashboard Settings</h5>
-                <hr>
                 <div class="row">
                     <div class="col-lg-12">
                         <button id="resetDashboardBtn" type="button"
@@ -425,8 +426,6 @@
             </div>
             <div class="tab-pane fade" id="system-printer-control" role="tabpanel"
                  aria-labelledby="dashboard-settings-list">
-                <h5>Printer Control Settings</h5>
-                <hr>
                 <div class="row">
                     <div class="col-3">
                         <form class="was-validated">
@@ -452,3 +451,6 @@
         </div>
     </div>
 </div>
+<button type="button" class="btn btn-success btn-block mt-1"
+        id="saveSettings">Save
+</button>

@@ -1,37 +1,41 @@
 <div class="row">
-    <div class="col-12 col-sm-12 col-md-4 col-lg-2 col-xl-2">
-        <div class="list-group" id="list-tab" role="tablist">
-            <a class="list-group-item list-group-item-action active"
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active"
                id="server-settings-list" data-toggle="list" href="#server-settings"
                role="tab" aria-controls="panelview"><i class="fas fa-cogs"></i>
                 System</a>
-            <a class="list-group-item list-group-item-action"
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
                id="server-timeout-list" data-toggle="list" href="#server-timeout"
                role="tab" aria-controls="listview"><i class="fas fa-stopwatch"></i>
                 Timeout</a>
-            <a class="list-group-item list-group-item-action"
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
                id="server-history-list" data-toggle="list" href="#server-history"
                role="tab" aria-controls="listview"><i class="fas fa-history"></i>
                 History</a>
-            <a class="list-group-item list-group-item-action"
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
                id="server-filament-list" data-toggle="list" href="#server-filament"
                role="tab" aria-controls="listview"><i
                         class="fas fa-toilet-paper"></i> Filament Manager</a>
-            <a class="list-group-item list-group-item-action"
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
                id="server-influx-list" data-toggle="list" href="#server-influx"
                role="tab" aria-controls="listview"><i class="fas fa-database"></i>
                 InfluxDB Export</a>
-            <button type="button" class="btn btn-success btn-block mt-1 bg-colour-2"
-                    id="saveServerSettings" data-dismiss="modal">Save
-            </button>
-        </div>
-    </div>
-    <div class="col-12 col-sm-12 col-md-8 col-lg-10 col-xl-10">
+        </li>
+
+    </ul>
+    <div class="col-12">
         <div class="tab-content" id="nav-tabContent">
             <div class="tab-pane fade show active" id="server-settings"
                  role="tabpanel" aria-labelledby="server-settings-list">
-                <h5>Server Settings</h5>
-                <hr>
                 <p class="font-weight-bold">Server Port</p>
                 <p>The port that OctoFarm will accept connections from for it's
                     inbuilt client.</p>
@@ -90,8 +94,6 @@
             </div>
             <div class="tab-pane fade" id="server-timeout" role="tabpanel"
                  aria-labelledby="server-timeout">
-                <h5>Timeout Settings</h5>
-                <hr>
                 <p class="font-weight-bold">WebSocket Throttle</p>
                 <p>You may be trying to run OctoFarm/OctoPrint on a potato, which
                     I've no aversion too but the CPU on the potato might not like
@@ -224,8 +226,6 @@
             </div>
             <div class="tab-pane fade" id="server-filament" role="tabpanel"
                  aria-labelledby="server-filament-list">
-                <h5>Filament Manager Settings</h5>
-                <hr>
                 <div id="filamentManagerSetup" class="row">
                     <div class="col-lg-12">
                         <h5>Check for filament selection before starting a
@@ -287,8 +287,6 @@
             </div>
             <div class="tab-pane fade" id="server-history" role="tabpanel"
                  aria-labelledby="server-history-list">
-                <h5>History Settings</h5>
-                <hr>
                 <div class="alert alert-secondary" role="alert">
                     OctoFarm has the ability to save a snapshot/thumbnail into
                     History. These options are turned on by default as it will check
@@ -769,3 +767,6 @@
         </div>
     </div>
 </div>
+<button type="button" class="btn btn-success btn-block"
+        id="saveServerSettings" data-dismiss="modal">Save
+</button>

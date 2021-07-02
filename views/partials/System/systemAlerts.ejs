@@ -1,28 +1,21 @@
 <div class="row">
-    <div class="col-12 col-sm-12 col-md-12 col-lg-2 col-xl-2">
-        <div class="list-group" id="list-tab" role="tablist">
-            <a class="list-group-item list-group-item-action  active"
+    <ul class="nav nav-tabs">
+        <li class="nav-item">
+            <a class="nav-link active"
                id="alerts-new-list" data-toggle="list" href="#alerts-new" role="tab"
                aria-controls="system"><i class="fas fa-plus"></i> New</a>
-            <a class="list-group-item list-group-item-action"
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
                id="alerts-current-list" data-toggle="list" href="#alerts-current"
                role="tab" aria-controls="panelview"><i class="fas fa-list"></i>
                 Current</a>
-            <!--                                    <a class="list-group-item list-group-item-action" id="alerts-log-list" data-toggle="list" href="#alerts-log" role="tab" aria-controls="listview"><i class="fas fa-clipboard-list"></i> Logs</a>-->
-        </div>
-        <button id="testScript" type="button"
-                class="btn btn-warning btn-block mt-1 bg-colour-1">Test Script
-        </button>
-        <button id="saveScript" type="button"
-                class="btn btn-success btn-block bg-colour-2">Save Script
-        </button>
-    </div>
-    <div class="col-12 col-sm-12 col-md-12 col-lg-10 col-xl-10">
+        </li>
+    </ul>
+    <div class="col-12">
         <div class="tab-content" id="nav-tabContent">
             <div class="tab-pane fade show active" id="alerts-new" role="tabpanel"
                  aria-labelledby="server-status-list">
-                <h5>New Alert</h5>
-                <hr>
                 <p class="mb-0">Alerts are managed by the OctoFarm server.</p>
                 <p>NOTE: If you want to pass through information to your script then
                     it needs to allow for a single variable, the message you input
@@ -185,11 +178,15 @@
                     </div>
 
                 </form>
+                <button id="testScript" type="button"
+                        class="btn btn-secondary btn-block mt-1">Test Script
+                </button>
+                <button id="saveScript" type="button"
+                        class="btn btn-success btn-block">Save Script
+                </button>
             </div>
             <div class="tab-pane fade" id="alerts-current" role="tabpanel"
                  aria-labelledby="server-settings-list">
-                <h5>Current Alerts</h5>
-                <hr>
                 <div class="col-lg-12 table-responsive-sm table-responsive-md">
                     <table class="table-hover table table-dark text-center">
                         <thead>
@@ -223,3 +220,4 @@
         </div>
     </div>
 </div>
+
