@@ -21,6 +21,6 @@ jobs:
         working-directory: ./client_src
       - uses: JS-DevTools/npm-publish@v1
         with:
-          dry-run: true
+          dry-run: ${{ github.event_name == 'pull_request' }}
           token: ${{ secrets.NPM_TOKEN }}
           package: ./client_src/package.json
