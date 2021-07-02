@@ -1,7 +1,6 @@
 const _ = require("lodash");
 const fetch = require("node-fetch");
 const fs = require("fs");
-const request = require("request");
 const History = require("../models/History.js");
 const ErrorLog = require("../models/ErrorLog.js");
 const Logger = require("../lib/logger.js");
@@ -11,13 +10,40 @@ const Spool = require("../models/Filament.js");
 const { FilamentManagerPlugin } = require("./filamentManagerPlugin.js");
 const { ScriptRunner } = require("./scriptCheck.js");
 const MjpegDecoder = require("mjpeg-decoder");
-const { downloadFromOctoPrint } = require("../utils/download.util");
+const {
+  downloadImage,
+  downloadFromOctoPrint
+} = require("../utils/download.util");
 const { getHistoryCache } = require("../cache/history.cache");
 const { writePoints } = require("../lib/influxExport.js");
 
 const logger = new Logger("OctoFarm-HistoryCollection");
 let counter = 0;
 let errorCounter = 0;
+
+const routeBase = "./images/historyCollection";
+const PATHS = {
+  base: routeBase,
+  thumbnails: routeBase + "/thumbs",
+  snapshots: routeBase + "/snapshots",
+  timelapses: routeBase + "/timelapses"
+};
+
+/**
+ * Make a specific historyCollection folder if not created yet
+ */
+function ensureFolderExists(folder) {
+  if (!fs.existsSync(folder)) {
+    fs.mkdirSync(folder);
+  }
+}
+
+/**
+ * Make the historyCollection root folder if not created yet
+ */
+function ensureBaseFolderExists() {
+  ensureFolderExists(PATHS.base);
+}
 
 class HistoryCollection {
   static async resyncFilament(printer) {
@@ -71,50 +97,34 @@ class HistoryCollection {
   }
 
   static async grabThumbnail(url, thumbnail, id, printer) {
-    const download = (url, path, callback) => {
-      request.head(url, (err, res, body) => {
-        res.headers["content-type"] = "image/png";
-        res.headers["x-api-key"] = printer.apikey;
-        request(url).pipe(fs.createWriteStream(path)).on("close", callback);
-      });
-    };
     const thumbParts = thumbnail.split("/");
     const result = thumbParts[thumbParts.length - 1];
     const splitAgain = result.split("?");
+    const filePath = `${PATHS.thumbnails}/${id}-${splitAgain[0]}`;
 
-    const path = `./images/historyCollection/thumbs/${id}-${splitAgain[0]}`;
-    if (!fs.existsSync("./images/historyCollection")) {
-      fs.mkdirSync("./images/historyCollection");
-    }
-    if (!fs.existsSync("./images/historyCollection/thumbs")) {
-      fs.mkdirSync("./images/historyCollection/thumbs");
-    }
-    await download(url, path, () => {
+    ensureBaseFolderExists();
+    ensureFolderExists(PATHS.thumbnails);
+
+    await downloadImage(url, filePath, printer.apikey, () => {
       logger.info("Downloaded: ", url);
-      logger.info(`images/historyCollection/thumbs/${id}-${splitAgain[0]}`);
+      logger.info(filePath);
     });
 
-    return `images/historyCollection/thumbs/${id}-${splitAgain[0]}`;
+    return filePath;
   }
+
   static async snapPictureOfPrinter(url, id, fileDisplay) {
-    if (!fs.existsSync("./images/historyCollection")) {
-      fs.mkdirSync("./images/historyCollection");
-    }
-    if (!fs.existsSync("./images/historyCollection/snapshots")) {
-      fs.mkdirSync("./images/historyCollection/snapshots");
-    }
+    ensureBaseFolderExists();
+    ensureFolderExists(PATHS.snapshots);
+
     const decoder = MjpegDecoder.decoderForSnapshot(url);
     const frame = await decoder.takeSnapshot();
-    await fs.writeFileSync(
-      `./images/historyCollection/snapshots/${id}-${fileDisplay}.jpg`,
-      frame
-    );
+    const filePath = `${PATHS.snapshots}/${id}-${fileDisplay}.jpg`;
+
+    await fs.writeFileSync(filePath, frame);
     logger.info("Downloaded: ", url);
-    logger.info(
-      "Saved as: ",
-      `images/historyCollection/snapshots/${id}-${fileDisplay}.jpg`
-    );
-    return `images/historyCollection/snapshots/${id}-${fileDisplay}.jpg`;
+    logger.info("Saved as: ", filePath);
+    return filePath;
   }
 
   static async thumbnailCheck(payload, files, id, event, printer) {
@@ -284,31 +294,26 @@ class HistoryCollection {
    * @returns {Promise<string>}
    */
   static async grabTimeLapse(fileName, url, id, printer) {
-    const path = `./images/historyCollection/timelapses/${id}-${fileName}`;
-    if (!fs.existsSync("./images/historyCollection")) {
-      fs.mkdirSync("./images/historyCollection");
-    }
-    if (!fs.existsSync("./images/historyCollection/timelapses")) {
-      fs.mkdirSync("./images/historyCollection/timelapses");
-    }
+    ensureBaseFolderExists();
+    ensureFolderExists(PATHS.timelapses);
+
+    const filePath = `${PATHS.timelapses}/${id}-${fileName}`;
 
     await downloadFromOctoPrint(
       url,
-      path,
+      filePath,
       () => {
         logger.info("Downloaded: ", url);
-        logger.info(`images/historyCollection/timelapses/${id}-${fileName}`);
-        if (
-          getServerSettingsCache().historyCollectionSettings.timelapse
-            .deleteAfter
-        ) {
+        logger.info(filePath);
+        if (getServerSettingsCache().historyCollectionSettings.timelapse
+            .deleteAfter) {
           HistoryCollection.deleteTimeLapse(printer, fileName);
         }
       },
       printer.apikey
     );
 
-    return `images/historyCollection/timelapses/${id}-${fileName}`;
+    return filePath;
   }
 
   static async deleteTimeLapse(printer, fileName) {
@@ -414,6 +419,7 @@ class HistoryCollection {
       writePoints(tags, "HistoryInformation", printerData);
     }
   }
+
   static async updateFilamentInfluxDB(
     selectedFilament,
     history,
@@ -477,6 +483,7 @@ class HistoryCollection {
       }
     }
   }
+
   static async complete(payload, printer, job, files, resends) {
     try {
       const previousFilament = JSON.parse(

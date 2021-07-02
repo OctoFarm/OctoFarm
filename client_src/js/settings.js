@@ -11,6 +11,7 @@ import {
   isFilamentManagerPluginSyncEnabled
 } from "./lib/modules/filamentManagerPlugin";
 
+import ApexCharts from "apexcharts";
 // Add listeners to settings
 document.getElementById("saveServerSettings").addEventListener("click", (e) => {
   // Validate Printer Form, then Add

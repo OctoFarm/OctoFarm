@@ -296,7 +296,7 @@ if (interval === false) {
 }
 
 initHistoryCache().catch((e) => {
-  console.error("✓ HistoryCache failed to initiate. " + e);
+  console.error("X HistoryCache failed to initiate. " + e);
 });
 
 module.exports = router;

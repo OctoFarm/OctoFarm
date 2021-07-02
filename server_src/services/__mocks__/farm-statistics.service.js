@@ -15,7 +15,9 @@ farmStatisticsService.list = async () => {
 farmStatisticsService.create = async (startDate, heatmapArray) => {
   const newEntry = {
     farmStart: startDate,
-    heatMap: heatmapArray
+    heatMap: heatmapArray,
+    markModified: () => {},
+    save: async () => {}
   };
   testFarmStatistics.push(newEntry);
   return Promise.resolve(newEntry);

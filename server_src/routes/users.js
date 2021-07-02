@@ -6,7 +6,9 @@ const { getServerSettingsCache } = require("../cache/server-settings.cache.js");
 const { AppConstants } = require("../app.constants");
 
 const User = require("../models/User.js");
-const { Token } = require("../config/token.js");
+const {
+  UserTokenService
+} = require("../services/authentication/user-token.service");
 
 let currentUsers;
 
@@ -29,47 +31,31 @@ router.get("/login", async (req, res) => {
 // Login Handle
 router.post(
   "/login",
-  async (req, res, next) => {
-    passport.authenticate(
-      "local",
-      {
-        failureRedirect: "/users/login",
-        failureFlash: true,
-        page: "Login",
-        octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-        registration: req.serverSettingsCache.server.registration
-      },
-      function (err, user, info) {
-        if (info?.message === "Missing credentials") {
-          res.status(400);
-          res.send(info);
-          return next();
-        }
-        // Issue a remember me cookie if the option was checked
-        if (!req.body.remember_me) {
-          res.redirect("/dashboard");
-          return next();
-        }
+  passport.authenticate("local", {
+    // Dont add or we wont reach remember_me cookie successRedirect: "/dashboard",
+    failureRedirect: "/users/login",
+    failureFlash: true
+  }),
+  async function (req, res, next) {
+    if (!req.body.remember_me) {
+      return next();
+    }
 
-        Token.issueToken(user, function (err, token) {
-          if (err) {
-            return next(err);
-          }
-          res.cookie("remember_me", token, {
-            path: "/",
-            httpOnly: true,
-            maxAge: 604800000
-          });
-          res.redirect("/dashboard");
-          return next();
-        });
+    await UserTokenService.issueTokenWithDone(req.user, function (err, token) {
+      if (err) {
+        return next(err);
       }
-    )(req, res, next);
+      res.cookie("remember_me", token, {
+        path: "/",
+        httpOnly: true,
+        maxAge: 604800000
+      });
+      return next();
+    });
+  },
+  (req, res) => {
+    res.redirect("/dashboard");
   }
-  // This redirect is not refined
-  // function (req, res) {
-  //   res.redirect("/dashboard");
-  // }
 );
 
 // Register Page

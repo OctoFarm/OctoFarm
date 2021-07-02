@@ -1,5 +1,6 @@
 const fetch = require("node-fetch");
 const fs = require("fs");
+const request = require("request");
 
 const downloadFromOctoPrint = async (url, path, callback, apiKey) => {
   const res = await fetch(url, {
@@ -17,6 +18,15 @@ const downloadFromOctoPrint = async (url, path, callback, apiKey) => {
   });
 };
 
+const downloadImage = async (url, path, apiKey, callback) => {
+  return request.head(url, (err, res, body) => {
+    res.headers["content-type"] = "image/png";
+    res.headers["x-api-key"] = apiKey;
+    request(url).pipe(fs.createWriteStream(path)).on("close", callback);
+  });
+};
+
 module.exports = {
-  downloadFromOctoPrint
+  downloadFromOctoPrint,
+  downloadImage
 };

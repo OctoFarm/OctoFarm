@@ -2,11 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [v1.1.14-rc1]
+## [v1.2-rc1]
 
 ### Added
     - Added #546: Node 13 or lower issue webpage with instructions, doesnt restart server anymore 
     - Added #509: HTTP/HTTPS support for websocket connections
+    - #628 Split client package.json and published package @octofarm/client to NPM 
 
 ### Changed
     - Completely reworked history cache, prepared and tested for OctoFarm V2
@@ -18,8 +19,13 @@ All notable changes to this project will be documented in this file.
     - Added the ability for settings dialog to return to "Printer Online" view when printer comes online in background / from settings changes.
     - Amended the functions for Global OctoPrint update and Global OctoPrint plugin update
     - The core `state` of OctoFarm is split off of OctoPrint and added possibilities to test it fully 
+    - Rewrote imports and entrypoint of frontend javascript for webpack
+    - Added Webpack to replace Gulp frontend bundler
+    - Rewrote dashboard page and completely refactored javascript code in browser
+    - Moved filament cleaner startup to app-core
 
 ### Removed
+    - Gulp packages and gulp as bundler
 
 ### Fixed
     - Fixed #531 - Updated settings are not grabbed when opening settings modal
@@ -36,7 +42,12 @@ All notable changes to this project will be documented in this file.
     - Fixed #592: Printer host is marked Online when URL is not correct / fake
     - Fixed #574: Reworked the statejs OctoPrint client and added tests
     - Fixed #630: System Info calls took huge amount of event-loop time (>2000ms) on Windows with a 2500ms interval period. Disabled for huge performance loss.
-
+    - Fixed #641: Opening the console on the Printers Page with offline printers would crash the browser due to spam.
+    - Fixed #638: Fixed login not working anymore after refactor
+    - Fixed `snapshots` instead of `snapshot` bug on client system Javascript bundle
+    - Fixed #655: Server-sent events were failing due to breaking import path of the flatted package. Fixed that path server-side.
+    - Fixed #625 - Incorrect html tags on Printer Manager
+    - Fixed #548 - Smaller screen action buttons wrapped incorrectly on Printer Manager
 
 ## [v1.1.13-hotfix]
 

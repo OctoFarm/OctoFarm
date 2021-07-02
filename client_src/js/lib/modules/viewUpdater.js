@@ -58,7 +58,7 @@ const returnPrinterInfo = (id) => {
 };
 export default function createWebWorker(view) {
   currentView = view;
-  worker = new Worker("/assets/js/workers/monitoringViewsWorker.min.js");
+  worker = new Worker("/assets/dist/monitoringViewsWorker.min.js");
   worker.onmessage = async function (event) {
     if (event.data != false) {
       //Update global variables with latest information...

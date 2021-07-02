@@ -120,7 +120,7 @@ const ClientSettings = settingsClean.SettingsClean;
 //     }
 // const infoDrop = {
 // ==== END DONE ===
-      printerInformation: printerInformation,
+      printerInformation,
       currentOperations: currentOperations,
       dashStatistics: dashStatistics,
 // ==== DONE ===
