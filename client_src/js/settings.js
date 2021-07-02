@@ -227,7 +227,7 @@ let oldServerSettings = {};
 
 const optionsMemory = {
   title: {
-    text: "Memory",
+    text: "",
     align: "center",
     margin: 1,
     offsetX: 0,
@@ -242,7 +242,6 @@ const optionsMemory = {
   },
   chart: {
     type: "donut",
-    height: "100%",
     width: "100%",
     animations: {
       enabled: false
@@ -328,7 +327,7 @@ const optionsMemory = {
 };
 const optionsCPU = {
   title: {
-    text: "CPU",
+    text: "",
     align: "center",
     margin: 1,
     offsetX: 0,
@@ -343,7 +342,6 @@ const optionsCPU = {
   },
   chart: {
     type: "donut",
-    height: "100%",
     width: "100%",
     animations: {
       enabled: true
@@ -831,7 +829,7 @@ class ServerSettings {
         );
         if (updateOctoFarmBtn) {
           updateOctoFarmBtn.innerHTML =
-            '<i class="fas fa-thumbs-up"></i> Update OctoFarm';
+            "<i class=\"fas fa-thumbs-up\"></i> Update OctoFarm";
           updateOctoFarmBtn.disabled = false;
         }
         return;
@@ -864,7 +862,7 @@ class ServerSettings {
             } else {
               if (updateOctoFarmBtn) {
                 updateOctoFarmBtn.innerHTML =
-                  '<i class="fas fa-thumbs-up"></i> Update OctoFarm';
+                  "<i class=\"fas fa-thumbs-up\"></i> Update OctoFarm";
                 updateOctoFarmBtn.disabled = false;
               }
             }

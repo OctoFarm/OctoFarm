@@ -16,6 +16,47 @@
                 <i class="fas fa-heart text-danger"></i> Hey lovely developer! Thanks for helping make OctoFarm great!
             </div>
         <% } %>
+        <% let systemButtonsDisabled = false; %>
+        <% if(serviceInformation?.isDockerContainer){ %>
+            <div class="alert alert-warning" role="alert">
+                TThe "Restart" and "Update" have all been disabled due to
+                Docker having it's own update mechanism
+                Please check the <a
+                        href="https://octofarm.net/installation">Installation
+                    Instructions</a> for more information on how to update
+                your docker container.
+            </div>
+            <% systemButtonsDisabled = true; %>
+        <% } %>
+        <% if(serviceInformation?.isNodemon && !serviceInformation?.isPm2){ %>
+            <div class="alert alert-warning" role="alert">
+                The "Restart" and "Update" functions have all been disabled due to not been
+                able to detect the use of the pm2 process manager.
+                Please check the <a target="_blank" href="https://octofarm.net/installation">Installation
+                    Instructions</a> for more information on how to set this
+                up.
+            </div>
+            <% systemButtonsDisabled = true; %>
+        <% } %>
+        <button title="Performs a restart of the OctoFarm service"
+                id="restartOctoFarmBtn" type="button"
+                <%= systemButtonsDisabled ? "disabled" : "" %>
+                class="btn btn-danger mr-3 btn-lg">
+            <i class="fas fa-sync"></i> Restart
+        </button>
+        <button title="Performs a check for latest updates of OctoFarm"
+                id="checkUpdatesForOctoFarmBtn" type="button"
+                <%= systemButtonsDisabled ? "disabled" : "" %>
+                class="btn btn-info ml-3 float-right btn-lg">
+            <i class="fab fa-github"></i> Check for Update
+        </button>
+        <button title="Performs an update command on OctoFarm to the latest version"
+                id="updateOctoFarmBtn" type="button"
+                class="btn btn-success ml-3 float-right btn-lg"
+                disabled>
+            <i class="fas fa-thumbs-up"></i> Update OctoFarm
+        </button>
+            <hr>
 <div class="row">
             <div class="col-12 text-center">
                 <div class="row">
