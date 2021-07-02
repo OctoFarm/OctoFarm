@@ -831,7 +831,7 @@ class ServerSettings {
         );
         if (updateOctoFarmBtn) {
           updateOctoFarmBtn.innerHTML =
-            "<i class=\"fas fa-thumbs-up\"></i> Update OctoFarm";
+            '<i class="fas fa-thumbs-up"></i> Update OctoFarm';
           updateOctoFarmBtn.disabled = false;
         }
         return;
@@ -864,7 +864,7 @@ class ServerSettings {
             } else {
               if (updateOctoFarmBtn) {
                 updateOctoFarmBtn.innerHTML =
-                  "<i class=\"fas fa-thumbs-up\"></i> Update OctoFarm";
+                  '<i class="fas fa-thumbs-up"></i> Update OctoFarm';
                 updateOctoFarmBtn.disabled = false;
               }
             }

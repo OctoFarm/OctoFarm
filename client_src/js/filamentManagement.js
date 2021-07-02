@@ -4,7 +4,6 @@ import { setupFilamentManagerReSyncBtn } from "./lib/modules/filamentManagerPlug
 import * as ApexCharts from "apexcharts";
 import { getLastThirtyDaysText } from "./utils/time.util";
 
-
 const jpInit = false;
 let filamentManager = false;
 const filamentStore = [
