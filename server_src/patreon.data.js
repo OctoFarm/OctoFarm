@@ -1,4 +1,3 @@
-// Snuck in here, no use yet...
 module.exports = [
   "Derek Kirkendall",
   "Kyle Menigoz",

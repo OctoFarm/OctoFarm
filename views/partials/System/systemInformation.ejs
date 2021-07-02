@@ -38,6 +38,8 @@
             </div>
             <% systemButtonsDisabled = true; %>
         <% } %>
+<div class="row">
+    <div class="col-12">
         <button title="Performs a restart of the OctoFarm service"
                 id="restartOctoFarmBtn" type="button"
                 <%= systemButtonsDisabled ? "disabled" : "" %>
@@ -56,6 +58,8 @@
                 disabled>
             <i class="fas fa-thumbs-up"></i> Update OctoFarm
         </button>
+    </div>
+</div>
             <hr>
 <div class="row">
             <div class="col-12 text-center">
@@ -189,7 +193,7 @@
         </div>
         <hr>
 <div class="row">
-    <div class="col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6 text-center">
+    <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 text-center">
         <i class="fas fa-microchip"></i> CPU: <br><span
                 class="text-light" id="systemArch"
                 style="font-size:0.8rem;"></span>
@@ -199,7 +203,7 @@
         <% }); %>
         <div id="systemChartCPU"></div>
     </div>
-    <div class="col-6 col-sm-6 col-md-6 col-lg-6 col-xl-6 text-center">
+    <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6 text-center">
         <i class="fas fa-memory"></i> Memory: <br>
         <span
                 class="text-light" id="systemArch"

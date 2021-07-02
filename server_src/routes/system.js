@@ -65,6 +65,8 @@ router.get(
     let dashboardSettings =
       clientSettings?.dashboard || getDefaultDashboardSettings();
 
+
+
     res.render("system", {
       name: req.user.name,
       userGroup: req.user.group,
@@ -84,7 +86,8 @@ router.get(
         isNode: isNode(),
         isPm2: isPm2(),
         update: softwareUpdateNotification
-      }
+      },
+      patreonData: require('../patreon.data.js')
     });
   }
 );
