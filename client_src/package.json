@@ -1,6 +1,6 @@
 {
   "name": "@octofarm/client",
-  "version": "0.1.0-rc1-build2506-2036",
+  "version": "0.1.0-rc1-build0107-2125",
   "description": "The website client for OctoFarm bundled using webpack.",
   "scripts": {
     "build": "webpack",
