@@ -38,12 +38,12 @@ class OctoprintApiClientService extends OctoprintApiService {
     }
   }
 
-  async postPrinter(printer, route, data, timeout = false) {
+  async postPrinter(printer, route, data, timeout = true) {
     OctoprintApiClientService.validatePrinter(printer);
     return super.post(printer.printerURL, printer.apikey, route, data, timeout);
   }
 
-  async getWithOptionalRetry(printer, route, retry = false) {
+  async getWithOptionalRetry(printer, route, retry = true) {
     OctoprintApiClientService.validatePrinter(printer);
     if (retry) {
       return await this.getRetry(printer.printerURL, printer.apikey, route);
@@ -54,7 +54,7 @@ class OctoprintApiClientService extends OctoprintApiService {
     }
   }
 
-  async getSettings(printer, retry = false) {
+  async getSettings(printer, retry = true) {
     return this.getWithOptionalRetry(printer, apiSettingsPart, retry);
   }
 
@@ -65,7 +65,7 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @param retry
    * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)|*|undefined>}
    */
-  async getFiles(printer, recursive = false, retry = false) {
+  async getFiles(printer, recursive = true, retry = true) {
     return this.getWithOptionalRetry(printer, apiFiles(recursive), retry);
   }
 
@@ -76,19 +76,19 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @param retry
    * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)|*|undefined>}
    */
-  async getFile(printer, path, retry = false) {
+  async getFile(printer, path, retry = true) {
     return this.getWithOptionalRetry(printer, apiFile(path), retry);
   }
 
-  async getConnection(printer, retry = false) {
+  async getConnection(printer, retry = true) {
     return this.getWithOptionalRetry(printer, apiConnection, retry);
   }
 
-  async getPrinterProfiles(printer, retry = false) {
+  async getPrinterProfiles(printer, retry = true) {
     return this.getWithOptionalRetry(printer, apiPrinterProfiles, retry);
   }
 
-  async getPluginManager(printer, retry = false) {
+  async getPluginManager(printer, retry = true) {
     const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(
       printer.octoPrintVersion
     );
@@ -100,15 +100,15 @@ class OctoprintApiClientService extends OctoprintApiService {
     return this.getWithOptionalRetry(printer, route, retry);
   }
 
-  async getSystemInfo(printer, retry = false) {
+  async getSystemInfo(printer, retry = true) {
     return this.getWithOptionalRetry(printer, apiSystemInfo, retry);
   }
 
-  async getSystemCommands(printer, retry = false) {
+  async getSystemCommands(printer, retry = true) {
     return this.getWithOptionalRetry(printer, apiSystemCommands, retry);
   }
 
-  async getSoftwareUpdateCheck(printer, force, retry = false) {
+  async getSoftwareUpdateCheck(printer, force, retry = true) {
     return this.getWithOptionalRetry(
       printer,
       apiSoftwareUpdateCheck(force),
@@ -116,11 +116,11 @@ class OctoprintApiClientService extends OctoprintApiService {
     );
   }
 
-  async getUsers(printer, retry = false) {
+  async getUsers(printer, retry = true) {
     return this.getWithOptionalRetry(printer, apiUsers, retry);
   }
 
-  async getPluginPiSupport(printer, retry = false) {
+  async getPluginPiSupport(printer, retry = true) {
     return this.getWithOptionalRetry(printer, apiPluginPiSupport, retry);
   }
 
