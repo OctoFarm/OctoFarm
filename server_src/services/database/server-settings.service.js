@@ -103,7 +103,7 @@ class ServerSettingsService {
    */
   async resetServerSettingsToDefault() {
     const currentDatabaseSettings = await this.listServerSettingsDocs({});
-    console.log(currentDatabaseSettings)
+    console.log(currentDatabaseSettings);
     await currentDatabaseSettings.deleteMany({});
     await currentDatabaseSettings.save();
     this.currentServerSettings = currentDatabaseSettings;
@@ -126,8 +126,7 @@ class ServerSettingsService {
    * @returns {Object} containing the new settings value
    */
   async updateOctoPrintWebsocketPollSettings(value = {}) {
-    if (isEmpty(value))
-      throw new Error("No value provided to update settings");
+    if (isEmpty(value)) throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
     const settingsDatabaseID = this.currentServerSettings._id;
@@ -153,8 +152,7 @@ class ServerSettingsService {
    * @returns {Object} containing the new settings value
    */
   async updateSystemSettings(value = {}) {
-    if (isEmpty(value))
-      throw new Error("No value provided to update settings");
+    if (isEmpty(value)) throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
     const settingsDatabaseID = this.currentServerSettings._id;
@@ -180,8 +178,7 @@ class ServerSettingsService {
    * @returns {Object} containing the new settings value
    */
   async updateOctoPrintTimeoutSettings(value = {}) {
-    if (isEmpty(value))
-      throw new Error("No value provided to update settings");
+    if (isEmpty(value)) throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
     const settingsDatabaseID = this.currentServerSettings._id;
@@ -207,8 +204,7 @@ class ServerSettingsService {
    * @returns {Object} containing the new settings value
    */
   async updateFilamentManagerSettings(value = {}) {
-    if (isEmpty(value))
-      throw new Error("No value provided to update settings");
+    if (isEmpty(value)) throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
     const settingsDatabaseID = this.currentServerSettings._id;
@@ -234,8 +230,7 @@ class ServerSettingsService {
    * @returns {Object} containing the new settings value
    */
   async updateHistoryCollectionSettings(value = {}) {
-    if (isEmpty(value))
-      throw new Error("No value provided to update settings");
+    if (isEmpty(value)) throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
     const settingsDatabaseID = this.currentServerSettings._id;
@@ -261,8 +256,7 @@ class ServerSettingsService {
    * @returns {Object} containing the new settings value
    */
   async updateInfluxDatabaseSettings(value = {}) {
-    if (isEmpty(value))
-      throw new Error("No value provided to update settings");
+    if (isEmpty(value)) throw new Error("No value provided to update settings");
 
     //Filter out the current settings from cache
     const settingsDatabaseID = this.currentServerSettings._id;

@@ -305,8 +305,10 @@ class HistoryCollection {
       () => {
         logger.info("Downloaded: ", url);
         logger.info(filePath);
-        if (getServerSettingsCache().historyCollectionSettings.timelapse
-            .deleteAfter) {
+        if (
+          getServerSettingsCache().historyCollectionSettings.timelapse
+            .deleteAfter
+        ) {
           HistoryCollection.deleteTimeLapse(printer, fileName);
         }
       },
