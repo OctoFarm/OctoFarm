@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
     - Added Webpack to replace Gulp frontend bundler
     - Rewrote dashboard page and completely refactored javascript code in browser
     - Moved filament cleaner startup to app-core
+    - Made NODE_ENV to be production by default causing the @octofarm/client bundle to be loaded and console logging to be filtered with level INFO/ERROR
 
 ### Removed
     - Gulp packages and gulp as bundler
