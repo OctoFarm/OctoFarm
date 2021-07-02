@@ -9,10 +9,10 @@ const illegalHistoryCache = [{ printHistory2: null }];
 const emptyLegalHistoryCache = [{ printHistory: {} }];
 const realisticHistoryCache = require("./mock-data/Histories.json");
 
-jest.mock("../../cache/server-settings.cache.js");
+jest.mock("../../../server_src/cache/server-settings.cache.js");
 const {
   getServerSettingsCache
-} = require("../../cache/server-settings.cache.js");
+} = require("../../../server_src/cache/server-settings.cache.js");
 
 const interestingButWeirdHistoryCache = [
   {
