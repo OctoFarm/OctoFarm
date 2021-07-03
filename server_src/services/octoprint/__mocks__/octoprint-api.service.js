@@ -23,7 +23,6 @@ class OctoprintApiService {
 
   async getRetry(printerURL, apiKey, item) {
     const message = `Connecting to OctoPrint Mock API: ${item} | ${printerURL}`;
-    logger.info(`${message} | timeout: ${this.timeout.apiTimeout}`);
     return await this.get(printerURL, apiKey, item);
   }
 
