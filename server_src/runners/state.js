@@ -1013,7 +1013,7 @@ class Runner {
 
   static async compareEnteredKeyToGlobalKey(printer) {
     // Compare entered API key to settings API Key...
-    const globalAPIKeyCheck = await this.octoPrintService.getSettings(printer);
+    const globalAPIKeyCheck = await this.octoPrintService.getSettings(printer, true);
     const errorCode = {
       message:
         "Global API Key detected... unable to authenticate websocket connection",
@@ -1142,7 +1142,7 @@ class Runner {
             typeof farmPrinters[i].fileList === "undefined" ||
             typeof farmPrinters[i].storage === "undefined"
           ) {
-            await Runner.getFiles(id, "files?recursive=true");
+            await Runner.getFiles(id, true);
           } else {
             const currentFilament = await Runner.compileSelectedFilament(
               farmPrinters[i].selectedFilament,
@@ -1278,7 +1278,7 @@ class Runner {
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[i].printerURL,
-              `${e.message}: Connection refused, trying again in: ${systemSettings.timeout.apiRetry}`,
+              `${e.message}: Connection refused, trying again in: ${systemSettings.timeout.apiRetry / 1000} seconds`,
               "Disconnected",
               farmPrinters[i]._id
             );
@@ -1351,7 +1351,7 @@ class Runner {
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[i].printerURL,
-              `${e.message} retrying in ${timeout.webSocketRetry}`,
+              `${e.message} retrying in ${timeout.apiRetry / 1000} seconds`,
               "Disconnected",
               farmPrinters[i]._id
             );
@@ -2141,7 +2141,7 @@ class Runner {
     const printer = farmPrinters[index];
 
     return await this.octoPrintService
-      .getFiles(printer, recursive)
+      .getFiles(printer, true, true)
       .then((res) => {
         return res.json();
       })
@@ -2675,7 +2675,8 @@ class Runner {
           );
 
           let piSupport = await this.octoPrintService.getPluginPiSupport(
-            farmPrinters[index]
+            farmPrinters[index],
+            true
           );
           piSupport = await piSupport.json();
           logger.info("Got from endpoint: ", piSupport);
