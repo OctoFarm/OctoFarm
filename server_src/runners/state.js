@@ -2675,8 +2675,7 @@ class Runner {
           );
 
           let piSupport = await this.octoPrintService.getPluginPiSupport(
-            farmPrinters[index],
-            true
+            farmPrinters[index]
           );
           piSupport = await piSupport.json();
           logger.info("Got from endpoint: ", piSupport);
