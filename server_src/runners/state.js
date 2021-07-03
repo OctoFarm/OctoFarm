@@ -2141,7 +2141,7 @@ class Runner {
     const printer = farmPrinters[index];
 
     return await this.octoPrintService
-      .getFiles(printer, true, true)
+      .getFiles(printer, recursive)
       .then((res) => {
         return res.json();
       })
