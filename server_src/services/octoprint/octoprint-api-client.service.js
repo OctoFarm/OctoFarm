@@ -65,7 +65,7 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @param retry
    * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)|*|undefined>}
    */
-  async getFiles(printer, recursive = true, retry = false) {
+  async getFiles(printer, recursive = false, retry = false) {
     return this.getWithOptionalRetry(printer, apiFiles(recursive), retry);
   }
 
@@ -116,7 +116,7 @@ class OctoprintApiClientService extends OctoprintApiService {
     );
   }
 
-  async getUsers(printer, retry = true) {
+  async getUsers(printer, retry = false) {
     return this.getWithOptionalRetry(printer, apiUsers, retry);
   }
 
