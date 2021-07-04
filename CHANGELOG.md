@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
     - Fixed #665: If Global API check fails due to intial time out, never recovered and tried again increasing timeout.
     - Fixed #670: File manager initial and subsequent scans we're not recursive. 
+    - Fixed #590 #669: File manager scroll wouldnt reset after switching printer. Nice visual tweaks and the Back button logic.
 
 ## [v1.2-rc1]
 
