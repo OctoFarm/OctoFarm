@@ -289,6 +289,8 @@ export default class FileManager {
   }
 
   static openFolder(folder, target, printer) {
+    const fileBackButtonElement = document.getElementById("fileBackBtn");
+
     if (typeof target !== "undefined" && target.type === "button") {
       return;
     }
@@ -296,6 +298,7 @@ export default class FileManager {
       folder = folder.replace("file-", "");
 
       document.getElementById("currentFolder").innerHTML = `local/${folder}`;
+      fileBackButtonElement.disabled = false;
       FileManager.updateFileList(printer._id);
     } else {
       const currentFolder = document.getElementById("currentFolder").innerHTML;
@@ -305,7 +308,10 @@ export default class FileManager {
           currentFolder.lastIndexOf("/")
         );
         document.getElementById("currentFolder").innerHTML = previousFolder;
+        fileBackButtonElement.disabled = previousFolder === "local";
         FileManager.updateFileList(printer._id);
+      } else {
+        fileBackButtonElement.disabled = true;
       }
     }
   }
@@ -560,7 +566,6 @@ export default class FileManager {
                 </div>
               </div>
             </a>
-         
             `
                 );
               }
@@ -886,6 +891,7 @@ export default class FileManager {
           grabFiles(this.files);
         });
     }
+
     function third() {
       if (selectedFolder == "") {
         selectedFolder = "local";
@@ -929,6 +935,7 @@ export default class FileManager {
         );
       });
     }
+
     const files = document.getElementById("multiFileSelectedNow");
     files.innerHTML = "";
     document.getElementById("multiPrinterBtn").disabled = false;
@@ -946,6 +953,7 @@ export default class FileManager {
       });
   }
 }
+
 export class FileActions {
   static async search(id) {
     let printer = await OctoFarmClient.post("printers/printerInfo", {

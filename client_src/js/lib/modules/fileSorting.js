@@ -4,6 +4,7 @@ export default class FileSorting {
   static saveSort(meta, reverse) {
     localStorage.setItem("fileSort", JSON.stringify({ meta, reverse }));
   }
+
   static loadSort(printer, recursive) {
     const fileSortStorage = JSON.parse(localStorage.getItem("fileSort"));
     if (fileSortStorage !== null) {
@@ -34,6 +35,7 @@ export default class FileSorting {
     }
     this.setListeners(printer);
   }
+
   static setListeners(printer) {
     document.getElementById("sortFileNameUp").addEventListener("click", (e) => {
       this.sortFileName(printer, true);
@@ -84,6 +86,7 @@ export default class FileSorting {
     }
     FileManager.drawFiles(printer, recursive);
   }
+
   static sortUploadDate(printer, reverse, recursive) {
     const sortHeader = document.getElementById("fileSortDropdownMenu");
     printer.fileList.fileList = _.sortBy(printer.fileList.fileList, [
@@ -109,6 +112,7 @@ export default class FileSorting {
     }
     FileManager.drawFiles(printer, recursive);
   }
+
   static sortPrintTime(printer, reverse, recursive) {
     const sortHeader = document.getElementById("fileSortDropdownMenu");
     printer.fileList.fileList = _.sortBy(printer.fileList.fileList, [

@@ -286,6 +286,9 @@ class Manager {
         FileManager.handleFiles(this.files, printer, "print");
       }
     );
+
+    // Root folder, disabled Back button
+    fileButtons.fileManager.back.disabled = true;
     fileButtons.fileManager.back.addEventListener("click", (e) => {
       FileManager.openFolder(undefined, undefined, printer);
     });
