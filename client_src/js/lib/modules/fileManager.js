@@ -761,7 +761,7 @@ export default class FileManager {
     let selectedFolder = "";
     let printAfterUpload = false;
     let selectedFile = null;
-    PrinterSelect.create(document.getElementById("multiPrintersSection"));
+    await PrinterSelect.create(document.getElementById("multiPrintersSection"));
 
     function first() {
       // let boxs = document.querySelectorAll('*[id^="multiUpPrinters-"]');
