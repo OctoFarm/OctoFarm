@@ -566,6 +566,7 @@ export default class FileManager {
               }
             });
           }
+
           if (fileList.fileList.length > 0) {
             fileList.fileList.forEach((file) => {
               let toolInfo = "";
@@ -709,6 +710,8 @@ export default class FileManager {
                 fileElem.insertAdjacentHTML("beforeend", f);
               }
             });
+          } else {
+            fileElem.insertAdjacentHTML("beforeend", "No files to be shown.");
           }
 
           FileManager.updateListeners(printer);

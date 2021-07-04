@@ -277,7 +277,7 @@ a.notyet {
 .fileBody {
   padding: 5px;
   overflow-y: scroll;
-  min-height: 65vh;
+  min-height: 40vh;
   max-height: 65vh;
 }
 

@@ -240,8 +240,7 @@ class Manager {
     document.getElementById("fileBody").insertAdjacentHTML(
       "beforeend",
       `
-            <div id="fileList-${id}" class="list-group" style="max-height:100%; overflow-y:scroll; min-height:1000px;" data-jplist-group="files">
-                
+            <div id="fileList-${id}" class="list-group" style="max-height:100%; overflow-y:scroll;" data-jplist-group="files">
             </div>
         `
     );
