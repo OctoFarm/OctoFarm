@@ -488,7 +488,7 @@ export default class FileManager {
             `fileTime-${file.fullPath}`
           ).innerHTML = ` ${Calc.generateTime(file.expectedPrintTime)}`;
           document.getElementById(`fileCost-${file.fullPath}`).innerHTML =
-            " " + `Print Cost: ${file.printCost}`;
+            " " + `Print Cost: ${file.printCost?.toFixed(2)}`;
           document.getElementById(
             `fileThumbnail-${file.fullPath}`
           ).innerHTML = ` ${thumbnail}`;
@@ -627,7 +627,7 @@ export default class FileManager {
                 <i class="fas fa-dollar-sign"></i> 
                 <span title="Expected Printer Cost" class="cost" id="fileCost-${
                   file.fullPath
-                }"> Print Cost: ${file.printCost} </span>    <br> 
+                }"> Print Cost: ${file.printCost?.toFixed(2)} </span>    <br> 
             <span title="Expected Filament Cost"> </span>
 
                 </p>

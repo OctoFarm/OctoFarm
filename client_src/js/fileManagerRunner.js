@@ -56,7 +56,7 @@ class Manager {
               <div class="col-lg-10">
                 <div class="d-flex w-100 justify-content-between">
                   <h5 class="mb-1">
-                    <span id="printerName-${printer._id}">
+                    <span class="badge badge-primary" id="printerName-${printer._id}">
                         ${printer.printerName}
                     </span>
         
@@ -161,11 +161,10 @@ class Manager {
         const item = document.getElementById(
           "fileManagerPrinter-" + printer._id
         );
-        item.classList.add("bg-dark");
+        item.classList.add("bg-dark", "printerSelected");
         item.classList.remove("bg-secondary");
         const firstElement = document.getElementById("currentPrinter");
-        firstElement.innerHTML =
-          '<i class="fas fa-print"></i> ' + printer.printerName;
+        firstElement.innerHTML = `<i class="fas fa-print"></i> ${printer.printerName}`;
         FileSorting.loadSort(printer);
         Manager.updatePrinterList(printer._id);
       }
@@ -192,10 +191,10 @@ class Manager {
       ).innerHTML;
       const panel = document.getElementById("fileManagerPrinter-" + target);
 
-      panel.classList.add("bg-dark");
+      panel.classList.add("bg-dark", "printerSelected");
       panel.classList.remove("bg-secondary");
       const firstElement = document.getElementById("currentPrinter");
-      firstElement.innerHTML = '<i class="fas fa-print"></i> ' + printerName;
+      firstElement.innerHTML = `<i class="fas fa-print"></i> ${printerName}`;
       Manager.updatePrinterList(target);
     }
   }
@@ -211,13 +210,10 @@ class Manager {
     fileList.innerHTML = `
          <div class="row mb-1">
           <div class="col-12">
-         
-
             <label class="btn btn-success float-left mr-1 mb-0 bg-colour-1" for="fileUploadBtn"><i class="fas fa-file-import"></i> Upload File(s)</label>
             <input id="fileUploadBtn" multiple accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left bg-colour-1" id="uploadFileBtn">
             <label class="btn btn-info float-left mr-1 mb-0 bg-colour-2" for="fileUploadPrintBtn"><i class="fas fa-file-import"></i> Upload and Print</label>
             <input id="fileUploadPrintBtn" accept=".gcode,.gco,.g" type="file" class="btn btn-success float-left bg-colour-2" id="uploadFileBtn">
-
             <button
                     id="createFolderBtn"
                     type="button"
@@ -234,7 +230,6 @@ class Manager {
               <i class="fas fa-sync"></i> Re-Sync
             </button>
           </div>
-
         </div>
         `;
     document.getElementById("fileBody").insertAdjacentHTML(
