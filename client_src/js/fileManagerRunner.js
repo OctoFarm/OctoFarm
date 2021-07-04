@@ -174,8 +174,13 @@ class Manager {
 
   static changePrinter(e, target) {
     if (!e.target.id.includes("filamentDrop")) {
+      const filamentList = document.getElementById("fileBody");
+      if (!!filamentList) {
+        filamentList.innerHTML = "";
+        filamentList.scrollTop = 0;
+      }
+
       //Set old one deselected
-      document.getElementById("fileBody").innerHTML = "";
       document.getElementById("currentFolder").innerHTML = "local";
       document.getElementById("fileManagerPrinter-" + lastId).className =
         "list-group-item list-group-item-action flex-column align-items-start bg-secondary";
