@@ -572,8 +572,14 @@ export default class FileManager {
             });
           }
 
-          if (fileList.fileList.length > 0) {
-            fileList.fileList.forEach((file) => {
+          // Filter out files out of current folder scope
+          const currentFileList = fileList.fileList.filter(
+            (f) => typeof recursive !== "undefined" || f.path === currentFolder
+          );
+
+          // Show empty or filled list
+          if (currentFileList.length > 0) {
+            currentFileList.forEach((file) => {
               let toolInfo = "";
               file.toolUnits.forEach((unit, index) => {
                 toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
@@ -708,12 +714,7 @@ export default class FileManager {
       </div>
       </div>
       </div>`;
-
-              if (typeof recursive !== "undefined") {
-                fileElem.insertAdjacentHTML("beforeend", f);
-              } else if (file.path == currentFolder) {
-                fileElem.insertAdjacentHTML("beforeend", f);
-              }
+              fileElem.insertAdjacentHTML("beforeend", f);
             });
           } else {
             fileElem.insertAdjacentHTML("beforeend", "No files to be shown.");
