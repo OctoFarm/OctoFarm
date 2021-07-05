@@ -54,15 +54,22 @@ In order to have OctoFarm running using a local installation of NodeJS and Mongo
 
 ### OS / Platform for OctoFarm
 Confirmed working on:
+- Windows 10/11 (direct or with chocolatey)
+> Find the chocolatey package here: https://community.chocolatey.org/packages/octofarm 
+> This will install all dependencies NodeJS, MongoDB and OctoFarm with pm2  
 - Linux (Ubuntu, Debian)
-- RaspberryPi (Rasbian, Raspberry Pi Lite OS)
-- Windows 10
+- FarmPi (Raspberry Pi 3A+ or newer)
+  > Find the FarmPi image for Raspberry Pi 3A+ or newer here: https://github.com/mkevenaar/FarmPi
+  > Please make sure to NOT install OctoPrint(s) on the same system and limit yourself to amount of printers in the table https://github.com/mkevenaar/FarmPi#supported-printers 
 
 Should also work on but not tested:
 - MacOS
 - _Anything else NodeJS 14+ will run on._
 
-_Note_: Raspberry Pi's Raspbian is 32 bits. In that case choose to upgrade to 64-bits Raspberry Pi Lite OS or find yourself a 32 bits MongoDB installation. Alternatively you can choose to run MongoDB on another machine.
+Avoid the following, known to be tough to get working: 
+- Raspberry Pi OS - go for the **FarmPi Ubuntu** image instead (https://github.com/mkevenaar/FarmPi/releases/latest)!
+
+_Note_: Raspberry Pi's OS is 32 bits, although 64 bits is available but harder to find. Both the docker containers as well as direct install is hard to get working. The docker containers seem to fail on wrong architecture and direct install fails on a 64 bits MongoDB requirement. 
 
 ### Important note OctoPrint 1.4.1+
 
