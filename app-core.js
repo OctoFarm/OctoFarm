@@ -155,13 +155,6 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
     const stateRunnerReport = await Runner.init();
     logger.info("OctoFarm State returned", stateRunnerReport);
 
-    // Test or example task
-    // TaskManager.registerAsyncTask("unique_test_task1", 10000, async () => {
-    //   await new Promise((resolve) => {
-    //     setTimeout(() => resolve(), 9000);
-    //   });
-    // });
-
     const serverSettings = require("./server_src/settings/serverSettings");
     TaskManager.registerAsyncTask("printer_clean_runner", 2500, async () => {
       const printersInformation = PrinterClean.listPrintersInformation();
