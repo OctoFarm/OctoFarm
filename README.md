@@ -59,8 +59,8 @@ Confirmed working on:
 > This will install all dependencies NodeJS, MongoDB and OctoFarm with pm2  
 - Linux (Ubuntu, Debian)
 - FarmPi (Raspberry Pi 3A+ or newer)
-  > Find the FarmPi image for Raspberry Pi 3A+ or newer here: https://github.com/mkevenaar/FarmPi
-  > Please make sure to NOT install OctoPrint(s) on the same system and limit yourself to amount of printers in the table https://github.com/mkevenaar/FarmPi#supported-printers 
+> Find the FarmPi image for Raspberry Pi 3A+ or newer here: https://github.com/mkevenaar/FarmPi
+> Please make sure to NOT install OctoPrint(s) on the same system and limit yourself to amount of printers in the table https://github.com/mkevenaar/FarmPi#supported-printers 
 
 Should also work on but not tested:
 - MacOS
