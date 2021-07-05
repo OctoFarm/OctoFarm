@@ -46,10 +46,10 @@ class TaskManager {
 
       // No logging of extremely repeatable logs
       const report = `Task ${identifier} with period ${milliseconds} finished. [Duration ${metricContainer.duration} ms]`;
-      if (milliseconds < 20000) {
-        console.log(report);
-      } else {
+      if (milliseconds > 40000) {
         logger.info(report);
+      } else if (milliseconds > 20000) {
+        console.log(report);
       }
     };
   }

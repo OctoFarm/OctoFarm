@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [v1.2-rc2]
 
 ### Added
+    - Task scheduler: runs periodic tasks for OctoFarm in a controllable, periodic manner.
 
 ### Changed
 
