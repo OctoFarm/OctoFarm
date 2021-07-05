@@ -56,10 +56,9 @@ class Manager {
               <div class="col-lg-10">
                 <div class="d-flex w-100 justify-content-between">
                   <h5 class="mb-1">
-                    <span class="badge badge-primary" id="printerName-${printer._id}">
+                    <span class="badge badge-secondary" id="printerName-${printer._id}">
                         ${printer.printerName}
                     </span>
-        
                   </h5>
                   <small>
                     <span class="float-right badge badge-dark badge-pill">
@@ -67,14 +66,12 @@ class Manager {
                     </span></small
                   >
                 </div>
-        
+                
                 <div
                   class="float-right btn-group flex-wrap btn-group-sm"
                   role="group"
                   aria-label="Basic example"
                 >
-                 
-        
                 </div>
                 <div class="row">
                   <div class="col-lg-2">
@@ -88,10 +85,6 @@ class Manager {
                     </div>
                   </div>
                 </div>
-
-
-        
-        
                   <small class="pt-2 float-left"
                   ><i class="fas fa-cube"></i> <b>H:</b> ${printer.currentProfile.volume.height}mm x <b>W:</b> ${printer.currentProfile.volume.width}mm x <b>D:</b> ${printer.currentProfile.volume.depth}mm</small
                 ><br><!--Fix for firefox-->
@@ -101,12 +94,10 @@ class Manager {
                   <b>Nozzle Size:</b> 
                   ${printer.currentProfile.extruder.nozzleDiameter}mm</small
                 >
-                
                                 ${extruderList}
               </div>
             </div>
           </a>
-              
       `
       );
       //Setup for first printer
@@ -173,10 +164,10 @@ class Manager {
 
   static changePrinter(e, target) {
     if (!e.target.id.includes("filamentDrop")) {
-      const filamentList = document.getElementById("fileBody");
-      if (!!filamentList) {
-        filamentList.innerHTML = "";
-        filamentList.scrollTop = 0;
+      const fileList = document.getElementById("fileBody");
+      if (!!fileList) {
+        fileList.innerHTML = "";
+        fileList.scrollTop = 0;
       }
 
       //Set old one deselected
