@@ -17,6 +17,7 @@ const {
 } = require("./server_src/lib/dataFunctions/printerClean.js");
 const { ServerSettings } = require("./server_src/settings/serverSettings.js");
 const { ClientSettings } = require("./server_src/settings/clientSettings.js");
+const { TaskManager } = require("./server_src/runners/task.manager");
 
 function setupExpressServer() {
   let app = express();
@@ -154,32 +155,31 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
     const stateRunnerReport = await Runner.init();
     logger.info("OctoFarm State returned", stateRunnerReport);
 
+    // Test or example task
+    // TaskManager.registerAsyncTask("unique_test_task1", 10000, async () => {
+    //   await new Promise((resolve) => {
+    //     setTimeout(() => resolve(), 9000);
+    //   });
+    // });
+
+    const serverSettings = require("./server_src/settings/serverSettings");
+    TaskManager.registerAsyncTask("printer_clean_runner", 2500, async () => {
+      const printersInformation = PrinterClean.listPrintersInformation();
+      await PrinterClean.sortCurrentOperations(printersInformation);
+
+      await PrinterClean.statisticsStart();
+      await PrinterClean.createPrinterList(
+        printersInformation,
+        serverSettings.filamentManager
+      );
+    });
+
     // await FilamentClean.start();
     // TODO race condition
+
     await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
       softwareUpdateChecker.checkReleaseAndLogUpdate();
     });
-
-    // Hacky database check due to shoddy layout of code...
-    // const mongoose = require("mongoose");
-    const serverSettings = require("./server_src/settings/serverSettings");
-
-    const printersInformation = PrinterClean.listPrintersInformation();
-    await PrinterClean.sortCurrentOperations(printersInformation);
-    await PrinterClean.statisticsStart();
-    await PrinterClean.createPrinterList(
-      printersInformation,
-      serverSettings.filamentManager
-    );
-
-    // let interval = false;
-    // if (interval === false) {
-    //   interval = setInterval(async () => {
-    //     if (mongoose.connection.readyState === 1) {
-    //
-    //     }
-    //   }, 2500);
-    // }
 
     await initHistoryCache().catch((e) => {
       console.error("X HistoryCache failed to initiate. " + e);
