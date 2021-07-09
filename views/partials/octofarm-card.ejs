@@ -10,6 +10,18 @@
             >
                 <i class="fas <%= tile.i %>"></i> <%= tile.title %>
             </button>
+
+            <% if(typeof status !== "undefined") { %>
+                <button
+                        type="button"
+                        class="btn btn-secondary float-right"
+                        href="#"
+                        aria-expanded="false"
+                        disabled
+                >
+                    <i class="fas <%= status.icon %>"></i> <%= status.title %> <span id="<%= status.id %>"><i class="fas fa-spinner fa-spin"></i></span>
+                </button>
+            <% } %>
         </div>
 
         <div class="card-body p-0">

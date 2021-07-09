@@ -14,7 +14,12 @@
 %>
 <%- include(card, {
     tile:{
-    id:"printerManagementBtns",i:"fa-sticky-note",title:"Connection Log",class:"col-12 col-sm-12 col-md-8 col-lg-9 col-xl-10"
+    id:"printerManagmentConnectionLog",i:"fa-sticky-note",title:"Connection Log",class:"col-12 col-sm-12 col-md-8 col-lg-9 col-xl-10",
+    },
+    status: {
+        id: "printerManagementConnectionLogStatus",
+        icon: "fa-info-circle",
+        title: "Log Lines: "
     },
     bodyFile:'./PrinterManager/printerConnectionLog.ejs'
     })
@@ -93,4 +98,4 @@
 })
 %>
 
-<script src="/assets/dist/printerManagementRunner.min.js" type="module"></script>
+<script src="/assets/dist/printer-management.runner.min.js" type="module"></script>

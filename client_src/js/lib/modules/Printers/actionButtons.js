@@ -75,15 +75,15 @@ function printerQuickDisconnected(id) {
   connectBtn.title = "Press to connect your printer!";
 }
 
-async function init(printer, element) {
+function init(printer, element) {
   document.getElementById(element).innerHTML = `
-    ${printerControlBtn(printer._id)}  
-    ${printerWebBtn(printer._id, printer.printerURL)}  
-    ${printerReSyncBtn(printer._id)}  
-    ${printerQuickConnect(printer._id)}  
-    ${powerBtnHolder(printer._id)}  
+      ${printerControlBtn(printer._id)}  
+      ${printerQuickConnect(printer._id)} 
+      ${printerReSyncBtn(printer._id)}  
+      ${printerWebBtn(printer._id, printer.printerURL)}    
+      ${powerBtnHolder(printer._id)}  
   `;
-  await PowerButton.applyBtn(printer, "powerBtn-");
+  PowerButton.applyBtn(printer, "powerBtn-");
   if (
     printer.currentConnection != null &&
     printer.currentConnection.port != null &&
