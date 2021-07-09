@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.2-rc2]
+
+### Added
+
+### Changed
+
+### Removed
+
+### Fixed
+    - Fixed #665: If Global API check fails due to intial time out, never recovered and tried again increasing timeout.
+    - Fixed #670: File manager initial and subsequent scans we're not recursive. 
+
 ## [v1.2-rc1]
 
 ### Added

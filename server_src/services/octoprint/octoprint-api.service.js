@@ -62,11 +62,11 @@ class OctoprintApiService {
       // If timeout exceeds max cut off then give up... Printer is considered offline.
       if (this.timeout.apiTimeout >= this.timeout.apiRetryCutoff) {
         logger.info(`Timeout Exceeded: ${item} | ${printerURL}`);
-        // Reset timeout for next printer...
-        this.timeout.apiTimeout = Number(this.timeout.apiTimeout) - 9000;
         throw err;
       }
-      this.timeout.apiTimeout += 9000;
+      // Make sure to use the settings for api retry.
+      // TODO: Fix apiRetryCutoff + apiRetry as they are swapped.
+      this.timeout.apiTimeout = this.timeout.apiRetryCutoff;
 
       return await this.getRetry(printerURL, apiKey, item);
     }
