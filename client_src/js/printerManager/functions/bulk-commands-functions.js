@@ -3,7 +3,10 @@ import { findIndex } from "lodash";
 import OctoFarmClient from "../../lib/octofarm_client.js";
 import UI from "../../lib/functions/ui";
 import PrinterSelect from "../../lib/modules/printerSelect";
-import { updateOctoPrintPlugins } from "../../octoprint/octoprint-plugin-commands";
+import {
+  octoPrintPluginInstallAction,
+  updateOctoPrintPlugins
+} from "../../octoprint/octoprint-plugin-commands";
 import {
   disconnectPrinterFromOctoPrint,
   quickConnectPrinterToOctoPrint,
@@ -20,8 +23,27 @@ import {
   printerResumePrint,
   printerStopPrint,
   printerMoveAxis,
-  printerHomeAxis
+  printerHomeAxis,
+  printerSendGcode
 } from "../../octoprint/octoprint-printer-commands";
+import CustomGenerator from "../../lib/modules/customScripts";
+import { setupPluginSearch } from "./plugin-search.function";
+import { returnPluginListTemplate } from "../templates/octoprint-plugin-list.template";
+
+let restartInstance = document.getElementById("restartInstances");
+
+async function setupRestartInstancesBtn(printersForPluginAction) {
+  restartInstance.classList.add("d-none");
+  for (let p = 0; p < printersForPluginAction.length; p++) {
+    await sendPowerCommandToOctoPrint(printersForPluginAction[p], "restart");
+  }
+  restartInstance.removeEventListener(
+    "click",
+    async (printersForPluginAction) => {
+      await setupRestartInstancesBtn(printersForPluginAction);
+    }
+  );
+}
 
 // TODO this should come from printer select to save the extra call, re-iteration and matching.
 async function getCurrentlySelectedPrinterList() {
@@ -271,13 +293,11 @@ export async function bulkOctoPrintControlCommand() {
   let cameraBlock = "";
 
   printersToControl.forEach((printer) => {
-    if (index > -1) {
-      cameraBlock += `
+    cameraBlock += `
         <div class="col-lg-3">
             <img width="100%" src="${printer.cameraURL}">
         </div>
         `;
-    }
   });
 
   bootbox.dialog({
@@ -521,4 +541,138 @@ export async function bulkOctoPrintControlCommand() {
       });
     }
   });
+}
+
+export async function bulkOctoPrintGcodeCommand() {
+  const printersToSendGcode = await getCurrentlySelectedPrinterList();
+
+  bootbox.prompt({
+    size: "large",
+    title: "What gcode commands would you like sent?",
+    inputType: "textarea",
+    onShow: function (e) {
+      let textArea = document.getElementsByClassName(
+        "bootbox-input bootbox-input-textarea form-control"
+      );
+      const customGcodeEE =
+        "<div class='mb-1' id='customGcodeCommandsArea'></div>";
+      textArea[0].insertAdjacentHTML("beforebegin", customGcodeEE);
+      let buttonPrinters = [];
+      printersToConnect.forEach(async (printer) => {
+        const index = _.findIndex(printerInfo, function (o) {
+          return o._id === printer;
+        });
+        if (index > -1) {
+          buttonPrinters.push(printerInfo[index]);
+        }
+      });
+      CustomGenerator.generateButtons(buttonPrinters);
+    },
+    callback: async function (result) {
+      if (result !== null) {
+        for (let p = 0; p < printersToSendGcode.length; p++) {
+          await printerSendGcode(printersToSendGcode[p]);
+        }
+      }
+    }
+  });
+}
+
+export async function bulkOctoPrintPluginAction(action) {
+  const printersForPluginAction = await getCurrentlySelectedPrinterList();
+  try {
+    let pluginList = [];
+    let printerPluginList = null;
+    if (action === "install") {
+      printerPluginList = await OctoFarmClient.get(
+        "printers/pluginList/" + printersForPluginAction[0]._id
+      );
+    } else {
+      printerPluginList = await OctoFarmClient.get("printers/pluginList/all");
+    }
+    printerPluginList.forEach((plugin) => {
+      if (action === "install") {
+        pluginList.push({
+          text: returnPluginListTemplate(plugin),
+          value: plugin.archive
+        });
+      } else {
+        pluginList.push({
+          text: returnPluginListTemplate(plugin),
+          value: plugin.id
+        });
+      }
+    });
+    pluginList = _.sortBy(pluginList, [
+      function (o) {
+        return o.text;
+      }
+    ]);
+
+    //Install Promt
+    bootbox.prompt({
+      size: "large",
+      title: `<form class="form-inline float-right">
+                  <div class="form-group">
+                    <label for="searchPlugins">
+                      Please choose the plugin you'd like to install... or: &nbsp;
+                    </label>
+                    <input width="50%" id="searchPlugins" type="text" placeholder="Type your plugin name here..." class="search-control search-control-underlined">
+                  </div>
+                </form>`,
+      inputType: "checkbox",
+      multiple: true,
+      inputOptions: pluginList,
+      scrollable: true,
+      onShow: function (e) {
+        setupPluginSearch();
+      },
+      callback: async function (result) {
+        if (result) {
+          let trackerBtn = document.getElementById("pluginTracking");
+          trackerBtn.classList.remove("d-none");
+          let pluginAmount = result.length * printersForPluginAction.length;
+          let cleanAction = action.charAt(0).toUpperCase() + action.slice(1);
+          if (action === "install") {
+            cleanAction = cleanAction + "ing";
+          }
+          trackerBtn.innerHTML = `
+                   ${cleanAction} Plugins!<br>
+                   <i class="fas fa-print"></i>${printersForPluginAction.length} / <i class="fas fa-plug"></i> ${pluginAmount}
+        `;
+          for (let p = 0; p < printersForPluginAction.length; p++) {
+            await octoPrintPluginInstallAction(
+              printersForPluginAction[p],
+              result,
+              action
+            );
+            trackerBtn.innerHTML = `
+                ${cleanAction} Plugins!<br>
+                <i class="fas fa-print"></i>${
+                  printersForPluginAction.length - p
+                } / <i class="fas fa-plug"></i> ${pluginAmount}
+              `;
+            pluginAmount = pluginAmount - 1;
+          }
+          trackerBtn.classList.add("d-none");
+          restartInstance.classList.remove("d-none");
+          restartInstance.addEventListener(
+            "click",
+            async (printersForPluginAction) => {
+              await setupRestartInstancesBtn(printersForPluginAction);
+            }
+          );
+          trackerBtn.classList.add("d-none");
+        }
+      }
+    });
+  } catch (e) {
+    console.error(e);
+    UI.createAlert(
+      "error",
+      `Failed to generate plugin list, please check logs: ${e}`,
+      0,
+      "clicked"
+    );
+  }
 }

@@ -165,3 +165,33 @@ export async function printerMoveAxis(e, printer, axis, dir) {
 export async function printerHomeAxis(e, printer, axis) {
   await OctoPrintClient.move(e, printer, "home", axis);
 }
+
+export async function printerSendGcode(printer) {
+  let lines = result.match(/[^\r\n]+/g);
+  lines = lines.map(function (name) {
+    if (!name.includes("=")) {
+      return name.toLocaleUpperCase();
+    } else {
+      return name;
+    }
+  });
+  const opt = {
+    commands: lines
+  };
+  const post = await OctoPrintClient.post(printer, "printer/command", opt);
+  if (post.status === 204) {
+    UI.createAlert(
+      "success",
+      "Your gcode commands have successfully been sent!",
+      3000,
+      "Clicked"
+    );
+  } else {
+    UI.createAlert(
+      "danger",
+      "Your gcode failed to send! Please check the printer is able to receive these commands.",
+      3000,
+      "Clicked"
+    );
+  }
+}

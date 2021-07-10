@@ -1,6 +1,7 @@
 import OctoPrintClient from "../lib/octoprint.js";
 import OctoFarmClient from "../lib/octofarm_client.js";
 import UI from "../lib/functions/ui";
+import PrinterSelect from "../lib/modules/printerSelect";
 
 const printerBase = "printers";
 const printerInfoURL = "/printerInfo";
@@ -114,6 +115,75 @@ export async function updateOctoPrintPlugins(pluginList, printer) {
       `${printer.printerName}: Failed to update, manual intervention required!`,
       3000,
       "Clicked"
+    );
+  }
+}
+
+export async function octoPrintPluginInstallAction(
+  printer,
+  pluginList,
+  action
+) {
+  let cleanAction = action.charAt(0).toUpperCase() + action.slice(1);
+  if (action === "install") {
+    cleanAction = cleanAction + "ing";
+  }
+  if (printer.printerState.colour.category !== "Active") {
+    for (let r = 0; r < pluginList.length; r++) {
+      let alert = UI.createAlert(
+        "warning",
+        `${printer.printerName}: ${cleanAction} - ${pluginList[r]}<br>Do not navigate away from this screen!`
+      );
+
+      let postData = {
+        command: action,
+        dependency_links: false,
+        url: pluginList[r]
+      };
+
+      const post = await OctoPrintClient.post(
+        printer,
+        "plugin/pluginmanager",
+        postData
+      );
+      alert.close();
+      if (post.status === 409) {
+        UI.createAlert(
+          "error",
+          "Plugin not installed... Printer could be active...",
+          4000,
+          "Clicked"
+        );
+      } else if (post.status === 400) {
+        UI.createAlert(
+          "error",
+          "Malformed request... please log an issue...",
+          4000,
+          "Clicked"
+        );
+      } else if (post.status === 200) {
+        let response = await post.json();
+        if (response.needs_restart || response.needs_refresh) {
+          UI.createAlert(
+            "success",
+            `${printer.printerName}: ${pluginList[r]} - Has successfully been installed... OctoPrint restart is required!`,
+            4000,
+            "Clicked"
+          );
+        } else {
+          UI.createAlert(
+            "success",
+            `${printer.printerName}: ${pluginList[r]} - Has successfully been installed... No further action requested...`,
+            4000,
+            "Clicked"
+          );
+        }
+      }
+    }
+  } else {
+    UI.createAlert(
+      "danger",
+      `${printer.printerName}: Is active skipping the plugin installation command...`
     );
   }
 }
