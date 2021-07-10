@@ -5,7 +5,7 @@ const fetch = require("node-fetch");
 const _ = require("lodash");
 const { ensureAuthenticated } = require("../config/auth");
 const Spool = require("../models/Filament.js");
-const Profile = require("../models/Profiles.js");
+const Profiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
 
 const settingsClean = require("../lib/dataFunctions/settingsClean.js");
@@ -107,7 +107,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
         break;
       }
     }
-    const profiles = await Profile.find({});
+    const profiles = await Profiles.find({});
     const findID = _.findIndex(profiles, function (o) {
       return o.profile.index == filament.spoolsProfile;
     });
@@ -240,7 +240,7 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
       }
     }
     const filamentManagerID = newContent[5];
-    const profiles = await Profile.find({});
+    const profiles = await Profiles.find({});
     const findID = _.findIndex(profiles, function (o) {
       return o.profile.index == filamentManagerID;
     });
@@ -363,7 +363,7 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
       density: newProfile.density,
       diameter: newProfile.diameter
     };
-    const dataProfile = new Profile({
+    const dataProfile = new Profiles({
       profile
     });
 
@@ -425,13 +425,13 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
       updateFilamentManager.profile.id
     );
     filamentManagerID = updateFilamentManager.profile.id;
-    const profiles = await Profile.find({});
+    const profiles = await Profiles.find({});
     const findID = _.findIndex(profiles, function (o) {
       return o.profile.index == searchId;
     });
     searchId = profiles[findID]._id;
   }
-  const profile = await Profile.findById(searchId);
+  const profile = await Profiles.findById(searchId);
   if (profile.profile.manufacturer != newContent[0]) {
     profile.profile.manufacturer = newContent[0];
     profile.markModified("profile");
@@ -451,7 +451,7 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
   await profile.save();
   logger.info("Profile saved successfully");
   FilamentClean.start(filamentManager);
-  Profile.find({}).then((profiles) => {
+  Profiles.find({}).then((profiles) => {
     Runner.updateFilament();
     res.send({ profiles });
   });
@@ -486,23 +486,23 @@ router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
         "X-Api-Key": printer.apikey
       }
     });
-    const profiles = await Profile.find({});
+    const profiles = await Profiles.find({});
     const findID = _.findIndex(profiles, function (o) {
       return o.profile.index == searchId;
     });
     logger.info("Deleting from database: ", searchId);
-    const rel = await Profile.deleteOne({ _id: profiles[findID]._id }).exec();
+    const rel = await Profiles.deleteOne({ _id: profiles[findID]._id }).exec();
     logger.info("Profile deleted successfully");
     FilamentClean.start(filamentManager);
     rel.status = 200;
     res.send({ profiles });
   } else {
     logger.info("Deleting from database: ", searchId);
-    const rel = await Profile.deleteOne({ _id: searchId }).exec();
+    const rel = await Profiles.deleteOne({ _id: searchId }).exec();
     rel.status = 200;
     logger.info("Profile deleted successfully");
     FilamentClean.start(filamentManager);
-    Profile.find({}).then((profiles) => {
+    Profiles.find({}).then((profiles) => {
       res.send({ profiles });
     });
   }
@@ -579,7 +579,7 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
     res.send({ status: false });
   }
   await Spool.deleteMany({});
-  await Profile.deleteMany({});
+  await Profiles.deleteMany({});
   spools = await spools.json();
   profiles = await profiles.json();
   spools.spools.forEach((sp) => {
@@ -607,7 +607,7 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
       manufacturer: sp.vendor,
       material: sp.material
     };
-    const newP = new Profile({
+    const newP = new Profiles({
       profile
     });
     newP.save();
@@ -630,7 +630,7 @@ router.post("/disableFilamentPlugin", ensureAuthenticated, async (req, res) => {
     logger.info("Spools deleted");
   });
 
-  await Profile.deleteMany({}).then((e) => {
+  await Profiles.deleteMany({}).then((e) => {
     logger.info("Profiles deleted");
   });
 

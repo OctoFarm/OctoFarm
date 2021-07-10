@@ -1,24 +1,17 @@
+const _ = require("lodash");
 const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth.js");
 const { ensureCurrentUserAndGroup } = require("../config/users.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const prettyHelpers = require("../../views/partials/functions/pretty.js");
-const runner = require("../runners/state.js");
-const { Runner } = runner;
-const _ = require("lodash");
-const filamentClean = require("../lib/dataFunctions/filamentClean.js");
-const { FilamentClean } = filamentClean;
-const settingsClean = require("../lib/dataFunctions/settingsClean.js");
-const { SettingsClean } = settingsClean;
-const printerClean = require("../lib/dataFunctions/printerClean.js");
-const { PrinterClean } = printerClean;
-const fileClean = require("../lib/dataFunctions/fileClean.js");
-const { FileClean } = fileClean;
+const { Runner } = require("../runners/state.js");
+const { FilamentClean } = require("../lib/dataFunctions/filamentClean.js");
+const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
+const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
+const { FileClean } = require("../lib/dataFunctions/fileClean.js");
 const { getSorting, getFilter } = require("../lib/sorting.js");
-const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
 const { AppConstants } = require("../app.constants");
-const { initHistoryCache } = require("../cache/history.cache");
 const {
   getDefaultDashboardSettings
 } = require("../lib/providers/settings.constants");
@@ -332,33 +325,5 @@ router.get(
     });
   }
 );
-
-// TODO race condition
-softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
-  softwareUpdateChecker.checkReleaseAndLogUpdate();
-});
-
-// Hacky database check due to shoddy layout of code...
-const mongoose = require("mongoose");
-const serverSettings = require("../settings/serverSettings");
-
-let interval = false;
-if (interval === false) {
-  interval = setInterval(async () => {
-    if (mongoose.connection.readyState === 1) {
-      const printersInformation = PrinterClean.listPrintersInformation();
-      await PrinterClean.sortCurrentOperations(printersInformation);
-      await PrinterClean.statisticsStart();
-      await PrinterClean.createPrinterList(
-        printersInformation,
-        serverSettings.filamentManager
-      );
-    }
-  }, 2500);
-}
-
-initHistoryCache().catch((e) => {
-  console.error("X HistoryCache failed to initiate. " + e);
-});
 
 module.exports = router;
