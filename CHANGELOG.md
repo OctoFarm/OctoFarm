@@ -5,14 +5,17 @@ All notable changes to this project will be documented in this file.
 ## [v1.2-rc2]
 
 ### Added
+    - Task scheduler: runs periodic tasks for OctoFarm in a controllable, periodic manner.
 
 ### Changed
-
+    - File manager: gave printer titles a badge. Gave selected printer a yellow border. Reduced file list minimum height (for smaller screens). 
 ### Removed
 
 ### Fixed
     - Fixed #665: If Global API check fails due to intial time out, never recovered and tried again increasing timeout.
     - Fixed #670: File manager initial and subsequent scans we're not recursive. 
+    - Fixed #669: File manager scroll wouldnt reset after switching printer.
+    - Fixed #590: The Back button now disables when there's no folder to go back to.
 
 ## [v1.2-rc1]
 

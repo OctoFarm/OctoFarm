@@ -118,6 +118,11 @@ body {
   background-size: cover;
   background-position: center;
   color: grey;
+  height:100%;
+}
+.flex-stretch-octofarm {
+  display: flex;
+  align-items: stretch;
 }
 button > * {
   pointer-events: none;
@@ -277,17 +282,19 @@ a.notyet {
 .fileBody {
   padding: 5px;
   overflow-y: scroll;
-  min-height: 65vh;
+  /*min-height: 40vh;*/
   max-height: 65vh;
 }
-
 .fileBody p {
   margin-bottom: 0px !important;
 }
-
+.printerSelected {
+  border-left: #f39c12 4px solid;
+}
 .fileFooter {
   padding: 5px;
 }
+
 .search-control:focus {
   border-width: 0;
   border-bottom-width: 1px;

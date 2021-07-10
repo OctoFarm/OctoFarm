@@ -23,3 +23,5 @@ client_2x/build/
 
 # V2 Server
 server_2x/assets/public/assets/
+
+*.tgz
