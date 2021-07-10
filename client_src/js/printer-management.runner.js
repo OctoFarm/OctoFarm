@@ -2531,7 +2531,7 @@ function workerEventFunction(data) {
           data.printerControlList
         );
       }
-      // TODO clean up power buttons
+      // TODO clean up power buttons wants to be in printer-data.js
       if (powerTimer >= 5000) {
         data.printersInformation.forEach((printer) => {
           PowerButton.applyBtn(printer, "powerBtn-");
@@ -2541,8 +2541,6 @@ function workerEventFunction(data) {
         powerTimer += 500;
       }
     } else {
-      // TODO functionise with printer manager refactor
-
       if (UI.checkIfSpecificModalShown("printerManagerModal")) {
         PrinterManager.init(
           "",
