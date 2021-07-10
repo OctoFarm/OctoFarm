@@ -3,8 +3,8 @@ import {
   checkQuickConnectState,
   init as actionButtonInit
 } from "../lib/modules/Printers/actionButtons";
-import { setupUpdateOctoPrintClientBtn } from "../octoprint/octoprint-client-update.js";
-import { setupUpdateOctoPrintPluginsBtn } from "../octoprint/octoprint-plugin-update.js";
+import { setupUpdateOctoPrintClientBtn } from "../octoprint/octoprint-client-commands";
+import { setupUpdateOctoPrintPluginsBtn } from "../octoprint/octoprint-plugin-commands";
 import UI from "../lib/functions/ui.js";
 import PrinterManager from "../lib/modules/printerManager.js";
 import PrinterLogs from "../lib/modules/printerLogs.js";

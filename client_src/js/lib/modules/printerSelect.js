@@ -1,5 +1,6 @@
 import OctoFarmClient from "../octofarm.js";
 import UI from "../functions/ui.js";
+import { findIndex } from "lodash";
 
 const editMessage = `
 <div class="alert alert-info" role="alert">

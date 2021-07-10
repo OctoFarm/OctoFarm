@@ -66,9 +66,9 @@ export function setupUpdateOctoPrintPluginsBtn(printer) {
   }
 }
 
-export async function updateOctoPrintPlugins(result, printer) {
+export async function updateOctoPrintPlugins(pluginList, printer) {
   const data = {
-    targets: result,
+    targets: pluginList,
     force: true
   };
   let updateRequest = await OctoPrintClient.postNOAPI(
