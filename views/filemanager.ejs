@@ -24,6 +24,7 @@
                 </div>
             </div>
         </div>
+
         <div class="row">
             <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
                 <div class="card text-white bg-dark h-100">
@@ -72,8 +73,9 @@
                 </div>
             </div>
         </div>
+
         <div id="filemanager" class="row">
-            <div id="filePrinters" class="col-12 col-sm-12 col-md-6 col-lg-3 col-xl-3">
+            <div id="filePrinters" class="col-3 col-sm-12 col-md-6 col-lg-3">
                 <div class="card text-white bg-dark">
                     <div class="card-header fileHeader">
                         <h5 class="float-left">
@@ -105,8 +107,8 @@
                     <div class="card-footer fileFooter text-muted"></div>
                 </div>
             </div>
-            <div class="col-12 col-sm-12 col-md-6 col-lg-9 col-xl-9">
-                <div class="card text-white bg-dark">
+            <div class="col-9 col-sm-12 col-md-6 col-lg-9 flex-stretch-octofarm">
+                <div class="card text-white bg-dark flex-fill">
                     <div class="card-header fileHeader">
                         <div class="col-12">
                             <h5 class="float-left  mb-0">
@@ -116,7 +118,8 @@
                                     <i class="fas fa-file"></i> <i class="fas fa-spinner fa-spin"></i> <i
                                             class="fas fa-folder"></i> <i class="fas fa-spinner fa-spin"></i>
                                 </button>
-                                <button id="printerStorage" type="button" class="btn btn-secondary float-right d-block"
+                                <button id="printerStorage" type="button"
+                                        class="btn btn-secondary float-right d-block"
                                         href="#" aria-expanded="false" disabled="">
 
                                     <i class="fas fa-hdd"></i> <i class="fas fa-spinner fa-spin"></i> / <i
@@ -124,9 +127,9 @@
                                 </button>
                                 <button type="button" class="btn btn-secondary float-right d-block"
                                         href="#" aria-expanded="false" disabled="">
-                                    <span id="currentPrinter">
-                                        <i class="fas fa-print"></i> <i class="fas fa-spinner fa-spin"></i>
-                                    </span>
+                                <span id="currentPrinter">
+                                    <i class="fas fa-print"></i> <i class="fas fa-spinner fa-spin"></i>
+                                </span>
                                 </button>
                             </h5>
                             <h5 class="float-left mb-0">
@@ -159,7 +162,8 @@
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" id="sortDateDown"><i
                                                     class="fas fa-sort-numeric-down"></i> Upload Date</a>
-                                        <a class="dropdown-item" id="sortDateUp"><i class="fas fa-sort-numeric-up"></i>
+                                        <a class="dropdown-item" id="sortDateUp"><i
+                                                    class="fas fa-sort-numeric-up"></i>
                                             Upload Date</a>
                                     </div>
                                 </div>
@@ -183,7 +187,6 @@
                 </div>
             </div>
         </div>
-
     <% }else{ %>
         <div class="row mt-5">
             <div class="col-md-6 m-auto">
