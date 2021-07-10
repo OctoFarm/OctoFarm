@@ -105,13 +105,11 @@ function updateOctoPiColumn(printer) {
 }
 function corsWarningCheck(printer) {
   const printerBadge = document.getElementById(`printerBadge-${printer._id}`);
-  if (printer.corsCheck) {
-    UI.doesElementNeedUpdating(
-      printer.printerState.state,
-      printerBadge,
-      "innerHTML"
-    );
-  } else {
+  if (
+    !printer.corsCheck &&
+    printer.hostState.state !== "Setting Up" &&
+    printer.hostState.state !== "Searching..."
+  ) {
     UI.doesElementNeedUpdating("CORS NOT ENABLED!", printerBadge, "innerHTML");
   }
 }
