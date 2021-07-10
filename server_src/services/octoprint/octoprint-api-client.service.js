@@ -1,3 +1,4 @@
+const { OPClientErrors } = require("./octoprint-service.constants");
 const {
   checkPluginManagerAPIDeprecation
 } = require("../../utils/compatibility.utils");
@@ -24,6 +25,8 @@ const apiPluginManagerRepository1_6_0 =
 const apiSoftwareUpdateCheck = (force) =>
   octoPrintBase + "plugin/softwareupdate/check" + (force ? "?force=true" : "");
 const apiPluginPiSupport = apiBase + "/plugin/pi_support";
+const apiPluginFilamentManagerSpecificSpool =
+  apiBase + "/plugin/filamentmanager/spools";
 
 const printerValidationErrorMessage = "printer apiKey or URL undefined";
 
@@ -122,6 +125,17 @@ class OctoprintApiClientService extends OctoprintApiService {
 
   async getPluginPiSupport(printer, retry = false) {
     return this.getWithOptionalRetry(printer, apiPluginPiSupport, retry);
+  }
+
+  async getPluginFilamentManagerFilament(printer, filamentID) {
+    // filamentID needs to be INT numeric
+    // https://github.com/malnvenshorn/OctoPrint-FilamentManager/blob/647af691d6081df2f16d400e834f12f11f6eea56/octoprint_filamentmanager/data/__init__.py#L84
+    const parsedFilamentID = Number.parseFloat(filamentID);
+    if (isNaN(filamentID)) {
+      throw OPClientErrors.filamentIDNotANumber;
+    }
+    const getURL = `${apiPluginFilamentManagerSpecificSpool}/${parsedFilamentID}`;
+    return this.getWithOptionalRetry(printer, getURL, false);
   }
 
   async login(printer, passive = true) {
