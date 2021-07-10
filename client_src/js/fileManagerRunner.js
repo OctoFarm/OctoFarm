@@ -30,7 +30,7 @@ class Manager {
       }
     });
     onlinePrinterList.forEach((printer, index) => {
-      let extruderList = ``;
+      let extruderList = "";
       for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
         extruderList += `<div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool${i}-${printer._id}">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool${i}-${printer._id}"></select></div>`;
       }
@@ -49,24 +49,26 @@ class Manager {
                 class="col-lg-2"
                 style="display:flex; justify-content:center; align-items:center;"
               >
-                <center><i class="fas fa-print fa-2x"></i><br>
-                <td><small><span title="${printer.printerState.desc}" id="printerBadge-${printer._id}" class="tag badge badge-${printer.printerState.colour.name} badge-pill ${printer.printerState.colour.category}">
-                        ${printer.printerState.state}</span></small></td></center>
+                <center>
+                  <i class="fas fa-print fa-2x"></i><br>
+                  <td>
+                  <small>
+                      <span title="${printer.printerState.desc}" id="printerBadge-${printer._id}" class="tag badge badge-${printer.printerState.colour.name} badge-pill ${printer.printerState.colour.category}">
+                          ${printer.printerState.state}
+                      </span>
+                      <span class="badge badge-dark badge-pill">
+                        Files: ${printer.fileList.filecount}
+                    </span>
+                    <span class="badge badge-dark badge-pill">
+                       Folders: ${printer.fileList.folderCount}
+                    </span>
+                  </small>
+                  </small>
+                  </td>
+                  </center>
               </div>
               <div class="col-lg-10">
-                <div class="d-flex w-100 justify-content-between">
-                  <h5 class="mb-1">
-                    <span class="badge badge-secondary" id="printerName-${printer._id}">
-                        ${printer.printerName}
-                    </span>
-                  </h5>
-                  <small>
-                    <span class="float-right badge badge-dark badge-pill">
-                        Files: ${printer.fileList.filecount} / Folders: ${printer.fileList.folderCount}
-                    </span></small
-                  >
-                </div>
-                
+                <button type="button" class="btn btn-secondary text-left" style="background-color: Transparent; border: 0px; pointer-events: none" id="printerName-${printer._id}" disabled>${printer.printerName}</button>
                 <div
                   class="float-right btn-group flex-wrap btn-group-sm"
                   role="group"
@@ -88,7 +90,7 @@ class Manager {
                   <small class="pt-2 float-left"
                   ><i class="fas fa-cube"></i> <b>H:</b> ${printer.currentProfile.volume.height}mm x <b>W:</b> ${printer.currentProfile.volume.width}mm x <b>D:</b> ${printer.currentProfile.volume.depth}mm</small
                 ><br><!--Fix for firefox-->
-                <small class="pt-2 float-left"
+                <small class="pt-2 pb-2 float-left"
                   ><i class="fas fa-pen"></i> <b>Extruders:</b>
                   ${printer.currentProfile.extruder.count}
                   <b>Nozzle Size:</b> 
