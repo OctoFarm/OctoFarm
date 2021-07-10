@@ -24,9 +24,6 @@ const workerURL = "/printersInfo/get/";
 let printerInfo = "";
 const deletedPrinters = [];
 let powerTimer = 5000;
-let printerControlList = null;
-let webWorkerErrorAlert = false;
-let sseErrorMessageTriggered = false;
 
 let newPrintersIndex = 0;
 const removeLine = function (element) {
@@ -2522,44 +2519,42 @@ const sortable = Sortable.create(el, {
 
 function workerEventFunction(data) {
   if (data != false) {
-    if (data.currentTickerList.length > 0) {
-      updateConnectionLog(data.currentTickerList);
+    const modalVisibility = UI.checkIfAnyModalShown();
+
+    if (!modalVisibility) {
+      if (data.currentTickerList.length > 0) {
+        updateConnectionLog(data.currentTickerList);
+      }
+      if (data.printersInformation.length > 0) {
+        createOrUpdatePrinterTableRow(
+          data.printersInformation,
+          data.printerControlList
+        );
+      }
+      // TODO clean up power buttons
+      if (powerTimer >= 5000) {
+        data.printersInformation.forEach((printer) => {
+          PowerButton.applyBtn(printer, "powerBtn-");
+        });
+        powerTimer = 0;
+      } else {
+        powerTimer += 500;
+      }
+    } else {
+      // TODO functionise with printer manager refactor
+
+      if (UI.checkIfSpecificModalShown("printerManagerModal")) {
+        PrinterManager.init(
+          "",
+          data.printersInformation,
+          data.printerControlList
+        );
+      }
+
+      if (UI.checkIfSpecificModalShown("printerSettingsModal")) {
+        updatePrinterSettingsModal(data.printersInformation);
+      }
     }
-    if (data.printersInformation.length > 0) {
-      createOrUpdatePrinterTableRow(data.printersInformation);
-    }
-    if (
-      document.getElementById("printerManagerModal").classList.contains("show")
-    ) {
-      PrinterManager.init("", data.printersInformation, printerControlList);
-    }
-    // if (event.data !== false) {
-    //   printerInfo = event.data.printersInformation;
-    //   printerControlList = event.data.printerControlList;
-    //   if (event.data.printersInformation.length > 0) {
-    //
-    //     } else if (
-    //       document
-    //         .getElementById("printerSettingsModal")
-    //         .classList.contains("show")
-    //     ) {
-    //       updatePrinterSettingsModal(event.data.printersInformation);
-    //     } else {
-    //       dashUpdate.printers(
-    //         event.data.printersInformation,
-    //         event.data.printerControlList
-    //       );
-    //       if (powerTimer >= 5000) {
-    //         event.data.printersInformation.forEach((printer) => {
-    //           PowerButton.applyBtn(printer, "powerBtn-");
-    //         });
-    //         powerTimer = 0;
-    //       } else {
-    //         powerTimer += 500;
-    //       }
-    //     }
-    //   }
-    // }
   } else {
     UI.createAlert(
       "warning",

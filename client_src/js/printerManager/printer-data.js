@@ -3,11 +3,17 @@ import {
   checkQuickConnectState,
   init as actionButtonInit
 } from "../lib/modules/Printers/actionButtons";
-import { setupUpdateOctoPrintClientBtn } from "./functions/octoprint-client-update.js";
-import { setupUpdateOctoPrintPluginsBtn } from "./functions/octoprint-plugin-update.js";
+import { setupUpdateOctoPrintClientBtn } from "../octoprint/octoprint-client-update.js";
+import { setupUpdateOctoPrintPluginsBtn } from "../octoprint/octoprint-plugin-update.js";
 import UI from "../lib/functions/ui.js";
+import PrinterManager from "../lib/modules/printerManager.js";
+import PrinterLogs from "../lib/modules/printerLogs.js";
+import OctoFarmClient from "../lib/octofarm_client";
+import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
 
 const printerList = document.getElementById("printerList");
+const printerBase = "printers";
+const printerInfoURL = "/printerInfo";
 
 function updatePrinterInfoAndState(printer) {
   const printName = document.getElementById(`printerName-${printer._id}`);
@@ -221,7 +227,7 @@ function updatePrinterRow(printer) {
   }
 }
 
-export function createOrUpdatePrinterTableRow(printers) {
+export function createOrUpdatePrinterTableRow(printers, printerControlList) {
   printers.forEach((printer) => {
     const printerCard = document.getElementById(`printerCard-${printer._id}`);
     if (printerCard) {
@@ -240,41 +246,81 @@ export function createOrUpdatePrinterTableRow(printers) {
       // Setup listeners
       setupUpdateOctoPrintClientBtn(printer);
       setupUpdateOctoPrintPluginsBtn(printer);
-      // document
-      //     .getElementById(`printerButton-${printer._id}`)
-      //     .addEventListener("click", () => {
-      //       // eslint-disable-next-line no-underscore-dangle
-      //       PrinterManager.init(
-      //           printer._id,
-      //           printerInfo,
-      //           printerControlList
-      //       );
-      //     });
-      // document
-      //   .getElementById(`printerSettings-${printer._id}`)
-      //   .addEventListener("click", (e) => {
-      //     PrinterSettings.init(
-      //       // eslint-disable-next-line no-underscore-dangle
-      //       printer._id,
-      //       printerInfo,
-      //       printerControlList
-      //     );
-      //   });
-      // document
-      //     .getElementById(`printerLog-${printer._id}`)
-      //     .addEventListener("click", async (e) => {
-      //       let connectionLogs = await OctoFarmClient.get(
-      //           "printers/connectionLogs/" + printer._id
-      //       );
-      //       connectionLogs = await connectionLogs.json();
-      //       PrinterLogs.loadLogs(printer, connectionLogs);
-      //     });
-      //
-      // document
-      //     .getElementById(`printerStatistics-${printer._id}`)
-      //     .addEventListener("click", async (e) => {
-      //       PrinterLogs.loadStatistics(printer._id);
-      //     });
+
+      // TODO move to function on printer manager cleanup
+      document
+        .getElementById(`printerButton-${printer._id}`)
+        .addEventListener("click", async () => {
+          try {
+            const printersInfo = await OctoFarmClient.post(
+              printerBase + printerInfoURL,
+              {}
+            );
+            await PrinterManager.init(
+              printer._id,
+              printersInfo,
+              printerControlList
+            );
+          } catch (e) {
+            console.error(e);
+            UI.createAlert(
+              "error",
+              `Unable to grab latest printer information: ${e}`,
+              0,
+              "clicked"
+            );
+          }
+        });
+      document
+        .getElementById(`printerSettings-${printer._id}`)
+        .addEventListener("click", async (e) => {
+          try {
+            const printersInfo = await OctoFarmClient.post(
+              printerBase + printerInfoURL,
+              {}
+            );
+            await updatePrinterSettingsModal(printersInfo, printer._id);
+          } catch (e) {
+            console.error(e);
+            UI.createAlert(
+              "error",
+              `Unable to grab latest printer information: ${e}`,
+              0,
+              "clicked"
+            );
+          }
+        });
+      document
+        .getElementById(`printerLog-${printer._id}`)
+        .addEventListener("click", async (e) => {
+          try {
+            let data = {
+              i: printer._id
+            };
+            const printerInfo = await OctoFarmClient.post(
+              printerBase + printerInfoURL,
+              data
+            );
+            let connectionLogs = await OctoFarmClient.get(
+              "printers/connectionLogs/" + printer._id
+            );
+            PrinterLogs.loadLogs(printerInfo, connectionLogs);
+          } catch (e) {
+            console.error(e);
+            UI.createAlert(
+              "error",
+              `Unable to grab latest printer information: ${e}`,
+              0,
+              "clicked"
+            );
+          }
+        });
+
+      document
+        .getElementById(`printerStatistics-${printer._id}`)
+        .addEventListener("click", async (e) => {
+          PrinterLogs.loadStatistics(printer._id);
+        });
     }
   });
 }
