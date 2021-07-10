@@ -24,6 +24,7 @@
                 </div>
             </div>
         </div>
+
         <div class="row">
             <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
                 <div class="card text-white bg-dark h-100">
@@ -56,37 +57,6 @@
                                         >
                                             <i class="fas fa-layer-group"></i> Multi-Upload
                                         </button>
-                                        <!--                    <div class="input-group mb-3 w-50 float-right">-->
-                                        <!--                      <div class="input-group-prepend">-->
-                                        <!--                        <label class="input-group-text" for="inputGroupSelect01">State: </label>-->
-                                        <!--                      </div>-->
-                                        <!--                      <select class="custom-select " id="inputGroupSelect01"-->
-                                        <!--                              data-jplist-control="select-filter"-->
-                                        <!--                              data-group="printers"-->
-                                        <!--                              data-name="printerNames"-->
-                                        <!--                      >-->
-                                        <!--                        <option selected-->
-                                        <!--                                href="#"-->
-                                        <!--                                data-value="0"-->
-                                        <!--                                data-path="default"-->
-                                        <!--                        >Filter</option>-->
-                                        <!--                        <option href="#"-->
-                                        <!--                                data-path=".Idle">Idle</option>-->
-                                        <!--                        <option href="#"-->
-                                        <!--                                data-path=".Active">Active</option>-->
-                                        <!--                        <option href="#"-->
-                                        <!--                                data-path=".Disconnected">Disconnected</option>-->
-
-                                        <!--                      </select>-->
-                                        <!--                    </div>-->
-                                        <!--  <button
-                                             type="button"
-                                             class="btn btn-info m-3"
-                                             data-toggle="modal"
-                                             data-target="#fileReplaceModal" disabled
-                                           >
-                                             <i class="fas fa-exchange-alt"></i> File Replace
-                                           </button>-->
                                     </div>
                                 </div>
                             </div>
@@ -103,8 +73,9 @@
                 </div>
             </div>
         </div>
+
         <div id="filemanager" class="row">
-            <div id="filePrinters" class="col-12 col-sm-12 col-md-4 col-lg-3 col-xl-3 ">
+            <div id="filePrinters" class="col-3 col-sm-12 col-md-6 col-lg-3">
                 <div class="card text-white bg-dark">
                     <div class="card-header fileHeader">
                         <h5 class="float-left">
@@ -131,14 +102,13 @@
                     </div>
                     <div class="card-body fileBody">
                         <div id="printerList" class="list-group">
-
                         </div>
                     </div>
                     <div class="card-footer fileFooter text-muted"></div>
                 </div>
             </div>
-            <div class="col-12 col-sm-12 col-md-8 col-lg-9 col-xl-9">
-                <div class="card text-white bg-dark">
+            <div class="col-9 col-sm-12 col-md-6 col-lg-9 flex-stretch-octofarm">
+                <div class="card text-white bg-dark flex-fill">
                     <div class="card-header fileHeader">
                         <div class="col-12">
                             <h5 class="float-left  mb-0">
@@ -148,15 +118,18 @@
                                     <i class="fas fa-file"></i> <i class="fas fa-spinner fa-spin"></i> <i
                                             class="fas fa-folder"></i> <i class="fas fa-spinner fa-spin"></i>
                                 </button>
-                                <button id="printerStorage" type="button" class="btn btn-secondary float-right d-block"
+                                <button id="printerStorage" type="button"
+                                        class="btn btn-secondary float-right d-block"
                                         href="#" aria-expanded="false" disabled="">
 
                                     <i class="fas fa-hdd"></i> <i class="fas fa-spinner fa-spin"></i> / <i
                                             class="fas fa-spinner fa-spin"></i>
                                 </button>
-                                <button id="currentPrinter" type="button" class="btn btn-secondary float-right d-block"
+                                <button type="button" class="btn btn-secondary float-right d-block"
                                         href="#" aria-expanded="false" disabled="">
+                                <span id="currentPrinter">
                                     <i class="fas fa-print"></i> <i class="fas fa-spinner fa-spin"></i>
+                                </span>
                                 </button>
                             </h5>
                             <h5 class="float-left mb-0">
@@ -166,7 +139,7 @@
                                 </button>
                             </h5>
                             <div class="float-right">
-                                <div id="backBtn" class="float-right"></div>
+                                <div id="backBtn" class="float-right" disabled></div>
                                 <!-- Split dropright button -->
                                 <div class="float-right mr-3 btn-group">
                                     <div id="fileSortDropdownMenu" class="btn bg-dark">Sort</div>
@@ -175,7 +148,6 @@
                                         <span class="sr-only">Toggle Dropdown</span>
                                     </button>
                                     <div class="dropdown-menu">
-
                                         <a class="dropdown-item" id="sortFileNameDown"><i
                                                     class="fas fa-sort-alpha-down"></i> File Name</a>
 
@@ -190,8 +162,8 @@
                                         <div class="dropdown-divider"></div>
                                         <a class="dropdown-item" id="sortDateDown"><i
                                                     class="fas fa-sort-numeric-down"></i> Upload Date</a>
-
-                                        <a class="dropdown-item" id="sortDateUp"><i class="fas fa-sort-numeric-up"></i>
+                                        <a class="dropdown-item" id="sortDateUp"><i
+                                                    class="fas fa-sort-numeric-up"></i>
                                             Upload Date</a>
                                     </div>
                                 </div>
@@ -210,14 +182,11 @@
                         </div>
                     </div>
                     <div id="fileBody" class="card-body fileBody">
-
-
                     </div>
                     <div class="card-footer fileFooter text-muted"></div>
                 </div>
             </div>
         </div>
-
     <% }else{ %>
         <div class="row mt-5">
             <div class="col-md-6 m-auto">
