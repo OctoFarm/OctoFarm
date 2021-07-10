@@ -433,15 +433,17 @@ a.notyet {
 }
 /* PRINTER MAP TILES */
 .printer-map-tile:hover {
-  opacity: 0.8;
-  border: 2px solid red;
-  margin: -2px;
+  border: 1px dashed lime;
+  /*opacity: 0.8;*/
+  /*border: 2px solid red;*/
+  /*margin: -2px;*/
 }
 .printer-map-tile-selected {
-  border: 1px solid lime;
+  border: 1px solid lime !important;
   margin: -5px;
 }
 .printer-map-tile-stub {
+  /*background: rgba(0, 0, 0, .3);*/
   opacity: 0.3;
 }
 .printer-map-idle {

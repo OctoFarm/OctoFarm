@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
@@ -11,19 +11,19 @@
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
     <link rel="manifest" href="/site.webmanifest">
     <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5">
-    <link rel="stylesheet" href="/assets/css/vendor/font-awesome.css" />
-    <link rel="stylesheet" href="/assets/css/vendor/bootstrap-v4.css" />
-    <link rel="stylesheet" href="/assets/css/vendor/slate.css" />
-    <link rel="stylesheet" href="/assets/css/vendor/noty.css" />
-    <link rel="stylesheet" href="/assets/css/vendor/balloon.css" />
-    <link rel="stylesheet" href="/assets/css/vendor/jplist.css" />
-    <link rel="stylesheet" href="/assets/css/vendor/font-awesome.css" />
-    <link rel="stylesheet" href="/assets/dist/octofarm.css" />
-    <title>OctoFarm: <%= octoFarmPageTitle ;%></title>
+    <link rel="stylesheet" href="/assets/css/vendor/font-awesome.css"/>
+    <link rel="stylesheet" href="/assets/css/vendor/bootstrap-v4.css"/>
+    <link rel="stylesheet" href="/assets/css/vendor/slate.css"/>
+    <link rel="stylesheet" href="/assets/css/vendor/noty.css"/>
+    <link rel="stylesheet" href="/assets/css/vendor/balloon.css"/>
+    <link rel="stylesheet" href="/assets/css/vendor/jplist.css"/>
+    <link rel="stylesheet" href="/assets/css/vendor/font-awesome.css"/>
+    <link rel="stylesheet" href="/assets/dist/octofarm.css"/>
+    <title>OctoFarm: <%= octoFarmPageTitle; %></title>
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top p-1">
+<nav class="navbar navbar-expand navbar-dark bg-dark sticky-top p-1">
     <a class="navbar-brand notyet" href="#">
         <img src="/favicon.ico" width="40px" class="pl-2" alt="favicon">
     </a>
@@ -43,7 +43,8 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a title="Panel Layout Monitoring View" class="nav-link text-light text-center btn-sm <%= noPrinters %>"
+                <a title="Panel Layout Monitoring View"
+                   class="nav-link text-light text-center btn-sm <%= noPrinters %> d-none"
                    id="menuPanelView" href="/mon/panel"><i class="fas fa-columns"></i>
                     Panel</a>
             </li>
@@ -53,24 +54,26 @@
             </li>
             <li class="nav-item">
                 <a title="Camera Layout Monitoring View"
-                   class="nav-link text-light text-center btn-sm <%= noPrinters ;%> d-none" id="menuCameraView"
+                   class="nav-link text-light text-center btn-sm <%= noPrinters; %> d-none" id="menuCameraView"
                    href="/mon/camera"><i class="fas fa-video"></i>
                     Camera</a>
             </li>
             <li class="nav-item">
                 <a title="Davids super power tool" class="nav-link text-light text-center btn-sm"
-                   id="menuListView" href="/mon/printerMap"><i class="fas fa-list"></i> Map</a>
+                   id="menuListView" href="/mon/printerMap">
+                    <i class="fas fa-map-marked-alt"></i> Map
+                </a>
             </li>
             <li class="nav-item">
                 <a title="Current Operations Monitoring Layout View"
                    class="nav-link text-light text-center btn-sm <%= noPrinters %>" id="menucurrentOperationsView"
                    href="/mon/currentOp"><i class="fas fa-star"></i>
-                    Current Operations</a>
+                    Current Jobs
+                </a>
             </li>
             <% if(page.includes("Camera") || page.includes("List") || page.includes("Panel") || page.includes("Printer Map")){ %>
-
-                <li class="nav-item">
-                    <div class="input-group p-0 m-0 pr-1  mx-auto">
+                <li class="nav-item" hidden>
+                    <div class="input-group p-0 m-0 pr-1 mx-auto">
                         <div class="input-group-prepend">
                             <label class="input-group-text" for="filterStates">Filter: </label>
                         </div>
@@ -93,7 +96,6 @@
                         </select>
                     </div>
                 </li>
-
             <% } %>
             <li class="nav-item">
                 <span title="Panel Layout Monitoring View"
@@ -140,12 +142,14 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a title="Filament Management" class="nav-link text-center" href="/filament" id=""><i
-                            class="fas fa-toilet-paper"></i> Filament</a>
+                <a title="Filament Management" class="nav-link text-center d-none" href="/filament">
+                    <i class="fas fa-toilet-paper"></i> Filament
+                </a>
             </li>
             <li class="nav-item">
-                <a title="Filament Management" class="nav-link text-center" href="/system" id=""><i
-                            class="fas fa-cogs"></i> System</a>
+                <a title="Filament Management" class="nav-link text-center" href="/system">
+                    <i class="fas fa-cogs"></i> System
+                </a>
             </li>
         </ul>
     </div>
@@ -261,7 +265,7 @@
         </div>
     </div>
 
-<!--    <div id="overlay"><i id="overlayIcon" class="fas fa-spinner fa-pulse fa-10x textActive"></i></div>-->
+    <!--    <div id="overlay"><i id="overlayIcon" class="fas fa-spinner fa-pulse fa-10x textActive"></i></div>-->
 </div>
 <!-- Avoid trouble -->
 <script src="/assets/jquery.min.js"></script>

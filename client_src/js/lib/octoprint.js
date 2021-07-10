@@ -132,10 +132,12 @@ export default class OctoPrintClient {
       }
     });
   }
+
   static async systemNoConfirm(printer, action) {
     const url = "system/commands/core/" + action;
     return await OctoPrintClient.post(printer, url);
   }
+
   static async move(element, printer, action, axis, dir) {
     const flashReturn = function () {
       element.target.classList = "btn btn-light";
@@ -176,7 +178,15 @@ export default class OctoPrintClient {
     }
   }
 
-  static async file(printer, fullPath, action, file) {
+  static async checkFile(printer, fullPath) {
+    const url = "api/files/local/" + fullPath;
+
+    let response = await OctoPrintClient.get(printer, url);
+    console.log();
+    return response.status;
+  }
+
+  static async file(printer, fullPath, action, notify = true) {
     const url = "files/local/" + fullPath;
     let post = null;
     if (action === "load") {
@@ -185,7 +195,7 @@ export default class OctoPrintClient {
         print: false
       };
       post = await OctoPrintClient.post(printer, url, opt);
-      return true;
+      return post.status;
     } else if (action === "print") {
       const opt = {
         command: "select",
@@ -206,34 +216,42 @@ export default class OctoPrintClient {
     } else if (action === "delete") {
       post = await OctoPrintClient.delete(printer, url);
     }
-    if (post.status === 204) {
+    if (post?.status === 204) {
       if (action === "delete") {
         const opt = {
           i: printer,
           fullPath
         };
         const fileDel = await OctoFarmClient.post("printers/removefile", opt);
-        UI.createAlert(
-          "success",
-          `${printer.printerName}: ${action} completed`,
-          3000,
-          "clicked"
-        );
+        if (notify) {
+          UI.createAlert(
+            "success",
+            `${printer.printerName}: delete completed`,
+            3000,
+            "clicked"
+          );
+        }
+        return fileDel;
       } else {
+        if (notify) {
+          UI.createAlert(
+            "success",
+            `${printer.printerName}: ${action} actioned`,
+            3000,
+            "clicked"
+          );
+        }
+      }
+    } else {
+      // TODO improve handling
+      if (notify) {
         UI.createAlert(
-          "success",
-          `${printer.printerName}: ${action} actioned`,
+          "error",
+          `${printer.printerName}: ${action} failed`,
           3000,
           "clicked"
         );
       }
-    } else {
-      UI.createAlert(
-        "error",
-        `${printer.printerName}: ${action} failed`,
-        3000,
-        "clicked"
-      );
     }
   }
 

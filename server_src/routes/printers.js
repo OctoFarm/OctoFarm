@@ -55,14 +55,14 @@ router.post("/removefile", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const file = req.body;
   logger.info("File deletion request: ", file.i);
-  Runner.removeFile(file.i, file.fullPath);
+  await Runner.removeFile(file.i, file.fullPath);
   res.send("success");
 });
 router.post("/removefolder", ensureAuthenticated, async (req, res) => {
   // Check required fields
   const folder = req.body;
   logger.info("Folder deletion request: ", folder.fullPath);
-  Runner.deleteFolder(folder.index, folder.fullPath);
+  await Runner.deleteFolder(folder.index, folder.fullPath);
   res.send(true);
 });
 router.post("/resyncFile", ensureAuthenticated, async (req, res) => {

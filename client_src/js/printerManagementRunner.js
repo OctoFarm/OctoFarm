@@ -2603,7 +2603,8 @@ class dashUpdate {
               `printerGroup-${printer._id}`
             );
 
-            printerGroup.innerHTML = printer.groups.map((g) => g.name).join() || printer.group;
+            printerGroup.innerHTML =
+              printer.groups.map((g) => g.name).join() || printer.group;
 
             if (typeof printer.octoPrintSystemInfo !== "undefined") {
               if (
@@ -2624,11 +2625,13 @@ class dashUpdate {
                 }
               }
             }
-            if (typeof printer.octoPi !== "undefined") {
-              printerOctoPrintInformation.innerHTML = `
-          <small>${printer.octoPrintVersion}</small><br>
-          <small>${printer.octoPi.version}</small><br>
-          <small>${printer.octoPi.model}</small>`;
+            if (!!printer.octoPi) {
+              printerOctoPrintInformation.innerHTML =
+                `<small>${printer.octoPrintVersion}</small><br>` +
+                (printer.octoPi?.version
+                  ? `<small>${printer.octoPi.version}</small><br>`
+                  : "") +
+                `<small>${printer.octoPi.model}</small>`;
             } else {
               printerOctoPrintInformation.innerHTML = `
           <small>${printer.octoPrintVersion}</small><br>
