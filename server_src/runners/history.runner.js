@@ -70,52 +70,52 @@ class HistoryCollection {
     this.validateProviders();
 
     const returnSpools = [];
-    // try {
-    for (let i = 0; i < printer.selectedFilament.length; i++) {
-      if (printer.selectedFilament[i] !== null) {
-        const filamentID = printer.selectedFilament[i].spools.fmID;
-        if (!filamentID) {
-          throw `Could not query OctoPrint FilamentManager for filament. FilamentID '${filamentID}' not found.`;
-        }
-        const response =
-          await this.octoPrintService.getPluginFilamentManagerFilament(
-            printer,
-            filamentID
+    try {
+      for (let i = 0; i < printer.selectedFilament.length; i++) {
+        if (printer.selectedFilament[i] !== null) {
+          const filamentID = printer.selectedFilament[i].spools.fmID;
+          if (!filamentID) {
+            throw `Could not query OctoPrint FilamentManager for filament. FilamentID '${filamentID}' not found.`;
+          }
+          const response =
+            await this.octoPrintService.getPluginFilamentManagerFilament(
+              printer,
+              filamentID
+            );
+
+          logger.info(
+            `${printer.printerURL}: spools fetched. Status: ${response.status}`
           );
+          const sp = await response.json();
 
-        logger.info(
-          `${printer.printerURL}: spools fetched. Status: ${response.status}`
-        );
-        const sp = await response.json();
-
-        const spoolID = printer.selectedFilament[i]._id;
-        const spoolEntity = await Spool.findById(spoolID);
-        if (!spoolEntity) {
-          throw `Spool database entity by ID '${spoolID}' not found. Cant update filament.`;
+          const spoolID = printer.selectedFilament[i]._id;
+          const spoolEntity = await Spool.findById(spoolID);
+          if (!spoolEntity) {
+            throw `Spool database entity by ID '${spoolID}' not found. Cant update filament.`;
+          }
+          spoolEntity.spools = {
+            name: sp.spool.name,
+            profile: sp.spool.profile.id,
+            price: sp.spool.cost,
+            weight: sp.spool.weight,
+            used: sp.spool.used,
+            tempOffset: sp.spool.temp_offset,
+            fmID: sp.spool.id
+          };
+          logger.info(
+            `${printer.printerURL}: updating... spool status ${spoolEntity.spools}`
+          );
+          spoolEntity.markModified("spools");
+          await spoolEntity.save();
+          returnSpools.push(spoolEntity);
         }
-        spoolEntity.spools = {
-          name: sp.spool.name,
-          profile: sp.spool.profile.id,
-          price: sp.spool.cost,
-          weight: sp.spool.weight,
-          used: sp.spool.used,
-          tempOffset: sp.spool.temp_offset,
-          fmID: sp.spool.id
-        };
-        logger.info(
-          `${printer.printerURL}: updating... spool status ${spoolEntity.spools}`
-        );
-        spoolEntity.markModified("spools");
-        await spoolEntity.save();
-        returnSpools.push(spoolEntity);
       }
+    } catch (e) {
+      logger.info(
+        e,
+        `${printer.printerURL}: Issue contacting filament manager... not updating spool`
+      );
     }
-    // } catch (e) {
-    //   logger.info(
-    //     e,
-    //     `${printer.printerURL}: Issue contacting filament manager... not updating spool`
-    //   );
-    // }
 
     // TODO dynamic circular import to State/Runner
     const reSync = await FilamentManagerPlugin.filamentManagerReSync();
