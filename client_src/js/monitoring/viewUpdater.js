@@ -10,20 +10,14 @@ import {
 import OctoPrintClient from "../lib/octoprint.js";
 import { checkTemps } from "../lib/modules/temperatureCheck.js";
 import { checkFilamentManager } from "../lib/modules/filamentGrab.js";
-import currentOperations from "../lib/modules/currentOperations";
 import doubleClickFullScreen from "../lib/functions/fullscreen.js";
 import OctoFarmclient from "../lib/octofarm";
-import { createClientSSEWorker } from "../lib/client-worker";
+import { getControlList, getPrinterInfo } from "./monitoring-view.state";
 
 const elems = [];
 let powerTimer = 20000;
-let printerInfo = null;
-let printerControlList = null;
-let worker = null;
-let controlModal = false;
 let printerManagerModal = document.getElementById("printerManagerModal");
 let printerArea = document.getElementById("printerArea");
-let currentView = null;
 
 document.getElementById("filterStates").addEventListener("change", (e) => {
   OctoFarmclient.get("client/updateFilter/" + e.target.value);
@@ -33,13 +27,14 @@ document.getElementById("sortStates").addEventListener("change", (e) => {
 });
 
 const returnPrinterInfo = (id) => {
+  const statePrinterInfo = getPrinterInfo();
   if (typeof id !== "undefined") {
-    const zeeIndex = _.findIndex(printerInfo, function (o) {
+    const zeeIndex = _.findIndex(statePrinterInfo, function (o) {
       return o._id == id;
     });
-    return printerInfo[zeeIndex];
+    return statePrinterInfo[zeeIndex];
   } else {
-    return printerInfo;
+    return statePrinterInfo;
   }
 };
 
@@ -50,11 +45,9 @@ function isHidden(state, clientSettings) {
   } else if (state === "Disconnected" && clientSettings.panel.hideClosed) {
     hidden = "hidden";
   }
-  // } else if (state === "Idle" && clientSettings.hideIdle) {
-  //   hidden = "hidden";
-  // }
   return hidden;
 }
+
 function isRotated(otherSettings) {
   let flipH = "";
   let flipV = "";
@@ -73,6 +66,7 @@ function isRotated(otherSettings) {
   }
   return { flipH, flipV, rotate90 };
 }
+
 function cleanName(printerName) {
   let name = printerName;
   if (name.includes("http://")) {
@@ -94,6 +88,7 @@ function checkPrinterRows(clientSettings) {
     return 2;
   }
 }
+
 function imageOrCamera(printer) {
   let drawCamera = ({ url, flipV, flipH, rotate90 }) => {
     return `<img
@@ -107,6 +102,7 @@ function imageOrCamera(printer) {
   };
   const flip = isRotated(printer.otherSettings);
   const { flipH, flipV, rotate90 } = flip;
+
   //Is octoprints camera settings enabled?
   if (
     printer.otherSettings !== null &&
@@ -259,6 +255,7 @@ function drawListView(printer, clientSettings) {
         </tr>
     `;
 }
+
 function drawPanelView(printer, clientSettings) {
   const hidden = isHidden(printer, clientSettings);
   const name = cleanName(printer.printerName);
@@ -420,6 +417,7 @@ function drawPanelView(printer, clientSettings) {
       </div>
     `;
 }
+
 function drawCameraView(printer, clientSettings) {
   let hidden = isHidden(printer, clientSettings);
   if (printer.cameraURL === "") {
@@ -487,27 +485,17 @@ function drawCameraView(printer, clientSettings) {
           
           <div class="camExtra">
             <div class=" row">
-
               <div class="col-6">
-                 <span
-                    class="mb-0 text-center"
-                    id="printTimeElapsed-${printer._id}"
-                  >
-
-                  </span>
+                 <span class="mb-0 text-center" id="printTimeElapsed-${printer._id}"></span>
               </div>
               <div class="col-6">
-                          <span
-              class="mb-0 text-center"
-              id="remainingTime-${printer._id}"
-            >
-
-            </span>
+                <span class="mb-0 text-center" id="remainingTime-${printer._id}"></span>
               </div>
-                          
-</div>
+            </div>
           </div>
-                ${cameraElement}
+          
+          ${cameraElement}
+          
           <div class="camTemps">
             <small
               id="toolTemps-${printer._id}"
@@ -557,9 +545,10 @@ function addListeners(printer) {
   //For now Control has to be seperated
   document
     .getElementById(`printerButton-${printer._id}`)
-    .addEventListener("click", () => {
-      // eslint-disable-next-line no-underscore-dangle
-      PrinterManager.init(printer._id, printerInfo, printerControlList);
+    .addEventListener("click", async () => {
+      const printerInfo = getPrinterInfo();
+      const controlList = getControlList();
+      await PrinterManager.init(printer._id, printerInfo, controlList);
     });
 
   //Play button listeners
@@ -1216,12 +1205,12 @@ async function updateState(printer, clientSettings, view) {
   }
 }
 
-async function init(printers, clientSettings, view) {
+export async function initMonitoring(printers, clientSettings, view) {
   //Check if printer manager modal is opened
   switch (printerManagerModal.classList.contains("show")) {
     case true:
       // Run printer manager updater
-      PrinterManager.init("", printers, printerControlList);
+      await PrinterManager.init("", printers, clientSettings);
       break;
     case false:
       // initialise or start the information updating..

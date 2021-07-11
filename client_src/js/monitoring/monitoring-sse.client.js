@@ -1,22 +1,24 @@
 import currentOperations from "../lib/modules/currentOperations";
-import { getViewType } from "./monitoring-view.state";
+import { getViewType, setMonitoringPrinterInfo } from "./monitoring-view.state";
+import { initMonitoring } from "./viewUpdater";
 
+let controlModal = false;
 export const monitoringWorkerURL = "/monitoringInfo/get/";
 
 export async function monitoringSSEEventHandler(data) {
   if (event.data != false) {
     //Update global variables with latest information...
-    printerInfo = event.data.printersInformation;
-    printerControlList = event.data.printerControlList;
+    const printerInfo = event.data.printersInformation;
+    const printerControlList = event.data.printerControlList;
+
+    setMonitoringPrinterInfo(printerInfo, printerControlList);
+
     //Grab control modal element...
     if (!controlModal) {
       controlModal = document.getElementById("printerManagerModal");
     }
-    await init(
-      event.data.printersInformation,
-      event.data.clientSettings,
-      getViewType()
-    );
+    await initMonitoring(printerInfo, event.data.clientSettings, getViewType());
+
     if (event.data.clientSettings.panelView.currentOp) {
       const currentOperationsData = event.data.currentOperations;
       currentOperations(
