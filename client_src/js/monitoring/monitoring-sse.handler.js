@@ -5,7 +5,7 @@ import { initMonitoring } from "./monitoring.updater";
 let controlModal = false;
 export const monitoringWorkerURL = "/monitoringInfo/get/";
 
-export async function monitoringSSEEventHandler(data) {
+export async function monitoringSSEventHandler(data) {
   if (event.data != false) {
     //Update global variables with latest information...
     const printerInfo = event.data.printersInformation;

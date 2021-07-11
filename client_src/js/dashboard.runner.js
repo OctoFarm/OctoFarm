@@ -13,7 +13,7 @@ import {
 } from "./dashboard/utils/chart.utils";
 import { DashUpdate } from "./dashboard/dashboard.updater";
 import {
-  dashboardSSEEventHandler,
+  dashboardSSEventHandler,
   workerURL
 } from "./dashboard/dashboard-sse.handler";
 
@@ -72,7 +72,7 @@ async function initNewGraphs() {
   await ChartsManager.renderPrintCompletionByDay(printCompletionByDay);
 }
 
-createClientSSEWorker(workerURL, dashboardSSEEventHandler);
+createClientSSEWorker(workerURL, dashboardSSEventHandler);
 
 loadGrid()
   .then(async () => {
