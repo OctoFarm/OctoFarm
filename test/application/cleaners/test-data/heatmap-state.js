@@ -12,7 +12,7 @@ module.exports = {
           y: 0
         },
         {
-          x: "Sunday",
+          x: dayName,
           y: 0,
           figure: NaN
         }
