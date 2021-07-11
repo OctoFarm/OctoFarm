@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
     - Refactor of SSE client into re-usable file. 
     - Moved the "API Errors" button, now appears on the start of a printer row and clicking will take you straight into Printer Settings.
     - Refactor monitoring pages (panel, list, camera) with latest SSE client reusability.
+    - Refine the printer map layout with borders and printer quick actions (page not public yet).
 
 ### Removed
 
