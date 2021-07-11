@@ -134,12 +134,19 @@ export async function octoPrintPluginInstallAction(
         "warning",
         `${printer.printerName}: ${cleanAction} - ${pluginList[r]}<br>Do not navigate away from this screen!`
       );
-
-      let postData = {
-        command: action,
-        dependency_links: false,
-        url: pluginList[r]
-      };
+      let postData = {};
+      if (action === "install") {
+        postData = {
+          command: action,
+          dependency_links: false,
+          url: pluginList[r]
+        };
+      } else {
+        postData = {
+          command: action,
+          plugin: pluginList[r]
+        };
+      }
 
       const post = await OctoPrintClient.post(
         printer,

@@ -627,7 +627,7 @@ export async function bulkOctoPrintPluginAction(action) {
       onShow: function (e) {
         setupPluginSearch();
       },
-      callback: async function (result, printersForPluginAction) {
+      callback: async function (result) {
         if (result) {
           let trackerBtn = document.getElementById("pluginTracking");
           trackerBtn.classList.remove("d-none");
