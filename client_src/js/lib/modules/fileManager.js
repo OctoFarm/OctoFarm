@@ -289,6 +289,8 @@ export default class FileManager {
   }
 
   static openFolder(folder, target, printer) {
+    const fileBackButtonElement = document.getElementById("fileBackBtn");
+
     if (typeof target !== "undefined" && target.type === "button") {
       return;
     }
@@ -296,6 +298,7 @@ export default class FileManager {
       folder = folder.replace("file-", "");
 
       document.getElementById("currentFolder").innerHTML = `local/${folder}`;
+      fileBackButtonElement.disabled = false;
       FileManager.updateFileList(printer._id);
     } else {
       const currentFolder = document.getElementById("currentFolder").innerHTML;
@@ -305,7 +308,10 @@ export default class FileManager {
           currentFolder.lastIndexOf("/")
         );
         document.getElementById("currentFolder").innerHTML = previousFolder;
+        fileBackButtonElement.disabled = previousFolder === "local";
         FileManager.updateFileList(printer._id);
+      } else {
+        fileBackButtonElement.disabled = true;
       }
     }
   }
@@ -488,7 +494,7 @@ export default class FileManager {
             `fileTime-${file.fullPath}`
           ).innerHTML = ` ${Calc.generateTime(file.expectedPrintTime)}`;
           document.getElementById(`fileCost-${file.fullPath}`).innerHTML =
-            " " + `Print Cost: ${file.printCost}`;
+            " " + `Print Cost: ${file.printCost?.toFixed(2)}`;
           document.getElementById(
             `fileThumbnail-${file.fullPath}`
           ).innerHTML = ` ${thumbnail}`;
@@ -560,14 +566,20 @@ export default class FileManager {
                 </div>
               </div>
             </a>
-         
             `
                 );
               }
             });
           }
-          if (fileList.fileList.length > 0) {
-            fileList.fileList.forEach((file) => {
+
+          // Filter out files out of current folder scope
+          const currentFileList = fileList.fileList.filter(
+            (f) => typeof recursive !== "undefined" || f.path === currentFolder
+          );
+
+          // Show empty or filled list
+          if (currentFileList.length > 0) {
+            currentFileList.forEach((file) => {
               let toolInfo = "";
               file.toolUnits.forEach((unit, index) => {
                 toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
@@ -626,7 +638,7 @@ export default class FileManager {
                 <i class="fas fa-dollar-sign"></i> 
                 <span title="Expected Printer Cost" class="cost" id="fileCost-${
                   file.fullPath
-                }"> Print Cost: ${file.printCost} </span>    <br> 
+                }"> Print Cost: ${file.printCost?.toFixed(2)} </span>    <br> 
             <span title="Expected Filament Cost"> </span>
 
                 </p>
@@ -702,13 +714,10 @@ export default class FileManager {
       </div>
       </div>
       </div>`;
-
-              if (typeof recursive !== "undefined") {
-                fileElem.insertAdjacentHTML("beforeend", f);
-              } else if (file.path == currentFolder) {
-                fileElem.insertAdjacentHTML("beforeend", f);
-              }
+              fileElem.insertAdjacentHTML("beforeend", f);
             });
+          } else {
+            fileElem.insertAdjacentHTML("beforeend", "No files to be shown.");
           }
 
           FileManager.updateListeners(printer);
@@ -758,7 +767,7 @@ export default class FileManager {
     let selectedFolder = "";
     let printAfterUpload = false;
     let selectedFile = null;
-    PrinterSelect.create(document.getElementById("multiPrintersSection"));
+    await PrinterSelect.create(document.getElementById("multiPrintersSection"));
 
     function first() {
       // let boxs = document.querySelectorAll('*[id^="multiUpPrinters-"]');
@@ -883,6 +892,7 @@ export default class FileManager {
           grabFiles(this.files);
         });
     }
+
     function third() {
       if (selectedFolder == "") {
         selectedFolder = "local";
@@ -926,6 +936,7 @@ export default class FileManager {
         );
       });
     }
+
     const files = document.getElementById("multiFileSelectedNow");
     files.innerHTML = "";
     document.getElementById("multiPrinterBtn").disabled = false;
@@ -943,6 +954,7 @@ export default class FileManager {
       });
   }
 }
+
 export class FileActions {
   static async search(id) {
     let printer = await OctoFarmClient.post("printers/printerInfo", {

@@ -5,6 +5,9 @@ const { parse } = require("flatted/cjs");
 const dbHandler = require("../db-handler");
 const supertest = require("supertest");
 const getEndpoints = require("express-list-endpoints");
+const {
+  PrinterClean
+} = require("../../server_src/lib/dataFunctions/printerClean");
 const { setupTestApp } = require("../../app-test");
 
 let request;
@@ -26,6 +29,8 @@ beforeAll(async () => {
 
 describe("SSE-dashboard", () => {
   it("should be able to be called with an EventSource", async (done) => {
+    await PrinterClean.initFarmInformation();
+    await PrinterClean.statisticsStart();
     const getRequest = request.get(routeBase + ssePath);
     const url = getRequest.url;
     expect(url).toBeTruthy();
@@ -87,81 +92,57 @@ describe("SSE-dashboard", () => {
           temperatureGraph: [
             {
               name: "Actual Tool",
-              data: [
-                {
-                  x: expect.any(Number),
-                  y: expect.any(Number)
-                },
+              data: expect.arrayContaining([
                 {
                   x: expect.any(Number),
                   y: expect.any(Number)
                 }
-              ]
+              ])
             },
             {
               name: "Target Tool",
-              data: [
-                {
-                  x: expect.any(Number),
-                  y: expect.any(Number)
-                },
+              data: expect.arrayContaining([
                 {
                   x: expect.any(Number),
                   y: expect.any(Number)
                 }
-              ]
+              ])
             },
             {
               name: "Actual Bed",
-              data: [
-                {
-                  x: expect.any(Number),
-                  y: expect.any(Number)
-                },
+              data: expect.arrayContaining([
                 {
                   x: expect.any(Number),
                   y: expect.any(Number)
                 }
-              ]
+              ])
             },
             {
               name: "Target Bed",
-              data: [
-                {
-                  x: expect.any(Number),
-                  y: expect.any(Number)
-                },
+              data: expect.arrayContaining([
                 {
                   x: expect.any(Number),
                   y: expect.any(Number)
                 }
-              ]
+              ])
             },
             {
               name: "Actual Chamber",
-              data: [
-                {
-                  x: expect.any(Number),
-                  y: expect.any(Number)
-                },
+              data: expect.arrayContaining([
                 {
                   x: expect.any(Number),
                   y: expect.any(Number)
                 }
-              ]
+              ])
             },
             {
               name: "Target Chamber",
-              data: [
-                {
-                  x: expect.any(Number),
-                  y: expect.any(Number)
-                },
+              data: expect.arrayContaining([
                 {
                   x: expect.any(Number),
                   y: expect.any(Number)
                 }
-              ]
+              ])
             }
           ],
           currentIAQ: null,
