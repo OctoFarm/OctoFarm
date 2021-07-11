@@ -31,7 +31,9 @@ function updatePrinterInfoAndState(printer) {
   UI.doesElementNeedUpdating(printer.printerName, printName, "innerHTML");
   UI.doesElementNeedUpdating(printer.group, printerGroup, "innerHTML");
   UI.doesElementNeedUpdating(printer.printerURL, webButton, "href");
-  // printerGroup.innerHTML = printer.groups.map((g) => g.name).join();
+
+  printerGroup.innerHTML =
+    printer.groups.map((g) => g.name).join() || printer.group;
 
   UI.doesElementNeedUpdating(
     `tag badge badge-${printer.printerState.colour.name} badge-pill`,
@@ -61,6 +63,7 @@ function updatePrinterInfoAndState(printer) {
     "className"
   );
 }
+
 function updatePrinterColumn(printer) {
   const printerPrinterInformation = document.getElementById(
     `printerPrinterInformation-${printer._id}`
@@ -88,16 +91,18 @@ function updatePrinterColumn(printer) {
     }
   }
 }
+
 function updateOctoPiColumn(printer) {
   const printerOctoPrintInformation = document.getElementById(
     `printerOctoPrintInformation-${printer._id}`
   );
-  if (typeof printer.octoPi !== "undefined") {
+  if (!!printer.octoPi) {
     UI.doesElementNeedUpdating(
-      `
-          <small>${printer.octoPrintVersion}</small><br>
-          <small>${printer.octoPi.version}</small><br>
-          <small>${printer.octoPi.model}</small>`,
+      `<small>${printer.octoPrintVersion}</small><br>` +
+        (printer.octoPi?.version
+          ? `<small>${printer.octoPi.version}</small><br>`
+          : "") +
+        `<small>${printer.octoPi.model}</small>`,
       printerOctoPrintInformation,
       "innerHTML"
     );
@@ -109,6 +114,7 @@ function updateOctoPiColumn(printer) {
     );
   }
 }
+
 function corsWarningCheck(printer) {
   const printerBadge = document.getElementById(`printerBadge-${printer._id}`);
   if (
@@ -119,6 +125,7 @@ function corsWarningCheck(printer) {
     UI.doesElementNeedUpdating("CORS NOT ENABLED!", printerBadge, "innerHTML");
   }
 }
+
 function checkForOctoPrintUpdate(printer) {
   let updateButton = document.getElementById(`octoprintUpdate-${printer._id}`);
   let bulkOctoPrintUpdateButton = document.getElementById("blkOctoPrintUpdate");
@@ -143,6 +150,7 @@ function checkForOctoPrintUpdate(printer) {
     }
   }
 }
+
 function checkForOctoPrintPluginUpdates(printer) {
   let updatePluginButton = document.getElementById(
     `octoprintPluginUpdate-${printer._id}`
@@ -170,6 +178,7 @@ function checkForOctoPrintPluginUpdates(printer) {
     }
   }
 }
+
 function checkForApiErrors(printer) {
   const apiErrorTag = document.getElementById(`scanningIssues-${printer._id}`);
 
@@ -194,11 +203,13 @@ function checkForApiErrors(printer) {
     }
   }
 }
+
 function updateButtonState(printer) {
   const printButton = document.getElementById(`printerButton-${printer._id}`);
 
   printButton.disabled = printer.printerState.colour.category === "Offline";
 }
+
 function updatePrinterRow(printer) {
   const printerCard = document.getElementById(`printerCard-${printer._id}`);
   if (printerCard) {
