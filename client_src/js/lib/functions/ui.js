@@ -144,4 +144,7 @@ export default class UI {
       setTimeout(resolve, ms);
     });
   }
+  static removeLine(element) {
+    element.remove();
+  }
 }

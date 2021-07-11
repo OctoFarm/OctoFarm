@@ -4,9 +4,8 @@ import OctoFarmClient from "../lib/octofarm_client.js";
 
 let newPrintersIndex = 0;
 
-const removeLine = function (element) {
-  element.remove();
-};
+// TODO: clean up this file is a mess jim
+
 class Printer {
   constructor(printerURL, camURL, apikey, group, name) {
     this.settingsAppearance = {
@@ -105,7 +104,9 @@ export class PrintersManagement {
     document
       .getElementById(`delButton-${newPrintersIndex}`)
       .addEventListener("click", (event) => {
-        removeLine(document.getElementById(`newPrinterCard-${currentIndex}`));
+        UI.removeLine(
+          document.getElementById(`newPrinterCard-${currentIndex}`)
+        );
         const table = document.getElementById("printerNewTable");
         if (table.rows.length === 1) {
           if (!table.classList.contains("d-none")) {

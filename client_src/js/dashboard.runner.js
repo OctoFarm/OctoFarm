@@ -12,6 +12,10 @@ import {
   toFixedWeightGramFormatter
 } from "./dashboard/utils/chart.utils";
 import { DashUpdate } from "./dashboard/dashboard.updater";
+import {
+  dashboardSSEEventHandler,
+  workerURL
+} from "./dashboard/dashboard-sse.client";
 
 async function updateHistoryGraphs() {
   let historyStatistics = await OctoFarmclient.getHistoryStatistics();
@@ -68,67 +72,7 @@ async function initNewGraphs() {
   await ChartsManager.renderPrintCompletionByDay(printCompletionByDay);
 }
 
-const workerURL = "/dashboardInfo/get/";
-
-async function workerEventFunction(data) {
-  if (data != false) {
-    const currentOperationsData = data.currentOperations;
-    const printerInfo = data.printerInformation;
-    const dashboard = data.dashStatistics;
-    const dashboardSettings = data.dashboardSettings;
-    if (dashboardSettings.farmActivity.currentOperations) {
-      currentOperations(
-        currentOperationsData.operations,
-        currentOperationsData.count,
-        printerInfo
-      );
-    }
-
-    DashUpdate.farmInformation(
-      dashboard.timeEstimates,
-      dashboard.utilisationGraph,
-      dashboard.temperatureGraph,
-      dashboardSettings
-    );
-    if (dashboardSettings.farmUtilisation.farmUtilisation) {
-      DashUpdate.farmUtilisation(dashboard.farmUtilisation);
-    }
-
-    DashUpdate.currentStatusAndUtilisation(
-      dashboard.currentStatus,
-      dashboard.currentUtilisation,
-      dashboardSettings.printerStates.currentStatus,
-      dashboardSettings.farmUtilisation.currentUtilisation
-    );
-
-    if (dashboardSettings.printerStates.printerState) {
-      DashUpdate.printerStatus(dashboard.printerHeatMaps.heatStatus);
-    }
-
-    if (dashboardSettings.printerStates.printerProgress) {
-      DashUpdate.printerProgress(dashboard.printerHeatMaps.heatProgress);
-    }
-    if (dashboardSettings.printerStates.printerTemps) {
-      DashUpdate.printerTemps(dashboard.printerHeatMaps.heatTemps);
-    }
-    if (dashboardSettings.printerStates.printerUtilisation) {
-      DashUpdate.printerUptime(dashboard.printerHeatMaps.heatUtilisation);
-    }
-
-    if (dashboardSettings.historical.environmentalHistory) {
-      await DashUpdate.environmentalData(dashboard.enviromentalData);
-    }
-  } else {
-    UI.createAlert(
-      "warning",
-      "Server Events closed unexpectedly... Retying in 10 seconds",
-      10000,
-      "Clicked"
-    );
-  }
-}
-
-createClientSSEWorker(workerURL, workerEventFunction);
+createClientSSEWorker(workerURL, dashboardSSEEventHandler);
 
 loadGrid()
   .then(async () => {
