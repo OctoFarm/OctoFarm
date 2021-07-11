@@ -3,7 +3,6 @@ const {
   checkPluginManagerAPIDeprecation
 } = require("../../utils/compatibility.utils");
 const { OctoprintApiService } = require("./octoprint-api.service");
-const softwareUpdateChecker = require("../../runners/softwareUpdateChecker");
 
 const octoPrintBase = "/";
 const apiBase = octoPrintBase + "api";
@@ -93,10 +92,6 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async getPluginManager(printer, retry = false) {
-    // Skip this call if farm is airgapped.
-    if (softwareUpdateChecker.getUpdateNotificationIfAny()?.air_gapped)
-      return false;
-
     const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(
       printer.octoPrintVersion
     );
@@ -117,10 +112,6 @@ class OctoprintApiClientService extends OctoprintApiService {
   }
 
   async getSoftwareUpdateCheck(printer, force, retry = false) {
-    // Skip this call if farm is airgapped.
-    if (softwareUpdateChecker.getUpdateNotificationIfAny()?.air_gapped)
-      return false;
-
     return this.getWithOptionalRetry(
       printer,
       apiSoftwareUpdateCheck(force),
