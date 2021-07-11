@@ -40,12 +40,13 @@ webpackEntries["bootstrap"] = "bootstrap/dist/js/bootstrap.bundle";
 
 module.exports = (env, options) => {
   const isProd = options.mode === "production";
-  let chodenBuildDir = isProd ? buildDirProd : buildDirDev;
+  let chosenBuildDir = isProd ? buildDirProd : buildDirDev;
+  const fullDir = path.resolve(__dirname, chosenBuildDir);
   return {
     entry: webpackEntries,
     output: {
       filename: "[name].min.js",
-      path: path.resolve(__dirname, chodenBuildDir)
+      path: fullDir
     },
     externals: {
       jquery: "jQuery",
@@ -114,12 +115,12 @@ module.exports = (env, options) => {
         function (stats, callback) {
           const newlyCreatedAssets = stats.compilation.assets;
           const unlinked = [];
-          const dirContents = fs.readdirSync(path.resolve(chodenBuildDir), {
+          const dirContents = fs.readdirSync(path.resolve(chosenBuildDir), {
             withFileTypes: true
           });
           dirContents.forEach((file) => {
             if (!newlyCreatedAssets[file.name] && file.isFile() && !isProd) {
-              fs.unlinkSync(path.resolve(chodenBuildDir + file.name));
+              fs.unlinkSync(path.resolve(chosenBuildDir + file.name));
               unlinked.push(file.name);
             }
           });

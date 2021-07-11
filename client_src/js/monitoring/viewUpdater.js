@@ -1,18 +1,19 @@
-import { dragAndDropEnable, dragCheck } from "../functions/dragAndDrop.js";
-import PrinterManager from "./printerManager.js";
-import PowerButton from "./powerButton.js";
-import UI from "../functions/ui.js";
-import Calc from "../functions/calc.js";
+import { dragAndDropEnable, dragCheck } from "../lib/functions/dragAndDrop.js";
+import PrinterManager from "../lib/modules/printerManager.js";
+import PowerButton from "../lib/modules/powerButton.js";
+import UI from "../lib/functions/ui.js";
+import Calc from "../lib/functions/calc.js";
 import {
   checkQuickConnectState,
   init as actionButtonInit
-} from "./Printers/actionButtons.js";
-import OctoPrintClient from "../octoprint.js";
-import { checkTemps } from "../modules/temperatureCheck.js";
-import { checkFilamentManager } from "./filamentGrab.js";
-import currentOperations from "./currentOperations";
-import doubleClickFullScreen from "../functions/fullscreen.js";
-import OctoFarmclient from "../octofarm";
+} from "../lib/modules/Printers/actionButtons.js";
+import OctoPrintClient from "../lib/octoprint.js";
+import { checkTemps } from "../lib/modules/temperatureCheck.js";
+import { checkFilamentManager } from "../lib/modules/filamentGrab.js";
+import currentOperations from "../lib/modules/currentOperations";
+import doubleClickFullScreen from "../lib/functions/fullscreen.js";
+import OctoFarmclient from "../lib/octofarm";
+import { createClientSSEWorker } from "../lib/client-worker";
 
 const elems = [];
 let powerTimer = 20000;
@@ -24,8 +25,6 @@ let printerManagerModal = document.getElementById("printerManagerModal");
 let printerArea = document.getElementById("printerArea");
 let currentView = null;
 
-document.addEventListener("visibilitychange", handleVisibilityChange, false);
-
 document.getElementById("filterStates").addEventListener("change", (e) => {
   OctoFarmclient.get("client/updateFilter/" + e.target.value);
 });
@@ -33,20 +32,6 @@ document.getElementById("sortStates").addEventListener("change", (e) => {
   OctoFarmclient.get("client/updateSorting/" + e.target.value);
 });
 
-function handleVisibilityChange() {
-  if (document.hidden) {
-    if (worker !== null) {
-      console.log("Screen Abandonded, closing web worker...");
-      worker.terminate();
-      worker = null;
-    }
-  } else {
-    if (worker === null) {
-      console.log("Screen resumed... opening web worker...");
-      createWebWorker(currentView);
-    }
-  }
-}
 const returnPrinterInfo = (id) => {
   if (typeof id !== "undefined") {
     const zeeIndex = _.findIndex(printerInfo, function (o) {
@@ -57,34 +42,6 @@ const returnPrinterInfo = (id) => {
     return printerInfo;
   }
 };
-export default function createWebWorker(view) {
-  currentView = view;
-  worker = new Worker("/assets/dist/monitoringViewsWorker.min.js");
-  worker.onmessage = async function (event) {
-    if (event.data != false) {
-      //Update global variables with latest information...
-      printerInfo = event.data.printersInformation;
-      printerControlList = event.data.printerControlList;
-      //Grab control modal element...
-      if (!controlModal) {
-        controlModal = document.getElementById("printerManagerModal");
-      }
-      await init(
-        event.data.printersInformation,
-        event.data.clientSettings,
-        currentView
-      );
-      if (event.data.clientSettings.panelView.currentOp) {
-        const currentOperationsData = event.data.currentOperations;
-        currentOperations(
-          currentOperationsData.operations,
-          currentOperationsData.count,
-          printerInfo
-        );
-      }
-    }
-  };
-}
 
 function isHidden(state, clientSettings) {
   let hidden = "";
