@@ -10,6 +10,7 @@ const Printers = require("../models/Printer.js");
 const Filament = require("../models/Filament.js");
 const TempHistory = require("../models/TempHistory.js");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
+const softwareUpdateChecker = require("./softwareUpdateChecker");
 
 const {
   OctoprintApiClientService
@@ -1014,7 +1015,10 @@ class Runner {
 
   static async compareEnteredKeyToGlobalKey(printer) {
     // Compare entered API key to settings API Key...
-    const globalAPIKeyCheck = await this.octoPrintService.getSettings(printer, true);
+    const globalAPIKeyCheck = await this.octoPrintService.getSettings(
+      printer,
+      true
+    );
     const errorCode = {
       message:
         "Global API Key detected... unable to authenticate websocket connection",
@@ -1279,7 +1283,9 @@ class Runner {
             PrinterTicker.addIssue(
               new Date(),
               farmPrinters[i].printerURL,
-              `${e.message}: Connection refused, trying again in: ${systemSettings.timeout.apiRetry / 1000} seconds`,
+              `${e.message}: Connection refused, trying again in: ${
+                systemSettings.timeout.apiRetry / 1000
+              } seconds`,
               "Disconnected",
               farmPrinters[i]._id
             );
@@ -2445,6 +2451,17 @@ class Runner {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
+    if (softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) {
+      PrinterTicker.addIssue(
+        new Date(),
+        farmPrinters[index].printerURL,
+        `Farm is air gapped, skipping OctoPrint plugin list request`,
+        "Active",
+        farmPrinters[index]._id
+      );
+      return false;
+    }
+
     farmPrinters[index].pluginsList = [];
     PrinterTicker.addIssue(
       new Date(),
@@ -2477,8 +2494,6 @@ class Runner {
           "Disconnected",
           farmPrinters[index]._id
         );
-        farmPrinters[index].systemChecks.scanning.profile.status = "danger";
-        farmPrinters[index].systemChecks.scanning.profile.date = new Date();
         logger.error(
           `Error grabbing plugin list for: ${farmPrinters[index].printerURL}: Reason: `,
           err
@@ -2536,6 +2551,16 @@ class Runner {
     const index = _.findIndex(farmPrinters, function (o) {
       return o._id == id;
     });
+    if (softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) {
+      PrinterTicker.addIssue(
+        new Date(),
+        farmPrinters[index].printerURL,
+        `Farm is air gapped, skipping OctoPrint updates request`,
+        "Active",
+        farmPrinters[index]._id
+      );
+      return false;
+    }
     farmPrinters[index].octoPrintUpdate = [];
     farmPrinters[index].octoPrintPluginUpdates = [];
 
@@ -2597,8 +2622,6 @@ class Runner {
           "Disconnected",
           farmPrinters[index]._id
         );
-        farmPrinters[index].systemChecks.scanning.profile.status = "danger";
-        farmPrinters[index].systemChecks.scanning.profile.date = new Date();
         logger.error(
           `Error grabbing octoprint updates for: ${farmPrinters[index].printerURL}: Reason: `,
           err

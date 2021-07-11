@@ -1,6 +1,8 @@
+<% const disable_btn_air_gapped = (air_gapped) ? "disabled" : "" %>
+
 <div class="text-center mt-1">
     <div class="btn-group">
-        <button type="button" class="btn bg-colour-3 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <button type="button" class="btn bg-colour-3 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <%= disable_btn_air_gapped %>>
             <i class="fas fa-sitemap"></i> OctoPrint Management
         </button>
         <div class="dropdown-menu">

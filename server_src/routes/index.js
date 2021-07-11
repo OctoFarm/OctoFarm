@@ -16,6 +16,7 @@ const {
   getDefaultDashboardSettings
 } = require("../lib/providers/settings.constants");
 const { getHistoryCache } = require("../cache/history.cache");
+const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
 
 const version = process.env[AppConstants.VERSION_KEY];
 
@@ -80,7 +81,8 @@ router.get(
       page: "Printer Manager",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
       printerCount: printers.length,
-      helpers: prettyHelpers
+      helpers: prettyHelpers,
+      air_gapped: softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped
     });
   }
 );
