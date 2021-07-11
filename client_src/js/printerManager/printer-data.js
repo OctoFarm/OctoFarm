@@ -121,6 +121,7 @@ function corsWarningCheck(printer) {
 }
 function checkForOctoPrintUpdate(printer) {
   let updateButton = document.getElementById(`octoprintUpdate-${printer._id}`);
+  let bulkOctoPrintUpdateButton = document.getElementById("blkOctoPrintUpdate");
   if (printer?.octoPrintUpdate?.updateAvailable) {
     if (updateButton.disabled) {
       UI.doesElementNeedUpdating(false, updateButton, "disabled");
@@ -129,23 +130,24 @@ function checkForOctoPrintUpdate(printer) {
         "You have an OctoPrint Update to install!"
       );
     }
-    // if (bulkOctoPrintUpdateButton.disabled) {
-    //   bulkOctoPrintUpdateButton.disabled = false;
-    // }
+    if (bulkOctoPrintUpdateButton.disabled) {
+      bulkOctoPrintUpdateButton.disabled = false;
+    }
   } else {
     if (!updateButton.disabled) {
       UI.doesElementNeedUpdating(true, updateButton, "disabled");
       updateButton.setAttribute("title", "No OctoPrint updates available!");
     }
-    // if (!bulkOctoPrintUpdateButton.disabled) {
-    //   bulkOctoPrintUpdateButton.disabled = true;
-    // }
+    if (!bulkOctoPrintUpdateButton.disabled) {
+      bulkOctoPrintUpdateButton.disabled = true;
+    }
   }
 }
 function checkForOctoPrintPluginUpdates(printer) {
   let updatePluginButton = document.getElementById(
     `octoprintPluginUpdate-${printer._id}`
   );
+  let bulkPluginUpdateButton = document.getElementById("blkUpdatePluginsBtn");
   if (
     printer.octoPrintPluginUpdates &&
     printer.octoPrintPluginUpdates.length > 0
@@ -155,17 +157,17 @@ function checkForOctoPrintPluginUpdates(printer) {
       updatePluginButton.title =
         "You have OctoPrint plugin updates to install!";
     }
-    // if (bulkPluginUpdateButton.disabled) {
-    //   bulkPluginUpdateButton.disabled = false;
-    // }
+    if (bulkPluginUpdateButton.disabled) {
+      bulkPluginUpdateButton.disabled = false;
+    }
   } else {
     if (!updatePluginButton.disabled) {
       updatePluginButton.disabled = true;
       updatePluginButton.title = "No OctoPrint plugin updates available!";
     }
-    // if (!bulkPluginUpdateButton.disabled) {
-    //   bulkPluginUpdateButton.disabled = true;
-    // }
+    if (!bulkPluginUpdateButton.disabled) {
+      bulkPluginUpdateButton.disabled = true;
+    }
   }
 }
 function checkForApiErrors(printer) {
@@ -180,7 +182,7 @@ function checkForApiErrors(printer) {
         }
       }
     }
-    apiErrors = 5;
+
     if (apiErrors > 0 && printer.printerState.colour.category !== "Offline") {
       if (apiErrorTag.classList.contains("d-none")) {
         apiErrorTag.classList.remove("d-none");
