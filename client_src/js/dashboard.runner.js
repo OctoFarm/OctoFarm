@@ -6,11 +6,16 @@ import {
   loadGrid
 } from "./dashboard/grid-stack.manager";
 import { ChartsManager } from "./dashboard/charts.manager";
-import { loadClientSSEWorker } from "./dashboard/dashboard.worker";
+import { createClientSSEWorker } from "./lib/client-worker.js";
 import {
   getUsageWeightSeries,
   toFixedWeightGramFormatter
 } from "./dashboard/utils/chart.utils";
+import { DashUpdate } from "./dashboard/dashboard.updater";
+import {
+  dashboardSSEEventHandler,
+  workerURL
+} from "./dashboard/dashboard-sse.client";
 
 async function updateHistoryGraphs() {
   let historyStatistics = await OctoFarmclient.getHistoryStatistics();
@@ -67,7 +72,8 @@ async function initNewGraphs() {
   await ChartsManager.renderPrintCompletionByDay(printCompletionByDay);
 }
 
-loadClientSSEWorker();
+createClientSSEWorker(workerURL, dashboardSSEEventHandler);
+
 loadGrid()
   .then(async () => {
     await initNewGraphs();

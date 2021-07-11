@@ -1,42 +1,53 @@
-<div class="text-center">
-    <button
-            title="Create pre-defined custom gcode scripts to use with the Bulk Gcode commands"
-            id="customGcodeBtn"
-            type="button"
-            class="tag btn btn-primary bg-colour-4 m-1"
-            href="#"
-            aria-expanded="false"
-            data-toggle="modal" data-target="#printerCustomGcodeScriptsModal"
+<div class="row text-center">
+    <div class="col-lg-12">
+        <button
+                title="Create pre-defined custom gcode scripts to use with the Bulk Gcode commands"
+                id="customGcodeBtn"
+                type="button"
+                class="tag btn btn-primary bg-colour-4"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#printerCustomGcodeScriptsModal"
 
-    >
-        <i class="fas fa-code"></i> Gcode Scripts
-    </button>
-    <button
-            title="Install multiple plugins at once."
-            id="blkUpdatePluginsBtn"
-            type="button"
-            class="tag btn btn-primary bg-colour-1 m-1 d-none"
-            href="#"
-    >
-        <i class="fas fa-upload"></i> Plugin updates available!
-    </button>
-    <button
-            title="Install multiple plugins at once."
-            id="blkOctoPrintUpdate"
-            type="button"
-            class="tag btn btn-primary bg-colour-2 m-1 d-none"
-            href="#"
-    >
-        <i class="fas fa-upload"></i> OctoPrint updates available!
-    </button>
-    <button
-            title="Restart the octoprint instances that require it..."
-            id="restartInstances"
-            type="button"
-            class="tag btn btn-warning m-1 d-none"
-            href="#"
-            aria-expanded="false"
-    >
-        Restart those instances!
-    </button>
+        >
+            <i class="fas fa-code"></i> Gcode Scripts
+        </button>
+    </div>
+    <div class="col-lg-12">
+        <button
+                title="Update multiple OctoPrint's at once."
+                id="blkOctoPrintUpdate"
+                type="button"
+                class="tag btn btn-primary bg-colour-1"
+                href="#"
+                disabled
+        >
+            <i class="fas fa-desktop"></i> Update OctoPrints
+        </button>
+    </div>
+    <div class="col-lg-12">
+        <button
+                title="Update multiple OctoPrint Plugins at once."
+                id="blkUpdatePluginsBtn"
+                type="button"
+                class="tag btn btn-primary bg-colour-2"
+                href="#"
+                disabled
+        >
+            <i class="fas fa-plug"></i> Update Plugins
+        </button>
+    </div>
+    <div class="col-lg-12">
+        <button
+                title="Tracking for Plugin Installation"
+                id="pluginTracking"
+                type="button"
+                class="tag btn btn-info ml-1 p-1 d-none"
+                href="#"
+                disabled
+        >
+
+        </button>
+    </div>
+
 </div>

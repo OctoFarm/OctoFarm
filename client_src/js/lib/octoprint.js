@@ -56,20 +56,6 @@ export default class OctoPrintClient {
     });
   }
 
-  static move(printer, item, data) {
-    const url = `${printer.printerURL}/api/${item}`;
-    return fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
-      },
-      body: JSON.stringify(data)
-    }).catch((e) => {
-      console.log(e);
-    });
-  }
-
   static delete(printer, item) {
     const url = `${printer.printerURL}/api/${item}`;
     return fetch(url, {
