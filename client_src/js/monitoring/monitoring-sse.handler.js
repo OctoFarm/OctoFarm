@@ -6,10 +6,10 @@ let controlModal = false;
 export const monitoringWorkerURL = "/monitoringInfo/get/";
 
 export async function monitoringSSEventHandler(data) {
-  if (event.data != false) {
+  if (data != false) {
     //Update global variables with latest information...
-    const printerInfo = event.data.printersInformation;
-    const printerControlList = event.data.printerControlList;
+    const printerInfo = data.printersInformation;
+    const printerControlList = data.printerControlList;
 
     setMonitoringPrinterInfo(printerInfo, printerControlList);
 
@@ -17,10 +17,10 @@ export async function monitoringSSEventHandler(data) {
     if (!controlModal) {
       controlModal = document.getElementById("printerManagerModal");
     }
-    await initMonitoring(printerInfo, event.data.clientSettings, getViewType());
+    await initMonitoring(printerInfo, data.clientSettings, getViewType());
 
     if (event.data.clientSettings.panelView.currentOp) {
-      const currentOperationsData = event.data.currentOperations;
+      const currentOperationsData = data.currentOperations;
       currentOperations(
         currentOperationsData.operations,
         currentOperationsData.count,
