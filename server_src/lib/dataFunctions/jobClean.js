@@ -87,7 +87,7 @@ class JobClean {
       let totalWeight = 0;
       if (!!currentJob.expectedFilamentCosts) {
         const keys = Object.keys(currentJob.expectedFilamentCosts);
-        for (let s = 0; s < currentJob.expectedFilamentCosts; s++) {
+        for (let s = 0; s < currentJob.expectedFilamentCosts.length; s++) {
           const toolFilamentCosts =
             currentJob.expectedFilamentCosts[s][`tool${keys[s]}`];
           if (!!toolFilamentCosts) {

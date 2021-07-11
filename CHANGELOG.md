@@ -25,6 +25,8 @@ All notable changes to this project will be documented in this file.
     - Fixed #590: The Back button now disables when there's no folder to go back to.
     - Fixed #679: OctoFarm would stall on air gapped farms due to checking for OP updates.
     - Added Filament Clean back to start up so filament manager and spools list load.
+    - Fixed #605: Tool total would show "null" if no spool selected. 
+    - Issue with totals not been counted with/without a spool selected on Printer Control.
 
 ## [v1.2-rc1]
 
