@@ -17,7 +17,7 @@ function printerControlBtn(id) {
     </button>
     `;
 }
-function printerWebBtn(id, webURL) {
+export function printerWebBtn(id, webURL) {
   return `
             <a title="Open OctoPrint"
                id="printerWeb-${id}"

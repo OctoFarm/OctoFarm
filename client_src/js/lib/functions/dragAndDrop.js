@@ -45,6 +45,7 @@ export function dragAndDropEnable(element, printer) {
     false
   );
 }
+
 export function dragAndDropEnableMultiplePrinters(element, printers) {
   const dropArea = document.getElementById(element.id);
   // Prevent default drag behaviors
@@ -83,32 +84,33 @@ export function dragAndDropEnableMultiplePrinters(element, printers) {
     false
   );
 }
+
 function preventDefaults(e) {
   e.preventDefault();
   e.stopPropagation();
 }
+
 function highlight(e, currentElement) {
   currentElement.classList.add("highlight");
 }
+
 function unhighlight(e, currentElement) {
   currentElement.classList.remove("highlight");
 }
+
 function handleDrop(e, currentPrinter, currentElement) {
   const dt = e.dataTransfer;
   const { files } = dt;
   handleFiles(files, [currentPrinter], currentElement);
 }
+
 function handleMassDrop(e, printers, currentElement) {
   const dt = e.dataTransfer;
   const { files } = dt;
   handleFiles(files, printers, currentElement);
 }
-function sendFilesToPrinter(
-  singleFileOnly,
-  printAfterUpload,
-  uploadableFiles,
-  printer
-) {
+
+function sendFilesToPrinter(singleFileOnly, printAfterUpload, uploadableFiles, printer) {
   UI.createAlert(
     "warning",
     `${Validate.getName(printer)}: started upload`,
@@ -123,6 +125,7 @@ function sendFilesToPrinter(
     FileManager.handleFiles(uploadableFiles, printer);
   }
 }
+
 export function handleFiles(uploadableFiles, printerArray) {
   if (!printerArray || printerArray.length === 0) {
     return;
