@@ -43,7 +43,6 @@ export default function currentOperations(
     });
   }
 
-  currentOperationsCount = currentOperationsCount;
   document.getElementById("completeCount").innerHTML =
     "Complete: " + currentOperationsCount.complete;
   document.getElementById("idleCount").innerHTML =
