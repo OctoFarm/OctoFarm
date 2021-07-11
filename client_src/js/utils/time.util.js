@@ -21,11 +21,3 @@ export function getLastThirtyDaysText() {
 
   return lastThirtyDaysText;
 }
-
-/**
- * Format a date string to human readable date.
- * @returns {String} Human readable date string
- */
-export function formatDateStringHumanReadable(date) {
-  return new Date(date).toLocaleString();
-}

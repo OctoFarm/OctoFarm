@@ -1,5 +1,3 @@
-import { formatDateStringHumanReadable } from "../utils/time.util.js";
-
 let tickerMessageBox = document.getElementById("printerTickerMessageBox");
 let tickerMessageBoxStatus = document.getElementById(
   "printerManagementConnectionLogStatus"
@@ -40,7 +38,7 @@ export function updateConnectionLog(list) {
   updateStatus(list.length);
   list.forEach((e) => {
     if (checkIfElementExistsInTicker(e.id)) {
-      let date = formatDateStringHumanReadable(e.date);
+      const date = new Date(e.date).toLocaleString();
       tickerMessageBox.insertAdjacentHTML(
         "afterbegin",
         `<div id="${e.id}" style="width: 100%; font-size:11px;" class="text-left ${e.state} text-wrap"> ${date} | ${e.printer} | ${e.message}</div>`
