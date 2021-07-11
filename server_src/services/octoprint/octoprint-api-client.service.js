@@ -120,6 +120,7 @@ class OctoprintApiClientService extends OctoprintApiService {
     // Skip this call if farm is airgapped.
     if (softwareUpdateChecker.getUpdateNotificationIfAny()?.air_gapped)
       return false;
+
     return this.getWithOptionalRetry(
       printer,
       apiSoftwareUpdateCheck(force),
