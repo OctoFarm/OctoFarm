@@ -6,10 +6,15 @@ All notable changes to this project will be documented in this file.
 
 ### Added
     - Task scheduler: runs periodic tasks for OctoFarm in a controllable, periodic manner.
+    - Added line counter to ticker log
 
 ### Changed
     - File manager: gave printer titles a badge. Gave selected printer a yellow border. Reduced file list minimum height (for smaller screens). 
-    - Refactor of History Runner with new OctoPrint Client service and added test coverage
+    - Refactor of History Runner with new OctoPrint Client service and added test coverage.
+    - Refactor of Printer Manager client view templates. All Manager functions under seperate dropdowns, wider connection log.
+    - Refactor of Printer Manager client code bringing a little speed boost and better fault tolerance. 
+    - Refactor of SSE client into re-usable file. 
+
 ### Removed
 
 ### Fixed
