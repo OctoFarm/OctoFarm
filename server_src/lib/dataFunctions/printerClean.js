@@ -840,7 +840,6 @@ class PrinterClean {
           currentOperations.count.idle,
           currentOperations.count.disconnected
         );
-
         heatMapCounter = 0;
       } else {
         heatMapCounter += 1728;
@@ -1395,6 +1394,7 @@ class PrinterClean {
         y: 0,
         figure: 0
       };
+
       if (heatMap[0].data.length === 0) {
         // Created initial data set
         heatMap[0].data.push(CompleteCount);
@@ -1556,6 +1556,8 @@ class PrinterClean {
       dashboardStatistics.utilisationGraph = heatMap;
       farmStats[0].markModified("heatMap");
       await farmStats[0].save();
+    } else {
+      heatMap = farmStats[0].heatMap;
     }
 
     return "Farm information inititialised...";
