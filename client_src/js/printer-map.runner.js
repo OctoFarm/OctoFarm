@@ -19,8 +19,7 @@ import {
 import {
   printerQuickActionsModal,
   resetProgressBar,
-  setProgressBar,
-  testSetProgressBar
+  setProgressBar
 } from "./printer-map/printer-quick-actions.modal";
 import { FileActions } from "./lib/modules/fileManager";
 import UI from "./lib/functions/ui";

@@ -89,12 +89,14 @@ export default class UI {
       }
     }
   }
+
   static clearSelect(elementValue) {
     let inputBoxes = document.querySelectorAll("*[id^=" + elementValue + "]");
     inputBoxes.forEach((input) => {
       input.value = "";
     });
   }
+
   static addSelectListeners(elementValue) {
     let inputBoxes = document.querySelectorAll("*[id^=" + elementValue + "]");
     inputBoxes.forEach((input) => {
