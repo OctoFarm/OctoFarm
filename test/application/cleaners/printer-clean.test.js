@@ -4,7 +4,11 @@ jest.mock("../../../server_src/models/TempHistory");
 jest.mock("../../../server_src/models/RoomData");
 const mockFarmStatisticsService = require("../../../server_src/services/farm-statistics.service");
 const RoomData = require("../../../server_src/models/RoomData");
-const { nanFigureHeatmap } = require("./test-data/heatmap-state");
+const {
+  zeroFigureHeatmap,
+  emptyHeatmap,
+  nanFigureHeatmap
+} = require("./test-data/heatmap-state");
 const {
   PrinterClean
 } = require("../../../server_src/lib/dataFunctions/printerClean");
@@ -121,20 +125,19 @@ describe("PrinterClean", function () {
     let farmStats = await mockFarmStatisticsService.list({});
     expect(farmStats).toHaveLength(1);
     // This is what I meant with TODO above
-    //expect(farmStats[0].heatMap).toMatchObject(nanFigureHeatmap);
+    expect(farmStats[0].heatMap).toMatchObject(emptyHeatmap);
 
     await PrinterClean.heatMapping();
 
     farmStats = await mockFarmStatisticsService.list({});
     expect(farmStats).toHaveLength(1);
-    // TODO nan figure values
-    //expect(farmStats[0].heatMap).toMatchObject(nanFigureHeatmap);
+    expect(farmStats[0].heatMap).toMatchObject(zeroFigureHeatmap);
 
     // Call again for another branch in the code...
     await PrinterClean.heatMapping();
 
     // TODO NaN figure values (2)
-    //expect(farmStats[0].heatMap).toMatchObject(nanFigureHeatmap);
+    expect(farmStats[0].heatMap).toMatchObject(nanFigureHeatmap);
 
     farmStats = await mockFarmStatisticsService.list({});
     expect(farmStats).toHaveLength(1);

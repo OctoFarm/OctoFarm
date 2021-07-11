@@ -6,6 +6,74 @@ module.exports = {
   zeroedHeatMap: [
     {
       name: "Completed",
+      data: []
+    },
+    {
+      name: "Active",
+      data: [
+        {
+          x: dayName,
+          y: 0,
+          figure: 0
+        }
+      ]
+    },
+    {
+      name: "Idle",
+      data: [
+        {
+          x: dayName,
+          y: 0,
+          figure: 0
+        }
+      ]
+    },
+    {
+      name: "Offline",
+      data: [
+        {
+          x: "Friday",
+          y: 0,
+          figure: 0
+        }
+      ]
+    },
+    {
+      name: "Disconnected",
+      data: [
+        {
+          x: dayName,
+          y: 0,
+          figure: 0
+        }
+      ]
+    }
+  ],
+  emptyHeatmap: [
+    {
+      name: "Completed",
+      data: []
+    },
+    {
+      name: "Active",
+      data: []
+    },
+    {
+      name: "Idle",
+      data: []
+    },
+    {
+      name: "Offline",
+      data: []
+    },
+    {
+      name: "Disconnected",
+      data: []
+    }
+  ],
+  zeroFigureHeatmap: [
+    {
+      name: "Completed",
       data: [
         {
           x: dayName,
@@ -38,7 +106,7 @@ module.exports = {
       name: "Offline",
       data: [
         {
-          x: "Friday",
+          x: dayName,
           y: 0,
           figure: 0
         }
