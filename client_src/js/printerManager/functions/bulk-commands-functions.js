@@ -30,21 +30,6 @@ import CustomGenerator from "../../lib/modules/customScripts";
 import { setupPluginSearch } from "./plugin-search.function";
 import { returnPluginListTemplate } from "../templates/octoprint-plugin-list.template";
 
-let restartInstance = document.getElementById("restartInstances");
-
-async function setupRestartInstancesBtn(printersForPluginAction) {
-  restartInstance.classList.add("d-none");
-  for (let p = 0; p < printersForPluginAction.length; p++) {
-    await sendPowerCommandToOctoPrint(printersForPluginAction[p], "restart");
-  }
-  restartInstance.removeEventListener(
-    "click",
-    async (printersForPluginAction) => {
-      await setupRestartInstancesBtn(printersForPluginAction);
-    }
-  );
-}
-
 // TODO this should come from printer select to save the extra call, re-iteration and matching.
 async function getCurrentlySelectedPrinterList() {
   try {
@@ -654,14 +639,6 @@ export async function bulkOctoPrintPluginAction(action) {
               `;
             pluginAmount = pluginAmount - 1;
           }
-          trackerBtn.classList.add("d-none");
-          restartInstance.classList.remove("d-none");
-          restartInstance.addEventListener(
-            "click",
-            async (printersForPluginAction) => {
-              await setupRestartInstancesBtn(printersForPluginAction);
-            }
-          );
           trackerBtn.classList.add("d-none");
         }
       }
