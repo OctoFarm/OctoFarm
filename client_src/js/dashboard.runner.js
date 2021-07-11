@@ -12,6 +12,7 @@ import {
   toFixedWeightGramFormatter
 } from "./dashboard/utils/chart.utils";
 import { DashUpdate } from "./dashboard/dashboard.updater";
+import currentOperations from "./lib/modules/currentOperations";
 
 async function updateHistoryGraphs() {
   let historyStatistics = await OctoFarmclient.getHistoryStatistics();
