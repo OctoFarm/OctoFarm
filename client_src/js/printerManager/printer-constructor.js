@@ -1,8 +1,9 @@
 import Validate from "../lib/functions/validate";
 import UI from "../lib/functions/ui";
-import OctoFarmClient from "../lib/octofarm";
+import OctoFarmClient from "../lib/octofarm_client.js";
 
 let newPrintersIndex = 0;
+
 const removeLine = function (element) {
   element.remove();
 };
@@ -21,7 +22,7 @@ class Printer {
     this.group = group;
   }
 }
-class PrintersManagement {
+export class PrintersManagement {
   constructor(printerURL, camURL, apikey, group, name) {
     this.printer = new Printer(printerURL, camURL, apikey, group, name);
   }
@@ -117,9 +118,6 @@ class PrintersManagement {
       .addEventListener("click", (event) => {
         PrintersManagement.savePrinter(event.target);
       });
-    const printerName = document.getElementById(
-      `newPrinterName-${newPrintersIndex}`
-    );
     newPrintersIndex++;
   }
 
@@ -173,15 +171,16 @@ class PrintersManagement {
     };
   }
 
-  static async deletePrinter() {
+  static async deletePrinter(deletedPrinters) {
     if (deletedPrinters.length > 0) {
-      const post = await OctoFarmClient.post(
-        "printers/remove",
-        deletedPrinters
-      );
-      if (post.status === 200) {
-        let printersRemoved = await post.json();
-        printersRemoved = printersRemoved.printersRemoved;
+      try {
+        const printersToRemove = await OctoFarmClient.post(
+          "printers/remove",
+          deletedPrinters
+        );
+        // Should help with SSE event re-building the deleted printer causing a refresh to be needed to actually clear from UI
+        await UI.delay(5000);
+        const printersRemoved = printersToRemove.printersRemoved;
         printersRemoved.forEach((printer) => {
           UI.createAlert(
             "success",
@@ -191,12 +190,13 @@ class PrintersManagement {
           );
           document.getElementById(`printerCard-${printer.printerId}`).remove();
         });
-      } else {
+      } catch (e) {
+        console.error(e);
         UI.createAlert(
           "error",
-          "Something went wrong updating the Server...",
+          "Something went wrong updating the server, please check your logs",
           3000,
-          "Clicked"
+          "clicked"
         );
       }
     } else {
@@ -210,71 +210,84 @@ class PrintersManagement {
   }
 
   static async savePrinter(event) {
-    // Gather the printer data...
-    let newId = event.id.split("-");
-    newId = newId[1];
+    try {
+      // Gather the printer data...
+      let newId = event.id.split("-");
+      newId = newId[1];
 
-    // Grab new printer cells...
-    const printerURL = document.getElementById(`newPrinterURL-${newId}`);
-    const printerCamURL = document.getElementById(`newPrinterCamURL-${newId}`);
-    const printerAPIKEY = document.getElementById(`newPrinterAPIKEY-${newId}`);
-    const printerGroup = document.getElementById(`newPrinterGroup-${newId}`);
-    const printerName = document.getElementById(`newPrinterName-${newId}`);
+      // Grab new printer cells...
+      const printerURL = document.getElementById(`newPrinterURL-${newId}`);
+      const printerCamURL = document.getElementById(
+        `newPrinterCamURL-${newId}`
+      );
+      const printerAPIKEY = document.getElementById(
+        `newPrinterAPIKEY-${newId}`
+      );
+      const printerGroup = document.getElementById(`newPrinterGroup-${newId}`);
+      const printerName = document.getElementById(`newPrinterName-${newId}`);
 
-    const errors = [];
-    let printCheck = -1;
-    if (printerURL.value !== "") {
-      printCheck = _.findIndex(printerInfo, function (o) {
-        return (
-          JSON.stringify(o.printerURL) === JSON.stringify(printerURL.value)
+      const errors = [];
+      let printCheck = -1;
+      if (printerURL.value !== "") {
+        const printerInfo = await OctoFarmClient.post(
+          "printers/printerInfo",
+          {}
         );
-      });
-    }
-    // Check information is filled correctly...
-    if (
-      printerURL.value === "" ||
-      printCheck > -1 ||
-      printerAPIKEY.value === "" ||
-      printerName.value === "" ||
-      printerCamURL.value === ""
-    ) {
-      if (printerURL.value === "") {
-        errors.push({ type: "warning", msg: "Please input your printers URL" });
-      }
-      if (printerAPIKEY.value === "") {
-        errors.push({
-          type: "warning",
-          msg: "Please input your printers API Key"
+        printCheck = _.findIndex(printerInfo, function (o) {
+          return (
+            JSON.stringify(o.printerURL) === JSON.stringify(printerURL.value)
+          );
         });
       }
-      if (printCheck > -1) {
-        errors.push({
-          type: "error",
-          msg: `Printer URL: ${printerURL.value} already exists on farm`
-        });
+      // Check information is filled correctly...
+      if (
+        printerURL.value === "" ||
+        printCheck > -1 ||
+        printerAPIKEY.value === "" ||
+        printerName.value === "" ||
+        printerCamURL.value === ""
+      ) {
+        if (printerURL.value === "") {
+          errors.push({
+            type: "warning",
+            msg: "Please input your printers URL"
+          });
+        }
+        if (printerAPIKEY.value === "") {
+          errors.push({
+            type: "warning",
+            msg: "Please input your printers API Key"
+          });
+        }
+        if (printCheck > -1) {
+          errors.push({
+            type: "error",
+            msg: `Printer URL: ${printerURL.value} already exists on farm`
+          });
+        }
       }
-    }
-    if (errors.length > 0) {
-      errors.forEach((error) => {
-        UI.createAlert(error.type, error.msg, 3000, "clicked");
-      });
-    } else {
-      const printers = [];
-      const saveButton = document.getElementById(`saveButton-${newId}`);
-      saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-      saveButton.disabled = true;
-      const printer = new PrintersManagement(
-        printerURL.value,
-        printerCamURL.value,
-        printerAPIKEY.value,
-        printerGroup.value,
-        printerName.value
-      ).build();
-      printers.push(printer);
-      const post = await OctoFarmClient.post("printers/add", printers);
-      if (post.status === 200) {
-        let printersAdded = await post.json();
-        printersAdded = printersAdded.printersAdded;
+      if (errors.length > 0) {
+        errors.forEach((error) => {
+          UI.createAlert(error.type, error.msg, 3000, "clicked");
+        });
+      } else {
+        const printers = [];
+        const saveButton = document.getElementById(`saveButton-${newId}`);
+        saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        saveButton.disabled = true;
+        const printer = new PrintersManagement(
+          printerURL.value,
+          printerCamURL.value,
+          printerAPIKEY.value,
+          printerGroup.value,
+          printerName.value
+        ).build();
+        printers.push(printer);
+        const printersToAdd = await OctoFarmClient.post(
+          "printers/add",
+          printers
+        );
+        const printersAdded = printersToAdd.printersAdded;
         printersAdded.forEach((printer) => {
           UI.createAlert(
             "success",
@@ -284,22 +297,23 @@ class PrintersManagement {
           );
         });
         event.parentElement.parentElement.parentElement.remove();
-      } else {
-        UI.createAlert(
-          "error",
-          "Something went wrong updating the Server...",
-          3000,
-          "Clicked"
-        );
         saveButton.innerHTML = '<i class="fas fa-save"></i>';
         saveButton.disabled = false;
       }
-    }
-    const table = document.getElementById("printerNewTable");
-    if (table.rows.length === 1) {
-      if (!table.classList.contains("d-none")) {
-        table.classList.add("d-none");
+      const table = document.getElementById("printerNewTable");
+      if (table.rows.length === 1) {
+        if (!table.classList.contains("d-none")) {
+          table.classList.add("d-none");
+        }
       }
+    } catch (e) {
+      console.error(e);
+      UI.createAlert(
+        "error",
+        "Something went wrong saving your printer, please check the logs",
+        3000,
+        "clicked"
+      );
     }
   }
 
