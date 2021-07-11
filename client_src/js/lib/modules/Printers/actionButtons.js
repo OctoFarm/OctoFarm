@@ -77,11 +77,11 @@ function printerQuickDisconnected(id) {
 
 function init(printer, element) {
   document.getElementById(element).innerHTML = `
-      ${printerControlBtn(printer._id)}  
-      ${printerQuickConnect(printer._id)} 
-      ${printerReSyncBtn(printer._id)}  
-      ${printerWebBtn(printer._id, printer.printerURL)}    
-      ${powerBtnHolder(printer._id)}  
+    ${printerControlBtn(printer._id)}  
+    ${printerQuickConnect(printer._id)} 
+    ${printerReSyncBtn(printer._id)}  
+    ${printerWebBtn(printer._id, printer.printerURL)}    
+    ${powerBtnHolder(printer._id)}  
   `;
   PowerButton.applyBtn(printer, "powerBtn-");
   if (
