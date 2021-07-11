@@ -4,8 +4,8 @@ async function getGithubReleasesPromise() {
   const connected = await fetch("https://google.com", {
     method: "GET",
     cache: "no-cache",
-    headers: {"Content-Type": "application/json"},
-    referrerPolicy: "no-referrer",
+    headers: { "Content-Type": "application/json" },
+    referrerPolicy: "no-referrer"
   })
     .then(() => true)
     .catch(() => false);
@@ -19,11 +19,10 @@ async function getGithubReleasesPromise() {
     {
       method: "GET",
       headers: {
-        "Content-Type": "application/json",
-      },
+        "Content-Type": "application/json"
+      }
     }
-  )
-    .then((res) => res.json());
+  ).then((res) => res.json());
 }
 
 module.exports = {
