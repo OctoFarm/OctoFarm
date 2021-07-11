@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
     - File manager: gave printer titles a badge. Gave selected printer a yellow border. Reduced file list minimum height (for smaller screens). 
+    - Refactor of History Runner with new OctoPrint Client service and added test coverage
 ### Removed
 
 ### Fixed

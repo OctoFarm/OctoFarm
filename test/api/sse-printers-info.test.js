@@ -25,22 +25,23 @@ beforeAll(async () => {
 });
 
 describe("SSE-printersInfo", () => {
-  it("should be able to be called with an EventSource", async (done) => {
+  it("should be able to be called with an EventSource", async () => {
     const getRequest = request.get(routeBase + ssePath);
     const url = getRequest.url;
     expect(url).toBeTruthy();
 
     const es = new EventSource(url);
 
-    // events.emit('test', 'test message')
-    es.onmessage = (e) => {
-      expect(parse(e.data)).toEqual({
-        printersInformation: [],
-        printerControlList: [],
-        currentTickerList: []
-      });
-      es.close();
-      done();
-    };
+    await Promise.resolve((done) => {
+      es.onmessage = (e) => {
+        expect(parse(e.data)).toEqual({
+          printersInformation: [],
+          printerControlList: [],
+          currentTickerList: []
+        });
+        es.close();
+        done();
+      };
+    });
   }, 10000);
 });
