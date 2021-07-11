@@ -3,122 +3,18 @@ const dayName = new Intl.DateTimeFormat(["en"], {
 }).format(new Date());
 
 module.exports = {
-  zeroedHeatMap: [
-    {
-      name: "Completed",
-      data: []
-    },
-    {
-      name: "Active",
-      data: [
-        {
-          x: dayName,
-          y: 0,
-          figure: 0
-        }
-      ]
-    },
-    {
-      name: "Idle",
-      data: [
-        {
-          x: dayName,
-          y: 0,
-          figure: 0
-        }
-      ]
-    },
-    {
-      name: "Offline",
-      data: [
-        {
-          x: "Friday",
-          y: 0,
-          figure: 0
-        }
-      ]
-    },
-    {
-      name: "Disconnected",
-      data: [
-        {
-          x: dayName,
-          y: 0,
-          figure: 0
-        }
-      ]
-    }
-  ],
   emptyHeatmap: [
     {
       name: "Completed",
-      data: []
-    },
-    {
-      name: "Active",
-      data: []
-    },
-    {
-      name: "Idle",
-      data: []
-    },
-    {
-      name: "Offline",
-      data: []
-    },
-    {
-      name: "Disconnected",
-      data: []
-    }
-  ],
-  zeroFigureHeatmap: [
-    {
-      name: "Completed",
       data: [
         {
-          x: dayName,
-          y: 0,
-          figure: 0
-        }
-      ]
-    },
-    {
-      name: "Active",
-      data: [
+          x: "Wednesday",
+          y: 0
+        },
         {
-          x: dayName,
+          x: "Sunday",
           y: 0,
-          figure: 0
-        }
-      ]
-    },
-    {
-      name: "Idle",
-      data: [
-        {
-          x: dayName,
-          y: 0,
-          figure: 0
-        }
-      ]
-    },
-    {
-      name: "Offline",
-      data: [
-        {
-          x: dayName,
-          y: 0,
-          figure: 0
-        }
-      ]
-    },
-    {
-      name: "Disconnected",
-      data: [
-        {
-          x: dayName,
-          y: 0,
-          figure: 0
+          figure: NaN
         }
       ]
     }
