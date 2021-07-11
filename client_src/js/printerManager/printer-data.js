@@ -180,21 +180,14 @@ function checkForApiErrors(printer) {
         }
       }
     }
-
+    apiErrors = 5;
     if (apiErrors > 0 && printer.printerState.colour.category !== "Offline") {
-      if (!apiErrorTag.classList.contains("badge-danger")) {
-        apiErrorTag.classList.add("tag", "badge", "badge-danger", "badge-pill");
-        apiErrorTag.innerHTML = "API Issues Detected!";
+      if (apiErrorTag.classList.contains("d-none")) {
+        apiErrorTag.classList.remove("d-none");
       }
     } else {
-      if (apiErrorTag.classList.contains("badge-danger")) {
-        apiErrorTag.classList.remove(
-          "tag",
-          "badge",
-          "badge-danger",
-          "badge-pill"
-        );
-        apiErrorTag.innerHTML = "";
+      if (apiErrorTag.classList.contains("d-none")) {
+        apiErrorTag.classList.add("d-none");
       }
     }
   }
@@ -291,6 +284,25 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
           }
         });
       document
+        .getElementById(`scanningIssues-${printer._id}`)
+        .addEventListener("click", async (e) => {
+          try {
+            const printersInfo = await OctoFarmClient.post(
+              printerBase + printerInfoURL,
+              {}
+            );
+            await updatePrinterSettingsModal(printersInfo, printer._id);
+          } catch (e) {
+            console.error(e);
+            UI.createAlert(
+              "error",
+              `Unable to grab latest printer information: ${e}`,
+              0,
+              "clicked"
+            );
+          }
+        });
+      document
         .getElementById(`printerLog-${printer._id}`)
         .addEventListener("click", async (e) => {
           try {
@@ -319,7 +331,7 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
       document
         .getElementById(`printerStatistics-${printer._id}`)
         .addEventListener("click", async (e) => {
-          PrinterLogs.loadStatistics(printer._id);
+          await PrinterLogs.loadStatistics(printer._id);
         });
     }
   });
