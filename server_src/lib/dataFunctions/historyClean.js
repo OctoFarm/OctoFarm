@@ -82,7 +82,7 @@ class HistoryClean {
 
   static getCostAsString(grams, spool, completionRatio) {
     if (!spool) {
-      return null;
+      return "0.00";
     }
     return (
       completionRatio *
