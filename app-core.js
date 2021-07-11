@@ -18,6 +18,9 @@ const {
 const { ServerSettings } = require("./server_src/settings/serverSettings.js");
 const { ClientSettings } = require("./server_src/settings/clientSettings.js");
 const { TaskManager } = require("./server_src/runners/task.manager");
+const {
+  FilamentClean
+} = require("./server_src/lib/dataFunctions/filamentClean.js");
 
 function setupExpressServer() {
   let app = express();
@@ -167,9 +170,6 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
       );
     });
 
-    // await FilamentClean.start();
-    // TODO race condition
-
     await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
       softwareUpdateChecker.checkReleaseAndLogUpdate();
     });
@@ -177,6 +177,8 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
     await initHistoryCache().catch((e) => {
       console.error("X HistoryCache failed to initiate. " + e);
     });
+
+    await FilamentClean.start();
 
     await optionalInfluxDatabaseSetup();
   }

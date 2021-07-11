@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
     - Fixed #669: File manager scroll wouldnt reset after switching printer.
     - Fixed #590: The Back button now disables when there's no folder to go back to.
     - Fixed #679: OctoFarm would stall on air gapped farms due to checking for OP updates.
+    - Added Filament Clean back to start up so filament manager and spools list load.
 
 ## [v1.2-rc1]
 
