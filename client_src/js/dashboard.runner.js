@@ -15,7 +15,7 @@ import { DashUpdate } from "./dashboard/dashboard.updater";
 import {
   dashboardSSEEventHandler,
   workerURL
-} from "./dashboard/dashboard-sse.client";
+} from "./dashboard/dashboard-sse.handler";
 
 async function updateHistoryGraphs() {
   let historyStatistics = await OctoFarmclient.getHistoryStatistics();

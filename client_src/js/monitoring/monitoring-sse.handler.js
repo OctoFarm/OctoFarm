@@ -1,6 +1,6 @@
 import currentOperations from "../lib/modules/currentOperations";
 import { getViewType, setMonitoringPrinterInfo } from "./monitoring-view.state";
-import { initMonitoring } from "./viewUpdater";
+import { initMonitoring } from "./monitoring.updater";
 
 let controlModal = false;
 export const monitoringWorkerURL = "/monitoringInfo/get/";

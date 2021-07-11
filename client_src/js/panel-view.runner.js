@@ -3,7 +3,7 @@ import { setViewType } from "./monitoring/monitoring-view.state";
 import {
   monitoringSSEEventHandler,
   monitoringWorkerURL
-} from "./monitoring/monitoring-sse.client";
+} from "./monitoring/monitoring-sse.handler";
 
 const viewType = "panel";
 
