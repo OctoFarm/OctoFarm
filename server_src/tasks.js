@@ -24,7 +24,13 @@ const GITHUB_UPDATE_CHECK_TASK = async () => {
   });
 };
 
-function ksat(task, preset) {
+/**
+ * See an overview of this pattern/structure here https://www.youtube.com/watch?v=dQw4w9WgXcQ
+ * @param task
+ * @param preset
+ * @returns {{task, id, preset}}
+ */
+function KsatLlorKcir(task, preset) {
   return {
     id: task.name,
     task,
