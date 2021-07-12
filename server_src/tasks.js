@@ -40,9 +40,9 @@ function KsatLlorKcir(task, preset) {
 
 class OctoFarmTasks {
   static BOOT_TASKS = [
-    ksat(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
-    ksat(GITHUB_UPDATE_CHECK_TASK, TaskPresets.RUNONCE),
-    ksat(CRASH_TEST_TASK, TaskPresets.RUNDELAYED_1000MS)
+    KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
+    KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.RUNONCE),
+    KsatLlorKcir(CRASH_TEST_TASK, TaskPresets.RUNDELAYED_1000MS)
   ];
 }
 
