@@ -1,7 +1,7 @@
 class JobValidationException extends Error {
-  constructor(message) {
+  constructor(message, taskId) {
     super(message); // (1)
-    this.name = "JobValidationError"; // (2)
+    this.name = `JobValidationError [${taskId || "anonymous"}]`; // (2)
   }
 }
 

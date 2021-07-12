@@ -7,6 +7,9 @@ const ServerSettingsDB = require("./server_src/models/ServerSettings");
 const expressLayouts = require("express-ejs-layouts");
 const Logger = require("./server_src/lib/logger.js");
 const softwareUpdateChecker = require("./server_src/services/octofarm-update.service");
+const { OctoFarmTasks } = require("./server_src/tasks");
+const { TaskPresets } = require("./server_src/task.presets");
+const { PRINTER_CLEAN_TASK } = require("./server_src/tasks");
 const { initHistoryCache } = require("./server_src/cache/history.cache");
 const {
   optionalInfluxDatabaseSetup
@@ -79,7 +82,6 @@ async function ensureSystemSettingsInitiated() {
   // Setup Settings as connection is established
   const serverSettingsStatus = await ServerSettings.init();
   await ClientSettings.init();
-  logger.info(serverSettingsStatus);
 
   return serverSettingsStatus;
 }
@@ -150,29 +152,15 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
     logger.info("Initialising FarmInformation...");
     await PrinterClean.initFarmInformation();
 
-    logger.info("Initialising Client Settings...");
     await ClientSettings.init();
 
-    logger.info("Initialising OctoFarm State...");
     const { Runner } = require("./server_src/runners/state.js");
     const stateRunnerReport = await Runner.init();
     logger.info("OctoFarm State returned", stateRunnerReport);
 
-    const serverSettings = require("./server_src/settings/serverSettings");
-    TaskManager.registerJobOrTask("printer_clean_runner", 2500, async () => {
-      const printersInformation = PrinterClean.listPrintersInformation();
-      await PrinterClean.sortCurrentOperations(printersInformation);
-
-      await PrinterClean.statisticsStart();
-      await PrinterClean.createPrinterList(
-        printersInformation,
-        serverSettings.filamentManager
-      );
-    });
-
-    await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
-      softwareUpdateChecker.checkReleaseAndLogUpdate();
-    });
+    TaskManager.registerJobOrTask(OctoFarmTasks.printerClean);
+    TaskManager.registerJobOrTask(OctoFarmTasks.crashTest);
+    TaskManager.registerJobOrTask(OctoFarmTasks.updateCheckTask);
 
     await initHistoryCache().catch((e) => {
       console.error("X HistoryCache failed to initiate. " + e);

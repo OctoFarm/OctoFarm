@@ -8,30 +8,16 @@ const {
 
 const logger = new Logger("OctoFarm-TaskManager");
 
-// Test or example task
-// TaskManager.registerPeriodicJob(
-//   "unique_test_task1",
-//   async () => {
-//     await new Promise((resolve) => {
-//       setTimeout(() => resolve(), 9000);
-//     });
-//   },
-//   {
-//     periodic: true,
-//     logFirstCompletion: true,
-//     runImmediately: false,
-//     milliseconds: 10000
-//   }
-// );
-
 /**
- * Manage recurring server tasks
+ * Manage immediate or delayed tasks and recurring jobs.
+ * Note: this class ought NOT TO BE USED FOR SYNCHRONOUS REQUEST MIDDLEWARE
  */
 class TaskManager {
-  static taskScheduler = new ToadScheduler();
+  static jobScheduler = new ToadScheduler();
+  static bootUpTasks = [];
   static taskStates = {};
 
-  static validateInput(taskId, workload, jobOptions) {
+  static validateInput(taskId, workload, schedulerOptions) {
     if (!taskId) {
       throw new JobValidationException(
         "Task ID was not provided. Cant register task or schedule job."
@@ -39,31 +25,52 @@ class TaskManager {
     }
     if (!!this.taskStates[taskId]) {
       throw new JobValidationException(
-        "Task ID was already registered. Cant register a key twice."
+        `Task ID with taskId '${taskId}' was already registered. Cant register a key twice.`,
+        taskId
       );
     }
     if (typeof workload !== "function") {
       throw new JobValidationException(
-        `Provided job '${
+        `Job '${
           workload.name || "anonymous"
-        }' for taskId '${taskId}' was not callable and can't be scheduled.`
+        }' with taskId '${taskId}' is not a callable function and can't be scheduled.`,
+        taskId
       );
     }
 
-    if (!jobOptions?.periodic && !jobOptions?.runOnce) {
-      throw new JobValidationException("Provide 'periodic' or 'runOnce'");
+    if (
+      !schedulerOptions?.periodic &&
+      !schedulerOptions?.runOnce &&
+      !schedulerOptions?.runDelayed
+    ) {
+      throw new JobValidationException(
+        `Provide 'periodic' or 'runOnce' or 'runDelayed' option'`,
+        taskId
+      );
     }
     if (
-      jobOptions?.periodic &&
-      (!jobOptions.milliseconds ||
-        !jobOptions.seconds ||
-        !jobOptions.minutes ||
-        !jobOptions.hours ||
-        !jobOptions.days)
+      schedulerOptions?.runDelayed &&
+      !schedulerOptions.milliseconds &&
+      !schedulerOptions.seconds
     ) {
       // Require milliseconds, minutes, hours or days
       throw new JobValidationException(
-        "Provide a periodic timing parameter (milliseconds|seconds|minutes|hours|days)"
+        `Provide a delayed timing parameter (milliseconds|seconds)'`,
+        taskId
+      );
+    }
+    if (
+      schedulerOptions?.periodic &&
+      !schedulerOptions.milliseconds &&
+      !schedulerOptions.seconds &&
+      !schedulerOptions.minutes &&
+      !schedulerOptions.hours &&
+      !schedulerOptions.days
+    ) {
+      // Require milliseconds, minutes, hours or days
+      throw new JobValidationException(
+        `Provide a periodic timing parameter (milliseconds|seconds|minutes|hours|days)'`,
+        taskId
       );
     }
   }
@@ -72,7 +79,11 @@ class TaskManager {
    * Create a recurring job
    * Tip: use the options properties `runImmediately` and `seconds/milliseconds/minutes/hours/days`
    */
-  static registerJobOrTask(taskID, asyncTaskCallback, schedulerOptions) {
+  static registerJobOrTask({
+    id: taskID,
+    task: asyncTaskCallback,
+    preset: schedulerOptions
+  }) {
     try {
       this.validateInput(taskID, asyncTaskCallback, schedulerOptions);
     } catch (e) {
@@ -81,12 +92,26 @@ class TaskManager {
     }
     const timedTask = this.getSafeTimedTask(taskID, asyncTaskCallback);
 
-    const job = new SimpleIntervalJob(schedulerOptions, timedTask);
-
-    TaskManager.taskStates[taskID] = {
+    this.taskStates[taskID] = {
       options: schedulerOptions
     };
-    TaskManager.taskScheduler.addSimpleIntervalJob(job);
+
+    if (schedulerOptions.runOnce) {
+      timedTask.execute();
+    } else if (schedulerOptions.runDelayed) {
+      const delay =
+        (schedulerOptions.milliseconds || 0) +
+        (schedulerOptions.seconds || 0) * 1000;
+      this.runTimeoutTaskInstance(taskID, timedTask, delay);
+    } else {
+      const job = new SimpleIntervalJob(schedulerOptions, timedTask);
+      this.jobScheduler.addSimpleIntervalJob(job);
+    }
+  }
+
+  static runTimeoutTaskInstance(taskID, task, timeoutMs) {
+    logger.info(`Running delayed task ${taskID} in ${timeoutMs}ms`);
+    setTimeout(() => task.execute(), timeoutMs, taskID);
   }
 
   static getSafeTimedTask(taskId, handler) {
@@ -98,17 +123,20 @@ class TaskManager {
   }
 
   static async timeTask(taskId, handler) {
-    TaskManager.taskStates[taskId] = { started: Date.now() };
+    let taskState = this.taskStates[taskId];
+    taskState.started = Date.now();
 
-    let taskState = TaskManager.taskStates[taskId];
     await handler();
     taskState.duration = Date.now() - taskState.started;
 
-    if (!taskState.options?.logFirstCompletion !== false) {
+    if (
+      taskState.options?.logFirstCompletion !== false &&
+      !taskState?.firstCompletion
+    ) {
       logger.info(
         `Task '${taskId}' first run completed with duration ${taskState.duration}ms`
       );
-      taskState.firstCompletion = true;
+      taskState.firstCompletion = Date.now();
     }
   }
 
@@ -118,7 +146,7 @@ class TaskManager {
 
   static getErrorHandler(taskId) {
     return (error) => {
-      const registration = TaskManager.taskStates[taskId];
+      const registration = this.taskStates[taskId];
 
       if (!registration.lastError)
         registration.erroredlastError = {
@@ -126,7 +154,7 @@ class TaskManager {
           error
         };
 
-      logger.error(`Task '${taskId}' threw an exception:`, error);
+      logger.error(`Task '${taskId}' threw an exception:` + error.stack);
     };
   }
 
@@ -134,7 +162,7 @@ class TaskManager {
    * Stops the tasks which were registered
    */
   static stopSchedulerTasks() {
-    TaskManager.taskScheduler.stop();
+    this.jobScheduler.stop();
   }
 }
 
