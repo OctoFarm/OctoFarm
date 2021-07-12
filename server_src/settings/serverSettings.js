@@ -86,7 +86,6 @@ class ServerSettings {
       await settings[0].save().then((ret) => {
         SettingsClean.start();
       });
-      return "Server settings already exist, loaded existing values...";
     }
   }
 

@@ -6,7 +6,7 @@ const passport = require("passport");
 const ServerSettingsDB = require("./server_src/models/ServerSettings");
 const expressLayouts = require("express-ejs-layouts");
 const Logger = require("./server_src/lib/logger.js");
-const softwareUpdateChecker = require("./server_src/runners/softwareUpdateChecker");
+const softwareUpdateChecker = require("./server_src/services/octofarm-update.service");
 const { initHistoryCache } = require("./server_src/cache/history.cache");
 const {
   optionalInfluxDatabaseSetup
@@ -159,7 +159,7 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
     logger.info("OctoFarm State returned", stateRunnerReport);
 
     const serverSettings = require("./server_src/settings/serverSettings");
-    TaskManager.registerAsyncTask("printer_clean_runner", 2500, async () => {
+    TaskManager.registerJobOrTask("printer_clean_runner", 2500, async () => {
       const printersInformation = PrinterClean.listPrintersInformation();
       await PrinterClean.sortCurrentOperations(printersInformation);
 

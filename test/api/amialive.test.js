@@ -14,7 +14,7 @@ beforeAll(async () => {
 });
 
 jest.mock("../../server_src/runners/githubClient");
-const softwareUpdateChecker = require("../../server_src/runners/softwareUpdateChecker");
+const softwareUpdateChecker = require("../../server_src/services/octofarm-update.service");
 
 describe("AmIAlive Endpoint", () => {
   it("should return ok and no update", async () => {

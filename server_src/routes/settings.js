@@ -25,7 +25,7 @@ const { SystemCommands } = require("../lib/serverCommands.js");
 const {
   checkReleaseAndLogUpdate,
   getUpdateNotificationIfAny
-} = require("../runners/softwareUpdateChecker.js");
+} = require("../services/octofarm-update.service.js");
 
 module.exports = router;
 

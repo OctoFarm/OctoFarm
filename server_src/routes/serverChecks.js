@@ -2,7 +2,7 @@ const express = require("express");
 
 const router = express.Router();
 const { ensureCurrentUserAndGroup } = require("../config/users.js");
-const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
+const softwareUpdateChecker = require("../services/octofarm-update.service");
 const isDocker = require("is-docker");
 const { isPm2, isNodemon, isNode } = require("../utils/env.utils");
 

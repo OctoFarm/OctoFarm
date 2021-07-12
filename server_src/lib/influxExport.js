@@ -30,9 +30,7 @@ async function optionalInfluxDatabaseSetup() {
     db = new Influx.InfluxDB(options);
     await checkDatabase(options);
 
-    return "Setup";
-  } else {
-    logger.info("No settings or disabled for influxdb export");
+    logger.info("Influx database enabled by settings");
   }
 }
 
