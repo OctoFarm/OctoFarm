@@ -14,32 +14,30 @@ const PRINTER_CLEAN_TASK = async () => {
   );
 };
 
-const CRASH_TEST = async () => {
+const CRASH_TEST_TASK = async () => {
   throw new Error("big error");
 };
 
-const UPDATE_CHECK_TEST = async () => {
+const GITHUB_UPDATE_CHECK_TASK = async () => {
   await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
     softwareUpdateChecker.checkReleaseAndLogUpdate();
   });
 };
 
+function ksat(task, preset) {
+  return {
+    id: task.name,
+    task,
+    preset
+  };
+}
+
 class OctoFarmTasks {
-  static printerClean = {
-    id: "PRINTER_CLEAN",
-    task: PRINTER_CLEAN_TASK,
-    preset: TaskPresets.PERIODIC_2500MS
-  };
-  static crashTest = {
-    id: "CRASH_TEST",
-    task: CRASH_TEST,
-    preset: TaskPresets.RUNDELAYED_1000MS
-  };
-  static updateCheckTask = {
-    id: "GITHUB_UPDATE_CHECK",
-    task: UPDATE_CHECK_TEST,
-    preset: TaskPresets.RUNONCE
-  };
+  static BOOT_TASKS = [
+    ksat(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
+    ksat(GITHUB_UPDATE_CHECK_TASK, TaskPresets.RUNONCE),
+    ksat(CRASH_TEST_TASK, TaskPresets.RUNDELAYED_1000MS)
+  ];
 }
 
 module.exports = {

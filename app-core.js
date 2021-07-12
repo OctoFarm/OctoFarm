@@ -158,9 +158,9 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
     const stateRunnerReport = await Runner.init();
     logger.info("OctoFarm State returned", stateRunnerReport);
 
-    TaskManager.registerJobOrTask(OctoFarmTasks.printerClean);
-    TaskManager.registerJobOrTask(OctoFarmTasks.crashTest);
-    TaskManager.registerJobOrTask(OctoFarmTasks.updateCheckTask);
+    OctoFarmTasks.BOOT_TASKS.forEach((task) =>
+      TaskManager.registerJobOrTask(task)
+    );
 
     await initHistoryCache().catch((e) => {
       console.error("X HistoryCache failed to initiate. " + e);
