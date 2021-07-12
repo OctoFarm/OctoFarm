@@ -1,4 +1,6 @@
 const softwareUpdateChecker = require("./services/octofarm-update.service");
+const { FilamentClean } = require("./lib/dataFunctions/filamentClean");
+const { initHistoryCache } = require("./cache/history.cache");
 const { TaskPresets } = require("./task.presets");
 const { PrinterClean } = require("./lib/dataFunctions/printerClean");
 
@@ -16,6 +18,16 @@ const PRINTER_CLEAN_TASK = async () => {
 
 const CRASH_TEST_TASK = async () => {
   throw new Error("big error");
+};
+
+const HISTORY_CACHE_TASK = async () => {
+  await initHistoryCache().catch((e) => {
+    console.error("X HistoryCache failed to initiate. " + e);
+  });
+};
+
+const FILAMENT_CLEAN_TASK = async () => {
+  await FilamentClean.start();
 };
 
 const GITHUB_UPDATE_CHECK_TASK = async () => {
@@ -41,8 +53,9 @@ function KsatLlorKcir(task, preset) {
 class OctoFarmTasks {
   static BOOT_TASKS = [
     KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
-    KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.RUNONCE),
-    KsatLlorKcir(CRASH_TEST_TASK, TaskPresets.RUNDELAYED_1000MS)
+    KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
+    KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNONCE),
+    KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.RUNDELAYED_1000MS)
   ];
 }
 

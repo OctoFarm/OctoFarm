@@ -995,7 +995,6 @@ class Runner {
       }
       // FilamentClean.start(systemSettings.filamentManager);
     }, 5000);
-    return `System Runner has checked over ${farmPrinters.length} printers...`;
   }
 
   static async compareEnteredKeyToGlobalKey(printer) {

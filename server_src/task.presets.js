@@ -14,7 +14,7 @@ class TASK_PRESETS {
   static PERIODIC_2500MS = {
     periodic: true,
     logFirstCompletion: true,
-    runImmediately: false,
+    runImmediately: true,
     milliseconds: 2500
   };
 

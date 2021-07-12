@@ -134,7 +134,7 @@ class TaskManager {
       !taskState?.firstCompletion
     ) {
       logger.info(
-        `Task '${taskId}' first run completed with duration ${taskState.duration}ms`
+        `Task '${taskId}' first completion. Duration ${taskState.duration}ms`
       );
       taskState.firstCompletion = Date.now();
     }

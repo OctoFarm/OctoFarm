@@ -155,18 +155,11 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
     await ClientSettings.init();
 
     const { Runner } = require("./server_src/runners/state.js");
-    const stateRunnerReport = await Runner.init();
-    logger.info("OctoFarm State returned", stateRunnerReport);
+    await Runner.init();
 
     OctoFarmTasks.BOOT_TASKS.forEach((task) =>
       TaskManager.registerJobOrTask(task)
     );
-
-    await initHistoryCache().catch((e) => {
-      console.error("X HistoryCache failed to initiate. " + e);
-    });
-
-    await FilamentClean.start();
 
     await optionalInfluxDatabaseSetup();
   }
