@@ -25,7 +25,7 @@ class PrinterTicker {
     }
   }
 
-  static addIssue(date, printer, message, state, printerID) {
+  static addIssue(printer, message, state) {
     let id = null;
     if (currentIssues.length === 0) {
       //first issue
@@ -35,10 +35,10 @@ class PrinterTicker {
     }
     const newIssue = {
       id: id,
-      date: date,
+      date: Date.now(),
       message: message,
-      printerID: printerID,
-      printer: printer,
+      printerID: printer?._id,
+      printer: printer.printerURL,
       state: state
     };
     currentIssues.push(newIssue);

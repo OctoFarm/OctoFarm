@@ -1,26 +1,103 @@
-"use strict";
-
+const Printers = require("../models/Printer.js");
 const printerModel = require("../models/Printer");
+const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
-/**
- * Stores a new printer into the database.
- * @param {Object} printer object to create.
- * @throws {Error} If the printer is not correctly provided.
- */
-const create = async (printer) => {
-  if (!printer) throw new Error("Missing printer");
+class PrinterService {
+  /**
+   * Lists the printers present in the database.
+   */
+  const;
 
-  return printerModel.create(printer);
-};
+  /**
+   * Stores a new printer into the database.
+   * @param {Object} printer object to create.
+   * @throws {Error} If the printer is not correctly provided.
+   */
+  static create = async (printer) => {
+    if (!printer) throw new Error("Missing printer");
 
-/**
- * Lists the printers present in the database.
- */
-const list = async () => {
-  return printerModel.find({});
-};
+    return printerModel.create(printer);
+  };
 
-module.exports = {
-  create,
-  list
-};
+  // W.I.P. with state refactor
+  // const generatePrinter = () => {
+  // const httpPrefix = secure ? "https" : "http";
+  // const wsPrefix = secure ? "https" : "http";
+  // this.printerURL = new URL(`${httpPrefix}://${host}:${port}`).href;
+  // this.camURL = new URL(`${httpPrefix}://${host}:${port}`).href;
+  // this.webSocketURL = new URL(`${wsPrefix}://${host}:${port}`).href;
+  // }
+
+  // Modeled by database: dont cache
+  // printerName => saved to db
+  // powerSettings = getPowerSettingsDefault(); => saved to db, dont cache
+  // costSettings = getCostSettingsDefault(); => saved to db, dont cache
+  // ip;
+  // port;
+  // printerURL;
+  // webSocketURL;
+  // camURL;
+  // feedRate = 100;
+  // flowRate = 100;
+  // sortIndex = null; // Yes this is a design change
+  // group = "";
+  // currentIdle = 0;
+  // currentActive = 0;
+  // currentOffline = 0;
+  // currentUser
+  // selectedFilament = []; // TODO This is not set to Array in schema?
+  // octoPrintVersion = "";
+  // tempTriggers = {
+  //   heatingVariation: 1,
+  //   coolDown: 30
+  // };
+  // dateAdded = Date.now(); // ! some weird undefined check
+  // settingsAppearance; // ! startup migration to rename 'settingsApperance'
+
+  // async saveStatePersisted() {
+  //   const printer = await Printers.findById(id);
+  //   printer.octoPrintVersion = this.octoPrintVersion;
+  //   printer.printerName = this.printerName;
+  //   printer.camURL = this.camURL;
+  //   printer.printerURL = this.printerURL;
+  //   printer.webSocketURL = this.webSocketURL;
+  //   printer.feedRate = this.feedRate;
+  //   printer.flowRate = this.flowRate;
+  //   printer.sortIndex = this.sortIndex;
+  //   printer.tempTriggers = this.tempTriggers;
+  //   printer.dateAdded = this.dateAdded;
+  //   printer.currentIdle = this.currentIdle;
+  //   printer.currentActive = this.currentActive;
+  //   printer.currentOffline = this.currentOffline;
+  //   printer.selectedFilament = this.selectedFilament;
+  //   printer.powerSettings = this.powerSettings;
+  //   printer.alerts = this.alerts;
+  //   printer.costSettings = this.costSettings;
+  //   await printer.save();
+  // }
+
+  static updateSortIndex = async (printerId, sortIndex) => {
+    const filter = { _id: printerId };
+    const update = { sortIndex };
+    await Printers.findOneAndUpdate(filter, update, {
+      returnOriginal: false
+    });
+  };
+
+  static savePrinterAdminUsername = async (id, opAdminUserName) => {
+    const printer = printerModel.findById(id);
+    if (!printer) {
+      throw new NotFoundException(`The printer with ID ${id} does not exist in database.`);
+    }
+
+    printer.currentUser = opAdminUserName;
+    printer.markModified("currentUser");
+    await printer.updateOne();
+  };
+
+  list = async () => {
+    return printerModel.find({});
+  };
+}
+
+module.exports = PrinterService;

@@ -64,7 +64,7 @@ let searchForDevicesOnNetwork = async function () {
   function x() {
     return new Promise(function (resolve, reject) {
       setTimeout(function () {
-        ssdp.close;
+        ssdp.close();
         resolve(discoveredDevices);
       }, 20001);
     });

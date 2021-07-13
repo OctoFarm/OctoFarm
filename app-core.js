@@ -147,7 +147,7 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
 
     await ClientSettings.init();
 
-    const { Runner } = require("./server_src/runners/state.js");
+    const { Runner } = require("./server_src/state/state.js");
     await Runner.init();
 
     OctoFarmTasks.BOOT_TASKS.forEach((task) =>

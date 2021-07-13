@@ -16,7 +16,7 @@ describe("State", () => {
   const {
     OctoprintApiService
   } = require("../../../server_src/services/octoprint/octoprint-api.service");
-  const { Runner } = require("../../../server_src/runners/state");
+  const { Runner } = require("../../../server_src/state/state");
 
   it("should init with 0 printers", async () => {
     // Requires system settings to be present

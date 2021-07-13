@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
 // User Modal
-const runner = require("../runners/state.js");
+const runner = require("../state/state.js");
 
 const { Runner } = runner;
 const Logger = require("../lib/logger.js");
@@ -158,7 +158,7 @@ router.post("/updatePrinterSettings", ensureAuthenticated, async (req, res) => {
 router.post("/runner/checkOffline", ensureAuthenticated, async (req, res) => {
   const printers = await Runner.returnFarmPrinters();
   for (let i = 0; i < printers.length; i++) {
-    const reset = await Runner.reScanOcto(i);
+    await Runner.reScanOcto(i);
   }
   res.send({
     printers: "All",
@@ -179,12 +179,7 @@ router.post("/moveFile", ensureAuthenticated, async (req, res) => {
 router.post("/moveFolder", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   logger.info("Move folder request: ", data);
-  Runner.moveFolder(
-    data.index,
-    data.oldFolder,
-    data.newFullPath,
-    data.folderName
-  );
+  Runner.moveFolder(data.index, data.oldFolder, data.newFullPath, data.folderName);
   res.send({ msg: "success" });
 });
 router.post("/newFolder", ensureAuthenticated, async (req, res) => {
@@ -253,9 +248,7 @@ router.get("/pluginList/:id", ensureAuthenticated, async (req, res) => {
   }
 });
 router.get("/scanNetwork", ensureAuthenticated, async (req, res) => {
-  const {
-    searchForDevicesOnNetwork
-  } = require("../../server_src/runners/autoDiscovery.js");
+  const { searchForDevicesOnNetwork } = require("../../server_src/runners/autoDiscovery.js");
 
   let devices = await searchForDevicesOnNetwork();
 

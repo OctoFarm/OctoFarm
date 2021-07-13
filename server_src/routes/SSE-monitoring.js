@@ -16,7 +16,7 @@ const SettingsClean = settingsClean.SettingsClean;
 const { getSorting, getFilter } = require("../lib/sorting.js");
 const { writePoints } = require("../lib/influxExport.js");
 // User Modal
-const runner = require("../runners/state.js");
+const runner = require("../state/state.js");
 const Runner = runner.Runner;
 
 let clients = [];

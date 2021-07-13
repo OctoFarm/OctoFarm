@@ -51,9 +51,8 @@ class HistoryCollection {
   /**
    * Without dependency injection this is what we've got
    * @param service
-   * @returns {Promise<void>}
    */
-  static async inject(service) {
+  static inject(service) {
     this.octoPrintService = service;
   }
 

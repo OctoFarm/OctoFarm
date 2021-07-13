@@ -13,7 +13,7 @@ const { AppConstants } = require("../app.constants");
 const {
   getDefaultDashboardSettings
 } = require("../lib/providers/settings.constants");
-const { Runner } = require("../runners/state");
+const { Runner } = require("../state/state");
 const { fetchMongoDBConnectionString } = require("../../app-env");
 const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean");

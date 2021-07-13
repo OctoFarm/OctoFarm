@@ -1,5 +1,5 @@
 const softwareUpdateChecker = require("./services/octofarm-update.service");
-const { Runner } = require("./runners/state");
+const { Runner } = require("./state/state");
 const { FilamentClean } = require("./lib/dataFunctions/filamentClean");
 const { initHistoryCache } = require("./cache/history.cache");
 const { TaskPresets } = require("./task.presets");
@@ -11,10 +11,7 @@ const PRINTER_CLEAN_TASK = async () => {
   await PrinterClean.sortCurrentOperations(printersInformation);
 
   await PrinterClean.statisticsStart();
-  await PrinterClean.createPrinterList(
-    printersInformation,
-    serverSettings.filamentManager
-  );
+  await PrinterClean.createPrinterList(printersInformation, serverSettings.filamentManager);
 };
 
 const CRASH_TEST_TASK = async () => {
@@ -37,10 +34,64 @@ const GITHUB_UPDATE_CHECK_TASK = async () => {
   });
 };
 
+const WEBSOCKET_HEARTBEAT_TASK = () => {
+  // farmPrinters.forEach(function each(client) {
+  //   if (
+  //     typeof client.ws !== "undefined" &&
+  //     typeof client.ws.isAlive !== "undefined"
+  //   ) {
+  //     if (
+  //       client.ws.instance.readyState !== 0 &&
+  //       client.ws.instance.readyState !== 2 &&
+  //       client.ws.instance.readyState !== 3
+  //     ) {
+  //       PrinterTicker.addIssue(
+  //         new Date(),
+  //         farmPrinters[client.ws.index].printerURL,
+  //         "Sending ping message to websocket...",
+  //         "Active",
+  //         farmPrinters[client.ws.index]._id
+  //       );
+  //       if (client.ws.isAlive === false) return client.ws.instance.terminate();
+  //
+  //       // Retry connecting if failed...
+  //       farmPrinters[client.ws.index].webSocket = "info";
+  //       farmPrinters[client.ws.index].webSocketDescription =
+  //         "Checking if Websocket is still alive";
+  //       client.ws.isAlive = false;
+  //       client.ws.instance.ping(noop);
+  //     }
+  //   }
+  // });
+};
 
 const STATE_TRACK_COUNTERS = async () => {
   await Runner.trackCounters();
 };
+
+// TODO we'll have to pool this with a network, event-loop or CPU budget in mind
+const STATE_SETUP_WEBSOCKETS = async () => {
+  for (let i = 0; i < farmPrinters.length; i++) {
+    // Make sure runners are created ready for each printer to pass between...
+    await Runner.setupWebSocket(farmPrinters[i]._id);
+    PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
+  }
+  // FilamentClean.start(systemSettings.filamentManager);
+};
+
+const STATE_PRINTER_GENERATE_TASK = async () => {
+  for (let index = 0; index < farmPrinters.length; index++) {
+    if (typeof farmPrinters[index] !== "undefined") {
+      PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
+    }
+  }
+};
+
+const DATABASE_MIGRATIONS_TASK = async () => {
+  // const migrations = require("./migrations");
+  // console.log(migrations);
+};
+
 /**
  * See an overview of this pattern/structure here https://www.youtube.com/watch?v=dQw4w9WgXcQ
  * @param task
@@ -60,6 +111,10 @@ function KsatLlorKcir(task, preset, milliseconds = 0) {
 class OctoFarmTasks {
   static BOOT_TASKS = [
     KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
+    KsatLlorKcir(DATABASE_MIGRATIONS_TASK, TaskPresets.RUNONCE),
+    // KsatLlorKcir(STATE_SETUP_WEBSOCKETS, TaskPresets.RUNDELAYED, 5000),
+    KsatLlorKcir(STATE_PRINTER_GENERATE_TASK, TaskPresets.RUNDELAYED, 10000),
+    KsatLlorKcir(STATE_PRINTER_GENERATE_TASK, TaskPresets.PERIODIC, 20000),
     KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.RUNDELAYED, 1000),

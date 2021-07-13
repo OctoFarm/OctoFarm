@@ -1,6 +1,6 @@
 "use strict";
 
-const printerGroupModel = require("../models/PrinterGroup");
+const PrinterGroupModel = require("../models/PrinterGroup");
 const printerService = require("../services/printer.service");
 const _ = require("lodash");
 const PrinterGroup = require("../models/PrinterGroup");
@@ -13,7 +13,7 @@ const PrinterGroup = require("../models/PrinterGroup");
 async function create(printerGroup) {
   if (!printerGroup) throw new Error("Missing printer-group");
 
-  return printerGroupModel.create(printerGroup);
+  return PrinterGroupModel.create(printerGroup);
 }
 
 /**
@@ -21,14 +21,14 @@ async function create(printerGroup) {
  * @param {Object} printerGroup object to create.
  */
 async function update(printerGroup) {
-  return await printerGroupModel.update(printerGroup);
+  return await PrinterGroupModel.update(printerGroup);
 }
 
 /**
  * Lists the printer groups present in the database.
  */
 async function list() {
-  return await printerGroupModel.find({});
+  return await PrinterGroupModel.find({});
 }
 
 /**
@@ -61,7 +61,7 @@ async function syncPrinterGroups() {
     }
   }
 
-  return await printerGroupModel.find({});
+  return await PrinterGroupModel.find({});
 }
 
 module.exports = {
