@@ -1,3 +1,4 @@
+jest.mock("../../../server_src/services/octoprint/octoprint-api.service");
 const dbHandler = require("../../db-handler");
 const { ensureSystemSettingsInitiated } = require("../../../app-core");
 
@@ -12,7 +13,6 @@ afterAll(async () => {
 });
 
 describe("State", () => {
-  jest.mock("../../../server_src/services/octoprint/octoprint-api.service");
   const {
     OctoprintApiService
   } = require("../../../server_src/services/octoprint/octoprint-api.service");
@@ -21,8 +21,7 @@ describe("State", () => {
   it("should init with 0 printers", async () => {
     // Requires system settings to be present
     // Will start generating printers, setting up websockets and cleaning Filament.
-    const response = await Runner.init();
-    expect(response).toEqual(`System Runner has checked over ${0} printers...`);
+    await Runner.init();
   });
 
   it("should be able to detect falsy api key response from OctoPrint using 'compareEnteredKeyToGlobalKey'", async () => {

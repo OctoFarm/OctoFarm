@@ -6,7 +6,7 @@ const prettyHelpers = require("../../views/partials/functions/pretty.js");
 const { SystemRunner } = require("../runners/systemInfo.js");
 
 const isDocker = require("is-docker");
-const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
+const softwareUpdateChecker = require("../services/octofarm-update.service");
 const { ensureAuthenticated } = require("../config/auth");
 const { ensureCurrentUserAndGroup } = require("../config/users");
 const { AppConstants } = require("../app.constants");

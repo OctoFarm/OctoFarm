@@ -90,18 +90,19 @@ class FileClean {
   }
 
   static generate(farmPrinter, selectedFilament) {
-    logger.info("Running File Cleaning");
     const { fileList, sortIndex } = farmPrinter;
 
     if (!fileList) {
-      logger.error("File Cleaner failed: farmPrinter:fileList not defined.");
+      logger.error(
+        "Printer File Cleaner failed: farmPrinter:fileList not defined."
+      );
       return;
     }
 
     // NaN, object, undefined here
     if (Number.isNaN(sortIndex) || isNaN(sortIndex)) {
       logger.error(
-        `File Cleaner failed: farmPrinter:sortIndex is NaN (${sortIndex})`
+        `Printer File Cleaner failed: farmPrinter:sortIndex is NaN (${sortIndex})`
       );
       return;
     }
@@ -109,7 +110,7 @@ class FileClean {
     // null, string caught here
     if (!sortIndex && !Number.isInteger(sortIndex)) {
       logger.error(
-        `File Cleaner failed: farmPrinter:sortIndex not defined (${sortIndex})`
+        `Printer File Cleaner failed: farmPrinter:sortIndex not defined (${sortIndex})`
       );
       return;
     }

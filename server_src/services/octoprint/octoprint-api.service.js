@@ -50,8 +50,6 @@ class OctoprintApiService {
    */
   async getRetry(printerURL, apiKey, item) {
     try {
-      const message = `Connecting to OctoPrint API: ${item} | ${printerURL}`;
-      logger.info(`${message} | timeout: ${this.timeout.apiTimeout}`);
       return await this.get(printerURL, apiKey, item);
     } catch (err) {
       const message = `Error connecting to OctoPrint API: ${item} | ${printerURL}`;

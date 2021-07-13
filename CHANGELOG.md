@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ### Added
     - Task scheduler: runs periodic tasks for OctoFarm in a controllable, periodic manner.
     - Added line counter to ticker log
+    - Refactored task manager so it becomes easier to use
 
 ### Changed
     - File manager: gave printer titles a badge. Gave selected printer a yellow border. Reduced file list minimum height (for smaller screens). 
@@ -17,6 +18,7 @@ All notable changes to this project will be documented in this file.
     - Moved the "API Errors" button, now appears on the start of a printer row and clicking will take you straight into Printer Settings.
     - Refactor monitoring pages (panel, list, camera) with latest SSE client reusability.
     - Refine the printer map layout with borders and printer quick actions (page not public yet).
+    - Reduced logging (we will bring it back later in different shape with an Exception handler)
 
 ### Removed
 

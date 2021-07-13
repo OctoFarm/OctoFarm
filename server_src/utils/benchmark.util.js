@@ -27,6 +27,9 @@ async function bench(cb, report = false) {
   } else return result;
 }
 
+function noop() {}
+
 module.exports = {
-  bench
+  bench,
+  noop
 };

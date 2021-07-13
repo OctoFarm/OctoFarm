@@ -1,6 +1,7 @@
 const rootPath = "../../../";
 const testPath = "../../";
 const dbHandler = require(testPath + "db-handler");
+jest.mock(rootPath + "server_src/services/octoprint/octoprint-api.service");
 const { ensureSystemSettingsInitiated } = require(rootPath + "app-core");
 
 beforeAll(async () => {
@@ -17,7 +18,6 @@ afterAll(async () => {
 });
 
 describe("OctoPrint-API-Client-Service", () => {
-  jest.mock(rootPath + "server_src/services/octoprint/octoprint-api.service");
   const { OctoprintApiClientService } = require(rootPath +
     "server_src/services/octoprint/octoprint-api-client.service");
 

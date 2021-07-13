@@ -1,6 +1,6 @@
 const Logger = require("../lib/logger.js");
 const { AppConstants } = require("../app.constants");
-const { getGithubReleasesPromise } = require("./githubClient");
+const { getGithubReleasesPromise } = require("./github-client.service");
 
 const logger = new Logger("OctoFarm-SoftwareUpdateChecker");
 let lastSuccessfulReleaseCheckMoment = null;
@@ -61,14 +61,21 @@ async function syncLatestOctoFarmRelease(includePrereleases = false) {
             lastReleaseCheckFailed = false;
             notificationReady = false;
           } else {
+            console.log(
+              "Latest release check failed because latestRelease not set"
+            );
             lastReleaseCheckFailed = true;
           }
         } else {
+          console.log(
+            "Latest release check failed because releases from gitty empty"
+          );
           lastReleaseCheckFailed = true;
         }
       }
     })
     .catch((e) => {
+      logger.error(e);
       lastReleaseCheckError = e;
       lastReleaseCheckFailed = true;
     });

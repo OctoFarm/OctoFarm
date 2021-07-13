@@ -1,5 +1,7 @@
 const { AppConstants } = require("../../app.constants");
-const githubClient = jest.createMockFromModule("../githubClient");
+const githubClientService = jest.createMockFromModule(
+  "../github-client.service"
+);
 
 /**
  * Test version of: connection-safe acquire data about the installed and latest released OctoFarm versions.
@@ -21,5 +23,5 @@ async function getGithubReleasesPromise(includePrereleases = false) {
   ]);
 }
 
-githubClient.getGithubReleasesPromise = getGithubReleasesPromise;
-module.exports = githubClient;
+githubClientService.getGithubReleasesPromise = getGithubReleasesPromise;
+module.exports = githubClientService;

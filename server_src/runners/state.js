@@ -10,7 +10,7 @@ const Printers = require("../models/Printer.js");
 const Filament = require("../models/Filament.js");
 const TempHistory = require("../models/TempHistory.js");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
-const softwareUpdateChecker = require("./softwareUpdateChecker");
+const softwareUpdateChecker = require("../services/octofarm-update.service");
 
 const {
   OctoprintApiClientService
@@ -32,7 +32,6 @@ let farmPrinters = [];
 let farmPrintersGroups = [];
 let systemSettings = {};
 
-const countersInterval = false;
 const printersInformation = false;
 let timeout = null;
 if (printersInformation === false) {
@@ -56,12 +55,6 @@ if (printersInformation === false) {
       }
     }
   }, 10000);
-}
-
-if (countersInterval === false) {
-  setInterval(async () => {
-    Runner.trackCounters();
-  }, 30000);
 }
 
 function WebSocketClient() {
@@ -451,8 +444,6 @@ WebSocketClient.prototype.reconnect = async function (e) {
 };
 
 WebSocketClient.prototype.onopen = async function (e) {
-  // eslint-disable-next-line prefer-rest-params
-  logger.info("WebSocketClient: open", arguments, `${this.index}: ${this.url}`);
   const Polling = systemSettings.onlinePolling;
   const data = {};
   const throt = {};
@@ -460,8 +451,7 @@ WebSocketClient.prototype.onopen = async function (e) {
     farmPrinters[this.index].sessionKey
   }`;
   throt.throttle = parseInt((Polling.seconds * 1000) / 500);
-  // Send User Auth
-  logger.info(`Sending Auth to Websocket: ${this.index}: ${this.url} `, data);
+
   this.instance.send(JSON.stringify(data));
   this.instance.send(JSON.stringify(throt));
   PrinterTicker.addIssue(
@@ -481,7 +471,6 @@ WebSocketClient.prototype.onopen = async function (e) {
 
 WebSocketClient.prototype.onmessage = async function (data, flags, number) {
   try {
-    // console.log("WebSocketClient: message",arguments);
     // Listen for print jobs
     farmPrinters[this.index].hostState = "Online";
     farmPrinters[this.index].hostStateColour = Runner.getColour("Online");
@@ -905,17 +894,7 @@ WebSocketClient.prototype.onerror = function (e) {
       "Couldn't delete old listeners... must not exist."
     );
   }
-  // PrinterTicker.addIssue(
-  //   new Date(),
-  //   farmPrinters[this.index].printerURL,
-  //   "Client error, setting back up...",
-  //   "Offline",
-  //   farmPrinters[this.index]._id
-  // );
-  // setTimeout(async () => {
-  //   Runner.reScanOcto(farmPrinters[this.index]._id);
-  //   logger.info("Error with websockets... resetting up!");
-  // }, 10000);
+
   if (typeof farmPrinters[this.index] !== "undefined") {
     //Reset job to null on error...
     farmPrinters[this.index].job = null;
@@ -984,7 +963,6 @@ class Runner {
       farmPrinters = await Printers.find({}, null, {
         sort: { sortIndex: 1 }
       });
-      logger.info(`Grabbed ${farmPrinters.length} for checking`);
 
       for (let i = 0; i < farmPrinters.length; i++) {
         // Make sure runners are created ready for each printer to pass between...
@@ -1010,7 +988,6 @@ class Runner {
       }
       // FilamentClean.start(systemSettings.filamentManager);
     }, 5000);
-    return `System Runner has checked over ${farmPrinters.length} printers...`;
   }
 
   static async compareEnteredKeyToGlobalKey(printer) {
@@ -1093,8 +1070,9 @@ class Runner {
       if (users.status === 200) {
         farmPrinters[i].systemChecks.scanning.api.status = "success";
         farmPrinters[i].systemChecks.scanning.api.date = new Date();
+
         users = await users.json();
-        logger.info("users: ", users);
+
         if (_.isEmpty(users)) {
           farmPrinters[i].currentUser = "admin";
           farmPrinters[i].markModified("currentUser");
@@ -1115,12 +1093,12 @@ class Runner {
           "Active",
           farmPrinters[i]._id
         );
-        logger.info("Chosen user:", farmPrinters[i].currentUser);
+
         const sessionKey = await this.octoPrintService.login(
           farmPrinters[i],
           true
         );
-        logger.info("Session Response", sessionKey);
+
         if (sessionKey.status === 200) {
           PrinterTicker.addIssue(
             new Date(),
@@ -1130,7 +1108,7 @@ class Runner {
             farmPrinters[i]._id
           );
           const sessionJson = await sessionKey.json();
-          logger.info("sessionKey JSON:", sessionJson);
+
           farmPrinters[i].sessionKey = sessionJson.session;
           // Update info via API
           farmPrinters[i].hostState = "Online";
@@ -1432,7 +1410,7 @@ class Runner {
       "Active",
       farmPrinters[i]._id
     );
-    logger.info(`Setting up defaults for Printer: ${printer.printerURL}`);
+
     farmPrinters[i].state = "Setting Up";
     farmPrinters[i].stateColour = Runner.getColour("Offline");
     farmPrinters[i].hostState = "Setting Up";
@@ -1787,6 +1765,7 @@ class Runner {
       }
     }
   }
+
   static async reGenerateSortIndex() {
     for (let p = 0; p < farmPrinters.length; p++) {
       await logger.info(
@@ -2689,7 +2668,6 @@ class Runner {
           farmPrinters[index].settingsAppearance.name = res.appearance.name;
         }
         if (res.plugins["pi_support"]) {
-          logger.info("Detected Pi Support!");
           PrinterTicker.addIssue(
             new Date(),
             farmPrinters[index].printerURL,
@@ -2702,12 +2680,12 @@ class Runner {
             farmPrinters[index]
           );
           piSupport = await piSupport.json();
-          logger.info("Got from endpoint: ", piSupport);
+
           farmPrinters[index].octoPi = {
             model: piSupport.model,
             version: piSupport.octopi_version
           };
-          logger.info("I captured: ", farmPrinters[index].octoPi);
+
           PrinterTicker.addIssue(
             new Date(),
             farmPrinters[index].printerURL,
@@ -2899,6 +2877,7 @@ class Runner {
         return false;
       });
   }
+
   // Patch for updating OctoPrint's settings for now until re-work of printer cache with state.js.
   static async getLatestOctoPrintSettingsValues(id) {
     const index = _.findIndex(farmPrinters, function (o) {

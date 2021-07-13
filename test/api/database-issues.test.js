@@ -12,7 +12,7 @@ async function setupDatabaseIssueApp() {
   await serveDatabaseIssueFallbackRoutes(server);
 }
 
-jest.mock("../../server_src/runners/githubClient");
+jest.mock("../../server_src/services/github-client.service");
 
 describe("DatabaseIssue server", () => {
   it("should return database issue page when no database is connected", async () => {
