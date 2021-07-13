@@ -11,10 +11,14 @@
 // );
 
 class TASK_PRESETS {
-  static PERIODIC_2500MS = {
+  static PERIODIC = {
     periodic: true,
     logFirstCompletion: true,
-    runImmediately: true,
+    runImmediately: false // Just like setInterval
+  };
+
+  static PERIODIC_2500MS = {
+    ...this.PERIODIC,
     milliseconds: 2500
   };
 
@@ -24,11 +28,10 @@ class TASK_PRESETS {
     runImmediately: true
   };
 
-  static RUNDELAYED_1000MS = {
+  static RUNDELAYED = {
     runDelayed: true, // not optional
     logFirstCompletion: true,
     runImmediately: false,
-    milliseconds: 1000,
     seconds: 0 // other timing units will be ignored (by design)
   };
 }

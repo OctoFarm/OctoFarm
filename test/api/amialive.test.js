@@ -13,7 +13,7 @@ beforeAll(async () => {
   request = supertest(server);
 });
 
-jest.mock("../../server_src/runners/githubClient");
+jest.mock("../../server_src/services/github-client.service");
 const softwareUpdateChecker = require("../../server_src/services/octofarm-update.service");
 
 describe("AmIAlive Endpoint", () => {

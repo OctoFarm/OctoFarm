@@ -32,7 +32,6 @@ let farmPrinters = [];
 let farmPrintersGroups = [];
 let systemSettings = {};
 
-const countersInterval = false;
 const printersInformation = false;
 let timeout = null;
 if (printersInformation === false) {
@@ -56,12 +55,6 @@ if (printersInformation === false) {
       }
     }
   }, 10000);
-}
-
-if (countersInterval === false) {
-  setInterval(async () => {
-    Runner.trackCounters();
-  }, 30000);
 }
 
 function WebSocketClient() {

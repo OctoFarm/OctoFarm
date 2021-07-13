@@ -1,4 +1,5 @@
 const softwareUpdateChecker = require("./services/octofarm-update.service");
+const { Runner } = require("./runners/state");
 const { FilamentClean } = require("./lib/dataFunctions/filamentClean");
 const { initHistoryCache } = require("./cache/history.cache");
 const { TaskPresets } = require("./task.presets");
@@ -36,13 +37,19 @@ const GITHUB_UPDATE_CHECK_TASK = async () => {
   });
 };
 
+
+const STATE_TRACK_COUNTERS = async () => {
+  await Runner.trackCounters();
+};
 /**
  * See an overview of this pattern/structure here https://www.youtube.com/watch?v=dQw4w9WgXcQ
  * @param task
  * @param preset
+ * @param milliseconds optional parameter to quickly set milliseconds timing
  * @returns {{task, id, preset}}
  */
-function KsatLlorKcir(task, preset) {
+function KsatLlorKcir(task, preset, milliseconds = 0) {
+  preset.milliseconds = preset.milliseconds || milliseconds;
   return {
     id: task.name,
     task,
@@ -55,7 +62,8 @@ class OctoFarmTasks {
     KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
     KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNONCE),
-    KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.RUNDELAYED_1000MS)
+    KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.RUNDELAYED, 1000),
+    KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000)
   ];
 }
 

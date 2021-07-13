@@ -6,11 +6,7 @@ const passport = require("passport");
 const ServerSettingsDB = require("./server_src/models/ServerSettings");
 const expressLayouts = require("express-ejs-layouts");
 const Logger = require("./server_src/lib/logger.js");
-const softwareUpdateChecker = require("./server_src/services/octofarm-update.service");
 const { OctoFarmTasks } = require("./server_src/tasks");
-const { TaskPresets } = require("./server_src/task.presets");
-const { PRINTER_CLEAN_TASK } = require("./server_src/tasks");
-const { initHistoryCache } = require("./server_src/cache/history.cache");
 const {
   optionalInfluxDatabaseSetup
 } = require("./server_src/lib/influxExport.js");
@@ -21,9 +17,6 @@ const {
 const { ServerSettings } = require("./server_src/settings/serverSettings.js");
 const { ClientSettings } = require("./server_src/settings/clientSettings.js");
 const { TaskManager } = require("./server_src/runners/task.manager");
-const {
-  FilamentClean
-} = require("./server_src/lib/dataFunctions/filamentClean.js");
 
 function setupExpressServer() {
   let app = express();
