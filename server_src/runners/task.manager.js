@@ -1,63 +1,168 @@
-const TaskScheduler = require("./task.scheduler");
 const Logger = require("../lib/logger.js");
+const { JobValidationException } = require("../exceptions/job.exceptions");
+const {
+  ToadScheduler,
+  SimpleIntervalJob,
+  AsyncTask
+} = require("toad-scheduler");
 
 const logger = new Logger("OctoFarm-TaskManager");
 
-// Test or example task
-// TaskManager.registerAsyncTask("unique_test_task1", 10000, async () => {
-//   await new Promise((resolve) => {
-//     setTimeout(() => resolve(), 9000);
-//   });
-// });
-
 /**
- * Manage recurring server tasks
+ * Manage immediate or delayed tasks and recurring jobs.
+ * Note: this class ought NOT TO BE USED FOR SYNCHRONOUS REQUEST MIDDLEWARE
  */
 class TaskManager {
-  static taskScheduler = new TaskScheduler();
-  static taskMetrics = {};
+  static jobScheduler = new ToadScheduler();
+  static bootUpTasks = [];
+  static taskStates = {};
 
-  static registerAsyncTask(uniqueTaskID, milliseconds, asyncTaskCallback) {
-    if (!uniqueTaskID) {
-      throw "TaskManager requires a unique task ID to be able to track performance";
+  static validateInput(taskId, workload, schedulerOptions) {
+    if (!taskId) {
+      throw new JobValidationException(
+        "Task ID was not provided. Cant register task or schedule job."
+      );
+    }
+    if (!!this.taskStates[taskId]) {
+      throw new JobValidationException(
+        `Task ID with taskId '${taskId}' was already registered. Cant register a key twice.`,
+        taskId
+      );
+    }
+    if (typeof workload !== "function") {
+      throw new JobValidationException(
+        `Job '${
+          workload.name || "anonymous"
+        }' with taskId '${taskId}' is not a callable function and can't be scheduled.`,
+        taskId
+      );
     }
 
-    const wrappedTask = this.wrapTaskWithTimer(
-      uniqueTaskID,
-      milliseconds,
-      asyncTaskCallback
-    );
-    this.taskScheduler.createTask(
-      uniqueTaskID,
-      { milliseconds: milliseconds },
-      wrappedTask,
-      this.getTaskErrorHandler(uniqueTaskID)
-    );
+    if (
+      !schedulerOptions?.periodic &&
+      !schedulerOptions?.runOnce &&
+      !schedulerOptions?.runDelayed
+    ) {
+      throw new JobValidationException(
+        `Provide 'periodic' or 'runOnce' or 'runDelayed' option'`,
+        taskId
+      );
+    }
+    if (
+      schedulerOptions?.runDelayed &&
+      !schedulerOptions.milliseconds &&
+      !schedulerOptions.seconds
+    ) {
+      // Require milliseconds, minutes, hours or days
+      throw new JobValidationException(
+        `Provide a delayed timing parameter (milliseconds|seconds)'`,
+        taskId
+      );
+    }
+    if (
+      schedulerOptions?.periodic &&
+      !schedulerOptions.milliseconds &&
+      !schedulerOptions.seconds &&
+      !schedulerOptions.minutes &&
+      !schedulerOptions.hours &&
+      !schedulerOptions.days
+    ) {
+      // Require milliseconds, minutes, hours or days
+      throw new JobValidationException(
+        `Provide a periodic timing parameter (milliseconds|seconds|minutes|hours|days)'`,
+        taskId
+      );
+    }
   }
 
-  static wrapTaskWithTimer(identifier, milliseconds, handler) {
-    return async () => {
-      let metricContainer = TaskManager.taskMetrics[identifier];
-      metricContainer = { started: Date.now() };
-      await handler();
-      metricContainer.finished = Date.now();
-      metricContainer.duration =
-        metricContainer.finished - metricContainer.started;
+  /**
+   * Create a recurring job
+   * Tip: use the options properties `runImmediately` and `seconds/milliseconds/minutes/hours/days`
+   */
+  static registerJobOrTask({
+    id: taskID,
+    task: asyncTaskCallback,
+    preset: schedulerOptions
+  }) {
+    try {
+      this.validateInput(taskID, asyncTaskCallback, schedulerOptions);
+    } catch (e) {
+      logger.error(e, schedulerOptions);
+      return;
+    }
+    const timedTask = this.getSafeTimedTask(taskID, asyncTaskCallback);
 
-      // No logging of extremely repeatable logs
-      const report = `Task ${identifier} with period ${milliseconds} finished. [Duration ${metricContainer.duration} ms]`;
-      if (milliseconds > 40000) {
-        logger.info(report);
-      } else if (milliseconds > 20000) {
-        console.log(report);
-      }
+    this.taskStates[taskID] = {
+      options: schedulerOptions
     };
+
+    if (schedulerOptions.runOnce) {
+      timedTask.execute();
+    } else if (schedulerOptions.runDelayed) {
+      const delay =
+        (schedulerOptions.milliseconds || 0) +
+        (schedulerOptions.seconds || 0) * 1000;
+      this.runTimeoutTaskInstance(taskID, timedTask, delay);
+    } else {
+      const job = new SimpleIntervalJob(schedulerOptions, timedTask);
+      this.jobScheduler.addSimpleIntervalJob(job);
+    }
   }
 
-  static getTaskErrorHandler(task) {
+  static runTimeoutTaskInstance(taskID, task, timeoutMs) {
+    logger.info(`Running delayed task ${taskID} in ${timeoutMs}ms`);
+    setTimeout(() => task.execute(), timeoutMs, taskID);
+  }
+
+  static getSafeTimedTask(taskId, handler) {
+    const asyncHandler = async () => {
+      await this.timeTask(taskId, handler);
+    };
+
+    return new AsyncTask(taskId, asyncHandler, this.getErrorHandler(taskId));
+  }
+
+  static async timeTask(taskId, handler) {
+    let taskState = this.taskStates[taskId];
+    taskState.started = Date.now();
+
+    await handler();
+    taskState.duration = Date.now() - taskState.started;
+
+    if (
+      taskState.options?.logFirstCompletion !== false &&
+      !taskState?.firstCompletion
+    ) {
+      logger.info(
+        `Task '${taskId}' first completion. Duration ${taskState.duration}ms`
+      );
+      taskState.firstCompletion = Date.now();
+    }
+  }
+
+  static getTaskState(taskId) {
+    return this.taskStates[taskId];
+  }
+
+  static getErrorHandler(taskId) {
     return (error) => {
-      console.log("task failed:", error);
+      const registration = this.taskStates[taskId];
+
+      if (!registration.lastError)
+        registration.erroredlastError = {
+          time: Date.now(),
+          error
+        };
+
+      logger.error(`Task '${taskId}' threw an exception:` + error.stack);
     };
+  }
+
+  /**
+   * Stops the tasks which were registered
+   */
+  static stopSchedulerTasks() {
+    this.jobScheduler.stop();
   }
 }
 

@@ -16,7 +16,7 @@ const {
   getDefaultDashboardSettings
 } = require("../lib/providers/settings.constants");
 const { getHistoryCache } = require("../cache/history.cache");
-const softwareUpdateChecker = require("../runners/softwareUpdateChecker");
+const softwareUpdateChecker = require("../services/octofarm-update.service");
 
 const version = process.env[AppConstants.VERSION_KEY];
 

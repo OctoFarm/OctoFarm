@@ -6,8 +6,7 @@ const passport = require("passport");
 const ServerSettingsDB = require("./server_src/models/ServerSettings");
 const expressLayouts = require("express-ejs-layouts");
 const Logger = require("./server_src/lib/logger.js");
-const softwareUpdateChecker = require("./server_src/runners/softwareUpdateChecker");
-const { initHistoryCache } = require("./server_src/cache/history.cache");
+const { OctoFarmTasks } = require("./server_src/tasks");
 const {
   optionalInfluxDatabaseSetup
 } = require("./server_src/lib/influxExport.js");
@@ -18,9 +17,6 @@ const {
 const { ServerSettings } = require("./server_src/settings/serverSettings.js");
 const { ClientSettings } = require("./server_src/settings/clientSettings.js");
 const { TaskManager } = require("./server_src/runners/task.manager");
-const {
-  FilamentClean
-} = require("./server_src/lib/dataFunctions/filamentClean.js");
 
 function setupExpressServer() {
   let app = express();
@@ -79,7 +75,6 @@ async function ensureSystemSettingsInitiated() {
   // Setup Settings as connection is established
   const serverSettingsStatus = await ServerSettings.init();
   await ClientSettings.init();
-  logger.info(serverSettingsStatus);
 
   return serverSettingsStatus;
 }
@@ -150,35 +145,14 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
     logger.info("Initialising FarmInformation...");
     await PrinterClean.initFarmInformation();
 
-    logger.info("Initialising Client Settings...");
     await ClientSettings.init();
 
-    logger.info("Initialising OctoFarm State...");
     const { Runner } = require("./server_src/runners/state.js");
-    const stateRunnerReport = await Runner.init();
-    logger.info("OctoFarm State returned", stateRunnerReport);
+    await Runner.init();
 
-    const serverSettings = require("./server_src/settings/serverSettings");
-    TaskManager.registerAsyncTask("printer_clean_runner", 2500, async () => {
-      const printersInformation = PrinterClean.listPrintersInformation();
-      await PrinterClean.sortCurrentOperations(printersInformation);
-
-      await PrinterClean.statisticsStart();
-      await PrinterClean.createPrinterList(
-        printersInformation,
-        serverSettings.filamentManager
-      );
-    });
-
-    await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
-      softwareUpdateChecker.checkReleaseAndLogUpdate();
-    });
-
-    await initHistoryCache().catch((e) => {
-      console.error("X HistoryCache failed to initiate. " + e);
-    });
-
-    await FilamentClean.start();
+    OctoFarmTasks.BOOT_TASKS.forEach((task) =>
+      TaskManager.registerJobOrTask(task)
+    );
 
     await optionalInfluxDatabaseSetup();
   }
