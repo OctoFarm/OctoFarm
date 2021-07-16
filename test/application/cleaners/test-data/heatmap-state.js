@@ -3,54 +3,18 @@ const dayName = new Intl.DateTimeFormat(["en"], {
 }).format(new Date());
 
 module.exports = {
-  zeroedHeatMap: [
+  emptyHeatmap: [
     {
       name: "Completed",
       data: [
         {
-          x: dayName,
-          y: 0,
-          figure: 0
-        }
-      ]
-    },
-    {
-      name: "Active",
-      data: [
+          x: "Wednesday",
+          y: 0
+        },
         {
           x: dayName,
           y: 0,
-          figure: 0
-        }
-      ]
-    },
-    {
-      name: "Idle",
-      data: [
-        {
-          x: dayName,
-          y: 0,
-          figure: 0
-        }
-      ]
-    },
-    {
-      name: "Offline",
-      data: [
-        {
-          x: "Friday",
-          y: 0,
-          figure: 0
-        }
-      ]
-    },
-    {
-      name: "Disconnected",
-      data: [
-        {
-          x: dayName,
-          y: 0,
-          figure: 0
+          figure: NaN
         }
       ]
     }
