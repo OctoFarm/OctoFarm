@@ -159,17 +159,14 @@ export default class FileManager {
           );
           setTimeout(async () => {
             let updatePrinter = await OctoFarmClient.getPrinter(printerInfo._id);
-            updatePrinter = await updatePrinter.json();
 
             // TODO !!!!!?????
             FileManager.refreshFiles(updatePrinter, spinnerIcon);
             setTimeout(async () => {
               let updatePrinter = await OctoFarmClient.getPrinter(printerInfo._id);
-              updatePrinter = await updatePrinter.json();
               FileManager.refreshFiles(updatePrinter, spinnerIcon);
               setTimeout(async () => {
                 let updatePrinter = await OctoFarmClient.getPrinter(printerInfo._id);
-                updatePrinter = await updatePrinter.json();
                 FileManager.refreshFiles(updatePrinter, "");
               }, 5000);
             }, 5000);
@@ -400,7 +397,7 @@ export default class FileManager {
       let printer = await OctoFarmClient.post("printers/printerInfo", {
         i: file.index
       });
-      printer = await printer.json();
+
       const fileActionBtns = document.querySelectorAll("[id*='*fileAction']");
       fileActionBtns.forEach((btn) => {
         // Gate Keeper listener for file action buttons
@@ -982,11 +979,11 @@ export class FileActions {
     const refreshBtn = document.getElementById(btn);
     const btnName = null;
     refreshBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Refreshing...';
-    const done = await OctoFarmClient.post("printers/resyncFile", {
+    const how = await OctoFarmClient.post("printers/resyncFile", {
       i: printer._id,
       fullPath
     });
-    const how = await done.json();
+
     FileManager.updateFileList(printer._id);
     refreshBtn.innerHTML = '<i class="fas fa-sync"></i> Refresh';
     const flashReturn = function () {
