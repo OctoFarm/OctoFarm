@@ -57,22 +57,18 @@ document.getElementById("restartOctoFarmBtn").addEventListener("click", (e) => {
 document.getElementById("updateOctoFarmBtn").addEventListener("click", (e) => {
   ServerSettings.updateOctoFarmCommand(false);
 });
-document
-  .getElementById("checkUpdatesForOctoFarmBtn")
-  .addEventListener("click", (e) => {
-    ServerSettings.checkForOctoFarmUpdates();
-  });
+document.getElementById("checkUpdatesForOctoFarmBtn").addEventListener("click", (e) => {
+  ServerSettings.checkForOctoFarmUpdates();
+});
 
 document.getElementById("exportAlerts").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
   ServerSettings.exportDatabases("AlertsDB");
 });
-document
-  .getElementById("exportClientSettings")
-  .addEventListener("click", (e) => {
-    // Validate Printer Form, then Add
-    ServerSettings.exportDatabases("ClientSettingsDB");
-  });
+document.getElementById("exportClientSettings").addEventListener("click", (e) => {
+  // Validate Printer Form, then Add
+  ServerSettings.exportDatabases("ClientSettingsDB");
+});
 document.getElementById("exportFilament").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
   ServerSettings.exportDatabases("FilamentDB");
@@ -89,28 +85,22 @@ document.getElementById("exportRoomData").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
   ServerSettings.exportDatabases("roomDataDB");
 });
-document
-  .getElementById("exportServerSettings")
-  .addEventListener("click", (e) => {
-    // Validate Printer Form, then Add
-    ServerSettings.exportDatabases("ServerSettingsDB");
-  });
+document.getElementById("exportServerSettings").addEventListener("click", (e) => {
+  // Validate Printer Form, then Add
+  ServerSettings.exportDatabases("ServerSettingsDB");
+});
 document.getElementById("exportUsers").addEventListener("click", (e) => {
   // Validate Printer Form, then Add
   ServerSettings.exportDatabases("UserDB");
 });
 
-document
-  .getElementById("setupTimelapseOctoPrint")
-  .addEventListener("click", async (e) => {
-    await setupOctoPrintClientsforTimelapse();
-  });
+document.getElementById("setupTimelapseOctoPrint").addEventListener("click", async (e) => {
+  await setupOctoPrintClientsforTimelapse();
+});
 
-document
-  .getElementById("logDumpGenerateBtn")
-  .addEventListener("click", async (e) => {
-    await ServerSettings.generateLogFileDump();
-  });
+document.getElementById("logDumpGenerateBtn").addEventListener("click", async (e) => {
+  await ServerSettings.generateLogFileDump();
+});
 
 async function setupOctoPrintClientsforTimelapse() {
   let printers = await OctoFarmclient.post("printers/printerInfo");
@@ -145,16 +135,11 @@ async function setupOctoPrintClientsforTimelapse() {
           };
           for (let i = 0; i < printers.length; i++) {
             if (printers[i].printerState.colour.category !== "Offline") {
-              let sett = await OctoPrintClient.post(
-                printers[i],
-                "settings",
-                settings
-              );
+              let sett = await OctoPrintClient.post(printers[i], "settings", settings);
               if (sett.status === 200) {
                 UI.createAlert(
                   "success",
-                  printers[i].printerName +
-                    ": Updated your web camera settings!",
+                  printers[i].printerName + ": Updated your web camera settings!",
                   1000,
                   "Clicked"
                 );
@@ -166,16 +151,11 @@ async function setupOctoPrintClientsforTimelapse() {
                   "Clicked"
                 );
               }
-              let time = await OctoPrintClient.post(
-                printers[i],
-                "timelapse",
-                timelapse
-              );
+              let time = await OctoPrintClient.post(printers[i], "timelapse", timelapse);
               if (time.status === 200) {
                 UI.createAlert(
                   "success",
-                  printers[i].printerName +
-                    ": Updated your timelapse settings!",
+                  printers[i].printerName + ": Updated your timelapse settings!",
                   1000,
                   "Clicked"
                 );
@@ -195,12 +175,7 @@ async function setupOctoPrintClientsforTimelapse() {
       }
     });
   } else {
-    UI.createAlert(
-      "error",
-      "Sorry OctoFarm is not responding...",
-      3000,
-      "Clicked"
-    );
+    UI.createAlert("error", "Sorry OctoFarm is not responding...", 3000, "Clicked");
   }
   // ?
   // OctoPrintClient.post;
@@ -212,12 +187,7 @@ document.getElementById("resetDashboardBtn").addEventListener("click", (e) => {
   if (serializedData !== null && serializedData.length !== 0) {
     localStorage.removeItem("dashboardConfiguration");
   }
-  UI.createAlert(
-    "success",
-    "Dashboard data cleared from browser",
-    3000,
-    "clicked"
-  );
+  UI.createAlert("success", "Dashboard data cleared from browser", 3000, "clicked");
 });
 
 let oldServerSettings = {};
@@ -424,10 +394,7 @@ const optionsCPU = {
     }
   }
 };
-const systemChartCPU = new ApexCharts(
-  document.querySelector("#systemChartCPU"),
-  optionsCPU
-);
+const systemChartCPU = new ApexCharts(document.querySelector("#systemChartCPU"), optionsCPU);
 systemChartCPU.render();
 const systemChartMemory = new ApexCharts(
   document.querySelector("#systemChartMemory"),
@@ -494,17 +461,13 @@ class ClientSettings {
       })
       .then((res) => {
         // localStorage.setItem("clientSettings", JSON.stringify(res));
-        document.getElementById("panelCurrentOpOn").checked =
-          res.panelView.currentOp;
-        document.getElementById("panelHideOffline").checked =
-          res.panelView.hideOff;
-        document.getElementById("panelHideClosed").checked =
-          res.panelView.hideClosed;
+        document.getElementById("panelCurrentOpOn").checked = res.panelView.currentOp;
+        document.getElementById("panelHideOffline").checked = res.panelView.hideOff;
+        document.getElementById("panelHideClosed").checked = res.panelView.hideClosed;
         // document.getElementById("panelHideIdle").checked =
         //   res.panelView.hideIdle;
         if (res.panelView.printerRows) {
-          document.getElementById("selectCameraGrid").value =
-            res.panelView.printerRows;
+          document.getElementById("selectCameraGrid").value = res.panelView.printerRows;
         } else {
           document.getElementById("selectCameraGrid").value = 2;
         }
@@ -514,8 +477,7 @@ class ClientSettings {
             res.dashboard.farmActivity.currentOperations;
           document.getElementById("cumulativeTimes").checked =
             res.dashboard.farmActivity.cumulativeTimes;
-          document.getElementById("averageTimes").checked =
-            res.dashboard.farmActivity.averageTimes;
+          document.getElementById("averageTimes").checked = res.dashboard.farmActivity.averageTimes;
 
           document.getElementById("printerState").checked =
             res.dashboard.printerStates.printerState;
@@ -600,40 +562,28 @@ class ClientSettings {
         ],
         savedLayout: localStorage.getItem("dashboardConfiguration"),
         farmActivity: {
-          currentOperations:
-            document.getElementById("currentOperations").checked,
+          currentOperations: document.getElementById("currentOperations").checked,
           cumulativeTimes: document.getElementById("cumulativeTimes").checked,
           averageTimes: document.getElementById("averageTimes").checked
         },
         printerStates: {
           printerState: document.getElementById("printerState").checked,
           printerTemps: document.getElementById("printerTemps").checked,
-          printerUtilisation:
-            document.getElementById("printerUtilisation").checked,
+          printerUtilisation: document.getElementById("printerUtilisation").checked,
           printerProgress: document.getElementById("printerProgress").checked,
           currentStatus: document.getElementById("currentStatus").checked
         },
         farmUtilisation: {
-          currentUtilisation:
-            document.getElementById("currentUtilisation").checked,
+          currentUtilisation: document.getElementById("currentUtilisation").checked,
           farmUtilisation: document.getElementById("farmUtilisation").checked
         },
         historical: {
-          weeklyUtilisation:
-            document.getElementById("weeklyUtilisation").checked,
-          hourlyTotalTemperatures: document.getElementById(
-            "hourlyTotalTemperatures"
-          ).checked,
-          environmentalHistory: document.getElementById("environmentalHistory")
-            .checked,
-          historyCompletionByDay: document.getElementById(
-            "printCompletionCheck"
-          ).checked,
-          filamentUsageByDay:
-            document.getElementById("filamentUsageCheck").checked,
-          filamentUsageOverTime: document.getElementById(
-            "filamentUsageOverTimeCheck"
-          ).checked
+          weeklyUtilisation: document.getElementById("weeklyUtilisation").checked,
+          hourlyTotalTemperatures: document.getElementById("hourlyTotalTemperatures").checked,
+          environmentalHistory: document.getElementById("environmentalHistory").checked,
+          historyCompletionByDay: document.getElementById("printCompletionCheck").checked,
+          filamentUsageByDay: document.getElementById("filamentUsageCheck").checked,
+          filamentUsageOverTime: document.getElementById("filamentUsageOverTimeCheck").checked
         }
       }
     };
@@ -665,26 +615,13 @@ class ServerSettings {
       })
       .then((res) => {
         if (!res || res.database.length === 0) {
-          UI.createAlert(
-            "error",
-            "Database could not be contacted",
-            3000,
-            "clicked"
-          );
+          UI.createAlert("error", "Database could not be contacted", 3000, "clicked");
           return;
         }
         if (res.databases[0].length !== 0) {
-          FileOperations.download(
-            database + ".json",
-            JSON.stringify(res.databases)
-          );
+          FileOperations.download(database + ".json", JSON.stringify(res.databases));
         } else {
-          UI.createAlert(
-            "warning",
-            "Database is empty, will not export...",
-            3000,
-            "clicked"
-          );
+          UI.createAlert("warning", "Database is empty, will not export...", 3000, "clicked");
         }
       });
   }
@@ -696,24 +633,17 @@ class ServerSettings {
       })
       .then((res) => {
         oldServerSettings = res;
-        document.getElementById("webSocketThrottle").value =
-          res.onlinePolling.seconds;
+        document.getElementById("webSocketThrottle").value = res.onlinePolling.seconds;
         document.getElementById("serverPortNo").value = res.server.port;
-        document.getElementById("requireLogin").checked =
-          res.server.loginRequired;
-        document.getElementById("requireRegistration").checked =
-          res.server.registration;
+        document.getElementById("requireLogin").checked = res.server.loginRequired;
+        document.getElementById("requireRegistration").checked = res.server.registration;
 
-        document.getElementById("webSocketRetry").value =
-          res.timeout.webSocketRetry / 1000;
-        document.getElementById("APITimeout").value =
-          res.timeout.apiTimeout / 1000;
-        document.getElementById("APIRetryTimeout").value =
-          res.timeout.apiRetryCutoff / 1000;
+        document.getElementById("webSocketRetry").value = res.timeout.webSocketRetry / 1000;
+        document.getElementById("APITimeout").value = res.timeout.apiTimeout / 1000;
+        document.getElementById("APIRetryTimeout").value = res.timeout.apiRetryCutoff / 1000;
         document.getElementById("APIRetry").value = res.timeout.apiRetry / 1000;
         if (typeof res.filament !== "undefined") {
-          document.getElementById("checkFilament").checked =
-            res.filament.filamentCheck;
+          document.getElementById("checkFilament").checked = res.filament.filamentCheck;
         }
 
         if (!res.filamentManager) {
@@ -727,17 +657,11 @@ class ServerSettings {
             );
             post = await post.json();
             if (post.status) {
-              filManager.innerHTML =
-                '<i class="fas fa-sync"></i> <br> Sync Filament Manager';
+              filManager.innerHTML = '<i class="fas fa-sync"></i> <br> Sync Filament Manager';
               filManager.disabled = true;
-              UI.createAlert(
-                "success",
-                "Filament Manager Plugin successfully synced",
-                3000
-              );
+              UI.createAlert("success", "Filament Manager Plugin successfully synced", 3000);
             } else {
-              filManager.innerHTML =
-                '<i class="fas fa-sync"></i> <br> Sync Filament Manager';
+              filManager.innerHTML = '<i class="fas fa-sync"></i> <br> Sync Filament Manager';
               filManager.disabled = false;
               UI.createAlert(
                 "error",

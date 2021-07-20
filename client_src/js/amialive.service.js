@@ -12,8 +12,7 @@ const drawModal = async function () {
 
 const reloadWindow = async function () {
   if (location.href.includes("submitEnvironment")) {
-    const hostName =
-      window.location.protocol + "//" + window.location.host + "";
+    const hostName = window.location.protocol + "//" + window.location.host + "";
     window.location.replace(hostName);
     return false;
   } else {
@@ -29,9 +28,7 @@ function checkUpdateAndNotify(updateResponse) {
     // Disregard notification if it it's version is already stored
     let parsedStorageReleaseInfo;
     try {
-      parsedStorageReleaseInfo = JSON.parse(
-        localStorage.getItem(notificationMarkReadSessionKey)
-      );
+      parsedStorageReleaseInfo = JSON.parse(localStorage.getItem(notificationMarkReadSessionKey));
     } catch (e) {
       parsedStorageReleaseInfo = null;
     }
@@ -43,8 +40,7 @@ function checkUpdateAndNotify(updateResponse) {
     // Process the full notification or a shorter reminder
     if (
       !parsedStorageReleaseInfo ||
-      parsedStorageReleaseInfo?.tag_name !==
-        updateResponse?.latestReleaseKnown?.tag_name
+      parsedStorageReleaseInfo?.tag_name !== updateResponse?.latestReleaseKnown?.tag_name
     ) {
       if (window.location?.href.includes("/system")) {
         return;
@@ -89,7 +85,7 @@ function checkUpdateAndNotify(updateResponse) {
   }
 }
 
-const serverAliveCheck = async function () {
+const amialiveService = async function () {
   if (!interval) {
     interval = setInterval(async () => {
       const modal = document.getElementById("lostServerConnection");
@@ -102,9 +98,7 @@ const serverAliveCheck = async function () {
           try {
             checkUpdateAndNotify(alive.update);
           } catch (e) {
-            console.warn(
-              "Could not succesfully parse OctoFarm update notification"
-            );
+            console.warn("Could not succesfully parse OctoFarm update notification");
           }
         }
 
@@ -124,9 +118,7 @@ const serverAliveCheck = async function () {
               text.innerHTML = `Connection Restored! <br> Automatically reloading the page in ${countDown} seconds... <br><br>
                                     <button id="reloadBtn" type="button" class="btn btn-success">Reload Now!</button>
                                 `;
-              document
-                .getElementById("reloadBtn")
-                .addEventListener("click", reloadWindow());
+              document.getElementById("reloadBtn").addEventListener("click", reloadWindow());
               countDown = countDown - 1;
             }, 1000);
             setTimeout(async () => {
@@ -139,10 +131,10 @@ const serverAliveCheck = async function () {
         console.error(e);
         clearInterval(interval);
         interval = false;
-        serverAliveCheck();
+        amialiveService();
       }
     }, 5000);
   }
 };
 
-serverAliveCheck();
+amialiveService();
