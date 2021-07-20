@@ -1,5 +1,5 @@
-import OctoPrintClient from "../octoprint.js";
-import OctoFarmclient from "../octofarm.js";
+import OctoPrintClient from "../octoprint";
+import OctoFarmClient from "../octofarm_client";
 
 export default class PowerButton {
   static revealBulkPower() {
@@ -265,10 +265,7 @@ export default class PowerButton {
             if (wakeButton.classList.contains("d-none")) {
               wakeButton.classList.remove("d-none");
               wakeButton.addEventListener("click", (e) => {
-                OctoFarmclient.post(
-                  "printers/wakeHost",
-                  printer.powerSettings.wol
-                );
+                OctoFarmClient.post("printers/wakeHost", printer.powerSettings.wol);
               });
             }
           }

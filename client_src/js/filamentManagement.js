@@ -1,10 +1,9 @@
-import OctoFarmclient from "./lib/octofarm.js";
 import UI from "./lib/functions/ui.js";
 import { checkFilamentManager } from "./lib/modules/filamentGrab.js";
 import * as ApexCharts from "apexcharts";
 import { getLastThirtyDaysText } from "./utils/time.util";
+import OctoFarmClient from "./lib/octofarm_client";
 
-const jpInit = false;
 let filamentManager = false;
 const filamentStore = [
   {
@@ -117,7 +116,7 @@ async function addProfile(manufacturer, material, density, diameter) {
     density: density.value,
     diameter: diameter.value
   };
-  let post = await OctoFarmclient.post("filament/save/profile", opts);
+  let post = await OctoFarmClient.post("filament/save/profile", opts);
   if (post.status === 200) {
     UI.createMessage(
       {
@@ -197,7 +196,7 @@ async function saveProfile(e) {
     id,
     profile
   };
-  let post = await OctoFarmclient.post("filament/edit/profile", data);
+  let post = await OctoFarmClient.post("filament/edit/profile", data);
   if (post.status === 200) {
     post = await post.json();
     updateProfileDrop();
@@ -209,7 +208,7 @@ async function saveProfile(e) {
 async function deleteProfile(e) {
   document.getElementById("profilesMessage").innerHTML = "";
   if (e.classList.contains("delete") || e.classList.contains("deleteIcon")) {
-    let post = await OctoFarmclient.post("filament/delete/profile", {
+    let post = await OctoFarmClient.post("filament/delete/profile", {
       id: e.parentElement.parentElement.firstElementChild.innerHTML.trim()
     });
     if (post.status === 200) {
@@ -279,7 +278,7 @@ async function addSpool(
     spoolsUsed: spoolsUsed.value,
     spoolsTempOffset: spoolsTempOffset.value
   };
-  let post = await OctoFarmclient.post("filament/save/filament", opts);
+  let post = await OctoFarmClient.post("filament/save/filament", opts);
 
   if (post.status === 200) {
     UI.createMessage(
@@ -379,7 +378,7 @@ async function editSpool(e) {
     edit.disabled = false;
     edit.value = edit.placeholder;
   });
-  // let profile = await OctoFarmclient.get("filament/get/profile");
+  // let profile = await OctoFarmClient.get("filament/get/profile");
   // profile = await profile.json();
   // document.getElementById("spoolsProfile-"+id).innerHTML = "";
   // profile.profiles.forEach(prof => {
@@ -400,7 +399,7 @@ async function editSpool(e) {
 async function deleteSpool(e) {
   document.getElementById("profilesMessage").innerHTML = "";
   if (e.classList.contains("delete") || e.classList.contains("deleteIcon")) {
-    let post = await OctoFarmclient.post("filament/delete/filament", {
+    let post = await OctoFarmClient.post("filament/delete/filament", {
       id: e.parentElement.parentElement.firstElementChild.innerHTML.trim()
     });
     if (post.status === 200) {
@@ -444,7 +443,7 @@ async function saveSpool(e) {
     id,
     spool
   };
-  let post = await OctoFarmclient.post("filament/edit/filament", data);
+  let post = await OctoFarmClient.post("filament/edit/filament", data);
   if (post.status === 200) {
     post = await post.json();
     document.getElementById(`spoolsProfile-${id}`).disabled = true;
@@ -457,11 +456,11 @@ async function saveSpool(e) {
 async function updateProfileDrop() {
   // Update filament selection profile drop
   const spoolsProfile = document.getElementById("spoolsProfile");
-  let profiles = await OctoFarmclient.get("filament/get/profile");
+  let profiles = await OctoFarmClient.get("filament/get/profile");
   profiles = await profiles.json();
-  let fill = await OctoFarmclient.get("filament/get/filament");
+  let fill = await OctoFarmClient.get("filament/get/filament");
   fill = await fill.json();
-  let profile = await OctoFarmclient.get("filament/get/profile");
+  let profile = await OctoFarmClient.get("filament/get/profile");
   profile = await profile.json();
   if (typeof profiles !== "undefined") {
     spoolsProfile.innerHTML = "";
@@ -529,10 +528,10 @@ async function updateProfileDrop() {
   });
 }
 async function updatePrinterDrops() {
-  let printerList = await OctoFarmclient.get("filament/get/printerList");
+  let printerList = await OctoFarmClient.get("filament/get/printerList");
   printerList = await printerList.json();
   // Generate printer assigment
-  let filament = await OctoFarmclient.get("filament/get/filament");
+  let filament = await OctoFarmClient.get("filament/get/filament");
 
   filament = await filament.json();
 
@@ -598,7 +597,7 @@ async function updatePrinterDrops() {
 async function init() {
   let lastThirtyDaysText = getLastThirtyDaysText();
 
-  let historyStatistics = await OctoFarmclient.getHistoryStatistics();
+  let historyStatistics = await OctoFarmClient.getHistoryStatistics();
   let usageByDay = historyStatistics.history.totalByDay;
   let usageOverTime = historyStatistics.history.usageOverTime;
 
@@ -897,7 +896,7 @@ async function init() {
     const resyncBtn = document.getElementById("resyncFilament");
     resyncBtn.addEventListener("click", async (e) => {
       resyncBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> <br> Syncing <br> Please Wait...';
-      const post = await OctoFarmclient.post("filament/filamentManagerReSync");
+      const post = await OctoFarmClient.post("filament/filamentManagerReSync");
       resyncBtn.innerHTML = '<i class="fas fa-sync"></i> Re-Sync Filament Manager';
       if (post.status === 200) {
         const meta = await post.json();
@@ -1010,14 +1009,14 @@ async function init() {
   //       printerId: e.target.value,
   //       spoolId: e.target.parentElement.parentElement.firstElementChild.innerHTML.trim(),
   //     };
-  //     OctoFarmclient.post("filament/select", data);
+  //     OctoFarmClient.post("filament/select", data);
   //   });
   // });
   //     //Grab printer list...
   //
   //
   //   //Init Profiles
-  //   let post = await OctoFarmclient.get("filament/get/profile");
+  //   let post = await OctoFarmClient.get("filament/get/profile");
   //   post = await post.json();
   //   let profileTable = document.getElementById("addProfilesTable");
   //     //profileTable.innerHTML = "";

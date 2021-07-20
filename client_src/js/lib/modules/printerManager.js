@@ -1,5 +1,5 @@
-import OctoPrintClient from "../octoprint.js";
-import OctoFarmClient from "../octofarm.js";
+import OctoPrintClient from "../octoprint";
+import OctoFarmClient from "../octofarm_client";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import FileManager from "./fileManager.js";

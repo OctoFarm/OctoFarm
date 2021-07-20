@@ -8,7 +8,7 @@ import {
   quickActionsModalId
 } from "./printer-map/printer-map.options";
 import { createWebWorker, handleVisibilityChange } from "./printer-map/printer-map.worker";
-import OctoFarmclient from "./lib/octofarm_client";
+import OctoFarmClient from "./lib/octofarm_client";
 import { getModalPrinter, setModalPrinter } from "./printer-map/printer-map.state";
 import {
   printerQuickActionsModal,
@@ -23,10 +23,10 @@ import { humanFileSize } from "./utils/file-size.util";
 
 document.addEventListener("visibilitychange", handleVisibilityChange, false);
 document.getElementById("filterStates").addEventListener("change", (e) => {
-  OctoFarmclient.get("client/updateFilter/" + e.target.value);
+  OctoFarmClient.get("client/updateFilter/" + e.target.value);
 });
 document.getElementById("sortStates").addEventListener("change", (e) => {
-  OctoFarmclient.get("client/updateSorting/" + e.target.value);
+  OctoFarmClient.get("client/updateSorting/" + e.target.value);
 });
 
 createWebWorker("panel");

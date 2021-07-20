@@ -12,8 +12,6 @@ import OctoFarmClient from "../lib/octofarm_client";
 import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
 
 const printerList = document.getElementById("printerList");
-const printerBase = "printers";
-const printerInfoURL = "/printerInfo";
 
 function updatePrinterInfoAndState(printer) {
   const printName = document.getElementById(`printerName-${printer._id}`);
@@ -161,9 +159,9 @@ function checkForApiErrors(printer) {
 
   if (printer.hostState.state === "Online") {
     let apiErrors = 0;
-    for (const key in printer.systemChecks.scanning) {
-      if (printer.systemChecks.scanning.hasOwnProperty(key)) {
-        if (printer.systemChecks.scanning[key].status !== "success") {
+    for (const key in printer.systemChecks) {
+      if (printer.systemChecks.hasOwnProperty(key)) {
+        if (printer.systemChecks[key].status !== "success") {
           apiErrors = apiErrors + 1;
         }
       }
@@ -232,15 +230,8 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
         .getElementById(`printerButton-${printer._id}`)
         .addEventListener("click", async () => {
           try {
-            const printersInfo = await OctoFarmClient.post(
-              printerBase + printerInfoURL,
-              {}
-            );
-            await PrinterManager.init(
-              printer._id,
-              printersInfo,
-              printerControlList
-            );
+            const printers = await OctoFarmClient.listPrinters();
+            await PrinterManager.init(printer._id, printers, printerControlList);
           } catch (e) {
             console.error(e);
             UI.createAlert(
@@ -255,10 +246,7 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
         .getElementById(`printerSettings-${printer._id}`)
         .addEventListener("click", async (e) => {
           try {
-            const printersInfo = await OctoFarmClient.post(
-              printerBase + printerInfoURL,
-              {}
-            );
+            const printersInfo = await OctoFarmClient.listPrinters();
             await updatePrinterSettingsModal(printersInfo, printer._id);
           } catch (e) {
             console.error(e);
@@ -274,10 +262,7 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
         .getElementById(`scanningIssues-${printer._id}`)
         .addEventListener("click", async (e) => {
           try {
-            const printersInfo = await OctoFarmClient.post(
-              printerBase + printerInfoURL,
-              {}
-            );
+            const printersInfo = await OctoFarmClient.listPrinters();
             await updatePrinterSettingsModal(printersInfo, printer._id);
           } catch (e) {
             console.error(e);
@@ -289,31 +274,16 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
             );
           }
         });
-      document
-        .getElementById(`printerLog-${printer._id}`)
-        .addEventListener("click", async (e) => {
-          try {
-            let data = {
-              i: printer._id
-            };
-            const printerInfo = await OctoFarmClient.post(
-              printerBase + printerInfoURL,
-              data
-            );
-            let connectionLogs = await OctoFarmClient.get(
-              "printers/connectionLogs/" + printer._id
-            );
-            PrinterLogs.loadLogs(printerInfo, connectionLogs);
-          } catch (e) {
-            console.error(e);
-            UI.createAlert(
-              "error",
-              `Unable to grab latest printer information: ${e}`,
-              0,
-              "clicked"
-            );
-          }
-        });
+      document.getElementById(`printerLog-${printer._id}`).addEventListener("click", async (e) => {
+        try {
+          const printerInfo = await OctoFarmClient.getPrinter(printer._id);
+          let connectionLogs = await OctoFarmClient.get("printers/connectionLogs/" + printer._id);
+          PrinterLogs.loadLogs(printerInfo, connectionLogs);
+        } catch (e) {
+          console.error(e);
+          UI.createAlert("error", `Unable to grab latest printer information: ${e}`, 0, "clicked");
+        }
+      });
 
       document
         .getElementById(`printerStatistics-${printer._id}`)

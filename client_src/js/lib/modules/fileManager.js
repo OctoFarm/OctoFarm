@@ -1,11 +1,11 @@
-import OctoFarmClient from "../octofarm.js";
-import OctoPrintClient from "../octoprint.js";
+import OctoPrintClient from "../octoprint";
 import Queue from "./clientQueue.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import { dragAndDropEnableMultiplePrinters } from "../functions/dragAndDrop.js";
 import FileSorting from "./fileSorting.js";
 import PrinterSelect from "./printerSelect.js";
+import OctoFarmClient from "../octofarm_client";
 
 const fileUploads = new Queue();
 
@@ -158,30 +158,17 @@ export default class FileManager {
             "clicked"
           );
           setTimeout(async () => {
-            let updatePrinter = await OctoFarmClient.post(
-              "printers/printerInfo",
-              {
-                i: printerInfo._id
-              }
-            );
+            let updatePrinter = await OctoFarmClient.getPrinter(printerInfo._id);
             updatePrinter = await updatePrinter.json();
+
+            // TODO !!!!!?????
             FileManager.refreshFiles(updatePrinter, spinnerIcon);
             setTimeout(async () => {
-              let updatePrinter = await OctoFarmClient.post(
-                "printers/printerInfo",
-                {
-                  i: printerInfo._id
-                }
-              );
+              let updatePrinter = await OctoFarmClient.getPrinter(printerInfo._id);
               updatePrinter = await updatePrinter.json();
               FileManager.refreshFiles(updatePrinter, spinnerIcon);
               setTimeout(async () => {
-                let updatePrinter = await OctoFarmClient.post(
-                  "printers/printerInfo",
-                  {
-                    i: printerInfo._id
-                  }
-                );
+                let updatePrinter = await OctoFarmClient.getPrinter(printerInfo._id);
                 updatePrinter = await updatePrinter.json();
                 FileManager.refreshFiles(updatePrinter, "");
               }, 5000);
@@ -773,10 +760,7 @@ export default class FileManager {
       });
 
       document.getElementById("multiSelectedPrinters2").innerHTML = "";
-      let printers = await OctoFarmClient.post("printers/printerInfo", {
-        i: null
-      });
-      printers = await printers.json();
+      let printers = await OctoFarmClient.listPrinters();
 
       selectedPrinters.forEach((printer, index) => {
         if (printer) {
@@ -894,10 +878,7 @@ export default class FileManager {
 
 export class FileActions {
   static async search(id) {
-    let printer = await OctoFarmClient.post("printers/printerInfo", {
-      i: id
-    });
-    printer = await printer.json();
+    let printer = await OctoFarmClient.getPrinter(id);
 
     const fileList = document.getElementById(`fileList-${id}`);
     let input = document.getElementById("searchFiles").value.toUpperCase();

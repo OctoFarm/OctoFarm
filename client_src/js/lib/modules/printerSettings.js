@@ -46,14 +46,7 @@ export async function updatePrinterSettingsModal(printersInformation, printerID)
     }
     try {
       // Resync Printer Settings to latest values and continue to setup page.
-      let opts = {
-        i: printerID
-      };
-      // Update printer settings
-      currentPrinter = await OctoFarmClient.post(
-        "printers/updatePrinterSettings",
-        opts
-      );
+      currentPrinter = await OctoFarmClient.refreshPrinterSettings(printerID);
     } catch (e) {
       // Fall back ensure printer data is loaded if new data couldn't be updated.
       currentPrinter = printersInformation[currentPrinterIndex];

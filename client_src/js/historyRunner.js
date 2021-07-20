@@ -1,9 +1,8 @@
-import OctoFarmClient from "./lib/octofarm.js";
 import Calc from "./lib/functions/calc.js";
 import UI from "./lib/functions/ui.js";
 import { returnDropDown } from "./lib/modules/filamentGrab.js";
-import OctoFarmclient from "./lib/octofarm.js";
 import * as ApexCharts from "apexcharts";
+import OctoFarmClient from "./lib/octofarm_client";
 
 // Setup history listeners
 document.getElementById("historyTable").addEventListener("click", (e) => {
@@ -35,7 +34,7 @@ export default class History {
     document.getElementById("wrapper").classList.remove("d-none");
     document.getElementById("historyToolbar").classList.remove("d-none");
 
-    let historyStatistics = await OctoFarmclient.get("history/statisticsData");
+    let historyStatistics = await OctoFarmClient.getHistoryStatistics();
     historyStatistics = await historyStatistics.json();
     let historyGraphData = historyStatistics.history.historyByDay;
 

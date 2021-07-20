@@ -216,10 +216,7 @@ export class PrintersManagement {
       const errors = [];
       let printCheck = -1;
       if (printerURL.value !== "") {
-        const printerInfo = await OctoFarmClient.post(
-          "printers/printerInfo",
-          {}
-        );
+        const printerInfo = await OctoFarmClient.listPrinters();
         printCheck = _.findIndex(printerInfo, function (o) {
           return JSON.stringify(o.printerURL) === JSON.stringify(printerURL.value);
         });

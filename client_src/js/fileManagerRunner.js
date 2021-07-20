@@ -1,4 +1,4 @@
-import OctoFarmClient from "./lib/octofarm.js";
+import OctoFarmClient from "./lib/octofarm_client";
 import Calc from "./lib/functions/calc.js";
 import FileManager from "./lib/modules/fileManager.js";
 import { dragAndDropEnable } from "./lib/functions/dragAndDrop.js";
@@ -15,7 +15,7 @@ document.getElementById("multUploadBtn").addEventListener("click", (e) => {
 class Manager {
   static async init() {
     // Draw printers
-    let printers = await OctoFarmClient.post("printers/printerInfo", {});
+    let printers = await OctoFarmClient.listPrinters();
     printers = await printers.json();
 
     // Draw first printer list...
@@ -129,16 +129,9 @@ class Manager {
         }
         filamentDrop.addEventListener("change", async (event) => {
           selectFilament(printer._id, event.target.value, i);
-          setTimeout(async () => {
-            let updatePrinter = await OctoFarmClient.post(
-              "printers/printerInfo",
-              {
-                i: lastId
-              }
-            );
-            updatePrinter = await updatePrinter.json();
-            FileManager.refreshFiles(updatePrinter);
-          }, 1000);
+          let updatePrinter = await OctoFarmClient.getPrinter(lastId);
+          updatePrinter = await updatePrinter.json();
+          FileManager.refreshFiles(updatePrinter);
         });
       }
 
@@ -219,9 +212,7 @@ class Manager {
             </div>
         `
     );
-    let printer = await OctoFarmClient.post("printers/printerInfo", {
-      i: id
-    });
+    let printer = await OctoFarmClient.getPrinter(id);
     printer = await printer.json();
     FileSorting.loadSort(printer);
     document.getElementById("backBtn").innerHTML = `
