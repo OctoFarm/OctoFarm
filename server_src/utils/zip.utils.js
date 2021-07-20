@@ -7,9 +7,7 @@ const logger = new Logger("OctoFarm-Server");
 
 const { getLogsPath } = require("../utils/system-paths.utils.js");
 
-const {
-  checkIfFileFileExistsAndDeleteIfSo
-} = require("../utils/file.utils.js");
+const { checkIfFileFileExistsAndDeleteIfSo } = require("../utils/file.utils.js");
 
 async function createZipFile(fileName, filePaths) {
   // create a file to stream archive data to.
