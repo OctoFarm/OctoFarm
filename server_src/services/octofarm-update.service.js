@@ -1,4 +1,4 @@
-const Logger = require("../lib/logger.js");
+const Logger = require("../handlers/logger.js");
 const { AppConstants } = require("../app.constants");
 const { getGithubReleasesPromise } = require("./github-client.service");
 

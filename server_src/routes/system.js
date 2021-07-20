@@ -10,11 +10,9 @@ const softwareUpdateChecker = require("../services/octofarm-update.service");
 const { ensureAuthenticated } = require("../config/auth");
 const { ensureCurrentUserAndGroup } = require("../config/users");
 const { AppConstants } = require("../app.constants");
-const {
-  getDefaultDashboardSettings
-} = require("../lib/providers/settings.constants");
+const { getDefaultDashboardSettings } = require("../lib/providers/settings.constants");
 const { Runner } = require("../runners/state");
-const { fetchMongoDBConnectionString } = require("../../app-env");
+const { fetchMongoDBConnectionString } = require("../app-env");
 const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
 

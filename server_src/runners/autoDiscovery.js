@@ -1,7 +1,7 @@
 const ssdp = require("node-upnp-ssdp");
 const fetch = require("node-fetch");
 const parseString = require("xml2js").parseString;
-const Logger = require("../lib/logger.js");
+const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-Server");
 let discoveredDevices = [];

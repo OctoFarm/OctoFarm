@@ -3,7 +3,7 @@ const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
 const { parse, stringify } = require("flatted");
 const _ = require("lodash");
-const Logger = require("../lib/logger.js");
+const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-API");
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!

@@ -1,8 +1,8 @@
-const rootPath = "../../../";
+const rootPath = "../../../server_src";
 const testPath = "../../";
 const dbHandler = require(testPath + "db-handler");
-jest.mock(rootPath + "server_src/services/octoprint/octoprint-api.service");
-const { ensureSystemSettingsInitiated } = require(rootPath + "app-core");
+jest.mock(rootPath + "/services/octoprint/octoprint-api.service");
+const { ensureSystemSettingsInitiated } = require(rootPath + "/app-core");
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -19,15 +19,16 @@ afterAll(async () => {
 
 describe("OctoPrint-API-Client-Service", () => {
   const { OctoprintApiClientService } = require(rootPath +
-    "server_src/services/octoprint/octoprint-api-client.service");
+    "/services/octoprint/octoprint-api-client.service");
 
   it("should throw error on any call incorrect printerURL", async () => {
     const instance = new OctoprintApiClientService();
 
     // TODO Not human-friendly
-    expect(
-      async () => await instance.get(null, "key", "route", false)
-    ).rejects.toHaveProperty("code", "ERR_INVALID_URL");
+    expect(async () => await instance.get(null, "key", "route", false)).rejects.toHaveProperty(
+      "code",
+      "ERR_INVALID_URL"
+    );
   });
 
   it("should throw error on getSettings with incorrect printerURL", async () => {

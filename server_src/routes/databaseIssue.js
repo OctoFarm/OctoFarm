@@ -2,12 +2,12 @@ const express = require("express");
 const path = require("path");
 const { execSync } = require("child_process");
 const mongoose = require("mongoose");
-const Logger = require("../../server_src/lib/logger.js");
+const Logger = require("../handlers/logger.js");
 const ServerSettingsDB = require("../models/ServerSettings");
 const isDocker = require("is-docker");
 const envUtils = require("../utils/env.utils");
 const { AppConstants } = require("../app.constants");
-const { fetchMongoDBConnectionString } = require("../../app-env");
+const { fetchMongoDBConnectionString } = require("../app-env");
 const { SystemCommands } = require("../lib/serverCommands.js");
 
 const router = express.Router();
@@ -31,12 +31,10 @@ router.get("/", (req, res) =>
   res.render("databaseIssue", {
     page: "Database Warning",
     octoFarmPageTitle:
-      process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY] ||
-      AppConstants.defaultOctoFarmPageTitle,
+      process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY] || AppConstants.defaultOctoFarmPageTitle,
     isDocker: isDocker(),
     isPm2: envUtils.isPm2(),
-    defaultMongoConnectionString:
-      AppConstants.defaultMongoStringUnauthenticated,
+    defaultMongoConnectionString: AppConstants.defaultMongoStringUnauthenticated,
     isNodemon: envUtils.isNodemon(),
     os: process.env.OS,
     npmPackageJson: process.env[AppConstants.VERSION_KEY],

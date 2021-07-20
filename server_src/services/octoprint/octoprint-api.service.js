@@ -1,7 +1,7 @@
 "use strict";
 
 const fetch = require("node-fetch");
-const Logger = require("../../lib/logger.js");
+const Logger = require("../../handlers/logger.js");
 
 const logger = new Logger("OctoPrint-API-Service");
 

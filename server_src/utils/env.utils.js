@@ -1,6 +1,6 @@
 const path = require("path");
 const fs = require("fs");
-const Logger = require("../lib/logger.js");
+const Logger = require("../handlers/logger.js");
 const dotenv = require("dotenv");
 const isDocker = require("is-docker");
 
