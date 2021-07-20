@@ -5,6 +5,7 @@ module.exports.PrinterGroupMockData = class PrinterGroupMockData {
   static get PrinterMock() {
     return {
       name: "Printuh",
+      printerURL: "test",
       apikey: "IwontfailYou"
     };
   }
@@ -12,6 +13,7 @@ module.exports.PrinterGroupMockData = class PrinterGroupMockData {
   static get PrinterMockWithGroup() {
     return {
       name: "Printuh",
+      printerURL: "test",
       apikey: "IwontfailYou",
       group: "testGroupName"
     };

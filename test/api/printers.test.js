@@ -23,6 +23,7 @@ describe("Printers", () => {
     const res = await request.post("/printers/add").send([
       {
         settingsAppearance: null,
+        printerURL: "test",
         apikey: "dafuc",
         tempTriggers: { heatingVariation: null }
       }

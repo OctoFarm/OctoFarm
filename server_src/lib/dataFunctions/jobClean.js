@@ -2,9 +2,9 @@
 
 const _ = require("lodash");
 const { DateTime } = require("luxon");
-const { getPrintCostNumeric } = require("../utils/print-cost.util");
+const { getPrintCostNumeric } = require("../../utils/print-cost.util");
 const { HistoryClean } = require("./historyClean.js");
-const { floatOrZero } = require("../utils/number.util");
+const { floatOrZero } = require("../../utils/number.util");
 
 const cleanJobs = [];
 
@@ -88,8 +88,7 @@ class JobClean {
       if (!!currentJob.expectedFilamentCosts) {
         const keys = Object.keys(currentJob.expectedFilamentCosts);
         for (let s = 0; s < currentJob.expectedFilamentCosts.length; s++) {
-          const toolFilamentCosts =
-            currentJob.expectedFilamentCosts[s][`tool${keys[s]}`];
+          const toolFilamentCosts = currentJob.expectedFilamentCosts[s][`tool${keys[s]}`];
           if (!!toolFilamentCosts) {
             spoolCost += floatOrZero(toolFilamentCosts.cost);
             totalVolume += floatOrZero(toolFilamentCosts.volume);
@@ -101,9 +100,7 @@ class JobClean {
       spoolCost = floatOrZero(spoolCost);
       currentJob.expectedTotals = {
         // TODO String a good idea?
-        totalCost: (
-          parseFloat(currentJob.expectedPrinterCosts) + spoolCost
-        ).toFixed(2),
+        totalCost: (parseFloat(currentJob.expectedPrinterCosts) + spoolCost).toFixed(2),
         totalVolume,
         totalLength,
         totalWeight,
@@ -117,9 +114,7 @@ class JobClean {
       currentJob.printTimeRemaining = printerProgress.printTimeLeft;
       currentJob.printTimeElapsed = printerProgress.printTime;
       currentJob.expectedPrintTime =
-        Math.round(
-          (printerProgress.printTimeLeft + printerProgress.printTime) / 1000
-        ) * 1000;
+        Math.round((printerProgress.printTimeLeft + printerProgress.printTime) / 1000) * 1000;
       currentJob.expectedCompletionDate = JobClean.getCompletionDate(
         printerProgress.printTimeLeft,
         printerProgress.completion
