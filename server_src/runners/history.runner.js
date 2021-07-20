@@ -3,17 +3,14 @@ const fetch = require("node-fetch");
 const fs = require("fs");
 const History = require("../models/History.js");
 const ErrorLog = require("../models/ErrorLog.js");
-const Logger = require("../lib/logger.js");
+const Logger = require("../handlers/logger.js");
 const filamentProfiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const Spool = require("../models/Filament.js");
 const { FilamentManagerPlugin } = require("./filamentManagerPlugin.js");
 const { ScriptRunner } = require("./scriptCheck.js");
 const MjpegDecoder = require("mjpeg-decoder");
-const {
-  downloadImage,
-  downloadFromOctoPrint
-} = require("../utils/download.util");
+const { downloadImage, downloadFromOctoPrint } = require("../utils/download.util");
 const { getHistoryCache } = require("../cache/history.cache");
 const { writePoints } = require("../lib/influxExport.js");
 

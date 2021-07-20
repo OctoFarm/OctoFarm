@@ -1,4 +1,4 @@
-const Logger = require("../lib/logger.js");
+const Logger = require("../handlers/logger.js");
 const { JobValidationException } = require("../exceptions/job.exceptions");
 const {
   ToadScheduler,

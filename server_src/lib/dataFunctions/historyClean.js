@@ -9,7 +9,7 @@ const {
   DEFAULT_SPOOL_DENSITY
 } = require("../providers/cleaner.constants");
 const historyService = require("../../services/history.service");
-const Logger = require("../logger.js");
+const Logger = require("../../handlers/logger.js");
 const serverSettingsCache = require("../../settings/serverSettings");
 const { noCostSettingsMessage } = require("../../utils/print-cost.util");
 const { stateToHtml } = require("../../utils/html.util");

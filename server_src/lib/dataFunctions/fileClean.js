@@ -1,7 +1,7 @@
 "use strict";
 
 const _ = require("lodash");
-const Logger = require("../logger.js");
+const Logger = require("../../handlers/logger.js");
 const { getPrintCostNumeric } = require("../../utils/print-cost.util");
 
 const { getDefaultFileCleanStatistics } = require("../providers/cleaner.constants");

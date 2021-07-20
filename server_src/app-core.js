@@ -3,25 +3,21 @@ const flash = require("connect-flash");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
-const ServerSettingsDB = require("./server_src/models/ServerSettings");
+const ServerSettingsDB = require("./models/ServerSettings");
 const expressLayouts = require("express-ejs-layouts");
-const Logger = require("./server_src/lib/logger.js");
-const { OctoFarmTasks } = require("./server_src/tasks");
-const {
-  optionalInfluxDatabaseSetup
-} = require("./server_src/lib/influxExport.js");
+const Logger = require("./handlers/logger.js");
+const { OctoFarmTasks } = require("./tasks");
+const { optionalInfluxDatabaseSetup } = require("./lib/influxExport.js");
 const { getViewsPath } = require("./app-env");
-const {
-  PrinterClean
-} = require("./server_src/lib/dataFunctions/printerClean.js");
-const { ServerSettings } = require("./server_src/settings/serverSettings.js");
-const { ClientSettings } = require("./server_src/settings/clientSettings.js");
-const { TaskManager } = require("./server_src/runners/task.manager");
+const { PrinterClean } = require("./lib/dataFunctions/printerClean.js");
+const { ServerSettings } = require("./settings/serverSettings.js");
+const { ClientSettings } = require("./settings/clientSettings.js");
+const { TaskManager } = require("./runners/task.manager");
 
 function setupExpressServer() {
   let app = express();
 
-  require("./server_src/config/passport.js")(passport);
+  require("./config/passport.js")(passport);
   app.use(express.json());
 
   const viewsPath = getViewsPath();
@@ -80,54 +76,21 @@ async function ensureSystemSettingsInitiated() {
 }
 
 function serveOctoFarmRoutes(app) {
-  app.use("/", require("./server_src/routes/index", { page: "route" }));
-  app.use(
-    "/serverChecks",
-    require("./server_src/routes/serverChecks", { page: "route" })
-  );
-  app.use("/users", require("./server_src/routes/users", { page: "route" }));
-  app.use(
-    "/printers",
-    require("./server_src/routes/printers", { page: "route" })
-  );
-  app.use(
-    "/groups",
-    require("./server_src/routes/printerGroups", { page: "route" })
-  );
-  app.use(
-    "/settings",
-    require("./server_src/routes/settings", { page: "route" })
-  );
-  app.use(
-    "/printersInfo",
-    require("./server_src/routes/SSE-printersInfo", { page: "route" })
-  );
-  app.use(
-    "/dashboardInfo",
-    require("./server_src/routes/SSE-dashboard", { page: "route" })
-  );
-  app.use(
-    "/monitoringInfo",
-    require("./server_src/routes/SSE-monitoring", { page: "route" })
-  );
-  app.use(
-    "/filament",
-    require("./server_src/routes/filament", { page: "route" })
-  );
-  app.use(
-    "/history",
-    require("./server_src/routes/history", { page: "route" })
-  );
-  app.use(
-    "/scripts",
-    require("./server_src/routes/scripts", { page: "route" })
-  );
-  app.use(
-    "/input",
-    require("./server_src/routes/externalDataCollection", { page: "route" })
-  );
-  app.use("/system", require("./server_src/routes/system", { page: "route" }));
-  app.use("/client", require("./server_src/routes/sorting", { page: "route" }));
+  app.use("/", require("./routes/index", { page: "route" }));
+  app.use("/serverChecks", require("./routes/serverChecks", { page: "route" }));
+  app.use("/users", require("./routes/users", { page: "route" }));
+  app.use("/printers", require("./routes/printers", { page: "route" }));
+  app.use("/groups", require("./routes/printerGroups", { page: "route" }));
+  app.use("/settings", require("./routes/settings", { page: "route" }));
+  app.use("/printersInfo", require("./routes/SSE-printersInfo", { page: "route" }));
+  app.use("/dashboardInfo", require("./routes/SSE-dashboard", { page: "route" }));
+  app.use("/monitoringInfo", require("./routes/SSE-monitoring", { page: "route" }));
+  app.use("/filament", require("./routes/filament", { page: "route" }));
+  app.use("/history", require("./routes/history", { page: "route" }));
+  app.use("/scripts", require("./routes/scripts", { page: "route" }));
+  app.use("/input", require("./routes/externalDataCollection", { page: "route" }));
+  app.use("/system", require("./routes/system", { page: "route" }));
+  app.use("/client", require("./routes/sorting", { page: "route" }));
   app.get("*", function (req, res) {
     console.debug("Had to redirect resource request:", req.originalUrl);
     if (req.originalUrl.endsWith(".min.js")) {
@@ -147,12 +110,10 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
 
     await ClientSettings.init();
 
-    const { Runner } = require("./server_src/runners/state.js");
+    const { Runner } = require("./runners/state.js");
     await Runner.init();
 
-    OctoFarmTasks.BOOT_TASKS.forEach((task) =>
-      TaskManager.registerJobOrTask(task)
-    );
+    OctoFarmTasks.BOOT_TASKS.forEach((task) => TaskManager.registerJobOrTask(task));
 
     await optionalInfluxDatabaseSetup();
   }

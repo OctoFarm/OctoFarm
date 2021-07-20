@@ -39,12 +39,8 @@ class LoggerService {
           : [])
       ],
       format: winston.format.printf((info) => {
-        let message = `${dateFormat()} | ${info.level.toUpperCase()} | ${route} | ${
-          info.message
-        }`;
-        message = info.obj
-          ? message + ` data: ${JSON.stringify(info.obj)} | `
-          : message;
+        let message = `${dateFormat()} | ${info.level.toUpperCase()} | ${route} | ${info.message}`;
+        message = info.obj ? message + ` data: ${JSON.stringify(info.obj)} | ` : message;
         message = this.log_data
           ? message + ` log_data: ${JSON.stringify(this.log_data)} | `
           : message;
