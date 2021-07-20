@@ -121,9 +121,7 @@ blkPluginsBtn.addEventListener("click", async (e) => {
   );
 });
 
-const blkPluginsUninstallBtn = document.getElementById(
-  "blkPluginsUnInstallBtn"
-);
+const blkPluginsUninstallBtn = document.getElementById("blkPluginsUnInstallBtn");
 blkPluginsUninstallBtn.addEventListener("click", async (e) => {
   PrinterSelect.create(
     document.getElementById("multiPrintersSection"),
@@ -172,27 +170,21 @@ editBtn.addEventListener("click", (event) => {
     bulkEditPrinters
   );
 });
-document
-  .getElementById("deletePrintersBtn")
-  .addEventListener("click", (event) => {
-    PrinterSelect.create(
-      document.getElementById("multiPrintersSection"),
-      false,
-      "Printer Deletion",
-      bulkDeletePrinters
-    );
-  });
+document.getElementById("deletePrintersBtn").addEventListener("click", (event) => {
+  PrinterSelect.create(
+    document.getElementById("multiPrintersSection"),
+    false,
+    "Printer Deletion",
+    bulkDeletePrinters
+  );
+});
 
-document
-  .getElementById("exportPrinterBtn")
-  .addEventListener("click", async (event) => {
-    await exportPrintersToJson();
-  });
-document
-  .getElementById("importPrinterBtn")
-  .addEventListener("change", async function () {
-    await importPrintersFromJsonFile;
-  });
+document.getElementById("exportPrinterBtn").addEventListener("click", async (event) => {
+  await exportPrintersToJson();
+});
+document.getElementById("importPrinterBtn").addEventListener("change", async function () {
+  await importPrintersFromJsonFile;
+});
 
 document.getElementById("addPrinterBtn").addEventListener("click", (event) => {
   addBlankPrinterToTable();

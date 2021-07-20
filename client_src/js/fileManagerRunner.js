@@ -103,9 +103,7 @@ class Manager {
       `
       );
       //Setup for first printer
-      const listItem = document.getElementById(
-        `fileManagerPrinter-${printer._id}`
-      );
+      const listItem = document.getElementById(`fileManagerPrinter-${printer._id}`);
 
       listItem.addEventListener("click", (e) => {
         if (!e.target.id.includes("tool")) {
@@ -116,17 +114,12 @@ class Manager {
       dragAndDropEnable(listItem, printer);
 
       for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
-        const filamentDrop = document.getElementById(
-          "tool" + i + "-" + printer._id
-        );
+        const filamentDrop = document.getElementById("tool" + i + "-" + printer._id);
         filamentDrop.innerHTML = "";
         filamentDropDown.forEach((filament) => {
           filamentDrop.insertAdjacentHTML("beforeend", filament);
         });
-        if (
-          Array.isArray(printer.selectedFilament) &&
-          printer.selectedFilament.length !== 0
-        ) {
+        if (Array.isArray(printer.selectedFilament) && printer.selectedFilament.length !== 0) {
           if (
             typeof printer.selectedFilament[i] !== "undefined" &&
             printer.selectedFilament[i] !== null
@@ -151,9 +144,7 @@ class Manager {
 
       if (index === 0) {
         lastId = printer._id;
-        const item = document.getElementById(
-          "fileManagerPrinter-" + printer._id
-        );
+        const item = document.getElementById("fileManagerPrinter-" + printer._id);
         item.classList.add("bg-dark", "printerSelected");
         item.classList.remove("bg-secondary");
         const firstElement = document.getElementById("currentPrinter");
@@ -179,9 +170,7 @@ class Manager {
 
       //Update old index to this one
       lastId = target;
-      const printerName = document.getElementById(
-        "printerName-" + lastId
-      ).innerHTML;
+      const printerName = document.getElementById("printerName-" + lastId).innerHTML;
       const panel = document.getElementById("fileManagerPrinter-" + target);
 
       panel.classList.add("bg-dark", "printerSelected");
@@ -194,9 +183,7 @@ class Manager {
 
   static async updatePrinterList(id) {
     let fileList = document.getElementById("fileBody");
-    const fileManagerManagement = document.getElementById(
-      "fileManagerManagement"
-    );
+    const fileManagerManagement = document.getElementById("fileManagerManagement");
     if (fileManagerManagement) {
       fileList = fileManagerManagement;
     }
@@ -273,12 +260,9 @@ class Manager {
     fileButtons.fileManager.fileSearch.addEventListener("keyup", (e) => {
       FileManager.search(printer._id);
     });
-    fileButtons.fileManager.uploadPrintFile.addEventListener(
-      "change",
-      function () {
-        FileManager.handleFiles(this.files, printer, "print");
-      }
-    );
+    fileButtons.fileManager.uploadPrintFile.addEventListener("change", function () {
+      FileManager.handleFiles(this.files, printer, "print");
+    });
 
     // Root folder, disabled Back button
     fileButtons.fileManager.back.disabled = true;
