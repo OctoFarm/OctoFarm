@@ -90,7 +90,7 @@ const amialiveService = async function () {
     interval = setInterval(async () => {
       const modal = document.getElementById("lostServerConnection");
       try {
-        let alive = await fetch("/amialive");
+        let alive = await fetch("/serverChecks/amialive");
         if (alive.status !== 200) throw "No Server Connection";
         alive = await alive.json();
 
