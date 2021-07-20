@@ -3,7 +3,7 @@
 const _ = require("lodash");
 const EventEmitter = require("events");
 const WebSocket = require("ws");
-const Logger = require("../lib/logger.js");
+const Logger = require("../handlers/logger.js");
 
 const Profiles = require("../models/Profiles.js");
 const Printers = require("../models/Printer.js");

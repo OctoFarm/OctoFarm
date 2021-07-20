@@ -1,6 +1,6 @@
 jest.mock("../../../server_src/services/octoprint/octoprint-api.service");
 const dbHandler = require("../../db-handler");
-const { ensureSystemSettingsInitiated } = require("../../../app-core");
+const { ensureSystemSettingsInitiated } = require("../../../server_src/app-core");
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -36,8 +36,7 @@ describe("State", () => {
 
     // TODO the conclusion from the code under test is incorrect
     expect(comparisonResult).toEqual({
-      message:
-        "Global API Key detected... unable to authenticate websocket connection",
+      message: "Global API Key detected... unable to authenticate websocket connection",
       type: "system",
       errno: "999",
       code: "999"
@@ -55,8 +54,7 @@ describe("State", () => {
     });
 
     expect(comparisonResult2).toEqual({
-      message:
-        "Global API Key detected... unable to authenticate websocket connection",
+      message: "Global API Key detected... unable to authenticate websocket connection",
       type: "system",
       errno: "999",
       code: "999"
@@ -88,8 +86,7 @@ describe("State", () => {
 
     // TODO the conclusion from the code under test is incorrect
     expect(comparisonResult3).toEqual({
-      message:
-        "Global API Key detected... unable to authenticate websocket connection",
+      message: "Global API Key detected... unable to authenticate websocket connection",
       type: "system",
       errno: "999",
       code: "999"

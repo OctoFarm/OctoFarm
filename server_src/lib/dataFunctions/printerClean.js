@@ -19,7 +19,7 @@ const ErrorLogs = require("../../models/ErrorLog.js");
 const TempHistory = require("../../models/TempHistory.js");
 const { PrinterTicker } = require("../../runners/printerTicker.js");
 
-const Logger = require("../logger.js");
+const Logger = require("../../handlers/logger.js");
 const { getDayName } = require("../../utils/time.util");
 const logger = new Logger("OctoFarm-InformationCleaning");
 

@@ -1,7 +1,7 @@
 const si = require("systeminformation");
 const os = require("os");
 const process = require("process");
-const Logger = require("../lib/logger.js");
+const Logger = require("../handlers/logger");
 const { bench } = require("../utils/benchmark.util");
 const logger = new Logger("OctoFarm-Server");
 

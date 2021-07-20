@@ -3,7 +3,7 @@
 const Influx = require("influx");
 const settingsClean = require("../lib/dataFunctions/settingsClean.js");
 const SettingsClean = settingsClean.SettingsClean;
-const Logger = require("../lib/logger.js");
+const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-Server");
 

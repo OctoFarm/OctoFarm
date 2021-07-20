@@ -1,4 +1,4 @@
-const Logger = require("../lib/logger.js");
+const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-Scripts");
 const util = require("util");
 const exec = util.promisify(require("child_process").exec);
