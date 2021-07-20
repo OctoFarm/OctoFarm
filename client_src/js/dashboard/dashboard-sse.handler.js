@@ -11,11 +11,7 @@ export async function dashboardSSEventHandler(data) {
     const dashboard = data.dashStatistics;
     const dashboardSettings = data.dashboardSettings;
     if (dashboardSettings.farmActivity.currentOperations) {
-      currentOperations(
-        currentOperationsData.operations,
-        currentOperationsData.count,
-        printerInfo
-      );
+      currentOperations(currentOperationsData.operations, currentOperationsData.count, printerInfo);
     }
 
     DashUpdate.farmInformation(
