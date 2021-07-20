@@ -235,10 +235,10 @@ export default class FileManager {
 
   static async reSyncFiles(e, printer) {
     e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Re-Syncing...";
-    const done = await OctoFarmClient.post("printers/resyncFile", {
+    const how = await OctoFarmClient.post("printers/resyncFile", {
       i: printer._id
     });
-    const how = await done.json();
+
     const flashReturn = function () {
       e.target.classList = "btn btn-primary mb-0";
       e.target.innerHTML = "<i class='fas fa-sync'></i> Re-Sync";
@@ -260,7 +260,7 @@ export default class FileManager {
     let printer = await OctoFarmClient.post("printers/printerInfo", {
       i: index
     });
-    printer = await printer.json();
+
     FileSorting.loadSort(printer);
     //FileManager.drawFiles(printer);
     return "done";

@@ -1,20 +1,25 @@
 export default class OctoFarmClient {
-  static apiRoute = "api";
-  static printerRoute = this.apiRoute + "/printer";
+  static printerRoute = "printers";
 
   static async getPrinter(id) {
     if (!id) {
       throw "Cant fetch printer without defined 'id' input";
     }
-    return await this.get(`${this.printerRoute}/${id}`);
+    const body = {
+      i: id
+    };
+    return await this.post(`${this.printerRoute}/printerInfo/`, body);
   }
 
   static async listPrinters() {
-    return this.get(`${this.printerRoute}`);
+    return this.post(`${this.printerRoute}/printerInfo/`);
   }
 
   static async refreshPrinterSettings(id) {
-    return this.get(`${this.printerRoute}/${id ? id : ""}`);
+    const body = {
+      i: id
+    };
+    return this.post(`${this.printerRoute}/updatePrinterSettings`, body);
   }
 
   static async getHistoryStatistics() {

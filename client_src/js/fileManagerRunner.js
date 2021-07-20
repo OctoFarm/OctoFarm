@@ -16,7 +16,6 @@ class Manager {
   static async init() {
     // Draw printers
     let printers = await OctoFarmClient.listPrinters();
-    printers = await printers.json();
 
     // Draw first printer list...
     const filamentDropDown = await returnDropDown();
@@ -130,7 +129,6 @@ class Manager {
         filamentDrop.addEventListener("change", async (event) => {
           selectFilament(printer._id, event.target.value, i);
           let updatePrinter = await OctoFarmClient.getPrinter(lastId);
-          updatePrinter = await updatePrinter.json();
           FileManager.refreshFiles(updatePrinter);
         });
       }
@@ -212,8 +210,9 @@ class Manager {
             </div>
         `
     );
+
     let printer = await OctoFarmClient.getPrinter(id);
-    printer = await printer.json();
+
     FileSorting.loadSort(printer);
     document.getElementById("backBtn").innerHTML = `
           <button id="fileBackBtn" type="button" class="btn btn-success">
