@@ -1,62 +1,28 @@
 import Calc from "./lib/functions/calc.js";
-
 import OctoPrintClient from "./lib/octoprint.js";
+import { createClientSSEWorker } from "./lib/client-worker";
+import { setViewType } from "./monitoring/monitoring-view.state";
 
-import UI from "./lib/functions/ui.js";
+// TODO dupe due to unwanted monitoring.update import causing missing element exceptions
+export const monitoringWorkerURL = "/monitoringInfo/get/";
 
-let worker = null;
-
-function createWebWorker() {
-  worker = new Worker("/assets/dist/monitoringViewsWorker.min.js");
-  worker.onmessage = async function (event) {
-    if (event.data != false) {
-      // /printerInfo === event.data.printersInformation
-      currentOperationsView(
-        event.data.currentOperations.operations,
-        event.data.currentOperations.count,
-        event.data.printersInformation
-      );
-    } else {
-      UI.createAlert(
-        "warning",
-        "Communication with the server has been suddenly lost, trying to re-establish connection...",
-        10000,
-        "Clicked"
-      );
-    }
-  };
-}
-function handleVisibilityChange() {
-  if (document.hidden) {
-    if (worker !== null) {
-      console.log("Screen Abandonded, closing web worker...");
-      worker.terminate();
-      worker = null;
-    }
+setViewType("current-ops");
+createClientSSEWorker(monitoringWorkerURL, async function (data) {
+  if (data != false) {
+    currentOperationsView(
+      data.currentOperations.operations,
+      data.currentOperations.count,
+      data.printersInformation
+    );
   } else {
-    if (worker === null) {
-      console.log("Screen resumed... opening web worker...");
-      createWebWorker();
-    }
+    UI.createAlert(
+      "warning",
+      "Communication with the server has been suddenly lost, trying to re-establish connection...",
+      10000,
+      "Clicked"
+    );
   }
-}
-
-document.addEventListener("visibilitychange", handleVisibilityChange, false);
-
-// Setup webWorker
-if (window.Worker) {
-  // Yes! Web worker support!
-  try {
-    if (worker === null) {
-      createWebWorker();
-    }
-  } catch (e) {
-    console.log(e);
-  }
-} else {
-  // Sorry! No Web Worker support..
-  console.log("Web workers not available... sorry!");
-}
+});
 
 let printers = [];
 const resetFile = function (id) {

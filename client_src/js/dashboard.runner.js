@@ -11,7 +11,6 @@ import {
   getUsageWeightSeries,
   toFixedWeightGramFormatter
 } from "./dashboard/utils/chart.utils";
-import { DashUpdate } from "./dashboard/dashboard.updater";
 import {
   dashboardSSEventHandler,
   workerURL
