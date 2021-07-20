@@ -33,9 +33,7 @@ import { returnPluginListTemplate } from "../templates/octoprint-plugin-list.tem
 // TODO this should come from printer select to save the extra call, re-iteration and matching.
 async function getCurrentlySelectedPrinterList() {
   try {
-    const currentPrinterList = await OctoFarmClient.post(
-      "printers/printerInfo"
-    );
+    const currentPrinterList = await OctoFarmClient.listPrinters();
     const matchedPrinters = [];
     //Grab all check boxes
     const selectedPrinters = PrinterSelect.getSelected();
@@ -58,10 +56,7 @@ async function getCurrentlySelectedPrinterList() {
 
 export async function bulkOctoPrintPluginUpdate() {
   try {
-    let currentPrinterList = await OctoFarmClient.post(
-      "printers/printerInfo",
-      {}
-    );
+    let currentPrinterList = await OctoFarmClient.listPrinters();
     let message = "";
     let toUpdate = [];
     let pluginList = [];
@@ -106,7 +101,7 @@ export async function bulkOctoPrintPluginUpdate() {
 
 export async function bulkOctoPrintClientUpdate() {
   try {
-    let currentPrinterList = await OctoFarmClient.post("printers/printerInfo");
+    let currentPrinterList = await OctoFarmClient.listPrinters();
     let message = "";
     let toUpdate = [];
     for (let printer = 0; printer < currentPrinterList.length; printer++) {

@@ -1,5 +1,5 @@
 import Calc from "../functions/calc.js";
-import OctoFarmClient from "../octofarm.js";
+import OctoFarmClient from "../octofarm_client";
 import OctoPrintClient from "../octoprint.js";
 import ApexCharts from "apexcharts";
 

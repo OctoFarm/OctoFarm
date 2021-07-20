@@ -1,6 +1,6 @@
-import OctoFarmClient from "../octofarm.js";
-import OctoPrintClient from "../octoprint.js";
+import OctoPrintClient from "../octoprint";
 import UI from "../functions/ui.js";
+import OctoFarmClient from "../octofarm_client";
 
 function getButton(button) {
   return `

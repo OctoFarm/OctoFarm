@@ -1,5 +1,5 @@
 import UI from "../functions/ui.js";
-import OctoFarmclient from "../octofarm.js";
+import OctoFarmClient from "../octofarm_client";
 
 const alertsDrop = `
 <option selected value="0">Choose...</option>
@@ -91,7 +91,7 @@ export default class Script {
     return alertsDrop;
   }
   static async get() {
-    let post = await OctoFarmclient.get("scripts/get");
+    let post = await OctoFarmClient.get("scripts/get");
     post = await post.json();
     let alertsTable = document.getElementById("alertsTable");
     alertsTable.innerHTML = "";
@@ -208,7 +208,7 @@ export default class Script {
       scriptLocation: newAlert.script,
       message: newAlert.message
     };
-    let post = await OctoFarmclient.post("scripts/edit", opts);
+    let post = await OctoFarmClient.post("scripts/edit", opts);
     post = await post.json();
     if (post.status !== 200) {
       UI.createAlert("error", "Failed to save your alert!", 3000, "Clicked");
@@ -235,7 +235,7 @@ export default class Script {
       message: newAlert.message,
       printer: []
     };
-    let post = await OctoFarmclient.post("scripts/save", opts);
+    let post = await OctoFarmClient.post("scripts/save", opts);
     post = await post.json();
     if (post.status !== 200) {
       UI.createAlert("error", "Failed to save your alert!", 3000, "Clicked");
@@ -245,7 +245,7 @@ export default class Script {
     }
   }
   static async delete(id) {
-    let post = await OctoFarmclient.delete("scripts/delete/" + id);
+    let post = await OctoFarmClient.delete("scripts/delete/" + id);
     post = await post.json();
     if (post.status === 200) {
       UI.createAlert("error", "Failed to delete your alert.", 3000, "Clicked");
@@ -259,7 +259,7 @@ export default class Script {
       scriptLocation: scriptLocation,
       message: message
     };
-    let post = await OctoFarmclient.post("scripts/test", opts);
+    let post = await OctoFarmClient.post("scripts/test", opts);
     post = await post.json();
     if (typeof post.testFire === "object") {
       UI.createAlert("error", post.testFire.stderr, 3000, "Clicked");

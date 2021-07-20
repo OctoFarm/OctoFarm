@@ -1,7 +1,7 @@
 import PowerButton from "../powerButton.js";
 import UI from "../../functions/ui";
 import OctoPrintClient from "../../octoprint";
-import OctoFarmClient from "../../octofarm";
+import OctoFarmClient from "../../octofarm_client";
 
 function printerControlBtn(id) {
   return `

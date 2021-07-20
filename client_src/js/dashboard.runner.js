@@ -1,6 +1,6 @@
 import "gridstack/dist/gridstack.min.css";
 import "gridstack/dist/h5/gridstack-dd-native";
-import OctoFarmclient from "./lib/octofarm.js";
+import OctoFarmClient from "./lib/octofarm_client";
 import { bindGraphChangeUpdate, loadGrid } from "./dashboard/grid-stack.manager";
 import { ChartsManager } from "./dashboard/charts.manager";
 import { createClientSSEWorker } from "./lib/client-worker.js";
@@ -8,7 +8,7 @@ import { getUsageWeightSeries, toFixedWeightGramFormatter } from "./dashboard/ut
 import { dashboardSSEventHandler, workerURL } from "./dashboard/dashboard-sse.handler";
 
 async function updateHistoryGraphs() {
-  let historyStatistics = await OctoFarmclient.getHistoryStatistics();
+  let historyStatistics = await OctoFarmClient.getHistoryStatistics();
 
   let historyGraphData = historyStatistics.history.historyByDay;
   let filamentUsageByDay = historyStatistics.history.totalByDay;
@@ -22,7 +22,7 @@ async function updateHistoryGraphs() {
 async function initNewGraphs() {
   await ChartsManager.renderDefaultCharts();
 
-  let historyStatistics = await OctoFarmclient.getHistoryStatistics();
+  let historyStatistics = await OctoFarmClient.getHistoryStatistics();
 
   let printCompletionByDay = historyStatistics.history.historyByDay;
   let filamentUsageByDay = historyStatistics.history.totalByDay;
