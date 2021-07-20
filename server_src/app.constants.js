@@ -13,7 +13,13 @@ const defaultProductionEnv = "production";
 const defaultTestEnv = "test";
 const knownEnvNames = ["development", "production", "test"];
 
+const apiRoute = "/api";
+
 class AppConstants {
+  static get apiRoute() {
+    return apiRoute;
+  }
+
   static get defaultMongoStringUnauthenticated() {
     return defaultMongoStringUnauthenticated;
   }

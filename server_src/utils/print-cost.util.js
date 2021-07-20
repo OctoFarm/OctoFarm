@@ -23,8 +23,7 @@ function getPrintCostNumeric(printTime, costSettings) {
   const lifespan = parseFloat(costSettings.estimateLifespan);
   const depreciationPerHour = lifespan > 0 ? purchasePrice / lifespan : 0;
   const maintenancePerHour = parseFloat(costSettings.maintenanceCosts);
-  const printerCost =
-    (depreciationPerHour + maintenancePerHour) * estimatedPrintTime;
+  const printerCost = (depreciationPerHour + maintenancePerHour) * estimatedPrintTime;
   // assembling string
   return electricityCost + printerCost;
 }
