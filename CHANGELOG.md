@@ -31,6 +31,7 @@ All notable changes to this project will be documented in this file.
     - Added Filament Clean back to start up so filament manager and spools list load.
     - Fixed #605: Tool total would show "null" if no spool selected. 
     - Issue with totals not been counted with/without a spool selected on Printer Control.
+    - Fixed #698: Current Operations would try to load the old browser worker. Replaced with sse client.
 
 ## [v1.2-rc1]
 
