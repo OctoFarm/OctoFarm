@@ -233,7 +233,7 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
             const printers = await OctoFarmClient.listPrinters();
             await PrinterManager.init(printer._id, printers, printerControlList);
           } catch (e) {
-            console.error(e);
+            console.error(e.stack);
             UI.createAlert(
               "error",
               `Unable to grab latest printer information: ${e}`,
@@ -249,7 +249,7 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
             const printersInfo = await OctoFarmClient.listPrinters();
             await updatePrinterSettingsModal(printersInfo, printer._id);
           } catch (e) {
-            console.error(e);
+            console.error(e.stack);
             UI.createAlert(
               "error",
               `Unable to grab latest printer information: ${e}`,
@@ -265,7 +265,7 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
             const printersInfo = await OctoFarmClient.listPrinters();
             await updatePrinterSettingsModal(printersInfo, printer._id);
           } catch (e) {
-            console.error(e);
+            console.error(e.stack);
             UI.createAlert(
               "error",
               `Unable to grab latest printer information: ${e}`,
@@ -280,7 +280,7 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
           let connectionLogs = await OctoFarmClient.get("printers/connectionLogs/" + printer._id);
           PrinterLogs.loadLogs(printerInfo, connectionLogs);
         } catch (e) {
-          console.error(e);
+          console.error(e.stack);
           UI.createAlert("error", `Unable to grab latest printer information: ${e}`, 0, "clicked");
         }
       });

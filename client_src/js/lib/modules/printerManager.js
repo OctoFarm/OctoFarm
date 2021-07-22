@@ -205,16 +205,11 @@ export default class PrinterManager {
           rotate90 = "rotate(90deg)";
         }
       }
-      let systemSettings = await OctoFarmClient.get("settings/client/get");
 
-      systemSettings = await systemSettings.json();
-
-      let serverSettings = await OctoFarmClient.get("settings/server/get");
-      serverSettings = await serverSettings.json();
-
+      let clientSettings = await OctoFarmClient.getClientSettings();
+      let serverSettings = await OctoFarmClient.getServerSettings();
       filamentManager = serverSettings.filamentManager;
-
-      let controlSettings = systemSettings.controlSettings;
+      let controlSettings = clientSettings.controlSettings;
       //Load tools
       if (typeof controlSettings !== "undefined" && controlSettings.filesTop) {
         document.getElementById("printerControls").innerHTML = `

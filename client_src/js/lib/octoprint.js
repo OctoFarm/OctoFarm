@@ -2,7 +2,17 @@ import UI from "./functions/ui.js";
 import OctoFarmClient from "./octofarm_client";
 
 export default class OctoPrintClient {
+  static validatePrinter(printer) {
+    if (!printer.apikey) {
+      throw new Error("Api key not provided");
+    }
+    if (!printer.printerURL) {
+      throw new Error("Printer URL not provided");
+    }
+  }
+
   static get(printer, item) {
+    this.validatePrinter(printer);
     const url = `${printer.printerURL}/${item}`;
     return fetch(url, {
       method: "GET",
@@ -16,6 +26,7 @@ export default class OctoPrintClient {
   }
 
   static postNOAPI(printer, item, data) {
+    this.validatePrinter(printer);
     const url = `${printer.printerURL}/${item}`;
     return fetch(url, {
       method: "POST",
@@ -30,6 +41,7 @@ export default class OctoPrintClient {
   }
 
   static post(printer, item, data) {
+    this.validatePrinter(printer);
     const url = `${printer.printerURL}/api/${item}`;
     return fetch(url, {
       method: "POST",
@@ -44,6 +56,7 @@ export default class OctoPrintClient {
   }
 
   static folder(printer, item, data) {
+    this.validatePrinter(printer);
     const url = `${printer.printerURL}/api/files/${item}`;
     return fetch(url, {
       method: "POST",
@@ -57,6 +70,7 @@ export default class OctoPrintClient {
   }
 
   static delete(printer, item) {
+    this.validatePrinter(printer);
     const url = `${printer.printerURL}/api/${item}`;
     return fetch(url, {
       method: "DELETE",
@@ -317,7 +331,7 @@ export default class OctoPrintClient {
   }
 
   static async connect(command, printer) {
-    let opts = null;
+    let opts;
     if (command === "connect") {
       opts = {
         command: "connect",
@@ -331,6 +345,7 @@ export default class OctoPrintClient {
         command: "disconnect"
       };
     }
+
     const post = await OctoPrintClient.post(printer, "connection", opts);
     if (typeof post !== "undefined" && post.status === 204) {
       UI.createAlert(

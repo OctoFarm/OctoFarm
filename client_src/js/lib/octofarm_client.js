@@ -23,7 +23,19 @@ export default class OctoFarmClient {
   }
 
   static async getHistoryStatistics() {
-    return this.get("history/stats").then((r) => r.json());
+    return this.get("history/stats");
+  }
+
+  static async getClientSettings() {
+    return this.get("settings/client/get");
+  }
+
+  static async getServerSettings() {
+    return this.get("settings/server/get");
+  }
+
+  static async getCustomGcode() {
+    return this.get("settings/customGcode");
   }
 
   static async get(item) {
