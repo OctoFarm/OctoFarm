@@ -8,6 +8,8 @@ const path = require("path");
 
 const Logger = require("./handlers/logger.js");
 const logger = new Logger("OctoFarm-Fallback-Server");
+const routePath = "./routes";
+const opts = { cwd: __dirname };
 
 function setupFallbackExpressServer() {
   let app = express();

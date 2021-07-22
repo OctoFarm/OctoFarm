@@ -216,7 +216,6 @@ function addEventListeners(printer) {
         id: printer._id
       };
       let post = await OctoFarmClient.post("printers/reScanOcto", data);
-      post = await post.json();
       if (post.msg.status !== "error") {
         UI.createAlert("success", post.msg.msg, 3000, "clicked");
       } else {

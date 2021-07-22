@@ -98,7 +98,7 @@ const amialiveService = async function () {
           try {
             checkUpdateAndNotify(alive.update);
           } catch (e) {
-            console.warn("Could not succesfully parse OctoFarm update notification");
+            console.warn("Could not successfully parse OctoFarm update notification");
           }
         }
 
