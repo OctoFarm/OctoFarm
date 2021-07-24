@@ -1,4 +1,5 @@
 import axios from "axios";
+import UI from "./functions/ui";
 
 export default class OctoFarmClient {
   static base = "/";
