@@ -28,6 +28,7 @@
   "author": "David Zwart (davidzwa) & James Mackay (NotExpectedYet)",
   "license": "ISC",
   "devDependencies": {
+    "axios": "^0.21.1",
     "@babel/cli": "^7.13.0",
     "@babel/core": "^7.14.0",
     "@babel/eslint-parser": "^7.13.8",
@@ -69,8 +70,5 @@
   "engine-strict": true,
   "engines": {
     "npm": ">= 6.10.0"
-  },
-  "dependencies": {
-    "axios": "^0.21.1"
   }
 }
