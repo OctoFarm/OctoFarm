@@ -69,5 +69,8 @@
   "engine-strict": true,
   "engines": {
     "npm": ">= 6.10.0"
+  },
+  "dependencies": {
+    "axios": "^0.21.1"
   }
 }

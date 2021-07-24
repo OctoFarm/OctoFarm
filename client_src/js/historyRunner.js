@@ -21,11 +21,9 @@ $("#historyModal").on("hidden.bs.modal", function (e) {
   document.getElementById("historyUpdateCostBtn").remove();
 });
 
-export default class History {
+class History {
   static async get() {
-    // let numOr0 = n => isNaN(n) ? 0 : parseFloat(n)
-    const newHistory = await OctoFarmClient.get("history/get");
-    historyList = await newHistory.json();
+    historyList = await OctoFarmClient.get("history/get");
     jplist.init({
       storage: "localStorage", // 'localStorage', 'sessionStorage' or 'cookies'
       storageName: "history-sorting" // the same storage name can be used to share storage between multiple pages
@@ -35,7 +33,6 @@ export default class History {
     document.getElementById("historyToolbar").classList.remove("d-none");
 
     let historyStatistics = await OctoFarmClient.getHistoryStatistics();
-    historyStatistics = await historyStatistics.json();
     let historyGraphData = historyStatistics.history.historyByDay;
 
     const historyGraphOptions = {
@@ -441,8 +438,7 @@ export default class History {
       id
     };
     let post = await OctoFarmClient.post("history/updateCostMatch", update);
-    post = await post.json();
-    if (post.status === 200) {
+    if (post) {
       UI.createAlert(
         "success",
         "Successfully added your printers cost to history.",
@@ -482,7 +478,7 @@ export default class History {
 
     const post = await OctoFarmClient.post("history/update", update);
 
-    if (post.status === 200) {
+    if (post) {
       UI.createAlert("success", "Successfully updated your history entry...", 3000, "clicked");
       document.getElementById(`note-${id}`).innerHTML = update.note;
       document.getElementById(`spool-${id}`).innerHTML = update.filamentId;
@@ -509,7 +505,7 @@ export default class History {
               id: e.target.id
             };
             const post = await OctoFarmClient.post("history/delete", histID);
-            if (post.status === 200) {
+            if (post) {
               jplist.resetContent(function () {
                 // remove element with id = el1
                 e.target.parentElement.parentElement.parentElement.remove();

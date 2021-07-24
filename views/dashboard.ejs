@@ -3,11 +3,13 @@
 
 <% if(typeof printerCount != 'undefined' && printerCount > 0 ) { %>
 
-    <div class="row">
-        <div class="col-12">
-            <%- include('./partials/currentOperations.ejs') %>
+    <% if(dashboardSettings?.farmActivity.currentOperations){ %>
+        <div class="row">
+            <div class="col-12">
+                <%- include('./partials/currentOperations.ejs') %>
+            </div>
         </div>
-    </div>
+    <% } %>
 
     <div class="grid-stack">
         <% if(dashboardSettings?.farmUtilisation.currentUtilisation){ %>

@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
     - Refactor monitoring pages (panel, list, camera) with latest SSE client reusability.
     - Refine the printer map layout with borders and printer quick actions (page not public yet).
     - Reduced logging (we will bring it back later in different shape with an Exception handler)
+    - Replaced fetch with axios in the local OctoFarm client calls.
 
 ### Removed
 
@@ -33,6 +34,7 @@ All notable changes to this project will be documented in this file.
     - Issue with totals not been counted with/without a spool selected on Printer Control.
     - Fixed #667: Weekly Utility was not loading the previous days values.
     - Fixed #698: Current Operations would try to load the old browser worker. Replaced with sse client.
+    - Fixed #681: Current Operations would load on dashboard even when not enabled in settings
 
 ## [v1.2-rc1]
 
