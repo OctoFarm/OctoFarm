@@ -268,7 +268,6 @@ export default class PrinterLogs {
         let connectionLogs = await OctoFarmClient.get(
           "printers/connectionLogs/" + currentPrinter._id
         );
-        connectionLogs = await connectionLogs.json();
         PrinterLogs.loadLogs(currentPrinter, connectionLogs);
       });
       eventListener = true;
@@ -590,7 +589,6 @@ export default class PrinterLogs {
   }
   static async loadStatistics(id) {
     let get = await OctoFarmClient.get("history/statistics/" + id);
-    get = await get.json();
     //Setup page
     let printerStatsWrapper = document.getElementById("printerStatistics");
     printerStatsWrapper.innerHTML = "";
