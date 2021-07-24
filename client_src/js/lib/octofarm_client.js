@@ -44,7 +44,7 @@ export default class OctoFarmClient {
 
   static async get(url) {
     return axios
-      .get(base + url)
+      .get(this.base + url)
       .then((res) => {
         return res.data;
       })
@@ -56,7 +56,7 @@ export default class OctoFarmClient {
 
   static async post(url, data) {
     return axios
-      .post(base + url, data)
+      .post(this.base + url, data)
       .then((res) => {
         return res.data;
       })
@@ -68,7 +68,7 @@ export default class OctoFarmClient {
 
   static async delete(url) {
     return axios
-      .delete(base + url)
+      .delete(this.base + url)
       .then((res) => {
         return res.data;
       })
@@ -79,7 +79,7 @@ export default class OctoFarmClient {
   }
   static async patch(url, data) {
     return axios
-      .delete(base + url, data)
+      .delete(this.base + url, data)
       .then((res) => {
         return res.data;
       })
