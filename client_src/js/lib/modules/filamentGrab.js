@@ -2,7 +2,6 @@ import OctoFarmClient from "../octofarm_client";
 
 export async function checkFilamentManager() {
   let settings = await OctoFarmClient.get("settings/server/get");
-  settings = await settings.json();
   return settings.filamentManager;
 }
 
@@ -21,5 +20,5 @@ export async function selectFilament(printerId, spoolId, tool) {
     printerId,
     spoolId
   };
-  const changedFilament = await OctoFarmClient.post("filament/select", data);
+  await OctoFarmClient.post("filament/select", data);
 }

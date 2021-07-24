@@ -27,7 +27,7 @@ export default class OctoFarmClient {
   }
 
   static async getHistoryStatistics() {
-    return this.get("history/stats");
+    return this.get("history/statisticsData");
   }
 
   static async getClientSettings() {
