@@ -111,14 +111,12 @@ export default class OctoFarmClient {
   }
 
   static async delete(path) {
-    this.validatePath(path);
     const url = new URL(this.base + path, window.location.origin).pathname;
     return axios.delete(url).then((res) => {
       return res.data;
     });
   }
   static async patch(path, data) {
-    this.validatePath(path);
     const url = new URL(this.base + path, window.location.origin).pathname;
     return axios.delete(url, data).then((res) => {
       return res.data;
