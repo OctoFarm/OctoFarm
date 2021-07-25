@@ -221,60 +221,25 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
       document
         .getElementById(`printerButton-${printer._id}`)
         .addEventListener("click", async () => {
-          try {
-            const printers = await OctoFarmClient.listPrinters();
-            await PrinterManager.init(printer._id, printers, printerControlList);
-          } catch (e) {
-            console.error(e.stack);
-            UI.createAlert(
-              "error",
-              `Unable to grab latest printer information: ${e}`,
-              0,
-              "clicked"
-            );
-          }
+          const printers = await OctoFarmClient.listPrinters();
+          await PrinterManager.init(printer._id, printers, printerControlList);
         });
       document
         .getElementById(`printerSettings-${printer._id}`)
         .addEventListener("click", async (e) => {
-          try {
-            const printersInfo = await OctoFarmClient.listPrinters();
-            await updatePrinterSettingsModal(printersInfo, printer._id);
-          } catch (e) {
-            console.error(e.stack);
-            UI.createAlert(
-              "error",
-              `Unable to grab latest printer information: ${e}`,
-              0,
-              "clicked"
-            );
-          }
+          const printersInfo = await OctoFarmClient.listPrinters();
+          await updatePrinterSettingsModal(printersInfo, printer._id);
         });
       document
         .getElementById(`scanningIssues-${printer._id}`)
         .addEventListener("click", async (e) => {
-          try {
-            const printersInfo = await OctoFarmClient.listPrinters();
-            await updatePrinterSettingsModal(printersInfo, printer._id);
-          } catch (e) {
-            console.error(e.stack);
-            UI.createAlert(
-              "error",
-              `Unable to grab latest printer information: ${e}`,
-              0,
-              "clicked"
-            );
-          }
+          const printersInfo = await OctoFarmClient.listPrinters();
+          await updatePrinterSettingsModal(printersInfo, printer._id);
         });
       document.getElementById(`printerLog-${printer._id}`).addEventListener("click", async (e) => {
-        try {
-          const printerInfo = await OctoFarmClient.getPrinter(printer._id);
-          let connectionLogs = await OctoFarmClient.get("printers/connectionLogs/" + printer._id);
-          PrinterLogs.loadLogs(printerInfo, connectionLogs);
-        } catch (e) {
-          console.error(e.stack);
-          UI.createAlert("error", `Unable to grab latest printer information: ${e}`, 0, "clicked");
-        }
+        const printerInfo = await OctoFarmClient.getPrinter(printer._id);
+        let connectionLogs = await OctoFarmClient.get("printers/connectionLogs/" + printer._id);
+        PrinterLogs.loadLogs(printerInfo, connectionLogs);
       });
 
       document

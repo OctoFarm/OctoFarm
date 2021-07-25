@@ -1,11 +1,45 @@
 import axios from "axios";
-import UI from "../lib/functions/ui";
+import { ApplicationError } from "../exceptions/application-error.handler";
+import { HTTPError } from "../exceptions/octofarm-api.exceptions";
+import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
+
+// axios request interceptor
+axios.interceptors.request.use(
+  function (config) {
+    OctoFarmClient.validatePath(config.url);
+    return config;
+  },
+  function (error) {
+    // Do something with request error
+    return Promise.reject(error);
+  }
+);
+
+// axios response interceptor
+axios.interceptors.response.use(
+  function (response) {
+    // Any status code that lie within the range of 2xx cause this function to trigger
+    // Do something with response data
+    return response;
+  },
+  function (error) {
+    // Any status codes that falls outside the range of 2xx cause this function to trigger
+    // Do something with response error
+    console.error(JSON.stringify(error, null, 4));
+    throw new ApplicationError(HTTPError.RESOURCE_NOT_FOUND);
+  }
+);
 
 export default class OctoFarmClient {
   static base = "/";
   static params = "?";
   static printerRoute = "printers";
-  static octoFarmErrorMessage = "Unable to contact OctoFarm server, is it online?";
+
+  static validatePath(pathname) {
+    if (!pathname) {
+      throw new ApplicationError(ClientErrors.FAILED_VALIDATION);
+    }
+  }
 
   static async getPrinter(id) {
     if (!id) {
@@ -18,7 +52,7 @@ export default class OctoFarmClient {
   }
 
   static async listPrinters() {
-    return this.post(`${this.printerRoute}/printerInfo/`);
+    return this.post(`${this.printerRoute}/printerInfoerr/`);
   }
 
   static async refreshPrinterSettings(id) {
@@ -44,50 +78,32 @@ export default class OctoFarmClient {
     return this.get("settings/customGcode");
   }
 
-  static async get(url) {
-    return axios
-      .get(this.base + url)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((error) => {
-        console.error(error);
-        UI.createAlert("error", this.octoFarmErrorMessage, 0, "clicked");
-      });
+  static async get(path) {
+    const url = new URL(this.base + path, window.location.origin).pathname;
+    return axios.get(url).then((res) => {
+      return res.data;
+    });
   }
 
-  static async post(url, data) {
-    return axios
-      .post(this.base + url, data)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((error) => {
-        console.error(error);
-        UI.createAlert("error", this.octoFarmErrorMessage, 0, "clicked");
-      });
+  static async post(path, data) {
+    const url = new URL(this.base + path, window.location.origin).pathname;
+    return axios.post(url, data).then((res) => {
+      return res.data;
+    });
   }
 
-  static async delete(url) {
-    return axios
-      .delete(this.base + url)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((error) => {
-        console.error(error);
-        UI.createAlert("error", this.octoFarmErrorMessage, 0, "clicked");
-      });
+  static async delete(path) {
+    this.validatePath(path);
+    const url = new URL(this.base + path, window.location.origin).pathname;
+    return axios.delete(url).then((res) => {
+      return res.data;
+    });
   }
-  static async patch(url, data) {
-    return axios
-      .delete(this.base + url, data)
-      .then((res) => {
-        return res.data;
-      })
-      .catch((error) => {
-        console.error(error);
-        UI.createAlert("error", this.octoFarmErrorMessage, 0, "clicked");
-      });
+  static async patch(path, data) {
+    this.validatePath(path);
+    const url = new URL(this.base + path, window.location.origin).pathname;
+    return axios.delete(url, data).then((res) => {
+      return res.data;
+    });
   }
 }

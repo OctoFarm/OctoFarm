@@ -2,11 +2,11 @@ import OctoFarmClient from "../../services/octofarm_client.service.js";
 import UI from "../functions/ui.js";
 import Calc from "../functions/calc.js";
 import Script from "./scriptCheck.js";
+import { ApplicationError } from "../../exceptions/application-error.handler";
 
 let currentPrinterIndex;
 let printerOnline;
 let currentPrinter;
-let hasErrorNotificationBeenTriggered = false;
 let pageElements;
 let currentPrintersInformation;
 
@@ -25,39 +25,39 @@ export async function updatePrinterSettingsModal(printersInformation, printerID)
     // No printer ID we are updating the state...
     // The SSE Event doesn't stop on an error, so we need to make sure the update event skips an error occurring...
 
-    if (!hasErrorNotificationBeenTriggered) {
-      try {
-        // Make sure online state is latest...
-        printerOnline =
-          printersInformation[currentPrinterIndex].printerState.colour.category !== "Offline";
-        PrinterSettings.updateStateElements(printersInformation[currentPrinterIndex]);
-      } catch (e) {
-        console.error(e);
-        UI.createAlert("error", `Failed to update the printers state: <br> ${e}`, 0, "clicked");
-        hasErrorNotificationBeenTriggered = true;
-      }
+    if (!ApplicationError.hasErrorNotificationBeenTriggered) {
+      // try {
+      // Make sure online state is latest...
+      printerOnline =
+        printersInformation[currentPrinterIndex].printerState.colour.category !== "Offline";
+      PrinterSettings.updateStateElements(printersInformation[currentPrinterIndex]);
+      // } catch (e) {
+      //   console.error(e);
+      //   UI.createAlert("error", `Failed to update the printers state: <br> ${e}`, 0, "clicked");
+      //
+      // }
     }
   } else {
-    try {
-      PrinterSettings.updateCurrentPrinterIndex(printersInformation, printerID);
-    } catch (e) {
-      console.error(e);
-      UI.createAlert("error", `Failed to find your printer from server: <br> ${e}`, 0, "clicked");
-    }
-    try {
-      // Resync Printer Settings to latest values and continue to setup page.
-      currentPrinter = await OctoFarmClient.refreshPrinterSettings(printerID);
-    } catch (e) {
-      // Fall back ensure printer data is loaded if new data couldn't be updated.
-      currentPrinter = printersInformation[currentPrinterIndex];
-      console.error(e);
-      UI.createAlert(
-        "warning",
-        "Failed to update OctoPrint settings, falling back to previous...",
-        0,
-        "clicked"
-      );
-    }
+    // try {
+    PrinterSettings.updateCurrentPrinterIndex(printersInformation, printerID);
+    // } catch (e) {
+    //   console.error(e);
+    //   UI.createAlert("error", `Failed to find your printer from server: <br> ${e}`, 0, "clicked");
+    // }
+    // try {
+    // Resync Printer Settings to latest values and continue to setup page.
+    currentPrinter = await OctoFarmClient.refreshPrinterSettings(printerID);
+    // } catch (e) {
+    //   // Fall back ensure printer data is loaded if new data couldn't be updated.
+    //   currentPrinter = printersInformation[currentPrinterIndex];
+    //   console.error(e);
+    //   UI.createAlert(
+    //     "warning",
+    //     "Failed to update OctoPrint settings, falling back to previous...",
+    //     0,
+    //     "clicked"
+    //   );
+    // }
 
     //Convert online state to a boolean
     printerOnline = currentPrinter.printerState.colour.category !== "Offline";

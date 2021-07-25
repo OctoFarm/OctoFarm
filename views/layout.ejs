@@ -1,3 +1,5 @@
+<% const octofarmErrorModal = './partials/octofarm-error.modal.ejs'  %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -157,6 +159,7 @@
 </nav>
 <div class="restricScreenSize">
     <%- body %>
+    <%- include(octofarmErrorModal) %>
     <div class="modal fade" id="printerManagerModal" tabindex="-1" role="dialog"
          aria-labelledby="printerManagerModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">
