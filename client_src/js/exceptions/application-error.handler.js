@@ -6,18 +6,6 @@ export class ApplicationError extends Error {
     super();
     Object.assign(options, overrides);
 
-    if (!errorTypes.hasOwnProperty(options.type)) {
-      throw new Error(`ApplicationError: ${options.type} is not a valid type.`);
-    }
-
-    if (!options.message) {
-      throw new Error("ApplicationError: error message required.");
-    }
-
-    if (!options.code) {
-      throw new Error("ApplicationError: error code required.");
-    }
-
     this.name = "OctoFarm Error";
     this.type = options.type;
     this.code = options.code;
