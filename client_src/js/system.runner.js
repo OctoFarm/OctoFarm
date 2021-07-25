@@ -903,7 +903,6 @@ class ServerSettings {
     if (spinner) {
       spinner.classList.add("d-none");
     }
-    console.log(logDumpResponse);
     if (!logDumpResponse?.status || !logDumpResponse?.msg || !logDumpResponse?.zipDumpPath) {
       UI.createAlert(
         "error",
@@ -939,4 +938,3 @@ class ServerSettings {
 ServerSettings.init();
 ClientSettings.init();
 Script.get();
-console.log("HELLO");
