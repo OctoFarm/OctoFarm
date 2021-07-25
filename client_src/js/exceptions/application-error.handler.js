@@ -1,8 +1,4 @@
 import { errorTypes } from "./error.types";
-import { createErrorAlert, openErrorModal } from "../client-error.modal";
-
-const modalErrors = [errorTypes.NETWORK, errorTypes.SERVER, errorTypes.UNKNOWN];
-const popUpErrors = [errorTypes.CLIENT];
 
 export class ApplicationError extends Error {
   static hasErrorNotificationBeenTriggered = false;
@@ -37,11 +33,5 @@ export class ApplicationError extends Error {
 
     // Show error message to client...
     ApplicationError.hasErrorNotificationBeenTriggered = true;
-    if (modalErrors.includes(this.type)) {
-      openErrorModal(this);
-    }
-    if (popUpErrors.includes(this.type)) {
-      createErrorAlert(this);
-    }
   }
 }

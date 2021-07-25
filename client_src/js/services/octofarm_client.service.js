@@ -70,7 +70,7 @@ export default class OctoFarmClient {
   }
 
   static async listPrinters() {
-    return this.post(`${this.printerRoute}/printfdgdferInfo/`);
+    return this.post(`${this.printerRoute}/printerInfo/`);
   }
 
   static async refreshPrinterSettings(id) {

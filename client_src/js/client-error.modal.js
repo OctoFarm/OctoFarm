@@ -1,8 +1,8 @@
 import UI from "./lib/functions/ui";
+import { errorTypes } from "./exceptions/error.types";
 
-const apiErrorTitle = document.getElementById("apiErrorTitle");
-const apiErrorMessage = document.getElementById("apiErrorMessage");
-const apiDeveloperInfo = document.getElementById("apiDeveloperInfo");
+const modalErrors = [errorTypes.NETWORK, errorTypes.SERVER, errorTypes.UNKNOWN];
+const popUpErrors = [errorTypes.CLIENT];
 
 function returnAlertErrorMessage(options) {
   return `
@@ -25,11 +25,14 @@ function returnModalDeveloperInfo(options) {
   `;
 }
 
-export function createErrorAlert(options) {
+function createErrorAlert(options) {
   UI.createAlert("error", returnAlertErrorMessage(options), 0, "clicked");
 }
 
-export function openErrorModal(options) {
+function openErrorModal(options) {
+  const apiErrorTitle = document.getElementById("apiErrorTitle");
+  const apiErrorMessage = document.getElementById("apiErrorMessage");
+  const apiDeveloperInfo = document.getElementById("apiDeveloperInfo");
   apiErrorTitle.innerHTML = ` ${options.name}`;
   apiErrorMessage.innerHTML = `
      <br>
@@ -41,3 +44,19 @@ export function openErrorModal(options) {
   apiDeveloperInfo.innerHTML = returnModalDeveloperInfo(options);
   $("#octofarmErrorModal").modal("show");
 }
+
+function handleError(event) {
+  if (modalErrors.includes(event.reason.type)) {
+    openErrorModal(event.reason);
+  }
+  if (popUpErrors.includes(event.reason.type)) {
+    createErrorAlert(event.reason);
+  }
+}
+
+window.onunhandledrejection = function (event) {
+  handleError(event);
+};
+window.onunhandledrejection = function (event) {
+  handleError(event);
+};
