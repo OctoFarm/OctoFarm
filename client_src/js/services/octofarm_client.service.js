@@ -1,8 +1,9 @@
 import axios from "axios";
-import UI from "./functions/ui";
+import UI from "../lib/functions/ui";
 
 export default class OctoFarmClient {
   static base = "/";
+  static params = "?";
   static printerRoute = "printers";
   static octoFarmErrorMessage = "Unable to contact OctoFarm server, is it online?";
 

@@ -1,4 +1,4 @@
-import OctoFarmClient from "../octofarm_client";
+import OctoFarmClient from "../../services/octofarm_client.service";
 import UI from "../functions/ui.js";
 
 const editMessage = `

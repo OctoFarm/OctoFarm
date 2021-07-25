@@ -1,6 +1,6 @@
 import { findIndex } from "lodash";
 
-import OctoFarmClient from "../../lib/octofarm_client.js";
+import OctoFarmClient from "../../services/octofarm_client.service.js";
 import UI from "../../lib/functions/ui";
 import PrinterSelect from "../../lib/modules/printerSelect";
 import {

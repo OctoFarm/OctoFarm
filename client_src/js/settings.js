@@ -1,4 +1,4 @@
-import OctoFarmClient from "./lib/octofarm_client";
+import OctoFarmClient from "./services/octofarm_client.service";
 import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
 import Script from "./lib/modules/scriptCheck.js";

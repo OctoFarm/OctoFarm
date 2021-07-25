@@ -5,7 +5,7 @@ import UI from "../functions/ui.js";
 import { dragAndDropEnableMultiplePrinters } from "../functions/dragAndDrop.js";
 import FileSorting from "./fileSorting.js";
 import PrinterSelect from "./printerSelect.js";
-import OctoFarmClient from "../octofarm_client";
+import OctoFarmClient from "../../services/octofarm_client.service";
 
 const fileUploads = new Queue();
 

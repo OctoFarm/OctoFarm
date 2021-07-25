@@ -1,5 +1,5 @@
 import UI from "./functions/ui.js";
-import OctoFarmClient from "./octofarm_client";
+import OctoFarmClient from "../services/octofarm_client.service";
 
 export default class OctoPrintClient {
   static validatePrinter(printer) {

@@ -1,4 +1,4 @@
-import OctoFarmClient from "../../lib/octofarm_client";
+import OctoFarmClient from "../../services/octofarm_client.service";
 import Sortable from "../../vendor/sortable";
 
 export function setupSortablePrintersTable() {

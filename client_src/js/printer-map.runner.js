@@ -8,7 +8,7 @@ import {
   quickActionsModalId
 } from "./printer-map/printer-map.options";
 import { createWebWorker, handleVisibilityChange } from "./printer-map/printer-map.worker";
-import OctoFarmClient from "./lib/octofarm_client";
+import OctoFarmClient from "./services/octofarm_client.service";
 import { getModalPrinter, setModalPrinter } from "./printer-map/printer-map.state";
 import {
   printerQuickActionsModal,
@@ -45,7 +45,7 @@ async function startPrint(printer, filePath) {
 
 function askConfirmation(message, cb) {
   return bootbox.confirm({
-    message: message || `Are you sure you want to perform this action?`,
+    message: message || "Are you sure you want to perform this action?",
     buttons: {
       cancel: {
         label: '<i class="fa fa-times"></i> Cancel'

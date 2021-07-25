@@ -1,6 +1,6 @@
 import Validate from "../lib/functions/validate";
 import UI from "../lib/functions/ui";
-import OctoFarmClient from "../lib/octofarm_client.js";
+import OctoFarmClient from "../services/octofarm_client.service.js";
 
 let newPrintersIndex = 0;
 
