@@ -30,6 +30,13 @@ const HTTPError = {
     message: "Resource not found",
     statusCode: 404
   },
+  NO_CONNECTION: {
+    type: errorTypes.NETWORK,
+    color: "danger",
+    code: "NO_CONNECTION",
+    message: "No connection to resource available",
+    statusCode: 0
+  },
 
   // Predefined 5xx http errors
   INTERNAL_SERVER_ERROR: {

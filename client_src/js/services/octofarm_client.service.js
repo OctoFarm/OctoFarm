@@ -26,6 +26,8 @@ axios.interceptors.response.use(
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
     switch (error.response.status) {
+      case 0:
+        throw new ApplicationError(HTTPError.NO_CONNECTION);
       case 400:
         throw new ApplicationError(HTTPError.BAD_REQUEST);
       case 401:
