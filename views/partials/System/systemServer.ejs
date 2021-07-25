@@ -64,7 +64,7 @@
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
                                 <input type="checkbox" class="custom-control-input"
-                                       id="requireLogin" required <%= (serverSettingsCache.server.loginRequired) ? "checked" : "" %>
+                                       id="requireLogin" required <%= (serverSettings.server.loginRequired) ? "checked" : "" %>
                                 >
                                 <label class="custom-control-label"
                                        for="requireLogin">Require a login</label>
@@ -77,7 +77,7 @@
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
                                 <input type="checkbox" class="custom-control-input"
-                                       id="requireRegistration" required <%= (serverSettingsCache.server.registration) ? "checked" : "" %>
+                                       id="requireRegistration" required <%= (serverSettings.server.registration) ? "checked" : "" %>
                                 >
                                 <label class="custom-control-label"
                                        for="requireRegistration">Registration</label>
@@ -110,7 +110,7 @@
                     </div>
                     <input id="webSocketThrottle" type="number" class="form-control"
                            placeholder="6" aria-label="Refresh Rate"
-                           id="onlinePollRate" value="<%= serverSettingsCache.onlinePolling.seconds %>" min="0.5" max="10"
+                           id="onlinePollRate" value="<%= serverSettings.onlinePolling.seconds %>" min="0.5" max="10"
                            step="0.5">
                     <div class="input-group-append">
                         <span class="input-group-text">Seconds</span>
@@ -136,7 +136,7 @@
                             <input id="webSocketRetry" type="number"
                                    class="form-control" placeholder="6"
                                    aria-label="Refresh Rate" id="onlinePollRate"
-                                   value="<%= serverSettingsCache.timeout.webSocketRetry/1000 %>" min="5" max="30" step="0.5">
+                                   value="<%= serverSettings.timeout.webSocketRetry/1000 %>" min="5" max="30" step="0.5">
                             <div class="input-group-append">
                                 <span class="input-group-text">Seconds</span>
                             </div>
@@ -161,7 +161,7 @@
                             <input id="APITimeout" type="number"
                                    class="form-control" placeholder="6"
                                    aria-label="Refresh Rate" id="onlinePollRate"
-                                   value="<%= serverSettingsCache.timeout.apiTimeout/1000 %>" min="1" max="10" step="0.5">
+                                   value="<%= serverSettings.timeout.apiTimeout/1000 %>" min="1" max="10" step="0.5">
                             <div class="input-group-append">
                                 <span class="input-group-text">Seconds</span>
                             </div>
@@ -186,7 +186,7 @@
                             <input id="APIRetryTimeout" type="number"
                                    class="form-control" placeholder="6"
                                    aria-label="Refresh Rate" id="onlinePollRate"
-                                   value="<%= serverSettingsCache.timeout.apiRetryCutoff/1000 %>" min="5" max="60" step="0.5">
+                                   value="<%= serverSettings.timeout.apiRetryCutoff/1000 %>" min="5" max="60" step="0.5">
                             <div class="input-group-append">
                                 <span class="input-group-text">Seconds</span>
                             </div>
@@ -209,7 +209,7 @@
                             </div>
                             <input id="APIRetry" type="number" class="form-control"
                                    placeholder="6" aria-label="Refresh Rate"
-                                   id="onlinePollRate" value="<%= serverSettingsCache.timeout.apiRetry/1000 %>" min="30" max="60"
+                                   id="onlinePollRate" value="<%= serverSettings.timeout.apiRetry/1000 %>" min="30" max="60"
                                    step="0.5">
                             <div class="input-group-append">
                                 <span class="input-group-text">Seconds</span>
@@ -233,7 +233,7 @@
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
                                 <input type="checkbox" class="custom-control-input"
-                                       id="checkFilament" required <%= (serverSettingsCache.server.registration) ? "checked" : "" %>>
+                                       id="checkFilament" required <%= (serverSettings.server.registration) ? "checked" : "" %>>
                                 <label class="custom-control-label"
                                        for="checkFilament">Filament Check</label>
                                 <div class="valid-feedback">Filament Check is turned
@@ -259,7 +259,7 @@
                             setup with a postgres database. Without this you will
                             not be able to select filament on every
                             instance.</small>
-                        <% if(!serverSettingsCache.filamentManager){ %>
+                        <% if(!serverSettings.filamentManager){ %>
                             <center>
                                 <br>
                                 <button id="resyncFilamentManagerBtn" type="button"
@@ -317,7 +317,7 @@
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
                                 <input type="checkbox" class="custom-control-input"
-                                       id="timelapseOnComplete" required <%= (serverSettingsCache.history.timelapse.onComplete) ? "checked" : "" %>>
+                                       id="timelapseOnComplete" required <%= (serverSettings.history.timelapse.onComplete) ? "checked" : "" %>>
                                 <label class="custom-control-label"
                                        for="timelapseOnComplete">On
                                     Completion</label>
@@ -332,7 +332,7 @@
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
                                 <input type="checkbox" class="custom-control-input"
-                                       id="timelapseOnFailure" required  <%= (serverSettingsCache.history.timelapse.onFailure) ? "checked" : "" %>>
+                                       id="timelapseOnFailure" required  <%= (serverSettings.history.timelapse.onFailure) ? "checked" : "" %>>
                                 <label class="custom-control-label"
                                        for="timelapseOnFailure">On Failure</label>
                                 <div class="valid-feedback">On Failure timelapse
@@ -346,7 +346,7 @@
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
                                 <input type="checkbox" class="custom-control-input"
-                                       id="timelapseDelete" required <%= (serverSettingsCache.history.timelapse.deleteAfter) ? "checked" : "" %>>
+                                       id="timelapseDelete" required <%= (serverSettings.history.timelapse.deleteAfter) ? "checked" : "" %>>
                                 <label class="custom-control-label"
                                        for="timelapseDelete">Delete from
                                     OctoPrint</label>
@@ -367,7 +367,7 @@
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
                                 <input type="checkbox" class="custom-control-input"
-                                       id="snapOnComplete" required <%= (serverSettingsCache.history.snapshot.onComplete) ? "checked" : "" %>>
+                                       id="snapOnComplete" required <%= (serverSettings.history.snapshot.onComplete) ? "checked" : "" %>>
                                 <label class="custom-control-label"
                                        for="snapOnComplete">On Complete</label>
                                 <div class="valid-feedback">On Complete snapshot
@@ -381,7 +381,7 @@
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
                                 <input type="checkbox" class="custom-control-input"
-                                       id="snapOnFailure" required <%= (serverSettingsCache.history.snapshot.onFailure) ? "checked" : "" %>>
+                                       id="snapOnFailure" required <%= (serverSettings.history.snapshot.onFailure) ? "checked" : "" %>>
                                 <label class="custom-control-label"
                                        for="snapOnFailure">On Failure</label>
                                 <div class="valid-feedback">On Failure snapshot
@@ -402,7 +402,7 @@
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
                                 <input type="checkbox" class="custom-control-input"
-                                       id="thumbOnComplete" required <%= (serverSettingsCache.history.thumbnails.onComplete) ? "checked" : "" %>>
+                                       id="thumbOnComplete" required <%= (serverSettings.history.thumbnails.onComplete) ? "checked" : "" %>>
                                 <label class="custom-control-label"
                                        for="thumbOnComplete">On Complete</label>
                                 <div class="valid-feedback">On Complete snapshot
@@ -416,7 +416,7 @@
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
                                 <input type="checkbox" class="custom-control-input"
-                                       id="thumbOnFailure" required <%= (serverSettingsCache.history.thumbnails.onFailure) ? "checked" : "" %>>
+                                       id="thumbOnFailure" required <%= (serverSettings.history.thumbnails.onFailure) ? "checked" : "" %>>
                                 <label class="custom-control-label"
                                        for="thumbOnFailure">On Failure</label>
                                 <div class="valid-feedback">On Failure snapshot
@@ -627,7 +627,7 @@
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
                                 <input type="checkbox" class="custom-control-input"
-                                       id="infActivateInfluxExport" required <%= (serverSettingsCache.influxExport.active) ? "checked" : "" %>>
+                                       id="infActivateInfluxExport" required <%= (serverSettings.influxExport.active) ? "checked" : "" %>>
                                 <label class="custom-control-label"
                                        for="infActivateInfluxExport">Activated?</label>
                                 <div class="valid-feedback">InfluxDB Export is
@@ -649,7 +649,7 @@
                                         </div>
                                         <input id="infHostIP" type="text"
                                                class="form-control"
-                                               value="<%= (serverSettingsCache?.influxExport.host) ? serverSettingsCache.influxExport.host : "" %>"
+                                               value="<%= (serverSettings?.influxExport.host) ? serverSettings.influxExport.host : "" %>"
                                                placeholder="192.168.1.5"
                                                aria-label="Username"
                                                aria-describedby="infHostIPe">
@@ -662,7 +662,7 @@
                                                               id="infHostPorte">Host Port: </span>
                                         </div>
                                         <input id="infHostPort" type="text"
-                                               value="<%= (serverSettingsCache?.influxExport.port) ? serverSettingsCache.influxExport.port : "" %>"
+                                               value="<%= (serverSettings?.influxExport.port) ? serverSettings.influxExport.port : "" %>"
                                                class="form-control"
                                                placeholder="8086"
                                                aria-label="Username"
@@ -678,7 +678,7 @@
                                                               id="infUsernamee">Username: </span>
                                         </div>
                                         <input id="infUsername" type="text"
-                                               value="<%= (serverSettingsCache?.influxExport.username) ? serverSettingsCache.influxExport.username : "" %>"
+                                               value="<%= (serverSettings?.influxExport.username) ? serverSettings.influxExport.username : "" %>"
                                                class="form-control" placeholder=""
                                                aria-label="Username"
                                                aria-describedby="infUsernamee">
@@ -695,7 +695,7 @@
                                                class="form-control" placeholder=""
                                                aria-label="Username"
                                                aria-describedby="infPassworde"
-                                               value="<%= (serverSettingsCache?.influxExport.password) ? serverSettingsCache.influxExport.password : "" %>">
+                                               value="<%= (serverSettings?.influxExport.password) ? serverSettings.influxExport.password : "" %>">
                                     </div>
                                 </div>
                             </div>
@@ -713,7 +713,7 @@
                                                placeholder="OctoFarmExport"
                                                aria-label="Username"
                                                aria-describedby="infDatabasee"
-                                               value="<%= (serverSettingsCache?.influxExport.database) ? serverSettingsCache.influxExport.database : "" %>">
+                                               value="<%= (serverSettings?.influxExport.database) ? serverSettings.influxExport.database : "" %>">
                                     </div>
                                 </div>
                             </div>
@@ -729,7 +729,7 @@
                                                placeholder="365d"
                                                aria-label="Username"
                                                aria-describedby="infDuration"
-                                               value="<%= (serverSettingsCache?.influxExport.retentionPolicy.duration) ? serverSettingsCache.influxExport.retentionPolicy.duration : "" %>">
+                                               value="<%= (serverSettings?.influxExport.retentionPolicy.duration) ? serverSettings.influxExport.retentionPolicy.duration : "" %>">
                                     </div>
                                 </div>
                                 <div class="col">
@@ -741,7 +741,7 @@
                                         <input type="text" class="form-control"
                                                placeholder="1" aria-label="Username"
                                                aria-describedby="infReplication"
-                                               value="<%= (serverSettingsCache?.influxExport.retentionPolicy.replication) ? serverSettingsCache.influxExport.retentionPolicy.replication : "" %>">
+                                               value="<%= (serverSettings?.influxExport.retentionPolicy.replication) ? serverSettings.influxExport.retentionPolicy.replication : "" %>">
                                     </div>
                                 </div>
                             </div>
@@ -749,7 +749,7 @@
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
                                 <input type="checkbox" class="custom-control-input"
-                                       id="infRetention" required <%= (!serverSettingsCache?.influxExport.retentionPolicy.duration) ? "checked": "" %>>
+                                       id="infRetention" required <%= (!serverSettings?.influxExport.retentionPolicy.duration) ? "checked": "" %>>
                                 <label class="custom-control-label"
                                        for="infRetention">Default Retention?</label>
                                 <div class="valid-feedback">Using default retention

@@ -16,43 +16,37 @@ const { fetchMongoDBConnectionString } = require("../app-env");
 const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
 
-router.get(
-  "/",
-  ensureAuthenticated,
-  ensureCurrentUserAndGroup,
-  async (req, res) => {
-    const clientSettings = await SettingsClean.returnClientSettings();
-    const serverSettings = await SettingsClean.returnSystemSettings();
-    const systemInformation = await SystemRunner.querySystemInfo();
-    const printers = Runner.returnFarmPrinters();
-    const softwareUpdateNotification =
-      softwareUpdateChecker.getUpdateNotificationIfAny();
-    let dashboardSettings =
-      clientSettings?.dashboard || getDefaultDashboardSettings();
+router.get("/", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
+  const clientSettings = await SettingsClean.returnClientSettings();
+  const serverSettings = await SettingsClean.returnSystemSettings();
+  const systemInformation = await SystemRunner.querySystemInfo();
+  const printers = Runner.returnFarmPrinters();
+  const softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
+  let dashboardSettings = clientSettings?.dashboard || getDefaultDashboardSettings();
 
-    res.render("system", {
-      name: req.user.name,
-      userGroup: req.user.group,
-      version: process.env[AppConstants.VERSION_KEY],
-      printerCount: printers.length,
-      page: "System",
-      octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-      helpers: prettyHelpers,
-      clientSettings,
-      serverSettings,
-      systemInformation,
-      db: fetchMongoDBConnectionString(),
-      dashboardSettings: dashboardSettings,
-      serviceInformation: {
-        isDockerContainer: isDocker(),
-        isNodemon: isNodemon(),
-        isNode: isNode(),
-        isPm2: isPm2(),
-        update: softwareUpdateNotification
-      }
-    });
-  }
-);
+  res.render("system", {
+    name: req.user.name,
+    userGroup: req.user.group,
+    version: process.env[AppConstants.VERSION_KEY],
+    printerCount: printers.length,
+    page: "System",
+    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+    helpers: prettyHelpers,
+    clientSettings,
+    serverSettings,
+    systemInformation,
+    db: fetchMongoDBConnectionString(),
+    dashboardSettings: dashboardSettings,
+    serviceInformation: {
+      isDockerContainer: isDocker(),
+      isNodemon: isNodemon(),
+      isNode: isNode(),
+      isPm2: isPm2(),
+      update: softwareUpdateNotification
+    },
+    patreonData: require("../../../../octofarm-development/OctoFarm/server_src/patreon.constants.js")
+  });
+});
 
 /**
  * Acquire system information from system info runner
