@@ -3,6 +3,7 @@ import UI from "../functions/ui.js";
 import Calc from "../functions/calc.js";
 import Script from "./scriptCheck.js";
 import { ApplicationError } from "../../exceptions/application-error.handler";
+import { ClientErrors } from "../../exceptions/octofarm-client.exceptions";
 
 let currentPrinterIndex;
 let printerOnline;
@@ -88,7 +89,7 @@ class PrinterSettings {
     if (printersIndex !== -1) {
       currentPrinterIndex = printersIndex;
     } else {
-      throw new Error("Could not find a valid printers index...");
+      ApplicationError(ClientErrors.FAILED_STATE_UPDATE);
     }
   }
 
@@ -1108,7 +1109,7 @@ class PrinterSettings {
       Object.values(pageElements.menu).map((e) => {
         this.disablePanel(e);
       });
-      throw new Error("Cannot apply state as no printer index can be found...");
+      ApplicationError(ClientErrors.FAILED_STATE_UPDATE);
     }
     pageElements.mainPage.title.innerHTML = `Printer Settings: ${currentPrinter.printerName}`;
     pageElements.mainPage.status.innerHTML = `<b>Printer Status</b><br>${currentPrinter.printerState.state}`;
