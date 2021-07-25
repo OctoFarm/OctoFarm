@@ -1,4 +1,4 @@
-import UI from "../lib/functions/ui";
+import UI from "./lib/functions/ui";
 
 const apiErrorTitle = document.getElementById("apiErrorTitle");
 const apiErrorMessage = document.getElementById("apiErrorMessage");
@@ -20,7 +20,7 @@ function returnDeveloperInfo(options) {
     <u>DEVELOPER INFO</u><br>
     LINE: ${options?.lineNumber}<br>
     COL: ${options?.columnNumber}<br>
-    FILE: ${options?.fileName}
+    FILE: ${new URL(options?.fileName).pathname}
     </code>
   `;
 }

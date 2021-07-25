@@ -1,5 +1,5 @@
 import { errorTypes } from "./error.types";
-import { createErrorAlert, openErrorModal } from "./error.modals";
+import { createErrorAlert, openErrorModal } from "../client-error.modal";
 
 const modalErrors = [errorTypes.NETWORK, errorTypes.SERVER, errorTypes.UNKNOWN];
 const popUpErrors = [errorTypes.CLIENT];

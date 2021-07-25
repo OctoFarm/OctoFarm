@@ -53,7 +53,7 @@ export default class OctoFarmClient {
   }
 
   static async listPrinters() {
-    return this.post(`${this.printerRoute}/printerInfoerr/`);
+    return this.post(`${this.printerRoute}/printerInfo/`);
   }
 
   static async refreshPrinterSettings(id) {
