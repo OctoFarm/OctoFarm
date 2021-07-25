@@ -1,4 +1,4 @@
-import OctoFarmClient from "../../services/octofarm_client.service";
+import OctoFarmClient from "../../services/octofarm-client.service";
 
 export async function checkFilamentManager() {
   let settings = await OctoFarmClient.get("settings/server/get");

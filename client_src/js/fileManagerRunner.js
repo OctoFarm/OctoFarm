@@ -1,4 +1,4 @@
-import OctoFarmClient from "./services/octofarm_client.service";
+import OctoFarmClient from "./services/octofarm-client.service";
 import Calc from "./lib/functions/calc.js";
 import FileManager from "./lib/modules/fileManager.js";
 import { dragAndDropEnable } from "./lib/functions/dragAndDrop.js";

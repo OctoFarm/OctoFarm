@@ -1,5 +1,5 @@
 import UI from "../functions/ui.js";
-import OctoFarmClient from "../../services/octofarm_client.service";
+import OctoFarmClient from "../../services/octofarm-client.service";
 
 const alertsDrop = `
 <option selected value="0">Choose...</option>

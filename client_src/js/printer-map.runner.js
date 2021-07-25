@@ -8,7 +8,7 @@ import {
   quickActionsModalId
 } from "./printer-map/printer-map.options";
 import { createWebWorker, handleVisibilityChange } from "./printer-map/printer-map.worker";
-import OctoFarmClient from "./services/octofarm_client.service";
+import OctoFarmClient from "./services/octofarm-client.service";
 import { getModalPrinter, setModalPrinter } from "./printer-map/printer-map.state";
 import {
   printerQuickActionsModal,
