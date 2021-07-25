@@ -155,14 +155,17 @@ function checkForApiErrors(printer) {
   if (!ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
     let apiErrors = 0;
     for (const key in printer.systemChecks) {
-      if (printer.systemChecks.hasOwnProperty(key)) {
-        if (printer.systemChecks[key].status !== "success") {
+      if (printer.systemChecks.scanning.hasOwnProperty(key)) {
+        if (printer.systemChecks.scanning[key].status !== "success") {
           apiErrors = apiErrors + 1;
         }
       }
     }
-    if (apiErrorTag.classList.contains("d-none")) {
-      apiErrorTag.classList.remove("d-none");
+    console.log(apiErrors);
+    if (apiErrors > 0) {
+      if (apiErrorTag.classList.contains("d-none")) {
+        apiErrorTag.classList.remove("d-none");
+      }
     }
   } else {
     if (apiErrorTag.classList.contains("d-none")) {
