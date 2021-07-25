@@ -161,7 +161,6 @@ function checkForApiErrors(printer) {
         }
       }
     }
-    console.log(apiErrors);
     if (apiErrors > 0) {
       if (apiErrorTag.classList.contains("d-none")) {
         apiErrorTag.classList.remove("d-none");
