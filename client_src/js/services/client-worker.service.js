@@ -1,4 +1,4 @@
-import UI from "./functions/ui.js";
+import UI from "../lib/functions/ui.js";
 
 let worker = null;
 let savedWorkerEventFunction = null;

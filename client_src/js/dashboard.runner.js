@@ -1,9 +1,9 @@
 import "gridstack/dist/gridstack.min.css";
 import "gridstack/dist/h5/gridstack-dd-native";
-import OctoFarmClient from "./lib/octofarm_client";
+import OctoFarmClient from "./services/octofarm_client.service";
 import { bindGraphChangeUpdate, loadGrid } from "./dashboard/grid-stack.manager";
 import { ChartsManager } from "./dashboard/charts.manager";
-import { createClientSSEWorker } from "./lib/client-worker.js";
+import { createClientSSEWorker } from "./services/client-worker.service.js";
 import { getUsageWeightSeries, toFixedWeightGramFormatter } from "./dashboard/utils/chart.utils";
 import { dashboardSSEventHandler, workerURL } from "./dashboard/dashboard-sse.handler";
 

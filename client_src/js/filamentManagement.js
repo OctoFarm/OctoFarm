@@ -2,7 +2,7 @@ import UI from "./lib/functions/ui.js";
 import { checkFilamentManager } from "./lib/modules/filamentGrab.js";
 import * as ApexCharts from "apexcharts";
 import { getLastThirtyDaysText } from "./utils/time.util";
-import OctoFarmClient from "./lib/octofarm_client";
+import OctoFarmClient from "./services/octofarm_client.service";
 
 let filamentManager = false;
 const filamentStore = [

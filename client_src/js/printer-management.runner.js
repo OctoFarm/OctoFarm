@@ -1,4 +1,4 @@
-import { createClientSSEWorker } from "./lib/client-worker";
+import { createClientSSEWorker } from "./services/client-worker.service";
 import PrinterSelect from "./lib/modules/printerSelect";
 import {
   bulkOctoPrintClientUpdate,

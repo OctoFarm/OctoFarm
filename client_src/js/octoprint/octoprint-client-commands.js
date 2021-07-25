@@ -1,6 +1,6 @@
 import OctoPrintClient from "../lib/octoprint.js";
 import UI from "../lib/functions/ui";
-import OctoFarmClient from "../lib/octofarm_client";
+import OctoFarmClient from "../services/octofarm_client.service";
 
 async function updateBtnOnClick(printerID) {
   try {

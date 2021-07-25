@@ -1,12 +1,13 @@
-import OctoFarmClient from "../octofarm_client.js";
+import OctoFarmClient from "../../services/octofarm_client.service.js";
 import UI from "../functions/ui.js";
 import Calc from "../functions/calc.js";
 import Script from "./scriptCheck.js";
+import { ApplicationError } from "../../exceptions/application-error.handler";
+import { ClientErrors } from "../../exceptions/octofarm-client.exceptions";
 
 let currentPrinterIndex;
 let printerOnline;
 let currentPrinter;
-let hasErrorNotificationBeenTriggered = false;
 let pageElements;
 let currentPrintersInformation;
 
@@ -25,39 +26,16 @@ export async function updatePrinterSettingsModal(printersInformation, printerID)
     // No printer ID we are updating the state...
     // The SSE Event doesn't stop on an error, so we need to make sure the update event skips an error occurring...
 
-    if (!hasErrorNotificationBeenTriggered) {
-      try {
-        // Make sure online state is latest...
-        printerOnline =
-          printersInformation[currentPrinterIndex].printerState.colour.category !== "Offline";
-        PrinterSettings.updateStateElements(printersInformation[currentPrinterIndex]);
-      } catch (e) {
-        console.error(e);
-        UI.createAlert("error", `Failed to update the printers state: <br> ${e}`, 0, "clicked");
-        hasErrorNotificationBeenTriggered = true;
-      }
+    if (!ApplicationError.hasErrorNotificationBeenTriggered) {
+      // Make sure online state is latest...
+      printerOnline =
+        printersInformation[currentPrinterIndex].printerState.colour.category !== "Offline";
+      PrinterSettings.updateStateElements(printersInformation[currentPrinterIndex]);
     }
   } else {
-    try {
-      PrinterSettings.updateCurrentPrinterIndex(printersInformation, printerID);
-    } catch (e) {
-      console.error(e);
-      UI.createAlert("error", `Failed to find your printer from server: <br> ${e}`, 0, "clicked");
-    }
-    try {
-      // Resync Printer Settings to latest values and continue to setup page.
-      currentPrinter = await OctoFarmClient.refreshPrinterSettings(printerID);
-    } catch (e) {
-      // Fall back ensure printer data is loaded if new data couldn't be updated.
-      currentPrinter = printersInformation[currentPrinterIndex];
-      console.error(e);
-      UI.createAlert(
-        "warning",
-        "Failed to update OctoPrint settings, falling back to previous...",
-        0,
-        "clicked"
-      );
-    }
+    PrinterSettings.updateCurrentPrinterIndex(printersInformation, printerID);
+    // Resync Printer Settings to latest values and continue to setup page.
+    currentPrinter = await OctoFarmClient.refreshPrinterSettings(printerID);
 
     //Convert online state to a boolean
     printerOnline = currentPrinter.printerState.colour.category !== "Offline";
@@ -66,73 +44,28 @@ export async function updatePrinterSettingsModal(printersInformation, printerID)
     UI.clearSelect("ps");
 
     // Setup Connection Tab
-    try {
-      PrinterSettings.setupConnectionTab(currentPrinter);
-      PrinterSettings.enablePanel(pageElements.menu.printerConnectionBtn);
-    } catch (e) {
-      console.error(e);
-      UI.createAlert("warning", "Failed to generate the Connection tab... skipping", 0, "clicked");
-    }
+    PrinterSettings.setupConnectionTab(currentPrinter);
+    PrinterSettings.enablePanel(pageElements.menu.printerConnectionBtn);
 
     // Setup Cost Tab
-    try {
-      PrinterSettings.setupCostTab(currentPrinter);
-      PrinterSettings.enablePanel(pageElements.menu.printerCostBtn);
-    } catch (e) {
-      console.error(e);
-      UI.createAlert("warning", "Failed to generate the Cost tab... skipping", 0, "clicked");
-    }
+    PrinterSettings.setupCostTab(currentPrinter);
+    PrinterSettings.enablePanel(pageElements.menu.printerCostBtn);
     // Setup Power Tab
-    try {
-      PrinterSettings.setupPowerTab(currentPrinter);
-      PrinterSettings.enablePanel(pageElements.menu.printerPowerBtn);
-    } catch (e) {
-      console.error(e);
-      UI.createAlert("warning", "Failed to generate the Power tab... skipping", 0, "clicked");
-    }
+    PrinterSettings.setupPowerTab(currentPrinter);
+    PrinterSettings.enablePanel(pageElements.menu.printerPowerBtn);
     // Setup Alerts Tab
-    try {
-      await PrinterSettings.setupAlertsTab(currentPrinter);
-      PrinterSettings.enablePanel(pageElements.menu.printerAlertsBtn);
-    } catch (e) {
-      console.error(e);
-      UI.createAlert("warning", "Failed to generate the Alerts tab... skipping", 0, "clicked");
-    }
+    await PrinterSettings.setupAlertsTab(currentPrinter);
+    PrinterSettings.enablePanel(pageElements.menu.printerAlertsBtn);
     if (printerOnline) {
       // Setup Profile Tab
-      try {
-        PrinterSettings.setupProfileTab(currentPrinter);
-        PrinterSettings.enablePanel(pageElements.menu.printerProfileBtn);
-      } catch (e) {
-        console.error(e);
-        UI.createAlert("warning", "Failed to generate the Profile tab... skipping", 0, "clicked");
-      }
+      PrinterSettings.setupProfileTab(currentPrinter);
+      PrinterSettings.enablePanel(pageElements.menu.printerProfileBtn);
       // Setup Gcode Script Tab
-      try {
-        PrinterSettings.setupGcodeTab(currentPrinter);
-        PrinterSettings.enablePanel(pageElements.menu.printerGcodeBtn);
-      } catch (e) {
-        console.error(e);
-        UI.createAlert(
-          "warning",
-          "Failed to generate the Gcode Scripts tab... skipping",
-          0,
-          "clicked"
-        );
-      }
+      PrinterSettings.setupGcodeTab(currentPrinter);
+      PrinterSettings.enablePanel(pageElements.menu.printerGcodeBtn);
       // Setup Other Settings Tab
-      try {
-        PrinterSettings.setupOtherSettingsTab(currentPrinter);
-        PrinterSettings.enablePanel(pageElements.menu.printerOtherSettings);
-      } catch (e) {
-        console.error(e);
-        UI.createAlert(
-          "warning",
-          "Failed to generate the Other Settings tab... skipping",
-          0,
-          "clicked"
-        );
-      }
+      PrinterSettings.setupOtherSettingsTab(currentPrinter);
+      PrinterSettings.enablePanel(pageElements.menu.printerOtherSettings);
     }
     // Setup Refresh Settings Button
     await PrinterSettings.setupRefreshButton(currentPrinter);
@@ -156,7 +89,7 @@ class PrinterSettings {
     if (printersIndex !== -1) {
       currentPrinterIndex = printersIndex;
     } else {
-      throw new Error("Could not find a valid printers index...");
+      ApplicationError(ClientErrors.FAILED_STATE_UPDATE);
     }
   }
 
@@ -712,12 +645,8 @@ class PrinterSettings {
         currentPrinter.powerSettings.powerStatusURL;
     }
     document.getElementById("resetPowerFields").addEventListener("click", async () => {
-      try {
-        await OctoFarmClient.post("printers/killPowerSettings/" + currentPrinter?._id);
-        UI.createAlert("success", "Successfully cleared Power Settings", 3000, "clicked");
-      } catch (e) {
-        UI.createAlert("error", `Unable to clear power settings... Error: ${e}`, 3000, "clicked");
-      }
+      await OctoFarmClient.post("printers/killPowerSettings/" + currentPrinter?._id);
+      UI.createAlert("success", "Successfully cleared Power Settings", 3000, "clicked");
     });
   }
 
@@ -924,22 +853,17 @@ class PrinterSettings {
     document.getElementById("savePrinterSettingsBtn").addEventListener("click", async (event) => {
       UI.addLoaderToElementsInnerHTML(event.target);
       const printerSettingsValues = this.getPageValues(currentPrinter);
-      try {
-        let updatedSettings = await OctoFarmClient.post(
-          "printers/updateSettings",
-          printerSettingsValues
-        );
-        const serverResponseMessage = this.createServerResponseMessageForSaveAction(
-          currentPrinter.printerName,
-          updatedSettings
-        );
-        UI.createAlert("info", serverResponseMessage, 5000, "clicked");
-        await updatePrinterSettingsModal(currentPrintersInformation, currentPrinter._id);
-      } catch (e) {
-        UI.createAlert("error", `Could not update your settings... Error: ${e}`, 5000, "clicked");
-      } finally {
-        UI.removeLoaderFromElementInnerHTML(event.target);
-      }
+      let updatedSettings = await OctoFarmClient.post(
+        "printers/updateSettings",
+        printerSettingsValues
+      );
+      const serverResponseMessage = this.createServerResponseMessageForSaveAction(
+        currentPrinter.printerName,
+        updatedSettings
+      );
+      UI.createAlert("info", serverResponseMessage, 5000, "clicked");
+      await updatePrinterSettingsModal(currentPrintersInformation, currentPrinter._id);
+      UI.removeLoaderFromElementInnerHTML(event.target);
     });
   }
 
@@ -1185,7 +1109,7 @@ class PrinterSettings {
       Object.values(pageElements.menu).map((e) => {
         this.disablePanel(e);
       });
-      throw new Error("Cannot apply state as no printer index can be found...");
+      ApplicationError(ClientErrors.FAILED_STATE_UPDATE);
     }
     pageElements.mainPage.title.innerHTML = `Printer Settings: ${currentPrinter.printerName}`;
     pageElements.mainPage.status.innerHTML = `<b>Printer Status</b><br>${currentPrinter.printerState.state}`;

@@ -8,10 +8,11 @@ import { setupUpdateOctoPrintPluginsBtn } from "../octoprint/octoprint-plugin-co
 import UI from "../lib/functions/ui.js";
 import PrinterManager from "../lib/modules/printerManager.js";
 import PrinterLogs from "../lib/modules/printerLogs.js";
-import OctoFarmClient from "../lib/octofarm_client";
+import OctoFarmClient from "../services/octofarm_client.service";
 import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
 
 const printerList = document.getElementById("printerList");
+const ignoredHostStatesForAPIErrors = ["Setting Up", "Searching...", "Shutdown"];
 
 function updatePrinterInfoAndState(printer) {
   const printName = document.getElementById(`printerName-${printer._id}`);
@@ -60,20 +61,18 @@ function updatePrinterColumn(printer) {
     `printerPrinterInformation-${printer._id}`
   );
   if (!!printer.octoPrintSystemInfo) {
-    if (!!printer.currentProfile) {
-      if (typeof printer.octoPrintSystemInfo["printer.firmware"] === "undefined") {
-        UI.doesElementNeedUpdating(
-          '<small title="Please connect and resync to display printer firmware">Unknown</small>',
-          printerPrinterInformation,
-          "innerHTML"
-        );
-      } else {
-        UI.doesElementNeedUpdating(
-          `<small>${printer.octoPrintSystemInfo["printer.firmware"]}</small>`,
-          printerPrinterInformation,
-          "innerHTML"
-        );
-      }
+    if (typeof printer.octoPrintSystemInfo["printer.firmware"] === "undefined") {
+      UI.doesElementNeedUpdating(
+        '<small title="Please connect and resync to display printer firmware">Unknown</small>',
+        printerPrinterInformation,
+        "innerHTML"
+      );
+    } else {
+      UI.doesElementNeedUpdating(
+        `<small>${printer.octoPrintSystemInfo["printer.firmware"]}</small>`,
+        printerPrinterInformation,
+        "innerHTML"
+      );
     }
   }
 }
@@ -101,11 +100,7 @@ function updateOctoPiColumn(printer) {
 
 function corsWarningCheck(printer) {
   const printerBadge = document.getElementById(`printerBadge-${printer._id}`);
-  if (
-    !printer.corsCheck &&
-    printer.hostState.state !== "Setting Up" &&
-    printer.hostState.state !== "Searching..."
-  ) {
+  if (!printer.corsCheck && !ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
     UI.doesElementNeedUpdating("CORS NOT ENABLED!", printerBadge, "innerHTML");
   }
 }
@@ -157,24 +152,23 @@ function checkForOctoPrintPluginUpdates(printer) {
 function checkForApiErrors(printer) {
   const apiErrorTag = document.getElementById(`scanningIssues-${printer._id}`);
 
-  if (printer.hostState.state === "Online") {
+  if (!ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
     let apiErrors = 0;
     for (const key in printer.systemChecks) {
-      if (printer.systemChecks.hasOwnProperty(key)) {
-        if (printer.systemChecks[key].status !== "success") {
+      if (printer.systemChecks.scanning.hasOwnProperty(key)) {
+        if (printer.systemChecks.scanning[key].status !== "success") {
           apiErrors = apiErrors + 1;
         }
       }
     }
-
-    if (apiErrors > 0 && printer.printerState.colour.category !== "Offline") {
+    if (apiErrors > 0) {
       if (apiErrorTag.classList.contains("d-none")) {
         apiErrorTag.classList.remove("d-none");
       }
-    } else {
-      if (apiErrorTag.classList.contains("d-none")) {
-        apiErrorTag.classList.add("d-none");
-      }
+    }
+  } else {
+    if (apiErrorTag.classList.contains("d-none")) {
+      apiErrorTag.classList.add("d-none");
     }
   }
 }
@@ -229,60 +223,25 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
       document
         .getElementById(`printerButton-${printer._id}`)
         .addEventListener("click", async () => {
-          try {
-            const printers = await OctoFarmClient.listPrinters();
-            await PrinterManager.init(printer._id, printers, printerControlList);
-          } catch (e) {
-            console.error(e.stack);
-            UI.createAlert(
-              "error",
-              `Unable to grab latest printer information: ${e}`,
-              0,
-              "clicked"
-            );
-          }
+          const printers = await OctoFarmClient.listPrinters();
+          await PrinterManager.init(printer._id, printers, printerControlList);
         });
       document
         .getElementById(`printerSettings-${printer._id}`)
         .addEventListener("click", async (e) => {
-          try {
-            const printersInfo = await OctoFarmClient.listPrinters();
-            await updatePrinterSettingsModal(printersInfo, printer._id);
-          } catch (e) {
-            console.error(e.stack);
-            UI.createAlert(
-              "error",
-              `Unable to grab latest printer information: ${e}`,
-              0,
-              "clicked"
-            );
-          }
+          const printersInfo = await OctoFarmClient.listPrinters();
+          await updatePrinterSettingsModal(printersInfo, printer._id);
         });
       document
         .getElementById(`scanningIssues-${printer._id}`)
         .addEventListener("click", async (e) => {
-          try {
-            const printersInfo = await OctoFarmClient.listPrinters();
-            await updatePrinterSettingsModal(printersInfo, printer._id);
-          } catch (e) {
-            console.error(e.stack);
-            UI.createAlert(
-              "error",
-              `Unable to grab latest printer information: ${e}`,
-              0,
-              "clicked"
-            );
-          }
+          const printersInfo = await OctoFarmClient.listPrinters();
+          await updatePrinterSettingsModal(printersInfo, printer._id);
         });
       document.getElementById(`printerLog-${printer._id}`).addEventListener("click", async (e) => {
-        try {
-          const printerInfo = await OctoFarmClient.getPrinter(printer._id);
-          let connectionLogs = await OctoFarmClient.get("printers/connectionLogs/" + printer._id);
-          PrinterLogs.loadLogs(printerInfo, connectionLogs);
-        } catch (e) {
-          console.error(e.stack);
-          UI.createAlert("error", `Unable to grab latest printer information: ${e}`, 0, "clicked");
-        }
+        const printerInfo = await OctoFarmClient.getPrinter(printer._id);
+        let connectionLogs = await OctoFarmClient.get("printers/connectionLogs/" + printer._id);
+        PrinterLogs.loadLogs(printerInfo, connectionLogs);
       });
 
       document

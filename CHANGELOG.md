@@ -19,7 +19,8 @@ All notable changes to this project will be documented in this file.
     - Refactor monitoring pages (panel, list, camera) with latest SSE client reusability.
     - Refine the printer map layout with borders and printer quick actions (page not public yet).
     - Reduced logging (we will bring it back later in different shape with an Exception handler)
-    - Replaced fetch with axios in the local OctoFarm client calls.
+    - Replaced fetch with axios in the local OctoFarm client calls.  
+    - Moved all error handling for client connections into axios calls
 
 ### Removed
 
