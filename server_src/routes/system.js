@@ -44,7 +44,7 @@ router.get("/", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res)
       isPm2: isPm2(),
       update: softwareUpdateNotification
     },
-    patreonData: require("../../../../octofarm-development/OctoFarm/server_src/patreon.constants.js")
+    patreonData: require("../patreon.constants")
   });
 });
 
