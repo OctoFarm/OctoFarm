@@ -4,7 +4,7 @@ const apiErrorTitle = document.getElementById("apiErrorTitle");
 const apiErrorMessage = document.getElementById("apiErrorMessage");
 const apiDeveloperInfo = document.getElementById("apiDeveloperInfo");
 
-function returnErrorMessage(options) {
+function returnAlertErrorMessage(options) {
   return `
     <i class="fas fa-exclamation-triangle"></i> ${options.name} 
     <br>
@@ -14,7 +14,7 @@ function returnErrorMessage(options) {
     <br>
   `;
 }
-function returnDeveloperInfo(options) {
+function returnModalDeveloperInfo(options) {
   return `
     <code>
     <u>DEVELOPER INFO</u><br>
@@ -26,7 +26,7 @@ function returnDeveloperInfo(options) {
 }
 
 export function createErrorAlert(options) {
-  UI.createAlert("error", returnErrorMessage(options), 0, "clicked");
+  UI.createAlert("error", returnAlertErrorMessage(options), 0, "clicked");
 }
 
 export function openErrorModal(options) {
@@ -38,6 +38,6 @@ export function openErrorModal(options) {
      ${options.message}
   `;
   apiErrorMessage.className = `text-${options.color}`;
-  apiDeveloperInfo.innerHTML = returnDeveloperInfo(options);
+  apiDeveloperInfo.innerHTML = returnModalDeveloperInfo(options);
   $("#octofarmErrorModal").modal("show");
 }
