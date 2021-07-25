@@ -69,7 +69,7 @@ const PrinterSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  settingsAppearance: {
+  settingsApperance: {
     type: Object,
     required: false
   },
