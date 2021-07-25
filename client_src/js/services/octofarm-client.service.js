@@ -51,12 +51,11 @@ axios.interceptors.response.use(
 );
 
 export default class OctoFarmClient {
-  static base = "/";
-  static params = "?";
-  static printerRoute = "printers";
+  static printerRoute = "/printers";
 
   static validatePath(pathname) {
     if (!pathname) {
+      new URL(path, window.location.origin);
       throw new ApplicationError(ClientErrors.FAILED_VALIDATION);
     }
   }
@@ -99,27 +98,27 @@ export default class OctoFarmClient {
   }
 
   static async get(path) {
-    const url = new URL(this.base + path, window.location.origin).pathname;
+    const url = new URL(path, window.location.origin).pathname;
     return axios.get(url).then((res) => {
       return res.data;
     });
   }
 
   static async post(path, data) {
-    const url = new URL(this.base + path, window.location.origin).pathname;
+    const url = new URL(path, window.location.origin).pathname;
     return axios.post(url, data).then((res) => {
       return res.data;
     });
   }
 
   static async delete(path) {
-    const url = new URL(this.base + path, window.location.origin).pathname;
+    const url = new URL(path, window.location.origin).href;
     return axios.delete(url).then((res) => {
       return res.data;
     });
   }
   static async patch(path, data) {
-    const url = new URL(this.base + path, window.location.origin).pathname;
+    const url = new URL(path, window.location.origin).pathname;
     return axios.delete(url, data).then((res) => {
       return res.data;
     });
