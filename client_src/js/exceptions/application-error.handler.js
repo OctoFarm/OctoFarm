@@ -1,40 +1,8 @@
 import { errorTypes } from "./error.types";
-import UI from "../lib/functions/ui";
+import { createErrorAlert, openErrorModal } from "./error.modals";
 
 const modalErrors = [errorTypes.NETWORK, errorTypes.SERVER, errorTypes.UNKNOWN];
 const popUpErrors = [errorTypes.CLIENT];
-
-const apiErrorTitle = document.getElementById("apiErrorTitle");
-const apiErrorMessage = document.getElementById("apiErrorMessage");
-
-function returnErrorMessage(options) {
-  return `
-     <i class="fas fa-exclamation-triangle"></i> ${options.name} 
-     <br>
-     ${options.type} (${options.statusCode}): 
-     <br>
-     ${options.message}
-     <br>
-  `;
-}
-
-function openErrorModal(options) {
-  apiErrorTitle.innerHTML = ` ${options.name}`;
-  apiErrorMessage.innerHTML = `
-     <br>
-     ${options.type} (${options.statusCode}): 
-     <br>
-     ${options.message}
-     <br>
-     <code>
-       DEVELOPER INFO:<br>
-       LINE: ${options.lineNumber}<br>
-       COL: ${options.column}<br>
-       FILE: ${options.fileName}
-     </code>
-  `;
-  $("#octofarmErrorModal").modal("show");
-}
 
 export class ApplicationError extends Error {
   static hasErrorNotificationBeenTriggered = false;
@@ -61,17 +29,19 @@ export class ApplicationError extends Error {
     this.errors = options.errors;
     this.meta = options.meta;
     this.statusCode = options.statusCode;
+    this.color = options.color;
     // {
     //   analytics:  {},
     //   context: {}
     // }
 
+    // Show error message to client...
     ApplicationError.hasErrorNotificationBeenTriggered = true;
     if (modalErrors.includes(this.type)) {
       openErrorModal(this);
     }
     if (popUpErrors.includes(this.type)) {
-      UI.createAlert("error", returnErrorMessage(this), 0, "clicked");
+      createErrorAlert(this);
     }
   }
 }
