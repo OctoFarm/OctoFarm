@@ -59,6 +59,13 @@ const HTTPError = {
     code: "GATEWAY_TIMEOUT",
     message: "Gateway timeout",
     statusCode: 504
+  },
+  UNKNOWN: {
+    type: errorTypes.SERVER,
+    color: "danger",
+    code: "UNKNOWN",
+    message: "Unknown Error Response",
+    statusCode: 999
   }
 };
 

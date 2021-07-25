@@ -25,8 +25,25 @@ axios.interceptors.response.use(
   function (error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
-    if (error.response.status === 404) {
-      throw new ApplicationError(HTTPError.RESOURCE_NOT_FOUND);
+    switch (error.response.statusCode) {
+      case 400:
+        throw new ApplicationError(HTTPError.BAD_REQUEST);
+      case 401:
+        throw new ApplicationError(HTTPError.UNAUTHORIZED);
+      case 402:
+        throw new ApplicationError(HTTPError.FORBIDDEN);
+      case 403:
+        throw new ApplicationError(HTTPError.RESOURCE_NOT_FOUND);
+      case 500:
+        throw new ApplicationError(HTTPError.INTERNAL_SERVER_ERROR);
+      case 502:
+        throw new ApplicationError(HTTPError.BAD_GATEWAY);
+      case 503:
+        throw new ApplicationError(HTTPError.SERVICE_UNAVAILABLE);
+      case 504:
+        throw new ApplicationError(HTTPError.GATEWAY_TIMEOUT);
+      default:
+        throw new ApplicationError(HTTPError.UNKNOWN);
     }
   }
 );
