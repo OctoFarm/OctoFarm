@@ -25,14 +25,14 @@ axios.interceptors.response.use(
   function (error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
-    switch (error.response.statusCode) {
+    switch (error.response.status) {
       case 400:
         throw new ApplicationError(HTTPError.BAD_REQUEST);
       case 401:
         throw new ApplicationError(HTTPError.UNAUTHORIZED);
-      case 402:
-        throw new ApplicationError(HTTPError.FORBIDDEN);
       case 403:
+        throw new ApplicationError(HTTPError.FORBIDDEN);
+      case 404:
         throw new ApplicationError(HTTPError.RESOURCE_NOT_FOUND);
       case 500:
         throw new ApplicationError(HTTPError.INTERNAL_SERVER_ERROR);
@@ -70,7 +70,7 @@ export default class OctoFarmClient {
   }
 
   static async listPrinters() {
-    return this.post(`${this.printerRoute}/printerInfo/`);
+    return this.post(`${this.printerRoute}/printfdgdferInfo/`);
   }
 
   static async refreshPrinterSettings(id) {
