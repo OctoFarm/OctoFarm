@@ -8,10 +8,11 @@ import { setupUpdateOctoPrintPluginsBtn } from "../octoprint/octoprint-plugin-co
 import UI from "../lib/functions/ui.js";
 import PrinterManager from "../lib/modules/printerManager.js";
 import PrinterLogs from "../lib/modules/printerLogs.js";
-import OctoFarmClient from "../lib/octofarm_client";
+import OctoFarmClient from "../services/octofarm_client.service";
 import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
 
 const printerList = document.getElementById("printerList");
+const ignoredHostStatesForAPIErrors = ["Setting Up", "Searching...", "Shutdown"];
 
 function updatePrinterInfoAndState(printer) {
   const printName = document.getElementById(`printerName-${printer._id}`);
@@ -60,20 +61,18 @@ function updatePrinterColumn(printer) {
     `printerPrinterInformation-${printer._id}`
   );
   if (!!printer.octoPrintSystemInfo) {
-    if (!!printer.currentProfile) {
-      if (typeof printer.octoPrintSystemInfo["printer.firmware"] === "undefined") {
-        UI.doesElementNeedUpdating(
-          '<small title="Please connect and resync to display printer firmware">Unknown</small>',
-          printerPrinterInformation,
-          "innerHTML"
-        );
-      } else {
-        UI.doesElementNeedUpdating(
-          `<small>${printer.octoPrintSystemInfo["printer.firmware"]}</small>`,
-          printerPrinterInformation,
-          "innerHTML"
-        );
-      }
+    if (typeof printer.octoPrintSystemInfo["printer.firmware"] === "undefined") {
+      UI.doesElementNeedUpdating(
+        '<small title="Please connect and resync to display printer firmware">Unknown</small>',
+        printerPrinterInformation,
+        "innerHTML"
+      );
+    } else {
+      UI.doesElementNeedUpdating(
+        `<small>${printer.octoPrintSystemInfo["printer.firmware"]}</small>`,
+        printerPrinterInformation,
+        "innerHTML"
+      );
     }
   }
 }
@@ -101,11 +100,7 @@ function updateOctoPiColumn(printer) {
 
 function corsWarningCheck(printer) {
   const printerBadge = document.getElementById(`printerBadge-${printer._id}`);
-  if (
-    !printer.corsCheck &&
-    printer.hostState.state !== "Setting Up" &&
-    printer.hostState.state !== "Searching..."
-  ) {
+  if (!printer.corsCheck && !ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
     UI.doesElementNeedUpdating("CORS NOT ENABLED!", printerBadge, "innerHTML");
   }
 }
@@ -157,7 +152,7 @@ function checkForOctoPrintPluginUpdates(printer) {
 function checkForApiErrors(printer) {
   const apiErrorTag = document.getElementById(`scanningIssues-${printer._id}`);
 
-  if (printer.hostState.state === "Online") {
+  if (!ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
     let apiErrors = 0;
     for (const key in printer.systemChecks) {
       if (printer.systemChecks.hasOwnProperty(key)) {
@@ -166,15 +161,12 @@ function checkForApiErrors(printer) {
         }
       }
     }
-
-    if (apiErrors > 0 && printer.printerState.colour.category !== "Offline") {
-      if (apiErrorTag.classList.contains("d-none")) {
-        apiErrorTag.classList.remove("d-none");
-      }
-    } else {
-      if (apiErrorTag.classList.contains("d-none")) {
-        apiErrorTag.classList.add("d-none");
-      }
+    if (apiErrorTag.classList.contains("d-none")) {
+      apiErrorTag.classList.remove("d-none");
+    }
+  } else {
+    if (apiErrorTag.classList.contains("d-none")) {
+      apiErrorTag.classList.add("d-none");
     }
   }
 }
