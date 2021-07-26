@@ -1,4 +1,4 @@
-import OctoFarmClient from "../../services/octofarm_client.service";
+import OctoFarmClient from "../../services/octofarm-client.service";
 import UI from "../../lib/functions/ui";
 import { customGcodeScriptTemplate } from "../templates/gcode-scripts-table.template";
 

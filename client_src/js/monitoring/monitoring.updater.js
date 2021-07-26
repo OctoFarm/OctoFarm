@@ -11,7 +11,7 @@ import OctoPrintClient from "../lib/octoprint.js";
 import { checkTemps } from "../lib/modules/temperatureCheck.js";
 import { checkFilamentManager } from "../lib/modules/filamentGrab.js";
 import doubleClickFullScreen from "../lib/functions/fullscreen.js";
-import OctoFarmClient from "../services/octofarm_client.service";
+import OctoFarmClient from "../services/octofarm-client.service";
 import { getControlList, getPrinterInfo } from "./monitoring-view.state";
 
 const elems = [];

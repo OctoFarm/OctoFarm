@@ -1,6 +1,6 @@
 import "gridstack/dist/gridstack.min.css";
 import "gridstack/dist/h5/gridstack-dd-native";
-import OctoFarmClient from "./services/octofarm_client.service";
+import OctoFarmClient from "./services/octofarm-client.service";
 import { bindGraphChangeUpdate, loadGrid } from "./dashboard/grid-stack.manager";
 import { ChartsManager } from "./dashboard/charts.manager";
 import { createClientSSEWorker } from "./services/client-worker.service.js";

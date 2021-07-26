@@ -1,4 +1,4 @@
-import OctoFarmClient from "../../services/octofarm_client.service.js";
+import OctoFarmClient from "../../services/octofarm-client.service.js";
 import UI from "../functions/ui.js";
 import Calc from "../functions/calc.js";
 import Script from "./scriptCheck.js";
@@ -89,7 +89,7 @@ class PrinterSettings {
     if (printersIndex !== -1) {
       currentPrinterIndex = printersIndex;
     } else {
-      ApplicationError(ClientErrors.FAILED_STATE_UPDATE);
+      throw new ApplicationError(ClientErrors.FAILED_STATE_UPDATE);
     }
   }
 
@@ -1109,7 +1109,7 @@ class PrinterSettings {
       Object.values(pageElements.menu).map((e) => {
         this.disablePanel(e);
       });
-      ApplicationError(ClientErrors.FAILED_STATE_UPDATE);
+      throw new ApplicationError(ClientErrors.FAILED_STATE_UPDATE);
     }
     pageElements.mainPage.title.innerHTML = `Printer Settings: ${currentPrinter.printerName}`;
     pageElements.mainPage.status.innerHTML = `<b>Printer Status</b><br>${currentPrinter.printerState.state}`;

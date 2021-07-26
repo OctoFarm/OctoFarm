@@ -8,7 +8,7 @@ import { setupUpdateOctoPrintPluginsBtn } from "../octoprint/octoprint-plugin-co
 import UI from "../lib/functions/ui.js";
 import PrinterManager from "../lib/modules/printerManager.js";
 import PrinterLogs from "../lib/modules/printerLogs.js";
-import OctoFarmClient from "../services/octofarm_client.service";
+import OctoFarmClient from "../services/octofarm-client.service";
 import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
 
 const printerList = document.getElementById("printerList");
