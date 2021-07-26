@@ -98,14 +98,14 @@ export default class OctoFarmClient {
   }
 
   static async get(path) {
-    const url = new URL(path, window.location.origin).pathname;
+    const url = new URL(path, window.location.origin).href;
     return axios.get(url).then((res) => {
       return res.data;
     });
   }
 
   static async post(path, data) {
-    const url = new URL(path, window.location.origin).pathname;
+    const url = new URL(path, window.location.origin).href;
     return axios.post(url, data).then((res) => {
       return res.data;
     });
@@ -118,7 +118,7 @@ export default class OctoFarmClient {
     });
   }
   static async patch(path, data) {
-    const url = new URL(path, window.location.origin).pathname;
+    const url = new URL(path, window.location.origin).href;
     return axios.delete(url, data).then((res) => {
       return res.data;
     });
