@@ -52,11 +52,13 @@ axios.interceptors.response.use(
 
 export default class OctoFarmClient {
   static printerRoute = "/printers";
+  static serverSettingsRoute = "/settings/server";
+  static logsRoute = `${this.serverSettingsRoute}/logs`;
 
   static validatePath(pathname) {
     if (!pathname) {
       new URL(path, window.location.origin);
-      throw new ApplicationError(ClientErrors.FAILED_VALIDATION);
+      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH);
     }
   }
 
@@ -79,6 +81,10 @@ export default class OctoFarmClient {
       i: id
     };
     return this.post(`${this.printerRoute}/updatePrinterSettings`, body);
+  }
+
+  static async generateLogDump() {
+    return this.post(`${this.logsRoute}/generateLogDump`, {});
   }
 
   static async getHistoryStatistics() {

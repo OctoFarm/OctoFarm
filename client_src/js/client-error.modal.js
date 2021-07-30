@@ -1,19 +1,14 @@
-import UI from "./lib/functions/ui";
-import { errorTypes } from "./exceptions/error.types";
+const octoFarmErrorModalElement = "#octofarmErrorModal";
 
-const modalErrors = [errorTypes.NETWORK, errorTypes.SERVER, errorTypes.UNKNOWN];
-const popUpErrors = [errorTypes.CLIENT];
-
-function returnAlertErrorMessage(options) {
+function returnErrorMessage(options) {
   return `
-    <i class="fas fa-exclamation-triangle"></i> ${options.name} 
-    <br>
-    ${options.type} (${options.statusCode}): 
-    <br>
-    ${options.message}
-    <br>
+     <br>
+     ${options.type} ERROR (${options.statusCode}): 
+     <br>
+     ${options.message}
   `;
 }
+
 function returnModalDeveloperInfo(options) {
   return `
     <code>
@@ -25,38 +20,20 @@ function returnModalDeveloperInfo(options) {
   `;
 }
 
-function createErrorAlert(options) {
-  UI.createAlert("error", returnAlertErrorMessage(options), 0, "clicked");
-}
-
 function openErrorModal(options) {
   const apiErrorTitle = document.getElementById("apiErrorTitle");
   const apiErrorMessage = document.getElementById("apiErrorMessage");
   const apiDeveloperInfo = document.getElementById("apiDeveloperInfo");
   apiErrorTitle.innerHTML = ` ${options.name}`;
-  apiErrorMessage.innerHTML = `
-     <br>
-     ${options.type} ERROR (${options.statusCode}): 
-     <br>
-     ${options.message}
-  `;
+  apiErrorMessage.innerHTML = returnErrorMessage(options);
   apiErrorMessage.className = `text-${options.color}`;
   apiDeveloperInfo.innerHTML = returnModalDeveloperInfo(options);
-  $("#octofarmErrorModal").modal("show");
-}
-
-function handleError(event) {
-  if (modalErrors.includes(event.reason.type)) {
-    openErrorModal(event.reason);
-  }
-  if (popUpErrors.includes(event.reason.type)) {
-    createErrorAlert(event.reason);
-  }
+  $(octoFarmErrorModalElement).modal("show");
 }
 
 window.onunhandledrejection = function (event) {
-  handleError(event);
+  openErrorModal(event.reason);
 };
-window.onunhandledrejection = function (event) {
-  handleError(event);
+window.onerror = function (event) {
+  openErrorModal(event.reason);
 };

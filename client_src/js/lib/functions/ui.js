@@ -108,17 +108,19 @@ export default class UI {
       });
     });
   }
+
+  static returnSpinnerTemplate() {
+    return "<i class='fas fa-spinner fa-spin'></i>";
+  }
+
   static removeLoaderFromElementInnerHTML(element) {
     if (element.innerHTML.includes("spinner")) {
-      element.innerHTML = element.innerHTML.replace(
-        '<br> <i class="fas fa-spinner fa-spin"></i>',
-        ""
-      );
+      element.innerHTML = element.innerHTML.replace(UI.returnSpinnerTemplate(), "");
     }
   }
   static addLoaderToElementsInnerHTML(element) {
     if (!element.innerHTML.includes("spinner")) {
-      element.innerHTML += '<br> <i class="fas fa-spinner fa-spin"></i>';
+      element.innerHTML += UI.returnSpinnerTemplate;
     }
   }
   static checkIfAnyModalShown() {

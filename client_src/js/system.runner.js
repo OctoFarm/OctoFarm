@@ -1,6 +1,8 @@
 import OctoFarmClient from "./services/octofarm-client.service.js";
 import UI from "./lib/functions/ui.js";
 import Calc from "./lib/functions/calc.js";
+import { ServerSettings } from "./system/server-settings";
+import {localStorageKeys, serverActionsElements, serverSettingKeys} from "./system/utils/server.options";
 import Script from "./services/gocde-scripts.service.js";
 import OctoPrintClient from "./lib/octoprint";
 import FileOperations from "./lib/functions/file.js";
@@ -10,100 +12,68 @@ import {
   setupFilamentManagerDisableBtn,
   isFilamentManagerPluginSyncEnabled
 } from "./services/filament-manager-plugin.service.js";
-import { setupDatabaseActionBtns } from "./system/server-settings";
 
 import ApexCharts from "apexcharts";
+import { generateLogDumpFile, exportDatabases, nukeDatabases } from "./system/utils/server.actions";
+import { serverBootBoxOptions } from "./system/utils/bootbox.options";
+import { removeLocalStorage } from "./services/local-storage.service";
 
-setupDatabaseActionBtns();
-
-// Add listeners to settings
-
-document.getElementById("setupTimelapseOctoPrint").addEventListener("click", async (e) => {
-  await setupOctoPrintClientsforTimelapse();
-});
-
-document.getElementById("logDumpGenerateBtn").addEventListener("click", async (e) => {
-  await ServerSettings.generateLogFileDump();
-});
-
-async function setupOctoPrintClientsforTimelapse() {
-  const printers = await OctoFarmClient.post("printers/printerInfo");
-  bootbox.confirm({
-    title: "Are you sure?",
-    message:
-      // eslint-disable-next-line max-len
-      "If you press yes below your timelapse settings will automatically be updated to work with OctoFarms setup. The script will update any online instances and there shouldn't be a restart necassary. It does however presume you have your ffmpeg path setup with your snapshot URL inputted into OctoPrint.",
-    buttons: {
-      confirm: {
-        label: "Yes",
-        className: "btn-success"
-      },
-      cancel: {
-        label: "No",
-        className: "btn-danger"
-      }
-    },
-    callback: async function (result) {
-      if (result) {
-        let settings = {
-          webcam: {
-            ffmpegVideoCodec: "libx264",
-            webcamEnabled: true
-          }
-        };
-        let timelapse = {
-          type: "zchange"
-        };
-        for (let i = 0; i < printers.length; i++) {
-          if (printers[i].printerState.colour.category !== "Offline") {
-            let sett = await OctoPrintClient.post(printers[i], "settings", settings);
-            if (sett.status === 200) {
-              UI.createAlert(
-                "success",
-                printers[i].printerName + ": Updated your web camera settings!",
-                1000,
-                "Clicked"
-              );
-            } else {
-              UI.createAlert(
-                "danger",
-                printers[i].printerName + ": Failed to update the settings!",
-                1000,
-                "Clicked"
-              );
-            }
-            let time = await OctoPrintClient.post(printers[i], "timelapse", timelapse);
-            if (time.status === 200) {
-              UI.createAlert(
-                "success",
-                printers[i].printerName + ": Updated your timelapse settings!",
-                1000,
-                "Clicked"
-              );
-            } else {
-              UI.createAlert(
-                "danger",
-                printers[i].printerName + ": Failed to timelapse settings!",
-                1000,
-                "Clicked"
-              );
-            }
-          } else {
-            //Printer offline skipping...
-          }
-        }
+// Setup Page
+  for (const key in serverSettingKeys) {
+    if (serverSettingKeys.hasOwnProperty(key)) {
+      document.getElementById(`nuke${serverSettingKeys[key]}`).addEventListener("click", async (e) => {
+        const alert = UI.createAlert("warning", `${UI.returnSpinnerTemplate()} Deleting ${serverSettingKeys[key]} database...`)
+        await nukeDatabases(`${serverSettingKeys[key]}DB`, e);
+        alert.close();
+      });
+      if (key !== "ALL") {
+        document
+            .getElementById(`export${serverSettingKeys[key]}`)
+            .addEventListener("click", async (e) => {
+              const alert = UI.createAlert("warning", `${UI.returnSpinnerTemplate()} Preparing ${serverSettingKeys[key]} database...`)
+              await exportDatabases(`${serverSettingKeys[key]}DB`, e);
+              alert.close();
+            });
       }
     }
-  });
-}
 
-document.getElementById("resetDashboardBtn").addEventListener("click", (e) => {
-  const dashData = localStorage.getItem("dashboardConfiguration");
-  const serializedData = JSON.parse(dashData);
-  if (serializedData !== null && serializedData.length !== 0) {
-    localStorage.removeItem("dashboardConfiguration");
-  }
-  UI.createAlert("success", "Dashboard data cleared from browser", 3000, "clicked");
+serverActionsElements.OP_TIMELAPSE_SETUP
+  .addEventListener("click", async (e) => {
+    bootbox.confirm(serverBootBoxOptions.OP_TIMELAPSE_SETUP);
+  });
+
+serverActionsElements.LOG_DUMP_GENERATE
+  .addEventListener("click", async (e) => {
+    const alert = UI.createAlert(
+      "warning",
+      `${UI.returnSpinnerTemplate()} Generating log dump, please wait...`
+    );
+    await generateLogDumpFile();
+    alert.close();
+  });
+
+serverActionsElements.RESET_DASHBOARD.addEventListener("click", (e) => {
+  removeLocalStorage(localStorageKeys.DASHBOARD_SETTINGS)
+  UI.createAlert(
+      "success",
+      "Dashboard data cleared from browser",
+      3000,
+      "clicked"
+  );
+});
+
+serverActionsElements.SAVE_SERVER_SETTINGS.addEventListener("click", (e) => {
+  // Validate Printer Form, then Add
+  ServerSettings.updateServerSettings();
+});
+document.getElementById("restartOctoFarmBtn").addEventListener("click", (e) => {
+  ServerSettings.serviceRestart();
+});
+document.getElementById("updateOctoFarmBtn").addEventListener("click", (e) => {
+  ServerSettings.updateOctoFarmCommand(false);
+});
+document.getElementById("checkUpdatesForOctoFarmBtn").addEventListener("click", (e) => {
+  ServerSettings.checkForOctoFarmUpdates();
 });
 
 let oldServerSettings = {};

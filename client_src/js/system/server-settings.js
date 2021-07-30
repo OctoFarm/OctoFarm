@@ -9,62 +9,11 @@ import {
 } from "../services/filament-manager-plugin.service";
 import Calc from "../lib/functions/calc";
 import Script from "../services/gocde-scripts.service";
-import { serverSettingKeys } from "./utils/server-database.options";
+import { serverSettingKeys, settingsElements } from "./utils/server.options";
+import { serverBootBoxOptions } from "./utils/bootbox.options";
+import { generateLogDumpFile } from "./utils/server.actions";
 
-function setupDatabaseActionBtns() {
-  for (const key in serverSettingKeys) {
-    if (serverSettingKeys.hasOwnProperty(key)) {
-      document.getElementById(`nuke${serverSettingKeys[key]}`).addEventListener("click", (e) => {
-        ServerSettings.nukeDatabases(`${serverSettingKeys[key]}DB`, e);
-      });
-      if (key !== "ALL") {
-        document
-          .getElementById(`export${serverSettingKeys[key]}`)
-          .addEventListener("click", (e) => {
-            ServerSettings.exportDatabases(`${serverSettingKeys[key]}DB`, e);
-          });
-      }
-    }
-  }
-}
-
-document.getElementById("saveServerSettings").addEventListener("click", (e) => {
-  // Validate Printer Form, then Add
-  ServerSettings.update();
-});
-document.getElementById("restartOctoFarmBtn").addEventListener("click", (e) => {
-  ServerSettings.serviceRestart();
-});
-document.getElementById("updateOctoFarmBtn").addEventListener("click", (e) => {
-  ServerSettings.updateOctoFarmCommand(false);
-});
-document.getElementById("checkUpdatesForOctoFarmBtn").addEventListener("click", (e) => {
-  ServerSettings.checkForOctoFarmUpdates();
-});
-
-class ServerSettings {
-  static async nukeDatabases(database) {
-    let databaseNuke;
-    if (!database) {
-      databaseNuke = await OctoFarmClient.get("settings/server/delete/database");
-    } else {
-      databaseNuke = await OctoFarmClient.get("settings/server/delete/database/" + database);
-    }
-    UI.createAlert("success", databaseNuke.message, 3000);
-  }
-
-  static async exportDatabases(database, event) {
-    UI.addLoaderToElementsInnerHTML(event.target);
-    const databaseExport = await OctoFarmClient.get("settings/server/get/database/" + database);
-
-    if (databaseExport?.databases[0].length !== 0) {
-      FileOperations.download(database + ".json", JSON.stringify(databaseExport.databases));
-    } else {
-      UI.createAlert("warning", "Database is empty, will not export...", 3000, "clicked");
-    }
-    UI.removeLoaderFromElementInnerHTML(event.target);
-  }
-
+export class ServerSettings {
   static async init() {
     if (await isFilamentManagerPluginSyncEnabled()) {
       setupFilamentManagerReSyncBtn();
@@ -254,85 +203,33 @@ class ServerSettings {
       }
     }, 5000);
   }
-  static update() {
+  static updateServerSettings() {
     let reboot = false;
-    const onlinePoll = document.getElementById("webSocketThrottle").value;
-    const onlinePolling = {
-      seconds: onlinePoll
-    };
-    const server = {
-      port: parseInt(document.getElementById("serverPortNo").value),
-      loginRequired: document.getElementById("requireLogin").checked,
-      registration: document.getElementById("requireRegistration").checked
-    };
-    const timeout = {
-      webSocketRetry: document.getElementById("webSocketRetry").value * 1000,
-      apiTimeout: document.getElementById("APITimeout").value * 1000,
-      apiRetryCutoff: document.getElementById("APIRetryTimeout").value * 1000,
-      apiRetry: document.getElementById("APIRetry").value * 1000
-    };
-    const filament = {
-      filamentCheck: document.getElementById("checkFilament").checked
-    };
-    const history = {
-      snapshot: {
-        onComplete: document.getElementById("snapOnComplete").checked,
-        onFailure: document.getElementById("snapOnFailure").checked
-      },
-      thumbnails: {
-        onComplete: document.getElementById("thumbOnComplete").checked,
-        onFailure: document.getElementById("thumbOnFailure").checked
-      },
-      timelapse: {
-        onComplete: document.getElementById("timelapseOnComplete").checked,
-        onFailure: document.getElementById("timelapseOnFailure").checked,
-        deleteAfter: document.getElementById("timelapseDelete").checked
-      }
-    };
-    const influxExport = {
-      active: document.getElementById("infActivateInfluxExport").checked,
-      host: document.getElementById("infHostIP").value,
-      port: document.getElementById("infHostPort").value,
-      database: document.getElementById("infDatabase").value,
-      username: document.getElementById("infUsername").value,
-      password: document.getElementById("infPassword").value,
-      retentionPolicy: {
-        duration: document.getElementById("infDuration").value,
-        replication: document.getElementById("infReplication").value,
-        defaultRet: document.getElementById("infRetention").checked
-      }
-    };
+
     if (
-      oldServerSettings.server.port !== server.port ||
-      oldServerSettings.server.loginRequired !== server.loginRequired ||
-      oldServerSettings.server.registration !== server.registration ||
-      oldServerSettings.timeout.webSocketRetry !== timeout.webSocketRetry ||
-      oldServerSettings.timeout.apiTimeout !== timeout.apiTimeout ||
-      oldServerSettings.timeout.apiRetryCutoff !== timeout.apiRetryCutoff ||
-      oldServerSettings.timeout.apiRetry !== timeout.apiRetry ||
-      oldServerSettings.influxExport.active !== influxExport.active ||
-      oldServerSettings.influxExport.host !== influxExport.host ||
-      oldServerSettings.influxExport.port !== influxExport.port ||
-      oldServerSettings.influxExport.database !== influxExport.database ||
-      oldServerSettings.influxExport.username !== influxExport.username ||
-      oldServerSettings.influxExport.password !== influxExport.password ||
+      oldServerSettings.server.port !== settingsElements.server.port.value ||
+      oldServerSettings.server.loginRequired !== settingsElements.server.loginRequired ||
+      oldServerSettings.server.registration !== settingsElements.server.registration ||
+      oldServerSettings.timeout.webSocketRetry !== settingsElements.timeout.webSocketRetry ||
+      oldServerSettings.timeout.apiTimeout !== settingsElements.timeout.apiTimeout ||
+      oldServerSettings.timeout.apiRetryCutoff !== settingsElements.timeout.apiRetryCutoff ||
+      oldServerSettings.timeout.apiRetry !== settingsElements.timeout.apiRetry ||
+      oldServerSettings.influxExport.active !== settingsElements.influxExport.active ||
+      oldServerSettings.influxExport.host !== settingsElements.influxExport.host ||
+      oldServerSettings.influxExport.port !== settingsElements.influxExport.port ||
+      oldServerSettings.influxExport.database !== settingsElements.influxExport.database ||
+      oldServerSettings.influxExport.username !== settingsElements.influxExport.username ||
+      oldServerSettings.influxExport.password !== settingsElements.influxExport.password ||
       oldServerSettings.influxExport.retentionPolicy.duration !==
-        influxExport.retentionPolicy.duration ||
+        settingsElements.influxExport.retentionPolicy.duration ||
       oldServerSettings.influxExport.retentionPolicy.replication !==
-        influxExport.retentionPolicy.replication ||
+        settingsElements.influxExport.retentionPolicy.replication ||
       oldServerSettings.influxExport.retentionPolicy.defaultRet !==
-        influxExport.retentionPolicy.defaultRet
+        settingsElements.influxExport.retentionPolicy.defaultRet
     ) {
       reboot = true;
     }
-    OctoFarmClient.post("settings/server/update", {
-      onlinePolling,
-      server,
-      timeout,
-      filament,
-      history,
-      influxExport
-    }).then((res) => {
+    OctoFarmClient.post("settings/server/update", {}).then((res) => {
       UI.createAlert(`${res.status}`, `${res.msg}`, 3000, "Clicked");
       if (reboot) {
         bootbox.confirm({
@@ -354,48 +251,7 @@ class ServerSettings {
       }
     });
   }
-  static async generateLogFileDump() {
-    const spinner = document.getElementById("logDumpSpinner");
-    if (spinner) {
-      spinner.classList.remove("d-none");
-    }
-    let logDumpResponse = await OctoFarmClient.post("settings/server/logs/generateLogDump", {});
-    // Safely assume the spinner is done with here after response from server...
-    if (spinner) {
-      spinner.classList.add("d-none");
-    }
-    if (!logDumpResponse?.status || !logDumpResponse?.msg || !logDumpResponse?.zipDumpPath) {
-      UI.createAlert(
-        "error",
-        "There was an issue with the servers response, please check your logs",
-        0,
-        "clicked"
-      );
-      return;
-    }
-
-    UI.createAlert(logDumpResponse.status, logDumpResponse.msg, 5000, "clicked");
-
-    // Error detected so no need to create button.
-    if (logDumpResponse.status === "error") {
-      return;
-    }
-
-    const logDumpDownloadBtn = document.getElementById("logDumpDownloadBtn");
-
-    if (logDumpDownloadBtn) {
-      logDumpDownloadBtn.classList.remove("d-none");
-      logDumpDownloadBtn.addEventListener("click", (e) => {
-        setTimeout(() => {
-          logDumpDownloadBtn.classList.add("d-none");
-        }, 5000);
-        window.open(`/settings/server/${logDumpResponse.zipDumpPath}`);
-      });
-    }
-  }
 }
 
 ServerSettings.init();
 Script.get();
-
-export { setupDatabaseActionBtns };
