@@ -1,5 +1,5 @@
 import OctoPrintClient from "../octoprint";
-import OctoFarmClient from "../../services/octofarm_client.service";
+import OctoFarmClient from "../../services/octofarm-client.service";
 
 export default class PowerButton {
   static revealBulkPower() {
