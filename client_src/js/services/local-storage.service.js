@@ -1,8 +1,6 @@
 import { ApplicationError } from "../exceptions/application-error.handler";
 import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
 
-ApplicationError(HTTPError.FORBIDDEN);
-
 export function removeLocalStorage(key) {
   if (!!key) throw ApplicationError(ClientErrors.FAILED_VALIDATION_KEY);
   const serializedData = getLocalStorage(key);
