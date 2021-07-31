@@ -5,7 +5,7 @@ export function removeLocalStorage(key) {
   if (!!key) throw new ApplicationError(ClientErrors.FAILED_VALIDATION_KEY);
   const serializedData = getLocalStorage(key);
   if (!!serializedData && serializedData.length !== 0) {
-    localStorage.removeItem("dashboardConfiguration");
+    localStorage.removeItem(key);
   }
 }
 export function getLocalStorage(key) {
