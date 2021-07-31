@@ -3,7 +3,7 @@ import OctoFarmClient from "../../services/octofarm-client.service";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import FileManager from "./fileManager.js";
-import { returnDropDown, selectFilament } from "./filamentGrab.js";
+import { returnDropDown, selectFilament } from "../../services/filament-manager-plugin.service";
 import FileSorting from "../modules/fileSorting.js";
 import CustomGenerator from "./customScripts.js";
 

@@ -2,7 +2,7 @@ import OctoFarmClient from "./services/octofarm-client.service";
 import Calc from "./lib/functions/calc.js";
 import FileManager from "./lib/modules/fileManager.js";
 import { dragAndDropEnable } from "./lib/functions/dragAndDrop.js";
-import { returnDropDown, selectFilament } from "./lib/modules/filamentGrab.js";
+import { returnDropDown, selectFilament } from "./services/filament-manager-plugin.service";
 import FileSorting from "./lib/modules/fileSorting.js";
 
 let lastId = null;

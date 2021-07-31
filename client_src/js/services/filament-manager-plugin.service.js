@@ -1,6 +1,11 @@
 import OctoFarmClient from "../services/octofarm-client.service";
 import UI from "../lib/functions/ui";
 
+export async function checkFilamentManager() {
+  let settings = await OctoFarmClient.get("settings/server/get");
+  return settings.filamentManager;
+}
+
 export async function isFilamentManagerPluginSyncEnabled() {
   try {
     const systemSettings = await OctoFarmClient.get("settings/server/get");
@@ -80,7 +85,7 @@ export function setupFilamentManagerReSyncBtn() {
     });
   }
 }
-
+// TODO: re-enable at some point
 // export async function returnSelected(id, profiles) {
 //   console.log("Return Selected");
 //   let profileId = null;
