@@ -1,5 +1,6 @@
 import { errorTypes } from "./error.types";
 
+//TODO: Needs updating for actual usage.
 export const ClientErrors = {
   FAILED_VALIDATION_PATH: {
     type: errorTypes.CLIENT,
