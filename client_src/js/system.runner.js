@@ -1,5 +1,5 @@
 import UI from "./lib/functions/ui.js";
-import Script from "./services/gocde-scripts.service";
+import Script from "./services/gcode-scripts.service";
 import ClientSettings from "./system/client-settings";
 import {
   localStorageKeys,
