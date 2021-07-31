@@ -1,12 +1,8 @@
-import OctoFarmClient from "../../services/octofarm-client.service";
-import UI from "../../lib/functions/ui";
+import OctoFarmClient from "../services/octofarm-client.service";
+import UI from "../lib/functions/ui";
+//TODO: Going to wait till backend changes are merged before tackling this. Also want to re-enable client settings local storage.
 
-document.getElementById("saveSettings").addEventListener("click", (e) => {
-  // Validate Printer Form, then Add
-  ClientSettings.update();
-});
-
-class ClientSettings {
+export default class ClientSettings {
   static async init() {
     const clientSettings = await OctoFarmClient.get("settings/client/get");
     //// localStorage.setItem("clientSettings", JSON.stringify(res));
@@ -141,5 +137,3 @@ class ClientSettings {
     //localStorage.setItem("clientSettings", JSON.stringify(opts));
   }
 }
-
-ClientSettings.init();

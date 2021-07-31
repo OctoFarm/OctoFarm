@@ -1,4 +1,4 @@
-const serverSettingKeys = {
+const serverDatabaseKeys = {
   ALL: "Everything",
   ALERTS: "Alerts",
   CLIENT: "ClientSettings",
@@ -14,7 +14,11 @@ const serverActionsElements = {
   OP_TIMELAPSE_SETUP: document.getElementById("setupTimelapseOctoPrint"),
   LOG_DUMP_GENERATE: document.getElementById("logDumpGenerateBtn"),
   RESET_DASHBOARD: document.getElementById("resetDashboardBtn"),
-  SAVE_SERVER_SETTINGS: document.getElementById("saveServerSettings")
+  SAVE_SERVER_SETTINGS: document.getElementById("saveServerSettings"),
+  SAVE_CLIENT_SETTINGS: document.getElementById("saveClientSettingsBtn"),
+  RESTART_OCTOFARM: document.getElementById("restartOctoFarmBtn"),
+  UPDATE_OCTOFARM: document.getElementById("updateOctoFarmBtn"),
+  CHECK_OCTOFARM_UPDATES: document.getElementById("checkUpdatesForOctoFarmBtn")
 };
 
 const localStorageKeys = {
@@ -73,4 +77,4 @@ const settingsElements = {
   }
 };
 
-export { serverSettingKeys, serverActionsElements, localStorageKeys, settingsElements };
+export { serverDatabaseKeys, serverActionsElements, localStorageKeys, settingsElements };
