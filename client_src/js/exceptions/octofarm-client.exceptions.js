@@ -13,7 +13,7 @@ export const ClientErrors = {
     type: errorTypes.CLIENT,
     color: "danger",
     code: "FAILED_VALIDATION_KEY",
-    message: "Input validation failed, no key way supplied",
+    message: "Input validation failed, no key was supplied",
     statusCode: 412
   },
   FAILED_STATE_UPDATE: {

@@ -120,7 +120,7 @@ export default class UI {
   }
   static addLoaderToElementsInnerHTML(element) {
     if (!element.innerHTML.includes("spinner")) {
-      element.innerHTML += UI.returnSpinnerTemplate;
+      element.innerHTML += UI.returnSpinnerTemplate();
     }
   }
   static checkIfAnyModalShown() {
