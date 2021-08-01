@@ -2,11 +2,13 @@ import axios from "axios";
 import { ApplicationError } from "../exceptions/application-error.handler";
 import { HTTPError } from "../exceptions/octofarm-api.exceptions";
 import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
-import { validateServerReponse, validatePath } from "../utils/validators/api.validator";
+import { validateServerResponse, validatePath } from "../utils/validators/api.validator";
 
 // axios request interceptor
 axios.interceptors.request.use(
   function (config) {
+    if (!config.url) throw new ApplicationError(ClientErrors.NO_PATHNAME_SUPPLIED);
+
     if (!validatePath(config.url)) {
       const overrides = {
         message: `${ClientErrors.INVALID_PATHNAME.message}: "${config.url}"`
@@ -29,7 +31,7 @@ axios.interceptors.response.use(
 
     // This is due to the (*) redirect. Might be worth looking into an alternative as it makes detecting invalid requests a problem.
 
-    if (!validateServerReponse(response.data)) {
+    if (!validateServerResponse(response.data)) {
       const overrides = {
         message: `${ClientErrors.INVALID_SERVER_RESPONSE.message}: "${response.config.url}"`
       };
@@ -67,29 +69,25 @@ axios.interceptors.response.use(
 );
 
 export default class Axios {
-  static async get(path) {
-    const url = new URL(path, window.location.origin).href;
-    return axios.get(url).then((res) => {
+  static async get(path, options) {
+    return axios.get(path, options).then((res) => {
       return res.data;
     });
   }
 
-  static async post(path, data) {
-    const url = new URL(path, window.location.origin).href;
-    return axios.post(url, data).then((res) => {
+  static async post(path, data, options) {
+    return axios.post(path, data, options).then((res) => {
       return res.data;
     });
   }
 
-  static async delete(path) {
-    const url = new URL(path, window.location.origin).href;
-    return axios.delete(url).then((res) => {
+  static async delete(path, options) {
+    return axios.delete(path, options).then((res) => {
       return res.data;
     });
   }
-  static async patch(path, data) {
-    const url = new URL(path, window.location.origin).href;
-    return axios.delete(url, data).then((res) => {
+  static async patch(path, data, options) {
+    return axios.patch(path, data, options).then((res) => {
       return res.data;
     });
   }

@@ -7,6 +7,11 @@ export const ClientErrors = {
     code: "INVALID_SERVER_RESPONSE",
     message: "Server responded with redirect! Invalid api endpoint detected"
   },
+  NO_PATHNAME_SUPPLIED: {
+    color: "danger",
+    code: "NO_PATHNAME_SUPPLIED",
+    message: "You need to supply a url / path to this command"
+  },
   INVALID_PATHNAME: {
     type: errorTypes.CLIENT,
     color: "danger",
