@@ -15,8 +15,8 @@ async function setupOctoPrintForTimelapses(printers) {
   };
   for (let i = 0; i < printers.length; i++) {
     if (printers[i].printerState.colour.category !== "Offline") {
-      await OctoPrintClient.post(printers[i], "settings", webCamSettings);
-      await OctoPrintClient.post(printers[i], "timelapse", timeLapseSettings);
+      await OctoPrintClient.updateSettings(printers[i], webCamSettings);
+      await OctoPrintClient.updateTimelapse(printers[i], timeLapseSettings);
       successfulPrinters += `<i class="fas fa-check-circle text-success"></i> ${printers[i].printerName}: Settings Updated! <br>`;
     } else {
       failedPrinters += `<i class="fas fa-check-circle text-danger"></i> ${printers[i].printerName}: Offline! <br>`;

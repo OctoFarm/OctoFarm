@@ -43,6 +43,15 @@ axios.interceptors.response.use(
   function (error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
+
+    // Make sure to catch any errors without a status...
+    if (!error?.response?.status) {
+      const overrides = {
+        message: `${HTTPError.UNKNOWN.message}: ${error.message} for ${error.config.url}`
+      };
+      throw new ApplicationError(HTTPError.UNKNOWN, overrides);
+    }
+
     switch (error.response.status) {
       case 0:
         throw new ApplicationError(HTTPError.NO_CONNECTION);
@@ -63,30 +72,47 @@ axios.interceptors.response.use(
       case 504:
         throw new ApplicationError(HTTPError.GATEWAY_TIMEOUT);
       default:
-        throw new ApplicationError(HTTPError.UNKNOWN);
+        const overrides = {
+          message: `${HTTPError.UNKNOWN.statusCode}: "${error.response.status}"`
+        };
+        throw new ApplicationError(HTTPError.UNKNOWN, overrides);
     }
   }
 );
 
 export default class Axios {
-  static async get(path, options) {
+  static get(path, options) {
     return axios.get(path, options).then((res) => {
       return res.data;
     });
   }
+  // TODO: these are just to keep the current op client calls working...
+  static getStatus(path, options) {
+    return axios.get(path, options).then((res) => {
+      return res;
+    });
+  }
 
-  static async post(path, data, options) {
+  static post(path, data, options) {
     return axios.post(path, data, options).then((res) => {
       return res.data;
     });
   }
 
-  static async delete(path, options) {
+  static delete(path, options) {
     return axios.delete(path, options).then((res) => {
       return res.data;
     });
   }
-  static async patch(path, data, options) {
+
+  // TODO: these are just to keep the current op client calls working...
+  static deleteStatus(path, options) {
+    return axios.get(path, options).then((res) => {
+      return res;
+    });
+  }
+
+  static patch(path, data, options) {
     return axios.patch(path, data, options).then((res) => {
       return res.data;
     });

@@ -916,19 +916,14 @@ export class FileActions {
       if (result) {
         formData.append("foldername", result);
         formData.append("path", `${currentFolder}/`);
-        const post = await OctoPrintClient.folder(printer, "local", formData);
-        if (post.status === 201 || post.status === 200) {
-          const opts = {
-            i: printer._id,
-            foldername: result,
-            path: currentFolder
-          };
-          const update = await OctoFarmClient.post("printers/newFolder", opts);
-          UI.createAlert("success", "Successfully created your new folder...", 3000, "clicked");
-          FileManager.updateFileList(printer._id);
-        } else {
-          UI.createAlert("error", "Sorry your folder couldn't be saved...", 3000, "clicked");
-        }
+        await OctoPrintClient.createFolder(printer, formData);
+        const opts = {
+          i: printer._id,
+          foldername: result,
+          path: currentFolder
+        };
+        await OctoFarmClient.post("printers/newFolder", opts);
+        UI.createAlert("success", "Successfully created your new folder...", 3000, "clicked");
       }
     });
   }
@@ -959,20 +954,12 @@ export class FileActions {
     return usageArray;
   }
 
-  static async startPrint(printer, filePath) {
-    const opts = {
-      command: "start"
-    };
-    let loadFile = await OctoPrintClient.file(printer, filePath, "load");
-    if (loadFile) {
-      OctoPrintClient.jobAction(printer, opts);
-    } else {
-      UI.createAlert("error", "Could not select file", 3000, "clicked");
-    }
+  static startPrint(printer, filePath) {
+    return OctoPrintClient.printFile(printer, filePath);
   }
 
   static selectFile(printer, filePath) {
-    OctoPrintClient.file(printer, filePath, "load");
+    return OctoPrintClient.selectFile(printer, filePath);
   }
 
   static async updateFile(printer, btn, fullPath) {
@@ -1018,40 +1005,19 @@ export class FileActions {
       inputOptions,
       async callback(result) {
         if (result) {
-          const opt = {
-            command: "move",
-            destination: result
+          const response = await OctoPrintClient.moveFileOrFolder(printer, fullPath, result);
+          const opts = {
+            index: printer._id,
+            newPath: result,
+            fileName: response.name,
+            newFullPath: response.path
           };
-          const post = await OctoPrintClient.post(printer, `files/local/${fullPath}`, opt);
-          if (post.status === 404) {
-            UI.createAlert(
-              "error",
-              "We could not find the location, does it exist?",
-              3000,
-              "clicked"
-            );
-          } else if (post.status === 409) {
-            UI.createAlert(
-              "error",
-              "There was a conflict, file already exists or is in use...",
-              3000,
-              "clicked"
-            );
-          } else {
-            const json = await post.json();
-            const opts = {
-              index: printer._id,
-              newPath: result,
-              fileName: json.name,
-              newFullPath: json.path
-            };
-            UI.createAlert("warning", "Moving file... please wait.", 3000, "clicked");
-            const updateFarm = await OctoFarmClient.post("printers/moveFile", opts);
-            setTimeout(function () {
-              FileManager.updateFileList(printer._id);
-              UI.createAlert("success", "Successfully moved your file...", 3000, "clicked");
-            }, 3000);
-          }
+          UI.createAlert("warning", "Moving file... please wait.", 3000, "clicked");
+          await OctoFarmClient.post("printers/moveFile", opts);
+          setTimeout(function () {
+            FileManager.updateFileList(printer._id);
+            UI.createAlert("success", "Successfully moved your file...", 3000, "clicked");
+          }, 3000);
         }
       }
     });
@@ -1070,7 +1036,12 @@ export class FileActions {
       },
       async callback(result) {
         if (result) {
-          await OctoPrintClient.file(printer, fullPath, "delete");
+          await OctoPrintClient.deleteFile(printer, fullPath);
+          const opt = {
+            i: printer,
+            filePath: file.fullPath
+          };
+          await OctoFarmClient.post("printers/removefile", opt);
           document.getElementById(`file-${fullPath}`).remove();
         }
       }
@@ -1089,13 +1060,13 @@ export class FileActions {
         }
       },
       async callback(result) {
-        const opts = {
-          index: printer._id,
-          fullPath
-        };
         if (result) {
-          const post = await OctoPrintClient.delete(printer, `files/local/${fullPath}`);
-          const del = await OctoFarmClient.post("printers/removefolder", opts);
+          await OctoPrintClient.deleteFolder(printer, fullPath);
+          const opts = {
+            index: printer._id,
+            fullPath
+          };
+          await OctoFarmClient.post("printers/removefolder", opts);
           document.getElementById(`file-${fullPath}`).remove();
         }
       }
@@ -1117,7 +1088,7 @@ export class FileActions {
       inputOptions.push(option);
     });
     bootbox.prompt({
-      title: "Where would you like to move the file?",
+      title: "Where would you like to move the folder?",
       inputType: "select",
       inputOptions,
       async callback(result) {
@@ -1127,36 +1098,19 @@ export class FileActions {
             destination: result
           };
 
-          const post = await OctoPrintClient.post(printer, `files/local/${fullPath}`, opt);
-          if (post.status === 404) {
-            UI.createAlert(
-              "error",
-              "We could not find the location, does it exist?",
-              3000,
-              "clicked"
-            );
-          } else if (post.status === 409) {
-            UI.createAlert(
-              "error",
-              "There was a conflict, file already exists or is in use...",
-              3000,
-              "clicked"
-            );
-          } else {
-            const json = await post.json();
-            const opts = {
-              index: printer._id,
-              oldFolder: fullPath,
-              newFullPath: result,
-              folderName: json.path
-            };
-            UI.createAlert("warning", "Moving folder please wait...", 3000, "clicked");
-            const updateFarm = await OctoFarmClient.post("printers/moveFolder", opts);
-            setTimeout(function () {
-              FileManager.updateFileList(printer._id);
-              UI.createAlert("success", "Successfully moved your file...", 3000, "clicked");
-            }, 3000);
-          }
+          let response = await OctoPrintClient.moveFileOrFolder(printer, fullPath, result);
+          const opts = {
+            index: printer._id,
+            oldFolder: fullPath,
+            newFullPath: result,
+            folderName: response.path
+          };
+          UI.createAlert("warning", "Moving folder please wait...", 3000, "clicked");
+          const updateFarm = await OctoFarmClient.post("printers/moveFolder", opts);
+          setTimeout(function () {
+            FileManager.updateFileList(printer._id);
+            UI.createAlert("success", "Successfully moved your file...", 3000, "clicked");
+          }, 3000);
         }
       }
     });

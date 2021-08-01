@@ -31,16 +31,8 @@ document.getElementById("sortStates").addEventListener("change", (e) => {
 
 createWebWorker("panel");
 
-async function startPrint(printer, filePath) {
-  const opts = {
-    command: "start"
-  };
-  let loadFile = await OctoPrintClient.file(printer, filePath, "load");
-  if (loadFile) {
-    await OctoPrintClient.jobAction(printer, opts);
-  } else {
-    UI.createAlert("error", "Could not select file", 3000, "clicked");
-  }
+function startPrint(printer, filePath) {
+  return OctoPrintClient.printFile(printer, filePath);
 }
 
 function askConfirmation(message, cb) {
@@ -99,11 +91,15 @@ async function clearFiles(files) {
   const failedFiles = [];
   const succeededFiles = [];
   for (let file of acceptedFiles) {
-    const responseOctoFarm = await OctoPrintClient.file(printer, file.fullPath, "delete", false);
-
+    const responseOctoFarm = await OctoPrintClient.deleteFile(printer, file.fullPath);
     if (responseOctoFarm.status > 204) {
       failedFiles.push(file);
     } else {
+      const opt = {
+        i: printer,
+        filePath: file.fullPath
+      };
+      OctoFarmClient.post("printers/removefile", opt);
       succeededFiles.push(file);
     }
 
