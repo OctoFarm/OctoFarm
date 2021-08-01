@@ -37,7 +37,7 @@ function openErrorModal(options) {
   $(octoFarmErrorModalElement).modal("show");
 }
 
-function handleEvent() {
+function handleEvent(event) {
   if (!event.reason) {
     openErrorModal(event);
   } else {

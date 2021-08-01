@@ -71,7 +71,7 @@ const HTTPError = {
     type: errorTypes.SERVER,
     color: "danger",
     code: "UNKNOWN",
-    message: "Unknown Error Response",
+    message: "Unknown Error Response: ",
     statusCode: 999
   }
 };

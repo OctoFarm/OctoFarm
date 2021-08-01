@@ -1,49 +1,158 @@
 import UI from "../lib/functions/ui.js";
 import OctoFarmClient from "./octofarm-client.service";
 import Axios from "./axios.service";
+import { validatePrinterObject } from "../utils/validators/octoprint.validator";
 
 export default class OctoPrintClient extends Axios {
-  static validatePrinter(printer) {
-    if (!printer.apikey) {
-      throw new Error("Api key not provided");
-    }
-    if (!printer.printerURL) {
-      throw new Error("Printer URL not provided");
-    }
+  static base = "/api";
+  static settings = `${this.base}/settings`;
+  static timelapse = `${this.base}/timelapse`;
+  static filesBase = `${this.base}/files`;
+  static filesLocal = `${this.filesBase}/local/`;
+  static filesSdCard = `${this.filesBase}/sdcard/`;
+  static printerBase = `${this.base}/printer`;
+  static tool = `${this.printerBase}/tool`;
+  static printHead = `${this.printerBase}/printhead`;
+  static command = `${this.printerBase}/command`;
+
+  static getDefaultHeaders(apikey) {
+    return {
+      "Content-Type": "application/json",
+      "X-Api-Key": apikey
+    };
+  }
+  static formDataHeaders(apikey) {
+    return {
+      "Content-Type": "multipart/form-data",
+      "X-Api-Key": apikey
+    };
   }
 
-  static get(printer, item) {
-    this.validatePrinter(printer);
-    const url = `${printer.printerURL}/${item}`;
-    return fetch(url, {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
-      }
-    }).catch((e) => {
-      console.log(e);
-    });
+  static updateSettings(printer, data) {
+    validatePrinterObject(printer);
+    const options = {
+      headers: this.getDefaultHeaders(printer.apikey)
+    };
+    return this.post(printer.printerURL + this.settings, data, options);
+  }
+
+  static updateTimelapse(printer, data) {
+    validatePrinterObject(printer);
+    const options = {
+      headers: this.getDefaultHeaders(printer.apikey)
+    };
+    return this.post(printer.printerURL + this.timelapse, data, options);
+  }
+
+  static selectFile(printer, filePath) {
+    validatePrinterObject(printer);
+    const options = {
+      headers: this.getDefaultHeaders(printer.apikey)
+    };
+    const command = {
+      command: "select",
+      print: false
+    };
+    return this.post(printer.printerURL + this.filesLocal + filePath, command, options);
+  }
+
+  static async printFile(printer, filePath) {
+    validatePrinterObject(printer);
+    const options = {
+      headers: this.getDefaultHeaders(printer.apikey)
+    };
+    const command = {
+      command: "select",
+      print: true
+    };
+    // OctoFarm keeps track of the previously set flow/feed rates and re-applies them to a print.
+    await this.updateFlowRate(printer);
+    await this.updateFeedRate(printer);
+    return this.post(printer.printerURL + this.filesLocal + filePath, command, options);
+  }
+
+  static deleteFile(printer, filePath) {
+    validatePrinterObject(printer);
+    const options = {
+      headers: this.getDefaultHeaders(printer.apikey)
+    };
+    return this.deleteStatus(printer.printerURL + this.filesLocal + filePath, options);
+  }
+
+  static moveFileOrFolder(printer, fullPath, location) {
+    validatePrinterObject(printer);
+    const options = {
+      headers: this.getDefaultHeaders(printer.apikey)
+    };
+    const command = {
+      command: "move",
+      destination: location
+    };
+    return this.post(printer.printerURL + this.filesLocal + fullPath, command, options);
+  }
+
+  static checkFile(printer, filePath) {
+    validatePrinterObject(printer);
+    const options = {
+      headers: this.getDefaultHeaders(printer.apikey)
+    };
+    return this.getStatus(printer.printerURL + this.filesLocal + filePath, options);
+  }
+
+  static createFolder(printer, formData) {
+    validatePrinterObject(printer);
+    const options = {
+      headers: this.getDefaultHeaders(printer.apikey)
+    };
+    return this.post(printer.printerURL + this.filesLocal, formData, options);
+  }
+
+  static deleteFolder(printer, filePath) {
+    validatePrinterObject(printer);
+    const options = {
+      headers: this.getDefaultHeaders(printer.apikey)
+    };
+    return this.post(printer.printerURL + this.filesLocal + filePath, options);
+  }
+
+  static updateFlowRate(printer, override) {
+    validatePrinterObject(printer);
+    const options = {
+      headers: this.getDefaultHeaders(printer.apikey)
+    };
+    const flow = {
+      command: "flowrate",
+      factor: parseInt(printer.flowRate)
+    };
+    return this.post(printer.printerURL + this.tool, flow, options);
+  }
+
+  static updateFeedRate(printer, override) {
+    validatePrinterObject(printer);
+    const options = {
+      headers: this.getDefaultHeaders(printer.apikey)
+    };
+    const feed = {
+      command: "feedrate",
+      factor: parseInt(printer.feedRate)
+    };
+    return this.post(printer.printerURL + this.printHead, feed, options);
+  }
+
+  static startGcode(printer, gcode) {
+    validatePrinterObject(printer);
+    const options = {
+      headers: this.getDefaultHeaders(printer.apikey)
+    };
+    const command = {
+      commands: gcode
+    };
+    return this.post(printer.printerURL + this.command, command, options);
   }
 
   static postNOAPI(printer, item, data) {
-    this.validatePrinter(printer);
+    validatePrinterObject(printer);
     const url = `${printer.printerURL}/${item}`;
-    return fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
-      },
-      body: JSON.stringify(data)
-    }).catch((e) => {
-      console.log(e);
-    });
-  }
-
-  static post(printer, item, data) {
-    this.validatePrinter(printer);
-    const url = `${printer.printerURL}/api/${item}`;
     return fetch(url, {
       method: "POST",
       headers: {
@@ -57,7 +166,7 @@ export default class OctoPrintClient extends Axios {
   }
 
   static folder(printer, item, data) {
-    this.validatePrinter(printer);
+    validatePrinterObject(printer);
     const url = `${printer.printerURL}/api/files/${item}`;
     return fetch(url, {
       method: "POST",
@@ -65,20 +174,6 @@ export default class OctoPrintClient extends Axios {
         "X-Api-Key": printer.apikey
       },
       body: data
-    }).catch((e) => {
-      console.log(e);
-    });
-  }
-
-  static delete(printer, item) {
-    this.validatePrinter(printer);
-    const url = `${printer.printerURL}/api/${item}`;
-    return fetch(url, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
-      }
     }).catch((e) => {
       console.log(e);
     });
@@ -178,67 +273,6 @@ export default class OctoPrintClient extends Axios {
     } else {
       element.target.classList = "btn btn-danger";
       setTimeout(flashReturn, 500);
-    }
-  }
-
-  static async checkFile(printer, fullPath) {
-    const url = "api/files/local/" + fullPath;
-
-    let response = await OctoPrintClient.get(printer, url);
-    return response.status;
-  }
-
-  static async file(printer, fullPath, action, notify = true) {
-    const url = "files/local/" + fullPath;
-    let post = null;
-    if (action === "load") {
-      const opt = {
-        command: "select",
-        print: false
-      };
-      post = await OctoPrintClient.post(printer, url, opt);
-      return post.status;
-    } else if (action === "print") {
-      const opt = {
-        command: "select",
-        print: true
-      };
-      // Make sure feed/flow are set before starting print...
-      const flow = {
-        command: "flowrate",
-        factor: parseInt(printer.flowRate)
-      };
-      await OctoPrintClient.post(printer, "printer/tool", flow);
-      const feed = {
-        command: "feedrate",
-        factor: parseInt(printer.feedRate)
-      };
-      await OctoPrintClient.post(printer, "printer/printhead", feed);
-      post = await OctoPrintClient.post(printer, url, opt);
-    } else if (action === "delete") {
-      post = await OctoPrintClient.delete(printer, url);
-    }
-    if (post?.status === 204) {
-      if (action === "delete") {
-        const opt = {
-          i: printer,
-          fullPath
-        };
-        const fileDel = await OctoFarmClient.post("printers/removefile", opt);
-        if (notify) {
-          UI.createAlert("success", `${printer.printerName}: delete completed`, 3000, "clicked");
-        }
-        return fileDel;
-      } else {
-        if (notify) {
-          UI.createAlert("success", `${printer.printerName}: ${action} actioned`, 3000, "clicked");
-        }
-      }
-    } else {
-      // TODO improve handling
-      if (notify) {
-        UI.createAlert("error", `${printer.printerName}: ${action} failed`, 3000, "clicked");
-      }
     }
   }
 
