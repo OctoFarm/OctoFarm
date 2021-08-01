@@ -18,7 +18,7 @@ function returnErrorMessage(options) {
 function returnModalDeveloperInfo(options) {
   return `
     <code>
-    <u>DEVELOPER INFO</u><br>
+    <u>FILE INFO</u><br>
     LINE: ${options?.lineNumber}<br>
     COL: ${options?.columnNumber}<br>
     FILE: ${new URL(options?.fileName).pathname}
