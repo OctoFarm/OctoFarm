@@ -1,5 +1,39 @@
 import OctoPrintClient from "../../services/octoprint-client.service";
 import OctoFarmClient from "../../services/octofarm-client.service";
+import UI from "../functions/ui";
+
+function updatePrinterPowerStatus(printer, status) {
+  const powerStatusPrinter = document.getElementById("printerStatus-" + printer._id);
+  if (powerStatusPrinter) {
+    if (status === "No Status") {
+      powerStatusPrinter.style.color = "black";
+    } else if (status[Object.keys(status)[0]]) {
+      powerStatusPrinter.style.color = "green";
+    } else {
+      powerStatusPrinter.style.color = "red";
+    }
+  }
+}
+async function getPrinterPowerStatus(printer) {
+  let status = await OctoPrintClient.powerPluginCommand(
+    printer,
+    printer.powerSettings.powerStatusURL,
+    printer.powerSettings.powerStatusCommand
+  );
+  updatePrinterPowerStatus(printer, status);
+  status = await OctoPrintClient.powerPluginCommand(
+    printer,
+    printer.powerSettings.powerStatusURL,
+    printer.powerSettings.powerStatusCommand
+  );
+  updatePrinterPowerStatus(printer, status);
+  status = await OctoPrintClient.powerPluginCommand(
+    printer,
+    printer.powerSettings.powerStatusURL,
+    printer.powerSettings.powerStatusCommand
+  );
+  updatePrinterPowerStatus(printer, status);
+}
 
 export default class PowerButton {
   static revealBulkPower() {
@@ -35,28 +69,18 @@ export default class PowerButton {
             },
             callback: async function (result) {
               if (result) {
-                await OctoPrintClient.power(
+                await OctoPrintClient.powerPluginCommand(
                   printer,
                   printer.powerSettings.powerOffURL,
-                  "Power Off",
                   printer.powerSettings.powerOffCommand
                 );
+                UI.createAlert(
+                  "success",
+                  `${printer.printerName}: Successfully powered off your printer`,
+                  3000
+                );
                 if (printer.powerSettings.powerStatusURL !== "") {
-                  await OctoPrintClient.getPowerStatus(
-                    printer,
-                    printer.powerSettings.powerStatusURL,
-                    printer.powerSettings.powerStatusCommand
-                  );
-                  await OctoPrintClient.getPowerStatus(
-                    printer,
-                    printer.powerSettings.powerStatusURL,
-                    printer.powerSettings.powerStatusCommand
-                  );
-                  await OctoPrintClient.getPowerStatus(
-                    printer,
-                    printer.powerSettings.powerStatusURL,
-                    printer.powerSettings.powerStatusCommand
-                  );
+                  await getPrinterPowerStatus(printer);
                 }
               }
             }
@@ -72,27 +96,17 @@ export default class PowerButton {
       if (powerOnnPrinter.classList.contains("d-none")) {
         powerOnnPrinter.classList.remove("d-none");
         powerOnnPrinter.addEventListener("click", async (event) => {
-          await OctoPrintClient.power(
+          await OctoPrintClient.powerPluginCommand(
             printer,
             printer.powerSettings.powerOnURL,
-            "Power On",
             printer.powerSettings.powerOnCommand
           );
-          await OctoPrintClient.getPowerStatus(
-            printer,
-            printer.powerSettings.powerStatusURL,
-            printer.powerSettings.powerStatusCommand
+          UI.createAlert(
+            "success",
+            `${printer.printerName}: Successfully powered on your printer`,
+            3000
           );
-          await OctoPrintClient.getPowerStatus(
-            printer,
-            printer.powerSettings.powerStatusURL,
-            printer.powerSettings.powerStatusCommand
-          );
-          await OctoPrintClient.getPowerStatus(
-            printer,
-            printer.powerSettings.powerStatusURL,
-            printer.powerSettings.powerStatusCommand
-          );
+          await getPrinterPowerStatus(printer);
         });
       }
     }
@@ -133,52 +147,22 @@ export default class PowerButton {
                 },
                 callback: async function (result) {
                   if (result) {
-                    const status = await OctoPrintClient.power(
+                    await OctoPrintClient.powerPluginCommand(
                       printer,
                       printer.powerSettings.powerToggleURL,
-                      "Power Toggle",
                       printer.powerSettings.powerToggleCommand
                     );
-                    await OctoPrintClient.getPowerStatus(
-                      printer,
-                      printer.powerSettings.powerStatusURL,
-                      printer.powerSettings.powerStatusCommand
+                    UI.createAlert(
+                      "success",
+                      `${printer.printerName}: Successfully toggled your printers power`,
+                      3000
                     );
-                    await OctoPrintClient.getPowerStatus(
-                      printer,
-                      printer.powerSettings.powerStatusURL,
-                      printer.powerSettings.powerStatusCommand
-                    );
-                    await OctoPrintClient.getPowerStatus(
-                      printer,
-                      printer.powerSettings.powerStatusURL,
-                      printer.powerSettings.powerStatusCommand
-                    );
+                    await getPrinterPowerStatus(printer);
                   }
                 }
               });
             } else {
-              const status = await OctoPrintClient.power(
-                printer,
-                printer.powerSettings.powerToggleURL,
-                "Power Toggle",
-                printer.powerSettings.powerToggleCommand
-              );
-              await OctoPrintClient.getPowerStatus(
-                printer,
-                printer.powerSettings.powerStatusURL,
-                printer.powerSettings.powerStatusCommand
-              );
-              await OctoPrintClient.getPowerStatus(
-                printer,
-                printer.powerSettings.powerStatusURL,
-                printer.powerSettings.powerStatusCommand
-              );
-              await OctoPrintClient.getPowerStatus(
-                printer,
-                printer.powerSettings.powerStatusURL,
-                printer.powerSettings.powerStatusCommand
-              );
+              await getPrinterPowerStatus(printer);
             }
           });
         }
@@ -211,7 +195,7 @@ export default class PowerButton {
           );
           restartOctoPrint.classList.remove("d-none");
           restartOctoPrint.addEventListener("click", (event) => {
-            OctoPrintClient.system(printer, "restart");
+            OctoPrintClient.restartService(printer);
           });
         }
         if (
@@ -221,7 +205,7 @@ export default class PowerButton {
           const restartHost = document.getElementById("printerRestartHost-" + printer._id);
           restartHost.classList.remove("d-none");
           restartHost.addEventListener("click", (event) => {
-            OctoPrintClient.system(printer, "reboot");
+            OctoPrintClient.rebootSystem(printer);
           });
         }
 
@@ -232,7 +216,7 @@ export default class PowerButton {
           const shutdownHost = document.getElementById("printerShutdownHost-" + printer._id);
           shutdownHost.classList.remove("d-none");
           shutdownHost.addEventListener("click", (event) => {
-            OctoPrintClient.system(printer, "shutdown");
+            OctoPrintClient.shutdownSystem(printer);
           });
         }
       }
