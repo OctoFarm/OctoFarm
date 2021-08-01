@@ -2,11 +2,17 @@ import axios from "axios";
 import { ApplicationError } from "../exceptions/application-error.handler";
 import { HTTPError } from "../exceptions/octofarm-api.exceptions";
 import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
-import { handleServerHTMLRedirect } from "../utils/validators/client-response.validator";
+import { validateServerReponse, validatePath } from "../utils/validators/api.validator";
 
 // axios request interceptor
 axios.interceptors.request.use(
   function (config) {
+    if (!validatePath(config.url)) {
+      const overrides = {
+        message: `${ClientErrors.INVALID_PATHNAME.message}: "${config.url}"`
+      };
+      throw new ApplicationError(ClientErrors.INVALID_PATHNAME, overrides);
+    }
     return config;
   },
   function (error) {
@@ -20,12 +26,14 @@ axios.interceptors.response.use(
   function (response) {
     // Any status code that lie within the range of 2xx cause this function to trigger
     // Do something with response data
-    if (response?.data) {
-      const htmlDetect = handleServerHTMLRedirect(response.data);
+
+    // This is due to the (*) redirect. Might be worth looking into an alternative as it makes detecting invalid requests a problem.
+
+    if (!validateServerReponse(response.data)) {
       const overrides = {
-        message: `${ClientErrors.INVALID_SERVER_RESPONSE.message}: ${response.config.url}`
+        message: `${ClientErrors.INVALID_SERVER_RESPONSE.message}: "${response.config.url}"`
       };
-      if (!htmlDetect) throw new ApplicationError(ClientErrors.INVALID_SERVER_RESPONSE, overrides);
+      throw new ApplicationError(ClientErrors.INVALID_SERVER_RESPONSE, overrides);
     }
 
     return response;

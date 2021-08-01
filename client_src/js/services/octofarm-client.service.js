@@ -4,16 +4,9 @@ import Axios from "./axios.service";
 
 export default class OctoFarmClient extends Axios {
   static printerRoute = "/printers";
-  static serverSettingsRoute = "/settings2/server";
+  static serverSettingsRoute = "/settings/server";
   static logsRoute = `${this.serverSettingsRoute}/logs`;
   static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
-
-  static validatePath(pathname) {
-    if (!pathname) {
-      new URL(path, window.location.origin);
-      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH);
-    }
-  }
 
   static async getPrinter(id) {
     if (!id) {
