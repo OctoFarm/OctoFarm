@@ -1,4 +1,4 @@
-import OctoPrintClient from "../lib/octoprint";
+import OctoPrintClient from "../services/octoprint-client.service";
 
 async function setupOctoPrintForTimelapses(printers) {
   let successfulPrinters = "";

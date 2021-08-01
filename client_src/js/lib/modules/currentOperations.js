@@ -1,5 +1,5 @@
 import Calc from "../functions/calc.js";
-import OctoPrintClient from "../octoprint.js";
+import OctoPrintClient from "../../services/octoprint-client.service.js";
 
 let printers = [];
 const resetFile = function (id) {

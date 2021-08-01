@@ -1,4 +1,4 @@
-import OctoPrintClient from "../octoprint";
+import OctoPrintClient from "../../services/octoprint-client.service";
 import Queue from "./clientQueue.js";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";

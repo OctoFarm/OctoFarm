@@ -1,4 +1,4 @@
-import OctoPrintClient from "../lib/octoprint";
+import OctoPrintClient from "../services/octoprint-client.service";
 import UI from "../lib/functions/ui";
 
 export async function printerPreHeatChamber(printer, chamberTemp) {

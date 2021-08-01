@@ -1,4 +1,4 @@
-import OctoPrintClient from "../octoprint";
+import OctoPrintClient from "../../services/octoprint-client.service";
 import OctoFarmClient from "../../services/octofarm-client.service";
 
 export default class PowerButton {

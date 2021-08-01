@@ -1,7 +1,8 @@
-import UI from "./functions/ui.js";
-import OctoFarmClient from "../services/octofarm-client.service";
+import UI from "../lib/functions/ui.js";
+import OctoFarmClient from "./octofarm-client.service";
+import Axios from "./axios.service";
 
-export default class OctoPrintClient {
+export default class OctoPrintClient extends Axios {
   static validatePrinter(printer) {
     if (!printer.apikey) {
       throw new Error("Api key not provided");

@@ -7,7 +7,7 @@ import {
   checkQuickConnectState,
   init as actionButtonInit
 } from "../lib/modules/Printers/actionButtons.js";
-import OctoPrintClient from "../lib/octoprint.js";
+import OctoPrintClient from "../services/octoprint-client.service.js";
 import { checkTemps } from "../lib/modules/temperatureCheck.js";
 import { checkFilamentManager } from "../services/filament-manager-plugin.service";
 import doubleClickFullScreen from "../lib/functions/fullscreen.js";

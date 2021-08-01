@@ -17,7 +17,7 @@ import {
 } from "./printer-map/printer-quick-actions.modal";
 import { FileActions } from "./lib/modules/fileManager";
 import UI from "./lib/functions/ui";
-import OctoPrintClient from "./lib/octoprint";
+import OctoPrintClient from "./services/octoprint-client.service";
 import { fileListStorageSize, findOldFiles } from "./printer-map/printer-map.utils";
 import { humanFileSize } from "./utils/file-size.util";
 
