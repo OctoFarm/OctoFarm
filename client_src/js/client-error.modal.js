@@ -21,7 +21,7 @@ function returnModalDeveloperInfo(options) {
     <u>FILE INFO</u><br>
     LINE: ${options?.lineNumber}<br>
     COL: ${options?.columnNumber}<br>
-    FILE: ${new URL(options?.fileName).pathname}
+    ${options?.fileName ? "FILE: " + options?.fileName : ""}
     </code>
   `;
 }
@@ -37,7 +37,7 @@ function openErrorModal(options) {
   $(octoFarmErrorModalElement).modal("show");
 }
 
-function handleEvent(event) {
+function handleEvent() {
   if (!event.reason) {
     openErrorModal(event);
   } else {
@@ -48,6 +48,6 @@ function handleEvent(event) {
 window.onunhandledrejection = function (event) {
   handleEvent(event);
 };
-window.onerror = function (event) {
-  handleEvent(event);
+window.onerror = function (message, source, lineno, colno, error) {
+  handleEvent(message);
 };

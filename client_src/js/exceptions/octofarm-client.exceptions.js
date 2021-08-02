@@ -1,5 +1,6 @@
 import { errorTypes } from "./error.types";
 
+//TODO: Needs updating for actual usage.
 export const ClientErrors = {
   INVALID_SERVER_RESPONSE: {
     type: errorTypes.CLIENT,
