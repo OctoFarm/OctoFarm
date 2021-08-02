@@ -22,9 +22,9 @@ All notable changes to this project will be documented in this file.
     - Reduced logging (we will bring it back later in different shape with an Exception handler)
     - Replaced fetch with axios in the local OctoFarm client calls.  
     - Moved all error handling for client connections into axios calls
-    - Refactored System page into seperate manageable files ejs/js, cleaned up a lot of code. 
+    - Refactored System page into separate manageable files ejs/js, cleaned up a lot of code. 
     - Updated the system page layout. 
-    - Moved filament manager plugin actions to serperate service file. 
+    - Moved filament manager plugin actions to serparate service file. 
 
 ### Removed
 
