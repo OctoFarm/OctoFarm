@@ -1147,7 +1147,7 @@ export async function initMonitoring(printers, clientSettings, view) {
   switch (printerManagerModal.classList.contains("show")) {
     case true:
       // Run printer manager updater
-      await PrinterManager.init("", printers, clientSettings);
+      await PrinterManager.init("", printers, getControlList());
       break;
     case false:
       // initialise or start the information updating..
