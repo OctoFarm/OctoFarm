@@ -39,42 +39,35 @@ class LoggerService {
           : [])
       ],
       format: winston.format.printf((info) => {
-        let message = `${dateFormat()} | ${info.level.toUpperCase()} | ${route} | ${info.message}`;
-        message = info.obj ? message + ` data: ${JSON.stringify(info.obj)} | ` : message;
-        message = this.log_data
-          ? message + ` log_data: ${JSON.stringify(this.log_data)} | `
-          : message;
+        const level = info.level.toUpperCase();
+        const date = dateFormat();
+        let message = `${date} | ${level} | ${route} | ${info.message}`;
+        message = info.meta ? message + ` data: ${info.meta} | ` : message;
         return message;
       })
     });
   }
 
-  setLogData(log_data) {
-    this.log_data = log_data;
-  }
-
-  info(message, obj) {
+  info(message, meta) {
     this.logger.log("info", message, {
-      obj
+      meta
     });
   }
 
-  warning(message, obj) {
+  warning(message, meta) {
     this.logger.log("warn", message, {
-      obj
+      meta
     });
   }
 
-  debug(message, obj) {
+  debug(message, meta) {
     this.logger.log("debug", message, {
-      obj
+      meta
     });
   }
 
-  error(message, obj) {
-    this.logger.log("error", message, {
-      obj
-    });
+  error(message, meta) {
+    this.logger.log("error", message, { meta });
   }
 }
 

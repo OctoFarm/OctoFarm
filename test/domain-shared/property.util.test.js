@@ -1,4 +1,4 @@
-const { toDefinedKeyValue } = require("../../../server_src/utils/property.util");
+const { toDefinedKeyValue } = require("../../server_src/utils/property.util");
 
 function conditionUnderTest(prop) {
   return typeof prop !== "undefined" && prop !== null;

@@ -13,6 +13,7 @@ const { PrinterClean } = require("./lib/dataFunctions/printerClean.js");
 const { ServerSettings } = require("./settings/serverSettings.js");
 const { ClientSettings } = require("./settings/clientSettings.js");
 const { TaskManager } = require("./runners/task.manager");
+const exceptionHandler = require("./exceptions/exception.handler");
 
 function setupExpressServer() {
   let app = express();
@@ -101,6 +102,7 @@ function serveOctoFarmRoutes(app) {
     }
     res.redirect("/");
   });
+  app.use(exceptionHandler);
 }
 
 async function serveOctoFarmNormally(app, quick_boot = false) {

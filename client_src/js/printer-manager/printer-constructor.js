@@ -257,6 +257,7 @@ export class PrintersManagement {
         const saveButton = document.getElementById(`saveButton-${newId}`);
         saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         saveButton.disabled = true;
+
         const printer = new PrintersManagement(
           printerURL.value,
           printerCamURL.value,

@@ -1,13 +1,21 @@
+function sanitizeURL(url) {
+  if (!url) return;
+  return new URL(url).href;
+}
+
 function convertHttpUrlToWebsocket(url) {
-  if (url.includes("http://")) {
-    return url.replace("http://", "ws://");
-  } else if (url.includes("https://")) {
-    return url.replace("https://", "wss://");
-  } else if (!url.includes("ws://")) {
-    return "ws://" + url;
+  const urlInstance = new URL(url);
+  const protocol = urlInstance.protocol;
+  if (protocol === "https:") {
+    urlInstance.protocol = "wss:";
+  } else {
+    urlInstance.protocol = "ws:";
   }
+
+  return urlInstance.href;
 }
 
 module.exports = {
-  convertHttpUrlToWebsocket
+  convertHttpUrlToWebsocket,
+  sanitizeURL
 };

@@ -7,6 +7,7 @@ const dotenv = require("dotenv");
 const { AppConstants } = require("./app.constants");
 
 const Logger = require("./handlers/logger.js");
+const { status, up } = require("migrate-mongo");
 const logger = new Logger("OctoFarm-Environment", false);
 
 // Constants and definition
@@ -265,6 +266,31 @@ function getViewsPath() {
   return viewsPath;
 }
 
+/**
+ * Checks and runs database migrations
+ * @param db
+ * @param client
+ * @returns {Promise<void>}
+ */
+async function runMigrations(db, client) {
+  const migrationsStatus = await status(db);
+  const pendingMigrations = migrationsStatus.filter((m) => m.appliedAt === "PENDING");
+
+  if (pendingMigrations.length) {
+    logger.info(
+      `! MongoDB has ${pendingMigrations.length} migrations left to run (${migrationsStatus.length} are already applied)`
+    );
+  } else {
+    logger.info(`✓ Mongo Database is up to date [${migrationsStatus.length} migration applied]`);
+  }
+
+  const migrationResult = await up(db, client);
+
+  if (migrationResult > 0) {
+    logger.info(`Applied ${migrationResult.length} migrations successfully`, migrationResult);
+  }
+}
+
 function ensurePageTitle() {
   if (!process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY]) {
     process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY] =
@@ -279,6 +305,7 @@ function isEnvProd() {
 module.exports = {
   isEnvProd,
   setupEnvConfig,
+  runMigrations,
   fetchMongoDBConnectionString,
   fetchOctoFarmPort,
   getViewsPath
