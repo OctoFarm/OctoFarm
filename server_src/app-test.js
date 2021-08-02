@@ -1,9 +1,10 @@
+const DITokens = require("./container.tokens");
 const { setupExpressServer, serveOctoFarmRoutes } = require("./app-core");
 const { setupEnvConfig } = require("./app-env");
 const { ensureSystemSettingsInitiated } = require("./app-core");
 
 /**
- * Setup the application without any async work
+ * Setup the application without hassle
  * @returns {app}
  */
 async function setupTestApp() {

@@ -240,7 +240,7 @@ export default class PrinterSelect {
         this.isOffline(printer.printerState.colour.category, editable, override)
       ) {
         let spoolName = "";
-        if (printer.selectedFilament.length !== 0) {
+        if (printer.selectedFilament && printer.selectedFilament.length !== 0) {
           printer.selectedFilament.forEach((spool, index) => {
             if (spool !== null) {
               spoolName += `Tool ${index}: ${spool.spools.name} - ${spool.spools.material} <br>`;

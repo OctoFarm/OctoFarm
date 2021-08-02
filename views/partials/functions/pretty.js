@@ -18,6 +18,7 @@ const calculatePercent = function (use, total) {
   const percent = (use / total) * 100;
   return Math.round(percent);
 };
+
 const generateTime = function (seconds) {
   let string = "";
   if (seconds === undefined || isNaN(seconds) || seconds === null) {
@@ -58,6 +59,7 @@ const generateTime = function (seconds) {
 
   return string;
 };
+
 const historyTotals = function (history) {
   const historyFileNames = [];
   const historyPrinterNames = [];

@@ -7,7 +7,7 @@ export function setupSortablePrintersTable() {
   const sortable = Sortable.create(el, {
     handle: ".sortableList",
     animation: 150,
-    onUpdate(/** Event */ e) {
+    onUpdate: async (e) => {
       const elements = e.target.querySelectorAll("[id^='printerCard-']");
       const listID = [];
       elements.forEach((e) => {

@@ -22,8 +22,10 @@ describe("Printers", () => {
     // TODO bug input validation completely lacking
     const res = await request.post("/printers/add").send([
       {
+        sortIndex: 0,
         settingsAppearance: null,
         printerURL: "test",
+        webSocketURL: "test",
         apikey: "dafuc",
         tempTriggers: { heatingVariation: null }
       }

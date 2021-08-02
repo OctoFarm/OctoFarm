@@ -1,8 +1,4 @@
-const {
-  arrayCounts,
-  checkNestedIndex,
-  checkNested
-} = require("../../../server_src/utils/array.util");
+const { arrayCounts, checkNestedIndex, checkNested } = require("../../server_src/utils/array.util");
 
 describe("checkNested", function () {
   it("checkNested should return tolerate non-array and undefined", async function () {
