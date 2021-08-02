@@ -1,5 +1,3 @@
-import { errorTypes } from "./error.types";
-
 export class ApplicationError extends Error {
   static hasErrorNotificationBeenTriggered = false;
   constructor(options, overrides) {
@@ -19,7 +17,7 @@ export class ApplicationError extends Error {
     //   context: {}
     // }
 
-    // Show error message to client...
+    // Trigger Error Notification
     ApplicationError.hasErrorNotificationBeenTriggered = true;
   }
 }

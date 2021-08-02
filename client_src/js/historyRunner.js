@@ -1,6 +1,6 @@
 import Calc from "./lib/functions/calc.js";
 import UI from "./lib/functions/ui.js";
-import { returnDropDown } from "./lib/modules/filamentGrab.js";
+import { returnDropDown } from "./services/filament-manager-plugin.service";
 import * as ApexCharts from "apexcharts";
 import OctoFarmClient from "./services/octofarm-client.service";
 

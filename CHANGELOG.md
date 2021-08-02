@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
     - Task scheduler: runs periodic tasks for OctoFarm in a controllable, periodic manner.
     - Added line counter to ticker log
     - Refactored task manager so it becomes easier to use
+    - Global Client Error Handler: Grabs any errant / uncaught errors and displays a modal
 
 ### Changed
     - File manager: gave printer titles a badge. Gave selected printer a yellow border. Reduced file list minimum height (for smaller screens). 
@@ -21,6 +22,9 @@ All notable changes to this project will be documented in this file.
     - Reduced logging (we will bring it back later in different shape with an Exception handler)
     - Replaced fetch with axios in the local OctoFarm client calls.  
     - Moved all error handling for client connections into axios calls
+    - Refactored System page into seperate manageable files ejs/js, cleaned up a lot of code. 
+    - Updated the system page layout. 
+    - Moved filament manager plugin actions to serperate service file. 
 
 ### Removed
 

@@ -1,5 +1,5 @@
 import UI from "./lib/functions/ui.js";
-import { checkFilamentManager } from "./lib/modules/filamentGrab.js";
+import { setupFilamentManagerReSyncBtn } from "./services/filament-manager-plugin.service";
 import * as ApexCharts from "apexcharts";
 import { getLastThirtyDaysText } from "./utils/time.util";
 import OctoFarmClient from "./services/octofarm-client.service";
@@ -853,37 +853,7 @@ async function init() {
     const spoolsTempOffset = document.getElementById("spoolsTempOffset");
     addSpool(spoolsName, spoolsProfile, spoolsPrice, spoolsWeight, spoolsUsed, spoolsTempOffset);
   });
-  filamentManager = await checkFilamentManager();
-
-  if (filamentManager) {
-    const resyncBtn = document.getElementById("resyncFilament");
-    resyncBtn.addEventListener("click", async (e) => {
-      resyncBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> <br> Syncing <br> Please Wait...';
-      const post = await OctoFarmClient.post("filament/filamentManagerReSync");
-      resyncBtn.innerHTML = '<i class="fas fa-sync"></i> Re-Sync Filament Manager';
-      if (post) {
-        if (meta.success) {
-          UI.createAlert(
-            "success",
-            `Successfully synced filament manager! <br> Profiles - Updated: ${meta.updatedProfiles} / New: ${meta.newProfiles} <br> Spools - Updated: ${meta.updatedSpools} / New: ${meta.newSpools}`,
-            4000,
-            "Clicked"
-          );
-        } else {
-          UI.createAlert(
-            "error",
-            `Successfully synced filament manager! <br> Profiles Status: ${meta.profiles} <br> Spools Status: ${meta.spools}`,
-            4000,
-            "Clicked"
-          );
-        }
-        resyncBtn.disabled = false;
-      } else {
-        UI.createAlert("error", "Could not contact server to sync, is it online?");
-        resyncBtn.disabled = false;
-      }
-    });
-  }
+  await setupFilamentManagerReSyncBtn();
 
   jplist.init({
     storage: "localStorage", // 'localStorage', 'sessionStorage' or 'cookies'

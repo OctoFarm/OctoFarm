@@ -1,62 +1,53 @@
-import UI from "./lib/functions/ui";
-import { errorTypes } from "./exceptions/error.types";
+const octoFarmErrorModalElement = "#octofarmErrorModal";
 
-const modalErrors = [errorTypes.NETWORK, errorTypes.SERVER, errorTypes.UNKNOWN];
-const popUpErrors = [errorTypes.CLIENT];
+function returnErrorMessage(options) {
+  let statusCode = `(${options?.statusCode})`;
+  if (!statusCode) statusCode = "";
 
-function returnAlertErrorMessage(options) {
   return `
-    <i class="fas fa-exclamation-triangle"></i> ${options.name} 
-    <br>
-    ${options.type} (${options.statusCode}): 
-    <br>
-    ${options.message}
-    <br>
+     <br>
+     ${options.type} ERROR ${statusCode}: 
+     <br>
+     <div class="py-3">
+        Please report this error to <a href="https://github.com/octofarm/octofarm/issues">OctoFarm Issues</a>!
+     </div>
+     ${options.message}
   `;
 }
+
 function returnModalDeveloperInfo(options) {
   return `
     <code>
-    <u>DEVELOPER INFO</u><br>
+    <u>FILE INFO</u><br>
     LINE: ${options?.lineNumber}<br>
     COL: ${options?.columnNumber}<br>
-    FILE: ${new URL(options?.fileName).pathname}
+    ${options?.fileName ? "FILE: " + options?.fileName : ""}
     </code>
   `;
-}
-
-function createErrorAlert(options) {
-  UI.createAlert("error", returnAlertErrorMessage(options), 0, "clicked");
 }
 
 function openErrorModal(options) {
   const apiErrorTitle = document.getElementById("apiErrorTitle");
   const apiErrorMessage = document.getElementById("apiErrorMessage");
   const apiDeveloperInfo = document.getElementById("apiDeveloperInfo");
-  apiErrorTitle.innerHTML = ` ${options.name}`;
-  apiErrorMessage.innerHTML = `
-     <br>
-     ${options.type} ERROR (${options.statusCode}): 
-     <br>
-     ${options.message}
-  `;
-  apiErrorMessage.className = `text-${options.color}`;
+  apiErrorTitle.innerHTML = ` ${options?.name}`;
+  apiErrorMessage.innerHTML = returnErrorMessage(options);
+  apiErrorMessage.className = `text-${options?.color}`;
   apiDeveloperInfo.innerHTML = returnModalDeveloperInfo(options);
-  $("#octofarmErrorModal").modal("show");
+  $(octoFarmErrorModalElement).modal("show");
 }
 
-function handleError(event) {
-  if (modalErrors.includes(event.reason.type)) {
+function handleEvent() {
+  if (!event.reason) {
+    openErrorModal(event);
+  } else {
     openErrorModal(event.reason);
   }
-  if (popUpErrors.includes(event.reason.type)) {
-    createErrorAlert(event.reason);
-  }
 }
 
 window.onunhandledrejection = function (event) {
-  handleError(event);
+  handleEvent(event);
 };
-window.onunhandledrejection = function (event) {
-  handleError(event);
+window.onerror = function (message, source, lineno, colno, error) {
+  handleEvent(message);
 };

@@ -50,13 +50,18 @@ axios.interceptors.response.use(
   }
 );
 
+// TODO: this could end up getting big, consider splitting it.
+// Would go by page, each page could get it's own extends class for pre-defined routes building on the CRUD actions available.
 export default class OctoFarmClient {
   static printerRoute = "/printers";
+  static serverSettingsRoute = "/settings/server";
+  static logsRoute = `${this.serverSettingsRoute}/logs`;
+  static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
 
   static validatePath(pathname) {
     if (!pathname) {
       new URL(path, window.location.origin);
-      throw new ApplicationError(ClientErrors.FAILED_VALIDATION);
+      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH);
     }
   }
 
@@ -81,6 +86,10 @@ export default class OctoFarmClient {
     return this.post(`${this.printerRoute}/updatePrinterSettings`, body);
   }
 
+  static async generateLogDump() {
+    return this.post(`${this.logsRoute}/generateLogDump`, {});
+  }
+
   static async getHistoryStatistics() {
     return this.get("history/statisticsData");
   }
@@ -90,7 +99,16 @@ export default class OctoFarmClient {
   }
 
   static async getServerSettings() {
-    return this.get("settings/server/get");
+    return this.get(`${this.serverSettingsRoute}/get`);
+  }
+
+  static async updateServerSettings(settingsObject) {
+    //TODO: should be patch not post
+    return this.post(this.updateSettingsRoute, settingsObject);
+  }
+
+  static async restartServer() {
+    return this.post(`${this.serverSettingsRoute}/restart`, {});
   }
 
   static async getCustomGcode() {
