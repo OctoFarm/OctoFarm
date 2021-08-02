@@ -75,7 +75,8 @@ export default class OctoFarmClient {
         "The following properties were empty/missing in the request",
         unsetRequiredProps
       );
-      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH);
+      // TODO unsetRequiredProps are not processed yet
+      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH, unsetRequiredProps);
     }
   }
 
