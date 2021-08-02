@@ -4,7 +4,7 @@ import Validate from "./validate.js";
 
 let activeFile = false;
 
-export async function dragCheck() {
+export function dragCheck() {
   return activeFile;
 }
 

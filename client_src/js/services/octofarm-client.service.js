@@ -53,6 +53,7 @@ axios.interceptors.response.use(
 // TODO: this could end up getting big, consider splitting it.
 // Would go by page, each page could get it's own extends class for pre-defined routes building on the CRUD actions available.
 export default class OctoFarmClient {
+  static base = "/api";
   static printerRoute = "/printers";
   static serverSettingsRoute = "/settings/server";
   static logsRoute = `${this.serverSettingsRoute}/logs`;
@@ -62,6 +63,20 @@ export default class OctoFarmClient {
     if (!pathname) {
       new URL(path, window.location.origin);
       throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH);
+    }
+  }
+
+  static validateRequiredProps(input, keys) {
+    const unsetRequiredProps = keys.filter((prop) => {
+      return !input[prop];
+    });
+    if (unsetRequiredProps.length) {
+      console.error(
+        "The following properties were empty/missing in the request",
+        unsetRequiredProps
+      );
+      // TODO unsetRequiredProps are not processed yet
+      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH, unsetRequiredProps);
     }
   }
 
@@ -135,6 +150,7 @@ export default class OctoFarmClient {
       return res.data;
     });
   }
+
   static async patch(path, data) {
     const url = new URL(path, window.location.origin).href;
     return axios.delete(url, data).then((res) => {

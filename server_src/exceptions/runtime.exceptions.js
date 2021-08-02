@@ -12,7 +12,16 @@ class NotFoundException extends Error {
   }
 }
 
+class ValidationException extends Error {
+  constructor(validationObject) {
+    super(JSON.stringify(validationObject));
+    this.name = "ValidationException";
+    this.errors = validationObject;
+  }
+}
+
 module.exports = {
   NotImplementedException,
-  NotFoundException
+  NotFoundException,
+  ValidationException
 };

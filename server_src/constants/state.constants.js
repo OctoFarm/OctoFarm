@@ -1,38 +1,3 @@
-const getWolPowerSubSettingsDefault = () => {
-  return {
-    enabled: false,
-    ip: "255.255.255.0",
-    packets: "3",
-    port: "9",
-    interval: "100",
-    MAC: ""
-  };
-};
-
-const getPowerSettingsDefault = () => {
-  return {
-    powerOnCommand: "",
-    powerOnURL: "",
-    powerOffCommand: "",
-    powerOffURL: "",
-    powerToggleCommand: "",
-    powerToggleURL: "",
-    powerStatusCommand: "",
-    powerStatusURL: "",
-    wol: getWolPowerSubSettingsDefault()
-  };
-};
-
-const getCostSettingsDefault = () => {
-  return {
-    powerConsumption: 0.5,
-    electricityCosts: 0.15,
-    purchasePrice: 500,
-    estimateLifespan: 43800,
-    maintenanceCosts: 0.25
-  };
-};
-
 const getFilterDefaults = () => [
   "All Printers",
   "State: Idle",
@@ -102,7 +67,7 @@ const CATEGORY = {
   Offline: "Offline",
   Disconnected: "Disconnected",
   Complete: "Complete",
-  "Error!": "Error!",
+  Error: "Error!",
   Active: "Active"
 };
 
@@ -130,13 +95,28 @@ const OP_STATE = {
   UnknownState: "Unknown State ()" // Unknown State (...) needs proper parsing
 };
 
+// Handy model to understand state.flags
+const OP_STATE_FLAGS = {
+  operational: "operational",
+  printing: "printing",
+  cancelling: "cancelling",
+  pausing: "pausing",
+  resuming: "resuming",
+  finishing: "finishing",
+  closedOrError: "closedOrError",
+  error: "error",
+  paused: "paused",
+  ready: "ready",
+  sdReady: "sdReady"
+};
+
 // All states of the app. Nice to share between server and client
 const PSTATE = {
   Offline: "Offline",
   GlobalAPIKey: "Global API Key Issue",
   Searching: "Searching...",
-  "Error!": "Error!",
-  "No-API": "No-API",
+  Error: "Error!",
+  NoAPI: "No-API",
   Disconnected: "Disconnected",
   Starting: "Starting",
   Operational: "Operational",
@@ -144,11 +124,110 @@ const PSTATE = {
   Printing: "Printing",
   Pausing: "Pausing",
   Cancelling: "Cancelling",
-  "Offline after error": "Offline after error",
+  OfflineAfterError: "Offline after error",
   Complete: "Complete",
   Shutdown: "Shutdown",
   Online: "Online"
 };
+
+const OF_STATE_REMAP = {
+  [OP_STATE.Offline]: {
+    state: PSTATE.Disconnected, // hard remap!
+    desc: "Your printer is disconnected"
+  },
+  [OP_STATE.OpeningSerial]: {
+    state: PSTATE.Searching, // Lack of better
+    desc: "Your printer is connecting to serial"
+  },
+  [OP_STATE.DetectingSerial]: {
+    state: PSTATE.Searching, // Lack of better
+    desc: "Your printer is detecting serial connections"
+  },
+  [OP_STATE.Connecting]: {
+    state: PSTATE.Connecting,
+    desc: "Your printer is connecting to serial"
+  },
+  [OP_STATE.Operational]: {
+    state: PSTATE.Operational,
+    desc: "Printer is ready to print"
+  },
+  [OP_STATE.StartingPrintFromSD]: {
+    state: PSTATE.Searching,
+    desc: "STARTING PRINT FROM SD!"
+  },
+  [OP_STATE.StartSendingPrintToSD]: {
+    state: PSTATE.Searching,
+    desc: "Starting to send file to SD"
+  },
+  [OP_STATE.Starting]: {
+    state: PSTATE.Starting,
+    desc: "Printing right now"
+  },
+  [OP_STATE.TransferringFileToSD]: {
+    state: PSTATE.Searching,
+    desc: "Transferring to SD"
+  },
+  [OP_STATE.SendingFileToSD]: {
+    state: PSTATE.Searching,
+    desc: "Busy sending file to SD"
+  },
+  [OP_STATE.PrintingFromSD]: {
+    state: PSTATE.Printing,
+    desc: "PRINTING FROM SD!"
+  },
+  [OP_STATE.Printing]: {
+    state: PSTATE.Printing,
+    desc: "Printing right now"
+  },
+  [OP_STATE.Cancelling]: {
+    state: PSTATE.Cancelling,
+    desc: "Print is cancelling"
+  },
+  [OP_STATE.Pausing]: {
+    state: PSTATE.Pausing,
+    desc: "Printing paused"
+  },
+  [OP_STATE.Paused]: {
+    state: PSTATE.Paused,
+    desc: "Printing paused"
+  },
+  [OP_STATE.Resuming]: {
+    state: PSTATE.Starting,
+    desc: "Print resuming"
+  },
+  [OP_STATE.Finishing]: {
+    state: PSTATE.Complete,
+    desc: "Print finishing"
+  },
+  [OP_STATE.UnknownState]: {
+    state: "Unknown state",
+    desc: "Unknown state"
+  }
+};
+
+function remapOctoPrintState(octoPrintState) {
+  // Handy stuff!
+  const flags = octoPrintState.flags;
+  const stateLabel = octoPrintState.text;
+
+  if (stateLabel.includes("Error:") || stateLabel.includes("error")) {
+    return {
+      state: PSTATE.Error,
+      flags,
+      desc: stateLabel
+    };
+  }
+
+  const mapping = OF_STATE_REMAP[stateLabel];
+  mapping.flags = flags;
+  if (!!mapping) return mapping;
+
+  return {
+    state: stateLabel,
+    flags,
+    desc: "OctoPrint's state was not recognized"
+  };
+}
 
 const mapStateToColor = (state) => {
   if (state === PSTATE.Loading) {
@@ -156,6 +235,9 @@ const mapStateToColor = (state) => {
   }
   if (state === PSTATE.Operational) {
     return { name: "dark", hex: "#262626", category: CATEGORY.Idle };
+  }
+  if (state === PSTATE.Online) {
+    return { name: "success", hex: "#00330e", category: CATEGORY.Idle };
   }
   if (state === PSTATE.Paused) {
     return { name: "warning", hex: "#583c0e", category: CATEGORY.Idle };
@@ -172,49 +254,43 @@ const mapStateToColor = (state) => {
   if (state === PSTATE.Starting) {
     return { name: "warning", hex: "#583c0e", category: CATEGORY.Active };
   }
-  if (state === PSTATE.GlobalAPIKey) {
-    return { name: "danger", hex: "#2e0905", category: CATEGORY["Error!"] };
-  }
-  if (state === PSTATE["Error!"]) {
-    return { name: "danger", hex: "#2e0905", category: CATEGORY["Error!"] };
-  }
   if (state === PSTATE.Offline) {
     return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
   }
-  if (state === PSTATE["Searching"]) {
+  if (state === PSTATE.Searching) {
+    return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
+  }
+  if (state === PSTATE.NoAPI) {
     return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
   }
   if (state === PSTATE.Disconnected) {
     return { name: "danger", hex: "#2e0905", category: CATEGORY.Disconnected };
   }
-  if (state === PSTATE["No-API"]) {
+  if (state === PSTATE.Shutdown) {
     return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
   }
   if (state === PSTATE.Complete) {
     return { name: "success", hex: "#00330e", category: CATEGORY.Complete };
   }
-  if (state === PSTATE.Shutdown) {
-    return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
+  if (state === PSTATE.GlobalAPIKey) {
+    return { name: "danger", hex: "#2e0905", category: CATEGORY.Error };
   }
-  if (state === PSTATE.Online) {
-    return { name: "success", hex: "#00330e", category: CATEGORY.Idle };
+  if (state === PSTATE.Error) {
+    return { name: "danger", hex: "#2e0905", category: CATEGORY.Error };
   }
-  if (state === PSTATE["Offline after error"]) {
-    return { name: "danger", hex: "#2e0905", category: CATEGORY["Error!"] };
+  if (state === PSTATE.OfflineAfterError) {
+    return { name: "danger", hex: "#2e0905", category: CATEGORY.Error };
   }
 
-  // TODO is this a smart idea? No error?
-  console.warn("PSTATE not recognized:", state);
+  console.warn("Provided PSTATE not recognized:", state);
   return { name: "warning", hex: "#583c0e", category: CATEGORY.Active };
 };
 
 module.exports = {
-  getPowerSettingsDefault,
-  getWolPowerSubSettingsDefault,
   getSystemChecksDefault,
-  getCostSettingsDefault,
   getFilterDefaults,
   mapStateToColor,
+  remapOctoPrintState,
   PSTATE,
   OP_STATE,
   CATEGORY,

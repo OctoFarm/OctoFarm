@@ -2,13 +2,14 @@ import Calc from "./lib/functions/calc.js";
 import OctoPrintClient from "./lib/octoprint.js";
 import { createClientSSEWorker } from "./services/client-worker.service";
 import { setViewType } from "./monitoring/monitoring-view.state";
+import UI from "./lib/functions/ui";
 
 // TODO dupe due to unwanted monitoring.update import causing missing element exceptions
 export const monitoringWorkerURL = "/monitoringInfo/get/";
 
 setViewType("current-ops");
 createClientSSEWorker(monitoringWorkerURL, async function (data) {
-  if (data != false) {
+  if (!!data) {
     currentOperationsView(
       data.currentOperations.operations,
       data.currentOperations.count,

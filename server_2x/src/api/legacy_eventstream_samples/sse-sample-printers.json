@@ -44,8 +44,8 @@
         "group": "33",
         "groups": "34",
         "printerURL": "35",
-        "cameraURL": "36",
-        "apikey": "37",
+        "camURL": "36",
+        "apiKey": "37",
         "octoPrintVersion": "38",
         "flowRate": 100,
         "feedRate": 100,
@@ -339,7 +339,7 @@
     [],
     {
         "fileList": "119",
-        "filecount": 6,
+        "fileCount": 6,
         "folderList": "120",
         "folderCount": 0
     },

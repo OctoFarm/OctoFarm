@@ -1,4 +1,4 @@
-const { parse } = require("flatted");
+import { parse } from "flatted";
 
 let source = null;
 

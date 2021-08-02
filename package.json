@@ -7,6 +7,9 @@
     "prestart": "npm ci --production",
     "start": "pm2 flush && pm2 start app.js --name OctoFarm -e ./logs/pm2.error.log -o ./logs/pm2.out.log --time --restart-delay=1000 --update-env --exp-backoff-restart-delay=1500",
     "restart": "pm2 restart OctoFarm",
+    "migration:up": "migrate-mongo up",
+    "migration:down": "migrate-mongo down",
+    "migration:status": "migrate-mongo status",
     "pupdate": "pm2 update",
     "stop": "pm2 stop OctoFarm",
     "stop:delete": "pm2 delete OctoFarm",
@@ -51,6 +54,7 @@
     "lodash": "^4.17.21",
     "lookpath": "^1.2.0",
     "luxon": "^1.26.0",
+    "migrate-mongo": "^8.2.2",
     "mjpeg-decoder": "^1.0.3",
     "mongoose": "^5.12.9",
     "multer": "^1.4.2",
@@ -70,7 +74,7 @@
     "toad-scheduler": "^1.4.0",
     "wake_on_lan": "^1.0.0",
     "winston": "^3.3.3",
-    "ws": "^7.4.6",
+    "ws": "^7.5.3",
     "xml2js": "^0.4.23"
   },
   "devDependencies": {

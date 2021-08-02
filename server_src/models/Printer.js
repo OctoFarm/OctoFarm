@@ -1,42 +1,6 @@
 const mongoose = require("mongoose");
 
 const PrinterSchema = new mongoose.Schema({
-  category: {
-    type: String,
-    required: false
-  },
-  dateAdded: {
-    type: Number,
-    required: false
-  },
-  currentIdle: {
-    type: Number,
-    required: false
-  },
-  currentActive: {
-    type: Number,
-    required: false
-  },
-  currentOffline: {
-    type: Number,
-    required: false
-  },
-  type: {
-    type: String,
-    required: false
-  },
-  sortIndex: {
-    type: Number,
-    required: false
-  },
-  ip: {
-    type: String,
-    required: false
-  },
-  port: {
-    type: String,
-    required: false
-  },
   apikey: {
     type: String,
     required: true // !
@@ -51,14 +15,41 @@ const PrinterSchema = new mongoose.Schema({
   },
   webSocketURL: {
     type: String,
-    required: false // !
+    required: true // !
   },
-  octoPrintVersion: {
+  sortIndex: {
+    type: Number,
+    required: true
+  },
+  // Auto-generated below
+  settingsAppearance: {
+    type: Object,
+    required: false
+  },
+  currentUser: {
     type: String,
     required: false
   },
-  klipperFirmwareVersion: {
-    type: String,
+  dateAdded: {
+    type: Number,
+    required: false
+  },
+  // TODO move out
+  fileList: {
+    type: Object,
+    required: false
+  },
+  // Non-essentials below
+  powerSettings: {
+    type: Object,
+    required: false
+  },
+  costSettings: {
+    type: Object,
+    required: false
+  },
+  tempTriggers: {
+    type: Object,
     required: false
   },
   feedRate: {
@@ -69,38 +60,58 @@ const PrinterSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  settingsApperance: {
-    type: Object,
-    required: false
-  },
   selectedFilament: {
     type: Object,
     required: false
   },
-  currentUser: {
+  currentIdle: {
+    type: Number,
+    required: false
+  },
+  currentActive: {
+    type: Number,
+    required: false
+  },
+  currentOffline: {
+    type: Number,
+    required: false
+  },
+  // TODO remove or change
+  category: {
     type: String,
     required: false
   },
+  // TODO remove or bundle
+  type: {
+    type: String,
+    required: false
+  },
+  // TODO remove unused
+  ip: {
+    type: String,
+    required: false
+  },
+  // TODO remove unused
+  port: {
+    type: Number,
+    required: false
+  },
+  // TODO remove
+  octoPrintVersion: {
+    type: String,
+    required: false
+  },
+  // TODO remove
+  klipperFirmwareVersion: {
+    type: String,
+    required: false
+  },
+  // TODO move out
   group: {
     type: String,
     required: false
   },
-  tempTriggers: {
-    type: Object,
-    required: false
-  },
-  powerSettings: {
-    type: Object,
-    required: false
-  },
-  costSettings: {
-    type: Object,
-    required: false
-  },
-  fileList: {
-    type: Object,
-    required: false
-  },
+  // TODO remove
   storage: {
     type: Object,
     required: false
