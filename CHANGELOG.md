@@ -24,7 +24,7 @@ All notable changes to this project will be documented in this file.
     - Moved all error handling for client connections into axios calls
     - Refactored System page into separate manageable files ejs/js, cleaned up a lot of code. 
     - Updated the system page layout. 
-    - Moved filament manager plugin actions to serparate service file. 
+    - Moved filament manager plugin actions to separate service file. 
 
 ### Removed
 
