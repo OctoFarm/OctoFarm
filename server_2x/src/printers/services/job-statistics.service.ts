@@ -2,8 +2,8 @@ import { JobStatisticsModel } from "../models/job-statistics.model";
 import { getPrintCostNumeric } from "../utils/print-cost.util";
 import { HistoryCache } from "./history.cache";
 import { floatOrZero } from "../utils/number.util";
-import {Injectable} from "@nestjs/common";
-import {IJobStatisticsService} from "../interfaces/job-statistics-service-interface";
+import { Injectable } from "@nestjs/common";
+import { IJobStatisticsService } from "../interfaces/job-statistics-service-interface";
 const { DateTime } = require("luxon");
 
 @Injectable()
@@ -90,8 +90,7 @@ export class JobStatisticsService implements IJobStatisticsService {
       if (!!currentJob.expectedFilamentCosts) {
         const keys = Object.keys(currentJob.expectedFilamentCosts);
         for (let s = 0; s < currentJob.expectedFilamentCosts; s++) {
-          const toolFilamentCosts =
-            currentJob.expectedFilamentCosts[s][`tool${keys[s]}`];
+          const toolFilamentCosts = currentJob.expectedFilamentCosts[s][`tool${keys[s]}`];
           if (!!toolFilamentCosts) {
             spoolCost += floatOrZero(toolFilamentCosts.cost);
             totalVolume += floatOrZero(toolFilamentCosts.volume);
@@ -103,9 +102,7 @@ export class JobStatisticsService implements IJobStatisticsService {
       spoolCost = floatOrZero(spoolCost);
       currentJob.expectedTotals = {
         // TODO String a good idea?
-        totalCost: (
-          parseFloat(currentJob.expectedPrinterCosts) + spoolCost
-        ).toFixed(2),
+        totalCost: (parseFloat(currentJob.expectedPrinterCosts) + spoolCost).toFixed(2),
         totalVolume,
         totalLength,
         totalWeight,
@@ -119,9 +116,7 @@ export class JobStatisticsService implements IJobStatisticsService {
       currentJob.printTimeRemaining = printerProgress.printTimeLeft;
       currentJob.printTimeElapsed = printerProgress.printTime;
       currentJob.expectedPrintTime =
-        Math.round(
-          (printerProgress.printTimeLeft + printerProgress.printTime) / 1000
-        ) * 1000;
+        Math.round((printerProgress.printTimeLeft + printerProgress.printTime) / 1000) * 1000;
       currentJob.expectedCompletionDate = JobStatisticsService.getCompletionDate(
         printerProgress.printTimeLeft,
         printerProgress.completion

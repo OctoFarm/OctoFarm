@@ -1,3 +1,3 @@
-import {CreatePrinterDto} from "./create-printer.dto";
+import { CreatePrinterDto } from "./create-printer.dto";
 
 export type CreateMultiplePrintersDtot = CreatePrinterDto[];

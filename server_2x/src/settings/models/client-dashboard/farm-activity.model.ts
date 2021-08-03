@@ -1,5 +1,5 @@
 export interface FarmActivityModel {
-    currentOperations: boolean;
-    cumulativeTimes: boolean;
-    averageTimes: boolean;
+  currentOperations: boolean;
+  cumulativeTimes: boolean;
+  averageTimes: boolean;
 }

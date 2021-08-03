@@ -1,3 +1,3 @@
 export interface DashboardConfigurationModel {
-    updateEventStreamPeriod: number;
+  updateEventStreamPeriod: number;
 }

@@ -1,21 +1,21 @@
-import {PrinterHistory} from "../printer-history.entity";
+import { PrinterHistory } from "../printer-history.entity";
 
 export class PrinterHistoryEntityMock {
-    history: PrinterHistory[] = [];
+  history: PrinterHistory[] = [];
 
-    setHistory(history) {
-        this.history = history;
-    }
+  setHistory(history) {
+    this.history = history;
+  }
 
-    find() {
-        return Promise.resolve(this.history);
-    }
+  find() {
+    return Promise.resolve(this.history);
+  }
 
-    findOne() {
-        return this.history[0];
-    };
+  findOne() {
+    return this.history[0];
+  }
 
-    save() {
-        return Promise.resolve()
-    }
+  save() {
+    return Promise.resolve();
+  }
 }

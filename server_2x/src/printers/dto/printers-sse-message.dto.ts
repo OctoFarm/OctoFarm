@@ -1,5 +1,5 @@
 export interface PrintersSseMessageDto {
-    printersInformation: any;
-    printerControlList: any;
-    currentTickerList: any;
+  printersInformation: any;
+  printerControlList: any;
+  currentTickerList: any;
 }

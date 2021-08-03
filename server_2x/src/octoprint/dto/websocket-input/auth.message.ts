@@ -1,11 +1,11 @@
 export class AuthMessage {
-    auth: string;
+  auth: string;
 
-    constructor(username: string, sessionKey: string) {
-        this.auth = `${username}:${sessionKey}`;
-    }
+  constructor(username: string, sessionKey: string) {
+    this.auth = `${username}:${sessionKey}`;
+  }
 
-    validateAuth() {
-        return this.auth.includes(':');
-    }
+  validateAuth() {
+    return this.auth.includes(":");
+  }
 }
