@@ -7,6 +7,7 @@ const dotenv = require("dotenv");
 const path = require("path");
 
 const Logger = require("./handlers/logger.js");
+const exceptionHandler = require("./exceptions/exception.handler");
 const logger = new Logger("OctoFarm-Fallback-Server");
 const routePath = "./routes";
 const opts = { cwd: __dirname };
@@ -68,6 +69,7 @@ function serveNodeVersionFallback(app) {
   app.get("*", function (req, res) {
     res.redirect("/");
   });
+  app.use(exceptionHandler);
 
   return listenerHttpServer;
 }
@@ -78,6 +80,7 @@ function serveDatabaseIssueFallbackRoutes(app) {
   app.get("*", function (req, res) {
     res.redirect("/");
   });
+  app.use(exceptionHandler);
 }
 
 function serveDatabaseIssueFallback(app, port) {

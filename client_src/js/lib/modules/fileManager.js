@@ -249,7 +249,8 @@ export default class FileManager {
       e.target.innerHTML = "<i class='fas fa-sync'></i> Re-Sync";
       setTimeout(flashReturn, 500);
     }
-    FileManager.updateFileList(printer._id);
+
+    await this.updateFileList(printer._id);
   }
 
   static async updateFileList(index) {
@@ -259,11 +260,9 @@ export default class FileManager {
     });
 
     FileSorting.loadSort(printer);
-    //FileManager.drawFiles(printer);
-    return "done";
   }
 
-  static openFolder(folder, target, printer) {
+  static async openFolder(folder, target, printer) {
     const fileBackButtonElement = document.getElementById("fileBackBtn");
 
     if (typeof target !== "undefined" && target.type === "button") {
@@ -274,14 +273,14 @@ export default class FileManager {
 
       document.getElementById("currentFolder").innerHTML = `local/${folder}`;
       fileBackButtonElement.disabled = false;
-      FileManager.updateFileList(printer._id);
+      await FileManager.updateFileList(printer._id);
     } else {
       const currentFolder = document.getElementById("currentFolder").innerHTML;
-      if (currentFolder != "local") {
+      if (currentFolder !== "local") {
         const previousFolder = currentFolder.substring(0, currentFolder.lastIndexOf("/"));
         document.getElementById("currentFolder").innerHTML = previousFolder;
         fileBackButtonElement.disabled = previousFolder === "local";
-        FileManager.updateFileList(printer._id);
+        await FileManager.updateFileList(printer._id);
       } else {
         fileBackButtonElement.disabled = true;
       }
@@ -426,13 +425,19 @@ export default class FileManager {
       if (file.path === currentFolder) {
         if (document.getElementById(`file-${file.fullPath}`)) {
           let toolInfo = "";
-          file.toolUnits.forEach((unit, index) => {
-            toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
-          });
+
+          // TODO dupe drawFile!!
+          if (file.toolUnits?.length) {
+            file.toolUnits.forEach((unit, index) => {
+              toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
+            });
+          }
+
           let thumbnail = '<center><i class="fas fa-file-code fa-2x"></i></center>';
-          if (typeof file.thumbnail !== "undefined" && file.thumbnail !== null) {
+          if (!!file.thumbnail) {
             thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
           }
+
           let fileDate = new Date(file.uploadDate * 1000);
           const dateString = fileDate.toDateString();
           const timeString = fileDate.toTimeString().substring(0, 8);
@@ -473,7 +478,7 @@ export default class FileManager {
             currentFolder = currentFolder.replace("local/", "");
           }
 
-          // then draw folders
+        // Draw sub - folders present in current folder
           if (fileList.folderList.length > 0) {
             fileList.folderList.forEach((folder) => {
               if (folder.path == currentFolder) {
@@ -678,23 +683,23 @@ export default class FileManager {
     dragAndDropEnableMultiplePrinters(fileElem, printer);
     const folders = document.querySelectorAll(".folderAction");
     folders.forEach((folder) => {
-      folder.addEventListener("click", (e) => {
+      folder.addEventListener("click", async (e) => {
         // Remove from UI
-        FileManager.openFolder(folder.id, e.target, printer);
+        await FileManager.openFolder(folder.id, e.target, printer);
       });
     });
     const fileActionBtns = document.querySelectorAll("[id*='*fileAction']");
     fileActionBtns.forEach((btn) => {
       // Gate Keeper listener for file action buttons
-      btn.addEventListener("click", (e) => {
-        FileManager.actionBtnGate(printer, btn.id);
+      btn.addEventListener("click", async (e) => {
+        await FileManager.actionBtnGate(printer, btn.id);
       });
     });
     const folderActionBtns = document.querySelectorAll("[id*='*folderAction']");
     folderActionBtns.forEach((btn) => {
       // Gate Keeper listener for file action buttons
-      btn.addEventListener("click", (e) => {
-        FileManager.actionBtnGate(printer, btn.id);
+      btn.addEventListener("click", async (e) => {
+        await FileManager.actionBtnGate(printer, btn.id);
       });
     });
   }
@@ -707,20 +712,6 @@ export default class FileManager {
     await PrinterSelect.create(document.getElementById("multiPrintersSection"));
 
     function first() {
-      // let boxs = document.querySelectorAll('*[id^="multiUpPrinters-"]');
-      // selectedPrinters = [].filter.call(boxs, function(el) {
-      //   return el.checked;
-      // });
-
-      // if (selectedPrinters.length < 2) {
-      //   UI.createAlert(
-      //     "error",
-      //     "Please select MORE than " + selectedPrinters.length + " printer(s)!",
-      //     2000,
-      //     "clicked"
-      //   );
-      //   return;
-      // }
       document.getElementById("multiPrinterBtn").disabled = true;
       document.getElementById("multiFolder").disabled = false;
       document.getElementById("multiPrintersSection").classList.add("hidden");
@@ -832,7 +823,7 @@ export default class FileManager {
           newObject.printerInfo = printer.printerInfo;
           newObject.upload = FileManager.fileUpload;
           newObject.currentFolder = selectedFolder;
-          console.log(printAfterUpload);
+
           if (printAfterUpload) {
             newObject.print = true;
           }

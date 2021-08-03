@@ -290,7 +290,7 @@ export async function init(printers, clientSettings, view) {
             }
           } else {
             if (!printerManagerModal.classList.contains("show")) {
-              if (!(await dragCheck())) {
+              if (!dragCheck()) {
                 await updateState(printer, clientSettings, view);
               }
               if (powerTimer >= 20000) {

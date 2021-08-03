@@ -1143,11 +1143,11 @@ async function updateState(printer, clientSettings, view) {
 }
 
 export async function initMonitoring(printers, clientSettings, view) {
-  //Check if printer manager modal is opened
+  // Check if printer manager modal is opened
   switch (printerManagerModal.classList.contains("show")) {
     case true:
       // Run printer manager updater
-      await PrinterManager.init("", printers, clientSettings);
+      await PrinterManager.init("", printers, getControlList());
       break;
     case false:
       // initialise or start the information updating..
@@ -1163,7 +1163,10 @@ export async function initMonitoring(printers, clientSettings, view) {
           } else if (view === "camera") {
             let printerHTML = await drawCameraView(printers[p], clientSettings, view);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
+          } else {
+            console.error("printerPanel could not determine view type to update", view);
           }
+
           //Update the printer panel to the actual one
           printerPanel = document.getElementById("panel-" + printers[p]._id);
           //Setup Action Buttons
@@ -1176,7 +1179,7 @@ export async function initMonitoring(printers, clientSettings, view) {
           await dragAndDropEnable(printerPanel, printers[p]);
         } else {
           if (!printerManagerModal.classList.contains("show")) {
-            if (!(await dragCheck())) {
+            if (!dragCheck()) {
               await updateState(printers[p], clientSettings, view);
             }
             if (powerTimer >= 20000) {

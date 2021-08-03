@@ -1,5 +1,5 @@
 const nodeInputValidator = require("node-input-validator");
-const { Validator } = require("node-input-validator");
+const { ValidationException } = require("../exceptions/runtime.exceptions");
 
 const arrayValidator = function arrayLengthValidator(minIncl = null, maxIncl = null) {
   return (arrayValue) => {
@@ -29,18 +29,28 @@ function validateMongoURL(mongoURL) {
   };
 }
 
-async function validateInput(data, rules) {
+function getExtendedValidator() {
   nodeInputValidator.extend("wsurl", ({ value, args }, validator) => {
     const url = new URL(value).href;
     return url.includes("ws://") || url.includes("wss://");
   });
+  nodeInputValidator.extend("httpurl", ({ value, args }, validator) => {
+    const url = new URL(value).href;
+    return url.includes("http://") || url.includes("https://");
+  });
+  return nodeInputValidator;
+}
 
-  const v = new nodeInputValidator.Validator(data, rules);
+async function validateInput(data, rules) {
+  const localNIV = getExtendedValidator();
+
+  const v = new localNIV.Validator(data, rules);
 
   const matched = await v.check();
   if (!matched) {
-    throw v.errors;
+    throw new ValidationException(v.errors);
   }
+  return v.inputs;
 }
 
 /**
@@ -50,20 +60,13 @@ async function validateInput(data, rules) {
  * @param res
  * @returns {Promise<boolean|any>}
  */
-async function handleInputValidation(req, rules, res) {
-  const v = new Validator(req.body, rules);
-  const matched = await v.check();
-  if (!matched) {
-    res.status(422).send(v.errors);
-    return false;
-  } else {
-    return v.inputs;
-  }
+async function validateMiddleware(req, rules, res) {
+  return validateInput(req.body, rules);
 }
 
 module.exports = {
   arrayValidator,
-  handleInputValidation,
+  validateMiddleware,
   validateInput,
   validateMongoURL
 };
