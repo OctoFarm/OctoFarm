@@ -1,6 +1,6 @@
 import { errorTypes } from "./error.types";
 
-const HTTPError = {
+const OctoPrintError = {
   // Predefined 4xx http errors
   BAD_REQUEST: {
     type: errorTypes.NETWORK,
