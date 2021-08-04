@@ -622,7 +622,7 @@ class PrinterClean {
     return otherSettings;
   }
 
-  static async sortTerminal(i, logs) {
+  static sortTerminal(i, logs) {
     if (typeof logs !== "undefined") {
       if (typeof currentLogs[i] === "undefined") {
         currentLogs[i] = [];
@@ -652,14 +652,14 @@ class PrinterClean {
     return currentLogs[i];
   }
 
-  static async sortGCODE(settings) {
+  static sortGCODE(settings) {
     if (typeof settings !== "undefined") {
       return settings.gcode;
     }
     return null;
   }
 
-  static async sortConnection(current) {
+  static sortConnection(current) {
     if (typeof current !== "undefined") {
       return {
         baudrate: current.baudrate,
