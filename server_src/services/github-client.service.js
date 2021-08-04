@@ -14,15 +14,12 @@ async function getGithubReleasesPromise() {
     return Promise.resolve(null);
   }
 
-  return await fetch(
-    "https://api.github.com/repos/octofarm/octofarm/releases",
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json"
-      }
+  return await fetch("https://api.github.com/repos/octofarm/octofarm/releases", {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
     }
-  ).then(async (res) => {
+  }).then(async (res) => {
     const data = await res.json();
     console.log(`Received ${data.length} releases from github.`);
     return data;

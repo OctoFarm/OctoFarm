@@ -57,10 +57,7 @@ class ScriptRunner {
   static async check(printer, trigger, historyID) {
     let currentAlerts = await Alerts.find({});
     for (let i = 0; i < currentAlerts.length; i++) {
-      if (
-        currentAlerts[i].printer === printer._id ||
-        currentAlerts[i].printer.length === 0
-      ) {
+      if (currentAlerts[i].printer === printer._id || currentAlerts[i].printer.length === 0) {
         if (currentAlerts[i].trigger === trigger && currentAlerts[i].active) {
           let newMessage = await ScriptRunner.convertMessage(
             printer,
@@ -101,10 +98,7 @@ class ScriptRunner {
     }
     let progress = "";
 
-    if (
-      typeof printer.progress != "undefined" &&
-      printer.progress.completion != null
-    ) {
+    if (typeof printer.progress != "undefined" && printer.progress.completion != null) {
       progress = printer.progress;
     } else {
       progress = {
@@ -124,10 +118,7 @@ class ScriptRunner {
     }
     if (message.includes("[ETA]")) {
       let dateComplete = "No Active Print";
-      if (
-        typeof printer.progress !== "undefined" &&
-        printer.progress.printTimeLeft !== null
-      ) {
+      if (typeof printer.progress !== "undefined" && printer.progress.printTimeLeft !== null) {
         let currentDate = new Date();
         currentDate = currentDate.getTime();
         let futureDateString = new Date(
@@ -142,10 +133,7 @@ class ScriptRunner {
       message = message.replace(/\[ETA\]/g, dateComplete);
     }
     if (message.includes("[PrinterName]")) {
-      message = message.replace(
-        /\[PrinterName\]/g,
-        printer.settingsApperance.name
-      );
+      message = message.replace(/\[PrinterName\]/g, printer.settingsApperance.name);
     }
     if (message.includes("[PrinterURL]")) {
       message = message.replace(/\[PrinterURL\]/g, printer.printerURL);
@@ -154,23 +142,14 @@ class ScriptRunner {
       message = message.replace(/\[PrinterAPIKey\]/g, printer.apikey);
     }
     if (message.includes("[TimeRemaining]")) {
-      message = message.replace(
-        /\[TimeRemaining\]/g,
-        generateTime(progress.printTimeLeft)
-      );
+      message = message.replace(/\[TimeRemaining\]/g, generateTime(progress.printTimeLeft));
     }
     if (message.includes("[EstimatedTime]")) {
-      message = message.replace(
-        /\[EstimatedTime\]/g,
-        generateTime(job.estimatedPrintTime)
-      );
+      message = message.replace(/\[EstimatedTime\]/g, generateTime(job.estimatedPrintTime));
     }
     if (message.includes("[CurrentZ]")) {
       let current = "";
-      if (
-        typeof printer.currentZ === "undefined" ||
-        printer.currentZ === null
-      ) {
+      if (typeof printer.currentZ === "undefined" || printer.currentZ === null) {
         current = "No Current Z";
       } else {
         current = printer.currentZ + "mm";
@@ -179,15 +158,9 @@ class ScriptRunner {
     }
     if (message.includes("[PercentRemaining]")) {
       if (progress.completion === 0) {
-        message = message.replace(
-          /\[PercentRemaining\]/g,
-          progress.completion + "%"
-        );
+        message = message.replace(/\[PercentRemaining\]/g, progress.completion + "%");
       } else {
-        message = message.replace(
-          /\[PercentRemaining\]/g,
-          progress.completion.toFixed(2) + "%"
-        );
+        message = message.replace(/\[PercentRemaining\]/g, progress.completion.toFixed(2) + "%");
       }
     }
     if (message.includes("[CurrentTime]")) {
@@ -228,12 +201,7 @@ class ScriptRunner {
       ) {
         message = message.replace(
           /\[BedTemp\]/g,
-          "T:" +
-            printer.temps[0].bed.target +
-            "°C" +
-            " / A:" +
-            printer.temps[0].bed.actual +
-            "°C"
+          "T:" + printer.temps[0].bed.target + "°C" + " / A:" + printer.temps[0].bed.actual + "°C"
         );
       } else {
         message = message.replace(/\[BedTemp\]/g, "No tool0 temperature");
@@ -241,10 +209,7 @@ class ScriptRunner {
     }
     if (message.includes("[Error!]")) {
       let errMess = "No Error";
-      if (
-        typeof printer.state !== "undefined" &&
-        printer.state.includes("Error")
-      ) {
+      if (typeof printer.state !== "undefined" && printer.state.includes("Error")) {
         errMess = printer.stateDescription;
       }
       message = message.replace(/\[Error!\]/g, errMess);
@@ -271,15 +236,7 @@ const generateTime = function (seconds) {
     seconds -= mnts * 60;
     seconds = Math.floor(seconds);
 
-    string =
-      days +
-      " Days, " +
-      hrs +
-      " Hrs, " +
-      mnts +
-      " Mins, " +
-      seconds +
-      " Seconds";
+    string = days + " Days, " + hrs + " Hrs, " + mnts + " Mins, " + seconds + " Seconds";
     if (mnts == 0) {
       if (string.includes("0 Mins")) {
         string = string.replace(" 0 Mins,", "");

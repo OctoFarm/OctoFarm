@@ -6,9 +6,7 @@ const ServerSettings = require("../models/ServerSettings.js");
 const { AppConstants } = require("../app.constants");
 
 const User = require("../models/User.js");
-const {
-  UserTokenService
-} = require("../services/authentication/user-token.service");
+const { UserTokenService } = require("../services/authentication/user-token.service");
 
 let settings;
 let currentUsers;
@@ -164,10 +162,7 @@ router.post("/register", async (req, res) => {
               newUser
                 .save()
                 .then((user) => {
-                  req.flash(
-                    "success_msg",
-                    "You are now registered and can login"
-                  );
+                  req.flash("success_msg", "You are now registered and can login");
                   const page = "login";
                   res.redirect("/users/login");
                 })

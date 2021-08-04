@@ -32,8 +32,7 @@ class Logs {
 
     // Generate nice text file of system information
     let octofarmInformationTxt = await generateOctoFarmSystemInformationTxt();
-    if (!octofarmInformationTxt)
-      throw "Couldn't generate octofarms_information.txt file...";
+    if (!octofarmInformationTxt) throw "Couldn't generate octofarms_information.txt file...";
 
     fileList.push(octofarmInformationTxt);
 

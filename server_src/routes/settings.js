@@ -52,91 +52,73 @@ router.get("/server/logs/:name", ensureAuthenticated, (req, res) => {
   const file = `./logs/${download}`;
   res.download(file, download); // Set disposition and send it.
 });
-router.post(
-  "/server/logs/generateLogDump",
-  ensureAuthenticated,
-  async (req, res) => {
-    // Will use in a future update to configure the dump.
-    // let settings = req.body;
-    // Generate the log package
-    let zipDumpResponse = {
-      status: "error",
-      msg: "Unable to generate zip file, please check 'OctoFarm-API.log' file for more information.",
-      zipDumpPath: ""
-    };
+router.post("/server/logs/generateLogDump", ensureAuthenticated, async (req, res) => {
+  // Will use in a future update to configure the dump.
+  // let settings = req.body;
+  // Generate the log package
+  let zipDumpResponse = {
+    status: "error",
+    msg: "Unable to generate zip file, please check 'OctoFarm-API.log' file for more information.",
+    zipDumpPath: ""
+  };
 
-    try {
-      zipDumpResponse.zipDumpPath = await Logs.generateOctoFarmLogDump();
-      zipDumpResponse.status = "success";
-      zipDumpResponse.msg =
-        "Successfully generated zip file, please click the download button.";
-    } catch (e) {
-      logger.error("Error Generating Log Dump Zip File | ", e);
-    }
+  try {
+    zipDumpResponse.zipDumpPath = await Logs.generateOctoFarmLogDump();
+    zipDumpResponse.status = "success";
+    zipDumpResponse.msg = "Successfully generated zip file, please click the download button.";
+  } catch (e) {
+    logger.error("Error Generating Log Dump Zip File | ", e);
+  }
 
-    res.send(zipDumpResponse);
-  }
-);
+  res.send(zipDumpResponse);
+});
 
-router.get(
-  "/server/delete/database/:name",
-  ensureAuthenticated,
-  async (req, res) => {
-    const databaseName = req.params.name;
-    await Runner.pause();
-    if (databaseName === "nukeEverything") {
-      await ServerSettingsDB.deleteMany({});
-      await ClientSettingsDB.deleteMany({});
-      await HistoryDB.deleteMany({});
-      await SpoolsDB.deleteMany({});
-      await ProfilesDB.deleteMany({});
-      await roomDataDB.deleteMany({});
-      await UserDB.deleteMany({});
-      await PrinterDB.deleteMany({});
-      await AlertsDB.deleteMany({});
-      await GcodeDB.deleteMany({});
-      res.send({
-        message: "Successfully deleted databases, server will restart..."
-      });
-      logger.info("Database completely wiped.... Restarting server...");
-      SystemCommands.rebootOctoFarm();
-    } else if (databaseName === "FilamentDB") {
-      await SpoolsDB.deleteMany({});
-      await ProfilesDB.deleteMany({});
-      logger.info(
-        "Successfully deleted Filament database.... Restarting server..."
-      );
-      SystemCommands.rebootOctoFarm();
-    } else {
-      await eval(databaseName).deleteMany({});
-      res.send({
-        message:
-          "Successfully deleted " + databaseName + ", server will restart..."
-      });
-      logger.info(
-        databaseName + " successfully deleted.... Restarting server..."
-      );
-      SystemCommands.rebootOctoFarm();
-    }
+router.get("/server/delete/database/:name", ensureAuthenticated, async (req, res) => {
+  const databaseName = req.params.name;
+  await Runner.pause();
+  if (databaseName === "nukeEverything") {
+    await ServerSettingsDB.deleteMany({});
+    await ClientSettingsDB.deleteMany({});
+    await HistoryDB.deleteMany({});
+    await SpoolsDB.deleteMany({});
+    await ProfilesDB.deleteMany({});
+    await roomDataDB.deleteMany({});
+    await UserDB.deleteMany({});
+    await PrinterDB.deleteMany({});
+    await AlertsDB.deleteMany({});
+    await GcodeDB.deleteMany({});
+    res.send({
+      message: "Successfully deleted databases, server will restart..."
+    });
+    logger.info("Database completely wiped.... Restarting server...");
+    SystemCommands.rebootOctoFarm();
+  } else if (databaseName === "FilamentDB") {
+    await SpoolsDB.deleteMany({});
+    await ProfilesDB.deleteMany({});
+    logger.info("Successfully deleted Filament database.... Restarting server...");
+    SystemCommands.rebootOctoFarm();
+  } else {
+    await eval(databaseName).deleteMany({});
+    res.send({
+      message: "Successfully deleted " + databaseName + ", server will restart..."
+    });
+    logger.info(databaseName + " successfully deleted.... Restarting server...");
+    SystemCommands.rebootOctoFarm();
   }
-);
-router.get(
-  "/server/get/database/:name",
-  ensureAuthenticated,
-  async (req, res) => {
-    const databaseName = req.params.name;
-    logger.info("Client requests export of " + databaseName);
-    let returnedObjects = [];
-    if (databaseName === "FilamentDB") {
-      returnedObjects.push(await ProfilesDB.find({}));
-      returnedObjects.push(await SpoolsDB.find({}));
-    } else {
-      returnedObjects.push(await eval(databaseName).find({}));
-    }
-    logger.info("Returning to client database object: " + databaseName);
-    res.send({ databases: returnedObjects });
+});
+router.get("/server/get/database/:name", ensureAuthenticated, async (req, res) => {
+  const databaseName = req.params.name;
+  logger.info("Client requests export of " + databaseName);
+  let returnedObjects = [];
+  if (databaseName === "FilamentDB") {
+    returnedObjects.push(await ProfilesDB.find({}));
+    returnedObjects.push(await SpoolsDB.find({}));
+  } else {
+    returnedObjects.push(await eval(databaseName).find({}));
   }
-);
+  logger.info("Returning to client database object: " + databaseName);
+  res.send({ databases: returnedObjects });
+});
 router.post("/server/restart", ensureAuthenticated, async (req, res) => {
   let serviceRestarted = false;
   try {
@@ -147,46 +129,35 @@ router.post("/server/restart", ensureAuthenticated, async (req, res) => {
   res.send(serviceRestarted);
 });
 
-router.post(
-  "/server/update/octofarm",
-  ensureAuthenticated,
-  async (req, res) => {
-    let clientResponse = {
-      haveWeSuccessfullyUpdatedOctoFarm: false,
-      statusTypeForUser: "error",
-      message: ""
-    };
-    let force = req?.body;
-    if (
-      !force ||
-      typeof force?.forcePull !== "boolean" ||
-      typeof force?.doWeInstallPackages !== "boolean"
-    ) {
-      res.sendStatus(400);
-      throw new Error(
-        "forceCheck object not correctly provided or not boolean"
-      );
-    }
-
-    try {
-      clientResponse =
-        await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate(
-          clientResponse,
-          force
-        );
-    } catch (e) {
-      clientResponse.message =
-        "Issue with updating | " + e?.message.replace(/(<([^>]+)>)/gi, "");
-      // Log error with html tags removed if contained in response message
-      logger.error(
-        "Issue with updating | ",
-        e?.message.replace(/(<([^>]+)>)/gi, "")
-      );
-    } finally {
-      res.send(clientResponse);
-    }
+router.post("/server/update/octofarm", ensureAuthenticated, async (req, res) => {
+  let clientResponse = {
+    haveWeSuccessfullyUpdatedOctoFarm: false,
+    statusTypeForUser: "error",
+    message: ""
+  };
+  let force = req?.body;
+  if (
+    !force ||
+    typeof force?.forcePull !== "boolean" ||
+    typeof force?.doWeInstallPackages !== "boolean"
+  ) {
+    res.sendStatus(400);
+    throw new Error("forceCheck object not correctly provided or not boolean");
   }
-);
+
+  try {
+    clientResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate(
+      clientResponse,
+      force
+    );
+  } catch (e) {
+    clientResponse.message = "Issue with updating | " + e?.message.replace(/(<([^>]+)>)/gi, "");
+    // Log error with html tags removed if contained in response message
+    logger.error("Issue with updating | ", e?.message.replace(/(<([^>]+)>)/gi, ""));
+  } finally {
+    res.send(clientResponse);
+  }
+});
 router.get("/server/update/check", ensureAuthenticated, async (req, res) => {
   await checkReleaseAndLogUpdate();
   const softwareUpdateNotification = getUpdateNotificationIfAny();
@@ -216,18 +187,13 @@ router.post("/client/update", ensureAuthenticated, (req, res) => {
     res.send({ msg: "Settings Saved" });
   });
 });
-router.post(
-  "/backgroundUpload",
-  ensureAuthenticated,
-  upload.single("myFile"),
-  (req, res) => {
-    const file = req.file;
-    if (!file) {
-      res.redirect("/system");
-    }
+router.post("/backgroundUpload", ensureAuthenticated, upload.single("myFile"), (req, res) => {
+  const file = req.file;
+  if (!file) {
     res.redirect("/system");
   }
-);
+  res.redirect("/system");
+});
 router.get("/server/get", ensureAuthenticated, (req, res) => {
   ServerSettingsDB.find({}).then((checked) => {
     res.send(checked[0]);

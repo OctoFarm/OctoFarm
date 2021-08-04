@@ -3,8 +3,7 @@ const testPath = "../../";
 jest.mock("mjpeg-decoder");
 const decoderMock = require("mjpeg-decoder");
 const dbHandler = require(testPath + "db-handler");
-const octoPrintApiServicePath =
-  rootPath + "server_src/services/octoprint/octoprint-api.service";
+const octoPrintApiServicePath = rootPath + "server_src/services/octoprint/octoprint-api.service";
 jest.mock(octoPrintApiServicePath);
 const { OctoprintApiService } = require(octoPrintApiServicePath);
 const { OctoprintApiClientService } = require(rootPath +
@@ -35,9 +34,7 @@ describe("History:Runner", () => {
   jest.mock("../../../server_src/utils/download.util");
   // FS should be mocked as late as possible in order to give MongoDB Memory Server a chance
   jest.mock("fs");
-  const {
-    HistoryCollection
-  } = require("../../../server_src/runners/history.runner");
+  const { HistoryCollection } = require("../../../server_src/runners/history.runner");
 
   const basePath = "./images/historyCollection";
 

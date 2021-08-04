@@ -478,7 +478,7 @@ export default class FileManager {
             currentFolder = currentFolder.replace("local/", "");
           }
 
-        // Draw sub - folders present in current folder
+          // Draw sub - folders present in current folder
           if (fileList.folderList.length > 0) {
             fileList.folderList.forEach((folder) => {
               if (folder.path == currentFolder) {

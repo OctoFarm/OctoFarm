@@ -15,9 +15,7 @@ const { AppConstants } = require("../app.constants");
 const currentVersion = process?.env[AppConstants.VERSION_KEY];
 const systemInformationFileName = "system_information.txt";
 
-const {
-  checkIfFileFileExistsAndDeleteIfSo
-} = require("../utils/file.utils.js");
+const { checkIfFileFileExistsAndDeleteIfSo } = require("../utils/file.utils.js");
 
 const { prettyPrintArray } = require("../utils/pretty-print.utils.js");
 
@@ -87,9 +85,7 @@ function generateSystemInformationContents() {
 
   if (printerVersions) {
     systemInformationContents += "--- OctoPrint Information ---\n\n";
-    systemInformationContents += `OctoPrint Versions\n ${prettyPrintArray(
-      printerVersions
-    )}`;
+    systemInformationContents += `OctoPrint Versions\n ${prettyPrintArray(printerVersions)}`;
   }
 
   return systemInformationContents;

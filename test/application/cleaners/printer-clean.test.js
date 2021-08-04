@@ -4,14 +4,8 @@ jest.mock("../../../server_src/models/TempHistory");
 jest.mock("../../../server_src/models/RoomData");
 const mockFarmStatisticsService = require("../../../server_src/services/farm-statistics.service");
 const RoomData = require("../../../server_src/models/RoomData");
-const {
-  zeroFigureHeatmap,
-  emptyHeatmap,
-  nanFigureHeatmap
-} = require("./test-data/heatmap-state");
-const {
-  PrinterClean
-} = require("../../../server_src/lib/dataFunctions/printerClean");
+const { zeroFigureHeatmap, emptyHeatmap, nanFigureHeatmap } = require("./test-data/heatmap-state");
+const { PrinterClean } = require("../../../server_src/lib/dataFunctions/printerClean");
 const dayName = new Intl.DateTimeFormat(["en"], {
   weekday: "long" // ?? what should I put here
 }).format(new Date());
@@ -210,9 +204,7 @@ describe("PrinterClean", function () {
   });
 
   it("should call sortCurrentOperations with printerState truthy no problem", async () => {
-    await PrinterClean.sortCurrentOperations([
-      { printerState: { colour: { category: "Idle" } } }
-    ]);
+    await PrinterClean.sortCurrentOperations([{ printerState: { colour: { category: "Idle" } } }]);
     await PrinterClean.sortCurrentOperations([
       { printerState: { colour: { category: "Offline" } } }
     ]);

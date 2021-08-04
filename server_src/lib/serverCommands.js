@@ -3,10 +3,7 @@ const { isPm2 } = require("../utils/env.utils.js");
 const { isNodemon } = require("../utils/env.utils.js");
 const { lookpath } = require("lookpath");
 
-const {
-  returnListOfMissingPackages,
-  installNpmDependency
-} = require("../utils/npm.utils.js");
+const { returnListOfMissingPackages, installNpmDependency } = require("../utils/npm.utils.js");
 const {
   returnCurrentGitStatus,
   isBranchUpToDate,
@@ -78,8 +75,7 @@ class SystemCommands {
       const gitBranchUpToDate = isBranchUpToDate(gitCurrentStatus);
       if (gitBranchUpToDate) {
         clientResponse.haveWeSuccessfullyUpdatedOctoFarm = false;
-        clientResponse.message =
-          "OctoFarm is already up to date! Your good to go!";
+        clientResponse.message = "OctoFarm is already up to date! Your good to go!";
         clientResponse.statusTypeForUser = "success";
         return clientResponse;
       }
@@ -139,8 +135,7 @@ class SystemCommands {
     // Everything went well, enjoy the tasty updates!
     clientResponse.haveWeSuccessfullyUpdatedOctoFarm = true;
     clientResponse.statusTypeForUser = "success";
-    clientResponse.message =
-      "Update command has run successfully, OctoFarm will restart.";
+    clientResponse.message = "Update command has run successfully, OctoFarm will restart.";
     // Local changes
     return clientResponse;
   }

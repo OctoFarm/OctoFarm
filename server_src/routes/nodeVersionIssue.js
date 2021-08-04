@@ -7,9 +7,7 @@ const router = express.Router();
 const logger = new Logger("OctoFarm-Fallback-Server");
 
 const isPm2Safe =
-  "PM2_HOME" in process.env ||
-  "PM2_JSON_PROCESSING" in process.env ||
-  "PM2_CLI" in process.env;
+  "PM2_HOME" in process.env || "PM2_JSON_PROCESSING" in process.env || "PM2_CLI" in process.env;
 /**
  * A Node 12 compatible route
  */
@@ -17,8 +15,7 @@ router.get("/", (req, res) =>
   res.render("nodeVersionIssue", {
     page: "Node Version Issue",
     octoFarmPageTitle:
-      process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY] ||
-      AppConstants.defaultOctoFarmPageTitle,
+      process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY] || AppConstants.defaultOctoFarmPageTitle,
     isDocker: isDocker(),
     isPm2: isPm2Safe,
     os: process.env.OS,

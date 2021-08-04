@@ -1,6 +1,4 @@
-const {
-  FileClean
-} = require("../../../server_src/lib/dataFunctions/fileClean");
+const { FileClean } = require("../../../server_src/lib/dataFunctions/fileClean");
 
 describe("generate", function () {
   it("doesnt throw error on illegal printer array", async function () {

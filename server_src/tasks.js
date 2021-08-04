@@ -11,10 +11,7 @@ const PRINTER_CLEAN_TASK = async () => {
   await PrinterClean.sortCurrentOperations(printersInformation);
 
   await PrinterClean.statisticsStart();
-  await PrinterClean.createPrinterList(
-    printersInformation,
-    serverSettings.filamentManager
-  );
+  await PrinterClean.createPrinterList(printersInformation, serverSettings.filamentManager);
 };
 
 const CRASH_TEST_TASK = async () => {

@@ -15,10 +15,7 @@ async function optionalInfluxDatabaseSetup() {
     await SettingsClean.start();
     serverSettings = await SettingsClean.returnSystemSettings();
   }
-  if (
-    typeof serverSettings.influxExport !== "undefined" &&
-    serverSettings.influxExport.active
-  ) {
+  if (typeof serverSettings.influxExport !== "undefined" && serverSettings.influxExport.active) {
     let options = {
       username: serverSettings.influxExport.username,
       password: serverSettings.influxExport.password,
@@ -37,9 +34,7 @@ async function optionalInfluxDatabaseSetup() {
 async function checkDatabase(options) {
   const names = await db.getDatabaseNames();
   if (!names.includes(options.database)) {
-    logger.info(
-      "Cannot find database... creating new database: " + options.database
-    );
+    logger.info("Cannot find database... creating new database: " + options.database);
     await db.createDatabase(options.database);
     return "database created...: " + options.database;
   } else {

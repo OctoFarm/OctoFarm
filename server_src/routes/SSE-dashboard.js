@@ -4,9 +4,7 @@ const { stringify } = require("flatted");
 const { ensureAuthenticated } = require("../config/auth");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
-const {
-  getDefaultDashboardSettings
-} = require("../lib/providers/settings.constants");
+const { getDefaultDashboardSettings } = require("../lib/providers/settings.constants");
 
 // Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
 let clientInformation = null;
