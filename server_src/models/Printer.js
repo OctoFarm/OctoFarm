@@ -15,11 +15,11 @@ const PrinterSchema = new mongoose.Schema({
   },
   webSocketURL: {
     type: String,
-    required: true // !
+    required: false // !
   },
   sortIndex: {
     type: Number,
-    required: true
+    required: false
   },
   // Auto-generated below
   settingsAppearance: {
