@@ -3,7 +3,7 @@
 const _ = require("lodash");
 const EventEmitter = require("events");
 const WebSocket = require("ws");
-const Logger = require("../lib/logger.js");
+const Logger = require("../handlers/logger.js");
 
 const Profiles = require("../models/Profiles.js");
 const Printers = require("../models/Printer.js");
@@ -12,14 +12,9 @@ const TempHistory = require("../models/TempHistory.js");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const softwareUpdateChecker = require("../services/octofarm-update.service");
 
-const {
-  OctoprintApiClientService
-} = require("../services/octoprint/octoprint-api-client.service");
+const { OctoprintApiClientService } = require("../services/octoprint/octoprint-api-client.service");
 const { HistoryCollection } = require("./history.runner.js");
-const {
-  ServerSettings,
-  filamentManager
-} = require("../settings/serverSettings.js");
+const { ServerSettings, filamentManager } = require("../settings/serverSettings.js");
 const { ScriptRunner } = require("./scriptCheck.js");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
 const { JobClean } = require("../lib/dataFunctions/jobClean.js");
@@ -38,20 +33,14 @@ if (printersInformation === false) {
   setInterval(async () => {
     for (let index = 0; index < farmPrinters.length; index++) {
       if (typeof farmPrinters[index] !== "undefined") {
-        PrinterClean.generate(
-          farmPrinters[index],
-          systemSettings.filamentManager
-        );
+        PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
       }
     }
   }, 20000);
   setTimeout(async () => {
     for (let index = 0; index < farmPrinters.length; index++) {
       if (typeof farmPrinters[index] !== "undefined") {
-        PrinterClean.generate(
-          farmPrinters[index],
-          systemSettings.filamentManager
-        );
+        PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
       }
     }
   }, 10000);
@@ -85,10 +74,7 @@ function heartBeat(index) {
 
 const heartBeatInterval = setInterval(function ping() {
   farmPrinters.forEach(function each(client) {
-    if (
-      typeof client.ws !== "undefined" &&
-      typeof client.ws.isAlive !== "undefined"
-    ) {
+    if (typeof client.ws !== "undefined" && typeof client.ws.isAlive !== "undefined") {
       if (
         client.ws.instance.readyState !== 0 &&
         client.ws.instance.readyState !== 2 &&
@@ -105,8 +91,7 @@ const heartBeatInterval = setInterval(function ping() {
 
         // Retry connecting if failed...
         farmPrinters[client.ws.index].webSocket = "info";
-        farmPrinters[client.ws.index].webSocketDescription =
-          "Checking if Websocket is still alive";
+        farmPrinters[client.ws.index].webSocketDescription = "Checking if Websocket is still alive";
         client.ws.isAlive = false;
         client.ws.instance.ping(noop);
       }
@@ -134,9 +119,7 @@ WebSocketClient.prototype.open = function (url, index) {
       try {
         this.onopen(this.index);
       } catch (e) {
-        logger.info(
-          `Cannot re-open web socket... : ${this.index}: ${this.url}`
-        );
+        logger.info(`Cannot re-open web socket... : ${this.index}: ${this.url}`);
         this.instance.emit("error", e);
       }
     });
@@ -148,10 +131,7 @@ WebSocketClient.prototype.open = function (url, index) {
       try {
         this.onmessage(data, flags, this.number, this.index);
       } catch (e) {
-        logger.info(
-          e,
-          "There was an issue opening the websocket... hard fail..."
-        );
+        logger.info(e, "There was an issue opening the websocket... hard fail...");
         this.instance.emit("error", e);
       }
     });
@@ -163,19 +143,14 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Shutdown";
-            farmPrinters[this.index].hostStateColour =
-              Runner.getColour("Shutdown");
+            farmPrinters[this.index].hostStateColour = Runner.getColour("Shutdown");
             farmPrinters[this.index].webSocket = "danger";
             farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
             farmPrinters[this.index].hostDescription = "Host is Shutdown";
-            farmPrinters[this.index].webSocketDescription =
-              "Websocket Closed by OctoFarm";
+            farmPrinters[this.index].webSocketDescription = "Websocket Closed by OctoFarm";
             this.instance.removeAllListeners();
             if (typeof farmPrinters[this.index] !== "undefined") {
-              PrinterClean.generate(
-                farmPrinters[this.index],
-                systemSettings.filamentManager
-              );
+              PrinterClean.generate(farmPrinters[this.index], systemSettings.filamentManager);
             }
           } catch (e) {
             logger.info(
@@ -189,19 +164,14 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Shutdown";
-            farmPrinters[this.index].hostStateColour =
-              Runner.getColour("Shutdown");
+            farmPrinters[this.index].hostStateColour = Runner.getColour("Shutdown");
             farmPrinters[this.index].webSocket = "danger";
             farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
             farmPrinters[this.index].hostDescription = "Host is Shutdown";
-            farmPrinters[this.index].webSocketDescription =
-              "Websocket Closed by OctoFarm";
+            farmPrinters[this.index].webSocketDescription = "Websocket Closed by OctoFarm";
             this.instance.removeAllListeners();
             if (typeof farmPrinters[this.index] !== "undefined") {
-              PrinterClean.generate(
-                farmPrinters[this.index],
-                systemSettings.filamentManager
-              );
+              PrinterClean.generate(farmPrinters[this.index], systemSettings.filamentManager);
             }
           } catch (e) {
             logger.info(
@@ -214,8 +184,7 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Shutdown";
-            farmPrinters[this.index].hostStateColour =
-              Runner.getColour("Shutdown");
+            farmPrinters[this.index].hostStateColour = Runner.getColour("Shutdown");
             farmPrinters[this.index].webSocket = "danger";
             farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
             farmPrinters[this.index].hostDescription = "Host is Shutdown";
@@ -223,10 +192,7 @@ WebSocketClient.prototype.open = function (url, index) {
               "Websocket Terminated by OctoFarm, Ping/Pong check fails";
             this.instance.removeAllListeners();
             if (typeof farmPrinters[this.index] !== "undefined") {
-              PrinterClean.generate(
-                farmPrinters[this.index],
-                systemSettings.filamentManager
-              );
+              PrinterClean.generate(farmPrinters[this.index], systemSettings.filamentManager);
             }
           } catch (e) {
             logger.info(
@@ -259,8 +225,7 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Connection Refused";
-            farmPrinters[this.index].hostStateColour =
-              Runner.getColour("Online");
+            farmPrinters[this.index].hostStateColour = Runner.getColour("Online");
             farmPrinters[this.index].webSocket = "danger";
             farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
             farmPrinters[this.index].hostDescription = "Host is Shutdown";
@@ -279,8 +244,7 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Connection Reset";
-            farmPrinters[this.index].hostStateColour =
-              Runner.getColour("Shutdown");
+            farmPrinters[this.index].hostStateColour = Runner.getColour("Shutdown");
             farmPrinters[this.index].webSocket = "danger";
             farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
             farmPrinters[this.index].hostDescription = "Host is Offline";
@@ -299,8 +263,7 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Host Unreachable";
-            farmPrinters[this.index].hostStateColour =
-              Runner.getColour("Shutdown");
+            farmPrinters[this.index].hostStateColour = Runner.getColour("Shutdown");
             farmPrinters[this.index].webSocket = "danger";
             farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
             farmPrinters[this.index].hostDescription = "Host is Shutdown";
@@ -319,8 +282,7 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Offline";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Host not found";
-            farmPrinters[this.index].hostStateColour =
-              Runner.getColour("Shutdown");
+            farmPrinters[this.index].hostStateColour = Runner.getColour("Shutdown");
             farmPrinters[this.index].webSocket = "danger";
             farmPrinters[this.index].stateDescription = "OctoPrint is Offline";
             farmPrinters[this.index].hostDescription =
@@ -340,22 +302,16 @@ WebSocketClient.prototype.open = function (url, index) {
             farmPrinters[this.index].state = "Re-Sync";
             farmPrinters[this.index].stateColour = Runner.getColour("Offline");
             farmPrinters[this.index].hostState = "Error!";
-            farmPrinters[this.index].hostStateColour =
-              Runner.getColour("Offline");
+            farmPrinters[this.index].hostStateColour = Runner.getColour("Offline");
             farmPrinters[this.index].webSocket = "danger";
-            farmPrinters[this.index].stateDescription =
-              "Hard Failure, please Re-Sync when Online";
-            farmPrinters[this.index].hostDescription =
-              "Hard Failure, please Re-Sync when Online";
+            farmPrinters[this.index].stateDescription = "Hard Failure, please Re-Sync when Online";
+            farmPrinters[this.index].hostDescription = "Hard Failure, please Re-Sync when Online";
             farmPrinters[this.index].webSocketDescription =
               "Hard Failure, please Re-Sync when Online";
             this.instance.removeAllListeners();
 
             if (typeof farmPrinters[this.index] !== "undefined") {
-              PrinterClean.generate(
-                farmPrinters[this.index],
-                systemSettings.filamentManager
-              );
+              PrinterClean.generate(farmPrinters[this.index], systemSettings.filamentManager);
             }
           } catch (e) {
             logger.info(
@@ -370,10 +326,7 @@ WebSocketClient.prototype.open = function (url, index) {
     });
     return true;
   } catch (e) {
-    logger.info(
-      JSON.stringify(e),
-      "There was an issue opening the websocket... hard fail..."
-    );
+    logger.info(JSON.stringify(e), "There was an issue opening the websocket... hard fail...");
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[this.index].printerURL,
@@ -396,10 +349,7 @@ WebSocketClient.prototype.throttle = function (data) {
     farmPrinters[this.index]._id
   );
   try {
-    logger.info(
-      `Throttling your websocket connection: ${this.index}: ${this.url} `,
-      data
-    );
+    logger.info(`Throttling your websocket connection: ${this.index}: ${this.url} `, data);
     this.instance.send(JSON.stringify(data));
   } catch (e) {
     logger.error(`Failed to Throttle websocket: ${this.index}: ${this.url}`);
@@ -433,10 +383,7 @@ WebSocketClient.prototype.reconnect = async function (e) {
     farmPrinters[that.index].hostDescription = "Searching for Host";
     logger.info(`Re-Opening Websocket: ${that.index}: ${that.url}`);
     if (typeof farmPrinters[that.index] !== "undefined") {
-      PrinterClean.generate(
-        farmPrinters[that.index],
-        systemSettings.filamentManager
-      );
+      PrinterClean.generate(farmPrinters[that.index], systemSettings.filamentManager);
     }
     that.open(that.url, that.index);
   }, this.autoReconnectInterval);
@@ -447,9 +394,7 @@ WebSocketClient.prototype.onopen = async function (e) {
   const Polling = systemSettings.onlinePolling;
   const data = {};
   const throt = {};
-  data.auth = `${farmPrinters[this.index].currentUser}:${
-    farmPrinters[this.index].sessionKey
-  }`;
+  data.auth = `${farmPrinters[this.index].currentUser}:${farmPrinters[this.index].sessionKey}`;
   throt.throttle = parseInt((Polling.seconds * 1000) / 500);
 
   this.instance.send(JSON.stringify(data));
@@ -462,10 +407,7 @@ WebSocketClient.prototype.onopen = async function (e) {
     farmPrinters[this.index]._id
   );
   if (typeof farmPrinters[this.index] !== "undefined") {
-    PrinterClean.generate(
-      farmPrinters[this.index],
-      systemSettings.filamentManager
-    );
+    PrinterClean.generate(farmPrinters[this.index], systemSettings.filamentManager);
   }
 };
 
@@ -481,10 +423,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       farmPrinters[this.index].plugin_hash = data.connected.plugin_hash;
       farmPrinters[this.index].config_hash = data.connected.config_hash;
 
-      if (
-        data.connected.version.includes("1.4.2") ||
-        data.connected.version.includes("1.4.1")
-      ) {
+      if (data.connected.version.includes("1.4.2") || data.connected.version.includes("1.4.1")) {
         farmPrinters[this.index].webSocket = "danger";
         farmPrinters[this.index].webSocketDescription =
           "OctoPrint Version 1.4.1+ requires the use of an Application/User API key to connect, please update your instance with that";
@@ -507,12 +446,10 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
     // Listen for printer status
     if (typeof data.current !== "undefined") {
       farmPrinters[this.index].webSocket = "success";
-      farmPrinters[this.index].webSocketDescription =
-        "Websocket Alive and Receiving Data";
+      farmPrinters[this.index].webSocketDescription = "Websocket Alive and Receiving Data";
       if (data.current.state.text === "Offline") {
         data.current.state.text = "Disconnected";
-        farmPrinters[this.index].stateDescription =
-          "Your printer is disconnected";
+        farmPrinters[this.index].stateDescription = "Your printer is disconnected";
       } else if (
         data.current.state.text.includes("Error:") ||
         data.current.state.text.includes("error")
@@ -521,16 +458,12 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         data.current.state.text = "Error!";
       } else if (data.current.state.text === "Closed") {
         res.current.state.text = "Disconnected";
-        farmPrinters[this.index].stateDescription =
-          "Your printer is disconnected";
+        farmPrinters[this.index].stateDescription = "Your printer is disconnected";
       } else {
-        farmPrinters[this.index].stateDescription =
-          "Current Status from OctoPrint";
+        farmPrinters[this.index].stateDescription = "Current Status from OctoPrint";
       }
       farmPrinters[this.index].state = data.current.state.text;
-      farmPrinters[this.index].stateColour = Runner.getColour(
-        data.current.state.text
-      );
+      farmPrinters[this.index].stateColour = Runner.getColour(data.current.state.text);
       if (typeof data.current.resends !== "undefined") {
         farmPrinters[this.index].resends = data.current.resends;
       }
@@ -540,39 +473,23 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       } else {
         farmPrinters[this.index].progress = 0;
       }
-      if (
-        typeof data.current.currentZ !== "undefined" &&
-        data.currentZ !== null
-      ) {
+      if (typeof data.current.currentZ !== "undefined" && data.currentZ !== null) {
         farmPrinters[this.index].currentZ = data.current.currentZ;
       }
-      if (
-        typeof data.current.job !== "undefined" &&
-        data.current.job.user !== null
-      ) {
+      if (typeof data.current.job !== "undefined" && data.current.job.user !== null) {
         farmPrinters[this.index].job = data.current.job;
-        const currentFileIndex = _.findIndex(
-          farmPrinters[this.index].fileList.files,
-          function (o) {
-            return o.name === data.current.job.file.name;
-          }
-        );
+        const currentFileIndex = _.findIndex(farmPrinters[this.index].fileList.files, function (o) {
+          return o.name === data.current.job.file.name;
+        });
         if (currentFileIndex > -1) {
           if (
-            typeof farmPrinters[this.index].fileList.files[currentFileIndex] !==
-              "undefined" &&
-            farmPrinters[this.index].fileList.files[currentFileIndex]
-              .thumbnail != null
+            typeof farmPrinters[this.index].fileList.files[currentFileIndex] !== "undefined" &&
+            farmPrinters[this.index].fileList.files[currentFileIndex].thumbnail != null
           ) {
             farmPrinters[this.index].job.file.thumbnail =
-              farmPrinters[this.index].fileList.files[
-                currentFileIndex
-              ].thumbnail;
+              farmPrinters[this.index].fileList.files[currentFileIndex].thumbnail;
           }
-          if (
-            typeof farmPrinters[this.index].fileList.files[currentFileIndex] !==
-            "undefined"
-          ) {
+          if (typeof farmPrinters[this.index].fileList.files[currentFileIndex] !== "undefined") {
             farmPrinters[this.index].job.file.length =
               farmPrinters[this.index].fileList.files[currentFileIndex].length;
           }
@@ -580,11 +497,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         const currentFilament = JSON.parse(
           JSON.stringify(farmPrinters[this.index].selectedFilament)
         );
-        for (
-          let s = 0;
-          s < farmPrinters[this.index].selectedFilament.length;
-          s++
-        ) {
+        for (let s = 0; s < farmPrinters[this.index].selectedFilament.length; s++) {
           if (farmPrinters[this.index].selectedFilament[s] !== null) {
             let profile = null;
             if (systemSettings.filamentManager) {
@@ -606,11 +519,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         const currentFilament = JSON.parse(
           JSON.stringify(farmPrinters[this.index].selectedFilament)
         );
-        for (
-          let s = 0;
-          s < farmPrinters[this.index].selectedFilament.length;
-          s++
-        ) {
+        for (let s = 0; s < farmPrinters[this.index].selectedFilament.length; s++) {
           if (farmPrinters[this.index].selectedFilament[s] !== null) {
             let profile = null;
             if (systemSettings.filamentManager) {
@@ -633,10 +542,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       if (typeof data.current.logs !== undefined) {
         farmPrinters[this.index].logs = data.current.logs;
       }
-      if (
-        typeof data.current.temps !== "undefined" &&
-        data.current.temps.length !== 0
-      ) {
+      if (typeof data.current.temps !== "undefined" && data.current.temps.length !== 0) {
         if (typeof data.current.temps[0].tool0 !== "undefined") {
           farmPrinters[this.index].temps = data.current.temps;
           let timeStamp = new Date();
@@ -657,23 +563,16 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
               }
               farmPrinters[this.index].tempTimer = 0;
             } else {
-              farmPrinters[this.index].tempTimer =
-                farmPrinters[this.index].tempTimer + 1000;
+              farmPrinters[this.index].tempTimer = farmPrinters[this.index].tempTimer + 1000;
             }
           }
         }
       }
-      if (
-        data.current.progress.completion != null &&
-        data.current.progress.completion === 100
-      ) {
+      if (data.current.progress.completion != null && data.current.progress.completion === 100) {
         farmPrinters[this.index].stateColour = Runner.getColour("Complete");
-        farmPrinters[this.index].stateDescription =
-          "Your current print is Completed!";
+        farmPrinters[this.index].stateDescription = "Your current print is Completed!";
       } else {
-        farmPrinters[this.index].stateColour = Runner.getColour(
-          data.current.state.text
-        );
+        farmPrinters[this.index].stateColour = Runner.getColour(data.current.state.text);
       }
     }
     if (typeof data.event !== "undefined") {
@@ -690,24 +589,14 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
           let job = {};
           job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
           let files = {};
-          files = JSON.parse(
-            JSON.stringify(farmPrinters[that.index].fileList.files)
-          );
+          files = JSON.parse(JSON.stringify(farmPrinters[that.index].fileList.files));
           let resendStats = null;
           if (typeof farmPrinters[that.index].resends !== "undefined") {
-            resendStats = JSON.parse(
-              JSON.stringify(farmPrinters[that.index].resends)
-            );
+            resendStats = JSON.parse(JSON.stringify(farmPrinters[that.index].resends));
           }
 
           // Register cancelled print...
-          await HistoryCollection.failed(
-            data.event.payload,
-            sendPrinter,
-            job,
-            files,
-            resendStats
-          );
+          await HistoryCollection.failed(data.event.payload, sendPrinter, job, files, resendStats);
           await Runner.updateFilament();
           setTimeout(async function () {
             await Runner.reSyncFile(
@@ -726,14 +615,10 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
           let job = {};
           job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
           let files = {};
-          files = JSON.parse(
-            JSON.stringify(farmPrinters[that.index].fileList.files)
-          );
+          files = JSON.parse(JSON.stringify(farmPrinters[that.index].fileList.files));
           let resendStats = null;
           if (typeof farmPrinters[that.index].resends !== "undefined") {
-            resendStats = JSON.parse(
-              JSON.stringify(farmPrinters[that.index].resends)
-            );
+            resendStats = JSON.parse(JSON.stringify(farmPrinters[that.index].resends));
           }
           // Register cancelled print...
 
@@ -761,26 +646,16 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
           sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
           let job = {};
           let files = {};
-          files = JSON.parse(
-            JSON.stringify(farmPrinters[that.index].fileList.files)
-          );
+          files = JSON.parse(JSON.stringify(farmPrinters[that.index].fileList.files));
           if (farmPrinters[that.index].job) {
             job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
           }
           // Register cancelled print...
-          await HistoryCollection.errorLog(
-            data.event.payload,
-            sendPrinter,
-            job,
-            files
-          );
+          await HistoryCollection.errorLog(data.event.payload, sendPrinter, job, files);
           await Runner.updateFilament();
           setTimeout(async function () {
             if (!_.isEmpty(job)) {
-              await Runner.reSyncFile(
-                farmPrinters[that.index]._id,
-                job.file.path
-              );
+              await Runner.reSyncFile(farmPrinters[that.index]._id, job.file.path);
             }
           }, 500);
         }, 10000);
@@ -822,8 +697,10 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       if (data.plugin.plugin === "klipper") {
         // console.log(data.plugin.data.payload);
         if (data.plugin.data.payload.includes("Firmware version:")) {
-          farmPrinters[this.index].klipperFirmwareVersion =
-            data.plugin.data.payload.replace("Firmware version: ", "");
+          farmPrinters[this.index].klipperFirmwareVersion = data.plugin.data.payload.replace(
+            "Firmware version: ",
+            ""
+          );
         }
       }
     }
@@ -835,10 +712,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         if (typeof farmPrinters[this.index].events === "undefined") {
           farmPrinters[this.index].events = new EventEmitter();
         }
-        if (
-          typeof farmPrinters[this.index].events._events.cooldown ===
-          "undefined"
-        ) {
+        if (typeof farmPrinters[this.index].events._events.cooldown === "undefined") {
           const that = this;
           farmPrinters[this.index].events.once("cooldown", (stream) => {
             ScriptRunner.check(farmPrinters[that.index], "cooldown");
@@ -889,20 +763,14 @@ WebSocketClient.prototype.onerror = function (e) {
     this.onerror = null;
     this.onmessage = null;
   } catch (e) {
-    logger.info(
-      JSON.stringify(e),
-      "Couldn't delete old listeners... must not exist."
-    );
+    logger.info(JSON.stringify(e), "Couldn't delete old listeners... must not exist.");
   }
 
   if (typeof farmPrinters[this.index] !== "undefined") {
     //Reset job to null on error...
     farmPrinters[this.index].job = null;
     JobClean.generate(farmPrinters[this.index]);
-    PrinterClean.generate(
-      farmPrinters[this.index],
-      systemSettings.filamentManager
-    );
+    PrinterClean.generate(farmPrinters[this.index], systemSettings.filamentManager);
   }
 };
 WebSocketClient.prototype.onclose = function (e) {
@@ -929,20 +797,14 @@ WebSocketClient.prototype.onclose = function (e) {
     this.onerror = null;
     this.onmessage = null;
   } catch (e) {
-    logger.info(
-      JSON.stringify(e),
-      "Couldn't delete old listeners... must not exist."
-    );
+    logger.info(JSON.stringify(e), "Couldn't delete old listeners... must not exist.");
   }
 
   if (typeof farmPrinters[this.index] !== "undefined") {
     //Reset job to null on error...
     farmPrinters[this.index].job = null;
     JobClean.generate(farmPrinters[this.index]);
-    PrinterClean.generate(
-      farmPrinters[this.index],
-      systemSettings.filamentManager
-    );
+    PrinterClean.generate(farmPrinters[this.index], systemSettings.filamentManager);
   }
 };
 
@@ -992,13 +854,9 @@ class Runner {
 
   static async compareEnteredKeyToGlobalKey(printer) {
     // Compare entered API key to settings API Key...
-    const globalAPIKeyCheck = await this.octoPrintService.getSettings(
-      printer,
-      true
-    );
+    const globalAPIKeyCheck = await this.octoPrintService.getSettings(printer, true);
     const errorCode = {
-      message:
-        "Global API Key detected... unable to authenticate websocket connection",
+      message: "Global API Key detected... unable to authenticate websocket connection",
       type: "system",
       errno: "999",
       code: "999"
@@ -1059,9 +917,7 @@ class Runner {
       if (typeof farmPrinters[i] !== "undefined") {
         PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
       }
-      let globalAPICheck = await this.compareEnteredKeyToGlobalKey(
-        farmPrinters[i]
-      );
+      let globalAPICheck = await this.compareEnteredKeyToGlobalKey(farmPrinters[i]);
       if (typeof globalAPICheck === "object") {
         throw globalAPICheck;
       }
@@ -1094,10 +950,7 @@ class Runner {
           farmPrinters[i]._id
         );
 
-        const sessionKey = await this.octoPrintService.login(
-          farmPrinters[i],
-          true
-        );
+        const sessionKey = await this.octoPrintService.login(farmPrinters[i], true);
 
         if (sessionKey.status === 200) {
           PrinterTicker.addIssue(
@@ -1145,10 +998,7 @@ class Runner {
             "Complete",
             farmPrinters[i]._id
           );
-          await farmPrinters[i].ws.open(
-            `${farmPrinters[i].webSocketURL}/sockjs/websocket`,
-            i
-          );
+          await farmPrinters[i].ws.open(`${farmPrinters[i].webSocketURL}sockjs/websocket`, i);
         } else {
           const error = {
             message: `Could not Establish connection to OctoPrint Returned: ${users.status}: ${farmPrinters[i].printerURL}`,
@@ -1208,10 +1058,7 @@ class Runner {
             farmPrinters[i].hostDescription = "Host is Online";
             farmPrinters[i].webSocketDescription = "Websocket Offline";
             if (typeof farmPrinters[i] !== "undefined") {
-              PrinterClean.generate(
-                farmPrinters[i],
-                systemSettings.filamentManager
-              );
+              PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
             }
           } catch (e) {
             logger.error(
@@ -1241,15 +1088,10 @@ class Runner {
             farmPrinters[i].hostDescription = "Host is Online";
             farmPrinters[i].webSocketDescription = "Websocket Offline";
             if (typeof farmPrinters[i] !== "undefined") {
-              PrinterClean.generate(
-                farmPrinters[i],
-                systemSettings.filamentManager
-              );
+              PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
             }
           } catch (e) {
-            logger.error(
-              "Couldn't set state of missing printer, safe to ignore"
-            );
+            logger.error("Couldn't set state of missing printer, safe to ignore");
           }
           break;
         case "ECONNREFUSED":
@@ -1276,15 +1118,10 @@ class Runner {
             farmPrinters[i].hostDescription = "Host is Online";
             farmPrinters[i].webSocketDescription = "Websocket Offline";
             if (typeof farmPrinters[i] !== "undefined") {
-              PrinterClean.generate(
-                farmPrinters[i],
-                systemSettings.filamentManager
-              );
+              PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
             }
           } catch (e) {
-            logger.error(
-              "Couldn't set state of missing printer, safe to ignore"
-            );
+            logger.error("Couldn't set state of missing printer, safe to ignore");
           }
           timeout = systemSettings.timeout;
           setTimeout(function () {
@@ -1313,15 +1150,10 @@ class Runner {
             farmPrinters[i].hostDescription = "Host is Online";
             farmPrinters[i].webSocketDescription = "Websocket Offline";
             if (typeof farmPrinters[i] !== "undefined") {
-              PrinterClean.generate(
-                farmPrinters[i],
-                systemSettings.filamentManager
-              );
+              PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
             }
           } catch (e) {
-            logger.error(
-              "Couldn't set state of missing printer, safe to ignore"
-            );
+            logger.error("Couldn't set state of missing printer, safe to ignore");
           }
           break;
         case "DELETED":
@@ -1354,10 +1186,7 @@ class Runner {
             );
           }
           if (typeof farmPrinters[i] !== "undefined") {
-            PrinterClean.generate(
-              farmPrinters[i],
-              systemSettings.filamentManager
-            );
+            PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
           }
           timeout = systemSettings.timeout;
           setTimeout(function () {
@@ -1541,9 +1370,7 @@ class Runner {
     }
 
     if (typeof farmPrinters[i].printerURL === "undefined") {
-      farmPrinters[
-        i
-      ].printerURL = `http://${farmPrinters[i].ip}:${farmPrinters[i].port}`;
+      farmPrinters[i].printerURL = `http://${farmPrinters[i].ip}:${farmPrinters[i].port}`;
     }
     if (
       typeof farmPrinters[i].printerURL !== "undefined" &&
@@ -1553,18 +1380,11 @@ class Runner {
       farmPrinters[i].printerURL = `http://${farmPrinters[i].printerURL}`;
     }
     //Check for trailing slash and remove...
-    if (
-      farmPrinters[i].printerURL[farmPrinters[i].printerURL.length - 1] === "/"
-    ) {
-      farmPrinters[i].printerURL = farmPrinters[i].printerURL.replace(
-        /\/?$/,
-        ""
-      );
+    if (farmPrinters[i].printerURL[farmPrinters[i].printerURL.length - 1] === "/") {
+      farmPrinters[i].printerURL = farmPrinters[i].printerURL.replace(/\/?$/, "");
     }
     if (!farmPrinters[i].webSocketURL) {
-      farmPrinters[i].webSocketURL = convertHttpUrlToWebsocket(
-        farmPrinters[i].printerURL
-      );
+      farmPrinters[i].webSocketURL = convertHttpUrlToWebsocket(farmPrinters[i].printerURL);
     }
     if (
       typeof farmPrinters[i].camURL !== "undefined" &&
@@ -1633,16 +1453,10 @@ class Runner {
       });
 
       //Check values for any changes, mark printers as requiring a rescan if so...
-      if (
-        farmPrinters[index].settingsAppearance.name !==
-        printers[i].settingsAppearance.name
-      ) {
-        farmPrinters[index].settingsApperance.name =
-          printers[i].settingsAppearance.name;
+      if (farmPrinters[index].settingsAppearance.name !== printers[i].settingsAppearance.name) {
+        farmPrinters[index].settingsApperance.name = printers[i].settingsAppearance.name;
         farmPrinters[index].markModified("settingsApperance");
-        logger.info(
-          `Modified Current Name  for: ${farmPrinters[i].printerURL}`
-        );
+        logger.info(`Modified Current Name  for: ${farmPrinters[i].printerURL}`);
         if (!changes.includes(printers[i]._id)) {
           changes.push(printers[i]._id);
         }
@@ -1653,9 +1467,7 @@ class Runner {
         }
         farmPrinters[index].printerURL = printers[i].printerURL;
         farmPrinters[index].markModified("printerURL");
-        logger.info(
-          `Modified current printer URL  for: ${farmPrinters[i].printerURL}`
-        );
+        logger.info(`Modified current printer URL  for: ${farmPrinters[i].printerURL}`);
         if (!changes.includes(printers[i]._id)) {
           changes.push(printers[i]._id);
         }
@@ -1663,9 +1475,7 @@ class Runner {
       if (farmPrinters[index].camURL !== printers[i].camURL) {
         farmPrinters[index].camURL = printers[i].camURL;
         farmPrinters[index].markModified("camURL");
-        logger.info(
-          `Modified current camera URL for: ${farmPrinters[i].printerURL}`
-        );
+        logger.info(`Modified current camera URL for: ${farmPrinters[i].printerURL}`);
         if (!changes.includes(printers[i]._id)) {
           changes.push(printers[i]._id);
         }
@@ -1673,9 +1483,7 @@ class Runner {
       if (farmPrinters[index].apikey !== printers[i].apikey) {
         farmPrinters[index].apikey = printers[i].apikey;
         farmPrinters[index].markModified("apikey");
-        logger.info(
-          `Modified current APIKEY for: ${farmPrinters[i].printerURL}`
-        );
+        logger.info(`Modified current APIKEY for: ${farmPrinters[i].printerURL}`);
         if (!changes.includes(printers[i]._id)) {
           changes.push(printers[i]._id);
         }
@@ -1684,9 +1492,7 @@ class Runner {
       if (farmPrinters[index].group !== printers[i].group) {
         farmPrinters[index].group = printers[i].group;
         farmPrinters[index].markModified("group");
-        logger.info(
-          `Modified current group for: ${farmPrinters[index].printerURL}`
-        );
+        logger.info(`Modified current group for: ${farmPrinters[index].printerURL}`);
         if (!changes.includes(printers[i]._id)) {
           changes.push(printers[i]._id);
         }
@@ -1700,13 +1506,10 @@ class Runner {
       farmPrinters[changeIndex].state = "Searching...";
       farmPrinters[changeIndex].stateColour = Runner.getColour("Searching...");
       farmPrinters[changeIndex].hostState = "Searching...";
-      farmPrinters[changeIndex].hostStateColour =
-        Runner.getColour("Searching...");
+      farmPrinters[changeIndex].hostStateColour = Runner.getColour("Searching...");
       farmPrinters[changeIndex].webSocket = "danger";
-      farmPrinters[changeIndex].stateDescription =
-        "Re-Scanning your OctoPrint Instance";
-      farmPrinters[changeIndex].hostDescription =
-        "Re-Scanning for OctoPrint Host";
+      farmPrinters[changeIndex].stateDescription = "Re-Scanning your OctoPrint Instance";
+      farmPrinters[changeIndex].hostDescription = "Re-Scanning for OctoPrint Host";
       farmPrinters[changeIndex].webSocketDescription = "Websocket is Offline";
       PrinterTicker.addIssue(
         new Date(),
@@ -1754,23 +1557,18 @@ class Runner {
           farmPrinters[p].currentIdle = farmPrinters[p].currentIdle + 30000;
         }
         if (farmPrinters[p].stateColour.category === "Offline") {
-          farmPrinters[p].currentOffline =
-            farmPrinters[p].currentOffline + 30000;
+          farmPrinters[p].currentOffline = farmPrinters[p].currentOffline + 30000;
         }
         farmPrinters[p]
           .save()
-          .catch((e) =>
-            logger.info("Error Saving Counters, Safe to ignore...", e)
-          );
+          .catch((e) => logger.info("Error Saving Counters, Safe to ignore...", e));
       }
     }
   }
 
   static async reGenerateSortIndex() {
     for (let p = 0; p < farmPrinters.length; p++) {
-      await logger.info(
-        `Regenerating existing indexes: ${farmPrinters[p].printerURL}`
-      );
+      await logger.info(`Regenerating existing indexes: ${farmPrinters[p].printerURL}`);
       PrinterTicker.addIssue(
         new Date(),
         farmPrinters[p].printerURL,
@@ -1797,9 +1595,7 @@ class Runner {
           return o._id == indexs[i];
         });
         if (index > -1) {
-          const removedURL = JSON.parse(
-            JSON.stringify(farmPrinters[index].printerURL)
-          );
+          const removedURL = JSON.parse(JSON.stringify(farmPrinters[index].printerURL));
           const removedIP = JSON.parse(JSON.stringify(farmPrinters[index]._id));
           logger.info(`Removing printer from database: ${removedIP}`);
           PrinterTicker.addIssue(
@@ -1838,9 +1634,7 @@ class Runner {
         farmPrinters[p].hostDescription = "Attempting to connect to OctoPrint";
         farmPrinters[p].webSocketDescription = "Websocket Offline";
         PrinterClean.generate(farmPrinters[p], systemSettings.filamentManager);
-        await logger.info(
-          `Regenerating existing indexes: ${farmPrinters[p].printerURL}`
-        );
+        await logger.info(`Regenerating existing indexes: ${farmPrinters[p].printerURL}`);
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[p].printerURL,
@@ -1910,8 +1704,7 @@ class Runner {
     farmPrinters[index].hostState = "Searching...";
     farmPrinters[index].hostStateColour = Runner.getColour("Searching...");
     farmPrinters[index].webSocket = "danger";
-    farmPrinters[index].stateDescription =
-      "Re-Scanning your OctoPrint Instance";
+    farmPrinters[index].stateDescription = "Re-Scanning your OctoPrint Instance";
     farmPrinters[index].hostDescription = "Re-Scanning for OctoPrint Host";
     farmPrinters[index].webSocketDescription = "Websocket is Offline";
     PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
@@ -1935,9 +1728,7 @@ class Runner {
           farmPrinters[index]._id
         );
         await farmPrinters[index].ws.instance.close();
-        logger.info(
-          `Closed websocket connection for: ${farmPrinters[index].printerURL}`
-        );
+        logger.info(`Closed websocket connection for: ${farmPrinters[index].printerURL}`);
         const { _id } = farmPrinters[index];
         await this.setupWebSocket(_id, skipAPI);
       } else if (farmPrinters[index].ws.instance.readyState === 2) {
@@ -1954,15 +1745,10 @@ class Runner {
         farmPrinters[index].hostState = "Searching...";
         farmPrinters[index].hostStateColour = Runner.getColour("Searching...");
         farmPrinters[index].webSocket = "info";
-        farmPrinters[index].stateDescription =
-          "Re-Scanning your OctoPrint Instance";
+        farmPrinters[index].stateDescription = "Re-Scanning your OctoPrint Instance";
         farmPrinters[index].hostDescription = "Re-Scanning for OctoPrint Host";
-        farmPrinters[index].webSocketDescription =
-          "Awaiting current websocket attempt to end...";
-        PrinterClean.generate(
-          farmPrinters[index],
-          systemSettings.filamentManager
-        );
+        farmPrinters[index].webSocketDescription = "Awaiting current websocket attempt to end...";
+        PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
         setTimeout(function () {
           PrinterTicker.addIssue(
             new Date(),
@@ -2008,9 +1794,7 @@ class Runner {
       systemSettings = server[0];
       const Polling = systemSettings.onlinePolling;
       const throt = {};
-      logger.info(
-        `Updating websock poll time: ${(Polling.seconds * 1000) / 500}`
-      );
+      logger.info(`Updating websock poll time: ${(Polling.seconds * 1000) / 500}`);
       throt.throttle = parseInt((Polling.seconds * 1000) / 500);
       if (
         typeof farmPrinters[i].ws !== "undefined" &&
@@ -2029,9 +1813,7 @@ class Runner {
         typeof farmPrinters[i].ws.instance !== "undefined"
       ) {
         await farmPrinters[i].ws.instance.close();
-        logger.info(
-          `Closed websocket connection for: ${farmPrinters[i].printerURL}`
-        );
+        logger.info(`Closed websocket connection for: ${farmPrinters[i].printerURL}`);
       }
     }
     return true;
@@ -2043,10 +1825,7 @@ class Runner {
     });
 
     const printer = farmPrinters[index];
-    const getFileInformation = await this.octoPrintService.getFile(
-      printer,
-      fullPath
-    );
+    const getFileInformation = await this.octoPrintService.getFile(printer, fullPath);
     const getJson = await getFileInformation.json();
 
     let timeStat = null;
@@ -2149,15 +1928,10 @@ class Runner {
           const isFolder = entry.type === "folder";
           if (!isFolder) {
             if (typeof entry.gcodeAnalysis !== "undefined") {
-              if (
-                typeof entry.gcodeAnalysis.estimatedPrintTime !== "undefined"
-              ) {
+              if (typeof entry.gcodeAnalysis.estimatedPrintTime !== "undefined") {
                 timeStat = entry.gcodeAnalysis.estimatedPrintTime;
                 // Start collecting multiple tool lengths and information from files....
-                Object.keys(entry.gcodeAnalysis.filament).forEach(function (
-                  item,
-                  i
-                ) {
+                Object.keys(entry.gcodeAnalysis.filament).forEach(function (item, i) {
                   filament[i] = entry.gcodeAnalysis.filament[item].length;
                 });
               } else {
@@ -2214,10 +1988,7 @@ class Runner {
           };
           if (isFolder) {
             if (entry.path.indexOf("/") > -1) {
-              folderPaths.path = entry.path.substr(
-                0,
-                entry.path.lastIndexOf("/")
-              );
+              folderPaths.path = entry.path.substr(0, entry.path.lastIndexOf("/"));
             } else {
               folderPaths.path = "local";
             }
@@ -2225,10 +1996,7 @@ class Runner {
             if (entry.path.indexOf("/")) {
               folderPaths.name = entry.path;
             } else {
-              folderPaths.name = entry.path.substr(
-                0,
-                entry.path.lastIndexOf("/")
-              );
+              folderPaths.name = entry.path.substr(0, entry.path.lastIndexOf("/"));
             }
             folderPaths.display = folderPaths.name.replace("/_/g", " ");
             printerLocations.push(folderPaths);
@@ -2266,9 +2034,7 @@ class Runner {
           farmPrinters[index]._id
         );
         FileClean.statistics(farmPrinters);
-        logger.info(
-          `Successfully grabbed Files for...: ${farmPrinters[index].printerURL}`
-        );
+        logger.info(`Successfully grabbed Files for...: ${farmPrinters[index].printerURL}`);
         return true;
       })
       .catch((err) => {
@@ -2281,10 +2047,7 @@ class Runner {
           "Disconnected",
           farmPrinters[index]._id
         );
-        logger.error(
-          `Error grabbing files for: ${farmPrinters[index].printerURL}: Reason: `,
-          err
-        );
+        logger.error(`Error grabbing files for: ${farmPrinters[index].printerURL}: Reason: `, err);
         return false;
       });
   }
@@ -2318,17 +2081,14 @@ class Runner {
           res.current.state = "Disconnected";
           farmPrinters[index].stateDescription = "Your printer is disconnected";
         } else {
-          farmPrinters[index].stateDescription =
-            "Current Status from OctoPrint";
+          farmPrinters[index].stateDescription = "Current Status from OctoPrint";
         }
         farmPrinters[index].current = res.current;
         farmPrinters[index].options = res.options;
         farmPrinters[index].job = null;
         farmPrinters[index].systemChecks.scanning.state.status = "success";
         farmPrinters[index].systemChecks.scanning.state.date = new Date();
-        const currentFilament = JSON.parse(
-          JSON.stringify(farmPrinters[index].selectedFilament)
-        );
+        const currentFilament = JSON.parse(JSON.stringify(farmPrinters[index].selectedFilament));
         for (let s = 0; s < farmPrinters[index].selectedFilament.length; s++) {
           if (farmPrinters[index].selectedFilament[s] !== null) {
             const profile = null;
@@ -2353,9 +2113,7 @@ class Runner {
           "Complete",
           farmPrinters[index]._id
         );
-        logger.info(
-          `Successfully grabbed Current State for...: ${farmPrinters[index].printerURL}`
-        );
+        logger.info(`Successfully grabbed Current State for...: ${farmPrinters[index].printerURL}`);
       })
       .catch((err) => {
         farmPrinters[index].systemChecks.scanning.state.status = "danger";
@@ -2367,10 +2125,7 @@ class Runner {
           "Disconnected",
           farmPrinters[index]._id
         );
-        logger.error(
-          `Error grabbing state for: ${farmPrinters[index].printerURL} Reason: `,
-          err
-        );
+        logger.error(`Error grabbing state for: ${farmPrinters[index].printerURL} Reason: `, err);
         return false;
       });
   }
@@ -2404,9 +2159,7 @@ class Runner {
           "Complete",
           farmPrinters[index]._id
         );
-        logger.info(
-          `Successfully grabbed Profiles.js for...: ${farmPrinters[index].printerURL}`
-        );
+        logger.info(`Successfully grabbed Profiles.js for...: ${farmPrinters[index].printerURL}`);
       })
       .catch((err) => {
         PrinterTicker.addIssue(
@@ -2518,10 +2271,7 @@ class Runner {
         );
         farmPrinters[index].systemChecks.scanning.profile.status = "danger";
         farmPrinters[index].systemChecks.scanning.profile.date = new Date();
-        logger.error(
-          `Error grabbing system for: ${farmPrinters[index].printerURL}: Reason: `,
-          err
-        );
+        logger.error(`Error grabbing system for: ${farmPrinters[index].printerURL}: Reason: `, err);
         return false;
       });
   }
@@ -2676,9 +2426,7 @@ class Runner {
             farmPrinters[index]._id
           );
 
-          let piSupport = await this.octoPrintService.getPluginPiSupport(
-            farmPrinters[index]
-          );
+          let piSupport = await this.octoPrintService.getPluginPiSupport(farmPrinters[index]);
           piSupport = await piSupport.json();
 
           farmPrinters[index].octoPi = {
@@ -2785,8 +2533,7 @@ class Runner {
             if (res.webcam.streamUrl.includes("http")) {
               farmPrinters[index].camURL = res.webcam.streamUrl;
             } else {
-              farmPrinters[index].camURL =
-                farmPrinters[index].printerURL + res.webcam.streamUrl;
+              farmPrinters[index].camURL = farmPrinters[index].printerURL + res.webcam.streamUrl;
             }
             const printer = await Printers.findById(id);
             printer.camURL = farmPrinters[index].camURL;
@@ -2804,9 +2551,7 @@ class Runner {
 
         farmPrinters[index].systemChecks.scanning.settings.status = "success";
         farmPrinters[index].systemChecks.scanning.settings.date = new Date();
-        logger.info(
-          `Successfully grabbed Settings for...: ${farmPrinters[index].printerURL}`
-        );
+        logger.info(`Successfully grabbed Settings for...: ${farmPrinters[index].printerURL}`);
       })
       .catch((err) => {
         PrinterTicker.addIssue(
@@ -2870,10 +2615,7 @@ class Runner {
         );
         farmPrinters[index].systemChecks.scanning.system.status = "danger";
         farmPrinters[index].systemChecks.scanning.system.date = new Date();
-        logger.error(
-          `Error grabbing system for: ${farmPrinters[index].printerURL}: Reason: `,
-          err
-        );
+        logger.error(`Error grabbing system for: ${farmPrinters[index].printerURL}: Reason: `, err);
         return false;
       });
   }
@@ -2894,10 +2636,7 @@ class Runner {
       // Re-generate the printer clean information - This is just cautionary, my tests showed it wasn't needed.
     }
 
-    await PrinterClean.generate(
-      farmPrinters[index],
-      systemSettings.filamentManager
-    );
+    await PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
   }
 
   static getColour(state) {
@@ -2963,12 +2702,9 @@ class Runner {
     const i = _.findIndex(farmPrinters, function (o) {
       return o._id == printer._id;
     });
-    const index = await _.findIndex(
-      farmPrinters[i].fileList.files,
-      function (o) {
-        return o.fullPath === fullPath;
-      }
-    );
+    const index = await _.findIndex(farmPrinters[i].fileList.files, function (o) {
+      return o.fullPath === fullPath;
+    });
     farmPrinters[i].fileList.files.splice(index, 1);
     farmPrinters[i].fileList.fileCount = farmPrinters[i].fileList.files.length;
     farmPrinters[i].markModified("fileList");
@@ -2992,13 +2728,10 @@ class Runner {
               "profile.index": selectedFilament[s].spools.profile
             });
           } else {
-            profile = await Profiles.findById(
-              selectedFilament[s].spools.profile
-            );
+            profile = await Profiles.findById(selectedFilament[s].spools.profile);
           }
           currentFilament[s].spools.profile = profile.profile;
-          farmPrinters[i].selectedFilament[s].spools.material =
-            profile.profile.material;
+          farmPrinters[i].selectedFilament[s].spools.material = profile.profile.material;
         } catch (e) {
           logger.error("Couldn't find profile", e);
         }
@@ -3081,9 +2814,7 @@ class Runner {
           return _.transform(object, function (result, value, key) {
             if (!_.isEqual(value, base[key])) {
               result[key] =
-                _.isObject(value) && _.isObject(base[key])
-                  ? changes(value, base[key])
-                  : value;
+                _.isObject(value) && _.isObject(base[key]) ? changes(value, base[key]) : value;
             }
           });
         } catch (e) {
@@ -3106,11 +2837,9 @@ class Runner {
       let updatePrinter = false;
       if (
         settings.printer.printerName !== "" &&
-        settings.printer.printerName !==
-          farmPrinters[index].settingsAppearance.name
+        settings.printer.printerName !== farmPrinters[index].settingsAppearance.name
       ) {
-        farmPrinters[index].settingsAppearance.name =
-          settings.printer.printerName;
+        farmPrinters[index].settingsAppearance.name = settings.printer.printerName;
         printer.settingsAppearance.name = settings.printer.printerName;
         printer.markModified("settingsApperance");
         updatePrinter = true;
@@ -3130,13 +2859,9 @@ class Runner {
       }
 
       const currentWebSocketURL = new URL(farmPrinters[index].webSocketURL);
-      if (
-        settings.printer.webSocketProtocol !==
-        currentWebSocketURL.protocol + "//"
-      ) {
+      if (settings.printer.webSocketProtocol !== currentWebSocketURL.protocol + "//") {
         // If we detect q difference then rebuild the websocket URL and mark for scan.
-        printer.webSocketURL =
-          settings.printer.webSocketProtocol + currentWebSocketURL.host;
+        printer.webSocketURL = settings.printer.webSocketProtocol + currentWebSocketURL.host;
         farmPrinters[index].webSocketURL =
           settings.printer.webSocketProtocol + currentWebSocketURL.host;
         printer.markModified("webSocketURL");
@@ -3175,26 +2900,16 @@ class Runner {
         printerProfilePreference: settings.connection.preferredProfile
       };
 
-      if (
-        typeof settings.other !== "undefined" &&
-        settings.other.coolDown != ""
-      ) {
-        farmPrinters[index].tempTriggers.coolDown = parseInt(
-          settings.other.coolDown
-        );
+      if (typeof settings.other !== "undefined" && settings.other.coolDown != "") {
+        farmPrinters[index].tempTriggers.coolDown = parseInt(settings.other.coolDown);
         printer.tempTriggers.coolDown = parseInt(settings.other.coolDown);
         printer.markModified("tempTriggers");
       }
-      if (
-        typeof settings.other !== "undefined" &&
-        settings.other.heatingVariation != ""
-      ) {
+      if (typeof settings.other !== "undefined" && settings.other.heatingVariation != "") {
         farmPrinters[index].tempTriggers.heatingVariation = parseFloat(
           settings.other.heatingVariation
         );
-        printer.tempTriggers.heatingVariation = parseFloat(
-          settings.other.heatingVariation
-        );
+        printer.tempTriggers.heatingVariation = parseFloat(settings.other.heatingVariation);
         printer.markModified("tempTriggers");
       }
       for (const key in settings.costSettings) {
@@ -3205,10 +2920,7 @@ class Runner {
       }
 
       printer.markModified("costSettings");
-      let differences = difference(
-        settings.costSettings,
-        farmPrinters[index].costSettings
-      );
+      let differences = difference(settings.costSettings, farmPrinters[index].costSettings);
 
       for (const key in differences) {
         if (differences[key] !== null && differences[key] !== "") {
@@ -3219,61 +2931,47 @@ class Runner {
 
       if (
         settings.powerCommands.powerOnCommand !== "" &&
-        settings.powerCommands.powerOnCommand !==
-          farmPrinters[index].powerSettings.powerOnCommand
+        settings.powerCommands.powerOnCommand !== farmPrinters[index].powerSettings.powerOnCommand
       ) {
-        farmPrinters[index].powerSettings.powerOnCommand =
-          settings.powerCommands.powerOnCommand;
-        printer.powerSettings.powerOnCommand =
-          settings.powerCommands.powerOnCommand;
+        farmPrinters[index].powerSettings.powerOnCommand = settings.powerCommands.powerOnCommand;
+        printer.powerSettings.powerOnCommand = settings.powerCommands.powerOnCommand;
       }
       if (
         settings.powerCommands.powerOnURL !== "" &&
-        settings.powerCommands.powerOnURL !==
-          farmPrinters[index].powerSettings.powerOnURL
+        settings.powerCommands.powerOnURL !== farmPrinters[index].powerSettings.powerOnURL
       ) {
-        farmPrinters[index].powerSettings.powerOnURL =
-          settings.powerCommands.powerOnURL;
+        farmPrinters[index].powerSettings.powerOnURL = settings.powerCommands.powerOnURL;
         printer.powerSettings.powerOnURL = settings.powerCommands.powerOnURL;
       }
       if (
         settings.powerCommands.powerOffCommand !== "" &&
-        settings.powerCommands.powerOffCommand !==
-          farmPrinters[index].powerSettings.powerOffCommand
+        settings.powerCommands.powerOffCommand !== farmPrinters[index].powerSettings.powerOffCommand
       ) {
-        farmPrinters[index].powerSettings.powerOffCommand =
-          settings.powerCommands.powerOffCommand;
-        printer.powerSettings.powerOffCommand =
-          settings.powerCommands.powerOffCommand;
+        farmPrinters[index].powerSettings.powerOffCommand = settings.powerCommands.powerOffCommand;
+        printer.powerSettings.powerOffCommand = settings.powerCommands.powerOffCommand;
       }
       if (
         settings.powerCommands.powerOffURL !== "" &&
-        settings.powerCommands.powerOffURL !==
-          farmPrinters[index].powerSettings.powerOffURL
+        settings.powerCommands.powerOffURL !== farmPrinters[index].powerSettings.powerOffURL
       ) {
         printer.powerSettings.powerOffURL = settings.powerCommands.powerOffURL;
-        farmPrinters[index].powerSettings.powerOffURL =
-          settings.powerCommands.powerOffURL;
+        farmPrinters[index].powerSettings.powerOffURL = settings.powerCommands.powerOffURL;
       }
       if (
         settings.powerCommands.powerToggleCommand !== "" &&
         settings.powerCommands.powerToggleCommand !==
           farmPrinters[index].powerSettings.powerToggleCommand
       ) {
-        printer.powerSettings.powerToggleCommand =
-          settings.powerCommands.powerToggleCommand;
+        printer.powerSettings.powerToggleCommand = settings.powerCommands.powerToggleCommand;
         farmPrinters[index].powerSettings.powerToggleCommand =
           settings.powerCommands.powerToggleCommand;
       }
       if (
         settings.powerCommands.powerToggleURL !== "" &&
-        settings.powerCommands.powerToggleURL !==
-          farmPrinters[index].powerSettings.powerToggleURL
+        settings.powerCommands.powerToggleURL !== farmPrinters[index].powerSettings.powerToggleURL
       ) {
-        printer.powerSettings.powerToggleURL =
-          settings.powerCommands.powerToggleURL;
-        farmPrinters[index].powerSettings.powerToggleURL =
-          settings.powerCommands.powerToggleURL;
+        printer.powerSettings.powerToggleURL = settings.powerCommands.powerToggleURL;
+        farmPrinters[index].powerSettings.powerToggleURL = settings.powerCommands.powerToggleURL;
       }
       if (
         settings.powerCommands.powerStatusCommand !== "" &&
@@ -3282,18 +2980,14 @@ class Runner {
       ) {
         farmPrinters[index].powerSettings.powerStatusCommand =
           settings.powerCommands.powerStatusCommand;
-        printer.powerSettings.powerStatusCommand =
-          settings.powerCommands.powerStatusCommand;
+        printer.powerSettings.powerStatusCommand = settings.powerCommands.powerStatusCommand;
       }
       if (
         settings.powerCommands.powerStatusURL !== "" &&
-        settings.powerCommands.powerStatusURL !==
-          farmPrinters[index].powerSettings.powerStatusURL
+        settings.powerCommands.powerStatusURL !== farmPrinters[index].powerSettings.powerStatusURL
       ) {
-        farmPrinters[index].powerSettings.powerStatusURL =
-          settings.powerCommands.powerStatusURL;
-        printer.powerSettings.powerStatusURL =
-          settings.powerCommands.powerStatusURL;
+        farmPrinters[index].powerSettings.powerStatusURL = settings.powerCommands.powerStatusURL;
+        printer.powerSettings.powerStatusURL = settings.powerCommands.powerStatusURL;
       }
       if (settings.powerCommands.wol.enabled) {
         farmPrinters[index].powerSettings.wol = settings.powerCommands.wol;
@@ -3324,8 +3018,7 @@ class Runner {
         for (const key in settings.gcode) {
           if (settings.gcode[key].length !== 0) {
             updateOctoPrintGcode[key] = settings.gcode[key];
-            farmPrinters[index].settingsScripts.gcode[key] =
-              settings.gcode[key];
+            farmPrinters[index].settingsScripts.gcode[key] = settings.gcode[key];
           }
         }
         const opts = {
@@ -3437,14 +3130,10 @@ class Runner {
     });
     farmPrinters[i].fileList.files.forEach((file, index) => {
       if (file.path === oldFolder) {
-        const fileName = farmPrinters[i].fileList.files[
-          index
-        ].fullPath.substring(
+        const fileName = farmPrinters[i].fileList.files[index].fullPath.substring(
           farmPrinters[i].fileList.files[index].fullPath.lastIndexOf("/") + 1
         );
-        farmPrinters[i].fileList.files[
-          index
-        ].fullPath = `${folderName}/${fileName}`;
+        farmPrinters[i].fileList.files[index].fullPath = `${folderName}/${fileName}`;
         farmPrinters[i].fileList.files[index].path = folderName;
       }
     });
@@ -3479,8 +3168,7 @@ class Runner {
     });
     farmPrinters[i].fileList.folders.splice(folder, 1);
     farmPrinters[i].fileList.fileCount = farmPrinters[i].fileList.files.length;
-    farmPrinters[i].fileList.folderCount =
-      farmPrinters[i].fileList.folders.length;
+    farmPrinters[i].fileList.folderCount = farmPrinters[i].fileList.folders.length;
     farmPrinters[i].markModified("fileList");
     farmPrinters[i].save();
     const currentFilament = await Runner.compileSelectedFilament(
@@ -3511,8 +3199,7 @@ class Runner {
     };
 
     farmPrinters[i].fileList.folders.push(newFolder);
-    farmPrinters[i].fileList.folderCount =
-      farmPrinters[i].fileList.folders.length;
+    farmPrinters[i].fileList.folderCount = farmPrinters[i].fileList.folders.length;
     farmPrinters[i].markModified("fileList");
     farmPrinters[i].save();
     const currentFilament = await Runner.compileSelectedFilament(
@@ -3528,9 +3215,7 @@ class Runner {
       if (Array.isArray(farmPrinters[i].selectedFilament)) {
         for (let f = 0; f < farmPrinters[i].selectedFilament.length; f++) {
           if (farmPrinters[i].selectedFilament[f] !== null) {
-            const newInfo = await Filament.findById(
-              farmPrinters[i].selectedFilament[f]._id
-            );
+            const newInfo = await Filament.findById(farmPrinters[i].selectedFilament[f]._id);
             const printer = await Printers.findById(farmPrinters[i]._id);
             farmPrinters[i].selectedFilament[f] = newInfo;
             printer.selectedFilament[f] = newInfo;
@@ -3543,9 +3228,7 @@ class Runner {
           }
         }
       } else if (farmPrinters[i].selectedFilament != null) {
-        const newInfo = await Filament.findById(
-          farmPrinters[i].selectedFilament._id
-        );
+        const newInfo = await Filament.findById(farmPrinters[i].selectedFilament._id);
         const printer = await Printers.findById(farmPrinters[i]._id);
         farmPrinters[i].selectedFilament = newInfo;
         printer.selectedFilament = newInfo;
@@ -3571,12 +3254,9 @@ class Runner {
       printer.selectedFilament[tool] = null;
       farmPrinters[i].selectedFilament[tool] = null;
       // Find in selected filament list and remove
-      const selected = _.findIndex(
-        farmPrinters[i].selectedFilament,
-        function (o) {
-          return o == filamentId;
-        }
-      );
+      const selected = _.findIndex(farmPrinters[i].selectedFilament, function (o) {
+        return o == filamentId;
+      });
     } else if (!Array.isArray(farmPrinters[i].selectedFilament)) {
       // Setup new spool...
       // Make sure selectedFilament is an array
@@ -3651,9 +3331,7 @@ class Runner {
     if (fileTimeout <= 20000) {
       logger.info(
         `Updating new file ${
-          farmPrinters[i].fileList.files[
-            farmPrinters[i].fileList.files.length - 1
-          ].name
+          farmPrinters[i].fileList.files[farmPrinters[i].fileList.files.length - 1].name
         } for Printer:${farmPrinters[i].printerURL}`
       );
       setTimeout(async function () {
@@ -3665,20 +3343,14 @@ class Runner {
         fileTimeout = fileTimeout + 5000;
         if (fileInformation) {
           logger.info("New File Information:", fileInformation);
-          farmPrinters[i].fileList.files[
-            farmPrinters[i].fileList.files.length - 1
-          ] = fileInformation;
+          farmPrinters[i].fileList.files[farmPrinters[i].fileList.files.length - 1] =
+            fileInformation;
           farmPrinters[i].markModified("fileList");
           farmPrinters[i].save();
-          if (
-            fileInformation.time === null ||
-            fileInformation.time === "No Time Estimate"
-          ) {
+          if (fileInformation.time === null || fileInformation.time === "No Time Estimate") {
             logger.info("File Information Still Missing Retrying...");
             Runner.updateFile(
-              farmPrinters[i].fileList.files[
-                farmPrinters[i].fileList.files.length - 1
-              ],
+              farmPrinters[i].fileList.files[farmPrinters[i].fileList.files.length - 1],
               i
             );
             const currentFilament = await Runner.compileSelectedFilament(
@@ -3700,9 +3372,7 @@ class Runner {
         }
       }, 5000);
     } else {
-      logger.info(
-        "File information took too long to generate, awaiting manual scan..."
-      );
+      logger.info("File information took too long to generate, awaiting manual scan...");
     }
   }
 
@@ -3724,9 +3394,7 @@ class Runner {
       return o._id == printerId;
     });
 
-    let connectionLogs = await PrinterClean.generateConnectionLogs(
-      farmPrinters[i]
-    );
+    let connectionLogs = await PrinterClean.generateConnectionLogs(farmPrinters[i]);
     return connectionLogs;
   }
 
@@ -3764,12 +3432,9 @@ class Runner {
       farmPrinters.forEach((printer) => {
         for (var key in printer.settingsPlugins) {
           if (printer.settingsPlugins.hasOwnProperty(key)) {
-            let installedPlugin = _.findIndex(
-              printer.pluginsList,
-              function (o) {
-                return o.id == key;
-              }
-            );
+            let installedPlugin = _.findIndex(printer.pluginsList, function (o) {
+              return o.id == key;
+            });
             if (installedPlugin > -1) {
               compatiblePluginList.push(printer.pluginsList[installedPlugin]);
             }

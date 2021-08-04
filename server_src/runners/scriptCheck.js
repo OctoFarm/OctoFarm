@@ -1,4 +1,4 @@
-const Logger = require("../lib/logger.js");
+const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-Scripts");
 const serverScripts = require("../lib/serverScripts.js");
 const Script = serverScripts.Script;

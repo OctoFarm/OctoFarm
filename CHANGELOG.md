@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
     - Task scheduler: runs periodic tasks for OctoFarm in a controllable, periodic manner.
     - Added line counter to ticker log
     - Refactored task manager so it becomes easier to use
+    - Global Client Error Handler: Grabs any errant / uncaught errors and displays a modal
 
 ### Changed
     - File manager: gave printer titles a badge. Gave selected printer a yellow border. Reduced file list minimum height (for smaller screens). 
@@ -19,6 +20,11 @@ All notable changes to this project will be documented in this file.
     - Refactor monitoring pages (panel, list, camera) with latest SSE client reusability.
     - Refine the printer map layout with borders and printer quick actions (page not public yet).
     - Reduced logging (we will bring it back later in different shape with an Exception handler)
+    - Replaced fetch with axios in the local OctoFarm client calls.  
+    - Moved all error handling for client connections into axios calls
+    - Refactored System page into separate manageable files ejs/js, cleaned up a lot of code. 
+    - Updated the system page layout. 
+    - Moved filament manager plugin actions to separate service file. 
 
 ### Removed
 
@@ -31,7 +37,9 @@ All notable changes to this project will be documented in this file.
     - Added Filament Clean back to start up so filament manager and spools list load.
     - Fixed #605: Tool total would show "null" if no spool selected. 
     - Issue with totals not been counted with/without a spool selected on Printer Control.
+    - Fixed #667: Weekly Utility was not loading the previous days values.
     - Fixed #698: Current Operations would try to load the old browser worker. Replaced with sse client.
+    - Fixed #681: Current Operations would load on dashboard even when not enabled in settings
 
 ## [v1.2-rc1]
 

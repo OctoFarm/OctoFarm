@@ -13,7 +13,20 @@ const defaultProductionEnv = "production";
 const defaultTestEnv = "test";
 const knownEnvNames = ["development", "production", "test"];
 
+// Make sure the client is up to date with this
+const jsonStringify = false;
+
+const apiRoute = "/api";
+
 class AppConstants {
+  static get jsonStringify() {
+    return jsonStringify;
+  }
+
+  static get apiRoute() {
+    return apiRoute;
+  }
+
   static get defaultMongoStringUnauthenticated() {
     return defaultMongoStringUnauthenticated;
   }

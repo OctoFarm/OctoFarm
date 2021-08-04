@@ -1,7 +1,7 @@
 "use strict";
 
 const _ = require("lodash");
-const Logger = require("../logger.js");
+const Logger = require("../../handlers/logger.js");
 const Spools = require("../../models/Filament.js");
 const Profiles = require("../../models/Profiles.js");
 const { PrinterClean } = require("./printerClean.js");

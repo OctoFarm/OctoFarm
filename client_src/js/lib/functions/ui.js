@@ -4,12 +4,8 @@ const printerSettingsModal = document.getElementById("printerSettingsModal");
 const printerManagerModal = document.getElementById("printerManagerModal");
 const printerLogsModal = document.getElementById("printerLogsModal");
 const printerStatisticsModal = document.getElementById("printerStatistics");
-const printerCustomGcodeScriptsModal = document.getElementById(
-  "printerCustomGcodeScriptsModal"
-);
-const printerSelectModal = document.getElementById(
-  "printerCustomGcodeScriptsModal"
-);
+const printerCustomGcodeScriptsModal = document.getElementById("printerCustomGcodeScriptsModal");
+const printerSelectModal = document.getElementById("printerCustomGcodeScriptsModal");
 const currentModals = [
   printerSettingsModal,
   printerManagerModal,
@@ -112,17 +108,19 @@ export default class UI {
       });
     });
   }
+  //TODO: Move to a templates folder
+  static returnSpinnerTemplate() {
+    return '<i class="fas fa-spinner fa-spin"></i>';
+  }
+
   static removeLoaderFromElementInnerHTML(element) {
     if (element.innerHTML.includes("spinner")) {
-      element.innerHTML = element.innerHTML.replace(
-        '<i class="fas fa-spinner fa-spin"></i>',
-        ""
-      );
+      element.innerHTML = element.innerHTML.replace(UI.returnSpinnerTemplate(), "");
     }
   }
   static addLoaderToElementsInnerHTML(element) {
     if (!element.innerHTML.includes("spinner")) {
-      element.innerHTML += ' <i class="fas fa-spinner fa-spin"></i>';
+      element.innerHTML += UI.returnSpinnerTemplate();
     }
   }
   static checkIfAnyModalShown() {
@@ -132,9 +130,7 @@ export default class UI {
     return modalArray.includes(true);
   }
   static checkIfSpecificModalShown(modalToCheck) {
-    const currentModal = currentModals.filter(
-      (modal) => modal.id === modalToCheck
-    );
+    const currentModal = currentModals.filter((modal) => modal.id === modalToCheck);
     if (currentModal[0]) {
       return currentModal[0].classList.contains("show");
     } else {

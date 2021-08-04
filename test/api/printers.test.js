@@ -3,7 +3,7 @@ jest.mock("../../server_src/config/auth");
 const dbHandler = require("../db-handler");
 const supertest = require("supertest");
 const { Runner } = require("../../server_src/runners/state");
-const { setupTestApp } = require("../../app-test");
+const { setupTestApp } = require("../../server_src/app-test");
 
 let request;
 
@@ -22,7 +22,10 @@ describe("Printers", () => {
     // TODO bug input validation completely lacking
     const res = await request.post("/printers/add").send([
       {
+        sortIndex: 0,
         settingsAppearance: null,
+        printerURL: "test",
+        webSocketURL: "test",
         apikey: "dafuc",
         tempTriggers: { heatingVariation: null }
       }

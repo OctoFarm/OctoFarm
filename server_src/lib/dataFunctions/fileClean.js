@@ -1,12 +1,10 @@
 "use strict";
 
 const _ = require("lodash");
-const Logger = require("../logger.js");
-const { getPrintCostNumeric } = require("../utils/print-cost.util");
+const Logger = require("../../handlers/logger.js");
+const { getPrintCostNumeric } = require("../../utils/print-cost.util");
 
-const {
-  getDefaultFileCleanStatistics
-} = require("../providers/cleaner.constants");
+const { getDefaultFileCleanStatistics } = require("../providers/cleaner.constants");
 
 const logger = new Logger("OctoFarm-InformationCleaning");
 const cleanFileList = [];
@@ -78,14 +76,12 @@ class FileClean {
     if (fileSizes.length !== 0) {
       fileStatistics.biggestFile = Math.max(...fileSizes);
       fileStatistics.smallestFile = Math.min(...fileSizes);
-      fileStatistics.averageFile =
-        fileSizes.reduce((a, b) => a + b, 0) / fileCount.length;
+      fileStatistics.averageFile = fileSizes.reduce((a, b) => a + b, 0) / fileCount.length;
     }
     if (fileLengths.length !== 0) {
       fileStatistics.biggestLength = Math.max(...fileLengths);
       fileStatistics.smallestLength = Math.min(...fileLengths);
-      fileStatistics.averageLength =
-        fileLengths.reduce((a, b) => a + b, 0) / fileCount.length;
+      fileStatistics.averageLength = fileLengths.reduce((a, b) => a + b, 0) / fileCount.length;
     }
   }
 
@@ -93,32 +89,24 @@ class FileClean {
     const { fileList, sortIndex } = farmPrinter;
 
     if (!fileList) {
-      logger.error(
-        "Printer File Cleaner failed: farmPrinter:fileList not defined."
-      );
+      logger.error("Printer File Cleaner failed: farmPrinter:fileList not defined.");
       return;
     }
 
     // NaN, object, undefined here
     if (Number.isNaN(sortIndex) || isNaN(sortIndex)) {
-      logger.error(
-        `Printer File Cleaner failed: farmPrinter:sortIndex is NaN (${sortIndex})`
-      );
+      logger.error(`Printer File Cleaner failed: farmPrinter:sortIndex is NaN (${sortIndex})`);
       return;
     }
 
     // null, string caught here
     if (!sortIndex && !Number.isInteger(sortIndex)) {
-      logger.error(
-        `Printer File Cleaner failed: farmPrinter:sortIndex not defined (${sortIndex})`
-      );
+      logger.error(`Printer File Cleaner failed: farmPrinter:sortIndex not defined (${sortIndex})`);
       return;
     }
 
     if (sortIndex < 0) {
-      logger.error(
-        `File Cleaner failed: farmPrinter:sortIndex cannot be negative (${sortIndex})`
-      );
+      logger.error(`File Cleaner failed: farmPrinter:sortIndex cannot be negative (${sortIndex})`);
       return;
     }
 
@@ -145,14 +133,8 @@ class FileClean {
           expectedPrintTime: file.time,
           printCost: getPrintCostNumeric(file.time, printCost)
         };
-        sortedFile.toolUnits = FileClean.getUnits(
-          selectedFilament,
-          file.length
-        );
-        sortedFile.toolCosts = FileClean.getCost(
-          selectedFilament,
-          sortedFile.toolUnits
-        );
+        sortedFile.toolUnits = FileClean.getUnits(selectedFilament, file.length);
+        sortedFile.toolCosts = FileClean.getCost(selectedFilament, sortedFile.toolUnits);
         sortedFileList.push(sortedFile);
       }
     }
@@ -185,30 +167,21 @@ class FileClean {
     if (!!fileLength) {
       for (let l = 0; l < fileLength.length; l++) {
         const length = fileLength[l] / 1000;
-        if (
-          typeof filamentSelection !== "undefined" &&
-          Array.isArray(filamentSelection)
-        ) {
+        if (typeof filamentSelection !== "undefined" && Array.isArray(filamentSelection)) {
           if (filamentSelection[l] === null) {
             const radius = 1.75 / 2;
             const volume = length * Math.PI * radius * radius;
             const usage = volume * 1.24;
             lengthArray.push(length);
             weightArray.push(usage);
-            strings.push(
-              `<b>Tool ${l}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`
-            );
+            strings.push(`<b>Tool ${l}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`);
           } else if (typeof filamentSelection[l] !== "undefined") {
-            const radius =
-              parseFloat(filamentSelection[l].spools.profile.diameter) / 2;
+            const radius = parseFloat(filamentSelection[l].spools.profile.diameter) / 2;
             const volume = length * Math.PI * radius * radius;
-            const usage =
-              volume * parseFloat(filamentSelection[l].spools.profile.density);
+            const usage = volume * parseFloat(filamentSelection[l].spools.profile.density);
             lengthArray.push(length);
             weightArray.push(usage);
-            strings.push(
-              `<b>Tool ${l}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`
-            );
+            strings.push(`<b>Tool ${l}:</b> ${length.toFixed(2)}m / ${usage.toFixed(2)}g`);
           } else {
             lengthArray.push(0);
             weightArray.push(0);
@@ -223,9 +196,7 @@ class FileClean {
 
       const totalLength = lengthArray.reduce((a, b) => a + b, 0);
       const totalGrams = weightArray.reduce((a, b) => a + b, 0);
-      const total = `<b>Total: </b>${totalLength.toFixed(
-        2
-      )}m / ${totalGrams.toFixed(2)}g`;
+      const total = `<b>Total: </b>${totalLength.toFixed(2)}m / ${totalGrams.toFixed(2)}g`;
       strings.unshift(total);
       return strings;
     }
@@ -249,21 +220,14 @@ class FileClean {
     filamentSelection = JSON.parse(JSON.stringify(filamentSelection));
     filamentSelection.unshift("SKIP");
     for (let u = 0; u < units.length; u++) {
-      if (
-        typeof filamentSelection !== "undefined" &&
-        Array.isArray(filamentSelection)
-      ) {
+      if (typeof filamentSelection !== "undefined" && Array.isArray(filamentSelection)) {
         if (filamentSelection[u] === "SKIP") {
-        } else if (
-          typeof filamentSelection[u] !== "undefined" &&
-          filamentSelection[u] !== null
-        ) {
+        } else if (typeof filamentSelection[u] !== "undefined" && filamentSelection[u] !== null) {
           let newUnit = units[u].split(" / ");
           newUnit = newUnit[1].replace("g", "");
           if (!units[u].includes("Total")) {
             const cost = (
-              (filamentSelection[u].spools.price /
-                filamentSelection[u].spools.weight) *
+              (filamentSelection[u].spools.price / filamentSelection[u].spools.weight) *
               parseFloat(newUnit)
             ).toFixed(2);
             costArray.push(parseFloat(cost));

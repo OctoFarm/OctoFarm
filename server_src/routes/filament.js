@@ -16,7 +16,7 @@ const printerClean = require("../lib/dataFunctions/printerClean.js");
 
 const { PrinterClean } = printerClean;
 
-const Logger = require("../lib/logger.js");
+const Logger = require("../handlers/logger.js");
 
 const logger = new Logger("OctoFarm-FilamentManager");
 

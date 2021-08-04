@@ -1,3 +1,5 @@
+<% const octofarmErrorModal = './partials/octofarm-error.modal.ejs'  %>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -21,11 +23,12 @@
     <link rel="stylesheet" href="/assets/dist/octofarm.css"/>
     <title><%= octoFarmPageTitle %>: <%= page %></title>
     <!-- Avoid trouble -->
+    <script src="/assets/dist/client-error.modal.min.js"></script>
     <script src="/assets/jquery.min.js"></script>
     <script src="/assets/bootbox.min.js"></script>
     <script src="/assets/dist/bootstrap.min.js"></script>
     <script src="/assets/dist/vendor.min.js"></script>
-    <script src="/assets/dist/serverAliveCheck.min.js"></script>
+    <script src="/assets/dist/amialive.service.min.js"></script>
 </head>
 
 <body>
@@ -157,6 +160,7 @@
 </nav>
 <div class="restricScreenSize">
     <%- body %>
+    <%- include(octofarmErrorModal) %>
     <div class="modal fade" id="printerManagerModal" tabindex="-1" role="dialog"
          aria-labelledby="printerManagerModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-xl" role="document">

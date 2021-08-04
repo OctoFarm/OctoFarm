@@ -1,9 +1,8 @@
-import OctoFarmClient from "./lib/octofarm.js";
 import Calc from "./lib/functions/calc.js";
 import UI from "./lib/functions/ui.js";
-import { returnDropDown } from "./lib/modules/filamentGrab.js";
-import OctoFarmclient from "./lib/octofarm.js";
+import { returnDropDown } from "./services/filament-manager-plugin.service";
 import * as ApexCharts from "apexcharts";
+import OctoFarmClient from "./services/octofarm-client.service";
 
 // Setup history listeners
 document.getElementById("historyTable").addEventListener("click", (e) => {
@@ -22,11 +21,9 @@ $("#historyModal").on("hidden.bs.modal", function (e) {
   document.getElementById("historyUpdateCostBtn").remove();
 });
 
-export default class History {
+class History {
   static async get() {
-    // let numOr0 = n => isNaN(n) ? 0 : parseFloat(n)
-    const newHistory = await OctoFarmClient.get("history/get");
-    historyList = await newHistory.json();
+    historyList = await OctoFarmClient.get("history/get");
     jplist.init({
       storage: "localStorage", // 'localStorage', 'sessionStorage' or 'cookies'
       storageName: "history-sorting" // the same storage name can be used to share storage between multiple pages
@@ -35,8 +32,7 @@ export default class History {
     document.getElementById("wrapper").classList.remove("d-none");
     document.getElementById("historyToolbar").classList.remove("d-none");
 
-    let historyStatistics = await OctoFarmclient.get("history/statisticsData");
-    historyStatistics = await historyStatistics.json();
+    let historyStatistics = await OctoFarmClient.getHistoryStatistics();
     let historyGraphData = historyStatistics.history.historyByDay;
 
     const historyGraphOptions = {
@@ -165,16 +161,12 @@ export default class History {
       </button>
     `
       );
-      document
-        .getElementById("historySaveBtn")
-        .addEventListener("click", (f) => {
-          History.save(e.target.id);
-        });
-      document
-        .getElementById("historyUpdateCostBtn")
-        .addEventListener("click", (f) => {
-          History.updateCost(e.target.id);
-        });
+      document.getElementById("historySaveBtn").addEventListener("click", (f) => {
+        History.save(e.target.id);
+      });
+      document.getElementById("historyUpdateCostBtn").addEventListener("click", (f) => {
+        History.updateCost(e.target.id);
+      });
       // Grab elements
       const printerName = document.getElementById("printerName");
       const fileName = document.getElementById("fileName");
@@ -223,9 +215,7 @@ export default class History {
       resendStats.placeholder = " - ";
 
       const thumbnail = document.getElementById("thumbnails");
-      const thumbnailIndicators = document.getElementById(
-        "thumbnails-indicators"
-      );
+      const thumbnailIndicators = document.getElementById("thumbnails-indicators");
       thumbnail.innerHTML = "";
       thumbnailIndicators.innerHTML = "";
       const index = _.findIndex(historyList.history, function (o) {
@@ -238,15 +228,11 @@ export default class History {
         resendStats.placeholder = `${current.resend.count} / ${
           current.resend.transmitted / 1000
         }K (${current.resend.ratio.toFixed(0)})`;
-        if (
-          document.getElementById("resendsTitle").classList.contains("d-none")
-        ) {
+        if (document.getElementById("resendsTitle").classList.contains("d-none")) {
           document.getElementById("resendsTitle").classList.remove("d-none");
         }
       } else {
-        if (
-          !document.getElementById("resendsTitle").classList.contains("d-none")
-        ) {
+        if (!document.getElementById("resendsTitle").classList.contains("d-none")) {
           document.getElementById("resendsTitle").classList.add("d-none");
         }
       }
@@ -340,29 +326,17 @@ export default class History {
         document.getElementById("galleryElements").style.display = "none";
       }
 
-      startDate.innerHTML = `<b>Started</b><hr>${current.startDate.replace(
-        " - ",
-        "<br>"
-      )}`;
-      printTime.innerHTML = `<b>Duration</b><hr>${Calc.generateTime(
-        current.printTime
-      )}`;
-      endDate.innerHTML = `<b>Finished</b><hr>${current.endDate.replace(
-        " - ",
-        "<br>"
-      )}`;
+      startDate.innerHTML = `<b>Started</b><hr>${current.startDate.replace(" - ", "<br>")}`;
+      printTime.innerHTML = `<b>Duration</b><hr>${Calc.generateTime(current.printTime)}`;
+      endDate.innerHTML = `<b>Finished</b><hr>${current.endDate.replace(" - ", "<br>")}`;
       printerCost.value = current.printerCost;
       jobHourlyCost.value = current.costPerHour;
       notes.value = current.notes;
       actualPrintTime.value = Calc.generateTime(current.printTime);
       status.innerHTML = `${current.state}`;
       if (typeof current.job !== "undefined" && current.job !== null) {
-        estimatedPrintTime.value = Calc.generateTime(
-          current.job.estimatedPrintTime
-        );
-        printTimeAccuracy.value = `${
-          current.job.printTimeAccuracy.toFixed(0) / 100
-        }%`;
+        estimatedPrintTime.value = Calc.generateTime(current.job.estimatedPrintTime);
+        printTimeAccuracy.value = `${current.job.printTimeAccuracy.toFixed(0) / 100}%`;
       }
       jobCosting.value = current.totalCost;
       let upDate = new Date(current.file.uploadDate * 1000);
@@ -407,22 +381,14 @@ export default class History {
         );
       });
       for (let i = 0; i < toolsArray.length; i++) {
-        const currentToolDropDown = document.getElementById(
-          `filament-${toolsArray[i]}`
-        );
+        const currentToolDropDown = document.getElementById(`filament-${toolsArray[i]}`);
         const filamentList = await returnDropDown();
         filamentList.forEach((list) => {
           currentToolDropDown.insertAdjacentHTML("beforeend", list);
         });
         if (current.spools[i][toolsArray[i]].spoolId !== null) {
-          if (
-            SelectHasValue(
-              currentToolDropDown.id,
-              current.spools[i][toolsArray[i]].spoolId
-            )
-          ) {
-            currentToolDropDown.value =
-              current.spools[i][toolsArray[i]].spoolId;
+          if (SelectHasValue(currentToolDropDown.id, current.spools[i][toolsArray[i]].spoolId)) {
+            currentToolDropDown.value = current.spools[i][toolsArray[i]].spoolId;
           } else {
             currentToolDropDown.insertAdjacentHTML(
               "afterbegin",
@@ -432,8 +398,7 @@ export default class History {
               }</option>
           `
             );
-            currentToolDropDown.value =
-              current.spools[i][toolsArray[i]].spoolId;
+            currentToolDropDown.value = current.spools[i][toolsArray[i]].spoolId;
           }
         } else {
           currentToolDropDown.value = 0;
@@ -473,16 +438,17 @@ export default class History {
       id
     };
     let post = await OctoFarmClient.post("history/updateCostMatch", update);
-    post = await post.json();
-    if (post.status === 200) {
+    if (post) {
       UI.createAlert(
         "success",
         "Successfully added your printers cost to history.",
         3000,
         "clicked"
       );
-      document.getElementById(`printerCost-${id}`).innerHTML =
-        Calc.returnPrintCost(post.costSettings, post.printTime);
+      document.getElementById(`printerCost-${id}`).innerHTML = Calc.returnPrintCost(
+        post.costSettings,
+        post.printTime
+      );
     } else {
       UI.createAlert(
         "warning",
@@ -490,8 +456,10 @@ export default class History {
         3000,
         "clicked"
       );
-      document.getElementById(`printerCost-${id}`).innerHTML =
-        Calc.returnPrintCost(post.costSettings, post.printTime);
+      document.getElementById(`printerCost-${id}`).innerHTML = Calc.returnPrintCost(
+        post.costSettings,
+        post.printTime
+      );
     }
   }
 
@@ -510,13 +478,8 @@ export default class History {
 
     const post = await OctoFarmClient.post("history/update", update);
 
-    if (post.status === 200) {
-      UI.createAlert(
-        "success",
-        "Successfully updated your history entry...",
-        3000,
-        "clicked"
-      );
+    if (post) {
+      UI.createAlert("success", "Successfully updated your history entry...", 3000, "clicked");
       document.getElementById(`note-${id}`).innerHTML = update.note;
       document.getElementById(`spool-${id}`).innerHTML = update.filamentId;
     }
@@ -525,8 +488,7 @@ export default class History {
   static async delete(e) {
     if (e.target.classList.value.includes("historyDelete")) {
       bootbox.confirm({
-        message:
-          "Are you sure you'd like to delete this entry? this is not reversible.",
+        message: "Are you sure you'd like to delete this entry? this is not reversible.",
         buttons: {
           confirm: {
             label: "Yes",
@@ -543,17 +505,12 @@ export default class History {
               id: e.target.id
             };
             const post = await OctoFarmClient.post("history/delete", histID);
-            if (post.status === 200) {
+            if (post) {
               jplist.resetContent(function () {
                 // remove element with id = el1
                 e.target.parentElement.parentElement.parentElement.remove();
               });
-              UI.createAlert(
-                "success",
-                "Your history entry has been deleted...",
-                3000,
-                "clicked"
-              );
+              UI.createAlert("success", "Your history entry has been deleted...", 3000, "clicked");
             } else {
               UI.createAlert(
                 "error",
@@ -580,38 +537,18 @@ export default class History {
     const costPerHour = [];
     filtered.forEach((row) => {
       times.push(parseInt(row.getElementsByClassName("time")[0].innerText));
-      if (
-        !isNaN(
-          parseFloat(row.getElementsByClassName("filamentCost")[0].innerText)
-        )
-      ) {
-        cost.push(
-          parseFloat(row.getElementsByClassName("filamentCost")[0].innerText)
-        );
+      if (!isNaN(parseFloat(row.getElementsByClassName("filamentCost")[0].innerText))) {
+        cost.push(parseFloat(row.getElementsByClassName("filamentCost")[0].innerText));
       }
-      if (
-        !isNaN(
-          parseFloat(row.getElementsByClassName("printerCost")[0].innerText)
-        )
-      ) {
-        printerCost.push(
-          parseFloat(row.getElementsByClassName("printerCost")[0].innerText)
-        );
+      if (!isNaN(parseFloat(row.getElementsByClassName("printerCost")[0].innerText))) {
+        printerCost.push(parseFloat(row.getElementsByClassName("printerCost")[0].innerText));
       }
-      if (
-        !isNaN(
-          parseFloat(row.getElementsByClassName("totalUsageGrams")[0].innerText)
-        )
-      ) {
+      if (!isNaN(parseFloat(row.getElementsByClassName("totalUsageGrams")[0].innerText))) {
         totalUsageGrams.push(
           parseFloat(row.getElementsByClassName("totalUsageGrams")[0].innerText)
         );
       }
-      if (
-        !isNaN(
-          parseFloat(row.getElementsByClassName("totalUsageMeter")[0].innerText)
-        )
-      ) {
+      if (!isNaN(parseFloat(row.getElementsByClassName("totalUsageMeter")[0].innerText))) {
         totalUsageMeter.push(
           parseFloat(row.getElementsByClassName("totalUsageMeter")[0].innerText)
         );
@@ -626,16 +563,13 @@ export default class History {
       if (stateText === "Success") {
         statesSuccess.push(stateText);
       }
-      costPerHour.push(
-        parseFloat(row.getElementsByClassName("costPerHour")[0].innerHTML)
-      );
+      costPerHour.push(parseFloat(row.getElementsByClassName("costPerHour")[0].innerHTML));
     });
     const totalHourCost = costPerHour.reduce((a, b) => a + b, 0);
 
     const avgHourCost = totalHourCost / costPerHour.length;
 
-    const total =
-      statesCancelled.length + statesFailed.length + statesSuccess.length;
+    const total = statesCancelled.length + statesFailed.length + statesSuccess.length;
     const cancelledPercent = (statesCancelled.length / total) * 100;
     const failurePercent = (statesFailed.length / total) * 100;
     const successPercent = (statesSuccess.length / total) * 100;
@@ -648,18 +582,13 @@ export default class History {
     const cancelled = document.getElementById("totalCancelledPercent");
     cancelled.style.width = `${cancelledPercent.toFixed(2)}%`;
     cancelled.innerHTML = `${cancelledPercent.toFixed(2)}%`;
-    document.getElementById("totalCost").innerHTML = cost
-      .reduce((a, b) => a + b, 0)
-      .toFixed(2);
+    document.getElementById("totalCost").innerHTML = cost.reduce((a, b) => a + b, 0).toFixed(2);
     document.getElementById("totalFilament").innerHTML = `${totalUsageMeter
       .reduce((a, b) => a + b, 0)
-      .toFixed(2)}m / ${totalUsageGrams
-      .reduce((a, b) => a + b, 0)
-      .toFixed(2)}g`;
+      .toFixed(2)}m / ${totalUsageGrams.reduce((a, b) => a + b, 0).toFixed(2)}g`;
     const totalTimes = times.reduce((a, b) => a + b, 0);
 
-    document.getElementById("totalPrintTime").innerHTML =
-      Calc.generateTime(totalTimes);
+    document.getElementById("totalPrintTime").innerHTML = Calc.generateTime(totalTimes);
     document.getElementById("printerTotalCost").innerHTML = printerCost
       .reduce((a, b) => a + b, 0)
       .toFixed(2);
@@ -667,8 +596,7 @@ export default class History {
       parseFloat(printerCost.reduce((a, b) => a + b, 0).toFixed(2)) +
       parseFloat(cost.reduce((a, b) => a + b, 0).toFixed(2))
     ).toFixed(2);
-    document.getElementById("averageCostPerHour").innerHTML =
-      avgHourCost.toFixed(2);
+    document.getElementById("averageCostPerHour").innerHTML = avgHourCost.toFixed(2);
   }
 }
 const element = document.getElementById("listenerHistory");

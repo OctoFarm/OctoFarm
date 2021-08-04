@@ -1,23 +1,14 @@
 import "gridstack/dist/gridstack.min.css";
 import "gridstack/dist/h5/gridstack-dd-native";
-import OctoFarmclient from "./lib/octofarm.js";
-import {
-  bindGraphChangeUpdate,
-  loadGrid
-} from "./dashboard/grid-stack.manager";
+import OctoFarmClient from "./services/octofarm-client.service";
+import { bindGraphChangeUpdate, loadGrid } from "./dashboard/grid-stack.manager";
 import { ChartsManager } from "./dashboard/charts.manager";
-import { createClientSSEWorker } from "./lib/client-worker.js";
-import {
-  getUsageWeightSeries,
-  toFixedWeightGramFormatter
-} from "./dashboard/utils/chart.utils";
-import {
-  dashboardSSEventHandler,
-  workerURL
-} from "./dashboard/dashboard-sse.handler";
+import { createClientSSEWorker } from "./services/client-worker.service.js";
+import { getUsageWeightSeries, toFixedWeightGramFormatter } from "./dashboard/utils/chart.utils";
+import { dashboardSSEventHandler, workerURL } from "./dashboard/dashboard-sse.handler";
 
 async function updateHistoryGraphs() {
-  let historyStatistics = await OctoFarmclient.getHistoryStatistics();
+  let historyStatistics = await OctoFarmClient.getHistoryStatistics();
 
   let historyGraphData = historyStatistics.history.historyByDay;
   let filamentUsageByDay = historyStatistics.history.totalByDay;
@@ -31,7 +22,7 @@ async function updateHistoryGraphs() {
 async function initNewGraphs() {
   await ChartsManager.renderDefaultCharts();
 
-  let historyStatistics = await OctoFarmclient.getHistoryStatistics();
+  let historyStatistics = await OctoFarmClient.getHistoryStatistics();
 
   let printCompletionByDay = historyStatistics.history.historyByDay;
   let filamentUsageByDay = historyStatistics.history.totalByDay;
@@ -61,10 +52,7 @@ async function initNewGraphs() {
     }
     yAxisSeries.push(obj);
   });
-  await ChartsManager.renderFilamentUsageOverTimeChart(
-    filamentUsageOverTime,
-    yAxisSeries
-  );
+  await ChartsManager.renderFilamentUsageOverTimeChart(filamentUsageOverTime, yAxisSeries);
 
   const yAxis = [getUsageWeightSeries("Weight", filamentUsageByDay[0]?.name)];
   await ChartsManager.renderFilamentUsageByDayChart(filamentUsageByDay, yAxis);

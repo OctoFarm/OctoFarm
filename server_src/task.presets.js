@@ -17,6 +17,12 @@ class TASK_PRESETS {
     runImmediately: false // Just like setInterval
   };
 
+  static PERIODIC_DISABLED = {
+    ...this.PERIODIC,
+    runImmediately: true,
+    disabled: true // Something else will trigger it
+  };
+
   static PERIODIC_2500MS = {
     ...this.PERIODIC,
     milliseconds: 2500

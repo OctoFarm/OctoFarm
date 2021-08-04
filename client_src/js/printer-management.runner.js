@@ -1,4 +1,4 @@
-import { createClientSSEWorker } from "./lib/client-worker";
+import { createClientSSEWorker } from "./services/client-worker.service";
 import PrinterSelect from "./lib/modules/printerSelect";
 import {
   bulkOctoPrintClientUpdate,
@@ -10,7 +10,7 @@ import {
   bulkOctoPrintControlCommand,
   bulkOctoPrintGcodeCommand,
   bulkOctoPrintPluginAction
-} from "./printerManager/functions/bulk-commands-functions";
+} from "./printer-manager/functions/bulk-commands-functions";
 import {
   addBlankPrinterToTable,
   bulkDeletePrinters,
@@ -22,9 +22,9 @@ import {
   saveAllOnAddPrinterTable,
   scanNetworkForDevices,
   workerEventFunction
-} from "./printerManager/functions/printer-manager.functions";
-import { loadCustomGcodeScriptsModel } from "./printerManager/functions/custom-gcode-scripts.functions";
-import { setupSortablePrintersTable } from "./printerManager/functions/sortable-table";
+} from "./printer-manager/functions/printer-manager.functions";
+import { loadCustomGcodeScriptsModel } from "./printer-manager/functions/custom-gcode-scripts.functions";
+import { setupSortablePrintersTable } from "./printer-manager/functions/sortable-table";
 
 const workerURL = "/printersInfo/get/";
 
@@ -121,9 +121,7 @@ blkPluginsBtn.addEventListener("click", async (e) => {
   );
 });
 
-const blkPluginsUninstallBtn = document.getElementById(
-  "blkPluginsUnInstallBtn"
-);
+const blkPluginsUninstallBtn = document.getElementById("blkPluginsUnInstallBtn");
 blkPluginsUninstallBtn.addEventListener("click", async (e) => {
   PrinterSelect.create(
     document.getElementById("multiPrintersSection"),
@@ -172,27 +170,21 @@ editBtn.addEventListener("click", (event) => {
     bulkEditPrinters
   );
 });
-document
-  .getElementById("deletePrintersBtn")
-  .addEventListener("click", (event) => {
-    PrinterSelect.create(
-      document.getElementById("multiPrintersSection"),
-      false,
-      "Printer Deletion",
-      bulkDeletePrinters
-    );
-  });
+document.getElementById("deletePrintersBtn").addEventListener("click", (event) => {
+  PrinterSelect.create(
+    document.getElementById("multiPrintersSection"),
+    false,
+    "Printer Deletion",
+    bulkDeletePrinters
+  );
+});
 
-document
-  .getElementById("exportPrinterBtn")
-  .addEventListener("click", async (event) => {
-    await exportPrintersToJson();
-  });
-document
-  .getElementById("importPrinterBtn")
-  .addEventListener("change", async function () {
-    await importPrintersFromJsonFile;
-  });
+document.getElementById("exportPrinterBtn").addEventListener("click", async (event) => {
+  await exportPrintersToJson();
+});
+document.getElementById("importPrinterBtn").addEventListener("change", async function () {
+  await importPrintersFromJsonFile;
+});
 
 document.getElementById("addPrinterBtn").addEventListener("click", (event) => {
   addBlankPrinterToTable();

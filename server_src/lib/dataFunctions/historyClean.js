@@ -1,11 +1,7 @@
 "use strict";
 
-const {
-  arrayCounts,
-  checkNested,
-  checkNestedIndex
-} = require("../utils/array.util");
-const { getPrintCostNumeric } = require("../utils/print-cost.util");
+const { arrayCounts, checkNested, checkNestedIndex } = require("../../utils/array.util");
+const { getPrintCostNumeric } = require("../../utils/print-cost.util");
 const {
   getDefaultHistoryStatistics,
   ALL_MONTHS,
@@ -13,13 +9,13 @@ const {
   DEFAULT_SPOOL_DENSITY
 } = require("../providers/cleaner.constants");
 const historyService = require("../../services/history.service");
-const Logger = require("../logger.js");
+const Logger = require("../../handlers/logger.js");
 const serverSettingsCache = require("../../settings/serverSettings");
-const { noCostSettingsMessage } = require("../utils/print-cost.util");
-const { stateToHtml } = require("../utils/html.util");
-const { toDefinedKeyValue } = require("../utils/property.util");
-const { floatOrZero } = require("../utils/number.util");
-const { toTimeFormat } = require("../utils/time.util");
+const { noCostSettingsMessage } = require("../../utils/print-cost.util");
+const { stateToHtml } = require("../../utils/html.util");
+const { toDefinedKeyValue } = require("../../utils/property.util");
+const { floatOrZero } = require("../../utils/number.util");
+const { toTimeFormat } = require("../../utils/time.util");
 
 let logger;
 
@@ -33,11 +29,7 @@ class HistoryClean {
 
   constructor(enableFileLogging = false, logLevel = "warn") {
     this.historyService = historyService;
-    this.logger = new Logger(
-      "OctoFarm-InformationCleaning",
-      enableFileLogging,
-      logLevel
-    );
+    this.logger = new Logger("OctoFarm-InformationCleaning", enableFileLogging, logLevel);
     this.enableLogging = enableFileLogging || false;
   }
 
@@ -84,10 +76,7 @@ class HistoryClean {
     if (!spool) {
       return "0.00";
     }
-    return (
-      completionRatio *
-      ((spool.spools.price / spool.spools.weight) * grams).toFixed(2)
-    );
+    return completionRatio * ((spool.spools.price / spool.spools.weight) * grams).toFixed(2);
   }
 
   static getJobAnalysis(job, printTime) {
@@ -95,8 +84,7 @@ class HistoryClean {
       ? {
           actualPrintTime: printTime,
           estimatedPrintTime: job.estimatedPrintTime,
-          printTimeAccuracy:
-            ((printTime - job.estimatedPrintTime) / printTime) * 10000 // TODO can become NaN (2x)
+          printTimeAccuracy: ((printTime - job.estimatedPrintTime) / printTime) * 10000 // TODO can become NaN (2x)
         }
       : null;
   }
@@ -167,11 +155,7 @@ class HistoryClean {
           volume: (completionRatio * metric.volume).toFixed(2),
           length: ((completionRatio * metric.length) / 1000).toFixed(2),
           weight: spoolWeight,
-          cost: HistoryClean.getCostAsString(
-            spoolWeight,
-            filamentEntry,
-            completionRatio
-          ),
+          cost: HistoryClean.getCostAsString(spoolWeight, filamentEntry, completionRatio),
           type: filamentEntry?.spools?.profile?.material || ""
         }
       });
@@ -179,12 +163,7 @@ class HistoryClean {
     return spools;
   }
 
-  static processHistorySpools(
-    historyCleanEntry,
-    usageOverTime,
-    totalByDay,
-    historyByDay
-  ) {
+  static processHistorySpools(historyCleanEntry, usageOverTime, totalByDay, historyByDay) {
     const spools = historyCleanEntry?.spools;
     const historyState = historyCleanEntry.state;
 
@@ -211,15 +190,9 @@ class HistoryClean {
               // TODO why return? Not continue?
               return;
             }
-            checkNestedIndexHistoryRates = checkNestedIndex(
-              searchKeyword,
-              historyByDay
-            );
+            checkNestedIndexHistoryRates = checkNestedIndex(searchKeyword, historyByDay);
 
-            let checkNestedIndexByDay = checkNestedIndex(
-              spool[key].type,
-              usageOverTime
-            );
+            let checkNestedIndexByDay = checkNestedIndex(spool[key].type, usageOverTime);
             let usageWeightCalc = historyCleanEntry.totalWeight;
             if (!!usageOverTime[checkNestedIndexByDay].data[0]) {
               usageWeightCalc =
@@ -229,18 +202,14 @@ class HistoryClean {
             }
 
             let checkedIndex = checkNestedIndex(spool[key].type, totalByDay);
-            let weightCalcSan = parseFloat(
-              historyCleanEntry.totalWeight.toFixed(2)
-            );
+            let weightCalcSan = parseFloat(historyCleanEntry.totalWeight.toFixed(2));
 
             // Don't include 0 weights
             if (weightCalcSan > 0) {
               let historyDate = historyCleanEntry.endDate;
               let dateSplit = historyDate.split(" ");
               let month = ALL_MONTHS.indexOf(dateSplit[1]);
-              let dateString = `${parseInt(dateSplit[3])}-${
-                month + 1
-              }-${parseInt(dateSplit[2])}`;
+              let dateString = `${parseInt(dateSplit[3])}-${month + 1}-${parseInt(dateSplit[2])}`;
               let dateParse = new Date(dateString);
               // Check if more than 90 days ago...
               if (dateParse.getTime() > ninetyDaysAgo.getTime()) {
@@ -315,16 +284,8 @@ class HistoryClean {
     const historyByDay = [];
 
     for (let h = 0; h < this.historyClean.length; h++) {
-      const {
-        printerCost,
-        file,
-        totalLength,
-        state,
-        printTime,
-        printer,
-        totalWeight,
-        spoolCost
-      } = this.historyClean[h];
+      const { printerCost, file, totalLength, state, printTime, printer, totalWeight, spoolCost } =
+        this.historyClean[h];
 
       if (state.includes("success")) {
         completedJobsCount++;
@@ -365,12 +326,8 @@ class HistoryClean {
     let mostUsedPrinter = "No Printers";
     let leastUsedPrinter = "No Printers";
     if (printerNamesArray[0].length !== 0) {
-      const maxIndexPrinterNames = printerNamesArray[1].indexOf(
-        Math.max(...printerNamesArray[1])
-      );
-      const minIndexPrinterNames = printerNamesArray[1].indexOf(
-        Math.min(...printerNamesArray[1])
-      );
+      const maxIndexPrinterNames = printerNamesArray[1].indexOf(Math.max(...printerNamesArray[1]));
+      const minIndexPrinterNames = printerNamesArray[1].indexOf(Math.min(...printerNamesArray[1]));
       mostUsedPrinter = printerNamesArray[0][maxIndexPrinterNames];
       leastUsedPrinter = printerNamesArray[0][minIndexPrinterNames];
     }
@@ -397,17 +354,12 @@ class HistoryClean {
       failedPercent: ((failedCount / statTotal) * 100).toFixed(2),
       longestPrintTime: Math.max(...printTimes).toFixed(2),
       shortestPrintTime: Math.min(...printTimes).toFixed(2),
-      averagePrintTime: (
-        printTimes.reduce((a, b) => a + b, 0) / printTimes.length
-      ).toFixed(2),
+      averagePrintTime: (printTimes.reduce((a, b) => a + b, 0) / printTimes.length).toFixed(2),
       mostPrintedFile,
       printerMost: mostUsedPrinter,
       printerLoad: leastUsedPrinter,
       totalFilamentUsage:
-        totalFilamentWeight.toFixed(2) +
-        "g / " +
-        totalFilamentLength.toFixed(2) +
-        "m",
+        totalFilamentWeight.toFixed(2) + "g / " + totalFilamentLength.toFixed(2) + "m",
       averageFilamentUsage:
         (totalFilamentWeight / filamentWeight.length).toFixed(2) +
         "g / " +
@@ -448,10 +400,7 @@ class HistoryClean {
     const historyArray = [];
     for (let hist of historyEntities) {
       const printHistory = hist.printHistory;
-      const printCost = getPrintCostNumeric(
-        printHistory.printTime,
-        printHistory.costSettings
-      );
+      const printCost = getPrintCostNumeric(printHistory.printTime, printHistory.costSettings);
       const printSummary = {
         _id: hist._id,
         index: printHistory.historyIndex,
@@ -471,10 +420,7 @@ class HistoryClean {
           printHistory.printTime
         ),
         thumbnail: printHistory.thumbnail,
-        job: HistoryClean.getJobAnalysis(
-          printHistory.job,
-          printHistory.printTime
-        ),
+        job: HistoryClean.getJobAnalysis(printHistory.job, printHistory.printTime),
         spoolCost: 0,
         totalVolume: 0,
         totalLength: 0,
@@ -499,8 +445,7 @@ class HistoryClean {
       }
       printSummary.totalCost = (printCost + printSummary.spoolCost).toFixed(2);
       printSummary.costPerHour = floatOrZero(
-        parseFloat(printSummary.totalCost) /
-          ((100 * parseFloat(printHistory.printTime)) / 360000)
+        parseFloat(printSummary.totalCost) / ((100 * parseFloat(printHistory.printTime)) / 360000)
       ).toFixed(2);
 
       printSummary.printHours = toTimeFormat(printHistory.printTime);

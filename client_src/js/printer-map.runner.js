@@ -7,15 +7,9 @@ import {
   oldFileCriteriumDays,
   quickActionsModalId
 } from "./printer-map/printer-map.options";
-import {
-  createWebWorker,
-  handleVisibilityChange
-} from "./printer-map/printer-map.worker";
-import OctoFarmclient from "./lib/octofarm";
-import {
-  getModalPrinter,
-  setModalPrinter
-} from "./printer-map/printer-map.state";
+import { createWebWorker, handleVisibilityChange } from "./printer-map/printer-map.worker";
+import OctoFarmClient from "./services/octofarm-client.service";
+import { getModalPrinter, setModalPrinter } from "./printer-map/printer-map.state";
 import {
   printerQuickActionsModal,
   resetProgressBar,
@@ -24,18 +18,15 @@ import {
 import { FileActions } from "./lib/modules/fileManager";
 import UI from "./lib/functions/ui";
 import OctoPrintClient from "./lib/octoprint";
-import {
-  fileListStorageSize,
-  findOldFiles
-} from "./printer-map/printer-map.utils";
+import { fileListStorageSize, findOldFiles } from "./printer-map/printer-map.utils";
 import { humanFileSize } from "./utils/file-size.util";
 
 document.addEventListener("visibilitychange", handleVisibilityChange, false);
 document.getElementById("filterStates").addEventListener("change", (e) => {
-  OctoFarmclient.get("client/updateFilter/" + e.target.value);
+  OctoFarmClient.get("client/updateFilter/" + e.target.value);
 });
 document.getElementById("sortStates").addEventListener("change", (e) => {
-  OctoFarmclient.get("client/updateSorting/" + e.target.value);
+  OctoFarmClient.get("client/updateSorting/" + e.target.value);
 });
 
 createWebWorker("panel");
@@ -54,7 +45,7 @@ async function startPrint(printer, filePath) {
 
 function askConfirmation(message, cb) {
   return bootbox.confirm({
-    message: message || `Are you sure you want to perform this action?`,
+    message: message || "Are you sure you want to perform this action?",
     buttons: {
       cancel: {
         label: '<i class="fa fa-times"></i> Cancel'
@@ -81,10 +72,7 @@ async function clearFiles(files) {
   const deniedFiles = [];
   const unknownCauseFiles = [];
   for (let file of files) {
-    const fileExistsStatus = await OctoPrintClient.checkFile(
-      printer,
-      file.fullPath
-    );
+    const fileExistsStatus = await OctoPrintClient.checkFile(printer, file.fullPath);
     if (fileExistsStatus === 200) {
       acceptedFiles.push(file);
     } else if (fileExistsStatus === 404) {
@@ -111,12 +99,7 @@ async function clearFiles(files) {
   const failedFiles = [];
   const succeededFiles = [];
   for (let file of acceptedFiles) {
-    const responseOctoFarm = await OctoPrintClient.file(
-      printer,
-      file.fullPath,
-      "delete",
-      false
-    );
+    const responseOctoFarm = await OctoPrintClient.file(printer, file.fullPath, "delete", false);
 
     if (responseOctoFarm.status > 204) {
       failedFiles.push(file);
@@ -124,11 +107,7 @@ async function clearFiles(files) {
       succeededFiles.push(file);
     }
 
-    setProgressBar(
-      succeededFiles.length,
-      failedFiles.length,
-      acceptedFiles.length
-    );
+    setProgressBar(succeededFiles.length, failedFiles.length, acceptedFiles.length);
 
     // I dont care too much what OF does, as long as its consistent
     // const statusString = await responseOctoFarm.text();
@@ -190,9 +169,7 @@ $(quickActionsModalId).on("show.bs.modal", function (event) {
     Quick actions for printer <span class="badge badge-primary">${modalPrinter.printerName}</span>
     `);
   modal.find(".modal-body input").val(loadPrinterId);
-  modal
-    .find(`.modal-body ${modalPrintFilesListId}`)
-    .html(printerQuickActionsModal(modalPrinter));
+  modal.find(`.modal-body ${modalPrintFilesListId}`).html(printerQuickActionsModal(modalPrinter));
 
   $(actionDeleteAllFilesId).click(async (event) => {
     const fileList = modalPrinter.fileList.fileList;
@@ -203,9 +180,9 @@ $(quickActionsModalId).on("show.bs.modal", function (event) {
 
     const msg = `Are you sure to delete ${fileList.length} files on printer '${
       modalPrinter.printerName
-    }'? This saves ${humanFileSize(
-      clearedStorageAllFiles
-    )} [${clearedRatio.toFixed(1)} % of ${humanFileSize(totalStorage)}]`;
+    }'? This saves ${humanFileSize(clearedStorageAllFiles)} [${clearedRatio.toFixed(
+      1
+    )} % of ${humanFileSize(totalStorage)}]`;
 
     askConfirmation(msg, async (result) => await clearFiles(fileList));
   });

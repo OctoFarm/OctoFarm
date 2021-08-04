@@ -41,16 +41,16 @@ router.get("/get/", ensureAuthenticated, function (req, res) {
 
 if (interval === false) {
   interval = setInterval(async function () {
-    const printersInformation = await PrinterClean.listPrintersInformation();
-    const printerControlList = await PrinterClean.returnPrinterControlList();
-    const currentTickerList = await PrinterTicker.returnIssue();
+    const printersInformation = PrinterClean.listPrintersInformation();
+    const printerControlList = PrinterClean.returnPrinterControlList();
+    const currentTickerList = PrinterTicker.returnIssue();
 
     const infoDrop = {
       printersInformation: printersInformation,
       printerControlList: printerControlList,
       currentTickerList: currentTickerList
     };
-    clientInformation = await stringify(infoDrop);
+    clientInformation = stringify(infoDrop);
     for (clientId in clients) {
       clients[clientId].write("retry:" + 10000 + "\n");
       clients[clientId].write("data: " + clientInformation + "\n\n"); // <- Push a message to a single attached client

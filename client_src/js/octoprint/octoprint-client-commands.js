@@ -1,21 +1,10 @@
 import OctoPrintClient from "../lib/octoprint.js";
 import UI from "../lib/functions/ui";
-import OctoFarmClient from "../lib/octofarm_client";
-
-const printerBase = "printers";
-const printerInfoURL = "/printerInfo";
+import OctoFarmClient from "../services/octofarm-client.service";
 
 async function updateBtnOnClick(printerID) {
   try {
-    let data = {
-      i: printerID
-    };
-
-    const printer = await OctoFarmClient.post(
-      printerBase + printerInfoURL,
-      data
-    );
-
+    const printer = await OctoFarmClient.getPrinter(printerID);
     bootbox.confirm({
       message: "This will tell OctoPrint to update, are you sure?",
       buttons: {
@@ -28,7 +17,7 @@ async function updateBtnOnClick(printerID) {
           className: "btn-danger"
         }
       },
-      callback: async function (result, printer) {
+      callback: async function (result) {
         if (result) {
           await updateOctoPrintClient(printer);
         }
@@ -36,19 +25,12 @@ async function updateBtnOnClick(printerID) {
     });
   } catch (e) {
     console.error(e);
-    UI.createAlert(
-      "error",
-      `Unable to grab latest printer information: ${e}`,
-      0,
-      "clicked"
-    );
+    UI.createAlert("error", `Unable to grab latest printer information: ${e}`, 0, "clicked");
   }
 }
 
 export function setupUpdateOctoPrintClientBtn(printer) {
-  const octoPrintClientUpdateBtn = document.getElementById(
-    `octoprintUpdate-${printer._id}`
-  );
+  const octoPrintClientUpdateBtn = document.getElementById(`octoprintUpdate-${printer._id}`);
   if (octoPrintClientUpdateBtn) {
     octoPrintClientUpdateBtn.addEventListener("click", async () => {
       await updateBtnOnClick(printer._id);

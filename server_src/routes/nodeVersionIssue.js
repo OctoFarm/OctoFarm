@@ -1,5 +1,5 @@
 const express = require("express");
-const Logger = require("../../server_src/lib/logger.js");
+const Logger = require("../handlers/logger");
 const isDocker = require("is-docker");
 const { AppConstants } = require("../app.constants");
 

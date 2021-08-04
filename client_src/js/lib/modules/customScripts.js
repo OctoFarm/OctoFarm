@@ -1,6 +1,6 @@
-import OctoFarmClient from "../octofarm.js";
-import OctoPrintClient from "../octoprint.js";
+import OctoPrintClient from "../octoprint";
 import UI from "../functions/ui.js";
+import OctoFarmClient from "../../services/octofarm-client.service";
 
 function getButton(button) {
   return `
@@ -10,8 +10,7 @@ function getButton(button) {
 
 export default class CustomGenerator {
   static async generateButtons(printers) {
-    let customScripts = await OctoFarmClient.get("settings/customGcode");
-    customScripts = await customScripts.json();
+    let customScripts = await OctoFarmClient.getCustomGcode();
 
     //Draw Scripts
     let area = document.getElementById("customGcodeCommandsArea");
@@ -19,16 +18,14 @@ export default class CustomGenerator {
       customScripts.forEach((scripts) => {
         let button = getButton(scripts);
         area.insertAdjacentHTML("beforeend", button);
-        document
-          .getElementById("gcode-" + scripts._id)
-          .addEventListener("click", (e) => {
-            this.fireCommand(scripts._id, scripts.gcode, printers);
-          });
+        document.getElementById("gcode-" + scripts._id).addEventListener("click", (e) => {
+          this.fireCommand(scripts._id, scripts.gcode, printers);
+        });
       });
     }
   }
   static async fireCommand(id, script, printers) {
-    printers.forEach(async (printer) => {
+    await printers.forEach(async (printer) => {
       const opt = {
         commands: script
       };
