@@ -135,10 +135,10 @@ async function updateServerSettings() {
       registration: settingsElements.server.registration.checked
     },
     timeout: {
-      webSocketRetry: settingsElements.timeout.webSocketRetry.value,
-      apiTimeout: settingsElements.timeout.apiTimeout.value,
-      apiRetryCutoff: settingsElements.timeout.apiRetryCutoff.value,
-      apiRetry: settingsElements.timeout.apiRetry.value
+      webSocketRetry: settingsElements.timeout.webSocketRetry.value * 1000,
+      apiTimeout: settingsElements.timeout.apiTimeout.value * 1000,
+      apiRetryCutoff: settingsElements.timeout.apiRetryCutoff.value * 1000,
+      apiRetry: settingsElements.timeout.apiRetry.value * 1000
     },
     filament: {
       filamentCheck: settingsElements.filament.filamentCheck.checked

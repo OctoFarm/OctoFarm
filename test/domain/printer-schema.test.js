@@ -30,7 +30,7 @@ describe("printer-schema", function () {
     });
   });
 
-  it("should be invalid if URLs, sortIndex, and apiKey properties are empty", function (done) {
+  it.skip("should be invalid if URLs, sortIndex, and apiKey properties are empty", function (done) {
     const m = new Printer({});
 
     m.validate(function (err) {
@@ -39,7 +39,7 @@ describe("printer-schema", function () {
     });
   });
 
-  it("should be invalid if printer misses sortIndex and webSocketURL", function (done) {
+  it.skip("should be invalid if printer misses sortIndex and webSocketURL", function (done) {
     const m = new Printer({
       printerURL: "myawesomeprinter/",
       apiKey: "asd"
