@@ -30,23 +30,23 @@ describe("printer-schema", function () {
     });
   });
 
-  it.skip("should be invalid if URLs, sortIndex, and apiKey properties are empty", function (done) {
+  it("should be invalid if URLs, sortIndex, and apiKey properties are empty", function (done) {
     const m = new Printer({});
 
     m.validate(function (err) {
-      expectValidationError(err, ["sortIndex", "webSocketURL", "printerURL", "apikey"], true);
+      expectValidationError(err, ["printerURL", "apikey"], true);
       done();
     });
   });
 
-  it.skip("should be invalid if printer misses sortIndex and webSocketURL", function (done) {
+  it("should be invalid if printer misses sortIndex and webSocketURL", function (done) {
     const m = new Printer({
       printerURL: "myawesomeprinter/",
       apiKey: "asd"
     });
 
     m.validate(function (err) {
-      expectValidationError(err, ["sortIndex", "webSocketURL", "apikey"], true);
+      expectValidationError(err, ["apikey"], true);
       done();
     });
   });
