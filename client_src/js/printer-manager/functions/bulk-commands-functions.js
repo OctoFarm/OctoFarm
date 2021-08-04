@@ -524,7 +524,7 @@ export async function bulkOctoPrintGcodeCommand() {
       const customGcodeEE = "<div class='mb-1' id='customGcodeCommandsArea'></div>";
       textArea[0].insertAdjacentHTML("beforebegin", customGcodeEE);
       let buttonPrinters = [];
-      printersToConnect.forEach(async (printer) => {
+      printersToSendGcode.forEach(async (printer) => {
         const index = _.findIndex(printerInfo, function (o) {
           return o._id === printer;
         });
