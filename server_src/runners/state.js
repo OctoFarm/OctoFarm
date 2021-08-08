@@ -998,7 +998,7 @@ class Runner {
             "Complete",
             farmPrinters[i]._id
           );
-          await farmPrinters[i].ws.open(`${farmPrinters[i].webSocketURL}sockjs/websocket`, i);
+          await farmPrinters[i].ws.open(`${farmPrinters[i].webSocketURL}/sockjs/websocket`, i);
         } else {
           const error = {
             message: `Could not Establish connection to OctoPrint Returned: ${users.status}: ${farmPrinters[i].printerURL}`,
