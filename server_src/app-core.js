@@ -85,7 +85,7 @@ function serveOctoFarmRoutes(app) {
     if (path.startsWith("/api") || path.startsWith("/plugins")) {
       logger.error("API resource was not found " + path);
       res.status(404);
-      res.send({ error: "API endpoint or method not found" });
+      res.send({ error: "API endpoint or method was not found" });
       return;
     } else if (req.originalUrl.endsWith(".min.js")) {
       logger.error("Javascript resource was not found " + path);

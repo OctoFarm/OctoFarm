@@ -13,7 +13,7 @@ const printerRoute = AppConstants.apiRoute + "/printer";
 const getRoute = printerRoute;
 const deleteRoute = printerRoute;
 const createRoute = printerRoute;
-const refreshSettingsRoute = printerRoute + "/refreshSettings";
+const refreshSettingsPath = "/query-settings";
 const updateRoute = printerRoute;
 
 beforeAll(async () => {
@@ -83,32 +83,26 @@ describe("PrintersController", () => {
   }, 10000);
 
   it("should return no printer Info entry when Id is provided but doesnt exist", async function () {
-    const res = await request.get(getRoute + "asd").send();
+    const res = await request.get(getRoute + "/asd").send();
 
     expect(res.statusCode).toEqual(404);
     expect(res.body).toEqual({});
   }, 10000);
 
   it("should return 400 error when wrong input is provided", async function () {
-    const res = await request.post(refreshSettingsRoute).send();
+    const path = printerRoute + "/undefined" + refreshSettingsPath;
+    const response = await request.put(path).send();
 
-    // Assert input validation failed
-    // TODO This is actually missing node-input-validation
-    expect(res.statusCode).toEqual(400);
-    expect(res.body).toEqual({});
-    expect(res.res.statusMessage).toEqual("No ID key was provided");
+    expectInvalidResponse(response, ["id"], true);
   }, 10000);
 
-  it("should return 500 if server fails to refresh printer settings", async function () {
-    const requestBody = {
-      i: "a0a569d20dd308890a1c06"
-    };
-    const res = await request.post(refreshSettingsRoute).send(requestBody);
+  it("should return 404 if server fails to find the printer", async function () {
+    const path = printerRoute + "/a0a569d20dd308890a1c06" + refreshSettingsPath;
+    const res = await request.post(path).send(path);
 
     // Assert server failed
-    // TODO This is actually a cheat way out...
-    expect(res.statusCode).toEqual(500);
+    expect(res.statusCode).toEqual(404);
     expect(res.body).toEqual({});
-    expect(res.res.statusMessage).toContain("The server couldn't update your printer settings!");
+    expect(res.res.statusMessage).toContain("Not Found");
   }, 10000);
 });
