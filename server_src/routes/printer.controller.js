@@ -12,6 +12,7 @@ const {
 } = require("./validation/printer-controller.validation");
 const { AppConstants } = require("../app.constants");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
+const { NotImplementedException } = require("../exceptions/runtime.exceptions");
 
 class PrinterController {
   #printersStore;
@@ -170,31 +171,40 @@ class PrinterController {
 
   // TODO === The big todo line ===
   async updateSettings(req, res) {
+    const params = await validateInput(req.params, idRules);
+
+    throw new NotImplementedException("Update settings is being split up.");
+
+    // TODO implement as partials (broken right now)
     const settings = req.body;
-    // TODO Validate body
     this.#logger.info("Update printers request: ", settings);
     const updateSettings = await Runner.updateSettings(settings);
     res.send({ status: updateSettings.status, printer: updateSettings.printer });
   }
 
-  async connectionLogs(req, res) {
-    let id = req.params.id;
-    this.#logger.info("Grabbing connection logs for: ", id);
-    let connectionLogs = await this.#connectionLogsCache.returnPrinterLogs(id);
+  async getConnectionLogs(req, res) {
+    const params = await validateInput(req.params, idRules);
+
+    const printerId = params.id;
+    this.#logger.info("Grabbing connection logs for: ", printerId);
+    let connectionLogs = this.#connectionLogsCache.getPrinterConnectionLogs(printerId);
+
     res.send(connectionLogs);
   }
 
-  async pluginList(req, res) {
-    let id = req.params.id;
-    if (id !== "all") {
-      this.#logger.info("Grabbing plugin list for: ", id);
-      let pluginList = await Runner.returnPluginList(id);
-      res.send(pluginList);
-      return;
-    }
-    this.#logger.info("Grabbing global plugin list");
-    let pluginList = await Runner.returnPluginList();
+  async getPluginList(req, res) {
+    const params = await validateInput(req.params, idRules);
+
+    let id = params.id;
+
+    this.#logger.info("Grabbing plugin list for: ", id);
+    let pluginList = await Runner.returnPluginList(id);
     res.send(pluginList);
+
+    // The following is not allowed (yet)
+    // this.#logger.info("Grabbing global plugin list");
+    // let pluginList = await Runner.returnPluginList();
+    // res.send(pluginList);
   }
 }
 
@@ -204,19 +214,17 @@ module.exports = createController(PrinterController)
   .before([ensureAuthenticated])
   .get("/", "list")
   .post("/", "create")
-  .put("/:id/reconnect", "reconnectOctoPrint")
   .get("/:id", "get")
+  .patch("/sort-index", "updateSortIndex")
+  .put("/:id/reconnect", "reconnectOctoPrint")
   .delete("/:id", "delete")
   .patch("/:id/connection", "updateConnectionSettings")
-  .patch("/sort-index", "updateSortIndex")
   .patch("/:id/step-size", "setStepSize")
   .patch("/:id/flow-rate", "setFlowRate")
   .patch("/:id/feed-rate", "setFeedRate")
   .patch("/:id/reset-power-settings", "resetPowerSettings")
   // WIP line
   .put("/:id/query-settings", "querySettings")
-  // TODO line
-  .post("/updateSettings", "updateSettings")
-  .get("/connectionLogs/:id", "connectionLogs")
-  .get("/pluginList/:id", "pluginList")
-;
+  .patch("/:id/update-settings", "updateSettings")
+  .get("/:id/connection-logs/", "getConnectionLogs")
+  .get("/:id/plugin-list", "getPluginList");

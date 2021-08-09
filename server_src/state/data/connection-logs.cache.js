@@ -5,7 +5,7 @@ const _ = require("lodash");
 class ConnectionLogsCache {
   #currentLogs = [];
   #previousLogs = [];
-  #printerConnectionLogs = [];
+  #printerConnectionLogs = {};
 
   #printerTickerStore;
 
@@ -42,6 +42,11 @@ class ConnectionLogsCache {
       this.#currentLogs[i] = [];
     }
     return this.#currentLogs[i];
+  }
+
+  getPrinterConnectionLogs(printerId) {
+    // Stub
+    return this.#printerConnectionLogs[printerId];
   }
 
   async generateConnectionLogs(farmPrinter) {

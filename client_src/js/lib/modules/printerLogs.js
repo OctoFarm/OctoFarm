@@ -265,9 +265,7 @@ export default class PrinterLogs {
       });
       document.getElementById("system-refresh-list").addEventListener("click", async (e) => {
         console.log("Refresh!", currentPrinter.printerURL);
-        let connectionLogs = await OctoFarmClient.get(
-          "/printers/connectionLogs/" + currentPrinter._id
-        );
+        let connectionLogs = await OctoFarmClient.getPrinterConnectionLogs(currentPrinter._id);
         PrinterLogs.loadLogs(currentPrinter, connectionLogs);
       });
       eventListener = true;

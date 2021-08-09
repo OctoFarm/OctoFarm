@@ -148,6 +148,18 @@ export default class OctoFarmClient {
     return this.get(`${this.printerRoute}/${id ? id : ""}`);
   }
 
+  static async getPrinterConnectionLogs(printerId) {
+    return this.get(`${this.printerRoute}/${printerId}/connection-logs`);
+  }
+
+  static async getPrinterPluginList(printerId, all = false) {
+    if (!all) {
+      return this.get(`${this.printerRoute}/${printerId}/plugins-list`);
+    } else {
+      throw "All Plugins query - Not Implemented Yet";
+    }
+  }
+
   static async generateLogDump() {
     return this.post(`${this.logsRoute}/generateLogDump`, {});
   }

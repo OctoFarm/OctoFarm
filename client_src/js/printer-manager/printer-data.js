@@ -240,7 +240,7 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
         });
       document.getElementById(`printerLog-${printer._id}`).addEventListener("click", async (e) => {
         const printerInfo = await OctoFarmClient.getPrinter(printer._id);
-        let connectionLogs = await OctoFarmClient.get("printers/connectionLogs/" + printer._id);
+        let connectionLogs = await OctoFarmClient.getPrinterConnectionLogs(printer._id);
         PrinterLogs.loadLogs(printerInfo, connectionLogs);
       });
 

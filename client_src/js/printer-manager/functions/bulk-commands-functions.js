@@ -538,11 +538,10 @@ export async function bulkOctoPrintPluginAction(action) {
     let pluginList = [];
     let printerPluginList = null;
     if (action === "install") {
-      printerPluginList = await OctoFarmClient.get(
-        "/printers/pluginList/" + printersForPluginAction[0]._id
-      );
+      printerPluginList = await OctoFarmClient.getPrinterPluginList(printersForPluginAction[0]._id);
     } else {
-      printerPluginList = await OctoFarmClient.get("/printers/pluginList/all");
+      // Will throw - not implemented yet
+      printerPluginList = await OctoFarmClient.getPrinterPluginList(null, true);
     }
     printerPluginList.forEach((plugin) => {
       if (action === "install") {
