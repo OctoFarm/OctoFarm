@@ -5,15 +5,23 @@ const { ensureSystemSettingsInitiated } = require("./app-core");
 
 /**
  * Setup the application without hassle
- * @returns {app}
+ * @param loadPrinterStore (default: false) setup printer store with database connection
+ * @returns {Promise<{container: AwilixContainer<any>, server: Server}>}
  */
-async function setupTestApp() {
+async function setupTestApp(loadPrinterStore = false) {
   setupEnvConfig(true);
-  await ensureSystemSettingsInitiated();
 
-  const newServer = setupExpressServer();
-  serveOctoFarmRoutes(newServer);
-  return newServer;
+  const { app: server, container } = setupExpressServer();
+  await ensureSystemSettingsInitiated(container);
+  serveOctoFarmRoutes(server);
+
+  if (loadPrinterStore) {
+    // Testing setup explicitly requested the store to be loaded, assuming a database is setup.
+    const printersStore = container.resolve(DITokens.printersStore);
+    await printersStore.loadPrintersStore();
+  }
+
+  return { server, container };
 }
 
 module.exports = {

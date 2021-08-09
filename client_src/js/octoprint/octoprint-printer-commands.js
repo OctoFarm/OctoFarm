@@ -11,7 +11,7 @@ export async function printerPreHeatChamber(printer, chamberTemp) {
   }
   //Set chamber temp
   if (chamberTemp.value !== "" && !isNaN(chamberTemp.value)) {
-    let post = await OctoPrintClient.post(printer, "printer/chamber", chamberData);
+    let post = await OctoPrintClient.postApi(printer, "printer/chamber", chamberData);
     if (typeof post !== "undefined") {
       if (post.status === 204) {
         UI.createAlert(
@@ -48,7 +48,7 @@ export async function printerPreHeatBed(printer, bedTemp) {
   }
   //Set bed temp
   if (bedTemp.value !== "" && !isNaN(bedTemp.value)) {
-    let post = await OctoPrintClient.post(printer, "printer/bed", bedData);
+    let post = await OctoPrintClient.postApi(printer, "printer/bed", bedData);
     if (typeof post !== "undefined") {
       if (post.status === 204) {
         UI.createAlert(
@@ -84,7 +84,7 @@ export async function printerPreHeatTool(printer, toolTemp, toolNumber) {
     toolData.targets["tool" + toolNumber.value] = parseInt(toolTemp.value);
   }
   if (toolTemp.value !== "" && !isNaN(toolTemp.value)) {
-    let post = await OctoPrintClient.post(printer, "printer/tool", toolData);
+    let post = await OctoPrintClient.postApi(printer, "printer/tool", toolData);
     if (typeof post !== "undefined") {
       if (post.status === 204) {
         UI.createAlert(
@@ -174,7 +174,7 @@ export async function printerSendGcode(printer) {
   const opt = {
     commands: lines
   };
-  const post = await OctoPrintClient.post(printer, "printer/command", opt);
+  const post = await OctoPrintClient.postApi(printer, "printer/command", opt);
   if (post.status === 204) {
     UI.createAlert("success", "Your gcode commands have successfully been sent!", 3000, "Clicked");
   } else {

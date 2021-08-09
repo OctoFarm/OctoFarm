@@ -26,7 +26,7 @@ import {
 import { loadCustomGcodeScriptsModel } from "./printer-manager/functions/custom-gcode-scripts.functions";
 import { setupSortablePrintersTable } from "./printer-manager/functions/sortable-table";
 
-const workerURL = "/printersInfo/get/";
+const workerURL = "/printers/sse/";
 
 const multiPrinterSelectModal = document.getElementById("multiPrintersSection");
 

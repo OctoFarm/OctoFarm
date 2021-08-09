@@ -1,4 +1,4 @@
-jest.mock("../../server_src/config/auth");
+jest.mock("../../server_src/middleware/auth");
 
 const EventSource = require("eventsource");
 const { parse } = require("flatted/cjs");
@@ -6,19 +6,23 @@ const dbHandler = require("../db-handler");
 const supertest = require("supertest");
 const getEndpoints = require("express-list-endpoints");
 const { setupTestApp } = require("../../server_src/app-test");
+const DITokens = require("../../server_src/container.tokens");
 
 let request;
-const routeBase = "/printersInfo/";
-const ssePath = "get/";
+let sseTask;
+const routeBase = "/printers/";
+const ssePath = "sse";
 
 beforeAll(async () => {
   await dbHandler.connect();
-  const server = await setupTestApp();
+  const { server, container } = await setupTestApp(true);
+
+  sseTask = container.resolve(DITokens.printerSseTask);
 
   const endpoints = getEndpoints(server);
   expect(endpoints).toContainEqual({
     methods: ["GET"],
-    middleware: ["anonymous", "anonymous"],
+    middleware: ["anonymous", "ensureCurrentUserAndGroup", "memberInvoker"],
     path: routeBase + ssePath
   });
   request = supertest(server);
@@ -30,18 +34,25 @@ describe("SSE-printersInfo", () => {
     const url = getRequest.url;
     expect(url).toBeTruthy();
 
-    const es = new EventSource(url);
+    let firedEvent = false;
 
-    await Promise.resolve((done) => {
+    await new Promise(async (resolve) => {
+      const es = new EventSource(url);
+
       es.onmessage = (e) => {
+        firedEvent = true;
         expect(parse(e.data)).toEqual({
           printersInformation: [],
           printerControlList: [],
           currentTickerList: []
         });
         es.close();
-        done();
+        resolve();
       };
+
+      await sseTask.run();
     });
+
+    expect(firedEvent).toBeTruthy();
   }, 10000);
 });

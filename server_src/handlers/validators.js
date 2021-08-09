@@ -31,10 +31,12 @@ function validateMongoURL(mongoURL) {
 
 function getExtendedValidator() {
   nodeInputValidator.extend("wsurl", ({ value, args }, validator) => {
+    if (!value) return false;
     const url = new URL(value).href;
     return url.includes("ws://") || url.includes("wss://");
   });
   nodeInputValidator.extend("httpurl", ({ value, args }, validator) => {
+    if (!value) return false;
     const url = new URL(value).href;
     return url.includes("http://") || url.includes("https://");
   });

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const PrinterSchema = new mongoose.Schema({
-  apikey: {
+  apiKey: {
     type: String,
     required: true // !
   },
@@ -15,11 +15,11 @@ const PrinterSchema = new mongoose.Schema({
   },
   webSocketURL: {
     type: String,
-    required: false // !
+    required: true // !
   },
   sortIndex: {
     type: Number,
-    required: false
+    required: true
   },
   // Auto-generated below
   settingsAppearance: {

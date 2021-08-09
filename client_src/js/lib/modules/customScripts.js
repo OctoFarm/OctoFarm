@@ -29,7 +29,7 @@ export default class CustomGenerator {
       const opt = {
         commands: script
       };
-      const post = await OctoPrintClient.post(printer, "printer/command", opt);
+      const post = await OctoPrintClient.postApi(printer, "printer/command", opt);
       if (post.status === 204) {
         UI.createAlert(
           "success",

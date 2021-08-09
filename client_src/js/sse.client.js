@@ -1,11 +1,12 @@
 import { parse } from "flatted";
 
+// Make sure this matches the backend stringify AppConstant
+let jsonParse = false;
 let source = null;
 
 async function asyncParse(str) {
   try {
-    const info = parse(str);
-    return info;
+    return jsonParse ? JSON.parse(str) : parse(str);
   } catch (e) {
     return false;
   }

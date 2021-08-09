@@ -30,7 +30,7 @@ async function newGcodeScript(newScript) {
     });
     if (newScript.id) {
       try {
-        const post = await OctoFarmClient.post("settings/customGcode/edit", newScript);
+        const post = await OctoFarmClient.post("/settings/customGcode/edit", newScript);
         console.info(post);
       } catch (e) {
         console.error(e);
@@ -38,7 +38,7 @@ async function newGcodeScript(newScript) {
       }
     } else {
       try {
-        const post = await OctoFarmClient.post("settings/customGcode", newScript);
+        const post = await OctoFarmClient.post("/settings/customGcode", newScript);
         drawScriptTable(post);
       } catch (e) {
         console.error(e);
@@ -67,7 +67,7 @@ function editScript(script) {
 }
 async function deleteScript(script) {
   try {
-    await OctoFarmClient.get("settings/customGcode/delete/" + script._id);
+    await OctoFarmClient.get("/settings/customGcode/delete/" + script._id);
     UI.createAlert("success", "Successfully deleted your script...", 3000, "Clicked");
     document.getElementById("scriptRow-" + script._id).remove();
   } catch (e) {
@@ -144,7 +144,7 @@ createNewScriptBtn.addEventListener("click", async (e) => {
 
 export async function loadCustomGcodeScriptsModel() {
   try {
-    const customScripts = await OctoFarmClient.get("settings/customGcode");
+    const customScripts = await OctoFarmClient.getCustomGcode();
     //Draw Scripts
     scriptTable.innerHTML = "";
     customScripts.forEach((script) => {

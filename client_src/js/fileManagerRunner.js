@@ -34,6 +34,7 @@ class Manager {
       for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
         extruderList += `<div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="tool${i}-${printer._id}">Filament:</label> </div> <select class="custom-select bg-secondary text-light" id="tool${i}-${printer._id}"></select></div>`;
       }
+      console.log("printer fileCount", printer.fileList.fileCount);
       printerList.insertAdjacentHTML(
         "beforeend",
         `
@@ -57,7 +58,7 @@ class Manager {
                           ${printer.printerState.state}
                       </span>
                       <span class="badge badge-dark badge-pill">
-                        Files: ${printer.fileList.filecount}
+                        Files: ${printer.fileList.fileCount}
                     </span>
                     <span class="badge badge-dark badge-pill">
                        Folders: ${printer.fileList.folderCount}
@@ -229,7 +230,7 @@ class Manager {
         createFolderBtn: document.getElementById("createFolderBtn")
       }
     };
-    fileButtons.fileManager.fileFolderCount.innerHTML = `<i class="fas fa-file"></i> ${printer.fileList.filecount} <i class="fas fa-folder"></i> ${printer.fileList.folderCount}`;
+    fileButtons.fileManager.fileFolderCount.innerHTML = `<i class="fas fa-file"></i> ${printer.fileList.fileCount} <i class="fas fa-folder"></i> ${printer.fileList.folderCount}`;
     if (typeof printer.storage !== "undefined") {
       fileButtons.fileManager.printerStorage.innerHTML = `<i class="fas fa-hdd"></i> ${Calc.bytes(
         printer.storage.free

@@ -23,10 +23,10 @@ import { humanFileSize } from "./utils/file-size.util";
 
 document.addEventListener("visibilitychange", handleVisibilityChange, false);
 document.getElementById("filterStates").addEventListener("change", (e) => {
-  OctoFarmClient.get("client/updateFilter/" + e.target.value);
+  OctoFarmClient.get("/client/updateFilter/" + e.target.value);
 });
 document.getElementById("sortStates").addEventListener("change", (e) => {
-  OctoFarmClient.get("client/updateSorting/" + e.target.value);
+  OctoFarmClient.get("/client/updateSorting/" + e.target.value);
 });
 
 createWebWorker("panel");

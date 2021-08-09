@@ -1,6 +1,9 @@
+const fs = require("fs");
+const request = require("request");
 const { OPClientErrors } = require("./constants/octoprint-service.constants");
 const { checkPluginManagerAPIDeprecation } = require("../../utils/compatibility.utils");
-const { OctoprintApiService } = require("./octoprint-api.service");
+const OctoPrintApiService = require("./octoprint-api.service");
+const { ValidationException } = require("../../exceptions/runtime.exceptions");
 
 const octoPrintBase = "/";
 const apiBase = octoPrintBase + "api";
@@ -20,39 +23,66 @@ const apiPluginManagerRepository1_6_0 = octoPrintBase + "plugin/pluginmanager/re
 const apiSoftwareUpdateCheck = (force) =>
   octoPrintBase + "plugin/softwareupdate/check" + (force ? "?force=true" : "");
 const apiPluginPiSupport = apiBase + "/plugin/pi_support";
-const apiPluginFilamentManagerSpecificSpool = apiBase + "/plugin/filamentmanager/spools";
+const apiPluginFilamentManagerSpools = apiBase + "/plugin/filamentmanager/spools";
+const apiPluginFilamentManagerProfiles = apiBase + "/plugin/filamentmanager/profiles";
+const apiTimelapse = apiBase + "/timelapse";
 
 const printerValidationErrorMessage = "printer apiKey or URL undefined";
 
-class OctoprintApiClientService extends OctoprintApiService {
-  constructor(timeoutSettings) {
-    super(timeoutSettings);
+class OctoPrintApiClientService extends OctoPrintApiService {
+  constructor({ settingsStore }) {
+    super({ settingsStore });
   }
 
-  static validatePrinter(printer) {
-    if (!printer.apikey || !printer.printerURL) {
-      throw printerValidationErrorMessage;
+  validatePrinter(printer) {
+    if (!printer.apiKey || !printer.printerURL) {
+      throw new ValidationException(printerValidationErrorMessage);
+    }
+  }
+
+  async getWithOptionalRetry(printer, route, retry = false) {
+    this.validatePrinter(printer);
+    if (retry) {
+      return await this.getRetry(printer.printerURL, printer.apiKey, route);
+    } else {
+      return await this.get(printer.printerURL, printer.apiKey, route);
     }
   }
 
   async postPrinter(printer, route, data, timeout = false) {
-    OctoprintApiClientService.validatePrinter(printer);
-    return super.post(printer.printerURL, printer.apikey, route, data, timeout);
+    this.validatePrinter(printer);
+    return super.post(printer.printerURL, printer.apiKey, route, data, timeout);
   }
 
-  async getWithOptionalRetry(printer, route, retry = false) {
-    OctoprintApiClientService.validatePrinter(printer);
-    if (retry) {
-      return await this.getRetry(printer.printerURL, printer.apikey, route);
-      // .then(r => r.json());
-    } else {
-      return await this.get(printer.printerURL, printer.apikey, route);
-      // .then(r => r.json());
-    }
+  async deletePrinter(printer, route) {
+    this.validatePrinter(printer);
+    return super.delete(printer.printerURL, printer.apiKey, route);
+  }
+
+  async login(printer, passive = true) {
+    return this.postPrinter(printer, apiLogin(passive), {}, false);
   }
 
   async getSettings(printer, retry = false) {
     return this.getWithOptionalRetry(printer, apiSettingsPart, retry);
+  }
+
+  async getAdminUserOrDefault(printer) {
+    const response = await this.getUsers(printer, true);
+    if (response.status != 200) throw "Didnt get 200 response";
+
+    const data = await response.json();
+    let opAdminUserName = "admin";
+    if (!!data?.users && Array.isArray(data)) {
+      const adminUser = data.users.find((user) => !!user.admin);
+      if (!adminUser) opAdminUserName = adminUser.name;
+    }
+
+    return opAdminUserName;
+  }
+
+  async getUsers(printer, retry = false) {
+    return this.getWithOptionalRetry(printer, apiUsers, retry);
   }
 
   /**
@@ -62,8 +92,8 @@ class OctoprintApiClientService extends OctoprintApiService {
    * @param retry
    * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)|*|undefined>}
    */
-  async getFiles(printer, recursive = false, retry = false) {
-    return this.getWithOptionalRetry(printer, apiFiles(recursive), retry);
+  async getFiles(printer, recursive = false) {
+    return this.getWithOptionalRetry(printer, apiFiles(recursive), false);
   }
 
   /**
@@ -105,12 +135,29 @@ class OctoprintApiClientService extends OctoprintApiService {
     return this.getWithOptionalRetry(printer, apiSoftwareUpdateCheck(force), retry);
   }
 
-  async getUsers(printer, retry = false) {
-    return this.getWithOptionalRetry(printer, apiUsers, retry);
-  }
-
   async getPluginPiSupport(printer, retry = false) {
     return this.getWithOptionalRetry(printer, apiPluginPiSupport, retry);
+  }
+
+  async deleteTimeLapse(printer, fileName) {
+    if (!fileName) {
+      throw new Error("Cant delete timelapse file without providing filename");
+    }
+    return this.deletePrinter(printer, `${apiTimelapse}/${fileName}`);
+  }
+
+  async listUnrenderedTimeLapses(printerConnection) {
+    return this.getWithOptionalRetry(printerConnection, apiTimelapse + "?unrendered=true", false);
+  }
+
+  async listPluginFilamentManagerProfiles(printer) {
+    const getURL = `${apiPluginFilamentManagerProfiles}`;
+    return this.getWithOptionalRetry(printer, getURL, false);
+  }
+
+  async listPluginFilamentManagerFilament(printer) {
+    const getURL = `${apiPluginFilamentManagerSpools}`;
+    return this.getWithOptionalRetry(printer, getURL, false);
   }
 
   async getPluginFilamentManagerFilament(printer, filamentID) {
@@ -120,15 +167,30 @@ class OctoprintApiClientService extends OctoprintApiService {
     if (isNaN(filamentID)) {
       throw OPClientErrors.filamentIDNotANumber;
     }
-    const getURL = `${apiPluginFilamentManagerSpecificSpool}/${parsedFilamentID}`;
+    const getURL = `${apiPluginFilamentManagerSpools}/${parsedFilamentID}`;
     return this.getWithOptionalRetry(printer, getURL, false);
   }
 
-  async login(printer, passive = true) {
-    return this.postPrinter(printer, apiLogin(passive), {}, false);
+  async downloadFile(printerConnection, fetchPath, targetPath, callback) {
+    const res = await this.getWithOptionalRetry(printerConnection, fetchPath, false);
+    const fileStream = fs.createWriteStream(targetPath);
+    return await new Promise((resolve, reject) => {
+      res.body.pipe(fileStream);
+      res.body.on("error", reject);
+      fileStream.on("finish", async () => {
+        await callback(resolve, reject);
+      });
+    });
+  }
+
+  async downloadImage({ printerURL, apiKey }, fetchPath, targetPath, callback) {
+    const downloadURL = new URL(fetchPath, printerURL);
+    return request.head(downloadURL, (err, res, body) => {
+      res.headers["content-type"] = "image/png";
+      res.headers["x-api-key"] = apiKey;
+      request(url).pipe(fs.createWriteStream(targetPath)).on("close", callback);
+    });
   }
 }
 
-module.exports = {
-  OctoprintApiClientService
-};
+module.exports = OctoPrintApiClientService;

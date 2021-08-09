@@ -1,22 +1,30 @@
-describe("ServerCommands", () => {
-  jest.mock("child_process", () => {
-    return {
-      exec: () => Promise.resolve()
-    };
-  });
-  jest.mock("../../server_src/utils/npm.utils");
-  jest.mock("simple-git");
-  const SimpleGit = require("simple-git");
-  const mockedSimpleGit = SimpleGit();
-  const npmUtils = require("../../server_src/utils/npm.utils");
-  const { SystemCommands } = require("../../server_src/lib/serverCommands");
+jest.mock("child_process", () => {
+  return {
+    exec: () => Promise.resolve()
+  };
+});
+jest.mock("../../server_src/utils/npm.utils");
+jest.mock("simple-git");
+const SimpleGit = require("simple-git");
+const mockedSimpleGit = SimpleGit();
+const npmUtils = require("../../server_src/utils/npm.utils");
+jest.mock("lookpath", () => {
+  return {
+    lookpath: () => Promise.resolve("/usr/random/path")
+  };
+});
+const { lookpath } = require("lookpath");
+const { configureContainer } = require("../../server_src/container");
+const DITokens = require("../../server_src/container.tokens");
 
-  jest.mock("lookpath", () => {
-    return {
-      lookpath: () => Promise.resolve("/usr/random/path")
-    };
+describe("ServerCommands", () => {
+  let container;
+  let systemCommandsService;
+
+  beforeAll(() => {
+    container = configureContainer();
+    systemCommandsService = container.resolve(DITokens.systemCommandsService);
   });
-  const { lookpath } = require("lookpath");
 
   describe("package updates, modifications and pull", () => {
     const scenarioModifiedOutput = {
@@ -106,7 +114,10 @@ describe("ServerCommands", () => {
 
     it("should be able to detect no updates", async () => {
       mockedSimpleGit.setTestScenario(scenarioUpToDate);
-      const serverResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate({}, true);
+      const serverResponse = await systemCommandsService.checkIfOctoFarmNeedsUpdatingAndUpdate(
+        {},
+        true
+      );
       expect(serverResponse.message).toBe(upToDateMessage);
       expect(serverResponse.haveWeSuccessfullyUpdatedOctoFarm).toBe(false);
       expect(serverResponse.statusTypeForUser).toBe(successType);
@@ -115,7 +126,10 @@ describe("ServerCommands", () => {
     it("should be able to complete when no uninstalled packages and behind in commits", async () => {
       mockedSimpleGit.setTestScenario(scenarioBehindOutput);
       npmUtils.setHasMissingPackages([]);
-      const serverResponse2 = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate({}, true);
+      const serverResponse2 = await systemCommandsService.checkIfOctoFarmNeedsUpdatingAndUpdate(
+        {},
+        true
+      );
       expect(serverResponse2.message).toContain(upDateCompletedMessage);
       expect(serverResponse2.statusTypeForUser).toBe(successType);
     });
@@ -123,7 +137,10 @@ describe("ServerCommands", () => {
     it("should be able to detect but not fix missing npm packages without force.doWeInstallPackages", async () => {
       mockedSimpleGit.setTestScenario(scenarioBehindOutput);
       npmUtils.setHasMissingPackages(["random"]);
-      const serverResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate({}, true);
+      const serverResponse = await systemCommandsService.checkIfOctoFarmNeedsUpdatingAndUpdate(
+        {},
+        true
+      );
       expect(serverResponse.message).toContain(missingPackagesMessage);
       expect(serverResponse.statusTypeForUser).toBe(warningType);
     });
@@ -131,7 +148,7 @@ describe("ServerCommands", () => {
     it("should be able to detect and fix missing npm packages", async () => {
       mockedSimpleGit.setTestScenario(scenarioBehindOutput);
       npmUtils.setHasMissingPackages(["random"]);
-      const serverResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate(
+      const serverResponse = await systemCommandsService.checkIfOctoFarmNeedsUpdatingAndUpdate(
         {},
         { doWeInstallPackages: true }
       );
@@ -147,7 +164,10 @@ describe("ServerCommands", () => {
 
     it("should fail on not being a git repo", async () => {
       mockedSimpleGit.setIsRepo(false);
-      const serverResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate({}, true);
+      const serverResponse = await systemCommandsService.checkIfOctoFarmNeedsUpdatingAndUpdate(
+        {},
+        true
+      );
       expect(serverResponse.message).toContain(notAGitRepoStart);
       expect(serverResponse.statusTypeForUser).toBe(warningType);
     });
@@ -155,7 +175,10 @@ describe("ServerCommands", () => {
     for (const spec of scenarioOutcomes) {
       it(spec.name, async () => {
         mockedSimpleGit.setTestScenario(spec.scenario);
-        const serverResponse = await SystemCommands.checkIfOctoFarmNeedsUpdatingAndUpdate({}, true);
+        const serverResponse = await systemCommandsService.checkIfOctoFarmNeedsUpdatingAndUpdate(
+          {},
+          true
+        );
         expect(serverResponse.message).toContain(spec.containsMessage);
         expect(serverResponse.statusTypeForUser).toBe(spec.type);
       });
@@ -165,14 +188,14 @@ describe("ServerCommands", () => {
   describe("Reboot command", () => {
     it("should not reboot octofarm in unknown mode", async () => {
       // Output indicates that we are neither in pm2 or nodemon mode
-      const output = await SystemCommands.rebootOctoFarm();
+      const output = await systemCommandsService.restartOctoFarm();
       expect(output).toBe(false);
     });
 
     it("should be able to attempt rebooting octofarm - pm2 mode", async () => {
       // Output indicates that we are in pm2 mode
       process.env.PM2_HOME = "true";
-      const outputPm2 = await SystemCommands.rebootOctoFarm();
+      const outputPm2 = await systemCommandsService.restartOctoFarm();
       expect(outputPm2).toBe(true);
       delete process.env.PM2_HOME;
     });
@@ -180,7 +203,7 @@ describe("ServerCommands", () => {
     it("should be able to attempt rebooting octofarm - nodemon mode", async () => {
       // Output indicates that we are in nodemon mode
       process.env.npm_lifecycle_script = "something something nodemon";
-      const outputNodemon = await SystemCommands.rebootOctoFarm();
+      const outputNodemon = await systemCommandsService.restartOctoFarm();
       expect(outputNodemon).toBe(true);
       delete process.env.npm_lifecycle_script;
     });

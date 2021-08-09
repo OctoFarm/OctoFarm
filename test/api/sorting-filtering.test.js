@@ -1,43 +1,44 @@
-jest.mock("../../server_src/config/auth");
+jest.mock("../../server_src/middleware/auth");
 
 const dbHandler = require("../db-handler");
 const supertest = require("supertest");
 const getEndpoints = require("express-list-endpoints");
+const DITokens = require("../../server_src/container.tokens");
 const {
   defaultFilterBy,
   defaultSortBy
-} = require("../../server_src/lib/providers/filter-sorting.constants");
-const { getSorting } = require("../../server_src/lib/sorting");
-const { getFilter } = require("../../server_src/lib/sorting");
+} = require("../../server_src/constants/filter-sorting.constants");
 const { setupTestApp } = require("../../server_src/app-test");
 
 let request;
+let container;
+
+const routeBase = "/api/client";
+const updateFilterGetRoute = routeBase + "/updateFilter/filterstring";
 
 beforeAll(async () => {
   await dbHandler.connect();
-  const server = await setupTestApp();
+  const { server, container: testContainer } = await setupTestApp();
+  container = testContainer;
 
   const endpoints = getEndpoints(server);
   expect(endpoints).toContainEqual({
     methods: ["GET"],
-    middleware: ["anonymous", "anonymous"],
-    path: "/client/updateFilter/:filter"
+    middleware: ["anonymous", "memberInvoker"],
+    path: `${routeBase}/updateFilter/:filter`
   });
   expect(endpoints).toContainEqual({
     methods: ["GET"],
-    middleware: ["anonymous", "anonymous"],
-    path: "/client/updateSorting/:sorting"
+    middleware: ["anonymous", "memberInvoker"],
+    path: `${routeBase}/updateSorting/:sorting`
   });
   request = supertest(server);
 });
 
-const routeBase = "/client";
-
 describe("Filter", () => {
-  const updateFilterGetRoute = routeBase + "/updateFilter/filterstring";
-
   it("should default to defaultFilterBy constant", async () => {
-    const filtering = getFilter();
+    const cache = container.resolve(DITokens.sortingFilteringCache);
+    const filtering = cache.getFilter();
     expect(filtering).toEqual(defaultFilterBy);
   });
 
@@ -46,7 +47,8 @@ describe("Filter", () => {
     const response = await request.get(updateFilterGetRoute).send();
     expect(response.statusCode).toEqual(200);
 
-    const filtering = getFilter();
+    const cache = container.resolve(DITokens.sortingFilteringCache);
+    const filtering = cache.getFilter();
     expect(filtering).toEqual("filterstring");
   });
 });
@@ -55,8 +57,9 @@ describe("Sorting", () => {
   const updateSortingGetRoute = routeBase + "/updateSorting/sortingstring";
 
   it("should default to defaultFilterBy constant", async () => {
-    const filtering = getSorting();
-    expect(filtering).toEqual(defaultSortBy);
+    const cache = container.resolve(DITokens.sortingFilteringCache);
+    const sorting = cache.getSorting();
+    expect(sorting).toEqual(defaultSortBy);
   });
 
   // TODO this test shows that this API endpoint is weakly constrained
@@ -64,7 +67,8 @@ describe("Sorting", () => {
     const response = await request.get(updateSortingGetRoute).send();
     expect(response.statusCode).toEqual(200);
 
-    const sorting = getSorting();
+    const cache = container.resolve(DITokens.sortingFilteringCache);
+    const sorting = cache.getSorting();
     expect(sorting).toEqual("sortingstring");
   });
 });

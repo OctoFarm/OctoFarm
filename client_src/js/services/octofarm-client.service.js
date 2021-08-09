@@ -54,8 +54,9 @@ axios.interceptors.response.use(
 // Would go by page, each page could get it's own extends class for pre-defined routes building on the CRUD actions available.
 export default class OctoFarmClient {
   static base = "/api";
-  static printerRoute = "/printers";
-  static serverSettingsRoute = "/settings/server";
+  static amIAliveRoute = this.base + "/amialive";
+  static printerRoute = this.base + "/printer";
+  static serverSettingsRoute = this.base + "/settings/server";
   static logsRoute = `${this.serverSettingsRoute}/logs`;
   static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
 
@@ -80,25 +81,71 @@ export default class OctoFarmClient {
     }
   }
 
+  static async amIAlive() {
+    return await this.get(`${this.amIAliveRoute}`);
+  }
+
   static async getPrinter(id) {
     if (!id) {
       throw "Cant fetch printer without defined 'id' input";
     }
-    const body = {
-      i: id
-    };
-    return await this.post(`${this.printerRoute}/printerInfo/`, body);
+    return await this.get(`${this.printerRoute}/${id}`);
   }
 
   static async listPrinters() {
-    return this.post(`${this.printerRoute}/printerInfo/`);
+    return this.get(`${this.printerRoute}`);
+  }
+
+  static async createPrinter(newPrinter) {
+    this.validateRequiredProps(newPrinter, [
+      "apiKey",
+      "printerURL"
+      // "webSocketURL" // TODO generate client-side
+    ]);
+    return this.post(`${this.printerRoute}/create`, newPrinter);
+  }
+
+  static async updatePrinterConnectionSettings(settings) {
+    this.validateRequiredProps(settings.printer, ["apiKey", "printerURL", "webSocketURL"]);
+
+    return this.patch(`${this.printerRoute}/update`, settings);
+  }
+
+  static async updateSortIndex(idList) {
+    return this.patch(`${this.printerRoute}/updateSortIndex`, { sortList: idList });
+  }
+
+  static async setStepSize(printerId, stepSize) {
+    return this.patch(`${this.printerRoute}/${printerId}/step-size`, { stepSize });
+  }
+
+  static async setFlowRate(printerId, flowRate) {
+    return this.patch(`${this.printerRoute}/${printerId}/flow-rate`, { flowRate });
+  }
+
+  static async setFeedRate(printerId, feedRate) {
+    return this.patch(`${this.printerRoute}/${printerId}/feed-rate`, { feedRate });
+  }
+
+  static async deletePrinter(printerId) {
+    return this.delete(`${this.printerRoute}/${printerId}`);
+  }
+
+  static async resetPowerSettings(printerId) {
+    return this.patch(`${this.printerRoute}/${printerId}/reset-power-settings`);
+  }
+
+  static async reconnectOctoPrintCommand(id) {
+    return this.put(`${this.printerRoute}/${id}/reconnect`);
+  }
+
+  static async reconnectFarmCommand() {
+    throw "This command is not implemented as it is quite taxing...";
+    // return this.postApi(`${this.printerRoute}/reconnectOctoPrint/`);
   }
 
   static async refreshPrinterSettings(id) {
-    const body = {
-      i: id
-    };
-    return this.post(`${this.printerRoute}/updatePrinterSettings`, body);
+    return this.get(`${this.printerRoute}/${id ? id : ""}`);
   }
 
   static async generateLogDump() {
@@ -106,11 +153,23 @@ export default class OctoFarmClient {
   }
 
   static async getHistoryStatistics() {
-    return this.get("history/statisticsData");
+    return this.get("/history/statisticsData");
+  }
+
+  static async getFilamentDropDown() {
+    return this.get("/filament/get/dropDownList");
+  }
+
+  static async selectFilament(data) {
+    return this.post("/filament/select", data);
+  }
+
+  static async getHistory() {
+    return this.get("/history/get");
   }
 
   static async getClientSettings() {
-    return this.get("settings/client/get");
+    return this.get("/settings/client/get");
   }
 
   static async getServerSettings() {
@@ -127,7 +186,19 @@ export default class OctoFarmClient {
   }
 
   static async getCustomGcode() {
-    return this.get("settings/customGcode");
+    return this.get("/settings/customGcode");
+  }
+
+  static async resyncFilamentManager() {
+    return this.post("/filament/filamentManagerReSync");
+  }
+
+  static async getFilamentSpools() {
+    return this.get("/filament/get/filament");
+  }
+
+  static async listFilamentProfiles() {
+    return this.get("/filament/get/profile");
   }
 
   static async get(path) {
@@ -140,6 +211,13 @@ export default class OctoFarmClient {
   static async post(path, data) {
     const url = new URL(path, window.location.origin).href;
     return axios.post(url, data).then((res) => {
+      return res.data;
+    });
+  }
+
+  static async put(path, data) {
+    const url = new URL(path, window.location.origin).href;
+    return axios.put(url, data).then((res) => {
       return res.data;
     });
   }

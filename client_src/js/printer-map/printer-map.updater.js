@@ -62,7 +62,7 @@ function attachEventToStopButton(printer) {
             command: "cancel"
           };
 
-          OctoPrintClient.post(print, "job", opts)
+          OctoPrintClient.postApi(print, "job", opts)
             .then((r) => {
               if (r.status === 200 || r.status === 201 || r.status === 204) {
                 // Error

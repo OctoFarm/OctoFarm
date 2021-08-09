@@ -18,12 +18,9 @@ if (!!majorVersion && majorVersion < 14) {
   const {
     setupEnvConfig,
     fetchMongoDBConnectionString,
+    runMigrations,
     fetchOctoFarmPort
   } = require("./server_src/app-env");
-
-  function bootAutoDiscovery() {
-    require("./server_src/runners/autoDiscovery.js");
-  }
 
   // Set environment/.env file and NODE_ENV if not set. Will call startup checks.
   setupEnvConfig();
@@ -34,11 +31,13 @@ if (!!majorVersion && majorVersion < 14) {
     ensureSystemSettingsInitiated
   } = require("./server_src/app-core");
 
+  const DITokens = require("./server_src/container.tokens");
+
   const mongoose = require("mongoose");
   const Logger = require("./server_src/handlers/logger.js");
   const logger = new Logger("OctoFarm-Server");
 
-  const octoFarmServer = setupExpressServer();
+  const { app: octoFarmServer, container } = setupExpressServer();
 
   mongoose
     .connect(fetchMongoDBConnectionString(), {
@@ -48,23 +47,29 @@ if (!!majorVersion && majorVersion < 14) {
       useCreateIndex: true,
       serverSelectionTimeoutMS: 2500
     })
-    .then(() => ensureSystemSettingsInitiated())
+    .then(async (mg) => {
+      await runMigrations(mg.connection.db, mg.connection.getClient());
+      await ensureSystemSettingsInitiated(container);
+    })
     .then(async () => {
       const port = fetchOctoFarmPort();
+
+      // Shit hit the fan
       if (!port || Number.isNaN(parseInt(port))) {
-        throw new Error("The server database-issue mode requires a numeric port input argument");
+        throw new Error("The OctoFarm server requires a numeric port input argument to run");
       }
 
-      const app = await serveOctoFarmNormally(octoFarmServer);
+      const app = await serveOctoFarmNormally(octoFarmServer, container);
       app.listen(port, "0.0.0.0", () => {
         logger.info(`Server started... open it at http://127.0.0.1:${port}`);
       });
+
+      const autoDiscoveryService = container.resolve(DITokens.autoDiscoveryService);
+      return autoDiscoveryService.searchForDevicesOnNetwork();
     })
     .catch(async (err) => {
       logger.error(err.stack);
       const { serveDatabaseIssueFallback } = require("./server_src/app-fallbacks");
       serveDatabaseIssueFallback(octoFarmServer, fetchOctoFarmPort());
     });
-
-  bootAutoDiscovery();
 }
