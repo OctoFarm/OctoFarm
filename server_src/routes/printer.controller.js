@@ -195,16 +195,13 @@ class PrinterController {
   async getPluginList(req, res) {
     const params = await validateInput(req.params, idRules);
 
-    let id = params.id;
+    this.#logger.info("Grabbing plugin list for: ", params.id);
 
-    this.#logger.info("Grabbing plugin list for: ", id);
-    let pluginList = await Runner.returnPluginList(id);
+    const printerState = this.#printersStore.getPrinterState(params.id);
+    const printerLogin = printerState.getLoginDetails();
+
+    let pluginList = await this.#octoPrintClient.getPluginManager(printerLogin, false);
     res.send(pluginList);
-
-    // The following is not allowed (yet)
-    // this.#logger.info("Grabbing global plugin list");
-    // let pluginList = await Runner.returnPluginList();
-    // res.send(pluginList);
   }
 }
 
