@@ -8,9 +8,11 @@ class ConnectionLogsCache {
   #printerConnectionLogs = {};
 
   #printerTickerStore;
+  #printersStore;
 
-  constructor({ printerTickerStore }) {
+  constructor({ printerTickerStore, printersStore }) {
     this.#printerTickerStore = printerTickerStore;
+    this.#printersStore = printersStore;
   }
 
   // TODO line
@@ -49,10 +51,11 @@ class ConnectionLogsCache {
     return this.#printerConnectionLogs[printerId];
   }
 
-  async generateConnectionLogs(printerState) {
+  async generateConnectionLogs(printerId) {
+    const printerState = this.#printersStore.getPrinterState(printerId);
+
     let printerErrorLogs = await ErrorLog.find({});
     const printerName = printerState.getName();
-    const printerId = printerState._id;
 
     let currentErrorLogs = [];
     let currentOctoFarmLogs = [];

@@ -101,7 +101,7 @@ class PrintersStore {
     const printerState = this.#printerStates.find((p) => p.id === id);
 
     if (!printerState) {
-      throw new NotFoundException(`The printer ID '${id}' was not generated. This is a bug.`);
+      throw new NotFoundException(`The printer ID '${id}' was not found in the PrintersStore.`);
     }
 
     return printerState;

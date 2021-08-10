@@ -4,12 +4,13 @@ const dbHandler = require("../../db-handler");
 
 let container;
 let connectionLogsCache;
+let printersStore;
 
 beforeAll(async () => {
   await dbHandler.connect();
   container = configureContainer();
   connectionLogsCache = container.resolve(DITokens.connectionLogsCache);
-  const printersStore = container.resolve(DITokens.printersStore);
+  printersStore = container.resolve(DITokens.printersStore);
   await printersStore.loadPrintersStore();
 });
 afterEach(async () => {
@@ -25,7 +26,13 @@ describe(DITokens.connectionLogsCache, () => {
   });
 
   it("should run generateConnectionLogs just fine", async () => {
-    await connectionLogsCache.generateConnectionLogs([]);
+    const printerState = await printersStore.addPrinter({
+      printerURL: "http://url.com",
+      webSocketURL: "ws://url.com",
+      apiKey: "octofarmoctofarmoctofarmoctofarm",
+      tempTriggers: { heatingVariation: null }
+    });
+    await connectionLogsCache.generateConnectionLogs(printerState.id);
   });
 
   test.skip("should be able to call returnPrinterLogs", () => {
