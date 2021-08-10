@@ -56,12 +56,25 @@ export default class OctoFarmClient {
   static base = "/api";
   static amIAliveRoute = this.base + "/amialive";
   static printerRoute = this.base + "/printer";
-  static serverSettingsRoute = this.base + "/settings/server";
+  static settingsRoute = this.base + "/settings";
+  static serverSettingsRoute = this.settingsRoute + "/server";
   static logsRoute = `${this.serverSettingsRoute}/logs`;
-  static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
+  static generateLogsDumpRoute = `${this.logsRoute}/generate-log-dump`;
+  static serverRestartRoute = `${this.serverSettingsRoute}/restart`;
+  static clientSettingsRoute = this.settingsRoute + "/client";
+  static customGCodeSettingsRoutes = this.settingsRoute + "/custom-gcode";
   static clientRoute = this.base + "/client";
   static clientFilterRoute = this.clientRoute + "/filter";
   static clientSortingRoute = this.clientRoute + "/sorting";
+  static historyRoute = this.base + "/history";
+  static historyStatsRoute = this.historyRoute + "/stats";
+  static filamentRoute = this.base + "/filament";
+  static filamentDropdownListRoute = this.filamentRoute + "/dropDownList";
+  static filamentProfilesRoute = this.filamentRoute + "/profiles";
+  static filamentSpoolsRoute = this.filamentRoute + "/spools";
+  static filamentSelectRoute = this.filamentRoute + "/select";
+  static filamentManagerRoute = this.filamentRoute + "/filament-manager";
+  static filamentManagerReSyncRoute = this.filamentManagerRoute + "/resync";
 
   static validatePath(pathname) {
     if (!pathname) {
@@ -85,14 +98,14 @@ export default class OctoFarmClient {
   }
 
   static async amIAlive() {
-    return await this.get(`${this.amIAliveRoute}`);
+    return await this.get(${this.amIAliveRoute});
   }
 
-  static async getPrinter(id) {
-    if (!id) {
+  static async getPrinter(printerId) {
+    if (!printerId) {
       throw "Cant fetch printer without defined 'id' input";
     }
-    return await this.get(`${this.printerRoute}/${id}`);
+    return await this.get(`${this.printerRoute}/${printerId}`);
   }
 
   static async listPrinters() {
@@ -105,17 +118,17 @@ export default class OctoFarmClient {
       "printerURL"
       // "webSocketURL" // TODO generate client-side
     ]);
-    return this.post(`${this.printerRoute}/create`, newPrinter);
+    return this.post(`${this.printerRoute}/`, newPrinter);
   }
 
   static async updatePrinterConnectionSettings(settings) {
     this.validateRequiredProps(settings.printer, ["apiKey", "printerURL", "webSocketURL"]);
 
-    return this.patch(`${this.printerRoute}/update`, settings);
+    return this.patch(`${this.printerRoute}/${settings.printer.id}/connection`, settings);
   }
 
   static async updateSortIndex(idList) {
-    return this.patch(`${this.printerRoute}/updateSortIndex`, { sortList: idList });
+    return this.patch(`${this.printerRoute}/sort-index`, { sortList: idList });
   }
 
   static async setStepSize(printerId, stepSize) {
@@ -164,56 +177,56 @@ export default class OctoFarmClient {
   }
 
   static async generateLogDump() {
-    return this.post(`${this.logsRoute}/generateLogDump`, {});
-  }
-
-  static async getHistoryStatistics() {
-    return this.get("/history/statisticsData");
-  }
-
-  static async getFilamentDropDown() {
-    return this.get("/filament/get/dropDownList");
-  }
-
-  static async selectFilament(data) {
-    return this.post("/filament/select", data);
+    return this.put(this.generateLogsDumpRoute);
   }
 
   static async getHistory() {
-    return this.get("/history/get");
+    return this.get(this.historyRoute);
+  }
+
+  static async getHistoryStatistics() {
+    return this.get(this.historyStatsRoute);
   }
 
   static async getClientSettings() {
-    return this.get("/settings/client/get");
+    return this.get(this.clientSettingsRoute);
   }
 
   static async getServerSettings() {
-    return this.get(`${this.serverSettingsRoute}/get`);
+    return this.get(this.serverSettingsRoute);
   }
 
   static async updateServerSettings(settingsObject) {
     //TODO: should be patch not post
-    return this.post(this.updateSettingsRoute, settingsObject);
+    return this.put(this.serverSettingsRoute, settingsObject);
   }
 
   static async restartServer() {
-    return this.post(`${this.serverSettingsRoute}/restart`, {});
+    return this.patch(this.serverRestartRoute);
   }
 
-  static async getCustomGcode() {
-    return this.get("/settings/customGcode");
+  static async getCustomGCode() {
+    return this.get(this.customGCodeSettingsRoutes);
+  }
+
+  static async getFilamentDropDown() {
+    return this.get(this.filamentDropdownListRoute);
+  }
+
+  static async selectFilament(data) {
+    return this.patch(this.filamentSelectRoute, data);
   }
 
   static async resyncFilamentManager() {
-    return this.post("/filament/filamentManagerReSync");
+    return this.put(this.filamentManagerReSyncRoute);
   }
 
   static async getFilamentSpools() {
-    return this.get("/filament/get/filament");
+    return this.get(this.filamentSpoolsRoute);
   }
 
   static async listFilamentProfiles() {
-    return this.get("/filament/get/profile");
+    return this.get(this.filamentProfilesRoute);
   }
 
   static async updateClientFilter(filterString) {

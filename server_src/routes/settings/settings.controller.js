@@ -91,7 +91,7 @@ class SettingsController {
 module.exports = createController(SettingsController)
   .prefix(AppConstants.apiRoute + "/settings")
   .before([ensureAuthenticated])
-  .get("/client/get", "getClientSettings")
-  .post("/client/update", "updateClientSettings")
-  .get("/server/get", "getServerSettings")
-  .post("/server/update", "updateServerSettings");
+  .get("/client", "getClientSettings")
+  .put("/client", "updateClientSettings")
+  .get("/server", "getServerSettings")
+  .put("/server", "updateServerSettings");

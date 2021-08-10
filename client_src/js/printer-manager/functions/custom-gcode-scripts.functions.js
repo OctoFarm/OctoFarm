@@ -144,7 +144,7 @@ createNewScriptBtn.addEventListener("click", async (e) => {
 
 export async function loadCustomGcodeScriptsModel() {
   try {
-    const customScripts = await OctoFarmClient.getCustomGcode();
+    const customScripts = await OctoFarmClient.getCustomGCode();
     //Draw Scripts
     scriptTable.innerHTML = "";
     customScripts.forEach((script) => {

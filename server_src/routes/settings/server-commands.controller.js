@@ -66,4 +66,4 @@ module.exports = createController(ServerCommandsController)
   .before([ensureAuthenticated])
   .get("/update/check", "checkUpdate")
   .post("/update/octofarm", "updateOctoFarm")
-  .post("/restart", "restartServer");
+  .patch("/restart", "restartServer");

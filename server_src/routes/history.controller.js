@@ -16,7 +16,8 @@ class HistoryController {
   }
 
   async get(req, res) {
-    res.send({ history: this.#historyCache.historyClean });
+    const { history } = this.#historyCache.getHistoryCache();
+    res.send({ history });
   }
 
   async delete(req, res) {
@@ -169,9 +170,9 @@ class HistoryController {
 module.exports = createController(HistoryController)
   .prefix(AppConstants.apiRoute + "/history")
   .before([ensureAuthenticated])
-  .get("/get", "get")
+  .get("/", "get")
   .delete("/delete", "delete")
-  .post("/update", "update")
+  .put("/update", "update")
   .get("/stats", "stats")
   .get("/printer-stats/:id", "printerStats")
-  .post("/updateCostMatch", "updateCostMatch");
+  .patch("/update-cost-match", "updateCostMatch");

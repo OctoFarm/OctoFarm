@@ -54,7 +54,7 @@ class CustomGcodeController {
 
 // prettier-ignore
 module.exports = createController(CustomGcodeController)
-  .prefix(AppConstants.apiRoute + "/settings/customGcode")
+  .prefix(AppConstants.apiRoute + "/settings/custom-gcode")
   .before([ensureAuthenticated])
   .delete("/delete/:id", "deleteGcode")
   .get("/", "list")

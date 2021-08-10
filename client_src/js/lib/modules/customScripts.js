@@ -10,7 +10,7 @@ function getButton(button) {
 
 export default class CustomGenerator {
   static async generateButtons(printers) {
-    let customScripts = await OctoFarmClient.getCustomGcode();
+    let customScripts = await OctoFarmClient.getCustomGCode();
 
     //Draw Scripts
     let area = document.getElementById("customGcodeCommandsArea");
