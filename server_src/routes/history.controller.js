@@ -1,6 +1,8 @@
 const { createController } = require("awilix-express");
 const { ensureAuthenticated } = require("../middleware/auth");
 const { AppConstants } = require("../app.constants");
+const { validateInput } = require("../handlers/validators");
+const { idRules } = require("./validation/generic.validation");
 
 class HistoryController {
   #serverVersion;
@@ -15,20 +17,25 @@ class HistoryController {
     this.#octoFarmPageTitle = octoFarmPageTitle;
   }
 
-  async get(req, res) {
+  async getCache(req, res) {
     const { history } = this.#historyCache.getHistoryCache();
     res.send({ history });
   }
 
   async delete(req, res) {
-    const deleteHistory = req.body;
-    await History.findOneAndDelete({ _id: deleteHistory.id }).then(() => {
+    const data = await validateInput(req.params, idRules);
+    const historyId = data.id;
+
+    await History.findOneAndDelete({ _id: historyId }).then(() => {
       this.#historyCache.initCache();
     });
     res.send("success");
   }
 
   async update(req, res) {
+    const data = await validateInput(req.params, idRules);
+    const historyId = data.id;
+
     // Check required fields
     const latest = req.body;
     const { note } = latest;
@@ -158,7 +165,7 @@ class HistoryController {
       };
       historyEntity.markModified("printHistory");
       historyEntity.save().then(() => {
-        getHistoryCache().initCache();
+        this.#historyCache.initCache();
       });
 
       res.send(send);
@@ -170,9 +177,9 @@ class HistoryController {
 module.exports = createController(HistoryController)
   .prefix(AppConstants.apiRoute + "/history")
   .before([ensureAuthenticated])
-  .get("/", "get")
-  .delete("/delete", "delete")
-  .put("/update", "update")
+  .get("/", "getCache")
+  .delete("/:id", "delete")
+  .put("/:id", "update")
   .get("/stats", "stats")
   .get("/printer-stats/:id", "printerStats")
   .patch("/update-cost-match", "updateCostMatch");

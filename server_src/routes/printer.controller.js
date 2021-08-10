@@ -3,7 +3,6 @@ const { createController } = require("awilix-express");
 const Logger = require("../handlers/logger.js");
 const { validateMiddleware, validateInput } = require("../handlers/validators");
 const {
-  idRules,
   updateSortIndexRules,
   updatePrinterConnectionSettingRules,
   stepSizeRules,
@@ -13,6 +12,7 @@ const {
 const { AppConstants } = require("../app.constants");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
 const { NotImplementedException } = require("../exceptions/runtime.exceptions");
+const { idRules } = require("./validation/generic.validation");
 
 class PrinterController {
   #printersStore;

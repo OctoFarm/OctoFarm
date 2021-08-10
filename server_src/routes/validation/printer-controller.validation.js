@@ -1,9 +1,5 @@
 const { UUID_LENGTH } = require("../../constants/service.constants");
 
-const idRules = {
-  id: "required|mongoId"
-};
-
 const stepSizeRules = {
   stepSize: "required|in:01,1,10,100|numeric"
 };
@@ -31,7 +27,6 @@ const updatePrinterConnectionSettingRules = {
 };
 
 module.exports = {
-  idRules,
   stepSizeRules,
   feedRateRules,
   flowRateRules,

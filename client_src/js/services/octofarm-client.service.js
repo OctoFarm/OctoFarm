@@ -186,6 +186,14 @@ export default class OctoFarmClient {
     return this.get(this.historyRoute);
   }
 
+  static async deleteHistory(historyId) {
+    return this.delete(`${this.historyRoute}/${historyId}`);
+  }
+
+  static async updateHistory(historyId, data) {
+    return this.put(`${this.historyRoute}/${historyId}`, data);
+  }
+
   static async getHistoryStatistics() {
     return this.get(this.historyStatsRoute);
   }
