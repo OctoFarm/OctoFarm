@@ -3,6 +3,7 @@ const { ensureAuthenticated } = require("../middleware/auth");
 const { AppConstants } = require("../app.constants");
 const { validateInput } = require("../handlers/validators");
 const { idRules } = require("./validation/generic.validation");
+const { getCostSettingsDefault } = require("../constants/service.constants");
 
 class HistoryController {
   #serverVersion;
@@ -36,6 +37,9 @@ class HistoryController {
     const data = await validateInput(req.params, idRules);
     const historyId = data.id;
 
+    const serverSettings = this.#settingsStore.getServerSettings();
+    const filamentManagerEnabled = serverSettings.filamentManager;
+
     // Check required fields
     const latest = req.body;
     const { note } = latest;
@@ -54,10 +58,9 @@ class HistoryController {
           //Skip da save
         } else {
           if (filamentId[f] != 0) {
-            const serverSettings = await ServerSettings.find({});
             const spool = await Spools.findById(filamentId[f]);
 
-            if (serverSettings[0].filamentManager) {
+            if (filamentManagerEnabled) {
               const profiles = await Profiles.find({});
               const profileIndex = _.findIndex(profiles, function (o) {
                 return o.profile.index == spool.spools.profile;
@@ -84,10 +87,9 @@ class HistoryController {
         } else {
           history.printHistory.filamentSelection = [];
           if (filamentId[f] != 0) {
-            const serverSettings = await ServerSettings.find({});
             const spool = await Spools.findById(filamentId[f]);
 
-            if (serverSettings[0].filamentManager) {
+            if (filamentManagerEnabled) {
               const profiles = await Profiles.find({});
               const profileIndex = _.findIndex(profiles, function (o) {
                 return o.profile.index == spool.spools.profile;
@@ -109,7 +111,7 @@ class HistoryController {
     }
     history.markModified("printHistory");
     history.save().then(() => {
-      getHistoryCache().initCache();
+      this.#historyCache().initCache();
     });
     res.send("success");
   }
@@ -138,7 +140,7 @@ class HistoryController {
     const historyEntity = await History.findOne({ _id: latest.id });
     const printers = await Printers.find({});
     const printer = _.findIndex(printers, function (o) {
-      return o.settingsAppearance.name == historyEntity.printHistory.printerName;
+      return o.settingsAppearance.name === historyEntity.printHistory.printerName;
     });
     if (printer > -1) {
       historyEntity.printHistory.costSettings = printers[printer].costSettings;
@@ -151,13 +153,7 @@ class HistoryController {
       };
       res.send(send);
     } else {
-      historyEntity.printHistory.costSettings = {
-        powerConsumption: 0.5,
-        electricityCosts: 0.15,
-        purchasePrice: 500,
-        estimateLifespan: 43800,
-        maintenanceCosts: 0.25
-      };
+      historyEntity.printHistory.costSettings = getCostSettingsDefault();
       const send = {
         status: 400,
         printTime: historyEntity.printHistory.printTime,
