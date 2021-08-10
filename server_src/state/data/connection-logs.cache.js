@@ -49,22 +49,22 @@ class ConnectionLogsCache {
     return this.#printerConnectionLogs[printerId];
   }
 
-  async generateConnectionLogs(farmPrinter) {
+  async generateConnectionLogs(printerState) {
     let printerErrorLogs = await ErrorLog.find({});
+    const printerName = printerState.getName();
+    const printerId = printerState._id;
 
-    let currentOctoFarmLogs = [];
     let currentErrorLogs = [];
+    let currentOctoFarmLogs = [];
     let currentTempLogs = [];
     let currentOctoPrintLogs = [];
     for (let e = 0; e < printerErrorLogs.length; e++) {
-      if (
-        typeof printerErrorLogs[e].errorLog.printerID !== "undefined" &&
-        JSON.stringify(printerErrorLogs[e].errorLog.printerID) === JSON.stringify(farmPrinter._id)
-      ) {
+      const errorLogEntry = !!printerErrorLogs[e].errorLog;
+      if (errorLogEntry?.printerID === printerId) {
         let errorFormat = {
-          date: printerErrorLogs[e].errorLog.endDate,
-          message: printerErrorLogs[e].errorLog.reason,
-          printer: farmPrinter.printerURL,
+          date: errorLogEntry.endDate,
+          message: errorLogEntry.reason,
+          printer: printerName,
           state: "Offline"
         };
         currentErrorLogs.push(errorFormat);
@@ -73,7 +73,7 @@ class ConnectionLogsCache {
 
     let currentIssues = await this.#printerTickerStore.getIssueList();
     for (let i = 0; i < currentIssues.length; i++) {
-      if (JSON.stringify(currentIssues[i].printerID) === JSON.stringify(farmPrinter._id)) {
+      if (currentIssues[i].printerID === printerId) {
         let errorFormat = {
           date: currentIssues[i].date,
           message: currentIssues[i].message,
@@ -84,55 +84,54 @@ class ConnectionLogsCache {
       }
     }
 
-    let octoprintLogs = await this.#printerTickerStore.returnOctoPrintLogs();
-    for (let i = 0; i < octoprintLogs.length; i++) {
-      if (JSON.stringify(octoprintLogs[i].printerID) === JSON.stringify(farmPrinter._id)) {
+    let octoPrintLogs = await this.#printerTickerStore.returnOctoPrintLogs();
+    for (let i = 0; i < octoPrintLogs.length; i++) {
+      const octoPrintLog = octoPrintLogs[i];
+      if (octoPrintLog.printerId === printerId) {
         let octoFormat = {
-          date: octoprintLogs[i].date,
-          message: octoprintLogs[i].message,
-          printer: octoprintLogs[i].printer,
-          pluginDisplay: octoprintLogs[i].pluginDisplay,
-          state: octoprintLogs[i].state
+          date: octoPrintLog.date,
+          message: octoPrintLog.message,
+          printer: octoPrintLog.printer,
+          pluginDisplay: octoPrintLog.pluginDisplay,
+          state: octoPrintLog.state
         };
         currentOctoPrintLogs.push(octoFormat);
       }
     }
 
     let tempHistory = await TempHistory.find({
-      printer_id: farmPrinter._id
+      printer_id: printerId
     })
       .sort({ _id: -1 })
       .limit(500);
-    if (typeof tempHistory !== "undefined") {
+    if (!!tempHistory) {
       for (let h = 0; h < tempHistory.length; h++) {
         let hist = tempHistory[h].currentTemp;
-        const reFormatTempHistory = async function (tempHistory) {
-          // create a new object to store full name.
-          let keys = Object.keys(tempHistory);
-          let array = [];
 
-          for (let k = 0; k < keys.length; k++) {
-            if (keys[k] !== "time") {
-              let target = {};
-              let actual = {};
-              target = {
-                name: keys[k] + "-target",
-                data: []
-              };
-              actual = {
-                name: keys[k] + "-actual",
-                data: []
-              };
-              array.push(target);
-              array.push(actual);
-            }
+        // create a new object to store full name.
+        let keys = Object.keys(hist);
+        let historyArray = [];
+
+        for (let k = 0; k < keys.length; k++) {
+          if (keys[k] !== "time") {
+            let target = {};
+            let actual = {};
+            target = {
+              name: keys[k] + "-target",
+              data: []
+            };
+            actual = {
+              name: keys[k] + "-actual",
+              data: []
+            };
+            historyArray.push(target);
+            historyArray.push(actual);
           }
+        }
 
-          // return our new object.
-          return array;
-        };
-        currentTempLogs = await reFormatTempHistory(hist);
+        currentTempLogs = historyArray;
       }
+
       if (currentTempLogs.length > 0) {
         for (let h = 0; h < tempHistory.length; h++) {
           let hist = tempHistory[h].currentTemp;

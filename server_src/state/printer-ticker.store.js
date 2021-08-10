@@ -40,7 +40,7 @@ class PrinterTickerStore {
       id,
       date: Date.now(),
       message: message,
-      printerID: printer?._id,
+      printerId: printer?._id,
       printer: printer.printerURL,
       state: state
     };
