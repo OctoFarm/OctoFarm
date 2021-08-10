@@ -10,6 +10,7 @@ class SortingFilteringController {
   }
 
   updateFilter(req, res) {
+    console.log("Updating filter", req.params.filter);
     this.#sortingFilteringCache.updateFilter(req.params.filter);
     res.sendStatus(200);
   }
@@ -24,5 +25,5 @@ class SortingFilteringController {
 module.exports = createController(SortingFilteringController)
   .prefix(AppConstants.apiRoute + "/client")
   .before([ensureAuthenticated])
-  .get("/updateFilter/:filter", "updateFilter")
-  .get("/updateSorting/:sorting", "updateSorting");
+  .patch("/filter/:filter", "updateFilter")
+  .patch("/sorting/:sorting", "updateSorting");

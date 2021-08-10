@@ -42,8 +42,10 @@ class MonitoringSseTask {
       state: sp.printerState?.colour
     }));
 
+    const filterLabel = this.#sortingFilteringCache.getFilter();
+
     const sseData = {
-      printersInformation: serializablePrinterStates,
+      printersInformation: applyPrinterDisplay(serializablePrinterStates, filterLabel),
       currentOperations,
       printerControlList,
       clientSettings
@@ -77,14 +79,48 @@ class MonitoringSseTask {
 
 module.exports = MonitoringSseTask;
 
+function applyPrinterDisplay(printers, filterLabel) {
+  if (filterLabel === "All Printers") {
+    return printers;
+  }
+  const stateFilterPrefix = "State: ";
+  if (filterLabel.includes(stateFilterPrefix)) {
+    const filteredState = filterLabel.replace(stateFilterPrefix, "");
+
+    // Active, Idle, Disconnected, Complete
+    printers.forEach((p) => {
+      p.display = p.printerState.colour.category === filteredState;
+    });
+  } else {
+    //Check groups...
+    let currentGroups = [];
+    let current = null;
+    for (let i = 0; i < currentGroups.length; i++) {
+      if (filterLabel === currentGroups[i]) {
+        current = currentGroups[i];
+      }
+    }
+    if (current !== null) {
+      let i = 0,
+        len = printers.length;
+      while (i < len) {
+        printers[i].display = printers[i].group === current.replace("Group: ", "");
+        i++;
+      }
+      return printers;
+    }
+  }
+  return printers;
+}
+
 const sortMe = function (printers) {
   let sortBy = getSorting();
   if (sortBy === "index") {
     return printers;
   } else if (sortBy === "percent") {
     let sortedPrinters = printers.sort(function (a, b) {
-      if (typeof a.currentJob === "undefined") return 1;
-      if (typeof b.currentJob === "undefined") return -1;
+      if (!a.currentJob) return 1;
+      if (!b.currentJob) return -1;
       return parseFloat(a.currentJob.percent) - parseFloat(b.currentJob.percent);
     });
     let i = 0,
@@ -111,64 +147,5 @@ const sortMe = function (printers) {
     return sortedPrinters;
   } else {
     return printers;
-  }
-};
-const filterMe = function (printers) {
-  let filterBy = getFilter();
-  let currentGroups = []; // TODO Runner.returnGroupList();
-  if (filterBy === "All Printers") {
-    return printers;
-  } else if (filterBy === "State: Active") {
-    let i = 0,
-      len = printers.length;
-    while (i < len) {
-      printers[i].display = printers[i].printerState.colour.category === "Active";
-      i++;
-    }
-    return printers;
-  } else if (filterBy === "State: Idle") {
-    let i = 0,
-      len = printers.length;
-    while (i < len) {
-      printers[i].display = printers[i].printerState.colour.category === "Idle";
-      i++;
-    }
-    return printers;
-  } else if (filterBy === "State: Disconnected") {
-    let i = 0,
-      len = printers.length;
-    while (i < len) {
-      printers[i].display = printers[i].printerState.colour.category === "Disconnected";
-      i++;
-    }
-    return printers;
-  } else if (filterBy === "State: Complete") {
-    let i = 0,
-      len = printers.length;
-    while (i < len) {
-      printers[i].display = printers[i].printerState.colour.category === "Complete";
-      i++;
-    }
-    return printers;
-  } else {
-    //Check groups...
-    let current = null;
-    for (let i = 0; i < currentGroups.length; i++) {
-      if (filterBy === currentGroups[i]) {
-        current = currentGroups[i];
-      }
-    }
-    if (current !== null) {
-      let i = 0,
-        len = printers.length;
-      while (i < len) {
-        printers[i].display = printers[i].group === current.replace("Group: ", "");
-        i++;
-      }
-      return printers;
-    } else {
-      //Fall back...
-      return printers;
-    }
   }
 };

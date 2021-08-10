@@ -22,11 +22,11 @@ import { fileListStorageSize, findOldFiles } from "./printer-map/printer-map.uti
 import { humanFileSize } from "./utils/file-size.util";
 
 document.addEventListener("visibilitychange", handleVisibilityChange, false);
-document.getElementById("filterStates").addEventListener("change", (e) => {
-  OctoFarmClient.get("/client/updateFilter/" + e.target.value);
+document.getElementById("filterStates").addEventListener("change", async (e) => {
+  await OctoFarmClient.updateClientFilter(e.target.value);
 });
-document.getElementById("sortStates").addEventListener("change", (e) => {
-  OctoFarmClient.get("/client/updateSorting/" + e.target.value);
+document.getElementById("sortStates").addEventListener("change", async (e) => {
+  await OctoFarmClient.updateClientSorting(e.target.value);
 });
 
 createWebWorker("panel");

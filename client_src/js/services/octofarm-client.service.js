@@ -59,6 +59,9 @@ export default class OctoFarmClient {
   static serverSettingsRoute = this.base + "/settings/server";
   static logsRoute = `${this.serverSettingsRoute}/logs`;
   static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
+  static clientRoute = this.base + "/client";
+  static clientFilterRoute = this.clientRoute + "/filter";
+  static clientSortingRoute = this.clientRoute + "/sorting";
 
   static validatePath(pathname) {
     if (!pathname) {
@@ -213,6 +216,14 @@ export default class OctoFarmClient {
     return this.get("/filament/get/profile");
   }
 
+  static async updateClientFilter(filterString) {
+    return this.patch(`${this.clientFilterRoute}/${filterString}`);
+  }
+
+  static async updateClientSorting(sortingString) {
+    return this.patch(`${this.clientSortingRoute}/${sortingString}`);
+  }
+
   static async get(path) {
     const url = new URL(path, window.location.origin).href;
     return axios.get(url).then((res) => {
@@ -243,7 +254,7 @@ export default class OctoFarmClient {
 
   static async patch(path, data) {
     const url = new URL(path, window.location.origin).href;
-    return axios.delete(url, data).then((res) => {
+    return axios.patch(url, data).then((res) => {
       return res.data;
     });
   }
