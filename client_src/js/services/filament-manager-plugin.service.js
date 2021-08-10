@@ -2,28 +2,14 @@ import OctoFarmClient from "../services/octofarm-client.service";
 import UI from "../lib/functions/ui";
 
 export async function checkFilamentManager() {
-  let settings = await OctoFarmClient.get("settings/server/get");
-  return settings.filamentManager;
-}
-
-export async function isFilamentManagerPluginSyncEnabled() {
-  try {
-    const systemSettings = await OctoFarmClient.get("settings/server/get");
-    return systemSettings.filamentManager;
-  } catch (e) {
-    console.error(e);
-    UI.createAlert(
-      "error",
-      "There was an issue contacting the server, please check your logs",
-      3000
-    );
-  }
+  const serverSettings = await OctoFarmClient.getServerSettings();
+  return serverSettings.filamentManager;
 }
 
 export function setupFilamentManagerDisableBtn() {
   const disableFilManagerBtn = document.getElementById("disable-FilamentManager");
   disableFilManagerBtn.addEventListener("click", async (event) => {
-    let filamentManagerDisabled = await OctoFarmClient.post("filament/disableFilamentPlugin", {
+    let filamentManagerDisabled = await OctoFarmClient.disableFilamentPlugin({
       activate: true
     });
     if (filamentManagerDisabled) {
@@ -47,7 +33,7 @@ export function setupFilamentManagerSyncBtn() {
   filamentManagerSyncBtn.addEventListener("click", async (event) => {
     UI.addLoaderToElementsInnerHTML(filamentManagerSyncBtn);
     filamentManagerSyncBtn.disabled = true;
-    const filamentManagerSyncEnabled = await OctoFarmClient.post("filament/filamentManagerSync", {
+    const filamentManagerSyncEnabled = await OctoFarmClient.syncFilamentManager({
       activate: true
     });
     if (filamentManagerSyncEnabled) {
@@ -68,13 +54,13 @@ export function setupFilamentManagerSyncBtn() {
   });
 }
 
-export function setupFilamentManagerReSyncBtn() {
-  const filamentManagerEnabled = isFilamentManagerPluginSyncEnabled();
+export async function setupFilamentManagerReSyncBtn() {
+  const filamentManagerEnabled = await checkFilamentManager();
   if (filamentManagerEnabled) {
     const resyncBtn = document.getElementById("resyncFilamentManagerBtn");
     resyncBtn.addEventListener("click", async (e) => {
       UI.addLoaderToElementsInnerHTML(resyncBtn);
-      const post = await OctoFarmClient.post("filament/filamentManagerReSync");
+      const post = await OctoFarmClient.reSyncFilamentManager();
       UI.createAlert(
         "success",
         `Successfully synced filament manager! <br> Profiles - Updated: ${post.updatedProfiles} / New: ${post.newProfiles} <br> Spools - Updated: ${post.updatedSpools} / New: ${post.newSpools}`,
@@ -85,6 +71,7 @@ export function setupFilamentManagerReSyncBtn() {
     });
   }
 }
+
 // TODO: re-enable at some point
 // export async function returnSelected(id, profiles) {
 //   console.log("Return Selected");
@@ -106,7 +93,7 @@ export function setupFilamentManagerReSyncBtn() {
 
 export async function returnDropDown(history) {
   try {
-    let dropDownLists = await OctoFarmClient.get("filament/get/dropDownList");
+    let dropDownLists = await OctoFarmClient.getFilamentDropDownList();
     if (history) {
       return dropDownLists.selected.historyDropDown;
     } else {
@@ -125,7 +112,7 @@ export async function selectFilament(printerId, spoolId, tool) {
     spoolId
   };
   try {
-    await OctoFarmClient.post("filament/select", data);
+    await OctoFarmClient.selectFilament(data);
   } catch (e) {
     UI.createAlert("error", "Issue changing your spool, please check the logs...");
   }

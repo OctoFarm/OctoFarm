@@ -75,6 +75,8 @@ export default class OctoFarmClient {
   static filamentSelectRoute = this.filamentRoute + "/select";
   static filamentManagerRoute = this.filamentRoute + "/filament-manager";
   static filamentManagerReSyncRoute = this.filamentManagerRoute + "/resync";
+  static filamentManagerSyncRoute = this.filamentManagerRoute + "/sync";
+  static filamentManagerDisableRoute = this.filamentManagerRoute + "/disable";
 
   static validatePath(pathname) {
     if (!pathname) {
@@ -98,7 +100,7 @@ export default class OctoFarmClient {
   }
 
   static async amIAlive() {
-    return await this.get(${this.amIAliveRoute});
+    return await this.get(this.amIAliveRoute);
   }
 
   static async getPrinter(printerId) {
@@ -209,7 +211,7 @@ export default class OctoFarmClient {
     return this.get(this.customGCodeSettingsRoutes);
   }
 
-  static async getFilamentDropDown() {
+  static async getFilamentDropDownList() {
     return this.get(this.filamentDropdownListRoute);
   }
 
@@ -217,8 +219,16 @@ export default class OctoFarmClient {
     return this.patch(this.filamentSelectRoute, data);
   }
 
-  static async resyncFilamentManager() {
+  static async reSyncFilamentManager() {
     return this.put(this.filamentManagerReSyncRoute);
+  }
+
+  static async syncFilamentManager(data) {
+    return this.patch(this.filamentManagerSyncRoute, data);
+  }
+
+  static async disableFilamentPlugin(data) {
+    return this.put(this.filamentManagerDisableRoute, data);
   }
 
   static async getFilamentSpools() {

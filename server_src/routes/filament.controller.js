@@ -88,7 +88,7 @@ class FilamentController {
     res.send({ status: 200 });
   }
 
-  async saveFilament(req, res) {
+  async create(req, res) {
     const { filamentManager } = this.#settingsStore.getServerSettings();
 
     const filament = req.body;
@@ -168,7 +168,7 @@ class FilamentController {
     }
   }
 
-  async deleteFilament(req, res) {
+  async delete(req, res) {
     const { filamentManager } = this.#settingsStore.getServerSettings();
 
     let searchId = req.body.id;
@@ -219,7 +219,7 @@ class FilamentController {
     }
   }
 
-  async editFilament(req, res) {
+  async update(req, res) {
     const { filamentManager } = this.#settingsStore.getServerSettings();
 
     const searchId = req.body.id;
@@ -311,7 +311,7 @@ class FilamentController {
     });
   }
 
-  async saveProfile(req, res) {
+  async createProfile(req, res) {
     const { filamentManager } = this.#settingsStore.getServerSettings();
 
     const newProfile = req.body;
@@ -381,7 +381,7 @@ class FilamentController {
     }
   }
 
-  async editProfile(req, res) {
+  async updateProfile(req, res) {
     const { filamentManager } = this.#settingsStore.getServerSettings();
 
     let searchId = req.body.id;
@@ -621,7 +621,7 @@ class FilamentController {
     }
   }
 
-  async disableFilamentPlugin(req, res) {
+  async disableFilamentManagerPlugin(req, res) {
     this.#logger.info("Request to disabled filament manager plugin");
     await Spool.deleteMany({}).then((e) => {
       this.#logger.info("Spools deleted");
@@ -648,18 +648,18 @@ class FilamentController {
 module.exports = createController(FilamentController)
   .prefix(AppConstants.apiRoute + "/filament")
   .before([ensureAuthenticated])
+  .post("/:id", "create")
+  .patch("/:id", "update")
+  .delete("/:id", "delete")
   .get("/dropdown-list", "dropDownList")
-  .get("/profiles", "listProfiles")
+  .get("/profile", "listProfiles")
+  .post("/profile/:id", "createProfile")
+  .patch("/profile/:id", "updateProfile")
+  .delete("/profile/:id", "deleteProfile")
   .get("/spools", "listSpools")
   .patch("/select", "selectFilament")
+  .get("/printer-list", "filamentList")
   // WIP line
-  .get("/get/printerList", "filamentList")
-  .post("/save/filament", "saveFilament")
-  .delete("/delete/filament", "deleteFilament")
-  .post("/edit/filament", "editFilament")
-  .post("/save/profile", "saveProfile")
-  .post("/edit/profile", "editProfile")
-  .delete("/delete/profile", "deleteProfile")
   .put("/filament-manager/resync", "filamentManagerReSync")
-  .post("/filament-manager/sync", "filamentManagerSync")
-  .post("/disableFilamentPlugin", "disableFilamentPlugin");
+  .patch("/filament-manager/sync", "filamentManagerSync")
+  .patch("/filament-manager/disable", "disableFilamentManagerPlugin");
