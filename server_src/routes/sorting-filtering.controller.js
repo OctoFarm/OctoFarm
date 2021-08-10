@@ -10,7 +10,6 @@ class SortingFilteringController {
   }
 
   updateFilter(req, res) {
-    console.log("Updating filter", req.params.filter);
     this.#sortingFilteringCache.updateFilter(req.params.filter);
     res.sendStatus(200);
   }

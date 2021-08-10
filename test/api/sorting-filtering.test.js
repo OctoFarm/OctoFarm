@@ -14,7 +14,8 @@ let request;
 let container;
 
 const routeBase = "/api/client";
-const updateFilterGetRoute = routeBase + "/updateFilter/filterstring";
+const updateFilterRoute = routeBase + "/filter";
+const updateSortingRoute = routeBase + "/sorting";
 
 beforeAll(async () => {
   await dbHandler.connect();
@@ -23,14 +24,14 @@ beforeAll(async () => {
 
   const endpoints = getEndpoints(server);
   expect(endpoints).toContainEqual({
-    methods: ["GET"],
+    methods: ["PATCH"],
     middleware: ["anonymous", "memberInvoker"],
-    path: `${routeBase}/updateFilter/:filter`
+    path: `${updateFilterRoute}/:filter`
   });
   expect(endpoints).toContainEqual({
-    methods: ["GET"],
+    methods: ["PATCH"],
     middleware: ["anonymous", "memberInvoker"],
-    path: `${routeBase}/updateSorting/:sorting`
+    path: `${updateSortingRoute}/:sorting`
   });
   request = supertest(server);
 });
@@ -44,7 +45,7 @@ describe("Filter", () => {
 
   // TODO this test shows that this API endpoint is weakly constrained
   it("should be able to update filter with route child as param", async () => {
-    const response = await request.get(updateFilterGetRoute).send();
+    const response = await request.patch(updateFilterRoute + "/filterstring").send();
     expect(response.statusCode).toEqual(200);
 
     const cache = container.resolve(DITokens.sortingFilteringCache);
@@ -54,7 +55,7 @@ describe("Filter", () => {
 });
 
 describe("Sorting", () => {
-  const updateSortingGetRoute = routeBase + "/updateSorting/sortingstring";
+  const updateSortingGetRoute = updateSortingRoute + "/sortingstring";
 
   it("should default to defaultFilterBy constant", async () => {
     const cache = container.resolve(DITokens.sortingFilteringCache);
@@ -64,7 +65,7 @@ describe("Sorting", () => {
 
   // TODO this test shows that this API endpoint is weakly constrained
   it("should be able to update sorting with route child as param", async () => {
-    const response = await request.get(updateSortingGetRoute).send();
+    const response = await request.patch(updateSortingGetRoute).send();
     expect(response.statusCode).toEqual(200);
 
     const cache = container.resolve(DITokens.sortingFilteringCache);
