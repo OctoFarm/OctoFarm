@@ -32,7 +32,7 @@ class ServerLogsService {
     return fileArray;
   }
 
-  async generateOctoFarmLogDumpZip() {
+  async generateLogDumpZip() {
     const fileList = [];
 
     // Generate nice text file of system information

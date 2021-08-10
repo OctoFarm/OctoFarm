@@ -6,10 +6,14 @@ const { AppConstants } = require("../../app.constants");
 class LogsController {
   #logger = new Logger("OctoFarm-API");
 
-  constructor({}) {}
+  #serverLogsService;
+
+  constructor({ serverLogsService }) {
+    this.#serverLogsService = serverLogsService;
+  }
 
   async list(req, res) {
-    const serverLogs = await Logs.grabLogs();
+    const serverLogs = await this.#serverLogsService.grabLogs();
     res.send(serverLogs);
   }
 
@@ -29,7 +33,7 @@ class LogsController {
     };
 
     try {
-      zipDumpResponse.zipDumpPath = await Logs.generateOctoFarmLogDump();
+      zipDumpResponse.zipDumpPath = await this.#serverLogsService.generateLogDumpZip();
       zipDumpResponse.status = "success";
       zipDumpResponse.msg = "Successfully generated zip file, please click the download button.";
     } catch (e) {
