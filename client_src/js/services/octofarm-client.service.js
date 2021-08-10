@@ -135,8 +135,8 @@ export default class OctoFarmClient {
     return this.patch(`${this.printerRoute}/${printerId}/reset-power-settings`);
   }
 
-  static async reconnectOctoPrintCommand(id) {
-    return this.put(`${this.printerRoute}/${id}/reconnect`);
+  static async reconnectOctoPrintCommand(printerId) {
+    return this.put(`${this.printerRoute}/${printerId}/reconnect`);
   }
 
   static async reconnectFarmCommand() {
