@@ -1,3 +1,1 @@
-export class UpdateServerSettingsDto {
-
-}
+export class UpdateServerSettingsDto {}

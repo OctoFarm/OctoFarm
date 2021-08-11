@@ -1,3 +1,3 @@
 export interface MonitoringConfigurationModel {
-    updateEventStreamPeriod: number;
+  updateEventStreamPeriod: number;
 }

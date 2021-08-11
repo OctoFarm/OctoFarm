@@ -1,6 +1,6 @@
-import {ObjectID} from "typeorm";
+import { ObjectID } from "typeorm";
 
 export class UserPayload {
-    id: ObjectID;
-    username: string;
+  id: ObjectID;
+  username: string;
 }

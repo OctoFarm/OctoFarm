@@ -1,4 +1,4 @@
 export enum OctoprintGroupType {
-    ADMIN = "admins",
-    USERS = "users"
+  ADMIN = "admins",
+  USERS = "users"
 }

@@ -10,20 +10,13 @@ import {
 } from "../printers.constants";
 import { toTimeFormat } from "../utils/time.util";
 import { stateToHtml } from "../utils/html.util";
-import {
-  arrayCounts,
-  checkNested,
-  checkNestedIndex
-} from "../utils/array.util";
+import { arrayCounts, checkNested, checkNestedIndex } from "../utils/array.util";
 import { floatOrZero } from "../utils/number.util";
 import { toDefinedKeyValue } from "../utils/property.util";
 import { Injectable } from "@nestjs/common";
 import { ServerSettingsCacheService } from "../../settings/services/server-settings-cache.service";
 import { ServerSettings } from "../../settings/entities/server-settings.entity";
-import {
-  getPrintCostNumeric,
-  noCostSettingsMessage
-} from "../utils/print-cost.util";
+import { getPrintCostNumeric, noCostSettingsMessage } from "../utils/print-cost.util";
 
 @Injectable()
 export class HistoryCache implements IHistoryCache {
@@ -83,11 +76,7 @@ export class HistoryCache implements IHistoryCache {
     if (!spool) {
       return null;
     }
-    return (
-      completionRatio *
-      (spool.spools.price / spool.spools.weight) *
-      grams
-    ).toFixed(2);
+    return (completionRatio * (spool.spools.price / spool.spools.weight) * grams).toFixed(2);
   }
 
   static getJobAnalysis(job, printTime) {
@@ -95,8 +84,7 @@ export class HistoryCache implements IHistoryCache {
       ? {
           actualPrintTime: printTime,
           estimatedPrintTime: job.estimatedPrintTime,
-          printTimeAccuracy:
-            ((printTime - job.estimatedPrintTime) / printTime) * 10000 // TODO can become NaN (2x)
+          printTimeAccuracy: ((printTime - job.estimatedPrintTime) / printTime) * 10000 // TODO can become NaN (2x)
         }
       : null;
   }
@@ -130,12 +118,7 @@ export class HistoryCache implements IHistoryCache {
       }));
   }
 
-  static processHistorySpools(
-    historyCleanEntry,
-    usageOverTime,
-    totalByDay,
-    historyByDay
-  ) {
+  static processHistorySpools(historyCleanEntry, usageOverTime, totalByDay, historyByDay) {
     const spools = historyCleanEntry?.spools;
     const historyState = historyCleanEntry.state;
 
@@ -162,15 +145,9 @@ export class HistoryCache implements IHistoryCache {
               // TODO why return? Not continue?
               return;
             }
-            checkNestedIndexHistoryRates = checkNestedIndex(
-              searchKeyword,
-              historyByDay
-            );
+            checkNestedIndexHistoryRates = checkNestedIndex(searchKeyword, historyByDay);
 
-            let checkNestedIndexByDay = checkNestedIndex(
-              spool[key].type,
-              usageOverTime
-            );
+            let checkNestedIndexByDay = checkNestedIndex(spool[key].type, usageOverTime);
             let usageWeightCalc = historyCleanEntry.totalWeight;
             if (!!usageOverTime[checkNestedIndexByDay].data[0]) {
               usageWeightCalc =
@@ -180,18 +157,14 @@ export class HistoryCache implements IHistoryCache {
             }
 
             let checkedIndex = checkNestedIndex(spool[key].type, totalByDay);
-            let weightCalcSan = parseFloat(
-              historyCleanEntry.totalWeight.toFixed(2)
-            );
+            let weightCalcSan = parseFloat(historyCleanEntry.totalWeight.toFixed(2));
 
             // Don't include 0 weights
             if (weightCalcSan > 0) {
               let historyDate = historyCleanEntry.endDate;
               let dateSplit = historyDate.split(" ");
               let month = ALL_MONTHS.indexOf(dateSplit[1]);
-              let dateString = `${parseInt(dateSplit[3])}-${
-                month + 1
-              }-${parseInt(dateSplit[2])}`;
+              let dateString = `${parseInt(dateSplit[3])}-${month + 1}-${parseInt(dateSplit[2])}`;
               let dateParse = new Date(dateString);
               // Check if more than 90 days ago...
               if (dateParse.getTime() > ninetyDaysAgo.getTime()) {
@@ -249,8 +222,7 @@ export class HistoryCache implements IHistoryCache {
   }
 
   async initCache() {
-    this.serverSettings =
-      await this.serverSettingsCacheService.getServerSettings();
+    this.serverSettings = await this.serverSettingsCacheService.getServerSettings();
 
     const storedHistory = await this.historyService.find({});
     const historyEntities = storedHistory ?? [];
@@ -261,10 +233,7 @@ export class HistoryCache implements IHistoryCache {
     const historyArray = [];
     for (let hist of historyEntities) {
       const printHistory = hist.printHistory;
-      const printCost = getPrintCostNumeric(
-        printHistory.printTime,
-        printHistory.costSettings
-      );
+      const printCost = getPrintCostNumeric(printHistory.printTime, printHistory.costSettings);
       const printSummary: HistoryCacheItemModel = {
         id: hist.id,
         index: printHistory.historyIndex,
@@ -284,10 +253,7 @@ export class HistoryCache implements IHistoryCache {
           printHistory.printTime
         ),
         thumbnail: printHistory.thumbnail,
-        job: HistoryCache.getJobAnalysis(
-          printHistory.job,
-          printHistory.printTime
-        ),
+        job: HistoryCache.getJobAnalysis(printHistory.job, printHistory.printTime),
         spoolCost: 0,
         totalVolume: 0,
         totalLength: 0,
@@ -312,8 +278,7 @@ export class HistoryCache implements IHistoryCache {
       }
       printSummary.totalCost = (printCost + printSummary.spoolCost).toFixed(2);
       printSummary.costPerHour = floatOrZero(
-        parseFloat(printSummary.totalCost) /
-          ((100 * parseFloat(printHistory.printTime)) / 360000)
+        parseFloat(printSummary.totalCost) / ((100 * parseFloat(printHistory.printTime)) / 360000)
       ).toFixed(2);
 
       printSummary.printHours = toTimeFormat(printHistory.printTime);
@@ -342,16 +307,8 @@ export class HistoryCache implements IHistoryCache {
     const historyByDay = [];
 
     for (let h = 0; h < this.history.length; h++) {
-      const {
-        printerCost,
-        file,
-        totalLength,
-        state,
-        printTime,
-        printer,
-        totalWeight,
-        spoolCost
-      } = this.history[h];
+      const { printerCost, file, totalLength, state, printTime, printer, totalWeight, spoolCost } =
+        this.history[h];
 
       if (state.includes("success")) {
         completedJobsCount++;
@@ -370,12 +327,7 @@ export class HistoryCache implements IHistoryCache {
       }
       filamentCost.push(spoolCost);
 
-      HistoryCache.processHistorySpools(
-        this.history[h],
-        usageOverTime,
-        totalByDay,
-        historyByDay
-      );
+      HistoryCache.processHistorySpools(this.history[h], usageOverTime, totalByDay, historyByDay);
     }
 
     // TODO huge refactor #2
@@ -392,12 +344,8 @@ export class HistoryCache implements IHistoryCache {
     let mostUsedPrinter = "No Printers";
     let leastUsedPrinter = "No Printers";
     if (printerNamesArray[0].length !== 0) {
-      const maxIndexPrinterNames = printerNamesArray[1].indexOf(
-        Math.max(...printerNamesArray[1])
-      );
-      const minIndexPrinterNames = printerNamesArray[1].indexOf(
-        Math.min(...printerNamesArray[1])
-      );
+      const maxIndexPrinterNames = printerNamesArray[1].indexOf(Math.max(...printerNamesArray[1]));
+      const minIndexPrinterNames = printerNamesArray[1].indexOf(Math.min(...printerNamesArray[1]));
       mostUsedPrinter = printerNamesArray[0][maxIndexPrinterNames];
       leastUsedPrinter = printerNamesArray[0][minIndexPrinterNames];
     }
@@ -424,17 +372,12 @@ export class HistoryCache implements IHistoryCache {
       failedPercent: ((failedCount / statTotal) * 100).toFixed(2),
       longestPrintTime: Math.max(...printTimes).toFixed(2),
       shortestPrintTime: Math.min(...printTimes).toFixed(2),
-      averagePrintTime: (
-        printTimes.reduce((a, b) => a + b, 0) / printTimes.length
-      ).toFixed(2),
+      averagePrintTime: (printTimes.reduce((a, b) => a + b, 0) / printTimes.length).toFixed(2),
       mostPrintedFile,
       printerMost: mostUsedPrinter,
       printerLoad: leastUsedPrinter,
       totalFilamentUsage:
-        totalFilamentWeight.toFixed(2) +
-        "g / " +
-        totalFilamentLength.toFixed(2) +
-        "m",
+        totalFilamentWeight.toFixed(2) + "g / " + totalFilamentLength.toFixed(2) + "m",
       averageFilamentUsage:
         (totalFilamentWeight / filamentWeight.length).toFixed(2) +
         "g / " +
@@ -508,11 +451,7 @@ export class HistoryCache implements IHistoryCache {
           volume: (completionRatio * metric.volume).toFixed(2),
           length: ((completionRatio * metric.length) / 1000).toFixed(2),
           weight: spoolWeight,
-          cost: HistoryCache.getCostAsString(
-            spoolWeight,
-            filamentEntry,
-            completionRatio
-          ),
+          cost: HistoryCache.getCostAsString(spoolWeight, filamentEntry, completionRatio),
           type: filamentEntry?.spools?.profile?.material || ""
         }
       });

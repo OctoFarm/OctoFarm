@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { CreateMonitoringDto } from '../dto/create-monitoring.dto';
-import { UpdateMonitoringDto } from '../dto/update-monitoring.dto';
+import { Injectable } from "@nestjs/common";
+import { CreateMonitoringDto } from "../dto/create-monitoring.dto";
+import { UpdateMonitoringDto } from "../dto/update-monitoring.dto";
 
 @Injectable()
 export class AlertsService {
   create(createMonitoringDto: CreateMonitoringDto) {
-    return 'This action adds a new monitoring';
+    return "This action adds a new monitoring";
   }
 
   findAll() {

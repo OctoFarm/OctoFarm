@@ -1,5 +1,5 @@
 export interface JobAnalysisModel {
-    actualPrintTime: number;
-    estimatedPrintTime:number;
-    printTimeAccuracy: number;
+  actualPrintTime: number;
+  estimatedPrintTime: number;
+  printTimeAccuracy: number;
 }

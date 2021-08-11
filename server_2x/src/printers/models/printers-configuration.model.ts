@@ -1,3 +1,3 @@
 export interface PrintersConfigurationModel {
-    updateEventStreamPeriod: number;
+  updateEventStreamPeriod: number;
 }

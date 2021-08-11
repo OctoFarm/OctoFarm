@@ -1,34 +1,38 @@
 interface EmptyFunction {
-    (): Promise<any>
+  (): Promise<any>;
 }
 
 function wait(duration: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, duration))
+  return new Promise((resolve) => setTimeout(resolve, duration));
 }
 
 function backoffOrig(retries: number, callbackFn: EmptyFunction, delay = 500): Promise<any> {
-    return callbackFn().catch((err) =>
-        retries > 1 ?
-            wait(delay).then(() => backoffOrig(retries - 1, callbackFn, delay * 2)) :
-            Promise.reject(err)
-    )
+  return callbackFn().catch((err) =>
+    retries > 1
+      ? wait(delay).then(() => backoffOrig(retries - 1, callbackFn, delay * 2))
+      : Promise.reject(err)
+  );
 }
 
-export async function backoff(retries: number, callbackFn: EmptyFunction, delay = 500): Promise<any> {
-    let result: any;
+export async function backoff(
+  retries: number,
+  callbackFn: EmptyFunction,
+  delay = 500
+): Promise<any> {
+  let result: any;
 
-    try {
-        result = await callbackFn();
-    } catch (e) {
-        if (retries > 1) {
-            await wait(delay);
-            result = await backoff(retries - 1, callbackFn, delay * 2);
-        } else {
-            throw e;
-        }
+  try {
+    result = await callbackFn();
+  } catch (e) {
+    if (retries > 1) {
+      await wait(delay);
+      result = await backoff(retries - 1, callbackFn, delay * 2);
+    } else {
+      throw e;
     }
+  }
 
-    return result;
+  return result;
 }
 
 // let i: number

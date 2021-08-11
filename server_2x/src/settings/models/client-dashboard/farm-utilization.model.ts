@@ -1,4 +1,4 @@
 export interface FarmUtilizationModel {
-    currentUtilisation: boolean,
-    farmUtilisation: boolean,
+  currentUtilisation: boolean;
+  farmUtilisation: boolean;
 }

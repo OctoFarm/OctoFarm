@@ -71,12 +71,8 @@ describe(HistoryCache.name, () => {
     }).compile();
 
     service = module.get<HistoryCache>(HistoryCache);
-    repoMock = module.get<PrinterHistoryEntityMock>(
-      getRepositoryToken(PrinterHistory)
-    );
-    serverSettingsService = module.get<ServerSettingsService>(
-      ServerSettingsService
-    );
+    repoMock = module.get<PrinterHistoryEntityMock>(getRepositoryToken(PrinterHistory));
+    serverSettingsService = module.get<ServerSettingsService>(ServerSettingsService);
   });
 
   it("should initiate and finish within 5 sec for empty history", async () => {
@@ -282,12 +278,7 @@ describe(HistoryCache.name, () => {
 
     await expect(await service.initCache()).resolves;
 
-    const resultingSpoolsReport = HistoryCache.processHistorySpools(
-      service.history[0],
-      [],
-      [],
-      []
-    );
+    const resultingSpoolsReport = HistoryCache.processHistorySpools(service.history[0], [], [], []);
     expect(resultingSpoolsReport.historyByDay).toContainEqual({
       name: "Success",
       data: []
@@ -307,20 +298,8 @@ describe("historyClean:Static", () => {
       { x: 0 },
       { x: 0, y: 1 }
     ];
-    const missingYInput = [
-      { x: 0 },
-      { x: 0, y: 1 },
-      { x: 0, y: 1 },
-      { x: 0 },
-      { x: 0, y: 1 }
-    ];
-    const falsyContainingInput = [
-      null,
-      { x: 0, y: 1 },
-      { x: 0 },
-      undefined,
-      { x: 0, y: 1 }
-    ];
+    const missingYInput = [{ x: 0 }, { x: 0, y: 1 }, { x: 0, y: 1 }, { x: 0 }, { x: 0, y: 1 }];
+    const falsyContainingInput = [null, { x: 0, y: 1 }, { x: 0 }, undefined, { x: 0, y: 1 }];
 
     // Prove that the new function outputs something useful
     expect(HistoryCache.assignYCumSum(undefinedYInput)[4]).toStrictEqual({

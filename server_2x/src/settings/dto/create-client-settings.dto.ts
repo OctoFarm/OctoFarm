@@ -1,3 +1,1 @@
-export class CreateClientSettingsDto {
-
-}
+export class CreateClientSettingsDto {}

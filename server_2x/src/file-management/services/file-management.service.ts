@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
-import { CreateFileManagementDto } from '../dto/create-file-management.dto';
-import { UpdateFileManagementDto } from '../dto/update-file-management.dto';
+import { Injectable } from "@nestjs/common";
+import { CreateFileManagementDto } from "../dto/create-file-management.dto";
+import { UpdateFileManagementDto } from "../dto/update-file-management.dto";
 
 @Injectable()
 export class FileManagementService {
   create(createFileManagementDto: CreateFileManagementDto) {
-    return 'This action adds a new fileManagement';
+    return "This action adds a new fileManagement";
   }
 
   findAll() {

@@ -6,15 +6,15 @@
  */
 
 export interface PluginMessageDto {
-    plugin?: {
-        plugin?: string;
-        data?: {
-            type?: string;
-            action?: string;
-            [k: string]: any;
-        };
-        [k: string]: any;
+  plugin?: {
+    plugin?: string;
+    data?: {
+      type?: string;
+      action?: string;
+      [k: string]: any;
     };
-
     [k: string]: any;
+  };
+
+  [k: string]: any;
 }

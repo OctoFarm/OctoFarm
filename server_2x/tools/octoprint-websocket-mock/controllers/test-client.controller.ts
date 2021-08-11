@@ -1,14 +1,13 @@
-import {Controller, Get} from "@nestjs/common";
-import {ApiTags} from "@nestjs/swagger";
-import {APP_PORT} from "../octoprint-websocket-mock.constants";
+import { Controller, Get } from "@nestjs/common";
+import { ApiTags } from "@nestjs/swagger";
+import { APP_PORT } from "../octoprint-websocket-mock.constants";
 
-@Controller('')
+@Controller("")
 @ApiTags(TestClientController.name)
 export class TestClientController {
-
-    @Get()
-    index() {
-        return `
+  @Get()
+  index() {
+    return `
         <html>
           <head>
             <script> 
@@ -60,5 +59,5 @@ export class TestClientController {
           </body>
         </html>            
         `;
-    }
+  }
 }
