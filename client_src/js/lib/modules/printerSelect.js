@@ -180,8 +180,8 @@ export default class PrinterSelect {
                           <td><input id="editInputURL-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.printerURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
                           <td class="${printer.state} d-none">${printer.state}</td>
                           <td><input id="editInputGroup-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.group}" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input id="editInputCamera-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.cameraURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input id="editInputApikey-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.apikey}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputCamera-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.camURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputApikey-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.apiKey}" aria-label="Username" aria-describedby="basic-addon1"></td>
     </tr>`;
   }
 
@@ -259,8 +259,8 @@ export default class PrinterSelect {
           state: printer.printerState.colour.category,
           group: printer.group,
           spool: spoolName,
-          cameraURL: printer.cameraURL,
-          apikey: printer.apikey
+          camURL: printer.camURL,
+          apiKey: printer.apiKey
         };
         printerList.push(forList);
       }

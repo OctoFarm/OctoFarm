@@ -3,7 +3,7 @@ import OctoFarmClient from "../services/octofarm-client.service";
 
 export default class OctoPrintClient {
   static validatePrinter(printer) {
-    if (!printer.apikey) {
+    if (!printer.apiKey) {
       throw new Error("Api key not provided");
     }
     if (!printer.printerURL) {
@@ -13,57 +13,38 @@ export default class OctoPrintClient {
 
   static get(printer, item) {
     this.validatePrinter(printer);
-    const url = `${printer.printerURL}/${item}`;
+
+    const url = new URL(item, printer.printerURL).href;
     return fetch(url, {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
+        "X-Api-Key": printer.apiKey
       }
     }).catch((e) => {
       console.log(e);
     });
   }
 
-  static postNOAPI(printer, item, data) {
-    this.validatePrinter(printer);
-    const url = `${printer.printerURL}/${item}`;
-    return fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
-      },
-      body: JSON.stringify(data)
-    }).catch((e) => {
-      console.log(e);
-    });
-  }
-
-  static post(printer, item, data) {
-    this.validatePrinter(printer);
-    const url = `${printer.printerURL}/api/${item}`;
-    return fetch(url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
-      },
-      body: JSON.stringify(data)
-    }).catch((e) => {
-      console.log(e);
-    });
+  static postApi(printer, item, data) {
+    return this.postRaw(printer, `/api/${item}`, data);
   }
 
   static folder(printer, item, data) {
+    return this.postRaw(printer, `/api/files/${item}`, data);
+  }
+
+  static postRaw(printer, item, data) {
     this.validatePrinter(printer);
-    const url = `${printer.printerURL}/api/files/${item}`;
+    const url = new URL(item, printer.printerURL).href;
+
     return fetch(url, {
       method: "POST",
       headers: {
-        "X-Api-Key": printer.apikey
+        "Content-Type": "application/json",
+        "X-Api-Key": printer.apiKey
       },
-      body: data
+      body: JSON.stringify(data)
     }).catch((e) => {
       console.log(e);
     });
@@ -76,7 +57,7 @@ export default class OctoPrintClient {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
+        "X-Api-Key": printer.apiKey
       }
     }).catch((e) => {
       console.log(e);
@@ -88,7 +69,7 @@ export default class OctoPrintClient {
       command: "select",
       tool
     };
-    const post = await OctoPrintClient.post(printer, "printer/tool", opt);
+    const post = await OctoPrintClient.postApi(printer, "printer/tool", opt);
 
     if (post.status === 204) {
       return true;
@@ -111,7 +92,7 @@ export default class OctoPrintClient {
       },
       async callback(result) {
         if (result) {
-          const post = await OctoPrintClient.post(printer, url).catch((e) => {
+          const post = await OctoPrintClient.postApi(printer, url).catch((e) => {
             UI.createAlert("danger", e, 4000, "Clicked");
           });
 
@@ -137,7 +118,7 @@ export default class OctoPrintClient {
 
   static async systemNoConfirm(printer, action) {
     const url = "system/commands/core/" + action;
-    return await OctoPrintClient.post(printer, url);
+    return await OctoPrintClient.postApi(printer, url);
   }
 
   static async move(element, printer, action, axis, dir) {
@@ -170,7 +151,7 @@ export default class OctoPrintClient {
         factor: amount
       };
     }
-    post = await OctoPrintClient.post(printer, url, opt);
+    post = await OctoPrintClient.postApi(printer, url, opt);
     if (post.status === 204) {
       element.target.classList = "btn btn-success";
       setTimeout(flashReturn, 500);
@@ -195,7 +176,7 @@ export default class OctoPrintClient {
         command: "select",
         print: false
       };
-      post = await OctoPrintClient.post(printer, url, opt);
+      post = await OctoPrintClient.postApi(printer, url, opt);
       return post.status;
     } else if (action === "print") {
       const opt = {
@@ -207,13 +188,13 @@ export default class OctoPrintClient {
         command: "flowrate",
         factor: parseInt(printer.flowRate)
       };
-      await OctoPrintClient.post(printer, "printer/tool", flow);
+      await OctoPrintClient.postApi(printer, "printer/tool", flow);
       const feed = {
         command: "feedrate",
         factor: parseInt(printer.feedRate)
       };
-      await OctoPrintClient.post(printer, "printer/printhead", feed);
-      post = await OctoPrintClient.post(printer, url, opt);
+      await OctoPrintClient.postApi(printer, "printer/printhead", feed);
+      post = await OctoPrintClient.postApi(printer, url, opt);
     } else if (action === "delete") {
       post = await OctoPrintClient.delete(printer, url);
     }
@@ -223,7 +204,7 @@ export default class OctoPrintClient {
           i: printer,
           fullPath
         };
-        const fileDel = await OctoFarmClient.post("printers/removefile", opt);
+        const fileDel = await OctoFarmClient.post("/printers/removefile", opt);
         if (notify) {
           UI.createAlert("success", `${printer.printerName}: delete completed`, 3000, "clicked");
         }
@@ -242,19 +223,19 @@ export default class OctoPrintClient {
   }
 
   static async jobAction(printer, opts, element) {
-    let checkSettings = await OctoFarmClient.get("settings/server/get");
+    let checkSettings = await OctoFarmClient.getServerSettings();
     // Make sure feed/flow are set before starting print...
     const flow = {
       command: "flowrate",
       factor: parseInt(printer.flowRate)
     };
-    await OctoPrintClient.post(printer, "printer/tool", flow);
+    await OctoPrintClient.postApi(printer, "printer/tool", flow);
     const feed = {
       command: "feedrate",
       factor: parseInt(printer.feedRate)
     };
 
-    await OctoPrintClient.post(printer, "printer/printhead", feed);
+    await OctoPrintClient.postApi(printer, "printer/printhead", feed);
     const body = {
       i: printer._id
     };
@@ -296,11 +277,11 @@ export default class OctoPrintClient {
                 }
               });
 
-              const post = await OctoPrintClient.post(printer, "printer/tool", offset);
+              const post = await OctoPrintClient.postApi(printer, "printer/tool", offset);
               console.log(offset);
             }
-            await OctoPrintClient.post(printer, "printer/printhead", feed);
-            const post = await OctoPrintClient.post(printer, "job", opts);
+            await OctoPrintClient.postApi(printer, "printer/printhead", feed);
+            const post = await OctoPrintClient.postApi(printer, "job", opts);
             if (element) {
               element.target.disabled = false;
             }
@@ -308,8 +289,8 @@ export default class OctoPrintClient {
         }
       });
     } else {
-      await OctoPrintClient.post(printer, "printer/printhead", feed);
-      const post = await OctoPrintClient.post(printer, "job", opts);
+      await OctoPrintClient.postApi(printer, "printer/printhead", feed);
+      const post = await OctoPrintClient.postApi(printer, "job", opts);
       if (printer.selectedFilament != null && Array.isArray(printer.selectedFilament)) {
         const offset = {
           command: "offset",
@@ -321,7 +302,7 @@ export default class OctoPrintClient {
           }
         });
 
-        const post = await OctoPrintClient.post(printer, "printer/tool", offset);
+        const post = await OctoPrintClient.postApi(printer, "printer/tool", offset);
       }
       if (element) {
         element.target.disabled = false;
@@ -345,7 +326,7 @@ export default class OctoPrintClient {
       };
     }
 
-    const post = await OctoPrintClient.post(printer, "connection", opts);
+    const post = await OctoPrintClient.postApi(printer, "connection", opts);
     if (typeof post !== "undefined" && post.status === 204) {
       UI.createAlert(
         "success",
@@ -375,7 +356,7 @@ export default class OctoPrintClient {
       url = url.replace("[PrinterURL]", printer.printerURL);
     }
     if (url.includes("[PrinterAPI]")) {
-      url = url.replace("[PrinterAPI]", printer.apikey);
+      url = url.replace("[PrinterAPI]", printer.apiKey);
     }
     if (typeof command === "undefined" || command.length === 0) {
       try {
@@ -383,7 +364,7 @@ export default class OctoPrintClient {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "X-Api-Key": printer.apikey
+            "X-Api-Key": printer.apiKey
           }
         });
         if (post.status !== 200 || post.status !== 204) {
@@ -408,7 +389,7 @@ export default class OctoPrintClient {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Api-Key": printer.apikey
+            "X-Api-Key": printer.apiKey
           },
           body: command
         });
@@ -437,14 +418,14 @@ export default class OctoPrintClient {
       url = url.replace("[PrinterURL]", printer.printerURL);
     }
     if (url.includes("[PrinterAPI]")) {
-      url = url.replace("[PrinterAPI]", printer.apikey);
+      url = url.replace("[PrinterAPI]", printer.apiKey);
     }
     if (typeof command === "undefined" || command === "" || command === null) {
       let post = await fetch(url, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-          "X-Api-Key": printer.apikey
+          "X-Api-Key": printer.apiKey
         }
       });
       if (post.status !== 200 || post.status !== 204) {
@@ -459,7 +440,7 @@ export default class OctoPrintClient {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Api-Key": printer.apikey
+            "X-Api-Key": printer.apiKey
           },
           body: command
         });

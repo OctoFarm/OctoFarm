@@ -265,7 +265,7 @@ export default class PowerButton {
             if (wakeButton.classList.contains("d-none")) {
               wakeButton.classList.remove("d-none");
               wakeButton.addEventListener("click", (e) => {
-                OctoFarmClient.post("printers/wakeHost", printer.powerSettings.wol);
+                OctoFarmClient.post("/printers/wakeHost", printer.powerSettings.wol);
               });
             }
           }

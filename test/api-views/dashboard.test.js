@@ -6,7 +6,7 @@ let request;
 
 beforeAll(async () => {
   await dbHandler.connect();
-  const server = await setupTestApp();
+  const { server } = await setupTestApp();
 
   request = supertest(server);
 });

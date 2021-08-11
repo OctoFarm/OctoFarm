@@ -58,14 +58,14 @@ export async function scanNetworkForDevices() {
   e.target.disabled = true;
   UI.createAlert("info", "Scanning your network for new devices now... Please wait!", 20000);
   try {
-    const scannedPrinters = await OctoFarmClient.get("printers/scanNetwork");
+    const scannedPrinters = await OctoFarmClient.get("/printers/scanNetwork");
     for (let index = 0; index < scannedPrinters.length; index++) {
       const printer = {
         printerURL: "",
-        cameraURL: "",
+        camURL: "",
         name: "",
         group: "",
-        apikey: ""
+        apiKey: ""
       };
 
       if (typeof scannedPrinters[index].name !== "undefined") {
@@ -102,9 +102,8 @@ export async function reSyncPrinters() {
   );
   searchOffline.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
   try {
-    const post = await OctoFarmClient.post("printers/reScanOcto", {
-      id: null
-    });
+    // Will throw error as it is disabled
+    const post = await OctoFarmClient.reconnectFarmCommand();
   } catch (e) {
     console.error(e);
     UI.createAlert("error", "There was an issue re-syncing your printers, please check the logs");
@@ -165,7 +164,7 @@ export async function bulkEditPrinters() {
 
   if (editedPrinters.length > 0) {
     try {
-      const editedPrinters = await OctoFarmClient.post("printers/update", editedPrinters);
+      const editedPrinters = await OctoFarmClient.post("/printers/update", editedPrinters);
       const printersAdded = editedPrinters.printersAdded;
       printersAdded.forEach((printer) => {
         UI.createAlert(
@@ -202,8 +201,8 @@ export async function exportPrintersToJson() {
         name: printers[r].printerName,
         group: printers[r].group,
         printerURL: printers[r].printerURL,
-        cameraURL: printers[r].cameraURL,
-        apikey: printers[r].apikey
+        camURL: printers[r].camURL,
+        apiKey: printers[r].apiKey
       };
       printersExport.push(printer);
     }

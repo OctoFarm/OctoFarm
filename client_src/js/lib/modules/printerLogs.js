@@ -15,7 +15,7 @@ export default class PrinterLogs {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey,
+        "X-Api-Key": printer.apiKey,
         Range: "bytes=-500000"
       }
     })
@@ -265,9 +265,7 @@ export default class PrinterLogs {
       });
       document.getElementById("system-refresh-list").addEventListener("click", async (e) => {
         console.log("Refresh!", currentPrinter.printerURL);
-        let connectionLogs = await OctoFarmClient.get(
-          "printers/connectionLogs/" + currentPrinter._id
-        );
+        let connectionLogs = await OctoFarmClient.getPrinterConnectionLogs(currentPrinter._id);
         PrinterLogs.loadLogs(currentPrinter, connectionLogs);
       });
       eventListener = true;
@@ -588,7 +586,7 @@ export default class PrinterLogs {
     `;
   }
   static async loadStatistics(id) {
-    let get = await OctoFarmClient.get("history/statistics/" + id);
+    let get = await OctoFarmClient.get("/history/statistics/" + id);
     //Setup page
     let printerStatsWrapper = document.getElementById("printerStatistics");
     printerStatsWrapper.innerHTML = "";

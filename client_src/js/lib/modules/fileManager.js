@@ -25,7 +25,7 @@ setInterval(async () => {
       file = JSON.parse(file);
       file.index = current.index;
       file.uploadDate = currentDate.getTime() / 1000;
-      const post = await OctoFarmClient.post("printers/newFiles", file);
+      const post = await OctoFarmClient.post("/printers/newFiles", file);
       const update = await FileManager.drawFile(file);
       fileUploads.remove();
       const fileCounts = document.getElementById(`fileCounts-${current.index}`);
@@ -138,7 +138,7 @@ export default class FileManager {
       };
 
       // xhr.setRequestHeader("Content-Type", "multipart/form-data");
-      xhr.setRequestHeader("X-Api-Key", printerInfo.apikey);
+      xhr.setRequestHeader("X-Api-Key", printerInfo.apiKey);
       xhr.onloadstart = function (e) {
         FileManager.createUpload(printerInfo._id, file.name, e.loaded, e.total);
       };
@@ -232,7 +232,7 @@ export default class FileManager {
 
   static async reSyncFiles(e, printer) {
     e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Re-Syncing...";
-    const how = await OctoFarmClient.post("printers/resyncFile", {
+    const how = await OctoFarmClient.post("/printers/resyncFile", {
       i: printer._id
     });
 
@@ -253,11 +253,8 @@ export default class FileManager {
     await this.updateFileList(printer._id);
   }
 
-  static async updateFileList(index) {
-    // Index or ID???
-    let printer = await OctoFarmClient.post("printers/printerInfo", {
-      i: index
-    });
+  static async updateFileList(printerId) {
+    let printer = await OctoFarmClient.getPrinter(printerId);
 
     FileSorting.loadSort(printer);
   }
@@ -288,13 +285,13 @@ export default class FileManager {
   }
 
   static async drawFile(file) {
-    try {
-      const fileElem = document.getElementById(`fileList-${file.index}`);
-      let fileDate = new Date(file.uploadDate * 1000);
-      const dateString = fileDate.toDateString();
-      const timeString = fileDate.toTimeString().substring(0, 8);
-      fileDate = `${dateString} ${timeString}`;
-      const f = ` <div
+    const fileElem = document.getElementById(`fileList-${file.index}`);
+    let fileDate = new Date(file.uploadDate * 1000);
+    const dateString = fileDate.toDateString();
+    const timeString = fileDate.toTimeString().substring(0, 8);
+    fileDate = `${dateString} ${timeString}`;
+    const f = `
+         <div
             id="file-${file.files.local.path}"
             href="#"
           class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
@@ -335,8 +332,8 @@ export default class FileManager {
                 <i class="fas fa-clock"></i><span id="fileDateClean-${
                   file.files.local.path
                 }" class="date d-none"> ${file.uploadDate}</span><span id="fileDate-${
-        file.files.local.path
-      }"> ${fileDate}</span><br>
+      file.files.local.path
+    }"> ${fileDate}</span><br>
                 <i class="fas fa-hdd"></i><span class="size" id="fileSize-${
                   file.files.local.path
                 }">  <i class="fa fa-spinner fa-spin" aria-hidden="true"></i></span> </span> <br>
@@ -363,18 +360,18 @@ export default class FileManager {
                 </button>
                 <button           title="Start printing file"
             id="${file.index}*fileActionStart*${
-        file.files.local.path
-      }" type="button" class="btn btn-success">
+      file.files.local.path
+    }" type="button" class="btn btn-success">
           <i class="fas fa-play"></i> Start
               </button>
               <button  title="Select file" id="${file.index}*fileActionSelect*${
-        file.files.local.path
-      }" type="button" class="btn btn-info">
+      file.files.local.path
+    }" type="button" class="btn btn-info">
         <i class="fas fa-file-upload"></i> Select
             </button>
             <button          title="Move file" id="${file.index}*fileActionMove*${
-        file.files.local.path
-      }" type="button" class="btn btn-warning">
+      file.files.local.path
+    }" type="button" class="btn btn-warning">
       <i class="fas fa-people-carry"></i> Move
           </button>
           <button          title="Download file" onclick="window.open('${
@@ -383,8 +380,8 @@ export default class FileManager {
     <i class="fas fa-download"></i> Download
         </button>
         <button title="Delete file" id="${file.index}*fileActionDelete*${
-        file.files.local.path
-      }" type="button" class="btn btn-danger">
+      file.files.local.path
+    }" type="button" class="btn btn-danger">
   <i class="fas fa-trash-alt"></i> Delete
       </button>
       </div>
@@ -392,23 +389,20 @@ export default class FileManager {
       </div>
       </div>
       </div>`;
-      fileElem.insertAdjacentHTML("afterbegin", f);
-      let printer = await OctoFarmClient.post("printers/printerInfo", {
-        i: file.index
-      });
+    fileElem.insertAdjacentHTML("afterbegin", f);
+    let printer = await OctoFarmClient.post("/printers/printerInfo", {
+      i: file.index
+    });
 
-      const fileActionBtns = document.querySelectorAll("[id*='*fileAction']");
-      fileActionBtns.forEach((btn) => {
-        // Gate Keeper listener for file action buttons
-        if (btn.id.includes(printer._id)) {
-          btn.addEventListener("click", async (e) => {
-            FileManager.actionBtnGate(printer, btn.id);
-          });
-        }
-      });
-    } catch (e) {
-      console.log(e);
-    }
+    const fileActionBtns = document.querySelectorAll("[id*='*fileAction']");
+    fileActionBtns.forEach((btn) => {
+      // Gate Keeper listener for file action buttons
+      if (btn.id.includes(printer._id)) {
+        btn.addEventListener("click", async (e) => {
+          FileManager.actionBtnGate(printer, btn.id);
+        });
+      }
+    });
   }
 
   static async refreshFiles(printer, spinnerIcon) {
@@ -463,28 +457,28 @@ export default class FileManager {
   }
 
   static drawFiles(printer, recursive) {
-    try {
-      const fileElem = document.getElementById(`fileList-${printer._id}`);
-      if (fileElem) {
-        const { fileList } = printer;
-        if (printer.systemChecks.cleaning.file.status === "danger") {
-          fileElem.innerHTML = `
-            <div class="noStorage  text-center"><i class="fas fa-file-code fa-5x"></i><br><h5>There are no files in local storage...</h5></div>
-      `;
-        } else {
-          fileElem.innerHTML = "";
-          let currentFolder = document.getElementById("currentFolder").innerHTML;
-          if (currentFolder.includes("local/")) {
-            currentFolder = currentFolder.replace("local/", "");
-          }
+    const fileElem = document.getElementById(`fileList-${printer._id}`);
+    if (fileElem) {
+      const { fileList } = printer;
+      // TODO drop the systemchecks
+      if (printer.systemChecks.cleaning.file.status === "danger") {
+        fileElem.innerHTML = `<div class="noStorage text-center"><i class="fas fa-file-code fa-5x"></i><br><h5>There are no files in local storage...</h5></div>`;
+      } else {
+        fileElem.innerHTML = "";
+        let currentFolder = document.getElementById("currentFolder").innerHTML;
+        if (currentFolder.includes("local/")) {
+          currentFolder = currentFolder.replace("local/", "");
+        }
 
         // Draw sub - folders present in current folder
-          if (fileList.folderList.length > 0) {
-            fileList.folderList.forEach((folder) => {
-              if (folder.path == currentFolder) {
-                fileElem.insertAdjacentHTML(
-                  "beforeend",
-                  `<a
+        fileList.folders.forEach((folder) => {
+          if (folder.path === currentFolder) {
+            return;
+          }
+          fileElem.insertAdjacentHTML(
+            "beforeend",
+            `
+            <a
               id="file-${folder.name}"
               href="#"
               class="list-group-item list-group-item-action flex-column align-items-start bg-dark folderAction"
@@ -521,152 +515,135 @@ export default class FileManager {
                   </div>
                 </div>
               </div>
-            </a>
-            `
-                );
-              }
-            });
-          }
-
-          // Filter out files out of current folder scope
-          const currentFileList = fileList.fileList.filter(
-            (f) => typeof recursive !== "undefined" || f.path === currentFolder
+            </a>`
           );
+        });
 
-          // Show empty or filled list
-          if (currentFileList.length > 0) {
-            currentFileList.forEach((file) => {
-              let toolInfo = "";
+        // Filter out files out of current folder scope
+        const currentFileList = fileList.files.filter(
+          (f) => typeof recursive !== "undefined" || f.path === currentFolder
+        );
+
+        // Show empty or filled list
+        if (currentFileList.length === 0) {
+          fileElem.insertAdjacentHTML("beforeend", "No files to be shown.");
+        } else {
+          currentFileList.forEach((file) => {
+            let toolInfo = "";
+
+            // TODO Dupe refreshFiles!
+            if (file.toolUnits?.length) {
               file.toolUnits.forEach((unit, index) => {
                 toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
               });
-              let thumbnail = '<center><i class="fas fa-file-code fa-2x"></i></center>';
-              if (typeof file.thumbnail !== "undefined" && file.thumbnail !== null) {
-                thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
-              }
-              let fileDate = new Date(file.uploadDate * 1000);
-              const dateString = fileDate.toDateString();
-              const timeString = fileDate.toTimeString().substring(0, 8);
-              let bgColour = "bg-secondary";
-              if (file.last === true) {
-                bgColour = "bg-dark-success";
-              } else if (file.last === false) {
-                bgColour = "bg-dark-failed";
-              }
-              fileDate = `${dateString} ${timeString}`;
-              const f = ` <div
-            id="file-${file.fullPath}"
-            href="#"
-          class="list-group-item list-group-item-action flex-column align-items-start ${bgColour}"
-            style="display: block;
-            padding: 0.7rem 0.1rem;"
-            >
+            }
+
+            let thumbnail = '<center><i class="fas fa-file-code fa-2x"></i></center>';
+            if (!!file.thumbnail) {
+              thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
+            }
+
+            let fileDate = new Date(file.uploadDate * 1000);
+            const dateString = fileDate.toDateString();
+            const timeString = fileDate.toTimeString().substring(0, 8);
+            let bgColour = "bg-secondary";
+            if (file.last === true) {
+              bgColour = "bg-dark-success";
+            } else if (file.last === false) {
+              bgColour = "bg-dark-failed";
+            }
+            fileDate = `${dateString} ${timeString}`;
+            const f = ` 
+          <div id="file-${
+            file.fullPath
+          }" href="#" class="list-group-item list-group-item-action flex-column align-items-start ${bgColour}" style="display: block; padding: 0.7rem 0.1rem;">
             <div class="row">
-                <div
-                            id="fileThumbnail-${file.fullPath}"
-          class="col-lg-2"
-            style="display:flex; justify-content:center; align-items:center;"
-                >
+              <div id="fileThumbnail-${
+                file.fullPath
+              }" class="col-lg-2" style="display:flex; justify-content:center; align-items:center;">
                 ${thumbnail}
-                </div>
-                <div class="col-lg-10">
+              </div>
+              <div class="col-lg-10">
                 <div class="row">
-                <div class="col-12">
-                <h5 class="mb-1 name">${file.display}</h5>         
-                <small class="mb-1 name">${file.fullPath}</small>         
-                </div>
+                  <div class="col-12">
+                    <h5 class="mb-1 name">${file.display}</h5>         
+                    <small class="mb-1 name">${file.fullPath}</small>         
+                  </div>
                 </div>
                 <div class="row">
-                <div class="col-12">
-                <p class="mb-1 float-right">
-                <span title="File specific success / failure rate from OctoPrint" id="fileHistoryRate-${
-                  file.fullPath
-                }"><i class="fas fa-thumbs-up"></i> ${
-                file.success
-              } / <i class="fas fa-thumbs-down"></i> ${file.failed}</span><br>
-                <i class="fas fa-stopwatch"></i> 
-                <span class="time" id="fileTime-${file.fullPath}">
-                    ${Calc.generateTime(file.expectedPrintTime)}</span> <br> 
-                <i class="fas fa-dollar-sign"></i> 
-                <span title="Expected Printer Cost" class="cost" id="fileCost-${
-                  file.fullPath
-                }"> Print Cost: ${file.printCost?.toFixed(2)} </span>    <br> 
-            <span title="Expected Filament Cost"> </span>
-
-                </p>
-                <p class="mb-1 float-left">
-                <i class="fas fa-clock"></i><span id="fileDateClean-${
-                  file.fullPath
-                }" class="date d-none"> ${file.uploadDate}</span><span id="fileDate-${
-                file.fullPath
-              }"> ${fileDate}</span><br>
-                <i class="fas fa-hdd"></i><span class="size" id="fileSize-${
-                  file.fullPath
-                }"> ${Calc.bytes(file.fileSize)}</span> <br>
-            <span class="usage" title="Expected Filament Usage/Cost" id="fileTool-${
+                  <div class="col-12">
+                    <p class="mb-1 float-right">
+                      <span title="File specific success / failure rate from OctoPrint" id="fileHistoryRate-${
+                        file.fullPath
+                      }">
+                        <i class="fas fa-thumbs-up"></i> ${
+                          file.success
+                        } / <i class="fas fa-thumbs-down"></i> ${file.failed}
+                      </span>
+                      <br>
+                      <i class="fas fa-stopwatch"></i> 
+                      <span class="time" id="fileTime-${file.fullPath}">${Calc.generateTime(
+              file.expectedPrintTime
+            )}</span> 
+                      <br> 
+                      <i class="fas fa-dollar-sign"></i> 
+                      <span title="Expected Printer Cost" class="cost" id="fileCost-${
+                        file.fullPath
+                      }"> Print Cost: ${file.printCost?.toFixed(2)} </span>    
+                      <br> 
+                      <span title="Expected Filament Cost"> </span>
+                    </p>
+                    <p class="mb-1 float-left">
+                      <i class="fas fa-clock"></i>
+                      <span id="fileDateClean-${file.fullPath}" class="date d-none"> ${
+              file.uploadDate
+            }</span>
+                      <span id="fileDate-${file.fullPath}"> ${fileDate}</span>
+                      <br>
+                      <i class="fas fa-hdd"></i>
+                      <span class="size" id="fileSize-${file.fullPath}"> ${Calc.bytes(
+              file.fileSize
+            )}</span>
+                      <br>
+                      <span class="usage" title="Expected Filament Usage/Cost" id="fileTool-${
+                        file.fullPath
+                      }"> ${toolInfo} </span>
+                    </p> 
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-12">
+                <div class="d-flex btn-group flex-wrap btn-group-sm" role="group" aria-label="Basic example">
+                  <button title="Re-Sync File" id="${printer._id}*fileActionUpdate*${
               file.fullPath
-            }"> ${toolInfo} </span>
-
-                </p> 
+            }" role="button" class="btn btn-dark"><i class="fas fa-sync"></i> Re-Sync</button>
+                  <button title="Start printing file" id="${printer._id}*fileActionStart*${
+              file.fullPath
+            }" type="button" class="btn btn-success"><i class="fas fa-play"></i> Start</button>
+                  <button  title="Select file" id="${printer._id}*fileActionSelect*${
+              file.fullPath
+            }" type="button" class="btn btn-info"><i class="fas fa-file-upload"></i> Select</button>
+                  <button title="Move file" id="${printer._id}*fileActionMove*${
+              file.fullPath
+            }" type="button" class="btn btn-warning"><i class="fas fa-people-carry"></i> Move</button>
+                  <button title="Download file" onclick="window.open('${
+                    printer.printerURL
+                  }/downloads/files/local/${
+              file.fullPath
+            }')" type="button" class="btn btn-dark"><i class="fas fa-download"></i> Download</button>
+                  <button title="Delete file" id="${printer.printerURL}*fileActionDelete*${
+              file.fullPath
+            }" type="button" class="btn btn-danger"><i class="fas fa-trash-alt"></i> Delete</button>
                 </div>
-                </div>
-                </div>
-                <div class="col-lg-12">
-                <div
-          class="d-flex btn-group flex-wrap btn-group-sm"
-            role="group"
-            aria-label="Basic example"
-                >
-                <button
-            title="Re-Sync File"
-            id="${printer._id}*fileActionUpdate*${file.fullPath}"
-            role="button"
-          class="btn btn-dark"
-                >
-                <i class="fas fa-sync"></i> Re-Sync
-                </button>
-                <button           title="Start printing file"
-            id="${printer._id}*fileActionStart*${
-                file.fullPath
-              }" type="button" class="btn btn-success">
-          <i class="fas fa-play"></i> Start
-              </button>
-              <button  title="Select file" id="${printer._id}*fileActionSelect*${
-                file.fullPath
-              }" type="button" class="btn btn-info">
-        <i class="fas fa-file-upload"></i> Select
-            </button>
-            <button          title="Move file" id="${printer._id}*fileActionMove*${
-                file.fullPath
-              }" type="button" class="btn btn-warning">
-      <i class="fas fa-people-carry"></i> Move
-          </button>
-          <button          title="Download file" onclick="window.open('${
-            printer.printerURL
-          }/downloads/files/local/${file.fullPath}')" type="button" class="btn btn-dark">
-    <i class="fas fa-download"></i> Download
-        </button>
-        <button title="Delete file" id="${printer.printerURL}*fileActionDelete*${
-                file.fullPath
-              }" type="button" class="btn btn-danger">
-  <i class="fas fa-trash-alt"></i> Delete
-      </button>
-      </div>
-      </div>
-      </div>
-      </div>
-      </div>`;
-              fileElem.insertAdjacentHTML("beforeend", f);
-            });
-          } else {
-            fileElem.insertAdjacentHTML("beforeend", "No files to be shown.");
-          }
-
-          FileManager.updateListeners(printer);
+              </div>
+            </div>
+          </div>`;
+            fileElem.insertAdjacentHTML("beforeend", f);
+          });
         }
+
+        FileManager.updateListeners(printer);
       }
-    } catch (e) {
-      console.log(e);
     }
   }
 
@@ -914,7 +891,7 @@ export class FileActions {
             foldername: result,
             path: currentFolder
           };
-          const update = await OctoFarmClient.post("printers/newFolder", opts);
+          const update = await OctoFarmClient.post("/printers/newFolder", opts);
           UI.createAlert("success", "Successfully created your new folder...", 3000, "clicked");
           FileManager.updateFileList(printer._id);
         } else {
@@ -970,7 +947,7 @@ export class FileActions {
     const refreshBtn = document.getElementById(btn);
     const btnName = null;
     refreshBtn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Refreshing...';
-    const how = await OctoFarmClient.post("printers/resyncFile", {
+    const how = await OctoFarmClient.post("/printers/resyncFile", {
       i: printer._id,
       fullPath
     });
@@ -1013,7 +990,7 @@ export class FileActions {
             command: "move",
             destination: result
           };
-          const post = await OctoPrintClient.post(printer, `files/local/${fullPath}`, opt);
+          const post = await OctoPrintClient.postApi(printer, `files/local/${fullPath}`, opt);
           if (post.status === 404) {
             UI.createAlert(
               "error",
@@ -1037,7 +1014,7 @@ export class FileActions {
               newFullPath: json.path
             };
             UI.createAlert("warning", "Moving file... please wait.", 3000, "clicked");
-            const updateFarm = await OctoFarmClient.post("printers/moveFile", opts);
+            const updateFarm = await OctoFarmClient.post("/printers/moveFile", opts);
             setTimeout(function () {
               FileManager.updateFileList(printer._id);
               UI.createAlert("success", "Successfully moved your file...", 3000, "clicked");
@@ -1086,7 +1063,7 @@ export class FileActions {
         };
         if (result) {
           const post = await OctoPrintClient.delete(printer, `files/local/${fullPath}`);
-          const del = await OctoFarmClient.post("printers/removefolder", opts);
+          const del = await OctoFarmClient.post("/printers/removefolder", opts);
           document.getElementById(`file-${fullPath}`).remove();
         }
       }
@@ -1118,7 +1095,7 @@ export class FileActions {
             destination: result
           };
 
-          const post = await OctoPrintClient.post(printer, `files/local/${fullPath}`, opt);
+          const post = await OctoPrintClient.postApi(printer, `files/local/${fullPath}`, opt);
           if (post.status === 404) {
             UI.createAlert(
               "error",
@@ -1142,7 +1119,7 @@ export class FileActions {
               folderName: json.path
             };
             UI.createAlert("warning", "Moving folder please wait...", 3000, "clicked");
-            const updateFarm = await OctoFarmClient.post("printers/moveFolder", opts);
+            const updateFarm = await OctoFarmClient.post("/printers/moveFolder", opts);
             setTimeout(function () {
               FileManager.updateFileList(printer._id);
               UI.createAlert("success", "Successfully moved your file...", 3000, "clicked");

@@ -1,0 +1,144 @@
+const Logger = require("../handlers/logger");
+const OctoprintRxjsWebsocketAdapter = require("../services/octoprint/octoprint-rxjs-websocket.adapter");
+const DITokens = require("../container.tokens");
+const { PSTATE } = require("../constants/state.constants");
+const { FetchError } = require("node-fetch");
+
+const noLoginResponseMessage = "OctoPrint login didnt respond";
+const globalAPIKeyDetectedMessage = "Global API Key was detected";
+const missingSessionKeyMessage = "Missing session key in login response";
+
+class PrinterWebsocketTask {
+  #printersStore;
+  #settingsStore;
+  #octoPrintService;
+  #taskManagerService;
+
+  #logger = new Logger("Printer-Websocket-Task");
+
+  #errorMaxThrows = 5;
+  #errorModulus = 10; // After max throws, log it every 10 failures
+  #errorCounts = {
+    missingApiKey: 0,
+    apiKeyIsGlobal: 0,
+    missingSessionKey: 0
+  };
+
+  constructor({
+    printersStore,
+    octoPrintApiClientService,
+    settingsStore,
+    taskManagerService,
+    printerSystemTask // Just to make sure it can resolve
+  }) {
+    this.#printersStore = printersStore;
+    this.#settingsStore = settingsStore;
+    this.#octoPrintService = octoPrintApiClientService;
+    this.#taskManagerService = taskManagerService;
+  }
+
+  getRetriedPrinters() {
+    return this.#printersStore.listPrinterStates().filter((p) => p.shouldRetryConnect());
+  }
+
+  async run() {
+    const startTime = Date.now();
+
+    const printerStates = this.getRetriedPrinters();
+    for (let printerState of printerStates) {
+      try {
+        // Pooling these promises with Promises.all or race is probably much faster
+        await this.setupPrinterConnection(printerState);
+      } catch (e) {
+        this.#logger.error(`WebSocket task failed for '${printerState.getName()}'`, e.stack);
+      }
+    }
+
+    const newPrinterStates = this.getRetriedPrinters();
+
+    const duration = Date.now() - startTime;
+    if (newPrinterStates.length !== printerStates.length) {
+      this.#logger.info(
+        `Attempted websocket connections taking ${duration}ms. ${newPrinterStates.length} adapters need retry (before: ${printerStates.length}).`
+      );
+    }
+
+    // Continue with delegate tasks
+    const taskName = DITokens.printerSystemTask;
+    if (this.#taskManagerService.isTaskDisabled(taskName)) {
+      this.#logger.info(`Triggered conditional task '${taskName}' to run`);
+      this.#taskManagerService.scheduleDisabledJob(taskName);
+    }
+  }
+
+  async setupPrinterConnection(printerState) {
+    const loginDetails = printerState.getLoginDetails();
+    const printerName = printerState.getName();
+
+    if (!printerState.shouldRetryConnect()) {
+      return;
+    }
+    this.#logger.info(`Trying WebSocket connection for '${printerName}'`);
+
+    let errorThrown = false;
+    const loginResponse = await this.#octoPrintService
+      .login(loginDetails, true)
+      .then((r) => r.json())
+      .catch((e) => {
+        errorThrown = true;
+        if (e instanceof FetchError) {
+          // No connection - return nothing
+        } else {
+          console.log("Another type of OctoPrint login error", e.stack);
+        }
+      });
+
+    // This is a check which is best done first
+    if (this.checkLoginGlobal(loginResponse)) {
+      const errorCount = this.#errorCounts.apiKeyIsGlobal++;
+      printerState.setHostState(PSTATE.GlobalAPIKey, globalAPIKeyDetectedMessage);
+      return this.handleSilencedError(errorCount, globalAPIKeyDetectedMessage, printerName);
+    } else {
+      this.#errorCounts.apiKeyIsGlobal = 0;
+    }
+    if (!loginResponse?.apikey) {
+      const errorCount = this.#errorCounts.missingApiKey++;
+      printerState.setHostState(PSTATE.Disconnected, noLoginResponseMessage);
+      return this.handleSilencedError(errorCount, noLoginResponseMessage, printerName);
+    } else {
+      this.#errorCounts.missingApiKey = 0;
+    }
+    if (!loginResponse?.session) {
+      const errorCount = this.#errorCounts.missingSessionKey++;
+      printerState.setHostState(PSTATE.NoAPI, missingSessionKeyMessage);
+      return this.handleSilencedError(errorCount, missingSessionKeyMessage, printerName);
+    } else {
+      this.#errorCounts.missingSessionKey = 0;
+    }
+
+    printerState.setApiLoginSuccessState(loginResponse.name, loginResponse?.session);
+    printerState.resetWebSocketAdapter();
+    // TODO time this (I wonder if the time spent is logging in or the binding)
+    printerState.bindWebSocketAdapter(OctoprintRxjsWebsocketAdapter);
+
+    // TODO time this
+    // Delaying or staggering this will speed up startup tasks - ~90 to 150ms per printer on uncongested (W)LAN
+    printerState.connectAdapter();
+  }
+
+  checkLoginGlobal(response) {
+    return !!response && response.apiKey === null;
+  }
+
+  handleSilencedError(prop, taskMessage, printerName) {
+    if (prop <= this.#errorMaxThrows - 1) {
+      throw new Error(taskMessage);
+    } else if (prop % this.#errorModulus === 0) {
+      throw new Error(`${taskMessage} ${prop} times for printer '${printerName}'.`);
+    } else {
+      return this.#logger.error("Websocket connection attempt failed (silenced).");
+    }
+  }
+}
+
+module.exports = PrinterWebsocketTask;

@@ -43,11 +43,7 @@ export async function updateOctoPrintClient(printer) {
     targets: ["octoprint"],
     force: true
   };
-  let updateRequest = await OctoPrintClient.postNOAPI(
-    printer,
-    "plugin/softwareupdate/update",
-    data
-  );
+  let updateRequest = await OctoPrintClient.postRaw(printer, "plugin/softwareupdate/update", data);
   if (updateRequest.status === 200) {
     UI.createAlert(
       "success",
@@ -89,7 +85,7 @@ export async function quickConnectPrinterToOctoPrint(printer) {
     data.save = false;
   }
   if (printer.printerState.colour.category === "Disconnected") {
-    const post = await OctoPrintClient.post(printer, "connection", data);
+    const post = await OctoPrintClient.postApi(printer, "connection", data);
     if (typeof post !== "undefined") {
       if (post.status === 204) {
         UI.createAlert(
@@ -129,7 +125,7 @@ export async function disconnectPrinterFromOctoPrint(printer) {
     command: "disconnect"
   };
   if (printer.printerState.colour.category === "Idle") {
-    let post = await OctoPrintClient.post(printer, "connection", data);
+    let post = await OctoPrintClient.postApi(printer, "connection", data);
     if (typeof post !== "undefined") {
       if (post.status === 204) {
         UI.createAlert(

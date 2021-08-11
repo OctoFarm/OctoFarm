@@ -3,22 +3,22 @@ const flash = require("connect-flash");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
-const ServerSettingsDB = require("./models/ServerSettings");
 const expressLayouts = require("express-ejs-layouts");
 const Logger = require("./handlers/logger.js");
-const { OctoFarmTasks } = require("./tasks");
-const { optionalInfluxDatabaseSetup } = require("./lib/influxExport.js");
-const { getViewsPath } = require("./app-env");
-const { PrinterClean } = require("./lib/dataFunctions/printerClean.js");
-const { ServerSettings } = require("./settings/serverSettings.js");
-const { ClientSettings } = require("./settings/clientSettings.js");
-const { TaskManager } = require("./runners/task.manager");
+const DITokens = require("./container.tokens");
 const exceptionHandler = require("./exceptions/exception.handler");
+const { configureContainer } = require("./container");
+const { scopePerRequest, loadControllers } = require("awilix-express");
+const { OctoFarmTasks } = require("./tasks");
+const { getViewsPath } = require("./app-env");
 
 function setupExpressServer() {
   let app = express();
+  let container = configureContainer();
 
-  require("./config/passport.js")(passport);
+  const userTokenService = container.resolve("userTokenService");
+  require("./middleware/passport.js")(passport, userTokenService);
+
   app.use(express.json());
 
   const viewsPath = getViewsPath();
@@ -55,69 +55,95 @@ function setupExpressServer() {
     next();
   });
 
-  return app;
+  app.use(scopePerRequest(container));
+
+  return {
+    app,
+    container
+  };
 }
 
-async function ensureSystemSettingsInitiated() {
-  logger.info("Checking Server Settings...");
+async function ensureSystemSettingsInitiated(container) {
+  logger.info("Loading Server Settings.");
 
-  await ServerSettingsDB.find({}).catch((e) => {
-    if (e.message.includes("command find requires authentication")) {
-      throw "Database authentication failed.";
-    } else {
-      throw "Database connection failed.";
-    }
-  });
+  const serverSettingsService = container.resolve(DITokens.serverSettingsService);
+  await serverSettingsService.probeDatabase();
 
-  // Setup Settings as connection is established
-  const serverSettingsStatus = await ServerSettings.init();
-  await ClientSettings.init();
-
-  return serverSettingsStatus;
+  const settingsStore = container.resolve(DITokens.settingsStore);
+  return await settingsStore.loadSettings();
 }
 
 function serveOctoFarmRoutes(app) {
-  app.use("/", require("./routes/index", { page: "route" }));
-  app.use("/serverChecks", require("./routes/serverChecks", { page: "route" }));
-  app.use("/users", require("./routes/users", { page: "route" }));
-  app.use("/printers", require("./routes/printers", { page: "route" }));
-  app.use("/groups", require("./routes/printerGroups", { page: "route" }));
-  app.use("/settings", require("./routes/settings", { page: "route" }));
-  app.use("/printersInfo", require("./routes/SSE-printersInfo", { page: "route" }));
-  app.use("/dashboardInfo", require("./routes/SSE-dashboard", { page: "route" }));
-  app.use("/monitoringInfo", require("./routes/SSE-monitoring", { page: "route" }));
-  app.use("/filament", require("./routes/filament", { page: "route" }));
-  app.use("/history", require("./routes/history", { page: "route" }));
-  app.use("/scripts", require("./routes/scripts", { page: "route" }));
-  app.use("/input", require("./routes/externalDataCollection", { page: "route" }));
-  app.use("/system", require("./routes/system", { page: "route" }));
-  app.use("/client", require("./routes/sorting", { page: "route" }));
+  const routePath = "./routes";
+
+  app.use(loadControllers(`${routePath}/settings/*.controller.js`, { cwd: __dirname }));
+  app.use(loadControllers(`${routePath}/*.controller.js`, { cwd: __dirname }));
+  app.use(exceptionHandler);
+
   app.get("*", function (req, res) {
-    console.debug("Had to redirect resource request:", req.originalUrl);
-    if (req.originalUrl.endsWith(".min.js")) {
-      logger.error("Javascript resource was not found " + req.originalUrl);
+    const path = req.originalUrl;
+    if (path.startsWith("/api") || path.startsWith("/plugins")) {
+      logger.error("API resource was not found " + path);
       res.status(404);
-      res.send("Resource not found " + req.originalUrl);
+      res.send({ error: "API endpoint or method was not found" });
+      return;
+    } else if (req.originalUrl.endsWith(".min.js")) {
+      logger.error("Javascript resource was not found " + path);
+      res.status(404);
+      res.send("Resource not found " + path);
       return;
     }
+
+    logger.error("MVC resource was not found " + path);
     res.redirect("/");
   });
   app.use(exceptionHandler);
 }
 
-async function serveOctoFarmNormally(app, quick_boot = false) {
+async function serveOctoFarmNormally(app, container, quick_boot = false) {
   if (!quick_boot) {
     logger.info("Initialising FarmInformation...");
-    await PrinterClean.initFarmInformation();
 
-    await ClientSettings.init();
+    const printersStore = container.resolve(DITokens.printersStore);
+    await printersStore.loadPrintersStore();
+    const filesStore = container.resolve(DITokens.filesStore);
+    await filesStore.loadFilesStore();
+    const currOpsCache = container.resolve(DITokens.currentOperationsCache);
+    currOpsCache.generateCurrentOperations();
+    const historyCache = container.resolve(DITokens.historyCache);
+    await historyCache.initCache();
+    const filamentCache = container.resolve(DITokens.filamentCache);
+    await filamentCache.initCache();
 
-    const { Runner } = require("./runners/state.js");
-    await Runner.init();
+    // Just validation, job cache is not seeded by database
+    container.resolve(DITokens.jobsCache);
+    const heatMapCache = container.resolve(DITokens.heatMapCache);
+    await heatMapCache.initHeatMap();
 
-    OctoFarmTasks.BOOT_TASKS.forEach((task) => TaskManager.registerJobOrTask(task));
+    // const api = container.resolve(DITokens.octoPrintApiClientService);
+    // await api
+    //   .downloadFile(
+    //     {
+    //       printerURL: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/",
+    //       apiKey: "asd"
+    //     },
+    //     "BigBuckBunny.mp4",
+    //     (resolve, reject) => {
+    //       console.log("stream finished");
+    //       resolve();
+    //     }
+    //   )
+    //   .then((r) => console.log(r));
 
-    await optionalInfluxDatabaseSetup();
+    const taskManagerService = container.resolve(DITokens.taskManagerService);
+    if (process.env.SAFEMODE_ENABLED !== "true") {
+      OctoFarmTasks.BOOT_TASKS.forEach((task) => taskManagerService.registerJobOrTask(task));
+    } else {
+      logger.warning("Starting in safe mode due to SAFEMODE_ENABLED");
+    }
+
+    const influxSetupService = container.resolve(DITokens.influxDbSetupService);
+    await influxSetupService.optionalInfluxDatabaseSetup();
   }
 
   serveOctoFarmRoutes(app);

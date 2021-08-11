@@ -4,7 +4,7 @@ const { expectValidationError } = require("../extensions");
 describe("printer-schema", function () {
   it("should be invalid if sortIndex is not numeric", function (done) {
     const m = new Printer({
-      apikey: "asd",
+      apiKey: "asd",
       printerURL: "myawesomeprinter/",
       webSocketURL: "myawesomeprinter/",
       sortIndex: "a"
@@ -18,7 +18,7 @@ describe("printer-schema", function () {
 
   it("should be valid for required properties", function (done) {
     const m = new Printer({
-      apikey: "asd",
+      apiKey: "asd",
       printerURL: "myawesomeprinter/",
       webSocketURL: "myawesomeprinter/",
       sortIndex: "1"
@@ -34,7 +34,7 @@ describe("printer-schema", function () {
     const m = new Printer({});
 
     m.validate(function (err) {
-      expectValidationError(err, ["printerURL", "apikey"], true);
+      expectValidationError(err, ["sortIndex", "webSocketURL", "printerURL", "apiKey"], true);
       done();
     });
   });
@@ -46,7 +46,7 @@ describe("printer-schema", function () {
     });
 
     m.validate(function (err) {
-      expectValidationError(err, ["apikey"], true);
+      expectValidationError(err, ["sortIndex", "webSocketURL"], true);
       done();
     });
   });

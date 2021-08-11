@@ -1,12 +1,18 @@
-const rootPath = "../../../server_src";
 const testPath = "../../";
 const dbHandler = require(testPath + "db-handler");
-jest.mock(rootPath + "/services/octoprint/octoprint-api.service");
-const { ensureSystemSettingsInitiated } = require(rootPath + "/app-core");
+jest.mock("../../../server_src/services/octoprint/octoprint-api.service");
+const { configureContainer } = require("../../../server_src/container");
+const { ensureSystemSettingsInitiated } = require("../../../server_src/app-core");
+const DITokens = require("../../../server_src/container.tokens");
+
+let octoPrintClient;
 
 beforeAll(async () => {
   await dbHandler.connect();
-  await ensureSystemSettingsInitiated();
+  const container = configureContainer();
+  await ensureSystemSettingsInitiated(container);
+
+  octoPrintClient = container.resolve(DITokens.octoPrintApiClientService);
 });
 
 afterEach(async () => {
@@ -18,37 +24,27 @@ afterAll(async () => {
 });
 
 describe("OctoPrint-API-Client-Service", () => {
-  const { OctoprintApiClientService } = require(rootPath +
-    "/services/octoprint/octoprint-api-client.service");
-
   it("should throw error on any call incorrect printerURL", async () => {
-    const instance = new OctoprintApiClientService();
-
     // TODO Not human-friendly
-    expect(async () => await instance.get(null, "key", "route", false)).rejects.toHaveProperty(
-      "code",
-      "ERR_INVALID_URL"
-    );
+    expect(
+      async () => await octoPrintClient.get(null, "key", "route", false)
+    ).rejects.toHaveProperty("code", "ERR_INVALID_URL");
   });
 
   it("should throw error on getSettings with incorrect printerURL", async () => {
-    const instance = new OctoprintApiClientService();
-
     // TODO Not human-friendly
     expect(
       async () =>
-        await instance.getSettings({
-          apikey: "surewhynot",
+        await octoPrintClient.getSettings({
+          apiKey: "surewhynot",
           printerURL: "some uwrl"
         })
     ).rejects.toHaveProperty("code", "ERR_INVALID_URL");
   });
 
   it("should not throw error on getSettings with incorrect printerURL", async () => {
-    const instance = new OctoprintApiClientService({ apiTimeout: 1 });
-
-    const settings = await instance.getSettings({
-      apikey: "surewhynot",
+    const settings = await octoPrintClient.getSettings({
+      apiKey: "surewhynotsurewhynotsurewhynotsu",
       printerURL: "http://someurl/"
     });
   });

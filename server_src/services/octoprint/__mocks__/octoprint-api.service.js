@@ -1,47 +1,80 @@
+const { UUID_LENGTH } = require("../../../constants/service.constants");
+
 class OctoprintApiService {
+  mockStatus = undefined;
+  mockResponse = undefined;
   timeout = null;
-  static mockStatus = undefined;
-  static mockResponse = undefined;
+  streamRejectPayload;
 
   constructor(timeoutSettings) {
     this.timeout = timeoutSettings;
   }
 
-  static saveMockResponse(status, response) {
-    OctoprintApiService.mockStatus = status;
-    OctoprintApiService.mockResponse = response;
+  setStreamWillError(rejectPayload = undefined) {
+    this.streamRejectPayload = rejectPayload;
   }
 
-  static async getMockResponse() {
+  saveMockResponse(status, response) {
+    this.mockStatus = status;
+    this.mockResponse = response;
+  }
+
+  async getMockResponse() {
     return Promise.resolve({
-      status: OctoprintApiService.mockStatus,
+      status: this.mockStatus,
       json: () => {
-        return OctoprintApiService.mockResponse;
+        return this.mockResponse;
+      },
+      body: {
+        pipe: (stream) => {},
+        on: (event, cb) => {
+          if (event === "error") {
+            if (this.streamRejectPayload) {
+              return cb(this.streamRejectPayload);
+            }
+            return;
+          } else {
+            return cb(this.mockResponse);
+          }
+        }
       }
     });
   }
 
+  validateInput(url, apiKey) {
+    const validateURL = new URL(url);
+    if (apiKey.length !== UUID_LENGTH) throw "Api key length not 32 - this is a test-only error.";
+  }
+
   async getRetry(printerURL, apiKey, item) {
+    this.validateInput(printerURL, apiKey);
     const message = `Connecting to OctoPrint Mock API: ${item} | ${printerURL}`;
     return await this.get(printerURL, apiKey, item);
   }
 
   post(printerURL, apiKey, route, data, timeout = true) {
+    this.validateInput(printerURL, apiKey);
     const url = new URL(route, printerURL).href;
-    return OctoprintApiService.getMockResponse();
+    return this.getMockResponse();
   }
 
   get(printerURL, apiKey, route, timeout = true) {
+    this.validateInput(printerURL, apiKey);
     const url = new URL(route, printerURL).href;
-    return OctoprintApiService.getMockResponse();
+    return this.getMockResponse();
   }
 
   patch(printerURL, apiKey, route, data, timeout = true) {
+    this.validateInput(printerURL, apiKey);
     const url = new URL(route, printerURL).href;
-    return OctoprintApiService.getMockResponse();
+    return this.getMockResponse();
+  }
+
+  delete(printerURL, apiKey, route) {
+    this.validateInput(printerURL, apiKey);
+    const url = new URL(route, printerURL).href;
+    return this.getMockResponse();
   }
 }
 
-module.exports = {
-  OctoprintApiService
-};
+module.exports = OctoprintApiService;

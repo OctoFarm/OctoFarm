@@ -48,7 +48,7 @@ export function getFileRow(file, index) {
 
 function getSortedPrinterFiles(fileInfo) {
   const fileList = fileInfo?.fileList;
-  if (!fileInfo?.fileList || fileInfo.filecount === 0) return;
+  if (!fileInfo?.fileList || fileInfo.fileCount === 0) return;
   return fileList.sort((f1, f2) => f2.uploadDate - f1.uploadDate);
 }
 

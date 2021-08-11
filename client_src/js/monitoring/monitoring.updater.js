@@ -19,11 +19,11 @@ let powerTimer = 20000;
 let printerManagerModal = document.getElementById("printerManagerModal");
 let printerArea = document.getElementById("printerArea");
 
-document.getElementById("filterStates").addEventListener("change", (e) => {
-  OctoFarmClient.get("client/updateFilter/" + e.target.value);
+document.getElementById("filterStates").addEventListener("change", async (e) => {
+  await OctoFarmClient.updateClientFilter(e.target.value);
 });
-document.getElementById("sortStates").addEventListener("change", (e) => {
-  OctoFarmClient.get("client/updateSorting/" + e.target.value);
+document.getElementById("sortStates").addEventListener("change", async (e) => {
+  await OctoFarmClient.updateClientSorting(e.target.value);
 });
 
 const returnPrinterInfo = (id) => {
@@ -110,9 +110,9 @@ function imageOrCamera(printer) {
     printer.otherSettings.webCamSettings.webcamEnabled
   ) {
     //Check if URL actually exists...
-    if (printer.cameraURL !== "") {
+    if (printer.camURL !== "") {
       return drawCamera({
-        url: printer.cameraURL,
+        url: printer.camURL,
         flipV,
         flipH,
         rotate90
@@ -409,7 +409,7 @@ function drawPanelView(printer, clientSettings) {
 
 function drawCameraView(printer, clientSettings) {
   let hidden = isHidden(printer, clientSettings);
-  if (printer.cameraURL === "") {
+  if (printer.camURL === "") {
     hidden = "hidden";
   }
   const name = cleanName(printer.printerName);

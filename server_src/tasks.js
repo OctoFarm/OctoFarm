@@ -1,41 +1,4 @@
-const softwareUpdateChecker = require("./services/octofarm-update.service");
-const { Runner } = require("./runners/state");
-const { FilamentClean } = require("./lib/dataFunctions/filamentClean");
-const { initHistoryCache } = require("./cache/history.cache");
 const { TaskPresets } = require("./task.presets");
-const { PrinterClean } = require("./lib/dataFunctions/printerClean");
-
-const PRINTER_CLEAN_TASK = async () => {
-  const serverSettings = require("./settings/serverSettings");
-  const printersInformation = PrinterClean.listPrintersInformation();
-  await PrinterClean.sortCurrentOperations(printersInformation);
-
-  await PrinterClean.statisticsStart();
-  await PrinterClean.createPrinterList(
-    printersInformation,
-    serverSettings.filamentManager
-  );
-};
-
-const CRASH_TEST_TASK = async () => {
-  throw new Error("big error");
-};
-
-const HISTORY_CACHE_TASK = async () => {
-  await initHistoryCache().catch((e) => {
-    console.error("X HistoryCache failed to initiate. " + e);
-  });
-};
-
-const FILAMENT_CLEAN_TASK = async () => {
-  await FilamentClean.start();
-};
-
-const GITHUB_UPDATE_CHECK_TASK = async () => {
-  await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
-    softwareUpdateChecker.checkReleaseAndLogUpdate();
-  });
-};
 
 const WEBSOCKET_HEARTBEAT_TASK = () => {
   // farmPrinters.forEach(function each(client) {
@@ -96,65 +59,51 @@ const SSE_TASK = () => {
   //     });
 };
 
-const SSE_DASHBOARD = () => {
-  // if (interval === false) {
-  //   interval = setInterval(async function () {
-  //     let clientsSettingsCache = await SettingsClean.returnClientSettings();
-  //     if (!clientsSettingsCache) {
-  //       await SettingsClean.start();
-  //       clientsSettingsCache = await SettingsClean.returnClientSettings();
-  //     }
-  //
-  //     let dashboardSettings = clientsSettingsCache.dashboard;
-  //     if (!dashboardSettings) {
-  //       dashboardSettings = getDefaultDashboardSettings();
-  //     }
-  //
-  //     const currentOperations = await PrinterClean.returnCurrentOperations();
-  //     const dashStatistics = await PrinterClean.returnDashboardStatistics();
-  //     const printerInformation = await PrinterClean.listPrintersInformation();
-  //     const infoDrop = {
-  //       printerInformation,
-  //       currentOperations,
-  //       dashStatistics,
-  //       dashboardSettings
-  //     };
-  //
-  //     clientInformation = await stringify(infoDrop);
-  //     for (clientId in clients) {
-  //       clients[clientId].write("retry:" + 10000 + "\n");
-  //       clients[clientId].write("data: " + clientInformation + "\n\n"); // <- Push a message to a single attached client
-  //     }
-  //   }, 5000);
-  // }
-};
-
 const STATE_TRACK_COUNTERS = async () => {
-  await Runner.trackCounters();
+  // await Runner.trackCounters();
 };
 
-// TODO we'll have to pool this with a network, event-loop or CPU budget in mind
-const STATE_SETUP_WEBSOCKETS = async () => {
-  // for (let i = 0; i < farmPrinters.length; i++) {
-  //   // Make sure runners are created ready for each printer to pass between...
-  //   await Runner.setupWebSocket(farmPrinters[i]._id);
-  //   PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
-  // }
+const HISTORY_CACHE_TASK = async () => {
+  // Will become a cache load from service => cache directly
+  // await initHistoryCache().catch((e) => {
+  //   console.error("X HistoryCache failed to initiate. " + e);
+  // });
+};
+
+// const FILAMENT_CLEAN_TASK = async () => {
+//   await FilamentClean.start();
+// };
+
+const RESYNC_FILAMENT_ONCE = async () => {
+  // Resync filament
   // FilamentClean.start(systemSettings.filamentManager);
 };
 
-const STATE_PRINTER_GENERATE_TASK = async () => {
-  // for (let index = 0; index < farmPrinters.length; index++) {
-  //   if (typeof farmPrinters[index] !== "undefined") {
-  //     PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
-  //   }
-  // }
-};
+// await PrinterClean.statisticsStart();
+// const printerList = ['<option value="0">Not Assigned</option>'];
+// farmPrinters.forEach((printer) => {
+//   if (typeof printer.currentProfile !== "undefined" && printer.currentProfile !== null) {
+//     for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
+//       let listing = null;
+//       if (filamentManager) {
+//         if (
+//           printer.printerState.colour.category === "Offline" ||
+//           printer.printerState.colour.category === "Active"
+//         ) {
+//           listing = `<option value="${printer._id}-${i}" disabled>${printer.printerName}: Tool ${i}</option>`;
+//         } else {
+//           listing = `<option value="${printer._id}-${i}">${printer.printerName}: Tool ${i}</option>`;
+//         }
+//       } else {
+//         listing = `<option value="${printer._id}-${i}">${printer.printerName}: Tool ${i}</option>`;
+//       }
+//
+//       printerList.push(listing);
+//     }
+//   }
+// });
 
-const DATABASE_MIGRATIONS_TASK = async () => {
-  // const migrations = require("./migrations");
-  // console.log(migrations);
-};
+// this.#printerFilamentList = printerList;
 
 /**
  * See an overview of this pattern/structure here https://www.youtube.com/watch?v=dQw4w9WgXcQ
@@ -163,22 +112,36 @@ const DATABASE_MIGRATIONS_TASK = async () => {
  * @param milliseconds optional parameter to quickly set milliseconds timing
  * @returns {{task, id, preset}}
  */
-function KsatLlorKcir(task, preset, milliseconds = 0) {
-  preset.milliseconds = preset.milliseconds || milliseconds;
+function KsatLlorKcir(task, preset, milliseconds = 0, runImmediately) {
+  let timingPreset = { ...preset };
+  timingPreset.milliseconds = preset.milliseconds || milliseconds;
+  timingPreset.runImmediately = runImmediately | false;
   return {
-    id: task.name,
+    id: task.name || task,
     task,
-    preset
+    preset: timingPreset
   };
 }
 
+const HOUR_MS = 3600 * 1000;
+
 class OctoFarmTasks {
   static BOOT_TASKS = [
-    KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
-    KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
-    KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNONCE),
-    KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.RUNDELAYED, 1000),
-    KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000)
+    KsatLlorKcir("softwareUpdateTask", TaskPresets.RUNDELAYED, 1500),
+    KsatLlorKcir("printerSseTask", TaskPresets.PERIODIC, 500),
+    KsatLlorKcir("dashboardSseTask", TaskPresets.PERIODIC, 5000),
+    KsatLlorKcir("monitoringSseTask", TaskPresets.PERIODIC, 500),
+    KsatLlorKcir("printerWebsocketTask", TaskPresets.PERIODIC, 5000, true),
+    KsatLlorKcir("printerFilesTask", TaskPresets.RUNONCE, 15000), // We dont need more than this
+    KsatLlorKcir("printerSystemTask", TaskPresets.PERIODIC_DISABLED, 6 * HOUR_MS, true)
+    // KsatLlorKcir(DATABASE_MIGRATIONS_TASK, TaskPresets.RUNONCE),
+    // KsatLlorKcir(STATE_SETUP_WEBSOCKETS, TaskPresets.RUNDELAYED, 5000),
+    // KsatLlorKcir(STATE_PRINTER_GENERATE_TASK, TaskPresets.RUNDELAYED, 10000)
+    // KsatLlorKcir(STATE_PRINTER_GENERATE_TASK, TaskPresets.PERIODIC, 20000),
+    // KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
+    // KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNONCE),
+    // KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.RUNDELAYED, 1000),
+    // KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000)
   ];
 }
 

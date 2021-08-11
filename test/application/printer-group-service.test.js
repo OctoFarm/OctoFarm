@@ -1,25 +1,21 @@
-const printerGroupService = require("../../server_src/services/printer-group.service");
-const printerService = require("../../server_src/services/printer.service");
 const printerGroupModel = require("../../server_src/models/PrinterGroup");
 const dbHandler = require("../db-handler");
+const DITokens = require("../../server_src/container.tokens");
+const { configureContainer } = require("../../server_src/container");
 const { PrinterGroupMockData } = require("./mock-data/printer-group.data");
-/**
- * Connect to a new in-memory database before running any tests.
- */
+
+let printerService;
+let printerGroupService;
+
 beforeAll(async () => {
   await dbHandler.connect();
+  const container = configureContainer();
+  printerService = container.resolve(DITokens.printerService);
+  printerGroupService = container.resolve(DITokens.printerGroupService);
 });
-
-/**
- * Clear all test data after every test.
- */
 afterEach(async () => {
   await dbHandler.clearDatabase();
 });
-
-/**
- * Remove and close the db and server.
- */
 afterAll(async () => {
   await dbHandler.closeDatabase();
 });

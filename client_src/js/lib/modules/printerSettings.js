@@ -4,6 +4,7 @@ import Calc from "../functions/calc.js";
 import Script from "../../services/gcode-scripts.service.js";
 import { ApplicationError } from "../../exceptions/application-error.handler";
 import { ClientErrors } from "../../exceptions/octofarm-client.exceptions";
+import { replaceHttpProtocolWith } from "../../utils/url.utils";
 
 let currentPrinterIndex;
 let printerOnline;
@@ -104,14 +105,14 @@ class PrinterSettings {
       <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultProfile">Preferred Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultProfile"></select></div>
       `;
     document.getElementById("psOctoPrintUser").placeholder = currentPrinter.currentUser;
-    document.getElementById("psPrinterName").placeholder = currentPrinter.printerName;
-    document.getElementById("psPrinterURL").placeholder = currentPrinter.printerURL;
+    document.getElementById("psPrinterName").value = currentPrinter.printerName;
+    document.getElementById("psPrinterURL").value = currentPrinter.printerURL;
     // Convert websocket url into a url object
     const webSocketURL = new URL(currentPrinter.webSocketURL);
     // Grab out the protocol and select it on the select box.
-    document.getElementById("psWebSocketProtocol").value = webSocketURL.protocol + "//";
-    document.getElementById("psCamURL").placeholder = currentPrinter.cameraURL;
-    document.getElementById("psAPIKEY").placeholder = currentPrinter.apikey;
+    document.getElementById("psWebSocketProtocol").value = webSocketURL.protocol; // Note: dont add "//"
+    document.getElementById("psCamURL").value = currentPrinter.camURL;
+    document.getElementById("psAPIKEY").value = currentPrinter.apiKey;
 
     const baudrateDropdown = document.getElementById("psDefaultBaudrate");
 
@@ -645,13 +646,13 @@ class PrinterSettings {
         currentPrinter.powerSettings.powerStatusURL;
     }
     document.getElementById("resetPowerFields").addEventListener("click", async () => {
-      await OctoFarmClient.post("printers/killPowerSettings/" + currentPrinter?._id);
+      await OctoFarmClient.resetPowerSettings(currentPrinter?._id);
       UI.createAlert("success", "Successfully cleared Power Settings", 3000, "clicked");
     });
   }
 
   static async setupAlertsTab(currentPrinter) {
-    let scripts = await OctoFarmClient.get("scripts/get");
+    let scripts = await OctoFarmClient.get("/scripts/get");
     const printerScripts = [];
     scripts.alerts.forEach((script) => {
       if (script.printer === currentPrinter._id || script.printer.length === 0) {
@@ -852,14 +853,16 @@ class PrinterSettings {
 
     document.getElementById("savePrinterSettingsBtn").addEventListener("click", async (event) => {
       UI.addLoaderToElementsInnerHTML(event.target);
-      const printerSettingsValues = this.getPageValues(currentPrinter);
-      let updatedSettings = await OctoFarmClient.post(
-        "printers/updateSettings",
-        printerSettingsValues
-      );
+      const settings = this.getPageValues(currentPrinter);
+
+      const { printerURL, webSocketProtocol } = settings.printer;
+      settings.printer.webSocketURL = replaceHttpProtocolWith(printerURL, webSocketProtocol);
+      delete settings.printer.webSocketProtocol;
+
+      let response = await OctoFarmClient.updatePrinterConnectionSettings(settings);
       const serverResponseMessage = this.createServerResponseMessageForSaveAction(
         currentPrinter.printerName,
-        updatedSettings
+        response
       );
       UI.createAlert("info", serverResponseMessage, 5000, "clicked");
       await updatePrinterSettingsModal(currentPrintersInformation, currentPrinter._id);
@@ -887,25 +890,27 @@ class PrinterSettings {
   static createServerResponseMessageForSaveAction(currentPrinterName, response) {
     let serverResponseMessage = `${currentPrinterName}: Settings Saved <br>`;
 
-    if (response.status.octofarm === 200) {
+    if (response) {
       serverResponseMessage += '<i class="fas fa-check-circle text-success"></i> OctoFarm<br>';
     } else {
       serverResponseMessage += '<i class="fas fa-exclamation-circle text-danger"></i> OctoFarm<br>';
     }
-    if (response.status.profile === 200) {
-      serverResponseMessage +=
-        '<i class="fas fa-check-circle text-success"></i> OctoPrint Profile<br>';
-    } else {
-      serverResponseMessage +=
-        '<i class="fas fa-exclamation-circle text-danger"></i> OctoPrint Profile<br>';
-    }
-    if (response.status.settings === 200) {
-      serverResponseMessage +=
-        '<i class="fas fa-check-circle text-success"></i> OctoPrint Settings <br>';
-    } else {
-      serverResponseMessage +=
-        '<i class="fas fa-exclamation-circle text-danger"></i> OctoPrint Profile <br>';
-    }
+
+    // TODO Different API
+    // if (response.status.profile === 200) {
+    //   serverResponseMessage +=
+    //     '<i class="fas fa-check-circle text-success"></i> OctoPrint Profile<br>';
+    // } else {
+    //   serverResponseMessage +=
+    //     '<i class="fas fa-exclamation-circle text-danger"></i> OctoPrint Profile<br>';
+    // }
+    // if (response.status.settings === 200) {
+    //   serverResponseMessage +=
+    //     '<i class="fas fa-check-circle text-success"></i> OctoPrint Settings <br>';
+    // } else {
+    //   serverResponseMessage +=
+    //     '<i class="fas fa-exclamation-circle text-danger"></i> OctoPrint Profile <br>';
+    // }
 
     return serverResponseMessage;
   }
@@ -917,9 +922,9 @@ class PrinterSettings {
         printerName: document.getElementById("psPrinterName").value,
         printerURL: document.getElementById("psPrinterURL").value,
         webSocketProtocol: document.getElementById("psWebSocketProtocol").value,
-        index: currentPrinter._id,
-        cameraURL: document.getElementById("psCamURL").value,
-        apikey: document.getElementById("psAPIKEY").value
+        id: currentPrinter._id,
+        camURL: document.getElementById("psCamURL").value,
+        apiKey: document.getElementById("psAPIKEY").value
       },
       connection: {
         preferredPort: document.getElementById("psDefaultSerialPort").value,
@@ -1120,29 +1125,29 @@ class PrinterSettings {
     pageElements.mainPage.socket.className = `btn btn-${currentPrinter.webSocketState.colour} mb-1 btn-block`;
 
     pageElements.connectPage.apiCheck.innerHTML = `<i class="fas fa-link"></i> <b>API Check</b><br><b>Last Checked: </b>${Calc.dateClean(
-      currentPrinter.systemChecks.scanning.api.date
+      currentPrinter.systemChecks.api.date
     )}`;
-    pageElements.connectPage.apiCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.api.status} mb-1 btn-block`;
+    pageElements.connectPage.apiCheck.className = `btn btn-${currentPrinter.systemChecks.api.status} mb-1 btn-block`;
     pageElements.connectPage.filesCheck.innerHTML = `<i class="fas fa-file-code"></i> <b>Files Check</b><br><b>Last Checked: </b>${Calc.dateClean(
-      currentPrinter.systemChecks.scanning.files.date
+      currentPrinter.systemChecks.files.date
     )}`;
-    pageElements.connectPage.filesCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.files.status} mb-1 btn-block`;
+    pageElements.connectPage.filesCheck.className = `btn btn-${currentPrinter.systemChecks.files.status} mb-1 btn-block`;
     pageElements.connectPage.stateCheck.innerHTML = `<i class="fas fa-info-circle"></i> <b>State Check</b><br><b>Last Checked: </b>${Calc.dateClean(
-      currentPrinter.systemChecks.scanning.state.date
+      currentPrinter.systemChecks.state.date
     )}`;
-    pageElements.connectPage.stateCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.state.status} mb-1 btn-block`;
+    pageElements.connectPage.stateCheck.className = `btn btn-${currentPrinter.systemChecks.state.status} mb-1 btn-block`;
     pageElements.connectPage.profileCheck.innerHTML = `<i class="fas fa-id-card"></i> <b>Profile Check</b><br><b>Last Checked: </b>${Calc.dateClean(
-      currentPrinter.systemChecks.scanning.profile.date
+      currentPrinter.systemChecks.profile.date
     )}`;
-    pageElements.connectPage.profileCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.profile.status} mb-1 btn-block`;
+    pageElements.connectPage.profileCheck.className = `btn btn-${currentPrinter.systemChecks.profile.status} mb-1 btn-block`;
     pageElements.connectPage.settingsCheck.innerHTML = `<i class="fas fa-cog"></i> <b>Settings Check</b><br><b>Last Checked: </b>${Calc.dateClean(
-      currentPrinter.systemChecks.scanning.settings.date
+      currentPrinter.systemChecks.settings.date
     )}`;
-    pageElements.connectPage.settingsCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.settings.status} mb-1 btn-block`;
+    pageElements.connectPage.settingsCheck.className = `btn btn-${currentPrinter.systemChecks.settings.status} mb-1 btn-block`;
     pageElements.connectPage.systemCheck.innerHTML = `<i class="fas fa-server"></i> <b>System Check</b><br><b>Last Checked: </b>${Calc.dateClean(
-      currentPrinter.systemChecks.scanning.system.date
+      currentPrinter.systemChecks.system.date
     )}`;
-    pageElements.connectPage.systemCheck.className = `btn btn-${currentPrinter.systemChecks.scanning.system.status} mb-1 btn-block`;
+    pageElements.connectPage.systemCheck.className = `btn btn-${currentPrinter.systemChecks.system.status} mb-1 btn-block`;
 
     pageElements.connectPage.apiClean.innerHTML = `<i class="fas fa-server"></i> <b>Printer Clean</b><br><b>Last Checked: </b>${Calc.dateClean(
       currentPrinter.systemChecks.cleaning.information.date

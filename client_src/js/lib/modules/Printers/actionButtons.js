@@ -133,7 +133,7 @@ function addEventListeners(printer) {
           data.baudrate = 0;
           data.printerProfile = "_default";
         }
-        let post = await OctoPrintClient.post(printer, "connection", data);
+        let post = await OctoPrintClient.postApi(printer, "connection", data);
         if (typeof post !== "undefined") {
           if (post.status === 204) {
             UI.createAlert(
@@ -176,7 +176,7 @@ function addEventListeners(printer) {
               let data = {
                 command: "disconnect"
               };
-              let post = await OctoPrintClient.post(printer, "connection", data);
+              let post = await OctoPrintClient.postApi(printer, "connection", data);
               if (typeof post !== "undefined") {
                 if (post.status === 204) {
                   UI.createAlert(
@@ -212,14 +212,12 @@ function addEventListeners(printer) {
     .addEventListener("click", async (e) => {
       e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i>";
       e.target.disabled = true;
-      const data = {
-        id: printer._id
-      };
-      let post = await OctoFarmClient.post("printers/reScanOcto", data);
-      if (post.msg.status !== "error") {
-        UI.createAlert("success", post.msg.msg, 3000, "clicked");
+      let post = await OctoFarmClient.reconnectOctoPrintCommand(printer._id);
+      if (post.success) {
+        UI.createAlert("success", post.message, 3000, "clicked");
       } else {
-        UI.createAlert("error", post.msg.msg, 3000, "clicked");
+        // TODO this .message property is not provided by backend
+        UI.createAlert("error", post.message, 3000, "clicked");
       }
 
       e.target.innerHTML = "<i class='fas fa-sync'></i>";

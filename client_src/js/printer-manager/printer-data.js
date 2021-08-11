@@ -155,8 +155,8 @@ function checkForApiErrors(printer) {
   if (!ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
     let apiErrors = 0;
     for (const key in printer.systemChecks) {
-      if (printer.systemChecks.scanning.hasOwnProperty(key)) {
-        if (printer.systemChecks.scanning[key].status !== "success") {
+      if (printer.systemChecks.hasOwnProperty(key)) {
+        if (printer.systemChecks[key].status !== "success") {
           apiErrors = apiErrors + 1;
         }
       }
@@ -240,7 +240,7 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
         });
       document.getElementById(`printerLog-${printer._id}`).addEventListener("click", async (e) => {
         const printerInfo = await OctoFarmClient.getPrinter(printer._id);
-        let connectionLogs = await OctoFarmClient.get("printers/connectionLogs/" + printer._id);
+        let connectionLogs = await OctoFarmClient.getPrinterConnectionLogs(printer._id);
         PrinterLogs.loadLogs(printerInfo, connectionLogs);
       });
 

@@ -1,5 +1,3 @@
-"use strict";
-
 const fetch = require("node-fetch");
 const Logger = require("../../handlers/logger.js");
 
@@ -16,29 +14,49 @@ async function fetchApi(url, method, apiKey, bodyData = undefined) {
   });
 }
 
-async function fetchApiTimeout(
-  url,
-  method,
-  apiKey,
-  fetchTimeout,
-  bodyData = undefined
-) {
-  if (!fetchTimeout || method !== "GET") {
+/**
+ * Fetch API with soon obsolete timeout
+ * @param url
+ * @param method
+ * @param apiKey
+ * @deprecated fetchTimeout this timeout is going to be deprecated in v1.2.0
+ * @param bodyData
+ * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)>}
+ */
+async function fetchApiTimeout(url, method, apiKey, fetchTimeout, bodyData = undefined) {
+  if (!fetchTimeout || method !== "GET" || true) {
     return await fetchApi(url, method, apiKey, bodyData);
   }
   return Promise.race([
     fetchApi(url, method, apiKey, bodyData),
     new Promise((_, reject) =>
-      setTimeout(() => reject(new Error("timeout")), fetchTimeout)
+      setTimeout(
+        () => reject(new Error(`timeout for url method ${method} and printer url ${url}`)),
+        fetchTimeout
+      )
     )
   ]);
 }
 
-class OctoprintApiService {
-  timeout = undefined;
+class OctoPrintApiService {
+  #settingsStore;
+  #timeout; // TODO this timeout is not stateful as it is derived from server settings... it might lose state
 
-  constructor(timeoutSettings) {
-    this.timeout = timeoutSettings;
+  constructor({ settingsStore }) {
+    this.#settingsStore = settingsStore;
+  }
+
+  ensureTimeoutSettingsLoaded() {
+    if (!this.#timeout) {
+      const serverSettings = this.#settingsStore.getServerSettings();
+      this.#timeout = serverSettings.timeout;
+    }
+
+    if (!this.#timeout) {
+      throw new Error(
+        "OctoPrint API Service could not load timeout settings. settingsStore:ServerSettings:timeout didnt return anything"
+      );
+    }
   }
 
   /**
@@ -49,22 +67,24 @@ class OctoprintApiService {
    * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)|*|undefined>}
    */
   async getRetry(printerURL, apiKey, item) {
+    this.ensureTimeoutSettingsLoaded();
+
     try {
       return await this.get(printerURL, apiKey, item);
     } catch (err) {
       const message = `Error connecting to OctoPrint API: ${item} | ${printerURL}`;
       logger.error(
-        `${message} | timeout: ${this.timeout.apiTimeout}`,
+        `${message} | timeout: ${this.#timeout.apiTimeout}`,
         JSON.stringify(err.message)
       );
       // If timeout exceeds max cut off then give up... Printer is considered offline.
-      if (this.timeout.apiTimeout >= this.timeout.apiRetryCutoff) {
+      if (this.#timeout.apiTimeout >= this.#timeout.apiRetryCutoff) {
         logger.info(`Timeout Exceeded: ${item} | ${printerURL}`);
         throw err;
       }
       // Make sure to use the settings for api retry.
       // TODO: Fix apiRetryCutoff + apiRetry as they are swapped.
-      this.timeout.apiTimeout = this.timeout.apiRetryCutoff;
+      this.#timeout.apiTimeout = this.#timeout.apiRetryCutoff;
 
       return await this.getRetry(printerURL, apiKey, item);
     }
@@ -80,14 +100,10 @@ class OctoprintApiService {
    * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)>}
    */
   post(printerURL, apiKey, route, data, timeout = true) {
+    this.ensureTimeoutSettingsLoaded();
+
     const url = new URL(route, printerURL).href;
-    return fetchApiTimeout(
-      url,
-      "POST",
-      apiKey,
-      timeout ? this.timeout.apiTimeout : false,
-      data
-    );
+    return fetchApiTimeout(url, "POST", apiKey, timeout ? this.#timeout.apiTimeout : false, data);
   }
 
   /**
@@ -99,13 +115,10 @@ class OctoprintApiService {
    * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)>}
    */
   get(printerURL, apiKey, route, timeout = true) {
+    this.ensureTimeoutSettingsLoaded();
+
     const url = new URL(route, printerURL).href;
-    return fetchApiTimeout(
-      url,
-      "GET",
-      apiKey,
-      timeout ? this.timeout.apiTimeout : false
-    );
+    return fetchApiTimeout(url, "GET", apiKey, timeout ? this.#timeout.apiTimeout : false);
   }
 
   /**
@@ -118,30 +131,23 @@ class OctoprintApiService {
    * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)>}
    */
   patch(printerURL, apiKey, route, data, timeout = true) {
+    this.ensureTimeoutSettingsLoaded();
+
     const url = new URL(route, printerURL).href;
-    return fetchApiTimeout(
-      url,
-      "PATCH",
-      apiKey,
-      timeout ? this.timeout.apiTimeout : false,
-      data
-    );
+    return fetchApiTimeout(url, "PATCH", apiKey, timeout ? this.#timeout.apiTimeout : false, data);
   }
 
-  // /**
-  //  * Acquire OctoPrint file references using GET and a timeout
-  //  * @param printerURL
-  //  * @param apiKey
-  //  * @param item
-  //  * @param timeout optional race to timeout (default: true)
-  //  * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)>}
-  //  */
-  // files(printerURL, apiKey, item, timeout = true) {
-  //   const url = new URL('api/' + item, printerURL).href;
-  //   return fetchApiTimeout(url, "GET", apiKey, timeout ? this.timeout.apiTimeout : false);
-  // }
+  /**
+   * Call DELETE without body data
+   * @param printerURL
+   * @param apiKey
+   * @param route
+   * @returns {Promise}
+   */
+  delete(printerURL, apiKey, route) {
+    const url = new URL(route, printerURL).href;
+    return fetchApi(url, "DELETE", apiKey);
+  }
 }
 
-module.exports = {
-  OctoprintApiService
-};
+module.exports = OctoPrintApiService;

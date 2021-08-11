@@ -109,7 +109,7 @@ function configureContainer() {
     [DITokens.printerFilesService]: awilix.asClass(PrinterFilesService),
     [DITokens.printerGroupService]: awilix.asClass(PrinterGroupService),
     [DITokens.octoPrintApiClientService]: awilix.asClass(OctoPrintApiClientService).singleton(),
-    filamentManagerPluginService: awilix.asClass(FilamentManagerPluginService),
+    [DITokens.filamentManagerPluginService]: awilix.asClass(FilamentManagerPluginService),
     [DITokens.historyService]: awilix.asClass(HistoryService),
     [DITokens.farmStatisticsService]: awilix.asClass(FarmStatisticsService),
     [DITokens.dashboardStatisticsCache]: awilix.asClass(DashboardStatisticsCache),

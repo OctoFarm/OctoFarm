@@ -3,7 +3,7 @@ import OctoFarmClient from "../services/octofarm-client.service.js";
 import UI from "../lib/functions/ui";
 import PrinterSelect from "../lib/modules/printerSelect";
 
-const printerBase = "printers";
+const printerBase = "/printers";
 const printerInfoURL = "/printerInfo";
 
 async function updateBtnOnClick(printerID) {
@@ -64,11 +64,7 @@ export async function updateOctoPrintPlugins(pluginList, printer) {
     targets: pluginList,
     force: true
   };
-  let updateRequest = await OctoPrintClient.postNOAPI(
-    printer,
-    "plugin/softwareupdate/update",
-    data
-  );
+  let updateRequest = await OctoPrintClient.postRaw(printer, "plugin/softwareupdate/update", data);
   if (updateRequest.status === 200) {
     UI.createAlert(
       "success",
@@ -136,7 +132,7 @@ export async function octoPrintPluginInstallAction(printer, pluginList, action) 
         };
       }
 
-      const post = await OctoPrintClient.post(printer, "plugin/pluginmanager", postData);
+      const post = await OctoPrintClient.postApi(printer, "plugin/pluginmanager", postData);
       alert.close();
       if (post.status === 409) {
         UI.createAlert(

@@ -5,7 +5,7 @@ import { setViewType } from "./monitoring/monitoring-view.state";
 import UI from "./lib/functions/ui";
 
 // TODO dupe due to unwanted monitoring.update import causing missing element exceptions
-export const monitoringWorkerURL = "/monitoringInfo/get/";
+export const monitoringWorkerURL = "/mon/sse/";
 
 setViewType("current-ops");
 createClientSSEWorker(monitoringWorkerURL, async function (data) {

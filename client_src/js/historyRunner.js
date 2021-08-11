@@ -23,7 +23,7 @@ $("#historyModal").on("hidden.bs.modal", function (e) {
 
 class History {
   static async get() {
-    historyList = await OctoFarmClient.get("history/get");
+    historyList = await OctoFarmClient.getHistory();
     jplist.init({
       storage: "localStorage", // 'localStorage', 'sessionStorage' or 'cookies'
       storageName: "history-sorting" // the same storage name can be used to share storage between multiple pages
@@ -437,7 +437,7 @@ class History {
     const update = {
       id
     };
-    let post = await OctoFarmClient.post("history/updateCostMatch", update);
+    let post = await OctoFarmClient.post("/history/updateCostMatch", update);
     if (post) {
       UI.createAlert(
         "success",
@@ -476,7 +476,7 @@ class History {
       filamentId: filamentID
     };
 
-    const post = await OctoFarmClient.post("history/update", update);
+    const post = await OctoFarmClient.post("/history/update", update);
 
     if (post) {
       UI.createAlert("success", "Successfully updated your history entry...", 3000, "clicked");
@@ -504,7 +504,7 @@ class History {
             const histID = {
               id: e.target.id
             };
-            const post = await OctoFarmClient.post("history/delete", histID);
+            const post = await OctoFarmClient.post("/history/delete", histID);
             if (post) {
               jplist.resetContent(function () {
                 // remove element with id = el1

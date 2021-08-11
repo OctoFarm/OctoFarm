@@ -1,13 +1,14 @@
 import Validate from "../lib/functions/validate";
 import UI from "../lib/functions/ui";
 import OctoFarmClient from "../services/octofarm-client.service.js";
+import { ApplicationError } from "../exceptions/application-error.handler";
 
 let newPrintersIndex = 0;
 
 // TODO: clean up this file is a mess jim
 
 class Printer {
-  constructor(printerURL, camURL, apikey, group, name) {
+  constructor(printerURL, camURL, apiKey, group, name) {
     this.settingsAppearance = {
       color: "default",
       colorTransparent: false,
@@ -17,14 +18,14 @@ class Printer {
     };
     this.printerURL = printerURL;
     this.camURL = camURL;
-    this.apikey = apikey;
+    this.apiKey = apiKey;
     this.group = group;
   }
 }
 
 export class PrintersManagement {
-  constructor(printerURL, camURL, apikey, group, name) {
-    this.printer = new Printer(printerURL, camURL, apikey, group, name);
+  constructor(printerURL, camURL, apiKey, group, name) {
+    this.printer = new Printer(printerURL, camURL, apiKey, group, name);
   }
 
   static addPrinter(newPrinter) {
@@ -48,10 +49,10 @@ export class PrintersManagement {
           <input id="newPrinterURL-${newPrintersIndex}" type="text" class="form-control" placeholder="" value="${newPrinter.printerURL}">
         </div></td>
         <td><div class="mb-0">
-          <input id="newPrinterCamURL-${newPrintersIndex}" type="text" class="form-control" placeholder="Leave blank to grab from OctoPrint" value="${newPrinter.cameraURL}">
+          <input id="newPrinterCamURL-${newPrintersIndex}" type="text" class="form-control" placeholder="Leave blank to grab from OctoPrint" value="${newPrinter.camURL}">
         </div></td>
         <td><div class="mb-0">
-          <input id="newPrinterAPIKEY-${newPrintersIndex}" type="text" class="form-control" placeholder="" value="${newPrinter.apikey}">
+          <input id="newPrinterAPIKEY-${newPrintersIndex}" type="text" class="form-control" placeholder="" value="${newPrinter.apiKey}">
         </div></td>
         <td><button id="saveButton-${newPrintersIndex}" type="button" class="btn btn-success btn-sm">
                 <i class="fas fa-save"></i>
@@ -128,10 +129,10 @@ export class PrintersManagement {
         for (let index = 0; index < importPrinters.length; index++) {
           const printer = {
             printerURL: "Key not found",
-            cameraURL: "Key not found",
+            camURL: "Key not found",
             name: "Key not found",
             group: "Key not found",
-            apikey: "Key not found"
+            apiKey: "Key not found"
           };
           if (typeof importPrinters[index].name !== "undefined") {
             printer.name = importPrinters[index].name;
@@ -139,14 +140,14 @@ export class PrintersManagement {
           if (typeof importPrinters[index].printerURL !== "undefined") {
             printer.printerURL = importPrinters[index].printerURL;
           }
-          if (typeof importPrinters[index].cameraURL !== "undefined") {
-            printer.cameraURL = importPrinters[index].cameraURL;
+          if (typeof importPrinters[index].camURL !== "undefined") {
+            printer.camURL = importPrinters[index].camURL;
           }
           if (typeof importPrinters[index].group !== "undefined") {
             printer.group = importPrinters[index].group;
           }
-          if (typeof importPrinters[index].apikey !== "undefined") {
-            printer.apikey = importPrinters[index].apikey;
+          if (typeof importPrinters[index].apiKey !== "undefined") {
+            printer.apiKey = importPrinters[index].apiKey;
           }
           PrintersManagement.addPrinter(printer);
         }
@@ -166,21 +167,23 @@ export class PrintersManagement {
   }
 
   static async deletePrinter(deletedPrinters) {
+    if (deletedPrinters.length > 1) {
+      throw new ApplicationError("Deleting more than one printer is currently not implemented.");
+    }
+
     if (deletedPrinters.length > 0) {
       try {
-        const printersToRemove = await OctoFarmClient.post("printers/remove", deletedPrinters);
-        // Should help with SSE event re-building the deleted printer causing a refresh to be needed to actually clear from UI
-        await UI.delay(5000);
-        const printersRemoved = printersToRemove.printersRemoved;
-        printersRemoved.forEach((printer) => {
-          UI.createAlert(
-            "success",
-            `Printer: ${printer.printerURL} has successfully been removed from the farm...`,
-            1000,
-            "Clicked"
-          );
-          document.getElementById(`printerCard-${printer.printerId}`).remove();
-        });
+        const response = await OctoFarmClient.deletePrinter(deletedPrinters[0]);
+
+        const entity = response.printerRemoved;
+
+        UI.createAlert(
+          "success",
+          `Printer: ${entity.printerURL} has successfully been removed from the farm...`,
+          1000,
+          "Clicked"
+        );
+        document.getElementById(`printerCard-${entity._id}`).remove();
       } catch (e) {
         console.error(e);
         UI.createAlert(
@@ -253,7 +256,6 @@ export class PrintersManagement {
           UI.createAlert(error.type, error.msg, 3000, "clicked");
         });
       } else {
-        const printers = [];
         const saveButton = document.getElementById(`saveButton-${newId}`);
         saveButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
         saveButton.disabled = true;
@@ -265,17 +267,16 @@ export class PrintersManagement {
           printerGroup.value,
           printerName.value
         ).build();
-        printers.push(printer);
-        const printersToAdd = await OctoFarmClient.post("printers/add", printers);
-        const printersAdded = printersToAdd.printersAdded;
-        printersAdded.forEach((printer) => {
-          UI.createAlert(
-            "success",
-            `Printer: ${printer.printerURL} has successfully been added to the farm...`,
-            500,
-            "Clicked"
-          );
-        });
+
+        const printerCreatedResponse = await OctoFarmClient.createPrinter(printer);
+
+        UI.createAlert(
+          "success",
+          `Printer: ${printerCreatedResponse.printerURL} has successfully been added to the farm.`,
+          500,
+          "Clicked"
+        );
+
         event.parentElement.parentElement.parentElement.remove();
         saveButton.innerHTML = '<i class="fas fa-save"></i>';
         saveButton.disabled = false;

@@ -87,7 +87,7 @@
                       md="4"
                     >
                       <v-text-field
-                        v-model="editedItem.apikey"
+                        v-model="editedItem.apiKey"
                         label="API KEY"
                       />
                     </v-col>
@@ -246,7 +246,7 @@ export default {
       url: "",
       groups: "",
       camera_url: 0,
-      apikey: 0,
+      apiKey: 0,
     },
     defaultItem: {
       name: "",

@@ -66,8 +66,9 @@
                         <div class="col-12 col-md-6">
                             <label for="psWebSocketProtocol">Printer WebSocket Protocol:</label>
                             <select id="psWebSocketProtocol" class="custom-select">
-                                <option value="ws://">ws://</option>
-                                <option value="wss://">wss://</option>
+                                <!-- The added slashes are not needed with URL protocol being ws: or wss: -->
+                                <option value="ws:">ws://</option>
+                                <option value="wss:">wss://</option>
                             </select>
                             <small class="form-text text-muted">Websocket connection protocol. Automatically selected based on Printer URL. Override here.</small>
                             <small>Example: <code>"ws:// (http) " or "wss:// (https)" </code></small>
