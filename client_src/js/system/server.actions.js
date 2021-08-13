@@ -3,7 +3,6 @@ import UI from "../lib/functions/ui";
 import Calc from "../lib/functions/calc";
 import { setupOctoPrintForTimelapses } from "../octoprint/octoprint-settings.actions";
 import {
-  isFilamentManagerPluginSyncEnabled,
   setupFilamentManagerDisableBtn,
   setupFilamentManagerReSyncBtn,
   setupFilamentManagerSyncBtn
