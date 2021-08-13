@@ -3,6 +3,9 @@ const { ensureAuthenticated } = require("../middleware/auth");
 const Logger = require("../handlers/logger.js");
 const Alerts = require("../models/Alerts");
 const { AppConstants } = require("../app.constants");
+const { validateInput } = require("../handlers/validators");
+const { idRules } = require("./validation/generic.validation");
+const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
 class ScriptsController {
   #serverVersion;
@@ -19,21 +22,29 @@ class ScriptsController {
     this.#scriptCheckService = scriptCheckService;
   }
 
-  async get(req, res) {
+  async list(req, res) {
     const alerts = await Alerts.find({});
-    res.send({ alerts: alerts, status: 200 });
+    res.send(alerts);
+  }
+
+  async update(req, res) {
+    const data = await validateInput(req.params, idRules);
+    const alertId = data.id;
+
+    const alertData = req.body;
+
+    let doc = await this.#scriptCheckService.update(alertId, alertData);
+
+    res.send(doc);
   }
 
   async delete(req, res) {
-    let id = req.params.id;
-    await Alerts.deleteOne({ _id: id })
-      .then((response) => {
-        res.send({ alerts: "success", status: 200 });
-      })
-      .catch((err) => {
-        console.log(err);
-        res.send({ alerts: "error", status: 500 });
-      });
+    const data = await validateInput(req.params, idRules);
+    const alertId = data.id;
+
+    await this.#scriptCheckService.delete(alertId);
+
+    res.send({ alerts: "success" });
   }
 
   async test(req, res) {
@@ -52,20 +63,14 @@ class ScriptsController {
     );
     res.send({ message: save, status: 200 });
   }
-
-  async edit(req, res) {
-    const opts = req.body;
-    let save = await this.#scriptCheckService.edit(opts);
-    res.send({ message: save, status: 200 });
-  }
 }
 
 // prettier-ignore
 module.exports = createController(ScriptsController)
   .prefix(AppConstants.apiRoute + "/scripts")
   .before([ensureAuthenticated])
-  .get("/get", "get")
-  .delete("/delete/:id", "delete")
+  .get("/", "list")
+  .put("/:id", "update")
+  .delete("/:id", "delete")
   .post("/test", "test")
-  .post("/save", "save")
-  .post("/edit", "edit");
+  .post("/save", "save");

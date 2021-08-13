@@ -51,7 +51,7 @@ for (const key in serverDatabaseKeys) {
 
 checkFilamentManagerPluginState().then();
 grabOctoFarmLogList().then();
-Script.get().then();
+Script.fetch().then();
 renderSystemCharts();
 startUpdatePageRunner();
 ClientSettings.init();

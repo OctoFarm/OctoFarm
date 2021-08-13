@@ -1,12 +1,30 @@
 const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-Scripts");
 const Alerts = require("../models/Alerts.js");
+const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
 class ScriptCheckService {
   #scriptsService;
 
   constructor({ scriptsService }) {
     this.#scriptsService = scriptsService;
+  }
+
+  async get(alertId) {
+    const filter = { _id: alertId };
+    const alert = await Alerts.findOne(filter);
+
+    if (!alert) {
+      throw new NotFoundException(`The alert ID '${alertId}' is not an existing Alert.`);
+    }
+
+    return alert;
+  }
+
+  async delete(alertId) {
+    const alert = await this.get(alertId);
+
+    await Alerts.deleteOne({ _id: alert._id });
   }
 
   /**
@@ -31,25 +49,25 @@ class ScriptCheckService {
       logger.info("Saved: " + trigger + " " + scriptLocation + " " + message);
     });
 
-    return "saved";
+    return newAlert;
   }
 
   /**
-   * TODO has potential bug find
+   * Update relevant alert without touching printers
+   * @param alertId
    * @param newAlert
    * @returns {Promise<string|undefined>}
    */
-  async edit(newAlert) {
-    let old = await Alerts.findById(newAlert._id);
-    if (!old) return;
+  async update(alertId, newAlert) {
+    const alert = this.get(alertId);
 
-    old.active = newAlert.active;
-    old.trigger = newAlert.trigger;
-    old.scriptLocation = newAlert.scriptLocation;
-    old.message = newAlert.message;
-    await old.save();
+    alert.active = newAlert.active;
+    alert.trigger = newAlert.trigger;
+    alert.scriptLocation = newAlert.scriptLocation;
+    alert.message = newAlert.message;
+    await alert.save();
 
-    return "saved";
+    return alert;
   }
 
   /**

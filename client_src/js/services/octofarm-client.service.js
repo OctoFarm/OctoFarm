@@ -77,6 +77,7 @@ export default class OctoFarmClient {
   static filamentManagerReSyncRoute = this.filamentManagerRoute + "/resync";
   static filamentManagerSyncRoute = this.filamentManagerRoute + "/sync";
   static filamentManagerDisableRoute = this.filamentManagerRoute + "/disable";
+  static scriptsRoute = this.base + "/scripts";
 
   static validatePath(pathname) {
     if (!pathname) {
@@ -253,6 +254,14 @@ export default class OctoFarmClient {
 
   static async updateClientSorting(sortingString) {
     return this.patch(`${this.clientSortingRoute}/${sortingString}`);
+  }
+
+  static async listAlerts() {
+    return await this.get(this.scriptsRoute);
+  }
+
+  static async updateAlert(scriptId, data) {
+    return await this.put(`${this.scriptsRoute}/${scriptId}`, data);
   }
 
   static async get(path) {

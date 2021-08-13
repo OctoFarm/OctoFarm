@@ -652,9 +652,9 @@ class PrinterSettings {
   }
 
   static async setupAlertsTab(currentPrinter) {
-    let scripts = await OctoFarmClient.get("/scripts/get");
+    let alerts = await OctoFarmClient.listAlerts();
     const printerScripts = [];
-    scripts.alerts.forEach((script) => {
+    alerts.forEach((script) => {
       if (script.printer === currentPrinter._id || script.printer.length === 0) {
         printerScripts.push({
           _id: script._id,
