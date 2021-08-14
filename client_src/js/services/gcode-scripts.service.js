@@ -51,7 +51,7 @@ if (alertsTriggers) {
 
 let saveScriptBtn = document.getElementById("saveScript");
 if (saveScriptBtn) {
-  saveScriptBtn.addEventListener("click", (event) => {
+  saveScriptBtn.addEventListener("click", async (event) => {
     event.preventDefault();
     event.stopPropagation();
     let elements = Script.grabPage();
@@ -84,10 +84,11 @@ if (saveScriptBtn) {
         script: elements.script.value,
         message: elements.message.value
       };
-      Script.save(newAlert);
+      await Script.save(newAlert);
     }
   });
 }
+
 export default class Script {
   static async alertsDrop() {
     return alertsDrop;
@@ -238,22 +239,22 @@ export default class Script {
       message: newAlert.message,
       printer: []
     };
-    let post = await OctoFarmClient.post("/scripts/save", opts);
+    let post = await OctoFarmClient.createAlert(opts);
     if (post) {
       UI.createAlert("error", "Failed to save your alert!", 3000, "Clicked");
     } else {
       UI.createAlert("success", "Successfully saved your alert!", 3000, "Clicked");
-      Script.fetch();
+      await Script.fetch();
     }
   }
 
-  static async delete(id) {
-    let post = await OctoFarmClient.delete("/scripts/delete/" + id);
-    if (post) {
-      UI.createAlert("error", "Failed to delete your alert.", 3000, "Clicked");
-      document.getElementById("alertList-" + id).remove();
-    } else {
+  static async delete(alertId) {
+    try {
+      await OctoFarmClient.deleteAlert(alertId);
       UI.createAlert("success", "Successfully deleted your alert.", 3000, "Clicked");
+      document.getElementById("alertList-" + id).remove();
+    } catch {
+      UI.createAlert("error", "Failed to delete your alert.", 3000, "Clicked");
     }
   }
 
@@ -262,11 +263,11 @@ export default class Script {
       scriptLocation: scriptLocation,
       message: message
     };
-    let post = await OctoFarmClient.post("/scripts/test", opts);
-    if (typeof post.testFire === "object") {
-      UI.createAlert("error", post.testFire.stderr, 3000, "Clicked");
+    let testExecution = await OctoFarmClient.testAlertScript(opts);
+    if (typeof testExecution === "object") {
+      UI.createAlert("error", testExecution.stderr, 3000, "Clicked");
     } else {
-      UI.createAlert("success", post.testFire, 3000, "Clicked");
+      UI.createAlert("success", testExecution, 3000, "Clicked");
     }
   }
 

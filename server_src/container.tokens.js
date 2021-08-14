@@ -12,7 +12,8 @@ const DITokens = {
   influxDbPrinterStateService: "InfluxDbPrinterStateService",
   taskManagerService: "taskManagerService",
   printerFilesService: "printerFilesService",
-  scriptCheckService: "scriptCheckService",
+  alertService: "alertService",
+  scriptService: "scriptService",
   autoDiscoveryService: "autoDiscoveryService",
   historyService: "historyService",
   // Stores/states

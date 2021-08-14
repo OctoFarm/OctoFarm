@@ -8,8 +8,7 @@ const ServerSettingsService = require("./services/server-settings.service");
 const ClientSettingsService = require("./services/client-settings.service");
 const OctofarmUpdateService = require("./services/octofarm-update.service");
 const InfluxDbSetupService = require("./services/influx/influx-db-setup.service");
-const ScriptCheckService = require("./services/script-check.service");
-const ScriptsService = require("./services/scripts.service");
+const ScriptService = require("./services/script.service");
 const TaskManagerService = require("./services/task-manager.service");
 const SystemInfoStore = require("./state/system-info.store");
 const SystemCommandsService = require("./services/system-commands.service");
@@ -50,6 +49,7 @@ const SoftwareUpdateTask = require("./tasks/software-update.task");
 const AutoDiscoveryService = require("./services/auto-discovery.service");
 const ConnectionLogsCache = require("./state/data/connection-logs.cache");
 const DashboardStatisticsCache = require("./state/data/dashboard-statistics.cache");
+const AlertService = require("./services/alert.service");
 
 function configureContainer() {
   // Create the container and set the injectionMode to PROXY (which is also the default).
@@ -128,8 +128,8 @@ function configureContainer() {
     [DITokens.printersStore]: awilix.asClass(PrintersStore).singleton(),
 
     // Extensibility and export
-    [DITokens.scriptCheckService]: awilix.asClass(ScriptCheckService),
-    scriptsService: awilix.asClass(ScriptsService),
+    [DITokens.alertService]: awilix.asClass(AlertService),
+    [DITokens.scriptService]: awilix.asClass(ScriptService),
     [DITokens.influxDbSetupService]: awilix.asClass(InfluxDbSetupService).singleton(),
     [DITokens.influxDbFilamentService]: awilix.asClass(InfluxDbFilamentService),
     [DITokens.influxDbHistoryService]: awilix.asClass(InfluxDbHistoryService),
