@@ -25,6 +25,9 @@ All notable changes to this project will be documented in this file.
     - Refactored System page into separate manageable files ejs/js, cleaned up a lot of code. 
     - Updated the system page layout. 
     - Moved filament manager plugin actions to separate service file. 
+    - Reworked backend with awilix dependency injection (lot of changes), caches and stores
+    - Cleaned up printer API
+    - Cleaned up alerts and scripts API 
 
 ### Removed
 
