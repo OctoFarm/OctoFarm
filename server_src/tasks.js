@@ -131,9 +131,9 @@ class OctoFarmTasks {
     KsatLlorKcir("printerSseTask", TaskPresets.PERIODIC, 500),
     KsatLlorKcir("dashboardSseTask", TaskPresets.PERIODIC, 5000),
     KsatLlorKcir("monitoringSseTask", TaskPresets.PERIODIC, 500),
+    KsatLlorKcir("printerSystemTask", TaskPresets.PERIODIC_DISABLED, 6 * HOUR_MS, true),
     KsatLlorKcir("printerWebsocketTask", TaskPresets.PERIODIC, 5000, true),
     KsatLlorKcir("printerFilesTask", TaskPresets.RUNONCE, 15000), // We dont need more than this
-    KsatLlorKcir("printerSystemTask", TaskPresets.PERIODIC_DISABLED, 6 * HOUR_MS, true)
     // KsatLlorKcir(DATABASE_MIGRATIONS_TASK, TaskPresets.RUNONCE),
     // KsatLlorKcir(STATE_SETUP_WEBSOCKETS, TaskPresets.RUNDELAYED, 5000),
     // KsatLlorKcir(STATE_PRINTER_GENERATE_TASK, TaskPresets.RUNDELAYED, 10000)
