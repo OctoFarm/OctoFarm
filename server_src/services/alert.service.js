@@ -1,12 +1,47 @@
 const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-Scripts");
-const Alerts = require("../models/Alerts.js");
+const Alert = require("../models/Alerts.js");
+const { NotFoundException } = require("../exceptions/runtime.exceptions");
 
-class ScriptCheckService {
-  #scriptsService;
+class AlertService {
+  #scriptService;
 
-  constructor({ scriptsService }) {
-    this.#scriptsService = scriptsService;
+  constructor({ scriptService }) {
+    this.#scriptService = scriptService;
+  }
+
+  async get(alertId) {
+    const filter = { _id: alertId };
+    const alert = await Alert.findOne(filter);
+
+    if (!alert) {
+      throw new NotFoundException(`The alert ID '${alertId}' is not an existing Alert.`);
+    }
+
+    return alert;
+  }
+
+  async list() {
+    return Alert.find({});
+  }
+
+  async delete(alertId) {
+    const alert = await this.get(alertId);
+
+    await Alert.deleteOne({ _id: alert._id });
+  }
+
+  /**
+   * Currently unused
+   * @param alertId
+   * @param messagePayload
+   * @returns {Promise<*>}
+   */
+  async executeAlertScript(alertId, messagePayload) {
+    const alert = await this.get(alertId);
+
+    logger.info("Testing Alerts: " + alert.scriptLocation + " " + messagePayload);
+    return await this.#scriptService.execute(alert.scriptLocation, JSON.stringify(messagePayload));
   }
 
   /**
@@ -17,39 +52,40 @@ class ScriptCheckService {
    * @param scriptLocation
    * @returns {Promise<string>}
    */
-  async save(printer, trigger, message, scriptLocation) {
+  async create({ printer, trigger, message, scriptLocation }) {
     let alert = {
       active: true,
-      trigger: trigger,
-      message: message,
-      scriptLocation: scriptLocation,
-      printers: printer
+      trigger,
+      message,
+      scriptLocation,
+      printer
     };
-    let newAlert = new Alerts(alert);
-    logger.info("Saving: " + trigger + " " + scriptLocation + " " + message);
-    await newAlert.save().then((e) => {
-      logger.info("Saved: " + trigger + " " + scriptLocation + " " + message);
-    });
+    let newAlert = new Alert(alert);
 
-    return "saved";
+    await newAlert.save();
+
+    logger.info("Saved: " + trigger + " " + scriptLocation + " " + message);
+
+    return newAlert;
   }
 
   /**
-   * TODO has potential bug find
+   * Update relevant alert without touching printers
+   * @param alertId
    * @param newAlert
    * @returns {Promise<string|undefined>}
    */
-  async edit(newAlert) {
-    let old = await Alerts.findById(newAlert._id);
-    if (!old) return;
+  async update(alertId, newAlert) {
+    const alert = await this.get(alertId);
 
-    old.active = newAlert.active;
-    old.trigger = newAlert.trigger;
-    old.scriptLocation = newAlert.scriptLocation;
-    old.message = newAlert.message;
-    await old.save();
+    alert.active = newAlert.active;
+    alert.trigger = newAlert.trigger;
+    alert.scriptLocation = newAlert.scriptLocation;
+    alert.message = newAlert.message;
 
-    return "saved";
+    await alert.save();
+
+    return alert;
   }
 
   /**
@@ -60,26 +96,16 @@ class ScriptCheckService {
    * @returns {Promise<void>}
    */
   async check(printer, trigger, historyID) {
-    let currentAlerts = await Alerts.find({});
+    let currentAlerts = await Alert.find({});
     for (let i = 0; i < currentAlerts.length; i++) {
       if (currentAlerts[i].printer === printer._id || currentAlerts[i].printer.length === 0) {
         if (currentAlerts[i].trigger === trigger && currentAlerts[i].active) {
           let newMessage = await this.convertMessage(printer, currentAlerts[i].message, historyID);
 
-          this.#scriptsService.fire(currentAlerts[i].scriptLocation, newMessage);
+          this.#scriptService.fire(currentAlerts[i].scriptLocation, newMessage);
         }
       }
     }
-  }
-
-  async test(scriptLocation, message) {
-    logger.info("Testing Alerts: " + scriptLocation + " " + message);
-    return await this.#scriptsService.fire(scriptLocation, JSON.stringify(message));
-  }
-
-  async fire(scriptLocation, message) {
-    logger.info("Alert Fire: " + scriptLocation + " " + message);
-    return await this.#scriptsService.fire(scriptLocation, message);
   }
 
   async convertMessage(printer, message, historyID) {
@@ -260,4 +286,4 @@ const generateTime = function (seconds) {
   return string;
 };
 
-module.exports = ScriptCheckService;
+module.exports = AlertService;

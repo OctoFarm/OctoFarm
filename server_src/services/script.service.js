@@ -4,9 +4,9 @@ const util = require("util");
 const exec = util.promisify(require("child_process").exec);
 const wol = require("wake_on_lan");
 
-class ScriptsService {
-  async fire(scriptLocation, message) {
-    logger.info("Script: ", scriptLocation);
+class ScriptService {
+  async execute(scriptLocation, message) {
+    logger.info("Executing script: ", scriptLocation);
     logger.info("Message: ", message);
     try {
       const { stdout, stderr } = await exec(`${scriptLocation} ${message}`);
@@ -38,4 +38,4 @@ class ScriptsService {
   }
 }
 
-module.exports = ScriptsService;
+module.exports = ScriptService;

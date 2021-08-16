@@ -51,7 +51,7 @@ if (alertsTriggers) {
 
 let saveScriptBtn = document.getElementById("saveScript");
 if (saveScriptBtn) {
-  saveScriptBtn.addEventListener("click", (event) => {
+  saveScriptBtn.addEventListener("click", async (event) => {
     event.preventDefault();
     event.stopPropagation();
     let elements = Script.grabPage();
@@ -84,20 +84,22 @@ if (saveScriptBtn) {
         script: elements.script.value,
         message: elements.message.value
       };
-      Script.save(newAlert);
+      await Script.save(newAlert);
     }
   });
 }
+
 export default class Script {
   static async alertsDrop() {
     return alertsDrop;
   }
-  static async get() {
-    let post = await OctoFarmClient.get("/scripts/get");
+
+  static async fetch() {
+    let response = await OctoFarmClient.listAlerts();
     let alertsTable = document.getElementById("alertsTable");
     alertsTable.innerHTML = "";
-    if (post) {
-      post.alerts.forEach((alert) => {
+    if (response) {
+      response.forEach((alert) => {
         if (alert.printer.length === 0) {
           alert.printer = "All Printers";
         }
@@ -189,6 +191,7 @@ export default class Script {
                 </tr>`);
     }
   }
+
   static async edit(id) {
     let row = document.getElementById("alertList-" + id);
     let editable = row.querySelectorAll("[contenteditable]");
@@ -201,20 +204,20 @@ export default class Script {
     document.getElementById("edit-" + id).classList.add("d-none");
     document.getElementById("trigger-" + id).disabled = false;
   }
+
   static async saveEdit(id, newAlert) {
     let opts = {
-      id: id,
       active: newAlert.active,
       trigger: newAlert.trigger,
       scriptLocation: newAlert.script,
       message: newAlert.message
     };
-    let post = await OctoFarmClient.post("/scripts/edit", opts);
+    let post = await OctoFarmClient.updateAlert(id, opts);
     if (post) {
       UI.createAlert("error", "Failed to save your alert!", 3000, "Clicked");
     } else {
       UI.createAlert("success", "Successfully saved your alert!", 3000, "Clicked");
-      Script.get();
+      await Script.fetch();
     }
     let row = document.getElementById("alertList-" + id);
     let editable = row.querySelectorAll("[contenteditable]");
@@ -227,6 +230,7 @@ export default class Script {
     document.getElementById("edit-" + id).classList.remove("d-none");
     document.getElementById("trigger-" + id).disabled = true;
   }
+
   static async save(newAlert) {
     let opts = {
       active: newAlert.active,
@@ -235,35 +239,38 @@ export default class Script {
       message: newAlert.message,
       printer: []
     };
-    let post = await OctoFarmClient.post("/scripts/save", opts);
+    let post = await OctoFarmClient.createAlert(opts);
     if (post) {
       UI.createAlert("error", "Failed to save your alert!", 3000, "Clicked");
     } else {
       UI.createAlert("success", "Successfully saved your alert!", 3000, "Clicked");
-      Script.get();
+      await Script.fetch();
     }
   }
-  static async delete(id) {
-    let post = await OctoFarmClient.delete("/scripts/delete/" + id);
-    if (post) {
-      UI.createAlert("error", "Failed to delete your alert.", 3000, "Clicked");
-      document.getElementById("alertList-" + id).remove();
-    } else {
+
+  static async delete(alertId) {
+    try {
+      await OctoFarmClient.deleteAlert(alertId);
       UI.createAlert("success", "Successfully deleted your alert.", 3000, "Clicked");
+      document.getElementById("alertList-" + id).remove();
+    } catch {
+      UI.createAlert("error", "Failed to delete your alert.", 3000, "Clicked");
     }
   }
+
   static async test(scriptLocation, message) {
     let opts = {
       scriptLocation: scriptLocation,
       message: message
     };
-    let post = await OctoFarmClient.post("/scripts/test", opts);
-    if (typeof post.testFire === "object") {
-      UI.createAlert("error", post.testFire.stderr, 3000, "Clicked");
+    let testExecution = await OctoFarmClient.testAlertScript(opts);
+    if (typeof testExecution === "object") {
+      UI.createAlert("error", testExecution.stderr, 3000, "Clicked");
     } else {
-      UI.createAlert("success", post.testFire, 3000, "Clicked");
+      UI.createAlert("success", testExecution, 3000, "Clicked");
     }
   }
+
   static checkPage(elements) {
     let errors = [];
 
@@ -278,6 +285,7 @@ export default class Script {
     }
     return errors;
   }
+
   static grabPage() {
     return {
       trigger: document.getElementById("alertsTrigger"),

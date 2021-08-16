@@ -77,6 +77,8 @@ export default class OctoFarmClient {
   static filamentManagerReSyncRoute = this.filamentManagerRoute + "/resync";
   static filamentManagerSyncRoute = this.filamentManagerRoute + "/sync";
   static filamentManagerDisableRoute = this.filamentManagerRoute + "/disable";
+  static alertRoute = this.base + "/alert";
+  static testAlertScriptRoute = this.alertRoute + "/test-alert-script";
 
   static validatePath(pathname) {
     if (!pathname) {
@@ -253,6 +255,27 @@ export default class OctoFarmClient {
 
   static async updateClientSorting(sortingString) {
     return this.patch(`${this.clientSortingRoute}/${sortingString}`);
+  }
+
+  static async listAlerts() {
+    return await this.get(this.alertRoute);
+  }
+
+  static async createAlert(data) {
+    return await this.post(`${this.alertRoute}/`, data);
+  }
+
+  static async updateAlert(scriptId, data) {
+    return await this.put(`${this.alertRoute}/${scriptId}`, data);
+  }
+
+  static async deleteAlert(scriptId) {
+    return await this.delete(`${this.alertRoute}/${scriptId}`);
+  }
+
+  static async testAlertScript(data) {
+    this.validateRequiredProps(data, ["scriptLocation", "message"]);
+    return await this.post(this.testAlertScriptRoute, data);
   }
 
   static async get(path) {
