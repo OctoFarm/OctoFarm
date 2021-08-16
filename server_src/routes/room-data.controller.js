@@ -16,6 +16,7 @@ class RoomDataController {
 
   async create(req, res) {
     const roomData = req.body;
+    // TODO add validation rules for roomData
     const databaseData = new RoomData(roomData);
     await databaseData.save();
   }
