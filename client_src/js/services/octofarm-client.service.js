@@ -275,7 +275,7 @@ export default class OctoFarmClient {
 
   static async testAlertScript(data) {
     this.validateRequiredProps(data, ["scriptLocation", "message"]);
-    return await this.patch(this.testAlertScriptRoute, data);
+    return await this.post(this.testAlertScriptRoute, data);
   }
 
   static async get(path) {

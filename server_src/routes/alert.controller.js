@@ -74,4 +74,4 @@ module.exports = createController(AlertController)
   .post("/", "create")
   .put("/:id", "update")
   .delete("/:id", "delete")
-  .patch("/test-alert-script", "testAlertScript");
+  .post("/test-alert-script", "testAlertScript");
