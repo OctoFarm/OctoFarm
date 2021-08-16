@@ -14,15 +14,16 @@ class RoomDataController {
     this.#octoFarmPageTitle = octoFarmPageTitle;
   }
 
-  async addRoomData(req, res) {
-    const enviromentData = req.body;
-    const databaseData = new RoomData(enviromentData);
+  async create(req, res) {
+    const roomData = req.body;
+    // TODO add validation rules for roomData
+    const databaseData = new RoomData(roomData);
     await databaseData.save();
   }
 }
 
 // prettier-ignore
 module.exports = createController(RoomDataController)
-  .prefix(AppConstants.apiRoute + "/input")
+  .prefix(AppConstants.apiRoute + "/room-data")
   .before([ensureAuthenticated])
-  .post("/roomData", "addRoomData");
+  .post("/", "create");

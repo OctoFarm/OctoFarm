@@ -79,6 +79,7 @@ export default class OctoFarmClient {
   static filamentManagerDisableRoute = this.filamentManagerRoute + "/disable";
   static alertRoute = this.base + "/alert";
   static testAlertScriptRoute = this.alertRoute + "/test-alert-script";
+  static roomDataRoute = this.base + "/room-data";
 
   static validatePath(pathname) {
     if (!pathname) {
@@ -276,6 +277,10 @@ export default class OctoFarmClient {
   static async testAlertScript(data) {
     this.validateRequiredProps(data, ["scriptLocation", "message"]);
     return await this.post(this.testAlertScriptRoute, data);
+  }
+
+  static async createRoomData(data) {
+    return await this.post(this.roomDataRoute, data);
   }
 
   static async get(path) {

@@ -28,6 +28,7 @@ All notable changes to this project will be documented in this file.
     - Reworked backend with awilix dependency injection (lot of changes), caches and stores
     - Cleaned up printer API
     - Cleaned up alerts and scripts API 
+    - Cleaned up room data API
 
 ### Removed
 
