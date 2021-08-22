@@ -1,31 +1,9 @@
 import OctoFarmClient from "../services/octofarm-client.service";
 import UI from "../lib/functions/ui";
 
-export async function checkFilamentManager() {
-  const serverSettings = await OctoFarmClient.getServerSettings();
+export async function isFilamentManagerPluginSyncEnabled() {
+  let serverSettings = await OctoFarmClient.getServerSettings();
   return serverSettings.filamentManager;
-}
-
-export function setupFilamentManagerDisableBtn() {
-  const disableFilManagerBtn = document.getElementById("disable-FilamentManager");
-  disableFilManagerBtn.addEventListener("click", async (event) => {
-    let filamentManagerDisabled = await OctoFarmClient.disableFilamentPlugin({
-      activate: true
-    });
-    if (filamentManagerDisabled) {
-      UI.createAlert(
-        "success",
-        "Successfully disabled filament manager and removed all spools / profiles.",
-        3000
-      );
-    } else {
-      UI.createAlert(
-        "error",
-        "Unable to disable filament manager please check the filament manager logs.",
-        3000
-      );
-    }
-  });
 }
 
 export function setupFilamentManagerSyncBtn() {
@@ -72,7 +50,7 @@ export async function setupFilamentManagerReSyncBtn() {
   }
 }
 
-// TODO: re-enable at some point
+// re-enable at some point
 // export async function returnSelected(id, profiles) {
 //   console.log("Return Selected");
 //   let profileId = null;
@@ -103,6 +81,28 @@ export async function returnDropDown(history) {
     console.error(e);
     UI.createAlert("error", "Issue contacting server, please check the logs...");
   }
+}
+
+export function setupFilamentManagerDisableBtn() {
+  const disableFilManagerBtn = document.getElementById("disable-FilamentManager");
+  disableFilManagerBtn.addEventListener("click", async (event) => {
+    let filamentManagerDisabled = await OctoFarmClient.post("filament/disableFilamentPlugin", {
+      activate: true
+    });
+    if (filamentManagerDisabled) {
+      UI.createAlert(
+        "success",
+        "Successfully disabled filament manager and removed all spools / profiles.",
+        3000
+      );
+    } else {
+      UI.createAlert(
+        "error",
+        "Unable to disable filament manager please check the filament manager logs.",
+        3000
+      );
+    }
+  });
 }
 
 export async function selectFilament(printerId, spoolId, tool) {

@@ -1,67 +1,18 @@
-import axios from "axios";
-import { ApplicationError } from "../exceptions/application-error.handler";
-import { HTTPError } from "../exceptions/octofarm-api.exceptions";
-import { ClientErrors } from "../exceptions/octofarm-client.exceptions";
+import AxiosService from "./axios.service";
 
-// axios request interceptor
-axios.interceptors.request.use(
-  function (config) {
-    OctoFarmClient.validatePath(config.url);
-    return config;
-  },
-  function (error) {
-    // Do something with request error
-    return Promise.reject(error);
-  }
-);
-
-// axios response interceptor
-axios.interceptors.response.use(
-  function (response) {
-    // Any status code that lie within the range of 2xx cause this function to trigger
-    // Do something with response data
-    return response;
-  },
-  function (error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
-    switch (error.response.status) {
-      case 0:
-        throw new ApplicationError(HTTPError.NO_CONNECTION);
-      case 400:
-        throw new ApplicationError(HTTPError.BAD_REQUEST);
-      case 401:
-        throw new ApplicationError(HTTPError.UNAUTHORIZED);
-      case 403:
-        throw new ApplicationError(HTTPError.FORBIDDEN);
-      case 404:
-        throw new ApplicationError(HTTPError.RESOURCE_NOT_FOUND);
-      case 500:
-        throw new ApplicationError(HTTPError.INTERNAL_SERVER_ERROR);
-      case 502:
-        throw new ApplicationError(HTTPError.BAD_GATEWAY);
-      case 503:
-        throw new ApplicationError(HTTPError.SERVICE_UNAVAILABLE);
-      case 504:
-        throw new ApplicationError(HTTPError.GATEWAY_TIMEOUT);
-      default:
-        throw new ApplicationError(HTTPError.UNKNOWN);
-    }
-  }
-);
-
-// TODO: this could end up getting big, consider splitting it.
-// Would go by page, each page could get it's own extends class for pre-defined routes building on the CRUD actions available.
-export default class OctoFarmClient {
+export default class OctoFarmClient extends AxiosService {
   static base = "/api";
-  static amIAliveRoute = this.base + "/amialive";
+  static systemInformationRoute = "/system/in3fo";
   static printerRoute = this.base + "/printer";
   static settingsRoute = this.base + "/settings";
-  static serverSettingsRoute = this.settingsRoute + "/server";
-  static logsRoute = `${this.serverSettingsRoute}/logs`;
+  static logsRoute = `${this.settingsRoute}/logs`;
   static generateLogsDumpRoute = `${this.logsRoute}/generate-log-dump`;
-  static serverRestartRoute = `${this.serverSettingsRoute}/restart`;
+  static serverRestartRoute = `${this.settingsRoute}/restart`;
   static clientSettingsRoute = this.settingsRoute + "/client";
+  static serverSettingsRoute = this.settingsRoute + "/server";
+  static updateOctoFarmRoute = this.serverSettingsRoute + "/update";
+  static databaseRoute = this.settingsRoute + "/database";
+  static scriptsRoute = this.base + "/alert";
   static customGCodeSettingsRoutes = this.settingsRoute + "/custom-gcode";
   static clientRoute = this.base + "/client";
   static clientFilterRoute = this.clientRoute + "/filter";
@@ -81,13 +32,6 @@ export default class OctoFarmClient {
   static testAlertScriptRoute = this.alertRoute + "/test-alert-script";
   static roomDataRoute = this.base + "/room-data";
 
-  static validatePath(pathname) {
-    if (!pathname) {
-      new URL(path, window.location.origin);
-      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH);
-    }
-  }
-
   static validateRequiredProps(input, keys) {
     const unsetRequiredProps = keys.filter((prop) => {
       return !input[prop];
@@ -98,22 +42,22 @@ export default class OctoFarmClient {
         unsetRequiredProps
       );
       // TODO unsetRequiredProps are not processed yet
-      throw new ApplicationError(ClientErrors.FAILED_VALIDATION_PATH, unsetRequiredProps);
+      // throw new ClientError(ClientErrors., unsetRequiredProps);
     }
   }
 
-  static async amIAlive() {
-    return await this.get(this.amIAliveRoute);
+  static getSystemInformation() {
+    return this.get(this.systemInformationRoute);
   }
 
-  static async getPrinter(printerId) {
+  static getPrinter(printerId) {
     if (!printerId) {
       throw "Cant fetch printer without defined 'id' input";
     }
-    return await this.get(`${this.printerRoute}/${printerId}`);
+    return this.get(`${this.printerRoute}/${printerId}`);
   }
 
-  static async listPrinters() {
+  static listPrinters() {
     return this.get(`${this.printerRoute}`);
   }
 
@@ -169,6 +113,10 @@ export default class OctoFarmClient {
     return this.get(`${this.printerRoute}/${id ? id : ""}`);
   }
 
+  static getLogsList() {
+    return this.get(this.logsRoute);
+  }
+
   static async getPrinterConnectionLogs(printerId) {
     return this.get(`${this.printerRoute}/${printerId}/connection-logs`);
   }
@@ -181,8 +129,16 @@ export default class OctoFarmClient {
     }
   }
 
-  static async generateLogDump() {
+  static getScriptsList() {
+    return this.get(this.scriptsRoute);
+  }
+
+  static generateLogDump() {
     return this.put(this.generateLogsDumpRoute);
+  }
+
+  static downloadLogFile(file) {
+    window.open(`${OctoFarmClient.logsRoute}/${file}`);
   }
 
   static async getHistory() {
@@ -201,17 +157,32 @@ export default class OctoFarmClient {
     return this.get(this.historyStatsRoute);
   }
 
-  static async getClientSettings() {
-    return this.get(this.clientSettingsRoute);
-  }
-
   static async getServerSettings() {
     return this.get(this.serverSettingsRoute);
   }
 
-  static async updateServerSettings(settingsObject) {
-    //TODO: should be patch not post
+  static updateServerSettings(settingsObject) {
     return this.put(this.serverSettingsRoute, settingsObject);
+  }
+
+  static async getClientSettings() {
+    return this.get(this.clientSettingsRoute);
+  }
+
+  static updateClientSettings(settingsObject) {
+    return this.put(this.clientSettingsRoute, settingsObject);
+  }
+
+  static checkForOctoFarmUpdates() {
+    return this.get(this.updateOctoFarmRoute);
+  }
+
+  static actionOctoFarmUpdates(data) {
+    return this.post(this.updateOctoFarmRoute, data);
+  }
+
+  static getDatabaseList(databaseName) {
+    return this.get(this.databaseRoute + `/${databaseName}`);
   }
 
   static async restartServer() {
@@ -281,40 +252,5 @@ export default class OctoFarmClient {
 
   static async createRoomData(data) {
     return await this.post(this.roomDataRoute, data);
-  }
-
-  static async get(path) {
-    const url = new URL(path, window.location.origin).href;
-    return axios.get(url).then((res) => {
-      return res.data;
-    });
-  }
-
-  static async post(path, data) {
-    const url = new URL(path, window.location.origin).href;
-    return axios.post(url, data).then((res) => {
-      return res.data;
-    });
-  }
-
-  static async put(path, data) {
-    const url = new URL(path, window.location.origin).href;
-    return axios.put(url, data).then((res) => {
-      return res.data;
-    });
-  }
-
-  static async delete(path) {
-    const url = new URL(path, window.location.origin).href;
-    return axios.delete(url).then((res) => {
-      return res.data;
-    });
-  }
-
-  static async patch(path, data) {
-    const url = new URL(path, window.location.origin).href;
-    return axios.patch(url, data).then((res) => {
-      return res.data;
-    });
   }
 }

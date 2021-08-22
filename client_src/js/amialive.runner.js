@@ -1,25 +1,10 @@
 import UI from "./lib/functions/ui";
-import OctoFarmClient from "./services/octofarm-client.service";
+import AxiosClient from "./services/axios.service";
 
-let interval = false;
-let timer = false;
+let interval;
+let timer = 2500;
 const notificationMarkReadSessionKey = "octofarm-updatemsg-read";
 let pageReloadPersistedRead = false;
-
-const drawModal = async function () {
-  $("#lostServerConnection").modal("show");
-};
-
-const reloadWindow = async function () {
-  if (location.href.includes("submitEnvironment")) {
-    const hostName = window.location.protocol + "//" + window.location.host + "";
-    window.location.replace(hostName);
-    return false;
-  } else {
-    window.location.reload();
-    return false;
-  }
-};
 
 function checkUpdateAndNotify(updateResponse) {
   if (!!updateResponse?.update_available && !pageReloadPersistedRead) {
@@ -86,53 +71,20 @@ function checkUpdateAndNotify(updateResponse) {
 }
 
 const amialiveService = async function () {
+  console.log("starting am I alive service check...");
   if (!interval) {
     interval = setInterval(async () => {
-      const modal = document.getElementById("lostServerConnection");
-      try {
-        let alive = await OctoFarmClient.amIAlive();
-
-        if (alive?.update && !alive.isDockerContainer) {
+      let serviceState = await AxiosClient.serverAliveCheck();
+      if (serviceState) {
+        if (serviceState?.update && !serviceState.isDockerContainer) {
           try {
-            checkUpdateAndNotify(alive.update);
+            checkUpdateAndNotify(serviceState.update);
           } catch (e) {
             console.warn("Could not successfully parse OctoFarm update notification");
           }
         }
-
-        if (modal.classList.contains("show")) {
-          //Connection recovered, re-load printer page
-          const spinner = document.getElementById("lostConnectionSpinner");
-          const text = document.getElementById("lostConnectionText");
-          spinner.className = "fas fa-spinner";
-          if (!timer) {
-            let countDown = 5;
-            timer = true;
-            setInterval(async () => {
-              text.innerHTML =
-                "Connection Restored! <br> Reloading the page automatically in " +
-                countDown +
-                " seconds...";
-              text.innerHTML = `Connection Restored! <br> Automatically reloading the page in ${countDown} seconds... <br><br>
-                                    <button id="reloadBtn" type="button" class="btn btn-success">Reload Now!</button>
-                                `;
-              document.getElementById("reloadBtn").addEventListener("click", reloadWindow());
-              countDown = countDown - 1;
-            }, 1000);
-            setTimeout(async () => {
-              reloadWindow();
-            }, 2500);
-          }
-        }
-      } catch (e) {
-        drawModal();
-        console.error(e);
-        clearInterval(interval);
-        interval = false;
-        amialiveService();
       }
-    }, 5000);
+    }, timer);
   }
 };
-
-amialiveService();
+amialiveService().then();

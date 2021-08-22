@@ -3,6 +3,17 @@ const { ensureAuthenticated } = require("../../middleware/auth");
 const Logger = require("../../handlers/logger.js");
 const { AppConstants } = require("../../app.constants");
 
+const ServerSettingsDB = require("../../models/ServerSettings");
+const ClientSettingsDB = require("../../models/ClientSettings");
+const HistoryDB = require("../../models/History");
+const SpoolsDB = require("../../models/Spool");
+const ProfilesDB = require("../../models/Profiles");
+const roomDataDB = require("../../models/RoomData");
+const UserDB = require("../../models/User");
+const PrintersDB = require("../../models/Printer");
+const AlertsDB = require("../../models/Alerts");
+const GcodeDB = require("../../models/CustomGcode");
+
 class DatabaseController {
   #logger = new Logger("OctoFarm-API");
 
@@ -19,32 +30,32 @@ class DatabaseController {
       await ProfilesDB.deleteMany({});
       await roomDataDB.deleteMany({});
       await UserDB.deleteMany({});
-      await PrinterDB.deleteMany({});
+      await PrintersDB.deleteMany({});
       await AlertsDB.deleteMany({});
       await GcodeDB.deleteMany({});
       res.send({
         message: "Successfully deleted databases, server will restart..."
       });
-      logger.info("Database completely wiped.... Restarting server...");
+      this.#logger.info("Database completely wiped.... Restarting server...");
       SystemCommands.rebootOctoFarm();
     } else if (databaseName === "FilamentDB") {
       await SpoolsDB.deleteMany({});
       await ProfilesDB.deleteMany({});
-      logger.info("Successfully deleted Filament database.... Restarting server...");
+      this.#logger.info("Successfully deleted Filament database.... Restarting server...");
       SystemCommands.rebootOctoFarm();
     } else {
       await eval(databaseName).deleteMany({});
       res.send({
         message: "Successfully deleted " + databaseName + ", server will restart..."
       });
-      logger.info(databaseName + " successfully deleted.... Restarting server...");
+      this.#logger.info(databaseName + " successfully deleted.... Restarting server...");
       SystemCommands.rebootOctoFarm();
     }
   }
 
   async getSchema(req, res) {
     const databaseName = req.params.name;
-    logger.info("Client requests export of " + databaseName);
+    this.#logger.info("Client requests export of " + databaseName);
     let returnedObjects = [];
     if (databaseName === "FilamentDB") {
       returnedObjects.push(await ProfilesDB.find({}));
@@ -52,7 +63,7 @@ class DatabaseController {
     } else {
       returnedObjects.push(await eval(databaseName).find({}));
     }
-    logger.info("Returning to client database object: " + databaseName);
+    this.#logger.info("Returning to client database object: " + databaseName);
     res.send({ databases: returnedObjects });
   }
 }
@@ -61,5 +72,5 @@ class DatabaseController {
 module.exports = createController(DatabaseController)
   .prefix(AppConstants.apiRoute + "/settings/database")
   .before([ensureAuthenticated])
-  .delete("/delete/:name", "deleteSchema")
-  .get("/get/:name", "getSchema");
+  .delete("/:name", "deleteSchema")
+  .get("/:name", "getSchema");

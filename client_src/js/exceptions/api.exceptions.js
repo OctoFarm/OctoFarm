@@ -71,7 +71,14 @@ const HTTPError = {
     type: errorTypes.SERVER,
     color: "danger",
     code: "UNKNOWN",
-    message: "Unknown Error Response",
+    message: "Unknown Error Response: ",
+    statusCode: 999
+  },
+  SERVER_ALIVE_CHECK_FAILED: {
+    type: errorTypes.NETWORK,
+    color: "warning",
+    code: "SERVER_ALIVE_CHECK_FAILED",
+    message: "Server alive check has failed, awaiting for service to be restored",
     statusCode: 999
   }
 };

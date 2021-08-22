@@ -108,7 +108,7 @@ export default class UI {
       });
     });
   }
-  //TODO: Move to a templates folder
+
   static returnSpinnerTemplate() {
     return '<i class="fas fa-spinner fa-spin"></i>';
   }

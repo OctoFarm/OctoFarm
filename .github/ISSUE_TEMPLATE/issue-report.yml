@@ -27,13 +27,18 @@ body:
     placeholder: "1.5.3, 1.6.0"
   validations:
     required: true
-- type: dropdown
+- type: input
   id: process
   attributes:
     label: "pm2 or docker?"
-    options:
-      - pm2
-      - docker
+    placeholder: "pm2, docker or not sure"
+  validations:
+    required: true
+- type: input
+  id: airgap
+  attributes:
+    label: "Is this an air-gapped farm? (unable to access the internet)"
+    placeholder: "Yes/No"
   validations:
     required: true
 - type: input
@@ -48,16 +53,11 @@ body:
   attributes:
     label: OctoPrint Plugins
     placeholder: "e.g. bed visualiser, octoklipper, printtimegenius"
-- type: dropdown
+- type: input
   id: current-location
   attributes:
-    label: "Location of the problem"
-    options:
-      - Server
-      - NodeJS
-      - MongoDb
-      - Web Interface
-      - Not sure
+    label: Location of the problem, ie.
+    placeholder: "e.g. Client, Server, Network, OctoPrint, Not sure"
   validations:
     required: true
 - type: textarea
@@ -66,7 +66,7 @@ body:
     label: Description of the problem
     value: |
       ...
-    render: bash
+    render: markdown
   validations:
     required: true
 - type: textarea
@@ -79,7 +79,7 @@ body:
       2.
       3.
       ...
-    render: bash
+    render: markdown
   validations:
     required: true
 - type: textarea
@@ -88,7 +88,7 @@ body:
     label: What did you expect to happen
     value: |
       ...
-    render: bash
+    render: markdown
   validations:
     required: true
 - type: textarea
@@ -97,7 +97,7 @@ body:
     label: To avoid the problem I had to
     value: |
       ...
-    render: bash
+    render: markdown
 - type: markdown
   attributes:
     value: |

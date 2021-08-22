@@ -1,12 +1,14 @@
 import OctoFarmClient from "../services/octofarm-client.service";
 import UI from "../lib/functions/ui";
 import Calc from "../lib/functions/calc";
-import { setupOctoPrintForTimelapses } from "../octoprint/octoprint-settings.actions";
 import {
   setupFilamentManagerDisableBtn,
   setupFilamentManagerReSyncBtn,
-  setupFilamentManagerSyncBtn
+  setupFilamentManagerSyncBtn,
+  isFilamentManagerPluginSyncEnabled
 } from "../services/filament-manager-plugin.service";
+import OctoPrintClient from "../services/octoprint-client.service";
+import FileOperations from "../lib/functions/file";
 import { settingsElements } from "./server.options";
 import { serverBootBoxOptions } from "./utils/bootbox.options";
 import { cpuChartOptions, memoryChartOptions } from "./utils/charts.options";
@@ -22,7 +24,9 @@ async function setupOPTimelapseSettings() {
     "warning",
     `${UI.returnSpinnerTemplate()} Setting up your OctoPrint settings, please wait...`
   );
-  const { successfulPrinters, failedPrinters } = await setupOctoPrintForTimelapses(printers);
+  const { successfulPrinters, failedPrinters } = await OctoPrintClient.setupOctoPrintForTimelapses(
+    printers
+  );
   alert.close();
   bootbox.alert(successfulPrinters + failedPrinters);
 }
@@ -63,18 +67,18 @@ async function generateLogDumpFile() {
 async function nukeDatabases(database) {
   let databaseNuke;
   if (!database) {
-    databaseNuke = await OctoFarmClient.get("settings/server/delete/database");
+    databaseNuke = await OctoFarmClient.get("settings/server/delete/database/" + "nukeEverything");
   } else {
     databaseNuke = await OctoFarmClient.get("settings/server/delete/database/" + database);
   }
   UI.createAlert("success", databaseNuke.message, 3000);
 }
 
-async function exportDatabases(database) {
-  const databaseExport = await OctoFarmClient.get("settings/server/get/database/" + database);
+async function exportDatabases(databaseName) {
+  const databaseExport = await OctoFarmClient.getDatabaseList(databaseName);
 
   if (databaseExport?.databases[0].length !== 0) {
-    FileOperations.download(database + ".json", JSON.stringify(databaseExport.databases));
+    FileOperations.download(databaseName + ".json", JSON.stringify(databaseExport.databases));
   } else {
     UI.createAlert("warning", "Database is empty, will not export...", 3000, "clicked");
   }
@@ -197,7 +201,7 @@ async function updateOctoFarmCommand(doWeForcePull, doWeInstallPackages) {
     updateData.doWeInstallPackages = true;
   }
 
-  let updateOctoFarm = await OctoFarmClient.post("settings/server/update/octofarm", updateData);
+  let updateOctoFarm = await OctoFarmClient.actionOctoFarmUpdates(updateData);
 
   // Local changes are detected, question whether we overwrite or cancel..
   if (
@@ -244,7 +248,7 @@ async function checkForOctoFarmUpdates() {
     forceCheckForUpdatesBtn.disabled = true;
   }
 
-  let updateCheck = await OctoFarmClient.get("settings/server/update/octofarm");
+  let updateCheck = await OctoFarmClient.checkForOctoFarmUpdates();
 
   if (updateCheck?.air_gapped) {
     UI.createAlert(
@@ -274,7 +278,7 @@ async function checkForOctoFarmUpdates() {
 }
 
 async function grabOctoFarmLogList() {
-  let logList = await OctoFarmClient.get(OctoFarmClient.logsRoute);
+  let logList = await OctoFarmClient.getLogsList();
   const logTable = document.getElementById("serverLogs");
   logList.forEach((logs) => {
     logTable.insertAdjacentHTML(
@@ -291,7 +295,7 @@ async function grabOctoFarmLogList() {
         `
     );
     document.getElementById(logs.name).addEventListener("click", async (event) => {
-      window.open(`${OctoFarmClient.logsRoute}/${logs.name}`);
+      OctoFarmClient.downloadLogFile(logs.name);
     });
   });
 }
@@ -306,10 +310,9 @@ function renderSystemCharts() {
   systemChartMemory.render();
 }
 
-//TODO: Move over to SSE
-function startUpdatePageRunner() {
-  setInterval(async function updateStatus() {
-    const systemInfo = await OctoFarmClient.get("system/info");
+async function renderSystemInfo() {
+  const systemInfo = await OctoFarmClient.getSystemInformation();
+  if (systemInfo) {
     const sysUptimeElem = document.getElementById("systemUptime");
     const procUptimeElem = document.getElementById("processUpdate");
 
@@ -356,7 +359,7 @@ function startUpdatePageRunner() {
     } else {
       systemChartMemory.updateSeries([0, 0, 0]);
     }
-  }, 5000);
+  }
 }
 
 export {
@@ -371,5 +374,5 @@ export {
   checkForOctoFarmUpdates,
   grabOctoFarmLogList,
   renderSystemCharts,
-  startUpdatePageRunner
+  renderSystemInfo
 };

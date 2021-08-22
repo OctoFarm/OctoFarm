@@ -2,8 +2,8 @@ import OctoFarmClient from "../../services/octofarm-client.service.js";
 import UI from "../functions/ui.js";
 import Calc from "../functions/calc.js";
 import Script from "../../services/gcode-scripts.service.js";
-import { ApplicationError } from "../../exceptions/application-error.handler";
-import { ClientErrors } from "../../exceptions/octofarm-client.exceptions";
+import { ClientError } from "../../exceptions/client-error.handler";
+import { ClientErrors } from "../../exceptions/client.exceptions";
 import { replaceHttpProtocolWith } from "../../utils/url.utils";
 
 let currentPrinterIndex;
@@ -25,14 +25,10 @@ export async function updatePrinterSettingsModal(printersInformation, printerID)
   // Check if printer ID is provided
   if (!printerID) {
     // No printer ID we are updating the state...
-    // The SSE Event doesn't stop on an error, so we need to make sure the update event skips an error occurring...
-
-    if (!ApplicationError.hasErrorNotificationBeenTriggered) {
-      // Make sure online state is latest...
-      printerOnline =
-        printersInformation[currentPrinterIndex].printerState.colour.category !== "Offline";
-      PrinterSettings.updateStateElements(printersInformation[currentPrinterIndex]);
-    }
+    // Make sure online state is latest...
+    printerOnline =
+      printersInformation[currentPrinterIndex].printerState.colour.category !== "Offline";
+    PrinterSettings.updateStateElements(printersInformation[currentPrinterIndex]);
   } else {
     PrinterSettings.updateCurrentPrinterIndex(printersInformation, printerID);
     // Resync Printer Settings to latest values and continue to setup page.
@@ -90,7 +86,7 @@ class PrinterSettings {
     if (printersIndex !== -1) {
       currentPrinterIndex = printersIndex;
     } else {
-      throw new ApplicationError(ClientErrors.FAILED_STATE_UPDATE);
+      throw new ClientError(ClientErrors.FAILED_TO_UPDATE_STATE);
     }
   }
 
@@ -1114,7 +1110,7 @@ class PrinterSettings {
       Object.values(pageElements.menu).map((e) => {
         this.disablePanel(e);
       });
-      throw new ApplicationError(ClientErrors.FAILED_STATE_UPDATE);
+      throw new ClientError(ClientErrors.FAILED_TO_UPDATE_STATE);
     }
     pageElements.mainPage.title.innerHTML = `Printer Settings: ${currentPrinter.printerName}`;
     pageElements.mainPage.status.innerHTML = `<b>Printer Status</b><br>${currentPrinter.printerState.state}`;

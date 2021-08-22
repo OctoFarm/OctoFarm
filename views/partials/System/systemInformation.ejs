@@ -64,41 +64,6 @@
             </div>
         </div>
                     <hr>
-        <div class="row">
-                    <div class="col-12 text-center">
-                        <div class="row">
-                            <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-4">
-                                <% if(serviceInformation?.air_gapped){ %>
-                                    <p class="text-light mb-0"><i class="fas fa-heartbeat text-danger"></i> Farm is
-                                        currently air gapped</p>
-                                    <small class="text-warning">Please note some features may not work as intended</small>
-                                <% }else{ %>
-                                    <p class="text-light"><i class="fas fa-heart text-success"></i> Farm is connected to the
-                                        internet</p>
-                                <% } %>
-                            </div>
-                            <% if(serviceInformation?.isNode){ %>
-                                <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-4">
-                                    <p class="text-light mt-2">Powered by <i class="fab fa-node fa-2x text-success"></i></p>
-                                </div>
-                            <% } %>
-                            <% if(serviceInformation?.isDockerContainer){ %>
-                                <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-4">
-                                    <p class="text-light"><i class="fab fa-docker text-info"></i></p>
-                                </div>
-                            <% } %>
-                            <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-4">
-                                <% if(serviceInformation?.isPm2){ %>
-                                    <p class="text-light"><i class="far fa-eye text-info"></i></i> Running under pm2</p>
-                                <% } %>
-                                <% if(serviceInformation?.isNodemon){ %>
-                                    <p class="text-light"><i class="far fa-eye text-info"></i> Running under nodemon</p>
-                                <% } %>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <hr>
          <div class="row">
              <div class="col-12 text-center">
                  <div class="row">
@@ -133,16 +98,32 @@
                          <% } %>
                      </div>
                      <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
-                         <i class="fas fa-hourglass-half"></i> System Uptime: <br>
-                         <span class="text-light" id="systemUptime" style="font-size:0.8rem;">
-                                <%= helpers.generateTime(systemInformation.sysUptime.uptime); %>
-                         </span>
+                         <% if(serviceInformation?.air_gapped){ %>
+                             <p class="text-light mb-0"><i class="fas fa-heartbeat text-danger"></i> Farm is
+                                 currently air gapped</p>
+                             <small class="text-warning">Please note some features may not work as intended</small>
+                         <% }else{ %>
+                             <p class="text-light"><i class="fas fa-heart text-success"></i> Farm is connected to the
+                                 internet</p>
+                         <% } %>
                      </div>
+                     <% if(serviceInformation?.isNode){ %>
+                         <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                             <p class="text-light mt-2">Powered by <i class="fab fa-node fa-2x text-success"></i></p>
+                         </div>
+                     <% } %>
+                     <% if(serviceInformation?.isDockerContainer){ %>
+                         <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
+                             <p class="text-light"><i class="fab fa-docker text-info"></i></p>
+                         </div>
+                     <% } %>
                      <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
-                         <i class="fas fa-hourglass-half"></i> System Uptime: <br>
-                         <span class="text-light" id="systemUptime" style="font-size:0.8rem;">
-                                <%= helpers.generateTime(systemInformation.sysUptime.uptime); %>
-                         </span>
+                         <% if(serviceInformation?.isPm2){ %>
+                             <p class="text-light"><i class="far fa-eye text-info"></i></i> Running under pm2</p>
+                         <% } %>
+                         <% if(serviceInformation?.isNodemon){ %>
+                             <p class="text-light"><i class="far fa-eye text-info"></i> Running under nodemon</p>
+                         <% } %>
                      </div>
                  </div>
              </div>
@@ -152,10 +133,10 @@
                     <div class="col-12 text-center">
                         <div class="row">
                             <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
-                                <i class="fas fa-hourglass-half"></i> System Uptime: <br><span
-                                        class="text-light" id="systemUptime" style="font-size:0.8rem;">
-                                        <%= helpers.generateTime(systemInformation.sysUptime.uptime); %>
-                                    </span>
+                                <i class="fas fa-hourglass-half"></i> System Uptime: <br>
+                                <span class="text-light" id="systemUptime" style="font-size:0.8rem;">
+                                    <%= helpers.generateTime(systemInformation.sysUptime.uptime); %>
+                                </span>
                             </div>
                             <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
                                 <i class="fas fa-server"></i> OS: <br><span class="text-light"

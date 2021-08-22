@@ -16,8 +16,8 @@ import {
   updateOctoFarmCommand,
   checkForOctoFarmUpdates,
   grabOctoFarmLogList,
-  startUpdatePageRunner,
-  renderSystemCharts
+  renderSystemCharts,
+  renderSystemInfo
 } from "./system/server.actions";
 import { serverBootBoxOptions } from "./system/utils/bootbox.options";
 
@@ -91,3 +91,11 @@ serverActionsElements.SAVE_CLIENT_SETTINGS.addEventListener("click", async (e) =
   // Validate Printer Form, then Add
   await ClientSettings.update();
 });
+
+async function startUpdatePageRunner() {
+  console.log("starting system page updater");
+  await renderSystemInfo();
+  setInterval(async function updateStatus() {
+    await renderSystemInfo();
+  }, 5000);
+}

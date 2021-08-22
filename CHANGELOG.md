@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
     - Added line counter to ticker log
     - Refactored task manager so it becomes easier to use
     - Global Client Error Handler: Grabs any errant / uncaught errors and displays a modal
+    - The ability to create a github issue from the interface after encountering an error.
 
 ### Changed
     - File manager: gave printer titles a badge. Gave selected printer a yellow border. Reduced file list minimum height (for smaller screens). 

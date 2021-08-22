@@ -1,15 +1,37 @@
-<div id="octofarmErrorModal" class="modal fade m-auto">
-    <div class="modal-dialog modal-confirm modal-dialog-centered">
+<div id="octofarmErrorModal" class="modal fade m-auto" data-backdrop="static">
+    <div class="modal-dialog modal-confirm modal-dialog-centered modal-xl">
         <div class="modal-content">
-            <div class="modal-header alert-danger">
+            <div id="octofarmErrorModalBanner" class="modal-header alert-danger text-dark">
                     <i class="fas fa-exclamation-triangle"></i>&nbsp;
-                    <span id="apiErrorTitle">  </span>
+                    <span id="errorTitle">  </span>
 
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
             </div>
             <div class="modal-body text-center pt-0">
-                <div id="apiErrorMessage"></div>
-                <div id="apiDeveloperInfo"></div>
+                <div id="errorBody"></div>
+                <div id="errorOverflowBody"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade m-auto" id="lostServerConnection" tabindex="0" role="dialog" aria-labelledby="lostServerConnection"
+     aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-confirm modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header alert-warning text-dark" >
+                <i class="fas fa-exclamation-triangle"></i>&nbsp;
+                <span>Lost Connection to Server...</span>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" disabled>&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 text-center">
+                            <p><i id="lostConnectionSpinner" class="fas fa-spinner fa-spin"></i></p>
+                            <p id="lostConnectionText">Attempting to reconnect...</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

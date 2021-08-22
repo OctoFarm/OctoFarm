@@ -1,5 +1,5 @@
 import Calc from "./lib/functions/calc.js";
-import OctoPrintClient from "./lib/octoprint.js";
+import OctoPrintClient from "./services/octoprint-client.service.js";
 import { createClientSSEWorker } from "./services/client-worker.service";
 import { setViewType } from "./monitoring/monitoring-view.state";
 import UI from "./lib/functions/ui";
@@ -30,13 +30,13 @@ const resetFile = function (id) {
   const i = _.findIndex(printers, function (o) {
     return o._id == id;
   });
-  OctoPrintClient.file(printers[i], printers[i].currentJob.filePath, "load");
+  OctoPrintClient.selectFile(printers[i], printers[i].currentJob.filePath);
 };
 const rePrint = function (id) {
   const i = _.findIndex(printers, function (o) {
     return o._id == id;
   });
-  OctoPrintClient.file(printers[i], printers[i].currentJob.filePath, "print");
+  OctoPrintClient.printFile(printers[i], printers[i].currentJob.filePath);
 };
 const currentHarvest = document.querySelectorAll("[id^='currentHarvest-']");
 currentHarvest.forEach((harvest) => {

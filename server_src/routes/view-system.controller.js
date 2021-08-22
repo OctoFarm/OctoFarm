@@ -51,7 +51,7 @@ const viewSystem = ({
    * Call slow system information from system info runner
    */
   info: async (req, res) => {
-    const systemInformation = await systemInfoStore.queryWithFreshCurrentProcess();
+    const systemInformation = await systemInfoStore.querySystemInfo();
     res.send(systemInformation);
   }
 });

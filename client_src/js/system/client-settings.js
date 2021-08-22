@@ -1,10 +1,10 @@
 import OctoFarmClient from "../services/octofarm-client.service";
 import UI from "../lib/functions/ui";
-//TODO: Going to wait till backend changes are merged before tackling this. Also want to re-enable client settings local storage.
+//Going to wait till backend changes are merged before tackling this. Also want to re-enable client settings local storage.
 
 export default class ClientSettings {
   static async init() {
-    const clientSettings = await OctoFarmClient.get("settings/client/get");
+    const clientSettings = await OctoFarmClient.getClientSettings();
     //// localStorage.setItem("clientSettings", JSON.stringify(res));
     document.getElementById("panelCurrentOpOn").checked = clientSettings.panelView.currentOp;
     document.getElementById("panelHideOffline").checked = clientSettings.panelView.hideOff;
@@ -132,7 +132,7 @@ export default class ClientSettings {
         }
       }
     };
-    await OctoFarmClient.post("settings/client/update", opts);
+    await OctoFarmClient.updateClientSettings(opts);
     UI.createAlert("success", "Client settings updated", 3000, "clicked");
     //localStorage.setItem("clientSettings", JSON.stringify(opts));
   }

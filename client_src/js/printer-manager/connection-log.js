@@ -9,10 +9,10 @@ export function checkIfLoaderExistsAndRemove(errored = false) {
   const loader = document.getElementById("printerTickerLoader");
   if (loader) {
     if (errored) {
+      tickerMessageBoxStatus.innerText = 0;
       tickerMessageBox.innerText = "No logs received ❌";
     } else {
       tickerMessageBox.classList.remove("d-flex");
-      loader.remove();
     }
   }
 }

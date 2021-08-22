@@ -93,9 +93,8 @@ export default class Script {
   static async alertsDrop() {
     return alertsDrop;
   }
-
   static async fetch() {
-    let response = await OctoFarmClient.listAlerts();
+    let response = await OctoFarmClient.getScriptsList();
     let alertsTable = document.getElementById("alertsTable");
     alertsTable.innerHTML = "";
     if (response) {

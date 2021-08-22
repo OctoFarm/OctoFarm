@@ -1,4 +1,4 @@
-import OctoPrintClient from "../octoprint";
+import OctoPrintClient from "../../services/octoprint-client.service";
 import UI from "../functions/ui.js";
 import OctoFarmClient from "../../services/octofarm-client.service";
 
@@ -25,26 +25,12 @@ export default class CustomGenerator {
     }
   }
   static async fireCommand(id, script, printers) {
-    await printers.forEach(async (printer) => {
-      const opt = {
-        commands: script
-      };
-      const post = await OctoPrintClient.postApi(printer, "printer/command", opt);
-      if (post.status === 204) {
-        UI.createAlert(
-          "success",
-          "Your gcode commands have successfully been sent!",
-          3000,
-          "Clicked"
-        );
-      } else {
-        UI.createAlert(
-          "danger",
-          "Your gcode failed to send! Please check the printer is able to receive these commands.",
-          3000,
-          "Clicked"
-        );
-      }
-    });
+    const command = {
+      commands: script
+    };
+    for (let i = 0; i < printers.length; i++) {
+      const printer = printers[i];
+      await OctoPrintClient.startGcode(printer, command);
+    }
   }
 }

@@ -1,18 +1,18 @@
 import Calc from "../functions/calc.js";
-import OctoPrintClient from "../octoprint.js";
+import OctoPrintClient from "../../services/octoprint-client.service.js";
 
 let printers = [];
 const resetFile = function (id) {
   const i = _.findIndex(printers, function (o) {
     return o._id == id;
   });
-  OctoPrintClient.file(printers[i], printers[i].currentJob.filePath, "load");
+  OctoPrintClient.selectFile(printers[i], printers[i].currentJob.filePath);
 };
 const rePrint = function (id) {
   const i = _.findIndex(printers, function (o) {
     return o._id == id;
   });
-  OctoPrintClient.file(printers[i], printers[i].currentJob.filePath, "print");
+  OctoPrintClient.printFile(printers[i], printers[i].currentJob.filePath);
 };
 const currentHarvest = document.querySelectorAll("[id^='currentHarvest-']");
 currentHarvest.forEach((harvest) => {

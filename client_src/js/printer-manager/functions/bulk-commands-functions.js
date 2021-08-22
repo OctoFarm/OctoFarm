@@ -1,31 +1,9 @@
 import { findIndex } from "lodash";
 
 import OctoFarmClient from "../../services/octofarm-client.service.js";
+import OctoPrintClient from "../../services/octoprint-client.service";
 import UI from "../../lib/functions/ui";
 import PrinterSelect from "../../lib/modules/printerSelect";
-import {
-  octoPrintPluginInstallAction,
-  updateOctoPrintPlugins
-} from "../../octoprint/octoprint-plugin-commands";
-import {
-  disconnectPrinterFromOctoPrint,
-  quickConnectPrinterToOctoPrint,
-  sendPowerCommandToOctoPrint,
-  updateOctoPrintClient
-} from "../../octoprint/octoprint-client-commands";
-import {
-  printerHomeAxis,
-  printerMoveAxis,
-  printerPausePrint,
-  printerPreHeatBed,
-  printerPreHeatChamber,
-  printerPreHeatTool,
-  printerRestartPrint,
-  printerResumePrint,
-  printerSendGcode,
-  printerStartPrint,
-  printerStopPrint
-} from "../../octoprint/octoprint-printer-commands";
 import CustomGenerator from "../../lib/modules/customScripts";
 import { setupPluginSearch } from "./plugin-search.function";
 import { returnPluginListTemplate } from "../templates/octoprint-plugin-list.template";
@@ -83,7 +61,7 @@ export async function bulkOctoPrintPluginUpdate() {
       callback: async function (result) {
         if (result) {
           for (let i = 0; i < toUpdate.length; i++) {
-            await updateOctoPrintPlugins(pluginList, toUpdate[i]);
+            await OctoPrintClient.updateOctoPrintPlugins(pluginList, toUpdate[i]);
           }
         }
       }
@@ -125,7 +103,7 @@ export async function bulkOctoPrintClientUpdate() {
       callback: async function (result) {
         if (result) {
           for (let i = 0; i < toUpdate.length; i++) {
-            await updateOctoPrintClient(toUpdate[i]);
+            await OctoPrintClient.updateOctoPrintClient(toUpdate[i]);
           }
         }
       }
@@ -144,15 +122,14 @@ export async function bulkOctoPrintClientUpdate() {
 export async function bulkConnectPrinters() {
   const printersToControl = await getCurrentlySelectedPrinterList();
   for (let p = 0; p < printersToControl.length; p++) {
-    await quickConnectPrinterToOctoPrint(printersToControl[p]);
+    await OctoPrintClient.quickConnectPrinterToOctoPrint(printersToControl[p]);
   }
 }
 
 export async function bulkDisconnectPrinters() {
   const printersToDisconnect = await getCurrentlySelectedPrinterList();
-  console.log(printersToDisconnect);
   for (let p = 0; p < printersToDisconnect.length; p++) {
-    await disconnectPrinterFromOctoPrint(printersToDisconnect[p]);
+    await OctoPrintClient.disconnectPrinterFromOctoPrint(printersToDisconnect[p]);
   }
 }
 
@@ -178,7 +155,7 @@ export function bulkOctoPrintPowerCommand() {
     callback: async function (result) {
       const printersToPower = await getCurrentlySelectedPrinterList();
       for (let p = 0; p < printersToPower.length; p++) {
-        await sendPowerCommandToOctoPrint(printersToPower[p], result);
+        await OctoPrintClient.sendPowerCommandToOctoPrint(printersToPower[p], result);
       }
     }
   });
@@ -245,9 +222,9 @@ export function bulkOctoPrintPreHeatCommand() {
 
           const printersToPreHeat = await getCurrentlySelectedPrinterList();
           for (let p = 0; p < printersToPreHeat.length; p++) {
-            await printerPreHeatTool(printersToPreHeat[p], toolTemp, toolNumber);
-            await printerPreHeatBed(printersToPreHeat[p], bedTemp);
-            await printerPreHeatChamber(printersToPreHeat[p], chamberTemp);
+            await OctoPrintClient.printerPreHeatTool(printersToPreHeat[p], toolTemp, toolNumber);
+            await OctoPrintClient.printerPreHeatBed(printersToPreHeat[p], bedTemp);
+            await OctoPrintClient.printerPreHeatChamber(printersToPreHeat[p], chamberTemp);
           }
         }
       }
@@ -375,22 +352,22 @@ export async function bulkOctoPrintControlCommand() {
       };
       printerControls.printStart.addEventListener("click", (e) => {
         printersToControl.forEach((printer) => {
-          printerStartPrint(printer, e);
+          OctoPrintClient.printerStartPrint(printer, e);
         });
       });
       printerControls.printPause.addEventListener("click", (e) => {
         printersToControl.forEach((printer) => {
-          printerPausePrint(printer, e);
+          OctoPrintClient.printerPausePrint(printer, e);
         });
       });
       printerControls.printRestart.addEventListener("click", (e) => {
         printersToControl.forEach((printer) => {
-          printerRestartPrint(printer, e);
+          OctoPrintClient.printerRestartPrint(printer, e);
         });
       });
       printerControls.printResume.addEventListener("click", (e) => {
         printersToControl.forEach((printer) => {
-          printerResumePrint(printer, e);
+          OctoPrintClient.printerResumePrint(printer, e);
         });
       });
       printerControls.printStop.addEventListener("click", (e) => {
@@ -407,7 +384,7 @@ export async function bulkOctoPrintControlCommand() {
           callback(result) {
             if (result) {
               printersToControl.forEach((printer) => {
-                printerStopPrint(printer, e);
+                OctoPrintClient.printerStopPrint(printer, e);
               });
             }
           }
@@ -416,42 +393,42 @@ export async function bulkOctoPrintControlCommand() {
 
       printerControls.xPlus.addEventListener("click", (e) => {
         printersToControl.forEach((printer) => {
-          printerMoveAxis(e, printer, "x");
+          OctoPrintClient.printerMoveAxis(e, printer, "x");
         });
       });
       printerControls.xMinus.addEventListener("click", (e) => {
         printersToControl.forEach((printer) => {
-          printerMoveAxis(e, printer, "x", "-");
+          OctoPrintClient.printerMoveAxis(e, printer, "x", "-");
         });
       });
       printerControls.yPlus.addEventListener("click", (e) => {
         printersToControl.forEach((printer) => {
-          printerMoveAxis(e, printer, "y");
+          OctoPrintClient.printerMoveAxis(e, printer, "y");
         });
       });
       printerControls.yMinus.addEventListener("click", (e) => {
         printersToControl.forEach((printer) => {
-          printerMoveAxis(e, printer, "y", "-");
+          OctoPrintClient.printerMoveAxis(e, printer, "y", "-");
         });
       });
       printerControls.xyHome.addEventListener("click", (e) => {
         printersToControl.forEach((printer) => {
-          printerHomeAxis(e, printer, ["x", "y"]);
+          OctoPrintClient.printerHomeAxis(e, printer, ["x", "y"]);
         });
       });
       printerControls.zPlus.addEventListener("click", (e) => {
         printersToControl.forEach((printer) => {
-          printerMoveAxis(e, printer, "z");
+          OctoPrintClient.printerMoveAxis(e, printer, "z");
         });
       });
       printerControls.zMinus.addEventListener("click", (e) => {
         printersToControl.forEach((printer) => {
-          printerMoveAxis(e, printer, "z", "-");
+          OctoPrintClient.printerMoveAxis(e, printer, "z", "-");
         });
       });
       printerControls.zHome.addEventListener("click", (e) => {
         printersToControl.forEach((printer) => {
-          printerHomeAxis(e, printer, ["z"]);
+          OctoPrintClient.printerHomeAxis(e, printer, ["z"]);
         });
       });
       printerControls.step01.addEventListener("click", (e) => {
@@ -525,7 +502,7 @@ export async function bulkOctoPrintGcodeCommand() {
     callback: async function (result) {
       if (result !== null) {
         for (let p = 0; p < printersToSendGcode.length; p++) {
-          await printerSendGcode(printersToSendGcode[p]);
+          await OctoPrintClient.printerSendGcode(printersToSendGcode[p]);
         }
       }
     }
@@ -594,7 +571,11 @@ export async function bulkOctoPrintPluginAction(action) {
                    <i class="fas fa-print"></i>${printersForPluginAction.length} / <i class="fas fa-plug"></i> ${pluginAmount}
         `;
           for (let p = 0; p < printersForPluginAction.length; p++) {
-            await octoPrintPluginInstallAction(printersForPluginAction[p], result, action);
+            await OctoPrintClient.octoPrintPluginInstallAction(
+              printersForPluginAction[p],
+              result,
+              action
+            );
             trackerBtn.innerHTML = `
                 ${cleanAction} Plugins!<br>
                 <i class="fas fa-print"></i>${

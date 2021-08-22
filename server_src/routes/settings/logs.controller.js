@@ -49,5 +49,5 @@ module.exports = createController(LogsController)
   .prefix(AppConstants.apiRoute + "/settings/logs")
   .before([ensureAuthenticated])
   .get("", "list")
-  .get("/download/:name", "download")
+  .get("/:name", "download")
   .put("/generate-log-dump", "generateLogDumpZip");

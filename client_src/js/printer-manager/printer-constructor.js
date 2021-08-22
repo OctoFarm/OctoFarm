@@ -1,7 +1,6 @@
 import Validate from "../lib/functions/validate";
 import UI from "../lib/functions/ui";
 import OctoFarmClient from "../services/octofarm-client.service.js";
-import { ApplicationError } from "../exceptions/application-error.handler";
 
 let newPrintersIndex = 0;
 
@@ -167,10 +166,6 @@ export class PrintersManagement {
   }
 
   static async deletePrinter(deletedPrinters) {
-    if (deletedPrinters.length > 1) {
-      throw new ApplicationError("Deleting more than one printer is currently not implemented.");
-    }
-
     if (deletedPrinters.length > 0) {
       try {
         const response = await OctoFarmClient.deletePrinter(deletedPrinters[0]);

@@ -1,6 +1,6 @@
 import Calc from "../functions/calc.js";
 import OctoFarmClient from "../../services/octofarm-client.service";
-import OctoPrintClient from "../octoprint.js";
+import OctoPrintClient from "../../services/octoprint-client.service.js";
 import ApexCharts from "apexcharts";
 
 let chart = null;
@@ -51,7 +51,7 @@ export default class PrinterLogs {
         octoPrintCount.innerHTML = "(" + (splitText.length / 2).toFixed(0) + ")";
       });
   }
-  static loadLogs(printer, connectionLogs) {
+  static async loadLogs(printer, connectionLogs) {
     currentPrinter = printer;
     document.getElementById("printerLogsTitle").innerHTML = "Printer Logs: " + printer.printerName;
     let printerRows = document.getElementById("printerConnectionLogRows");
@@ -77,34 +77,26 @@ export default class PrinterLogs {
     octoprintLogsRows.innerHTML = "";
     octologsLogsRows.innerHTML = "";
     //tempChart.innerHTML = "";
-    OctoPrintClient.get(printer, "/plugin/logging/logs")
-      .then(async (res) => res.json())
-      .then(async (res) => {
-        let mainLog = _.findIndex(res.files, function (o) {
-          return o.name === "octoprint.log";
-        });
-        let orderedSelect = _.sortBy(res.files, [
-          function (o) {
-            return o.name;
-          }
-        ]);
-        logSelect.innerHTML = "";
-        for (let i = 0; i < orderedSelect.length; i++) {
-          logSelect.insertAdjacentHTML(
-            "beforeend",
-            `
-            <option value="${orderedSelect[i].refs.download}">${orderedSelect[i].name}</option>
-          `
-          );
-        }
-
-        logSelect.value = res.files[mainLog].refs.download;
-        PrinterLogs.parseLogs(printer, res.files[mainLog].refs.download);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
-
+    let logFileList = await OctoPrintClient.getLogs(printer);
+    let mainLog = _.findIndex(logFileList, function (o) {
+      return o.name === "octoprint.log";
+    });
+    let orderedSelect = _.sortBy(logFileList, [
+      function (o) {
+        return o.name;
+      }
+    ]);
+    logSelect.innerHTML = "";
+    for (let i = 0; i < orderedSelect.length; i++) {
+      logSelect.insertAdjacentHTML(
+        "beforeend",
+        `
+        <option value="${orderedSelect[i].refs.download}">${orderedSelect[i].name}</option>
+      `
+      );
+    }
+    logSelect.value = res.files[mainLog].refs.download;
+    PrinterLogs.parseLogs(printer, res.files[mainLog].refs.download);
     if (typeof connectionLogs.currentOctoFarmLogs === "object") {
       for (let i = 0; i < connectionLogs.currentOctoPrintLogs.length; i++) {
         tempCount.innerHTML = "(0)";

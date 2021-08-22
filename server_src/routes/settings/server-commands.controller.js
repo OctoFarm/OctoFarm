@@ -64,6 +64,6 @@ class ServerCommandsController {
 module.exports = createController(ServerCommandsController)
   .prefix(AppConstants.apiRoute + "/settings/server")
   .before([ensureAuthenticated])
-  .get("/update/check", "checkUpdate")
-  .post("/update/octofarm", "updateOctoFarm")
+  .get("/update", "checkUpdate")
+  .post("/update", "updateOctoFarm")
   .patch("/restart", "restartServer");
