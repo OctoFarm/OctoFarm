@@ -137,10 +137,11 @@ class HistoryService {
   async timelapseCheck(printer, historyId, fileName, printTime) {
     logger.info("Checking for timelapse...", fileName);
 
-    let timelapseResponse = await this.#octoPrintApiService
-      .listUnrenderedTimeLapses(printer.getLoginDetails())
-      .then((r) => r.json());
+    let response = await this.#octoPrintApiService.listUnrenderedTimeLapses(
+      printer.getLoginDetails()
+    );
 
+    let timelapseResponse = response.data;
     logger.info("Successfully grabbed timelapse list... Checking for:", fileName);
 
     let unrenderedFileName = null;

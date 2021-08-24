@@ -1,10 +1,15 @@
 const fs = require("fs");
 const request = require("request");
-const { OPClientErrors } = require("./constants/octoprint-service.constants");
+const {
+  OPClientErrors,
+  contentTypeHeaderKey,
+  apiKeyHeaderKey
+} = require("./constants/octoprint-service.constants");
 const { checkPluginManagerAPIDeprecation } = require("../../utils/compatibility.utils");
 const Logger = require("../../handlers/logger.js");
-const { prepareRequest } = require("./utils/api.utils");
+const { prepareRequest, processResponse } = require("./utils/api.utils");
 
+const defaultResponseOptions = { unwrap: true };
 const octoPrintBase = "/";
 const apiBase = octoPrintBase + "api";
 const apiSettingsPart = apiBase + "/settings";
@@ -53,24 +58,25 @@ class OctoprintApiService {
     }
   }
 
-  async login(printer) {
+  async login(printer, responseOptions = defaultResponseOptions) {
     const { url, options } = prepareRequest(printer, apiLogin);
 
-    return this.#httpClient.post(url, {}, options);
+    const response = await this.#httpClient.post(url, {}, options);
+
+    return processResponse(response, responseOptions);
   }
 
-  async getSettings(printer) {
+  async getSettings(printer, responseOptions = defaultResponseOptions) {
     const { url, options } = prepareRequest(printer, apiSettingsPart);
 
-    return this.#httpClient.get(url, options);
+    const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
   async getAdminUserOrDefault(printer) {
-    const response = await this.getUsers(printer, true);
-    // TODO
-    if (response.status != 200) throw "Didnt get 200 response";
+    const data = await this.getUsers(printer, defaultResponseOptions);
 
-    const data = await response.json();
     let opAdminUserName = "admin";
     if (!!data?.users && Array.isArray(data)) {
       const adminUser = data.users.find((user) => !!user.admin);
@@ -80,70 +86,90 @@ class OctoprintApiService {
     return opAdminUserName;
   }
 
-  async getUsers(printer) {
+  async getUsers(printer, responseOptions = defaultResponseOptions) {
     const { url, options } = prepareRequest(printer, apiUsers);
 
-    return this.#httpClient.get(url, options);
+    const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
-  async getFiles(printer, recursive = false) {
+  async getFiles(printer, recursive = false, responseOptions = defaultResponseOptions) {
     const { url, options } = prepareRequest(printer, apiFiles(recursive));
 
-    return this.#httpClient.get(url, options);
+    const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
-  async getFile(printer, path) {
+  async getFile(printer, path, responseOptions = defaultResponseOptions) {
     const { url, options } = prepareRequest(printer, apiFile(path));
 
-    return this.#httpClient.get(url, options);
+    const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
-  async getConnection(printer) {
+  async getConnection(printer, responseOptions = defaultResponseOptions) {
     const { url, options } = prepareRequest(printer, apiConnection);
 
-    return this.#httpClient.get(url, options);
+    const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
-  async getPrinterProfiles(printer) {
+  async getPrinterProfiles(printer, responseOptions = defaultResponseOptions) {
     const { url, options } = prepareRequest(printer, apiPrinterProfiles);
 
-    return this.#httpClient.get(url, options);
+    const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
-  async getPluginManager(printer) {
+  async getPluginManager(printer, responseOptions = defaultResponseOptions) {
     const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(printer.octoPrintVersion);
 
     const path = printerManagerApiCompatible ? apiPluginManagerRepository1_6_0 : apiPluginManager;
     const { url, options } = prepareRequest(printer, path);
 
-    return this.#httpClient.get(url, options);
+    const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
-  async getSystemInfo(printer) {
+  async getSystemInfo(printer, responseOptions = defaultResponseOptions) {
     const { url, options } = prepareRequest(printer, apiSystemInfo);
 
-    return await this.#httpClient.get(url, options);
+    const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
-  async getSystemCommands(printer) {
+  async getSystemCommands(printer, responseOptions = defaultResponseOptions) {
     const { url, options } = prepareRequest(printer, apiSystemCommands);
 
-    return this.#httpClient.get(url, options);
+    const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
-  async getSoftwareUpdateCheck(printer, force) {
+  async getSoftwareUpdateCheck(printer, force, responseOptions = defaultResponseOptions) {
     const { url, options } = prepareRequest(printer, apiSoftwareUpdateCheck(force));
 
-    return this.#httpClient.get(url, options);
+    const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
-  async getPluginPiSupport(printer) {
+  async getPluginPiSupport(printer, responseOptions = defaultResponseOptions) {
     const { url, options } = prepareRequest(printer, apiPluginPiSupport);
 
-    return this.#httpClient.get(url, options);
+    const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
-  async deleteTimeLapse(printer, fileName) {
+  async deleteTimeLapse(printer, fileName, responseOptions = defaultResponseOptions) {
     if (!fileName) {
       throw new Error("Cant delete timelapse file without providing filename");
     }
@@ -151,29 +177,41 @@ class OctoprintApiService {
     const path = `${apiTimelapse}/${fileName}`;
     const { url, options } = prepareRequest(printer, path);
 
-    return this.#httpClient.delete(url, options);
+    const response = await this.#httpClient.delete(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
-  async listUnrenderedTimeLapses(printer) {
+  async listUnrenderedTimeLapses(printer, responseOptions = defaultResponseOptions) {
     const path = `${apiTimelapse}?unrendered=true`;
     const { url, options } = prepareRequest(printer, path);
 
-    return this.#httpClient.get(url, options);
+    const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
-  async listPluginFilamentManagerProfiles(printer) {
+  async listPluginFilamentManagerProfiles(printer, responseOptions = defaultResponseOptions) {
     const { url, options } = prepareRequest(printer, apiPluginFilamentManagerProfiles);
 
-    return this.#httpClient.get(url, options);
+    const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
-  async listPluginFilamentManagerFilament(printer) {
+  async listPluginFilamentManagerFilament(printer, responseOptions = defaultResponseOptions) {
     const { url, options } = prepareRequest(printer, apiPluginFilamentManagerSpools);
 
-    return this.#httpClient.get(url, options);
+    const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
-  async getPluginFilamentManagerFilament(printer, filamentID) {
+  async getPluginFilamentManagerFilament(
+    printer,
+    filamentID,
+    responseOptions = defaultResponseOptions
+  ) {
     // filamentID needs to be INT numeric
     // https://github.com/malnvenshorn/OctoPrint-FilamentManager/blob/647af691d6081df2f16d400e834f12f11f6eea56/octoprint_filamentmanager/data/__init__.py#L84
     const parsedFilamentID = Number.parseFloat(filamentID);
@@ -184,9 +222,12 @@ class OctoprintApiService {
     const path = `${apiPluginFilamentManagerSpools}/${parsedFilamentID}`;
     const { url, options } = prepareRequest(printer, path);
 
-    return this.#httpClient.get(url, options);
+    const response = await this.#httpClient.get(url, options);
+
+    return processResponse(response, responseOptions);
   }
 
+  // TODO WIP with axios
   async downloadFile(printerConnection, fetchPath, targetPath, callback) {
     const fileStream = fs.createWriteStream(targetPath);
 
@@ -204,6 +245,7 @@ class OctoprintApiService {
     });
   }
 
+  // TODO WIP
   async downloadImage({ printerURL, apiKey }, fetchPath, targetPath, callback) {
     const fileStream = fs.createWriteStream(targetPath);
 
@@ -212,8 +254,8 @@ class OctoprintApiService {
     // TODO
     const downloadURL = new URL(fetchPath, printerURL);
     return request.head(downloadURL, (err, res, body) => {
-      res.headers["content-type"] = "image/png";
-      res.headers["x-api-key"] = apiKey;
+      res.headers[contentTypeHeaderKey] = "image/png";
+      res.headers[apiKeyHeaderKey] = apiKey;
       request(url).pipe(fs.createWriteStream(targetPath)).on("close", callback);
     });
   }

@@ -121,9 +121,6 @@ class FilesStore {
 
     return await this.#octoPrintApiService
       .getFiles(printer, recursive)
-      .then((res) => {
-        return res.json();
-      })
       .then(async (res) => {
         // Setup the files json storage object
         printer.storage = {

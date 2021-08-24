@@ -52,9 +52,15 @@ function prepareJSONRequest(printer, path, timeout = 0, data) {
   };
 }
 
+function processResponse(response, options = { unwrap: true }) {
+  if (options.unwrap) return response.data;
+  return response;
+}
+
 module.exports = {
   validatePrinter,
   constructHeaders,
   prepareRequest,
-  prepareJSONRequest
+  prepareJSONRequest,
+  processResponse
 };
