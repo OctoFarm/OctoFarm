@@ -3,9 +3,11 @@ const OctoprintRxjsWebsocketAdapter = require("../services/octoprint/octoprint-r
 const DITokens = require("../container.tokens");
 const { PSTATE } = require("../constants/state.constants");
 const HttpStatusCode = require("../constants/http-status-codes.constants");
+const { ExternalServiceError } = require("../exceptions/runtime.exceptions");
 
 const offlineMessage = "OctoPrint instance seems to be offline";
 const noApiKeyInResponseMessage = "OctoPrint login didnt return apikey to check";
+const badRequestMessage = "OctoPrint login responded with bad request. This is a bug";
 const apiKeyNotAccepted = "OctoPrint apiKey was rejected.";
 const globalAPIKeyDetectedMessage =
   "Global API Key was detected (apikey was null indicating global API key)";
@@ -104,6 +106,11 @@ class PrinterWebsocketTask {
       });
 
     // Check for rejection
+    if (code === HttpStatusCode.BAD_REQUEST) {
+      // Bug
+      printerState.setHostState(PSTATE.NoAPI, badRequestMessage);
+      throw new ExternalServiceError(localError.response?.data);
+    }
     if (code === HttpStatusCode.FORBIDDEN) {
       const errorCount = this.#errorCounts.apiKeyNotAccepted++;
       printerState.setHostState(PSTATE.ApiKeyRejected, apiKeyNotAccepted);
