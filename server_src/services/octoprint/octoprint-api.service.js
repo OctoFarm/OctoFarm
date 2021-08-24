@@ -16,7 +16,7 @@ const apiSystem = apiBase + "/system";
 const apiSystemInfo = apiSystem + "/info";
 const apiSystemCommands = apiSystem + "/commands";
 const apiUsers = apiBase + "/users";
-const apiLogin = (passive = true) => apiBase + "/login" + (passive ? "?passive=true" : "");
+const apiLogin = apiBase + "/login?passive=true";
 
 const apiPluginManager = apiBase + "/plugin/pluginmanager";
 const apiPluginManagerRepository1_6_0 = octoPrintBase + "plugin/pluginmanager/repository";
@@ -53,10 +53,10 @@ class OctoprintApiService {
     }
   }
 
-  async login(printer, passive = true) {
-    const { url, options } = prepareRequest(printer, apiLogin(passive));
+  async login(printer) {
+    const { url, options } = prepareRequest(printer, apiLogin);
 
-    return this.#httpClient.post(url, options);
+    return this.#httpClient.post(url, {}, options);
   }
 
   async getSettings(printer) {
@@ -122,7 +122,7 @@ class OctoprintApiService {
   async getSystemInfo(printer) {
     const { url, options } = prepareRequest(printer, apiSystemInfo);
 
-    return this.#httpClient.get(url, options);
+    return await this.#httpClient.get(url, options);
   }
 
   async getSystemCommands(printer) {

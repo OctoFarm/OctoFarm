@@ -19,10 +19,8 @@ function validatePrinter(printer) {
 
 function constructHeaders(apiKey) {
   return {
-    headers: {
-      [contentTypeHeaderKey]: jsonContentType, // Can be overwritten without problem
-      [apiKeyHeaderKey]: apiKey
-    }
+    [contentTypeHeaderKey]: jsonContentType, // Can be overwritten without problem
+    [apiKeyHeaderKey]: apiKey
   };
 }
 
@@ -44,11 +42,12 @@ function prepareJSONRequest(printer, path, timeout = 0, data) {
   const { url, options } = prepareRequest(printer, path, timeout);
 
   // We must allow file uploads elsewhere, so be explicit about the content type and data in this JSON request
-  options.data = data ? JSON.stringify(data) : undefined;
+  let serializedData = data ? JSON.stringify(data) : undefined;
   options.headers[contentTypeHeaderKey] = jsonContentType;
 
   return {
     url,
+    data: serializedData,
     options
   };
 }

@@ -26,7 +26,7 @@ class PrinterSystemTask {
       const response = await this.#octoPrintApiService.getSystemInfo(
         printerState.getLoginDetails()
       );
-      const data = await response.json();
+      const data = await response.data;
       if (!!data.systeminfo) {
         printerState.updateSystemInfo(data.systeminfo);
       }

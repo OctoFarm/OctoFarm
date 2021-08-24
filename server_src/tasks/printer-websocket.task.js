@@ -90,20 +90,17 @@ class PrinterWebsocketTask {
     let errorThrown = false;
     let localError;
     let code;
-    const loginResponse = await this.#octoPrintService
-      .login(loginDetails, true)
-      .then((r) => r.json())
-      .catch((e) => {
-        errorThrown = true;
-        if (!e.response) {
-          // Not connected or DNS issue - abort flow
-          this.#errorCounts.offline++;
-          printerState.setHostState(PSTATE.Offline, offlineMessage);
-          throw e;
-        }
-        code = e.response.status;
-        localError = e;
-      });
+    const response = await this.#octoPrintService.login(loginDetails, true).catch((e) => {
+      errorThrown = true;
+      if (!e.response) {
+        // Not connected or DNS issue - abort flow
+        this.#errorCounts.offline++;
+        printerState.setHostState(PSTATE.Offline, offlineMessage);
+        throw e;
+      }
+      code = e.response.status;
+      localError = e;
+    });
 
     // Check for rejection
     if (code === HttpStatusCode.BAD_REQUEST) {
@@ -116,6 +113,9 @@ class PrinterWebsocketTask {
       printerState.setHostState(PSTATE.ApiKeyRejected, apiKeyNotAccepted);
       return this.handleSilencedError(errorCount, apiKeyNotAccepted, printerName);
     }
+
+    code = response.status;
+    const loginResponse = response.data;
     // This is a check which is best done after checking 400 code (GlobalAPIKey or pass-thru) - possible
     if (this.checkLoginGlobal(loginResponse)) {
       const errorCount = this.#errorCounts.apiKeyIsGlobal++;
@@ -124,7 +124,7 @@ class PrinterWebsocketTask {
     } else {
       this.#errorCounts.apiKeyIsGlobal = 0;
     }
-    // Check for an apikey (defines connection state NoAPI) - quite rare
+    // Check for an apikey (defines connection state NoAPI) - happens when no apikey is sent by OF => bug
     if (!loginResponse?.apikey) {
       const errorCount = this.#errorCounts.missingApiKey++;
       printerState.setHostState(PSTATE.NoAPI, noApiKeyInResponseMessage);
