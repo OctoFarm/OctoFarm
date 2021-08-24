@@ -135,14 +135,11 @@ class HistoryService {
   // TODO this function is so vague. Needs a complete redo and move out of history...
   // TODO I broke it completely so we have to start again
   async timelapseCheck(printer, historyId, fileName, printTime) {
-    logger.info("Checking for timelapse...", fileName);
+    logger.info("Acquiring timelapse", fileName);
 
-    let response = await this.#octoPrintApiService.listUnrenderedTimeLapses(
+    let timelapseResponse = await this.#octoPrintApiService.listUnrenderedTimeLapses(
       printer.getLoginDetails()
     );
-
-    let timelapseResponse = response.data;
-    logger.info("Successfully grabbed timelapse list... Checking for:", fileName);
 
     let unrenderedFileName = null;
     if (timelapseResponse.unrendered.length === 0) {
