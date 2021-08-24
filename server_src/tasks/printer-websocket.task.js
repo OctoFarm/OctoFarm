@@ -147,14 +147,14 @@ class PrinterWebsocketTask {
     printerState.bindWebSocketAdapter(OctoprintRxjsWebsocketAdapter);
 
     // TODO time this
-    // Delaying or staggering this will speed up startup tasks - ~90 to 150ms per printer on uncongested (W)LAN
+    // Delaying or staggering this will speed up startup tasks - ~90 to 150ms per printer on non-congested (W)LAN
     printerState.connectAdapter();
   }
 
-  checkLoginGlobal(octoprintResponse) {
+  checkLoginGlobal(octoPrintResponse) {
     // Explicit nullability check serves to let an unconnected printer fall through as well as incorrect apiKey
     // Note: 'apikey' property is conform OctoPrint response (and not OctoFarm printer model's 'apiKey')
-    return !!octoprintResponse && octoprintResponse.apikey === null;
+    return !!octoPrintResponse && octoPrintResponse.apikey === null;
   }
 
   handleSilencedError(prop, taskMessage, printerName) {

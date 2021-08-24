@@ -15,7 +15,7 @@ const SystemInfoStore = require("./state/system-info.store");
 const SystemCommandsService = require("./services/system-commands.service");
 const ServerLogsService = require("./services/server-logs.service");
 const SystemInfoBundleService = require("./services/system-info-bundle.service");
-const GithubClientService = require("./services/github-client.service");
+const GithubApiService = require("./services/github-api.service");
 const HistoryService = require("./services/history.service");
 const FarmStatisticsService = require("./services/farm-statistics.service");
 const FileCache = require("./state/data/file.cache");
@@ -100,7 +100,7 @@ function configureContainer() {
     eventEmitter2: awilix.asFunction(configureEventEmitter).singleton(),
     [DITokens.octofarmUpdateService]: awilix.asClass(OctofarmUpdateService).singleton(),
     [DITokens.systemInfoStore]: awilix.asClass(SystemInfoStore).singleton(),
-    githubClientService: awilix.asClass(GithubClientService),
+    githubApiService: awilix.asClass(GithubApiService),
     [DITokens.autoDiscoveryService]: awilix.asClass(AutoDiscoveryService),
     [DITokens.systemCommandsService]: awilix.asClass(SystemCommandsService),
     serverLogsService: awilix.asClass(ServerLogsService),

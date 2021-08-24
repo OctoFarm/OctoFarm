@@ -20,7 +20,6 @@ class FilesStore {
 
   /**
    * Load the file store by grabbing files from the service. TODO move files out of printer
-   * @param printerId
    * @returns {Promise<void>}
    */
   async loadFilesStore() {
