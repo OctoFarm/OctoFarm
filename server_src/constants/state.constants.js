@@ -6,6 +6,14 @@ const getFilterDefaults = () => [
   "State: Disconnected"
 ];
 
+const ERR_COUNT = {
+  offline: "offline",
+  apiKeyNotAccepted: "apiKeyNotAccepted",
+  missingApiKey: "missingApiKey",
+  apiKeyIsGlobal: "apiKeyIsGlobal",
+  missingSessionKey: "missingSessionKey"
+};
+
 const SYSTEM_CHECKS = {
   api: "api",
   files: "files",
@@ -295,6 +303,7 @@ module.exports = {
   getFilterDefaults,
   mapStateToColor,
   remapOctoPrintState,
+  ERR_COUNT,
   PSTATE,
   OP_STATE,
   CATEGORY,

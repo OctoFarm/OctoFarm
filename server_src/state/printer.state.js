@@ -410,7 +410,7 @@ class PrinterState {
   }
 
   shouldRetryConnect() {
-    if (this.markForRemoval || !this.isApiAccessible()) {
+    if (this.markForRemoval || !this.isApiRetryable()) {
       return false;
     }
 
@@ -467,11 +467,7 @@ class PrinterState {
   // Tracking for API failures like GlobalAPIKey, ApiKey rejected which can only be fixed by OctoFarm
   setApiAccessibility(accessible, retryable, reason) {
     if (!accessible) {
-      if (retryable) {
-        this.#logger.error(
-          `Printer ${this.getName()} was flagged API inaccessible. Reason: '${reason}'. Reconnecting automatically.`
-        );
-      } else {
+      if (!retryable) {
         this.#logger.error(
           `Printer ${this.getName()} was flagged API inaccessible. Reason: ${reason}. Please check connection settings.`
         );
@@ -494,6 +490,10 @@ class PrinterState {
    */
   isApiAccessible() {
     return this.#apiAccessibility.accessible;
+  }
+
+  isApiRetryable() {
+    return this.isApiAccessible() || this.#apiAccessibility.retryable;
   }
 
   resetApiAccessibility() {
