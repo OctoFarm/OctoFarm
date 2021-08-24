@@ -2,6 +2,7 @@ const Logger = require("../handlers/logger");
 const OctoprintRxjsWebsocketAdapter = require("../services/octoprint/octoprint-rxjs-websocket.adapter");
 const DITokens = require("../container.tokens");
 const { PSTATE } = require("../constants/state.constants");
+const HttpStatusCode = require("../constants/http-status-codes.constants");
 
 const offlineMessage = "OctoPrint instance seems to be offline";
 const noApiKeyInResponseMessage = "OctoPrint login didnt return apikey to check";
@@ -102,12 +103,13 @@ class PrinterWebsocketTask {
         localError = e;
       });
 
-    if (code === 400) {
+    // Check for rejection
+    if (code === HttpStatusCode.FORBIDDEN) {
       const errorCount = this.#errorCounts.apiKeyNotAccepted++;
       printerState.setHostState(PSTATE.ApiKeyRejected, apiKeyNotAccepted);
       return this.handleSilencedError(errorCount, apiKeyNotAccepted, printerName);
     }
-    // This is a check which is best done after checking 400 code (GlobalAPIKey or pass-thru)
+    // This is a check which is best done after checking 400 code (GlobalAPIKey or pass-thru) - possible
     if (this.checkLoginGlobal(loginResponse)) {
       const errorCount = this.#errorCounts.apiKeyIsGlobal++;
       printerState.setHostState(PSTATE.GlobalAPIKey, globalAPIKeyDetectedMessage);
@@ -115,7 +117,7 @@ class PrinterWebsocketTask {
     } else {
       this.#errorCounts.apiKeyIsGlobal = 0;
     }
-    // Check for an apikey (defines connection state Connected/Disconnected)
+    // Check for an apikey (defines connection state NoAPI) - quite rare
     if (!loginResponse?.apikey) {
       const errorCount = this.#errorCounts.missingApiKey++;
       printerState.setHostState(PSTATE.NoAPI, noApiKeyInResponseMessage);
@@ -123,7 +125,7 @@ class PrinterWebsocketTask {
     } else {
       this.#errorCounts.missingApiKey = 0;
     }
-    // Sanity check for login success (alt: could also check status code)
+    // Sanity check for login success (alt: could also check status code) - quite rare
     if (!loginResponse?.session) {
       const errorCount = this.#errorCounts.missingSessionKey++;
       printerState.setHostState(PSTATE.NoAPI, missingSessionKeyMessage);
