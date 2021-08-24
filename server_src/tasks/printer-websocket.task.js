@@ -4,8 +4,9 @@ const DITokens = require("../container.tokens");
 const { PSTATE } = require("../constants/state.constants");
 const { FetchError } = require("node-fetch");
 
-const noLoginResponseMessage = "OctoPrint login didnt respond";
-const globalAPIKeyDetectedMessage = "Global API Key was detected";
+const noLoginResponseMessage = "OctoPrint login didnt respond (response empty)";
+const globalAPIKeyDetectedMessage =
+  "Global API Key was detected (apikey was null indicating global API key)";
 const missingSessionKeyMessage = "Missing session key in login response";
 
 class PrinterWebsocketTask {
@@ -87,13 +88,14 @@ class PrinterWebsocketTask {
       .catch((e) => {
         errorThrown = true;
         if (e instanceof FetchError) {
+          console.log(e);
           // No connection - return nothing
         } else {
           console.log("Another type of OctoPrint login error", e.stack);
         }
       });
 
-    // This is a check which is best done first
+    // This is a check which is best done first (GlobalAPIKey or pass-thru)
     if (this.checkLoginGlobal(loginResponse)) {
       const errorCount = this.#errorCounts.apiKeyIsGlobal++;
       printerState.setHostState(PSTATE.GlobalAPIKey, globalAPIKeyDetectedMessage);
@@ -101,6 +103,7 @@ class PrinterWebsocketTask {
     } else {
       this.#errorCounts.apiKeyIsGlobal = 0;
     }
+    // Check for an apikey (defines connection state Connected/Disconnected)
     if (!loginResponse?.apikey) {
       const errorCount = this.#errorCounts.missingApiKey++;
       printerState.setHostState(PSTATE.Disconnected, noLoginResponseMessage);
@@ -108,6 +111,7 @@ class PrinterWebsocketTask {
     } else {
       this.#errorCounts.missingApiKey = 0;
     }
+    // Sanity check for login success (alt: could also check status code)
     if (!loginResponse?.session) {
       const errorCount = this.#errorCounts.missingSessionKey++;
       printerState.setHostState(PSTATE.NoAPI, missingSessionKeyMessage);
@@ -126,8 +130,10 @@ class PrinterWebsocketTask {
     printerState.connectAdapter();
   }
 
-  checkLoginGlobal(response) {
-    return !!response && response.apiKey === null;
+  checkLoginGlobal(octoprintResponse) {
+    // Explicit nullability check serves to let an unconnected printer fall through as well as incorrect apiKey
+    // Note: 'apikey' property is conform OctoPrint response (and not OctoFarm printer model's 'apiKey')
+    return !!octoprintResponse && octoprintResponse.apikey === null;
   }
 
   handleSilencedError(prop, taskMessage, printerName) {
