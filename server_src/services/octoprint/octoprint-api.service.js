@@ -47,10 +47,8 @@ class OctoprintApiService {
   }
 
   #ensureTimeoutSettingsLoaded() {
-    if (!this.#timeouts) {
-      const serverSettings = this.#settingsStore.getServerSettings();
-      this.#timeouts = { ...serverSettings.timeout };
-    }
+    const serverSettings = this.#settingsStore.getServerSettings();
+    this.#timeouts = { ...serverSettings.timeout };
 
     if (!this.#timeouts) {
       throw new Error(
