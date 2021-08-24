@@ -30,14 +30,14 @@ class PrinterWebsocketTask {
 
   constructor({
     printersStore,
-    octoPrintApiClientService,
+    octoPrintApiService,
     settingsStore,
     taskManagerService,
     printerSystemTask // Just to make sure it can resolve
   }) {
     this.#printersStore = printersStore;
     this.#settingsStore = settingsStore;
-    this.#octoPrintService = octoPrintApiClientService;
+    this.#octoPrintService = octoPrintApiService;
     this.#taskManagerService = taskManagerService;
   }
 

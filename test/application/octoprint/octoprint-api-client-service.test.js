@@ -12,7 +12,7 @@ beforeAll(async () => {
   const container = configureContainer();
   await ensureSystemSettingsInitiated(container);
 
-  octoPrintClient = container.resolve(DITokens.octoPrintApiClientService);
+  octoPrintClient = container.resolve(DITokens.octoPrintApiService);
 });
 
 afterEach(async () => {

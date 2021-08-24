@@ -27,7 +27,7 @@ beforeAll(async () => {
   await settingsStore.loadSettings();
   historyService = container.resolve(DITokens.historyService);
   printerStateFactory = container.resolve(DITokens.printerStateFactory);
-  octoPrintClientMock = container.resolve(DITokens.octoPrintApiClientService);
+  octoPrintClientMock = container.resolve(DITokens.octoPrintApiService);
 
   printerInstance = await printerStateFactory.create({
     _id: "fake",

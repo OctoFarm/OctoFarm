@@ -5,11 +5,11 @@
  */
 class PrinterSystemTask {
   #printersStore;
-  #octoPrintClient;
+  #octoPrintApiService;
 
-  constructor({ printersStore, octoPrintApiClientService }) {
+  constructor({ printersStore, octoPrintApiService }) {
     this.#printersStore = printersStore;
-    this.#octoPrintClient = octoPrintApiClientService;
+    this.#octoPrintApiService = octoPrintApiService;
   }
 
   async run() {
@@ -23,7 +23,9 @@ class PrinterSystemTask {
 
   async refreshOctoPrintSystemInfo(printerState) {
     try {
-      const response = await this.#octoPrintClient.getSystemInfo(printerState.getLoginDetails());
+      const response = await this.#octoPrintApiService.getSystemInfo(
+        printerState.getLoginDetails()
+      );
       const data = await response.json();
       if (!!data.systeminfo) {
         printerState.updateSystemInfo(data.systeminfo);

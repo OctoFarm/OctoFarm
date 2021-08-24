@@ -32,7 +32,7 @@ const SortingFilteringCache = require("./state/data/sorting-filtering.cache");
 const DashboardSseTask = require("./tasks/dashboard-sse.task");
 const CurrentOperationsCache = require("./state/data/current-operations.cache");
 const PrinterSystemTask = require("./tasks/printer-system.task");
-const OctoPrintApiClientService = require("./services/octoprint/octoprint-api.service");
+const OctoPrintApiService = require("./services/octoprint/octoprint-api.service");
 const FilamentManagerPluginService = require("./services/octoprint/filament-manager-plugin.service");
 const FilamentCache = require("./state/data/filament.cache");
 const PrinterState = require("./state/printer.state");
@@ -110,7 +110,7 @@ function configureContainer() {
     [DITokens.printerService]: awilix.asClass(PrinterService),
     [DITokens.printerFilesService]: awilix.asClass(PrinterFilesService),
     [DITokens.printerGroupService]: awilix.asClass(PrinterGroupService),
-    [DITokens.octoPrintApiClientService]: awilix.asClass(OctoPrintApiClientService).singleton(),
+    [DITokens.octoPrintApiService]: awilix.asClass(OctoPrintApiService).singleton(),
     [DITokens.filamentManagerPluginService]: awilix.asClass(FilamentManagerPluginService),
     [DITokens.historyService]: awilix.asClass(HistoryService),
     [DITokens.farmStatisticsService]: awilix.asClass(FarmStatisticsService),
