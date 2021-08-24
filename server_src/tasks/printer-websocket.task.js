@@ -7,6 +7,7 @@ const { ExternalServiceError } = require("../exceptions/runtime.exceptions");
 
 const offlineMessage = "OctoPrint instance seems to be offline";
 const noApiKeyInResponseMessage = "OctoPrint login didnt return apikey to check";
+const retryingApiConnection = "Delaying retry for OctoPrint API connection as it is offline";
 const badRequestMessage = "OctoPrint login responded with bad request. This is a bug";
 const apiKeyNotAccepted = "OctoPrint apiKey was rejected.";
 const globalAPIKeyDetectedMessage =
@@ -85,41 +86,46 @@ class PrinterWebsocketTask {
     if (!printerState.shouldRetryConnect()) {
       return;
     }
-    this.#logger.info(`Trying WebSocket connection for '${printerName}'`);
 
     let errorThrown = false;
     let localError;
-    let code;
+
     const response = await this.#octoPrintService.login(loginDetails, true).catch((e) => {
       errorThrown = true;
-      if (!e.response) {
-        // Not connected or DNS issue - abort flow
-        this.#errorCounts.offline++;
-        printerState.setHostState(PSTATE.Offline, offlineMessage);
-        throw e;
-      }
-      code = e.response.status;
       localError = e;
     });
 
     // Check for rejection
-    if (code === HttpStatusCode.BAD_REQUEST) {
+    let errorCode = localError?.response?.status;
+    if (errorThrown && !localError.response) {
+      // Not connected or DNS issue - abort flow
+      this.#errorCounts.offline++;
+      printerState.setHostState(PSTATE.Offline, offlineMessage);
+      printerState.setApiAccessibility(false, true, retryingApiConnection);
+      this.#logger.info(
+        `OctoPrint API offline. Scheduling WebSocket connection retry for '${printerName}'`
+      );
+      return;
+    }
+    if (errorCode === HttpStatusCode.BAD_REQUEST) {
       // Bug
       printerState.setHostState(PSTATE.NoAPI, badRequestMessage);
+      printerState.setApiAccessibility(false, false, badRequestMessage);
       throw new ExternalServiceError(localError.response?.data);
     }
-    if (code === HttpStatusCode.FORBIDDEN) {
+    if (errorCode === HttpStatusCode.FORBIDDEN) {
       const errorCount = this.#errorCounts.apiKeyNotAccepted++;
       printerState.setHostState(PSTATE.ApiKeyRejected, apiKeyNotAccepted);
+      printerState.setApiAccessibility(false, false, apiKeyNotAccepted);
       return this.handleSilencedError(errorCount, apiKeyNotAccepted, printerName);
     }
 
-    code = response.status;
     const loginResponse = response.data;
     // This is a check which is best done after checking 400 code (GlobalAPIKey or pass-thru) - possible
     if (this.checkLoginGlobal(loginResponse)) {
       const errorCount = this.#errorCounts.apiKeyIsGlobal++;
       printerState.setHostState(PSTATE.GlobalAPIKey, globalAPIKeyDetectedMessage);
+      printerState.setApiAccessibility(false, false, globalAPIKeyDetectedMessage);
       return this.handleSilencedError(errorCount, globalAPIKeyDetectedMessage, printerName);
     } else {
       this.#errorCounts.apiKeyIsGlobal = 0;
@@ -128,6 +134,7 @@ class PrinterWebsocketTask {
     if (!loginResponse?.apikey) {
       const errorCount = this.#errorCounts.missingApiKey++;
       printerState.setHostState(PSTATE.NoAPI, noApiKeyInResponseMessage);
+      printerState.setApiAccessibility(false, false, noApiKeyInResponseMessage);
       return this.handleSilencedError(errorCount, noApiKeyInResponseMessage, printerName);
     } else {
       this.#errorCounts.missingApiKey = 0;
@@ -136,12 +143,14 @@ class PrinterWebsocketTask {
     if (!loginResponse?.session) {
       const errorCount = this.#errorCounts.missingSessionKey++;
       printerState.setHostState(PSTATE.NoAPI, missingSessionKeyMessage);
+      printerState.setApiAccessibility(false, false, noApiKeyInResponseMessage);
       return this.handleSilencedError(errorCount, missingSessionKeyMessage, printerName);
     } else {
       this.#errorCounts.missingSessionKey = 0;
     }
 
     printerState.setApiLoginSuccessState(loginResponse.name, loginResponse?.session);
+    printerState.setApiAccessibility(true, true, null);
     printerState.resetWebSocketAdapter();
     // TODO time this (I wonder if the time spent is logging in or the binding)
     printerState.bindWebSocketAdapter(OctoprintRxjsWebsocketAdapter);

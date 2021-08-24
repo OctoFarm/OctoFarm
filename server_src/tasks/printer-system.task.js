@@ -22,11 +22,10 @@ class PrinterSystemTask {
   }
 
   async refreshOctoPrintSystemInfo(printerState) {
+    if (!printerState.isApiAccessible()) return;
+
     try {
-      const response = await this.#octoPrintApiService.getSystemInfo(
-        printerState.getLoginDetails()
-      );
-      const data = await response.data;
+      const data = await this.#octoPrintApiService.getSystemInfo(printerState.getLoginDetails());
       if (!!data.systeminfo) {
         printerState.updateSystemInfo(data.systeminfo);
       }

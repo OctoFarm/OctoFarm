@@ -1,12 +1,21 @@
 const fetch = require("node-fetch");
 const { parseString } = require("xml2js");
 const Logger = require("../handlers/logger.js");
+const {
+  jsonContentType,
+  contentTypeHeaderKey
+} = require("./octoprint/constants/octoprint-service.constants");
 
 class AutoDiscoveryService {
   #discoveredDevices = [];
 
   #ssdpClient;
+  #httpClient;
   #logger = new Logger("OctoFarm-Server");
+
+  constructor({ httpClient }) {
+    this.#httpClient = httpClient;
+  }
 
   #setupSsdp() {
     this.#ssdpClient = require("node-upnp-ssdp");
@@ -17,15 +26,14 @@ class AutoDiscoveryService {
     this.#ssdpClient.on("DeviceFound", (res) => {
       this.#logger.info("Device found! Parsing information", res.location);
       if (res.location) {
-        fetch(res.location, {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json"
-          }
-        })
-          .then((response) => response.text())
-          .then((data) => {
-            parseString(data, (err, result) => {
+        this.#httpClient
+          .get(res.location, {
+            headers: {
+              [contentTypeHeaderKey]: jsonContentType
+            }
+          })
+          .then((response) => {
+            parseString(response.data, (err, result) => {
               if (err) {
                 this.#logger.error(err);
                 return;
