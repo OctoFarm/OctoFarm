@@ -1,6 +1,4 @@
 const supertest = require("supertest");
-jest.mock("../../server_src/services/github-client.service");
-
 const { setupExpressServer } = require("../../server_src/app-core");
 const { setupEnvConfig } = require("../../server_src/app-env");
 const { serveDatabaseIssueFallbackRoutes } = require("../../server_src/app-fallbacks");

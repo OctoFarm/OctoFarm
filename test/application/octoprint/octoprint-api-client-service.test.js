@@ -1,18 +1,21 @@
 const testPath = "../../";
 const dbHandler = require(testPath + "db-handler");
-jest.mock("../../../server_src/services/octoprint/octoprint-api.service");
 const { configureContainer } = require("../../../server_src/container");
 const { ensureSystemSettingsInitiated } = require("../../../server_src/app-core");
 const DITokens = require("../../../server_src/container.tokens");
+const AxiosMock = require("../../provisioning/axios.mock");
+const awilix = require("awilix");
 
-let octoPrintClient;
+let octoPrintApi;
 
 beforeAll(async () => {
   await dbHandler.connect();
   const container = configureContainer();
+  container.register(DITokens.httpClient, awilix.asClass(AxiosMock));
+
   await ensureSystemSettingsInitiated(container);
 
-  octoPrintClient = container.resolve(DITokens.octoPrintApiService);
+  octoPrintApi = container.resolve(DITokens.octoPrintApiService);
 });
 
 afterEach(async () => {
@@ -24,26 +27,19 @@ afterAll(async () => {
 });
 
 describe("OctoPrint-API-Client-Service", () => {
-  it("should throw error on any call incorrect printerURL", async () => {
-    // TODO Not human-friendly
-    expect(
-      async () => await octoPrintClient.get(null, "key", "route", false)
-    ).rejects.toHaveProperty("code", "ERR_INVALID_URL");
-  });
-
   it("should throw error on getSettings with incorrect printerURL", async () => {
     // TODO Not human-friendly
-    expect(
+    await expect(
       async () =>
-        await octoPrintClient.getSettings({
+        await octoPrintApi.getSettings({
           apiKey: "surewhynot",
           printerURL: "some uwrl"
         })
     ).rejects.toHaveProperty("code", "ERR_INVALID_URL");
   });
 
-  it("should not throw error on getSettings with incorrect printerURL", async () => {
-    const settings = await octoPrintClient.getSettings({
+  it("should not throw error on getSettings with correct printerURL", async () => {
+    const settings = await octoPrintApi.getSettings({
       apiKey: "surewhynotsurewhynotsurewhynotsu",
       printerURL: "http://someurl/"
     });

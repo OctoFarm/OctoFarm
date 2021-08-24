@@ -35,8 +35,7 @@ const apiTimelapse = apiBase + "/timelapse";
 class OctoprintApiService {
   #settingsStore;
   #httpClient;
-  #timeouts; // apiTimeout, apiRetry, apiRetryCutoff (and webSocketRetry)
-  #defaultTimeout = 1000;
+  #timeouts; // TODO apply apiTimeout, but apply apiRetry, apiRetryCutoff elsewhere (and webSocketRetry)
 
   #logger = new Logger("OctoPrint-API-Service");
 

@@ -215,7 +215,7 @@ module.exports = createController(PrinterController)
   .patch("/:id/feed-rate", "setFeedRate")
   .patch("/:id/reset-power-settings", "resetPowerSettings")
   // WIP line
-  .put("/:id/query-settings", "querySettings")
+  .post("/:id/query-settings", "querySettings")
   .patch("/:id/update-settings", "updateSettings")
   .get("/:id/connection-logs/", "getConnectionLogs")
   .get("/:id/plugin-list", "getPluginList");

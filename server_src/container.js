@@ -100,7 +100,7 @@ function configureContainer() {
     eventEmitter2: awilix.asFunction(configureEventEmitter).singleton(),
     [DITokens.octofarmUpdateService]: awilix.asClass(OctofarmUpdateService).singleton(),
     [DITokens.systemInfoStore]: awilix.asClass(SystemInfoStore).singleton(),
-    githubApiService: awilix.asClass(GithubApiService),
+    [DITokens.githubApiService]: awilix.asClass(GithubApiService),
     [DITokens.autoDiscoveryService]: awilix.asClass(AutoDiscoveryService),
     [DITokens.systemCommandsService]: awilix.asClass(SystemCommandsService),
     serverLogsService: awilix.asClass(ServerLogsService),

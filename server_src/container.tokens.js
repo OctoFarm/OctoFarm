@@ -5,6 +5,7 @@ const DITokens = {
   farmStatisticsService: "farmStatisticsService",
   serverSettingsService: "serverSettingsService",
   octofarmUpdateService: "octofarmUpdateService",
+  githubApiService: "githubApiService",
   octoPrintApiService: "octoPrintApiService",
   filamentManagerPluginService: "filamentManagerPluginService",
   influxDbSetupService: "influxDbSetupService",

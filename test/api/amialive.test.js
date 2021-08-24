@@ -9,9 +9,11 @@ let request;
 let testContainer;
 let softwareUpdateChecker;
 
-jest.mock("../../server_src/services/github-client.service");
 require("../../server_src/services/octofarm-update.service");
 const DITokens = require("../../server_src/container.tokens");
+const awilix = require("awilix");
+const AxiosMock = require("../provisioning/axios.mock");
+const GithubApiServiceMock = require("../provisioning/github-api.mock");
 
 const testRoute = "/api/amialive";
 
@@ -19,6 +21,8 @@ beforeAll(async () => {
   await dbHandler.connect();
   const { server, container } = await setupTestApp();
   testContainer = container;
+  container.register(DITokens.httpClient, awilix.asClass(AxiosMock));
+  container.register(DITokens.githubApiService, awilix.asClass(GithubApiServiceMock));
   request = supertest(server);
 
   const endpoints = getEndpoints(server);

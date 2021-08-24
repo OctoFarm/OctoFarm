@@ -91,13 +91,13 @@ describe("PrintersController", () => {
 
   it("should return 400 error when wrong input is provided", async function () {
     const path = printerRoute + "/undefined" + refreshSettingsPath;
-    const response = await request.put(path).send();
+    const response = await request.post(path).send();
 
     expectInvalidResponse(response, ["id"], true);
   }, 10000);
 
   it("should return 404 if server fails to find the printer", async function () {
-    const path = printerRoute + "/a0a569d20dd308890a1c06" + refreshSettingsPath;
+    const path = printerRoute + "/60ae2b760bca4f5930be3d88" + refreshSettingsPath;
     const res = await request.post(path).send(path);
 
     // Assert server failed
