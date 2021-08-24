@@ -114,6 +114,7 @@ const OP_STATE_FLAGS = {
 const PSTATE = {
   Offline: "Offline",
   GlobalAPIKey: "Global API Key Issue",
+  ApiKeyRejected: "API Key rejected",
   Searching: "Searching...",
   Error: "Error!",
   NoAPI: "No-API",
@@ -271,6 +272,9 @@ const mapStateToColor = (state) => {
   }
   if (state === PSTATE.Complete) {
     return { name: "success", hex: "#00330e", category: CATEGORY.Complete };
+  }
+  if (state === PSTATE.ApiKeyRejected) {
+    return { name: "danger", hex: "#2e0905", category: CATEGORY.Error };
   }
   if (state === PSTATE.GlobalAPIKey) {
     return { name: "danger", hex: "#2e0905", category: CATEGORY.Error };

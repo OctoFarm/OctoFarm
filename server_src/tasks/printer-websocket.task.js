@@ -2,9 +2,10 @@ const Logger = require("../handlers/logger");
 const OctoprintRxjsWebsocketAdapter = require("../services/octoprint/octoprint-rxjs-websocket.adapter");
 const DITokens = require("../container.tokens");
 const { PSTATE } = require("../constants/state.constants");
-const { FetchError } = require("node-fetch");
 
-const noLoginResponseMessage = "OctoPrint login didnt respond (response empty)";
+const offlineMessage = "OctoPrint instance seems to be offline";
+const noApiKeyInResponseMessage = "OctoPrint login didnt return apikey to check";
+const apiKeyNotAccepted = "OctoPrint apiKey was rejected.";
 const globalAPIKeyDetectedMessage =
   "Global API Key was detected (apikey was null indicating global API key)";
 const missingSessionKeyMessage = "Missing session key in login response";
@@ -20,6 +21,8 @@ class PrinterWebsocketTask {
   #errorMaxThrows = 5;
   #errorModulus = 10; // After max throws, log it every 10 failures
   #errorCounts = {
+    offline: 0,
+    apiKeyNotAccepted: 0,
     missingApiKey: 0,
     apiKeyIsGlobal: 0,
     missingSessionKey: 0
@@ -82,20 +85,29 @@ class PrinterWebsocketTask {
     this.#logger.info(`Trying WebSocket connection for '${printerName}'`);
 
     let errorThrown = false;
+    let localError;
+    let code;
     const loginResponse = await this.#octoPrintService
       .login(loginDetails, true)
       .then((r) => r.json())
       .catch((e) => {
         errorThrown = true;
-        if (e instanceof FetchError) {
-          console.log(e);
-          // No connection - return nothing
-        } else {
-          console.log("Another type of OctoPrint login error", e.stack);
+        if (!e.response) {
+          // Not connected or DNS issue - abort flow
+          this.#errorCounts.offline++;
+          printerState.setHostState(PSTATE.Offline, offlineMessage);
+          throw e;
         }
+        code = e.response.status;
+        localError = e;
       });
 
-    // This is a check which is best done first (GlobalAPIKey or pass-thru)
+    if (code === 400) {
+      const errorCount = this.#errorCounts.apiKeyNotAccepted++;
+      printerState.setHostState(PSTATE.ApiKeyRejected, apiKeyNotAccepted);
+      return this.handleSilencedError(errorCount, apiKeyNotAccepted, printerName);
+    }
+    // This is a check which is best done after checking 400 code (GlobalAPIKey or pass-thru)
     if (this.checkLoginGlobal(loginResponse)) {
       const errorCount = this.#errorCounts.apiKeyIsGlobal++;
       printerState.setHostState(PSTATE.GlobalAPIKey, globalAPIKeyDetectedMessage);
@@ -106,8 +118,8 @@ class PrinterWebsocketTask {
     // Check for an apikey (defines connection state Connected/Disconnected)
     if (!loginResponse?.apikey) {
       const errorCount = this.#errorCounts.missingApiKey++;
-      printerState.setHostState(PSTATE.Disconnected, noLoginResponseMessage);
-      return this.handleSilencedError(errorCount, noLoginResponseMessage, printerName);
+      printerState.setHostState(PSTATE.NoAPI, noApiKeyInResponseMessage);
+      return this.handleSilencedError(errorCount, noApiKeyInResponseMessage, printerName);
     } else {
       this.#errorCounts.missingApiKey = 0;
     }

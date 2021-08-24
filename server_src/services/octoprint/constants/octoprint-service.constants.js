@@ -1,6 +1,12 @@
 class OPClientErrors {
   static filamentIDNotANumber = "FilamentID provided was not numeric";
+
+  static printerValidationErrorMessage = "printer apiKey or URL undefined";
 }
+
+const contentTypeHeaderKey = "Content-Type";
+const apiKeyHeaderKey = "X-Api-Key";
+const jsonContentType = "application/json";
 
 // TODO ofc this is lazy - but I'd rather have working code and optimize later
 function getCurrentProfileDefault() {
@@ -48,5 +54,8 @@ function getCurrentProfileDefault() {
 
 module.exports = {
   OPClientErrors,
+  contentTypeHeaderKey,
+  apiKeyHeaderKey,
+  jsonContentType,
   getCurrentProfileDefault
 };

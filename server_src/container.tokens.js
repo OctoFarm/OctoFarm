@@ -1,4 +1,5 @@
 const DITokens = {
+  httpClient: "httpClient",
   printerService: "printerService",
   printerGroupService: "printerGroupService",
   farmStatisticsService: "farmStatisticsService",
