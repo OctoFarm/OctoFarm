@@ -30,8 +30,8 @@ class GithubApiService {
         }
       })
       .then((r) => {
-        console.log(`Received ${data.length} releases from github.`);
-        return data;
+        console.log(`Received ${r.data.length} releases from github.`);
+        return r.data;
       });
   }
 }
