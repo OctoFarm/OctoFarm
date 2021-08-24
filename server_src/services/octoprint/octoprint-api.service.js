@@ -7,7 +7,9 @@ const {
 } = require("./constants/octoprint-service.constants");
 const { checkPluginManagerAPIDeprecation } = require("../../utils/compatibility.utils");
 const Logger = require("../../handlers/logger.js");
-const { prepareRequest, processResponse } = require("./utils/api.utils");
+const { processResponse, validatePrinter, constructHeaders } = require("./utils/api.utils");
+const { jsonContentType } = require("../constants/octoprint-service.constants");
+const { getDefaultTimeout } = require("../../constants/server-settings.constants");
 
 const defaultResponseOptions = { unwrap: true };
 const octoPrintBase = "/";
@@ -57,8 +59,44 @@ class OctoprintApiService {
     }
   }
 
+  #prepareRequest(printer, path, timeoutOverride) {
+    this.#ensureTimeoutSettingsLoaded();
+
+    const { apiKey, printerURL } = validatePrinter(printer);
+
+    let headers = constructHeaders(apiKey);
+
+    let timeout = timeoutOverride || this.#timeouts.apiTimeout;
+    if (timeout <= 0) {
+      timeout = getDefaultTimeout().apiTimeout;
+    }
+
+    return {
+      url: new URL(path, printerURL).href,
+      options: {
+        headers,
+        timeout
+      }
+    };
+  }
+
+  // Unused because we dont have any PUT/PATCH/POST with relevant data so far
+  #prepareJSONRequest(printer, path, data, timeoutOverride) {
+    const { url, options } = this.#prepareRequest(printer, path, timeoutOverride);
+
+    // We must allow file uploads elsewhere, so be explicit about the content type and data in this JSON request
+    let serializedData = data ? JSON.stringify(data) : undefined;
+    options.headers[contentTypeHeaderKey] = jsonContentType;
+
+    return {
+      url,
+      data: serializedData,
+      options
+    };
+  }
+
   async login(printer, responseOptions = defaultResponseOptions) {
-    const { url, options } = prepareRequest(printer, apiLogin);
+    const { url, options } = this.#prepareRequest(printer, apiLogin);
 
     const response = await this.#httpClient.post(url, {}, options);
 
@@ -66,7 +104,7 @@ class OctoprintApiService {
   }
 
   async getSettings(printer, responseOptions = defaultResponseOptions) {
-    const { url, options } = prepareRequest(printer, apiSettingsPart);
+    const { url, options } = this.#prepareRequest(printer, apiSettingsPart);
 
     const response = await this.#httpClient.get(url, options);
 
@@ -86,7 +124,7 @@ class OctoprintApiService {
   }
 
   async getUsers(printer, responseOptions = defaultResponseOptions) {
-    const { url, options } = prepareRequest(printer, apiUsers);
+    const { url, options } = this.#prepareRequest(printer, apiUsers);
 
     const response = await this.#httpClient.get(url, options);
 
@@ -94,7 +132,7 @@ class OctoprintApiService {
   }
 
   async getFiles(printer, recursive = false, responseOptions = defaultResponseOptions) {
-    const { url, options } = prepareRequest(printer, apiFiles(recursive));
+    const { url, options } = this.#prepareRequest(printer, apiFiles(recursive));
 
     const response = await this.#httpClient.get(url, options);
 
@@ -102,7 +140,7 @@ class OctoprintApiService {
   }
 
   async getFile(printer, path, responseOptions = defaultResponseOptions) {
-    const { url, options } = prepareRequest(printer, apiFile(path));
+    const { url, options } = this.#prepareRequest(printer, apiFile(path));
 
     const response = await this.#httpClient.get(url, options);
 
@@ -110,7 +148,7 @@ class OctoprintApiService {
   }
 
   async getConnection(printer, responseOptions = defaultResponseOptions) {
-    const { url, options } = prepareRequest(printer, apiConnection);
+    const { url, options } = this.#prepareRequest(printer, apiConnection);
 
     const response = await this.#httpClient.get(url, options);
 
@@ -118,7 +156,7 @@ class OctoprintApiService {
   }
 
   async getPrinterProfiles(printer, responseOptions = defaultResponseOptions) {
-    const { url, options } = prepareRequest(printer, apiPrinterProfiles);
+    const { url, options } = this.#prepareRequest(printer, apiPrinterProfiles);
 
     const response = await this.#httpClient.get(url, options);
 
@@ -129,7 +167,7 @@ class OctoprintApiService {
     const printerManagerApiCompatible = checkPluginManagerAPIDeprecation(printer.octoPrintVersion);
 
     const path = printerManagerApiCompatible ? apiPluginManagerRepository1_6_0 : apiPluginManager;
-    const { url, options } = prepareRequest(printer, path);
+    const { url, options } = this.#prepareRequest(printer, path);
 
     const response = await this.#httpClient.get(url, options);
 
@@ -137,7 +175,7 @@ class OctoprintApiService {
   }
 
   async getSystemInfo(printer, responseOptions = defaultResponseOptions) {
-    const { url, options } = prepareRequest(printer, apiSystemInfo);
+    const { url, options } = this.#prepareRequest(printer, apiSystemInfo);
 
     const response = await this.#httpClient.get(url, options);
 
@@ -145,7 +183,7 @@ class OctoprintApiService {
   }
 
   async getSystemCommands(printer, responseOptions = defaultResponseOptions) {
-    const { url, options } = prepareRequest(printer, apiSystemCommands);
+    const { url, options } = this.#prepareRequest(printer, apiSystemCommands);
 
     const response = await this.#httpClient.get(url, options);
 
@@ -153,7 +191,7 @@ class OctoprintApiService {
   }
 
   async getSoftwareUpdateCheck(printer, force, responseOptions = defaultResponseOptions) {
-    const { url, options } = prepareRequest(printer, apiSoftwareUpdateCheck(force));
+    const { url, options } = this.#prepareRequest(printer, apiSoftwareUpdateCheck(force));
 
     const response = await this.#httpClient.get(url, options);
 
@@ -161,7 +199,7 @@ class OctoprintApiService {
   }
 
   async getPluginPiSupport(printer, responseOptions = defaultResponseOptions) {
-    const { url, options } = prepareRequest(printer, apiPluginPiSupport);
+    const { url, options } = this.#prepareRequest(printer, apiPluginPiSupport);
 
     const response = await this.#httpClient.get(url, options);
 
@@ -174,7 +212,7 @@ class OctoprintApiService {
     }
 
     const path = `${apiTimelapse}/${fileName}`;
-    const { url, options } = prepareRequest(printer, path);
+    const { url, options } = this.#prepareRequest(printer, path);
 
     const response = await this.#httpClient.delete(url, options);
 
@@ -183,7 +221,7 @@ class OctoprintApiService {
 
   async listUnrenderedTimeLapses(printer, responseOptions = defaultResponseOptions) {
     const path = `${apiTimelapse}?unrendered=true`;
-    const { url, options } = prepareRequest(printer, path);
+    const { url, options } = this.#prepareRequest(printer, path);
 
     const response = await this.#httpClient.get(url, options);
 
@@ -191,7 +229,7 @@ class OctoprintApiService {
   }
 
   async listPluginFilamentManagerProfiles(printer, responseOptions = defaultResponseOptions) {
-    const { url, options } = prepareRequest(printer, apiPluginFilamentManagerProfiles);
+    const { url, options } = this.#prepareRequest(printer, apiPluginFilamentManagerProfiles);
 
     const response = await this.#httpClient.get(url, options);
 
@@ -199,7 +237,7 @@ class OctoprintApiService {
   }
 
   async listPluginFilamentManagerFilament(printer, responseOptions = defaultResponseOptions) {
-    const { url, options } = prepareRequest(printer, apiPluginFilamentManagerSpools);
+    const { url, options } = this.#prepareRequest(printer, apiPluginFilamentManagerSpools);
 
     const response = await this.#httpClient.get(url, options);
 
@@ -219,7 +257,7 @@ class OctoprintApiService {
     }
 
     const path = `${apiPluginFilamentManagerSpools}/${parsedFilamentID}`;
-    const { url, options } = prepareRequest(printer, path);
+    const { url, options } = this.#prepareRequest(printer, path);
 
     const response = await this.#httpClient.get(url, options);
 

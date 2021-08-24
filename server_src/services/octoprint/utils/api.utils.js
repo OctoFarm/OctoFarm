@@ -24,34 +24,6 @@ function constructHeaders(apiKey) {
   };
 }
 
-function prepareRequest(printer, path, timeout = 0) {
-  const { apiKey, printerURL } = validatePrinter(printer);
-
-  let headers = constructHeaders(apiKey);
-
-  return {
-    url: new URL(path, printerURL).href,
-    options: {
-      headers,
-      timeout
-    }
-  };
-}
-
-function prepareJSONRequest(printer, path, timeout = 0, data) {
-  const { url, options } = prepareRequest(printer, path, timeout);
-
-  // We must allow file uploads elsewhere, so be explicit about the content type and data in this JSON request
-  let serializedData = data ? JSON.stringify(data) : undefined;
-  options.headers[contentTypeHeaderKey] = jsonContentType;
-
-  return {
-    url,
-    data: serializedData,
-    options
-  };
-}
-
 function processResponse(response, options = { unwrap: true }) {
   if (options.unwrap) return response.data;
   return response;
@@ -60,7 +32,5 @@ function processResponse(response, options = { unwrap: true }) {
 module.exports = {
   validatePrinter,
   constructHeaders,
-  prepareRequest,
-  prepareJSONRequest,
   processResponse
 };
