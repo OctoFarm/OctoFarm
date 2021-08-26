@@ -9,7 +9,6 @@ const getFilterDefaults = () => [
 const ERR_COUNT = {
   offline: "offline",
   apiKeyNotAccepted: "apiKeyNotAccepted",
-  missingApiKey: "missingApiKey",
   apiKeyIsGlobal: "apiKeyIsGlobal",
   missingSessionKey: "missingSessionKey"
 };

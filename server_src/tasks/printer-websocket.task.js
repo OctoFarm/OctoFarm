@@ -6,8 +6,7 @@ const HttpStatusCode = require("../constants/http-status-codes.constants");
 const { ExternalServiceError } = require("../exceptions/runtime.exceptions");
 
 const offlineMessage = "OctoPrint instance seems to be offline";
-const noApiKeyInResponseMessage =
-  "OctoPrint login response missing 'apikey' property. API Key is wrong.";
+const wrongApiKeyMessage = "OctoPrint login response missing 'name' property. API Key is wrong.";
 const retryingApiConnection = "OctoPrint is offline. Retry is scheduled";
 const badRequestMessage = "OctoPrint login responded with bad request. This is a bug";
 const apiKeyNotAccepted = "OctoPrint apiKey was rejected.";
@@ -27,7 +26,6 @@ class PrinterWebsocketTask {
   #errorCounts = {
     [ERR_COUNT.offline]: {},
     [ERR_COUNT.apiKeyNotAccepted]: {},
-    [ERR_COUNT.missingApiKey]: {},
     [ERR_COUNT.apiKeyIsGlobal]: {},
     [ERR_COUNT.missingSessionKey]: {}
   };
@@ -115,14 +113,6 @@ class PrinterWebsocketTask {
       printerState.setApiAccessibility(false, false, badRequestMessage);
       throw new ExternalServiceError(localError.response?.data);
     }
-    if (errorCode === HttpStatusCode.FORBIDDEN) {
-      const errorCount = this.#incrementErrorCount(ERR_COUNT.apiKeyNotAccepted, printerId);
-      printerState.setHostState(PSTATE.ApiKeyRejected, apiKeyNotAccepted);
-      printerState.setApiAccessibility(false, false, apiKeyNotAccepted);
-      return this.handleSilencedError(errorCount, apiKeyNotAccepted, printerName);
-    } else {
-      this.#resetPrinterErrorCount(ERR_COUNT.apiKeyNotAccepted, printerId);
-    }
 
     // Response related errors
     const loginResponse = response.data;
@@ -135,20 +125,20 @@ class PrinterWebsocketTask {
     } else {
       this.#resetPrinterErrorCount(ERR_COUNT.apiKeyIsGlobal, printerId);
     }
-    // Check for an apikey (defines connection state NoAPI) - happens when apikey is not known
-    if (!loginResponse?.apikey) {
-      const errorCount = this.#incrementErrorCount(ERR_COUNT.missingApiKey, printerId);
-      printerState.setHostState(PSTATE.NoAPI, noApiKeyInResponseMessage);
-      printerState.setApiAccessibility(false, false, noApiKeyInResponseMessage);
-      return this.handleSilencedError(errorCount, noApiKeyInResponseMessage, printerName);
+    // Check for an name (defines connection state NoAPI) - undefined when apikey is wrong
+    if (!loginResponse?.name) {
+      const errorCount = this.#incrementErrorCount(ERR_COUNT.apiKeyNotAccepted, printerId);
+      printerState.setHostState(PSTATE.ApiKeyRejected, apiKeyNotAccepted);
+      printerState.setApiAccessibility(false, false, apiKeyNotAccepted);
+      return this.handleSilencedError(errorCount, apiKeyNotAccepted, printerName);
     } else {
-      this.#resetPrinterErrorCount(ERR_COUNT.missingApiKey, printerId);
+      this.#resetPrinterErrorCount(ERR_COUNT.apiKeyNotAccepted, printerId);
     }
     // Sanity check for login success (alt: could also check status code) - quite rare
     if (!loginResponse?.session) {
       const errorCount = this.#incrementErrorCount(ERR_COUNT.missingSessionKey, printerId);
       printerState.setHostState(PSTATE.NoAPI, missingSessionKeyMessage);
-      printerState.setApiAccessibility(false, false, noApiKeyInResponseMessage);
+      printerState.setApiAccessibility(false, false, missingSessionKeyMessage);
       return this.handleSilencedError(errorCount, missingSessionKeyMessage, printerName);
     } else {
       this.#resetPrinterErrorCount(ERR_COUNT.missingSessionKey, printerId);
