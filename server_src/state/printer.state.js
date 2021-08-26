@@ -469,7 +469,7 @@ class PrinterState {
     if (!accessible) {
       if (!retryable) {
         this.#logger.error(
-          `Printer ${this.getName()} was flagged API inaccessible. Reason: ${reason}. Please check connection settings.`
+          `Printer API '${this.getName()}' was marked as inaccessible. Reason: '${reason}'. Please check connection settings.`
         );
       }
     }

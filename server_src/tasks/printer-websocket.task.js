@@ -6,12 +6,12 @@ const HttpStatusCode = require("../constants/http-status-codes.constants");
 const { ExternalServiceError } = require("../exceptions/runtime.exceptions");
 
 const offlineMessage = "OctoPrint instance seems to be offline";
-const noApiKeyInResponseMessage = "OctoPrint login didnt return apikey to check";
+const noApiKeyInResponseMessage =
+  "OctoPrint login response missing 'apikey' property. API Key is wrong.";
 const retryingApiConnection = "OctoPrint is offline. Retry is scheduled";
 const badRequestMessage = "OctoPrint login responded with bad request. This is a bug";
 const apiKeyNotAccepted = "OctoPrint apiKey was rejected.";
-const globalAPIKeyDetectedMessage =
-  "Global API Key was detected (apikey was null indicating global API key)";
+const globalAPIKeyDetectedMessage = "Global API Key was detected (username/name was '_api')";
 const missingSessionKeyMessage = "Missing session key in login response";
 
 class PrinterWebsocketTask {
@@ -103,7 +103,7 @@ class PrinterWebsocketTask {
       const errorCount = this.#incrementErrorCount(ERR_COUNT.offline, printerId);
       printerState.setHostState(PSTATE.Offline, offlineMessage);
       printerState.setApiAccessibility(false, true, retryingApiConnection);
-      return this.handleSilencedError(errorCount, retryingApiConnection, printerName);
+      return this.handleSilencedError(errorCount, retryingApiConnection, printerName, true);
     } else {
       this.#resetPrinterErrorCount(ERR_COUNT.offline, printerId);
     }
@@ -127,7 +127,7 @@ class PrinterWebsocketTask {
     // Response related errors
     const loginResponse = response.data;
     // This is a check which is best done after checking 400 code (GlobalAPIKey or pass-thru) - possible
-    if (this.checkLoginGlobal(loginResponse)) {
+    if (this.#checkLoginGlobal(loginResponse)) {
       const errorCount = this.#incrementErrorCount(ERR_COUNT.apiKeyIsGlobal, printerId);
       printerState.setHostState(PSTATE.GlobalAPIKey, globalAPIKeyDetectedMessage);
       printerState.setApiAccessibility(false, false, globalAPIKeyDetectedMessage);
@@ -135,7 +135,7 @@ class PrinterWebsocketTask {
     } else {
       this.#resetPrinterErrorCount(ERR_COUNT.apiKeyIsGlobal, printerId);
     }
-    // Check for an apikey (defines connection state NoAPI) - happens when no apikey is sent by OF => bug
+    // Check for an apikey (defines connection state NoAPI) - happens when apikey is not known
     if (!loginResponse?.apikey) {
       const errorCount = this.#incrementErrorCount(ERR_COUNT.missingApiKey, printerId);
       printerState.setHostState(PSTATE.NoAPI, noApiKeyInResponseMessage);
@@ -183,17 +183,18 @@ class PrinterWebsocketTask {
     return this.#errorCounts[key][printerId] || 0;
   }
 
-  checkLoginGlobal(octoPrintResponse) {
+  #checkLoginGlobal(octoPrintResponse) {
     // Explicit nullability check serves to let an unconnected printer fall through as well as incorrect apiKey
     // Note: 'apikey' property is conform OctoPrint response (and not OctoFarm printer model's 'apiKey')
-    return !!octoPrintResponse && octoPrintResponse.apikey === null;
+    return !!octoPrintResponse && octoPrintResponse.name === "_api";
   }
 
-  handleSilencedError(errorCount, taskMessage, printerName) {
+  handleSilencedError(errorCount, taskMessage, printerName, willRetry = false) {
     if (errorCount <= this.#errorMaxThrows) {
-      throw new Error(
-        `${taskMessage} (Error muted in ${this.#errorMaxThrows - errorCount} tries.)`
-      );
+      const retrySilencePostFix = willRetry
+        ? `(Error muted in ${this.#errorMaxThrows - errorCount} tries.)`
+        : "(Not retried)";
+      throw new Error(`${taskMessage} ${retrySilencePostFix}`);
     } else if (errorCount % this.#errorModulus === 0) {
       throw new Error(`${taskMessage} ${errorCount} times for printer '${printerName}'.`);
     }
