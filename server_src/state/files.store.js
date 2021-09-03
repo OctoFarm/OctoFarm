@@ -7,20 +7,19 @@ class FilesStore {
   #printersStore;
   #printerFilesService;
   #filesCache;
-  #octoPrintClient;
+  #octoPrintApiService;
 
   #logger = new Logger("OctoFarm-FilesStore");
 
-  constructor({ printersStore, printerFilesService, fileCache, octoPrintApiClientService }) {
+  constructor({ printersStore, printerFilesService, fileCache, octoPrintApiService }) {
     this.#printersStore = printersStore;
     this.#printerFilesService = printerFilesService;
     this.#filesCache = fileCache;
-    this.#octoPrintClient = octoPrintApiClientService;
+    this.#octoPrintApiService = octoPrintApiService;
   }
 
   /**
    * Load the file store by grabbing files from the service. TODO move files out of printer
-   * @param printerId
    * @returns {Promise<void>}
    */
   async loadFilesStore() {
@@ -58,7 +57,7 @@ class FilesStore {
   // === TODO BELOW ===
   async getFile(id, fullPath) {
     const printer = this.#printersStore.getPrinter(id);
-    const response = await this.#octoPrintClient.getFile(printer.getLoginDetails(), fullPath);
+    const response = await this.#octoPrintApiService.getFile(printer.getLoginDetails(), fullPath);
 
     let timeStat = null;
     let filament = [];
@@ -120,11 +119,8 @@ class FilesStore {
     };
     PrinterTicker.addIssue(printer, "Grabbing file information...", "Active");
 
-    return await this.#octoPrintClient
+    return await this.#octoPrintApiService
       .getFiles(printer, recursive)
-      .then((res) => {
-        return res.json();
-      })
       .then(async (res) => {
         // Setup the files json storage object
         printer.storage = {

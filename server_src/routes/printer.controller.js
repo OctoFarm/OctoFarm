@@ -18,22 +18,16 @@ class PrinterController {
   #printersStore;
   #jobsCache;
   #connectionLogsCache;
-  #octoPrintClient;
+  #octoPrintApiService;
   #fileCache;
 
   #logger = new Logger("OctoFarm-API");
 
-  constructor({
-    printersStore,
-    connectionLogsCache,
-    octoPrintApiClientService,
-    jobsCache,
-    fileCache
-  }) {
+  constructor({ printersStore, connectionLogsCache, octoPrintApiService, jobsCache, fileCache }) {
     this.#printersStore = printersStore;
     this.#jobsCache = jobsCache;
     this.#connectionLogsCache = connectionLogsCache;
-    this.#octoPrintClient = octoPrintApiClientService;
+    this.#octoPrintApiService = octoPrintApiService;
     this.#fileCache = fileCache;
   }
 
@@ -161,9 +155,9 @@ class PrinterController {
     const printerLogin = printerState.getLoginDetails();
 
     // TODO We dont process these yet
-    const octoPrintConnection = await this.#octoPrintClient.getConnection(printerLogin);
-    const octoPrintSettings = await this.#octoPrintClient.getSettings(printerLogin);
-    const octoPrintSystemInfo = await this.#octoPrintClient.getSystemInfo(printerLogin);
+    const octoPrintConnection = await this.#octoPrintApiService.getConnection(printerLogin);
+    const octoPrintSettings = await this.#octoPrintApiService.getSettings(printerLogin);
+    const octoPrintSystemInfo = await this.#octoPrintApiService.getSystemInfo(printerLogin);
     // await Runner.getLatestOctoPrintSettingsValues(id);
 
     res.send({ printerInformation: printerState.toFlat() });
@@ -200,7 +194,7 @@ class PrinterController {
     const printerState = this.#printersStore.getPrinterState(params.id);
     const printerLogin = printerState.getLoginDetails();
 
-    let pluginList = await this.#octoPrintClient.getPluginManager(printerLogin, false);
+    let pluginList = await this.#octoPrintApiService.getPluginManager(printerLogin, false);
     res.send(pluginList);
   }
 }
@@ -221,7 +215,7 @@ module.exports = createController(PrinterController)
   .patch("/:id/feed-rate", "setFeedRate")
   .patch("/:id/reset-power-settings", "resetPowerSettings")
   // WIP line
-  .put("/:id/query-settings", "querySettings")
+  .post("/:id/query-settings", "querySettings")
   .patch("/:id/update-settings", "updateSettings")
   .get("/:id/connection-logs/", "getConnectionLogs")
   .get("/:id/plugin-list", "getPluginList");

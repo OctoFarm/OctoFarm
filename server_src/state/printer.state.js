@@ -52,6 +52,11 @@ class PrinterState {
   // New idea to enable/disable printers
   // enabled = false;
   #markedForRemoval = false;
+  #apiAccessibility = {
+    accessible: true,
+    retryable: true,
+    reason: null
+  };
 
   #logger = new Logger("Printer-State");
   #eventEmitter2;
@@ -231,6 +236,7 @@ class PrinterState {
    */
   resetConnectionState() {
     this.setHostState(PSTATE.Searching, "Attempting to connect to OctoPrint");
+    this.resetApiAccessibility();
     this.resetWebSocketAdapter();
   }
 
@@ -404,7 +410,7 @@ class PrinterState {
   }
 
   shouldRetryConnect() {
-    if (this.markForRemoval) {
+    if (this.markForRemoval || !this.isApiRetryable()) {
       return false;
     }
 
@@ -456,6 +462,46 @@ class PrinterState {
       colour: mapStateToColor(state),
       desc: description
     };
+  }
+
+  // Tracking for API failures like GlobalAPIKey, ApiKey rejected which can only be fixed by OctoFarm
+  setApiAccessibility(accessible, retryable, reason) {
+    if (!accessible) {
+      if (!retryable) {
+        this.#logger.error(
+          `Printer API '${this.getName()}' was marked as inaccessible. Reason: '${reason}'. Please check connection settings.`
+        );
+      }
+    }
+    this.#apiAccessibility = {
+      accessible,
+      retryable,
+      reason
+    };
+  }
+
+  getApiAccessibility() {
+    return Object.freeze(this.#apiAccessibility);
+  }
+
+  /**
+   * Determines whether API was marked accessible - whether it should be skipped or not.
+   * @returns {boolean}
+   */
+  isApiAccessible() {
+    return this.#apiAccessibility.accessible;
+  }
+
+  isApiRetryable() {
+    return this.isApiAccessible() || this.#apiAccessibility.retryable;
+  }
+
+  resetApiAccessibility() {
+    this.setApiAccessibility({
+      accessible: true,
+      retryable: true,
+      reason: null
+    });
   }
 
   setApiSuccessState(success = true) {
