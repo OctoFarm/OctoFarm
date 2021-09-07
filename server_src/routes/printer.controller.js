@@ -7,7 +7,8 @@ const {
   updatePrinterConnectionSettingRules,
   stepSizeRules,
   flowRateRules,
-  feedRateRules
+  feedRateRules,
+  updatePrinterEnabledRule
 } = require("./validation/printer-controller.validation");
 const { AppConstants } = require("../app.constants");
 const { convertHttpUrlToWebsocket } = require("../utils/url.utils");
@@ -99,6 +100,16 @@ class PrinterController {
     this.#logger.info("Sorting printers according to provided order", JSON.stringify(data));
 
     this.#printersStore.updateSortIndex(data.sortList);
+    res.send({});
+  }
+
+  async updateEnabled(req, res) {
+    const params = await validateInput(req.params, idRules);
+    const data = await validateMiddleware(req, updatePrinterEnabledRule, res);
+
+    this.#logger.info("Changing printer enabled setting", JSON.stringify(data));
+
+    await this.#printersStore.updateEnabled(params.id, data.enabled);
     res.send({});
   }
 
@@ -208,6 +219,7 @@ module.exports = createController(PrinterController)
   .get("/:id", "get")
   .delete("/:id", "delete")
   .patch("/sort-index", "updateSortIndex")
+  .patch("/:id/enabled", "updateEnabled")
   .put("/:id/reconnect", "reconnect")
   .patch("/:id/connection", "updateConnectionSettings")
   .patch("/:id/step-size", "setStepSize")

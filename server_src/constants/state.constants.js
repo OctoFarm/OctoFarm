@@ -6,6 +6,15 @@ const getFilterDefaults = () => [
   "State: Disconnected"
 ];
 
+const MESSAGE = {
+  offline: "OctoPrint instance seems to be offline",
+  retryingApiConnection: "OctoPrint is offline. Retry is scheduled",
+  badRequest: "OctoPrint login responded with bad request. This is a bug",
+  apiKeyNotAccepted: "OctoPrint apiKey was rejected.",
+  disabled: "Printer was disabled in OctoFarm",
+  globalAPIKeyDetected: "Global API Key was detected (username/name was '_api')",
+  missingSessionKey: "Missing session key in login response"
+};
 const ERR_COUNT = {
   offline: "offline",
   apiKeyNotAccepted: "apiKeyNotAccepted",
@@ -120,6 +129,7 @@ const OP_STATE_FLAGS = {
 // All states of the app. Nice to share between server and client
 const PSTATE = {
   Offline: "Offline",
+  Disabled: "Disabled",
   GlobalAPIKey: "Global API Key Issue",
   ApiKeyRejected: "API Key rejected",
   Searching: "Searching...",
@@ -262,6 +272,9 @@ const mapStateToColor = (state) => {
   if (state === PSTATE.Starting) {
     return { name: "warning", hex: "#583c0e", category: CATEGORY.Active };
   }
+  if (state === PSTATE.Disabled) {
+    return { name: "secondary", hex: "#2e0905", category: CATEGORY.Offline };
+  }
   if (state === PSTATE.Offline) {
     return { name: "danger", hex: "#2e0905", category: CATEGORY.Offline };
   }
@@ -303,6 +316,7 @@ module.exports = {
   mapStateToColor,
   remapOctoPrintState,
   ERR_COUNT,
+  MESSAGE,
   PSTATE,
   OP_STATE,
   CATEGORY,

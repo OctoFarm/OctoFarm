@@ -12,7 +12,8 @@ const {
   getSystemChecksDefault,
   mapStateToColor,
   PSTATE,
-  SYSTEM_CHECKS
+  SYSTEM_CHECKS,
+  MESSAGE
 } = require("../constants/state.constants");
 const Logger = require("../handlers/logger.js");
 
@@ -49,8 +50,6 @@ class PrinterState {
   #currentProfile = getCurrentProfileDefault();
   #octoPi;
 
-  // New idea to enable/disable printers
-  // enabled = false;
   #markedForRemoval = false;
   #apiAccessibility = {
     accessible: true,
@@ -221,6 +220,7 @@ class PrinterState {
       gcodeScripts: {},
       octoPrintVersion: this.getOctoPrintVersion(),
       selectedFilament: this.#entityData.selectedFilament,
+      enabled: this.#entityData.enabled,
       sortIndex: this.#entityData.sortIndex,
       printerName: this.#entityData.settingsAppearance?.name,
       webSocketURL: this.#websocketAdapter?.webSocketURL || this.#entityData.webSocketURL,
@@ -235,8 +235,13 @@ class PrinterState {
    * Reset the API state and dispose any websocket related data
    */
   resetConnectionState() {
-    this.setHostState(PSTATE.Searching, "Attempting to connect to OctoPrint");
-    this.resetApiAccessibility();
+    if (this.#entityData.enabled) {
+      this.setHostState(PSTATE.Searching, "Attempting to connect to OctoPrint");
+      this.resetApiAccessibility();
+    } else {
+      this.setHostState(PSTATE.Disabled, "Printer was disabled in OctoFarm");
+      this.setApiAccessibility(false, false, MESSAGE.disabled);
+    }
     this.resetWebSocketAdapter();
   }
 
@@ -468,7 +473,7 @@ class PrinterState {
   setApiAccessibility(accessible, retryable, reason) {
     if (!accessible) {
       if (!retryable) {
-        this.#logger.error(
+        this.#logger.warning(
           `Printer API '${this.getName()}' was marked as inaccessible. Reason: '${reason}'. Please check connection settings.`
         );
       }
@@ -497,11 +502,7 @@ class PrinterState {
   }
 
   resetApiAccessibility() {
-    this.setApiAccessibility({
-      accessible: true,
-      retryable: true,
-      reason: null
-    });
+    this.setApiAccessibility(true, true, null);
   }
 
   setApiSuccessState(success = true) {

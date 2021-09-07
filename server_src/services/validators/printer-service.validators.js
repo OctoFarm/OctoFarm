@@ -7,6 +7,11 @@ const createPrinterRules = {
   camURL: "httpurl"
 };
 
+const updatePrinterEnabledRule = {
+  enabled: `required|boolean`
+};
+
 module.exports = {
-  createPrinterRules
+  createPrinterRules,
+  updatePrinterEnabledRule
 };

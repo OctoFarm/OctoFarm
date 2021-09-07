@@ -17,6 +17,10 @@ const updateSortIndexRules = {
   "sortList.*": "required|mongoId"
 };
 
+const updatePrinterEnabledRule = {
+  enabled: `required|boolean`
+};
+
 const updatePrinterConnectionSettingRules = {
   printer: "required|object",
   "printer.id": "required|mongoId", // Changed from index to id
@@ -31,5 +35,6 @@ module.exports = {
   feedRateRules,
   flowRateRules,
   updateSortIndexRules,
+  updatePrinterEnabledRule,
   updatePrinterConnectionSettingRules
 };

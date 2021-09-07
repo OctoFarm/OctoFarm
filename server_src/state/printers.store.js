@@ -197,6 +197,15 @@ class PrintersStore {
     }
   }
 
+  async updateEnabled(printerId, enabled) {
+    // Check existence with cache first
+    let printer = this.getPrinterState(printerId);
+
+    const doc = await this.#printerService.updateEnabled(printerId, enabled);
+
+    printer.updateEntityData(doc, doc.enabled);
+  }
+
   /**
    * @deprecated A list used to sort printers. This is obsolete next minor release.
    * @returns {*[]}
@@ -259,6 +268,7 @@ class PrintersStore {
   setPrinterStepSize(id, stepSize) {
     // Will be abstracted in future in order to fit different types of printers
     const printer = this.getPrinterState(id);
+
     printer.updateStepSize(stepSize);
   }
 

@@ -2,7 +2,10 @@ const Printers = require("../models/Printer");
 const { NotFoundException } = require("../exceptions/runtime.exceptions");
 const { sanitizeURL } = require("../utils/url.utils");
 const { validateInput } = require("../handlers/validators");
-const { createPrinterRules } = require("./validators/printer-service.validators");
+const {
+  createPrinterRules,
+  updatePrinterEnabledRule
+} = require("./validators/printer-service.validators");
 const {
   getDefaultPrinterEntry,
   getPowerSettingsDefault
@@ -111,7 +114,21 @@ class PrinterService {
       webSocketURL: sanitizeURL(webSocketURL),
       apiKey
     };
+
     await validateInput(update, createPrinterRules);
+
+    return Printers.findOneAndUpdate(filter, update, {
+      returnOriginal: false
+    });
+  }
+
+  async updateEnabled(printerId, enabled) {
+    const filter = { _id: printerId };
+    const update = {
+      enabled
+    };
+
+    await validateInput(update, updatePrinterEnabledRule);
 
     return Printers.findOneAndUpdate(filter, update, {
       returnOriginal: false
