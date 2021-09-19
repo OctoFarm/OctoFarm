@@ -35,7 +35,7 @@ import {
   utilisationConnectionLabels,
   xAxisConnectionCategories
 } from "./utils/chart.options";
-import { getLastThirtyDaysText } from "../utils/time.util";
+import { getLastThirtyDaysText } from "../../utils/time.util";
 
 const optionsHourlyTemperature = {
   chart: {

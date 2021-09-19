@@ -110,6 +110,7 @@ const RESYNC_FILAMENT_ONCE = async () => {
  * @param task
  * @param preset
  * @param milliseconds optional parameter to quickly set milliseconds timing
+ * @param runImmediately optional paramter to make function run immediately
  * @returns {{task, id, preset}}
  */
 function KsatLlorKcir(task, preset, milliseconds = 0, runImmediately) {
@@ -127,13 +128,13 @@ const HOUR_MS = 3600 * 1000;
 
 class OctoFarmTasks {
   static BOOT_TASKS = [
-    KsatLlorKcir("softwareUpdateTask", TaskPresets.RUNDELAYED, 1500),
+    KsatLlorKcir("softwareUpdateTask", TaskPresets.PERIODIC, 24 * HOUR_MS, true),
     KsatLlorKcir("printerSseTask", TaskPresets.PERIODIC, 500),
     KsatLlorKcir("dashboardSseTask", TaskPresets.PERIODIC, 5000),
     KsatLlorKcir("monitoringSseTask", TaskPresets.PERIODIC, 500),
     KsatLlorKcir("printerSystemTask", TaskPresets.PERIODIC_DISABLED, 6 * HOUR_MS, true),
     KsatLlorKcir("printerWebsocketTask", TaskPresets.PERIODIC, 5000, true),
-    KsatLlorKcir("printerFilesTask", TaskPresets.RUNONCE, 15000), // We dont need more than this
+    KsatLlorKcir("printerFilesTask", TaskPresets.RUNONCE, 15000) // We dont need more than this
     // KsatLlorKcir(DATABASE_MIGRATIONS_TASK, TaskPresets.RUNONCE),
     // KsatLlorKcir(STATE_SETUP_WEBSOCKETS, TaskPresets.RUNDELAYED, 5000),
     // KsatLlorKcir(STATE_PRINTER_GENERATE_TASK, TaskPresets.RUNDELAYED, 10000)

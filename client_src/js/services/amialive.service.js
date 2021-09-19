@@ -1,6 +1,7 @@
 import { ClientError } from "../exceptions/client-error.handler";
 import { ClientErrors } from "../exceptions/client.exceptions";
 import { reloadCurrentWindow } from "../utils/window.util";
+import { TIMERS } from "../constants/timer.constants";
 
 // Feeling like I'd prefer state management here, window object works for now.
 window.isServerOnline = true;
@@ -39,7 +40,7 @@ export default class AmIAliveService {
         if (countDown === 0) reloadCurrentWindow();
         countDown = countDown - 1;
         window.awaitingConnectionRestored = true;
-      }, 1000);
+      }, TIMERS.AMIALIVE_MODAL);
     }
   }
 }

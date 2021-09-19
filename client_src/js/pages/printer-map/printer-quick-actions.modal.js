@@ -1,5 +1,5 @@
-import { humanFileSize } from "../utils/file-size.util";
-import { secondsToTime, timeDifference } from "../utils/time.util";
+import { humanFileSize } from "../../utils/file-size.util";
+import { secondsToTime, timeDifference } from "../../utils/time.util";
 import {
   actionDeleteAllFiles,
   actionDeleteOldFiles,
@@ -11,7 +11,7 @@ import {
   actionProgressSucceededClass,
   oldFileCriteriumDays
 } from "./printer-map.options";
-import { printerWebBtn } from "../lib/modules/Printers/actionButtons";
+import { printerWebBtn } from "../../lib/modules/Printers/actionButtons";
 import {
   calculatePrinterSystemStorageBadges,
   calculatePrinterSystemStorageStats,

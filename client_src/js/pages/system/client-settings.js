@@ -1,5 +1,5 @@
-import OctoFarmClient from "../services/octofarm-client.service";
-import UI from "../lib/functions/ui";
+import OctoFarmClient from "../../services/octofarm-client.service";
+import UI from "../../lib/functions/ui";
 //Going to wait till backend changes are merged before tackling this. Also want to re-enable client settings local storage.
 
 export default class ClientSettings {

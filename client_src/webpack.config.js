@@ -49,6 +49,9 @@ module.exports = (env, options) => {
       jquery: "jQuery",
       bootbox: "bootbox"
     },
+    watchOptions: {
+      ignored: "**/node_modules/"
+    },
     mode: isProd ? "production" : "development",
     devtool: "source-map",
     node: {
@@ -60,7 +63,7 @@ module.exports = (env, options) => {
       minimize: env.production,
       minimizer: [
         // For webpack@5 you can use the `...` syntax to extend existing minimizers (i.e. `terser-webpack-plugin`), uncomment the next line
-        `...`,
+        "...",
         new CssMinimizerPlugin()
       ]
     },

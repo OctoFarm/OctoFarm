@@ -2,7 +2,10 @@ import AxiosService from "./axios.service";
 
 export default class OctoFarmClient extends AxiosService {
   static base = "/api";
-  static systemInformationRoute = "/system/in3fo";
+  static serverRoute = "/server";
+  static systemInformationRoute = this.base + this.serverRoute + "/info";
+  static updateAvailableRoute = this.base + this.serverRoute + "/update-ready";
+  static githubIssueRoute = this.base + this.serverRoute + "/github-issue";
   static printerRoute = this.base + "/printer";
   static settingsRoute = this.base + "/settings";
   static logsRoute = `${this.settingsRoute}/logs`;
@@ -45,9 +48,14 @@ export default class OctoFarmClient extends AxiosService {
       // throw new ClientError(ClientErrors., unsetRequiredProps);
     }
   }
-
+  static updateNotificationCheck() {
+    return this.get(this.updateAvailableRoute);
+  }
   static getSystemInformation() {
     return this.get(this.systemInformationRoute);
+  }
+  static getGithubIssueInformation() {
+    return this.get(this.githubIssueRoute);
   }
 
   static getPrinter(printerId) {

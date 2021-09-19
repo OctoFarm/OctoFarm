@@ -46,13 +46,6 @@ const viewSystem = ({
       },
       patreonData: getPatreons()
     });
-  },
-  /**
-   * Call slow system information from system info runner
-   */
-  info: async (req, res) => {
-    const systemInformation = await systemInfoStore.querySystemInfo();
-    res.send(systemInformation);
   }
 });
 
@@ -61,4 +54,3 @@ module.exports = createController(viewSystem)
   .prefix("/system")
   .before([ensureAuthenticated, ensureCurrentUserAndGroup])
   .get("", "index")
-  .get("/info", "info");

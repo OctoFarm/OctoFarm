@@ -13,7 +13,7 @@ class GithubApiService {
 
   async getGithubReleasesPromise() {
     const connected = await this.#httpClient
-      .get("https://google.com", {
+      .get("https://octofarm.net", {
         headers: { [contentTypeHeaderKey]: jsonContentType }
       })
       .then(() => true)

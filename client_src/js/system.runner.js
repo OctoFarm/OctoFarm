@@ -1,11 +1,11 @@
 import UI from "./lib/functions/ui.js";
 import Script from "./services/gcode-scripts.service";
-import ClientSettings from "./system/client-settings";
+import ClientSettings from "./pages/system/client-settings";
 import {
   localStorageKeys,
   serverActionsElements,
   serverDatabaseKeys
-} from "./system/server.options";
+} from "./pages/system/server.options";
 import {
   generateLogDumpFile,
   exportDatabases,
@@ -18,8 +18,8 @@ import {
   grabOctoFarmLogList,
   renderSystemCharts,
   renderSystemInfo
-} from "./system/server.actions";
-import { serverBootBoxOptions } from "./system/utils/bootbox.options";
+} from "./pages/system/server.actions";
+import { serverBootBoxOptions } from "./pages/system/utils/bootbox.options";
 
 // Setup Page
 for (const key in serverDatabaseKeys) {

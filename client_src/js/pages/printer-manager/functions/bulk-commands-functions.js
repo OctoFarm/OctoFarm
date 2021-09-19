@@ -1,10 +1,10 @@
 import { findIndex } from "lodash";
 
-import OctoFarmClient from "../../services/octofarm-client.service.js";
-import OctoPrintClient from "../../services/octoprint-client.service";
-import UI from "../../lib/functions/ui";
-import PrinterSelect from "../../lib/modules/printerSelect";
-import CustomGenerator from "../../lib/modules/customScripts";
+import OctoFarmClient from "../../../services/octofarm-client.service.js";
+import OctoPrintClient from "../../../services/octoprint-client.service";
+import UI from "../../../lib/functions/ui";
+import PrinterSelect from "../../../lib/modules/printerSelect";
+import CustomGenerator from "../../../lib/modules/customScripts";
 import { setupPluginSearch } from "./plugin-search.function";
 import { returnPluginListTemplate } from "../templates/octoprint-plugin-list.template";
 

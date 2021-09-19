@@ -6,19 +6,19 @@ import {
   modalPrintFilesListId,
   oldFileCriteriumDays,
   quickActionsModalId
-} from "./printer-map/printer-map.options";
-import { createWebWorker, handleVisibilityChange } from "./printer-map/printer-map.worker";
+} from "./pages/printer-map/printer-map.options";
+import { createWebWorker, handleVisibilityChange } from "./pages/printer-map/printer-map.worker";
 import OctoFarmClient from "./services/octofarm-client.service";
-import { getModalPrinter, setModalPrinter } from "./printer-map/printer-map.state";
+import { getModalPrinter, setModalPrinter } from "./pages/printer-map/printer-map.state";
 import {
   printerQuickActionsModal,
   resetProgressBar,
   setProgressBar
-} from "./printer-map/printer-quick-actions.modal";
+} from "./pages/printer-map/printer-quick-actions.modal";
 import { FileActions } from "./lib/modules/fileManager";
 import UI from "./lib/functions/ui";
 import OctoPrintClient from "./services/octoprint-client.service";
-import { fileListStorageSize, findOldFiles } from "./printer-map/printer-map.utils";
+import { fileListStorageSize, findOldFiles } from "./pages/printer-map/printer-map.utils";
 import { humanFileSize } from "./utils/file-size.util";
 
 document.addEventListener("visibilitychange", handleVisibilityChange, false);

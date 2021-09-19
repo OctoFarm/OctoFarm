@@ -10,7 +10,9 @@ function handleErrorEvent(event) {
   if (!event?.type) {
     HTTPError.UNKNOWN.message += `<br> ${event}`;
     Object.assign(event, HTTPError.UNKNOWN);
-    createErrorModal(event).then();
+    (async function () {
+      await createErrorModal(event);
+    })();
     return true;
   }
 
@@ -22,10 +24,10 @@ function handleErrorEvent(event) {
         createNotificationPopUp(event);
         break;
       default:
-        createErrorModal(event).then();
+        (async function () {
+          await createErrorModal(event);
+        })();
     }
-  } else {
-    AmIAliveService.showModal();
   }
   // Make sure all events are logged to the console
   logToConsole(event);

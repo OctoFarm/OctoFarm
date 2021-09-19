@@ -2,12 +2,12 @@ import { returnPrinterTableRow } from "./templates/printer-table-row.templates.j
 import {
   checkQuickConnectState,
   init as actionButtonInit
-} from "../lib/modules/Printers/actionButtons";
-import UI from "../lib/functions/ui.js";
-import PrinterManager from "../lib/modules/printerManager.js";
-import PrinterLogs from "../lib/modules/printerLogs.js";
-import OctoFarmClient from "../services/octofarm-client.service";
-import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
+} from "../../lib/modules/Printers/actionButtons";
+import UI from "../../lib/functions/ui.js";
+import PrinterManager from "../../lib/modules/printerManager.js";
+import PrinterLogs from "../../lib/modules/printerLogs.js";
+import OctoFarmClient from "../../services/octofarm-client.service";
+import { updatePrinterSettingsModal } from "../../lib/modules/printerSettings";
 
 const printerList = document.getElementById("printerList");
 const ignoredHostStatesForAPIErrors = ["Setting Up", "Searching...", "Shutdown"];

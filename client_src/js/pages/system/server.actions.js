@@ -1,14 +1,14 @@
-import OctoFarmClient from "../services/octofarm-client.service";
-import UI from "../lib/functions/ui";
-import Calc from "../lib/functions/calc";
+import OctoFarmClient from "../../services/octofarm-client.service";
+import UI from "../../lib/functions/ui";
+import Calc from "../../lib/functions/calc";
 import {
   setupFilamentManagerDisableBtn,
   setupFilamentManagerReSyncBtn,
   setupFilamentManagerSyncBtn,
   isFilamentManagerPluginSyncEnabled
-} from "../services/filament-manager-plugin.service";
-import OctoPrintClient from "../services/octoprint-client.service";
-import FileOperations from "../lib/functions/file";
+} from "../../services/filament-manager-plugin.service";
+import OctoPrintClient from "../../services/octoprint-client.service";
+import FileOperations from "../../lib/functions/file";
 import { settingsElements } from "./server.options";
 import { serverBootBoxOptions } from "./utils/bootbox.options";
 import { cpuChartOptions, memoryChartOptions } from "./utils/charts.options";

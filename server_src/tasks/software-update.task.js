@@ -1,5 +1,6 @@
 class SoftwareUpdateTask {
   #octofarmUpdateService;
+
   constructor({ octofarmUpdateService }) {
     this.#octofarmUpdateService = octofarmUpdateService;
   }

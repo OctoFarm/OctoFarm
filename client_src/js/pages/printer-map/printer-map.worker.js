@@ -1,4 +1,4 @@
-import currentOperations from "../lib/modules/currentOperations";
+import currentOperations from "../../lib/modules/currentOperations";
 import { setPrinterMapState } from "./printer-map.state";
 import { init } from "./printer-map.updater";
 

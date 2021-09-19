@@ -70,6 +70,16 @@ body:
   validations:
     required: true
 - type: textarea
+  id: stack-trace
+  attributes:
+    label: Stack trace from application
+    description: "Please enter any stack trace message if available"
+    value: |
+      ...
+    render: markdown
+  validations:
+    required: false
+- type: textarea
   id: repro-steps
   attributes:
     label: Steps taken to reproduce

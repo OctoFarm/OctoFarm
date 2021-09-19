@@ -7,6 +7,9 @@ import { PrinterApiErrors } from "../exceptions/printer-api.exceptions";
 import { ClientErrors } from "../exceptions/client.exceptions";
 import { validateServerResponse, validatePath } from "../utils/validators/api.validator";
 import AmIAliveService from "./amialive.service";
+import { TIMEOUTS } from "../constants/timer.constants";
+
+const CancelToken = axios.CancelToken;
 
 function octofarmErrorResponseCheck(response) {
   switch (response.status) {
@@ -75,6 +78,15 @@ function printerClientErrorResponseCheck(response) {
 // axios request interceptor
 axios.interceptors.request.use(
   function (config) {
+    // Cancel all calls going forward if server offline and route is not am I alive
+    if (!AmIAliveService.getStatus() && config.url !== AxiosService.serverAliveRoute)
+      return {
+        ...config,
+        cancelToken: new CancelToken((cancel) =>
+          cancel("Server offline, cancelling repeated requests")
+        )
+      };
+
     // Validate the config has a url
     if (!validatePath(config.url)) {
       const overrides = {
@@ -110,19 +122,17 @@ axios.interceptors.response.use(
   function (error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
-
-    // All octofarm call URL's won't include HTTP/HTTPS, check for those here and deal with the response correctly.
-    if (error.config.url.includes("http")) {
-      // These responses will be the printer client.
-      printerClientErrorResponseCheck(error.response);
+    // console.log("ERROR", error);
+    // Anything else will be OctoFarm server/client communications.
+    if (error?.response?.status) {
+      // Calls here will be OctoFarm issues
+      octofarmErrorResponseCheck(error.response);
     } else {
-      // Anything else will be OctoFarm server/client communications.
-      if (error?.response?.status) {
-        // Calls here will be OctoFarm issues
-        octofarmErrorResponseCheck(error.response);
-      } else {
+      // Silence the SERVER_ALIVE_CHECK_FAILED error
+      if (AmIAliveService.getStatus()) {
         // This captures the failure from the am I alive check.
         AmIAliveService.setStatus(false);
+        AmIAliveService.showModal();
         throw new ServerError(HTTPError.SERVER_ALIVE_CHECK_FAILED);
       }
     }
@@ -133,7 +143,7 @@ export default class AxiosService {
   static serverAliveRoute = "/api/amialive";
   // Tried this check inside of the Octofarm Client Service but the errors didn't capture in a decent order causing typing errors
   static serverAliveCheck() {
-    return axios.get(this.serverAliveRoute).then((res) => {
+    return axios.get(this.serverAliveRoute, { timeout: TIMEOUTS.AXIOS }).then((res) => {
       // This comes back undefined during the bubbling up to check the error so just making sure to not raise extra errors
       if (res) {
         AmIAliveService.setStatus(true); // Service is alive
@@ -143,27 +153,22 @@ export default class AxiosService {
     });
   }
   static get(path, options) {
-    if (!AmIAliveService.getStatus()) return;
     return axios.get(path, options);
   }
 
   static post(path, data, options) {
-    if (!AmIAliveService.getStatus()) return;
     return axios.post(path, data, options);
   }
 
   static delete(path, options) {
-    if (!AmIAliveService.getStatus()) return;
     return axios.delete(path, options);
   }
 
   static put(path, data, options) {
-    if (!AmIAliveService.getStatus()) return;
     return axios.put(path, data, options);
   }
 
   static patch(path, data, options) {
-    if (!AmIAliveService.getStatus()) return;
     return axios.patch(path, data, options);
   }
 }

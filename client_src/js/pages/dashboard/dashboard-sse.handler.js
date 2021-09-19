@@ -1,6 +1,6 @@
 import { DashUpdate } from "./dashboard.updater";
-import UI from "../lib/functions/ui";
-import currentOperations from "../lib/modules/currentOperations";
+import UI from "../../lib/functions/ui";
+import currentOperations from "../../lib/modules/currentOperations";
 
 export const workerURL = "/dashboard/sse/";
 

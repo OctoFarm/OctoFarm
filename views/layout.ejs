@@ -1,4 +1,7 @@
-<% const octofarmErrorModal = './partials/octofarm-error.modal.ejs'  %>
+<% const base = './partials' %>
+<% const system = base + '/Navigation' %>
+<% const userDropDown = system + '/userDropDown.ejs' %>
+<% const octofarmErrorModal = base + '/octofarm-error.modal.ejs'  %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -28,6 +31,10 @@
     <script src="/assets/dist/bootstrap.min.js"></script>
     <script src="/assets/dist/vendor.min.js"></script>
     <script src="/assets/dist/amialive.runner.min.js"></script>
+    <!-- Requires been logged in to utilise this file...-->
+    <% if(typeof name !== 'undefined'){ %>
+        <script src="/assets/dist/update-checker.runner.min.js"></script>
+    <% } %>
 </head>
 
 <body>
@@ -123,8 +130,8 @@
             </li>
         </ul>
         <ul class="nav navbar-nav navbar-right">
-            <li id="menuPrinters">
-                <% if(process.env.npm_package_version && process.env.npm_package_version.includes("dev")){ %>
+            <li id="octofarm-version">
+                <% if(process.env?.npm_package_version.includes("rc")){ %>
                     <a title="Printer Setup" class="nav-link text-center notyet">
                         <i class="fas fa-code-branch"></i> <%= process.env.npm_package_version %>
                     </a>
@@ -154,6 +161,8 @@
                     <i class="fas fa-cogs"></i> System
                 </a>
             </li>
+
+            <%- include(userDropDown) %>
         </ul>
     </div>
 </nav>

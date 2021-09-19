@@ -3,58 +3,59 @@ import {
   githubIssueBaseURL,
   githubIssueFormId,
   errorGithubIssueLabelMap,
-  doNotDeleteMessageStart,
-  doNotDeleteMessageEnd,
   githubSignUpURL
 } from "../constants/github-issue.constants";
-import AxiosClient from "../services/axios.service";
+import AmIAliveService from "../services/amialive.service";
+import OctoFarmClient from "../services/octofarm-client.service";
 
 async function returnGithubIssueLink(options) {
   let encodedURIString = githubIssueBaseURL;
 
   encodedURIString += options?.message
-    ? `${githubIssueFormId["TITLE"]}${encodeURIComponent(options.message)}`
+    ? `${githubIssueFormId.TITLE}${encodeURIComponent(options.message)}`
     : "";
 
   if (options?.serverResponse) {
     encodedURIString += options?.stack
-      ? `${githubIssueFormId["DESCRIPTION"]}${encodeURIComponent(
-          doNotDeleteMessageStart +
-            options.stack +
-            options.serverResponse.stack +
-            doNotDeleteMessageEnd
+      ? `${githubIssueFormId.STACK_TRACE}${encodeURIComponent(
+          options.stack + options.serverResponse.stack
         )}`
       : "";
   } else {
     encodedURIString += options?.stack
-      ? `${githubIssueFormId["DESCRIPTION"]}${encodeURIComponent(
-          doNotDeleteMessageStart + options.stack + doNotDeleteMessageEnd
-        )}`
+      ? `${githubIssueFormId.STACK_TRACE}${encodeURIComponent(options.stack)}`
       : "";
   }
 
   encodedURIString += options?.type
-    ? `${githubIssueFormId["ERROR_TYPE"]}${camelCase(options.type)}`
+    ? `${githubIssueFormId.ERROR_TYPE}${camelCase(options.type)}`
     : "";
 
-  encodedURIString += `${githubIssueFormId["LABELS"]}${errorGithubIssueLabelMap[options.type]}`;
+  encodedURIString += `${githubIssueFormId.LABELS}${errorGithubIssueLabelMap[options.type]}`;
 
   // TODO create proper endpoint for this that's authenticated. Also switch over all of below...
-  const octofarmData = await AxiosClient.serverAliveCheck();
-  console.log(octofarmData);
+  let octofarmData;
+  if (AmIAliveService.getStatus()) {
+    octofarmData = await OctoFarmClient.getGithubIssueInformation();
+  }
+
   if (octofarmData) {
-    encodedURIString += octofarmData.isPm2 ? `${githubIssueFormId["SERVER_PROCESS"]}pm2` : "";
+    encodedURIString += octofarmData.isPm2 ? `${githubIssueFormId.SERVER_PROCESS}pm2` : "";
 
     encodedURIString += octofarmData.update.air_gapped
-      ? `${githubIssueFormId["AIR_GAPPED"]}Yes`
-      : `${githubIssueFormId["AIR_GAPPED"]}No`;
+      ? `${githubIssueFormId.AIR_GAPPED}Yes`
+      : `${githubIssueFormId.AIR_GAPPED}No`;
 
     encodedURIString += octofarmData.update.current_version
-      ? `${githubIssueFormId["OCTOFARM_VERSION"]}${octofarmData.update.current_version}`
+      ? `${githubIssueFormId.OCTOFARM_VERSION}${octofarmData.update.current_version}`
+      : "";
+
+    encodedURIString += octofarmData?.printerVersions
+      ? `${githubIssueFormId.OCTOPRINT_VERSIONS}${octofarmData.printerVersions}`
       : "";
 
     encodedURIString += octofarmData?.os
-      ? `${githubIssueFormId["OPERATING_SYSTEM"]}${octofarmData?.os}`
+      ? `${githubIssueFormId.OPERATING_SYSTEM}${octofarmData.os}`
       : "";
   }
 

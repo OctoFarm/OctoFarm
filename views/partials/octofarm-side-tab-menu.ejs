@@ -1,13 +1,5 @@
 <div class="<%= list.menuClass %>">
     <div class="list-group" id="list-tab" role="tablist">
-        <button type="button" class="btn btn-secondary list-group-item" disabled>
-            <i class="far fa-user"></i><br>
-            <%= name; %><br>
-            <%= userGroup; %>
-        </button>
-        <button type="button" class="btn btn-success mb-3" href="/users/logout">
-            <i class="fas fa-sign-out-alt"></i>Sign Out
-        </button><br>
         <% list.listItems.forEach((item, index) => {  %>
             <% if(item.permissionGroup === "" || item.permissionGroup === userGroup){ %>
             <a

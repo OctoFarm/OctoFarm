@@ -2,10 +2,10 @@ import {
   dragAndDropEnable,
   dragAndDropEnableMultiplePrinters,
   dragCheck
-} from "../lib/functions/dragAndDrop.js";
-import PrinterManager from "../lib/modules/printerManager.js";
-import UI from "../lib/functions/ui.js";
-import OctoPrintClient from "../services/octoprint-client.service";
+} from "../../lib/functions/dragAndDrop.js";
+import PrinterManager from "../../lib/modules/printerManager.js";
+import UI from "../../lib/functions/ui.js";
+import OctoPrintClient from "../../services/octoprint-client.service";
 import {
   groupWidth,
   mapRealLimits,

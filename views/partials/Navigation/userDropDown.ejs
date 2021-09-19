@@ -1,0 +1,19 @@
+<% if(typeof name !== 'undefined' && name !== 'No User'){ %>
+    <li class="nav-item">
+        <a class="nav-link dropdown-toggle text-center" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <i class="fas fa-user"></i> <%= name %>
+            <% if(typeof notifications !== 'undefined') {%>
+            <span class="position-absolute  badge rounded-pill bg-warning text-dark">
+                    1
+            </span>
+            <% } %>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right text-center" aria-labelledby="navbarDropdownMenuLink">
+                <p>
+                    <%= userGroup %>
+                </p>
+            <div class="dropdown-divider"></div>
+            <a class="dropdown-item" href="#">Log Out</a>
+        </div>
+    </li>
+<% } %>
