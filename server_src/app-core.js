@@ -120,7 +120,7 @@ async function serveOctoFarmNormally(app, container, quick_boot = false) {
     const heatMapCache = container.resolve(DITokens.heatMapCache);
     await heatMapCache.initHeatMap();
 
-    // const api = container.resolve(DITokens.octoPrintApiClientService);
+    // const api = container.resolve(DITokens.octoPrintApiService);
     // await api
     //   .downloadFile(
     //     {

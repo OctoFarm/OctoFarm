@@ -1,12 +1,12 @@
 class PrinterFilesTask {
   #printersStore;
   #settingsStore;
-  #octoPrintClient;
+  #octoPrintApiService;
 
-  constructor({ printersStore, settingsStore, octoPrintApiClientService }) {
+  constructor({ printersStore, settingsStore, octoPrintApiService }) {
     this.#printersStore = printersStore;
     this.#settingsStore = settingsStore;
-    this.#octoPrintClient = octoPrintApiClientService;
+    this.#octoPrintApiService = octoPrintApiService;
   }
 
   /**

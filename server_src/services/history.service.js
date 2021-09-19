@@ -35,18 +35,18 @@ function ensureBaseFolderExists() {
 }
 
 class HistoryService {
-  #octoPrintClient;
+  #octoPrintApiService;
   #filamentManagerPluginService;
   #influxDbHistoryService;
   #settingsStore;
 
   constructor({
-    octoPrintApiClientService,
+    octoPrintApiService,
     influxDbHistoryService,
     filamentManagerPluginService,
     settingsStore
   }) {
-    this.#octoPrintClient = octoPrintApiClientService;
+    this.#octoPrintApiService = octoPrintApiService;
     // TODO Better to decouple Influx using EventEmitter2
     this.#influxDbHistoryService = influxDbHistoryService;
     this.#filamentManagerPluginService = filamentManagerPluginService;
@@ -68,7 +68,7 @@ class HistoryService {
 
     const printerConnectionParams = printer.getLoginDetails();
 
-    await this.#octoPrintClient.downloadImage(
+    await this.#octoPrintApiService.downloadImage(
       printerConnectionParams,
       thumbnailPath,
       octoFarmTargetFilePath,
@@ -135,13 +135,11 @@ class HistoryService {
   // TODO this function is so vague. Needs a complete redo and move out of history...
   // TODO I broke it completely so we have to start again
   async timelapseCheck(printer, historyId, fileName, printTime) {
-    logger.info("Checking for timelapse...", fileName);
+    logger.info("Acquiring timelapse", fileName);
 
-    let timelapseResponse = await this.#octoPrintClient
-      .listUnrenderedTimeLapses(printer.getLoginDetails())
-      .then((r) => r.json());
-
-    logger.info("Successfully grabbed timelapse list... Checking for:", fileName);
+    let timelapseResponse = await this.#octoPrintApiService.listUnrenderedTimeLapses(
+      printer.getLoginDetails()
+    );
 
     let unrenderedFileName = null;
     if (timelapseResponse.unrendered.length === 0) {
@@ -214,7 +212,7 @@ class HistoryService {
     const filePath = `${PATHS.timelapses}/${historyId}-${fileName}`;
     const printerConnectionParams = printer.getLoginDetails();
 
-    await this.#octoPrintClient.downloadFile(
+    await this.#octoPrintApiService.downloadFile(
       printerConnectionParams,
       fileName,
       filePath,
@@ -223,7 +221,7 @@ class HistoryService {
 
         const historySetting = this.#settingsStore.getHistorySetting();
         if (historySetting?.timelapse?.deleteAfter) {
-          await this.#octoPrintClient.deleteTimeLapse(printerConnectionParams, fileName);
+          await this.#octoPrintApiService.deleteTimeLapse(printerConnectionParams, fileName);
           logger.info("Purged " + fileName + " timelapse from OctoPrint after it was saved.");
         }
       }

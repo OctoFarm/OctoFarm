@@ -11,12 +11,12 @@ const server = {
   loginRequired: true
 };
 
-const timeout = {
+const getDefaultTimeout = () => ({
   apiTimeout: 1000,
   apiRetryCutoff: 10000,
   apiRetry: 30000,
   webSocketRetry: 5000
-};
+});
 
 // TODO rename to filamentManagerEnabled
 const filamentManager = false;
@@ -60,7 +60,7 @@ const influxExport = {
 const getDefaultSettings = () => ({
   onlinePolling,
   server,
-  timeout,
+  timeout: getDefaultTimeout(),
   filamentManager,
   history,
   influxExport
@@ -72,7 +72,7 @@ module.exports = {
   history,
   filamentManager,
   server,
-  timeout,
+  getDefaultTimeout,
   onlinePolling,
   getDefaultSettings
 };

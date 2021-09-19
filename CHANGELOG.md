@@ -30,8 +30,10 @@ All notable changes to this project will be documented in this file.
     - Cleaned up printer API
     - Cleaned up alerts and scripts API 
     - Cleaned up room data API
+    - Refactored WebSocket Task, OctoPrint API (axios) and PrinterState dependencies to be more explicit about connection errors
 
 ### Removed
+    - Removed possibilty for OctoPrint API to retry by itself. This is now done on scheduling level to with printer state management. 
 
 ### Fixed
     - Fixed #665: If Global API check fails due to intial time out, never recovered and tried again increasing timeout.

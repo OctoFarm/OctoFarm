@@ -1,10 +1,12 @@
 const DITokens = {
+  httpClient: "httpClient",
   printerService: "printerService",
   printerGroupService: "printerGroupService",
   farmStatisticsService: "farmStatisticsService",
   serverSettingsService: "serverSettingsService",
   octofarmUpdateService: "octofarmUpdateService",
-  octoPrintApiClientService: "octoPrintApiClientService",
+  githubApiService: "githubApiService",
+  octoPrintApiService: "octoPrintApiService",
   filamentManagerPluginService: "filamentManagerPluginService",
   influxDbSetupService: "influxDbSetupService",
   influxDbFilamentService: "influxDbFilamentService",

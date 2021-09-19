@@ -14,11 +14,11 @@ class OctofarmUpdateService {
 
   // Resolved
   #serverVersion;
-  #githubClientService;
+  #githubApiService;
 
-  constructor({ serverVersion, githubClientService }) {
+  constructor({ serverVersion, githubApiService }) {
     this.#serverVersion = serverVersion;
-    this.#githubClientService = githubClientService;
+    this.#githubApiService = githubApiService;
   }
 
   static findGithubRelease(releases, prerelease = false, tag_name = null) {
@@ -36,7 +36,7 @@ class OctofarmUpdateService {
    * @returns {Promise<*|null>}
    */
   async syncLatestOctoFarmRelease(includePre = false) {
-    await this.#githubClientService
+    await this.#githubApiService
       .getGithubReleasesPromise()
       .then((githubReleases) => {
         this.#airGapped = !githubReleases;

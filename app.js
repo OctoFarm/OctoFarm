@@ -63,9 +63,6 @@ if (!!majorVersion && majorVersion < 14) {
       app.listen(port, "0.0.0.0", () => {
         logger.info(`Server started... open it at http://127.0.0.1:${port}`);
       });
-
-      const autoDiscoveryService = container.resolve(DITokens.autoDiscoveryService);
-      return autoDiscoveryService.searchForDevicesOnNetwork();
     })
     .catch(async (err) => {
       logger.error(err.stack);

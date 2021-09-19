@@ -1,4 +1,5 @@
 const awilix = require("awilix");
+const axios = require("axios");
 const DITokens = require("./container.tokens");
 const PrinterService = require("./services/printer.service");
 const PrinterGroupService = require("./services/printer-group.service");
@@ -14,7 +15,7 @@ const SystemInfoStore = require("./state/system-info.store");
 const SystemCommandsService = require("./services/system-commands.service");
 const ServerLogsService = require("./services/server-logs.service");
 const SystemInfoBundleService = require("./services/system-info-bundle.service");
-const GithubClientService = require("./services/github-client.service");
+const GithubApiService = require("./services/github-api.service");
 const HistoryService = require("./services/history.service");
 const FarmStatisticsService = require("./services/farm-statistics.service");
 const FileCache = require("./state/data/file.cache");
@@ -31,7 +32,7 @@ const SortingFilteringCache = require("./state/data/sorting-filtering.cache");
 const DashboardSseTask = require("./tasks/dashboard-sse.task");
 const CurrentOperationsCache = require("./state/data/current-operations.cache");
 const PrinterSystemTask = require("./tasks/printer-system.task");
-const OctoPrintApiClientService = require("./services/octoprint/octoprint-api-client.service");
+const OctoPrintApiService = require("./services/octoprint/octoprint-api.service");
 const FilamentManagerPluginService = require("./services/octoprint/filament-manager-plugin.service");
 const FilamentCache = require("./state/data/filament.cache");
 const PrinterState = require("./state/printer.state");
@@ -99,16 +100,17 @@ function configureContainer() {
     eventEmitter2: awilix.asFunction(configureEventEmitter).singleton(),
     [DITokens.octofarmUpdateService]: awilix.asClass(OctofarmUpdateService).singleton(),
     [DITokens.systemInfoStore]: awilix.asClass(SystemInfoStore).singleton(),
-    githubClientService: awilix.asClass(GithubClientService),
+    [DITokens.githubApiService]: awilix.asClass(GithubApiService),
     [DITokens.autoDiscoveryService]: awilix.asClass(AutoDiscoveryService),
     [DITokens.systemCommandsService]: awilix.asClass(SystemCommandsService),
     serverLogsService: awilix.asClass(ServerLogsService),
     systemInfoBundleService: awilix.asClass(SystemInfoBundleService),
+    [DITokens.httpClient]: awilix.asValue(axios),
 
     [DITokens.printerService]: awilix.asClass(PrinterService),
     [DITokens.printerFilesService]: awilix.asClass(PrinterFilesService),
     [DITokens.printerGroupService]: awilix.asClass(PrinterGroupService),
-    [DITokens.octoPrintApiClientService]: awilix.asClass(OctoPrintApiClientService).singleton(),
+    [DITokens.octoPrintApiService]: awilix.asClass(OctoPrintApiService).singleton(),
     [DITokens.filamentManagerPluginService]: awilix.asClass(FilamentManagerPluginService),
     [DITokens.historyService]: awilix.asClass(HistoryService),
     [DITokens.farmStatisticsService]: awilix.asClass(FarmStatisticsService),

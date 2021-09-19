@@ -20,6 +20,7 @@ jobs:
       - run: npm run webpack:prod
         working-directory: ./client_src
       - uses: JS-DevTools/npm-publish@v1
+        if: ${{ github.repository.name == 'OctoFarm' }}
         with:
           dry-run: ${{ github.event_name == 'pull_request' }}
           token: ${{ secrets.NPM_TOKEN }}

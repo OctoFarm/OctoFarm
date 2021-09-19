@@ -4,13 +4,13 @@ const Profile = require("../../models/Profiles.js");
 
 class FilamentManagerPluginService {
   #printersStore;
-  #octoPrintClient;
+  #octoPrintApiService;
 
   #logger = new Logger("OctoFarm-FilamentManager");
 
-  constructor({ printersStore, octoPrintApiClientService }) {
+  constructor({ printersStore, octoPrintApiService }) {
     this.#printersStore = printersStore;
-    this.#octoPrintClient = octoPrintApiClientService;
+    this.#octoPrintApiService = octoPrintApiService;
   }
 
   async updatePrinterSelectedFilament(printer) {
@@ -21,7 +21,7 @@ class FilamentManagerPluginService {
         if (!filamentID) {
           throw `Could not query OctoPrint FilamentManager for filament. FilamentID '${filamentID}' not found.`;
         }
-        const response = await this.#octoPrintClient.getPluginFilamentManagerFilament(
+        const response = await this.#octoPrintApiService.getPluginFilamentManagerFilament(
           printer.getLoginDetails(),
           filamentID
         );
@@ -80,8 +80,8 @@ class FilamentManagerPluginService {
       return "error";
     }
 
-    const spools = await this.#octoPrintClient.listPluginFilamentManagerFilament(printer);
-    const profiles = await this.#octoPrintClient.listPluginFilamentManagerProfiles(printer);
+    const spools = await this.#octoPrintApiService.listPluginFilamentManagerFilament(printer);
+    const profiles = await this.#octoPrintApiService.listPluginFilamentManagerProfiles(printer);
 
     // Make sure filament manager responds...
     // TODO this will not be reached in case of errors due to .json() now failing
