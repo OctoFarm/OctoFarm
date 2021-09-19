@@ -17,7 +17,7 @@ jobs:
         working-directory: ./client_src
       - run: npm test
         working-directory: ./client_src
-      - run: npm run webpack:prod
+      - run: npm run prod
         working-directory: ./client_src
       - uses: JS-DevTools/npm-publish@v1
         if: ${{ github.repository.name == 'OctoFarm' }}
