@@ -1,4 +1,5 @@
 let majorVersion = null;
+
 try {
   majorVersion = parseInt(process.version.replace("v", "").split(".")[0]);
 } catch (e) {
@@ -28,6 +29,7 @@ if (!!majorVersion && majorVersion < 14) {
   const {
     setupExpressServer,
     serveOctoFarmNormally,
+    checkSystemSetupState,
     ensureSystemSettingsInitiated
   } = require("./server_src/app-core");
 
@@ -49,6 +51,12 @@ if (!!majorVersion && majorVersion < 14) {
     })
     .then(async (mg) => {
       await runMigrations(mg.connection.db, mg.connection.getClient());
+    })
+    .then(async () => {
+      let systemSetup = await checkSystemSetupState(container);
+      console.log(systemSetup);
+    })
+    .then(async () => {
       await ensureSystemSettingsInitiated(container);
     })
     .then(async () => {
@@ -65,8 +73,20 @@ if (!!majorVersion && majorVersion < 14) {
       });
     })
     .catch(async (err) => {
-      logger.error(err.stack);
-      const { serveDatabaseIssueFallback } = require("./server_src/app-fallbacks");
-      serveDatabaseIssueFallback(octoFarmServer, fetchOctoFarmPort());
+      const { SERVER_ISSUES } = require("./server_src/constants/server-message.constants");
+      logger.error(err);
+      const {
+        serverInitialSetupFallback,
+        serveDatabaseIssueFallback
+      } = require("./server_src/app-fallbacks");
+      if (err.includes(SERVER_ISSUES.SYSTEM_NOT_SETUP)) {
+        serverInitialSetupFallback(octoFarmServer, fetchOctoFarmPort());
+      } else if (
+        err.includes(SERVER_ISSUES.DATABASE_AUTH_FAIL || SERVER_ISSUES.DATABASE_CONN_FAIL)
+      ) {
+        serveDatabaseIssueFallback(octoFarmServer, fetchOctoFarmPort());
+      } else {
+        console.log("YOU'VE FUCKED SOMETHING");
+      }
     });
 }

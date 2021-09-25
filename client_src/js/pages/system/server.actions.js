@@ -9,7 +9,7 @@ import {
 } from "../../services/filament-manager-plugin.service";
 import OctoPrintClient from "../../services/octoprint-client.service";
 import FileOperations from "../../lib/functions/file";
-import { settingsElements } from "./server.options";
+import { settingsElements } from "./system.constants";
 import { serverBootBoxOptions } from "./utils/bootbox.options";
 import { cpuChartOptions, memoryChartOptions } from "./utils/charts.options";
 

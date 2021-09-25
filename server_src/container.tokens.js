@@ -3,6 +3,7 @@ const DITokens = {
   printerService: "printerService",
   printerGroupService: "printerGroupService",
   farmStatisticsService: "farmStatisticsService",
+  systemSetupService: "systemSetupService",
   serverSettingsService: "serverSettingsService",
   octofarmUpdateService: "octofarmUpdateService",
   githubApiService: "githubApiService",
@@ -19,6 +20,7 @@ const DITokens = {
   autoDiscoveryService: "autoDiscoveryService",
   historyService: "historyService",
   // Stores/states
+  systemSetupStore: "systemSetupStore",
   settingsStore: "settingsStore",
   printersStore: "printersStore",
   systemInfoStore: "systemInfoStore",

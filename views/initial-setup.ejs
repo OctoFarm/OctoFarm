@@ -1,0 +1,236 @@
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="btn-group d-flex" role="group" aria-label="...">
+                <button id="systemStatusChecks" type="button" class="btn btn-info w-100" disabled>1. System Status Checks <i class="fas fa-times-circle"></i></button>
+                <button id="systemCreateAdmin" type="button" class="btn btn-outline-warning w-100" disabled>2. Create Admin User <i class="fas fa-times-circle"></i></button>
+                <button id="systemCreateUsers" type="button" class="btn btn-outline-warning w-100" disabled>3. Create Additional Users <i class="fas fa-times-circle"></i></button>
+                <button id="systemCustomise" type="button" class="btn btn-outline-warning w-100" disabled>4. Customise OctoFarm <i class="fas fa-times-circle"></i></button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-8 col-lg-8 m-auto">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-12">
+                        <%- include('./partials/messages') %>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-6 text-center">
+                        <img class="mt-2" width="75%" src="images/logo.png" />
+                        <h2 class="text-center mb-3">
+                            Let's get OctoFarm setup!
+                        </h2>
+                    </div>
+                    <div class="col-6" id="setupWindow">
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<% console.log(SETUP_STAGES) %>
+<% console.log(currentStage) %>
+
+<script>
+    const ELEMENTS = {
+        SETUP_WINDOW: document.getElementById("setupWindow"),
+        SYSTEM_CHECKS_STATE: document.getElementById("systemStatusChecks"),
+        CREATE_ADMIN_STATE: document.getElementById("systemCreateAdmin"),
+        CREATE_USERS_STATE: document.getElementById("systemCreateUsers"),
+        CUSTOMISE_STATE: document.getElementById("systemCustomise")
+    }
+
+    // If we're at this stage in the apps lifecycle we can assum database and minimum nodejs have passed...
+    const MESSAGES = {
+        SYSTEM_SUCCESS: '<h5 class="text-success">Congratulations your system health is great! Please press the "Setup Admin User" button below to setup the rest of OctoFarm. </h5>',
+        SYSTEM_FAIL: '<h5 class="text-danger">OctoFarm did not detect the pm2 process manager! It is not recommended to continue without this setup.</h5><br>' +
+            '<h5 class="text-warning">You may continue but some system commands OctoFarm uses may not work... e.g. Restarting, Updating</h5><br>' +
+            '<h5 class="text-info">For more information on how to set this up please visit <a href="https://docs.octofarm.net/installation/setup-service.html">OctoFarms Service Setup</a></h5>',
+        PM2: "PM2 Process manager: ",
+        NODEJS: 'Minimum NodeJS Version: <span class="text-success"><i class="fas fa-check-circle"></i></span>',
+        DATABASE: 'Database Connection: <span class="text-success"><i class="fas fa-check-circle"></i></span>'
+    }
+
+    function advanceStage(currentState, nextStage){
+        currentState.innerHTML = currentState.innerHTML.replace('<i class="fas fa-times-circle"></i>', '<i class="fas fa-check-circle"></i>')
+        currentState.className = "btn btn-success w-100"
+        nextStage.className = "btn btn-info w-100"
+    }
+
+    function returnStatusChecksTemplate(){
+        return `
+            <div class="card-subtitle text-center">
+                <h6>${MESSAGES.NODEJS}</h6>
+                <h6>${MESSAGES.DATABASE}</h6>
+                <h6>${(<%= isPm2 %>) ? '<span class="text-success"><i class="fas fa-check-circle"></i></span>' : MESSAGES.PM2 + '<span class="text-danger"><i class="fas fa-times-circle"></i></span>'} </h6>
+            </div>
+            <div class="card-subtitle text-center mt-5">
+            ${(<%= isPm2 %>) ? MESSAGES.SYSTEM_SUCCESS : MESSAGES.SYSTEM_FAIL}
+            </div>
+            <div class="card-subtitle text-center mt-5">
+                <button onclick="setupAdminUser()" type="button" class="btn btn-success">Setup Admin User</button>
+            </div>
+        `
+    }
+
+
+
+    // Initialise the page
+    <% if(!currentStage){ %>
+        ELEMENTS.SETUP_WINDOW.innerHTML = returnStatusChecksTemplate();
+    <% }else if (currentStage ===  SETUP_STAGES.IS_ADMIN_CREATED){ %>
+        advanceStage(ELEMENTS.SYSTEM_CHECKS_STATE, ELEMENTS.CREATE_ADMIN_STATE)
+        ELEMENTS.SETUP_WINDOW.innerHTML = returnSetupAdminUserTemplate()
+    <% }else if (currentStage === SETUP_STAGES.IS_ADDITIONAL_USERS_DONE){ %>
+        advanceStage(ELEMENTS.SYSTEM_CHECKS_STATE, ELEMENTS.CREATE_ADMIN_STATE)
+        advanceStage(ELEMENTS.CREATE_ADMIN_STATE, ELEMENTS.CREATE_USERS_STATE)
+        ELEMENTS.SETUP_WINDOW.innerHTML = returnUserSetupTemplate()
+    <% }else if (currentStage === SETUP_STAGES.IS_CUSTOMISATION_DONE){ %>
+        advanceStage(ELEMENTS.SYSTEM_CHECKS_STATE, ELEMENTS.CREATE_ADMIN_STATE)
+        advanceStage(ELEMENTS.CREATE_ADMIN_STATE, ELEMENTS.CREATE_USERS_STATE)
+        advanceStage(ELEMENTS.CREATE_USERS_STATE, ELEMENTS.CUSTOMISE_STATE)
+        // ELEMENTS.SETUP_WINDOW.innerHTML = returnUserSetupTemplate()
+    <% } %>
+
+
+    function returnSetupAdminUserTemplate(){
+        return `
+        <form action="users" method="POST">
+            <div class="form-group">
+              <label for="name">* Name</label>
+              <input type="name" id="name" name="name" class="form-control" placeholder="Enter Name"
+                value="<%= typeof name != 'undefined' ? name : '' %>" />
+            </div>
+            <div class="form-group">
+              <label for="username">* Username</label>
+              <input type="username" id="username" name="username" class="form-control" placeholder="Enter Username"
+                value="<%= typeof username != 'undefined' ? username : '' %>" />
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" name="email" class="form-control" placeholder="Enter Email Address"
+                value="<%= typeof email != 'undefined' ? email : '' %>" />
+            </div>
+            <div class="form-row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="password">* Password</label>
+                      <input type="password" id="password" name="password" class="form-control" placeholder="Create Password" autocomplete="new-password"
+                        value="<%= typeof password != 'undefined' ? password : '' %>" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="password2">* Confirm Password</label>
+                      <input type="password" id="password2" name="password2" class="form-control" placeholder="Confirm Password" autocomplete="new-password"
+                        value="<%= typeof password2 != 'undefined' ? password2 : '' %>" />
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-block">
+              Create Admin User
+            </button>
+        </form>
+        <small>* denotes a required field</small>
+        `
+    }
+    function returnUserSetupTemplate(){
+        return `
+        <form action="users" method="POST">
+            <div class="form-group">
+              <label for="name">* Name</label>
+              <input type="name" id="name" name="name" class="form-control" placeholder="Enter Name"
+                value="<%= typeof name != 'undefined' ? name : '' %>" />
+            </div>
+            <div class="form-group">
+              <label for="username">* Username</label>
+              <input type="username" id="username" name="username" class="form-control" placeholder="Enter Username"
+                value="<%= typeof username != 'undefined' ? username : '' %>" />
+            </div>
+            <div class="form-group">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" name="email" class="form-control" placeholder="Enter Email Address"
+                value="<%= typeof email != 'undefined' ? email : '' %>" />
+            </div>
+            <div class="form-row">
+                <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="password">* Password</label>
+                      <input type="password" id="password" name="password" class="form-control" placeholder="Create Password" autocomplete="new-password"
+                        value="<%= typeof password != 'undefined' ? password : '' %>" />
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="password2">* Confirm Password</label>
+                      <input type="password" id="password2" name="password2" class="form-control" placeholder="Confirm Password" autocomplete="new-password"
+                        value="<%= typeof password2 != 'undefined' ? password2 : '' %>" />
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-success btn-block">
+              USER
+            </button>
+        </form>
+        <small>* denotes a required field</small>
+        `
+    }
+
+    function checkForAdminUser(user_list){
+        return user_list.findIndex(e => e.group === 'Administrator')
+    }
+
+    function updateSystemState(systemState){
+        return fetch("/update-system-state", {
+            method: "PUT",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "key":systemState
+            })
+        }).then(res => res.json())
+            .catch(e => {
+                // TODO: Add some error notification here... tbf if connection to server failed the amIAliveCheck will trigger
+                console.error(e)
+            })
+    }
+
+    async function setupAdminUser() {
+        await updateSystemState("<%= SETUP_STAGES.IS_SYSTEM_CHECKS_OK %>")        // Check for administrator users...
+        let user_list = await fetch("/users", {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json"
+            }
+        })
+        .then(res => res.json())
+        .catch(e => {
+            // TODO: Add some error notification here... tbf if connection to server failed the amIAliveCheck will trigger
+            return e;
+        })
+        const admin_index = checkForAdminUser(user_list)
+        if (admin_index === -1) {
+            // No administrator, need to be created
+            advanceStage(ELEMENTS.SYSTEM_CHECKS_STATE, ELEMENTS.CREATE_ADMIN_STATE)
+            ELEMENTS.SETUP_WINDOW.innerHTML = returnSetupAdminUserTemplate()
+        }else{
+            advanceStage(ELEMENTS.SYSTEM_CHECKS_STATE, ELEMENTS.CREATE_ADMIN_STATE)
+            advanceStage(ELEMENTS.CREATE_ADMIN_STATE, ELEMENTS.CREATE_USERS_STATE)
+            ELEMENTS.SETUP_WINDOW.innerHTML = returnUserSetupTemplate()
+        }
+
+    }
+
+
+
+</script>

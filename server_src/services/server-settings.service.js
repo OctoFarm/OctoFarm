@@ -1,5 +1,6 @@
 const ServerSettingsDB = require("../models/ServerSettings.js");
 const Constants = require("../constants/server-settings.constants");
+const { SERVER_ISSUES } = require("../constants/server-message.constants");
 
 class ServerSettingsService {
   constructor({}) {}
@@ -7,9 +8,9 @@ class ServerSettingsService {
   async probeDatabase() {
     await ServerSettingsDB.find({}).catch((e) => {
       if (e.message.includes("command find requires authentication")) {
-        throw "Database authentication failed.";
+        throw SERVER_ISSUES.DATABASE_AUTH_FAIL;
       } else {
-        throw "Database connection failed.";
+        throw SERVER_ISSUES.DATABASE_CONN_FAIL;
       }
       throw "Got you there bitch!";
     });

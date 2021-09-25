@@ -32,7 +32,7 @@
     "pi",
     "node"
   ],
-  "author": "James Mackay (NotExpectedYet) & David Zwart (davidzwa)",
+  "author": "James Mackay (NotExpectedYet)",
   "license": "ISC",
   "dependencies": {
     "@octofarm/client": "^0.1.0-rc2-build6",
@@ -41,6 +41,7 @@
     "awilix-express": "^4.0.0",
     "axios": "^0.21.1",
     "bcryptjs": "^2.4.3",
+    "bs-stepper": "^1.7.0",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.5",
     "dotenv": "^9.0.1",

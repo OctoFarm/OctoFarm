@@ -1,11 +1,8 @@
 import AxiosService from "./axios.service";
+import { APP } from "../constants/api-routes.constants";
 
 export default class OctoFarmClient extends AxiosService {
   static base = "/api";
-  static serverRoute = "/server";
-  static systemInformationRoute = this.base + this.serverRoute + "/info";
-  static updateAvailableRoute = this.base + this.serverRoute + "/update-ready";
-  static githubIssueRoute = this.base + this.serverRoute + "/github-issue";
   static printerRoute = this.base + "/printer";
   static settingsRoute = this.base + "/settings";
   static logsRoute = `${this.settingsRoute}/logs`;
@@ -48,15 +45,23 @@ export default class OctoFarmClient extends AxiosService {
       // throw new ClientError(ClientErrors., unsetRequiredProps);
     }
   }
+  // APP CALLS
   static updateNotificationCheck() {
-    return this.get(this.updateAvailableRoute);
-  }
-  static getSystemInformation() {
-    return this.get(this.systemInformationRoute);
+    return this.get(APP.UPDATEREADY);
   }
   static getGithubIssueInformation() {
-    return this.get(this.githubIssueRoute);
+    return this.get(APP.GITHUBISSUE);
   }
+  // SYSTEM PAGE CALLS
+  static getSystemInformation() {
+    return this.get(APP.SYSTEMINFO);
+  }
+  //DASHBOARD CALLS
+  //PRINTER MANAGER CALLS
+  //FILE MANAGER CALLS
+  //HISTORY CALLS
+  //FILAMENT CALLS
+  //ALERTS CALLS
 
   static getPrinter(printerId) {
     if (!printerId) {
@@ -69,7 +74,7 @@ export default class OctoFarmClient extends AxiosService {
     return this.get(`${this.printerRoute}`);
   }
 
-  static async createPrinter(newPrinter) {
+  static createPrinter(newPrinter) {
     this.validateRequiredProps(newPrinter, [
       "apiKey",
       "printerURL"
@@ -78,46 +83,46 @@ export default class OctoFarmClient extends AxiosService {
     return this.post(`${this.printerRoute}/`, newPrinter);
   }
 
-  static async updatePrinterConnectionSettings(settings) {
+  static updatePrinterConnectionSettings(settings) {
     this.validateRequiredProps(settings.printer, ["apiKey", "printerURL", "webSocketURL"]);
 
     return this.patch(`${this.printerRoute}/${settings.printer.id}/connection`, settings);
   }
 
-  static async updateSortIndex(idList) {
+  static updateSortIndex(idList) {
     return this.patch(`${this.printerRoute}/sort-index`, { sortList: idList });
   }
 
-  static async setStepSize(printerId, stepSize) {
+  static setStepSize(printerId, stepSize) {
     return this.patch(`${this.printerRoute}/${printerId}/step-size`, { stepSize });
   }
 
-  static async setFlowRate(printerId, flowRate) {
+  static setFlowRate(printerId, flowRate) {
     return this.patch(`${this.printerRoute}/${printerId}/flow-rate`, { flowRate });
   }
 
-  static async setFeedRate(printerId, feedRate) {
+  static setFeedRate(printerId, feedRate) {
     return this.patch(`${this.printerRoute}/${printerId}/feed-rate`, { feedRate });
   }
 
-  static async deletePrinter(printerId) {
+  static deletePrinter(printerId) {
     return this.delete(`${this.printerRoute}/${printerId}`);
   }
 
-  static async resetPowerSettings(printerId) {
+  static resetPowerSettings(printerId) {
     return this.patch(`${this.printerRoute}/${printerId}/reset-power-settings`);
   }
 
-  static async reconnectOctoPrintCommand(printerId) {
+  static reconnectOctoPrintCommand(printerId) {
     return this.put(`${this.printerRoute}/${printerId}/reconnect`);
   }
 
-  static async reconnectFarmCommand() {
+  static reconnectFarmCommand() {
     throw "This command is not implemented as it is quite taxing...";
     // return this.postApi(`${this.printerRoute}/reconnectOctoPrint/`);
   }
 
-  static async refreshPrinterSettings(id) {
+  static refreshPrinterSettings(id) {
     return this.get(`${this.printerRoute}/${id ? id : ""}`);
   }
 
@@ -125,11 +130,11 @@ export default class OctoFarmClient extends AxiosService {
     return this.get(this.logsRoute);
   }
 
-  static async getPrinterConnectionLogs(printerId) {
+  static getPrinterConnectionLogs(printerId) {
     return this.get(`${this.printerRoute}/${printerId}/connection-logs`);
   }
 
-  static async getPrinterPluginList(printerId, all = false) {
+  static getPrinterPluginList(printerId, all = false) {
     if (!all) {
       return this.get(`${this.printerRoute}/${printerId}/plugins-list`);
     } else {
@@ -149,23 +154,23 @@ export default class OctoFarmClient extends AxiosService {
     window.open(`${OctoFarmClient.logsRoute}/${file}`);
   }
 
-  static async getHistory() {
+  static getHistory() {
     return this.get(this.historyRoute);
   }
 
-  static async deleteHistory(historyId) {
+  static deleteHistory(historyId) {
     return this.delete(`${this.historyRoute}/${historyId}`);
   }
 
-  static async updateHistory(historyId, data) {
+  static updateHistory(historyId, data) {
     return this.put(`${this.historyRoute}/${historyId}`, data);
   }
 
-  static async getHistoryStatistics() {
+  static getHistoryStatistics() {
     return this.get(this.historyStatsRoute);
   }
 
-  static async getServerSettings() {
+  static getServerSettings() {
     return this.get(this.serverSettingsRoute);
   }
 
@@ -173,7 +178,7 @@ export default class OctoFarmClient extends AxiosService {
     return this.put(this.serverSettingsRoute, settingsObject);
   }
 
-  static async getClientSettings() {
+  static getClientSettings() {
     return this.get(this.clientSettingsRoute);
   }
 
@@ -193,72 +198,72 @@ export default class OctoFarmClient extends AxiosService {
     return this.get(this.databaseRoute + `/${databaseName}`);
   }
 
-  static async restartServer() {
+  static restartServer() {
     return this.patch(this.serverRestartRoute);
   }
 
-  static async getCustomGCode() {
+  static getCustomGCode() {
     return this.get(this.customGCodeSettingsRoutes);
   }
 
-  static async getFilamentDropDownList() {
+  static getFilamentDropDownList() {
     return this.get(this.filamentDropdownListRoute);
   }
 
-  static async selectFilament(data) {
+  static selectFilament(data) {
     return this.patch(this.filamentSelectRoute, data);
   }
 
-  static async reSyncFilamentManager() {
+  static reSyncFilamentManager() {
     return this.put(this.filamentManagerReSyncRoute);
   }
 
-  static async syncFilamentManager(data) {
+  static syncFilamentManager(data) {
     return this.patch(this.filamentManagerSyncRoute, data);
   }
 
-  static async disableFilamentPlugin(data) {
+  static disableFilamentPlugin(data) {
     return this.put(this.filamentManagerDisableRoute, data);
   }
 
-  static async getFilamentSpools() {
+  static getFilamentSpools() {
     return this.get(this.filamentSpoolsRoute);
   }
 
-  static async listFilamentProfiles() {
+  static listFilamentProfiles() {
     return this.get(this.filamentProfilesRoute);
   }
 
-  static async updateClientFilter(filterString) {
+  static updateClientFilter(filterString) {
     return this.patch(`${this.clientFilterRoute}/${filterString}`);
   }
 
-  static async updateClientSorting(sortingString) {
+  static updateClientSorting(sortingString) {
     return this.patch(`${this.clientSortingRoute}/${sortingString}`);
   }
 
-  static async listAlerts() {
-    return await this.get(this.alertRoute);
+  static listAlerts() {
+    return this.get(this.alertRoute);
   }
 
-  static async createAlert(data) {
-    return await this.post(`${this.alertRoute}/`, data);
+  static createAlert(data) {
+    return this.post(`${this.alertRoute}/`, data);
   }
 
-  static async updateAlert(scriptId, data) {
-    return await this.put(`${this.alertRoute}/${scriptId}`, data);
+  static updateAlert(scriptId, data) {
+    return this.put(`${this.alertRoute}/${scriptId}`, data);
   }
 
-  static async deleteAlert(scriptId) {
-    return await this.delete(`${this.alertRoute}/${scriptId}`);
+  static deleteAlert(scriptId) {
+    return this.delete(`${this.alertRoute}/${scriptId}`);
   }
 
-  static async testAlertScript(data) {
+  static testAlertScript(data) {
     this.validateRequiredProps(data, ["scriptLocation", "message"]);
-    return await this.post(this.testAlertScriptRoute, data);
+    return this.post(this.testAlertScriptRoute, data);
   }
 
-  static async createRoomData(data) {
-    return await this.post(this.roomDataRoute, data);
+  static createRoomData(data) {
+    return this.post(this.roomDataRoute, data);
   }
 }

@@ -37,4 +37,4 @@ module.exports = createController(AppController)
   .prefix("/")
   .before([])
   //.get("wizard, "wizard")
-  .get("", "welcome");
+  .get("", "welcome")

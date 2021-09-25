@@ -11,7 +11,7 @@ const { status, up } = require("migrate-mongo");
 const logger = new Logger("OctoFarm-Environment", false);
 
 // Constants and definition
-const instructionsReferralURL = "https://github.com/OctoFarm/OctoFarm/blob/master/README.md"; // TODO replace with environment setup markdown
+const instructionsReferralURL = "https://github.com/OctoFarm/OctoFarm/blob/master/README.md";
 const deprecatedConfigFolder = "./config";
 const deprecatedConfigFilePath = deprecatedConfigFolder + "/db.js";
 const packageJsonPath = path.join(__dirname, "../package.json");

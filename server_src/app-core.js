@@ -63,6 +63,16 @@ function setupExpressServer() {
   };
 }
 
+async function checkSystemSetupState(container) {
+  logger.info("Checking system setup state...");
+
+  const systemSetupService = container.resolve(DITokens.systemSetupService);
+  await systemSetupService.probeDatabase();
+
+  const systemSetupStore = container.resolve(DITokens.systemSetupStore);
+  return await systemSetupStore.loadSystemSetupState();
+}
+
 async function ensureSystemSettingsInitiated(container) {
   logger.info("Loading Server Settings.");
 
@@ -155,6 +165,7 @@ const logger = new Logger("OctoFarm-Server");
 
 module.exports = {
   setupExpressServer,
+  checkSystemSetupState,
   ensureSystemSettingsInitiated,
   serveOctoFarmRoutes,
   serveOctoFarmNormally

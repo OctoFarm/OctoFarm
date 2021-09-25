@@ -21,7 +21,7 @@ class SettingsStore {
       ...this.#server._doc
     });
   }
-
+  // TODO: make sure to ignore as now done with User Service
   getClientSettings() {
     return Object.freeze({
       ...this.#client._doc

@@ -60,6 +60,29 @@ function fetchOctoFarmPort() {
   return port;
 }
 
+function serverInitialSetupFallbackRoutes(app) {
+  app.use(loadControllers(`${fallbacksRoutePath}/fallback-initial-setup.controller.js`, opts));
+  app.use(loadControllers(`${routePath}/amialive.controller.js`, opts));
+  app.get("*", function (req, res) {
+    res.redirect("/");
+  });
+  app.use(exceptionHandler);
+}
+
+function serverInitialSetupFallback(app, port) {
+  if (!port || Number.isNaN(parseInt(port))) {
+    throw new Error("The server database-issue mode requires a numeric port input argument");
+  }
+  let listenerHttpServer = app.listen(port, "0.0.0.0", () => {
+    const msg = `Please open our webpage at http://127.0.0.1:${port} and continue the server setup!`;
+    logger.info(msg);
+  });
+
+  serverInitialSetupFallbackRoutes(app);
+
+  return listenerHttpServer;
+}
+
 function serveNodeVersionFallback(app) {
   const port = fetchOctoFarmPort();
   let listenerHttpServer = app.listen(port, "0.0.0.0", () => {
@@ -104,5 +127,6 @@ module.exports = {
   serveDatabaseIssueFallback,
   serveNodeVersionFallback,
   setupFallbackExpressServer,
-  serveDatabaseIssueFallbackRoutes
+  serveDatabaseIssueFallbackRoutes,
+  serverInitialSetupFallback
 };

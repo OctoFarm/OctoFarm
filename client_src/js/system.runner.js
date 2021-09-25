@@ -5,7 +5,7 @@ import {
   localStorageKeys,
   serverActionsElements,
   serverDatabaseKeys
-} from "./pages/system/server.options";
+} from "./pages/system/system.constants";
 import {
   generateLogDumpFile,
   exportDatabases,

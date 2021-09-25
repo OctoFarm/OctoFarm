@@ -22,7 +22,8 @@ const serverActionsElements = {
 };
 
 const localStorageKeys = {
-  DASHBOARD_SETTINGS: "dashboardConfiguration"
+  DASHBOARD_SETTINGS: "dashboardConfiguration",
+  USER_SETTINGS: ""
 };
 
 // TODO clean up with a settings migration...

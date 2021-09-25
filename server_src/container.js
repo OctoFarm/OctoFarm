@@ -5,6 +5,8 @@ const PrinterService = require("./services/printer.service");
 const PrinterGroupService = require("./services/printer-group.service");
 const PrintersStore = require("./state/printers.store");
 const SettingsStore = require("./state/settings.store");
+const SystemSetupStore = require("./state/system-setup.store");
+const SystemSetupService = require("./services/system-setup.service");
 const ServerSettingsService = require("./services/server-settings.service");
 const ClientSettingsService = require("./services/client-settings.service");
 const OctofarmUpdateService = require("./services/octofarm-update.service");
@@ -91,6 +93,8 @@ function configureContainer() {
     // Other flavours are: .transient() (default, volatile instance) and .scoped() (conditionally volatile)
     // scoping is usually done for request API middleware to ensure f.e. that current user is set or group/tenant/roles/etc
     // Therefore scoping can influence how many requests per sec the API can handle... in case you're interested to know.
+    [DITokens.systemSetupStore]: awilix.asClass(SystemSetupStore).singleton(),
+    [DITokens.systemSetupService]: awilix.asClass(SystemSetupService),
     [DITokens.settingsStore]: awilix.asClass(SettingsStore).singleton(),
     [DITokens.serverSettingsService]: awilix.asClass(ServerSettingsService),
     clientSettingsService: awilix.asClass(ClientSettingsService),
