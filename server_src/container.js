@@ -106,7 +106,7 @@ function configureContainer() {
     [DITokens.systemInfoStore]: awilix.asClass(SystemInfoStore).singleton(),
     [DITokens.githubApiService]: awilix.asClass(GithubApiService),
     [DITokens.autoDiscoveryService]: awilix.asClass(AutoDiscoveryService),
-    [DITokens.systemCommandsService]: awilix.asClass(SystemCommandsService),
+    [DITokens.systemCommandsService]: awilix.asClass(SystemCommandsService).singleton(),
     serverLogsService: awilix.asClass(ServerLogsService),
     systemInfoBundleService: awilix.asClass(SystemInfoBundleService),
     [DITokens.httpClient]: awilix.asValue(axios),

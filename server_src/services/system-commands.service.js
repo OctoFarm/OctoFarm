@@ -18,6 +18,7 @@ class SystemCommandsService {
   constructor() {}
 
   async restartOctoFarm() {
+    console.log("RESTARTING OCTOFARM");
     let checkForNamedService = false;
 
     // If we're on pm2, then restart buddy!

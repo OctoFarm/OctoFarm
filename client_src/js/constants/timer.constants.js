@@ -5,7 +5,7 @@ const DAY_MS = HOUR_MS * 24;
 
 module.exports = {
   TIMERS: {
-    AMIALIVE: 2.5 * SECOND_MS,
+    AMIALIVE: SECOND_MS,
     AMIALIVE_MODAL: SECOND_MS,
     UPDATECHECK: 5 * MINUTE_MS
   },
