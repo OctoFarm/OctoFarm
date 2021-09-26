@@ -38,11 +38,9 @@ class SystemSetupService {
       [key]: value
     };
 
-    return SystemSetupDB.findByIdAndUpdate(this.#databaseID, updateObject)
-      .then((r) => console.log("RES", r))
-      .catch((e) => {
-        console.error("E", e);
-      });
+    return SystemSetupDB.findByIdAndUpdate(this.#databaseID, updateObject).catch((e) => {
+      console.error("E", e);
+    });
   }
 }
 

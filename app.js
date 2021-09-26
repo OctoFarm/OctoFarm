@@ -53,8 +53,7 @@ if (!!majorVersion && majorVersion < 14) {
       await runMigrations(mg.connection.db, mg.connection.getClient());
     })
     .then(async () => {
-      let systemSetup = await checkSystemSetupState(container);
-      console.log(systemSetup);
+      await checkSystemSetupState(container);
     })
     .then(async () => {
       await ensureSystemSettingsInitiated(container);

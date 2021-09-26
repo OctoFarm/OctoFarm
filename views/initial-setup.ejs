@@ -20,11 +20,11 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-6 text-center">
-                        <img class="mt-2" width="75%" src="images/logo.png" />
-                        <h2 class="text-center mb-3">
+                    <div class="col-6 text-center" id="sideWindow">
+                        <h2 class="text-center mb-3" id="titleText">
                             Let's get OctoFarm setup!
                         </h2>
+                        <img class="mt-2" width="75%" src="images/logo.png" />
                     </div>
                     <div class="col-6" id="setupWindow">
 
@@ -35,12 +35,11 @@
     </div>
 </div>
 
-<% console.log(SETUP_STAGES) %>
-<% console.log(currentStage) %>
-
 <script>
     const ELEMENTS = {
         SETUP_WINDOW: document.getElementById("setupWindow"),
+        SIDE_WINDOW: document.getElementById("sideWindow"),
+        TITLE_TEXT: document.getElementById("titleText"),
         SYSTEM_CHECKS_STATE: document.getElementById("systemStatusChecks"),
         CREATE_ADMIN_STATE: document.getElementById("systemCreateAdmin"),
         CREATE_USERS_STATE: document.getElementById("systemCreateUsers"),
@@ -55,13 +54,21 @@
             '<h5 class="text-info">For more information on how to set this up please visit <a href="https://docs.octofarm.net/installation/setup-service.html">OctoFarms Service Setup</a></h5>',
         PM2: "PM2 Process manager: ",
         NODEJS: 'Minimum NodeJS Version: <span class="text-success"><i class="fas fa-check-circle"></i></span>',
-        DATABASE: 'Database Connection: <span class="text-success"><i class="fas fa-check-circle"></i></span>'
+        DATABASE: 'Database Connection: <span class="text-success"><i class="fas fa-check-circle"></i></span>',
+        SETUP_TITLE: "Let's get OctoFarm setup!",
+        ADMIN_TITLE: "Create your first Administrator!",
+        USER_TITLE: "Create some additional Users!",
+        CUSTOMISE_TITLE: "Let's customise OctoFarm!",
+        RESTART_TITLE: "Setup Complete! OctoFarm will restart!"
     }
 
     function advanceStage(currentState, nextStage){
         currentState.innerHTML = currentState.innerHTML.replace('<i class="fas fa-times-circle"></i>', '<i class="fas fa-check-circle"></i>')
         currentState.className = "btn btn-success w-100"
-        nextStage.className = "btn btn-info w-100"
+        if (currentState.innerHTML !== nextStage.innerHTML){
+            nextStage.className = "btn btn-info w-100"
+        }
+
     }
 
     function returnStatusChecksTemplate(){
@@ -75,41 +82,72 @@
             ${(<%= isPm2 %>) ? MESSAGES.SYSTEM_SUCCESS : MESSAGES.SYSTEM_FAIL}
             </div>
             <div class="card-subtitle text-center mt-5">
-                <button onclick="setupAdminUser()" type="button" class="btn btn-success">Setup Admin User</button>
+                <button onclick="completeStatusChecksState()" type="button" class="btn btn-success">Setup Admin User</button>
             </div>
         `
     }
 
-
-
-    // Initialise the page
-    <% if(!currentStage){ %>
+    function drawStatusCheckStage() {
         ELEMENTS.SETUP_WINDOW.innerHTML = returnStatusChecksTemplate();
-    <% }else if (currentStage ===  SETUP_STAGES.IS_ADMIN_CREATED){ %>
+    }
+
+    function drawAdminUserStage() {
         advanceStage(ELEMENTS.SYSTEM_CHECKS_STATE, ELEMENTS.CREATE_ADMIN_STATE)
+        ELEMENTS.TITLE_TEXT.innerHTML = MESSAGES.ADMIN_TITLE
         ELEMENTS.SETUP_WINDOW.innerHTML = returnSetupAdminUserTemplate()
-    <% }else if (currentStage === SETUP_STAGES.IS_ADDITIONAL_USERS_DONE){ %>
+    }
+
+    function drawBasicUserState() {
         advanceStage(ELEMENTS.SYSTEM_CHECKS_STATE, ELEMENTS.CREATE_ADMIN_STATE)
         advanceStage(ELEMENTS.CREATE_ADMIN_STATE, ELEMENTS.CREATE_USERS_STATE)
+        ELEMENTS.TITLE_TEXT.innerHTML = MESSAGES.USER_TITLE
+        ELEMENTS.SIDE_WINDOW.innerHTML = returnUserTableTemplate()
         ELEMENTS.SETUP_WINDOW.innerHTML = returnUserSetupTemplate()
-    <% }else if (currentStage === SETUP_STAGES.IS_CUSTOMISATION_DONE){ %>
+    }
+
+    function drawCustomiseStage() {
         advanceStage(ELEMENTS.SYSTEM_CHECKS_STATE, ELEMENTS.CREATE_ADMIN_STATE)
         advanceStage(ELEMENTS.CREATE_ADMIN_STATE, ELEMENTS.CREATE_USERS_STATE)
         advanceStage(ELEMENTS.CREATE_USERS_STATE, ELEMENTS.CUSTOMISE_STATE)
-        // ELEMENTS.SETUP_WINDOW.innerHTML = returnUserSetupTemplate()
+        ELEMENTS.TITLE_TEXT.innerHTML = returnLogoTemplate()
+        ELEMENTS.TITLE_TEXT.innerHTML = MESSAGES.CUSTOMISE_TITLE
+         ELEMENTS.SETUP_WINDOW.innerHTML = returnCustomiseTemplate()
+    }
+
+    function drawRestartStage() {
+        advanceStage(ELEMENTS.SYSTEM_CHECKS_STATE, ELEMENTS.CREATE_ADMIN_STATE)
+        advanceStage(ELEMENTS.CREATE_ADMIN_STATE, ELEMENTS.CREATE_USERS_STATE)
+        advanceStage(ELEMENTS.CREATE_USERS_STATE, ELEMENTS.CUSTOMISE_STATE)
+        advanceStage(ELEMENTS.CUSTOMISE_STATE, ELEMENTS.CUSTOMISE_STATE)
+        ELEMENTS.TITLE_TEXT.innerHTML = returnLogoTemplate()
+        ELEMENTS.TITLE_TEXT.innerHTML = MESSAGES.CUSTOMISE_TITLE
+        ELEMENTS.SETUP_WINDOW.innerHTML = returnRestartMessage()
+    }
+    // Initialise the page
+    <% console.log(currentStage) %>
+    <% if(currentStage === SETUP_STAGES.IS_SYSTEM_CHECKS_OK){ %>
+        drawStatusCheckStage()
+    <% }else if (currentStage === SETUP_STAGES.IS_ADMIN_CREATED){ %>
+        drawAdminUserStage()
+    <% }else if (currentStage === SETUP_STAGES.IS_ADDITIONAL_USERS_DONE){ %>
+        drawBasicUserState();
+    <% }else if (currentStage === SETUP_STAGES.IS_CUSTOMISATION_DONE){ %>
+        drawCustomiseStage();
+    <% } else { %>
+        drawRestartStage();
     <% } %>
 
 
     function returnSetupAdminUserTemplate(){
         return `
-        <form action="users" method="POST">
+        <form action="users/admin" method="POST">
             <div class="form-group">
-              <label for="name">* Name</label>
+              <label for="name">Name* </label>
               <input type="name" id="name" name="name" class="form-control" placeholder="Enter Name"
                 value="<%= typeof name != 'undefined' ? name : '' %>" />
             </div>
             <div class="form-group">
-              <label for="username">* Username</label>
+              <label for="username">Username* </label>
               <input type="username" id="username" name="username" class="form-control" placeholder="Enter Username"
                 value="<%= typeof username != 'undefined' ? username : '' %>" />
             </div>
@@ -121,37 +159,37 @@
             <div class="form-row">
                 <div class="col-md-6">
                     <div class="form-group">
-                      <label for="password">* Password</label>
+                      <label for="password">Password*</label>
                       <input type="password" id="password" name="password" class="form-control" placeholder="Create Password" autocomplete="new-password"
                         value="<%= typeof password != 'undefined' ? password : '' %>" />
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                      <label for="password2">* Confirm Password</label>
+                      <label for="password2">Confirm Password* </label>
                       <input type="password" id="password2" name="password2" class="form-control" placeholder="Confirm Password" autocomplete="new-password"
                         value="<%= typeof password2 != 'undefined' ? password2 : '' %>" />
                     </div>
                 </div>
             </div>
-
+            <small>* denotes a required field</small>
             <button type="submit" class="btn btn-success btn-block">
               Create Admin User
             </button>
         </form>
-        <small>* denotes a required field</small>
         `
     }
+
     function returnUserSetupTemplate(){
         return `
-        <form action="users" method="POST">
+          <form action="users/basic" method="POST">
             <div class="form-group">
-              <label for="name">* Name</label>
+              <label for="name">Name* </label>
               <input type="name" id="name" name="name" class="form-control" placeholder="Enter Name"
                 value="<%= typeof name != 'undefined' ? name : '' %>" />
             </div>
             <div class="form-group">
-              <label for="username">* Username</label>
+              <label for="username">Username* </label>
               <input type="username" id="username" name="username" class="form-control" placeholder="Enter Username"
                 value="<%= typeof username != 'undefined' ? username : '' %>" />
             </div>
@@ -163,25 +201,63 @@
             <div class="form-row">
                 <div class="col-md-6">
                     <div class="form-group">
-                      <label for="password">* Password</label>
+                      <label for="password">Password* </label>
                       <input type="password" id="password" name="password" class="form-control" placeholder="Create Password" autocomplete="new-password"
                         value="<%= typeof password != 'undefined' ? password : '' %>" />
                     </div>
                 </div>
                 <div class="col-md-6">
                     <div class="form-group">
-                      <label for="password2">* Confirm Password</label>
+                      <label for="password2">Confirm Password* </label>
                       <input type="password" id="password2" name="password2" class="form-control" placeholder="Confirm Password" autocomplete="new-password"
                         value="<%= typeof password2 != 'undefined' ? password2 : '' %>" />
                     </div>
                 </div>
             </div>
-
+            <small>* denotes a required field</small>
             <button type="submit" class="btn btn-success btn-block">
-              USER
+              Create Basic User
             </button>
         </form>
-        <small>* denotes a required field</small>
+        <br>
+        <button type="submit" class="btn btn-success float-right" onclick="completeAdditionalUserStage()">
+          Continue
+        </button>
+        `
+    }
+
+    function returnUserTableTemplate(){
+        <% let usersList; %>
+        <% if (typeof user_list !== "undefined") { %>
+        <%     usersList = user_list %>
+        <% }else{ %>
+        <%     usersList = []; %>
+        <% } %>
+        return `
+            <table class="table table-striped table-dark">
+              <thead>
+                <tr>
+                  <th scope="col">Name</th>
+                  <th scope="col">Username</th>
+                  <th scope="col">Email</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if(usersList.length === 0){ %>
+                   <tr>
+                    <th colspan="5">No users, if you require additional please create some</th>
+                   </tr>
+                <% } %>
+                <% usersList.forEach(user => { %>
+                    <tr>
+                        <th scope="row"><%= user.name %></th>
+                        <td><%= user.username %></td>
+                        <td><%= user.email %></td>
+                    </tr>
+                <% }) %>
+              </tbody>
+            </table>
+            <small>You will be able to manage these more in the application user screen</small>
         `
     }
 
@@ -198,16 +274,15 @@
             body: JSON.stringify({
                 "key":systemState
             })
-        }).then(res => res.json())
+        })
             .catch(e => {
                 // TODO: Add some error notification here... tbf if connection to server failed the amIAliveCheck will trigger
                 console.error(e)
             })
     }
 
-    async function setupAdminUser() {
-        await updateSystemState("<%= SETUP_STAGES.IS_SYSTEM_CHECKS_OK %>")        // Check for administrator users...
-        let user_list = await fetch("/users", {
+    function fetchUserList(){
+        return fetch("/users", {
             method: "GET",
             headers: {
                 "Content-Type": "application/json"
@@ -218,19 +293,143 @@
             // TODO: Add some error notification here... tbf if connection to server failed the amIAliveCheck will trigger
             return e;
         })
+    }
+
+    async function completeStatusChecksState() {
+        await updateSystemState("<%= SETUP_STAGES.IS_SYSTEM_CHECKS_OK %>")
+        const user_list = await fetchUserList();
+        // Check for administrator users...
         const admin_index = checkForAdminUser(user_list)
         if (admin_index === -1) {
             // No administrator, need to be created
-            advanceStage(ELEMENTS.SYSTEM_CHECKS_STATE, ELEMENTS.CREATE_ADMIN_STATE)
-            ELEMENTS.SETUP_WINDOW.innerHTML = returnSetupAdminUserTemplate()
+            drawAdminUserStage()
         }else{
-            advanceStage(ELEMENTS.SYSTEM_CHECKS_STATE, ELEMENTS.CREATE_ADMIN_STATE)
-            advanceStage(ELEMENTS.CREATE_ADMIN_STATE, ELEMENTS.CREATE_USERS_STATE)
-            ELEMENTS.SETUP_WINDOW.innerHTML = returnUserSetupTemplate()
+            drawBasicUserState()
         }
 
     }
 
+    async function completeAdditionalUserStage(){
+        await updateSystemState("<%= SETUP_STAGES.IS_ADDITIONAL_USERS_DONE %>")
+        drawCustomiseStage()
+    }
 
+    function returnLogoTemplate () {
+        return `
+            <h2 class="text-center mb-3" id="titleText">
+                Let's get OctoFarm setup!
+            </h2>
+            <img class="mt-2" width="75%" src="images/logo.png" />
+        `
+    }
+
+    function returnCustomiseTemplate(){
+        return `
+            ${ (<%= isDocker %>) ? '<small class="text-warning">Running in a docker container... these options are disabled. Please update your entironment variables and restart your container</small>' : ""}
+            <% let disabledForDocker = ""; %>
+            <% if(isDocker){ %>
+                <% disabledForDocker = "disabled" %>
+            <% } %>
+            <form action="update-environment" method="POST">
+              <div class="form-row">
+                <div class="form-group col-md-12">
+                  <label for="app_title">App Title</label>
+                  <input type="text" class="form-control" id="app_title" name="app_title" placeholder="<%= octoFarmPageTitle %>" <%= disabledForDocker %>>
+                  <small id="app_title_help" class="form-text text-muted">This will replace anywhere "OctoFarm" is displayed in the UI.</small>
+                </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-group col-md-4">
+                    <label for="inputAddress">System Port</label>
+                    <input type="text" class="form-control" id="app_port" name="app_port" placeholder="<%= octoFarmPort %>" <%= disabledForDocker %>>
+                    <small id="app_title_help" class="form-text text-muted">Change OctoFarms default port.</small>
+                  </div>
+                  <div class="form-group col-md-8">
+                    <label for="app_db_url">Mongo Connection URI</label>
+                    <input type="text" class="form-control" id="app_db_url" name="app_db_url" placeholder="<%= octoFarmDatabase %>" value="" <%= disabledForDocker %>>
+                    <small id="app_title_help" class="form-text text-muted">Change OctoFarms default mongodb connection URI.</small>
+                  </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-group col-md-6">
+                    <label for="releaseChecking">Release Branch</label>
+                    <select class="custom-select" id="releaseChecking" name="release_branch" <%= disabledForDocker %> >
+                      <option value="master" selected>Master</option>
+                      <option value="development">Release Candidate</option>
+                      <option value="canary">Bleeding Edge</option>
+                    </select>
+                    <small id="app_title_help" class="form-text text-muted">Select which release you'd like to pull updates from.</small>
+                  </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-group col-md-12 mb-1">
+                    <label class="mb-0">App Security</label>
+                    <small id="app_title_help" class="form-text text-muted">Enable/Disable OctoFarms authentication or registration.</small>
+                  </div>
+
+                  <div class="form-group col-md-4">
+                      <div class="custom-control custom-checkbox mb-1">
+                        <input type="checkbox" class="custom-control-input" id="enable_auth" name="enable_auth" checked <%= disabledForDocker %>>
+                        <label class="custom-control-label" for="enable_dashboard">Enable Authentication</label>
+                      </div>
+                  </div>
+                  <div class="form-group col-md-4">
+                      <div class="custom-control custom-checkbox mb-1">
+                        <input type="checkbox" class="custom-control-input" id="enable_registration" name="enable_registration" checked <%= disabledForDocker %>>
+                        <label class="custom-control-label" for="enable_file_manager">Enable Registration</label>
+                      </div>
+                  </div>
+              </div>
+              <div class="form-row">
+                  <div class="form-group col-md-12 mb-1">
+                    <label class="mb-0">Enable/Disable App Sections</label>
+                    <small id="app_title_help" class="form-text text-muted">Enable/Disable different sections of the app you may not use.</small>
+                  </div>
+
+                  <div class="form-group col-md-4">
+                      <div class="custom-control custom-checkbox mb-1">
+                        <input type="checkbox" class="custom-control-input" id="enable_dashboard" name="enable_dashboard" checked <%= disabledForDocker %>>
+                        <label class="custom-control-label" for="enable_dashboard">Enable Dashboard</label>
+                      </div>
+                  </div>
+                  <div class="form-group col-md-4">
+                      <div class="custom-control custom-checkbox mb-1">
+                        <input type="checkbox" class="custom-control-input" id="enable_file_manager" name="enable_file_manager" checked <%= disabledForDocker %>>
+                        <label class="custom-control-label" for="enable_file_manager">Enable File Manager</label>
+                      </div>
+                  </div>
+                  <div class="form-group col-md-4">
+                      <div class="custom-control custom-checkbox mb-1">
+                        <input type="checkbox" class="custom-control-input" id="enable_history" name="enable_history" checked <%= disabledForDocker %>>
+                        <label class="custom-control-label" for="enable_history">Enable History</label>
+                      </div>
+                  </div>
+                  <div class="form-group col-md-4">
+                      <div class="custom-control custom-checkbox mb-1">
+                        <input type="checkbox" class="custom-control-input" id="enable_filament_manager" name="enable_filament_manager" checked <%= disabledForDocker %>>
+                        <label class="custom-control-label" for="enable_filament_manager">Enable Filament Manager</label>
+                      </div>
+                  </div>
+              </div>
+              <button type="submit" class="btn btn-success">Submit</button>
+            </form>
+            ${ (<%= isDocker %>) ? '<small class="text-warning">* OctoFarm will reboot, so make sure you have edited your environment variables in your docker config.</small>' : '<small class="text-info">* OctoFarm will save your settings and initiate a reboot</small>'}
+
+        `
+    }
+
+    function returnRestartMessage(){
+        return `
+            <div class="row">
+                <div class="col-12 text-center">
+                    <h5 class="text-warning">OctoFarm has triggered a restart of the server<br> this will happen in 5 seconds...</h5>
+                </div>
+            </div>
+        `
+    }
+
+    <%if(typeof RESTART_MESSAGE  !== "undefined"){%>
+        drawRestartStage();
+    <%}%>
 
 </script>

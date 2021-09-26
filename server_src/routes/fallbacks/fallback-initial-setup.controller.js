@@ -2,16 +2,19 @@ const path = require("path");
 const Logger = require("../../handlers/logger.js");
 const isDocker = require("is-docker");
 const envUtils = require("../../utils/env.utils");
-const { validateMongoURL } = require("../../handlers/validators");
 const { AppConstants } = require("../../app.constants");
 const { createController } = require("awilix-express");
 const bcrypt = require("bcryptjs");
-const SystemSetup = require("../../models/SystemSetup");
 const UserDB = require("../../models/User");
 const ClientSettingsDB = require("../../models/ClientSettings.js");
+const ClientSettingsConstants = require("../../constants/client-settings.constants");
 const { GROUPS } = require("../../constants/group.constants");
 const { SETUP_STAGES } = require("../../constants/system-setup.constants");
-const ClientSettingsConstants = require("../../constants/client-settings.constants");
+const { fetchOctoFarmPort, fetchMongoDBConnectionString } = require("../../app-env");
+
+const RESTART_MESSAGE =
+  "OctoFarm is now setup... The service will restart in 5 seconds to enable your configuration!";
+const SWITCH_TRUE = "on";
 
 class FallbackInitialSetupController {
   #octoFarmPageTitle;
@@ -27,13 +30,17 @@ class FallbackInitialSetupController {
     this.#systemCommandsService = systemCommandsService;
   }
 
-  index(req, res) {
+  async index(req, res) {
     res.render("initial-setup", {
       page: "Initial Setup",
       octoFarmPageTitle: this.#octoFarmPageTitle,
+      octoFarmPort: fetchOctoFarmPort(),
+      octoFarmDatabase: fetchMongoDBConnectionString(),
       isPm2: envUtils.isPm2(),
+      isDocker: isDocker(),
       currentStage: this.#systemSetupStore.getStage(),
-      SETUP_STAGES
+      SETUP_STAGES,
+      user_list: await UserDB.find({ group: GROUPS.USER })
     });
   }
 
@@ -87,6 +94,7 @@ class FallbackInitialSetupController {
         page: "Initial Setup",
         octoFarmPageTitle: this.#octoFarmPageTitle,
         isPm2: envUtils.isPm2(),
+        isDocker: isDocker(),
         errors,
         name,
         username,
@@ -128,6 +136,7 @@ class FallbackInitialSetupController {
         res.render("initial-setup", {
           page: "Initial Setup",
           octoFarmPageTitle: this.#octoFarmPageTitle,
+          isDocker: isDocker(),
           isPm2: envUtils.isPm2(),
           currentStage: this.#systemSetupStore.getStage(),
           SETUP_STAGES
@@ -136,64 +145,273 @@ class FallbackInitialSetupController {
       })
     );
   }
+  async createBasicUser(req, res) {
+    const { name, username, email, password, password2 } = req.body;
 
-  async restartOctoFarm(req, res) {
-    let serviceRestarted = false;
-    try {
-      serviceRestarted = await this.#systemCommandsService.restartOctoFarm();
-    } catch (e) {
-      this.#logger.error(e);
+    const errors = [];
+
+    // Check required fields
+    if (!name || !username || !password || !password2) {
+      errors.push({ msg: "Please fill in all fields..." });
     }
-    res.send(serviceRestarted);
+
+    // Check passwords match
+    if (password !== password2) {
+      errors.push({ msg: "Passwords do not match..." });
+    }
+
+    // Password at least 6 characters
+    if (password.length < 6) {
+      errors.push({ msg: "Password should be at least 6 characters..." });
+    }
+
+    if (errors.length > 0) {
+      res.render("initial-setup", {
+        page: "Initial Setup",
+        octoFarmPageTitle: this.#octoFarmPageTitle,
+        isPm2: envUtils.isPm2(),
+        isDocker: isDocker(),
+        errors,
+        name,
+        username,
+        email,
+        password,
+        password2,
+        currentStage: this.#systemSetupStore.getStage(),
+        SETUP_STAGES,
+        user_list: await UserDB.find({ group: GROUPS.USER })
+      });
+      return;
+    }
+
+    const userGroup = GROUPS.USER;
+
+    const newUser = new UserDB({
+      name,
+      username,
+      password,
+      email,
+      group: userGroup
+    });
+
+    // Add client settings to new user...
+    const defaultClientSettings = new ClientSettingsDB(
+      ClientSettingsConstants.getDefaultSettings()
+    );
+    await defaultClientSettings.save();
+
+    newUser._clientSettings = defaultClientSettings._id;
+
+    bcrypt.genSalt(10, (error, salt) =>
+      bcrypt.hash(newUser.password, salt, async (err, hash) => {
+        if (err) throw err;
+        // Set password to hashed
+        newUser.password = hash;
+        // Save new User
+        await newUser.save();
+
+        res.render("initial-setup", {
+          page: "Initial Setup",
+          octoFarmPageTitle: this.#octoFarmPageTitle,
+          isPm2: envUtils.isPm2(),
+          isDocker: isDocker(),
+          currentStage: this.#systemSetupStore.getStage(),
+          SETUP_STAGES,
+          user_list: await UserDB.find({ group: GROUPS.USER })
+        });
+        // set system state to live
+      })
+    );
   }
 
-  async saveConnectionEnv(req, res) {
-    if (isDocker()) {
-      res.statusCode = 500;
-      return res.send({
-        reason: `The OctoFarm docker container cannot change this setting. Change the ${AppConstants.MONGO_KEY} variable yourself.`,
-        succeeded: false
-      });
+  async updateEnvironment(req, res) {
+    const {
+      app_title,
+      app_port,
+      app_db_url,
+      release_branch,
+      enable_auth,
+      enable_registration,
+      enable_dashboard,
+      enable_file_manager,
+      enable_history,
+      enable_filament_manager
+    } = req.body;
+
+    if (app_title !== "") {
+      try {
+        envUtils.writeVariableToEnvFile(
+          path.join(__dirname, "../../../.env"),
+          AppConstants.OCTOFARM_SITE_TITLE_KEY,
+          app_title.toString()
+        );
+        this.#logger.info(
+          `Saved ${AppConstants.OCTOFARM_SITE_TITLE_KEY} env variable to .env file`
+        );
+      } catch (e) {
+        this.#logger.error(
+          `Unable to save ${AppConstants.OCTOFARM_SITE_TITLE_KEY} env variable to .env file ${e}`
+        );
+      }
+    }
+    if (app_port !== "") {
+      try {
+        envUtils.writeVariableToEnvFile(
+          path.join(__dirname, "../../../.env"),
+          AppConstants.OCTOFARM_PORT_KEY,
+          app_port.toString()
+        );
+        this.#logger.info(`Saved ${AppConstants.OCTOFARM_PORT_KEY} env variable to .env file`);
+      } catch (e) {
+        this.#logger.error(
+          `Unable to save ${AppConstants.OCTOFARM_PORT_KEY} env variable to .env file ${e}`
+        );
+      }
     }
 
-    const body = req.body;
-    const connectionURL = body.connectionURL;
-    if (!connectionURL || !validateMongoURL(connectionURL)) {
-      res.statusCode = 400;
-      return res.send({
-        connectionURL,
-        reason: "Not a valid connection string",
-        succeeded: false
-      });
+    if (app_db_url !== "") {
+      try {
+        envUtils.writeVariableToEnvFile(
+          path.join(__dirname, "../../../.env"),
+          AppConstants.MONGO_KEY,
+          app_db_url.toString()
+        );
+        this.#logger.info(`Saved ${AppConstants.MONGO_KEY} env variable to .env file`);
+      } catch (e) {
+        this.#logger.error(
+          `Unable to save ${AppConstants.MONGO_KEY} env variable to .env file ${e}`
+        );
+      }
     }
 
-    try {
-      envUtils.writeVariableToEnvFile(
-        path.join(__dirname, "../../.env"),
-        AppConstants.MONGO_KEY,
-        connectionURL
-      );
-    } catch (e) {
-      res.statusCode = 500;
-      return res.send({
-        reason: e.message,
-        succeeded: false
-      });
+    if (release_branch !== "") {
+      try {
+        envUtils.writeVariableToEnvFile(
+          path.join(__dirname, "../../../.env"),
+          AppConstants.RELEASE_BRANCH_KEY,
+          release_branch.toString()
+        );
+        this.#logger.info(`Saved ${AppConstants.RELEASE_BRANCH_KEY} env variable to .env file`);
+      } catch (e) {
+        this.#logger.error(
+          `Unable to save ${AppConstants.RELEASE_BRANCH_KEY} env variable to .env file ${e}`
+        );
+      }
     }
 
-    this.#logger.info(`Saved ${AppConstants.MONGO_KEY} env variable to .env file`);
-
-    if (envUtils.isNodemon()) {
-      res.send({
-        reason: `Succesfully saved ${AppConstants.MONGO_KEY} environment variable to .env file. Please restart OctoFarm manually!`,
-        succeeded: true
-      });
-    } else {
-      res.send({
-        reason: `Succesfully saved ${AppConstants.MONGO_KEY} environment variable to .env file. Restarting OctoFarm service, please start it again if that fails!`,
-        succeeded: true
-      });
+    if (enable_auth !== SWITCH_TRUE) {
+      // try {
+      //   envUtils.writeVariableToEnvFile(
+      //     path.join(__dirname, "../../../.env"),
+      //     AppConstants.RELEASE_BRANCH_KEY,
+      //     release_branch.toString()
+      //   );
+      //   this.#logger.info(`Saved ${AppConstants.RELEASE_BRANCH_KEY} env variable to .env file`);
+      // } catch (e) {
+      //   res.statusCode = 500;
+      //   return res.send({
+      //     reason: e.message,
+      //     succeeded: false
+      //   });
+      // }
     }
+
+    if (enable_registration !== SWITCH_TRUE) {
+      // try {
+      //   envUtils.writeVariableToEnvFile(
+      //     path.join(__dirname, "../../../.env"),
+      //     AppConstants.RELEASE_BRANCH_KEY,
+      //     release_branch.toString()
+      //   );
+      //   this.#logger.info(`Saved ${AppConstants.RELEASE_BRANCH_KEY} env variable to .env file`);
+      // } catch (e) {
+      //   res.statusCode = 500;
+      //   return res.send({
+      //     reason: e.message,
+      //     succeeded: false
+      //   });
+      // }
+    }
+
+    if (enable_dashboard !== SWITCH_TRUE) {
+      try {
+        envUtils.writeVariableToEnvFile(
+          path.join(__dirname, "../../../.env"),
+          AppConstants.ENABLE_DASHBOARD_KEY,
+          enable_dashboard.toString()
+        );
+        this.#logger.info(`Saved ${AppConstants.ENABLE_DASHBOARD_KEY} env variable to .env file`);
+      } catch (e) {
+        this.#logger.error(
+          `Unable to save ${AppConstants.ENABLE_DASHBOARD_KEY} env variable to .env file ${e}`
+        );
+      }
+    }
+
+    if (enable_file_manager !== SWITCH_TRUE) {
+      try {
+        envUtils.writeVariableToEnvFile(
+          path.join(__dirname, "../../../.env"),
+          AppConstants.ENABLE_OP_FILE_MANAGER_KEY,
+          enable_file_manager.toString()
+        );
+        this.#logger.info(
+          `Saved ${AppConstants.ENABLE_OP_FILE_MANAGER_KEY} env variable to .env file`
+        );
+      } catch (e) {
+        this.#logger.error(
+          `Unable to save ${AppConstants.ENABLE_OP_FILE_MANAGER_KEY} env variable to .env file ${e}`
+        );
+      }
+    }
+
+    if (enable_history !== SWITCH_TRUE) {
+      try {
+        envUtils.writeVariableToEnvFile(
+          path.join(__dirname, "../../../.env"),
+          AppConstants.ENABLE_HISTORY_KEY,
+          enable_history.toString()
+        );
+        this.#logger.info(`Saved ${AppConstants.ENABLE_HISTORY_KEY} env variable to .env file`);
+      } catch (e) {
+        this.#logger.error(
+          `Unable to save ${AppConstants.ENABLE_HISTORY_KEY} env variable to .env file ${e}`
+        );
+      }
+    }
+
+    if (enable_filament_manager !== SWITCH_TRUE) {
+      try {
+        envUtils.writeVariableToEnvFile(
+          path.join(__dirname, "../../../.env"),
+          AppConstants.ENABLE_FILAMENT_MANAGER_KEY,
+          enable_filament_manager.toString()
+        );
+        this.#logger.info(
+          `Saved ${AppConstants.ENABLE_FILAMENT_MANAGER_KEY} env variable to .env file`
+        );
+      } catch (e) {
+        this.#logger.error(
+          `Unable to save ${AppConstants.ENABLE_FILAMENT_MANAGER_KEY} env variable to .env file ${e}`
+        );
+      }
+    }
+
+    this.#systemSetupStore.setCustomisationsDone();
+    await this.#systemCommandsService.restartOctoFarm();
+
+    res.render("initial-setup", {
+      page: "Initial Setup",
+      octoFarmPageTitle: this.#octoFarmPageTitle,
+      octoFarmPort: fetchOctoFarmPort(),
+      octoFarmDatabase: fetchMongoDBConnectionString(),
+      isPm2: envUtils.isPm2(),
+      isDocker: isDocker(),
+      currentStage: this.#systemSetupStore.getStage(),
+      SETUP_STAGES,
+      user_list: await UserDB.find({ group: GROUPS.USER }),
+      RESTART_MESSAGE
+    });
   }
 }
 
@@ -205,4 +423,7 @@ module.exports = createController(FallbackInitialSetupController)
   .post("restart-octofarm", "restartOctoFarm")
   .post("save-connection-env", "saveConnectionEnv")
   .get("users", "getCurrentUserList")
-  .post("users", "createAdminUser")
+  .post("users/admin", "createAdminUser")
+  .post("users/basic", "createBasicUser")
+  // Should be PUT to follow previous methods but HTML forms only allow POST/GET
+  .post("update-environment", "updateEnvironment")

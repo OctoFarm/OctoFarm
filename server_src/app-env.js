@@ -129,7 +129,7 @@ function fetchMongoDBConnectionString(persistToEnv = false) {
   return process.env[AppConstants.MONGO_KEY];
 }
 
-function fetchOctoFarmPort() {
+function fetchOctoFarmPort(persistToEnv = false) {
   let port = process.env[AppConstants.OCTOFARM_PORT_KEY];
   if (Number.isNaN(parseInt(port))) {
     logger.warning(
@@ -208,7 +208,7 @@ function ensureMongoDBConnectionStringSet() {
 }
 
 function ensurePortSet() {
-  fetchOctoFarmPort();
+  fetchOctoFarmPort(true);
 
   if (!process.env[AppConstants.OCTOFARM_PORT_KEY]) {
     logger.info(
@@ -221,7 +221,6 @@ function ensurePortSet() {
 
 /**
  * Parse and consume the .env file. Validate everything before starting OctoFarm.
- * Later this will switch to parsing a `config.yaml` file.
  */
 function setupEnvConfig(skipDotEnv = false) {
   if (!skipDotEnv) {
@@ -237,6 +236,12 @@ function setupEnvConfig(skipDotEnv = false) {
   ensurePortSet();
   envUtils.ensureBackgroundImageExists(__dirname);
   ensurePageTitle();
+  ensureReleaseBranchSet();
+  ensureEnableDashboardSet();
+  ensureEnableOPFileManagerSet();
+  ensureEnableLocalFileManagerSet();
+  ensureEnableHistorySet();
+  ensureEnableFilamentManagerSet();
 }
 
 function getViewsPath() {
@@ -300,6 +305,33 @@ function ensurePageTitle() {
 
 function isEnvProd() {
   return process.env[AppConstants.NODE_ENV_KEY] === AppConstants.defaultProductionEnv;
+}
+
+function ensureReleaseBranchSet() {
+  return process.env[AppConstants.RELEASE_BRANCH_KEY] === AppConstants.defaultReleaseBranch;
+}
+function ensureEnableDashboardSet() {
+  return process.env[AppConstants.ENABLE_DASHBOARD_KEY] === AppConstants.defaultDashboardEnabled;
+}
+function ensureEnableOPFileManagerSet() {
+  return (
+    process.env[AppConstants.ENABLE_OP_FILE_MANAGER_KEY] ===
+    AppConstants.defaultOPFileManagerEnabled
+  );
+}
+function ensureEnableLocalFileManagerSet() {
+  return (
+    process.env[AppConstants.ENABLE_LOCAL_FILE_MANAGER_KEY] ===
+    AppConstants.defaultLocalFileManagerEnabled
+  );
+}
+function ensureEnableHistorySet() {
+  return process.env[AppConstants.ENABLE_HISTORY_KEY] === AppConstants.defaultHistoryEnabled;
+}
+function ensureEnableFilamentManagerSet() {
+  return (
+    process.env[AppConstants.ENABLE_FILAMENT_MANAGER_KEY] === AppConstants.defaultFilamentManager
+  );
 }
 
 module.exports = {
