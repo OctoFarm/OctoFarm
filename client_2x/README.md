@@ -1,4 +1,4 @@
-# client_2x
+# octofarm-web-client
 
 ## Project setup
 ```

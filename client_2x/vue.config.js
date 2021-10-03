@@ -3,9 +3,9 @@ module.exports = {
   runtimeCompiler: true,
 
   pwa: {
-    name: "OctoFarm",
+    name: "OctoFarm"
   },
 
-  outputDir: "build",
-  assetsDir: "src/assets",
+  outputDir: "public",
+  assetsDir: "src/assets"
 };

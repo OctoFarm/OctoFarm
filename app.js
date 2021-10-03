@@ -85,7 +85,7 @@ if (!!majorVersion && majorVersion < 14) {
       ) {
         serveDatabaseIssueFallback(octoFarmServer, fetchOctoFarmPort());
       } else {
-        console.log("YOU'VE FUCKED SOMETHING");
+        console.error("YOU'VE FUCKED SOMETHING");
       }
     });
 }

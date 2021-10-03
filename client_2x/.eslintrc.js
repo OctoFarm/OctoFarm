@@ -1,22 +1,31 @@
 module.exports = {
   root: true,
   env: {
+    browser: true,
     node: true,
   },
   extends: [
-    "plugin:vue/essential",
-    "eslint:recommended",
-    "@vue/typescript/recommended",
+    'plugin:vue/essential',
+    'plugin:vue/strongly-recommended',
+    '@vue/airbnb',
   ],
   parserOptions: {
     ecmaVersion: 2020,
+    parser: 'babel-eslint',
+    sourceType: "module"
   },
   rules: {
-    '@typescript-eslint/no-inferrable-types': 'off',
-    '@typescript-eslint/type-annotation-spacing': 'off',
-    '@typescript-eslint/no-empty-function': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
+    'max-len': [
+      'error',
+      {
+        code: 300,
+        ignoreComments: true,
+        ignoreUrls: true,
+      },
+    ],
+    "global-require": "off",
+    "quotes": ["error", "double"],
     'no-console': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
     'no-debugger': process.env.NODE_ENV === 'production' ? 'warn' : 'off',
-    'no-var': process.env.NODE_ENV === 'production' ? 'warn' : 'off'
   },
 };
