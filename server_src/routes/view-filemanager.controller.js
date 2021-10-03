@@ -17,8 +17,10 @@ const viewFileManager = ({
     const fileStatistics = fileCache.getStatistics();
 
     res.render("filemanager", {
-      name: req.user.name,
-      userGroup: req.user.group,
+      user: {
+        name: req.user.name,
+        group: req.user.group
+      },
       version: serverVersion,
       page: "Printer Manager",
       octoFarmPageTitle,

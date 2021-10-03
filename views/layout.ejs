@@ -1,7 +1,12 @@
 <% const base = './partials' %>
 <% const system = base + '/Navigation' %>
 <% const userDropDown = system + '/userDropDown.ejs' %>
-<% const octofarmErrorModal = base + '/octofarm-error.modal.ejs'  %>
+<% const octofarmErrorModal = base + '/octofarm-error.modals.ejs'  %>
+<% const octofarmModal = base + '/octofarm-modal.ejs' %>
+<% let isAdmin = false; %>
+<% if(typeof user !== 'undefined' && user.group === "Administrator"){ %>
+<%  isAdmin = true; %>
+<% } %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -31,8 +36,9 @@
     <script src="/assets/dist/bootstrap.min.js"></script>
     <script src="/assets/dist/vendor.min.js"></script>
     <script src="/assets/dist/amialive.runner.min.js"></script>
-<!--     Requires been logged in to utilise this file...-->
-    <% if(typeof userGroup !== 'undefined'){ %>
+    <script src="/assets/dist/client-error.listeners.min.js"></script>
+<!--     Requires been logged in and admin to use this file-->
+    <% if(isAdmin){ %>
         <script src="/assets/dist/update-checker.runner.min.js"></script>
     <% } %>
 </head>
@@ -156,11 +162,6 @@
                 <a title="Filament Management" class="nav-link text-center" href="/filament" id=""><i
                             class="fas fa-toilet-paper"></i> Filament</a>
             </li>
-            <li class="nav-item">
-                <a title="Filament Management" class="nav-link text-center" href="/system">
-                    <i class="fas fa-cogs"></i> System
-                </a>
-            </li>
 
             <%- include(userDropDown) %>
         </ul>
@@ -252,8 +253,18 @@
         </div>
     </div>
 
+    <!--     Requires been logged in and admin to use these modals-->
+    <% if(isAdmin){ %>
+        <%- include(octofarmModal, {
+        modal:{
+        id:"systemInformation",i:"fas fa-info-circle",title:"System Information", size: "xl"
+        },
+        bodyFile:'./Admin/systemInformation.ejs'
+        })
+        %>
+    <% } %>
+
     <div id="overlay"><i id="overlayIcon" class="fas fa-spinner fa-pulse fa-10x textActive"></i></div>
 </div>
 </body>
-<script src="/assets/dist/client-error.listeners.min.js"></script>
 </html>

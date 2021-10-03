@@ -32,8 +32,10 @@ class ViewPrinters {
     const printers = await this.#printersStore.listPrintersFlat();
 
     res.render("printerManagement", {
-      name: req.user.name,
-      userGroup: req.user.group,
+      user: {
+        name: req.user.name,
+        group: req.user.group
+      },
       version: this.#serverVersion,
       page: "Printer Manager",
       octoFarmPageTitle: this.#octoFarmPageTitle,

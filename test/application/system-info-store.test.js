@@ -12,7 +12,7 @@ function clientCPUCalc(systemInfo) {
     const octoLoad = !!currentProc?.cpuu ? currentProc.cpuu : 0;
     const remain = systemLoad + octoLoad + userLoad;
 
-    // labels: ['System', 'OctoFarm', 'User', 'Free'],
+    // labels: ['Admin', 'OctoFarm', 'User', 'Free'],
     return [systemLoad, octoLoad, userLoad, 100 - remain];
   }
 }
@@ -31,7 +31,7 @@ function clientMemCalc(systemInfo) {
       }
 
       if (Number.isNaN(octoFarmRAM)) {
-        // labels: ['System', 'OctoFarm', 'Free'],
+        // labels: ['Admin', 'OctoFarm', 'Free'],
         return [systemUsedRAM, 0, freeRAM];
       } else {
         return [systemUsedRAM, octoFarmRAM, freeRAM];
@@ -52,7 +52,7 @@ beforeAll(async () => {
   systemInfoStore = container.resolve(DITokens.systemInfoStore);
 });
 
-describe("System-Info-Store", () => {
+describe("Admin-Info-Store", () => {
   /**
    * Tests that valid system information is passed from the SystemRunner
    */

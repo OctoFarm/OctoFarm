@@ -21,8 +21,10 @@ const viewFilament = ({
     const profiles = filamentCache.getProfiles();
 
     res.render("filament", {
-      name: req.user.name,
-      userGroup: req.user.group,
+      user: {
+        name: req.user.name,
+        group: req.user.group
+      },
       version: serverVersion,
       printerCount: printers.length,
       page: "Filament Manager",

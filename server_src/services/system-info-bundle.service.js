@@ -28,7 +28,7 @@ class SystemInfoBundleService {
    * @throws {String} If the SystemInformation object doesn't return
    */
   generateSystemInformationContents() {
-    let systemInformationContents = "--- OctoFarm System Information ---\n\n";
+    let systemInformationContents = "--- OctoFarm Admin Information ---\n\n";
     systemInformationContents += `OctoFarm Version\n ${currentVersion} \n`;
     const airGapped = "Are we connected to the internet?\n";
     const pm2 = "Are we running under pm2?\n";
@@ -48,7 +48,7 @@ class SystemInfoBundleService {
     const systemInformation = this.#systemInfoStore?.returnInfo();
     if (!systemInformation) throw "No system information found";
 
-    systemInformationContents += "--- System Information ---\n\n";
+    systemInformationContents += "--- Admin Information ---\n\n";
 
     systemInformationContents += `Platform\n ${systemInformation?.osInfo?.platform} \n`;
     systemInformationContents += `Processor Arch\n ${systemInformation?.osInfo?.arch} \n`;

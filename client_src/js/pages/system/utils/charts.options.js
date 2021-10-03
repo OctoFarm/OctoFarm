@@ -126,7 +126,7 @@ const cpuChartOptions = {
   },
   noData: noData,
   series: [],
-  labels: ["System", "OctoFarm", "User", "Free"],
+  labels: ["Admin", "OctoFarm", "User", "Free"],
   colors: ["#f39c12", "#3498db", "#375a7f", "#00bc8c"],
   legend: legend
 };

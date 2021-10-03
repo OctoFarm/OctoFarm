@@ -10,8 +10,10 @@ const viewHistory = ({ serverVersion, printersStore, octoFarmPageTitle, historyC
     const { history, stats } = historyCache.getHistoryCache();
 
     res.render("history", {
-      name: req.user.name,
-      userGroup: req.user.group,
+      user: {
+        name: req.user.name,
+        group: req.user.group
+      },
       version: serverVersion,
       octoFarmPageTitle: octoFarmPageTitle,
       printerCount: printers.length,

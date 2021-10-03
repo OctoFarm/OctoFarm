@@ -261,7 +261,7 @@
         })
         .then(b => {
           if (b === true) {
-            setLastMessageBox("System restart command was successful,the server will restart in 5 seconds... Please refresh page or wait for automatic refresh in 10 seconds.", false);
+            setLastMessageBox("Admin restart command was successful,the server will restart in 5 seconds... Please refresh page or wait for automatic refresh in 10 seconds.", false);
             setTimeout(() => location.reload(), 10 * 1000)
           } else {
             setLastMessageBox("Failed to Restart OctoFarm. Reason:'" + b + "'", true);

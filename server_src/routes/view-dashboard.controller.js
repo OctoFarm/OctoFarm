@@ -39,8 +39,10 @@ class ViewDashboard {
     let dashboardSettings = clientSettings?.dashboard || getDefaultDashboardSettings();
 
     res.render("dashboard", {
-      name: req.user.name,
-      userGroup: req.user.group,
+      user: {
+        name: req.user.name,
+        group: req.user.group
+      },
       version: this.#serverVersion,
       printerCount: printers.length,
       page: "Dashboard",

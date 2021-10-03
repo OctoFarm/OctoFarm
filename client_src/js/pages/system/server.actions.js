@@ -94,7 +94,7 @@ async function restartOctoFarmServer() {
   if (restart) {
     UI.createAlert(
       "success",
-      "System restart command was successful, the server will restart in 5 seconds...",
+      "Admin restart command was successful, the server will restart in 5 seconds...",
       5000,
       "clicked"
     );
@@ -332,7 +332,7 @@ async function renderSystemInfo() {
       const octoLoad = !!currentProc?.cpuu ? currentProc.cpuu : 0;
       const remain = systemLoad + octoLoad + userLoad;
 
-      // labels: ['System', 'OctoFarm', 'User', 'Free'],
+      // labels: ['Admin', 'OctoFarm', 'User', 'Free'],
       systemChartCPU.updateSeries([systemLoad, octoLoad, userLoad, 100 - remain]);
     }
 
@@ -348,7 +348,7 @@ async function renderSystemInfo() {
         }
 
         if (Number.isNaN(octoFarmRAM)) {
-          // labels: ['System', 'OctoFarm', 'Free'],
+          // labels: ['Admin', 'OctoFarm', 'Free'],
           systemChartMemory.updateSeries([systemUsedRAM, 0, freeRAM]);
         } else {
           systemChartMemory.updateSeries([systemUsedRAM, octoFarmRAM, freeRAM]);

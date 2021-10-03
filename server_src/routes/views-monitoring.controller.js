@@ -73,8 +73,10 @@ class ViewDashboard {
     const sortedIndex = this.#printersStore.getPrinterSortingList();
 
     res.render(template, {
-      name: req.user.name,
-      userGroup: req.user.group,
+      user: {
+        name: req.user.name,
+        group: req.user.group
+      },
       version: this.#serverVersion,
       octoFarmPageTitle: this.#octoFarmPageTitle,
       page: pageTitle,

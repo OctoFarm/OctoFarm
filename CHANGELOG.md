@@ -10,6 +10,9 @@ All notable changes to this project will be documented in this file.
     - Refactored task manager so it becomes easier to use
     - Global Client Error Handler: Grabs any errant / uncaught errors and displays a modal
     - The ability to create a github issue from the interface after encountering an error.
+    - New setup screen for OctoFarm, runs through system safety checks, setting up an Administrator user, Adding other users and also some customisation options for OF. 
+        - Note: All users will have to run through the setup screen on upgrading to this version. Admin user will skip if already created...
+    
 
 ### Changed
     - File manager: gave printer titles a badge. Gave selected printer a yellow border. Reduced file list minimum height (for smaller screens). 

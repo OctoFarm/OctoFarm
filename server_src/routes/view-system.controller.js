@@ -25,10 +25,12 @@ const viewSystem = ({
     let dashboardSettings = clientSettings?.dashboard || getDefaultDashboardSettings();
 
     res.render("system", {
-      name: req.user.name,
-      userGroup: req.user.group,
+      user: {
+        name: req.user.name,
+        group: req.user.group
+      },
       version: serverVersion,
-      page: "System",
+      page: "Admin",
       octoFarmPageTitle: octoFarmPageTitle,
       helpers: prettyHelpers,
       printerCount,

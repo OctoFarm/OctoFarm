@@ -146,7 +146,7 @@ class OctoFarmManager {
     if (softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) {
       PrinterTickerStore.addIssue(
         printer,
-        `Farm is air gapped, skipping OctoPrint plugin list request`,
+        "Farm is air gapped, skipping OctoPrint plugin list request",
         "Active"
       );
       return false;
@@ -182,7 +182,7 @@ class OctoFarmManager {
   getOctoPrintSystemInfo(id) {
     const printer = this.getPrinter(id);
     printer.octoPrintSystemInfo = {};
-    PrinterTickerStore.addIssue(printer, "Grabbing OctoPrint's System Information", "Active");
+    PrinterTickerStore.addIssue(printer, "Grabbing OctoPrint's Admin Information", "Active");
     return this.octoPrintService
       .getSystemInfo(printer, true)
       .then((res) => {
@@ -190,7 +190,7 @@ class OctoFarmManager {
       })
       .then((res) => {
         printer.octoPrintSystemInfo = res.systeminfo;
-        PrinterTickerStore.addIssue(printer, "Grabbed OctoPrints System Info", "Complete");
+        PrinterTickerStore.addIssue(printer, "Grabbed OctoPrints Admin Info", "Complete");
       })
       .catch((err) => {
         PrinterTickerStore.addIssue(
@@ -210,7 +210,7 @@ class OctoFarmManager {
     if (softwareUpdateChecker.getUpdateNotificationIfAny().air_gapped) {
       PrinterTickerStore.addIssue(
         printer,
-        `Farm is air gapped, skipping OctoPrint updates request`,
+        "Farm is air gapped, skipping OctoPrint updates request",
         "Active"
       );
       return false;
