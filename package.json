@@ -32,10 +32,9 @@
     "pi",
     "node"
   ],
-  "author": "James Mackay (NotExpectedYet) & David Zwart (davidzwa)",
+  "author": "James Mackay (NotExpectedYet)",
   "license": "ISC",
   "dependencies": {
-    "@octofarm/client": "^0.1.0-rc2-build5",
     "archiver": "^5.3.0",
     "awilix": "^4.3.4",
     "awilix-express": "^4.0.0",
