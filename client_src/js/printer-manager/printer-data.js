@@ -12,7 +12,7 @@ import OctoFarmClient from "../services/octofarm-client.service";
 import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
 
 const printerList = document.getElementById("printerList");
-const ignoredHostStatesForAPIErrors = ["Setting Up", "Searching...", "Shutdown"];
+const ignoredHostStatesForAPIErrors = ["Setting Up", "Searching...", "Shutdown", "Offline"];
 
 function updatePrinterInfoAndState(printer) {
   const printName = document.getElementById(`printerName-${printer._id}`);
@@ -100,7 +100,7 @@ function updateOctoPiColumn(printer) {
 
 function corsWarningCheck(printer) {
   const printerBadge = document.getElementById(`printerBadge-${printer._id}`);
-  if (!printer.corsCheck && !ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
+  if (!printer.corsCheck && !ignoredHostStatesForAPIErrors.includes(printer.printerState.state)) {
     UI.doesElementNeedUpdating("CORS NOT ENABLED!", printerBadge, "innerHTML");
   }
 }
