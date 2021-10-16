@@ -62,13 +62,13 @@ function heartBeat(index) {
     farmPrinters[index].webSocket = "success";
     farmPrinters[index].webSocketDescription = "Websocket Connection Online";
   }
-  PrinterTicker.addIssue(
-    new Date(),
-    farmPrinters[index].printerURL,
-    "Pong message received from client...",
-    "Complete",
-    farmPrinters[index]._id
-  );
+  // PrinterTicker.addIssue(
+  //   new Date(),
+  //   farmPrinters[index].printerURL,
+  //   "Pong message received from client...",
+  //   "Complete",
+  //   farmPrinters[index]._id
+  // );
   farmPrinters[index].ws.isAlive = true;
 }
 
@@ -80,13 +80,13 @@ const heartBeatInterval = setInterval(function ping() {
         client.ws.instance.readyState !== 2 &&
         client.ws.instance.readyState !== 3
       ) {
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[client.ws.index].printerURL,
-          "Sending ping message to websocket...",
-          "Active",
-          farmPrinters[client.ws.index]._id
-        );
+        // PrinterTicker.addIssue(
+        //   new Date(),
+        //   farmPrinters[client.ws.index].printerURL,
+        //   "Sending ping message to websocket...",
+        //   "Active",
+        //   farmPrinters[client.ws.index]._id
+        // );
         if (client.ws.isAlive === false) return client.ws.instance.terminate();
 
         // Retry connecting if failed...
@@ -195,7 +195,14 @@ WebSocketClient.prototype.open = function (url, index) {
               PrinterClean.generate(farmPrinters[this.index], systemSettings.filamentManager);
             }
           } catch (e) {
-            logger.info(
+            PrinterTicker.addIssue(
+              new Date(),
+              farmPrinters[index].printerURL,
+              "Ping/Pong failed to get a response, attempting to reconnect...",
+              "Complete",
+              farmPrinters[index]._id
+            );
+            logger.debug(
               `Ping/Pong failed to get a response, closing and attempted to reconnect: ${this.index}: ${this.url}`
             );
           }
