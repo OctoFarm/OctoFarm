@@ -49,5 +49,5 @@ window.onunhandledrejection = function (event) {
   handleEvent(event);
 };
 window.onerror = function (message, source, lineno, colno, error) {
-  handleEvent(message);
+  handleEvent({ message, source, lineno, colno, error });
 };
