@@ -934,6 +934,7 @@ class Runner {
         throw globalAPICheck;
       }
       // Make a connection attempt, and grab current user.
+      console.log("CURRENT USER", farmPrinters[i].currentUser)
       let users = await this.octoPrintService.getUsers(farmPrinters[i], true);
       if (users.status === 200) {
         farmPrinters[i].systemChecks.scanning.api.status = "success";
@@ -944,21 +945,38 @@ class Runner {
           farmPrinters[i].userList = [];
         }
         farmPrinters[i].userList = [];
-        if (_.isEmpty(users)) {
-          farmPrinters[i].currentUser = "admin";
-          farmPrinters[i].userList.push("admin");
-          farmPrinters[i].markModified("currentUser");
-          farmPrinters[i].updateOne();
-        } else {
-          users.users.forEach((user) => {
-            if (user.admin) {
-              farmPrinters[i].currentUser = user.name;
-              farmPrinters[i].userList.push(user.name);
-              farmPrinters[i].markModified("currentUser");
-              farmPrinters[i].updateOne();
-            }
-          });
+        if(!farmPrinters[i]?.currentUser){
+          //No user so make a grab at what's available
+          if (_.isEmpty(users)) {
+            farmPrinters[i].currentUser = "admin";
+            farmPrinters[i].userList.push("admin");
+            farmPrinters[i].markModified("currentUser");
+            farmPrinters[i].updateOne();
+          } else {
+            users.users.forEach((user) => {
+              if (user.admin) {
+                farmPrinters[i].currentUser = user.name;
+                farmPrinters[i].userList.push(user.name);
+                farmPrinters[i].markModified("currentUser");
+                farmPrinters[i].updateOne();
+              }
+            });
+          }
+        }else{
+          // Hmmm we already have a user, just make sure we have the list available to change it.
+          if (_.isEmpty(users)) {
+            farmPrinters[i].userList.push("admin");
+            farmPrinters[i].updateOne();
+          } else {
+            users.users.forEach((user) => {
+              if (user.admin) {
+                farmPrinters[i].userList.push(user.name);
+                farmPrinters[i].updateOne();
+              }
+            });
+          }
         }
+
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[i].printerURL,
@@ -2872,6 +2890,13 @@ class Runner {
         farmPrinters[index].printerURL = settings.printer.printerURL;
         printer.printerURL = settings.printer.printerURL;
         printer.markModified("printerURL");
+        updatePrinter = true;
+      }
+
+      if(settings.printer.currentUser !== farmPrinters[index].currentUser){
+        farmPrinters[index].currentUser = settings.printer.currentUser;
+        printer.currentUser = settings.printer.currentUser;
+        printer.markModified("currentUser");
         updatePrinter = true;
       }
 
