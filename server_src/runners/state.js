@@ -911,7 +911,7 @@ class Runner {
         throw error;
       }
       farmPrinters[i].systemChecks.scanning.api.status = "warning";
-      // Clear out the old websocket connection...
+      // Clear out the old websocket connection if it exists...
       if(farmPrinters[i]?.ws){
         delete farmPrinters[i].ws
       }
@@ -987,6 +987,7 @@ class Runner {
           await Runner.getSystem(id);
           await Runner.getProfile(id);
           await Runner.getState(id);
+          await Runner.getSettings(id);
           await Runner.getOctoPrintSystenInfo(id);
           await Runner.getPluginList(id);
           await Runner.getUpdates(id);
