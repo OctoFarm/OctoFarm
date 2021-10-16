@@ -24,7 +24,7 @@ function setupExpressServer() {
   const viewsPath = getViewsPath();
 
   if (process.env.NODE_ENV === "production") {
-    const { getOctoFarmUiPath } = require("@octofarm/client");
+    const { getOctoFarmUiPath } = require("@notexpectedyet/octofarm-client");
     const bundlePath = getOctoFarmUiPath();
     app.use("/assets/dist", express.static(bundlePath));
   }
