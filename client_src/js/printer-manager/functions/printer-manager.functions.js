@@ -54,7 +54,7 @@ export function workerEventFunction(data) {
   }
 }
 
-export async function scanNetworkForDevices() {
+export async function scanNetworkForDevices(e) {
   e.target.disabled = true;
   UI.createAlert("info", "Scanning your network for new devices now... Please wait!", 20000);
   try {

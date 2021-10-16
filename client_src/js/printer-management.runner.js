@@ -71,7 +71,7 @@ bulkPowerBtn.addEventListener("click", async (e) => {
 
 let scanNetworkBtn = document.getElementById("scanNetworkBtn");
 scanNetworkBtn.addEventListener("click", async (e) => {
-  await scanNetworkForDevices();
+  await scanNetworkForDevices(e);
 });
 
 let bulkPreHeat = document.getElementById("bulkPreHeat");
