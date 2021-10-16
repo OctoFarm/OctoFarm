@@ -6,6 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
     - Bulk actions will now produce a modal to track the actions which produces a status and message. This replaces the alert notification that flooded the screen previously.
+    - The user Octofarm connects with is now no longer static... You can open the settings modal and change the user OF connects with. It's still automatically selected on boot.
 
 ### Changed
 
