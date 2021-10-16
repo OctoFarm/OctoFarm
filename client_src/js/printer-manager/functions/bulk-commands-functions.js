@@ -627,6 +627,9 @@ export async function bulkOctoPrintPluginAction(action) {
         return o.text;
       }
     ]);
+    pluginList = _.uniqBy(pluginList, function (e) {
+      return e.text;
+    });
 
     //Install Promt
     bootbox.prompt({
@@ -636,7 +639,7 @@ export async function bulkOctoPrintPluginAction(action) {
                     <label for="searchPlugins">
                       Please choose the plugin you'd like to install... or: &nbsp;
                     </label>
-                    <input width="50%" id="searchPlugins" type="text" placeholder="Type your plugin name here..." class="search-control search-control-underlined">
+                    <input width="75%" id="searchPlugins" type="text" placeholder="Search for your plugin name here..." class="search-control search-control-underlined">
                   </div>
                 </form>`,
       inputType: "checkbox",
@@ -648,28 +651,24 @@ export async function bulkOctoPrintPluginAction(action) {
       },
       callback: async function (result) {
         if (result) {
-          let trackerBtn = document.getElementById("pluginTracking");
-          trackerBtn.classList.remove("d-none");
           let pluginAmount = result.length * printersForPluginAction.length;
           let cleanAction = action.charAt(0).toUpperCase() + action.slice(1);
           if (action === "install") {
             cleanAction = cleanAction + "ing";
           }
-          trackerBtn.innerHTML = `
-                   ${cleanAction} Plugins!<br>
-                   <i class="fas fa-print"></i>${printersForPluginAction.length} / <i class="fas fa-plug"></i> ${pluginAmount}
-        `;
+          showBulkActionsModal();
+          updateBulkActionsProgress(0, printersForPluginAction.length);
+          generateTableRows(printersForPluginAction);
           for (let p = 0; p < printersForPluginAction.length; p++) {
-            await octoPrintPluginInstallAction(printersForPluginAction[p], result, action);
-            trackerBtn.innerHTML = `
-                ${cleanAction} Plugins!<br>
-                <i class="fas fa-print"></i>${
-                  printersForPluginAction.length - p
-                } / <i class="fas fa-plug"></i> ${pluginAmount}
-              `;
-            pluginAmount = pluginAmount - 1;
+            const response = await octoPrintPluginInstallAction(
+              printersForPluginAction[p],
+              result,
+              action
+            );
+            updateTableRow(printersForPluginAction[p]._id, response.status, response.message);
+            updateBulkActionsProgress(p, printersForPluginAction.length);
           }
-          trackerBtn.classList.add("d-none");
+          updateBulkActionsProgress(printersForPluginAction.length, printersForPluginAction.length);
         }
       }
     });

@@ -149,37 +149,34 @@ export async function octoPrintPluginInstallAction(printer, pluginList, action) 
       const post = await OctoPrintClient.post(printer, "plugin/pluginmanager", postData);
       alert.close();
       if (post.status === 409) {
-        UI.createAlert(
-          "error",
-          "Plugin not installed... Printer could be active...",
-          4000,
-          "Clicked"
-        );
+        return {
+          status: bulkActionsStates.ERROR,
+          message: "OctoPrint reported a conflict when dealing with the request! are you printing?"
+        };
       } else if (post.status === 400) {
-        UI.createAlert("error", "Malformed request... please log an issue...", 4000, "Clicked");
+        return {
+          status: bulkActionsStates.ERROR,
+          message: "OctoPrint did not action the request, please open an issue!"
+        };
       } else if (post.status === 200) {
         let response = await post.json();
         if (response.needs_restart || response.needs_refresh) {
-          UI.createAlert(
-            "success",
-            `${printer.printerName}: ${pluginList[r]} - Has successfully been installed... OctoPrint restart is required!`,
-            4000,
-            "Clicked"
-          );
+          return {
+            status: bulkActionsStates.WARNING,
+            message: "Your plugins we're installed successfully! Restart is required!"
+          };
         } else {
-          UI.createAlert(
-            "success",
-            `${printer.printerName}: ${pluginList[r]} - Has successfully been installed... No further action requested...`,
-            4000,
-            "Clicked"
-          );
+          return {
+            status: bulkActionsStates.SUCCESS,
+            message: "Your plugins we're installed successfully! No restart required."
+          };
         }
       }
     }
   } else {
-    UI.createAlert(
-      "danger",
-      `${printer.printerName}: Is active skipping the plugin installation command...`
-    );
+    return {
+      status: bulkActionsStates.SKIPPED,
+      message: "Skipped because your printer is currently active..."
+    };
   }
 }

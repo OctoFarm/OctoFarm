@@ -16,7 +16,8 @@ All notable changes to this project will be documented in this file.
 ### Fixed
     - Fixed an issue with gcode scripts table
     - Fixed issue with Pre-Heat bulk command sending commands without a value inputted / value at 0.
-    - Fixed bulk control function trying to display camera image when non available
+    - Fixed bulk control function trying to display camera image when non available.
+    - Fixed issue where disable, enable and uninstall plugins would show duplicate plugin list.
 
 ## [v1.2-rc2]
 

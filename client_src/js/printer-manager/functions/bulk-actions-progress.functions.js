@@ -7,7 +7,8 @@ const EL = {
   TABLE: document.getElementById("bulkActionResultsTable"),
   COMPLETE_COUNT: document.getElementById("bulkActionCompleteCount"),
   SKIPPED_COUNT: document.getElementById("bulkActionSkipped"),
-  ERROR_COUNT: document.getElementById("bulkActionError")
+  ERROR_COUNT: document.getElementById("bulkActionError"),
+  WARNING_COUNT: document.getElementById("bulkActionWarning")
 };
 
 const INITIAL_MESSAGE =
@@ -71,7 +72,7 @@ export function updateTableRow(id, status, message) {
     } else {
       resultElement.innerHTML = WARNING;
     }
-    EL.SKIPPED_COUNT.innerHTML = parseInt(EL.SKIPPED_COUNT.innerHTML) + 1;
+    EL.WARNING_COUNT.innerHTML = parseInt(EL.WARNING_COUNT.innerHTML) + 1;
   }
   if (messageElement.innerHTML.length !== 0) {
     messageElement.innerHTML = messageElement.innerHTML + "<br>" + message;
