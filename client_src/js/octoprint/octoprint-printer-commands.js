@@ -1,5 +1,6 @@
 import OctoPrintClient from "../lib/octoprint";
 import UI from "../lib/functions/ui";
+import bulkActionsStates from "../printer-manager/bulk-actions.constants";
 
 export async function printerPreHeatChamber(printer, chamberTemp) {
   let chamberData = {
@@ -14,27 +15,21 @@ export async function printerPreHeatChamber(printer, chamberTemp) {
     let post = await OctoPrintClient.post(printer, "printer/chamber", chamberData);
     if (typeof post !== "undefined") {
       if (post.status === 204) {
-        UI.createAlert(
-          "success",
-          `Successfully set chamber target attempt to ${printer.printerName}...`,
-          3000,
-          "Clicked"
-        );
+        return {
+          status: bulkActionsStates.SUCCESS,
+          message: "Chamber successfully set at " + chamberData.target + "°C"
+        };
       } else {
-        UI.createAlert(
-          "error",
-          `There was an issue setting chamber target attempt to ${printer.printerName} are you sure it's online?`,
-          3000,
-          "Clicked"
-        );
+        return {
+          status: bulkActionsStates.ERROR,
+          message: "Failed to set chamber temp!"
+        };
       }
     } else {
-      UI.createAlert(
-        "error",
-        `No response from ${printer.printerName}, is it online???`,
-        3000,
-        "Clicked"
-      );
+      return {
+        status: bulkActionsStates.ERROR,
+        message: "Failed to contact OctoPrint, is it online?"
+      };
     }
   }
 }
@@ -51,27 +46,21 @@ export async function printerPreHeatBed(printer, bedTemp) {
     let post = await OctoPrintClient.post(printer, "printer/bed", bedData);
     if (typeof post !== "undefined") {
       if (post.status === 204) {
-        UI.createAlert(
-          "success",
-          `Successfully set bed target attempt to ${printer.printerName}...`,
-          3000,
-          "Clicked"
-        );
+        return {
+          status: bulkActionsStates.SUCCESS,
+          message: "Bed successfully set at " + bedData.target + "°C"
+        };
       } else {
-        UI.createAlert(
-          "error",
-          `There was an issue setting bed target attempt to ${printer.printerName} are you sure it's online?`,
-          3000,
-          "Clicked"
-        );
+        return {
+          status: bulkActionsStates.ERROR,
+          message: "Failed to set bed temp!"
+        };
       }
     } else {
-      UI.createAlert(
-        "error",
-        `No response from ${printer.printerName}, is it online???`,
-        3000,
-        "Clicked"
-      );
+      return {
+        status: bulkActionsStates.ERROR,
+        message: "Failed to contact OctoPrint, is it online?"
+      };
     }
   }
 }
@@ -87,27 +76,22 @@ export async function printerPreHeatTool(printer, toolTemp, toolNumber) {
     let post = await OctoPrintClient.post(printer, "printer/tool", toolData);
     if (typeof post !== "undefined") {
       if (post.status === 204) {
-        UI.createAlert(
-          "success",
-          `Successfully set tool${toolNumber.value} target attempt to ${printer.printerName}...`,
-          3000,
-          "Clicked"
-        );
+        return {
+          status: bulkActionsStates.SUCCESS,
+          message:
+            "Tool(s) successfully set at " + toolData.targets["tool" + toolNumber.value] + "°C"
+        };
       } else {
-        UI.createAlert(
-          "error",
-          `There was an issue setting tool${toolNumber.value} target attempt to ${printer.printerName} are you sure it's online?`,
-          3000,
-          "Clicked"
-        );
+        return {
+          status: bulkActionsStates.ERROR,
+          message: "Failed to set Tool(s) temp!"
+        };
       }
     } else {
-      UI.createAlert(
-        "error",
-        `No response from ${printer.printerName}, is it online???`,
-        3000,
-        "Clicked"
-      );
+      return {
+        status: bulkActionsStates.ERROR,
+        message: "Failed to contact OctoPrint, is it online?"
+      };
     }
   }
 }
@@ -162,7 +146,7 @@ export async function printerHomeAxis(e, printer, axis) {
   await OctoPrintClient.move(e, printer, "home", axis);
 }
 
-export async function printerSendGcode(printer) {
+export async function printerSendGcode(printer, result) {
   let lines = result.match(/[^\r\n]+/g);
   lines = lines.map(function (name) {
     if (!name.includes("=")) {

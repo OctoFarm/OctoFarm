@@ -165,7 +165,7 @@ export async function bulkEditPrinters() {
 
   if (editedPrinters.length > 0) {
     try {
-      const editedPrinters = await OctoFarmClient.post("printers/update", editedPrinters);
+      editedPrinters = await OctoFarmClient.post("printers/update", editedPrinters);
       const printersAdded = editedPrinters.printersAdded;
       printersAdded.forEach((printer) => {
         UI.createAlert(

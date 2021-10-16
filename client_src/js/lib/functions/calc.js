@@ -127,4 +127,7 @@ export default class Calculate {
       return 0;
     }
   }
+  static getPercentage(done, total) {
+    return ((100 * done) / total).toFixed(0);
+  }
 }

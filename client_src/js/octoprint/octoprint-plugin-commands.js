@@ -1,7 +1,7 @@
 import OctoPrintClient from "../lib/octoprint.js";
 import OctoFarmClient from "../services/octofarm-client.service.js";
 import UI from "../lib/functions/ui";
-import PrinterSelect from "../lib/modules/printerSelect";
+import bulkActionsStates from "../printer-manager/bulk-actions.constants";
 
 const printerBase = "printers";
 const printerInfoURL = "/printerInfo";
@@ -79,12 +79,10 @@ export async function updateOctoPrintPlugins(pluginList, printer) {
     let post = await OctoPrintClient.systemNoConfirm(printer, "restart");
     if (typeof post !== "undefined") {
       if (post.status === 204) {
-        UI.createAlert(
-          "success",
-          `Successfully made restart attempt to ${printer.printerName}... You may need to Re-Sync!`,
-          3000,
-          "Clicked"
-        );
+        return {
+          status: bulkActionsStates.SUCCESS,
+          message: "Update command fired and instance restart start command sent!"
+        };
       } else {
         UI.createAlert(
           "error",
@@ -92,6 +90,10 @@ export async function updateOctoPrintPlugins(pluginList, printer) {
           3000,
           "Clicked"
         );
+        return {
+          status: bulkActionsStates.WARNING,
+          message: "Update command fired, but unable to restart instance, please do this manually!"
+        };
       }
     } else {
       UI.createAlert(
@@ -100,6 +102,10 @@ export async function updateOctoPrintPlugins(pluginList, printer) {
         3000,
         "Clicked"
       );
+      return {
+        status: bulkActionsStates.ERROR,
+        message: "Could not contact OctoPrint, is it online?"
+      };
     }
   } else {
     UI.createAlert(
@@ -108,6 +114,10 @@ export async function updateOctoPrintPlugins(pluginList, printer) {
       3000,
       "Clicked"
     );
+    return {
+      status: bulkActionsStates.ERROR,
+      message: "Failed to update, manual intervention required!"
+    };
   }
 }
 

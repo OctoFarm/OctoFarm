@@ -1,6 +1,7 @@
 import OctoPrintClient from "../lib/octoprint.js";
 import UI from "../lib/functions/ui";
 import OctoFarmClient from "../services/octofarm-client.service";
+import bulkActionsStates from "../printer-manager/bulk-actions.constants";
 
 async function updateBtnOnClick(printerID) {
   try {
@@ -49,25 +50,33 @@ export async function updateOctoPrintClient(printer) {
     data
   );
   if (updateRequest.status === 200) {
-    UI.createAlert(
-      "success",
-      `${printer.printerName}: Update command fired, you may need to restart OctoPrint once complete.`,
-      3000,
-      "Clicked"
-    );
+    UI.createAlert("success", "Update command fired!", 3000, "clicked");
+    return {
+      status: bulkActionsStates.SUCCESS,
+      message: "Update command fired, you may need to restart OctoPrint once complete."
+    };
   } else {
     UI.createAlert(
-      "error",
-      `${printer.printerName}: Failed to update, manual intervention required!`,
+      "success",
+      "OctoPrint responded with a status of: " +
+        post.status +
+        "... there may be bugs on your instance!",
       3000,
-      "Clicked"
+      "clicked"
     );
+    return {
+      status: bulkActionsStates.ERROR,
+      message:
+        "OctoPrint responded with a status of: " +
+        post.status +
+        "... there may be bugs on your instance!"
+    };
   }
 }
 
 export async function quickConnectPrinterToOctoPrint(printer) {
   let data = {};
-  if (typeof printer.connectionOptions !== "undefined") {
+  if (printer.connectionOptions) {
     data = {
       command: "connect",
       port: printer.connectionOptions.portPreference,
@@ -76,12 +85,6 @@ export async function quickConnectPrinterToOctoPrint(printer) {
       save: true
     };
   } else {
-    UI.createAlert(
-      "warning",
-      `${printer.printerName} has no preferences saved, defaulting to AUTO...`,
-      8000,
-      "Clicked"
-    );
     data.command = "connect";
     data.port = "AUTO";
     data.baudrate = 0;
@@ -92,35 +95,27 @@ export async function quickConnectPrinterToOctoPrint(printer) {
     const post = await OctoPrintClient.post(printer, "connection", data);
     if (typeof post !== "undefined") {
       if (post.status === 204) {
-        UI.createAlert(
-          "success",
-          `Successfully made connection attempt to ${printer.printerName}...`,
-          3000,
-          "Clicked"
-        );
+        return { status: bulkActionsStates.SUCCESS, message: "Connection attempt was successful!" };
       } else {
-        UI.createAlert(
-          "error",
-          `There was an issue connecting to ${printer.printerName} it's either not online, or the connection options supplied are not available...`,
-          3000,
-          "Clicked"
-        );
+        return {
+          status: bulkActionsStates.ERROR,
+          message:
+            "OctoPrint responded with a status of: " +
+            post.status +
+            "... please check your connection values in the printer settings modal."
+        };
       }
     } else {
-      UI.createAlert(
-        "error",
-        `No response from ${printer.printerName}, is it online???`,
-        3000,
-        "Clicked"
-      );
+      return {
+        status: bulkActionsStates.ERROR,
+        message: "Couldn't contact OctoPrint, is it online?"
+      };
     }
   } else {
-    UI.createAlert(
-      "warning",
-      `Printer ${printer.printerName} is not in "Disconnected" state... skipping`,
-      3000,
-      "Clicked"
-    );
+    return {
+      status: bulkActionsStates.SKIPPED,
+      message: "Skipped because printer wasn't in disconnected state..."
+    };
   }
 }
 
@@ -132,35 +127,27 @@ export async function disconnectPrinterFromOctoPrint(printer) {
     let post = await OctoPrintClient.post(printer, "connection", data);
     if (typeof post !== "undefined") {
       if (post.status === 204) {
-        UI.createAlert(
-          "success",
-          `Successfully made disconnect attempt to ${printer.printerName}...`,
-          3000,
-          "Clicked"
-        );
+        return { status: bulkActionsStates.SUCCESS, message: "Connection attempt was successful!" };
       } else {
-        UI.createAlert(
-          "error",
-          `There was an issue disconnecting to ${printer.printerName} are you sure it's online?`,
-          3000,
-          "Clicked"
-        );
+        return {
+          status: bulkActionsStates.ERROR,
+          message:
+            "OctoPrint responded with a status of: " +
+            post.status +
+            "... please check your connection values in the printer settings modal."
+        };
       }
     } else {
-      UI.createAlert(
-        "error",
-        `No response from ${printer.printerName}, is it online???`,
-        3000,
-        "Clicked"
-      );
+      return {
+        status: bulkActionsStates.ERROR,
+        message: "Couldn't contact OctoPrint, is it online?"
+      };
     }
   } else {
-    UI.createAlert(
-      "warning",
-      `Printer ${printer.printerName} is not in "Idle" state... skipping`,
-      3000,
-      "Clicked"
-    );
+    return {
+      status: bulkActionsStates.SKIPPED,
+      message: "Skipped because printer wasn't in idle state..."
+    };
   }
 }
 
@@ -170,34 +157,29 @@ export async function sendPowerCommandToOctoPrint(printer, powerCommand) {
     await UI.delay(1000);
     if (typeof post !== "undefined") {
       if (post.status === 204) {
-        UI.createAlert(
-          "success",
-          `Successfully made ${result} attempt to ${printer.printerName}...`,
-          3000,
-          "Clicked"
-        );
+        return {
+          status: bulkActionsStates.SUCCESS,
+          message: "Your OctoPrint instance will " + powerCommand
+        };
       } else {
-        UI.createAlert(
-          "error",
-          `There was an issue sending ${result} to ${printer.printerName} are you sure it's online?`,
-          3000,
-          "Clicked"
-        );
+        return {
+          status: bulkActionsStates.ERROR,
+          message:
+            "OctoPrint responded with a status of: " +
+            post.status +
+            "... please check your power settings in the printer settings modal"
+        };
       }
     } else {
-      UI.createAlert(
-        "error",
-        `No response from ${printer.printerName}, is it online???`,
-        3000,
-        "Clicked"
-      );
+      return {
+        status: bulkActionsStates.ERROR,
+        message: "Couldn't contact OctoPrint, is it online?"
+      };
     }
   } else {
-    UI.createAlert(
-      "warning",
-      `Printer ${printer.printerName} is not in "Idle" state... skipping`,
-      3000,
-      "Clicked"
-    );
+    return {
+      status: bulkActionsStates.SKIPPED,
+      message: "Skipped because printer wasn't in idle state..."
+    };
   }
 }

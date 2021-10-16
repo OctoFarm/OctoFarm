@@ -29,6 +29,12 @@ import {
 import CustomGenerator from "../../lib/modules/customScripts";
 import { setupPluginSearch } from "./plugin-search.function";
 import { returnPluginListTemplate } from "../templates/octoprint-plugin-list.template";
+import {
+  showBulkActionsModal,
+  updateBulkActionsProgress,
+  generateTableRows,
+  updateTableRow
+} from "../functions/bulk-actions-progress.functions";
 
 // TODO this should come from printer select to save the extra call, re-iteration and matching.
 async function getCurrentlySelectedPrinterList() {
@@ -62,9 +68,10 @@ export async function bulkOctoPrintPluginUpdate() {
     let pluginList = [];
     for (let printer = 0; printer < currentPrinterList.length; printer++) {
       let currentPrinter = currentPrinterList[printer];
-      if (currentPrinter.octoPrintPluginUpdates.length > 0) {
+      if (currentPrinter?.octoPrintPluginUpdates?.length > 0) {
         message += currentPrinter.printerName + "<br>";
         toUpdate.push({
+          _id: currentPrinter._id,
           printerURL: currentPrinter.printerURL,
           printerName: currentPrinter.printerName,
           apikey: currentPrinter.apikey
@@ -75,6 +82,10 @@ export async function bulkOctoPrintPluginUpdate() {
         }
       }
     }
+    if (toUpdate.length < 1) {
+      UI.createAlert("error", "There are no plugin updates available!", 0, "clicked");
+      return;
+    }
     message += "Are you sure?";
     bootbox.confirm({
       size: "medium",
@@ -82,9 +93,15 @@ export async function bulkOctoPrintPluginUpdate() {
       message: message,
       callback: async function (result) {
         if (result) {
+          showBulkActionsModal();
+          updateBulkActionsProgress(0, toUpdate.length);
+          generateTableRows(toUpdate);
           for (let i = 0; i < toUpdate.length; i++) {
-            await updateOctoPrintPlugins(pluginList, toUpdate[i]);
+            const response = await updateOctoPrintPlugins(pluginList, toUpdate[i]);
+            updateTableRow(toUpdate[i]._id, response.status, response.message);
+            updateBulkActionsProgress(i, toUpdate.length);
           }
+          updateBulkActionsProgress(toUpdate.length, toUpdate.length);
         }
       }
     });
@@ -106,17 +123,21 @@ export async function bulkOctoPrintClientUpdate() {
     let toUpdate = [];
     for (let printer = 0; printer < currentPrinterList.length; printer++) {
       let currentPrinter = currentPrinterList[printer];
-      if (currentPrinter.octoPrintUpdate.updateAvailable) {
+      if (currentPrinter?.octoPrintUpdate?.updateAvailable) {
         message += currentPrinter.printerName + "<br>";
 
         toUpdate.push({
+          _id: currentPrinter._id,
           printerURL: currentPrinter.printerURL,
           printerName: currentPrinter.printerName,
           apikey: currentPrinter.apikey
         });
       }
     }
-
+    if (toUpdate.length < 1) {
+      UI.createAlert("error", "There are no OctoPrint updates available!", 0, "clicked");
+      return;
+    }
     message += "Are you sure?";
     bootbox.confirm({
       size: "medium",
@@ -124,9 +145,15 @@ export async function bulkOctoPrintClientUpdate() {
       message: message,
       callback: async function (result) {
         if (result) {
+          showBulkActionsModal();
+          updateBulkActionsProgress(0, toUpdate.length);
+          generateTableRows(toUpdate);
           for (let i = 0; i < toUpdate.length; i++) {
-            await updateOctoPrintClient(toUpdate[i]);
+            const response = await updateOctoPrintClient(toUpdate[i]);
+            updateTableRow(toUpdate[i]._id, response.status, response.message);
+            updateBulkActionsProgress(i, toUpdate.length);
           }
+          updateBulkActionsProgress(toUpdate.length, toUpdate.length);
         }
       }
     });
@@ -143,17 +170,28 @@ export async function bulkOctoPrintClientUpdate() {
 
 export async function bulkConnectPrinters() {
   const printersToControl = await getCurrentlySelectedPrinterList();
+  showBulkActionsModal();
+  updateBulkActionsProgress(0, printersToControl.length);
+  generateTableRows(printersToControl);
   for (let p = 0; p < printersToControl.length; p++) {
-    await quickConnectPrinterToOctoPrint(printersToControl[p]);
+    const response = await quickConnectPrinterToOctoPrint(printersToControl[p]);
+    updateTableRow(printersToControl[p]._id, response.status, response.message);
+    updateBulkActionsProgress(p, printersToControl.length);
   }
+  updateBulkActionsProgress(printersToControl.length, printersToControl.length);
 }
 
 export async function bulkDisconnectPrinters() {
   const printersToDisconnect = await getCurrentlySelectedPrinterList();
-  console.log(printersToDisconnect);
+  showBulkActionsModal();
+  updateBulkActionsProgress(0, printersToDisconnect.length);
+  generateTableRows(printersToDisconnect);
   for (let p = 0; p < printersToDisconnect.length; p++) {
-    await disconnectPrinterFromOctoPrint(printersToDisconnect[p]);
+    const response = await disconnectPrinterFromOctoPrint(printersToDisconnect[p]);
+    updateTableRow(printersToDisconnect[p]._id, response.status, response.message);
+    updateBulkActionsProgress(p, printersToDisconnect.length);
   }
+  updateBulkActionsProgress(printersToDisconnect.length, printersToDisconnect.length);
 }
 
 export function bulkOctoPrintPowerCommand() {
@@ -177,9 +215,15 @@ export function bulkOctoPrintPowerCommand() {
     ],
     callback: async function (result) {
       const printersToPower = await getCurrentlySelectedPrinterList();
+      showBulkActionsModal();
+      updateBulkActionsProgress(0, printersToPower.length);
+      generateTableRows(printersToPower);
       for (let p = 0; p < printersToPower.length; p++) {
-        await sendPowerCommandToOctoPrint(printersToPower[p], result);
+        const response = await sendPowerCommandToOctoPrint(printersToPower[p], result);
+        updateTableRow(printersToPower[p]._id, response.status, response.message);
+        updateBulkActionsProgress(p, printersToPower.length);
       }
+      updateBulkActionsProgress(printersToPower.length, printersToPower.length);
     }
   });
 }
@@ -244,11 +288,28 @@ export function bulkOctoPrintPreHeatCommand() {
           let chamberTemp = document.getElementById("preHeatChamberTempSelect");
 
           const printersToPreHeat = await getCurrentlySelectedPrinterList();
+          showBulkActionsModal();
+          updateBulkActionsProgress(0, printersToPreHeat.length);
+          generateTableRows(printersToPreHeat);
           for (let p = 0; p < printersToPreHeat.length; p++) {
-            await printerPreHeatTool(printersToPreHeat[p], toolTemp, toolNumber);
-            await printerPreHeatBed(printersToPreHeat[p], bedTemp);
-            await printerPreHeatChamber(printersToPreHeat[p], chamberTemp);
+            let response;
+            if (toolTemp.value && toolTemp.value > 0) {
+              response = await printerPreHeatTool(printersToPreHeat[p], toolTemp, toolNumber);
+              updateTableRow(printersToPreHeat[p]._id, response.status, response.message);
+              updateBulkActionsProgress(p, printersToPreHeat.length);
+            }
+            if (bedTemp.value !== "" && bedTemp.value > 0) {
+              response = await printerPreHeatBed(printersToPreHeat[p], bedTemp);
+              updateTableRow(printersToPreHeat[p]._id, response.status, response.message);
+              updateBulkActionsProgress(p, printersToPreHeat.length);
+            }
+            if (chamberTemp.value !== "" && chamberTemp.value > 0) {
+              response = await printerPreHeatChamber(printersToPreHeat[p], chamberTemp);
+              updateTableRow(printersToPreHeat[p]._id, response.status, response.message);
+              updateBulkActionsProgress(p, printersToPreHeat.length);
+            }
           }
+          updateBulkActionsProgress(printersToPreHeat.length, printersToPreHeat.length);
         }
       }
     }
@@ -258,17 +319,18 @@ export function bulkOctoPrintPreHeatCommand() {
 export async function bulkOctoPrintControlCommand() {
   const printersToControl = await getCurrentlySelectedPrinterList();
   let cameraBlock = "";
-
   printersToControl.forEach((printer) => {
-    cameraBlock += `
+    if (printer.cameraURL && printer.cameraURL.length !== 0) {
+      cameraBlock += `
         <div class="col-lg-3">
             <img width="100%" src="${printer.cameraURL}">
         </div>
         `;
+    }
   });
 
   bootbox.dialog({
-    title: "Bulk printer control...",
+    title: "Bulk printer control",
     message: `
       <div id="printerControls" class="row">
             <div class="col-lg-12">
@@ -523,21 +585,12 @@ export async function bulkOctoPrintGcodeCommand() {
       );
       const customGcodeEE = "<div class='mb-1' id='customGcodeCommandsArea'></div>";
       textArea[0].insertAdjacentHTML("beforebegin", customGcodeEE);
-      let buttonPrinters = [];
-      printersToSendGcode.forEach(async (printer) => {
-        const index = _.findIndex(printerInfo, function (o) {
-          return o._id === printer;
-        });
-        if (index > -1) {
-          buttonPrinters.push(printerInfo[index]);
-        }
-      });
-      CustomGenerator.generateButtons(buttonPrinters);
+      CustomGenerator.generateButtons(printersToSendGcode);
     },
     callback: async function (result) {
-      if (result !== null) {
+      if (result) {
         for (let p = 0; p < printersToSendGcode.length; p++) {
-          await printerSendGcode(printersToSendGcode[p]);
+          await printerSendGcode(printersToSendGcode[p], result);
         }
       }
     }

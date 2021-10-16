@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.2-rc3]
+
+### Added
+    - Bulk actions will now produce a modal to track the actions which produces a status and message. This replaces the alert notification that flooded the screen previously.
+
+### Changed
+
+### Removed
+    - Bulk actions notification alert
+    - Ping/Pong message on connection log, redundant and ends up flooding the log.
+
+### Fixed
+    - Fixed an issue with gcode scripts table
+    - Fixed issue with Pre-Heat bulk command sending commands without a value inputted / value at 0.
+    - Fixed bulk control function trying to display camera image when non available
+
 ## [v1.2-rc2]
 
 ### Added

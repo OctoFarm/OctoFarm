@@ -55,7 +55,7 @@ export function returnPrinterTableRow(printer) {
                 >
                     <i class="fas fa-wrench"></i>
                 </button>
-                <button title="No OctoPrint updates available!" id="octoprintUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-1' disabled><i class="fas fa-desktop"></i></button>
+                <button title="No OctoPrint updates available!" id="octoprintUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-1' disabled><i class="fab fa-raspberry-pi"></i></button>
                 <button title="No OctoPrint plugin updates available" id="octoprintPluginUpdate-${printer._id}" class='tag btn btn-secondary btn-sm bg-colour-2' disabled><i class="fas fa-plug"></i></button>
         </td>
         <td class="align-middle">

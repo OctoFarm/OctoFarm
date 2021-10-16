@@ -1,4 +1,6 @@
-<% const octofarmErrorModal = './partials/octofarm-error.modal.ejs'  %>
+<% const base = './partials' %>
+<% const octofarmErrorModal = base + '/octofarm-error.modal.ejs'  %>
+<% const modal = base + '/octofarm-modal.ejs' %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -269,6 +271,13 @@
             </div>
         </div>
     </div>
+    <%- include(modal, {
+    modal:{
+    id:"bulkActionProgress", title:"Bulk Action Progress: ", isBodyScrollable: "true"
+    },
+    bodyFile:'./PrinterManager/bulkActionsProgress.modal.ejs'
+    })
+    %>
 
     <div id="overlay"><i id="overlayIcon" class="fas fa-spinner fa-pulse fa-10x textActive"></i></div>
 </div>
