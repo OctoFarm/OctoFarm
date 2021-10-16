@@ -2,7 +2,6 @@ const groupSelectionDropDown = document.getElementById("filterStates");
 
 export default function initGroupSelect(printers) {
   //Active and fill dropdown...
-  console.log(printers);
   const currentGroups = [];
   printers.forEach((printer) => {
     currentGroups.push(printer.group);

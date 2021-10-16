@@ -934,7 +934,6 @@ class Runner {
         throw globalAPICheck;
       }
       // Make a connection attempt, and grab current user.
-      console.log("CURRENT USER", farmPrinters[i].currentUser)
       let users = await this.octoPrintService.getUsers(farmPrinters[i], true);
       if (users.status === 200) {
         farmPrinters[i].systemChecks.scanning.api.status = "success";
