@@ -911,7 +911,12 @@ class Runner {
         throw error;
       }
       farmPrinters[i].systemChecks.scanning.api.status = "warning";
+      // Clear out the old websocket connection...
+      if(farmPrinters[i]?.ws){
+        delete farmPrinters[i].ws
+      }
       const ws = new WebSocketClient();
+      farmPrinters[i].ws = ws;
       farmPrinters[i].state = "Searching...";
       farmPrinters[i].stateColour = Runner.getColour("Searching...");
       farmPrinters[i].hostState = "Searching...";
@@ -920,7 +925,7 @@ class Runner {
       farmPrinters[i].stateDescription = "Attempting to connect to OctoPrint";
       farmPrinters[i].hostDescription = "Attempting to connect to OctoPrint";
       farmPrinters[i].webSocketDescription = "Websocket Offline";
-      farmPrinters[i].ws = ws;
+
       if (typeof farmPrinters[i] !== "undefined") {
         PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
       }
@@ -935,15 +940,20 @@ class Runner {
         farmPrinters[i].systemChecks.scanning.api.date = new Date();
 
         users = await users.json();
-
+        if(!farmPrinters[i]?.userList){
+          farmPrinters[i].userList = [];
+        }
+        farmPrinters[i].userList = [];
         if (_.isEmpty(users)) {
           farmPrinters[i].currentUser = "admin";
+          farmPrinters[i].userList.push("admin");
           farmPrinters[i].markModified("currentUser");
           farmPrinters[i].updateOne();
         } else {
           users.users.forEach((user) => {
             if (user.admin) {
               farmPrinters[i].currentUser = user.name;
+              farmPrinters[i].userList.push(user.name);
               farmPrinters[i].markModified("currentUser");
               farmPrinters[i].updateOne();
             }
@@ -975,7 +985,6 @@ class Runner {
           farmPrinters[i].hostStateColour = Runner.getColour("Online");
           farmPrinters[i].hostDescription = "Host is Online";
           await Runner.getSystem(id);
-          await Runner.getSettings(id);
           await Runner.getProfile(id);
           await Runner.getState(id);
           await Runner.getOctoPrintSystenInfo(id);

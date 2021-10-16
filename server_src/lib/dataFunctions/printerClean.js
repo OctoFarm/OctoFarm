@@ -343,6 +343,7 @@ class PrinterClean {
           colour: farmPrinter.hostStateColour,
           desc: farmPrinter.hostDescription
         },
+        userList: farmPrinter.userList,
         printerState: {
           state: farmPrinter.state,
           colour: farmPrinter.stateColour,
