@@ -183,7 +183,7 @@ document.getElementById("exportPrinterBtn").addEventListener("click", async (eve
   await exportPrintersToJson();
 });
 document.getElementById("importPrinterBtn").addEventListener("change", async function () {
-  await importPrintersFromJsonFile;
+  await importPrintersFromJsonFile(this.files);
 });
 
 document.getElementById("addPrinterBtn").addEventListener("click", (event) => {

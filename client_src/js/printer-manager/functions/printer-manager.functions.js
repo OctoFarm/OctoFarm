@@ -213,8 +213,8 @@ export async function exportPrintersToJson() {
     UI.createAlert("error", `Error exporting printers, please check logs: ${e}`, 3000, "clicked");
   }
 }
-export async function importPrintersFromJsonFile() {
-  const Afile = this.files;
+export async function importPrintersFromJsonFile(file) {
+  const Afile = file;
   if (Afile[0].name.includes(".json")) {
     const files = Afile[0];
     const reader = new FileReader();
@@ -266,7 +266,7 @@ export async function saveAllOnAddPrinterTable() {
   for (const btn of onScreenButtons) {
     btn.disabled = false;
     btn.click();
-    await delay(1500);
+    await UI.delay(1500);
   }
   UI.createAlert("success", "Successfully saved all your instances", 4000);
   saveAllBtn.disabled = false;
