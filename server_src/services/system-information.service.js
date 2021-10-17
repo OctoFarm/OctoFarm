@@ -15,9 +15,7 @@ const { AppConstants } = require("../app.constants");
 const currentVersion = process?.env[AppConstants.VERSION_KEY];
 const systemInformationFileName = "system_information.txt";
 
-const {
-  checkIfFileFileExistsAndDeleteIfSo
-} = require("../utils/file.utils.js");
+const { checkIfFileFileExistsAndDeleteIfSo } = require("../utils/file.utils.js");
 
 const { prettyPrintArray } = require("../utils/pretty-print.utils.js");
 
@@ -74,7 +72,9 @@ function generateSystemInformationContents() {
 
   systemInformationContents += "--- System Information ---\n\n";
 
-  systemInformationContents += `Platform\n ${systemInformation?.osInfo?.platform} \n`;
+  console.log(systemInformation);
+
+  systemInformationContents += `Platform\n ${systemInformation?.osInfo?.distro} \n`;
   systemInformationContents += `Processor Arch\n ${systemInformation?.osInfo?.arch} \n`;
   systemInformationContents += `System Uptime\n ${prettyHelpers.generateTime(
     systemInformation?.sysUptime?.uptime
@@ -87,9 +87,7 @@ function generateSystemInformationContents() {
 
   if (printerVersions) {
     systemInformationContents += "--- OctoPrint Information ---\n\n";
-    systemInformationContents += `OctoPrint Versions\n ${prettyPrintArray(
-      printerVersions
-    )}`;
+    systemInformationContents += `OctoPrint Versions\n ${prettyPrintArray(printerVersions)}`;
   }
 
   return systemInformationContents;
