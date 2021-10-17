@@ -23,6 +23,7 @@ All notable changes to this project will be documented in this file.
     - Fixed bulk control function trying to display camera image when non available.
     - Fixed issue where disable, enable and uninstall plugins would show duplicate plugin list.
     - Fixed #730: Group selections we're not working as intended...
+    - Fixed #672: Tool temperature offset's we're not applied before a print.
 
 ## [v1.2-rc2]
 
