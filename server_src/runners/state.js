@@ -713,10 +713,13 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       }
       if (data.plugin.plugin === "DisplayLayerProgress"){
         if(data.plugin?.data?.printerDisplay) {
+          const totalLayers = parseInt(OP_PLUGIN_DISPLAY_LAYER.totalLayerRegex.exec(data.plugin.data.printerDisplay)[0]) || 0;
+          const currentLayer = parseInt(OP_PLUGIN_DISPLAY_LAYER.currentLayerRegex.exec(data.plugin.data.printerDisplay)[0]) || 0;
+          const layerPercent = ((currentLayer / totalLayers) * 100).toFixed(0)
           farmPrinters[this.index].layerData = {
-            totalLayers: parseInt(OP_PLUGIN_DISPLAY_LAYER.totalLayerRegex.exec(data.plugin.data.printerDisplay)[0]) || 0,
-            currentLayer: parseInt(OP_PLUGIN_DISPLAY_LAYER.currentLayerRegex.exec(data.plugin.data.printerDisplay)[0]) || 0,
-            percentComplete: parseInt(OP_PLUGIN_DISPLAY_LAYER.currentPercentRegex.exec(data.plugin.data.printerDisplay)[0]) || 0
+            totalLayers: totalLayers,
+            currentLayer: currentLayer,
+            percentComplete:layerPercent
           }
         }
       }
