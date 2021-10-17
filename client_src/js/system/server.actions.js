@@ -1,6 +1,7 @@
 import OctoFarmClient from "../services/octofarm-client.service";
 import UI from "../lib/functions/ui";
 import Calc from "../lib/functions/calc";
+import FileOperations from "../lib/functions/file";
 import { setupOctoPrintForTimelapses } from "../octoprint/octoprint-settings.actions";
 import {
   isFilamentManagerPluginSyncEnabled,

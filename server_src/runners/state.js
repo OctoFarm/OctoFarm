@@ -717,11 +717,11 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         if(data.plugin?.data?.printerDisplay) {
           const totalLayers = parseInt(OP_PLUGIN_DISPLAY_LAYER.totalLayerRegex.exec(data.plugin.data.printerDisplay)[0]) || 0;
           const currentLayer = parseInt(OP_PLUGIN_DISPLAY_LAYER.currentLayerRegex.exec(data.plugin.data.printerDisplay)[0]) || 0;
-          const layerPercent = ((currentLayer / totalLayers) * 100).toFixed(0)
+          const layerPercent = parseInt(((currentLayer / totalLayers) * 100).toFixed(0)) || 0
           farmPrinters[this.index].layerData = {
             totalLayers: totalLayers,
             currentLayer: currentLayer,
-            percentComplete:layerPercent
+            percentComplete: layerPercent
           }
         }
       }
@@ -930,8 +930,7 @@ class Runner {
       if(farmPrinters[i]?.ws){
         delete farmPrinters[i].ws
       }
-      const ws = new WebSocketClient();
-      farmPrinters[i].ws = ws;
+      farmPrinters[i].ws = new WebSocketClient();
       farmPrinters[i].state = "Searching...";
       farmPrinters[i].stateColour = Runner.getColour("Searching...");
       farmPrinters[i].hostState = "Searching...";

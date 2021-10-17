@@ -72,8 +72,6 @@ function generateSystemInformationContents() {
 
   systemInformationContents += "--- System Information ---\n\n";
 
-  console.log(systemInformation);
-
   systemInformationContents += `Platform\n ${systemInformation?.osInfo?.distro} \n`;
   systemInformationContents += `Processor Arch\n ${systemInformation?.osInfo?.arch} \n`;
   systemInformationContents += `System Uptime\n ${prettyHelpers.generateTime(

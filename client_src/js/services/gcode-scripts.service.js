@@ -210,7 +210,7 @@ export default class Script {
       message: newAlert.message
     };
     let post = await OctoFarmClient.post("scripts/edit", opts);
-    if (post) {
+    if (!post) {
       UI.createAlert("error", "Failed to save your alert!", 3000, "Clicked");
     } else {
       UI.createAlert("success", "Successfully saved your alert!", 3000, "Clicked");
@@ -236,7 +236,7 @@ export default class Script {
       printer: []
     };
     let post = await OctoFarmClient.post("scripts/save", opts);
-    if (post) {
+    if (!post) {
       UI.createAlert("error", "Failed to save your alert!", 3000, "Clicked");
     } else {
       UI.createAlert("success", "Successfully saved your alert!", 3000, "Clicked");
@@ -245,11 +245,11 @@ export default class Script {
   }
   static async delete(id) {
     let post = await OctoFarmClient.delete("scripts/delete/" + id);
-    if (post) {
+    if (!post) {
       UI.createAlert("error", "Failed to delete your alert.", 3000, "Clicked");
-      document.getElementById("alertList-" + id).remove();
     } else {
       UI.createAlert("success", "Successfully deleted your alert.", 3000, "Clicked");
+      document.getElementById("alertList-" + id).remove();
     }
   }
   static async test(scriptLocation, message) {
