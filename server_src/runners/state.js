@@ -21,6 +21,7 @@ const { JobClean } = require("../lib/dataFunctions/jobClean.js");
 const { FileClean } = require("../lib/dataFunctions/fileClean.js");
 const { FilamentClean } = require("../lib/dataFunctions/filamentClean.js");
 const { PrinterTicker } = require("./printerTicker.js");
+const { OP_PLUGIN_DISPLAY_LAYER } = require("../constants/regex.constants")
 
 const logger = new Logger("OctoFarm-State");
 let farmPrinters = [];
@@ -62,13 +63,13 @@ function heartBeat(index) {
     farmPrinters[index].webSocket = "success";
     farmPrinters[index].webSocketDescription = "Websocket Connection Online";
   }
-  PrinterTicker.addIssue(
-    new Date(),
-    farmPrinters[index].printerURL,
-    "Pong message received from client...",
-    "Complete",
-    farmPrinters[index]._id
-  );
+  // PrinterTicker.addIssue(
+  //   new Date(),
+  //   farmPrinters[index].printerURL,
+  //   "Pong message received from client...",
+  //   "Complete",
+  //   farmPrinters[index]._id
+  // );
   farmPrinters[index].ws.isAlive = true;
 }
 
@@ -80,13 +81,13 @@ const heartBeatInterval = setInterval(function ping() {
         client.ws.instance.readyState !== 2 &&
         client.ws.instance.readyState !== 3
       ) {
-        PrinterTicker.addIssue(
-          new Date(),
-          farmPrinters[client.ws.index].printerURL,
-          "Sending ping message to websocket...",
-          "Active",
-          farmPrinters[client.ws.index]._id
-        );
+        // PrinterTicker.addIssue(
+        //   new Date(),
+        //   farmPrinters[client.ws.index].printerURL,
+        //   "Sending ping message to websocket...",
+        //   "Active",
+        //   farmPrinters[client.ws.index]._id
+        // );
         if (client.ws.isAlive === false) return client.ws.instance.terminate();
 
         // Retry connecting if failed...
@@ -195,7 +196,14 @@ WebSocketClient.prototype.open = function (url, index) {
               PrinterClean.generate(farmPrinters[this.index], systemSettings.filamentManager);
             }
           } catch (e) {
-            logger.info(
+            PrinterTicker.addIssue(
+              new Date(),
+              farmPrinters[index].printerURL,
+              "Ping/Pong failed to get a response, attempting to reconnect...",
+              "Complete",
+              farmPrinters[index]._id
+            );
+            logger.debug(
               `Ping/Pong failed to get a response, closing and attempted to reconnect: ${this.index}: ${this.url}`
             );
           }
@@ -418,6 +426,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
     farmPrinters[this.index].hostStateColour = Runner.getColour("Online");
     farmPrinters[this.index].hostDescription = "Host is Online";
     data = await JSON.parse(data);
+
     if (typeof data.connected !== "undefined") {
       farmPrinters[this.index].octoPrintVersion = data.connected.version;
       farmPrinters[this.index].plugin_hash = data.connected.plugin_hash;
@@ -443,6 +452,8 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         farmPrinters[this.index]._id
       );
     }
+    //Unsilence the offline log
+    farmPrinters[this.index].silenceOfflineLog = false;
     // Listen for printer status
     if (typeof data.current !== "undefined") {
       farmPrinters[this.index].webSocket = "success";
@@ -662,7 +673,6 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       }
     }
     if (data.plugin) {
-      //console.log(farmPrinters[this.index].printerURL, data.plugin);
       if (data.plugin.data.type === "loglines") {
         if (
           typeof data.plugin.data !== "undefined" &&
@@ -701,6 +711,18 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
             "Firmware version: ",
             ""
           );
+        }
+      }
+      if (data.plugin.plugin === "DisplayLayerProgress"){
+        if(data.plugin?.data?.printerDisplay) {
+          const totalLayers = parseInt(OP_PLUGIN_DISPLAY_LAYER.totalLayerRegex.exec(data.plugin.data.printerDisplay)[0]) || 0;
+          const currentLayer = parseInt(OP_PLUGIN_DISPLAY_LAYER.currentLayerRegex.exec(data.plugin.data.printerDisplay)[0]) || 0;
+          const layerPercent = parseInt(((currentLayer / totalLayers) * 100).toFixed(0)) || 0
+          farmPrinters[this.index].layerData = {
+            totalLayers: totalLayers,
+            currentLayer: currentLayer,
+            percentComplete: layerPercent
+          }
         }
       }
     }
@@ -904,7 +926,11 @@ class Runner {
         throw error;
       }
       farmPrinters[i].systemChecks.scanning.api.status = "warning";
-      const ws = new WebSocketClient();
+      // Clear out the old websocket connection if it exists...
+      if(farmPrinters[i]?.ws){
+        delete farmPrinters[i].ws
+      }
+      farmPrinters[i].ws = new WebSocketClient();
       farmPrinters[i].state = "Searching...";
       farmPrinters[i].stateColour = Runner.getColour("Searching...");
       farmPrinters[i].hostState = "Searching...";
@@ -913,7 +939,7 @@ class Runner {
       farmPrinters[i].stateDescription = "Attempting to connect to OctoPrint";
       farmPrinters[i].hostDescription = "Attempting to connect to OctoPrint";
       farmPrinters[i].webSocketDescription = "Websocket Offline";
-      farmPrinters[i].ws = ws;
+
       if (typeof farmPrinters[i] !== "undefined") {
         PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
       }
@@ -928,20 +954,42 @@ class Runner {
         farmPrinters[i].systemChecks.scanning.api.date = new Date();
 
         users = await users.json();
-
-        if (_.isEmpty(users)) {
-          farmPrinters[i].currentUser = "admin";
-          farmPrinters[i].markModified("currentUser");
-          farmPrinters[i].updateOne();
-        } else {
-          users.users.forEach((user) => {
-            if (user.admin) {
-              farmPrinters[i].currentUser = user.name;
-              farmPrinters[i].markModified("currentUser");
-              farmPrinters[i].updateOne();
-            }
-          });
+        if(!farmPrinters[i]?.userList){
+          farmPrinters[i].userList = [];
         }
+        farmPrinters[i].userList = [];
+        if(!farmPrinters[i]?.currentUser){
+          //No user so make a grab at what's available
+          if (_.isEmpty(users)) {
+            farmPrinters[i].currentUser = "admin";
+            farmPrinters[i].userList.push("admin");
+            farmPrinters[i].markModified("currentUser");
+            farmPrinters[i].updateOne();
+          } else {
+            users.users.forEach((user) => {
+              if (user.admin) {
+                farmPrinters[i].currentUser = user.name;
+                farmPrinters[i].userList.push(user.name);
+                farmPrinters[i].markModified("currentUser");
+                farmPrinters[i].updateOne();
+              }
+            });
+          }
+        }else{
+          // Hmmm we already have a user, just make sure we have the list available to change it.
+          if (_.isEmpty(users)) {
+            farmPrinters[i].userList.push("admin");
+            farmPrinters[i].updateOne();
+          } else {
+            users.users.forEach((user) => {
+              if (user.admin) {
+                farmPrinters[i].userList.push(user.name);
+                farmPrinters[i].updateOne();
+              }
+            });
+          }
+        }
+
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[i].printerURL,
@@ -968,9 +1016,9 @@ class Runner {
           farmPrinters[i].hostStateColour = Runner.getColour("Online");
           farmPrinters[i].hostDescription = "Host is Online";
           await Runner.getSystem(id);
-          await Runner.getSettings(id);
           await Runner.getProfile(id);
           await Runner.getState(id);
+          await Runner.getSettings(id);
           await Runner.getOctoPrintSystenInfo(id);
           await Runner.getPluginList(id);
           await Runner.getUpdates(id);
@@ -998,7 +1046,7 @@ class Runner {
             "Complete",
             farmPrinters[i]._id
           );
-          await farmPrinters[i].ws.open(`${farmPrinters[i].webSocketURL}/sockjs/websocket`, i);
+          await farmPrinters[i].ws.open(`${farmPrinters[i].webSocketURL}sockjs/websocket`, i);
         } else {
           const error = {
             message: `Could not Establish connection to OctoPrint Returned: ${users.status}: ${farmPrinters[i].printerURL}`,
@@ -1100,15 +1148,20 @@ class Runner {
               e.message,
               `Couldn't grab initial connection for Printer: ${farmPrinters[i].printerURL}`
             );
-            PrinterTicker.addIssue(
-              new Date(),
-              farmPrinters[i].printerURL,
-              `${e.message}: Connection refused, trying again in: ${
-                systemSettings.timeout.apiRetry / 1000
-              } seconds`,
-              "Disconnected",
-              farmPrinters[i]._id
-            );
+            if(!farmPrinters[i].silenceOfflineLog){
+              PrinterTicker.addIssue(
+                  new Date(),
+                  farmPrinters[i].printerURL,
+                  `${e.message}: Connection refused, trying again in: ${
+                      systemSettings.timeout.apiRetry / 1000
+                  } seconds. Any subsequent logs for this printer will be silenced...`,
+                  "Disconnected",
+                  farmPrinters[i]._id
+              );
+              farmPrinters[i].silenceOfflineLog = true;
+            }
+
+
             farmPrinters[i].state = "Offline";
             farmPrinters[i].stateColour = Runner.getColour("Offline");
             farmPrinters[i].hostState = "Online";
@@ -2855,6 +2908,13 @@ class Runner {
         farmPrinters[index].printerURL = settings.printer.printerURL;
         printer.printerURL = settings.printer.printerURL;
         printer.markModified("printerURL");
+        updatePrinter = true;
+      }
+
+      if(settings.printer.currentUser !== farmPrinters[index].currentUser){
+        farmPrinters[index].currentUser = settings.printer.currentUser;
+        printer.currentUser = settings.printer.currentUser;
+        printer.markModified("currentUser");
         updatePrinter = true;
       }
 

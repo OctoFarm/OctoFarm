@@ -5,7 +5,7 @@ const editMessage = `
 <div class="alert alert-info" role="alert">
 Update any of the printer values below and press action when you've made your changes.
 </div>
-<div class="alert alert-warning" role="alert">
+<div class="alert alert-warning text-dark" role="alert">
  OctoFarm will then update only the changed printers.
 </div>
 `;
@@ -13,7 +13,7 @@ const deleteMessage = `
 <div class="alert alert-info" role="alert">
 Select which printers you'd like to delete. Press action when you have selected all the printers you'd like to remove.
 </div>
-<div class="alert alert-danger" role="alert">
+<div class="alert alert-danger text-dark" role="alert">
  This is unrecoverable! If you remove the database entry for your printer, any links in the database will be lost... i.e. History/Statistics. Unless you have a backup in place.
 </div>
 `;
@@ -21,10 +21,10 @@ const connectMessage = `
 <div class="alert alert-info" role="alert">
 Please select which printers you'd like to connect to from OctoPrint. Selected printers will attempt a connection with the preferred port settings from OctoPrint.
 </div>
-<div class="alert alert-warning" role="alert">
+<div class="alert alert-warning text-dark" role="alert">
 This can be updated in your printer settings on OctoFarm/OctoPrint. You will need to re-scan for OctoFarm to detect the changes if updated on OctoPrint.
 </div>
-<div class="alert alert-danger" role="alert">
+<div class="alert alert-danger text-dark" role="alert">
  If this doesn't exist the connection attempt will fall back to AUTO and could fail/put your printer in an error state. 
 </div>
 `;
@@ -32,7 +32,7 @@ const disconnectMessage = `
 <div class="alert alert-info" role="alert">
 Please select which printers you'd like to disconnect from OctoPrint.
 </div>
-<div class="alert alert-warning" role="alert">
+<div class="alert alert-warning text-dark" role="alert">
 This will by default skip Active printers. This is not an emergency stop button!
 </div>
 
@@ -41,7 +41,7 @@ const pluginInstallMessage = `
 <div class="alert alert-info" role="alert">
 Please select which printers you'd like to action a plugin installation on... You will be able to choose multiple plugins on the next pop up.
 </div>
-<div class="alert alert-warning" role="alert">
+<div class="alert alert-warning text-dark" role="alert">
   Your plugin installation will be skipped if it's already installed...
 </div>
 `;
@@ -49,7 +49,7 @@ const powerOnOffMessage = `
 <div class="alert alert-info" role="alert">
 Please select your list of printers to action the power command on. You will be able to choose the actual command on the next pop up.
 </div>
-<div class="alert alert-danger" role="alert">
+<div class="alert alert-danger text-dark" role="alert">
   These commands will run without user interaction... It will skip by default any active printers.
 </div>
 `;
@@ -57,7 +57,7 @@ const preHeatMessage = `
 <div class="alert alert-info" role="alert">
   Please select your list of printers to action the pre-heat command. You will configure the temperatures on the next pop up.
 </div>
-<div class="alert alert-danger" role="alert">
+<div class="alert alert-danger text-dark" role="alert">
   Due to this allowing for temps to be actioned on the fly it will not check printer state before doing so.
 </div>
 `;
@@ -66,7 +66,7 @@ const controlPrintersMessage = `
 <div class="alert alert-info" role="alert">
   Please select your list of printers you'd like to bulk control.
 </div>
-<div class="alert alert-danger" role="alert">
+<div class="alert alert-danger text-dark" role="alert">
   Due to this allowing for temps to be actioned on the fly it will not check printer state before doing so.
 </div>
 `;
@@ -75,10 +75,10 @@ const gcodePrintersMessage = `
 <div class="alert alert-info" role="alert">
   Please select your list of printers you'd like to send gcode commands to.
 </div>
-<div class="alert alert-info" role="alert">
+<div class="alert alert-info text-dark" role="alert">
   Commands split up by a new line will be sent sequentially to the terminal.
 </div>
-<div class="alert alert-danger" role="alert">
+<div class="alert alert-danger text-dark" role="alert">
   Due to this allowing for gcode commands to be sent on the fly it will not check printer state before doing so.
 </div>
 `;
@@ -106,7 +106,7 @@ const printersTable = `
           <option href="#" value="complete" data-path=".Complete">
             Complete
           </option>
-          <option href="#" value="disconnected"data-path=".Disconnected">
+          <option href="#" value="disconnected" data-path=".Disconnected">
             Disconnected
           </option>
         </select>
@@ -166,7 +166,7 @@ export default class PrinterSelect {
     <th scope="row">${printer.index}</th>
     <td>${printer.name}</td>
     <td class="${printer.state}">${printer.state}</td>
-    <td class="${printer.group.replace(/\s/g, "_")}">${printer.group}</td>
+    <td class="${printer.group.replace(/[^\w\-]+/g, "-").toLowerCase()}">${printer.group}</td>
     <td>${printer.spool}</td>
 </tr>
 `;
@@ -176,12 +176,32 @@ export default class PrinterSelect {
     return `
 <tr id="editPrinterCard-${printer.id}" class="${printer.state}" data-jplist-item>
   <th scope="row">${printer.index}</th>
-  <td><input id="editInputName-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.name}" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input id="editInputURL-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.printerURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
+  <td><input id="editInputName-${printer.id}" type="text" class="form-control Idle" placeholder="${
+      printer.name
+    }" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputURL-${
+                            printer.id
+                          }" type="text" class="form-control Idle" placeholder="${
+      printer.printerURL
+    }" aria-label="Username" aria-describedby="basic-addon1"></td>
                           <td class="${printer.state} d-none">${printer.state}</td>
-                          <td><input id="editInputGroup-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.group}" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input id="editInputCamera-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.cameraURL}" aria-label="Username" aria-describedby="basic-addon1"></td>
-                          <td><input id="editInputApikey-${printer.id}" type="text" class="form-control Idle" placeholder="${printer.apikey}" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputGroup-${
+                            printer.id
+                          }" type="text" class="form-control Idle" placeholder="${
+      printer.group
+    }" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td class="${printer.group
+                            .replace(/[^\w\-]+/g, "-")
+                            .toLowerCase()}"><input id="editInputCamera-${
+      printer.id
+    }" type="text" class="form-control Idle" placeholder="${
+      printer.cameraURL
+    }" aria-label="Username" aria-describedby="basic-addon1"></td>
+                          <td><input id="editInputApikey-${
+                            printer.id
+                          }" type="text" class="form-control Idle" placeholder="${
+      printer.apikey
+    }" aria-label="Username" aria-describedby="basic-addon1"></td>
     </tr>`;
   }
 
@@ -267,13 +287,14 @@ export default class PrinterSelect {
       if (printer.group !== "") {
         const group = {
           display: printer.group,
-          tag: printer.group.replace(/\s/g, "_")
+          tag: printer.group.replace(/[^\w\-]+/g, "-").toLowerCase()
         };
         groupList.push(group);
       }
     });
-
-    const groupListUnique = _.uniq(groupList, "tag");
+    const groupListUnique = _.uniqBy(groupList, function (e) {
+      return e.tag;
+    });
     if (printerList.length !== 0) {
       //Create printers table
 
@@ -301,10 +322,11 @@ export default class PrinterSelect {
         "beforeend",
         '<option selected value="all" data-path="default">Filter</option>'
       );
+
       groupListUnique.forEach((group, index) => {
         printerGroupList.insertAdjacentHTML(
           "beforeend",
-          `<option value="${group.tag.toLowerCase()}" data-path=".${group.tag}">${
+          `<option value="${group.tag.toLowerCase()}" data-path=".${group.tag.toLowerCase()}">${
             group.display
           }</option>`
         );
@@ -318,9 +340,7 @@ export default class PrinterSelect {
         groupListUnique.forEach((group, index) => {
           printerGroupAssignSelect.insertAdjacentHTML(
             "beforeend",
-            `<option value="${group.tag.toLowerCase()}" data-path=".${group.tag}">${
-              group.display
-            }</option>`
+            `<option value="${group.tag}" data-path=".${group.tag}">${group.display}</option>`
           );
         });
       });

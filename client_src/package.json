@@ -1,6 +1,6 @@
 {
-  "name": "@octofarm/client",
-  "version": "0.1.0-rc2-build6",
+  "name": "@notexpectedyet/octofarm-client",
+  "version": "0.9.1",
   "description": "The website client for OctoFarm bundled using webpack.",
   "scripts": {
     "build": "webpack",
@@ -8,7 +8,7 @@
     "test": "jest --passWithNoTests",
     "webpack": "webpack",
     "webpack:prod": "webpack --mode=production",
-    "webpack:watch": "webpack --watch"
+    "dev": "webpack --watch"
   },
   "repository": {
     "type": "git",
@@ -25,7 +25,7 @@
     "javascript",
     "3d-printing"
   ],
-  "author": "David Zwart (davidzwa) & James Mackay (NotExpectedYet)",
+  "author": "James Mackay (NotExpectedYet)",
   "license": "ISC",
   "devDependencies": {
     "@babel/cli": "^7.13.0",

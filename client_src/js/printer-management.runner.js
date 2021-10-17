@@ -71,7 +71,7 @@ bulkPowerBtn.addEventListener("click", async (e) => {
 
 let scanNetworkBtn = document.getElementById("scanNetworkBtn");
 scanNetworkBtn.addEventListener("click", async (e) => {
-  await scanNetworkForDevices();
+  await scanNetworkForDevices(e);
 });
 
 let bulkPreHeat = document.getElementById("bulkPreHeat");
@@ -183,7 +183,7 @@ document.getElementById("exportPrinterBtn").addEventListener("click", async (eve
   await exportPrintersToJson();
 });
 document.getElementById("importPrinterBtn").addEventListener("change", async function () {
-  await importPrintersFromJsonFile;
+  await importPrintersFromJsonFile(this.files);
 });
 
 document.getElementById("addPrinterBtn").addEventListener("click", (event) => {

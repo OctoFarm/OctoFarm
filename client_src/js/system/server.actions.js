@@ -1,6 +1,7 @@
 import OctoFarmClient from "../services/octofarm-client.service";
 import UI from "../lib/functions/ui";
 import Calc from "../lib/functions/calc";
+import FileOperations from "../lib/functions/file";
 import { setupOctoPrintForTimelapses } from "../octoprint/octoprint-settings.actions";
 import {
   isFilamentManagerPluginSyncEnabled,
@@ -56,7 +57,9 @@ async function generateLogDumpFile() {
       setTimeout(() => {
         logDumpDownloadBtn.classList.add("d-none");
       }, 5000);
-      window.open(`/${OctoFarmClient.serverSettingsRoute}/${logDumpResponse.zipDumpPath}`);
+      window.open(
+        `${OctoFarmClient.logsRoute.replace("/logs", "")}/${logDumpResponse.zipDumpPath}`
+      );
     });
   }
 }

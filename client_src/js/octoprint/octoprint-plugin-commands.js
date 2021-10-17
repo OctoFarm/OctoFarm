@@ -1,7 +1,7 @@
 import OctoPrintClient from "../lib/octoprint.js";
 import OctoFarmClient from "../services/octofarm-client.service.js";
 import UI from "../lib/functions/ui";
-import PrinterSelect from "../lib/modules/printerSelect";
+import bulkActionsStates from "../printer-manager/bulk-actions.constants";
 
 const printerBase = "printers";
 const printerInfoURL = "/printerInfo";
@@ -79,12 +79,10 @@ export async function updateOctoPrintPlugins(pluginList, printer) {
     let post = await OctoPrintClient.systemNoConfirm(printer, "restart");
     if (typeof post !== "undefined") {
       if (post.status === 204) {
-        UI.createAlert(
-          "success",
-          `Successfully made restart attempt to ${printer.printerName}... You may need to Re-Sync!`,
-          3000,
-          "Clicked"
-        );
+        return {
+          status: bulkActionsStates.SUCCESS,
+          message: "Update command fired and instance restart start command sent!"
+        };
       } else {
         UI.createAlert(
           "error",
@@ -92,6 +90,10 @@ export async function updateOctoPrintPlugins(pluginList, printer) {
           3000,
           "Clicked"
         );
+        return {
+          status: bulkActionsStates.WARNING,
+          message: "Update command fired, but unable to restart instance, please do this manually!"
+        };
       }
     } else {
       UI.createAlert(
@@ -100,6 +102,10 @@ export async function updateOctoPrintPlugins(pluginList, printer) {
         3000,
         "Clicked"
       );
+      return {
+        status: bulkActionsStates.ERROR,
+        message: "Could not contact OctoPrint, is it online?"
+      };
     }
   } else {
     UI.createAlert(
@@ -108,6 +114,10 @@ export async function updateOctoPrintPlugins(pluginList, printer) {
       3000,
       "Clicked"
     );
+    return {
+      status: bulkActionsStates.ERROR,
+      message: "Failed to update, manual intervention required!"
+    };
   }
 }
 
@@ -139,37 +149,34 @@ export async function octoPrintPluginInstallAction(printer, pluginList, action) 
       const post = await OctoPrintClient.post(printer, "plugin/pluginmanager", postData);
       alert.close();
       if (post.status === 409) {
-        UI.createAlert(
-          "error",
-          "Plugin not installed... Printer could be active...",
-          4000,
-          "Clicked"
-        );
+        return {
+          status: bulkActionsStates.ERROR,
+          message: "OctoPrint reported a conflict when dealing with the request! are you printing?"
+        };
       } else if (post.status === 400) {
-        UI.createAlert("error", "Malformed request... please log an issue...", 4000, "Clicked");
+        return {
+          status: bulkActionsStates.ERROR,
+          message: "OctoPrint did not action the request, please open an issue!"
+        };
       } else if (post.status === 200) {
         let response = await post.json();
         if (response.needs_restart || response.needs_refresh) {
-          UI.createAlert(
-            "success",
-            `${printer.printerName}: ${pluginList[r]} - Has successfully been installed... OctoPrint restart is required!`,
-            4000,
-            "Clicked"
-          );
+          return {
+            status: bulkActionsStates.WARNING,
+            message: "Your plugins we're installed successfully! Restart is required!"
+          };
         } else {
-          UI.createAlert(
-            "success",
-            `${printer.printerName}: ${pluginList[r]} - Has successfully been installed... No further action requested...`,
-            4000,
-            "Clicked"
-          );
+          return {
+            status: bulkActionsStates.SUCCESS,
+            message: "Your plugins we're installed successfully! No restart required."
+          };
         }
       }
     }
   } else {
-    UI.createAlert(
-      "danger",
-      `${printer.printerName}: Is active skipping the plugin installation command...`
-    );
+    return {
+      status: bulkActionsStates.SKIPPED,
+      message: "Skipped because your printer is currently active..."
+    };
   }
 }

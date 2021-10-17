@@ -32,7 +32,6 @@
 - [About the Project](#about-the-project)
 - [Prerequisites](#prerequisites)
 - [Getting Started](#getting-started)
-- [Contributing](#contributing)
 - [License](#license)
 - [Contact](#contact)
 - [Acknowledgements](#acknowledgements)
@@ -144,26 +143,6 @@ npm run dev
 - The developer version will skip some basic sanity checks, if your pages don't load right after server boot then it's
   because those sanity checks haven't finished.
 
-## Contributing
-The awesome project OctoFarm needs extra contributors to move even faster! If you feel like you have what it takes, and want to join the fun please head over to discord with
-the following link: [Discord](https://discord.gg/vjabMUn) and speak to us in Developer Discussions. Thanks!
-
-### Work on version 1.2.x-rc2
-Version 1.2.x-rc2 is our current OctoFarm release on the `development` branch. This has the following specs:
-- NodeJS 14+ (version 12 was dropped to support better syntax like the optional chaining operator `?`)
-- ExpressJS with `ejs` and `ejs-express-layouts`
-- Mongoose and MongoDB
-
-We are working hard to prepare version 1.2.x for the upgrade to a newer Typescripty OctoFarm in version 2.0! Continue reading for that version below.
-
-### Work on version 2.0
-Version 2.0 is underway on the `alpha-2x` branch. This will have the following specs:
-- Node 14+ support
-- NestJS backend with Typescript
-- TypeORM database Object-Relational Mapper with Typescript
-- SQLite (instead of MongoDB)
-- (Optional) VueJS client is introduced
-
 ## License
 Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more information.
 
@@ -178,9 +157,6 @@ Distributed under GNU Affero General Public License v3.0. See `LICENSE` for more
   of Gina and everyone who helps out with that.
 - All Patreon Supporters and random donations! - Big massive thanks for these, they keep me full of steak!
 - [James Mackay (NotExpectedYet)](https://github.com/NotExpectedYet) - The spirit and creator of OctoFarm!
-- [David Zwart (davidzwa)](https://github.com/davidzwa) - Big help for the massive push from him to get V2 underway.
-  Brought a lot of knowledge to the table that I was lacking.
-- The users calonmer, Insertion and noxin from my discord server! Seriously no end to my thanks for these 3.
 - [Derek from 3D Printed Debris](https://www.3dprinteddebris.com/) - Massive big thanks to Derek who has donated a lot
   of time and money to the project. I don't think I'd have continued at the rate I did without his bug reports and
   support.

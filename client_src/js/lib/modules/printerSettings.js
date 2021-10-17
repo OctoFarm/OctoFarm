@@ -103,7 +103,15 @@ class PrinterSettings {
     document.getElementById("psDefaultProfileDrop").innerHTML = `
       <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultProfile">Preferred Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultProfile"></select></div>
       `;
-    document.getElementById("psOctoPrintUser").placeholder = currentPrinter.currentUser;
+
+    console.log(currentPrinter);
+    const userDropDown = document.getElementById("psOctoPrintUser");
+    userDropDown.innerHTML = "";
+    currentPrinter.userList.forEach((user) => {
+      userDropDown.insertAdjacentHTML("beforeend", `<option value="${user}">${user}</option>`);
+    });
+    userDropDown.value = currentPrinter.currentUser;
+
     document.getElementById("psPrinterName").placeholder = currentPrinter.printerName;
     document.getElementById("psPrinterURL").placeholder = currentPrinter.printerURL;
     // Convert websocket url into a url object
@@ -919,7 +927,8 @@ class PrinterSettings {
         webSocketProtocol: document.getElementById("psWebSocketProtocol").value,
         index: currentPrinter._id,
         cameraURL: document.getElementById("psCamURL").value,
-        apikey: document.getElementById("psAPIKEY").value
+        apikey: document.getElementById("psAPIKEY").value,
+        currentUser: document.getElementById("psOctoPrintUser").value
       },
       connection: {
         preferredPort: document.getElementById("psDefaultSerialPort").value,

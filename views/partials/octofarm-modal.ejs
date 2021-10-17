@@ -1,6 +1,10 @@
+<% let scrollable = "" %>
+<% if (typeof modal.isBodyScrollable !== "undefined") { %>
+<% scrollable = "modal-dialog-scrollable" %>
+<% } %>
 <div class="modal fade" id="<%= modal.id %>Modal" tabindex="-1" role="dialog"
      aria-labelledby="<%= modal.id %>ModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-dialog modal-xl <%= scrollable %>" role="document">
         <div class="modal-content bg-dark text-light">
             <div class="modal-header px-3 pt-3 pb-2">
                 <span id="<%= modal.id %>Index" value="" style="display: none;"></span>

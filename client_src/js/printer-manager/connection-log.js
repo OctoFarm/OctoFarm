@@ -10,6 +10,8 @@ export function checkIfLoaderExistsAndRemove(errored = false) {
   if (loader) {
     if (errored) {
       tickerMessageBox.innerText = "No logs received ❌";
+      loader.remove();
+      updateStatus(0);
     } else {
       tickerMessageBox.classList.remove("d-flex");
       loader.remove();

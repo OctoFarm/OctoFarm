@@ -12,7 +12,15 @@ import OctoFarmClient from "../services/octofarm-client.service";
 import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
 
 const printerList = document.getElementById("printerList");
-const ignoredHostStatesForAPIErrors = ["Setting Up", "Searching...", "Shutdown"];
+const ignoredHostStatesForAPIErrors = [
+  "Shutdown",
+  "Offline",
+  "Searching...",
+  "Setting Up",
+  "Incorrect API Key",
+  "Error!",
+  "Operational"
+];
 
 function updatePrinterInfoAndState(printer) {
   const printName = document.getElementById(`printerName-${printer._id}`);
@@ -100,51 +108,37 @@ function updateOctoPiColumn(printer) {
 
 function corsWarningCheck(printer) {
   const printerBadge = document.getElementById(`printerBadge-${printer._id}`);
-  if (!printer.corsCheck && !ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
+  if (!printer.corsCheck && !ignoredHostStatesForAPIErrors.includes(printer.printerState.state)) {
     UI.doesElementNeedUpdating("CORS NOT ENABLED!", printerBadge, "innerHTML");
   }
 }
 
 function checkForOctoPrintUpdate(printer) {
   let updateButton = document.getElementById(`octoprintUpdate-${printer._id}`);
-  let bulkOctoPrintUpdateButton = document.getElementById("blkOctoPrintUpdate");
   if (printer?.octoPrintUpdate?.updateAvailable) {
     if (updateButton.disabled) {
       UI.doesElementNeedUpdating(false, updateButton, "disabled");
       updateButton.setAttribute("title", "You have an OctoPrint Update to install!");
-    }
-    if (bulkOctoPrintUpdateButton.disabled) {
-      bulkOctoPrintUpdateButton.disabled = false;
     }
   } else {
     if (!updateButton.disabled) {
       UI.doesElementNeedUpdating(true, updateButton, "disabled");
       updateButton.setAttribute("title", "No OctoPrint updates available!");
     }
-    if (!bulkOctoPrintUpdateButton.disabled) {
-      bulkOctoPrintUpdateButton.disabled = true;
-    }
   }
 }
 
 function checkForOctoPrintPluginUpdates(printer) {
   let updatePluginButton = document.getElementById(`octoprintPluginUpdate-${printer._id}`);
-  let bulkPluginUpdateButton = document.getElementById("blkUpdatePluginsBtn");
   if (printer.octoPrintPluginUpdates && printer.octoPrintPluginUpdates.length > 0) {
     if (updatePluginButton.disabled) {
       updatePluginButton.disabled = false;
       updatePluginButton.title = "You have OctoPrint plugin updates to install!";
     }
-    if (bulkPluginUpdateButton.disabled) {
-      bulkPluginUpdateButton.disabled = false;
-    }
   } else {
     if (!updatePluginButton.disabled) {
       updatePluginButton.disabled = true;
       updatePluginButton.title = "No OctoPrint plugin updates available!";
-    }
-    if (!bulkPluginUpdateButton.disabled) {
-      bulkPluginUpdateButton.disabled = true;
     }
   }
 }

@@ -202,17 +202,8 @@ export default class OctoPrintClient {
         command: "select",
         print: true
       };
-      // Make sure feed/flow are set before starting print...
-      const flow = {
-        command: "flowrate",
-        factor: parseInt(printer.flowRate)
-      };
-      await OctoPrintClient.post(printer, "printer/tool", flow);
-      const feed = {
-        command: "feedrate",
-        factor: parseInt(printer.feedRate)
-      };
-      await OctoPrintClient.post(printer, "printer/printhead", feed);
+      await OctoPrintClient.updateFeedAndFlow(printer);
+      await OctoPrintClient.updateFilamentOffsets(printer);
       post = await OctoPrintClient.post(printer, url, opt);
     } else if (action === "delete") {
       post = await OctoPrintClient.delete(printer, url);
@@ -241,9 +232,7 @@ export default class OctoPrintClient {
     }
   }
 
-  static async jobAction(printer, opts, element) {
-    let checkSettings = await OctoFarmClient.get("settings/server/get");
-    // Make sure feed/flow are set before starting print...
+  static async updateFeedAndFlow(printer) {
     const flow = {
       command: "flowrate",
       factor: parseInt(printer.flowRate)
@@ -253,11 +242,29 @@ export default class OctoPrintClient {
       command: "feedrate",
       factor: parseInt(printer.feedRate)
     };
-
     await OctoPrintClient.post(printer, "printer/printhead", feed);
-    const body = {
-      i: printer._id
-    };
+  }
+
+  static async updateFilamentOffsets(printer) {
+    if (printer.selectedFilament != null && Array.isArray(printer.selectedFilament)) {
+      const offset = {
+        command: "offset",
+        offsets: {}
+      };
+      printer.selectedFilament.forEach((spool, index) => {
+        if (spool != null) {
+          offset.offsets["tool" + index] = parseInt(spool.spools.tempOffset);
+        }
+      });
+      await OctoPrintClient.post(printer, "printer/tool", offset);
+    }
+  }
+
+  static async jobAction(printer, opts, element) {
+    let checkSettings = await OctoFarmClient.get("settings/server/get");
+    // Make sure feed/flow are set before starting print...
+    await OctoPrintClient.updateFeedAndFlow(printer);
+    await OctoPrintClient.updateFilamentOffsets(printer);
 
     let filamentCheck = false;
     if (typeof checkSettings.filament !== "undefined") {
@@ -285,47 +292,15 @@ export default class OctoPrintClient {
         },
         async callback(result) {
           if (!result) {
-            if (printer.selectedFilament != null && Array.isArray(printer.selectedFilament)) {
-              const offset = {
-                command: "offset",
-                offsets: {}
-              };
-              printer.selectedFilament.forEach((spool, index) => {
-                if (spool != null) {
-                  offset.offsets["tool" + index] = parseInt(spool.spools.tempOffset);
-                }
-              });
-
-              const post = await OctoPrintClient.post(printer, "printer/tool", offset);
-              console.log(offset);
-            }
-            await OctoPrintClient.post(printer, "printer/printhead", feed);
-            const post = await OctoPrintClient.post(printer, "job", opts);
-            if (element) {
-              element.target.disabled = false;
-            }
+            await OctoPrintClient.post(printer, "job", opts);
           }
         }
       });
     } else {
-      await OctoPrintClient.post(printer, "printer/printhead", feed);
-      const post = await OctoPrintClient.post(printer, "job", opts);
-      if (printer.selectedFilament != null && Array.isArray(printer.selectedFilament)) {
-        const offset = {
-          command: "offset",
-          offsets: {}
-        };
-        printer.selectedFilament.forEach((spool, index) => {
-          if (spool != null) {
-            offset.offsets["tool" + index] = parseInt(spool.spools.tempOffset);
-          }
-        });
-
-        const post = await OctoPrintClient.post(printer, "printer/tool", offset);
-      }
-      if (element) {
-        element.target.disabled = false;
-      }
+      await OctoPrintClient.post(printer, "job", opts);
+    }
+    if (element) {
+      element.target.disabled = false;
     }
   }
 

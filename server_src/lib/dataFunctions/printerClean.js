@@ -343,6 +343,7 @@ class PrinterClean {
           colour: farmPrinter.hostStateColour,
           desc: farmPrinter.hostDescription
         },
+        userList: farmPrinter.userList,
         printerState: {
           state: farmPrinter.state,
           colour: farmPrinter.stateColour,
@@ -376,7 +377,11 @@ class PrinterClean {
         octoPrintSystemInfo: farmPrinter.octoPrintSystemInfo
       };
 
-      if (typeof farmPrinter.resends !== "undefined" && farmPrinter.resends !== null) {
+      if (farmPrinter?.layerData) {
+        sortedPrinter.layerData = farmPrinter.layerData;
+      }
+
+      if (farmPrinter?.resends) {
         sortedPrinter.resends = farmPrinter.resends;
       }
       sortedPrinter.tools = PrinterClean.sortTemps(farmPrinter.temps);

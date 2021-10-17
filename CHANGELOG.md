@@ -2,6 +2,29 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v1.2-rc3]
+
+### Added
+    - Bulk actions will now produce a modal to track the actions which produces a status and message. This replaces the alert notification that flooded the screen previously.
+    - Added #607: The user Octofarm connects with is now no longer static... You can open the settings modal and change the user OF connects with. It's still automatically selected on boot.
+    - Added #295: Support for DisplayLayerProgress plugin. The List, Panel, Camera and Printer Manager views all now display this information if it's available. Works automatically on detection of the plugin!
+    - Added #761: All filament selection boxes now show manufactuere.
+
+### Changed
+    - Printer offline logs (specifically connection refused) are now silenced after the first one. 
+
+### Removed
+    - Bulk actions notification alert
+    - Ping/Pong message on connection log, redundant and ends up flooding the log.
+
+### Fixed
+    - Fixed an issue with gcode scripts table
+    - Fixed issue with Pre-Heat bulk command sending commands without a value inputted / value at 0.
+    - Fixed bulk control function trying to display camera image when non available.
+    - Fixed issue where disable, enable and uninstall plugins would show duplicate plugin list.
+    - Fixed #730: Group selections we're not working as intended...
+    - Fixed #672: Tool temperature offset's we're not applied before a print.
+
 ## [v1.2-rc2]
 
 ### Added

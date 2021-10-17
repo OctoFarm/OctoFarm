@@ -499,14 +499,19 @@ export default class PrinterManager {
                 </div>
                 <div class="col-12">
                 <center>
-                                 <b class="mb-1">File Name: </b><br><p title="Loading..." class="tag mb-1" id="pmFileName">Loading...</p>
-  </center>
-  </div>
-                  <div class="col-12">
-                <center>
-                                 <b id="resentTitle" class="mb-1 d-none">Resend Statistics: </b><br><p title="Current job resend ratio" class="tag mb-1 d-none" id="printerResends">Loading...</p>
-  </center>
-  </div>
+                    <b class="mb-1">File Name: </b><br><p title="Loading..." class="tag mb-1" id="pmFileName">Loading...</p>
+                  </center>
+                  </div>
+                  <div class="col-6">
+                  <center>
+                     <b id="resentTitle" class="mb-1 d-none">Resend Statistics: </b><br><p title="Current job resend ratio" class="tag mb-1 d-none" id="printerResends">Loading...</p>
+                  </center>
+                  </div>
+                  <div class="col-6">
+                  <center>
+                     <b id="dlpPluginDataTitle" class="mb-1 d-none">Layer Progress: </b><br><p title="Current job resend ratio" class="tag mb-1 d-none" id="dlpPluginDataData">Loading...</p>
+                  </center>
+                  </div>
                   <div class="col-lg-12 col-xl-6">
                      <center>
                   <b>Expected Completion Date: </b><p class="mb-1" id="pmExpectedCompletionDate">Loading...</p>
@@ -792,13 +797,18 @@ export default class PrinterManager {
                 <div class="col-12">
                 <center>
                                  <b class="mb-1">File Name: </b><br><p title="Loading..." class="tag mb-1" id="pmFileName">Loading...</p>
-  </center>
-  </div>
-                  <div class="col-12">
-                <center>
-                                 <b id="resentTitle" class="mb-1 d-none">Resend Statistics: </b><br><p title="Current job resend ratio" class="tag mb-1 d-none" id="printerResends">Loading...</p>
-  </center>
-  </div>
+                  </center>
+                  </div>
+                  <div class="col-6">
+                  <center>
+                     <b id="resentTitle" class="mb-1 d-none">Resend Statistics: </b><br><p title="Current job resend ratio" class="tag mb-1 d-none" id="printerResends">Loading...</p>
+                  </center>
+                  </div>
+                  <div class="col-6">
+                  <center>
+                     <b id="dlpPluginDataTitle" class="mb-1 d-none">Layer Progress: </b><br><p title="Current job resend ratio" class="tag mb-1 d-none" id="dlpPluginDataData">Loading...</p>
+                  </center>
+                  </div>
                   <div class="col-lg-12 col-xl-6">
                      <center>
                   <b>Expected Completion Date: </b><p class="mb-1" id="pmExpectedCompletionDate">Loading...</p>
@@ -1692,7 +1702,9 @@ export default class PrinterManager {
         expectedFilamentCost: document.getElementById("pmExpectedFilamentCost"),
         expectedTotalCosts: document.getElementById("pmJobCosts"),
         printerResends: document.getElementById("printerResends"),
-        resendTitle: document.getElementById("resentTitle")
+        resendTitle: document.getElementById("resentTitle"),
+        dlpPluginDataTitle: document.getElementById("dlpPluginDataTitle"),
+        dlpPluginDataData: document.getElementById("dlpPluginDataData")
       },
       connectPage: {
         printerPort: document.getElementById("printerPortDrop"),
@@ -1831,6 +1843,14 @@ export default class PrinterManager {
         printer.resends.transmitted / 1000
       }K (${printer.resends.ratio.toFixed(0)})
       `;
+    }
+
+    if (printer?.layerData) {
+      if (elements.jobStatus.dlpPluginDataTitle.classList.contains("d-none")) {
+        elements.jobStatus.dlpPluginDataTitle.classList.remove("d-none");
+        elements.jobStatus.dlpPluginDataData.classList.remove("d-none");
+      }
+      elements.jobStatus.dlpPluginDataData.innerHTML = `${printer.layerData.currentLayer} / ${printer.layerData.totalLayers} (${printer.layerData.percentComplete}%)`;
     }
 
     if (typeof printer.currentJob !== "undefined" && printer.currentJob.progress !== null) {
