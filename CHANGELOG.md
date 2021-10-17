@@ -10,6 +10,7 @@ All notable changes to this project will be documented in this file.
     #295 - Support for DisplayLayerProgress plugin. The List, Panel, Camera and Printer Manager views all now display this information if it's available. Works automatically on detection of the plugin!
 
 ### Changed
+    - Printer offline logs (specifically connection refused) are now silenced after the first one. 
 
 ### Removed
     - Bulk actions notification alert

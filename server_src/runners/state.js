@@ -452,6 +452,8 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         farmPrinters[this.index]._id
       );
     }
+    //Unsilence the offline log
+    farmPrinters[this.index].silenceOfflineLog = false;
     // Listen for printer status
     if (typeof data.current !== "undefined") {
       farmPrinters[this.index].webSocket = "success";
@@ -1147,15 +1149,20 @@ class Runner {
               e.message,
               `Couldn't grab initial connection for Printer: ${farmPrinters[i].printerURL}`
             );
-            PrinterTicker.addIssue(
-              new Date(),
-              farmPrinters[i].printerURL,
-              `${e.message}: Connection refused, trying again in: ${
-                systemSettings.timeout.apiRetry / 1000
-              } seconds`,
-              "Disconnected",
-              farmPrinters[i]._id
-            );
+            if(!farmPrinters[i].silenceOfflineLog){
+              PrinterTicker.addIssue(
+                  new Date(),
+                  farmPrinters[i].printerURL,
+                  `${e.message}: Connection refused, trying again in: ${
+                      systemSettings.timeout.apiRetry / 1000
+                  } seconds. Any subsequent logs for this printer will be silenced...`,
+                  "Disconnected",
+                  farmPrinters[i]._id
+              );
+              farmPrinters[i].silenceOfflineLog = true;
+            }
+
+
             farmPrinters[i].state = "Offline";
             farmPrinters[i].stateColour = Runner.getColour("Offline");
             farmPrinters[i].hostState = "Online";
