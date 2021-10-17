@@ -21,6 +21,7 @@ const { JobClean } = require("../lib/dataFunctions/jobClean.js");
 const { FileClean } = require("../lib/dataFunctions/fileClean.js");
 const { FilamentClean } = require("../lib/dataFunctions/filamentClean.js");
 const { PrinterTicker } = require("./printerTicker.js");
+const { OP_PLUGIN_DISPLAY_LAYER } = require("../constants/regex.constants")
 
 const logger = new Logger("OctoFarm-State");
 let farmPrinters = [];
@@ -425,6 +426,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
     farmPrinters[this.index].hostStateColour = Runner.getColour("Online");
     farmPrinters[this.index].hostDescription = "Host is Online";
     data = await JSON.parse(data);
+
     if (typeof data.connected !== "undefined") {
       farmPrinters[this.index].octoPrintVersion = data.connected.version;
       farmPrinters[this.index].plugin_hash = data.connected.plugin_hash;
@@ -669,7 +671,6 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       }
     }
     if (data.plugin) {
-      //console.log(farmPrinters[this.index].printerURL, data.plugin);
       if (data.plugin.data.type === "loglines") {
         if (
           typeof data.plugin.data !== "undefined" &&
@@ -708,6 +709,15 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
             "Firmware version: ",
             ""
           );
+        }
+      }
+      if (data.plugin.plugin === "DisplayLayerProgress"){
+        if(data.plugin?.data?.printerDisplay) {
+          farmPrinters[this.index].layerData = {
+            totalLayers: parseInt(OP_PLUGIN_DISPLAY_LAYER.totalLayerRegex.exec(data.plugin.data.printerDisplay)[0]) || 0,
+            currentLayer: parseInt(OP_PLUGIN_DISPLAY_LAYER.currentLayerRegex.exec(data.plugin.data.printerDisplay)[0]) || 0,
+            percentComplete: parseInt(OP_PLUGIN_DISPLAY_LAYER.currentPercentRegex.exec(data.plugin.data.printerDisplay)[0]) || 0
+          }
         }
       }
     }

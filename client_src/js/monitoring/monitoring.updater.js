@@ -230,6 +230,7 @@ function drawListView(printer, clientSettings) {
             <div class="progress m-0 p-0">
               <div id="progress-${printer._id}" class="progress-bar progress-bar-striped bg-secondary percent" role="progressbar progress-bar-striped" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
             </div>
+            <small id="displayLayerProgressData-${printer._id}"></small>
           </td>
           <td class="p-1">
           <span id="remainingTime-${printer._id}">
@@ -382,8 +383,11 @@ function drawPanelView(printer, clientSettings) {
             </center>
           </div>
           <div class="row">
+           <div class="col-12">
+                <small id="displayLayerProgressData-${printer._id}"></small>
+            </div>
             <div class="col-6">
-                       <span id="printTimeElapsed-${printer._id}">Loading...</span>
+                <span id="printTimeElapsed-${printer._id}">Loading...</span>
             </div>
             <div class="col-6">
                       <span id="remainingTime-${printer._id}">
@@ -486,6 +490,7 @@ function drawCameraView(printer, clientSettings) {
           ${cameraElement}
           
           <div class="camTemps">
+            <small id="displayLayerProgressData-${printer._id}"></small><br>
             <small
               id="toolTemps-${printer._id}"
               class="mb-0 text-center"
@@ -640,6 +645,7 @@ function grabElements(printer) {
       currentFile: document.getElementById("currentFile-" + printer._id),
       currentFilament: document.getElementById("currentFilament-" + printer._id),
       state: document.getElementById("state-" + printer._id),
+      layerData: document.getElementById("displayLayerProgressData-" + printer._id),
       printTimeElapsed: document.getElementById("printTimeElapsed-" + printer._id),
       remainingPrintTime: document.getElementById("remainingTime-" + printer._id),
       cameraContain: document.getElementById("cameraContain-" + printer._id),
@@ -837,6 +843,11 @@ async function updateState(printer, clientSettings, view) {
     UI.doesElementNeedUpdating(remainingPrintTimeFormat, elements.remainingPrintTime, "innerHTML");
     elements.currentFile.setAttribute("title", "No File Selected");
     elements.currentFile.innerHTML = '<i class="fas fa-file-code"></i> ' + "No File Selected";
+  }
+
+  if (printer?.layerData) {
+    const formatLayerData = `<i class="fas fa-layer-group"></i> Layer ${printer.layerData.currentLayer} / ${printer.layerData.totalLayers} (${printer.layerData.percentComplete}%)`;
+    UI.doesElementNeedUpdating(formatLayerData, elements.layerData, "innerHTML");
   }
 
   if (printer.tools !== null) {

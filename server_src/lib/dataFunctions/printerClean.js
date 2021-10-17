@@ -377,7 +377,11 @@ class PrinterClean {
         octoPrintSystemInfo: farmPrinter.octoPrintSystemInfo
       };
 
-      if (typeof farmPrinter.resends !== "undefined" && farmPrinter.resends !== null) {
+      if (farmPrinter?.layerData) {
+        sortedPrinter.layerData = farmPrinter.layerData;
+      }
+
+      if (farmPrinter?.resends) {
         sortedPrinter.resends = farmPrinter.resends;
       }
       sortedPrinter.tools = PrinterClean.sortTemps(farmPrinter.temps);
