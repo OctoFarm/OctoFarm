@@ -56,7 +56,9 @@ async function generateLogDumpFile() {
       setTimeout(() => {
         logDumpDownloadBtn.classList.add("d-none");
       }, 5000);
-      window.open(`/${OctoFarmClient.serverSettingsRoute}/${logDumpResponse.zipDumpPath}`);
+      window.open(
+        `${OctoFarmClient.logsRoute.replace("/logs", "")}/${logDumpResponse.zipDumpPath}`
+      );
     });
   }
 }
