@@ -43,7 +43,7 @@ class FilamentClean {
   static async start(filamentManager) {
     const profiles = await Profiles.find({});
     const spools = await Spools.find({});
-    const farmPrinters = await PrinterClean.listPrintersInformation();
+    const farmPrinters = PrinterClean.listPrintersInformation();
     const spoolsArray = [];
     const profilesArray = [];
 
@@ -74,9 +74,9 @@ class FilamentClean {
         percent:
           100 - (spools[sp].spools.used / spools[sp].spools.weight) * 100,
         tempOffset: spools[sp].spools.tempOffset,
-        printerAssignment: await FilamentClean.getPrinterAssignment(
-          spools[sp]._id,
-          farmPrinters
+        printerAssignment: FilamentClean.getPrinterAssignment(
+            spools[sp]._id,
+            farmPrinters
         ),
         fmID: spools[sp].spools.fmID
       };
@@ -86,10 +86,10 @@ class FilamentClean {
     profilesClean = profilesArray;
 
     selectedFilamentList = await FilamentClean.selectedFilament(farmPrinters);
-    statisticsClean = await FilamentClean.createStatistics(
-      spoolsArray,
-      profilesArray,
-      selectedFilamentList
+    statisticsClean = FilamentClean.createStatistics(
+        spoolsArray,
+        profilesArray,
+        selectedFilamentList
     );
     await FilamentClean.dropDownList(
       spools,
@@ -122,7 +122,7 @@ class FilamentClean {
           historyDropObject.push(`
                   <option value="${spool._id}">${spool.spools.name} (${(
             spool.spools.weight - spool.spools.used
-          ).toFixed(2)}g) - ${profiles[profileId].profile.material}</option>
+          ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${profiles[profileId].profile.manufacturer})</option>
               `);
           if (index > -1) {
             normalDropObject.push(`
@@ -130,21 +130,21 @@ class FilamentClean {
               spool.spools.name
             } (${(spool.spools.weight - spool.spools.used).toFixed(2)}g) - ${
               profiles[profileId].profile.material
-            }</option>
+            } (${profiles[profileId].profile.manufacturer})</option>
               `);
           } else {
             normalDropObject.push(`
                   <option value="${spool._id}">${spool.spools.name} (${(
               spool.spools.weight - spool.spools.used
-            ).toFixed(2)}g) - ${profiles[profileId].profile.material}</option>
+            ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${profiles[profileId].profile.manufacturer})</option>
               `);
           }
         } else {
           historyDropObject.push(`
-                  <option value="${spool._id}">${spool.spools.name} - ${profiles[profileId].profile.material}</option>
+                  <option value="${spool._id}">${spool.spools.name} - ${profiles[profileId].profile.material} (${profiles[profileId].profile.manufacturer})</option>
               `);
           normalDropObject.push(`
-                  <option value="${spool._id}">${spool.spools.name} - ${profiles[profileId].profile.material}</option>
+                  <option value="${spool._id}">${spool.spools.name} - ${profiles[profileId].profile.material} (${profiles[profileId].profile.manufacturer})</option>
               `);
         }
       }

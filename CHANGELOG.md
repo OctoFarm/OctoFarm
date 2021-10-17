@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
     - Bulk actions will now produce a modal to track the actions which produces a status and message. This replaces the alert notification that flooded the screen previously.
     - Added #607: The user Octofarm connects with is now no longer static... You can open the settings modal and change the user OF connects with. It's still automatically selected on boot.
     - Added #295: Support for DisplayLayerProgress plugin. The List, Panel, Camera and Printer Manager views all now display this information if it's available. Works automatically on detection of the plugin!
+    - Added #761: All filament selection boxes now show manufactuere.
 
 ### Changed
     - Printer offline logs (specifically connection refused) are now silenced after the first one. 
