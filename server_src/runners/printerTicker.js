@@ -20,7 +20,7 @@ class PrinterTicker {
       pluginDisplay: plugin
     };
     octoprintLogs.push(newLog);
-    if (octoprintLogs.length >= 2000) {
+    if (octoprintLogs.length >= 1001) {
       octoprintLogs.shift();
     }
   }
@@ -42,7 +42,7 @@ class PrinterTicker {
       state: state
     };
     currentIssues.push(newIssue);
-    if (currentIssues.length >= 10000) {
+    if (currentIssues.length >= 1001) {
       currentIssues.shift();
     }
   }
