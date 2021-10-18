@@ -740,7 +740,7 @@ export default class FileManager {
   static async multiUpload() {
     let selectedPrinters = null;
     let selectedFolder = "";
-    let printAfterUpload = false;
+    let printAfterUpload = true;
     let selectedFile = null;
     await PrinterSelect.create(document.getElementById("multiPrintersSection"));
 
