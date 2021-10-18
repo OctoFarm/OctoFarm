@@ -208,15 +208,14 @@ class Manager {
       .getElementById("fileBody")
       .insertAdjacentHTML(
         "beforeend",
-        `<div id="fileList-${id}" class="list-group" style="max-height:100%; overflow-y:scroll;" data-jplist-group="files"></div>`
+        `<div id="fileList-${id}" class="list-group" data-jplist-group="files"></div>`
       );
 
     let printer = await OctoFarmClient.getPrinter(id);
 
     FileSorting.loadSort(printer);
-    document.getElementById(
-      "backBtn"
-    ).innerHTML = `<button id="fileBackBtn" type="button" class="btn btn-success"><i class="fas fa-chevron-left"></i> Back</button>`;
+    document.getElementById("backBtn").innerHTML =
+      '<button id="fileBackBtn" type="button" class="btn btn-success"><i class="fas fa-chevron-left"></i> Back</button>';
     const fileButtons = {
       fileManager: {
         printerStorage: document.getElementById("printerStorage"),

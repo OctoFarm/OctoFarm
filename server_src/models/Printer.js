@@ -34,7 +34,6 @@ const PrinterSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  // TODO move out
   fileList: {
     type: Object,
     required: false
@@ -76,42 +75,34 @@ const PrinterSchema = new mongoose.Schema({
     type: Number,
     required: false
   },
-  // TODO remove or change
   category: {
     type: String,
     required: false
   },
-  // TODO remove or bundle
   type: {
     type: String,
     required: false
   },
-  // TODO remove unused
   ip: {
     type: String,
     required: false
   },
-  // TODO remove unused
   port: {
     type: Number,
     required: false
   },
-  // TODO remove
   octoPrintVersion: {
     type: String,
     required: false
   },
-  // TODO remove
   klipperFirmwareVersion: {
     type: String,
     required: false
   },
-  // TODO move out
   group: {
     type: String,
     required: false
   },
-  // TODO remove
   storage: {
     type: Object,
     required: false

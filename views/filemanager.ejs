@@ -107,7 +107,7 @@
                     <div class="card-footer fileFooter text-muted"></div>
                 </div>
             </div>
-            <div class="col-9 col-sm-12 col-md-6 col-lg-9 flex-stretch-octofarm">
+            <div class="col-9 col-sm-12 col-md-6 col-lg-9">
                 <div class="card text-white bg-dark flex-fill">
                     <div class="card-header fileHeader">
                         <div class="col-12">
@@ -182,6 +182,7 @@
                         </div>
                     </div>
                     <div id="fileBody" class="card-body fileBody">
+
                     </div>
                     <div class="card-footer fileFooter text-muted"></div>
                 </div>
@@ -200,81 +201,7 @@
         </div>
     <% } %>
 
-    <div class="modal fade" id="multiUploadModal" tabindex="0" role="dialog" aria-labelledby="multiUploadLabel"
-         aria-hidden="true" data-backdrop="static" data-keyboard="false">
-        <div class="modal-dialog modal-xl" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="systemSettingsLabel">Multi-Upload</h3>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span class="text-white" aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <div class="container-fluid">
-                        <div class="row">
-                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12  text-center">
-                                <div class="btn-group" role="group" aria-label="Basic example">
-                                    <button id="multiPrinterBtn" class="btn btn-danger">1. Choose your printers..
-                                    </button>
-                                    <button id="multiFolder" class="btn btn-warning hidden" disabled>2. Choose your
-                                        folder path..
-                                    </button>
-                                    <button id="multiFile" class="btn btn-success" disabled>3. Select your files..
-                                    </button>
-                                </div>
 
-                            </div>
-                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
-                                <div id="multiPrintersSection" class="col-lg-12">
-
-
-                                </div>
-                                <div id="multiFolderSection" class="col-lg-12 hidden">
-                                    <p id="multiSelectedPrinters"></p>
-                                    <p>Would you like to create a folder too?</p>
-                                    <p><b>Note:</b> Leaving blank will create the files in local, otherwise they will be
-                                        put inside your newly created folder...</p>
-                                    <input id="multiNewFolder" class="form-control bg-dark text-light" type="text"
-                                           placeholder="Please type your new folder name here..."
-                                           aria-label="NewFolder">
-                                </div>
-                                <div id="multiFileSection" class="col-lg-12 hidden">
-                                    <p id="multiSelectedPrinters2"></p>
-                                    <form class="was-validated form-check-inline form-check">
-                                        <div class="custom-control custom-checkbox mb-2 pr-2">
-                                            <input type="checkbox" class="custom-control-input" id="printOnLoadBtn"
-                                                   required>
-                                            <label class="custom-control-label" for="printOnLoadBtn">Would you like to
-                                                print after upload? (Global Effect...)</label>
-                                            <div class="invalid-feedback">Do not print after upload...</div>
-                                            <div class="valid-feedback">
-                                                Print after upload...
-                                            </div>
-                                        </div>
-                                    </form>
-                                    <p><b>Note:</b> If the print on successful upload action is enabled above, you may
-                                        only upload a single file to your printers.</p>
-                                    <label id="multiFileUploadBtnLabel" class="btn btn-success m-3 float-left"
-                                           for="multiFileUploadBtn"><i class="fas fa-file-import"></i> Upload
-                                        File's</label>
-                                    <input id="multiFileUploadBtn" multiple accept=".gcode,.gco,.g" type="file"
-                                           class="btn btn-success float-left">
-                                    <br>
-                                    <p id="multiFileSelectedNow"></p>
-                                </div>
-
-
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div id="multiUploadFooter" class="modal-footer">
-
-                </div>
-            </div>
-        </div>
-    </div>
     <script src="/assets/dist/fileManagerRunner.min.js" type="module"></script>
 <% }else{ %>
     <%- include('./addPrinters.ejs') %>

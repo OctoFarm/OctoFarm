@@ -1,0 +1,47 @@
+<div
+  id="actionsBar"
+  class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 stuck mb-3 d-none d-md-block d-lg-block d-xl-block"
+>
+  <div class="card text-white bg-dark mx-0 my-0">
+    <div class="row px-1" id="actionsBarBody">
+
+      <div class="col-1 pt-0">
+        <%- include('./PrinterManager/printerBulkActionsBtns.ejs') %>
+      </div>
+      <div class="col-7">
+
+      </div>
+      <div class="col-2">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="sortStates">Sort: </label>
+          </div>
+          <select class="custom-select" id="sortStates">
+            <option href="#" value="index">Index</option>
+            <option href="#" value="percent">Percent</option>
+            <option id="timeOption" href="#" value="time">Time</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="col-2">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <label class="input-group-text" for="filterStates">Filter: </label>
+          </div>
+          <select class="custom-select" id="filterStates">
+            <% for(let i = 0; i < printGroups.length; i++){ %>
+              <option href="#" value="<%= printGroups[i] %>"><%= printGroups[i] %></option>
+            <% } %>
+          </select>
+        </div>
+      </div>
+
+
+
+
+
+
+    </div>
+  </div>
+</div>

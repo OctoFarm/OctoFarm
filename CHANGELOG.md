@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
     - Added #607: The user Octofarm connects with is now no longer static... You can open the settings modal and change the user OF connects with. It's still automatically selected on boot.
     - Added #295: Support for DisplayLayerProgress plugin. The List, Panel, Camera and Printer Manager views all now display this information if it's available. Works automatically on detection of the plugin!
     - Added #761: All filament selection boxes now show manufactuere.
+    - Added #763: Allow file multi-upload to create folders if they don't exist. 
 
 ### Changed
     - Printer offline logs (specifically connection refused) are now silenced after the first one. 
@@ -24,6 +25,9 @@ All notable changes to this project will be documented in this file.
     - Fixed issue where disable, enable and uninstall plugins would show duplicate plugin list.
     - Fixed #730: Group selections we're not working as intended...
     - Fixed #672: Tool temperature offset's we're not applied before a print.
+    - Fixed file manager showing folders with "_" in folder name.
+    - Fixed and issue with file manager crashing if searching an empty directory.
+    - Fixed "No Files Available" not been removed after uploading a file...
 
 ## [v1.2-rc2]
 
@@ -69,11 +73,10 @@ All notable changes to this project will be documented in this file.
 ### Added
     - Added #546: Node 13 or lower issue webpage with instructions, doesnt restart server anymore 
     - Added #509: HTTP/HTTPS support for websocket connections
-    - #628 Split client package.json and published package @octofarm/client to NPM 
 
 ### Changed
     - Completely reworked history cache, prepared and tested for OctoFarm V2
-    - Slightly reworked file cache, prepared for V2 and made it robust
+    - Slightly reworked file cache, prepared for V2 and made it robust - "robust"
     - Made API tests less prone to unnecessary failure
     - Reworked the Settings modal to be more resiliant to failure and cleaned up code
     - Slightly reworked job cache, prepared for V2

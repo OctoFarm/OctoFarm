@@ -6,6 +6,12 @@ import { dragAndDropEnableMultiplePrinters } from "../functions/dragAndDrop.js";
 import FileSorting from "./fileSorting.js";
 import PrinterSelect from "./printerSelect.js";
 import OctoFarmClient from "../../services/octofarm-client.service";
+import {
+  showBulkActionsModal,
+  updateBulkActionsProgress,
+  generateTableRows,
+  updateTableRow
+} from "../../printer-manager/functions/bulk-actions-progress.functions";
 
 const fileUploads = new Queue();
 
@@ -26,7 +32,7 @@ setInterval(async () => {
       file.index = current.index;
       file.uploadDate = currentDate.getTime() / 1000;
       const post = await OctoFarmClient.post("printers/newFiles", file);
-      const update = await FileManager.drawFile(file);
+      // const update = await FileManager.updateFileList(file);
       fileUploads.remove();
       const fileCounts = document.getElementById(`fileCounts-${current.index}`);
       if (fileCounts && fileCounts.innerHTML == 1) {
@@ -107,6 +113,7 @@ export default class FileManager {
 
   static fileUpload(file) {
     return new Promise(function (resolve, reject) {
+      FileManager.removeNoFiles();
       // Grab folder location
       const { currentFolder } = file;
       // Grab Client Info
@@ -121,7 +128,6 @@ export default class FileManager {
       if (currentFolder.includes("local/")) {
         path = currentFolder.replace("local/", "");
       }
-
       formData.append("file", file.file);
       formData.append("path", path);
       if (file.print) {
@@ -159,8 +165,6 @@ export default class FileManager {
           );
           setTimeout(async () => {
             let updatePrinter = await OctoFarmClient.getPrinter(printerInfo._id);
-
-            // TODO !!!!!?????
             FileManager.refreshFiles(updatePrinter, spinnerIcon);
             setTimeout(async () => {
               let updatePrinter = await OctoFarmClient.getPrinter(printerInfo._id);
@@ -390,7 +394,6 @@ export default class FileManager {
       </div>
       </div>
       </div>
-      </div>
       </div>`;
       fileElem.insertAdjacentHTML("afterbegin", f);
       let printer = await OctoFarmClient.post("printers/printerInfo", {
@@ -425,8 +428,6 @@ export default class FileManager {
       if (file.path === currentFolder) {
         if (document.getElementById(`file-${file.fullPath}`)) {
           let toolInfo = "";
-
-          // TODO dupe drawFile!!
           if (file.toolUnits?.length) {
             file.toolUnits.forEach((unit, index) => {
               toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
@@ -462,6 +463,13 @@ export default class FileManager {
     }
   }
 
+  static removeNoFiles() {
+    const noFilesElement = document.getElementById("noFilesToBeShown");
+    if (noFilesElement) {
+      noFilesElement.remove();
+    }
+  }
+
   static drawFiles(printer, recursive) {
     try {
       const fileElem = document.getElementById(`fileList-${printer._id}`);
@@ -469,7 +477,7 @@ export default class FileManager {
         const { fileList } = printer;
         if (printer.systemChecks.cleaning.file.status === "danger") {
           fileElem.innerHTML = `
-            <div class="noStorage  text-center"><i class="fas fa-file-code fa-5x"></i><br><h5>There are no files in local storage...</h5></div>
+            <div class="noStorage  text-center"><i class="fas fa-file-code fa-5x"></i><br><h5>Your files are either still scanning or have failed to scan...</h5></div>
       `;
         } else {
           fileElem.innerHTML = "";
@@ -478,7 +486,7 @@ export default class FileManager {
             currentFolder = currentFolder.replace("local/", "");
           }
 
-        // Draw sub - folders present in current folder
+          // Draw sub - folders present in current folder
           if (fileList.folderList.length > 0) {
             fileList.folderList.forEach((folder) => {
               if (folder.path == currentFolder) {
@@ -504,17 +512,21 @@ export default class FileManager {
                   >
                   <div class="d-flex w-100 justify-content-between">
                     <h5 class="mb-1 float-left">
-                      ${folder.display}
+                      ${folder.display.replace(/_/g, " ")}
                     </h5>
                     <div
                       class="float-right btn-group flex-wrap btn-group-sm"
                       role="group"
                       aria-label="Basic example"
                     >
-                      <button id="${printer._id}*folderActionMove*${folder.name}" type="button" class="btn btn-warning">
+                      <button id="${printer._id}*folderActionMove*${
+                    folder.name
+                  }" type="button" class="btn btn-warning">
                         <i class="fas fa-people-carry"></i> Move
                       </button>
-                      <button id="${printer._id}*folderActionDelete*${folder.name}" type="button" class="btn btn-danger">
+                      <button id="${printer._id}*folderActionDelete*${
+                    folder.name
+                  }" type="button" class="btn btn-danger">
                         <i class="fas fa-trash-alt"></i> Delete
                       </button>
                     </div>
@@ -532,7 +544,6 @@ export default class FileManager {
           const currentFileList = fileList.fileList.filter(
             (f) => typeof recursive !== "undefined" || f.path === currentFolder
           );
-
           // Show empty or filled list
           if (currentFileList.length > 0) {
             currentFileList.forEach((file) => {
@@ -659,7 +670,29 @@ export default class FileManager {
               fileElem.insertAdjacentHTML("beforeend", f);
             });
           } else {
-            fileElem.insertAdjacentHTML("beforeend", "No files to be shown.");
+            fileElem.insertAdjacentHTML(
+              "beforeend",
+              `
+            <div
+            id="noFilesToBeShown"
+            href="#"
+          class="list-group-item list-group-item-action flex-column align-items-start bg-secondary"
+            style="display: block;
+            padding: 0.7rem 0.1rem;"
+            >
+            <div class="row">
+                <div class="col-lg-12">
+                <div class="row">
+                <div class="col-12">
+                <h5 class="mb-1 name">No files available...</h5>         
+                </div>
+                </div>
+      </div>
+      </div>
+      </div>
+            
+            `
+            );
           }
 
           FileManager.updateListeners(printer);
@@ -711,41 +744,11 @@ export default class FileManager {
     let selectedFile = null;
     await PrinterSelect.create(document.getElementById("multiPrintersSection"));
 
-    function first() {
+    async function chooseOrCreateFolder() {
       document.getElementById("multiPrinterBtn").disabled = true;
       document.getElementById("multiFolder").disabled = false;
       document.getElementById("multiPrintersSection").classList.add("hidden");
       document.getElementById("multiFolderSection").classList.remove("hidden");
-      document.getElementById("multiUploadFooter").innerHTML =
-        '<button id="multiUpSubmitBtn" type="button" class="btn btn-warning float-right">Next</button>';
-      document.getElementById("multiUpSubmitBtn").addEventListener("click", (e) => {
-        second();
-      });
-      document.getElementById("multiSelectedPrinters").innerHTML = "";
-    }
-
-    async function second() {
-      // DELETE WHEN FOLDERS WORKING
-      selectedPrinters = PrinterSelect.getSelected();
-      if (selectedPrinters.length < 2) {
-        UI.createAlert(
-          "error",
-          `Please select MORE than ${selectedPrinters.length} printer(s)!`,
-          2000,
-          "clicked"
-        );
-        return;
-      }
-
-      document.getElementById("multiPrinterBtn").disabled = true;
-      document.getElementById("multiFolder").disabled = false;
-      document.getElementById("multiPrintersSection").classList.add("hidden");
-      document.getElementById("multiFolderSection").classList.remove("hidden");
-      document.getElementById("multiUploadFooter").innerHTML =
-        '<button id="multiUpSubmitBtn" type="button" class="btn btn-warning float-right">Next</button>';
-      document.getElementById("multiUpSubmitBtn").addEventListener("click", (e) => {
-        second();
-      });
 
       document.getElementById("multiSelectedPrinters2").innerHTML = "";
       let printers = await OctoFarmClient.listPrinters();
@@ -755,12 +758,20 @@ export default class FileManager {
           const i = _.findIndex(printers, function (o) {
             return o._id == printer.value.toString();
           });
+          const id = printers[i]._id;
           const name = printers[i].printerName;
 
           document.getElementById("multiSelectedPrinters2").insertAdjacentHTML(
             "beforeend",
             `
-            [<span class="MultiSelected">${name}</span>]
+            <div class="card col-2 px-1 py-1">
+             <div class="card-header px-1 py-1">
+               <small>${name}</small> 
+              </div>
+              <div class="card-body px-1 py-1" id="folderCheckBody-${id}">
+                <small><i class="fas fa-spinner fa-pulse"></i> Checking Folder Exists...</small>
+              </div>
+            </div>
             `
           );
           selectedPrinters[index] = {
@@ -769,19 +780,67 @@ export default class FileManager {
           };
         }
       });
+      document.getElementById("multiFolder").disabled = false;
+      document.getElementById("multiFile").disabled = true;
+      document.getElementById("multiFolderSection").classList.remove("hidden");
+      document.getElementById("multiFileSection").classList.add("hidden");
+      document.getElementById("multiUploadFooter").innerHTML =
+        "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-success float-right\">Next</button>";
+      document.getElementById("multiUpSubmitBtn").addEventListener("click", async (e) => {
+        selectedFolder = document.getElementById("multiNewFolder").value;
+        if (selectedFolder === "") {
+          selectedFolder = "local";
+        }
+        if (selectedFolder[0] === "/") {
+          selectedFolder = selectedFolder.replace("/", "");
+        }
+        const regexValidation = new RegExp("\\/[a-zA-Z0-9_\\/-]*[^\\/]$");
+
+        const multiFolderInput = document.getElementById("multiNewFolder");
+        // validate the path
+        if (!regexValidation.exec("/" + selectedFolder.replace(/ /g, "_"))) {
+          multiFolderInput.classList.add("is-invalid");
+        } else {
+          multiFolderInput.classList.remove("is-invalid");
+          multiFolderInput.classList.add("is-valid");
+          await checkIfPathExistsOnOctoPrint();
+
+          await selectFilesToupload();
+        }
+      });
+    }
+
+    async function checkIfPathExistsOnOctoPrint() {
+      for (let i = 0; i < selectedPrinters.length; i++) {
+        const currentPrinter = selectedPrinters[i].printerInfo;
+        const doesFolderExist = await OctoPrintClient.checkFile(currentPrinter, selectedFolder);
+        if (doesFolderExist === 200) {
+          document.getElementById("folderCheckBody-" + currentPrinter._id).innerHTML =
+            "<i class=\"fas fa-folder-plus text-success\"></i> Folder exists!";
+          selectedPrinters[i].folderExists = true;
+        } else {
+          document.getElementById("folderCheckBody-" + currentPrinter._id).innerHTML =
+            "<i class=\"fas fa-folder-minus text-warning\"></i> Folder will be created!";
+          selectedPrinters[i].folderExists = false;
+        }
+      }
+      document.getElementById("multiFileUploadBtn").disabled = false;
+      document.getElementById("multiFileUploadBtnLabel").classList.remove("disabled");
+    }
+
+    async function selectFilesToupload() {
+      document.getElementById("multiSelectedFolder").innerHTML = selectedFolder;
       document.getElementById("multiFolder").disabled = true;
       document.getElementById("multiFile").disabled = false;
       document.getElementById("multiFileSection").classList.remove("hidden");
       document.getElementById("multiFolderSection").classList.add("hidden");
+
       document.getElementById("multiUploadFooter").innerHTML =
-        '<button id="multiUpSubmitBtn" type="button" class="btn btn-success float-right" data-dismiss="modal">Start!</button>';
+        "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-success float-right\" data-dismiss=\"modal\">Start!</button>";
       document.getElementById("multiUpSubmitBtn").addEventListener("click", (e) => {
-        third();
+        initiateTheUpload();
       });
-      selectedFolder = document.getElementById("multiNewFolder").value;
-      if (selectedFolder != "") {
-        selectedFolder += "";
-      }
+
       document.getElementById("printOnLoadBtn").addEventListener("click", (e) => {
         let state = null;
         state = e.target.checked;
@@ -804,33 +863,54 @@ export default class FileManager {
       });
     }
 
-    function third() {
-      if (selectedFolder == "") {
-        selectedFolder = "local";
-      }
-
+    async function initiateTheUpload() {
+      showBulkActionsModal();
+      updateBulkActionsProgress(0, selectedPrinters.length);
+      const printerInfo = [];
       selectedPrinters.forEach((printer) => {
-        const spinner = document.getElementById("fileUploadCountSpinner");
-        if (spinner.classList.contains("fa-spin")) {
+        printerInfo.push(printer.printerInfo);
+      });
+      generateTableRows(printerInfo);
+      for (let p = 0; p < selectedPrinters.length; p++) {
+        const currentPrinter = selectedPrinters[p];
+        // Make sure the folder is created...
+        if (!selectedPrinters[p].folderExists) {
+          const response = await FileActions.multiUploadCreateFolders(
+            currentPrinter.printerInfo,
+            selectedFolder
+          );
+          updateTableRow(printerInfo[p]._id, response.status, response.message);
         } else {
-          spinner.classList = "fas fa-spinner fa-spin";
+          const response = {
+            status: "skipped",
+            message: "Folder exists, skipped!"
+          };
+          updateTableRow(printerInfo[p]._id, response.status, response.message);
         }
+
         selectedFile.forEach((file) => {
           const newObject = {};
-          const num = printer.value;
+          const num = currentPrinter.value;
           newObject.file = file;
           newObject.index = num;
-          newObject.printerInfo = printer.printerInfo;
+          newObject.printerInfo = currentPrinter.printerInfo;
           newObject.upload = FileManager.fileUpload;
-          newObject.currentFolder = selectedFolder;
+          newObject.currentFolder = "local/" + selectedFolder;
 
           if (printAfterUpload) {
             newObject.print = true;
           }
 
           fileUploads.add(newObject);
+          const response = {
+            status: "success",
+            message: "Your file has been added to the upload queue"
+          };
+          updateTableRow(printerInfo[p]._id, response.status, response.message);
+          updateBulkActionsProgress(p, selectedPrinters.length);
         });
-      });
+      }
+      updateBulkActionsProgress(selectedPrinters.length, selectedPrinters.length);
     }
 
     function grabFiles(Afiles) {
@@ -842,7 +922,11 @@ export default class FileManager {
         files.insertAdjacentHTML(
           "beforeend",
           `
-          <li>${file.name}</li>
+           <div class="card col-2 px-1 py-1">
+             <div class="card-header px-1 py-1">
+               <small>${file.name}</small> 
+              </div>
+            </div>
         `
         );
       });
@@ -859,7 +943,17 @@ export default class FileManager {
     document.getElementById("multiUploadFooter").innerHTML =
       '<button id="multiUpSubmitBtn" type="button" class="btn btn-warning float-right">Next</button>';
     document.getElementById("multiUpSubmitBtn").addEventListener("click", (e) => {
-      second();
+      selectedPrinters = PrinterSelect.getSelected();
+      if (selectedPrinters.length < 2) {
+        UI.createAlert(
+          "error",
+          `Please select MORE than ${selectedPrinters.length} printer(s)!`,
+          2000,
+          "clicked"
+        );
+        return;
+      }
+      chooseOrCreateFolder();
     });
   }
 }
@@ -881,14 +975,17 @@ export class FileActions {
       FileSorting.loadSort(printer, "recursive");
       //FileManager.drawFiles(printer, "Recursive");
     }
-    const button = fileList.querySelectorAll('*[id^="file-"]');
-    for (let i = 0; i < button.length; i++) {
-      const file = button[i].id.replace("file-", "");
+    if (fileList) {
+      const button = fileList.querySelectorAll('*[id^="file-"]');
 
-      if (file.toUpperCase().indexOf(input) > -1) {
-        button[i].style.display = "";
-      } else {
-        button[i].style.display = "none";
+      for (let i = 0; i < button.length; i++) {
+        const file = button[i].id.replace("file-", "");
+
+        if (file.toUpperCase().indexOf(input) > -1) {
+          button[i].style.display = "";
+        } else {
+          button[i].style.display = "none";
+        }
       }
     }
   }
@@ -922,6 +1019,45 @@ export class FileActions {
         }
       }
     });
+  }
+  static async multiUploadCreateFolders(printer, folderPath) {
+    const folderSplit = folderPath.split("/");
+    for (let f = 0; f < folderSplit.length; f++) {
+      const formData = new FormData();
+      let octofarmPath;
+      if (f === 0) {
+        //First folder goes to no path
+        octofarmPath = "";
+        formData.append("foldername", folderSplit[f]);
+        formData.append("path", "");
+      } else {
+        //Subsequent folders go to previous folder path... should be created!
+        octofarmPath = folderSplit[f - 1];
+        formData.append("foldername", folderSplit[f]);
+        formData.append("path", folderSplit[f - 1]);
+      }
+      const post = await OctoPrintClient.folder(printer, "local", formData);
+      if (post.status === 201) {
+        // Add status folder creation success and update OctoFarm with new folder...
+        const opts = {
+          i: printer._id,
+          foldername: folderSplit[f],
+          path: octofarmPath
+        };
+        const update = await OctoFarmClient.post("printers/newFolder", opts);
+        await FileManager.updateFileList(printer._id);
+        return {
+          status: "success",
+          message: "Successfully created your missing folder!"
+        };
+      } else {
+        // Add status folder creation great failure
+        return {
+          status: "danger",
+          message: "Successfully created your missing folder!"
+        };
+      }
+    }
   }
 
   // Needs updating when filament is brought in.
