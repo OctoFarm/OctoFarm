@@ -1456,6 +1456,23 @@ class PrinterClean {
     });
     return versionArray;
   }
+  static returnUniqueListOfOctoPrintPaths() {
+    const printers = this.listPrintersInformation();
+
+    const filePathsArray = [""];
+
+    for (let f = 0; f < printers.length; f++) {
+      const folderList = printers[f]?.fileList?.folderList;
+      if (folderList) {
+        for (let p = 0; p < folderList.length; p++) {
+          if (!filePathsArray.includes(folderList[p].name)) {
+            filePathsArray.push(folderList[p].name);
+          }
+        }
+      }
+    }
+    return filePathsArray;
+  }
 }
 
 module.exports = {

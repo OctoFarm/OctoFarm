@@ -179,12 +179,7 @@ router.post("/moveFile", ensureAuthenticated, async (req, res) => {
 router.post("/moveFolder", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   logger.info("Move folder request: ", data);
-  Runner.moveFolder(
-    data.index,
-    data.oldFolder,
-    data.newFullPath,
-    data.folderName
-  );
+  Runner.moveFolder(data.index, data.oldFolder, data.newFullPath, data.folderName);
   res.send({ msg: "success" });
 });
 router.post("/newFolder", ensureAuthenticated, async (req, res) => {
@@ -253,13 +248,16 @@ router.get("/pluginList/:id", ensureAuthenticated, async (req, res) => {
   }
 });
 router.get("/scanNetwork", ensureAuthenticated, async (req, res) => {
-  const {
-    searchForDevicesOnNetwork
-  } = require("../../server_src/runners/autoDiscovery.js");
+  const { searchForDevicesOnNetwork } = require("../../server_src/runners/autoDiscovery.js");
 
   let devices = await searchForDevicesOnNetwork();
 
   res.json(devices);
+});
+
+router.get("/listUniqueFolders", ensureAuthenticated, async (req, res) => {
+  let uniqueFolderPaths = await PrinterClean.returnUniqueListOfOctoPrintPaths();
+  res.json(uniqueFolderPaths);
 });
 
 module.exports = router;

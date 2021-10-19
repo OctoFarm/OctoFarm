@@ -846,7 +846,7 @@ async function updateState(printer, clientSettings, view) {
   }
 
   if (printer?.layerData) {
-    const formatLayerData = `<i class="fas fa-layer-group"></i> Layer ${printer.layerData.currentLayer} / ${printer.layerData.totalLayers} (${printer.layerData.percentComplete}%)`;
+    const formatLayerData = `<i class="fas fa-layer-group"></i> ${printer.layerData.currentLayer} / ${printer.layerData.totalLayers} (${printer.layerData.percentComplete}%)`;
     UI.doesElementNeedUpdating(formatLayerData, elements.layerData, "innerHTML");
   }
 

@@ -745,25 +745,46 @@ export default class FileManager {
     await PrinterSelect.create(document.getElementById("multiPrintersSection"));
 
     async function chooseOrCreateFolder() {
+      const multiFolderInput = document.getElementById("multiNewFolder");
+      multiFolderInput.innerHTML = "";
+      const uniqueFolderList = await OctoFarmClient.getOctoPrintUniqueFolders();
+
+      uniqueFolderList.forEach((path) => {
+        multiFolderInput.insertAdjacentHTML(
+          "beforeend",
+          `
+          <option value=${path}>${path}</option>
+        `
+        );
+      });
+
       document.getElementById("multiPrinterBtn").disabled = true;
       document.getElementById("multiFolder").disabled = false;
       document.getElementById("multiPrintersSection").classList.add("hidden");
       document.getElementById("multiFolderSection").classList.remove("hidden");
 
       document.getElementById("multiSelectedPrinters2").innerHTML = "";
-      let printers = await OctoFarmClient.listPrinters();
+      document.getElementById("multiFolder").disabled = false;
+      document.getElementById("multiFile").disabled = true;
+      document.getElementById("multiFolderSection").classList.remove("hidden");
+      document.getElementById("multiFileSection").classList.add("hidden");
+      document.getElementById("multiUploadFooter").innerHTML =
+        "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-success float-right\">Next</button>";
+      document.getElementById("multiUpSubmitBtn").addEventListener("click", async (e) => {
+        selectedFolder = document.getElementById("multiNewFolder").value;
+        let newFolder = document.getElementById("multiNewFolderNew").value;
+        let printers = await OctoFarmClient.listPrinters();
+        selectedPrinters.forEach((printer, index) => {
+          if (printer) {
+            const i = _.findIndex(printers, function (o) {
+              return o._id == printer.value.toString();
+            });
+            const id = printers[i]._id;
+            const name = printers[i].printerName;
 
-      selectedPrinters.forEach((printer, index) => {
-        if (printer) {
-          const i = _.findIndex(printers, function (o) {
-            return o._id == printer.value.toString();
-          });
-          const id = printers[i]._id;
-          const name = printers[i].printerName;
-
-          document.getElementById("multiSelectedPrinters2").insertAdjacentHTML(
-            "beforeend",
-            `
+            document.getElementById("multiSelectedPrinters2").insertAdjacentHTML(
+              "beforeend",
+              `
             <div class="card col-2 px-1 py-1">
              <div class="card-header px-1 py-1">
                <small>${name}</small> 
@@ -773,30 +794,31 @@ export default class FileManager {
               </div>
             </div>
             `
-          );
-          selectedPrinters[index] = {
-            value: printers[i]._id,
-            printerInfo: printers[i]
-          };
+            );
+            selectedPrinters[index] = {
+              value: printers[i]._id,
+              printerInfo: printers[i]
+            };
+          }
+        });
+
+        if (newFolder !== "") {
+          if (newFolder[0] === "/") {
+            newFolder.replace("/", "");
+          }
+          selectedFolder = selectedFolder + "/" + newFolder;
         }
-      });
-      document.getElementById("multiFolder").disabled = false;
-      document.getElementById("multiFile").disabled = true;
-      document.getElementById("multiFolderSection").classList.remove("hidden");
-      document.getElementById("multiFileSection").classList.add("hidden");
-      document.getElementById("multiUploadFooter").innerHTML =
-        "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-success float-right\">Next</button>";
-      document.getElementById("multiUpSubmitBtn").addEventListener("click", async (e) => {
-        selectedFolder = document.getElementById("multiNewFolder").value;
+
         if (selectedFolder === "") {
           selectedFolder = "local";
         }
+
         if (selectedFolder[0] === "/") {
           selectedFolder = selectedFolder.replace("/", "");
         }
+
         const regexValidation = new RegExp("\\/[a-zA-Z0-9_\\/-]*[^\\/]$");
 
-        const multiFolderInput = document.getElementById("multiNewFolder");
         // validate the path
         if (!regexValidation.exec("/" + selectedFolder.replace(/ /g, "_"))) {
           multiFolderInput.classList.add("is-invalid");

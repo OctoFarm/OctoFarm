@@ -130,6 +130,10 @@ export default class OctoFarmClient {
     return this.get("settings/customGcode");
   }
 
+  static async getOctoPrintUniqueFolders() {
+    return this.get(`${this.printerRoute}/listUniqueFolders`);
+  }
+
   static async get(path) {
     const url = new URL(path, window.location.origin).href;
     return axios.get(url).then((res) => {

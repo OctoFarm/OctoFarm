@@ -284,16 +284,18 @@
 
                                 </div>
                                 <div id="multiFolderSection" class="col-lg-12 hidden">
-                                    <p id="multiSelectedPrinters"></p>
-                                    <p>Would you like to create a folder too?</p>
-                                    <p><b>Note:</b> Leaving blank will create the files in local, otherwise they will be
-                                        put inside your newly created folder...</p>
-                                    <code>Accepted formats are: </code><br>
-                                    <code>Single folder by name: 'Files of Wonder'</code><br>
-                                    <code>Paths for nested folders: 'Files of Wonder/Job of Wonder'</code><br>
-                                    <input id="multiNewFolder" class="form-control bg-dark text-light mt-2" type="text"
-                                           placeholder="Please type your new folder name here..."
-                                           aria-label="NewFolder">
+                                    <p>Please choose or create a folder below!</p>
+                                    <p><b>Note:</b> To create a new folder, at a specific path please enter into the new folder input. It will be appended to the chosen path.</p>
+                                    <div class="input-group mb-3">
+                                        <select class="form-control bg-dark text-light mt-2" id="multiNewFolder" style="max-width:60%;">
+
+                                        </select>
+                                        <div class="input-group-append" style="min-width:40%;">
+                                            <input id="multiNewFolderNew" class="form-control bg-dark text-light mt-2" type="text"
+                                                   placeholder="Please type your new folder name here..."
+                                                   aria-label="NewFolder">
+                                        </div>
+                                    </div>
                                 </div>
                                 <div id="multiFileSection" class="col-lg-12 hidden">
                                     <h5>Current folder/path:</h5>
