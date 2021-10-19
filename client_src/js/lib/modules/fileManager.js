@@ -746,6 +746,12 @@ export default class FileManager {
 
     async function chooseOrCreateFolder() {
       const multiFolderInput = document.getElementById("multiNewFolder");
+      const multiNewFolderNew = document.getElementById("multiNewFolderNew");
+      multiNewFolderNew.classList.remove("is-invalid");
+      multiNewFolderNew.classList.remove("is-valid");
+      multiFolderInput.classList.remove("is-invalid");
+      multiFolderInput.classList.remove("is-valid");
+      multiNewFolderNew.value = "";
       multiFolderInput.innerHTML = "";
       const uniqueFolderList = await OctoFarmClient.getOctoPrintUniqueFolders();
 
@@ -822,7 +828,10 @@ export default class FileManager {
         // validate the path
         if (!regexValidation.exec("/" + selectedFolder.replace(/ /g, "_"))) {
           multiFolderInput.classList.add("is-invalid");
+          multiNewFolderNew.classList.add("is-invalid");
         } else {
+          multiNewFolderNew.classList.remove("is-invalid");
+          multiNewFolderNew.classList.add("is-valid");
           multiFolderInput.classList.remove("is-invalid");
           multiFolderInput.classList.add("is-valid");
           await checkIfPathExistsOnOctoPrint();
