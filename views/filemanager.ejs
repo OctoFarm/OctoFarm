@@ -1,3 +1,6 @@
+<% let base = './partials' %>
+<% let modal = base + '/octofarm-modal.ejs' %>
+
 <% if(typeof printerCount != 'undefined' && printerCount > 0 ) { %>
     <% if(typeof currentOperationsCount != 'undefined' && currentOperationsCount.idle > 0 || currentOperationsCount.active > 0 || currentOperationsCount.disconnected > 0 || currentOperationsCount.complete > 0) { %>
 
@@ -51,11 +54,23 @@
                                         <button
                                                 id="multUploadBtn"
                                                 type="button"
-                                                class="btn btn-info d-inline bg-colour-3"
+                                                class="btn btn-info d-inline bg-colour-3 text-dark"
                                                 data-toggle="modal"
                                                 data-target="#multiUploadModal"
                                         >
                                             <i class="fas fa-layer-group"></i> Multi-Upload
+                                        </button>
+                                        <button
+                                                title="Create pre-defined custom gcode scripts to use with the Bulk Gcode commands"
+                                                id="customGcodeBtn"
+                                                type="button"
+                                                class="tag btn btn-primary bg-colour-4"
+                                                href="#"
+                                                aria-expanded="false"
+                                                data-toggle="modal" data-target="#printerCustomGcodeScriptsModal"
+
+                                        >
+                                            <i class="fas fa-code"></i> Gcode Scripts
                                         </button>
                                     </div>
                                 </div>
@@ -201,7 +216,13 @@
         </div>
     <% } %>
 
-
+    <%- include(modal, {
+    modal:{
+    id:"printerCustomGcodeScripts", title:"Custom Gcode Scripts"
+    },
+    bodyFile:'./PrinterManager/printerCustomGcodeScripts.modal.ejs'
+    })
+    %>
     <script src="/assets/dist/fileManagerRunner.min.js" type="module"></script>
 <% }else{ %>
     <%- include('./addPrinters.ejs') %>

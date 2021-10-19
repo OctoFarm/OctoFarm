@@ -1,6 +1,10 @@
 import currentOperations from "../lib/modules/currentOperations";
 import { setPrinterMapState } from "./printer-map.state";
 import { init } from "./printer-map.updater";
+import {
+  monitoringSSEventHandler,
+  monitoringWorkerURL
+} from "../monitoring/monitoring-sse.handler";
 
 let worker = null;
 let currentView = null;
@@ -20,7 +24,7 @@ export function handleVisibilityChange() {
 
 export function createWebWorker(view) {
   currentView = view;
-  worker = new Worker("/assets/dist/monitoringViewsWorker.min.js");
+  worker = new Worker(monitoringWorkerURL);
   worker.onmessage = async function (event) {
     if (event.data != false) {
       //Update global variables with latest information...

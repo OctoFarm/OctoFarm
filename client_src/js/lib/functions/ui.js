@@ -4,14 +4,12 @@ const printerSettingsModal = document.getElementById("printerSettingsModal");
 const printerManagerModal = document.getElementById("printerManagerModal");
 const printerLogsModal = document.getElementById("printerLogsModal");
 const printerStatisticsModal = document.getElementById("printerStatistics");
-const printerCustomGcodeScriptsModal = document.getElementById("printerCustomGcodeScriptsModal");
-const printerSelectModal = document.getElementById("printerCustomGcodeScriptsModal");
+const printerSelectModal = document.getElementById("printerSelectModal");
 const currentModals = [
   printerSettingsModal,
   printerManagerModal,
   printerLogsModal,
   printerStatisticsModal,
-  printerCustomGcodeScriptsModal,
   printerSelectModal
 ];
 

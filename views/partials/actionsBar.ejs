@@ -5,11 +5,83 @@
   <div class="card text-white bg-dark mx-0 my-0">
     <div class="row px-1" id="actionsBarBody">
 
-      <div class="col-1 pt-0">
-        <%- include('./PrinterManager/printerBulkActionsBtns.ejs') %>
-      </div>
-      <div class="col-7">
+      <div class="col-8">
+        <button
+                title="Connect multiple Printers at once."
+                id="bulkConnectBtn"
+                type="button"
+                class="btn btn-success"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#printerSelectModal"
+        >
+          <i class="fas fa-link"></i> Connect
+        </button>
+        <button
+                title="Diconnect multiple Printers at once."
+                id="bulkDisconnectBtn"
+                type="button"
+                class="btn btn-danger"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#printerSelectModal"
+        >
+          <i class="fas fa-unlink"></i> Disconnect
+        </button>
+        <button
+                title="Power On/Off multiple Printers at once."
+                id="bulkPowerBtn"
+                type="button"
+                class="btn btn-outline-danger"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#printerSelectModal"
+        >
+          <i class="fas fa-power-off"></i> Power
+        </button>
 
+        <button
+                title="Send heating commands to multiple printers at once."
+                id="bulkPreHeat"
+                type="button"
+                class="btn btn-warning text-dark"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#printerSelectModal"
+        >
+          <i class="fas fa-temperature-high"></i> Pre-Heat
+        </button>
+        <button
+                title="Control multiple printers at once."
+                id="bulkControl"
+                type="button"
+                class="btn btn-info"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#printerSelectModal"
+        >
+          <i class="fas fa-gamepad"></i> Control
+        </button>
+        <button
+                title="Send gcode commands to multiple printers at once."
+                id="bulkGcodeCommands"
+                type="button"
+                class="btn btn-success"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#printerSelectModal"
+        >
+          <i class="fas fa-code"></i> Gcode
+        </button>
+        <button
+                id="multUploadBtn"
+                type="button"
+                class="btn btn-warning text-dark"
+                data-toggle="modal"
+                data-target="#multiUploadModal"
+        >
+          <i class="fas fa-layer-group"></i> Multi-Upload
+        </button>
       </div>
       <div class="col-2">
         <div class="input-group">

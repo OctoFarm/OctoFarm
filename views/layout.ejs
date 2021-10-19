@@ -252,7 +252,13 @@
     bodyFile:'./PrinterManager/bulkActionsProgress.modal.ejs'
     })
     %>
-
+    <%- include(modal, {
+    modal:{
+    id:"printerSelect", title:"Printer Select: "
+    },
+    bodyFile:'./PrinterManager/printerSelect.modal.ejs'
+    })
+    %>
     <div class="modal fade" id="multiUploadModal" tabindex="0" role="dialog" aria-labelledby="multiUploadLabel"
          aria-hidden="true" data-backdrop="static" data-keyboard="false">
         <div class="modal-dialog modal-xl" role="document">

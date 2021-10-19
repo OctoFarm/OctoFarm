@@ -10,12 +10,17 @@ All notable changes to this project will be documented in this file.
     - Added #295: Support for DisplayLayerProgress plugin. The List, Panel, Camera and Printer Manager views all now display this information if it's available. Works automatically on detection of the plugin!
     - Added #761: All filament selection boxes now show manufactuere.
     - Added #763: Allow file multi-upload to create folders if they don't exist. 
+    - Added a new Actions Bar to List, Panel, Camera, {MAP TO NAME} views. These contain filters and bulk commands for controlling printers.
+    - Multi-Upload has been added to the action bar as well as it's home in file manager.
 
 ### Changed
     - Printer offline logs (specifically connection refused) are now silenced after the first one. 
+    - Bulk commands are no longer in Printer Manager -> Moved to the action bar on views...
+    - Custom gcode editor has been moved -> Files Manager.
+    - All octoprint plugin/client update commands have been moved under "OctoPrint Management" dropdown on Printer Manager.
 
 ### Removed
-    - Bulk actions notification alert
+    - Some bulk actions notification alert
     - Ping/Pong message on connection log, redundant and ends up flooding the log.
 
 ### Fixed
