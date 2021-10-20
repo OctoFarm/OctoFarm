@@ -18,6 +18,7 @@ All notable changes to this project will be documented in this file.
     - Bulk commands are no longer in Printer Manager -> Moved to the action bar on views...
     - Custom gcode editor has been moved -> Files Manager.
     - All octoprint plugin/client update commands have been moved under "OctoPrint Management" dropdown on Printer Manager.
+    - Cleaned up OctoPrint Management icons, no longer all the plug.
 
 ### Removed
     - Some bulk actions notification alert
@@ -33,6 +34,8 @@ All notable changes to this project will be documented in this file.
     - Fixed file manager showing folders with "_" in folder name.
     - Fixed and issue with file manager crashing if searching an empty directory.
     - Fixed "No Files Available" not been removed after uploading a file...
+    - Fixed current operations on mobile views... now stacks the cards correctly. 
+    - Fixed an issue we're Printer Statistics wouldn't open if printer had never been live.
 
 ## [v1.2-rc2]
 

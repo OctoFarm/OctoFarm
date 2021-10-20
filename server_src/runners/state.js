@@ -28,24 +28,23 @@ let farmPrinters = [];
 let farmPrintersGroups = [];
 let systemSettings = {};
 
-const printersInformation = false;
 let timeout = null;
-if (printersInformation === false) {
-  setInterval(async () => {
-    for (let index = 0; index < farmPrinters.length; index++) {
-      if (typeof farmPrinters[index] !== "undefined") {
-        PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
-      }
-    }
-  }, 20000);
-  setTimeout(async () => {
-    for (let index = 0; index < farmPrinters.length; index++) {
-      if (typeof farmPrinters[index] !== "undefined") {
-        PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
-      }
-    }
-  }, 10000);
-}
+//if (printersInformation === false) {
+  // setInterval(async () => {
+  //   for (let index = 0; index < farmPrinters.length; index++) {
+  //     if (typeof farmPrinters[index] !== "undefined") {
+  //       PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
+  //     }
+  //   }
+  // }, 20000);
+  // setTimeout(async () => {
+  //   for (let index = 0; index < farmPrinters.length; index++) {
+  //     if (typeof farmPrinters[index] !== "undefined") {
+  //       PrinterClean.generate(farmPrinters[index], systemSettings.filamentManager);
+  //     }
+  //   }
+  // }, 10000);
+//}
 
 function WebSocketClient() {
   this.number = 0; // Message number
@@ -102,6 +101,10 @@ const heartBeatInterval = setInterval(function ping() {
 
 WebSocketClient.prototype.open = function (url, index) {
   try {
+    // Shim for whatever happend with the URLS..
+    if(url[url.length-1] !== "/"){
+      url = url + "/"
+    }
     this.url = url;
     this.index = index;
     PrinterTicker.addIssue(
@@ -1218,13 +1221,16 @@ class Runner {
               e.message,
               `Couldn't grab initial connection for Printer: ${farmPrinters[i].printerURL}`
             );
-            PrinterTicker.addIssue(
-              new Date(),
-              farmPrinters[i].printerURL,
-              `${e.message} retrying in ${timeout.apiRetry / 1000} seconds`,
-              "Disconnected",
-              farmPrinters[i]._id
-            );
+            if(!farmPrinters[i].silenceOfflineLog) {
+              PrinterTicker.addIssue(
+                  new Date(),
+                  farmPrinters[i].printerURL,
+                  `${e.message} retrying in ${timeout.apiRetry / 1000} seconds. Any subsequent logs for this printer will be silenced...\``,
+                  "Disconnected",
+                  farmPrinters[i]._id
+              );
+              farmPrinters[i].silenceOfflineLog = true;
+            }
             farmPrinters[i].state = "Offline";
             farmPrinters[i].stateColour = Runner.getColour("Offline");
             farmPrinters[i].hostState = "Shutdown";

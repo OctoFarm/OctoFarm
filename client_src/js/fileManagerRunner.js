@@ -8,9 +8,12 @@ import FileSorting from "./lib/modules/fileSorting.js";
 let lastId = null;
 
 //Setup global listeners...
-document.getElementById("multUploadBtn").addEventListener("click", (e) => {
-  FileManager.multiUpload();
-});
+const multiUploadBtn = document.getElementById("multUploadBtn");
+if (multiUploadBtn) {
+  multiUploadBtn.addEventListener("click", (e) => {
+    FileManager.multiUpload();
+  });
+}
 
 class Manager {
   static async init() {
@@ -20,7 +23,6 @@ class Manager {
     // Draw first printer list...
     const filamentDropDown = await returnDropDown();
     const printerList = document.getElementById("printerList");
-
     //Get online printers...
     const onlinePrinterList = [];
     printers.forEach((printer) => {
@@ -104,7 +106,6 @@ class Manager {
       );
       //Setup for first printer
       const listItem = document.getElementById(`fileManagerPrinter-${printer._id}`);
-
       listItem.addEventListener("click", (e) => {
         if (!e.target.id.includes("tool")) {
           Manager.changePrinter(e, printer._id);

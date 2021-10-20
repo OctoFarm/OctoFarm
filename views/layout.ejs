@@ -1,6 +1,10 @@
 <% const base = './partials' %>
 <% const octofarmErrorModal = base + '/octofarm-error.modal.ejs'  %>
 <% const modal = base + '/octofarm-modal.ejs' %>
+<% let currentUserGroup = "User" %>
+<% if(typeof userGroup !== "undefined") { %>
+    <% currentUserGroup = userGroup %>
+<% } %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -42,10 +46,6 @@
             aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <% let noPrinters = "d-none" %>
-    <% if(typeof printerCount !== 'undefined' && printerCount > 0){ %>
-        <% noPrinters = "" %>
-    <% } %>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li id="menuDashboard">
@@ -54,33 +54,33 @@
                 </a>
             </li>
             <li class="nav-item">
-                <a title="Panel Layout Monitoring View" class="nav-link text-light text-center btn-sm <%= noPrinters %>"
+                <a title="Panel Layout Monitoring View" class="nav-link text-light text-center btn-sm"
                    id="menuPanelView" href="/mon/panel"><i class="fas fa-columns"></i>
                     Panel</a>
             </li>
             <li class="nav-item">
-                <a title="List Layout Monitoring View" class="nav-link text-light text-center btn-sm <%= noPrinters %>"
+                <a title="List Layout Monitoring View" class="nav-link text-light text-center btn-sm"
                    id="menuListView" href="/mon/list"><i class="fas fa-list"></i> List</a>
             </li>
             <li class="nav-item">
                 <a title="Camera Layout Monitoring View"
-                   class="nav-link text-light text-center btn-sm <%= noPrinters %>" id="menuCameraView"
+                   class="nav-link text-light text-center btn-sm" id="menuCameraView"
                    href="/mon/camera"><i class="fas fa-video"></i>
                     Camera</a>
             </li>
             <li class="nav-item">
                 <a title="Davids super power tool" class="nav-link text-light text-center btn-sm"
-                   id="menuListView" href="/mon/printerMap"><i class="fas fa-list"></i> Map</a>
+                   id="menuListView" href="/mon/printerMap"><i class="fas fa-map-marked-alt"></i> Group</a>
             </li>
             <li class="nav-item">
                 <a title="Current Operations Monitoring Layout View"
-                   class="nav-link text-light text-center btn-sm <%= noPrinters %>" id="menucurrentOperationsView"
+                   class="nav-link text-light text-center btn-sm" id="menucurrentOperationsView"
                    href="/mon/currentOp"><i class="fas fa-star"></i>
                     Current Operations</a>
             </li>
             <li class="nav-item">
                 <span title="Panel Layout Monitoring View"
-                      class="nav-link text-light text-center btn-sm <%= noPrinters %>" id="menuPanelView">
+                      class="nav-link text-light text-center btn-sm">
                     <% if(typeof dashboardStatistics !== "undefined"){ %>
                         <% if(typeof dashboardStatistics.currentTemperature !== "undefined" && dashboardStatistics.currentTemperature !== null){ %>
                             <i class="fas fa-temperature-high"></i> <%= dashboardStatistics.currentTemperature %>°C
@@ -107,11 +107,13 @@
                     </a>
                 <% } %>
             </li>
-            <li id="menuPrinters">
-                <a title="Printer Setup" class="nav-link text-center" href="/printers">
-                    <i class="fas fa-print"></i> Printers
-                </a>
-            </li>
+            <% if(currentUserGroup === "Administrator"){ %>
+                <li id="menuPrinters">
+                    <a title="Printer Setup" class="nav-link text-center" href="/printers">
+                        <i class="fas fa-print"></i> Printers
+                    </a>
+                </li>
+            <% } %>
             <li class="nav-item">
                 <a title="File Manager" class="nav-link text-center" href="/filemanager" id="fileManagerBtn">
                     <i class="fas fa-folder-open"></i> File Manager

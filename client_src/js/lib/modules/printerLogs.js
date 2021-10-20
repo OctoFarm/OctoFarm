@@ -277,24 +277,47 @@ export default class PrinterLogs {
     let display = "";
     let noHistoryMessage = "";
     let safeModeCheck = "";
-    if (stats.octoPrintSystemInfo["octoprint.safe_mode"]) {
-      safeModeCheck = `
-      <i title="You are not in safe mode, all is fine" class="fas fa-thumbs-down text-success"></i>
+
+    let printerFirmware = "Unknown";
+    let octoPrintVersion = "Unknown";
+    let pythonVersion = "Unknown";
+    let pythonPip = "Unknown";
+    let osPlatform = "Unknown";
+    let hardwareCores = "Unknown";
+    let hardwareRam = "Unknown";
+
+    if (stats.octoPrintSystemInfo) {
+      octoPrintVersion = stats.octoPrintSystemInfo["octoprint.version"];
+
+      pythonVersion = stats.octoPrintSystemInfo["env.python.version"];
+
+      pythonPip = stats.octoPrintSystemInfo["env.python.pip"];
+
+      osPlatform = stats.octoPrintSystemInfo["env.os.platform"];
+
+      hardwareCores = stats.octoPrintSystemInfo["env.hardware.cores"];
+
+      hardwareRam = stats.octoPrintSystemInfo["env.hardware.ram"];
+
+      if (stats.octoPrintSystemInfo["octoprint.safe_mode"]) {
+        safeModeCheck = `
+        <i title="You are not in safe mode, all is fine" class="fas fa-thumbs-down text-success"></i>
       `;
-    } else {
-      safeModeCheck = `
-      <i title="Something wrong with your system? Detecting safe mode" class="fas fa-thumbs-up text-success"></i>
+      } else {
+        safeModeCheck = `
+        <i title=\"Something maybe wrong with your system? Detecting safe mode\" class=\"fas fa-thumbs-up text-success\"></i>
       `;
+      }
+      if (typeof stats?.octoPrintSystemInfo["printer.firmware"] !== "undefined") {
+        printerFirmware = stats.octoPrintSystemInfo["printer.firmware"];
+      }
     }
+
     if (stats.historyByDay.length === 0) {
       noHistoryMessage = `<div class='row'>
                     <div class="col-12"><h5>Sorry but your printer currently has no history captured. Please run some prints to generate information here.</h5></div>
                 </div>`;
       display = "d-none";
-    }
-    let printerFirmware = "Unknown";
-    if (typeof stats.octoPrintSystemInfo["printer.firmware"] !== "undefined") {
-      printerFirmware = stats.octoPrintSystemInfo["printer.firmware"];
     }
     return `
             <div class="col-md-12 col-lg-4">
@@ -304,27 +327,15 @@ export default class PrinterLogs {
                               <p class="card-text">
                               <div class="row">
                                 <div class="col-md-12 col-lg-6">
-                                   <small><b>OctoPrint Version:</b> ${
-                                     stats.octoPrintSystemInfo["octoprint.version"]
-                                   }</small><br>
+                                   <small><b>OctoPrint Version:</b> ${octoPrintVersion}</small><br>
                                     <small><b>Printer Firmware:</b> ${printerFirmware}</small><br>
-                                    <small><b>Python Version:</b> ${
-                                      stats.octoPrintSystemInfo["env.python.version"]
-                                    }</small>   <br>     
-                                       <small><b>pip Version:</b> ${
-                                         stats.octoPrintSystemInfo["env.python.pip"]
-                                       }</small>        <br>                          
+                                    <small><b>Python Version:</b> ${pythonVersion}</small>   <br>     
+                                       <small><b>pip Version:</b> ${pythonPip}</small>        <br>                          
                                 </div>
                                   <div class="col-md-12 col-lg-6">
-                                   <small><b>OS Platform:</b> ${
-                                     stats.octoPrintSystemInfo["env.os.platform"]
-                                   }</small><br>
-                                   <small><b>OS Cores:</b> ${
-                                     stats.octoPrintSystemInfo["env.hardware.cores"]
-                                   }</small><br>
-                                    <small><b>OS ram:</b> ${Calc.bytes(
-                                      stats.octoPrintSystemInfo["env.hardware.ram"]
-                                    )}</small><br>
+                                   <small><b>OS Platform:</b> ${osPlatform}</small><br>
+                                   <small><b>OS Cores:</b> ${hardwareCores}</small><br>
+                                    <small><b>OS ram:</b> ${Calc.bytes(hardwareRam)}</small><br>
                                      <small><b>Safe Mode Check:</b> ${safeModeCheck} </small><br>
                                 </div>
                               </div>
