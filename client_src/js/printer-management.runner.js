@@ -42,50 +42,30 @@ scanNetworkBtn.addEventListener("click", async (e) => {
 
 const blkPluginsBtn = document.getElementById("blkPluginsInstallBtn");
 blkPluginsBtn.addEventListener("click", async (e) => {
-  PrinterSelect.create(
-    document.getElementById("multiPrintersSection"),
-    false,
-    "Install Plugins",
-    function () {
-      bulkOctoPrintPluginAction("install");
-    }
-  );
+  await PrinterSelect.create(multiPrinterSelectModal, false, "Install Plugins", function () {
+    bulkOctoPrintPluginAction("install");
+  });
 });
 
 const blkPluginsUninstallBtn = document.getElementById("blkPluginsUnInstallBtn");
 blkPluginsUninstallBtn.addEventListener("click", async (e) => {
-  PrinterSelect.create(
-    document.getElementById("multiPrintersSection"),
-    false,
-    "Uninstall Plugins",
-    function () {
-      bulkOctoPrintPluginAction("uninstall");
-    }
-  );
+  await PrinterSelect.create(multiPrinterSelectModal, false, "Uninstall Plugins", function () {
+    bulkOctoPrintPluginAction("uninstall");
+  });
 });
 
 const blkPluginsEnableBtn = document.getElementById("blkPluginsEnableBtn");
 blkPluginsEnableBtn.addEventListener("click", async (e) => {
-  PrinterSelect.create(
-    document.getElementById("multiPrintersSection"),
-    false,
-    "Enable Plugins",
-    function () {
-      bulkOctoPrintPluginAction("enable");
-    }
-  );
+  await PrinterSelect.create(multiPrinterSelectModal, false, "Enable Plugins", function () {
+    bulkOctoPrintPluginAction("enable");
+  });
 });
 
 const blkPluginsDisableBtn = document.getElementById("blkPluginsDisableBtn");
 blkPluginsDisableBtn.addEventListener("click", async (e) => {
-  PrinterSelect.create(
-    document.getElementById("multiPrintersSection"),
-    false,
-    "Disable Plugins",
-    function () {
-      bulkOctoPrintPluginAction("disable");
-    }
-  );
+  await PrinterSelect.create(multiPrinterSelectModal, false, "Disable Plugins", function () {
+    bulkOctoPrintPluginAction("disable");
+  });
 });
 
 const searchOffline = document.getElementById("searchOfflineBtn");
@@ -93,17 +73,12 @@ searchOffline.addEventListener("click", async (e) => {
   await reSyncPrinters();
 });
 const editBtn = document.getElementById("editPrinterBtn");
-editBtn.addEventListener("click", (event) => {
-  PrinterSelect.create(
-    document.getElementById("multiPrintersSection"),
-    true,
-    "Edit Printers",
-    bulkEditPrinters
-  );
+editBtn.addEventListener("click", async (event) => {
+  await PrinterSelect.create(multiPrinterSelectModal, true, "Edit Printers", bulkEditPrinters);
 });
-document.getElementById("deletePrintersBtn").addEventListener("click", (event) => {
-  PrinterSelect.create(
-    document.getElementById("multiPrintersSection"),
+document.getElementById("deletePrintersBtn").addEventListener("click", async (event) => {
+  await PrinterSelect.create(
+    multiPrinterSelectModal,
     false,
     "Printer Deletion",
     bulkDeletePrinters

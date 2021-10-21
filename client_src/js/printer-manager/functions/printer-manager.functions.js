@@ -14,11 +14,12 @@ import { createPrinterAddInstructions } from "../templates/printer-add-instructi
 let powerTimer = 5000;
 
 export function workerEventFunction(data) {
-  if (data != false) {
+  if (data) {
     const modalVisibility = UI.checkIfAnyModalShown();
 
     if (!modalVisibility) {
       if (data.currentTickerList.length > 0) {
+        checkIfLoaderExistsAndRemove();
         updateConnectionLog(data.currentTickerList);
       } else {
         checkIfLoaderExistsAndRemove(true);

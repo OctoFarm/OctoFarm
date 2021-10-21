@@ -5,16 +5,20 @@ let tickerMessageBoxStatus = document.getElementById("printerManagementConnectio
  * Checks if the ticker contains the loader element and removes it.
  * Also updates the tickers styling to remove the d-flex class.
  */
-export function checkIfLoaderExistsAndRemove(errored = false) {
+export function checkIfLoaderExistsAndRemove(noLogs = false) {
   const loader = document.getElementById("printerTickerLoader");
   if (loader) {
-    if (errored) {
+    if (noLogs) {
       tickerMessageBox.innerText = "No logs received ❌";
       loader.remove();
       updateStatus(0);
     } else {
       tickerMessageBox.classList.remove("d-flex");
       loader.remove();
+    }
+  } else {
+    if (tickerMessageBox.classList.contains("d-flex")) {
+      tickerMessageBox.classList.remove("d-flex");
     }
   }
 }
