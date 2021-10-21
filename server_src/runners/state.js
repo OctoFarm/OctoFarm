@@ -106,7 +106,7 @@ WebSocketClient.prototype.open = function (url, index) {
     PrinterTicker.addIssue(
       new Date(),
       farmPrinters[this.index].printerURL,
-      "Setting up the clients websocket connection",
+      "Setting up the clients websocket connection: " + farmPrinters[this.index].webSocketURL,
       "Active",
       farmPrinters[this.index]._id
     );
@@ -724,6 +724,10 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
           }
         }
       }
+      if(data.plugin.plugin === "pluginmanager"){
+        console.log(data.plugin)
+      }
+      console.log(data.plugin.plugin)
     }
     // Event Listeners for state changes
     if (typeof farmPrinters[this.index].temps !== "undefined") {
@@ -1045,7 +1049,11 @@ class Runner {
             "Complete",
             farmPrinters[i]._id
           );
-          await farmPrinters[i].ws.open(`${farmPrinters[i].webSocketURL}sockjs/websocket`, i);
+          if(farmPrinters[i].ws){
+            delete farmPrinters[i].ws
+            farmPrinters[i].ws = new WebSocketClient();
+          }
+          farmPrinters[i].ws.open(`${farmPrinters[i].webSocketURL}/sockjs/websocket`, i);
         } else {
           const error = {
             message: `Could not Establish connection to OctoPrint Returned: ${users.status}: ${farmPrinters[i].printerURL}`,
@@ -1237,7 +1245,7 @@ class Runner {
             farmPrinters[i].webSocketDescription = "Websocket Offline";
           } catch (e) {
             logger.error(
-              `Couldn't set state of missing printer, safe to ignore: ${farmPrinters[i].index}: ${farmPrinters[i].printerURL}`
+              `Issue updating printer state... index: ${i} error:${e}`
             );
           }
           if (typeof farmPrinters[i] !== "undefined") {
@@ -1511,7 +1519,15 @@ class Runner {
       if (farmPrinters[index].settingsAppearance.name !== printers[i].settingsAppearance.name) {
         farmPrinters[index].settingsApperance.name = printers[i].settingsAppearance.name;
         farmPrinters[index].markModified("settingsApperance");
-        logger.info(`Modified Current Name  for: ${farmPrinters[i].printerURL}`);
+        const loggerMessage = `Changing printer name from ${farmPrinters[index].settingsAppearance.name} to ${printers[i].settingsAppearance.name}`;
+        logger.info(loggerMessage);
+        PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            loggerMessage,
+            "Active",
+            farmPrinters[index]._id
+        );
         if (!changes.includes(printers[i]._id)) {
           changes.push(printers[i]._id);
         }
@@ -1520,9 +1536,24 @@ class Runner {
         if (printers[i].printerURL[printers[i].printerURL.length - 1] === "/") {
           printers[i].printerURL = printers[i].printerURL.replace(/\/?$/, "");
         }
+        const loggerMessage = `Changing printer url from ${farmPrinters[index].printerURL} to ${printers[i].printerURL}`;
+        logger.info(loggerMessage);
+        PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            loggerMessage,
+            "Active",
+            farmPrinters[index]._id
+        );
         farmPrinters[index].printerURL = printers[i].printerURL;
+        if (!farmPrinters[index].printerURL.includes("https://") &&
+            !farmPrinters[index].printerURL.includes("http://")
+        ) {
+          farmPrinters[index].printerURL = `http://${farmPrinters[index].printerURL}`;
+        }
+        farmPrinters[index].webSocketURL = convertHttpUrlToWebsocket(printers[i].printerURL);
         farmPrinters[index].markModified("printerURL");
-        logger.info(`Modified current printer URL  for: ${farmPrinters[i].printerURL}`);
+        farmPrinters[index].markModified("webSocketURL");
         if (!changes.includes(printers[i]._id)) {
           changes.push(printers[i]._id);
         }
@@ -1530,7 +1561,15 @@ class Runner {
       if (farmPrinters[index].camURL !== printers[i].camURL) {
         farmPrinters[index].camURL = printers[i].camURL;
         farmPrinters[index].markModified("camURL");
-        logger.info(`Modified current camera URL for: ${farmPrinters[i].printerURL}`);
+        const loggerMessage = `Changing camera url from ${farmPrinters[index].camURL} to ${printers[i].camURL}`;
+        logger.info(loggerMessage);
+        PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            loggerMessage,
+            "Active",
+            farmPrinters[index]._id
+        );
         if (!changes.includes(printers[i]._id)) {
           changes.push(printers[i]._id);
         }
@@ -1538,7 +1577,15 @@ class Runner {
       if (farmPrinters[index].apikey !== printers[i].apikey) {
         farmPrinters[index].apikey = printers[i].apikey;
         farmPrinters[index].markModified("apikey");
-        logger.info(`Modified current APIKEY for: ${farmPrinters[i].printerURL}`);
+        const loggerMessage = `Changing apiKey from ${farmPrinters[index].apikey} to ${printers[i].apikey}`;
+        logger.info(loggerMessage);
+        PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            loggerMessage,
+            "Active",
+            farmPrinters[index]._id
+        );
         if (!changes.includes(printers[i]._id)) {
           changes.push(printers[i]._id);
         }
@@ -1547,7 +1594,15 @@ class Runner {
       if (farmPrinters[index].group !== printers[i].group) {
         farmPrinters[index].group = printers[i].group;
         farmPrinters[index].markModified("group");
-        logger.info(`Modified current group for: ${farmPrinters[index].printerURL}`);
+        const loggerMessage = `Changing group from ${farmPrinters[index].group} to ${printers[i].group}`;
+        logger.info(loggerMessage);
+        PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            loggerMessage,
+            "Active",
+            farmPrinters[index]._id
+        );
         if (!changes.includes(printers[i]._id)) {
           changes.push(printers[i]._id);
         }
@@ -2897,6 +2952,15 @@ class Runner {
         farmPrinters[index].settingsAppearance.name = settings.printer.printerName;
         printer.settingsAppearance.name = settings.printer.printerName;
         printer.markModified("settingsApperance");
+        const loggerMessage = `Changing printer name from ${farmPrinters[index].settingsAppearance.name} to ${settings.printer.printerName}`;
+        logger.info(loggerMessage);
+        PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            loggerMessage,
+            "Active",
+            farmPrinters[index]._id
+        );
         updatePrinter = true;
       }
       let profile = {};
@@ -2907,9 +2971,20 @@ class Runner {
         settings.printer.printerURL !== "" &&
         settings.printer.printerURL !== farmPrinters[index].printerURL
       ) {
+        const loggerMessage = `Changing printer URL from ${farmPrinters[index].printerURL} to ${settings.printer.printerURL}`;
+        logger.info(loggerMessage);
+        PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            loggerMessage,
+            "Active",
+            farmPrinters[index]._id
+        );
         farmPrinters[index].printerURL = settings.printer.printerURL;
         printer.printerURL = settings.printer.printerURL;
         printer.markModified("printerURL");
+        printer.webSocketURL = convertHttpUrlToWebsocket(settings.printer.printerURL);
+        printer.markModified("webSocketURL")
         updatePrinter = true;
       }
 
@@ -2917,16 +2992,36 @@ class Runner {
         farmPrinters[index].currentUser = settings.printer.currentUser;
         printer.currentUser = settings.printer.currentUser;
         printer.markModified("currentUser");
+        const loggerMessage = `Changing OctoPrint User from ${farmPrinters[index].currentUser} to ${settings.printer.currentUser}`;
+        logger.info(loggerMessage);
+        PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            loggerMessage,
+            "Active",
+            farmPrinters[index]._id
+        );
         updatePrinter = true;
       }
 
+
       const currentWebSocketURL = new URL(farmPrinters[index].webSocketURL);
+
       if (settings.printer.webSocketProtocol !== currentWebSocketURL.protocol + "//") {
-        // If we detect q difference then rebuild the websocket URL and mark for scan.
+        // If we detect a difference then rebuild the websocket URL and mark for scan.
         printer.webSocketURL = settings.printer.webSocketProtocol + currentWebSocketURL.host;
         farmPrinters[index].webSocketURL =
           settings.printer.webSocketProtocol + currentWebSocketURL.host;
         printer.markModified("webSocketURL");
+        const loggerMessage = `Changing Websocket protocol from ${farmPrinters[index].webSocketURL} to ${settings.printer.webSocketProtocol + currentWebSocketURL.host}`;
+        logger.info(loggerMessage);
+        PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            loggerMessage,
+            "Active",
+            farmPrinters[index]._id
+        );
         updatePrinter = true;
       }
       if (
@@ -2935,6 +3030,15 @@ class Runner {
       ) {
         farmPrinters[index].camURL = settings.printer.cameraURL;
         printer.camURL = settings.printer.cameraURL;
+        const loggerMessage = `Changing camera URL from ${farmPrinters[index].cameraURL} to ${settings.printer.cameraURL}`;
+        logger.info(loggerMessage);
+        PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            loggerMessage,
+            "Active",
+            farmPrinters[index]._id
+        );
         printer.markModified("camURL");
       }
       // Moved the update printer before the API print calls as it was causing errors to be caught in the api calls when offline... This was why it wasn't updating I believe as it was never firing the rescan code due to the catch.
@@ -2945,12 +3049,16 @@ class Runner {
         farmPrinters[index].apikey = settings.printer.apikey;
         printer.apikey = settings.printer.apikey;
         printer.markModified("apikey");
+        const loggerMessage = `Changing apiKey from ${farmPrinters[index].apikey} to ${settings.printer.apikey}`;
+        logger.info(loggerMessage);
+        PrinterTicker.addIssue(
+            new Date(),
+            farmPrinters[index].printerURL,
+            loggerMessage,
+            "Active",
+            farmPrinters[index]._id
+        );
         updatePrinter = true;
-      }
-
-      // Make sure OctoPrint status is updated before continuing on with settings...
-      if (updatePrinter) {
-        await Runner.reScanOcto(farmPrinters[index]._id, false);
       }
 
       // Update the baudrate preferences.
@@ -3070,9 +3178,7 @@ class Runner {
           settings.systemCommands.systemShutdown;
       }
 
-      printer.save().catch((e) => {
-        logger.error(JSON.stringify(e), "ERROR savin power settings.");
-      });
+
       // Made the state check from the server, not the client...
       if (farmPrinters[index].state !== "Offline") {
         // Gocde update printer and Live
@@ -3143,6 +3249,15 @@ class Runner {
           opts,
           false
         );
+      }
+
+      // Make sure OctoPrint status is updated before continuing on with settings...
+      if (updatePrinter) {
+        printer.save().catch((e) => {
+          logger.error(JSON.stringify(e), `Error saving printer settings: ${e}`);
+        }).finally(async () => {
+          await Runner.reScanOcto(farmPrinters[index]._id, false);
+        });
       }
 
       PrinterClean.generate(farmPrinters[index], filamentManager);

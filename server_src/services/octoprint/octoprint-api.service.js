@@ -80,6 +80,9 @@ class OctoprintApiService {
    * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)>}
    */
   post(printerURL, apiKey, route, data, timeout = true) {
+    if(!printerURL.includes("http")){
+      printerURL = "http://"+printerURL
+    }
     const url = new URL(route, printerURL).href;
     return fetchApiTimeout(
       url,
@@ -99,6 +102,9 @@ class OctoprintApiService {
    * @returns {Promise<Promise<Response>|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise<Response>|Promise<unknown>)>}
    */
   get(printerURL, apiKey, route, timeout = true) {
+    if(!printerURL.includes("http")){
+      printerURL = "http://"+printerURL
+    }
     const url = new URL(route, printerURL).href;
     return fetchApiTimeout(
       url,
@@ -118,6 +124,9 @@ class OctoprintApiService {
    * @returns {Promise<*|Promise|Promise<unknown> extends PromiseLike<infer U> ? U : (Promise|Promise<unknown>)>}
    */
   patch(printerURL, apiKey, route, data, timeout = true) {
+    if(!printerURL.includes("http")){
+      printerURL = "http://"+printerURL
+    }
     const url = new URL(route, printerURL).href;
     return fetchApiTimeout(
       url,

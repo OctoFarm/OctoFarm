@@ -36,6 +36,8 @@ All notable changes to this project will be documented in this file.
     - Fixed "No Files Available" not been removed after uploading a file...
     - Fixed current operations on mobile views... now stacks the cards correctly. 
     - Fixed an issue we're Printer Statistics wouldn't open if printer had never been live.
+    - Fixed websocket issue not updating when printer url changed.
+    - Fixed issue where user could enter updated URL with http:// prefix and would cause errors in backend.
 
 ## [v1.2-rc2]
 
