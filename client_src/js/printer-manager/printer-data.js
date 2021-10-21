@@ -143,10 +143,23 @@ function checkForOctoPrintPluginUpdates(printer) {
   }
 }
 
+function checkIfRestartRequired(printer) {
+  const restartRequiredTag = document.getElementById(`restartRequired-${printer._id}`);
+  if (restartRequiredTag && printer?.restartRequired) {
+    if (restartRequiredTag.classList.contains("d-none")) {
+      restartRequiredTag.classList.remove("d-none");
+    }
+  } else {
+    if (restartRequiredTag.classList.contains("d-none")) {
+      restartRequiredTag.classList.add("d-none");
+    }
+  }
+}
+
 function checkForApiErrors(printer) {
   const apiErrorTag = document.getElementById(`scanningIssues-${printer._id}`);
 
-  if (!ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
+  if (apiErrorTag && !ignoredHostStatesForAPIErrors.includes(printer.hostState.state)) {
     let apiErrors = 0;
     for (const key in printer.systemChecks) {
       if (printer.systemChecks.scanning.hasOwnProperty(key)) {
@@ -194,6 +207,8 @@ function updatePrinterRow(printer) {
     checkForOctoPrintPluginUpdates(printer);
 
     checkForApiErrors(printer);
+
+    checkIfRestartRequired(printer);
   }
 }
 

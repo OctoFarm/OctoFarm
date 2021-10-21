@@ -384,7 +384,7 @@ WebSocketClient.prototype.reconnect = async function (e) {
   );
   this.instance.removeAllListeners();
   const that = this;
-
+  farmPrinters[this.index].restartRequired = true;
   that.timeout = setTimeout(async function () {
     farmPrinters[that.index].hostStateColour = Runner.getColour("Searching...");
     farmPrinters[that.index].hostDescription = "Searching for Host";
@@ -724,10 +724,19 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
           }
         }
       }
-      if(data.plugin.plugin === "pluginmanager"){
+      if (data.plugin.plugin === "pluginmanager"){
         console.log(data.plugin)
       }
-      console.log(data.plugin.plugin)
+      if (data.plugin.plugin === "softwareupdate"){
+        if(data.plugin.data.type === "restart_manually"){
+          farmPrinters[this.index].restartRequired = true;
+        }
+      }
+      if (data.plugin.plugin === "psucontrol"){
+        // Could be used to get rid of the API calls at the front end. Would require supporting each power plugin though.
+        //console.log(data.plugin)
+      }
+      //console.log(data.plugin.plugin)
     }
     // Event Listeners for state changes
     if (typeof farmPrinters[this.index].temps !== "undefined") {

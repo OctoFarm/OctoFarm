@@ -12,6 +12,7 @@ All notable changes to this project will be documented in this file.
     - Added #763: Allow file multi-upload to create folders if they don't exist. 
     - Added a new Actions Bar to List, Panel, Camera, {MAP TO NAME} views. These contain filters and bulk commands for controlling printers.
     - Multi-Upload has been added to the action bar as well as it's home in file manager.
+    - OctoFarm now listens on the websocket for Plugin/System updates. After a command is fired for updating you will see a "Restart Required" flag in Printer Manager for the printer that requires it. 
 
 ### Changed
     - Printer offline logs (specifically connection refused) are now silenced after the first one. 

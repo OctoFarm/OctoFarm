@@ -377,6 +377,10 @@ class PrinterClean {
         octoPrintSystemInfo: farmPrinter.octoPrintSystemInfo
       };
 
+      if (farmPrinter?.restartRequired) {
+        sortedPrinter.restartRequired = farmPrinter.restartRequired;
+      }
+
       if (farmPrinter?.layerData) {
         sortedPrinter.layerData = farmPrinter.layerData;
       }
