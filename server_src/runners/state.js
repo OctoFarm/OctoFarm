@@ -101,10 +101,6 @@ const heartBeatInterval = setInterval(function ping() {
 
 WebSocketClient.prototype.open = function (url, index) {
   try {
-    // Shim for whatever happend with the URLS..
-    if(url[url.length-1] !== "/"){
-      url = url + "/"
-    }
     this.url = url;
     this.index = index;
     PrinterTicker.addIssue(
@@ -2218,7 +2214,7 @@ class Runner {
           "Complete",
           farmPrinters[index]._id
         );
-        logger.info(`Successfully grabbed Profiles.js for...: ${farmPrinters[index].printerURL}`);
+        logger.info(`Successfully grabbed profile information for...: ${farmPrinters[index].printerURL}`);
       })
       .catch((err) => {
         PrinterTicker.addIssue(
@@ -2744,7 +2740,7 @@ class Runner {
     if (state === "Offline after error") {
       return { name: "danger", hex: "#2e0905", category: "Error!" };
     }
-    return { name: "warning", hex: "#583c0e", category: "Active" };
+    return { name: "warning", hex: "#583c0e", category: "Idle" };
   }
 
   static returnFarmPrinters(index) {
