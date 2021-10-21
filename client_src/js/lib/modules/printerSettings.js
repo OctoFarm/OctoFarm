@@ -1,7 +1,7 @@
 import OctoFarmClient from "../../services/octofarm-client.service.js";
 import UI from "../functions/ui.js";
 import Calc from "../functions/calc.js";
-import Script from "../../services/gcode-scripts.service.js";
+import Script from "../../services/octofarm-scripts.service.js";
 import { ApplicationError } from "../../exceptions/application-error.handler";
 import { ClientErrors } from "../../exceptions/octofarm-client.exceptions";
 

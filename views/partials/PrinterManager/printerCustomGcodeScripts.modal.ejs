@@ -1,37 +1,76 @@
-<div class="col-12 col-sm-12 col-md-12 col-lg-4 col-xl-2">
-    <div class="form-group">
-        <label for="gcodeScriptName">Name</label>
-        <input type="text" class="form-control" id="gcodeScriptName"
-               placeholder="New script name">
+<div class="col-12">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="gcodeScriptName">Name</label>
+                <input type="text" class="form-control" id="gcodeScriptName"
+                       placeholder="New script name">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="form-group">
+                <label for="gcodeScriptDescription">Description</label>
+                <input type="text" class="form-control" id="gcodeScriptDescription"
+                       placeholder="New script description">
+            </div>
+        </div>
+        <div class="col-md-4">
+            <label for="gcodeScriptBtnColour">Button Colour</label>
+            <select class="custom-select" id="gcodeScriptBtnColour">
+                <option selected value="success">Green</option>
+                <option value="warning">Yellow</option>
+                <option value="info">Blue</option>
+                <option value="danger">Red</option>
+                <option value="dark">Black</option>
+            </select>
+            <small class="form-text text-muted">Choose a colour for your button!</small>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label for="gcodeScriptScript">Script</label>
+                <textarea class="form-control" id="gcodeScriptScript" rows="5"></textarea>
+                <small class="form-text text-muted">New lines will be treated as separate
+                    commands <code>SHIFT + ENTER</code></small>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <label for="gcodeScriptBtnColour">Select Printers</label>
+            <select multiple class="custom-select" id="gcodeScriptPrinters" size="6">
+
+            </select>
+            <small class="form-text text-muted">Choose the printers this button is visible to. <br>
+                <code>CTRL + A</code> to select all <br>
+                <code>CTRL + Left Click</code> to select multiple
+            </small>
+        </div>
+        <div class="col-12">
+            <button id="createNewScriptBtn" type="submit" class="btn btn-success">Create Script</button>
+        </div>
     </div>
-    <div class="form-group">
-        <label for="gcodeScriptDescription">Description</label>
-        <input type="text" class="form-control" id="gcodeScriptDescription"
-               placeholder="New script description">
-    </div>
-    <div class="form-group">
-        <label for="gcodeScriptScript">Script</label>
-        <textarea class="form-control" id="gcodeScriptScript" rows="3"></textarea>
-        <small class="form-text text-muted">New lines will be treated as seperate
-            commands</small>
-    </div>
-    <button id="createNewScriptBtn" type="submit" class="btn btn-success">Create Script</button>
+
+
+
+
+
+
 </div>
 <div id="wrapper"
-     class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-10">
+     class="col-12">
     <table id="historyTableTop" class="table table-dark text-center">
         <thead>
         <tr>
             <th class="table-dark table-dark d-none" scope="col"></th>
             <th class="table-dark table-dark" scope="col">Name</th>
             <th class="table-dark table-dark" scope="col">Description</th>
-            <th class="table-dark table-dark" scope="col" width="400px">Script</th>
-            <th class="table-dark table-dark" scope="col" min-width="100px">
+            <th class="table-dark" scope="col">Colour</th>
+            <th class="table-dark" scope="col" style="min-width: 200px">Printers</th>
+            <th class="table-dark table-dark" scope="col" style="min-width: 200px">Script</th>
+            <th class="table-dark table-dark" scope="col">
                 Actions
             </th>
         </tr>
         </thead>
-        <tbody id="gcodeScriptTable" data-jplist-group="history">
+        <tbody id="gcodeScriptTable">
 
         </tbody>
 
