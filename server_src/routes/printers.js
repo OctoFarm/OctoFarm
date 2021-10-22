@@ -123,7 +123,6 @@ router.get("/groups", ensureAuthenticated, async (req, res) => {
   res.send(groups);
 });
 
-// TODO why is this not GET method?
 router.post("/printerInfo", ensureAuthenticated, async (req, res) => {
   const id = req.body.i;
   let returnedPrinterInformation;

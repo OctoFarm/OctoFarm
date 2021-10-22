@@ -8,6 +8,7 @@ const {
   getEmptyOperationsObject,
   ALL_MONTHS
 } = require("../providers/cleaner.constants");
+const { returnCurrentOrdering } = require("../../services/current-operations-order.service");
 const { getHistoryCache } = require("../../cache/history.cache");
 const _ = require("lodash");
 const { JobClean } = require("./jobClean.js");
@@ -737,7 +738,6 @@ class PrinterClean {
           }
 
           if (typeof printer.printerState !== "undefined" && printer.currentJob != null) {
-            // TODO toString error if not present
             let id = printer._id;
             id = id.toString();
             if (printer.printerState.colour.category === "Complete") {
@@ -745,6 +745,7 @@ class PrinterClean {
               progress.push(printer.currentJob.progress);
               operations.push({
                 index: id,
+                sortIndex: printer.sortIndex,
                 name,
                 progress: Math.floor(printer.currentJob.progress),
                 progressColour: "success",
@@ -761,6 +762,7 @@ class PrinterClean {
               progress.push(printer.currentJob.progress);
               operations.push({
                 index: id,
+                sortIndex: printer.sortIndex,
                 name,
                 progress: Math.floor(printer.currentJob.progress),
                 progressColour: "warning",
@@ -806,7 +808,9 @@ class PrinterClean {
       currentOperations.count.idle = idle.length;
       currentOperations.count.disconnected = disconnected.length;
 
-      currentOperations.operations = _.orderBy(operations, ["progress"], ["desc"]);
+      const { currentIterie, currentOrder } = returnCurrentOrdering();
+
+      currentOperations.operations = _.orderBy(operations, [currentIterie], [currentOrder]);
     } catch (err) {
       logger.error(`Current Operations issue: ${err}`);
     }
