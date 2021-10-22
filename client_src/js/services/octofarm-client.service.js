@@ -126,8 +126,12 @@ export default class OctoFarmClient {
     return this.post(`${this.serverSettingsRoute}/restart`, {});
   }
 
-  static async getCustomGcode() {
-    return this.get("settings/customGcode");
+  static async getCustomGcode(id) {
+    let url = "settings/customGcode";
+    if(id){
+      url = url + "/" + id
+    }
+    return this.get(url);
   }
 
   static async getOctoPrintUniqueFolders() {

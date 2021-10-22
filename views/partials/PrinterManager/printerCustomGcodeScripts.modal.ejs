@@ -30,29 +30,25 @@
                 <label for="gcodeScriptScript">Script</label>
                 <textarea class="form-control" id="gcodeScriptScript" rows="5"></textarea>
                 <small class="form-text text-muted">New lines will be treated as separate
-                    commands <code>SHIFT + ENTER</code></small>
+                    commands<br> <kbd>SHIFT + RETURN/ENTER</kbd> or <kbd>RETURN/ENTER</kbd> To create a new line</small>
             </div>
         </div>
         <div class="col-md-6">
-            <label for="gcodeScriptBtnColour">Select Printers</label>
+            <label for="gcodeScriptPrinters">Select Printers</label>
             <select multiple class="custom-select" id="gcodeScriptPrinters" size="6">
-
+                <% printers.forEach(printer => { %>
+                    <option value="<%= printer._id %>"> <%= printer.printerName %> </option>
+                <% }) %>
             </select>
             <small class="form-text text-muted">Choose the printers this button is visible to. <br>
-                <code>CTRL + A</code> to select all <br>
-                <code>CTRL + Left Click</code> to select multiple
+                <kbd>CTRL + A</kbd> to select all <br>
+                <kbd>CTRL + Left Click</kbd> to select multiple
             </small>
         </div>
         <div class="col-12">
             <button id="createNewScriptBtn" type="submit" class="btn btn-success">Create Script</button>
         </div>
     </div>
-
-
-
-
-
-
 </div>
 <div id="wrapper"
      class="col-12">
@@ -60,11 +56,11 @@
         <thead>
         <tr>
             <th class="table-dark table-dark d-none" scope="col"></th>
-            <th class="table-dark table-dark" scope="col">Name</th>
+            <th class="table-dark table-dark" scope="col" style="min-width: 50px">Name</th>
             <th class="table-dark table-dark" scope="col">Description</th>
             <th class="table-dark" scope="col">Colour</th>
-            <th class="table-dark" scope="col" style="min-width: 200px">Printers</th>
-            <th class="table-dark table-dark" scope="col" style="min-width: 200px">Script</th>
+            <th class="table-dark" scope="col" style="min-width: 300px">Printers</th>
+            <th class="table-dark table-dark" scope="col" style="min-width: 400px">Script</th>
             <th class="table-dark table-dark" scope="col">
                 Actions
             </th>
@@ -76,3 +72,4 @@
 
     </table>
 </div>
+

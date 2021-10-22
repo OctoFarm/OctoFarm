@@ -143,4 +143,32 @@ export default class UI {
   static removeLine(element) {
     element.remove();
   }
+
+  static disableElements(elements) {
+    elements.forEach((element) => {
+      element.disabled = true;
+    });
+  }
+  static enableElements(elements) {
+    elements.forEach((element) => {
+      element.disabled = false;
+    });
+  }
+
+  static blankElementValue(elements) {
+    elements.forEach((element) => {
+      element.value = "";
+    });
+  }
+
+  static setElementValueFromPlaceholder(elements) {
+    elements.forEach((element) => {
+      element.value = element.placeholder;
+    });
+  }
+  static setElementPlaceholderFromValue(elements) {
+    elements.forEach((element) => {
+      element.placeholder = element.value;
+    });
+  }
 }

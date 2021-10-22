@@ -33,6 +33,10 @@ function tableRowTemplate(info) {
 }
 
 export function generateTableRows(printers) {
+  EL.ERROR_COUNT.innerHTML = 0;
+  EL.SKIPPED_COUNT.innerHTML = 0;
+  EL.COMPLETE_COUNT.innerHTML = 0;
+  EL.WARNING_COUNT.innerHTML = 0;
   EL.TABLE.innerHTML = "";
   printers.forEach((printer, index) => {
     printer.index = index;

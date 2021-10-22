@@ -1,4 +1,5 @@
 import OctoFarmClient from "./octofarm-client.service";
+import UI from "../lib/functions/ui";
 
 const customGcodeScripts = document.getElementById("customGcodeBtn");
 customGcodeScripts.addEventListener("click", async (e) => {
@@ -18,13 +19,23 @@ async function newGcodeScript(newScript) {
   for (const key of keys) {
     if (newScript["name"] === "") {
       errors.push(key);
-    }
-    if (newScript["gcode"] === "") {
+    } else if (newScript["gcode"] === "") {
+      errors.push(key);
+    } else if (newScript["printerIds"].length === 0) {
       errors.push(key);
     }
   }
+
   if (errors.length !== 0) {
-    UI.createAlert("error", "You have blank fields sony jim!, sort them out...", 3000, "Clicked");
+    if (errors.includes("printerIds"))
+      UI.createAlert("error", "You need to select some printers!", 3000, "Clicked");
+    if (errors.includes("gcode") || errors.includes("name"))
+      UI.createAlert(
+        "error",
+        "You need to fill in at least a name and some gcode ",
+        3000,
+        "Clicked"
+      );
     return false;
   } else {
     let lines = newScript.gcode.match(/[^\r\n]+/g);
@@ -37,19 +48,21 @@ async function newGcodeScript(newScript) {
     });
     if (newScript.id) {
       let post = await OctoFarmClient.post("settings/customGcode/edit", newScript);
-      if (post.status === 200) {
-        post = await post.json();
-      } else {
-        UI.createAlert("error", "Something went wrong updating, is the server online?");
-      }
+      console.log(post);
+      // if (post.status === 200) {
+      //   post = await post.json();
+      // } else {
+      //   UI.createAlert("error", "Something went wrong updating, is the server online?");
+      // }
     } else {
       let post = await OctoFarmClient.post("settings/customGcode", newScript);
-      if (post.status === 200) {
-        post = await post.json();
-        drawScriptTable(post);
-      } else {
-        UI.createAlert("error", "Something went wrong updating, is the server online?");
-      }
+      console.log(post);
+      // if (post.status === 200) {
+      //   post = await post.json();
+      //   drawScriptTable(post);
+      // } else {
+      //   UI.createAlert("error", "Something went wrong updating, is the server online?");
+      // }
     }
   }
   return true;
@@ -59,20 +72,31 @@ createNewScriptBtn.addEventListener("click", async (e) => {
   let newScript = {
     name: document.getElementById("gcodeScriptName").value,
     description: document.getElementById("gcodeScriptDescription").value,
-    gcode: document.getElementById("gcodeScriptScript").value
+    gcode: document.getElementById("gcodeScriptScript").value,
+    buttonColour: document.getElementById("gcodeScriptBtnColour").value,
+    printerIds: Array.from(document.getElementById("gcodeScriptPrinters").selectedOptions).map(
+      (v) => v.value
+    )
   };
   await newGcodeScript(newScript);
   document.getElementById("gcodeScriptName").value = "";
   document.getElementById("gcodeScriptDescription").value = "";
   document.getElementById("gcodeScriptScript").value = "";
+  document.getElementById("gcodeScriptBtnColour").value = "";
+  document.getElementById("gcodeScriptPrinters").value = "";
 });
 
-function drawScriptTable(scripts) {
+async function drawScriptTable(scripts) {
   let scriptTable = document.getElementById("gcodeScriptTable");
-  let scriptLines = "";
+  const printerList = await OctoFarmClient.listPrinters();
+  const printerSelect = [];
+  printerList.forEach((printer) => {
+    printerSelect.push(`<option value="${printer._id}"> ${printer.printerName} </option>`);
+  });
+  let lines = "";
 
   scripts.gcode.forEach((e) => {
-    scriptLines += `${e}\n`;
+    lines += `${e}\n`;
   });
 
   scriptTable.insertAdjacentHTML(
@@ -82,9 +106,9 @@ function drawScriptTable(scripts) {
                 <td id="script_id_${scripts._id}" class="d-none">${scripts._id}</td>
                 <td><input type="text" class="form-control" id="script_name_${scripts._id}" placeholder="${scripts.name}" disabled></input></td>
                 <td><input type="text" class="form-control" id="script_desc_${scripts._id}"  placeholder="${scripts.description}" disabled></input></td>
-                <td>
-                  <select class="custom-select" id="gcodeScriptBtnColour" size="5">
-                    <option selected value="success">Green</option>
+                <td>            
+                  <select class="custom-select" id="script_btn_colour_${scripts._id}" size="1" disabled>
+                    <option value="success">Green</option>
                     <option value="warning">Yellow</option>
                     <option value="info">Blue</option>
                     <option value="danger">Red</option>
@@ -92,11 +116,11 @@ function drawScriptTable(scripts) {
                   </select>
                 </td>
                 <td>
-                <select multiple class="custom-select" id="gcodeScriptPrinters" size="5">
-
-                    </select>
+                  <select multiple class="custom-select" id="script_printer_select_${scripts._id}" size="1" disabled>
+                        ${printerSelect}
+                  </select>
                 </td>
-                <td><textarea rows="4" type="text" class="form-control" id="script_lines_${scripts._id}"  placeholder="${scriptLines}" disabled></textarea></td>
+                <td><textarea rows="1" type="text" class="form-control" id="script_lines_${scripts._id}"  placeholder="${lines}" disabled></textarea></td>
                 <td>                                
                 <button id="editScript-${scripts._id}" type="button" class="btn btn-sm btn-info edit bg-colour-1">
                     <i class="fas fa-edit editIcon"></i>
@@ -111,6 +135,35 @@ function drawScriptTable(scripts) {
             </tr>
       `
   );
+  const scriptButton = document.getElementById(`script_btn_colour_${scripts._id}`);
+  const scriptPrinters = document.getElementById(`script_printer_select_${scripts._id}`);
+
+  if (!scripts?.buttonColour) {
+    scriptButton.value = "success";
+  } else {
+    scriptButton.value = scripts.buttonColour;
+  }
+
+  if (!scripts?.printerIds || scripts.printerIds.length === 0) {
+    for (let i = 0; i < scriptPrinters.options.length; i++) {
+      scriptPrinters.options[i].selected = true;
+    }
+  } else {
+    for (let i = 0; i < scriptPrinters.options.length; i++) {
+      if (scripts.printerIds.includes(scriptPrinters.options[i].value)) {
+        scriptPrinters.options[i].selected = true;
+      }
+    }
+  }
+
+  const scriptID = document.getElementById(`script_id_${scripts._id}`);
+  const scriptName = document.getElementById(`script_name_${scripts._id}`);
+  const scriptDesc = document.getElementById(`script_desc_${scripts._id}`);
+
+  const scriptLines = document.getElementById(`script_lines_${scripts._id}`);
+  const editButton = document.getElementById(`editScript-${scripts._id}`);
+  const saveButton = document.getElementById(`saveScript-${scripts._id}`);
+
   document.getElementById("deleteScript-" + scripts._id).addEventListener("click", async (e) => {
     let delt = await OctoFarmClient.get("settings/customGcode/delete/" + scripts._id);
     if (delt.status === 200) {
@@ -126,48 +179,35 @@ function drawScriptTable(scripts) {
     }
   });
   document.getElementById("editScript-" + scripts._id).addEventListener("click", async (e) => {
-    document.getElementById(`script_name_${scripts._id}`).disabled = false;
-    document.getElementById(`script_desc_${scripts._id}`).disabled = false;
-    document.getElementById(`script_lines_${scripts._id}`).disabled = false;
-    document.getElementById(`script_name_${scripts._id}`).value = document.getElementById(
-      `script_name_${scripts._id}`
-    ).placeholder;
-    document.getElementById(`script_desc_${scripts._id}`).value = document.getElementById(
-      `script_desc_${scripts._id}`
-    ).placeholder;
-    document.getElementById(`script_lines_${scripts._id}`).value = document.getElementById(
-      `script_lines_${scripts._id}`
-    ).placeholder;
-    document.getElementById(`editScript-${scripts._id}`).classList.toggle("d-none");
-    document.getElementById(`saveScript-${scripts._id}`).classList.toggle("d-none");
+    UI.enableElements([scriptName, scriptDesc, scriptButton, scriptPrinters, scriptLines]);
+
+    UI.setElementValueFromPlaceholder([scriptName, scriptDesc, scriptLines]);
+
+    scriptLines.rows = "10";
+    scriptPrinters.size = "11";
+    editButton.classList.toggle("d-none");
+    saveButton.classList.toggle("d-none");
   });
-  document.getElementById("saveScript-" + scripts._id).addEventListener("click", async (e) => {
+  saveButton.addEventListener("click", async (e) => {
     let newScript = {
-      id: document.getElementById(`script_id_${scripts._id}`).innerHTML,
-      name: document.getElementById(`script_name_${scripts._id}`).value,
-      description: document.getElementById(`script_desc_${scripts._id}`).value,
-      gcode: document.getElementById(`script_lines_${scripts._id}`).value
+      id: scriptID.innerHTML,
+      name: scriptName.value,
+      description: scriptDesc.value,
+      gcode: scriptLines.value,
+      buttonColour: scriptButton.value,
+      printerIds: Array.from(scriptPrinters.selectedOptions).map((v) => v.value)
     };
-    console.log(newScript);
+
     let save = await newGcodeScript(newScript);
     if (save) {
-      document.getElementById(`script_name_${scripts._id}`).placeholder = document.getElementById(
-        `script_name_${scripts._id}`
-      ).value;
-      document.getElementById(`script_desc_${scripts._id}`).placeholder = document.getElementById(
-        `script_desc_${scripts._id}`
-      ).value;
-      document.getElementById(`script_lines_${scripts._id}`).placeholder = document.getElementById(
-        `script_lines_${scripts._id}`
-      ).value;
-      document.getElementById(`script_name_${scripts._id}`).value = "";
-      document.getElementById(`script_desc_${scripts._id}`).value = "";
-      document.getElementById(`script_lines_${scripts._id}`).value = "";
-      document.getElementById(`script_name_${scripts._id}`).disabled = true;
-      document.getElementById(`script_desc_${scripts._id}`).disabled = true;
-      document.getElementById(`script_lines_${scripts._id}`).disabled = true;
-      document.getElementById(`editScript-${scripts._id}`).classList.toggle("d-none");
-      document.getElementById(`saveScript-${scripts._id}`).classList.toggle("d-none");
+      UI.setElementPlaceholderFromValue([scriptName, scriptDesc, scriptLines]);
+      UI.disableElements([scriptName, scriptDesc, scriptButton, scriptPrinters, scriptLines]);
+      UI.blankElementValue([scriptName, scriptDesc, scriptLines]);
+
+      scriptLines.rows = "1";
+      scriptPrinters.size = "1";
+      editButton.classList.toggle("d-none");
+      saveButton.classList.toggle("d-none");
     }
   });
 }

@@ -17,9 +17,12 @@ All notable changes to this project will be documented in this file.
 ### Changed
     - Printer offline logs (specifically connection refused) are now silenced after the first one. 
     - Bulk commands are no longer in Printer Manager -> Moved to the action bar on views...
-    - Custom gcode editor has been moved -> Files Manager.
+    - Custom gcode editor has been moved -> Files Manager and given a functionality boost. 
+        - You can now change the colour of the button displayed in the UI. Old buttons will default to "Green".
+        - You can now filter the buttons by printers. Old buttons will default to ALL printers. 
     - All octoprint plugin/client update commands have been moved under "OctoPrint Management" dropdown on Printer Manager.
     - Cleaned up OctoPrint Management icons, no longer all the plug.
+    - Continual work on improving readability and contrast across the application.
 
 ### Removed
     - Some bulk actions notification alert
@@ -49,7 +52,7 @@ All notable changes to this project will be documented in this file.
     - Global Client Error Handler: Grabs any errant / uncaught errors and displays a modal
 
 ### Changed
-    - File manager: gave printer titles a badge. Gave selected printer a yellow border. Reduced file list minimum height (for smaller screens). 
+    - File manager: gave printer titles a badge. Gave selected printer a yellow border. 
     - Refactor of History Runner with new OctoPrint Client service and added test coverage.
     - Refactor of Printer Manager client view templates. All Manager functions under seperate dropdowns, wider connection log.
     - Refactor of Printer Manager client code bringing a little speed boost (avg 40fps -> 50fps) and better fault tolerance. 

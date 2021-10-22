@@ -4,6 +4,7 @@ import FileManager from "./lib/modules/fileManager.js";
 import { dragAndDropEnable } from "./lib/functions/dragAndDrop.js";
 import { returnDropDown, selectFilament } from "./services/filament-manager-plugin.service";
 import FileSorting from "./lib/modules/fileSorting.js";
+import gcodeScripts from "./services/gcode-scripts.service";
 
 let lastId = null;
 

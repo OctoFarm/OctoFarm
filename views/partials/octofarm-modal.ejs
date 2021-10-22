@@ -2,8 +2,12 @@
 <% if (typeof modal.isBodyScrollable !== "undefined") { %>
 <% scrollable = "modal-dialog-scrollable" %>
 <% } %>
+<% let zIndex = 1050 %>
+<% if (typeof modal.zIndex !== "undefined") { %>
+    <% zIndex = modal.zIndex %>
+<% } %>
 <div class="modal fade" id="<%= modal.id %>Modal" tabindex="-1" role="dialog"
-     aria-labelledby="<%= modal.id %>ModalLabel" aria-hidden="true">
+     aria-labelledby="<%= modal.id %>ModalLabel" aria-hidden="true" style="z-index: <%= zIndex %>;">
     <div class="modal-dialog modal-xl <%= scrollable %>" role="document">
         <div class="modal-content bg-dark text-light">
             <div class="modal-header px-3 pt-3 pb-2">

@@ -34,7 +34,7 @@ import {
   updateBulkActionsProgress,
   generateTableRows,
   updateTableRow
-} from "../functions/bulk-actions-progress.functions";
+} from "./bulk-actions-progress.functions";
 
 // TODO this should come from printer select to save the extra call, re-iteration and matching.
 async function getCurrentlySelectedPrinterList() {
@@ -579,13 +579,56 @@ export async function bulkOctoPrintGcodeCommand() {
     size: "large",
     title: "What gcode commands would you like sent?",
     inputType: "textarea",
-    onShow: function (e) {
+    onShow: async function (e) {
       let textArea = document.getElementsByClassName(
         "bootbox-input bootbox-input-textarea form-control"
       );
       const customGcodeEE = "<div class='mb-1' id='customGcodeCommandsArea'></div>";
       textArea[0].insertAdjacentHTML("beforebegin", customGcodeEE);
-      CustomGenerator.generateButtons(printersToSendGcode);
+      const gcodeButtons = await OctoFarmClient.getCustomGcode();
+      let area = document.getElementById("customGcodeCommandsArea");
+      if (area) {
+        gcodeButtons.forEach((scripts) => {
+          let button = CustomGenerator.getButton(scripts);
+          area.insertAdjacentHTML("beforeend", button);
+          document.getElementById("gcode-" + scripts._id).addEventListener("click", async (e) => {
+            showBulkActionsModal();
+            updateBulkActionsProgress(0, printersToSendGcode.length);
+            generateTableRows(printersToSendGcode);
+            for (let p = 0; p < printersToSendGcode.length; p++) {
+              if (scripts.printerIds.includes(printersToSendGcode[p]._id)) {
+                let post = await CustomGenerator.fireCommand(
+                  scripts._id,
+                  scripts.gcode,
+                  printersToSendGcode[p]
+                );
+                updateBulkActionsProgress(p, printersToSendGcode.length);
+                if (post.status === 204) {
+                  updateTableRow(
+                    printersToSendGcode[p]._id,
+                    "success",
+                    "Successfully sent your command to the printer!"
+                  );
+                } else {
+                  updateTableRow(
+                    printersToSendGcode[p]._id,
+                    "danger",
+                    "Failed to send your command to the printer!"
+                  );
+                }
+              } else {
+                //Skipped
+                updateTableRow(
+                  printersToSendGcode[p]._id,
+                  "warning",
+                  "Printer was skipped because it is not allowed to be sent the script..."
+                );
+              }
+            }
+            updateBulkActionsProgress(printersToSendGcode.length, printersToSendGcode.length);
+          });
+        });
+      }
     },
     callback: async function (result) {
       if (result) {

@@ -12,7 +12,6 @@ import {
   generateTableRows,
   updateTableRow
 } from "../../printer-manager/functions/bulk-actions-progress.functions";
-import gcodeScripts from "../../services/gcode-scripts.service";
 
 const fileUploads = new Queue();
 

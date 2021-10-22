@@ -1138,7 +1138,7 @@ export default class PrinterManager {
 
       FileSorting.loadSort(printer);
 
-      CustomGenerator.generateButtons([printer]);
+      CustomGenerator.generateButtons(printer);
 
       return true;
     } catch (e) {

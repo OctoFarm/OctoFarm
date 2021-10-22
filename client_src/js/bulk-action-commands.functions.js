@@ -11,8 +11,8 @@ import FileManager from "./lib/modules/fileManager";
 
 const multiUploadBtn = document.getElementById("multUploadBtn");
 if (multiUploadBtn) {
-  multiUploadBtn.addEventListener("click", (e) => {
-    FileManager.multiUpload().then((r) => {});
+  multiUploadBtn.addEventListener("click", async (e) => {
+    await FileManager.multiUpload();
   });
 }
 
