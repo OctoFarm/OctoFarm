@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const { ensureAuthenticated } = require("../config/auth");
-const { parse, stringify } = require("flatted");
+const { stringify } = require("flatted");
 const _ = require("lodash");
 const Logger = require("../handlers/logger.js");
 
@@ -24,37 +24,13 @@ let interval = false;
 let influxCounter = 2000;
 
 const sortMe = function (printers) {
-  let sortBy = getSorting();
-  if (sortBy === "index") {
-    return printers;
+  const sortBy = getSorting();
+  if (sortBy === "time") {
+    return _.orderBy(printers, ["currentJob.printTimeRemaining"], "desc");
   } else if (sortBy === "percent") {
-    let sortedPrinters = printers.sort(function (a, b) {
-      if (typeof a.currentJob === "undefined") return 1;
-      if (typeof b.currentJob === "undefined") return -1;
-      return parseFloat(a.currentJob.percent) - parseFloat(b.currentJob.percent);
-    });
-    let i = 0,
-      len = sortedPrinters.length;
-    while (i + 1 < len + 1) {
-      sortedPrinters[i].order = i;
-      i++;
-    }
-    return sortedPrinters;
-  } else if (sortBy === "time") {
-    let sortedPrinters = printers.sort(function (a, b) {
-      if (typeof a.currentJob === "undefined") return 1;
-      if (typeof b.currentJob === "undefined") return -1;
-      return (
-        parseFloat(a.currentJob.printTimeRemaining) - parseFloat(b.currentJob.printTimeRemaining)
-      );
-    });
-    let i = 0,
-      len = sortedPrinters.length;
-    while (i + 1 < len + 1) {
-      sortedPrinters[i].order = i;
-      i++;
-    }
-    return sortedPrinters;
+    return _.orderBy(printers, ["currentJob.progress"], "desc");
+  } else if (sortBy === "index") {
+    return _.orderBy(printers, ["sortIndex"], "asc");
   } else {
     return printers;
   }
@@ -125,7 +101,7 @@ if (interval === false) {
     let printersInformation = PrinterClean.listPrintersInformation();
 
     printersInformation = await filterMe(printersInformation);
-    printersInformation = await sortMe(printersInformation);
+    printersInformation = sortMe(printersInformation);
     const printerControlList = PrinterClean.returnPrinterControlList();
     let clientSettings = SettingsClean.returnClientSettings();
     if (typeof clientSettings === "undefined") {
@@ -153,7 +129,7 @@ if (interval === false) {
       printerControlList: printerControlList,
       clientSettings: clientSettings
     };
-    clientInformation = await stringify(infoDrop);
+    clientInformation = stringify(infoDrop);
     clients.forEach((c, index) => {
       c.res.write("data: " + clientInformation + "\n\n");
     });

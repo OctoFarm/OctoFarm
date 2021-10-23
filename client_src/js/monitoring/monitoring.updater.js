@@ -657,13 +657,14 @@ function grabElements(printer) {
   }
 }
 
-async function updateState(printer, clientSettings, view) {
+async function updateState(printer, clientSettings, view, index) {
   //Grab elements on page
   const elements = grabElements(printer);
   if (typeof elements.row === "undefined") return; //Doesn't exist can skip updating
 
   //Check sorting order and update if required...
-  //elements.row.style.order = printer.order;
+
+  elements.row.style.order = index;
 
   //Check display and skip if not displayed...
   if (printer.display) {
@@ -1191,7 +1192,7 @@ export async function initMonitoring(printers, clientSettings, view) {
         } else {
           if (!printerManagerModal.classList.contains("show")) {
             if (!dragCheck()) {
-              await updateState(printers[p], clientSettings, view);
+              await updateState(printers[p], clientSettings, view, p);
             }
             if (powerTimer >= 20000) {
               await PowerButton.applyBtn(printers[p], "powerBtn-");
