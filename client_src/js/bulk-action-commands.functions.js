@@ -22,7 +22,7 @@ bulkGcodeCommands.addEventListener("click", async (e) => {
     document.getElementById("multiPrintersSection"),
     false,
     "Send Gcode to Printers",
-    bulkOctoPrintGcodeCommand
+    await bulkOctoPrintGcodeCommand
   );
 });
 
@@ -32,7 +32,7 @@ bulkConnectBtn.addEventListener("click", async (e) => {
     document.getElementById("multiPrintersSection"),
     false,
     "Connect Printers",
-    bulkConnectPrinters
+    await bulkConnectPrinters
   );
 });
 const bulkDisconnectBtn = document.getElementById("bulkDisconnectBtn");
@@ -41,7 +41,7 @@ bulkDisconnectBtn.addEventListener("click", async (e) => {
     document.getElementById("multiPrintersSection"),
     false,
     "Disconnect Printers",
-    bulkDisconnectPrinters
+    await bulkDisconnectPrinters
   );
 });
 const bulkPowerBtn = document.getElementById("bulkPowerBtn");
@@ -50,7 +50,7 @@ bulkPowerBtn.addEventListener("click", async (e) => {
     document.getElementById("multiPrintersSection"),
     false,
     "Power On/Off Printers",
-    bulkOctoPrintPowerCommand
+    await bulkOctoPrintPowerCommand
   );
 });
 
@@ -70,6 +70,6 @@ bulkControl.addEventListener("click", async (e) => {
     document.getElementById("multiPrintersSection"),
     false,
     "Control Printers",
-    bulkOctoPrintControlCommand
+    await bulkOctoPrintControlCommand
   );
 });

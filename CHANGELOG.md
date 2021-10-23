@@ -13,6 +13,8 @@ All notable changes to this project will be documented in this file.
     - Added a new Actions Bar to List, Panel, Camera, {MAP TO NAME} views. These contain filters and bulk commands for controlling printers.
     - Multi-Upload has been added to the action bar as well as it's home in file manager.
     - OctoFarm now listens on the websocket for Plugin/System updates. After a command is fired for updating you will see a "Restart Required" flag in Printer Manager for the printer that requires it. 
+    - OctoPrint plugin / software update actions are printed to the Connection Logs in printer manager. 
+    - Added #762: Current Operations may now be sorted. Sorting is remembered on server side and resets with a server reset currently. You can sort by progress/time remaining/file name/printers sort index in ascending and descending.
 
 ### Changed
     - Printer offline logs (specifically connection refused) are now silenced after the first one. 
@@ -27,6 +29,7 @@ All notable changes to this project will be documented in this file.
 ### Removed
     - Some bulk actions notification alert
     - Ping/Pong message on connection log, redundant and ends up flooding the log.
+    - Removed Offline count from Current Operations. Feel it's unessasary please open an issue if it's required back.
 
 ### Fixed
     - Fixed an issue with gcode scripts table
@@ -42,6 +45,7 @@ All notable changes to this project will be documented in this file.
     - Fixed an issue we're Printer Statistics wouldn't open if printer had never been live.
     - Fixed websocket issue not updating when printer url changed.
     - Fixed issue where user could enter updated URL with http:// prefix and would cause errors in backend.
+    - Fixed an issue where the client would repeatedly * printer amount call for filament manager settings...
 
 ## [v1.2-rc2]
 

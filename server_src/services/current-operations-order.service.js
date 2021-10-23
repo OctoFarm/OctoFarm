@@ -20,7 +20,7 @@ function returnCurrentOrdering() {
   };
 }
 
-function updateOrdering(iterie, order) {
+function updateOrdering({ iterie, order }) {
   currentIterie = iterie || ITERIES.PROGRESS;
   currentOrder = order || ORDERS.DESCENDING;
 }

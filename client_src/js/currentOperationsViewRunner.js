@@ -191,7 +191,7 @@ function currentOperationsView(currentOperations, currentOperationsCount, printe
     });
     const remove = _.difference(cards, curr);
     remove.forEach((rem) => {
-      document.getElementById("viewPanel-" + rem).style.display = "none";
+      document.getElementById("viewPanel-" + rem).remove();
     });
   });
 }

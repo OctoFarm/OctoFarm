@@ -809,8 +809,9 @@ class PrinterClean {
       currentOperations.count.disconnected = disconnected.length;
 
       const { currentIterie, currentOrder } = returnCurrentOrdering();
-
-      currentOperations.operations = _.orderBy(operations, [currentIterie], [currentOrder]);
+      const iterie = [currentIterie];
+      const order = [currentOrder];
+      currentOperations.operations = _.orderBy(operations, iterie, order);
     } catch (err) {
       logger.error(`Current Operations issue: ${err}`);
     }

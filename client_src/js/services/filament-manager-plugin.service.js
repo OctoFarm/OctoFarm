@@ -1,8 +1,12 @@
 import OctoFarmClient from "../services/octofarm-client.service";
 import UI from "../lib/functions/ui";
 
+let settings;
+
 export async function checkFilamentManager() {
-  let settings = await OctoFarmClient.get("settings/server/get");
+  if (!settings) {
+    settings = await OctoFarmClient.get("settings/server/get");
+  }
   return settings.filamentManager;
 }
 

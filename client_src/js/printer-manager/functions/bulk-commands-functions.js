@@ -596,7 +596,11 @@ export async function bulkOctoPrintGcodeCommand() {
             updateBulkActionsProgress(0, printersToSendGcode.length);
             generateTableRows(printersToSendGcode);
             for (let p = 0; p < printersToSendGcode.length; p++) {
-              if (scripts.printerIds.includes(printersToSendGcode[p]._id)) {
+              // To cover old script states we must check for blank printer ids.
+              if (
+                scripts.printerIds.length === 0 ||
+                scripts.printerIds.includes(printersToSendGcode[p]._id)
+              ) {
                 let post = await CustomGenerator.fireCommand(
                   scripts._id,
                   scripts.gcode,

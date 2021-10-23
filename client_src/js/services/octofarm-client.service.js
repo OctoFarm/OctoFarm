@@ -138,6 +138,13 @@ export default class OctoFarmClient {
     return this.get(`${this.printerRoute}/listUniqueFolders`);
   }
 
+  static getCurrentOpState(){
+    return this.get("client/currentOpSorting")
+  }
+  static updateCurrentOpState({iterie, order}){
+    return this.post("client/currentOpSorting" , {iterie, order})
+  }
+
   static async get(path) {
     const url = new URL(path, window.location.origin).href;
     return axios.get(url).then((res) => {

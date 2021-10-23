@@ -19,7 +19,6 @@ const { ScriptRunner } = require("./scriptCheck.js");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
 const { JobClean } = require("../lib/dataFunctions/jobClean.js");
 const { FileClean } = require("../lib/dataFunctions/fileClean.js");
-const { FilamentClean } = require("../lib/dataFunctions/filamentClean.js");
 const { PrinterTicker } = require("./printerTicker.js");
 const { OP_PLUGIN_DISPLAY_LAYER } = require("../constants/regex.constants")
 
@@ -384,7 +383,6 @@ WebSocketClient.prototype.reconnect = async function (e) {
   );
   this.instance.removeAllListeners();
   const that = this;
-  farmPrinters[this.index].restartRequired = true;
   that.timeout = setTimeout(async function () {
     farmPrinters[that.index].hostStateColour = Runner.getColour("Searching...");
     farmPrinters[that.index].hostDescription = "Searching for Host";
@@ -406,6 +404,7 @@ WebSocketClient.prototype.onopen = async function (e) {
 
   this.instance.send(JSON.stringify(data));
   this.instance.send(JSON.stringify(throt));
+  farmPrinters[this.index].restartRequired = false;
   PrinterTicker.addIssue(
     new Date(),
     farmPrinters[this.index].printerURL,
@@ -692,12 +691,46 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
                 "Complete",
                 data.plugin.plugin
               );
+              if(logLine.line.includes("Successfully installed") || logLine.line.includes("Successfully built")){
+                PrinterTicker.addIssue(
+                    new Date(),
+                    farmPrinters[this.index].printerURL,
+                    logLine.line,
+                    "Complete",
+                    data.plugin.plugin
+                );
+              }
+              if(logLine.line.includes("Uninstalling")){
+                PrinterTicker.addIssue(
+                    new Date(),
+                    farmPrinters[this.index].printerURL,
+                    logLine.line,
+                    "Offline",
+                    data.plugin.plugin
+                );
+              }
+              if(logLine.line.includes("Processing")){
+                PrinterTicker.addIssue(
+                    new Date(),
+                    farmPrinters[this.index].printerURL,
+                    logLine.line,
+                    "Active",
+                    data.plugin.plugin
+                );
+              }
             } else {
               PrinterTicker.addOctoPrintLog(
                 farmPrinters[this.index],
                 logLine.line,
                 "Offline",
                 data.plugin.plugin
+              );
+              PrinterTicker.addIssue(
+                  new Date(),
+                  farmPrinters[this.index].printerURL,
+                  logLine.line,
+                  "Offline",
+                  data.plugin.plugin
               );
             }
           });
@@ -725,7 +758,9 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         }
       }
       if (data.plugin.plugin === "pluginmanager"){
-        console.log(data.plugin)
+        if(data.plugin.data.needs_restart){
+          farmPrinters[this.index].restartRequired = true;
+        }
       }
       if (data.plugin.plugin === "softwareupdate"){
         if(data.plugin.data.type === "restart_manually"){
