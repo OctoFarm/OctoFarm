@@ -747,13 +747,23 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       }
       if (data.plugin.plugin === "DisplayLayerProgress"){
         if(data.plugin?.data?.printerDisplay) {
-          const totalLayers = parseInt(OP_PLUGIN_DISPLAY_LAYER.totalLayerRegex.exec(data?.plugin?.data?.printerDisplay)[0]) || 0;
-          const currentLayer = parseInt(OP_PLUGIN_DISPLAY_LAYER.currentLayerRegex.exec(data?.plugin?.data?.printerDisplay)[0]) || 0;
-          const layerPercent = parseInt(((currentLayer / totalLayers) * 100).toFixed(0)) || 0
-          farmPrinters[this.index].layerData = {
-            totalLayers: totalLayers,
-            currentLayer: currentLayer,
-            percentComplete: layerPercent
+          const screenPrint = data?.plugin?.data?.printerDisplay || false;
+          if(screenPrint){
+            const totalLayers = OP_PLUGIN_DISPLAY_LAYER.totalLayerRegex.exec(screenPrint) || 0;
+            const currentLayer = OP_PLUGIN_DISPLAY_LAYER.currentLayerRegex.exec(screenPrint) || 0;
+            let totalLayersParsed = 0;
+            let currentLayerParsed = 0;
+            if(totalLayers.length > 0){
+              totalLayersParsed = parseInt(totalLayers[0]) || 0
+            }
+            if(currentLayer.length > 0){
+              currentLayerParsed = parseInt(currentLayer[0]) || 0
+            }
+            farmPrinters[this.index].layerData = {
+               totalLayers: totalLayersParsed,
+               currentLayer: currentLayerParsed,
+               percentComplete: parseInt(((currentLayerParsed / totalLayersParsed) * 100).toFixed(0)) || 0
+            }
           }
         }
       }
@@ -2176,9 +2186,7 @@ class Runner {
           farmPrinters[index].selectedFilament,
           index
         );
-        FileClean.generate(farmPrinters[index], currentFilament);
-        farmPrinters[index].systemChecks.scanning.files.status = "success";
-        farmPrinters[index].systemChecks.scanning.files.date = new Date();
+
         PrinterTicker.addIssue(
           new Date(),
           farmPrinters[index].printerURL,
@@ -2186,6 +2194,9 @@ class Runner {
           "Complete",
           farmPrinters[index]._id
         );
+        FileClean.generate(farmPrinters[index], currentFilament);
+        farmPrinters[index].systemChecks.scanning.files.status = "success";
+        farmPrinters[index].systemChecks.scanning.files.date = new Date();
         FileClean.statistics(farmPrinters);
         logger.info(`Successfully grabbed Files for...: ${farmPrinters[index].printerURL}`);
         return true;

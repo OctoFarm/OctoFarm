@@ -269,6 +269,7 @@ export default class PrinterSelect {
     const printerList = [];
 
     const printers = await OctoFarmClient.listPrinters();
+
     printers.forEach((printer) => {
       if (
         typeof printer.printerState !== "undefined" &&

@@ -742,7 +742,7 @@ export default class FileManager {
     let selectedFolder = "";
     let printAfterUpload = true;
     let selectedFile = null;
-    await PrinterSelect.create(document.getElementById("multiPrintersSection"));
+    await PrinterSelect.create(document.getElementById("multiPrinterSection"));
 
     async function chooseOrCreateFolder() {
       const multiFolderInput = document.getElementById("multiNewFolder");
@@ -766,7 +766,7 @@ export default class FileManager {
 
       document.getElementById("multiPrinterBtn").disabled = true;
       document.getElementById("multiFolder").disabled = false;
-      document.getElementById("multiPrintersSection").classList.add("hidden");
+      document.getElementById("multiPrinterSection").classList.add("hidden");
       document.getElementById("multiFolderSection").classList.remove("hidden");
 
       document.getElementById("multiSelectedPrinters2").innerHTML = "";
@@ -968,7 +968,7 @@ export default class FileManager {
     document.getElementById("multiPrinterBtn").disabled = false;
     document.getElementById("multiFolder").disabled = true;
     document.getElementById("multiFile").disabled = true;
-    document.getElementById("multiPrintersSection").classList.remove("hidden");
+    document.getElementById("multiPrinterSection").classList.remove("hidden");
     document.getElementById("multiFolderSection").classList.add("hidden");
     document.getElementById("multiFileSection").classList.add("hidden");
     document.getElementById("multiUploadFooter").innerHTML =

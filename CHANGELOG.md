@@ -11,10 +11,14 @@ All notable changes to this project will be documented in this file.
     - Added #761: All filament selection boxes now show manufactuere.
     - Added #763: Allow file multi-upload to create folders if they don't exist. 
     - Added a new Actions Bar to List, Panel, Camera, {MAP TO NAME} views. These contain filters and bulk commands for controlling printers.
-    - Multi-Upload has been added to the action bar as well as it's home in file manager.
     - OctoFarm now listens on the websocket for Plugin/System updates. After a command is fired for updating you will see a "Restart Required" flag in Printer Manager for the printer that requires it. 
     - OctoPrint plugin / software update actions are printed to the Connection Logs in printer manager. 
     - Added #762: Current Operations may now be sorted. Sorting is remembered on server side and resets with a server reset currently. You can sort by progress/time remaining/file name/printers sort index in ascending and descending.
+    - Added a new option to the new action bar: Multi-Print! 
+        - Multi-Print is for starting... multple prints. It also takes care of checking if your printer is "Operational", uploading the file if it doesn't exist and actioning the print.
+        - There are two modes, based on how many files you upload. 
+        - Single file mode: Detected when you select only 1 file. This will upload that file to all of the selected printers.
+        - Multi file mode: Detected when you select more than 1 file. This will upload those files, one by one in a round robin to each printer. This works best with the same amount of files and printers. More printers than files, or more files than printers will result in some been missed off... It's not very smart!
 
 ### Changed
     - Printer offline logs (specifically connection refused) are now silenced after the first one. 

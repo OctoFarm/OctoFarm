@@ -257,4 +257,9 @@ router.get("/listUniqueFolders", ensureAuthenticated, async (req, res) => {
   res.json(uniqueFolderPaths);
 });
 
+router.get("/listUniqueFiles", ensureAuthenticated, async (req, res) => {
+  let uniqueFolderPaths = await PrinterClean.returnUniqueListOfOctoPrintFiles();
+  res.json(uniqueFolderPaths);
+});
+
 module.exports = router;

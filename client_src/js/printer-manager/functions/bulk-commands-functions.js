@@ -285,21 +285,30 @@ export async function bulkPrintFileSetup() {
     "<button id=\"bpActionButton\" type=\"button\" class=\"btn btn-success\" disabled>Start Prints!</button>";
   document.getElementById("bpuploadFilesElement").innerHTML = `<div class="custom-file">
           <input type="file" class="custom-file-input" id="bpFileUpload" multiple>
-          <label class="custom-file-label" multiple for="bpFileUpload">Click here to choose your file(s)</label>
+          <label class="custom-file-label" multiple for="bpFileUpload">Click here to upload file(s)</label>
       </div>
     `;
   document.getElementById(
     "bpFilesSelectElement"
   ).innerHTML = `<select id="bpFileSelect" class="custom-select" multiple>
-                                <options selected> Choose a pre-existing file </options>
-                            </select>`;
+                </select>`;
+
+  let uniqueFileList = await OctoFarmClient.get("printers/listUniqueFiles");
+  uniqueFileList.forEach((file) => {
+    document.getElementById("bpFileSelect").insertAdjacentHTML(
+      "beforeend",
+      `
+        <option value="${file.name}">${file.display}</option>
+      `
+    );
+  });
 
   // Load the new modal up...
   $("#bulkPrintSetupModal").modal("show");
   // Grab current list of printers...
   let selectedFiles;
   const printersToControl = await getCurrentlySelectedPrinterList();
-  console.log(printersToControl);
+
   const printerDisplayElement = document.getElementById("bpSelectedPrintersAndFiles");
   printerDisplayElement.innerHTML = "";
   const bpActionButton = document.getElementById("bpActionButton");
@@ -455,11 +464,25 @@ export async function bulkPrintFileSetup() {
     }
   }
 
-  function runSelect() {}
+  async function runSelect() {
+    // Setup the tracking modal...
+    showBulkActionsModal();
+    updateBulkActionsProgress(0, printersToControl.length);
+    generateTableRows(printersToControl);
+    // Make sure printers are in idle state...
+    for (let p = 0; p < printersToControl.length; p++) {
+      const response = await quickConnectPrinterToOctoPrint(printersToControl[p]);
+      updateTableRow(printersToControl[p]._id, response.status, response.message);
+    }
+  }
 
   // Choose existing file listener
   document.getElementById("bpFileSelect").addEventListener("change", function () {
-    selectedFiles = grabFiles(this.files);
+    selectedFiles = Array.from(document.getElementById("bpFileSelect").selectedOptions).map(
+      (v) => ({
+        name: v.value
+      })
+    );
     if (selectedFiles.length === 1) {
       // Setup single file mode
       setupSingleFileMode(printersToControl, selectedFiles[0]);
@@ -469,7 +492,7 @@ export async function bulkPrintFileSetup() {
     }
     bpActionButton.disabled = false;
     bpActionButton.addEventListener("click", async function () {
-      runSelect();
+      await runSelect();
     });
   });
   // Upload file listener
@@ -484,7 +507,7 @@ export async function bulkPrintFileSetup() {
     }
     bpActionButton.disabled = false;
     bpActionButton.addEventListener("click", async function () {
-      runUpload();
+      await runUpload();
     });
   });
 
