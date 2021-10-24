@@ -33,8 +33,14 @@ import {
   showBulkActionsModal,
   updateBulkActionsProgress,
   generateTableRows,
-  updateTableRow
+  updateTableRow,
+  createTableRowProgress
 } from "./bulk-actions-progress.functions";
+import bulkActionsStates from "../bulk-actions.constants";
+
+import Queue from "../../lib/modules/clientQueue.js";
+import OctoPrintClient from "../../lib/octoprint";
+const fileUploads = new Queue();
 
 // TODO this should come from printer select to save the extra call, re-iteration and matching.
 async function getCurrentlySelectedPrinterList() {
@@ -179,6 +185,330 @@ export async function bulkConnectPrinters() {
     updateBulkActionsProgress(p, printersToControl.length);
   }
   updateBulkActionsProgress(printersToControl.length, printersToControl.length);
+}
+
+function setupSingleFileMode(printers, file) {
+  printers.forEach((printer) => {
+    document.getElementById(`printerFileChoice-${printer._id}`).innerHTML = `
+      <small><i class="fas fa-file-code"></i> ${file.name}</small>
+    `;
+  });
+}
+
+function setupMultiFileMode(printers, files) {
+  printers.forEach((printer, index) => {
+    if (files[index]) {
+      document.getElementById(`printerFileChoice-${printer._id}`).innerHTML = `
+      <small><i class="fas fa-file-code"></i> ${files[index].name}</small>
+    `;
+    } else {
+      document.getElementById(`printerFileChoice-${printer._id}`).innerHTML = `
+      <small><i class="fas fa-forward"></i> Not enough files for this printer</small>
+    `;
+    }
+  });
+}
+
+function fileUpload(file) {
+  return new Promise(function (resolve, reject) {
+    // Grab folder location
+    const { currentFolder } = file;
+    // Grab Client Info
+    const { index } = file;
+    const { printerInfo } = file;
+
+    // XHR doesn't like posting without it been a form, can't use offical octoprint api way...
+    // Create form data
+    const formData = new FormData();
+    let path = "";
+    if (currentFolder.includes("local/")) {
+      path = currentFolder.replace("local/", "");
+    }
+    formData.append("file", file.file);
+    formData.append("path", path);
+    if (file.print) {
+      formData.append("print", true);
+    }
+    const url = `${printerInfo.printerURL}/api/files/local`;
+    const xhr = new XMLHttpRequest();
+    file = file.file;
+    xhr.open("POST", url);
+    xhr.upload.onprogress = function (e) {
+      if (e.lengthComputable) {
+        // Update progress
+        const progressBar = document.getElementById("bpUploadProgress-" + index);
+        progressBar.classList = "progress-bar progress-bar-striped bg-warning";
+        if (progressBar) {
+          let percentLoad = (e.loaded / e.total) * 100;
+          if (isNaN(percentLoad)) {
+            percentLoad = 0;
+          }
+          progressBar.style.width = `${Math.floor(percentLoad)}%`;
+          progressBar.innerHTML = "Uploading: " + Math.floor(percentLoad) + "%";
+          if (percentLoad === 100) {
+            progressBar.classList = "progress-bar progress-bar-striped bg-success";
+          }
+        }
+      }
+    };
+
+    // xhr.setRequestHeader("Content-Type", "multipart/form-data");
+    xhr.setRequestHeader("X-Api-Key", printerInfo.apikey);
+    xhr.onloadend = async function (e) {
+      if (this.status >= 200 && this.status < 300) {
+        resolve({
+          status: bulkActionsStates.SUCCESS,
+          message: "Successfully uploaded your file! Printing started."
+        });
+        // Success!
+      } else {
+        resolve({
+          status: bulkActionsStates.ERROR,
+          message: "An error occured whilst updating your file... Printing failed."
+        });
+        // Error occured
+      }
+    };
+    xhr.onerror = function () {
+      resolve({
+        status: bulkActionsStates.ERROR,
+        message: "An error occured whilst updating your file... printing failed."
+      });
+      // Error occured!
+    };
+    xhr.send(formData);
+  });
+}
+
+export async function bulkPrintFileSetup() {
+  document.getElementById("bpActionButtonElement").innerHTML =
+    "<button id=\"bpActionButton\" type=\"button\" class=\"btn btn-success\" disabled>Start Prints!</button>";
+  document.getElementById("bpuploadFilesElement").innerHTML = `<div class="custom-file">
+          <input type="file" class="custom-file-input" id="bpFileUpload" multiple>
+          <label class="custom-file-label" multiple for="bpFileUpload">Click here to choose your file(s)</label>
+      </div>
+    `;
+  document.getElementById(
+    "bpFilesSelectElement"
+  ).innerHTML = `<select id="bpFileSelect" class="custom-select" multiple>
+                                <options selected> Choose a pre-existing file </options>
+                            </select>`;
+
+  // Load the new modal up...
+  $("#bulkPrintSetupModal").modal("show");
+  // Grab current list of printers...
+  let selectedFiles;
+  const printersToControl = await getCurrentlySelectedPrinterList();
+  console.log(printersToControl);
+  const printerDisplayElement = document.getElementById("bpSelectedPrintersAndFiles");
+  printerDisplayElement.innerHTML = "";
+  const bpActionButton = document.getElementById("bpActionButton");
+  printersToControl.forEach((printer) => {
+    printerDisplayElement.insertAdjacentHTML(
+      "beforeend",
+      `
+        <div class="card col-2 px-1 py-1">
+         <div class="card-header px-1 py-1">
+           <small><i class="fas fa-print"></i> ${printer.printerName}</small> 
+          </div>
+          <div class="card-body px-1 py-1" id="printerFileChoice-${printer._id}">
+            <small><i class="fas fa-spinner fa-pulse"></i> Awaiting file selection...</small>
+         </div>
+        </div>
+    `
+    );
+  });
+
+  async function runUpload() {
+    // Setup the tracking modal...
+    showBulkActionsModal();
+    updateBulkActionsProgress(0, printersToControl.length);
+    generateTableRows(printersToControl);
+    // Make sure printers are in idle state...
+    for (let p = 0; p < printersToControl.length; p++) {
+      const response = await quickConnectPrinterToOctoPrint(printersToControl[p]);
+      updateTableRow(printersToControl[p]._id, response.status, response.message);
+    }
+
+    // Check if file exists and upload if not...
+    for (let p = 0; p < printersToControl.length; p++) {
+      const currentPrinter = printersToControl[p];
+      if (selectedFiles.length === 1) {
+        const doesFileExist = await OctoPrintClient.checkFile(
+          currentPrinter,
+          selectedFiles[0].name
+        );
+        if (doesFileExist === 200) {
+          const opt = {
+            command: "select",
+            print: true
+          };
+          await OctoPrintClient.updateFeedAndFlow(currentPrinter);
+          await OctoPrintClient.updateFilamentOffsets(currentPrinter);
+          const url = "files/local/" + selectedFiles[0].name.replaceAll(" ", "_");
+          const file = await OctoPrintClient.post(currentPrinter, url, opt);
+          if (file.status === 204) {
+            updateTableRow(
+              currentPrinter._id,
+              bulkActionsStates.SUCCESS,
+              "File exists... print has successfully started!"
+            );
+          } else {
+            updateTableRow(
+              currentPrinter._id,
+              bulkActionsStates.ERROR,
+              "There was an issue selecting your file to print..."
+            );
+          }
+          updateBulkActionsProgress(p, printersToControl.length);
+        } else {
+          // Prep the file for upload...
+          const newObject = {};
+          newObject.file = selectedFiles[0];
+          newObject.index = currentPrinter._id;
+          newObject.printerInfo = currentPrinter;
+          newObject.currentFolder = "local/";
+          newObject.print = true;
+          updateTableRow(
+            currentPrinter._id,
+            bulkActionsStates.SKIPPED,
+            `
+            <div class="progress">
+              <div id="bpUploadProgress-${currentPrinter._id}" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">Uploading: 0%</div>
+            </div>
+          `
+          );
+
+          const response = await fileUpload(newObject);
+          updateTableRow(currentPrinter._id, response.status, response.message, true);
+          updateBulkActionsProgress(p, printersToControl.length);
+        }
+      } else if (selectedFiles.length > 1) {
+        if (selectedFiles[p]) {
+          const doesFileExist = await OctoPrintClient.checkFile(
+            currentPrinter,
+            selectedFiles[p].name
+          );
+          if (doesFileExist === 200) {
+            const opt = {
+              command: "select",
+              print: true
+            };
+            await OctoPrintClient.updateFeedAndFlow(currentPrinter);
+            await OctoPrintClient.updateFilamentOffsets(currentPrinter);
+            const url = "files/local/" + selectedFiles[p].name;
+            const file = await OctoPrintClient.post(currentPrinter, url, opt);
+            if (file.status === 204) {
+              updateTableRow(
+                currentPrinter._id,
+                bulkActionsStates.SUCCESS,
+                "File exists... print has successfully started!"
+              );
+            } else {
+              updateTableRow(
+                currentPrinter._id,
+                bulkActionsStates.ERROR,
+                "There was an issue selecting your file to print..."
+              );
+            }
+            updateBulkActionsProgress(p, printersToControl.length);
+          } else {
+            // Prep the file for upload...
+            const newObject = {};
+            newObject.file = selectedFiles[p];
+            newObject.index = currentPrinter._id;
+            newObject.printerInfo = currentPrinter;
+            newObject.currentFolder = "local/";
+            newObject.print = true;
+
+            updateTableRow(
+              currentPrinter._id,
+              bulkActionsStates.SKIPPED,
+              `
+              <div class="progress">
+                <div id="bpUploadProgress-${currentPrinter._id}" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">Uploading: 0%</div>
+              </div>
+            `
+            );
+
+            const response = await fileUpload(newObject);
+            updateTableRow(currentPrinter._id, response.status, response.message, true);
+            updateBulkActionsProgress(p, printersToControl.length);
+          }
+        } else {
+          updateTableRow(
+            currentPrinter._id,
+            bulkActionsStates.ERROR,
+            "Seems there wasn't enough files selected for the printers..."
+          );
+          updateBulkActionsProgress(p, printersToControl.length);
+        }
+      }
+      updateBulkActionsProgress(printersToControl.length, printersToControl.length);
+    }
+
+    // Run a background sync of all printers files...
+    for (let p = 0; p < printersToControl.length; p++) {
+      await OctoFarmClient.post("printers/resyncFile", {
+        i: printersToControl[p]._id
+      });
+    }
+  }
+
+  function runSelect() {}
+
+  // Choose existing file listener
+  document.getElementById("bpFileSelect").addEventListener("change", function () {
+    selectedFiles = grabFiles(this.files);
+    if (selectedFiles.length === 1) {
+      // Setup single file mode
+      setupSingleFileMode(printersToControl, selectedFiles[0]);
+    } else {
+      // Setup multiple file mode
+      setupMultiFileMode(printersToControl, selectedFiles);
+    }
+    bpActionButton.disabled = false;
+    bpActionButton.addEventListener("click", async function () {
+      runSelect();
+    });
+  });
+  // Upload file listener
+  document.getElementById("bpFileUpload").addEventListener("change", async function () {
+    selectedFiles = grabFiles(this.files);
+    if (selectedFiles.length === 1) {
+      // Setup single file mode
+      setupSingleFileMode(printersToControl, selectedFiles[0]);
+    } else {
+      // Setup multiple file mode
+      setupMultiFileMode(printersToControl, selectedFiles);
+    }
+    bpActionButton.disabled = false;
+    bpActionButton.addEventListener("click", async function () {
+      runUpload();
+    });
+  });
+
+  // If file is existing choice then check all instances for it's existance, if one is missing we need to capture the file...
+
+  // If file is new upload then
+
+  // Setup complete... let's run the actions...
+
+  //
+  // showBulkActionsModal();
+  // updateBulkActionsProgress(0, printersToControl.length);
+  // generateTableRows(printersToControl);
+  // for (let p = 0; p < printersToControl.length; p++) {
+  //   const response = await quickConnectPrinterToOctoPrint(printersToControl[p]);
+  //   updateTableRow(printersToControl[p]._id, response.status, response.message);
+  //   updateBulkActionsProgress(p, printersToControl.length);
+  // }
+  // updateBulkActionsProgress(printersToControl.length, printersToControl.length);
+
+  function grabFiles(Afiles) {
+    Afiles = [...Afiles];
+    return Afiles;
+  }
 }
 
 export async function bulkDisconnectPrinters() {
@@ -729,3 +1059,36 @@ export async function bulkOctoPrintPluginAction(action) {
     );
   }
 }
+
+setInterval(async () => {
+  //Auto refresh of files
+  // If there are files in the queue, plow through until uploaded... currently single file at a time.
+  if (fileUploads.size() > 0) {
+    const current = fileUploads.first();
+    if (!current.active) {
+      fileUploads.activate(0);
+      const currentDate = new Date();
+      let file = await current.upload(current);
+      file = JSON.parse(file);
+      file.index = current.index;
+      file.uploadDate = currentDate.getTime() / 1000;
+      const post = await OctoFarmClient.post("printers/newFiles", file);
+      // const update = await FileManager.updateFileList(file);
+      fileUploads.remove();
+      const fileCounts = document.getElementById(`fileCounts-${current.index}`);
+      if (fileCounts && fileCounts.innerHTML == 1) {
+        fileCounts.innerHTML = ` ${0}`;
+      }
+    }
+  }
+  const allUploads = fileUploads.all();
+  allUploads.forEach((uploads) => {
+    const currentCount = allUploads.reduce(function (n, up) {
+      return n + (up.index == uploads.index);
+    }, 0);
+    const fileCounts = document.getElementById(`fileCounts-${uploads.index}`);
+    if (fileCounts) {
+      fileCounts.innerHTML = ` ${currentCount}`;
+    }
+  });
+}, 1000);

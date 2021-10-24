@@ -45,7 +45,7 @@ export function generateTableRows(printers) {
   $("#bulkActionProgressModal").modal("handleUpdate");
 }
 
-export function updateTableRow(id, status, message) {
+export function updateTableRow(id, status, message, noBreak) {
   const resultElement = document.getElementById("result-" + id);
   const messageElement = document.getElementById("message-" + id);
   if (status === bulkActionsStates.SKIPPED) {
@@ -79,7 +79,11 @@ export function updateTableRow(id, status, message) {
     EL.WARNING_COUNT.innerHTML = parseInt(EL.WARNING_COUNT.innerHTML) + 1;
   }
   if (messageElement.innerHTML.length !== 0) {
-    messageElement.innerHTML = messageElement.innerHTML + "<br>" + message;
+    if (noBreak) {
+      messageElement.innerHTML = messageElement.innerHTML + message;
+    } else {
+      messageElement.innerHTML = messageElement.innerHTML + "<br>" + message;
+    }
   } else {
     messageElement.innerHTML = message;
   }

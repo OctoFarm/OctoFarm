@@ -747,8 +747,8 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       }
       if (data.plugin.plugin === "DisplayLayerProgress"){
         if(data.plugin?.data?.printerDisplay) {
-          const totalLayers = parseInt(OP_PLUGIN_DISPLAY_LAYER.totalLayerRegex.exec(data.plugin.data.printerDisplay)[0]) || 0;
-          const currentLayer = parseInt(OP_PLUGIN_DISPLAY_LAYER.currentLayerRegex.exec(data.plugin.data.printerDisplay)[0]) || 0;
+          const totalLayers = parseInt(OP_PLUGIN_DISPLAY_LAYER.totalLayerRegex.exec(data?.plugin?.data?.printerDisplay)[0]) || 0;
+          const currentLayer = parseInt(OP_PLUGIN_DISPLAY_LAYER.currentLayerRegex.exec(data?.plugin?.data?.printerDisplay)[0]) || 0;
           const layerPercent = parseInt(((currentLayer / totalLayers) * 100).toFixed(0)) || 0
           farmPrinters[this.index].layerData = {
             totalLayers: totalLayers,
@@ -821,7 +821,6 @@ WebSocketClient.prototype.onerror = function (e) {
   );
   logger.error(
     "WebSocketClient: Error",
-    // eslint-disable-next-line prefer-rest-params
     arguments,
     `${+this.index}: ${this.url} - ${e}`
   );

@@ -75,9 +75,7 @@ router.post("/resyncFile", ensureAuthenticated, async (req, res) => {
   } else {
     ret = await Runner.getFiles(file.i, true);
   }
-  setTimeout(function () {
-    res.send(ret);
-  }, 5000);
+  res.send(ret);
 });
 router.post("/stepChange", ensureAuthenticated, async (req, res) => {
   // Check required fields

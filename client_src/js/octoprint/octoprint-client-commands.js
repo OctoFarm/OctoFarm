@@ -114,7 +114,7 @@ export async function quickConnectPrinterToOctoPrint(printer) {
   } else {
     return {
       status: bulkActionsStates.SKIPPED,
-      message: "Skipped because printer wasn't in disconnected state..."
+      message: "Skipped connecting because printer wasn't in disconnected state..."
     };
   }
 }
