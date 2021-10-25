@@ -10,7 +10,6 @@ const PRINTER_CLEAN_TASK = async () => {
   const printersInformation = PrinterClean.listPrintersInformation();
   await PrinterClean.sortCurrentOperations(printersInformation);
 
-  await PrinterClean.statisticsStart();
   await PrinterClean.createPrinterList(
     printersInformation,
     serverSettings.filamentManager

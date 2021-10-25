@@ -15,7 +15,7 @@
     "stop:delete": "pm2 delete OctoFarm",
     "release": "git archive -o octofarm.zip HEAD",
     "prettier": "prettier --write \"./server_src/**/*.js\" \"./test/**/*.js\" \"./client_src/**/*.js\"",
-    "dev": "nodemon ./app.js",
+    "dev": "nodemon --inspect ./app.js",
     "test": "jest --forceExit"
   },
   "repository": {

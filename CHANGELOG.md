@@ -29,6 +29,7 @@ All notable changes to this project will be documented in this file.
     - All octoprint plugin/client update commands have been moved under "OctoPrint Management" dropdown on Printer Manager.
     - Cleaned up OctoPrint Management icons, no longer all the plug.
     - Continual work on improving readability and contrast across the application.
+    - Dashboard statistics are now produced on demand, should improve loading times a touch.
 
 ### Removed
     - Some bulk actions notification alert
