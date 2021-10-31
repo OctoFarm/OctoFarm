@@ -30,6 +30,16 @@ All notable changes to this project will be documented in this file.
     - Cleaned up OctoPrint Management icons, no longer all the plug.
     - Continual work on improving readability and contrast across the application.
     - Dashboard statistics are now produced on demand, should improve loading times a touch.
+    - Printer Action buttons have been given a new breath of life. They are now a full bar of main actions with a dropdown for lesser used actions. 
+        - From left to right:
+            - File Manager: New modal that just brings up the file manager, allowing a quicker access to starting prints, also includes the custom gcode buttons. 
+            - Printer Control: Same as before, Got a refactor to keep it all on a page without scrolling, and now nicely collapses for mobile views. 
+            - Quick Connect: Same as before.
+            - Power Toggle: Same as before, if a power control is setup for printer it will display the toggle button. The previous dropdown for further actions has been removed. 
+            - Dropdown menu:
+                - Starts with lesser used functions: Web Interface, Terminal (new modal for terminal focus, includes custom gcode), Re-sync printers. 
+                - Normal OctoPrint related power commands: Restart OP, Reboot and shutdown host. 
+                - Any inputted power function buttons so turn on/off printer.  
 
 ### Removed
     - Some bulk actions notification alert

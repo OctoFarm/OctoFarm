@@ -54,11 +54,6 @@ export default class ClientSettings {
       document.getElementById("filamentUsageOverTimeCheck").checked =
         clientSettings.dashboard.historical.filamentUsageOverTime;
     }
-
-    if (clientSettings.controlSettings) {
-      document.getElementById("printerControlFilesFirst").checked =
-        clientSettings.controlSettings.filesTop;
-    }
   }
 
   static async update() {

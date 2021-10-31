@@ -266,6 +266,7 @@ router.post("/customGcode/edit", ensureAuthenticated, async (req, res) => {
   script.save();
   res.send(script);
 });
+
 router.post("/customGcode", ensureAuthenticated, async (req, res) => {
   let newScript = req.body;
   const saveScript = new GcodeDB(newScript);
@@ -274,16 +275,16 @@ router.post("/customGcode", ensureAuthenticated, async (req, res) => {
     .then(res.send(saveScript))
     .catch((e) => res.send(e));
 });
+
 router.get("/customGcode", ensureAuthenticated, async (req, res) => {
   res.send(await GcodeDB.find());
 });
-
 router.get("/customGcode/:id", ensureAuthenticated, async (req, res) => {
   const printerId = req.params.id;
   const all = await GcodeDB.find();
   let returnCode = [];
   all.forEach((script) => {
-    if (script.printerIds.includes(printerId)) {
+    if (script.printerIds.includes(printerId) || script.printerIds.length === 0) {
       returnCode.push(script);
     }
   });

@@ -17,6 +17,9 @@ export default class CustomGenerator {
     //Draw Scripts
     let area = document.getElementById("customGcodeCommandsArea");
     if (area) {
+      if (customScripts.length > 0 && area.classList.contains("d-none")) {
+        area.classList.remove("d-none");
+      }
       customScripts.forEach((scripts) => {
         let button = CustomGenerator.getButton(scripts);
         area.insertAdjacentHTML("beforeend", button);

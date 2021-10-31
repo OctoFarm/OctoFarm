@@ -10,6 +10,9 @@ import PrinterManager from "../lib/modules/printerManager.js";
 import PrinterLogs from "../lib/modules/printerLogs.js";
 import OctoFarmClient from "../services/octofarm-client.service";
 import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
+import PrinterFileManager from "../lib/modules/printerFileManager";
+
+const currentOpenModal = document.getElementById("printerManagerModalTitle");
 
 const printerList = document.getElementById("printerList");
 const ignoredHostStatesForAPIErrors = [
@@ -183,7 +186,8 @@ function checkForApiErrors(printer) {
 
 function updateButtonState(printer) {
   const printButton = document.getElementById(`printerButton-${printer._id}`);
-
+  const printFileButton = document.getElementById(`printerFilesBtn-${printer._id}`);
+  printFileButton.disabled = printer.printerState.colour.category === "Offline";
   printButton.disabled = printer.printerState.colour.category === "Offline";
 }
 
@@ -233,8 +237,16 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
       document
         .getElementById(`printerButton-${printer._id}`)
         .addEventListener("click", async () => {
+          currentOpenModal.innerHTML = "Printer Control: ";
           const printers = await OctoFarmClient.listPrinters();
           await PrinterManager.init(printer._id, printers, printerControlList);
+        });
+      document
+        .getElementById(`printerFilesBtn-${printer._id}`)
+        .addEventListener("click", async () => {
+          currentOpenModal.innerHTML = "Printer Files: ";
+          const printers = await OctoFarmClient.listPrinters();
+          await PrinterFileManager.init(printer._id, printers, printerControlList);
         });
       document
         .getElementById(`printerSettings-${printer._id}`)
