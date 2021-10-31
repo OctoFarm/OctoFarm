@@ -292,12 +292,12 @@ export default class OctoPrintClient {
         },
         async callback(result) {
           if (!result) {
-            await OctoPrintClient.post(printer, "job", opts);
+            return await OctoPrintClient.post(printer, "job", opts);
           }
         }
       });
     } else {
-      await OctoPrintClient.post(printer, "job", opts);
+      return await OctoPrintClient.post(printer, "job", opts);
     }
     if (element) {
       element.target.disabled = false;

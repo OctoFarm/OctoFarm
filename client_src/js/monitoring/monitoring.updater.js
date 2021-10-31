@@ -1,5 +1,6 @@
 import { dragAndDropEnable, dragCheck } from "../lib/functions/dragAndDrop.js";
 import PrinterManager from "../lib/modules/printerManager.js";
+import PrinterFileManager from "../lib/modules/printerFileManager.js";
 import PowerButton from "../lib/modules/powerButton.js";
 import UI from "../lib/functions/ui.js";
 import Calc from "../lib/functions/calc.js";
@@ -17,6 +18,7 @@ import { getControlList, getPrinterInfo } from "./monitoring-view.state";
 const elems = [];
 let powerTimer = 20000;
 let printerManagerModal = document.getElementById("printerManagerModal");
+const currentOpenModal = document.getElementById("printerManagerModalTitle");
 let printerArea = document.getElementById("printerArea");
 
 document.getElementById("filterStates").addEventListener("change", (e) => {
@@ -538,9 +540,16 @@ function drawCameraView(printer, clientSettings) {
 function addListeners(printer) {
   //For now Control has to be seperated
   document.getElementById(`printerButton-${printer._id}`).addEventListener("click", async () => {
+    currentOpenModal.innerHTML = "Printer Control: ";
     const printerInfo = getPrinterInfo();
     const controlList = getControlList();
     await PrinterManager.init(printer._id, printerInfo, controlList);
+  });
+  document.getElementById(`printerFilesBtn-${printer._id}`).addEventListener("click", async () => {
+    currentOpenModal.innerHTML = "Printer Files: ";
+    const printerInfo = getPrinterInfo();
+    const controlList = getControlList();
+    await PrinterFileManager.init(printer._id, printerInfo, controlList);
   });
 
   //Play button listeners
@@ -635,6 +644,7 @@ function grabElements(printer) {
       row: document.getElementById("panel-" + printer._id),
       name: document.getElementById("name-" + printer._id),
       control: document.getElementById("printerButton-" + printer._id),
+      files: document.getElementById("printerFilesBtn-" + printer._id),
       connect: document.getElementById("printerQuickConnect-" + printer._id),
       start: document.getElementById("play-" + printer._id),
       stop: document.getElementById("cancel-" + printer._id),
@@ -691,6 +701,7 @@ async function updateState(printer, clientSettings, view, index) {
   //Printer
   checkQuickConnectState(printer);
   elements.control.disabled = printer.printerState.colour.category === "Offline";
+  elements.files.disabled = printer.printerState.colour.category === "Offline";
   UI.doesElementNeedUpdating(printer.printerState.state, elements.state, "innerHTML");
 
   let stateCategory = printer.printerState.colour.category;
@@ -1159,7 +1170,12 @@ export async function initMonitoring(printers, clientSettings, view) {
   switch (printerManagerModal.classList.contains("show")) {
     case true:
       // Run printer manager updater
-      await PrinterManager.init("", printers, getControlList());
+      if (currentOpenModal.innerHTML.includes("Files")) {
+        PrinterFileManager.init("", printers, getControlList());
+      } else if (currentOpenModal.innerHTML.includes("Control")) {
+        PrinterManager.init("", printers, getControlList());
+      } else if (currentOpenModal.innerHTML.includes("Terminal")) {
+      }
       break;
     case false:
       // initialise or start the information updating..
@@ -1195,7 +1211,7 @@ export async function initMonitoring(printers, clientSettings, view) {
               await updateState(printers[p], clientSettings, view, p);
             }
             if (powerTimer >= 20000) {
-              await PowerButton.applyBtn(printers[p], "powerBtn-");
+              await PowerButton.applyBtn(printers[p]);
               powerTimer = 0;
             } else {
               powerTimer += 500;

@@ -10,6 +10,9 @@ import { PrintersManagement } from "../printer-constructor";
 import PrinterSelect from "../../lib/modules/printerSelect";
 import FileOperations from "../../lib/functions/file";
 import { createPrinterAddInstructions } from "../templates/printer-add-instructions.template";
+import PrinterFileManager from "../../lib/modules/printerFileManager";
+
+const currentOpenModal = document.getElementById("printerManagerModalTitle");
 
 let powerTimer = 5000;
 
@@ -30,7 +33,7 @@ export function workerEventFunction(data) {
       // TODO clean up power buttons wants to be in printer-data.js
       if (powerTimer >= 5000) {
         data.printersInformation.forEach((printer) => {
-          PowerButton.applyBtn(printer, "powerBtn-");
+          PowerButton.applyBtn(printer);
         });
         powerTimer = 0;
       } else {
@@ -38,7 +41,12 @@ export function workerEventFunction(data) {
       }
     } else {
       if (UI.checkIfSpecificModalShown("printerManagerModal")) {
-        PrinterManager.init("", data.printersInformation, data.printerControlList);
+        if (currentOpenModal.innerHTML.includes("Files")) {
+          PrinterFileManager.init("", data.printersInformation, data.printerControlList);
+        } else if (currentOpenModal.innerHTML.includes("Control")) {
+          PrinterManager.init("", data.printersInformation, data.printerControlList);
+        } else if (currentOpenModal.innerHTML.includes("Terminal")) {
+        }
       }
 
       if (UI.checkIfSpecificModalShown("printerSettingsModal")) {
