@@ -2,6 +2,7 @@
 
 const ClientSettings = require("../../models/ClientSettings.js");
 const ServerSettings = require("../../models/ServerSettings.js");
+const { findIndex } = require("lodash");
 
 let systemClean = [];
 let clientClean = [];
@@ -11,8 +12,17 @@ class SettingsClean {
     return systemClean;
   }
 
-  static returnClientSettings() {
-    return clientClean;
+  static returnClientSettings(id) {
+    if (!!id) {
+      const settingsIndex = findIndex(clientClean, function (o) {
+        return o._id == id;
+      });
+      console.log(settingsIndex);
+      return clientClean[settingsIndex];
+    } else {
+      // No idea, fall back to the default client settings
+      return clientClean[0];
+    }
   }
 
   /**
@@ -23,7 +33,7 @@ class SettingsClean {
     const clientSettings = await ClientSettings.find({});
     const serverSettings = await ServerSettings.find({});
     systemClean = serverSettings[0];
-    clientClean = clientSettings[0];
+    clientClean = clientSettings;
   }
 }
 

@@ -169,23 +169,27 @@ router.get("/client/get", ensureAuthenticated, (req, res) => {
   });
 });
 router.post("/client/update", ensureAuthenticated, (req, res) => {
-  ClientSettingsDB.find({}).then((checked) => {
-    const panelView = {
-      currentOp: req.body.panelView.currentOp,
-      hideOff: req.body.panelView.hideOff,
-      hideClosed: req.body.panelView.hideClosed,
-      hideIdle: req.body.panelView.hideIdle,
-      printerRows: req.body.cameraView.cameraRows
-    };
-    checked[0].panelView = panelView;
-    checked[0].dashboard = req.body.dashboard;
-    checked[0].controlSettings = req.body.controlSettings;
-    checked[0].markModified("controlSettings");
-    checked[0].save().then(() => {
-      SettingsClean.start();
-    });
-    res.send({ msg: "Settings Saved" });
-  });
+  console.log(req.user);
+  UserDB.find({})
+    .then((checked) => {
+      console.log(checked);
+      // const panelView = {
+      //   currentOp: req.body.panelView.currentOp,
+      //   hideOff: req.body.panelView.hideOff,
+      //   hideClosed: req.body.panelView.hideClosed,
+      //   hideIdle: req.body.panelView.hideIdle,
+      //   printerRows: req.body.cameraView.cameraRows
+      // };
+      // checked[0].panelView = panelView;
+      // checked[0].dashboard = req.body.dashboard;
+      // checked[0].controlSettings = req.body.controlSettings;
+      // checked[0].markModified("controlSettings");
+      // checked[0].save().then(() => {
+      //   SettingsClean.start();
+      // });
+      // res.send({ msg: "Settings Saved" });
+    })
+    .populate("clientSettings");
 });
 router.post("/backgroundUpload", ensureAuthenticated, upload.single("myFile"), (req, res) => {
   const file = req.file;
