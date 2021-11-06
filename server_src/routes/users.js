@@ -8,6 +8,7 @@ const { AppConstants } = require("../app.constants");
 const User = require("../models/User.js");
 const { UserTokenService } = require("../services/authentication/user-token.service");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
+const { ensureAuthenticated } = require("../config/auth");
 
 let currentUsers;
 
@@ -174,6 +175,70 @@ router.get("/logout", (req, res) => {
   req.logout();
   req.flash("success_msg", "You are logged out");
   res.redirect("/users/login");
+});
+
+// Get user list
+router.get("/users", ensureAuthenticated, async (req, res) => {
+  const serverSettings = SettingsClean.returnSystemSettings();
+  if (serverSettings.server.registration !== true) {
+    return res.redirect("login");
+  }
+
+  let currentUsers = await fetchUsers();
+  res.render("register", {
+    page: "Register",
+    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+    serverSettings: serverSettings,
+    userCount: currentUsers.length
+  });
+});
+
+// Update user
+router.patch("/users", ensureAuthenticated, async (req, res) => {
+  const serverSettings = SettingsClean.returnSystemSettings();
+  if (serverSettings.server.registration !== true) {
+    return res.redirect("login");
+  }
+
+  let currentUsers = await fetchUsers();
+  res.render("register", {
+    page: "Register",
+    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+    serverSettings: serverSettings,
+    userCount: currentUsers.length
+  });
+});
+
+// New user
+router.post("/users", ensureAuthenticated, async (req, res) => {
+  const serverSettings = SettingsClean.returnSystemSettings();
+  if (serverSettings.server.registration !== true) {
+    return res.redirect("login");
+  }
+
+  let currentUsers = await fetchUsers();
+  res.render("register", {
+    page: "Register",
+    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+    serverSettings: serverSettings,
+    userCount: currentUsers.length
+  });
+});
+
+// Delete User
+router.delete("/users", ensureAuthenticated, async (req, res) => {
+  const serverSettings = SettingsClean.returnSystemSettings();
+  if (serverSettings.server.registration !== true) {
+    return res.redirect("login");
+  }
+
+  let currentUsers = await fetchUsers();
+  res.render("register", {
+    page: "Register",
+    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
+    serverSettings: serverSettings,
+    userCount: currentUsers.length
+  });
 });
 
 module.exports = router;
