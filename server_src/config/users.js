@@ -14,7 +14,9 @@ module.exports = {
         clientSettings: clientSettings
       };
     } else {
-      req.user.clientSettings = clientSettings;
+      if (req?.user) {
+        req.user.clientSettings = clientSettings;
+      }
     }
 
     next();

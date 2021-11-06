@@ -6,13 +6,13 @@ export default class ClientSettings {
   static async init() {
     const clientSettings = await OctoFarmClient.get("settings/client/get");
     //// localStorage.setItem("clientSettings", JSON.stringify(res));
-    document.getElementById("panelCurrentOpOn").checked = clientSettings.panelView.currentOp;
-    document.getElementById("panelHideOffline").checked = clientSettings.panelView.hideOff;
-    document.getElementById("panelHideClosed").checked = clientSettings.panelView.hideClosed;
+    document.getElementById("panelCurrentOpOn").checked = clientSettings.views.currentOperations;
+    document.getElementById("panelHideOffline").checked = clientSettings.views.showOffline;
+    document.getElementById("panelHideClosed").checked = clientSettings.views.showDisonnected;
     // document.getElementById("panelHideIdle").checked =
     //   res.panelView.hideIdle;
-    if (clientSettings.panelView.printerRows) {
-      document.getElementById("selectCameraGrid").value = clientSettings.panelView.printerRows;
+    if (clientSettings.views.cameraColumns) {
+      document.getElementById("selectCameraGrid").value = clientSettings.views.cameraColumns;
     } else {
       document.getElementById("selectCameraGrid").value = 2;
     }
@@ -58,18 +58,13 @@ export default class ClientSettings {
 
   static async update() {
     const opts = {
-      panelView: {
-        currentOp: document.getElementById("panelCurrentOpOn").checked,
-        hideOff: document.getElementById("panelHideOffline").checked,
-        hideClosed: document.getElementById("panelHideClosed").checked
-        // hideIdle: document.getElementById("panelHideIdle").checked,
+      views: {
+        currentOperations: document.getElementById("panelCurrentOpOn").checked,
+        showOffline: document.getElementById("panelHideOffline").checked,
+        showDisconnected: document.getElementById("panelHideClosed").checked,
+        cameraColumns: document.getElementById("selectCameraGrid").value
       },
-      cameraView: {
-        cameraRows: document.getElementById("selectCameraGrid").value
-      },
-      controlSettings: {
-        filesTop: document.getElementById("printerControlFilesFirst").checked
-      },
+
       dashboard: {
         defaultLayout: [
           { x: 0, y: 0, width: 2, height: 5, id: "currentUtil" },

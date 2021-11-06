@@ -42,9 +42,9 @@ const returnPrinterInfo = (id) => {
 
 function isHidden(state, clientSettings) {
   let hidden = "";
-  if (state === "Offline" && clientSettings.panel.hideOff) {
+  if (state === "Offline" && clientSettings.views.showOffline) {
     hidden = "hidden";
-  } else if (state === "Disconnected" && clientSettings.panel.hideClosed) {
+  } else if (state === "Disconnected" && clientSettings.views.showDisonnected) {
     hidden = "hidden";
   }
   return hidden;
@@ -80,12 +80,8 @@ function cleanName(printerName) {
 }
 
 function checkPrinterRows(clientSettings) {
-  if (
-    typeof clientSettings !== "undefined" &&
-    typeof clientSettings.panelView !== "undefined" &&
-    typeof clientSettings.panelView.printerRows !== "undefined"
-  ) {
-    return clientSettings.panelView.printerRows;
+  if (!clientSettings) {
+    return clientSettings.views.cameraColumns;
   } else {
     return 2;
   }
@@ -610,7 +606,7 @@ function drawCombinedView(printer, clientSettings) {
                 <div class="${columns.mainColumn}">
      
                    <div class="row">
-                        <div class="col-sm-6 col-md-8 col-lg-10">
+                        <div class="col-sm-6 col-md-8 col-lg-6">
                           <button
                             id="name-${printer._id}"
                             type="button"
@@ -621,7 +617,7 @@ function drawCombinedView(printer, clientSettings) {
                             ${name}
                           </button>
                         </div>
-                        <div class="col-sm-6 col-md-4 col-lg-2">
+                        <div class="col-sm-6 col-md-1 col-lg-4">
                           <button
                             id="state-${printer._id}"
                             type="button"
@@ -632,14 +628,44 @@ function drawCombinedView(printer, clientSettings) {
                             ${printer.printerState.state}
                           </button>
                         </div>
-                    </div>
-                   <div class="row">
-                        <div class="col-sm-12 col-md-6 col-lg-4">
-                          <small id="printerActionBtns-${printer._id}">
+                        <div class="col-sm-6 col-md-3 col-lg-2">
+                         <small class="float-right" id="printerActionBtns-${printer._id}">
 
                           </small>
                         </div>
-                        <div class="col-sm-12 col-md-6 col-lg-8">
+                    </div>
+            
+                   <div class="row">
+                     <div class="col-12">
+                        <div class="progress">
+                        <div
+                          id="progress-${printer._id}"
+                          class="progress-bar progress-bar-striped bg-${printer.printerState.colour.name} percent"
+                          role="progressbar progress-bar-striped"
+                          style="width: 0%"
+                          aria-valuenow="0"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        >
+                          0%
+                        </div>
+                      </div>
+                     </div> 
+                   </div> 
+                   <div class="row">
+                      <div class="col-sm-12 col-md-4 col-lg-6">
+                        <button
+                                id="currentFile-${printer._id}"
+                                type="button"
+                                class="btn btn-block btn-secondary text-truncate btn-sm"
+                                role="button"
+                                title="Loading..."
+                                disabled
+                        >
+                            <i class="fas fa-file-code" ></i> No File Selected
+                        </button>
+                        <div class="row">
+                        <div class="col-sm-12 text-center">
                           <button
                             title="Load a file ready to print"
                             id="load-${printer._id}"
@@ -702,35 +728,6 @@ function drawCombinedView(printer, clientSettings) {
                           </button>
                         </div>
                     </div>
-                   <div class="row">
-                     <div class="col-12">
-                        <div class="progress">
-                        <div
-                          id="progress-${printer._id}"
-                          class="progress-bar progress-bar-striped bg-${printer.printerState.colour.name} percent"
-                          role="progressbar progress-bar-striped"
-                          style="width: 0%"
-                          aria-valuenow="0"
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                        >
-                          0%
-                        </div>
-                      </div>
-                     </div> 
-                   </div> 
-                   <div class="row">
-                      <div class="col-sm-12 col-md-4 col-lg-6">
-                        <button
-                                id="currentFile-${printer._id}"
-                                type="button"
-                                class="btn btn-block btn-secondary text-truncate btn-sm"
-                                role="button"
-                                title="Loading..."
-                                disabled
-                        >
-                            <i class="fas fa-file-code" ></i> No File Selected
-                        </button>
                         <div class="row text-center">
                           <div class="col-12">
                               <small id="displayLayerProgressData-${printer._id}"></small>
@@ -1153,12 +1150,15 @@ async function updateState(printer, clientSettings, view, index) {
   let hideClosed = "";
   let hideOffline = "";
 
-  if (typeof clientSettings.panelView.hideOff !== "undefined" && clientSettings.panelView.hideOff) {
+  if (
+    typeof clientSettings.views.showOffline !== "undefined" &&
+    clientSettings.views.showDisonnected
+  ) {
     hideOffline = "hidden";
   }
   if (
-    typeof clientSettings.panelView.hideClosed !== "undefined" &&
-    clientSettings.panelView.hideClosed
+    typeof clientSettings.views.showOffline !== "undefined" &&
+    clientSettings.views.showDisonnected
   ) {
     hideClosed = "hidden";
   }

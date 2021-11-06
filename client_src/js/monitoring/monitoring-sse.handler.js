@@ -19,8 +19,7 @@ export async function monitoringSSEventHandler(data) {
     }
 
     await initMonitoring(printerInfo, data.clientSettings, getViewType());
-
-    if (data.clientSettings.panelView.currentOp) {
+    if (data.clientSettings.views.currentOperations) {
       const currentOperationsData = data.currentOperations;
       currentOperations(currentOperationsData.operations, currentOperationsData.count, printerInfo);
     }

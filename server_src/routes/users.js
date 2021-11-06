@@ -2,14 +2,13 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const passport = require("passport");
-const ServerSettings = require("../models/ServerSettings.js");
+const ClientSettings = require("../models/ClientSettings.js");
 const { AppConstants } = require("../app.constants");
 
 const User = require("../models/User.js");
 const { UserTokenService } = require("../services/authentication/user-token.service");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 
-let settings;
 let currentUsers;
 
 async function fetchUsers(force = false) {
@@ -132,18 +131,21 @@ router.post("/register", async (req, res) => {
         });
       } else {
         // Check if first user that's created.
-        User.find({}).then((user) => {
+        User.find({}).then(async (user) => {
           let userGroup = "";
           if (user.length < 1) {
             userGroup = "Administrator";
           } else {
             userGroup = "User";
           }
+          const userSettings = new ClientSettings();
+          await userSettings.save();
           const newUser = new User({
             name,
             username,
             password,
-            group: userGroup
+            group: userGroup,
+            clientSettings: userSettings._id
           });
           // Hash Password
           bcrypt.genSalt(10, (error, salt) =>
