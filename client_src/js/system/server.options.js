@@ -74,6 +74,14 @@ const settingsElements = {
       replication: document.getElementById("infReplication"),
       defaultRet: document.getElementById("infRetention")
     }
+  },
+  monitoringViews: {
+    panel: document.getElementById("monitoringpanel"),
+    list: document.getElementById("monitoringlist"),
+    camera: document.getElementById("monitoringcamera"),
+    group: document.getElementById("monitoringgroup"),
+    currentOperations: document.getElementById("monitoringcurrentOperations"),
+    combined: document.getElementById("monitoringcombined")
   }
 };
 

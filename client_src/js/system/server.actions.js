@@ -132,7 +132,7 @@ async function updateServerSettings() {
       seconds: settingsElements.onlinePolling.seconds.value
     },
     server: {
-      // Deprecated
+      // Deprecated Port
       port: settingsElements.server.port.value,
       loginRequired: settingsElements.server.loginRequired.checked,
       registration: settingsElements.server.registration.checked
@@ -173,6 +173,14 @@ async function updateServerSettings() {
         replication: settingsElements.influxExport.retentionPolicy.replication.value,
         defaultRet: settingsElements.influxExport.retentionPolicy.defaultRet.checked
       }
+    },
+    monitoringViews: {
+      panel: settingsElements.monitoringViews.panel.checked,
+      list: settingsElements.monitoringViews.list.checked,
+      camera: settingsElements.monitoringViews.camera.checked,
+      group: settingsElements.monitoringViews.group.checked,
+      currentOperations: settingsElements.monitoringViews.currentOperations.checked,
+      combined: settingsElements.monitoringViews.combined.checked
     }
   };
   OctoFarmClient.post("settings/server/update", opts).then((res) => {

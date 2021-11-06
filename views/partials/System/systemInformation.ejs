@@ -79,7 +79,7 @@
                             </div>
                             <% if(serviceInformation?.isNode){ %>
                                 <div class="col-6 col-sm-6 col-md-4 col-lg-4 col-xl-4">
-                                    <p class="text-light mt-2">Powered by <i class="fab fa-node fa-2x text-success"></i></p>
+                                    <p class="text-light">Powered by <i class="fab fa-node text-success"></i></p>
                                 </div>
                             <% } %>
                             <% if(serviceInformation?.isDockerContainer){ %>
@@ -131,18 +131,6 @@
                                      <br><%= serviceInformation?.update?.latestReleaseKnown.tag_name; %>
                                  </a>
                          <% } %>
-                     </div>
-                     <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
-                         <i class="fas fa-hourglass-half"></i> System Uptime: <br>
-                         <span class="text-light" id="systemUptime" style="font-size:0.8rem;">
-                                <%= helpers.generateTime(systemInformation.sysUptime.uptime); %>
-                         </span>
-                     </div>
-                     <div class="col-6 col-sm-6 col-md-4 col-lg-2 col-xl-2">
-                         <i class="fas fa-hourglass-half"></i> System Uptime: <br>
-                         <span class="text-light" id="systemUptime" style="font-size:0.8rem;">
-                                <%= helpers.generateTime(systemInformation.sysUptime.uptime); %>
-                         </span>
                      </div>
                  </div>
              </div>

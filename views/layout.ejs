@@ -5,6 +5,10 @@
 <% if(typeof userGroup !== "undefined") { %>
     <% currentUserGroup = userGroup %>
 <% } %>
+<% let monitoringSettings; %>
+<% if(typeof serverSettings !== "undefined") { %>
+    <% monitoringSettings = serverSettings.monitoringViews %>
+<% } %>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -53,31 +57,54 @@
                     <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
             </li>
-            <li class="nav-item">
-                <a title="Panel Layout Monitoring View" class="nav-link text-light text-center btn-sm"
-                   id="menuPanelView" href="/mon/panel"><i class="fas fa-columns"></i>
-                    Panel</a>
-            </li>
-            <li class="nav-item">
-                <a title="List Layout Monitoring View" class="nav-link text-light text-center btn-sm"
-                   id="menuListView" href="/mon/list"><i class="fas fa-list"></i> List</a>
-            </li>
-            <li class="nav-item">
-                <a title="Camera Layout Monitoring View"
-                   class="nav-link text-light text-center btn-sm" id="menuCameraView"
-                   href="/mon/camera"><i class="fas fa-video"></i>
-                    Camera</a>
-            </li>
-            <li class="nav-item">
-                <a title="Davids super power tool" class="nav-link text-light text-center btn-sm"
-                   id="menuListView" href="/mon/printerMap"><i class="fas fa-map-marked-alt"></i> Group</a>
-            </li>
-            <li class="nav-item">
-                <a title="Current Operations Monitoring Layout View"
-                   class="nav-link text-light text-center btn-sm" id="menucurrentOperationsView"
-                   href="/mon/currentOp"><i class="fas fa-star"></i>
-                    Current Operations</a>
-            </li>
+            <% if(monitoringSettings.panel){ %>
+                <li class="nav-item">
+                    <a title="Panel Layout Monitoring View" class="nav-link text-light text-center btn-sm"
+                       id="menuPanelView" href="/mon/panel"><i class="fas fa-columns"></i>
+                        Panel</a>
+                </li>
+            <% } %>
+            <% if(monitoringSettings.list){ %>
+                <li class="nav-item">
+                    <a title="List Layout Monitoring View" class="nav-link text-light text-center btn-sm"
+                       id="menuListView" href="/mon/list"><i class="fas fa-list"></i> List</a>
+                </li>
+            <% } %>
+            <% if(monitoringSettings.camera){ %>
+                <li class="nav-item">
+                    <a title="Camera Layout Monitoring View"
+                       class="nav-link text-light text-center btn-sm" id="menuCameraView"
+                       href="/mon/camera"><i class="fas fa-video"></i>
+                        Camera</a>
+                </li>
+            <% } %>
+            <% if(monitoringSettings.group){ %>
+                <li class="nav-item">
+                    <a title="Davids super power tool" class="nav-link text-light text-center btn-sm"
+                       id="menuListView" href="/mon/group"><i class="fas fa-map-marked-alt"></i> Group</a>
+                </li>
+            <% } %>
+            <% if(monitoringSettings.currentOperations){ %>
+                <li class="nav-item">
+                    <a title="Current Operations Monitoring Layout View"
+                       class="nav-link text-light text-center btn-sm" id="menucurrentOperationsView"
+                       href="/mon/currentOp"><i class="fas fa-star"></i>
+                        Current Operations</a>
+                </li>
+            <% } %>
+            <% if(monitoringSettings.combined){ %>
+                <li class="nav-item">
+                    <a title="Combined monitoring view layout"
+                       class="nav-link text-light text-center btn-sm" id="menuCombinedView"
+                       href="/mon/combined"><i class="fas fa-object-group"></i>
+                        Combined</a>
+                </li>
+            <% } %>
+
+
+
+
+
             <li class="nav-item">
                 <span title="Panel Layout Monitoring View"
                       class="nav-link text-light text-center btn-sm">

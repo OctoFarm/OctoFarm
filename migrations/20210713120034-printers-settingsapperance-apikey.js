@@ -7,7 +7,7 @@ module.exports = {
         // Do the migration
         const dbCollection = db.collection("printers");
         await dbCollection.updateMany({}, { $rename: { settingsApperance: "settingsAppearance" } });
-        await dbCollection.updateMany({}, { $rename: { apikey: "apiKey" } });
+        // await dbCollection.updateMany({}, { $rename: { apikey: "apiKey" } });
       });
     } finally {
       await session.endSession();
@@ -22,7 +22,7 @@ module.exports = {
         // Do the inverse migration
         const dbCollection = db.collection("printers");
         await dbCollection.updateMany({}, { $rename: { settingsAppearance: "settingsApperance" } });
-        await dbCollection.updateMany({}, { $rename: { apiKey: "apikey" } });
+        // await dbCollection.updateMany({}, { $rename: { apiKey: "apikey" } });
       });
     } finally {
       await session.endSession();

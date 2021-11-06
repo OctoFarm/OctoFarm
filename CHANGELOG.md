@@ -19,6 +19,7 @@ All notable changes to this project will be documented in this file.
         - There are two modes, based on how many files you upload. 
         - Single file mode: Detected when you select only 1 file. This will upload that file to all of the selected printers.
         - Multi file mode: Detected when you select more than 1 file. This will upload those files, one by one in a round robin to each printer. This works best with the same amount of files and printers. More printers than files, or more files than printers will result in some been missed off... It's not very smart!
+    - New server side settings to enable and diable any monitoring views... You can now turn on/off each view in System -> Server -> Monitoring Views.
 
 ### Changed
     - Printer offline logs (specifically connection refused) are now silenced after the first one. 

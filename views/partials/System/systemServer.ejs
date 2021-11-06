@@ -14,6 +14,12 @@
         </li>
         <li class="nav-item">
             <a class="nav-link"
+               id="server-timeout-list" data-toggle="list" href="#server-views"
+               role="tab" aria-controls="listview"><i class="fas fa-eye"></i>
+                Monitoring Views</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link"
                id="server-history-list" data-toggle="list" href="#server-history"
                role="tab" aria-controls="listview"><i class="fas fa-history"></i>
                 History</a>
@@ -285,6 +291,42 @@
                     </div>
                 </div>
             </div>
+            <div class="tab-pane fade" id="server-views" role="tabpanel"
+                 aria-labelledby="server-timeout">
+                <div class="row">
+                    <div class="col-12">
+                        <div class="alert alert-warning text-dark" role="alert">
+                            Below are some options to enable and disable certain monitoring views across the user interface.
+                            <hr>
+                            <b>Panel:</b> Panel view is OctoFarms standard view where each printer has it's own card.<br>
+                            <b>List:</b> List view is a table view where each printer is on a row of the table.<br>
+                            <b>Camera:</b> Camera is similar to Panel but has more of a focus on the camera's.<br>
+                            <b>Group:</b> Group view keeps your printers together in groups and allows batch control of prints.<br>
+                            <b>Current Operations:</b> Current Operations view is a cut down view with just basic print information.<br>
+                            <b>Combined:</b> Combined view is a list table view combining camera/list and panel views information/control.<br>
+
+                        </div>
+                    </div>
+                </div>
+                 <div class="row">
+                         <% const viewNames = [ "Panel", "List", "Camera", "Group", "Current Operations", "Combined" ] %>
+                         <% Object.keys(serverSettings.monitoringViews.toJSON()).forEach((key, index) => { %>
+                             <div class="col-md-4 col-lg-2">
+                                 <form class="was-validated">
+                                     <div class="custom-control custom-checkbox mb-3">
+                                         <input type="checkbox" class="custom-control-input"
+                                                id="monitoring<%= key %>" required <%= (serverSettings.monitoringViews[key]) ? "checked" : "" %>
+                                         >
+                                         <label class="custom-control-label"
+                                                for="monitoring<%= key %>"><%= viewNames[index] %> View</label>
+                                         <div class="valid-feedback"><%= viewNames[index] %> View Enabled</div>
+                                         <div class="invalid-feedback"><%= viewNames[index] %> View Disabled</div>
+                                     </div>
+                                 </form>
+                             </div>
+                         <% }) %>
+                 </div>
+            </div>
             <div class="tab-pane fade" id="server-history" role="tabpanel"
                  aria-labelledby="server-history-list">
                 <div class="alert alert-secondary" role="alert">
@@ -292,14 +334,14 @@
                     History. These options are turned on by default as it will check
                     if the thumbnail/camera url exist before actually saving.
                 </div>
-                <div class="alert alert-warning" role="alert">
+                <div class="alert alert-warning text-dark" role="alert">
                     If your running on Docker, make sure to mount "/app/images"
                     otherwise these will not persist reboots/upgrades.
                 </div>
                 <div id="filamentManagerSetup" class="row">
                     <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                         <h6>Timelapse Capture</h6>
-                        <div class="alert alert-warning" role="alert">
+                        <div class="alert alert-warning text-dark" role="alert">
                             Timelapse must be turned on in OctoPrint for this to
                             work, then activated below. It is not turned on by
                             default and does not react to your OctoPrint setting.
@@ -361,7 +403,7 @@
                     </div>
                     <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                         <h6>Printer snapshot capture</h6>
-                        <div class="alert alert-warning" role="alert">
+                        <div class="alert alert-warning text-dark" role="alert">
                             Requires an active camera URL in OctoFarm.
                         </div>
                         <form class="was-validated">
@@ -395,7 +437,7 @@
                     </div>
                     <div class="col-12 col-sm-12 col-md-6 col-lg-4 col-xl-4">
                         <h6>Prusa/Cura slicer thumbnailcapture</h6>
-                        <div class="alert alert-warning" role="alert">
+                        <div class="alert alert-warning text-dark" role="alert">
                             Requires either the Prusa / Cura thumbnail plugins to be
                             installed on OctoPrint.
                         </div>
@@ -449,7 +491,7 @@
                     change/addition to the information format that you'd like please
                     let me know on github issues and I'll see what I can do.
                 </div>
-                <div class="alert alert-warning" role="alert">
+                <div class="alert alert-warning text-dark" role="alert">
                     You must already have influxDB setup and working to be able to
                     use this feature. A restart will be required after saving the
                     settings to correctly enable.
@@ -543,7 +585,7 @@
                             History information will be sent when a print is logged
                             as completed or failed (cancelled / error).
                         </div>
-                        <div class="alert alert-warning" role="alert">
+                        <div class="alert alert-warning text-dark" role="alert">
                             If you don't use the Filament Manager plugin then there
                             will be 0 grams in the used_difference and used_spool
                             fields as it is not tracked without that.
@@ -592,7 +634,7 @@
                             Spool information will be logged everytime a print has
                             completed.
                         </div>
-                        <div class="alert alert-warning" role="alert">
+                        <div class="alert alert-warning text-dark" role="alert">
                             If you don't use the Filament Manager plugin then there
                             will be 0 grams in the "used_difference" and
                             "used_spool" fields as it is not tracked without that.

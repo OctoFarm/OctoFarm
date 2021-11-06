@@ -6,20 +6,11 @@ const ServerSettings = require("../models/ServerSettings.js");
 const { AppConstants } = require("../app.constants");
 
 const User = require("../models/User.js");
-const {
-  UserTokenService
-} = require("../services/authentication/user-token.service");
+const { UserTokenService } = require("../services/authentication/user-token.service");
+const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 
 let settings;
 let currentUsers;
-
-async function fetchServerSettings() {
-  if (!settings) {
-    settings = await ServerSettings.find({});
-  }
-
-  return settings;
-}
 
 async function fetchUsers(force = false) {
   if (!currentUsers || force) {
@@ -30,12 +21,12 @@ async function fetchUsers(force = false) {
 
 // Login Page
 router.get("/login", async (req, res) => {
-  settings = await fetchServerSettings();
+  const serverSettings = SettingsClean.returnSystemSettings();
   res.render("login", {
     page: "Login",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-    registration: settings[0].server.registration,
-    serverSettings: settings
+    registration: serverSettings.server.registration,
+    serverSettings: serverSettings
   });
 });
 
@@ -71,8 +62,8 @@ router.post(
 
 // Register Page
 router.get("/register", async (req, res) => {
-  let settings = await fetchServerSettings();
-  if (settings[0].server.registration !== true) {
+  const serverSettings = SettingsClean.returnSystemSettings();
+  if (serverSettings.server.registration !== true) {
     return res.redirect("login");
   }
 
@@ -80,7 +71,7 @@ router.get("/register", async (req, res) => {
   res.render("register", {
     page: "Register",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-    serverSettings: settings,
+    serverSettings: serverSettings,
     userCount: currentUsers.length
   });
 });
@@ -90,7 +81,7 @@ router.post("/register", async (req, res) => {
   const { name, username, password, password2 } = req.body;
   const errors = [];
 
-  let settings = await fetchServerSettings();
+  const serverSettings = SettingsClean.returnSystemSettings();
   let currentUsers = await fetchUsers(true);
 
   // Check required fields
@@ -112,8 +103,8 @@ router.post("/register", async (req, res) => {
     res.render("register", {
       page: "Login",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-      registration: settings[0].server.registration,
-      serverSettings: settings,
+      registration: serverSettings.server.registration,
+      serverSettings: serverSettings,
       errors,
       name,
       username,
@@ -130,8 +121,8 @@ router.post("/register", async (req, res) => {
         res.render("register", {
           page: "Login",
           octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-          registration: settings[0].server.registration,
-          serverSettings: settings,
+          registration: serverSettings.server.registration,
+          serverSettings: serverSettings,
           errors,
           name,
           username,
@@ -164,11 +155,7 @@ router.post("/register", async (req, res) => {
               newUser
                 .save()
                 .then((user) => {
-                  req.flash(
-                    "success_msg",
-                    "You are now registered and can login"
-                  );
-                  const page = "login";
+                  req.flash("success_msg", "You are now registered and can login");
                   res.redirect("/users/login");
                 })
                 .catch((err) => console.log(err));

@@ -1,6 +1,6 @@
 <% if(typeof printerCount != 'undefined' && printerCount > 0 ) {%>
     <%- include('./partials/actionsBar.ejs') %>
-    <% if(clientSettings.panelView.currentOp){%> <%-
+    <% if(clientSettings.views.currentOperations){%> <%-
     include('./partials/currentOperations.ejs') %> <% }%>
     <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
       <div id="printerArea" class="row">

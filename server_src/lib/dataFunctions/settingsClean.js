@@ -20,8 +20,6 @@ class SettingsClean {
    * @returns {Promise<void>}
    */
   static async start() {
-    // TODO this cache is nice and all, but also the start of many problems of inconsistencies
-    // TODO cont'd - What if you forget to persist a setting change to database? This file acts as a cache, so where are the persistence functions?
     const clientSettings = await ClientSettings.find({});
     const serverSettings = await ServerSettings.find({});
     systemClean = serverSettings[0];

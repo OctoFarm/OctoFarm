@@ -208,6 +208,7 @@ router.post("/server/update", ensureAuthenticated, (req, res) => {
     checked[0].filament = req.body.filament;
     checked[0].history = req.body.history;
     checked[0].influxExport = req.body.influxExport;
+    checked[0].monitoringViews = req.body.monitoringViews;
     //Check the influx export to see if all information exists... disable if not...
     let shouldDisableInflux = false;
     let returnMsg = "";
