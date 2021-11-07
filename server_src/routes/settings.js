@@ -276,21 +276,16 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
   });
 });
 
-router.get(
-  "/customGcode/delete/:id",
-  ensureAuthenticated,
-  ensureAdministrator,
-  async (req, res) => {
-    const scriptId = req.params.id;
-    GcodeDB.findByIdAndDelete(scriptId, function (err) {
-      if (err) {
-        res.send(err);
-      } else {
-        res.send(scriptId);
-      }
-    });
-  }
-);
+router.get("/customGcode/delete/:id", ensureAuthenticated, async (req, res) => {
+  const scriptId = req.params.id;
+  GcodeDB.findByIdAndDelete(scriptId, function (err) {
+    if (err) {
+      res.send(err);
+    } else {
+      res.send(scriptId);
+    }
+  });
+});
 router.post("/customGcode/edit", ensureAuthenticated, async (req, res) => {
   const newObj = req.body;
   let script = await GcodeDB.findById(newObj.id);

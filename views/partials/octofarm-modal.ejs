@@ -6,9 +6,13 @@
 <% if (typeof modal.zIndex !== "undefined") { %>
     <% zIndex = modal.zIndex %>
 <% } %>
+<% let size = "modal-xl"  %>
+<% if (typeof modal.size !== "undefined") { %>
+    <% size = modal.size %>
+<% } %>
 <div class="modal fade" id="<%= modal.id %>Modal" tabindex="-1" role="dialog"
      aria-labelledby="<%= modal.id %>ModalLabel" aria-hidden="true" style="z-index: <%= zIndex %>;">
-    <div class="modal-dialog modal-xl <%= scrollable %>" role="document">
+    <div class="modal-dialog <% size %> <%= scrollable %>" role="document">
         <div class="modal-content bg-dark text-light">
             <div class="modal-header px-3 pt-3 pb-2">
                 <span id="<%= modal.id %>Index" value="" style="display: none;"></span>
@@ -30,8 +34,8 @@
                     </div>
                 </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-light" data-dismiss="modal">Close</button>
+            <div id="<%= modal.id %>ModalFooter" class="modal-footer">
+
             </div>
         </div>
     </div>

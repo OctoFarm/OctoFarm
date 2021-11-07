@@ -9,7 +9,7 @@ import {
   setupFilamentManagerReSyncBtn,
   setupFilamentManagerSyncBtn
 } from "../services/filament-manager-plugin.service";
-import { settingsElements } from "./server.options";
+import { returnSaveBtn, settingsElements, userActionElements } from "./server.options";
 import { serverBootBoxOptions } from "./utils/bootbox.options";
 import { cpuChartOptions, memoryChartOptions } from "./utils/charts.options";
 
@@ -371,6 +371,172 @@ function startUpdatePageRunner() {
   }, 5000);
 }
 
+async function createNewUser() {
+  userActionElements.userCreateMessage.innerHTML = "";
+  const newUser = {
+    name: userActionElements.createName.value,
+    username: userActionElements.createUserName.value,
+    group: userActionElements.createGroup.value,
+    password: userActionElements.createPassword.value,
+    password2: userActionElements.createPassword2.value
+  };
+  const createNewUser = await OctoFarmClient.createNewUser(newUser);
+
+  if (createNewUser.errors.length > 0) {
+    createNewUser.errors.forEach((error) => {
+      userActionElements.userCreateMessage.insertAdjacentHTML(
+        "beforeend",
+        `
+        <div class="alert alert-warning text-dark" role="alert">
+          <i class="fas fa-exclamation-triangle"></i> ${error.msg}
+        </div>
+        `
+      );
+    });
+  } else {
+    const createdUser = createNewUser.createdNewUser;
+    userActionElements.userTableContent.insertAdjacentHTML(
+      "beforeend",
+      ` 
+                <tr id="userRow-${createdUser._id}">
+                        <th scope="row">${createdUser.name}</th>
+                        <td>${createdUser.username}</td>
+                        <td>${createdUser.group}</td>
+                        <td>${new Date(createdUser.date).toLocaleDateString()}</td>
+                        <td>
+                            <button id="resetPasswordBtn-${
+                              createdUser._id
+                            }" type="button" class="btn btn-warning text-dark btn-sm" data-toggle="modal" data-target="#usersResetPasswordModal"><i class="fas fa-user-shield"></i> Reset Password</button>
+                            <button id="editUserBtn-${
+                              createdUser._id
+                            }" type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#userEditModal"><i class="fas fa-user-edit"></i> Edit</button>
+                            <button id="deleteUserBtn-${
+                              createdUser._id
+                            }" type="button" class="btn btn-danger btn-sm"><i class="fas fa-user-minus"></i> Delete</button>
+                        </td>
+                    </tr>           
+            `
+    );
+    userActionElements.createName.value = "";
+    userActionElements.createUserName.value = "";
+    userActionElements.createGroup.value = "User";
+    userActionElements.createPassword.value = "";
+    userActionElements.createPassword2.value = "";
+    $("#userCreateModal").modal("hide");
+    document.getElementById(`deleteUserBtn-${createdUser._id}`).addEventListener("click", (e) => {
+      deleteUser(createdUser._id);
+    });
+    document
+      .getElementById(`resetPasswordBtn-${createdUser._id}`)
+      .addEventListener("click", (e) => {
+        userActionElements.resetPasswordFooter.innerHTML = `
+        ${returnSaveBtn()}
+        `;
+        const userActionSave = document.getElementById("userActionSave");
+        userActionSave.addEventListener("click", async () => {
+          await resetUserPassword(createdUser._id);
+        });
+      });
+    document
+      .getElementById(`editUserBtn-${createdUser._id}`)
+      .addEventListener("click", async (e) => {
+        userActionElements.editUserFooter.innerHTML = `
+        ${returnSaveBtn()}
+        `;
+        await fillInEditInformation(createdUser._id);
+        const userActionSave = document.getElementById("userActionSave");
+        userActionSave.addEventListener("click", async () => {
+          await editUser(createdUser._id);
+        });
+      });
+    UI.createAlert("success", "Successfully created your user!", 3000, "clicked");
+  }
+}
+
+async function fillInEditInformation(id) {
+  let editInformation = await OctoFarmClient.getUser(id);
+  userActionElements.editName.value = editInformation.name;
+  userActionElements.editUserName.value = editInformation.username;
+  userActionElements.editGroup.value = editInformation.group;
+}
+
+async function editUser(id) {
+  userActionElements.userEditMessage.innerHTML = "";
+  const newUserInfo = {
+    name: userActionElements.editName.value,
+    username: userActionElements.editUserName.value,
+    group: userActionElements.editGroup.value
+  };
+  const editedUser = await OctoFarmClient.editUser(id, newUserInfo);
+  if (editedUser.errors.length > 0) {
+    editedUser.errors.forEach((error) => {
+      userActionElements.userCreateMessage.insertAdjacentHTML(
+        "beforeend",
+        `
+        <div class="alert alert-warning text-dark" role="alert">
+          <i class="fas fa-exclamation-triangle"></i> ${error.msg}
+        </div>
+        `
+      );
+    });
+  } else {
+    UI.createAlert("success", "Successfully updated your user!", 3000, "clicked");
+    userActionElements.editName.value = "";
+    userActionElements.editUserName.value = "";
+    userActionElements.editGroup.value = "User";
+    $("#userEditModal").modal("hide");
+  }
+}
+
+function deleteUser(id) {
+  bootbox.confirm({
+    message: "This action is unrecoverable, are you sure?",
+    buttons: {
+      confirm: {
+        label: "Yes",
+        className: "btn-success"
+      },
+      cancel: {
+        label: "No",
+        className: "btn-danger"
+      }
+    },
+    callback: async function (result) {
+      if (result) {
+        const deletedUser = await OctoFarmClient.deleteUser(id);
+        document.getElementById(`userRow-${deletedUser._id}`).remove();
+        UI.createAlert("success", "Successfully deleted your user!", 3000, "clicked");
+      }
+    }
+  });
+}
+
+async function resetUserPassword(id) {
+  userActionElements.userResetMessage.innerHTML = "";
+  const newPassword = {
+    password: userActionElements.resetPassword.value,
+    password2: userActionElements.resetPassword2.value
+  };
+  let resetPassword = await OctoFarmClient.resetUserPassword(id, newPassword);
+  if (resetPassword.errors.length > 0) {
+    resetPassword.errors.forEach((error) => {
+      userActionElements.userResetMessage.insertAdjacentHTML(
+        "beforeend",
+        `
+        <div class="alert alert-warning text-dark" role="alert">
+          <i class="fas fa-exclamation-triangle"></i> ${error.msg}
+        </div>
+        `
+      );
+    });
+  } else {
+    UI.createAlert("success", "Successfully reset your users password!", 3000, "clicked");
+    userActionElements.resetPassword.value = "";
+    userActionElements.resetPassword2.value = "";
+    $("#usersResetPasswordModal").modal("hide");
+  }
+}
+
 export {
   setupOPTimelapseSettings,
   generateLogDumpFile,
@@ -383,5 +549,10 @@ export {
   checkForOctoFarmUpdates,
   grabOctoFarmLogList,
   renderSystemCharts,
-  startUpdatePageRunner
+  startUpdatePageRunner,
+  createNewUser,
+  editUser,
+  deleteUser,
+  resetUserPassword,
+  fillInEditInformation
 };

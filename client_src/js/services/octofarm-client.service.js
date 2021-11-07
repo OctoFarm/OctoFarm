@@ -58,6 +58,7 @@ export default class OctoFarmClient {
   static serverSettingsRoute = "/settings/server";
   static logsRoute = `${this.serverSettingsRoute}/logs`;
   static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
+  static userRoute = `/users/users`;
 
   static validatePath(pathname) {
     if (!pathname) {
@@ -117,6 +118,26 @@ export default class OctoFarmClient {
     return this.get(`${this.serverSettingsRoute}/get`);
   }
 
+  static async getUser(id) {
+    return this.get(`${this.userRoute}/${id}`);
+  }
+
+  static async createNewUser(user) {
+    return this.post(`${this.userRoute}`, user);
+  }
+
+  static async editUser(id, user) {
+    return this.patch(`${this.userRoute}/${id}`, user);
+  }
+
+  static async deleteUser(id) {
+    return this.delete(`${this.userRoute}/${id}`);
+  }
+
+  static async resetUserPassword(id, password) {
+    return this.patch(`${this.userRoute}/${id}`, password);
+  }
+
   static async updateServerSettings(settingsObject) {
     //TODO: should be patch not post
     return this.post(this.updateSettingsRoute, settingsObject);
@@ -128,8 +149,8 @@ export default class OctoFarmClient {
 
   static async getCustomGcode(id) {
     let url = "settings/customGcode";
-    if(id){
-      url = url + "/" + id
+    if (id) {
+      url = url + "/" + id;
     }
     return this.get(url);
   }
@@ -138,11 +159,11 @@ export default class OctoFarmClient {
     return this.get(`${this.printerRoute}/listUniqueFolders`);
   }
 
-  static getCurrentOpState(){
-    return this.get("client/currentOpSorting")
+  static getCurrentOpState() {
+    return this.get("client/currentOpSorting");
   }
-  static updateCurrentOpState({iterie, order}){
-    return this.post("client/currentOpSorting" , {iterie, order})
+  static updateCurrentOpState({ iterie, order }) {
+    return this.post("client/currentOpSorting", { iterie, order });
   }
 
   static async get(path) {
@@ -168,7 +189,7 @@ export default class OctoFarmClient {
 
   static async patch(path, data) {
     const url = new URL(path, window.location.origin).href;
-    return axios.delete(url, data).then((res) => {
+    return axios.patch(url, data).then((res) => {
       return res.data;
     });
   }

@@ -17,6 +17,7 @@ const { isPm2, isNodemon, isNode } = require("../utils/env.utils.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
 const fs = require("fs");
 const marked = require("marked");
+const { fetchUsers } = require("../services/user-service");
 
 marked.setOptions({
   renderer: new marked.Renderer(),
@@ -31,6 +32,7 @@ router.get("/", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res)
   const printers = Runner.returnFarmPrinters();
   const softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
   let dashboardSettings = clientSettings?.dashboard || getDefaultDashboardSettings();
+  const currentUsers = await fetchUsers();
 
   const md = function (filename) {
     const path = "./" + filename;
@@ -60,7 +62,8 @@ router.get("/", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res)
       isPm2: isPm2(),
       update: softwareUpdateNotification
     },
-    patreonData: require("../patreon.constants")
+    patreonData: require("../patreon.constants"),
+    currentUsers
   });
 });
 

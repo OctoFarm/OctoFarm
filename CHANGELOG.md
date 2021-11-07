@@ -23,6 +23,8 @@ All notable changes to this project will be documented in this file.
   - New server side settings to enable and diable any monitoring views... You can now turn on/off each view in System -> Server -> Monitoring Views.
   - Added #299: New View combined mode, is a bulked out list view. Pretty much a combination of Panel/List/Camera views rolled into one super view.
   - New section in System for Release Notes. This will display the current version changes from the previous version.
+  - New user CRUD endpoints: /users/users. Required administrator rights to access.
+  - New system tab called "Users". Can created, edit, read, update all users. There is also a password reset option.
 
 ### Changed
 
@@ -70,6 +72,8 @@ All notable changes to this project will be documented in this file.
   - Fixed issue where user could enter updated URL with http:// prefix and would cause errors in backend.
   - Fixed an issue where the client would repeatedly * printer amount call for filament manager settings...
   - Fixed changelog been considered a block via parsers.
+# Security
+  - Protected all system settings endpoints by ensuring user is Administrator.
 
 ## [v1.2-rc2]
 

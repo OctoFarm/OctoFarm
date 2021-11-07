@@ -8,16 +8,14 @@ const { AppConstants } = require("../app.constants");
 const User = require("../models/User.js");
 const { UserTokenService } = require("../services/authentication/user-token.service");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
-const { ensureAuthenticated } = require("../config/auth");
-
-let currentUsers;
-
-async function fetchUsers(force = false) {
-  if (!currentUsers || force) {
-    currentUsers = await User.find({});
-  }
-  return currentUsers;
-}
+const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
+const {
+  fetchUsers,
+  createUser,
+  deleteUser,
+  resetPassword,
+  editUser
+} = require("../services/user-service");
 
 // Login Page
 router.get("/login", async (req, res) => {
@@ -178,67 +176,33 @@ router.get("/logout", (req, res) => {
 });
 
 // Get user list
-router.get("/users", ensureAuthenticated, async (req, res) => {
-  const serverSettings = SettingsClean.returnSystemSettings();
-  if (serverSettings.server.registration !== true) {
-    return res.redirect("login");
-  }
-
-  let currentUsers = await fetchUsers();
-  res.render("register", {
-    page: "Register",
-    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-    serverSettings: serverSettings,
-    userCount: currentUsers.length
-  });
+router.get("/users/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  const user = await User.findById(req.params.id);
+  res.send(user);
 });
 
 // Update user
-router.patch("/users", ensureAuthenticated, async (req, res) => {
-  const serverSettings = SettingsClean.returnSystemSettings();
-  if (serverSettings.server.registration !== true) {
-    return res.redirect("login");
+router.patch("/users/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  const newUserInformation = req.body;
+  const id = req.params.id;
+  if ("password" in newUserInformation) {
+    res.send(await resetPassword(id, newUserInformation));
   }
-
-  let currentUsers = await fetchUsers();
-  res.render("register", {
-    page: "Register",
-    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-    serverSettings: serverSettings,
-    userCount: currentUsers.length
-  });
+  if ("username" in newUserInformation) {
+    res.send(await editUser(id, newUserInformation));
+  }
 });
 
 // New user
-router.post("/users", ensureAuthenticated, async (req, res) => {
-  const serverSettings = SettingsClean.returnSystemSettings();
-  if (serverSettings.server.registration !== true) {
-    return res.redirect("login");
-  }
-
-  let currentUsers = await fetchUsers();
-  res.render("register", {
-    page: "Register",
-    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-    serverSettings: serverSettings,
-    userCount: currentUsers.length
-  });
+router.post("/users", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  const user = req.body;
+  res.send(await createUser(user));
 });
 
 // Delete User
-router.delete("/users", ensureAuthenticated, async (req, res) => {
-  const serverSettings = SettingsClean.returnSystemSettings();
-  if (serverSettings.server.registration !== true) {
-    return res.redirect("login");
-  }
-
-  let currentUsers = await fetchUsers();
-  res.render("register", {
-    page: "Register",
-    octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-    serverSettings: serverSettings,
-    userCount: currentUsers.length
-  });
+router.delete("/users/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  const id = req.params.id;
+  res.send(await deleteUser(id));
 });
 
 module.exports = router;
