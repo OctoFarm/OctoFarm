@@ -504,8 +504,14 @@ function deleteUser(id) {
     callback: async function (result) {
       if (result) {
         const deletedUser = await OctoFarmClient.deleteUser(id);
-        document.getElementById(`userRow-${deletedUser._id}`).remove();
-        UI.createAlert("success", "Successfully deleted your user!", 3000, "clicked");
+        if (deletedUser.errors.length > 0) {
+          deletedUser.errors.forEach((error) => {
+            UI.createAlert("danger", error.msg, 3000, "clicked");
+          });
+        } else {
+          document.getElementById(`userRow-${deletedUser._id}`).remove();
+          UI.createAlert("success", "Successfully deleted your user!", 3000, "clicked");
+        }
       }
     }
   });

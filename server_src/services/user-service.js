@@ -1,6 +1,7 @@
 const User = require("../models/User.js");
 const ClientSettings = require("../models/ClientSettings.js");
 const bcrypt = require("bcryptjs");
+const { findIndex } = require("lodash");
 
 let currentUsers;
 
@@ -9,6 +10,20 @@ async function fetchUsers(force = false) {
     currentUsers = await User.find({});
   }
   return Object.freeze(currentUsers);
+}
+
+async function checkLastAdministrator() {
+  const currentUserList = await fetchUsers();
+  const userIndex = findIndex(currentUserList, function (o) {
+    return o.group == "Administrator";
+  });
+
+  return userIndex === -1;
+}
+
+async function checkLastExistingUser() {
+  const currentUserList = await fetchUsers();
+  return currentUserList.length < 2;
 }
 
 async function createUser({
@@ -85,7 +100,24 @@ async function createUser({
 }
 
 async function deleteUser(id) {
-  let userDeleted;
+  let userDeleted = false;
+  const errors = [];
+
+  if (await checkLastExistingUser()) {
+    errors.push({ msg: "Cannot delete your last user!" });
+  }
+
+  if (await checkLastAdministrator()) {
+    errors.push({ msg: "Cannot delete your last Administrator!" });
+  }
+
+  if (errors.length > 0) {
+    return {
+      userDeleted,
+      errors
+    };
+  }
+
   try {
     userDeleted = await User.findByIdAndDelete(id);
     await ClientSettings.findByIdAndDelete(userDeleted.clientSettings);
@@ -94,7 +126,10 @@ async function deleteUser(id) {
     console.error(e);
   }
 
-  return userDeleted;
+  return {
+    userDeleted,
+    errors
+  };
 }
 
 async function resetPassword(id, { password = undefined, password2 = undefined }) {
@@ -150,6 +185,10 @@ async function editUser(id, { name = undefined, username = undefined, group = un
   // Check required fields
   if (!name || !username || !group) {
     errors.push({ msg: "Please fill in all fields..." });
+  }
+
+  if (await checkLastAdministrator()) {
+    errors.push({ msg: "Cannot set this user's group, this is your last administrator!" });
   }
 
   // Group must be Administrator or User
