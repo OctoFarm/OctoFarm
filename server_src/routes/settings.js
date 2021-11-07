@@ -1,6 +1,7 @@
 const express = require("express");
 
 const router = express.Router();
+const { ensureCurrentUserAndGroup } = require("../config/users");
 const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
 const ServerSettingsDB = require("../models/ServerSettings.js");
 const ClientSettingsDB = require("../models/ClientSettings.js");
@@ -183,12 +184,12 @@ router.get("/server/update/check", ensureAuthenticated, ensureAdministrator, asy
   const softwareUpdateNotification = getUpdateNotificationIfAny();
   res.send(softwareUpdateNotification);
 });
-router.get("/client/get", ensureAuthenticated, (req, res) => {
+router.get("/client/get", ensureCurrentUserAndGroup, ensureAuthenticated, (req, res) => {
   ClientSettingsDB.findById(req.user.clientSettings).then((checked) => {
     res.send(checked);
   });
 });
-router.post("/client/update", ensureAuthenticated, (req, res) => {
+router.post("/client/update", ensureCurrentUserAndGroup, ensureAuthenticated, (req, res) => {
   ClientSettingsDB.findByIdAndUpdate(req.user.clientSettings, req.body)
     .then(() => {
       SettingsClean.start();

@@ -9,18 +9,18 @@ All notable changes to this project will be documented in this file.
   - Bulk actions will now produce a modal to track the actions which produces a status and message. This replaces the alert notification that flooded the screen previously.
   - Added #607: The user Octofarm connects with is now no longer static... You can open the settings modal and change the user OF connects with. It's still automatically selected on boot.
   - Added #295: Support for DisplayLayerProgress plugin. The List, Panel, Camera and Printer Manager views all now display this information if it's available. Works automatically on detection of the plugin!
-  - Added #761: All filament selection boxes now show manufactuere.
+  - Added #761: All filament selection boxes now show manufacture.
   - Added #763: Allow file multi-upload to create folders if they don't exist.
   - Added a new Actions Bar to views. These contain filters and bulk commands for controlling printers.
   - OctoFarm now listens on the websocket for Plugin/System updates. After a command is fired for updating you will see a "Restart Required" flag in Printer Manager for the printer that requires it.
   - OctoPrint plugin / software update actions are printed to the Connection Logs in printer manager.
   - Added #762: Current Operations may now be sorted. Sorting is remembered on server side and resets with a server reset currently. You can sort by progress/time remaining/file name/printers sort index in ascending and descending.
   - Added a new option to the new action bar: Multi-Print!
-    - Multi-Print is for starting... multple prints. It also takes care of checking if your printer is "Operational", uploading the file if it doesn't exist and actioning the print.
+    - Multi-Print is for starting... multiple prints. It also takes care of checking if your printer is "Operational", uploading the file if it doesn't exist and actioning the print.
     - There are two modes, based on how many files you upload.
-    - Single file mode: Detected when you select only 1 file. This will upload that file to all of the selected printers.
-    - Multi file mode: Detected when you select more than 1 file. This will upload those files, one by one in a round robin to each printer. This works best with the same amount of files and printers. More printers than files, or more files than printers will result in some been missed off... It's not very smart!
-  - New server side settings to enable and diable any monitoring views... You can now turn on/off each view in System -> Server -> Monitoring Views.
+    - Single file mode: Detected when you select only 1 file. This will upload that file to all the selected printers.
+    - Multi file mode: Detected when you select more than 1 file. This will upload those files, one by one in a round-robin to each printer. This works best with the same amount of files and printers. More printers than files, or more files than printers will result in some been missed off... It's not very smart!
+  - New server side settings to enable and disable any monitoring views... You can now turn on/off each view in System -> Server -> Monitoring Views.
   - Added #299: New View combined mode, is a bulked out list view. Pretty much a combination of Panel/List/Camera views rolled into one super view.
   - New section in System for Release Notes. This will display the current version changes from the previous version.
   - New user CRUD endpoints: /users/users. Required administrator rights to access.
@@ -47,7 +47,7 @@ All notable changes to this project will be documented in this file.
         - Starts with lesser used functions: Web Interface, Terminal (new modal for terminal focus, includes custom gcode), Re-sync printers.
         - Normal OctoPrint related power commands: Restart OP, Reboot and shutdown host.
         - Any inputted power function buttons so turn on/off printer.
-  - Client settings are no longer global. They are now attached to a user, so different users can have different settings.
+  - Client settings are no longer global. They are now attached to a user, so different users can have different settings/dashboard configurations.
 
 ### Removed
 
