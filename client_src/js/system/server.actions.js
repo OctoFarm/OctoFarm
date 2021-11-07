@@ -506,10 +506,10 @@ function deleteUser(id) {
         const deletedUser = await OctoFarmClient.deleteUser(id);
         if (deletedUser.errors.length > 0) {
           deletedUser.errors.forEach((error) => {
-            UI.createAlert("danger", error.msg, 3000, "clicked");
+            UI.createAlert("error", error.msg, 3000, "clicked");
           });
         } else {
-          document.getElementById(`userRow-${deletedUser._id}`).remove();
+          document.getElementById(`userRow-${deletedUser.userDeleted._id}`).remove();
           UI.createAlert("success", "Successfully deleted your user!", 3000, "clicked");
         }
       }
