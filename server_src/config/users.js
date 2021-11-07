@@ -4,9 +4,9 @@ module.exports = {
   async ensureCurrentUserAndGroup(req, res, next) {
     const serverSettings = SettingsClean.returnSystemSettings();
 
-    let clientID = req?.user?._id || null;
+    let clientSettingsID = req?.user?.clientSettings || null;
 
-    const clientSettings = SettingsClean.returnClientSettings(clientID);
+    const clientSettings = SettingsClean.returnClientSettings(clientSettingsID);
     // If login is not required, set default user and admin otherwise pass current user/group.
     if (!serverSettings?.server?.loginRequired) {
       req.user = {

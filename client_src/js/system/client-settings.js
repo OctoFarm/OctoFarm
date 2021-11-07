@@ -8,7 +8,7 @@ export default class ClientSettings {
     //// localStorage.setItem("clientSettings", JSON.stringify(res));
     document.getElementById("panelCurrentOpOn").checked = clientSettings.views.currentOperations;
     document.getElementById("panelHideOffline").checked = clientSettings.views.showOffline;
-    document.getElementById("panelHideClosed").checked = clientSettings.views.showDisonnected;
+    document.getElementById("panelHideClosed").checked = clientSettings.views.showDisconnected;
     // document.getElementById("panelHideIdle").checked =
     //   res.panelView.hideIdle;
     if (clientSettings.views.cameraColumns) {

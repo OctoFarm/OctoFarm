@@ -24,7 +24,6 @@ module.exports = {
     const currentUserGroup = req?.user?.group === "Administrator";
 
     if (currentUserGroup) {
-      console.log("WE HAVE GROUP");
       return next();
     } else {
       res.sendStatus(401);

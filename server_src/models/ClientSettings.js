@@ -136,7 +136,7 @@ const ClientSettingsSchema = new mongoose.Schema({
       required: true,
       default: true
     },
-    showDisonnected: {
+    showDisconnected: {
       type: Boolean,
       required: true,
       default: true

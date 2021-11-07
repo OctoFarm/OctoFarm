@@ -15,9 +15,8 @@ class SettingsClean {
   static returnClientSettings(id) {
     if (!!id) {
       const settingsIndex = findIndex(clientClean, function (o) {
-        return o._id == id;
+        return o._id.toString() === id.toString();
       });
-      console.log(settingsIndex);
       return clientClean[settingsIndex];
     } else {
       // No idea, fall back to the default client settings
