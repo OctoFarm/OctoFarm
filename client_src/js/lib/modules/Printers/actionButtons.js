@@ -28,13 +28,13 @@ function returnActionBtnTemplate(id) {
       >
           <i class="fas fa-sync"></i>
       </button> 
-                  <div class="btn-group">
+      <div class="btn-group">
         <button title="Toggle your printers power"
               id="printerPowerToggle-${id}"
-              class="btn btn-outline-danger btn-sm" type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled>
+              class="btn btn-outline-danger btn-sm d-none" type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled>
           <i id="printerStatus-${id}" class="fas fa-power-off" style="color: black;"></i>
         </button>
-        <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split btn-sm" id="dropdownMenuReference" data-toggle="dropdown" aria-expanded="false" data-reference="parent">
+        <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split btn-sm d-none" id="dropdownMenuReference" data-toggle="dropdown" aria-expanded="false" data-reference="parent">
           <span class="sr-only">Toggle Dropdown</span>
         </button>
         <div class="dropdown-menu" aria-labelledby="dropdownMenuReference">
