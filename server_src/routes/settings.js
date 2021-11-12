@@ -190,7 +190,7 @@ router.get("/client/get", ensureCurrentUserAndGroup, ensureAuthenticated, (req, 
   });
 });
 router.post("/client/update", ensureCurrentUserAndGroup, ensureAuthenticated, (req, res) => {
-  ClientSettingsDB.findByIdAndUpdate(req.user.clientSettings, req.body)
+  ClientSettingsDB.findByIdAndUpdate(req.user.clientSettings._id, req.body)
     .then(() => {
       SettingsClean.start();
       res.send({ msg: "Settings Saved" });
