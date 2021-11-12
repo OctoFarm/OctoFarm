@@ -148,7 +148,7 @@ const ServerSettingsSchema = new mongoose.Schema({
     group: {
       type: Boolean,
       required: true,
-      default: true
+      default: false
     },
     currentOperations: {
       type: Boolean,
