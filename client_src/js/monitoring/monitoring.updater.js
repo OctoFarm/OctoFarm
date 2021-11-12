@@ -62,135 +62,6 @@ const returnPrinterInfo = (id) => {
   }
 };
 
-function isHidden(state, clientSettings) {
-  let hidden = "";
-  if (state === "Offline" && clientSettings.views.showOffline) {
-    hidden = "hidden";
-  } else if (state === "Disconnected" && clientSettings.views.showDisonnected) {
-    hidden = "hidden";
-  }
-  return hidden;
-}
-
-function isRotated(otherSettings) {
-  let flipH = "";
-  let flipV = "";
-  let rotate90 = "";
-
-  if (otherSettings.webCamSettings !== null) {
-    if (otherSettings.webCamSettings.flipH) {
-      flipH = "rotateY(180deg)";
-    }
-    if (otherSettings.webCamSettings.flipV) {
-      flipV = "rotateX(180deg)";
-    }
-    if (otherSettings.webCamSettings.rotate90) {
-      rotate90 = "rotate(90deg)";
-    }
-  }
-  return { flipH, flipV, rotate90 };
-}
-
-function cleanName(printerName) {
-  let name = printerName;
-  if (name.includes("http://")) {
-    name = name.replace("http://", "");
-  } else if (name.includes("https://")) {
-    name = name.replace("https://", "");
-  }
-  return name;
-}
-
-//TODO move this out to sevice
-function checkPrinterRows(clientSettings) {
-  if (!clientSettings) {
-    return clientSettings.views.cameraColumns;
-  } else {
-    return 2;
-  }
-}
-//TODO move this out to sevice
-function imageOrCamera(printer) {
-  let drawCamera = ({ url, flipV, flipH, rotate90 }) => {
-    return `<img
-        loading="lazy"
-        class="camImg"
-        id="camera-${printer._id}"
-        width="100%"
-        style="transform: ${flipH} ${flipV} ${rotate90}";
-        src="${url}"
-     alt=""/>`;
-  };
-  const flip = isRotated(printer.otherSettings);
-  const { flipH, flipV, rotate90 } = flip;
-
-  //Is octoprints camera settings enabled?
-  if (
-    printer.otherSettings !== null &&
-    printer.otherSettings.webCamSettings !== null &&
-    printer.otherSettings.webCamSettings.webcamEnabled
-  ) {
-    //Check if URL actually exists...
-    if (printer.cameraURL !== "") {
-      return drawCamera({
-        url: printer.cameraURL,
-        flipV,
-        flipH,
-        rotate90
-      });
-    } else {
-      if (typeof printer.currentJob !== "undefined" && printer.currentJob.thumbnail != null) {
-        return drawCamera({
-          url: printer.printerURL + "/" + printer.currentJob.thumbnail,
-          flipV,
-          flipH,
-          rotate90
-        });
-      } else {
-        return drawCamera({
-          url: "../images/noCamera.jpg",
-          flipV,
-          flipH,
-          rotate90
-        });
-      }
-    }
-  } else {
-    if (typeof printer.currentJob !== "undefined" && printer.currentJob.thumbnail != null) {
-      return drawCamera({
-        url: printer.printerURL + "/" + printer.currentJob.thumbnail,
-        flipV,
-        flipH,
-        rotate90
-      });
-    } else {
-      return drawCamera({ url: "", flipV, flipH, rotate90 });
-    }
-  }
-}
-
-//TODO move this out to sevice
-function checkCameraState(printer) {
-  const flip = isRotated(printer.otherSettings);
-  const { flipH, flipV, rotate90 } = flip;
-
-  //Is octoprints camera settings enabled?
-  if (
-    printer.otherSettings !== null &&
-    printer.otherSettings.webCamSettings !== null &&
-    printer.otherSettings.webCamSettings.webcamEnabled
-  ) {
-    //Check if URL actually exists...
-    if (printer.cameraURL !== "") {
-      return true;
-    } else {
-      return typeof printer.currentJob !== "undefined" && printer.currentJob.thumbnail != null;
-    }
-  } else {
-    return typeof printer.currentJob !== "undefined" && printer.currentJob.thumbnail != null;
-  }
-}
-
 function addListeners(printer) {
   //For now Control has to be seperated
   document.getElementById(`printerButton-${printer._id}`).addEventListener("click", async () => {
@@ -362,7 +233,7 @@ async function updateState(printer, clientSettings, view, index) {
   if (stateCategory === "Error!") {
     stateCategory = "Offline";
   }
-  UI.doesElementNeedUpdating(cleanName(printer.printerName), elements.name, "innerHTML");
+  UI.doesElementNeedUpdating(printer.printerName, elements.name, "innerHTML");
 
   switch (view) {
     case "list":
@@ -839,15 +710,14 @@ export async function initMonitoring(printers, clientSettings, view) {
       for (let p = 0; p < printers.length; p++) {
         let printerPanel = document.getElementById("panel-" + printers[p]._id);
         if (!printerPanel) {
-          let printerHTML;
           if (view === "panel") {
-            printerHTML = drawPanelView(printers[p], clientSettings);
+            let printerHTML = drawPanelView(printers[p], clientSettings);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else if (view === "list") {
-            printerHTML = drawListView(printers[p], clientSettings);
+            let printerHTML = drawListView(printers[p], clientSettings);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else if (view === "camera") {
-            printerHTML = drawCameraView(printers[p], clientSettings);
+            let printerHTML = drawCameraView(printers[p], clientSettings);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else if (view === "group") {
             const groupContainerElement = document.getElementById(
@@ -861,7 +731,7 @@ export async function initMonitoring(printers, clientSettings, view) {
               groupContainerElement.insertAdjacentHTML("beforeend", groupPrinter);
             }
           } else if (view === "combined") {
-            printerHTML = drawCombinedView(printers[p], clientSettings);
+            let printerHTML = drawCombinedView(printers[p], clientSettings);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else {
             console.error("printerPanel could not determine view type to update", view);
@@ -869,13 +739,13 @@ export async function initMonitoring(printers, clientSettings, view) {
           //Update the printer panel to the actual one
           printerPanel = document.getElementById("panel-" + printers[p]._id);
           //Setup Action Buttons
-          // await actionButtonInit(printers[p], `printerActionBtns-${printers[p]._id}`);
-          // //Add page listeners
-          // addListeners(printers[p]);
-          // //Grab elements
-          // await grabElements(printers[p]);
-          // //Initialise Drag and Drop
-          // await dragAndDropEnable(printerPanel, printers[p]);
+          await actionButtonInit(printers[p], `printerActionBtns-${printers[p]._id}`);
+          //Add page listeners
+          addListeners(printers[p]);
+          //Grab elements
+          await grabElements(printers[p]);
+          //Initialise Drag and Drop
+          await dragAndDropEnable(printerPanel, printers[p]);
         } else {
           if (!printerManagerModal.classList.contains("show")) {
             if (!dragCheck()) {

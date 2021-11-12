@@ -5,26 +5,13 @@ import OctoFarmClient from "../../../services/octofarm-client.service";
 
 function returnActionBtnTemplate(id) {
   return `
-        <button  
-           title="Printers file manager"
-           id="printerFilesBtn-${id}"
-           type="button"
-           class="tag btn btn-warning btn-sm"
-           data-toggle="modal"
-           data-target="#printerManagerModal" disabled
-           >
-              <i class="fas fa-file-code"></i>
-       </button>
-       <button  
-           title="Printer Control"
-           id="printerButton-${id}"
-           type="button"
-           class="tag btn btn-primary btn-sm"
-           data-toggle="modal"
-           data-target="#printerManagerModal" disabled
-           >
-              <i class="fas fa-print"></i>
-      </button>
+
+      <button title="Open OctoPrint"
+         id="printerWeb-${id}"
+         type="button"
+         class="tag btn btn-info btn-sm"
+         target="_blank"
+         href="" role="button"><i class="fas fa-globe-europe"></i></button>
       <button  
          title="Quickly connect/disconnect your printer"
          id="printerQuickConnect-${id}"
@@ -33,42 +20,24 @@ function returnActionBtnTemplate(id) {
          >
             <i class="fas fa-toggle-off"></i>
       </button>
-      <button title="Toggle your printers power"
+            <button  
+         title="Re-Sync your printers connection"
+         id="printerSyncButton-${id}"
+         type="button"
+         class="tag btn btn-success btn-sm"
+      >
+          <i class="fas fa-sync"></i>
+      </button> 
+                  <div class="btn-group">
+        <button title="Toggle your printers power"
               id="printerPowerToggle-${id}"
-              class="btn btn-outline-danger btn-sm" type="button" disabled>
+              class="btn btn-outline-danger btn-sm" type="button"  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled>
           <i id="printerStatus-${id}" class="fas fa-power-off" style="color: black;"></i>
-      </button>
-    
-      <div class="btn-group" role="group">
-        <button id="btnGroupDrop1" type="button" class="btn btn-info dropdown-toggle btn-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-          <i class="fas fa-cogs"></i>
         </button>
-        <div class="dropdown-menu" aria-labelledby="btnGroupDrop1">
-            <a title="Open OctoPrint"
-               id="printerWeb-${id}"
-               type="button"
-               class="dropdown-item"
-               target="_blank"
-               href="" role="button"><i class="fas fa-globe-europe text-info"></i> Web Interface</a>
-            <a  
-               title="Printers file manager"
-               id="printerFilesBtn-${id}"
-               type="button"
-               class="dropdown-item"
-               data-toggle="modal"
-               data-target="#printerManagerModal" disabled
-               >
-                  <i class="fas fa-terminal text-warning"></i> Terminal
-            </a>
-            <a  
-               title="Re-Sync your printers connection"
-               id="printerSyncButton-${id}"
-               type="button"
-               class="dropdown-item"
-            >
-                <i class="fas fa-sync text-success"></i> Re-Sync Printer
-            </a>    
-             <div id="printerPowerDropDownMarker-${id}" class="dropdown-divider d-none"></div>
+        <button type="button" class="btn btn-danger dropdown-toggle dropdown-toggle-split btn-sm" id="dropdownMenuReference" data-toggle="dropdown" aria-expanded="false" data-reference="parent">
+          <span class="sr-only">Toggle Dropdown</span>
+        </button>
+        <div class="dropdown-menu" aria-labelledby="dropdownMenuReference">
             <a id="printerPowerOn-${id}" title="Turn on your printer" class="dropdown-item d-none" href="#"><i class="text-success fas fa-power-off"></i> Power On Printer</a>
             <a id="printerPowerOff-${id}" title="Turn off your printer" class="dropdown-item d-none" href="#"><i class="text-danger fas fa-power-off"></i> Power Off Printer</a>
             <div id="printerDropDownMaker-${id}" class="dropdown-divider d-none"></div>
@@ -76,9 +45,9 @@ function returnActionBtnTemplate(id) {
             <a id="printerRestartHost-${id}" title="Reboot OctoPrint Host" class="dropdown-item d-none" href="#"><i class="text-warning fas fa-sync-alt"></i> Reboot Host</a>
             <a id="printerWakeHost-${id}" title="Wake up OctoPrint Host" class="dropdown-item d-none" href="#"><i class="text-success fas fa-power-off"></i> Wake Host</a>
             <a id="printerShutdownHost-${id}" title="Shutdown OctoPrint Host" class="dropdown-item d-none" href="#"><i class="text-danger fas fa-power-off"></i> Shutdown Host</a>
-           
+
         </div>
-      </div>
+      </div>   
   `;
 }
 

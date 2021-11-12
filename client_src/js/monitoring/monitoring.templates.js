@@ -8,10 +8,128 @@ import {
   selectableTilePrefix,
   stopButtonIdPrefix
 } from "../group/group.options";
+//TODO move this out to sevice
+function isRotated(otherSettings) {
+  let flipH = "";
+  let flipV = "";
+  let rotate90 = "";
+
+  if (otherSettings.webCamSettings !== null) {
+    if (otherSettings.webCamSettings.flipH) {
+      flipH = "rotateY(180deg)";
+    }
+    if (otherSettings.webCamSettings.flipV) {
+      flipV = "rotateX(180deg)";
+    }
+    if (otherSettings.webCamSettings.rotate90) {
+      rotate90 = "rotate(90deg)";
+    }
+  }
+  return { flipH, flipV, rotate90 };
+}
+//TODO move this out to sevice
+function isHidden(state, clientSettings) {
+  let hidden = "";
+  if (state === "Offline" && clientSettings.views.showOffline) {
+    hidden = "hidden";
+  } else if (state === "Disconnected" && clientSettings.views.showDisonnected) {
+    hidden = "hidden";
+  }
+  return hidden;
+}
+//TODO move this out to sevice
+function checkPrinterRows(clientSettings) {
+  if (!clientSettings) {
+    return clientSettings.views.cameraColumns;
+  } else {
+    return 2;
+  }
+}
+//TODO move this out to sevice
+function imageOrCamera(printer) {
+  let drawCamera = ({ url, flipV, flipH, rotate90 }) => {
+    return `<img
+        loading="lazy"
+        class="camImg"
+        id="camera-${printer._id}"
+        width="100%"
+        style="transform: ${flipH} ${flipV} ${rotate90}";
+        src="${url}"
+     alt=""/>`;
+  };
+  const flip = isRotated(printer.otherSettings);
+  const { flipH, flipV, rotate90 } = flip;
+
+  //Is octoprints camera settings enabled?
+  if (
+    printer.otherSettings !== null &&
+    printer.otherSettings.webCamSettings !== null &&
+    printer.otherSettings.webCamSettings.webcamEnabled
+  ) {
+    //Check if URL actually exists...
+    if (printer.cameraURL !== "") {
+      return drawCamera({
+        url: printer.cameraURL,
+        flipV,
+        flipH,
+        rotate90
+      });
+    } else {
+      if (typeof printer.currentJob !== "undefined" && printer.currentJob.thumbnail != null) {
+        return drawCamera({
+          url: printer.printerURL + "/" + printer.currentJob.thumbnail,
+          flipV,
+          flipH,
+          rotate90
+        });
+      } else {
+        return drawCamera({
+          url: "../images/noCamera.jpg",
+          flipV,
+          flipH,
+          rotate90
+        });
+      }
+    }
+  } else {
+    if (typeof printer.currentJob !== "undefined" && printer.currentJob.thumbnail != null) {
+      return drawCamera({
+        url: printer.printerURL + "/" + printer.currentJob.thumbnail,
+        flipV,
+        flipH,
+        rotate90
+      });
+    } else {
+      return drawCamera({ url: "", flipV, flipH, rotate90 });
+    }
+  }
+}
+
+//TODO move this out to sevice
+function checkCameraState(printer) {
+  const flip = isRotated(printer.otherSettings);
+  const { flipH, flipV, rotate90 } = flip;
+
+  //Is octoprints camera settings enabled?
+  if (
+    printer.otherSettings !== null &&
+    printer.otherSettings.webCamSettings !== null &&
+    printer.otherSettings.webCamSettings.webcamEnabled
+  ) {
+    //Check if URL actually exists...
+    if (printer.cameraURL !== "") {
+      return true;
+    } else {
+      return typeof printer.currentJob !== "undefined" && printer.currentJob.thumbnail != null;
+    }
+  } else {
+    return typeof printer.currentJob !== "undefined" && printer.currentJob.thumbnail != null;
+  }
+}
 
 export function drawListView(printer, clientSettings) {
   const hidden = isHidden(printer, clientSettings);
-  const name = cleanName(printer.printerName);
+  const name = printer.printerName;
   let toolList = "";
   let environment = "";
 
@@ -61,24 +179,92 @@ export function drawListView(printer, clientSettings) {
           </td>
           <td id="printerActionBtns-${printer._id}" class="py-auto">
 
+          </td> 
+          <td class="py-auto">
+                    <button
+                            title="Start your currently selected print"
+                            id="play-${printer._id}"
+                            type="button"
+                            class="tag btn btn-success mt-1 mb-1 btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-play-circle"></i>
+                          </button>
+                          <button
+                                  title="Pause your current print"
+                            id="pause-${printer._id}"
+                            type="button"
+                            class="tag btn btn-light mt-1 mb-1 btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-pause"></i>
+                          </button>
+                          <button
+                            title="Restart your current print"
+                            id="restart-${printer._id}"
+                            type="button"
+                            class="tag btn btn-danger mt-1 mb-1 hidden btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-undo"></i>
+                          </button>
+                          <button
+                                  title="Resume your current print"
+                            id="resume-${printer._id}"
+                            type="button"
+                            class="tag btn btn-success mt-1 mb-1 hidden btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-redo"></i>
+                          </button>
+                          <button
+                                  title="Stop your current print"
+                            id="cancel-${printer._id}"
+                            type="button"
+                            class="tag btn btn-danger mt-1 mb-1 btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-square"></i>
+                          </button>
           </td>
           <td class="py-auto">
-            <button title="Start your current selected file"
-              id="play-${printer._id}"
-              type="button"
-              class="tag btn btn-success btn-sm"
-              disabled
-            >
-              <i class="fas fa-play"></i>
-            </button>
-            <button title="Cancel your current print"
-              id="cancel-${printer._id}"
-              type="button"
-              class="tag btn btn-danger btn-sm"
-              disabled
-            >
-              <i class="fas fa-square"></i>
-            </button>
+                                    <button
+                            title="Select and Manager your printers files"
+                            id="printerFilesBtn-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-warning mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal"
+                          >
+                            <i class="fas fa-file-code"></i>
+                          </button>
+                          <button
+                                  title="Control your printer"
+                            id="printerButton-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-success mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal"
+                          >
+                            <i class="fas fa-print"></i>
+                          </button>
+                          <button  
+                           title="Printers Terminal"
+                           id="printerTerminalButton-${printer._id}"
+                           type="button"
+                           class="tag btn btn-outline-info btn-sm"
+                           data-toggle="modal"
+                           data-target="#printerManagerModal"
+                           >
+                              <i class="fas fa-terminal"></i>
+                        </button>
           </td>
           <td class="py-auto">
           <p id="currentFile-${printer._id}" title="Loading..." class="mb-1 tag">
@@ -110,7 +296,7 @@ export function drawListView(printer, clientSettings) {
 
 export function drawPanelView(printer, clientSettings) {
   const hidden = isHidden(printer, clientSettings);
-  const name = cleanName(printer.printerName);
+  const name = printer.printerName;
   const printerRows = checkPrinterRows(clientSettings);
   let cameraElement = imageOrCamera(printer);
   let toolList = "";
@@ -191,56 +377,88 @@ export function drawPanelView(printer, clientSettings) {
               ${printer.printerState.state}
             </button>
             <center>
-              <button
-                title="Start your currently selected print"
-                id="play-${printer._id}"
-                type="button"
-                class="tag btn btn-success mt-1 mb-1 btn-sm"
-                role="button"
-                disabled
-              >
-                <i class="fas fa-print"></i> Print
-              </button>
-              <button
-                      title="Pause your current print"
-                id="pause-${printer._id}"
-                type="button"
-                class="tag btn btn-light mt-1 mb-1 btn-sm"
-                role="button"
-                disabled
-              >
-                <i class="fas fa-pause"></i> Pause
-              </button>
-              <button
-                title="Restart your current print"
-                id="restart-${printer._id}"
-                type="button"
-                class="tag btn btn-danger mt-1 mb-1 hidden btn-sm"
-                role="button"
-                disabled
-              >
-                <i class="fas fa-undo"></i> Restart
-              </button>
-              <button
-                      title="Resume your current print"
-                id="resume-${printer._id}"
-                type="button"
-                class="tag btn btn-success mt-1 mb-1 hidden btn-sm"
-                role="button"
-                disabled
-              >
-                <i class="fas fa-redo"></i> Resume
-              </button>
-              <button
-                      title="Stop your current print"
-                id="cancel-${printer._id}"
-                type="button"
-                class="tag btn btn-danger mt-1 mb-1 btn-sm"
-                role="button"
-                disabled
-              >
-                <i class="fas fa-square"></i> Cancel
-              </button>
+                                     <button
+                            title="Start your currently selected print"
+                            id="play-${printer._id}"
+                            type="button"
+                            class="tag btn btn-success mt-1 mb-1 btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-print"></i> Print
+                          </button>
+                          <button
+                                  title="Pause your current print"
+                            id="pause-${printer._id}"
+                            type="button"
+                            class="tag btn btn-light mt-1 mb-1 btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-pause"></i> Pause
+                          </button>
+                          <button
+                            title="Restart your current print"
+                            id="restart-${printer._id}"
+                            type="button"
+                            class="tag btn btn-danger mt-1 mb-1 hidden btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-undo"></i> Restart
+                          </button>
+                          <button
+                                  title="Resume your current print"
+                            id="resume-${printer._id}"
+                            type="button"
+                            class="tag btn btn-success mt-1 mb-1 hidden btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-redo"></i> Resume
+                          </button>
+                          <button
+                                  title="Stop your current print"
+                            id="cancel-${printer._id}"
+                            type="button"
+                            class="tag btn btn-danger mt-1 mb-1 btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-square"></i> Cancel
+                          </button> <br>
+                          <button
+                            title="Select and Manager your printers files"
+                            id="printerFilesBtn-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-warning mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal"
+                          >
+                            <i class="fas fa-file-code"></i> Files
+                          </button>
+                          <button
+                                  title="Control your printer"
+                            id="printerButton-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-success mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal"
+                          >
+                            <i class="fas fa-print"></i> Control
+                          </button>
+                          <button  
+                           title="Printers Terminal"
+                           id="printerTerminalButton-${printer._id}"
+                           type="button"
+                           class="tag btn btn-outline-info btn-sm"
+                           data-toggle="modal"
+                           data-target="#printerManagerModal"
+                           >
+                              <i class="fas fa-terminal"></i> Terminal
+                        </button>
             </center>
           </div>
           <div class="row">
@@ -277,7 +495,7 @@ export function drawCameraView(printer, clientSettings) {
   if (printer.cameraURL === "") {
     hidden = "hidden";
   }
-  const name = cleanName(printer.printerName);
+  const name = printer.printerName;
   const printerRows = checkPrinterRows(clientSettings);
   let cameraElement = imageOrCamera(printer);
 
@@ -375,20 +593,88 @@ export function drawCameraView(printer, clientSettings) {
             </div>
           </div>
           <small>
-            <button
-              title="Start your current selected print"
-              class="tag btn btn-success camButtons hidden btn-sm"
-              id="play-${printer._id}"
-            >
-              Start
-            </button>
-            <button
-              title="Stop your current selected print"
-              class="tag btn btn-danger camButtons btn-sm"
-              id="cancel-${printer._id}"
-            >
-              Cancel
-            </button>
+                         <button
+                            title="Start your currently selected print"
+                            id="play-${printer._id}"
+                            type="button"
+                            class="tag btn btn-success mt-1 mb-1 btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-print"></i> Print
+                          </button>
+                          <button
+                                  title="Pause your current print"
+                            id="pause-${printer._id}"
+                            type="button"
+                            class="tag btn btn-light mt-1 mb-1 btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-pause"></i> Pause
+                          </button>
+                          <button
+                            title="Restart your current print"
+                            id="restart-${printer._id}"
+                            type="button"
+                            class="tag btn btn-danger mt-1 mb-1 hidden btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-undo"></i> Restart
+                          </button>
+                          <button
+                                  title="Resume your current print"
+                            id="resume-${printer._id}"
+                            type="button"
+                            class="tag btn btn-success mt-1 mb-1 hidden btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-redo"></i> Resume
+                          </button>
+                          <button
+                                  title="Stop your current print"
+                            id="cancel-${printer._id}"
+                            type="button"
+                            class="tag btn btn-danger mt-1 mb-1 btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-square"></i> Cancel
+                          </button> <br>
+                          <button
+                            title="Select and Manager your printers files"
+                            id="printerFilesBtn-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-warning mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal"
+                          >
+                            <i class="fas fa-file-code"></i> Files
+                          </button>
+                          <button
+                                  title="Control your printer"
+                            id="printerButton-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-success mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal"
+                          >
+                            <i class="fas fa-print"></i> Control
+                          </button>
+                          <button  
+                           title="Printers Terminal"
+                           id="printerTerminalButton-${printer._id}"
+                           type="button"
+                           class="tag btn btn-outline-info btn-sm"
+                           data-toggle="modal"
+                           data-target="#printerManagerModal"
+                           >
+                              <i class="fas fa-terminal"></i> Terminal
+                        </button>
           </small>
         </div>
       </div>
@@ -398,7 +684,7 @@ export function drawCameraView(printer, clientSettings) {
 
 export function drawCombinedView(printer, clientSettings) {
   const hidden = isHidden(printer, clientSettings);
-  const name = cleanName(printer.printerName);
+  const name = printer.printerName;
   let cameraElement = imageOrCamera(printer);
   let toolList = "";
   let environment = "";
@@ -507,17 +793,7 @@ export function drawCombinedView(printer, clientSettings) {
                             <i class="fas fa-file-code" ></i> No File Selected
                         </button>
                         <div class="row">
-                        <div class="col-sm-12 text-center">
-                          <button
-                            title="Load a file ready to print"
-                            id="load-${printer._id}"
-                            type="button"
-                            class="tag btn btn-info mt-1 mb-1 btn-sm"
-                            role="button"
-                            disabled
-                          >
-                            <i class="fas fa-file-upload"></i> Load
-                          </button>
+                        <div class="col-sm-12 col-md-4 col-lg-4 text-center">
                           <button
                             title="Start your currently selected print"
                             id="play-${printer._id}"
@@ -567,21 +843,55 @@ export function drawCombinedView(printer, clientSettings) {
                             disabled
                           >
                             <i class="fas fa-square"></i> Cancel
+                          </button> <br>
+                          <button
+                            title="Select and Manager your printers files"
+                            id="printerFilesBtn-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-warning mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal"
+                          >
+                            <i class="fas fa-file-code"></i> Files
                           </button>
+                          <button
+                                  title="Control your printer"
+                            id="printerButton-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-success mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal"
+                          >
+                            <i class="fas fa-print"></i> Control
+                          </button>
+                          <button  
+                           title="Printers Terminal"
+                           id="printerTerminalButton-${printer._id}"
+                           type="button"
+                           class="tag btn btn-outline-info btn-sm"
+                           data-toggle="modal"
+                           data-target="#printerManagerModal"
+                           >
+                              <i class="fas fa-terminal"></i> Terminal
+                        </button>
                         </div>
-                    </div>
-                        <div class="row text-center">
-                          <div class="col-12">
+                        <div class="col-sm-12 col-md-8 col-lg-8 text-center">
+                           <div class="row">
+                            <div class="col-12">
                               <small id="displayLayerProgressData-${printer._id}"></small>
+                             </div>
+                            <div class="col-6">
+                                <span id="printTimeElapsed-${printer._id}">Loading...</span>
+                            </div>
+                            <div class="col-6">
+                                      <span id="remainingTime-${printer._id}">
+                                Loading...
+                            </span>
+                            </div> 
                           </div>
-                          <div class="col-6">
-                              <span id="printTimeElapsed-${printer._id}">Loading...</span>
-                          </div>
-                          <div class="col-6">
-                                    <span id="remainingTime-${printer._id}">
-                              Loading...
-                          </span>
-                          </div> 
+                        </div>  
                         </div>
                       </div>
                       <div class="col-sm-12 col-md-8 col-lg-6">
@@ -595,7 +905,7 @@ export function drawCombinedView(printer, clientSettings) {
                           ${environment}
                         </div>
                       </div>
-                    </div>
+                   </div>
                 </div>
             </div>
         </div>
@@ -622,6 +932,7 @@ export function drawGroupViewContainers(printer, clientSettings) {
       </div>
     `;
 }
+
 export function drawGroupViewPrinters(printer) {
   return `
         <div class="col-lg-6">
@@ -633,21 +944,4 @@ export function drawGroupViewPrinters(printer) {
           </div>
         </div>
     `;
-}
-
-export function drawMassDragAndDropPanel() {
-  return `
-  <div class="col-12">
-    <div class="card" id="${massDragAndDropId}">
-      <div class="card-header dashHeader">
-        <strong>Drag a file here to mass print</strong>
-      </div>
-      <div class="card-body pt-1 pb-0 pl-2 pr-2">
-        <div id="${massDragAndDropStatusId}">
-          <span class="badge badge-danger">0 selected</span> select a printer first to mass-upload.
-        </div>
-      </div>
-    </div>
-  </div>
-  `;
 }
