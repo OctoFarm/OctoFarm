@@ -8,7 +8,7 @@ import {
   oldFileCriteriumDays,
   warningLargeGcodeCollectionCriterium,
   warningStorageRatioCriterium
-} from "./printer-map.options";
+} from "./group.options";
 
 export function cleanPrinterName(printer) {
   if (!printer) {
@@ -39,13 +39,14 @@ export function parseGroupLocation(printer) {
       printerGroupCut = printer.group.toLowerCase().replace(groupStartNames[i], "");
     }
   }
-
+  console.log(hasGroupStartName);
   if (!hasGroupStartName) {
     throw new Error(
       `Printer group does not meet convention (value: ${printer.group}). Contact DEV~ID.`
     );
   }
   const splitPrinterGroupName = printerGroupCut.split(groupSplitString);
+  console.log(splitPrinterGroupName);
   if (!splitPrinterGroupName?.length > 1) {
     throw new Error(
       "Printer group name is not according to x_x location convention. Contact DEV~ID."

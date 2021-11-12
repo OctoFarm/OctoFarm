@@ -1,4 +1,4 @@
-import { cleanPrinterName } from "./printer-map.utils";
+import { cleanPrinterName } from "./group.utils";
 import {
   gutterHalfSize,
   panelPrefix,
@@ -6,7 +6,7 @@ import {
   quickActionsModalId,
   selectableTilePrefix,
   stopButtonIdPrefix
-} from "./printer-map.options";
+} from "./group.options";
 
 export function constructPrinterPanelHTML(
   printer,
@@ -17,7 +17,7 @@ export function constructPrinterPanelHTML(
 ) {
   const name = cleanPrinterName(printer);
   const separatorStyle =
-    realCoord[1] % 2 === 1 ? `border-top:2px gray solid;` : `border-bottom:2px gray solid;`;
+    realCoord[1] % 2 === 1 ? "border-top:2px gray solid;" : "border-bottom:2px gray solid;";
   const gutterStyle = isLeftOfGutter
     ? `style="margin-right:${gutterHalfSize}; margin-left:-${gutterHalfSize}; border-right:2px orange solid; ${separatorStyle}"`
     : isRightOfGutter

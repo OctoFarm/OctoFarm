@@ -5,7 +5,7 @@ import {
 } from "../lib/functions/dragAndDrop.js";
 import PrinterManager from "../lib/modules/printerManager.js";
 import UI from "../lib/functions/ui.js";
-import OctoPrintClient from "../lib/octoprint";
+import OctoPrintClient from "../lib/octoprint.js";
 import {
   groupWidth,
   mapRealLimits,
@@ -13,17 +13,17 @@ import {
   massDragAndDropStatusId,
   selectableTilePrefix,
   stopButtonIdPrefix
-} from "./printer-map.options";
+} from "./group.options";
 import {
   cleanPrinterName,
   combineSubAndNormalCoords,
   convertPrinterURLToXYCoordinate,
   findPrinterWithBlockCoordinate,
   parseGroupLocation
-} from "./printer-map.utils";
+} from "./group.utils";
 import { constructPrinterPanelHTML } from "./printer.panel";
 import { constructMassDragAndDropPanelHTML } from "./drag-and-drop.panel";
-import { getControlList, getPrinterById } from "./printer-map.state";
+import { getControlList, getPrinterById } from "./group.state";
 
 const elems = [];
 let powerTimer = 20000;
@@ -62,13 +62,13 @@ function attachEventToStopButton(printer) {
             command: "cancel"
           };
 
-          OctoPrintClient.post(print, "job", opts)
+          OctoPrintClient.postApi(print, "job", opts)
             .then((r) => {
               if (r.status === 200 || r.status === 201 || r.status === 204) {
                 // Error
                 UI.createAlert(
                   "success",
-                  `Successfully informed OctoPrint to cancel job!`,
+                  "Successfully informed OctoPrint to cancel job!",
                   4000,
                   "Clicked"
                 );
@@ -129,7 +129,7 @@ function grabElements(printer) {
       row: document.getElementById("panel-" + printer._id),
       name: document.getElementById("name-" + printer._id),
       currentFile: document.getElementById("currentFile-" + printer._id),
-      state: document.getElementById("state-" + printer._id),
+      state: document.getElementById("store-" + printer._id),
       progress: document.getElementById("progress-" + printer._id)
     };
     return elems[printer._id];
@@ -218,52 +218,7 @@ export async function init(printers, clientSettings, view) {
       await PrinterManager.init("", printers, getControlList());
       break;
     case false:
-      let massDragAndDropPanelDom = document.getElementById(massDragAndDropId);
-      if (!massDragAndDropPanelDom) {
-        const panelHtml = constructMassDragAndDropPanelHTML();
-        printerArea.insertAdjacentHTML("beforeend", panelHtml);
 
-        // Attach drag and drop to mass upload
-        massDragAndDropPanelDom = document.getElementById(massDragAndDropId);
-        await dragAndDropEnableMultiplePrinters(massDragAndDropPanelDom, printers);
-      }
-
-      // initialise or start the information updating..
-      const parsedPrinters = [
-        ...printers.map((p) => {
-          const parsedGroupCoord = parseGroupLocation(p);
-          const printerSubCoordinate = convertPrinterURLToXYCoordinate(p);
-          return {
-            printer: p,
-            coord: parsedGroupCoord,
-            subCoord: printerSubCoordinate,
-            realCoord: !!parsedGroupCoord
-              ? combineSubAndNormalCoords(parsedGroupCoord, printerSubCoordinate)
-              : undefined
-          };
-        })
-      ];
-      for (let realY = mapRealLimits[1] - 1; realY >= 0; realY--) {
-        for (let realX = 0; realX < mapRealLimits[0]; realX++) {
-          const printerWithCoord = findPrinterWithBlockCoordinate(parsedPrinters, [realX, realY]);
-          let printer = null;
-          if (!printerWithCoord) {
-            // We construct a fakey
-            printer = {
-              _id: `X${realX}Y${realY}STUB`,
-              stub: true,
-              printerName: "",
-              printerState: {
-                colour: {
-                  name: "red"
-                },
-                state: ""
-              },
-              display: true
-            };
-          } else {
-            printer = printerWithCoord.printer;
-          }
 
           let printerPanel = document.getElementById("panel-" + printer._id);
           if (!printerPanel) {

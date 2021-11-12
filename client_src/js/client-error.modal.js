@@ -52,12 +52,13 @@ function handleEvent() {
   }
 }
 
+// TODO fix this, it's not presenting the correct errors.l
 window.onunhandledrejection = function (event) {
-  console.trace("UNHANDLED: ", JSON.stringify(event));
-  handleEvent(event);
-  event.preventDefault();
+  // console.trace("UNHANDLED: ", JSON.stringify(event));
+  // handleEvent(event);
+  // event.preventDefault();
 };
 window.onerror = function (message, source, lineno, colno, error) {
-  console.trace("HANDLED: ", JSON.stringify({ message, source, lineno, colno, error }));
-  handleEvent({ message, source, lineno, colno, error });
+  // console.trace("HANDLED: ", JSON.stringify({ message, source, lineno, colno, error }));
+  // handleEvent({ message, source, lineno, colno, error });
 };

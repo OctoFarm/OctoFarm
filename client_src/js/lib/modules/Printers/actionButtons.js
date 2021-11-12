@@ -5,7 +5,6 @@ import OctoFarmClient from "../../../services/octofarm-client.service";
 
 function returnActionBtnTemplate(id) {
   return `
-    <div title="Extra printer actions" class="btn-group btn-group-sm" role="group" aria-label="Button group with nested dropdown">
         <button  
            title="Printers file manager"
            id="printerFilesBtn-${id}"
@@ -80,7 +79,6 @@ function returnActionBtnTemplate(id) {
            
         </div>
       </div>
-    </div>
   `;
 }
 

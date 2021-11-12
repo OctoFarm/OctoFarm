@@ -1,4 +1,8 @@
-import { dragAndDropEnable, dragCheck } from "../lib/functions/dragAndDrop.js";
+import {
+  dragAndDropEnable,
+  dragCheck,
+  dragAndDropEnableMultiplePrinters
+} from "../lib/functions/dragAndDrop.js";
 import PrinterManager from "../lib/modules/printerManager.js";
 import PrinterFileManager from "../lib/modules/printerFileManager.js";
 import PowerButton from "../lib/modules/powerButton.js";
@@ -14,6 +18,24 @@ import { checkFilamentManager } from "../services/filament-manager-plugin.servic
 import doubleClickFullScreen from "../lib/functions/fullscreen.js";
 import OctoFarmClient from "../services/octofarm-client.service";
 import { getControlList, getPrinterInfo } from "./monitoring-view.state";
+import {
+  drawCameraView,
+  drawPanelView,
+  drawListView,
+  drawCombinedView,
+  drawGroupView,
+  drawMassDragAndDropPanel,
+  drawGroupViewContainers,
+  drawGroupViewPrinters
+} from "./monitoring.templates";
+import { massDragAndDropId, mapRealLimits, groupWidth } from "../group/group.options";
+import {
+  cleanPrinterName,
+  combineSubAndNormalCoords,
+  convertPrinterURLToXYCoordinate,
+  findPrinterWithBlockCoordinate,
+  parseGroupLocation
+} from "../group/group.utils";
 
 const elems = [];
 let powerTimer = 20000;
@@ -79,6 +101,7 @@ function cleanName(printerName) {
   return name;
 }
 
+//TODO move this out to sevice
 function checkPrinterRows(clientSettings) {
   if (!clientSettings) {
     return clientSettings.views.cameraColumns;
@@ -86,7 +109,7 @@ function checkPrinterRows(clientSettings) {
     return 2;
   }
 }
-
+//TODO move this out to sevice
 function imageOrCamera(printer) {
   let drawCamera = ({ url, flipV, flipH, rotate90 }) => {
     return `<img
@@ -146,6 +169,7 @@ function imageOrCamera(printer) {
   }
 }
 
+//TODO move this out to sevice
 function checkCameraState(printer) {
   const flip = isRotated(printer.otherSettings);
   const { flipH, flipV, rotate90 } = flip;
@@ -165,600 +189,6 @@ function checkCameraState(printer) {
   } else {
     return typeof printer.currentJob !== "undefined" && printer.currentJob.thumbnail != null;
   }
-}
-
-function drawListView(printer, clientSettings) {
-  const hidden = isHidden(printer, clientSettings);
-  const name = cleanName(printer.printerName);
-  let toolList = "";
-  let environment = "";
-
-  if (printer.currentProfile !== null) {
-    for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += '<div class="btn-group btn-block m-0" role="group" aria-label="Basic example">';
-      toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
-      toolList += "</div>";
-    }
-    if (printer.currentProfile.heatedBed && printer.currentProfile.heatedChamber) {
-      environment = `<small
-      id="bedTemp-${printer._id}"
-    class="mb-0 float-right"
-
-          </small><br><small
-      id="chamberTemp-${printer._id}"
-    class="mb-0 float-right"
-
-          </small>`;
-    } else if (printer.currentProfile.heatedBed) {
-      environment = `<div
-      id="badTemp-${printer._id}"
-    class="mb-0 float-left"
-          >
-          </div>`;
-    } else if (printer.currentProfile.heatedChamber) {
-      environment = `<div
-      id="chamberTemp-${printer._id}"
-    class="mb-0 float-right"
-        >
-          </div>`;
-    }
-  }
-  let stateCategory = printer.printerState.colour.category;
-  if (stateCategory === "Error!") {
-    stateCategory = "Offline";
-  }
-  return `
-        <tr
-          class="p-0 ${stateCategory} ${hidden}"
-          id="panel-${printer._id}">
-          <td id="name-${printer._id}" class="py-auto">
-            ${name}
-          </td>
-          <td id="state-${printer._id}" class="py-auto">
-           ${printer.printerState.state}
-          </td>
-          <td id="printerActionBtns-${printer._id}" class="py-auto">
-
-          </td>
-          <td class="py-auto">
-            <button title="Start your current selected file"
-              id="play-${printer._id}"
-              type="button"
-              class="tag btn btn-success btn-sm"
-              disabled
-            >
-              <i class="fas fa-play"></i>
-            </button>
-            <button title="Cancel your current print"
-              id="cancel-${printer._id}"
-              type="button"
-              class="tag btn btn-danger btn-sm"
-              disabled
-            >
-              <i class="fas fa-square"></i>
-            </button>
-          </td>
-          <td class="py-auto">
-          <p id="currentFile-${printer._id}" title="Loading..." class="mb-1 tag">
-            <i class="fas fa-file-code"></i> No File Selected </p>
-          </td>
-          <td class="p-1">
-          <span id="printTimeElapsed-${printer._id}">Loading...</span>
-          </td>
-          <td class="py-auto">
-            <div class="progress m-0 p-0">
-              <div id="progress-${printer._id}" class="progress-bar progress-bar-striped bg-secondary percent" role="progressbar progress-bar-striped" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
-            </div>
-            <small id="displayLayerProgressData-${printer._id}"></small>
-          </td>
-          <td class="p-1">
-          <span id="remainingTime-${printer._id}">
-                Loading...
-            </span>
-          </td>
-          <td class="py-auto">
-           ${toolList}
-          </td>
-          <td class="py-auto">
-            ${environment}
-          </td>
-        </tr>
-    `;
-}
-
-function drawPanelView(printer, clientSettings) {
-  const hidden = isHidden(printer, clientSettings);
-  const name = cleanName(printer.printerName);
-  const printerRows = checkPrinterRows(clientSettings);
-  let cameraElement = imageOrCamera(printer);
-  let toolList = "";
-  let environment = "";
-  if (printer.currentProfile !== null) {
-    for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += '<div class="btn-group btn-block m-0" role="group" aria-label="Basic example">';
-      toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
-      toolList += "</div>";
-    }
-
-    if (printer.currentProfile.heatedBed) {
-      environment += `<small
-    class="mb-0 float-left"
-          ><b>Bed: </b><span id="badTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span>
-          </small>`;
-    }
-    if (printer.currentProfile.heatedChamber) {
-      environment += `<small
-    class="mb-0 float-right"
-        ><b>Chamber: </b><span  id="chamberTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span>
-          </small>`;
-    }
-  }
-
-  return `
-        <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2 ${hidden}" id="panel-${printer._id}">
-        <div class="card mt-1 mb-1 ml-1 mr-1 text-center">
-          <div class="card-header dashHeader">
-           <button
-                id="name-${printer._id}"
-                type="button"
-                class="btn btn-secondary mb-0 btn-sm float-left"
-                role="button"
-                disabled
-              >
-                ${name}
-              </button>
-          <small class="float-right" id="printerActionBtns-${printer._id}">
-
-          </small>
-          </div>
-          <div class="card-body pt-1 pb-0 pl-2 pr-2">
-            <div class="d-none index">${printer.sortIndex}</div>
-            <button
-                    id="currentFile-${printer._id}"
-                    type="button"
-                    class="tag btn btn-block btn-secondary mb-0 text-truncate btn-sm"
-                    role="button"
-                    title="Loading..."
-                    disabled
-            >
-                <i class="fas fa-file-code" ></i> No File Selected
-            </button>
-            <div id="cameraContain-${printer._id}" class="noBlue">
-                ${cameraElement}
-            </div>
-            <div class="progress">
-              <div
-                id="progress-${printer._id}"
-                class="progress-bar progress-bar-striped bg-${printer.printerState.colour.name} percent"
-                role="progressbar progress-bar-striped"
-                style="width: 0%"
-                aria-valuenow="0"
-                aria-valuemin="0"
-                aria-valuemax="100"
-              >
-                0%
-              </div>
-            </div>
-            <button
-              id="state-${printer._id}"
-              type="button"
-              class="btn btn-block mb-1 mt-1 btn-sm ${printer.printerState.colour.category}"
-              role="button"
-              disabled
-            >
-              ${printer.printerState.state}
-            </button>
-            <center>
-              <button
-                title="Start your currently selected print"
-                id="play-${printer._id}"
-                type="button"
-                class="tag btn btn-success mt-1 mb-1 btn-sm"
-                role="button"
-                disabled
-              >
-                <i class="fas fa-print"></i> Print
-              </button>
-              <button
-                      title="Pause your current print"
-                id="pause-${printer._id}"
-                type="button"
-                class="tag btn btn-light mt-1 mb-1 btn-sm"
-                role="button"
-                disabled
-              >
-                <i class="fas fa-pause"></i> Pause
-              </button>
-              <button
-                title="Restart your current print"
-                id="restart-${printer._id}"
-                type="button"
-                class="tag btn btn-danger mt-1 mb-1 hidden btn-sm"
-                role="button"
-                disabled
-              >
-                <i class="fas fa-undo"></i> Restart
-              </button>
-              <button
-                      title="Resume your current print"
-                id="resume-${printer._id}"
-                type="button"
-                class="tag btn btn-success mt-1 mb-1 hidden btn-sm"
-                role="button"
-                disabled
-              >
-                <i class="fas fa-redo"></i> Resume
-              </button>
-              <button
-                      title="Stop your current print"
-                id="cancel-${printer._id}"
-                type="button"
-                class="tag btn btn-danger mt-1 mb-1 btn-sm"
-                role="button"
-                disabled
-              >
-                <i class="fas fa-square"></i> Cancel
-              </button>
-            </center>
-          </div>
-          <div class="row">
-           <div class="col-12">
-                <small id="displayLayerProgressData-${printer._id}"></small>
-            </div>
-            <div class="col-6">
-                <span id="printTimeElapsed-${printer._id}">Loading...</span>
-            </div>
-            <div class="col-6">
-                      <span id="remainingTime-${printer._id}">
-                Loading...
-            </span>
-            </div> 
-
-          </div>
-          <div
-            id="listFilament-${printer._id}" disabled
-            class="bg-dark"
-          >
-           ${toolList}
-          </div>
-
-          <div class="card-footer text-muted dashFooter">
-                ${environment}
-          </div>
-        </div>
-      </div>
-    `;
-}
-
-function drawCameraView(printer, clientSettings) {
-  let hidden = isHidden(printer, clientSettings);
-  if (printer.cameraURL === "") {
-    hidden = "hidden";
-  }
-  const name = cleanName(printer.printerName);
-  const printerRows = checkPrinterRows(clientSettings);
-  let cameraElement = imageOrCamera(printer);
-
-  let toolList = "";
-  let environment = "";
-  if (printer.currentProfile !== null) {
-    for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += `<span><b>Tool ${e} </b></span> | <span id="${printer._id}-spool-${e}"> No Spool </span> | <span id="${printer._id}-temperature-${e}" ><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>`;
-    }
-
-    if (printer.currentProfile.heatedBed) {
-      environment += `
-          <b>Bed: </b><span id="badTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>
-`;
-    }
-    if (printer.currentProfile.heatedChamber) {
-      environment += `
-    class="mb-0"
-        <b>Chamber: </b><span id="chamberTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span><br>
- `;
-    }
-  }
-
-  return `
-  <div
-      id="panel-${printer._id}"
-      class="col-md-4 col-lg-${printerRows} col-xl-${printerRows} ${hidden}"
-    >
-      <div class="card text-center mb-0 mt-0 ml-0 mr-0">
-        <div
-          class="card-header dashHeader p-0"
-          id="camHeader-${printer._id}"
-        >
-            <button
-              id="name-${printer._id}"
-              type="button"
-              class="btn btn-secondary float-left p-0 pl-2 pt-1"
-              data-toggle="modal"
-              data-target="#printerManagerModal"
-              disabled
-            >
-                ${name}
-            </button>
-          <small id="printerActionBtns-${printer._id}" class="float-right">
-          </small>
-        </div>
-        <div
-          class="card-body cameraContain text-truncate noBlue"
-          id="cameraContain-${printer._id}"
-        >
-          <div class="camName">
-            <small
-              class="mb-0 text-center"
-              id="currentFile-${printer._id}"
-            >
-              <i class="fas fa-file-code"></i> Loading... 
-            </small><br>
-          </div>
-          
-          <div class="camExtra">
-            <div class=" row">
-              <div class="col-6">
-                 <span class="mb-0 text-center" id="printTimeElapsed-${printer._id}"></span>
-              </div>
-              <div class="col-6">
-                <span class="mb-0 text-center" id="remainingTime-${printer._id}"></span>
-              </div>
-            </div>
-          </div>
-          
-          ${cameraElement}
-          
-          <div class="camTemps">
-            <small id="displayLayerProgressData-${printer._id}"></small><br>
-            <small
-              id="toolTemps-${printer._id}"
-              class="mb-0 text-center"
-            >
-             ${toolList}
-             ${environment}
-            </small>
-          </div>
-          <div class="progress camProgress">
-            <div class="d-none percent">Loading...</div>
-            <div
-              id="progress-${printer._id}"
-              class="progress-bar progress-bar-striped bg-${printer.printerState.colour.category} percent"
-              role="progressbar"
-              style="width: 0%"
-              aria-valuenow="10"
-              aria-valuemin="0"
-              aria-valuemax="100"
-            >
-            0%
-            </div>
-          </div>
-          <small>
-            <button
-              title="Start your current selected print"
-              class="tag btn btn-success camButtons hidden btn-sm"
-              id="play-${printer._id}"
-            >
-              Start
-            </button>
-            <button
-              title="Stop your current selected print"
-              class="tag btn btn-danger camButtons btn-sm"
-              id="cancel-${printer._id}"
-            >
-              Cancel
-            </button>
-          </small>
-        </div>
-      </div>
-    </div>
-  `;
-}
-
-function drawCombinedView(printer, clientSettings) {
-  const hidden = isHidden(printer, clientSettings);
-  const name = cleanName(printer.printerName);
-  let cameraElement = imageOrCamera(printer);
-  let toolList = "";
-  let environment = "";
-  if (printer.currentProfile !== null) {
-    for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += '<div class="btn-group btn-block mb-1" role="group" aria-label="Basic example">';
-      toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
-      toolList += "</div>";
-    }
-
-    if (printer.currentProfile.heatedBed) {
-      environment +=
-        '<div class="btn-group btn-block mb-1" role="group" aria-label="Basic example">';
-      environment += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Bed: </b></button><button type="button" class="btn btn-secondary btn-sm" disabled><span id="badTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span></button>`;
-      environment += "</div>";
-    }
-    if (printer.currentProfile.heatedChamber) {
-      environment +=
-        '<div class="btn-group btn-block mb-1" role="group" aria-label="Basic example">';
-      environment += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Chamber: </b></button><button type="button" class="btn btn-secondary btn-sm" disabled><span  id="chamberTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span></button>`;
-      environment += "</div>";
-    }
-  }
-
-  const cameraCheck = checkCameraState(printer);
-
-  const columns = {
-    cameraColumn: "col-sm-12 col-md-5 col-lg-4 col-xl-3",
-    mainColumn: "col-sm-12 col-md-7 col-lg-8 col-xl-9"
-  };
-  if (!cameraCheck) {
-    columns.cameraColumn = "d-none";
-    columns.mainColumn = "col-12";
-  }
-
-  return `
-     <div class="card ${hidden}" id="panel-${printer._id}">
-        <div class="d-none index">${printer.sortIndex}</div>
-        <div class="col-12">
-            <div class="row">
-                
-                <div class="${columns.cameraColumn}">
-                   <div id="cameraContain-${printer._id}" class="noBlue">
-                        ${cameraElement}
-                    </div>
-                </div>
-                <div class="${columns.mainColumn}">
-     
-                   <div class="row">
-                        <div class="col-sm-6 col-md-8 col-lg-6">
-                          <button
-                            id="name-${printer._id}"
-                            type="button"
-                            class="btn btn-block btn-secondary btn-sm text-left"
-                            role="button"
-                            disabled
-                          >
-                            ${name}
-                          </button>
-                        </div>
-                        <div class="col-sm-6 col-md-1 col-lg-4">
-                          <button
-                            id="state-${printer._id}"
-                            type="button"
-                            class="btn btn-block btn-sm ${printer.printerState.colour.category}"
-                            role="button"
-                            disabled
-                          >
-                            ${printer.printerState.state}
-                          </button>
-                        </div>
-                        <div class="col-sm-6 col-md-3 col-lg-2">
-                         <small class="float-right" id="printerActionBtns-${printer._id}">
-
-                          </small>
-                        </div>
-                    </div>
-            
-                   <div class="row">
-                     <div class="col-12">
-                        <div class="progress">
-                        <div
-                          id="progress-${printer._id}"
-                          class="progress-bar progress-bar-striped bg-${printer.printerState.colour.name} percent"
-                          role="progressbar progress-bar-striped"
-                          style="width: 0%"
-                          aria-valuenow="0"
-                          aria-valuemin="0"
-                          aria-valuemax="100"
-                        >
-                          0%
-                        </div>
-                      </div>
-                     </div> 
-                   </div> 
-                   <div class="row">
-                      <div class="col-sm-12 col-md-4 col-lg-6">
-                        <button
-                                id="currentFile-${printer._id}"
-                                type="button"
-                                class="btn btn-block btn-secondary text-truncate btn-sm"
-                                role="button"
-                                title="Loading..."
-                                disabled
-                        >
-                            <i class="fas fa-file-code" ></i> No File Selected
-                        </button>
-                        <div class="row">
-                        <div class="col-sm-12 text-center">
-                          <button
-                            title="Load a file ready to print"
-                            id="load-${printer._id}"
-                            type="button"
-                            class="tag btn btn-info mt-1 mb-1 btn-sm"
-                            role="button"
-                            disabled
-                          >
-                            <i class="fas fa-file-upload"></i> Load
-                          </button>
-                          <button
-                            title="Start your currently selected print"
-                            id="play-${printer._id}"
-                            type="button"
-                            class="tag btn btn-success mt-1 mb-1 btn-sm"
-                            role="button"
-                            disabled
-                          >
-                            <i class="fas fa-print"></i> Print
-                          </button>
-                          <button
-                                  title="Pause your current print"
-                            id="pause-${printer._id}"
-                            type="button"
-                            class="tag btn btn-light mt-1 mb-1 btn-sm"
-                            role="button"
-                            disabled
-                          >
-                            <i class="fas fa-pause"></i> Pause
-                          </button>
-                          <button
-                            title="Restart your current print"
-                            id="restart-${printer._id}"
-                            type="button"
-                            class="tag btn btn-danger mt-1 mb-1 hidden btn-sm"
-                            role="button"
-                            disabled
-                          >
-                            <i class="fas fa-undo"></i> Restart
-                          </button>
-                          <button
-                                  title="Resume your current print"
-                            id="resume-${printer._id}"
-                            type="button"
-                            class="tag btn btn-success mt-1 mb-1 hidden btn-sm"
-                            role="button"
-                            disabled
-                          >
-                            <i class="fas fa-redo"></i> Resume
-                          </button>
-                          <button
-                                  title="Stop your current print"
-                            id="cancel-${printer._id}"
-                            type="button"
-                            class="tag btn btn-danger mt-1 mb-1 btn-sm"
-                            role="button"
-                            disabled
-                          >
-                            <i class="fas fa-square"></i> Cancel
-                          </button>
-                        </div>
-                    </div>
-                        <div class="row text-center">
-                          <div class="col-12">
-                              <small id="displayLayerProgressData-${printer._id}"></small>
-                          </div>
-                          <div class="col-6">
-                              <span id="printTimeElapsed-${printer._id}">Loading...</span>
-                          </div>
-                          <div class="col-6">
-                                    <span id="remainingTime-${printer._id}">
-                              Loading...
-                          </span>
-                          </div> 
-                        </div>
-                      </div>
-                      <div class="col-sm-12 col-md-8 col-lg-6">
-                        <div
-                          id="listFilament-${printer._id}" disabled
-                          class="bg-dark"
-                        >
-                          ${toolList}
-                        </div>
-                        <div>
-                          ${environment}
-                        </div>
-                      </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-     </div>   
-    `;
 }
 
 function addListeners(printer) {
@@ -1409,36 +839,43 @@ export async function initMonitoring(printers, clientSettings, view) {
       for (let p = 0; p < printers.length; p++) {
         let printerPanel = document.getElementById("panel-" + printers[p]._id);
         if (!printerPanel) {
+          let printerHTML;
           if (view === "panel") {
-            let printerHTML = await drawPanelView(printers[p], clientSettings, view);
+            printerHTML = drawPanelView(printers[p], clientSettings);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else if (view === "list") {
-            let printerHTML = await drawListView(printers[p], clientSettings, view);
+            printerHTML = drawListView(printers[p], clientSettings);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else if (view === "camera") {
-            let printerHTML = await drawCameraView(printers[p], clientSettings, view);
+            printerHTML = drawCameraView(printers[p], clientSettings);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else if (view === "group") {
-            console.log("GROUP VIEW TODO");
-            // let printerHTML = await drawCameraView(printers[p], clientSettings, view);
-            // printerArea.insertAdjacentHTML("beforeend", printerHTML);
+            const groupContainerElement = document.getElementById(
+              `Group-${encodeURIComponent(printers[p].group)}`
+            );
+            if (!groupContainerElement) {
+              const groupContainer = drawGroupViewContainers(printers[p]);
+              printerArea.insertAdjacentHTML("beforeend", groupContainer);
+            } else {
+              const groupPrinter = drawGroupViewPrinters(printers[p]);
+              groupContainerElement.insertAdjacentHTML("beforeend", groupPrinter);
+            }
           } else if (view === "combined") {
-            let printerHTML = await drawCombinedView(printers[p], clientSettings, view);
+            printerHTML = drawCombinedView(printers[p], clientSettings);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else {
             console.error("printerPanel could not determine view type to update", view);
           }
-
           //Update the printer panel to the actual one
           printerPanel = document.getElementById("panel-" + printers[p]._id);
           //Setup Action Buttons
-          await actionButtonInit(printers[p], `printerActionBtns-${printers[p]._id}`);
-          //Add page listeners
-          addListeners(printers[p]);
-          //Grab elements
-          await grabElements(printers[p]);
-          //Initialise Drag and Drop
-          await dragAndDropEnable(printerPanel, printers[p]);
+          // await actionButtonInit(printers[p], `printerActionBtns-${printers[p]._id}`);
+          // //Add page listeners
+          // addListeners(printers[p]);
+          // //Grab elements
+          // await grabElements(printers[p]);
+          // //Initialise Drag and Drop
+          // await dragAndDropEnable(printerPanel, printers[p]);
         } else {
           if (!printerManagerModal.classList.contains("show")) {
             if (!dragCheck()) {

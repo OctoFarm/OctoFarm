@@ -196,7 +196,7 @@ router.get("/mon/group", ensureAuthenticated, ensureCurrentUserAndGroup, async (
     printGroups = [];
   }
 
-  res.render("printerMap", {
+  res.render("groupView", {
     name: req.user.name,
     userGroup: req.user.group,
     version,

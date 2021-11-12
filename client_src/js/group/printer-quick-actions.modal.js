@@ -10,13 +10,13 @@ import {
   actionProgressSucceeded,
   actionProgressSucceededClass,
   oldFileCriteriumDays
-} from "./printer-map.options";
-import { printerWebBtn } from "../lib/modules/Printers/actionButtons";
+} from "./group.options";
+
 import {
   calculatePrinterSystemStorageBadges,
   calculatePrinterSystemStorageStats,
   findOldFiles
-} from "./printer-map.utils";
+} from "./group.utils";
 
 export function getFileRow(file, index) {
   return `
@@ -48,7 +48,7 @@ export function getFileRow(file, index) {
 
 function getSortedPrinterFiles(fileInfo) {
   const fileList = fileInfo?.fileList;
-  if (!fileInfo?.fileList || fileInfo.filecount === 0) return;
+  if (!fileInfo?.fileList || fileInfo.fileCount === 0) return;
   return fileList.sort((f1, f2) => f2.uploadDate - f1.uploadDate);
 }
 
@@ -133,7 +133,7 @@ export const printerQuickActionsModal = (printer) => {
   } class="btn btn-outline-danger" id="${actionDeleteAllFiles}">Clear all ${
     fileListSorted?.length
   } files</button>
-${printerWebBtn(printer._id, printer.printerURL)}<br/>
+<br/>
 
 <div class="progress ${actionProgressBar}" style="margin-top:10px;">
   <div role="progressbar" class="${actionProgressSucceeded} progress-bar bg-success progress-bar-striped progress-bar-animated" style="width:0%">

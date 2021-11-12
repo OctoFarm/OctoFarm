@@ -9,7 +9,7 @@ export function setPrinterMapState(newPrinterInfo, controlList) {
 }
 
 /**
- * Set the modal state for the Quick Actions Modal
+ * Set the modal store for the Quick Actions Modal
  * @param id
  */
 export function setModalPrinter(id) {
@@ -21,7 +21,7 @@ export function setModalPrinter(id) {
 }
 
 /**
- * Get the modal state for the Quick Actions Modal
+ * Get the modal store for the Quick Actions Modal
  * @returns {null}
  */
 export function getModalPrinter() {
