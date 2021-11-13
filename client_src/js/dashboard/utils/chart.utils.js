@@ -18,7 +18,7 @@ export const toFixedFormatter = (value) => {
 };
 
 export const toFixedWeightGramFormatter = (value) => {
-  if (value !== null) {
+  if (!!value) {
     return value.toFixed(0) + "g";
   } else {
     return "";
