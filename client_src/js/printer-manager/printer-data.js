@@ -233,7 +233,6 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
       setupUpdateOctoPrintClientBtn(printer);
       setupUpdateOctoPrintPluginsBtn(printer);
 
-      // // TODO move to function on printer manager cleanup
       // document
       //   .getElementById(`printerButton-${printer._id}`)
       //   .addEventListener("click", async () => {
