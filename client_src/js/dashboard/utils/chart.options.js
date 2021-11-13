@@ -8,7 +8,7 @@ export const xAxisConnectionCategories = ["Active", "Complete", "Idle", "Disconn
 export const utilisationConnectionLabels = ["Active", "Idle", "Offline"];
 export const farmTempColors = ["#fcc329", "#ff1500", "#009cff", "#ff1800", "#37ff00", "#ff1800"];
 export const utilisationConnectionColors = ["#00bc8c", "#444", "#e74c3c"];
-export const historyColors = ["#00bc8c", "#f39c12", "#e74c3c"];
+export const historyColors = ["#00bc8c", "#e74c3c", "#f39c12"];
 export const rainBow = () => [
   "#ff0000",
   "#ff8400",

@@ -41,7 +41,6 @@ class HistoryClean {
    * @returns {string|*|number}
    */
   static calcSpoolWeightAsString(length, filament, completionRatio) {
-    // TODO ... this is not a weight being returned at all?
     if (!length) {
       return length === 0 ? 0 : length;
     }
@@ -166,7 +165,6 @@ class HistoryClean {
   static processHistorySpools(historyCleanEntry, usageOverTime, totalByDay, historyByDay) {
     const spools = historyCleanEntry?.spools;
     const historyState = historyCleanEntry.state;
-
     const timestampDiffDaysAgo = 90 * 24 * 60 * 60 * 1000;
     let ninetyDaysAgo = new Date(Date.now() - timestampDiffDaysAgo);
 
