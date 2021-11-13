@@ -84,20 +84,20 @@
                        id="menuListView" href="/mon/group"><i class="fas fa-map-marked-alt"></i> Group</a>
                 </li>
             <% } %>
+            <% if(monitoringSettings.combined){ %>
+                <li class="nav-item">
+                    <a title="Combined monitoring view layout"
+                       class="nav-link text-light text-center btn-sm" id="menuCombinedView"
+                       href="/mon/combined"><i class="fas fa-object-group"></i>
+                        Super List</a>
+                </li>
+            <% } %>
             <% if(monitoringSettings.currentOperations){ %>
                 <li class="nav-item">
                     <a title="Current Operations Monitoring Layout View"
                        class="nav-link text-light text-center btn-sm" id="menucurrentOperationsView"
                        href="/mon/currentOp"><i class="fas fa-star"></i>
                         Current Operations</a>
-                </li>
-            <% } %>
-            <% if(monitoringSettings.combined){ %>
-                <li class="nav-item">
-                    <a title="Combined monitoring view layout"
-                       class="nav-link text-light text-center btn-sm" id="menuCombinedView"
-                       href="/mon/combined"><i class="fas fa-object-group"></i>
-                        Combined</a>
                 </li>
             <% } %>
 
