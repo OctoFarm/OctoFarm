@@ -118,10 +118,7 @@ class SystemRunner {
 
       return systemInfo;
     } catch (e) {
-      logger.error(
-        "Some system information has failed to generate:",
-        e.message
-      );
+      logger.error("Some system information has failed to generate:", e.message);
 
       return false;
     }

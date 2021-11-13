@@ -71,7 +71,7 @@ router.get("/", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res)
  * Acquire system information from system info runner
  */
 router.get("/info", ensureAuthenticated, async (req, res) => {
-  const systemInformation = await SystemRunner.queryWithFreshCurrentProcess();
+  const systemInformation = await SystemRunner.querySystemInfo();
   res.send(systemInformation);
 });
 
