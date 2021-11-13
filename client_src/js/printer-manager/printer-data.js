@@ -194,7 +194,7 @@ function updateButtonState(printer) {
 function updatePrinterRow(printer) {
   const printerCard = document.getElementById(`printerCard-${printer._id}`);
   if (printerCard) {
-    updateButtonState(printer);
+    // updateButtonState(printer);
 
     checkQuickConnectState(printer);
 
@@ -233,21 +233,21 @@ export function createOrUpdatePrinterTableRow(printers, printerControlList) {
       setupUpdateOctoPrintClientBtn(printer);
       setupUpdateOctoPrintPluginsBtn(printer);
 
-      // TODO move to function on printer manager cleanup
-      document
-        .getElementById(`printerButton-${printer._id}`)
-        .addEventListener("click", async () => {
-          currentOpenModal.innerHTML = "Printer Control: ";
-          const printers = await OctoFarmClient.listPrinters();
-          await PrinterManager.init(printer._id, printers, printerControlList);
-        });
-      document
-        .getElementById(`printerFilesBtn-${printer._id}`)
-        .addEventListener("click", async () => {
-          currentOpenModal.innerHTML = "Printer Files: ";
-          const printers = await OctoFarmClient.listPrinters();
-          await PrinterFileManager.init(printer._id, printers, printerControlList);
-        });
+      // // TODO move to function on printer manager cleanup
+      // document
+      //   .getElementById(`printerButton-${printer._id}`)
+      //   .addEventListener("click", async () => {
+      //     currentOpenModal.innerHTML = "Printer Control: ";
+      //     const printers = await OctoFarmClient.listPrinters();
+      //     await PrinterManager.init(printer._id, printers, printerControlList);
+      //   });
+      // document
+      //   .getElementById(`printerFilesBtn-${printer._id}`)
+      //   .addEventListener("click", async () => {
+      //     currentOpenModal.innerHTML = "Printer Files: ";
+      //     const printers = await OctoFarmClient.listPrinters();
+      //     await PrinterFileManager.init(printer._id, printers, printerControlList);
+      //   });
       document
         .getElementById(`printerSettings-${printer._id}`)
         .addEventListener("click", async (e) => {
