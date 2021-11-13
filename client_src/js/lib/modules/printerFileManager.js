@@ -3,17 +3,13 @@ import OctoFarmClient from "../../services/octofarm-client.service";
 import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import FileManager from "./fileManager.js";
-import { returnDropDown, selectFilament } from "../../services/filament-manager-plugin.service";
+import { returnDropDown } from "../../services/filament-manager-plugin.service";
 import FileSorting from "../modules/fileSorting.js";
 import CustomGenerator from "./customScripts.js";
+import { setupClientSwitchDropDown } from "../../services/client-modal.service";
 
 let currentIndex = 0;
-
-let controlDropDown = false;
-
 let currentPrinter = null;
-
-let filamentManager = false;
 
 $("#connectionModal").on("hidden.bs.modal", function (e) {
   if (document.getElementById("connectionAction")) {
@@ -30,42 +26,15 @@ export default class PrinterFileManager {
         return o._id == index;
       });
       currentPrinter = printers[id];
-      //Load the printer dropdown
-      if (!controlDropDown) {
-        const printerDrop = document.getElementById("printerSelection");
-        printerDrop.innerHTML = "";
-        printerControlList.forEach((list) => {
-          if (list.state.category !== "Offline") {
-            printerDrop.insertAdjacentHTML(
-              "beforeend",
-              `
-                  <option value="${list.printerID}" selected>${list.printerName}</option>
-              `
-            );
-          }
-        });
-        printerDrop.value = currentPrinter._id;
-        printerDrop.addEventListener("change", (event) => {
-          if (document.getElementById("printerControls")) {
-            document.getElementById("printerControls").innerHTML = "";
-          }
-          document.getElementById("pmStatus").innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-          document.getElementById("pmStatus").className = "btn btn-secondary mb-2";
-          //Load Connection Panel
-          document.getElementById("printerPortDrop").innerHTML = "";
-          document.getElementById("printerBaudDrop").innerHTML = "";
-          document.getElementById("printerProfileDrop").innerHTML = "";
-          document.getElementById("printerConnect").innerHTML = "";
-          PrinterFileManager.init(event.target.value, printers, printerControlList);
-        });
-        controlDropDown = true;
-      }
+
+      const changeFunction = function (value) {
+        PrinterFileManager.init(value, printers, printerControlList);
+      };
+
+      setupClientSwitchDropDown(currentPrinter._id, printerControlList, changeFunction, true);
+
       const filamentDropDown = await returnDropDown();
-      const done = await PrinterFileManager.loadPrinter(
-        currentPrinter,
-        printerControlList,
-        filamentDropDown
-      );
+      await PrinterFileManager.loadPrinter(currentPrinter);
       const elements = PrinterFileManager.grabPage();
       PrinterFileManager.applyState(currentPrinter, elements);
       PrinterFileManager.applyListeners(elements, printers, filamentDropDown);
@@ -74,20 +43,6 @@ export default class PrinterFileManager {
         return o._id == currentIndex;
       });
       currentPrinter = printers[id];
-      const printerDrop = document.getElementById("printerSelection");
-      printerDrop.innerHTML = "";
-      printerControlList.forEach((list) => {
-        if (list.state.category !== "Offline") {
-          printerDrop.insertAdjacentHTML(
-            "beforeend",
-            `
-                  <option value="${list.printerID}" selected>${list.printerName}</option>
-              `
-          );
-        }
-      });
-      printerDrop.value = currentPrinter._id;
-
       const elements = await PrinterFileManager.grabPage();
       PrinterFileManager.applyState(currentPrinter, elements);
       document.getElementById("printerManagerModal").style.overflow = "auto";
@@ -95,7 +50,7 @@ export default class PrinterFileManager {
     return true;
   }
 
-  static async loadPrinter(printer, printerControlList, filamentDropDown) {
+  static async loadPrinter(printer) {
     //Load Connection Panel
     try {
       const printerPort = document.getElementById("printerPortDrop");
@@ -282,7 +237,7 @@ export default class PrinterFileManager {
     }
   }
 
-  static applyListeners(elements, printers, filamentDropDown) {
+  static applyListeners(elements) {
     const rangeSliders = document.querySelectorAll("input.octoRange");
     rangeSliders.forEach((slider) => {
       slider.addEventListener("input", (e) => {

@@ -4,6 +4,7 @@ import Calc from "../functions/calc.js";
 import UI from "../functions/ui.js";
 import { returnDropDown, selectFilament } from "../../services/filament-manager-plugin.service";
 import CustomGenerator from "./customScripts.js";
+import { setupClientSwitchDropDown } from "../../services/client-modal.service";
 
 let currentIndex = 0;
 
@@ -32,42 +33,15 @@ export default class PrinterManager {
         return o._id == index;
       });
       currentPrinter = printers[id];
-      //Load the printer dropdown
-      if (!controlDropDown) {
-        const printerDrop = document.getElementById("printerSelection");
-        printerDrop.innerHTML = "";
-        printerControlList.forEach((list) => {
-          if (list.state.category !== "Offline") {
-            printerDrop.insertAdjacentHTML(
-              "beforeend",
-              `
-                  <option value="${list.printerID}" selected>${list.printerName}</option>
-              `
-            );
-          }
-        });
-        printerDrop.value = currentPrinter._id;
-        printerDrop.addEventListener("change", (event) => {
-          if (document.getElementById("printerControls")) {
-            document.getElementById("printerControls").innerHTML = "";
-          }
-          document.getElementById("pmStatus").innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-          document.getElementById("pmStatus").className = "btn btn-secondary mb-2";
-          //Load Connection Panel
-          document.getElementById("printerPortDrop").innerHTML = "";
-          document.getElementById("printerBaudDrop").innerHTML = "";
-          document.getElementById("printerProfileDrop").innerHTML = "";
-          document.getElementById("printerConnect").innerHTML = "";
-          PrinterManager.init(event.target.value, printers, printerControlList);
-        });
-        controlDropDown = true;
-      }
+
+      const changeFunction = function (value) {
+        PrinterManager.init(value, printers, printerControlList);
+      };
+
+      setupClientSwitchDropDown(currentPrinter._id, printerControlList, changeFunction, true);
+
       const filamentDropDown = await returnDropDown();
-      const done = await PrinterManager.loadPrinter(
-        currentPrinter,
-        printerControlList,
-        filamentDropDown
-      );
+      await PrinterManager.loadPrinter(currentPrinter, printerControlList, filamentDropDown);
       const elements = PrinterManager.grabPage();
       elements.printerControls["step" + currentPrinter.stepRate].className = "btn btn-dark active";
       PrinterManager.applyState(currentPrinter, elements);
@@ -78,20 +52,6 @@ export default class PrinterManager {
         return o._id == currentIndex;
       });
       currentPrinter = printers[id];
-      const printerDrop = document.getElementById("printerSelection");
-      printerDrop.innerHTML = "";
-      printerControlList.forEach((list) => {
-        if (list.state.category !== "Offline") {
-          printerDrop.insertAdjacentHTML(
-            "beforeend",
-            `
-                  <option value="${list.printerID}" selected>${list.printerName}</option>
-              `
-          );
-        }
-      });
-      printerDrop.value = currentPrinter._id;
-
       const elements = await PrinterManager.grabPage();
       PrinterManager.applyState(currentPrinter, elements);
       PrinterManager.applyTemps(currentPrinter, elements);

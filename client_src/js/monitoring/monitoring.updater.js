@@ -28,14 +28,7 @@ import {
   drawGroupViewContainers,
   drawGroupViewPrinters
 } from "./monitoring.templates";
-import { massDragAndDropId, mapRealLimits, groupWidth } from "../group/group.options";
-import {
-  cleanPrinterName,
-  combineSubAndNormalCoords,
-  convertPrinterURLToXYCoordinate,
-  findPrinterWithBlockCoordinate,
-  parseGroupLocation
-} from "../group/group.utils";
+import PrinterTerminalManager from "../lib/modules/printerTerminalManager";
 
 const elems = [];
 let powerTimer = 20000;
@@ -76,6 +69,14 @@ function addListeners(printer) {
     const controlList = getControlList();
     await PrinterFileManager.init(printer._id, printerInfo, controlList);
   });
+  document
+    .getElementById(`printerTerminalButton-${printer._id}`)
+    .addEventListener("click", async () => {
+      currentOpenModal.innerHTML = "Printer Terminal: ";
+      const printerInfo = getPrinterInfo();
+      const controlList = getControlList();
+      await PrinterTerminalManager.init(printer._id, printerInfo, controlList);
+    });
 
   //Play button listeners
   let playBtn = document.getElementById("play-" + printer._id);
@@ -703,6 +704,7 @@ export async function initMonitoring(printers, clientSettings, view) {
       } else if (currentOpenModal.innerHTML.includes("Control")) {
         PrinterManager.init("", printers, getControlList());
       } else if (currentOpenModal.innerHTML.includes("Terminal")) {
+        PrinterTerminalManager.init("", printers, getControlList());
       }
       break;
     case false:

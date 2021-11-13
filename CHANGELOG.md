@@ -25,6 +25,7 @@ All notable changes to this project will be documented in this file.
   - New section in System for Release Notes. This will display the current version changes from the previous version.
   - New user CRUD endpoints: /users/users. Required administrator rights to access.
   - New system tab called "Users". Can created, edit, read, update all users. There is also a password reset option.
+  - You can now see UserLoggedIn/UserLoggedOut/ClientAuthed/ClientClosed events for OctoPrints websocket and user interface in the Printer Managers connections log.
 
 ### Changed
 
@@ -37,16 +38,8 @@ All notable changes to this project will be documented in this file.
   - Cleaned up OctoPrint Management icons, no longer all the plug.
   - Continual work on improving readability and contrast across the application.
   - Dashboard statistics are now produced on demand, should improve loading times a touch.
-  - Printer Action buttons have been given a new breath of life. They are now a full bar of main actions with a dropdown for lesser used actions.
-    - From left to right:
-      - File Manager: New modal that just brings up the file manager, allowing a quicker access to starting prints, also includes the custom gcode buttons.
-      - Printer Control: Same as before, Got a refactor to keep it all on a page without scrolling, and now nicely collapses for mobile views.
-      - Quick Connect: Same as before.
-      - Power Toggle: Same as before, if a power control is setup for printer it will display the toggle button. The previous dropdown for further actions has been removed.
-      - Dropdown menu:
-        - Starts with lesser used functions: Web Interface, Terminal (new modal for terminal focus, includes custom gcode), Re-sync printers.
-        - Normal OctoPrint related power commands: Restart OP, Reboot and shutdown host.
-        - Any inputted power function buttons so turn on/off printer.
+  - Printer Action buttons have been split up. I've left Web, Quick connect, ReSync and Power on the top bars for printer actions. Then the Printer Control from before has been split up.
+    - Printer control is now Files, Control and Terminal. You will find these on most of the views in various places. 
   - Client settings are no longer global. They are now attached to a user, so different users can have different settings/dashboard configurations.
 
 ### Removed
@@ -72,6 +65,8 @@ All notable changes to this project will be documented in this file.
   - Fixed issue where user could enter updated URL with http:// prefix and would cause errors in backend.
   - Fixed an issue where the client would repeatedly * printer amount call for filament manager settings...
   - Fixed changelog been considered a block via parsers.
+  - Fixed the buggy behaviour of the printer swap drop down in Printer Control.  
+
 # Security
   - Protected all system settings endpoints by ensuring user is Administrator.
 

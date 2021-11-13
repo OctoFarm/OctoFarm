@@ -5,13 +5,6 @@ import OctoFarmClient from "../../../services/octofarm-client.service";
 
 function returnActionBtnTemplate(id) {
   return `
-
-      <button title="Open OctoPrint"
-         id="printerWeb-${id}"
-         type="button"
-         class="tag btn btn-info btn-sm"
-         target="_blank"
-         href="" role="button"><i class="fas fa-globe-europe"></i></button>
       <button  
          title="Quickly connect/disconnect your printer"
          id="printerQuickConnect-${id}"
@@ -20,7 +13,7 @@ function returnActionBtnTemplate(id) {
          >
             <i class="fas fa-toggle-off"></i>
       </button>
-            <button  
+      <button  
          title="Re-Sync your printers connection"
          id="printerSyncButton-${id}"
          type="button"
@@ -79,6 +72,7 @@ function printerQuickDisconnected(id) {
 
 function init(printer, element) {
   document.getElementById(element).innerHTML = `
+    ${printerWebBtn(printer._id, printer.printerURL)}
     ${returnActionBtnTemplate(printer._id)}
   `;
   PowerButton.applyBtn(printer);
@@ -91,11 +85,8 @@ function init(printer, element) {
   } else {
     printerQuickDisconnected(printer._id);
   }
-  if (printer.printerState.colour.category === "Offline") {
-    document.getElementById("printerQuickConnect-" + printer._id).disabled = true;
-  } else {
-    document.getElementById("printerQuickConnect-" + printer._id).disabled = false;
-  }
+  document.getElementById("printerQuickConnect-" + printer._id).disabled =
+    printer.printerState.colour.category === "Offline";
 
   document.getElementById("printerWeb-" + printer._id).href = printer.printerURL;
 
@@ -210,7 +201,7 @@ function addEventListeners(printer) {
   document
     .getElementById(`printerSyncButton-${printer._id}`)
     .addEventListener("click", async (e) => {
-      e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i> Syncing...";
+      e.target.innerHTML = "<i class='fas fa-sync fa-spin'></i>";
       e.target.disabled = true;
       const data = {
         id: printer._id
@@ -222,7 +213,7 @@ function addEventListeners(printer) {
         UI.createAlert("error", post.msg.msg, 3000, "clicked");
       }
 
-      e.target.innerHTML = "<i class='fas fa-sync'></i> Re-Sync Printer";
+      e.target.innerHTML = "<i class='fas fa-sync'></i>";
       e.target.disabled = false;
     });
 }

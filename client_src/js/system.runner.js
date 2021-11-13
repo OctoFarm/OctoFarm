@@ -27,6 +27,7 @@ import {
   fillInEditInformation
 } from "./system/server.actions";
 import { serverBootBoxOptions } from "./system/utils/bootbox.options";
+import { removeLocalStorage } from "./services/local-storage.service";
 
 // Setup Page
 for (const key in serverDatabaseKeys) {
