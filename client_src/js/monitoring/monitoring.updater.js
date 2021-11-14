@@ -476,10 +476,6 @@ async function updateState(printer, clientSettings, view, index) {
     //Set the buttons
     if (elements.start) {
       elements.start.disabled = true;
-      if (view === "camera") {
-        elements.start.classList.add("hidden");
-        elements.stop.classList.remove("hidden");
-      }
     }
     if (elements.stop) {
       elements.stop.disabled = false;
@@ -487,17 +483,13 @@ async function updateState(printer, clientSettings, view, index) {
 
     if (printer.printerState.state === "Pausing") {
       if (elements.start) {
-        if (view === "panel") {
-          elements.start.classList.remove("hidden");
-        }
+        elements.start.classList.remove("hidden");
       }
       if (elements.stop) {
         elements.stop.disabled = false;
       }
       if (elements.resume) {
-        if (view === "panel") {
-          elements.resume.classList.add("hidden");
-        }
+        elements.resume.classList.add("hidden");
       }
       if (elements.pause) {
         elements.pause.disabled = true;
@@ -509,9 +501,7 @@ async function updateState(printer, clientSettings, view, index) {
       }
     } else if (printer.printerState.state === "Paused") {
       if (elements.start) {
-        if (view === "panel") {
-          elements.start.classList.add("hidden");
-        }
+        elements.start.classList.add("hidden");
       }
       if (elements.resume) {
         elements.resume.disabled = false;
@@ -528,9 +518,7 @@ async function updateState(printer, clientSettings, view, index) {
       }
     } else {
       if (elements.start) {
-        if (view === "panel" && view === "camera") {
-          elements.start.classList.remove("hidden");
-        }
+        elements.start.classList.remove("hidden");
       }
 
       if (elements.resume) {
@@ -557,10 +545,6 @@ async function updateState(printer, clientSettings, view, index) {
       elements.row.classList.remove(hideOffline);
     }
     if (printer.currentJob !== null && printer.currentJob.fileName !== "No File Selected") {
-      if (view === "camera") {
-        elements.start.classList.remove("hidden");
-        elements.stop.classList.add("hidden");
-      }
       if (elements.start) {
         elements.start.disabled = false;
       }
@@ -595,9 +579,7 @@ async function updateState(printer, clientSettings, view, index) {
     }
     if (printer.printerState.state === "Paused") {
       if (elements.start) {
-        if (view === "panel") {
-          elements.start.classList.add("hidden");
-        }
+        elements.start.classList.add("hidden");
       }
       if (elements.stop) {
         elements.stop.disabled = false;
@@ -616,9 +598,7 @@ async function updateState(printer, clientSettings, view, index) {
       }
     } else {
       if (elements.start) {
-        if (view === "panel") {
-          elements.start.classList.remove("hidden");
-        }
+        elements.start.classList.remove("hidden");
       }
       if (elements.resume) {
         elements.resume.disabled = true;
@@ -634,18 +614,12 @@ async function updateState(printer, clientSettings, view, index) {
       }
     }
   } else if (printer.printerState.state === "Disconnected") {
-    if (view === "camera") {
-      elements.start.classList.remove("hidden");
-      elements.stop.classList.add("hidden");
-    }
     if (hideClosed !== "") {
       elements.row.classList.add(hideClosed);
     }
     if (elements.start) {
       elements.start.disabled = true;
-      if (view === "panel") {
-        elements.start.classList.remove("hidden");
-      }
+      elements.start.classList.remove("hidden");
     }
     if (elements.stop) {
       elements.stop.disabled = true;
@@ -663,18 +637,12 @@ async function updateState(printer, clientSettings, view, index) {
       elements.restart.classList.add("hidden");
     }
   } else if (printer.printerState.colour.category === "Offline") {
-    if (view === "camera") {
-      elements.start.classList.remove("hidden");
-      elements.stop.classList.add("hidden");
-    }
     if (hideOffline !== "") {
       elements.row.classList.add(hideOffline);
     }
     if (elements.start) {
       elements.start.disabled = true;
-      if (view === "panel") {
-        elements.start.classList.remove("hidden");
-      }
+      elements.start.classList.remove("hidden");
     }
     if (elements.stop) {
       elements.stop.disabled = true;

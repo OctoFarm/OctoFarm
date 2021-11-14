@@ -32,14 +32,14 @@ function isHidden(state, clientSettings) {
   let hidden = "";
   if (state === "Offline" && clientSettings.views.showOffline) {
     hidden = "hidden";
-  } else if (state === "Disconnected" && clientSettings.views.showDisonnected) {
+  } else if (state === "Disconnected" && clientSettings.views.showDisconnected) {
     hidden = "hidden";
   }
   return hidden;
 }
 //TODO move this out to sevice
 function checkPrinterRows(clientSettings) {
-  if (!clientSettings) {
+  if (clientSettings) {
     return clientSettings.views.cameraColumns;
   } else {
     return 2;
@@ -135,7 +135,7 @@ export function drawListView(printer, clientSettings) {
 
   if (printer.currentProfile !== null) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += "<div class=\"btn-group btn-block m-0\" role=\"group\" aria-label=\"Basic example\">";
+      toolList += '<div class="btn-group btn-block m-0" role="group" aria-label="Basic example">';
       toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
       toolList += "</div>";
     }
@@ -177,9 +177,40 @@ export function drawListView(printer, clientSettings) {
           <td id="state-${printer._id}" class="py-auto">
            ${printer.printerState.state}
           </td>
-          <td id="printerActionBtns-${printer._id}" class="py-auto">
-
-          </td> 
+          <td class="py-auto">
+                                    <button
+                            title="Select and Manager your printers files"
+                            id="printerFilesBtn-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-warning mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal"
+                          >
+                            <i class="fas fa-file-code"></i>
+                          </button>
+                          <button
+                                  title="Control your printer"
+                            id="printerButton-${printer._id}"
+                            type="button"
+                            class="tag btn btn-outline-success mt-1 mb-1 btn-sm"
+                            role="button"
+                            data-toggle="modal"
+                            data-target="#printerManagerModal"
+                          >
+                            <i class="fas fa-print"></i>
+                          </button>
+                          <button  
+                           title="Printers Terminal"
+                           id="printerTerminalButton-${printer._id}"
+                           type="button"
+                           class="tag btn btn-outline-info btn-sm"
+                           data-toggle="modal"
+                           data-target="#printerManagerModal"
+                           >
+                              <i class="fas fa-terminal"></i>
+                        </button>
+          </td>
           <td class="py-auto">
                     <button
                             title="Start your currently selected print"
@@ -232,40 +263,9 @@ export function drawListView(printer, clientSettings) {
                             <i class="fas fa-square"></i>
                           </button>
           </td>
-          <td class="py-auto">
-                                    <button
-                            title="Select and Manager your printers files"
-                            id="printerFilesBtn-${printer._id}"
-                            type="button"
-                            class="tag btn btn-outline-warning mt-1 mb-1 btn-sm"
-                            role="button"
-                            data-toggle="modal"
-                            data-target="#printerManagerModal"
-                          >
-                            <i class="fas fa-file-code"></i>
-                          </button>
-                          <button
-                                  title="Control your printer"
-                            id="printerButton-${printer._id}"
-                            type="button"
-                            class="tag btn btn-outline-success mt-1 mb-1 btn-sm"
-                            role="button"
-                            data-toggle="modal"
-                            data-target="#printerManagerModal"
-                          >
-                            <i class="fas fa-print"></i>
-                          </button>
-                          <button  
-                           title="Printers Terminal"
-                           id="printerTerminalButton-${printer._id}"
-                           type="button"
-                           class="tag btn btn-outline-info btn-sm"
-                           data-toggle="modal"
-                           data-target="#printerManagerModal"
-                           >
-                              <i class="fas fa-terminal"></i>
-                        </button>
-          </td>
+            <td id="printerActionBtns-${printer._id}" class="py-auto">
+
+          </td> 
           <td class="py-auto">
           <p id="currentFile-${printer._id}" title="Loading..." class="mb-1 tag">
             <i class="fas fa-file-code"></i> No File Selected </p>
@@ -303,7 +303,7 @@ export function drawPanelView(printer, clientSettings) {
   let environment = "";
   if (printer.currentProfile !== null) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += "<div class=\"btn-group btn-block m-0\" role=\"group\" aria-label=\"Basic example\">";
+      toolList += '<div class="btn-group btn-block m-0" role="group" aria-label="Basic example">';
       toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
       toolList += "</div>";
     }
@@ -385,7 +385,7 @@ export function drawPanelView(printer, clientSettings) {
                             role="button"
                             disabled
                           >
-                            <i class="fas fa-print"></i> Print
+                            <i class="fas fa-play-circle"></i> Print
                           </button>
                           <button
                                   title="Pause your current print"
@@ -496,7 +496,9 @@ export function drawCameraView(printer, clientSettings) {
     hidden = "hidden";
   }
   const name = printer.printerName;
+
   const printerRows = checkPrinterRows(clientSettings);
+
   let cameraElement = imageOrCamera(printer);
 
   let toolList = "";
@@ -592,57 +594,62 @@ export function drawCameraView(printer, clientSettings) {
             0%
             </div>
           </div>
-          <small>
+          <div class="row">
+            <div class="col-lg-12 camButtons">
+                        <small class="float-right pr-2">
                          <button
                             title="Start your currently selected print"
                             id="play-${printer._id}"
                             type="button"
-                            class="tag btn btn-success mt-1 mb-1 btn-sm"
+                            class="tag btn btn-outline-success mt-1 mb-1 btn-sm"
                             role="button"
                             disabled
                           >
-                            <i class="fas fa-print"></i> Print
+                            <i class="fas fa-play-circle"></i>
                           </button>
                           <button
                                   title="Pause your current print"
                             id="pause-${printer._id}"
                             type="button"
-                            class="tag btn btn-light mt-1 mb-1 btn-sm"
+                            class="tag btn btn-outline-light mt-1 mb-1 hidden btn-sm"
                             role="button"
                             disabled
                           >
-                            <i class="fas fa-pause"></i> Pause
+                            <i class="fas fa-pause"></i>
                           </button>
                           <button
                             title="Restart your current print"
                             id="restart-${printer._id}"
                             type="button"
-                            class="tag btn btn-danger mt-1 mb-1 hidden btn-sm"
+                            class="tag btn btn-outline-danger mt-1 mb-1 hidden btn-sm"
                             role="button"
                             disabled
                           >
-                            <i class="fas fa-undo"></i> Restart
+                            <i class="fas fa-undo"></i>
                           </button>
                           <button
                                   title="Resume your current print"
                             id="resume-${printer._id}"
                             type="button"
-                            class="tag btn btn-success mt-1 mb-1 hidden btn-sm"
+                            class="tag btn btn-outline-success mt-1 mb-1 hidden btn-sm"
                             role="button"
                             disabled
                           >
-                            <i class="fas fa-redo"></i> Resume
+                            <i class="fas fa-redo"></i>
                           </button>
                           <button
                                   title="Stop your current print"
                             id="cancel-${printer._id}"
                             type="button"
-                            class="tag btn btn-danger mt-1 mb-1 btn-sm"
+                            class="tag btn btn-outline-danger mt-1 mb-1 btn-sm"
                             role="button"
                             disabled
                           >
-                            <i class="fas fa-square"></i> Cancel
-                          </button> <br>
+                            <i class="fas fa-square"></i>
+                          </button>
+                          
+                         </small>
+                          <small class="float-left">
                           <button
                             title="Select and Manager your printers files"
                             id="printerFilesBtn-${printer._id}"
@@ -652,7 +659,7 @@ export function drawCameraView(printer, clientSettings) {
                             data-toggle="modal"
                             data-target="#printerManagerModal"
                           >
-                            <i class="fas fa-file-code"></i> Files
+                            <i class="fas fa-file-code"></i>
                           </button>
                           <button
                                   title="Control your printer"
@@ -663,7 +670,7 @@ export function drawCameraView(printer, clientSettings) {
                             data-toggle="modal"
                             data-target="#printerManagerModal"
                           >
-                            <i class="fas fa-print"></i> Control
+                            <i class="fas fa-print"></i>
                           </button>
                           <button  
                            title="Printers Terminal"
@@ -673,9 +680,12 @@ export function drawCameraView(printer, clientSettings) {
                            data-toggle="modal"
                            data-target="#printerManagerModal"
                            >
-                              <i class="fas fa-terminal"></i> Terminal
+                              <i class="fas fa-terminal"></i>
                         </button>
-          </small>
+   
+            </div>
+          </div>
+
         </div>
       </div>
     </div>
@@ -690,20 +700,20 @@ export function drawCombinedView(printer, clientSettings) {
   let environment = "";
   if (printer.currentProfile !== null) {
     for (let e = 0; e < printer.currentProfile.extruder.count; e++) {
-      toolList += "<div class=\"btn-group btn-block mb-1\" role=\"group\" aria-label=\"Basic example\">";
+      toolList += '<div class="btn-group btn-block mb-1" role="group" aria-label="Basic example">';
       toolList += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Tool ${e} </b></button><button disabled id="${printer._id}-spool-${e}" type="button" class="btn btn-secondary  btn-sm"> No Spool </button><button id="${printer._id}-temperature-${e}" type="button" class="btn btn-secondary btn-sm" disabled><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</button>`;
       toolList += "</div>";
     }
 
     if (printer.currentProfile.heatedBed) {
       environment +=
-        "<div class=\"btn-group btn-block mb-1\" role=\"group\" aria-label=\"Basic example\">";
+        '<div class="btn-group btn-block mb-1" role="group" aria-label="Basic example">';
       environment += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Bed: </b></button><button type="button" class="btn btn-secondary btn-sm" disabled><span id="badTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span></button>`;
       environment += "</div>";
     }
     if (printer.currentProfile.heatedChamber) {
       environment +=
-        "<div class=\"btn-group btn-block mb-1\" role=\"group\" aria-label=\"Basic example\">";
+        '<div class="btn-group btn-block mb-1" role="group" aria-label="Basic example">';
       environment += `<button type="button" class="btn btn-secondary btn-sm" disabled><b>Chamber: </b></button><button type="button" class="btn btn-secondary btn-sm" disabled><span  id="chamberTemp-${printer._id}"><i class="far fa-circle "></i> 0°C <i class="fas fa-bullseye"></i> 0°C</span></button>`;
       environment += "</div>";
     }
@@ -734,7 +744,7 @@ export function drawCombinedView(printer, clientSettings) {
                 <div class="${columns.mainColumn}">
      
                    <div class="row">
-                        <div class="col-sm-6 col-md-8 col-lg-6">
+                        <div class="col-sm-12 col-md-12 col-lg-6">
                           <button
                             id="name-${printer._id}"
                             type="button"
@@ -745,7 +755,7 @@ export function drawCombinedView(printer, clientSettings) {
                             ${name}
                           </button>
                         </div>
-                        <div class="col-sm-6 col-md-1 col-lg-4">
+                        <div class="col-sm-6 col-md-6 col-lg-4">
                           <button
                             id="state-${printer._id}"
                             type="button"
@@ -756,7 +766,7 @@ export function drawCombinedView(printer, clientSettings) {
                             ${printer.printerState.state}
                           </button>
                         </div>
-                        <div class="col-sm-6 col-md-3 col-lg-2">
+                        <div class="col-sm-6 col-md-6 col-lg-2">
                          <small class="float-right" id="printerActionBtns-${printer._id}">
 
                           </small>
@@ -781,7 +791,7 @@ export function drawCombinedView(printer, clientSettings) {
                      </div> 
                    </div> 
                    <div class="row">
-                      <div class="col-sm-12 col-md-4 col-lg-6">
+                      <div class="col-sm-12 col-md-12 col-lg-8">
                         <button
                                 id="currentFile-${printer._id}"
                                 type="button"
@@ -793,7 +803,7 @@ export function drawCombinedView(printer, clientSettings) {
                             <i class="fas fa-file-code" ></i> No File Selected
                         </button>
                         <div class="row">
-                        <div class="col-sm-12 col-md-4 col-lg-4 text-center">
+                        <div class="col-sm-12 col-md-6 col-lg-6 text-center">
                           <button
                             title="Start your currently selected print"
                             id="play-${printer._id}"
@@ -877,7 +887,7 @@ export function drawCombinedView(printer, clientSettings) {
                               <i class="fas fa-terminal"></i> Terminal
                         </button>
                         </div>
-                        <div class="col-sm-12 col-md-8 col-lg-8 text-center">
+                        <div class="col-sm-12 col-md-6 col-lg-6 text-center">
                            <div class="row">
                             <div class="col-12">
                               <small id="displayLayerProgressData-${printer._id}"></small>
@@ -894,7 +904,7 @@ export function drawCombinedView(printer, clientSettings) {
                         </div>  
                         </div>
                       </div>
-                      <div class="col-sm-12 col-md-8 col-lg-6">
+                      <div class="col-sm-12 col-md-12 col-lg-4">
                         <div
                           id="listFilament-${printer._id}" disabled
                           class="bg-dark"

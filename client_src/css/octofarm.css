@@ -363,10 +363,9 @@ a.notyet {
 /*  height: 90vh;*/
 /*}*/
 
-.camButtons {
+.camButtons{
   position: absolute;
-  bottom: 25px;
-  right: 7px;
+  bottom: 15px;
   z-index: 1000;
 }
 .camName {
