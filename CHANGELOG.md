@@ -26,6 +26,7 @@ All notable changes to this project will be documented in this file.
   - New user CRUD endpoints: /users/users. Required administrator rights to access.
   - New system tab called "Users". Can created, edit, read, update all users. There is also a password reset option.
   - You can now see UserLoggedIn/UserLoggedOut/ClientAuthed/ClientClosed events for OctoPrints websocket and user interface in the Printer Managers connections log.
+  - New columns setting for the Group Views, added in System -> Client -> Views. 
 
 ### Changed
 

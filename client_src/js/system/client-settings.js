@@ -17,6 +17,12 @@ export default class ClientSettings {
       document.getElementById("selectCameraGrid").value = 2;
     }
 
+    if (clientSettings.views.groupColumns) {
+      document.getElementById("selectGroupGrid").value = clientSettings.views.groupColumns;
+    } else {
+      document.getElementById("selectGroupGrid").value = 2;
+    }
+
     if (clientSettings.dashboard) {
       document.getElementById("currentOperations").checked =
         clientSettings.dashboard.farmActivity.currentOperations;

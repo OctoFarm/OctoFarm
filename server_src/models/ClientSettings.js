@@ -145,6 +145,11 @@ const ClientSettingsSchema = new mongoose.Schema({
       type: Number,
       required: true,
       default: 3
+    },
+    groupColumns: {
+      type: Number,
+      required: true,
+      default: 4
     }
   }
 });

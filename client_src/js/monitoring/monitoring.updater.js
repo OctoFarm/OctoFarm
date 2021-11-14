@@ -23,8 +23,6 @@ import {
   drawPanelView,
   drawListView,
   drawCombinedView,
-  drawGroupView,
-  drawMassDragAndDropPanel,
   drawGroupViewContainers,
   drawGroupViewPrinters
 } from "./monitoring.templates";
@@ -690,39 +688,39 @@ export async function initMonitoring(printers, clientSettings, view) {
             let printerHTML = drawCameraView(printers[p], clientSettings);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else if (view === "group") {
+            drawGroupViewContainers(printers, printerArea, clientSettings);
             const groupContainerElement = document.getElementById(
               `Group-${encodeURIComponent(printers[p].group)}`
             );
-            if (!groupContainerElement) {
-              const groupContainer = drawGroupViewContainers(printers[p]);
-              printerArea.insertAdjacentHTML("beforeend", groupContainer);
-            } else {
-              const groupPrinter = drawGroupViewPrinters(printers[p]);
-              groupContainerElement.insertAdjacentHTML("beforeend", groupPrinter);
-            }
+            const groupPrinter = drawGroupViewPrinters(printers[p]);
+            groupContainerElement.insertAdjacentHTML("beforeend", groupPrinter);
           } else if (view === "combined") {
             let printerHTML = drawCombinedView(printers[p], clientSettings);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else {
             console.error("printerPanel could not determine view type to update", view);
           }
-          //Update the printer panel to the actual one
-          printerPanel = document.getElementById("panel-" + printers[p]._id);
-          //Setup Action Buttons
-          await actionButtonInit(printers[p], `printerActionBtns-${printers[p]._id}`);
-          //Add page listeners
-          addListeners(printers[p]);
-          //Grab elements
-          await grabElements(printers[p]);
-          //Initialise Drag and Drop
-          await dragAndDropEnable(printerPanel, printers[p]);
+
+          if (view !== "group") {
+            //Update the printer panel to the actual one
+            printerPanel = document.getElementById("panel-" + printers[p]._id);
+            //Setup Action Buttons
+            await actionButtonInit(printers[p], `printerActionBtns-${printers[p]._id}`);
+            //Add page listeners
+            addListeners(printers[p]);
+            //Grab elements
+            await grabElements(printers[p]);
+            //Initialise Drag and Drop
+            await dragAndDropEnable(printerPanel, printers[p]);
+          } else {
+          }
         } else {
           if (!printerManagerModal.classList.contains("show")) {
             if (!dragCheck()) {
-              await updateState(printers[p], clientSettings, view, p);
+              // await updateState(printers[p], clientSettings, view, p);
             }
             if (powerTimer >= 20000) {
-              await PowerButton.applyBtn(printers[p]);
+              // await PowerButton.applyBtn(printers[p]);
               powerTimer = 0;
             } else {
               powerTimer += 500;

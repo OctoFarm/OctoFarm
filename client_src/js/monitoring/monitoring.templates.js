@@ -8,6 +8,7 @@ import {
   selectableTilePrefix,
   stopButtonIdPrefix
 } from "../group/group.options";
+import { sortAlphaNum } from "../system/utils/array.utils";
 //TODO move this out to sevice
 function isRotated(otherSettings) {
   let flipH = "";
@@ -41,6 +42,13 @@ function isHidden(state, clientSettings) {
 function checkPrinterRows(clientSettings) {
   if (clientSettings) {
     return clientSettings.views.cameraColumns;
+  } else {
+    return 2;
+  }
+}
+function checkGroupColumns(clientSettings) {
+  if (clientSettings) {
+    return clientSettings.views.groupColumns;
   } else {
     return 2;
   }
@@ -923,24 +931,31 @@ export function drawCombinedView(printer, clientSettings) {
     `;
 }
 
-export function drawGroupViewContainers(printer, clientSettings) {
-  if (!printer?.group) {
-    return;
-  }
-
-  const cleanGroup = encodeURIComponent(printer.group);
-  return `
-      <div class="col-lg-3">
-        <div class="card">
-          <div class="card-header">
-            ${printer.group}
-          </div>
-          <div class="row" id="Group-${cleanGroup}">
-
-          </div>
-        </div> 
-      </div>
-    `;
+export function drawGroupViewContainers(printers, printerArea, clientSettings) {
+  const uniqueGroupList = [...new Set(printers.map((printer) => printer.group))];
+  const sortedUniqueGroupList = uniqueGroupList.sort(sortAlphaNum);
+  const groupColumns = checkGroupColumns(clientSettings);
+  sortedUniqueGroupList.forEach((group) => {
+    const cleanGroup = encodeURIComponent(group);
+    const skipElement = document.getElementById(`Group-${cleanGroup}`);
+    if (!skipElement) {
+      printerArea.insertAdjacentHTML(
+        "beforeend",
+        `
+            <div class="col-lg-${groupColumns}">
+              <div class="card">
+                <div class="card-header">
+                  ${group}
+                </div>
+                <div class="row" id="Group-${cleanGroup}">
+      
+                </div>
+              </div> 
+            </div>
+    `
+      );
+    }
+  });
 }
 
 export function drawGroupViewPrinters(printer) {
@@ -948,9 +963,6 @@ export function drawGroupViewPrinters(printer) {
         <div class="col-lg-6">
           <div id="panel-${printer._id}" class="card text-white bg-dark">
             <div class="card-header">${printer.printerName}</div>
-            <div class="card-body">
-              <h5 class="card-title">Dark card title</h5>
-            </div>
           </div>
         </div>
     `;
