@@ -68,7 +68,8 @@ export default class ClientSettings {
         currentOperations: document.getElementById("panelCurrentOpOn").checked,
         showOffline: document.getElementById("panelHideOffline").checked,
         showDisconnected: document.getElementById("panelHideClosed").checked,
-        cameraColumns: document.getElementById("selectCameraGrid").value
+        cameraColumns: document.getElementById("selectCameraGrid").value,
+        groupColumns: document.getElementById("selectGroupGrid").value
       },
 
       dashboard: {

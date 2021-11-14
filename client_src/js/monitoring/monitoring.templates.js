@@ -1,13 +1,3 @@
-import {
-  gutterHalfSize,
-  massDragAndDropId,
-  massDragAndDropStatusId,
-  panelPrefix,
-  quickActionsButtonIdPrefix,
-  quickActionsModalId,
-  selectableTilePrefix,
-  stopButtonIdPrefix
-} from "../group/group.options";
 import { sortAlphaNum } from "../system/utils/array.utils";
 //TODO move this out to sevice
 function isRotated(otherSettings) {
@@ -820,7 +810,7 @@ export function drawCombinedView(printer, clientSettings) {
                             role="button"
                             disabled
                           >
-                            <i class="fas fa-print"></i> Print
+                            <i class="fas fa-play-circle"></i> Print
                           </button>
                           <button
                                   title="Pause your current print"
@@ -942,10 +932,86 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
       printerArea.insertAdjacentHTML(
         "beforeend",
         `
-            <div class="col-lg-${groupColumns}">
+            <div id="dropPanel-${cleanGroup}" class="col-lg-${groupColumns}">
               <div class="card">
-                <div class="card-header">
+                <div class="card-header dashHeader">
                   ${group}
+                  <small class="float-right" id="printerActionBtns-${cleanGroup}">
+
+                  </small>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12 py-0 px-0 my-0 mx-0">
+                     <div class="progress">
+                        <div class="d-none percent">Loading...</div>
+                        <div
+                          id="progress-${groupColumns}"
+                          class="progress-bar progress-bar-striped percent"
+                          role="progressbar"
+                          style="width: 0%"
+                          aria-valuenow="10"
+                          aria-valuemin="0"
+                          aria-valuemax="100"
+                        >
+                        0%
+                        </div>
+                      </div>        
+                    </div>
+                </div>
+           
+                <div class="row">
+                    <div class="col-12 text-center">   
+                      <button
+                            title="Start your currently selected print"
+                            id="play-${cleanGroup}"
+                            type="button"
+                            class="tag btn btn-success mt-1 mb-1 btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-play-circle"></i> Print
+                          </button>
+                      <button
+                                  title="Pause your current print"
+                            id="pause-${cleanGroup}"
+                            type="button"
+                            class="tag btn btn-light mt-1 mb-1 btn-sm"
+                            role="button"
+                            disabled
+                          >
+                            <i class="fas fa-pause"></i> Pause
+                          </button>
+                      <button
+                          title="Restart your current print"
+                          id="restart-${cleanGroup}"
+                          type="button"
+                          class="tag btn btn-danger mt-1 mb-1 hidden btn-sm"
+                          role="button"
+                          disabled
+                        >
+                          <i class="fas fa-undo"></i> Restart
+                        </button>
+                      <button
+                                title="Resume your current print"
+                          id="resume-${cleanGroup}"
+                          type="button"
+                          class="tag btn btn-success mt-1 mb-1 hidden btn-sm"
+                          role="button"
+                          disabled
+                        >
+                          <i class="fas fa-redo"></i> Resume
+                        </button>
+                      <button
+                                title="Stop your current print"
+                          id="cancel-${cleanGroup}"
+                          type="button"
+                          class="tag btn btn-danger mt-1 mb-1 btn-sm"
+                          role="button"
+                          disabled
+                        >
+                          <i class="fas fa-square"></i> Cancel
+                        </button>
+                    </div>
                 </div>
                 <div class="row" id="Group-${cleanGroup}">
       
@@ -959,11 +1025,24 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
 }
 
 export function drawGroupViewPrinters(printer) {
-  return `
-        <div class="col-lg-6">
+  printer.forEach((printer) => {
+    const cleanGroup = encodeURIComponent(printer.group);
+    const groupContainer = document.getElementById(`Group-${cleanGroup}`);
+    const skipElement = document.getElementById(`panel-${printer._id}`);
+    if (!skipElement) {
+      groupContainer.insertAdjacentHTML(
+        "beforeend",
+        `
+        <div class="col-sm-12 col-md-6 col-lg-6">
           <div id="panel-${printer._id}" class="card text-white bg-dark">
-            <div class="card-header">${printer.printerName}</div>
+            <div class="card-header dashHeader">
+                <span id="name-${printer._id}" class="badge badge-secondary float-left ml-1 py-1">${printer.printerName}</span><br>
+                <span id="state-${printer._id}" class="w-100 badge ${printer.printerState.colour.category} pl-0 text-wrap"> ${printer.printerState.state}</span>
+            </div>
           </div>
         </div>
-    `;
+    `
+      );
+    }
+  });
 }

@@ -1,7 +1,7 @@
 import {
   dragAndDropEnable,
   dragCheck,
-  dragAndDropEnableMultiplePrinters
+  dragAndDropGroupEnable
 } from "../lib/functions/dragAndDrop.js";
 import PrinterManager from "../lib/modules/printerManager.js";
 import PrinterFileManager from "../lib/modules/printerFileManager.js";
@@ -10,7 +10,9 @@ import UI from "../lib/functions/ui.js";
 import Calc from "../lib/functions/calc.js";
 import {
   checkQuickConnectState,
-  init as actionButtonInit
+  init as actionButtonInit,
+  groupInit as actionButtonGroupInit,
+  checkGroupQuickConnectState
 } from "../lib/modules/Printers/actionButtons.js";
 import OctoPrintClient from "../lib/octoprint.js";
 import { checkTemps } from "../lib/modules/temperatureCheck.js";
@@ -27,12 +29,15 @@ import {
   drawGroupViewPrinters
 } from "./monitoring.templates";
 import PrinterTerminalManager from "../lib/modules/printerTerminalManager";
+import { groupBy, mapValues } from "lodash";
 
 const elems = [];
+const groupElems = [];
 let powerTimer = 20000;
 let printerManagerModal = document.getElementById("printerManagerModal");
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
 let printerArea = document.getElementById("printerArea");
+let actionButtonsInitialised;
 
 document.getElementById("filterStates").addEventListener("change", (e) => {
   OctoFarmClient.get("client/updateFilter/" + e.target.value);
@@ -160,6 +165,105 @@ function addListeners(printer) {
   return "done";
 }
 
+function addGroupListeners(printers) {
+  const groupedPrinters = mapValues(groupBy(printers, "group"));
+  for (const key in groupedPrinters) {
+    if (groupedPrinters.hasOwnProperty(key)) {
+      const currentGroupEncoded = encodeURIComponent(key);
+      //Play button listeners
+      let playBtn = document.getElementById("play-" + currentGroupEncoded);
+      if (playBtn) {
+        playBtn.addEventListener("click", (e) => {
+          e.target.disabled = true;
+          for (let p = 0; p < groupedPrinters[key].length; p++) {
+            const printer = groupedPrinters[key][p];
+            const opts = {
+              command: "start"
+            };
+            const print = returnPrinterInfo(printer._id);
+            OctoPrintClient.jobAction(print, opts, e);
+          }
+        });
+      }
+      let cancelBtn = document.getElementById("cancel-" + currentGroupEncoded);
+      if (cancelBtn) {
+        cancelBtn.addEventListener("click", (e) => {
+          bootbox.confirm({
+            message: "Are you sure you want to cancel the ongoing prints?",
+            buttons: {
+              cancel: {
+                label: '<i class="fa fa-times"></i> Cancel'
+              },
+              confirm: {
+                label: '<i class="fa fa-check"></i> Confirm'
+              }
+            },
+            callback(result) {
+              if (result) {
+                e.target.disabled = true;
+                for (let p = 0; p < groupedPrinters[key].length; p++) {
+                  const printer = groupedPrinters[key][p];
+                  const print = returnPrinterInfo(printer._id);
+                  const opts = {
+                    command: "cancel"
+                  };
+                  OctoPrintClient.jobAction(print, opts, e);
+                }
+              }
+            }
+          });
+        });
+      }
+      let restartBtn = document.getElementById("restart-" + currentGroupEncoded);
+      if (restartBtn) {
+        restartBtn.addEventListener("click", (e) => {
+          e.target.disabled = true;
+          for (let p = 0; p < groupedPrinters[key].length; p++) {
+            const printer = groupedPrinters[key][p];
+            const opts = {
+              command: "restart"
+            };
+            const print = returnPrinterInfo(printer._id);
+            OctoPrintClient.jobAction(print, opts, e);
+          }
+        });
+      }
+      let pauseBtn = document.getElementById("pause-" + currentGroupEncoded);
+      if (pauseBtn) {
+        pauseBtn.addEventListener("click", (e) => {
+          e.target.disabled = true;
+          for (let p = 0; p < groupedPrinters[key].length; p++) {
+            const printer = groupedPrinters[key][p];
+            const opts = {
+              command: "pause",
+              action: "pause"
+            };
+            const print = returnPrinterInfo(printer._id);
+            OctoPrintClient.jobAction(print, opts, e);
+          }
+        });
+      }
+      let resumeBtn = document.getElementById("resume-" + currentGroupEncoded);
+      if (resumeBtn) {
+        resumeBtn.addEventListener("click", (e) => {
+          e.target.disabled = true;
+          for (let p = 0; p < groupedPrinters[key].length; p++) {
+            const printer = groupedPrinters[key][p];
+            const opts = {
+              command: "pause",
+              action: "resume"
+            };
+            const print = returnPrinterInfo(printer._id);
+            OctoPrintClient.jobAction(print, opts, e);
+          }
+        });
+      }
+    }
+  }
+
+  return "done";
+}
+
 function grabElements(printer) {
   if (typeof elems[printer._id] !== "undefined") {
     return elems[printer._id];
@@ -188,6 +292,22 @@ function grabElements(printer) {
       chamber: document.getElementById("chamberTemp-" + printer._id)
     };
     return elems[printer._id];
+  }
+}
+function grabGroupElements(group) {
+  if (typeof groupElems[group] !== "undefined") {
+    return groupElems[group];
+  } else {
+    groupElems[group] = {
+      name: document.getElementById("name-" + group),
+      start: document.getElementById("play-" + group),
+      stop: document.getElementById("cancel-" + group),
+      pause: document.getElementById("pause-" + group),
+      restart: document.getElementById("restart-" + group),
+      resume: document.getElementById("resume-" + group),
+      state: document.getElementById("state-" + group)
+    };
+    return groupElems[group];
   }
 }
 
@@ -452,13 +572,13 @@ async function updateState(printer, clientSettings, view, index) {
 
   if (
     typeof clientSettings.views.showOffline !== "undefined" &&
-    clientSettings.views.showDisonnected
+    clientSettings.views.showDisconnected
   ) {
     hideOffline = "hidden";
   }
   if (
     typeof clientSettings.views.showOffline !== "undefined" &&
-    clientSettings.views.showDisonnected
+    clientSettings.views.showDisconnected
   ) {
     hideClosed = "hidden";
   }
@@ -660,6 +780,301 @@ async function updateState(printer, clientSettings, view, index) {
   }
 }
 
+async function updateGroupState(printers, clientSettings, view) {
+  checkGroupQuickConnectState(printers);
+  printers.forEach((printer, index) => {
+    const elements = grabElements(printer);
+    if (typeof elements.row === "undefined") return;
+    elements.row.style.order = index;
+    if (printer.display) {
+      if (elements.row.style.display === "none") {
+        switch (view) {
+          case "list":
+            elements.row.style.display = "table";
+            break;
+          case "panel":
+            elements.row.style.display = "block";
+            break;
+          case "camera":
+            elements.row.style.display = "block";
+            break;
+          case "group":
+            elements.row.style.display = "flex";
+            break;
+          case "combined":
+            elements.row.style.display = "flex";
+            break;
+        }
+      }
+    } else {
+      if (elements.row.style.display !== "none") {
+        elements.row.style.display = "none";
+      }
+      return;
+    }
+
+    let hideOffline = "";
+    let hideClosed = "";
+
+    if (
+      typeof clientSettings.views.showOffline !== "undefined" &&
+      clientSettings.views.showDisconnected
+    ) {
+      hideOffline = "hidden";
+    }
+    if (
+      typeof clientSettings.views.showOffline !== "undefined" &&
+      clientSettings.views.showDisconnected
+    ) {
+      hideClosed = "hidden";
+    }
+
+    if (printer.printerState.colour.category === "Active") {
+      // Set the state
+      if (elements.row.classList.contains(hideClosed)) {
+        elements.row.classList.remove(hideClosed);
+      }
+      if (elements.row.classList.contains(hideOffline)) {
+        elements.row.classList.remove(hideOffline);
+      }
+    } else if (
+      printer.printerState.colour.category === "Idle" ||
+      printer.printerState.colour.category === "Complete"
+    ) {
+      if (elements.row.classList.contains(hideClosed)) {
+        elements.row.classList.remove(hideClosed);
+      }
+      if (elements.row.classList.contains(hideOffline)) {
+        elements.row.classList.remove(hideOffline);
+      }
+    } else if (printer.printerState.state === "Disconnected") {
+      if (hideClosed !== "") {
+        elements.row.classList.add(hideClosed);
+      }
+    } else if (printer.printerState.colour.category === "Offline") {
+      if (hideOffline !== "") {
+        elements.row.classList.add(hideOffline);
+      }
+    }
+
+    UI.doesElementNeedUpdating(printer.printerName, elements.name, "innerHTML");
+    UI.doesElementNeedUpdating(printer.printerState.state, elements.state, "innerHTML");
+    UI.doesElementNeedUpdating(
+      `w-100 badge ${printer.printerState.colour.category}`,
+      elements.state,
+      "classList"
+    );
+  });
+  const groupedPrinters = mapValues(groupBy(printers, "group"));
+  for (const key in groupedPrinters) {
+    if (groupedPrinters.hasOwnProperty(key)) {
+      const currentGroupEncoded = encodeURIComponent(key);
+      const elements = grabGroupElements(currentGroupEncoded);
+      const offlinePrinters = groupedPrinters[key].filter(
+        (obj) => obj.printerState.colour.category === "Offline"
+      ).length;
+      const disconnectedPrinters = groupedPrinters[key].filter(
+        (obj) => obj.printerState.state === "Disconnected"
+      ).length;
+      const idlePrinters = groupedPrinters[key].filter(
+        (obj) => obj.printerState.colour.category === "Idle"
+      ).length;
+      const completePrinters = groupedPrinters[key].filter(
+        (obj) => obj.printerState.colour.category === "Complete"
+      ).length;
+      const activePrinters = groupedPrinters[key].filter(
+        (obj) => obj.printerState.colour.category === "Active"
+      ).length;
+      const pausedPrinters = groupedPrinters[key].filter(
+        (obj) => obj.printerState.state === "Paused"
+      ).length;
+      const pausingPrinters = groupedPrinters[key].filter(
+        (obj) => obj.printerState.state === "Pausing"
+      ).length;
+      const filesSelected = groupedPrinters[key].filter(
+        (obj) => obj.currentJob.fileName !== "No File Selected"
+      ).length;
+
+      if (activePrinters === groupedPrinters[key].length) {
+        //Set the buttons
+        if (elements.start) {
+          elements.start.disabled = true;
+        }
+        if (elements.stop) {
+          elements.stop.disabled = false;
+        }
+
+        if (pausingPrinters === groupedPrinters[key].length) {
+          if (elements.start) {
+            elements.start.classList.remove("hidden");
+          }
+          if (elements.stop) {
+            elements.stop.disabled = false;
+          }
+          if (elements.resume) {
+            elements.resume.classList.add("hidden");
+          }
+          if (elements.pause) {
+            elements.pause.disabled = true;
+            elements.pause.classList.remove("hidden");
+          }
+          if (elements.restart) {
+            elements.restart.disabled = true;
+            elements.restart.classList.add("hidden");
+          }
+        } else if (pausedPrinters === groupedPrinters[key].length) {
+          if (elements.start) {
+            elements.start.classList.add("hidden");
+          }
+          if (elements.resume) {
+            elements.resume.disabled = false;
+            elements.resume.classList.remove("hidden");
+          }
+          if (elements.pause) {
+            elements.pause.disabled = true;
+            elements.pause.classList.add("hidden");
+          }
+          if (elements.restart) {
+            elements.restart.disabled = false;
+
+            elements.restart.classList.remove("hidden");
+          }
+        } else {
+          if (elements.start) {
+            elements.start.classList.remove("hidden");
+          }
+
+          if (elements.resume) {
+            elements.resume.disabled = true;
+            elements.resume.classList.add("hidden");
+          }
+          if (elements.pause) {
+            elements.pause.disabled = false;
+            elements.pause.classList.remove("hidden");
+          }
+          if (elements.restart) {
+            elements.restart.disabled = true;
+            elements.restart.classList.add("hidden");
+          }
+        }
+      } else if (
+        idlePrinters === groupedPrinters[key].length ||
+        completePrinters === groupedPrinters[key].length
+      ) {
+        if (filesSelected === groupedPrinters[key].length) {
+          if (elements.start) {
+            elements.start.disabled = false;
+          }
+          if (elements.stop) {
+            elements.stop.disabled = true;
+          }
+          if (elements.resume) {
+            elements.resume.disabled = true;
+          }
+          if (elements.pause) {
+            elements.pause.disabled = true;
+          }
+          if (elements.restart) {
+            elements.restart.disabled = true;
+          }
+        } else {
+          if (elements.start) {
+            elements.start.disabled = true;
+          }
+          if (elements.stop) {
+            elements.stop.disabled = true;
+          }
+          if (elements.resume) {
+            elements.resume.disabled = true;
+          }
+          if (elements.pause) {
+            elements.pause.disabled = true;
+          }
+          if (elements.restart) {
+            elements.restart.disabled = true;
+          }
+        }
+        if (pausedPrinters === groupedPrinters[key].length) {
+          if (elements.start) {
+            elements.start.classList.add("hidden");
+          }
+          if (elements.stop) {
+            elements.stop.disabled = false;
+          }
+          if (elements.resume) {
+            elements.resume.disabled = false;
+            elements.resume.classList.remove("hidden");
+          }
+          if (elements.pause) {
+            elements.pause.disabled = true;
+            elements.pause.classList.add("hidden");
+          }
+          if (elements.restart) {
+            elements.restart.disabled = false;
+            elements.restart.classList.remove("hidden");
+          }
+        } else {
+          if (elements.start) {
+            elements.start.classList.remove("hidden");
+          }
+          if (elements.resume) {
+            elements.resume.disabled = true;
+            elements.resume.classList.add("hidden");
+          }
+          if (elements.pause) {
+            elements.pause.disabled = true;
+            elements.pause.classList.remove("hidden");
+          }
+          if (elements.restart) {
+            elements.restart.disabled = true;
+            elements.restart.classList.add("hidden");
+          }
+        }
+      } else if (disconnectedPrinters === groupedPrinters[key].length) {
+        if (elements.start) {
+          elements.start.disabled = true;
+          elements.start.classList.remove("hidden");
+        }
+        if (elements.stop) {
+          elements.stop.disabled = true;
+        }
+        if (elements.resume) {
+          elements.resume.disabled = true;
+          elements.resume.classList.add("hidden");
+        }
+        if (elements.pause) {
+          elements.pause.disabled = true;
+          elements.pause.classList.remove("hidden");
+        }
+        if (elements.restart) {
+          elements.restart.disabled = true;
+          elements.restart.classList.add("hidden");
+        }
+      } else if (offlinePrinters === groupedPrinters[key].length) {
+        if (elements.start) {
+          elements.start.disabled = true;
+          elements.start.classList.remove("hidden");
+        }
+        if (elements.stop) {
+          elements.stop.disabled = true;
+        }
+        if (elements.resume) {
+          elements.resume.disabled = true;
+          elements.resume.classList.add("hidden");
+        }
+        if (elements.pause) {
+          elements.pause.disabled = true;
+          elements.pause.classList.remove("hidden");
+        }
+        if (elements.restart) {
+          elements.restart.disabled = true;
+          elements.restart.classList.add("hidden");
+        }
+      }
+    }
+  }
+}
+
 export async function initMonitoring(printers, clientSettings, view) {
   // Check if printer manager modal is opened
   switch (printerManagerModal.classList.contains("show")) {
@@ -689,11 +1104,7 @@ export async function initMonitoring(printers, clientSettings, view) {
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else if (view === "group") {
             drawGroupViewContainers(printers, printerArea, clientSettings);
-            const groupContainerElement = document.getElementById(
-              `Group-${encodeURIComponent(printers[p].group)}`
-            );
-            const groupPrinter = drawGroupViewPrinters(printers[p]);
-            groupContainerElement.insertAdjacentHTML("beforeend", groupPrinter);
+            drawGroupViewPrinters(printers);
           } else if (view === "combined") {
             let printerHTML = drawCombinedView(printers[p], clientSettings);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
@@ -713,20 +1124,33 @@ export async function initMonitoring(printers, clientSettings, view) {
             //Initialise Drag and Drop
             await dragAndDropEnable(printerPanel, printers[p]);
           } else {
+            if (!actionButtonsInitialised) {
+              //Setup Action Buttons
+              await actionButtonGroupInit(printers);
+
+              addGroupListeners(printers);
+              await dragAndDropGroupEnable(printers);
+              actionButtonsInitialised = true;
+            }
           }
         } else {
           if (!printerManagerModal.classList.contains("show")) {
             if (!dragCheck()) {
-              // await updateState(printers[p], clientSettings, view, p);
+              if (view !== "group") {
+                await updateState(printers[p], clientSettings, view, p);
+              }
             }
             if (powerTimer >= 20000) {
-              // await PowerButton.applyBtn(printers[p]);
+              //await PowerButton.applyBtn(printers[p]);
               powerTimer = 0;
             } else {
               powerTimer += 500;
             }
           }
         }
+      }
+      if (view === "group") {
+        await updateGroupState(printers, clientSettings, view);
       }
       break;
   }
