@@ -8,7 +8,7 @@
             </div>
         <% } %>
         <% if(!serviceInformation?.isPm2 && !serviceInformation?.isNodemon){ %>
-            <div class="alert alert-warning" role="alert">
+            <div class="alert alert-warning text-dark" role="alert">
                 Your system is not running with PM2! Some commands below may not work... Please
                 setup your system correctly as instructed here: <a
                         href='<%= instructionsURL %>' target='_blank'>Click Here</a>
@@ -21,7 +21,7 @@
         <% } %>
         <% let systemButtonsDisabled = false; %>
         <% if(serviceInformation?.isDockerContainer){ %>
-            <div class="alert alert-warning" role="alert">
+            <div class="alert alert-warning text-dark" role="alert">
                 TThe "Restart" and "Update" have all been disabled due to
                 Docker having it's own update mechanism
                 Please check the <a
@@ -32,7 +32,7 @@
             <% systemButtonsDisabled = true; %>
         <% } %>
         <% if(serviceInformation?.isNodemon && !serviceInformation?.isPm2){ %>
-            <div class="alert alert-warning" role="alert">
+            <div class="alert alert-warning text-dark" role="alert">
                 The "Restart" and "Update" functions have all been disabled due to not been
                 able to detect the use of the pm2 process manager.
                 Please check the <a target="_blank" href="<%= instructionsURL %>">Installation

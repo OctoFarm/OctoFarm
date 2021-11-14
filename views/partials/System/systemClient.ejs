@@ -47,7 +47,8 @@
             </div>
             <div class="tab-pane fade" id="system-monitoring" role="tabpanel"
                  aria-labelledby="dashboard-monitoring-list">
-                <p>Enable and disable different parts of the UI on the views
+                <h4>Views Visibility</h4>
+                <p>Enable and disable different parts of the UI on any of the views
                     pages.</p>
                 <div class="row">
                     <div class="col-3">
@@ -111,10 +112,10 @@
                     <!--                                                            </div>-->
                     <!--                                                        </form>-->
                     <!--                                                    </div>-->
-                    <div class="col-12">
-                        <p>Select how many columns you would like on camera view
-                            (excl. List View)</p>
-                        <div class="alert alert-warning" role="alert">
+                    <div class="col-sm-12 col-md-6">
+                        <h4>Camera View Columns</h4>
+                        <p>Select how many columns you would like on camera view</p>
+                        <div class="alert alert-warning text-dark" role="alert">
                             This only takes effect on screen sizes larger than a
                             tablet.
                         </div>
@@ -124,6 +125,28 @@
                                        for="selectCameraGrid">Camera Columns</label>
                             </div>
                             <select class="custom-select" id="selectCameraGrid">
+                                <option value="12">1</option>
+                                <option value="6" selected>2</option>
+                                <option value="4">3</option>
+                                <option value="3">4</option>
+                                <option value="5">5</option>
+                                <option value="2">6</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <h4>Group View Columns</h4>
+                        <p>Select how many columns you would like on group view</p>
+                        <div class="alert alert-warning text-dark" role="alert">
+                            This only takes effect on screen sizes larger than a
+                            tablet.
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text"
+                                       for="selectCameraGrid">Group Columns</label>
+                            </div>
+                            <select class="custom-select" id="selectGroupGrid">
                                 <option value="12">1</option>
                                 <option value="6" selected>2</option>
                                 <option value="4">3</option>
