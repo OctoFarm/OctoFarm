@@ -12,13 +12,13 @@ export const toFixedTempCelciusFormatter = (value) => {
 };
 
 export const toFixedFormatter = (value) => {
-  if (value !== null) {
+  if (!!value) {
     return value.toFixed(0);
   }
 };
 
 export const toFixedWeightGramFormatter = (value) => {
-  if (value !== null) {
+  if (!!value) {
     return value.toFixed(0) + "g";
   } else {
     return "";
@@ -33,8 +33,8 @@ export function valueToLocaleDateStringFormatter(value) {
   return new Date(value).toLocaleDateString();
 }
 
-export function timestampToLocaleDateStringFormatter(value, timestamp) {
-  return new Date(timestamp).toLocaleDateString();
+export function timestampToLocaleDateStringFormatter(value) {
+  return new Date(value).toLocaleDateString();
 }
 
 export function percentageFormatter(value) {

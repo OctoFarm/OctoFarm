@@ -21,6 +21,27 @@ const serverActionsElements = {
   CHECK_OCTOFARM_UPDATES: document.getElementById("checkUpdatesForOctoFarmBtn")
 };
 
+const userActionElements = {
+  createUserBtn: document.getElementById("createUserBtn"),
+  resetPassword: document.getElementById("resetPassword"),
+  resetPassword2: document.getElementById("resetPassword2"),
+  resetPasswordFooter: document.getElementById("usersResetPasswordModalFooter"),
+  userResetMessage: document.getElementById("userResetMessage"),
+  editName: document.getElementById("editName"),
+  editUserName: document.getElementById("editUserName"),
+  editGroup: document.getElementById("editGroup"),
+  editUserFooter: document.getElementById("userEditModalFooter"),
+  userEditMessage: document.getElementById("userEditMessage"),
+  createName: document.getElementById("createName"),
+  createUserName: document.getElementById("createUserName"),
+  createGroup: document.getElementById("createGroup"),
+  createPassword: document.getElementById("createPassword"),
+  createPassword2: document.getElementById("createPassword2"),
+  createUserFooter: document.getElementById("userCreateModalFooter"),
+  userCreateMessage: document.getElementById("userCreateMessage"),
+  userTableContent: document.getElementById("userTable")
+};
+
 const localStorageKeys = {
   DASHBOARD_SETTINGS: "dashboardConfiguration"
 };
@@ -74,7 +95,28 @@ const settingsElements = {
       replication: document.getElementById("infReplication"),
       defaultRet: document.getElementById("infRetention")
     }
+  },
+  monitoringViews: {
+    panel: document.getElementById("monitoringpanel"),
+    list: document.getElementById("monitoringlist"),
+    camera: document.getElementById("monitoringcamera"),
+    group: document.getElementById("monitoringgroup"),
+    currentOperations: document.getElementById("monitoringcurrentOperations"),
+    combined: document.getElementById("monitoringcombined")
   }
 };
 
-export { serverDatabaseKeys, serverActionsElements, localStorageKeys, settingsElements };
+function returnSaveBtn() {
+  return `
+    <button id="userActionSave" type="button" class="btn btn-success">Save</button>
+  `;
+}
+
+export {
+  serverDatabaseKeys,
+  serverActionsElements,
+  localStorageKeys,
+  settingsElements,
+  userActionElements,
+  returnSaveBtn
+};

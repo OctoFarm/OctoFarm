@@ -4,6 +4,9 @@ function sanitizeURL(url) {
 }
 
 function convertHttpUrlToWebsocket(url) {
+  if (!url.includes("http")) {
+    url = "http://" + url;
+  }
   const urlInstance = new URL(url);
   const protocol = urlInstance.protocol;
   if (protocol === "https:") {
@@ -12,7 +15,7 @@ function convertHttpUrlToWebsocket(url) {
     urlInstance.protocol = "ws:";
   }
 
-  return urlInstance.href;
+  return urlInstance.href.replace(/\/?$/, "");
 }
 
 module.exports = {

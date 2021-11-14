@@ -1,6 +1,6 @@
 {
   "name": "octofarm",
-  "version": "1.2.0-rc3",
+  "version": "1.2.0-rc4",
   "description": "OctoFarm is a easy to setup and install web interface that unifies your Octoprint instances for easy monitoring of all your printers. OctoFarm allows you to connect to multiple octoprint instances on your network allowing creating a farm management system. You can control, manage, upload files to any of your instances without ever leaving the tab it's open in.",
   "main": "app.js",
   "scripts": {
@@ -15,7 +15,7 @@
     "stop:delete": "pm2 delete OctoFarm",
     "release": "git archive -o octofarm.zip HEAD",
     "prettier": "prettier --write \"./server_src/**/*.js\" \"./test/**/*.js\" \"./client_src/**/*.js\"",
-    "dev": "nodemon ./app.js",
+    "dev": "nodemon --inspect ./app.js",
     "test": "jest --forceExit"
   },
   "repository": {
@@ -35,7 +35,7 @@
   "author": "James Mackay (NotExpectedYet)",
   "license": "ISC",
   "dependencies": {
-    "@notexpectedyet/octofarm-client": "0.9.1",
+    "@notexpectedyet/octofarm-client": "0.9.4",
     "archiver": "^5.3.0",
     "awilix": "^4.3.4",
     "awilix-express": "^4.0.0",
@@ -54,6 +54,7 @@
     "lodash": "^4.17.21",
     "lookpath": "^1.2.0",
     "luxon": "^1.26.0",
+    "marked": "^4.0.0",
     "migrate-mongo": "^8.2.2",
     "mjpeg-decoder": "^1.0.3",
     "mongoose": "^5.12.9",
@@ -61,7 +62,6 @@
     "node-fetch": "^2.6.1",
     "node-input-validator": "^4.4.1",
     "node-upnp-ssdp": "^0.1.1",
-    "nodemon": "^2.0.7",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0",
     "passport-remember-me": "0.0.1",
@@ -93,7 +93,7 @@
     "jest": "^26.6.3",
     "jest-util": "^26.6.2",
     "mongodb-memory-server": "^6.9.3",
-    "nodemon": "^2.0.7",
+    "nodemon": "^2.0.15",
     "prettier": "^2.3.0",
     "rimraf": "^3.0.2",
     "supertest": "^6.1.3"

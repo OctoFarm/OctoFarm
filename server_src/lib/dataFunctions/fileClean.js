@@ -139,8 +139,6 @@ class FileClean {
       }
     }
 
-    // TODO oof not the sortIndex again... this is SUPER BUG PRONE
-    // sortIndex should be a supporting math tool, not an array accessor
     cleanFileList[sortIndex] = {
       fileList: sortedFileList,
       filecount: fileList.fileCount || 0,

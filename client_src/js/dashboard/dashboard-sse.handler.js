@@ -5,7 +5,7 @@ import currentOperations from "../lib/modules/currentOperations";
 export const workerURL = "/dashboardInfo/get/";
 
 export async function dashboardSSEventHandler(data) {
-  if (data != false) {
+  if (data) {
     const currentOperationsData = data.currentOperations;
     const printerInfo = data.printerInformation;
     const dashboard = data.dashStatistics;

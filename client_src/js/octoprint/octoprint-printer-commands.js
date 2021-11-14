@@ -160,13 +160,14 @@ export async function printerSendGcode(printer, result) {
   };
   const post = await OctoPrintClient.post(printer, "printer/command", opt);
   if (post.status === 204) {
-    UI.createAlert("success", "Your gcode commands have successfully been sent!", 3000, "Clicked");
+    return {
+      status: bulkActionsStates.SUCCESS,
+      message: "Successfully sent your gcode script to the client!"
+    };
   } else {
-    UI.createAlert(
-      "danger",
-      "Your gcode failed to send! Please check the printer is able to receive these commands.",
-      3000,
-      "Clicked"
-    );
+    return {
+      status: bulkActionsStates.ERROR,
+      message: "Failed to send your gcode script to the client!"
+    };
   }
 }

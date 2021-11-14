@@ -4,13 +4,17 @@ import FileManager from "./lib/modules/fileManager.js";
 import { dragAndDropEnable } from "./lib/functions/dragAndDrop.js";
 import { returnDropDown, selectFilament } from "./services/filament-manager-plugin.service";
 import FileSorting from "./lib/modules/fileSorting.js";
+import gcodeScripts from "./services/gcode-scripts.service";
 
 let lastId = null;
 
 //Setup global listeners...
-document.getElementById("multUploadBtn").addEventListener("click", (e) => {
-  FileManager.multiUpload();
-});
+const multiUploadBtn = document.getElementById("multUploadBtn");
+if (multiUploadBtn) {
+  multiUploadBtn.addEventListener("click", (e) => {
+    FileManager.multiUpload();
+  });
+}
 
 class Manager {
   static async init() {
@@ -20,7 +24,6 @@ class Manager {
     // Draw first printer list...
     const filamentDropDown = await returnDropDown();
     const printerList = document.getElementById("printerList");
-
     //Get online printers...
     const onlinePrinterList = [];
     printers.forEach((printer) => {
@@ -104,7 +107,6 @@ class Manager {
       );
       //Setup for first printer
       const listItem = document.getElementById(`fileManagerPrinter-${printer._id}`);
-
       listItem.addEventListener("click", (e) => {
         if (!e.target.id.includes("tool")) {
           Manager.changePrinter(e, printer._id);
@@ -208,15 +210,14 @@ class Manager {
       .getElementById("fileBody")
       .insertAdjacentHTML(
         "beforeend",
-        `<div id="fileList-${id}" class="list-group" style="max-height:100%; overflow-y:scroll;" data-jplist-group="files"></div>`
+        `<div id="fileList-${id}" class="list-group" data-jplist-group="files"></div>`
       );
 
     let printer = await OctoFarmClient.getPrinter(id);
 
     FileSorting.loadSort(printer);
-    document.getElementById(
-      "backBtn"
-    ).innerHTML = `<button id="fileBackBtn" type="button" class="btn btn-success"><i class="fas fa-chevron-left"></i> Back</button>`;
+    document.getElementById("backBtn").innerHTML =
+      '<button id="fileBackBtn" type="button" class="btn btn-success"><i class="fas fa-chevron-left"></i> Back</button>';
     const fileButtons = {
       fileManager: {
         printerStorage: document.getElementById("printerStorage"),

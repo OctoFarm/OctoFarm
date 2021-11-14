@@ -128,6 +128,38 @@ const ServerSettingsSchema = new mongoose.Schema({
         type: Boolean
       }
     }
+  },
+  monitoringViews: {
+    panel: {
+      type: Boolean,
+      required: true,
+      default: true
+    },
+    list: {
+      type: Boolean,
+      required: true,
+      default: true
+    },
+    camera: {
+      type: Boolean,
+      required: true,
+      default: true
+    },
+    group: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    currentOperations: {
+      type: Boolean,
+      required: true,
+      default: false
+    },
+    combined: {
+      type: Boolean,
+      required: true,
+      default: false
+    }
   }
 });
 

@@ -114,7 +114,7 @@ export async function quickConnectPrinterToOctoPrint(printer) {
   } else {
     return {
       status: bulkActionsStates.SKIPPED,
-      message: "Skipped because printer wasn't in disconnected state..."
+      message: "Skipped connecting because printer wasn't in disconnected state..."
     };
   }
 }
@@ -127,7 +127,7 @@ export async function disconnectPrinterFromOctoPrint(printer) {
     let post = await OctoPrintClient.post(printer, "connection", data);
     if (typeof post !== "undefined") {
       if (post.status === 204) {
-        return { status: bulkActionsStates.SUCCESS, message: "Connection attempt was successful!" };
+        return { status: bulkActionsStates.SUCCESS, message: "Disconnect attempt was successful!" };
       } else {
         return {
           status: bulkActionsStates.ERROR,

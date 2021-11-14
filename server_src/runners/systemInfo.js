@@ -86,6 +86,20 @@ class SystemRunner {
     return {};
   }
 
+  static getIpAddressList() {
+    const nets = os.networkInterfaces();
+    const results = [];
+    for (const name of Object.keys(nets)) {
+      for (const net of nets[name]) {
+        // Skip over non-IPv4 and internal (i.e. 127.0.0.1) addresses
+        if (net.family === "IPv4" && !net.internal) {
+          results.push(net.address);
+        }
+      }
+    }
+    return results;
+  }
+
   /**
    * Call and collect quite heavy system information queries
    * @returns {Promise<boolean|{sysUptime: *, currentProcess: {}, cpuLoad: any, memoryInfo: any, osInfo: any, systemDisk, warnings: {}, processUptime: number, cpuInfo: {cpu: any, speed: any}}>}
@@ -113,15 +127,13 @@ class SystemRunner {
         },
         systemDisk,
         currentProcess: systemInfo.currentProcess,
-        benchmarkTimes: benchResults
+        benchmarkTimes: benchResults,
+        networkIpAddresses: this.getIpAddressList()
       };
 
       return systemInfo;
     } catch (e) {
-      logger.error(
-        "Some system information has failed to generate:",
-        e.message
-      );
+      logger.error("Some system information has failed to generate:", e.message);
 
       return false;
     }

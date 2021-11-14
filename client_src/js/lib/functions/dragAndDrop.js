@@ -1,6 +1,8 @@
 import FileManager from "../modules/fileManager.js";
 import UI from "./ui.js";
 import Validate from "./validate.js";
+import { groupBy, mapValues } from "lodash";
+import OctoPrintClient from "../octoprint";
 
 let activeFile = false;
 
@@ -83,6 +85,51 @@ export function dragAndDropEnableMultiplePrinters(element, printers) {
     },
     false
   );
+}
+
+export function dragAndDropGroupEnable(printers) {
+  const groupedPrinters = mapValues(groupBy(printers, "group"));
+  for (const key in groupedPrinters) {
+    if (groupedPrinters.hasOwnProperty(key)) {
+      const currentGroupEncoded = encodeURIComponent(key);
+      const dropArea = document.getElementById(`dropPanel-${currentGroupEncoded}`);
+
+      // Prevent default drag behaviors
+      ["dragenter", "dragover", "dragleave", "drop"].forEach((eventName) => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+        document.body.addEventListener(eventName, preventDefaults, false);
+      });
+
+      // Highlight drop area when item is dragged over it
+      ["dragenter", "dragover"].forEach((eventName) => {
+        dropArea.addEventListener(
+          eventName,
+          (event) => {
+            activeFile = true;
+            highlight(event, dropArea);
+          },
+          false
+        );
+      });
+      ["dragleave", "drop"].forEach((eventName) => {
+        dropArea.addEventListener(
+          eventName,
+          (event) => {
+            activeFile = false;
+            unhighlight(event, dropArea);
+          },
+          false
+        );
+      });
+      dropArea.addEventListener(
+        "drop",
+        (event) => {
+          handleMassDrop(event, groupedPrinters[key]);
+        },
+        false
+      );
+    }
+  }
 }
 
 function preventDefaults(e) {

@@ -22,5 +22,13 @@ export const ClientErrors = {
     code: "FAILED_STATE_UPDATE",
     message: "There was an issue updating the printer state",
     statusCode: 412
+  },
+  UNKNOWN_ERROR: {
+    type: errorTypes.UNKNOWN,
+    color: "danger",
+    code: "UNKNOWN_ERROR",
+    message:
+      "We encountered an unknown error! Please help the developer out and send a issue report!",
+    statusCode: 999
   }
 };

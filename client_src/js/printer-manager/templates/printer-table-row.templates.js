@@ -69,7 +69,13 @@ export function returnPrinterTableRow(printer) {
             <small>
                 <span data-title="${printer.printerState.desc}" id="printerBadge-${printer._id}" class="tag badge badge-${printer.printerState.colour.name} badge-pill">
                     ${printer.printerState.state}
-                </span>
+                </span><br>
+                <span title="A restart is required on your OctoPrint instance!"
+                 id="restartRequired-${printer._id}"
+                 class="tag badge badge-warning text-dark badge-pill d-none"
+                >
+                <i class="fas fa-power-off"></i> Restart Required!
+            </span>
             </small>
         </td>
         <td class="align-middle">

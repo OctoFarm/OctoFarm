@@ -13,7 +13,6 @@ async function asyncParse(str) {
 
 export function createNewEventSource(url) {
   source = new EventSource(url);
-
   source.onmessage = async function (e) {
     if (e.data != null) {
       const res = await asyncParse(e.data);

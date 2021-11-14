@@ -1,7 +1,7 @@
 import OctoFarmClient from "../../services/octofarm-client.service.js";
 import UI from "../functions/ui.js";
 import Calc from "../functions/calc.js";
-import Script from "../../services/gcode-scripts.service.js";
+import Script from "../../services/octofarm-scripts.service.js";
 import { ApplicationError } from "../../exceptions/application-error.handler";
 import { ClientErrors } from "../../exceptions/octofarm-client.exceptions";
 
@@ -103,14 +103,20 @@ class PrinterSettings {
     document.getElementById("psDefaultProfileDrop").innerHTML = `
       <div class="input-group mb-1"> <div class="input-group-prepend"> <label class="input-group-text bg-secondary text-light" for="psDefaultProfile">Preferred Profile:</label> </div> <select class="custom-select bg-secondary text-light" id="psDefaultProfile"></select></div>
       `;
-
-    console.log(currentPrinter);
     const userDropDown = document.getElementById("psOctoPrintUser");
     userDropDown.innerHTML = "";
-    currentPrinter.userList.forEach((user) => {
-      userDropDown.insertAdjacentHTML("beforeend", `<option value="${user}">${user}</option>`);
-    });
-    userDropDown.value = currentPrinter.currentUser;
+    userDropDown.disabled = false;
+    if (currentPrinter?.userList) {
+      userDropDown.innerHTML = "";
+      currentPrinter.userList.forEach((user) => {
+        userDropDown.insertAdjacentHTML("beforeend", `<option value="${user}">${user}</option>`);
+      });
+      userDropDown.value = currentPrinter.currentUser;
+    } else {
+      userDropDown.disabled = true;
+      userDropDown.insertAdjacentHTML("beforeend", "<option value=\"0\">No users available</option>");
+      userDropDown.value = 0;
+    }
 
     document.getElementById("psPrinterName").placeholder = currentPrinter.printerName;
     document.getElementById("psPrinterURL").placeholder = currentPrinter.printerURL;

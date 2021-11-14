@@ -21,7 +21,7 @@ class ServerSentEventsHandler {
       delete this.#clients[this.#clientId];
     });
 
-    // TODO isnt this index tracker prone to bugs? What if an older client closes its connection?
+    // isnt this index tracker prone to bugs? What if an older client closes its connection? //Then it get's removed from the index.... -_-
     this.#clientId++;
   }
 

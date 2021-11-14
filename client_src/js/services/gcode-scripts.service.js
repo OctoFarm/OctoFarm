@@ -1,288 +1,217 @@
-import UI from "../lib/functions/ui.js";
 import OctoFarmClient from "./octofarm-client.service";
+import UI from "../lib/functions/ui";
 
-//TODO: Rework in another PR
-
-const alertsDrop = `
-<option selected value="0">Choose...</option>
-<option value="done">Print Done</option>
-<option value="failed">Print Failed</option>
-<option value="paused">Print Paused</option>
-<option value="cooldown">Print Cooled</option>
-<option value="error">Print Error</option>
-`;
-let testScriptBtn = document.getElementById("testScript");
-if (testScriptBtn) {
-  testScriptBtn.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    let elements = Script.grabPage();
-    let errors = Script.checkPage(elements);
-    if (errors.length > 0) {
-      UI.createAlert(
-        "warning",
-        "There are issues with your input, please correct the highlighted fields",
-        3000,
-        "Clicked"
-      );
-      errors.forEach((error) => {
-        if (error === "script") {
-          elements.script.style.borderColor = "red";
-        }
-        if (error === "message") {
-          elements.message.style.borderColor = "red";
-        }
-        if (error === "trigger") {
-          elements.trigger.style.borderColor = "red";
-        }
-      });
-    } else {
-      elements.script.style.borderColor = "green";
-      elements.message.style.borderColor = "green";
-      elements.trigger.style.borderColor = "green";
-      Script.test(elements.script.value, elements.message.value);
-    }
+const customGcodeScripts = document.getElementById("customGcodeBtn");
+customGcodeScripts.addEventListener("click", async (e) => {
+  let customScripts = await OctoFarmClient.get("settings/customGcode");
+  //Draw Scripts
+  let scriptTable = document.getElementById("gcodeScriptTable");
+  scriptTable.innerHTML = "";
+  customScripts.forEach((scripts) => {
+    drawScriptTable(scripts);
   });
-}
-let alertsTriggers = document.getElementById("alertsTrigger");
-if (alertsTriggers) {
-  alertsTriggers.insertAdjacentHTML("beforeend", alertsDrop);
-}
+});
+const createNewScriptBtn = document.getElementById("createNewScriptBtn");
 
-let saveScriptBtn = document.getElementById("saveScript");
-if (saveScriptBtn) {
-  saveScriptBtn.addEventListener("click", (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-    let elements = Script.grabPage();
-    let errors = Script.checkPage(elements);
-    if (errors.length > 0) {
-      UI.createAlert(
-        "warning",
-        "There are issues with your input, please correct the highlighted fields",
-        3000,
-        "Clicked"
-      );
-      errors.forEach((error) => {
-        if (error === "script") {
-          elements.script.style.borderColor = "red";
-        }
-        if (error === "message") {
-          elements.message.style.borderColor = "red";
-        }
-        if (error === "trigger") {
-          elements.trigger.style.borderColor = "red";
-        }
-      });
-    } else {
-      elements.script.style.borderColor = "green";
-      elements.message.style.borderColor = "green";
-      elements.trigger.style.borderColor = "green";
-      let newAlert = {
-        active: true,
-        trigger: elements.trigger.value,
-        script: elements.script.value,
-        message: elements.message.value
-      };
-      Script.save(newAlert);
+async function newGcodeScript(newScript) {
+  const keys = Object.keys(newScript);
+  let errors = [];
+  for (const key of keys) {
+    if (newScript["name"] === "") {
+      errors.push(key);
+    } else if (newScript["gcode"] === "") {
+      errors.push(key);
+    } else if (newScript["printerIds"].length === 0) {
+      errors.push(key);
     }
-  });
-}
-export default class Script {
-  static async alertsDrop() {
-    return alertsDrop;
   }
-  static async get() {
-    let post = await OctoFarmClient.get("scripts/get");
-    let alertsTable = document.getElementById("alertsTable");
-    alertsTable.innerHTML = "";
-    if (post) {
-      post.alerts.forEach((alert) => {
-        if (alert.printer.length === 0) {
-          alert.printer = "All Printers";
-        }
 
-        alertsTable.insertAdjacentHTML(
-          "beforeend",
-          `
-                <tr id="alertList-${alert._id}">
-                <td class="d-none">
-                    ${alert._id}
-                </td>
-                <td> 
-                 <form class="was-validated">
-                      <div class="custom-control custom-checkbox mb-3">
-                            <input type="checkbox" class="custom-control-input" id="active-${alert._id}" required>
-                            <label class="custom-control-label" for="active-${alert._id}"></label>
-
-                        </div>
-                    </form>
-                </td>
-                <td>  
-                      <select class="custom-select" id="trigger-${alert._id}" disabled>
-
-                       </select>
-                </td> 
-                <td >    
-                        <div id="scriptLocation-${alert._id}" contenteditable="false"> ${alert.scriptLocation}  </div>
-                </td>
-                <td>    
-                        <div  id="message-${alert._id}" contenteditable="false"> ${alert.message}</div>
-                </td>
-                <td id="printers-${alert._id}">
-                        ${alert.printer}
-                </td>
-                 <td>
-                    <button id="edit-${alert._id}" type="button" class="btn btn-sm btn-info edit">
-                    <i class="fas fa-edit editIcon"></i>
-                  </button>
-                  <button id="save-${alert._id}" type="button" class="btn btn-sm d-none btn-success save">
-                    <i class="fas fa-save saveIcon"></i>
-                  </button>
-                  <button id="delete-${alert._id}" type="button" class="btn btn-sm btn-danger delete">
-                    <i class="fas fa-trash deleteIcon"></i>
-                  </button>
-                </td>
-                </tr>
-           `
-        );
-        let alertsTrigger = document.getElementById("trigger-" + alert._id);
-        alertsTrigger.innerHTML = alertsDrop;
-        alertsTrigger.value = alert.trigger;
-
-        document.getElementById("active-" + alert._id).checked = alert.active;
-        document.getElementById("edit-" + alert._id).addEventListener("click", (event) => {
-          Script.edit(alert._id);
-        });
-        document.getElementById("save-" + alert._id).addEventListener("click", (event) => {
-          let newAlert = {
-            active: document.getElementById("active-" + alert._id).checked,
-            trigger: document.getElementById("trigger-" + alert._id).value,
-            script: document.getElementById("scriptLocation-" + alert._id).innerHTML.trim(),
-            message: document.getElementById("message-" + alert._id).innerHTML.trim()
-          };
-          Script.saveEdit(alert._id, newAlert);
-        });
-        document.getElementById("delete-" + alert._id).addEventListener("click", (event) => {
-          Script.delete(alert._id);
-        });
-      });
+  if (errors.length !== 0) {
+    if (errors.includes("printerIds"))
+      UI.createAlert("error", "You need to select some printers!", 3000, "Clicked");
+    if (errors.includes("gcode") || errors.includes("name"))
+      UI.createAlert(
+        "error",
+        "You need to fill in at least a name and some gcode ",
+        3000,
+        "Clicked"
+      );
+    return false;
+  } else {
+    let lines = newScript.gcode.match(/[^\r\n]+/g);
+    newScript.gcode = lines.map(function (name) {
+      if (!name.includes("=")) {
+        return name.toLocaleUpperCase();
+      } else {
+        return name;
+      }
+    });
+    if (newScript.id) {
+      let post = await OctoFarmClient.post("settings/customGcode/edit", newScript);
+      console.log(post);
+      // if (post.status === 200) {
+      //   post = await post.json();
+      // } else {
+      //   UI.createAlert("error", "Something went wrong updating, is the server online?");
+      // }
     } else {
-      alertsTable.insertAdjacentHTML("beforeend"`
-                           <tr class="d-none">
+      let post = await OctoFarmClient.post("settings/customGcode", newScript);
+      console.log(post);
+      // if (post.status === 200) {
+      //   post = await post.json();
+      //   drawScriptTable(post);
+      // } else {
+      //   UI.createAlert("error", "Something went wrong updating, is the server online?");
+      // }
+    }
+  }
+  return true;
+}
 
-                </td>
-                <td>  
-                </td>
-                <td>  
+createNewScriptBtn.addEventListener("click", async (e) => {
+  let newScript = {
+    name: document.getElementById("gcodeScriptName").value,
+    description: document.getElementById("gcodeScriptDescription").value,
+    gcode: document.getElementById("gcodeScriptScript").value,
+    buttonColour: document.getElementById("gcodeScriptBtnColour").value,
+    printerIds: Array.from(document.getElementById("gcodeScriptPrinters").selectedOptions).map(
+      (v) => v.value
+    )
+  };
+  await newGcodeScript(newScript);
+  document.getElementById("gcodeScriptName").value = "";
+  document.getElementById("gcodeScriptDescription").value = "";
+  document.getElementById("gcodeScriptScript").value = "";
+  document.getElementById("gcodeScriptBtnColour").value = "";
+  document.getElementById("gcodeScriptPrinters").value = "";
+});
 
-                </td> 
-                <td>    
-                    No Alerts Found
-                </td>
-                <td>    
+async function drawScriptTable(scripts) {
+  let scriptTable = document.getElementById("gcodeScriptTable");
+  const printerList = await OctoFarmClient.listPrinters();
+  const printerSelect = [];
+  printerList.forEach((printer) => {
+    printerSelect.push(`<option value="${printer._id}"> ${printer.printerName} </option>`);
+  });
+  let lines = "";
 
+  scripts.gcode.forEach((e) => {
+    lines += `${e}\n`;
+  });
+
+  scriptTable.insertAdjacentHTML(
+    "beforeend",
+    `
+             <tr id="scriptRow-${scripts._id}" >
+                <td id="script_id_${scripts._id}" class="d-none">${scripts._id}</td>
+                <td><input type="text" class="form-control" id="script_name_${scripts._id}" placeholder="${scripts.name}" disabled></input></td>
+                <td><input type="text" class="form-control" id="script_desc_${scripts._id}"  placeholder="${scripts.description}" disabled></input></td>
+                <td>            
+                  <select class="custom-select" id="script_btn_colour_${scripts._id}" size="1" disabled>
+                    <option value="success">Green</option>
+                    <option value="warning">Yellow</option>
+                    <option value="info">Blue</option>
+                    <option value="danger">Red</option>
+                    <option value="dark">Black</option>
+                  </select>
                 </td>
                 <td>
-
+                  <select multiple class="custom-select" id="script_printer_select_${scripts._id}" size="1" disabled>
+                        ${printerSelect}
+                  </select>
                 </td>
-                </tr>`);
-    }
-  }
-  static async edit(id) {
-    let row = document.getElementById("alertList-" + id);
-    let editable = row.querySelectorAll("[contenteditable]");
+                <td><textarea rows="1" type="text" class="form-control" id="script_lines_${scripts._id}"  placeholder="${lines}" disabled></textarea></td>
+                <td>                                
+                <button id="editScript-${scripts._id}" type="button" class="btn btn-sm btn-info edit bg-colour-1">
+                    <i class="fas fa-edit editIcon"></i>
+                </button>
+                <button id="saveScript-${scripts._id}" type="button" class="btn btn-sm btn-success save bg-colour-2 d-none">
+                    <i class="fas fa-save saveIcon"></i>
+                </button>
+                <button id="deleteScript-${scripts._id}" type="button" class="btn btn-sm btn-danger delete">
+                    <i class="fas fa-trash deleteIcon"></i>
+                </button>
+                </td>
+            </tr>
+      `
+  );
+  const scriptButton = document.getElementById(`script_btn_colour_${scripts._id}`);
+  const scriptPrinters = document.getElementById(`script_printer_select_${scripts._id}`);
 
-    editable.forEach((edit) => {
-      edit.contentEditable = true;
-      edit.classList.add("contentEditable");
-    });
-    document.getElementById("save-" + id).classList.remove("d-none");
-    document.getElementById("edit-" + id).classList.add("d-none");
-    document.getElementById("trigger-" + id).disabled = false;
+  if (!scripts?.buttonColour) {
+    scriptButton.value = "success";
+  } else {
+    scriptButton.value = scripts.buttonColour;
   }
-  static async saveEdit(id, newAlert) {
-    let opts = {
-      id: id,
-      active: newAlert.active,
-      trigger: newAlert.trigger,
-      scriptLocation: newAlert.script,
-      message: newAlert.message
-    };
-    let post = await OctoFarmClient.post("scripts/edit", opts);
-    if (!post) {
-      UI.createAlert("error", "Failed to save your alert!", 3000, "Clicked");
-    } else {
-      UI.createAlert("success", "Successfully saved your alert!", 3000, "Clicked");
-      Script.get();
-    }
-    let row = document.getElementById("alertList-" + id);
-    let editable = row.querySelectorAll("[contenteditable]");
 
-    editable.forEach((edit) => {
-      edit.contentEditable = false;
-      edit.classList.remove("contentEditable");
-    });
-    document.getElementById("save-" + id).classList.add("d-none");
-    document.getElementById("edit-" + id).classList.remove("d-none");
-    document.getElementById("trigger-" + id).disabled = true;
-  }
-  static async save(newAlert) {
-    let opts = {
-      active: newAlert.active,
-      trigger: newAlert.trigger,
-      scriptLocation: newAlert.script,
-      message: newAlert.message,
-      printer: []
-    };
-    let post = await OctoFarmClient.post("scripts/save", opts);
-    if (!post) {
-      UI.createAlert("error", "Failed to save your alert!", 3000, "Clicked");
-    } else {
-      UI.createAlert("success", "Successfully saved your alert!", 3000, "Clicked");
-      Script.get();
+  if (!scripts?.printerIds || scripts.printerIds.length === 0) {
+    for (let i = 0; i < scriptPrinters.options.length; i++) {
+      scriptPrinters.options[i].selected = true;
+    }
+  } else {
+    for (let i = 0; i < scriptPrinters.options.length; i++) {
+      if (scripts.printerIds.includes(scriptPrinters.options[i].value)) {
+        scriptPrinters.options[i].selected = true;
+      }
     }
   }
-  static async delete(id) {
-    let post = await OctoFarmClient.delete("scripts/delete/" + id);
-    if (!post) {
-      UI.createAlert("error", "Failed to delete your alert.", 3000, "Clicked");
-    } else {
-      UI.createAlert("success", "Successfully deleted your alert.", 3000, "Clicked");
-      document.getElementById("alertList-" + id).remove();
-    }
-  }
-  static async test(scriptLocation, message) {
-    let opts = {
-      scriptLocation: scriptLocation,
-      message: message
-    };
-    let post = await OctoFarmClient.post("scripts/test", opts);
-    if (typeof post.testFire === "object") {
-      UI.createAlert("error", post.testFire.stderr, 3000, "Clicked");
-    } else {
-      UI.createAlert("success", post.testFire, 3000, "Clicked");
-    }
-  }
-  static checkPage(elements) {
-    let errors = [];
 
-    if (elements.script.value === "") {
-      errors.push("script");
+  const scriptID = document.getElementById(`script_id_${scripts._id}`);
+  const scriptName = document.getElementById(`script_name_${scripts._id}`);
+  const scriptDesc = document.getElementById(`script_desc_${scripts._id}`);
+
+  const scriptLines = document.getElementById(`script_lines_${scripts._id}`);
+  const editButton = document.getElementById(`editScript-${scripts._id}`);
+  const saveButton = document.getElementById(`saveScript-${scripts._id}`);
+
+  document.getElementById("deleteScript-" + scripts._id).addEventListener("click", async (e) => {
+    let delt = await OctoFarmClient.get("settings/customGcode/delete/" + scripts._id);
+    if (delt.status === 200) {
+      UI.createAlert("success", "Successfully deleted your script...", 3000, "Clicked");
+      document.getElementById("scriptRow-" + scripts._id).remove();
+    } else {
+      UI.createAlert(
+        "error",
+        "Something went wrong, is the OctoFarm server online?",
+        3000,
+        "Clicked"
+      );
     }
-    if (elements.trigger.value === "0") {
-      errors.push("trigger");
-    }
-    if (elements.message.value === "") {
-      errors.push("message");
-    }
-    return errors;
-  }
-  static grabPage() {
-    return {
-      trigger: document.getElementById("alertsTrigger"),
-      script: document.getElementById("scriptLocation"),
-      message: document.getElementById("scriptMessage")
+  });
+  document.getElementById("editScript-" + scripts._id).addEventListener("click", async (e) => {
+    UI.enableElements([scriptName, scriptDesc, scriptButton, scriptPrinters, scriptLines]);
+
+    UI.setElementValueFromPlaceholder([scriptName, scriptDesc, scriptLines]);
+
+    scriptLines.rows = "10";
+    scriptPrinters.size = "11";
+    editButton.classList.toggle("d-none");
+    saveButton.classList.toggle("d-none");
+  });
+  saveButton.addEventListener("click", async (e) => {
+    let newScript = {
+      id: scriptID.innerHTML,
+      name: scriptName.value,
+      description: scriptDesc.value,
+      gcode: scriptLines.value,
+      buttonColour: scriptButton.value,
+      printerIds: Array.from(scriptPrinters.selectedOptions).map((v) => v.value)
     };
-  }
+
+    let save = await newGcodeScript(newScript);
+    if (save) {
+      UI.setElementPlaceholderFromValue([scriptName, scriptDesc, scriptLines]);
+      UI.disableElements([scriptName, scriptDesc, scriptButton, scriptPrinters, scriptLines]);
+      UI.blankElementValue([scriptName, scriptDesc, scriptLines]);
+
+      scriptLines.rows = "1";
+      scriptPrinters.size = "1";
+      editButton.classList.toggle("d-none");
+      saveButton.classList.toggle("d-none");
+    }
+  });
 }
+
+export default {
+  ignore: "ignore"
+};

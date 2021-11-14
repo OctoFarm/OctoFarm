@@ -262,11 +262,10 @@ const filamentUsageOverTimeChartOptions = {
   // Set dynamically
   // yaxis: yAxisSeries,
   xaxis: {
-    type: "category",
-    categories: getLastThirtyDaysText(),
-    tickAmount: 15,
+    type: "datetime",
+    tickAmount: 10,
     labels: {
-      formatter: valueToLocaleTimeStringFormatter
+      formatter: valueToLocaleDateStringFormatter
     }
   }
 };
@@ -298,7 +297,7 @@ const printCompletionByDayChartOptions = {
     type: "datetime",
     tickAmount: 10,
     labels: {
-      formatter: timestampToLocaleDateStringFormatter
+      formatter: valueToLocaleDateStringFormatter
     }
   }
 };

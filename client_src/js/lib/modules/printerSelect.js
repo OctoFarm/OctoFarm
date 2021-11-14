@@ -17,6 +17,19 @@ Select which printers you'd like to delete. Press action when you have selected 
  This is unrecoverable! If you remove the database entry for your printer, any links in the database will be lost... i.e. History/Statistics. Unless you have a backup in place.
 </div>
 `;
+const multiPrintMessage = `
+  <div class="alert alert-info" role="alert">
+    Please select which printers you'd like to start printing on! Press action when you have selected all the printers you'd like.
+  </div>
+  <div class="alert alert-info" role="alert">
+    <p class="mb-0"><strong>Single-File Mode:</strong> This will distribute 1 file across all selected printers and action a print.</p>
+    <hr>
+    <p class="mb-0"><strong>Multi-File Mode:</strong> This will distribute the first file to the first selected printer, the second file goes to the second selected printer and so on.</p>
+  </div>
+  <div class="alert alert-warning text-dark" role="alert">
+    <strong>NOTE: </strong> Multi-File mode expects and equal number of printers and files... 
+  </div>
+`;
 const connectMessage = `
 <div class="alert alert-info" role="alert">
 Please select which printers you'd like to connect to from OctoPrint. Selected printers will attempt a connection with the preferred port settings from OctoPrint.
@@ -248,12 +261,15 @@ export default class PrinterSelect {
       messageBox.innerHTML = controlPrintersMessage;
     } else if (action === "Send Gcode to Printers") {
       messageBox.innerHTML = gcodePrintersMessage;
+    } else if (action === "Start a Bulk Print") {
+      messageBox.innerHTML = multiPrintMessage;
     }
 
     const groupList = [];
     const printerList = [];
 
     const printers = await OctoFarmClient.listPrinters();
+
     printers.forEach((printer) => {
       if (
         typeof printer.printerState !== "undefined" &&

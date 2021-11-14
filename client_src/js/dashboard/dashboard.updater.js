@@ -126,7 +126,6 @@ export class DashUpdate {
 
   static async environmentalData(data) {
     let analyzedLabels = [];
-
     if (!environmentDataChartExists) {
       for (let i = 0; i < data.length; i++) {
         if (data[i].data.length !== 0) {
@@ -144,7 +143,7 @@ export class DashUpdate {
           }
         }
       }
-      await ChartsManager.renderEnvironmentDataChart(undefined, analyzedLabels);
+      // await ChartsManager.renderEnvironmentDataChart(data, analyzedLabels);
       environmentDataChartExists = true;
     }
 

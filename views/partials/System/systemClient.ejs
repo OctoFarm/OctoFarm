@@ -16,12 +16,6 @@
                id="system-dashboard-list" data-toggle="list"
                href="#system-dashboard" role="tab" aria-controls="dashboard"><i class="fas fa-tachometer-alt"></i> Dashboard</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link"
-               id="system-printer-control-list" data-toggle="list"
-               href="#system-printer-control" role="tab" aria-controls="dashboard"><i class="fas fa-gamepad"></i> Printer
-                Control</a>
-        </li>
     </ul>
 
     <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
@@ -53,7 +47,8 @@
             </div>
             <div class="tab-pane fade" id="system-monitoring" role="tabpanel"
                  aria-labelledby="dashboard-monitoring-list">
-                <p>Enable and disable different parts of the UI on the views
+                <h4>Views Visibility</h4>
+                <p>Enable and disable different parts of the UI on any of the views
                     pages.</p>
                 <div class="row">
                     <div class="col-3">
@@ -117,10 +112,10 @@
                     <!--                                                            </div>-->
                     <!--                                                        </form>-->
                     <!--                                                    </div>-->
-                    <div class="col-12">
-                        <p>Select how many columns you would like on camera view
-                            (excl. List View)</p>
-                        <div class="alert alert-warning" role="alert">
+                    <div class="col-sm-12 col-md-6">
+                        <h4>Camera View Columns</h4>
+                        <p>Select how many columns you would like on camera view</p>
+                        <div class="alert alert-warning text-dark" role="alert">
                             This only takes effect on screen sizes larger than a
                             tablet.
                         </div>
@@ -130,6 +125,28 @@
                                        for="selectCameraGrid">Camera Columns</label>
                             </div>
                             <select class="custom-select" id="selectCameraGrid">
+                                <option value="12">1</option>
+                                <option value="6" selected>2</option>
+                                <option value="4">3</option>
+                                <option value="3">4</option>
+                                <option value="5">5</option>
+                                <option value="2">6</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-12 col-md-6">
+                        <h4>Group View Columns</h4>
+                        <p>Select how many columns you would like on group view</p>
+                        <div class="alert alert-warning text-dark" role="alert">
+                            This only takes effect on screen sizes larger than a
+                            tablet.
+                        </div>
+                        <div class="input-group mb-3">
+                            <div class="input-group-prepend">
+                                <label class="input-group-text"
+                                       for="selectCameraGrid">Group Columns</label>
+                            </div>
+                            <select class="custom-select" id="selectGroupGrid">
                                 <option value="12">1</option>
                                 <option value="6" selected>2</option>
                                 <option value="4">3</option>
@@ -418,29 +435,6 @@
                                         }</code><br> Null values are required if
                                     data is missing!</small>
 
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-            </div>
-            <div class="tab-pane fade" id="system-printer-control" role="tabpanel"
-                 aria-labelledby="dashboard-settings-list">
-                <div class="row">
-                    <div class="col-3">
-                        <form class="was-validated">
-                            <div class="custom-control custom-checkbox mb-3">
-                                <input type="checkbox" class="custom-control-input"
-                                       id="printerControlFilesFirst" required>
-                                <label class="custom-control-label"
-                                       for="printerControlFilesFirst">Files
-                                    First</label>
-                                <div class="valid-feedback">Show files at the top of
-                                    the Printer Control Modal
-                                </div>
-                                <div class="invalid-feedback">Show files under
-                                    Printer Status on the Printer Control Modal
-                                </div>
                             </div>
                         </form>
                     </div>

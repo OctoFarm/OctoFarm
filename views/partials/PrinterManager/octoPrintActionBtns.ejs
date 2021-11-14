@@ -1,7 +1,6 @@
 <% const disable_btn_air_gapped = (air_gapped) ? "disabled" : "" %>
 
-<div class="text-center mt-1">
-    <div class="btn-group">
+    <div class="btn-group float-right">
         <button type="button" class="btn bg-colour-3 dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" <%= disable_btn_air_gapped %>>
             <i class="fas fa-sitemap"></i> OctoPrint Management
         </button>
@@ -15,7 +14,7 @@
                     aria-expanded="false"
                     data-toggle="modal" data-target="#printerSelectModal"
             >
-                <i class="fas fa-plug"></i> Install Plugins
+                <i class="fas fa-download"></i> Install Plugins
             </button>
             <button
                     title="Uninstall multiple plugins at once."
@@ -28,7 +27,7 @@
             >
 
 
-                <i class="fas fa-plug"></i> Uninstall Plugins
+                <i class="fas fa-trash"></i> Uninstall Plugins
             </button>
             <button
                     title="Enable multiple plugins at once"
@@ -39,7 +38,7 @@
                     aria-expanded="false"
                     data-toggle="modal" data-target="#printerSelectModal"
             >
-                <i class="fas fa-plug"></i> Enable Plugin
+                <i class="fas fa-toggle-on"></i> Enable Plugin
             </button>
             <button
                     title="Disable multiple plugins at once"
@@ -50,7 +49,25 @@
                     aria-expanded="false"
                     data-toggle="modal" data-target="#printerSelectModal"
             >
-                <i class="fas fa-plug"></i> Disable Plugin
+                <i class="fas fa-toggle-off"></i> Disable Plugin
+            </button>
+            <button
+                    title="Update multiple OctoPrint Plugins at once."
+                    id="blkUpdatePluginsBtn"
+                    type="button"
+                    class="dropdown-item"
+                    href="#"
+            >
+                <i class="fas fa-sync"></i> Update Plugins
+            </button>
+            <button
+                    title="Update multiple OctoPrint's at once."
+                    id="blkOctoPrintUpdate"
+                    type="button"
+                    class="dropdown-item"
+                    href="#"
+            >
+                <i class="fab fa-raspberry-pi"></i> Update Clients
             </button>
             <button
                     title="Install multiple plugins at once."
@@ -78,5 +95,3 @@
             </button>
         </div>
     </div>
-
-</div>

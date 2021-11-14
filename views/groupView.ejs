@@ -1,10 +1,13 @@
 <% if(typeof printerCount != 'undefined' && printerCount > 0 ) { %>
-    <% if(clientSettings.panelView.currentOp){ %> <%-
+    <%- include('./partials/actionsBar.ejs') %>
+    <% if(clientSettings.views.currentOperations){ %> <%-
     include('./partials/currentOperations.ejs') %> <% } %>
     <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
         <div id="printerArea" class="row">
         </div>
     </div>
+    <script src="/assets/dist/group-view.runner.min.js" type="module"></script>
+    <script src="/assets/dist/bulk-action-commands.functions.min.js" type="module"></script>
 <% }else{ %>
     <%- include('./addPrinters.ejs') %>
 <% } %>
@@ -28,5 +31,3 @@
         </div>
     </div>
 </div>
-
-<script src="/assets/dist/printer-map.runner.min.js" type="module"></script>

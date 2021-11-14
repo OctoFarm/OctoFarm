@@ -4,17 +4,14 @@ const { FilamentClean } = require("./lib/dataFunctions/filamentClean");
 const { initHistoryCache } = require("./cache/history.cache");
 const { TaskPresets } = require("./task.presets");
 const { PrinterClean } = require("./lib/dataFunctions/printerClean");
+const { SystemRunner } = require("./runners/systemInfo");
 
 const PRINTER_CLEAN_TASK = async () => {
   const serverSettings = require("./settings/serverSettings");
   const printersInformation = PrinterClean.listPrintersInformation();
   await PrinterClean.sortCurrentOperations(printersInformation);
 
-  await PrinterClean.statisticsStart();
-  await PrinterClean.createPrinterList(
-    printersInformation,
-    serverSettings.filamentManager
-  );
+  await PrinterClean.createPrinterList(printersInformation, serverSettings.filamentManager);
 };
 
 const CRASH_TEST_TASK = async () => {
@@ -35,6 +32,10 @@ const GITHUB_UPDATE_CHECK_TASK = async () => {
   await softwareUpdateChecker.syncLatestOctoFarmRelease(false).then(() => {
     softwareUpdateChecker.checkReleaseAndLogUpdate();
   });
+};
+
+const SYSTEM_INFO_CHECK_TASK = async () => {
+  await SystemRunner.querySystemInfo();
 };
 
 const WEBSOCKET_HEARTBEAT_TASK = () => {
@@ -174,6 +175,7 @@ function KsatLlorKcir(task, preset, milliseconds = 0) {
 
 class OctoFarmTasks {
   static BOOT_TASKS = [
+    KsatLlorKcir(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
     KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNONCE),

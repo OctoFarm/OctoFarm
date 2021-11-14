@@ -34,7 +34,12 @@ import {
   updateBulkActionsProgress,
   generateTableRows,
   updateTableRow
-} from "../functions/bulk-actions-progress.functions";
+} from "./bulk-actions-progress.functions";
+import bulkActionsStates from "../bulk-actions.constants";
+
+import Queue from "../../lib/modules/clientQueue.js";
+import OctoPrintClient from "../../lib/octoprint";
+const fileUploads = new Queue();
 
 // TODO this should come from printer select to save the extra call, re-iteration and matching.
 async function getCurrentlySelectedPrinterList() {
@@ -179,6 +184,360 @@ export async function bulkConnectPrinters() {
     updateBulkActionsProgress(p, printersToControl.length);
   }
   updateBulkActionsProgress(printersToControl.length, printersToControl.length);
+}
+
+function setupSingleFileMode(printers, files = "No File", selectedFolder = "") {
+  printers.forEach((printer) => {
+    document.getElementById(`printerFileChoice-${printer._id}`).innerHTML = `
+      <small><i class="fas fa-file-code"></i> ${selectedFolder}/${file.name}</small>
+    `;
+  });
+}
+
+function setupMultiFileMode(printers, files, selectedFolder = "") {
+  if (files) {
+    printers.forEach((printer, index) => {
+      if (files[index]) {
+        document.getElementById(`printerFileChoice-${printer._id}`).innerHTML = `
+      <small><i class="fas fa-file-code"></i>${selectedFolder}/${files[index].name}</small>
+    `;
+      } else {
+        document.getElementById(`printerFileChoice-${printer._id}`).innerHTML = `
+      <small><i class="fas fa-forward"></i> Select more files to send to this printer!</small>
+    `;
+      }
+    });
+  }
+}
+
+function fileUpload(file) {
+  return new Promise(function (resolve, reject) {
+    // Grab folder location
+    const { currentFolder } = file;
+    // Grab Client Info
+    const { index } = file;
+    const { printerInfo } = file;
+
+    // XHR doesn't like posting without it been a form, can't use offical octoprint api way...
+    // Create form data
+    const formData = new FormData();
+    let path = "";
+    if (currentFolder.includes("local/")) {
+      path = currentFolder.replace("local/", "");
+    }
+    formData.append("file", file.file);
+    formData.append("path", path);
+    if (file.print) {
+      formData.append("print", true);
+    }
+    const url = `${printerInfo.printerURL}/api/files/local`;
+    const xhr = new XMLHttpRequest();
+    file = file.file;
+    xhr.open("POST", url);
+    xhr.upload.onprogress = function (e) {
+      if (e.lengthComputable) {
+        // Update progress
+        const progressBar = document.getElementById("bpUploadProgress-" + index);
+        progressBar.classList = "progress-bar progress-bar-striped bg-warning";
+        if (progressBar) {
+          let percentLoad = (e.loaded / e.total) * 100;
+          if (isNaN(percentLoad)) {
+            percentLoad = 0;
+          }
+          progressBar.style.width = `${Math.floor(percentLoad)}%`;
+          progressBar.innerHTML = "Uploading: " + Math.floor(percentLoad) + "%";
+          if (percentLoad === 100) {
+            progressBar.classList = "progress-bar progress-bar-striped bg-success";
+          }
+        }
+      }
+    };
+
+    // xhr.setRequestHeader("Content-Type", "multipart/form-data");
+    xhr.setRequestHeader("X-Api-Key", printerInfo.apikey);
+    xhr.onloadend = async function (e) {
+      if (this.status >= 200 && this.status < 300) {
+        resolve({
+          status: bulkActionsStates.SUCCESS,
+          message: "Successfully uploaded your file! Printing started."
+        });
+        // Success!
+      } else {
+        resolve({
+          status: bulkActionsStates.ERROR,
+          message: "An error occured whilst updating your file... Printing failed."
+        });
+        // Error occured
+      }
+    };
+    xhr.onerror = function () {
+      resolve({
+        status: bulkActionsStates.ERROR,
+        message: "An error occured whilst updating your file... printing failed."
+      });
+      // Error occured!
+    };
+    xhr.send(formData);
+  });
+}
+
+export async function bulkPrintFileSetup() {
+  document.getElementById("bpActionButtonElement").innerHTML =
+    "<button id=\"bpActionButton\" type=\"button\" class=\"btn btn-success\" disabled>Start Prints!</button>";
+  document.getElementById("bpuploadFilesElement").innerHTML = `<div class="custom-file">
+          <input type="file" accept=".gcode,.gco" class="custom-file-input" id="bpFileUpload" multiple>
+          <label class="custom-file-label" multiple for="bpFileUpload">Click here to upload file(s)</label>
+      </div>
+    `;
+  document.getElementById(
+    "bpFilesSelectElement"
+  ).innerHTML = `<select id="bpFileSelect" class="custom-select" multiple>
+                </select>`;
+
+  const multiFolderInput = document.getElementById("multiNewFolder");
+  const multiNewFolderNew = document.getElementById("multiNewFolderNew");
+  let selectedFolder;
+  let uniqueFolderList = await OctoFarmClient.getOctoPrintUniqueFolders();
+  uniqueFolderList.forEach((folder) => {
+    multiFolderInput.insertAdjacentHTML(
+      "beforeend",
+      `
+        <option value="${folder}">${folder}</option>
+      `
+    );
+  });
+
+  // Load the new modal up...
+  $("#bulkPrintSetupModal").modal("show");
+  // Grab current list of printers...
+  let selectedFiles;
+  const printersToControl = await getCurrentlySelectedPrinterList();
+
+  const printerDisplayElement = document.getElementById("bpSelectedPrintersAndFiles");
+  printerDisplayElement.innerHTML = "";
+  const bpActionButton = document.getElementById("bpActionButton");
+  printersToControl.forEach((printer) => {
+    printerDisplayElement.insertAdjacentHTML(
+      "beforeend",
+      `
+        <div class="card col-2 px-1 py-1">
+         <div class="card-header px-1 py-1">
+           <small><i class="fas fa-print"></i> ${printer.printerName}</small> 
+          </div>
+          <div class="card-body px-1 py-1" id="printerFileChoice-${printer._id}">
+            <small><i class="fas fa-spinner fa-pulse"></i> Awaiting file selection...</small>
+         </div>
+        </div>
+    `
+    );
+  });
+
+  async function runUpload() {
+    // Setup the tracking modal...
+    showBulkActionsModal();
+    updateBulkActionsProgress(0, printersToControl.length);
+    generateTableRows(printersToControl);
+    // Make sure printers are in idle state...
+    for (let p = 0; p < printersToControl.length; p++) {
+      const response = await quickConnectPrinterToOctoPrint(printersToControl[p]);
+      updateTableRow(printersToControl[p]._id, response.status, response.message);
+    }
+
+    // Check if folder exists and create if not...
+
+    // Check if file exists and upload if not...
+    for (let p = 0; p < printersToControl.length; p++) {
+      const currentPrinter = printersToControl[p];
+      if (selectedFiles.length === 1) {
+        const doesFileExist = await OctoPrintClient.checkFile(
+          currentPrinter,
+          selectedFiles[0].name
+        );
+        if (doesFileExist === 200) {
+          const opt = {
+            command: "select",
+            print: true
+          };
+          await OctoPrintClient.updateFeedAndFlow(currentPrinter);
+          await OctoPrintClient.updateFilamentOffsets(currentPrinter);
+          console.log(selectedFolder);
+          const url = "files/local/" + selectedFiles[0].name.replaceAll(" ", "_");
+          const file = await OctoPrintClient.post(currentPrinter, url, opt);
+          if (file.status === 204) {
+            updateTableRow(
+              currentPrinter._id,
+              bulkActionsStates.SUCCESS,
+              "File exists... print has successfully started!"
+            );
+          } else {
+            updateTableRow(
+              currentPrinter._id,
+              bulkActionsStates.ERROR,
+              "There was an issue selecting your file to print..."
+            );
+          }
+        } else {
+          // Prep the file for upload...
+          const newObject = {};
+          newObject.file = selectedFiles[0];
+          newObject.index = currentPrinter._id;
+          newObject.printerInfo = currentPrinter;
+          newObject.currentFolder = "local/";
+          newObject.print = true;
+          updateTableRow(
+            currentPrinter._id,
+            bulkActionsStates.SKIPPED,
+            `
+            <div class="progress">
+              <div id="bpUploadProgress-${currentPrinter._id}" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">Uploading: 0%</div>
+            </div>
+          `
+          );
+
+          const response = await fileUpload(newObject);
+          updateTableRow(currentPrinter._id, response.status, response.message, true);
+        }
+      } else if (selectedFiles.length > 1) {
+        if (selectedFiles[p]) {
+          const doesFileExist = await OctoPrintClient.checkFile(
+            currentPrinter,
+            selectedFiles[p].name
+          );
+          if (doesFileExist === 200) {
+            const opt = {
+              command: "select",
+              print: true
+            };
+            await OctoPrintClient.updateFeedAndFlow(currentPrinter);
+            await OctoPrintClient.updateFilamentOffsets(currentPrinter);
+            const url = "files/local/" + selectedFiles[p].name;
+            const file = await OctoPrintClient.post(currentPrinter, url, opt);
+            if (file.status === 204) {
+              updateTableRow(
+                currentPrinter._id,
+                bulkActionsStates.SUCCESS,
+                "File exists... print has successfully started!"
+              );
+            } else {
+              updateTableRow(
+                currentPrinter._id,
+                bulkActionsStates.ERROR,
+                "There was an issue selecting your file to print..."
+              );
+            }
+          } else {
+            // Prep the file for upload...
+            const newObject = {};
+            newObject.file = selectedFiles[p];
+            newObject.index = currentPrinter._id;
+            newObject.printerInfo = currentPrinter;
+            newObject.currentFolder = "local/";
+            newObject.print = true;
+
+            updateTableRow(
+              currentPrinter._id,
+              bulkActionsStates.SKIPPED,
+              `
+              <div class="progress">
+                <div id="bpUploadProgress-${currentPrinter._id}" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">Uploading: 0%</div>
+              </div>
+            `
+            );
+
+            const response = await fileUpload(newObject);
+            updateTableRow(currentPrinter._id, response.status, response.message, true);
+          }
+        } else {
+          updateTableRow(
+            currentPrinter._id,
+            bulkActionsStates.ERROR,
+            "Seems there wasn't enough files selected for the printers..."
+          );
+        }
+      }
+      updateBulkActionsProgress(printersToControl.length, printersToControl.length);
+    }
+
+    // Run a background sync of all printers files...
+    for (let p = 0; p < printersToControl.length; p++) {
+      await OctoFarmClient.post("printers/resyncFile", {
+        i: printersToControl[p]._id
+      });
+    }
+  }
+
+  function grabFiles(Afiles) {
+    Afiles = [...Afiles];
+    return Afiles;
+  }
+
+  function setup() {
+    if (selectedFiles.length === 1) {
+      // Setup single file mode
+      bpActionButton.disabled = false;
+      setupSingleFileMode(printersToControl, selectedFiles[0], selectedFolder);
+    } else if (selectedFiles.length > 1) {
+      // Setup multiple file mode
+      bpActionButton.disabled = false;
+      setupMultiFileMode(printersToControl, selectedFiles, selectedFolder);
+    } else if (selectedFiles.length === 0) {
+      bpActionButton.disabled = true;
+    }
+  }
+
+  // Upload file listener
+  document.getElementById("bpFileUpload").addEventListener("change", function () {
+    selectedFiles = grabFiles(this.files);
+    setup();
+  });
+
+  bpActionButton.addEventListener("click", async function () {
+    await runUpload();
+  });
+
+  async function checkIfPathExistsOnOctoPrint() {
+    for (let i = 0; i < printersToControl.length; i++) {
+      const currentPrinter = printersToControl[i];
+
+      const doesFolderExist = await OctoPrintClient.checkFile(currentPrinter, selectedFolder);
+
+      if (doesFolderExist === 200) {
+        document.getElementById("printerFileChoice-" + currentPrinter._id).innerHTML =
+          "<i class=\"fas fa-folder-plus text-success\"></i> Folder exists!";
+        printersToControl[i].folderExists = true;
+      } else {
+        document.getElementById("printerFileChoice-" + currentPrinter._id).innerHTML =
+          "<i class=\"fas fa-folder-minus text-warning\"></i> Folder will be created!";
+        printersToControl[i].folderExists = false;
+      }
+    }
+  }
+
+  async function updateSelectedFolder() {
+    console.log(multiFolderInput.value + "/" + multiNewFolderNew.value);
+    selectedFolder = multiFolderInput.value + "/" + multiNewFolderNew.value;
+
+    const regexValidation = new RegExp("\\/[a-zA-Z0-9_\\/-]*[^\\/]$");
+    // validate the path
+    if (!regexValidation.exec("/" + selectedFolder.replace(/ /g, "_"))) {
+      multiFolderInput.classList.add("is-invalid");
+      multiNewFolderNew.classList.add("is-invalid");
+    } else {
+      multiNewFolderNew.classList.remove("is-invalid");
+      multiNewFolderNew.classList.add("is-valid");
+      multiFolderInput.classList.remove("is-invalid");
+      multiFolderInput.classList.add("is-valid");
+      await checkIfPathExistsOnOctoPrint();
+    }
+  }
+
+  multiFolderInput.addEventListener("change", function () {
+    setup();
+  });
+
+  multiNewFolderNew.addEventListener("change", function () {
+    setup();
+  });
 }
 
 export async function bulkDisconnectPrinters() {
@@ -579,19 +938,72 @@ export async function bulkOctoPrintGcodeCommand() {
     size: "large",
     title: "What gcode commands would you like sent?",
     inputType: "textarea",
-    onShow: function (e) {
+    onShow: async function (e) {
       let textArea = document.getElementsByClassName(
         "bootbox-input bootbox-input-textarea form-control"
       );
-      const customGcodeEE = "<div class='mb-1' id='customGcodeCommandsArea'></div>";
+      const customGcodeEE =
+        "<h5>Pre-defined Gcode Scripts: </h5><div class='mb-1' id='customGcodeCommandsArea'></div><h5 class='mt-2'>On demand gcode script: </h5>";
       textArea[0].insertAdjacentHTML("beforebegin", customGcodeEE);
-      CustomGenerator.generateButtons(printersToSendGcode);
+      const gcodeButtons = await OctoFarmClient.getCustomGcode();
+      let area = document.getElementById("customGcodeCommandsArea");
+      if (area) {
+        gcodeButtons.forEach((scripts) => {
+          let button = CustomGenerator.getButton(scripts);
+          area.insertAdjacentHTML("beforeend", button);
+          document.getElementById("gcode-" + scripts._id).addEventListener("click", async (e) => {
+            showBulkActionsModal();
+            updateBulkActionsProgress(0, printersToSendGcode.length);
+            generateTableRows(printersToSendGcode);
+            for (let p = 0; p < printersToSendGcode.length; p++) {
+              // To cover old script states we must check for blank printer ids.
+              if (
+                scripts.printerIds.length === 0 ||
+                scripts.printerIds.includes(printersToSendGcode[p]._id)
+              ) {
+                let post = await CustomGenerator.fireCommand(
+                  scripts._id,
+                  scripts.gcode,
+                  printersToSendGcode[p]
+                );
+                updateBulkActionsProgress(p, printersToSendGcode.length);
+                if (post.status === 204) {
+                  updateTableRow(
+                    printersToSendGcode[p]._id,
+                    "success",
+                    "Successfully sent your command to the printer!"
+                  );
+                } else {
+                  updateTableRow(
+                    printersToSendGcode[p]._id,
+                    "danger",
+                    "Failed to send your command to the printer!"
+                  );
+                }
+              } else {
+                //Skipped
+                updateTableRow(
+                  printersToSendGcode[p]._id,
+                  "warning",
+                  "Printer was skipped because it is not allowed to be sent the script..."
+                );
+              }
+            }
+            updateBulkActionsProgress(printersToSendGcode.length, printersToSendGcode.length);
+          });
+        });
+      }
     },
     callback: async function (result) {
       if (result) {
+        showBulkActionsModal();
+        updateBulkActionsProgress(0, printersToSendGcode.length);
+        generateTableRows(printersToSendGcode);
         for (let p = 0; p < printersToSendGcode.length; p++) {
-          await printerSendGcode(printersToSendGcode[p], result);
+          let response = await printerSendGcode(printersToSendGcode[p], result);
+          updateTableRow(printersToSendGcode[p]._id, response.status, response.message);
         }
+        updateBulkActionsProgress(printersToSendGcode.length, printersToSendGcode.length);
       }
     }
   });
@@ -682,3 +1094,36 @@ export async function bulkOctoPrintPluginAction(action) {
     );
   }
 }
+
+setInterval(async () => {
+  //Auto refresh of files
+  // If there are files in the queue, plow through until uploaded... currently single file at a time.
+  if (fileUploads.size() > 0) {
+    const current = fileUploads.first();
+    if (!current.active) {
+      fileUploads.activate(0);
+      const currentDate = new Date();
+      let file = await current.upload(current);
+      file = JSON.parse(file);
+      file.index = current.index;
+      file.uploadDate = currentDate.getTime() / 1000;
+      const post = await OctoFarmClient.post("printers/newFiles", file);
+      // const update = await FileManager.updateFileList(file);
+      fileUploads.remove();
+      const fileCounts = document.getElementById(`fileCounts-${current.index}`);
+      if (fileCounts && fileCounts.innerHTML == 1) {
+        fileCounts.innerHTML = ` ${0}`;
+      }
+    }
+  }
+  const allUploads = fileUploads.all();
+  allUploads.forEach((uploads) => {
+    const currentCount = allUploads.reduce(function (n, up) {
+      return n + (up.index == uploads.index);
+    }, 0);
+    const fileCounts = document.getElementById(`fileCounts-${uploads.index}`);
+    if (fileCounts) {
+      fileCounts.innerHTML = ` ${currentCount}`;
+    }
+  });
+}, 1000);

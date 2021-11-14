@@ -123,7 +123,9 @@ function currentOperationsView(currentOperations, currentOperationsCount, printe
       document.getElementById("currentOperationsBody").insertAdjacentHTML(
         "beforeend",
         `
-            <div class="col-2 pt-0 pb-0" id="viewPanel-${current.index}">
+            <div class="col-sm-6 col-md-4 col-lg-2 col-xl-1 pt-0 pb-0" id="viewPanel-${
+              current.index
+            }">
                 <div id="currentOpCard-${current.index}"
                 class="card card-block text-white bg-secondary d-inline-block"
                  style="width:100%;"
@@ -189,7 +191,7 @@ function currentOperationsView(currentOperations, currentOperationsCount, printe
     });
     const remove = _.difference(cards, curr);
     remove.forEach((rem) => {
-      document.getElementById("viewPanel-" + rem).style.display = "none";
+      document.getElementById("viewPanel-" + rem).remove();
     });
   });
 }

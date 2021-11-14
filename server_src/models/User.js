@@ -23,8 +23,9 @@ const UserSchema = new mongoose.Schema({
     required: false
   },
   clientSettings: {
-    type: Object,
-    required: false
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "ClientSettings",
+    required: true
   }
 });
 

@@ -2,40 +2,29 @@ const express = require("express");
 const router = express.Router();
 const bcrypt = require("bcryptjs");
 const passport = require("passport");
-const ServerSettings = require("../models/ServerSettings.js");
+const ClientSettings = require("../models/ClientSettings.js");
 const { AppConstants } = require("../app.constants");
 
 const User = require("../models/User.js");
+const { UserTokenService } = require("../services/authentication/user-token.service");
+const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
+const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
 const {
-  UserTokenService
-} = require("../services/authentication/user-token.service");
-
-let settings;
-let currentUsers;
-
-async function fetchServerSettings() {
-  if (!settings) {
-    settings = await ServerSettings.find({});
-  }
-
-  return settings;
-}
-
-async function fetchUsers(force = false) {
-  if (!currentUsers || force) {
-    currentUsers = await User.find({});
-  }
-  return currentUsers;
-}
+  fetchUsers,
+  createUser,
+  deleteUser,
+  resetPassword,
+  editUser
+} = require("../services/user-service");
 
 // Login Page
 router.get("/login", async (req, res) => {
-  settings = await fetchServerSettings();
+  const serverSettings = SettingsClean.returnSystemSettings();
   res.render("login", {
     page: "Login",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-    registration: settings[0].server.registration,
-    serverSettings: settings
+    registration: serverSettings.server.registration,
+    serverSettings: serverSettings
   });
 });
 
@@ -71,8 +60,8 @@ router.post(
 
 // Register Page
 router.get("/register", async (req, res) => {
-  let settings = await fetchServerSettings();
-  if (settings[0].server.registration !== true) {
+  const serverSettings = SettingsClean.returnSystemSettings();
+  if (serverSettings.server.registration !== true) {
     return res.redirect("login");
   }
 
@@ -80,7 +69,7 @@ router.get("/register", async (req, res) => {
   res.render("register", {
     page: "Register",
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-    serverSettings: settings,
+    serverSettings: serverSettings,
     userCount: currentUsers.length
   });
 });
@@ -90,7 +79,7 @@ router.post("/register", async (req, res) => {
   const { name, username, password, password2 } = req.body;
   const errors = [];
 
-  let settings = await fetchServerSettings();
+  const serverSettings = SettingsClean.returnSystemSettings();
   let currentUsers = await fetchUsers(true);
 
   // Check required fields
@@ -112,8 +101,8 @@ router.post("/register", async (req, res) => {
     res.render("register", {
       page: "Login",
       octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-      registration: settings[0].server.registration,
-      serverSettings: settings,
+      registration: serverSettings.server.registration,
+      serverSettings: serverSettings,
       errors,
       name,
       username,
@@ -130,8 +119,8 @@ router.post("/register", async (req, res) => {
         res.render("register", {
           page: "Login",
           octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
-          registration: settings[0].server.registration,
-          serverSettings: settings,
+          registration: serverSettings.server.registration,
+          serverSettings: serverSettings,
           errors,
           name,
           username,
@@ -141,18 +130,21 @@ router.post("/register", async (req, res) => {
         });
       } else {
         // Check if first user that's created.
-        User.find({}).then((user) => {
+        User.find({}).then(async (user) => {
           let userGroup = "";
           if (user.length < 1) {
             userGroup = "Administrator";
           } else {
             userGroup = "User";
           }
+          const userSettings = new ClientSettings();
+          await userSettings.save();
           const newUser = new User({
             name,
             username,
             password,
-            group: userGroup
+            group: userGroup,
+            clientSettings: userSettings._id
           });
           // Hash Password
           bcrypt.genSalt(10, (error, salt) =>
@@ -164,11 +156,7 @@ router.post("/register", async (req, res) => {
               newUser
                 .save()
                 .then((user) => {
-                  req.flash(
-                    "success_msg",
-                    "You are now registered and can login"
-                  );
-                  const page = "login";
+                  req.flash("success_msg", "You are now registered and can login");
                   res.redirect("/users/login");
                 })
                 .catch((err) => console.log(err));
@@ -185,6 +173,36 @@ router.get("/logout", (req, res) => {
   req.logout();
   req.flash("success_msg", "You are logged out");
   res.redirect("/users/login");
+});
+
+// Get user list
+router.get("/users/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  const user = await User.findById(req.params.id);
+  res.send(user);
+});
+
+// Update user
+router.patch("/users/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  const newUserInformation = req.body;
+  const id = req.params.id;
+  if ("password" in newUserInformation) {
+    res.send(await resetPassword(id, newUserInformation));
+  }
+  if ("username" in newUserInformation) {
+    res.send(await editUser(id, newUserInformation));
+  }
+});
+
+// New user
+router.post("/users", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  const user = req.body;
+  res.send(await createUser(user));
+});
+
+// Delete User
+router.delete("/users/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
+  const id = req.params.id;
+  res.send(await deleteUser(id));
 });
 
 module.exports = router;

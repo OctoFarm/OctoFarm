@@ -282,7 +282,8 @@ a.notyet {
 .fileBody {
   padding: 5px;
   overflow-y: scroll;
-  /*min-height: 40vh;*/
+  min-height: 65vh;
+  height: 65vh;
   max-height: 65vh;
 }
 .fileBody p {
@@ -362,10 +363,9 @@ a.notyet {
 /*  height: 90vh;*/
 /*}*/
 
-.camButtons {
+.camButtons{
   position: absolute;
-  bottom: 25px;
-  right: 7px;
+  bottom: 15px;
   z-index: 1000;
 }
 .camName {
@@ -582,4 +582,12 @@ label {
 }
 .carousel-caption:hover {
   display: block !important;
+}
+
+
+.stuck {
+  position: -webkit-sticky;
+  position: sticky;
+  top: 60px;
+  z-index: 1020;
 }

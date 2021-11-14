@@ -8,6 +8,7 @@ const {
   getEmptyOperationsObject,
   ALL_MONTHS
 } = require("../providers/cleaner.constants");
+const { returnCurrentOrdering } = require("../../services/current-operations-order.service");
 const { getHistoryCache } = require("../../cache/history.cache");
 const _ = require("lodash");
 const { JobClean } = require("./jobClean.js");
@@ -377,6 +378,10 @@ class PrinterClean {
         octoPrintSystemInfo: farmPrinter.octoPrintSystemInfo
       };
 
+      if (farmPrinter?.restartRequired) {
+        sortedPrinter.restartRequired = farmPrinter.restartRequired;
+      }
+
       if (farmPrinter?.layerData) {
         sortedPrinter.layerData = farmPrinter.layerData;
       }
@@ -733,7 +738,6 @@ class PrinterClean {
           }
 
           if (typeof printer.printerState !== "undefined" && printer.currentJob != null) {
-            // TODO toString error if not present
             let id = printer._id;
             id = id.toString();
             if (printer.printerState.colour.category === "Complete") {
@@ -741,6 +745,7 @@ class PrinterClean {
               progress.push(printer.currentJob.progress);
               operations.push({
                 index: id,
+                sortIndex: printer.sortIndex,
                 name,
                 progress: Math.floor(printer.currentJob.progress),
                 progressColour: "success",
@@ -757,6 +762,7 @@ class PrinterClean {
               progress.push(printer.currentJob.progress);
               operations.push({
                 index: id,
+                sortIndex: printer.sortIndex,
                 name,
                 progress: Math.floor(printer.currentJob.progress),
                 progressColour: "warning",
@@ -802,7 +808,10 @@ class PrinterClean {
       currentOperations.count.idle = idle.length;
       currentOperations.count.disconnected = disconnected.length;
 
-      currentOperations.operations = _.orderBy(operations, ["progress"], ["desc"]);
+      const { currentIterie, currentOrder } = returnCurrentOrdering();
+      const iterie = [currentIterie];
+      const order = [currentOrder];
+      currentOperations.operations = _.orderBy(operations, iterie, order);
     } catch (err) {
       logger.error(`Current Operations issue: ${err}`);
     }
@@ -1455,6 +1464,46 @@ class PrinterClean {
       versionArray.push(printer.octoPrintVersion);
     });
     return versionArray;
+  }
+  static returnUniqueListOfOctoPrintFiles() {
+    const printers = this.listPrintersInformation();
+
+    const filePathsArray = [];
+
+    for (let f = 0; f < printers.length; f++) {
+      const fileList = printers[f]?.fileList?.fileList;
+      if (fileList) {
+        for (let p = 0; p < fileList.length; p++) {
+          const index = _.findIndex(filePathsArray, function (o) {
+            return o.display == fileList[p].display;
+          });
+          if (index === -1) {
+            filePathsArray.push({
+              name: fileList[p].name,
+              display: fileList[p].display
+            });
+          }
+        }
+      }
+    }
+    return filePathsArray;
+  }
+  static returnUniqueListOfOctoPrintPaths() {
+    const printers = this.listPrintersInformation();
+
+    const filePathsArray = [""];
+
+    for (let f = 0; f < printers.length; f++) {
+      const folderList = printers[f]?.fileList?.folderList;
+      if (folderList) {
+        for (let p = 0; p < folderList.length; p++) {
+          if (!filePathsArray.includes(folderList[p].name)) {
+            filePathsArray.push(folderList[p].name);
+          }
+        }
+      }
+    }
+    return filePathsArray;
   }
 }
 
