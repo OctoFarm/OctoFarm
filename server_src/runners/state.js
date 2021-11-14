@@ -3063,10 +3063,9 @@ class Runner {
       farmPrinters[i].selectedFilament,
       i
     );
-    FileClean.generate(farmPrinters[i], currentFilament);
-    FileClean.statistics(farmPrinters);
 
-    return true;
+    FileClean.statistics(farmPrinters);
+    return FileClean.generate(farmPrinters[i], currentFilament);
   }
 
   static async flowRate(id, newRate) {
