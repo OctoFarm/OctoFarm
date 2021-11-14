@@ -31,8 +31,8 @@ import {
 import PrinterTerminalManager from "../lib/modules/printerTerminalManager";
 import { groupBy, mapValues } from "lodash";
 
-const elems = [];
-const groupElems = [];
+let elems = [];
+let groupElems = [];
 let powerTimer = 20000;
 let printerManagerModal = document.getElementById("printerManagerModal");
 const currentOpenModal = document.getElementById("printerManagerModalTitle");
@@ -40,9 +40,17 @@ let printerArea = document.getElementById("printerArea");
 let actionButtonsInitialised;
 
 document.getElementById("filterStates").addEventListener("change", (e) => {
+  printerArea.innerHTML = "";
+  elems = [];
+  groupElems = [];
+  actionButtonsInitialised = false;
   OctoFarmClient.get("client/updateFilter/" + e.target.value);
 });
 document.getElementById("sortStates").addEventListener("change", (e) => {
+  printerArea.innerHTML = "";
+  elems = [];
+  groupElems = [];
+  actionButtonsInitialised = false;
   OctoFarmClient.get("client/updateSorting/" + e.target.value);
 });
 
