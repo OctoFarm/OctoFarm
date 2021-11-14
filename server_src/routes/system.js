@@ -25,21 +25,21 @@ marked.setOptions({
   smartypants: true
 });
 
+const md = function (filename) {
+  const path = "./" + filename;
+  const include = fs.readFileSync(path, "utf8");
+  const html = marked.parse(include);
+  return html;
+};
+
 router.get("/", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const clientSettings = await SettingsClean.returnClientSettings();
-  const serverSettings = await SettingsClean.returnSystemSettings();
+  const serverSettings = SettingsClean.returnSystemSettings();
   const systemInformation = await SystemRunner.querySystemInfo();
   const printers = Runner.returnFarmPrinters();
   const softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
   let dashboardSettings = clientSettings?.dashboard || getDefaultDashboardSettings();
   const currentUsers = await fetchUsers();
-
-  const md = function (filename) {
-    const path = "./" + filename;
-    const include = fs.readFileSync(path, "utf8");
-    const html = marked.parse(include);
-    return html;
-  };
 
   res.render("system", {
     name: req.user.name,

@@ -3706,6 +3706,7 @@ class Runner {
   }
 
   static async updateFile(file, i) {
+    console.log(fileTimeout);
     if (fileTimeout <= 20000) {
       logger.info(
         `Updating new file ${
