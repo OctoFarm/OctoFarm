@@ -729,7 +729,7 @@ export function drawCombinedView(printer, clientSettings) {
   }
 
   return `
-     <div class="card ${hidden}" id="panel-${printer._id}">
+     <div class="card ${hidden} mb-3" id="panel-${printer._id}">
         <div class="d-none index">${printer.sortIndex}</div>
         <div class="col-12">
             <div class="row">
