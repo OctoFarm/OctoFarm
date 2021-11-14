@@ -1104,7 +1104,7 @@ export async function initMonitoring(printers, clientSettings, view) {
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
           } else if (view === "group") {
             drawGroupViewContainers(printers, printerArea, clientSettings);
-            drawGroupViewPrinters(printers);
+            drawGroupViewPrinters(printers, clientSettings);
           } else if (view === "combined") {
             let printerHTML = drawCombinedView(printers[p], clientSettings);
             printerArea.insertAdjacentHTML("beforeend", printerHTML);
