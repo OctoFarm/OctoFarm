@@ -182,14 +182,12 @@ router.post("/moveFolder", ensureAuthenticated, async (req, res) => {
 router.post("/newFolder", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   logger.info("New folder request: ", data);
-  Runner.newFolder(data);
-  res.send({ msg: "success" });
+  res.send({ msg: "success", files: await Runner.newFolder(data) });
 });
 router.post("/newFiles", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   logger.info("Adding a new file to server: ", data);
-  Runner.newFile(data);
-  res.send({ msg: "success" });
+  res.send({ msg: "success", files: await Runner.newFile(data) });
 });
 router.post("/selectFilament", ensureAuthenticated, async (req, res) => {
   const data = req.body;

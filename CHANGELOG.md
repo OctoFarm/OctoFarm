@@ -43,6 +43,7 @@ All notable changes to this project will be documented in this file.
   - Printer Action buttons have been split up. I've left Web, Quick connect, ReSync and Power on the top bars for printer actions. Then the Printer Control from before has been split up.
     - Printer control is now Files, Control and Terminal. You will find these on most of the views in various places. 
   - Client settings are no longer global. They are now attached to a user, so different users can have different settings/dashboard configurations.
+  - File manager improvements, re-sync's are near instantaneous now.
 
 ### Removed
 

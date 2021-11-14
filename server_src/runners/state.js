@@ -2344,12 +2344,10 @@ class Runner {
           "Complete",
           farmPrinters[index]._id
         );
-        FileClean.generate(farmPrinters[index], currentFilament);
         farmPrinters[index].systemChecks.scanning.files.status = "success";
         farmPrinters[index].systemChecks.scanning.files.date = new Date();
         FileClean.statistics(farmPrinters);
-        logger.info(`Successfully grabbed Files for...: ${farmPrinters[index].printerURL}`);
-        return true;
+        return FileClean.generate(farmPrinters[index], currentFilament);
       })
       .catch((err) => {
         farmPrinters[index].systemChecks.scanning.files.status = "danger";
@@ -2427,7 +2425,6 @@ class Runner {
           "Complete",
           farmPrinters[index]._id
         );
-        logger.info(`Successfully grabbed Current State for...: ${farmPrinters[index].printerURL}`);
       })
       .catch((err) => {
         farmPrinters[index].systemChecks.scanning.state.status = "danger";
@@ -2867,7 +2864,6 @@ class Runner {
 
         farmPrinters[index].systemChecks.scanning.settings.status = "success";
         farmPrinters[index].systemChecks.scanning.settings.date = new Date();
-        logger.info(`Successfully grabbed Settings for...: ${farmPrinters[index].printerURL}`);
       })
       .catch((err) => {
         PrinterTicker.addIssue(
@@ -2915,10 +2911,6 @@ class Runner {
           "Grabbed system information...",
           "Complete",
           farmPrinters[index]._id
-        );
-
-        logger.info(
-          `Successfully grabbed System Information for...: ${farmPrinters[index].printerURL}`
         );
       })
       .catch((err) => {
@@ -3592,8 +3584,8 @@ class Runner {
       farmPrinters[i].selectedFilament,
       i
     );
-    FileClean.generate(farmPrinters[i], currentFilament);
     FileClean.statistics(farmPrinters);
+    return FileClean.generate(farmPrinters[i], currentFilament);
   }
 
   static async updateFilament() {
@@ -3705,12 +3697,13 @@ class Runner {
       farmPrinters[i].selectedFilament,
       i
     );
-    FileClean.generate(farmPrinters[i], currentFilament);
+
     FileClean.statistics(farmPrinters);
     await this.updateFile(
       farmPrinters[i].fileList.files[farmPrinters[i].fileList.files.length - 1],
       i
     );
+    return await FileClean.generate(farmPrinters[i], currentFilament);
   }
 
   static async updateFile(file, i) {
@@ -3743,17 +3736,16 @@ class Runner {
               farmPrinters[i].selectedFilament,
               i
             );
-            FileClean.generate(farmPrinters[i], currentFilament);
+
             FileClean.statistics(farmPrinters);
-            return null;
+            return FileClean.generate(farmPrinters[i], currentFilament);
           } else {
             const currentFilament = await Runner.compileSelectedFilament(
               farmPrinters[i].selectedFilament,
               i
             );
-            FileClean.generate(farmPrinters[i], currentFilament);
             FileClean.statistics(farmPrinters);
-            return null;
+            return FileClean.generate(farmPrinters[i], currentFilament);
           }
         }
       }, 5000);

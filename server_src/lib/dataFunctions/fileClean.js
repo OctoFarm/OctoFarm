@@ -145,15 +145,16 @@ class FileClean {
       folderList: fileList.folders || [],
       folderCount: fileList.folderCount || 0
     };
+
     if (!!farmPrinter.systemChecks) {
       farmPrinter.systemChecks.cleaning.file.status = "success";
       farmPrinter.systemChecks.cleaning.file.date = new Date();
     }
-    logger.info("File Information cleaned and ready for consumption...");
+    return cleanFileList[sortIndex];
   }
 
   /**
-   * TODO get units of what? Be explicit.
+   * TODO get units of what? Be explicit. Your in a file called FILECLEAN... maybe just maybe the cost of the file!? follow your own god damn rules
    * @param filamentSelection
    * @param fileLength
    * @returns {*[]}
