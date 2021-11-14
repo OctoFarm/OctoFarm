@@ -1,5 +1,14 @@
 // Create the drop down template
-const printerDrop = document.getElementById("printerSelection");
+let printerDrop = document.getElementById("printerSelection");
+const printerDropWrapper = document.getElementById("printerSelectionWrapper");
+
+function returnDropDownHTML() {
+  return `
+      <select class="custom-select p-1" id="printerSelection">
+
+      </select>
+  `;
+}
 
 export function setupClientSwitchDropDown(
   currentPrinterId,
@@ -24,26 +33,27 @@ export function setupClientSwitchDropDown(
 
   if (forceCreate) {
     if (printerDrop) {
-      printerDrop.innerHTML = "";
+      printerDrop.remove();
+      printerDropWrapper.insertAdjacentHTML("beforeend", returnDropDownHTML());
+      printerDrop = document.getElementById("printerSelection");
+
       printerControlList.forEach((list) => {
         if (list.state.category !== "Offline") {
           printerDrop.insertAdjacentHTML(
             "beforeend",
             `
-                <option value="${list.printerID}" selected>${list.printerName}</option>
+                <option value="${list.printerID}">${list.printerName}</option>
             `
           );
         }
       });
     }
   }
-
+  // Select the current printer
   printerDrop.value = currentPrinterId;
+
   if (printerDrop.getAttribute("listener") === null) {
     printerDrop.addEventListener("change", changeEventFunction, false);
     printerDrop.setAttribute("listener", "true");
   }
-
-  // Insert into the client
-  // Select the current printer
 }
