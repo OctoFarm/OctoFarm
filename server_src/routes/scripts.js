@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { ensureAuthenticated } = require("../config/auth");
+const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
 // User Modal
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
@@ -10,13 +10,13 @@ const Alerts = require("../models/Alerts.js");
 
 const script = require("../runners/scriptCheck.js");
 const Script = script.ScriptRunner;
-router.get("/get", ensureAuthenticated, async (req, res) => {
+router.get("/get", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   //Grab the API body
   const alerts = await Alerts.find({});
   //Return printers added...
   res.send({ alerts: alerts, status: 200 });
 });
-router.delete("/delete/:id", ensureAuthenticated, async (req, res) => {
+router.delete("/delete/:id", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   //Grab the API body
   let id = req.params.id;
   await Alerts.deleteOne({ _id: id })
@@ -29,7 +29,7 @@ router.delete("/delete/:id", ensureAuthenticated, async (req, res) => {
     });
   //Return printers added...
 });
-router.post("/test", ensureAuthenticated, async (req, res) => {
+router.post("/test", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   //Grab the API body
   const opts = req.body;
   //Send Dashboard to Runner..
@@ -37,20 +37,15 @@ router.post("/test", ensureAuthenticated, async (req, res) => {
   //Return printers added...
   res.send({ testFire: testFire, status: 200 });
 });
-router.post("/save", ensureAuthenticated, async (req, res) => {
+router.post("/save", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   //Grab the API body
   const opts = req.body;
   //Send Dashboard to Runner..
-  let save = await Script.save(
-    opts.printer,
-    opts.trigger,
-    opts.message,
-    opts.scriptLocation
-  );
+  let save = await Script.save(opts.printer, opts.trigger, opts.message, opts.scriptLocation);
   //Return printers added...
   res.send({ message: save, status: 200 });
 });
-router.post("/edit", ensureAuthenticated, async (req, res) => {
+router.post("/edit", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   //Grab the API body
   const opts = req.body;
   //Send Dashboard to Runner..
