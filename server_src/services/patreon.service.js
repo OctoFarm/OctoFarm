@@ -1,4 +1,3 @@
-const { writeFile } = require("fs");
 const fetch = require("node-fetch");
 let patreonData = require("../patreon.constants");
 
