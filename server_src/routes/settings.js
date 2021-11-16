@@ -22,7 +22,7 @@ const { Runner } = runner;
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 const { Logs } = require("../lib/serverLogs.js");
 const { SystemCommands } = require("../lib/serverCommands.js");
-
+const { fetchUsers } = require("../services/user-service");
 const {
   checkReleaseAndLogUpdate,
   getUpdateNotificationIfAny
@@ -189,7 +189,18 @@ router.get("/client/get", ensureCurrentUserAndGroup, ensureAuthenticated, (req, 
     res.send(checked);
   });
 });
-router.post("/client/update", ensureCurrentUserAndGroup, ensureAuthenticated, (req, res) => {
+router.post("/client/update", ensureCurrentUserAndGroup, ensureAuthenticated, async (req, res) => {
+  const currentUserList = await fetchUsers();
+
+  // Patch to fill in user settings if it doesn't exist
+  for (let i = 0; i < currentUserList.length; i++) {
+    if (!currentUserList[i].clientSettings) {
+      currentUserList[i].clientSettings = new ClientSettingsDB();
+      currentUserList[i].clientSettings.save();
+      currentUserList[i].save();
+    }
+  }
+
   ClientSettingsDB.findByIdAndUpdate(req.user.clientSettings._id, req.body)
     .then(() => {
       SettingsClean.start();
