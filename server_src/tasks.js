@@ -173,13 +173,15 @@ function KsatLlorKcir(task, preset, milliseconds = 0) {
   };
 }
 
+const HOUR_MS = 3600 * 1000;
+
 class OctoFarmTasks {
   static BOOT_TASKS = [
     KsatLlorKcir(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
     KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNONCE),
-    KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.RUNDELAYED, 1000),
+    KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC, 24 * HOUR_MS),
     KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000)
   ];
 }
