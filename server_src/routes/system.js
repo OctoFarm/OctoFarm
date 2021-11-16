@@ -27,8 +27,8 @@ marked.setOptions({
 
 router.get("/", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const clientSettings = await SettingsClean.returnClientSettings();
-  const serverSettings = await SettingsClean.returnSystemSettings();
-  const systemInformation = await SystemRunner.querySystemInfo();
+  const serverSettings = SettingsClean.returnSystemSettings();
+  const systemInformation = SystemRunner.returnInfo();
   const printers = Runner.returnFarmPrinters();
   const softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
   let dashboardSettings = clientSettings?.dashboard || getDefaultDashboardSettings();

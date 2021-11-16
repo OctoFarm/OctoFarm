@@ -3,6 +3,13 @@
 
 <div class="row">
     <div class="col-12">
+        <% if(!serverSettings.server.loginRequired){ %>
+            <div class="alert alert-warning text-dark" role="alert">
+                The server has the login requirement turned off, the users below cannot be used.
+            </div>
+        <% } %>
+    </div>
+    <div class="col-12">
         <div class="float-left">
             <h4>User Manager</h4>
         </div>
@@ -25,6 +32,20 @@
             </thead>
             <tbody id="userTable" style="height:100%; overflow-y:auto;">
                 <% currentUsers.forEach(user => { %>
+                    <% if(user.name === name || name === ""){ %>
+                        <!-- Current user, do not allow password reset, edit, delete! -->
+                        <tr id="userRow-<%=user._id%>">
+                            <th scope="row"><%= user.name %></th>
+                            <td><%= user.username %></td>
+                            <td><%= user.group %></td>
+                            <td><%= user.date.toLocaleDateString() %></td>
+                            <td>
+                                <button id="resetPasswordBtn-<%=user._id%>" type="button" class="btn btn-warning text-dark btn-sm" data-toggle="modal" data-target="#usersResetPasswordModal" disabled><i class="fas fa-user-shield"></i> Reset Password</button>
+                                <button id="editUserBtn-<%=user._id%>" type="button" class="btn btn-info btn-sm" data-toggle="modal" data-target="#userEditModal" disabled><i class="fas fa-user-edit"></i> Edit</button>
+                                <button id="deleteUserBtn-<%=user._id%>" type="button" class="btn btn-danger btn-sm" disabled><i class="fas fa-user-minus"></i> Delete</button>
+                            </td>
+                        </tr>
+                    <% } else { %>
                     <tr id="userRow-<%=user._id%>">
                         <th scope="row"><%= user.name %></th>
                         <td><%= user.username %></td>
@@ -36,6 +57,8 @@
                             <button id="deleteUserBtn-<%=user._id%>" type="button" class="btn btn-danger btn-sm"><i class="fas fa-user-minus"></i> Delete</button>
                         </td>
                     </tr>
+                    <% } %>
+
                 <% }) %>
             </tbody>
         </table>
