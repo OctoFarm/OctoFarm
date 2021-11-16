@@ -14,7 +14,7 @@ async function grabLatestPatreonData() {
     const getJSON = latestPatreonData.json();
     patreonData = getJSON.patreons.applicationPledges;
   } else {
-    console.log("FAILED TO CHECK SERVER FOR PATREON DATA");
+    console.log("FAILED TO CHECK SERVER FOR PATREON DATA, FALLING BACK TO LOCAL");
   }
 }
 
