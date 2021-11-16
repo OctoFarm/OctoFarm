@@ -17,12 +17,12 @@ const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-API");
 const runner = require("../runners/state.js");
 const multer = require("multer");
+const { isEqual } = require("lodash");
 const { Runner } = runner;
-// const { SystemRunner } = require("../runners/systemInfo.js");
 const { SettingsClean } = require("../lib/dataFunctions/settingsClean.js");
 const { Logs } = require("../lib/serverLogs.js");
 const { SystemCommands } = require("../lib/serverCommands.js");
-
+const { fetchUsers } = require("../services/user-service");
 const {
   checkReleaseAndLogUpdate,
   getUpdateNotificationIfAny
@@ -189,10 +189,22 @@ router.get("/client/get", ensureCurrentUserAndGroup, ensureAuthenticated, (req, 
     res.send(checked);
   });
 });
-router.post("/client/update", ensureCurrentUserAndGroup, ensureAuthenticated, (req, res) => {
+router.post("/client/update", ensureCurrentUserAndGroup, ensureAuthenticated, async (req, res) => {
+  const currentUserList = await fetchUsers();
+
+  // Patch to fill in user settings if it doesn't exist
+  for (let i = 0; i < currentUserList.length; i++) {
+    if (!currentUserList[i].clientSettings) {
+      currentUserList[i].clientSettings = new ClientSettingsDB();
+      currentUserList[i].clientSettings.save();
+      currentUserList[i].save();
+    }
+  }
+
   ClientSettingsDB.findByIdAndUpdate(req.user.clientSettings._id, req.body)
-    .then(() => {
+    .then(async () => {
       SettingsClean.start();
+      await fetchUsers(true);
       res.send({ msg: "Settings Saved" });
     })
     .catch((e) => {
@@ -219,14 +231,37 @@ router.get("/server/get", ensureAuthenticated, ensureAdministrator, (req, res) =
 });
 router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, res) => {
   ServerSettingsDB.find({}).then(async (checked) => {
+    let restartRequired = false;
+
+    const onlineChanges = isEqual(checked[0].onlinePolling, req.body.onlinePolling);
+    const serverChanges = isEqual(checked[0].server, req.body.onlinePolling);
+    const timeoutChanges = isEqual(checked[0].timeout, req.body.onlinePolling);
+    const filamentChanges = isEqual(checked[0].filament, req.body.onlinePolling);
+    const historyChanges = isEqual(checked[0].history, req.body.onlinePolling);
+    const influxExport = isEqual(checked[0].influxExport, req.body.influxExport);
+
     checked[0].onlinePolling = req.body.onlinePolling;
-    Runner.updatePoll();
     checked[0].server = req.body.server;
     checked[0].timeout = req.body.timeout;
     checked[0].filament = req.body.filament;
     checked[0].history = req.body.history;
     checked[0].influxExport = req.body.influxExport;
     checked[0].monitoringViews = req.body.monitoringViews;
+
+    if (
+      [
+        onlineChanges,
+        serverChanges,
+        timeoutChanges,
+        filamentChanges,
+        historyChanges,
+        influxExport
+      ].includes(false)
+    ) {
+      restartRequired = true;
+      await Runner.updatePoll();
+    }
+
     //Check the influx export to see if all information exists... disable if not...
     let shouldDisableInflux = false;
     let returnMsg = "";
@@ -259,7 +294,7 @@ router.post("/server/update", ensureAuthenticated, ensureAdministrator, (req, re
         status: "warning"
       });
     } else {
-      res.send({ msg: "Settings Saved", status: "success" });
+      res.send({ msg: "Settings Saved", status: "success", restartRequired });
     }
   });
 });

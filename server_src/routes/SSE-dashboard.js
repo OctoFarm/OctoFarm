@@ -32,15 +32,15 @@ router.get("/get/", ensureAuthenticated, async function (req, res) {
       delete clients[clientId];
     }); // <- Remove this client when he errors out
   })(++clientId);
-  await sendData();
+  await sendData(req?.user?.clientSettings._id || null, false);
 });
 
-async function sendData() {
+async function sendData(clientSettingsID, timeout) {
   await PrinterClean.statisticsStart();
-  let clientsSettingsCache = await SettingsClean.returnClientSettings();
+  let clientsSettingsCache = await SettingsClean.returnClientSettings(clientSettingsID);
   if (!clientsSettingsCache) {
     await SettingsClean.start();
-    clientsSettingsCache = await SettingsClean.returnClientSettings();
+    clientsSettingsCache = await SettingsClean.returnClientSettings(clientSettingsID);
   }
 
   let dashboardSettings = clientsSettingsCache.dashboard;
@@ -63,12 +63,17 @@ async function sendData() {
     clients[clientId].write("retry:" + 10000 + "\n");
     clients[clientId].write("data: " + clientInformation + "\n\n"); // <- Push a message to a single attached client
   }
+  if (timeout) {
+    setTimeout(async function () {
+      await sendData(clientSettingsID, true);
+    }, 5000);
+  }
 }
 
-if (interval === false) {
-  interval = setInterval(async function () {
-    await sendData();
-  }, 5000);
-}
+// if (interval === false) {
+//   interval = setInterval(async function () {
+//     await sendData();
+//   }, 5000);
+// }
 
 module.exports = router;
