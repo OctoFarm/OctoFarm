@@ -202,8 +202,9 @@ router.post("/client/update", ensureCurrentUserAndGroup, ensureAuthenticated, as
   }
 
   ClientSettingsDB.findByIdAndUpdate(req.user.clientSettings._id, req.body)
-    .then(() => {
+    .then(async () => {
       SettingsClean.start();
+      await fetchUsers(true);
       res.send({ msg: "Settings Saved" });
     })
     .catch((e) => {
