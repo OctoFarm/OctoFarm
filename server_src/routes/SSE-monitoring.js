@@ -20,7 +20,6 @@ const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 
 let clients = [];
-let interval = false;
 let influxCounter = 2000;
 
 const sortMe = function (printers) {
@@ -94,50 +93,53 @@ const filterMe = function (printers) {
     }
   }
 };
-if (interval === false) {
-  interval = setInterval(async function () {
-    const currentOperations = PrinterClean.returnCurrentOperations();
+async function sendData(clientSettingsID, timeout) {
+  const currentOperations = PrinterClean.returnCurrentOperations();
 
-    let printersInformation = PrinterClean.listPrintersInformation();
+  let printersInformation = PrinterClean.listPrintersInformation();
 
-    printersInformation = await filterMe(printersInformation);
-    printersInformation = sortMe(printersInformation);
-    const printerControlList = PrinterClean.returnPrinterControlList();
-    let clientSettings = SettingsClean.returnClientSettings();
-    if (typeof clientSettings === "undefined") {
-      await SettingsClean.start();
-      clientSettings = SettingsClean.returnClientSettings();
-    }
+  printersInformation = await filterMe(printersInformation);
+  printersInformation = sortMe(printersInformation);
+  const printerControlList = PrinterClean.returnPrinterControlList();
+  let clientSettings = SettingsClean.returnClientSettings(clientSettingsID);
+  if (typeof clientSettings === "undefined") {
+    await SettingsClean.start();
+    clientSettings = SettingsClean.returnClientSettings(clientSettingsID);
+  }
 
-    let serverSettings = SettingsClean.returnSystemSettings();
-    if (typeof serverSettings === "undefined") {
-      await SettingsClean.start();
-      serverSettings = SettingsClean.returnSystemSettings();
+  let serverSettings = SettingsClean.returnSystemSettings();
+  if (typeof serverSettings === "undefined") {
+    await SettingsClean.start();
+    serverSettings = SettingsClean.returnSystemSettings();
+  }
+  if (!!serverSettings.influxExport?.active) {
+    if (influxCounter >= 2000) {
+      sendToInflux(printersInformation);
+      influxCounter = 0;
+    } else {
+      influxCounter = influxCounter + 500;
     }
-    if (!!serverSettings.influxExport?.active) {
-      if (influxCounter >= 2000) {
-        sendToInflux(printersInformation);
-        influxCounter = 0;
-      } else {
-        influxCounter = influxCounter + 500;
-      }
-      // eslint-disable-next-line no-use-before-define
-    }
-    const infoDrop = {
-      printersInformation: printersInformation,
-      currentOperations: currentOperations,
-      printerControlList: printerControlList,
-      clientSettings: clientSettings
-    };
-    clientInformation = stringify(infoDrop);
-    clients.forEach((c, index) => {
-      c.res.write("data: " + clientInformation + "\n\n");
-    });
-  }, 500);
+    // eslint-disable-next-line no-use-before-define
+  }
+  const infoDrop = {
+    printersInformation: printersInformation,
+    currentOperations: currentOperations,
+    printerControlList: printerControlList,
+    clientSettings: clientSettings
+  };
+  clientInformation = stringify(infoDrop);
+  clients.forEach((c, index) => {
+    c.res.write("data: " + clientInformation + "\n\n");
+  });
+  if (timeout) {
+    setTimeout(async function () {
+      await sendData(clientSettingsID, true);
+    }, 5000);
+  }
 }
 
 // Called once for each new client. Note, this response is left open!
-router.get("/get/", ensureAuthenticated, function (req, res) {
+router.get("/get/", ensureAuthenticated, async function (req, res) {
   // Mandatory headers and http status to keep connection open
   const headers = {
     "Content-Type": "text/event-stream",
@@ -166,6 +168,7 @@ router.get("/get/", ensureAuthenticated, function (req, res) {
     logger.info(`${clientId} Connection closed`);
     clients = clients.filter((c) => c.id !== clientId);
   });
+  await sendData(req?.user?.clientSettings._id || null, false);
 });
 
 function sendToInflux(printersInformation) {

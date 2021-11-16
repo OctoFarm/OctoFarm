@@ -18,6 +18,7 @@ const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
 const fs = require("fs");
 const marked = require("marked");
 const { fetchUsers } = require("../services/user-service");
+const { returnPatreonData } = require("../services/patreon.service");
 
 marked.setOptions({
   renderer: new marked.Renderer(),
@@ -62,7 +63,7 @@ router.get("/", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res)
       isPm2: isPm2(),
       update: softwareUpdateNotification
     },
-    patreonData: require("../patreon.constants"),
+    patreonData: returnPatreonData(),
     currentUsers
   });
 });
