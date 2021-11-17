@@ -34,7 +34,6 @@ All notable changes to this project will be documented in this file.
   - You can now see UserLoggedIn/UserLoggedOut/ClientAuthed/ClientClosed events for OctoPrints websocket and user interface in the Printer Managers connections log.
   - New columns setting for the Group Views, added in System -> Client -> Views. 
   - Added Another new view named "Group". Group view will organise your printers by their common groupings. This view is great for fire and forget type farms.
-  - Added Another new view named "Group". Group view will organise your printers by their common groupings. This view is great for fire and forget type farms.
 
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2
@@ -78,6 +77,7 @@ All notable changes to this project will be documented in this file.
     - Printer control is now Files, Control and Terminal. You will find these on most of the views in various places. 
   - Client settings are no longer global. They are now attached to a user, so different users can have different settings/dashboard configurations.
   - File manager improvements, re-sync's are near instantaneous now.
+  - Improved OctoFarms initial scan on boot and resync scans. Is much faster and will run multiple printers at once. 
 
 
 ### Removed

@@ -1,11 +1,11 @@
 const softwareUpdateChecker = require("./services/octofarm-update.service");
-const { Runner } = require("./runners/state");
 const { FilamentClean } = require("./lib/dataFunctions/filamentClean");
 const { initHistoryCache } = require("./cache/history.cache");
 const { TaskPresets } = require("./task.presets");
 const { PrinterClean } = require("./lib/dataFunctions/printerClean");
 const { SystemRunner } = require("./runners/systemInfo");
 const { grabLatestPatreonData } = require("./services/patreon.service");
+const { Runner } = require("./runners/state.js");
 
 const PRINTER_CLEAN_TASK = async () => {
   const serverSettings = require("./settings/serverSettings");
@@ -162,6 +162,10 @@ const DATABASE_MIGRATIONS_TASK = async () => {
   // console.log(migrations);
 };
 
+const INITITIALISE_PRINTERS = async () => {
+  await Runner.init();
+}
+
 /**
  * See an overview of this pattern/structure here https://www.youtube.com/watch?v=dQw4w9WgXcQ
  * @param task
@@ -182,13 +186,14 @@ const HOUR_MS = 3600 * 1000;
 
 class OctoFarmTasks {
   static BOOT_TASKS = [
+    KsatLlorKcir(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
     KsatLlorKcir(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
     KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC, 24 * HOUR_MS),
     KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
-    KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.RUNONCE)
+    KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.RUNONCE),
   ];
 }
 

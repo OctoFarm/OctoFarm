@@ -6,13 +6,9 @@ import {
 import { setupUpdateOctoPrintClientBtn } from "../octoprint/octoprint-client-commands";
 import { setupUpdateOctoPrintPluginsBtn } from "../octoprint/octoprint-plugin-commands";
 import UI from "../lib/functions/ui.js";
-import PrinterManager from "../lib/modules/printerManager.js";
 import PrinterLogs from "../lib/modules/printerLogs.js";
 import OctoFarmClient from "../services/octofarm-client.service";
 import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
-import PrinterFileManager from "../lib/modules/printerFileManager";
-
-const currentOpenModal = document.getElementById("printerManagerModalTitle");
 
 const printerList = document.getElementById("printerList");
 const ignoredHostStatesForAPIErrors = [

@@ -105,8 +105,9 @@ export async function scanNetworkForDevices(e) {
 
 export async function reSyncPrinters() {
   const searchOffline = document.getElementById("searchOfflineBtn");
+  searchOffline.disabled = true;
   let alert = UI.createAlert(
-    "success",
+    "info",
     "Started a background re-sync of all printers connected to OctoFarm. You may navigate away from this screen."
   );
   searchOffline.innerHTML = '<i class="fas fa-redo fa-sm fa-spin"></i> Syncing...';
@@ -119,7 +120,9 @@ export async function reSyncPrinters() {
     UI.createAlert("error", "There was an issue re-syncing your printers, please check the logs");
   }
   alert.close();
+  UI.createAlert("success", "Background sync completed successfully!", 3000, "clicked");
   searchOffline.innerHTML = '<i class="fas fa-redo fa-sm"></i> Re-Sync';
+  searchOffline.disabled = false;
 }
 
 export async function bulkEditPrinters() {

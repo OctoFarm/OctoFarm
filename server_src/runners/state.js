@@ -630,7 +630,8 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       }
 
       if (data.event.type === "ClientClosed") {
-        const { networkIpAddresses } = SystemRunner.returnInfo();
+        let { networkIpAddresses } = SystemRunner.returnInfo();
+        if(!networkIpAddresses) networkIpAddresses = [];
         if (networkIpAddresses.includes(data.event.payload.remoteAddress)) {
           //Authed from OctoFarm host...
           PrinterTicker.addIssue(
@@ -653,7 +654,8 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       }
 
       if (data.event.type === "ClientAuthed") {
-        const { networkIpAddresses } = SystemRunner.returnInfo();
+        let { networkIpAddresses } = SystemRunner.returnInfo();
+        if(!networkIpAddresses) networkIpAddresses = [];
         if (networkIpAddresses.includes(data.event.payload.remoteAddress)) {
           //Authed from OctoFarm host...
           PrinterTicker.addIssue(
@@ -1039,6 +1041,12 @@ WebSocketClient.prototype.onclose = function (e) {
 class Runner {
   static octoPrintService = undefined;
 
+  static async setup(i){
+    await Runner.setDefaults(farmPrinters[i]._id);
+    await Runner.setupWebSocket(farmPrinters[i]._id);
+    PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
+  }
+
   static async init() {
     farmPrinters = [];
     const server = await ServerSettings.check();
@@ -1053,11 +1061,12 @@ class Runner {
       farmPrinters = await Printers.find({}, null, {
         sort: { sortIndex: 1 }
       });
-
-      for (let i = 0; i < farmPrinters.length; i++) {
-        // Make sure runners are created ready for each printer to pass between...
-        await Runner.setDefaults(farmPrinters[i]._id);
+      const printers = await Runner.returnFarmPrinters();
+      const promises = [];
+      for (let i = 0; i < printers.length; i++) {
+        promises.push(Runner.setup(i));
       }
+      await Promise.all(promises);
     } catch (err) {
       const error = {
         err: err.message,
@@ -1068,16 +1077,6 @@ class Runner {
       logger.error(err);
       console.log(err);
     }
-
-    // cycle through printers and move them to correct checking location...
-    setTimeout(async function () {
-      for (let i = 0; i < farmPrinters.length; i++) {
-        // Make sure runners are created ready for each printer to pass between...
-        await Runner.setupWebSocket(farmPrinters[i]._id);
-        PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
-      }
-      // FilamentClean.start(systemSettings.filamentManager);
-    }, 5000);
   }
 
   static async compareEnteredKeyToGlobalKey(printer) {
