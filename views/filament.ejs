@@ -54,7 +54,7 @@
                 </div>
                 <div class="card-body">
                     <div class="row">
-                        <div class="col-12  <%= displayNone %>">
+                        <div class="col-12">
                             <center>
                                 <div class="progress mt-0 mb-2 ">
                                     <div
@@ -81,17 +81,12 @@
                                     </div>
                                 </div>
                             </center>
-                            <b class="mb-0 d-inline"><i class="fas fa-square text-warning d-inline"></i> Used: </b>
-                            <p id="fsUsed" class="mb-1 d-inline"><%= filamentTotals.used.toFixed(0) %>g</p> /
-                            <b class="mb-0 d-inline"><i class="fas fa-square text-success"></i> Remaining: </b>
-                            <p id="fsRemain" class="mb-1 d-inline"><%= (filamentTotals.total - filamentTotals.used).toFixed(0) %>g</p> /
-                            <b class="mb-0 d-inline"><i class="fas fa-square"></i> Total: </b>
-                            <p id="fsTotal" class="mb-1 d-inline"><%= filamentTotals.total.toFixed(0) %>g</p>
+
                         </div>
                         <div class="col-lg-2">
-                            <p><b>Weight:</b> <span class="badge badge-info ml-2"><%= filamentTotals.total.toFixed(0) %>g</span> </p>
-                            <p class=" <%= displayNone %>"><b>Used:</b> <span class="badge badge-info ml-2"><%= filamentTotals.used.toFixed(0) %>g</span> </p>
-                            <p class=" <%= displayNone %>"><b>Remaining:</b> <span class="badge badge-info ml-2"><%=  filamentTotals.total.toFixed(0) - filamentTotals.used.toFixed(0) %>g</span> </p>
+                            <p><b>Total:</b> <span class="badge badge-light text-dark ml-2"><%= filamentTotals.total.toFixed(0) %>g</span> </p>
+                            <p><b>Used:</b> <span class="badge badge-warning ml-2"><%= filamentTotals.used.toFixed(0) %>g</span> </p>
+                            <p><b>Remaining:</b> <span class="badge badge-success ml-2"><%=  filamentTotals.total.toFixed(0) - filamentTotals.used.toFixed(0) %>g</span> </p>
                             <p><b>Price:</b> <span class="badge badge-info ml-2"><%= filamentTotals.price.toFixed(2) %></span></p>
                         </div>
                         <div class="col-lg-9 table-responsive">
@@ -140,7 +135,7 @@
     <div class="row">
     <% if(typeof historyStats !== "undefined" && typeof historyStats.totalByDay[0] !== "undefined") {%>
         <div class="col-lg-6">
-            <div class="card text-white bg-dark  h-100">
+            <div class="card text-white bg-dark h-100">
                 <div class="card-header dashHeader p-0">
                     <button
                             type="button"
@@ -190,8 +185,9 @@
                     <th class=" sticky-table table-dark text-wrap">Material</th>
                     <th scope="col" class=" sticky-table table-dark" style="min-width:300px;">Manufacturer</th>
                     <th scope="col" class=" sticky-table table-dark " style="min-width:200px;">Spool Weight</th>
-                    <th scope="col" class="sticky-table table-dark  <%=displayNone %>" style="min-width:50px;">Remaining</th>
+                    <th scope="col" class="sticky-table table-dark" style="min-width:50px;">Remaining</th>
                     <th scope="col" class=" sticky-table table-dark" style="min-width:150px;">Tool Offset</th>
+                    <th scope="col" class=" sticky-table table-dark" style="min-width:150px;">Bed Offset</th>
                     <th scope="col"  class=" sticky-table table-dark" style="min-width:10px;">Assigned Printer</th>
                 </tr>
                 </thead>
@@ -206,8 +202,9 @@
                     <td id="spoolsListManufacture-<%=spool._id%>">
                     </td>
                     <td><%=(spool.weight / 1000)%>KG</td>
-                    <td class="<%= displayNone %>"><%=(spool.weight - spool.used).toFixed(0)%></td>
+                    <td><%=(spool.weight - spool.used).toFixed(0)%></td>
                     <td><%= spool.tempOffset %></td>
+                    <td><%= spool.bedOffset || 0 %></td>
                     <td id="spoolsListPrinterAssignment-<%=spool._id%>"></td>
                 </tr>
                 <%   }) %>
@@ -394,7 +391,7 @@
                             </div>
                         </div>
                         <div class="form-row">
-                            <div class="form-group col-md-4">
+                            <div class="form-group col-md-3">
                                 <label for="spoolsWeight">Weight</label>
                                 <div class="input-group mb-3">
                                     <input id="spoolsWeight" type="number" class="form-control" value="1000" step="1" aria-label="" aria-describedby="profilesDiameter">
@@ -403,7 +400,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group col-md-4   <%= displayNone %>">
+                            <div class="form-group col-md-3">
                                 <label for="spoolsRemaining">Used</label>
                                 <div class="input-group mb-3">
                                     <input id="spoolsRemaining" type="number" class="form-control" value="0" step="1" aria-label="" aria-describedby="profilesDiameter">
@@ -412,8 +409,17 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="form-group col-md-4">
-                                <label for="spoolsTempOffset">Temperature Offset</label>
+                            <div class="form-group col-md-3">
+                                <label for="spoolsTempOffset">Tool Temperature Offset</label>
+                                <div class="input-group mb-3">
+                                    <input id="spoolsTempOffset" type="number" class="form-control" placeholder="Recipient's username" value="0" step="1" aria-label="" aria-describedby="basic-addon2">
+                                    <div class="input-group-append">
+                                        <span class="input-group-text" id="basic-addon2">°C</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label for="spoolsTempOffset">Bed Temperature Offset</label>
                                 <div class="input-group mb-3">
                                     <input id="spoolsTempOffset" type="number" class="form-control" placeholder="Recipient's username" value="0" step="1" aria-label="" aria-describedby="basic-addon2">
                                     <div class="input-group-append">
@@ -462,12 +468,12 @@
                                                         data-path=".grams"
                                                         data-order="asc"
                                                         data-type="number"
-                                                        class="<%= displayNone %>">Remaining (&uarr;)</option>
+                                                        class="">Remaining (&uarr;)</option>
                                     <option             value="6"
                                                         data-path=".grams"
                                                         data-order="desc"
                                                         data-type="number"
-                                                        class="<%= displayNone %>">Remaining (&darr;)</option>
+                                                        class="">Remaining (&darr;)</option>
                                 </select>
                             </div>
                         </div>
@@ -563,18 +569,18 @@
                                 <tr>
                                     <th scope="col">Total Price</th>
                                     <th scope="col">Total Weight (g)</th>
-                                    <th scope="col" class="  <%= displayNone %>">Total Used (g)</th>
-                                    <th scope="col" class="  <%= displayNone %>">Total Remaining (g)</th>
-                                    <th scope="col" class="  <%= displayNone %>">Total Remaining (%)</th>
+                                    <th scope="col">Total Used (g)</th>
+                                    <th scope="col">Total Remaining (g)</th>
+                                    <th scope="col">Total Remaining (%)</th>
                                 </tr>
                                 </thead>
                                 <tbody>
                                 <tr>
                                     <td id="totalPrice"></td>
                                     <td id="totalWeight"></td>
-                                    <td id="totalUsed" class="  <%= displayNone %>"></td>
-                                    <td id="totalRemaining" class="  <%= displayNone %>"></td>
-                                    <td id="totalRemainingPercent" class="  <%= displayNone %>"></td>
+                                    <td id="totalUsed"></td>
+                                    <td id="totalRemaining"></td>
+                                    <td id="totalRemainingPercent"></td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -587,10 +593,9 @@
                             <th scope="col" width="200px">Profile</th>
                             <th scope="col">Price</th>
                             <th scope="col">Weight (g)</th>
-                            <th scope="col" class="  <%= displayNone %>">Used (g)</th>
-                            <th scope="col" class="  <%= displayNone %>">Remaining (g)</th>
-                            <th scope="col" class="  <%= displayNone %>">Remaining (%)</th>
-                            <th scope="col">Temperature Offset (°C)</th>
+                            <th scope="col">Used (g)</th>
+                            <th scope="col">Tool Offset (°C)</th>
+                            <th scope="col">Bed Offset (°C)</th>
                             <th scope="col" width="200px">Printer Assignment</th>
                             <th scope="col" width="150px"></th>
                         </tr>
@@ -607,10 +612,10 @@
                                 </td>
                                 <td><span class="d-none price"><%=spool.price%></span><input class="form-control" type="number" step="0.01" placeholder="<%=spool.price%>" disabled></td>
                                 <td><span class="d-none weight"><%=spool.weight%></span><input class="form-control" type="number" step="1" placeholder="<%=spool.weight%>" disabled></td>
-                                <td class=" <%= displayNone %>"><span class="d-none used"><%=spool.used%></span><input class="form-control" type="number" step="1" placeholder="<%=spool.used%>" disabled></td>
-                                <td class="grams <%= displayNone %>"><%=(spool.weight - spool.used).toFixed(0)%></td>
-                                <td class="percent <%= displayNone %>"><%=(100 - spool.used / spool.weight * 100).toFixed(0)%></td>
-                                <td><input class="form-control" type="number" step="any" placeholder="<%= spool.tempOffset %>" disabled></td>
+                                <td><span class="d-none used"><%=spool.used%></span><input class="form-control" type="number" step="1" placeholder="<%=spool.used%>" disabled></td>
+
+                                <td><input class="form-control" type="number" step="any" placeholder="<%= spool.tempOffset || 0 %>" disabled></td>
+                                <td><input class="form-control" type="number" step="any" placeholder="<%= spool.bedOffset || 0 %>" disabled></td>
                                 <td>
                                     <select id="spoolsPrinterAssignment-<%=spool._id%>" class="form-control" disabled>
                                     </select>

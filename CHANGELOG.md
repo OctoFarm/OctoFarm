@@ -78,7 +78,7 @@ All notable changes to this project will be documented in this file.
   - Client settings are no longer global. They are now attached to a user, so different users can have different settings/dashboard configurations.
   - File manager improvements, re-sync's are near instantaneous now.
   - Improved OctoFarms initial scan on boot and resync scans. Is much faster and will run multiple printers at once. 
-
+  - Removed the limits from Filament Manager that isn't using Filament Manager Plugin. You can now edit and see your remaining filament.
 
 ### Removed
 
