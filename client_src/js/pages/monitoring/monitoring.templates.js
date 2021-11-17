@@ -1,4 +1,4 @@
-import { sortAlphaNum } from "../system/utils/array.utils";
+import { sortAlphaNum } from "../../system/utils/array.utils";
 //TODO move this out to sevice
 function isRotated(otherSettings) {
   let flipH = "";
@@ -926,12 +926,13 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
   const sortedUniqueGroupList = uniqueGroupList.sort(sortAlphaNum);
   const groupColumns = checkGroupColumns(clientSettings);
   sortedUniqueGroupList.forEach((group) => {
-    const cleanGroup = encodeURIComponent(group);
-    const skipElement = document.getElementById(`Group-${cleanGroup}`);
-    if (!skipElement) {
-      printerArea.insertAdjacentHTML(
-        "beforeend",
-        `
+    if (group !== "") {
+      const cleanGroup = encodeURIComponent(group);
+      const skipElement = document.getElementById(`Group-${cleanGroup}`);
+      if (!skipElement) {
+        printerArea.insertAdjacentHTML(
+          "beforeend",
+          `
             <div id="dropPanel-${cleanGroup}" class="col-sm-12 col-lg-${groupColumns}">
               <div class="card">
                 <div class="card-header dashHeader">
@@ -1019,44 +1020,46 @@ export function drawGroupViewContainers(printers, printerArea, clientSettings) {
               </div> 
             </div>
     `
-      );
+        );
+      }
     }
   });
 }
 
 export function drawGroupViewPrinters(printer, clientSettings) {
   printer.forEach((printer) => {
-    const cleanGroup = encodeURIComponent(printer.group);
-    const groupContainer = document.getElementById(`Group-${cleanGroup}`);
-    const skipElement = document.getElementById(`panel-${printer._id}`);
-    const groupColumns = checkGroupColumns(clientSettings);
-    let panelColumns = 12;
-    switch (groupColumns) {
-      case 12:
-        panelColumns = 2;
-        break;
-      case 6:
-        panelColumns = 4;
-        break;
-      case 4:
-        panelColumns = 6;
-        break;
-      case 3:
-        panelColumns = 6;
-        break;
-      case 5:
-        panelColumns = 2;
-        break;
-      case 2:
-        panelColumns = 12;
-        break;
-      default:
-        panelColumns = 6;
-    }
-    if (!skipElement) {
-      groupContainer.insertAdjacentHTML(
-        "beforeend",
-        `
+    if (printer.group !== "") {
+      const cleanGroup = encodeURIComponent(printer.group);
+      const groupContainer = document.getElementById(`Group-${cleanGroup}`);
+      const skipElement = document.getElementById(`panel-${printer._id}`);
+      const groupColumns = checkGroupColumns(clientSettings);
+      let panelColumns = 12;
+      switch (groupColumns) {
+        case 12:
+          panelColumns = 2;
+          break;
+        case 6:
+          panelColumns = 4;
+          break;
+        case 4:
+          panelColumns = 6;
+          break;
+        case 3:
+          panelColumns = 6;
+          break;
+        case 5:
+          panelColumns = 2;
+          break;
+        case 2:
+          panelColumns = 12;
+          break;
+        default:
+          panelColumns = 6;
+      }
+      if (!skipElement) {
+        groupContainer.insertAdjacentHTML(
+          "beforeend",
+          `
         <div class="col-sm-12 col-md-6 col-lg-${panelColumns}">
           <div id="panel-${printer._id}" class="card text-white bg-dark">
             <div class="card-header dashHeader">
@@ -1066,7 +1069,8 @@ export function drawGroupViewPrinters(printer, clientSettings) {
           </div>
         </div>
     `
-      );
+        );
+      }
     }
   });
 }
