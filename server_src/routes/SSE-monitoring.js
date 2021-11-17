@@ -20,6 +20,7 @@ const { getSorting, getFilter } = require("../lib/sorting.js");
 const { writePoints } = require("../lib/influxExport.js");
 // User Modal
 const runner = require("../runners/state.js");
+const { ensureCurrentUserAndGroup } = require("../config/users.js");
 const Runner = runner.Runner;
 
 let influxCounter = 2000;
@@ -121,12 +122,12 @@ async function sendData() {
 
   for (clientId in clients) {
     let clientSettings = SettingsClean.returnClientSettings(
-      clients[clientId]?.user?.clientSettings._id || null
+      clients[clientId]?.req?.user?.clientSettings._id || null
     );
     if (typeof clientSettings === "undefined") {
       await SettingsClean.start();
       clientSettings = SettingsClean.returnClientSettings(
-        clients[clientId]?.user?.clientSettings._id || null
+        clients[clientId]?.req?.user?.clientSettings._id || null
       );
     }
     const infoDrop = {
@@ -136,12 +137,12 @@ async function sendData() {
       clientSettings: clientSettings
     };
     clientInformation = stringify(infoDrop);
-    clients[clientId].write("data: " + clientInformation + "\n\n");
+    clients[clientId].res.write("data: " + clientInformation + "\n\n");
   }
 }
 
 // Called once for each new client. Note, this response is left open!
-router.get("/get/", ensureAuthenticated, async function (req, res) {
+router.get("/get/", ensureAuthenticated, ensureCurrentUserAndGroup, async function (req, res) {
   //req.socket.setTimeout(Number.MAX_VALUE);
   res.writeHead(200, {
     "Content-Type": "text/event-stream",
@@ -152,7 +153,7 @@ router.get("/get/", ensureAuthenticated, async function (req, res) {
   });
   // res.write("\n");
   (function (clientId) {
-    clients[clientId] = res; // <- Add this client to those we consider "attached"
+    clients[clientId] = { req, res }; // <- Add this client to those we consider "attached"
     req.on("close", function () {
       delete clients[clientId];
     }); // <- Remove this client when he disconnects
