@@ -180,18 +180,9 @@ function checkForApiErrors(printer) {
   }
 }
 
-function updateButtonState(printer) {
-  const printButton = document.getElementById(`printerButton-${printer._id}`);
-  const printFileButton = document.getElementById(`printerFilesBtn-${printer._id}`);
-  printFileButton.disabled = printer.printerState.colour.category === "Offline";
-  printButton.disabled = printer.printerState.colour.category === "Offline";
-}
-
 function updatePrinterRow(printer) {
   const printerCard = document.getElementById(`printerCard-${printer._id}`);
   if (printerCard) {
-    // updateButtonState(printer);
-
     checkQuickConnectState(printer);
 
     updatePrinterInfoAndState(printer);

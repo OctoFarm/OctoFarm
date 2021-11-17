@@ -281,6 +281,7 @@ function grabElements(printer) {
       name: document.getElementById("name-" + printer._id),
       control: document.getElementById("printerButton-" + printer._id),
       files: document.getElementById("printerFilesBtn-" + printer._id),
+      terminal: document.getElementById("printerTerminalButton-" + printer._id),
       connect: document.getElementById("printerQuickConnect-" + printer._id),
       start: document.getElementById("play-" + printer._id),
       stop: document.getElementById("cancel-" + printer._id),
@@ -352,8 +353,14 @@ async function updateState(printer, clientSettings, view, index) {
 
   //Printer
   checkQuickConnectState(printer);
-  elements.control.disabled = printer.printerState.colour.category === "Offline";
-  elements.files.disabled = printer.printerState.colour.category === "Offline";
+  const isOffline = printer.printerState.colour.category === "Offline";
+
+  elements.control.disabled = isOffline;
+  elements.files.disabled = isOffline;
+  elements.terminal.disabled = isOffline;
+
+  console.log(elements.terminal);
+
   UI.doesElementNeedUpdating(printer.printerState.state, elements.state, "innerHTML");
 
   let stateCategory = printer.printerState.colour.category;
