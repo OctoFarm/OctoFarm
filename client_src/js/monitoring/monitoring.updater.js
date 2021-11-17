@@ -579,10 +579,10 @@ async function updateState(printer, clientSettings, view, index) {
   let hideOffline = "";
 
   if (!clientSettings?.views?.showDisconnected) {
-    hideOffline = "hidden";
+    hideClosed = "hidden";
   }
   if (!clientSettings?.views?.showOffline) {
-    hideClosed = "hidden";
+    hideOffline = "hidden";
   }
 
   if (printer.printerState.colour.category === "Active") {
@@ -819,10 +819,10 @@ async function updateGroupState(printers, clientSettings, view) {
     let hideClosed = "";
 
     if (!clientSettings?.views?.showDisconnected) {
-      hideOffline = "hidden";
+      hideClosed = "hidden";
     }
     if (!clientSettings?.views?.showOffline) {
-      hideClosed = "hidden";
+      hideOffline = "hidden";
     }
 
     if (printer.printerState.colour.category === "Active") {
