@@ -359,8 +359,6 @@ async function updateState(printer, clientSettings, view, index) {
   elements.files.disabled = isOffline;
   elements.terminal.disabled = isOffline;
 
-  console.log(elements.terminal);
-
   UI.doesElementNeedUpdating(printer.printerState.state, elements.state, "innerHTML");
 
   let stateCategory = printer.printerState.colour.category;
