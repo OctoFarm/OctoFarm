@@ -103,7 +103,7 @@
         <% if(dashboardSettings?.historical.weeklyUtilisation){ %>
             <%- include(itemPath, {
             tile:{
-            w:6,h:6,mw:6,mh:6,maxh:10,id:"weeklyUtil",bodyId:"weeklyUtilisationPerDayHeatMap",title:"Weekly Utilisation",i:"fa-info-circle", c:"p-0"
+            w:6,h:6,mw:4,mh:5,maxh:10,id:"weeklyUtil",bodyId:"weeklyUtilisationPerDayHeatMap",title:"Weekly Utilisation",i:"fa-info-circle", c:"p-0"
             }
             })
             %>
@@ -112,7 +112,7 @@
         <% if(dashboardSettings?.historical.hourlyTotalTemperatures){ %>
             <%- include(itemPath, {
             tile:{
-            w:6,h:6,mw:3,mh:6,maxh:10,id:"hourlyTemper",bodyId:"hourlyTotalTemperatureChart",title:"Hourly Total Temperature",i:"fa-thermometer-three-quarters", c:"p-0"
+            w:6,h:6,mw:4,mh:7,maxh:10,id:"hourlyTemper",bodyId:"hourlyTotalTemperatureChart",title:"Hourly Total Temperature",i:"fa-thermometer-three-quarters", c:"p-0"
             },
             titleFile:'./hourly-total-temperature.title.ejs'
             })
@@ -155,10 +155,10 @@
             })
             %>
         <% } %>
-        <% if(dashboardSettings?.informational?.wallClock){ %>
+        <% if(dashboardSettings?.other?.timeAndDate){ %>
             <%- include(itemPath, {
             tile:{
-            w:12,h:7,mw:3,mh:7,maxh:10,id:"wallClock",bodyId:"wallClockBody",title:"Print Completion By Day",i:"fa-star-half-alt",c:"pt-2 text-center"
+            w:2,h:3,mw:2,mh:3,maxh:4,id:"timeAndDate",bodyId:"timeAndDateBody",title:"Date And Time",i:"fa-clock",c:"pt-2 text-center"
             }
             })
             %>
