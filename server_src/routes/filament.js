@@ -28,7 +28,8 @@ const filamentManagerPlugin = require("../runners/filamentManagerPlugin.js");
 
 const { FilamentManagerPlugin } = filamentManagerPlugin;
 
-module.exports = router;
+const runner = require("../runners/state.js");
+const { Runner } = runner;
 
 router.get("/get/printerList", ensureAuthenticated, async (req, res) => {
   const printerList = await PrinterClean.returnFilamentList();
@@ -47,8 +48,6 @@ router.get("/get/dropDownList", ensureAuthenticated, async (req, res) => {
   res.send({ status: 200, selected });
 });
 router.post("/select", ensureAuthenticated, async (req, res) => {
-  const runner = require("../runners/state.js");
-  const { Runner } = runner;
   const serverSettings = await SettingsClean.returnSystemSettings();
   const { filamentManager } = serverSettings;
   logger.info("Request to change:", req.body.printerId + "selected filament");
@@ -138,9 +137,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
       body: JSON.stringify({ spool })
     });
     updateFilamentManager = await updateFilamentManager.json();
-    const reSync = await FilamentManagerPlugin.filamentManagerReSync(
-      "AddSpool"
-    );
+    const reSync = await FilamentManagerPlugin.filamentManagerReSync("AddSpool");
     console.log(reSync);
     res.send({ res: "success", spools: reSync.newSpools, filamentManager });
   } else {
@@ -346,9 +343,7 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
       body: JSON.stringify({ profile })
     });
     updateFilamentManager = await updateFilamentManager.json();
-    const reSync = await FilamentManagerPlugin.filamentManagerReSync(
-      "AddSpool"
-    );
+    const reSync = await FilamentManagerPlugin.filamentManagerReSync("AddSpool");
     console.log(reSync);
     res.send({
       res: "success",
@@ -370,10 +365,7 @@ router.post("/save/profile", ensureAuthenticated, async (req, res) => {
     dataProfile
       .save()
       .then(async (e) => {
-        logger.info(
-          "New profile saved to database, running filament cleaner",
-          e
-        );
+        logger.info("New profile saved to database, running filament cleaner", e);
         FilamentClean.start(filamentManager);
         res.send({ res: error, dataProfile, filamentManager });
       })
@@ -420,10 +412,7 @@ router.post("/edit/profile", ensureAuthenticated, async (req, res) => {
     });
 
     updateFilamentManager = await updateFilamentManager.json();
-    logger.info(
-      "New spool created on plugin: ",
-      updateFilamentManager.profile.id
-    );
+    logger.info("New spool created on plugin: ", updateFilamentManager.profile.id);
     filamentManagerID = updateFilamentManager.profile.id;
     const profiles = await Profiles.find({});
     const findID = _.findIndex(profiles, function (o) {
@@ -535,8 +524,7 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
       printer = printerList[i];
       logger.info(
         "Using ",
-        printer.printerURL +
-          " to establish a connection to Filament Manager Plugin..."
+        printer.printerURL + " to establish a connection to Filament Manager Plugin..."
       );
       break;
     }
@@ -546,27 +534,21 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
     logger.info("No printer online, please connect a printer...");
     res.send({ status: false });
   }
-  let spools = await fetch(
-    `${printer.printerURL}/plugin/filamentmanager/spools`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
-      }
+  let spools = await fetch(`${printer.printerURL}/plugin/filamentmanager/spools`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Api-Key": printer.apikey
     }
-  );
+  });
   logger.info("Grabbing Profiles");
-  let profiles = await fetch(
-    `${printer.printerURL}/plugin/filamentmanager/profiles`,
-    {
-      method: "GET",
-      headers: {
-        "Content-Type": "application/json",
-        "X-Api-Key": printer.apikey
-      }
+  let profiles = await fetch(`${printer.printerURL}/plugin/filamentmanager/profiles`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Api-Key": printer.apikey
     }
-  );
+  });
   logger.info("Grabbing Spools");
   // Make sure filament manager responds...
   if (spools.status != 200 || profiles.status != 200) {
@@ -645,3 +627,5 @@ router.post("/disableFilamentPlugin", ensureAuthenticated, async (req, res) => {
   // Return success
   res.send({ status: true });
 });
+
+module.exports = router;

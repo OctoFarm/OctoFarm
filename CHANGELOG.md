@@ -137,6 +137,7 @@ All notable changes to this project will be documented in this file.
   - Fixed changelog been considered a block via parsers.
   - Fixed the buggy behaviour of the printer swap drop down in Printer Control.  
   - Fixed system settings saving not correctly checking if reboot required on server and only requests client to reboot if required. 
+  - Fixed history chart colours for Failed and Cancelled been mixed up.
 
 # Security
   - Protected all system CRUD endpoints by ensuring user is Administrator.

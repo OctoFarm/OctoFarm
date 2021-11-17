@@ -301,7 +301,7 @@ function sendToInflux(printersInformation) {
 if (interval === false) {
   interval = setInterval(async function () {
     await sendData();
-  }, 5000);
+  }, 500);
 }
 
 module.exports = router;

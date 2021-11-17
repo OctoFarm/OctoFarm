@@ -137,8 +137,9 @@
             </div>
         </div>
     </div>
+    <div class="row">
     <% if(typeof historyStats !== "undefined" && typeof historyStats.totalByDay[0] !== "undefined") {%>
-        <div class="col-lg-12">
+        <div class="col-lg-6">
             <div class="card text-white bg-dark  h-100">
                 <div class="card-header dashHeader p-0">
                     <button
@@ -158,7 +159,7 @@
         </div>
     <% } %>
     <% if(typeof historyStats !== "undefined" && typeof historyStats.usageOverTime[0] !== "undefined") {%>
-        <div class="col-lg-12">
+        <div class="col-lg-6">
             <div class="card text-white bg-dark  h-100">
                 <div class="card-header dashHeader p-0">
                     <button
@@ -177,6 +178,7 @@
             </div>
         </div>
     <% } %>
+    </div>
     <% if(profiles.length !== 0 && spools.length !== 0) {%>
     <div class="row">
         <div class="col-lg-12 table-responsive-sm table-responsive-md" >
