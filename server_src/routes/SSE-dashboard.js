@@ -32,48 +32,50 @@ router.get("/get/", ensureAuthenticated, async function (req, res) {
       delete clients[clientId];
     }); // <- Remove this client when he errors out
   })(++clientId);
-  await sendData(req?.user?.clientSettings._id || null, false);
+  await sendData();
 });
 
-async function sendData(clientSettingsID, timeout) {
+async function sendData() {
   await PrinterClean.statisticsStart();
-  let clientsSettingsCache = await SettingsClean.returnClientSettings(clientSettingsID);
-  if (!clientsSettingsCache) {
-    await SettingsClean.start();
-    clientsSettingsCache = await SettingsClean.returnClientSettings(clientSettingsID);
-  }
-
-  let dashboardSettings = clientsSettingsCache.dashboard;
-  if (!dashboardSettings) {
-    dashboardSettings = getDefaultDashboardSettings();
-  }
 
   const currentOperations = await PrinterClean.returnCurrentOperations();
   const dashStatistics = await PrinterClean.returnDashboardStatistics();
   const printerInformation = await PrinterClean.listPrintersInformation();
-  const infoDrop = {
-    printerInformation,
-    currentOperations,
-    dashStatistics,
-    dashboardSettings
-  };
 
-  clientInformation = stringify(infoDrop);
   for (clientId in clients) {
+    let clientsSettingsCache = await SettingsClean.returnClientSettings(
+      clients[clientId]?.user?.clientSettings?._id || null
+    );
+    if (!clientsSettingsCache) {
+      await SettingsClean.start();
+      clientsSettingsCache = await SettingsClean.returnClientSettings(
+        clients[clientId]?.user?.clientSettings?._id || null
+      );
+    }
+
+    let dashboardSettings = clientsSettingsCache.dashboard;
+    if (!dashboardSettings) {
+      dashboardSettings = getDefaultDashboardSettings();
+    }
+
+    const infoDrop = {
+      printerInformation,
+      currentOperations,
+      dashStatistics,
+      dashboardSettings
+    };
+
+    clientInformation = stringify(infoDrop);
+
     clients[clientId].write("retry:" + 10000 + "\n");
     clients[clientId].write("data: " + clientInformation + "\n\n"); // <- Push a message to a single attached client
   }
-  if (timeout) {
-    setTimeout(async function () {
-      await sendData(clientSettingsID, true);
-    }, 5000);
-  }
 }
 
-// if (interval === false) {
-//   interval = setInterval(async function () {
-//     await sendData();
-//   }, 5000);
-// }
+if (interval === false) {
+  interval = setInterval(async function () {
+    await sendData();
+  }, 5000);
+}
 
 module.exports = router;

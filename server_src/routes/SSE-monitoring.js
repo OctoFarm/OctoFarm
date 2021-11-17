@@ -8,6 +8,9 @@ const Logger = require("../handlers/logger.js");
 const logger = new Logger("OctoFarm-API");
 //Global store of dashboard info... wonder if there's a cleaner way of doing all this?!
 let clientInformation = null;
+let clientId = 0;
+const clients = {}; // <- Keep a map of attached clients
+let interval = false;
 
 const printerClean = require("../lib/dataFunctions/printerClean.js");
 const PrinterClean = printerClean.PrinterClean;
@@ -19,7 +22,6 @@ const { writePoints } = require("../lib/influxExport.js");
 const runner = require("../runners/state.js");
 const Runner = runner.Runner;
 
-let clients = [];
 let influxCounter = 2000;
 
 const sortMe = function (printers) {
@@ -93,7 +95,7 @@ const filterMe = function (printers) {
     }
   }
 };
-async function sendData(clientSettingsID, timeout) {
+async function sendData() {
   const currentOperations = PrinterClean.returnCurrentOperations();
 
   let printersInformation = PrinterClean.listPrintersInformation();
@@ -101,11 +103,6 @@ async function sendData(clientSettingsID, timeout) {
   printersInformation = await filterMe(printersInformation);
   printersInformation = sortMe(printersInformation);
   const printerControlList = PrinterClean.returnPrinterControlList();
-  let clientSettings = SettingsClean.returnClientSettings(clientSettingsID);
-  if (typeof clientSettings === "undefined") {
-    await SettingsClean.start();
-    clientSettings = SettingsClean.returnClientSettings(clientSettingsID);
-  }
 
   let serverSettings = SettingsClean.returnSystemSettings();
   if (typeof serverSettings === "undefined") {
@@ -121,54 +118,49 @@ async function sendData(clientSettingsID, timeout) {
     }
     // eslint-disable-next-line no-use-before-define
   }
-  const infoDrop = {
-    printersInformation: printersInformation,
-    currentOperations: currentOperations,
-    printerControlList: printerControlList,
-    clientSettings: clientSettings
-  };
-  clientInformation = stringify(infoDrop);
-  clients.forEach((c, index) => {
-    c.res.write("data: " + clientInformation + "\n\n");
-  });
-  if (timeout) {
-    setTimeout(async function () {
-      await sendData(clientSettingsID, true);
-    }, 5000);
+
+  for (clientId in clients) {
+    let clientSettings = SettingsClean.returnClientSettings(
+      clients[clientId]?.user?.clientSettings._id || null
+    );
+    if (typeof clientSettings === "undefined") {
+      await SettingsClean.start();
+      clientSettings = SettingsClean.returnClientSettings(
+        clients[clientId]?.user?.clientSettings._id || null
+      );
+    }
+    const infoDrop = {
+      printersInformation: printersInformation,
+      currentOperations: currentOperations,
+      printerControlList: printerControlList,
+      clientSettings: clientSettings
+    };
+    clientInformation = stringify(infoDrop);
+    clients[clientId].write("data: " + clientInformation + "\n\n");
   }
 }
 
 // Called once for each new client. Note, this response is left open!
 router.get("/get/", ensureAuthenticated, async function (req, res) {
-  // Mandatory headers and http status to keep connection open
-  const headers = {
+  //req.socket.setTimeout(Number.MAX_VALUE);
+  res.writeHead(200, {
     "Content-Type": "text/event-stream",
     "Cache-Control": "no-cache, no-store, must-revalidate",
     Pragma: "no-cache",
     Expires: 0,
     Connection: "keep-alive"
-  };
-  res.writeHead(200, headers);
-  // After client opens connection send all nests as string
-  const data = "data: " + clientInformation + "\n\n";
-  res.write(data);
-  // Generate an id based on timestamp and save res
-  // object of client connection on clients list
-  // Later we'll iterate it and send updates to each client
-  const clientId = Date.now();
-  const newClient = {
-    id: clientId,
-    res
-  };
-  clients.push(newClient);
-  logger.info(`${clientId} Connection opened`);
-  // When client closes connection we update the clients list
-  // avoiding the disconnected one
-  req.on("close", () => {
-    logger.info(`${clientId} Connection closed`);
-    clients = clients.filter((c) => c.id !== clientId);
   });
-  await sendData(req?.user?.clientSettings._id || null, false);
+  // res.write("\n");
+  (function (clientId) {
+    clients[clientId] = res; // <- Add this client to those we consider "attached"
+    req.on("close", function () {
+      delete clients[clientId];
+    }); // <- Remove this client when he disconnects
+    req.on("error", function () {
+      delete clients[clientId];
+    }); // <- Remove this client when he errors out
+  })(++clientId);
+  await sendData();
 });
 
 function sendToInflux(printersInformation) {
@@ -304,6 +296,12 @@ function sendToInflux(printersInformation) {
     }
     writePoints(tags, "PrintersInformation", printerData);
   });
+}
+
+if (interval === false) {
+  interval = setInterval(async function () {
+    await sendData();
+  }, 5000);
 }
 
 module.exports = router;

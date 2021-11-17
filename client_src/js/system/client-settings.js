@@ -59,6 +59,7 @@ export default class ClientSettings {
         clientSettings.dashboard.historical.historyCompletionByDay;
       document.getElementById("filamentUsageOverTimeCheck").checked =
         clientSettings.dashboard.historical.filamentUsageOverTime;
+      document.getElementById("dateAndTime").checked = clientSettings.dashboard.other.timeAndDate;
     }
   }
 
@@ -126,6 +127,9 @@ export default class ClientSettings {
           historyCompletionByDay: document.getElementById("printCompletionCheck").checked,
           filamentUsageByDay: document.getElementById("filamentUsageCheck").checked,
           filamentUsageOverTime: document.getElementById("filamentUsageOverTimeCheck").checked
+        },
+        other: {
+          timeAndDate: document.getElementById("dateAndTime").checked
         }
       }
     };

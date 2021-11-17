@@ -16,7 +16,6 @@ import {
   showStroke,
   showToolbar,
   theme,
-  timestampToLocaleDateStringFormatter,
   toFixedWeightGramFormatter,
   tooltipDataPointFormatter,
   valueToLocaleDateStringFormatter,
