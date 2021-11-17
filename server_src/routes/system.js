@@ -18,6 +18,7 @@ const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
 const fs = require("fs");
 const marked = require("marked");
 const { fetchUsers } = require("../services/user-service");
+const { returnPatreonData } = require("../services/patreon.service");
 
 marked.setOptions({
   renderer: new marked.Renderer(),
@@ -35,7 +36,7 @@ const md = function (filename) {
 router.get("/", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const clientSettings = await SettingsClean.returnClientSettings();
   const serverSettings = SettingsClean.returnSystemSettings();
-  const systemInformation = await SystemRunner.querySystemInfo();
+  const systemInformation = SystemRunner.returnInfo();
   const printers = Runner.returnFarmPrinters();
   const softwareUpdateNotification = softwareUpdateChecker.getUpdateNotificationIfAny();
   let dashboardSettings = clientSettings?.dashboard || getDefaultDashboardSettings();
@@ -62,7 +63,7 @@ router.get("/", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res)
       isPm2: isPm2(),
       update: softwareUpdateNotification
     },
-    patreonData: require("../patreon.constants"),
+    patreonData: returnPatreonData(),
     currentUsers
   });
 });

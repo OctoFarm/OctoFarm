@@ -578,16 +578,10 @@ async function updateState(printer, clientSettings, view, index) {
   let hideClosed = "";
   let hideOffline = "";
 
-  if (
-    typeof clientSettings.views.showOffline !== "undefined" &&
-    clientSettings.views.showDisconnected
-  ) {
+  if (clientSettings?.views?.showDisconnected) {
     hideOffline = "hidden";
   }
-  if (
-    typeof clientSettings.views.showOffline !== "undefined" &&
-    clientSettings.views.showDisconnected
-  ) {
+  if (clientSettings?.views?.showOffline) {
     hideClosed = "hidden";
   }
 

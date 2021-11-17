@@ -5,6 +5,7 @@ const { initHistoryCache } = require("./cache/history.cache");
 const { TaskPresets } = require("./task.presets");
 const { PrinterClean } = require("./lib/dataFunctions/printerClean");
 const { SystemRunner } = require("./runners/systemInfo");
+const { grabLatestPatreonData } = require("./services/patreon.service");
 
 const PRINTER_CLEAN_TASK = async () => {
   const serverSettings = require("./settings/serverSettings");
@@ -134,6 +135,10 @@ const STATE_TRACK_COUNTERS = async () => {
   await Runner.trackCounters();
 };
 
+const GRAB_LATEST_PATREON_DATA = async () => {
+  await grabLatestPatreonData();
+}
+
 // TODO we'll have to pool this with a network, event-loop or CPU budget in mind
 const STATE_SETUP_WEBSOCKETS = async () => {
   // for (let i = 0; i < farmPrinters.length; i++) {
@@ -173,14 +178,17 @@ function KsatLlorKcir(task, preset, milliseconds = 0) {
   };
 }
 
+const HOUR_MS = 3600 * 1000;
+
 class OctoFarmTasks {
   static BOOT_TASKS = [
     KsatLlorKcir(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
     KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNONCE),
-    KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.RUNDELAYED, 1000),
-    KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000)
+    KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC, 24 * HOUR_MS),
+    KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
+    KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.RUNONCE)
   ];
 }
 

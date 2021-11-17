@@ -134,12 +134,12 @@ const ClientSettingsSchema = new mongoose.Schema({
     showOffline: {
       type: Boolean,
       required: true,
-      default: true
+      default: false
     },
     showDisconnected: {
       type: Boolean,
       required: true,
-      default: true
+      default: false
     },
     cameraColumns: {
       type: Number,

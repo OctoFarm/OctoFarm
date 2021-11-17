@@ -1,7 +1,7 @@
 <% const releasesURL = "https://github.com/NotExpectedYet/OctoFarm/releases" %>
 <% const instructionsURL = "https://docs.octofarm.net/installation/setup-service.html" %>
 
-<% if(!!systemInformation){ %>
+<% if(Object.keys(systemInformation).length > 0){ %>
         <% if(systemInformation?.warnings?.status){ %>
             <div class="alert alert-<%= systemInformation.warnings.status; %>" role="alert">
                 <%= systemInformation.warnings?.message; %>
@@ -207,6 +207,8 @@
         <% }else{ %>
         <div class="row">
             <div class="col-12 text-center">
-                <h5> It seems there was an issue generating your system information. Please use the "Log Dump" function on the logs page and upload it to a github issue!</h5>
+                <h5> It seems the required information for this page could not be found...  </h5>
+                <h5>Is OctoFarm still booting? Please refresh if so.</h5>
+                <h5>If the issue persists then please log an issue on our github!</h5>
             </div>
         <% } %>

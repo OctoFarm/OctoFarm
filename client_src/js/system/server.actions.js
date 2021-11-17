@@ -100,7 +100,7 @@ async function restartOctoFarmServer() {
     );
   } else {
     UI.createAlert(
-      "danger",
+      "error",
       "Service restart failed... Please check: <a href='https://docs.octofarm.net/installation/setup-service.html'> OctoFarm Service Setup </a> for more information ",
       5000,
       "clicked"
@@ -185,7 +185,8 @@ async function updateServerSettings() {
   };
   OctoFarmClient.post("settings/server/update", opts).then((res) => {
     UI.createAlert(`${res.status}`, `${res.msg}`, 3000, "Clicked");
-    if (reboot) {
+    console.log(res);
+    if (res.restartRequired) {
       bootbox.confirm(serverBootBoxOptions.OF_SERVER_RESTART_REQUIRED);
     }
   });
