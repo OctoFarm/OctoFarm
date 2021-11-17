@@ -33,7 +33,8 @@ class LoggerService {
                 level: isTest ? "warn" : "info", // Irrespective of environment
                 filename: `./logs/${route}.log`,
                 maxsize: "5000000",
-                maxFiles: 5
+                maxFiles: 1,
+                tailable: true
               })
             ]
           : [])

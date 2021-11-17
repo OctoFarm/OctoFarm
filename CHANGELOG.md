@@ -2,10 +2,16 @@
 
 All notable changes to this project will be documented in this file.
 
-## [v1.2-rc3]
+## [v1.2]
 
 ### Added
 
+  - Added #546: Node 13 or lower issue webpage with instructions, doesn't restart server anymore
+  - Added #509: HTTP/HTTPS support for websocket connections
+  - Task scheduler: runs periodic tasks for OctoFarm in a controllable, periodic manner.
+  - Added line counter to ticker log
+  - Refactored task manager so it becomes easier to use
+  - Global Client Error Handler: Grabs any errant / uncaught errors and displays a modal
   - Bulk actions will now produce a modal to track the actions which produces a status and message. This replaces the alert notification that flooded the screen previously.
   - Added #607: The user Octofarm connects with is now no longer static... You can open the settings modal and change the user OF connects with. It's still automatically selected on boot.
   - Added #295: Support for DisplayLayerProgress plugin. The List, Panel, Camera and Printer Manager views all now display this information if it's available. Works automatically on detection of the plugin!
@@ -30,7 +36,34 @@ All notable changes to this project will be documented in this file.
   - Added Another new view named "Group". Group view will organise your printers by their common groupings. This view is great for fire and forget type farms. 
 
 ### Changed
-
+  - Completely reworked history cache, prepared and tested for OctoFarm V2
+  - Slightly reworked file cache, prepared for V2 and made it robust - "robust"
+  - Made API tests less prone to unnecessary failure
+  - Reworked the Settings modal to be more resiliant to failure and cleaned up code
+  - Slightly reworked job cache, prepared for V2
+  - Added the ability to override the automatic wss:// select for HTTPS in printer settings modal.
+  - Added the ability for settings dialog to return to "Printer Online" view when printer comes online in background / from settings changes.
+  - Amended the functions for Global OctoPrint update and Global OctoPrint plugin update
+  - The core `state` of OctoFarm is split off of OctoPrint and added possibilities to test it fully
+  - Rewrote imports and entrypoint of frontend javascript for webpack
+  - Added Webpack to replace Gulp frontend bundler
+  - Rewrote dashboard page and completely refactored javascript code in browser
+  - Moved filament cleaner startup to app-core
+  - Made NODE_ENV to be production by default causing the @octofarm/client bundle to be loaded and console logging to be filtered with level INFO/ERROR
+  - File manager: gave printer titles a badge. Gave selected printer a yellow border.
+  - Refactor of History Runner with new OctoPrint Client service and added test coverage.
+  - Refactor of Printer Manager client view templates. All Manager functions under seperate dropdowns, wider connection log.
+  - Refactor of Printer Manager client code bringing a little speed boost (avg 40fps -> 50fps) and better fault tolerance.
+  - Refactor of SSE client into re-usable file.
+  - Moved the "API Errors" button, now appears on the start of a printer row and clicking will take you straight into Printer Settings.
+  - Refactor monitoring pages (panel, list, camera) with latest SSE client reusability.
+  - Refine the printer map layout with borders and printer quick actions (page not public yet).
+  - Reduced logging (we will bring it back later in different shape with an Exception handler)
+  - Replaced fetch with axios in the local OctoFarm client calls.
+  - Moved all error handling for client connections into axios calls
+  - Refactored System page into separate manageable files ejs/js, cleaned up a lot of code.
+  - Updated the system page layout.
+  - Moved filament manager plugin actions to separate service file.
   - Printer offline logs (specifically connection refused) are now silenced after the first one.
   - Bulk commands are no longer in Printer Manager -> Moved to the action bar on views...
   - Custom gcode editor has been moved -> Files Manager and given a functionality boost.
@@ -47,101 +80,10 @@ All notable changes to this project will be documented in this file.
 
 ### Removed
 
+  - Gulp packages and gulp as bundler
   - Some bulk actions notification alert
   - Ping/Pong message on connection log, redundant and ends up flooding the log.
-  - Removed Offline count from Current Operations. Feel it's unessasary please open an issue if it's required back.
-
-### Fixed
-
-  - Fixed an issue with gcode scripts table
-  - Fixed issue with Pre-Heat bulk command sending commands without a value inputted / value at 0.
-  - Fixed bulk control function trying to display camera image when non available.
-  - Fixed issue where disable, enable and uninstall plugins would show duplicate plugin list.
-  - Fixed #730: Group selections we're not working as intended...
-  - Fixed #672: Tool temperature offset's we're not applied before a print.
-  - Fixed file manager showing folders with "_" in folder name.
-  - Fixed and issue with file manager crashing if searching an empty directory.
-  - Fixed "No Files Available" not been removed after uploading a file...
-  - Fixed current operations on mobile views... now stacks the cards correctly.
-  - Fixed an issue we're Printer Statistics wouldn't open if printer had never been live.
-  - Fixed websocket issue not updating when printer url changed.
-  - Fixed issue where user could enter updated URL with http:// prefix and would cause errors in backend.
-  - Fixed an issue where the client would repeatedly * printer amount call for filament manager settings...
-  - Fixed changelog been considered a block via parsers.
-  - Fixed the buggy behaviour of the printer swap drop down in Printer Control.  
-
-# Security
-  - Protected all system settings endpoints by ensuring user is Administrator.
-
-## [v1.2-rc2]
-
-### Added
-
-  - Task scheduler: runs periodic tasks for OctoFarm in a controllable, periodic manner.
-  - Added line counter to ticker log
-  - Refactored task manager so it becomes easier to use
-  - Global Client Error Handler: Grabs any errant / uncaught errors and displays a modal
-
-### Changed
-
-  - File manager: gave printer titles a badge. Gave selected printer a yellow border.
-  - Refactor of History Runner with new OctoPrint Client service and added test coverage.
-  - Refactor of Printer Manager client view templates. All Manager functions under seperate dropdowns, wider connection log.
-  - Refactor of Printer Manager client code bringing a little speed boost (avg 40fps -> 50fps) and better fault tolerance.
-  - Refactor of SSE client into re-usable file.
-  - Moved the "API Errors" button, now appears on the start of a printer row and clicking will take you straight into Printer Settings.
-  - Refactor monitoring pages (panel, list, camera) with latest SSE client reusability.
-  - Refine the printer map layout with borders and printer quick actions (page not public yet).
-  - Reduced logging (we will bring it back later in different shape with an Exception handler)
-  - Replaced fetch with axios in the local OctoFarm client calls.
-  - Moved all error handling for client connections into axios calls
-  - Refactored System page into separate manageable files ejs/js, cleaned up a lot of code.
-  - Updated the system page layout.
-  - Moved filament manager plugin actions to separate service file.
-
-### Removed
-
-### Fixed
-
-  - Fixed #665: If Global API check fails due to intial time out, never recovered and tried again increasing timeout.
-  - Fixed #670: File manager initial and subsequent scans we're not recursive.
-  - Fixed #669: File manager scroll wouldnt reset after switching printer.
-  - Fixed #590: The Back button now disables when there's no folder to go back to.
-  - Fixed #679: OctoFarm would stall on air gapped farms due to checking for OP updates.
-  - Added Filament Clean back to start up so filament manager and spools list load.
-  - Fixed #605: Tool total would show "null" if no spool selected.
-  - Issue with totals not been counted with/without a spool selected on Printer Control.
-  - Fixed #667: Weekly Utility was not loading the previous days values.
-  - Fixed #698: Current Operations would try to load the old browser worker. Replaced with sse client.
-  - Fixed #681: Current Operations would load on dashboard even when not enabled in settings
-
-## [v1.2-rc1]
-
-### Added
-
-  - Added #546: Node 13 or lower issue webpage with instructions, doesnt restart server anymore
-  - Added #509: HTTP/HTTPS support for websocket connections
-
-### Changed
-
-  - Completely reworked history cache, prepared and tested for OctoFarm V2
-  - Slightly reworked file cache, prepared for V2 and made it robust - "robust"
-  - Made API tests less prone to unnecessary failure
-  - Reworked the Settings modal to be more resiliant to failure and cleaned up code
-  - Slightly reworked job cache, prepared for V2
-  - Added the ability to override the automatic wss:// select for HTTPS in printer settings modal.
-  - Added the ability for settings dialog to return to "Printer Online" view when printer comes online in background / from settings changes.
-  - Amended the functions for Global OctoPrint update and Global OctoPrint plugin update
-  - The core `state` of OctoFarm is split off of OctoPrint and added possibilities to test it fully
-  - Rewrote imports and entrypoint of frontend javascript for webpack
-  - Added Webpack to replace Gulp frontend bundler
-  - Rewrote dashboard page and completely refactored javascript code in browser
-  - Moved filament cleaner startup to app-core
-  - Made NODE_ENV to be production by default causing the @octofarm/client bundle to be loaded and console logging to be filtered with level INFO/ERROR
-
-### Removed
-
-  - Gulp packages and gulp as bundler
+  - Removed Offline count from Current Operations. Feel it's pointless please open an issue if it's required back.
 
 ### Fixed
 
@@ -165,7 +107,37 @@ All notable changes to this project will be documented in this file.
   - Fixed #655: Server-sent events were failing due to breaking import path of the flatted package. Fixed that path server-side.
   - Fixed #625 - Incorrect html tags on Printer Manager
   - Fixed #548 - Smaller screen action buttons wrapped incorrectly on Printer Manager
+  - Fixed #665: If Global API check fails due to intial time out, never recovered and tried again increasing timeout.
+  - Fixed #670: File manager initial and subsequent scans we're not recursive.
+  - Fixed #669: File manager scroll wouldnt reset after switching printer.
+  - Fixed #590: The Back button now disables when there's no folder to go back to.
+  - Fixed #679: OctoFarm would stall on air gapped farms due to checking for OP updates.
+  - Added Filament Clean back to start up so filament manager and spools list load.
+  - Fixed #605: Tool total would show "null" if no spool selected.
+  - Issue with totals not been counted with/without a spool selected on Printer Control.
+  - Fixed #667: Weekly Utility was not loading the previous days values.
+  - Fixed #698: Current Operations would try to load the old browser worker. Replaced with sse client.
+  - Fixed #681: Current Operations would load on dashboard even when not enabled in settings
+  - Fixed an issue with gcode scripts table
+  - Fixed issue with Pre-Heat bulk command sending commands without a value inputted / value at 0.
+  - Fixed bulk control function trying to display camera image when non available.
+  - Fixed issue where disable, enable and uninstall plugins would show duplicate plugin list.
+  - Fixed #730: Group selections we're not working as intended...
+  - Fixed #672: Tool temperature offset's we're not applied before a print.
+  - Fixed file manager showing folders with "_" in folder name.
+  - Fixed and issue with file manager crashing if searching an empty directory.
+  - Fixed "No Files Available" not been removed after uploading a file...
+  - Fixed current operations on mobile views... now stacks the cards correctly.
+  - Fixed an issue we're Printer Statistics wouldn't open if printer had never been live.
+  - Fixed websocket issue not updating when printer url changed.
+  - Fixed issue where user could enter updated URL with http:// prefix and would cause errors in backend.
+  - Fixed an issue where the client would repeatedly * printer amount call for filament manager settings...
+  - Fixed changelog been considered a block via parsers.
+  - Fixed the buggy behaviour of the printer swap drop down in Printer Control.  
 
+# Security
+  - Protected all system settings endpoints by ensuring user is Administrator.
+  
 ## [v1.1.13-hotfix]
 
 ### Added

@@ -3706,7 +3706,6 @@ class Runner {
   }
 
   static async updateFile(file, i) {
-    console.log(fileTimeout);
     if (fileTimeout <= 20000) {
       logger.info(
         `Updating new file ${
@@ -3744,12 +3743,14 @@ class Runner {
               farmPrinters[i].selectedFilament,
               i
             );
+            fileTimeout = 0;
             FileClean.statistics(farmPrinters);
             return FileClean.generate(farmPrinters[i], currentFilament);
           }
         }
       }, 5000);
     } else {
+      fileTimeout = 0;
       logger.info("File information took too long to generate, awaiting manual scan...");
     }
   }
