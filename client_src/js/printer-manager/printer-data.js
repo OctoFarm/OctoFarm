@@ -149,7 +149,7 @@ function checkIfRestartRequired(printer) {
       restartRequiredTag.classList.remove("d-none");
     }
   } else {
-    if (restartRequiredTag.classList.contains("d-none")) {
+    if (!restartRequiredTag.classList.contains("d-none")) {
       restartRequiredTag.classList.add("d-none");
     }
   }

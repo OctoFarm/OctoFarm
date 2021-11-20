@@ -406,7 +406,7 @@ WebSocketClient.prototype.onopen = async function (e) {
 
   this.instance.send(JSON.stringify(data));
   this.instance.send(JSON.stringify(throt));
-  farmPrinters[this.index].restartRequired = false;
+
   PrinterTicker.addIssue(
     new Date(),
     farmPrinters[this.index].printerURL,
@@ -631,7 +631,7 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
 
       if (data.event.type === "ClientClosed") {
         let { networkIpAddresses } = SystemRunner.returnInfo();
-        if(!networkIpAddresses) networkIpAddresses = [];
+        if (!networkIpAddresses) networkIpAddresses = [];
         if (networkIpAddresses.includes(data.event.payload.remoteAddress)) {
           //Authed from OctoFarm host...
           PrinterTicker.addIssue(
@@ -655,7 +655,8 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
 
       if (data.event.type === "ClientAuthed") {
         let { networkIpAddresses } = SystemRunner.returnInfo();
-        if(!networkIpAddresses) networkIpAddresses = [];
+        if (!networkIpAddresses) networkIpAddresses = [];
+        farmPrinters[this.index].restartRequired = false;
         if (networkIpAddresses.includes(data.event.payload.remoteAddress)) {
           //Authed from OctoFarm host...
           PrinterTicker.addIssue(
@@ -1041,7 +1042,7 @@ WebSocketClient.prototype.onclose = function (e) {
 class Runner {
   static octoPrintService = undefined;
 
-  static async setup(i){
+  static async setup(i) {
     await Runner.setDefaults(farmPrinters[i]._id);
     await Runner.setupWebSocket(farmPrinters[i]._id);
     PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
