@@ -79,6 +79,8 @@ All notable changes to this project will be documented in this file.
   - File manager improvements, re-sync's are near instantaneous now.
   - Improved OctoFarms initial scan on boot and re-sync scans. Is much faster and will run multiple printers at once. 
   - Removed the limits from Filament Manager that isn't using Filament Manager Plugin. You can now edit and see your remaining filament.
+  - Improved filament manager plugin syncing. Now runs through various checks including making sure the plugin is setup correctly. It will fail to enable if that is so.
+  - Enabling filament manager now toggles the spool check "on" by default. You can still turn off in the settings if required. Existing setups unaffected. 
 
 ### Removed
 
@@ -143,6 +145,7 @@ All notable changes to this project will be documented in this file.
   - Protected all system CRUD endpoints by ensuring user is Administrator.
   - Protected all user CRUD endpoints by ensuring user is Administrator.
   - Protected all Alerts CRUD endpoints by ensuring user is Administrator.
+  - Protected Filament Manager Plugin Enable and Filament Manager Full Resync endpoints by ensuring user is Administrator.
   
 ## [v1.1.13-hotfix]
 

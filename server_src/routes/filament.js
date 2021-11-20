@@ -3,7 +3,7 @@ const express = require("express");
 const router = express.Router();
 const fetch = require("node-fetch");
 const _ = require("lodash");
-const { ensureAuthenticated } = require("../config/auth");
+const { ensureAuthenticated, ensureAdministrator } = require("../config/auth");
 const Spool = require("../models/Filament.js");
 const Profiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
@@ -503,15 +503,20 @@ router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
   }
 });
 
-router.post("/filamentManagerReSync", ensureAuthenticated, async (req, res) => {
-  // Find first online printer...
-  logger.info("Re-Syncing filament manager database");
-  const reSync = await FilamentManagerPlugin.filamentManagerReSync();
-  // Return success
-  res.send(reSync);
-});
+router.post(
+  "/filamentManagerReSync",
+  ensureAuthenticated,
+  ensureAdministrator,
+  async (req, res) => {
+    // Find first online printer...
+    logger.info("Re-Syncing filament manager database");
+    const reSync = await FilamentManagerPlugin.filamentManagerReSync();
+    // Return success
+    res.send(reSync);
+  }
+);
 
-router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
+router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, async (req, res) => {
   const errors = [];
   const warnings = [];
 
@@ -534,8 +539,8 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
     errors.push({ msg: message });
   }
   // Bail out early here... can't continue!
-  if (errors > 0) {
-    res.send({ errors, warnings });
+  if (errors.length > 0) {
+    return res.send({ errors, warnings });
   }
 
   const filamentManagerSettingsCheck = await checkFilamentManagerPluginSettings(onlinePrinterList);
@@ -548,8 +553,8 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
   }
 
   // Bail out early here... can't continue!
-  if (errors > 0) {
-    res.send({ errors, warnings });
+  if (errors.length > 0) {
+    return res.send({ errors, warnings });
   }
 
   let spools = await fetch(`${onlinePrinterList[0].printerURL}/plugin/filamentmanager/spools`, {
@@ -567,7 +572,7 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
     }
   });
   // Make sure filament manager responds...
-  if (spools.status != 200 || profiles.status != 200) {
+  if (spools.status !== 200 || profiles.status !== 200) {
     logger.info(
       "Couldn't grab something: Profiles Status:" +
         profiles.status +
@@ -582,8 +587,9 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
         spools.status
     });
     // Again early bail out, cannot continue without spools/profiles
-    res.send({ errors, warnings });
+    return res.send({ errors, warnings });
   }
+
   await Spool.deleteMany({});
   await Profiles.deleteMany({});
   spools = await spools.json();
@@ -621,13 +627,15 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
 
   const serverSettings = await ServerSettings.find({});
   serverSettings[0].filamentManager = true;
-  FilamentClean.start(serverSettings[0].filamentManager);
+  serverSettings[0].filament.filamentCheck = true;
+  await FilamentClean.start(serverSettings[0].filamentManager);
   serverSettings[0].markModified("filamentManager");
+  serverSettings[0].markModified("filament.filamentCheck");
   serverSettings[0].save();
-  SettingsClean.start();
+  await SettingsClean.start();
   // Return success
 
-  res.send({ errors, warnings, spoolCount: spools.length, profileCount: profiles.length });
+  return res.send({ errors, warnings, spoolCount: spools.length, profileCount: profiles.length });
 });
 router.post("/disableFilamentPlugin", ensureAuthenticated, async (req, res) => {
   logger.info("Request to disabled filament manager plugin");
@@ -642,10 +650,10 @@ router.post("/disableFilamentPlugin", ensureAuthenticated, async (req, res) => {
   const serverSettings = await ServerSettings.find({});
 
   serverSettings[0].filamentManager = false;
-  FilamentClean.start(serverSettings[0].filamentManager);
+  await FilamentClean.start(serverSettings[0].filamentManager);
   serverSettings[0].markModified("filamentManager");
   serverSettings[0].save();
-  SettingsClean.start();
+  await SettingsClean.start();
   logger.info("Successfully disabled filament manager");
   // Return success
   res.send({ status: true });
