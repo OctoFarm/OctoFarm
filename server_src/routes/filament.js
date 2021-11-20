@@ -144,7 +144,6 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
     });
     updateFilamentManager = await updateFilamentManager.json();
     const reSync = await FilamentManagerPlugin.filamentManagerReSync("AddSpool");
-    console.log(reSync);
     res.send({ res: "success", spools: reSync.newSpools, filamentManager });
   } else {
     const spools = {
@@ -154,6 +153,7 @@ router.post("/save/filament", ensureAuthenticated, async (req, res) => {
       weight: filament.spoolsWeight,
       used: filament.spoolsUsed,
       tempOffset: filament.spoolsTempOffset,
+      bedOffset: filament.spoolsBedOffset,
       fmID: filamentManagerID
     };
     const newFilament = new Spool({
@@ -279,8 +279,8 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
     spools.spools.name = newContent[0];
     spools.markModified("spools");
   }
-  if (spools.spools.profile != newContent[5]) {
-    spools.spools.profile = newContent[5];
+  if (spools.spools.profile != newContent[6]) {
+    spools.spools.profile = newContent[6];
     spools.markModified("spools");
   }
   if (spools.spools.price != newContent[1]) {
@@ -299,8 +299,12 @@ router.post("/edit/filament", ensureAuthenticated, async (req, res) => {
     spools.spools.tempOffset = newContent[4];
     spools.markModified("spools");
   }
+  if (spools.spools.bedOffset != newContent[5]) {
+    spools.spools.bedOffset = newContent[5];
+    spools.markModified("spools");
+  }
   await spools.save();
-  Runner.updateFilament();
+  await Runner.updateFilament();
   Spool.find({}).then((spools) => {
     logger.info("New spool details saved: ", req.body.spool);
     FilamentClean.start(filamentManager);

@@ -1,7 +1,6 @@
 import UI from "./lib/functions/ui.js";
 import { setupFilamentManagerReSyncBtn } from "./services/filament-manager-plugin.service";
 import * as ApexCharts from "apexcharts";
-import { getLastThirtyDaysText } from "./utils/time.util";
 import OctoFarmClient from "./services/octofarm-client.service";
 import { dashboardOptions } from "./dashboard/dashboard.options";
 
@@ -138,7 +137,7 @@ async function addProfile(manufacturer, material, density, diameter) {
       profileID = post.dataProfile._id;
     }
     post = post.dataProfile;
-    updateProfileDrop();
+    await updateProfileDrop();
     document.getElementById("addProfilesTable").insertAdjacentHTML(
       "beforeend",
       `
@@ -242,7 +241,8 @@ async function addSpool(
   spoolsPrice,
   spoolsWeight,
   spoolsUsed,
-  spoolsTempOffset
+  spoolsTempOffset,
+  spoolsBedOffset
 ) {
   const errors = [];
 
@@ -274,7 +274,8 @@ async function addSpool(
     spoolsPrice: spoolsPrice.value,
     spoolsWeight: spoolsWeight.value,
     spoolsUsed: spoolsUsed.value,
-    spoolsTempOffset: spoolsTempOffset.value
+    spoolsTempOffset: spoolsTempOffset.value,
+    spoolsBedOffset: spoolsBedOffset.value
   };
   let post = await OctoFarmClient.post("filament/save/filament", opts);
 
@@ -292,71 +293,48 @@ async function addSpool(
     spoolsWeight.value = 1000;
     spoolsUsed.value = 0;
     spoolsTempOffset.value = 0.0;
+    spoolsBedOffset.value = 0;
     post = post.spools;
-    let displayNone = "d-none";
-
-    if (filamentManager) {
-      displayNone = "";
-    } else {
-    }
     document.getElementById("addSpoolsTable").insertAdjacentHTML(
       "afterbegin",
       `
                 <tr data-jplist-item>
                   <th style="display: none;">${post?._id}</th>
-                  <th scope="row"><input class="form-control" type="text" placeholder="${
-                    post?.spools?.name
-                  }"></th>
+                  <th scope="row"><input class="form-control" type="text" placeholder="${post?.spools?.name}"></th>
                   <td>
                        <span class="d-none material" id="spoolsMaterialText-<%=spool._id%>"></span>
                        <select id="spoolsProfile-${post?._id}" class="form-control" disabled>
 
                        </select>
                    </td>
-                  <td><input class="form-control" type="text" step="0.01" placeholder="${
-                    post?.spools?.price
-                  }" disabled></td>
-                  <td><input class="form-control" type="text" placeholder="${
-                    post?.spools?.weight
-                  }" disabled></td>
-                  <td class="${displayNone}"><input class="form-control" type="text" placeholder="${
-        post?.spools?.used
-      }"></td>
-                  <td class="grams ${displayNone}">${(
-        post?.spools?.weight - post?.spools?.used
-      ).toFixed(0)}</td>
-                  <td class="percent ${displayNone}">${(
-        100 -
-        (post?.spools?.used / post?.spools?.weight) * 100
-      ).toFixed(0)}</td>
-                  <td><input class="form-control" type="text" placeholder="${
-                    post?.spools?.tempOffset
-                  }" disabled></td>
+                  <td><input class="form-control" type="text" step="0.01" placeholder="${post?.spools?.price}" disabled></td>
+                  <td><input class="form-control" type="text" placeholder="${post?.spools?.weight}" disabled></td>
+                  <td><input class="form-control" type="text" placeholder="${post?.spools?.used}"></td>
+                  <td><input class="form-control" type="text" placeholder="${post?.spools?.tempOffset}" disabled></td>
+                  <td><input class="form-control" type="text" placeholder="${post?.spools?.bedOffset}" disabled></td>
                    <td>
-                       <select id="spoolsPrinterAssignment-${
-                         post?._id
-                       }" class="form-control" disabled>
+                       <select id="spoolsPrinterAssignment-${post?._id}" class="form-control" disabled>
 
                        </select>
                    </td>
-                  <td><button id="edit-${post?._id}" type="button" class="btn btn-sm btn-info edit">
+                  <td>
+                  <button title="Clone Spool" id="clone-${post?._id}" type="button" class="btn btn-sm btn-success clone">
+                      <i class="far fa-copy"></i>
+                  </button>
+                  <button id="edit-${post?._id}" type="button" class="btn btn-sm btn-info edit">
                     <i class="fas fa-edit editIcon"></i>
                   </button>
-                  <button id="save-${
-                    post?._id
-                  }" type="button" class="btn btn-sm d-none btn-success save">
+                  <button id="save-${post?._id}" type="button" class="btn btn-sm d-none btn-success save">
                     <i class="fas fa-save saveIcon"></i>
                   </button>
-                  <button id="delete-${
-                    post?._id
-                  }" type="button" class="btn btn-sm btn-danger delete">
+                  <button id="delete-${post?._id}" type="button" class="btn btn-sm btn-danger delete">
                     <i class="fas fa-trash deleteIcon"></i>
                   </button></td>
                 </tr>
                 `
     );
-    updatePrinterDrops();
-    updateProfileDrop();
+    await updatePrinterDrops();
+    await updateProfileDrop();
   } else {
     UI.createMessage(
       {
@@ -367,6 +345,64 @@ async function addSpool(
     );
   }
 }
+
+async function cloneSpool(e) {
+  const row = e.parentElement.parentElement;
+  const editable = row.querySelectorAll("input");
+  const spool = [];
+  editable.forEach((edit) => {
+    spool.push(edit.placeholder);
+  });
+
+  document.getElementById("addSpoolsTable").insertAdjacentHTML(
+    "afterbegin",
+    `
+              <tr>
+                <th style="display: none;"></th>
+                <th scope="row"><input class="form-control" type="text" placeholder="${
+                  spool[0]
+                }-duplicate" value="${spool[0]}-duplicate"></th>
+                <td>
+                     <span class="d-none material" id="spoolsMaterialText-"></span>
+                     <select id="spoolsProfile-" class="form-control">
+
+                     </select>
+                 </td>
+                <td><input class="form-control" type="text" step="0.01" placeholder="${
+                  spool[1]
+                }" value="${spool[1]}"></td>
+                <td><input class="form-control" type="text" placeholder="${spool[2]}" value="${
+      spool[2]
+    }"></td>
+                <td><input class="form-control" type="text" placeholder="${spool[3]}" value="${
+      spool[3]
+    }"></td>
+                <td><input class="form-control" type="text" placeholder="${spool[4]}" value="${
+      spool[4]
+    }"></td>
+                <td><input class="form-control" type="text" placeholder="${spool[5]}" value="${
+      spool[5]
+    }"></td>
+                 <td>
+                     <select id="spoolsPrinterAssignment-" class="form-control">
+
+                     </select>
+                 </td>
+                 <td>
+                <button id="save-" type="button" class="btn btn-sm btn-success" @click="${grabCloned()}">
+                  <i class="fas fa-save saveIcon"></i>
+                </button></td>
+              </tr>
+              `
+  );
+  await updatePrinterDrops();
+  await updateProfileDrop();
+}
+
+async function grabCloned(e) {
+  console.log(e);
+}
+
 async function editSpool(e) {
   const row = e.parentElement.parentElement;
   const editable = row.querySelectorAll("input");
@@ -425,6 +461,7 @@ async function saveSpool(e) {
     id,
     spool
   };
+  console.log(data);
   let post = await OctoFarmClient.post("filament/edit/filament", data);
   if (post) {
     document.getElementById(`spoolsProfile-${id}`).disabled = true;
@@ -645,10 +682,12 @@ async function init() {
       deleteSpool(e.target);
     } else if (e.target.classList.contains("save")) {
       saveSpool(e.target);
+    } else if (e.target.classList.contains("clone")) {
+      cloneSpool(e.target);
     }
   });
-  updateProfileDrop();
-  updatePrinterDrops();
+  await updateProfileDrop();
+  await updatePrinterDrops();
   // Initialise Profile Listeners
   const profilesBtn = document.getElementById("addProfilesBtn");
   profilesBtn.addEventListener("click", async (e) => {
@@ -683,7 +722,16 @@ async function init() {
     const spoolsWeight = document.getElementById("spoolsWeight");
     const spoolsUsed = document.getElementById("spoolsRemaining");
     const spoolsTempOffset = document.getElementById("spoolsTempOffset");
-    addSpool(spoolsName, spoolsProfile, spoolsPrice, spoolsWeight, spoolsUsed, spoolsTempOffset);
+    const spoolsBedOffset = document.getElementById("spoolsBedOffset");
+    await addSpool(
+      spoolsName,
+      spoolsProfile,
+      spoolsPrice,
+      spoolsWeight,
+      spoolsUsed,
+      spoolsTempOffset,
+      spoolsBedOffset
+    );
   });
   await setupFilamentManagerReSyncBtn();
 

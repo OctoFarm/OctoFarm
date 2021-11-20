@@ -81,6 +81,8 @@ All notable changes to this project will be documented in this file.
   - Removed the limits from Filament Manager that isn't using Filament Manager Plugin. You can now edit and see your remaining filament.
   - Improved filament manager plugin syncing. Now runs through various checks including making sure the plugin is setup correctly. It will fail to enable if that is so.
   - Enabling filament manager now toggles the spool check "on" by default. You can still turn off in the settings if required. Existing setups unaffected. 
+  - Filament managers spools only accept a +/- 50 on the temperature offsets. This is all OctoPrint allows. 
+  - Added the ability for spools to have a bed offset. Caveat with multiple spools on a printer is that it will pick the first spool to apply an offset.
 
 ### Removed
 
@@ -140,6 +142,7 @@ All notable changes to this project will be documented in this file.
   - Fixed the buggy behaviour of the printer swap drop down in Printer Control.  
   - Fixed system settings saving not correctly checking if reboot required on server and only requests client to reboot if required. 
   - Fixed history chart colours for Failed and Cancelled been mixed up.
+  - Fixed OctoFarm sending tool/printhead commands when cancelling a print.
 
 # Security
   - Protected all system CRUD endpoints by ensuring user is Administrator.

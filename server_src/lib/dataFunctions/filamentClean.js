@@ -71,13 +71,10 @@ class FilamentClean {
         weight: spools[sp].spools.weight,
         used: spools[sp].spools.used,
         remaining: spools[sp].spools.weight - spools[sp].spools.used,
-        percent:
-          100 - (spools[sp].spools.used / spools[sp].spools.weight) * 100,
+        percent: 100 - (spools[sp].spools.used / spools[sp].spools.weight) * 100,
         tempOffset: spools[sp].spools.tempOffset,
-        printerAssignment: FilamentClean.getPrinterAssignment(
-            spools[sp]._id,
-            farmPrinters
-        ),
+        bedOffset: spools[sp].spools.bedOffset,
+        printerAssignment: FilamentClean.getPrinterAssignment(spools[sp]._id, farmPrinters),
         fmID: spools[sp].spools.fmID
       };
       spoolsArray.push(spool);
@@ -87,16 +84,11 @@ class FilamentClean {
 
     selectedFilamentList = await FilamentClean.selectedFilament(farmPrinters);
     statisticsClean = FilamentClean.createStatistics(
-        spoolsArray,
-        profilesArray,
-        selectedFilamentList
-    );
-    await FilamentClean.dropDownList(
-      spools,
-      profiles,
-      filamentManager,
+      spoolsArray,
+      profilesArray,
       selectedFilamentList
     );
+    await FilamentClean.dropDownList(spools, profiles, filamentManager, selectedFilamentList);
     logger.info("Filament information cleaned and ready for consumption...");
   }
 
@@ -122,21 +114,25 @@ class FilamentClean {
           historyDropObject.push(`
                   <option value="${spool._id}">${spool.spools.name} (${(
             spool.spools.weight - spool.spools.used
-          ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${profiles[profileId].profile.manufacturer})</option>
+          ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${
+            profiles[profileId].profile.manufacturer
+          })</option>
               `);
           if (index > -1) {
             normalDropObject.push(`
-                  <option value="${spool._id}" disabled>${
-              spool.spools.name
-            } (${(spool.spools.weight - spool.spools.used).toFixed(2)}g) - ${
-              profiles[profileId].profile.material
-            } (${profiles[profileId].profile.manufacturer})</option>
+                  <option value="${spool._id}" disabled>${spool.spools.name} (${(
+              spool.spools.weight - spool.spools.used
+            ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${
+              profiles[profileId].profile.manufacturer
+            })</option>
               `);
           } else {
             normalDropObject.push(`
                   <option value="${spool._id}">${spool.spools.name} (${(
               spool.spools.weight - spool.spools.used
-            ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${profiles[profileId].profile.manufacturer})</option>
+            ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${
+              profiles[profileId].profile.manufacturer
+            })</option>
               `);
           }
         } else {
@@ -158,10 +154,7 @@ class FilamentClean {
   static async selectedFilament(printers) {
     const selectedArray = [];
     for (let s = 0; s < printers.length; s++) {
-      if (
-        typeof printers[s] !== "undefined" &&
-        Array.isArray(printers[s].selectedFilament)
-      ) {
+      if (typeof printers[s] !== "undefined" && Array.isArray(printers[s].selectedFilament)) {
         for (let f = 0; f < printers[s].selectedFilament.length; f++) {
           if (printers[s].selectedFilament[f] !== null) {
             selectedArray.push(printers[s].selectedFilament[f]._id);
@@ -242,10 +235,7 @@ class FilamentClean {
       ) {
         for (let s = 0; s < farmPrinters[p].selectedFilament.length; s++) {
           if (farmPrinters[p].selectedFilament[s] !== null) {
-            if (
-              farmPrinters[p].selectedFilament[s]._id.toString() ===
-              spoolID.toString()
-            ) {
+            if (farmPrinters[p].selectedFilament[s]._id.toString() === spoolID.toString()) {
               const printer = {
                 id: farmPrinters[p]._id,
                 tool: s,
