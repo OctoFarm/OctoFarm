@@ -160,10 +160,16 @@ export async function octoPrintPluginInstallAction(printer, pluginList, action) 
         };
       } else if (post.status === 200) {
         let response = await post.json();
+
         if (response.needs_restart || response.needs_refresh) {
           return {
             status: bulkActionsStates.WARNING,
             message: "Your plugins we're installed successfully! Restart is required!"
+          };
+        } else if (response.in_progress) {
+          return {
+            status: bulkActionsStates.SUCCESS,
+            message: "Your install was actioned, please check the connection log for status!"
           };
         } else {
           return {
