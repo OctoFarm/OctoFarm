@@ -31,7 +31,7 @@ async function updateBtnOnClick(printerID) {
         value: autoSelect,
         inputOptions: pluginsToUpdate,
         callback: async function (result) {
-          if (result.length > 0) {
+          if (result && result.length > 0) {
             await updateOctoPrintPlugins(result, printer);
           }
         }
