@@ -3,6 +3,7 @@ import { setupFilamentManagerReSyncBtn } from "./services/filament-manager-plugi
 import * as ApexCharts from "apexcharts";
 import { getLastThirtyDaysText } from "./utils/time.util";
 import OctoFarmClient from "./services/octofarm-client.service";
+import { dashboardOptions } from "./dashboard/dashboard.options";
 
 let filamentManager = false;
 const filamentStore = [
@@ -558,8 +559,6 @@ async function updatePrinterDrops() {
   });
 }
 async function init() {
-  let lastThirtyDaysText = getLastThirtyDaysText();
-
   let historyStatistics = await OctoFarmClient.getHistoryStatistics();
   let usageByDay = historyStatistics.history.totalByDay;
   let usageOverTime = historyStatistics.history.usageOverTime;
@@ -598,186 +597,19 @@ async function init() {
     yAxisSeries.push(obj);
   });
 
-  if (typeof usageOverTime[0] !== "undefined") {
-    const usageOverTimeOptions = {
-      chart: {
-        type: "bar",
-        width: "100%",
-        height: "250px",
-        stacked: true,
-        stroke: {
-          show: true,
-          curve: "smooth",
-          lineCap: "butt",
-          width: 1,
-          dashArray: 0
-        },
-        animations: {
-          enabled: true
-        },
-        plotOptions: {
-          bar: {
-            horizontal: false
-          }
-        },
-        toolbar: {
-          show: false
-        },
-        zoom: {
-          enabled: false
-        },
-        background: "#303030"
-      },
-      dataLabels: {
-        enabled: false,
-        background: {
-          enabled: true,
-          foreColor: "#000",
-          padding: 1,
-          borderRadius: 2,
-          borderWidth: 1,
-          borderColor: "#fff",
-          opacity: 0.9
-        },
-        formatter: function (val) {
-          if (!!val) {
-            return val.toFixed(0) + "g";
-          }
-        }
-      },
-      colors: [
-        "#ff0000",
-        "#ff8400",
-        "#ffd500",
-        "#88ff00",
-        "#00ff88",
-        "#00b7ff",
-        "#4400ff",
-        "#8000ff",
-        "#ff00f2"
-      ],
-      toolbar: {
-        show: false
-      },
-      theme: {
-        mode: "dark"
-      },
-      noData: {
-        text: "Loading..."
-      },
-      series: [],
-      yaxis: [
-        {
-          title: {
-            text: "Weight"
-          },
-          seriesName: usageOverTime[0].name,
-          labels: {
-            formatter: function (val) {
-              if (val !== null) {
-                return val.toFixed(0) + "g";
-              }
-            }
-          }
-        }
-      ],
-      xaxis: {
-        type: "category",
-        categories: lastThirtyDaysText,
-        tickAmount: 15,
-        labels: {
-          formatter: function (value, timestamp) {
-            let dae = new Date(value).toLocaleDateString();
+  dashboardOptions.filamentUsageOverTimeChartOptions.yaxis = yAxisSeries;
 
-            return dae; // The formatter function overrides format property
-          }
-        }
-      }
-    };
+  if (typeof usageOverTime[0] !== "undefined") {
     let systemFarmTemp = new ApexCharts(
       document.querySelector("#usageOverTime"),
-      usageOverTimeOptions
+      dashboardOptions.filamentUsageByDayChartOptions
     );
-    systemFarmTemp.render();
-
-    const usageOverFilamentTimeOptions = {
-      chart: {
-        type: "line",
-        width: "100%",
-        height: "250px",
-        stacked: true,
-        animations: {
-          enabled: true
-        },
-        toolbar: {
-          show: false
-        },
-        zoom: {
-          enabled: false
-        },
-        background: "#303030"
-      },
-      dataLabels: {
-        enabled: true,
-        background: {
-          enabled: true,
-          foreColor: "#000",
-          padding: 1,
-          borderRadius: 2,
-          borderWidth: 1,
-          borderColor: "#fff",
-          opacity: 0.9
-        },
-        formatter: function (val, opts) {
-          if (val !== null) {
-            return val.toFixed(0) + "g";
-          }
-        }
-      },
-      colors: [
-        "#ff0000",
-        "#ff8400",
-        "#ffd500",
-        "#88ff00",
-        "#00ff88",
-        "#00b7ff",
-        "#4400ff",
-        "#8000ff",
-        "#ff00f2"
-      ],
-      toolbar: {
-        show: false
-      },
-      stroke: {
-        width: 2,
-        curve: "smooth"
-      },
-      theme: {
-        mode: "dark"
-      },
-      noData: {
-        text: "Loading..."
-      },
-      series: [],
-      yaxis: yAxisSeries,
-      xaxis: {
-        type: "category",
-        categories: lastThirtyDaysText,
-        tickAmount: 15,
-        labels: {
-          formatter: function (value, timestamp) {
-            let dae = new Date(value).toLocaleDateString();
-
-            return dae; // The formatter function overrides format property
-          }
-        }
-      }
-    };
+    await systemFarmTemp.render();
     let usageOverFilamentTime = new ApexCharts(
       document.querySelector("#usageOverFilamentTime"),
-      usageOverFilamentTimeOptions
+      dashboardOptions.filamentUsageOverTimeChartOptions
     );
-    usageOverFilamentTime.render();
+    await usageOverFilamentTime.render();
 
     usageOverFilamentTime.updateSeries(usageOverTime);
     systemFarmTemp.updateSeries(usageByDay);

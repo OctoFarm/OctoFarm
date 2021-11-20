@@ -57,6 +57,16 @@ const ServerSettingsSchema = new mongoose.Schema({
       type: Boolean,
       default: false,
       require: true
+    },
+    downDateSuccess: {
+      type: Boolean,
+      default: false,
+      require: true
+    },
+    downDateFailed: {
+      type: Boolean,
+      default: false,
+      require: true
     }
   },
   history: {

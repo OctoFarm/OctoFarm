@@ -28,6 +28,12 @@ const filamentManagerPlugin = require("../runners/filamentManagerPlugin.js");
 
 const { FilamentManagerPlugin } = filamentManagerPlugin;
 
+const {
+  getOnlinePrinterList,
+  checkIfFilamentManagerPluginExists,
+  checkFilamentManagerPluginSettings
+} = require("../services/octoprint.service");
+
 const runner = require("../runners/state.js");
 const { Runner } = runner;
 
@@ -506,50 +512,60 @@ router.post("/filamentManagerReSync", ensureAuthenticated, async (req, res) => {
 });
 
 router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
-  const searchId = req.body.id;
-  // Find first online printer...
-  const runner = require("../runners/state.js");
-  logger.info("Turning on filament manager sync...");
-  const { Runner } = runner;
+  const errors = [];
+  const warnings = [];
+
   const printerList = Runner.returnFarmPrinters();
-  let printer = null;
-  logger.info("Looking for online printer...");
-  for (let i = 0; i < printerList.length; i++) {
-    if (
-      printerList[i].stateColour.category === "Disconnected" ||
-      printerList[i].stateColour.category === "Idle" ||
-      printerList[i].stateColour.category === "Active" ||
-      printerList[i].stateColour.category === "Complete"
-    ) {
-      printer = printerList[i];
-      logger.info(
-        "Using ",
-        printer.printerURL + " to establish a connection to Filament Manager Plugin..."
-      );
-      break;
-    }
+  const onlinePrinterList = await getOnlinePrinterList();
+
+  if (onlinePrinterList.length !== printerList.length) {
+    warnings.push({
+      msg: `Can only check ${onlinePrinterList.length} of ${printerList.length} instances... If those instances don't have Filament Manager installed with the database, you could run into issues!`
+    });
   }
 
-  if (printer === null) {
-    logger.info("No printer online, please connect a printer...");
-    res.send({ status: false });
+  const filamentManagerPluginCheck = await checkIfFilamentManagerPluginExists(onlinePrinterList);
+  if (filamentManagerPluginCheck.length > 0) {
+    let message =
+      "These instances don't seem to have the plugin manager installed... Cannot continue!";
+    filamentManagerPluginCheck.forEach((printer) => {
+      message += `<br> ${printer.url}`;
+    });
+    errors.push({ msg: message });
   }
-  let spools = await fetch(`${printer.printerURL}/plugin/filamentmanager/spools`, {
+  // Bail out early here... can't continue!
+  if (errors > 0) {
+    res.send({ errors, warnings });
+  }
+
+  const filamentManagerSettingsCheck = await checkFilamentManagerPluginSettings(onlinePrinterList);
+  if (filamentManagerSettingsCheck.length > 0) {
+    let message = "These instances don't have the plugin setup correctly... Cannot continue!";
+    filamentManagerSettingsCheck.forEach((printer) => {
+      message += `<br> ${printer.url}`;
+    });
+    errors.push({ msg: message });
+  }
+
+  // Bail out early here... can't continue!
+  if (errors > 0) {
+    res.send({ errors, warnings });
+  }
+
+  let spools = await fetch(`${onlinePrinterList[0].printerURL}/plugin/filamentmanager/spools`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "X-Api-Key": printer.apikey
+      "X-Api-Key": onlinePrinterList[0].apikey
     }
   });
-  logger.info("Grabbing Profiles");
-  let profiles = await fetch(`${printer.printerURL}/plugin/filamentmanager/profiles`, {
+  let profiles = await fetch(`${onlinePrinterList[0].printerURL}/plugin/filamentmanager/profiles`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
-      "X-Api-Key": printer.apikey
+      "X-Api-Key": onlinePrinterList[0].apikey
     }
   });
-  logger.info("Grabbing Spools");
   // Make sure filament manager responds...
   if (spools.status != 200 || profiles.status != 200) {
     logger.info(
@@ -558,7 +574,15 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
         " Spools Status: " +
         spools.status
     );
-    res.send({ status: false });
+    errors.push({
+      msg:
+        "Couldn't grab something: Profiles Status:" +
+        profiles.status +
+        " Spools Status: " +
+        spools.status
+    });
+    // Again early bail out, cannot continue without spools/profiles
+    res.send({ errors, warnings });
   }
   await Spool.deleteMany({});
   await Profiles.deleteMany({});
@@ -602,9 +626,8 @@ router.post("/filamentManagerSync", ensureAuthenticated, async (req, res) => {
   serverSettings[0].save();
   SettingsClean.start();
   // Return success
-  if (spools.status === 200 || profiles.status != 200) {
-    res.send({ status: true });
-  }
+
+  res.send({ errors, warnings, spoolCount: spools.length, profileCount: profiles.length });
 });
 router.post("/disableFilamentPlugin", ensureAuthenticated, async (req, res) => {
   logger.info("Request to disabled filament manager plugin");

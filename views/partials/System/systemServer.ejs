@@ -233,38 +233,77 @@
             <div class="tab-pane fade" id="server-filament" role="tabpanel"
                  aria-labelledby="server-filament-list">
                 <div id="filamentManagerSetup" class="row">
-                    <div class="col-lg-12">
-                        <h5>Check for filament selection before starting a
-                            print?</h5>
+                    <div class="col-lg-4">
+                        <h5>Check Spool?</h5>
+                        <div class="alert alert-info small" role="alert">
+                            OctoFarm will throw a nag screen when trying to start a print without a spool attached.
+                        </div>
                         <form class="was-validated">
                             <div class="custom-control custom-checkbox mb-3">
                                 <input type="checkbox" class="custom-control-input"
-                                       id="checkFilament" required <%= (serverSettings.server.registration) ? "checked" : "" %>>
+                                       id="checkFilament" required <%= (serverSettings.filament.filamentCheck) ? "checked" : "" %>>
                                 <label class="custom-control-label"
                                        for="checkFilament">Filament Check</label>
-                                <div class="valid-feedback">Filament Check is turned
-                                    on
+                                <div class="valid-feedback">Check for spool
                                 </div>
-                                <div class="invalid-feedback">Filament Check is
-                                    turned off
+                                <div class="invalid-feedback">Ignore check for spool
                                 </div>
                             </div>
                         </form>
                     </div>
+                    <% if (!serverSettings.filamentManager){ %>
+                        <div class="col-lg-4">
+                            <h5>Downdate Successful Usage?</h5>
+                            <div class="alert alert-info small" role="alert">
+                                On a successful print completion OctoFarm will use OctoPrints filament meta data and downdate the currently selected spool with that amount.
+                            </div>
+                            <form class="was-validated">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input type="checkbox" class="custom-control-input"
+                                           id="downDateSuccess" required <%= (serverSettings?.server?.downDateSuccess) ? "checked" : "" %>>
+                                    <label class="custom-control-label"
+                                           for="downDateSuccess">Downdate Successful</label>
+                                    <div class="valid-feedback">Downdate usage
+                                    </div>
+                                    <div class="invalid-feedback">Ignore usage
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-lg-4">
+                            <h5>Downdate Failed/Cancelled Usage?</h5>
+                            <div class="alert alert-info small" role="alert">
+                                On failed/cancelled print completion OctoFarm will use OctoPrints filament meta data and downdate the currently selected spool with that amount.
+                                <b>NOTE: </b> This is an best guess calculation, it will never be accurate.
+                            </div>
+                            <form class="was-validated">
+                                <div class="custom-control custom-checkbox mb-3">
+                                    <input type="checkbox" class="custom-control-input"
+                                           id="downDateFailed" required <%= (serverSettings?.server?.downDateFailed) ? "checked" : "" %>>
+                                    <label class="custom-control-label"
+                                           for="downDateFailed">Downdate failed/cancelled</label>
+                                    <div class="valid-feedback">Downdate usage
+                                    </div>
+                                    <div class="invalid-feedback">Ignore usage
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    <% } %>
                     <div class="col-lg-12">
                         <h5>Filament Manager Sync</h5>
                         <p class="mb-1">Click the button below to activate filament
                             manager plugin and link it to OctoFarm. Please read the
                             notes below before proceeding.</p>
-                        <small><b>Note:</b> OctoFarm expects filament manager
+                        <code><b>Note:</b> OctoFarm expects filament manager
                             installed on every instance. If it isn't, and you
                             activate it you run the risk of some updates/selections
-                            failing to register.</small>
+                            failing to register.</code>
                         <br>
-                        <small><b>Note:</b> You must also have all these instances
+                        <code><b>Note:</b> You must also have all these instances
                             setup with a postgres database. Without this you will
                             not be able to select filament on every
-                            instance.</small>
+                            instance.</code>
                         <% if(!serverSettings.filamentManager){ %>
                             <center>
                                 <br>
