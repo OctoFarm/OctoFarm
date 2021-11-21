@@ -555,7 +555,6 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
     });
     errors.push({ msg: message });
   }
-
   // Bail out early here... can't continue!
   if (errors.length > 0) {
     return res.send({ errors, warnings });
@@ -591,6 +590,7 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
         spools.status
     });
     // Again early bail out, cannot continue without spools/profiles
+    console.log("RES SEND");
     return res.send({ errors, warnings });
   }
 
@@ -598,6 +598,7 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
   await Profiles.deleteMany({});
   spools = await spools.json();
   profiles = await profiles.json();
+
   spools.spools.forEach((sp) => {
     logger.info("Saving Spool: ", sp);
     const spools = {
@@ -637,9 +638,14 @@ router.post("/filamentManagerSync", ensureAuthenticated, ensureAdministrator, as
   serverSettings[0].markModified("filament.filamentCheck");
   serverSettings[0].save();
   await SettingsClean.start();
-  // Return success
 
-  return res.send({ errors, warnings, spoolCount: spools.length, profileCount: profiles.length });
+  // Return success
+  return res.send({
+    errors,
+    warnings,
+    spoolCount: spools.spools.length,
+    profileCount: profiles.profiles.length
+  });
 });
 router.post("/disableFilamentPlugin", ensureAuthenticated, async (req, res) => {
   logger.info("Request to disabled filament manager plugin");

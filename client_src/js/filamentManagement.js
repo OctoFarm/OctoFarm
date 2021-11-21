@@ -337,7 +337,6 @@ async function addSpool(
     await updateProfileDrop();
     return true;
   } else {
-    return false;
     UI.createMessage(
       {
         type: "error",
@@ -345,6 +344,7 @@ async function addSpool(
       },
       "addSpoolsMessage"
     );
+    return false;
   }
 }
 

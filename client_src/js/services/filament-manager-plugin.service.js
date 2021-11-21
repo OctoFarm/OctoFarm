@@ -58,6 +58,7 @@ export function setupFilamentManagerSyncBtn() {
     const filamentManagerSyncEnabled = await OctoFarmClient.post("filament/filamentManagerSync", {
       activate: true
     });
+
     if (filamentManagerSyncEnabled.errors.length > 0) {
       filamentManagerAlert.close();
       UI.removeLoaderFromElementInnerHTML(filamentManagerSyncBtn);
@@ -68,13 +69,12 @@ export function setupFilamentManagerSyncBtn() {
     } else if (filamentManagerSyncEnabled.warnings.length > 0) {
       filamentManagerAlert.close();
       UI.removeLoaderFromElementInnerHTML(filamentManagerSyncBtn);
-      filamentManagerSyncBtn.disabled = false;
       filamentManagerSyncEnabled.warnings.forEach((error) => {
         UI.createAlert("warning", error.msg, 0, "Clicked");
         UI.createAlert(
           "success",
           `Filament Manager Plugin has been enabled regardless of the warnings! <br> Profiles: ${filamentManagerSyncEnabled.profileCount} <br> Spools: ${filamentManagerSyncEnabled.spoolCount}`,
-          3000,
+          0,
           "Clicked"
         );
       });
@@ -87,7 +87,6 @@ export function setupFilamentManagerSyncBtn() {
         "Clicked"
       );
       UI.removeLoaderFromElementInnerHTML(filamentManagerSyncBtn);
-      filamentManagerSyncBtn.disabled = false;
     }
   });
 }
