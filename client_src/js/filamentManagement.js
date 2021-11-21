@@ -244,115 +244,108 @@ async function addSpool(
   spoolsTempOffset,
   spoolsBedOffset
 ) {
-  console.log(
-    spoolsName,
-    spoolsProfile,
-    spoolsPrice,
-    spoolsWeight,
-    spoolsUsed,
-    spoolsTempOffset,
-    spoolsBedOffset
-  );
-  // const errors = [];
-  //
-  // if (spoolsName.value === "") {
-  //   errors.push({ type: "warning", msg: "Please input a spool name" });
-  // }
-  // if (spoolsProfile.value === "") {
-  //   errors.push({ type: "warning", msg: "Please select a profile" });
-  // }
-  // if (spoolsPrice.value === "") {
-  //   errors.push({ type: "warning", msg: "Please input a spool price" });
-  // }
-  // if (spoolsWeight.value === 0 || spoolsWeight.value === "") {
-  //   errors.push({ type: "warning", msg: "Please input a spool weight" });
-  // }
-  // if (spoolsUsed.value === "") {
-  //   errors.push({ type: "warning", msg: "Please input spool used weight" });
-  // }
-  //
-  // if (errors.length > 0) {
-  //   errors.forEach((error) => {
-  //     UI.createMessage(error, "addSpoolsMessage");
-  //   });
-  //   return;
-  // }
-  // const opts = {
-  //   spoolsName: spoolsName.value,
-  //   spoolsProfile: spoolsProfile.value,
-  //   spoolsPrice: spoolsPrice.value,
-  //   spoolsWeight: spoolsWeight.value,
-  //   spoolsUsed: spoolsUsed.value,
-  //   spoolsTempOffset: spoolsTempOffset.value,
-  //   spoolsBedOffset: spoolsBedOffset.value
-  // };
-  // let post = await OctoFarmClient.post("filament/save/filament", opts);
-  //
-  // if (post) {
-  //   UI.createMessage(
-  //     {
-  //       type: "success",
-  //       msg: "Successfully added new roll to the database..."
-  //     },
-  //     "addSpoolsMessage"
-  //   );
-  //   filamentManager = post.filamentManager;
-  //   spoolsName.value = "";
-  //   spoolsPrice.value = "";
-  //   spoolsWeight.value = 1000;
-  //   spoolsUsed.value = 0;
-  //   spoolsTempOffset.value = 0.0;
-  //   spoolsBedOffset.value = 0;
-  //   post = post.spools;
-  //   document.getElementById("addSpoolsTable").insertAdjacentHTML(
-  //     "afterbegin",
-  //     `
-  //               <tr data-jplist-item>
-  //                 <th style="display: none;">${post?._id}</th>
-  //                 <th scope="row"><input class="form-control" type="text" placeholder="${post?.spools?.name}"></th>
-  //                 <td>
-  //                      <span class="d-none material" id="spoolsMaterialText-<%=spool._id%>"></span>
-  //                      <select id="spoolsProfile-${post?._id}" class="form-control" disabled>
-  //
-  //                      </select>
-  //                  </td>
-  //                 <td><input class="form-control" type="text" step="0.01" placeholder="${post?.spools?.price}" disabled></td>
-  //                 <td><input class="form-control" type="text" placeholder="${post?.spools?.weight}" disabled></td>
-  //                 <td><input class="form-control" type="text" placeholder="${post?.spools?.used}"></td>
-  //                 <td><input class="form-control" type="text" placeholder="${post?.spools?.tempOffset}" disabled></td>
-  //                 <td><input class="form-control" type="text" placeholder="${post?.spools?.bedOffset}" disabled></td>
-  //                  <td>
-  //                      <select id="spoolsPrinterAssignment-${post?._id}" class="form-control" disabled>
-  //
-  //                      </select>
-  //                  </td>
-  //                 <td>
-  //                 <button title="Clone Spool" id="clone-${post?._id}" type="button" class="btn btn-sm btn-success clone">
-  //                     <i class="far fa-copy"></i>
-  //                 </button>
-  //                 <button id="edit-${post?._id}" type="button" class="btn btn-sm btn-info edit">
-  //                   <i class="fas fa-edit editIcon"></i>
-  //                 </button>
-  //                 <button id="save-${post?._id}" type="button" class="btn btn-sm d-none btn-success save">
-  //                   <i class="fas fa-save saveIcon"></i>
-  //                 </button>
-  //                 <button id="delete-${post?._id}" type="button" class="btn btn-sm btn-danger delete">
-  //                   <i class="fas fa-trash deleteIcon"></i>
-  //                 </button></td>
-  //               </tr>
-  //               `
-  //   );
-  //   await updatePrinterDrops();
-  //   await updateProfileDrop();
-  // } else {
-  //   UI.createMessage(
-  //     {
-  //       type: "error",
-  //       msg: "Could not add roll to database... is it alive?"
-  //     },
-  //     "addSpoolsMessage"
-  //   );
-  // }
+  const errors = [];
+
+  if (spoolsName.value === "") {
+    errors.push({ type: "warning", msg: "Please input a spool name" });
+  }
+  if (spoolsProfile.value === "") {
+    errors.push({ type: "warning", msg: "Please select a profile" });
+  }
+  if (spoolsPrice.value === "") {
+    errors.push({ type: "warning", msg: "Please input a spool price" });
+  }
+  if (spoolsWeight.value === 0 || spoolsWeight.value === "") {
+    errors.push({ type: "warning", msg: "Please input a spool weight" });
+  }
+  if (spoolsUsed.value === "") {
+    errors.push({ type: "warning", msg: "Please input spool used weight" });
+  }
+
+  if (errors.length > 0) {
+    errors.forEach((error) => {
+      UI.createMessage(error, "addSpoolsMessage");
+    });
+    return;
+  }
+  const opts = {
+    spoolsName: spoolsName.value,
+    spoolsProfile: spoolsProfile.value,
+    spoolsPrice: spoolsPrice.value,
+    spoolsWeight: spoolsWeight.value,
+    spoolsUsed: spoolsUsed.value,
+    spoolsTempOffset: spoolsTempOffset.value,
+    spoolsBedOffset: spoolsBedOffset.value
+  };
+  let post = await OctoFarmClient.post("filament/save/filament", opts);
+
+  if (post) {
+    UI.createMessage(
+      {
+        type: "success",
+        msg: "Successfully added new roll to the database..."
+      },
+      "addSpoolsMessage"
+    );
+    filamentManager = post.filamentManager;
+    spoolsName.value = "";
+    spoolsPrice.value = "";
+    spoolsWeight.value = 1000;
+    spoolsUsed.value = 0;
+    spoolsTempOffset.value = 0.0;
+    spoolsBedOffset.value = 0;
+    post = post.spools;
+    document.getElementById("addSpoolsTable").insertAdjacentHTML(
+      "afterbegin",
+      `
+                <tr data-jplist-item>
+                  <th style="display: none;">${post?._id}</th>
+                  <th scope="row"><input class="form-control" type="text" placeholder="${post?.spools?.name}"></th>
+                  <td>
+                       <span class="d-none material" id="spoolsMaterialText-<%=spool._id%>"></span>
+                       <select id="spoolsProfile-${post?._id}" class="form-control" disabled>
+
+                       </select>
+                   </td>
+                  <td><input class="form-control" type="text" step="0.01" placeholder="${post?.spools?.price}" disabled></td>
+                  <td><input class="form-control" type="text" placeholder="${post?.spools?.weight}" disabled></td>
+                  <td><input class="form-control" type="text" placeholder="${post?.spools?.used}"></td>
+                  <td><input class="form-control" type="text" placeholder="${post?.spools?.tempOffset}" disabled></td>
+                  <td><input class="form-control" type="text" placeholder="${post?.spools?.bedOffset}" disabled></td>
+                   <td>
+                       <select id="spoolsPrinterAssignment-${post?._id}" class="form-control" disabled>
+
+                       </select>
+                   </td>
+                  <td>
+                  <button title="Clone Spool" id="clone-${post?._id}" type="button" class="btn btn-sm btn-success clone">
+                      <i class="far fa-copy"></i>
+                  </button>
+                  <button id="edit-${post?._id}" type="button" class="btn btn-sm btn-info edit">
+                    <i class="fas fa-edit editIcon"></i>
+                  </button>
+                  <button id="save-${post?._id}" type="button" class="btn btn-sm d-none btn-success save">
+                    <i class="fas fa-save saveIcon"></i>
+                  </button>
+                  <button id="delete-${post?._id}" type="button" class="btn btn-sm btn-danger delete">
+                    <i class="fas fa-trash deleteIcon"></i>
+                  </button></td>
+                </tr>
+                `
+    );
+    await updatePrinterDrops();
+    await updateProfileDrop();
+    return true;
+  } else {
+    return false;
+    UI.createMessage(
+      {
+        type: "error",
+        msg: "Could not add roll to database... is it alive?"
+      },
+      "addSpoolsMessage"
+    );
+  }
 }
 
 const clonedSpools = [];
@@ -379,13 +372,13 @@ async function cloneSpool(e) {
 
                      </select>
                  </td>
-                <td><input class="form-control" type="text" step="0.01" placeholder="${spool[1]}" value="${spool[1]}"></td>
-                <td><input class="form-control" type="text" placeholder="${spool[2]}" value="${spool[2]}"></td>
-                <td><input class="form-control" type="text" placeholder="${spool[3]}" value="${spool[3]}"></td>
-                <td><input class="form-control" type="text" placeholder="${spool[4]}" value="${spool[4]}"></td>
-                <td><input class="form-control" type="text" placeholder="${spool[5]}" value="${spool[5]}"></td>
+                <td><input id="clonedPrice-${clonedIndex}" class="form-control" type="text" step="0.01" placeholder="${spool[1]}" value="${spool[1]}"></td>
+                <td><input id="clonedWeight-${clonedIndex}" class="form-control" type="text" placeholder="${spool[2]}" value="1000"></td>
+                <td><input id="clonedUsed-${clonedIndex}" class="form-control" type="text" placeholder="${spool[3]}" value="0"></td>
+                <td><input id="clonedToolOffset-${clonedIndex}" class="form-control" type="text" placeholder="${spool[4]}" value="${spool[4]}"></td>
+                <td><input id="clonedBedOffset-${clonedIndex}" class="form-control" type="text" placeholder="${spool[5]}" value="${spool[5]}"></td>
                  <td>
-                     <select id="spoolsPrinterAssignment-${clonedIndex}" class="form-control">
+                     <select id="spoolsPrinterAssignment-${clonedIndex}" class="form-control" disabled>
 
                      </select>
                  </td>
@@ -399,19 +392,20 @@ async function cloneSpool(e) {
 
   document.getElementById("clonedSave-" + clonedIndex).addEventListener("click", function () {
     const clonedRow = document.getElementById(`clonedRow-${clonedIndex}`);
-    addSpool(
+    const addedSpool = addSpool(
       document.getElementById(`clonedName-${clonedIndex}`),
-      document.getElementById(`clonedName-${clonedIndex}`),
-      document.getElementById(`clonedName-${clonedIndex}`),
-      document.getElementById(`clonedName-${clonedIndex}`),
-      document.getElementById(`clonedName-${clonedIndex}`),
-      document.getElementById(`clonedName-${clonedIndex}`),
-      document.getElementById(`clonedName-${clonedIndex}`)
+      document.getElementById(`spoolsProfile-${clonedIndex}`),
+      document.getElementById(`clonedPrice-${clonedIndex}`),
+      document.getElementById(`clonedWeight-${clonedIndex}`),
+      document.getElementById(`clonedUsed-${clonedIndex}`),
+      document.getElementById(`clonedToolOffset-${clonedIndex}`),
+      document.getElementById(`clonedBedOffset-${clonedIndex}`)
     );
-
-    // Remove Row
-    clonedRow.remove();
-    clonedSpools.pop();
+    if (addedSpool) {
+      // Remove Row
+      clonedRow.remove();
+      clonedSpools.pop();
+    }
   });
 
   clonedSpools.push(clonedIndex);

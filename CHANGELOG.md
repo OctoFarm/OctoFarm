@@ -34,6 +34,7 @@ All notable changes to this project will be documented in this file.
   - You can now see UserLoggedIn/UserLoggedOut/ClientAuthed/ClientClosed events for OctoPrints websocket and user interface in the Printer Managers connections log.
   - New columns setting for the Group Views, added in System -> Client -> Views. 
   - Added Another new view named "Group". Group view will organise your printers by their common groupings. This view is great for fire and forget type farms.
+  - Added a quick setup button for Filament Manager Plugin. This will run through all online instances and set the up with the database settings you provide.
 
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2
