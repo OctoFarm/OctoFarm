@@ -35,6 +35,7 @@ All notable changes to this project will be documented in this file.
   - New columns setting for the Group Views, added in System -> Client -> Views. 
   - Added Another new view named "Group". Group view will organise your printers by their common groupings. This view is great for fire and forget type farms.
   - Added a quick setup button for Filament Manager Plugin. This will run through all online instances and set the up with the database settings you provide.
+  - Filament manager can now clone spools. Pressing the button will insert a new row defaulting to 1000g and 0g usage. The name will be incremented with (#).
 
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2
