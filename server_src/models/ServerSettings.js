@@ -56,17 +56,22 @@ const ServerSettingsSchema = new mongoose.Schema({
     filamentCheck: {
       type: Boolean,
       default: false,
-      require: true
+      required: true
     },
     downDateSuccess: {
       type: Boolean,
       default: false,
-      require: true
+      required: true
     },
     downDateFailed: {
       type: Boolean,
       default: false,
-      require: true
+      required: true
+    },
+    hideEmpty: {
+      type: Boolean,
+      default: false,
+      required: true
     }
   },
   history: {
