@@ -6,6 +6,7 @@ const { PrinterClean } = require("./lib/dataFunctions/printerClean");
 const { SystemRunner } = require("./runners/systemInfo");
 const { grabLatestPatreonData } = require("./services/patreon.service");
 const { Runner } = require("./runners/state.js");
+const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
 
 const PRINTER_CLEAN_TASK = async () => {
   const serverSettings = require("./settings/serverSettings");
@@ -27,6 +28,7 @@ const HISTORY_CACHE_TASK = async () => {
 
 // TODO this runs without knowing about filament manager -_-
 const FILAMENT_CLEAN_TASK = async () => {
+  // console.log(SettingsClean.returnSystemSettings());
   await FilamentClean.start();
 };
 

@@ -4,6 +4,16 @@ import * as ApexCharts from "apexcharts";
 import OctoFarmClient from "./services/octofarm-client.service";
 import { dashboardOptions } from "./dashboard/dashboard.options";
 
+const pageElements = {
+  filamentProfileTotals: document.getElementById("filamentProfileTotals"),
+  filamentSpoolTotals: document.getElementById("filamentSpoolsTotals"),
+  filamentSpoolsActiveTotals: document.getElementById("filamentSpoolsActiveTotals"),
+  filamentUsedProgress: document.getElementById("filamentUsedProgress"),
+  filamentRemainingProgress: document.getElementById("filamentRemainingProgress"),
+  filamentOverviewTable: document.getElementById("filamentOverviewTable"),
+  filamentOverviewList: document.getElementById("filamentOverviewList")
+};
+
 let filamentManager = false;
 const filamentStore = [
   {
@@ -88,6 +98,92 @@ const filamentStore = [
   }
 ];
 
+async function reRenderPageInformation() {
+  let { statistics, spools, profiles } = await OctoFarmClient.getFilamentStatistics();
+  console.log(statistics, spools, profiles);
+
+  pageElements.filamentProfileTotals.innerHTML = statistics.profileCount;
+  pageElements.filamentSpoolTotals.innerHTML = statistics.spoolCount;
+  pageElements.filamentSpoolsActiveTotals.innerHTML = statistics.activeSpoolCount;
+  const usedPercent = ((statistics.used / statistics.total) * 100).toFixed(0);
+  pageElements.filamentUsedProgress.innerHTML = usedPercent + "%";
+  pageElements.filamentUsedProgress.style.width = usedPercent;
+  const remainingPercent = (
+    ((statistics.total - statistics.used) / statistics.total) *
+    100
+  ).toFixed(0);
+  pageElements.filamentRemainingProgress.innerHTML = remainingPercent + "%";
+  pageElements.filamentRemainingProgress.style.width = remainingPercent;
+
+  let remainingBreakdown = "";
+  statistics.materialBreakDown.forEach((used) => {
+    remainingBreakdown += `<th scope="col">${(used.total - used.used).toFixed(2)}g</th>`;
+  });
+  let usedBreakdown = "";
+  statistics.materialBreakDown.forEach((used) => {
+    usedBreakdown += `<th scope="col">${used.used.toFixed(2)}g</th>`;
+  });
+
+  let weightBreakdown = "";
+  statistics.materialBreakDown.forEach((used) => {
+    weightBreakdown += `<th scope="col">${used.total.toFixed(2)}g</th>`;
+  });
+
+  let costBreakdown = "";
+  statistics.materialBreakDown.forEach((used) => {
+    costBreakdown += `<th scope="col">${used.price.toFixed(2)}g</th>`;
+  });
+
+  pageElements.filamentOverviewTable.innerHTML = `
+  <tr>
+      <td scope="row">Remaining <span class="badge badge-success ml-2">${
+        statistics.total.toFixed(0) - statistics.used.toFixed(0)
+      }g</span></td>
+      ${remainingBreakdown}
+  </tr>
+  <tr>
+      <td scope="row">Used <span class="badge badge-warning ml-2">${statistics.used.toFixed(
+        0
+      )}g</span> </td>
+      ${usedBreakdown}
+  </tr>
+  <tr>
+      <th scope="row">Weight<span class="badge badge-light text-dark ml-2">${statistics.total.toFixed(
+        0
+      )}g</span></th>
+      ${weightBreakdown}
+  </tr>
+  <tr>
+      <th scope="row">Cost <span class="badge badge-info ml-2">${statistics.price.toFixed(
+        2
+      )}</span></th>
+      ${costBreakdown}
+  </tr>
+  `;
+
+  let spoolList = "";
+  spools.forEach((spool) => {
+    spoolList += `
+                <tr>
+                    <th style="display: none;"> </th>
+                    <th><i class="fas fa-toilet-paper"></i></th>
+                    <th scope="row">${spool.name}</th>
+                    <td id="spoolsListMaterial-${spool._id}">
+                    </td>
+                    <td id="spoolsListManufacture-${spool._id}">
+                    </td>
+                    <td>${spool.weight / 1000}KG</td>
+                    <td>${(spool.weight - spool.used).toFixed(0)}</td>
+                    <td>${spool.tempOffset}</td>
+                    <td>${spool.bedOffset || 0}</td>
+                    <td id="spoolsListPrinterAssignment-${spool._id}"></td>
+                </tr>
+    `;
+  });
+
+  pageElements.filamentOverviewList.innerHTML = spoolList;
+}
+
 // Profile functions
 async function addProfile(manufacturer, material, density, diameter) {
   const errors = [];
@@ -137,6 +233,7 @@ async function addProfile(manufacturer, material, density, diameter) {
       profileID = post.dataProfile._id;
     }
     post = post.dataProfile;
+    await reRenderPageInformation();
     await updateProfileDrop();
     document.getElementById("addProfilesTable").insertAdjacentHTML(
       "beforeend",
@@ -197,7 +294,8 @@ async function saveProfile(e) {
   };
   let post = await OctoFarmClient.post("filament/edit/profile", data);
   if (post) {
-    updateProfileDrop();
+    await reRenderPageInformation();
+    await updateProfileDrop();
     document.getElementById(`save-${id}`).classList.add("d-none");
     document.getElementById(`edit-${id}`).classList.remove("d-none");
   }
@@ -209,7 +307,7 @@ async function deleteProfile(e) {
     let post = await OctoFarmClient.post("filament/delete/profile", {
       id: e.parentElement.parentElement.firstElementChild.innerHTML.trim()
     });
-    if (post) {
+    if (post?.profiles) {
       if (e.classList.contains("deleteIcon")) {
         jplist.resetContent(function () {
           // remove element with id = el1
@@ -221,14 +319,14 @@ async function deleteProfile(e) {
           e.parentElement.parentElement.remove();
         });
       }
+      await reRenderPageInformation();
       updateProfileDrop(post);
     } else {
-      UI.createMessage(
-        {
-          type: "danger",
-          msg: "Error: Could not delete roll from database, check connection..."
-        },
-        "filamentMessage"
+      UI.createAlert(
+        "error",
+        "There was a conflict when deleting this profile, is it attached to a spool?",
+        4000,
+        "Clicked"
       );
     }
   }
@@ -333,6 +431,7 @@ async function addSpool(
                 </tr>
                 `
     );
+    await reRenderPageInformation();
     await updatePrinterDrops();
     await updateProfileDrop();
     return true;
@@ -409,7 +508,7 @@ async function cloneSpool(e) {
   });
 
   clonedSpools.push(clonedIndex);
-
+  await reRenderPageInformation();
   await updatePrinterDrops();
   await updateProfileDrop();
 }
@@ -433,6 +532,7 @@ async function deleteSpool(e) {
       id: e.parentElement.parentElement.firstElementChild.innerHTML.trim()
     });
     if (post?.spool) {
+      await reRenderPageInformation();
       if (e.classList.contains("deleteIcon")) {
         jplist.resetContent(function () {
           // remove element with id = el1
