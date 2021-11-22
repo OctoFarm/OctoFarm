@@ -187,8 +187,8 @@ const HOUR_MS = 3600 * 1000;
 
 class OctoFarmTasks {
   static BOOT_TASKS = [
-    KsatLlorKcir(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
     KsatLlorKcir(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
+    KsatLlorKcir(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
     KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
     KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
