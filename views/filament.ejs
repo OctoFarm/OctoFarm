@@ -594,6 +594,10 @@
                             <th scope="col" width="150px"></th>
                         </tr>
                         </thead>
+                        <% let multiple = "" %>
+                        <% if(!serverSettings.filamentManager){ %>
+                            <% multiple = "multiple=true" %>
+                        <% } %>
                         <tbody id="addSpoolsTable" data-jplist-group="spools">
                         <% spools.forEach(spool => { %>
                             <tr data-jplist-item>
@@ -610,7 +614,8 @@
                                 <td><input class="form-control" type="number" step="any" placeholder="<%= spool.tempOffset || 0 %>" disabled></td>
                                 <td><input class="form-control" type="number" step="any" placeholder="<%= spool.bedOffset || 0 %>" disabled></td>
                                 <td>
-                                    <select id="spoolsPrinterAssignment-<%=spool._id%>" class="form-control" disabled>
+
+                                    <select id="spoolsPrinterAssignment-<%=spool._id%>" class="form-control" <%= multiple %>>
                                     </select>
                                 </td>
                                 <td>

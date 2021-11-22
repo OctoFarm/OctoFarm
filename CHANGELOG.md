@@ -88,6 +88,9 @@ All notable changes to this project will be documented in this file.
   - Filament Manager can no longer delete spools if attached to printer.
   - Filament Manager can no longer delete profiles if attached to spool.
   - Filament Manager totals are now displayed in KG.
+  - Re-enabled the filament manager spool assignment:
+    - Without filament manager plugin this will be a multi-select option. You can CTRL + Click to select mutliple, or normal left click to select a single. 
+    - With filament manager plugin this will be a single dropdown menu only allowing to select a single spool as per the plugins requirements. 
 
 ### Removed
 

@@ -588,7 +588,10 @@ class PrinterClean {
   }
 
   static async createPrinterList(farmPrinters, filamentManager) {
-    const printerList = ['<option value="0">Not Assigned</option>'];
+    const printerList = [];
+    if (filamentManager) {
+      printerList.push('<option value="0">Not Assigned</option>');
+    }
     farmPrinters.forEach((printer) => {
       if (typeof printer.currentProfile !== "undefined" && printer.currentProfile !== null) {
         for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
