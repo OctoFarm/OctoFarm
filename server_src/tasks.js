@@ -9,7 +9,7 @@ const { Runner } = require("./runners/state.js");
 
 const PRINTER_CLEAN_TASK = async () => {
   const serverSettings = require("./settings/serverSettings");
-  const printersInformation = Runner.returnFarmPrinters();
+  const printersInformation = PrinterClean.listPrintersInformation();
   await PrinterClean.sortCurrentOperations(printersInformation);
 
   await PrinterClean.createPrinterList(printersInformation, serverSettings.filamentManager);
@@ -188,12 +188,12 @@ const HOUR_MS = 3600 * 1000;
 class OctoFarmTasks {
   static BOOT_TASKS = [
     KsatLlorKcir(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
-    KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
+    KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
+    KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC, 24 * HOUR_MS),
     KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
-    KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.RUNONCE)
   ];
 }
