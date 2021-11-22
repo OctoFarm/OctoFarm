@@ -57,7 +57,6 @@
     "html-loader": "^2.1.2",
     "jest": "^26.6.3",
     "jest-util": "^26.6.2",
-    "jplist-es6": "^1.2.0",
     "jquery": "^3.5.1",
     "lodash": "^4.17.21",
     "mini-css-extract-plugin": "^1.6.0",

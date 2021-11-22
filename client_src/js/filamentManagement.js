@@ -434,12 +434,12 @@ async function deleteSpool(e) {
     });
     if (post) {
       if (e.classList.contains("deleteIcon")) {
-        jpList.resetContent(function () {
+        jplist.resetContent(function () {
           // remove element with id = el1
           e.parentElement.parentElement.parentElement.remove();
         });
       } else {
-        jpList.resetContent(function () {
+        jplist.resetContent(function () {
           // remove element with id = el1
           e.parentElement.parentElement.remove();
         });
