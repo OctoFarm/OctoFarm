@@ -190,8 +190,8 @@ async function updateServerSettings() {
     filament: {
       filamentCheck: settingsElements.filament.filamentCheck.checked,
       hideEmpty: settingsElements.filament.hideEmpty.checked,
-      downDateFailed: settingsElements.filament.downDateFailed,
-      downDateSuccess: settingsElements.filament.downDateSuccess
+      downDateFailed: settingsElements.filament.downDateFailed.checked,
+      downDateSuccess: settingsElements.filament.downDateSuccess.checked
     },
     history: {
       snapshot: {
@@ -230,6 +230,7 @@ async function updateServerSettings() {
       combined: settingsElements.monitoringViews.combined.checked
     }
   };
+  console.log(opts);
   OctoFarmClient.post("settings/server/update", opts).then((res) => {
     UI.createAlert(`${res.status}`, `${res.msg}`, 3000, "Clicked");
     if (res.restartRequired) {

@@ -5,6 +5,7 @@ const Logger = require("../../handlers/logger.js");
 const Spools = require("../../models/Filament.js");
 const Profiles = require("../../models/Profiles.js");
 const { PrinterClean } = require("./printerClean.js");
+const { SettingsClean } = require("../dataFunctions/settingsClean");
 
 const logger = new Logger("OctoFarm-InformationCleaning");
 
@@ -99,6 +100,9 @@ class FilamentClean {
   }
 
   static dropDownList(spools, profiles, filamentManager, selected) {
+    const currentSettings = SettingsClean.returnSystemSettings();
+    const { filament } = currentSettings;
+    const { hideEmpty } = filament;
     const normalDropObject = [this.noSpoolOptions];
     const historyDropObject = [this.noSpoolOptions];
     spools.forEach((spool) => {
@@ -116,38 +120,47 @@ class FilamentClean {
         return o == spool._id;
       });
       if (profileId >= 0) {
-        if (filamentManager) {
-          historyDropObject.push(`
-                  <option value="${spool._id}">${spool.spools.name} (${(
-            spool.spools.weight - spool.spools.used
-          ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${
-            profiles[profileId].profile.manufacturer
-          })</option>
-              `);
-          if (index > -1) {
-            normalDropObject.push(`
-                  <option value="${spool._id}" disabled>${spool.spools.name} (${(
-              spool.spools.weight - spool.spools.used
-            ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${
-              profiles[profileId].profile.manufacturer
-            })</option>
-              `);
-          } else {
-            normalDropObject.push(`
-                  <option value="${spool._id}">${spool.spools.name} (${(
-              spool.spools.weight - spool.spools.used
-            ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${
-              profiles[profileId].profile.manufacturer
-            })</option>
-              `);
-          }
+        const amountLeft = (spool.spools.weight - spool.spools.used).toFixed(2);
+
+        if (hideEmpty && amountLeft < 1) {
         } else {
-          historyDropObject.push(`
+          if (filamentManager) {
+            historyDropObject.push(`
+                  <option value="${spool._id}">${spool.spools.name} (${(
+              spool.spools.weight - spool.spools.used
+            ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${
+              profiles[profileId].profile.manufacturer
+            })</option>
+              `);
+            if (index > -1) {
+              normalDropObject.push(`
+                  <option value="${spool._id}" disabled>${spool.spools.name} (${(
+                spool.spools.weight - spool.spools.used
+              ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${
+                profiles[profileId].profile.manufacturer
+              })</option>
+              `);
+            } else {
+              normalDropObject.push(`
+                  <option value="${spool._id}">${spool.spools.name} (${(
+                spool.spools.weight - spool.spools.used
+              ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${
+                profiles[profileId].profile.manufacturer
+              })</option>
+              `);
+            }
+          } else {
+            historyDropObject.push(`
                   <option value="${spool._id}">${spool.spools.name} - ${profiles[profileId].profile.material} (${profiles[profileId].profile.manufacturer})</option>
               `);
-          normalDropObject.push(`
-                  <option value="${spool._id}">${spool.spools.name} - ${profiles[profileId].profile.material} (${profiles[profileId].profile.manufacturer})</option>
-              `);
+            normalDropObject.push(`
+                <option value="${spool._id}">${spool.spools.name} (${(
+              spool.spools.weight - spool.spools.used
+            ).toFixed(2)}g) - ${profiles[profileId].profile.material} (${
+              profiles[profileId].profile.manufacturer
+            })</option>
+          `);
+          }
         }
       }
     });

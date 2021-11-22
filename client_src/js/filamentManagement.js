@@ -542,6 +542,7 @@ async function editSpool(e) {
   document.getElementById(`spoolsProfile-${id}`).disabled = false;
   document.getElementById(`save-${id}`).classList.remove("d-none");
   document.getElementById(`edit-${id}`).classList.add("d-none");
+  await reRenderPageInformation();
 }
 async function deleteSpool(e) {
   document.getElementById("profilesMessage").innerHTML = "";
