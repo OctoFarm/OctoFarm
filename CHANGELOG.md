@@ -85,6 +85,8 @@ All notable changes to this project will be documented in this file.
   - Enabling filament manager now toggles the spool check "on" by default. You can still turn off in the settings if required. Existing setups unaffected. 
   - Filament managers spools only accept a +/- 50 on the temperature offsets. This is all OctoPrint allows. 
   - Added the ability for spools to have a bed offset. Caveat with multiple spools on a printer is that it will pick the first spool to apply an offset.
+  - Filament Manager can no longer delete spools if attached to printer.
+  - Filament Manager can no longer delete profiles if attached to spool.
 
 ### Removed
 

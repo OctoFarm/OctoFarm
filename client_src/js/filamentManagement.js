@@ -432,7 +432,7 @@ async function deleteSpool(e) {
     let post = await OctoFarmClient.post("filament/delete/filament", {
       id: e.parentElement.parentElement.firstElementChild.innerHTML.trim()
     });
-    if (post) {
+    if (post?.spool) {
       if (e.classList.contains("deleteIcon")) {
         jplist.resetContent(function () {
           // remove element with id = el1
@@ -445,12 +445,11 @@ async function deleteSpool(e) {
         });
       }
     } else {
-      UI.createMessage(
-        {
-          type: "danger",
-          msg: "Error: Could not delete roll from database, check connection..."
-        },
-        "filamentMessage"
+      UI.createAlert(
+        "error",
+        "There was a conflict when deleting this spool, is it attached to a printer?",
+        4000,
+        "Clicked"
       );
     }
   }
@@ -472,7 +471,6 @@ async function saveSpool(e) {
     id,
     spool
   };
-  console.log(data);
   let post = await OctoFarmClient.post("filament/edit/filament", data);
   if (post) {
     document.getElementById(`spoolsProfile-${id}`).disabled = true;

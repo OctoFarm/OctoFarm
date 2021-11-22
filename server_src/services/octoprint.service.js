@@ -63,8 +63,24 @@ const checkFilamentManagerPluginSettings = async function (printers) {
   return notSetupCorrectly;
 };
 
+const checkIfSpoolAttachedToPrinter = function (spoolId) {
+  const printerList = Runner.returnFarmPrinters();
+  const filteredList = printerList.filter((printer) => printer.selectedFilament.length > 0);
+  let isSpoolAttached = false;
+  for (let i = 0; i < filteredList.length; i++) {
+    const doWeHaveSpoolIndex = filteredList[i].selectedFilament.some(
+      (spool) => spool?._id == spoolId
+    );
+    if (doWeHaveSpoolIndex) {
+      isSpoolAttached = true;
+    }
+  }
+  return isSpoolAttached;
+};
+
 module.exports = {
   getOnlinePrinterList,
   checkIfFilamentManagerPluginExists,
-  checkFilamentManagerPluginSettings
+  checkFilamentManagerPluginSettings,
+  checkIfSpoolAttachedToPrinter
 };
