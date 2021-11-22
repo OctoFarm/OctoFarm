@@ -99,6 +99,35 @@ router.post("/select", ensureAuthenticated, async (req, res) => {
   FilamentClean.start(filamentManager);
   res.send({ status: 200 });
 });
+router.post("/assign", ensureAuthenticated, async (req, res) => {
+  const serverSettings = await SettingsClean.returnSystemSettings();
+  const { filamentManager } = serverSettings;
+  logger.info("Request to change:", req.body.printerId + "selected filament");
+  if (filamentManager && req.body.spoolId != 0) {
+    const printerList = Runner.returnFarmPrinters();
+    const i = _.findIndex(printerList, function (o) {
+      return o._id == req.body.printerId;
+    });
+    const printer = printerList[i];
+    const spool = await Spool.findById(req.body.spoolId);
+    const selection = {
+      tool: req.body.tool,
+      spool: { id: spool.spools.fmID }
+    };
+    const url = `${printer.printerURL}/plugin/filamentmanager/selections/0`;
+    const updateFilamentManager = await fetch(url, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Api-Key": printer.apikey
+      },
+      body: JSON.stringify({ selection })
+    });
+  }
+  const printerList = await Runner.assignSpool(req.body.printerId, req.body.spoolId, req.body.tool);
+  FilamentClean.start(filamentManager);
+  res.send({ status: 200 });
+});
 
 router.post("/save/filament", ensureAuthenticated, async (req, res) => {
   const serverSettings = await SettingsClean.returnSystemSettings();

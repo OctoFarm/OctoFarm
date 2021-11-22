@@ -3619,6 +3619,49 @@ class Runner {
     }
   }
 
+  static async assignSpool(printerIds, filamentId, tool) {
+    // Unassign existing printers
+    const farmPrintersAssigned = farmPrinters.filter(
+      (printer) =>
+        _.findIndex(printer.selectedFilament, function (o) {
+          if (o !== null) {
+            return o._id == filamentId;
+          }
+        }) > -1
+    );
+    farmPrintersAssigned.forEach((printer) => {
+      printer.selectedFilament[tool] = null;
+    });
+
+    const spool = await Filament.findById(filamentId);
+
+    // Asign new printer id's;
+    printerIds.forEach((id) => {
+      const split = id.split("-");
+      const i = _.findIndex(farmPrinters, function (o) {
+        return o._id == split[0];
+      });
+
+      farmPrinters[i].selectedFilament[tool] = spool;
+
+      Printers.findByIdAndUpdate(
+        split[0],
+        { selectedFilament: farmPrinters[i].selectedFilament },
+        async function (err) {
+          if (err) {
+            logger.error("Unable to save spool assignment", err);
+          } else {
+            const currentFilament = await Runner.compileSelectedFilament(
+              farmPrinters[i].selectedFilament,
+              i
+            );
+            FileClean.generate(farmPrinters[i], currentFilament);
+          }
+        }
+      );
+    });
+  }
+
   static async selectedFilament(printerId, filamentId, tool) {
     const i = _.findIndex(farmPrinters, function (o) {
       return o._id == printerId;

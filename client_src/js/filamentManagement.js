@@ -663,6 +663,22 @@ async function updateProfileDrop() {
     }
   });
 }
+
+function getSelectValues(select) {
+  const result = [];
+  const options = select && select.options;
+  let opt;
+
+  for (let i = 0, iLen = options.length; i < iLen; i++) {
+    opt = options[i];
+
+    if (opt.selected) {
+      result.push(opt.value || opt.text);
+    }
+  }
+  return result;
+}
+
 async function updatePrinterDrops() {
   let filament = await OctoFarmClient.get("filament/get/filament");
   let { printerList } = await OctoFarmClient.get("filament/get/printerList");
@@ -694,13 +710,17 @@ async function updatePrinterDrops() {
       }
     }
     // Not needed until bring back selecting spool function server side
-    drop.addEventListener("change", (e) => {
-      const meta = e.target.value.split("-");
-      const printerId = meta[0];
-      const tool = meta[1];
-      const spoolId = e.target.id.split("-");
-      selectFilament(printerId, spoolId[1], tool);
-    });
+    drop.addEventListener(
+      "change",
+      (e) => {
+        const meta = e.target.value.split("-");
+        const printerId = meta[0];
+        const tool = meta[1];
+        const spoolId = e.target.id.split("-");
+        selectFilament(getSelectValues(drop), spoolId[1], tool);
+      },
+      true
+    );
   });
   printerAssignments.forEach((text, index) => {
     const split = text.id.split("-");
@@ -721,8 +741,14 @@ async function updatePrinterDrops() {
   });
 }
 
-function selectFilament(printerId, spoolId, tool) {
+async function selectFilament(printerId, spoolId, tool) {
   console.log(printerId, spoolId, tool);
+  const selectedFilament = await OctoFarmClient.post("/filament/assign", {
+    printerId,
+    spoolId,
+    tool
+  });
+  console.log(selectedFilament);
 }
 
 async function init() {
