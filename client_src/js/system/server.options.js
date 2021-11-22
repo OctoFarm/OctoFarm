@@ -18,7 +18,15 @@ const serverActionsElements = {
   SAVE_CLIENT_SETTINGS: document.getElementById("saveClientSettingsBtn"),
   RESTART_OCTOFARM: document.getElementById("restartOctoFarmBtn"),
   UPDATE_OCTOFARM: document.getElementById("updateOctoFarmBtn"),
-  CHECK_OCTOFARM_UPDATES: document.getElementById("checkUpdatesForOctoFarmBtn")
+  CHECK_OCTOFARM_UPDATES: document.getElementById("checkUpdatesForOctoFarmBtn"),
+  OP_FILAMENT_SETUP: document.getElementById("filamentManagerPluginSetupBtn")
+};
+
+const filamentManagerPluginActionElements = {
+  postgresURI: document.getElementById("filamentPostGresURI"),
+  databaseName: document.getElementById("filamentDatebaseName"),
+  username: document.getElementById("filamentUsername"),
+  password: document.getElementById("filamentPassword")
 };
 
 const userActionElements = {
@@ -66,7 +74,10 @@ const settingsElements = {
     apiRetry: document.getElementById("APIRetry")
   },
   filament: {
-    filamentCheck: document.getElementById("checkFilament")
+    filamentCheck: document.getElementById("checkFilament"),
+    hideEmpty: document.getElementById("hideEmpty"),
+    downDateFailed: document.getElementById("downDateFailed"),
+    downDateSuccess: document.getElementById("downDateSuccess")
   },
   history: {
     snapshot: {
@@ -118,5 +129,6 @@ export {
   localStorageKeys,
   settingsElements,
   userActionElements,
-  returnSaveBtn
+  returnSaveBtn,
+  filamentManagerPluginActionElements
 };

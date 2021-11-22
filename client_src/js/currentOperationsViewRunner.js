@@ -1,7 +1,7 @@
 import Calc from "./lib/functions/calc.js";
 import OctoPrintClient from "./lib/octoprint.js";
 import { createClientSSEWorker } from "./services/client-worker.service";
-import { setViewType } from "./monitoring/monitoring-view.state";
+import { setViewType } from "./pages/monitoring/monitoring-view.state";
 import UI from "./lib/functions/ui";
 
 // TODO dupe due to unwanted monitoring.update import causing missing element exceptions

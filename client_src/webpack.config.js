@@ -14,7 +14,6 @@ const dirContents = fs.readdirSync(clientJSFolder, { withFileTypes: true });
 const dirCssContents = fs.readdirSync(clientCSSFolder, { withFileTypes: true });
 
 // Target
-// TODO find a different solution for when in PROD
 const insideBasePath = "../views/assets/";
 const buildDirProd = "./dist/";
 const buildDirDev = insideBasePath + "dist/";
@@ -60,7 +59,7 @@ module.exports = (env, options) => {
       minimize: env.production,
       minimizer: [
         // For webpack@5 you can use the `...` syntax to extend existing minimizers (i.e. `terser-webpack-plugin`), uncomment the next line
-        `...`,
+        "...",
         new CssMinimizerPlugin()
       ]
     },

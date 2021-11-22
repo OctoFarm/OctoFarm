@@ -24,7 +24,8 @@ import {
   editUser,
   deleteUser,
   resetUserPassword,
-  fillInEditInformation
+  fillInEditInformation,
+  setupOPFilamentManagerPluginSettings
 } from "./system/server.actions";
 import { serverBootBoxOptions } from "./system/utils/bootbox.options";
 import { removeLocalStorage } from "./services/local-storage.service";
@@ -66,6 +67,10 @@ ClientSettings.init();
 
 serverActionsElements.OP_TIMELAPSE_SETUP.addEventListener("click", async (e) => {
   bootbox.confirm(serverBootBoxOptions.OP_TIMELAPSE_SETUP);
+});
+
+serverActionsElements.OP_FILAMENT_SETUP.addEventListener("click", async (e) => {
+  await setupOPFilamentManagerPluginSettings();
 });
 
 serverActionsElements.LOG_DUMP_GENERATE.addEventListener("click", async (e) => {

@@ -51,24 +51,43 @@ export function setupFilamentManagerSyncBtn() {
   filamentManagerSyncBtn.addEventListener("click", async (event) => {
     UI.addLoaderToElementsInnerHTML(filamentManagerSyncBtn);
     filamentManagerSyncBtn.disabled = true;
+    const filamentManagerAlert = UI.createAlert(
+      "info",
+      "Enabling filament manager plugin sync... Please wait whilst checks have finished!"
+    );
     const filamentManagerSyncEnabled = await OctoFarmClient.post("filament/filamentManagerSync", {
       activate: true
     });
-    if (filamentManagerSyncEnabled) {
+
+    if (filamentManagerSyncEnabled.errors.length > 0) {
+      filamentManagerAlert.close();
+      UI.removeLoaderFromElementInnerHTML(filamentManagerSyncBtn);
+      filamentManagerSyncBtn.disabled = false;
+      filamentManagerSyncEnabled.errors.forEach((error) => {
+        UI.createAlert("error", error.msg, 0, "Clicked");
+      });
+    } else if (filamentManagerSyncEnabled.warnings.length > 0) {
+      filamentManagerAlert.close();
+      UI.removeLoaderFromElementInnerHTML(filamentManagerSyncBtn);
+      filamentManagerSyncEnabled.warnings.forEach((error) => {
+        UI.createAlert("warning", error.msg, 0, "Clicked");
+        UI.createAlert(
+          "success",
+          `Filament Manager Plugin has been enabled regardless of the warnings! <br> Profiles: ${filamentManagerSyncEnabled.profileCount} <br> Spools: ${filamentManagerSyncEnabled.spoolCount}`,
+          0,
+          "Clicked"
+        );
+      });
+    } else {
+      filamentManagerAlert.close();
       UI.createAlert(
         "success",
-        "Successfully disabled filament manager and removed all spools / profiles.",
-        3000
+        `Filament Manager Plugin has been enabled and synced!  <br> Profiles: ${filamentManagerSyncEnabled.profileCount} <br> Spools: ${filamentManagerSyncEnabled.spoolCount}`,
+        0,
+        "Clicked"
       );
-    } else {
-      UI.createAlert(
-        "error",
-        "Unable to disable filament manager please check the filament manager logs.",
-        3000
-      );
+      UI.removeLoaderFromElementInnerHTML(filamentManagerSyncBtn);
     }
-    UI.removeLoaderFromElementInnerHTML(filamentManagerSyncBtn);
-    filamentManagerSyncBtn.disabled = false;
   });
 }
 

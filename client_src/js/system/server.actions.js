@@ -2,14 +2,22 @@ import OctoFarmClient from "../services/octofarm-client.service";
 import UI from "../lib/functions/ui";
 import Calc from "../lib/functions/calc";
 import FileOperations from "../lib/functions/file";
-import { setupOctoPrintForTimelapses } from "../octoprint/octoprint-settings.actions";
+import {
+  setupOctoPrintForTimelapses,
+  setupOctoPrintForFilamentManager
+} from "../octoprint/octoprint-settings.actions";
 import {
   isFilamentManagerPluginSyncEnabled,
   setupFilamentManagerDisableBtn,
   setupFilamentManagerReSyncBtn,
   setupFilamentManagerSyncBtn
 } from "../services/filament-manager-plugin.service";
-import { returnSaveBtn, settingsElements, userActionElements } from "./server.options";
+import {
+  returnSaveBtn,
+  settingsElements,
+  userActionElements,
+  filamentManagerPluginActionElements
+} from "./server.options";
 import { serverBootBoxOptions } from "./utils/bootbox.options";
 import { cpuChartOptions, memoryChartOptions } from "./utils/charts.options";
 
@@ -25,6 +33,45 @@ async function setupOPTimelapseSettings() {
     `${UI.returnSpinnerTemplate()} Setting up your OctoPrint settings, please wait...`
   );
   const { successfulPrinters, failedPrinters } = await setupOctoPrintForTimelapses(printers);
+  alert.close();
+  bootbox.alert(successfulPrinters + failedPrinters);
+}
+
+async function setupOPFilamentManagerPluginSettings() {
+  const printers = await OctoFarmClient.listPrinters();
+  const alert = UI.createAlert(
+    "warning",
+    `${UI.returnSpinnerTemplate()} Setting up your OctoPrint settings, please wait...`
+  );
+
+  const settings = {
+    uri: filamentManagerPluginActionElements.postgresURI.value,
+    name: filamentManagerPluginActionElements.databaseName.value,
+    user: filamentManagerPluginActionElements.username.value,
+    password: filamentManagerPluginActionElements.password.value
+  };
+
+  if (!settings.uri.includes("postgresql://")) {
+    UI.createAlert("warning", "Your postgres URI isn't configured correctly!", 3000, "clicked");
+    alert.close();
+    return;
+  }
+  if (!settings.uri || !settings.name || !settings.user || !settings.password) {
+    UI.createAlert("warning", "You are missing some required fields!", 3000, "clicked");
+    alert.close();
+    return;
+  }
+
+  const { successfulPrinters, failedPrinters } = await setupOctoPrintForFilamentManager(
+    printers,
+    settings
+  );
+
+  filamentManagerPluginActionElements.postgresURI.value = "";
+  filamentManagerPluginActionElements.databaseName.value = "";
+  filamentManagerPluginActionElements.username.value = "";
+  filamentManagerPluginActionElements.password.value = "";
+
   alert.close();
   bootbox.alert(successfulPrinters + failedPrinters);
 }
@@ -123,10 +170,7 @@ async function checkFilamentManagerPluginState() {
   }
 }
 
-//TODO: Also needs cleaning up more, ie only sending changed values rather than everything. Add to a listener and grabbed changed values.
 async function updateServerSettings() {
-  //TODO: Reboot flag should come from server endpoint.
-  let reboot = true;
   const opts = {
     onlinePolling: {
       seconds: settingsElements.onlinePolling.seconds.value
@@ -144,7 +188,10 @@ async function updateServerSettings() {
       apiRetry: settingsElements.timeout.apiRetry.value * 1000
     },
     filament: {
-      filamentCheck: settingsElements.filament.filamentCheck.checked
+      filamentCheck: settingsElements.filament.filamentCheck.checked,
+      hideEmpty: settingsElements.filament.hideEmpty.checked,
+      downDateFailed: settingsElements.filament.downDateFailed.checked,
+      downDateSuccess: settingsElements.filament.downDateSuccess.checked
     },
     history: {
       snapshot: {
@@ -183,9 +230,9 @@ async function updateServerSettings() {
       combined: settingsElements.monitoringViews.combined.checked
     }
   };
+  console.log(opts);
   OctoFarmClient.post("settings/server/update", opts).then((res) => {
     UI.createAlert(`${res.status}`, `${res.msg}`, 3000, "Clicked");
-    console.log(res);
     if (res.restartRequired) {
       bootbox.confirm(serverBootBoxOptions.OF_SERVER_RESTART_REQUIRED);
     }
@@ -561,5 +608,6 @@ export {
   editUser,
   deleteUser,
   resetUserPassword,
-  fillInEditInformation
+  fillInEditInformation,
+  setupOPFilamentManagerPluginSettings
 };

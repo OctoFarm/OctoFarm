@@ -112,9 +112,6 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
 
     await ClientSettings.init();
 
-    const { Runner } = require("./runners/state.js");
-    await Runner.init();
-
     OctoFarmTasks.BOOT_TASKS.forEach((task) => TaskManager.registerJobOrTask(task));
 
     await optionalInfluxDatabaseSetup();

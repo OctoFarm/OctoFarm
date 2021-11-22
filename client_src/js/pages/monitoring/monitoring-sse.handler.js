@@ -1,4 +1,4 @@
-import currentOperations from "../lib/modules/currentOperations";
+import currentOperations from "../../lib/modules/currentOperations";
 import { getViewType, setMonitoringPrinterInfo } from "./monitoring-view.state";
 import { initMonitoring } from "./monitoring.updater";
 

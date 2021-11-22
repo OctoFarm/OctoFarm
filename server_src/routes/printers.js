@@ -151,18 +151,6 @@ router.post("/updatePrinterSettings", ensureAuthenticated, async (req, res) => {
   }
 });
 
-// Register handle for checking for offline printers - Depricated due to websocket full implementation
-router.post("/runner/checkOffline", ensureAuthenticated, async (req, res) => {
-  const printers = await Runner.returnFarmPrinters();
-  for (let i = 0; i < printers.length; i++) {
-    const reset = await Runner.reScanOcto(i);
-  }
-  res.send({
-    printers: "All",
-    msg: " Were successfully rescanned..."
-  });
-});
-
 router.post("/moveFile", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   if (data.newPath === "/") {
@@ -182,14 +170,12 @@ router.post("/moveFolder", ensureAuthenticated, async (req, res) => {
 router.post("/newFolder", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   logger.info("New folder request: ", data);
-  Runner.newFolder(data);
-  res.send({ msg: "success" });
+  res.send({ msg: "success", files: await Runner.newFolder(data) });
 });
 router.post("/newFiles", ensureAuthenticated, async (req, res) => {
   const data = req.body;
   logger.info("Adding a new file to server: ", data);
-  Runner.newFile(data);
-  res.send({ msg: "success" });
+  res.send({ msg: "success", files: await Runner.newFile(data) });
 });
 router.post("/selectFilament", ensureAuthenticated, async (req, res) => {
   const data = req.body;
@@ -202,9 +188,11 @@ router.post("/reScanOcto", ensureAuthenticated, async (req, res) => {
   if (data.id === null) {
     logger.info("Rescan All OctoPrint Requests: ", data);
     const printers = await Runner.returnFarmPrinters();
+    const promises = [];
     for (let i = 0; i < printers.length; i++) {
-      await Runner.reScanOcto(printers[i]._id);
+      promises.push(Runner.reScanOcto(printers[i]._id));
     }
+    await Promise.all(promises);
     logger.info("Full re-scan of OctoFarm completed");
     res.send({ msg: "Started a full farm rescan." });
   } else {

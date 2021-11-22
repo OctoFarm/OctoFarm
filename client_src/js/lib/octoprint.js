@@ -195,6 +195,9 @@ export default class OctoPrintClient {
         command: "select",
         print: false
       };
+      await OctoPrintClient.updateFeedAndFlow(printer);
+      await OctoPrintClient.updateFilamentOffsets(printer);
+      await OctoPrintClient.updateBedOffsets(printer);
       post = await OctoPrintClient.post(printer, url, opt);
       return post.status;
     } else if (action === "print") {
@@ -204,6 +207,7 @@ export default class OctoPrintClient {
       };
       await OctoPrintClient.updateFeedAndFlow(printer);
       await OctoPrintClient.updateFilamentOffsets(printer);
+      await OctoPrintClient.updateBedOffsets(printer);
       post = await OctoPrintClient.post(printer, url, opt);
     } else if (action === "delete") {
       post = await OctoPrintClient.delete(printer, url);
@@ -245,6 +249,20 @@ export default class OctoPrintClient {
     await OctoPrintClient.post(printer, "printer/printhead", feed);
   }
 
+  static async updateBedOffsets(printer) {
+    if (printer.selectedFilament != null && Array.isArray(printer.selectedFilament)) {
+      // Ignoring any multi-spools here, take first spool's bed offset.
+      const bedOffset = parseInt(printer?.selectedFilament[0]?.spools?.bedOffset);
+      if (bedOffset) {
+        const offset = {
+          command: "offset",
+          offset: bedOffset
+        };
+        await OctoPrintClient.post(printer, "printer/bed", offset);
+      }
+    }
+  }
+
   static async updateFilamentOffsets(printer) {
     if (printer.selectedFilament != null && Array.isArray(printer.selectedFilament)) {
       const offset = {
@@ -262,9 +280,6 @@ export default class OctoPrintClient {
 
   static async jobAction(printer, opts, element) {
     let checkSettings = await OctoFarmClient.get("settings/server/get");
-    // Make sure feed/flow are set before starting print...
-    await OctoPrintClient.updateFeedAndFlow(printer);
-    await OctoPrintClient.updateFilamentOffsets(printer);
 
     let filamentCheck = false;
     if (typeof checkSettings.filament !== "undefined") {
@@ -276,6 +291,13 @@ export default class OctoPrintClient {
         return e !== null;
       });
     }
+
+    if (opts.command === "start") {
+      await OctoPrintClient.updateFeedAndFlow(printer);
+      await OctoPrintClient.updateFilamentOffsets(printer);
+      await OctoPrintClient.updateBedOffsets(printer);
+    }
+
     if (filamentCheck && !printerCheck && opts.command === "start") {
       bootbox.confirm({
         message:
@@ -292,6 +314,7 @@ export default class OctoPrintClient {
         },
         async callback(result) {
           if (!result) {
+            // Make sure feed/flow are set before starting print...
             return await OctoPrintClient.post(printer, "job", opts);
           }
         }

@@ -25,7 +25,7 @@ axios.interceptors.response.use(
   function (error) {
     // Any status codes that falls outside the range of 2xx cause this function to trigger
     // Do something with response error
-    switch (error.response.status) {
+    switch (error?.response?.status) {
       case 0:
         throw new ApplicationError(HTTPError.NO_CONNECTION);
       case 400:
@@ -56,6 +56,8 @@ export default class OctoFarmClient {
   static base = "/api";
   static printerRoute = "/printers";
   static serverSettingsRoute = "/settings/server";
+  static filamentRoute = `/filament`;
+  static filamentStatistics = `${this.filamentRoute}/get/statistics`;
   static logsRoute = `${this.serverSettingsRoute}/logs`;
   static updateSettingsRoute = `${this.serverSettingsRoute}/update`;
   static userRoute = `/users/users`;
@@ -136,6 +138,10 @@ export default class OctoFarmClient {
 
   static async resetUserPassword(id, password) {
     return this.patch(`${this.userRoute}/${id}`, password);
+  }
+
+  static async getFilamentStatistics() {
+    return this.get(this.filamentStatistics);
   }
 
   static async updateServerSettings(settingsObject) {

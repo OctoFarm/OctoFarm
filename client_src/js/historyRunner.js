@@ -51,7 +51,7 @@ class History {
         },
         background: "#303030"
       },
-      colors: ["#00bc8c", "#f39c12", "#e74c3c"],
+      colors: ["#00bc8c", "#e74c3c", "#f39c12"],
       dataLabels: {
         enabled: true,
         background: {

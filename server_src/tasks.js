@@ -1,18 +1,20 @@
 const softwareUpdateChecker = require("./services/octofarm-update.service");
-const { Runner } = require("./runners/state");
 const { FilamentClean } = require("./lib/dataFunctions/filamentClean");
 const { initHistoryCache } = require("./cache/history.cache");
 const { TaskPresets } = require("./task.presets");
 const { PrinterClean } = require("./lib/dataFunctions/printerClean");
 const { SystemRunner } = require("./runners/systemInfo");
 const { grabLatestPatreonData } = require("./services/patreon.service");
+const { Runner } = require("./runners/state.js");
+const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
+const serverSettings = require("./settings/serverSettings");
 
 const PRINTER_CLEAN_TASK = async () => {
   const serverSettings = require("./settings/serverSettings");
   const printersInformation = PrinterClean.listPrintersInformation();
   await PrinterClean.sortCurrentOperations(printersInformation);
 
-  await PrinterClean.createPrinterList(printersInformation, serverSettings.filamentManager);
+  await FilamentClean.createPrinterList(printersInformation, serverSettings.filamentManager);
 };
 
 const CRASH_TEST_TASK = async () => {
@@ -25,8 +27,10 @@ const HISTORY_CACHE_TASK = async () => {
   });
 };
 
+// // TODO this runs without knowing about filament manager -_-
 const FILAMENT_CLEAN_TASK = async () => {
-  await FilamentClean.start();
+  const serverSettings = require("./settings/serverSettings");
+  await FilamentClean.start(serverSettings.filamentManager);
 };
 
 const GITHUB_UPDATE_CHECK_TASK = async () => {
@@ -137,9 +141,8 @@ const STATE_TRACK_COUNTERS = async () => {
 
 const GRAB_LATEST_PATREON_DATA = async () => {
   await grabLatestPatreonData();
-}
+};
 
-// TODO we'll have to pool this with a network, event-loop or CPU budget in mind
 const STATE_SETUP_WEBSOCKETS = async () => {
   // for (let i = 0; i < farmPrinters.length; i++) {
   //   // Make sure runners are created ready for each printer to pass between...
@@ -162,6 +165,10 @@ const DATABASE_MIGRATIONS_TASK = async () => {
   // console.log(migrations);
 };
 
+const INITITIALISE_PRINTERS = async () => {
+  await Runner.init();
+};
+
 /**
  * See an overview of this pattern/structure here https://www.youtube.com/watch?v=dQw4w9WgXcQ
  * @param task
@@ -169,6 +176,7 @@ const DATABASE_MIGRATIONS_TASK = async () => {
  * @param milliseconds optional parameter to quickly set milliseconds timing
  * @returns {{task, id, preset}}
  */
+// TODO, this is not a decent function name...
 function KsatLlorKcir(task, preset, milliseconds = 0) {
   preset.milliseconds = preset.milliseconds || milliseconds;
   return {
@@ -183,12 +191,13 @@ const HOUR_MS = 3600 * 1000;
 class OctoFarmTasks {
   static BOOT_TASKS = [
     KsatLlorKcir(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
+    KsatLlorKcir(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
     KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
-    KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
-    KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC, 24 * HOUR_MS),
     KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
-    KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.RUNONCE)
+    KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.RUNONCE),
+    KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
+    KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE)
   ];
 }
 

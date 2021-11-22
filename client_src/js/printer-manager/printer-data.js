@@ -6,13 +6,9 @@ import {
 import { setupUpdateOctoPrintClientBtn } from "../octoprint/octoprint-client-commands";
 import { setupUpdateOctoPrintPluginsBtn } from "../octoprint/octoprint-plugin-commands";
 import UI from "../lib/functions/ui.js";
-import PrinterManager from "../lib/modules/printerManager.js";
 import PrinterLogs from "../lib/modules/printerLogs.js";
 import OctoFarmClient from "../services/octofarm-client.service";
 import { updatePrinterSettingsModal } from "../lib/modules/printerSettings";
-import PrinterFileManager from "../lib/modules/printerFileManager";
-
-const currentOpenModal = document.getElementById("printerManagerModalTitle");
 
 const printerList = document.getElementById("printerList");
 const ignoredHostStatesForAPIErrors = [
@@ -153,7 +149,7 @@ function checkIfRestartRequired(printer) {
       restartRequiredTag.classList.remove("d-none");
     }
   } else {
-    if (restartRequiredTag.classList.contains("d-none")) {
+    if (!restartRequiredTag.classList.contains("d-none")) {
       restartRequiredTag.classList.add("d-none");
     }
   }
@@ -184,18 +180,9 @@ function checkForApiErrors(printer) {
   }
 }
 
-function updateButtonState(printer) {
-  const printButton = document.getElementById(`printerButton-${printer._id}`);
-  const printFileButton = document.getElementById(`printerFilesBtn-${printer._id}`);
-  printFileButton.disabled = printer.printerState.colour.category === "Offline";
-  printButton.disabled = printer.printerState.colour.category === "Offline";
-}
-
 function updatePrinterRow(printer) {
   const printerCard = document.getElementById(`printerCard-${printer._id}`);
   if (printerCard) {
-    // updateButtonState(printer);
-
     checkQuickConnectState(printer);
 
     updatePrinterInfoAndState(printer);

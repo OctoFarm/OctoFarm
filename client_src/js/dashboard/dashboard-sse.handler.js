@@ -48,6 +48,9 @@ export async function dashboardSSEventHandler(data) {
     if (dashboardSettings.historical.environmentalHistory) {
       await DashUpdate.environmentalData(dashboard.enviromentalData);
     }
+    if (dashboardSettings.other.timeAndDate) {
+      DashUpdate.dateAndTime();
+    }
   } else {
     UI.createAlert(
       "warning",

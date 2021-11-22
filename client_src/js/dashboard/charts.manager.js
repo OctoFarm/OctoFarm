@@ -1,7 +1,5 @@
 import ApexCharts from "apexcharts";
 import { dashboardOptions } from "./dashboard.options";
-import { getUsageWeightSeries } from "./utils/chart.utils";
-
 const chartIds = {
   hourlyTotalTemperatureChart: "#hourlyTotalTemperatureChart",
   weeklyUtilisationPerDayHeatMap: "#weeklyUtilisationPerDayHeatMap",

@@ -406,7 +406,7 @@ WebSocketClient.prototype.onopen = async function (e) {
 
   this.instance.send(JSON.stringify(data));
   this.instance.send(JSON.stringify(throt));
-  farmPrinters[this.index].restartRequired = false;
+
   PrinterTicker.addIssue(
     new Date(),
     farmPrinters[this.index].printerURL,
@@ -630,7 +630,8 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       }
 
       if (data.event.type === "ClientClosed") {
-        const { networkIpAddresses } = SystemRunner.returnInfo();
+        let { networkIpAddresses } = SystemRunner.returnInfo();
+        if (!networkIpAddresses) networkIpAddresses = [];
         if (networkIpAddresses.includes(data.event.payload.remoteAddress)) {
           //Authed from OctoFarm host...
           PrinterTicker.addIssue(
@@ -653,7 +654,9 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
       }
 
       if (data.event.type === "ClientAuthed") {
-        const { networkIpAddresses } = SystemRunner.returnInfo();
+        let { networkIpAddresses } = SystemRunner.returnInfo();
+        if (!networkIpAddresses) networkIpAddresses = [];
+        farmPrinters[this.index].restartRequired = false;
         if (networkIpAddresses.includes(data.event.payload.remoteAddress)) {
           //Authed from OctoFarm host...
           PrinterTicker.addIssue(
@@ -1039,6 +1042,12 @@ WebSocketClient.prototype.onclose = function (e) {
 class Runner {
   static octoPrintService = undefined;
 
+  static async setup(i) {
+    await Runner.setDefaults(farmPrinters[i]._id);
+    await Runner.setupWebSocket(farmPrinters[i]._id);
+    PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
+  }
+
   static async init() {
     farmPrinters = [];
     const server = await ServerSettings.check();
@@ -1053,11 +1062,12 @@ class Runner {
       farmPrinters = await Printers.find({}, null, {
         sort: { sortIndex: 1 }
       });
-
-      for (let i = 0; i < farmPrinters.length; i++) {
-        // Make sure runners are created ready for each printer to pass between...
-        await Runner.setDefaults(farmPrinters[i]._id);
+      const printers = await Runner.returnFarmPrinters();
+      const promises = [];
+      for (let i = 0; i < printers.length; i++) {
+        promises.push(Runner.setup(i));
       }
+      await Promise.all(promises);
     } catch (err) {
       const error = {
         err: err.message,
@@ -1068,16 +1078,6 @@ class Runner {
       logger.error(err);
       console.log(err);
     }
-
-    // cycle through printers and move them to correct checking location...
-    setTimeout(async function () {
-      for (let i = 0; i < farmPrinters.length; i++) {
-        // Make sure runners are created ready for each printer to pass between...
-        await Runner.setupWebSocket(farmPrinters[i]._id);
-        PrinterClean.generate(farmPrinters[i], systemSettings.filamentManager);
-      }
-      // FilamentClean.start(systemSettings.filamentManager);
-    }, 5000);
   }
 
   static async compareEnteredKeyToGlobalKey(printer) {
@@ -2344,12 +2344,10 @@ class Runner {
           "Complete",
           farmPrinters[index]._id
         );
-        FileClean.generate(farmPrinters[index], currentFilament);
         farmPrinters[index].systemChecks.scanning.files.status = "success";
         farmPrinters[index].systemChecks.scanning.files.date = new Date();
         FileClean.statistics(farmPrinters);
-        logger.info(`Successfully grabbed Files for...: ${farmPrinters[index].printerURL}`);
-        return true;
+        return FileClean.generate(farmPrinters[index], currentFilament);
       })
       .catch((err) => {
         farmPrinters[index].systemChecks.scanning.files.status = "danger";
@@ -2427,7 +2425,6 @@ class Runner {
           "Complete",
           farmPrinters[index]._id
         );
-        logger.info(`Successfully grabbed Current State for...: ${farmPrinters[index].printerURL}`);
       })
       .catch((err) => {
         farmPrinters[index].systemChecks.scanning.state.status = "danger";
@@ -2867,7 +2864,6 @@ class Runner {
 
         farmPrinters[index].systemChecks.scanning.settings.status = "success";
         farmPrinters[index].systemChecks.scanning.settings.date = new Date();
-        logger.info(`Successfully grabbed Settings for...: ${farmPrinters[index].printerURL}`);
       })
       .catch((err) => {
         PrinterTicker.addIssue(
@@ -2915,10 +2911,6 @@ class Runner {
           "Grabbed system information...",
           "Complete",
           farmPrinters[index]._id
-        );
-
-        logger.info(
-          `Successfully grabbed System Information for...: ${farmPrinters[index].printerURL}`
         );
       })
       .catch((err) => {
@@ -3071,10 +3063,9 @@ class Runner {
       farmPrinters[i].selectedFilament,
       i
     );
-    FileClean.generate(farmPrinters[i], currentFilament);
-    FileClean.statistics(farmPrinters);
 
-    return true;
+    FileClean.statistics(farmPrinters);
+    return FileClean.generate(farmPrinters[i], currentFilament);
   }
 
   static async flowRate(id, newRate) {
@@ -3592,8 +3583,8 @@ class Runner {
       farmPrinters[i].selectedFilament,
       i
     );
-    FileClean.generate(farmPrinters[i], currentFilament);
     FileClean.statistics(farmPrinters);
+    return FileClean.generate(farmPrinters[i], currentFilament);
   }
 
   static async updateFilament() {
@@ -3626,6 +3617,49 @@ class Runner {
         FileClean.generate(farmPrinters[i], currentFilament);
       }
     }
+  }
+
+  static async assignSpool(printerIds, filamentId, tool) {
+    // Unassign existing printers
+    const farmPrintersAssigned = farmPrinters.filter(
+      (printer) =>
+        _.findIndex(printer.selectedFilament, function (o) {
+          if (o !== null) {
+            return o._id == filamentId;
+          }
+        }) > -1
+    );
+    farmPrintersAssigned.forEach((printer) => {
+      printer.selectedFilament[tool] = null;
+    });
+
+    const spool = await Filament.findById(filamentId);
+
+    // Asign new printer id's;
+    printerIds.forEach((id) => {
+      const split = id.split("-");
+      const i = _.findIndex(farmPrinters, function (o) {
+        return o._id == split[0];
+      });
+
+      farmPrinters[i].selectedFilament[tool] = spool;
+
+      Printers.findByIdAndUpdate(
+        split[0],
+        { selectedFilament: farmPrinters[i].selectedFilament },
+        async function (err) {
+          if (err) {
+            logger.error("Unable to save spool assignment", err);
+          } else {
+            const currentFilament = await Runner.compileSelectedFilament(
+              farmPrinters[i].selectedFilament,
+              i
+            );
+            FileClean.generate(farmPrinters[i], currentFilament);
+          }
+        }
+      );
+    });
   }
 
   static async selectedFilament(printerId, filamentId, tool) {
@@ -3705,12 +3739,13 @@ class Runner {
       farmPrinters[i].selectedFilament,
       i
     );
-    FileClean.generate(farmPrinters[i], currentFilament);
+
     FileClean.statistics(farmPrinters);
     await this.updateFile(
       farmPrinters[i].fileList.files[farmPrinters[i].fileList.files.length - 1],
       i
     );
+    return await FileClean.generate(farmPrinters[i], currentFilament);
   }
 
   static async updateFile(file, i) {
@@ -3743,21 +3778,22 @@ class Runner {
               farmPrinters[i].selectedFilament,
               i
             );
-            FileClean.generate(farmPrinters[i], currentFilament);
+
             FileClean.statistics(farmPrinters);
-            return null;
+            return FileClean.generate(farmPrinters[i], currentFilament);
           } else {
             const currentFilament = await Runner.compileSelectedFilament(
               farmPrinters[i].selectedFilament,
               i
             );
-            FileClean.generate(farmPrinters[i], currentFilament);
+            fileTimeout = 0;
             FileClean.statistics(farmPrinters);
-            return null;
+            return FileClean.generate(farmPrinters[i], currentFilament);
           }
         }
       }, 5000);
     } else {
+      fileTimeout = 0;
       logger.info("File information took too long to generate, awaiting manual scan...");
     }
   }

@@ -9,6 +9,7 @@ const printerClean = require("../lib/dataFunctions/printerClean.js");
 const PrinterClean = printerClean.PrinterClean;
 
 const printerTicker = require("../runners/printerTicker.js");
+const { ensureCurrentUserAndGroup } = require("../config/users.js");
 
 const { PrinterTicker } = printerTicker;
 
@@ -17,7 +18,7 @@ const clients = {}; // <- Keep a map of attached clients
 let interval = false;
 
 // Called once for each new client. Note, this response is left open!
-router.get("/get/", ensureAuthenticated, function (req, res) {
+router.get("/get/", ensureAuthenticated, ensureCurrentUserAndGroup, function (req, res) {
   //req.socket.setTimeout(Number.MAX_VALUE);
   res.writeHead(200, {
     "Content-Type": "text/event-stream",

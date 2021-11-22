@@ -35,7 +35,7 @@ let farmStats = null;
 let heatMapCounter = 17280;
 const arrayTotal = [];
 const printerControlList = [];
-let printerFilamentList = [];
+
 let printerConnectionLogs = [];
 
 let fmToggle = false;
@@ -77,18 +77,10 @@ class PrinterClean {
     });
   }
 
-  /**
-   * @deprecated Use cache/printer.cache.js instead
-   * @returns {[]}
-   */
   static returnPrinterControlList() {
     return printerControlList;
   }
 
-  /**
-   * @deprecated Use cache/printer.cache.js instead
-   * @returns {[]}
-   */
   static returnFilamentList() {
     return printerFilamentList;
   }
@@ -585,33 +577,6 @@ class PrinterClean {
       currentTempLogs,
       currentOctoPrintLogs
     };
-  }
-
-  static async createPrinterList(farmPrinters, filamentManager) {
-    const printerList = ['<option value="0">Not Assigned</option>'];
-    farmPrinters.forEach((printer) => {
-      if (typeof printer.currentProfile !== "undefined" && printer.currentProfile !== null) {
-        for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
-          let listing = null;
-          if (filamentManager) {
-            if (
-              printer.printerState.colour.category === "Offline" ||
-              printer.printerState.colour.category === "Active"
-            ) {
-              listing = `<option value="${printer._id}-${i}" disabled>${printer.printerName}: Tool ${i}</option>`;
-            } else {
-              listing = `<option value="${printer._id}-${i}">${printer.printerName}: Tool ${i}</option>`;
-            }
-          } else {
-            listing = `<option value="${printer._id}-${i}">${printer.printerName}: Tool ${i}</option>`;
-          }
-
-          printerList.push(listing);
-        }
-      }
-    });
-
-    printerFilamentList = printerList;
   }
 
   static sortOtherSettings(temp, webcam, system) {

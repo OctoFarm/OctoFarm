@@ -13,11 +13,13 @@ const SystemInfo = systemInfo.SystemRunner;
 const prettyHelpers = require("../../views/partials/functions/pretty.js");
 const { AppConstants } = require("../app.constants");
 const currentVersion = process?.env[AppConstants.VERSION_KEY];
-const systemInformationFileName = "system_information.txt";
+const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
 
 const { checkIfFileFileExistsAndDeleteIfSo } = require("../utils/file.utils.js");
 
 const { prettyPrintArray } = require("../utils/pretty-print.utils.js");
+
+const systemInformationFileName = "system_information.txt";
 
 /**
  * Generates the contents for the system information files
@@ -31,6 +33,12 @@ function generateSystemInformationContents() {
   const nodemon = "Are we running under nodemon?\n";
   const node = "Are we running with node?\n";
   const docker = "Are we in a docker container?\n";
+  const loginRequires = "Is login required on the server?\n";
+  const registration = "Is registration turned on the server?\n";
+  const apiTimeout = "What are the API timeout settings?\n";
+  const filamentManagerPlugin = "Is the filament manager plugin enabled?\n";
+  const historySnapshot = "What are the history snapshot settings?\n";
+  const influxDB = "What are the influxDB database settings? \n";
   const yes = " ✓  \n";
   const no = " ✘ \n";
 
@@ -63,7 +71,7 @@ function generateSystemInformationContents() {
   if (isDocker()) {
     systemInformationContents += `${docker} ${yes}`;
   } else {
-    systemInformationContents += `${docker} ${no}`;
+    systemInformationContents += `${docker} ${no}\n`;
   }
 
   const systemInformation = SystemInfo?.returnInfo();
@@ -79,13 +87,54 @@ function generateSystemInformationContents() {
   )} \n`;
   systemInformationContents += `OctoFarm Uptime\n ${prettyHelpers.generateTime(
     systemInformation?.processUptime
-  )} \n`;
+  )} \n\n`;
+
+  const { server, timeout, history, filamentManager } = SettingsClean.returnSystemSettings();
+  // System settings section
+
+  systemInformationContents += "--- OctoFarm System Settings ---\n\n";
+
+  if (server.loginRequired) {
+    systemInformationContents += `${loginRequires} ${yes}`;
+  } else {
+    systemInformationContents += `${loginRequires} ${no}`;
+  }
+  if (server.registration) {
+    systemInformationContents += `${registration} ${yes}`;
+  } else {
+    systemInformationContents += `${registration} ${no}`;
+  }
+  if (filamentManager) {
+    systemInformationContents += `${filamentManagerPlugin} ${yes}\n`;
+  } else {
+    systemInformationContents += `${filamentManagerPlugin} ${no}\n`;
+  }
+  systemInformationContents += "-- History Settings --\n\n";
+  for (const key in history) {
+    if (history.hasOwnProperty(key)) {
+      if (history[key].onComplete) {
+        systemInformationContents += `History ${key} on complete? \n${yes}`;
+      }
+      if (history[key].onFailure) {
+        systemInformationContents += `History ${key} on failure? \n${yes}`;
+      }
+      if (history[key]?.deleteAfter) {
+        systemInformationContents += `History ${key} delete after?\n ${yes}`;
+      }
+    }
+  }
+  systemInformationContents += "\n-- API Settings --\n\n";
+  for (const key in timeout) {
+    if (timeout.hasOwnProperty(key)) {
+      systemInformationContents += `${key}\n${timeout[key]}\n`;
+    }
+  }
 
   const printerVersions = PrinterClean.returnAllOctoPrintVersions();
 
   if (printerVersions) {
     systemInformationContents += "--- OctoPrint Information ---\n\n";
-    systemInformationContents += `OctoPrint Versions\n ${prettyPrintArray(printerVersions)}`;
+    systemInformationContents += `OctoPrint Versions\n ${prettyPrintArray(printerVersions)}\n`;
   }
 
   return systemInformationContents;
@@ -103,7 +152,7 @@ async function generateOctoFarmSystemInformationTxt() {
   // Make sure existing zip files have been cleared from the system before continuing.
   await checkIfFileFileExistsAndDeleteIfSo(systemInformation?.path);
 
-  let systemInformationContents = await generateSystemInformationContents();
+  let systemInformationContents = generateSystemInformationContents();
 
   if (!systemInformationContents)
     throw { status: "error", msg: "Couldn't generate system_information.txt" };

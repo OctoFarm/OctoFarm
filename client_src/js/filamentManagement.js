@@ -1,8 +1,19 @@
 import UI from "./lib/functions/ui.js";
 import { setupFilamentManagerReSyncBtn } from "./services/filament-manager-plugin.service";
 import * as ApexCharts from "apexcharts";
-import { getLastThirtyDaysText } from "./utils/time.util";
 import OctoFarmClient from "./services/octofarm-client.service";
+import { dashboardOptions } from "./dashboard/dashboard.options";
+
+const pageElements = {
+  filamentProfileTotals: document.getElementById("filamentProfileTotals"),
+  filamentSpoolTotals: document.getElementById("filamentSpoolsTotals"),
+  filamentSpoolsActiveTotals: document.getElementById("filamentSpoolsActiveTotals"),
+  filamentUsedProgress: document.getElementById("filamentUsedProgress"),
+  filamentRemainingProgress: document.getElementById("filamentRemainingProgress"),
+  filamentOverviewTable: document.getElementById("filamentOverviewTable"),
+  filamentOverviewTableHeader: document.getElementById("filamentOverviewTableHeader"),
+  filamentOverviewList: document.getElementById("filamentOverviewList")
+};
 
 let filamentManager = false;
 const filamentStore = [
@@ -88,6 +99,102 @@ const filamentStore = [
   }
 ];
 
+async function reRenderPageInformation() {
+  let { statistics, spools } = await OctoFarmClient.getFilamentStatistics();
+  pageElements.filamentProfileTotals.innerHTML = statistics.profileCount;
+  pageElements.filamentSpoolTotals.innerHTML = statistics.spoolCount;
+  pageElements.filamentSpoolsActiveTotals.innerHTML = statistics.activeSpoolCount;
+  const usedPercent = ((statistics.used / statistics.total) * 100).toFixed(0);
+  pageElements.filamentUsedProgress.innerHTML = usedPercent + "%";
+  pageElements.filamentUsedProgress.style.width = usedPercent;
+  const remainingPercent = (
+    ((statistics.total - statistics.used) / statistics.total) *
+    100
+  ).toFixed(0);
+  pageElements.filamentRemainingProgress.innerHTML = remainingPercent + "%";
+  pageElements.filamentRemainingProgress.style.width = remainingPercent;
+
+  let headerBreakdown = "";
+  statistics.materialBreakDown.forEach((used) => {
+    headerBreakdown += `<th scope="col">${used.name}</th>`;
+  });
+
+  let remainingBreakdown = "";
+  statistics.materialBreakDown.forEach((used) => {
+    remainingBreakdown += `<th scope="col">${(used.total - used.used).toFixed(2) / 1000}kg</th>`;
+  });
+  let usedBreakdown = "";
+  statistics.materialBreakDown.forEach((used) => {
+    usedBreakdown += `<th scope="col">${used.used.toFixed(2) / 1000}kg</th>`;
+  });
+
+  let weightBreakdown = "";
+  statistics.materialBreakDown.forEach((used) => {
+    weightBreakdown += `<th scope="col">${used.total.toFixed(2) / 1000}kg</th>`;
+  });
+
+  let costBreakdown = "";
+  statistics.materialBreakDown.forEach((used) => {
+    costBreakdown += `<th scope="col">${used.price.toFixed(2)}</th>`;
+  });
+
+  pageElements.filamentOverviewTableHeader.innerHTML = `
+  <tr>
+    <td scope="row">Material Overview: </td>
+    ${headerBreakdown}    
+  </tr>
+  `;
+
+  pageElements.filamentOverviewTable.innerHTML = `
+  <tr>
+      <td scope="row">Remaining <span class="badge badge-success ml-2">${
+        (statistics.total.toFixed(0) - statistics.used.toFixed(0)) / 1000
+      }kg</span></td>
+      ${remainingBreakdown}
+  </tr>
+  <tr>
+      <td scope="row">Used <span class="badge badge-warning ml-2">${
+        statistics.used.toFixed(0) / 1000
+      }kg</span> </td>
+      ${usedBreakdown}
+  </tr>
+  <tr>
+      <th scope="row">Weight<span class="badge badge-light text-dark ml-2">${
+        statistics.total.toFixed(0) / 1000
+      }kg</span></th>
+      ${weightBreakdown}
+  </tr>
+  <tr>
+      <th scope="row">Cost <span class="badge badge-info ml-2">${statistics.price.toFixed(
+        2
+      )}</span></th>
+      ${costBreakdown}
+  </tr>
+  `;
+
+  let spoolList = "";
+  spools.forEach((spool) => {
+    spoolList += `
+                <tr>
+                    <th style="display: none;"> </th>
+                    <th><i class="fas fa-toilet-paper"></i></th>
+                    <th scope="row">${spool.name}</th>
+                    <td id="spoolsListMaterial-${spool._id}">
+                    </td>
+                    <td id="spoolsListManufacture-${spool._id}">
+                    </td>
+                    <td>${spool.weight / 1000}KG</td>
+                    <td>${(spool.weight - spool.used).toFixed(0)}g</td>
+                    <td>${spool.tempOffset}</td>
+                    <td>${spool.bedOffset || 0}</td>
+                    <td id="spoolsListPrinterAssignment-${spool._id}"></td>
+                </tr>
+    `;
+  });
+
+  pageElements.filamentOverviewList.innerHTML = spoolList;
+}
+
 // Profile functions
 async function addProfile(manufacturer, material, density, diameter) {
   const errors = [];
@@ -137,7 +244,8 @@ async function addProfile(manufacturer, material, density, diameter) {
       profileID = post.dataProfile._id;
     }
     post = post.dataProfile;
-    updateProfileDrop();
+    await reRenderPageInformation();
+    await updateProfileDrop();
     document.getElementById("addProfilesTable").insertAdjacentHTML(
       "beforeend",
       `
@@ -197,7 +305,8 @@ async function saveProfile(e) {
   };
   let post = await OctoFarmClient.post("filament/edit/profile", data);
   if (post) {
-    updateProfileDrop();
+    await reRenderPageInformation();
+    await updateProfileDrop();
     document.getElementById(`save-${id}`).classList.add("d-none");
     document.getElementById(`edit-${id}`).classList.remove("d-none");
   }
@@ -209,7 +318,7 @@ async function deleteProfile(e) {
     let post = await OctoFarmClient.post("filament/delete/profile", {
       id: e.parentElement.parentElement.firstElementChild.innerHTML.trim()
     });
-    if (post) {
+    if (post?.profiles) {
       if (e.classList.contains("deleteIcon")) {
         jplist.resetContent(function () {
           // remove element with id = el1
@@ -221,14 +330,14 @@ async function deleteProfile(e) {
           e.parentElement.parentElement.remove();
         });
       }
+      await reRenderPageInformation();
       updateProfileDrop(post);
     } else {
-      UI.createMessage(
-        {
-          type: "danger",
-          msg: "Error: Could not delete roll from database, check connection..."
-        },
-        "filamentMessage"
+      UI.createAlert(
+        "error",
+        "There was a conflict when deleting this profile, is it attached to a spool?",
+        4000,
+        "Clicked"
       );
     }
   }
@@ -241,7 +350,8 @@ async function addSpool(
   spoolsPrice,
   spoolsWeight,
   spoolsUsed,
-  spoolsTempOffset
+  spoolsTempOffset,
+  spoolsBedOffset
 ) {
   const errors = [];
 
@@ -273,7 +383,8 @@ async function addSpool(
     spoolsPrice: spoolsPrice.value,
     spoolsWeight: spoolsWeight.value,
     spoolsUsed: spoolsUsed.value,
-    spoolsTempOffset: spoolsTempOffset.value
+    spoolsTempOffset: spoolsTempOffset.value,
+    spoolsBedOffset: spoolsBedOffset.value
   };
   let post = await OctoFarmClient.post("filament/save/filament", opts);
 
@@ -286,76 +397,61 @@ async function addSpool(
       "addSpoolsMessage"
     );
     filamentManager = post.filamentManager;
+
+    let multiple = "";
+    if (!filamentManager) {
+      multiple = "multiple=true";
+    }
+
     spoolsName.value = "";
     spoolsPrice.value = "";
     spoolsWeight.value = 1000;
     spoolsUsed.value = 0;
     spoolsTempOffset.value = 0.0;
+    spoolsBedOffset.value = 0;
     post = post.spools;
-    let displayNone = "d-none";
-
-    if (filamentManager) {
-      displayNone = "";
-    } else {
-    }
     document.getElementById("addSpoolsTable").insertAdjacentHTML(
       "afterbegin",
       `
                 <tr data-jplist-item>
                   <th style="display: none;">${post?._id}</th>
-                  <th scope="row"><input class="form-control" type="text" placeholder="${
-                    post?.spools?.name
-                  }"></th>
+                  <th scope="row"><input class="form-control" type="text" placeholder="${post?.spools?.name}"></th>
                   <td>
                        <span class="d-none material" id="spoolsMaterialText-<%=spool._id%>"></span>
                        <select id="spoolsProfile-${post?._id}" class="form-control" disabled>
 
                        </select>
                    </td>
-                  <td><input class="form-control" type="text" step="0.01" placeholder="${
-                    post?.spools?.price
-                  }" disabled></td>
-                  <td><input class="form-control" type="text" placeholder="${
-                    post?.spools?.weight
-                  }" disabled></td>
-                  <td class="${displayNone}"><input class="form-control" type="text" placeholder="${
-        post?.spools?.used
-      }"></td>
-                  <td class="grams ${displayNone}">${(
-        post?.spools?.weight - post?.spools?.used
-      ).toFixed(0)}</td>
-                  <td class="percent ${displayNone}">${(
-        100 -
-        (post?.spools?.used / post?.spools?.weight) * 100
-      ).toFixed(0)}</td>
-                  <td><input class="form-control" type="text" placeholder="${
-                    post?.spools?.tempOffset
-                  }" disabled></td>
+                  <td><input class="form-control" type="text" step="0.01" placeholder="${post?.spools?.price}" disabled></td>
+                  <td><input class="form-control" type="text" placeholder="${post?.spools?.weight}" disabled></td>
+                  <td><input class="form-control" type="text" placeholder="${post?.spools?.used}"></td>
+                  <td><input class="form-control" type="text" placeholder="${post?.spools?.tempOffset}" disabled></td>
+                  <td><input class="form-control" type="text" placeholder="${post?.spools?.bedOffset}" disabled></td>
                    <td>
-                       <select id="spoolsPrinterAssignment-${
-                         post?._id
-                       }" class="form-control" disabled>
+                       <select id="spoolsPrinterAssignment-${post?._id}" class="form-control" ${multiple}>
 
                        </select>
                    </td>
-                  <td><button id="edit-${post?._id}" type="button" class="btn btn-sm btn-info edit">
+                  <td>
+                  <button title="Clone Spool" id="clone-${post?._id}" type="button" class="btn btn-sm btn-success clone">
+                      <i class="far fa-copy"></i>
+                  </button>
+                  <button id="edit-${post?._id}" type="button" class="btn btn-sm btn-info edit">
                     <i class="fas fa-edit editIcon"></i>
                   </button>
-                  <button id="save-${
-                    post?._id
-                  }" type="button" class="btn btn-sm d-none btn-success save">
+                  <button id="save-${post?._id}" type="button" class="btn btn-sm d-none btn-success save">
                     <i class="fas fa-save saveIcon"></i>
                   </button>
-                  <button id="delete-${
-                    post?._id
-                  }" type="button" class="btn btn-sm btn-danger delete">
+                  <button id="delete-${post?._id}" type="button" class="btn btn-sm btn-danger delete">
                     <i class="fas fa-trash deleteIcon"></i>
                   </button></td>
                 </tr>
                 `
     );
-    updatePrinterDrops();
-    updateProfileDrop();
+    await reRenderPageInformation();
+    await updatePrinterDrops();
+    await updateProfileDrop();
+    return true;
   } else {
     UI.createMessage(
       {
@@ -364,8 +460,77 @@ async function addSpool(
       },
       "addSpoolsMessage"
     );
+    return false;
   }
 }
+
+const clonedSpools = [];
+
+async function cloneSpool(e) {
+  const row = e.parentElement.parentElement;
+  const editable = row.querySelectorAll("input");
+  const selects = row.querySelectorAll("select");
+  const spool = [];
+  editable.forEach((edit) => {
+    spool.push(edit.placeholder);
+  });
+
+  let clonedIndex = clonedSpools.length;
+
+  document.getElementById("addSpoolsTable").insertAdjacentHTML(
+    "afterend",
+    `
+              <tr id="clonedRow-${clonedIndex}">
+                <th style="display: none;">${clonedIndex}</th>
+                <th scope="row"><input id="clonedName-${clonedIndex}" class="form-control" type="text" placeholder="${spool[0]}-${clonedIndex}" value="${spool[0]} (${clonedIndex})"></th>
+                <td>
+                     <span class="d-none material" id="spoolsMaterialText-${clonedIndex}"></span>
+                     <select id="spoolsProfile-${clonedIndex}" class="form-control">
+
+                     </select>
+                 </td>
+                <td><input id="clonedPrice-${clonedIndex}" class="form-control" type="text" step="0.01" placeholder="${spool[1]}" value="${spool[1]}"></td>
+                <td><input id="clonedWeight-${clonedIndex}" class="form-control" type="text" placeholder="${spool[2]}" value="1000"></td>
+                <td><input id="clonedUsed-${clonedIndex}" class="form-control" type="text" placeholder="${spool[3]}" value="0"></td>
+                <td><input id="clonedToolOffset-${clonedIndex}" class="form-control" type="text" placeholder="${spool[4]}" value="${spool[4]}"></td>
+                <td><input id="clonedBedOffset-${clonedIndex}" class="form-control" type="text" placeholder="${spool[5]}" value="${spool[5]}"></td>
+                 <td>
+                     <select id="spoolsPrinterAssignment-${clonedIndex}" class="form-control" disabled>
+
+                     </select>
+                 </td>
+                 <td>
+                <button id="clonedSave-${clonedIndex}" type="button" class="btn btn-sm btn-success">
+                  <i class="fas fa-save saveIcon"></i>
+                </button></td>
+              </tr>
+              `
+  );
+
+  document.getElementById("clonedSave-" + clonedIndex).addEventListener("click", function () {
+    const clonedRow = document.getElementById(`clonedRow-${clonedIndex}`);
+    const addedSpool = addSpool(
+      document.getElementById(`clonedName-${clonedIndex}`),
+      document.getElementById(`spoolsProfile-${clonedIndex}`),
+      document.getElementById(`clonedPrice-${clonedIndex}`),
+      document.getElementById(`clonedWeight-${clonedIndex}`),
+      document.getElementById(`clonedUsed-${clonedIndex}`),
+      document.getElementById(`clonedToolOffset-${clonedIndex}`),
+      document.getElementById(`clonedBedOffset-${clonedIndex}`)
+    );
+    if (addedSpool) {
+      // Remove Row
+      clonedRow.remove();
+      clonedSpools.pop();
+    }
+  });
+
+  clonedSpools.push(clonedIndex);
+  await updatePrinterDrops();
+  await updateProfileDrop();
+  document.getElementById(`spoolsProfile-${clonedIndex}`).value = selects[0].value;
+}
+
 async function editSpool(e) {
   const row = e.parentElement.parentElement;
   const editable = row.querySelectorAll("input");
@@ -377,6 +542,7 @@ async function editSpool(e) {
   document.getElementById(`spoolsProfile-${id}`).disabled = false;
   document.getElementById(`save-${id}`).classList.remove("d-none");
   document.getElementById(`edit-${id}`).classList.add("d-none");
+  await reRenderPageInformation();
 }
 async function deleteSpool(e) {
   document.getElementById("profilesMessage").innerHTML = "";
@@ -384,7 +550,8 @@ async function deleteSpool(e) {
     let post = await OctoFarmClient.post("filament/delete/filament", {
       id: e.parentElement.parentElement.firstElementChild.innerHTML.trim()
     });
-    if (post) {
+    if (post?.spool) {
+      await reRenderPageInformation();
       if (e.classList.contains("deleteIcon")) {
         jplist.resetContent(function () {
           // remove element with id = el1
@@ -397,12 +564,11 @@ async function deleteSpool(e) {
         });
       }
     } else {
-      UI.createMessage(
-        {
-          type: "danger",
-          msg: "Error: Could not delete roll from database, check connection..."
-        },
-        "filamentMessage"
+      UI.createAlert(
+        "error",
+        "There was a conflict when deleting this spool, is it attached to a printer?",
+        4000,
+        "Clicked"
       );
     }
   }
@@ -504,8 +670,29 @@ async function updateProfileDrop() {
     }
   });
 }
+
+function getSelectValues(select) {
+  const result = [];
+  const options = select && select.options;
+  let opt;
+
+  for (let i = 0, iLen = options.length; i < iLen; i++) {
+    opt = options[i];
+
+    if (opt.selected) {
+      result.push(opt.value || opt.text);
+    }
+  }
+  return result;
+}
+
 async function updatePrinterDrops() {
   let filament = await OctoFarmClient.get("filament/get/filament");
+  let { printerList } = await OctoFarmClient.get("filament/get/printerList");
+  let printerDropList = "";
+  printerList.forEach((printer) => {
+    printerDropList += printer;
+  });
 
   const printerDrops = document.querySelectorAll("[id^='spoolsPrinterAssignment-']");
   const printerAssignments = document.querySelectorAll("[id^='spoolsListPrinterAssignment-']");
@@ -515,23 +702,35 @@ async function updatePrinterDrops() {
     const spool = _.findIndex(filament?.Spool, function (o) {
       return o?._id == spoolID;
     });
+    drop.innerHTML = printerDropList;
+
+    const selectedValues = [];
+
     if (typeof filament.Spool[spool] !== "undefined") {
-      if (filament?.Spool[spool]?.printerAssignment.length > 0) {
-        drop.innerHTML = `<option>${filament?.Spool[spool]?.printerAssignment[0]?.name}: Tool ${filament?.Spool[spool]?.printerAssignment[0]?.tool}</option>`;
-      } else {
-        drop.innerHTML = "<option>Not Assigned</option>";
+      filament?.Spool[spool]?.printerAssignment.forEach((printer) => {
+        selectedValues.push(`${printer?.id}-${printer?.tool}`);
+      });
+    }
+    for (let i = 0; i < drop.options.length; i++) {
+      if (selectedValues.includes(drop.options[i].value)) {
+        drop.options[i].selected = true;
       }
     }
     // Not needed until bring back selecting spool function server side
-    // drop.addEventListener("change", (e) => {
-    //   const meta = e.target.value.split("-");
-    //   const printerId = meta[0];
-    //   const tool = meta[1];
-    //   const spoolId = e.target.id.split("-");
-    //   selectFilament(printerId, spoolId[1], tool);
-    // });
+    drop.addEventListener(
+      "change",
+      (e) => {
+        const meta = e.target.value.split("-");
+        const printerId = meta[0];
+        const tool = meta[1];
+        const spoolId = e.target.id.split("-");
+        selectFilament(getSelectValues(drop), spoolId[1], tool);
+      },
+      true
+    );
   });
   printerAssignments.forEach((text, index) => {
+    text.innerHTML = "";
     const split = text.id.split("-");
     const spoolID = split[1];
     const spool = _.findIndex(filament?.Spool, function (o) {
@@ -539,27 +738,28 @@ async function updatePrinterDrops() {
     });
     if (typeof filament?.Spool[spool] !== "undefined") {
       if (filament?.Spool[spool]?.printerAssignment.length > 0) {
-        text.innerHTML =
-          filament?.Spool[spool]?.printerAssignment[0]?.name +
-          ": Tool" +
-          filament?.Spool[spool]?.printerAssignment[0]?.tool;
+        filament?.Spool[spool]?.printerAssignment.forEach((printer) => {
+          text.innerHTML +=
+            "<small>" + printer.name + ": Tool" + printer.tool + "<br>" + "</small>";
+        });
       } else {
         text.innerHTML = "Not Assigned";
       }
     }
-    // Not needed until bring back selecting spool function server side
-    // drop.addEventListener("change", (e) => {
-    //   const meta = e.target.value.split("-");
-    //   const printerId = meta[0];
-    //   const tool = meta[1];
-    //   const spoolId = e.target.id.split("-");
-    //   selectFilament(printerId, spoolId[1], tool);
-    // });
   });
 }
-async function init() {
-  let lastThirtyDaysText = getLastThirtyDaysText();
 
+async function selectFilament(printerId, spoolId, tool) {
+  await OctoFarmClient.post("/filament/assign", {
+    printerId,
+    spoolId,
+    tool
+  });
+  await reRenderPageInformation();
+  await updatePrinterDrops();
+}
+
+async function init() {
   let historyStatistics = await OctoFarmClient.getHistoryStatistics();
   let usageByDay = historyStatistics.history.totalByDay;
   let usageOverTime = historyStatistics.history.usageOverTime;
@@ -598,186 +798,19 @@ async function init() {
     yAxisSeries.push(obj);
   });
 
-  if (typeof usageOverTime[0] !== "undefined") {
-    const usageOverTimeOptions = {
-      chart: {
-        type: "bar",
-        width: "100%",
-        height: "250px",
-        stacked: true,
-        stroke: {
-          show: true,
-          curve: "smooth",
-          lineCap: "butt",
-          width: 1,
-          dashArray: 0
-        },
-        animations: {
-          enabled: true
-        },
-        plotOptions: {
-          bar: {
-            horizontal: false
-          }
-        },
-        toolbar: {
-          show: false
-        },
-        zoom: {
-          enabled: false
-        },
-        background: "#303030"
-      },
-      dataLabels: {
-        enabled: false,
-        background: {
-          enabled: true,
-          foreColor: "#000",
-          padding: 1,
-          borderRadius: 2,
-          borderWidth: 1,
-          borderColor: "#fff",
-          opacity: 0.9
-        },
-        formatter: function (val) {
-          if (!!val) {
-            return val.toFixed(0) + "g";
-          }
-        }
-      },
-      colors: [
-        "#ff0000",
-        "#ff8400",
-        "#ffd500",
-        "#88ff00",
-        "#00ff88",
-        "#00b7ff",
-        "#4400ff",
-        "#8000ff",
-        "#ff00f2"
-      ],
-      toolbar: {
-        show: false
-      },
-      theme: {
-        mode: "dark"
-      },
-      noData: {
-        text: "Loading..."
-      },
-      series: [],
-      yaxis: [
-        {
-          title: {
-            text: "Weight"
-          },
-          seriesName: usageOverTime[0].name,
-          labels: {
-            formatter: function (val) {
-              if (val !== null) {
-                return val.toFixed(0) + "g";
-              }
-            }
-          }
-        }
-      ],
-      xaxis: {
-        type: "category",
-        categories: lastThirtyDaysText,
-        tickAmount: 15,
-        labels: {
-          formatter: function (value, timestamp) {
-            let dae = new Date(value).toLocaleDateString();
+  dashboardOptions.filamentUsageOverTimeChartOptions.yaxis = yAxisSeries;
 
-            return dae; // The formatter function overrides format property
-          }
-        }
-      }
-    };
+  if (typeof usageOverTime[0] !== "undefined") {
     let systemFarmTemp = new ApexCharts(
       document.querySelector("#usageOverTime"),
-      usageOverTimeOptions
+      dashboardOptions.filamentUsageByDayChartOptions
     );
-    systemFarmTemp.render();
-
-    const usageOverFilamentTimeOptions = {
-      chart: {
-        type: "line",
-        width: "100%",
-        height: "250px",
-        stacked: true,
-        animations: {
-          enabled: true
-        },
-        toolbar: {
-          show: false
-        },
-        zoom: {
-          enabled: false
-        },
-        background: "#303030"
-      },
-      dataLabels: {
-        enabled: true,
-        background: {
-          enabled: true,
-          foreColor: "#000",
-          padding: 1,
-          borderRadius: 2,
-          borderWidth: 1,
-          borderColor: "#fff",
-          opacity: 0.9
-        },
-        formatter: function (val, opts) {
-          if (val !== null) {
-            return val.toFixed(0) + "g";
-          }
-        }
-      },
-      colors: [
-        "#ff0000",
-        "#ff8400",
-        "#ffd500",
-        "#88ff00",
-        "#00ff88",
-        "#00b7ff",
-        "#4400ff",
-        "#8000ff",
-        "#ff00f2"
-      ],
-      toolbar: {
-        show: false
-      },
-      stroke: {
-        width: 2,
-        curve: "smooth"
-      },
-      theme: {
-        mode: "dark"
-      },
-      noData: {
-        text: "Loading..."
-      },
-      series: [],
-      yaxis: yAxisSeries,
-      xaxis: {
-        type: "category",
-        categories: lastThirtyDaysText,
-        tickAmount: 15,
-        labels: {
-          formatter: function (value, timestamp) {
-            let dae = new Date(value).toLocaleDateString();
-
-            return dae; // The formatter function overrides format property
-          }
-        }
-      }
-    };
+    await systemFarmTemp.render();
     let usageOverFilamentTime = new ApexCharts(
       document.querySelector("#usageOverFilamentTime"),
-      usageOverFilamentTimeOptions
+      dashboardOptions.filamentUsageOverTimeChartOptions
     );
-    usageOverFilamentTime.render();
+    await usageOverFilamentTime.render();
 
     usageOverFilamentTime.updateSeries(usageOverTime);
     systemFarmTemp.updateSeries(usageByDay);
@@ -813,10 +846,12 @@ async function init() {
       deleteSpool(e.target);
     } else if (e.target.classList.contains("save")) {
       saveSpool(e.target);
+    } else if (e.target.classList.contains("clone")) {
+      cloneSpool(e.target);
     }
   });
-  updateProfileDrop();
-  updatePrinterDrops();
+  await updateProfileDrop();
+  await updatePrinterDrops();
   // Initialise Profile Listeners
   const profilesBtn = document.getElementById("addProfilesBtn");
   profilesBtn.addEventListener("click", async (e) => {
@@ -851,7 +886,16 @@ async function init() {
     const spoolsWeight = document.getElementById("spoolsWeight");
     const spoolsUsed = document.getElementById("spoolsRemaining");
     const spoolsTempOffset = document.getElementById("spoolsTempOffset");
-    addSpool(spoolsName, spoolsProfile, spoolsPrice, spoolsWeight, spoolsUsed, spoolsTempOffset);
+    const spoolsBedOffset = document.getElementById("spoolsBedOffset");
+    await addSpool(
+      spoolsName,
+      spoolsProfile,
+      spoolsPrice,
+      spoolsWeight,
+      spoolsUsed,
+      spoolsTempOffset,
+      spoolsBedOffset
+    );
   });
   await setupFilamentManagerReSyncBtn();
 

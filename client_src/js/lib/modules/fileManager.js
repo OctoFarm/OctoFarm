@@ -32,7 +32,7 @@ setInterval(async () => {
       file.index = current.index;
       file.uploadDate = currentDate.getTime() / 1000;
       const post = await OctoFarmClient.post("printers/newFiles", file);
-      // const update = await FileManager.updateFileList(file);
+      FileManager.updateFileList(current.index);
       fileUploads.remove();
       const fileCounts = document.getElementById(`fileCounts-${current.index}`);
       if (fileCounts && fileCounts.innerHTML == 1) {
@@ -241,15 +241,15 @@ export default class FileManager {
     });
 
     const flashReturn = function () {
-      e.target.classList = "btn btn-primary mb-0";
+      e.target.classList = "btn btn-success mb-0";
       e.target.innerHTML = "<i class='fas fa-sync'></i> Re-Sync";
     };
     if (how) {
-      e.target.classList = "btn btn-primary mb-0";
+      e.target.classList = "btn btn-success mb-0";
       e.target.innerHTML = "<i class='fas fa-sync'></i> Re-Sync";
       setTimeout(flashReturn, 500);
     } else {
-      e.target.classList = "btn btn-primary mb-0";
+      e.target.classList = "btn btn-success mb-0";
       e.target.innerHTML = "<i class='fas fa-sync'></i> Re-Sync";
       setTimeout(flashReturn, 500);
     }
@@ -775,7 +775,7 @@ export default class FileManager {
       document.getElementById("multiFolderSection").classList.remove("hidden");
       document.getElementById("multiFileSection").classList.add("hidden");
       document.getElementById("multiUploadFooter").innerHTML =
-        "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-success float-right\">Next</button>";
+        '<button id="multiUpSubmitBtn" type="button" class="btn btn-success float-right">Next</button>';
       document.getElementById("multiUpSubmitBtn").addEventListener("click", async (e) => {
         selectedFolder = document.getElementById("multiNewFolder").value;
         let newFolder = document.getElementById("multiNewFolderNew").value;
@@ -847,11 +847,11 @@ export default class FileManager {
         const doesFolderExist = await OctoPrintClient.checkFile(currentPrinter, selectedFolder);
         if (doesFolderExist === 200) {
           document.getElementById("folderCheckBody-" + currentPrinter._id).innerHTML =
-            "<i class=\"fas fa-folder-plus text-success\"></i> Folder exists!";
+            '<i class="fas fa-folder-plus text-success"></i> Folder exists!';
           selectedPrinters[i].folderExists = true;
         } else {
           document.getElementById("folderCheckBody-" + currentPrinter._id).innerHTML =
-            "<i class=\"fas fa-folder-minus text-warning\"></i> Folder will be created!";
+            '<i class="fas fa-folder-minus text-warning"></i> Folder will be created!';
           selectedPrinters[i].folderExists = false;
         }
       }
@@ -867,7 +867,7 @@ export default class FileManager {
       document.getElementById("multiFolderSection").classList.add("hidden");
 
       document.getElementById("multiUploadFooter").innerHTML =
-        "<button id=\"multiUpSubmitBtn\" type=\"button\" class=\"btn btn-success float-right\" data-dismiss=\"modal\">Start!</button>";
+        '<button id="multiUpSubmitBtn" type="button" class="btn btn-success float-right" data-dismiss="modal">Start!</button>';
       document.getElementById("multiUpSubmitBtn").addEventListener("click", (e) => {
         initiateTheUpload();
       });
