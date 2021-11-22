@@ -397,6 +397,12 @@ async function addSpool(
       "addSpoolsMessage"
     );
     filamentManager = post.filamentManager;
+
+    let multiple = "";
+    if (!filamentManager) {
+      multiple = "multiple=true";
+    }
+
     spoolsName.value = "";
     spoolsPrice.value = "";
     spoolsWeight.value = 1000;
@@ -422,7 +428,7 @@ async function addSpool(
                   <td><input class="form-control" type="text" placeholder="${post?.spools?.tempOffset}" disabled></td>
                   <td><input class="form-control" type="text" placeholder="${post?.spools?.bedOffset}" disabled></td>
                    <td>
-                       <select id="spoolsPrinterAssignment-${post?._id}" class="form-control">
+                       <select id="spoolsPrinterAssignment-${post?._id}" class="form-control" ${multiple}>
 
                        </select>
                    </td>
@@ -723,6 +729,7 @@ async function updatePrinterDrops() {
     );
   });
   printerAssignments.forEach((text, index) => {
+    text.innerHTML = "";
     const split = text.id.split("-");
     const spoolID = split[1];
     const spool = _.findIndex(filament?.Spool, function (o) {
@@ -730,10 +737,10 @@ async function updatePrinterDrops() {
     });
     if (typeof filament?.Spool[spool] !== "undefined") {
       if (filament?.Spool[spool]?.printerAssignment.length > 0) {
-        text.innerHTML =
-          filament?.Spool[spool]?.printerAssignment[0]?.name +
-          ": Tool" +
-          filament?.Spool[spool]?.printerAssignment[0]?.tool;
+        filament?.Spool[spool]?.printerAssignment.forEach((printer) => {
+          text.innerHTML +=
+            "<small>" + printer.name + ": Tool" + printer.tool + "<br>" + "</small>";
+        });
       } else {
         text.innerHTML = "Not Assigned";
       }
@@ -742,13 +749,13 @@ async function updatePrinterDrops() {
 }
 
 async function selectFilament(printerId, spoolId, tool) {
-  console.log(printerId, spoolId, tool);
-  const selectedFilament = await OctoFarmClient.post("/filament/assign", {
+  await OctoFarmClient.post("/filament/assign", {
     printerId,
     spoolId,
     tool
   });
-  console.log(selectedFilament);
+  await reRenderPageInformation();
+  await updatePrinterDrops();
 }
 
 async function init() {
