@@ -17,8 +17,14 @@ let dropDownList = {
   historyDropDown: []
 };
 
+let printerFilamentList = [];
+
 class FilamentClean {
   static noSpoolOptions = `<option value="0">No Spool Selected</option>`;
+
+  static returnFilamentList() {
+    return printerFilamentList;
+  }
 
   static getSpools() {
     return spoolsClean;
@@ -248,6 +254,58 @@ class FilamentClean {
       }
     }
     return assignments;
+  }
+
+  static getPrinterAssignmentList() {
+    const spoolList = this.getSpools();
+
+    const assignmentList = [];
+
+    let reducedList = spoolList.filter((spool) => spool?.printerAssignment?.length > 0);
+
+    reducedList.forEach((spool) => {
+      spool.printerAssignment.forEach((printer) => {
+        assignmentList.push(`${printer.id}-${printer.tool}`);
+      });
+    });
+
+    return assignmentList;
+  }
+
+  static async createPrinterList(farmPrinters, filamentManager) {
+    const printerList = [];
+    if (filamentManager) {
+      printerList.push('<option value="0">Not Assigned</option>');
+    }
+    const assignedPrinters = this.getPrinterAssignmentList();
+
+    farmPrinters.forEach((printer) => {
+      if (typeof printer.currentProfile !== "undefined" && printer.currentProfile !== null) {
+        for (let i = 0; i < printer.currentProfile.extruder.count; i++) {
+          let listing = null;
+          if (filamentManager) {
+            if (
+              printer.printerState.colour.category === "Offline" ||
+              printer.printerState.colour.category === "Active"
+            ) {
+              listing = `<option value="${printer._id}-${i}" disabled>${printer.printerName}: Tool ${i}</option>`;
+            } else {
+              listing = `<option value="${printer._id}-${i}">${printer.printerName}: Tool ${i}</option>`;
+            }
+          } else {
+            if (assignedPrinters.includes(`${printer._id}-${i}`)) {
+              listing = `<option value="${printer._id}-${i}" disabled>${printer.printerName}: Tool ${i}</option>`;
+            } else {
+              listing = `<option value="${printer._id}-${i}">${printer.printerName}: Tool ${i}</option>`;
+            }
+          }
+
+          printerList.push(listing);
+        }
+      }
+    });
+
+    printerFilamentList = printerList;
   }
 }
 

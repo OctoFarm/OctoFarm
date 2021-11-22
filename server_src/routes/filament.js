@@ -40,8 +40,8 @@ const {
   checkIfProfileAttachedToSpool
 } = require("../services/octoprint.service");
 
-router.get("/get/printerList", ensureAuthenticated, async (req, res) => {
-  const printerList = await PrinterClean.returnFilamentList();
+router.get("/get/printerList", ensureAuthenticated, (req, res) => {
+  const printerList = FilamentClean.returnFilamentList();
   res.send({ printerList });
 });
 router.get("/get/statistics", ensureAuthenticated, async (req, res) => {

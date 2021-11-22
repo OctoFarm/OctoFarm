@@ -7,13 +7,14 @@ const { SystemRunner } = require("./runners/systemInfo");
 const { grabLatestPatreonData } = require("./services/patreon.service");
 const { Runner } = require("./runners/state.js");
 const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
+const serverSettings = require("./settings/serverSettings");
 
 const PRINTER_CLEAN_TASK = async () => {
   const serverSettings = require("./settings/serverSettings");
   const printersInformation = PrinterClean.listPrintersInformation();
   await PrinterClean.sortCurrentOperations(printersInformation);
 
-  await PrinterClean.createPrinterList(printersInformation, serverSettings.filamentManager);
+  await FilamentClean.createPrinterList(printersInformation, serverSettings.filamentManager);
 };
 
 const CRASH_TEST_TASK = async () => {
@@ -26,10 +27,10 @@ const HISTORY_CACHE_TASK = async () => {
   });
 };
 
-// TODO this runs without knowing about filament manager -_-
+// // TODO this runs without knowing about filament manager -_-
 const FILAMENT_CLEAN_TASK = async () => {
-  // console.log(SettingsClean.returnSystemSettings());
-  await FilamentClean.start();
+  const serverSettings = require("./settings/serverSettings");
+  await FilamentClean.start(serverSettings.filamentManager);
 };
 
 const GITHUB_UPDATE_CHECK_TASK = async () => {
@@ -192,11 +193,11 @@ class OctoFarmTasks {
     KsatLlorKcir(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
     KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
-    KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNONCE),
-    KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC, 24 * HOUR_MS),
     KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
-    KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.RUNONCE)
+    KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.RUNONCE),
+    KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
+    KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE)
   ];
 }
 
