@@ -11,6 +11,7 @@ const pageElements = {
   filamentUsedProgress: document.getElementById("filamentUsedProgress"),
   filamentRemainingProgress: document.getElementById("filamentRemainingProgress"),
   filamentOverviewTable: document.getElementById("filamentOverviewTable"),
+  filamentOverviewTableHeader: document.getElementById("filamentOverviewTableHeader"),
   filamentOverviewList: document.getElementById("filamentOverviewList")
 };
 
@@ -99,9 +100,7 @@ const filamentStore = [
 ];
 
 async function reRenderPageInformation() {
-  let { statistics, spools, profiles } = await OctoFarmClient.getFilamentStatistics();
-  console.log(statistics, spools, profiles);
-
+  let { statistics, spools } = await OctoFarmClient.getFilamentStatistics();
   pageElements.filamentProfileTotals.innerHTML = statistics.profileCount;
   pageElements.filamentSpoolTotals.innerHTML = statistics.spoolCount;
   pageElements.filamentSpoolsActiveTotals.innerHTML = statistics.activeSpoolCount;
@@ -115,42 +114,54 @@ async function reRenderPageInformation() {
   pageElements.filamentRemainingProgress.innerHTML = remainingPercent + "%";
   pageElements.filamentRemainingProgress.style.width = remainingPercent;
 
+  let headerBreakdown = "";
+  statistics.materialBreakDown.forEach((used) => {
+    headerBreakdown += `<th scope="col">${used.name}</th>`;
+  });
+
   let remainingBreakdown = "";
   statistics.materialBreakDown.forEach((used) => {
-    remainingBreakdown += `<th scope="col">${(used.total - used.used).toFixed(2)}g</th>`;
+    remainingBreakdown += `<th scope="col">${(used.total - used.used).toFixed(2) / 1000}kg</th>`;
   });
   let usedBreakdown = "";
   statistics.materialBreakDown.forEach((used) => {
-    usedBreakdown += `<th scope="col">${used.used.toFixed(2)}g</th>`;
+    usedBreakdown += `<th scope="col">${used.used.toFixed(2) / 1000}kg</th>`;
   });
 
   let weightBreakdown = "";
   statistics.materialBreakDown.forEach((used) => {
-    weightBreakdown += `<th scope="col">${used.total.toFixed(2)}g</th>`;
+    weightBreakdown += `<th scope="col">${used.total.toFixed(2) / 1000}kg</th>`;
   });
 
   let costBreakdown = "";
   statistics.materialBreakDown.forEach((used) => {
-    costBreakdown += `<th scope="col">${used.price.toFixed(2)}g</th>`;
+    costBreakdown += `<th scope="col">${used.price.toFixed(2)}</th>`;
   });
+
+  pageElements.filamentOverviewTableHeader.innerHTML = `
+  <tr>
+    <td scope="row">Material Overview: </td>
+    ${headerBreakdown}    
+  </tr>
+  `;
 
   pageElements.filamentOverviewTable.innerHTML = `
   <tr>
       <td scope="row">Remaining <span class="badge badge-success ml-2">${
-        statistics.total.toFixed(0) - statistics.used.toFixed(0)
-      }g</span></td>
+        (statistics.total.toFixed(0) - statistics.used.toFixed(0)) / 1000
+      }kg</span></td>
       ${remainingBreakdown}
   </tr>
   <tr>
-      <td scope="row">Used <span class="badge badge-warning ml-2">${statistics.used.toFixed(
-        0
-      )}g</span> </td>
+      <td scope="row">Used <span class="badge badge-warning ml-2">${
+        statistics.used.toFixed(0) / 1000
+      }kg</span> </td>
       ${usedBreakdown}
   </tr>
   <tr>
-      <th scope="row">Weight<span class="badge badge-light text-dark ml-2">${statistics.total.toFixed(
-        0
-      )}g</span></th>
+      <th scope="row">Weight<span class="badge badge-light text-dark ml-2">${
+        statistics.total.toFixed(0) / 1000
+      }kg</span></th>
       ${weightBreakdown}
   </tr>
   <tr>
@@ -173,7 +184,7 @@ async function reRenderPageInformation() {
                     <td id="spoolsListManufacture-${spool._id}">
                     </td>
                     <td>${spool.weight / 1000}KG</td>
-                    <td>${(spool.weight - spool.used).toFixed(0)}</td>
+                    <td>${(spool.weight - spool.used).toFixed(0)}g</td>
                     <td>${spool.tempOffset}</td>
                     <td>${spool.bedOffset || 0}</td>
                     <td id="spoolsListPrinterAssignment-${spool._id}"></td>
@@ -452,6 +463,7 @@ const clonedSpools = [];
 async function cloneSpool(e) {
   const row = e.parentElement.parentElement;
   const editable = row.querySelectorAll("input");
+  const selects = row.querySelectorAll("select");
   const spool = [];
   editable.forEach((edit) => {
     spool.push(edit.placeholder);
@@ -508,9 +520,9 @@ async function cloneSpool(e) {
   });
 
   clonedSpools.push(clonedIndex);
-  await reRenderPageInformation();
   await updatePrinterDrops();
   await updateProfileDrop();
+  document.getElementById(`spoolsProfile-${clonedIndex}`).value = selects[0].value;
 }
 
 async function editSpool(e) {

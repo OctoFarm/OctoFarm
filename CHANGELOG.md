@@ -87,6 +87,7 @@ All notable changes to this project will be documented in this file.
   - Added the ability for spools to have a bed offset. Caveat with multiple spools on a printer is that it will pick the first spool to apply an offset.
   - Filament Manager can no longer delete spools if attached to printer.
   - Filament Manager can no longer delete profiles if attached to spool.
+  - Filament Manager totals are now displayed in KG.
 
 ### Removed
 

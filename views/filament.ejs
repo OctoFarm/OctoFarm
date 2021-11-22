@@ -85,7 +85,7 @@
                         </div>
                         <div class="col-lg-12 table-responsive">
                             <table class="table-hover table table-dark table-hover">
-                                <thead>
+                                <thead id="filamentOverviewTableHeader">
                                 <tr>
                                     <td scope="row">Material Overview: </td>
                                     <% filamentTotals.materialBreakDown.forEach(used => { %>
@@ -95,21 +95,21 @@
                                 </thead>
                                 <tbody id="filamentOverviewTable">
                                 <tr>
-                                    <td scope="row">Remaining <span class="badge badge-success ml-2"><%=  filamentTotals.total.toFixed(0) - filamentTotals.used.toFixed(0) %>g</span></td>
+                                    <td scope="row">Remaining <span class="badge badge-success ml-2"><%=  (filamentTotals.total.toFixed(0) - filamentTotals.used.toFixed(0)) / 1000 %>kg</span></td>
                                     <% filamentTotals.materialBreakDown.forEach(used => { %>
-                                        <th scope="col"><%= (used.total - used.used).toFixed(2) %>g</th>
+                                        <th scope="col"><%= (used.total - used.used).toFixed(2) / 1000 %>kg</th>
                                     <%   }) %>
                                 </tr>
                                 <tr>
-                                    <td scope="row">Used <span class="badge badge-warning ml-2"><%= filamentTotals.used.toFixed(0) %>g</span> </td>
+                                    <td scope="row">Used <span class="badge badge-warning ml-2"><%= filamentTotals.used.toFixed(0) / 1000  %>kg</span> </td>
                                     <% filamentTotals.materialBreakDown.forEach(used => { %>
-                                        <th scope="col"><%= used.used.toFixed(2) %>g</th>
+                                        <th scope="col"><%= used.used.toFixed(2) /1000 %>kg</th>
                                     <%   }) %>
                                 </tr>
                                 <tr>
-                                    <th scope="row">Weight   <span class="badge badge-light text-dark ml-2"><%= filamentTotals.total.toFixed(0) %>g</span></th>
+                                    <th scope="row">Weight   <span class="badge badge-light text-dark ml-2"><%= filamentTotals.total.toFixed(0) / 1000 %>kg</span></th>
                                     <% filamentTotals.materialBreakDown.forEach(used => { %>
-                                        <th scope="col"> <%= used.total.toFixed(2) %>g</th>
+                                        <th scope="col"> <%= used.total.toFixed(2) /1000 %>kg</th>
                                     <%   }) %>
                                 </tr>
                                 <tr>
@@ -196,7 +196,7 @@
                     <td id="spoolsListManufacture-<%=spool._id%>">
                     </td>
                     <td><%=(spool.weight / 1000)%>KG</td>
-                    <td><%=(spool.weight - spool.used).toFixed(0)%></td>
+                    <td><%=(spool.weight - spool.used).toFixed(0)%>g</td>
                     <td><%= spool.tempOffset %></td>
                     <td><%= spool.bedOffset || 0 %></td>
                     <td id="spoolsListPrinterAssignment-<%=spool._id%>"></td>
