@@ -19,9 +19,9 @@
                     </button>
                 </div>
                 <div class="card-body text-center">
-                    <b>Profiles:</b> <span class="badge badge-info"><%= filamentTotals.profileCount %></span>
-                    <b>Spools:</b> <span class="badge badge-info"><%= filamentTotals.spoolCount %></span>
-                    <b>Active:</b> <span class="badge badge-warning"><%= filamentTotals.activeSpoolCount %></span>
+                    <b>Profiles:</b> <span id="filamentProfileTotals" class="badge badge-info"><%= filamentTotals.profileCount %></span>
+                    <b>Spools:</b> <span id="filamentSpoolsTotals" class="badge badge-info"><%= filamentTotals.spoolCount %></span>
+                    <b>Active:</b> <span id="filamentSpoolsActiveTotals" class="badge badge-warning"><%= filamentTotals.activeSpoolCount %></span>
                     <button title="Setup and edit your filament profiles."
                             type="button" class="btn btn-secondary m-2" data-toggle="modal" data-target="#profileManagerModal">
                         <i class="far fa-id-card"></i> Profile Manager
@@ -58,7 +58,7 @@
                             <center>
                                 <div class="progress mt-0 mb-2 ">
                                     <div
-                                            id="fsUsedProgress"
+                                            id="filamentUsedProgress"
                                             class="progress-bar progress-bar-striped bg-warning"
                                             role="progressbar"
                                             style="width: <%= (filamentTotals.used / filamentTotals.total) * 100%>% "
@@ -69,7 +69,7 @@
                                         <%= ((filamentTotals.used / filamentTotals.total) * 100).toFixed(0)  %> %
                                     </div>
                                     <div
-                                            id="fsRemainingProgress"
+                                            id="filamentRemainingProgress"
                                             class="progress-bar progress-bar-striped bg-success"
                                             role="progressbar"
                                             style="width: <%= ( (filamentTotals.total - filamentTotals.used) / filamentTotals.total) * 100%>% "
@@ -93,7 +93,7 @@
                                     <%   }) %>
                                 </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="filamentOverviewTable">
                                 <tr>
                                     <td scope="row">Remaining <span class="badge badge-success ml-2"><%=  filamentTotals.total.toFixed(0) - filamentTotals.used.toFixed(0) %>g</span></td>
                                     <% filamentTotals.materialBreakDown.forEach(used => { %>
@@ -185,7 +185,7 @@
                     <th scope="col"  class=" sticky-table table-dark" style="min-width:10px;">Assigned Printer</th>
                 </tr>
                 </thead>
-                <tbody style="height:100%; overflow-y:auto;">
+                <tbody id="filamentOverviewList" style="height:100%; overflow-y:auto;">
                 <% spools.forEach(spool => { %>
                 <tr>
                     <th style="display: none;"> </th>

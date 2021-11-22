@@ -2,6 +2,7 @@ const fetch = require("node-fetch");
 const { findIndex } = require("lodash");
 const runner = require("../runners/state.js");
 const { Runner } = runner;
+const Spool = require("../models/Filament.js");
 
 const getOnlinePrinterList = async function () {
   const printerList = Runner.returnFarmPrinters();
@@ -78,9 +79,15 @@ const checkIfSpoolAttachedToPrinter = function (spoolId) {
   return isSpoolAttached;
 };
 
+const checkIfProfileAttachedToSpool = async function (profileId) {
+  const attachedSpools = await Spool.find({ "spools.profile": profileId });
+  return attachedSpools.length > 0;
+};
+
 module.exports = {
   getOnlinePrinterList,
   checkIfFilamentManagerPluginExists,
   checkFilamentManagerPluginSettings,
-  checkIfSpoolAttachedToPrinter
+  checkIfSpoolAttachedToPrinter,
+  checkIfProfileAttachedToSpool
 };

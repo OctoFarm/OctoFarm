@@ -36,12 +36,23 @@ const {
   getOnlinePrinterList,
   checkIfFilamentManagerPluginExists,
   checkFilamentManagerPluginSettings,
-  checkIfSpoolAttachedToPrinter
+  checkIfSpoolAttachedToPrinter,
+  checkIfProfileAttachedToSpool
 } = require("../services/octoprint.service");
 
 router.get("/get/printerList", ensureAuthenticated, async (req, res) => {
   const printerList = await PrinterClean.returnFilamentList();
   res.send({ printerList });
+});
+router.get("/get/statistics", ensureAuthenticated, async (req, res) => {
+  const statistics = FilamentClean.getStatistics();
+  const spools = FilamentClean.getSpools();
+  const profiles = FilamentClean.getProfiles();
+  res.send({
+    statistics,
+    spools,
+    profiles
+  });
 });
 router.get("/get/profile", ensureAuthenticated, async (req, res) => {
   const profiles = await FilamentClean.getProfiles();
@@ -456,7 +467,11 @@ router.post("/delete/profile", ensureAuthenticated, async (req, res) => {
   const serverSettings = SettingsClean.returnSystemSettings();
   const { filamentManager } = serverSettings;
   const searchId = req.body.id;
-  logger.info("Profile delete request: ", searchId);
+
+  const isProfileAttached = await checkIfProfileAttachedToSpool(searchId);
+
+  if (isProfileAttached) return res.send({ profiles: false });
+
   if (filamentManager) {
     const printerList = Runner.returnFarmPrinters();
     let printer = null;
