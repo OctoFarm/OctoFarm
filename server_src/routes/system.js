@@ -19,6 +19,7 @@ const fs = require("fs");
 const marked = require("marked");
 const { fetchUsers } = require("../services/user-service");
 const { returnPatreonData } = require("../services/patreon.service");
+const { TaskManager } = require("../runners/task.manager");
 
 marked.setOptions({
   renderer: new marked.Renderer(),
@@ -64,7 +65,8 @@ router.get("/", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res)
       update: softwareUpdateNotification
     },
     patreonData: returnPatreonData(),
-    currentUsers
+    currentUsers,
+    taskManagerState: TaskManager.getTaskState()
   });
 });
 

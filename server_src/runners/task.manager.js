@@ -108,7 +108,6 @@ class TaskManager {
     const asyncHandler = async () => {
       await this.timeTask(taskId, handler);
     };
-
     return new AsyncTask(taskId, asyncHandler, this.getErrorHandler(taskId));
   }
 
@@ -122,6 +121,9 @@ class TaskManager {
     if (taskState.options?.logFirstCompletion !== false && !taskState?.firstCompletion) {
       logger.info(`Task '${taskId}' first completion. Duration ${taskState.duration}ms`);
       taskState.firstCompletion = Date.now();
+    }
+    if (taskState.options?.periodic) {
+      taskState.nextRun = new Date(Date.now() + taskState.options.milliseconds).getTime();
     }
   }
 

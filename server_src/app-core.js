@@ -112,7 +112,16 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
 
     await ClientSettings.init();
 
-    OctoFarmTasks.BOOT_TASKS.forEach((task) => TaskManager.registerJobOrTask(task));
+    const startUpTasks = [];
+
+    for (let i = 0; i < OctoFarmTasks.BOOT_TASKS.length; i++) {
+      const task = OctoFarmTasks.BOOT_TASKS[i];
+      startUpTasks.push(TaskManager.registerJobOrTask(task));
+    }
+
+    const bootTasks = await Promise.allSettled(startUpTasks);
+
+    console.log(bootTasks);
 
     await optionalInfluxDatabaseSetup();
   }

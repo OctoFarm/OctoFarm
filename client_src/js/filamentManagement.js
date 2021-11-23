@@ -526,8 +526,6 @@ async function cloneSpool(e) {
   });
 
   clonedSpools.push(clonedIndex);
-  await updatePrinterDrops();
-  await updateProfileDrop();
   document.getElementById(`spoolsProfile-${clonedIndex}`).value = selects[0].value;
 }
 

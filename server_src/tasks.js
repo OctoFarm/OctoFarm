@@ -13,7 +13,6 @@ const PRINTER_CLEAN_TASK = async () => {
   const serverSettings = require("./settings/serverSettings");
   const printersInformation = PrinterClean.listPrintersInformation();
   await PrinterClean.sortCurrentOperations(printersInformation);
-
   await FilamentClean.createPrinterList(printersInformation, serverSettings.filamentManager);
 };
 
@@ -27,7 +26,6 @@ const HISTORY_CACHE_TASK = async () => {
   });
 };
 
-// // TODO this runs without knowing about filament manager -_-
 const FILAMENT_CLEAN_TASK = async () => {
   const serverSettings = require("./settings/serverSettings");
   await FilamentClean.start(serverSettings.filamentManager);
@@ -179,6 +177,7 @@ const INITITIALISE_PRINTERS = async () => {
 // TODO, this is not a decent function name...
 function KsatLlorKcir(task, preset, milliseconds = 0) {
   preset.milliseconds = preset.milliseconds || milliseconds;
+
   return {
     id: task.name,
     task,
@@ -186,16 +185,14 @@ function KsatLlorKcir(task, preset, milliseconds = 0) {
   };
 }
 
-const HOUR_MS = 3600 * 1000;
-
 class OctoFarmTasks {
   static BOOT_TASKS = [
     KsatLlorKcir(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
+    KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
     KsatLlorKcir(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
     KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
-    KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC, 24 * HOUR_MS),
     KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
-    KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.RUNONCE),
+    KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
     KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
     KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE)
   ];
