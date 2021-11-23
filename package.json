@@ -71,7 +71,7 @@
     "semver": "^6.3.0",
     "simple-git": "^2.38.0",
     "systeminformation": "^5.7.7",
-    "toad-scheduler": "^1.4.0",
+    "toad-scheduler": "^1.6.0",
     "wake_on_lan": "^1.0.0",
     "winston": "^3.3.3",
     "ws": "^7.5.3",
