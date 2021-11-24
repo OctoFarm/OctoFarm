@@ -367,22 +367,23 @@ function renderSystemCharts() {
 }
 
 //TODO: Move over to SSE
-function startUpdatePageRunner() {
+function startUpdateInfoRunner() {
   setInterval(async function updateStatus() {
-    const systemInfo = await OctoFarmClient.get("system/info");
+    const systemInformation = await OctoFarmClient.get("system/info");
+
     const sysUptimeElem = document.getElementById("systemUptime");
     const procUptimeElem = document.getElementById("processUpdate");
 
-    if (systemInfo.sysUptime?.uptime && !!sysUptimeElem) {
-      sysUptimeElem.innerHTML = Calc.generateTime(systemInfo.sysUptime.uptime);
+    if (systemInformation.sysUptime?.uptime && !!sysUptimeElem) {
+      sysUptimeElem.innerHTML = Calc.generateTime(systemInformation.sysUptime.uptime);
     }
 
-    if (systemInfo.processUptime && !!sysUptimeElem) {
-      procUptimeElem.innerHTML = Calc.generateTime(systemInfo.processUptime);
+    if (systemInformation.processUptime && !!sysUptimeElem) {
+      procUptimeElem.innerHTML = Calc.generateTime(systemInformation.processUptime);
     }
 
-    const currentProc = systemInfo?.currentProcess;
-    const cpuLoad = systemInfo?.cpuLoad;
+    const currentProc = systemInformation?.currentProcess;
+    const cpuLoad = systemInformation?.cpuLoad;
     if (!!cpuLoad?.currentLoadSystem && !!cpuLoad?.currentLoadUser) {
       const systemLoad = cpuLoad.currentLoadSystem;
       const userLoad = cpuLoad.currentLoadUser;
@@ -393,7 +394,7 @@ function startUpdatePageRunner() {
       systemChartCPU.updateSeries([systemLoad, octoLoad, userLoad, 100 - remain]);
     }
 
-    const memoryInfo = systemInfo?.memoryInfo;
+    const memoryInfo = systemInformation?.memoryInfo;
     if (!!memoryInfo) {
       const systemUsedRAM = memoryInfo.used;
       const freeRAM = memoryInfo.free;
@@ -417,6 +418,39 @@ function startUpdatePageRunner() {
       systemChartMemory.updateSeries([0, 0, 0]);
     }
   }, 5000);
+}
+function startUpdateTasksRunner() {
+  setInterval(async function updateStatus() {
+    const taskManagerState = await OctoFarmClient.get("system/tasks");
+
+    for (let task in taskManagerState) {
+      const theTask = taskManagerState[task];
+
+      UI.doesElementNeedUpdating(
+        theTask.firstCompletion
+          ? new Date(theTask.firstCompletion).toLocaleString().replace(",", ": ")
+          : "Not Finished",
+        document.getElementById("execution-" + task),
+        "innerHTML"
+      );
+
+      UI.doesElementNeedUpdating(
+        theTask.duration
+          ? UI.generateMilisecondsTime(theTask.duration)
+          : '<i class="fas fa-sync fa-spin"></i>',
+        document.getElementById("duration-" + task),
+        "innerHTML"
+      );
+
+      UI.doesElementNeedUpdating(
+        theTask.nextRun
+          ? new Date(theTask.nextRun).toLocaleString().replace(",", ": ")
+          : "Not Planned",
+        document.getElementById("next-" + task),
+        "innerHTML"
+      );
+    }
+  }, 500);
 }
 
 async function createNewUser() {
@@ -603,7 +637,8 @@ export {
   checkForOctoFarmUpdates,
   grabOctoFarmLogList,
   renderSystemCharts,
-  startUpdatePageRunner,
+  startUpdateTasksRunner,
+  startUpdateInfoRunner,
   createNewUser,
   editUser,
   deleteUser,

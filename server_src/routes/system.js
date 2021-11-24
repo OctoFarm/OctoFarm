@@ -75,7 +75,14 @@ router.get("/", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res)
  */
 router.get("/info", ensureAuthenticated, async (req, res) => {
   const systemInformation = await SystemRunner.querySystemInfo();
+
   res.send(systemInformation);
+});
+
+router.get("/tasks", ensureAuthenticated, async (req, res) => {
+  const taskManagerState = TaskManager.getTaskState();
+
+  res.send(taskManagerState);
 });
 
 module.exports = router;

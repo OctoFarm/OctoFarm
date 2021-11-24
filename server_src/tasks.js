@@ -168,7 +168,6 @@ const INITITIALISE_PRINTERS = async () => {
 };
 
 /**
- * See an overview of this pattern/structure here https://www.youtube.com/watch?v=dQw4w9WgXcQ
  * @param task
  * @param preset
  * @param milliseconds optional parameter to quickly set milliseconds timing

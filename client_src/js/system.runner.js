@@ -18,7 +18,8 @@ import {
   updateOctoFarmCommand,
   checkForOctoFarmUpdates,
   grabOctoFarmLogList,
-  startUpdatePageRunner,
+  startUpdateTasksRunner,
+  startUpdateInfoRunner,
   renderSystemCharts,
   createNewUser,
   editUser,
@@ -62,7 +63,8 @@ checkFilamentManagerPluginState().then();
 grabOctoFarmLogList().then();
 Script.get().then();
 renderSystemCharts();
-startUpdatePageRunner();
+startUpdateTasksRunner();
+startUpdateInfoRunner();
 ClientSettings.init();
 
 serverActionsElements.OP_TIMELAPSE_SETUP.addEventListener("click", async (e) => {
