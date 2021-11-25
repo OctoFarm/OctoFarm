@@ -1563,9 +1563,7 @@ class Runner {
       currentTime = currentTime.getTime();
       farmPrinters[i].dateAdded = currentTime;
     }
-    if (typeof farmPrinters[i].settingsApperance !== "undefined") {
-      farmPrinters[i].settingsAppearance = farmPrinters[i].settingsApperance;
-    }
+
     if (typeof farmPrinters[i].alerts === "undefined") {
       farmPrinters[i].alerts = null;
     }
@@ -1719,8 +1717,8 @@ class Runner {
 
       //Check values for any changes, mark printers as requiring a rescan if so...
       if (farmPrinters[index].settingsAppearance.name !== printers[i].settingsAppearance.name) {
-        farmPrinters[index].settingsApperance.name = printers[i].settingsAppearance.name;
-        farmPrinters[index].markModified("settingsApperance");
+        farmPrinters[index].settingsAppearance.name = printers[i].settingsAppearance.name;
+        farmPrinters[index].markModified("settingsAppearance");
         const loggerMessage = `Changing printer name from ${farmPrinters[index].settingsAppearance.name} to ${printers[i].settingsAppearance.name}`;
         logger.info(loggerMessage);
         PrinterTicker.addIssue(
@@ -3148,7 +3146,7 @@ class Runner {
       ) {
         farmPrinters[index].settingsAppearance.name = settings.printer.printerName;
         printer.settingsAppearance.name = settings.printer.printerName;
-        printer.markModified("settingsApperance");
+        printer.markModified("settingsAppearance");
         const loggerMessage = `Changing printer name from ${farmPrinters[index].settingsAppearance.name} to ${settings.printer.printerName}`;
         logger.info(loggerMessage);
         PrinterTicker.addIssue(
