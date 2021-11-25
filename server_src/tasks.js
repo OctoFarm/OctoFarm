@@ -7,10 +7,9 @@ const { SystemRunner } = require("./runners/systemInfo");
 const { grabLatestPatreonData } = require("./services/patreon.service");
 const { Runner } = require("./runners/state.js");
 const { SettingsClean } = require("./lib/dataFunctions/settingsClean");
-const serverSettings = require("./settings/serverSettings");
 
 const PRINTER_CLEAN_TASK = async () => {
-  const serverSettings = require("./settings/serverSettings");
+  const serverSettings = SettingsClean.returnSystemSettings();
   const printersInformation = PrinterClean.listPrintersInformation();
   await PrinterClean.sortCurrentOperations(printersInformation);
   await FilamentClean.createPrinterList(printersInformation, serverSettings.filamentManager);
@@ -27,7 +26,7 @@ const HISTORY_CACHE_TASK = async () => {
 };
 
 const FILAMENT_CLEAN_TASK = async () => {
-  const serverSettings = require("./settings/serverSettings");
+  const serverSettings = SettingsClean.returnSystemSettings();
   await FilamentClean.start(serverSettings.filamentManager);
 };
 
@@ -159,8 +158,8 @@ const STATE_PRINTER_GENERATE_TASK = async () => {
 };
 
 const DATABASE_MIGRATIONS_TASK = async () => {
-  // const migrations = require("./migrations");
-  // console.log(migrations);
+  const migrations = require("./migrations");
+  console.log(migrations);
 };
 
 const INITITIALISE_PRINTERS = async () => {
@@ -188,10 +187,10 @@ class OctoFarmTasks {
   static BOOT_TASKS = [
     KsatLlorKcir(SYSTEM_INFO_CHECK_TASK, TaskPresets.RUNONCE),
     KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
-    KsatLlorKcir(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
-    KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
-    KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
+    KsatLlorKcir(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
+    // KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
+    KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
     KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE)
   ];

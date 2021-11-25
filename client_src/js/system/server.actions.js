@@ -430,7 +430,15 @@ function startUpdateTasksRunner() {
         theTask.firstCompletion
           ? new Date(theTask.firstCompletion).toLocaleString().replace(",", ": ")
           : "Not Finished",
-        document.getElementById("execution-" + task),
+        document.getElementById("firstExecution-" + task),
+        "innerHTML"
+      );
+
+      UI.doesElementNeedUpdating(
+        theTask.lastExecuted
+          ? new Date(theTask.lastExecuted).toLocaleString().replace(",", ": ")
+          : "Not Finished",
+        document.getElementById("lastExecution-" + task),
         "innerHTML"
       );
 
@@ -450,7 +458,7 @@ function startUpdateTasksRunner() {
         "innerHTML"
       );
     }
-  }, 500);
+  }, 1500);
 }
 
 async function createNewUser() {

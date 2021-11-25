@@ -5,6 +5,7 @@
             <tr>
                 <th scope="col">Task Name</th>
                 <th scope="col">Interval</th>
+                <th scope="col">First Execution</th>
                 <th scope="col">Last Execution</th>
                 <th scope="col">Duration</th>
                 <th scope="col">Next Execution</th>
@@ -18,7 +19,8 @@
                 <tr>
                     <th scope="row"><%= taskName %></th>
                     <td><%= (currentTask.options.periodic) ? helpers.generateMilisecondsTime(currentTask.options.milliseconds) : 'No Interval' %></td>
-                    <td id="execution-<%= task %>"><%= (currentTask.firstCompletion) ? new Date(currentTask.firstCompletion).toLocaleString().replace(",", ": ") : "Not Finished" %></td>
+                    <td id="firstExecution-<%= task %>"><%= (currentTask.firstCompletion) ? new Date(currentTask.firstCompletion).toLocaleString().replace(",", ": ") : "Not Finished" %></td>
+                    <td id="lastExecution-<%= task %>"><%= (currentTask.lastExecuted) ? new Date(currentTask.lastExecuted).toLocaleString().replace(",", ": ") : "Not Finished" %></td>
                     <td id="duration-<%= task %>"><%- (currentTask.duration) ? helpers.generateMilisecondsTime(currentTask.duration) : '<i class="fas fa-sync fa-spin"></i>'  %></td>
                     <td id="next-<%= task %>"><%= (currentTask.nextRun) ? new Date(currentTask.nextRun).toLocaleString().replace(",", ": ") : "Not Planned" %></td>
                 </tr>

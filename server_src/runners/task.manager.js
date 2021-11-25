@@ -10,7 +10,6 @@ const logger = new Logger("OctoFarm-TaskManager");
  */
 class TaskManager {
   static jobScheduler = new ToadScheduler();
-  static bootUpTasks = [];
   static taskStates = {};
 
   static validateInput(taskId, workload, schedulerOptions) {
@@ -85,7 +84,8 @@ class TaskManager {
     const timedTask = this.getSafeTimedTask(taskID, asyncTaskCallback);
 
     this.taskStates[taskID] = {
-      options: schedulerOptions
+      options: schedulerOptions,
+      task: timedTask
     };
 
     if (schedulerOptions.runOnce) {
@@ -94,7 +94,7 @@ class TaskManager {
       const delay = (schedulerOptions.milliseconds || 0) + (schedulerOptions.seconds || 0) * 1000;
       this.runTimeoutTaskInstance(taskID, timedTask, delay);
     } else {
-      const job = new SimpleIntervalJob(schedulerOptions, timedTask);
+      const job = new SimpleIntervalJob(schedulerOptions, timedTask, taskID);
       this.jobScheduler.addSimpleIntervalJob(job);
     }
   }
@@ -125,6 +125,8 @@ class TaskManager {
     if (taskState.options?.periodic) {
       taskState.nextRun = new Date(Date.now() + taskState.options.milliseconds).getTime();
     }
+    // Always log when the task was last executed
+    taskState.lastExecuted = Date.now();
   }
 
   static getTaskState(taskId) {
@@ -153,6 +155,14 @@ class TaskManager {
    */
   static stopSchedulerTasks() {
     this.jobScheduler.stop();
+  }
+
+  /**
+   * Runs the tasks which were registered
+   */
+  static forceRunTask(taskId) {
+    if (!taskId) return;
+    this.taskStates[taskId].task.execute();
   }
 }
 

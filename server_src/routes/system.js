@@ -73,8 +73,9 @@ router.get("/", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res)
 /**
  * Acquire system information from system info runner
  */
-router.get("/info", ensureAuthenticated, async (req, res) => {
-  const systemInformation = await SystemRunner.querySystemInfo();
+router.get("/info", ensureAuthenticated, (req, res) => {
+  TaskManager.forceRunTask("SYSTEM_INFO_CHECK_TASK");
+  const systemInformation = SystemRunner.returnInfo();
 
   res.send(systemInformation);
 });
