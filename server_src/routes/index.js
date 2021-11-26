@@ -15,6 +15,7 @@ const { AppConstants } = require("../app.constants");
 const { getDefaultDashboardSettings } = require("../lib/providers/settings.constants");
 const { getHistoryCache } = require("../cache/history.cache");
 const softwareUpdateChecker = require("../services/octofarm-update.service");
+const { defaultPaginationOptions } = require("../constants/history-sort.constants");
 
 const version = process.env[AppConstants.VERSION_KEY];
 
@@ -101,20 +102,21 @@ router.get("/filemanager", ensureAuthenticated, ensureCurrentUserAndGroup, async
 // History Page
 router.get("/history", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = Runner.returnFarmPrinters();
-  const historyCache = getHistoryCache();
-  const { historyClean, statisticsClean, pagination } = historyCache;
 
   const serverSettings = SettingsClean.returnSystemSettings();
+
+  const historyCache = getHistoryCache();
+  const { historyClean, statisticsClean, pagination } = historyCache;
 
   res.render("history", {
     name: req.user.name,
     userGroup: req.user.group,
     version,
     printerCount: printers.length,
+    helpers: prettyHelpers,
     history: historyClean,
     printStatistics: statisticsClean,
     pagination: pagination,
-    helpers: prettyHelpers,
     page: "History",
     serverSettings,
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],

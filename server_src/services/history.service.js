@@ -11,6 +11,7 @@ const { myCustomLabels, defaultPaginationOptions } = require("../constants/histo
 async function find(input, options = defaultPaginationOptions) {
   //Merge in the custom labels used
   options = { ...options, ...{ customLabels: myCustomLabels } };
+
   return historyModel.paginate(input, options, function (err, result) {
     return { itemList: result.docs, pagination: result.paginator };
   });

@@ -94,6 +94,7 @@ All notable changes to this project will be documented in this file.
     - With filament manager plugin this will be a single dropdown menu only allowing to select a single spool as per the plugins requirements. 
   - Printers with selected spools are now disabled from selection without filament manager plugin.
   - System information now shows OctoFarms usage as a pure value rather than just on the donut charts.
+  - Cut down the history table view. Now only shows State/Printer Name/File Name/ Start/ Duration/End/ Cost/Hourly Cost. All other info is inspectable in the "view" button.
 
 ### Removed
 

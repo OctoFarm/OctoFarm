@@ -6,7 +6,6 @@ const myCustomLabels = {
   nextPage: "next",
   prevPage: "prev",
   totalPages: "pageCount",
-  pagingCounter: "slNo",
   meta: "paginator"
 };
 
@@ -16,7 +15,7 @@ const defaultPaginationOptions = {
   sort: { "printHistory.historyIndex": -1 }
 };
 
-const sortOption = {
+const sortOptions = {
   index_asc: { "printHistory.historyIndex": -1 },
   index_desc: { "printHistory.historyIndex": 1 },
   printer_name_asc: { "printHistory.printerName": -1 },
@@ -45,5 +44,5 @@ const filterOptions = {
 module.exports = {
   myCustomLabels,
   defaultPaginationOptions,
-  sortOption
+  sortOptions
 };

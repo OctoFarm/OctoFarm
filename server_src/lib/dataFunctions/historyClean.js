@@ -446,12 +446,17 @@ class HistoryClean {
       printSummary.costPerHour = floatOrZero(
         parseFloat(printSummary.totalCost) / ((100 * parseFloat(printHistory.printTime)) / 360000)
       ).toFixed(2);
-
+      console.log(printHistory.printTime);
       printSummary.printHours = toTimeFormat(printHistory.printTime);
+      console.log(printSummary.printHours);
       historyArray.push(printSummary);
     }
     if (returnData) {
-      return { historyArray, statistics: this.generateStatistics(historyArray), pagination };
+      return {
+        historyClean: historyArray,
+        statisticsClean: this.generateStatistics(historyArray),
+        pagination
+      };
     } else {
       this.historyClean = historyArray;
       this.statisticsClean = this.generateStatistics();

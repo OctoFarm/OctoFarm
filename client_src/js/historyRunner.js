@@ -3,6 +3,8 @@ import UI from "./lib/functions/ui.js";
 import { returnDropDown } from "./services/filament-manager-plugin.service";
 import * as ApexCharts from "apexcharts";
 import OctoFarmClient from "./services/octofarm-client.service";
+import { HISTORY_CONSTANTS } from "./constants/history.constants";
+import { returnHistoryTableRow } from "./pages/history/history.templates";
 
 // Setup history listeners
 document.getElementById("historyTable").addEventListener("click", (e) => {
@@ -15,130 +17,156 @@ document.getElementById("historyTable").addEventListener("click", (e) => {
   e.preventDefault();
   History.edit(e);
 });
-let historyList = [];
+
 $("#historyModal").on("hidden.bs.modal", function (e) {
   document.getElementById("historySaveBtn").remove();
   document.getElementById("historyUpdateCostBtn").remove();
 });
 
 class History {
+  static drawHistoryTable(records) {
+    const historyTable = document.getElementById("historyTable");
+    historyTable.innerHTML = "";
+
+    if (records) {
+      for (let r = 0; r < records.length; r++) {
+        historyTable.insertAdjacentHTML("beforeend", returnHistoryTableRow(records[r]));
+      }
+    }
+  }
   static async get() {
-    historyList = await OctoFarmClient.get("history/get");
+    const { history, statisticsClean, pagination } = await OctoFarmClient.get(
+      `history/get?${HISTORY_CONSTANTS.currentPage}2&${HISTORY_CONSTANTS.perPage}25&${HISTORY_CONSTANTS.sort}index_asc`
+    );
+
+    console.log(history, statisticsClean, pagination);
+
     // jplist.init({
     //   storage: "localStorage", // 'localStorage', 'sessionStorage' or 'cookies'
+
     //   storageName: "history-sorting" // the same storage name can be used to share storage between multiple pages
     // });
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("wrapper").classList.remove("d-none");
-    document.getElementById("historyToolbar").classList.remove("d-none");
 
-    let historyStatistics = await OctoFarmClient.getHistoryStatistics();
-    let historyGraphData = historyStatistics.history.historyByDay;
+    // TODO: Load statistics
 
-    const historyGraphOptions = {
-      chart: {
-        type: "line",
-        width: "100%",
-        height: "250px",
-        animations: {
-          enabled: true
-        },
-        toolbar: {
-          show: false
-        },
-        zoom: {
-          enabled: false
-        },
-        background: "#303030"
-      },
-      colors: ["#00bc8c", "#e74c3c", "#f39c12"],
-      dataLabels: {
-        enabled: true,
-        background: {
-          enabled: true,
-          foreColor: "#000",
-          padding: 1,
-          borderRadius: 2,
-          borderWidth: 1,
-          borderColor: "#fff",
-          opacity: 0.9
-        }
-      },
-      // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
-      toolbar: {
-        show: false
-      },
-      stroke: {
-        width: 4,
-        curve: "smooth"
-      },
-      theme: {
-        mode: "dark"
-      },
-      noData: {
-        text: "Loading..."
-      },
-      series: [],
-      yaxis: [
-        {
-          title: {
-            text: "Count"
-          },
-          seriesName: "Success",
-          labels: {
-            formatter: function (val) {
-              if (val !== null) {
-                return val.toFixed(0);
-              }
-            }
-          }
-        },
-        {
-          title: {
-            text: "Count"
-          },
-          seriesName: "Success",
-          labels: {
-            formatter: function (val) {
-              if (val !== null) {
-                return val.toFixed(0);
-              }
-            }
-          },
-          show: false
-        },
-        {
-          title: {
-            text: "Count"
-          },
-          seriesName: "Success",
-          labels: {
-            formatter: function (val) {
-              if (val !== null) {
-                return val.toFixed(0);
-              }
-            }
-          },
-          show: false
-        }
-      ],
-      xaxis: {
-        type: "datetime",
-        tickAmount: 10,
-        labels: {
-          formatter: function (value, timestamp) {
-            let dae = new Date(timestamp);
-            return dae.toLocaleDateString(); // The formatter function overrides format property
-          }
-        }
-      }
-    };
-    let historyGraph = new ApexCharts(
-      document.querySelector("#printCompletionByDay"),
-      historyGraphOptions
-    );
-    historyGraph.render();
-    historyGraph.updateSeries(historyGraphData);
+    // TODO: Load graphs
+
+    // TODO: Load history filters
+
+    // TODO: Load history table...
+    this.drawHistoryTable(history);
+
+    // document.getElementById("loading").style.display = "none";
+    // document.getElementById("wrapper").classList.remove("d-none");
+    // document.getElementById("historyToolbar").classList.remove("d-none");
+    //
+    // let historyStatistics = await OctoFarmClient.getHistoryStatistics();
+    // let historyGraphData = historyStatistics.history.historyByDay;
+    //
+    // const historyGraphOptions = {
+    //   chart: {
+    //     type: "line",
+    //     width: "100%",
+    //     height: "250px",
+    //     animations: {
+    //       enabled: true
+    //     },
+    //     toolbar: {
+    //       show: false
+    //     },
+    //     zoom: {
+    //       enabled: false
+    //     },
+    //     background: "#303030"
+    //   },
+    //   colors: ["#00bc8c", "#e74c3c", "#f39c12"],
+    //   dataLabels: {
+    //     enabled: true,
+    //     background: {
+    //       enabled: true,
+    //       foreColor: "#000",
+    //       padding: 1,
+    //       borderRadius: 2,
+    //       borderWidth: 1,
+    //       borderColor: "#fff",
+    //       opacity: 0.9
+    //     }
+    //   },
+    //   // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+    //   toolbar: {
+    //     show: false
+    //   },
+    //   stroke: {
+    //     width: 4,
+    //     curve: "smooth"
+    //   },
+    //   theme: {
+    //     mode: "dark"
+    //   },
+    //   noData: {
+    //     text: "Loading..."
+    //   },
+    //   series: [],
+    //   yaxis: [
+    //     {
+    //       title: {
+    //         text: "Count"
+    //       },
+    //       seriesName: "Success",
+    //       labels: {
+    //         formatter: function (val) {
+    //           if (val !== null) {
+    //             return val.toFixed(0);
+    //           }
+    //         }
+    //       }
+    //     },
+    //     {
+    //       title: {
+    //         text: "Count"
+    //       },
+    //       seriesName: "Success",
+    //       labels: {
+    //         formatter: function (val) {
+    //           if (val !== null) {
+    //             return val.toFixed(0);
+    //           }
+    //         }
+    //       },
+    //       show: false
+    //     },
+    //     {
+    //       title: {
+    //         text: "Count"
+    //       },
+    //       seriesName: "Success",
+    //       labels: {
+    //         formatter: function (val) {
+    //           if (val !== null) {
+    //             return val.toFixed(0);
+    //           }
+    //         }
+    //       },
+    //       show: false
+    //     }
+    //   ],
+    //   xaxis: {
+    //     type: "datetime",
+    //     tickAmount: 10,
+    //     labels: {
+    //       formatter: function (value, timestamp) {
+    //         let dae = new Date(timestamp);
+    //         return dae.toLocaleDateString(); // The formatter function overrides format property
+    //       }
+    //     }
+    //   }
+    // };
+    // let historyGraph = new ApexCharts(
+    //   document.querySelector("#printCompletionByDay"),
+    //   historyGraphOptions
+    // );
+    // historyGraph.render();
+    // historyGraph.updateSeries(historyGraphData);
   }
 
   static async edit(e) {

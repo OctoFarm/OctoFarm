@@ -10,6 +10,7 @@ const Profiles = require("../models/Profiles.js");
 const ServerSettings = require("../models/ServerSettings.js");
 const { getHistoryCache } = require("../cache/history.cache");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
+const { sortOptions } = require("../constants/history-sort.constants");
 
 router.post("/update", ensureAuthenticated, async (req, res) => {
   // Check required fields
@@ -98,10 +99,26 @@ router.post("/delete", ensureAuthenticated, async (req, res) => {
   });
   res.send("success");
 });
+
 router.get("/get", ensureAuthenticated, async (req, res) => {
+  const findOptions = {};
+
+  const paginationOptions = req.query;
+
+  paginationOptions.sort = sortOptions[req.query.sort];
+
+  console.log(paginationOptions);
+
   const historyCache = getHistoryCache();
-  res.send({ history: historyCache.historyClean });
+
+  const { historyClean, statisticsClean, pagination } = await historyCache.initCache(
+    {},
+    paginationOptions
+  );
+
+  res.send({ history: historyClean, statisticsClean, pagination });
 });
+
 router.get("/statisticsData", ensureAuthenticated, async (req, res) => {
   const historyCache = getHistoryCache();
   const stats = historyCache.generateStatistics();
