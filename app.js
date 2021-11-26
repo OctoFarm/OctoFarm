@@ -18,7 +18,8 @@ if (!!majorVersion && majorVersion < 14) {
   const {
     setupEnvConfig,
     fetchMongoDBConnectionString,
-    fetchOctoFarmPort
+    fetchOctoFarmPort,
+    runMigrations
   } = require("./server_src/app-env");
 
   function bootAutoDiscovery() {
@@ -47,6 +48,9 @@ if (!!majorVersion && majorVersion < 14) {
       useFindAndModify: false,
       useCreateIndex: true,
       serverSelectionTimeoutMS: 2500
+    })
+    .then(async (mg) => {
+      await runMigrations(mg.connection.db, mg.connection.getClient());
     })
     .then(() => ensureSystemSettingsInitiated())
     .then(async () => {

@@ -71,7 +71,7 @@ async function ensureSystemSettingsInitiated() {
 
   // Setup Settings as connection is established
   const serverSettingsStatus = await ServerSettings.init();
-  await ClientSettings.init();
+  ClientSettings.init();
 
   return serverSettingsStatus;
 }
