@@ -33,9 +33,9 @@ import { removeLocalStorage } from "./services/local-storage.service";
 // Setup Page
 for (const key in serverDatabaseKeys) {
   if (serverDatabaseKeys.hasOwnProperty(key)) {
-    document
-      .getElementById(`nuke${serverDatabaseKeys[key]}`)
-      .addEventListener("click", async (e) => {
+    const element = document.getElementById(`nuke${serverDatabaseKeys[key]}`);
+    if (element) {
+      element.addEventListener("click", async (e) => {
         const alert = UI.createAlert(
           "warning",
           `${UI.returnSpinnerTemplate()} Deleting ${serverDatabaseKeys[key]} database...`
@@ -43,10 +43,13 @@ for (const key in serverDatabaseKeys) {
         await nukeDatabases(`${serverDatabaseKeys[key]}DB`, e);
         alert.close();
       });
+    }
+
     if (key !== "ALL") {
-      document
-        .getElementById(`export${serverDatabaseKeys[key]}`)
-        .addEventListener("click", async (e) => {
+      const element = document.getElementById(`export${serverDatabaseKeys[key]}`);
+
+      if (element) {
+        element.addEventListener("click", async (e) => {
           const alert = UI.createAlert(
             "warning",
             `${UI.returnSpinnerTemplate()} Preparing ${serverDatabaseKeys[key]} database...`
@@ -54,68 +57,98 @@ for (const key in serverDatabaseKeys) {
           await exportDatabases(`${serverDatabaseKeys[key]}DB`, e);
           alert.close();
         });
+      }
     }
   }
 }
 
-checkFilamentManagerPluginState().then();
-grabOctoFarmLogList().then();
-Script.get().then();
+if (serverActionsElements.LOG_DUMP_GENERATE) {
+  checkFilamentManagerPluginState().then();
+  grabOctoFarmLogList().then();
+  Script.get().then();
+}
+
 renderSystemCharts();
 startUpdatePageRunner();
 ClientSettings.init();
 
-serverActionsElements.OP_TIMELAPSE_SETUP.addEventListener("click", async (e) => {
-  bootbox.confirm(serverBootBoxOptions.OP_TIMELAPSE_SETUP);
-});
+if (serverActionsElements.OP_TIMELAPSE_SETUP) {
+  serverActionsElements.OP_TIMELAPSE_SETUP.addEventListener("click", async (e) => {
+    bootbox.confirm(serverBootBoxOptions.OP_TIMELAPSE_SETUP);
+  });
+}
 
-serverActionsElements.OP_FILAMENT_SETUP.addEventListener("click", async (e) => {
-  await setupOPFilamentManagerPluginSettings();
-});
+if (serverActionsElements.OP_FILAMENT_SETUP) {
+  serverActionsElements.OP_FILAMENT_SETUP.addEventListener("click", async (e) => {
+    await setupOPFilamentManagerPluginSettings();
+  });
+}
 
-serverActionsElements.LOG_DUMP_GENERATE.addEventListener("click", async (e) => {
-  const alert = UI.createAlert(
-    "warning",
-    `${UI.returnSpinnerTemplate()} Generating log dump, please wait...`
-  );
-  await generateLogDumpFile();
-  alert.close();
-});
+if (serverActionsElements.LOG_DUMP_GENERATE) {
+  serverActionsElements.LOG_DUMP_GENERATE.addEventListener("click", async (e) => {
+    const alert = UI.createAlert(
+      "warning",
+      `${UI.returnSpinnerTemplate()} Generating log dump, please wait...`
+    );
+    await generateLogDumpFile();
+    alert.close();
+  });
+}
 
-serverActionsElements.RESET_DASHBOARD.addEventListener("click", (e) => {
-  removeLocalStorage(localStorageKeys.DASHBOARD_SETTINGS);
-  UI.createAlert("success", "Dashboard data cleared from browser", 3000, "clicked");
-});
+if (serverActionsElements.RESET_DASHBOARD) {
+  serverActionsElements.RESET_DASHBOARD.addEventListener("click", (e) => {
+    removeLocalStorage(localStorageKeys.DASHBOARD_SETTINGS);
+    UI.createAlert("success", "Dashboard data cleared from browser", 3000, "clicked");
+  });
+}
 
-serverActionsElements.SAVE_SERVER_SETTINGS.addEventListener("click", async (e) => {
-  // Validate Printer Form, then Add
-  await updateServerSettings();
-});
-serverActionsElements.RESTART_OCTOFARM.addEventListener("click", async (e) => {
-  await restartOctoFarmServer();
-});
-serverActionsElements.UPDATE_OCTOFARM.addEventListener("click", async (e) => {
-  await updateOctoFarmCommand(false);
-});
-serverActionsElements.CHECK_OCTOFARM_UPDATES.addEventListener("click", async (e) => {
-  await checkForOctoFarmUpdates();
-});
-serverActionsElements.SAVE_CLIENT_SETTINGS.addEventListener("click", async (e) => {
-  // Validate Printer Form, then Add
-  await ClientSettings.update();
-});
+if (serverActionsElements.SAVE_SERVER_SETTINGS) {
+  serverActionsElements.SAVE_SERVER_SETTINGS.addEventListener("click", async (e) => {
+    // Validate Printer Form, then Add
+    await updateServerSettings();
+  });
+}
 
-// Setup user create btn
-userActionElements.createUserBtn.addEventListener("click", (e) => {
-  userActionElements.createUserFooter.innerHTML = `
+if (serverActionsElements.RESTART_OCTOFARM) {
+  serverActionsElements.RESTART_OCTOFARM.addEventListener("click", async (e) => {
+    await restartOctoFarmServer();
+  });
+}
+
+if (serverActionsElements.UPDATE_OCTOFARM) {
+  serverActionsElements.UPDATE_OCTOFARM.addEventListener("click", async (e) => {
+    await updateOctoFarmCommand(false);
+  });
+}
+
+if (serverActionsElements.CHECK_OCTOFARM_UPDATES) {
+  serverActionsElements.CHECK_OCTOFARM_UPDATES.addEventListener("click", async (e) => {
+    await checkForOctoFarmUpdates();
+  });
+}
+
+if (serverActionsElements.SAVE_CLIENT_SETTINGS) {
+  serverActionsElements.SAVE_CLIENT_SETTINGS.addEventListener("click", async (e) => {
+    // Validate Printer Form, then Add
+    await ClientSettings.update();
+  });
+}
+
+if (userActionElements.createUserBtn) {
+  // Setup user create btn
+  userActionElements.createUserBtn.addEventListener("click", (e) => {
+    userActionElements.createUserFooter.innerHTML = `
     ${returnSaveBtn()}
   `;
-  const userActionSave = document.getElementById("userActionSave");
-  userActionSave.addEventListener("click", async () => {
-    await createNewUser();
+    const userActionSave = document.getElementById("userActionSave");
+    userActionSave.addEventListener("click", async () => {
+      await createNewUser();
+    });
   });
-});
+}
 
+if (serverActionsElements.RESET_DASHBOARD) {
+}
 // Setup user password resets
 const passResetButtons = document.querySelectorAll('*[id^="resetPasswordBtn-"]');
 passResetButtons.forEach((btn) => {
@@ -131,6 +164,8 @@ passResetButtons.forEach((btn) => {
   });
 });
 
+if (serverActionsElements.RESET_DASHBOARD) {
+}
 // Setup user edits
 const userEditButtons = document.querySelectorAll('*[id^="editUserBtn-"]');
 userEditButtons.forEach((btn) => {
@@ -147,6 +182,8 @@ userEditButtons.forEach((btn) => {
   });
 });
 
+if (serverActionsElements.RESET_DASHBOARD) {
+}
 // Setup user deletes
 const deleteButtons = document.querySelectorAll('*[id^="deleteUserBtn-"]');
 deleteButtons.forEach((btn) => {

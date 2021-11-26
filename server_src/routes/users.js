@@ -161,6 +161,7 @@ router.post("/register", async (req, res) => {
                 })
                 .catch((err) => console.log(err))
                 .finally(async () => {
+                  await SettingsClean.start();
                   await fetchUsers(true);
                 });
             })
