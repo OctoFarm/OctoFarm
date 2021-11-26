@@ -110,7 +110,7 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
     logger.info("Initialising FarmInformation...");
     await PrinterClean.initFarmInformation();
 
-    await ClientSettings.init();
+    ClientSettings.init();
 
     const startUpTasks = [];
 
@@ -118,7 +118,7 @@ async function serveOctoFarmNormally(app, quick_boot = false) {
       const task = OctoFarmTasks.BOOT_TASKS[i];
       startUpTasks.push(TaskManager.registerJobOrTask(task));
     }
-
+    // TODO attempt to run in sequence
     const bootTasks = await Promise.allSettled(startUpTasks);
 
     console.log(bootTasks);

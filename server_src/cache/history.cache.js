@@ -1,5 +1,7 @@
 const { HistoryClean } = require("../lib/dataFunctions/historyClean");
 
+// TODO what an utterly pointless file... history clean is the cache you absolute melt! I know let's complicate shit and make two cache...
+
 let historyCleanState = new HistoryClean();
 
 function getHistoryCache() {

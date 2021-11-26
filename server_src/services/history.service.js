@@ -1,14 +1,18 @@
 "use strict";
 
 const historyModel = require("../models/History");
+const { myCustomLabels, defaultPaginationOptions } = require("../constants/history-sort.constants");
 
 /**
  * Finds the history rows in the database.
  * @param {any} input
+ * @param options
  */
-async function find(input) {
-  return historyModel.find(input, null, {
-    sort: { historyIndex: -1 }
+async function find(input, options = defaultPaginationOptions) {
+  //Merge in the custom labels used
+  options = { ...options, ...{ customLabels: myCustomLabels } };
+  return historyModel.paginate(input, options, function (err, result) {
+    return { itemList: result.docs, pagination: result.paginator };
   });
 }
 

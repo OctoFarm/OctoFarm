@@ -384,10 +384,15 @@ function startUpdateInfoRunner() {
 
     const currentProc = systemInformation?.currentProcess;
     const cpuLoad = systemInformation?.cpuLoad;
+
+    const currentCPULoad = document.getElementById("currentCPUUsage");
+    const currentMemoryLoad = document.getElementById("currentMemoryUsage");
+
     if (!!cpuLoad?.currentLoadSystem && !!cpuLoad?.currentLoadUser) {
       const systemLoad = cpuLoad.currentLoadSystem;
       const userLoad = cpuLoad.currentLoadUser;
       const octoLoad = !!currentProc?.cpuu ? currentProc.cpuu : 0;
+      currentCPULoad.innerHTML = octoLoad.toFixed(10) + "%";
       const remain = systemLoad + octoLoad + userLoad;
 
       // labels: ['System', 'OctoFarm', 'User', 'Free'],
@@ -395,6 +400,7 @@ function startUpdateInfoRunner() {
     }
 
     const memoryInfo = systemInformation?.memoryInfo;
+
     if (!!memoryInfo) {
       const systemUsedRAM = memoryInfo.used;
       const freeRAM = memoryInfo.free;
@@ -404,11 +410,12 @@ function startUpdateInfoRunner() {
         if (!currentProc.memRss || Number.isNaN(octoFarmRAM)) {
           octoFarmRAM = (memoryInfo.total / 100) * currentProc?.mem;
         }
-
         if (Number.isNaN(octoFarmRAM)) {
           // labels: ['System', 'OctoFarm', 'Free'],
           systemChartMemory.updateSeries([systemUsedRAM, 0, freeRAM]);
         } else {
+          currentMemoryLoad.innerHTML =
+            ((100 * currentProc?.mem) / memoryInfo.total).toFixed(10) + "%";
           systemChartMemory.updateSeries([systemUsedRAM, octoFarmRAM, freeRAM]);
         }
       } else {
@@ -417,7 +424,7 @@ function startUpdateInfoRunner() {
     } else {
       systemChartMemory.updateSeries([0, 0, 0]);
     }
-  }, 5000);
+  }, 15000);
 }
 function startUpdateTasksRunner() {
   setInterval(async function updateStatus() {

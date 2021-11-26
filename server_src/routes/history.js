@@ -115,7 +115,7 @@ router.post("/updateCostMatch", ensureAuthenticated, async (req, res) => {
   const historyEntity = await History.findOne({ _id: latest.id });
   const printers = await Printers.find({});
   const printer = _.findIndex(printers, function (o) {
-    return o.settingsApperance.name == historyEntity.printHistory.printerName;
+    return o.settingsAppearance.name == historyEntity.printHistory.printerName;
   });
   if (printer > -1) {
     historyEntity.printHistory.costSettings = printers[printer].costSettings;

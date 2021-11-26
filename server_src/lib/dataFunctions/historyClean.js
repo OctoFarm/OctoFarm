@@ -25,6 +25,7 @@ class HistoryClean {
   enableLogging = false;
   logger = logger;
   historyClean = [];
+  pagination = {};
   statisticsClean = getDefaultHistoryStatistics();
 
   constructor(enableFileLogging = false, logLevel = "warn") {
@@ -165,8 +166,6 @@ class HistoryClean {
   static processHistorySpools(historyCleanEntry, usageOverTime, totalByDay, historyByDay) {
     const spools = historyCleanEntry?.spools;
     const historyState = historyCleanEntry.state;
-    const timestampDiffDaysAgo = 90 * 24 * 60 * 60 * 1000;
-    let ninetyDaysAgo = new Date(Date.now() - timestampDiffDaysAgo);
 
     if (!!spools) {
       spools.forEach((spool) => {
@@ -185,7 +184,6 @@ class HistoryClean {
             } else if (historyState.includes("danger")) {
               searchKeyword = "Failed";
             } else {
-              // TODO why return? Not continue?
               return;
             }
             checkNestedIndexHistoryRates = checkNestedIndex(searchKeyword, historyByDay);
@@ -210,20 +208,18 @@ class HistoryClean {
               let dateString = `${parseInt(dateSplit[3])}-${month + 1}-${parseInt(dateSplit[2])}`;
               let dateParse = new Date(dateString);
               // Check if more than 90 days ago...
-              if (dateParse.getTime() > ninetyDaysAgo.getTime()) {
-                totalByDay[checkedIndex].data.push({
-                  x: dateParse,
-                  y: weightCalcSan
-                });
-                usageOverTime[checkedIndex].data.push({
-                  x: dateParse,
-                  y: weightCalcSan
-                });
-                historyByDay[checkNestedIndexHistoryRates].data.push({
-                  x: dateParse,
-                  y: 1
-                });
-              }
+              totalByDay[checkedIndex].data.push({
+                x: dateParse,
+                y: weightCalcSan
+              });
+              usageOverTime[checkedIndex].data.push({
+                x: dateParse,
+                y: weightCalcSan
+              });
+              historyByDay[checkNestedIndexHistoryRates].data.push({
+                x: dateParse,
+                y: 1
+              });
             }
           } else {
             if (spool[key].type !== "") {
@@ -264,7 +260,7 @@ class HistoryClean {
     };
   }
 
-  generateStatistics() {
+  generateStatistics(historyData) {
     let completedJobsCount = 0;
     let cancelledCount = 0;
     let failedCount = 0;
@@ -281,9 +277,15 @@ class HistoryClean {
     const totalByDay = [];
     const historyByDay = [];
 
-    for (let h = 0; h < this.historyClean.length; h++) {
+    let currentHistory = this.historyClean;
+
+    if (historyData) {
+      currentHistory = historyData;
+    }
+
+    for (let h = 0; h < currentHistory.length; h++) {
       const { printerCost, file, totalLength, state, printTime, printer, totalWeight, spoolCost } =
-        this.historyClean[h];
+        currentHistory[h];
 
       if (state.includes("success")) {
         completedJobsCount++;
@@ -302,12 +304,7 @@ class HistoryClean {
       }
       filamentCost.push(spoolCost);
 
-      HistoryClean.processHistorySpools(
-        this.historyClean[h],
-        usageOverTime,
-        totalByDay,
-        historyByDay
-      );
+      HistoryClean.processHistorySpools(currentHistory[h], usageOverTime, totalByDay, historyByDay);
     }
 
     // TODO huge refactor #2
@@ -386,13 +383,18 @@ class HistoryClean {
 
   /**
    * Set the initial state for the history cache
-   * @returns {Promise<void>}
+   * @returns {Promise<{historyArray: *[], pagination, statistics: {currentFailed: *, historyByDay: *[], usageOverTime: *[], totalPrinterCost, highestFilamentUsage: string, completed: number, failed: number, failedPercent: string, lowestFilamentUsage: string, printerLoad: string, totalFilamentUsage: string, totalSpoolCost, highestSpoolCost: string, completedPercent: string, longestPrintTime: string, printerMost: string, cancelledPercent: string, highestPrinterCost: string, shortestPrintTime: string, averageFilamentUsage: string, averagePrintTime: string, cancelled: number, mostPrintedFile: string, totalByDay: *[]}}>}
    */
-  async initCache() {
-    const storedHistory = await this.historyService.find({});
-    const historyEntities = storedHistory ?? [];
+  async initCache(findOptions = {}, paginationOptions = undefined) {
+    let returnData = false;
+    if (paginationOptions) {
+      returnData = true;
+    }
+
+    const { itemList, pagination } = await this.historyService.find(findOptions, paginationOptions);
+    const historyEntities = itemList ?? [];
     if (!historyEntities?.length) {
-      return;
+      return itemList;
     }
 
     const historyArray = [];
@@ -402,7 +404,6 @@ class HistoryClean {
       const printSummary = {
         _id: hist._id,
         index: printHistory.historyIndex,
-        // TODO success: printHistory.success, // Proposal to avoid parsing html again
         state: stateToHtml(printHistory.success, printHistory?.reason),
         printer: printHistory.printerName,
         file: this.historyService.getFileFromHistoricJob(printHistory),
@@ -449,9 +450,13 @@ class HistoryClean {
       printSummary.printHours = toTimeFormat(printHistory.printTime);
       historyArray.push(printSummary);
     }
-
-    this.historyClean = historyArray;
-    this.statisticsClean = this.generateStatistics();
+    if (returnData) {
+      return { historyArray, statistics: this.generateStatistics(historyArray), pagination };
+    } else {
+      this.historyClean = historyArray;
+      this.statisticsClean = this.generateStatistics();
+      this.pagination = pagination;
+    }
   }
 }
 

@@ -58,6 +58,7 @@
     "migrate-mongo": "^8.2.2",
     "mjpeg-decoder": "^1.0.3",
     "mongoose": "^5.12.9",
+    "mongoose-paginate-v2": "^1.4.2",
     "multer": "^1.4.2",
     "node-fetch": "^2.6.1",
     "node-input-validator": "^4.4.1",

@@ -36,6 +36,7 @@ All notable changes to this project will be documented in this file.
   - Added Another new view named "Group". Group view will organise your printers by their common groupings. This view is great for fire and forget type farms.
   - Added a quick setup button for Filament Manager Plugin. This will run through all online instances and set the up with the database settings you provide.
   - Filament manager can now clone spools. Pressing the button will insert a new row defaulting to 1000g and 0g usage. The name will be incremented with (#).
+  - System manager can now view the running OctoFarm tasks.
 
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2
@@ -92,6 +93,7 @@ All notable changes to this project will be documented in this file.
     - Without filament manager plugin this will be a multi-select option. You can CTRL + Click to select mutliple, or normal left click to select a single. 
     - With filament manager plugin this will be a single dropdown menu only allowing to select a single spool as per the plugins requirements. 
   - Printers with selected spools are now disabled from selection without filament manager plugin.
+  - System information now shows OctoFarms usage as a pure value rather than just on the donut charts.
 
 ### Removed
 

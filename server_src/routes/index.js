@@ -102,8 +102,8 @@ router.get("/filemanager", ensureAuthenticated, ensureCurrentUserAndGroup, async
 router.get("/history", ensureAuthenticated, ensureCurrentUserAndGroup, async (req, res) => {
   const printers = Runner.returnFarmPrinters();
   const historyCache = getHistoryCache();
-  const history = historyCache.historyClean;
-  const statistics = historyCache.statisticsClean;
+  const { historyClean, statisticsClean, pagination } = historyCache;
+
   const serverSettings = SettingsClean.returnSystemSettings();
 
   res.render("history", {
@@ -111,8 +111,9 @@ router.get("/history", ensureAuthenticated, ensureCurrentUserAndGroup, async (re
     userGroup: req.user.group,
     version,
     printerCount: printers.length,
-    history,
-    printStatistics: statistics,
+    history: historyClean,
+    printStatistics: statisticsClean,
+    pagination: pagination,
     helpers: prettyHelpers,
     page: "History",
     serverSettings,

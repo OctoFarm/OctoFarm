@@ -24,10 +24,10 @@ $("#historyModal").on("hidden.bs.modal", function (e) {
 class History {
   static async get() {
     historyList = await OctoFarmClient.get("history/get");
-    jplist.init({
-      storage: "localStorage", // 'localStorage', 'sessionStorage' or 'cookies'
-      storageName: "history-sorting" // the same storage name can be used to share storage between multiple pages
-    });
+    // jplist.init({
+    //   storage: "localStorage", // 'localStorage', 'sessionStorage' or 'cookies'
+    //   storageName: "history-sorting" // the same storage name can be used to share storage between multiple pages
+    // });
     document.getElementById("loading").style.display = "none";
     document.getElementById("wrapper").classList.remove("d-none");
     document.getElementById("historyToolbar").classList.remove("d-none");
@@ -506,10 +506,11 @@ class History {
             };
             const post = await OctoFarmClient.post("history/delete", histID);
             if (post) {
-              jplist.resetContent(function () {
-                // remove element with id = el1
-                e.target.parentElement.parentElement.parentElement.remove();
-              });
+              e.target.parentElement.parentElement.parentElement.remove();
+              // jplist.resetContent(function () {
+              //   // remove element with id = el1
+              //
+              // });
               UI.createAlert("success", "Your history entry has been deleted...", 3000, "clicked");
             } else {
               UI.createAlert(
@@ -599,13 +600,14 @@ class History {
     document.getElementById("averageCostPerHour").innerHTML = avgHourCost.toFixed(2);
   }
 }
-const element = document.getElementById("listenerHistory");
-element.addEventListener(
-  "jplist.state",
-  (e) => {
-    // the elements list after filtering + pagination
-    History.updateTotals(e.jplistState.filtered);
-  },
-  false
-);
+// const element = document.getElementById("listenerHistory");
+// element.addEventListener(
+//   "jplist.state",
+//   (e) => {
+//     // the elements list after filtering + pagination
+//     console.log(e.jplistState.paginationOptions);
+//     History.updateTotals(e.jplistState.filtered);
+//   },
+//   false
+// );
 History.get();
