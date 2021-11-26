@@ -135,8 +135,6 @@ router.get("/mon/panel", ensureAuthenticated, ensureCurrentUserAndGroup, async (
     printGroups = [];
   }
 
-  console.log("GOING TO CLIENT", req.user.clientSettings);
-
   res.render("panelView", {
     name: req.user.name,
     userGroup: req.user.group,
