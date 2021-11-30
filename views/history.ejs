@@ -1,9 +1,46 @@
 <% if(typeof history.length != 'undefined' && history.length > 0 ) {%>
-  <% let historyTotals = helpers.historyTotals(history); %>
 
+<div class="row mt-3 mx-2">
+  <div class="col-md-3">
+    <div class="bg-dark rounded p-2 row">
+      <div class="col-lg-2">
+        <h3 id="totalSparkLast" class="text-info">#</h3>
+        <h4 class="text-info">Total</h4>
+      </div>
+      <div id="totalSpark" class="col-lg-10 text-right"></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="bg-dark rounded p-2 row">
+      <div class="col-lg-4">
+        <h3 id="successSparkLast" class="text-success">#</h3>
+        <h4 class="text-success">Completed</h4>
+      </div>
+      <div id="successSpark" class="col-lg-8 text-right"></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="bg-dark rounded p-2 row">
+      <div class="col-lg-4">
+        <h3 id="cancelledSparkLast" class="text-warning">#</h3>
+        <h4 class="text-warning">Cancelled</h4>
+      </div>
+      <div id="cancelledSpark" class="col-lg-8 text-right"></div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="bg-dark rounded p-2 row">
+      <div class="col-lg-2">
+        <h3 id="failedSparkLast" class="text-danger">#</h3>
+        <h4 class="text-danger">Failed</h4>
+      </div>
+      <div id="failedSpark" class="col-lg-10 text-right"></div>
+    </div>
+  </div>
+</div>
 
 <div class="row">
-  <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
+  <div id="dashboardInfo" class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 mb-2 mb-2">
     <div class="card text-white bg-dark h-100">
       <div class="card-header dashHeader p-0">
         <button
@@ -13,114 +50,138 @@
                 aria-expanded="false"
                 disabled
         >
-          <i class="fas fa-chart-bar"></i> History Statistics
+          <i class="fas fa-chart-bar"></i> Statistics
         </button>
-
-
       </div>
-      <div id="history" class="card-body pt-2 pb-0 text-center">
-
+      <div class="card-body pt-2 pb-0 text-center">
+        <button
+                title="View statistics for the currently selected period"
+                type="button"
+                class="btn btn-success mb-2"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#currentStatistics"
+        >
+          <i class="fas fa-chart-pie"></i> Statistics
+        </button><br>
+        <button
+                title="View statistics for the past grouped by month"
+                type="button"
+                class="btn btn-info mb-2"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#historicalStatistics"
+        >
+          <i class="fas fa-history"></i> Monthly Statistics
+        </button>
       </div>
+
     </div>
   </div>
-</div>
-<div class="row d-none">
-  <div class="col-lg-12">
-    <div class="card text-white bg-dark ">
+  <div id="dashboardInfo" class="col-10 col-sm-10 col-md-10 col-lg-10 col-xl-10 mb-2">
+    <div class="card text-white bg-dark h-100">
       <div class="card-header dashHeader p-0">
         <button
                 type="button"
-                class="btn btn-secondary d-block ml-1 mr-1 p-1 float-left"
+                class="btn btn-secondary d-block ml-1 mr-1 p-1"
                 href="#"
                 aria-expanded="false"
                 disabled
         >
-          <i class="fas fa-star-half-alt"></i> Print Completion By Day
+          <i class="fas fa-filter"></i> Filters
         </button>
 
 
-
       </div>
-      <div class="card-body pb-0 text-center">
-        <div id="printCompletionByDay">
+      <div class="card-body pt-1 pb-0 text-center">
+        <div class="row">
+          <div class="col-lg-2 text-center">
+            <div class="row">
+              <div class="col-lg-12">
+                <h5>Sorting</h5><hr>
+                <div class="input-group mt-1 d-inline-flex">
+                  <div class="input-group-prepend">
+                    <label class="input-group-text" for="sortHistoryTable">Sort By: </label>
+                  </div>
+                  <select class="custom-select" id="sortHistoryTable">
+                    <option             value="startDateAsc"
+                                        data-path=".start"
+                                        data-order="desc"
+                                        data-type="datetime">Start Date (&uarr;)</option>
+                    <option             value="startDateDesc"
+                                        data-path=".start"
+                                        data-order="asc"
+                                        data-type="datetime">Start Date (&darr;)</option>
+                    <option             value="endDateAsc"
+                                        data-path=".end"
+                                        data-order="desc"
+                                        data-type="datetime">End Date (&uarr;)</option>
+                    <option             selected value="endDateDesc"
+                                        data-path=".end"
+                                        data-order="asc"
+                                        data-type="datetime">End Date (&darr;)</option>
+                    <option             value="durationAsc"
+                                        data-path=".end"
+                                        data-order="desc"
+                                        data-type="datetime">Duration (&uarr;)</option>
+                    <option             selected value="durationDesc"
+                                        data-path=".end"
+                                        data-order="asc"
+                                        data-type="datetime">Duration (&darr;)</option>
+                    <option             value="printNameAsc"
+                                        data-path=".printer"
+                                        data-order="asc"
+                                        data-type="text">Printer Name (&uarr;)</option>
+                    <option             value="printNameDesc"
+                                        data-path=".printer"
+                                        data-order="desc"
+                                        data-type="text">Printer Name (&darr;)</option>
+                    <option             value="fileNameAsc"
+                                        data-path=".file"
+                                        data-order="asc"
+                                        data-type="text">File Name (&uarr;)</option>
+                    <option             value="fileNameDesc"
+                                        data-path=".file"
+                                        data-order="desc"
+                                        data-type="text">File Name (&darr;)</option>
+                    <option             value="11"
+                                        disabled
+                                        data-path=".cost"
+                                        data-order="asc"
+                                        data-type="number">Cost (&uarr;)</option>
+                    <option             value="12"
+                                        disabled
+                                        data-path=".cost"
+                                        data-order="desc"
+                                        data-type="number">Cost (&darr;)</option>
+                    <option             value="13"
+                                        disabled
+                                        data-path=".usage"
+                                        data-order="asc"
+                                        data-type="number">Usage (&uarr;)</option>
+                    <option             value="14"
+                                        disabled
+                                        data-path=".usage"
+                                        data-order="desc"
+                                        data-type="number">Usage (&darr;)</option>
 
-        </div>
-      </div>
-    </div>
-</div>
-  <div class="col-lg-6 d-none">
-    <div class="card text-white bg-dark">
-      <div class="card-header dashHeader p-0">
-        <button
-                type="button"
-                class="btn btn-secondary d-block ml-1 mr-1 p-1 float-left"
-                href="#"
-                aria-expanded="false"
-                disabled
-        >
-          <i class="fas fa-star-half-alt"></i> Print Completion Over Time
-        </button>
-
-
-
-      </div>
-      <div class="card-body pb-0 text-center">
-        <div id="printCompletionOverTime"></div>
-      </div>
-    </div>
-  </div>
-</div>
-<div class="row d-none">
-    <div id="dashboardInfo" class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 mb-2">
-      <div class="card text-white bg-dark h-100">
-        <div class="card-header dashHeader p-0">
-          <button
-                  type="button"
-                  class="btn btn-secondary d-block ml-1 mr-1 p-1"
-                  href="#"
-                  aria-expanded="false"
-                  disabled
-          >
-            <i class="fas fa-chart-bar"></i> History Filters
-          </button>
-
-
-        </div>
-        <div class="card-body pt-2 pb-0 text-center">
-          <div class="row d-none" id="historyToolbar">
-            <div class="col-12">
-              <nav
-                      id="listenerHistory">
-
-                <!-- first and previous buttons -->
-                <div class="btn-group pagination d-inline-flex" role="group" aria-label="Basic example">
-                  <button id="hFirstPageBtn" type="button" class="btn btn-secondary" data-type="first" disabled>First</button>
-                  <button id="hPreviousPageBtn"  type="button" class="btn btn-secondary" data-type="prev" disabled>Previous</button>
+                  </select>
                 </div>
+              </div>
 
-
-                <div class="btn-group pagination d-inline-flex" data-type="pages">
-
-                    <% for(let page = 1; page <= pagination.pageCount; page++){%>
-                        <% if(page === 1){%>
-                          <button id="h-page-<%= page %>" type="button" class="btn btn-secondary active" data-type="page"><%= page %></button>
-                        <% }else {%>
-                              <button id="h-page-<%= page %>" type="button" class="btn btn-secondary" data-type="page"><%= page %></button>
-                        <%  } %>
-                    <% } %>
-
-
-
-
+            </div>
+          </div>
+          <div class="col-lg-10">
+            <div class="row">
+              <div class="col-lg-3 bg-dark text-center" id="historyRange">
+                <h5>Range</h5><hr>
+                <div class="input-group mb-1 d-inline-flex">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Date Range</span>
+                  </div>
+                  <input id="historyDateRange"  class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
                 </div>
-
-                <div class="btn-group pagination d-inline-flex" role="group" aria-label="Basic example">
-                  <button id="hNextPageBtn" type="button" class="btn btn-secondary" data-type="next">Next</button>
-                  <button id="hLastPageBtn" type="button" class="btn btn-secondary" data-type="lase">Last</button>
-                </div>
-
-                <!-- items per page dropdown -->
-                <div class="input-group mb-3 d-inline-flex w-25">
+                <div class="input-group mb-1 d-inline-flex">
                   <div class="input-group-prepend">
                     <label class="input-group-text" for="inputGroupSelect01">Items per page: </label>
                   </div>
@@ -129,426 +190,206 @@
                     <option value="50">50</option>
                     <option value="75">75</option>
                     <option value="100">100</option>
-                    <option value="0">All</option>
+                    <option value="<%= Number.MAX_SAFE_INTEGER %>">All</option>
                   </select>
                 </div>
+              </div>
+              <div class="col-lg-3 bg-dark text-center" id="historyFileFilters">
+                <h5>File</h5><hr>
+                <div class="input-group mb-1 d-inline-flex">
+                  <div class="input-group-prepend">
+                    <label class="input-group-text" for="historyFileNames">Names: </label>
+                  </div>
+                  <select class="custom-select" id="historyFileNames"
+                          data-jplist-control="select-filter"
+                          data-group="history"
+                          data-name="fileNames"
+                  >
+                    <option selected
+                            href="#"
+                            data-value="0"
+                            data-path="default"
+                    >Filter</option>
 
-                <!-- information labels -->
-                <span data-type="info" id="historyPageOf" class="badge badge-secondary ml-3 p-2">
-                  Page 1 of <%= pagination.pageCount %>
-            </span>
-
-              </nav>
-            </div>
-            <div class="col-12 col-md-6 col-lg-3">
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="inputGroupSelect01">Default Sort: </label>
+                  </select>
                 </div>
-                <select class="custom-select" id="inputGroupSelect01"
-                        data-jplist-control="select-sort"
-                        data-group="history"
-                        data-name="default-sort"
-                        data-id="default-sort"
-                >
-                  <option
-                          value="0"
-                          data-path="default">Sort by</option>
-                  <option             value="1"
-                                      data-path=".index"
-                                      data-order="asc"
-                                      data-type="number">Index (&uarr;)</option>
-                  <option             value="2"
-                                      data-path=".index"
-                                      data-order="desc"
-                                      data-type="number">Index (&darr;)</option>
-                  <option             value="3"
-                                      data-path=".printer"
-                                      data-order="asc"
-                                      data-type="text">Printer Name (&uarr;)</option>
-                  <option             value="4"
-                                      data-path=".printer"
-                                      data-order="desc"
-                                      data-type="text">Printer Name (&darr;)</option>
-                  <option             value="5"
-                                      data-path=".file"
-                                      data-order="asc"
-                                      data-type="text">File Name (&uarr;)</option>
-                  <option             value="6"
-                                      data-path=".file"
-                                      data-order="desc"
-                                      data-type="text">File Name (&darr;)</option>
-                  <option             value="7"
-                                      data-path=".start"
-                                      data-order="desc"
-                                      data-type="datetime">Start Date (&uarr;)</option>
-                  <option             value="8"
-                                      data-path=".start"
-                                      data-order="asc"
-                                      data-type="datetime">Start Date (&darr;)</option>
-                  <option             value="9"
-                                      data-path=".end"
-                                      data-order="desc"
-                                      data-type="datetime">End Date (&uarr;)</option>
-                  <option             value="10"
-                                      data-path=".end"
-                                      data-order="asc"
-                                      data-type="datetime">End Date (&darr;)</option>
-                  <option             value="11"
-                                      data-path=".cost"
-                                      data-order="asc"
-                                      data-type="number">Cost (&uarr;)</option>
-                  <option             value="12"
-                                      data-path=".cost"
-                                      data-order="desc"
-                                      data-type="number">Cost (&darr;)</option>
-                  <option             value="13"
-                                      data-path=".usage"
-                                      data-order="asc"
-                                      data-type="number">Usage (&uarr;)</option>
-                  <option             value="14"
-                                      data-path=".usage"
-                                      data-order="desc"
-                                      data-type="number">Usage (&darr;)</option>
+                <div class="input-group mb-1 d-inline-flex">
+                  <div class="input-group-prepend">
+                    <label class="input-group-text" for="historyFilePaths">Paths: </label>
+                  </div>
+                  <select class="custom-select" id="historyFilePaths"
+                          data-jplist-control="select-filter"
+                          data-group="history"
+                          data-name="pathName"
+                  >
+                    <option selected
+                            href="#"
+                            data-value="0"
+                            data-path="default"
+                    >Filter</option>
 
-                </select>
+                  </select>
+                </div>
+              </div>
+              <div class="col-lg-3 bg-dark text-center" id="historySpoolFilters">
+                <h5>Spool</h5><hr>
+                <div class="input-group mb-1 d-inline-flex">
+                  <div class="input-group-prepend">
+                    <label class="input-group-text" for="historySpoolManu">Manufacturer: </label>
+                  </div>
+                  <select class="custom-select" id="historySpoolManu"
+                          data-jplist-control="select-filter"
+                          data-group="history"
+                          data-name="fileNames"
+                  >
+                    <option selected
+                            href="#"
+                            data-value="0"
+                            data-path="default"
+                    >Filter</option>
+
+                  </select>
+                </div>
+                <div class="input-group mb-1 d-inline-flex">
+                  <div class="input-group-prepend">
+                    <label class="input-group-text" for="historySpoolMat">Material: </label>
+                  </div>
+                  <select class="custom-select" id="historySpoolMat"
+                          data-jplist-control="select-filter"
+                          data-group="history"
+                          data-name="fileNames"
+                  >
+                    <option selected
+                            href="#"
+                            data-value="0"
+                            data-path="default"
+                    >Filter</option>
+
+                  </select>
+                </div>
+              </div>
+              <div class="col-lg-3 bg-dark text-center" id="historySearch">
+                <h5>Search</h5><hr>
+                <div class="input-group mb-1 d-inline-flex">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">File Search</span>
+                  </div>
+                  <input id="historyFileSearch" type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1"
+                         data-jplist-control="textbox-filter"
+                         data-group="history"
+                         data-name="fileNameSearch"
+                         data-path=".file"
+                         type="text"
+                         value=""
+                         placeholder="Search...">
+                </div>
+                <div class="input-group mb-3">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="basic-addon1">Spool Search</span>
+                  </div>
+                  <input id="historySpoolSearch" type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1"
+                         data-jplist-control="textbox-filter"
+                         data-group="history"
+                         data-name="fileNameSearch"
+                         data-path=".spool"
+                         type="text"
+                         value=""
+                         placeholder="Search...">
+                </div>
               </div>
             </div>
-            <div class="col-12 col-md-6 col-lg-3">
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="inputGroupSelect01">Printer Name: </label>
-                </div>
-                <select class="custom-select" id="inputGroupSelect01"
-                        data-jplist-control="select-filter"
-                        data-group="history"
-                        data-name="printerNames"
-                >
-                  <option selected
-                          href="#"
-                          data-value="0"
-                          data-path="default"
-                  >Filter</option>
-                  <% historyTotals.printerNames.forEach(printer => { %>
-                    <% const printerEncode = printer.replace(/[^a-zA-Z0-9]/g, "_") %>
-                    <option href="#"
-                            data-path=".<%= printerEncode %>"><%= printer.replace(/_/g, " ") %></option>
-                  <%  }) %>
-
-                </select>
-              </div>
-            </div>
-            <div class="col-12 col-md-6 col-lg-3">
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="inputGroupSelect01">Spool Type: </label>
-                </div>
-                <select class="custom-select" id="inputGroupSelect01"
-                        data-jplist-control="select-filter"
-                        data-group="history"
-                        data-name="spoolName"
-                >
-                  <option selected
-                          href="#"
-                          data-value="0"
-                          data-path="default"
-                  >Filter</option>
-                  <% historyTotals.spools.forEach(spool => { %>
-                    <option href="#"
-                            data-path=".<%= spool %>"><%= spool.replace(/_/g, " ") %></option>
-                  <%  }) %>
-
-                </select>
-              </div>
-            </div>
-            <div class="col-12 col-md-6 col-lg-3">
-              <!--Filament Search-->
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="basic-addon1">Spool Search</span>
-                </div>
-                <input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1"
-                       data-jplist-control="textbox-filter"
-                       data-group="history"
-                       data-name="fileNameSearch"
-                       data-path=".spool"
-                       type="text"
-                       value=""
-                       placeholder="Search...">
-              </div>
-
-            </div>
-            <div class="col-12 col-md-6 col-lg-3">
-              <!--File Name Search-->
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <span class="input-group-text" id="basic-addon1">File Name Search</span>
-                </div>
-                <input type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1"
-                       data-jplist-control="textbox-filter"
-                       data-group="history"
-                       data-name="fileNameSearch"
-                       data-path=".file"
-                       type="text"
-                       value=""
-                       placeholder="Search...">
-              </div>
-            </div>
-            <div class="col-12 col-md-6 col-lg-3">
-              <!--Path Filter-->
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="inputGroupSelect01">File Path: </label>
-                </div>
-                <select class="custom-select" id="inputGroupSelect01"
-                        data-jplist-control="select-filter"
-                        data-group="history"
-                        data-name="pathName"
-                >
-                  <option selected
-                          href="#"
-                          data-value="0"
-                          data-path="default"
-                  >Filter</option>
-                  <% historyTotals.pathList.forEach(path => { %>
-                    <option href="#"
-                            data-path=".<%= path.replace(/\//g, "_") %>"><%= path %></option>
-                  <%  }) %>
-
-                </select>
-              </div>
-            </div>
-            <div class="col-12 col-md-6 col-lg-3">
-              <div class="input-group mb-3">
-                <div class="input-group-prepend">
-                  <label class="input-group-text" for="inputGroupSelect01">File Name: </label>
-                </div>
-                <select class="custom-select" id="inputGroupSelect01"
-                        data-jplist-control="select-filter"
-                        data-group="history"
-                        data-name="fileNames"
-                >
-                  <option selected
-                          href="#"
-                          data-value="0"
-                          data-path="default"
-                  >Filter</option>
-                  <% historyTotals.fileNames.forEach(file => { %>
-                    <% const fileEnconde = file.replace(/[^a-zA-Z0-9]/g, "_") %>
-                    <option href="#"
-                            data-path=".<%= fileEnconde + "_gcode" %>"><%= file.replace(/_/g, " ") %></option>
-                  <%  }) %>
-
-                </select>
-              </div>
-            </div>
-            <div class="col-12 col-md-6 col-lg-3">
-              <!--Date Range Possibly-->
-            </div>
-            <div class="col-lg-12 table-responsive-sm table-responsive-md">
-
-              <table class="table-hover table table-dark text-center">
-                <thead>
-                <tr>
-                  <th class="table-dark" scope="col" width="350px">Status</th>
-                  <th class="table-dark" scope="col">Print Time Total</th>
-                  <th class="table-dark" scope="col">Filament Usage Total</th>
-                  <th class="table-dark" scope="col">Filament Cost Total</th>
-                  <th class="table-dark" scope="col">Printer Cost Total</th>
-                  <th class="table-dark" scope="col">Combined Total</th>
-                  <th class="table-dark" scope="col">Average Cost Per Hour</th>
-                </tr>
-                </thead>
-                <tbody id="historyTableTotals">
-                <tr>
-                  <th class="table-dark" scope="col">
-                    <div class="progress mb-0">
-                      <div
-                              id="totalSuccessPercent"
-                              class="progress-bar progress-bar-striped bg-success"
-                              role="progressbar"
-                              style="width: 0%"
-                              aria-valuenow="0%"
-                              aria-valuemin="0"
-                              aria-valuemax="100"
-                      >
-
-                      </div>
-                      <div
-                              id="totalCancelledPercent"
-                              class="progress-bar progress-bar-striped bg-warning"
-                              role="progressbar"
-                              style="width: 0%"
-                              aria-valuenow="0%"
-                              aria-valuemin="0"
-                              aria-valuemax="100"
-                      >
-                        0%
-                      </div>
-                      <div
-                              id="totalFailurePercent"
-                              class="progress-bar progress-bar-striped bg-danger"
-                              role="progressbar"
-                              style="width: <%= printStatistics.failedPercent %>% "
-                              aria-valuenow="0%"
-                              aria-valuemin="0"
-                              aria-valuemax="100"
-                      >
-                        0%
-                      </div>
-                    </div>
-
-
-                  </th>
-                  <th id="totalPrintTime" class="table-dark" scope="col"></th>
-                  <th id="totalFilament" class="table-dark" scope="col"></th>
-                  <th id="totalCost" class="table-dark" scope="col"></th>
-                  <th id="printerTotalCost" class="table-dark" scope="col"></th>
-                  <th id="combinedTotalCost" class="table-dark" scope="col"></th>
-                  <th id="averageCostPerHour" class="table-dark" scope="col"></th>
-                </tr>
-                </tbody>
-
-              </table>
-            </div>
-
           </div>
-          <div class="row">
-            <div class="col-12"><p id="loading">Loading...</p></div>
-          </div>
+
         </div>
       </div>
     </div>
   </div>
+</div>
+<div class="card">
+  <div class="row" id="historyPagination">
+
+  </div>
+</div>
+<div class="row pb-0">
+  <div class="col-lg-12 table-responsive-sm table-responsive-md">
+    <table class="table-hover table table-dark text-center mb-0">
+      <thead>
+      <tr>
+        <th class="table-dark" scope="col" width="350px">Status</th>
+        <th class="table-dark" scope="col">Print Time Total</th>
+        <th class="table-dark" scope="col">Filament Usage Total</th>
+        <th class="table-dark" scope="col">Filament Cost Total</th>
+        <th class="table-dark" scope="col">Printer Cost Total</th>
+        <th class="table-dark" scope="col">Combined Total</th>
+        <th class="table-dark" scope="col">Average Cost Per Hour</th>
+      </tr>
+      </thead>
+      <tbody id="historyTableTotals">
+      <tr>
+        <th class="table-dark" scope="col">
+          <div class="progress mb-0">
+            <div
+                    id="totalSuccessPercent"
+                    class="progress-bar progress-bar-striped bg-success"
+                    role="progressbar"
+                    style="width: 0%"
+                    aria-valuenow="0%"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+            >
+            </div>
+            <div
+                    id="totalCancelledPercent"
+                    class="progress-bar progress-bar-striped bg-warning"
+                    role="progressbar"
+                    style="width: 0%"
+                    aria-valuenow="0%"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+            >
+              0%
+            </div>
+            <div
+                    id="totalFailurePercent"
+                    class="progress-bar progress-bar-striped bg-danger"
+                    role="progressbar"
+                    style="0"
+                    aria-valuenow="0%"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+            >
+              0%
+            </div>
+          </div>
+        </th>
+        <th id="totalPrintTime" class="table-dark" scope="col"></th>
+        <th id="totalFilament" class="table-dark" scope="col"></th>
+        <th id="totalCost" class="table-dark" scope="col"></th>
+        <th id="printerTotalCost" class="table-dark" scope="col"></th>
+        <th id="combinedTotalCost" class="table-dark" scope="col"></th>
+        <th id="averageCostPerHour" class="table-dark" scope="col"></th>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
 <div class="row">
-  <div id="wrapper" class="col-lg-12 table-responsive-sm table-responsive-md">
+  <div id="wrapper" class="col-lg-12 table-responsive-sm table-responsive-md pt-0">
     <table id="historyTableTop" class="table table-dark text-center">
       <thead>
-        <tr>
-          <th class="table-dark sticky-table table-dark" scope="col">State</th>
-          <th class="table-dark sticky-table table-dark" scope="col">Printer</th>
-          <th class="table-dark sticky-table table-dark" scope="col">File Name</th>
-          <th class="table-dark sticky-table table-dark" scope="col">Start Date</th>
-          <th class="table-dark sticky-table table-dark" scope="col">Duration</th>
-          <th class="table-dark sticky-table table-dark" scope="col">End Date</th>
-          <th class="table-dark sticky-table table-dark" scope="col">Total/Hourly Cost</th>
-          <th class="sticky-table table-dark" scope="col">Actions</th>
-        </tr>
+      <tr>
+        <th class="table-dark sticky-table table-dark" scope="col">State</th>
+        <th class="table-dark sticky-table table-dark" scope="col">Printer</th>
+        <th class="table-dark sticky-table table-dark" scope="col">File Name</th>
+        <th class="table-dark sticky-table table-dark" scope="col">Start Date</th>
+        <th class="table-dark sticky-table table-dark" scope="col">Duration</th>
+        <th class="table-dark sticky-table table-dark" scope="col">End Date</th>
+        <th class="table-dark sticky-table table-dark" scope="col">Total/Hourly Cost</th>
+        <th class="sticky-table table-dark" scope="col">Actions</th>
+      </tr>
       </thead>
       <tbody id="historyTable">
-      <% for(let i = 0; i < history.length; i++){ %>
-        <tr data-jplist-item>
-          <td class="index">
-            <%= history[i].index %>
-          </td>
-          <td>
-            <%- history[i].state %>
-          </td>
-          <td class="printer <%= history[i].printer.replace(/[^a-zA-Z0-9]/g, "_") %>"><%=
-              history[i].printer %>
-          </td>
-          <% let path = history[i].file.path.substring(0, history[i].file.path.lastIndexOf("/"))%>
-          <td title="<%= path %>" class="file <%= history[i].file.name.replace(/[^a-zA-Z0-9]/g, "_") %> <%= path.replace(/\//g, "_") %>" class="text-wrap">
-            <%= history[i].file.name.replace(/_/g," ") %>
-          </td>
-          <td class="start">
-            <%= history[i].startDate %>
-          </td>
-          <td class="end">
-            <%= history[i].endDate %>
-          </td>
-          <td>
-            <span class="d-none time"><%= history[i].printTime %></span>
-            <span><%= helpers.generateTime(history[i].printTime) %></span>
-            <br><code><%= history[i].printHours %></code>
-          </td>
-          <td class="printerCost" id="printerCost-<%= history[i]._id %>">
-            <%= history[i].printerCost %>
-          </td>
-          <% let spoolTypes = "" %>
-          <% if(history[i].spools !== null){ %>
-            <% history[i].spools.forEach((spool,index) => { %>
-              <% spoolTypes += spool[Object.keys(spool)[0]].type+" " %>
-            <% })%>
-          <% } %>
-          <td class="spool <%= spoolTypes %>" id="spool-<%= history[i]._id %>">
-            <% if(history[i].spools !== null){ %>
-              <% history[i].spools.forEach((spool,index) => { %>
-              <%if(spool[Object.keys(spool)[0]].spoolName !== null){%>
-                <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p><%= spool[Object.keys(spool)[0]].spoolName %></p>
-              <%}else{%>
-                <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p>(No Spool)</p>
-              <%}%>
-              <% })%>
-            <% } %>
-          </td>
-          <td >
-            <span class="usage" id="usage-<%= history[i]._id %>">
-              <% if(history[i].spools !== null){ %>
-                <% history[i].spools.forEach((spool,index) => { %>
-                <%if(spool[Object.keys(spool)[0]].spoolName !== null){%>
-                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p><%= spool[Object.keys(spool)[0]].weight %>g / <%= spool[Object.keys(spool)[0]].length %>m</p>
-                <%}else{%>
-                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p>(No Spool)</p>
-                <%}%>
-                <% })%>
-              <% } %>
-            </span>
-            <span class="d-none totalUsageMeter" id="totalUsageMeter-<%= history[i]._id %>">
-              <%= history[i].totalLength %>
-            </span>
-            <span class="d-none totalUsageGrams" id="totalUsageGrams-<%= history[i]._id %>">
-              <%= history[i].totalWeight %>
-            </span>
-          </td>
-          <td>
-            <span class="cost" id="cost-<%= history[i]._id %>">
-              <% if(history[i].spools !== null){ %>
-                <% history[i].spools.forEach((spool,index) => { %>
-                <%if(spool[Object.keys(spool)[0]].spoolName !== null){%>
-                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p><%= spool[Object.keys(spool)[0]].cost %></p>
-                <%}else{%>
-                  <b><%= spool[Object.keys(spool)[0]].toolName %></b>: <p>(No Spool)</p>
-                <%}%>
-                <% })%>
-              <% } %>
-            </span>
-            <span class="d-none filamentCost" id="totalFilamentCost-<%= history[i]._id %>">
-              <%= history[i].spoolCost %>
-            </span>
-          </td>
-          <td class="totalCost" id="totalCost-<%= history[i]._id %>">
-            <%= history[i].totalCost %>
-          </td>
-          <td class="costPerHour" id="costPerHour-<%= history[i]._id %>">
-            <%= history[i].costPerHour %>
-          </td>
-          <td class="notes" class="text-wrap" id="note-<%= history[i]._id %>">
-            <%= history[i].notes %>
-          </td>
-          <td>
-            <div class="btn-group" role="group" aria-label="Basic example">
-              <button
-                      type="button"
-                      class="btn btn-info btn-small historyEdit bg-colour-1"
-                      id="<%= history[i]._id %>"
-                      data-toggle="modal"
-                      data-target="#historyModal"
-              >
-                <i class="fas fa-eye"></i>
-              </button>
 
-              <button
-                      type="button"
-                      class="btn btn-danger btn-small historyDelete"
-                      id="<%= history[i]._id %>"
-              >
-                <i class="fas fa-trash"></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-      <% } %>
       </tbody>
 
     </table>
@@ -556,6 +397,404 @@
   </div>
 </div>
   <script src="/assets/dist/historyRunner.min.js" type="module"></script>
+
+  <div class="modal fade" id="currentStatistics" tabindex="0" role="dialog" aria-labelledby="historyModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="historyModalLabel"><button type="button" class="btn btn-dark float-right d-block" href="#" aria-expanded="false" disabled="">
+              Statistics
+            </button></h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span class="text-white" aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-lg-12">
+              <div class="progress">
+                <div    id="completedPercent"
+                        class="progress-bar progress-bar-striped bg-success"
+                        role="progressbar"
+                        style="width: <%= printStatistics.completedPercent  %>% "
+                        aria-valuenow=" <%= printStatistics.completedPercent %>%"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                >
+                  <%= Math.round(printStatistics.completedPercent * 10 ) /10 %>%
+                </div>
+                <div    id="cancelledPercent"
+                        class="progress-bar progress-bar-striped bg-warning"
+                        role="progressbar"
+                        style="width: <%= printStatistics.cancelledPercent %>% "
+                        aria-valuenow="<%= printStatistics.cancelledPercent %>%"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                >
+                  <%= Math.round(printStatistics.cancelledPercent * 10 ) /10 %>%
+                </div>
+                <div    id="failedPercent"
+                        class="progress-bar progress-bar-striped bg-danger"
+                        role="progressbar"
+                        style="width: <%= printStatistics.failedPercent %>% "
+                        aria-valuenow="<%= printStatistics.failedPercent %>%"
+                        aria-valuemin="0"
+                        aria-valuemax="100"
+                >
+                  <%= Math.round(printStatistics.failedPercent * 10 ) /10 %>%
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-2 text-center">
+              <div class="row">
+                <div class="col-lg-12">
+                  <h6>State Totals</h6><hr>
+                  <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                    Completed
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+              <b id="completedCount"><%= printStatistics.completed %></b>
+            </span>
+                  </button><hr>
+                  <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                    Cancelled
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+              <b id="cancelledCount"><%= printStatistics.cancelled %></b>
+            </span>
+                  </button><hr>
+                  <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                    Failed
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              <b id="failedCount"><%= printStatistics.failed %></b>
+            </span>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="col-lg-10">
+              <div class="row">
+                <div class="col-lg-3 text-center">
+                  <h6>Totals</h6><hr>
+                  <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                    Print Time
+                    <span id="totalPrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                      <%= helpers.generateTime(printStatistics.totalPrintTime) %>
+                    </span>
+                          </button><hr>
+                          <button  type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                            Filament Usage
+                            <span id="totalFilamentUsage" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                      <%= printStatistics.totalFilamentUsage %>
+                    </span>
+                          </button><hr>
+                          <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                            Cost
+                            <span id="totalCost" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
+                      <%= (parseFloat(printStatistics.totalSpoolCost) + parseFloat(printStatistics.totalPrinterCost)).toFixed(2) %>
+                    </span>
+                  </button>
+                </div>
+                <div class="col-lg-3 text-center">
+                  <h6>Largest</h6><hr>
+                  <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                    Print Time
+                    <span id="largestPrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                      <%= helpers.generateTime(printStatistics.longestPrintTime) %>
+                    </span>
+                          </button><hr>
+                          <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                            Filament Usage
+                            <span id="largestFilamentUsage" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                      <%= printStatistics.highestFilamentUsage %>
+                    </span>
+                          </button><hr>
+                          <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                            Cost
+                            <span id="largestCost" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
+                      <%= (parseFloat(printStatistics.highestSpoolCost) + parseFloat(printStatistics.highestPrinterCost)).toFixed(2)%>
+                    </span>
+                          </button>
+                </div>
+                <div class="col-lg-3 text-center">
+                  <h6>Smallest</h6><hr>
+                  <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                    Print Time
+                    <span id="smallestPrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                      <%= helpers.generateTime(printStatistics.shortestPrintTime) %>
+                    </span>
+                          </button><hr>
+                          <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                            Filament Usage
+                            <span id="smallestFilamentUsage" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                       <%= printStatistics.lowestFilamentUsage %>
+                    </span>
+                          </button><hr>
+                          <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                            Cost
+                            <span id="smallestCost" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
+                       <%= (parseFloat(printStatistics.lowestSpoolCost) + parseFloat(printStatistics.lowestPrinterCost)).toFixed(2) %>
+                    </span>
+                          </button>
+                </div>
+                <div class="col-lg-3 text-center">
+                  <h6>Averages</h6><hr>
+                  <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                    Print Time
+                    <span id="averagePrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                      <%= helpers.generateTime(printStatistics.averagePrintTime) %>
+                    </span>
+                          </button><hr>
+                          <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                            Filament Usage
+                            <span id="averageFilamentUsage" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                      <%= printStatistics.averageFilamentUsage %>
+                    </span>
+                          </button><hr>
+                          <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                            Cost
+                            <span id="averageCost" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
+                      <%= (parseFloat(printStatistics.averageSpoolCost) + parseFloat(printStatistics.averagePrinterCost)).toFixed(2) %>
+
+                    </span>
+                          </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-6">
+              <h6>Most Utilised Printers</h6><hr>
+              <ul id="longestRunningPrinters" class="list-group list-group-flush">
+                <% printStatistics.sortedTopPrinterList.slice(0, 5).forEach(printer =>  { %>
+                  <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="bg-dark col-lg-4 text-truncate"><%= printer.printerName %></small><small class="text-center bg-primary col-lg-2"><%= helpers.generateTime(printer.time) %></small><small class="bg-info col-lg-2 text-center">Prints: <%= printer.prints %></small><small class="bg-success col-lg-1 text-center"><%= printer.successCount %> </small><small class="bg-warning text-dark col-lg-1 text-center"><%= printer.cancelledCount %></small><small class="bg-danger col-lg-1 text-center"><%= printer.failedCount %></small> </li>
+                <% }) %>
+              </ul>
+            </div>
+            <div class="col-lg-6">
+              <h6>Most Printed Files</h6><hr>
+              <ul id="mostPrintedFiles" class="list-group list-group-flush">
+                <% printStatistics.sortedTopFilesList.slice(0, 5).forEach(printer =>  { %>
+                  <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="bg-dark col-lg-6 text-truncate"><%= printer.file.replace(".gcode", "")  %></small><small class="text-center bg-info col-lg-2">Prints: <%= printer.prints %> </small><small class="bg-success text-center col-lg-1"><%= printer.successCount %> </small><small class="bg-warning text-dark text-center col-lg-1"><%= printer.cancelledCount %></small><small class="bg-danger col-lg-1 text-center"><%= printer.failedCount %></small> </li>
+                <% }) %>
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="row mx-3">
+            <div class="col-lg-6">
+              <h6>Print Completion By Day</h6><hr>
+              <div id="printCompletionByDay">
+
+              </div>
+            </div>
+            <div class="col-lg-6">
+              <h6>Print Completion By Day</h6><hr>
+              <div id="printCompletionOverTime"></div>
+            </div>
+        </div>
+
+        <div class="modal-footer" id="historySave">
+          <button type="button" class="btn btn-light" data-dismiss="modal">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal fade" id="historicalStatistics" tabindex="0" role="dialog" aria-labelledby="historyModal" aria-hidden="true">
+    <div class="modal-dialog modal-xl" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title" id="historyModalLabel"><button type="button" class="btn btn-dark float-right d-block" href="#" aria-expanded="false" disabled="">
+              Monthly Statistics
+            </button></h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span class="text-white" aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-lg-6">
+              <div id="monthlySuccessRate"></div>
+            </div>
+            <div class="col-lg-6">
+              <div id="monthlyPrintRate"></div>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="col-lg-6">
+              <h6>Most Utilised Printer</h6><hr>
+              <ul id="monthlyMostUtilisedPrinter" class="list-group list-group-flush">
+
+              </ul>
+            </div>
+            <div class="col-lg-6">
+              <h6>Most Printed File</h6><hr>
+              <ul id="monthlyMostPrintedFile" class="list-group list-group-flush">
+
+              </ul>
+            </div>
+          </div>
+
+          <div class="row">
+            <h6>Data Breakdown</h6><hr>
+            <table id="historyTableTop" class="table table-dark text-center p-0 m-0">
+              <thead>
+              <tr>
+                <th class="table-dark sticky-table table-dark table-hover p-2 m-0" scope="col">Metric</th>
+                <% monthlyStatistics.forEach(stat => { %>
+                  <th class="table-dark sticky-table table-dark p-2 m-0" scope="col"><%= stat.month %></th>
+                <% }) %>
+              </tr>
+              </thead>
+              <tbody>
+              <tr>
+                <td class="p-1 m-0 bg-primary" scope="col">Total Print Time</td>
+                <% monthlyStatistics.forEach(stat => { %>
+                  <% if(Object.keys(stat.statistics).length !== 0) { %>
+                  <td class="p-1 m-0 bg-primary" scope="col"><%= helpers.generateTime(stat.statistics.totalPrintTime) %></td>
+                  <% }else{ %>
+                  <td class="p-1 m-0 bg-primary" scope="col"></td>
+                  <% } %>
+                <% }) %>
+              </tr>
+              <tr>
+                <td class="p-1 m-0" scope="col">Largest Print Time</td>
+                <% monthlyStatistics.forEach(stat => { %>
+                  <% if(Object.keys(stat.statistics).length !== 0) { %>
+                    <td class="p-1 m-0" scope="col"><%= helpers.generateTime(stat.statistics.longestPrintTime) %></td>
+                  <% }else{ %>
+                    <td class="p-1 m-0" scope="col"></td>
+                  <% } %>
+                <% }) %>
+              </tr>
+              <tr>
+                <td class="p-1 m-0" scope="col">Smallest Print Time</td>
+                <% monthlyStatistics.forEach(stat => { %>
+                  <% if(Object.keys(stat.statistics).length !== 0) { %>
+                    <td class="p-1 m-0" scope="col"><%= helpers.generateTime(stat.statistics.shortestPrintTime) %></td>
+                  <% }else{ %>
+                    <td class="p-1 m-0" scope="col"></td>
+                  <% } %>
+                <% }) %>
+              </tr>
+              <tr>
+                <td class="p-1 m-0" scope="col">Average Print Time</td>
+                <% monthlyStatistics.forEach(stat => { %>
+                  <% if(Object.keys(stat.statistics).length !== 0) { %>
+                    <td class="p-1 m-0" scope="col"><%= helpers.generateTime(stat.statistics.averagePrintTime) %></td>
+                  <% }else{ %>
+                    <td class="p-1 m-0" scope="col"></td>
+                  <% } %>
+                <% }) %>
+              </tr>
+              <tr>
+                <td class="p-1 m-0" scope="col"></td>
+                <% monthlyStatistics.forEach(stat => { %>
+                    <td class="p-1 m-0" scope="col"></td>
+                <% }) %>
+              </tr>
+              <tr>
+                <td class="p-1 m-0  bg-primary" scope="col">Total Filament Usage</td>
+                <% monthlyStatistics.forEach(stat => { %>
+                  <% if(Object.keys(stat.statistics).length !== 0) { %>
+                    <td class="p-1 m-0  bg-primary" scope="col"><%= stat.statistics.totalFilamentUsage %></td>
+                  <% }else{ %>
+                    <td class="p-1 m-0  bg-primary" scope="col"></td>
+                  <% } %>
+                <% }) %>
+              </tr>
+              <tr>
+                <td class="p-1 m-0" scope="col">Largest Filament Usage</td>
+                <% monthlyStatistics.forEach(stat => { %>
+                  <% if(Object.keys(stat.statistics).length !== 0) { %>
+                    <td class="p-1 m-0" scope="col"><%= stat.statistics.highestFilamentUsage %></td>
+                  <% }else{ %>
+                    <td class="p-1 m-0" scope="col"></td>
+                  <% } %>
+                <% }) %>
+              </tr>
+              <tr>
+                <td class="p-1 m-0" scope="col">Smallest Filament Usage</td>
+                <% monthlyStatistics.forEach(stat => { %>
+                  <% if(Object.keys(stat.statistics).length !== 0) { %>
+                    <td class="p-1 m-0" scope="col"><%= stat.statistics.lowestFilamentUsage %></td>
+                  <% }else{ %>
+                    <td class="p-1 m-0" scope="col"></td>
+                  <% } %>
+                <% }) %>
+              </tr>
+              <tr>
+                <td class="p-1 m-0" scope="col">Average Filament Usage</td>
+                <% monthlyStatistics.forEach(stat => { %>
+                  <% if(Object.keys(stat.statistics).length !== 0) { %>
+                    <td class="p-1 m-0" scope="col"><%= stat.statistics.averageFilamentUsage %></td>
+                  <% }else{ %>
+                    <td class="p-1 m-0" scope="col"></td>
+                  <% } %>
+                <% }) %>
+              </tr>
+              <tr>
+                <td class="p-1 m-0" scope="col"></td>
+                <% monthlyStatistics.forEach(stat => { %>
+                  <td class="p-1 m-0" scope="col"></td>
+                <% }) %>
+              </tr>
+              <tr>
+                <td class="p-1 m-0 bg-primary" scope="col">Total Cost</td>
+                <% monthlyStatistics.forEach(stat => { %>
+                  <% if(Object.keys(stat.statistics).length !== 0) { %>
+                    <td class="p-1 m-0 bg-primary" scope="col"><%= (parseFloat(stat.statistics.totalSpoolCost) + parseFloat(stat.statistics.totalPrinterCost)).toFixed(2)%></td>
+                  <% }else{ %>
+                    <td class="p-1 m-0 bg-primary" scope="col"></td>
+                  <% } %>
+                <% }) %>
+              </tr>
+              <tr>
+                <td class="p-1 m-0" scope="col">Largest Cost</td>
+                <% monthlyStatistics.forEach(stat => { %>
+                  <% if(Object.keys(stat.statistics).length !== 0) { %>
+                    <td class="p-1 m-0" scope="col"><%= (parseFloat(stat.statistics.highestSpoolCost) + parseFloat(stat.statistics.highestPrinterCost)).toFixed(2)%></td>
+                  <% }else{ %>
+                    <td class="p-1 m-0" scope="col"></td>
+                  <% } %>
+                <% }) %>
+              </tr>
+              <tr>
+                <td class="p-1 m-0" scope="col">Smallest Cost</td>
+                <% monthlyStatistics.forEach(stat => { %>
+                  <% if(Object.keys(stat.statistics).length !== 0) { %>
+                    <td class="p-1 m-0" scope="col"><%= (parseFloat(stat.statistics.lowestSpoolCost) + parseFloat(stat.statistics.lowestPrinterCost)).toFixed(2)%></td>
+                  <% }else{ %>
+                    <td class="p-1 m-0" scope="col"></td>
+                  <% } %>
+                <% }) %>
+              </tr>
+              <tr>
+                <td class="p-1 m-0" scope="col">Average Cost</td>
+                <% monthlyStatistics.forEach(stat => { %>
+                  <% if(Object.keys(stat.statistics).length !== 0) { %>
+                    <td class="p-1 m-0" scope="col"><%= (parseFloat(stat.statistics.averageSpoolCost) + parseFloat(stat.statistics.averagePrinterCost)).toFixed(2)%></td>
+                  <% }else{ %>
+                    <td class="p-1 m-0" scope="col"></td>
+                  <% } %>
+                <% }) %>
+              </tr>
+              </tbody>
+
+            </table>
+
+          </div>
+        </div>
+
+        <div class="modal-footer" id="historySave">
+          <button type="button" class="btn btn-light" data-dismiss="modal">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 <% }else{ %>
   <div class="row mt-5">
     <div class="col-md-6 m-auto">
@@ -573,7 +812,7 @@
   <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h3 class="modal-title" id="historyModalLabel"><button type="button" class="btn btn-secondary float-right d-block" href="#" aria-expanded="false" disabled="">
+        <h3 class="modal-title" id="historyModalLabel"><button type="button" class="btn btn-dark float-right d-block" href="#" aria-expanded="false" disabled="">
             <span id="printerName"></span> - <span id="fileName"></span>
           </button></h3>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
@@ -750,3 +989,4 @@
     </div>
   </div>
 </div>
+

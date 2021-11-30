@@ -3,8 +3,14 @@ import UI from "./lib/functions/ui.js";
 import { returnDropDown } from "./services/filament-manager-plugin.service";
 import * as ApexCharts from "apexcharts";
 import OctoFarmClient from "./services/octofarm-client.service";
-import { HISTORY_CONSTANTS } from "./constants/history.constants";
-import { returnHistoryTableRow } from "./pages/history/history.templates";
+import { ELEMENTS, HISTORY_CONSTANTS, SORT_CONSTANTS } from "./constants/history.constants";
+import {
+  returnHistoryPagination,
+  returnHistoryTableRow,
+  returnHistoryFilterDefaultSelected
+} from "./pages/history/history.templates";
+import { getFirstDayOfLastMonth } from "./utils/date.utils";
+import Litepicker from "litepicker";
 
 // Setup history listeners
 document.getElementById("historyTable").addEventListener("click", (e) => {
@@ -24,6 +30,45 @@ $("#historyModal").on("hidden.bs.modal", function (e) {
 });
 
 class History {
+  static historyGraph;
+  static overTimeGraph;
+  static monthlySuccessRateGraph;
+  static monthlyCompetionByDay;
+  static datePicker;
+  static totalSpark;
+  static completeSpark;
+  static cancelledSpark;
+  static failedSpark;
+  static listenersApplied;
+
+  static loadNoData() {
+    ELEMENTS.historyTable.innerHTML = `<tr><td>NO DATA</td></tr>`;
+    ELEMENTS.historyPagination.innerHTML = "";
+    const paginationZero = {
+      itemCount: 0,
+      perPage: 0,
+      pageCount: 0,
+      currentPage: 1,
+      pagingCounter: 1,
+      hasPrevPage: false,
+      hasNextPage: false,
+      prev: null,
+      next: null
+    };
+    if (paginationZero) {
+      ELEMENTS.historyPagination.insertAdjacentHTML(
+        "beforeend",
+        returnHistoryPagination(paginationZero)
+      );
+    }
+    ELEMENTS.printTimeTotal.innerHTML = "No Time";
+    ELEMENTS.filamentUsageTotal.innerHTML = `0m / 0g`;
+    ELEMENTS.filamentCostTotal.innerHTML = 0;
+    ELEMENTS.printerCostTotal.innerHTML = 0;
+    ELEMENTS.totalCost.innerHTML = 0;
+    ELEMENTS.averageCostPerHour.innerHTML = 0;
+  }
+
   static drawHistoryTable(records) {
     const historyTable = document.getElementById("historyTable");
     historyTable.innerHTML = "";
@@ -34,139 +79,819 @@ class History {
       }
     }
   }
-  static async get() {
-    const { history, statisticsClean, pagination } = await OctoFarmClient.get(
-      `history/get?${HISTORY_CONSTANTS.currentPage}2&${HISTORY_CONSTANTS.perPage}25&${HISTORY_CONSTANTS.sort}index_asc`
-    );
+  static addHistoryFilterListeners(pagination) {
+    const paginationElementsList = document.querySelectorAll('*[id^="changePage"]');
+    paginationElementsList.forEach((element) => {
+      element.addEventListener("click", (e) => {
+        console.log(e.target.id);
+        const split = e.target.id.split("-");
 
-    console.log(history, statisticsClean, pagination);
+        this.get(split[1]);
+      });
+    });
 
-    // jplist.init({
-    //   storage: "localStorage", // 'localStorage', 'sessionStorage' or 'cookies'
+    document.getElementById("firstPage").addEventListener("click", () => {
+      this.get(1);
+    });
 
-    //   storageName: "history-sorting" // the same storage name can be used to share storage between multiple pages
-    // });
+    document.getElementById("previousPage").addEventListener("click", () => {
+      this.get(pagination.prev);
+    });
 
-    // TODO: Load statistics
+    document.getElementById("nextPage").addEventListener("click", () => {
+      this.get(pagination.next);
+    });
 
-    // TODO: Load graphs
+    document.getElementById("lastPage").addEventListener("click", () => {
+      this.get(pagination.pageCount);
+    });
 
-    // TODO: Load history filters
+    if (!this?.listenersApplied) {
+      this.datePicker.on("selected", (date1, date2) => {
+        this.get();
+      });
+      ELEMENTS.sort.addEventListener("change", () => {
+        this.get();
+      });
+      ELEMENTS.itemsPerPage.addEventListener("change", () => {
+        this.get();
+      });
 
-    // TODO: Load history table...
+      this.listenersApplied = true;
+    }
+  }
+  static drawHistoryFilters(pagination, filterData) {
+    ELEMENTS.historyPagination.innerHTML = "";
+    if (pagination) {
+      ELEMENTS.historyPagination.insertAdjacentHTML(
+        "beforeend",
+        returnHistoryPagination(pagination)
+      );
+    }
+    if (!this?.datePicker) {
+      this.datePicker = new Litepicker({
+        element: document.getElementById("historyDateRange"),
+        singleMode: false,
+        numberOfMonths: 2,
+        numberOfColumns: 2,
+        resetButton: true,
+        tooltipText: {
+          one: "night",
+          other: "nights"
+        },
+        tooltipNumber: (totalDays) => {
+          return totalDays - 1;
+        }
+      });
+      this.datePicker.setDateRange(getFirstDayOfLastMonth(), Calc.lastDayOfMonth());
+    }
+
+    ELEMENTS.fileFilter.innerHTML = returnHistoryFilterDefaultSelected();
+    filterData.fileNames.forEach((file) => {
+      ELEMENTS.fileFilter.insertAdjacentHTML(
+        "beforeend",
+        `<option value="${file.replace(/ /g, "_")}"> ${file} </option>`
+      );
+    });
+    ELEMENTS.pathFilter.innerHTML = returnHistoryFilterDefaultSelected();
+    filterData.pathList.forEach((path) => {
+      ELEMENTS.pathFilter.insertAdjacentHTML(
+        "beforeend",
+        `<option value="${path.replace(/ /g, "_")}"> ${path} </option>`
+      );
+    });
+    ELEMENTS.spoolManuFilter.innerHTML = returnHistoryFilterDefaultSelected();
+    filterData.spoolsManu.forEach((manu) => {
+      if (manu !== "") {
+        ELEMENTS.spoolManuFilter.insertAdjacentHTML(
+          "beforeend",
+          `<option value="${manu}"> ${manu} </option>`
+        );
+      }
+    });
+    ELEMENTS.spoolMatFilter.innerHTML = returnHistoryFilterDefaultSelected();
+    filterData.spoolsMat.forEach((mat) => {
+      if (mat !== "") {
+        ELEMENTS.spoolMatFilter.insertAdjacentHTML(
+          "beforeend",
+          `<option value="${mat}"> ${mat} </option>`
+        );
+      }
+    });
+  }
+  static drawMonthlyStatistics(statistics) {
+    const monthArray = [];
+    statistics.forEach((stat) => {
+      monthArray.push(stat.month);
+    });
+
+    let successRateList = statistics.map((stat) => {
+      const currentRate =
+        (stat.statistics.totalSuccessPrintTimes * 100) / stat.statistics.totalPrintTime;
+      if (isNaN(currentRate)) {
+        return 0;
+      } else {
+        return parseFloat(currentRate.toFixed(0));
+      }
+    });
+    let failureRateList = statistics.map((stat) => {
+      const currentRate = (stat.statistics.currentFailed * 100) / stat.statistics.totalPrintTime;
+      if (isNaN(currentRate)) {
+        return 0;
+      } else {
+        return parseFloat(currentRate.toFixed(0));
+      }
+    });
+    const historyGraphOptions = {
+      chart: {
+        type: "bar",
+        stacked: true,
+        width: "100%",
+        height: "250px",
+        animations: {
+          enabled: true
+        },
+        toolbar: {
+          show: false
+        },
+        zoom: {
+          enabled: false
+        },
+        background: "#303030"
+      },
+      colors: ["#00bc8c", "#e74c3c", "#f39c12"],
+      dataLabels: {
+        enabled: true,
+        background: {
+          enabled: true,
+          foreColor: "#000",
+          padding: 1,
+          borderRadius: 2,
+          borderWidth: 1,
+          borderColor: "#fff",
+          opacity: 0.9
+        }
+      },
+      // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+      toolbar: {
+        show: false
+      },
+      stroke: {
+        width: 4,
+        curve: "smooth"
+      },
+      theme: {
+        mode: "dark"
+      },
+      noData: {
+        text: "Loading..."
+      },
+      series: [],
+      yaxis: [
+        {
+          title: {
+            text: "Success Percent"
+          },
+          min: 0,
+          max: 100,
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0) + "%";
+              }
+            }
+          }
+        }
+      ],
+      xaxis: {
+        categories: monthArray
+      }
+    };
+    if (!this?.monthlySuccessRateGraph) {
+      this.monthlySuccessRateGraph = new ApexCharts(
+        document.querySelector("#monthlySuccessRate"),
+        historyGraphOptions
+      );
+      this.monthlySuccessRateGraph.render();
+    }
+
+    this.monthlySuccessRateGraph.updateSeries([
+      {
+        name: "Success Percent",
+        data: successRateList
+      },
+      {
+        name: "Failed Percent",
+        data: failureRateList
+      }
+    ]);
+
+    let printerLists = statistics.map((stat) => {
+      return { month: stat.month, data: stat.statistics.sortedTopPrinterList };
+    });
+    const topPrinterPerMonth = document.getElementById("monthlyMostUtilisedPrinter");
+    topPrinterPerMonth.innerHTML = "";
+    printerLists.forEach((item) => {
+      if (item?.data) {
+        topPrinterPerMonth.insertAdjacentHTML(
+          "beforeend",
+          `
+        <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="bg-dark col-lg-1 text-truncate">${
+          item.month
+        }</small><small class="bg-dark col-lg-4 text-truncate">${
+            item.data[0].printerName
+          }</small><small class="text-center bg-primary col-lg-2">${Calc.generateTime(
+            item.data[0].time
+          )}</small><small class="bg-info col-lg-2 text-center">Prints: ${
+            item.data[0].prints
+          }</small><small class="bg-success col-lg-1 text-center">${
+            item.data[0].successCount
+          } </small><small class="bg-warning text-dark col-lg-1 text-center">${
+            item.data[0].cancelledCount
+          }</small><small class="bg-danger col-lg-1 text-center">${
+            item.data[0].failedCount
+          }</small> </li>
+      `
+        );
+      } else {
+        topPrinterPerMonth.insertAdjacentHTML(
+          "beforeend",
+          `
+        <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="bg-dark col-lg-1 text-truncate">${item.month}</small><small class="bg-dark col-lg-4 text-truncate"></small><small class="text-center bg-primary col-lg-2"></small><small class="bg-info col-lg-2 text-center">Prints: </small><small class="bg-success col-lg-1 text-center"> </small><small class="bg-warning text-dark col-lg-1 text-center"></small><small class="bg-danger col-lg-1 text-center"></small> </li>
+      `
+        );
+      }
+    });
+    let fileLists = statistics.map((stat) => {
+      return { month: stat.month, data: stat.statistics.sortedTopFilesList };
+    });
+    const topFilePerMonth = document.getElementById("monthlyMostPrintedFile");
+    topFilePerMonth.innerHTML = "";
+    fileLists.forEach((item) => {
+      if (item?.data) {
+        topFilePerMonth.insertAdjacentHTML(
+          "beforeend",
+          `
+        <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="bg-dark col-lg-1 text-truncate">${
+          item.month
+        }</small><small class="bg-dark col-lg-6 text-truncate">${item.data[0].file.replace(
+            ".gcode",
+            ""
+          )}</small><small class="text-center bg-info col-lg-2">Prints: ${
+            item.data[0].prints
+          } </small><small class="bg-success text-center col-lg-1">${
+            item.data[0].successCount
+          } </small><small class="bg-warning text-dark text-center col-lg-1">${
+            item.data[0].cancelledCount
+          }</small><small class="bg-danger col-lg-1 text-center">${
+            item.data[0].failedCount
+          }</small> </li>
+      `
+        );
+      } else {
+        topFilePerMonth.insertAdjacentHTML(
+          "beforeend",
+          `
+        <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="bg-dark col-lg-1 text-truncate">${item.month}</small><small class="bg-dark col-lg-6 text-truncate"></small><small class="text-center bg-info col-lg-2">Prints:  </small><small class="bg-success text-center col-lg-1"></small><small class="bg-warning text-dark text-center col-lg-1"></small><small class="bg-danger col-lg-1 text-center"></small> </li>
+      `
+        );
+      }
+    });
+
+    let successCountList = statistics.map((stat) => {
+      if (isNaN(stat.statistics.completed)) {
+        return 0;
+      } else {
+        return parseInt(stat.statistics.completed);
+      }
+    });
+    let failedCountList = statistics.map((stat) => {
+      if (isNaN(stat.statistics.failed)) {
+        return 0;
+      } else {
+        return parseInt(stat.statistics.failed);
+      }
+    });
+    let cancelledCountList = statistics.map((stat) => {
+      if (isNaN(stat.statistics.cancelled)) {
+        return 0;
+      } else {
+        return parseInt(stat.statistics.cancelled);
+      }
+    });
+
+    let totalPrintList = statistics.map((stat) => {
+      if (isNaN(stat.statistics.cancelled + stat.statistics.failed + stat.statistics.completed)) {
+        return 0;
+      } else {
+        return parseInt(
+          stat.statistics.cancelled + stat.statistics.failed + stat.statistics.completed
+        );
+      }
+    });
+
+    const printRateGraphOptions = {
+      chart: {
+        type: "line",
+        width: "100%",
+        height: "250px",
+        animations: {
+          enabled: true
+        },
+        toolbar: {
+          show: false
+        },
+        zoom: {
+          enabled: false
+        },
+        background: "#303030"
+      },
+      colors: ["#00bc8c", "#e74c3c", "#f39c12", "#12d1f3"],
+      dataLabels: {
+        enabled: true,
+        background: {
+          enabled: true,
+          foreColor: "#000",
+          padding: 1,
+          borderRadius: 2,
+          borderWidth: 1,
+          borderColor: "#fff",
+          opacity: 0.9
+        }
+      },
+      // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+      toolbar: {
+        show: false
+      },
+      stroke: {
+        width: 4,
+        curve: "smooth"
+      },
+      theme: {
+        mode: "dark"
+      },
+      noData: {
+        text: "Loading..."
+      },
+      series: [],
+      yaxis: [
+        {
+          title: {
+            text: "Count"
+          },
+          max: Math.max(...successCountList) + Math.max(...totalPrintList),
+          seriesName: "Success Count",
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0);
+              }
+            }
+          }
+        },
+        {
+          title: {
+            text: "Count"
+          },
+          seriesName: "Success Count",
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0);
+              }
+            }
+          },
+          show: false
+        },
+        {
+          title: {
+            text: "Count"
+          },
+          seriesName: "Success Count",
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0);
+              }
+            }
+          },
+          show: false
+        },
+        {
+          title: {
+            text: "Total"
+          },
+          seriesName: "Success Count",
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0);
+              }
+            }
+          },
+          show: false
+        }
+      ],
+      xaxis: {
+        categories: monthArray
+      }
+    };
+    if (!this?.monthlyCompetionByDay) {
+      this.monthlyCompetionByDay = new ApexCharts(
+        document.querySelector("#monthlyPrintRate"),
+        printRateGraphOptions
+      );
+      this.monthlyCompetionByDay.render();
+    }
+
+    this.monthlyCompetionByDay.updateSeries([
+      {
+        name: "Success Count",
+        data: successCountList
+      },
+      {
+        name: "Failed Count",
+        data: failedCountList
+      },
+      {
+        name: "Cancelled Count",
+        data: cancelledCountList
+      },
+      { name: "Total Count", data: totalPrintList }
+    ]);
+
+    const options1 = {
+      series: [
+        {
+          data: totalPrintList
+        }
+      ],
+      chart: {
+        type: "line",
+        width: "100%",
+        height: 85,
+        sparkline: {
+          enabled: true
+        },
+        zoom: {
+          enabled: false
+        },
+        background: "#303030"
+      },
+
+      theme: {
+        mode: "dark"
+      },
+      noData: {
+        text: "Loading..."
+      },
+      colors: ["#3498db"],
+      tooltip: {
+        fixed: {
+          enabled: false
+        },
+        x: {
+          show: true,
+          formatter: function (value) {
+            return monthArray[value - 1]; // The formatter function overrides format property
+          }
+        },
+        y: {
+          title: {
+            formatter: (seriesName) => "Total: "
+          }
+        },
+        marker: {
+          show: false
+        }
+      }
+    };
+
+    if (!this?.totalSpark) {
+      this.totalSpark = new ApexCharts(document.querySelector("#totalSpark"), options1);
+      this.totalSpark.render();
+    }
+
+    document.getElementById("totalSparkLast").innerHTML = totalPrintList[totalPrintList.length - 1];
+
+    options1.colors = ["#00bc8c"];
+    options1.series[0].data = successCountList;
+    options1.tooltip.y.title.formatter = (seriesName) => "Success: ";
+    if (!this?.completeSpark) {
+      this.completeSpark = new ApexCharts(document.querySelector("#successSpark"), options1);
+      this.completeSpark.render();
+    }
+
+    document.getElementById("successSparkLast").innerHTML =
+      successCountList[successCountList.length - 1];
+
+    options1.colors = ["#f39c12"];
+    options1.series[0].data = cancelledCountList;
+    options1.tooltip.y.title.formatter = (seriesName) => "Cancelled: ";
+    if (!this?.cancelledSpark) {
+      this.cancelledSpark = new ApexCharts(document.querySelector("#cancelledSpark"), options1);
+      this.cancelledSpark.render();
+    }
+
+    document.getElementById("cancelledSparkLast").innerHTML =
+      cancelledCountList[cancelledCountList.length - 1];
+
+    options1.colors = ["#e74c3c"];
+    options1.series[0].data = failedCountList;
+    options1.tooltip.y.title.formatter = (seriesName) => "Failed: ";
+    if (!this?.failedSpark) {
+      this.failedSpark = new ApexCharts(document.querySelector("#failedSpark"), options1);
+      this.failedSpark.render();
+    }
+
+    document.getElementById("failedSparkLast").innerHTML =
+      failedCountList[failedCountList.length - 1];
+  }
+  static getHistoryRequestURL(pageNumber) {
+    let lastDay = new Date().toISOString();
+    let firstDay = getFirstDayOfLastMonth();
+    if (this?.datePicker) {
+      lastDay = this.datePicker.getEndDate().dateInstance;
+      firstDay = this.datePicker.getDate().dateInstance;
+    }
+
+    return `history/get?${HISTORY_CONSTANTS.currentPage}${pageNumber}&${HISTORY_CONSTANTS.perPage}${
+      ELEMENTS.itemsPerPage.value
+    }&${HISTORY_CONSTANTS.sort}${SORT_CONSTANTS[ELEMENTS.sort.value]}&${
+      HISTORY_CONSTANTS.dateBefore
+    }${lastDay}&${HISTORY_CONSTANTS.dateAfter}${firstDay}`;
+  }
+  static async get(pageNumber = 1) {
+    const { history, statisticsClean, pagination, monthlyStatistics, historyFilterData } =
+      await OctoFarmClient.get(this.getHistoryRequestURL(pageNumber));
+
+    console.log(history, statisticsClean, pagination, monthlyStatistics, historyFilterData);
+
+    if (!history || !statisticsClean || !pagination) {
+      this.loadNoData();
+      return;
+    }
+
+    // TODO: Load statistics EJS renders currently, want's to be dynamic as well.
+    //this.updateStatistics(statisticsClean);
+
+    // Load history filters
+    this.drawHistoryFilters(pagination, historyFilterData);
+    this.addHistoryFilterListeners(pagination);
+
+    // Load history table...
     this.drawHistoryTable(history);
+    // TODO: Add Listeners
 
-    // document.getElementById("loading").style.display = "none";
-    // document.getElementById("wrapper").classList.remove("d-none");
-    // document.getElementById("historyToolbar").classList.remove("d-none");
-    //
-    // let historyStatistics = await OctoFarmClient.getHistoryStatistics();
-    // let historyGraphData = historyStatistics.history.historyByDay;
-    //
-    // const historyGraphOptions = {
-    //   chart: {
-    //     type: "line",
-    //     width: "100%",
-    //     height: "250px",
-    //     animations: {
-    //       enabled: true
-    //     },
-    //     toolbar: {
-    //       show: false
-    //     },
-    //     zoom: {
-    //       enabled: false
-    //     },
-    //     background: "#303030"
-    //   },
-    //   colors: ["#00bc8c", "#e74c3c", "#f39c12"],
-    //   dataLabels: {
-    //     enabled: true,
-    //     background: {
-    //       enabled: true,
-    //       foreColor: "#000",
-    //       padding: 1,
-    //       borderRadius: 2,
-    //       borderWidth: 1,
-    //       borderColor: "#fff",
-    //       opacity: 0.9
-    //     }
-    //   },
-    //   // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
-    //   toolbar: {
-    //     show: false
-    //   },
-    //   stroke: {
-    //     width: 4,
-    //     curve: "smooth"
-    //   },
-    //   theme: {
-    //     mode: "dark"
-    //   },
-    //   noData: {
-    //     text: "Loading..."
-    //   },
-    //   series: [],
-    //   yaxis: [
-    //     {
-    //       title: {
-    //         text: "Count"
-    //       },
-    //       seriesName: "Success",
-    //       labels: {
-    //         formatter: function (val) {
-    //           if (val !== null) {
-    //             return val.toFixed(0);
-    //           }
-    //         }
-    //       }
-    //     },
-    //     {
-    //       title: {
-    //         text: "Count"
-    //       },
-    //       seriesName: "Success",
-    //       labels: {
-    //         formatter: function (val) {
-    //           if (val !== null) {
-    //             return val.toFixed(0);
-    //           }
-    //         }
-    //       },
-    //       show: false
-    //     },
-    //     {
-    //       title: {
-    //         text: "Count"
-    //       },
-    //       seriesName: "Success",
-    //       labels: {
-    //         formatter: function (val) {
-    //           if (val !== null) {
-    //             return val.toFixed(0);
-    //           }
-    //         }
-    //       },
-    //       show: false
-    //     }
-    //   ],
-    //   xaxis: {
-    //     type: "datetime",
-    //     tickAmount: 10,
-    //     labels: {
-    //       formatter: function (value, timestamp) {
-    //         let dae = new Date(timestamp);
-    //         return dae.toLocaleDateString(); // The formatter function overrides format property
-    //       }
-    //     }
-    //   }
-    // };
-    // let historyGraph = new ApexCharts(
-    //   document.querySelector("#printCompletionByDay"),
-    //   historyGraphOptions
-    // );
-    // historyGraph.render();
-    // historyGraph.updateSeries(historyGraphData);
+    // Load monthly statistics
+    this.drawMonthlyStatistics(monthlyStatistics);
+
+    //Update totals
+    this.updateTotals(history);
+
+    // Load graphs
+    let historyGraphData = statisticsClean.historyByDay;
+    let historyUsageOverTimeData = statisticsClean.totalOverTime;
+    //TODO Move out, same as dashboards
+
+    let yAxisSeries = [];
+    historyUsageOverTimeData.forEach((usage, index) => {
+      let obj = null;
+      if (index === 0) {
+        obj = {
+          title: {
+            text: "Count"
+          },
+          seriesName: historyUsageOverTimeData[0].name,
+          labels: {
+            formatter: function (val) {
+              if (!!val) {
+                return val.toFixed(0);
+              }
+            }
+          }
+        };
+      } else {
+        obj = {
+          show: false,
+          seriesName: historyUsageOverTimeData[0].name,
+          labels: {
+            formatter: function (val) {
+              if (!!val) {
+                return val.toFixed(0);
+              }
+            }
+          }
+        };
+      }
+
+      yAxisSeries.push(obj);
+    });
+    const filamentUsageOverTimeChartOptions = {
+      chart: {
+        type: "bar",
+        stacked: true,
+        width: "100%",
+        height: "200px",
+        animations: {
+          enabled: true
+        },
+        toolbar: {
+          show: false
+        },
+        zoom: {
+          enabled: false
+        },
+        background: "#303030"
+      },
+      colors: ["#00bc8c", "#e74c3c", "#f39c12"],
+      // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+      toolbar: {
+        show: false
+      },
+      stroke: {
+        width: 4,
+        curve: "smooth"
+      },
+      theme: {
+        mode: "dark"
+      },
+      noData: {
+        text: "Loading..."
+      },
+      series: [],
+      yaxis: [
+        {
+          title: {
+            text: "Count"
+          },
+          seriesName: "Success",
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0);
+              }
+            }
+          }
+        },
+        {
+          title: {
+            text: "Count"
+          },
+          seriesName: "Success",
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0);
+              }
+            }
+          },
+          show: false
+        },
+        {
+          title: {
+            text: "Count"
+          },
+          seriesName: "Success",
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0);
+              }
+            }
+          },
+          show: false
+        }
+      ],
+      xaxis: {
+        type: "datetime",
+        tickAmount: 10,
+        labels: {
+          formatter: function (value, timestamp) {
+            let dae = new Date(timestamp);
+            return dae.toLocaleDateString(); // The formatter function overrides format property
+          }
+        }
+      }
+    };
+    filamentUsageOverTimeChartOptions.yaxis = yAxisSeries;
+    if (!this?.competionByDay) {
+      this.competionByDay = new ApexCharts(
+        document.querySelector("#printCompletionByDay"),
+        filamentUsageOverTimeChartOptions
+      );
+      this.competionByDay.render();
+    }
+
+    this.competionByDay.updateSeries(historyGraphData);
+
+    const historyGraphOptions = {
+      chart: {
+        type: "line",
+        width: "100%",
+        height: "200px",
+        animations: {
+          enabled: true
+        },
+        toolbar: {
+          show: false
+        },
+        zoom: {
+          enabled: false
+        },
+        background: "#303030"
+      },
+      colors: ["#00bc8c", "#e74c3c", "#f39c12"],
+      dataLabels: {
+        enabled: true,
+        background: {
+          enabled: true,
+          foreColor: "#000",
+          padding: 1,
+          borderRadius: 2,
+          borderWidth: 1,
+          borderColor: "#fff",
+          opacity: 0.9
+        }
+      },
+      // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
+      toolbar: {
+        show: false
+      },
+      stroke: {
+        width: 4,
+        curve: "smooth"
+      },
+      theme: {
+        mode: "dark"
+      },
+      noData: {
+        text: "Loading..."
+      },
+      series: [],
+      yaxis: [
+        {
+          title: {
+            text: "Count"
+          },
+          seriesName: "Success",
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0);
+              }
+            }
+          }
+        },
+        {
+          title: {
+            text: "Count"
+          },
+          seriesName: "Success",
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0);
+              }
+            }
+          },
+          show: false
+        },
+        {
+          title: {
+            text: "Count"
+          },
+          seriesName: "Success",
+          labels: {
+            formatter: function (val) {
+              if (val !== null) {
+                return val.toFixed(0);
+              }
+            }
+          },
+          show: false
+        }
+      ],
+      xaxis: {
+        type: "datetime",
+        tickAmount: 10,
+        labels: {
+          formatter: function (value, timestamp) {
+            let dae = new Date(timestamp);
+            return dae.toLocaleDateString(); // The formatter function overrides format property
+          }
+        }
+      }
+    };
+
+    if (!this?.overTimeGraph) {
+      this.overTimeGraph = new ApexCharts(
+        document.querySelector("#printCompletionOverTime"),
+        historyGraphOptions
+      );
+      this.overTimeGraph.render();
+    }
+    this.overTimeGraph.updateSeries(historyUsageOverTimeData);
   }
 
   static async edit(e) {
@@ -554,46 +1279,36 @@ class History {
     }
   }
 
-  static updateTotals(filtered) {
-    const times = [];
-    const cost = [];
-    const printerCost = [];
+  static updateTotals(history) {
     const statesCancelled = [];
     const statesFailed = [];
     const statesSuccess = [];
-    const totalUsageGrams = [];
-    const totalUsageMeter = [];
+    const printTimeTotal = [];
+    const filamentUsageGrams = [];
+    const filamentUsageLength = [];
+    const filamentCost = [];
+    const printerCostTotal = [];
+    const fullCostTotal = [];
     const costPerHour = [];
-    filtered.forEach((row) => {
-      times.push(parseInt(row.getElementsByClassName("time")[0].innerText));
-      if (!isNaN(parseFloat(row.getElementsByClassName("filamentCost")[0].innerText))) {
-        cost.push(parseFloat(row.getElementsByClassName("filamentCost")[0].innerText));
+
+    history.forEach((record) => {
+      if (record.state.includes("Success")) {
+        statesSuccess.push(1);
+      } else if (record.state.includes("Cancelled")) {
+        statesCancelled.push(1);
+      } else {
+        statesFailed.push(1);
       }
-      if (!isNaN(parseFloat(row.getElementsByClassName("printerCost")[0].innerText))) {
-        printerCost.push(parseFloat(row.getElementsByClassName("printerCost")[0].innerText));
-      }
-      if (!isNaN(parseFloat(row.getElementsByClassName("totalUsageGrams")[0].innerText))) {
-        totalUsageGrams.push(
-          parseFloat(row.getElementsByClassName("totalUsageGrams")[0].innerText)
-        );
-      }
-      if (!isNaN(parseFloat(row.getElementsByClassName("totalUsageMeter")[0].innerText))) {
-        totalUsageMeter.push(
-          parseFloat(row.getElementsByClassName("totalUsageMeter")[0].innerText)
-        );
-      }
-      const stateText = row.getElementsByClassName("state")[0].innerText.trim();
-      if (stateText === "Cancelled") {
-        statesCancelled.push(stateText);
-      }
-      if (stateText === "Failure") {
-        statesFailed.push(stateText);
-      }
-      if (stateText === "Success") {
-        statesSuccess.push(stateText);
-      }
-      costPerHour.push(parseFloat(row.getElementsByClassName("costPerHour")[0].innerHTML));
+
+      printTimeTotal.push(parseInt(record.printTime));
+      filamentUsageGrams.push(parseInt(record.totalWeight));
+      filamentUsageLength.push(parseInt(record.totalLength));
+      filamentCost.push(parseInt(record.spoolCost));
+      printerCostTotal.push(parseInt(record.printerCost));
+      fullCostTotal.push(parseInt(record.totalCost));
+      costPerHour.push(parseInt(record.costPerHour));
     });
+
     const totalHourCost = costPerHour.reduce((a, b) => a + b, 0);
 
     const avgHourCost = totalHourCost / costPerHour.length;
@@ -611,31 +1326,17 @@ class History {
     const cancelled = document.getElementById("totalCancelledPercent");
     cancelled.style.width = `${cancelledPercent.toFixed(2)}%`;
     cancelled.innerHTML = `${cancelledPercent.toFixed(2)}%`;
-    document.getElementById("totalCost").innerHTML = cost.reduce((a, b) => a + b, 0).toFixed(2);
-    document.getElementById("totalFilament").innerHTML = `${totalUsageMeter
-      .reduce((a, b) => a + b, 0)
-      .toFixed(2)}m / ${totalUsageGrams.reduce((a, b) => a + b, 0).toFixed(2)}g`;
-    const totalTimes = times.reduce((a, b) => a + b, 0);
 
-    document.getElementById("totalPrintTime").innerHTML = Calc.generateTime(totalTimes);
-    document.getElementById("printerTotalCost").innerHTML = printerCost
+    ELEMENTS.printTimeTotal.innerHTML = Calc.generateTime(
+      printTimeTotal.reduce((a, b) => a + b, 0)
+    );
+    ELEMENTS.filamentUsageTotal.innerHTML = `${filamentUsageLength
       .reduce((a, b) => a + b, 0)
-      .toFixed(2);
-    document.getElementById("combinedTotalCost").innerHTML = (
-      parseFloat(printerCost.reduce((a, b) => a + b, 0).toFixed(2)) +
-      parseFloat(cost.reduce((a, b) => a + b, 0).toFixed(2))
-    ).toFixed(2);
-    document.getElementById("averageCostPerHour").innerHTML = avgHourCost.toFixed(2);
+      .toFixed(2)}m / ${filamentUsageGrams.reduce((a, b) => a + b, 0).toFixed(2)}g`;
+    ELEMENTS.filamentCostTotal.innerHTML = filamentCost.reduce((a, b) => a + b, 0).toFixed(2);
+    ELEMENTS.printerCostTotal.innerHTML = printerCostTotal.reduce((a, b) => a + b, 0).toFixed(2);
+    ELEMENTS.totalCost.innerHTML = fullCostTotal.reduce((a, b) => a + b, 0).toFixed(2);
+    ELEMENTS.averageCostPerHour.innerHTML = avgHourCost.toFixed(2);
   }
 }
-// const element = document.getElementById("listenerHistory");
-// element.addEventListener(
-//   "jplist.state",
-//   (e) => {
-//     // the elements list after filtering + pagination
-//     console.log(e.jplistState.paginationOptions);
-//     History.updateTotals(e.jplistState.filtered);
-//   },
-//   false
-// );
 History.get();

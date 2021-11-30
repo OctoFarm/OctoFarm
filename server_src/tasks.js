@@ -1,6 +1,6 @@
 const softwareUpdateChecker = require("./services/octofarm-update.service");
 const { FilamentClean } = require("./lib/dataFunctions/filamentClean");
-const { initHistoryCache } = require("./cache/history.cache");
+const { initHistoryCache, getHistoryCache } = require("./cache/history.cache");
 const { TaskPresets } = require("./task.presets");
 const { PrinterClean } = require("./lib/dataFunctions/printerClean");
 const { SystemRunner } = require("./runners/systemInfo");
@@ -38,6 +38,10 @@ const GITHUB_UPDATE_CHECK_TASK = async () => {
 
 const SYSTEM_INFO_CHECK_TASK = async () => {
   await SystemRunner.querySystemInfo();
+};
+
+const GENERATE_MONTHLY_HISTORY_STATS = async () => {
+  await getHistoryCache().generateMonthlyStats();
 };
 
 const WEBSOCKET_HEARTBEAT_TASK = () => {
@@ -189,10 +193,11 @@ class OctoFarmTasks {
     KsatLlorKcir(GITHUB_UPDATE_CHECK_TASK, TaskPresets.PERIODIC_IMMEDIATE_DAY),
     KsatLlorKcir(GRAB_LATEST_PATREON_DATA, TaskPresets.PERIODIC_IMMEDIATE_WEEK),
     KsatLlorKcir(INITITIALISE_PRINTERS, TaskPresets.RUNONCE),
-    // KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
+    KsatLlorKcir(PRINTER_CLEAN_TASK, TaskPresets.PERIODIC_2500MS),
     KsatLlorKcir(STATE_TRACK_COUNTERS, TaskPresets.PERIODIC, 30000),
     KsatLlorKcir(FILAMENT_CLEAN_TASK, TaskPresets.RUNDELAYED, 1000),
-    KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE)
+    KsatLlorKcir(HISTORY_CACHE_TASK, TaskPresets.RUNONCE),
+    KsatLlorKcir(GENERATE_MONTHLY_HISTORY_STATS, TaskPresets.PERIODIC_IMMEDIATE_DAY)
   ];
 }
 

@@ -130,4 +130,12 @@ export default class Calculate {
   static getPercentage(done, total) {
     return ((100 * done) / total).toFixed(0);
   }
+  static firstDayOfMonth() {
+    const date = new Date();
+    return new Date(date.getFullYear(), date.getMonth(), 1);
+  }
+  static lastDayOfMonth() {
+    const date = new Date();
+    return new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  }
 }

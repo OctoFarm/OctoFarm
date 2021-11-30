@@ -37,6 +37,9 @@ All notable changes to this project will be documented in this file.
   - Added a quick setup button for Filament Manager Plugin. This will run through all online instances and set the up with the database settings you provide.
   - Filament manager can now clone spools. Pressing the button will insert a new row defaulting to 1000g and 0g usage. The name will be incremented with (#).
   - System manager can now view the running OctoFarm tasks.
+  - History now has server side pagination, should reduce resources some and make the history page load snappier. 
+  - Any history data requests are now filtered starting from the first day of the last month. You should see at least 1 months worth of data( when available ) as well as any from the current month.
+
 
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2
@@ -95,6 +98,7 @@ All notable changes to this project will be documented in this file.
   - Printers with selected spools are now disabled from selection without filament manager plugin.
   - System information now shows OctoFarms usage as a pure value rather than just on the donut charts.
   - Cut down the history table view. Now only shows State/Printer Name/File Name/ Start/ Duration/End/ Cost/Hourly Cost. All other info is inspectable in the "view" button.
+  - Refreshed the History page Layout. Now has headers that show Monthly Totals, Statistics modal, Monthly Statistics Modal, Pagination, Sorting, Range and Filters.
 
 ### Removed
 

@@ -107,46 +107,9 @@ const generateMilisecondsTime = function (miliseconds) {
   }
 };
 
-const generateRunDate = function (date) {
-  new Date(currentTask.started).toLocaleString().replace(",", ": ");
-};
-
-const historyTotals = function (history) {
-  const historyFileNames = [];
-  const historyPrinterNames = [];
-  const historySpools = [];
-  const paths = [];
-
-  history.forEach((hist) => {
-    historyPrinterNames.push(hist.printer.replace(/ /g, "_"));
-    if (typeof hist.file !== "undefined") {
-      historyFileNames.push(hist.file.name.replace(".gcode", ""));
-      const path = hist.file.path.substring(0, hist.file.path.lastIndexOf("/"));
-      if (path != "") {
-        paths.push(path);
-      }
-    }
-  });
-  return {
-    pathList: paths.filter(function (item, i, ar) {
-      return ar.indexOf(item) === i;
-    }),
-    fileNames: historyFileNames.filter(function (item, i, ar) {
-      return ar.indexOf(item) === i;
-    }),
-    printerNames: historyPrinterNames.filter(function (item, i, ar) {
-      return ar.indexOf(item) === i;
-    }),
-    spools: historySpools.filter(function (item, i, ar) {
-      return ar.indexOf(item) === i;
-    })
-  };
-};
-
 module.exports = {
   generateBytes: bytes,
   generateTime: generateTime,
   calculatePercent: calculatePercent,
-  historyTotals: historyTotals,
   generateMilisecondsTime
 };

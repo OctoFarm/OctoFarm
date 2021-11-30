@@ -119,6 +119,7 @@ router.get("/history", ensureAuthenticated, ensureCurrentUserAndGroup, async (re
     pagination: pagination,
     page: "History",
     serverSettings,
+    monthlyStatistics: historyCache.monthlyStatistics,
     octoFarmPageTitle: process.env[AppConstants.OCTOFARM_SITE_TITLE_KEY],
     clientSettings: req.user.clientSettings
   });

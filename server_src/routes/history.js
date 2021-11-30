@@ -11,6 +11,7 @@ const ServerSettings = require("../models/ServerSettings.js");
 const { getHistoryCache } = require("../cache/history.cache");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
 const { sortOptions } = require("../constants/history-sort.constants");
+const { getFirstDayOfLastMonth } = require("../utils/date.utils");
 
 router.post("/update", ensureAuthenticated, async (req, res) => {
   // Check required fields
@@ -101,22 +102,42 @@ router.post("/delete", ensureAuthenticated, async (req, res) => {
 });
 
 router.get("/get", ensureAuthenticated, async (req, res) => {
-  const findOptions = {};
+  const { page, limit, sort } = req.query;
+  console.log(req.query);
+  let paginationOptions = {};
 
-  const paginationOptions = req.query;
+  paginationOptions.page = page;
 
-  paginationOptions.sort = sortOptions[req.query.sort];
+  paginationOptions.limit = limit;
+
+  paginationOptions.sort = sortOptions[sort];
 
   console.log(paginationOptions);
+
+  const { firstDate, lastDate } = req.query;
+
+  const findOptions = {
+    "printHistory.endDate": { $gte: new Date(lastDate), $lte: new Date(firstDate) }
+  };
 
   const historyCache = getHistoryCache();
 
   const { historyClean, statisticsClean, pagination } = await historyCache.initCache(
-    {},
+    findOptions,
     paginationOptions
   );
 
-  res.send({ history: historyClean, statisticsClean, pagination });
+  const historyFilterData = historyCache.generateHistoryFilterData(historyClean);
+
+  console.log(paginationOptions);
+
+  res.send({
+    history: historyClean,
+    statisticsClean,
+    pagination,
+    monthlyStatistics: historyCache.monthlyStatistics,
+    historyFilterData
+  });
 });
 
 router.get("/statisticsData", ensureAuthenticated, async (req, res) => {

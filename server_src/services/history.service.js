@@ -1,17 +1,21 @@
 "use strict";
 
 const historyModel = require("../models/History");
-const { myCustomLabels, defaultPaginationOptions } = require("../constants/history-sort.constants");
+const {
+  myCustomLabels,
+  defaultPaginationOptions,
+  defaultInputFilters
+} = require("../constants/history-sort.constants");
 
 /**
  * Finds the history rows in the database.
  * @param {any} input
  * @param options
  */
-async function find(input, options = defaultPaginationOptions) {
+async function find(input = defaultInputFilters, options = defaultPaginationOptions) {
   //Merge in the custom labels used
   options = { ...options, ...{ customLabels: myCustomLabels } };
-
+  console.log(input);
   return historyModel.paginate(input, options, function (err, result) {
     return { itemList: result.docs, pagination: result.paginator };
   });
