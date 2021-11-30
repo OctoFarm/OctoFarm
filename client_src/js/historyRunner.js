@@ -79,7 +79,7 @@ class History {
       }
     }
   }
-  static addHistoryFilterListeners(pagination) {
+  static addHistoryFilterListeners(pagination, forceFilterRedraw) {
     const paginationElementsList = document.querySelectorAll('*[id^="changePage"]');
     paginationElementsList.forEach((element) => {
       element.addEventListener("click", (e) => {
@@ -91,36 +91,62 @@ class History {
     });
 
     document.getElementById("firstPage").addEventListener("click", () => {
-      this.get(1);
+      this.get(1, true);
     });
 
     document.getElementById("previousPage").addEventListener("click", () => {
-      this.get(pagination.prev);
+      this.get(pagination.prev, true);
     });
 
     document.getElementById("nextPage").addEventListener("click", () => {
-      this.get(pagination.next);
+      this.get(pagination.next, true);
     });
 
     document.getElementById("lastPage").addEventListener("click", () => {
-      this.get(pagination.pageCount);
+      this.get(pagination.pageCount, true);
     });
+
+    if (forceFilterRedraw) {
+      this.listenersApplied = false;
+    }
 
     if (!this?.listenersApplied) {
       this.datePicker.on("selected", (date1, date2) => {
-        this.get();
+        this.get(undefined, true);
       });
       ELEMENTS.sort.addEventListener("change", () => {
         this.get();
       });
       ELEMENTS.itemsPerPage.addEventListener("change", () => {
+        this.get(undefined, true);
+      });
+      ELEMENTS.fileFilter.addEventListener("change", () => {
+        this.get();
+      });
+      ELEMENTS.pathFilter.addEventListener("change", () => {
+        this.get();
+      });
+
+      ELEMENTS.spoolManuFilter.addEventListener("change", () => {
+        this.get();
+      });
+
+      ELEMENTS.spoolMatFilter.addEventListener("change", () => {
+        this.get();
+      });
+
+      ELEMENTS.fileSearch.addEventListener("keyup", () => {
+        this.get();
+      });
+
+      ELEMENTS.spoolSearch.addEventListener("keyup", () => {
         this.get();
       });
 
       this.listenersApplied = true;
     }
   }
-  static drawHistoryFilters(pagination, filterData) {
+  static drawHistoryFilters(pagination, filterData, forceFilterRedraw) {
     ELEMENTS.historyPagination.innerHTML = "";
     if (pagination) {
       ELEMENTS.historyPagination.insertAdjacentHTML(
@@ -145,39 +171,40 @@ class History {
       });
       this.datePicker.setDateRange(getFirstDayOfLastMonth(), Calc.lastDayOfMonth());
     }
-
-    ELEMENTS.fileFilter.innerHTML = returnHistoryFilterDefaultSelected();
-    filterData.fileNames.forEach((file) => {
-      ELEMENTS.fileFilter.insertAdjacentHTML(
-        "beforeend",
-        `<option value="${file.replace(/ /g, "_")}"> ${file} </option>`
-      );
-    });
-    ELEMENTS.pathFilter.innerHTML = returnHistoryFilterDefaultSelected();
-    filterData.pathList.forEach((path) => {
-      ELEMENTS.pathFilter.insertAdjacentHTML(
-        "beforeend",
-        `<option value="${path.replace(/ /g, "_")}"> ${path} </option>`
-      );
-    });
-    ELEMENTS.spoolManuFilter.innerHTML = returnHistoryFilterDefaultSelected();
-    filterData.spoolsManu.forEach((manu) => {
-      if (manu !== "") {
-        ELEMENTS.spoolManuFilter.insertAdjacentHTML(
+    if (forceFilterRedraw) {
+      ELEMENTS.fileFilter.innerHTML = returnHistoryFilterDefaultSelected();
+      filterData.fileNames.forEach((file) => {
+        ELEMENTS.fileFilter.insertAdjacentHTML(
           "beforeend",
-          `<option value="${manu}"> ${manu} </option>`
+          `<option value="${file.replace(/ /g, "_")}"> ${file} </option>`
         );
-      }
-    });
-    ELEMENTS.spoolMatFilter.innerHTML = returnHistoryFilterDefaultSelected();
-    filterData.spoolsMat.forEach((mat) => {
-      if (mat !== "") {
-        ELEMENTS.spoolMatFilter.insertAdjacentHTML(
+      });
+      ELEMENTS.pathFilter.innerHTML = returnHistoryFilterDefaultSelected();
+      filterData.pathList.forEach((path) => {
+        ELEMENTS.pathFilter.insertAdjacentHTML(
           "beforeend",
-          `<option value="${mat}"> ${mat} </option>`
+          `<option value="${path.replace(/ /g, "_")}"> ${path} </option>`
         );
-      }
-    });
+      });
+      ELEMENTS.spoolManuFilter.innerHTML = returnHistoryFilterDefaultSelected();
+      filterData.spoolsManu.forEach((manu) => {
+        if (manu !== "") {
+          ELEMENTS.spoolManuFilter.insertAdjacentHTML(
+            "beforeend",
+            `<option value="${manu}"> ${manu} </option>`
+          );
+        }
+      });
+      ELEMENTS.spoolMatFilter.innerHTML = returnHistoryFilterDefaultSelected();
+      filterData.spoolsMat.forEach((mat) => {
+        if (mat !== "") {
+          ELEMENTS.spoolMatFilter.insertAdjacentHTML(
+            "beforeend",
+            `<option value="${mat}"> ${mat} </option>`
+          );
+        }
+      });
+    }
   }
   static drawMonthlyStatistics(statistics) {
     const monthArray = [];
@@ -615,13 +642,39 @@ class History {
       firstDay = this.datePicker.getDate().dateInstance;
     }
 
-    return `history/get?${HISTORY_CONSTANTS.currentPage}${pageNumber}&${HISTORY_CONSTANTS.perPage}${
-      ELEMENTS.itemsPerPage.value
-    }&${HISTORY_CONSTANTS.sort}${SORT_CONSTANTS[ELEMENTS.sort.value]}&${
-      HISTORY_CONSTANTS.dateBefore
-    }${lastDay}&${HISTORY_CONSTANTS.dateAfter}${firstDay}`;
+    let url = `history/get?${HISTORY_CONSTANTS.currentPage}${pageNumber}&${
+      HISTORY_CONSTANTS.perPage
+    }${ELEMENTS.itemsPerPage.value}&${HISTORY_CONSTANTS.sort}${
+      SORT_CONSTANTS[ELEMENTS.sort.value]
+    }&${HISTORY_CONSTANTS.dateBefore}${lastDay}&${HISTORY_CONSTANTS.dateAfter}${firstDay}`;
+
+    if (ELEMENTS.fileFilter.value !== "Filter") {
+      url += "&fileFilter=" + ELEMENTS.fileFilter.value + ".gcode";
+    }
+
+    if (ELEMENTS.pathFilter.value !== "Filter") {
+      url += "&pathFilter=" + ELEMENTS.pathFilter.value;
+    }
+
+    if (ELEMENTS.spoolManuFilter.value !== "Filter") {
+      url += "&spoolManuFilter=" + ELEMENTS.spoolManuFilter.value.replace(/ /g, "-");
+    }
+
+    if (ELEMENTS.spoolMatFilter.value !== "Filter") {
+      url += "&spoolMatFilter=" + ELEMENTS.spoolMatFilter.value.replace(/ /g, "-");
+    }
+
+    if (ELEMENTS.fileSearch.value !== "Filter") {
+      url += "&fileSearch=" + ELEMENTS.fileSearch.value.replace(/ /g, "-");
+    }
+
+    if (ELEMENTS.spoolSearch.value !== "Filter") {
+      url += "&spoolSearch=" + ELEMENTS.spoolSearch.value.replace(/ /g, "-");
+    }
+
+    return url;
   }
-  static async get(pageNumber = 1) {
+  static async get(pageNumber = 1, forceFilterRedraw = false) {
     const { history, statisticsClean, pagination, monthlyStatistics, historyFilterData } =
       await OctoFarmClient.get(this.getHistoryRequestURL(pageNumber));
 
@@ -636,8 +689,8 @@ class History {
     //this.updateStatistics(statisticsClean);
 
     // Load history filters
-    this.drawHistoryFilters(pagination, historyFilterData);
-    this.addHistoryFilterListeners(pagination);
+    this.drawHistoryFilters(pagination, historyFilterData, forceFilterRedraw);
+    this.addHistoryFilterListeners(pagination, forceFilterRedraw);
 
     // Load history table...
     this.drawHistoryTable(history);
@@ -1339,4 +1392,4 @@ class History {
     ELEMENTS.averageCostPerHour.innerHTML = avgHourCost.toFixed(2);
   }
 }
-History.get();
+History.get(1, true);

@@ -103,7 +103,6 @@ router.post("/delete", ensureAuthenticated, async (req, res) => {
 
 router.get("/get", ensureAuthenticated, async (req, res) => {
   const { page, limit, sort } = req.query;
-  console.log(req.query);
   let paginationOptions = {};
 
   paginationOptions.page = page;
@@ -112,13 +111,47 @@ router.get("/get", ensureAuthenticated, async (req, res) => {
 
   paginationOptions.sort = sortOptions[sort];
 
-  console.log(paginationOptions);
-
-  const { firstDate, lastDate } = req.query;
+  const {
+    firstDate,
+    lastDate,
+    fileFilter,
+    pathFilter,
+    spoolManuFilter,
+    spoolMatFilter,
+    fileSearch,
+    spoolSearch
+  } = req.query;
 
   const findOptions = {
     "printHistory.endDate": { $gte: new Date(lastDate), $lte: new Date(firstDate) }
   };
+  if (fileFilter) {
+    findOptions["printHistory.fileName"] = fileFilter;
+  }
+  if (pathFilter) {
+    findOptions["printHistory.job.file.path"] = new RegExp(pathFilter, "g");
+  }
+  if (spoolManuFilter) {
+    findOptions["printHistory.filamentSelection.spools.profile.manufacturer"] = new RegExp(
+      spoolManuFilter.replace(/_/g, " "),
+      "g"
+    );
+  }
+  if (spoolMatFilter) {
+    findOptions["printHistory.filamentSelection.spools.profile.material"] = new RegExp(
+      spoolMatFilter.replace(/_/g, " "),
+      "g"
+    );
+  }
+  if (fileSearch) {
+    findOptions["printHistory.fileName"] = new RegExp(fileSearch.replace(/_/g, " "), "g");
+  }
+  if (spoolSearch) {
+    findOptions["printHistory.filamentSelection.spools.name"] = new RegExp(
+      spoolSearch.replace(/_/g, " "),
+      "g"
+    );
+  }
 
   const historyCache = getHistoryCache();
 
@@ -128,8 +161,6 @@ router.get("/get", ensureAuthenticated, async (req, res) => {
   );
 
   const historyFilterData = historyCache.generateHistoryFilterData(historyClean);
-
-  console.log(paginationOptions);
 
   res.send({
     history: historyClean,

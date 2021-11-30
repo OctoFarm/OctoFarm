@@ -18,7 +18,6 @@ module.exports = {
     durationAsc: "duration_asc",
     durationDesc: "duration_desc"
   },
-  FILTER_CONSTANTS: {},
   ELEMENTS: {
     historyTable: document.getElementById("historyTable"),
     historyPagination: document.getElementById("historyPagination"),
