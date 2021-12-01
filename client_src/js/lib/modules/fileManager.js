@@ -416,49 +416,51 @@ export default class FileManager {
   }
 
   static async refreshFiles(printer, spinnerIcon) {
-    for (let i = 0; i < printer.fileList.fileList.length; i++) {
-      const file = printer.fileList.fileList[i];
-      let currentFolder = document.getElementById("currentFolder")?.innerHTML;
-      if (!currentFolder) {
-        // Null-ref is tolerable
-        continue;
-      }
-      if (currentFolder.includes("local/")) {
-        currentFolder = currentFolder.replace("local/", "");
-      }
-      if (file.path === currentFolder) {
-        if (document.getElementById(`file-${file.fullPath}`)) {
-          let toolInfo = "";
-          if (file.toolUnits?.length) {
-            file.toolUnits.forEach((unit, index) => {
-              toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
-            });
-          }
+    if (fileUploads.size() <= 1) {
+      for (let i = 0; i < printer.fileList.fileList.length; i++) {
+        const file = printer.fileList.fileList[i];
+        let currentFolder = document.getElementById("currentFolder")?.innerHTML;
+        if (!currentFolder) {
+          // Null-ref is tolerable
+          continue;
+        }
+        if (currentFolder.includes("local/")) {
+          currentFolder = currentFolder.replace("local/", "");
+        }
+        if (file.path === currentFolder) {
+          if (document.getElementById(`file-${file.fullPath}`)) {
+            let toolInfo = "";
+            if (file.toolUnits?.length) {
+              file.toolUnits.forEach((unit, index) => {
+                toolInfo += `<i class="fas fa-weight"></i> ${unit} / <i class="fas fa-dollar-sign"></i> Cost: ${file.toolCosts[index]}<br>`;
+              });
+            }
 
-          let thumbnail = '<center><i class="fas fa-file-code fa-2x"></i></center>';
-          if (!!file.thumbnail) {
-            thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
-          }
+            let thumbnail = '<center><i class="fas fa-file-code fa-2x"></i></center>';
+            if (!!file.thumbnail) {
+              thumbnail = `<center><img src='${printer.printerURL}/${file.thumbnail}' width="100%"></center>`;
+            }
 
-          let fileDate = new Date(file.uploadDate * 1000);
-          const dateString = fileDate.toDateString();
-          const timeString = fileDate.toTimeString().substring(0, 8);
-          fileDate = `${dateString} ${timeString}`;
-          document.getElementById("fileHistoryRate-" + file.fullPath).innerHTML =
-            spinnerIcon +
-            '<i class="fas fa-thumbs-up"></i> 0 / <i class="fas fa-thumbs-down"></i> 0';
-          document.getElementById(`fileDate-${file.fullPath}`).innerHTML = ` ${fileDate}`;
-          document.getElementById(`fileSize-${file.fullPath}`).innerHTML = ` ${Calc.bytes(
-            file.fileSize
-          )}`;
-          document.getElementById(`fileTool-${file.fullPath}`).innerHTML = ` ${toolInfo}`;
-          document.getElementById(`fileTime-${file.fullPath}`).innerHTML = ` ${Calc.generateTime(
-            file.expectedPrintTime
-          )}`;
-          document.getElementById(`fileCost-${file.fullPath}`).innerHTML =
-            " " + `Print Cost: ${file.printCost?.toFixed(2)}`;
-          document.getElementById(`fileThumbnail-${file.fullPath}`).innerHTML = ` ${thumbnail}`;
-          document.getElementById(`fileDateClean-${file.fullPath}`).innerHTML = file.uploadDate;
+            let fileDate = new Date(file.uploadDate * 1000);
+            const dateString = fileDate.toDateString();
+            const timeString = fileDate.toTimeString().substring(0, 8);
+            fileDate = `${dateString} ${timeString}`;
+            document.getElementById("fileHistoryRate-" + file.fullPath).innerHTML =
+              spinnerIcon +
+              '<i class="fas fa-thumbs-up"></i> 0 / <i class="fas fa-thumbs-down"></i> 0';
+            document.getElementById(`fileDate-${file.fullPath}`).innerHTML = ` ${fileDate}`;
+            document.getElementById(`fileSize-${file.fullPath}`).innerHTML = ` ${Calc.bytes(
+              file.fileSize
+            )}`;
+            document.getElementById(`fileTool-${file.fullPath}`).innerHTML = ` ${toolInfo}`;
+            document.getElementById(`fileTime-${file.fullPath}`).innerHTML = ` ${Calc.generateTime(
+              file.expectedPrintTime
+            )}`;
+            document.getElementById(`fileCost-${file.fullPath}`).innerHTML =
+              " " + `Print Cost: ${file.printCost?.toFixed(2)}`;
+            document.getElementById(`fileThumbnail-${file.fullPath}`).innerHTML = ` ${thumbnail}`;
+            document.getElementById(`fileDateClean-${file.fullPath}`).innerHTML = file.uploadDate;
+          }
         }
       }
     }
