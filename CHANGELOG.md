@@ -99,6 +99,7 @@ All notable changes to this project will be documented in this file.
   - System information now shows OctoFarms usage as a pure value rather than just on the donut charts.
   - Cut down the history table view. Now only shows State/Printer Name/File Name/ Start/ Duration/End/ Cost/Hourly Cost. All other info is inspectable in the "view" button.
   - Refreshed the History page Layout. Now has headers that show Monthly Totals, Statistics modal, Monthly Statistics Modal, Pagination, Sorting, Range and Filters.
+  - Printer Manager "Re-Sync" button renamed to "Re-Connect" to differentiate it from the file manager action. 
 
 ### Removed
 
@@ -159,6 +160,7 @@ All notable changes to this project will be documented in this file.
   - Fixed system settings saving not correctly checking if reboot required on server and only requests client to reboot if required. 
   - Fixed history chart colours for Failed and Cancelled been mixed up.
   - Fixed OctoFarm sending tool/printhead commands when cancelling a print.
+  - Decoupled the historyByDay stats so they generate if you don't use spools/filament mananger at all.
 
 # Security
   - Protected all system CRUD endpoints by ensuring user is Administrator.

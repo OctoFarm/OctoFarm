@@ -1,46 +1,46 @@
 <% if(typeof history.length != 'undefined' && history.length > 0 ) {%>
 
 <div class="row mt-3 mx-2">
-  <div class="col-md-3">
+  <div class="col-md-6 col-lg-3">
     <div class="bg-dark rounded p-2 row">
-      <div class="col-lg-2">
+      <div class="col-md-4 col-lg-2">
         <h3 id="totalSparkLast" class="text-info">#</h3>
         <h4 class="text-info">Total</h4>
       </div>
-      <div id="totalSpark" class="col-lg-10 text-right"></div>
+      <div id="totalSpark" class="col-md-8 col-lg-10 text-right"></div>
     </div>
   </div>
-  <div class="col-md-3">
+  <div class="col-md-6 col-lg-3">
     <div class="bg-dark rounded p-2 row">
-      <div class="col-lg-4">
+      <div class="col-md-4 col-lg-2">
         <h3 id="successSparkLast" class="text-success">#</h3>
         <h4 class="text-success">Completed</h4>
       </div>
-      <div id="successSpark" class="col-lg-8 text-right"></div>
+      <div id="successSpark" class="col-md-8 col-lg-10 text-right"></div>
     </div>
   </div>
-  <div class="col-md-3">
+  <div class="col-md-6 col-lg-3">
     <div class="bg-dark rounded p-2 row">
-      <div class="col-lg-4">
+      <div class="col-md-4 col-lg-2">
         <h3 id="cancelledSparkLast" class="text-warning">#</h3>
         <h4 class="text-warning">Cancelled</h4>
       </div>
-      <div id="cancelledSpark" class="col-lg-8 text-right"></div>
+      <div id="cancelledSpark" class="col-md-8 col-lg-10 text-right"></div>
     </div>
   </div>
-  <div class="col-md-3">
+  <div class="col-md-6 col-lg-3">
     <div class="bg-dark rounded p-2 row">
-      <div class="col-lg-2">
+      <div class="col-md-4 col-lg-2">
         <h3 id="failedSparkLast" class="text-danger">#</h3>
         <h4 class="text-danger">Failed</h4>
       </div>
-      <div id="failedSpark" class="col-lg-10 text-right"></div>
+      <div id="failedSpark" class="col-md-8 col-lg-10 text-right"></div>
     </div>
   </div>
 </div>
 
 <div class="row">
-  <div id="dashboardInfo" class="col-2 col-sm-2 col-md-2 col-lg-2 col-xl-2 mb-2 mb-2">
+  <div id="dashboardInfo" class="col-sm-12 col-md-12 col-lg-2 col-xl-2 mb-2 mb-2">
     <div class="card text-white bg-dark h-100">
       <div class="card-header dashHeader p-0">
         <button
@@ -78,7 +78,7 @@
 
     </div>
   </div>
-  <div id="dashboardInfo" class="col-10 col-sm-10 col-md-10 col-lg-10 col-xl-10 mb-2">
+  <div id="dashboardInfo" class="col-sm-12 col-md-12 col-lg-10 col-xl-10 mb-2">
     <div class="card text-white bg-dark h-100">
       <div class="card-header dashHeader p-0">
         <button
@@ -95,10 +95,16 @@
       </div>
       <div class="card-body pt-1 pb-0 text-center">
         <div class="row">
-          <div class="col-lg-2 text-center">
+          <div class="col-md-4 col-lg-4">
             <div class="row">
-              <div class="col-lg-12">
-                <h5>Sorting</h5><hr>
+              <div class="col-lg-12 bg-dark text-center" id="historyRange">
+                <h5>Range</h5><hr>
+                <div class="input-group d-inline-flex">
+                  <div class="input-group-prepend">
+                    <span class="input-group-text" id="inputGroup-sizing-default">Date Range</span>
+                  </div>
+                  <input id="historyDateRange"  class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                </div>
                 <div class="input-group mt-1 d-inline-flex">
                   <div class="input-group-prepend">
                     <label class="input-group-text" for="sortHistoryTable">Sort By: </label>
@@ -167,21 +173,7 @@
 
                   </select>
                 </div>
-              </div>
-
-            </div>
-          </div>
-          <div class="col-lg-10">
-            <div class="row">
-              <div class="col-lg-3 bg-dark text-center" id="historyRange">
-                <h5>Range</h5><hr>
-                <div class="input-group mb-1 d-inline-flex">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" id="inputGroup-sizing-default">Date Range</span>
-                  </div>
-                  <input id="historyDateRange"  class="form-control" aria-label="Default" aria-describedby="inputGroup-sizing-default">
-                </div>
-                <div class="input-group mb-1 d-inline-flex">
+                <div class="input-group mt-1 d-inline-flex">
                   <div class="input-group-prepend">
                     <label class="input-group-text" for="inputGroupSelect01">Items per page: </label>
                   </div>
@@ -194,7 +186,58 @@
                   </select>
                 </div>
               </div>
-              <div class="col-lg-3 bg-dark text-center" id="historyFileFilters">
+            </div>
+          </div>
+          <div class="col-md-8 col-lg-8">
+            <div class="row">
+              <div class="col-md-6 col-lg-4 bg-dark text-center" id="historyPrinterFilters">
+                <h5>Printer</h5><hr>
+                <div class="input-group mb-1 d-inline-flex">
+                  <div class="input-group-prepend">
+                    <label class="input-group-text" for="historyPrinterNames">Names: </label>
+                  </div>
+                  <select class="custom-select" id="historyPrinterNames"
+                          data-jplist-control="select-filter"
+                          data-group="history"
+                          data-name="fileNames"
+                  >
+                    <option selected
+                            href="#"
+                            data-value="0"
+                            data-path="default"
+                    >Filter</option>
+
+                  </select>
+                </div>
+                <div class="input-group mb-1 d-inline-flex">
+                  <div class="input-group-prepend">
+                    <label class="input-group-text" for="historyPrinterGroups">Groups: </label>
+                  </div>
+                  <select class="custom-select" id="historyPrinterGroups"
+                          data-jplist-control="select-filter"
+                          data-group="history"
+                          data-name="pathName"
+                  >
+                    <option selected
+                            href="#"
+                            data-value="0"
+                            data-path="default"
+                    >Filter</option>
+
+                  </select>
+                </div>
+                <div class="input-group mb-1 d-inline-flex">
+                  <input id="historyPrinterSearch" type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1"
+                         data-jplist-control="textbox-filter"
+                         data-group="history"
+                         data-name="historyPrinterSearch"
+                         data-path=".file"
+                         type="text"
+                         value=""
+                         placeholder="Search...">
+                </div>
+              </div>
+              <div class="col-md-6 col-lg-4 bg-dark text-center" id="historyFileFilters">
                 <h5>File</h5><hr>
                 <div class="input-group mb-1 d-inline-flex">
                   <div class="input-group-prepend">
@@ -230,8 +273,18 @@
 
                   </select>
                 </div>
+                <div class="input-group mb-1 d-inline-flex">
+                  <input id="historyFileSearch" type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1"
+                         data-jplist-control="textbox-filter"
+                         data-group="history"
+                         data-name="fileNameSearch"
+                         data-path=".file"
+                         type="text"
+                         value=""
+                         placeholder="Search...">
+                </div>
               </div>
-              <div class="col-lg-3 bg-dark text-center" id="historySpoolFilters">
+              <div class="col-md-6 col-lg-4 bg-dark text-center" id="historySpoolFilters">
                 <h5>Spool</h5><hr>
                 <div class="input-group mb-1 d-inline-flex">
                   <div class="input-group-prepend">
@@ -267,26 +320,7 @@
 
                   </select>
                 </div>
-              </div>
-              <div class="col-lg-3 bg-dark text-center" id="historySearch">
-                <h5>Search</h5><hr>
-                <div class="input-group mb-1 d-inline-flex">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">File Search</span>
-                  </div>
-                  <input id="historyFileSearch" type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1"
-                         data-jplist-control="textbox-filter"
-                         data-group="history"
-                         data-name="fileNameSearch"
-                         data-path=".file"
-                         type="text"
-                         value=""
-                         placeholder="Search...">
-                </div>
-                <div class="input-group mb-3">
-                  <div class="input-group-prepend">
-                    <span class="input-group-text" id="basic-addon1">Spool Search</span>
-                  </div>
+                <div class="input-group mb-1">
                   <input id="historySpoolSearch" type="text" class="form-control" aria-label="Username" aria-describedby="basic-addon1"
                          data-jplist-control="textbox-filter"
                          data-group="history"

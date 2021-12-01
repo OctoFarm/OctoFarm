@@ -22,15 +22,19 @@ module.exports = {
         const dbCollection = db.collection("histories");
 
         await dbCollection.find({}).forEach(function (data) {
-          dbCollection.findOneAndUpdate(
-            { _id: data._id },
-            {
-              $set: {
-                "printHistory.startDate": convertDateStringToDateTime(data.printHistory.startDate),
-                "printHistory.endDate": convertDateStringToDateTime(data.printHistory.endDate)
+          if (typeof data?.printHistory?.startDate === "string") {
+            dbCollection.findOneAndUpdate(
+              { _id: data._id },
+              {
+                $set: {
+                  "printHistory.startDate": convertDateStringToDateTime(
+                    data.printHistory.startDate
+                  ),
+                  "printHistory.endDate": convertDateStringToDateTime(data.printHistory.endDate)
+                }
               }
-            }
-          );
+            );
+          }
         });
       });
     } finally {
@@ -47,17 +51,19 @@ module.exports = {
         const dbCollection = db.collection("histories");
 
         await dbCollection.find({}).forEach(function (data) {
-          dbCollection.findOneAndUpdate(
-            { _id: data._id },
-            {
-              $set: {
-                "printHistory.startDate": convertDateObjectToDateString(
-                  data.printHistory.startDate
-                ),
-                "printHistory.endDate": convertDateObjectToDateString(data.printHistory.endDate)
+          if (Object.prototype.toString.call(data?.printHistory?.endDate) === "[object Date]") {
+            dbCollection.findOneAndUpdate(
+              { _id: data._id },
+              {
+                $set: {
+                  "printHistory.startDate": convertDateObjectToDateString(
+                    data.printHistory.startDate
+                  ),
+                  "printHistory.endDate": convertDateObjectToDateString(data.printHistory.endDate)
+                }
               }
-            }
-          );
+            );
+          }
         });
       });
     } finally {

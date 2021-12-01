@@ -180,13 +180,7 @@ class HistoryClean {
     return spools;
   }
 
-  static processHistorySpools(
-    historyCleanEntry,
-    usageOverTime,
-    totalByDay,
-    historyByDay,
-    totalOverTime
-  ) {
+  static processHistorySpools(historyCleanEntry, usageOverTime, totalByDay) {
     const spools = historyCleanEntry?.spools;
     const historyState = historyCleanEntry.state;
 
@@ -209,8 +203,6 @@ class HistoryClean {
             } else {
               return;
             }
-            checkNestedIndexHistoryRates = checkNestedIndex(searchKeyword, historyByDay);
-            checkNestedIndexOverTimeRates = checkNestedIndex(searchKeyword, totalOverTime);
             let checkNestedIndexByDay = checkNestedIndex(spool[key].type, usageOverTime);
             let usageWeightCalc = historyCleanEntry.totalWeight;
             if (!!usageOverTime[checkNestedIndexByDay].data[0]) {
@@ -221,12 +213,9 @@ class HistoryClean {
             }
 
             let checkedIndex = checkNestedIndex(spool[key].type, totalByDay);
-            // console.log(historyCleanEntry.totalWeight);
             let weightCalcSan = parseFloat(historyCleanEntry.totalWeight.toFixed(2));
-            //console.log(weightCalcSan);
             // Don't include 0 weights
             if (weightCalcSan > 0) {
-              //  console.log(historyCleanEntry.endDate);
               // Check if more than 90 days ago...
               totalByDay[checkedIndex].data.push({
                 x: historyCleanEntry.endDate,
@@ -235,14 +224,6 @@ class HistoryClean {
               usageOverTime[checkedIndex].data.push({
                 x: historyCleanEntry.endDate,
                 y: weightCalcSan
-              });
-              historyByDay[checkNestedIndexHistoryRates].data.push({
-                x: historyCleanEntry.endDate,
-                y: 1
-              });
-              totalOverTime[checkNestedIndexOverTimeRates].data.push({
-                x: historyCleanEntry.endDate,
-                y: 1
               });
             }
           } else {
@@ -258,34 +239,6 @@ class HistoryClean {
                 data: []
               });
             }
-            if (!historyByDay[0]) {
-              historyByDay.push({
-                name: "Success",
-                data: []
-              });
-              historyByDay.push({
-                name: "Failed",
-                data: []
-              });
-              historyByDay.push({
-                name: "Cancelled",
-                data: []
-              });
-            }
-            if (!totalOverTime[0]) {
-              totalOverTime.push({
-                name: "Success",
-                data: []
-              });
-              totalOverTime.push({
-                name: "Failed",
-                data: []
-              });
-              totalOverTime.push({
-                name: "Cancelled",
-                data: []
-              });
-            }
           }
         }
       });
@@ -293,11 +246,75 @@ class HistoryClean {
 
     return {
       usageOverTime,
-      totalByDay,
+      totalByDay
+    };
+  }
+
+  static processHistoryCounts(historyCleanEntry, historyByDay, totalOverTime) {
+    const historyState = historyCleanEntry.state;
+
+    // Check if type exists
+    let searchKeyword = "";
+    if (historyState.includes("success")) {
+      searchKeyword = "Success";
+    } else if (historyState.includes("warning")) {
+      searchKeyword = "Cancelled";
+    } else if (historyState.includes("danger")) {
+      searchKeyword = "Failed";
+    } else {
+      return;
+    }
+
+    let checkNestedResult = checkNested(searchKeyword, historyByDay);
+    let checkNestedIndexHistoryRates = checkNestedIndex(searchKeyword, historyByDay);
+    let checkNestedIndexOverTimeRates = checkNestedIndex(searchKeyword, totalOverTime);
+
+    if (!!checkNestedResult) {
+      historyByDay[checkNestedIndexHistoryRates].data.push({
+        x: historyCleanEntry.endDate,
+        y: 1
+      });
+      totalOverTime[checkNestedIndexOverTimeRates].data.push({
+        x: historyCleanEntry.endDate,
+        y: 1
+      });
+    } else {
+      if (!historyByDay[0]) {
+        historyByDay.push({
+          name: "Success",
+          data: []
+        });
+        historyByDay.push({
+          name: "Failed",
+          data: []
+        });
+        historyByDay.push({
+          name: "Cancelled",
+          data: []
+        });
+      }
+      if (!totalOverTime[0]) {
+        totalOverTime.push({
+          name: "Success",
+          data: []
+        });
+        totalOverTime.push({
+          name: "Failed",
+          data: []
+        });
+        totalOverTime.push({
+          name: "Cancelled",
+          data: []
+        });
+      }
+    }
+
+    return {
       historyByDay,
       totalOverTime
     };
   }
+
   generateStatistics(historyData) {
     let completedJobsCount = 0;
     let cancelledCount = 0;
@@ -366,14 +383,8 @@ class HistoryClean {
       topFilesList.push(topFileState);
       topPrinterList.push(topPrinterState);
       filamentCost.push(spoolCost);
-
-      HistoryClean.processHistorySpools(
-        currentHistory[h],
-        usageOverTime,
-        totalByDay,
-        historyByDay,
-        totalOverTime
-      );
+      HistoryClean.processHistoryCounts(currentHistory[h], historyByDay, totalOverTime);
+      HistoryClean.processHistorySpools(currentHistory[h], usageOverTime, totalByDay);
     }
 
     const totalFilamentWeight = filamentWeight.reduce((a, b) => a + b, 0);
@@ -397,6 +408,7 @@ class HistoryClean {
       leastUsedPrinter = printerNamesArray[0][minIndexPrinterNames];
     }
     const statTotal = completedJobsCount + cancelledCount + failedCount;
+
     totalByDay.forEach((usage) => {
       usage.data = HistoryClean.sumValuesGroupByDate(usage.data);
     });
@@ -616,11 +628,15 @@ class HistoryClean {
     const historyFileNames = [];
     const historyFilePaths = [];
     const historyPrinterNames = [];
+    const historyPrinterGroups = [];
     const historySpoolsManu = [];
     const historySpoolsMat = [];
     if (history) {
       history.forEach((hist) => {
         historyPrinterNames.push(hist.printer.replace(/ /g, "_"));
+        if (hist?.printerGroup) {
+          historyPrinterGroups.push(hist.printerGroup);
+        }
         if (typeof hist.file !== "undefined") {
           historyFileNames.push(hist.file.name.replace(".gcode", ""));
           const path = hist.file.path.substring(0, hist.file.path.lastIndexOf("/"));
@@ -649,6 +665,9 @@ class HistoryClean {
         return ar.indexOf(item) === i;
       }),
       printerNames: historyPrinterNames.filter(function (item, i, ar) {
+        return ar.indexOf(item) === i;
+      }),
+      printerGroups: historyPrinterGroups.filter(function (item, i, ar) {
         return ar.indexOf(item) === i;
       }),
       spoolsMat: historySpoolsMat.filter(function (item, i, ar) {

@@ -79,7 +79,7 @@ class History {
       }
     }
   }
-  static addHistoryFilterListeners(pagination, forceFilterRedraw) {
+  static addHistoryFilterListeners(pagination) {
     const paginationElementsList = document.querySelectorAll('*[id^="changePage"]');
     paginationElementsList.forEach((element) => {
       element.addEventListener("click", (e) => {
@@ -106,41 +106,75 @@ class History {
       this.get(pagination.pageCount, true);
     });
 
-    if (forceFilterRedraw) {
-      this.listenersApplied = false;
-    }
+    // if (forceFilterRedraw) {
+    //   this.listenersApplied = false;
+    // }
 
     if (!this?.listenersApplied) {
-      this.datePicker.on("selected", (date1, date2) => {
-        this.get(undefined, true);
+      this.datePicker.on("selected", async (date1, date2) => {
+        await this.get(undefined, true);
       });
-      ELEMENTS.sort.addEventListener("change", () => {
-        this.get();
+      ELEMENTS.sort.addEventListener("change", async () => {
+        await this.get();
       });
-      ELEMENTS.itemsPerPage.addEventListener("change", () => {
-        this.get(undefined, true);
+      ELEMENTS.itemsPerPage.addEventListener("change", async () => {
+        if (ELEMENTS.itemsPerPage.value === "9007199254740991") {
+          bootbox.confirm({
+            message:
+              "You are trying to load ALL of your records, this could be very slow! are you sure?",
+            buttons: {
+              confirm: {
+                label: "Yes",
+                className: "btn-success"
+              },
+              cancel: {
+                label: "No",
+                className: "btn-danger"
+              }
+            },
+            callback: async (result) => {
+              if (result) {
+                this.get(undefined, true);
+              }
+            }
+          });
+        } else {
+          this.get(undefined, true);
+        }
       });
-      ELEMENTS.fileFilter.addEventListener("change", () => {
-        this.get();
+      ELEMENTS.fileFilter.addEventListener("change", async () => {
+        await this.get();
       });
-      ELEMENTS.pathFilter.addEventListener("change", () => {
-        this.get();
+      ELEMENTS.pathFilter.addEventListener("change", async () => {
+        await this.get();
       });
 
-      ELEMENTS.spoolManuFilter.addEventListener("change", () => {
-        this.get();
+      ELEMENTS.spoolManuFilter.addEventListener("change", async () => {
+        await this.get();
       });
 
-      ELEMENTS.spoolMatFilter.addEventListener("change", () => {
-        this.get();
+      ELEMENTS.spoolMatFilter.addEventListener("change", async () => {
+        await this.get();
       });
 
-      ELEMENTS.fileSearch.addEventListener("keyup", () => {
-        this.get();
+      ELEMENTS.printerNamesFilter.addEventListener("change", async () => {
+        await this.get();
       });
 
-      ELEMENTS.spoolSearch.addEventListener("keyup", () => {
-        this.get();
+      ELEMENTS.printerGroupsFilter.addEventListener("change", async () => {
+        await this.get();
+      });
+
+      ELEMENTS.fileSearch.addEventListener("keyup", async () => {
+        await this.get();
+      });
+
+      ELEMENTS.spoolSearch.addEventListener("keyup", async () => {
+        await this.get();
+      });
+
+      ELEMENTS.printerSearch.addEventListener("keyup", async () => {
+        await this.get();
       });
 
       this.listenersApplied = true;
