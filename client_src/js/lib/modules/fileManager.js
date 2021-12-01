@@ -254,7 +254,8 @@ export default class FileManager {
       setTimeout(flashReturn, 500);
     }
 
-    await this.updateFileList(printer._id);
+    printer.fileList = how;
+    FileSorting.loadSort(printer);
   }
 
   static async updateFileList(index) {
