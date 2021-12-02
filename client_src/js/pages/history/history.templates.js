@@ -1,6 +1,21 @@
 import UI from "../../lib/functions/ui";
 
 export const returnHistoryTableRow = function (record) {
+  const spoolType = [];
+  if (!!record?.spools) {
+    record.spools.forEach((tool, index) => {
+      spoolType.push(
+        index + ": " + tool["tool" + index].type + " - " + tool["tool" + index].weight + "g"
+      );
+    });
+  } else {
+    spoolType.push("0: No Spool<br>");
+  }
+  const spoolString = [];
+  spoolType.forEach((spool) => {
+    spoolString.push(spool + "<br>");
+  });
+
   return `
        <tr>
           <td class="d-none">
@@ -33,7 +48,12 @@ export const returnHistoryTableRow = function (record) {
                         }
           </td>
           <td>
+            ${spoolString}
+          </td>          
+          <td>
             <p class="mb-0"> ${record.totalCost} </p>
+          </td>
+          <td>
             <code>${record.costPerHour} / hour</code>
           </td>
           <td>

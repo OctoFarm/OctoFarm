@@ -517,6 +517,7 @@ class HistoryClean {
     return {
       sortedTopFilesList: orderBy(sortedTopFilesList, ["prints"], ["desc"]),
       sortedTopPrinterList: orderBy(sortedTopPrinterList, ["time"], ["desc"]),
+      sortedTopSuccessPrinterList: orderBy(sortedTopPrinterList, ["successCount"], ["desc"]),
       totalSuccessPrintTimes,
       completed: completedJobsCount,
       cancelled: cancelledCount,

@@ -31,6 +31,7 @@ $("#historyModal").on("hidden.bs.modal", function (e) {
 });
 
 class History {
+  static historyList;
   static historyGraph;
   static overTimeGraph;
   static monthlySuccessRateGraph;
@@ -137,7 +138,6 @@ class History {
     const paginationElementsList = document.querySelectorAll('*[id^="changePage"]');
     paginationElementsList.forEach((element) => {
       element.addEventListener("click", (e) => {
-        console.log(e.target.id);
         const split = e.target.id.split("-");
 
         this.get(split[1]);
@@ -166,6 +166,13 @@ class History {
 
     if (!this?.listenersApplied) {
       this.datePicker.on("selected", async (date1, date2) => {
+        const datesElements = document.querySelectorAll('[id^="dateRange-"]');
+        datesElements.forEach((element) => {
+          element.innerHTML =
+            new Date(date1.dateInstance).toLocaleDateString() +
+            " <-> " +
+            new Date(date2.dateInstance).toLocaleDateString();
+        });
         await this.get(undefined, true);
       });
       ELEMENTS.sort.addEventListener("change", async () => {
@@ -258,6 +265,13 @@ class History {
         }
       });
       this.datePicker.setDateRange(getFirstDayOfLastMonth(), Calc.lastDayOfMonth());
+      const datesElements = document.querySelectorAll('[id^="dateRange-"]');
+      datesElements.forEach((element) => {
+        element.innerHTML =
+          new Date(getFirstDayOfLastMonth()).toLocaleDateString() +
+          " <-> " +
+          new Date(Calc.lastDayOfMonth()).toLocaleDateString();
+      });
     }
     if (forceFilterRedraw) {
       ELEMENTS.printerGroupsFilter.innerHTML = returnHistoryFilterDefaultSelected();
@@ -420,6 +434,9 @@ class History {
     let printerLists = statistics.map((stat) => {
       return { month: stat.month, data: stat.statistics.sortedTopPrinterList };
     });
+    let printerSuccessLists = statistics.map((stat) => {
+      return { month: stat.month, data: stat.statistics.sortedTopSuccessPrinterList };
+    });
     const topPrinterPerMonth = document.getElementById("monthlyMostUtilisedPrinter");
     topPrinterPerMonth.innerHTML = "";
     topPrinterPerMonth.insertAdjacentHTML(
@@ -439,7 +456,7 @@ class History {
         topPrinterPerMonth.insertAdjacentHTML(
           "beforeend",
           `
-        <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="col-lg-1 text-truncate">${
+        <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="col-lg-1 text-center text-truncate">${
           item.month
         }</small><small class="col-lg-3 text-center text-truncate">${
             item.data[0].printerName
@@ -456,7 +473,7 @@ class History {
         aria-valuenow="0%"
         aria-valuemin="0"
         aria-valuemax="100"
-        >${successPercent}%
+        >${successPercent.toFixed(2)}%
       </div>
         <div
             id="totalCancelledPercent"
@@ -467,7 +484,7 @@ class History {
             aria-valuemin="0"
             aria-valuemax="100"
         >
-          ${cancelledPercent}%
+          ${cancelledPercent.toFixed(2)}%
         </div>
         <div
             id="totalFailurePercent"
@@ -478,7 +495,74 @@ class History {
             aria-valuemin="0"
             aria-valuemax="100"
         >
-          ${failedPercent}%
+          ${failedPercent.toFixed(2)}%
+        </div>
+      </div>
+      </small></li>
+      `
+        );
+      } else {
+      }
+    });
+    const monthlyMostSuccessPrinter = document.getElementById("monthlyMostSuccessPrinter");
+    monthlyMostSuccessPrinter.innerHTML = "";
+    monthlyMostSuccessPrinter.insertAdjacentHTML(
+      "beforeend",
+      `
+        <li class="list-group-item m-0 p-0 row d-flex"><small class="col-lg-1 text-center">Month</small><small class="col-lg-3 text-center">Printer</small><small class="text-center col-lg-2">Time</small><small class="col-lg-2 text-center">Count</small><small class="col-lg-4 text-center">Success Rate</small></li>
+      `
+    );
+    printerSuccessLists.forEach((item) => {
+      if (item?.data) {
+        const total =
+          item.data[0].failedCount + item.data[0].cancelledCount + item.data[0].successCount;
+        const failedPercent = (item.data[0].failedCount * 100) / total;
+        const cancelledPercent = (item.data[0].cancelledCount * 100) / total;
+        const successPercent = (item.data[0].successCount * 100) / total;
+
+        monthlyMostSuccessPrinter.insertAdjacentHTML(
+          "beforeend",
+          `
+        <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="col-lg-1 text-center text-truncate">${
+          item.month
+        }</small><small class="col-lg-3 text-center text-truncate">${
+            item.data[0].printerName
+          }</small><small class="text-center col-lg-2">${Calc.generateTime(
+            item.data[0].time
+          )}</small><small class="col-lg-2 text-center">${
+            item.data[0].prints
+          }</small><small class="col-lg-4 text-center">            <div class="progress mb-0" style="width: 100%;">
+            <div
+        id="totalSuccessPercent"
+        class="progress-bar progress-bar-striped bg-success"
+        role="progressbar"
+        style="width: ${successPercent}%"
+        aria-valuenow="0%"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        >${successPercent.toFixed(2)}%
+      </div>
+        <div
+            id="totalCancelledPercent"
+            class="progress-bar progress-bar-striped bg-warning"
+            role="progressbar"
+            style="width: ${cancelledPercent}%"
+            aria-valuenow="0%"
+            aria-valuemin="0"
+            aria-valuemax="100"
+        >
+          ${cancelledPercent.toFixed(2)}%
+        </div>
+        <div
+            id="totalFailurePercent"
+            class="progress-bar progress-bar-striped bg-danger"
+            role="progressbar"
+            style="width: ${failedPercent}%"
+            aria-valuenow="0%"
+            aria-valuemin="0"
+            aria-valuemax="100"
+        >
+          ${failedPercent.toFixed(2)}%
         </div>
       </div>
       </small></li>
@@ -509,7 +593,7 @@ class History {
         topFilePerMonth.insertAdjacentHTML(
           "beforeend",
           `
-        <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="col-lg-1 text-truncate">${
+        <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="col-lg-1 text-center text-truncate">${
           item.month
         }</small><small class="col-lg-3 text-center text-truncate">${item.data[0].file.replace(
             ".gcode",
@@ -564,7 +648,7 @@ class History {
       if (isNaN(currentRate)) {
         return 0;
       } else {
-        return parseInt(2000);
+        return parseInt(currentRate);
       }
     });
     let failedPercentList = statistics.map((stat) => {
@@ -588,6 +672,7 @@ class History {
 
     let successCountList = statistics.map((stat) => {
       const total = stat.statistics.completed;
+
       if (isNaN(total)) {
         return 0;
       } else {
@@ -785,7 +870,7 @@ class History {
     }
 
     document.getElementById("successSparkLast").innerHTML =
-      successCountList[successCountList.length - 1] + "%";
+      successPercentList[successPercentList.length - 1] + "%";
 
     sparkOptions.colors = ["#f39c12"];
     sparkOptions.series[0].data = cancelledPercentList;
@@ -796,7 +881,7 @@ class History {
     }
 
     document.getElementById("cancelledSparkLast").innerHTML =
-      cancelledCountList[cancelledCountList.length - 1] + "%";
+      cancelledPercentList[cancelledPercentList.length - 1] + "%";
 
     sparkOptions.colors = ["#e74c3c"];
     sparkOptions.series[0].data = failedPercentList;
@@ -807,7 +892,7 @@ class History {
     }
 
     document.getElementById("failedSparkLast").innerHTML =
-      failedCountList[failedCountList.length - 1] + "%";
+      failedPercentList[failedPercentList.length - 1] + "%";
   }
 
   static drawStatisticsTotals(statistics) {
@@ -838,8 +923,6 @@ class History {
     const { history, statisticsClean, pagination, monthlyStatistics, historyFilterData } =
       await OctoFarmClient.get(this.getHistoryRequestURL(pageNumber));
 
-    console.log(history, statisticsClean, pagination, monthlyStatistics, historyFilterData);
-
     if (!history || !statisticsClean || !pagination) {
       this.loadNoData();
       return;
@@ -847,7 +930,7 @@ class History {
 
     // TODO: Load statistics EJS renders currently, want's to be dynamic as well.
     //this.updateStatistics(statisticsClean);
-
+    this.historyList = history;
     // Load history filters
     this.drawHistoryFilters(pagination, historyFilterData, forceFilterRedraw);
     this.addHistoryFilterListeners(pagination, forceFilterRedraw);
@@ -943,10 +1026,11 @@ class History {
       const thumbnailIndicators = document.getElementById("thumbnails-indicators");
       thumbnail.innerHTML = "";
       thumbnailIndicators.innerHTML = "";
-      const index = _.findIndex(historyList.history, function (o) {
-        return o._id == e.target.id;
+      const split = e.target.id.split("-");
+      const index = _.findIndex(this.historyList, function (o) {
+        return o._id == split[1];
       });
-      const current = historyList.history[index];
+      const current = this.historyList[index];
       printerName.innerHTML = current.printer;
       fileName.innerHTML = current.file.name;
       if (typeof current.resend !== "undefined" && current.resend !== null) {
@@ -1051,9 +1135,13 @@ class History {
         document.getElementById("galleryElements").style.display = "none";
       }
 
-      startDate.innerHTML = `<b>Started</b><hr>${current.startDate.replace(" - ", "<br>")}`;
+      startDate.innerHTML = `<b>Started</b><hr>${new Date(
+        current.startDate
+      ).toLocaleDateString()} - ${new Date(current.startDate).toLocaleTimeString()}`;
       printTime.innerHTML = `<b>Duration</b><hr>${Calc.generateTime(current.printTime)}`;
-      endDate.innerHTML = `<b>Finished</b><hr>${current.endDate.replace(" - ", "<br>")}`;
+      endDate.innerHTML = `<b>Finished</b><hr>${new Date(
+        current.endDate
+      ).toLocaleDateString()} - ${new Date(current.endDate).toLocaleTimeString()}`;
       printerCost.value = current.printerCost;
       jobHourlyCost.value = current.costPerHour;
       notes.value = current.notes;
@@ -1226,16 +1314,13 @@ class History {
         },
         async callback(result) {
           if (result) {
+            const split = e.target.id.split("-");
             const histID = {
-              id: e.target.id
+              id: split[1]
             };
             const post = await OctoFarmClient.post("history/delete", histID);
             if (post) {
-              e.target.parentElement.parentElement.parentElement.remove();
-              // jplist.resetContent(function () {
-              //   // remove element with id = el1
-              //
-              // });
+              e.target.parentElement.parentElement.remove();
               UI.createAlert("success", "Your history entry has been deleted...", 3000, "clicked");
             } else {
               UI.createAlert(

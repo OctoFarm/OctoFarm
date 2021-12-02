@@ -125,8 +125,6 @@ router.get("/get", ensureAuthenticated, async (req, res) => {
     printerSearch
   } = req.query;
 
-  console.log(req.query);
-
   const findOptions = {
     "printHistory.endDate": { $gte: new Date(lastDate), $lte: new Date(firstDate) }
   };
