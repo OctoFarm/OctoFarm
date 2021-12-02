@@ -119,8 +119,13 @@ router.get("/get", ensureAuthenticated, async (req, res) => {
     spoolManuFilter,
     spoolMatFilter,
     fileSearch,
-    spoolSearch
+    spoolSearch,
+    printerNameFilter,
+    printerGroupFilter,
+    printerSearch
   } = req.query;
+
+  console.log(req.query);
 
   const findOptions = {
     "printHistory.endDate": { $gte: new Date(lastDate), $lte: new Date(firstDate) }
@@ -128,6 +133,15 @@ router.get("/get", ensureAuthenticated, async (req, res) => {
   if (fileFilter) {
     findOptions["printHistory.fileName"] = fileFilter;
   }
+
+  if (printerNameFilter) {
+    findOptions["printHistory.printerName"] = printerNameFilter;
+  }
+
+  if (printerGroupFilter) {
+    findOptions["printHistory.printerGroup"] = printerGroupFilter;
+  }
+
   if (pathFilter) {
     findOptions["printHistory.job.file.path"] = new RegExp(pathFilter, "g");
   }
@@ -143,9 +157,15 @@ router.get("/get", ensureAuthenticated, async (req, res) => {
       "g"
     );
   }
+
   if (fileSearch) {
     findOptions["printHistory.fileName"] = new RegExp(fileSearch.replace(/_/g, " "), "g");
   }
+
+  if (printerSearch) {
+    findOptions["printHistory.printerName"] = new RegExp(printerSearch.replace(/_/g, " "), "g");
+  }
+
   if (spoolSearch) {
     findOptions["printHistory.filamentSelection.spools.name"] = new RegExp(
       spoolSearch.replace(/_/g, " "),

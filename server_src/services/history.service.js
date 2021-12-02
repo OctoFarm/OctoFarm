@@ -90,7 +90,7 @@ async function generateYearsWorthOfHistory() {
 
   const monthList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
 
-  const successRatePerDay = ["success", "success", "cancelled", "failed", "success", "failed"];
+  const successRatePerDay = ["success", "success", "success"];
 
   for (let i = 0; i < monthList.length; i++) {
     const currentMonth = monthList[i];
@@ -104,11 +104,12 @@ async function generateYearsWorthOfHistory() {
           defaultHistoryObject.printHistory.success = false;
         }
         const currentDay = dayList[d];
-        defaultHistoryObject.printHistory.printTime = Math.floor(Math.random() * 2 * 86400000);
+        defaultHistoryObject.printHistory.printTime =
+          Math.floor(Math.random() * 2 * 86400000) / 1000;
         defaultHistoryObject.printHistory.startDate = new Date(currentDay);
         let endDate = new Date(currentDay);
         defaultHistoryObject.printHistory.endDate = new Date(
-          endDate.getTime() + defaultHistoryObject.printHistory.printTime
+          endDate.getTime() + defaultHistoryObject.printHistory.printTime * 1000
         );
 
         const history = new historyModel(defaultHistoryObject);

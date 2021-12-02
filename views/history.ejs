@@ -3,36 +3,40 @@
 <div class="row mt-3 mx-2">
   <div class="col-md-6 col-lg-3">
     <div class="bg-dark rounded p-2 row">
-      <div class="col-md-4 col-lg-2">
+      <div class="col-md-4 col-lg-4">
+        <h4 class="text-info">Total Print Time</h4>
         <h3 id="totalSparkLast" class="text-info">#</h3>
-        <h4 class="text-info">Total</h4>
+
       </div>
-      <div id="totalSpark" class="col-md-8 col-lg-10 text-right"></div>
+      <div id="totalSpark" class="col-md-8 col-lg-8 text-right"></div>
     </div>
   </div>
   <div class="col-md-6 col-lg-3">
     <div class="bg-dark rounded p-2 row">
-      <div class="col-md-4 col-lg-2">
+      <div class="col-md-4 col-lg-3">
+        <h4 class="text-success">Success Rate</h4>
         <h3 id="successSparkLast" class="text-success">#</h3>
-        <h4 class="text-success">Completed</h4>
+
       </div>
-      <div id="successSpark" class="col-md-8 col-lg-10 text-right"></div>
+      <div id="successSpark" class="col-md-8 col-lg-9 text-right"></div>
     </div>
   </div>
   <div class="col-md-6 col-lg-3">
     <div class="bg-dark rounded p-2 row">
-      <div class="col-md-4 col-lg-2">
+      <div class="col-md-4 col-lg-3">
+        <h4 class="text-warning">Cancelled Rate</h4>
         <h3 id="cancelledSparkLast" class="text-warning">#</h3>
-        <h4 class="text-warning">Cancelled</h4>
+
       </div>
-      <div id="cancelledSpark" class="col-md-8 col-lg-10 text-right"></div>
+      <div id="cancelledSpark" class="col-md-8 col-lg-9"></div>
     </div>
   </div>
   <div class="col-md-6 col-lg-3">
     <div class="bg-dark rounded p-2 row">
       <div class="col-md-4 col-lg-2">
+        <h4 class="text-danger">Failure Rate</h4>
         <h3 id="failedSparkLast" class="text-danger">#</h3>
-        <h4 class="text-danger">Failed</h4>
+
       </div>
       <div id="failedSpark" class="col-md-8 col-lg-10 text-right"></div>
     </div>
@@ -62,7 +66,17 @@
                 aria-expanded="false"
                 data-toggle="modal" data-target="#currentStatistics"
         >
-          <i class="fas fa-chart-pie"></i> Statistics
+          <i class="fas fa-chart-pie"></i> State
+        </button><br>
+        <button
+                title="View statistics for the currently selected period"
+                type="button"
+                class="btn btn-warning text-dark mb-2"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#costsStatistics"
+        >
+          <i class="fas fa-dollar-sign"></i> Costs / Usage
         </button><br>
         <button
                 title="View statistics for the past grouped by month"
@@ -70,9 +84,19 @@
                 class="btn btn-info mb-2"
                 href="#"
                 aria-expanded="false"
-                data-toggle="modal" data-target="#historicalStatistics"
+                data-toggle="modal" data-target="#printerStatistics"
         >
-          <i class="fas fa-history"></i> Monthly Statistics
+          <i class="fas fa-print"></i> Printer
+        </button><br>
+        <button
+                title="View statistics for the past grouped by month"
+                type="button"
+                class="btn btn-primary mb-2"
+                href="#"
+                aria-expanded="false"
+                data-toggle="modal" data-target="#fileStatistics"
+        >
+          <i class="fas fa-file-code"></i> File
         </button>
       </div>
 
@@ -130,10 +154,7 @@
                                         data-path=".end"
                                         data-order="desc"
                                         data-type="datetime">Duration (&uarr;)</option>
-                    <option             selected value="durationDesc"
-                                        data-path=".end"
-                                        data-order="asc"
-                                        data-type="datetime">Duration (&darr;)</option>
+                    <option             value="durationDesc">Duration (&darr;)</option>
                     <option             value="printNameAsc"
                                         data-path=".printer"
                                         data-order="asc"
@@ -437,7 +458,7 @@
       <div class="modal-content">
         <div class="modal-header">
           <h3 class="modal-title" id="historyModalLabel"><button type="button" class="btn btn-dark float-right d-block" href="#" aria-expanded="false" disabled="">
-              Statistics
+              State Statistics
             </button></h3>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span class="text-white" aria-hidden="true">&times;</span>
@@ -445,186 +466,29 @@
         </div>
         <div class="modal-body">
           <div class="row">
-            <div class="col-lg-12">
-              <div class="progress">
-                <div    id="completedPercent"
-                        class="progress-bar progress-bar-striped bg-success"
-                        role="progressbar"
-                        style="width: <%= printStatistics.completedPercent  %>% "
-                        aria-valuenow=" <%= printStatistics.completedPercent %>%"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                >
-                  <%= Math.round(printStatistics.completedPercent * 10 ) /10 %>%
-                </div>
-                <div    id="cancelledPercent"
-                        class="progress-bar progress-bar-striped bg-warning"
-                        role="progressbar"
-                        style="width: <%= printStatistics.cancelledPercent %>% "
-                        aria-valuenow="<%= printStatistics.cancelledPercent %>%"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                >
-                  <%= Math.round(printStatistics.cancelledPercent * 10 ) /10 %>%
-                </div>
-                <div    id="failedPercent"
-                        class="progress-bar progress-bar-striped bg-danger"
-                        role="progressbar"
-                        style="width: <%= printStatistics.failedPercent %>% "
-                        aria-valuenow="<%= printStatistics.failedPercent %>%"
-                        aria-valuemin="0"
-                        aria-valuemax="100"
-                >
-                  <%= Math.round(printStatistics.failedPercent * 10 ) /10 %>%
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-2 text-center">
-              <div class="row">
-                <div class="col-lg-12">
-                  <h6>State Totals</h6><hr>
-                  <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
-                    Completed
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
-              <b id="completedCount"><%= printStatistics.completed %></b>
-            </span>
-                  </button><hr>
-                  <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
-                    Cancelled
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
-              <b id="cancelledCount"><%= printStatistics.cancelled %></b>
-            </span>
-                  </button><hr>
-                  <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
-                    Failed
-                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-              <b id="failedCount"><%= printStatistics.failed %></b>
-            </span>
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div class="col-lg-10">
-              <div class="row">
-                <div class="col-lg-3 text-center">
-                  <h6>Totals</h6><hr>
-                  <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
-                    Print Time
-                    <span id="totalPrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
-                      <%= helpers.generateTime(printStatistics.totalPrintTime) %>
-                    </span>
-                          </button><hr>
-                          <button  type="button" class="btn btn-dark position-relative btn-sm" disabled>
-                            Filament Usage
-                            <span id="totalFilamentUsage" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
-                      <%= printStatistics.totalFilamentUsage %>
-                    </span>
-                          </button><hr>
-                          <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
-                            Cost
-                            <span id="totalCost" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
-                      <%= (parseFloat(printStatistics.totalSpoolCost) + parseFloat(printStatistics.totalPrinterCost)).toFixed(2) %>
-                    </span>
-                  </button>
-                </div>
-                <div class="col-lg-3 text-center">
-                  <h6>Largest</h6><hr>
-                  <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
-                    Print Time
-                    <span id="largestPrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
-                      <%= helpers.generateTime(printStatistics.longestPrintTime) %>
-                    </span>
-                          </button><hr>
-                          <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
-                            Filament Usage
-                            <span id="largestFilamentUsage" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
-                      <%= printStatistics.highestFilamentUsage %>
-                    </span>
-                          </button><hr>
-                          <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
-                            Cost
-                            <span id="largestCost" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
-                      <%= (parseFloat(printStatistics.highestSpoolCost) + parseFloat(printStatistics.highestPrinterCost)).toFixed(2)%>
-                    </span>
-                          </button>
-                </div>
-                <div class="col-lg-3 text-center">
-                  <h6>Smallest</h6><hr>
-                  <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
-                    Print Time
-                    <span id="smallestPrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
-                      <%= helpers.generateTime(printStatistics.shortestPrintTime) %>
-                    </span>
-                          </button><hr>
-                          <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
-                            Filament Usage
-                            <span id="smallestFilamentUsage" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
-                       <%= printStatistics.lowestFilamentUsage %>
-                    </span>
-                          </button><hr>
-                          <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
-                            Cost
-                            <span id="smallestCost" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
-                       <%= (parseFloat(printStatistics.lowestSpoolCost) + parseFloat(printStatistics.lowestPrinterCost)).toFixed(2) %>
-                    </span>
-                          </button>
-                </div>
-                <div class="col-lg-3 text-center">
-                  <h6>Averages</h6><hr>
-                  <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
-                    Print Time
-                    <span id="averagePrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
-                      <%= helpers.generateTime(printStatistics.averagePrintTime) %>
-                    </span>
-                          </button><hr>
-                          <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
-                            Filament Usage
-                            <span id="averageFilamentUsage" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
-                      <%= printStatistics.averageFilamentUsage %>
-                    </span>
-                          </button><hr>
-                          <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
-                            Cost
-                            <span id="averageCost" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
-                      <%= (parseFloat(printStatistics.averageSpoolCost) + parseFloat(printStatistics.averagePrinterCost)).toFixed(2) %>
-
-                    </span>
-                          </button>
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="row">
             <div class="col-lg-6">
-              <h6>Most Utilised Printers</h6><hr>
-              <ul id="longestRunningPrinters" class="list-group list-group-flush">
-                <% printStatistics.sortedTopPrinterList.slice(0, 5).forEach(printer =>  { %>
-                  <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="bg-dark col-lg-4 text-truncate"><%= printer.printerName %></small><small class="text-center bg-primary col-lg-2"><%= helpers.generateTime(printer.time) %></small><small class="bg-info col-lg-2 text-center">Prints: <%= printer.prints %></small><small class="bg-success col-lg-1 text-center"><%= printer.successCount %> </small><small class="bg-warning text-dark col-lg-1 text-center"><%= printer.cancelledCount %></small><small class="bg-danger col-lg-1 text-center"><%= printer.failedCount %></small> </li>
-                <% }) %>
-              </ul>
-            </div>
-            <div class="col-lg-6">
-              <h6>Most Printed Files</h6><hr>
-              <ul id="mostPrintedFiles" class="list-group list-group-flush">
-                <% printStatistics.sortedTopFilesList.slice(0, 5).forEach(printer =>  { %>
-                  <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="bg-dark col-lg-6 text-truncate"><%= printer.file.replace(".gcode", "")  %></small><small class="text-center bg-info col-lg-2">Prints: <%= printer.prints %> </small><small class="bg-success text-center col-lg-1"><%= printer.successCount %> </small><small class="bg-warning text-dark text-center col-lg-1"><%= printer.cancelledCount %></small><small class="bg-danger col-lg-1 text-center"><%= printer.failedCount %></small> </li>
-                <% }) %>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="row mx-3">
-            <div class="col-lg-6">
-              <h6>Print Completion By Day</h6><hr>
+              <h6>Print State Rate Per Day</h6><hr>
               <div id="printCompletionByDay">
 
               </div>
             </div>
             <div class="col-lg-6">
-              <h6>Print Completion By Day</h6><hr>
+              <h6>Print Totals Per Day</h6><hr>
               <div id="printCompletionOverTime"></div>
             </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-6">
+              <h6>Success Rate Per Month</h6><hr>
+              <div id="monthlySuccessRate"></div>
+            </div>
+            <div class="col-lg-6">
+              <h6>Print Totals Per Month</h6><hr>
+              <div id="monthlyPrintRate"></div>
+            </div>
+          </div>
         </div>
+
 
         <div class="modal-footer" id="historySave">
           <button type="button" class="btn btn-light" data-dismiss="modal">
@@ -634,189 +498,365 @@
       </div>
     </div>
   </div>
-  <div class="modal fade" id="historicalStatistics" tabindex="0" role="dialog" aria-labelledby="historyModal" aria-hidden="true">
+  <div class="modal fade" id="costsStatistics" tabindex="0" role="dialog" aria-labelledby="historyModal" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="historyModalLabel"><button type="button" class="btn btn-dark float-right d-block" href="#" aria-expanded="false" disabled="">
+            Costs and Usage Statistics
+          </button></h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span class="text-white" aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <h6>Current Data Totals</h6><hr>
+        <div class="row">
+          <div class="col-lg-2 text-center">
+            <div class="row">
+              <div class="col-lg-12">
+                <h6>State Totals</h6><hr>
+                <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                  Completed
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+              <b id="completedCount"><%= printStatistics.completed %></b>
+            </span>
+                </button><hr>
+                <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                  Cancelled
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+              <b id="cancelledCount"><%= printStatistics.cancelled %></b>
+            </span>
+                </button><hr>
+                <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                  Failed
+                  <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+              <b id="failedCount"><%= printStatistics.failed %></b>
+            </span>
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-10">
+            <div class="row">
+              <div class="col-lg-3 text-center">
+                <h6>Totals</h6><hr>
+                <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                  Print Time
+                  <span id="totalPrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                      <%= helpers.generateTime(printStatistics.totalPrintTime) %>
+                    </span>
+                </button><hr>
+                <button  type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                  Filament Usage
+                  <span id="totalFilamentUsage" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                      <%= printStatistics.totalFilamentUsage %>
+                    </span>
+                </button><hr>
+                <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                  Cost
+                  <span id="totalCost" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
+                      <%= (parseFloat(printStatistics.totalSpoolCost) + parseFloat(printStatistics.totalPrinterCost)).toFixed(2) %>
+                    </span>
+                </button>
+              </div>
+              <div class="col-lg-3 text-center">
+                <h6>Largest</h6><hr>
+                <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                  Print Time
+                  <span id="largestPrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                      <%= helpers.generateTime(printStatistics.longestPrintTime) %>
+                    </span>
+                </button><hr>
+                <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                  Filament Usage
+                  <span id="largestFilamentUsage" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                      <%= printStatistics.highestFilamentUsage %>
+                    </span>
+                </button><hr>
+                <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                  Cost
+                  <span id="largestCost" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
+                      <%= (parseFloat(printStatistics.highestSpoolCost) + parseFloat(printStatistics.highestPrinterCost)).toFixed(2)%>
+                    </span>
+                </button>
+              </div>
+              <div class="col-lg-3 text-center">
+                <h6>Smallest</h6><hr>
+                <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                  Print Time
+                  <span id="smallestPrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                      <%= helpers.generateTime(printStatistics.shortestPrintTime) %>
+                    </span>
+                </button><hr>
+                <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                  Filament Usage
+                  <span id="smallestFilamentUsage" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                       <%= printStatistics.lowestFilamentUsage %>
+                    </span>
+                </button><hr>
+                <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                  Cost
+                  <span id="smallestCost" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
+                       <%= (parseFloat(printStatistics.lowestSpoolCost) + parseFloat(printStatistics.lowestPrinterCost)).toFixed(2) %>
+                    </span>
+                </button>
+              </div>
+              <div class="col-lg-3 text-center">
+                <h6>Averages</h6><hr>
+                <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                  Print Time
+                  <span id="averagePrintTime" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark">
+                      <%= helpers.generateTime(printStatistics.averagePrintTime) %>
+                    </span>
+                </button><hr>
+                <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                  Filament Usage
+                  <span id="averageFilamentUsage" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-success">
+                      <%= printStatistics.averageFilamentUsage %>
+                    </span>
+                </button><hr>
+                <button type="button" class="btn btn-dark position-relative btn-sm" disabled>
+                  Cost
+                  <span id="averageCost" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-info">
+                      <%= (parseFloat(printStatistics.averageSpoolCost) + parseFloat(printStatistics.averagePrinterCost)).toFixed(2) %>
+
+                    </span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <h6>Monthly Data Totals</h6><hr>
+          <table id="historyTableTop" class="table table-dark text-center p-0 m-0">
+            <thead>
+            <tr>
+              <th class="table-dark sticky-table table-dark table-hover p-2 m-0" scope="col">Metric</th>
+              <% monthlyStatistics.forEach(stat => { %>
+                <th class="table-dark sticky-table table-dark p-2 m-0" scope="col"><%= stat.month %></th>
+              <% }) %>
+            </tr>
+            </thead>
+            <tbody>
+            <tr>
+              <td class="p-1 m-0 bg-primary" scope="col">Total Print Time</td>
+              <% monthlyStatistics.forEach(stat => { %>
+                <% if(Object.keys(stat.statistics).length !== 0) { %>
+                  <td class="p-1 m-0 bg-primary" scope="col"><%= helpers.generateTime(stat.statistics.totalPrintTime) %></td>
+                <% }else{ %>
+                  <td class="p-1 m-0 bg-primary" scope="col"></td>
+                <% } %>
+              <% }) %>
+            </tr>
+            <tr>
+              <td class="p-1 m-0" scope="col">Largest Print Time</td>
+              <% monthlyStatistics.forEach(stat => { %>
+                <% if(Object.keys(stat.statistics).length !== 0) { %>
+                  <td class="p-1 m-0" scope="col"><%= helpers.generateTime(stat.statistics.longestPrintTime) %></td>
+                <% }else{ %>
+                  <td class="p-1 m-0" scope="col"></td>
+                <% } %>
+              <% }) %>
+            </tr>
+            <tr>
+              <td class="p-1 m-0" scope="col">Smallest Print Time</td>
+              <% monthlyStatistics.forEach(stat => { %>
+                <% if(Object.keys(stat.statistics).length !== 0) { %>
+                  <td class="p-1 m-0" scope="col"><%= helpers.generateTime(stat.statistics.shortestPrintTime) %></td>
+                <% }else{ %>
+                  <td class="p-1 m-0" scope="col"></td>
+                <% } %>
+              <% }) %>
+            </tr>
+            <tr>
+              <td class="p-1 m-0" scope="col">Average Print Time</td>
+              <% monthlyStatistics.forEach(stat => { %>
+                <% if(Object.keys(stat.statistics).length !== 0) { %>
+                  <td class="p-1 m-0" scope="col"><%= helpers.generateTime(stat.statistics.averagePrintTime) %></td>
+                <% }else{ %>
+                  <td class="p-1 m-0" scope="col"></td>
+                <% } %>
+              <% }) %>
+            </tr>
+            <tr>
+              <td class="p-1 m-0" scope="col"></td>
+              <% monthlyStatistics.forEach(stat => { %>
+                <td class="p-1 m-0" scope="col"></td>
+              <% }) %>
+            </tr>
+            <tr>
+              <td class="p-1 m-0  bg-primary" scope="col">Total Filament Usage</td>
+              <% monthlyStatistics.forEach(stat => { %>
+                <% if(Object.keys(stat.statistics).length !== 0) { %>
+                  <td class="p-1 m-0  bg-primary" scope="col"><%= stat.statistics.totalFilamentUsage %></td>
+                <% }else{ %>
+                  <td class="p-1 m-0  bg-primary" scope="col"></td>
+                <% } %>
+              <% }) %>
+            </tr>
+            <tr>
+              <td class="p-1 m-0" scope="col">Largest Filament Usage</td>
+              <% monthlyStatistics.forEach(stat => { %>
+                <% if(Object.keys(stat.statistics).length !== 0) { %>
+                  <td class="p-1 m-0" scope="col"><%= stat.statistics.highestFilamentUsage %></td>
+                <% }else{ %>
+                  <td class="p-1 m-0" scope="col"></td>
+                <% } %>
+              <% }) %>
+            </tr>
+            <tr>
+              <td class="p-1 m-0" scope="col">Smallest Filament Usage</td>
+              <% monthlyStatistics.forEach(stat => { %>
+                <% if(Object.keys(stat.statistics).length !== 0) { %>
+                  <td class="p-1 m-0" scope="col"><%= stat.statistics.lowestFilamentUsage %></td>
+                <% }else{ %>
+                  <td class="p-1 m-0" scope="col"></td>
+                <% } %>
+              <% }) %>
+            </tr>
+            <tr>
+              <td class="p-1 m-0" scope="col">Average Filament Usage</td>
+              <% monthlyStatistics.forEach(stat => { %>
+                <% if(Object.keys(stat.statistics).length !== 0) { %>
+                  <td class="p-1 m-0" scope="col"><%= stat.statistics.averageFilamentUsage %></td>
+                <% }else{ %>
+                  <td class="p-1 m-0" scope="col"></td>
+                <% } %>
+              <% }) %>
+            </tr>
+            <tr>
+              <td class="p-1 m-0" scope="col"></td>
+              <% monthlyStatistics.forEach(stat => { %>
+                <td class="p-1 m-0" scope="col"></td>
+              <% }) %>
+            </tr>
+            <tr>
+              <td class="p-1 m-0 bg-primary" scope="col">Total Cost</td>
+              <% monthlyStatistics.forEach(stat => { %>
+                <% if(Object.keys(stat.statistics).length !== 0) { %>
+                  <td class="p-1 m-0 bg-primary" scope="col"><%= (parseFloat(stat.statistics.totalSpoolCost) + parseFloat(stat.statistics.totalPrinterCost)).toFixed(2)%></td>
+                <% }else{ %>
+                  <td class="p-1 m-0 bg-primary" scope="col"></td>
+                <% } %>
+              <% }) %>
+            </tr>
+            <tr>
+              <td class="p-1 m-0" scope="col">Largest Cost</td>
+              <% monthlyStatistics.forEach(stat => { %>
+                <% if(Object.keys(stat.statistics).length !== 0) { %>
+                  <td class="p-1 m-0" scope="col"><%= (parseFloat(stat.statistics.highestSpoolCost) + parseFloat(stat.statistics.highestPrinterCost)).toFixed(2)%></td>
+                <% }else{ %>
+                  <td class="p-1 m-0" scope="col"></td>
+                <% } %>
+              <% }) %>
+            </tr>
+            <tr>
+              <td class="p-1 m-0" scope="col">Smallest Cost</td>
+              <% monthlyStatistics.forEach(stat => { %>
+                <% if(Object.keys(stat.statistics).length !== 0) { %>
+                  <td class="p-1 m-0" scope="col"><%= (parseFloat(stat.statistics.lowestSpoolCost) + parseFloat(stat.statistics.lowestPrinterCost)).toFixed(2)%></td>
+                <% }else{ %>
+                  <td class="p-1 m-0" scope="col"></td>
+                <% } %>
+              <% }) %>
+            </tr>
+            <tr>
+              <td class="p-1 m-0" scope="col">Average Cost</td>
+              <% monthlyStatistics.forEach(stat => { %>
+                <% if(Object.keys(stat.statistics).length !== 0) { %>
+                  <td class="p-1 m-0" scope="col"><%= (parseFloat(stat.statistics.averageSpoolCost) + parseFloat(stat.statistics.averagePrinterCost)).toFixed(2)%></td>
+                <% }else{ %>
+                  <td class="p-1 m-0" scope="col"></td>
+                <% } %>
+              <% }) %>
+            </tr>
+            </tbody>
+
+          </table>
+
+        </div>
+      </div>
+
+
+      <div class="modal-footer" id="historySave">
+        <button type="button" class="btn btn-light" data-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+  <div class="modal fade" id="printerStatistics" tabindex="0" role="dialog" aria-labelledby="historyModal" aria-hidden="true">
     <div class="modal-dialog modal-xl" role="document">
       <div class="modal-content">
         <div class="modal-header">
           <h3 class="modal-title" id="historyModalLabel"><button type="button" class="btn btn-dark float-right d-block" href="#" aria-expanded="false" disabled="">
-              Monthly Statistics
+              Printer Statistics
             </button></h3>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span class="text-white" aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
-          <div class="row">
-            <div class="col-lg-6">
-              <div id="monthlySuccessRate"></div>
-            </div>
-            <div class="col-lg-6">
-              <div id="monthlyPrintRate"></div>
-            </div>
-          </div>
 
           <div class="row">
-            <div class="col-lg-6">
-              <h6>Most Utilised Printer</h6><hr>
+            <div class="col-lg-12">
+              <h6>Current Most Utilised Printers</h6><hr>
+              <ul id="longestRunningPrinters" class="list-group list-group-flush">
+                <li class="list-group-item m-0 p-0 row d-flex"><small class="col-lg-6 text-center">Printer</small><small class="text-center col-lg-1">Time</small><small class="col-lg-1 text-center">Count</small><small class="col-lg-4 text-center">Success Rate</small> </li>
+                <% printStatistics.sortedTopPrinterList.slice(0, 6).forEach(printer =>  { %>
+                  <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="col-lg-6 text-center text-truncate"><%= printer.printerName %></small><small class="text-center col-lg-1"><%= helpers.generateTime(printer.time) %></small><small class="col-lg-1 text-center"><%= printer.prints %></small><small class="col-lg-4 text-center">
+                      <% const total = printer.failedCount + printer.cancelledCount + printer.successCount %>
+                      <% const failedPercent = (printer.failedCount * 100 ) / total %>
+                      <% const cancelledPercent = (printer.cancelledCount * 100) / total %>
+                      <% const successPercent = (printer.successCount * 100) / total %>
+                      <div class="progress mb-0" style="width: 100%;">
+                        <div
+                                id="totalSuccessPercent"
+                                class="progress-bar progress-bar-striped bg-success"
+                                role="progressbar"
+                                style="width: <%= successPercent %>%"
+                                aria-valuenow="0%"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                        ><%= successPercent %>%
+                        </div>
+                        <div
+                                id="totalCancelledPercent"
+                                class="progress-bar progress-bar-striped bg-warning"
+                                role="progressbar"
+                                style="width: <%= cancelledPercent %>%"
+                                aria-valuenow="0%"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                        >
+                          <%= cancelledPercent %>%
+                        </div>
+                        <div
+                                id="totalFailurePercent"
+                                class="progress-bar progress-bar-striped bg-danger"
+                                role="progressbar"
+                                style="width: <%= failedPercent %>%"
+                                aria-valuenow="0%"
+                                aria-valuemin="0"
+                                aria-valuemax="100"
+                        >
+                          <%= failedPercent %>%
+                        </div>
+                      </div>
+                    </small> </li>
+                <% }) %>
+              </ul>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-lg-12">
+              <h6>Most Utilised Printer Per Month</h6><hr>
               <ul id="monthlyMostUtilisedPrinter" class="list-group list-group-flush">
 
               </ul>
             </div>
-            <div class="col-lg-6">
-              <h6>Most Printed File</h6><hr>
-              <ul id="monthlyMostPrintedFile" class="list-group list-group-flush">
-
-              </ul>
-            </div>
-          </div>
-
-          <div class="row">
-            <h6>Data Breakdown</h6><hr>
-            <table id="historyTableTop" class="table table-dark text-center p-0 m-0">
-              <thead>
-              <tr>
-                <th class="table-dark sticky-table table-dark table-hover p-2 m-0" scope="col">Metric</th>
-                <% monthlyStatistics.forEach(stat => { %>
-                  <th class="table-dark sticky-table table-dark p-2 m-0" scope="col"><%= stat.month %></th>
-                <% }) %>
-              </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <td class="p-1 m-0 bg-primary" scope="col">Total Print Time</td>
-                <% monthlyStatistics.forEach(stat => { %>
-                  <% if(Object.keys(stat.statistics).length !== 0) { %>
-                  <td class="p-1 m-0 bg-primary" scope="col"><%= helpers.generateTime(stat.statistics.totalPrintTime) %></td>
-                  <% }else{ %>
-                  <td class="p-1 m-0 bg-primary" scope="col"></td>
-                  <% } %>
-                <% }) %>
-              </tr>
-              <tr>
-                <td class="p-1 m-0" scope="col">Largest Print Time</td>
-                <% monthlyStatistics.forEach(stat => { %>
-                  <% if(Object.keys(stat.statistics).length !== 0) { %>
-                    <td class="p-1 m-0" scope="col"><%= helpers.generateTime(stat.statistics.longestPrintTime) %></td>
-                  <% }else{ %>
-                    <td class="p-1 m-0" scope="col"></td>
-                  <% } %>
-                <% }) %>
-              </tr>
-              <tr>
-                <td class="p-1 m-0" scope="col">Smallest Print Time</td>
-                <% monthlyStatistics.forEach(stat => { %>
-                  <% if(Object.keys(stat.statistics).length !== 0) { %>
-                    <td class="p-1 m-0" scope="col"><%= helpers.generateTime(stat.statistics.shortestPrintTime) %></td>
-                  <% }else{ %>
-                    <td class="p-1 m-0" scope="col"></td>
-                  <% } %>
-                <% }) %>
-              </tr>
-              <tr>
-                <td class="p-1 m-0" scope="col">Average Print Time</td>
-                <% monthlyStatistics.forEach(stat => { %>
-                  <% if(Object.keys(stat.statistics).length !== 0) { %>
-                    <td class="p-1 m-0" scope="col"><%= helpers.generateTime(stat.statistics.averagePrintTime) %></td>
-                  <% }else{ %>
-                    <td class="p-1 m-0" scope="col"></td>
-                  <% } %>
-                <% }) %>
-              </tr>
-              <tr>
-                <td class="p-1 m-0" scope="col"></td>
-                <% monthlyStatistics.forEach(stat => { %>
-                    <td class="p-1 m-0" scope="col"></td>
-                <% }) %>
-              </tr>
-              <tr>
-                <td class="p-1 m-0  bg-primary" scope="col">Total Filament Usage</td>
-                <% monthlyStatistics.forEach(stat => { %>
-                  <% if(Object.keys(stat.statistics).length !== 0) { %>
-                    <td class="p-1 m-0  bg-primary" scope="col"><%= stat.statistics.totalFilamentUsage %></td>
-                  <% }else{ %>
-                    <td class="p-1 m-0  bg-primary" scope="col"></td>
-                  <% } %>
-                <% }) %>
-              </tr>
-              <tr>
-                <td class="p-1 m-0" scope="col">Largest Filament Usage</td>
-                <% monthlyStatistics.forEach(stat => { %>
-                  <% if(Object.keys(stat.statistics).length !== 0) { %>
-                    <td class="p-1 m-0" scope="col"><%= stat.statistics.highestFilamentUsage %></td>
-                  <% }else{ %>
-                    <td class="p-1 m-0" scope="col"></td>
-                  <% } %>
-                <% }) %>
-              </tr>
-              <tr>
-                <td class="p-1 m-0" scope="col">Smallest Filament Usage</td>
-                <% monthlyStatistics.forEach(stat => { %>
-                  <% if(Object.keys(stat.statistics).length !== 0) { %>
-                    <td class="p-1 m-0" scope="col"><%= stat.statistics.lowestFilamentUsage %></td>
-                  <% }else{ %>
-                    <td class="p-1 m-0" scope="col"></td>
-                  <% } %>
-                <% }) %>
-              </tr>
-              <tr>
-                <td class="p-1 m-0" scope="col">Average Filament Usage</td>
-                <% monthlyStatistics.forEach(stat => { %>
-                  <% if(Object.keys(stat.statistics).length !== 0) { %>
-                    <td class="p-1 m-0" scope="col"><%= stat.statistics.averageFilamentUsage %></td>
-                  <% }else{ %>
-                    <td class="p-1 m-0" scope="col"></td>
-                  <% } %>
-                <% }) %>
-              </tr>
-              <tr>
-                <td class="p-1 m-0" scope="col"></td>
-                <% monthlyStatistics.forEach(stat => { %>
-                  <td class="p-1 m-0" scope="col"></td>
-                <% }) %>
-              </tr>
-              <tr>
-                <td class="p-1 m-0 bg-primary" scope="col">Total Cost</td>
-                <% monthlyStatistics.forEach(stat => { %>
-                  <% if(Object.keys(stat.statistics).length !== 0) { %>
-                    <td class="p-1 m-0 bg-primary" scope="col"><%= (parseFloat(stat.statistics.totalSpoolCost) + parseFloat(stat.statistics.totalPrinterCost)).toFixed(2)%></td>
-                  <% }else{ %>
-                    <td class="p-1 m-0 bg-primary" scope="col"></td>
-                  <% } %>
-                <% }) %>
-              </tr>
-              <tr>
-                <td class="p-1 m-0" scope="col">Largest Cost</td>
-                <% monthlyStatistics.forEach(stat => { %>
-                  <% if(Object.keys(stat.statistics).length !== 0) { %>
-                    <td class="p-1 m-0" scope="col"><%= (parseFloat(stat.statistics.highestSpoolCost) + parseFloat(stat.statistics.highestPrinterCost)).toFixed(2)%></td>
-                  <% }else{ %>
-                    <td class="p-1 m-0" scope="col"></td>
-                  <% } %>
-                <% }) %>
-              </tr>
-              <tr>
-                <td class="p-1 m-0" scope="col">Smallest Cost</td>
-                <% monthlyStatistics.forEach(stat => { %>
-                  <% if(Object.keys(stat.statistics).length !== 0) { %>
-                    <td class="p-1 m-0" scope="col"><%= (parseFloat(stat.statistics.lowestSpoolCost) + parseFloat(stat.statistics.lowestPrinterCost)).toFixed(2)%></td>
-                  <% }else{ %>
-                    <td class="p-1 m-0" scope="col"></td>
-                  <% } %>
-                <% }) %>
-              </tr>
-              <tr>
-                <td class="p-1 m-0" scope="col">Average Cost</td>
-                <% monthlyStatistics.forEach(stat => { %>
-                  <% if(Object.keys(stat.statistics).length !== 0) { %>
-                    <td class="p-1 m-0" scope="col"><%= (parseFloat(stat.statistics.averageSpoolCost) + parseFloat(stat.statistics.averagePrinterCost)).toFixed(2)%></td>
-                  <% }else{ %>
-                    <td class="p-1 m-0" scope="col"></td>
-                  <% } %>
-                <% }) %>
-              </tr>
-              </tbody>
-
-            </table>
 
           </div>
         </div>
@@ -829,6 +869,86 @@
       </div>
     </div>
   </div>
+  <div class="modal fade" id="fileStatistics" tabindex="0" role="dialog" aria-labelledby="historyModal" aria-hidden="true">
+  <div class="modal-dialog modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title" id="historyModalLabel"><button type="button" class="btn btn-dark float-right d-block" href="#" aria-expanded="false" disabled="">
+            File Statistics
+          </button></h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span class="text-white" aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-lg-12">
+            <h6>Current Most Printed Files</h6><hr>
+            <ul id="mostPrintedFiles" class="list-group list-group-flush">
+              <li class="list-group-item m-0 p-0 row d-flex"><small class="col-lg-6 text-center">File</small><small class="text-center col-lg-1">Time</small><small class="col-lg-1 text-center">Count</small><small class="col-lg-4 text-center">Success Rate</small> </li>
+              <% printStatistics.sortedTopFilesList.slice(0, 6).forEach(printer =>  { %>
+                <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="col-lg-6 text-center text-truncate"><%= printer.file.replace(".gcode", "")  %></small><small class="text-center col-lg-1"><%= helpers.generateTime(printer.sumOfPrintTime) %> </small><small class="text-center col-lg-1"><%= printer.prints %> </small><small class="col-lg-4 text-center">
+                    <% const total = printer.failedCount + printer.cancelledCount + printer.successCount %>
+                    <% const failedPercent = (printer.failedCount * 100 ) / total %>
+                    <% const cancelledPercent = (printer.cancelledCount * 100) / total %>
+                    <% const successPercent = (printer.successCount * 100) / total %>
+                    <div class="progress mb-0" style="width: 100%;">
+                      <div
+                              id="totalSuccessPercent"
+                              class="progress-bar progress-bar-striped bg-success"
+                              role="progressbar"
+                              style="width: <%= successPercent %>%"
+                              aria-valuenow="0%"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                      ><%= successPercent %>%
+                      </div>
+                      <div
+                              id="totalCancelledPercent"
+                              class="progress-bar progress-bar-striped bg-warning"
+                              role="progressbar"
+                              style="width: <%= cancelledPercent %>%"
+                              aria-valuenow="0%"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                      >
+                        <%= cancelledPercent %>%
+                      </div>
+                      <div
+                              id="totalFailurePercent"
+                              class="progress-bar progress-bar-striped bg-danger"
+                              role="progressbar"
+                              style="width: <%= failedPercent %>%"
+                              aria-valuenow="0%"
+                              aria-valuemin="0"
+                              aria-valuemax="100"
+                      >
+                        <%= failedPercent %>%
+                      </div>
+                    </div>
+                  </small> </li>
+              <% }) %>
+            </ul>
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-lg-12">
+            <h6>Most Printed File Per Month</h6><hr>
+            <ul id="monthlyMostPrintedFile" class="list-group list-group-flush">
+
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer" id="historySave">
+        <button type="button" class="btn btn-light" data-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 <% }else{ %>
   <div class="row mt-5">
     <div class="col-md-6 m-auto">

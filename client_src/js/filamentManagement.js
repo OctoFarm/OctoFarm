@@ -527,6 +527,7 @@ async function cloneSpool(e) {
 
   clonedSpools.push(clonedIndex);
   document.getElementById(`spoolsProfile-${clonedIndex}`).value = selects[0].value;
+  await updateProfileDrop();
 }
 
 async function editSpool(e) {
@@ -762,41 +763,7 @@ async function init() {
   let usageByDay = historyStatistics.history.totalByDay;
   let usageOverTime = historyStatistics.history.usageOverTime;
 
-  let yAxisSeries = [];
-  usageOverTime.forEach((usage, index) => {
-    let obj = null;
-    if (index === 0) {
-      obj = {
-        title: {
-          text: "Weight"
-        },
-        seriesName: usageOverTime[0].name,
-        labels: {
-          formatter: function (val) {
-            if (!!val) {
-              return val.toFixed(0) + "g";
-            }
-          }
-        }
-      };
-    } else {
-      obj = {
-        show: false,
-        seriesName: usageOverTime[0].name,
-        labels: {
-          formatter: function (val) {
-            if (!!val) {
-              return val.toFixed(0) + "g";
-            }
-          }
-        }
-      };
-    }
-
-    yAxisSeries.push(obj);
-  });
-
-  dashboardOptions.filamentUsageOverTimeChartOptions.yaxis = yAxisSeries;
+  for (let i = 0; i < usageByDay.length; i++) {}
 
   if (typeof usageOverTime[0] !== "undefined") {
     let systemFarmTemp = new ApexCharts(

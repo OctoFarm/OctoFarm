@@ -213,6 +213,14 @@ export default class UI {
     return string;
   }
 
+  static milisecondsToDays(miliseconds) {
+    if (!isNaN(miliseconds)) {
+      return Math.floor(miliseconds / (3600 * 24));
+    } else {
+      return 0;
+    }
+  }
+
   static generateMilisecondsTime(miliseconds) {
     let seconds = miliseconds / 1000;
     let string = "";

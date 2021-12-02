@@ -192,8 +192,6 @@ class HistoryClean {
           let searchKeyword = "";
           let checkNestedResult = checkNested(spool[key].type, totalByDay);
           if (!!checkNestedResult) {
-            let checkNestedIndexHistoryRates = null;
-            let checkNestedIndexOverTimeRates = null;
             if (historyState.includes("success")) {
               searchKeyword = "Success";
             } else if (historyState.includes("warning")) {
@@ -203,7 +201,7 @@ class HistoryClean {
             } else {
               return;
             }
-            let checkNestedIndexByDay = checkNestedIndex(spool[key].type, usageOverTime);
+            let checkNestedIndexByDay = checkNestedIndex(spool[key].type, totalByDay);
             let usageWeightCalc = historyCleanEntry.totalWeight;
             if (!!usageOverTime[checkNestedIndexByDay].data[0]) {
               usageWeightCalc =
@@ -344,7 +342,7 @@ class HistoryClean {
       currentHistory = historyData;
     }
 
-    currentHistory = orderBy(currentHistory, ["index"], ["asc"]);
+    currentHistory = orderBy(currentHistory, ["endDate"], ["asc"]);
 
     for (let h = 0; h < currentHistory.length; h++) {
       const { printerCost, file, totalLength, state, printTime, printer, totalWeight, spoolCost } =
@@ -356,7 +354,8 @@ class HistoryClean {
       };
       const topFileState = {
         file: file.name,
-        state: "success"
+        state: "success",
+        printTime
       };
       if (state.includes("success")) {
         completedJobsCount++;
@@ -415,9 +414,7 @@ class HistoryClean {
     totalOverTime.forEach((usage) => {
       usage.data = HistoryClean.sumValuesGroupByDate(usage.data);
     });
-    totalOverTime.forEach((usage) => {
-      usage.data = HistoryClean.assignYCumSum(usage.data);
-    });
+
     usageOverTime.forEach((usage) => {
       usage.data = HistoryClean.sumValuesGroupByDate(usage.data);
     });
@@ -472,14 +469,16 @@ class HistoryClean {
         successCount: sumOfSuccess || 0
       });
     });
-
     const groupedFilesList = topFilesList.reduce(function (r, a) {
       r[a.file] = r[a.file] || [];
-      r[a.file].push({ state: a.state });
+      r[a.file].push({ state: a.state, printTime: a.printTime });
       return r;
     }, Object.create(null));
     const sortedTopFilesList = [];
     Object.entries(groupedFilesList).forEach(([key, value]) => {
+      const sumOfPrintTime = value.reduce((sum, currentValue) => {
+        return sum + currentValue.printTime;
+      }, 0);
       const sumOfPrints = value.reduce((sum) => {
         return sum + 1;
       }, 0);
@@ -510,7 +509,8 @@ class HistoryClean {
         prints: sumOfPrints,
         cancelledCount: sumOfCancelled || 0,
         failedCount: sumOfFailed || 0,
-        successCount: sumOfSuccess || 0
+        successCount: sumOfSuccess || 0,
+        sumOfPrintTime: sumOfPrintTime || 0
       });
     });
 

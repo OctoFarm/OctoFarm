@@ -30,11 +30,12 @@ import {
   historyColors,
   rainBow,
   succesCountSeries,
+  successRateSeries,
   utilisationConnectionColors,
   utilisationConnectionLabels,
   xAxisConnectionCategories
 } from "./utils/chart.options";
-import { getLastThirtyDaysText } from "../utils/time.util";
+import UI from "../lib/functions/ui";
 
 const optionsHourlyTemperature = {
   chart: {
@@ -262,7 +263,6 @@ const filamentUsageOverTimeChartOptions = {
   // yaxis: yAxisSeries,
   xaxis: {
     type: "datetime",
-    tickAmount: 10,
     labels: {
       formatter: valueToLocaleDateStringFormatter
     }
@@ -293,8 +293,40 @@ const printCompletionByDayChartOptions = {
   series: [],
   yaxis: [succesCountSeries(true), succesCountSeries(false), succesCountSeries(false)],
   xaxis: {
-    type: "datetime",
-    tickAmount: 10,
+    type: "category",
+    labels: {
+      formatter: valueToLocaleDateStringFormatter
+    }
+  }
+};
+const printSuccessRatePerDay = {
+  chart: {
+    type: "bar",
+    stacked: true,
+    stackType: "100%",
+    ...defaultChartWidth(),
+    height: "250px",
+    ...enableAnimations(true),
+    ...showToolbar(false),
+    ...noZoom(),
+    ...defaultBackground()
+  },
+  colors: historyColors,
+  dataLabels: {
+    enabled: true,
+    background: defaultDataLabelBackground()
+  },
+  stroke: {
+    width: 4,
+    curve: "smooth"
+  },
+  ...showToolbar(false),
+  ...theme(),
+  ...loadingText(),
+  series: [],
+  yaxis: [successRateSeries(true), successRateSeries(false), successRateSeries(false)],
+  xaxis: {
+    type: "category",
     labels: {
       formatter: valueToLocaleDateStringFormatter
     }
@@ -335,7 +367,6 @@ const filamentUsageByDayChartOptions = {
       title: {
         text: "Weight"
       },
-      seriesName: "Unset", // Used to be usageOverTime[0]?.name,
       labels: {
         formatter: toFixedWeightGramFormatter
       }
@@ -343,8 +374,6 @@ const filamentUsageByDayChartOptions = {
   ],
   xaxis: {
     type: "category",
-    categories: getLastThirtyDaysText(),
-    tickAmount: 15,
     labels: {
       formatter: valueToLocaleDateStringFormatter
     }
@@ -383,6 +412,54 @@ const environmentalDataChartOptions = {
   }
 };
 
+const historySparkLineOptions = {
+  series: [
+    {
+      data: []
+    }
+  ],
+  chart: {
+    type: "line",
+    width: "100%",
+    height: 85,
+    sparkline: {
+      enabled: true
+    },
+    zoom: {
+      enabled: false
+    },
+    background: "#303030"
+  },
+
+  theme: {
+    mode: "dark"
+  },
+  noData: {
+    text: "No Data to Display"
+  },
+  colors: ["#3498db"],
+  tooltip: {
+    fixed: {
+      enabled: false
+    },
+    x: {
+      show: true,
+      formatter: ""
+    },
+    y: {
+      formatter: function (value) {
+        return UI.generateTime(value);
+      },
+      title: {
+        formatter: (seriesName) => ""
+      }
+    },
+    marker: {
+      show: false
+    }
+  }
+};
+
 export const dashboardOptions = {
   optionsHourlyTemperature,
   optionsWeeklyUtilisationPerDayHeatMap,
@@ -391,5 +468,7 @@ export const dashboardOptions = {
   filamentUsageOverTimeChartOptions,
   filamentUsageByDayChartOptions,
   printCompletionByDayChartOptions,
-  environmentalDataChartOptions
+  environmentalDataChartOptions,
+  printSuccessRatePerDay,
+  historySparkLineOptions
 };

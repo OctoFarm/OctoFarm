@@ -511,15 +511,8 @@ class HistoryCollection {
       let startDate = today.getTime() - printTime.getTime();
       startDate = new Date(startDate);
 
-      const startDDMM = startDate.toDateString();
-      const startTime = startDate.toTimeString();
-      const startTimeFormat = startTime.substring(0, 8);
-      startDate = `${startDDMM} - ${startTimeFormat}`;
+      const endDate = new Date();
 
-      const endDDMM = today.toDateString();
-      const endTime = today.toTimeString();
-      const endTimeFormat = endTime.substring(0, 8);
-      const endDate = `${endDDMM} - ${endTimeFormat}`;
       const profiles = await filamentProfiles.find({});
 
       const selectedFilament = null;
@@ -653,15 +646,7 @@ class HistoryCollection {
       let startDate = today.getTime() - printTime.getTime();
       startDate = new Date(startDate);
 
-      const startDDMM = startDate.toDateString();
-      const startTime = startDate.toTimeString();
-      const startTimeFormat = startTime.substring(0, 8);
-      startDate = `${startDDMM} - ${startTimeFormat}`;
-
-      const endDDMM = today.toDateString();
-      const endTime = today.toTimeString();
-      const endTimeFormat = endTime.substring(0, 8);
-      const endDate = `${endDDMM} - ${endTimeFormat}`;
+      const endDate = new Date();
       const profiles = await filamentProfiles.find({});
 
       const selectedFilament = null;
@@ -791,15 +776,7 @@ class HistoryCollection {
       let startDate = today.getTime() - printTime.getTime();
       startDate = new Date(startDate);
 
-      const startDDMM = startDate.toDateString();
-      const startTime = startDate.toTimeString();
-      const startTimeFormat = startTime.substring(0, 8);
-      startDate = `${startDDMM} - ${startTimeFormat}`;
-
-      const endDDMM = today.toDateString();
-      const endTime = today.toTimeString();
-      const endTimeFormat = endTime.substring(0, 8);
-      const endDate = `${endDDMM} - ${endTimeFormat}`;
+      const endDate = new Date();
 
       if (errorCollection.length === 0) {
         errorCounter = 0;

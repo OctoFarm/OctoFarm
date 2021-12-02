@@ -11,6 +11,7 @@ import {
 } from "./pages/history/history.templates";
 import { getFirstDayOfLastMonth } from "./utils/date.utils";
 import Litepicker from "litepicker";
+import { dashboardOptions } from "./dashboard/dashboard.options";
 
 // Setup history listeners
 document.getElementById("historyTable").addEventListener("click", (e) => {
@@ -68,7 +69,60 @@ class History {
     ELEMENTS.totalCost.innerHTML = 0;
     ELEMENTS.averageCostPerHour.innerHTML = 0;
   }
+  static getHistoryRequestURL(pageNumber) {
+    let lastDay = new Date().toISOString();
+    let firstDay = getFirstDayOfLastMonth();
+    if (this?.datePicker) {
+      lastDay = this.datePicker.getEndDate().dateInstance;
+      firstDay = this.datePicker.getDate().dateInstance;
+    }
 
+    let url = `history/get?${HISTORY_CONSTANTS.currentPage}${pageNumber}&${
+      HISTORY_CONSTANTS.perPage
+    }${ELEMENTS.itemsPerPage.value}&${HISTORY_CONSTANTS.sort}${
+      SORT_CONSTANTS[ELEMENTS.sort.value]
+    }&${HISTORY_CONSTANTS.dateBefore}${lastDay}&${HISTORY_CONSTANTS.dateAfter}${firstDay}`;
+
+    if (ELEMENTS.printerNamesFilter.value !== "Filter") {
+      url += "&printerNameFilter=" + ELEMENTS.printerNamesFilter.value.replace(/ /g, "-");
+    }
+
+    if (ELEMENTS.printerGroupsFilter.value !== "Filter") {
+      url +=
+        "&printerGroupFilter=" +
+        ELEMENTS.printerGroupsFilter.value.replace(/[^\w\-]+/g, "-").toLowerCase();
+    }
+
+    if (ELEMENTS.fileFilter.value !== "Filter") {
+      url += "&fileFilter=" + ELEMENTS.fileFilter.value + ".gcode";
+    }
+
+    if (ELEMENTS.pathFilter.value !== "Filter") {
+      url += "&pathFilter=" + ELEMENTS.pathFilter.value;
+    }
+
+    if (ELEMENTS.spoolManuFilter.value !== "Filter") {
+      url += "&spoolManuFilter=" + ELEMENTS.spoolManuFilter.value.replace(/ /g, "-");
+    }
+
+    if (ELEMENTS.spoolMatFilter.value !== "Filter") {
+      url += "&spoolMatFilter=" + ELEMENTS.spoolMatFilter.value.replace(/ /g, "-");
+    }
+
+    if (ELEMENTS.fileSearch.value !== "") {
+      url += "&fileSearch=" + ELEMENTS.fileSearch.value.replace(/ /g, "-");
+    }
+
+    if (ELEMENTS.printerSearch.value !== "") {
+      url += "&printerSearch=" + ELEMENTS.printerSearch.value.replace(/ /g, "-");
+    }
+
+    if (ELEMENTS.spoolSearch.value !== "") {
+      url += "&spoolSearch=" + ELEMENTS.spoolSearch.value.replace(/ /g, "-");
+    }
+
+    return url;
+  }
   static drawHistoryTable(records) {
     const historyTable = document.getElementById("historyTable");
     historyTable.innerHTML = "";
@@ -206,6 +260,22 @@ class History {
       this.datePicker.setDateRange(getFirstDayOfLastMonth(), Calc.lastDayOfMonth());
     }
     if (forceFilterRedraw) {
+      ELEMENTS.printerGroupsFilter.innerHTML = returnHistoryFilterDefaultSelected();
+      filterData.printerGroups.forEach((group) => {
+        ELEMENTS.printerNamesFilter.insertAdjacentHTML(
+          "beforeend",
+          `<option value="${group.replace(/[^\w\-]+/g, "-").toLowerCase()}${group} </option>`
+        );
+      });
+
+      ELEMENTS.printerNamesFilter.innerHTML = returnHistoryFilterDefaultSelected();
+      filterData.printerNames.forEach((printer) => {
+        ELEMENTS.printerNamesFilter.insertAdjacentHTML(
+          "beforeend",
+          `<option value="${printer.replace(/ /g, "_")}"> ${printer} </option>`
+        );
+      });
+
       ELEMENTS.fileFilter.innerHTML = returnHistoryFilterDefaultSelected();
       filterData.fileNames.forEach((file) => {
         ELEMENTS.fileFilter.insertAdjacentHTML(
@@ -247,8 +317,7 @@ class History {
     });
 
     let successRateList = statistics.map((stat) => {
-      const currentRate =
-        (stat.statistics.totalSuccessPrintTimes * 100) / stat.statistics.totalPrintTime;
+      const currentRate = parseInt(stat.statistics.completedPercent);
       if (isNaN(currentRate)) {
         return 0;
       } else {
@@ -256,7 +325,8 @@ class History {
       }
     });
     let failureRateList = statistics.map((stat) => {
-      const currentRate = (stat.statistics.currentFailed * 100) / stat.statistics.totalPrintTime;
+      const currentRate =
+        parseInt(stat.statistics.cancelledPercent) + parseInt(stat.statistics.failedPercent);
       if (isNaN(currentRate)) {
         return 0;
       } else {
@@ -352,35 +422,69 @@ class History {
     });
     const topPrinterPerMonth = document.getElementById("monthlyMostUtilisedPrinter");
     topPrinterPerMonth.innerHTML = "";
+    topPrinterPerMonth.insertAdjacentHTML(
+      "beforeend",
+      `
+        <li class="list-group-item m-0 p-0 row d-flex"><small class="col-lg-1 text-center">Month</small><small class="col-lg-3 text-center">Printer</small><small class="text-center col-lg-2">Time</small><small class="col-lg-2 text-center">Count</small><small class="col-lg-4 text-center">Success Rate</small></li>
+      `
+    );
     printerLists.forEach((item) => {
       if (item?.data) {
+        const total =
+          item.data[0].failedCount + item.data[0].cancelledCount + item.data[0].successCount;
+        const failedPercent = (item.data[0].failedCount * 100) / total;
+        const cancelledPercent = (item.data[0].cancelledCount * 100) / total;
+        const successPercent = (item.data[0].successCount * 100) / total;
+
         topPrinterPerMonth.insertAdjacentHTML(
           "beforeend",
           `
-        <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="bg-dark col-lg-1 text-truncate">${
+        <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="col-lg-1 text-truncate">${
           item.month
-        }</small><small class="bg-dark col-lg-4 text-truncate">${
+        }</small><small class="col-lg-3 text-center text-truncate">${
             item.data[0].printerName
-          }</small><small class="text-center bg-primary col-lg-2">${Calc.generateTime(
+          }</small><small class="text-center col-lg-2">${Calc.generateTime(
             item.data[0].time
-          )}</small><small class="bg-info col-lg-2 text-center">Prints: ${
+          )}</small><small class="col-lg-2 text-center">${
             item.data[0].prints
-          }</small><small class="bg-success col-lg-1 text-center">${
-            item.data[0].successCount
-          } </small><small class="bg-warning text-dark col-lg-1 text-center">${
-            item.data[0].cancelledCount
-          }</small><small class="bg-danger col-lg-1 text-center">${
-            item.data[0].failedCount
-          }</small> </li>
+          }</small><small class="col-lg-4 text-center">            <div class="progress mb-0" style="width: 100%;">
+            <div
+        id="totalSuccessPercent"
+        class="progress-bar progress-bar-striped bg-success"
+        role="progressbar"
+        style="width: ${successPercent}%"
+        aria-valuenow="0%"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        >${successPercent}%
+      </div>
+        <div
+            id="totalCancelledPercent"
+            class="progress-bar progress-bar-striped bg-warning"
+            role="progressbar"
+            style="width: ${cancelledPercent}%"
+            aria-valuenow="0%"
+            aria-valuemin="0"
+            aria-valuemax="100"
+        >
+          ${cancelledPercent}%
+        </div>
+        <div
+            id="totalFailurePercent"
+            class="progress-bar progress-bar-striped bg-danger"
+            role="progressbar"
+            style="width: ${failedPercent}%"
+            aria-valuenow="0%"
+            aria-valuemin="0"
+            aria-valuemax="100"
+        >
+          ${failedPercent}%
+        </div>
+      </div>
+      </small></li>
       `
         );
       } else {
-        topPrinterPerMonth.insertAdjacentHTML(
-          "beforeend",
-          `
-        <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="bg-dark col-lg-1 text-truncate">${item.month}</small><small class="bg-dark col-lg-4 text-truncate"></small><small class="text-center bg-primary col-lg-2"></small><small class="bg-info col-lg-2 text-center">Prints: </small><small class="bg-success col-lg-1 text-center"> </small><small class="bg-warning text-dark col-lg-1 text-center"></small><small class="bg-danger col-lg-1 text-center"></small> </li>
-      `
-        );
       }
     });
     let fileLists = statistics.map((stat) => {
@@ -388,66 +492,140 @@ class History {
     });
     const topFilePerMonth = document.getElementById("monthlyMostPrintedFile");
     topFilePerMonth.innerHTML = "";
+    topFilePerMonth.insertAdjacentHTML(
+      "beforeend",
+      `
+        <li class="list-group-item m-0 p-0 row d-flex"><small class="col-lg-1 text-center">Month</small><small class="col-lg-3 text-center">File</small><small class="text-center col-lg-2">Time</small><small class="col-lg-2 text-center">Count</small><small class="col-lg-4 text-center">Success Rate</small></li>
+      `
+    );
     fileLists.forEach((item) => {
       if (item?.data) {
+        const total =
+          item.data[0].failedCount + item.data[0].cancelledCount + item.data[0].successCount;
+        const failedPercent = (item.data[0].failedCount * 100) / total;
+        const cancelledPercent = (item.data[0].cancelledCount * 100) / total;
+        const successPercent = (item.data[0].successCount * 100) / total;
+
         topFilePerMonth.insertAdjacentHTML(
           "beforeend",
           `
-        <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="bg-dark col-lg-1 text-truncate">${
+        <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="col-lg-1 text-truncate">${
           item.month
-        }</small><small class="bg-dark col-lg-6 text-truncate">${item.data[0].file.replace(
+        }</small><small class="col-lg-3 text-center text-truncate">${item.data[0].file.replace(
             ".gcode",
             ""
-          )}</small><small class="text-center bg-info col-lg-2">Prints: ${
+          )}</small><small class="text-center col-lg-2">${UI.generateTime(
+            item.data[0].sumOfPrintTime
+          )} </small><small class="text-center col-lg-2">${
             item.data[0].prints
-          } </small><small class="bg-success text-center col-lg-1">${
-            item.data[0].successCount
-          } </small><small class="bg-warning text-dark text-center col-lg-1">${
-            item.data[0].cancelledCount
-          }</small><small class="bg-danger col-lg-1 text-center">${
-            item.data[0].failedCount
-          }</small> </li>
+          } </small><small class="col-lg-4 text-center">            <div class="progress mb-0" style="width: 100%;">
+            <div
+        id="totalSuccessPercent"
+        class="progress-bar progress-bar-striped bg-success"
+        role="progressbar"
+        style="width: ${successPercent}%"
+        aria-valuenow="0%"
+        aria-valuemin="0"
+        aria-valuemax="100"
+        >${successPercent}%
+      </div>
+        <div
+            id="totalCancelledPercent"
+            class="progress-bar progress-bar-striped bg-warning"
+            role="progressbar"
+            style="width: ${cancelledPercent}%"
+            aria-valuenow="0%"
+            aria-valuemin="0"
+            aria-valuemax="100"
+        >
+          ${cancelledPercent}%
+        </div>
+        <div
+            id="totalFailurePercent"
+            class="progress-bar progress-bar-striped bg-danger"
+            role="progressbar"
+            style="width: ${failedPercent}%"
+            aria-valuenow="0%"
+            aria-valuemin="0"
+            aria-valuemax="100"
+        >
+          ${failedPercent}%
+        </div>
+      </div>
+      </small></li>
       `
         );
+      }
+    });
+
+    let successPercentList = statistics.map((stat) => {
+      const total = stat.statistics.cancelled + stat.statistics.failed + stat.statistics.completed;
+      const currentRate = (stat.statistics.completed * 100) / total;
+      if (isNaN(currentRate)) {
+        return 0;
       } else {
-        topFilePerMonth.insertAdjacentHTML(
-          "beforeend",
-          `
-        <li class="list-group-item list-group-item-action m-0 p-0 row d-flex"><small class="bg-dark col-lg-1 text-truncate">${item.month}</small><small class="bg-dark col-lg-6 text-truncate"></small><small class="text-center bg-info col-lg-2">Prints:  </small><small class="bg-success text-center col-lg-1"></small><small class="bg-warning text-dark text-center col-lg-1"></small><small class="bg-danger col-lg-1 text-center"></small> </li>
-      `
-        );
+        return parseInt(2000);
+      }
+    });
+    let failedPercentList = statistics.map((stat) => {
+      const total = stat.statistics.cancelled + stat.statistics.failed + stat.statistics.completed;
+      const currentRate = (stat.statistics.failed * 100) / total;
+      if (isNaN(currentRate)) {
+        return 0;
+      } else {
+        return parseInt(currentRate);
+      }
+    });
+    let cancelledPercentList = statistics.map((stat) => {
+      const total = stat.statistics.cancelled + stat.statistics.failed + stat.statistics.completed;
+      const currentRate = (stat.statistics.cancelled * 100) / total;
+      if (isNaN(currentRate)) {
+        return 0;
+      } else {
+        return parseInt(currentRate);
       }
     });
 
     let successCountList = statistics.map((stat) => {
-      if (isNaN(stat.statistics.completed)) {
+      const total = stat.statistics.completed;
+      if (isNaN(total)) {
         return 0;
       } else {
-        return parseInt(stat.statistics.completed);
+        return parseInt(total);
       }
     });
     let failedCountList = statistics.map((stat) => {
-      if (isNaN(stat.statistics.failed)) {
+      const total = stat.statistics.failed;
+      if (isNaN(total)) {
         return 0;
       } else {
-        return parseInt(stat.statistics.failed);
+        return parseInt(total);
       }
     });
     let cancelledCountList = statistics.map((stat) => {
-      if (isNaN(stat.statistics.cancelled)) {
+      const total = stat.statistics.cancelled;
+
+      if (isNaN(total)) {
         return 0;
       } else {
-        return parseInt(stat.statistics.cancelled);
+        return parseInt(total);
+      }
+    });
+    let totalPrintCountList = statistics.map((stat) => {
+      const calculation =
+        stat.statistics.complete + stat.statistics.failed + stat.statistics.cancelled;
+      if (isNaN(calculation)) {
+        return 0;
+      } else {
+        return parseInt(calculation);
       }
     });
 
-    let totalPrintList = statistics.map((stat) => {
-      if (isNaN(stat.statistics.cancelled + stat.statistics.failed + stat.statistics.completed)) {
+    let totalPrintTimeList = statistics.map((stat) => {
+      if (isNaN(stat.statistics.totalPrintTime)) {
         return 0;
       } else {
-        return parseInt(
-          stat.statistics.cancelled + stat.statistics.failed + stat.statistics.completed
-        );
+        return parseInt(stat.statistics.totalPrintTime);
       }
     });
 
@@ -500,7 +678,7 @@ class History {
           title: {
             text: "Count"
           },
-          max: Math.max(...successCountList) + Math.max(...totalPrintList),
+
           seriesName: "Success Count",
           labels: {
             formatter: function (val) {
@@ -578,135 +756,83 @@ class History {
         name: "Cancelled Count",
         data: cancelledCountList
       },
-      { name: "Total Count", data: totalPrintList }
+      { name: "Total Count", data: totalPrintCountList }
     ]);
 
-    const options1 = {
-      series: [
-        {
-          data: totalPrintList
-        }
-      ],
-      chart: {
-        type: "line",
-        width: "100%",
-        height: 85,
-        sparkline: {
-          enabled: true
-        },
-        zoom: {
-          enabled: false
-        },
-        background: "#303030"
-      },
+    const sparkOptions = dashboardOptions.historySparkLineOptions;
 
-      theme: {
-        mode: "dark"
-      },
-      noData: {
-        text: "Loading..."
-      },
-      colors: ["#3498db"],
-      tooltip: {
-        fixed: {
-          enabled: false
-        },
-        x: {
-          show: true,
-          formatter: function (value) {
-            return monthArray[value - 1]; // The formatter function overrides format property
-          }
-        },
-        y: {
-          title: {
-            formatter: (seriesName) => "Total: "
-          }
-        },
-        marker: {
-          show: false
-        }
-      }
+    sparkOptions.series[0].data = totalPrintTimeList;
+    sparkOptions.tooltip.x.formatter = function (value) {
+      return monthArray[value - 1]; // The formatter function overrides format property
     };
-
     if (!this?.totalSpark) {
-      this.totalSpark = new ApexCharts(document.querySelector("#totalSpark"), options1);
+      this.totalSpark = new ApexCharts(document.querySelector("#totalSpark"), sparkOptions);
       this.totalSpark.render();
     }
 
-    document.getElementById("totalSparkLast").innerHTML = totalPrintList[totalPrintList.length - 1];
+    const totalDays = UI.milisecondsToDays(totalPrintTimeList[totalPrintTimeList.length - 1]);
+    document.getElementById("totalSparkLast").innerHTML = totalDays.toFixed(0) + " Days";
 
-    options1.colors = ["#00bc8c"];
-    options1.series[0].data = successCountList;
-    options1.tooltip.y.title.formatter = (seriesName) => "Success: ";
+    sparkOptions.colors = ["#00bc8c"];
+    sparkOptions.series[0].data = successPercentList;
+    sparkOptions.tooltip.y.formatter = function (value) {
+      return value + "%";
+    };
+    sparkOptions.tooltip.y.title.formatter = (seriesName) => "Success: ";
     if (!this?.completeSpark) {
-      this.completeSpark = new ApexCharts(document.querySelector("#successSpark"), options1);
+      this.completeSpark = new ApexCharts(document.querySelector("#successSpark"), sparkOptions);
       this.completeSpark.render();
     }
 
     document.getElementById("successSparkLast").innerHTML =
-      successCountList[successCountList.length - 1];
+      successCountList[successCountList.length - 1] + "%";
 
-    options1.colors = ["#f39c12"];
-    options1.series[0].data = cancelledCountList;
-    options1.tooltip.y.title.formatter = (seriesName) => "Cancelled: ";
+    sparkOptions.colors = ["#f39c12"];
+    sparkOptions.series[0].data = cancelledPercentList;
+    sparkOptions.tooltip.y.title.formatter = (seriesName) => "Cancelled: ";
     if (!this?.cancelledSpark) {
-      this.cancelledSpark = new ApexCharts(document.querySelector("#cancelledSpark"), options1);
+      this.cancelledSpark = new ApexCharts(document.querySelector("#cancelledSpark"), sparkOptions);
       this.cancelledSpark.render();
     }
 
     document.getElementById("cancelledSparkLast").innerHTML =
-      cancelledCountList[cancelledCountList.length - 1];
+      cancelledCountList[cancelledCountList.length - 1] + "%";
 
-    options1.colors = ["#e74c3c"];
-    options1.series[0].data = failedCountList;
-    options1.tooltip.y.title.formatter = (seriesName) => "Failed: ";
+    sparkOptions.colors = ["#e74c3c"];
+    sparkOptions.series[0].data = failedPercentList;
+    sparkOptions.tooltip.y.title.formatter = (seriesName) => "Failed: ";
     if (!this?.failedSpark) {
-      this.failedSpark = new ApexCharts(document.querySelector("#failedSpark"), options1);
+      this.failedSpark = new ApexCharts(document.querySelector("#failedSpark"), sparkOptions);
       this.failedSpark.render();
     }
 
     document.getElementById("failedSparkLast").innerHTML =
-      failedCountList[failedCountList.length - 1];
+      failedCountList[failedCountList.length - 1] + "%";
   }
-  static getHistoryRequestURL(pageNumber) {
-    let lastDay = new Date().toISOString();
-    let firstDay = getFirstDayOfLastMonth();
-    if (this?.datePicker) {
-      lastDay = this.datePicker.getEndDate().dateInstance;
-      firstDay = this.datePicker.getDate().dateInstance;
+
+  static drawStatisticsTotals(statistics) {
+    // Load graphs
+    let historyGraphData = statistics.historyByDay;
+    let historyUsageOverTimeData = statistics.totalOverTime;
+
+    if (!this?.competionByDay) {
+      this.competionByDay = new ApexCharts(
+        document.querySelector("#printCompletionByDay"),
+        dashboardOptions.printSuccessRatePerDay
+      );
+      this.competionByDay.render();
     }
 
-    let url = `history/get?${HISTORY_CONSTANTS.currentPage}${pageNumber}&${
-      HISTORY_CONSTANTS.perPage
-    }${ELEMENTS.itemsPerPage.value}&${HISTORY_CONSTANTS.sort}${
-      SORT_CONSTANTS[ELEMENTS.sort.value]
-    }&${HISTORY_CONSTANTS.dateBefore}${lastDay}&${HISTORY_CONSTANTS.dateAfter}${firstDay}`;
+    this.competionByDay.updateSeries(historyUsageOverTimeData);
 
-    if (ELEMENTS.fileFilter.value !== "Filter") {
-      url += "&fileFilter=" + ELEMENTS.fileFilter.value + ".gcode";
+    if (!this?.overTimeGraph) {
+      this.overTimeGraph = new ApexCharts(
+        document.querySelector("#printCompletionOverTime"),
+        dashboardOptions.printCompletionByDayChartOptions
+      );
+      this.overTimeGraph.render();
     }
-
-    if (ELEMENTS.pathFilter.value !== "Filter") {
-      url += "&pathFilter=" + ELEMENTS.pathFilter.value;
-    }
-
-    if (ELEMENTS.spoolManuFilter.value !== "Filter") {
-      url += "&spoolManuFilter=" + ELEMENTS.spoolManuFilter.value.replace(/ /g, "-");
-    }
-
-    if (ELEMENTS.spoolMatFilter.value !== "Filter") {
-      url += "&spoolMatFilter=" + ELEMENTS.spoolMatFilter.value.replace(/ /g, "-");
-    }
-
-    if (ELEMENTS.fileSearch.value !== "Filter") {
-      url += "&fileSearch=" + ELEMENTS.fileSearch.value.replace(/ /g, "-");
-    }
-
-    if (ELEMENTS.spoolSearch.value !== "Filter") {
-      url += "&spoolSearch=" + ELEMENTS.spoolSearch.value.replace(/ /g, "-");
-    }
-
-    return url;
+    this.overTimeGraph.updateSeries(historyGraphData);
   }
   static async get(pageNumber = 1, forceFilterRedraw = false) {
     const { history, statisticsClean, pagination, monthlyStatistics, historyFilterData } =
@@ -736,249 +862,8 @@ class History {
     //Update totals
     this.updateTotals(history);
 
-    // Load graphs
-    let historyGraphData = statisticsClean.historyByDay;
-    let historyUsageOverTimeData = statisticsClean.totalOverTime;
-    //TODO Move out, same as dashboards
-
-    let yAxisSeries = [];
-    historyUsageOverTimeData.forEach((usage, index) => {
-      let obj = null;
-      if (index === 0) {
-        obj = {
-          title: {
-            text: "Count"
-          },
-          seriesName: historyUsageOverTimeData[0].name,
-          labels: {
-            formatter: function (val) {
-              if (!!val) {
-                return val.toFixed(0);
-              }
-            }
-          }
-        };
-      } else {
-        obj = {
-          show: false,
-          seriesName: historyUsageOverTimeData[0].name,
-          labels: {
-            formatter: function (val) {
-              if (!!val) {
-                return val.toFixed(0);
-              }
-            }
-          }
-        };
-      }
-
-      yAxisSeries.push(obj);
-    });
-    const filamentUsageOverTimeChartOptions = {
-      chart: {
-        type: "bar",
-        stacked: true,
-        width: "100%",
-        height: "200px",
-        animations: {
-          enabled: true
-        },
-        toolbar: {
-          show: false
-        },
-        zoom: {
-          enabled: false
-        },
-        background: "#303030"
-      },
-      colors: ["#00bc8c", "#e74c3c", "#f39c12"],
-      // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
-      toolbar: {
-        show: false
-      },
-      stroke: {
-        width: 4,
-        curve: "smooth"
-      },
-      theme: {
-        mode: "dark"
-      },
-      noData: {
-        text: "Loading..."
-      },
-      series: [],
-      yaxis: [
-        {
-          title: {
-            text: "Count"
-          },
-          seriesName: "Success",
-          labels: {
-            formatter: function (val) {
-              if (val !== null) {
-                return val.toFixed(0);
-              }
-            }
-          }
-        },
-        {
-          title: {
-            text: "Count"
-          },
-          seriesName: "Success",
-          labels: {
-            formatter: function (val) {
-              if (val !== null) {
-                return val.toFixed(0);
-              }
-            }
-          },
-          show: false
-        },
-        {
-          title: {
-            text: "Count"
-          },
-          seriesName: "Success",
-          labels: {
-            formatter: function (val) {
-              if (val !== null) {
-                return val.toFixed(0);
-              }
-            }
-          },
-          show: false
-        }
-      ],
-      xaxis: {
-        type: "datetime",
-        tickAmount: 10,
-        labels: {
-          formatter: function (value, timestamp) {
-            let dae = new Date(timestamp);
-            return dae.toLocaleDateString(); // The formatter function overrides format property
-          }
-        }
-      }
-    };
-    filamentUsageOverTimeChartOptions.yaxis = yAxisSeries;
-    if (!this?.competionByDay) {
-      this.competionByDay = new ApexCharts(
-        document.querySelector("#printCompletionByDay"),
-        filamentUsageOverTimeChartOptions
-      );
-      this.competionByDay.render();
-    }
-
-    this.competionByDay.updateSeries(historyGraphData);
-
-    const historyGraphOptions = {
-      chart: {
-        type: "line",
-        width: "100%",
-        height: "200px",
-        animations: {
-          enabled: true
-        },
-        toolbar: {
-          show: false
-        },
-        zoom: {
-          enabled: false
-        },
-        background: "#303030"
-      },
-      colors: ["#00bc8c", "#e74c3c", "#f39c12"],
-      dataLabels: {
-        enabled: true,
-        background: {
-          enabled: true,
-          foreColor: "#000",
-          padding: 1,
-          borderRadius: 2,
-          borderWidth: 1,
-          borderColor: "#fff",
-          opacity: 0.9
-        }
-      },
-      // colors: ["#295efc", "#37ff00", "#ff7700", "#ff1800", "#37ff00", "#ff1800"],
-      toolbar: {
-        show: false
-      },
-      stroke: {
-        width: 4,
-        curve: "smooth"
-      },
-      theme: {
-        mode: "dark"
-      },
-      noData: {
-        text: "Loading..."
-      },
-      series: [],
-      yaxis: [
-        {
-          title: {
-            text: "Count"
-          },
-          seriesName: "Success",
-          labels: {
-            formatter: function (val) {
-              if (val !== null) {
-                return val.toFixed(0);
-              }
-            }
-          }
-        },
-        {
-          title: {
-            text: "Count"
-          },
-          seriesName: "Success",
-          labels: {
-            formatter: function (val) {
-              if (val !== null) {
-                return val.toFixed(0);
-              }
-            }
-          },
-          show: false
-        },
-        {
-          title: {
-            text: "Count"
-          },
-          seriesName: "Success",
-          labels: {
-            formatter: function (val) {
-              if (val !== null) {
-                return val.toFixed(0);
-              }
-            }
-          },
-          show: false
-        }
-      ],
-      xaxis: {
-        type: "datetime",
-        tickAmount: 10,
-        labels: {
-          formatter: function (value, timestamp) {
-            let dae = new Date(timestamp);
-            return dae.toLocaleDateString(); // The formatter function overrides format property
-          }
-        }
-      }
-    };
-
-    if (!this?.overTimeGraph) {
-      this.overTimeGraph = new ApexCharts(
-        document.querySelector("#printCompletionOverTime"),
-        historyGraphOptions
-      );
-      this.overTimeGraph.render();
-    }
-    this.overTimeGraph.updateSeries(historyUsageOverTimeData);
+    // Load statistics totals
+    this.drawStatisticsTotals(statisticsClean);
   }
 
   static async edit(e) {

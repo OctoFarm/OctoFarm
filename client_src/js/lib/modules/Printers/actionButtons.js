@@ -15,7 +15,7 @@ function returnActionBtnTemplate(id) {
             <i class="fas fa-toggle-off"></i>
       </button>
       <button  
-         title="Re-Sync your printers connection"
+         title="Re-establish the OctoFarm -> OctoPrint Connection"
          id="printerSyncButton-${id}"
          type="button"
          class="tag btn btn-success btn-sm"
