@@ -78,19 +78,19 @@ async function ensureSystemSettingsInitiated() {
 
 function serveOctoFarmRoutes(app) {
   app.use("/", require("./routes/index", { page: "route" }));
-  app.use("/serverChecks", require("./routes/serverChecks", { page: "route" }));
+  app.use("/amialive", require("./routes/SSE-amIAlive", { page: "route" }));
   app.use("/users", require("./routes/users", { page: "route" }));
   app.use("/printers", require("./routes/printers", { page: "route" }));
   app.use("/settings", require("./routes/settings", { page: "route" }));
-  app.use("/printersInfo", require("./routes/SSE-printersInfo", { page: "route" }));
-  app.use("/dashboardInfo", require("./routes/SSE-dashboard", { page: "route" }));
-  app.use("/monitoringInfo", require("./routes/SSE-monitoring", { page: "route" }));
   app.use("/filament", require("./routes/filament", { page: "route" }));
   app.use("/history", require("./routes/history", { page: "route" }));
   app.use("/scripts", require("./routes/scripts", { page: "route" }));
   app.use("/input", require("./routes/externalDataCollection", { page: "route" }));
   app.use("/system", require("./routes/system", { page: "route" }));
   app.use("/client", require("./routes/sorting", { page: "route" }));
+  app.use("/printersInfo", require("./routes/SSE-printersInfo", { page: "route" }));
+  app.use("/dashboardInfo", require("./routes/SSE-dashboard", { page: "route" }));
+  app.use("/monitoringInfo", require("./routes/SSE-monitoring", { page: "route" }));
   app.get("*", function (req, res) {
     console.debug("Had to redirect resource request:", req.originalUrl);
     if (req.originalUrl.endsWith(".min.js")) {
