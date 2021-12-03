@@ -10,18 +10,14 @@ const {
 } = require("../providers/cleaner.constants");
 const historyService = require("../../services/history.service");
 const Logger = require("../../handlers/logger.js");
-const serverSettingsCache = require("../../settings/serverSettings");
 const { noCostSettingsMessage } = require("../../utils/print-cost.util");
 const { stateToHtml } = require("../../utils/html.util");
 const { toDefinedKeyValue } = require("../../utils/property.util");
 const { floatOrZero } = require("../../utils/number.util");
 const { toTimeFormat } = require("../../utils/time.util");
-const {
-  last12Month,
-  getDatesBetweenDates,
-  getFirstDayOfLastMonth
-} = require("../../utils/date.utils");
+const { last12Month } = require("../../utils/date.utils");
 const { orderBy } = require("lodash");
+const { SettingsClean } = require("../../lib/dataFunctions/settingsClean");
 
 let logger;
 
@@ -43,7 +39,7 @@ class HistoryClean {
   }
 
   /**
-   * Calculate spool weight static (has nothing to do with cleaning state)
+   * Calculate spool weight static
    * @param length
    * @param filament
    * @param completionRatio
@@ -56,7 +52,6 @@ class HistoryClean {
 
     let density = DEFAULT_SPOOL_DENSITY;
     let radius = DEFAULT_SPOOL_RATIO;
-    // TODO improve illegality checks (if one is non-numeric, the weight becomes NaN)
     if (!!filament?.spools?.profile) {
       radius = parseFloat(filament.spools.profile.diameter) / 2;
       density = parseFloat(filament.spools.profile.density);
@@ -67,6 +62,7 @@ class HistoryClean {
   }
 
   static getSpoolLabel(id) {
+    const serverSettingsCache = SettingsClean.returnSystemSettings();
     const spool = id?.spools;
     if (!spool) {
       return null;
@@ -142,10 +138,16 @@ class HistoryClean {
 
     let printPercentage = 0;
     if (!success) {
-      // TODO what if estimatedPrintTime is falsy? Should become partial result.
-      printPercentage = (time / job.estimatedPrintTime) * 100;
+      let printTime = 0;
+      if (job?.lastPrintTime) {
+        // Last print time available, use this as it's more accurate
+        printTime = job.lastPrintTime;
+      } else {
+        printTime = job.estimatedPrintTime;
+      }
+
+      printPercentage = (time / printTime) * 100;
     }
-    // TODO ehm?
     const filament = job.filament;
 
     const spools = [];
@@ -638,7 +640,7 @@ class HistoryClean {
         if (hist?.printerGroup) {
           historyPrinterGroups.push(hist.printerGroup);
         }
-        if (typeof hist.file !== "undefined") {
+        if (hist?.file?.name) {
           historyFileNames.push(hist.file.name.replace(".gcode", ""));
           const path = hist.file.path.substring(0, hist.file.path.lastIndexOf("/"));
           if (path !== "") {

@@ -81,7 +81,6 @@ function serveOctoFarmRoutes(app) {
   app.use("/serverChecks", require("./routes/serverChecks", { page: "route" }));
   app.use("/users", require("./routes/users", { page: "route" }));
   app.use("/printers", require("./routes/printers", { page: "route" }));
-  app.use("/groups", require("./routes/printerGroups", { page: "route" }));
   app.use("/settings", require("./routes/settings", { page: "route" }));
   app.use("/printersInfo", require("./routes/SSE-printersInfo", { page: "route" }));
   app.use("/dashboardInfo", require("./routes/SSE-dashboard", { page: "route" }));

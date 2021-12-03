@@ -5,7 +5,7 @@ const History = require("../models/History.js");
 const ErrorLog = require("../models/ErrorLog.js");
 const Logger = require("../handlers/logger.js");
 const filamentProfiles = require("../models/Profiles.js");
-const ServerSettings = require("../models/ServerSettings.js");
+const { SettingsClean } = require("../lib/dataFunctions/settingsClean");
 const Spool = require("../models/Filament.js");
 const { FilamentManagerPlugin } = require("./filamentManagerPlugin.js");
 const { ScriptRunner } = require("./scriptCheck.js");
@@ -13,6 +13,10 @@ const MjpegDecoder = require("mjpeg-decoder");
 const { downloadImage, downloadFromOctoPrint } = require("../utils/download.util");
 const { getHistoryCache } = require("../cache/history.cache");
 const { writePoints } = require("../lib/influxExport.js");
+const {
+  DEFAULT_SPOOL_DENSITY,
+  DEFAULT_SPOOL_RATIO
+} = require("../lib/providers/cleaner.constants");
 
 const logger = new Logger("OctoFarm-HistoryCollection");
 let counter = 0;
@@ -156,50 +160,47 @@ class HistoryCollection {
    * @param printer
    * @returns {Promise<null>}
    */
-  static async thumbnailCheck(payload, serverSettings, files, id, event, printer) {
-    let runCapture = async () => {
-      // grab Thumbnail if available.
-      const currentFileIndex = _.findIndex(files, function (o) {
-        return o.name === payload.name;
-      });
-      let base64Thumbnail = null;
-      if (currentFileIndex > -1) {
-        if (
-          typeof files[currentFileIndex] !== "undefined" &&
-          files[currentFileIndex].thumbnail != null
-        ) {
-          base64Thumbnail = await HistoryCollection.grabThumbnail(
-            `${printer.printerURL}/${files[currentFileIndex].thumbnail}`,
-            files[currentFileIndex].thumbnail,
-            id,
-            printer
-          );
+  static async thumbnailCheck(payload, files, id, printer) {
+    try {
+      let runCapture = async () => {
+        // grab Thumbnail if available.
+        const currentFileIndex = _.findIndex(files, function (o) {
+          return o.name === payload.name;
+        });
+        let base64Thumbnail = null;
+        if (currentFileIndex > -1) {
+          if (
+            typeof files[currentFileIndex] !== "undefined" &&
+            files[currentFileIndex].thumbnail !== null
+          ) {
+            base64Thumbnail = await HistoryCollection.grabThumbnail(
+              `${printer.printerURL}/${files[currentFileIndex].thumbnail}`,
+              files[currentFileIndex].thumbnail,
+              id,
+              printer
+            );
+          }
         }
-      }
-      return base64Thumbnail;
-    };
+        return base64Thumbnail;
+      };
 
-    if (typeof serverSettings.history === "undefined" || serverSettings.history.thumbnails[event]) {
       return await runCapture();
-    } else {
-      return null;
+    } catch (e) {
+      logger.error("Couldn't capture thumbnail as requested!", e);
     }
   }
 
-  static async snapshotCheck(event, serverSettings, printer, saveHistory, payload) {
+  static async snapshotCheck(printer, id, payload) {
     // Use default settings if not present
-    if (typeof serverSettings.history === "undefined" || serverSettings.history.snapshot[event]) {
-      return await HistoryCollection.snapPictureOfPrinter(
-        printer.camURL,
-        saveHistory._id,
-        payload.name
-      );
-    } else {
-      return null;
+    try {
+      return await HistoryCollection.snapPictureOfPrinter(printer.camURL, id, payload.name);
+    } catch (e) {
+      logger.error("Couldn't capture webcam snapshot as requested!", e);
     }
   }
 
-  static async timelapseCheck(printer, fileName, printTime, serverSettings, id) {
+  static async timelapseCheck(printer, fileName, printTime, id) {
+    const serverSettingsCache = SettingsClean.returnSystemSettings();
     if (printTime >= 10) {
       let interval = false;
       const grabTimelapse = async (printer) => {
@@ -244,7 +245,7 @@ class HistoryCollection {
                   printer.printerURL + timelapseResponse.files[lastTimelapse].url,
                   id,
                   printer,
-                  serverSettings
+                  serverSettingsCache
                 );
                 //Clearing interval
                 clearInterval(interval);
@@ -260,7 +261,7 @@ class HistoryCollection {
                 updateHistory.markModified("printHistory");
                 await updateHistory.save();
                 await getHistoryCache().initCache();
-                logger.info("Successfully grabbed timelapse!");
+                logger.info("Failed to grab a timelapse...");
                 clearInterval(interval);
                 return null;
               }
@@ -485,274 +486,247 @@ class HistoryCollection {
     }
   }
 
-  static async complete(payload, printer, job, files, resends) {
-    try {
-      let serverSettings = await ServerSettings.find({});
-      const previousFilament = JSON.parse(JSON.stringify(printer.selectedFilament));
-      let name = null;
-      if (typeof printer.settingsAppearance !== "undefined") {
-        if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
-          name = printer.printerURL;
-        } else {
-          name = printer.settingsAppearance.name;
-        }
+  static getPrinterName(printer) {
+    if (typeof printer.settingsAppearance !== "undefined") {
+      if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
+        return printer.printerURL;
       } else {
-        name = printer.printerURL;
+        return printer.settingsAppearance.name;
       }
-      if (serverSettings[0]?.filamentManager && Array.isArray(printer?.selectedFilament)) {
-        printer.selectedFilament = await HistoryCollection.resyncFilament(printer);
-        logger.info("Grabbed latest filament values", printer.filamentSelection);
-      }
-      logger.info("Completed Print triggered", payload + printer.printerURL);
-      const today = new Date();
-      const historyCollection = await History.find({});
-
-      const printTime = new Date(payload.time * 1000);
-      let startDate = today.getTime() - printTime.getTime();
-      startDate = new Date(startDate);
-
-      const endDate = new Date();
-
-      const profiles = await filamentProfiles.find({});
-
-      const selectedFilament = null;
-      if (printer.selectedFilament !== null && Array.isArray(printer.selectedFilament)) {
-        let profileId = [];
-        printer.selectedFilament.forEach((spool, index) => {
-          if (spool !== null) {
-            if (serverSettings[0]?.filamentManager) {
-              profileId = _.findIndex(profiles, function (o) {
-                return o.profile.index == printer.selectedFilament[index].spools.profile;
-              });
-            } else {
-              profileId = _.findIndex(profiles, function (o) {
-                return o._id == printer.selectedFilament[index].spools.profile;
-              });
-            }
-            printer.selectedFilament[index].spools.profile = profiles[profileId].profile;
-          }
-        });
-      }
-      if (historyCollection.length === 0) {
-        counter = 0;
-      } else {
-        counter = historyCollection[historyCollection.length - 1].printHistory.historyIndex + 1;
-      }
-
-      const printHistory = {
-        historyIndex: counter,
-        printerName: name,
-        printerID: printer._id,
-        costSettings: printer.costSettings,
-        success: true,
-        reason: payload.reason,
-        fileName: payload.name,
-        fileDisplay: payload.display,
-        filePath: payload.path,
-        startDate,
-        endDate,
-        thumbnail: "",
-        printTime: Math.round(payload.time),
-        filamentSelection: printer.selectedFilament,
-        previousFilamentSelection: previousFilament,
-        job,
-        notes: "",
-        snapshot: "",
-        resends: resends
-      };
-
-      await HistoryCollection.updateFilamentInfluxDB(
-        printer.selectedFilament,
-        printHistory,
-        previousFilament,
-        printer
-      );
-
-      const saveHistory = new History({
-        printHistory
-      });
-      await saveHistory.save().then(async (r) => {
-        const thumbnail = await HistoryCollection.thumbnailCheck(
-          payload,
-          serverSettings[0],
-          files,
-          saveHistory._id,
-          "onComplete",
-          printer
-        );
-        let snapshot = "";
-        if (printer.camURL !== "") {
-          snapshot = await HistoryCollection.snapshotCheck(
-            "onComplete",
-            serverSettings[0],
-            printer,
-            saveHistory,
-            payload
-          );
-        }
-
-        if (serverSettings[0]?.history?.timelapse?.onComplete) {
-          HistoryCollection.timelapseCheck(
-            printer,
-            payload.name,
-            payload.time,
-            serverSettings[0],
-            saveHistory._id
-          );
-        }
-        saveHistory.printHistory.thumbnail = thumbnail;
-        saveHistory.printHistory.snapshot = snapshot;
-        saveHistory.markModified("printHistory");
-        saveHistory.save();
-        printer.fileName = payload.display;
-        printer.filePath = payload.path;
-        ScriptRunner.check(printer, "done", saveHistory._id);
-        await getHistoryCache().initCache();
-        setTimeout(async function () {
-          await getHistoryCache().initCache();
-          HistoryCollection.updateInfluxDB(saveHistory._id, "history", printer);
-        }, 5000);
-      });
-
-      logger.info("Completed Print Captured for ", payload + printer.printerURL);
-    } catch (e) {
-      logger.error(e, `Failed to capture history for ${printer.printerURL}`);
+    } else {
+      return printer.printerURL;
     }
   }
 
-  static async failed(payload, printer, job, files, resends) {
-    try {
-      const serverSettings = await ServerSettings.find({});
-      const previousFilament = JSON.parse(JSON.stringify(printer.selectedFilament));
-      if (serverSettings[0]?.filamentManager) {
-        printer.selectedFilament = await HistoryCollection.resyncFilament(printer);
-        logger.info("Grabbed latest filament values", printer.filamentSelection);
-      }
-      let name = null;
-      if (typeof printer.settingsAppearance !== "undefined") {
-        if (printer.settingsAppearance.name === "" || printer.settingsAppearance.name === null) {
-          name = printer.printerURL;
-        } else {
-          name = printer.settingsAppearance.name;
-        }
-      } else {
-        name = printer.printerURL;
-      }
-      logger.info("Failed Print triggered ", payload + printer.printerURL);
-      const today = new Date();
-      const historyCollection = await History.find({});
+  static generateStartEndDates(payload) {
+    const today = new Date();
+    const printTime = new Date(payload.time * 1000);
+    let startDate = today.getTime() - printTime.getTime();
+    startDate = new Date(startDate);
 
-      const printTime = new Date(payload.time * 1000);
-      let startDate = today.getTime() - printTime.getTime();
-      startDate = new Date(startDate);
+    const endDate = new Date();
+    return { startDate, endDate };
+  }
 
-      const endDate = new Date();
-      const profiles = await filamentProfiles.find({});
-
-      const selectedFilament = null;
-      if (printer.selectedFilament !== null && Array.isArray(printer.selectedFilament)) {
-        let profileId = [];
-        printer.selectedFilament.forEach((spool, index) => {
-          if (spool !== null) {
-            if (serverSettings[0]?.filamentManager) {
-              profileId = _.findIndex(profiles, function (o) {
-                return o.profile.index == printer.selectedFilament[index].spools.profile;
-              });
-            } else {
-              profileId = _.findIndex(profiles, function (o) {
-                return o._id == printer.selectedFilament[index].spools.profile;
-              });
-            }
-            printer.selectedFilament[index].spools.profile = profiles[profileId].profile;
+  static async populateFilamentProfile(selectedFilament) {
+    const serverSettingsCache = SettingsClean.returnSystemSettings();
+    const profiles = await filamentProfiles.find({});
+    if (selectedFilament !== null && Array.isArray(selectedFilament)) {
+      let profileId = [];
+      selectedFilament.forEach((spool, index) => {
+        if (spool !== null) {
+          if (serverSettingsCache.filamentManager) {
+            profileId = _.findIndex(profiles, function (o) {
+              return o.profile.index == selectedFilament[index].spools.profile;
+            });
+          } else {
+            profileId = _.findIndex(profiles, function (o) {
+              return o._id == selectedFilament[index].spools.profile;
+            });
           }
+          selectedFilament[index].spools.profile = profiles[profileId].profile;
+        }
+      });
+    }
+    return selectedFilament;
+  }
+  // repeated... could have imported I suppose...
+  static generateWeightOfJobForASpool(length, filament, completionRatio) {
+    if (!length) {
+      return length === 0 ? 0 : length;
+    }
+
+    let density = DEFAULT_SPOOL_DENSITY;
+    let radius = DEFAULT_SPOOL_RATIO;
+    if (!!filament?.spools?.profile) {
+      radius = parseFloat(filament.spools.profile.diameter) / 2;
+      density = parseFloat(filament.spools.profile.density);
+    }
+
+    const volume = length * Math.PI * radius * radius; // Repeated 4x across server
+    return (completionRatio * volume * density).toFixed(2);
+  }
+  static async downDateWeight(payload, job, filament, success) {
+    let printTime = 0;
+    if (job?.lastPrintTime) {
+      // Last print time available, use this as it's more accurate
+      printTime = job.lastPrintTime;
+    } else {
+      printTime = job.estimatedPrintTime;
+    }
+
+    let printPercentage = 0;
+
+    if (!success) {
+      printPercentage = (payload.time / printTime) * 100;
+    }
+
+    let completionRatio = success ? 1.0 : printPercentage / 100;
+
+    for (let s = 0; s < filament.length; s++) {
+      const currentSpool = filament[s];
+      if (job?.filament["tool" + s]?.length) {
+        const currentGram = this.generateWeightOfJobForASpool(
+          job.filament["tool" + s].length / 1000,
+          currentSpool,
+          completionRatio
+        );
+        await Spool.findById(currentSpool._id).then((spool) => {
+          const currentUsed = parseFloat(spool.spools.used);
+          spool.spools.used = (currentUsed + parseFloat(currentGram)).toFixed(2);
+          spool.markModified("spools.used");
+          spool.save();
         });
       }
-      if (historyCollection.length === 0) {
-        counter = 0;
-      } else {
-        counter = historyCollection[historyCollection.length - 1].printHistory.historyIndex + 1;
+    }
+  }
+
+  static async capturePrint(payload, printer, job, files, resends, state) {
+    logger.info("Completed Print triggered", printer.printerURL);
+    try {
+      // Initial Data Preperation...
+      const serverSettingsCache = SettingsClean.returnSystemSettings();
+
+      const { startDate, endDate } = this.generateStartEndDates(payload);
+
+      // populate the filament profile
+      let currentSelectedFilament = await this.populateFilamentProfile(printer.selectedFilament);
+
+      // Need to actually use this one day... think it got superseded and isn't required anymore
+      const previousFilament = _.cloneDeep(currentSelectedFilament);
+      let currentFilament = _.cloneDeep(currentSelectedFilament);
+
+      //If we're using the filament manager plugin... we need to grab the latest spool values to be saved from it.
+      if (serverSettingsCache.filamentManager && Array.isArray(currentFilament)) {
+        currentFilament = await HistoryCollection.resyncFilament(printer);
+        logger.info("Grabbed latest filament values", currentFilament);
+      }
+
+      //If we're not using filament manager plugin... we need to check if the user has enabled automated spool updating.
+      if (
+        !serverSettingsCache.filamentManager &&
+        (serverSettingsCache.filament.downDateFailed ||
+          serverSettingsCache.filament.downDateSuccess)
+      ) {
+        if (!state && serverSettingsCache.filament.downDateFailed) {
+          // No point even trying to down date failed without these...
+          if (!job?.estimatedPrintTime && !job?.lastPrintTime) {
+            return;
+          }
+          // Capture failed amount
+          await this.downDateWeight(payload, job, currentFilament, state);
+        }
+        if (state && serverSettingsCache.filament.downDateSuccess) {
+          // Capture success amount
+          await this.downDateWeight(payload, job, currentFilament, state);
+        }
       }
 
       const printHistory = {
-        historyIndex: counter,
-        printerIndex: printer.index,
-        costSettings: printer.costSettings,
+        printerName: this.getPrinterName(printer),
         printerID: printer._id,
-        printerName: name,
-        success: false,
-        reason: payload.reason,
+        printerGroup: printer.group,
+        costSettings: printer.costSettings,
+        success: state,
+        reason: payload?.reason,
         fileName: payload.name,
         filePath: payload.path,
         startDate,
         endDate,
-        thumbnail: "",
         printTime: Math.round(payload.time),
-        filamentSelection: printer.selectedFilament,
+        filamentSelection: currentFilament,
         previousFilamentSelection: previousFilament,
         job,
         notes: "",
         snapshot: "",
         timelapse: "",
+        thumbnail: "",
         resends: resends
       };
+      // Update influx if it's active
+      if (serverSettingsCache.influxExport.active) {
+        await HistoryCollection.updateFilamentInfluxDB(
+          printer.selectedFilament,
+          printHistory,
+          currentFilament,
+          printer
+        );
+      }
+      // Create our history object
       const saveHistory = new History({
         printHistory
       });
-
-      HistoryCollection.updateFilamentInfluxDB(
-        printer.selectedFilament,
-        printHistory,
-        previousFilament,
-        printer
-      );
-
-      await saveHistory.save().then(async (r) => {
-        const thumbnail = await HistoryCollection.thumbnailCheck(
+      // Capture thumbnails if enabled
+      if (serverSettingsCache.history.thumbnails.onComplete && state) {
+        saveHistory.printHistory.thumbnail = await HistoryCollection.thumbnailCheck(
           payload,
-          serverSettings[0],
           files,
           saveHistory._id,
-          "onFailure",
           printer
         );
-        let snapshot = "";
-        if (printer.camURL !== "") {
-          snapshot = await HistoryCollection.snapshotCheck(
-            "onFailure",
-            serverSettings[0],
-            printer,
-            saveHistory,
-            payload
-          );
-        }
-        if (serverSettings[0]?.history?.timelapse?.onFailure) {
-          HistoryCollection.timelapseCheck(
-            printer,
-            payload.name,
-            payload.time,
-            serverSettings[0],
-            saveHistory._id
-          );
-        }
+      }
+      if (serverSettingsCache.history.thumbnails.onFailure && !state) {
+        saveHistory.printHistory.thumbnail = await HistoryCollection.thumbnailCheck(
+          payload,
+          files,
+          saveHistory._id,
+          printer
+        );
+      }
 
-        saveHistory.printHistory.thumbnail = thumbnail;
-        saveHistory.printHistory.snapshot = snapshot;
-        saveHistory.markModified("printHistory");
-        printer.fileName = payload.display;
-        printer.filePath = payload.path;
-        ScriptRunner.check(printer, "failed", saveHistory._id);
-        await saveHistory.save();
+      if (serverSettingsCache.history.snapshot.onComplete && state) {
+        saveHistory.printHistory.snapshot = await HistoryCollection.snapshotCheck(
+          printer,
+          saveHistory._id,
+          payload
+        );
+      }
+      if (serverSettingsCache.history.snapshot.onFailure && !state) {
+        saveHistory.printHistory.snapshot = await HistoryCollection.snapshotCheck(
+          printer,
+          saveHistory._id,
+          payload
+        );
+      }
 
+      if (serverSettingsCache.history.timelapse.onComplete && state) {
+        await HistoryCollection.timelapseCheck(
+          printer,
+          payload.name,
+          payload.time,
+          saveHistory._id
+        );
+      }
+      if (serverSettingsCache.history.timelapse.onFailure && !state) {
+        await HistoryCollection.timelapseCheck(
+          printer,
+          payload.name,
+          payload.time,
+          saveHistory._id
+        );
+      }
+      printer.fileName = payload.display;
+      printer.filePath = payload.path;
+      if (!state) {
+        await ScriptRunner.check(printer, "failed", saveHistory._id);
+      } else {
+        await ScriptRunner.check(printer, "done", saveHistory._id);
+      }
+
+      console.log(saveHistory);
+      saveHistory.markModified("printHistory");
+      await saveHistory.save();
+      // Update cache after save
+      await getHistoryCache().initCache();
+      setTimeout(async function () {
+        // Re-D
         await getHistoryCache().initCache();
-        setTimeout(async function () {
-          await getHistoryCache().initCache();
-          HistoryCollection.updateInfluxDB(saveHistory._id, "history", printer);
-        }, 5000);
-      });
-
-      logger.info("Failed Print captured ", payload + printer.printerURL);
+        if (serverSettingsCache.influxExport.active) {
+          await HistoryCollection.updateInfluxDB(saveHistory._id, "history", printer);
+        }
+      }, 5000);
     } catch (e) {
-      logger.error(e, `Failed to capture history for ${printer.printerURL}`);
+      logger.error("Unable to save history record!", e);
     }
   }
 
@@ -807,25 +781,6 @@ class HistoryCollection {
     } catch (e) {
       logger.error(e, `Failed to capture ErrorLog for ${printer.printerURL}`);
     }
-  }
-
-  // TODO, Da fuck is this...
-  static history() {
-    const printHistory = {
-      printerIndex: 0,
-      printerName: "",
-      success: true,
-      fileName: "",
-      filePath: "",
-      startDate: "",
-      endDate: "",
-      printTime: "",
-      spoolUsed: "",
-      filamentLength: 0,
-      filamentVolume: 0,
-      notes: ""
-    };
-    return printHistory;
   }
 
   static get(ip, port, apikey, item) {

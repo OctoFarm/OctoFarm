@@ -100,6 +100,7 @@ All notable changes to this project will be documented in this file.
   - Cut down the history table view. Now only shows State/Printer Name/File Name/ Start/ Duration/End/ Cost/Hourly Cost. All other info is inspectable in the "view" button.
   - Refreshed the History page Layout. Now has headers that show Monthly Totals, Statistics modal, Monthly Statistics Modal, Pagination, Sorting, Range and Filters.
   - Printer Manager "Re-Sync" button renamed to "Re-Connect" to differentiate it from the file manager action. 
+  - Improved filament usage estimates, if a jobs previous print time exists it will utilise that over the estimated value from OctoPrint which is often wildly inaccurate.
 
 ### Removed
 

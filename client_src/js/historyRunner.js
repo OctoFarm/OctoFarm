@@ -9,7 +9,7 @@ import {
   returnHistoryTableRow,
   returnHistoryFilterDefaultSelected
 } from "./pages/history/history.templates";
-import { getFirstDayOfLastMonth } from "./utils/date.utils";
+import { daysBetweenTwoDates, getFirstDayOfLastMonth } from "./utils/date.utils";
 import Litepicker from "litepicker";
 import { dashboardOptions } from "./dashboard/dashboard.options";
 
@@ -166,14 +166,46 @@ class History {
 
     if (!this?.listenersApplied) {
       this.datePicker.on("selected", async (date1, date2) => {
-        const datesElements = document.querySelectorAll('[id^="dateRange-"]');
-        datesElements.forEach((element) => {
-          element.innerHTML =
-            new Date(date1.dateInstance).toLocaleDateString() +
-            " <-> " +
-            new Date(date2.dateInstance).toLocaleDateString();
-        });
-        await this.get(undefined, true);
+        const daysBetweenDates = daysBetweenTwoDates(
+          new Date(date1.dateInstance),
+          new Date(date2.dateInstance)
+        );
+        if (daysBetweenDates > 50) {
+          bootbox.confirm({
+            message: `You are trying to load ${daysBetweenDates} of your records, this could be very slow! are you sure?`,
+            buttons: {
+              confirm: {
+                label: "Yes",
+                className: "btn-success"
+              },
+              cancel: {
+                label: "No",
+                className: "btn-danger"
+              }
+            },
+            callback: async (result) => {
+              if (result) {
+                const datesElements = document.querySelectorAll('[id^="dateRange-"]');
+                datesElements.forEach((element) => {
+                  element.innerHTML =
+                    new Date(date1.dateInstance).toLocaleDateString() +
+                    " <-> " +
+                    new Date(date2.dateInstance).toLocaleDateString();
+                });
+                await this.get(undefined, true);
+              }
+            }
+          });
+        } else {
+          const datesElements = document.querySelectorAll('[id^="dateRange-"]');
+          datesElements.forEach((element) => {
+            element.innerHTML =
+              new Date(date1.dateInstance).toLocaleDateString() +
+              " <-> " +
+              new Date(date2.dateInstance).toLocaleDateString();
+          });
+          await this.get(undefined, true);
+        }
       });
       ELEMENTS.sort.addEventListener("change", async () => {
         await this.get();

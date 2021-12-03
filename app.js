@@ -45,8 +45,6 @@ if (!!majorVersion && majorVersion < 14) {
     .connect(fetchMongoDBConnectionString(), {
       useNewUrlParser: true,
       useUnifiedTopology: true,
-      useFindAndModify: false,
-      useCreateIndex: true,
       serverSelectionTimeoutMS: 2500
     })
     .then(async (mg) => {

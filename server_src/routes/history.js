@@ -11,7 +11,6 @@ const ServerSettings = require("../models/ServerSettings.js");
 const { getHistoryCache } = require("../cache/history.cache");
 const { PrinterClean } = require("../lib/dataFunctions/printerClean.js");
 const { sortOptions } = require("../constants/history-sort.constants");
-const { getFirstDayOfLastMonth } = require("../utils/date.utils");
 
 router.post("/update", ensureAuthenticated, async (req, res) => {
   // Check required fields

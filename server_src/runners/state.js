@@ -22,6 +22,7 @@ const { FileClean } = require("../lib/dataFunctions/fileClean.js");
 const { PrinterTicker } = require("./printerTicker.js");
 const { SystemRunner } = require("./systemInfo");
 const { OP_PLUGIN_DISPLAY_LAYER } = require("../constants/regex.constants");
+const { clonePayloadDataForHistory } = require("../utils/mapping.utils");
 
 const logger = new Logger("OctoFarm-State");
 let farmPrinters = [];
@@ -366,7 +367,7 @@ WebSocketClient.prototype.throttle = function (data) {
 };
 WebSocketClient.prototype.send = function (data, option) {
   try {
-    this.instance.send(data, option).then((res) => console.log(res));
+    this.instance.send(data, option);
   } catch (e) {
     this.instance.emit("error", e);
   }
@@ -680,25 +681,25 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
 
       if (data.event.type === "PrintPaused") {
         const that = this;
-        ScriptRunner.check(farmPrinters[that.index], "paused");
+        await ScriptRunner.check(farmPrinters[that.index], "paused");
       }
       if (data.event.type === "PrintFailed") {
+        // Make a capture of the current required printer data..
+        const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
+          data.event.payload,
+          farmPrinters[this.index]
+        );
         const that = this;
         setTimeout(async function () {
-          logger.info(`${data.event.type + that.index}: ${that.url}`);
-          let sendPrinter = {};
-          sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
-          let job = {};
-          job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
-          let files = {};
-          files = JSON.parse(JSON.stringify(farmPrinters[that.index].fileList.files));
-          let resendStats = null;
-          if (typeof farmPrinters[that.index].resends !== "undefined") {
-            resendStats = JSON.parse(JSON.stringify(farmPrinters[that.index].resends));
-          }
-
           // Register cancelled print...
-          await HistoryCollection.failed(data.event.payload, sendPrinter, job, files, resendStats);
+          await HistoryCollection.capturePrint(
+            payloadData,
+            printer,
+            job,
+            files,
+            resendStats,
+            false
+          );
           await Runner.updateFilament();
           setTimeout(async function () {
             await Runner.reSyncFile(
@@ -709,28 +710,14 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         }, 10000);
       }
       if (data.event.type === "PrintDone") {
+        const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
+          data.event.payload,
+          farmPrinters[this.index]
+        );
         const that = this;
         setTimeout(async function () {
-          logger.info(`${data.event.type + that.index}: ${that.url}`);
-          let sendPrinter = {};
-          sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
-          let job = {};
-          job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
-          let files = {};
-          files = JSON.parse(JSON.stringify(farmPrinters[that.index].fileList.files));
-          let resendStats = null;
-          if (typeof farmPrinters[that.index].resends !== "undefined") {
-            resendStats = JSON.parse(JSON.stringify(farmPrinters[that.index].resends));
-          }
           // Register cancelled print...
-
-          await HistoryCollection.complete(
-            data.event.payload,
-            sendPrinter,
-            job,
-            files,
-            resendStats
-          );
+          await HistoryCollection.capturePrint(payloadData, printer, job, files, resendStats, true);
           await Runner.updateFilament();
           setTimeout(async function () {
             await Runner.reSyncFile(
@@ -741,19 +728,14 @@ WebSocketClient.prototype.onmessage = async function (data, flags, number) {
         }, 10000);
       }
       if (data.event.type === "Error") {
+        const { payloadData, printer, job, files, resendStats } = clonePayloadDataForHistory(
+          data.event.payload,
+          farmPrinters[this.index]
+        );
         const that = this;
         setTimeout(async function () {
-          logger.info(`${data.event.type + that.index}: ${that.url}`);
-          let sendPrinter = {};
-          sendPrinter = JSON.parse(JSON.stringify(farmPrinters[that.index]));
-          let job = {};
-          let files = {};
-          files = JSON.parse(JSON.stringify(farmPrinters[that.index].fileList.files));
-          if (farmPrinters[that.index].job) {
-            job = JSON.parse(JSON.stringify(farmPrinters[that.index].job));
-          }
           // Register cancelled print...
-          await HistoryCollection.errorLog(data.event.payload, sendPrinter, job, files);
+          await HistoryCollection.errorLog(payloadData, printer, job, files, resendStats);
           await Runner.updateFilament();
           setTimeout(async function () {
             if (!_.isEmpty(job)) {

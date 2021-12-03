@@ -1,3 +1,5 @@
+const _ = require("lodash");
+
 function mapProgressToColor(progress) {
   progress = parseInt(progress);
   if (progress === 0) {
@@ -40,7 +42,18 @@ function checkTempRange(state, target, actual, heatingVariation, coolDown) {
   return "tempOffline";
 }
 
+const clonePayloadDataForHistory = function (payload, farmPrinter) {
+  const payloadData = _.cloneDeep(payload);
+  const printer = _.cloneDeep(farmPrinter);
+  const job = _.cloneDeep(farmPrinter.job);
+  const files = _.cloneDeep(farmPrinter.fileList.files);
+  const resendStats = _.cloneDeep(farmPrinter.resends);
+
+  return { payloadData, printer, job, files, resendStats };
+};
+
 module.exports = {
   mapProgressToColor,
-  checkTempRange
+  checkTempRange,
+  clonePayloadDataForHistory
 };

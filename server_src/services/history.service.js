@@ -52,7 +52,6 @@ const defaultHistoryObject = {
 async function find(input = defaultInputFilters, options = defaultPaginationOptions) {
   //Merge in the custom labels used
   options = { ...options, ...{ customLabels: myCustomLabels } };
-  console.log(input);
   return historyModel.paginate(input, options, function (err, result) {
     return { itemList: result.docs, pagination: result.paginator };
   });
