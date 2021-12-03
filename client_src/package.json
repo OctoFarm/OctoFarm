@@ -35,7 +35,7 @@
     "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.16.4",
     "@fnando/sparkline": "^0.3.10",
-    "apexcharts": "^3.31.0",
+    "apexcharts": "^3.24.0",
     "axios": "^0.24.0",
     "babel-jest": "^27.4.2",
     "before-build-webpack": "^0.2.12",

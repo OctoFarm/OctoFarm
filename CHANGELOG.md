@@ -34,12 +34,15 @@ All notable changes to this project will be documented in this file.
   - You can now see UserLoggedIn/UserLoggedOut/ClientAuthed/ClientClosed events for OctoPrints websocket and user interface in the Printer Managers connections log.
   - New columns setting for the Group Views, added in System -> Client -> Views. 
   - Added Another new view named "Group". Group view will organise your printers by their common groupings. This view is great for fire and forget type farms.
-  - Added a quick setup button for Filament Manager Plugin. This will run through all online instances and set the up with the database settings you provide.
+  - Added a quick setup button for Filament Manager Plugin in System. This will run through all online instances and set the up with the database settings you provide.
   - Filament manager can now clone spools. Pressing the button will insert a new row defaulting to 1000g and 0g usage. The name will be incremented with (#).
   - System manager can now view the running OctoFarm tasks.
   - History now has server side pagination, should reduce resources some and make the history page load snappier. 
   - Any history data requests are now filtered starting from the first day of the last month. You should see at least 1 months worth of data( when available ) as well as any from the current month.
-
+  - Filament Manager has some new settings in System -> Server -> Filament Manager:
+    - Hide Empty Spools: If enabled this will hide empty spools from the spool selection dropdowns and also the main printer list. They are still visible in the Spool Manager. (with or without OP Filament Manager Plugin).
+    - Downdate successful usage: If enabled history will attempt to take the OctoPrints gram calculation and add it to the amount used on the currently selected spool.  (only without OP Filament Manager Plugin).
+    - Downdate failed/cancelled usage: If enabled history will calculate the percentage through a print and using OctoPrints gram calculation add it to the amount used of the currently selected spool. (only without OP Filament manager Plugin).
 
 ### Changed
   - Completely reworked history cache, prepared and tested for OctoFarm V2
@@ -101,6 +104,7 @@ All notable changes to this project will be documented in this file.
   - Refreshed the History page Layout. Now has headers that show Monthly Totals, Statistics modal, Monthly Statistics Modal, Pagination, Sorting, Range and Filters.
   - Printer Manager "Re-Sync" button renamed to "Re-Connect" to differentiate it from the file manager action. 
   - Improved filament usage estimates, if a jobs previous print time exists it will utilise that over the estimated value from OctoPrint which is often wildly inaccurate.
+  - Completely reworked the history UI. 
 
 ### Removed
 
@@ -162,6 +166,8 @@ All notable changes to this project will be documented in this file.
   - Fixed history chart colours for Failed and Cancelled been mixed up.
   - Fixed OctoFarm sending tool/printhead commands when cancelling a print.
   - Decoupled the historyByDay stats so they generate if you don't use spools/filament mananger at all.
+  - Fixed history trying to capture timelapse, thumbnails and influxdb without been enabled...
+  - Fixed history not registering spools when cancelled in some situations. 
 
 # Security
   - Protected all system CRUD endpoints by ensuring user is Administrator.

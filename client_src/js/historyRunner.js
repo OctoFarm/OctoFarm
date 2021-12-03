@@ -30,6 +30,8 @@ $("#historyModal").on("hidden.bs.modal", function (e) {
   document.getElementById("historyUpdateCostBtn").remove();
 });
 
+$("#currentStatistics").on("hidden.bs.modal", function (e) {});
+
 class History {
   static historyList;
   static historyGraph;
@@ -42,6 +44,7 @@ class History {
   static cancelledSpark;
   static failedSpark;
   static listenersApplied;
+  static statistics;
 
   static loadNoData() {
     ELEMENTS.historyTable.innerHTML = `<tr><td>NO DATA</td></tr>`;
@@ -379,6 +382,7 @@ class History {
         return parseFloat(currentRate.toFixed(0));
       }
     });
+
     const historyGraphOptions = {
       chart: {
         type: "bar",
@@ -423,7 +427,16 @@ class History {
       noData: {
         text: "Loading..."
       },
-      series: [],
+      series: [
+        {
+          name: "Success Percent",
+          data: successRateList
+        },
+        {
+          name: "Failed Percent",
+          data: failureRateList
+        }
+      ],
       yaxis: [
         {
           title: {
